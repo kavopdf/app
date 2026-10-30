@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- same K as the launcher icon: spine, then the two arms -->
+    <path
+        android:pathData="M36.7,34.2 L36.7,73.9"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="8.95"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M44.9,54 L70.2,29.3 M44.9,54 L70.2,78.7"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="11.1"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
