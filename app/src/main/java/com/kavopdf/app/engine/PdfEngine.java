@@ -1394,9 +1394,57 @@ public final class PdfEngine {
                              new PDPageContentStream(d, page, AppendMode.APPEND, true, true)) {
                     cs.setRenderingMode(com.tom_roush.pdfbox.pdmodel.graphics.state.RenderingMode.NEITHER);
                     cs.beginText();
-                    for (OcrWord word : pt.words) {
-                        String txt = winAnsi(word.text);
-                        if (txt == null || txt.trim().isEmpty()) continue;
+                    // One font size for a whole line, taken from its median word. Sizing each
+                    // word separately made a line's words sit at different heights, so a
+                    // selection dragged across the line looked ragged even though every word
+                    // was in the right place.
+                    Map<Integer, Float> lineSize = new HashMap<>();
+                    Map<Integer, List<Float>> lineSizes = new HashMap<>();
+                    // Group words into lines by their vertical centre - no extra field on
+                    // OcrWord, so nothing else has to change.
+                    List<Float> centres = new ArrayList<>();
+                    for (OcrWord cw : pt.words) centres.add(cw.y + cw.h / 2f);
+                    java.util.Collections.sort(centres);
+                    float lineGap = 0f;
+                    if (centres.size() > 1) {
+                        float span = centres.get(centres.size() - 1) - centres.get(0);
+                        lineGap = Math.max(2f, span / Math.max(1, centres.size() - 1) * 1.5f);
+                    }
+                    Map<Integer, Integer> lineOf = new HashMap<>();
+                    for (int i = 0; i < pt.words.size(); i++) {
+                        OcrWord lw = pt.words.get(i);
+                        // words whose centre falls in the same band share a line
+                        lineOf.put(i, Math.round((lw.y + lw.h / 2f) / Math.max(lineGap, 1f)));
+                    }
+                    for (int i = 0; i < pt.words.size(); i++) {
+                        OcrWord mw = pt.words.get(i);
+                        int line = lineOf.get(i);
+                        if (mw.w <= 0 || pt.imgW <= 0) continue;
+                        float tw = mw.w / pt.imgW * dw;
+                        String enc = ocrEncodable(mw.text);
+                        if (enc.isEmpty()) continue;
+                        float em = PDType1Font.HELVETICA.getStringWidth(enc) / 1000f;
+                        if (em <= 0.02f) continue;
+                        float sz = tw / em;
+                        float bh = (mw.h / pt.imgH * dh) * FONT_HEIGHT_FRACTION;
+                        sz = Math.max(bh * 0.5f, Math.min(bh * 1.6f, sz));
+                        List<Float> l = lineSizes.get(line);
+                        if (l == null) { l = new ArrayList<>(); lineSizes.put(line, l); }
+                        l.add(sz);
+                    }
+                    for (Map.Entry<Integer, List<Float>> e : lineSizes.entrySet()) {
+                        List<Float> l = e.getValue();
+                        java.util.Collections.sort(l);
+                        lineSize.put(e.getKey(), l.get(l.size() / 2));
+                    }
+                    for (int wi = 0; wi < pt.words.size(); wi++) {
+                        OcrWord word = pt.words.get(wi);
+                        // Characters Helvetica cannot encode (Hindi, rupee sign, em dash)
+                        // used to be written as "?" - which put a fake word in the search
+                        // index. Such a word is now skipped instead: no junk, and the words
+                        // that can be encoded are still there.
+                        String txt = ocrEncodable(word.text);
+                        if (txt.isEmpty()) continue;
                         float xd = word.x / pt.imgW * dw;
                         float yd = (word.y + word.h * BASELINE_FRACTION) / pt.imgH * dh;
                         float hd = word.h / pt.imgH * dh;
@@ -1414,6 +1462,8 @@ public final class PdfEngine {
                             size = byHeight;
                         }
                         size = Math.max(1f, size);
+                        Float lineSized = lineSize.get(lineOf.get(wi));
+                        if (lineSized != null && lineSized > 0.5f) size = lineSized;
                         // displayed point -> page point (same mapping the cropper uses)
                         float px, py;
                         switch (r) {
@@ -2752,6 +2802,30 @@ public final class PdfEngine {
     }
 
     /** Restrict a string to characters the standard-14 fonts can encode (WinAnsi-ish). */
+    /**
+     * Text for the invisible OCR layer, or "" when the font cannot represent it.
+     * Latin-1 is kept (including accents), anything else is dropped rather than turned
+     * into "?" so the search index never gains a word that was not on the page.
+     */
+    static String ocrEncodable(String s) {
+        if (s == null) return "";
+        StringBuilder b = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\n' || c == '\r' || c == '\t') b.append(' ');
+            else if (c >= 32 && c <= 126) b.append(c);
+            else if (c >= 160 && c <= 255) b.append(c);
+            // everything else is intentionally skipped
+        }
+        String out = b.toString().trim();
+        // a run that lost all its letters (e.g. a Devanagari word) is not useful
+        boolean hasLetter = false;
+        for (int i = 0; i < out.length(); i++) {
+            if (Character.isLetterOrDigit(out.charAt(i))) { hasLetter = true; break; }
+        }
+        return hasLetter ? out : "";
+    }
+
     static String winAnsi(String s) {
         if (s == null) return "";
         StringBuilder b = new StringBuilder(s.length());
