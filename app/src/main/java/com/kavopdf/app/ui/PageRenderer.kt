@@ -82,6 +82,15 @@ class PageRenderer(private val renderer: PdfRenderer) {
         @Volatile private var config: Bitmap.Config = Bitmap.Config.ARGB_8888
 
         /**
+         * How much memory the reader's page cache may hold. A fixed number was backwards:
+         * 72 MB is a fifth of the heap on a 2 GB phone and a seventh on a flagship, so the
+         * cheap device was the one at risk. It is now a sixth of whatever this device
+         * grants the app, so a flagship keeps more pages ready and a budget phone keeps
+         * fewer.
+         */
+        @Volatile private var cacheBudget: Int = 48 * 1024 * 1024
+
+        /**
          * Called once at start-up. A low-RAM device gets a smaller page budget and a
          * 2-byte-per-pixel format, which halves memory; a normal phone keeps full colour.
          */
@@ -96,6 +105,8 @@ class PageRenderer(private val renderer: PdfRenderer) {
                 config = if (lowRam || mb <= 192L) Bitmap.Config.RGB_565 else Bitmap.Config.ARGB_8888
                 val bytesPerPixel = if (config == Bitmap.Config.RGB_565) 2L else 4L
                 maxPixels = (budgetBytes / bytesPerPixel).coerceIn(400_000L, 16_000_000L)
+                cacheBudget = (mb * 1024L * 1024L / 6L)
+                        .coerceIn(24L * 1024 * 1024, 192L * 1024 * 1024).toInt()
             } catch (_: Throwable) {
                 // keep the conservative defaults
             }
@@ -121,6 +132,9 @@ class PageRenderer(private val renderer: PdfRenderer) {
 
         /** For tests: what the current budget works out to. */
         fun budgetPixels(): Long = maxPixels
+
+        /** Memory the reader's page cache may use on this device. */
+        fun cacheBytes(): Int = cacheBudget
 
         /**
          * The system told us it is short of memory. Halve the page budget so the next

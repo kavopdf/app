@@ -94,6 +94,10 @@ class ViewerActivity : PdfActivity() {
                 onTap = { position, fx, fy -> onPageTap(position, fx, fy) }
             )
             this.adapter = adapter
+            // Render the page either side before the user swipes to it. Without this a
+            // swipe always landed on an empty frame while the page was being drawn, which
+            // is the one place the reader felt slow on every device.
+            binding.pager.offscreenPageLimit = 1
             binding.pager.adapter = adapter
             binding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {

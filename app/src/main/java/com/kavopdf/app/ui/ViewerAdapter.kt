@@ -34,7 +34,7 @@ class ViewerAdapter(
     /** Which rotation each cached bitmap was rendered at. */
     private val cacheRotation = HashMap<Int, Int>()
 
-    private val cache = object : LruCache<Int, Bitmap>(MAX_CACHE_BYTES) {
+    private val cache = object : LruCache<Int, Bitmap>(PageRenderer.cacheBytes()) {
         override fun sizeOf(key: Int, value: Bitmap) = value.byteCount
     }
     private val renderedWidth = HashMap<Int, Int>()
@@ -177,10 +177,6 @@ class ViewerAdapter(
             }
             onReady(bmp)
         }
-    }
-
-    private companion object {
-        const val MAX_CACHE_BYTES = 72 * 1024 * 1024
     }
 
 }
