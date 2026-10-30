@@ -22,7 +22,7 @@ javac -d out $(find stubs -name '*.java')
 CP="out:libs/aar/classes.jar:libs/aar/assets:libs/bcprov.jar:libs/bcpkix.jar:libs/bcutil.jar"
 
 echo "== compiling the real engine + tests =="
-javac -cp "$CP" -d out $(find ../../app/src/main/java -name '*.java') TestEngine.java TestEncrypt.java TestBookmarks.java TestReport.java TestFonts.java TestNorms.java TestFallback.java TestOrder.java
+javac -cp "$CP" -d out $(find ../../app/src/main/java -name '*.java') TestEngine.java TestEncrypt.java TestBookmarks.java TestReport.java TestFonts.java TestNorms.java TestFallback.java TestOrder.java TestFlatten.java
 
 echo "== running engine verification =="
 java -cp "$CP" TestEngine
@@ -99,6 +99,11 @@ java -cp "$CP" TestFallback
 echo
 echo "== every field knows its page (from its widget, not from its name) =="
 java -cp "$CP" TestOrder
+
+echo
+echo "== a filled value must be in the PAGE CONTENT, because Android's PdfRenderer =="
+echo "== ignores annotations - that is why the app's own reader showed an empty form =="
+java -cp "$CP" TestFlatten
 
 echo
 echo "== the detector's own rules (no false positives, no missed regressions) =="

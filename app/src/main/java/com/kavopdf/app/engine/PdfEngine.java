@@ -1137,14 +1137,12 @@ public final class PdfEngine {
             java.util.List<PDAnnotationWidget> ws = f.getWidgets();
             if (ws == null || ws.isEmpty()) return;
             PDAnnotationWidget w = ws.get(0);
-            PDAppearanceDictionary ap = w.getAppearance();
-            if (ap != null && ap.getNormalAppearance() != null) {
-                PDAppearanceStream as = ap.getNormalAppearance().getAppearanceStream();
-                if (as != null) {
-                    String drawn = new String(as.getStream().toByteArray(), "ISO-8859-1");
-                    if (drawn.contains(v)) return;          // already visible, leave it
-                }
-            }
+            // Android's own PdfRenderer - which this app reads PDFs with - draws page
+            // CONTENT only and ignores annotations entirely. A form value normally lives
+            // in an annotation appearance, so a filled form looked empty in KavoPDF while
+            // Google Drive showed it. The value is therefore always drawn onto the page,
+            // and the annotation appearance is dropped so a viewer that does draw
+            // annotations does not show the same text twice.
             Integer pi = pageOf.get(w.getCOSObject());
             PDRectangle r = boxOf.get(w.getCOSObject());
             if (pi == null || r == null) return;
@@ -1171,6 +1169,11 @@ public final class PdfEngine {
                 cs.newLineAtOffset(x, y);
                 cs.showText(v);
                 cs.endText();
+            }
+            // the value now lives on the page, so the annotation must stop drawing it
+            try {
+                w.setAppearance(null);
+            } catch (Throwable ignored) {
             }
         } catch (Throwable ignored) {
             // one awkward field must not stop the rest
