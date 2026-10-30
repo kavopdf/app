@@ -51,10 +51,13 @@ class PageRenderer(private val renderer: PdfRenderer) {
                     page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     return rotate(bmp, w, h, rotation)
                 } catch (oom: OutOfMemoryError) {
-                    // cheaper phone, or another screen holding memory: go smaller
-                    if (attempt >= 3 || w <= MIN_SIDE) throw oom
+                    // The device refused this allocation. Go smaller and remember it, so
+                    // the next page starts where this one succeeded instead of failing
+                    // the same way again.
+                    if (attempt >= 5 || w <= MIN_SIDE) throw oom
                     attempt++
                     w /= 2
+                    maxPixels = (w.toLong() * (w * ratio).toLong()).coerceAtLeast(FLOOR_PIXELS)
                 }
             }
         } finally {
@@ -81,8 +84,17 @@ class PageRenderer(private val renderer: PdfRenderer) {
         private const val MAX_SIDE = 4000
         private const val MIN_SIDE = 240
 
-        /** Pixels allowed per page, decided once per process. */
-        @Volatile private var maxPixels: Long = 4_000_000L
+        /**
+         * Pixels allowed per page. This is the full-quality ceiling, the same on a 2 GB
+         * phone and a 12 GB flagship: 16M pixels is a 2800 px wide A4 page, which covers
+         * the reader at maximum zoom and OCR at its render width. Memory safety does not
+         * come from shrinking this - it comes from render() retrying smaller when the
+         * device actually refuses the allocation, and from remembering that size.
+         */
+        @Volatile private var maxPixels: Long = 16_000_000L
+
+        /** Never go below this: about a 530 px wide page, still legible as a last resort. */
+        private const val FLOOR_PIXELS = 900_000L
 
         /**
          * How much memory the reader's page cache may hold. A fixed number was backwards:
@@ -102,13 +114,10 @@ class PageRenderer(private val renderer: PdfRenderer) {
             try {
                 val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                 val mb = am.memoryClass.toLong()          // heap this app may use, in MB
-                val lowRam = am.isLowRamDevice
-                // Always 4 bytes per pixel: that is the only format PdfRenderer draws to.
-                // A low-RAM device gets fewer pixels instead of a cheaper format.
-                val bytesPerPixel = 4L
-                val share = if (lowRam || mb <= 192L) 6L else 4L
-                maxPixels = ((mb * 1024L * 1024L / share) / bytesPerPixel)
-                        .coerceIn(400_000L, 16_000_000L)
+                // The page budget stays at full quality on every device. A cheaper phone
+                // is not given a blurrier page; it is given fewer cached pages instead,
+                // and render() falls back only if the allocator actually says no.
+                maxPixels = 16_000_000L
                 cacheBudget = (mb * 1024L * 1024L / 6L)
                         .coerceIn(24L * 1024 * 1024, 192L * 1024 * 1024).toInt()
             } catch (_: Throwable) {
@@ -147,10 +156,11 @@ class PageRenderer(private val renderer: PdfRenderer) {
          */
         fun reduceBudget() {
             try {
-                // Only the pixel count changes. Switching the bitmap format here used to
-                // break every later render, because PdfRenderer rejects anything but
-                // ARGB_8888 - the screen went black until the app was restarted.
-                maxPixels = (maxPixels / 2).coerceAtLeast(400_000L)
+                // Freeing memory must not make the page look worse. Lowering the page
+                // budget here is what turned every screen blurry after the app had been
+                // in the background a few times. The page size is left alone; the cache
+                // budget is what shrinks, and the allocator is the real safety net.
+                cacheBudget = (cacheBudget / 2).coerceAtLeast(16 * 1024 * 1024)
             } catch (_: Throwable) {
             }
         }

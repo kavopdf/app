@@ -181,6 +181,12 @@ class RedactActivity : PdfActivity() {
 
     private companion object {
         /** Resolution used for the flattened page. */
-        const val PRINT_DPI = 200f
+        /**
+         * Redaction has to rasterise the page - that is what makes the removal permanent -
+         * so the DPI decides what the rest of the page looks like afterwards. 300 is the
+         * usual print standard and keeps text and line art crisp; the page budget in
+         * PageRenderer is what keeps the memory for it in check.
+         */
+        const val PRINT_DPI = 300f
     }
 }

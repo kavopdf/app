@@ -1305,7 +1305,9 @@ public final class PdfEngine {
                 if (bmp == null) throw new IllegalArgumentException("Could not read image: " + image.getName());
                 PDImageXObject img = bmp.hasAlpha()
                         ? LosslessFactory.createFromImage(d, bmp)
-                        : JPEGFactory.createFromImage(d, bmp, 0.85f);
+                        // 0.85 was visibly soft on camera photos. 0.95 is still a
+                        // normal JPEG and keeps detail that a scan needs.
+                        : JPEGFactory.createFromImage(d, bmp, 0.95f);
 
                 PDRectangle pageSize;
                 if (fitToA4) {
