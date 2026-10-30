@@ -121,5 +121,18 @@ class PageRenderer(private val renderer: PdfRenderer) {
 
         /** For tests: what the current budget works out to. */
         fun budgetPixels(): Long = maxPixels
+
+        /**
+         * The system told us it is short of memory. Halve the page budget so the next
+         * render is smaller instead of failing, and drop to 16-bit colour. A phone that
+         * is under pressure keeps working; nothing else changes.
+         */
+        fun reduceBudget() {
+            try {
+                config = Bitmap.Config.RGB_565
+                maxPixels = (maxPixels / 2).coerceAtLeast(400_000L)
+            } catch (_: Throwable) {
+            }
+        }
     }
 }

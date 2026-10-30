@@ -21,6 +21,33 @@ class KavoPdfApp : Application() {
         com.kavopdf.app.util.CrashGuard.install(this)
     }
 
+    /**
+     * The system is short of memory. A budget phone hits this constantly; a flagship
+     * almost never. Shrink the page budget and clear the temp copies so the app keeps
+     * working instead of being killed in the background.
+     */
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        try {
+            if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) {
+                com.kavopdf.app.ui.PageRenderer.reduceBudget()
+            }
+            if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL) {
+                cleanStaleCache()
+            }
+        } catch (_: Throwable) {
+        }
+    }
+
+    /** Older platforms call this instead of onTrimMemory. */
+    override fun onLowMemory() {
+        super.onLowMemory()
+        try {
+            com.kavopdf.app.ui.PageRenderer.reduceBudget()
+        } catch (_: Throwable) {
+        }
+    }
+
     /** Documents are copied to the cache while they are worked on; drop old ones so
      *  nothing lingers on the device longer than it needs to. */
     private fun cleanStaleCache() {
