@@ -1,0 +1,21 @@
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+*.jks
+*.keystore
+/app/build/
+
+# engine-verify build artifacts
+tools/engine-verify/libs/
+tools/engine-verify/out/
+.kotlin/
+build/
+app/build/
+*.hprof
