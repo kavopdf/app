@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_background"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="?attr/colorOnPrimary"
+        app:title="@string/tool_create_pdf"
+        app:titleTextColor="?attr/colorOnPrimary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create_page_size"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp" />
+
+        <Spinner
+            android:id="@+id/sizeSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_spinner_pill"
+            android:popupBackground="@drawable/bg_popup_pill"
+            android:paddingStart="18dp"
+            android:paddingEnd="40dp"
+            android:minHeight="52dp"
+            android:layout_marginStart="6dp" />
+
+        <Spinner
+            android:id="@+id/orientSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_spinner_pill"
+            android:popupBackground="@drawable/bg_popup_pill"
+            android:paddingStart="18dp"
+            android:paddingEnd="40dp"
+            android:minHeight="52dp"
+            android:layout_marginStart="10dp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/viewer_bg">
+
+        <com.kavopdf.app.ui.ZoomableImageView
+            android:id="@+id/pageImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/tool_create_pdf" />
+
+        <com.kavopdf.app.ui.OverlayView
+            android:id="@+id/overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/optionsScroll"
+        android:overScrollMode="never"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="10dp">
+            <LinearLayout
+                android:id="@+id/colourRow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/swatchBlack"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_swatch"
+                    android:backgroundTint="@color/swatch_black"
+                    android:contentDescription="@string/label_colour" />
+
+                <ImageButton
+                    android:id="@+id/swatchRed"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_swatch"
+                    android:backgroundTint="@color/swatch_red"
+                    android:contentDescription="@string/label_colour" />
+
+                <ImageButton
+                    android:id="@+id/swatchBlue"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_swatch"
+                    android:backgroundTint="@color/swatch_blue"
+                    android:contentDescription="@string/label_colour" />
+
+                <ImageButton
+                    android:id="@+id/swatchGreen"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_swatch"
+                    android:backgroundTint="@color/swatch_green"
+                    android:contentDescription="@string/label_colour" />
+
+                <ImageButton
+                    android:id="@+id/swatchOrange"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_swatch"
+                    android:backgroundTint="@color/swatch_orange"
+                    android:contentDescription="@string/label_colour" />
+
+                <ImageButton
+                    android:id="@+id/swatchPurple"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginEnd="14dp"
+                    android:background="@drawable/bg_swatch"
+                    android:backgroundTint="@color/swatch_purple"
+                    android:contentDescription="@string/label_colour" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sizeBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:paddingEnd="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_size"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/sizeSlider"
+                    android:layout_width="146dp"
+                    android:layout_height="wrap_content"
+                    android:stepSize="1"
+                    android:value="4"
+                    android:valueFrom="1"
+                    android:valueTo="72" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/opacityBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:paddingEnd="14dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_opacity"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/opacitySlider"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:stepSize="0.05"
+                    android:value="0.35"
+                    android:valueFrom="0.1"
+                    android:valueTo="1" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/selDelete"
+                style="@style/Widget.KavoPDF.Button.Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/action_delete"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/optHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                tools:text="hint"         android:visibility="gone"
+            />
+            </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <HorizontalScrollView
+        android:overScrollMode="never"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp">
+
+            <ImageButton
+                android:id="@+id/toolPan"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tooltipText="Pan"
+                android:contentDescription="@string/tool_pan"
+                android:src="@drawable/ic_pan"
+                app:tint="@color/text_primary" />
+
+            <ImageButton
+                android:id="@+id/toolPen"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tooltipText="Pen"
+                android:contentDescription="@string/tool_pen"
+                android:src="@drawable/ic_pen"
+                app:tint="@color/text_primary" />
+
+            <ImageButton
+                android:id="@+id/toolHighlight"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tooltipText="Highlighter"
+                android:contentDescription="@string/tool_highlighter"
+                android:src="@drawable/ic_highlighter"
+                app:tint="@color/warning" />
+
+            <ImageButton
+                android:id="@+id/toolCover"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tooltipText="Cover"
+                android:contentDescription="@string/tool_cover"
+                android:src="@drawable/ic_cover"
+                app:tint="@color/text_primary" />
+
+            <ImageButton
+                android:id="@+id/toolSign"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tooltipText="Signature"
+                android:contentDescription="@string/tool_signature"
+                android:src="@drawable/ic_check"
+                app:tint="@color/success" />
+
+            <ImageButton
+                android:id="@+id/toolText"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tooltipText="Text"
+                android:contentDescription="@string/tool_text_box"
+                android:src="@drawable/ic_text"
+                app:tint="@color/text_primary" />
+
+            <ImageButton
+                android:id="@+id/toolImage"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tooltipText="Image"
+                android:contentDescription="@string/tool_insert_image"
+                android:src="@drawable/ic_image_pdf"
+                app:tint="@color/brand_secondary" />
+
+            <ImageButton
+                android:id="@+id/toolMove"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tooltipText="Select"
+                android:contentDescription="@string/tool_move"
+                android:src="@drawable/ic_move"
+                app:tint="@color/text_primary" />
+
+            <ImageButton
+                android:id="@+id/toolErase"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tooltipText="Eraser"
+                android:contentDescription="@string/tool_erase"
+                android:src="@drawable/ic_eraser"
+                app:tint="@color/danger" />
+            <ImageButton
+                android:id="@+id/toolShape"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tooltipText="Shape"
+                android:contentDescription="@string/tool_erase"
+                android:src="@drawable/ic_shape"
+                app:tint="@color/danger" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="6dp">
+
+        <ImageButton
+            android:id="@+id/prevPage"
+            android:layout_width="42dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/action_move_up"
+            android:src="@drawable/ic_chevron_left"
+            app:tint="@color/text_primary" />
+
+        <TextView
+            android:id="@+id/pageLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            tools:text="Page 1 / 1" />
+
+        <ImageButton
+            android:id="@+id/nextPage"
+            android:layout_width="42dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/action_move_down"
+            android:src="@drawable/ic_chevron_right"
+            app:tint="@color/text_primary" />
+
+        <ImageButton
+            android:id="@+id/addPage"
+            android:layout_width="42dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/create_add_page"
+            android:src="@drawable/ic_add"
+            app:tint="@color/success" />
+
+        <ImageButton
+            android:id="@+id/delPage"
+            android:layout_width="42dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/create_delete_page"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/danger" />
+    </LinearLayout>
+
+</LinearLayout>

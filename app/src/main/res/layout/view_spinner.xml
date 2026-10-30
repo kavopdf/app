@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A spinner that looks like every other field: a pill, with a rounded list that
+     drops out of it. Kept as a layout so the styling lives in one place. -->
+<Spinner xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_spinner_pill"
+    android:minHeight="52dp"
+    android:paddingStart="18dp"
+    android:paddingEnd="40dp"
+    android:popupBackground="@drawable/bg_popup_pill" />

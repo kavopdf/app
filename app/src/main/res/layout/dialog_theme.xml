@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="22dp"
+    android:paddingTop="18dp"
+    android:paddingEnd="22dp"
+    android:paddingBottom="10dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/action_theme"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <RadioGroup
+        android:id="@+id/modeGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/modeSystem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_system" />
+
+        <RadioButton
+            android:id="@+id/modeLight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_light" />
+
+        <RadioButton
+            android:id="@+id/modeDark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_dark" />
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="@string/label_colour"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/accentRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/accentIndigo"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginEnd="7dp"
+            android:background="@drawable/bg_swatch"
+            android:backgroundTint="@color/accent_indigo"
+            android:contentDescription="@string/label_colour" />
+
+        <ImageButton
+            android:id="@+id/accentTeal"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginEnd="7dp"
+            android:background="@drawable/bg_swatch"
+            android:backgroundTint="@color/accent_teal"
+            android:contentDescription="@string/label_colour" />
+
+        <ImageButton
+            android:id="@+id/accentViolet"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginEnd="7dp"
+            android:background="@drawable/bg_swatch"
+            android:backgroundTint="@color/accent_violet"
+            android:contentDescription="@string/label_colour" />
+
+        <ImageButton
+            android:id="@+id/accentGreen"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginEnd="7dp"
+            android:background="@drawable/bg_swatch"
+            android:backgroundTint="@color/accent_green"
+            android:contentDescription="@string/label_colour" />
+
+        <ImageButton
+            android:id="@+id/accentCrimson"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginEnd="7dp"
+            android:background="@drawable/bg_swatch"
+            android:backgroundTint="@color/accent_crimson"
+            android:contentDescription="@string/label_colour" />
+
+        <ImageButton
+            android:id="@+id/accentAmber"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginEnd="7dp"
+            android:background="@drawable/bg_swatch"
+            android:backgroundTint="@color/accent_amber"
+            android:contentDescription="@string/label_colour" />
+    </LinearLayout>
+
+</LinearLayout>

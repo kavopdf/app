@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="10dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginEnd="10dp"
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/bg_row"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingEnd="4dp">
+
+    <ImageView
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:contentDescription="@string/cd_tool_icon"
+        android:src="@drawable/ic_file"
+        app:tint="@color/brand_secondary" />
+
+    <TextView
+        android:id="@+id/fileName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:ellipsize="middle"
+        android:maxLines="2"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        tools:text="document.pdf" />
+
+    <ImageButton
+        android:id="@+id/btnUp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_move_up"
+        android:src="@drawable/ic_arrow_up"
+        app:tint="@color/text_secondary" />
+
+    <ImageButton
+        android:id="@+id/btnDown"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_move_down"
+        android:src="@drawable/ic_arrow_down"
+        app:tint="@color/text_secondary" />
+
+    <ImageButton
+        android:id="@+id/btnRemove"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_delete"
+        android:src="@drawable/ic_delete"
+        app:tint="@color/danger" />
+
+</LinearLayout>

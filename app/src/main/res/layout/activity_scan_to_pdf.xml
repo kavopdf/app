@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_background"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="@string/tool_scan_pdf"
+        app:titleTextColor="?attr/colorOnPrimary" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageButton
+            android:id="@+id/btnTorch"
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="26dp"
+            android:background="@drawable/bg_camera_button"
+            android:contentDescription="@string/qr_torch"
+            android:padding="15dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_torch"
+            android:tint="#FFFFFFFF" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/countLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:text="@string/scan_none"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp" />
+
+    <HorizontalScrollView
+        android:id="@+id/stripScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/strip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="12dp" />
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCapture"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:text="@string/scan_capture" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBuild"
+            style="@style/Widget.KavoPDF.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:text="@string/scan_create" />
+    </LinearLayout>
+</LinearLayout>

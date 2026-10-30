@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_background"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="?attr/colorOnPrimary"
+        app:title="@string/tool_links"
+        app:titleTextColor="?attr/colorOnPrimary" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="14dp">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:contentDescription="@string/tool_links"
+                android:src="@drawable/ic_link"
+                app:tint="@color/brand_primary" />
+
+            <TextView
+                android:id="@+id/fileName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:ellipsize="middle"
+                android:maxLines="1"
+                android:text="@string/msg_no_file_chosen"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnChoose"
+                style="@style/Widget.KavoPDF.Button.Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/action_choose_pdf" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/modeAuto"
+            style="@style/Widget.KavoPDF.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:maxLines="2"
+            android:gravity="center"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/links_mode_auto" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/modeManual"
+            style="@style/Widget.KavoPDF.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:maxLines="2"
+            android:gravity="center"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/links_mode_manual" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp" />
+
+    <ScrollView
+        android:overScrollMode="never"
+        android:id="@+id/listWrap"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <LinearLayout
+            android:id="@+id/linkList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/manualWrap"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/viewer_bg">
+
+            <ImageView
+                android:id="@+id/pageImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/tool_links"
+                android:scaleType="fitCenter" />
+
+            <com.kavopdf.app.ui.CropView
+                android:id="@+id/rectPick"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="4dp">
+
+            <ImageButton
+                android:id="@+id/prevPage"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_move_up"
+                android:src="@drawable/ic_chevron_left"
+                app:tint="@color/text_primary" />
+
+            <TextView
+                android:id="@+id/pageLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <ImageButton
+                android:id="@+id/nextPage"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_move_down"
+                android:src="@drawable/ic_chevron_right"
+                app:tint="@color/text_primary" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:id="@+id/kindRow"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/kindIcon"
+            style="@style/Widget.KavoPDF.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:maxLines="2"
+            android:gravity="center"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/links_kind_icon" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/kindText"
+            style="@style/Widget.KavoPDF.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:maxLines="2"
+            android:gravity="center"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/links_kind_text" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/kindPicture"
+            style="@style/Widget.KavoPDF.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:maxLines="2"
+            android:gravity="center"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/links_kind_picture" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/textInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_field_pill"
+        android:hint="@string/hint_link_text"
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="14dp"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp"
+        android:textColorHint="@color/text_secondary"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="12dp" />
+
+    <LinearLayout
+        android:id="@+id/fontRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <Spinner
+            android:id="@+id/fontSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_spinner_pill"
+            android:popupBackground="@drawable/bg_popup_pill"
+            android:paddingStart="18dp"
+            android:paddingEnd="40dp"
+            android:minHeight="52dp"
+            android:layout_weight="1" />
+
+    <EditText
+        android:id="@+id/sizeInput"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_field_pill"
+        android:hint="@string/hint_link_size"
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="14dp"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp"
+        android:textColorHint="@color/text_secondary"
+        android:layout_marginStart="10dp" />
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/opacityRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+    <EditText
+        android:id="@+id/opacityInput"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_field_pill"
+        android:hint="@string/hint_link_opacity"
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="14dp"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp"
+        android:textColorHint="@color/text_secondary" />
+
+        <LinearLayout
+            android:id="@+id/colourRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:gravity="center_vertical|end"
+            android:orientation="horizontal"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnPlace"
+        style="@style/Widget.KavoPDF.Button.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/links_fullscreen" />
+
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/applyAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/links_apply_all" />
+
+    <EditText
+        android:id="@+id/urlInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_field_pill"
+        android:hint="@string/hint_link_url"
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="14dp"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp"
+        android:textColorHint="@color/text_secondary"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="12dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRun"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:enabled="false"
+        android:text="@string/links_add_save" />
+
+</LinearLayout>

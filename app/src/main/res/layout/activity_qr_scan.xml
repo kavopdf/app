@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_background"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="@string/tool_qr"
+        app:titleTextColor="?attr/colorOnPrimary" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <View
+            android:id="@+id/reticle"
+            android:layout_width="230dp"
+            android:layout_height="230dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_qr_reticle" />
+
+        <ImageButton
+            android:id="@+id/btnGallery"
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="26dp"
+            android:background="@drawable/bg_camera_button"
+            android:contentDescription="@string/qr_gallery"
+            android:padding="15dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_gallery"
+            android:tint="#FFFFFFFF" />
+        <ImageButton
+            android:id="@+id/btnTorch"
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="26dp"
+            android:background="@drawable/bg_camera_button"
+            android:contentDescription="@string/qr_torch"
+            android:padding="15dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_torch"
+            android:tint="#FFFFFFFF" />
+    </FrameLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/resultCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:visibility="gone"
+        app:cardCornerRadius="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/resultType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/resultValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/text_primary"
+                android:textIsSelectable="true"
+                android:textSize="15sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCopy"
+                    style="@style/Widget.KavoPDF.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:text="@string/action_copy" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnOpen"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:text="@string/action_open" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnShare"
+                    style="@style/Widget.KavoPDF.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:text="@string/action_share" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAgain"
+                    style="@style/Widget.KavoPDF.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:text="@string/qr_again" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>
