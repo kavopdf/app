@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ML Kit's library declares these; the bundled recogniser works entirely
+         offline, so they are removed from the merged manifest. -->
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+    <!-- The only real permission the app asks for, and only for the two camera
+         features. It is requested at runtime, never at install. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
+
+    <application
+        android:name=".KavoPdfApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="false"
+        android:theme="@style/Theme.KavoPDF">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ViewerActivity"
+            android:exported="true"
+            android:label="@string/tool_view"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".PagesActivity" android:exported="false" android:label="@string/tool_pages"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity android:name=".MergeActivity" android:exported="false" android:label="@string/tool_merge"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity android:name=".ImagesToPdfActivity" android:exported="false" android:label="@string/tool_images_pdf"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity android:name=".AnnotateActivity" android:exported="false" android:label="@string/tool_annotate"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity android:name=".FormsActivity" android:exported="false" android:label="@string/tool_forms"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity android:name=".ToolsActivity" android:exported="false"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".QrScanActivity"
+            android:exported="false"
+            android:label="@string/tool_qr"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".ScanToPdfActivity"
+            android:exported="false"
+            android:label="@string/tool_scan_pdf"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".BookmarksActivity"
+            android:exported="false"
+            android:label="@string/tool_bookmarks"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".LogActivity"
+            android:exported="false"
+            android:label="@string/tool_log"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".RedactActivity"
+            android:exported="false"
+            android:label="@string/tool_redact"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".LinksActivity"
+            android:exported="false"
+            android:label="@string/tool_links"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".ImageOcrActivity"
+            android:exported="false"
+            android:label="@string/tool_image_ocr"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".OcrActivity"
+            android:exported="false"
+            android:label="@string/tool_ocr"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".CropActivity"
+            android:exported="false"
+            android:label="@string/tool_crop"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".CreatePdfActivity"
+            android:exported="false"
+            android:label="@string/tool_create_pdf"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+
+</manifest>
