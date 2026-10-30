@@ -15,6 +15,7 @@ import com.tom_roush.pdfbox.pdmodel.PDPageContentStream;
 import com.tom_roush.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import com.tom_roush.pdfbox.pdmodel.PDResources;
 import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
+import com.tom_roush.pdfbox.pdmodel.common.PDMetadata;
 import com.tom_roush.pdfbox.pdmodel.encryption.AccessPermission;
 import com.tom_roush.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import com.tom_roush.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
@@ -893,8 +894,94 @@ public final class PdfEngine {
             m.put("creationDate", info.getCreationDate() == null ? "" : META_DATE.format(info.getCreationDate().getTime()));
             m.put("modDate", info.getModificationDate() == null ? "" : META_DATE.format(info.getModificationDate().getTime()));
             m.put("pages", String.valueOf(d.getNumberOfPages()));
+
+            // A PDF carries document properties in TWO places: the Info dictionary read
+            // above, and an XMP packet. Many files written by modern tools fill only the
+            // XMP one, which is why the screen used to look empty on a file that clearly
+            // had a title. Anything still blank is filled from XMP - never overwriting a
+            // value that Info already gave.
+            try {
+                Map<String, String> xmp = xmpFields(d);
+                for (Map.Entry<String, String> e : xmp.entrySet()) {
+                    if (m.get(e.getKey()) == null || m.get(e.getKey()).isEmpty()) {
+                        m.put(e.getKey(), e.getValue());
+                    }
+                }
+                m.put("xmp", xmp.isEmpty() ? "" : "yes");
+            } catch (Throwable ignored) {
+                m.put("xmp", "");
+            }
         }
         return m;
+    }
+
+    /** The handful of XMP fields that map onto the properties this screen edits. */
+    private static Map<String, String> xmpFields(PDDocument d) throws Exception {
+        Map<String, String> out = new LinkedHashMap<>();
+        PDMetadata md = d.getDocumentCatalog().getMetadata();
+        if (md == null) return out;
+        byte[] raw;
+        try (java.io.InputStream in = md.createInputStream()) {
+            raw = readAll(in);
+        }
+        if (raw == null || raw.length == 0) return out;
+        String xml = new String(raw, "UTF-8");
+        String title = firstXmp(xml, "dc:title");
+        if (title != null) out.put("title", title);
+        String author = firstXmp(xml, "dc:creator");
+        if (author != null) out.put("author", author);
+        String subject = firstXmp(xml, "dc:description");
+        if (subject != null) out.put("subject", subject);
+        String keywords = firstXmp(xml, "pdf:Keywords");
+        if (keywords != null) out.put("keywords", keywords);
+        String creator = firstXmp(xml, "xmp:CreatorTool");
+        if (creator != null) out.put("creator", creator);
+        String producer = firstXmp(xml, "pdf:Producer");
+        if (producer != null) out.put("producer", producer);
+        String created = firstXmp(xml, "xmp:CreateDate");
+        if (created != null) out.put("creationDate", xmpDate(created));
+        String modified = firstXmp(xml, "xmp:ModifyDate");
+        if (modified != null) out.put("modDate", xmpDate(modified));
+        return out;
+    }
+
+    /** Text of the first element with this name, whatever its nesting, or null. */
+    private static String firstXmp(String xml, String tag) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile(
+                "<" + java.util.regex.Pattern.quote(tag) + "[^>]*>(.*?)</"
+                        + java.util.regex.Pattern.quote(tag) + ">",
+                java.util.regex.Pattern.DOTALL).matcher(xml);
+        while (m.find()) {
+            String v = m.group(1);
+            // XMP often wraps the value: <rdf:li>the title</rdf:li>
+            java.util.regex.Matcher li = java.util.regex.Pattern
+                    .compile("<rdf:li[^>]*>(.*?)</rdf:li>",
+                             java.util.regex.Pattern.DOTALL).matcher(v);
+            if (li.find()) v = li.group(1);
+            v = v.replaceAll("<[^>]+>", " ")
+                 .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
+                 .replace("&quot;", "\"").replace("&apos;", "'")
+                 .replaceAll("\\s+", " ").trim();
+            if (!v.isEmpty()) return v;
+        }
+        return null;
+    }
+
+    /** 2026-10-30T12:00:00+05:30 -> yyyy-MM-dd HH:mm */
+    private static String xmpDate(String v) {
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2})").matcher(v);
+        if (m.find()) return m.group(1) + "-" + m.group(2) + "-" + m.group(3)
+                + " " + m.group(4) + ":" + m.group(5);
+        return v;
+    }
+
+    private static byte[] readAll(java.io.InputStream in) throws java.io.IOException {
+        java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream();
+        byte[] b = new byte[8192];
+        int n;
+        while ((n = in.read(b)) > 0) bo.write(b, 0, n);
+        return bo.toByteArray();
     }
 
     public static void setMetadata(File src, MetadataInfo in, File out) throws Exception {
@@ -1639,7 +1726,11 @@ public final class PdfEngine {
     private static final java.util.regex.Pattern URL_PATTERN = java.util.regex.Pattern.compile(
             "(?i)((?:https?://|ftp://|www\\.)[^\\s<>\"')]+"
             + "|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+"
-            + "(?:com|net|org|in|io|co|edu|gov|info|biz|me|app|dev|xyz|online|site|store|club|live|tv|cc|us|uk|de|fr|jp|au|ca|ru|ai|link|top|win|bid|download|stream|site)"
+            + "(?:com|net|org|in|io|co|edu|gov|info|biz|me|app|dev|xyz|online|site|store|club|live|tv|cc|us|uk|de|fr|jp|au|ca|ru|ai|link|top|win|bid|download|stream"
+            // second-level names that matter in India and the UK, so a link like
+            // nic.in or co.uk is found instead of being read as two words
+            + "|co\\.in|org\\.in|net\\.in|ac\\.in|gov\\.in|nic\\.in|edu\\.in|res\\.in|firm\\.in|gen\\.in|ind\\.in"
+            + "|co\\.uk|org\\.uk|ac\\.uk|gov\\.uk|me\\.uk|co\\.jp|com\\.au|com\\.br|co\\.za|com\\.sg)"
             + "(?:/[^\\s<>\"')]*)?"
             + "|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,})");
 

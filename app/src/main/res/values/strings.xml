@@ -25,9 +25,9 @@
     <string name="tool_compress_desc">Shrink file size by re-encoding images</string>
     <string name="tool_watermark">Watermark</string>
     <string name="tool_watermark_desc">Stamp text over every page — centre or random spot</string>
-    <string name="tool_protect">Protect</string>
+    <string name="tool_protect">Protect PDF</string>
     <string name="tool_protect_desc">Add a password and permissions</string>
-    <string name="tool_unlock">Unlock</string>
+    <string name="tool_unlock">Unlock PDF</string>
     <string name="tool_unlock_desc">Remove a known password</string>
     <string name="tool_metadata">Edit metadata</string>
     <string name="tool_metadata_desc">Set title, author, subject and keywords</string>
