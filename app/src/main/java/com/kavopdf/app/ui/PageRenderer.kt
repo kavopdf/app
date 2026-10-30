@@ -101,6 +101,24 @@ class PageRenderer(private val renderer: PdfRenderer) {
             }
         }
 
+        /**
+         * Page sizes from a renderer that is already open. Asking PdfEngine as well
+         * loaded the whole document a second time with pdfbox - the slowest thing in
+         * every open path. Used by the reader, crop, links and redact screens.
+         */
+        fun displaySizes(r: PdfRenderer): List<FloatArray> {
+            val out = ArrayList<FloatArray>(r.pageCount)
+            for (i in 0 until r.pageCount) {
+                val pg = r.openPage(i)
+                try {
+                    out.add(floatArrayOf(pg.width.toFloat(), pg.height.toFloat()))
+                } finally {
+                    pg.close()
+                }
+            }
+            return out
+        }
+
         /** For tests: what the current budget works out to. */
         fun budgetPixels(): Long = maxPixels
     }
