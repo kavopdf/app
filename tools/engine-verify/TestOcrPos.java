@@ -132,6 +132,26 @@ public class TestOcrPos {
         else if (!hiText.contains("Hello")) { System.out.println("  FAIL the Latin word was lost"); fail++; }
         else System.out.println("  PASS - Hindi skipped, Latin kept, no '?' in the index");
 
+        // a rupee amount must survive as something a reader can copy and search
+        List<PdfEngine.OcrWord> bill = new ArrayList<>();
+        bill.add(new PdfEngine.OcrWord("\u20b9500", 100, 100, 160, 40));
+        bill.add(new PdfEngine.OcrWord("What is 2+2?", 400, 100, 300, 40));
+        File billOut = new File(dir, "ocr_bill.pdf");
+        PdfEngine.addTextLayer(src, Collections.singletonList(
+                new PdfEngine.PageText(1, IMG_W, IMG_H, bill)), billOut);
+        String billText;
+        try (PDDocument d = PDDocument.load(billOut)) {
+            billText = new PDFTextStripper().getText(d).replace("\n", " ").trim();
+        }
+        System.out.println("bill layer: \"" + billText + "\"");
+        if (!billText.contains("Rs.500")) {
+            System.out.println("  FAIL the rupee amount did not survive"); fail++;
+        } else if (!billText.contains("2+2?")) {
+            System.out.println("  FAIL the question mark was lost"); fail++;
+        } else {
+            System.out.println("  PASS - \u20b9500 copies as Rs.500 and '?' survives");
+        }
+
         System.out.println(fail == 0 ? "\nOCRPOS: PASS" : "\nOCRPOS: " + fail + " FAILED");
         if (fail != 0) System.exit(1);
     }
