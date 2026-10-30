@@ -1,6 +1,7 @@
 package com.kavopdf.app.util
 
 import android.app.Activity
+import android.content.Context
 import android.view.WindowManager
 
 /**
@@ -17,7 +18,7 @@ import android.view.WindowManager
  */
 fun Activity.useHighestRefreshRate() {
     try {
-        val wm = getSystemService(WINDOW_SERVICE) as? WindowManager ?: return
+        val wm = getSystemService(Context.WINDOW_SERVICE) as? WindowManager ?: return
 
         @Suppress("DEPRECATION")
         val d = wm.defaultDisplay ?: return
