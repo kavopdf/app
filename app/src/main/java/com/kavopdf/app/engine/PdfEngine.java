@@ -1395,8 +1395,8 @@ public final class PdfEngine {
                     cs.setRenderingMode(com.tom_roush.pdfbox.pdmodel.graphics.state.RenderingMode.NEITHER);
                     cs.beginText();
                     for (OcrWord word : pt.words) {
-                        String txt = winAnsi(word.text);
-                        if (txt == null || txt.trim().isEmpty()) continue;
+                        String txt = ocrText(word.text);
+                        if (txt.isEmpty()) continue;
                         float xd = word.x / pt.imgW * dw;
                         float yd = (word.y + word.h * BASELINE_FRACTION) / pt.imgH * dh;
                         float hd = word.h / pt.imgH * dh;
@@ -2752,6 +2752,62 @@ public final class PdfEngine {
     }
 
     /** Restrict a string to characters the standard-14 fonts can encode (WinAnsi-ish). */
+    /**
+     * Characters outside Latin-1 that a reader still expects to copy out of an OCR
+     * layer, and what to write instead. A bill prints the rupee sign; without this the
+     * layer kept only "500" and copying gave a number with no currency.
+     */
+    private static final Map<Character, String> OCR_SYMBOLS = new HashMap<>();
+    static {
+        OCR_SYMBOLS.put('\u20b9', "Rs.");
+        OCR_SYMBOLS.put('\u2013', "-");
+        OCR_SYMBOLS.put('\u2014', "-");
+        OCR_SYMBOLS.put('\u2018', "'");
+        OCR_SYMBOLS.put('\u2019', "'");
+        OCR_SYMBOLS.put('\u201c', "\"");
+        OCR_SYMBOLS.put('\u201d', "\"");
+        OCR_SYMBOLS.put('\u2022', "-");
+        OCR_SYMBOLS.put('\u00d7', "x");
+        OCR_SYMBOLS.put('\u00f7', "/");
+        OCR_SYMBOLS.put('\u2192', "->");
+        OCR_SYMBOLS.put('\u2265', ">=");
+        OCR_SYMBOLS.put('\u2264', "<=");
+        OCR_SYMBOLS.put('\u2260', "!=");
+        OCR_SYMBOLS.put('\u00b2', "2");
+        OCR_SYMBOLS.put('\u00b3', "3");
+        OCR_SYMBOLS.put('\u2080', "0"); OCR_SYMBOLS.put('\u2081', "1");
+        OCR_SYMBOLS.put('\u2082', "2"); OCR_SYMBOLS.put('\u2083', "3");
+        OCR_SYMBOLS.put('\u2084', "4"); OCR_SYMBOLS.put('\u2085', "5");
+        OCR_SYMBOLS.put('\u2086', "6"); OCR_SYMBOLS.put('\u2087', "7");
+        OCR_SYMBOLS.put('\u2088', "8"); OCR_SYMBOLS.put('\u2089', "9");
+    }
+
+    /**
+     * Text for the invisible OCR layer only. Latin-1 is kept as it is; a symbol in
+     * OCR_SYMBOLS is written as its plain equivalent; anything else the font cannot
+     * draw is dropped rather than written as "?", so the search index never gains a
+     * word that was not on the page. Returns "" when nothing useful is left.
+     */
+    static String ocrText(String s) {
+        if (s == null) return "";
+        StringBuilder b = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\n' || c == '\r' || c == '\t') b.append(' ');
+            else if (c >= 32 && c <= 126) b.append(c);
+            else if (c >= 160 && c <= 255) b.append(c);
+            else {
+                String m = OCR_SYMBOLS.get(c);
+                if (m != null) b.append(m);
+            }
+        }
+        String out = b.toString().trim();
+        for (int i = 0; i < out.length(); i++) {
+            if (Character.isLetterOrDigit(out.charAt(i))) return out;
+        }
+        return "";
+    }
+
     static String winAnsi(String s) {
         if (s == null) return "";
         StringBuilder b = new StringBuilder(s.length());
