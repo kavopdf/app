@@ -13,6 +13,7 @@ import com.kavopdf.app.model.ToolItem
 import com.kavopdf.app.ui.HomeRow
 import com.kavopdf.app.ui.ToolAdapter
 import com.kavopdf.app.util.ThemeUtil
+import com.kavopdf.app.util.useHighestRefreshRate
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeUtil.apply(this)
         super.onCreate(savedInstanceState)
-        com.kavopdf.app.util.useHighestRefreshRate()
+        useHighestRefreshRate()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         // read from the build, so every release shows its own version

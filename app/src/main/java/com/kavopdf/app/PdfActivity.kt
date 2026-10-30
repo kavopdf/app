@@ -15,6 +15,7 @@ import com.kavopdf.app.util.Busy
 import com.kavopdf.app.util.AppLog
 import com.kavopdf.app.util.Files
 import com.kavopdf.app.util.ThemeUtil
+import com.kavopdf.app.util.useHighestRefreshRate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -91,7 +92,7 @@ abstract class PdfActivity : AppCompatActivity() {
         ThemeUtil.apply(this)
         super.onCreate(savedInstanceState)
         // 120 Hz panels stay at 60 unless the window asks for more.
-        com.kavopdf.app.util.useHighestRefreshRate()
+        useHighestRefreshRate()
         com.kavopdf.app.util.CrashGuard.step("Opened: " + javaClass.simpleName)
         busy = Busy(this)
     }
