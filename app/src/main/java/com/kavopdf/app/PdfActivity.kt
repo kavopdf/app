@@ -90,6 +90,8 @@ abstract class PdfActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeUtil.apply(this)
         super.onCreate(savedInstanceState)
+        // 120 Hz panels stay at 60 unless the window asks for more.
+        com.kavopdf.app.util.useHighestRefreshRate()
         com.kavopdf.app.util.CrashGuard.step("Opened: " + javaClass.simpleName)
         busy = Busy(this)
     }

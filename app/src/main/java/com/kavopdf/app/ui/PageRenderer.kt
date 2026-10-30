@@ -155,14 +155,17 @@ class PageRenderer(private val renderer: PdfRenderer) {
          * is under pressure keeps working; nothing else changes.
          */
         fun reduceBudget() {
-            try {
-                // Freeing memory must not make the page look worse. Lowering the page
-                // budget here is what turned every screen blurry after the app had been
-                // in the background a few times. The page size is left alone; the cache
-                // budget is what shrinks, and the allocator is the real safety net.
-                cacheBudget = (cacheBudget / 2).coerceAtLeast(16 * 1024 * 1024)
-            } catch (_: Throwable) {
-            }
+            // Deliberately empty.
+            //
+            // This used to halve a budget on every onTrimMemory callback. Halving the
+            // page budget turned every screen blurry; halving the cache budget made
+            // scrolling stutter afterwards, because the budget never came back. Both
+            // were permanent damage caused by a transient event.
+            //
+            // Nothing needs shrinking here now: the page cache is an LruCache already
+            // bounded by cacheBytes(), so it evicts by itself under pressure, and the
+            // page size is decided by the allocator in render(). The method stays so
+            // the call sites keep compiling and the intent stays documented.
         }
     }
 }

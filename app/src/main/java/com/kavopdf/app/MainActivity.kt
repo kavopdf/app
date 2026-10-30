@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeUtil.apply(this)
         super.onCreate(savedInstanceState)
+        com.kavopdf.app.util.useHighestRefreshRate()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         // read from the build, so every release shows its own version
