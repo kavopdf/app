@@ -1394,14 +1394,9 @@ public final class PdfEngine {
                              new PDPageContentStream(d, page, AppendMode.APPEND, true, true)) {
                     cs.setRenderingMode(com.tom_roush.pdfbox.pdmodel.graphics.state.RenderingMode.NEITHER);
                     cs.beginText();
-                    for (int wi = 0; wi < pt.words.size(); wi++) {
-                        OcrWord word = pt.words.get(wi);
-                        // Characters Helvetica cannot encode (Hindi, rupee sign, em dash)
-                        // used to be written as "?" - which put a fake word in the search
-                        // index. Such a word is now skipped instead: no junk, and the words
-                        // that can be encoded are still there.
-                        String txt = ocrEncodable(word.text);
-                        if (txt.isEmpty()) continue;
+                    for (OcrWord word : pt.words) {
+                        String txt = winAnsi(word.text);
+                        if (txt == null || txt.trim().isEmpty()) continue;
                         float xd = word.x / pt.imgW * dw;
                         float yd = (word.y + word.h * BASELINE_FRACTION) / pt.imgH * dh;
                         float hd = word.h / pt.imgH * dh;
@@ -2757,67 +2752,6 @@ public final class PdfEngine {
     }
 
     /** Restrict a string to characters the standard-14 fonts can encode (WinAnsi-ish). */
-    /**
-     * Characters outside Latin-1 that a reader still expects to copy, and what to write
-     * instead. Only used for the invisible OCR layer - every other tool keeps winAnsi.
-     */
-    private static final Map<Character, String> OCR_SYMBOLS = new HashMap<>();
-    static {
-        OCR_SYMBOLS.put('\u20b9', "Rs.");   // rupee
-        OCR_SYMBOLS.put('\u2013', "-");     // en dash
-        OCR_SYMBOLS.put('\u2014', "-");     // em dash
-        OCR_SYMBOLS.put('\u2018', "'");
-        OCR_SYMBOLS.put('\u2019', "'");
-        OCR_SYMBOLS.put('\u201c', "\"");
-        OCR_SYMBOLS.put('\u201d', "\"");
-        OCR_SYMBOLS.put('\u2022', "-");     // bullet
-        OCR_SYMBOLS.put('\u00d7', "x");     // multiplication
-        OCR_SYMBOLS.put('\u00f7', "/");
-        OCR_SYMBOLS.put('\u2192', "->");    // arrow
-        OCR_SYMBOLS.put('\u2265', ">=");
-        OCR_SYMBOLS.put('\u2264', "<=");
-        OCR_SYMBOLS.put('\u2260', "!=");
-        OCR_SYMBOLS.put('\u2080', "0"); OCR_SYMBOLS.put('\u2081', "1");
-        OCR_SYMBOLS.put('\u2082', "2"); OCR_SYMBOLS.put('\u2083', "3");
-        OCR_SYMBOLS.put('\u2084', "4"); OCR_SYMBOLS.put('\u2085', "5");
-        OCR_SYMBOLS.put('\u2086', "6"); OCR_SYMBOLS.put('\u2087', "7");
-        OCR_SYMBOLS.put('\u2088', "8"); OCR_SYMBOLS.put('\u2089', "9");
-        OCR_SYMBOLS.put('\u00b2', "2"); OCR_SYMBOLS.put('\u00b3', "3");
-        OCR_SYMBOLS.put('\u2081', "1");
-        OCR_SYMBOLS.put('\u2093', "x");     // subscript x
-    }
-
-    /**
-     * Text for the invisible OCR layer, or "" when the font cannot represent it.
-     * Latin-1 is kept (including accents), anything else is dropped rather than turned
-     * into "?" so the search index never gains a word that was not on the page.
-     */
-    static String ocrEncodable(String s) {
-        if (s == null) return "";
-        StringBuilder b = new StringBuilder(s.length());
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '\n' || c == '\r' || c == '\t') b.append(' ');
-            else if (c >= 32 && c <= 126) b.append(c);
-            else if (c >= 160 && c <= 255) b.append(c);
-            else {
-                // Symbols a reader expects to copy, mapped to what the font can write.
-                // Without this, "\u20b9500" became "500" - the amount survived, the currency
-                // did not, and copying a bill gave a number with no unit.
-                String m = OCR_SYMBOLS.get(c);
-                if (m != null) b.append(m);
-                // anything else is intentionally skipped
-            }
-        }
-        String out = b.toString().trim();
-        // a run that lost all its letters (e.g. a Devanagari word) is not useful
-        boolean hasLetter = false;
-        for (int i = 0; i < out.length(); i++) {
-            if (Character.isLetterOrDigit(out.charAt(i))) { hasLetter = true; break; }
-        }
-        return hasLetter ? out : "";
-    }
-
     static String winAnsi(String s) {
         if (s == null) return "";
         StringBuilder b = new StringBuilder(s.length());
