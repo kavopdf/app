@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <set>
+            <objectAnimator android:interpolator="@android:anim/decelerate_interpolator" android:propertyName="scaleX" android:valueTo="0.965" android:duration="240" />
+            <objectAnimator android:propertyName="scaleY" android:valueTo="0.965" android:duration="240" />
+        </set>
+    </item>
+    <item>
+        <set>
+            <objectAnimator android:propertyName="scaleX" android:valueTo="1.0" android:duration="240" />
+            <objectAnimator android:propertyName="scaleY" android:valueTo="1.0" android:duration="240" />
+        </set>
+    </item>
+</selector>

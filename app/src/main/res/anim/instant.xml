@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A no-op animation. Used for screens that open a picker immediately, so the
+     screen appearing and the picker opening do not animate over each other. -->
+<alpha android:interpolator="@android:anim/decelerate_interpolator" xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromAlpha="1.0"
+    android:toAlpha="1.0"
+    android:duration="240" />
