@@ -104,8 +104,9 @@ object AnnotRenderer {
     fun rasterize(items: List<Annot>, pageW: Float, pageH: Float, scale: Float): Bitmap {
         var w = (pageW * scale).toInt().coerceAtLeast(1)
         var h = (pageH * scale).toInt().coerceAtLeast(1)
-        // never allocate more than ~16 MP, whatever the page claims to be
-        val maxPixels = 16_000_000.0
+        // same budget the page renderer uses, so a cheap phone does not allocate a
+        // 64 MB bitmap here and run out of memory in the middle of an export
+        val maxPixels = com.kavopdf.app.ui.PageRenderer.budgetPixels().toDouble()
         val px = w.toDouble() * h
         if (px > maxPixels) {
             val s = Math.sqrt(maxPixels / px)

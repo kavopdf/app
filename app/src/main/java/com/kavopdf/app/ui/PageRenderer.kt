@@ -1,11 +1,25 @@
 package com.kavopdf.app.ui
 
+import android.app.ActivityManager
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.pdf.PdfRenderer
 
-/** Renders PDF pages to bitmaps using the platform renderer (fast, offline). */
+/**
+ * Renders PDF pages to bitmaps using the platform renderer (fast, offline).
+ *
+ * Every page goes through here, so this is the one place where the app can behave the
+ * same on a 2 GB budget phone and a 12 GB flagship. Two rules do that:
+ *
+ *   1. A page bitmap is never allowed to take more than a fixed share of the heap this
+ *      device actually gave us. The old code allowed 6000 px wide, which on an A4 page
+ *      is 6000 x 8485 x 4 bytes = 203 MB - an instant OutOfMemoryError on anything
+ *      cheap, while a flagship never noticed.
+ *   2. If the allocation still fails, the size is halved and retried, so a page always
+ *      renders rather than crashing the screen.
+ */
 class PageRenderer(private val renderer: PdfRenderer) {
 
     val pageCount: Int get() = renderer.pageCount
@@ -14,46 +28,80 @@ class PageRenderer(private val renderer: PdfRenderer) {
     fun render(index: Int, targetWidth: Int, rotation: Int = 0): Bitmap {
         val page = renderer.openPage(index)
         try {
-            if (page.width <= 0 || page.height <= 0) return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+            if (page.width <= 0 || page.height <= 0) {
+                return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+            }
             val ratio = page.height.toFloat() / page.width.toFloat()
-            val w = targetWidth.coerceIn(1, 6000)
-            val h = (w * ratio).toInt().coerceAtLeast(1)
-            val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-            bmp.eraseColor(Color.WHITE)
-            page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-            val deg = ((rotation % 360) + 360) % 360
-            if (deg == 0) return bmp
-            val m = Matrix().apply { postRotate(deg.toFloat()) }
-            val rotated = Bitmap.createBitmap(bmp, 0, 0, w, h, m, true)
-            if (rotated != bmp) bmp.recycle()
-            return rotated
+            var w = targetWidth.coerceIn(1, MAX_SIDE)
+            // never let one page exceed this device's own budget
+            val allowed = maxPixels
+            while (w > MIN_SIDE && (w.toLong() * (w * ratio).toLong()) > allowed) {
+                w /= 2
+            }
+            var attempt = 0
+            while (true) {
+                val h = (w * ratio).toInt().coerceAtLeast(1)
+                try {
+                    val bmp = Bitmap.createBitmap(w, h, config)
+                    bmp.eraseColor(Color.WHITE)
+                    page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                    return rotate(bmp, w, h, rotation)
+                } catch (oom: OutOfMemoryError) {
+                    // cheaper phone, or another screen holding memory: go smaller
+                    if (attempt >= 3 || w <= MIN_SIDE) throw oom
+                    attempt++
+                    w /= 2
+                }
+            }
         } finally {
             page.close()
         }
+    }
+
+    private fun rotate(bmp: Bitmap, w: Int, h: Int, rotation: Int): Bitmap {
+        val deg = ((rotation % 360) + 360) % 360
+        if (deg == 0) return bmp
+        val m = Matrix().apply { postRotate(deg.toFloat()) }
+        val rotated = Bitmap.createBitmap(bmp, 0, 0, w, h, m, true)
+        if (rotated != bmp) bmp.recycle()
+        return rotated
     }
 
     @Synchronized
     fun close() {
         try { renderer.close() } catch (_: Exception) { }
     }
-    companion object {
-        /**
-         * Page sizes from a renderer that is already open. Asking PdfEngine as well
-         * loaded the whole document a second time with pdfbox - the slowest thing in
-         * every open path.
-         */
-        fun displaySizes(r: android.graphics.pdf.PdfRenderer): List<FloatArray> {
-            val out = ArrayList<FloatArray>(r.pageCount)
-            for (i in 0 until r.pageCount) {
-                val pg = r.openPage(i)
-                try {
-                    out.add(floatArrayOf(pg.width.toFloat(), pg.height.toFloat()))
-                } finally {
-                    pg.close()
-                }
-            }
-            return out
-        }
-    }
 
+    companion object {
+        /** Hard ceiling on a page's short side, whatever the caller asks for. */
+        private const val MAX_SIDE = 4000
+        private const val MIN_SIDE = 240
+
+        /** Pixels allowed per page, and the bitmap format, decided once per process. */
+        @Volatile private var maxPixels: Long = 4_000_000L
+        @Volatile private var config: Bitmap.Config = Bitmap.Config.ARGB_8888
+
+        /**
+         * Called once at start-up. A low-RAM device gets a smaller page budget and a
+         * 2-byte-per-pixel format, which halves memory; a normal phone keeps full colour.
+         */
+        fun configure(context: Context) {
+            try {
+                val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                val mb = am.memoryClass.toLong()          // heap this app may use, in MB
+                val lowRam = am.isLowRamDevice
+                // a quarter of the heap for one page bitmap: two pages on screen plus the
+                // rest of the app still fit
+                val budgetBytes = mb * 1024L * 1024L / 4L
+                config = if (lowRam || mb <= 192L) Bitmap.Config.RGB_565 else Bitmap.Config.ARGB_8888
+                val bytesPerPixel = if (config == Bitmap.Config.RGB_565) 2L else 4L
+                maxPixels = (budgetBytes / bytesPerPixel).coerceIn(400_000L, 16_000_000L)
+            } catch (_: Throwable) {
+                // keep the conservative defaults
+            }
+        }
+
+        /** For tests: what the current budget works out to. */
+        fun budgetPixels(): Long = maxPixels
+    }
 }

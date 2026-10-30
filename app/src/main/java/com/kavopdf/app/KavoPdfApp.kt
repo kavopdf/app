@@ -14,6 +14,9 @@ class KavoPdfApp : Application() {
             else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         })
         PDFBoxResourceLoader.init(applicationContext)
+        // Decide once how much memory a page bitmap may use on THIS device, so a budget
+        // phone and a flagship both render the same page without either running out.
+        com.kavopdf.app.ui.PageRenderer.configure(this)
         cleanStaleCache()
         com.kavopdf.app.util.CrashGuard.install(this)
     }
