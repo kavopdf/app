@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Default accent: Indigo. The Theme.KavoPDF.* overlays below re-tint the
+         whole app (toolbars, headers, icons) by overriding colorPrimary. -->
+    <style name="Theme.KavoPDF" parent="Theme.Material3Expressive.DayNight.NoActionBar">
+        <item name="colorPrimary">#FF3B5BDB</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">#FFDDE4FF</item>
+        <item name="colorOnPrimaryContainer">#FF16224F</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
+        <item name="colorSecondaryContainer">@color/brand_secondary_container</item>
+        <item name="android:colorBackground">@color/app_background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:windowAnimationStyle">@style/Animation.KavoPDF</item>
+        <item name="textInputStyle">@style/Widget.KavoPDF.TextInput</item>
+        <item name="popupMenuStyle">@style/Widget.KavoPDF.PopupMenu</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.KavoPDF.PopupMenu.Overflow</item>
+        <!-- Material 3 Expressive: a larger, softer shape scale, and pill buttons -->
+        <item name="materialButtonStyle">@style/Widget.KavoPDF.Button</item>
+        <item name="shapeAppearanceCornerExtraSmall">@style/ShapeAppearance.KavoPDF.CornerExtraSmall</item>
+        <item name="shapeAppearanceCornerSmall">@style/ShapeAppearance.KavoPDF.CornerSmall</item>
+        <item name="shapeAppearanceCornerMedium">@style/ShapeAppearance.KavoPDF.CornerMedium</item>
+        <item name="shapeAppearanceCornerLarge">@style/ShapeAppearance.KavoPDF.CornerLarge</item>
+        <item name="shapeAppearanceCornerExtraLarge">@style/ShapeAppearance.KavoPDF.CornerExtraLarge</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.KavoPDF.Dialog</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.KavoPDF.Dialog</item>
+    </style>
+
+    <style name="Theme.KavoPDF.Teal" parent="Theme.KavoPDF">
+        <item name="colorPrimary">#FF0C8599</item>
+        <item name="colorPrimaryContainer">#FFD3F1F5</item>
+        <item name="colorOnPrimaryContainer">#FF0B3038</item>
+    </style>
+
+    <style name="Theme.KavoPDF.Violet" parent="Theme.KavoPDF">
+        <item name="colorPrimary">#FF7048E8</item>
+        <item name="colorPrimaryContainer">#FFE5DBFF</item>
+        <item name="colorOnPrimaryContainer">#FF221454</item>
+    </style>
+
+    <style name="Theme.KavoPDF.Green" parent="Theme.KavoPDF">
+        <item name="colorPrimary">#FF2F9E44</item>
+        <item name="colorPrimaryContainer">#FFD3F9D8</item>
+        <item name="colorOnPrimaryContainer">#FF0B2E13</item>
+    </style>
+
+    <style name="Theme.KavoPDF.Crimson" parent="Theme.KavoPDF">
+        <item name="colorPrimary">#FFC2255C</item>
+        <item name="colorPrimaryContainer">#FFFCE0E9</item>
+        <item name="colorOnPrimaryContainer">#FF4A0E24</item>
+    </style>
+
+    <!-- Light, quick activity transitions -->
+    <style name="Animation.KavoPDF" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/fade_out_slight</item>
+        <item name="android:activityCloseEnterAnimation">@anim/fade_in_slight</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+    </style>
+
+    <style name="TextAppearance.KavoPDF.SectionHeader" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.06</item>
+    </style>
+
+    <!-- Every dialog gets the same soft, rounded surface. In the theme so a new
+         dialog can never come out square by accident. -->
+    <style name="ShapeAppearance.KavoPDF.Dialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">26dp</item>
+    </style>
+
+    <style name="ThemeOverlay.KavoPDF.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.KavoPDF.Dialog</item>
+        <item name="android:windowBackground">@drawable/bg_dialog_rounded</item>
+        <item name="android:backgroundDimAmount">0.55</item>
+    </style>
+    <!-- For screens that open a picker straight away: nothing to animate, so the
+         screen and the picker never animate over each other. -->
+    <style name="Animation.KavoPDF.None" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/instant</item>
+        <item name="android:activityOpenExitAnimation">@anim/instant</item>
+        <item name="android:activityCloseEnterAnimation">@anim/instant</item>
+        <item name="android:activityCloseExitAnimation">@anim/instant</item>
+    </style>
+    <!-- Input fields are pills everywhere. Set as the theme's textInputStyle so a
+         field can never come out as a bare underline by accident. -->
+    <style name="Widget.KavoPDF.TextInput" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">@color/field_bg</item>
+        <item name="boxCornerRadiusTopStart">26dp</item>
+        <item name="boxCornerRadiusTopEnd">26dp</item>
+        <item name="boxCornerRadiusBottomStart">26dp</item>
+        <item name="boxCornerRadiusBottomEnd">26dp</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <item name="hintTextColor">?attr/colorPrimary</item>
+    </style>
+    <!-- Matches the launcher mark: the amber of the K on a near-black ground. -->
+    <style name="Theme.KavoPDF.Amber" parent="Theme.KavoPDF">
+        <item name="colorPrimary">#FFF5A524</item>
+        <item name="colorOnPrimary">#FF241A00</item>
+        <item name="colorPrimaryContainer">#FFFFE7C2</item>
+        <item name="colorOnPrimaryContainer">#FF3D2A00</item>
+        <item name="colorSecondary">#FFB26A00</item>
+        <item name="colorSecondaryContainer">#FFFFDFAE</item>
+        <item name="android:statusBarColor">#FF241A00</item>
+    </style>
+    <style name="ShapeAppearance.KavoPDF.Pill" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="Widget.KavoPDF.Button" parent="Widget.Material3.Button">
+        <item name="shapeAppearance">@style/ShapeAppearance.KavoPDF.Pill</item>
+    </style>
+
+    <style name="Widget.KavoPDF.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="shapeAppearance">@style/ShapeAppearance.KavoPDF.Pill</item>
+    </style>
+
+    <style name="Widget.KavoPDF.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="shapeAppearance">@style/ShapeAppearance.KavoPDF.Pill</item>
+    </style>
+
+    <style name="Widget.KavoPDF.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="shapeAppearance">@style/ShapeAppearance.KavoPDF.Pill</item>
+    </style>
+    <!-- Material 3 Expressive shape scale: each step is a ShapeAppearance style. -->
+    <style name="ShapeAppearance.KavoPDF.CornerExtraSmall" parent="">
+        <item name="cornerFamily">rounded</item><item name="cornerSize">8dp</item>
+    </style>
+    <style name="ShapeAppearance.KavoPDF.CornerSmall" parent="">
+        <item name="cornerFamily">rounded</item><item name="cornerSize">12dp</item>
+    </style>
+    <style name="ShapeAppearance.KavoPDF.CornerMedium" parent="">
+        <item name="cornerFamily">rounded</item><item name="cornerSize">16dp</item>
+    </style>
+    <style name="ShapeAppearance.KavoPDF.CornerLarge" parent="">
+        <item name="cornerFamily">rounded</item><item name="cornerSize">24dp</item>
+    </style>
+    <style name="ShapeAppearance.KavoPDF.CornerExtraLarge" parent="">
+        <item name="cornerFamily">rounded</item><item name="cornerSize">32dp</item>
+    </style>
+    <!-- Popups (the toolbar overflow, and every spinner's list) are rounded, and so
+         is the highlight that runs under a menu item. -->
+    <style name="Widget.KavoPDF.PopupMenu" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupAnimationStyle">@style/Animation.KavoPDF.None</item>
+        <item name="android:popupElevation">2dp</item>
+        <item name="android:popupBackground">@drawable/bg_popup_pill</item>
+        <item name="android:itemBackground">@drawable/bg_menu_item</item>
+    </style>
+
+    <style name="Widget.KavoPDF.PopupMenu.Overflow" parent="Widget.Material3.PopupMenu.Overflow">
+        <item name="android:popupAnimationStyle">@style/Animation.KavoPDF.None</item>
+        <item name="android:popupElevation">2dp</item>
+        <item name="android:popupBackground">@drawable/bg_popup_pill</item>
+        <item name="android:itemBackground">@drawable/bg_menu_item</item>
+    </style>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Intentionally empty.
+
+  Dark-mode container colours used to live here as styles. A style in a qualifier
+  folder replaces the default one entirely, and these had no parent - so AAPT
+  resolved their parent to a bare "Theme" and resource linking failed. The dark
+  container colours are not needed (nothing uses a tonal fill any more), so this
+  file stays empty rather than carrying half-defined themes.
+-->
+<resources />
