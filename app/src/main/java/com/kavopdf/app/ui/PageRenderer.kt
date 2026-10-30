@@ -42,7 +42,11 @@ class PageRenderer(private val renderer: PdfRenderer) {
             while (true) {
                 val h = (w * ratio).toInt().coerceAtLeast(1)
                 try {
-                    val bmp = Bitmap.createBitmap(w, h, config)
+                    // PdfRenderer refuses anything but ARGB_8888 - it throws
+                    // IllegalArgumentException("Unsupported pixel format") and the page
+                    // never appears. Memory is saved by drawing fewer pixels, never by
+                    // dropping to 16-bit colour.
+                    val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
                     bmp.eraseColor(Color.WHITE)
                     page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     return rotate(bmp, w, h, rotation)
@@ -77,9 +81,8 @@ class PageRenderer(private val renderer: PdfRenderer) {
         private const val MAX_SIDE = 4000
         private const val MIN_SIDE = 240
 
-        /** Pixels allowed per page, and the bitmap format, decided once per process. */
+        /** Pixels allowed per page, decided once per process. */
         @Volatile private var maxPixels: Long = 4_000_000L
-        @Volatile private var config: Bitmap.Config = Bitmap.Config.ARGB_8888
 
         /**
          * How much memory the reader's page cache may hold. A fixed number was backwards:
@@ -91,20 +94,21 @@ class PageRenderer(private val renderer: PdfRenderer) {
         @Volatile private var cacheBudget: Int = 48 * 1024 * 1024
 
         /**
-         * Called once at start-up. A low-RAM device gets a smaller page budget and a
-         * 2-byte-per-pixel format, which halves memory; a normal phone keeps full colour.
+         * Called once at start-up. A low-RAM device gets a smaller page budget, so a page
+         * is drawn with fewer pixels; the bitmap format is always ARGB_8888 because that
+         * is the only one PdfRenderer can draw to.
          */
         fun configure(context: Context) {
             try {
                 val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                 val mb = am.memoryClass.toLong()          // heap this app may use, in MB
                 val lowRam = am.isLowRamDevice
-                // a quarter of the heap for one page bitmap: two pages on screen plus the
-                // rest of the app still fit
-                val budgetBytes = mb * 1024L * 1024L / 4L
-                config = if (lowRam || mb <= 192L) Bitmap.Config.RGB_565 else Bitmap.Config.ARGB_8888
-                val bytesPerPixel = if (config == Bitmap.Config.RGB_565) 2L else 4L
-                maxPixels = (budgetBytes / bytesPerPixel).coerceIn(400_000L, 16_000_000L)
+                // Always 4 bytes per pixel: that is the only format PdfRenderer draws to.
+                // A low-RAM device gets fewer pixels instead of a cheaper format.
+                val bytesPerPixel = 4L
+                val share = if (lowRam || mb <= 192L) 6L else 4L
+                maxPixels = ((mb * 1024L * 1024L / share) / bytesPerPixel)
+                        .coerceIn(400_000L, 16_000_000L)
                 cacheBudget = (mb * 1024L * 1024L / 6L)
                         .coerceIn(24L * 1024 * 1024, 192L * 1024 * 1024).toInt()
             } catch (_: Throwable) {
@@ -143,7 +147,9 @@ class PageRenderer(private val renderer: PdfRenderer) {
          */
         fun reduceBudget() {
             try {
-                config = Bitmap.Config.RGB_565
+                // Only the pixel count changes. Switching the bitmap format here used to
+                // break every later render, because PdfRenderer rejects anything but
+                // ARGB_8888 - the screen went black until the app was restarted.
                 maxPixels = (maxPixels / 2).coerceAtLeast(400_000L)
             } catch (_: Throwable) {
             }
