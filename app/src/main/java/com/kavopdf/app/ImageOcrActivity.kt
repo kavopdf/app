@@ -68,16 +68,20 @@ class ImageOcrActivity : PdfActivity() {
             val text = StringBuilder()
             for ((i, uri) in uris.withIndex()) {
                 busy.update(getString(R.string.image_ocr_working, i + 1, uris.size))
+                // Copy once, then decode that same file through the shared decoder, which
+                // applies EXIF orientation. Decoding the uri separately left the OCR
+                // reading a sideways bitmap while the PDF embedded an upright one, so the
+                // text layer sat 90 degrees away from the page on portrait photos.
+                val f = withContext(Dispatchers.IO) {
+                    runCatching { Files.copyToCache(this@ImageOcrActivity, uri) }.getOrNull()
+                } ?: continue
                 val bmp = withContext(Dispatchers.IO) {
-                    runCatching { decodeBounded(uri, OCR_MAX) }.getOrNull()
+                    runCatching { PdfEngine.decodeImage(f, OCR_MAX) }.getOrNull()
                 } ?: continue
                 val w = bmp.width
                 val h = bmp.height
                 val words = recognise(bmp)
                 bmp.recycle()
-                val f = withContext(Dispatchers.IO) {
-                    runCatching { Files.copyToCache(this@ImageOcrActivity, uri) }.getOrNull()
-                } ?: continue
                 inputs.add(f)
                 pages.add(PdfEngine.PageText(inputs.size, w, h, words))
                 if (words.isNotEmpty()) {
@@ -101,24 +105,6 @@ class ImageOcrActivity : PdfActivity() {
         }
     }
 
-    private fun decodeBounded(uri: Uri, maxDim: Int): Bitmap? {
-        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        try {
-            contentResolver.openInputStream(uri)?.use {
-                android.graphics.BitmapFactory.decodeStream(it, null, bounds)
-            }
-        } catch (_: Exception) { return null }
-        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
-        var sample = 1
-        while (max(bounds.outWidth, bounds.outHeight) / (sample * 2) >= maxDim) sample *= 2
-        val opts = android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
-        return try {
-            contentResolver.openInputStream(uri)?.use {
-                android.graphics.BitmapFactory.decodeStream(it, null, opts)
-            }
-        } catch (_: Exception) { null }
-    }
-
     private suspend fun recognise(bitmap: Bitmap): List<PdfEngine.OcrWord> =
         suspendCoroutine { cont ->
             recogniser.process(InputImage.fromBitmap(bitmap, 0))
@@ -130,6 +116,12 @@ class ImageOcrActivity : PdfActivity() {
                                 val b = el.boundingBox ?: continue
                                 val t = el.text
                                 if (t.isBlank() || b.width() <= 0 || b.height() <= 0) continue
+                                // A one- or two-character element that the recogniser
+                                // barely believes is a watermark or a rule, not a word.
+                                // Real short words ("of", "50") come back confident, so
+                                // the threshold stays low and length alone never filters.
+                                val conf = el.confidence
+                                if (t.trim().length <= 2 && conf != null && conf < 0.5f) continue
                                 words.add(
                                     PdfEngine.OcrWord(
                                         t, b.left.toFloat(), b.top.toFloat(),

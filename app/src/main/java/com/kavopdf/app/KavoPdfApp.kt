@@ -17,6 +17,9 @@ class KavoPdfApp : Application() {
         // Decide once how much memory a page bitmap may use on THIS device, so a budget
         // phone and a flagship both render the same page without either running out.
         com.kavopdf.app.ui.PageRenderer.configure(this)
+        // The OCR layer writes exact characters (rupee sign, dashes, subscripts) with an
+        // embedded Unicode font. Read once here so the engine needs no Context.
+        loadOcrFont()
         cleanStaleCache()
         com.kavopdf.app.util.CrashGuard.install(this)
     }
@@ -78,6 +81,22 @@ class KavoPdfApp : Application() {
 
         fun setAccentPref(context: android.content.Context, index: Int) {
             context.getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_ACCENT, index).apply()
+        }
+    }
+
+    /**
+     * Hand the OCR layer its Unicode font. If the asset is missing or unreadable the
+     * engine keeps using Helvetica, so a build without the font still works - it just
+     * substitutes the rupee sign instead of writing it.
+     */
+    private fun loadOcrFont() {
+        try {
+            assets.open("fonts/NotoSans-Regular.ttf").use { input ->
+                val bytes = input.readBytes()
+                if (bytes.isNotEmpty()) com.kavopdf.app.engine.PdfEngine.setOcrFont(bytes)
+            }
+        } catch (_: Throwable) {
+            // no font: the layer falls back to Helvetica
         }
     }
 }

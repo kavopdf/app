@@ -28,7 +28,7 @@ echo "== running engine verification =="
 java -cp "$CP" TestEngine
 
 echo "== rotation / overlay placement (rendered and pixel-checked) =="
-javac -cp "$CP" -d out TestRotate.java TestCrop.java TestEnc.java TestHostile.java TestTextLayer.java TestSearch.java TestLinkIcon.java TestTextLink.java TestOcrText.java TestOpacity.java TestAllPages.java TestCopy.java TestRedact.java
+javac -cp "$CP" -d out TestRotate.java TestCrop.java TestEnc.java TestHostile.java TestTextLayer.java TestSearch.java TestLinkIcon.java TestTextLink.java TestOcrText.java TestFontExact.java TestOpacity.java TestAllPages.java TestCopy.java TestRedact.java
 java -cp "$CP" TestRotate
 java -cp "$CP" TestCrop
 java -cp "$CP" TestEnc
@@ -117,5 +117,9 @@ java -cp "$CP" TestNorms
 java -cp "$CP" TestFonts
 python3 verify-fonts.py
 
+echo "== the layer must write the characters that were on the page, not substitutes =="
+java -cp "$CP" TestFontExact ../../app/src/main/assets/fonts/NotoSans-Regular.ttf
+
+echo
 echo "== what a reader copies out of an OCR layer =="
 java -cp "$CP" TestOcrText
