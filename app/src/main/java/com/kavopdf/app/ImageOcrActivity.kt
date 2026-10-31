@@ -116,12 +116,13 @@ class ImageOcrActivity : PdfActivity() {
                                 val b = el.boundingBox ?: continue
                                 val t = el.text
                                 if (t.isBlank() || b.width() <= 0 || b.height() <= 0) continue
-                                // A one- or two-character element that the recogniser
-                                // barely believes is a watermark or a rule, not a word.
-                                // Real short words ("of", "50") come back confident, so
-                                // the threshold stays low and length alone never filters.
+                                // A single character the recogniser barely believes is a
+                                // spec of dirt or a rule, not a word. Kept deliberately
+                                // narrow: the layer is invisible, so a stray glyph costs
+                                // nothing while a dropped real character costs a search
+                                // hit. Only one character AND very low confidence.
                                 val conf = el.confidence
-                                if (t.trim().length <= 2 && conf != null && conf < 0.5f) continue
+                                if (t.trim().length <= 1 && conf != null && conf < 0.3f) continue
                                 words.add(
                                     PdfEngine.OcrWord(
                                         t, b.left.toFloat(), b.top.toFloat(),

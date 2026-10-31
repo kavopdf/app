@@ -1470,16 +1470,42 @@ public final class PdfEngine {
      */
     private static boolean hasInvisibleLayer(PDPage page) {
         try {
-            java.io.InputStream in = page.getContents();
-            if (in == null) return false;
-            java.io.ByteArrayOutputStream buf = new java.io.ByteArrayOutputStream();
-            byte[] chunk = new byte[8192];
-            int n;
-            while ((n = in.read(chunk)) > 0) buf.write(chunk, 0, n);
-            in.close();
-            String content = new String(buf.toByteArray(), java.nio.charset.StandardCharsets.ISO_8859_1);
-            // "3 Tr" sets the text rendering mode to neither-fill-nor-stroke.
-            return java.util.regex.Pattern.compile("(?m)(^|\\s)3\\s+Tr(\\s|$)").matcher(content).find();
+            // A page may carry more than one content stream, and our layer can be in any
+            // of them - reading only the first one missed it and wrote a second layer.
+            java.util.List<java.io.InputStream> streams = new ArrayList<>();
+            try {
+                java.util.Iterator<com.tom_roush.pdfbox.pdmodel.common.PDStream> it =
+                        page.getContentStreams();
+                if (it != null) {
+                    while (it.hasNext()) {
+                        com.tom_roush.pdfbox.pdmodel.common.PDStream ps = it.next();
+                        if (ps != null) streams.add(ps.createInputStream());
+                    }
+                }
+            } catch (Throwable ignored) {
+            }
+            if (streams.isEmpty()) {
+                java.io.InputStream single = page.getContents();
+                if (single != null) streams.add(single);
+            }
+            java.util.regex.Pattern tr3 =
+                    java.util.regex.Pattern.compile("(?m)(^|\\s)3\\s+Tr(\\s|$)");
+            for (java.io.InputStream in : streams) {
+                try {
+                    java.io.ByteArrayOutputStream buf = new java.io.ByteArrayOutputStream();
+                    byte[] chunk = new byte[8192];
+                    int n;
+                    while ((n = in.read(chunk)) > 0) buf.write(chunk, 0, n);
+                    String content = new String(buf.toByteArray(),
+                            java.nio.charset.StandardCharsets.ISO_8859_1);
+                    // "3 Tr" sets the text rendering mode to neither-fill-nor-stroke.
+                    if (tr3.matcher(content).find()) return true;
+                } catch (Throwable ignored) {
+                } finally {
+                    try { in.close(); } catch (Throwable ignored) { }
+                }
+            }
+            return false;
         } catch (Throwable t) {
             // If it cannot be read, assume there is no layer: writing one is the safe way.
             return false;
@@ -2863,6 +2889,9 @@ public final class PdfEngine {
     /** Called once from the Application with the bytes of assets/fonts/NotoSans-Regular.ttf. */
     public static void setOcrFont(byte[] ttf) {
         ocrFontBytes = ttf;
+        // The cache answers "can this font draw this character", so it is only valid for
+        // the font it was built against. A new font must start from an empty cache.
+        GLYPH_CACHE.clear();
     }
 
     /** True when a Unicode layer font is available; used by tests. */
