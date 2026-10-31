@@ -17,8 +17,10 @@ import android.graphics.pdf.PdfRenderer
  *      device actually gave us. The old code allowed 6000 px wide, which on an A4 page
  *      is 6000 x 8485 x 4 bytes = 203 MB - an instant OutOfMemoryError on anything
  *      cheap, while a flagship never noticed.
- *   2. If the allocation still fails, the size is halved and retried, so a page always
- *      renders rather than crashing the screen.
+ *   2. If the allocation still fails, that one page is retried smaller, so it still
+ *      renders rather than crashing the screen. The smaller size is never written back
+ *      into the budget: doing that made one hard page shrink every page after it, which
+ *      is why a long document used to look worse towards the end than at the start.
  */
 class PageRenderer(private val renderer: PdfRenderer) {
 
@@ -51,13 +53,18 @@ class PageRenderer(private val renderer: PdfRenderer) {
                     page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     return rotate(bmp, w, h, rotation)
                 } catch (oom: OutOfMemoryError) {
-                    // The device refused this allocation. Go smaller and remember it, so
-                    // the next page starts where this one succeeded instead of failing
-                    // the same way again.
+                    // The device refused this allocation. Retry THIS page smaller, and do
+                    // not write the smaller size back into maxPixels.
+                    //
+                    // Writing it back is what made a long document fade towards the end:
+                    // one hard page halved the budget for the rest of the process, so
+                    // page 150 came out at half resolution and every page after it stayed
+                    // there, while page one - rendered before any pressure - was sharp.
+                    // Every page now starts from the same budget, so the last page is
+                    // rendered exactly like the first.
                     if (attempt >= 5 || w <= MIN_SIDE) throw oom
                     attempt++
                     w /= 2
-                    maxPixels = (w.toLong() * (w * ratio).toLong()).coerceAtLeast(FLOOR_PIXELS)
                 }
             }
         } finally {

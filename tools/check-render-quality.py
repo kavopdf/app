@@ -2,7 +2,8 @@
 """Fails the build if page rendering quality is quietly reduced for some devices.
 
 Memory safety for page bitmaps has to come from two places only:
-  - render() retrying smaller when the allocator actually refuses a size, and
+  - render() retrying a single page smaller when the allocator actually refuses a
+    size, without writing that smaller size back into the shared budget, and
   - the page cache budget.
 
 It must never come from lowering the page budget up front, because that is exactly how
@@ -10,7 +11,7 @@ the app went blurry: 3.30.3 gave low-RAM devices a smaller page, and 3.30.4 halv
 budget on every onTrimMemory callback and never restored it, so after a few trips to the
 background a page was drawn at 530 px wide and scaled up.
 
-This guard pins the three things that keep that from happening again.
+This guard pins the four things that keep that from happening again.
 """
 import pathlib
 import re
@@ -71,6 +72,15 @@ if viewer.exists():
     w = re.search(r"MAX_WIDTH\s*=\s*(\d+)", v)
     if not w or int(w.group(1)) < 2800:
         fails.append("ViewerActivity MAX_WIDTH dropped below 2800")
+
+# 6) render() must never write a smaller size back into the page budget
+m = re.search(r"fun render\(index: Int[^\n]*\{(.*?)\n    \}", src, re.S)
+if not m:
+    fails.append("render() not found")
+elif re.search(r"\bmaxPixels\s*=", m.group(1)):
+    fails.append("render() writes a smaller size back into maxPixels - one hard page then "
+                 "shrinks every page after it, so a long document fades towards the end "
+                 "while page one stays sharp")
 
 if fails:
     for f in fails:
