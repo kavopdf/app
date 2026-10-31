@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
         useHighestRefreshRate()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        com.kavopdf.app.util.applyCutoutInsets(this)
         // read from the build, so every release shows its own version
         findViewById<android.widget.TextView>(R.id.tvVersion)?.text =
             "v" + com.kavopdf.app.BuildConfig.VERSION_NAME

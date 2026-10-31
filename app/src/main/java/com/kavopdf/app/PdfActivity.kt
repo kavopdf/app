@@ -100,7 +100,6 @@ abstract class PdfActivity : AppCompatActivity() {
         // 120 Hz panels stay at 60 unless the window asks for more.
         useHighestRefreshRate()
         com.kavopdf.app.util.CrashGuard.step("Opened: " + javaClass.simpleName)
-        com.kavopdf.app.util.applyCutoutInsets(this)
         busy = Busy(this)
     }
 

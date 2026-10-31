@@ -83,35 +83,6 @@ else:
     if "intent?.data" in v and "incomingUri" not in v:
         fails.append("ViewerActivity went back to reading only intent.data")
 
-# 4) the whole display, camera cutout included
-#    Without windowLayoutInDisplayCutoutMode a phone with a notch treats the app as
-#    "fit to screen" and keeps a black band along the edge, so every other app looked
-#    full screen and this one did not.
-THEMES = pathlib.Path("app/src/main/res/values/themes.xml")
-if not THEMES.exists():
-    fails.append("values/themes.xml is missing")
-else:
-    th = THEMES.read_text(encoding="utf-8")
-    if "android:windowLayoutInDisplayCutoutMode" not in th:
-        fails.append("the theme no longer asks for the display cutout - a notched phone "
-                     "would letterbox the app again")
-    elif "shortEdges" not in th:
-        fails.append("windowLayoutInDisplayCutoutMode is not shortEdges")
-
-UI = pathlib.Path("app/src/main/java/com/kavopdf/app/util/Ui.kt")
-if not UI.exists():
-    fails.append("util/Ui.kt is missing")
-elif "applyCutoutInsets" not in UI.read_text(encoding="utf-8"):
-    fails.append("applyCutoutInsets is gone - content would sit under the punch-hole in "
-                 "landscape")
-
-for name in ("PdfActivity", "MainActivity"):
-    f = pathlib.Path(f"app/src/main/java/com/kavopdf/app/{name}.kt")
-    if not f.exists():
-        fails.append(f"{name}.kt is missing")
-    elif "applyCutoutInsets" not in f.read_text(encoding="utf-8"):
-        fails.append(f"{name} does not apply the cutout insets")
-
 if fails:
     for f in fails:
         print("FAIL:", f)

@@ -6,31 +6,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.kavopdf.app.R
 
-/**
- * Keep content out from under the camera cutout now that the window is allowed to use it.
- *
- * The theme asks for the whole display (shortEdges). In portrait that changes nothing -
- * the status bar already holds content below the notch - so only the LEFT and RIGHT safe
- * insets are applied: those are what matter in landscape, where a punch-hole sits beside
- * the toolbar. Padding the top as well would double-count the status bar and push every
- * screen down by the notch height.
- *
- * Below Android 9 there is no cutout, so nothing happens at all.
- */
-fun applyCutoutInsets(activity: Activity) {
-    val content = activity.findViewById<android.view.View>(android.R.id.content) ?: return
-    content.setOnApplyWindowInsetsListener { v, insets ->
-        if (android.os.Build.VERSION.SDK_INT >= 28) {
-            val cut = insets.displayCutout
-            if (cut != null) {
-                v.setPadding(cut.safeInsetLeft, 0, cut.safeInsetRight, 0)
-            }
-        }
-        insets
-    }
-    content.requestApplyInsets()
-}
-
 /** A simple, non-cancelable progress dialog used while the engine works. */
 class Busy(private val activity: Activity) {
     private var dialog: AlertDialog? = null
