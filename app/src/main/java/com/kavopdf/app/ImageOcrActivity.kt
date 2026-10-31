@@ -1,6 +1,5 @@
 package com.kavopdf.app
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
@@ -17,7 +16,6 @@ import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.coroutines.resume
-import kotlin.math.max
 
 /**
  * Reads the text in photos / screenshots on-device and saves them as a PDF that
@@ -63,63 +61,75 @@ class ImageOcrActivity : PdfActivity() {
         if (uris.isEmpty()) return toast(getString(R.string.msg_need_one_image))
         lifecycleScope.launch {
             busy.show(getString(R.string.image_ocr_working, 1, uris.size))
-            val inputs = ArrayList<File>()
             val pages = ArrayList<PdfEngine.PageText>()
             val text = StringBuilder()
-            for ((i, uri) in uris.withIndex()) {
-                busy.update(getString(R.string.image_ocr_working, i + 1, uris.size))
-                val bmp = withContext(Dispatchers.IO) {
-                    runCatching { decodeBounded(uri, OCR_MAX) }.getOrNull()
-                } ?: continue
-                val w = bmp.width
-                val h = bmp.height
-                val words = recognise(bmp)
-                bmp.recycle()
-                val f = withContext(Dispatchers.IO) {
-                    runCatching { Files.copyToCache(this@ImageOcrActivity, uri) }.getOrNull()
-                } ?: continue
-                inputs.add(f)
-                pages.add(PdfEngine.PageText(inputs.size, w, h, words))
-                if (words.isNotEmpty()) {
-                    if (text.isNotEmpty()) text.append("\n\n")
-                    text.append(names.getOrElse(i) { "image ${i + 1}" }).append("\n")
-                    text.append(words.joinToString(" ") { it.text })
+            val flat = runCatching { Files.newFile(this@ImageOcrActivity, "imgflat.pdf") }.getOrNull()
+            if (flat == null) {
+                busy.dismiss()
+                toast(getString(R.string.msg_failed, "PDF"))
+                return@launch
+            }
+            val writer = PdfEngine.ImagePdfWriter(OCR_MAX, false)
+            var built = false
+            try {
+                for ((i, uri) in uris.withIndex()) {
+                    busy.update(getString(R.string.image_ocr_working, i + 1, uris.size))
+                    // Copy first, then decode that one copy. The picture the recogniser reads
+                    // is the same picture that goes onto the page, so an image is decoded once
+                    // instead of twice and the boxes cannot drift away from what is shown.
+                    val file = withContext(Dispatchers.IO) {
+                        runCatching { Files.copyToCache(this@ImageOcrActivity, uri) }.getOrNull()
+                    } ?: continue
+                    val bmp = withContext(Dispatchers.IO) {
+                        runCatching { PdfEngine.decodeImage(file, OCR_MAX) }.getOrNull()
+                    } ?: continue
+                    val w = bmp.width
+                    val h = bmp.height
+                    val words = recognise(bmp)
+                    bmp.recycle()
+                    // The page is built from the file itself: a JPEG is embedded as its
+                    // original bytes, so there is no re-encode and no loss.
+                    // A phone photo keeps its rotation in EXIF: the bitmap is already turned
+                    // for the recogniser, so the page is told to rotate to match instead of
+                    // the JPEG being re-encoded.
+                    val degrees = withContext(Dispatchers.IO) {
+                        runCatching { PdfEngine.exifDegrees(file) }.getOrDefault(0)
+                    }
+                    val added = withContext(Dispatchers.IO) {
+                        runCatching { writer.addPage(file, w, h, degrees) }.isSuccess
+                    }
+                    if (!added) continue
+                    pages.add(PdfEngine.PageText(pages.size + 1, w, h, words))
+                    if (words.isNotEmpty()) {
+                        if (text.isNotEmpty()) text.append("\n\n")
+                        text.append(names.getOrElse(i) { "image ${i + 1}" }).append("\n")
+                        text.append(words.joinToString(" ") { it.text })
+                    }
                 }
+                built = withContext(Dispatchers.IO) {
+                    runCatching { writer.finish(flat) }.isSuccess
+                }
+            } finally {
+                writer.close()
             }
             busy.dismiss()
+            if (!built) {
+                toast(getString(R.string.msg_failed, "PDF"))
+                return@launch
+            }
             recognisedText = text.toString()
-            val chars = recognisedText.count { !it.isWhitespace() }
             if (pages.isEmpty()) {
                 toast(getString(R.string.image_ocr_none))
                 return@launch
             }
             runAndSave(Files.sanitize("images_searchable.pdf")) { out ->
-                val flat = Files.newFile(this@ImageOcrActivity, "imgflat.pdf")
-                PdfEngine.imagesToPdf(inputs, flat, OCR_MAX, false)
                 PdfEngine.addTextLayer(flat, pages, out)
+                pages.size
             }
         }
     }
 
-    private fun decodeBounded(uri: Uri, maxDim: Int): Bitmap? {
-        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        try {
-            contentResolver.openInputStream(uri)?.use {
-                android.graphics.BitmapFactory.decodeStream(it, null, bounds)
-            }
-        } catch (_: Exception) { return null }
-        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
-        var sample = 1
-        while (max(bounds.outWidth, bounds.outHeight) / (sample * 2) >= maxDim) sample *= 2
-        val opts = android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
-        return try {
-            contentResolver.openInputStream(uri)?.use {
-                android.graphics.BitmapFactory.decodeStream(it, null, opts)
-            }
-        } catch (_: Exception) { null }
-    }
-
-    private suspend fun recognise(bitmap: Bitmap): List<PdfEngine.OcrWord> =
+    private suspend fun recognise(bitmap: android.graphics.Bitmap): List<PdfEngine.OcrWord> =
         suspendCoroutine { cont ->
             recogniser.process(InputImage.fromBitmap(bitmap, 0))
                 .addOnSuccessListener { result ->

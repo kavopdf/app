@@ -1436,6 +1436,212 @@ public final class PdfEngine {
         }
     }
 
+    // ---------------------------------------------------------------------------------
+    // Image OCR: one EXIF-aware decoder and one streaming PDF writer.
+    // ---------------------------------------------------------------------------------
+
+    /**
+     * Degrees to rotate a bitmap by, from an {@link android.media.ExifInterface} orientation
+     * constant. A phone photo stores its rotation in EXIF rather than in the pixels, so a
+     * portrait page decodes sideways; ML Kit then reports boxes in that sideways frame and
+     * the text layer lands rotated against the page. Pure so it can be checked directly.
+     */
+    public static int exifRotation(int orientation) {
+        switch (orientation) {
+            case 6:  // ORIENTATION_ROTATE_90
+            case 8:  // ORIENTATION_ROTATE_270
+                return 90;
+            case 3:  // ORIENTATION_ROTATE_180
+                return 180;
+            default:
+                return 0;
+        }
+    }
+
+    /** Rotation for a 90-degree step: orientation 8 turns the other way from 6. */
+    public static int exifRotationSigned(int orientation) {
+        if (orientation == 8) return -90;
+        if (orientation == 6) return 90;
+        if (orientation == 3) return 180;
+        return 0;
+    }
+
+    /**
+     * The EXIF rotation of an image file in degrees clockwise: 0, 90, 180 or 270.
+     * Unreadable or missing EXIF reads as 0, which is right for PNG and for screenshots.
+     */
+    public static int exifDegrees(File f) {
+        try (java.io.InputStream in = new java.io.FileInputStream(f)) {
+            android.media.ExifInterface exif = new android.media.ExifInterface(in);
+            int signed = exifRotationSigned(exif.getAttributeInt(
+                    android.media.ExifInterface.TAG_ORIENTATION,
+                    android.media.ExifInterface.ORIENTATION_NORMAL));
+            return ((signed % 360) + 360) % 360;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Decode an image file to a bitmap no wider or taller than maxDimension, with the EXIF
+     * rotation already applied, so what ML Kit sees is what the reader sees.
+     *
+     * This is the only decoder the OCR path uses. Both the recogniser and the PDF writer get
+     * their picture from here, which is what keeps the recognised boxes and the page the same
+     * shape - decoding twice, once with EXIF and once without, put the layer 90 degrees off.
+     */
+    public static Bitmap decodeImage(File f, int maxDimension) {
+        android.graphics.BitmapFactory.Options bounds = new android.graphics.BitmapFactory.Options();
+        bounds.inJustDecodeBounds = true;
+        android.graphics.BitmapFactory.decodeFile(f.getAbsolutePath(), bounds);
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null;
+
+        int sample = 1;
+        while (Math.max(bounds.outWidth, bounds.outHeight) / (sample * 2) >= maxDimension) sample *= 2;
+
+        android.graphics.BitmapFactory.Options opts = new android.graphics.BitmapFactory.Options();
+        opts.inSampleSize = sample;
+        Bitmap bmp = android.graphics.BitmapFactory.decodeFile(f.getAbsolutePath(), opts);
+        if (bmp == null) return null;
+
+        int degrees = 0;
+        try (java.io.InputStream in = new java.io.FileInputStream(f)) {
+            android.media.ExifInterface exif = new android.media.ExifInterface(in);
+            degrees = exifRotationSigned(exif.getAttributeInt(
+                    android.media.ExifInterface.TAG_ORIENTATION,
+                    android.media.ExifInterface.ORIENTATION_NORMAL));
+        } catch (Exception ignored) {
+            // No EXIF block, or a format the platform cannot parse: the pixels are upright
+            // already, which is the common case for PNG and for screenshots.
+        }
+        if (degrees == 0) return bmp;
+        android.graphics.Matrix m = new android.graphics.Matrix();
+        m.postRotate(degrees);
+        Bitmap turned = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), m, true);
+        if (turned != bmp) bmp.recycle();
+        return turned;
+    }
+
+    /**
+     * Builds a PDF from images one page at a time.
+     *
+     * The old path decoded every image once for the recogniser and again for the PDF, and the
+     * PDF copy went through a JPEG re-encode. Here the caller hands over the picture it has
+     * already decoded, and a JPEG is embedded as its original bytes - no re-encode at all, so
+     * the page keeps exactly the quality of the file that was picked and the file does not
+     * grow. Anything that is not a JPEG falls back to a lossless Flate image.
+     */
+    public static final class ImagePdfWriter implements java.io.Closeable {
+        private final PDDocument doc = new PDDocument();
+        private final int maxDimension;
+        private final boolean fitToA4;
+        private boolean finished;
+
+        public ImagePdfWriter(int maxDimension, boolean fitToA4) {
+            this.maxDimension = maxDimension;
+            this.fitToA4 = fitToA4;
+        }
+
+        /**
+         * Add one page. pxW and pxH are the pixel size of the picture the recogniser read, so
+         * the page has the same shape as the boxes that will be written onto it.
+         */
+        public void addPage(File image, int pxW, int pxH) throws Exception {
+            addPage(image, pxW, pxH, 0);
+        }
+
+        /**
+         * Add one page, with the page told to rotate by {@code rotation} degrees clockwise.
+         *
+         * A phone photo stores its rotation in EXIF, so the picture the recogniser read is
+         * already turned while the JPEG in the file is not. Setting the page rotation makes
+         * the viewer show the turned picture, and addTextLayer already maps recognised boxes
+         * through the page rotation, so the layer lands on the right words. Rotating the
+         * bitmap instead would have meant re-encoding the JPEG, which is the quality loss
+         * this whole change exists to avoid.
+         */
+        public void addPage(File image, int pxW, int pxH, int rotation) throws Exception {
+            if (pxW <= 0 || pxH <= 0) throw new IllegalArgumentException("Empty image");
+            int r = ((rotation % 360) + 360) % 360;
+            PDImageXObject img = embed(image);
+            // Page geometry is copied exactly from imagesToPdf, so a searchable PDF made here
+            // has the same page size as one made by the plain Images-to-PDF tool.
+            PDRectangle pageSize;
+            if (fitToA4) {
+                pageSize = PDRectangle.A4;
+            } else {
+                // When the page is going to be rotated, its own box must be the unturned
+                // picture, so take the size from the embedded image rather than from the
+                // turned bitmap the recogniser used.
+                float pw = Math.max(1f, r == 0 ? pxW : img.getWidth());
+                float ph = Math.max(1f, r == 0 ? pxH : img.getHeight());
+                float longest = Math.max(pw, ph);
+                if (longest > 2000f) { float k = 2000f / longest; pw *= k; ph *= k; }
+                pageSize = new PDRectangle(pw, ph);
+            }
+            PDPage page = new PDPage(pageSize);
+            if (r != 0 && !fitToA4) page.setRotation(r);
+            doc.addPage(page);
+            float iw = img.getWidth(), ih = img.getHeight();
+            float scale = Math.min(pageSize.getWidth() / iw, pageSize.getHeight() / ih);
+            try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
+                if (fitToA4) {
+                    float dw = iw * scale, dh = ih * scale;
+                    cs.drawImage(img, (pageSize.getWidth() - dw) / 2f,
+                            (pageSize.getHeight() - dh) / 2f, dw, dh);
+                } else {
+                    cs.drawImage(img, 0, 0, pageSize.getWidth(), pageSize.getHeight());
+                }
+            }
+        }
+
+        /**
+         * The original bytes when the file really is a JPEG, otherwise a lossless Flate image.
+         *
+         * The JPEG test is a marker check, not a guess: createFromStream does not validate its
+         * input, so handing it a PNG or a truncated file produced a page with a broken image
+         * and no error. Anything that is not a JPEG now goes through a decode, and a file that
+         * cannot be decoded is rejected instead of being written.
+         */
+        private PDImageXObject embed(File image) throws Exception {
+            if (isJpeg(image)) {
+                try (java.io.InputStream in = new java.io.BufferedInputStream(new java.io.FileInputStream(image))) {
+                    return JPEGFactory.createFromStream(doc, in);
+                } catch (Exception brokenJpeg) {
+                    // fall through to the decode path, which reports a real failure
+                }
+            }
+            Bitmap bmp = decodeImage(image, maxDimension);
+            if (bmp == null) throw new IllegalArgumentException("Could not read image: " + image.getName());
+            try {
+                return LosslessFactory.createFromImage(doc, bmp);
+            } finally {
+                bmp.recycle();
+            }
+        }
+
+        /** True when the file starts with the JPEG start-of-image marker FF D8 FF. */
+        private static boolean isJpeg(File f) {
+            if (f == null || !f.isFile() || f.length() < 3) return false;
+            try (java.io.InputStream in = new java.io.FileInputStream(f)) {
+                int a = in.read(), b = in.read(), c = in.read();
+                return a == 0xFF && b == 0xD8 && c == 0xFF;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        public void finish(File out) throws Exception {
+            doc.save(out);
+            finished = true;
+        }
+
+        @Override public void close() {
+            if (finished) return;
+            try { doc.close(); } catch (Exception ignored) { }
+        }
+    }
+
     /** Restrict a string to characters the standard-14 fonts can encode (WinAnsi-ish). */
     static String winAnsi(String s) {
         if (s == null) return "";
