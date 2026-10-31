@@ -68,20 +68,16 @@ class ImageOcrActivity : PdfActivity() {
             val text = StringBuilder()
             for ((i, uri) in uris.withIndex()) {
                 busy.update(getString(R.string.image_ocr_working, i + 1, uris.size))
-                // Copy once, then decode that same file through the shared decoder, which
-                // applies EXIF orientation. Decoding the uri separately left the OCR
-                // reading a sideways bitmap while the PDF embedded an upright one, so the
-                // text layer sat 90 degrees away from the page on portrait photos.
-                val f = withContext(Dispatchers.IO) {
-                    runCatching { Files.copyToCache(this@ImageOcrActivity, uri) }.getOrNull()
-                } ?: continue
                 val bmp = withContext(Dispatchers.IO) {
-                    runCatching { PdfEngine.decodeImage(f, OCR_MAX) }.getOrNull()
+                    runCatching { decodeBounded(uri, OCR_MAX) }.getOrNull()
                 } ?: continue
                 val w = bmp.width
                 val h = bmp.height
                 val words = recognise(bmp)
                 bmp.recycle()
+                val f = withContext(Dispatchers.IO) {
+                    runCatching { Files.copyToCache(this@ImageOcrActivity, uri) }.getOrNull()
+                } ?: continue
                 inputs.add(f)
                 pages.add(PdfEngine.PageText(inputs.size, w, h, words))
                 if (words.isNotEmpty()) {
@@ -103,6 +99,24 @@ class ImageOcrActivity : PdfActivity() {
                 PdfEngine.addTextLayer(flat, pages, out)
             }
         }
+    }
+
+    private fun decodeBounded(uri: Uri, maxDim: Int): Bitmap? {
+        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        try {
+            contentResolver.openInputStream(uri)?.use {
+                android.graphics.BitmapFactory.decodeStream(it, null, bounds)
+            }
+        } catch (_: Exception) { return null }
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+        var sample = 1
+        while (max(bounds.outWidth, bounds.outHeight) / (sample * 2) >= maxDim) sample *= 2
+        val opts = android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
+        return try {
+            contentResolver.openInputStream(uri)?.use {
+                android.graphics.BitmapFactory.decodeStream(it, null, opts)
+            }
+        } catch (_: Exception) { null }
     }
 
     private suspend fun recognise(bitmap: Bitmap): List<PdfEngine.OcrWord> =
@@ -137,15 +151,6 @@ class ImageOcrActivity : PdfActivity() {
 
     private companion object {
         /** Decode size for recognition: higher is noticeably more accurate. */
-        /**
-         * Longest edge for the image that goes INTO the PDF, and for the bitmap handed to
-         * the recogniser.
-         *
-         * It is the same number Images-to-PDF uses on purpose: the same photo must not
-         * come out at a different size depending on which tool made the file. Note that
-         * decodeBounded samples by powers of two, so this is a target rather than a hard
-         * cap - a 4000 px photo is decoded at 4000 px, not at 3000.
-         */
-        const val OCR_MAX = 3000
+        const val OCR_MAX = 2600
     }
 }

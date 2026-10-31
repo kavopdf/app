@@ -101,28 +101,10 @@ class OcrActivity : PdfActivity() {
                 // a completely empty page has nothing to recognise: skip it.
                 // Deliberately strict (only truly blank pages) so no text is lost.
                 if (isBlank(bmp)) { bmp.recycle(); continue }
-                var w = bmp.width
-                var h = bmp.height
-                var words = recognise(bmp)
+                val w = bmp.width
+                val h = bmp.height
+                val words = recognise(bmp)
                 bmp.recycle()
-                // A page that came back almost empty usually means small print - footnotes,
-                // terms, a dense table. One more pass at the largest width the page budget
-                // allows, and only that page pays for it. If the second pass finds more,
-                // it wins; otherwise the first result stands untouched.
-                if (words.size < 6) {
-                    val bigger = runCatching {
-                        r.render(page - 1, (OCR_WIDTH * 1.6f).toInt())
-                    }.getOrNull()
-                    if (bigger != null) {
-                        val again = recognise(bigger)
-                        if (again.size > words.size) {
-                            words = again
-                            w = bigger.width
-                            h = bigger.height
-                        }
-                        bigger.recycle()
-                    }
-                }
                 if (words.isNotEmpty()) found.add(PdfEngine.PageText(page, w, h, words))
             }
             busy.dismiss()

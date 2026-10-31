@@ -1381,26 +1381,10 @@ public final class PdfEngine {
     public static void addTextLayer(File src, List<PageText> pages, File out) throws Exception {
         try (PDDocument d = open(src)) {
             int total = d.getNumberOfPages();
-            // One Unicode font for the whole document, so a rupee sign or an en dash is
-            // written exactly instead of being substituted. Falls back to Helvetica if the
-            // font could not be loaded, which is the old behaviour.
-            com.tom_roush.pdfbox.pdmodel.font.PDType0Font unicode = null;
-            byte[] fontBytes = ocrFontBytes;
-            if (fontBytes != null && fontBytes.length > 0) {
-                try {
-                    unicode = com.tom_roush.pdfbox.pdmodel.font.PDType0Font.load(
-                            d, new java.io.ByteArrayInputStream(fontBytes), true);
-                } catch (Throwable t) {
-                    unicode = null;
-                }
-            }
             for (PageText pt : pages) {
                 if (pt == null || pt.page < 1 || pt.page > total) continue;
                 if (pt.words.isEmpty() || pt.imgW <= 0 || pt.imgH <= 0) continue;
                 PDPage page = d.getPage(pt.page - 1);
-                // Already has our invisible layer from an earlier run: writing it again
-                // would put two copies of every word in the file.
-                if (hasInvisibleLayer(page)) continue;
                 PDRectangle box = page.getCropBox();
                 float w = box.getWidth(), h = box.getHeight();
                 int r = ((page.getRotation() % 360) + 360) % 360;
@@ -1413,8 +1397,8 @@ public final class PdfEngine {
                     cs.setRenderingMode(com.tom_roush.pdfbox.pdmodel.graphics.state.RenderingMode.NEITHER);
                     cs.beginText();
                     for (OcrWord word : pt.words) {
-                        String txt = ocrTextWith(unicode, word.text);
-                        if (txt.isEmpty()) continue;
+                        String txt = winAnsi(word.text);
+                        if (txt == null || txt.trim().isEmpty()) continue;
                         float xd = word.x / pt.imgW * dw;
                         float yd = (word.y + word.h * BASELINE_FRACTION) / pt.imgH * dh;
                         float hd = word.h / pt.imgH * dh;
@@ -1422,9 +1406,7 @@ public final class PdfEngine {
                         // Derive the size from the box WIDTH so the placed run matches the
                         // ink width (that is what selection and highlighting follow). Fall
                         // back to the box height, and keep the result sane.
-                        float emWidth = (unicode != null
-                                ? unicode.getStringWidth(txt)
-                                : PDType1Font.HELVETICA.getStringWidth(txt)) / 1000f;
+                        float emWidth = PDType1Font.HELVETICA.getStringWidth(txt) / 1000f;
                         float byHeight = hd * FONT_HEIGHT_FRACTION;
                         float size;
                         if (emWidth > 0.02f && targetW > 0.5f) {
@@ -1442,8 +1424,7 @@ public final class PdfEngine {
                             case 270: px = w - yd;  py = h - xd;  break;
                             default:  px = xd;      py = h - yd;  break;
                         }
-                        if (unicode != null) cs.setFont(unicode, size);
-                        else cs.setFont(PDType1Font.HELVETICA, size);
+                        cs.setFont(PDType1Font.HELVETICA, size);
                         // rotate the run so it reads upright once the page /Rotate is applied
                         cs.setTextMatrix(Matrix.getRotateInstance(Math.toRadians(r), px, py));
                         cs.showText(txt);
@@ -1455,62 +1436,24 @@ public final class PdfEngine {
         }
     }
 
+    /** Restrict a string to characters the standard-14 fonts can encode (WinAnsi-ish). */
+    static String winAnsi(String s) {
+        if (s == null) return "";
+        StringBuilder b = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\n' || c == '\r' || c == '\t') { b.append(' '); }
+            else if (c >= 32 && c <= 126) { b.append(c); }
+            else if (c >= 160 && c <= 255) { b.append(c); }
+            else { b.append('?'); }
+        }
+        return b.toString();
+    }
+
+
     // ------------------------------------------------------------------
     // Text search and hyperlinks
     // ------------------------------------------------------------------
-
-    /**
-     * True when this page already carries an INVISIBLE text layer - our own work from an
-     * earlier run.
-     *
-     * A page can also carry real, visible text from whoever produced the PDF; that page
-     * still needs an OCR layer if it was scanned on top of a typed header, so visible text
-     * must not count here. Only rendering mode 3 (neither fill nor stroke) does, and that
-     * is exactly what this app writes.
-     */
-    private static boolean hasInvisibleLayer(PDPage page) {
-        try {
-            // A page may carry more than one content stream, and our layer can be in any
-            // of them - reading only the first one missed it and wrote a second layer.
-            java.util.List<java.io.InputStream> streams = new ArrayList<>();
-            try {
-                java.util.Iterator<com.tom_roush.pdfbox.pdmodel.common.PDStream> it =
-                        page.getContentStreams();
-                if (it != null) {
-                    while (it.hasNext()) {
-                        com.tom_roush.pdfbox.pdmodel.common.PDStream ps = it.next();
-                        if (ps != null) streams.add(ps.createInputStream());
-                    }
-                }
-            } catch (Throwable ignored) {
-            }
-            if (streams.isEmpty()) {
-                java.io.InputStream single = page.getContents();
-                if (single != null) streams.add(single);
-            }
-            java.util.regex.Pattern tr3 =
-                    java.util.regex.Pattern.compile("(?m)(^|\\s)3\\s+Tr(\\s|$)");
-            for (java.io.InputStream in : streams) {
-                try {
-                    java.io.ByteArrayOutputStream buf = new java.io.ByteArrayOutputStream();
-                    byte[] chunk = new byte[8192];
-                    int n;
-                    while ((n = in.read(chunk)) > 0) buf.write(chunk, 0, n);
-                    String content = new String(buf.toByteArray(),
-                            java.nio.charset.StandardCharsets.ISO_8859_1);
-                    // "3 Tr" sets the text rendering mode to neither-fill-nor-stroke.
-                    if (tr3.matcher(content).find()) return true;
-                } catch (Throwable ignored) {
-                } finally {
-                    try { in.close(); } catch (Throwable ignored) { }
-                }
-            }
-            return false;
-        } catch (Throwable t) {
-            // If it cannot be read, assume there is no layer: writing one is the safe way.
-            return false;
-        }
-    }
 
     /** A text match, located on the page in DISPLAY points (origin top-left, y down),
      *  i.e. the same frame the page is rendered in. */
@@ -2797,16 +2740,6 @@ public final class PdfEngine {
         return decodeBounded(f, maxDimension);
     }
 
-    /**
-     * Decode an image the way every other tool does: EXIF orientation applied, longest
-     * edge kept under [maxDimension]. Public so the OCR screen reads the same pixels the
-     * PDF is built from - reading it any other way put the text layer 90 degrees away
-     * from the page on any photo taken in portrait.
-     */
-    public static Bitmap decodeImage(File f, int maxDimension) {
-        return decodeBounded(f, maxDimension);
-    }
-
     private static Bitmap decodeBounded(File f, int maxDimension) {
         BitmapFactory.Options bounds = new BitmapFactory.Options();
         bounds.inJustDecodeBounds = true;
@@ -2924,138 +2857,6 @@ public final class PdfEngine {
     }
 
     /** Restrict a string to characters the standard-14 fonts can encode (WinAnsi-ish). */
-    /**
-     * A Unicode font for the invisible OCR layer, handed in once at start-up.
-     *
-     * Helvetica - the standard-14 font the layer used before - can only draw Latin-1, so
-     * the rupee sign, an en dash or a subscript could not be written at all and had to be
-     * substituted. An embedded TrueType font writes them exactly, and pdfbox subsets it,
-     * so the PDF grows by a few KB rather than by the font's size.
-     */
-    private static volatile byte[] ocrFontBytes;
-
-    /** Called once from the Application with the bytes of assets/fonts/NotoSans-Regular.ttf. */
-    public static void setOcrFont(byte[] ttf) {
-        ocrFontBytes = ttf;
-        // The cache answers "can this font draw this character", so it is only valid for
-        // the font it was built against. A new font must start from an empty cache.
-        GLYPH_CACHE.clear();
-    }
-
-    /** True when a Unicode layer font is available; used by tests. */
-    public static boolean hasOcrFont() {
-        return ocrFontBytes != null && ocrFontBytes.length > 0;
-    }
-
-    /** Whether the font can actually draw this character. Cached: a page repeats letters. */
-    private static final java.util.Map<Character, Boolean> GLYPH_CACHE = new java.util.HashMap<>();
-
-    private static boolean fontHas(com.tom_roush.pdfbox.pdmodel.font.PDType0Font f, char c) {
-        Character key = c;
-        Boolean known = GLYPH_CACHE.get(key);
-        if (known != null) return known;
-        boolean ok;
-        try {
-            f.getStringWidth(String.valueOf(c));
-            ok = true;
-        } catch (Throwable t) {
-            ok = false;
-        }
-        GLYPH_CACHE.put(key, ok);
-        return ok;
-    }
-
-    /**
-     * Text for the invisible OCR layer, written with a real Unicode font when one is
-     * available. Exact wherever the font has the glyph; where it does not, the plain
-     * substitute from OCR_SYMBOLS; and if there is neither, the character is dropped
-     * rather than written as "?" - so the search index never gains a word that was not
-     * on the page.
-     */
-    static String ocrTextWith(com.tom_roush.pdfbox.pdmodel.font.PDType0Font f, String s) {
-        if (s == null) return "";
-        if (f == null) return ocrText(s);
-        StringBuilder b = new StringBuilder(s.length());
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '\n' || c == '\r' || c == '\t') { b.append(' '); continue; }
-            if (fontHas(f, c)) { b.append(c); continue; }
-            String m = OCR_SYMBOLS.get(c);
-            if (m != null) b.append(m);
-        }
-        // Nothing is dropped for being punctuation. A page that prints "% weight"
-        // puts the percent sign in the layer, exactly as the pre-3.30.7 code did, so it
-        // can be copied and searched. The old letter-or-digit test was there to keep a
-        // mapped symbol from becoming a meaningless search entry, and it threw away real
-        // punctuation with it.
-        return b.toString().trim();
-    }
-
-    /**
-     * Characters outside Latin-1 that a reader still expects to copy out of an OCR
-     * layer, and what to write instead. A bill prints the rupee sign; without this the
-     * layer kept only "500" and copying gave a number with no currency.
-     */
-    private static final Map<Character, String> OCR_SYMBOLS = new HashMap<>();
-    static {
-        OCR_SYMBOLS.put('\u20b9', "Rs.");
-        OCR_SYMBOLS.put('\u2013', "-");
-        OCR_SYMBOLS.put('\u2014', "-");
-        OCR_SYMBOLS.put('\u2018', "'");
-        OCR_SYMBOLS.put('\u2019', "'");
-        OCR_SYMBOLS.put('\u201c', "\"");
-        OCR_SYMBOLS.put('\u201d', "\"");
-        OCR_SYMBOLS.put('\u2022', "-");
-        OCR_SYMBOLS.put('\u00d7', "x");
-        OCR_SYMBOLS.put('\u00f7', "/");
-        OCR_SYMBOLS.put('\u2192', "->");
-        OCR_SYMBOLS.put('\u2265', ">=");
-        OCR_SYMBOLS.put('\u2264', "<=");
-        OCR_SYMBOLS.put('\u2260', "!=");
-        OCR_SYMBOLS.put('\u00b2', "2");
-        OCR_SYMBOLS.put('\u00b3', "3");
-        OCR_SYMBOLS.put('\u2080', "0"); OCR_SYMBOLS.put('\u2081', "1");
-        OCR_SYMBOLS.put('\u2082', "2"); OCR_SYMBOLS.put('\u2083', "3");
-        OCR_SYMBOLS.put('\u2084', "4"); OCR_SYMBOLS.put('\u2085', "5");
-        OCR_SYMBOLS.put('\u2086', "6"); OCR_SYMBOLS.put('\u2087', "7");
-        OCR_SYMBOLS.put('\u2088', "8"); OCR_SYMBOLS.put('\u2089', "9");
-    }
-
-    /**
-     * Text for the invisible OCR layer only. Latin-1 is kept as it is; a symbol in
-     * OCR_SYMBOLS is written as its plain equivalent; anything else the font cannot
-     * draw is dropped rather than written as "?", so the search index never gains a
-     * word that was not on the page. Returns "" when nothing useful is left.
-     */
-    static String ocrText(String s) {
-        if (s == null) return "";
-        StringBuilder b = new StringBuilder(s.length());
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '\n' || c == '\r' || c == '\t') b.append(' ');
-            else if (c >= 32 && c <= 126) b.append(c);
-            else if (c >= 160 && c <= 255) b.append(c);
-            else {
-                String m = OCR_SYMBOLS.get(c);
-                if (m != null) b.append(m);
-            }
-        }
-        return b.toString().trim();
-    }
-
-    static String winAnsi(String s) {
-        if (s == null) return "";
-        StringBuilder b = new StringBuilder(s.length());
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '\n' || c == '\r' || c == '\t') { b.append(' '); }
-            else if (c >= 32 && c <= 126) { b.append(c); }
-            else if (c >= 160 && c <= 255) { b.append(c); }
-            else { b.append('?'); }
-        }
-        return b.toString();
-    }
-
     private static String nullToEmpty(String s) { return s == null ? "" : s; }
 
     private static String emptyToNull(String s) { return (s == null || s.trim().isEmpty()) ? null : s; }
