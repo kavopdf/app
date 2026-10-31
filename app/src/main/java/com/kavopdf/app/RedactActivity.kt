@@ -47,6 +47,10 @@ class RedactActivity : PdfActivity() {
         setSupportActionBar(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.redactView.imageView = binding.pageImage
+        // Zooming in re-renders the page sharper, exactly like the annotate and reader
+        // screens do. Without this the page was drawn once at 1.8x and then stretched,
+        // which is why a redaction page looked softer than the same page anywhere else.
+        binding.pageImage.onZoomSettled = { z -> upgradeCurrent(z) }
         // one finger draws; two fingers zoom and pan (RedactView toggles this)
         binding.btnChoose.setOnClickListener { pickPdf() }
         binding.prevPage.setOnClickListener { goTo(current - 1) }
@@ -73,6 +77,9 @@ class RedactActivity : PdfActivity() {
                 source = f
                 marks.clear()
                 sizes.clear()
+                // A new document starts with no page rendered yet, so a stale width from
+                // the previous one cannot make the zoom upgrade skip a re-render.
+                renderedWidth.clear()
                 // sizes come from the renderer below, so the file is opened once
                 val d = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY)
                 try { pfd?.close() } catch (_: Exception) { }
@@ -103,13 +110,45 @@ class RedactActivity : PdfActivity() {
         binding.redactView.clear()
         binding.redactView.rects.addAll(marks[current] ?: emptyList())
         val r = renderer ?: return
-        val targetW = (resources.displayMetrics.widthPixels * 1.8f).toInt().coerceAtMost(2400)
+        val targetW = baseRenderWidth()
+        renderedWidth[index] = targetW
         lifecycleScope.launch {
             val bmp = withContext(Dispatchers.IO) {
                 runCatching { r.render(index, targetW) }.getOrNull()
             }
             if (bmp != null && current == index) {
                 binding.pageImage.setImageBitmap(bmp)
+                binding.redactView.post { binding.redactView.invalidate() }
+            }
+        }
+    }
+
+    /** Resolution each page was last rendered at, so zooming only ever goes sharper. */
+    private val renderedWidth = HashMap<Int, Int>()
+
+    /**
+     * The width a page is drawn at before any zoom. Same rule as the annotate and reader
+     * screens - twice the screen width, capped - so a page looks identical in every tool.
+     */
+    private fun baseRenderWidth() =
+        (resources.displayMetrics.widthPixels * 2.0f).toInt().coerceAtMost(MAX_WIDTH)
+
+    /** Zooming in re-renders the page sharper without disturbing the zoom. */
+    private fun upgradeCurrent(zoom: Float) {
+        val r = renderer ?: return
+        val index = current
+        val target = (resources.displayMetrics.widthPixels * zoom.coerceIn(2f, 4f))
+            .toInt().coerceAtMost(MAX_WIDTH)
+        if ((renderedWidth[index] ?: 0) >= target) return
+        renderedWidth[index] = target
+        lifecycleScope.launch {
+            val bmp = withContext(Dispatchers.IO) {
+                runCatching { r.render(index, target) }.getOrNull()
+            }
+            if (bmp != null && current == index) {
+                // Keeps the zoom and pan where the user put them; a plain setImageBitmap
+                // would snap the page back to fit.
+                binding.pageImage.setImageBitmapPreservingTransform(bmp)
                 binding.redactView.post { binding.redactView.invalidate() }
             }
         }
@@ -192,5 +231,8 @@ class RedactActivity : PdfActivity() {
          * PageRenderer is what keeps the memory for it in check.
          */
         const val PRINT_DPI = 300f
+
+        /** Same ceiling as the annotate and reader screens, so no tool is the soft one. */
+        const val MAX_WIDTH = 2800
     }
 }
