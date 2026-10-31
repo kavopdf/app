@@ -181,7 +181,9 @@ object CrashGuard {
                     "the app stopped while it was in the foreground\n" + environment(app), false)
             }
             boot.edit().putBoolean("running", false).commit()
-            app.registerActivityLifecycleCallbacks(
+            // registerActivityLifecycleCallbacks lives on Application, not Context.
+            val application = app.applicationContext as? android.app.Application
+            application?.registerActivityLifecycleCallbacks(
                 object : android.app.Application.ActivityLifecycleCallbacks {
                     private var started = 0
 
