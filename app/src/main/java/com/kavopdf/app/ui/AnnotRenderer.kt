@@ -14,6 +14,41 @@ import com.kavopdf.app.model.Annot
  */
 object AnnotRenderer {
 
+    /**
+     * One freehand stroke, as a smooth curve.
+     *
+     * The points are the raw touch samples. Joining them with straight lines is what made
+     * a drawn line look like a polygon: every sample became a corner, and a slow drag
+     * shows them all. This runs a quadratic through the midpoint of each pair of samples,
+     * which keeps the shape the finger made and rounds off every corner. The last sample
+     * is joined with a straight line so the stroke still ends where the finger lifted.
+     *
+     * [xOf] and [yOf] place a sample on the canvas, so the live preview and the exported
+     * raster are the very same curve instead of two that look similar.
+     */
+    fun strokePath(points: List<android.graphics.PointF>,
+                   xOf: (android.graphics.PointF) -> Float,
+                   yOf: (android.graphics.PointF) -> Float): Path {
+        val path = Path()
+        if (points.isEmpty()) return path
+        var prevX = xOf(points[0])
+        var prevY = yOf(points[0])
+        path.moveTo(prevX, prevY)
+        if (points.size == 1) {
+            path.lineTo(prevX, prevY)          // a tap leaves a dot
+            return path
+        }
+        for (i in 1 until points.size) {
+            val cx = xOf(points[i])
+            val cy = yOf(points[i])
+            path.quadTo(prevX, prevY, (prevX + cx) / 2f, (prevY + cy) / 2f)
+            prevX = cx
+            prevY = cy
+        }
+        path.lineTo(prevX, prevY)
+        return path
+    }
+
     fun draw(
         canvas: Canvas,
         items: List<Annot>,
@@ -68,12 +103,11 @@ object AnnotRenderer {
                 }
                 is Annot.Stroke -> {
                     if (item.points.size < 2) continue
-                    val path = Path()
-                    item.points.forEachIndexed { i, p ->
-                        val x = ox + p.x * pageW * pxPerPt
-                        val y = oy + p.y * pageH * pxPerPt
-                        if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
-                    }
+                    val path = strokePath(
+                        item.points,
+                        { p -> ox + p.x * pageW * pxPerPt },
+                        { p -> oy + p.y * pageH * pxPerPt }
+                    )
                     stroke.color = withAlpha(item.color, item.opacity)
                     stroke.strokeWidth = (item.widthPt * pxPerPt).coerceAtLeast(1f)
                     canvas.drawPath(path, stroke)

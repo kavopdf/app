@@ -164,21 +164,48 @@ object CrashGuard {
         if (installed) return
         installed = true
         val app = context.applicationContext
-        // B7: if the flag is still set, the last launch never got this far
+        // B7: a launch that ended while it was still in front of the user is the shape of
+        // a crash. The flag used to be cleared by a five-second timer instead, so any
+        // launch that was closed inside five seconds - or reclaimed by Android - reported
+        // "the app stopped before it finished starting" on the next start. Those entries
+        // all carried uptime=0s and a near-empty heap, which is a process that ended
+        // normally, not one that crashed.
+        //
+        // It is now driven by the activity lifecycle: set while the app is in front,
+        // cleared the moment it goes behind another app. A kill in the background is
+        // normal and is never reported; an end while in front still is.
         try {
             val boot = app.getSharedPreferences("diag_boot", Context.MODE_PRIVATE)
             if (boot.getBoolean("running", false)) {
                 AppLog.record(app, "Previous launch crashed",
-                    "the app stopped before it finished starting\n" + environment(app), false)
+                    "the app stopped while it was in the foreground\n" + environment(app), false)
             }
-            boot.edit().putBoolean("running", true).commit()
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                try {
-                    app.getSharedPreferences("diag_boot", Context.MODE_PRIVATE)
-                        .edit().putBoolean("running", false).apply()
-                } catch (_: Throwable) {
+            boot.edit().putBoolean("running", false).commit()
+            app.registerActivityLifecycleCallbacks(
+                object : android.app.Application.ActivityLifecycleCallbacks {
+                    private var started = 0
+
+                    override fun onActivityStarted(activity: android.app.Activity) {
+                        if (started == 0) {
+                            try { boot.edit().putBoolean("running", true).commit() } catch (_: Throwable) {}
+                        }
+                        started++
+                    }
+
+                    override fun onActivityStopped(activity: android.app.Activity) {
+                        if (started > 0) started--
+                        if (started == 0) {
+                            try { boot.edit().putBoolean("running", false).apply() } catch (_: Throwable) {}
+                        }
+                    }
+
+                    override fun onActivityCreated(a: android.app.Activity, b: android.os.Bundle?) {}
+                    override fun onActivityResumed(a: android.app.Activity) {}
+                    override fun onActivityPaused(a: android.app.Activity) {}
+                    override fun onActivitySaveInstanceState(a: android.app.Activity, b: android.os.Bundle) {}
+                    override fun onActivityDestroyed(a: android.app.Activity) {}
                 }
-            }, 5000)
+            )
         } catch (_: Throwable) {
         }
 
@@ -187,12 +214,24 @@ object CrashGuard {
             val handler = android.os.Handler(android.os.Looper.getMainLooper())
             val stalls = Stalls()
             val tick = object : Runnable {
+                private var expected = Stalls.TICK_MS
+                private var startedInFront = true
+
                 override fun run() {
                     try {
-                        val blocked = stalls.onTick(android.os.SystemClock.elapsedRealtime())
-                        // only trust a stall while the app is actually in front of the
-                        // user - a background app gets no timers, which looks identical
-                        if (blocked > 0L && isForeground(app) && screenOn(app)) {
+                        val inFront = isForeground(app)
+                        // A stall is only real when the beat was running in front of the
+                        // user AND it is still in front now. The ticker slows to IDLE_MS
+                        // behind another app, and the gap that creates is five seconds
+                        // wide - which the detector read as a five-second freeze. Every
+                        // "blocked for 5001ms" entry in the log came from exactly that.
+                        val blocked = if (startedInFront && inFront) {
+                            stalls.onTick(android.os.SystemClock.elapsedRealtime(), expected)
+                        } else {
+                            stalls.reset()
+                            0L
+                        }
+                        if (blocked > 0L && screenOn(app)) {
                             AppLog.record(
                                 app,
                                 "Main thread blocked",
@@ -200,16 +239,18 @@ object CrashGuard {
                                 AppLog.Level.SLOW
                             )
                         }
+                        // 500 ms while the app is in front, where a stall matters and can
+                        // be seen; 5 s once it is behind another app, where the tick cannot
+                        // catch anything a user would notice.
+                        val next = if (inFront) Stalls.TICK_MS else Stalls.IDLE_MS
+                        expected = next
+                        startedInFront = inFront
+                        handler.postDelayed(this, next)
                     } catch (_: Throwable) {
+                        expected = Stalls.TICK_MS
+                        startedInFront = false
+                        handler.postDelayed(this, Stalls.TICK_MS)
                     }
-                    // 500 ms while the app is in front, where a stall matters and can be
-                    // seen; 5 s once it is behind another app, where the tick cannot catch
-                    // anything a user would notice. The detector is not removed - it just
-                    // stops waking the main thread twice a second for nothing.
-                    handler.postDelayed(
-                        this,
-                        if (isForeground(app)) Stalls.TICK_MS else Stalls.IDLE_MS
-                    )
                 }
             }
             handler.postDelayed(tick, Stalls.TICK_MS)

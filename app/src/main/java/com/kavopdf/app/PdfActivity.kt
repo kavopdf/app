@@ -260,8 +260,18 @@ abstract class PdfActivity : AppCompatActivity() {
     /** Size of the open file, so the detector can compare like with like. */
     protected var sizeHint: Long = 0L
 
-    private fun taskKey(status: String): String =
-        toolName() ?: javaClass.simpleName
+    /**
+     * The name a run is measured under: the tool plus the operation.
+     *
+     * It used to be the screen alone, so opening a document and exporting thirty pages
+     * shared one history. The export was then compared against the open's 176 ms norm
+     * and every export was reported as slow, while nothing was wrong at all.
+     */
+    private fun taskKey(status: String): String {
+        val tool = toolName() ?: javaClass.simpleName
+        val op = status.trim().replace(Regex("[^A-Za-z0-9]+"), "_").trim('_').take(24)
+        return if (op.isEmpty()) tool else tool + ":" + op
+    }
 
     protected fun <T> runTask(status: String, pages: Int = 1, onDone: (T?) -> Unit, block: () -> T) {
         com.kavopdf.app.util.CrashGuard.step(javaClass.simpleName + ": " + status)

@@ -22,7 +22,7 @@ javac -d out $(find stubs -name '*.java')
 CP="out:libs/aar/classes.jar:libs/aar/assets:libs/bcprov.jar:libs/bcpkix.jar:libs/bcutil.jar"
 
 echo "== compiling the real engine + tests =="
-javac -cp "$CP" -d out $(find ../../app/src/main/java -name '*.java') TestEngine.java TestEncrypt.java TestBookmarks.java TestReport.java TestFonts.java TestNorms.java TestFallback.java TestOrder.java TestFlatten.java TestMeta.java TestImagePdf.java TestCachePolicy.java
+javac -cp "$CP" -d out $(find ../../app/src/main/java -name '*.java') TestEngine.java TestEncrypt.java TestBookmarks.java TestReport.java TestFonts.java TestNorms.java TestFallback.java TestOrder.java TestFlatten.java TestMeta.java TestImagePdf.java TestCachePolicy.java TestStalls.java
 
 echo "== running engine verification =="
 java -cp "$CP" TestEngine
@@ -111,6 +111,7 @@ echo "== and links must be found in .in / .co.in addresses, not split into words
 java -cp "$CP" TestMeta
 java -cp "$CP" TestImagePdf
 java -cp "$CP" TestCachePolicy
+java -cp "$CP" TestStalls
 
 echo
 echo "== the detector's own rules (no false positives, no missed regressions) =="

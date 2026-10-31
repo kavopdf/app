@@ -228,12 +228,12 @@ class OverlayView @JvmOverloads constructor(
             preview.strokeJoin = Paint.Join.ROUND
             preview.strokeWidth = (penWidthPt * pxPerPt).coerceAtLeast(1f)
             preview.color = color
-            val path = Path()
-            s.forEachIndexed { i, p ->
-                val x = r.left + p.x * r.width()
-                val y = r.top + p.y * r.height()
-                if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
-            }
+            // The same curve the export draws, so what is on screen is what gets saved.
+            val path = AnnotRenderer.strokePath(
+                s,
+                { p -> r.left + p.x * r.width() },
+                { p -> r.top + p.y * r.height() }
+            )
             canvas.drawPath(path, preview)
         }
 

@@ -33,26 +33,42 @@ public final class Stalls {
     private long last = -1L;
     private boolean reported = false;
 
-    /** Called on every tick. Returns the blocked duration once, or 0. */
-    public synchronized long onTick(long nowMs) {
+    /**
+     * Called on every tick, with the interval this tick was actually scheduled for.
+     *
+     * The interval matters. The ticker beats at [TICK_MS] in front of the user and backs
+     * off to [IDLE_MS] behind another app, so the gap after a rate change is the new
+     * interval - five seconds - and reading that as a block filled the log with
+     * "Main thread blocked for 5001ms" entries that were nothing of the kind. Only the
+     * time beyond what was asked for counts as blocked.
+     *
+     * Returns the blocked duration once, or 0.
+     */
+    public synchronized long onTick(long nowMs, long expectedMs) {
         if (last < 0L) {
             last = nowMs;
             return 0L;
         }
         long gap = nowMs - last;
         last = nowMs;
-        if (gap >= MAX_BLOCK_MS) {
+        long excess = gap - Math.max(0L, expectedMs);
+        if (excess >= MAX_BLOCK_MS) {
             // timers were suspended, not blocked - start a fresh beat, report nothing
             reported = false;
             return 0L;
         }
-        if (gap >= BLOCK_MS) {
+        if (excess >= BLOCK_MS) {
             if (reported) return 0L;      // still the same block, already recorded
             reported = true;
-            return gap;
+            return excess;
         }
         reported = false;                  // healthy beat again: a new block may be reported
         return 0L;
+    }
+
+    /** For a caller that always beats at [TICK_MS]. */
+    public synchronized long onTick(long nowMs) {
+        return onTick(nowMs, TICK_MS);
     }
 
     public synchronized void reset() {
