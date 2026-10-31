@@ -1812,6 +1812,46 @@ public final class PdfEngine {
         return out;
     }
 
+    /**
+     * Bookmarks and link targets together, in one pass over the document.
+     *
+     * The reader needs both the moment a file opens. Asking for them separately loaded
+     * the whole PDF with pdfbox twice in a row, and on a large file that double load was
+     * the slowest part of opening it. One open, both answers.
+     */
+    public static final class OutlineAndLinks {
+        public final List<Bookmark> bookmarks;
+        public final java.util.Map<Integer, List<FoundLink>> links;
+
+        OutlineAndLinks(List<Bookmark> bookmarks, java.util.Map<Integer, List<FoundLink>> links) {
+            this.bookmarks = bookmarks;
+            this.links = links;
+        }
+    }
+
+    public static OutlineAndLinks outlineAndLinks(File src) {
+        List<Bookmark> marks = new ArrayList<>();
+        java.util.Map<Integer, List<FoundLink>> links = new java.util.HashMap<>();
+        try (PDDocument d = open(src)) {
+            try {
+                PDDocumentOutline outline = d.getDocumentCatalog().getDocumentOutline();
+                if (outline != null) collectOutline(outline.getFirstChild(), d, marks, 0);
+            } catch (Exception ignored) {
+            }
+            try {
+                float[][] g = pageGeom(d);
+                for (FoundLink l : linkAnnotations(d, g)) {
+                    List<FoundLink> list = links.get(l.page);
+                    if (list == null) { list = new ArrayList<>(); links.put(l.page, list); }
+                    list.add(l);
+                }
+            } catch (Exception ignored) {
+            }
+        } catch (Exception ignored) {
+        }
+        return new OutlineAndLinks(marks, links);
+    }
+
     /** The link targets on one page (1-based), for tapping in the reader. */
     public static List<FoundLink> pageLinks(File src, int page) {
         List<FoundLink> out = new ArrayList<>();

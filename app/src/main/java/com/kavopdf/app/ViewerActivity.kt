@@ -124,17 +124,14 @@ class ViewerActivity : PdfActivity() {
                 if (current !== file) return@launch
                 sizes.clear(); sizes.addAll(sizesOut)
 
-                val marks = com.kavopdf.app.util.CrashGuard.io(
-                    this@ViewerActivity, "Reader: bookmarks", pagesHint
-                ) { runCatching { PdfEngine.bookmarks(file) }.getOrDefault(emptyList()) }
+                // One pass for both. Asking separately loaded the whole document twice,
+                // and on a big file that was the slowest part of opening it.
+                val both = com.kavopdf.app.util.CrashGuard.io(
+                    this@ViewerActivity, "Reader: outline and links", pagesHint
+                ) { runCatching { PdfEngine.outlineAndLinks(file) }.getOrNull() }
                 if (current !== file) return@launch
-                outline = marks
-
-                val map = com.kavopdf.app.util.CrashGuard.io(
-                    this@ViewerActivity, "Reader: links", pagesHint
-                ) { runCatching { PdfEngine.allPageLinks(file) }.getOrDefault(emptyMap()) }
-                if (current !== file) return@launch
-                links = map
+                outline = both?.bookmarks ?: emptyList()
+                links = both?.links ?: emptyMap()
                 linksReady = true
             }
         } catch (t: Throwable) {
