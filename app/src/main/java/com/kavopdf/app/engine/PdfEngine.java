@@ -2678,30 +2678,73 @@ public final class PdfEngine {
                 int p = pageNos[i];
                 android.graphics.Bitmap bmp = images[i];
                 if (bmp == null || p < 1 || p > d.getNumberOfPages()) continue;
-                PDPage page = d.getPage(p - 1);
-                PDRectangle box = page.getCropBox();
-                int r = ((page.getRotation() % 360) + 360) % 360;
-                float dw = (r == 90 || r == 270) ? box.getHeight() : box.getWidth();
-                float dh = (r == 90 || r == 270) ? box.getWidth() : box.getHeight();
-
-                // drop everything the page used to hold
-                page.setAnnotations(new ArrayList<com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotation>());
-                page.setResources(new PDResources());
-                // the image is already in the displayed orientation, so no extra /Rotate
-                page.setRotation(0);
-                PDRectangle nb = new PDRectangle(dw, dh);
-                page.setMediaBox(nb);
-                page.setCropBox(nb);
-
-                PDImageXObject img = JPEGFactory.createFromImage(d, bmp, 0.9f);
-                try (PDPageContentStream cs =
-                             new PDPageContentStream(d, page, AppendMode.OVERWRITE, true, true)) {
-                    cs.drawImage(img, 0, 0, dw, dh);
-                }
+                applyRedaction(d, p, bmp);
                 applied++;
             }
             if (applied == 0) throw new IllegalArgumentException("Nothing to redact");
             d.save(out);
+        }
+    }
+
+    /**
+     * Hands the engine one painted page at a time.
+     *
+     * Redaction needs a full-page bitmap per page, and holding them all at once would be
+     * tens of megabytes each, so the screen cannot simply pass an array. Before this, it
+     * called redactPages once per page, which reloaded and rewrote the ENTIRE document
+     * for every redacted page - twenty redactions on a two-hundred page file meant twenty
+     * full loads and twenty full saves.
+     */
+    public interface PagePainter {
+        /** @param page1Based the page to paint, 1-based; return null to skip it */
+        android.graphics.Bitmap paint(int page1Based);
+    }
+
+    public static void redactPagesLazy(File src, int[] pageNos, PagePainter painter, File out)
+            throws Exception {
+        if (pageNos == null || pageNos.length == 0 || painter == null) {
+            throw new IllegalArgumentException("Nothing to redact");
+        }
+        try (PDDocument d = open(src)) {
+            int applied = 0;
+            for (int p : pageNos) {
+                if (p < 1 || p > d.getNumberOfPages()) continue;
+                android.graphics.Bitmap bmp = painter.paint(p);
+                if (bmp == null) continue;
+                try {
+                    applyRedaction(d, p, bmp);
+                    applied++;
+                } finally {
+                    bmp.recycle();
+                }
+            }
+            if (applied == 0) throw new IllegalArgumentException("Nothing to redact");
+            d.save(out);
+        }
+    }
+
+    /** Replace one page with a painted bitmap. Shared by both redaction entry points. */
+    private static void applyRedaction(PDDocument d, int p, android.graphics.Bitmap bmp)
+            throws Exception {
+        PDPage page = d.getPage(p - 1);
+        PDRectangle box = page.getCropBox();
+        int r = ((page.getRotation() % 360) + 360) % 360;
+        float dw = (r == 90 || r == 270) ? box.getHeight() : box.getWidth();
+        float dh = (r == 90 || r == 270) ? box.getWidth() : box.getHeight();
+
+        // drop everything the page used to hold
+        page.setAnnotations(new ArrayList<com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotation>());
+        page.setResources(new PDResources());
+        // the image is already in the displayed orientation, so no extra /Rotate
+        page.setRotation(0);
+        PDRectangle nb = new PDRectangle(dw, dh);
+        page.setMediaBox(nb);
+        page.setCropBox(nb);
+
+        PDImageXObject img = JPEGFactory.createFromImage(d, bmp, 0.9f);
+        try (PDPageContentStream cs =
+                     new PDPageContentStream(d, page, AppendMode.OVERWRITE, true, true)) {
+            cs.drawImage(img, 0, 0, dw, dh);
         }
     }
 

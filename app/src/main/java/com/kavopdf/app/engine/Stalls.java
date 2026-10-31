@@ -16,6 +16,9 @@ public final class Stalls {
     /** The beat, in milliseconds. */
     public static final long TICK_MS = 500L;
 
+    /** How often to look while the app is behind another app and nothing can be seen. */
+    public static final long IDLE_MS = 5000L;
+
     /** A gap this long means the main thread was blocked. */
     public static final long BLOCK_MS = 2000L;
 

@@ -202,7 +202,14 @@ object CrashGuard {
                         }
                     } catch (_: Throwable) {
                     }
-                    handler.postDelayed(this, Stalls.TICK_MS)
+                    // 500 ms while the app is in front, where a stall matters and can be
+                    // seen; 5 s once it is behind another app, where the tick cannot catch
+                    // anything a user would notice. The detector is not removed - it just
+                    // stops waking the main thread twice a second for nothing.
+                    handler.postDelayed(
+                        this,
+                        if (isForeground(app)) Stalls.TICK_MS else Stalls.IDLE_MS
+                    )
                 }
             }
             handler.postDelayed(tick, Stalls.TICK_MS)

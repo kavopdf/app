@@ -126,25 +126,29 @@ class RedactActivity : PdfActivity() {
         // NOTE: runAndSave hands the work back later (the user picks a file first),
         // so nothing may be recycled before the block actually runs.
         runAndSave(Files.suggestName(sourceName, "_redacted")) { out ->
-            var cur = src
-            todo.forEachIndexed { i, page ->
-                val size = sizes[page]
-                val boxes = marks[page] ?: emptyList()
+            // One open and one save for the whole document.
+            //
+            // This used to call the engine once per page, so every redacted page reloaded
+            // and rewrote the entire file: twenty redactions on a two-hundred page
+            // document meant twenty full loads and twenty full saves, plus a temp copy per
+            // step. The engine still asks for one painted page at a time, so only a single
+            // full-page bitmap exists at any moment - the memory this loop protected is
+            // still protected.
+            val pages = todo.map { it + 1 }.toIntArray()
+            PdfEngine.redactPagesLazy(src, pages, { page ->
+                val index = page - 1
+                val size = sizes[index]
+                val boxes = marks[index] ?: emptyList()
                 val w = (size[0] * PRINT_DPI / 72f).toInt().coerceIn(600, 4000)
-                val rendered = r.render(page, w)
-                val painted = paintBlack(rendered, boxes)
-                    ?: throw IllegalStateException("Could not prepare page ${page + 1}")
-                val target = if (i == todo.lastIndex) out
-                else Files.newFile(this@RedactActivity, "redact_step_$i.pdf")
-                try {
-                    PdfEngine.redactPages(cur, intArrayOf(page + 1),
-                        arrayOf(painted), target)
+                val rendered = r.render(index, w)
+                val painted = try {
+                    paintBlack(rendered, boxes)
                 } finally {
-                    // only the copy we made; the renderer's bitmap is left alone
-                    runCatching { painted.recycle() }
+                    // a fresh bitmap from the renderer; the painted copy is independent
+                    runCatching { rendered.recycle() }
                 }
-                cur = target
-            }
+                painted ?: throw IllegalStateException("Could not prepare page $page")
+            }, out)
             todo.size
         }
     }
