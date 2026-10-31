@@ -54,15 +54,38 @@ class ViewerActivity : PdfActivity() {
         binding.pager.orientation = ViewPager2.ORIENTATION_VERTICAL
 
         wireSearch()
-        val uri: Uri? = intent?.data
+        val uri: Uri? = incomingUri(intent)
         if (uri != null) openUri(uri) else pickPdf()
+    }
+
+    /**
+     * The PDF this screen was opened with, however it arrived.
+     *
+     * Tapping a PDF sends ACTION_VIEW with the file in the intent data. Sharing a PDF
+     * sends ACTION_SEND with the file in EXTRA_STREAM instead, so an app that only looked
+     * at intent.data would open nothing at all after being picked from the share sheet.
+     * clipData is the third place a sender may put it.
+     */
+    private fun incomingUri(intent: android.content.Intent?): Uri? {
+        intent ?: return null
+        intent.data?.let { return it }
+        val extra: Uri? = if (android.os.Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(android.content.Intent.EXTRA_STREAM, Uri::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(android.content.Intent.EXTRA_STREAM)
+        }
+        extra?.let { return it }
+        val clip = intent.clipData
+        if (clip != null && clip.itemCount > 0) return clip.getItemAt(0).uri
+        return null
     }
 
     /** Opening another PDF from another app while this screen is up. */
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        intent.data?.let { openUri(it) }
+        incomingUri(intent)?.let { openUri(it) }
     }
 
     override fun onPdfChosen(uri: Uri) = openUri(uri)

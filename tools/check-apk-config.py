@@ -52,6 +52,37 @@ else:
         if need not in abis:
             fails.append(f"{need} was dropped from abiFilters - phones using it cannot install")
 
+# 3) sharing: the app must be able to RECEIVE a shared PDF
+#    "Open with" (ACTION_VIEW) and the share sheet (ACTION_SEND) are separate filters in
+#    Android. KavoPDF only had VIEW, so it never appeared in a share sheet at all.
+MANIFEST = pathlib.Path("app/src/main/AndroidManifest.xml")
+if not MANIFEST.exists():
+    fails.append("AndroidManifest.xml is missing")
+else:
+    mf = MANIFEST.read_text(encoding="utf-8")
+    if "android.intent.action.SEND" not in mf:
+        fails.append("no ACTION_SEND filter - KavoPDF would not appear in any share sheet")
+    else:
+        i = mf.find("android.intent.action.SEND")
+        block = mf[max(0, i - 200):i + 400]
+        if "application/pdf" not in block:
+            fails.append("the ACTION_SEND filter is not for application/pdf")
+    if "android.intent.action.VIEW" not in mf:
+        fails.append("the ACTION_VIEW filter is gone - tapping a PDF would stop opening it")
+
+VIEWER = pathlib.Path("app/src/main/java/com/kavopdf/app/ViewerActivity.kt")
+if not VIEWER.exists():
+    fails.append("ViewerActivity.kt is missing")
+else:
+    v = VIEWER.read_text(encoding="utf-8")
+    if "EXTRA_STREAM" not in v:
+        fails.append("ViewerActivity does not read EXTRA_STREAM - a shared PDF would open "
+                     "nothing even with the filter in place")
+    if "clipData" not in v:
+        fails.append("ViewerActivity does not fall back to clipData")
+    if "intent?.data" in v and "incomingUri" not in v:
+        fails.append("ViewerActivity went back to reading only intent.data")
+
 if fails:
     for f in fails:
         print("FAIL:", f)
