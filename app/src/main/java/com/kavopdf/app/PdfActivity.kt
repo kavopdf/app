@@ -30,6 +30,12 @@ abstract class PdfActivity : AppCompatActivity() {
 
     protected lateinit var busy: Busy
     private var pendingProducer: ((File) -> Unit)? = null
+
+    /** Cache files this screen made, removed when it closes. */
+    private val sessionFiles = ArrayList<File>()
+
+    /** The one file the user shared or opened - another app may still be reading it. */
+    private val keptFiles = HashSet<File>()
     private var pendingName: String = "output.pdf"
 
     protected val openPdfLauncher =
@@ -69,7 +75,7 @@ abstract class PdfActivity : AppCompatActivity() {
             val producer = pendingProducer
             pendingProducer = null
             if (uri == null || producer == null) return@registerForActivityResult
-            val out = Files.newFile(this, pendingName)
+            val out = trackCacheFile(Files.newFile(this, pendingName))
             val taskName = taskLabel()
             runTask(getString(R.string.msg_processing), onDone = saved@{ result ->
                 if (result == null) return@saved
@@ -107,7 +113,7 @@ abstract class PdfActivity : AppCompatActivity() {
             if (!res.second) { onReady(res.first); return@checked }
             askPassword(res.first, onReady)
         }) {
-            val f = Files.copyToCache(this, uri)
+            val f = trackCacheFile(Files.copyToCache(this, uri))
             if (!Files.looksLikePdf(f)) error(getString(R.string.msg_not_a_pdf))
             pagesHint = runCatching { com.kavopdf.app.engine.PdfEngine.pageCount(f, "") }
                 .getOrDefault(1).coerceAtLeast(1)
@@ -178,10 +184,18 @@ abstract class PdfActivity : AppCompatActivity() {
         open.isEnabled = file != null
         share.isEnabled = file != null
         open.setOnClickListener {
-            file?.let { Files.openWith(this, it, mime) }
+            file?.let {
+                keptFiles.add(it)
+                Files.openWith(this, it, mime)
+            }
             dialog.dismiss()
         }
-        share.setOnClickListener { file?.let { Files.share(this, it, mime) } }
+        share.setOnClickListener {
+            file?.let {
+                keptFiles.add(it)
+                Files.share(this, it, mime)
+            }
+        }
         view.findViewById<View>(R.id.successClose).setOnClickListener { dialog.dismiss() }
         dialog.apply {
             // dead centre: no vertical offset, and the window itself is centred
@@ -202,6 +216,30 @@ abstract class PdfActivity : AppCompatActivity() {
     protected fun pickPdfs() = openPdfsLauncher.launch(arrayOf("application/pdf"))
     protected fun pickImages() = openImagesLauncher.launch(arrayOf("image/*"))
     protected fun pickTree() = openTreeLauncher.launch(null)
+
+    /**
+     * Remember a cache file so this screen can remove it when it closes.
+     *
+     * Nothing is deleted while the screen is alive: the success dialog offers Open and
+     * Share, which hand the same file to another app, and the reader keeps its copy open
+     * for as long as it is showing. Closing the screen is the first moment it is certain
+     * that this screen is done with the file.
+     */
+    protected fun trackCacheFile(f: File): File {
+        sessionFiles.add(f)
+        return f
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val removable = sessionFiles.filter { it !in keptFiles }
+        com.kavopdf.app.util.CacheSweep.deleteNow(removable)
+        sessionFiles.clear()
+        keptFiles.clear()
+        // Whatever this screen did not make - other screens' leftovers - ages out here too,
+        // so the cache does not wait for the next cold start to be tidied.
+        com.kavopdf.app.util.CacheSweep.sweep(this)
+    }
 
     /** Ask the user where to save, then run [produce] to build the output file. */
     protected fun runAndSave(name: String, produce: (File) -> Unit) {

@@ -17,7 +17,7 @@ class KavoPdfApp : Application() {
         // Decide once how much memory a page bitmap may use on THIS device, so a budget
         // phone and a flagship both render the same page without either running out.
         com.kavopdf.app.ui.PageRenderer.configure(this)
-        cleanStaleCache()
+        com.kavopdf.app.util.CacheSweep.sweep(this, force = true)
         com.kavopdf.app.util.CrashGuard.install(this)
     }
 
@@ -33,7 +33,7 @@ class KavoPdfApp : Application() {
                 com.kavopdf.app.ui.PageRenderer.reduceBudget()
             }
             if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL) {
-                cleanStaleCache()
+                com.kavopdf.app.util.CacheSweep.sweep(this)
             }
         } catch (_: Throwable) {
         }
@@ -46,19 +46,6 @@ class KavoPdfApp : Application() {
             com.kavopdf.app.ui.PageRenderer.reduceBudget()
         } catch (_: Throwable) {
         }
-    }
-
-    /** Documents are copied to the cache while they are worked on; drop old ones so
-     *  nothing lingers on the device longer than it needs to. */
-    private fun cleanStaleCache() {
-        Thread {
-            try {
-                val dir = java.io.File(cacheDir, "work")
-                val cutoff = System.currentTimeMillis() - 6L * 3600_000L
-                dir.listFiles()?.forEach { if (it.lastModified() < cutoff) it.delete() }
-            } catch (_: Exception) {
-            }
-        }.start()
     }
 
     companion object {
