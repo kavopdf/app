@@ -2771,6 +2771,11 @@ public final class PdfEngine {
         if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null;
         int sample = 1;
         if (maxDimension > 0) {
+            // inSampleSize only takes powers of two, so this is a TARGET, not a cap: a
+            // 4000 px photo asked for with maxDimension 3000 is decoded at the full 4000,
+            // and a 6000 px photo is decoded at 3000. Two different targets inside one
+            // power-of-two band therefore produce byte-identical output, which is why
+            // every image path in the app shares one constant.
             while (Math.max(bounds.outWidth, bounds.outHeight) / (sample * 2) >= maxDimension) sample *= 2;
         }
         BitmapFactory.Options opts = new BitmapFactory.Options();

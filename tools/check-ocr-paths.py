@@ -73,6 +73,25 @@ if "alreadySearchable" in engine:
     fails.append("the old visible-text skip is back - it refused to OCR a scanned page "
                  "that had a typed header")
 
+# --- one image size for every path, or the same photo comes out two sizes ---
+import re as _re
+
+_ocr_max = _re.search(r"const val OCR_MAX = (\d+)", image_ocr)
+_images_default = _re.search(r"imagesToPdf\(images, out, (\d+), false\)", engine)
+if not _ocr_max:
+    fails.append("ImageOcrActivity has no OCR_MAX")
+if not _images_default:
+    fails.append("PdfEngine.imagesToPdf no longer takes an explicit default size")
+if _ocr_max and _images_default and _ocr_max.group(1) != _images_default.group(1):
+    fails.append(
+        f"the searchable-image path embeds at {_ocr_max.group(1)} px while Images-to-PDF "
+        f"embeds at {_images_default.group(1)} px - the same photo would come out two "
+        f"different sizes depending on which tool made the file")
+if "powers of two" not in engine:
+    fails.append("decodeBounded no longer says that inSampleSize only takes powers of two "
+                 "- without that, its maxDimension reads like a hard cap and gets 'fixed' "
+                 "by someone who then changes the output")
+
 # --- the font: cache must be dropped when the font changes, and the asset must exist ---
 if "GLYPH_CACHE.clear()" not in engine:
     fails.append("the glyph cache is not cleared when the font changes - it would answer "

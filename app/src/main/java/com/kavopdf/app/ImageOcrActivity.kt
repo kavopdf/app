@@ -144,6 +144,15 @@ class ImageOcrActivity : PdfActivity() {
 
     private companion object {
         /** Decode size for recognition: higher is noticeably more accurate. */
-        const val OCR_MAX = 2600
+        /**
+         * Longest edge for the image that goes INTO the PDF, and for the bitmap handed to
+         * the recogniser.
+         *
+         * It is the same number Images-to-PDF uses on purpose: the same photo must not
+         * come out at a different size depending on which tool made the file. Note that
+         * decodeBounded samples by powers of two, so this is a target rather than a hard
+         * cap - a 4000 px photo is decoded at 4000 px, not at 3000.
+         */
+        const val OCR_MAX = 3000
     }
 }
