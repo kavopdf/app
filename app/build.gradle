@@ -12,8 +12,15 @@ android {
         applicationId "com.kavopdf.app"
         minSdk 24
         targetSdk 35
-        versionCode 167
-        versionName "3.33.1"
+
+        // Only English. The app has no translations of its own - res/ has just values and
+        // values-night - but resources.arsc was carrying about 120 languages of strings
+        // from material, appcompat and the rest, which the app can never show. Dropping
+        // them changes nothing that is displayed and takes roughly a megabyte off the APK.
+        // If a translation is ever added, its folder has to be added here too.
+        resConfigs "en"
+        versionCode 168
+        versionName "3.33.2"
 
         ndk {
             // Real phones are ARM. The x86/x86_64 slices only exist for emulators
