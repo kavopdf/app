@@ -2983,11 +2983,12 @@ public final class PdfEngine {
             String m = OCR_SYMBOLS.get(c);
             if (m != null) b.append(m);
         }
-        String out = b.toString().trim();
-        for (int i = 0; i < out.length(); i++) {
-            if (Character.isLetterOrDigit(out.charAt(i))) return out;
-        }
-        return "";
+        // Nothing is dropped for being punctuation. A page that prints "% weight"
+        // puts the percent sign in the layer, exactly as the pre-3.30.7 code did, so it
+        // can be copied and searched. The old letter-or-digit test was there to keep a
+        // mapped symbol from becoming a meaningless search entry, and it threw away real
+        // punctuation with it.
+        return b.toString().trim();
     }
 
     /**
@@ -3039,11 +3040,7 @@ public final class PdfEngine {
                 if (m != null) b.append(m);
             }
         }
-        String out = b.toString().trim();
-        for (int i = 0; i < out.length(); i++) {
-            if (Character.isLetterOrDigit(out.charAt(i))) return out;
-        }
-        return "";
+        return b.toString().trim();
     }
 
     static String winAnsi(String s) {

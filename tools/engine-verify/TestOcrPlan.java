@@ -50,8 +50,21 @@ public class TestOcrPlan {
         want(got, "a!=b", "!= falls back to !=");
         wantNot(got, "?", "nothing is written as a question mark");
         wantNot(got, "\u6f22", "a character with no glyph and no substitute is dropped");
-        // a word that is only a symbol and has no letter or digit must not be written at all
-        check(!got.trim().endsWith("->"), "a lone arrow does not leave a dangling glyph");
+        // a lone symbol is still written - pre-3.30.7 wrote something for it too, and
+        // dropping it is how "% weight" lost its percent sign
+        want(got, "->", "a lone arrow is written as -> rather than dropped");
+
+        // punctuation on its own must survive: this is the "% weight" case
+        File pctSrc = blank(dir, "spct.pdf");
+        File pctOut = layer(pctSrc, dir, "opct.pdf",
+                new String[]{"%", "weight", "-", "=", "/", "&", "(", ")", "+", "#", "@"});
+        String pct = text(pctOut);
+        System.out.println("  punctuation: " + pct);
+        for (String ch : new String[]{"%", "-", "=", "/", "&", "(", ")", "+", "#", "@"}) {
+            want(pct, ch, "a standalone \"" + ch + "\" is kept in the layer");
+        }
+        check(PdfEngine.search(pctOut, "%", false).size() >= 1,
+                "searching for a standalone % finds the page");
 
         check(out.length() < 200_000, "the font is subset, not copied whole (" + out.length() + " bytes)");
         check(PdfEngine.search(out, "\u20b9500", false).size() == 1, "search finds the rupee amount");

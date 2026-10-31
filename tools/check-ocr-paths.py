@@ -53,15 +53,21 @@ if "OCR_WIDTH * 1.6" not in ocr:
 if ocr.count("recognise(") < 3:
     fails.append("the retry no longer re-recognises the page")
 
-# --- both screens must apply the same, deliberately narrow junk rule ---
-RULE = "t.trim().length <= 1 && conf != null && conf < 0.3f"
+# --- nothing may be filtered for being short or low-confidence ---
+# Pre-3.30.7 had no such filter, and adding one is how a standalone "%" disappeared from
+# a page that printed "% weight". The layer is invisible: a stray glyph costs nothing,
+# a dropped character costs a search hit.
 for name, src in (("OcrActivity", ocr), ("ImageOcrActivity", image_ocr)):
-    if RULE not in src:
-        fails.append(f"{name} lost the narrow junk rule ({RULE}) - either nothing is "
-                     f"filtered, or real short words are dropped")
-if "conf < 0.5f" in ocr or "conf < 0.5f" in image_ocr:
-    fails.append("a wider junk threshold came back - it can drop real one- and "
-                 "two-character words")
+    if "el.confidence" in src:
+        fails.append(f"{name} filters on recogniser confidence again - that drops real "
+                     f"punctuation such as a standalone %")
+
+# --- and the layer must not drop punctuation for lacking a letter or a digit ---
+if "isLetterOrDigit(out.charAt(i))" in engine:
+    fails.append("ocrText/ocrTextWith drop anything that is not a letter or digit again - "
+                 "that is exactly what lost the % from \"% weight\"")
+if "return b.toString().trim();" not in engine:
+    fails.append("the OCR layer text helper no longer returns its built string")
 
 # --- no stacked layers, and the check must cover every content stream ---
 if "hasInvisibleLayer(page)" not in engine:
@@ -116,4 +122,5 @@ if fails:
     sys.exit(1)
 
 print("PASS: the OCR path keeps its shape - one EXIF-aware decoder, the small-print "
-      "retry, the narrow junk rule, one layer per page, and a subset Unicode font")
+      "retry, nothing filtered for being short, one layer per page, and a subset "
+      "Unicode font")
