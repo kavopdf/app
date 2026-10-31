@@ -120,6 +120,22 @@ public class TestImagePdf {
               imageHashes(e2eLayer).get(0).equals(srcHash),
               "adding the text layer left the embedded JPEG byte-identical");
 
+        // --- imagesToPdf (Images -> PDF, Scan -> PDF) must also be lossless -----------
+        File i2p = new File(dir, "i2p.pdf");
+        PdfEngine.imagesToPdf(Collections.singletonList(jpeg), i2p, 3000, false);
+        List<String> i2pHashes = imageHashes(i2p);
+        eq(i2pHashes.size(), 1, "imagesToPdf wrote one image");
+        eq(i2pHashes.get(0), srcHash, "Images-to-PDF embeds the JPEG's own bytes (no re-encode)");
+
+        File i2pA4 = new File(dir, "i2p_a4.pdf");
+        PdfEngine.imagesToPdf(Collections.singletonList(jpeg), i2pA4, 3000, true);
+        eq(imageHashes(i2pA4).get(0), srcHash, "fit-to-A4 path is lossless too");
+        try (PDDocument d = PDDocument.load(i2pA4)) {
+            PDRectangle b = d.getPage(0).getCropBox();
+            eq((long) Math.round(b.getWidth()), 595L, "A4 width");
+            eq((long) Math.round(b.getHeight()), 842L, "A4 height");
+        }
+
         // --- a corrupt file must throw, not produce a broken page ---------------------
         File junk = new File(dir, "junk.bin");
         try (FileOutputStream fo = new FileOutputStream(junk)) { fo.write(new byte[]{1,2,3,4,5}); }
@@ -130,13 +146,30 @@ public class TestImagePdf {
         } finally { w2.close(); }
         check(threw, "a corrupt image is rejected instead of written as a broken page");
 
-        // --- empty dimensions are rejected --------------------------------------------
-        boolean rejected = false;
+        // --- no size given: it comes from the picture, so nothing is decoded ---------
+        File auto = new File(dir, "auto.pdf");
         PdfEngine.ImagePdfWriter w3 = new PdfEngine.ImagePdfWriter(2600, false);
         try {
-            try { w3.addPage(jpeg, 0, 0); } catch (IllegalArgumentException e) { rejected = true; }
+            w3.addPage(jpeg, 0, 0);
+            w3.finish(auto);
         } finally { w3.close(); }
-        check(rejected, "zero-size page is rejected");
+        try (PDDocument d = PDDocument.load(auto)) {
+            eq((long) Math.round(d.getPage(0).getCropBox().getWidth()), 900L, "size taken from the image");
+            eq((long) Math.round(d.getPage(0).getCropBox().getHeight()), 1200L, "and the height too");
+        }
+        eq(imageHashes(auto).get(0), srcHash, "still byte-identical with no size given");
+
+        // --- a file that is not an image at all is still rejected -------------------
+        File notImage = new File(dir, "notes.txt");
+        try (FileOutputStream fo = new FileOutputStream(notImage)) {
+            fo.write("just some text, not a picture".getBytes("UTF-8"));
+        }
+        boolean refused = false;
+        PdfEngine.ImagePdfWriter w4 = new PdfEngine.ImagePdfWriter(2600, false);
+        try {
+            try { w4.addPage(notImage); } catch (Exception e) { refused = true; }
+        } finally { w4.close(); }
+        check(refused, "a text file is rejected as an image");
 
         System.out.println("IMAGEPDF TOTAL: " + pass + " passed, " + fail + " failed");
         if (fail > 0) System.exit(1);

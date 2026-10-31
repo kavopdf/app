@@ -779,9 +779,11 @@ public final class PdfEngine {
         int maxDim;
         float quality;
         switch (level) {
-            case 0: maxDim = 2200; quality = 0.78f; break;
-            case 2: maxDim = 1200; quality = 0.48f; break;
-            default: maxDim = 1600; quality = 0.62f; break;
+            // Light is meant to be almost invisible: it only touches images wider than
+            // 2600 px and re-encodes them at 0.90, which most scans never hit.
+            case 0: maxDim = 2600; quality = 0.90f; break;
+            case 2: maxDim = 1200; quality = 0.50f; break;
+            default: maxDim = 1800; quality = 0.72f; break;
         }
         compress(src, out, maxDim, quality);
     }
@@ -1299,45 +1301,20 @@ public final class PdfEngine {
      */
     public static void imagesToPdf(List<File> images, File out, int maxDimension, boolean fitToA4) throws Exception {
         if (images == null || images.isEmpty()) throw new IllegalArgumentException("Pick at least one image");
-        try (PDDocument d = new PDDocument()) {
+        // Built through ImagePdfWriter so there is exactly one image->PDF path in the app.
+        // A JPEG goes in as its original bytes and everything else as a lossless Flate
+        // image, so building a PDF from pictures never re-compresses them.
+        ImagePdfWriter w = new ImagePdfWriter(maxDimension, fitToA4);
+        try {
             for (File image : images) {
-                Bitmap bmp = decodeBounded(image, maxDimension);
-                if (bmp == null) throw new IllegalArgumentException("Could not read image: " + image.getName());
-                PDImageXObject img = bmp.hasAlpha()
-                        ? LosslessFactory.createFromImage(d, bmp)
-                        // 0.85 was visibly soft on camera photos. 0.95 is still a
-                        // normal JPEG and keeps detail that a scan needs.
-                        : JPEGFactory.createFromImage(d, bmp, 0.95f);
-
-                PDRectangle pageSize;
-                if (fitToA4) {
-                    pageSize = PDRectangle.A4;
-                } else {
-                    float pw = Math.max(1f, bmp.getWidth());
-                    float ph = Math.max(1f, bmp.getHeight());
-                    // keep pages to a sensible size (max 2000pt on the long edge)
-                    float longest = Math.max(pw, ph);
-                    if (longest > 2000f) { float s = 2000f / longest; pw *= s; ph *= s; }
-                    pageSize = new PDRectangle(pw, ph);
+                if (image == null || !image.isFile()) {
+                    throw new IllegalArgumentException("Could not read image: " + (image == null ? "?" : image.getName()));
                 }
-                bmp.recycle();
-
-                PDPage page = new PDPage(pageSize);
-                d.addPage(page);
-                float iw = img.getWidth(), ih = img.getHeight();
-                float scale = Math.min(pageSize.getWidth() / iw, pageSize.getHeight() / ih);
-                if (fitToA4) {
-                    float dw = iw * scale, dh = ih * scale;
-                    try (PDPageContentStream cs = new PDPageContentStream(d, page)) {
-                        cs.drawImage(img, (pageSize.getWidth() - dw) / 2f, (pageSize.getHeight() - dh) / 2f, dw, dh);
-                    }
-                } else {
-                    try (PDPageContentStream cs = new PDPageContentStream(d, page)) {
-                        cs.drawImage(img, 0, 0, pageSize.getWidth(), pageSize.getHeight());
-                    }
-                }
+                w.addPage(image);
             }
-            d.save(out);
+            w.finish(out);
+        } finally {
+            w.close();
         }
     }
 
@@ -1546,6 +1523,14 @@ public final class PdfEngine {
          * Add one page. pxW and pxH are the pixel size of the picture the recogniser read, so
          * the page has the same shape as the boxes that will be written onto it.
          */
+        /**
+         * Add one page, taking its size from the picture itself. A JPEG is never decoded at
+         * all on this path - its own bytes go into the PDF, so nothing is re-encoded.
+         */
+        public void addPage(File image) throws Exception {
+            addPage(image, 0, 0, 0);
+        }
+
         public void addPage(File image, int pxW, int pxH) throws Exception {
             addPage(image, pxW, pxH, 0);
         }
@@ -1561,9 +1546,15 @@ public final class PdfEngine {
          * this whole change exists to avoid.
          */
         public void addPage(File image, int pxW, int pxH, int rotation) throws Exception {
-            if (pxW <= 0 || pxH <= 0) throw new IllegalArgumentException("Empty image");
             int r = ((rotation % 360) + 360) % 360;
             PDImageXObject img = embed(image);
+            // No size given: take it from the embedded picture. This is what lets a JPEG go
+            // in without ever being decoded.
+            if (pxW <= 0 || pxH <= 0) {
+                pxW = img.getWidth();
+                pxH = img.getHeight();
+            }
+            if (pxW <= 0 || pxH <= 0) throw new IllegalArgumentException("Empty image");
             // Page geometry is copied exactly from imagesToPdf, so a searchable PDF made here
             // has the same page size as one made by the plain Images-to-PDF tool.
             PDRectangle pageSize;
@@ -2890,7 +2881,9 @@ public final class PdfEngine {
         page.setMediaBox(nb);
         page.setCropBox(nb);
 
-        PDImageXObject img = JPEGFactory.createFromImage(d, bmp, 0.9f);
+        // Lossless, not JPEG: the page has to be rasterised for the redaction to be real,
+        // but the picture that is left behind does not also have to be compressed.
+        PDImageXObject img = LosslessFactory.createFromImage(d, bmp);
         try (PDPageContentStream cs =
                      new PDPageContentStream(d, page, AppendMode.OVERWRITE, true, true)) {
             cs.drawImage(img, 0, 0, dw, dh);
