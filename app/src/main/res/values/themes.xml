@@ -4,6 +4,11 @@
     <!-- Default accent: Indigo. The Theme.KavoPDF.* overlays below re-tint the
          whole app (toolbars, headers, icons) by overriding colorPrimary. -->
     <style name="Theme.KavoPDF" parent="Theme.Material3Expressive.DayNight.NoActionBar">
+        <!-- Use the whole display, camera cutout included. Without this a phone with a
+             notch or a punch-hole treats the app as "fit to screen" and keeps a black band
+             along the edge - in landscape especially - which is why every other app looked
+             full screen and this one did not. Ignored below Android 9. -->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
         <item name="colorPrimary">#FF3B5BDB</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorPrimaryContainer">#FFDDE4FF</item>
