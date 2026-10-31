@@ -2311,6 +2311,21 @@ public final class PdfEngine {
             "Helvetica", "Helvetica Bold", "Times", "Times Bold", "Courier"
     };
 
+    /** True for a JPEG with no soft mask or colour mask, so its own bytes can be copied. */
+    private static boolean isPlainJpeg(PDImageXObject img) {
+        try {
+            com.tom_roush.pdfbox.cos.COSStream s = img.getCOSObject();
+            com.tom_roush.pdfbox.cos.COSBase filters = s.getFilters();
+            if (filters == null || !filters.toString().contains("DCTDecode")) return false;
+            if (img.getSoftMask() != null) return false;
+            if (s.getCOSName(com.tom_roush.pdfbox.cos.COSName.SMASK) != null) return false;
+            if (s.getCOSName(com.tom_roush.pdfbox.cos.COSName.MASK) != null) return false;
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private static PDType1Font pickFont(String name) {
         if (name == null) return PDType1Font.HELVETICA;
         switch (name) {
@@ -2936,7 +2951,9 @@ public final class PdfEngine {
 
     /** Decode an image the right way up - EXIF orientation applied. For previews. */
     public static Bitmap decodeUpright(File f, int maxDimension) {
-        return decodeBounded(f, maxDimension);
+        // Was a plain decode that ignored EXIF, so a portrait photo's thumbnail came out
+        // sideways. decodeImage is the EXIF-aware one; the name finally tells the truth.
+        return decodeImage(f, maxDimension);
     }
 
     private static Bitmap decodeBounded(File f, int maxDimension) {
@@ -3014,14 +3031,31 @@ public final class PdfEngine {
                     if (!(xo instanceof PDImageXObject)) continue;
                     PDImageXObject img = (PDImageXObject) xo;
                     if (seen.put(img.getCOSObject(), Boolean.TRUE) != null) continue;
+
+                    // A JPEG that carries no mask goes out as its own bytes. Decoding and
+                    // re-encoding it at quality 90 was a second compression of a picture
+                    // that was already compressed, so an extracted image was worse than
+                    // the one inside the PDF.
+                    if (isPlainJpeg(img)) {
+                        File dest = new File(outDir, "image_" + (++n) + ".jpg");
+                        try (java.io.InputStream in = img.getCOSObject().createRawInputStream();
+                             OutputStream os = new FileOutputStream(dest)) {
+                            byte[] buf = new byte[8192];
+                            int r;
+                            while ((r = in.read(buf)) > 0) os.write(buf, 0, r);
+                        }
+                        written.add(dest);
+                        continue;
+                    }
+
                     if (!safeToDecode(img)) continue;
                     Bitmap bmp;
                     try { bmp = img.getImage(); } catch (OutOfMemoryError | Exception e) { continue; }
                     if (bmp == null) continue;
-                    boolean alpha = bmp.hasAlpha();
-                    File dest = new File(outDir, "image_" + (++n) + (alpha ? ".png" : ".jpg"));
+                    // Anything that is not a plain JPEG is written losslessly.
+                    File dest = new File(outDir, "image_" + (++n) + ".png");
                     try (OutputStream os = new FileOutputStream(dest)) {
-                        bmp.compress(alpha ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG, 90, os);
+                        bmp.compress(Bitmap.CompressFormat.PNG, 100, os);
                     }
                     bmp.recycle();
                     written.add(dest);

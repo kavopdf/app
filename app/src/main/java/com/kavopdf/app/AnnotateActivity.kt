@@ -575,7 +575,7 @@ class AnnotateActivity : PdfActivity() {
             val rasters = ArrayList<File>()
             for ((page, list) in pagesWithInk) {
                 val size = displaySize(page)
-                val bmp = com.kavopdf.app.ui.AnnotRenderer.rasterize(list, size[0], size[1], 2.5f)
+                val bmp = com.kavopdf.app.ui.AnnotRenderer.rasterize(list, size[0], size[1], com.kavopdf.app.ui.AnnotRenderer.EXPORT_SCALE)
                 val png = Files.newFile(this, "annot_${page + 1}.png")
                 FileOutputStream(png).use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
                 bmp.recycle()

@@ -338,7 +338,7 @@ class CreatePdfActivity : PdfActivity() {
             pages.forEachIndexed { i, p ->
                 var raster: File? = null
                 if (p.items.isNotEmpty()) {
-                    val bmp = AnnotRenderer.rasterize(p.items, p.w, p.h, 2.5f)
+                    val bmp = AnnotRenderer.rasterize(p.items, p.w, p.h, com.kavopdf.app.ui.AnnotRenderer.EXPORT_SCALE)
                     raster = Files.newFile(this, "page_${i + 1}.png")
                     FileOutputStream(raster).use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
                     bmp.recycle()

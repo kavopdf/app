@@ -136,6 +136,16 @@ public class TestImagePdf {
             eq((long) Math.round(b.getHeight()), 842L, "A4 height");
         }
 
+        // --- extract images must hand back the original bytes ------------------------
+        File exDir = new File(dir, "extracted");
+        exDir.mkdirs();
+        for (File old : exDir.listFiles() == null ? new File[0] : exDir.listFiles()) old.delete();
+        java.util.List<File> got = PdfEngine.extractImages(i2p, exDir);
+        eq(got.size(), 1, "one image extracted");
+        eq(got.get(0).getName().endsWith(".jpg") ? ".jpg" : got.get(0).getName(),
+                ".jpg", "a plain JPEG is extracted as .jpg");
+        eq(sha(got.get(0)), srcHash, "the extracted image is byte-identical to the original (no re-encode)");
+
         // --- a corrupt file must throw, not produce a broken page ---------------------
         File junk = new File(dir, "junk.bin");
         try (FileOutputStream fo = new FileOutputStream(junk)) { fo.write(new byte[]{1,2,3,4,5}); }

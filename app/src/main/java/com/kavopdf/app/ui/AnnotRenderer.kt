@@ -100,6 +100,20 @@ object AnnotRenderer {
         }
     }
 
+    /**
+     * Export resolution. A PDF point is 1/72 inch, so 300 dpi is 300/72 px per point.
+     *
+     * This used to be a flat 2.5 px per point - about 180 dpi - which made an exported
+     * annotation, and every page made in Create PDF, noticeably softer than a 300 dpi
+     * scan. At 300 dpi an A4 page is 2480x3508 px, 8.7 megapixels: inside the same
+     * 16-megapixel budget the page renderer uses, so the clamp below still protects a
+     * cheap phone, and a page larger than A3 is scaled down automatically.
+     */
+    const val EXPORT_DPI = 300f
+
+    /** Pixels per PDF point at [EXPORT_DPI]. */
+    const val EXPORT_SCALE = EXPORT_DPI / 72f
+
     /** Rasterise the annotations for one page onto a transparent bitmap. */
     fun rasterize(items: List<Annot>, pageW: Float, pageH: Float, scale: Float): Bitmap {
         var w = (pageW * scale).toInt().coerceAtLeast(1)

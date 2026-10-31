@@ -122,6 +122,67 @@ else:
     if quality < 0.85:
         fails.append(f"Compress light setting re-encodes at {quality}, below the 0.85 floor")
 
+# 6) export raster resolution: 300 dpi, and no call site may pass its own number
+RENDERER = pathlib.Path("app/src/main/java/com/kavopdf/app/ui/AnnotRenderer.kt")
+if not RENDERER.exists():
+    fails.append("AnnotRenderer.kt is missing")
+else:
+    r = RENDERER.read_text(encoding="utf-8")
+    m = re.search(r"EXPORT_DPI\s*=\s*([\d.]+)f", r)
+    if not m:
+        fails.append("AnnotRenderer.EXPORT_DPI not found")
+    elif float(m.group(1)) < 300:
+        fails.append(f"AnnotRenderer.EXPORT_DPI is {m.group(1)}, below 300 - exports would be soft")
+    if "EXPORT_SCALE" not in r:
+        fails.append("AnnotRenderer.EXPORT_SCALE not found")
+for name in ("AnnotateActivity.kt", "CreatePdfActivity.kt"):
+    p2 = pathlib.Path("app/src/main/java/com/kavopdf/app") / name
+    if not p2.exists():
+        fails.append(f"{name} is missing")
+        continue
+    body = p2.read_text(encoding="utf-8")
+    if "rasterize(" not in body:
+        fails.append(f"{name} no longer rasterises")
+    # a hard-coded scale would silently drop back to the old resolution
+    for lit in re.findall(r"rasterize\([^)]*,\s*([\d.]+)f\s*\)", body):
+        fails.append(f"{name} passes a hard-coded rasterize scale ({lit}) instead of EXPORT_SCALE")
+    if "EXPORT_SCALE" not in body:
+        fails.append(f"{name} does not use AnnotRenderer.EXPORT_SCALE")
+
+# 7) extracting an image must not re-compress it
+body = method("extractImages(File src, File outDir, List<Integer> pages1based)",
+              r"public static List<File> %s\s*throws")
+if body is None:
+    fails.append("extractImages() not found")
+else:
+    if "CompressFormat.JPEG" in body:
+        fails.append("extractImages() re-encodes as JPEG - an extracted image would be worse "
+                     "than the one inside the PDF")
+    if "createRawInputStream" not in body:
+        fails.append("extractImages() no longer copies a JPEG's own bytes")
+    if "CompressFormat.PNG" not in body:
+        fails.append("extractImages() no longer writes other images losslessly")
+
+# 8) decodeUpright must actually rotate
+m = re.search(r"public static Bitmap decodeUpright\(File f, int maxDimension\)\s*\{", src)
+if not m:
+    fails.append("decodeUpright() not found")
+else:
+    i = m.start()
+    j = src.index("{", i)
+    depth, k = 0, j
+    while k < len(src):
+        if src[k] == "{":
+            depth += 1
+        elif src[k] == "}":
+            depth -= 1
+            if depth == 0:
+                break
+        k += 1
+    if "decodeImage(" not in src[i:k]:
+        fails.append("decodeUpright() does not use the EXIF-aware decoder - a portrait "
+                     "photo's thumbnail would come out sideways")
+
 if fails:
     for f in fails:
         print("FAIL:", f)
