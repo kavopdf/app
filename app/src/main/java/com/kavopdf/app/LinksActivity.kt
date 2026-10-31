@@ -342,7 +342,13 @@ class LinksActivity : PdfActivity() {
         val targetW = (resources.displayMetrics.widthPixels * 1.7f).toInt().coerceAtMost(2400)
         lifecycleScope.launch {
             val bmp = withContext(Dispatchers.IO) {
-                runCatching { r.render(index, targetW) }.getOrNull()
+                r.renderOrRetry(index, targetW)
+            }
+            if (bmp == null) {
+                com.kavopdf.app.util.AppLog.problem(
+                    this@LinksActivity, "Page render failed",
+                    IllegalStateException("page ${index + 1}")
+                )
             }
             if (bmp != null && current == index) {
                 binding.pageImage.setImageBitmap(bmp)

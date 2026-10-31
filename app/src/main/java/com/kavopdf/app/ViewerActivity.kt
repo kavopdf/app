@@ -99,6 +99,13 @@ class ViewerActivity : PdfActivity() {
             // is the one place the reader felt slow on every device.
             binding.pager.offscreenPageLimit = 1
             binding.pager.adapter = adapter
+            // The pager's inner RecyclerView animates item changes, which shows up as a
+            // small stutter when a page is rebound mid-swipe. Nothing here needs an item
+            // animation, and caching one extra view keeps the next page ready.
+            (binding.pager.getChildAt(0) as? androidx.recyclerview.widget.RecyclerView)?.apply {
+                itemAnimator = null
+                setItemViewCacheSize(3)
+            }
             binding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     updateIndicator(position, pr.pageCount)

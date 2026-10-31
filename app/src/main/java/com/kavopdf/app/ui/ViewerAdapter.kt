@@ -96,14 +96,27 @@ class ViewerAdapter(
         }
         // never blank the page: whatever is there stays until the rotated bitmap
         // arrives, so rotating cannot flash black
-        renderInto(position, baseWidthProvider()) { bmp ->
-            if (bmp == null) return@renderInto
+        val baseWidth = baseWidthProvider()
+        renderInto(position, baseWidth) { bmp ->
+            if (bmp == null) {
+                com.kavopdf.app.util.AppLog.problem(
+                    iv.context, "Page render failed",
+                    IllegalStateException("page ${position + 1}")
+                )
+                return@renderInto
+            }
             cache.put(position, bmp)
             cacheRotation[position] = rotationProvider()
+            // Record what this page was drawn at. It used to be recorded only when the
+            // page was upgraded, so the first tap on any page looked like an upgrade and
+            // re-rendered the whole page for nothing.
+            renderedWidth[position] = baseWidth
             if (holder.boundPosition == position) {
                 iv.setImageBitmap(bmp)
-                iv.alpha = 0.3f
-                iv.animate().alpha(1f).setDuration(150).start()
+                // No fade. The page used to start at 0.3 alpha and animate to 1; an
+                // interrupted animator left it at 0.3, and 30% of a page over the near
+                // black viewer background reads as a black screen.
+                iv.alpha = 1f
             }
         }
     }
@@ -173,7 +186,7 @@ class ViewerAdapter(
         val rot = rotationProvider()
         scope.launch {
             val bmp = withContext(Dispatchers.IO) {
-                runCatching { renderer.render(position, width, rot) }.getOrNull()
+                renderer.renderOrRetry(position, width, rot)
             }
             onReady(bmp)
         }

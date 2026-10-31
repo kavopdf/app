@@ -114,7 +114,13 @@ class RedactActivity : PdfActivity() {
         renderedWidth[index] = targetW
         lifecycleScope.launch {
             val bmp = withContext(Dispatchers.IO) {
-                runCatching { r.render(index, targetW) }.getOrNull()
+                r.renderOrRetry(index, targetW)
+            }
+            if (bmp == null) {
+                com.kavopdf.app.util.AppLog.problem(
+                    this@RedactActivity, "Page render failed",
+                    IllegalStateException("page ${index + 1}")
+                )
             }
             if (bmp != null && current == index) {
                 binding.pageImage.setImageBitmap(bmp)
@@ -143,7 +149,7 @@ class RedactActivity : PdfActivity() {
         renderedWidth[index] = target
         lifecycleScope.launch {
             val bmp = withContext(Dispatchers.IO) {
-                runCatching { r.render(index, target) }.getOrNull()
+                r.renderOrRetry(index, target)
             }
             if (bmp != null && current == index) {
                 // Keeps the zoom and pan where the user put them; a plain setImageBitmap

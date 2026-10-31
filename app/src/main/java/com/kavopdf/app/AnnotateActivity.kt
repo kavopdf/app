@@ -371,7 +371,15 @@ class AnnotateActivity : PdfActivity() {
         renderedWidth[index] = targetW
         lifecycleScope.launch {
             val bmp = withContext(Dispatchers.IO) {
-                runCatching { r.render(index, targetW, viewRotation) }.getOrNull()
+                r.renderOrRetry(index, targetW, viewRotation)
+            }
+            if (bmp == null) {
+                // Not silent any more: a page that could not be drawn used to leave the
+                // screen at its background colour, which reads as a black screen.
+                com.kavopdf.app.util.AppLog.problem(
+                    this@AnnotateActivity, "Page render failed",
+                    IllegalStateException("page ${index + 1}")
+                )
             }
             if (bmp != null && current == index) {
                 binding.pageImage.setImageBitmap(bmp)
@@ -408,7 +416,7 @@ class AnnotateActivity : PdfActivity() {
         renderedWidth[index] = target
         lifecycleScope.launch {
             val bmp = withContext(Dispatchers.IO) {
-                runCatching { r.render(index, target, viewRotation) }.getOrNull()
+                r.renderOrRetry(index, target, viewRotation)
             }
             if (bmp != null && current == index) {
                 binding.pageImage.setImageBitmapPreservingTransform(bmp)

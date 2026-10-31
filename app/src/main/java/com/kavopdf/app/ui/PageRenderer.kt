@@ -72,6 +72,31 @@ class PageRenderer(private val renderer: PdfRenderer) {
         }
     }
 
+    /**
+     * Render a page, and if the first attempt throws, try once more before giving up.
+     *
+     * Every screen that previews a page used to wrap render() in
+     * runCatching { ... }.getOrNull() and then quietly do nothing when it came back null.
+     * render() never returns null - it throws - so a null there meant a failure that was
+     * swallowed: the page area stayed at its background colour, which in dark theme is
+     * almost pure black, and nothing ever retried. That is the black screen: the page was
+     * there to be drawn, the one attempt had failed, and only an unrelated event (a touch
+     * that triggered a re-render) brought it back.
+     *
+     * A second attempt costs nothing when the first one worked, and the failure is now
+     * written to the activity log instead of disappearing.
+     */
+    fun renderOrRetry(index: Int, targetWidth: Int, rotation: Int = 0): Bitmap? {
+        repeat(2) {
+            try {
+                return render(index, targetWidth, rotation)
+            } catch (_: Throwable) {
+                // fall through to the second attempt
+            }
+        }
+        return null
+    }
+
     private fun rotate(bmp: Bitmap, w: Int, h: Int, rotation: Int): Bitmap {
         val deg = ((rotation % 360) + 360) % 360
         if (deg == 0) return bmp

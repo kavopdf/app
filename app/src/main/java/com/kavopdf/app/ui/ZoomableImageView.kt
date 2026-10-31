@@ -197,7 +197,7 @@ class ZoomableImageView @JvmOverloads constructor(
         // the toolbar appears or disappears. That is why picking Select-and-move (or
         // any tool) snapped a zoomed page back to full size mid-work. Keep the zoom
         // and simply re-fit to the new size.
-        if (zoom > 1.01f) apply() else reset()
+        if (pendingFit || zoom <= 1.01f) reset() else apply()
     }
 
     private var zoomAnimator: ValueAnimator? = null
@@ -242,20 +242,23 @@ class ZoomableImageView @JvmOverloads constructor(
 
     private fun notifyZoom() = onZoomChanged?.invoke(isZoomed())
 
+    /** True when a fit was skipped because the size was not known yet. */
+    private var pendingFit = false
+
     private fun apply() {
         val d = drawable
         val vw = width.toFloat()
         val vh = height.toFloat()
-        if (d == null || vw <= 0f || vh <= 0f) {
-            imageMatrix = m
+        val dw = d?.intrinsicWidth?.toFloat() ?: 0f
+        val dh = d?.intrinsicHeight?.toFloat() ?: 0f
+        if (d == null || vw <= 0f || vh <= 0f || dw <= 0f || dh <= 0f) {
+            // No size or no picture yet. Assigning the old matrix here drew the new page
+            // at the previous page's scale and offset, and nothing corrected it. Ask for
+            // a fit as soon as both are known instead.
+            pendingFit = true
             return
         }
-        val dw = d.intrinsicWidth.toFloat()
-        val dh = d.intrinsicHeight.toFloat()
-        if (dw <= 0f || dh <= 0f) {
-            imageMatrix = m
-            return
-        }
+        pendingFit = false
         val base = minOf(vw / dw, vh / dh)
         val s = base * zoom
         val w = dw * s
