@@ -128,7 +128,7 @@ REPAIR_HASH=$(
   {
     cat ../../app/src/main/java/com/kavopdf/app/engine/PdfRepair.java
     cat TestRepair.java TestRepairFixtures.java
-    ls -l fixtures/repair | awk '{print $5, $9}'
+    ls -l fixtures/repair fixtures/torture | awk '{print $5, $9}'
   } | sha256sum | cut -d' ' -f1
 )
 if [ "${REPAIR_FULL:-0}" != "1" ] && [ -f "$REPAIR_STAMP" ] \

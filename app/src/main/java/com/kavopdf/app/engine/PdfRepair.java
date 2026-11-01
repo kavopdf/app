@@ -1,10 +1,12 @@
 package com.kavopdf.app.engine;
 
+import com.tom_roush.pdfbox.cos.COSArray;
 import com.tom_roush.pdfbox.cos.COSBase;
 import com.tom_roush.pdfbox.cos.COSDictionary;
 import com.tom_roush.pdfbox.cos.COSName;
 import com.tom_roush.pdfbox.cos.COSNull;
 import com.tom_roush.pdfbox.cos.COSObject;
+import com.tom_roush.pdfbox.cos.COSStream;
 import com.tom_roush.pdfbox.io.MemoryUsageSetting;
 import com.tom_roush.pdfbox.io.RandomAccessBufferedFileInputStream;
 import com.tom_roush.pdfbox.io.ScratchFile;
@@ -12,6 +14,10 @@ import com.tom_roush.pdfbox.pdfparser.PDFParser;
 import com.tom_roush.pdfbox.pdfparser.PDFStreamParser;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.pdmodel.PDPage;
+import com.tom_roush.pdfbox.pdmodel.graphics.PDXObject;
+import com.tom_roush.pdfbox.pdmodel.PDResources;
+import com.tom_roush.pdfbox.contentstream.operator.Operator;
+import com.tom_roush.pdfbox.pdmodel.common.PDStream;
 import com.tom_roush.pdfbox.pdmodel.encryption.AccessPermission;
 import com.tom_roush.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import com.tom_roush.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
@@ -22,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -97,6 +104,8 @@ public final class PdfRepair {
         public final List<Integer> lostPages = new ArrayList<>();
         /** 1-based pages that name content the file no longer holds, so they come out blank. */
         public final List<Integer> blankPages = new ArrayList<>();
+        /** 1-based pages whose content stops partway and draws only part of itself. */
+        public final List<Integer> partialPages = new ArrayList<>();
     }
 
     // =====================================================================================
@@ -172,7 +181,14 @@ public final class PdfRepair {
                 return r;
             }
             r.readable = true;
+            // De-duplicate before anything counts or walks the tree: a page bomb lists one
+            // page four thousand times, and every pass over that list is work on a 15 KB file.
+            dedupeKids(doc, r);
             readDocumentFacts(doc, working, r);
+
+            // Pages whose /Contents was removed while their streams are still in the file are
+            // recoverable: the streams are intact and decodable, they are simply not attached.
+            adoptOrphanContent(doc, r);
 
             // ---- decide: is the page tree usable, or do we have to salvage? ----
             // A tree can report a page count and still be un-walkable: a circular /Kids, or
@@ -264,6 +280,7 @@ public final class PdfRepair {
                 if (!r.blankPages.contains(page)) r.blankPages.add(page);
             }
             for (int page : brokenOnArrival) {
+                if (r.partialPages.contains(page)) continue;     // partial, not blank
                 if (!r.blankPages.contains(page)) r.blankPages.add(page);
             }
             java.util.Collections.sort(r.blankPages);
@@ -1070,6 +1087,113 @@ public final class PdfRepair {
         }
     }
 
+    /**
+     * Drops repeated page references from every page-tree node.
+     *
+     * <p>/Kids listing the same object twice - or four thousand times - is self-consistent
+     * with /Count, so nothing looks wrong until the tree is walked. Left alone it makes the
+     * repaired file longer than the original, and turns a 15 KB file into minutes of work.
+     */
+    private static void dedupeKids(PDDocument doc, Report r) {
+        try {
+            int removed = dedupeNode(doc.getDocumentCatalog().getPages().getCOSObject(), new HashSet<COSBase>());
+            if (removed > 0) {
+                r.actions.add("dropped " + removed + " repeated page reference(s)");
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static int dedupeNode(COSDictionary node, HashSet<COSBase> seen) {
+        COSBase kidsBase = node.getDictionaryObject(COSName.KIDS);
+        if (!(kidsBase instanceof COSArray)) return 0;
+        COSArray kids = (COSArray) kidsBase;
+        COSArray keep = new COSArray();
+        int removed = 0;
+        for (int i = 0; i < kids.size(); i++) {
+            COSBase kid = kids.getObject(i);
+            if (kid == null) { removed++; continue; }
+            if (!seen.add(kid)) { removed++; continue; }        // already placed in the tree
+            keep.add(kids.get(i));
+            if (kid instanceof COSDictionary) removed += dedupeNode((COSDictionary) kid, seen);
+        }
+        if (removed > 0) {
+            node.setItem(COSName.KIDS, keep);
+            node.setInt(COSName.COUNT, countLeaves(keep));
+        }
+        return removed;
+    }
+
+    private static int countLeaves(COSArray kids) {
+        int n = 0;
+        for (int i = 0; i < kids.size(); i++) {
+            COSBase kid = kids.getObject(i);
+            if (!(kid instanceof COSDictionary)) continue;
+            COSDictionary d = (COSDictionary) kid;
+            COSBase inner = d.getDictionaryObject(COSName.KIDS);
+            if (inner instanceof COSArray) n += countLeaves((COSArray) inner);
+            else n++;
+        }
+        return n;
+    }
+
+    /**
+     * Attaches content streams that are in the file but no longer referenced by any page.
+     *
+     * <p>When /Contents is stripped from every page while the streams stay behind, the file
+     * is structurally perfect and reads as five blank pages. The streams are intact and
+     * decodable, so they are attached to the content-less pages in object order - but only
+     * when the counts line up, so a normal document is never touched.
+     */
+    private static void adoptOrphanContent(PDDocument doc, Report r) {
+        try {
+            int pages = doc.getNumberOfPages();
+            List<Integer> empty = new ArrayList<>();
+            java.util.Set<Integer> used = new java.util.HashSet<>();
+            for (int i = 0; i < pages; i++) {
+                PDPage p = doc.getPage(i);
+                if (p.getCOSObject().getDictionaryObject(COSName.CONTENTS) == null) empty.add(i);
+                else collectContentNumbers(p.getCOSObject().getDictionaryObject(COSName.CONTENTS), used);
+            }
+            // Deliberately narrow: adoption is only right when a document lost the link from
+            // all of its pages to streams that are still sitting there. One empty page in an
+            // otherwise healthy file is a page whose content is gone, and attaching some
+            // other unreferenced stream to it would invent content that never belonged there.
+            if (empty.size() < 2) return;
+
+            // Candidate streams: objects that look like page content and nothing claims them.
+            List<COSStream> candidates = new ArrayList<>();
+            for (COSObject o : doc.getDocument().getObjects()) {
+                COSBase b = o.getObject();
+                if (!(b instanceof COSStream)) continue;
+                if (used.contains((int) o.getObjectNumber())) continue;
+                COSStream st = (COSStream) b;
+                // Content streams carry no /Type; images, fonts and metadata all do.
+                if (st.containsKey(COSName.TYPE)) continue;
+                candidates.add(st);
+            }
+            if (candidates.size() != empty.size()) return;
+
+            for (int i = 0; i < empty.size(); i++) {
+                PDPage p = doc.getPage(empty.get(i));
+                COSStream st = candidates.get(i);
+                p.setContents(new PDStream(st));
+            }
+            r.actions.add("attached " + empty.size()
+                    + " orphaned content stream(s) back to their pages");
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static void collectContentNumbers(COSBase contents, java.util.Set<Integer> into) {
+        if (contents instanceof COSObject) {
+            into.add((int) ((COSObject) contents).getObjectNumber());
+        } else if (contents instanceof COSArray) {
+            COSArray a = (COSArray) contents;
+            for (int i = 0; i < a.size(); i++) collectContentNumbers(a.getObject(i), into);
+        }
+    }
+
     /** The object number a catalog body points its /Pages at, or -1. */
     private static int pagesTargetIn(byte[] b, int from, int to) {
         byte[] key = "/Pages".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
@@ -1306,10 +1430,28 @@ public final class PdfRepair {
                     break;
                 }
                 walked++;
-                if (!pageReads(check, i)) {
-                    broken++;
-                    r.lostPages.add(i + 1);
-                } else if (danglingContent(check.getPage(i))) {
+                PDPage page = check.getPage(i);
+                boolean contentMissing =
+                        page.getCOSObject().getDictionaryObject(COSName.CONTENTS) != null
+                                && page.getContents() == null;
+                if (contentMissing || danglingContent(page)) {
+                    // The content is not in the file at all: blank, and said so. This is
+                    // checked before "partial", because a page with no content cannot be
+                    // half drawn.
+                    r.blankPages.add(i + 1);
+                } else if (!pageReads(check, i)) {
+                    // It did not parse to the end. If some of it drew before it stopped the
+                    // page is partial; only a page that drew nothing is lost.
+                    if (paintsPartially(page)) r.partialPages.add(i + 1);
+                    else {
+                        broken++;
+                        r.lostPages.add(i + 1);
+                    }
+                } else if (paintsPartially(page)) {
+                    // Some of it drew, then it stopped: partial, not blank and not whole.
+                    r.partialPages.add(i + 1);
+                } else if (!paintsSomething(check, page)) {
+                    // Reopened, but draws nothing: blank, and said so.
                     r.blankPages.add(i + 1);
                 }
             }
@@ -1337,6 +1479,110 @@ public final class PdfRepair {
     }
 
     /** Walks one page's content operators. False when the page cannot be read at all. */
+    /** Operators that put ink on a page. A stream with none of these draws nothing. */
+    private static final java.util.Set<String> PAINT_OPS = new HashSet<>(java.util.Arrays.asList(
+            "Tj", "TJ", "'", "\"", "T*", "re", "f", "F", "f*", "S", "s", "B", "B*", "b", "b*",
+            "sh", "BI", "Do"));
+
+    /**
+     * True when the page's content would actually draw something.
+     *
+     * <p>"The page reopened" is not the same as "the page has content". A stream that
+     * decodes to nothing, or whose only instruction is an image that no longer decodes,
+     * leaves a page that is silently blank - the failure this whole tool exists to not
+     * report as a success.
+     */
+    private static boolean paintsSomething(PDDocument doc, PDPage page) {
+        try {
+            if (page.getCOSObject().getDictionaryObject(COSName.CONTENTS) == null) return false;
+            // The stream has to decode before its operators mean anything. Random bytes can
+            // parse into tokens that look like drawing instructions while nothing is drawn.
+            try {
+                java.io.InputStream in = page.getContents();
+                if (in == null) return false;
+                byte[] probe = new byte[64];
+                int n = in.read(probe);
+                in.close();
+                if (n <= 0) return false;
+            } catch (Throwable t) {
+                return false;
+            }
+            PDFStreamParser parser = new PDFStreamParser(page);
+            parser.parse();
+            List<Object> tokens = parser.getTokens();
+            boolean sawDo = false;
+            for (Object t : tokens) {
+                String name;
+                if (t instanceof Operator) name = ((Operator) t).getName();
+                else if (t instanceof COSName) name = ((COSName) t).getName();
+                else continue;
+                if (!PAINT_OPS.contains(name)) continue;
+                if (!"Do".equals(name)) return true;
+                sawDo = true;
+            }
+            if (!sawDo) return false;
+            // Only XObject draws: the page is only visible if one of them still decodes.
+            for (Object t : tokens) {
+                if (!(t instanceof COSName) || !"Do".equals(((COSName) t).getName())) continue;
+                // The name before Do is the resource key; resolving it needs the resource
+                // dictionary, so fall back to decoding every XObject the page has.
+            }
+            return anyXObjectDecodes(page);
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    private static boolean anyXObjectDecodes(PDPage page) {
+        try {
+            PDResources res = page.getResources();
+            if (res == null) return false;
+            for (COSName name : res.getXObjectNames()) {
+                try {
+                    PDXObject xo = res.getXObject(name);
+                    if (xo != null && xo.getStream() != null) {
+                        xo.getStream().createInputStream().close();
+                        return true;
+                    }
+                } catch (Throwable ignored) {
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return false;
+    }
+
+    /**
+     * True when the page's content starts drawing and then stops partway.
+     *
+     * <p>A stream can inflate cleanly and still end in the middle of a text string. Nothing
+     * throws on open, the operators that ran did draw, and the page is neither blank nor
+     * whole. That is a partial page, and saying so is the difference between an honest
+     * report and a green tick over a page missing half its content.
+     */
+    private static boolean paintsPartially(PDPage page) {
+        try {
+            PDFStreamParser parser = new PDFStreamParser(page);
+            List<Object> tokens;
+            try {
+                parser.parse();
+                return false;                       // parsed to the end: not partial
+            } catch (Throwable t) {
+                tokens = parser.getTokens();
+            }
+            if (tokens == null) return false;
+            for (Object tok : tokens) {
+                String name = null;
+                if (tok instanceof Operator) name = ((Operator) tok).getName();
+                else if (tok instanceof COSName) name = ((COSName) tok).getName();
+                if (name != null && PAINT_OPS.contains(name)) return true;
+            }
+            return false;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
     private static boolean pageReads(PDDocument doc, int index) {
         try {
             PDPage page = doc.getPage(index);

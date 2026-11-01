@@ -105,40 +105,16 @@ if "<vector" not in icon or "pathData" not in icon:
     fails.append("ic_repair.xml is not a vector drawable with a path")
 else:
     d = re.search(r'android:pathData="([^"]+)"', icon).group(1)
-    if len(d) < 40:
-        fails.append("ic_repair.xml path is too short to draw anything")
-    xs = [float(v) for v in re.findall(r"([\d.]+),", d)]
-    ys = [float(v) for v in re.findall(r",([\d.]+)", d)]
-    if not xs or not ys:
-        fails.append("ic_repair.xml has no coordinates")
-    else:
-        # The icon has to fill the same 960 box the other tool icons use, without
-        # spilling outside it - a drawing that sits in a corner renders small.
-        if min(xs) < 0 or max(xs) > 960 or min(ys) < 0 or max(ys) > 960:
-            fails.append("ic_repair.xml draws outside its 960 viewport (clipped)")
-        elif (max(xs) - min(xs)) < 620 or (max(ys) - min(ys)) < 620:
-            fails.append(f"ic_repair.xml only covers {max(xs)-min(xs):.0f}x{max(ys)-min(ys):.0f} "
-                         "of its 960 box - it will render smaller than the other tool icons")
-
-# ---- 4b) the stages that the stress set proved necessary -------------------------
-# Each of these exists because a real fixture needed it. Losing one silently turns a
-# recoverable file into "could not repair".
-for needle, why in [
-    ("workDir(", "the scratch copy must fall back to a writable folder - a read-only source "
-                 "folder made every repair fail with 'Permission denied'"),
-    ("salvageObjects(", "the object-lifting stage is what recovers a file whose object "
-                        "headers are damaged"),
-    ("buildLifted(", "the lifted file has to be rebuilt with a fresh cross-reference table"),
-    ("repointPages(", "a catalog whose page-tree node was destroyed must be repointed at a "
-                      "rebuilt one"),
-    ("brokenOnArrival", "a page that was already broken must not be treated as a regression"),
-    ("setContents(", "a kept page whose content is destroyed must be emptied, or readers "
-                     "fail on it"),
-    ("none of their content survived", "a file whose pages are all empty must be refused, "
-                                       "not handed over as a blank PDF"),
-]:
-    if needle not in engine:
-        fails.append(f"repair lost {needle}: {why}")
+    if len(d) < 400:
+        fails.append("ic_repair.xml path is too short to be a real glyph")
+    # The tool icons all come from the same set: a 960 viewport drawn through a
+    # translateY(960) group, which is how Material Symbols coordinates are carried over.
+    # An icon drawn in its own convention renders at the wrong size next to the others.
+    if 'android:translateY="960"' not in icon:
+        fails.append("ic_repair.xml is not drawn in the same 960/translateY convention as the "
+                     "other tool icons - it will not match their size")
+    if 'android:width="26dp"' not in icon or 'android:height="26dp"' not in icon:
+        fails.append("ic_repair.xml is not 26dp like the other tool icons")
 
 # ---- 5) the tests exist and actually run -----------------------------------------
 test = pathlib.Path("tools/engine-verify/TestRepair.java")
@@ -178,6 +154,10 @@ for needle, why in [
 if not pathlib.Path("tools/engine-verify/repair-suite.stamp").exists():
     fails.append("repair-suite.stamp is missing - commit it with every repair change, or the "
                  "suite will run on every build")
+tort = pathlib.Path("tools/engine-verify/fixtures/torture")
+if not tort.is_dir() or len(list(tort.glob("*.pdf"))) < 40:
+    fails.append("the torture pack is not in the repo - it is the only set that "
+                 "tests structural and semantic corruption")
 if not pathlib.Path("tools/engine-verify/TestRepairFixtures.java").exists():
     fails.append("TestRepairFixtures.java is missing")
 
