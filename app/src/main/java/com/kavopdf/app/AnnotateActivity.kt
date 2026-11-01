@@ -713,12 +713,4 @@ class AnnotateActivity : PdfActivity() {
         else -> R.drawable.ic_shape
     }
 
-    /** True when white text would read better on this colour. */
-    private fun isDark(c: Int): Boolean {
-        val r = (c shr 16) and 0xFF
-        val g = (c shr 8) and 0xFF
-        val b = c and 0xFF
-        return (0.299 * r + 0.587 * g + 0.114 * b) < 140
-    }
-
 }

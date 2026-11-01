@@ -10,9 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import androidx.viewpager2.widget.ViewPager2
 import com.kavopdf.app.databinding.ActivityViewerBinding
 import com.kavopdf.app.engine.PdfEngine
@@ -253,13 +251,6 @@ class ViewerActivity : PdfActivity() {
      * when the page is zoomed. A page with no text layer does nothing at all:
      * that PDF is a picture and the user can see that for themselves.
      */
-    private fun copyToClipboard(text: String) {
-        val cm = getSystemService(android.content.Context.CLIPBOARD_SERVICE)
-                as android.content.ClipboardManager
-        cm.setPrimaryClip(android.content.ClipData.newPlainText("KavoPDF", text))
-        toast(getString(R.string.copied))
-    }
-
     private fun stepMatch(delta: Int) {
         if (matches.isEmpty()) return
         matchIndex = ((matchIndex + delta) % matches.size + matches.size) % matches.size

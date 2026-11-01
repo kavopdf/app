@@ -39,10 +39,6 @@ object AppLog {
 
     private fun file(ctx: Context) = File(ctx.filesDir, FILE_NAME)
 
-    /** A formatter per call keeps this safe from any thread without extra locking. */
-    private fun stamp(): String =
-        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date())
-
     fun record(ctx: Context, action: String, detail: String = "", ok: Boolean = true) =
         record(ctx, action, detail, if (ok) Level.OK else Level.FAIL)
 

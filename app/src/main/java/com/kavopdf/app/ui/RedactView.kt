@@ -7,7 +7,6 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.widget.ImageView
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -35,7 +34,6 @@ class RedactView @JvmOverloads constructor(
     private var downX = 0f
     private var downY = 0f
     private var moved = false
-    private val rect = RectF()
     private val slop = 12f
 
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply {

@@ -10,8 +10,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * A crop selection over a page image. The rectangle is stored in normalised page

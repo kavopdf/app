@@ -238,8 +238,6 @@ class ZoomableImageView @JvmOverloads constructor(
 
     fun isZoomed() = zoom > 1.05f
 
-    fun currentZoom() = zoom
-
     private fun notifyZoom() = onZoomChanged?.invoke(isZoomed())
 
     /** True when a fit was skipped because the size was not known yet. */

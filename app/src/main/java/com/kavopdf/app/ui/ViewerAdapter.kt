@@ -1,6 +1,5 @@
 package com.kavopdf.app.ui
 
-import com.kavopdf.app.R
 
 import android.graphics.Bitmap
 import android.graphics.RectF

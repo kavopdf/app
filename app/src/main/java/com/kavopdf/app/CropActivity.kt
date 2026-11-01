@@ -1,6 +1,5 @@
 package com.kavopdf.app
 
-import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.Bundle

@@ -212,7 +212,6 @@
     <string name="links_fullscreen">Full screen placement</string>
     <string name="links_done">Done</string>
     <string name="links_apply_all">Put the same link on every page</string>
-    <string name="copied">Copied</string>
     <string name="tool_redact">Redact</string>
     <string name="tool_redact_desc">Permanently remove private text before sharing</string>
     <string name="redact_intro">Drag over anything private to hide it. Tap a box to remove it. Redacted pages are flattened to an image, so the hidden text is really gone \u2014 not just covered.</string>
@@ -262,17 +261,6 @@
     <string name="label_add_text">Add text</string>
     <string name="msg_xfa_form">This is an XFA form (the kind most bank and government forms use). Its fields are stored in XML, so they cannot be filled here. Tap below to fill it with Annotate &amp; sign - the Text tool writes anywhere on the page.</string>
     <string name="action_fill_in_annotate">Fill it in Annotate &amp; sign</string>
-    <string name="action_fill_from_profile">Fill from profile (long press to edit)</string>
-    <string name="action_edit_profile">Your details</string>
-    <string name="profile_name">Full name</string>
-    <string name="profile_phone">Mobile number</string>
-    <string name="profile_email">Email</string>
-    <string name="profile_address">Address</string>
-    <string name="profile_dob">Date of birth (dd/mm/yyyy)</string>
-    <string name="profile_pan">PAN</string>
-    <string name="msg_profile_saved">Saved on this device</string>
-    <string name="msg_profile_nothing_filled">Nothing to fill - the fields do not look like your details</string>
-    <string name="msg_profile_filled">Filled %1$d field(s) from your profile</string>
     <string name="action_use_saved">Use saved</string>
     <string name="msg_no_saved_signature">No saved signature yet - draw one and tap Add</string>
     <string name="msg_required_missing">%1$s is required - please fill it</string>
@@ -285,17 +273,13 @@
     <string name="hint_image_width">Picture width, % of page width</string>
     <string name="action_image_link">Picture link</string>
     <string name="msg_enter_url">Enter a link first</string>
-    <string name="hint_pos_x">Left position, % from left</string>
-    <string name="hint_pos_y">Top position, % from top</string>
     <string name="msg_drag_then_done">Drag the box where you want it, then press Done</string>
     <string name="title_page_size">Page size</string>
     <string name="hint_page_width">Width in points (72 = 1 inch)</string>
     <string name="hint_page_height">Height in points</string>
     <string name="action_page_from_picture">From a picture...</string>
     <string name="action_grid_page">Grid on this page</string>
-    <string name="action_lines_page">Lines on this page</string>
     <string name="msg_grid_added">Grid added</string>
-    <string name="msg_lines_added">Lines added</string>
     <string name="label_position">Position</string>
     <string name="hint_image_height">Picture height, % of page height</string>
     <string name="label_sizing">Sizing</string>
@@ -303,10 +287,7 @@
     <string name="hint_guide_count">Number of lines</string>
     <string name="hint_guide_gap">Space between lines, mm (empty = spread evenly)</string>
     <string name="hint_guide_opacity">Opacity %, 5 - 100 (empty = 55)</string>
-    <string name="msg_guide_added">%1$d lines added</string>
     <string name="note_auto_height">In automatic mode, the Picture height option is disabled. To enable it, please select manual mode.</string>
-    <string name="sizing_auto">Automatic (keeps shape)</string>
-    <string name="sizing_manual">Manual (width and height)</string>
     <string name="links_kind_picture">Link picture</string>
     <string name="action_lines_vertical">Vertical lines on this page</string>
     <string name="action_lines_horizontal">Horizontal lines on this page</string>

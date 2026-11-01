@@ -9,7 +9,6 @@ import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
-import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.kavopdf.app.databinding.ActivityRedactBinding
 import com.kavopdf.app.engine.PdfEngine

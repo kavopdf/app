@@ -58,12 +58,5 @@ class Busy(private val activity: Activity) {
         hideHandler.post(r)   // next frame: a follow-up task cancels this
     }
 
-    /** Dismiss now, no waiting. */
-    fun dismissNow() {
-        hidePending?.let { hideHandler.removeCallbacks(it) }
-        hidePending = null
-        try { dialog?.dismiss() } catch (_: Exception) { }
-        dialog = null
-    }
 }
 

@@ -1,7 +1,6 @@
 package com.kavopdf.app
 
 import android.net.Uri
-import androidx.appcompat.app.AlertDialog
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
@@ -9,7 +8,6 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.google.android.material.button.MaterialButton
 import com.kavopdf.app.databinding.ActivityFormsBinding
 import com.kavopdf.app.engine.PdfEngine
 import com.kavopdf.app.util.Files
