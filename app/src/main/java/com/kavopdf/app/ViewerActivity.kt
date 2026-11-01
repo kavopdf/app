@@ -378,9 +378,25 @@ class ViewerActivity : PdfActivity() {
     }
 
     private fun openUrl(url: String) {
-        val target = if (url.contains("://")) url else "https://$url"
+        val raw = url.trim()
+        val target = if (raw.contains("://")) raw else "https://$raw"
+        val uri = runCatching { Uri.parse(target) }.getOrNull()
+        val scheme = uri?.scheme?.lowercase()
+        // A PDF is untrusted input, and a link inside one is just as untrusted as the file
+        // itself. Its /Link annotation can carry anything - intent://, file://,
+        // content://, javascript: - and launching that from here would let a document make
+        // this app start something on its behalf, or hand it a private file path. Only the
+        // four schemes a document has any business carrying are allowed through; the QR
+        // scanner has always been this strict, the PDF path was not.
+        if (uri == null || scheme !in LINK_SCHEMES) {
+            toast(getString(R.string.msg_failed, "this link cannot be opened"))
+            com.kavopdf.app.util.AppLog.record(
+                this, "Link blocked", (scheme ?: "no scheme") + ": " + target.take(120), false
+            )
+            return
+        }
         try {
-            startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse(target)))
+            startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri))
         } catch (t: Throwable) {
             toast(getString(R.string.msg_failed, "no app can open that link"))
         }
@@ -421,6 +437,8 @@ class ViewerActivity : PdfActivity() {
     }
 
     companion object {
+        /** The only schemes a link inside a document may use. */
+        private val LINK_SCHEMES = setOf("http", "https", "mailto", "tel")
         private const val BASE_FACTOR = 2.0f
         private const val MAX_FACTOR = 4.0f
         private const val MAX_WIDTH = 2800
