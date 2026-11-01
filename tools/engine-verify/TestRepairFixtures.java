@@ -43,6 +43,7 @@ public class TestRepairFixtures {
         totalPass += runSuite(new File("fixtures/repair"), "repair");
         totalFail += fail; fail = 0;
         totalPass += runSuite(new File("fixtures/torture"), "torture");
+        totalPass += runSuite(new File("fixtures/gaps"), "gaps");
         totalFail += fail; fail = 0;
         System.out.println();
         System.out.println("FIXTURES TOTAL: " + totalPass + " passed, " + totalFail + " failed");
@@ -60,7 +61,7 @@ public class TestRepairFixtures {
         List<File> files = new ArrayList<>();
         if (all != null) Arrays.sort(all);
         for (File f : all) if (f.getName().toLowerCase().endsWith(".pdf")) files.add(f);
-        check(label + ": fixtures found", files.size() >= 40);
+        check(label + ": fixtures found", files.size() >= ("gaps".equals(label) ? 20 : 40));
 
         File outDir = new File(System.getProperty("java.io.tmpdir"), "kavopdf-fixture-out-" + label);
         outDir.mkdirs();
@@ -104,7 +105,7 @@ public class TestRepairFixtures {
             }
         }
 
-        int floor = "repair".equals(label) ? 45 : 26;
+        int floor = "repair".equals(label) ? 45 : "torture".equals(label) ? 26 : 14;
         check(label + ": at least " + floor + " fixtures are recoverable (got " + recovered + ")",
                 recovered >= floor);
         System.out.println("  " + label + ": recovered " + recovered + ", refused " + refused
