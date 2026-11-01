@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Locale;
 
 /**
@@ -649,6 +651,38 @@ public final class PdfToWord {
                 prev = g;
             }
         }
+        if (candidates.size() < 2) return new ArrayList<>();
+
+        // A real column boundary is one that many lines share. A single wide space inside one
+        // cell is not a column: on the salary slip and the simple table that turned 4 columns
+        // into 6, because one cell happened to contain a wide gap.
+        Map<Integer, Integer> support = new HashMap<>();
+        for (Line line : lines) {
+            if (line.text.trim().isEmpty()) continue;
+            // one vote per line per boundary, however many glyphs that line has there
+            java.util.HashSet<Integer> voted = new java.util.HashSet<>();
+            for (Glyph g : line.glyphs) {
+                int key = Math.round(g.x);
+                if (!voted.add(key)) continue;
+                Integer have = support.get(key);
+                support.put(key, have == null ? 1 : have + 1);
+            }
+        }
+        // A column boundary has to be shared by a good part of the page. Two lines are not
+        // enough: a single wide space inside one cell produced the extra columns on the salary
+        // slip and the simple table. A quarter of the lines is a column; two lines is a gap.
+        int need = Math.max(3, Math.round(lines.size() * 0.25f));
+        List<Float> kept = new ArrayList<>();
+        for (Float c : candidates) {
+            int key = Math.round(c);
+            int seen = 0;
+            for (int dx = -3; dx <= 3; dx++) {
+                Integer v = support.get(key + dx);
+                if (v != null && v > seen) seen = v;
+            }
+            if (seen >= need) kept.add(c);
+        }
+        candidates = kept;
         if (candidates.size() < 2) return new ArrayList<>();
 
         Collections.sort(candidates);
