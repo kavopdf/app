@@ -594,8 +594,20 @@ public final class PdfToWord {
         return out;
     }
 
+    /** Characters that begin a list item. */
+    private static boolean startsWithBullet(String text) {
+        String t = text.trim();
+        if (t.isEmpty()) return false;
+        char c = t.charAt(0);
+        return c == '\u2022' || c == '\u25e6' || c == '\u25aa' || c == '\u25ab'
+                || c == '\u2023' || c == '\u00b7' || c == '\u2043';
+    }
+
     private static boolean sameParagraph(Line prev, Line next, float pageWidth) {
         if (prev.column != next.column) return false;
+        // A bullet starts its own item. Its glyph is often set larger than the words beside
+        // it, which made the alignment test pass and swallowed three advice lines into one.
+        if (startsWithBullet(next.text)) return false;
         float gap = next.y - prev.y;
         float size = Math.max(prev.size, next.size);
         if (gap <= 0 || gap > size * 1.75f) return false;
@@ -860,56 +872,110 @@ public final class PdfToWord {
      * merged cells, which is worse than leaving the text as text. Those pages keep their text
      * and the report says the table was flattened.
      */
+    /**
+     * Tables drawn with lines, found one region at a time.
+     *
+     * <p>Collecting every rule on the page and clustering them globally turned a prescription
+     * into a single thirty-column table: the page frame, a decorative header band and a
+     * hand-drawn signature all contributed lines, and the real five-column table disappeared
+     * inside it. A table is a region, so its rules are grouped first: horizontal rules that
+     * share a horizontal extent are rows of one table, and only the vertical rules standing
+     * inside that extent, tall enough to cross its rows, are its columns.
+     */
     private static List<Table> buildTables(Rules rules, List<Line> lines, float pageWidth) {
         List<Table> out = new ArrayList<>();
-        if (rules.horizontal.size() < 2 || rules.vertical.size() < 2) return out;
 
-        List<Float> ys = mergedPositions(rules.horizontal, true);
-        List<Float> xs = mergedPositions(rules.vertical, false);
-        if (ys.size() < 2 || xs.size() < 2) return out;
+        // Short segments are decoration, not edges: a signature squiggle is a hundred 2 pt
+        // strokes, and every one of them used to become a column.
+        List<float[]> hs = new ArrayList<>();
+        List<float[]> vs = new ArrayList<>();
+        for (float[] h : rules.horizontal) if (h[2] - h[1] >= 12f) hs.add(h);
+        for (float[] v : rules.vertical) if (v[2] - v[1] >= 6f) vs.add(v);
+        if (hs.size() < 2 || vs.size() < 2) return out;
 
-        float top = ys.get(0), bottom = ys.get(ys.size() - 1);
-        float left = xs.get(0), right = xs.get(xs.size() - 1);
-        if (bottom - top < 12 || right - left < 30) return out;
-
-        int rows = ys.size() - 1, cols = xs.size() - 1;
-        if (rows < 1 || cols < 1 || rows > 400 || cols > 40) return out;
-
-        String[][] cells = new String[rows][cols];
-        for (Line line : lines) {
-            float cx = (line.x + line.right) / 2f;
-            int r = band(ys, line.y);
-            int c = band(xs, cx);
-            if (r < 0 || c < 0) continue;
-            cells[r][c] = cells[r][c] == null ? line.text.trim() : cells[r][c] + " " + line.text.trim();
+        // Horizontal rules with the same extent are rows of the same table.
+        List<List<float[]>> groups = new ArrayList<>();
+        for (float[] h : hs) {
+            List<float[]> target = null;
+            for (List<float[]> g : groups) {
+                float[] first = g.get(0);
+                float overlap = Math.min(first[2], h[2]) - Math.max(first[1], h[1]);
+                float shorter = Math.min(first[2] - first[1], h[2] - h[1]);
+                if (shorter > 0 && overlap >= shorter * 0.6f) {
+                    target = g;
+                    break;
+                }
+            }
+            if (target == null) {
+                target = new ArrayList<>();
+                groups.add(target);
+            }
+            target.add(h);
         }
 
-        int filled = 0;
-        for (String[] row : cells) for (String cell : row) if (cell != null) filled++;
-        if (filled < 2) return out;                       // a box, not a table
+        for (List<float[]> group : groups) {
+            if (group.size() < 2) continue;
 
-        Table t = new Table();
-        t.top = top;
-        t.bottom = bottom;
-        t.left = left;
-        t.right = right;
-        t.header = rows > 1;
-        for (int r = 0; r < rows; r++) {
-            List<String> row = new ArrayList<>();
-            for (int c = 0; c < cols; c++) row.add(cells[r][c] == null ? "" : cells[r][c]);
-            t.rows.add(row);
+            float left = Float.MAX_VALUE, right = -Float.MAX_VALUE;
+            for (float[] h : group) {
+                left = Math.min(left, h[1]);
+                right = Math.max(right, h[2]);
+            }
+            List<Float> ys = new ArrayList<>();
+            for (float[] h : group) ys.add(h[0]);
+            Collections.sort(ys);
+            ys = mergeNear(ys, 1.6f);
+            if (ys.size() < 2) continue;
+
+            float top = ys.get(0), bottom = ys.get(ys.size() - 1);
+            if (bottom - top < 12 || right - left < 30) continue;
+
+            // Columns: the region's own edges, plus the vertical rules that stand inside it
+            // and are tall enough to cross its rows.
+            List<Float> xs = new ArrayList<>();
+            xs.add(left);
+            xs.add(right);
+            for (float[] v : vs) {
+                if (v[0] < left - 2f || v[0] > right + 2f) continue;
+                float overlap = Math.min(v[2], bottom) - Math.max(v[1], top);
+                if (overlap < (bottom - top) * 0.5f) continue;
+                xs.add(v[0]);
+            }
+            Collections.sort(xs);
+            xs = mergeNear(xs, 1.6f);
+
+            int rows = ys.size() - 1, cols = xs.size() - 1;
+            if (rows < 1 || cols < 2 || rows > 400 || cols > 40) continue;
+
+            String[][] cells = new String[rows][cols];
+            for (Line line : lines) {
+                float cx = (line.x + line.right) / 2f;
+                int r = band(ys, line.y);
+                int c = band(xs, cx);
+                if (r < 0 || c < 0) continue;
+                cells[r][c] = cells[r][c] == null
+                        ? line.text.trim() : cells[r][c] + " " + line.text.trim();
+            }
+
+            int filled = 0;
+            for (String[] row : cells) for (String cell : row) if (cell != null) filled++;
+            if (filled < 2) continue;                     // a box, not a table
+
+            Table t = new Table();
+            t.top = top;
+            t.bottom = bottom;
+            t.left = left;
+            t.right = right;
+            t.header = rows > 1;
+            for (int r = 0; r < rows; r++) {
+                List<String> row = new ArrayList<>();
+                for (int c = 0; c < cols; c++) row.add(cells[r][c] == null ? "" : cells[r][c]);
+                t.rows.add(row);
+            }
+            out.add(t);
         }
-        out.add(t);
         return out;
     }
-
-
-
-
-
-
-
-
 
     /**
      * Rebuilds a table that has no drawn lines, from the rows its cells sit on.
@@ -1096,6 +1162,15 @@ public final class PdfToWord {
     }
 
     /** Collapses runs of near-identical coordinates into one position. */
+    /** Collapses positions closer together than [near] into one, keeping the first. */
+    private static List<Float> mergeNear(List<Float> sorted, float near) {
+        List<Float> out = new ArrayList<>();
+        for (float v : sorted) {
+            if (out.isEmpty() || v - out.get(out.size() - 1) > near) out.add(v);
+        }
+        return out;
+    }
+
     private static List<Float> mergedPositions(List<float[]> segments, boolean byY) {
         List<Float> raw = new ArrayList<>();
         for (float[] seg : segments) raw.add(seg[0]);
