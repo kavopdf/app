@@ -151,6 +151,7 @@ class MainActivity : AppCompatActivity() {
         add(HomeRow.Tool(ToolItem(R.string.tool_redact, R.string.tool_redact_desc, R.drawable.ic_redact, Action.REDACT)))
 
         add(HomeRow.Header(R.string.section_output))
+        add(HomeRow.Tool(ToolItem(R.string.tool_repair, R.string.tool_repair_desc, R.drawable.ic_repair, Action.REPAIR)))
         add(HomeRow.Tool(ToolItem(R.string.tool_compress, R.string.tool_compress_desc, R.drawable.ic_compress, Action.COMPRESS)))
         add(HomeRow.Tool(ToolItem(R.string.tool_metadata, R.string.tool_metadata_desc, R.drawable.ic_metadata, Action.METADATA)))
         add(HomeRow.Tool(ToolItem(R.string.tool_extract, R.string.tool_extract_desc, R.drawable.ic_extract, Action.EXTRACT)))

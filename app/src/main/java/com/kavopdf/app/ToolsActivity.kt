@@ -17,6 +17,7 @@ import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.kavopdf.app.databinding.ActivityToolsBinding
 import com.kavopdf.app.engine.PdfEngine
+import com.kavopdf.app.engine.PdfRepair
 import com.kavopdf.app.engine.PdfSigner
 import com.kavopdf.app.model.Action
 import com.kavopdf.app.util.Files
@@ -57,6 +58,8 @@ class ToolsActivity : PdfActivity() {
     override fun toolName(): String = if (::tool.isInitialized) tool.name else "ToolsActivity"
     private var source: File? = null
     private var sourceName: String = "document.pdf"
+    /** The last repair report, shown on screen and again after saving. */
+    private var repairReport: PdfRepair.Report? = null
     private var treeUri: Uri? = null
     private var pendingRun = false
 
@@ -126,6 +129,7 @@ class ToolsActivity : PdfActivity() {
             Action.EXTRACT -> R.string.tool_extract to R.string.tool_extract_desc
             Action.PAGENUM -> R.string.tool_pagenum to R.string.tool_pagenum_desc
             Action.SPLIT -> R.string.tool_split to R.string.tool_split_desc
+            Action.REPAIR -> R.string.tool_repair to R.string.tool_repair_desc
             else -> R.string.app_name to R.string.app_tagline
         }
         // The toolbar is the support ActionBar here, and the ActionBar owns the
@@ -148,6 +152,26 @@ class ToolsActivity : PdfActivity() {
                 if (!Files.looksLikePdf(f)) error(getString(R.string.msg_not_a_pdf))
                 source = f
                 Unit
+            }
+            return
+        }
+        if (tool == Action.REPAIR) {
+            // Repair reads the file before it is asked to: the diagnosis is the useful
+            // half of the feature, and doing it here means the user sees what is wrong
+            // with their document before they commit to anything.
+            openPdf(uri) { f ->
+                runTask(getString(R.string.repair_reading), onDone = loaded@{ rep ->
+                    binding.fileName.text = sourceName
+                    repairReport = rep
+                    buildParams(emptyMap())
+                    binding.btnRun.isEnabled = rep?.readable == true
+                    if (rep != null && !rep.readable) {
+                        toast(rep.failure.ifEmpty { getString(R.string.repair_failed_title) })
+                    }
+                }) {
+                    source = f
+                    PdfRepair.diagnose(f, "")
+                }
             }
             return
         }
@@ -290,6 +314,10 @@ class ToolsActivity : PdfActivity() {
         fPagenumOpacity = null; fSplitAll = null; fExtractPages = null
 
         when (tool) {
+            Action.REPAIR -> {
+                binding.btnRun.setText(R.string.repair_run)
+                repairReport?.let { showDiagnosis(it) }
+            }
             Action.WATERMARK -> {
                 wmImage = null
                 fText = addField(getString(R.string.hint_watermark_text))
@@ -401,6 +429,21 @@ class ToolsActivity : PdfActivity() {
 
     private fun onRun() {
         when (tool) {
+            Action.REPAIR -> {
+                val src = source ?: return toast(getString(R.string.msg_pick_file_first))
+                runAndSave(Files.suggestName(sourceName, suffixFor(tool))) { out ->
+                    val rep = PdfRepair.repair(src, "", out)
+                    repairReport = rep
+                    // The engine only leaves a file behind when it verified it. If it did
+                    // not, say why instead of saving a document that is worse than the one
+                    // that came in.
+                    if (!rep.readable || !rep.verified) {
+                        throw IllegalStateException(
+                            rep.failure.ifEmpty { getString(R.string.repair_not_ok) }
+                        )
+                    }
+                }
+            }
             Action.COMPRESS -> {
                 val level = fLevelSpinner?.selectedItemPosition ?: 1
                 single { PdfEngine.compress(it.first, it.second, level) }
@@ -587,6 +630,131 @@ class ToolsActivity : PdfActivity() {
         dialog.show()
     }
 
+    /**
+     * After a repair has been saved, show what was actually done.
+     *
+     * <p>The file is already saved at this point; this is the receipt - what was wrong,
+     * what was rebuilt, and what did not make it across.
+     */
+    override fun onSaved(file: File) {
+        if (tool != Action.REPAIR) return
+        repairReport?.let { showRepairReport(it) }
+    }
+
+    /** The read-only card shown under the file name before repairing. */
+    private fun showDiagnosis(rep: PdfRepair.Report) {
+        val parent = binding.params
+        parent.addView(sectionHeader(getString(R.string.repair_diagnosis)))
+        addRow(parent, getString(R.string.repair_label_pages),
+            rep.pagesBefore.toString())
+        if (!rep.version.isEmpty()) {
+            addRow(parent, "PDF", rep.version)
+        }
+        val findings = if (rep.findings.isEmpty()) {
+            listOf(getString(R.string.repair_nothing_found))
+        } else {
+            rep.findings
+        }
+        findings.forEach { line ->
+            parent.addView(android.widget.TextView(this).apply {
+                text = "\u2022  " + line
+                textSize = 13f
+                setTextColor(getColor(R.color.text_secondary))
+                setPadding(dp(2), dp(3), dp(2), dp(3))
+            })
+        }
+        if (rep.lostPages.isNotEmpty() || rep.blankPages.isNotEmpty()) {
+            addRow(parent, getString(R.string.repair_label_lost),
+                rep.lostPages.joinToString(", ").ifEmpty { "\u2014" })
+        }
+    }
+
+    /** The receipt shown once the repaired file has been saved. */
+    private fun showRepairReport(rep: PdfRepair.Report) {
+        if (isFinishing || isDestroyed) return
+        val v = layoutInflater.inflate(R.layout.dialog_signature_result, null)
+        val icon = v.findViewById<android.widget.ImageView>(R.id.statusIcon)
+        val title = v.findViewById<android.widget.TextView>(R.id.statusTitle)
+        val sub = v.findViewById<android.widget.TextView>(R.id.statusSub)
+        val details = v.findViewById<android.widget.LinearLayout>(R.id.details)
+
+        val intact = rep.findings.isEmpty() && rep.actions.isEmpty()
+        val lost = rep.pagesBefore - rep.pagesAfter
+        val accent: Int
+        when {
+            !rep.verified -> {
+                accent = getColor(R.color.danger)
+                title.setText(R.string.repair_failed_title)
+                sub.text = getString(R.string.repair_not_ok)
+                icon.setImageResource(R.drawable.ic_close)
+            }
+            intact -> {
+                accent = getColor(R.color.success)
+                title.setText(R.string.repair_intact_title)
+                sub.setText(R.string.repair_intact_sub)
+                icon.setImageResource(R.drawable.ic_check)
+            }
+            lost > 0 -> {
+                accent = getColor(R.color.danger)
+                title.setText(R.string.repair_partial_title)
+                sub.text = getString(R.string.repair_recovered, rep.pagesAfter, rep.pagesBefore)
+                icon.setImageResource(R.drawable.ic_repair)
+            }
+            else -> {
+                accent = getColor(R.color.success)
+                title.setText(R.string.repair_fixed_title)
+                sub.text = getString(R.string.repair_all_recovered, rep.pagesAfter)
+                icon.setImageResource(R.drawable.ic_check)
+            }
+        }
+        title.setTextColor(accent)
+        icon.setColorFilter(accent)
+
+        if (rep.findings.isNotEmpty()) {
+            details.addView(sectionHeader(getString(R.string.repair_section_found)))
+            rep.findings.forEach { details.addView(bullet(it)) }
+        }
+        if (rep.actions.isNotEmpty()) {
+            details.addView(sectionHeader(getString(R.string.repair_section_done)))
+            rep.actions.forEach { details.addView(bullet(it)) }
+        }
+        addRow(details, getString(R.string.repair_label_pages),
+            rep.pagesBefore.toString() + " \u2192 " + rep.pagesAfter)
+        if (rep.lostPages.isNotEmpty()) {
+            addRow(details, getString(R.string.repair_label_lost),
+                rep.lostPages.joinToString(", "), getColor(R.color.danger))
+        }
+        if (rep.blankPages.isNotEmpty()) {
+            addRow(details, getString(R.string.repair_label_blank),
+                rep.blankPages.joinToString(", "), getColor(R.color.danger))
+        }
+        addRow(details, getString(R.string.repair_label_size),
+            humanSize(rep.sizeBefore) + " \u2192 " + humanSize(rep.sizeAfter))
+        addRow(details, getString(R.string.repair_label_checked),
+            if (rep.verified) getString(R.string.repair_ok) else getString(R.string.repair_not_ok),
+            if (rep.verified) getColor(R.color.success) else getColor(R.color.danger))
+
+        val dialog = AlertDialog.Builder(this).setView(v).create()
+        v.findViewById<android.view.View>(R.id.btnClose).setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
+    /** One finding or action line. */
+    private fun bullet(text: String): android.widget.TextView =
+        android.widget.TextView(this).apply {
+            this.text = "\u2022  " + text
+            textSize = 13f
+            setTextColor(getColor(R.color.text_primary))
+            setPadding(0, dp(2), 0, dp(2))
+        }
+
+    private fun humanSize(bytes: Long): String {
+        if (bytes <= 0) return "\u2014"
+        val mb = bytes / 1048576.0
+        return if (mb >= 1) String.format(java.util.Locale.US, "%.1f MB", mb)
+        else String.format(java.util.Locale.US, "%.0f KB", bytes / 1024.0)
+    }
+
     /** A small grey caption used to separate several signatures. */
     private fun sectionHeader(text: String): android.widget.TextView =
         android.widget.TextView(this).apply {
@@ -656,6 +824,7 @@ class ToolsActivity : PdfActivity() {
         Action.SIGN -> "_signed"
         Action.METADATA -> "_metadata"
         Action.PAGENUM -> "_numbered"
+        Action.REPAIR -> "_repaired"
         else -> "_out"
     }
 

@@ -28,7 +28,7 @@ echo "== running engine verification =="
 java -cp "$CP" TestEngine
 
 echo "== rotation / overlay placement (rendered and pixel-checked) =="
-javac -cp "$CP" -d out TestRotate.java TestCrop.java TestEnc.java TestHostile.java TestTextLayer.java TestSearch.java TestLinkIcon.java TestTextLink.java TestOpacity.java TestAllPages.java TestCopy.java TestRedact.java
+javac -cp "$CP" -d out TestRotate.java TestCrop.java TestEnc.java TestHostile.java TestTextLayer.java TestSearch.java TestLinkIcon.java TestTextLink.java TestOpacity.java TestAllPages.java TestCopy.java TestRedact.java TestRepair.java
 java -cp "$CP" TestRotate
 java -cp "$CP" TestCrop
 java -cp "$CP" TestEnc
@@ -112,6 +112,12 @@ java -cp "$CP" TestMeta
 java -cp "$CP" TestImagePdf
 java -cp "$CP" TestCachePolicy
 java -cp "$CP" TestStalls
+
+echo
+echo "== repair: deliberately broken files must come back readable =="
+echo "   (xref, startxref, trailer, header, junk prefix and suffix, truncation,"
+echo "    a broken page tree, dangling and corrupt page content, encryption)"
+java -cp "$CP" TestRepair
 
 echo
 echo "== the detector's own rules (no false positives, no missed regressions) =="
