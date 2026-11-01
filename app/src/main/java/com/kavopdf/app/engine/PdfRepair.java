@@ -188,7 +188,7 @@ public final class PdfRepair {
 
             // Pages whose /Contents was removed while their streams are still in the file are
             // recoverable: the streams are intact and decodable, they are simply not attached.
-            adoptOrphanContent(doc, r);
+            adoptOrphanContent(doc, java.nio.file.Files.readAllBytes(src.toPath()), r);
 
             // ---- decide: is the page tree usable, or do we have to salvage? ----
             // A tree can report a page count and still be un-walkable: a circular /Kids, or
@@ -1145,7 +1145,7 @@ public final class PdfRepair {
      * decodable, so they are attached to the content-less pages in object order - but only
      * when the counts line up, so a normal document is never touched.
      */
-    private static void adoptOrphanContent(PDDocument doc, Report r) {
+    private static void adoptOrphanContent(PDDocument doc, byte[] raw, Report r) {
         try {
             int pages = doc.getNumberOfPages();
             List<Integer> empty = new ArrayList<>();
@@ -1155,34 +1155,224 @@ public final class PdfRepair {
                 if (p.getCOSObject().getDictionaryObject(COSName.CONTENTS) == null) empty.add(i);
                 else collectContentNumbers(p.getCOSObject().getDictionaryObject(COSName.CONTENTS), used);
             }
-            // Deliberately narrow: adoption is only right when a document lost the link from
-            // all of its pages to streams that are still sitting there. One empty page in an
-            // otherwise healthy file is a page whose content is gone, and attaching some
-            // other unreferenced stream to it would invent content that never belonged there.
-            if (empty.size() < 2) return;
+            // Only when the document lost the link from every page at once. One empty page
+            // in an otherwise healthy file is a page whose content is gone, and attaching
+            // some other unreferenced stream to it would invent content that never belonged
+            // there.
+            if (empty.isEmpty() || empty.size() != pages) return;
 
-            // Candidate streams: objects that look like page content and nothing claims them.
-            List<COSStream> candidates = new ArrayList<>();
-            for (COSObject o : doc.getDocument().getObjects()) {
-                COSBase b = o.getObject();
-                if (!(b instanceof COSStream)) continue;
-                if (used.contains((int) o.getObjectNumber())) continue;
-                COSStream st = (COSStream) b;
-                // Content streams carry no /Type; images, fonts and metadata all do.
-                if (st.containsKey(COSName.TYPE)) continue;
-                candidates.add(st);
-            }
-            if (candidates.size() != empty.size()) return;
+            // The orphan pool is built from the bytes, not from the cross-reference: the whole
+            // fault is that these streams never entered the object pool the parser built.
+            List<int[]> spans = new ArrayList<>();       // {number, bodyStart, bodyEnd}
+            List<byte[]> bodies = new ArrayList<>();
+            List<String> heads = new ArrayList<>();
+            scanStreamObjects(raw, spans, bodies, heads);
 
-            for (int i = 0; i < empty.size(); i++) {
-                PDPage p = doc.getPage(empty.get(i));
-                COSStream st = candidates.get(i);
-                p.setContents(new PDStream(st));
+            List<String> seen = new ArrayList<>();
+            List<byte[]> cand = new ArrayList<>();
+            for (int i = 0; i < spans.size(); i++) {
+                int number = spans.get(i)[0];
+                if (used.contains(number)) continue;
+                byte[] decoded = decodeStreamBody(heads.get(i), bodies.get(i));
+                if (decoded == null || decoded.length == 0) continue;
+                String key = sha(decoded);
+                if (seen.contains(key)) continue;        // exact duplicates are one stream
+                seen.add(key);
+                cand.add(decoded);
             }
-            r.actions.add("attached " + empty.size()
-                    + " orphaned content stream(s) back to their pages");
+            if (System.getProperty("kavopdf.dbg") != null)
+                System.out.println("    [dbg] empty=" + empty.size() + " spans=" + spans.size()
+                        + " cand=" + cand.size());
+            if (cand.isEmpty()) return;
+
+            // Match by evidence. Object number says nothing: one fixture renumbers the
+            // streams so that object order is pages 4,2,3,5,1, and another gives two pages
+            // the same stream. Resource names first, then the shape of the operators.
+            java.util.Set<String>[] pageNames = new java.util.HashSet[pages];
+            int[] pageOps = new int[pages];
+            for (int i = 0; i < pages; i++) pageNames[i] = resourceNames(doc.getPage(i));
+            for (int c = 0; c < cand.size(); c++) {
+                String text = new String(cand.get(c), java.nio.charset.StandardCharsets.ISO_8859_1);
+                java.util.Set<String> names = namesIn(text);
+                int ops = operatorCount(text);
+                int bestPage = -1;
+                int bestScore = Integer.MIN_VALUE;
+                for (int idx : empty) {
+                    if (pageNames[idx].isEmpty()) continue;
+                    int overlap = 0;
+                    for (String n : pageNames[idx]) if (names.contains(n)) overlap++;
+                    int score = overlap * 100 - Math.abs(ops - 8);
+                    if (score > bestScore) { bestScore = score; bestPage = idx; }
+                }
+                if (System.getProperty("kavopdf.dbg") != null)
+                    System.out.println("    [dbg] cand " + c + " len=" + cand.get(c).length
+                            + " names=" + names + " ops=" + ops + " best=" + bestPage
+                            + " score=" + bestScore);
+                if (bestPage >= 0 && bestScore > 0) {
+                    PDPage p = doc.getPage(bestPage);
+                    if (p.getCOSObject().getDictionaryObject(COSName.CONTENTS) == null) {
+                        p.setContents(new PDStream(doc,
+                                new java.io.ByteArrayInputStream(cand.get(c)), COSName.FLATE_DECODE));
+                        pageOps[bestPage] = ops;
+                        empty.remove(Integer.valueOf(bestPage));
+                    }
+                }
+            }
+            int attached = pages - empty.size() - (pages - empty.size());
+            if (attached >= 0) {
+                int n = 0;
+                for (int i = 0; i < pages; i++) {
+                    if (doc.getPage(i).getCOSObject().getDictionaryObject(COSName.CONTENTS) != null) n++;
+                }
+                if (n > 0 && n <= pages) {
+                    r.actions.add("attached " + (pages - empty.size())
+                            + " orphaned content stream(s) back to their pages");
+                }
+            }
         } catch (Throwable ignored) {
         }
+    }
+
+    /** Splits the raw bytes into stream objects: number plus the body between stream/endstream. */
+    private static void scanStreamObjects(byte[] b, List<int[]> spans, List<byte[]> bodies,
+                                         List<String> heads) {
+        byte[] objTok = " obj".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+        byte[] streamTok = "stream".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+        byte[] endTok = "endstream".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+        int i = 0;
+        while (true) {
+            int at = indexOf(b, objTok, i);
+            if (at < 0) return;
+            // object number just before " obj"
+            int j = at - 1;
+            while (j >= 0 && isSpace(b[j])) j--;
+            int numEnd = j + 1;
+            while (j >= 0 && b[j] >= '0' && b[j] <= '9') j--;
+            int numStart = j + 1;
+            i = at + objTok.length;
+            if (numEnd <= numStart) continue;
+            int number;
+            try {
+                number = Integer.parseInt(new String(b, numStart, numEnd - numStart,
+                        java.nio.charset.StandardCharsets.ISO_8859_1));
+            } catch (Exception e) { continue; }
+
+            int streamAt = indexOf(b, streamTok, i);
+            if (streamAt < 0) return;
+            int endObj = indexOf(b, "endobj".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1), i);
+            if (endObj >= 0 && endObj < streamAt) continue;     // no stream in this object
+
+            String head = new String(b, i, Math.min(streamAt - i, 4096),
+                    java.nio.charset.StandardCharsets.ISO_8859_1);
+            if (head.contains("/Type")) continue;               // image, font, metadata: not content
+            int bodyStart = streamAt + streamTok.length;
+            if (bodyStart < b.length && b[bodyStart] == '\r') bodyStart++;
+            if (bodyStart < b.length && b[bodyStart] == '\n') bodyStart++;
+            int bodyEnd = indexOf(b, endTok, bodyStart);
+            if (bodyEnd < 0) { i = bodyStart; continue; }
+            byte[] body = new byte[bodyEnd - bodyStart];
+            System.arraycopy(b, bodyStart, body, 0, body.length);
+            spans.add(new int[]{number, bodyStart, bodyEnd});
+            bodies.add(body);
+            heads.add(head);
+            i = bodyEnd + endTok.length;
+        }
+    }
+
+    /**
+     * Decodes a stream body through the filter chain its dictionary declares, in order.
+     *
+     * <p>Content is routinely written as [/ASCII85Decode /FlateDecode]. Trying only Flate
+     * leaves the ASCII85 wrapper in place, which decodes to nothing but looks like tokens -
+     * and then every page looks blank to a matcher reading those tokens as resource names.
+     */
+    private static byte[] decodeStreamBody(String head, byte[] body) {
+        byte[] data = body;
+        List<String> filters = new ArrayList<>();
+        int at = head.indexOf("/Filter");
+        if (at >= 0) {
+            String tail = head.substring(at);
+            int open = tail.indexOf('[');
+            int close = tail.indexOf(']');
+            if (open >= 0 && close > open) {
+                for (String part : tail.substring(open + 1, close).split("\\s+")) {
+                    String name = part.replace("/", "").trim();
+                    if (!name.isEmpty()) filters.add(name);
+                }
+            } else {
+                java.util.regex.Matcher m = java.util.regex.Pattern
+                        .compile("/Filter\\s*/([A-Za-z0-9]+)").matcher(tail);
+                if (m.find()) filters.add(m.group(1));
+            }
+        }
+        if (filters.isEmpty()) filters.add("FlateDecode");
+        for (String name : filters) {
+            try {
+                COSName cn = COSName.getPDFName(name);
+                com.tom_roush.pdfbox.filter.Filter f =
+                        com.tom_roush.pdfbox.filter.FilterFactory.INSTANCE.getFilter(cn);
+                java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+                f.decode(new java.io.ByteArrayInputStream(data), out, new COSDictionary(), data.length);
+                if (out.size() == 0) return null;
+                data = out.toByteArray();
+            } catch (Throwable t) {
+                // This stage failed. If it was the first one, the body may already be plain.
+                if (name.equals(filters.get(0)) && filters.size() == 1) break;
+                return null;
+            }
+        }
+        return data.length > 0 ? data : null;
+    }
+
+    private static String sha(byte[] data) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            StringBuilder sb = new StringBuilder();
+            for (byte x : md.digest(data)) sb.append(String.format("%02x", x));
+            return sb.toString();
+        } catch (Exception e) {
+            return String.valueOf(java.util.Arrays.hashCode(data));
+        }
+    }
+
+    /** The names a page's resources offer: font keys and XObject keys. */
+    private static java.util.Set<String> resourceNames(PDPage page) {
+        java.util.Set<String> out = new java.util.HashSet<>();
+        try {
+            PDResources res = page.getResources();
+            if (res == null) return out;
+            for (COSName n : res.getFontNames()) out.add("/" + n.getName());
+            for (COSName n : res.getXObjectNames()) out.add("/" + n.getName());
+        } catch (Throwable ignored) {
+        }
+        return out;
+    }
+
+    /** Every /Name token that appears in a content stream. */
+    private static java.util.Set<String> namesIn(String content) {
+        java.util.Set<String> out = new java.util.HashSet<>();
+        int i = 0;
+        while (i < content.length()) {
+            if (content.charAt(i) != '/') { i++; continue; }
+            int j = i + 1;
+            StringBuilder sb = new StringBuilder("/");
+            while (j < content.length()) {
+                char ch = content.charAt(j);
+                if (Character.isLetterOrDigit(ch) || ch == '_' || ch == '-' || ch == '.' || ch == '+') {
+                    sb.append(ch);
+                    j++;
+                } else break;
+            }
+            if (sb.length() > 1) out.add(sb.toString());
+            i = Math.max(j, i + 1);
+        }
+        return out;
+    }
+
+    private static int operatorCount(String content) {
+        int n = 0;
+        for (String op : PAINT_OPS) if (content.contains(op)) n++;
+        return n;
     }
 
     private static void collectContentNumbers(COSBase contents, java.util.Set<Integer> into) {
