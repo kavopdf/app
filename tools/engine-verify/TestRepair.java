@@ -209,6 +209,33 @@ public class TestRepair {
                     t.contains("PAGE_1_MARKER") && t.contains("PAGE_3_MARKER"));
         }
 
+        System.out.println("== text containing operator letters is not mistaken for damage ==");
+        {
+            // "q", "Q", "BT" and "ET" inside a string are just letters. A page whose caption
+            // happens to read "(q Q BT)" is a healthy page, and counting those letters as
+            // operators would mark it partial - a false alarm on an ordinary document.
+            File ok = new File(W, "strings_with_operator_letters.pdf");
+            try (PDDocument d = new PDDocument()) {
+                PDPage page = new PDPage(PDRectangle.A4);
+                d.addPage(page);
+                try (PDPageContentStream cs = new PDPageContentStream(d, page)) {
+                    cs.beginText();
+                    cs.setFont(PDType1Font.HELVETICA, 12);
+                    cs.newLineAtOffset(60, 700);
+                    cs.showText("(q q q) - three q words in a caption");
+                    cs.endText();
+                }
+                d.save(ok);
+            }
+            PdfRepair.Report r = PdfRepair.repair(ok, "", new File(W, "repaired_strings.pdf"));
+            check("string letters: repaired", r.readable && r.verified);
+            check("string letters: the page is complete, not partial",
+                    r.partialPages.isEmpty());
+            check("string letters: the page is not called blank", r.blankPages.isEmpty());
+            check("string letters: the text survives", textOf(new File(W, "repaired_strings.pdf"))
+                    .contains("three q words"));
+        }
+
         System.out.println("== a page whose content stream is corrupt is kept and reported ==");
         {
             // The page was already broken when it arrived, so deleting it would shift every

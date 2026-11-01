@@ -1487,6 +1487,7 @@ public final class PdfRepair {
     /** Every /Name token that appears in a content stream. */
     private static java.util.Set<String> namesIn(String content) {
         java.util.Set<String> out = new java.util.HashSet<>();
+        content = stripStrings(content);
         int i = 0;
         while (i < content.length()) {
             if (content.charAt(i) != '/') { i++; continue; }
@@ -1942,6 +1943,7 @@ public final class PdfRepair {
             } catch (Throwable t) {
                 return true;                    // the stream itself will not decode
             }
+            content = stripStrings(content);
             for (COSName name : res.getXObjectNames()) {
                 if (!content.contains("/" + name.getName())) continue;
                 try {
@@ -1974,12 +1976,58 @@ public final class PdfRepair {
      * signal available without rendering, and it is a reliable one: a complete stream
      * balances its own brackets.
      */
+    /**
+     * The content stream with string literals, hex strings and comments blanked out.
+     *
+     * <p>Content is a program: outside a string, "q" saves graphics state and "Q" restores
+     * it. Inside one it is just a letter - "(Q)" in a caption is not an operator. Counting
+     * operators without honouring that would mark an ordinary document partial because its
+     * text happens to contain a parenthesis.
+     */
+    private static String stripStrings(String content) {
+        StringBuilder out = new StringBuilder(content.length());
+        int i = 0;
+        int n = content.length();
+        int depth = 0;
+        while (i < n) {
+            char ch = content.charAt(i);
+            if (depth > 0) {
+                if (ch == '\\') { i += 2; continue; }
+                if (ch == '(') depth++;
+                else if (ch == ')') depth--;
+                out.append(' ');
+                i++;
+                continue;
+            }
+            if (ch == '(') { depth = 1; out.append(' '); i++; continue; }
+            if (ch == '%') {                              // comment to end of line
+                while (i < n && content.charAt(i) != '\n' && content.charAt(i) != '\r') {
+                    out.append(' ');
+                    i++;
+                }
+                continue;
+            }
+            if (ch == '<' && i + 1 < n && content.charAt(i + 1) != '<') {
+                int close = content.indexOf('>', i);
+                if (close > i) {
+                    for (int k = i; k <= close; k++) out.append(' ');
+                    i = close + 1;
+                    continue;
+                }
+            }
+            out.append(ch);
+            i++;
+        }
+        return out.toString();
+    }
+
     private static boolean unbalancedContent(PDPage page) {
         try {
             java.io.InputStream in = page.getContents();
             if (in == null) return false;
-            String content = new String(com.tom_roush.pdfbox.io.IOUtils.toByteArray(in),
-                    java.nio.charset.StandardCharsets.ISO_8859_1);
+            String content = stripStrings(new String(
+                    com.tom_roush.pdfbox.io.IOUtils.toByteArray(in),
+                    java.nio.charset.StandardCharsets.ISO_8859_1));
             int q = 0, Q = 0, bt = 0, et = 0;
             int i = 0;
             int n = content.length();
