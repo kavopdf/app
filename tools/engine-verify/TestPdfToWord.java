@@ -89,6 +89,37 @@ public class TestPdfToWord {
         check("docx has styles.xml", hasStyles);
         check("the big line became a heading", hasHeadingStyle);
 
+        // A borderless table: three rows of two aligned cells, no drawn lines anywhere.
+        File tbl = new File(W, "borderless.pdf");
+        try (PDDocument d = new PDDocument()) {
+            PDPage page = new PDPage(PDRectangle.A4);
+            d.addPage(page);
+            try (PDPageContentStream cs = new PDPageContentStream(d, page)) {
+                String[][] rows = {{"Item", "Amount"}, {"Widgets", "1200"}, {"Gadgets", "3400"}};
+                float y = 720;
+                for (String[] row : rows) {
+                    cs.beginText();
+                    cs.setFont(PDType1Font.HELVETICA, 11);
+                    cs.newLineAtOffset(70, y);
+                    cs.showText(row[0]);
+                    cs.endText();
+                    cs.beginText();
+                    cs.setFont(PDType1Font.HELVETICA, 11);
+                    cs.newLineAtOffset(260, y);
+                    cs.showText(row[1]);
+                    cs.endText();
+                    y -= 16;
+                }
+            }
+            d.save(tbl);
+        }
+        PdfToWord.Result tr = PdfToWord.convert(tbl, "", null);
+        File ttxt = new File(W, "borderless.txt");
+        PdfToWord.writeTxt(tr, ttxt);
+        String ttext = new String(Files.readAllBytes(ttxt.toPath()), StandardCharsets.UTF_8);
+        check("borderless table became a table", tr.report.tables >= 1);
+        check("borderless rows keep their cells", ttext.contains("Widgets | 1200"));
+
         System.out.println("PDF2WORD TOTAL: " + pass + " passed, " + fail + " failed");
         if (fail > 0) System.exit(1);
     }

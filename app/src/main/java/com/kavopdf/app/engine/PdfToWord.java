@@ -217,6 +217,7 @@ public final class PdfToWord {
         List<Line> lines = toLines(glyphs, asBands(starts));
 
         List<Table> tables = buildTables(rules, lines, pageWidth);
+        tables.addAll(rowTables(lines, tables, pageWidth));
         List<Line> body = new ArrayList<>();
         for (Line line : lines) {
             if (line.consumed) continue;
@@ -898,6 +899,134 @@ public final class PdfToWord {
 
 
 
+
+
+    /**
+     * Rebuilds a table that has no drawn lines, from the rows its cells sit on.
+     *
+     * <p>Splitting a line at its gaps leaves the cells of one row as separate lines that share
+     * a baseline. Grouping those back by baseline recovers the row, and three or more such rows
+     * with the same number of cells at the same x positions is a table.
+     *
+     * <p>The short-cell test is what keeps a two-column page out. A table's cells are labels and
+     * values - a few words each. Two columns of prose also line up, row for row, but each of
+     * their "cells" is a sentence, and turning that into a table would be far worse than leaving
+     * it as two paragraphs.
+     */
+    private static List<Table> rowTables(List<Line> lines, List<Table> ruled, float pageWidth) {
+        List<Table> out = new ArrayList<>();
+        List<Line> candidates = new ArrayList<>();
+        for (Line line : lines) {
+            if (line.text.trim().isEmpty()) continue;
+            boolean inRuled = false;
+            for (Table t : ruled) {
+                if (line.inside(t)) { inRuled = true; break; }
+            }
+            if (!inRuled) candidates.add(line);
+        }
+        if (candidates.size() < 6) return out;
+
+        Collections.sort(candidates, new Comparator<Line>() {
+            @Override
+            public int compare(Line a, Line b) {
+                return Float.compare(a.y, b.y);
+            }
+        });
+
+        List<List<Line>> rows = new ArrayList<>();
+        List<Line> current = new ArrayList<>();
+        float baseY = 0;
+        for (Line line : candidates) {
+            if (current.isEmpty() || Math.abs(line.y - baseY) <= 3f) {
+                current.add(line);
+                if (current.size() == 1) baseY = line.y;
+            } else {
+                rows.add(current);
+                current = new ArrayList<>();
+                current.add(line);
+                baseY = line.y;
+            }
+        }
+        if (!current.isEmpty()) rows.add(current);
+
+        int i = 0;
+        while (i < rows.size()) {
+            int cells = rows.get(i).size();
+            if (cells < 2) { i++; continue; }
+            int j = i + 1;
+            while (j < rows.size() && rows.get(j).size() == cells && sameStarts(rows.get(i), rows.get(j))) j++;
+            if (j - i >= 3 && shortCells(rows, i, j) && tightRows(rows, i, j)) {
+                Table t = new Table();
+                t.top = rows.get(i).get(0).y;
+                float bottom = t.top, left = Float.MAX_VALUE, right = 0;
+                for (int r = i; r < j; r++) {
+                    List<Line> ordered = new ArrayList<>(rows.get(r));
+                    Collections.sort(ordered, new Comparator<Line>() {
+                        @Override
+                        public int compare(Line a, Line b) { return Float.compare(a.x, b.x); }
+                    });
+                    List<String> texts = new ArrayList<>();
+                    for (Line c : ordered) {
+                        texts.add(c.text.trim());
+                        bottom = Math.max(bottom, c.y);
+                        left = Math.min(left, c.x);
+                        right = Math.max(right, c.right);
+                        c.consumed = true;
+                    }
+                    t.rows.add(texts);
+                }
+                t.bottom = bottom;
+                t.left = left;
+                t.right = right;
+                t.header = true;
+                t.column = rows.get(i).get(0).column;
+                out.add(t);
+            }
+            i = Math.max(j, i + 1);
+        }
+        return out;
+    }
+
+    private static boolean sameStarts(List<Line> a, List<Line> b) {
+        List<Float> xa = new ArrayList<>(), xb = new ArrayList<>();
+        for (Line l : a) xa.add(l.x);
+        for (Line l : b) xb.add(l.x);
+        Collections.sort(xa);
+        Collections.sort(xb);
+        for (int k = 0; k < xa.size(); k++) {
+            if (Math.abs(xa.get(k) - xb.get(k)) > 14f) return false;
+        }
+        return true;
+    }
+
+    /**
+     * True when the rows sit close together, the way table rows do.
+     *
+     * <p>Separate boxes placed on a page also line up in a grid, but they are spread out over
+     * the page; a table's rows follow one another at roughly the line spacing. Without this the
+     * four independent text boxes in the layout test become a four-cell table.
+     */
+    private static boolean tightRows(List<List<Line>> rows, int from, int to) {
+        for (int r = from; r + 1 < to; r++) {
+            float gap = rows.get(r + 1).get(0).y - rows.get(r).get(0).y;
+            float size = rows.get(r).get(0).size;
+            if (gap > Math.max(size * 2.4f, 16f)) return false;
+        }
+        return true;
+    }
+
+    /** True when the run holds labels and values rather than sentences. */
+    private static boolean shortCells(List<List<Line>> rows, int from, int to) {
+        int total = 0, cells = 0;
+        for (int r = from; r < to; r++) {
+            for (Line line : rows.get(r)) {
+                total += line.text.trim().length();
+                cells++;
+            }
+        }
+        if (cells == 0) return false;
+        return (float) total / cells <= 32f;
+    }
 
     /** Collapses runs of near-identical coordinates into one position. */
     private static List<Float> mergedPositions(List<float[]> segments, boolean byY) {

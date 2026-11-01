@@ -23,6 +23,8 @@ for needle, why in [
     ("class RuleCollector extends PDFGraphicsStreamEngine", "drawn-rule table detection"),
     ("private static List<Line> toLines", "line clustering"),
     ("columnStarts(", "column detection"),
+    ("rowTables(", "borderless table rebuild"),
+    ("tightRows(", "grid vs box discrimination"),
     ("classifyHeadings", "heading levels"),
     ("dedupe(", "duplicate text layer removal"),
     ("OcrHook", "scanned-page fallback"),
