@@ -1,0 +1,214 @@
+Time: 3 hours
+
+MODULE - 1
+
+1a.
+
+schemas.
+
+1b.
+
+highest average salary.
+
+1c.
+
+2a.
+
+schemas.
+
+2b.
+
+highest average salary.
+
+2c.
+
+MODULE - 2
+
+3a.
+
+schemas.
+
+3b.
+
+highest average salary.
+
+3c.
+
+4a.
+
+schemas.
+
+4b.
+
+highest average salary.
+
+4c.
+
+MODULE - 3
+
+5a.
+
+schemas.
+
+5b.
+
+highest average salary.
+
+5c.
+
+6a.
+
+schemas.
+
+6b.
+
+highest average salary.
+
+6c.
+
+MODULE - 4
+
+7a.
+
+schemas.
+
+7b.
+
+highest average salary.
+
+7c.
+
+8a.
+
+schemas.
+
+8b.
+
+highest average salary.
+
+8c.
+
+MODULE - 5
+
+9a.
+
+schemas.
+
+9b.
+
+highest average salary.
+
+9c.
+
+10a.
+
+schemas.
+
+10b.
+
+highest average salary.
+
+10c.
+
+SECTION B - OBJECTIVE (answer all) 1. Which normal form eliminates transitive dependency?
+
+(a) 1NF 2. Which normal form eliminates transitive dependency?
+
+(a) 1NF 3. Which normal form eliminates transitive dependency?
+
+(a) 1NF 4. Which normal form eliminates transitive dependency?
+
+(a) 1NF
+
+Note: Answer any FIVE full questions, choosing one full question from each module.
+
+(b) 2NF
+
+(b) 2NF
+
+(b) 2NF
+
+(b) 2NF
+
+VISVESVARAYA TECHNOLOGICAL UNIVERSITY
+
+B.E. DEGREE EXAMINATION - SEMESTER IV (2023-24) CS401 - DATABASE MANAGEMENT SYSTEMS
+
+(c) 3NF
+
+(c) 3NF
+
+(c) 3NF
+
+(c) 3NF
+
+Max marks: 100
+
+[08] Explain the concept of normalisation with a suitable example. Discuss 1NF, 2NF and 3NF with relation
+
+[08] Write SQL queries for the following: (i) list students with a CGPA above 8.5; (ii) find the department with the
+
+[04] Differentiate between a clustered and a non-clustered index.
+
+[08] Explain the concept of normalisation with a suitable example. Discuss 1NF, 2NF and 3NF with relation
+
+[08] Write SQL queries for the following: (i) list students with a CGPA above 8.5; (ii) find the department with the
+
+[04] Differentiate between a clustered and a non-clustered index.
+
+[08] Explain the concept of normalisation with a suitable example. Discuss 1NF, 2NF and 3NF with relation
+
+[08] Write SQL queries for the following: (i) list students with a CGPA above 8.5; (ii) find the department with the
+
+[04] Differentiate between a clustered and a non-clustered index.
+
+[08] Explain the concept of normalisation with a suitable example. Discuss 1NF, 2NF and 3NF with relation
+
+[08] Write SQL queries for the following: (i) list students with a CGPA above 8.5; (ii) find the department with the
+
+[04] Differentiate between a clustered and a non-clustered index.
+
+[08] Explain the concept of normalisation with a suitable example. Discuss 1NF, 2NF and 3NF with relation
+
+[08] Write SQL queries for the following: (i) list students with a CGPA above 8.5; (ii) find the department with the
+
+[04] Differentiate between a clustered and a non-clustered index.
+
+[08] Explain the concept of normalisation with a suitable example. Discuss 1NF, 2NF and 3NF with relation
+
+[08] Write SQL queries for the following: (i) list students with a CGPA above 8.5; (ii) find the department with the
+
+[04] Differentiate between a clustered and a non-clustered index.
+
+[08] Explain the concept of normalisation with a suitable example. Discuss 1NF, 2NF and 3NF with relation
+
+[08] Write SQL queries for the following: (i) list students with a CGPA above 8.5; (ii) find the department with the
+
+[04] Differentiate between a clustered and a non-clustered index.
+
+[08] Explain the concept of normalisation with a suitable example. Discuss 1NF, 2NF and 3NF with relation
+
+[08] Write SQL queries for the following: (i) list students with a CGPA above 8.5; (ii) find the department with the
+
+[04] Differentiate between a clustered and a non-clustered index. * * * * *
+
+[08] Explain the concept of normalisation with a suitable example. Discuss 1NF, 2NF and 3NF with relation
+
+[08] Write SQL queries for the following: (i) list students with a CGPA above 8.5; (ii) find the department with the
+
+[04] Differentiate between a clustered and a non-clustered index.
+
+[08] Explain the concept of normalisation with a suitable example. Discuss 1NF, 2NF and 3NF with relation
+
+[08] Write SQL queries for the following: (i) list students with a CGPA above 8.5; (ii) find the department with the
+
+[04] Differentiate between a clustered and a non-clustered index.
+
+(d) BCNF
+
+(d) BCNF
+
+(d) BCNF
+
+(d) BCNF
+

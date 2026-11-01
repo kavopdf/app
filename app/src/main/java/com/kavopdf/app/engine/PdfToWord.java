@@ -1049,6 +1049,28 @@ public final class PdfToWord {
             for (String[] row : cells) for (String cell : row) if (cell != null) filled++;
             if (filled < 2) continue;                     // a box, not a table
 
+            // A column nobody wrote in carries nothing but its separators. A drawing sheet's
+            // frame produces a grid of six columns where four are always empty, and the output
+            // was a page of "|  |  |  |" with the real text buried in it.
+            List<Integer> keep = new ArrayList<>();
+            for (int c = 0; c < cols; c++) {
+                for (int r = 0; r < rows; r++) {
+                    if (cells[r][c] != null) {
+                        keep.add(c);
+                        break;
+                    }
+                }
+            }
+            if (keep.size() < 2) continue;
+            if (keep.size() < cols) {
+                String[][] trimmed = new String[rows][keep.size()];
+                for (int r = 0; r < rows; r++) {
+                    for (int k = 0; k < keep.size(); k++) trimmed[r][k] = cells[r][keep.get(k)];
+                }
+                cells = trimmed;
+                cols = keep.size();
+            }
+
             Table t = new Table();
             t.top = top;
             t.bottom = bottom;

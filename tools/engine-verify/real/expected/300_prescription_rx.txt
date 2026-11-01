@@ -1,0 +1,35 @@
+SHRIRAM MULTISPECIALITY HOSPITAL
+
+14 Residency Road, Bengaluru 560025  |  Tel 080-4123 8890  |  Reg. KA/HOSP/2019/0442
+
+Dr. Meera Krishnan, MBBS, MD (General Medicine)
+
+Reg. No. KMC/44821/2009  |  Consulting Physician
+
+NAME | AGE / SEX | DATE | UHID
+ANANYA RAO | 34 / F | 18-03-2024 | MRN-2024-008871
+ADDRESS |  |  | WEIGHT
+Flat 402, Palm Meadows, Whitefield, Bengaluru 560066 |  |  | 62 kg
+
+Rx
+
+# | Medicine | Strength | Dosage | Duration
+1 | Tab. Augmentin 625 | 625 mg | 1-0-1 after food | 5 days
+2 | Tab. Paracetamol | 650 mg | SOS max 3/day | 3 days
+3 | Syp. Ascoril LS | 5 ml | 1-1-1 | 5 days
+4 | Cap. Pantoprazole | 40 mg | 1-0-0 before breakfast | 10 days
+
+Advice:
+
+• Warm saline gargle thrice a day.
+
+• Plenty of oral fluids; avoid cold beverages.
+
+• Review after 5 days or earlier if fever persists above 101 F.
+
+Dr. Meera Krishnan
+
+MBBS, MD - Reg. KMC/44821/2009
+
+Not valid for medico-legal purposes. Please carry this prescription to the pharmacy along with a photo ID. Medicines once sold are not returnable.
+
