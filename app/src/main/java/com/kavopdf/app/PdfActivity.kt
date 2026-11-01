@@ -36,7 +36,8 @@ abstract class PdfActivity : AppCompatActivity() {
 
     /** The one file the user shared or opened - another app may still be reading it. */
     private val keptFiles = HashSet<File>()
-    private var pendingName: String = "output.pdf"
+    /** The name the finished file is offered under; tool screens use it in their own receipt. */
+    protected var pendingName: String = "output.pdf"
 
     protected val openPdfLauncher =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
