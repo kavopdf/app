@@ -172,6 +172,21 @@ button always hands over the newest build.
 | **Edit metadata** | Title, author, subject, keywords. |
 | **Extract images** | Pulls embedded raster images out of a PDF. |
 | **Page numbers** | Number every page with a custom format (`Page {n} of {total}`). |
+| **Create PDF** | Build a document from scratch — typed text, images, freehand drawing and shapes, then save it as a PDF. |
+| **Crop page** | Trim a page's margins and write the crop into the file itself. |
+| **Hyperlinks** | Find web and e-mail addresses and make them tappable, or place your own link as an icon, a caption or custom text at a position you choose — one page or every page. |
+| **Bookmarks** | Add a navigation outline so the reader shows a table of contents. |
+| **Digital signature** | Sign a PDF with a real certificate (self-signed on the device) so the signature can be verified later. |
+| **Verify signature** | Check whether a file is signed, by whom, and whether the bytes changed after signing. |
+| **Redact** | Permanently remove private text — the characters are deleted from the file, not covered with a black box. |
+| **Repair PDF** | Rebuild a damaged file: lost cross-reference table, wrong offset, missing trailer, broken page tree. It verifies every page before saving and reports exactly what it recovered. |
+| **PDF to Word** | Rebuild the document as an editable `.docx` (or `.txt`): paragraphs, heading levels, bold and italic, alignment, ruled and borderless tables, page breaks. Scanned pages go through on-device OCR. |
+| **Make searchable (OCR)** | Add an invisible text layer to a scanned PDF so it can be searched and copied, using on-device ML Kit. |
+| **Image to searchable PDF** | Read the text in a photo or screenshot and save it as a searchable PDF. |
+| **QR & barcode scanner** | Read any code with the camera. |
+| **Scan to PDF** | Photograph pages into a single PDF. |
+| **Activity log** | See what the app has done — every run, how long it took, and any failure with its cause — and export it. |
+
 
 **Dark mode** is supported throughout (follows the system, or pick Light / Dark from
 the theme button on the home screen). All file access goes through the Storage Access
@@ -179,7 +194,7 @@ Framework, so **no storage permission is requested** and the app works fully off
 
 ## Building
 
-Gradle 8.7 / AGP 8.5.2 / Kotlin 1.9.24, JDK 17, compileSdk 34, minSdk 24.
+Gradle 8.7 / AGP 8.6.1 / Kotlin 2.1.0, JDK 17, compileSdk 35, minSdk 24.
 
 ```bash
 gradle :app:assembleDebug          # debug build
