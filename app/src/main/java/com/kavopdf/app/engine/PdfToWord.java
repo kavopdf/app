@@ -206,10 +206,20 @@ public final class PdfToWord {
         // split. A column start that falls inside one is that table's cell separator, not a
         // page column - splitting there would tear every row apart.
         List<Table> firstPass = buildTables(rules, rawLines, pageWidth);
+
+        // Borderless tables are found here, before the column starts are filtered, so that a
+        // table's cell positions are known to be cell separators. Otherwise the cells look
+        // like page columns, and the heading above the table gets a later column than the
+        // table itself - which puts the heading after the table in the output.
+        List<Table> rowPass = rowTables(rawLines, firstPass, pageWidth);
+
         List<Float> starts = new ArrayList<>();
         for (Float x : columnStarts(rawLines)) {
             boolean inTable = false;
             for (Table t : firstPass) {
+                if (x >= t.left - 4 && x <= t.right + 4) { inTable = true; break; }
+            }
+            for (Table t : rowPass) {
                 if (x >= t.left - 4 && x <= t.right + 4) { inTable = true; break; }
             }
             if (!inTable) starts.add(x);
@@ -217,7 +227,7 @@ public final class PdfToWord {
         List<Line> lines = toLines(glyphs, asBands(starts));
 
         List<Table> tables = buildTables(rules, lines, pageWidth);
-        tables.addAll(rowTables(rawLines, tables, pageWidth));
+        tables.addAll(rowPass);
         List<Line> body = new ArrayList<>();
         for (Line line : lines) {
             if (line.consumed) continue;
