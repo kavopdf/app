@@ -60,6 +60,8 @@ class ToolsActivity : PdfActivity() {
     private var sourceName: String = "document.pdf"
     /** The last repair report, shown on screen and again after saving. */
     private var repairReport: PdfRepair.Report? = null
+    /** The password the user gave for an encrypted file, kept only while this screen is open. */
+    private var repairPassword: String = ""
     private var treeUri: Uri? = null
     private var pendingRun = false
 
@@ -156,22 +158,29 @@ class ToolsActivity : PdfActivity() {
             return
         }
         if (tool == Action.REPAIR) {
-            // Repair reads the file before it is asked to: the diagnosis is the useful
-            // half of the feature, and doing it here means the user sees what is wrong
-            // with their document before they commit to anything.
-            openPdf(uri) { f ->
-                runTask(getString(R.string.repair_reading), onDone = loaded@{ rep ->
-                    binding.fileName.text = sourceName
-                    repairReport = rep
-                    buildParams(emptyMap())
-                    binding.btnRun.isEnabled = rep?.readable == true
-                    if (rep != null && !rep.readable) {
-                        toast(rep.failure.ifEmpty { getString(R.string.repair_failed_title) })
-                    }
-                }) {
-                    source = f
-                    PdfRepair.diagnose(f, "")
+            // Repair must NOT go through openPdf(). That path refuses any file without
+            // "%PDF-" in its first kilobyte and asks the engine for a page count first -
+            // which is exactly the file a user brings here. A damaged PDF is the point of
+            // this tool, so the bytes are copied and handed straight to the diagnosis.
+            repairPassword = ""
+            runTask(getString(R.string.repair_reading), onDone = loaded@{ rep ->
+                binding.fileName.text = sourceName
+                repairReport = rep
+                buildParams(emptyMap())
+                binding.btnRun.isEnabled = rep?.readable == true
+                if (rep == null) {
+                    toast(getString(R.string.msg_could_not_read))
+                } else if (!rep.readable) {
+                    toast(rep.failure.ifEmpty { getString(R.string.repair_failed_title) })
+                } else if (rep.encrypted) {
+                    askRepairPassword()
                 }
+            }) {
+                val f = trackCacheFile(Files.copyToCache(this, uri))
+                source = f
+                sizeHint = f.length()
+                pagesHint = 1
+                PdfRepair.diagnose(f, "")
             }
             return
         }
@@ -432,7 +441,7 @@ class ToolsActivity : PdfActivity() {
             Action.REPAIR -> {
                 val src = source ?: return toast(getString(R.string.msg_pick_file_first))
                 runAndSave(Files.suggestName(sourceName, suffixFor(tool))) { out ->
-                    val rep = PdfRepair.repair(src, "", out)
+                    val rep = PdfRepair.repair(src, repairPassword, out)
                     repairReport = rep
                     // The engine only leaves a file behind when it verified it. If it did
                     // not, say why instead of saving a document that is worse than the one
@@ -639,6 +648,48 @@ class ToolsActivity : PdfActivity() {
     override fun onSaved(file: File) {
         if (tool != Action.REPAIR) return
         repairReport?.let { showRepairReport(it) }
+    }
+
+    /**
+     * Asks for the password of an encrypted file, then diagnoses it again with it.
+     *
+     * <p>Repair needs the password itself: the repaired copy is written back with the same
+     * protection, so the file still opens only for someone who knows it.
+     */
+    private fun askRepairPassword() {
+        val f = source ?: return
+        if (isFinishing || isDestroyed) return
+        val v = layoutInflater.inflate(R.layout.dialog_password, null)
+        val input = v.findViewById<android.widget.EditText>(R.id.pwInput)
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.msg_password_required)
+            .setView(v)
+            .setPositiveButton(R.string.action_open, null)
+            .setNegativeButton(R.string.action_cancel, null)
+            .create()
+        dialog.window?.setBackgroundDrawableResource(R.drawable.bg_dialog_rounded)
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val pw = input.text?.toString().orEmpty()
+                if (pw.isEmpty()) {
+                    toast(getString(R.string.msg_enter_password))
+                    return@setOnClickListener
+                }
+                dialog.dismiss()
+                runTask(getString(R.string.repair_reading), onDone = retried@{ rep ->
+                    repairReport = rep
+                    buildParams(emptyMap())
+                    binding.btnRun.isEnabled = rep?.readable == true
+                    if (rep != null && !rep.readable) {
+                        toast(rep.failure.ifEmpty { getString(R.string.repair_failed_title) })
+                    }
+                }) {
+                    repairPassword = pw
+                    PdfRepair.diagnose(f, pw)
+                }
+            }
+        }
+        dialog.show()
     }
 
     /** The read-only card shown under the file name before repairing. */

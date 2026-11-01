@@ -54,6 +54,30 @@ if "new PDFStreamParser(page).parse()" not in engine:
 if "keepProtection" not in engine:
     fails.append("repairing an encrypted file would strip its protection")
 
+# ---- 1b) repair must not go through the normal "is this a PDF" gate ---------------
+# openPdf() refuses anything without "%PDF-" in its first kilobyte and asks the engine
+# for a page count before handing the file over. A damaged PDF fails both - which is the
+# one file this tool exists for. The repair branch has to load the bytes itself.
+branch = act[act.index("if (tool == Action.REPAIR)"):]
+branch = branch[: branch.index("\n            return")]
+# Comments explain why openPdf is avoided; they are not calls. Strip them first so the
+# check reads code, not prose.
+branch = re.sub(r"//[^\n]*", "", branch)
+if "openPdf(" in branch:
+    fails.append("the repair branch calls openPdf() - a damaged file would be refused "
+                 "before the repair engine ever sees it")
+if "looksLikePdf" in branch:
+    fails.append("the repair branch gates on looksLikePdf() - a file with a damaged or "
+                 "missing header can never reach the repair")
+if "copyToCache" not in branch:
+    fails.append("the repair branch does not copy the file to the cache itself")
+if "diagnose(" not in branch:
+    fails.append("the repair branch no longer diagnoses the file as soon as it is picked")
+if "askRepairPassword" not in act:
+    fails.append("an encrypted file is never asked for its password")
+if "PdfRepair.repair(src, repairPassword, out)" not in act:
+    fails.append("the password the user gave is not passed to the repair")
+
 # ---- 2) the screen must not save an unverified repair -----------------------------
 if "if (!rep.readable || !rep.verified)" not in act:
     fails.append("ToolsActivity would save a repair the engine did not verify")
@@ -79,8 +103,22 @@ for s in ("tool_repair", "tool_repair_desc", "repair_run", "repair_failed_title"
 # ---- 4) the icon is a real vector, not an empty file -----------------------------
 if "<vector" not in icon or "pathData" not in icon:
     fails.append("ic_repair.xml is not a vector drawable with a path")
-elif len(re.search(r'android:pathData="([^"]+)"', icon).group(1)) < 40:
-    fails.append("ic_repair.xml path is too short to draw anything")
+else:
+    d = re.search(r'android:pathData="([^"]+)"', icon).group(1)
+    if len(d) < 40:
+        fails.append("ic_repair.xml path is too short to draw anything")
+    xs = [float(v) for v in re.findall(r"([\d.]+),", d)]
+    ys = [float(v) for v in re.findall(r",([\d.]+)", d)]
+    if not xs or not ys:
+        fails.append("ic_repair.xml has no coordinates")
+    else:
+        # The icon has to fill the same 960 box the other tool icons use, without
+        # spilling outside it - a drawing that sits in a corner renders small.
+        if min(xs) < 0 or max(xs) > 960 or min(ys) < 0 or max(ys) > 960:
+            fails.append("ic_repair.xml draws outside its 960 viewport (clipped)")
+        elif (max(xs) - min(xs)) < 620 or (max(ys) - min(ys)) < 620:
+            fails.append(f"ic_repair.xml only covers {max(xs)-min(xs):.0f}x{max(ys)-min(ys):.0f} "
+                         "of its 960 box - it will render smaller than the other tool icons")
 
 # ---- 5) the tests exist and actually run -----------------------------------------
 test = pathlib.Path("tools/engine-verify/TestRepair.java")
