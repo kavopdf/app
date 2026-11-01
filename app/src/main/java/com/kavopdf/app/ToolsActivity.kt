@@ -17,7 +17,12 @@ import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.kavopdf.app.databinding.ActivityToolsBinding
 import com.kavopdf.app.engine.PdfEngine
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
+import android.os.ParcelFileDescriptor
+import com.kavopdf.app.engine.DocxWriter
 import com.kavopdf.app.engine.PdfRepair
+import com.kavopdf.app.engine.PdfToWord
 import com.kavopdf.app.engine.PdfSigner
 import com.kavopdf.app.model.Action
 import com.kavopdf.app.util.Files
@@ -60,6 +65,7 @@ class ToolsActivity : PdfActivity() {
     private var sourceName: String = "document.pdf"
     /** The last repair report, shown on screen and again after saving. */
     private var repairReport: PdfRepair.Report? = null
+    private var wordReport: PdfToWord.Report? = null
     /** The password the user gave for an encrypted file, kept only while this screen is open. */
     private var repairPassword: String = ""
     private var treeUri: Uri? = null
@@ -101,6 +107,7 @@ class ToolsActivity : PdfActivity() {
     private var fPagenumOpacity: EditText? = null
     private var fSplitAll: SwitchMaterial? = null
     private var fExtractPages: EditText? = null
+    private var fWordFormat: Spinner? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,6 +139,7 @@ class ToolsActivity : PdfActivity() {
             Action.PAGENUM -> R.string.tool_pagenum to R.string.tool_pagenum_desc
             Action.SPLIT -> R.string.tool_split to R.string.tool_split_desc
             Action.REPAIR -> R.string.tool_repair to R.string.tool_repair_desc
+            Action.PDF_TO_WORD -> R.string.tool_word to R.string.tool_word_desc
             else -> R.string.app_name to R.string.app_tagline
         }
         // The toolbar is the support ActionBar here, and the ActionBar owns the
@@ -430,14 +438,82 @@ class ToolsActivity : PdfActivity() {
             Action.EXTRACT -> {
                 fExtractPages = addField(getString(R.string.hint_extract_pages), InputType.TYPE_CLASS_TEXT, "")
             }
+            Action.PDF_TO_WORD -> {
+                fWordFormat = addSpinner(
+                    getString(R.string.word_format),
+                    listOf(getString(R.string.word_format_docx), getString(R.string.word_format_txt))
+                )
+            }
             else -> { }
         }
     }
 
     // ---- run ---------------------------------------------------------------
 
+
+    /**
+     * OCR for pages that hold no text layer.
+     *
+     * <p>Rendering and recognition both need the Android framework, so they live here and the
+     * engine only sees a string. Each page is rendered once, recognised once, and the renderer
+     * is closed even when a page throws - a leaked renderer holds the file open.
+     */
+    private fun wordOcrHook(src: File): PdfToWord.OcrHook {
+        return PdfToWord.OcrHook { pageIndex ->
+            var recognised: String? = null
+            try {
+                val pfd = ParcelFileDescriptor.open(src, ParcelFileDescriptor.MODE_READ_ONLY)
+                pfd.use {
+                    PdfRenderer(it).use { renderer ->
+                        if (pageIndex in 0 until renderer.pageCount) {
+                            renderer.openPage(pageIndex).use { page ->
+                                val bmp = Bitmap.createBitmap(
+                                    (page.width * 2).coerceAtLeast(1),
+                                    (page.height * 2).coerceAtLeast(1),
+                                    Bitmap.Config.ARGB_8888
+                                )
+                                bmp.eraseColor(android.graphics.Color.WHITE)
+                                page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                                recognised = ocrBitmap(bmp)
+                                bmp.recycle()
+                            }
+                        }
+                    }
+                }
+            } catch (t: Throwable) {
+                recognised = null
+            }
+            recognised
+        }
+    }
+
+    /** ML Kit recognition on one bitmap, on the caller's background thread. */
+    private fun ocrBitmap(bitmap: Bitmap): String? = try {
+        val client = com.google.mlkit.vision.text.TextRecognition
+            .getClient(com.google.mlkit.vision.text.latin.TextRecognizerOptions.DEFAULT_OPTIONS)
+        val image = com.google.mlkit.vision.common.InputImage.fromBitmap(bitmap, 0)
+        val result = com.google.android.gms.tasks.Tasks.await(client.process(image))
+        client.close()
+        result.text
+    } catch (t: Throwable) {
+        null
+    }
+
     private fun onRun() {
         when (tool) {
+            Action.PDF_TO_WORD -> {
+                val src = source ?: return toast(getString(R.string.msg_pick_file_first))
+                val asTxt = fWordFormat?.selectedItemPosition == 1
+                runAndSave(Files.suggestName(sourceName, "_word", if (asTxt) "txt" else "docx")) { out ->
+                    val result = PdfToWord.convert(src, "", wordOcrHook(src))
+                    PdfToWord.classifyHeadings(result)
+                    if (result.isEmpty()) {
+                        throw IllegalStateException(getString(R.string.word_nothing_found))
+                    }
+                    if (asTxt) PdfToWord.writeTxt(result, out) else DocxWriter.write(result, out)
+                    wordReport = result.report
+                }
+            }
             Action.REPAIR -> {
                 val src = source ?: return toast(getString(R.string.msg_pick_file_first))
                 runAndSave(Files.suggestName(sourceName, suffixFor(tool))) { out ->
@@ -881,6 +957,7 @@ class ToolsActivity : PdfActivity() {
         Action.METADATA -> "_metadata"
         Action.PAGENUM -> "_numbered"
         Action.REPAIR -> "_repaired"
+        Action.PDF_TO_WORD -> "_word"
         else -> "_out"
     }
 

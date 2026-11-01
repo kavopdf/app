@@ -320,4 +320,10 @@
     <string name="action_clear_form">Clear form</string>
     <string name="msg_form_cleared">Form cleared</string>
     <string name="msg_form_page">Page %1$d</string>
+    <string name="tool_word">PDF to Word</string>
+    <string name="tool_word_desc">Editable .docx or plain .txt, with real paragraphs and tables</string>
+    <string name="word_format">Output format</string>
+    <string name="word_format_docx">Word document (.docx)</string>
+    <string name="word_format_txt">Plain text (.txt)</string>
+    <string name="word_nothing_found">No text could be read from this PDF</string>
 </resources>
