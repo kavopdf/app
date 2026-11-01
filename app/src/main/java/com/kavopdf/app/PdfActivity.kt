@@ -39,6 +39,9 @@ abstract class PdfActivity : AppCompatActivity() {
     /** The name the finished file is offered under; tool screens use it in their own receipt. */
     protected var pendingName: String = "output.pdf"
 
+    /** True when the running task has already written its failure to the activity log. */
+    private var failureLogged = false
+
     protected val openPdfLauncher =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             if (uri != null) { takePersist(uri); onPdfChosen(uri) }
