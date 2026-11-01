@@ -160,8 +160,24 @@ fixtures = sorted(fixdir.glob("*.pdf")) if fixdir.is_dir() else []
 if len(fixtures) < 50:
     fails.append(f"only {len(fixtures)} repair fixtures are in the repo - the stress set "
                  "must stay, it is the only thing that tests real damage")
-if "TestRepairFixtures" not in pathlib.Path("tools/verify-engine.sh").read_text(encoding="utf-8"):
+suite = pathlib.Path("tools/verify-engine.sh").read_text(encoding="utf-8")
+if "TestRepairFixtures" not in suite:
     fails.append("TestRepairFixtures is not run by verify-engine.sh")
+# The 51-fixture sweep is slow and only says anything about the repair engine, so it is
+# gated on a fingerprint of the engine, its tests and its fixtures. A change to any other
+# tool must not pay for it - and a change to the repair must never silently skip it.
+for needle, why in [
+    ("repair-suite.stamp", "the fingerprint file is gone - the suite would either never "
+                           "run or run on every build"),
+    ("PdfRepair.java", "the fingerprint must include the engine itself"),
+    ("fixtures/repair", "the fingerprint must include the fixtures"),
+    ("REPAIR_FULL", "there is no way to force a full run"),
+]:
+    if needle not in suite:
+        fails.append(f"the repair-suite gate lost {needle}: {why}")
+if not pathlib.Path("tools/engine-verify/repair-suite.stamp").exists():
+    fails.append("repair-suite.stamp is missing - commit it with every repair change, or the "
+                 "suite will run on every build")
 if not pathlib.Path("tools/engine-verify/TestRepairFixtures.java").exists():
     fails.append("TestRepairFixtures.java is missing")
 

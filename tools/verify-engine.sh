@@ -120,8 +120,26 @@ echo "    a broken page tree, dangling and corrupt page content, encryption)"
 java -cp "$CP" TestRepair
 
 echo
-echo "== repair against the 21 real damaged fixtures (the stress set) =="
-java -cp "$CP" TestRepairFixtures
+# The 51-fixture sweep is the slowest thing in this script, and it only says anything about
+# the repair engine. It runs when the engine, its tests or its fixtures change - and is
+# skipped otherwise, so a change to any other tool does not pay for it.
+REPAIR_STAMP="repair-suite.stamp"
+REPAIR_HASH=$(
+  {
+    cat ../../app/src/main/java/com/kavopdf/app/engine/PdfRepair.java
+    cat TestRepair.java TestRepairFixtures.java
+    ls -l fixtures/repair | awk '{print $5, $9}'
+  } | sha256sum | cut -d' ' -f1
+)
+if [ "${REPAIR_FULL:-0}" != "1" ] && [ -f "$REPAIR_STAMP" ] \
+   && [ "$(tr -d '\n' < "$REPAIR_STAMP")" = "$REPAIR_HASH" ]; then
+  echo "== repair fixtures: unchanged since the last full run - skipped =="
+  echo "   (REPAIR_FULL=1 bash tools/verify-engine.sh forces it)"
+else
+  echo "== repair against the 51 real damaged fixtures (the stress set) =="
+  java -cp "$CP" TestRepairFixtures
+  echo "$REPAIR_HASH" > "$REPAIR_STAMP"
+fi
 
 echo
 echo "== the detector's own rules (no false positives, no missed regressions) =="
