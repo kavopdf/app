@@ -35,6 +35,9 @@ import java.io.File
 class ToolsActivity : PdfActivity() {
 
     companion object {
+        /** Longest side of an OCR bitmap. 2200 px keeps A4 at 2x and stops a poster from OOM. */
+        private const val MAX_OCR_SIDE = 2200
+
         const val EXTRA_TOOL = "tool"
 
         private val FONT_NAMES = listOf("Helvetica", "Helvetica Bold", "Times", "Times Bold", "Courier")
@@ -468,7 +471,7 @@ class ToolsActivity : PdfActivity() {
      * which is an out-of-memory crash on a phone; the scale is reduced until the image fits
      * inside the cap, and never goes below 1x.
      */
-    private inner class WordOcr(src: File) : PdfToWord.OcrHook, AutoCloseable {
+    private inner class WordOcr(private val src: File) : PdfToWord.OcrHook, AutoCloseable {
         private var pfd: ParcelFileDescriptor? = null
         private var renderer: PdfRenderer? = null
 
@@ -529,11 +532,6 @@ class ToolsActivity : PdfActivity() {
         if (r.ocrPages > 0) parts.add(getString(R.string.word_ocr_pages, r.ocrPages))
         if (r.skippedPages > 0) parts.add(getString(R.string.word_skipped_pages, r.skippedPages))
         return parts.joinToString(" \u00b7 ")
-    }
-
-    private companion object {
-        /** Longest side of an OCR bitmap. 2200 px keeps A4 at 2x and stops a poster from OOM. */
-        const val MAX_OCR_SIDE = 2200
     }
 
     /** ML Kit recognition on one bitmap, on the caller's background thread. */
