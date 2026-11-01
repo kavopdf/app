@@ -13,6 +13,7 @@ import com.tom_roush.pdfbox.io.ScratchFile;
 import com.tom_roush.pdfbox.pdfparser.PDFParser;
 import com.tom_roush.pdfbox.pdfparser.PDFStreamParser;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.pdmodel.PDDocumentInformation;
 import com.tom_roush.pdfbox.pdmodel.PDPage;
 import com.tom_roush.pdfbox.pdmodel.graphics.PDXObject;
 import com.tom_roush.pdfbox.pdmodel.PDResources;
@@ -262,6 +263,7 @@ public final class PdfRepair {
 
             // ---- write, then verify ----
             keepProtection(source, pw, r);
+            preserveMetadata(source, src, r);
             if (!writeOut(source, out, r)) return r;
             verify(out, pw, r);
 
@@ -482,7 +484,14 @@ public final class PdfRepair {
      * a repair tool trims or rebuilds the front of the file and tries again.
      */
     private static File prepare(File src, File outFile, Report r) throws IOException {
-        boolean needsWork = (r.headerFound && r.headerOffset > 0) || !r.headerFound;
+        // A header can name a version that does not exist - "%PDF-9.9" is not a published
+        // PDF version, and some viewers refuse the file over it. The objects below the header
+        // are what matter, so an impossible version is written as the newest one this engine
+        // understands rather than passed through.
+        String declared = headerVersion(src, r.headerOffset);
+        boolean badVersion = declared != null && !validVersion(declared);
+
+        boolean needsWork = (r.headerFound && r.headerOffset > 0) || !r.headerFound || badVersion;
         if (!needsWork) return src;
 
         // Nothing to repair if the file never held a PDF object at all.
@@ -501,8 +510,29 @@ public final class PdfRepair {
                     if (n <= 0) break;
                     left -= n;
                 }
-                copy(in, os);
-                r.actions.add("removed " + skip + " byte(s) of junk before the %PDF- header");
+                if (badVersion) {
+                    // Copy the body without its header line, behind a valid one.
+                    java.io.ByteArrayOutputStream head = new java.io.ByteArrayOutputStream();
+                    byte[] buf = new byte[64];
+                    int n = in.read(buf);
+                    int eol = -1;
+                    if (n > 0) {
+                        for (int i = 0; i < n; i++) {
+                            if (buf[i] == '\n' || buf[i] == '\r') { eol = i; break; }
+                        }
+                    }
+                    os.write("%PDF-1.7\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                    if (eol >= 0) os.write(buf, eol + 1, n - eol - 1);
+                    else if (n > 0) os.write(buf, 0, n);
+                    copy(in, os);
+                    r.actions.add("replaced the invalid header version %PDF-" + declared
+                            + " with %PDF-1.7");
+                } else {
+                    copy(in, os);
+                }
+                if (skip > 0) {
+                    r.actions.add("removed " + skip + " byte(s) of junk before the %PDF- header");
+                }
             } else {
                 // A header can be rebuilt: every reader only uses it to pick a parser
                 // version, and the objects below it are untouched.
@@ -512,6 +542,37 @@ public final class PdfRepair {
             }
         }
         return work;
+    }
+
+    /** The version a header declares, or null. */
+    private static String headerVersion(File src, long offset) {
+        try (java.io.RandomAccessFile raf = new java.io.RandomAccessFile(src, "r")) {
+            raf.seek(offset);
+            byte[] b = new byte[16];
+            int n = raf.read(b);
+            if (n < 8) return null;
+            String s = new String(b, 0, n, java.nio.charset.StandardCharsets.ISO_8859_1);
+            if (!s.startsWith("%PDF-")) return null;
+            int end = 5;
+            while (end < s.length() && (Character.isDigit(s.charAt(end)) || s.charAt(end) == '.')) end++;
+            return s.substring(5, end);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /** True for a PDF version a reader will accept: 1.0 to 1.7, or 2.0. */
+    private static boolean validVersion(String v) {
+        try {
+            int dot = v.indexOf('.');
+            if (dot <= 0) return false;
+            int major = Integer.parseInt(v.substring(0, dot));
+            int minor = Integer.parseInt(v.substring(dot + 1));
+            if (major == 1) return minor >= 0 && minor <= 7;
+            return major == 2 && minor == 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /** One object header found in the raw bytes: its number, and what it says it is. */
@@ -727,6 +788,42 @@ public final class PdfRepair {
             int n;
             while ((n = in.read(buf)) > 0) os.write(buf, 0, n);
             return os.toByteArray();
+        }
+    }
+
+    /** The last /Prev offset a trailer names, or null. */
+    private static String prevTarget(File src) {
+        try {
+            byte[] b = readAll(src);
+            String s = new String(b, java.nio.charset.StandardCharsets.ISO_8859_1);
+            int at = s.lastIndexOf("/Prev");
+            if (at < 0) return null;
+            int i = at + 5;
+            while (i < s.length() && Character.isWhitespace(s.charAt(i))) i++;
+            int start = i;
+            while (i < s.length() && Character.isDigit(s.charAt(i))) i++;
+            return i > start ? s.substring(start, i) : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /** True when the given offset holds a cross-reference table or a cross-reference stream. */
+    private static boolean pointsAtXref(File src, String offset) {
+        try {
+            long at = Long.parseLong(offset);
+            if (at <= 0 || at >= src.length()) return false;
+            try (java.io.RandomAccessFile raf = new java.io.RandomAccessFile(src, "r")) {
+                raf.seek(at);
+                byte[] b = new byte[32];
+                int n = raf.read(b);
+                if (n <= 0) return false;
+                String head = new String(b, 0, n,
+                        java.nio.charset.StandardCharsets.ISO_8859_1).trim();
+                return head.startsWith("xref") || head.matches("\\d+\\s+\\d+\\s+obj.*");
+            }
+        } catch (Throwable t) {
+            return true;                     // unreadable is not evidence of damage
         }
     }
 
@@ -1666,6 +1763,14 @@ public final class PdfRepair {
         // A classic cross-reference table must be followed by a trailer dictionary. When it
         // is gone a reader still recovers, but the file is damaged and saying so is the
         // whole point of a diagnosis.
+        // An incremental update chains back through /Prev. If a link in that chain points at
+        // nothing, everything the later revision added - including metadata - is only as
+        // good as the older revision it can fall back to, and the user should be told.
+        String prev = prevTarget(file);
+        if (prev != null && !pointsAtXref(file, prev)) {
+            r.findings.add("the /Prev link points at " + prev
+                    + ", which is not a cross-reference section");
+        }
         if (!r.xrefStream && r.startxrefOk && !trailerPresent(file)) {
             r.findings.add("the trailer dictionary is missing");
         }
@@ -2104,6 +2209,58 @@ public final class PdfRepair {
             r.blankPages.addAll(blank);
             r.findings.add("page(s) " + join(blank)
                     + " name content that is not in the file - they come out blank");
+        }
+    }
+
+    /** The metadata fields a reader expects to find when they are there at all. */
+    private static final COSName[] CORE_INFO = {COSName.TITLE, COSName.AUTHOR,
+            COSName.SUBJECT, COSName.KEYWORDS, COSName.CREATOR, COSName.PRODUCER};
+
+    /**
+     * Restores metadata fields that a later revision of the file dropped.
+     *
+     * <p>A PDF can carry an incremental update that rewrites the Info dictionary. When that
+     * update is itself damaged, the parser settles on whichever revision it can read - and
+     * that one may be missing fields the original had. Title, author, subject and creator
+     * usually survive because the update repeats them; keywords are the first to go, because
+     * a metadata-only revision rarely bothers to repeat them.
+     *
+     * <p>Nothing is invented: a field is copied only when our dictionary does not have it and
+     * a plain read of the same file does. A healthy file pays nothing - the second read only
+     * happens when a core field is actually absent.
+     */
+    private static void preserveMetadata(PDDocument doc, File src, Report r) {
+        try {
+            PDDocumentInformation mine = doc.getDocumentInformation();
+            if (mine == null) return;
+            COSDictionary ours = mine.getCOSObject();
+            boolean missing = false;
+            for (COSName key : CORE_INFO) {
+                if (ours.getItem(key) == null) { missing = true; break; }
+            }
+            if (!missing) return;
+            // A file that carries no metadata at all is not a file that lost some. Only read
+            // it a second time when there is something to restore from - an empty dictionary
+            // in a file the repair found nothing wrong with means the document never had any.
+            if (ours.keySet().isEmpty() && r.findings.isEmpty()) return;
+
+            try (PDDocument plain = PDDocument.load(src)) {
+                PDDocumentInformation theirs = plain.getDocumentInformation();
+                if (theirs == null) return;
+                COSDictionary other = theirs.getCOSObject();
+                int added = 0;
+                for (COSName key : other.keySet()) {
+                    if (ours.getItem(key) == null && other.getItem(key) != null) {
+                        ours.setItem(key, other.getItem(key));
+                        added++;
+                    }
+                }
+                if (added > 0) {
+                    r.actions.add("restored " + added
+                            + " metadata field(s) the damaged revision had dropped");
+                }
+            }
+        } catch (Throwable ignored) {
         }
     }
 

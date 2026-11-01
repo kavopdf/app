@@ -1,5 +1,6 @@
 import com.kavopdf.app.engine.PdfRepair;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.pdmodel.PDDocumentInformation;
 import com.tom_roush.pdfbox.pdmodel.PDPage;
 import com.tom_roush.pdfbox.pdmodel.PDPageContentStream;
 import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
@@ -209,6 +210,58 @@ public class TestRepair {
                     t.contains("PAGE_1_MARKER") && t.contains("PAGE_3_MARKER"));
         }
 
+        System.out.println("== metadata survives a repair ==");
+        {
+            File meta = new File(W, "with_metadata.pdf");
+            try (PDDocument d = new PDDocument()) {
+                PDPage page = new PDPage(PDRectangle.A4);
+                d.addPage(page);
+                try (PDPageContentStream cs = new PDPageContentStream(d, page)) {
+                    cs.beginText();
+                    cs.setFont(PDType1Font.HELVETICA, 12);
+                    cs.newLineAtOffset(60, 700);
+                    cs.showText("metadata fixture page");
+                    cs.endText();
+                }
+                PDDocumentInformation info = new PDDocumentInformation();
+                info.setTitle("Metadata Title");
+                info.setAuthor("Metadata Author");
+                info.setSubject("Metadata Subject");
+                info.setKeywords("alpha; beta; gamma");
+                info.setCreator("Metadata Creator");
+                d.setDocumentInformation(info);
+                d.save(meta);
+            }
+            // Damage the container so the repair actually rebuilds something.
+            byte[] broken = Files.readAllBytes(meta.toPath());
+            File bad = write("with_metadata_bad_startxref.pdf", corruptStartxref(broken));
+            File out = new File(W, "repaired_metadata.pdf");
+            PdfRepair.Report r = PdfRepair.repair(bad, "", out);
+            check("metadata: repaired", r.readable && r.verified);
+            try (PDDocument d = PDDocument.load(out)) {
+                PDDocumentInformation info = d.getDocumentInformation();
+                check("metadata: title kept", "Metadata Title".equals(info.getTitle()));
+                check("metadata: author kept", "Metadata Author".equals(info.getAuthor()));
+                check("metadata: subject kept", "Metadata Subject".equals(info.getSubject()));
+                check("metadata: keywords kept", "alpha; beta; gamma".equals(info.getKeywords()));
+                check("metadata: creator kept", "Metadata Creator".equals(info.getCreator()));
+            }
+        }
+
+        System.out.println("== an impossible PDF version is not passed through ==");
+        {
+            String text = new String(original, StandardCharsets.ISO_8859_1);
+            String withBadVersion = text.replaceFirst("%PDF-[0-9.]+", "%PDF-9.9");
+            File bad = write("bad_version.pdf", withBadVersion.getBytes(StandardCharsets.ISO_8859_1));
+            File out = new File(W, "repaired_version.pdf");
+            PdfRepair.Report r = PdfRepair.repair(bad, "", out);
+            check("version: repaired", r.readable && r.verified);
+            String head = new String(Files.readAllBytes(out.toPath()), 0, 8,
+                    StandardCharsets.ISO_8859_1);
+            check("version: the header is a published version, not %PDF-9.9",
+                    !head.startsWith("%PDF-9.9") && head.startsWith("%PDF-1."));
+        }
+
         System.out.println("== text containing operator letters is not mistaken for damage ==");
         {
             // "q", "Q", "BT" and "ET" inside a string are just letters. A page whose caption
@@ -311,6 +364,20 @@ public class TestRepair {
     }
 
     /** Points one page at a content object that does not exist. */
+    /** Points startxref at an offset that holds no cross-reference table. */
+    static byte[] corruptStartxref(byte[] src) {
+        String s = new String(src, StandardCharsets.ISO_8859_1);
+        int at = s.lastIndexOf("startxref");
+        if (at < 0) return src;
+        int numStart = at + 9;
+        while (numStart < s.length() && Character.isWhitespace(s.charAt(numStart))) numStart++;
+        int numEnd = numStart;
+        while (numEnd < s.length() && Character.isDigit(s.charAt(numEnd))) numEnd++;
+        if (numEnd <= numStart) return src;
+        return (s.substring(0, numStart) + "999999" + s.substring(numEnd))
+                .getBytes(StandardCharsets.ISO_8859_1);
+    }
+
     static byte[] breakPageContent(byte[] src, int objNum) {
         String s = new String(src, StandardCharsets.ISO_8859_1);
         return s.replace("/Contents " + objNum + " 0 R", "/Contents 0 0 R")
