@@ -94,6 +94,12 @@ jobs:
       - name: Guard - every tool has a heading
         run: python3 tools/check-tool-titles.py
 
+      - name: Guard - nothing inside a save producer touches the UI
+        run: python3 tools/check-main-thread.py
+
+      - name: Guard - PDF to Word keeps its extraction stages and wiring
+        run: python3 tools/check-pdf2word.py
+
       - name: Guard - no unexpected permissions
         run: |
           python3 -m pip install --quiet pyaxmlparser

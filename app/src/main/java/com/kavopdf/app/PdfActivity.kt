@@ -90,6 +90,7 @@ abstract class PdfActivity : AppCompatActivity() {
 
     /** Writes the produced file to the document the user picked. */
     private fun finishSave(uri: Uri?) {
+        failureLogged = false
         val producer = pendingProducer
         pendingProducer = null
         if (uri == null || producer == null) return
@@ -107,6 +108,7 @@ abstract class PdfActivity : AppCompatActivity() {
                 out
             } catch (t: Throwable) {
                 com.kavopdf.app.util.CrashGuard.problem(this, taskName, t)
+                failureLogged = true
                 // The picker has already created an empty document. Leaving it behind means a
                 // 0-byte file in the user's folder that looks like a result but is not one.
                 runCatching { contentResolver.delete(uri, null, null) }
@@ -348,7 +350,9 @@ abstract class PdfActivity : AppCompatActivity() {
                     ) { block() }
                 }
             } catch (t: Throwable) {
-                AppLog.problem(applicationContext, "Failed", t)
+                // The producer already recorded this failure with its breadcrumbs. Recording it
+                // again under a second name put the same crash in the log twice.
+                if (!failureLogged) AppLog.problem(applicationContext, "Failed", t)
                 toast(getString(R.string.msg_could_not_read))
                 null
             }

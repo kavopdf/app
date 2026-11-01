@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The list that drops out of a spinner: rounded, like everything else. -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="@color/surface" />
-    <corners android:radius="20dp" />
-    <padding android:left="6dp" android:top="6dp" android:right="6dp" android:bottom="6dp" />
-</shape>
+<!-- The list that drops out of a spinner: rounded, like everything else.
+
+     The card is inset from the popup window rather than filling it. A popup window is always
+     a rectangle, so a rounded shape filling it leaves the window's own square corners showing
+     behind - which is why this list looked square while every other surface was round. With
+     the card inset, the corners the user sees are the card's. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="6dp"
+    android:insetTop="6dp"
+    android:insetRight="6dp"
+    android:insetBottom="6dp">
+    <shape android:shape="rectangle">
+        <solid android:color="@color/surface" />
+        <corners android:radius="18dp" />
+        <padding
+            android:left="4dp"
+            android:top="4dp"
+            android:right="4dp"
+            android:bottom="4dp" />
+    </shape>
+</inset>

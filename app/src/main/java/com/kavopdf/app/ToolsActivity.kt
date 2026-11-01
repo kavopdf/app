@@ -459,13 +459,6 @@ class ToolsActivity : PdfActivity() {
     /**
      * OCR for pages that hold no text layer.
      *
-     * <p>Rendering and recognition both need the Android framework, so they live here and the
-     * engine only sees a string. Each page is rendered once, recognised once, and the renderer
-     * is closed even when a page throws - a leaked renderer holds the file open.
-     */
-    /**
-     * OCR for pages that hold no text layer.
-     *
      * <p>One renderer is opened for the whole conversion and closed afterwards - opening it per
      * page meant reopening the file and re-parsing the page tree for every scanned page.
      *
@@ -581,7 +574,11 @@ class ToolsActivity : PdfActivity() {
                     wordReport = result.report
                     // Say what happened, including what could not be done. A conversion that
                     // silently dropped a table or a scanned page is worse than one that says so.
-                    toast(wordSummary(result.report))
+                    // Posted, because this block runs on a worker thread and a toast needs the
+                    // main looper - calling it here crashed with "Can't toast on a thread that
+                    // has not called Looper.prepare()".
+                    val summary = wordSummary(result.report)
+                    runOnUiThread { if (!isFinishing && !isDestroyed) toast(summary) }
                 }
             }
             Action.REPAIR -> {
