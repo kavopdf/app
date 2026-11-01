@@ -494,7 +494,7 @@ public final class PdfToWord {
             sb.append(g.text);
             prev = g;
         }
-        return sb.toString();
+        return logicalOrder(sb.toString());
     }
 
 
@@ -1402,6 +1402,50 @@ public final class PdfToWord {
             }
         }
         return merged;
+    }
+
+
+    /** True for the characters Arabic, Hebrew, Syriac and the presentation forms use. */
+    private static boolean isRtl(char c) {
+        // Digits are numbers, not letters: ١٢٠ is 120 and must not be mirrored into ٠٢١.
+        if ((c >= 0x0660 && c <= 0x0669) || (c >= 0x06F0 && c <= 0x06F9)) return false;
+        return (c >= 0x0590 && c <= 0x05FF)      // Hebrew
+                || (c >= 0x0600 && c <= 0x06FF)  // Arabic
+                || (c >= 0x0700 && c <= 0x074F)  // Syriac
+                || (c >= 0x0750 && c <= 0x077F)  // Arabic supplement
+                || (c >= 0x08A0 && c <= 0x08FF)  // Arabic extended-A
+                || (c >= 0xFB1D && c <= 0xFDFF)  // Hebrew/Arabic presentation
+                || (c >= 0xFE70 && c <= 0xFEFF); // Arabic presentation-B
+    }
+
+    /**
+     * A right-to-left line comes out of the PDF in visual order - the last letter first - which
+     * reads as mirror writing. Reversing the whole line gives logical order, and each run of
+     * Latin letters or digits is then turned back so numbers still read left to right.
+     */
+    private static String logicalOrder(String text) {
+        int rtl = 0, ltr = 0;
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (isRtl(c)) rtl++;
+            else if (Character.isLetter(c)) ltr++;
+        }
+        if (rtl <= ltr || rtl == 0) return text;          // not an RTL line
+
+        StringBuilder sb = new StringBuilder(text).reverse();
+        int i = 0;
+        while (i < sb.length()) {
+            if (isRtl(sb.charAt(i))) { i++; continue; }
+            int j = i;
+            while (j < sb.length() && !isRtl(sb.charAt(j))) j++;
+            // a run of non-RTL characters: reverse it back so "2024" stays "2024"
+            String run = sb.substring(i, j);
+            if (run.trim().length() > 0) {
+                sb.replace(i, j, new StringBuilder(run).reverse().toString());
+            }
+            i = j;
+        }
+        return sb.toString();
     }
 
     /** Index of the band a coordinate falls in, or -1. */
