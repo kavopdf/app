@@ -26,7 +26,7 @@
     <string name="tool_watermark">Watermark</string>
     <string name="tool_watermark_desc">Stamp text over every page — centre or random spot</string>
     <string name="tool_protect">Protect PDF</string>
-    <string name="tool_protect_desc">Add a password and permissions</string>
+    <string name="tool_protect_desc">Add a password to open it</string>
     <string name="tool_unlock">Unlock PDF</string>
     <string name="tool_unlock_desc">Remove a known password</string>
     <string name="tool_metadata">Edit metadata</string>
@@ -219,12 +219,6 @@
     <string name="redact_clear_page">Clear page</string>
     <string name="redact_apply">Redact &amp; save</string>
     <string name="redact_need_boxes">Mark at least one area to hide</string>
-    <string-array name="perm_choices">
-        <item>View only — no printing, no copying</item>
-        <item>View and print</item>
-        <item>View, print and copy text</item>
-        <item>Everything — also allow editing</item>
-    </string-array>
     <string name="pw_too_short">Use at least 6 characters</string>
     <string name="pw_weak">That password is easy to guess — a longer one protects better</string>
     <string name="tool_bookmarks">Bookmarks</string>
