@@ -921,6 +921,111 @@ public final class PdfRepair {
      * correct cross-reference table and trailer. Whatever is broken inside a body is that
      * object's problem, and the page walk will say so.
      */
+    /**
+     * Reads the objects packed inside compressed object streams.
+     *
+     * <p>A PDF 1.5+ file can put its objects inside /Type /ObjStm streams and index them from
+     * the cross-reference. Destroy the xref and those objects are unreachable by any parser -
+     * they are not top-level "N 0 obj" blocks, so a byte scan finds nothing. But the stream
+     * payload is intact, and the pair table at its start says where each object begins.
+     *
+     * <p>Rules that matter here: the table starts at byte 0 (a /First of 0 is a lie, not a
+     * layout), /N is bounded by how many pairs actually fit before /First, and an /Extends
+     * that points at its own stream must not be followed twice.
+     */
+    private static java.util.LinkedHashMap<Integer, byte[]> extractObjectStreams(byte[] b) {
+        java.util.LinkedHashMap<Integer, byte[]> out = new java.util.LinkedHashMap<>();
+        List<int[]> spans = new ArrayList<>();
+        List<byte[]> bodies = new ArrayList<>();
+        List<String> heads = new ArrayList<>();
+        scanAllStreams(b, spans, bodies, heads);
+        for (int i = 0; i < spans.size(); i++) {
+            String head = heads.get(i);
+            if (!head.contains("/ObjStm")) continue;
+            byte[] data = decodeStreamBody(head, bodies.get(i));
+            if (data == null || data.length == 0) continue;
+            int declared = intFrom(head, "/N");
+            int first = intFrom(head, "/First");
+            if (first <= 0 || first > data.length) first = data.length;
+            String table = new String(data, 0, Math.min(first, data.length),
+                    java.nio.charset.StandardCharsets.ISO_8859_1);
+            String[] parts = table.trim().split("\\s+");
+            int pairs = parts.length / 2;
+            if (declared > 0 && declared < pairs) pairs = declared;   // /N cannot add objects
+            for (int p = 0; p < pairs; p++) {
+                int num, off;
+                try {
+                    num = Integer.parseInt(parts[2 * p]);
+                    off = Integer.parseInt(parts[2 * p + 1]);
+                } catch (Exception e) { break; }
+                int start = first + off;
+                if (start < 0 || start >= data.length) continue;
+                int end = data.length;
+                if (p + 1 < pairs) {
+                    try {
+                        end = first + Integer.parseInt(parts[2 * (p + 1) + 1]);
+                    } catch (Exception ignored) { }
+                }
+                if (end > data.length) end = data.length;
+                if (end <= start) continue;
+                byte[] body = new byte[end - start];
+                System.arraycopy(data, start, body, 0, body.length);
+                if (!out.containsKey(num)) out.put(num, body);
+            }
+        }
+        return out;
+    }
+
+    /** Every stream object, including the ones carrying a /Type (object streams do). */
+    private static void scanAllStreams(byte[] b, List<int[]> spans, List<byte[]> bodies,
+                                       List<String> heads) {
+        byte[] objTok = " obj".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+        byte[] streamTok = "stream".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+        byte[] endTok = "endstream".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+        int i = 0;
+        while (true) {
+            int at = indexOf(b, objTok, i);
+            if (at < 0) return;
+            int j = at - 1;
+            while (j >= 0 && isSpace(b[j])) j--;
+            int numEnd = j + 1;
+            while (j >= 0 && b[j] >= '0' && b[j] <= '9') j--;
+            int numStart = j + 1;
+            i = at + objTok.length;
+            if (numEnd <= numStart) continue;
+            int number;
+            try {
+                number = Integer.parseInt(new String(b, numStart, numEnd - numStart,
+                        java.nio.charset.StandardCharsets.ISO_8859_1));
+            } catch (Exception e) { continue; }
+            int streamAt = indexOf(b, streamTok, i);
+            if (streamAt < 0) return;
+            int bodyStart = streamAt + streamTok.length;
+            if (bodyStart < b.length && b[bodyStart] == '\r') bodyStart++;
+            if (bodyStart < b.length && b[bodyStart] == '\n') bodyStart++;
+            int bodyEnd = indexOf(b, endTok, bodyStart);
+            if (bodyEnd < 0) { i = bodyStart; continue; }
+            byte[] body = new byte[bodyEnd - bodyStart];
+            System.arraycopy(b, bodyStart, body, 0, body.length);
+            spans.add(new int[]{number, bodyStart, bodyEnd});
+            bodies.add(body);
+            heads.add(new String(b, i, Math.min(streamAt - i, 4096),
+                    java.nio.charset.StandardCharsets.ISO_8859_1));
+            i = bodyEnd + endTok.length;
+        }
+    }
+
+    private static int intFrom(String head, String key) {
+        int at = head.indexOf(key);
+        if (at < 0) return -1;
+        int i = at + key.length();
+        while (i < head.length() && (head.charAt(i) == ' ' || head.charAt(i) == '/')) i++;
+        StringBuilder sb = new StringBuilder();
+        while (i < head.length() && Character.isDigit(head.charAt(i))) sb.append(head.charAt(i++));
+        if (sb.length() == 0) return -1;
+        try { return Integer.parseInt(sb.toString()); } catch (Exception e) { return -1; }
+    }
+
     private static File salvageObjects(File src, File outFile, Report r) {
         if (src.length() > 16L * 1024 * 1024L) return null;
         byte[] b;
@@ -967,20 +1072,29 @@ public final class PdfRepair {
             }
             at = bodyEnd + 1;
         }
-        if (found.size() < 2) return null;
-
         // One body per number: the last definition in a file is the one a reader would use.
         java.util.LinkedHashMap<Integer, int[]> byNumber = new java.util.LinkedHashMap<>();
         for (int[] o : found) byNumber.put(o[0], o);
+        List<Integer> keepExtra = new ArrayList<>();
 
+        // Objects packed inside compressed object streams are not top-level blocks, so the
+        // scan above cannot see them. They are read out of their containers here.
+        java.util.LinkedHashMap<Integer, byte[]> packed = extractObjectStreams(b);
+        for (Integer number : packed.keySet()) {
+            if (!byNumber.containsKey(number)) keepExtra.add(number);
+        }
+        // A PDF 1.5+ file can keep everything inside object streams, leaving one or two
+        // top-level blocks. Refusing on a top-level count would throw those away.
+        if (found.size() < 2 && packed.isEmpty()) return null;
         List<Integer> keep = new ArrayList<>(byNumber.keySet());
+        keep.addAll(keepExtra);
 
         // One broken body must not sink the whole salvage. The parser names the byte offset
         // it choked on, so that object is dropped and the file is rebuilt without it - and
         // again, until it parses or nothing is left worth writing.
         for (int attempt = 0; attempt < 16 && keep.size() >= 2; attempt++) {
             List<int[]> spans = new ArrayList<>();          // {objectNumber, start, end}
-            File built = buildLifted(b, byNumber, keep, outFile, spans, r);
+            File built = buildLifted(b, byNumber, packed, keep, outFile, spans, r);
             if (built == null) return null;
             try {
                 PDDocument check = parse(built, "", true, 64 * 1024);
@@ -1001,6 +1115,7 @@ public final class PdfRepair {
 
     /** Writes the kept objects into a fresh, correctly cross-referenced file. */
     private static File buildLifted(byte[] b, java.util.LinkedHashMap<Integer, int[]> byNumber,
+                                    java.util.LinkedHashMap<Integer, byte[]> packed,
                                     List<Integer> keep, File outFile, List<int[]> spans, Report r) {
         boolean hasCatalog = false;
         int catalogObject = -1;
@@ -1010,13 +1125,19 @@ public final class PdfRepair {
         for (int number : keep) {
             maxNumber = Math.max(maxNumber, number);
             int[] o = byNumber.get(number);
-            if (o == null) continue;
-            String head = new String(b, o[1], Math.min(o[2] - o[1], 4096),
-                    java.nio.charset.StandardCharsets.ISO_8859_1);
+            String head;
+            if (o != null) {
+                head = new String(b, o[1], Math.min(o[2] - o[1], 4096),
+                        java.nio.charset.StandardCharsets.ISO_8859_1);
+            } else if (packed.get(number) != null) {
+                byte[] pb = packed.get(number);
+                head = new String(pb, 0, Math.min(pb.length, 4096),
+                        java.nio.charset.StandardCharsets.ISO_8859_1);
+            } else continue;
             if (head.contains("/Type /Catalog")) {
                 hasCatalog = true;
                 catalogObject = number;
-                catalogPagesTarget = pagesTargetIn(b, o[1], o[2]);
+                catalogPagesTarget = o == null ? -1 : pagesTargetIn(b, o[1], o[2]);
             } else if (head.contains("/Type /Page") && !head.contains("/Type /Pages")) {
                 pageObjects.add(number);
             }
@@ -1044,13 +1165,18 @@ public final class PdfRepair {
             int newPagesNumber = needPagesNode ? pagesNumber : catalogPagesTarget;
             for (int number : keep) {
                 int[] o = byNumber.get(number);
-                if (o == null) continue;
+                byte[] packedBody = o == null ? packed.get(number) : null;
+                if (o == null && packedBody == null) continue;
                 int startAt = os.size();
                 os.write((number + " 0 obj\n").getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
-                if (needPagesNode && number == catalogObject) {
+                if (o == null && needPagesNode && number == catalogObject) {
+                    os.write(repointPages(packedBody, newPagesNumber));
+                } else if (o != null && needPagesNode && number == catalogObject) {
                     os.write(repointPages(b, o[1], o[2], newPagesNumber));
-                } else {
+                } else if (o != null) {
                     os.write(b, o[1], o[2] - o[1]);
+                } else {
+                    os.write(packedBody);
                 }
                 os.write("\nendobj\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
                 spans.add(new int[]{number, startAt, os.size()});
@@ -1152,14 +1278,22 @@ public final class PdfRepair {
             java.util.Set<Integer> used = new java.util.HashSet<>();
             for (int i = 0; i < pages; i++) {
                 PDPage p = doc.getPage(i);
-                if (p.getCOSObject().getDictionaryObject(COSName.CONTENTS) == null) empty.add(i);
-                else collectContentNumbers(p.getCOSObject().getDictionaryObject(COSName.CONTENTS), used);
+                COSBase declared = p.getCOSObject().getItem(COSName.CONTENTS);
+                if (declared == null) {
+                    // The link is gone: the page never names a stream. This is the orphan case.
+                    empty.add(i);
+                } else {
+                    collectContentNumbers(p.getCOSObject().getDictionaryObject(COSName.CONTENTS), used);
+                }
+                // A page that DOES name a stream which resolves to nothing is a different
+                // fault - its content is gone, not misplaced - and it is never adopted.
             }
-            // Only when the document lost the link from every page at once. One empty page
-            // in an otherwise healthy file is a page whose content is gone, and attaching
-            // some other unreferenced stream to it would invent content that never belonged
-            // there.
-            if (empty.isEmpty() || empty.size() != pages) return;
+            // Some pages may have lost their link while others kept theirs - a partial
+            // orphan case. Adoption is allowed then too, but only on positive evidence: the
+            // stream must name a resource that the page actually offers. Without that match
+            // nothing is attached, so a page whose content is genuinely gone is never handed
+            // someone else's content.
+            if (empty.isEmpty()) return;
 
             // The orphan pool is built from the bytes, not from the cross-reference: the whole
             // fault is that these streams never entered the object pool the parser built.
@@ -1208,7 +1342,9 @@ public final class PdfRepair {
                     System.out.println("    [dbg] cand " + c + " len=" + cand.get(c).length
                             + " names=" + names + " ops=" + ops + " best=" + bestPage
                             + " score=" + bestScore);
-                if (bestPage >= 0 && bestScore > 0) {
+                int overlapBest = bestScore > 0 ? (bestScore + Math.abs(ops - 8)) / 100 : 0;
+                boolean strong = empty.size() == pages || overlapBest > 0;
+                if (bestPage >= 0 && bestScore > 0 && strong) {
                     PDPage p = doc.getPage(bestPage);
                     if (p.getCOSObject().getDictionaryObject(COSName.CONTENTS) == null) {
                         p.setContents(new PDStream(doc,
@@ -1395,6 +1531,17 @@ public final class PdfRepair {
         while (i < to && b[i] >= '0' && b[i] <= '9') digits.append((char) b[i++]);
         if (digits.length() == 0) return -1;
         try { return Integer.parseInt(digits.toString()); } catch (Exception e) { return -1; }
+    }
+
+    /** The same repointing, for a catalog that came out of an object stream. */
+    private static byte[] repointPages(byte[] body, int newNumber) {
+        String text = new String(body, java.nio.charset.StandardCharsets.ISO_8859_1);
+        String replaced = text.replaceFirst("/Pages\\s+\\d+\\s+\\d+\\s+R",
+                "/Pages " + newNumber + " 0 R");
+        if (replaced.equals(text)) {
+            replaced = text.replaceFirst("/Pages\\b", "/Pages " + newNumber + " 0 R ");
+        }
+        return replaced.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
     }
 
     /** A copy of a catalog body whose /Pages entry points somewhere else. */
@@ -1637,8 +1784,10 @@ public final class PdfRepair {
                         broken++;
                         r.lostPages.add(i + 1);
                     }
-                } else if (paintsPartially(page)) {
-                    // Some of it drew, then it stopped: partial, not blank and not whole.
+                } else if (paintsPartially(page) || drawsBrokenResource(page)
+                        || unbalancedContent(page)) {
+                    // Some of it drew, then it stopped - or it draws a resource that cannot
+                    // be read. Either way part of the page never appears: partial, not whole.
                     r.partialPages.add(i + 1);
                 } else if (!paintsSomething(check, page)) {
                     // Reopened, but draws nothing: blank, and said so.
@@ -1770,6 +1919,88 @@ public final class PdfRepair {
             return false;
         } catch (Throwable t) {
             return false;
+        }
+    }
+
+    /**
+     * True when the page draws a resource that cannot be read.
+     *
+     * <p>A truncated image, a font object that is gone, an XObject whose stream will not
+     * inflate: the content stream still parses, so "the page reopened" passes while part of
+     * the page never appears. That is a partial page, not a complete one.
+     */
+    private static boolean drawsBrokenResource(PDPage page) {
+        try {
+            PDResources res = page.getResources();
+            if (res == null) return false;
+            String content;
+            try {
+                java.io.InputStream in = page.getContents();
+                if (in == null) return false;
+                content = new String(com.tom_roush.pdfbox.io.IOUtils.toByteArray(in),
+                        java.nio.charset.StandardCharsets.ISO_8859_1);
+            } catch (Throwable t) {
+                return true;                    // the stream itself will not decode
+            }
+            for (COSName name : res.getXObjectNames()) {
+                if (!content.contains("/" + name.getName())) continue;
+                try {
+                    PDXObject xo = res.getXObject(name);
+                    if (xo == null) return true;
+                    xo.getStream().createInputStream().close();
+                } catch (Throwable t) {
+                    return true;
+                }
+            }
+            for (COSName name : res.getFontNames()) {
+                if (!content.contains("/" + name.getName())) continue;
+                try {
+                    if (res.getFont(name) == null) return true;
+                } catch (Throwable t) {
+                    return true;
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return false;
+    }
+
+    /**
+     * True when the content stream stops without closing what it opened.
+     *
+     * <p>A page's content brackets its work: q ... Q saves and restores state, BT ... ET
+     * wraps text. A stream cut short leaves those unbalanced even though it still parses
+     * cleanly - the page draws the part that survived and nothing says so. This is the only
+     * signal available without rendering, and it is a reliable one: a complete stream
+     * balances its own brackets.
+     */
+    private static boolean unbalancedContent(PDPage page) {
+        try {
+            java.io.InputStream in = page.getContents();
+            if (in == null) return false;
+            String content = new String(com.tom_roush.pdfbox.io.IOUtils.toByteArray(in),
+                    java.nio.charset.StandardCharsets.ISO_8859_1);
+            int q = 0, Q = 0, bt = 0, et = 0;
+            int i = 0;
+            int n = content.length();
+            while (i < n) {
+                char ch = content.charAt(i);
+                if (!Character.isLetter(ch)) { i++; continue; }
+                int j = i;
+                while (j < n && Character.isLetter(content.charAt(j))) j++;
+                String tok = content.substring(i, j);
+                boolean wordStart = i == 0 || !Character.isLetterOrDigit(content.charAt(i - 1));
+                if (wordStart) {
+                    if (tok.equals("q")) q++;
+                    else if (tok.equals("Q")) Q++;
+                    else if (tok.equals("BT")) bt++;
+                    else if (tok.equals("ET")) et++;
+                }
+                i = j;
+            }
+            return q != Q || bt != et;
+        } catch (Throwable t) {
+            return true;
         }
     }
 
