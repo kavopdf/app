@@ -73,6 +73,7 @@ public final class PdfToWord {
         public int indent;           // list nesting depth, 0 = none
         public String bullet;        // "•", "1.", "-" or null
         public float top;            // y of the first line, for ordering
+        public float left, right;    // horizontal extent, for the layout cut
         public int column;           // which column band it sits in
         public int lines;            // how many visual lines the paragraph wraps to
 
@@ -249,36 +250,36 @@ public final class PdfToWord {
         for (Table t : tables) ordered.add(t);
         for (Para p : paras) ordered.add(p);
 
-        // A page of two tall text columns reads down one and then the other. A page of four
-        // short boxes reads left to right, then down. The difference is whether the bands
-        // hold a column of text or just a box, so it is counted, not guessed.
-        // Wrapped text means a column of prose; single-line items side by side mean a grid of
-        // boxes. That is the real difference between "read down, then across" and "read
-        // across, then down" - counting paragraphs got both cases wrong.
-        boolean wrapped = false;
-        for (Para p : paras) if (p.lines >= 2) wrapped = true;
-        final boolean rowMajor = bands > 1 && !wrapped;
-        Collections.sort(ordered, new Comparator<Object>() {
+        // Reading order by recursive whitespace cut (the XY-cut of pdfminer.six, MIT), not by
+        // column index. Sorting by column is what put a question paper's questions out of
+        // order: the gap after "1a." looked like a column boundary.
+        // The cut is applied to the prose, not to the tables: a table is one block with its own
+        // internal order, and letting the cut move it away from its heading broke documents
+        // that were right. Tables keep their place by vertical position; the prose around them
+        // is cut so a two- or three-column page reads down one column and then the next.
+        List<Object> prose = new ArrayList<>();
+        for (Object o : ordered) if (o instanceof Para) prose.add(o);
+        List<Object> cut = new ArrayList<>();
+        // Only a page that actually has columns needs the cut. On a single-column page the old
+        // top-to-bottom order is already right, and cutting there separated a heading from the
+        // line under it.
+        if (bands > 1) xyCut(prose, cut, 8f); else cut.addAll(prose);
+        List<Object> reordered = new ArrayList<>();
+        List<Table> pending = new ArrayList<>();
+        for (Object o : ordered) if (o instanceof Table) pending.add((Table) o);
+        Collections.sort(pending, new Comparator<Table>() {
             @Override
-            public int compare(Object a, Object b) {
-                if (rowMajor) {
-                    int c = Float.compare(topOf(a), topOf(b));
-                    if (Math.abs(topOf(a) - topOf(b)) > 6f) return c;
-                    return columnOf(a) - columnOf(b);
-                }
-                int ca = columnOf(a), cb = columnOf(b);
-                if (ca != cb) return ca - cb;
-                return Float.compare(topOf(a), topOf(b));
-            }
+            public int compare(Table a, Table b) { return Float.compare(a.top, b.top); }
         });
-        Collections.sort(ordered, new Comparator<Object>() {
-            @Override
-            public int compare(Object a, Object b) {
-                int ca = columnOf(a), cb = columnOf(b);
-                if (ca != cb) return ca - cb;
-                return Float.compare(topOf(a), topOf(b));
+        int ti = 0;
+        for (Object o : cut) {
+            while (ti < pending.size() && pending.get(ti).top <= topOf(o)) {
+                reordered.add(pending.get(ti++));
             }
-        });
+            reordered.add(o);
+        }
+        while (ti < pending.size()) reordered.add(pending.get(ti++));
+        ordered = reordered;
 
         for (Object o : ordered) {
             page.blocks.add(o);
@@ -526,6 +527,114 @@ public final class PdfToWord {
         return false;
     }
 
+
+    /**
+     * Reading order by recursive whitespace cut - the XY-cut of pdfminer.six (MIT).
+     *
+     * <p>Two columns are not "column index then y": that is what put a question paper's
+     * questions out of order. A page is cut at its widest empty strip, each half is cut again,
+     * and the pieces come out in the order a reader takes them - down a column, then the next.
+     */
+    private static void xyCut(List<Object> items, List<Object> out, float minGap) {
+        if (items.size() <= 1) {
+            out.addAll(items);
+            return;
+        }
+        // widest vertical gap (a column boundary)
+        List<Object> byX = new ArrayList<>(items);
+        Collections.sort(byX, new Comparator<Object>() {
+            @Override
+            public int compare(Object a, Object b) { return Float.compare(leftOf(a), leftOf(b)); }
+        });
+        float bestV = 0f;
+        int bestVi = -1;
+        float runRight = rightOf(byX.get(0));
+        for (int i = 1; i < byX.size(); i++) {
+            float gap = leftOf(byX.get(i)) - runRight;
+            if (gap > bestV) { bestV = gap; bestVi = i; }
+            runRight = Math.max(runRight, rightOf(byX.get(i)));
+        }
+        // widest horizontal gap (a block boundary)
+        List<Object> byY = new ArrayList<>(items);
+        Collections.sort(byY, new Comparator<Object>() {
+            @Override
+            public int compare(Object a, Object b) { return Float.compare(topOf(a), topOf(b)); }
+        });
+        float bestH = 0f;
+        int bestHi = -1;
+        float runBottom = bottomOf(byY.get(0));
+        for (int i = 1; i < byY.size(); i++) {
+            float gap = topOf(byY.get(i)) - runBottom;
+            if (gap > bestH) { bestH = gap; bestHi = i; }
+            runBottom = Math.max(runBottom, bottomOf(byY.get(i)));
+        }
+
+        // A cut is only a cut if the two sides sit beside each other. Two blocks stacked one
+        // above the other can have disjoint x-ranges and would look like a column boundary;
+        // cutting there swapped a heading with the line under it. The sides must overlap on the
+        // other axis for the cut to mean anything.
+        boolean vValid = false, hValid = false;
+        if (bestVi > 0) {
+            float aTop = Float.MAX_VALUE, aBot = -Float.MAX_VALUE;
+            for (int i = 0; i < bestVi; i++) {
+                aTop = Math.min(aTop, topOf(byX.get(i)));
+                aBot = Math.max(aBot, bottomOf(byX.get(i)));
+            }
+            float bTop = Float.MAX_VALUE, bBot = -Float.MAX_VALUE;
+            for (int i = bestVi; i < byX.size(); i++) {
+                bTop = Math.min(bTop, topOf(byX.get(i)));
+                bBot = Math.max(bBot, bottomOf(byX.get(i)));
+            }
+            float overlap = Math.min(aBot, bBot) - Math.max(aTop, bTop);
+            float smaller = Math.min(aBot - aTop, bBot - bTop);
+            vValid = smaller <= 0 || overlap >= smaller * 0.3f;
+        }
+        if (bestHi > 0) {
+            float aL = Float.MAX_VALUE, aR = -Float.MAX_VALUE;
+            for (int i = 0; i < bestHi; i++) {
+                aL = Math.min(aL, leftOf(byY.get(i)));
+                aR = Math.max(aR, rightOf(byY.get(i)));
+            }
+            float bL = Float.MAX_VALUE, bR = -Float.MAX_VALUE;
+            for (int i = bestHi; i < byY.size(); i++) {
+                bL = Math.min(bL, leftOf(byY.get(i)));
+                bR = Math.max(bR, rightOf(byY.get(i)));
+            }
+            float overlap = Math.min(aR, bR) - Math.max(aL, bL);
+            float smaller = Math.min(aR - aL, bR - bL);
+            hValid = smaller <= 0 || overlap >= smaller * 0.3f;
+        }
+
+        // Prefer the column cut: a page is more often read down a column than split across.
+        // A horizontal cut needs a clearly wider gap, or it separates a paragraph from its own
+        // next line and the text comes out in the wrong order.
+        float horizontalFloor = minGap * 1.6f;
+        boolean cutVertically = vValid && bestV >= minGap && bestVi > 0
+                && (bestH < horizontalFloor || bestV >= bestH || !hValid);
+        if (cutVertically) {
+            xyCut(new ArrayList<>(byX.subList(0, bestVi)), out, minGap);   // left first
+            xyCut(new ArrayList<>(byX.subList(bestVi, byX.size())), out, minGap);
+        } else if (hValid && bestH >= horizontalFloor && bestHi > 0) {
+            xyCut(new ArrayList<>(byY.subList(0, bestHi)), out, minGap);   // top first
+            xyCut(new ArrayList<>(byY.subList(bestHi, byY.size())), out, minGap);
+        } else {
+            // nothing to cut: read down, then across
+            out.addAll(byY);
+        }
+    }
+
+    private static float leftOf(Object o) {
+        return o instanceof Para ? ((Para) o).left : ((Table) o).left;
+    }
+
+    private static float rightOf(Object o) {
+        return o instanceof Para ? ((Para) o).right : ((Table) o).right;
+    }
+
+    private static float bottomOf(Object o) {
+        return o instanceof Para ? ((Para) o).top : ((Table) o).bottom;
+    }
+
     private static List<Float> columnStarts(List<Line> lines) {
         List<Float> candidates = new ArrayList<>();
         for (Line line : lines) {
@@ -712,7 +821,11 @@ public final class PdfToWord {
     }
 
     private static Para buildPara(List<Line> group, float pageWidth, int bands) {
+        float l = Float.MAX_VALUE, r = -Float.MAX_VALUE;
+        for (Line ln : group) { l = Math.min(l, ln.x); r = Math.max(r, ln.right); }
         Para p = new Para();
+        p.left = l;
+        p.right = r;
         p.top = group.get(0).y;
         p.column = group.get(0).column;
 
