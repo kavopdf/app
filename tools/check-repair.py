@@ -157,7 +157,7 @@ else:
 # ---- 6) the stress fixtures are in the repo and wired into the suite ------------
 fixdir = pathlib.Path("tools/engine-verify/fixtures/repair")
 fixtures = sorted(fixdir.glob("*.pdf")) if fixdir.is_dir() else []
-if len(fixtures) < 20:
+if len(fixtures) < 50:
     fails.append(f"only {len(fixtures)} repair fixtures are in the repo - the stress set "
                  "must stay, it is the only thing that tests real damage")
 if "TestRepairFixtures" not in pathlib.Path("tools/verify-engine.sh").read_text(encoding="utf-8"):

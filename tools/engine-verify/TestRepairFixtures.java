@@ -29,7 +29,8 @@ import java.util.List;
  */
 public class TestRepairFixtures {
     static int pass = 0, fail = 0;
-    static final int MUST_RECOVER = 18;      // 20 and 06/10 are genuinely unrecoverable
+    static final int MUST_RECOVER = 45;      // 51 files; 20 is not a PDF, 06/10 lost their
+                                         // page content, and a few recover only partly
     static final long MAX_MS = 5000;
 
     static void check(String name, boolean ok) {
@@ -47,7 +48,7 @@ public class TestRepairFixtures {
         List<File> files = new ArrayList<>();
         if (all != null) Arrays.sort(all);
         for (File f : all) if (f.getName().toLowerCase().endsWith(".pdf")) files.add(f);
-        check("fixtures found", files.size() >= 20);
+        check("fixtures found", files.size() >= 50);
 
         File outDir = new File(System.getProperty("java.io.tmpdir"), "kavopdf-fixture-out");
         outDir.mkdirs();
@@ -79,6 +80,11 @@ public class TestRepairFixtures {
                 check(name + ": every page parses", everyPageParses(out));
                 check(name + ": it says nothing it did not do",
                         r.failure.isEmpty() && r.pagesAfter <= Math.max(r.pagesBefore, r.pagesAfter));
+                // A page that is present but blank is not a recovered page: at least one
+                // page must really hold content, or this is a blank document wearing a
+                // success message.
+                check(name + ": at least one page really holds content",
+                        r.pagesAfter - r.blankPages.size() - r.lostPages.size() > 0);
             } else {
                 refused++;
                 check(name + ": a failed repair left no file", !outExists);

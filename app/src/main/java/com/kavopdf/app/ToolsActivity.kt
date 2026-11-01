@@ -730,6 +730,10 @@ class ToolsActivity : PdfActivity() {
         val details = v.findViewById<android.widget.LinearLayout>(R.id.details)
 
         val intact = rep.findings.isEmpty() && rep.actions.isEmpty()
+        // A page that is present but blank is not a recovered page. Counting only the pages
+        // that really came back is what keeps this screen from claiming "all pages recovered"
+        // over a document where seven of eight pages are empty.
+        val usable = rep.pagesAfter - rep.blankPages.size - rep.lostPages.size
         val lost = rep.pagesBefore - rep.pagesAfter
         val accent: Int
         when {
@@ -745,10 +749,11 @@ class ToolsActivity : PdfActivity() {
                 sub.setText(R.string.repair_intact_sub)
                 icon.setImageResource(R.drawable.ic_check)
             }
-            lost > 0 -> {
+            usable < rep.pagesAfter || lost > 0 -> {
                 accent = getColor(R.color.danger)
                 title.setText(R.string.repair_partial_title)
-                sub.text = getString(R.string.repair_recovered, rep.pagesAfter, rep.pagesBefore)
+                sub.text = getString(R.string.repair_recovered,
+                    maxOf(usable, 0), maxOf(rep.pagesBefore, rep.pagesAfter))
                 icon.setImageResource(R.drawable.ic_repair)
             }
             else -> {

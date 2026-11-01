@@ -175,8 +175,47 @@ public final class PdfRepair {
             readDocumentFacts(doc, working, r);
 
             // ---- decide: is the page tree usable, or do we have to salvage? ----
+            // A tree can report a page count and still be un-walkable: a circular /Kids, or
+            // a /Count that no longer matches. Every page is fetched once here, because a
+            // document whose pages cannot be reached is not a repaired document.
+            boolean treeWalks = r.pagesBefore > 0;
+            if (treeWalks) {
+                for (int i = 0; i < r.pagesBefore; i++) {
+                    try {
+                        doc.getPage(i);
+                    } catch (Throwable t) {
+                        treeWalks = false;
+                        r.findings.add("the page tree cannot be walked at page " + (i + 1)
+                                + ": " + describe(t));
+                        break;
+                    }
+                }
+            }
             PDDocument source = doc;
-            if (r.pagesBefore <= 0) {
+            if (!treeWalks) {
+                // The object pool only holds what the parser managed to reach, which for a
+                // circular or truncated tree can be a fraction of the pages. The bytes still
+                // carry every /Type /Page object, so the byte-level lift is tried first and
+                // the pool is only a fallback.
+                File lifted = null;
+                try {
+                    lifted = salvageObjects(src, out, r);
+                    if (lifted != null) {
+                        PDDocument liftedDoc = parse(lifted, pw, true, 64 * 1024);
+                        source = liftedDoc;
+                        r.stage = "salvaged";
+                        r.failure = "";
+                        r.pagesBefore = source.getNumberOfPages();
+                        //noinspection ResultOfMethodCallIgnored
+                        lifted.deleteOnExit();
+                    }
+                } catch (Throwable ignored) {
+                }
+                if (source == doc) {
+                    source = null;      // fall through to the pool-based salvage below
+                }
+            }
+            if (source == null) {
                 rebuilt = salvagePages(doc, r);
                 if (rebuilt == null) {
                     r.failure = "no readable page could be found in the file";
@@ -970,8 +1009,10 @@ public final class PdfRepair {
         // The catalog can survive while the page-tree node it points at is the thing that was
         // destroyed - the chunk that removed object 12 took the whole /Pages node with it.
         // Then a fresh /Type /Pages node is written and the catalog is repointed at it.
-        boolean needPagesNode = !hasCatalog || catalogPagesTarget < 0
-                || !keep.contains(catalogPagesTarget);
+        // The lift only runs when the old structure is already unusable, so the page tree is
+        // always rebuilt from the page objects actually found - never reused. A circular
+        // /Kids or a /Count that does not match its children is exactly why we are here.
+        boolean needPagesNode = true;
 
         java.io.ByteArrayOutputStream os = new java.io.ByteArrayOutputStream(b.length + 4096);
         try {
@@ -1253,20 +1294,35 @@ public final class PdfRepair {
         try {
             check = PDDocument.load(out, password == null ? "" : password,
                     MemoryUsageSetting.setupTempFileOnly());
-            int n = check.getNumberOfPages();
-            r.pagesAfter = n;
-            if (n <= 0) {
-                r.verifyNote = "the repaired file has no pages";
-                return;
-            }
+            int claimed = check.getNumberOfPages();
+            int walked = 0;
             int broken = 0;
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < claimed; i++) {
+                try {
+                    check.getPage(i);
+                } catch (Throwable t) {
+                    // The tree says there is a page here and there is not. Stop counting:
+                    // the document is broken however many pages it claims.
+                    break;
+                }
+                walked++;
                 if (!pageReads(check, i)) {
                     broken++;
                     r.lostPages.add(i + 1);
                 } else if (danglingContent(check.getPage(i))) {
                     r.blankPages.add(i + 1);
                 }
+            }
+            r.pagesAfter = walked;
+            if (walked < claimed) {
+                r.verified = false;
+                r.verifyNote = "the page tree claims " + claimed + " page(s) but only "
+                        + walked + " can be reached";
+                return;
+            }
+            if (walked <= 0) {
+                r.verifyNote = "the repaired file has no pages";
+                return;
             }
             r.verified = broken == 0;
             r.verifyNote = broken == 0
