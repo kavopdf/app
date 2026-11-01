@@ -379,13 +379,49 @@ public final class PdfToWord {
         }
     }
 
+    /**
+     * Puts a baseline's glyphs in reading order without breaking a run apart.
+     *
+     * <p>Sorting every glyph by x interleaves runs that overlap - text that runs past its cell
+     * and a label that starts inside it become one nonsense word. A run is a sequence drawn
+     * left to right without overlap; runs are ordered by where they start.
+     */
+    private static void orderRuns(List<Glyph> glyphs) {
+        if (glyphs.size() < 2) return;
+        List<List<Glyph>> runs = new ArrayList<>();
+        List<Glyph> run = new ArrayList<>();
+        Glyph prev = null;
+        for (Glyph g : glyphs) {
+            if (prev != null && g.x < prev.x + prev.width - 0.5f) {
+                runs.add(run);
+                run = new ArrayList<>();
+            }
+            run.add(g);
+            prev = g;
+        }
+        if (!run.isEmpty()) runs.add(run);
+        if (runs.size() == 1) return;
+
+        Collections.sort(runs, new Comparator<List<Glyph>>() {
+            @Override
+            public int compare(List<Glyph> a, List<Glyph> b) {
+                return Float.compare(a.get(0).x, b.get(0).x);
+            }
+        });
+        glyphs.clear();
+        for (List<Glyph> r : runs) glyphs.addAll(r);
+    }
+
     private static List<Line> toLines(List<Glyph> glyphs, List<float[]> gutters) {
         List<Glyph> sorted = new ArrayList<>(glyphs);
+        // Sort by baseline only. Collections.sort is stable, so glyphs drawn on the same
+        // baseline stay in the order the page drew them - which is what keeps two overlapping
+        // runs whole. Sorting by x here interleaved them: a value that ran past its cell and a
+        // label that began inside it came out as "56M0o0b6i7le".
         Collections.sort(sorted, new Comparator<Glyph>() {
             @Override
             public int compare(Glyph a, Glyph b) {
-                int c = Float.compare(a.y, b.y);
-                return c != 0 ? c : Float.compare(a.x, b.x);
+                return Float.compare(a.y, b.y);
             }
         });
 
@@ -409,12 +445,7 @@ public final class PdfToWord {
         // Any gap wide enough to be a gutter rather than a space starts a new segment.
         List<Line> split = new ArrayList<>();
         for (Line raw : lines) {
-            Collections.sort(raw.glyphs, new Comparator<Glyph>() {
-                @Override
-                public int compare(Glyph a, Glyph b) {
-                    return Float.compare(a.x, b.x);
-                }
-            });
+            orderRuns(raw.glyphs);
             List<List<Glyph>> segments = new ArrayList<>();
             List<Glyph> run = new ArrayList<>();
             Glyph prev = null;
@@ -453,7 +484,11 @@ public final class PdfToWord {
         for (Glyph g : glyphs) {
             if (prev != null) {
                 float gap = g.x - (prev.x + prev.width);
-                if (gap > g.size * 0.18f && !endsWithSpace(sb)) sb.append(' ');
+                // A gap is a space. A negative gap means the next run starts inside the last
+                // one - text that ran past its cell - and the two must not be welded together.
+                if ((gap > g.size * 0.18f || gap < -g.size * 0.6f) && !endsWithSpace(sb)) {
+                    sb.append(' ');
+                }
             }
             sb.append(g.text);
             prev = g;
@@ -477,6 +512,20 @@ public final class PdfToWord {
      * twice is a second column. Counting this instead of measuring gutter bands survives ragged
      * columns, full-width headings above them, and columns that do not line up at the bottom.
      */
+    /** True when the line has a wide gap right where [at] falls - it is two columns in one row. */
+    private static boolean splitAt(Line line, float at) {
+        Glyph prev = null;
+        for (Glyph g : line.glyphs) {
+            if (prev != null) {
+                float gap = g.x - (prev.x + prev.width);
+                float limit = Math.max(12f, Math.max(g.size, prev.size) * 1.6f);
+                if (gap > limit && prev.x + prev.width <= at + 2f && g.x >= at - 2f) return true;
+            }
+            prev = g;
+        }
+        return false;
+    }
+
     private static List<Float> columnStarts(List<Line> lines) {
         List<Float> candidates = new ArrayList<>();
         for (Line line : lines) {
@@ -494,7 +543,20 @@ public final class PdfToWord {
         if (candidates.size() < 2) return new ArrayList<>();
 
         Collections.sort(candidates);
+
+        // A column has to be a column's width. The marks on a question paper sit in a 44 pt
+        // strip at the right margin; treating that as a column moved every "[08]" to the end of
+        // the page instead of leaving it beside its question.
+        float contentLeft = Float.MAX_VALUE, contentRight = -Float.MAX_VALUE;
+        for (Line line : lines) {
+            if (line.text.trim().isEmpty()) continue;
+            contentLeft = Math.min(contentLeft, line.x);
+            contentRight = Math.max(contentRight, line.right);
+        }
+        float minColumnWidth = (contentRight - contentLeft) * 0.12f;
+
         List<Float> starts = new ArrayList<>();
+        float lastBoundary = contentLeft;
         int i = 0;
         while (i < candidates.size()) {
             int j = i;
@@ -504,7 +566,33 @@ public final class PdfToWord {
                 j++;
             }
             int count = j - i;
-            if (count >= 3) starts.add(sum / count);      // three lines agree, so it is a column
+            if (count >= 3) {
+                float at = sum / count;
+                // Three lines agreeing on a gap is not enough. In a question paper the gap
+                // after "1a." agrees with the gap after "2a." and so on, and the page was split
+                // into columns at the start of every question's text - the questions then came
+                // out grouped by that x instead of in reading order.
+                //
+                // A real column boundary is a place no text crosses: the left column stops
+                // before it and the right column starts after it. A handful of crossings is
+                // allowed, because a title spanning both columns is normal.
+                int crossings = 0;
+                for (Line other : lines) {
+                    if (other.text.trim().isEmpty()) continue;
+                    if (other.x >= at - 2f || other.right <= at + 2f) continue;
+                    // A line that is itself split at this point is a two-column row, not prose
+                    // running through the gutter - it is the evidence for the column, not
+                    // against it.
+                    if (splitAt(other, at)) continue;
+                    crossings++;
+                }
+                boolean wideEnough = at - lastBoundary >= minColumnWidth
+                        && contentRight - at >= minColumnWidth;
+                if (crossings <= Math.max(1, (int) (lines.size() * 0.12f)) && wideEnough) {
+                    starts.add(at);
+                    lastBoundary = at;
+                }
+            }
             i = j;
         }
         return starts;
@@ -1004,10 +1092,7 @@ public final class PdfToWord {
             if (inRuled) continue;
 
             List<Glyph> glyphs = new ArrayList<>(raw.glyphs);
-            Collections.sort(glyphs, new Comparator<Glyph>() {
-                @Override
-                public int compare(Glyph a, Glyph b) { return Float.compare(a.x, b.x); }
-            });
+            orderRuns(glyphs);
             List<Glyph> run = new ArrayList<>();
             Glyph prev = null;
             for (Glyph g : glyphs) {
