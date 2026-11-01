@@ -499,10 +499,16 @@ public final class PdfToWord {
         return starts;
     }
 
-    /** Turns column start positions into the narrow bands used to split a line. */
+    /**
+     * Turns column start positions into the narrow bands used to split a line.
+     *
+     * <p>The band sits just before the start, not around it: the text of the new cell begins at
+     * x, so a band that reaches past x is never wholly inside the gap and the line would never
+     * be split.
+     */
     private static List<float[]> asBands(List<Float> starts) {
         List<float[]> bands = new ArrayList<>();
-        for (Float x : starts) bands.add(new float[]{x - 2f, x + 2f});
+        for (Float x : starts) bands.add(new float[]{x - 5f, x - 1f});
         return bands;
     }
 
