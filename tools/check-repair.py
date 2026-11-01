@@ -120,6 +120,26 @@ else:
             fails.append(f"ic_repair.xml only covers {max(xs)-min(xs):.0f}x{max(ys)-min(ys):.0f} "
                          "of its 960 box - it will render smaller than the other tool icons")
 
+# ---- 4b) the stages that the stress set proved necessary -------------------------
+# Each of these exists because a real fixture needed it. Losing one silently turns a
+# recoverable file into "could not repair".
+for needle, why in [
+    ("workDir(", "the scratch copy must fall back to a writable folder - a read-only source "
+                 "folder made every repair fail with 'Permission denied'"),
+    ("salvageObjects(", "the object-lifting stage is what recovers a file whose object "
+                        "headers are damaged"),
+    ("buildLifted(", "the lifted file has to be rebuilt with a fresh cross-reference table"),
+    ("repointPages(", "a catalog whose page-tree node was destroyed must be repointed at a "
+                      "rebuilt one"),
+    ("brokenOnArrival", "a page that was already broken must not be treated as a regression"),
+    ("setContents(", "a kept page whose content is destroyed must be emptied, or readers "
+                     "fail on it"),
+    ("none of their content survived", "a file whose pages are all empty must be refused, "
+                                       "not handed over as a blank PDF"),
+]:
+    if needle not in engine:
+        fails.append(f"repair lost {needle}: {why}")
+
 # ---- 5) the tests exist and actually run -----------------------------------------
 test = pathlib.Path("tools/engine-verify/TestRepair.java")
 if not test.exists():
@@ -134,9 +154,21 @@ else:
         if case not in t:
             fails.append(f"TestRepair no longer covers {case}")
 
+# ---- 6) the stress fixtures are in the repo and wired into the suite ------------
+fixdir = pathlib.Path("tools/engine-verify/fixtures/repair")
+fixtures = sorted(fixdir.glob("*.pdf")) if fixdir.is_dir() else []
+if len(fixtures) < 20:
+    fails.append(f"only {len(fixtures)} repair fixtures are in the repo - the stress set "
+                 "must stay, it is the only thing that tests real damage")
+if "TestRepairFixtures" not in pathlib.Path("tools/verify-engine.sh").read_text(encoding="utf-8"):
+    fails.append("TestRepairFixtures is not run by verify-engine.sh")
+if not pathlib.Path("tools/engine-verify/TestRepairFixtures.java").exists():
+    fails.append("TestRepairFixtures.java is missing")
+
 if fails:
     for x in fails:
         print("FAIL:", x)
     sys.exit(1)
 print("PASS: repair verifies every page before saving, refuses to save otherwise, "
-      "and is wired into the enum, home screen, heading, suffix, strings and icon")
+      "handles every real damage stage, and is wired into the enum, home screen, "
+      "heading, suffix, strings, icon and the 21-file stress set")

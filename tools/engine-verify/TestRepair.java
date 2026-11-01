@@ -205,16 +205,17 @@ public class TestRepair {
                     t.contains("PAGE_1_MARKER") && t.contains("PAGE_3_MARKER"));
         }
 
-        System.out.println("== a page whose content stream is corrupt is dropped, the rest kept ==");
+        System.out.println("== a page whose content stream is corrupt is kept and reported ==");
         {
+            // The page was already broken when it arrived, so deleting it would shift every
+            // page number after it. It is kept, reported as blank, and the page count holds.
             File bad = write("corrupt_stream2.pdf", corruptStream(original, 8));
             File out = new File(W, "repaired_corrupt_stream2.pdf");
             PdfRepair.Report r = PdfRepair.repair(bad, "", out);
             check("corrupt stream: repaired", r.readable);
-            check("corrupt stream: the other pages survived", r.pagesAfter == PAGES - 1);
+            check("corrupt stream: every page is still there", r.pagesAfter == PAGES);
             check("corrupt stream: verified", r.verified);
-            check("corrupt stream: the report says a page was dropped",
-                    r.actions.toString().contains("dropped"));
+            check("corrupt stream: the report names the blank page", r.blankPages.contains(2));
             String t = textOf(out);
             check("corrupt stream: page 1 and page 3 text intact",
                     t.contains("PAGE_1_MARKER") && t.contains("PAGE_3_MARKER"));

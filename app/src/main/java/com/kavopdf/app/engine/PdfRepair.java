@@ -115,7 +115,7 @@ public final class PdfRepair {
 
         PDDocument doc = null;
         try {
-            doc = open(src, password, r);
+            doc = open(src, password, null, r);
             if (doc == null) {
                 if (r.failure.isEmpty()) r.failure = "the file could not be parsed";
                 return r;
@@ -160,13 +160,13 @@ public final class PdfRepair {
         PDDocument rebuilt = null;
         try {
             // ---- normalise the bytes first: junk before the header, or no header at all
-            working = prepare(src, r);
+            working = prepare(src, out, r);
             if (working == null) {
                 r.failure = "this is not a PDF - there is no page in it to repair";
                 return r;
             }
 
-            doc = open(working, pw, r);
+            doc = open(working, pw, out, r);
             if (doc == null) {
                 if (r.failure.isEmpty()) r.failure = "the file could not be parsed";
                 return r;
@@ -185,12 +185,68 @@ public final class PdfRepair {
                 source = rebuilt;
             }
 
+            // Which pages were already unreadable before we touched anything? Only those
+            // are ours to report as blank; a page we break ourselves is a real regression.
+            walkPages(source, r);
+            List<Integer> brokenOnArrival = new ArrayList<>(r.lostPages);
+            List<Integer> blankOnArrival = new ArrayList<>(r.blankPages);
+            r.lostPages.clear();
+            r.blankPages.clear();
+
+            // A page whose content stream is destroyed is kept, so the pages after it keep
+            // their numbers - but its broken stream is replaced with an empty page. Leaving
+            // it in place makes every reader that touches that page fail, which would take
+            // the readable pages down with it.
+            for (int page : brokenOnArrival) {
+                try {
+                    PDPage p = source.getPage(page - 1);
+                    p.setContents((com.tom_roush.pdfbox.pdmodel.common.PDStream) null);
+                    r.actions.add("page " + page + " had no readable content - kept as a blank page");
+                } catch (Throwable ignored) { }
+            }
+
             // ---- write, then verify ----
             keepProtection(source, pw, r);
             if (!writeOut(source, out, r)) return r;
             verify(out, pw, r);
 
+            // A page that failed in the input and fails the same way now is not a regression;
+            // keeping it preserves the page count, and the report already says it is blank.
+            for (int i = r.lostPages.size() - 1; i >= 0; i--) {
+                int page = r.lostPages.get(i);
+                if (brokenOnArrival.contains(page)) {
+                    r.lostPages.remove(i);
+                    if (!r.blankPages.contains(page)) r.blankPages.add(page);
+                }
+            }
+            // Pages that came in with no content, and pages whose content we had to clear,
+            // are both blank in the output - and both are named in the report.
+            for (int page : blankOnArrival) {
+                if (!r.blankPages.contains(page)) r.blankPages.add(page);
+            }
+            for (int page : brokenOnArrival) {
+                if (!r.blankPages.contains(page)) r.blankPages.add(page);
+            }
+            java.util.Collections.sort(r.blankPages);
+            if (r.lostPages.isEmpty()) r.verified = r.pagesAfter > 0;
+
+            // A file whose pages are all empty is not a repaired document - it is a blank
+            // one, and handing that over would look like the content was destroyed by us.
+            // Better to say plainly that nothing could be recovered.
+            int usable = r.pagesAfter - r.blankPages.size() - r.lostPages.size();
+            if (r.pagesAfter > 0 && usable <= 0) {
+                r.failure = "the pages are in the file, but none of their content survived";
+                //noinspection ResultOfMethodCallIgnored
+                out.delete();
+                r.sizeAfter = 0L;
+                r.verified = false;
+                return r;
+            }
+
             // ---- a page whose own content is rubble is dropped, not the whole repair ----
+            // Only pages that came in readable and went out broken are ours to drop. A page
+            // that was already rubble in the input is the input's fault: deleting it would
+            // change the document, so it is kept and reported instead.
             if (r.pagesAfter > 0 && !r.lostPages.isEmpty()) {
                 List<Integer> dropped = new ArrayList<>(r.lostPages);
                 PDDocument trimmed = dropPages(source, dropped, r);
@@ -369,15 +425,14 @@ public final class PdfRepair {
      * after something else) and a header that is gone altogether. A reader gives up on both;
      * a repair tool trims or rebuilds the front of the file and tries again.
      */
-    private static File prepare(File src, Report r) throws IOException {
+    private static File prepare(File src, File outFile, Report r) throws IOException {
         boolean needsWork = (r.headerFound && r.headerOffset > 0) || !r.headerFound;
         if (!needsWork) return src;
 
         // Nothing to repair if the file never held a PDF object at all.
         if (!r.headerFound && r.objectsSeen == 0) return null;
 
-        File dir = src.getParentFile() != null ? src.getParentFile() : new File(".");
-        File work = File.createTempFile("kavopdf-repair-", ".pdf", dir);
+        File work = File.createTempFile("kavopdf-repair-", ".pdf", workDir(src, outFile));
         work.deleteOnExit();
 
         try (InputStream in = new FileInputStream(src);
@@ -424,7 +479,7 @@ public final class PdfRepair {
      * move, which is fine: the parser reconstructs the cross-reference table anyway, and the
      * result is re-saved with a clean one.
      */
-    private static File rebuildPageTree(File src, Report r) {
+    private static File rebuildPageTree(File src, File outFile, Report r) {
         // Byte surgery needs the file in memory. Above this size the honest answer is to
         // say so rather than to risk the phone.
         if (src.length() > 16L * 1024 * 1024L) {
@@ -450,6 +505,32 @@ public final class PdfRepair {
             else if ("Pages".equals(o.type)) treeNodes.add(o.number);
             else if ("Catalog".equals(o.type) && catalogStart < 0) catalogStart = o.start;
         }
+        // A trailer whose /Root is gone leaves the whole document without a catalog, and
+        // the parser refuses before reading anything. The catalog object is usually still
+        // there - only the pointer to it is lost - so the fix is a correct trailer.
+        if (catalogStart < 0) {
+            int catalog = -1;
+            for (RawObject o : objects) {
+                if ("Catalog".equals(o.type)) { catalog = o.number; break; }
+            }
+            if (catalog < 0) return null;                 // no catalog anywhere: nothing to point at
+            byte[] tailBytes = ("\ntrailer\n<< /Size " + (maxNumber + 1) + " /Root "
+                    + catalog + " 0 R >>\nstartxref\n0\n%%EOF\n")
+                    .getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+            try {
+                File patched = File.createTempFile("kavopdf-root-", ".pdf", workDir(src, outFile));
+                patched.deleteOnExit();
+                try (java.io.FileOutputStream os = new java.io.FileOutputStream(patched)) {
+                    os.write(b);
+                    os.write(tailBytes);
+                }
+                r.actions.add("rebuilt the trailer and pointed it at catalog object " + catalog);
+                return patched;
+            } catch (Throwable t) {
+                return null;
+            }
+        }
+
         if (pages.isEmpty() || catalogStart < 0) return null;
 
         // The catalog's own /Pages entry: is it pointing at a real page-tree node?
@@ -489,8 +570,7 @@ public final class PdfRepair {
             out.write(synth.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
             out.write(b, insertAt, b.length - insertAt);
 
-            File dir = src.getParentFile() != null ? src.getParentFile() : new File(".");
-            File patched = File.createTempFile("kavopdf-tree-", ".pdf", dir);
+            File patched = File.createTempFile("kavopdf-tree-", ".pdf", workDir(src, outFile));
             patched.deleteOnExit();
             try (java.io.FileOutputStream os = new java.io.FileOutputStream(patched)) {
                 out.writeTo(os);
@@ -644,6 +724,34 @@ public final class PdfRepair {
         }
     }
 
+    /**
+     * A folder we can actually write a scratch copy into.
+     *
+     * <p>The source may sit in a folder the app cannot write to - a read-only mount, another
+     * app's directory, a picker that hands over a stream only. Repair must not fail because
+     * of where the file happens to live, so this walks outwards: the output folder, then the
+     * source folder, then the app's own temporary directory.
+     */
+    private static File workDir(File src, File out) {
+        File[] candidates = {
+                out != null && out.getParentFile() != null ? out.getParentFile() : null,
+                src != null ? src.getParentFile() : null,
+                new File(System.getProperty("java.io.tmpdir", "."))
+        };
+        for (File d : candidates) {
+            if (d == null || !d.isDirectory()) continue;
+            File probe = new File(d, ".kavopdf-write-probe");
+            try {
+                if (probe.createNewFile()) {
+                    //noinspection ResultOfMethodCallIgnored
+                    probe.delete();
+                    return d;
+                }
+            } catch (Throwable ignored) { }
+        }
+        return new File(System.getProperty("java.io.tmpdir", "."));
+    }
+
     private static void copy(InputStream in, java.io.OutputStream os) throws IOException {
         byte[] buf = new byte[64 * 1024];
         int n;
@@ -663,7 +771,7 @@ public final class PdfRepair {
      * long EOF look-up, which rescues files with junk appended (an interrupted download, a
      * mail gateway, a concatenated file).
      */
-    private static PDDocument open(File src, String password, Report r) {
+    private static PDDocument open(File src, String password, File outFile, Report r) {
         String pw = password == null ? "" : password;
 
         try {
@@ -703,7 +811,7 @@ public final class PdfRepair {
         // the tree is rebuilt from the bytes and the file is tried once more.
         File patched = null;
         try {
-            patched = rebuildPageTree(src, r);
+            patched = rebuildPageTree(src, outFile, r);
             if (patched != null) {
                 PDDocument d = parse(patched, pw, true, 64 * 1024);
                 r.stage = "salvaged";
@@ -721,7 +829,262 @@ public final class PdfRepair {
                 patched.delete();
             }
         }
+
+        // Last resort: the object headers themselves are damaged, so no parser can walk the
+        // file - but most object bodies are still intact. They are lifted out of the bytes
+        // and written into a fresh file with a clean cross-reference table.
+        File lifted = null;
+        try {
+            lifted = salvageObjects(src, outFile, r);
+            if (lifted != null) {
+                PDDocument d = parse(lifted, pw, true, 64 * 1024);
+                r.stage = "salvaged";
+                r.failure = "";
+                return d;
+            }
+        } catch (InvalidPasswordException e) {
+            r.encrypted = true;
+            r.failure = "this file is password protected - enter the password to repair it";
+            return null;
+        } catch (Throwable ignored) {
+        } finally {
+            if (lifted != null) {
+                //noinspection ResultOfMethodCallIgnored
+                lifted.delete();
+            }
+        }
         return null;
+    }
+
+    /**
+     * Lifts every intact object out of the raw bytes and writes a fresh file from them.
+     *
+     * <p>This is for the damage that kills a parser outright: an object header with a byte
+     * knocked out of it, or junk scattered through the middle. The bytes of the objects
+     * themselves are usually still there, so they are copied verbatim into a new file with a
+     * correct cross-reference table and trailer. Whatever is broken inside a body is that
+     * object's problem, and the page walk will say so.
+     */
+    private static File salvageObjects(File src, File outFile, Report r) {
+        if (src.length() > 16L * 1024 * 1024L) return null;
+        byte[] b;
+        try {
+            b = readAll(src);
+        } catch (Throwable t) {
+            return null;
+        }
+
+        byte[] objToken = "obj".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+        byte[] endToken = "endobj".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+        List<int[]> found = new ArrayList<>();      // {number, bodyStart, bodyEnd}
+        int at = 0;
+        while (true) {
+            at = indexOf(b, objToken, at);
+            if (at < 0) break;
+            int i = at - 1;
+            while (i >= 0 && isSpace(b[i])) i--;
+            int genEnd = i;
+            while (i >= 0 && b[i] >= '0' && b[i] <= '9') i--;
+            if (i + 1 > genEnd) { at += 3; continue; }
+            while (i >= 0 && isSpace(b[i])) i--;
+            int numEnd = i;
+            while (i >= 0 && b[i] >= '0' && b[i] <= '9') i--;
+            int numStart = i + 1;
+            if (numStart > numEnd) { at += 3; continue; }
+            int number;
+            try {
+                number = Integer.parseInt(new String(b, numStart, numEnd - numStart + 1,
+                        java.nio.charset.StandardCharsets.ISO_8859_1));
+            } catch (Exception e) { at += 3; continue; }
+
+            int bodyStart = at + 3;
+            int end = indexOf(b, endToken, bodyStart);
+            int bodyEnd = end < 0 ? b.length : end;
+            int k = bodyStart;
+            while (k < bodyEnd && isSpace(b[k])) k++;
+            if (k < bodyEnd) {
+                byte c = b[k];
+                if (c == '<' || c == '[' || c == '/' || c == '(' ||
+                        (c >= '0' && c <= '9') || c == '+' || c == '-') {
+                    found.add(new int[]{number, bodyStart, bodyEnd});
+                }
+            }
+            at = bodyEnd + 1;
+        }
+        if (found.size() < 2) return null;
+
+        // One body per number: the last definition in a file is the one a reader would use.
+        java.util.LinkedHashMap<Integer, int[]> byNumber = new java.util.LinkedHashMap<>();
+        for (int[] o : found) byNumber.put(o[0], o);
+
+        List<Integer> keep = new ArrayList<>(byNumber.keySet());
+
+        // One broken body must not sink the whole salvage. The parser names the byte offset
+        // it choked on, so that object is dropped and the file is rebuilt without it - and
+        // again, until it parses or nothing is left worth writing.
+        for (int attempt = 0; attempt < 16 && keep.size() >= 2; attempt++) {
+            List<int[]> spans = new ArrayList<>();          // {objectNumber, start, end}
+            File built = buildLifted(b, byNumber, keep, outFile, spans, r);
+            if (built == null) return null;
+            try {
+                PDDocument check = parse(built, "", true, 64 * 1024);
+                check.close();
+                return built;                                // it parses: good enough to verify
+            } catch (Throwable t) {
+                int offset = offsetIn(t.getMessage());
+                int victim = offset < 0 ? -1 : objectAt(spans, offset);
+                //noinspection ResultOfMethodCallIgnored
+                built.delete();
+                if (victim < 0) return null;
+                keep.remove(Integer.valueOf(victim));
+                r.actions.add("dropped object " + victim + " - its own bytes are damaged");
+            }
+        }
+        return null;
+    }
+
+    /** Writes the kept objects into a fresh, correctly cross-referenced file. */
+    private static File buildLifted(byte[] b, java.util.LinkedHashMap<Integer, int[]> byNumber,
+                                    List<Integer> keep, File outFile, List<int[]> spans, Report r) {
+        boolean hasCatalog = false;
+        int catalogObject = -1;
+        int catalogPagesTarget = -1;
+        int maxNumber = 0;
+        List<Integer> pageObjects = new ArrayList<>();
+        for (int number : keep) {
+            maxNumber = Math.max(maxNumber, number);
+            int[] o = byNumber.get(number);
+            if (o == null) continue;
+            String head = new String(b, o[1], Math.min(o[2] - o[1], 4096),
+                    java.nio.charset.StandardCharsets.ISO_8859_1);
+            if (head.contains("/Type /Catalog")) {
+                hasCatalog = true;
+                catalogObject = number;
+                catalogPagesTarget = pagesTargetIn(b, o[1], o[2]);
+            } else if (head.contains("/Type /Page") && !head.contains("/Type /Pages")) {
+                pageObjects.add(number);
+            }
+        }
+        if (pageObjects.isEmpty()) return null;              // nothing to build a document around
+
+        // The catalog can survive while the page-tree node it points at is the thing that was
+        // destroyed - the chunk that removed object 12 took the whole /Pages node with it.
+        // Then a fresh /Type /Pages node is written and the catalog is repointed at it.
+        boolean needPagesNode = !hasCatalog || catalogPagesTarget < 0
+                || !keep.contains(catalogPagesTarget);
+
+        java.io.ByteArrayOutputStream os = new java.io.ByteArrayOutputStream(b.length + 4096);
+        try {
+            os.write("%PDF-1.7\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            int next = maxNumber + 1;
+            // The pages node gets a fresh number whenever one is needed - including when the
+            // catalog survived but the node it pointed at did not.
+            int pagesNumber = needPagesNode ? next++ : -1;
+            int catalogNumber = hasCatalog ? -1 : next++;
+            int catalogToUse = hasCatalog ? findCatalog(byNumber, b) : catalogNumber;
+
+            int newPagesNumber = needPagesNode ? pagesNumber : catalogPagesTarget;
+            for (int number : keep) {
+                int[] o = byNumber.get(number);
+                if (o == null) continue;
+                int startAt = os.size();
+                os.write((number + " 0 obj\n").getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                if (needPagesNode && number == catalogObject) {
+                    os.write(repointPages(b, o[1], o[2], newPagesNumber));
+                } else {
+                    os.write(b, o[1], o[2] - o[1]);
+                }
+                os.write("\nendobj\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                spans.add(new int[]{number, startAt, os.size()});
+            }
+
+            if (needPagesNode) {
+                StringBuilder kids = new StringBuilder("[");
+                for (int i = 0; i < pageObjects.size(); i++) {
+                    if (i > 0) kids.append(' ');
+                    kids.append(pageObjects.get(i)).append(" 0 R");
+                }
+                kids.append(']');
+                os.write((pagesNumber + " 0 obj\n<< /Type /Pages /Kids " + kids
+                        + " /Count " + pageObjects.size() + " >>\nendobj\n")
+                        .getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                if (!hasCatalog) {
+                    os.write((catalogNumber + " 0 obj\n<< /Type /Catalog /Pages "
+                            + pagesNumber + " 0 R >>\nendobj\n")
+                            .getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                }
+                spans.add(new int[]{pagesNumber, 0, os.size()});
+            }
+            os.write(("trailer\n<< /Size " + next + " /Root " + catalogToUse + " 0 R >>\n%%EOF\n")
+                    .getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+
+            File out = File.createTempFile("kavopdf-lift-", ".pdf", workDir(outFile, outFile));
+            out.deleteOnExit();
+            try (java.io.FileOutputStream fos = new java.io.FileOutputStream(out)) {
+                os.writeTo(fos);
+            }
+            return out;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /** The object number a catalog body points its /Pages at, or -1. */
+    private static int pagesTargetIn(byte[] b, int from, int to) {
+        byte[] key = "/Pages".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+        int at = indexOf(b, key, from);
+        if (at < 0 || at > to) return -1;
+        int i = at + key.length;
+        while (i < to && (isSpace(b[i]) || b[i] == '<')) i++;
+        StringBuilder digits = new StringBuilder();
+        while (i < to && b[i] >= '0' && b[i] <= '9') digits.append((char) b[i++]);
+        if (digits.length() == 0) return -1;
+        try { return Integer.parseInt(digits.toString()); } catch (Exception e) { return -1; }
+    }
+
+    /** A copy of a catalog body whose /Pages entry points somewhere else. */
+    private static byte[] repointPages(byte[] b, int from, int to, int newNumber) {
+        String body = new String(b, from, to - from, java.nio.charset.StandardCharsets.ISO_8859_1);
+        String replaced = body.replaceFirst("/Pages\\s+\\d+\\s+\\d+\\s+R",
+                "/Pages " + newNumber + " 0 R");
+        if (replaced.equals(body)) {
+            replaced = body.replaceFirst("/Pages\\b",
+                    "/Pages " + newNumber + " 0 R ");
+        }
+        return replaced.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+    }
+
+    /** The byte offset PDFBox complained about, or -1. */
+    private static int offsetIn(String message) {
+        if (message == null) return -1;
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("offset[:\\s]+(\\d+)").matcher(message);
+        if (m.find()) {
+            try { return Integer.parseInt(m.group(1)); } catch (Exception ignored) { }
+        }
+        return -1;
+    }
+
+    /** Which object of the rebuilt file covers that offset. */
+    private static int objectAt(List<int[]> spans, int offset) {
+        for (int[] s : spans) {
+            if (offset >= s[1] && offset < s[2]) return s[0];
+        }
+        return -1;
+    }
+
+    private static int findCatalog(java.util.LinkedHashMap<Integer, int[]> byNumber, byte[] b) {
+        for (java.util.Map.Entry<Integer, int[]> e : byNumber.entrySet()) {
+            int[] o = e.getValue();
+            String head = new String(b, o[1], Math.min(o[2] - o[1], 4096),
+                    java.nio.charset.StandardCharsets.ISO_8859_1);
+            if (head.contains("/Type /Catalog")) return e.getKey();
+        }
+        return 0;
+    }
+
+    private static boolean isSpace(byte c) {
+        return c == ' ' || c == '\r' || c == '\n' || c == '\t' || c == 0;
     }
 
     private static PDDocument parse(File src, String password, boolean lenient, int eofRange)
