@@ -334,4 +334,7 @@
         <item quantity="other">%1$d pages</item>
     </plurals>
     <string name="word_no_text_pages">No text could be read from this PDF — %1$d pages hold no text layer and OCR found nothing</string>
+    <string name="share_choice_title">Open this PDF with KavoPDF</string>
+    <string name="share_choice_read">Read PDF</string>
+    <string name="share_choice_tools">Execute tools</string>
 </resources>

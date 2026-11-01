@@ -126,7 +126,9 @@ class ToolsActivity : PdfActivity() {
         applyToolChrome()
         binding.btnChoose.setOnClickListener { pickPdf() }
         binding.btnRun.setOnClickListener { onRun() }
-        pickAfterEnter { pickPdf() }
+        // A file handed over by another app is already chosen; opening the picker on top
+        // of it would ask the user to pick the same document twice.
+        if (incomingUri == null) pickAfterEnter { pickPdf() }
     }
 
     private fun applyToolChrome() {
@@ -789,9 +791,16 @@ class ToolsActivity : PdfActivity() {
      * <p>The file is already saved at this point; this is the receipt - what was wrong,
      * what was rebuilt, and what did not make it across.
      */
+    override fun showsOwnResult(): Boolean = tool == Action.REPAIR
+
     override fun onSaved(file: File) {
         if (tool != Action.REPAIR) return
-        repairReport?.let { showRepairReport(it) }
+        val rep = repairReport ?: return
+        // The receipt comes first, on its own. The "Done" sheet with Share and Open result is
+        // shown only after the receipt is closed, so the two never stack.
+        showRepairReport(rep) {
+            showSuccess(getString(R.string.msg_saved_to, pendingName), file)
+        }
     }
 
     /**
@@ -865,7 +874,7 @@ class ToolsActivity : PdfActivity() {
     }
 
     /** The receipt shown once the repaired file has been saved. */
-    private fun showRepairReport(rep: PdfRepair.Report) {
+    private fun showRepairReport(rep: PdfRepair.Report, onClosed: () -> Unit = {}) {
         if (isFinishing || isDestroyed) return
         val v = layoutInflater.inflate(R.layout.dialog_signature_result, null)
         val icon = v.findViewById<android.widget.ImageView>(R.id.statusIcon)
@@ -935,7 +944,15 @@ class ToolsActivity : PdfActivity() {
             if (rep.verified) getColor(R.color.success) else getColor(R.color.danger))
 
         val dialog = AlertDialog.Builder(this).setView(v).create()
+        var closed = false
+        val finishOnce = {
+            if (!closed) {
+                closed = true
+                onClosed()
+            }
+        }
         v.findViewById<android.view.View>(R.id.btnClose).setOnClickListener { dialog.dismiss() }
+        dialog.setOnDismissListener { finishOnce() }
         dialog.show()
     }
 

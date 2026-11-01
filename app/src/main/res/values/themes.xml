@@ -153,4 +153,13 @@
         <item name="android:popupBackground">@drawable/bg_popup_pill</item>
         <item name="android:itemBackground">@drawable/bg_menu_item</item>
     </style>
+
+    <!-- A dialog-only screen: shows its dialog over whatever the user was looking at. -->
+    <style name="Theme.KavoPDF.Transparent" parent="Theme.KavoPDF">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
 </resources>

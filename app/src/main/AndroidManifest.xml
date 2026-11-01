@@ -43,10 +43,18 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/pdf" />
             </intent-filter>
-            <!-- Sharing a PDF from another app. "Open with" and the share sheet are two
-                 different things in Android: the filter above is what makes KavoPDF appear
-                 when you tap a PDF, and this one is what makes it appear in the share
-                 sheet. Without it the app simply never showed up there. -->
+        </activity>
+
+        <!-- Sharing a PDF from another app. The share sheet cannot tell "read this" from
+             "work on this", so it lands here and asks once: reader, or the tool list with the
+             file already in hand. Tapping a PDF in a file manager still goes straight to the
+             reader through the VIEW filter above. -->
+        <activity
+            android:name=".ShareChoiceActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@style/Theme.KavoPDF.Transparent">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />

@@ -19,7 +19,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    /** A PDF handed over by another app, kept until the user picks a tool. */
+    private var sharedUri: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        sharedUri = intent?.getStringExtra(PdfActivity.EXTRA_SOURCE_URI)
         ThemeUtil.apply(this)
         super.onCreate(savedInstanceState)
         useHighestRefreshRate()
@@ -93,6 +97,14 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        // The home screen may already be running when a file is shared in; the new intent
+        // arrives here rather than through onCreate.
+        intent.getStringExtra(PdfActivity.EXTRA_SOURCE_URI)?.let { sharedUri = it }
+    }
+
     private fun dispatch(action: Action) {
         val intent = when (action) {
             Action.VIEW -> Intent(this, ViewerActivity::class.java)
@@ -114,6 +126,9 @@ class MainActivity : AppCompatActivity() {
             else -> Intent(this, ToolsActivity::class.java)
                 .putExtra(ToolsActivity.EXTRA_TOOL, action.name)
         }
+        // Hand the shared document to whichever tool screen is opening, so it starts with the
+        // file already chosen instead of asking for it again.
+        sharedUri?.let { intent.putExtra(PdfActivity.EXTRA_SOURCE_URI, it) }
         try {
             startActivity(intent)
         } catch (t: Throwable) {

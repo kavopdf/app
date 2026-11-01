@@ -117,6 +117,9 @@ abstract class PdfActivity : AppCompatActivity() {
         }
     }
 
+    /** True when the tool shows its own result dialog, so the generic one is skipped. */
+    protected open fun showsOwnResult(): Boolean = false
+
     /** Save as a Word document or a text file rather than a PDF. */
     protected fun runAndSaveAs(name: String, kind: SaveKind, produce: (File) -> Unit) {
         pendingName = name
@@ -137,7 +140,19 @@ abstract class PdfActivity : AppCompatActivity() {
         useHighestRefreshRate()
         com.kavopdf.app.util.CrashGuard.step("Opened: " + javaClass.simpleName)
         busy = Busy(this)
+
+        // A file handed over from the share sheet. Posted to the view rather than called here:
+        // this runs before the tool's own onCreate, so its views do not exist yet.
+        incomingUri?.let { uri ->
+            window.decorView.post { onPdfChosen(uri) }
+        }
     }
+
+    /** The PDF this screen was opened with, when it came from another app. */
+    protected val incomingUri: Uri?
+        get() = intent?.getStringExtra(EXTRA_SOURCE_URI)?.let {
+            runCatching { Uri.parse(it) }.getOrNull()
+        }
 
     /**
      * Copy the picked PDF into the cache, asking for a password when the document is
@@ -296,7 +311,10 @@ abstract class PdfActivity : AppCompatActivity() {
     /** Size of the open file, so the detector can compare like with like. */
     protected var sizeHint: Long = 0L
 
-    private companion object {
+    companion object {
+        /** A PDF handed over by another app, so the tool screen opens with it already chosen. */
+        const val EXTRA_SOURCE_URI = "com.kavopdf.app.extra.SOURCE_URI"
+
         const val DOCX_MIME =
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     }
