@@ -458,33 +458,82 @@ class ToolsActivity : PdfActivity() {
      * engine only sees a string. Each page is rendered once, recognised once, and the renderer
      * is closed even when a page throws - a leaked renderer holds the file open.
      */
-    private fun wordOcrHook(src: File): PdfToWord.OcrHook {
-        return PdfToWord.OcrHook { pageIndex ->
+    /**
+     * OCR for pages that hold no text layer.
+     *
+     * <p>One renderer is opened for the whole conversion and closed afterwards - opening it per
+     * page meant reopening the file and re-parsing the page tree for every scanned page.
+     *
+     * <p>The bitmap is capped. A poster-sized page at 2x would be about 130 MB of ARGB_8888,
+     * which is an out-of-memory crash on a phone; the scale is reduced until the image fits
+     * inside the cap, and never goes below 1x.
+     */
+    private inner class WordOcr(src: File) : PdfToWord.OcrHook, AutoCloseable {
+        private var pfd: ParcelFileDescriptor? = null
+        private var renderer: PdfRenderer? = null
+
+        private fun rendererOrNull(): PdfRenderer? {
+            if (renderer == null) {
+                try {
+                    val fd = ParcelFileDescriptor.open(src, ParcelFileDescriptor.MODE_READ_ONLY)
+                    pfd = fd
+                    renderer = PdfRenderer(fd)
+                } catch (t: Throwable) {
+                    close()
+                    return null
+                }
+            }
+            return renderer
+        }
+
+        override fun text(pageIndex: Int): String? {
             var recognised: String? = null
             try {
-                val pfd = ParcelFileDescriptor.open(src, ParcelFileDescriptor.MODE_READ_ONLY)
-                pfd.use {
-                    PdfRenderer(it).use { renderer ->
-                        if (pageIndex in 0 until renderer.pageCount) {
-                            renderer.openPage(pageIndex).use { page ->
-                                val bmp = Bitmap.createBitmap(
-                                    (page.width * 2).coerceAtLeast(1),
-                                    (page.height * 2).coerceAtLeast(1),
-                                    Bitmap.Config.ARGB_8888
-                                )
-                                bmp.eraseColor(android.graphics.Color.WHITE)
-                                page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                                recognised = ocrBitmap(bmp)
-                                bmp.recycle()
-                            }
-                        }
-                    }
+                val r = rendererOrNull() ?: return null
+                if (pageIndex < 0 || pageIndex >= r.pageCount) return null
+                r.openPage(pageIndex).use { page ->
+                    val scale = fitScale(page.width, page.height)
+                    val w = (page.width * scale).toInt().coerceIn(1, MAX_OCR_SIDE)
+                    val h = (page.height * scale).toInt().coerceIn(1, MAX_OCR_SIDE)
+                    val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+                    bmp.eraseColor(android.graphics.Color.WHITE)
+                    page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                    recognised = ocrBitmap(bmp)
+                    bmp.recycle()
                 }
             } catch (t: Throwable) {
                 recognised = null
             }
-            recognised
+            return recognised
         }
+
+        private fun fitScale(width: Int, height: Int): Float {
+            if (width <= 0 || height <= 0) return 1f
+            val longest = maxOf(width, height)
+            return if (longest * 2 <= MAX_OCR_SIDE) 2f else MAX_OCR_SIDE.toFloat() / longest
+        }
+
+        override fun close() {
+            try { renderer?.close() } catch (t: Throwable) { }
+            try { pfd?.close() } catch (t: Throwable) { }
+            renderer = null
+            pfd = null
+        }
+    }
+
+    /** One line describing what the conversion did, so nothing is silently dropped. */
+    private fun wordSummary(r: PdfToWord.Report): String {
+        val parts = ArrayList<String>()
+        parts.add(resources.getQuantityString(R.plurals.word_pages, r.pages, r.pages))
+        if (r.tables > 0) parts.add(getString(R.string.word_tables, r.tables))
+        if (r.ocrPages > 0) parts.add(getString(R.string.word_ocr_pages, r.ocrPages))
+        if (r.skippedPages > 0) parts.add(getString(R.string.word_skipped_pages, r.skippedPages))
+        return parts.joinToString(" \u00b7 ")
+    }
+
+    private companion object {
+        /** Longest side of an OCR bitmap. 2200 px keeps A4 at 2x and stops a poster from OOM. */
+        const val MAX_OCR_SIDE = 2200
     }
 
     /** ML Kit recognition on one bitmap, on the caller's background thread. */
@@ -505,13 +554,21 @@ class ToolsActivity : PdfActivity() {
                 val src = source ?: return toast(getString(R.string.msg_pick_file_first))
                 val asTxt = fWordFormat?.selectedItemPosition == 1
                 runAndSave(Files.suggestName(sourceName, "_word", if (asTxt) "txt" else "docx")) { out ->
-                    val result = PdfToWord.convert(src, "", wordOcrHook(src))
+                    val ocr = WordOcr(src)
+                    val result = try {
+                        PdfToWord.convert(src, "", ocr)
+                    } finally {
+                        ocr.close()
+                    }
                     PdfToWord.classifyHeadings(result)
                     if (result.isEmpty()) {
                         throw IllegalStateException(getString(R.string.word_nothing_found))
                     }
                     if (asTxt) PdfToWord.writeTxt(result, out) else DocxWriter.write(result, out)
                     wordReport = result.report
+                    // Say what happened, including what could not be done. A conversion that
+                    // silently dropped a table or a scanned page is worse than one that says so.
+                    toast(wordSummary(result.report))
                 }
             }
             Action.REPAIR -> {

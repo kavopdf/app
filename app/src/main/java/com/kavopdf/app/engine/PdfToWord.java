@@ -217,7 +217,7 @@ public final class PdfToWord {
         List<Line> lines = toLines(glyphs, asBands(starts));
 
         List<Table> tables = buildTables(rules, lines, pageWidth);
-        tables.addAll(rowTables(lines, tables, pageWidth));
+        tables.addAll(rowTables(rawLines, tables, pageWidth));
         List<Line> body = new ArrayList<>();
         for (Line line : lines) {
             if (line.consumed) continue;
@@ -904,115 +904,158 @@ public final class PdfToWord {
     /**
      * Rebuilds a table that has no drawn lines, from the rows its cells sit on.
      *
-     * <p>Splitting a line at its gaps leaves the cells of one row as separate lines that share
-     * a baseline. Grouping those back by baseline recovers the row, and three or more such rows
-     * with the same number of cells at the same x positions is a table.
+     * <p>Each raw line is cut at its own wide gaps, so a row becomes the cells a reader sees.
+     * Cells are then grouped by baseline, and consecutive rows that start at the same place
+     * with short cells are a table.
      *
-     * <p>The short-cell test is what keeps a two-column page out. A table's cells are labels and
-     * values - a few words each. Two columns of prose also line up, row for row, but each of
-     * their "cells" is a sentence, and turning that into a table would be far worse than leaving
-     * it as two paragraphs.
+     * <p>Rows are allowed to carry different numbers of cells: a real table has empty cells,
+     * and a row that stops early is still that row. Columns come from clustering the cell
+     * positions across the whole run, and each cell is placed in the nearest column - which is
+     * why a missing value leaves a gap in the right place instead of shifting the row.
      */
-    private static List<Table> rowTables(List<Line> lines, List<Table> ruled, float pageWidth) {
+    private static List<Table> rowTables(List<Line> rawLines, List<Table> ruled, float pageWidth) {
         List<Table> out = new ArrayList<>();
-        List<Line> candidates = new ArrayList<>();
-        for (Line line : lines) {
-            if (line.text.trim().isEmpty()) continue;
+        if (rawLines.size() < 3) return out;
+
+        // cut every raw line at its own gaps
+        List<Line> cells = new ArrayList<>();
+        for (Line raw : rawLines) {
+            if (raw.text.trim().isEmpty()) continue;
             boolean inRuled = false;
             for (Table t : ruled) {
-                if (line.inside(t)) { inRuled = true; break; }
+                if (raw.inside(t)) { inRuled = true; break; }
             }
-            if (!inRuled) candidates.add(line);
-        }
-        if (candidates.size() < 6) return out;
+            if (inRuled) continue;
 
-        Collections.sort(candidates, new Comparator<Line>() {
+            List<Glyph> glyphs = new ArrayList<>(raw.glyphs);
+            Collections.sort(glyphs, new Comparator<Glyph>() {
+                @Override
+                public int compare(Glyph a, Glyph b) { return Float.compare(a.x, b.x); }
+            });
+            List<Glyph> run = new ArrayList<>();
+            Glyph prev = null;
+            for (Glyph g : glyphs) {
+                if (prev != null) {
+                    float gap = g.x - (prev.x + prev.width);
+                    float limit = Math.max(9f, Math.max(g.size, prev.size) * 1.1f);
+                    if (gap > limit) {
+                        cells.add(cellOf(run, raw));
+                        run = new ArrayList<>();
+                    }
+                }
+                run.add(g);
+                prev = g;
+            }
+            if (!run.isEmpty()) cells.add(cellOf(run, raw));
+        }
+        if (cells.size() < 6) return out;
+
+        Collections.sort(cells, new Comparator<Line>() {
             @Override
             public int compare(Line a, Line b) {
-                return Float.compare(a.y, b.y);
+                int c = Float.compare(a.y, b.y);
+                return c != 0 ? c : Float.compare(a.x, b.x);
             }
         });
 
+        // rows: cells sharing a baseline
         List<List<Line>> rows = new ArrayList<>();
         List<Line> current = new ArrayList<>();
         float baseY = 0;
-        for (Line line : candidates) {
-            if (current.isEmpty() || Math.abs(line.y - baseY) <= 3f) {
-                current.add(line);
-                if (current.size() == 1) baseY = line.y;
+        for (Line cell : cells) {
+            if (current.isEmpty() || Math.abs(cell.y - baseY) <= 3f) {
+                current.add(cell);
+                if (current.size() == 1) baseY = cell.y;
             } else {
                 rows.add(current);
                 current = new ArrayList<>();
-                current.add(line);
-                baseY = line.y;
+                current.add(cell);
+                baseY = cell.y;
             }
         }
         if (!current.isEmpty()) rows.add(current);
 
         int i = 0;
         while (i < rows.size()) {
-            int cells = rows.get(i).size();
-            if (cells < 2) { i++; continue; }
+            if (rows.get(i).size() < 2) { i++; continue; }
             int j = i + 1;
-            while (j < rows.size() && rows.get(j).size() == cells && sameStarts(rows.get(i), rows.get(j))) j++;
+            while (j < rows.size() && rows.get(j).size() >= 2
+                    && alignedStart(rows.get(i), rows.get(j))) j++;
             if (j - i >= 3 && shortCells(rows, i, j) && tightRows(rows, i, j)) {
-                Table t = new Table();
-                t.top = rows.get(i).get(0).y;
-                float bottom = t.top, left = Float.MAX_VALUE, right = 0;
-                for (int r = i; r < j; r++) {
-                    List<Line> ordered = new ArrayList<>(rows.get(r));
-                    Collections.sort(ordered, new Comparator<Line>() {
-                        @Override
-                        public int compare(Line a, Line b) { return Float.compare(a.x, b.x); }
-                    });
-                    List<String> texts = new ArrayList<>();
-                    for (Line c : ordered) {
-                        texts.add(c.text.trim());
-                        bottom = Math.max(bottom, c.y);
-                        left = Math.min(left, c.x);
-                        right = Math.max(right, c.right);
-                        c.consumed = true;
-                    }
-                    t.rows.add(texts);
-                }
-                t.bottom = bottom;
-                t.left = left;
-                t.right = right;
-                t.header = true;
-                t.column = rows.get(i).get(0).column;
-                out.add(t);
+                Table t = buildRowTable(rows, i, j);
+                if (t != null) out.add(t);
             }
             i = Math.max(j, i + 1);
         }
         return out;
     }
 
-    private static boolean sameStarts(List<Line> a, List<Line> b) {
-        List<Float> xa = new ArrayList<>(), xb = new ArrayList<>();
-        for (Line l : a) xa.add(l.x);
-        for (Line l : b) xb.add(l.x);
-        Collections.sort(xa);
-        Collections.sort(xb);
-        for (int k = 0; k < xa.size(); k++) {
-            if (Math.abs(xa.get(k) - xb.get(k)) > 14f) return false;
-        }
-        return true;
+    private static Line cellOf(List<Glyph> glyphs, Line parent) {
+        Line cell = new Line();
+        cell.glyphs.addAll(glyphs);
+        cell.text = textOf(glyphs);
+        float total = 0;
+        for (Glyph g : glyphs) total += g.size;
+        cell.size = glyphs.isEmpty() ? 10f : total / glyphs.size();
+        cell.x = glyphs.get(0).x;
+        cell.y = parent.y;
+        float right = cell.x;
+        for (Glyph g : glyphs) right = Math.max(right, g.x + g.width);
+        cell.right = right;
+        cell.left = cell.x;
+        cell.column = parent.column;
+        return cell;
     }
 
-    /**
-     * True when the rows sit close together, the way table rows do.
-     *
-     * <p>Separate boxes placed on a page also line up in a grid, but they are spread out over
-     * the page; a table's rows follow one another at roughly the line spacing. Without this the
-     * four independent text boxes in the layout test become a four-cell table.
-     */
-    private static boolean tightRows(List<List<Line>> rows, int from, int to) {
-        for (int r = from; r + 1 < to; r++) {
-            float gap = rows.get(r + 1).get(0).y - rows.get(r).get(0).y;
-            float size = rows.get(r).get(0).size;
-            if (gap > Math.max(size * 2.4f, 16f)) return false;
+    /** Two rows belong to the same table when they start at the same place. */
+    private static boolean alignedStart(List<Line> a, List<Line> b) {
+        if (a.isEmpty() || b.isEmpty()) return false;
+        float ax = a.get(0).x, bx = b.get(0).x;
+        return Math.abs(ax - bx) <= 14f;
+    }
+
+    /** Builds the table, placing each cell in the nearest of the run's column positions. */
+    private static Table buildRowTable(List<List<Line>> rows, int from, int to) {
+        List<Float> rawStarts = new ArrayList<>();
+        for (int r = from; r < to; r++) for (Line cell : rows.get(r)) rawStarts.add(cell.x);
+        Collections.sort(rawStarts);
+
+        List<Float> columns = new ArrayList<>();
+        for (Float x : rawStarts) {
+            if (columns.isEmpty() || Math.abs(x - columns.get(columns.size() - 1)) > 18f) {
+                columns.add(x);
+            }
         }
-        return true;
+        if (columns.size() < 2 || columns.size() > 24) return null;
+
+        Table t = new Table();
+        t.top = rows.get(from).get(0).y;
+        float bottom = t.top, left = Float.MAX_VALUE, right = 0;
+        for (int r = from; r < to; r++) {
+            String[] line = new String[columns.size()];
+            for (Line cell : rows.get(r)) {
+                int best = 0;
+                float bestDistance = Float.MAX_VALUE;
+                for (int c = 0; c < columns.size(); c++) {
+                    float d = Math.abs(columns.get(c) - cell.x);
+                    if (d < bestDistance) { bestDistance = d; best = c; }
+                }
+                line[best] = line[best] == null ? cell.text.trim() : line[best] + " " + cell.text.trim();
+                bottom = Math.max(bottom, cell.y);
+                left = Math.min(left, cell.x);
+                right = Math.max(right, cell.right);
+                cell.consumed = true;
+            }
+            List<String> texts = new ArrayList<>();
+            for (String cell : line) texts.add(cell == null ? "" : cell);
+            t.rows.add(texts);
+        }
+        t.bottom = bottom;
+        t.left = left;
+        t.right = right;
+        t.header = true;
+        t.column = rows.get(from).get(0).column;
+        return t;
     }
 
     /** True when the run holds labels and values rather than sentences. */
@@ -1024,8 +1067,22 @@ public final class PdfToWord {
                 cells++;
             }
         }
-        if (cells == 0) return false;
-        return (float) total / cells <= 32f;
+        return cells > 0 && (float) total / cells <= 32f;
+    }
+
+    /**
+     * True when the rows sit close together, the way table rows do.
+     *
+     * <p>Separate boxes placed on a page also line up in a grid, but they are spread out over
+     * the page; a table's rows follow one another at roughly the line spacing.
+     */
+    private static boolean tightRows(List<List<Line>> rows, int from, int to) {
+        for (int r = from; r + 1 < to; r++) {
+            float gap = rows.get(r + 1).get(0).y - rows.get(r).get(0).y;
+            float size = rows.get(r).get(0).size;
+            if (gap > Math.max(size * 2.4f, 16f)) return false;
+        }
+        return true;
     }
 
     /** Collapses runs of near-identical coordinates into one position. */

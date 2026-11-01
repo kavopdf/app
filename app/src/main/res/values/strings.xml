@@ -326,4 +326,11 @@
     <string name="word_format_docx">Word document (.docx)</string>
     <string name="word_format_txt">Plain text (.txt)</string>
     <string name="word_nothing_found">No text could be read from this PDF</string>
+    <string name="word_tables">%1$d tables</string>
+    <string name="word_ocr_pages">%1$d pages read by OCR</string>
+    <string name="word_skipped_pages">%1$d pages could not be read</string>
+    <plurals name="word_pages">
+        <item quantity="one">%1$d page</item>
+        <item quantity="other">%1$d pages</item>
+    </plurals>
 </resources>

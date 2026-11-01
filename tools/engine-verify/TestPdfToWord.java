@@ -120,6 +120,37 @@ public class TestPdfToWord {
         check("borderless table became a table", tr.report.tables >= 1);
         check("borderless rows keep their cells", ttext.contains("Widgets | 1200"));
 
+        // A table whose rows carry different numbers of cells: a real table has empty cells,
+        // and a row that stops early is still that row, not a reason to abandon the table.
+        File uneven = new File(W, "uneven.pdf");
+        try (PDDocument d = new PDDocument()) {
+            PDPage page = new PDPage(PDRectangle.A4);
+            d.addPage(page);
+            try (PDPageContentStream cs = new PDPageContentStream(d, page)) {
+                String[][] rows = {{"Name", "Qty", "Price"}, {"Bolts", "40", "12"}, {"Nuts", "25"}};
+                float y = 720;
+                float[] x = {70, 200, 330};
+                for (String[] row : rows) {
+                    for (int c = 0; c < row.length; c++) {
+                        cs.beginText();
+                        cs.setFont(PDType1Font.HELVETICA, 11);
+                        cs.newLineAtOffset(x[c], y);
+                        cs.showText(row[c]);
+                        cs.endText();
+                    }
+                    y -= 16;
+                }
+            }
+            d.save(uneven);
+        }
+        PdfToWord.Result ur = PdfToWord.convert(uneven, "", null);
+        File utxt = new File(W, "uneven.txt");
+        PdfToWord.writeTxt(ur, utxt);
+        String utext = new String(Files.readAllBytes(utxt.toPath()), StandardCharsets.UTF_8);
+        check("table with an uneven last row still becomes a table", ur.report.tables >= 1);
+        check("uneven row keeps its cells in the right columns",
+                utext.contains("Bolts | 40 | 12") && utext.contains("Nuts | 25"));
+
         System.out.println("PDF2WORD TOTAL: " + pass + " passed, " + fail + " failed");
         if (fail > 0) System.exit(1);
     }
