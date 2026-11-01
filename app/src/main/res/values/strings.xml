@@ -333,4 +333,5 @@
         <item quantity="one">%1$d page</item>
         <item quantity="other">%1$d pages</item>
     </plurals>
+    <string name="word_no_text_pages">No text could be read from this PDF — %1$d pages hold no text layer and OCR found nothing</string>
 </resources>

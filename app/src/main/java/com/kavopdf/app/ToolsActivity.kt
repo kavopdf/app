@@ -551,16 +551,29 @@ class ToolsActivity : PdfActivity() {
             Action.PDF_TO_WORD -> {
                 val src = source ?: return toast(getString(R.string.msg_pick_file_first))
                 val asTxt = fWordFormat?.selectedItemPosition == 1
-                runAndSave(Files.suggestName(sourceName, "_word", if (asTxt) "txt" else "docx")) { out ->
+                runAndSaveAs(
+                    Files.suggestName(sourceName, "_word", if (asTxt) "txt" else "docx"),
+                    if (asTxt) SaveKind.TXT else SaveKind.DOCX
+                ) { out ->
                     val ocr = WordOcr(src)
                     val result = try {
                         PdfToWord.convert(src, "", ocr)
+                    } catch (t: Throwable) {
+                        throw com.kavopdf.app.util.UserFacing(
+                            t.message?.takeIf { it.isNotBlank() }
+                                ?: getString(R.string.msg_could_not_read)
+                        )
                     } finally {
                         ocr.close()
                     }
                     PdfToWord.classifyHeadings(result)
                     if (result.isEmpty()) {
-                        throw IllegalStateException(getString(R.string.word_nothing_found))
+                        // Say which of the two it was: a file with no text layer that OCR could
+                        // not read, or a file that holds nothing at all.
+                        val reason = if (result.report.skippedPages > 0)
+                            getString(R.string.word_no_text_pages, result.report.skippedPages)
+                        else getString(R.string.word_nothing_found)
+                        throw com.kavopdf.app.util.UserFacing(reason)
                     }
                     if (asTxt) PdfToWord.writeTxt(result, out) else DocxWriter.write(result, out)
                     wordReport = result.report

@@ -72,27 +72,63 @@ abstract class PdfActivity : AppCompatActivity() {
 
     private val createDocLauncher =
         registerForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
-            val producer = pendingProducer
-            pendingProducer = null
-            if (uri == null || producer == null) return@registerForActivityResult
-            val out = trackCacheFile(Files.newFile(this, pendingName))
-            val taskName = taskLabel()
-            runTask(getString(R.string.msg_processing), onDone = saved@{ result ->
-                if (result == null) return@saved
-                showSuccess(getString(R.string.msg_saved_to, pendingName), result)
-                onSaved(result)
-            }) {
-                try {
-                    producer(out)
-                    Files.writeToUri(this, out, uri)
-                    AppLog.record(this, taskName, pendingName, true)
-                    out
-                } catch (t: Throwable) {
-                    com.kavopdf.app.util.CrashGuard.problem(this, taskName, t)
-                    throw t
+            finishSave(uri)
+        }
+
+    // The system file picker appends the extension for its own MIME type. Reusing the PDF
+    // picker for a .docx wrote "report_word.docx.pdf" - the right file with the wrong name.
+    private val createDocxLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument(DOCX_MIME)) { uri ->
+            finishSave(uri)
+        }
+
+    private val createTxtLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
+            finishSave(uri)
+        }
+
+    /** Writes the produced file to the document the user picked. */
+    private fun finishSave(uri: Uri?) {
+        val producer = pendingProducer
+        pendingProducer = null
+        if (uri == null || producer == null) return
+        val out = trackCacheFile(Files.newFile(this, pendingName))
+        val taskName = taskLabel()
+        runTask(getString(R.string.msg_processing), onDone = saved@{ result ->
+            if (result == null) return@saved
+            showSuccess(getString(R.string.msg_saved_to, pendingName), result)
+            onSaved(result)
+        }) {
+            try {
+                producer(out)
+                Files.writeToUri(this, out, uri)
+                AppLog.record(this, taskName, pendingName, true)
+                out
+            } catch (t: Throwable) {
+                com.kavopdf.app.util.CrashGuard.problem(this, taskName, t)
+                // The picker has already created an empty document. Leaving it behind means a
+                // 0-byte file in the user's folder that looks like a result but is not one.
+                runCatching { contentResolver.delete(uri, null, null) }
+                if (t is com.kavopdf.app.util.UserFacing) {
+                    runOnUiThread { toast(t.message ?: getString(R.string.msg_could_not_read)) }
                 }
+                throw t
             }
         }
+    }
+
+    /** Save as a Word document or a text file rather than a PDF. */
+    protected fun runAndSaveAs(name: String, kind: SaveKind, produce: (File) -> Unit) {
+        pendingName = name
+        pendingProducer = produce
+        when (kind) {
+            SaveKind.DOCX -> createDocxLauncher.launch(name)
+            SaveKind.TXT -> createTxtLauncher.launch(name)
+        }
+    }
+
+    /** The kind of document a tool produces, when it is not a PDF. */
+    protected enum class SaveKind { DOCX, TXT }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeUtil.apply(this)
@@ -259,6 +295,11 @@ abstract class PdfActivity : AppCompatActivity() {
     protected var pagesHint: Int = 1
     /** Size of the open file, so the detector can compare like with like. */
     protected var sizeHint: Long = 0L
+
+    private companion object {
+        const val DOCX_MIME =
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    }
 
     /**
      * The name a run is measured under: the tool plus the operation.
