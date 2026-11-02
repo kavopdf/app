@@ -825,6 +825,12 @@ public final class PdfToWord {
             }
         });
 
+        // The right edge of the text block, not of the line: contentRight() used to be built
+        // from the line itself, so "the line reached the margin" was always true and no
+        // paragraph ever ended.
+        float blockRight = -Float.MAX_VALUE;
+        for (Line ln : lines) if (!ln.text.trim().isEmpty()) blockRight = Math.max(blockRight, ln.right);
+
         List<Line> group = new ArrayList<>();
         for (Line line : lines) {
             if (line.text.trim().isEmpty()) continue;
@@ -833,7 +839,7 @@ public final class PdfToWord {
                 continue;
             }
             Line prev = group.get(group.size() - 1);
-            if (sameParagraph(prev, line, pageWidth)) {
+            if (sameParagraph(prev, line, pageWidth, blockRight)) {
                 group.add(line);
             } else {
                 out.add(buildPara(group, pageWidth, bands));
@@ -854,7 +860,7 @@ public final class PdfToWord {
                 || c == '\u2023' || c == '\u00b7' || c == '\u2043';
     }
 
-    private static boolean sameParagraph(Line prev, Line next, float pageWidth) {
+    private static boolean sameParagraph(Line prev, Line next, float pageWidth, float blockRight) {
         if (prev.column != next.column) return false;
         // A bullet starts its own item. Its glyph is often set larger than the words beside
         // it, which made the alignment test pass and swallowed three advice lines into one.
@@ -864,10 +870,12 @@ public final class PdfToWord {
         if (gap <= 0 || gap > size * 1.75f) return false;
         if (Math.abs(prev.size - next.size) > size * 0.18f) return false;
 
-        boolean alignedLeft = Math.abs(prev.x - next.x) <= size * 0.6f;
-        boolean continues = prev.right >= contentRight(prev, pageWidth) - size * 2.5f;
+        // A paragraph continues only if the line above ran on to the margin. Left alignment
+        // alone is not enough: an invoice header has six left-aligned lines that are six
+        // different fields, and merging them put the whole header into one paragraph.
+        boolean continues = prev.right >= blockRight - size * 2.5f;
         boolean indented = next.x > prev.x + size * 1.2f;
-        return alignedLeft || (continues && !indented);
+        return continues && !indented;
     }
 
     private static float contentRight(Line line, float pageWidth) {
