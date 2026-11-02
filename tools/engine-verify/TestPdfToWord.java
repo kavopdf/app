@@ -63,8 +63,14 @@ public class TestPdfToWord {
         String text = new String(Files.readAllBytes(txt.toPath()), StandardCharsets.UTF_8);
         check("txt has the heading", text.contains("BIG HEADING"));
         check("txt has the body text", text.contains("ordinary words"));
-        check("wrapped lines joined into one paragraph",
-                text.contains("with ordinary words in it. A second line"));
+        // The plain-text file keeps the lines the PDF drew. A .txt has no paragraph of its
+        // own, and hard-wrapping a paragraph back into lines at a width the reader never saw
+        // was the thing that made the text stop matching the document it came from.
+        check("txt keeps the PDF's own line break",
+                text.contains("with ordinary words in it.\n")
+                        && text.contains("A second line that belongs to the same paragraph."));
+        check("txt does not glue the two lines together",
+                !text.contains("in it. A second line"));
 
         File docx = new File(W, "out.docx");
         DocxWriter.write(r, docx);

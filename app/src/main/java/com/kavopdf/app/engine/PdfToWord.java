@@ -83,6 +83,10 @@ public final class PdfToWord {
         public float top;            // y of the first line, for ordering
         public float left, right;    // horizontal extent, for the layout cut
         public int column;           // which column band it sits in
+        /** The lines the PDF actually drew, in order. A .txt has no paragraph concept, so the
+         *  plain-text output keeps them instead of hard-wrapping a paragraph back into lines
+         *  at a width the reader never saw. */
+        public final List<String> lines = new ArrayList<>();
 
         public String text() {
             StringBuilder sb = new StringBuilder();
@@ -1129,6 +1133,7 @@ public final class PdfToWord {
         for (Line line : group) {
             String t = line.text.trim();
             if (t.isEmpty()) continue;
+            p.lines.add(t);
             if (prevText != null) {
                 if (prevText.endsWith("-") && t.length() > 0
                         && Character.isLowerCase(t.charAt(0))) {
@@ -2127,9 +2132,18 @@ public final class PdfToWord {
                     }
                     sb.append('\n');
                 } else if (block instanceof Para) {
-                    String text = ((Para) block).text().trim();
+                    Para para = (Para) block;
+                    String text = para.text().trim();
                     if (text.isEmpty()) continue;
-                    sb.append(text).append("\n\n");
+                    if (para.lines.isEmpty()) {
+                        sb.append(text).append("\n\n");
+                    } else {
+                        // One line per line the PDF drew, and a blank line where the
+                        // paragraph ends. The paragraph itself is still one paragraph in the
+                        // .docx; only the plain-text file shows the original line structure.
+                        for (String ln : para.lines) sb.append(ln).append('\n');
+                        sb.append('\n');
+                    }
                 }
             }
         }
