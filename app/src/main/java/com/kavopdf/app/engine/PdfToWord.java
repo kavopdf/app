@@ -335,6 +335,30 @@ public final class PdfToWord {
             }
         }
 
+        // A table that does not account for the lines drawn inside it is not a table. A menu
+        // read as a two-row table swallowed fifty of its lines: they were marked consumed and
+        // the table never wrote them. Such a table is dropped and its lines handed back.
+        List<Table> solid = new ArrayList<>();
+        for (Table t : tables) {
+            int inside = 0, covered = 0;
+            for (Line line : lines) {
+                if (!line.inside(t)) continue;
+                inside++;
+                String norm = line.text.trim().replaceAll("\\s+", " ");
+                for (List<String> row : t.rows) {
+                    boolean hit = false;
+                    for (String cell : row) {
+                        String c = cell.trim().replaceAll("\\s+", " ");
+                        if (!c.isEmpty() && (c.contains(norm) || norm.contains(c))) { hit = true; break; }
+                    }
+                    if (hit) { covered++; break; }
+                }
+            }
+            if (inside == 0 || covered * 100 / inside >= 60) solid.add(t);
+            else for (Line line : lines) if (line.inside(t)) line.consumed = false;
+        }
+        tables = solid;
+
         List<Line> body = new ArrayList<>();
         for (Line line : lines) {
             if (line.consumed) continue;
