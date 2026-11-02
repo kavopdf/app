@@ -638,7 +638,17 @@ public final class PdfToWord {
      * and the pieces come out in the order a reader takes them - down a column, then the next.
      */
     private static void xyCut(List<Object> items, List<Object> out, float minGap) {
-        if (items.size() <= 1) {
+        xyCut(items, out, minGap, 0);
+    }
+
+    /**
+     * @param depth how many cuts deep we already are. Each cut can shave a single item off, so
+     *              a page with thousands of blocks would recurse thousands of frames deep and
+     *              take the stack with it. Past the limit the rest is read top to bottom, which
+     *              is what the uncut branch does anyway.
+     */
+    private static void xyCut(List<Object> items, List<Object> out, float minGap, int depth) {
+        if (items.size() <= 1 || depth > 40) {
             out.addAll(items);
             return;
         }
@@ -714,11 +724,11 @@ public final class PdfToWord {
         boolean cutVertically = vValid && bestV >= minGap && bestVi > 0
                 && (bestH < horizontalFloor || bestV >= bestH || !hValid);
         if (cutVertically) {
-            xyCut(new ArrayList<>(byX.subList(0, bestVi)), out, minGap);   // left first
-            xyCut(new ArrayList<>(byX.subList(bestVi, byX.size())), out, minGap);
+            xyCut(new ArrayList<>(byX.subList(0, bestVi)), out, minGap, depth + 1);
+            xyCut(new ArrayList<>(byX.subList(bestVi, byX.size())), out, minGap, depth + 1);
         } else if (hValid && bestH >= horizontalFloor && bestHi > 0) {
-            xyCut(new ArrayList<>(byY.subList(0, bestHi)), out, minGap);   // top first
-            xyCut(new ArrayList<>(byY.subList(bestHi, byY.size())), out, minGap);
+            xyCut(new ArrayList<>(byY.subList(0, bestHi)), out, minGap, depth + 1);
+            xyCut(new ArrayList<>(byY.subList(bestHi, byY.size())), out, minGap, depth + 1);
         } else {
             // nothing to cut: read down, then across
             out.addAll(byY);
@@ -1981,7 +1991,12 @@ public final class PdfToWord {
                 }
             }
         }
+        // A PDF can carry NUL and other control bytes inside its text. They are legal in a
+        // .txt but every editor shows them as garbage. They become a space, not nothing: a NUL
+        // between two words is a word separator, and deleting it ran "Strongly agree" together.
+        String clean = sb.toString()
+                .replaceAll("[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F]", " ");
         java.nio.file.Files.write(out.toPath(),
-                sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                clean.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 }
