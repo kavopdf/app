@@ -703,7 +703,14 @@ public final class PdfToWord {
             List<List<Glyph>> segments = new ArrayList<>();
             List<Glyph> run = new ArrayList<>();
             Glyph prev = null;
+            int pageNoAt = pageNumberSplit(raw.glyphs);
+            int gi = -1;
             for (Glyph g : raw.glyphs) {
+                gi++;
+                if (prev != null && gi == pageNoAt) {
+                    segments.add(run);
+                    run = new ArrayList<>();
+                }
                 if (prev != null && crossesGutter(gutters, prev.x + prev.width, g.x)) {                    segments.add(run);
                     run = new ArrayList<>();
                 }
@@ -749,6 +756,38 @@ public final class PdfToWord {
         return logicalOrder(sb.toString());
     }
 
+
+    /**
+     * Where a running head should be cut, or -1.
+     *
+     * <p>A running head puts the title and the page number on one baseline with most of the
+     * page between them, and they came out as one line: "Meridian Consulting - Internal Page 1".
+     * Splitting every wide gap also fixed that, but it cut a question paper's heading in half,
+     * so the gap alone is not the test. The cut happens only where the tail is a page number -
+     * "Page 12", "12", "12 of 30", "- 12 -" - which is what a running head always ends with.
+     */
+    private static int pageNumberSplit(List<Glyph> line) {
+        if (line == null || line.size() < 2) return -1;
+        for (int i = 1; i < line.size(); i++) {
+            Glyph prev = line.get(i - 1);
+            Glyph g = line.get(i);
+            float gap = g.x - (prev.x + prev.width);
+            if (gap < 24f) continue;
+            StringBuilder tail = new StringBuilder();
+            for (int k = i; k < line.size(); k++) tail.append(line.get(k).text);
+            String t = tail.toString().trim();
+            // A page number, an author line and a marks column all sit far from what comes
+            // before them on the same baseline. Each is a short standalone token, so each is
+            // cut away rather than glued on - the reference keeps them on their own lines.
+            if (t.matches("(Page\\s+)?\\d{1,4}(\\s+of\\s+\\d{1,4})?")
+                    || t.matches("-\\s*\\d{1,4}\\s*-")
+                    || t.matches("\\[\\d{1,3}\\]")
+                    || t.matches("[A-Z]\\.\\s*[A-Z][\\p{L}\\-]{1,20}")) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     private static boolean crossesGutter(List<float[]> gutters, float from, float to) {
         for (float[] g : gutters) {
