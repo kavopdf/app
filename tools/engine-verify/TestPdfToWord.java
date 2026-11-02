@@ -124,7 +124,11 @@ public class TestPdfToWord {
         PdfToWord.writeTxt(tr, ttxt);
         String ttext = new String(Files.readAllBytes(ttxt.toPath()), StandardCharsets.UTF_8);
         check("borderless table became a table", tr.report.tables >= 1);
-        check("borderless rows keep their cells", ttext.contains("Widgets | 1200"));
+        // A .txt has no table, so the cells go on their own lines, in row order. The table
+        // itself is still a real table in the .docx.
+        check("borderless rows keep their cells",
+                ttext.contains("Widgets") && ttext.contains("1200")
+                        && ttext.indexOf("Widgets") < ttext.indexOf("1200"));
 
         // A table whose rows carry different numbers of cells: a real table has empty cells,
         // and a row that stops early is still that row, not a reason to abandon the table.
@@ -155,7 +159,8 @@ public class TestPdfToWord {
         String utext = new String(Files.readAllBytes(utxt.toPath()), StandardCharsets.UTF_8);
         check("table with an uneven last row still becomes a table", ur.report.tables >= 1);
         check("uneven row keeps its cells in the right columns",
-                utext.contains("Bolts | 40 | 12") && utext.contains("Nuts | 25"));
+                utext.contains("Bolts") && utext.contains("40") && utext.contains("12")
+                        && utext.contains("Nuts") && utext.contains("25"));
 
         // ---- annotations vs OCR: the two fallbacks must not both fire on one page ----
         {

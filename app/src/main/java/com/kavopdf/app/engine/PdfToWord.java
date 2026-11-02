@@ -2122,13 +2122,14 @@ public final class PdfToWord {
                 if (block instanceof Table) {
                     Table t = (Table) block;
                     if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '\n') sb.append('\n');
+                    // A .txt has no table. One cell per line keeps every line the PDF drew on
+                    // a line of its own, which is what a reader searching the text expects; a
+                    // "cell | cell" row glued them into a line that appears nowhere in the file.
                     for (List<String> row : t.rows) {
-                        StringBuilder line = new StringBuilder();
-                        for (int c = 0; c < row.size(); c++) {
-                            if (c > 0) line.append(" | ");
-                            line.append(row.get(c).replace("\n", " ").trim());
+                        for (String cell : row) {
+                            String c = cell.replace("\n", " ").trim();
+                            if (!c.isEmpty()) sb.append(c).append('\n');
                         }
-                        sb.append(line.toString().trim()).append('\n');
                     }
                     sb.append('\n');
                 } else if (block instanceof Para) {
