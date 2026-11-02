@@ -1097,6 +1097,14 @@ public final class PdfRepair {
      * The table is {@code N} pairs of "objectNumber offset" integers; the first byte after the
      * last of them is where the bodies begin. Returns -1 when the table does not look like one.
      */
+    /** Bytes the app can still allocate before it would hit the heap ceiling. */
+    private static long freeHeapBytes() {
+        Runtime rt = Runtime.getRuntime();
+        long max = rt.maxMemory();
+        long used = rt.totalMemory() - rt.freeMemory();
+        return Math.max(0L, max - used);
+    }
+
     /** True when this byte can begin a PDF object body. */
     private static boolean startsObject(byte b) {
         return b == '<' || b == '[' || b == '/' || b == '('
@@ -1240,9 +1248,16 @@ public final class PdfRepair {
     }
 
     private static File salvageObjects(File src, File outFile, Report r) {
-        if (src.length() > 16L * 1024 * 1024L) {
-            r.findings.add("the file is over 16 MB - the object lift is skipped on files that"
-                    + " large so a repair cannot exhaust the phone's memory");
+        // The lift holds the whole file in memory twice - once as bytes, once as the rebuilt
+        // file. A fixed 16 MB ceiling refused every scanned document, which is exactly the
+        // kind of file people bring to a repair tool. The ceiling is now the phone's own free
+        // heap: the lift runs whenever the file fits in a quarter of it, and says so plainly
+        // when it does not, instead of quietly failing.
+        long budget = freeHeapBytes() / 4;
+        if (src.length() > budget) {
+            r.findings.add("the file is " + (src.length() / (1024 * 1024)) + " MB and only "
+                    + (budget / (1024 * 1024)) + " MB of memory is free - the object lift was"
+                    + " skipped rather than risk running the phone out of memory");
             return null;
         }
         byte[] b;
