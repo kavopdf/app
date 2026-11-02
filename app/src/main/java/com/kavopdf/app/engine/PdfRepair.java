@@ -1185,8 +1185,11 @@ public final class PdfRepair {
         if (dataStart < text.length() && text.charAt(dataStart) == '\r') dataStart++;
         if (dataStart < text.length() && text.charAt(dataStart) == '\n') dataStart++;
         int endAt = text.lastIndexOf("endstream");
-        if (endAt < dataStart) return body;
-        int len = endAt - dataStart;
+        // An object body runs to "endobj", so "endstream" is often NOT inside the slice that
+        // was handed in. Requiring it made the repair silently do nothing on exactly the files
+        // that needed it. When it is absent the stream simply runs to the end of the body.
+        int len = (endAt > dataStart ? endAt : text.length()) - dataStart;
+        if (len <= 0) return body;
         String out = text.substring(0, m.start()) + "/Length " + len + text.substring(m.end());
         return out.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
     }
