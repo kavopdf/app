@@ -251,6 +251,36 @@ public final class PdfToWord {
             tables = buildTables(rules, lines, pageWidth);
             tables.addAll(rowPass);
         }
+        // A form drawn round everything can swallow a real table inside it. The bill of lading
+        // came out twice for exactly this reason: one big table for the whole form and one for
+        // the marks grid. The outer box is dropped and the inner tables are kept.
+        List<Table> keepTables = new ArrayList<>();
+        for (Table a : tables) {
+            boolean containsAnother = false;
+            for (Table b : tables) {
+                if (a == b) continue;
+                boolean inside = b.left >= a.left - 4 && b.right <= a.right + 4
+                        && b.top >= a.top - 4 && b.bottom <= a.bottom + 4;
+                boolean smaller = (b.right - b.left) * (b.bottom - b.top)
+                        < (a.right - a.left) * (a.bottom - a.top) * 0.9f;
+                if (inside && smaller) { containsAnother = true; break; }
+            }
+            if (!containsAnother) keepTables.add(a);
+        }
+        tables = keepTables;
+
+        // Text already sitting in a table cell must not also come out as body text: the bill of
+        // lading appeared twice, once as a run-on paragraph and once as its proper table.
+        java.util.HashSet<String> cellText = new java.util.HashSet<>();
+        for (Table t : tables) {
+            for (List<String> row : t.rows) {
+                for (String cell : row) {
+                    String norm = cell.trim().replaceAll("\\s+", " ");
+                    if (norm.length() > 3) cellText.add(norm);
+                }
+            }
+        }
+
         List<Line> body = new ArrayList<>();
         for (Line line : lines) {
             if (line.consumed) continue;
@@ -260,6 +290,10 @@ public final class PdfToWord {
                     inTable = true;
                     break;
                 }
+            }
+            if (!inTable) {
+                String norm = line.text.trim().replaceAll("\\s+", " ");
+                if (!norm.isEmpty() && cellText.contains(norm)) inTable = true;
             }
             if (!inTable) body.add(line);
         }
@@ -825,6 +859,12 @@ public final class PdfToWord {
             }
         });
 
+        // The right edge of the text block, not of the line: contentRight() used to be built
+        // from the line itself, so "the line reached the margin" was always true and no
+        // paragraph ever ended.
+        float blockRight = -Float.MAX_VALUE;
+        for (Line ln : lines) if (!ln.text.trim().isEmpty()) blockRight = Math.max(blockRight, ln.right);
+
         List<Line> group = new ArrayList<>();
         for (Line line : lines) {
             if (line.text.trim().isEmpty()) continue;
@@ -833,7 +873,7 @@ public final class PdfToWord {
                 continue;
             }
             Line prev = group.get(group.size() - 1);
-            if (sameParagraph(prev, line, pageWidth)) {
+            if (sameParagraph(prev, line, pageWidth, blockRight)) {
                 group.add(line);
             } else {
                 out.add(buildPara(group, pageWidth, bands));
@@ -854,7 +894,7 @@ public final class PdfToWord {
                 || c == '\u2023' || c == '\u00b7' || c == '\u2043';
     }
 
-    private static boolean sameParagraph(Line prev, Line next, float pageWidth) {
+    private static boolean sameParagraph(Line prev, Line next, float pageWidth, float blockRight) {
         if (prev.column != next.column) return false;
         // A bullet starts its own item. Its glyph is often set larger than the words beside
         // it, which made the alignment test pass and swallowed three advice lines into one.
@@ -864,10 +904,12 @@ public final class PdfToWord {
         if (gap <= 0 || gap > size * 1.75f) return false;
         if (Math.abs(prev.size - next.size) > size * 0.18f) return false;
 
-        boolean alignedLeft = Math.abs(prev.x - next.x) <= size * 0.6f;
-        boolean continues = prev.right >= contentRight(prev, pageWidth) - size * 2.5f;
+        // A paragraph continues only if the line above ran on to the margin. Left alignment
+        // alone is not enough: an invoice header has six left-aligned lines that are six
+        // different fields, and merging them put the whole header into one paragraph.
+        boolean continues = prev.right >= blockRight - size * 2.5f;
         boolean indented = next.x > prev.x + size * 1.2f;
-        return alignedLeft || (continues && !indented);
+        return continues && !indented;
     }
 
     private static float contentRight(Line line, float pageWidth) {
@@ -1416,6 +1458,20 @@ public final class PdfToWord {
         // cells are real but the words are not there. A real table has text in a good share of
         // its cells; without this test a 21x21 QR code becomes a table and swallows the invoice.
         if (filled < Math.max(2, group.size() / 4)) return null;
+
+        // If one cell's text runs straight into the next with no space and the next begins with
+        // a small letter, the drawn grid is cutting through a word - "Strongly agree" became
+        // "S | trongly agre | e". A table that breaks words is worse than no table, so the
+        // caller falls back to the older pass for this page.
+        for (List<String> row : t.rows) {
+            for (int c = 0; c + 1 < row.size(); c++) {
+                String cellL = row.get(c), cellR = row.get(c + 1);
+                if (cellL.isEmpty() || cellR.isEmpty()) continue;
+                char last = cellL.charAt(cellL.length() - 1);
+                char first = cellR.charAt(0);
+                if (Character.isLetter(last) && Character.isLowerCase(first)) return null;
+            }
+        }
         return t;
     }
 
@@ -1461,8 +1517,6 @@ public final class PdfToWord {
         for (List<float[]> group : cellsToTables(cells)) {
             Table t = tableFromCells(group, glyphs);
             if (t == null) continue;
-            float area = (t.right - t.left) * (t.bottom - t.top);
-            if (pageWidth > 0 && area > pageWidth * pageWidth * 0.42f) continue;
             out.add(t);
         }
         return out;
