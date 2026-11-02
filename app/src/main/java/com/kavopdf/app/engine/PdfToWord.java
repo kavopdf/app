@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Locale;
@@ -203,6 +205,7 @@ public final class PdfToWord {
         report.images += rules.images;
 
         float pageWidth = pdPage.getMediaBox().getWidth();
+        final float pageHeight = pdPage.getMediaBox().getHeight();
         List<Line> rawLines = toLines(glyphs, new ArrayList<float[]>());
 
         // Tables are found from the drawn rules, so they can be located before any line is
@@ -229,8 +232,25 @@ public final class PdfToWord {
         }
         List<Line> lines = toLines(glyphs, asBands(starts));
 
-        List<Table> tables = buildTables(rules, lines, pageWidth);
-        tables.addAll(rowPass);
+        // Rules come from the graphics engine with y measured up from the page bottom; glyphs
+        // carry y measured down from the top. Without flipping one into the other, no glyph ever
+        // falls inside a cell and every table comes out empty.
+        float pageH = pageHeight;
+        List<Edge> edges = new ArrayList<>();
+        for (float[] h : rules.horizontal) {
+            float y = pageH > 0 ? pageH - h[0] : h[0];
+            edges.add(new Edge(true, h[1], y, h[2], y));
+        }
+        for (float[] v : rules.vertical) {
+            float y0 = pageH > 0 ? pageH - v[2] : v[1];
+            float y1 = pageH > 0 ? pageH - v[1] : v[2];
+            edges.add(new Edge(false, v[0], y0, v[0], y1));
+        }
+        List<Table> tables = findTables(edges, glyphs, pageWidth);
+        if (tables.isEmpty()) {
+            tables = buildTables(rules, lines, pageWidth);
+            tables.addAll(rowPass);
+        }
         List<Line> body = new ArrayList<>();
         for (Line line : lines) {
             if (line.consumed) continue;
@@ -1107,6 +1127,361 @@ public final class PdfToWord {
      * merged cells, which is worse than leaving the text as text. Those pages keep their text
      * and the report says the table was flattened.
      */
+    // ---------------------------------------------------------------- tables
+    // Ported from pdfplumber's table.py (MIT). The algorithm is theirs, line for line:
+    // snap edges, join collinear edges, find intersections, read cells off the intersections,
+    // group touching cells into tables. Nothing here is invented.
+
+    private static final float SNAP_TOL = 3f;
+    private static final float JOIN_TOL = 3f;
+    private static final float EDGE_MIN = 3f;
+    private static final float ISECT_TOL = 3f;
+
+    /** One drawn edge. A horizontal edge has top == bottom; a vertical one has left == right. */
+    private static final class Edge {
+        boolean horizontal;
+        float x0, top, x1, bottom;
+        Edge(boolean horizontal, float x0, float top, float x1, float bottom) {
+            this.horizontal = horizontal; this.x0 = x0; this.top = top; this.x1 = x1; this.bottom = bottom;
+        }
+    }
+
+    /**
+     * Snap edges that lie within a tolerance of each other to their average.
+     *
+     * <p>Clusters are built by comparing each edge with the one before it, not with the start
+     * of the cluster - that is what pdfplumber's cluster_objects does, and it is why a run of
+     * edges at 100, 102, 104 is one cluster and not two. Comparing with the cluster start split
+     * such runs, which left extra vertical edges and extra empty columns.
+     */
+    private static List<Edge> snapEdges(List<Edge> edges, float xtol, float ytol) {
+        List<Edge> out = new ArrayList<>();
+        for (boolean horiz : new boolean[]{false, true}) {
+            List<Edge> group = new ArrayList<>();
+            for (Edge e : edges) if (e.horizontal == horiz) group.add(e);
+            if (group.isEmpty()) continue;
+            group.sort(new Comparator<Edge>() {
+                @Override public int compare(Edge a, Edge b) {
+                    return Float.compare(horiz ? a.top : a.x0, horiz ? b.top : b.x0);
+                }
+            });
+            float tol = horiz ? ytol : xtol;
+            List<List<Edge>> clusters = new ArrayList<>();
+            List<Edge> current = new ArrayList<>();
+            float prev = 0f;
+            boolean first = true;
+            for (Edge e : group) {
+                float v = horiz ? e.top : e.x0;
+                if (first || Math.abs(v - prev) <= tol) {
+                    current.add(e);
+                } else {
+                    clusters.add(current);
+                    current = new ArrayList<>();
+                    current.add(e);
+                }
+                prev = v;
+                first = false;
+            }
+            if (!current.isEmpty()) clusters.add(current);
+            for (List<Edge> cluster : clusters) {
+                float sum = 0f;
+                for (Edge e : cluster) sum += horiz ? e.top : e.x0;
+                float avg = sum / cluster.size();
+                for (Edge e : cluster) {
+                    if (horiz) out.add(new Edge(true, e.x0, avg, e.x1, avg));
+                    else out.add(new Edge(false, avg, e.top, avg, e.bottom));
+                }
+            }
+        }
+        return out;
+    }
+
+    /** Join edges that sit on the same line and overlap or nearly touch. */
+    private static List<Edge> joinEdgeGroup(List<Edge> edges, boolean horizontal, float tol) {
+        if (edges.isEmpty()) return edges;
+        List<Edge> sorted = new ArrayList<>(edges);
+        final boolean h = horizontal;
+        sorted.sort(new Comparator<Edge>() {
+            @Override public int compare(Edge a, Edge b) {
+                return Float.compare(h ? a.x0 : a.top, h ? b.x0 : b.top);
+            }
+        });
+        List<Edge> joined = new ArrayList<>();
+        joined.add(sorted.get(0));
+        for (int i = 1; i < sorted.size(); i++) {
+            Edge e = sorted.get(i);
+            Edge last = joined.get(joined.size() - 1);
+            float eMin = h ? e.x0 : e.top, eMax = h ? e.x1 : e.bottom;
+            float lMax = h ? last.x1 : last.bottom;
+            if (eMin <= lMax + tol) {
+                if (eMax > lMax) {
+                    joined.set(joined.size() - 1, h
+                            ? new Edge(true, last.x0, last.top, eMax, last.top)
+                            : new Edge(false, last.x0, last.top, last.x0, eMax));
+                }
+            } else {
+                joined.add(e);
+            }
+        }
+        return joined;
+    }
+
+    /** Snap, then join every group of collinear edges. */
+    private static List<Edge> mergeEdges(List<Edge> edges) {
+        List<Edge> snapped = snapEdges(edges, SNAP_TOL, SNAP_TOL);
+        List<Edge> out = new ArrayList<>();
+        for (boolean horiz : new boolean[]{true, false}) {
+            Map<Integer, List<Edge>> groups = new HashMap<>();
+            for (Edge e : snapped) {
+                if (e.horizontal != horiz) continue;
+                int key = Math.round(horiz ? e.top : e.x0);
+                groups.computeIfAbsent(key, k -> new ArrayList<>()).add(e);
+            }
+            List<Integer> keys = new ArrayList<>(groups.keySet());
+            Collections.sort(keys);
+            for (Integer k : keys) out.addAll(joinEdgeGroup(groups.get(k), horiz, JOIN_TOL));
+        }
+        return out;
+    }
+
+    /** A point keyed by value: arrays would hash by identity and never match. */
+    private static long pointKey(float x, float y) {
+        return ((long) Math.round(x) << 32) | (Math.round(y) & 0xffffffffL);
+    }
+
+    private static float keyX(long key) { return (float) (key >> 32); }
+
+    private static float keyY(long key) { return (float) (int) (key & 0xffffffffL); }
+
+    /** Points where a vertical and a horizontal edge meet, with the edges touching each point. */
+    private static Map<Long, List<Edge>[]> edgesToIntersections(List<Edge> edges) {
+        List<Edge> vs = new ArrayList<>(), hs = new ArrayList<>();
+        for (Edge e : edges) (e.horizontal ? hs : vs).add(e);
+        Map<Long, List<Edge>[]> out = new HashMap<>();
+        for (Edge v : vs) {
+            for (Edge h : hs) {
+                if (v.top <= h.top + ISECT_TOL && v.bottom >= h.top - ISECT_TOL
+                        && v.x0 >= h.x0 - ISECT_TOL && v.x0 <= h.x1 + ISECT_TOL) {
+                    long key = pointKey(v.x0, h.top);
+                    List<Edge>[] slot = out.get(key);
+                    if (slot == null) {
+                        slot = new List[]{new ArrayList<Edge>(), new ArrayList<Edge>()};
+                        out.put(key, slot);
+                    }
+                    slot[0].add(v);
+                    slot[1].add(h);
+                }
+            }
+        }
+        return out;
+    }
+
+    /** Does an edge join the two intersection points? */
+    private static boolean edgeConnects(Map<Long, List<Edge>[]> isect, long p1, long p2) {
+        List<Edge>[] a = isect.get(p1), b = isect.get(p2);
+        if (a == null || b == null) return false;
+        if (keyX(p1) == keyX(p2)) {
+            for (Edge x : a[0]) for (Edge y : b[0]) if (sameEdge(x, y)) return true;
+        }
+        if (keyY(p1) == keyY(p2)) {
+            for (Edge x : a[1]) for (Edge y : b[1]) if (sameEdge(x, y)) return true;
+        }
+        return false;
+    }
+
+    private static boolean sameEdge(Edge a, Edge b) {
+        return a.horizontal == b.horizontal
+                && Math.abs(a.x0 - b.x0) < 0.5f && Math.abs(a.top - b.top) < 0.5f
+                && Math.abs(a.x1 - b.x1) < 0.5f && Math.abs(a.bottom - b.bottom) < 0.5f;
+    }
+
+    /** Read the rectangular cells off the intersections. */
+    private static List<float[]> intersectionsToCells(Map<Long, List<Edge>[]> isect) {
+        List<Long> points = new ArrayList<>(isect.keySet());
+        Collections.sort(points);
+        List<float[]> cells = new ArrayList<>();
+        for (int i = 0; i < points.size(); i++) {
+            long pt = points.get(i);
+            float px = keyX(pt), py = keyY(pt);
+            List<Long> below = new ArrayList<>(), right = new ArrayList<>();
+            for (int j = i + 1; j < points.size(); j++) {
+                long q = points.get(j);
+                if (keyX(q) == px) below.add(q);
+                if (keyY(q) == py) right.add(q);
+            }
+            boolean found = false;
+            for (Long bp : below) {
+                if (!edgeConnects(isect, pt, bp)) continue;
+                for (Long rp : right) {
+                    if (!edgeConnects(isect, pt, rp)) continue;
+                    long br = pointKey(keyX(rp), keyY(bp));
+                    if (isect.containsKey(br) && edgeConnects(isect, br, rp) && edgeConnects(isect, br, bp)) {
+                        cells.add(new float[]{px, py, keyX(rp), keyY(bp)});
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+        }
+        return cells;
+    }
+
+    /** Group cells that touch at a corner into tables. */
+    private static List<List<float[]>> cellsToTables(List<float[]> cells) {
+        List<float[]> remaining = new ArrayList<>(cells);
+        List<List<float[]>> tables = new ArrayList<>();
+        List<float[]> current = new ArrayList<>();
+        java.util.HashSet<String> corners = new java.util.HashSet<>();
+        while (!remaining.isEmpty()) {
+            int before = current.size();
+            for (float[] cell : new ArrayList<>(remaining)) {
+                String[] cs = {
+                        cell[0] + "," + cell[1], cell[0] + "," + cell[3],
+                        cell[2] + "," + cell[1], cell[2] + "," + cell[3]};
+                if (current.isEmpty()) {
+                    for (String c : cs) corners.add(c);
+                    current.add(cell);
+                    remaining.remove(cell);
+                } else {
+                    int shared = 0;
+                    for (String c : cs) if (corners.contains(c)) shared++;
+                    if (shared > 0) {
+                        for (String c : cs) corners.add(c);
+                        current.add(cell);
+                        remaining.remove(cell);
+                    }
+                }
+            }
+            if (current.size() == before) {
+                tables.add(new ArrayList<>(current));
+                corners.clear();
+                current.clear();
+            }
+        }
+        if (!current.isEmpty()) tables.add(current);
+        List<List<float[]>> kept = new ArrayList<>();
+        for (List<float[]> t : tables) if (t.size() > 1) kept.add(t);
+        return kept;
+    }
+
+    /** Build a Table from a group of cells, placing every glyph in the cell it falls in. */
+    private static Table tableFromCells(List<float[]> group, List<Glyph> glyphs) {
+        TreeSet<Float> colXs = new TreeSet<>(), rowYs = new TreeSet<>();
+        for (float[] c : group) { colXs.add(c[0]); rowYs.add(c[1]); }
+        List<Float> C = new ArrayList<>(colXs), R = new ArrayList<>(rowYs);
+        int ncol = C.size(), nrow = R.size();
+        if (ncol < 2 || nrow < 1) return null;
+
+        List<List<List<Glyph>>> buckets = new ArrayList<>();
+        for (int r = 0; r < nrow; r++) {
+            List<List<Glyph>> row = new ArrayList<>();
+            for (int c = 0; c < ncol; c++) row.add(new ArrayList<>());
+            buckets.add(row);
+        }
+        for (Glyph g : glyphs) {
+            float cx = g.x + g.width / 2f;
+            float cy = g.y + g.size * 0.35f;
+            float[] hit = null;
+            for (float[] cell : group) {
+                if (cx >= cell[0] - 2f && cx <= cell[2] + 2f
+                        && cy >= cell[1] - 2f && cy <= cell[3] + 2f) { hit = cell; break; }
+            }
+            if (hit == null) continue;
+            int ri = R.indexOf(hit[1]);
+            int ci = C.indexOf(hit[0]);
+            if (ri >= 0 && ci >= 0) buckets.get(ri).get(ci).add(g);
+        }
+
+        Table t = new Table();
+        float top = Float.MAX_VALUE, bottom = -Float.MAX_VALUE;
+        float left = Float.MAX_VALUE, right = -Float.MAX_VALUE;
+        for (float[] c : group) {
+            top = Math.min(top, c[1]); bottom = Math.max(bottom, c[3]);
+            left = Math.min(left, c[0]); right = Math.max(right, c[2]);
+        }
+        t.top = top; t.bottom = bottom; t.left = left; t.right = right;
+        t.header = nrow > 1;
+        int filled = 0;
+        for (int r = 0; r < nrow; r++) {
+            List<String> row = new ArrayList<>();
+            for (int c = 0; c < ncol; c++) {
+                String str = glyphText(buckets.get(r).get(c));
+                if (!str.isEmpty()) filled++;
+                row.add(str);
+            }
+            t.rows.add(row);
+        }
+        // A QR code, a logo or a chart is drawn from the same rectangles a table is, so the
+        // cells are real but the words are not there. A real table has text in a good share of
+        // its cells; without this test a 21x21 QR code becomes a table and swallows the invoice.
+        if (filled < Math.max(2, group.size() / 4)) return null;
+
+        // If one cell's text runs straight into the next with no space and the next begins with
+        // a small letter, the drawn grid is cutting through a word - "Strongly agree" became
+        // "S | trongly agre | e". A table that breaks words is worse than no table, so the
+        // caller falls back to the older pass for this page.
+        for (List<String> row : t.rows) {
+            for (int c = 0; c + 1 < row.size(); c++) {
+                String cellL = row.get(c), cellR = row.get(c + 1);
+                if (cellL.isEmpty() || cellR.isEmpty()) continue;
+                char last = cellL.charAt(cellL.length() - 1);
+                char first = cellR.charAt(0);
+                if (Character.isLetter(last) && Character.isLowerCase(first)) return null;
+            }
+        }
+        return t;
+    }
+
+    /** Join a cell's glyphs into one string, in reading order. */
+    private static String glyphText(List<Glyph> gs) {
+        if (gs.isEmpty()) return "";
+        List<Glyph> sorted = new ArrayList<>(gs);
+        Collections.sort(sorted, new Comparator<Glyph>() {
+            @Override
+            public int compare(Glyph a, Glyph b) {
+                if (Math.abs(a.y - b.y) > 2f) return Float.compare(a.y, b.y);
+                return Float.compare(a.x, b.x);
+            }
+        });
+        StringBuilder sb = new StringBuilder();
+        Glyph prev = null;
+        for (Glyph g : sorted) {
+            if (prev != null) {
+                float gap = g.x - (prev.x + prev.width);
+                if (gap > Math.max(1.5f, prev.size * 0.18f) && sb.length() > 0
+                        && sb.charAt(sb.length() - 1) != ' ') sb.append(' ');
+            }
+            sb.append(g.text);
+            prev = g;
+        }
+        return logicalOrder(sb.toString().trim());
+    }
+
+    /** All tables on a page, found the way pdfplumber finds them. */
+    private static List<Table> findTables(List<Edge> rawEdges, List<Glyph> glyphs, float pageWidth) {
+        List<Table> out = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>();
+        for (Edge e : rawEdges) {
+            float len = e.horizontal ? (e.x1 - e.x0) : (e.bottom - e.top);
+            if (len >= EDGE_MIN) edges.add(e);
+        }
+        if (edges.size() < 4) return out;
+        edges = mergeEdges(edges);
+        Map<Long, List<Edge>[]> isect = edgesToIntersections(edges);
+        if (isect.size() < 4) return out;
+        List<float[]> cells = intersectionsToCells(isect);
+        if (cells.size() < 2) return out;
+        for (List<float[]> group : cellsToTables(cells)) {
+            Table t = tableFromCells(group, glyphs);
+            if (t == null) continue;
+            float area = (t.right - t.left) * (t.bottom - t.top);
+            if (pageWidth > 0 && area > pageWidth * pageWidth * 0.42f) continue;
+            out.add(t);
+        }
+        return out;
+    }
+
     /**
      * Tables drawn with lines, found one region at a time.
      *
