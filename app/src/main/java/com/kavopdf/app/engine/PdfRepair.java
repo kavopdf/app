@@ -246,6 +246,18 @@ public final class PdfRepair {
             // A tree can report a page count and still be un-walkable: a circular /Kids, or
             // a /Count that no longer matches. Every page is fetched once here, because a
             // document whose pages cannot be reached is not a repaired document.
+            // A tree can walk and still be only part of the document. When the cross-reference
+            // is damaged the parser reaches a fraction of the objects - one file leaves 32 of
+            // them unreached and the pool yields a single page, which then verifies cleanly
+            // while eleven pages sit in the bytes. An incomplete pool earns the lift a try,
+            // but the tree is only given up when the lift is demonstrably better.
+            boolean poolIncomplete = r.objectsSeen >= 8 && r.objectsLoaded > 0
+                    && r.objectsLoaded < r.objectsSeen * 0.8f;
+            if (poolIncomplete) {
+                r.findings.add("the parser reached only " + r.objectsLoaded + " of "
+                        + r.objectsSeen + " object(s) in the file - the cross-reference is"
+                        + " damaged, so the bytes were searched for pages as well");
+            }
             boolean treeWalks = r.pagesBefore > 0;
             if (treeWalks) {
                 for (int i = 0; i < r.pagesBefore; i++) {
@@ -260,7 +272,7 @@ public final class PdfRepair {
                 }
             }
             PDDocument source = doc;
-            if (!treeWalks) {
+            if (!treeWalks || poolIncomplete) {
                 // The object pool only holds what the parser managed to reach, which for a
                 // circular or truncated tree can be a fraction of the pages. The bytes still
                 // carry every /Type /Page object, so the byte-level lift is tried first and
@@ -270,17 +282,44 @@ public final class PdfRepair {
                     lifted = salvageObjects(src, out, r);
                     if (lifted != null) {
                         PDDocument liftedDoc = parse(lifted, pw, true, 64 * 1024);
-                        source = liftedDoc;
-                        r.stage = "salvaged";
-                        r.failure = "";
-                        r.pagesBefore = source.getNumberOfPages();
+                        int liftedPages = liftedDoc.getNumberOfPages();
+                        boolean everyPageOpens = liftedPages > 0;
+                        for (int i = 0; everyPageOpens && i < liftedPages; i++) {
+                            try {
+                                liftedDoc.getPage(i);
+                            } catch (Throwable t) {
+                                everyPageOpens = false;
+                            }
+                        }
+                        // The lift is taken only when it is better on both counts: more pages
+                        // than the tree already had, and every one of them opens. Taking it on
+                        // page count alone turned a one-page repair into no file at all.
+                        if (liftedPages > r.pagesBefore && everyPageOpens) {
+                            source = liftedDoc;
+                            r.stage = "salvaged";
+                            r.failure = "";
+                            r.pagesBefore = liftedPages;
+                            r.findings.add("the pages were rebuilt from the file's own objects:"
+                                    + " " + liftedPages + " page(s)");
+                        } else {
+                            if (liftedPages > 0) {
+                                r.findings.add("the byte-level rebuild offered " + liftedPages
+                                        + " page(s) against the " + r.pagesBefore
+                                        + " the page tree already had - the tree was kept");
+                            }
+                            liftedDoc.close();
+                        }
                         //noinspection ResultOfMethodCallIgnored
                         lifted.deleteOnExit();
                     }
                 } catch (Throwable ignored) {
                 }
                 if (source == doc) {
-                    source = null;      // fall through to the pool-based salvage below
+                    if (treeWalks) {
+                        // The tree still works; nothing better came out of the bytes.
+                    } else {
+                        source = null;  // fall through to the pool-based salvage below
+                    }
                 }
             }
             if (source == null) {
@@ -343,7 +382,17 @@ public final class PdfRepair {
             // one, and handing that over would look like the content was destroyed by us.
             // Better to say plainly that nothing could be recovered.
             int usable = r.pagesAfter - r.blankPages.size() - r.lostPages.size();
-            if (r.pagesAfter > 0 && usable <= 0) {
+            // When every page came back but not one of them kept its content, the structure is
+            // still worth returning - as long as the file says so. Withholding the file leaves
+            // the user with nothing at all; a document of the right number of blank pages plus
+            // a plain sentence about it is the honest version of the same truth. The file is
+            // only withheld when the page count itself did not survive.
+            boolean structureKept = r.pagesOriginal > 0 && r.pagesAfter == r.pagesOriginal;
+            if (r.pagesAfter > 0 && usable <= 0 && structureKept) {
+                r.findings.add("every page came back, but no page kept its content - the file"
+                        + " is delivered with blank pages rather than withheld");
+                r.verified = true;
+            } else if (r.pagesAfter > 0 && usable <= 0) {
                 r.failure = "the pages are in the file, but none of their content survived";
                 //noinspection ResultOfMethodCallIgnored
                 out.delete();
@@ -1376,11 +1425,16 @@ public final class PdfRepair {
                 head = new String(pb, 0, Math.min(pb.length, 4096),
                         java.nio.charset.StandardCharsets.ISO_8859_1);
             } else continue;
-            if (head.contains("/Type /Catalog")) {
+            // "/Type /Page" and "/Type/Page" are the same thing to a reader. Producers write
+            // both, and a whole corpus of 36-page files is written without the space - the
+            // scan found 160 objects and not one page. The head is compared with its
+            // whitespace removed so either spelling is recognised.
+            String flat = head.replaceAll("\\s+", "");
+            if (flat.contains("/Type/Catalog")) {
                 hasCatalog = true;
                 catalogObject = number;
                 catalogPagesTarget = o == null ? -1 : pagesTargetIn(b, o[1], o[2]);
-            } else if (head.contains("/Type /Page") && !head.contains("/Type /Pages")) {
+            } else if (flat.contains("/Type/Page") && !flat.contains("/Type/Pages")) {
                 pageObjects.add(number);
             }
         }

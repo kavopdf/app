@@ -93,11 +93,17 @@ public class TestRepairFixtures {
                 check(name + ": every page parses", everyPageParses(out));
                 check(name + ": it says nothing it did not do",
                         r.failure.isEmpty() && r.pagesAfter <= Math.max(r.pagesBefore, r.pagesAfter));
-                // A page that is present but blank is not a recovered page: at least one
-                // page must really hold content, or this is a blank document wearing a
-                // success message.
-                check(name + ": at least one page really holds content",
-                        r.pagesAfter - r.blankPages.size() - r.lostPages.size() > 0);
+                // A page that is present but blank is not a recovered page. Either at least
+                // one page really holds content, or the report says in so many words that
+                // every page came back blank - a blank document wearing a success message is
+                // the one thing this must never be.
+                boolean holdsContent = r.pagesAfter - r.blankPages.size() - r.lostPages.size() > 0;
+                boolean saysItIsBlank = false;
+                for (String line : r.findings) {
+                    if (line.contains("no page kept its content")) saysItIsBlank = true;
+                }
+                check(name + ": a page holds content, or the report says every page is blank",
+                        holdsContent || saysItIsBlank);
             } else {
                 refused++;
                 check(name + ": a failed repair left no file", !outExists);
