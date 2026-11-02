@@ -1154,6 +1154,43 @@ public final class PdfRepair {
         return Math.max(0L, max - used);
     }
 
+    /**
+     * Makes a stream's /Length direct when it points at an object that is not a number.
+     *
+     * <p>A damaged file can leave {@code /Length 16 0 R} where object 16 has been overwritten by
+     * a dictionary. Every reader that follows the reference then fails the whole file with
+     * "wrong type of referenced length object", even though the stream's own bytes are intact
+     * and its true length is right there between {@code stream} and {@code endstream}. That
+     * length is measured and written in place of the broken reference.
+     */
+    private static byte[] fixStreamLength(byte[] body, java.util.LinkedHashMap<Integer, int[]> byNumber,
+                                          byte[] fileBytes,
+                                          java.util.LinkedHashMap<Integer, byte[]> packed) {
+        String text = new String(body, java.nio.charset.StandardCharsets.ISO_8859_1);
+        int streamAt = text.indexOf("stream");
+        if (streamAt < 0) return body;
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("/Length\\s+(\\d+)\\s+(\\d+)\\s+R").matcher(text);
+        if (!m.find() || m.start() > streamAt) return body;
+        int target = Integer.parseInt(m.group(1));
+        // Is the referenced object a plain number? If so the reference is fine.
+        int[] o = byNumber.get(target);
+        byte[] pb = packed.get(target);
+        String refBody = o != null
+                ? new String(fileBytes, o[1], o[2] - o[1], java.nio.charset.StandardCharsets.ISO_8859_1)
+                : pb != null ? new String(pb, 0, pb.length, java.nio.charset.StandardCharsets.ISO_8859_1)
+                : "";
+        if (refBody.trim().matches("\\d+")) return body;
+        int dataStart = streamAt + 6;
+        if (dataStart < text.length() && text.charAt(dataStart) == '\r') dataStart++;
+        if (dataStart < text.length() && text.charAt(dataStart) == '\n') dataStart++;
+        int endAt = text.lastIndexOf("endstream");
+        if (endAt < dataStart) return body;
+        int len = endAt - dataStart;
+        String out = text.substring(0, m.start()) + "/Length " + len + text.substring(m.end());
+        return out.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+    }
+
     /** True when this byte can begin a PDF object body. */
     private static boolean startsObject(byte b) {
         return b == '<' || b == '[' || b == '/' || b == '('
@@ -1502,9 +1539,10 @@ public final class PdfRepair {
                 } else if (o != null && needPagesNode && number == catalogObject) {
                     os.write(repointPages(b, o[1], o[2], newPagesNumber));
                 } else if (o != null) {
-                    os.write(b, o[1], o[2] - o[1]);
+                    byte[] raw = java.util.Arrays.copyOfRange(b, o[1], o[2]);
+                    os.write(fixStreamLength(raw, byNumber, b, packed));
                 } else {
-                    os.write(packedBody);
+                    os.write(fixStreamLength(packedBody, byNumber, b, packed));
                 }
                 os.write("\nendobj\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
                 spans.add(new int[]{number, startAt, os.size()});
