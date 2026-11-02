@@ -177,6 +177,14 @@ abstract class PdfActivity : AppCompatActivity() {
      * protected. [onReady] always receives a file that can actually be opened.
      */
     protected fun openPdf(uri: Uri, onReady: (File) -> Unit) {
+        // The size has to be known BEFORE the timed block runs, or the reading step is judged
+        // against runs of completely different files: a 45 MB scan and one text page were both
+        // "1 page, ? size", and the scan was reported as a 26x stall.
+        runCatching {
+            contentResolver.openAssetFileDescriptor(uri, "r")?.use { afd ->
+                if (afd.length > 0) sizeHint = afd.length
+            }
+        }
         runTask(getString(R.string.msg_processing), onDone = checked@{ res ->
             if (res == null) return@checked
             if (!res.second) { onReady(res.first); return@checked }
@@ -371,7 +379,9 @@ abstract class PdfActivity : AppCompatActivity() {
             } catch (t: Throwable) {
                 // The producer already recorded this failure with its breadcrumbs. Recording it
                 // again under a second name put the same crash in the log twice.
-                if (!failureLogged) AppLog.problem(applicationContext, "Failed", t)
+                // The task name, not the literal word "Failed" - every failure used to be
+                // filed under "Failed", so the log could not say which tool broke.
+                if (!failureLogged) AppLog.problem(applicationContext, taskKey(status), t)
                 toast(getString(R.string.msg_could_not_read))
                 null
             }
