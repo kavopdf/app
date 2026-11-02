@@ -214,7 +214,9 @@ public final class PdfToWord {
                     page.blocks.add(p);
                     report.paragraphs++;
                 }
-            } else {
+            } else if (!readAnnotations) {
+                // Only a page that produced nothing at all is skipped. A page read from its
+                // annotations has text and must not be reported as empty.
                 report.skippedPages++;
                 report.notes.add("page " + (index + 1)
                         + " has no text layer and was not OCR'd - it comes out empty");

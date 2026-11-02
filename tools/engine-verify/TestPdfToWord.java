@@ -177,6 +177,8 @@ public class TestPdfToWord {
             check("OCR is not called when annotations gave the words", calls[0] == 0);
             check("OCR text does not appear twice", !ta.contains("OCR MARKER"));
             check("annotation page is not counted as OCR", ra.report.ocrPages == 0);
+            check("annotation page is not counted as skipped", ra.report.skippedPages == 0);
+            check("annotation page is not reported as empty", !ra.isEmpty());
         }
         {
             // A page with nothing on it at all: OCR must still be offered.
@@ -200,6 +202,27 @@ public class TestPdfToWord {
             PdfToWord.Result none = PdfToWord.convert(blank, "", null);
             check("no hook means the page is reported, not silently dropped",
                     none.report.skippedPages == 1);
+        }
+
+        // ---- the .docx must put sectPr last: it is the section properties of the body ----
+        {
+            File d = new File(W, "sectpr.docx");
+            PdfToWord.Result rs = PdfToWord.convert(new File(W, "annotation_only.pdf"), "", null);
+            DocxWriter.write(rs, d);
+            String xml;
+            try (ZipFile z = new ZipFile(d)) {
+                try (java.io.InputStream in = z.getInputStream(z.getEntry("word/document.xml"))) {
+                    xml = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+                }
+            }
+            int body = xml.indexOf("<w:body>");
+            int sect = xml.indexOf("<w:sectPr>");
+            int close = xml.indexOf("</w:body>");
+            check("document.xml has a body", body >= 0 && close > body);
+            check("sectPr sits inside the body", sect > body && sect < close);
+            check("sectPr is the last thing in the body",
+                    sect > 0 && xml.substring(sect, close).indexOf("<w:p>") < 0
+                            && xml.substring(sect, close).indexOf("<w:tbl>") < 0);
         }
 
         System.out.println("PDF2WORD TOTAL: " + pass + " passed, " + fail + " failed");

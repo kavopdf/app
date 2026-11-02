@@ -70,10 +70,6 @@ public final class DocxWriter {
                 .append("\" xmlns:wp=\"").append(NS_WP).append("\" xmlns:a=\"").append(NS_A)
                 .append("\" xmlns:pic=\"").append(NS_PIC).append("\"><w:body>");
 
-        // A4 portrait, 2 cm margins - a page the reader will recognise.
-        sb.append("<w:sectPr><w:pgSz w:w=\"11906\" w:h=\"16838\"/>")
-                .append("<w:pgMar w:top=\"1134\" w:right=\"1134\" w:bottom=\"1134\" w:left=\"1134\" ")
-                .append("w:header=\"709\" w:footer=\"709\" w:gutter=\"0\"/></w:sectPr>");
 
         boolean first = true;
         for (PdfToWord.Page page : result.pages) {
@@ -92,6 +88,11 @@ public final class DocxWriter {
                 }
             }
         }
+        // The section properties must be the LAST child of w:body. Emitting them first is
+        // what a hand-written writer does by accident, and strict consumers reject the file.
+        sb.append("<w:sectPr><w:pgSz w:w=\"11906\" w:h=\"16838\"/>")
+                .append("<w:pgMar w:top=\"1134\" w:right=\"1134\" w:bottom=\"1134\" w:left=\"1134\" ")
+                .append("w:header=\"709\" w:footer=\"709\" w:gutter=\"0\"/></w:sectPr>");
         sb.append("</w:body></w:document>");
         return sb.toString();
     }

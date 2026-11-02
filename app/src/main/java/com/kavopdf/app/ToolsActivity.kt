@@ -494,10 +494,14 @@ class ToolsActivity : PdfActivity() {
                     val w = (page.width * scale).toInt().coerceIn(1, MAX_OCR_SIDE)
                     val h = (page.height * scale).toInt().coerceIn(1, MAX_OCR_SIDE)
                     val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-                    bmp.eraseColor(android.graphics.Color.WHITE)
-                    page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                    recognised = ocrBitmap(bmp)
-                    bmp.recycle()
+                    try {
+                        bmp.eraseColor(android.graphics.Color.WHITE)
+                        page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                        recognised = ocrBitmap(bmp)
+                    } finally {
+                        // If render() throws, the bitmap is still ours to free.
+                        bmp.recycle()
+                    }
                 }
             } catch (t: Throwable) {
                 recognised = null
@@ -508,7 +512,10 @@ class ToolsActivity : PdfActivity() {
         private fun fitScale(width: Int, height: Int): Float {
             if (width <= 0 || height <= 0) return 1f
             val longest = maxOf(width, height)
-            return if (longest * 2 <= MAX_OCR_SIDE) 2f else MAX_OCR_SIDE.toFloat() / longest
+            // Never below 1x: a page scaled down is a page OCR cannot read. The cap on the
+            // bitmap size above already keeps a huge page from being rendered at full size.
+            return if (longest * 2 <= MAX_OCR_SIDE) 2f
+            else (MAX_OCR_SIDE.toFloat() / longest).coerceAtLeast(1f)
         }
 
         override fun close() {
@@ -530,15 +537,21 @@ class ToolsActivity : PdfActivity() {
     }
 
     /** ML Kit recognition on one bitmap, on the caller's background thread. */
-    private fun ocrBitmap(bitmap: Bitmap): String? = try {
-        val client = com.google.mlkit.vision.text.TextRecognition
-            .getClient(com.google.mlkit.vision.text.latin.TextRecognizerOptions.DEFAULT_OPTIONS)
-        val image = com.google.mlkit.vision.common.InputImage.fromBitmap(bitmap, 0)
-        val result = com.google.android.gms.tasks.Tasks.await(client.process(image))
-        client.close()
-        result.text
-    } catch (t: Throwable) {
-        null
+    private fun ocrBitmap(bitmap: Bitmap): String? {
+        // The recogniser holds native memory. Closing it only on the happy path leaked one
+        // client per failed page, and a long scan would run the app out of memory.
+        var holder: com.google.mlkit.vision.text.TextRecognizer? = null
+        return try {
+            val client = com.google.mlkit.vision.text.TextRecognition
+                .getClient(com.google.mlkit.vision.text.latin.TextRecognizerOptions.DEFAULT_OPTIONS)
+            holder = client
+            val image = com.google.mlkit.vision.common.InputImage.fromBitmap(bitmap, 0)
+            com.google.android.gms.tasks.Tasks.await(client.process(image)).text
+        } catch (t: Throwable) {
+            null
+        } finally {
+            try { holder?.close() } catch (t: Throwable) { }
+        }
     }
 
     private fun onRun() {
