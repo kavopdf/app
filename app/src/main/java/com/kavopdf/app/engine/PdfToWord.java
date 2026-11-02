@@ -79,7 +79,6 @@ public final class PdfToWord {
         public float top;            // y of the first line, for ordering
         public float left, right;    // horizontal extent, for the layout cut
         public int column;           // which column band it sits in
-        public int lines;            // how many visual lines the paragraph wraps to
 
         public String text() {
             StringBuilder sb = new StringBuilder();
@@ -968,10 +967,6 @@ public final class PdfToWord {
         return continues && !indented;
     }
 
-    private static float contentRight(Line line, float pageWidth) {
-        return Math.min(pageWidth, line.right + line.size * 2f);
-    }
-
     private static Para buildPara(List<Line> group, float pageWidth, int bands) {
         float l = Float.MAX_VALUE, r = -Float.MAX_VALUE;
         for (Line ln : group) { l = Math.min(l, ln.x); r = Math.max(r, ln.right); }
@@ -1012,7 +1007,6 @@ public final class PdfToWord {
         }
         if (text.length() > 0) p.runs.add(new Run(text, bold, italic, size));
 
-        p.lines = group.size();
         p.heading = headingLevel(group, text);
         p.align = alignment(group, pageWidth, bands);
         int indent = Math.max(0, Math.round((first.x - leftMargin(group)) / Math.max(8f, size * 1.6f)));
