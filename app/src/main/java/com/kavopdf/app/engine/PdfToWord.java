@@ -251,6 +251,36 @@ public final class PdfToWord {
             tables = buildTables(rules, lines, pageWidth);
             tables.addAll(rowPass);
         }
+        // A form drawn round everything can swallow a real table inside it. The bill of lading
+        // came out twice for exactly this reason: one big table for the whole form and one for
+        // the marks grid. The outer box is dropped and the inner tables are kept.
+        List<Table> keepTables = new ArrayList<>();
+        for (Table a : tables) {
+            boolean containsAnother = false;
+            for (Table b : tables) {
+                if (a == b) continue;
+                boolean inside = b.left >= a.left - 4 && b.right <= a.right + 4
+                        && b.top >= a.top - 4 && b.bottom <= a.bottom + 4;
+                boolean smaller = (b.right - b.left) * (b.bottom - b.top)
+                        < (a.right - a.left) * (a.bottom - a.top) * 0.9f;
+                if (inside && smaller) { containsAnother = true; break; }
+            }
+            if (!containsAnother) keepTables.add(a);
+        }
+        tables = keepTables;
+
+        // Text already sitting in a table cell must not also come out as body text: the bill of
+        // lading appeared twice, once as a run-on paragraph and once as its proper table.
+        java.util.HashSet<String> cellText = new java.util.HashSet<>();
+        for (Table t : tables) {
+            for (List<String> row : t.rows) {
+                for (String cell : row) {
+                    String norm = cell.trim().replaceAll("\\s+", " ");
+                    if (norm.length() > 3) cellText.add(norm);
+                }
+            }
+        }
+
         List<Line> body = new ArrayList<>();
         for (Line line : lines) {
             if (line.consumed) continue;
@@ -260,6 +290,10 @@ public final class PdfToWord {
                     inTable = true;
                     break;
                 }
+            }
+            if (!inTable) {
+                String norm = line.text.trim().replaceAll("\\s+", " ");
+                if (!norm.isEmpty() && cellText.contains(norm)) inTable = true;
             }
             if (!inTable) body.add(line);
         }
@@ -289,13 +323,19 @@ public final class PdfToWord {
         List<Object> reordered = new ArrayList<>();
         List<Table> pending = new ArrayList<>();
         for (Object o : ordered) if (o instanceof Table) pending.add((Table) o);
+        // A big grid's box starts at the top of the page even when its content sits in the
+        // middle. Placing it by its top put it above paragraphs that belong before it, so the
+        // page read out of order. The middle of the box is a better guess at where it belongs.
         Collections.sort(pending, new Comparator<Table>() {
             @Override
-            public int compare(Table a, Table b) { return Float.compare(a.top, b.top); }
+            public int compare(Table a, Table b) {
+                return Float.compare((a.top + a.bottom) / 2f, (b.top + b.bottom) / 2f);
+            }
         });
         int ti = 0;
         for (Object o : cut) {
-            while (ti < pending.size() && pending.get(ti).top <= topOf(o)) {
+            while (ti < pending.size()
+                    && (pending.get(ti).top + pending.get(ti).bottom) / 2f <= topOf(o)) {
                 reordered.add(pending.get(ti++));
             }
             reordered.add(o);
@@ -1483,8 +1523,6 @@ public final class PdfToWord {
         for (List<float[]> group : cellsToTables(cells)) {
             Table t = tableFromCells(group, glyphs);
             if (t == null) continue;
-            float area = (t.right - t.left) * (t.bottom - t.top);
-            if (pageWidth > 0 && area > pageWidth * pageWidth * 0.42f) continue;
             out.add(t);
         }
         return out;
