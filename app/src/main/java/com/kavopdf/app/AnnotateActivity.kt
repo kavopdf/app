@@ -454,7 +454,7 @@ class AnnotateActivity : PdfActivity() {
             0xFFEA580C.toInt(), 0xFF7C3AED.toInt()
         )
         val inkSpin = android.widget.Spinner(this).apply {
-            popupBackground = getDrawable(R.drawable.bg_popup_pill)
+            setPopupBackground(getDrawable(R.drawable.bg_popup_pill))
             adapter = android.widget.ArrayAdapter(this@AnnotateActivity, R.layout.item_dropdown, inkNames)
         }
         (dlg.root as? android.view.ViewGroup)?.addView(

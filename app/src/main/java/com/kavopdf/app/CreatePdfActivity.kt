@@ -437,7 +437,7 @@ class CreatePdfActivity : PdfActivity() {
             0xFFEA580C.toInt(), 0xFF7C3AED.toInt()
         )
         val inkSpin = android.widget.Spinner(this).apply {
-            popupBackground = getDrawable(R.drawable.bg_popup_pill)
+            setPopupBackground(getDrawable(R.drawable.bg_popup_pill))
             adapter = android.widget.ArrayAdapter(this@CreatePdfActivity, R.layout.item_dropdown, inkNames)
         }
         (dlg.root as? android.view.ViewGroup)?.addView(
