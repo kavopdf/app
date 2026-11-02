@@ -151,6 +151,57 @@ public class TestPdfToWord {
         check("uneven row keeps its cells in the right columns",
                 utext.contains("Bolts | 40 | 12") && utext.contains("Nuts | 25"));
 
+        // ---- annotations vs OCR: the two fallbacks must not both fire on one page ----
+        {
+            // A page whose words live only in a free-text annotation.
+            File ann = new File(W, "annotation_only.pdf");
+            try (PDDocument d = new PDDocument()) {
+                PDPage pg = new PDPage(PDRectangle.A4);
+                d.addPage(pg);
+                com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotationText note =
+                        new com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotationText();
+                note.setRectangle(new PDRectangle(72, 700, 24, 24));
+                note.setContents("STICKY NOTE MARKER");
+                pg.getAnnotations().add(note);
+                d.save(ann);
+            }
+            final int[] calls = {0};
+            PdfToWord.OcrHook hook = new PdfToWord.OcrHook() {
+                @Override public String text(int pageIndex) { calls[0]++; return "OCR MARKER"; }
+            };
+            PdfToWord.Result ra = PdfToWord.convert(ann, "", hook);
+            File taF = new File(W, "annotation_only.txt");
+            PdfToWord.writeTxt(ra, taF);
+            String ta = new String(Files.readAllBytes(taF.toPath()), StandardCharsets.UTF_8);
+            check("annotation text is read", ta.contains("STICKY NOTE MARKER"));
+            check("OCR is not called when annotations gave the words", calls[0] == 0);
+            check("OCR text does not appear twice", !ta.contains("OCR MARKER"));
+            check("annotation page is not counted as OCR", ra.report.ocrPages == 0);
+        }
+        {
+            // A page with nothing on it at all: OCR must still be offered.
+            File blank = new File(W, "blank_page.pdf");
+            try (PDDocument d = new PDDocument()) {
+                d.addPage(new PDPage(PDRectangle.A4));
+                d.save(blank);
+            }
+            final int[] calls = {0};
+            PdfToWord.OcrHook hook = new PdfToWord.OcrHook() {
+                @Override public String text(int pageIndex) { calls[0]++; return "OCR MARKER"; }
+            };
+            PdfToWord.Result ra = PdfToWord.convert(blank, "", hook);
+            File tbF = new File(W, "blank_page.txt");
+            PdfToWord.writeTxt(ra, tbF);
+            String ta = new String(Files.readAllBytes(tbF.toPath()), StandardCharsets.UTF_8);
+            check("OCR runs on a page with no text layer", calls[0] == 1);
+            check("OCR text reaches the page", ta.contains("OCR MARKER"));
+            check("OCR page is counted", ra.report.ocrPages == 1);
+
+            PdfToWord.Result none = PdfToWord.convert(blank, "", null);
+            check("no hook means the page is reported, not silently dropped",
+                    none.report.skippedPages == 1);
+        }
+
         System.out.println("PDF2WORD TOTAL: " + pass + " passed, " + fail + " failed");
         if (fail > 0) System.exit(1);
     }

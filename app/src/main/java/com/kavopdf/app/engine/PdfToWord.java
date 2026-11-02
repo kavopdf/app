@@ -177,25 +177,26 @@ public final class PdfToWord {
             // free-text box, a note, a comment, a highlight with a remark on it. That is still
             // text on the page, so it is read before falling back to OCR.
             String annotated = annotationTextOf(pdPage);
+            boolean readAnnotations = false;
             if (!annotated.isEmpty()) {
-                for (String block : annotated.split("\n\s*\n")) {
+                for (String block : annotated.split("\\n\\s*\\n")) {
                     String t = block.trim();
                     if (t.isEmpty()) continue;
                     Para p = new Para();
-                    p.runs.add(new Run(t.replaceAll("\s*\n\s*", " "), false, false, 11f));
+                    p.runs.add(new Run(t.replaceAll("\\s*\\n\\s*", " "), false, false, 11f));
                     p.top = 0;
                     page.blocks.add(p);
                     report.paragraphs++;
                 }
+                readAnnotations = true;
                 report.notes.add("page " + (index + 1) + " has no text layer; read its annotations");
-                // Not an early return: a page can carry annotations AND drawn tables, and
-                // returning here dropped the table on a salary slip.
-                chars = (int) MIN_TEXT_CHARS;
             }
 
             // No usable text layer. Either OCR it, or say plainly that it was not read.
+            // Annotations already gave us the page's words: running OCR on top of that would
+            // put the same text in twice.
             String ocrText = null;
-            if (hook != null) {
+            if (!readAnnotations && hook != null) {
                 try {
                     ocrText = hook.text(index);
                 } catch (Throwable ignored) {
