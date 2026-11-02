@@ -111,6 +111,12 @@ public final class PdfRepair {
         public final List<Integer> blankPages = new ArrayList<>();
         /** 1-based pages whose content stops partway and draws only part of itself. */
         public final List<Integer> partialPages = new ArrayList<>();
+        /**
+         * Temp files this run created. deleteOnExit() does nothing on Android, so every
+         * working copy of the file would otherwise stay in the cache for good; they are
+         * removed once the documents that read them are closed.
+         */
+        final List<File> tempFiles = new ArrayList<>();
     }
 
     // =====================================================================================
@@ -216,8 +222,7 @@ public final class PdfRepair {
                         r.findings.add("the cross-reference and catalog were gone; the pages"
                                 + " were lifted out of the file's own objects");
                     }
-                    //noinspection ResultOfMethodCallIgnored
-                    lifted.deleteOnExit();
+                    // removed with the rest of the run's temp files
                 }
             }
             if (doc == null) {
@@ -240,7 +245,18 @@ public final class PdfRepair {
 
             // Pages whose /Contents was removed while their streams are still in the file are
             // recoverable: the streams are intact and decodable, they are simply not attached.
-            adoptOrphanContent(doc, java.nio.file.Files.readAllBytes(src.toPath()), r);
+            // Reading the whole file is only safe when it fits comfortably in what is free.
+            // On a large scan the bytes are not read at all, and the report says so rather
+            // than letting the app die for want of memory.
+            long freeHeap = freeHeapBytes();
+            if (src.length() <= freeHeap / 3) {
+                adoptOrphanContent(doc, java.nio.file.Files.readAllBytes(src.toPath()), r);
+            } else {
+                r.findings.add("the file is " + (src.length() / (1024 * 1024)) + " MB and only "
+                        + (freeHeap / (1024 * 1024)) + " MB of memory is free - the search for"
+                        + " orphaned content streams was skipped rather than risk running the"
+                        + " phone out of memory");
+            }
 
             // ---- decide: is the page tree usable, or do we have to salvage? ----
             // A tree can report a page count and still be un-walkable: a circular /Kids, or
@@ -309,8 +325,7 @@ public final class PdfRepair {
                             }
                             liftedDoc.close();
                         }
-                        //noinspection ResultOfMethodCallIgnored
-                        lifted.deleteOnExit();
+                        // removed with the rest of the run's temp files
                     }
                 } catch (Throwable ignored) {
                 }
@@ -455,6 +470,12 @@ public final class PdfRepair {
         } finally {
             close(rebuilt);
             close(doc);
+            // The documents above hold these files open, so they can only be removed now.
+            for (File f : r.tempFiles) {
+                //noinspection ResultOfMethodCallIgnored
+                f.delete();
+            }
+            r.tempFiles.clear();
             if (working != null && !working.equals(src)) {
                 //noinspection ResultOfMethodCallIgnored
                 working.delete();
@@ -608,8 +629,7 @@ public final class PdfRepair {
         // Nothing to repair if the file never held a PDF object at all.
         if (!r.headerFound && r.objectsSeen == 0) return null;
 
-        File work = File.createTempFile("kavopdf-repair-", ".pdf", workDir(src, outFile));
-        work.deleteOnExit();
+        File work = temp(r, "kavopdf-repair-", workDir(src, outFile));
 
         try (InputStream in = new FileInputStream(src);
              java.io.OutputStream os = new java.io.FileOutputStream(work)) {
@@ -746,8 +766,7 @@ public final class PdfRepair {
                     + catalog + " 0 R >>\nstartxref\n0\n%%EOF\n")
                     .getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
             try {
-                File patched = File.createTempFile("kavopdf-root-", ".pdf", workDir(src, outFile));
-                patched.deleteOnExit();
+                File patched = temp(r, "kavopdf-root-", workDir(src, outFile));
                 try (java.io.FileOutputStream os = new java.io.FileOutputStream(patched)) {
                     os.write(b);
                     os.write(tailBytes);
@@ -798,8 +817,7 @@ public final class PdfRepair {
             out.write(synth.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
             out.write(b, insertAt, b.length - insertAt);
 
-            File patched = File.createTempFile("kavopdf-tree-", ".pdf", workDir(src, outFile));
-            patched.deleteOnExit();
+            File patched = temp(r, "kavopdf-tree-", workDir(src, outFile));
             try (java.io.FileOutputStream os = new java.io.FileOutputStream(patched)) {
                 out.writeTo(os);
             }
@@ -905,7 +923,16 @@ public final class PdfRepair {
     /** The last /Prev offset a trailer names, or null. */
     private static String prevTarget(File src) {
         try {
-            byte[] b = readAll(src);
+            // Only the tail can hold a trailer. Reading the whole file here meant every
+            // repair held the document in memory a second time - on a large scan that is an
+            // out-of-memory crash, not a slow repair.
+            long len = src.length();
+            int want = (int) Math.min(len, 64 * 1024L);
+            byte[] b = new byte[want];
+            try (java.io.RandomAccessFile raf = new java.io.RandomAccessFile(src, "r")) {
+                raf.seek(len - want);
+                raf.readFully(b);
+            }
             String s = new String(b, java.nio.charset.StandardCharsets.ISO_8859_1);
             int at = s.lastIndexOf("/Prev");
             if (at < 0) return null;
@@ -1192,6 +1219,13 @@ public final class PdfRepair {
         if (len <= 0) return body;
         String out = text.substring(0, m.start()) + "/Length " + len + text.substring(m.end());
         return out.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+    }
+
+    /** Registers a temp file so it is removed when the run finishes. */
+    private static File temp(Report r, String prefix, File dir) throws IOException {
+        File f = File.createTempFile(prefix, ".pdf", dir);
+        r.tempFiles.add(f);
+        return f;
     }
 
     /** True when this byte can begin a PDF object body. */
@@ -1598,8 +1632,7 @@ public final class PdfRepair {
             os.write(("trailer\n<< /Size " + next + " /Root " + catalogToUse + " 0 R >>\n%%EOF\n")
                     .getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
 
-            File out = File.createTempFile("kavopdf-lift-", ".pdf", workDir(outFile, outFile));
-            out.deleteOnExit();
+            File out = temp(r, "kavopdf-lift-", workDir(outFile, outFile));
             try (java.io.FileOutputStream fos = new java.io.FileOutputStream(out)) {
                 os.writeTo(fos);
             }
@@ -2160,7 +2193,13 @@ public final class PdfRepair {
      */
     private static void verify(File out, String password, Report r) {
         PDDocument check = null;
+        // verify() runs twice - once on the first save, and again after pages are dropped -
+        // so every list it fills has to start empty. Clearing only lostPages doubled the
+        // blank and partial lists on the second pass, which drove "usable" negative and could
+        // withhold a file that was fine.
         r.lostPages.clear();
+        r.blankPages.clear();
+        r.partialPages.clear();
         try {
             check = PDDocument.load(out, password == null ? "" : password,
                     MemoryUsageSetting.setupTempFileOnly());
