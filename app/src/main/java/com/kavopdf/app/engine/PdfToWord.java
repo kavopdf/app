@@ -1,7 +1,11 @@
 package com.kavopdf.app.engine;
 
 import com.tom_roush.pdfbox.contentstream.PDFGraphicsStreamEngine;
+import com.tom_roush.pdfbox.cos.COSArray;
+import com.tom_roush.pdfbox.cos.COSBase;
+import com.tom_roush.pdfbox.cos.COSDictionary;
 import com.tom_roush.pdfbox.cos.COSName;
+import com.tom_roush.pdfbox.cos.COSString;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.pdmodel.PDPage;
 import com.tom_roush.pdfbox.pdmodel.PDResources;
@@ -170,6 +174,25 @@ public final class PdfToWord {
         List<Glyph> glyphs = glyphsOf(doc, index);
         int chars = 0;
         for (Glyph g : glyphs) chars += g.text.length();
+
+        // A filled form keeps its answers in the field's /V, never in the content stream, so
+        // they are read on every page - not only on a page with no text layer. Without this a
+        // filled form converted to Word kept its printed labels and lost every answer.
+        if (chars >= MIN_TEXT_CHARS) {
+            StringBuilder pageText = new StringBuilder();
+            for (Glyph g : glyphs) pageText.append(g.text);
+            String flat = pageText.toString().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
+            for (String v : formValuesOf(pdPage)) {
+                // Some generators also draw the value into the content stream. Adding it again
+                // would put the same words in twice, which is worse than not adding it.
+                if (flat.contains(v.replaceAll("\\s+", " ").toLowerCase(Locale.ROOT))) continue;
+                Para p = new Para();
+                p.runs.add(new Run(v, false, false, 11f));
+                p.top = 0;
+                page.blocks.add(p);
+                report.paragraphs++;
+            }
+        }
 
         if (chars < MIN_TEXT_CHARS) {
             // A page can carry its words in annotations rather than in its content stream - a
@@ -419,13 +442,25 @@ public final class PdfToWord {
         }
     }
 
-    /** Text held in a page's annotations: free-text boxes, notes, comments. */
+    /**
+     * Text a page carries outside its content stream: form field values, free-text boxes,
+     * notes, comments.
+     *
+     * <p>A filled form keeps its answers in the field's /V, not in the page content. A reader
+     * shows them because it draws the widget; a converter that only reads the content stream
+     * silently drops every answer the user typed. That is data loss, not a layout choice.
+     */
     private static String annotationTextOf(PDPage page) {
         StringBuilder sb = new StringBuilder();
         try {
             for (PDAnnotation ann : page.getAnnotations()) {
                 if (ann == null || ann.isHidden()) continue;
                 String c = ann.getContents();
+                if (ann instanceof com.tom_roush.pdfbox.pdmodel.interactive.annotation
+                        .PDAnnotationWidget) {
+                    String v = widgetValue(ann);
+                    if (v != null && !v.trim().isEmpty()) c = v.trim();
+                }
                 if (c == null || c.trim().isEmpty()) continue;
                 if (sb.length() > 0) sb.append("\n\n");
                 sb.append(c.trim());
@@ -434,6 +469,59 @@ public final class PdfToWord {
             return "";
         }
         return sb.toString();
+    }
+
+    /** Every answer a page's form fields hold, in page order. */
+    private static List<String> formValuesOf(PDPage page) {
+        List<String> out = new ArrayList<>();
+        try {
+            for (PDAnnotation ann : page.getAnnotations()) {
+                if (ann == null || ann.isHidden()) continue;
+                if (!(ann instanceof com.tom_roush.pdfbox.pdmodel.interactive.annotation
+                        .PDAnnotationWidget)) continue;
+                String v = widgetValue(ann);
+                if (v != null && !v.trim().isEmpty()) out.add(v.trim());
+            }
+        } catch (Throwable ignored) {
+        }
+        return out;
+    }
+
+    /** The answer a form field holds, in the form a reader would show. */
+    private static String widgetValue(PDAnnotation ann) {
+        try {
+            COSDictionary d = ann.getCOSObject();
+            COSBase parent = d.getDictionaryObject(COSName.PARENT);
+            COSDictionary field = parent instanceof COSDictionary
+                    ? (COSDictionary) parent : d;
+            String ft = field.getNameAsString(COSName.FT);
+            COSBase v = field.getDictionaryObject(COSName.V);
+            if (v == null) return null;
+            if ("Btn".equals(ft)) {
+                // A tick box has no text of its own; its /V is a state name like "Yes".
+                String state = v instanceof COSName ? ((COSName) v).getName() : String.valueOf(v);
+                if (state.isEmpty() || "Off".equalsIgnoreCase(state)) return null;
+                String label = field.getString(COSName.T);
+                return label == null || label.trim().isEmpty() ? null : label.trim();
+            }
+            if (v instanceof COSString) {
+                String t = ((COSString) v).getString();
+                return t == null || t.trim().isEmpty() ? null : t;
+            }
+            if (v instanceof COSArray) {
+                StringBuilder j = new StringBuilder();
+                for (COSBase e : (COSArray) v) {
+                    if (e instanceof COSString) {
+                        if (j.length() > 0) j.append(", ");
+                        j.append(((COSString) e).getString());
+                    }
+                }
+                return j.length() == 0 ? null : j.toString();
+            }
+            return null;
+        } catch (Throwable t) {
+            return null;
+        }
     }
 
     private static List<Glyph> glyphsOf(PDDocument doc, int index) {
