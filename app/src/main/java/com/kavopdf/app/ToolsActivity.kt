@@ -897,7 +897,13 @@ class ToolsActivity : PdfActivity() {
         // that really came back is what keeps this screen from claiming "all pages recovered"
         // over a document where seven of eight pages are empty.
         val usable = rep.pagesAfter - rep.blankPages.size - rep.lostPages.size
-        val lost = rep.pagesBefore - rep.pagesAfter
+        // What the file actually listed when it arrived. pagesBefore is measured after the
+        // repeated-page pass, so on its own it would tell the reader "4 of 4 recovered" about
+        // a file that had 8 pages in it.
+        val original = if (rep.pagesOriginal > 0) rep.pagesOriginal else rep.pagesBefore
+        // Repeats are not lost pages - they were the same page object listed twice, and
+        // dropping them is the fix. Everything else that went missing is.
+        val lost = original - rep.pagesRepeated - rep.pagesAfter
         val accent: Int
         when {
             !rep.verified -> {
@@ -916,7 +922,7 @@ class ToolsActivity : PdfActivity() {
                 accent = getColor(R.color.danger)
                 title.setText(R.string.repair_partial_title)
                 sub.text = getString(R.string.repair_recovered,
-                    maxOf(usable, 0), maxOf(rep.pagesBefore, rep.pagesAfter))
+                    maxOf(usable, 0), maxOf(original, rep.pagesAfter))
                 icon.setImageResource(R.drawable.ic_repair)
             }
             else -> {
@@ -929,8 +935,12 @@ class ToolsActivity : PdfActivity() {
         title.setTextColor(accent)
         icon.setColorFilter(accent)
 
-        if (rep.findings.isNotEmpty()) {
+        if (rep.pagesRepeated > 0 || rep.findings.isNotEmpty()) {
             details.addView(sectionHeader(getString(R.string.repair_section_found)))
+            if (rep.pagesRepeated > 0) {
+                details.addView(bullet(getString(R.string.repair_pages_repeated,
+                    rep.pagesRepeated)))
+            }
             rep.findings.forEach { details.addView(bullet(it)) }
         }
         if (rep.actions.isNotEmpty()) {
@@ -938,7 +948,7 @@ class ToolsActivity : PdfActivity() {
             rep.actions.forEach { details.addView(bullet(it)) }
         }
         addRow(details, getString(R.string.repair_label_pages),
-            rep.pagesBefore.toString() + " \u2192 " + rep.pagesAfter)
+            original.toString() + " \u2192 " + rep.pagesAfter)
         if (rep.lostPages.isNotEmpty()) {
             addRow(details, getString(R.string.repair_label_lost),
                 rep.lostPages.joinToString(", "), getColor(R.color.danger))

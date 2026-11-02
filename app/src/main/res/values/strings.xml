@@ -32,6 +32,7 @@
     <string name="repair_failed_title">Could not repair this file</string>
     <string name="repair_recovered">%1$d of %2$d pages recovered</string>
     <string name="repair_all_recovered">All %1$d pages recovered</string>
+    <string name="repair_pages_repeated">The file listed %1$d more page(s) than it has: the same page was referenced again. Those repeats were dropped.</string>
     <string name="repair_section_found">What was wrong</string>
     <string name="repair_section_done">What was done</string>
     <string name="repair_label_pages">Pages</string>
