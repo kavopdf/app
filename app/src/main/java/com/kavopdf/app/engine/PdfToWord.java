@@ -430,6 +430,15 @@ public final class PdfToWord {
         @Override
         protected void processTextPosition(TextPosition tp) {
             String u = tp.getUnicode();
+            PDFont f0 = tp.getFont();
+            // A CID font with no ToUnicode hands back the raw code as if it were a character:
+            // a page that says "not subject without a ToUnicode CMap" arrives as
+            // ")RQW\u0003VXEVHW...". The font itself still knows the right answer, so the
+            // codes are decoded through it instead of trusting the empty result.
+            if (f0 != null && isJunk(u)) {
+                String again = decodeThroughFont(tp, f0);
+                if (again != null && !isJunk(again)) u = again;
+            }
             if (u == null || u.isEmpty()) return;
             Glyph g = new Glyph();
             g.text = u;
@@ -490,6 +499,36 @@ public final class PdfToWord {
         } catch (Throwable ignored) {
         }
         return out;
+    }
+
+    /** True when a decoded string carries nothing a person could read. */
+    private static boolean isJunk(String s) {
+        if (s == null || s.isEmpty()) return true;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\n' || c == '\r' || c == '\t') continue;
+            if (c < 0x20 || (c >= 0x7F && c <= 0x9F)) continue;
+            return false;
+        }
+        return true;
+    }
+
+    /** Decode a glyph again straight from its font, glyph names included. */
+    private static String decodeThroughFont(TextPosition tp, PDFont font) {
+        try {
+            int[] codes = tp.getCharacterCodes();
+            if (codes == null || codes.length == 0) return null;
+            StringBuilder sb = new StringBuilder();
+            for (int code : codes) {
+                String part = font.toUnicode(code,
+                        com.tom_roush.pdfbox.pdmodel.font.encoding.GlyphList.getAdobeGlyphList());
+                if (part == null) part = font.toUnicode(code);
+                if (part != null) sb.append(part);
+            }
+            return sb.toString();
+        } catch (Throwable t) {
+            return null;
+        }
     }
 
     /** Every answer a page's form fields hold, in page order. */
