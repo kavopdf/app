@@ -117,7 +117,12 @@ abstract class PdfActivity : AppCompatActivity() {
                 AppLog.record(this, taskName, pendingName, true)
                 out
             } catch (t: Throwable) {
-                com.kavopdf.app.util.CrashGuard.problem(this, taskName, t)
+                // A UserFacing failure is the tool telling the user something they can act
+                // on. Recording it as a problem made ordinary mistakes - opening a Word file
+                // in the PDF picker, say - look like crashes in the activity log.
+                if (t !is com.kavopdf.app.util.UserFacing) {
+                    com.kavopdf.app.util.CrashGuard.problem(this, taskName, t)
+                }
                 failureLogged = true
                 // The picker has already created an empty document. Leaving it behind means a
                 // 0-byte file in the user's folder that looks like a result but is not one.
@@ -178,7 +183,11 @@ abstract class PdfActivity : AppCompatActivity() {
             askPassword(res.first, onReady)
         }) {
             val f = trackCacheFile(Files.copyToCache(this, uri))
-            if (!Files.looksLikePdf(f)) error(getString(R.string.msg_not_a_pdf))
+            // Picking the wrong file is a user mistake, not an app failure: it is said plainly
+            // and never logged as a problem, or the log fills with failures that are not bugs.
+            if (!Files.looksLikePdf(f)) throw com.kavopdf.app.util.UserFacing(
+                getString(R.string.msg_not_a_pdf)
+            )
             pagesHint = runCatching { com.kavopdf.app.engine.PdfEngine.pageCount(f, "") }
                 .getOrDefault(1).coerceAtLeast(1)
             sizeHint = runCatching { f.length() }.getOrDefault(0L)

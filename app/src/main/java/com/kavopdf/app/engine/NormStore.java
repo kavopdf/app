@@ -80,6 +80,10 @@ public final class NormStore {
     }
 
     public boolean isAnomalous(String tool, int pages, long bytes, long ms) {
+        // A run whose file size is not known cannot be judged. One page of plain text and a
+        // 45 MB scan are both "1 page", and comparing them flagged a healthy 16-second repair
+        // of a huge file as a 26x stall. Such runs are still learned from, never accused.
+        if (bytes <= 0) return false;
         long[] hist = data.get(key(tool, pages, bytes));
         if (hist == null || hist.length < 2) return false;      // no norm yet: silent
         long norm = median(hist);

@@ -164,7 +164,11 @@ class ToolsActivity : PdfActivity() {
                 binding.btnRun.isEnabled = true
             }) {
                 val f = Files.copyToCache(this, uri)
-                if (!Files.looksLikePdf(f)) error(getString(R.string.msg_not_a_pdf))
+                // Picking the wrong file is a user mistake, not an app failure: it is said plainly
+            // and never logged as a problem, or the log fills with failures that are not bugs.
+            if (!Files.looksLikePdf(f)) throw com.kavopdf.app.util.UserFacing(
+                getString(R.string.msg_not_a_pdf)
+            )
                 source = f
                 Unit
             }
