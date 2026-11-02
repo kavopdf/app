@@ -83,6 +83,10 @@ public final class PdfRepair {
 
         // ---- document-level facts ----
         public int pagesBefore;
+        /** Pages the file listed as it arrived, before any repeat was dropped. */
+        public int pagesOriginal;
+        /** How many of those were the same page object listed again. */
+        public int pagesRepeated;
         public int pagesAfter;
         public boolean encrypted;
         public boolean signed;
@@ -176,12 +180,59 @@ public final class PdfRepair {
                 return r;
             }
 
-            doc = open(working, pw, out, r);
+            // open() reports through the Report and throws rather than returning null, so a
+            // bare null check never fires. Catching here is what lets the byte-level lift
+            // below have its turn at a file whose catalog is gone.
+            try {
+                doc = open(working, pw, out, r);
+            } catch (Throwable t) {
+                if (r.failure.isEmpty()) r.failure = describe(t);
+                doc = null;
+            }
+            if (doc == null && !r.encrypted) {
+                // A locked file is not a damaged file: open() has already said it needs a
+                // password, and lifting objects out of it would hand back a file the owner
+                // deliberately protected.
+                //
+                // No reachable catalog does not mean no pages. An object-stream file whose
+                // cross-reference is gone still carries its /Type /Page objects in the bytes,
+                // and the byte-level lift can find them: one torture file comes back with
+                // 5 pages and 2313 characters this way. The lift parses its own output before
+                // returning, so nothing unproven is accepted here.
+                File lifted = null;
+                try {
+                    lifted = salvageObjects(src, out, r);
+                } catch (Throwable ignored) {
+                }
+                if (lifted != null) {
+                    try {
+                        doc = parse(lifted, pw, true, 64 * 1024);
+                    } catch (Throwable ignored) {
+                        doc = null;
+                    }
+                    if (doc != null) {
+                        r.stage = "salvaged";
+                        r.failure = "";
+                        r.findings.add("the cross-reference and catalog were gone; the pages"
+                                + " were lifted out of the file's own objects");
+                    }
+                    //noinspection ResultOfMethodCallIgnored
+                    lifted.deleteOnExit();
+                }
+            }
             if (doc == null) {
                 if (r.failure.isEmpty()) r.failure = "the file could not be parsed";
                 return r;
             }
             r.readable = true;
+            // What the file claims, before we touch it. Dropping a repeated page reference is
+            // right for a page bomb, but the reader still deserves to know the document listed
+            // more pages than it ends up with.
+            try {
+                r.pagesOriginal = doc.getNumberOfPages();
+            } catch (Throwable ignored) {
+                r.pagesOriginal = 0;
+            }
             // De-duplicate before anything counts or walks the tree: a page bomb lists one
             // page four thousand times, and every pass over that list is work on a 15 KB file.
             dedupeKids(doc, r);
@@ -328,6 +379,17 @@ public final class PdfRepair {
                             : "the repaired file did not pass verification";
                 }
                 return r;
+            }
+
+            // ---- the reader is owed an honest count ----
+            // A page that was in the file and is not in the output is the one thing a repair
+            // must never hide. Repeated references are already named above; anything else is
+            // said here, in the same breath as the success.
+            int missing = r.pagesOriginal - r.pagesRepeated - r.pagesAfter;
+            if (r.pagesOriginal > 0 && missing > 0) {
+                r.findings.add("the file listed " + r.pagesOriginal + " page(s) but "
+                        + r.pagesAfter + " came out - " + missing
+                        + " could not be reached in the page tree");
             }
             return r;
         } catch (InvalidPasswordException e) {
@@ -1030,7 +1092,25 @@ public final class PdfRepair {
      * layout), /N is bounded by how many pairs actually fit before /First, and an /Extends
      * that points at its own stream must not be followed twice.
      */
-    private static java.util.LinkedHashMap<Integer, byte[]> extractObjectStreams(byte[] b) {
+    /**
+     * Where the object bodies start in an object stream, derived from the header table itself.
+     * The table is {@code N} pairs of "objectNumber offset" integers; the first byte after the
+     * last of them is where the bodies begin. Returns -1 when the table does not look like one.
+     */
+    private static int headerTableEnd(byte[] data, int declared) {
+        if (declared <= 0) return -1;
+        int i = 0;
+        for (int n = 0; n < declared * 2; n++) {
+            while (i < data.length && isSpace(data[i])) i++;
+            int start = i;
+            while (i < data.length && data[i] >= '0' && data[i] <= '9') i++;
+            if (i == start) return -1;                 // not a number: this is not the table
+        }
+        while (i < data.length && isSpace(data[i])) i++;
+        return i < data.length ? i : -1;
+    }
+
+    private static java.util.LinkedHashMap<Integer, byte[]> extractObjectStreams(byte[] b, Report r) {
         java.util.LinkedHashMap<Integer, byte[]> out = new java.util.LinkedHashMap<>();
         List<int[]> spans = new ArrayList<>();
         List<byte[]> bodies = new ArrayList<>();
@@ -1040,10 +1120,28 @@ public final class PdfRepair {
             String head = heads.get(i);
             if (!head.contains("/ObjStm")) continue;
             byte[] data = decodeStreamBody(head, bodies.get(i));
-            if (data == null || data.length == 0) continue;
+            if (data == null || data.length == 0) {
+                r.findings.add("an object stream in the file could not be decoded ("
+                        + (data == null ? "filter failed" : "empty") + ")");
+                continue;
+            }
             int declared = intFrom(head, "/N");
             int first = intFrom(head, "/First");
-            if (first <= 0 || first > data.length) first = data.length;
+            if (first <= 0 || first > data.length) {
+                // /First says where the bodies begin, just past the "number offset" header
+                // table. A damaged file can carry /First 0 - one of the torture files does -
+                // and taking that at face value reads the whole stream as the table and finds
+                // no objects at all. The table is exactly /N pairs of integers, so it can be
+                // walked and the real start derived.
+                first = headerTableEnd(data, declared);
+                if (first <= 0) {
+                    r.findings.add("an object stream in the file has no usable /First offset"
+                            + " and its header table could not be read either");
+                    continue;
+                }
+                r.findings.add("an object stream in the file had /First 0; its header table"
+                        + " was read directly and the objects recovered");
+            }
             String table = new String(data, 0, Math.min(first, data.length),
                     java.nio.charset.StandardCharsets.ISO_8859_1);
             String[] parts = table.trim().split("\\s+");
@@ -1124,7 +1222,11 @@ public final class PdfRepair {
     }
 
     private static File salvageObjects(File src, File outFile, Report r) {
-        if (src.length() > 16L * 1024 * 1024L) return null;
+        if (src.length() > 16L * 1024 * 1024L) {
+            r.findings.add("the file is over 16 MB - the object lift is skipped on files that"
+                    + " large so a repair cannot exhaust the phone's memory");
+            return null;
+        }
         byte[] b;
         try {
             b = readAll(src);
@@ -1176,13 +1278,16 @@ public final class PdfRepair {
 
         // Objects packed inside compressed object streams are not top-level blocks, so the
         // scan above cannot see them. They are read out of their containers here.
-        java.util.LinkedHashMap<Integer, byte[]> packed = extractObjectStreams(b);
+        java.util.LinkedHashMap<Integer, byte[]> packed = extractObjectStreams(b, r);
         for (Integer number : packed.keySet()) {
             if (!byNumber.containsKey(number)) keepExtra.add(number);
         }
         // A PDF 1.5+ file can keep everything inside object streams, leaving one or two
         // top-level blocks. Refusing on a top-level count would throw those away.
-        if (found.size() < 2 && packed.isEmpty()) return null;
+        if (found.size() < 2 && packed.isEmpty()) {
+            r.findings.add("no recoverable object could be found in the file's bytes");
+            return null;
+        }
         List<Integer> keep = new ArrayList<>(byNumber.keySet());
         keep.addAll(keepExtra);
 
@@ -1192,7 +1297,10 @@ public final class PdfRepair {
         for (int attempt = 0; attempt < 16 && keep.size() >= 2; attempt++) {
             List<int[]> spans = new ArrayList<>();          // {objectNumber, start, end}
             File built = buildLifted(b, byNumber, packed, keep, outFile, spans, r);
-            if (built == null) return null;
+            if (built == null) {
+                r.findings.add("the lifted objects could not be written back as a PDF");
+                return null;
+            }
             try {
                 PDDocument check = parse(built, "", true, 64 * 1024);
                 check.close();
@@ -1202,7 +1310,11 @@ public final class PdfRepair {
                 int victim = offset < 0 ? -1 : objectAt(spans, offset);
                 //noinspection ResultOfMethodCallIgnored
                 built.delete();
-                if (victim < 0) return null;
+                if (victim < 0) {
+                    r.findings.add("the rebuilt file does not parse and no single object could"
+                            + " be blamed for it");
+                    return null;
+                }
                 keep.remove(Integer.valueOf(victim));
                 r.actions.add("dropped object " + victim + " - its own bytes are damaged");
             }
@@ -1239,7 +1351,12 @@ public final class PdfRepair {
                 pageObjects.add(number);
             }
         }
-        if (pageObjects.isEmpty()) return null;              // nothing to build a document around
+        if (pageObjects.isEmpty()) {
+            r.findings.add("no /Type /Page object was found among the " + keep.size()
+                    + " object(s) the file yielded (" + packed.size() + " of them came out of"
+                    + " object streams)");
+            return null;                                     // nothing to build a document around
+        }
 
         // The catalog can survive while the page-tree node it points at is the thing that was
         // destroyed - the chunk that removed object 12 took the whole /Pages node with it.
@@ -1321,7 +1438,11 @@ public final class PdfRepair {
         try {
             int removed = dedupeNode(doc.getDocumentCatalog().getPages().getCOSObject(), new HashSet<COSBase>());
             if (removed > 0) {
+                r.pagesRepeated = removed;
                 r.actions.add("dropped " + removed + " repeated page reference(s)");
+                r.findings.add("the file listed " + removed + " more page(s) than it has: the"
+                        + " same page object was referenced again, and a viewer would have shown"
+                        + " it twice");
             }
         } catch (Throwable ignored) {
         }

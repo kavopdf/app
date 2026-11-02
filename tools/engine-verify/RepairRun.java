@@ -49,6 +49,8 @@ public class RepairRun {
                 w.println("  \"readable\": " + r.readable + ",");
                 w.println("  \"verified\": " + r.verified + ",");
                 w.println("  \"stage\": \"" + r.stage + "\",");
+                w.println("  \"pagesOriginal\": " + r.pagesOriginal + ",");
+                w.println("  \"pagesRepeated\": " + r.pagesRepeated + ",");
                 w.println("  \"pagesBefore\": " + r.pagesBefore + ",");
                 w.println("  \"pagesAfter\": " + r.pagesAfter + ",");
                 w.println("  \"outExists\": " + outExists + ",");
