@@ -151,6 +151,7 @@ class FormsActivity : PdfActivity() {
             // a free text box would only let the user type something invalid.
             android.widget.Spinner(this).apply {
                 background = getDrawable(R.drawable.bg_field_pill)
+                popupBackground = getDrawable(R.drawable.bg_popup_pill)
                 val px = (16 * resources.displayMetrics.density).toInt()
                 val py = (8 * resources.displayMetrics.density).toInt()
                 setPadding(px, py, px, py)

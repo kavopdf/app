@@ -464,6 +464,9 @@ class LinksActivity : PdfActivity() {
         // size fields start empty, and empty means "the picture's own size".
         val sizingNames = arrayOf("Automatic (keeps shape)", "Manual (width and height)")
         val sizingSpin = android.widget.Spinner(this).apply {
+            // Without this the drop-down opens as a square black box while everything else on
+            // the screen is a rounded pill.
+            popupBackground = getDrawable(R.drawable.bg_popup_pill)
             adapter = android.widget.ArrayAdapter(this@LinksActivity, R.layout.item_dropdown, sizingNames)
         }
         box.addView(sizingSpin, android.widget.LinearLayout.LayoutParams(
@@ -497,6 +500,7 @@ class LinksActivity : PdfActivity() {
         val fOpacity = field(getString(R.string.hint_opacity), "")
         val shapeNames = arrayOf("Rectangle", "Rounded", "Circle")
         val shapeSpin = android.widget.Spinner(this).apply {
+            popupBackground = getDrawable(R.drawable.bg_popup_pill)
             adapter = android.widget.ArrayAdapter(this@LinksActivity, R.layout.item_dropdown, shapeNames)
         }
         box.addView(shapeSpin, android.widget.LinearLayout.LayoutParams(

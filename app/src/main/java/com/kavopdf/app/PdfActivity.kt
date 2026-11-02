@@ -101,8 +101,15 @@ abstract class PdfActivity : AppCompatActivity() {
         val taskName = taskLabel()
         runTask(getString(R.string.msg_processing), onDone = saved@{ result ->
             if (result == null) return@saved
-            showSuccess(getString(R.string.msg_saved_to, pendingName), result)
-            onSaved(result)
+            // A tool that shows its own result dialog must get the screen first. Showing the
+            // generic "Done" sheet here and then the tool's own dialog put one on top of the
+            // other - the repair receipt appeared over the Done sheet instead of before it.
+            if (showsOwnResult()) {
+                onSaved(result)
+            } else {
+                showSuccess(getString(R.string.msg_saved_to, pendingName), result)
+                onSaved(result)
+            }
         }) {
             try {
                 producer(out)

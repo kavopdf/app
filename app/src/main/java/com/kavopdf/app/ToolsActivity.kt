@@ -805,9 +805,15 @@ class ToolsActivity : PdfActivity() {
 
     override fun onSaved(file: File) {
         if (tool != Action.REPAIR) return
-        val rep = repairReport ?: return
+        val rep = repairReport
         // The receipt comes first, on its own. The "Done" sheet with Share and Open result is
-        // shown only after the receipt is closed, so the two never stack.
+        // shown only after the receipt is closed, so the two never stack. When there is no
+        // report to show the Done sheet still has to appear - it is the only thing telling the
+        // user the file was saved.
+        if (rep == null) {
+            showSuccess(getString(R.string.msg_saved_to, pendingName), file)
+            return
+        }
         showRepairReport(rep) {
             showSuccess(getString(R.string.msg_saved_to, pendingName), file)
         }
