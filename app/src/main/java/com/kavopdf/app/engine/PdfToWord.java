@@ -182,7 +182,12 @@ public final class PdfToWord {
             StringBuilder pageText = new StringBuilder();
             for (Glyph g : glyphs) pageText.append(g.text);
             String flat = pageText.toString().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
-            for (String v : formValuesOf(pdPage)) {
+            // A stamp, a comment or a free-text box sits on a page that already has text, so
+            // the annotation path below (which only runs on an empty page) never saw it: the
+            // words "RECEIVED", "APPROVED" and every reviewer comment were dropped.
+            List<String> outside = new ArrayList<>(formValuesOf(pdPage));
+            outside.addAll(annotationContentsOf(pdPage));
+            for (String v : outside) {
                 // Some generators also draw the value into the content stream. Adding it again
                 // would put the same words in twice, which is worse than not adding it.
                 if (flat.contains(v.replaceAll("\\s+", " ").toLowerCase(Locale.ROOT))) continue;
@@ -469,6 +474,22 @@ public final class PdfToWord {
             return "";
         }
         return sb.toString();
+    }
+
+    /** Text an annotation carries in its own right: a comment, a note, a free-text box. */
+    private static List<String> annotationContentsOf(PDPage page) {
+        List<String> out = new ArrayList<>();
+        try {
+            for (PDAnnotation ann : page.getAnnotations()) {
+                if (ann == null || ann.isHidden()) continue;
+                if (ann instanceof com.tom_roush.pdfbox.pdmodel.interactive.annotation
+                        .PDAnnotationWidget) continue;      // its /V was already read
+                String c = ann.getContents();
+                if (c != null && !c.trim().isEmpty()) out.add(c.trim());
+            }
+        } catch (Throwable ignored) {
+        }
+        return out;
     }
 
     /** Every answer a page's form fields hold, in page order. */
