@@ -704,8 +704,7 @@ public final class PdfToWord {
             List<Glyph> run = new ArrayList<>();
             Glyph prev = null;
             for (Glyph g : raw.glyphs) {
-                if (prev != null && crossesGutter(gutters, prev.x + prev.width, g.x)) {
-                    segments.add(run);
+                if (prev != null && crossesGutter(gutters, prev.x + prev.width, g.x)) {                    segments.add(run);
                     run = new ArrayList<>();
                 }
                 run.add(g);
@@ -2152,7 +2151,10 @@ public final class PdfToWord {
         // .txt but every editor shows them as garbage. They become a space, not nothing: a NUL
         // between two words is a word separator, and deleting it ran "Strongly agree" together.
         String clean = sb.toString()
-                .replaceAll("[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F]", " ");
+                .replaceAll("[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F]", " ")
+                // Positioned fragments leave runs of spaces where the PDF had a gap. In a .txt
+                // that is noise: the same line then differs from the line the document shows.
+                .replaceAll("[ \\t]{2,}", " ");
         java.nio.file.Files.write(out.toPath(),
                 clean.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
