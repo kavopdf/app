@@ -1435,6 +1435,18 @@ public final class PdfRepair {
                 //noinspection ResultOfMethodCallIgnored
                 built.delete();
                 if (victim < 0) {
+                    // Not every parse failure can be pinned on one object - "page tree root must
+                    // be a dictionary" and "expected root dictionary, but got this: null" both
+                    // name no offset and no object number. Giving up on the first of those threw
+                    // away whole files that a few more attempts would have opened. The last kept
+                    // object is dropped instead, so every attempt makes progress, and the loop's
+                    // own limit still bounds how much can be lost.
+                    if (keep.size() >= 2) {
+                        int last = keep.remove(keep.size() - 1);
+                        r.actions.add("dropped object " + last + " - the rebuild still would not"
+                                + " parse and no single object could be blamed");
+                        continue;
+                    }
                     r.findings.add("the rebuilt file does not parse and no single object could"
                             + " be blamed for it");
                     return null;
