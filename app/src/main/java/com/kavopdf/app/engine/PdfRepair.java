@@ -1097,6 +1097,13 @@ public final class PdfRepair {
      * The table is {@code N} pairs of "objectNumber offset" integers; the first byte after the
      * last of them is where the bodies begin. Returns -1 when the table does not look like one.
      */
+    /** True when this byte can begin a PDF object body. */
+    private static boolean startsObject(byte b) {
+        return b == '<' || b == '[' || b == '/' || b == '('
+                || (b >= '0' && b <= '9') || b == '+' || b == '-' || b == 't' || b == 'f'
+                || b == 'n';
+    }
+
     private static int headerTableEnd(byte[] data, int declared) {
         if (declared <= 0) return -1;
         int i = 0;
@@ -1127,6 +1134,17 @@ public final class PdfRepair {
             }
             int declared = intFrom(head, "/N");
             int first = intFrom(head, "/First");
+            // A positive /First can be wrong too - one file says 207 where the bodies start
+            // somewhere else entirely. The declared offset is only trusted when an object
+            // really begins there; otherwise the header table is walked instead.
+            if (first > 0 && first < data.length && !startsObject(data[first])) {
+                int derived = headerTableEnd(data, declared);
+                if (derived > 0) {
+                    r.findings.add("an object stream in the file had a /First offset that does"
+                            + " not point at an object; the header table was read instead");
+                    first = derived;
+                }
+            }
             if (first <= 0 || first > data.length) {
                 // /First says where the bodies begin, just past the "number offset" header
                 // table. A damaged file can carry /First 0 - one of the torture files does -
