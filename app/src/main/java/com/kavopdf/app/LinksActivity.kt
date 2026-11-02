@@ -463,12 +463,9 @@ class LinksActivity : PdfActivity() {
         // picture's own shape, Manual lets width and height be set separately. Both
         // size fields start empty, and empty means "the picture's own size".
         val sizingNames = arrayOf("Automatic (keeps shape)", "Manual (width and height)")
-        val sizingSpin = android.widget.Spinner(this).apply {
-            // Without this the drop-down opens as a square black box while everything else on
-            // the screen is a rounded pill.
-            setPopupBackground(getDrawable(R.drawable.bg_popup_pill))
-            adapter = android.widget.ArrayAdapter(this@LinksActivity, R.layout.item_dropdown, sizingNames)
-        }
+        // Inflated from view_spinner so the drop-down opens rounded, like every other field.
+        val sizingSpin = layoutInflater.inflate(R.layout.view_spinner, null) as android.widget.Spinner
+        sizingSpin.adapter = android.widget.ArrayAdapter(this, R.layout.item_dropdown, sizingNames)
         box.addView(sizingSpin, android.widget.LinearLayout.LayoutParams(
             android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
             android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
@@ -499,10 +496,8 @@ class LinksActivity : PdfActivity() {
         }
         val fOpacity = field(getString(R.string.hint_opacity), "")
         val shapeNames = arrayOf("Rectangle", "Rounded", "Circle")
-        val shapeSpin = android.widget.Spinner(this).apply {
-            setPopupBackground(getDrawable(R.drawable.bg_popup_pill))
-            adapter = android.widget.ArrayAdapter(this@LinksActivity, R.layout.item_dropdown, shapeNames)
-        }
+        val shapeSpin = layoutInflater.inflate(R.layout.view_spinner, null) as android.widget.Spinner
+        shapeSpin.adapter = android.widget.ArrayAdapter(this, R.layout.item_dropdown, shapeNames)
         box.addView(shapeSpin, android.widget.LinearLayout.LayoutParams(
             android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
             android.widget.LinearLayout.LayoutParams.WRAP_CONTENT

@@ -149,9 +149,7 @@ class FormsActivity : PdfActivity() {
         } else if (choices.isNotEmpty()) {
             // a dropdown or a radio group: the value has to be one of the options, so
             // a free text box would only let the user type something invalid.
-            android.widget.Spinner(this).apply {
-                background = getDrawable(R.drawable.bg_field_pill)
-                setPopupBackground(getDrawable(R.drawable.bg_popup_pill))
+            (layoutInflater.inflate(R.layout.view_spinner, null) as android.widget.Spinner).apply {
                 val px = (16 * resources.displayMetrics.density).toInt()
                 val py = (8 * resources.displayMetrics.density).toInt()
                 setPadding(px, py, px, py)
