@@ -173,6 +173,26 @@ public final class PdfToWord {
         for (Glyph g : glyphs) chars += g.text.length();
 
         if (chars < MIN_TEXT_CHARS) {
+            // A page can carry its words in annotations rather than in its content stream - a
+            // free-text box, a note, a comment, a highlight with a remark on it. That is still
+            // text on the page, so it is read before falling back to OCR.
+            String annotated = annotationTextOf(pdPage);
+            if (!annotated.isEmpty()) {
+                for (String block : annotated.split("\n\s*\n")) {
+                    String t = block.trim();
+                    if (t.isEmpty()) continue;
+                    Para p = new Para();
+                    p.runs.add(new Run(t.replaceAll("\s*\n\s*", " "), false, false, 11f));
+                    p.top = 0;
+                    page.blocks.add(p);
+                    report.paragraphs++;
+                }
+                report.notes.add("page " + (index + 1) + " has no text layer; read its annotations");
+                // Not an early return: a page can carry annotations AND drawn tables, and
+                // returning here dropped the table on a salary slip.
+                chars = (int) MIN_TEXT_CHARS;
+            }
+
             // No usable text layer. Either OCR it, or say plainly that it was not read.
             String ocrText = null;
             if (hook != null) {
@@ -395,6 +415,23 @@ public final class PdfToWord {
             g.italic = n.contains("italic") || n.contains("oblique");
             out.add(g);
         }
+    }
+
+    /** Text held in a page's annotations: free-text boxes, notes, comments. */
+    private static String annotationTextOf(PDPage page) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            for (PDAnnotation ann : page.getAnnotations()) {
+                if (ann == null || ann.isHidden()) continue;
+                String c = ann.getContents();
+                if (c == null || c.trim().isEmpty()) continue;
+                if (sb.length() > 0) sb.append("\n\n");
+                sb.append(c.trim());
+            }
+        } catch (Throwable ignored) {
+            return "";
+        }
+        return sb.toString();
     }
 
     private static List<Glyph> glyphsOf(PDDocument doc, int index) {
