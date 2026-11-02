@@ -1412,7 +1412,10 @@ public final class PdfToWord {
             }
             t.rows.add(row);
         }
-        if (filled < 2) return null;
+        // A QR code, a logo or a chart is drawn from the same rectangles a table is, so the
+        // cells are real but the words are not there. A real table has text in a good share of
+        // its cells; without this test a 21x21 QR code becomes a table and swallows the invoice.
+        if (filled < Math.max(2, group.size() / 4)) return null;
         return t;
     }
 
@@ -1441,10 +1444,6 @@ public final class PdfToWord {
         return logicalOrder(sb.toString().trim());
     }
 
-    private static void dbg(String m) {
-        if (System.getProperty("p2w.debug") != null) System.out.println("  DBG " + m);
-    }
-
     /** All tables on a page, found the way pdfplumber finds them. */
     private static List<Table> findTables(List<Edge> rawEdges, List<Glyph> glyphs, float pageWidth) {
         List<Table> out = new ArrayList<>();
@@ -1453,18 +1452,11 @@ public final class PdfToWord {
             float len = e.horizontal ? (e.x1 - e.x0) : (e.bottom - e.top);
             if (len >= EDGE_MIN) edges.add(e);
         }
-        if (edges.size() < 4) { dbg("edges<4 " + edges.size()); return out; }
-        dbg("raw edges=" + edges.size());
+        if (edges.size() < 4) return out;
         edges = mergeEdges(edges);
-        if (System.getProperty("p2w.debug") != null) {
-            TreeSet<Integer> vx = new TreeSet<>(), hy = new TreeSet<>();
-            for (Edge e : edges) { if (e.horizontal) hy.add(Math.round(e.top)); else vx.add(Math.round(e.x0)); }
-            dbg("merged v=" + vx + " h=" + hy);
-        }
         Map<Long, List<Edge>[]> isect = edgesToIntersections(edges);
-        if (isect.size() < 4) { dbg("isect<4 " + isect.size() + " edges=" + edges.size()); return out; }
+        if (isect.size() < 4) return out;
         List<float[]> cells = intersectionsToCells(isect);
-        dbg("isect=" + isect.size() + " cells=" + cells.size());
         if (cells.size() < 2) return out;
         for (List<float[]> group : cellsToTables(cells)) {
             Table t = tableFromCells(group, glyphs);
