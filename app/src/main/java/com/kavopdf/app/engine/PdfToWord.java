@@ -205,6 +205,7 @@ public final class PdfToWord {
         report.images += rules.images;
 
         float pageWidth = pdPage.getMediaBox().getWidth();
+        final float pageHeight = pdPage.getMediaBox().getHeight();
         List<Line> rawLines = toLines(glyphs, new ArrayList<float[]>());
 
         // Tables are found from the drawn rules, so they can be located before any line is
@@ -231,9 +232,20 @@ public final class PdfToWord {
         }
         List<Line> lines = toLines(glyphs, asBands(starts));
 
+        // Rules come from the graphics engine with y measured up from the page bottom; glyphs
+        // carry y measured down from the top. Without flipping one into the other, no glyph ever
+        // falls inside a cell and every table comes out empty.
+        float pageH = pageHeight;
         List<Edge> edges = new ArrayList<>();
-        for (float[] h : rules.horizontal) edges.add(new Edge(true, h[1], h[0], h[2], h[0]));
-        for (float[] v : rules.vertical) edges.add(new Edge(false, v[0], v[1], v[0], v[2]));
+        for (float[] h : rules.horizontal) {
+            float y = pageH > 0 ? pageH - h[0] : h[0];
+            edges.add(new Edge(true, h[1], y, h[2], y));
+        }
+        for (float[] v : rules.vertical) {
+            float y0 = pageH > 0 ? pageH - v[2] : v[1];
+            float y1 = pageH > 0 ? pageH - v[1] : v[2];
+            edges.add(new Edge(false, v[0], y0, v[0], y1));
+        }
         List<Table> tables = findTables(edges, glyphs, pageWidth);
         if (tables.isEmpty()) {
             tables = buildTables(rules, lines, pageWidth);
@@ -1134,7 +1146,14 @@ public final class PdfToWord {
         }
     }
 
-    /** Snap edges that lie within a tolerance of each other to their average. */
+    /**
+     * Snap edges that lie within a tolerance of each other to their average.
+     *
+     * <p>Clusters are built by comparing each edge with the one before it, not with the start
+     * of the cluster - that is what pdfplumber's cluster_objects does, and it is why a run of
+     * edges at 100, 102, 104 is one cluster and not two. Comparing with the cluster start split
+     * such runs, which left extra vertical edges and extra empty columns.
+     */
     private static List<Edge> snapEdges(List<Edge> edges, float xtol, float ytol) {
         List<Edge> out = new ArrayList<>();
         for (boolean horiz : new boolean[]{false, true}) {
@@ -1146,24 +1165,32 @@ public final class PdfToWord {
                     return Float.compare(horiz ? a.top : a.x0, horiz ? b.top : b.x0);
                 }
             });
-            int i = 0;
-            while (i < group.size()) {
-                int j = i;
-                float key = horiz ? group.get(i).top : group.get(i).x0;
-                float sum = 0f;
-                int n = 0;
-                while (j < group.size()) {
-                    float k = horiz ? group.get(j).top : group.get(j).x0;
-                    if (Math.abs(k - key) > (horiz ? ytol : xtol)) break;
-                    sum += k; n++; j++;
+            float tol = horiz ? ytol : xtol;
+            List<List<Edge>> clusters = new ArrayList<>();
+            List<Edge> current = new ArrayList<>();
+            float prev = 0f;
+            boolean first = true;
+            for (Edge e : group) {
+                float v = horiz ? e.top : e.x0;
+                if (first || Math.abs(v - prev) <= tol) {
+                    current.add(e);
+                } else {
+                    clusters.add(current);
+                    current = new ArrayList<>();
+                    current.add(e);
                 }
-                float avg = sum / n;
-                for (int m = i; m < j; m++) {
-                    Edge e = group.get(m);
+                prev = v;
+                first = false;
+            }
+            if (!current.isEmpty()) clusters.add(current);
+            for (List<Edge> cluster : clusters) {
+                float sum = 0f;
+                for (Edge e : cluster) sum += horiz ? e.top : e.x0;
+                float avg = sum / cluster.size();
+                for (Edge e : cluster) {
                     if (horiz) out.add(new Edge(true, e.x0, avg, e.x1, avg));
                     else out.add(new Edge(false, avg, e.top, avg, e.bottom));
                 }
-                i = j;
             }
         }
         return out;
@@ -1427,7 +1454,13 @@ public final class PdfToWord {
             if (len >= EDGE_MIN) edges.add(e);
         }
         if (edges.size() < 4) { dbg("edges<4 " + edges.size()); return out; }
+        dbg("raw edges=" + edges.size());
         edges = mergeEdges(edges);
+        if (System.getProperty("p2w.debug") != null) {
+            TreeSet<Integer> vx = new TreeSet<>(), hy = new TreeSet<>();
+            for (Edge e : edges) { if (e.horizontal) hy.add(Math.round(e.top)); else vx.add(Math.round(e.x0)); }
+            dbg("merged v=" + vx + " h=" + hy);
+        }
         Map<Long, List<Edge>[]> isect = edgesToIntersections(edges);
         if (isect.size() < 4) { dbg("isect<4 " + isect.size() + " edges=" + edges.size()); return out; }
         List<float[]> cells = intersectionsToCells(isect);
