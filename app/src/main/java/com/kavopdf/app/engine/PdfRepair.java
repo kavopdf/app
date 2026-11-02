@@ -1381,6 +1381,18 @@ public final class PdfRepair {
 
             int bodyStart = at + 3;
             int end = indexOf(b, endToken, bodyStart);
+            // An object's body cannot run past the next object's header. When one object is
+            // missing its own "endobj", the next "endobj" in the file belongs to a LATER object,
+            // and using it swallows every object in between: one file lost page object 49 that
+            // way and came back with 34 pages where the bytes hold 35.
+            // The one exception is a stream: its binary data may legitimately contain " obj",
+            // so the cap is only applied when no "stream" appears before that header.
+            int nextObj = indexOf(b, objToken, bodyStart);
+            if (nextObj >= 0 && (end < 0 || nextObj < end)) {
+                byte[] streamTok = "stream".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+                int streamAt = indexOf(b, streamTok, bodyStart);
+                if (streamAt < 0 || streamAt > nextObj) end = nextObj;
+            }
             int bodyEnd = end < 0 ? b.length : end;
             int k = bodyStart;
             while (k < bodyEnd && isSpace(b[k])) k++;
@@ -1391,7 +1403,10 @@ public final class PdfRepair {
                     found.add(new int[]{number, bodyStart, bodyEnd});
                 }
             }
-            at = bodyEnd + 1;
+            // Resume AT bodyEnd, not one past it: when the previous object had no "endobj",
+            // bodyEnd is the start of the next object token and +1 stepped over it, losing that
+            // object - and with it a page.
+            at = bodyEnd;
         }
         // One body per number: the last definition in a file is the one a reader would use.
         java.util.LinkedHashMap<Integer, int[]> byNumber = new java.util.LinkedHashMap<>();
