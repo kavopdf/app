@@ -1376,9 +1376,14 @@ public final class PdfRepair {
         // One broken body must not sink the whole salvage. The parser names the byte offset
         // it choked on, so that object is dropped and the file is rebuilt without it - and
         // again, until it parses or nothing is left worth writing.
+        // A page object whose own bytes are damaged used to be dropped, which loses the page
+        // entirely - that is why 29 files came back one or two pages short of the count their
+        // index asks for. Such an object is now replaced with a minimal, valid, blank page, so
+        // the page survives with nothing on it instead of vanishing.
+        java.util.HashMap<Integer, byte[]> overrides = new java.util.HashMap<>();
         for (int attempt = 0; attempt < 16 && keep.size() >= 2; attempt++) {
             List<int[]> spans = new ArrayList<>();          // {objectNumber, start, end}
-            File built = buildLifted(b, byNumber, packed, keep, outFile, spans, r);
+            File built = buildLifted(b, byNumber, packed, keep, outFile, spans, r, overrides);
             if (built == null) {
                 r.findings.add("the lifted objects could not be written back as a PDF");
                 return null;
@@ -1397,8 +1402,26 @@ public final class PdfRepair {
                             + " be blamed for it");
                     return null;
                 }
-                keep.remove(Integer.valueOf(victim));
-                r.actions.add("dropped object " + victim + " - its own bytes are damaged");
+                int[] vo = byNumber.get(victim);
+                byte[] vp = packed.get(victim);
+                String vh = vo != null
+                        ? new String(b, vo[1], Math.min(vo[2] - vo[1], 4096),
+                                java.nio.charset.StandardCharsets.ISO_8859_1)
+                        : vp != null
+                        ? new String(vp, 0, Math.min(vp.length, 4096),
+                                java.nio.charset.StandardCharsets.ISO_8859_1)
+                        : "";
+                String vflat = vh.replaceAll("\\s+", "");
+                if (vflat.contains("/Type/Page") && !vflat.contains("/Type/Pages")) {
+                    overrides.put(victim, ("<< /Type /Page /MediaBox [0 0 612 792]"
+                            + " /Resources << >> >>")
+                            .getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                    r.actions.add("object " + victim + " is a page whose own bytes are damaged -"
+                            + " the page was kept, blank, instead of being dropped");
+                } else {
+                    keep.remove(Integer.valueOf(victim));
+                    r.actions.add("dropped object " + victim + " - its own bytes are damaged");
+                }
             }
         }
         return null;
@@ -1407,7 +1430,8 @@ public final class PdfRepair {
     /** Writes the kept objects into a fresh, correctly cross-referenced file. */
     private static File buildLifted(byte[] b, java.util.LinkedHashMap<Integer, int[]> byNumber,
                                     java.util.LinkedHashMap<Integer, byte[]> packed,
-                                    List<Integer> keep, File outFile, List<int[]> spans, Report r) {
+                                    List<Integer> keep, File outFile, List<int[]> spans, Report r,
+                                    java.util.HashMap<Integer, byte[]> overrides) {
         boolean hasCatalog = false;
         int catalogObject = -1;
         int catalogPagesTarget = -1;
@@ -1470,7 +1494,10 @@ public final class PdfRepair {
                 if (o == null && packedBody == null) continue;
                 int startAt = os.size();
                 os.write((number + " 0 obj\n").getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
-                if (o == null && needPagesNode && number == catalogObject) {
+                byte[] replaced = overrides.get(number);
+                if (replaced != null) {
+                    os.write(replaced);
+                } else if (o == null && needPagesNode && number == catalogObject) {
                     os.write(repointPages(packedBody, newPagesNumber));
                 } else if (o != null && needPagesNode && number == catalogObject) {
                     os.write(repointPages(b, o[1], o[2], newPagesNumber));
