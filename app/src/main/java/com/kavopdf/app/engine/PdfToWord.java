@@ -1012,7 +1012,7 @@ public final class PdfToWord {
             // superscript with its body. PyMuPDF keeps them apart, so a merged line is a line
             // the reference has that we do not - the largest single cause of lines present in
             // the output but not on a line of their own.
-            float tol = Math.max(0.8f, g.size * 0.15f);
+            float tol = Math.max(0.9f, g.size * 0.18f);
             // Compare against the PREVIOUS glyph, not the first one on the line. A stamp is
             // often drawn very slightly rotated, so each character sits a fraction of a point
             // lower than the one before: 'P' 547.91, 'M' 548.50, 'C' 549.25. Measured from the
