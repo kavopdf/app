@@ -342,6 +342,47 @@ public final class PdfToWord {
                     hi = Math.max(hi, g.x + g.width);
                 }
             }
+            // A pull quote, a footnote block or a section heading that spans both columns covers
+            // the gutter, and one such block is enough to hide it from a whole-page projection.
+            // Project each vertical band separately and keep a gutter that most bands agree on:
+            // a spanning block only pollutes the bands it occupies.
+            if (keep0(rawLines, fullWidth).isEmpty()) {
+                float top = Float.MAX_VALUE, bot = -Float.MAX_VALUE;
+                for (Line l : rawLines) {
+                    if (l.text.trim().isEmpty()) continue;
+                    top = Math.min(top, l.y);
+                    bot = Math.max(bot, l.y);
+                }
+                int bandsN = 6;
+                float bh = (bot - top) / bandsN;
+                List<List<Float>> perBand = new ArrayList<>();
+                if (bh > 8f) {
+                    for (int b = 0; b < bandsN; b++) {
+                        float y0 = top + b * bh, y1 = y0 + bh;
+                        List<Line> sub = new ArrayList<>();
+                        for (Line l : rawLines) if (l.y >= y0 && l.y < y1) sub.add(l);
+                        if (sub.size() < 4) continue;
+                        List<Float> g = keep0(sub, fullWidth);
+                        if (g.size() == 1) perBand.add(g);
+                    }
+                }
+                if (perBand.size() >= 2) {
+                    List<Float> votes = new ArrayList<>();
+                    for (List<Float> g : perBand) votes.add(g.get(0));
+                    Collections.sort(votes);
+                    float best = votes.get(0), bestN = 0;
+                    for (float c : votes) {
+                        int n = 0;
+                        for (float v : votes) if (Math.abs(v - c) <= 6f) n++;
+                        if (n > bestN) { bestN = n; best = c; }
+                    }
+                    if (bestN >= perBand.size() * 0.5f) {
+                        starts.clear();
+                        starts.add(best);
+                    }
+                }
+            }
+
             if (iv.size() >= 40 && hi > lo) {
                 Collections.sort(iv, new Comparator<float[]>() {
                     @Override
@@ -903,6 +944,46 @@ public final class PdfToWord {
         });
         glyphs.clear();
         for (List<Glyph> r : runs) glyphs.addAll(r);
+    }
+
+    /** Zero-coverage x-ranges of the glyphs in these lines, keeping only gaps with real
+     *  columns on both sides. Used by the whole-page pass and by the per-band pass. */
+    private static List<Float> keep0(List<Line> rawLines, float fullWidth) {
+        List<float[]> iv = new ArrayList<>();
+        float lo = Float.MAX_VALUE, hi = -Float.MAX_VALUE;
+        for (Line l : rawLines) {
+            if (l.text.trim().isEmpty() || l.right - l.x > fullWidth) continue;
+            for (Glyph g : l.glyphs) {
+                if (g.width <= 0 || g.text == null || g.text.trim().isEmpty()) continue;
+                iv.add(new float[]{g.x, g.x + g.width});
+                lo = Math.min(lo, g.x);
+                hi = Math.max(hi, g.x + g.width);
+            }
+        }
+        List<Float> keep = new ArrayList<>();
+        if (iv.size() < 40 || hi <= lo) return keep;
+        Collections.sort(iv, new Comparator<float[]>() {
+            @Override
+            public int compare(float[] a, float[] b) { return Float.compare(a[0], b[0]); }
+        });
+        float span = hi - lo;
+        List<float[]> gaps = new ArrayList<>();
+        float reach = iv.get(0)[1];
+        for (int i = 1; i < iv.size(); i++) {
+            float gs = iv.get(i)[0];
+            if (gs - reach > span * 0.015f) gaps.add(new float[]{reach, gs});
+            reach = Math.max(reach, iv.get(i)[1]);
+        }
+        for (float[] gp : gaps) {
+            float mid = (gp[0] + gp[1]) / 2f;
+            int left = 0, right = 0;
+            for (float[] v : iv) {
+                if (v[1] <= mid) left++;
+                else if (v[0] >= mid) right++;
+            }
+            if (left >= iv.size() * 0.10f && right >= iv.size() * 0.10f) keep.add(mid);
+        }
+        return keep;
     }
 
     private static List<Line> toLines(List<Glyph> glyphs, List<float[]> gutters) {
