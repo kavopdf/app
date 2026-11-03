@@ -96,7 +96,15 @@ abstract class PdfActivity : AppCompatActivity() {
         failureLogged = false
         val producer = pendingProducer
         pendingProducer = null
-        if (uri == null || producer == null) return
+        if (uri == null) return
+        // producer is null when the activity was recreated while the save dialog was open -
+        // a dark-mode switch or a split-screen resize rebuilds it and the lambda is gone.
+        // Returning silently meant the user picked a location and nothing happened: no file,
+        // no message. Say so instead, so a second tap fixes it.
+        if (producer == null) {
+            toast(getString(R.string.msg_failed, pendingName))
+            return
+        }
         val out = trackCacheFile(Files.newFile(this, pendingName))
         val taskName = taskLabel()
         runTask(getString(R.string.msg_processing), onDone = saved@{ result ->
