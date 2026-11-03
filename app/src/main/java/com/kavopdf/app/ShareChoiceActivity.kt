@@ -72,12 +72,13 @@ class ShareChoiceActivity : AppCompatActivity() {
      * it is also set as ClipData so the permission has something to attach to.
      */
     private fun openTools(uri: Uri) {
-        startActivity(
-            Intent(this, MainActivity::class.java)
-                .putExtra(PdfActivity.EXTRA_SOURCE_URI, uri.toString())
-                .setClipData(android.content.ClipData.newRawUri("", uri))
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        )
+        val intent = Intent(this, MainActivity::class.java)
+            .putExtra(PdfActivity.EXTRA_SOURCE_URI, uri.toString())
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        // Set as a property, not chained: Kotlin maps setClipData/getClipData to a property,
+        // and the setter returns Unit, so ".setClipData(x).addFlags(y)" does not compile.
+        intent.clipData = android.content.ClipData.newRawUri("", uri)
+        startActivity(intent)
     }
 }
