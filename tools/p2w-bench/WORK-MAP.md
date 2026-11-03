@@ -76,3 +76,52 @@ table it finds that the ruled pass did not is added.
     line count match     93.86 -> 93.75   -0.11   within the 0.5 allowance
 
 Everything else flat. Rows 1, 2 and 7 of the table above are one fix, as predicted.
+
+## Which fixes lift more than one benchmark for free
+
+This is the useful half of splitting by benchmark. A fix is worth far more when it lands
+on a number that several benchmarks are computed from, and some fixes are nearly free
+because they are already half-done.
+
+### One fix, four benchmarks
+
+`line order`, `line count match`, `exact line hit` and `global line hit` are all computed
+from the same thing: **the list of lines**. Any fix that gets a line right moves all four.
+
+    line order accuracy   79.82 %      exact line hit   89.06 %
+    line count match      93.75 %      global line hit  95.85 %
+
+This is why the column work is worth so much even though it is hard: it is the only thing
+that moves four numbers at once.
+
+### One fix, three benchmarks
+
+`table count match`, `table row accuracy` and `table cell accuracy` all come from the same
+list of tables. That is what 3.46.6 proved - one line in the detector moved all three:
+
+    table rows  90.98 -> 95.55      cells  95.90 -> 98.75      count  84.62 -> 86.54
+
+### One fix, two benchmarks
+
+`doc pass @95 %` and `doc pass @98 %` are thresholds over per-file exact line hit. Every
+improvement anywhere that lifts a file past 95 % or 98 % moves these two as well. They are
+the cheapest numbers to move late, and the most honest: they count documents, not lines.
+
+### Already free, do not spend time here
+
+    median per-file   100.00 %   half the corpus is perfect already
+    garbage rate        0.02 %   nothing to fix
+    char volume        97.38 %   0.6 from target, and no user notices
+
+### The multiplier nobody expects
+
+A fix that removes lines the reference does **not** have is worth double. `350_question_paper`
+produces 117 lines where the reference has 104. Thirteen of those are ours alone, and each
+one costs line count match, exact line hit and global line hit at the same time. Removing an
+invented line is worth more than adding a correct one.
+
+### Where the remaining work actually is
+
+    line order 79.82 %   4 benchmarks, hard, 5 approaches already reverted
+    table count 86.54 %  1 real miss left (a table rotated inside an upright page)
+    exact hit 89.06 %    follows line order, plus ~230 misses from text held twice in the file
