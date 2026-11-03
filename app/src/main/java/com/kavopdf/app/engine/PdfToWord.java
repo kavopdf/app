@@ -641,11 +641,18 @@ public final class PdfToWord {
                 // A newspaper's two columns also align at the same baselines, so alignment
                 // alone is not enough - it cost Group A five points. What separates them is
                 // length: a value column holds short values, a newspaper column holds prose.
-                float rSum = 0;
+                float rSum = 0, lSum = 0;
                 for (Para b : R) rSum += b.right - b.left;
+                for (Para a : L) lSum += a.right - a.left;
                 float rMean = rSum / R.size();
+                float lMean = lSum / L.size();
                 boolean shortValues = rMean <= 90f;
-                if (share >= 0.85f && shortValues) {
+                // Both sides must be short. A delivery challan puts an address block in one
+                // column and a transport block in the other; the rows align, but each column is
+                // a self-contained block of prose and the reference reads one then the other.
+                // Testing only the right side fired there and interleaved two unrelated blocks.
+                boolean shortLabels = lMean <= 90f;
+                if (share >= 0.85f && shortValues && shortLabels) {
                     // row-wise: interleave by y, and when two blocks share a baseline the
                     // left one comes first, which is how the page reads
                     List<Para> row = new ArrayList<>(ps2);
