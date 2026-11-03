@@ -315,6 +315,65 @@ public final class PdfToWord {
                 if (bounds.size() >= 1 && bounds.size() <= 2) starts.addAll(bounds);
             }
         }
+        // A gutter is an x-range that NO GLYPH on the page covers. Projecting every glyph's
+        // extent is the only test that survives a fragmented layout: a headline drawn one word
+        // per line still has glyphs that stop at the column edge, so the gap between the
+        // columns stays empty even though ten different lines begin at ten different x values.
+        // Projecting line extents fails there, and clustering line starts fails worse.
+        if (glyphs.size() >= 40) {
+            // A full-width headline or footer covers the gutter and hides it. Those lines are
+            // not part of any column, so they are left out of the projection - the columns
+            // underneath them are what we are trying to find.
+            float contentLo = Float.MAX_VALUE, contentHi = -Float.MAX_VALUE;
+            for (Line l : rawLines) {
+                if (l.text.trim().isEmpty() || l.right <= l.x) continue;
+                contentLo = Math.min(contentLo, l.x);
+                contentHi = Math.max(contentHi, l.right);
+            }
+            float fullWidth = (contentHi - contentLo) * 0.62f;
+            List<float[]> iv = new ArrayList<>();
+            float lo = Float.MAX_VALUE, hi = -Float.MAX_VALUE;
+            for (Line l : rawLines) {
+                if (l.text.trim().isEmpty() || l.right - l.x > fullWidth) continue;
+                for (Glyph g : l.glyphs) {
+                    if (g.width <= 0 || g.text == null || g.text.trim().isEmpty()) continue;
+                    iv.add(new float[]{g.x, g.x + g.width});
+                    lo = Math.min(lo, g.x);
+                    hi = Math.max(hi, g.x + g.width);
+                }
+            }
+            if (iv.size() >= 40 && hi > lo) {
+                Collections.sort(iv, new Comparator<float[]>() {
+                    @Override
+                    public int compare(float[] a, float[] b) { return Float.compare(a[0], b[0]); }
+                });
+                float span = hi - lo;
+                List<float[]> gaps = new ArrayList<>();
+                float reach = iv.get(0)[1];
+                for (int i = 1; i < iv.size(); i++) {
+                    float gs = iv.get(i)[0];
+                    if (gs - reach > span * 0.03f) gaps.add(new float[]{reach, gs});
+                    reach = Math.max(reach, iv.get(i)[1]);
+                }
+                // keep only gaps that leave real columns on both sides of them
+                List<Float> keep = new ArrayList<>();
+                for (float[] gp : gaps) {
+                    float mid = (gp[0] + gp[1]) / 2f;
+                    int left = 0, right = 0;
+                    for (float[] v : iv) {
+                        if (v[1] <= mid) left++;
+                        else if (v[0] >= mid) right++;
+                    }
+                    if (left + right < iv.size() * 0.8f) continue;      // glyphs cross it
+                    float ratio = Math.min(left, right) / (float) Math.max(left, right);
+                    if (ratio < 0.30f) continue;                        // a margin, not a column
+                    keep.add(mid);
+                }
+                // The glyph projection is the most reliable of the three detectors, so when it
+                // finds a gutter it replaces what the other two guessed.
+                if (keep.size() >= 1 && keep.size() <= 2) { starts.clear(); starts.addAll(keep); }
+            }
+        }
         List<Line> lines = toLines(glyphs, asBands(starts));
 
         // Rules come from the graphics engine with y measured up from the page bottom; glyphs
