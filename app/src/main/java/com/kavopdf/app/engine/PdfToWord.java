@@ -650,6 +650,9 @@ public final class PdfToWord {
         float x, right, y, size, left;
         int column;
         boolean consumed;
+        /** True when this line was cut out of a longer one at a wide gap: it is its own line
+         *  and must never be merged back into the paragraph above it. */
+        boolean hardEnd;
 
         boolean inside(Table t) {
             float cx = (x + right) / 2f;
@@ -729,22 +732,44 @@ public final class PdfToWord {
             Glyph prev = null;
             int pageNoAt = pageNumberSplit(raw.glyphs);
             int gi = -1;
+            // A justified line is full of wide word gaps, so a plain "gap is big" test cut
+            // sentences in half. The gap that separates two real fields is an outlier on its
+            // own line - far wider than the gaps between the words around it.
+            java.util.List<Float> gaps = new java.util.ArrayList<>();
+            for (int k = 1; k < raw.glyphs.size(); k++) {
+                Glyph a = raw.glyphs.get(k - 1), b = raw.glyphs.get(k);
+                gaps.add(b.x - (a.x + a.width));
+            }
+            java.util.Collections.sort(gaps);
+            float median = gaps.isEmpty() ? 0f : gaps.get(gaps.size() / 2);
+            float outlier = Math.max(24f, median * 1.8f);
+            boolean splitBefore = false;
             for (Glyph g : raw.glyphs) {
                 gi++;
                 if (prev != null && gi == pageNoAt) {
                     segments.add(run);
                     run = new ArrayList<>();
                 }
-                if (prev != null && crossesGutter(gutters, prev.x + prev.width, g.x)) {                    segments.add(run);
+                boolean wideGap = prev != null
+                        && (g.x - (prev.x + prev.width)) > outlier;
+                if (prev != null && (wideGap
+                        || crossesGutter(gutters, prev.x + prev.width, g.x))) {
+                    segments.add(run);
                     run = new ArrayList<>();
+                    splitBefore = wideGap;
                 }
                 run.add(g);
                 prev = g;
             }
             if (!run.isEmpty()) segments.add(run);
 
+            // A baseline cut into more than one segment is several fields, not one sentence.
+            // None of those segments may be merged back into the line above it - that is what
+            // turned a question and its marks column into "[08] Explain the concept ...".
+            boolean cutHere = segments.size() > 1;
             for (List<Glyph> segment : segments) {
                 Line line = new Line();
+                line.hardEnd = cutHere;
                 line.glyphs.addAll(segment);
                 line.text = textOf(segment);
                 float totalSize = 0;
@@ -1176,6 +1201,9 @@ public final class PdfToWord {
         // A paragraph continues only if the line above ran on to the margin. Left alignment
         // alone is not enough: an invoice header has six left-aligned lines that are six
         // different fields, and merging them put the whole header into one paragraph.
+        // A line that was cut out of a longer one at a wide gap is its own field, so the line
+        // after it never joins it.
+        if (prev.hardEnd) return false;
         boolean continues = prev.right >= blockRight - size * 2.5f;
         boolean indented = next.x > prev.x + size * 1.2f;
         return continues && !indented;
