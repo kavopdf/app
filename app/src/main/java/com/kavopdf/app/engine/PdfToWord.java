@@ -580,9 +580,17 @@ public final class PdfToWord {
                             return c != 0 ? c : Float.compare(a.left, b.left);
                         }
                     });
-                    List<Object> again = new ArrayList<>();
+                    // Merge tables back in by position. Putting every table first and every
+                    // paragraph after broke the top of the page on two documents: a newsletter
+                    // masthead and a BOQ heading both jumped out of place.
+                    List<Object> again = new ArrayList<>(row);
                     for (Object o : ordered) if (!(o instanceof Para)) again.add(o);
-                    again.addAll(row);
+                    Collections.sort(again, new java.util.Comparator<Object>() {
+                        @Override
+                        public int compare(Object a, Object b) {
+                            return Float.compare(topOf(a), topOf(b));
+                        }
+                    });
                     ordered = again;
                 }
             }
