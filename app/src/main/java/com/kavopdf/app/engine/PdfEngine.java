@@ -215,7 +215,10 @@ public final class PdfEngine {
                     float px, py;
                     switch (r) {
                         case 90:  px = yd;      py = xd;      break;
-                        case 180: px = w - xd;  py = yd;      break;
+                        // A 180-degree page is upside down, so BOTH axes flip. Flipping only
+                        // x put the crop on the wrong half of the page: a rectangle taken from
+                        // the top of a rotated page landed at the bottom of the document.
+                        case 180: px = w - xd;  py = h - yd;  break;
                         case 270: px = w - yd;  py = h - xd;  break;
                         default:  px = xd;      py = h - yd;  break;
                     }
