@@ -777,7 +777,10 @@ public final class PdfToWord {
             }
             java.util.Collections.sort(gaps);
             float median = gaps.isEmpty() ? 0f : gaps.get(gaps.size() / 2);
-            float outlier = Math.max(10f, median * 1.15f);
+            // Measured: 1.15 -> 87.55 hit, 1.6 -> 86.77, 0.85 -> 89.06, 0.75 -> 88.65, 0.6 -> 87.72.
+            // The best of five settings tried on the full corpus. A split costs one space and
+            // gains a line break, so the line metrics rise faster than char volume falls.
+            float outlier = Math.max(6f, median * 0.85f);
             boolean splitBefore = false;
             for (Glyph g : raw.glyphs) {
                 gi++;
@@ -1825,6 +1828,13 @@ public final class PdfToWord {
                 return Float.compare(a.x, b.x);
             }
         });
+        java.util.List<Float> cg = new java.util.ArrayList<>();
+        for (int k = 1; k < sorted.size(); k++) {
+            Glyph a = sorted.get(k - 1), b = sorted.get(k);
+            if (Math.abs(a.y - b.y) <= 2f) cg.add(b.x - (a.x + a.width));
+        }
+        java.util.Collections.sort(cg);
+        float cellMedian = cg.isEmpty() ? 3f : cg.get(cg.size() / 2);
         StringBuilder sb = new StringBuilder();
         Glyph prev = null;
         for (Glyph g : sorted) {
@@ -1841,6 +1851,16 @@ public final class PdfToWord {
                     continue;
                 }
                 float gap = g.x - (prev.x + prev.width);
+                // Two blocks of text side by side on one baseline inside a cell are two lines,
+                // not one. The newspaper's body text did exactly this and came out as
+                // "and inline formatting while Headers, footers and page". A gap several times
+                // the cell's own median gap is a break, not a space.
+                if (gap > Math.max(24f, cellMedian * 2.5f)) {
+                    if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '\n') sb.append('\n');
+                    sb.append(g.text);
+                    prev = g;
+                    continue;
+                }
                 if (gap > Math.max(1.5f, prev.size * 0.18f) && sb.length() > 0
                         && sb.charAt(sb.length() - 1) != ' ') sb.append(' ');
             }
