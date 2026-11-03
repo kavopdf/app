@@ -125,3 +125,56 @@ invented line is worth more than adding a correct one.
     line order 79.82 %   4 benchmarks, hard, 5 approaches already reverted
     table count 86.54 %  1 real miss left (a table rotated inside an upright page)
     exact hit 89.06 %    follows line order, plus ~230 misses from text held twice in the file
+
+## Three more attempts, all reverted, all measured
+
+Recorded so they are not tried again blind.
+
+### Deduplicate lines with the same text and baseline
+
+`350_question_paper` emits 60 lines the reference does not have, and they are only three
+unique strings repeated twenty times each. Deduplicating them looked like the highest-value
+fix in the file - four benchmarks from one change.
+
+    char volume      97.38 -> 97.11   -0.27
+    word recall      95.95 -> 95.59   -0.36
+    line count match 93.75 -> 93.39   -0.36
+    line order       79.82 -> 79.62   -0.20
+
+Reverted. The repeats are real content the reference also carries; the words still have to
+be there. Removing a duplicate removes words the metric counts.
+
+**And a trap worth naming:** the 60 "extra" lines were counted against a `set` of reference
+lines. A set hides duplicates, so 60 extra looked like duplication when the reference had
+the same words on different lines. Always count against the **list**, not the set.
+
+### Split any field that starts past 90 % of the line width
+
+The marks column sits at x=551.9 with the question running to x=549, so the gap is 3 pt and
+the outlier test never fires. Splitting at 90 % of the line width looked exact.
+
+    global line hit  95.85 -> 93.26   -2.59
+    doc pass @95 %   71.92 -> 68.47   -3.45
+    exact line hit   89.06 -> 88.62
+
+Reverted. Justified text puts its last word past 90 % constantly, so the rule split
+sentences everywhere.
+
+### Run the XY-cut always instead of gating it on bands > 1
+
+    line order 79.82 -> 79.29
+
+Reverted. The gate exists for a reason.
+
+## What this says about the remaining work
+
+Three plausible, well-reasoned fixes in one session, all measured, all negative. The two
+remaining failures are not threshold problems:
+
+- the marks column is welded on because the **question text runs into it** - the split has
+  to be decided on the glyph level with the column geometry, not on the gap
+- the multi-column pages fail because column detection returns nothing for fragmented
+  layouts
+
+That is why Group A and Group B in TEST-CORPUS-REQUEST.md matter: more examples of these
+two shapes are the only way to tell a fix from a coincidence.
