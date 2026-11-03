@@ -64,3 +64,41 @@ a missing one on the same page.
    60.0%  202_bilingual_hindi_english_form (5 rows)
    60.5%  200_bank_statement_multipage     (38 rows)
    61.5%  333_datasheet_spec_tables        (26 rows)
+
+## Root cause found (instrumented 3.46.5)
+
+`314_tender_rfp_boq`, with prints at each stage:
+
+    TBL cells=12 rows=6   medH=16.0     <- the summary table
+    TBL cells=66 rows=11  medH=15.0     <- the bill of quantities
+    CONT rows=6  containsAnother=false
+    SOLID rows=6 inside=12 covered=12 pct=100
+    CONT rows=8  containsAnother=false
+    SOLID rows=8 inside=24 covered=24 pct=100
+    BLOCK table rows=6  top=136
+    BLOCK table rows=8  top=1003       <- off the page
+
+Both tables are detected, both survive the contains-another filter, both pass the 60%
+coverage rule, and **both reach `page.blocks`**. So nothing in the table logic loses them.
+
+The second table is dropped in `DocxWriter.table()`:
+
+    int cols = 0;
+    for (List<String> row : t.rows) cols = Math.max(cols, row.size());
+    if (cols == 0) return;              <- silently skipped
+
+Its cells are empty, and they are empty because **`top=1003` on a page that is 842 pt
+tall**. The table sits outside the page, so no glyph falls inside any of its cells and
+every cell is the empty string.
+
+So this is not a table-detection bug and not a rejection-rule bug. It is a **coordinate
+bug**: the cells for the lower half of this page are placed with a y that was never
+flipped back into page space. Fix that and the bill of quantities comes back, along with
+every other table that sits low on a page.
+
+Where to look: `cellsToTables` returns cell rectangles built from `intersectionsToCells`
+on edges whose y came through `mergeEdges`. Compare the y of a cell on the lower half
+against `pageH` - the first table's `top=136` is sane, the second's `1003` is not.
+
+Also worth doing regardless: `DocxWriter` should not silently skip a table. A table with
+no text is a bug worth seeing, not hiding.
