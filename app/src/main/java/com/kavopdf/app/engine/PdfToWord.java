@@ -1006,13 +1006,21 @@ public final class PdfToWord {
         List<Line> lines = new ArrayList<>();
         Line current = null;
         float baseY = 0;
+        float prevY = 0;
         for (Glyph g : sorted) {
             // 30% of the font size merges two PDF lines whenever the leading is tight, and a
             // superscript with its body. PyMuPDF keeps them apart, so a merged line is a line
             // the reference has that we do not - the largest single cause of lines present in
             // the output but not on a line of their own.
             float tol = Math.max(0.8f, g.size * 0.15f);
-            if (current == null || Math.abs(g.y - baseY) > tol) {
+            // Compare against the PREVIOUS glyph, not the first one on the line. A stamp is
+            // often drawn very slightly rotated, so each character sits a fraction of a point
+            // lower than the one before: 'P' 547.91, 'M' 548.50, 'C' 549.25. Measured from the
+            // first glyph the drift passes the 0.96 pt tolerance by the third character, and
+            // "PMC" came out as P / M / C on three lines - the vertical smear the user saw.
+            // Comparing to the previous glyph keeps a gradual drift together while a real line
+            // break, which is several points, still starts a new line.
+            if (current == null || Math.abs(g.y - prevY) > tol) {
                 current = new Line();
                 current.glyphs.add(g);
                 baseY = g.y;
@@ -1020,6 +1028,7 @@ public final class PdfToWord {
             } else {
                 current.glyphs.add(g);
             }
+            prevY = g.y;
         }
 
         // A line is not the same as a baseline: two columns sit on the same baseline, and
