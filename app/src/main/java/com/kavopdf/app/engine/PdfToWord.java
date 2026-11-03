@@ -352,7 +352,7 @@ public final class PdfToWord {
                 float reach = iv.get(0)[1];
                 for (int i = 1; i < iv.size(); i++) {
                     float gs = iv.get(i)[0];
-                    if (gs - reach > span * 0.03f) gaps.add(new float[]{reach, gs});
+                    if (gs - reach > span * 0.015f) gaps.add(new float[]{reach, gs});
                     reach = Math.max(reach, iv.get(i)[1]);
                 }
                 // keep only gaps that leave real columns on both sides of them
