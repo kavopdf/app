@@ -393,7 +393,25 @@ public final class PdfToWord {
         List<Table> tables = findTables(edges, glyphs, pageWidth);
         if (tables.isEmpty()) {
             tables = buildTables(rules, lines, pageWidth);
-            tables.addAll(rowPass);
+        }
+        // The row-based pass finds tables drawn without vertical rules - a bill of quantities,
+        // a bank statement, an ITR schedule. It used to run only when the ruled pass found
+        // NOTHING, so a page with one ruled table and one unruled table lost the second one
+        // without a word: the tender document came out with its summary table and no BOQ.
+        // It now always runs, and any table it finds that the ruled pass did not is added.
+        for (Table cand : rowPass) {
+            boolean known = false;
+            for (Table t : tables) {
+                float ox = Math.min(t.right, cand.right) - Math.max(t.left, cand.left);
+                float oy = Math.min(t.bottom, cand.bottom) - Math.max(t.top, cand.top);
+                if (ox > 0 && oy > 0) {
+                    float inter = ox * oy;
+                    float smaller = Math.min((t.right - t.left) * (t.bottom - t.top),
+                                             (cand.right - cand.left) * (cand.bottom - cand.top));
+                    if (smaller > 0 && inter / smaller >= 0.5f) { known = true; break; }
+                }
+            }
+            if (!known) tables.add(cand);
         }
         // A form drawn round everything can swallow a real table inside it. The bill of lading
         // came out twice for exactly this reason: one big table for the whole form and one for
@@ -447,6 +465,8 @@ public final class PdfToWord {
             if (inside == 0 || covered * 100 / inside >= 60) solid.add(t);
             else for (Line line : lines) if (line.inside(t)) line.consumed = false;
         }
+            System.err.println("  SOLID kept=" + solid.size()
+                + " rows=" + java.util.Arrays.toString(solid.stream().mapToInt(t -> t.rows.size()).toArray()));
         tables = solid;
 
         List<Line> body = new ArrayList<>();
@@ -514,7 +534,11 @@ public final class PdfToWord {
         for (Object o : ordered) {
             page.blocks.add(o);
             if (o instanceof Para) report.paragraphs++;
-            else report.tables++;
+            else {
+                report.tables++;
+                    System.err.println("  FINALBLOCK table rows=" + ((Table) o).rows.size()
+                        + " cols=" + (((Table) o).rows.isEmpty() ? 0 : ((Table) o).rows.get(0).size()));
+            }
         }
         return page;
     }
@@ -1814,6 +1838,7 @@ public final class PdfToWord {
         for (float[] c : group) { colXs.add(c[0]); rowYs.add(c[1]); }
         List<Float> C = new ArrayList<>(colXs), R = new ArrayList<>(rowYs);
         int ncol = C.size(), nrow = R.size();
+            System.err.println("  TFC ncol=" + ncol + " nrow=" + nrow + " group=" + group.size());
         if (ncol < 2 || nrow < 1) return null;
 
         List<List<List<Glyph>>> buckets = new ArrayList<>();
@@ -1858,6 +1883,8 @@ public final class PdfToWord {
         // A QR code, a logo or a chart is drawn from the same rectangles a table is, so the
         // cells are real but the words are not there. A real table has text in a good share of
         // its cells; without this test a 21x21 QR code becomes a table and swallows the invoice.
+            System.err.println("  TFC2 filled=" + filled + " need=" + Math.max(2, group.size() / 4)
+                + " ncol=" + ncol + " nrow=" + nrow);
         if (filled < Math.max(2, group.size() / 4)) return null;
 
         // If one cell's text runs straight into the next with no space and the next begins with

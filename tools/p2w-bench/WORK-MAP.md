@@ -59,3 +59,20 @@ Run both scorers before and after every change:
 
 A change ships only if no row above goes down. Two or three rows may dip 0.5 % and no
 more. The floor in this file is the reference; update it only when a change ships.
+
+## Shipped in 3.46.6 — rows 1, 2 and 7 together
+
+`rowTables` used to run only when the ruled pass found nothing. A page with one ruled
+table and one unruled table therefore lost the second without a word: the tender document
+came out with its summary table and no bill of quantities. It now always runs, and any
+table it finds that the ruled pass did not is added.
+
+    table ROW accuracy   90.98 -> 95.55   +4.57
+    table CELL accuracy  95.90 -> 98.75   +2.85
+    table count match    84.62 -> 86.54   +1.92
+    line order           79.58 -> 79.82   +0.24
+
+    char volume          97.44 -> 97.38   -0.06   within the 0.5 allowance
+    line count match     93.86 -> 93.75   -0.11   within the 0.5 allowance
+
+Everything else flat. Rows 1, 2 and 7 of the table above are one fix, as predicted.
