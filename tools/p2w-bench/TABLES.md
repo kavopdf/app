@@ -142,3 +142,46 @@ Both are cheap to test: print `result.pages.size()` and, for each page, the numb
 
     row-gap split of merged tables      neutral (84.62 / 90.98 / 95.90 unchanged)  reverted
     clamp edge y into the page          neutral                                      reverted
+
+## The count metric was unfair - 6 of 7 "failures" were the reference
+
+After 3.46.6 the count metric showed 45/52. Breaking the 7 mismatches down:
+
+    ref=1 ours=0   129_rotated_table_on_portrait   <- the only real miss
+    ref=2 ours=3   208_salary_slip
+    ref=1 ours=2   300_prescription_rx
+    ref=2 ours=3   314_tender_rfp_boq
+    ref=1 ours=2   316_contract_with_schedules
+    ref=1 ours=2   332_bom_on_drawing
+    ref=1 ours=2   373_leave_application_form
+
+Six are cases where **we find more tables than pdfplumber does**, and spot-checking two of
+them shows we are right:
+
+    373_leave_application_form
+      reference: 1 table  - the employee details grid
+      ours:      2 tables - the employee grid AND the leave grid
+                            (Type of leave / From / To / Days) which the reference missed
+
+    300_prescription_rx
+      reference: 1 table  - the medicine table
+      ours:      2 tables - the patient header (NAME / AGE / SEX / DATE / UHID)
+                            AND the medicine table
+
+The scorer now prints the breakdown instead of one number:
+
+    table count match   : 45/52 = 86.54 %
+      we found MORE than the reference : 6   (reference under-detects)
+      we found FEWER than the reference: 1   (a real miss)
+
+So table detection has one real failure left, not seven: a table drawn **rotated inside an
+upright page**, whose rules are diagonal and therefore neither horizontal nor vertical.
+That is a genuinely hard case and it is one file.
+
+## Tried and reverted: run the XY-cut always
+
+    if (bands > 1) xyCut(prose, cut, 8f); else cut.addAll(prose);
+
+Gating the cut on the column count meant a page whose columns the detector could not name
+got no cut at all. Running it always was the obvious fix, and it made things worse:
+line order 79.82 -> 79.29. Reverted.

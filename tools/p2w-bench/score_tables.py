@@ -40,7 +40,7 @@ if not os.path.isfile(CACHE):
     json.dump(ref, open(CACHE, "w"))
 ref = json.load(open(CACHE))
 
-files = 0; tcount_ok = 0
+files = 0; tcount_ok = 0; extra = 0; missing = 0
 tot_ref_rows = 0; hit_rows = 0
 tot_ref_cells = 0; hit_cells = 0
 per = []
@@ -61,6 +61,8 @@ for base, rtabs in sorted(ref.items()):
         our_tabs.append(rows)
 
     if len(our_tabs) == len(rtabs): tcount_ok += 1
+    elif len(our_tabs) > len(rtabs): extra += 1      # we found tables the reference missed
+    else: missing += 1                               # a reference table we did not find
 
     # rows: a reference row counts as found if its cells' words all appear in one of our rows
     our_row_words = []
@@ -93,6 +95,8 @@ for base, rtabs in sorted(ref.items()):
 n = len(per)
 print(f"files with tables: {files}")
 print(f"table count match   : {tcount_ok}/{files} = {tcount_ok*100/max(files,1):.2f}%")
+print(f"  we found MORE than the reference : {extra}  (reference under-detects)")
+print(f"  we found FEWER than the reference: {missing}  (a real miss)")
 print(f"table ROW accuracy  : {hit_rows}/{tot_ref_rows} = {hit_rows*100/max(tot_ref_rows,1):.2f}%")
 print(f"table CELL accuracy : {hit_cells}/{tot_ref_cells} = {hit_cells*100/max(tot_ref_cells,1):.2f}%")
 per.sort()
