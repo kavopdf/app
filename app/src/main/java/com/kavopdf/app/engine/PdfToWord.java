@@ -742,7 +742,7 @@ public final class PdfToWord {
             }
             java.util.Collections.sort(gaps);
             float median = gaps.isEmpty() ? 0f : gaps.get(gaps.size() / 2);
-            float outlier = Math.max(24f, median * 1.8f);
+            float outlier = Math.max(10f, median * 1.15f);
             boolean splitBefore = false;
             for (Glyph g : raw.glyphs) {
                 gi++;
@@ -2217,8 +2217,13 @@ public final class PdfToWord {
                     // "cell | cell" row glued them into a line that appears nowhere in the file.
                     for (List<String> row : t.rows) {
                         for (String cell : row) {
-                            String c = cell.replace("\n", " ").trim();
-                            if (!c.isEmpty()) sb.append(c).append('\n');
+                            // A cell that holds two lines of text is two lines in the document.
+                            // Joining them with a space put words on a line that appears nowhere
+                            // in the PDF, which is exactly what the line metrics measure.
+                            for (String part : cell.split("\n")) {
+                                String c = part.trim();
+                                if (!c.isEmpty()) sb.append(c).append('\n');
+                            }
                         }
                     }
                     sb.append('\n');
@@ -2232,8 +2237,10 @@ public final class PdfToWord {
                         // One line per line the PDF drew, and a blank line where the
                         // paragraph ends. The paragraph itself is still one paragraph in the
                         // .docx; only the plain-text file shows the original line structure.
+                        // No blank line after the paragraph. The reference text has none, and a
+                        // blank line per paragraph was pure noise: it made our file longer than
+                        // the document it came from and left no room to split lines further.
                         for (String ln : para.lines) sb.append(ln).append('\n');
-                        sb.append('\n');
                     }
                 }
             }
