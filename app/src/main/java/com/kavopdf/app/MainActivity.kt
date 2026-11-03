@@ -128,7 +128,19 @@ class MainActivity : AppCompatActivity() {
         }
         // Hand the shared document to whichever tool screen is opening, so it starts with the
         // file already chosen instead of asking for it again.
-        sharedUri?.let { intent.putExtra(PdfActivity.EXTRA_SOURCE_URI, it) }
+        //
+        // The URI goes in the extra as a string, but the read permission has to be attached to
+        // ClipData - FLAG_GRANT_READ_URI_PERMISSION does not cover a URI that only appears in
+        // an extra. Without this second hop the tool screen could not open the file and every
+        // tool said "this file couldn't be read", while Read PDF worked because it was given
+        // the URI as intent data.
+        sharedUri?.let { raw ->
+            intent.putExtra(PdfActivity.EXTRA_SOURCE_URI, raw)
+            runCatching { android.net.Uri.parse(raw) }.getOrNull()?.let {
+                intent.setClipData(android.content.ClipData.newRawUri(null, it))
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+        }
         try {
             startActivity(intent)
         } catch (t: Throwable) {

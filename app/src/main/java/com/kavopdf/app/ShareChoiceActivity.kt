@@ -62,10 +62,20 @@ class ShareChoiceActivity : AppCompatActivity() {
         )
     }
 
+    /**
+     * FLAG_GRANT_READ_URI_PERMISSION grants access to the URI in the intent's data or its
+     * ClipData - not to a URI sitting in an extra as a string. The reader path used setData,
+     * so it worked; this one used putExtra, so the flag granted nothing, the tool screen got
+     * a URI it was not allowed to open, and every tool answered "this file couldn't be read".
+     *
+     * The URI still travels as a string extra because that is what the tool screens read, but
+     * it is also set as ClipData so the permission has something to attach to.
+     */
     private fun openTools(uri: Uri) {
         startActivity(
             Intent(this, MainActivity::class.java)
                 .putExtra(PdfActivity.EXTRA_SOURCE_URI, uri.toString())
+                .setClipData(android.content.ClipData.newRawUri(null, uri))
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         )
