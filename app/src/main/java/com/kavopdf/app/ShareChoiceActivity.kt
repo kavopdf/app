@@ -75,7 +75,7 @@ class ShareChoiceActivity : AppCompatActivity() {
         startActivity(
             Intent(this, MainActivity::class.java)
                 .putExtra(PdfActivity.EXTRA_SOURCE_URI, uri.toString())
-                .setClipData(android.content.ClipData.newRawUri(null, uri))
+                .setClipData(android.content.ClipData.newRawUri("", uri))
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         )

@@ -134,10 +134,11 @@ class MainActivity : AppCompatActivity() {
         // an extra. Without this second hop the tool screen could not open the file and every
         // tool said "this file couldn't be read", while Read PDF worked because it was given
         // the URI as intent data.
-        sharedUri?.let { raw ->
-            intent.putExtra(PdfActivity.EXTRA_SOURCE_URI, raw)
-            runCatching { android.net.Uri.parse(raw) }.getOrNull()?.let {
-                intent.setClipData(android.content.ClipData.newRawUri(null, it))
+        val shared = sharedUri
+        if (shared != null) {
+            intent.putExtra(PdfActivity.EXTRA_SOURCE_URI, shared)
+            runCatching {
+                intent.clipData = android.content.ClipData.newRawUri("", android.net.Uri.parse(shared))
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
         }
