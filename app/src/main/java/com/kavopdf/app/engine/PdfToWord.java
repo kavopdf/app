@@ -540,6 +540,41 @@ public final class PdfToWord {
                 ? new ArrayList<Line>() : new ArrayList<Line>());
         List<Para> ps2 = new ArrayList<>();
         for (Object o : ordered) if (o instanceof Para) ps2.add((Para) o);
+
+        // A wide table the detector missed - a BOQ, an invoice grid - arrives as one block per
+        // cell, and sorting those by column reads the whole first column, then the whole second.
+        // Three or more x-clusters of SHORT blocks is a grid, not prose: prose columns are long.
+        // Read a grid row by row, which is how the page is read.
+        if (ps2.size() >= 9) {
+            List<Float> gx = new ArrayList<>();
+            for (Para p : ps2) gx.add(p.left);
+            Collections.sort(gx);
+            int clusters = 1;
+            for (int i = 1; i < gx.size(); i++) if (gx.get(i) - gx.get(i - 1) > 12f) clusters++;
+            float wSum = 0;
+            for (Para p : ps2) wSum += p.right - p.left;
+            float wMean = wSum / ps2.size();
+            if (clusters >= 4 && wMean < 90f) {
+                List<Para> row = new ArrayList<>(ps2);
+                Collections.sort(row, new java.util.Comparator<Para>() {
+                    @Override
+                    public int compare(Para a, Para b) {
+                        int c = Float.compare(a.top, b.top);
+                        return c != 0 ? c : Float.compare(a.left, b.left);
+                    }
+                });
+                List<Object> again = new ArrayList<>(row);
+                for (Object o : ordered) if (!(o instanceof Para)) again.add(o);
+                Collections.sort(again, new java.util.Comparator<Object>() {
+                    @Override
+                    public int compare(Object a, Object b) {
+                        return Float.compare(topOf(a), topOf(b));
+                    }
+                });
+                ordered = again;
+            }
+        }
+
         if (ps2.size() >= 6) {
             List<Float> xs2 = new ArrayList<>();
             for (Para p : ps2) xs2.add(p.left);
