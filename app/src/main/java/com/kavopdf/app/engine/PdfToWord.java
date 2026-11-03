@@ -284,6 +284,37 @@ public final class PdfToWord {
             }
             if (!inTable) starts.add(x);
         }
+        // A column can be evidenced two ways. The first is a line that spans the gutter - that
+        // is what columnStarts finds. The second is a page where the columns are already
+        // separate lines, so no line spans anything and columnStarts comes back empty: a
+        // three-column newspaper page. Without this the page got no columns at all, the XY-cut
+        // never ran, and the columns interleaved line by line.
+        if (starts.isEmpty()) {
+            List<Float> xs = new ArrayList<>();
+            for (Line l : rawLines) if (!l.text.trim().isEmpty()) xs.add(l.x);
+            Collections.sort(xs);
+            if (xs.size() >= 8) {
+                List<float[]> groups = new ArrayList<>();
+                float gStart = xs.get(0), gEnd = xs.get(0);
+                int gCount = 0;
+                for (Float x : xs) {
+                    if (x - gEnd > 24f) {
+                        groups.add(new float[]{gStart, gEnd, gCount});
+                        gStart = x; gCount = 0;
+                    }
+                    gEnd = x; gCount++;
+                }
+                groups.add(new float[]{gStart, gEnd, gCount});
+                int need = Math.max(3, Math.round(xs.size() * 0.08f));
+                List<Float> bounds = new ArrayList<>();
+                for (int k = 1; k < groups.size(); k++) {
+                    float[] left = groups.get(k - 1), right = groups.get(k);
+                    if (left[2] < need || right[2] < need) continue;
+                    bounds.add((left[1] + right[0]) / 2f);
+                }
+                if (bounds.size() >= 1 && bounds.size() <= 2) starts.addAll(bounds);
+            }
+        }
         List<Line> lines = toLines(glyphs, asBands(starts));
 
         // Rules come from the graphics engine with y measured up from the page bottom; glyphs
@@ -1027,12 +1058,19 @@ public final class PdfToWord {
         // A column boundary has to be shared by a good part of the page. Two lines are not
         // enough: a single wide space inside one cell produced the extra columns on the salary
         // slip and the simple table. A quarter of the lines is a column; two lines is a gap.
-        int need = Math.max(3, Math.round(lines.size() * 0.25f));
+        // A quarter of the page is far too strict. On a three-column newspaper only the lines
+        // that span a gutter carry a gap at that x, so the evidence for a real column came from
+        // a minority of lines and the page came out with no columns at all - the two columns
+        // then interleaved line by line. A tenth is enough to be a column and still too many to
+        // be a wide space inside one cell.
+        int need = Math.max(3, Math.round(lines.size() * 0.10f));
         List<Float> kept = new ArrayList<>();
         for (Float c : candidates) {
             int key = Math.round(c);
             int seen = 0;
-            for (int dx = -3; dx <= 3; dx++) {
+            // Ragged column starts drift a few points from line to line, so the window has to
+            // be wider than the rounding error of one glyph.
+            for (int dx = -6; dx <= 6; dx++) {
                 Integer v = support.get(key + dx);
                 if (v != null && v > seen) seen = v;
             }
