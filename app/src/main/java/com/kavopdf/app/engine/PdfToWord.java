@@ -1829,6 +1829,17 @@ public final class PdfToWord {
         Glyph prev = null;
         for (Glyph g : sorted) {
             if (prev != null) {
+                // A cell that holds several lines of text holds several lines. Joining them
+                // with a space invented a line that appears nowhere in the document, and the
+                // bank statement lost 232 of its 362 lines to exactly that. The newline is kept
+                // and the .txt writer puts each one on its own line; a Word cell shows them as
+                // line breaks, which is what the document has.
+                if (Math.abs(g.y - prev.y) > Math.max(2f, prev.size * 0.5f)) {
+                    if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '\n') sb.append('\n');
+                    sb.append(g.text);
+                    prev = g;
+                    continue;
+                }
                 float gap = g.x - (prev.x + prev.width);
                 if (gap > Math.max(1.5f, prev.size * 0.18f) && sb.length() > 0
                         && sb.charAt(sb.length() - 1) != ' ') sb.append(' ');
