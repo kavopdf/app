@@ -710,7 +710,11 @@ public final class PdfToWord {
         Line current = null;
         float baseY = 0;
         for (Glyph g : sorted) {
-            float tol = Math.max(1.2f, g.size * 0.3f);
+            // 30% of the font size merges two PDF lines whenever the leading is tight, and a
+            // superscript with its body. PyMuPDF keeps them apart, so a merged line is a line
+            // the reference has that we do not - the largest single cause of lines present in
+            // the output but not on a line of their own.
+            float tol = Math.max(0.8f, g.size * 0.15f);
             if (current == null || Math.abs(g.y - baseY) > tol) {
                 current = new Line();
                 current.glyphs.add(g);
@@ -768,6 +772,10 @@ public final class PdfToWord {
             // turned a question and its marks column into "[08] Explain the concept ...".
             boolean cutHere = segments.size() > 1;
             for (List<Glyph> segment : segments) {
+                // A segment can be empty when a cut lands exactly on a boundary. Reading its
+                // first glyph threw IndexOutOfBounds and took the whole conversion down - 41
+                // files in the corpus died this way before this guard existed.
+                if (segment.isEmpty()) continue;
                 Line line = new Line();
                 line.hardEnd = cutHere;
                 line.glyphs.addAll(segment);
