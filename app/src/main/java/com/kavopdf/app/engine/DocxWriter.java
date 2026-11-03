@@ -167,7 +167,6 @@ public final class DocxWriter {
     private static void table(StringBuilder sb, PdfToWord.Table t) {
         int cols = 0;
         for (List<String> row : t.rows) cols = Math.max(cols, row.size());
-            System.err.println("  DW.table rows=" + t.rows.size() + " cols=" + cols);
         if (cols == 0) return;
         int width = 9638 / cols;                       // content width in twips, split evenly
 

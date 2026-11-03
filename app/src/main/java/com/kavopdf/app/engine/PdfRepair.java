@@ -1747,9 +1747,6 @@ public final class PdfRepair {
                 seen.add(key);
                 cand.add(decoded);
             }
-            if (System.getProperty("kavopdf.dbg") != null)
-                System.out.println("    [dbg] empty=" + empty.size() + " spans=" + spans.size()
-                        + " cand=" + cand.size());
             if (cand.isEmpty()) return;
 
             // Match by evidence. Object number says nothing: one fixture renumbers the
@@ -1771,10 +1768,6 @@ public final class PdfRepair {
                     int score = overlap * 100 - Math.abs(ops - 8);
                     if (score > bestScore) { bestScore = score; bestPage = idx; }
                 }
-                if (System.getProperty("kavopdf.dbg") != null)
-                    System.out.println("    [dbg] cand " + c + " len=" + cand.get(c).length
-                            + " names=" + names + " ops=" + ops + " best=" + bestPage
-                            + " score=" + bestScore);
                 int overlapBest = bestScore > 0 ? (bestScore + Math.abs(ops - 8)) / 100 : 0;
                 boolean strong = empty.size() == pages || overlapBest > 0;
                 if (bestPage >= 0 && bestScore > 0 && strong) {
