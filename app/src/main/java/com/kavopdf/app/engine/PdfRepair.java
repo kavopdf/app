@@ -1879,7 +1879,9 @@ public final class PdfRepair {
                 data = out.toByteArray();
             } catch (Throwable t) {
                 // This stage failed. If it was the first one, the body may already be plain.
-                if (name.equals(filters.get(0)) && filters.size() == 1) break;
+                // size first: get(0) on an empty list is an IndexOutOfBoundsException, and a
+                // damaged file can carry a filter array with nothing in it.
+                if (filters.size() == 1 && name.equals(filters.get(0))) break;
                 return null;
             }
         }

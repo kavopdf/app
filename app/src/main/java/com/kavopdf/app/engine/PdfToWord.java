@@ -689,9 +689,6 @@ public final class PdfToWord {
         return page;
     }
 
-    private static int columnOf(Object o) {
-        return o instanceof Para ? ((Para) o).column : ((Table) o).column;
-    }
 
     private static float topOf(Object o) {
         return o instanceof Para ? ((Para) o).top : ((Table) o).top;
@@ -2479,18 +2476,6 @@ public final class PdfToWord {
         return out;
     }
 
-    private static List<Float> mergedPositions(List<float[]> segments, boolean byY) {
-        List<Float> raw = new ArrayList<>();
-        for (float[] seg : segments) raw.add(seg[0]);
-        Collections.sort(raw);
-        List<Float> merged = new ArrayList<>();
-        for (float v : raw) {
-            if (merged.isEmpty() || Math.abs(v - merged.get(merged.size() - 1)) > 1.6f) {
-                merged.add(v);
-            }
-        }
-        return merged;
-    }
 
 
     /** True for the characters Arabic, Hebrew, Syriac and the presentation forms use. */
