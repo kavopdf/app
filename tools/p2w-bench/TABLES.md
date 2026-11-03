@@ -102,3 +102,43 @@ against `pageH` - the first table's `top=136` is sane, the second's `1003` is no
 
 Also worth doing regardless: `DocxWriter` should not silently skip a table. A table with
 no text is a bug worth seeing, not hiding.
+
+## Second pass: the tables are on two different pages
+
+Instrumenting `findTables`, `tableFromCells` and `DocxWriter.table` together printed:
+
+    PAGEH glyphs y=18..781 x=28..560 n=1729
+    CELLGROUP n=12 y=136..232 x=28..567     <- group 1, inside the page
+    CELLGROUP n=66 y=258..423 x=28..516     <- group 2, inside the page
+    TFC  ncol=2 nrow=6  group=12  -> filled=12 need=3   PASS
+    TFC  ncol=6 nrow=11 group=66  -> filled=54 need=16  PASS
+    FINALBLOCK table rows=6 cols=2
+    DW.table   rows=6 cols=2
+    FINALBLOCK table rows=8 cols=5
+    DW.table   rows=8 cols=5
+
+So: both cell groups are **inside the page** (the earlier `top=1003` was an artefact of the
+row-gap split experiment, not the real build), both pass every filter in `tableFromCells`,
+both reach `page.blocks`, and `DocxWriter.table()` is **called for both**.
+
+And yet `word/document.xml` contains exactly one `<w:tbl>` and six `<w:tr>`.
+
+The interleaving is the clue: build-page, write-page, build-page, write-page. The document
+has **two pages**, and the table on the second page is lost between the call to `table()`
+and the string that gets written.
+
+Two things to check next, in this order:
+
+1. Whether `result.pages` holds the same `Page` objects whose `blocks` were filled, or a
+   copy taken before page 2 was built. A copy would explain everything.
+2. Whether the second page's blocks are appended to a `StringBuilder` that is not the one
+   `documentXml` returns - `table()` takes `sb` as a parameter, so a shadowed builder
+   inside `documentXml` would do it.
+
+Both are cheap to test: print `result.pages.size()` and, for each page, the number of
+`Table` blocks in `page.blocks`, immediately before the XML is built.
+
+## What was measured and reverted in this pass
+
+    row-gap split of merged tables      neutral (84.62 / 90.98 / 95.90 unchanged)  reverted
+    clamp edge y into the page          neutral                                      reverted
