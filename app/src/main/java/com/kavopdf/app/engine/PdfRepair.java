@@ -2170,6 +2170,25 @@ public final class PdfRepair {
         if (failed > 0) {
             r.findings.add(failed + " page object(s) were too damaged to carry across");
         }
+        // Say what was lost, by number.
+        //
+        // The rebuild can only carry pages the parser actually reached. When an object
+        // stream is destroyed, the pages whose objects lived in it never enter the pool, and
+        // the output is quietly shorter than the document was - measured: a 40-page book
+        // came back with 32 pages and the report said lostPages=0. The user would have had
+        // no way to know eight pages were gone.
+        //
+        // The count the file listed before repair is known. If the rebuild came up short,
+        // every missing page goes on the lost list so the receipt tells the truth.
+        int shortfall = r.pagesOriginal - kept;
+        if (shortfall > 0) {
+            for (int i = kept + 1; i <= r.pagesOriginal; i++) {
+                r.lostPages.add(i);
+            }
+            r.findings.add(shortfall + " page(s) could not be carried across: their objects"
+                    + " were in a part of the file that could not be read, so the rebuilt"
+                    + " document is " + shortfall + " page(s) shorter than the original");
+        }
         if (r.signed) {
             r.actions.add("digital signatures are gone - the page tree they signed no longer exists");
         }
