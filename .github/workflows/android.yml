@@ -21,6 +21,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # The tool benchmark diffs this commit against the one before it to decide which
+          # tools a change can have touched. One commit of history is not enough for that.
+          fetch-depth: 2
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4

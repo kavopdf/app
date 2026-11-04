@@ -1,0 +1,79 @@
+{
+ "known_fail": {
+  "Fill forms|drawn once (no double)": "open bug: value drawn twice - see KAVOPDF-TOOL-BENCHMARK-MAP.md"
+ },
+ "metrics": {
+  "Annotate & sign|placed where asked": "(120,325)",
+  "Annotate & sign|text stamp present": true,
+  "Bookmarks|destinations correct": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "Bookmarks|entry count": 4,
+  "Bookmarks|titles correct": 100.0,
+  "Compress|quality PSNR": 83.78,
+  "Compress|size ratio": 1.4,
+  "Compress|text layer intact": 100.0,
+  "Create PDF|page count": 2,
+  "Create PDF|page size": [
+   [
+    595,
+    842
+   ],
+   [
+    595,
+    842
+   ]
+  ],
+  "Crop|content inside kept": true,
+  "Crop|cropbox correct": 100.0,
+  "Extract images|count": 3,
+  "Extract images|dimensions match": 100.0,
+  "Fill forms|values written": 100.0,
+  "Fill forms|visible on the page": true,
+  "Hyperlinks|URI correct": "https://example.com/bench",
+  "Hyperlinks|link created": 1,
+  "Hyperlinks|placed where asked": "(100,100)",
+  "Hyperlinks|visible text present": true,
+  "Images to PDF|aspect ratio kept": 100.0,
+  "Images to PDF|page count": 3,
+  "Merge|bookmarks kept": 2,
+  "Merge|page count": 5,
+  "Merge|page order + content": 100.0,
+  "Metadata|fields written": 100.0,
+  "Metadata|keywords written": true,
+  "Organize pages|order correct": 100.0,
+  "Organize pages|rotate applied": [
+   90,
+   90,
+   0,
+   0
+  ],
+  "PDF to Word|docx has the text": true,
+  "PDF to Word|docx tables": 4,
+  "PDF to Word|exact line hit": 100.0,
+  "PDF to Word|line order": 100.0,
+  "Page numbers|correct on every page": 100.0,
+  "Protect|locked without password": true,
+  "Protect|right password works": true,
+  "Protect|wrong password rejected": true,
+  "Redact|other page untouched": true,
+  "Redact|page has no text layer": true,
+  "Redact|secret text gone": true,
+  "Repair PDF|content recovered": true,
+  "Repair PDF|output opens": true,
+  "Repair PDF|pages recovered": 2,
+  "Sign|incremental (original bytes intact)": true,
+  "Sign|signature verifies": true,
+  "Split|file count": 2,
+  "Split|pages preserved": 100.0,
+  "Unlock|content identical": 100.0,
+  "Unlock|opens without password": true,
+  "Verify signature|no false positive on unsigned": true,
+  "Verify signature|reports valid on signed file": true,
+  "Watermark|centred (off by)": 24.9,
+  "Watermark|text on every page": 100.0
+ }
+}
