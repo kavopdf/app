@@ -93,6 +93,12 @@ public final class PdfToWord {
         public String bullet;        // "•", "1.", "-" or null
         public float top;            // y of the first line, for ordering
         public float left, right;    // horizontal extent, for the layout cut
+        /**
+         * True when every line of this paragraph was drawn on a non-horizontal baseline - a
+         * stamp, a watermark. It is an overlay rather than part of the page's text, so it is
+         * read after the page's own words.
+         */
+        public boolean stamp;
         public int column;           // which column band it sits in
         /** The lines the PDF actually drew, in order. A .txt has no paragraph concept, so the
          *  plain-text output keeps them instead of hard-wrapping a paragraph back into lines
@@ -674,11 +680,17 @@ public final class PdfToWord {
         List<Line> body = new ArrayList<>();
         for (Line line : lines) {
             if (line.consumed) continue;
+            // A stamp is drawn over the page, not in its grid: a line whose baseline is not
+            // horizontal is never a table cell, however squarely it lies on one. Without this
+            // the "PAID" stamp on file 07 - laid across the lower rows of the item table - was
+            // dropped as if it were cell text that the table had already written.
             boolean inTable = false;
-            for (Table t : tables) {
-                if (line.inside(t)) {
-                    inTable = true;
-                    break;
+            if (!line.rotated) {
+                for (Table t : tables) {
+                    if (line.inside(t)) {
+                        inTable = true;
+                        break;
+                    }
                 }
             }
             if (!inTable) {
@@ -848,6 +860,20 @@ public final class PdfToWord {
         // the sentence "in recognition of the first rank..." was split by four border letters.
         // They go together, in drawing order, after the page's text.
         if (ring.size() >= 8) ordered.add(ringPara(ring));
+        // A stamp is an overlay, not part of the text flow: it is drawn across the page rather
+        // than in it, so a reader meets it after the page's own words. Left where its baseline
+        // falls, "AUDITED" and "FY 2024-25" landed between the signature lines of file 09.
+        // Every rotated line of the reference sits at the end of its page on all eight stamped
+        // files measured here.
+        List<Object> overlay = new ArrayList<>();
+        for (java.util.Iterator<Object> it = ordered.iterator(); it.hasNext(); ) {
+            Object o = it.next();
+            if (o instanceof Para && ((Para) o).stamp) {
+                overlay.add(o);
+                it.remove();
+            }
+        }
+        ordered.addAll(overlay);
         // A table in a right-to-left document runs from the right margin to the left one, so
         // its first column is the rightmost. Every pass that builds a table places its cells
         // in the order the page draws them, left to right, which mirrors the rows: the Arabic
@@ -971,6 +997,18 @@ public final class PdfToWord {
         float px, py;
         /** Unit vector along the baseline, in page space (y up). */
         float dirx = 1f, diry = 0f;
+        /**
+         * Unit vector along the baseline, in the space {@link #x}/{@link #y} are measured in
+         * (page points, y DOWN) - taken from the text rendering matrix, not from
+         * {@code TextPosition.getDir()}.
+         *
+         * <p>A stamp's rotation lives in the form's own {@code cm}, and {@code getDir()} comes
+         * back 0 for every glyph of both stamps measured here: "SUNRISE FASTENERS" on file 01
+         * and "PAID" on file 06 report {@code dir=(1,0)} while their glyphs step 2.5 pt and
+         * 3.7 pt down the page. The text rendering matrix does carry the form's matrix, so its
+         * first column is the direction the glyph was really drawn in.
+         */
+        float tx = 1f, ty = 0f;
     }
 
     private static final class GlyphCollector extends PDFTextStripper {
@@ -1132,6 +1170,19 @@ public final class PdfToWord {
                 } else {
                     com.tom_roush.pdfbox.util.Matrix tm = tp.getTextMatrix();
                     if (tm != null && Math.abs(tm.getShearY()) > 0.02f) g.rotated = true;
+                }
+                com.tom_roush.pdfbox.util.Matrix tm2 = tp.getTextMatrix();
+                if (tm2 != null) {
+                    // First column of the text rendering matrix: where the glyph's own +x
+                    // points, in PDF space (y up). Flipped into page space (y down) it is the
+                    // direction the stamp's line advances in the coordinates everything else
+                    // here uses.
+                    float a = tm2.getValue(0, 0), b = tm2.getValue(0, 1);
+                    float len = (float) Math.sqrt(a * a + b * b);
+                    if (len > 1e-4f) {
+                        g.tx = a / len;
+                        g.ty = -b / len;
+                    }
                 }
             } catch (Throwable ignored) {
             }
@@ -1320,7 +1371,14 @@ public final class PdfToWord {
             // PDF y grows upwards; the glyph y from the stripper grows downwards.
             float h = doc.getPage(index).getMediaBox().getHeight();
             for (Glyph g : glyphs) {
-                int colour = walker.colourAt(g.px, h - g.py, g.dirx, g.diry, g.size);
+                // The direction the colour is matched along must be the direction the glyph was
+                // really drawn in. getDir() reports 0 for every glyph of a stamp whose rotation
+                // is in the form's cm, so the match was made along a horizontal baseline: the
+                // vertical offset of a 15-degree stamp then read as "across the baseline" and
+                // passed the tolerance for the first few characters only. Measured on file 01,
+                // the first 9 glyphs of "SUNRISE FASTENERS" resolved to #BF0D0D and the other
+                // 8 resolved to nothing, which split one stamp line into four runs.
+                int colour = walker.colourAt(g.px, h - g.py, g.tx, -g.ty, g.size);
                 if (colour > 0) g.color = colour;
             }
         } catch (Throwable ignored) {
@@ -1781,6 +1839,174 @@ public final class PdfToWord {
         return true;
     }
 
+    /**
+     * The rotated glyphs of a page, one line per stamp.
+     *
+     * <p>A rotated line does not advance along x: every glyph sits a fraction of a point
+     * further down than the one before, and the baseline tolerance that separates two lines is
+     * a fraction of the font size. On a 15-degree stamp in a 14 pt face the step is 2.5 pt
+     * against a 2.52 pt tolerance, so the two are the same size and the comparison comes out
+     * either way glyph by glyph: "SUNRISE FASTENERS" reached the output as twenty fragments
+     * ("S U", "E T", "A O", "S SIG"). On a stamp in a 44 pt face the tolerance is 7.9 pt and
+     * the step 3.7 pt, so the stamp's glyphs were instead swallowed by whatever upright line
+     * happened to cross them: "PAID" put P inside the body line at y=398, A and I inside the
+     * amount at y=389, and left a lone "D" behind. Neither stamp string appeared anywhere in
+     * either .docx.
+     *
+     * <p>So a rotated glyph is clustered by the direction it was drawn in, not by raw y.
+     * Glyphs that share a direction are separated by their offset perpendicular to it, which
+     * is what tells two crossing stamp lines apart - on file 01 the two baselines are 17.5 pt
+     * apart against a 2.52 pt tolerance, though their y ranges overlap completely. Within one
+     * line the glyphs are then ordered along the direction, which is reading order whatever
+     * the angle.
+     *
+     * <p>The direction is each glyph's own, from the text rendering matrix (see
+     * {@link Glyph#tx}); a slope estimated for the page as a whole was tried before and
+     * reverted, because it was applied to text that was not rotated. Nothing here can touch
+     * upright text: a glyph enters this pass only if it is already flagged rotated <em>and</em>
+     * its own direction is more than about 2.9 degrees off horizontal, and the pass stands
+     * down entirely on a page where nearly everything is rotated - that is a rotated page,
+     * not a stamp, and the ordinary clustering handles it.
+     */
+    private static List<Line> stampLines(List<Glyph> glyphs) {
+        List<Line> out = new ArrayList<>();
+        if (glyphs.isEmpty()) return out;
+        List<Glyph> rot = new ArrayList<>();
+        for (Glyph g : glyphs) {
+            if (!g.rotated) continue;
+            if (Math.abs(g.ty) <= 0.05f) continue;          // horizontal to within 2.9 degrees
+            rot.add(g);
+        }
+        if (rot.size() < 2) return out;
+        if (rot.size() > glyphs.size() * 0.85f) return out;  // a rotated page, not a stamp
+
+        // One group per direction: two stamps at different angles must not share a line.
+        List<List<Glyph>> byDir = new ArrayList<>();
+        for (Glyph g : rot) {
+            List<Glyph> target = null;
+            for (List<Glyph> grp : byDir) {
+                Glyph s = grp.get(0);
+                if (s.tx * g.tx + s.ty * g.ty > 0.996f) {    // within 5 degrees
+                    target = grp;
+                    break;
+                }
+            }
+            if (target == null) {
+                target = new ArrayList<>();
+                byDir.add(target);
+            }
+            target.add(g);
+        }
+
+        for (List<Glyph> grp : byDir) {
+            final Glyph seed = grp.get(0);
+            final float dx = seed.tx, dy = seed.ty;
+            final float nx = -dy, ny = dx;
+            List<Glyph> byPerp = new ArrayList<>(grp);
+            Collections.sort(byPerp, new Comparator<Glyph>() {
+                @Override
+                public int compare(Glyph a, Glyph b) {
+                    return Float.compare(perpOf(a, seed, nx, ny), perpOf(b, seed, nx, ny));
+                }
+            });
+
+            List<List<Glyph>> rows = new ArrayList<>();
+            List<Glyph> row = new ArrayList<>();
+            float ref = 0;
+            for (Glyph g : byPerp) {
+                float perp = perpOf(g, seed, nx, ny);
+                float tol = Math.max(0.9f, g.size * 0.18f);
+                if (row.isEmpty() || Math.abs(perp - ref) > tol) {
+                    if (!row.isEmpty()) rows.add(row);
+                    row = new ArrayList<>();
+                    ref = perp;
+                }
+                row.add(g);
+            }
+            if (!row.isEmpty()) rows.add(row);
+
+            for (List<Glyph> r : rows) {
+                Collections.sort(r, new Comparator<Glyph>() {
+                    @Override
+                    public int compare(Glyph a, Glyph b) {
+                        return Float.compare(alongOf(a, seed, dx, dy), alongOf(b, seed, dx, dy));
+                    }
+                });
+                // A gap no letter advance makes is two fields, not one line - the same rule the
+                // upright pass applies to a gutter, measured along the stamp's own baseline.
+                List<Glyph> seg = new ArrayList<>();
+                Glyph prev = null;
+                for (Glyph g : r) {
+                    if (prev != null) {
+                        float gap = alongOf(g, seed, dx, dy)
+                                - (alongOf(prev, seed, dx, dy) + prev.width);
+                        if (gap > Math.max(9f, g.size * 1.6f)) {
+                            out.add(stampLineOf(seg));
+                            seg = new ArrayList<>();
+                        }
+                    }
+                    seg.add(g);
+                    prev = g;
+                }
+                if (!seg.isEmpty()) out.add(stampLineOf(seg));
+            }
+        }
+        return out;
+    }
+
+    /**
+     * Distance of a glyph from the stamp's baseline, measured across it.
+     *
+     * <p>Measured in page coordinates ({@link Glyph#px}/{@link Glyph#py}), not in the
+     * direction-adjusted {@link Glyph#x}/{@link Glyph#y}: those are rotated into the text's own
+     * frame, so on a 90-degree stamp they run along the baseline and cannot say which of two
+     * parallel baselines a glyph is on. Measured that way, the vertical stamp on file 03 came
+     * out one character per line - every glyph of a line shares an x, and the line's own
+     * direction is not in the numbers.
+     */
+    private static float perpOf(Glyph g, Glyph seed, float nx, float ny) {
+        return (g.px - seed.px) * nx + (g.py - seed.py) * ny;
+    }
+
+    /** Distance of a glyph along the stamp's baseline, measured from the first glyph. */
+    private static float alongOf(Glyph g, Glyph seed, float dx, float dy) {
+        return (g.px - seed.px) * dx + (g.py - seed.py) * dy;
+    }
+
+    /**
+     * One stamp line, with the extent the writer needs to place it.
+     *
+     * <p>The extent is the stamp's own, in page points: {@link Glyph#x} is measured along the
+     * baseline, so on the 90-degree stamp it is the distance up the page and on the 180-degree
+     * one it runs backwards - anchoring a text box at that value put "CANCELLED" at x=151 on a
+     * page where it is drawn at x=444.
+     */
+    private static Line stampLineOf(List<Glyph> seg) {
+        Line line = new Line();
+        line.glyphs.addAll(seg);
+        line.text = textOf(seg);
+        float totalSize = 0;
+        float left = Float.MAX_VALUE, right = -Float.MAX_VALUE;
+        float top = Float.MAX_VALUE;
+        float widest = 0;
+        for (Glyph g : seg) {
+            totalSize += g.size;
+            if (g.px < left) {
+                left = g.px;
+                top = g.py;
+            }
+            right = Math.max(right, g.px);
+            widest = Math.max(widest, g.size);
+        }
+        line.size = totalSize / seg.size();
+        line.x = left;
+        line.left = left;
+        line.right = Math.max(right, left) + widest;
+        line.y = top;
+        line.rotated = true;
+        return line;
+    }
+
     private static List<Line> toLines(List<Glyph> glyphs, List<float[]> gutters) {
         // A seal drawn as a ring of characters is not a block of text and has no baseline to
         // cluster on: every character sits on its own tangent. It is taken out of the page's
@@ -1793,6 +2019,17 @@ public final class PdfToWord {
             for (Line rl : ring) for (Glyph g : rl.glyphs) inRing.put(g, Boolean.TRUE);
             List<Glyph> rest = new ArrayList<>(glyphs.size());
             for (Glyph g : glyphs) if (!inRing.containsKey(g)) rest.add(g);
+            glyphs = rest;
+        }
+        // A stamp has no baseline to find by y - it advances down the page as it goes across
+        // it - so its glyphs are taken out here and clustered by their own direction instead.
+        // Left in, they both fragmented and were swallowed by the upright lines they cross.
+        List<Line> stamp = stampLines(glyphs);
+        if (!stamp.isEmpty()) {
+            java.util.IdentityHashMap<Glyph, Boolean> inStamp = new java.util.IdentityHashMap<>();
+            for (Line sl : stamp) for (Glyph g : sl.glyphs) inStamp.put(g, Boolean.TRUE);
+            List<Glyph> rest = new ArrayList<>(glyphs.size());
+            for (Glyph g : glyphs) if (!inStamp.containsKey(g)) rest.add(g);
             glyphs = rest;
         }
         List<Glyph> sorted = new ArrayList<>(glyphs);
@@ -1927,6 +2164,7 @@ public final class PdfToWord {
         for (Line ln : split) if (!markOnly(ln.text)) kept.add(ln);
         split = kept;
         split.addAll(ring);
+        split.addAll(stamp);
         return split;
     }
 
@@ -2547,6 +2785,8 @@ public final class PdfToWord {
         p.right = r;
         p.top = group.get(0).y;
         p.column = group.get(0).column;
+        p.stamp = true;
+        for (Line ln : group) if (!ln.rotated) { p.stamp = false; break; }
 
         StringBuilder sb = new StringBuilder();
         String prevText = null;
@@ -3129,6 +3369,19 @@ public final class PdfToWord {
         List<Float> C = new ArrayList<>(colXs), R = new ArrayList<>(rowYs);
         int ncol = C.size(), nrow = R.size();
         if (ncol < 2 || nrow < 1) return null;
+
+        // A column narrower than a character is not a column. Two vertical rules three points
+        // apart are the edge of a stamp's own frame, not a table's cell separator: on file 01
+        // the stamp draws rules at x=356, 367 and 370 across the invoice totals, the 3 pt
+        // "column" between 367 and 370 cut "TOTAL PAYABLE" into "T", "O" and "TAL PAYABLE",
+        // and the table then owned the line - so the words appeared in no paragraph of the
+        // .docx at all. Rejecting the grid hands the totals block back as text.
+        float widest = 0;
+        for (float[] c : group) widest = Math.max(widest, c[2]);
+        for (int c = 0; c < ncol; c++) {
+            float nextX = c + 1 < ncol ? C.get(c + 1) : widest;
+            if (nextX - C.get(c) < 6f) return null;
+        }
 
         List<List<List<Glyph>>> buckets = new ArrayList<>();
         for (int r = 0; r < nrow; r++) {
