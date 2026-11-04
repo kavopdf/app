@@ -273,23 +273,25 @@ if want("Sign"): guard(t_sign)
 
 # ------------------------------------------------------------------ Forms
 def t_forms():
-    d = op(f"{OUT}/forms.pdf")
-    vals = {}
-    for p in d:
-        for w in p.widgets():
-            if w.field_name:
-                vals[w.field_name] = w.field_value
-    d.close()
-    want_v = {"name": "SANDEEP KULKARNI", "email": "sandeep@example.com", "city": "Pune"}
-    ok = sum(1 for k, v in want_v.items() if (vals.get(k) or "") == v)
+    # The tool now flattens: every value is drawn onto the page and the interactive form is
+    # dropped, because leaving it in place made any viewer draw each value a second time.
+    # So the values are checked where the user actually sees them - the page - not in a
+    # widget that no longer exists.
+    t = " ".join(texts(f"{OUT}/forms.pdf"))
+    want_v = ["SANDEEP KULKARNI", "sandeep@example.com", "Pune"]
+    ok = sum(1 for v in want_v if v in t)
     add("Fill forms", "values written", round(ok * 100 / len(want_v), 1), "%",
         "pass" if ok == len(want_v) else "FAIL")
-    t = " ".join(texts(f"{OUT}/forms.pdf"))
-    add("Fill forms", "visible on the page", "SANDEEP KULKARNI" in t, "bool",
-        "pass" if "SANDEEP KULKARNI" in t else "FAIL")
+    add("Fill forms", "visible on the page", all(v in t for v in want_v), "bool",
+        "pass" if all(v in t for v in want_v) else "FAIL")
     n = t.count("SANDEEP KULKARNI")
     add("Fill forms", "drawn once (no double)", n == 1, f"count {n}",
         "pass" if n == 1 else "FAIL")
+    d = op(f"{OUT}/forms.pdf")
+    leftover = sum(len(list(p.widgets())) for p in d)
+    d.close()
+    add("Fill forms", "form flattened", leftover == 0, f"widgets left {leftover}",
+        "pass" if leftover == 0 else "WARN")
 if want("Fill forms"): guard(t_forms)
 
 # ------------------------------------------------------------------ Annotate

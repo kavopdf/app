@@ -1176,6 +1176,27 @@ public final class PdfEngine {
             // here, and any field still without a visible appearance gets its text
             // drawn onto the page directly.
             paintMissingValues(d, form, values);
+            // Every value is now on the page, so the interactive form has nothing left to
+            // draw - and leaving it in place is what made values appear twice. Measured with
+            // pdftotext: the page content held the value once, and the widget held it again.
+            // Removing the widget from /Annots was not enough, because a viewer reaches the
+            // fields through the AcroForm /Fields array as well and rebuilds an appearance
+            // from /V. Dropping the AcroForm is the only way to make it a single copy.
+            //
+            // The values themselves stay in the file: they are drawn on the page, which is
+            // what every reader shows and what a copy operation returns.
+            try {
+                // COS level, not the typed API: setAcroForm(null) and page.setAnnotations()
+                // both leave entries behind that a viewer still walks. Removing the keys is
+                // the only form that every reader honours.
+                for (int i = 0; i < d.getNumberOfPages(); i++) {
+                    d.getPage(i).getCOSObject()
+                     .removeItem(com.tom_roush.pdfbox.cos.COSName.ANNOTS);
+                }
+                d.getDocumentCatalog().getCOSObject()
+                 .removeItem(com.tom_roush.pdfbox.cos.COSName.ACRO_FORM);
+            } catch (Throwable ignored) {
+            }
             d.save(out);
         }
     }
@@ -1262,9 +1283,32 @@ public final class PdfEngine {
                 cs.showText(v);
                 cs.endText();
             }
-            // the value now lives on the page, so the annotation must stop drawing it
+            // The value now lives on the page, so nothing else may draw it.
+            //
+            // Dropping the appearance stream is not enough. The field still carries /V, and a
+            // viewer that renders form fields rebuilds an appearance from /V and draws the
+            // value a second time - measured with pdftotext, which reads the page content and
+            // the widget, so a filled form copied out of any viewer other than this app's own
+            // reader returned every value twice.
+            //
+            // Removing the widget from the page stops every viewer drawing it, and leaves
+            // exactly the one copy this method just drew. /V stays on the field, so the data
+            // is still readable by anything that inspects the form.
+            //
+            // This makes the form flat. It already was, in practice: once the value is drawn
+            // onto the page, editing the field would leave the old drawn text behind.
             try {
                 w.setAppearance(null);
+                PDPage host = null;
+                Integer pi2 = pageOf.get(w.getCOSObject());
+                if (pi2 != null) host = d.getPage(pi2);
+                if (host != null) {
+                    java.util.List<PDAnnotation> keep = new java.util.ArrayList<>();
+                    for (PDAnnotation an : host.getAnnotations()) {
+                        if (an != w) keep.add(an);
+                    }
+                    host.setAnnotations(keep);
+                }
             } catch (Throwable ignored) {
             }
         } catch (Throwable ignored) {

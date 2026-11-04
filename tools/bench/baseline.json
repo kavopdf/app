@@ -1,7 +1,5 @@
 {
- "known_fail": {
-  "Fill forms|drawn once (no double)": "open bug: value drawn twice - see KAVOPDF-TOOL-BENCHMARK-MAP.md"
- },
+ "known_fail": {},
  "metrics": {
   "Annotate & sign|placed where asked": "(120,325)",
   "Annotate & sign|text stamp present": true,
@@ -31,6 +29,8 @@
   "Crop|cropbox correct": 100.0,
   "Extract images|count": 3,
   "Extract images|dimensions match": 100.0,
+  "Fill forms|drawn once (no double)": true,
+  "Fill forms|form flattened": true,
   "Fill forms|values written": 100.0,
   "Fill forms|visible on the page": true,
   "Hyperlinks|URI correct": "https://example.com/bench",
