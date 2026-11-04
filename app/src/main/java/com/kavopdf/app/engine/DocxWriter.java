@@ -487,8 +487,17 @@ public final class DocxWriter {
                         }
                     }
                     if (r == 0 && t.header) inner.append("<w:b/>");
-                    inner.append("</w:rPr><w:t xml:space=\"preserve\">").append(esc(cell))
-                            .append("</w:t></w:r>");
+                    // A cell can hold two lines of the page: a numbered item's marker sits on
+                    // its own line above the name, and the page drew them eight points apart.
+                    // One w:t would flatten them into "1. SUNRISE" again.
+                    inner.append("</w:rPr>");
+                    String[] parts = cell.split("\n");
+                    for (int q = 0; q < parts.length; q++) {
+                        if (q > 0) inner.append("<w:br/>");
+                        inner.append("<w:t xml:space=\"preserve\">").append(esc(parts[q]))
+                                .append("</w:t>");
+                    }
+                    inner.append("</w:r>");
                 }
                 inner.append("</w:p></w:tc>");
                 c += span;

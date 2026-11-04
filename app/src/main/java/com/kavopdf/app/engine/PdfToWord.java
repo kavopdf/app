@@ -541,6 +541,38 @@ public final class PdfToWord {
             }
         }
         List<Line> lines = toLines(glyphs, asBands(starts));
+        List<Line> ring = new ArrayList<>();
+        for (java.util.Iterator<Line> it = lines.iterator(); it.hasNext(); ) {
+            Line ln = it.next();
+            if (ln.ring) { ring.add(ln); it.remove(); }
+        }
+        // The words inside the ring belong to the seal, not to the page's text: a round seal
+        // carries its centre line - "SEAL", "TRAINING & PLACEMENT CELL", a year - inside the
+        // circle it draws. They travel with the ring, in reading order, after its characters.
+        if (ring.size() >= 8) {
+            float rx0 = Float.MAX_VALUE, rx1 = -Float.MAX_VALUE;
+            float ry0 = Float.MAX_VALUE, ry1 = -Float.MAX_VALUE;
+            for (Line ln : ring) {
+                rx0 = Math.min(rx0, ln.x);
+                rx1 = Math.max(rx1, ln.right);
+                ry0 = Math.min(ry0, ln.y);
+                ry1 = Math.max(ry1, ln.y);
+            }
+            List<Line> inner = new ArrayList<>();
+            for (java.util.Iterator<Line> it = lines.iterator(); it.hasNext(); ) {
+                Line ln = it.next();
+                float cx = (ln.x + ln.right) / 2f;
+                if (cx > rx0 && cx < rx1 && ln.y > ry0 && ln.y < ry1) { inner.add(ln); it.remove(); }
+            }
+            Collections.sort(inner, new Comparator<Line>() {
+                @Override
+                public int compare(Line a, Line b) {
+                    int c = Float.compare(a.y, b.y);
+                    return c != 0 ? c : Float.compare(a.x, b.x);
+                }
+            });
+            ring.addAll(inner);
+        }
 
         // Rules come from the graphics engine with y measured up from the page bottom; glyphs
         // carry y measured down from the top. Without flipping one into the other, no glyph ever
@@ -811,6 +843,11 @@ public final class PdfToWord {
             }
         }
 
+        // The ring of a seal is not part of the reading flow: its characters have no reading
+        // order of their own, and leaving them inline tore the body text apart - on file 60
+        // the sentence "in recognition of the first rank..." was split by four border letters.
+        // They go together, in drawing order, after the page's text.
+        if (ring.size() >= 8) ordered.add(ringPara(ring));
         for (Object o : ordered) {
             page.blocks.add(o);
             if (o instanceof Para) report.paragraphs++;
@@ -1597,6 +1634,8 @@ public final class PdfToWord {
          * it is only kept out of the grid.
          */
         boolean rotated;
+        /** True when this line is one character of a seal drawn as a ring. */
+        boolean ring;
 
         boolean inside(Table t) {
             float cx = (x + right) / 2f;
@@ -1685,6 +1724,19 @@ public final class PdfToWord {
     }
 
     private static List<Line> toLines(List<Glyph> glyphs, List<float[]> gutters) {
+        // A seal drawn as a ring of characters is not a block of text and has no baseline to
+        // cluster on: every character sits on its own tangent. It is taken out of the page's
+        // text here and handed back as one character per line, in the order the page drew
+        // them - which is the order a reader follows round the ring.
+        List<Line> ring = ringLines(glyphs);
+        if (!ring.isEmpty()) {
+            java.util.IdentityHashMap<Glyph, Boolean> inRing =
+                    new java.util.IdentityHashMap<>();
+            for (Line rl : ring) for (Glyph g : rl.glyphs) inRing.put(g, Boolean.TRUE);
+            List<Glyph> rest = new ArrayList<>(glyphs.size());
+            for (Glyph g : glyphs) if (!inRing.containsKey(g)) rest.add(g);
+            glyphs = rest;
+        }
         List<Glyph> sorted = new ArrayList<>(glyphs);
         // Sort by baseline only. Collections.sort is stable, so glyphs drawn on the same
         // baseline stay in the order the page drew them - which is what keeps two overlapping
@@ -1803,7 +1855,99 @@ public final class PdfToWord {
                 split.add(line);
             }
         }
+        split.addAll(ring);
         return split;
+    }
+
+    /**
+     * The characters of a seal drawn as a ring, one line each, in drawing order.
+     *
+     * <p>A round seal sets every character on its own tangent, so the left of the ring runs
+     * one way along its baseline and the right side runs the opposite way: on the certificate
+     * page "S" has direction (0, 1) and "G" has (0, -1). A line of text cannot do that - a
+     * line has one direction - so two opposing baselines among the rotated glyphs is proof
+     * that the page draws a ring. A stamp, however many of them a page carries, is rotated one
+     * way only, and is left to the ordinary clustering.
+     *
+     * <p>Clustered by baseline instead, the ring came out as pairs of unrelated letters welded
+     * together - "G NA", "O Y", "L I V" - because the two sides of the ring meet at the same
+     * height: file 60 read 35.40 on line order and lost 15 of its 64 lines.
+     */
+    private static List<Line> ringLines(List<Glyph> glyphs) {
+        List<Line> out = new ArrayList<>();
+        List<Glyph> rot = new ArrayList<>();
+        for (Glyph g : glyphs) if (g.rotated) rot.add(g);
+        if (rot.size() < 8) return out;
+        boolean ring = false;
+        for (int i = 0; i < rot.size() && !ring; i++) {
+            Glyph a = rot.get(i);
+            for (int j = i + 1; j < rot.size(); j++) {
+                Glyph b = rot.get(j);
+                if (a.dirx * b.dirx + a.diry * b.diry <= -0.5f) { ring = true; break; }
+            }
+        }
+        if (!ring) return out;
+        for (Glyph g : rot) {
+            if (g.text == null || g.text.trim().isEmpty()) continue;
+            Line line = new Line();
+            line.glyphs.add(g);
+            line.text = g.text;
+            line.size = g.size;
+            // Page coordinates: x and y are measured along a rotated glyph's own baseline and
+            // are not comparable between two characters of a ring.
+            line.x = g.px;
+            line.y = g.py;
+            line.left = g.px;
+            line.right = g.px + Math.max(g.width, 1f);
+            line.rotated = true;
+            line.ring = true;
+            line.hardEnd = true;
+            out.add(line);
+        }
+        return out;
+    }
+
+    /**
+     * One paragraph holding every character of the ring, one per line, in drawing order.
+     *
+     * <p>One paragraph, not forty: a .txt writes a paragraph's lines as they come, so this is
+     * what keeps the ring's characters together and in the order the page drew them instead of
+     * scattering them through the body by their heights.
+     */
+    private static Para ringPara(List<Line> ring) {
+        Para p = new Para();
+        float l = Float.MAX_VALUE, r = -Float.MAX_VALUE, top = Float.MAX_VALUE;
+        StringBuilder sb = new StringBuilder();
+        for (Line ln : ring) {
+            l = Math.min(l, ln.x);
+            r = Math.max(r, ln.right);
+            top = Math.min(top, ln.y);
+            String t = ln.text.trim();
+            if (t.isEmpty()) continue;
+            p.lines.add(t);
+            sb.append(t);
+        }
+        p.left = l == Float.MAX_VALUE ? 0f : l;
+        p.right = r == -Float.MAX_VALUE ? 0f : r;
+        p.top = top == Float.MAX_VALUE ? 0f : top;
+        p.column = 0;
+        Glyph lead = ring.get(0).glyphs.isEmpty() ? null : ring.get(0).glyphs.get(0);
+        if (!p.lines.isEmpty()) {
+            p.runs.add(new Run(sb.toString(), false, false, ring.get(0).size,
+                    lead == null || lead.font == null ? "" : lead.font,
+                    lead == null ? -1 : lead.color));
+        }
+        for (Line ln : ring) {
+            if (ln.text.trim().isEmpty()) continue;
+            Box box = new Box();
+            box.x = ln.x;
+            box.y = ln.y;
+            box.right = ln.right;
+            box.size = ln.size;
+            box.runs.addAll(runsOf(ln));
+            p.boxes.add(box);
+        }
+        return p;
     }
 
     private static String textOf(List<Glyph> glyphs) {
@@ -3345,7 +3489,7 @@ public final class PdfToWord {
             while (j < rows.size() && rows.get(j).size() >= 2
                     && alignedStart(rows.get(i), rows.get(j))) j++;
             if (j - i >= 3 && shortCells(rows, i, j) && tightRows(rows, i, j)) {
-                Table t = buildRowTable(rows, i, j);
+                Table t = keyValuePanels(buildRowTable(rows, i, j));
                 if (t != null) out.add(t);
             }
             i = Math.max(j, i + 1);
@@ -3409,7 +3553,19 @@ public final class PdfToWord {
                     if (d < bestDistance) { bestDistance = d; best = c; }
                 }
                 if (Float.isNaN(lineX[best])) lineX[best] = visibleX(cell.glyphs, cell.x);
-                line[best] = line[best] == null ? cell.text.trim() : line[best] + " " + cell.text.trim();
+                String piece = cell.text.trim();
+                // A numbered item's marker is its own line, not the first word of the name.
+                // The page drew "1." at x=64 and "SUNRISE FASTENERS PVT LTD" at x=80 - eight
+                // points apart, under the gap that starts a new cell, so both fell into one
+                // cell and the document lost a line it plainly has. The reference text reads
+                // "1." then the name, and so does a person.
+                if (line[best] == null) {
+                    line[best] = piece;
+                } else if (isListMarker(line[best]) && !isListMarker(piece)) {
+                    line[best] = line[best] + "\n" + piece;
+                } else {
+                    line[best] = line[best] + " " + piece;
+                }
                 if (lineFonts[best] == null) {
                     lineFonts[best] = fontOf(cell.glyphs);
                     lineCols[best] = colorOf(cell.glyphs);
@@ -3442,6 +3598,197 @@ public final class PdfToWord {
         t.header = true;
         t.column = rows.get(from).get(0).column;
         return t;
+    }
+
+    /**
+     * True when a cell holds nothing but a list marker: "1.", "2)", "(a)", "b.".
+     *
+     * <p>Only digits, or a single letter, may precede the punctuation. A label that ends in a
+     * dot - a form field called "No." - is a word, not a number, and must not start a line of
+     * its own.
+     */
+    private static boolean isListMarker(String s) {
+        String t = s.trim();
+        if (t.isEmpty() || t.length() > 5) return false;
+        int i = 0;
+        if (t.charAt(0) == '(') i = 1;
+        int digits = 0, letters = 0;
+        while (i < t.length()) {
+            char c = t.charAt(i);
+            if (Character.isDigit(c)) digits++;
+            else if (Character.isLetter(c)) letters++;
+            else break;
+            i++;
+        }
+        if (i == 0 || i != t.length() - 1) return false;
+        char end = t.charAt(i);
+        if (end != '.' && end != ')' && end != ':') return false;
+        return digits > 0 || letters == 1;
+    }
+
+    /**
+     * True when a cell reads as a form field's name rather than as a value.
+     *
+     * <p>Short, no digits, and made of the letters and punctuation a label is made of. A
+     * value - an amount, a code, a date, a sentence - fails at least one of those.
+     */
+    private static boolean isFieldLabel(String s) {
+        String t = s.trim();
+        if (t.isEmpty() || t.length() > 14) return false;
+        boolean letter = false;
+        for (int i = 0; i < t.length(); i++) {
+            char c = t.charAt(i);
+            if (Character.isDigit(c)) return false;
+            if (Character.isLetter(c)) { letter = true; continue; }
+            if (" .&/()'-:,".indexOf(c) < 0) return false;
+        }
+        return letter;
+    }
+
+    /**
+     * How many rows of a column group are a label followed by its value, or 0 when the group
+     * holds something that is not a label/value pair at all.
+     */
+    private static int pairRows(Table t, int from, int to) {
+        int n = 0;
+        for (List<String> row : t.rows) {
+            List<Integer> filled = new ArrayList<>();
+            for (int c = from; c < to && c < row.size(); c++) {
+                String s = row.get(c);
+                if (s != null && !s.trim().isEmpty()) filled.add(c);
+            }
+            if (filled.size() < 2) continue;                       // a title line, not a pair
+            if (!isFieldLabel(row.get(filled.get(0)))) return 0;
+            n++;
+        }
+        return n;
+    }
+
+    /**
+     * Reads a two-panel key/value form panel by panel instead of row by row.
+     *
+     * <p>A record laid out as two blocks of labels and values side by side - registration
+     * identifiers on the left, bank and address on the right - has no rows that mean anything.
+     * Its four columns are two independent (label, value) pairs, and the reference text reads
+     * the whole left panel and then the whole right panel. Read row by row, the output
+     * interleaved the two panels and sent the reader's eye back and forth across the page on
+     * every line: file 80 of the batch scored 43.97 on line order for exactly this.
+     *
+     * <p>Four tests keep this off a real table, and each is a property of the form rather than
+     * of the page:
+     * <ul>
+     *   <li>the widest gap between two column starts is at least 90 pt - a panel gutter, not
+     *       the padding between an invoice's Quantity and its Rate;</li>
+     *   <li>that gap falls in the middle, so each side has at least two columns of its own;</li>
+     *   <li>on both sides, at least two rows are a pair whose first cell reads as a field
+     *       name. An invoice's Date/Amount rows start with "01-04-2025" and fail here, and so
+     *       does a marksheet's "BCO-401";</li>
+     *   <li>no row on either side breaks that pattern - one pair of prose and the "form" is a
+     *       table with a wide column, which must keep reading row by row.</li>
+     * </ul>
+     * The result is a two-column label/value table. Every cell keeps its own typeface, colour
+     * and x, so the .docx puts each one back where the page had it.
+     */
+    private static Table keyValuePanels(Table t) {
+        if (t == null || t.colX == null || t.rows.size() < 3) return t;
+        int cols = 0;
+        for (List<String> row : t.rows) cols = Math.max(cols, row.size());
+        if (cols < 4 || t.colX.length != cols + 1) return t;
+
+        int split = -1;
+        float widest = 0;
+        for (int c = 1; c < cols; c++) {
+            float gap = t.colX[c] - t.colX[c - 1];
+            if (gap > widest) { widest = gap; split = c; }
+        }
+        if (split < 2 || split > cols - 2) return t;
+        if (widest < 90f) return t;
+        if (pairRows(t, 0, split) < 2 || pairRows(t, split, cols) < 2) return t;
+
+        Table out = new Table();
+        // The record's own heading - the numbered line that is not a label/value pair - keeps
+        // its place at the top, because it introduces both panels.
+        for (int r = 0; r < t.rows.size(); r++) {
+            List<String> row = t.rows.get(r);
+            if (isPair(row, 0, split) || isPair(row, split, cols)) continue;
+            int c = firstFilled(row, 0, cols);
+            if (c < 0) continue;
+            out.rows.add(new ArrayList<>(java.util.Arrays.asList(cellOf(t, r, c), "")));
+            out.fonts.add(new ArrayList<>(java.util.Arrays.asList(fontOf(t, r, c), "")));
+            out.cellX.add(new ArrayList<>(java.util.Arrays.asList(xOf(t, r, c), Float.NaN)));
+            out.colors.add(new ArrayList<>(java.util.Arrays.asList(colorOf(t, r, c), -1)));
+        }
+        for (int side = 0; side < 2; side++) {
+            int from = side == 0 ? 0 : split;
+            int to = side == 0 ? split : cols;
+            for (int r = 0; r < t.rows.size(); r++) {
+                List<String> row = t.rows.get(r);
+                if (!isPair(row, from, to)) continue;
+                int a = firstFilled(row, from, to);
+                int b = nextFilled(row, a + 1, to);
+                out.rows.add(new ArrayList<>(java.util.Arrays.asList(
+                        cellOf(t, r, a), b < 0 ? "" : cellOf(t, r, b))));
+                out.fonts.add(new ArrayList<>(java.util.Arrays.asList(
+                        fontOf(t, r, a), b < 0 ? "" : fontOf(t, r, b))));
+                out.cellX.add(new ArrayList<>(java.util.Arrays.asList(
+                        xOf(t, r, a), b < 0 ? Float.NaN : xOf(t, r, b))));
+                out.colors.add(new ArrayList<>(java.util.Arrays.asList(
+                        colorOf(t, r, a), b < 0 ? -1 : colorOf(t, r, b))));
+            }
+        }
+        // The label column is as wide as the left panel's label column was; the value column
+        // takes the rest of the table. Each cell still carries its own x, so a right panel's
+        // value lands where the page drew it.
+        float edge = Math.max(t.colX[1], t.colX[0] + 1f);
+        out.colX = new float[]{t.colX[0], edge, Math.max(edge + 1f, t.right)};
+        out.header = t.header;
+        out.top = t.top;
+        out.bottom = t.bottom;
+        out.left = t.left;
+        out.right = t.right;
+        out.column = t.column;
+        return out;
+    }
+
+    /** True when this row holds at least two filled cells in the given column group. */
+    private static boolean isPair(List<String> row, int from, int to) {
+        int a = firstFilled(row, from, to);
+        return a >= 0 && nextFilled(row, a + 1, to) >= 0;
+    }
+
+    private static int firstFilled(List<String> row, int from, int to) {
+        for (int c = from; c < to && c < row.size(); c++) {
+            String s = row.get(c);
+            if (s != null && !s.trim().isEmpty()) return c;
+        }
+        return -1;
+    }
+
+    private static int nextFilled(List<String> row, int from, int to) {
+        return firstFilled(row, from, to);
+    }
+
+    private static String cellOf(Table t, int r, int c) {
+        List<String> row = t.rows.get(r);
+        return c < row.size() && row.get(c) != null ? row.get(c) : "";
+    }
+
+    private static String fontOf(Table t, int r, int c) {
+        if (r >= t.fonts.size()) return "";
+        List<String> row = t.fonts.get(r);
+        return c < row.size() && row.get(c) != null ? row.get(c) : "";
+    }
+
+    private static int colorOf(Table t, int r, int c) {
+        if (r >= t.colors.size()) return -1;
+        List<Integer> row = t.colors.get(r);
+        return c < row.size() && row.get(c) != null ? row.get(c) : -1;
+    }
+
+    private static float xOf(Table t, int r, int c) {
+        if (r >= t.cellX.size()) return Float.NaN;
+        List<Float> row = t.cellX.get(r);
+        return c < row.size() && row.get(c) != null ? row.get(c) : Float.NaN;
     }
 
     /** True when the run holds labels and values rather than sentences. */
