@@ -424,19 +424,50 @@ public final class DocxWriter {
         }
         inner.append("</w:tblGrid>");
 
+        // The laid-out left edge of each cell, in twips from the table's own x0. Word stacks the
+        // column widths it is given, so this - not t.colX - is where a cell's box really starts;
+        // the two differ by the rounding of each width to a whole twip.
+        long[] edgeTw = new long[cols + 1];
+        for (int c = 0; c < cols; c++) edgeTw[c + 1] = edgeTw[c] + colTw[c];
+
         for (int r = 0; r < t.rows.size(); r++) {
             List<String> row = t.rows.get(r);
             inner.append("<w:tr>");
-            for (int c = 0; c < cols; c++) {
+            int c = 0;
+            while (c < cols) {
                 String cell = c < row.size() ? row.get(c) : "";
                 String face = r < t.fonts.size() && c < t.fonts.get(r).size()
                         ? t.fonts.get(r).get(c) : "";
-                inner.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(colTw[c])
-                        .append("\" w:type=\"dxa\"/></w:tcPr>")
+                // How far into its own box this cell's text was drawn. A cell's text does not
+                // start at its border: the page padded it, centred it or right-aligned it, and
+                // in a right-aligned column the distance changes row by row. Word's cell margin
+                // is one number for the whole cell, so the offset goes on the paragraph, which
+                // is per cell and is what w:ind means.
+                int insetTw = insetTw(t, r, c, x0, edgeTw[c]);
+                // A text that starts further right than its own cell is wide cannot be in that
+                // cell alone: the page merged it with the columns to its right. The depot
+                // report's "SCHEDULED" header begins 74 pt into a 66 pt column. Clamping the
+                // indent to the column width puts the first letter at the right x and stacks the
+                // rest one character per line - a vertical word. The cell is widened over the
+                // empty cells beside it instead, which is what the page drew, and w:gridSpan is
+                // how OOXML says it: no cell has to be split, and every later cell in the row
+                // keeps its own left edge.
+                int span = 1, spanTw = colTw[c];
+                while (insetTw >= spanTw && c + span < cols
+                        && cellAt(t, r, c + span).isEmpty()) {
+                    spanTw += colTw[c + span];
+                    span++;
+                }
+                if (insetTw > spanTw - 1) insetTw = Math.max(0, spanTw - 1);
+                inner.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(spanTw)
+                        .append("\" w:type=\"dxa\"/>");
+                if (span > 1) inner.append("<w:gridSpan w:val=\"").append(span).append("\"/>");
+                inner.append("</w:tcPr>")
                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
                         .append("<w:snapToGrid w:val=\"0\"/>")
-                        .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"200\" w:lineRule=\"exact\"/>")
-                        .append("</w:pPr>");
+                        .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"200\" w:lineRule=\"exact\"/>");
+                if (insetTw > 0) inner.append("<w:ind w:left=\"").append(insetTw).append("\"/>");
+                inner.append("</w:pPr>");
                 if (!cell.isEmpty()) {
                     inner.append("<w:r><w:rPr>");
                     if (!face.isEmpty()) {
@@ -450,6 +481,7 @@ public final class DocxWriter {
                             .append("</w:t></w:r>");
                 }
                 inner.append("</w:p></w:tc>");
+                c += span;
             }
             inner.append("</w:tr>");
         }
@@ -461,6 +493,32 @@ public final class DocxWriter {
                 .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
 
         anchor(sb, ctx, x0, t.top, wPt + 2f, hPt, inner.toString());
+    }
+
+    /** The text of cell (r, c), or "" when the row does not reach that far. */
+    private static String cellAt(PdfToWord.Table t, int r, int c) {
+        if (r >= t.rows.size()) return "";
+        List<String> row = t.rows.get(r);
+        if (c >= row.size()) return "";
+        String s = row.get(c);
+        return s == null ? "" : s;
+    }
+
+    /**
+     * How far into the cell, in twips, this cell's text was drawn.
+     *
+     * <p>Zero when the page did not record where the text went, or when the glyphs put it left
+     * of the cell's own left edge - in both cases the border is the safer answer.
+     */
+    private static int insetTw(PdfToWord.Table t, int r, int c, float x0, long edgeTw) {
+        if (r >= t.cellX.size()) return 0;
+        List<Float> xs = t.cellX.get(r);
+        if (c >= xs.size()) return 0;
+        Float textX = xs.get(c);
+        if (textX == null || textX.isNaN()) return 0;
+        double leftPt = x0 + edgeTw / TWIPS_PER_PT;
+        int tw = (int) Math.round((textX - leftPt) * TWIPS_PER_PT);
+        return Math.max(0, tw);
     }
 
     /**

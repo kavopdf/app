@@ -151,6 +151,18 @@ public final class PdfToWord {
          * started in the right place and every figure inside it was at the wrong x.
          */
         public float[] colX;
+        /**
+         * The x, in points, at which each cell's own text starts - same shape as {@link #rows},
+         * {@link Float#NaN} where the pass did not measure it.
+         *
+         * <p>A cell's text does not begin at its left border. In the batch the distance is 6 pt
+         * on a left-aligned cell (the generator's own cell padding), half the slack on a centred
+         * cell - the timetable's period columns are centred, 27.12 pt in - and whatever the
+         * string's own width leaves on a right-aligned amount. It also varies row by row in one
+         * column, which no single cell margin can express. Recording where the text was drawn
+         * is the only description that covers all three.
+         */
+        public final List<List<Float>> cellX = new ArrayList<>();
         /** The typeface each cell was drawn in, same shape as {@link #rows}. */
         public final List<List<String>> fonts = new ArrayList<>();
         public boolean header;
@@ -2361,14 +2373,17 @@ public final class PdfToWord {
         for (int r = 0; r < nrow; r++) {
             List<String> row = new ArrayList<>();
             List<String> rowFonts = new ArrayList<>();
+            List<Float> rowXs = new ArrayList<>();
             for (int c = 0; c < ncol; c++) {
                 String str = glyphText(buckets.get(r).get(c));
                 if (!str.isEmpty()) filled++;
                 row.add(str);
                 rowFonts.add(fontOf(buckets.get(r).get(c)));
+                rowXs.add(glyphFirstX(buckets.get(r).get(c)));
             }
             t.rows.add(row);
             t.fonts.add(rowFonts);
+            t.cellX.add(rowXs);
         }
         // A QR code, a logo or a chart is drawn from the same rectangles a table is, so the
         // cells are real but the words are not there. A real table has text in a good share of
@@ -2389,6 +2404,45 @@ public final class PdfToWord {
             }
         }
         return t;
+    }
+
+    /**
+     * The x of the glyph the cell's text starts with, in the order {@link #glyphText} reads
+     * them - topmost line first, then left to right. That glyph is the first word of the cell
+     * in the .docx too, so its x is where the .docx has to put the cell's text.
+     *
+     * <p>A space is not a glyph a reader sees. The balance sheet indents "(a) Share capital"
+     * by drawing the spaces in front of it: the first glyph is at x=56 and the first letter at
+     * 73.4, and measuring the space put the cell 348 twips out. Whitespace is skipped.
+     */
+    private static Float glyphFirstX(List<Glyph> gs) {
+        if (gs == null || gs.isEmpty()) return Float.NaN;
+        List<Glyph> sorted = new ArrayList<>(gs);
+        Collections.sort(sorted, new Comparator<Glyph>() {
+            @Override
+            public int compare(Glyph a, Glyph b) {
+                if (Math.abs(a.y - b.y) > 2f) return Float.compare(a.y, b.y);
+                return Float.compare(a.x, b.x);
+            }
+        });
+        for (Glyph g : sorted) if (visible(g)) return g.x;
+        return sorted.get(0).x;
+    }
+
+    /** A glyph that puts ink on the page - not a space. */
+    private static boolean visible(Glyph g) {
+        return g != null && g.text != null && !g.text.trim().isEmpty();
+    }
+
+    /**
+     * The x of the leftmost glyph of a line that puts ink on the page, or {@code fallback} when
+     * the line is only whitespace.
+     */
+    private static float visibleX(List<Glyph> gs, float fallback) {
+        if (gs == null) return fallback;
+        float best = Float.MAX_VALUE;
+        for (Glyph g : gs) if (visible(g) && g.x < best) best = g.x;
+        return best == Float.MAX_VALUE ? fallback : best;
     }
 
     /** The typeface the first drawn glyph of a cell carries; empty when the page did not say. */
@@ -2553,6 +2607,10 @@ public final class PdfToWord {
 
             String[][] cells = new String[rows][cols];
             String[][] faces = new String[rows][cols];
+            // Where the first line written into each cell actually starts. A cell's text is not
+            // at its rule: it is wherever the page drew it, centred, right-aligned or padded.
+            float[][] firstX = new float[rows][cols];
+            for (float[] rowX : firstX) java.util.Arrays.fill(rowX, Float.NaN);
             for (Line line : lines) {
                 float cx = (line.x + line.right) / 2f;
                 int r = band(ys, line.y);
@@ -2561,6 +2619,7 @@ public final class PdfToWord {
                 cells[r][c] = cells[r][c] == null
                         ? line.text.trim() : cells[r][c] + " " + line.text.trim();
                 if (faces[r][c] == null) faces[r][c] = fontOf(line.glyphs);
+                if (Float.isNaN(firstX[r][c])) firstX[r][c] = visibleX(line.glyphs, line.x);
             }
 
             int filled = 0;
@@ -2583,14 +2642,17 @@ public final class PdfToWord {
             if (keep.size() < cols) {
                 String[][] trimmed = new String[rows][keep.size()];
                 String[][] trimmedFaces = new String[rows][keep.size()];
+                float[][] trimmedX = new float[rows][keep.size()];
                 for (int r = 0; r < rows; r++) {
                     for (int k = 0; k < keep.size(); k++) {
                         trimmed[r][k] = cells[r][keep.get(k)];
                         trimmedFaces[r][k] = faces[r][keep.get(k)];
+                        trimmedX[r][k] = firstX[r][keep.get(k)];
                     }
                 }
                 cells = trimmed;
                 faces = trimmedFaces;
+                firstX = trimmedX;
                 cols = keep.size();
             }
 
@@ -2612,12 +2674,15 @@ public final class PdfToWord {
             for (int r = 0; r < rows; r++) {
                 List<String> row = new ArrayList<>();
                 List<String> rowFonts = new ArrayList<>();
+                List<Float> rowXs = new ArrayList<>();
                 for (int c = 0; c < cols; c++) {
                     row.add(cells[r][c] == null ? "" : cells[r][c]);
                     rowFonts.add(faces[r][c] == null ? "" : faces[r][c]);
+                    rowXs.add(firstX[r][c]);
                 }
                 t.rows.add(row);
                 t.fonts.add(rowFonts);
+                t.cellX.add(rowXs);
             }
             out.add(t);
         }
@@ -2757,6 +2822,8 @@ public final class PdfToWord {
         for (int r = from; r < to; r++) {
             String[] line = new String[columns.size()];
             String[] lineFonts = new String[columns.size()];
+            float[] lineX = new float[columns.size()];
+            java.util.Arrays.fill(lineX, Float.NaN);
             for (Line cell : rows.get(r)) {
                 int best = 0;
                 float bestDistance = Float.MAX_VALUE;
@@ -2764,6 +2831,7 @@ public final class PdfToWord {
                     float d = Math.abs(columns.get(c) - cell.x);
                     if (d < bestDistance) { bestDistance = d; best = c; }
                 }
+                if (Float.isNaN(lineX[best])) lineX[best] = visibleX(cell.glyphs, cell.x);
                 line[best] = line[best] == null ? cell.text.trim() : line[best] + " " + cell.text.trim();
                 if (lineFonts[best] == null) lineFonts[best] = fontOf(cell.glyphs);
                 bottom = Math.max(bottom, cell.y);
@@ -2773,10 +2841,13 @@ public final class PdfToWord {
             }
             List<String> texts = new ArrayList<>();
             List<String> textFonts = new ArrayList<>();
+            List<Float> textXs = new ArrayList<>();
             for (String cell : line) texts.add(cell == null ? "" : cell);
             for (String f : lineFonts) textFonts.add(f == null ? "" : f);
+            for (float x : lineX) textXs.add(x);
             t.rows.add(texts);
             t.fonts.add(textFonts);
+            t.cellX.add(textXs);
         }
         t.bottom = bottom;
         float[] cx2 = new float[columns.size() + 1];
