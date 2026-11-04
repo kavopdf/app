@@ -205,7 +205,8 @@ def tools_for_changes(files):
                 picked.update(ALL_TOOLS)
             continue
         if f.startswith("tools/bench/"):
-            picked.update(ALL_TOOLS)
+            # The harness and the baseline change the numbers, not the tools. Re-seeding a
+            # metric is handled by the ratchet; there is no reason to run 22 tools for it.
             continue
         if f.startswith("app/src/main/res/") or f.endswith(".xml"):
             continue
