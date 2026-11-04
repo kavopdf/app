@@ -77,6 +77,16 @@ def build(OUT):
         p.set_rotation(rot)
     d.save(os.path.join(OUT, "rot.pdf")); d.close()
 
+    # cropbox.pdf - three lines, one inside the crop rectangle and two well outside.
+    # cropPages is asked to keep (60,60,300,300); "CROP OUTSIDE-TOP" and "CROP OUTSIDE-BOTTOM"
+    # sit at y=40 and y=800, outside it.
+    d = pymupdf.open()
+    p = d.new_page(width=595, height=842)
+    p.insert_text((70, 40), "CROP OUTSIDE-TOP", fontsize=12, fontname="helv")
+    p.insert_text((70, 120), "CROP INSIDE-KEPT", fontsize=12, fontname="helv")
+    p.insert_text((70, 800), "CROP OUTSIDE-BOTTOM", fontsize=12, fontname="helv")
+    d.save(os.path.join(OUT, "cropbox.pdf")); d.close()
+
     # secret.pdf - the same secret on two pages - redact
     d = pymupdf.open()
     for i in range(2):

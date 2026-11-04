@@ -313,15 +313,17 @@ if want("Merge"): guard(t_merge_img)
 
 # ------------------------------------------------------------------ Crop, outside removed
 def t_crop_outside():
-    d = op(f"{OUT}/crop.pdf")
-    p = d[0]
-    inside = p.get_text(clip=p.cropbox)
-    # text that sat outside the kept rectangle must not be reachable any more
-    whole = p.get_text()
-    leaked = "MULTI PAGE" in whole and "MULTI PAGE" not in inside
-    add("Crop", "outside not leaking", not leaked, "bool",
-        "pass" if not leaked else "WARN")
+    # cropbox.pdf has one line inside the kept rectangle and two well outside it. If a
+    # crop only moves the box, the outside text is still in the content stream and any
+    # extractor can read what the user thought they had cut away.
+    d = op(f"{OUT}/crop_leak.pdf")
+    t = d[0].get_text()
     d.close()
+    leaked = ("CROP OUTSIDE-TOP" in t) or ("CROP OUTSIDE-BOTTOM" in t)
+    kept = "CROP INSIDE-KEPT" in t
+    add("Crop", "outside not leaking", not leaked, "bool",
+        "pass" if not leaked else "FAIL")
+    add("Crop", "inside kept", kept, "bool", "pass" if kept else "FAIL")
 if want("Crop"): guard(t_crop_outside)
 
 # ------------------------------------------------------------------ Watermark, opacity
@@ -329,11 +331,25 @@ def t_watermark_opacity():
     import re as _re
     d = op(f"{OUT}/watermark.pdf")
     raw = d[0].read_contents().decode("latin-1", "replace")
-    d.close()
     # the alpha is written as "/GS<n> gs" with an ExtGState carrying /ca
     alphas = [float(x) for x in _re.findall(r"/ca\s+([0-9.]+)", raw)]
     if not alphas:
-        add("Watermark", "opacity applied", "not found", "alpha (asked 0.30)", "WARN")
+        # the alpha usually lives in an ExtGState, not inline in the content stream
+        try:
+            allraw = ""
+            for x in range(1, d.xref_length()):
+                try:
+                    allraw += d.xref_stream(x).decode("latin-1", "replace")
+                except Exception:
+                    pass
+            alphas = [float(x) for x in _re.findall(r"/ca\s+([0-9.]+)", allraw)]
+        except Exception:
+            alphas = []
+    d.close()
+    if not alphas:
+        # The alpha is not written where any of the three places this metric looks put it.
+        # Rather than report a number that means nothing, say it is not measured.
+        add("Watermark", "opacity applied", "not measured", "alpha (asked 0.30)", "WARN")
     else:
         a0 = alphas[0]
         add("Watermark", "opacity applied", round(a0, 2), "alpha (asked 0.30)",

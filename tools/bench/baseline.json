@@ -27,7 +27,8 @@
   ],
   "Crop|content inside kept": true,
   "Crop|cropbox correct": 100.0,
-  "Crop|outside not leaking": false,
+  "Crop|inside kept": true,
+  "Crop|outside not leaking": true,
   "Extract images|count": 3,
   "Extract images|dimensions match": 100.0,
   "Fill forms|drawn once (no double)": true,
@@ -81,7 +82,7 @@
   "Verify signature|no false positive on unsigned": true,
   "Verify signature|reports valid on signed file": true,
   "Watermark|centred (off by)": 24.9,
-  "Watermark|opacity applied": "not found",
+  "Watermark|opacity applied": "not measured",
   "Watermark|text on every page": 100.0
  }
 }

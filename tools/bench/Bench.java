@@ -79,6 +79,9 @@ public class Bench {
         run("CROP", () -> PdfEngine.cropPages(
                 in("multi.pdf"), 1, 60f, 60f, 300f, 300f, true, out("crop.pdf")));
 
+        run("CROP_LEAK", () -> PdfEngine.cropPages(
+                in("cropbox.pdf"), 1, 60f, 60f, 300f, 300f, true, out("crop_leak.pdf")));
+
         run("PAGES", () -> PdfEngine.rebuild(
                 in("multi.pdf"), Arrays.asList(4, 2, 3, 1), null, out("organize.pdf")));
 

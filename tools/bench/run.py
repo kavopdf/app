@@ -312,7 +312,7 @@ def main():
 
     # Bench.java uses engine tool names; the map above uses display names.
     java_names = {
-        "Merge": "MERGE", "Split": "SPLIT", "Crop": "CROP", "Organize pages": "PAGES,ROTATE",
+        "Merge": "MERGE", "Split": "SPLIT", "Crop": "CROP,CROP_LEAK", "Organize pages": "PAGES,ROTATE",
         "Watermark": "WATERMARK", "Page numbers": "PAGENUM", "Compress": "COMPRESS",
         "Protect": "PROTECT,UNLOCK", "Unlock": "PROTECT,UNLOCK", "Metadata": "METADATA",
         "Extract images": "EXTRACT", "Hyperlinks": "LINKS", "Sign": "SIGN,VERIFY,TAMPER,VERIFY_TAMPER",
