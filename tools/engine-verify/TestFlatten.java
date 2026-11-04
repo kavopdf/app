@@ -48,10 +48,14 @@ public class TestFlatten {
         System.out.println("  value in ANNOTATION    : " + inAppearance(filled, "jalalpur")
                 + "   <- Google Drive reads this");
 
-        // ---- 2. now flatten the same file ----
+        // ---- 2. fillForm now flattens on its own ----
+        // It has to. Drawing the value onto the page for Android's renderer while leaving
+        // the field interactive made every other viewer draw it a second time.
         File flat = new File(dir, "flat_out.pdf");
         try (PDDocument d = PDDocument.load(filled)) {
-            d.getDocumentCatalog().getAcroForm().flatten();
+            if (d.getDocumentCatalog().getAcroForm() != null) {
+                d.getDocumentCatalog().getAcroForm().flatten();
+            }
             d.save(flat);
         }
         System.out.println("\nafter flatten():");
@@ -62,6 +66,31 @@ public class TestFlatten {
         System.out.println("\n" + (pass ? "FLATTEN: PASS - the value is in the page content now"
                                          : "FLATTEN: FAIL"));
         if (!pass) System.exit(1);
+
+        // ---- 3. the value must be on the page exactly once ----
+        // This is the bug the benchmark found: one copy in the content stream, and a second
+        // a viewer rebuilt from the form field that was still there.
+        try (PDDocument d = PDDocument.load(filled)) {
+            boolean noForm = d.getDocumentCatalog().getAcroForm() == null;
+            boolean noAnnots = true;
+            for (int i = 0; i < d.getNumberOfPages(); i++) {
+                if (d.getPage(i).getCOSObject()
+                        .getDictionaryObject(com.tom_roush.pdfbox.cos.COSName.ANNOTS) != null) {
+                    noAnnots = false;
+                }
+            }
+            String content = pageText(filled);
+            int n = 0, i = 0;
+            while ((i = content.indexOf("jalalpur", i)) >= 0) { n++; i += 8; }
+            boolean once = n == 1;
+            System.out.println("\nfillForm output:");
+            System.out.println("  value drawn on the page : " + n + " time(s)  (must be 1)");
+            System.out.println("  AcroForm removed        : " + noForm);
+            System.out.println("  /Annots removed         : " + noAnnots);
+            boolean ok = once && noForm && noAnnots;
+            System.out.println("\n" + (ok ? "SINGLE COPY: PASS" : "SINGLE COPY: FAIL"));
+            if (!ok) System.exit(1);
+        }
     }
 
     static String pageText(File f) throws Exception {
