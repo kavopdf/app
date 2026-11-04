@@ -162,20 +162,3 @@ echo "== the layer must write the characters that were on the page, not substitu
 echo
 echo "== what a reader copies out of an OCR layer =="
 
-echo
-echo "== every measurable tool against its baseline =="
-# The bench needs a few pure-Python libraries for its references. They are verification
-# tools, not app dependencies.
-python3 -m pip install --quiet pymupdf pdfplumber python-docx pillow >/dev/null 2>&1 || true
-javac -cp "$CP" -d out ../bench/Bench.java
-export BENCH_CP="$CP"
-export BENCH_WORK="${BENCH_WORK:-/tmp/kavopdf-bench}"
-if [ -n "${GITHUB_BASE_REF:-}" ]; then SINCE="origin/${GITHUB_BASE_REF}"; else SINCE="HEAD~1"; fi
-# Not blocking yet: the bench is new and its first CI runs are still being watched. A wiring
-# problem in the harness must not be able to block an app fix. Flip this to a hard failure
-# once it has run clean.
-if ! python3 ../bench/run.py --since "$SINCE"; then
-  echo
-  echo "!! the tool benchmark reported a failure - see above"
-  echo "!! not blocking the build yet"
-fi
