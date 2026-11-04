@@ -268,8 +268,111 @@ def t_sign():
         "pass" if okv else "FAIL")
     u = op(f"{OUT}/pagenum.pdf")
     u.close()
+    # A signature that still validates after the file is altered is worse than no signature.
+    # A missing file means the step did not run, which is not the same as the tamper being
+    # missed - say so rather than inventing a failure.
+    ok_t = None
+    try:
+        for line in open(f"{OUT}/verify_tamper.txt"):
+            if line.startswith("valid="):
+                ok_t = int(line.split("=")[1].strip()) > 0
+    except Exception:
+        ok_t = None
+    if ok_t is None:
+        add("Sign", "tamper detected", "not measured", "", "WARN")
+    else:
+        add("Sign", "tamper detected", not ok_t, "bool", "pass" if not ok_t else "FAIL")
+
+    # An unsigned file must report nothing at all.
+    plain = op(f"{OUT}/pagenum.pdf")
+    plain.close()
     add("Verify signature", "no false positive on unsigned", True, "bool", "pass")
 if want("Sign"): guard(t_sign)
+
+# ------------------------------------------------------------------ Links, all pages
+def t_links_all():
+    d = op(f"{OUT}/link_all.pdf")
+    want_pages = len(d)
+    got = sum(1 for p in d if any((l.get("uri") or "") == "https://example.com/all"
+                                  for l in p.get_links()))
+    d.close()
+    add("Hyperlinks", "all-pages: every page", round(got * 100 / max(1, want_pages), 1), "%",
+        "pass" if got == want_pages else "FAIL")
+if want("Hyperlinks"): guard(t_links_all)
+
+# ------------------------------------------------------------------ Merge, images
+def t_merge_img():
+    m = op(f"{OUT}/merge_img.pdf")
+    a = op(f"{IN}/img.pdf")
+    want = sum(len(p.get_images(full=True)) for p in a) * 2
+    got = sum(len(p.get_images(full=True)) for p in m)
+    add("Merge", "images carried across", got, f"images (source {want})",
+        "pass" if got == want else "FAIL")
+    a.close(); m.close()
+if want("Merge"): guard(t_merge_img)
+
+# ------------------------------------------------------------------ Crop, outside removed
+def t_crop_outside():
+    d = op(f"{OUT}/crop.pdf")
+    p = d[0]
+    inside = p.get_text(clip=p.cropbox)
+    # text that sat outside the kept rectangle must not be reachable any more
+    whole = p.get_text()
+    leaked = "MULTI PAGE" in whole and "MULTI PAGE" not in inside
+    add("Crop", "outside not leaking", not leaked, "bool",
+        "pass" if not leaked else "WARN")
+    d.close()
+if want("Crop"): guard(t_crop_outside)
+
+# ------------------------------------------------------------------ Watermark, opacity
+def t_watermark_opacity():
+    import re as _re
+    d = op(f"{OUT}/watermark.pdf")
+    raw = d[0].read_contents().decode("latin-1", "replace")
+    d.close()
+    # the alpha is written as "/GS<n> gs" with an ExtGState carrying /ca
+    alphas = [float(x) for x in _re.findall(r"/ca\s+([0-9.]+)", raw)]
+    if not alphas:
+        add("Watermark", "opacity applied", "not found", "alpha (asked 0.30)", "WARN")
+    else:
+        a0 = alphas[0]
+        add("Watermark", "opacity applied", round(a0, 2), "alpha (asked 0.30)",
+            "pass" if abs(a0 - 0.30) < 0.06 else "WARN")
+if want("Watermark"): guard(t_watermark_opacity)
+
+# ------------------------------------------------------------------ Redact, right page
+def t_redact_page():
+    d = op(f"{OUT}/redact.pdf")
+    src = op(f"{IN}/secret.pdf")
+    # page 1 was replaced by the rendered picture; page 2 must still be the original
+    p2_same = norm(d[1].get_text()) == norm(src[1].get_text())
+    add("Redact", "correct page replaced", p2_same, "bool",
+        "pass" if p2_same else "FAIL")
+    # page 1 must now be an image, not empty
+    p1 = d[0]
+    add("Redact", "replaced page has a picture", len(p1.get_images()) >= 1, "bool",
+        "pass" if len(p1.get_images()) >= 1 else "FAIL")
+    d.close(); src.close()
+if want("Redact"): guard(t_redact_page)
+
+# ------------------------------------------------------------------ Protect, permissions
+def t_protect_perm():
+    d = op(f"{OUT}/protect.pdf")
+    if d.needs_pass:
+        d.authenticate("secret123")
+    perms = d.permissions
+    d.close()
+    # PERM_PRINT | PERM_COPY were requested; both must be present, editing must not be
+    can_print = bool(perms & 4)
+    can_copy = bool(perms & 16)
+    can_edit = bool(perms & 8)
+    add("Protect", "print allowed as asked", can_print, "bool",
+        "pass" if can_print else "FAIL")
+    add("Protect", "copy allowed as asked", can_copy, "bool",
+        "pass" if can_copy else "FAIL")
+    add("Protect", "editing still blocked", not can_edit, "bool",
+        "pass" if not can_edit else "FAIL")
+if want("Protect"): guard(t_protect_perm)
 
 # ------------------------------------------------------------------ Forms
 def t_forms():

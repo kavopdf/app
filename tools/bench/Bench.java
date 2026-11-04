@@ -64,6 +64,9 @@ public class Bench {
         run("MERGE", () -> PdfEngine.merge(
                 Arrays.asList(in("a.pdf"), in("b.pdf")), out("merge.pdf")));
 
+        run("MERGE_IMG", () -> PdfEngine.merge(
+                Arrays.asList(in("img.pdf"), in("img.pdf")), out("merge_img.pdf")));
+
         run("SPLIT", () -> {
             List<int[]> r = new ArrayList<>();
             r.add(new int[]{1, 2});
@@ -120,6 +123,10 @@ public class Bench {
                 in("rot.pdf"), 1, 100f, 100f, 14f, "TESTLINK", null, 0xFF0000FF,
                 "https://example.com/bench", 1f, out("link.pdf")));
 
+        run("LINKS_ALL", () -> PdfEngine.addTextLinkAllPages(
+                in("rot.pdf"), 100f, 100f, 14f, "ALLLINK", null, 0xFF0000FF,
+                "https://example.com/all", 1f, out("link_all.pdf")));
+
         run("SIGN", () -> {
             PdfSigner.SignParams p = new PdfSigner.SignParams();
             p.name = "Benchmark Signer";
@@ -127,6 +134,25 @@ public class Bench {
             p.reason = "Benchmark";
             p.location = "India";
             PdfSigner.sign(in("multi.pdf"), out("sign.pdf"), p);
+        });
+
+        // --- the signature must break when the file is altered -------------------
+        run("TAMPER", () -> {
+            byte[] b = java.nio.file.Files.readAllBytes(out("sign.pdf").toPath());
+            // flip a byte inside the signed range, well past the header
+            int at = Math.min(b.length - 200, b.length / 2);
+            b[at] = (byte) (b[at] ^ 0xFF);
+            java.nio.file.Files.write(out("tampered.pdf").toPath(), b);
+        });
+
+        run("VERIFY_TAMPER", () -> {
+            List<PdfSigner.SignatureInfo> si = PdfSigner.verify(out("tampered.pdf"));
+            int ok = 0;
+            for (PdfSigner.SignatureInfo s : si) if (s.valid) ok++;
+            try (PrintWriter w = new PrintWriter(new FileWriter(out("verify_tamper.txt")))) {
+                w.println("signatures=" + si.size());
+                w.println("valid=" + ok);
+            }
         });
 
         run("VERIFY", () -> {

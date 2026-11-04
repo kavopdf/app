@@ -315,8 +315,8 @@ def main():
         "Merge": "MERGE", "Split": "SPLIT", "Crop": "CROP", "Organize pages": "PAGES,ROTATE",
         "Watermark": "WATERMARK", "Page numbers": "PAGENUM", "Compress": "COMPRESS",
         "Protect": "PROTECT,UNLOCK", "Unlock": "PROTECT,UNLOCK", "Metadata": "METADATA",
-        "Extract images": "EXTRACT", "Hyperlinks": "LINKS", "Sign": "SIGN,VERIFY",
-        "Verify signature": "SIGN,VERIFY", "Fill forms": "FORMS",
+        "Extract images": "EXTRACT", "Hyperlinks": "LINKS", "Sign": "SIGN,VERIFY,TAMPER,VERIFY_TAMPER",
+        "Verify signature": "SIGN,VERIFY,TAMPER,VERIFY_TAMPER", "Fill forms": "FORMS",
         "Annotate & sign": "ANNOTATE", "Create PDF": "CREATE_PDF",
         "Images to PDF": "IMAGES_PDF", "Bookmarks": "BOOKMARKS", "Redact": "REDACT",
         "Repair PDF": "REPAIR", "PDF to Word": "PDF_TO_WORD",
@@ -348,6 +348,11 @@ def main():
         prev = floor.get(key)
 
         if prev is None:
+            # A metric that is already failing must never become the floor - that would
+            # enshrine the bug. It is reported and left unseeded until it passes.
+            if verdict == "FAIL":
+                dropped.append((key, "(no baseline)", v))
+                continue
             floor[key] = v
             raised.append((key, "new", v))
             continue
