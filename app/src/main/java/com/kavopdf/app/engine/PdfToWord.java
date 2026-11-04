@@ -944,7 +944,7 @@ public final class PdfToWord {
                 } else if (m.group(13) != null) {
                     x = 0f; y = 0f;
                 } else if (m.group(14) != null) {
-                    marks.add(new float[]{y, cur});
+                    marks.add(new float[]{y, x, cur});
                 }
             }
 
@@ -953,15 +953,19 @@ public final class PdfToWord {
             // the page height so the two agree.
             float h = page.getMediaBox().getHeight();
             for (Glyph g : glyphs) {
-                float want = h - g.y;
+                float wantY = h - g.y;
+                float wantX = g.x;
                 float best = Float.MAX_VALUE;
                 int colour = -1;
                 for (float[] mk : marks) {
-                    if (mk[1] < 0) continue;
-                    float d = Math.abs(mk[0] - want);
-                    if (d < best) { best = d; colour = (int) mk[1]; }
+                    if (mk[2] < 0) continue;
+                    // Both axes, because a rotated stamp's text-showing operator sits at a
+                    // different y from the glyphs it draws - matching on y alone missed every
+                    // stamp colour on the page.
+                    float d = Math.abs(mk[0] - wantY) + Math.abs(mk[1] - wantX) * 0.25f;
+                    if (d < best) { best = d; colour = (int) mk[2]; }
                 }
-                if (colour > 0 && best < 24f) g.color = colour;
+                if (colour > 0 && best < 60f) g.color = colour;
             }
         } catch (Throwable ignored) {
         }
