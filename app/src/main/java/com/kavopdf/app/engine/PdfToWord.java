@@ -881,13 +881,112 @@ public final class PdfToWord {
         }
     }
 
+    /**
+     * Paints each glyph with the colour the page actually fills it in.
+     *
+     * <p>PDFBox's text stripper cannot supply this: measured on a document whose headings are
+     * #1C6B33 and #9E1A1A, getGraphicsState().getNonStrokingColor() returned DeviceGray 0,0,0
+     * for every glyph. PyMuPDF reads the real colours from the same file, so the information
+     * is there - it just is not reachable through the stripper.
+     *
+     * <p>So the content stream is walked here instead. The fill colour operators are tracked
+     * (rg, g, k), and every text-showing operator records the colour in force at the baseline
+     * it draws on. Each glyph then takes the colour of the nearest recorded baseline. That is
+     * enough because a colour change on a page happens between lines, not inside one.
+     */
+    private static void applyColours(PDDocument doc, int index, List<Glyph> glyphs) {
+        if (glyphs.isEmpty()) return;
+        try {
+            PDPage page = doc.getPage(index);
+            java.io.InputStream in = page.getContents();
+            if (in == null) return;
+            java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) > 0) bo.write(buf, 0, n);
+            in.close();
+            String cs = new String(bo.toByteArray(),
+                    java.nio.charset.StandardCharsets.ISO_8859_1);
+
+            List<float[]> marks = new ArrayList<>();   // {y, rgbPacked}
+            int cur = -1;
+            float y = 0f, x = 0f, lead = 0f;
+
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile(
+                    "(?s)([-0-9.]+)\\s+([-0-9.]+)\\s+([-0-9.]+)\\s+rg"
+                  + "|([-0-9.]+)\\s+g(?![a-zA-Z])"
+                  + "|([-0-9.]+)\\s+([-0-9.]+)\\s+([-0-9.]+)\\s+([-0-9.]+)\\s+k"
+                  + "|([-0-9.]+)\\s+([-0-9.]+)\\s+T[dD]"
+                  + "|([-0-9.]+)\\s+TL"
+                  + "|(T\\*)|(BT)|(Tj|TJ)").matcher(cs);
+
+            while (m.find()) {
+                if (m.group(1) != null) {
+                    cur = packRgb(f(m.group(1)), f(m.group(2)), f(m.group(3)));
+                } else if (m.group(4) != null) {
+                    float v = f(m.group(4));
+                    int c = Math.round(Math.max(0f, Math.min(1f, v)) * 255f);
+                    cur = (c << 16) | (c << 8) | c;
+                } else if (m.group(5) != null) {
+                    float c = f(m.group(5)), mm = f(m.group(6)), yy = f(m.group(7));
+                    float kk = f(m.group(8));
+                    int r = Math.round(255f * (1f - Math.min(1f, c + kk)));
+                    int g2 = Math.round(255f * (1f - Math.min(1f, mm + kk)));
+                    int b = Math.round(255f * (1f - Math.min(1f, yy + kk)));
+                    cur = ((r & 0xFF) << 16) | ((g2 & 0xFF) << 8) | (b & 0xFF);
+                } else if (m.group(9) != null) {
+                    x += f(m.group(9));
+                    y += f(m.group(10));
+                } else if (m.group(11) != null) {
+                    lead = f(m.group(11));
+                } else if (m.group(12) != null) {
+                    y -= lead;
+                } else if (m.group(13) != null) {
+                    x = 0f; y = 0f;
+                } else if (m.group(14) != null) {
+                    marks.add(new float[]{y, cur});
+                }
+            }
+
+            if (marks.isEmpty()) return;
+            // PDF y grows upwards; the glyph y from the stripper grows downwards. Compare on
+            // the page height so the two agree.
+            float h = page.getMediaBox().getHeight();
+            for (Glyph g : glyphs) {
+                float want = h - g.y;
+                float best = Float.MAX_VALUE;
+                int colour = -1;
+                for (float[] mk : marks) {
+                    if (mk[1] < 0) continue;
+                    float d = Math.abs(mk[0] - want);
+                    if (d < best) { best = d; colour = (int) mk[1]; }
+                }
+                if (colour > 0 && best < 24f) g.color = colour;
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static float f(String s) {
+        try { return Float.parseFloat(s); } catch (Exception e) { return 0f; }
+    }
+
+    private static int packRgb(float r, float g, float b) {
+        int ri = Math.round(Math.max(0f, Math.min(1f, r)) * 255f);
+        int gi = Math.round(Math.max(0f, Math.min(1f, g)) * 255f);
+        int bi = Math.round(Math.max(0f, Math.min(1f, b)) * 255f);
+        return ((ri & 0xFF) << 16) | ((gi & 0xFF) << 8) | (bi & 0xFF);
+    }
+
     private static List<Glyph> glyphsOf(PDDocument doc, int index) {
         try {
             GlyphCollector gc = new GlyphCollector();
             gc.setStartPage(index + 1);
             gc.setEndPage(index + 1);
             gc.getText(doc);
-            return dedupe(gc.out);
+            List<Glyph> out = dedupe(gc.out);
+            applyColours(doc, index, out);
+            return out;
         } catch (Throwable t) {
             return new ArrayList<>();
         }
