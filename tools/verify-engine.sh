@@ -161,4 +161,3 @@ echo "== the layer must write the characters that were on the page, not substitu
 
 echo
 echo "== what a reader copies out of an OCR layer =="
-
