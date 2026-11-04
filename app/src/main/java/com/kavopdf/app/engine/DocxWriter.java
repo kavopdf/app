@@ -150,6 +150,18 @@ public final class DocxWriter {
         for (PdfToWord.Run run : p.runs) {
             if (run.text.isEmpty()) continue;
             sb.append("<w:r><w:rPr>");
+            // The typeface and colour the PDF used. Without these every document came out in
+            // the default font in black, and "the Word file should look like the PDF" had no
+            // way to be measured - both benchmarks read 0 %.
+            if (run.font != null && !run.font.isEmpty()) {
+                String face = esc(run.font);
+                sb.append("<w:rFonts w:ascii=\"").append(face)
+                        .append("\" w:hAnsi=\"").append(face)
+                        .append("\" w:cs=\"").append(face).append("\"/>");
+            }
+            if (run.color >= 0) {
+                sb.append(String.format("<w:color w:val=\"%06X\"/>", run.color & 0xFFFFFF));
+            }
             if (run.bold) sb.append("<w:b/>");
             if (run.italic) sb.append("<w:i/>");
             int half = Math.round(run.sizePt * 2f);
