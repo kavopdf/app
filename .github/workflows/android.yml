@@ -147,3 +147,80 @@ jobs:
               --notes "Signed release APK built automatically from commit ${GITHUB_SHA}." \
               --latest
           fi
+
+  # ---------------------------------------------------------------------------
+  # The tool benchmark, on its own.
+  #
+  # Separate from `build` on purpose. The bench compiles the engine a second time and runs
+  # 22 tools against a fixture corpus. Inside verify-engine.sh that meant a wiring problem in
+  # the harness could take the APK down with it, which is exactly what happened once. Here
+  # the two cannot interfere.
+  # ---------------------------------------------------------------------------
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # run.py diffs this commit against the one before to decide which tools a change
+          # can have touched.
+          fetch-depth: 2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install the reference libraries
+        run: |
+          python3 -m pip install --quiet --upgrade pip
+          python3 -m pip install --quiet pymupdf pdfplumber python-docx pillow
+
+      - name: Fetch the engine libraries
+        run: |
+          mkdir -p tools/bench/libs/aar
+          curl -sSL -o tools/bench/libs/pdfbox.aar \
+            https://repo1.maven.org/maven2/com/tom-roush/pdfbox-android/2.0.27.0/pdfbox-android-2.0.27.0.aar
+          curl -sSL -o tools/bench/libs/bcprov.jar \
+            https://repo1.maven.org/maven2/org/bouncycastle/bcprov-jdk15to18/1.72/bcprov-jdk15to18-1.72.jar
+          curl -sSL -o tools/bench/libs/bcpkix.jar \
+            https://repo1.maven.org/maven2/org/bouncycastle/bcpkix-jdk15to18/1.72/bcpkix-jdk15to18-1.72.jar
+          curl -sSL -o tools/bench/libs/bcutil.jar \
+            https://repo1.maven.org/maven2/org/bouncycastle/bcutil-jdk15to18/1.72/bcutil-jdk15to18-1.72.jar
+          cd tools/bench/libs/aar && unzip -oq ../pdfbox.aar && ls classes.jar
+
+      - name: Compile the engine, then the harness
+        run: |
+          set -e
+          mkdir -p tools/bench/out
+          # The stubs go in first and are on the classpath for the engine, which is why the
+          # engine and the harness are two separate javac calls into the same directory.
+          javac -d tools/bench/out $(find tools/engine-verify/stubs -name '*.java')
+          javac -cp "tools/bench/out:tools/bench/libs/aar/classes.jar:tools/bench/libs/aar/assets:tools/bench/libs/bcprov.jar:tools/bench/libs/bcpkix.jar:tools/bench/libs/bcutil.jar" \
+                -d tools/bench/out $(find app/src/main/java -name '*.java')
+          javac -cp "tools/bench/out:tools/bench/libs/aar/classes.jar:tools/bench/libs/aar/assets:tools/bench/libs/bcprov.jar:tools/bench/libs/bcpkix.jar:tools/bench/libs/bcutil.jar" \
+                -d tools/bench/out tools/bench/Bench.java
+          ls tools/bench/out/Bench.class
+
+      - name: Run only the tools this change can have touched
+        env:
+          BENCH_CP: tools/bench/out:tools/bench/libs/aar/classes.jar:tools/bench/libs/aar/assets:tools/bench/libs/bcprov.jar:tools/bench/libs/bcpkix.jar:tools/bench/libs/bcutil.jar
+          BENCH_WORK: /tmp/kavopdf-bench
+        run: |
+          SINCE="HEAD~1"
+          if [ -n "${GITHUB_BASE_REF:-}" ]; then SINCE="origin/${GITHUB_BASE_REF}"; fi
+          python3 tools/bench/run.py --since "$SINCE"
+
+      - name: Keep the baseline the run produced
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-baseline
+          path: tools/bench/baseline.json
+          if-no-files-found: warn
