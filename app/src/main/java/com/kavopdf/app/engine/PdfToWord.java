@@ -9,6 +9,7 @@ import com.tom_roush.pdfbox.cos.COSString;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.pdmodel.PDPage;
 import com.tom_roush.pdfbox.pdmodel.PDResources;
+import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
 import com.tom_roush.pdfbox.pdmodel.font.PDFont;
 import com.tom_roush.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import com.tom_roush.pdfbox.pdmodel.graphics.form.PDTransparencyGroup;
@@ -97,6 +98,18 @@ public final class PdfToWord {
          *  plain-text output keeps them instead of hard-wrapping a paragraph back into lines
          *  at a width the reader never saw. */
         public final List<String> lines = new ArrayList<>();
+        /**
+         * The same lines, with the coordinates the page actually used.
+         *
+         * <p>{@link #runs} is one run holding the whole paragraph, which is all a .txt or a
+         * flowed .docx can use. That is why the Word file used to put every paragraph at a
+         * single indent: a value set at x=300 in the PDF reached the .docx as "indent 4".
+         * Each {@link Box} is one drawn line and carries the x, the baseline y and the runs
+         * with their own typeface, size and colour, so the writer can put the text back where
+         * it was. Empty for paragraphs that were never on a page grid - an OCR block, an
+         * annotation, a filled form value.
+         */
+        public final List<Box> boxes = new ArrayList<>();
 
         public String text() {
             StringBuilder sb = new StringBuilder();
@@ -109,9 +122,35 @@ public final class PdfToWord {
         }
     }
 
+    /**
+     * One line as the page drew it: where it starts, how wide it is, and the runs on it.
+     *
+     * <p>x and right are points from the left edge of the page, y is points from the TOP
+     * edge - the same convention {@code Glyph} and {@code Line} use.
+     */
+    public static final class Box {
+        public float x, y, right, size;
+        public final List<Run> runs = new ArrayList<>();
+
+        public String text() {
+            StringBuilder sb = new StringBuilder();
+            for (Run r : runs) sb.append(r.text);
+            return sb.toString();
+        }
+    }
+
     /** A table, as the cells a reader sees. */
     public static final class Table {
         public final List<List<String>> rows = new ArrayList<>();
+        /**
+         * The x of every column edge, left to right, in points - one more entry than there are
+         * columns. Null when the pass that built the table did not know them, in which case the
+         * writer splits the width evenly.
+         *
+         * <p>Without this a five-column invoice reached Word as five equal columns: the table
+         * started in the right place and every figure inside it was at the wrong x.
+         */
+        public float[] colX;
         /** The typeface each cell was drawn in, same shape as {@link #rows}. */
         public final List<List<String>> fonts = new ArrayList<>();
         public boolean header;
@@ -123,6 +162,9 @@ public final class PdfToWord {
         public int number;
         public final List<Object> blocks = new ArrayList<>();   // Para or Table
         public boolean ocr;
+        /** The page box in points. A .docx section has to be told, or a landscape page comes
+         *  out portrait and every x on it is measured against the wrong width. */
+        public float width, height;
     }
 
     /** What the conversion could and could not do. */
@@ -186,6 +228,13 @@ public final class PdfToWord {
         Page page = new Page();
         page.number = index + 1;
         PDPage pdPage = doc.getPage(index);
+        // The page box, in points, is what a .docx section has to be told: without it a
+        // landscape page comes out portrait and every x on it is measured against a width
+        // the page never had. Measured on the 80-file batch: 77 A4 portrait, 2 A4 landscape
+        // and one file that mixes the two across its pages.
+        PDRectangle box = pdPage.getMediaBox();
+        page.width = box.getWidth();
+        page.height = box.getHeight();
 
         List<Glyph> glyphs = glyphsOf(doc, index);
         int chars = 0;
@@ -1744,6 +1793,20 @@ public final class PdfToWord {
             p.runs.add(new Run(text, bold, italic, size, face, col));
         }
 
+        // The same words again, line by line, carrying the page's own coordinates and each
+        // line's own styling. This is what lets the writer put a value back at x=300 instead
+        // of at "indent 4".
+        for (Line line : group) {
+            if (line.text.trim().isEmpty()) continue;
+            Box box = new Box();
+            box.x = line.x;
+            box.y = line.y;
+            box.right = line.right;
+            box.size = line.size;
+            box.runs.addAll(runsOf(line));
+            p.boxes.add(box);
+        }
+
         p.heading = headingLevel(group, text);
         p.align = alignment(group, pageWidth, bands);
         int indent = Math.max(0, Math.round((first.x - leftMargin(group)) / Math.max(8f, size * 1.6f)));
@@ -1751,6 +1814,65 @@ public final class PdfToWord {
         p.bullet = bulletOf(text);
         if (p.bullet != null) p.indent = Math.max(1, p.indent);
         return p;
+    }
+
+    /**
+     * Splits one drawn line into runs by bold / italic / size / typeface / colour, putting
+     * back the spaces the line's own gaps imply - the same rule {@link #textOf} uses.
+     *
+     * <p>When the rebuild does not reproduce the line's text character for character - bidi
+     * reordering on an Arabic page, a ligature the page drew as two glyphs - the line is
+     * emitted as a single run holding {@code line.text}. Losing the styling is recoverable;
+     * losing or reordering a character is not.
+     */
+    private static List<Run> runsOf(Line line) {
+        List<Run> out = new ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        String curKey = null;
+        Glyph first = null, prev = null;
+        char lastOut = 0;
+        for (Glyph g : line.glyphs) {
+            String key = g.bold + "|" + g.italic + "|" + Math.round(g.size * 4f) + "|"
+                    + g.font + "|" + g.color;
+            if (curKey == null) {
+                curKey = key;
+                first = g;
+            } else if (!key.equals(curKey)) {
+                out.add(new Run(cur.toString(), first.bold, first.italic, first.size,
+                        first.font, first.color));
+                cur.setLength(0);
+                curKey = key;
+                first = g;
+            }
+            if (prev != null) {
+                float gap = g.x - (prev.x + prev.width);
+                if ((gap > g.size * 0.18f || gap < -g.size * 0.6f) && lastOut != ' ') {
+                    cur.append(' ');
+                    lastOut = ' ';
+                }
+            }
+            cur.append(g.text);
+            if (g.text != null && !g.text.isEmpty()) lastOut = g.text.charAt(g.text.length() - 1);
+            prev = g;
+        }
+        if (first != null) {
+            out.add(new Run(cur.toString(), first.bold, first.italic, first.size,
+                    first.font, first.color));
+        }
+        StringBuilder all = new StringBuilder();
+        for (Run r : out) all.append(r.text);
+        if (!all.toString().equals(line.text)) {
+            Glyph lead = line.glyphs.isEmpty() ? null : line.glyphs.get(0);
+            List<Run> one = new ArrayList<>();
+            one.add(new Run(line.text,
+                    lead != null && lead.bold,
+                    lead != null && lead.italic,
+                    line.size,
+                    lead == null ? "" : lead.font,
+                    lead == null ? -1 : lead.color));
+            return one;
+        }
+        return out;
     }
 
     private static float leftMargin(List<Line> group) {
@@ -2230,6 +2352,10 @@ public final class PdfToWord {
             left = Math.min(left, c[0]); right = Math.max(right, c[2]);
         }
         t.top = top; t.bottom = bottom; t.left = left; t.right = right;
+        float[] cx = new float[ncol + 1];
+        for (int i = 0; i < ncol; i++) cx[i] = C.get(i);
+        cx[ncol] = right;
+        t.colX = cx;
         t.header = nrow > 1;
         int filled = 0;
         for (int r = 0; r < nrow; r++) {
@@ -2473,6 +2599,15 @@ public final class PdfToWord {
             t.bottom = bottom;
             t.left = left;
             t.right = right;
+            // The rule positions the columns were cut at, so the .docx can use the same widths
+            // instead of five equal ones.
+            float[] colX = new float[cols + 1];
+            for (int c = 0; c < cols; c++) {
+                int src = c < keep.size() ? keep.get(c) : c;
+                colX[c] = xs.get(Math.min(src, xs.size() - 1));
+            }
+            colX[cols] = right;
+            t.colX = colX;
             t.header = rows > 1;
             for (int r = 0; r < rows; r++) {
                 List<String> row = new ArrayList<>();
@@ -2644,6 +2779,10 @@ public final class PdfToWord {
             t.fonts.add(textFonts);
         }
         t.bottom = bottom;
+        float[] cx2 = new float[columns.size() + 1];
+        for (int i = 0; i < columns.size(); i++) cx2[i] = columns.get(i);
+        cx2[columns.size()] = Math.max(right, columns.get(columns.size() - 1));
+        t.colX = cx2;
         t.left = left;
         t.right = right;
         t.header = true;

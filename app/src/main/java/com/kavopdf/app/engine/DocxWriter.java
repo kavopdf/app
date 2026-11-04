@@ -16,10 +16,22 @@ import java.util.zip.ZipOutputStream;
  * <p>Two reasons for hand-writing it: a Word library is 12 MB of the APK for one feature, and
  * the output is a handful of XML documents that Word, LibreOffice and Google Docs all read.
  *
- * <p>What comes out is a <em>document</em>, not a picture of one: real paragraphs with real
- * runs, heading styles Word understands, and tables with cells you can type into. Absolutely
- * positioned text boxes would look closer to the page and be useless to edit, which is the one
- * thing this tool must not do.
+ * <p><b>Where the text sits.</b> A .docx has no page grid of its own: a paragraph is placed by
+ * the flow, and the only horizontal control a flowing paragraph has is {@code w:ind}. That is
+ * why a value set at x=300 pt in the PDF used to arrive at "indent 4" - the paragraph was
+ * pinned to the left margin and nudged. Every paragraph here is therefore a floating shape:
+ * a {@code wp:anchor} whose {@code positionH}/{@code positionV} are taken straight from the
+ * page, {@code relativeFrom="page"}, in EMU (1 pt = 12700 EMU), with the page section set to
+ * the PDF's own page box and zero margins, so the anchor offset IS the PDF x.
+ *
+ * <p>Inside the anchor the text is ordinary WordprocessingML in {@code w:txbxContent} - real
+ * characters in real runs with their real {@code rPr}, so the result is selectable, searchable
+ * and editable, not a picture of a page. (A {@code a:txBody} would be DrawingML text, which
+ * carries {@code a:rPr}, not {@code w:rPr}: bold, italic, size, typeface and colour would all
+ * be lost, and Word would not open the shape as a text box at all.)
+ *
+ * <p>Tables stay tables: a {@code w:tbl} with {@code w:tr}/{@code w:tc} cells, anchored at the
+ * table's own top-left corner.
  */
 public final class DocxWriter {
 
@@ -28,15 +40,38 @@ public final class DocxWriter {
     private static final String NS_WP = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
     private static final String NS_A = "http://schemas.openxmlformats.org/drawingml/2006/main";
     private static final String NS_PIC = "http://schemas.openxmlformats.org/drawingml/2006/picture";
+    private static final String NS_WPS =
+            "http://schemas.microsoft.com/office/word/2010/wordprocessingShape";
+
+    /** 1 point in EMU, for wp:posOffset and wp:extent. */
+    private static final double EMU_PER_PT = 12700.0;
+    /** 1 point in twips, for every w:* length. */
+    private static final double TWIPS_PER_PT = 20.0;
+
+    /**
+     * Distance from the top of a text box to the baseline of its first line, as a fraction of
+     * the font size.
+     *
+     * <p>A text box positions its top edge, not its baseline, and a PDF gives a baseline. The
+     * gap is the face's ascent, but with {@code w:lineRule="exact"} the renderer puts the
+     * baseline at the bottom of the line box instead: measured over 377 words of two files,
+     * the rendered baseline sat 0.268 * size below where it was asked to be, so the box has to
+     * be lifted by 0.90 + 0.27 = 1.17 em. That is the LibreOffice figure; Word's exact-line
+     * model puts the baseline a shade higher, so expect the Word baseline within about 1 pt of
+     * the PDF's.
+     */
+    private static final float ASCENT = 1.17f;
+    /** Line box height as a multiple of the font size. Generous: a tight exact height clips. */
+    private static final float LINE_FACTOR = 1.30f;
 
     private DocxWriter() {
     }
 
     public static void write(PdfToWord.Result result, File out) throws IOException {
-        List<byte[]> media = new ArrayList<>();
-        String documentXml = documentXml(result, media);
-        String rels = documentRels(media);
-        String contentTypes = contentTypes(media.size());
+        Ctx ctx = new Ctx();
+        String documentXml = documentXml(result, ctx);
+        String rels = documentRels(ctx.media);
+        String contentTypes = contentTypes(ctx.media.size());
 
         try (OutputStream fos = new FileOutputStream(out);
              ZipOutputStream zip = new ZipOutputStream(fos)) {
@@ -47,9 +82,9 @@ public final class DocxWriter {
             put(zip, "word/_rels/document.xml.rels", rels);
             put(zip, "docProps/core.xml", coreXml(result));
             put(zip, "docProps/app.xml", appXml());
-            for (int i = 0; i < media.size(); i++) {
+            for (int i = 0; i < ctx.media.size(); i++) {
                 zip.putNextEntry(new ZipEntry("word/media/image" + (i + 1) + ".png"));
-                zip.write(media.get(i));
+                zip.write(ctx.media.get(i));
                 zip.closeEntry();
             }
         }
@@ -61,40 +96,89 @@ public final class DocxWriter {
         zip.closeEntry();
     }
 
+    /** Mutable state for one write: the shape id counter and the images collected. */
+    private static final class Ctx {
+        final List<byte[]> media = new ArrayList<>();
+        int shapeSeq = 1;
+        int anchorCount;
+        int flowCount;
+    }
+
     // ------------------------------------------------------------------ document
 
-    private static String documentXml(PdfToWord.Result result, List<byte[]> media) {
-        StringBuilder sb = new StringBuilder(1 << 16);
+    private static String documentXml(PdfToWord.Result result, Ctx ctx) {
+        StringBuilder sb = new StringBuilder(1 << 18);
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
         sb.append("<w:document xmlns:w=\"").append(NS_W).append("\" xmlns:r=\"").append(NS_R)
                 .append("\" xmlns:wp=\"").append(NS_WP).append("\" xmlns:a=\"").append(NS_A)
+                .append("\" xmlns:wps=\"").append(NS_WPS)
                 .append("\" xmlns:pic=\"").append(NS_PIC).append("\"><w:body>");
 
-
+        // The page box the current section is set to. A section carries one page size, so a
+        // file that mixes landscape and portrait pages gets a section break where the size
+        // changes; every other page break stays a plain page break.
+        float secW = 0, secH = 0;
         boolean first = true;
         for (PdfToWord.Page page : result.pages) {
-            if (page.blocks.isEmpty()) continue;
-            if (!first) {
-                sb.append("<w:p><w:r><w:br w:type=\"page\"/></w:r></w:p>");
+            float pw = page.width > 0 ? page.width : 595f;
+            float ph = page.height > 0 ? page.height : 842f;
+            if (first) {
+                secW = pw;
+                secH = ph;
+                first = false;
+            } else if (Math.abs(pw - secW) > 0.5f || Math.abs(ph - secH) > 0.5f) {
+                // Close the section that just ended. A sectPr lives in the last paragraph of
+                // its section, and nextPage starts the new one on a fresh page - which is the
+                // page break this page needed anyway.
+                sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                        .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                        .append("<w:sectPr>").append(sectPrXml(secW, secH))
+                        .append("<w:type w:val=\"nextPage\"/></w:sectPr>")
+                        .append("</w:pPr></w:p>");
+                secW = pw;
+                secH = ph;
+            } else {
+                // A page with nothing on it still has to advance the page counter, or every
+                // anchor after it lands one page too early.
+                sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                        .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                        .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr>")
+                        .append("<w:r><w:br w:type=\"page\"/></w:r></w:p>");
             }
-            first = false;
+            if (page.blocks.isEmpty()) continue;
             for (Object block : page.blocks) {
                 if (block instanceof PdfToWord.Para) {
-                    para(sb, (PdfToWord.Para) block);
+                    para(sb, (PdfToWord.Para) block, ctx);
                 } else if (block instanceof PdfToWord.Table) {
-                    table(sb, (PdfToWord.Table) block);
+                    table(sb, (PdfToWord.Table) block, ctx);
                 } else if (block instanceof Picture) {
-                    picture(sb, (Picture) block, media);
+                    picture(sb, (Picture) block, ctx);
                 }
             }
         }
-        // The section properties must be the LAST child of w:body. Emitting them first is
-        // what a hand-written writer does by accident, and strict consumers reject the file.
-        sb.append("<w:sectPr><w:pgSz w:w=\"11906\" w:h=\"16838\"/>")
-                .append("<w:pgMar w:top=\"1134\" w:right=\"1134\" w:bottom=\"1134\" w:left=\"1134\" ")
-                .append("w:header=\"709\" w:footer=\"709\" w:gutter=\"0\"/></w:sectPr>");
+        // The section properties must be the LAST child of w:body.
+        sb.append("<w:sectPr>").append(sectPrXml(secW <= 0 ? 595f : secW, secH <= 0 ? 842f : secH))
+                .append("</w:sectPr>");
         sb.append("</w:body></w:document>");
         return sb.toString();
+    }
+
+    /**
+     * A page the size of the PDF page, with no margins.
+     *
+     * <p>Zero margins are not cosmetic: they make the page box and the text box the same
+     * coordinate system, so a paragraph anchored {@code relativeFrom="page"} at 300 pt is at
+     * 300 pt from the edge of the paper and from the start of the text area alike.
+     */
+    private static String sectPrXml(float wPt, float hPt) {
+        int w = Math.max(1, Math.round((float) (wPt * TWIPS_PER_PT)));
+        int h = Math.max(1, Math.round((float) (hPt * TWIPS_PER_PT)));
+        String orient = wPt > hPt ? " w:orient=\"landscape\"" : "";
+        return "<w:pgSz w:w=\"" + w + "\" w:h=\"" + h + "\"" + orient + "/>"
+                + "<w:pgMar w:top=\"0\" w:right=\"0\" w:bottom=\"0\" w:left=\"0\""
+                + " w:header=\"0\" w:footer=\"0\" w:gutter=\"0\"/>"
+                + "<w:cols w:space=\"0\"/>"
+                + "<w:docGrid w:linePitch=\"360\"/>";
     }
 
     /** An image lifted out of the PDF and placed where it was. */
@@ -112,9 +196,9 @@ public final class DocxWriter {
         }
     }
 
-    private static void picture(StringBuilder sb, Picture p, List<byte[]> media) {
-        media.add(p.png);
-        int id = media.size();
+    private static void picture(StringBuilder sb, Picture p, Ctx ctx) {
+        ctx.media.add(p.png);
+        int id = ctx.media.size();
         sb.append("<w:p><w:r><w:drawing><wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">")
                 .append("<wp:extent cx=\"").append(p.widthEmu).append("\" cy=\"")
                 .append(p.heightEmu).append("\"/>")
@@ -132,57 +216,192 @@ public final class DocxWriter {
                 .append("</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>");
     }
 
-    private static void para(StringBuilder sb, PdfToWord.Para p) {
-        String text = p.text();
-        if (text.trim().isEmpty()) return;
+    // ------------------------------------------------------------------ paragraphs
 
+    /**
+     * One paragraph. Every line the PDF drew becomes its own anchored text box at its own
+     * x and y - a paragraph in the PDF is a group of lines, but the lines are not at one x,
+     * and it is the x of each line that the reader sees.
+     */
+    private static void para(StringBuilder sb, PdfToWord.Para p, Ctx ctx) {
+        if (!p.boxes.isEmpty()) {
+            for (PdfToWord.Box b : p.boxes) {
+                if (b.runs.isEmpty()) continue;
+                float wPt = Math.max(4f, b.right - b.x) + b.size * 1.5f;
+                float hPt = Math.max(4f, b.size * LINE_FACTOR);
+                StringBuilder inner = new StringBuilder(256);
+                lineParagraph(inner, p, b);
+                anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString());
+            }
+            return;
+        }
+        // No page coordinates: an OCR block, an annotation, a filled form value. There is no
+        // x to restore, so it goes into the flow rather than pretending to a position.
+        flowParagraph(sb, p, ctx);
+    }
+
+    /** One drawn line, as the single paragraph inside its own text box. */
+    private static void lineParagraph(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b) {
+        int lineTw = Math.max(1, Math.round((float) (Math.max(4f, b.size * LINE_FACTOR) * TWIPS_PER_PT)));
         sb.append("<w:p><w:pPr>");
         if (p.heading > 0) {
             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
         }
+        sb.append("<w:snapToGrid w:val=\"0\"/>")
+                .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"").append(lineTw)
+                .append("\" w:lineRule=\"exact\"/>")
+                // The anchor already put this line at its x; an indent here would move it off.
+                .append("<w:ind w:left=\"0\" w:right=\"0\" w:firstLine=\"0\"/>");
+        int half = Math.round(b.size * 2f);
+        if (half > 0) {
+            sb.append("<w:rPr><w:sz w:val=\"").append(Math.min(3276, Math.max(2, half)))
+                    .append("\"/></w:rPr>");
+        }
+        sb.append("</w:pPr>");
+        for (PdfToWord.Run run : b.runs) {
+            if (run.text.isEmpty()) continue;
+            runXml(sb, run);
+        }
+        sb.append("</w:p>");
+    }
+
+    /** A paragraph with no page coordinates of its own: the old flowing behaviour. */
+    private static void flowParagraph(StringBuilder sb, PdfToWord.Para p, Ctx ctx) {
+        String text = p.text();
+        if (text.trim().isEmpty()) return;
+        ctx.flowCount++;
+        sb.append("<w:p><w:pPr>");
+        if (p.heading > 0) {
+            sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
+        }
+        sb.append("<w:snapToGrid w:val=\"0\"/>");
         if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");
         else if (p.align == 2) sb.append("<w:jc w:val=\"right\"/>");
         if (p.indent > 0) {
             sb.append("<w:ind w:left=\"").append(p.indent * 420).append("\"/>");
         }
         sb.append("</w:pPr>");
-
         for (PdfToWord.Run run : p.runs) {
             if (run.text.isEmpty()) continue;
-            sb.append("<w:r><w:rPr>");
-            // The typeface and colour the PDF used. Without these every document came out in
-            // the default font in black, and "the Word file should look like the PDF" had no
-            // way to be measured - both benchmarks read 0 %.
-            if (run.font != null && !run.font.isEmpty()) {
-                String face = esc(run.font);
-                sb.append("<w:rFonts w:ascii=\"").append(face)
-                        .append("\" w:hAnsi=\"").append(face)
-                        .append("\" w:cs=\"").append(face).append("\"/>");
-            }
-            if (run.color >= 0) {
-                sb.append(String.format("<w:color w:val=\"%06X\"/>", run.color & 0xFFFFFF));
-            }
-            if (run.bold) sb.append("<w:b/>");
-            if (run.italic) sb.append("<w:i/>");
-            int half = Math.round(run.sizePt * 2f);
-            if (half > 0) {
-                sb.append("<w:sz w:val=\"").append(Math.min(3276, Math.max(2, half))).append("\"/>");
-                sb.append("<w:szCs w:val=\"").append(Math.min(3276, Math.max(2, half)))
-                        .append("\"/>");
-            }
-            sb.append("</w:rPr><w:t xml:space=\"preserve\">").append(esc(run.text))
-                    .append("</w:t></w:r>");
+            runXml(sb, run);
         }
         sb.append("</w:p>");
     }
 
-    private static void table(StringBuilder sb, PdfToWord.Table t) {
+    /** One run with the properties the PDF drew it with. */
+    private static void runXml(StringBuilder sb, PdfToWord.Run run) {
+        sb.append("<w:r><w:rPr>");
+        // The typeface and colour the PDF used. Without these every document came out in
+        // the default font in black, and "the Word file should look like the PDF" had no
+        // way to be measured - both benchmarks read 0 %.
+        if (run.font != null && !run.font.isEmpty()) {
+            String face = esc(faceName(run.font));
+            sb.append("<w:rFonts w:ascii=\"").append(face)
+                    .append("\" w:hAnsi=\"").append(face)
+                    .append("\" w:cs=\"").append(face).append("\"/>");
+        }
+        if (run.color >= 0) {
+            sb.append(String.format("<w:color w:val=\"%06X\"/>", run.color & 0xFFFFFF));
+        }
+        if (run.bold) sb.append("<w:b/>");
+        if (run.italic) sb.append("<w:i/>");
+        int half = Math.round(run.sizePt * 2f);
+        if (half > 0) {
+            sb.append("<w:sz w:val=\"").append(Math.min(3276, Math.max(2, half))).append("\"/>");
+            sb.append("<w:szCs w:val=\"").append(Math.min(3276, Math.max(2, half)))
+                    .append("\"/>");
+        }
+        sb.append("</w:rPr><w:t xml:space=\"preserve\">").append(esc(run.text))
+                .append("</w:t></w:r>");
+    }
+
+    // ------------------------------------------------------------------ the anchor
+
+    /**
+     * Wraps a block of WordprocessingML in a floating text box at (xPt, yTopPt).
+     *
+     * <p>The child order of {@code wp:anchor} is fixed by the schema - simplePos, positionH,
+     * positionV, extent, effectExtent, wrap*, docPr, cNvGraphicFramePr, graphic - and Word
+     * refuses the whole file if it is wrong, so it is written in one place, in order.
+     */
+    private static void anchor(StringBuilder sb, Ctx ctx, float xPt, float yTopPt,
+                               float wPt, float hPt, String inner) {
+        int id = ctx.shapeSeq++;
+        long cx = Math.max(1, Math.round(wPt * EMU_PER_PT));
+        long cy = Math.max(1, Math.round(hPt * EMU_PER_PT));
+        long offX = Math.round(xPt * EMU_PER_PT);
+        long offY = Math.round(yTopPt * EMU_PER_PT);
+        int relHeight = 251658240 + (id & 0xFFFF);
+
+        sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                .append("<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr></w:pPr>")
+                .append("<w:r><w:drawing>")
+                .append("<wp:anchor distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"")
+                .append(" simplePos=\"0\" relativeHeight=\"").append(relHeight).append("\"")
+                .append(" behindDoc=\"0\" locked=\"0\" layoutInCell=\"1\" allowOverlap=\"1\">")
+                .append("<wp:simplePos x=\"0\" y=\"0\"/>")
+                .append("<wp:positionH relativeFrom=\"page\"><wp:posOffset>").append(offX)
+                .append("</wp:posOffset></wp:positionH>")
+                .append("<wp:positionV relativeFrom=\"page\"><wp:posOffset>").append(offY)
+                .append("</wp:posOffset></wp:positionV>")
+                .append("<wp:extent cx=\"").append(cx).append("\" cy=\"").append(cy).append("\"/>")
+                .append("<wp:effectExtent l=\"0\" t=\"0\" r=\"0\" b=\"0\"/>")
+                .append("<wp:wrapNone/>")
+                .append("<wp:docPr id=\"").append(id).append("\" name=\"KavoPDF text ")
+                .append(id).append("\"/>")
+                .append("<wp:cNvGraphicFramePr/>")
+                .append("<a:graphic><a:graphicData uri=\"").append(NS_WPS).append("\">")
+                .append("<wps:wsp><wps:cNvSpPr txBox=\"1\"/>")
+                .append("<wps:spPr><a:xfrm><a:off x=\"0\" y=\"0\"/><a:ext cx=\"").append(cx)
+                .append("\" cy=\"").append(cy).append("\"/></a:xfrm>")
+                .append("<a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom>")
+                .append("<a:noFill/><a:ln><a:noFill/></a:ln></wps:spPr>")
+                .append("<wps:txbx><w:txbxContent>").append(inner).append("</w:txbxContent></wps:txbx>")
+                // wrap="none": the box must not re-wrap the line it holds, or a long line
+                // would break at the box width and the second half would land under the first.
+                .append("<wps:bodyPr wrap=\"none\" lIns=\"0\" tIns=\"0\" rIns=\"0\" bIns=\"0\"")
+                .append(" anchor=\"t\" anchorCtr=\"0\"><a:noAutofit/></wps:bodyPr>")
+                .append("</wps:wsp></a:graphicData></a:graphic>")
+                .append("</wp:anchor></w:drawing></w:r></w:p>");
+        ctx.anchorCount++;
+    }
+
+    // ------------------------------------------------------------------ tables
+
+    /**
+     * A table stays a table: {@code w:tbl} with real rows and cells, inside a text box so it
+     * keeps the position it had on the page. Turning the cells into loose text boxes would
+     * place the text and destroy the table, which is the one thing a conversion must not do.
+     */
+    private static void table(StringBuilder sb, PdfToWord.Table t, Ctx ctx) {
         int cols = 0;
         for (List<String> row : t.rows) cols = Math.max(cols, row.size());
         if (cols == 0) return;
-        int width = 9638 / cols;                       // content width in twips, split evenly
+        // The column edges the page actually used, when the pass that found the table knew
+        // them. Even columns put a right-aligned figure 60 pt from where the reader saw it.
+        int[] colTw = new int[cols];
+        float x0 = t.left;
+        boolean exact = t.colX != null && t.colX.length == cols + 1;
+        if (exact) {
+            x0 = t.colX[0];
+            for (int c = 0; c < cols; c++) {
+                colTw[c] = Math.max(1, Math.round((float) ((t.colX[c + 1] - t.colX[c])
+                        * TWIPS_PER_PT)));
+            }
+        } else {
+            float wPt = Math.max(40f, t.right - t.left);
+            int width = Math.max(1, Math.round((float) (wPt * TWIPS_PER_PT / cols)));
+            for (int c = 0; c < cols; c++) colTw[c] = width;
+        }
+        int totalTw = 0;
+        for (int c = 0; c < cols; c++) totalTw += colTw[c];
+        float wPt = (float) (totalTw / TWIPS_PER_PT);
+        float hPt = Math.max(12f, t.bottom - t.top);
 
-        sb.append("<w:tbl><w:tblPr><w:tblW w:w=\"0\" w:type=\"auto\"/>")
+        StringBuilder inner = new StringBuilder(512);
+        inner.append("<w:tbl><w:tblPr>")
+                .append("<w:tblW w:w=\"").append(totalTw).append("\" w:type=\"dxa\"/>")
                 .append("<w:tblBorders>")
                 .append("<w:top w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
                 .append("<w:left w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
@@ -190,44 +409,92 @@ public final class DocxWriter {
                 .append("<w:right w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
                 .append("<w:insideH w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
                 .append("<w:insideV w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
-                .append("</w:tblBorders></w:tblPr><w:tblGrid>");
-        for (int c = 0; c < cols; c++) sb.append("<w:gridCol w:w=\"").append(width).append("\"/>");
-        sb.append("</w:tblGrid>");
+                .append("</w:tblBorders>")
+                .append("<w:tblLayout w:type=\"fixed\"/>")
+                // Word's default cell margin is 0.19 cm (108 twips) on each side. Left at the
+                // default, every cell's text sat 6 pt right of where the page had it - a
+                // measured 120 twips of error on every cell in the batch.
+                .append("<w:tblCellMar><w:top w:w=\"0\" w:type=\"dxa\"/>")
+                .append("<w:left w:w=\"0\" w:type=\"dxa\"/>")
+                .append("<w:bottom w:w=\"0\" w:type=\"dxa\"/>")
+                .append("<w:right w:w=\"0\" w:type=\"dxa\"/></w:tblCellMar>")
+                .append("</w:tblPr><w:tblGrid>");
+        for (int c = 0; c < cols; c++) {
+            inner.append("<w:gridCol w:w=\"").append(colTw[c]).append("\"/>");
+        }
+        inner.append("</w:tblGrid>");
 
         for (int r = 0; r < t.rows.size(); r++) {
             List<String> row = t.rows.get(r);
-            sb.append("<w:tr>");
+            inner.append("<w:tr>");
             for (int c = 0; c < cols; c++) {
                 String cell = c < row.size() ? row.get(c) : "";
                 String face = r < t.fonts.size() && c < t.fonts.get(r).size()
                         ? t.fonts.get(r).get(c) : "";
-                sb.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(width).append("\" w:type=\"dxa\"/>")
-                        .append("</w:tcPr><w:p><w:pPr><w:pStyle w:val=\"TableText\"/></w:pPr>");
-                if (r == 0 && t.header && !cell.isEmpty()) {
-                    sb.append("<w:r><w:rPr>");
+                inner.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(colTw[c])
+                        .append("\" w:type=\"dxa\"/></w:tcPr>")
+                        .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
+                        .append("<w:snapToGrid w:val=\"0\"/>")
+                        .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"200\" w:lineRule=\"exact\"/>")
+                        .append("</w:pPr>");
+                if (!cell.isEmpty()) {
+                    inner.append("<w:r><w:rPr>");
                     if (!face.isEmpty()) {
-                        sb.append("<w:rFonts w:ascii=\"").append(esc(face))
-                                .append("\" w:hAnsi=\"").append(esc(face))
-                                .append("\" w:cs=\"").append(esc(face)).append("\"/>");
+                        String f = esc(faceName(face));
+                        inner.append("<w:rFonts w:ascii=\"").append(f)
+                                .append("\" w:hAnsi=\"").append(f)
+                                .append("\" w:cs=\"").append(f).append("\"/>");
                     }
-                    sb.append("<w:b/></w:rPr><w:t xml:space=\"preserve\">")
-                            .append(esc(cell)).append("</w:t></w:r>");
-                } else if (!cell.isEmpty()) {
-                    sb.append("<w:r>");
-                    if (!face.isEmpty()) {
-                        sb.append("<w:rPr><w:rFonts w:ascii=\"").append(esc(face))
-                                .append("\" w:hAnsi=\"").append(esc(face))
-                                .append("\" w:cs=\"").append(esc(face)).append("\"/></w:rPr>");
-                    }
-                    sb.append("<w:t xml:space=\"preserve\">").append(esc(cell))
+                    if (r == 0 && t.header) inner.append("<w:b/>");
+                    inner.append("</w:rPr><w:t xml:space=\"preserve\">").append(esc(cell))
                             .append("</w:t></w:r>");
                 }
-                sb.append("</w:p></w:tc>");
+                inner.append("</w:p></w:tc>");
             }
-            sb.append("</w:tr>");
+            inner.append("</w:tr>");
         }
-        sb.append("</w:tbl>");
-        sb.append("<w:p/>");
+        inner.append("</w:tbl>");
+        // A text box whose last child is a table is legal but some consumers expect a
+        // paragraph after it; one empty one costs nothing.
+        inner.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+
+        anchor(sb, ctx, x0, t.top, wPt + 2f, hPt, inner.toString());
+    }
+
+    /**
+     * The typeface name without the PDF's subset tag.
+     *
+     * <p>A PDF names a subset face "KLGWYD+Liberation Sans Bold", and the style is part of the
+     * name rather than of the family. Written straight into {@code w:rFonts} it names a face no
+     * machine has: fontconfig resolves "Liberation Serif Regular" and "Liberation Sans Bold" to
+     * Noto Sans, a different face with different advances, and every word after the first drifts
+     * along the line. Measured on file 51, word starts inside a line were up to 12.2 pt out
+     * while the line start itself was 0.1 pt out. Dropping the subset tag and the style suffix
+     * lets the family resolve to the face the PDF was drawn with; bold and italic are already
+     * carried by {@code w:b} and {@code w:i}, so no styling is lost by removing them from the
+     * name.
+     */
+    static String faceName(String font) {
+        if (font == null) return "";
+        String f = font;
+        if (f.length() > 7 && f.charAt(6) == '+') {
+            boolean tag = true;
+            for (int i = 0; i < 6; i++) {
+                char c = f.charAt(i);
+                if (!(c >= 'A' && c <= 'Z')) { tag = false; break; }
+            }
+            if (tag) f = f.substring(7);
+        }
+        String[] suffixes = {" Bold Italic", " Bold Oblique", " Italic", " Oblique",
+                " Bold", " Regular", " Roman", " Normal"};
+        for (String suf : suffixes) {
+            if (f.length() > suf.length() && f.endsWith(suf)) {
+                return f.substring(0, f.length() - suf.length());
+            }
+        }
+        return f;
     }
 
     private static String esc(String s) {
