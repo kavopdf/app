@@ -848,6 +848,13 @@ public final class PdfToWord {
         // the sentence "in recognition of the first rank..." was split by four border letters.
         // They go together, in drawing order, after the page's text.
         if (ring.size() >= 8) ordered.add(ringPara(ring));
+        // A table in a right-to-left document runs from the right margin to the left one, so
+        // its first column is the rightmost. Every pass that builds a table places its cells
+        // in the order the page draws them, left to right, which mirrors the rows: the Arabic
+        // invoice's header reached the reader as "المبلغ السعر الكمية الوصف البند" and its
+        // first line as "1380000 34500 40 … 1". The rows are turned round here, once, for
+        // every table on the page, and the column geometry is mirrored with them.
+        for (Object o : ordered) if (o instanceof Table) rtlTable((Table) o);
         for (Object o : ordered) {
             page.blocks.add(o);
             if (o instanceof Para) report.paragraphs++;
@@ -858,6 +865,57 @@ public final class PdfToWord {
         return page;
     }
 
+
+    /**
+     * Turns a right-to-left table round: first column on the right, rows read from the right.
+     *
+     * <p>The rows are reversed together with the three arrays that run alongside them - the
+     * cell x, the typeface and the colour - so a cell keeps its own geometry after the move.
+     * The column edges are mirrored about the table's own extent, which reverses the widths
+     * and puts each width back over the text it belongs to.
+     */
+    private static void rtlTable(Table t) {
+        if (t == null || t.rows.isEmpty()) return;
+        boolean rtl = false;
+        for (List<String> row : t.rows) {
+            for (String c : row) {
+                if (c == null) continue;
+                int r = 0, l = 0;
+                for (int i = 0; i < c.length(); i++) {
+                    char ch = c.charAt(i);
+                    if (isRtl(ch)) r++;
+                    else if (Character.isLetter(ch)) l++;
+                }
+                if (r > l && r > 0) { rtl = true; break; }
+            }
+            if (rtl) break;
+        }
+        if (!rtl) return;
+
+        for (List<String> row : t.rows) Collections.reverse(row);
+        reverseRows(t.cellX);
+        reverseRows(t.fonts);
+        reverseRows(t.colors);
+
+        float lo = t.colX != null && t.colX.length > 0 ? t.colX[0] : t.left;
+        float hi = t.colX != null && t.colX.length > 0 ? t.colX[t.colX.length - 1] : t.right;
+        if (hi <= lo) return;
+        if (t.colX != null) {
+            float[] nx = new float[t.colX.length];
+            for (int i = 0; i < t.colX.length; i++) nx[i] = lo + hi - t.colX[t.colX.length - 1 - i];
+            t.colX = nx;
+        }
+        for (List<Float> xs : t.cellX) {
+            for (int i = 0; i < xs.size(); i++) {
+                Float v = xs.get(i);
+                if (v != null && !v.isNaN()) xs.set(i, lo + hi - v);
+            }
+        }
+    }
+
+    private static <E> void reverseRows(List<List<E>> rows) {
+        for (List<E> r : rows) Collections.reverse(r);
+    }
 
     /**
      * A table row is a baseline, so a real table has about one baseline of text per row.
@@ -1829,6 +1887,12 @@ public final class PdfToWord {
             }
             if (!run.isEmpty()) segments.add(run);
 
+            // A right-to-left baseline reads from its right edge, so the fields standing on it
+            // are ordered from the right as well. Sorting them left to right mirrored every
+            // table row on the Arabic document - the amount before the item number, and the
+            // header read "المبلغ السعر الكمية الوصف البند" against "البند الوصف الكمية السعر المبلغ".
+            if (segments.size() > 1 && rtlDominant(raw.glyphs)) Collections.reverse(segments);
+
             // A baseline cut into more than one segment is several fields, not one sentence.
             // None of those segments may be merged back into the line above it - that is what
             // turned a question and its marks column into "[08] Explain the concept ...".
@@ -1855,8 +1919,30 @@ public final class PdfToWord {
                 split.add(line);
             }
         }
+        // A baseline that holds nothing but vowel signs is not a line of text. Arabic sets a
+        // tanween a few points off the baseline of the letter it decorates, so it clustered on
+        // its own and the Arabic document gained three lines that are a bare "ً" - and, worse,
+        // pushed every line after them one place out of step with the reference.
+        List<Line> kept = new ArrayList<>(split.size());
+        for (Line ln : split) if (!markOnly(ln.text)) kept.add(ln);
+        split = kept;
         split.addAll(ring);
         return split;
+    }
+
+    /** True when a string carries nothing a reader would see: spaces and combining marks only. */
+    private static boolean markOnly(String s) {
+        if (s == null) return false;
+        boolean sawMark = false;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isWhitespace(c)) continue;
+            int t = Character.getType(c);
+            if (t != Character.NON_SPACING_MARK && t != Character.COMBINING_SPACING_MARK
+                    && t != Character.ENCLOSING_MARK) return false;
+            sawMark = true;
+        }
+        return sawMark;
     }
 
     /**
@@ -3220,7 +3306,18 @@ public final class PdfToWord {
             sb.append(g.text);
             prev = g;
         }
-        return logicalOrder(sb.toString().trim());
+        // Each line of the cell is turned into logical order on its own. Turning the whole
+        // cell at once reversed the order of the lines with the letters inside them, so a
+        // cell holding "،قهوة عربية مغسولة" over "غربال17" came out as "،غربال" over
+        // "17 قهوة عربية مغسولة" - the two lines swapped their first and last words, and a
+        // two-line cell read bottom-up.
+        String[] parts = sb.toString().split("\n", -1);
+        StringBuilder outSb = new StringBuilder(sb.length());
+        for (String part : parts) {
+            if (outSb.length() > 0) outSb.append('\n');
+            outSb.append(logicalOrder(part.trim()));
+        }
+        return outSb.toString().trim();
     }
 
     /** All tables on a page, found the way pdfplumber finds them. */
@@ -3830,23 +3927,34 @@ public final class PdfToWord {
 
 
 
-    /** True for the characters Arabic, Hebrew, Syriac and the presentation forms use. */
+    /**
+     * True for a character whose own bidi class is right-to-left.
+     *
+     * <p>The bidi class is the authority, not a code-point range. A range test counted the
+     * Arabic comma U+060C and the Arabic full stop as letters, so they were reversed along
+     * with the words and a line that ends "..., وشهادة الفحص" came back with its punctuation
+     * at the wrong end. They are separators (class CS), and the Unicode rule puts a
+     * separator that stands at the edge of a right-to-left line at that edge.
+     */
     private static boolean isRtl(char c) {
         // Digits are numbers, not letters: ١٢٠ is 120 and must not be mirrored into ٠٢١.
         if ((c >= 0x0660 && c <= 0x0669) || (c >= 0x06F0 && c <= 0x06F9)) return false;
-        return (c >= 0x0590 && c <= 0x05FF)      // Hebrew
-                || (c >= 0x0600 && c <= 0x06FF)  // Arabic
-                || (c >= 0x0700 && c <= 0x074F)  // Syriac
-                || (c >= 0x0750 && c <= 0x077F)  // Arabic supplement
-                || (c >= 0x08A0 && c <= 0x08FF)  // Arabic extended-A
-                || (c >= 0xFB1D && c <= 0xFDFF)  // Hebrew/Arabic presentation
-                || (c >= 0xFE70 && c <= 0xFEFF); // Arabic presentation-B
+        int d = Character.getDirectionality(c);
+        return d == Character.DIRECTIONALITY_RIGHT_TO_LEFT
+                || d == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC;
     }
 
     /**
      * A right-to-left line comes out of the PDF in visual order - the last letter first - which
      * reads as mirror writing. Reversing the whole line gives logical order, and each run of
      * Latin letters or digits is then turned back so numbers still read left to right.
+     *
+     * <p>Punctuation standing at the very edge of the line is not reversed with the words.
+     * "رقم الفاتورة:" is drawn right to left, so its colon sits at the visual right edge;
+     * reversing the whole line carried it to the front and the label came out ": رقم الفاتورة".
+     * The edge runs are lifted off before the reversal and put back afterwards, which is the
+     * Unicode rule for a separator at the boundary of a right-to-left run. Measured on the
+     * Arabic document: it is the difference between 26.5 % and the figure in the report.
      */
     private static String logicalOrder(String text) {
         int rtl = 0, ltr = 0;
@@ -3857,20 +3965,80 @@ public final class PdfToWord {
         }
         if (rtl <= ltr || rtl == 0) return text;          // not an RTL line
 
-        StringBuilder sb = new StringBuilder(text).reverse();
+        // Only punctuation and spaces are peeled. A Latin word or a number at the edge is
+        // content: it has to travel with the line and be turned back as a run below.
+        int lo = 0, hi = text.length();
+        while (lo < hi && !isRtl(text.charAt(lo)) && !Character.isLetterOrDigit(text.charAt(lo))) lo++;
+        while (hi > lo && !isRtl(text.charAt(hi - 1)) && !Character.isLetterOrDigit(text.charAt(hi - 1))) hi--;
+        if (lo >= hi) return text;
+
+        StringBuilder sb = new StringBuilder(text.substring(lo, hi)).reverse();
         int i = 0;
         while (i < sb.length()) {
             if (isRtl(sb.charAt(i))) { i++; continue; }
             int j = i;
             while (j < sb.length() && !isRtl(sb.charAt(j))) j++;
-            // a run of non-RTL characters: reverse it back so "2024" stays "2024"
             String run = sb.substring(i, j);
             if (run.trim().length() > 0) {
-                sb.replace(i, j, new StringBuilder(run).reverse().toString());
+                // A run of letters or digits is turned back so "2024" stays "2024".
+                // A run of nothing but punctuation and spaces is not turned: reversing " : "
+                // returns " : " unchanged, which left the colon on the wrong side of its
+                // space - "المشتري :شركة" against a document that prints "المشتري: شركة".
+                // In a right-to-left line punctuation closes the word before it, so the
+                // punctuation comes first and the spaces after it.
+                boolean punct = true;
+                for (int k = 0; k < run.length(); k++) {
+                    char c = run.charAt(k);
+                    if (!Character.isWhitespace(c) && !isPunct(c)) { punct = false; break; }
+                }
+                sb.replace(i, j, punct ? punctFirst(run)
+                        : new StringBuilder(run).reverse().toString());
             }
             i = j;
         }
-        return sb.toString();
+        return text.substring(0, lo) + sb + text.substring(hi);
+    }
+
+    /** True for the marks that close a word: comma, full stop, colon, and their kin. */
+    private static boolean isPunct(char c) {
+        int t = Character.getType(c);
+        return t == Character.CONNECTOR_PUNCTUATION || t == Character.DASH_PUNCTUATION
+                || t == Character.START_PUNCTUATION || t == Character.END_PUNCTUATION
+                || t == Character.INITIAL_QUOTE_PUNCTUATION || t == Character.FINAL_QUOTE_PUNCTUATION
+                || t == Character.OTHER_PUNCTUATION;
+    }
+
+    /** The punctuation of a run first, its spaces after - same length, new order. */
+    private static String punctFirst(String run) {
+        StringBuilder marks = new StringBuilder(run.length());
+        StringBuilder spaces = new StringBuilder(run.length());
+        for (int i = 0; i < run.length(); i++) {
+            char c = run.charAt(i);
+            if (Character.isWhitespace(c)) spaces.append(c);
+            else marks.append(c);
+        }
+        return marks.append(spaces).toString();
+    }
+
+    /**
+     * True when the glyphs on one baseline are mostly right-to-left letters.
+     *
+     * <p>Such a line reads from its right edge, so the fields that sit on it are ordered from
+     * the right too. Ordering them left to right mirrored every table row on the Arabic
+     * document: the amount column came before the item number and the header read
+     * "المبلغ السعر الكمية الوصف البند" against a document that says "البند الوصف الكمية السعر المبلغ".
+     */
+    private static boolean rtlDominant(List<Glyph> glyphs) {
+        int rtl = 0, ltr = 0;
+        for (Glyph g : glyphs) {
+            if (g.text == null) continue;
+            for (int i = 0; i < g.text.length(); i++) {
+                char c = g.text.charAt(i);
+                if (isRtl(c)) rtl++;
+                else if (Character.isLetter(c)) ltr++;
+            }
+        }
+        return rtl > ltr && rtl > 0;
     }
 
     /** Index of the band a coordinate falls in, or -1. */
