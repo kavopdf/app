@@ -165,6 +165,13 @@ public final class PdfToWord {
         public final List<List<Float>> cellX = new ArrayList<>();
         /** The typeface each cell was drawn in, same shape as {@link #rows}. */
         public final List<List<String>> fonts = new ArrayList<>();
+        /**
+         * The colour each cell's text was drawn in (0xRRGGBB, -1 for the default black), same
+         * shape as {@link #rows}. Without it every table cell reached Word in black: measured on
+         * the corpus, 37 of the 98 colour pairs the page-level pass had already found correctly
+         * were thrown away here, because a cell is written as a string and a font name.
+         */
+        public final List<List<Integer>> colors = new ArrayList<>();
         public boolean header;
         public float top, bottom, left, right;
         public int column;
@@ -849,6 +856,12 @@ public final class PdfToWord {
         int color = -1;
         /** True when the baseline is not horizontal - a rotated stamp, a seal, a watermark. */
         boolean rotated;
+        /** Page position from the text matrix, y downwards - the same space for every
+         *  direction. {@link #x}/{@link #y} are measured ALONG the baseline, so on a 90-degree
+         *  stamp they are not page coordinates and a colour cannot be matched to them. */
+        float px, py;
+        /** Unit vector along the baseline, in page space (y up). */
+        float dirx = 1f, diry = 0f;
     }
 
     private static final class GlyphCollector extends PDFTextStripper {
@@ -877,6 +890,11 @@ public final class PdfToWord {
             g.text = u;
             g.x = tp.getXDirAdj();
             g.y = tp.getYDirAdj();
+            g.px = tp.getX();
+            g.py = tp.getY();
+            double ang = Math.toRadians(tp.getDir());
+            g.dirx = (float) Math.cos(ang);
+            g.diry = (float) Math.sin(ang);
             g.width = tp.getWidthDirAdj();
             g.size = tp.getFontSizeInPt() > 0 ? tp.getFontSizeInPt() : tp.getFontSize();
             PDFont font = tp.getFont();
@@ -1037,86 +1055,347 @@ public final class PdfToWord {
      * for every glyph. PyMuPDF reads the real colours from the same file, so the information
      * is there - it just is not reachable through the stripper.
      *
-     * <p>So the content stream is walked here instead. The fill colour operators are tracked
-     * (rg, g, k), and every text-showing operator records the colour in force at the baseline
-     * it draws on. Each glyph then takes the colour of the nearest recorded baseline. That is
-     * enough because a colour change on a page happens between lines, not inside one.
+     * <p>So the content stream is walked here instead, as a stream of operators rather than as
+     * text matched by regular expressions. Three things the old regex walk could not see, each
+     * measured on the 80-document corpus:
+     *
+     * <ul>
+     *   <li>the CTM. A stamp drawn under {@code q ... cm BT ... Tj ET Q} records its colour at
+     *       coordinates in the untransformed space, so nothing lands near the glyphs. That is
+     *       every rotated stamp: 03, 04, 05, 60.</li>
+     *   <li>Form XObjects. {@code /fzFrm0 Do} draws the stamp's text from a separate stream the
+     *       page-level parse never opens - 12_stamp_across_page_break,
+     *       13_stamp_non_english, and a third XObject inside the second.</li>
+     *   <li>the glyph's page position. {@code TextPosition.getXDirAdj()/getYDirAdj()} are
+     *       measured ALONG the baseline, so for 90-degree text they are not page coordinates at
+     *       all; {@code getX()/getY()} are.</li>
+     * </ul>
+     *
+     * <p>A mark is recorded per text-showing operator, in page space, together with the unit
+     * vector of the baseline it draws on. A glyph then takes the colour of the nearest mark
+     * behind it on its own baseline, which is what "the colour in force" means: operators paint
+     * the text that follows them.
      */
     private static void applyColours(PDDocument doc, int index, List<Glyph> glyphs) {
         if (glyphs.isEmpty()) return;
+        ColourWalker walker = new ColourWalker();
         try {
             PDPage page = doc.getPage(index);
             java.io.InputStream in = page.getContents();
             if (in == null) return;
-            java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream();
-            byte[] buf = new byte[8192];
-            int n;
-            while ((n = in.read(buf)) > 0) bo.write(buf, 0, n);
-            in.close();
-            String cs = new String(bo.toByteArray(),
-                    java.nio.charset.StandardCharsets.ISO_8859_1);
-
-            List<float[]> marks = new ArrayList<>();   // {y, rgbPacked}
-            int cur = -1;
-            float y = 0f, x = 0f, lead = 0f;
-
-            java.util.regex.Matcher m = java.util.regex.Pattern.compile(
-                    "(?s)([-0-9.]+)\\s+([-0-9.]+)\\s+([-0-9.]+)\\s+rg"
-                  + "|([-0-9.]+)\\s+g(?![a-zA-Z])"
-                  + "|([-0-9.]+)\\s+([-0-9.]+)\\s+([-0-9.]+)\\s+([-0-9.]+)\\s+k"
-                  + "|([-0-9.]+)\\s+([-0-9.]+)\\s+T[dD]"
-                  + "|([-0-9.]+)\\s+TL"
-                  + "|(T\\*)|(BT)|(Tj|TJ)").matcher(cs);
-
-            while (m.find()) {
-                if (m.group(1) != null) {
-                    cur = packRgb(f(m.group(1)), f(m.group(2)), f(m.group(3)));
-                } else if (m.group(4) != null) {
-                    float v = f(m.group(4));
-                    int c = Math.round(Math.max(0f, Math.min(1f, v)) * 255f);
-                    cur = (c << 16) | (c << 8) | c;
-                } else if (m.group(5) != null) {
-                    float c = f(m.group(5)), mm = f(m.group(6)), yy = f(m.group(7));
-                    float kk = f(m.group(8));
-                    int r = Math.round(255f * (1f - Math.min(1f, c + kk)));
-                    int g2 = Math.round(255f * (1f - Math.min(1f, mm + kk)));
-                    int b = Math.round(255f * (1f - Math.min(1f, yy + kk)));
-                    cur = ((r & 0xFF) << 16) | ((g2 & 0xFF) << 8) | (b & 0xFF);
-                } else if (m.group(9) != null) {
-                    x += f(m.group(9));
-                    y += f(m.group(10));
-                } else if (m.group(11) != null) {
-                    lead = f(m.group(11));
-                } else if (m.group(12) != null) {
-                    y -= lead;
-                } else if (m.group(13) != null) {
-                    x = 0f; y = 0f;
-                } else if (m.group(14) != null) {
-                    marks.add(new float[]{y, x, cur});
-                }
-            }
-
-            if (marks.isEmpty()) return;
-            // PDF y grows upwards; the glyph y from the stripper grows downwards. Compare on
-            // the page height so the two agree.
-            float h = page.getMediaBox().getHeight();
+            walker.walk(readAll(in), page.getResources(), new float[]{1, 0, 0, 1, 0, 0}, 0);
+        } catch (Throwable ignored) {
+            return;
+        }
+        if (walker.marks.isEmpty()) return;
+        try {
+            // PDF y grows upwards; the glyph y from the stripper grows downwards.
+            float h = doc.getPage(index).getMediaBox().getHeight();
             for (Glyph g : glyphs) {
-                float wantY = h - g.y;
-                float wantX = g.x;
-                float best = Float.MAX_VALUE;
-                int colour = -1;
-                for (float[] mk : marks) {
-                    if (mk[2] < 0) continue;
-                    // Both axes, because a rotated stamp's text-showing operator sits at a
-                    // different y from the glyphs it draws - matching on y alone missed every
-                    // stamp colour on the page.
-                    float d = Math.abs(mk[0] - wantY) + Math.abs(mk[1] - wantX) * 0.25f;
-                    if (d < best) { best = d; colour = (int) mk[2]; }
-                }
-                if (colour > 0 && best < 60f) g.color = colour;
+                int colour = walker.colourAt(g.px, h - g.py, g.dirx, g.diry, g.size);
+                if (colour > 0) g.color = colour;
             }
         } catch (Throwable ignored) {
         }
+    }
+
+    /** One fill-colour change, in page space (y up), and the baseline it starts on. */
+    private static final class ColourMark {
+        final float x, y;      // page space, y up
+        final float ux, uy;    // unit vector along the baseline the operator draws on
+        final int rgb;
+
+        ColourMark(float x, float y, float ux, float uy, int rgb) {
+            this.x = x; this.y = y; this.ux = ux; this.uy = uy; this.rgb = rgb;
+        }
+    }
+
+    /**
+     * Walks a content stream - and every Form XObject it draws - recording each fill colour
+     * change against the page-space point the text that follows it starts from.
+     */
+    private static final class ColourWalker {
+        final List<ColourMark> marks = new ArrayList<>();
+        /** Form XObjects already visited, so a stream that draws itself cannot recurse for ever. */
+        private final java.util.Set<Object> seen =
+                java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<Object, Boolean>());
+        private static final int MAX_DEPTH = 8;
+        private static final Object DUMMY = new Object();
+
+        /** The colour a glyph at (gx, gy) - page space, y up - is drawn in, or -1. */
+        int colourAt(float gx, float gy, float dirx, float diry, float size) {
+            float tol = Math.max(2.5f, size * 0.45f);
+            ColourMark behind = null, ahead = null, loose = null;
+            float behindAlong = Float.MAX_VALUE, aheadAlong = Float.MAX_VALUE, looseDist = 60f;
+            for (ColourMark m : marks) {
+                if (m.rgb <= 0) continue;
+                float dot = m.ux * dirx + m.uy * diry;
+                float dx = gx - m.x, dy = gy - m.y;
+                if (dot > 0.9f) {
+                    // the mark draws on the same baseline: measure along it and across it
+                    float along = dx * dirx + dy * diry;
+                    float perp = -dx * diry + dy * dirx;
+                    if (Math.abs(perp) <= tol) {
+                        if (along >= -tol) {
+                            if (along < behindAlong) { behindAlong = along; behind = m; }
+                        } else if (-along < aheadAlong) {
+                            aheadAlong = -along; ahead = m;
+                        }
+                        continue;
+                    }
+                }
+                // nothing on this baseline: fall back to the nearest mark anywhere, as before
+                float d = Math.abs(dx) + Math.abs(dy) * 4f;
+                if (d < looseDist) { looseDist = d; loose = m; }
+            }
+            if (behind != null) return behind.rgb;
+            if (ahead != null) return ahead.rgb;
+            return loose == null ? -1 : loose.rgb;
+        }
+
+        void walk(String cs, PDResources res, float[] startCtm, int depth) {
+            float[] ctm = startCtm.clone();
+            ArrayList<float[]> stack = new ArrayList<>();
+            float[] tm = {1, 0, 0, 1, 0, 0};
+            float leading = 0f, charSpacing = 0f, wordSpacing = 0f, hScale = 1f;
+            int cur = -1;
+            String space = "";
+            ArrayList<Object> ops = new ArrayList<>();
+            int i = 0, n = cs.length();
+            while (i < n) {
+                char c = cs.charAt(i);
+                if (isWs(c)) { i++; continue; }
+                if (c == '%') { while (i < n && cs.charAt(i) != '\n' && cs.charAt(i) != '\r') i++; continue; }
+                if (c == '(') { i = skipString(cs, i); ops.add(DUMMY); continue; }
+                if (c == '<') {
+                    if (i + 1 < n && cs.charAt(i + 1) == '<') { i = skipDict(cs, i); }
+                    else { while (i < n && cs.charAt(i) != '>') i++; i++; }
+                    ops.add(DUMMY);
+                    continue;
+                }
+                if (c == '[') { i = skipArray(cs, i); ops.add(DUMMY); continue; }
+                if (c == ']' || c == '>' || c == '{' || c == '}') { i++; continue; }
+                if (c == '/') {
+                    int s = i + 1;
+                    i = s;
+                    while (i < n && !isDelim(cs.charAt(i))) i++;
+                    ops.add(cs.substring(s, i));
+                    continue;
+                }
+                int s = i;
+                while (i < n && !isDelim(cs.charAt(i))) i++;
+                if (i == s) { i++; continue; }
+                String tok = cs.substring(s, i);
+                float num;
+                try {
+                    num = Float.parseFloat(tok);
+                } catch (Exception notANumber) {
+                    if (tok.equals("BI")) { i = skipInlineImage(cs, i); ops.clear(); continue; }
+                    String name = ops.isEmpty() ? "" : (ops.get(ops.size() - 1) instanceof String
+                            ? (String) ops.get(ops.size() - 1) : "");
+                    if (tok.equals("q")) {
+                        stack.add(ctm.clone());
+                    } else if (tok.equals("Q")) {
+                        if (!stack.isEmpty()) ctm = stack.remove(stack.size() - 1);
+                    } else if (tok.equals("cm") && ops.size() >= 6) {
+                        ctm = mul(new float[]{num(ops, -6), num(ops, -5), num(ops, -4),
+                                num(ops, -3), num(ops, -2), num(ops, -1)}, ctm);
+                    } else if (tok.equals("BT")) {
+                        tm = new float[]{1, 0, 0, 1, 0, 0};
+                    } else if (tok.equals("Td") || tok.equals("TD")) {
+                        float tx = num(ops, -2), ty = num(ops, -1);
+                        if (tok.equals("TD")) leading = -ty;
+                        tm = mul(new float[]{1, 0, 0, 1, tx, ty}, tm);
+                    } else if (tok.equals("Tm") && ops.size() >= 6) {
+                        tm = new float[]{num(ops, -6), num(ops, -5), num(ops, -4),
+                                num(ops, -3), num(ops, -2), num(ops, -1)};
+                    } else if (tok.equals("TL")) {
+                        leading = num(ops, -1);
+                    } else if (tok.equals("Tc")) {
+                        charSpacing = num(ops, -1);
+                    } else if (tok.equals("Tw")) {
+                        wordSpacing = num(ops, -1);
+                    } else if (tok.equals("Tz")) {
+                        hScale = num(ops, -1) / 100f;
+                    } else if (tok.equals("T*")) {
+                        tm = mul(new float[]{1, 0, 0, 1, 0, -leading}, tm);
+                    } else if (tok.equals("'")) {
+                        tm = mul(new float[]{1, 0, 0, 1, 0, -leading}, tm);
+                        addMark(tm, ctm, cur);
+                    } else if (tok.equals("\"")) {
+                        if (ops.size() >= 3) { wordSpacing = num(ops, -3); charSpacing = num(ops, -2); }
+                        tm = mul(new float[]{1, 0, 0, 1, 0, -leading}, tm);
+                        addMark(tm, ctm, cur);
+                    } else if (tok.equals("Tj") || tok.equals("TJ")) {
+                        addMark(tm, ctm, cur);
+                    } else if (tok.equals("rg") && ops.size() >= 3) {
+                        cur = packRgb(num(ops, -3), num(ops, -2), num(ops, -1));
+                    } else if (tok.equals("g") && ops.size() >= 1) {
+                        cur = grey(num(ops, -1));
+                    } else if (tok.equals("k") && ops.size() >= 4) {
+                        cur = cmyk(num(ops, -4), num(ops, -3), num(ops, -2), num(ops, -1));
+                    } else if (tok.equals("cs")) {
+                        space = name;
+                    } else if ((tok.equals("sc") || tok.equals("scn")) && !ops.isEmpty()) {
+                        // A pattern name instead of components: leave the colour alone.
+                        int count = 0;
+                        for (Object o : ops) if (o instanceof Float) count++;
+                        if (count == 1) cur = grey(num(ops, -1));
+                        else if (count == 3) cur = packRgb(num(ops, -3), num(ops, -2), num(ops, -1));
+                        else if (count == 4) cur = cmyk(num(ops, -4), num(ops, -3), num(ops, -2), num(ops, -1));
+                    } else if (tok.equals("Do")) {
+                        draw(name, res, ctm, depth);
+                    }
+                    ops.clear();
+                    continue;
+                }
+                ops.add(num);
+            }
+        }
+
+        /** Records the colour in force at the origin of {@code tm}, transformed by {@code ctm}. */
+        private void addMark(float[] tm, float[] ctm, int rgb) {
+            if (rgb <= 0) return;
+            float tx = tm[4], ty = tm[5];
+            float px = tx * ctm[0] + ty * ctm[2] + ctm[4];
+            float py = tx * ctm[1] + ty * ctm[3] + ctm[5];
+            float ux = tm[0] * ctm[0] + tm[1] * ctm[2];
+            float uy = tm[0] * ctm[1] + tm[1] * ctm[3];
+            float len = (float) Math.hypot(ux, uy);
+            if (len < 1e-6f) { ux = 1f; uy = 0f; } else { ux /= len; uy /= len; }
+            marks.add(new ColourMark(px, py, ux, uy, rgb));
+        }
+
+        /** Follows {@code /Name Do} into a Form XObject and reads its stream the same way. */
+        private void draw(String name, PDResources res, float[] ctm, int depth) {
+            if (depth >= MAX_DEPTH || res == null || name.isEmpty()) return;
+            try {
+                com.tom_roush.pdfbox.pdmodel.graphics.PDXObject xo =
+                        res.getXObject(com.tom_roush.pdfbox.cos.COSName.getPDFName(name));
+                if (!(xo instanceof com.tom_roush.pdfbox.pdmodel.graphics.form.PDFormXObject)) return;
+                com.tom_roush.pdfbox.pdmodel.graphics.form.PDFormXObject form =
+                        (com.tom_roush.pdfbox.pdmodel.graphics.form.PDFormXObject) xo;
+                com.tom_roush.pdfbox.pdmodel.common.PDStream stream = form.getStream();
+                if (stream == null || !seen.add(stream.getCOSObject())) return;
+                float[] m = {1, 0, 0, 1, 0, 0};
+                try {
+                    com.tom_roush.pdfbox.util.Matrix mm = form.getMatrix();
+                    if (mm != null) {
+                        m[0] = mm.getValue(0, 0); m[1] = mm.getValue(1, 0);
+                        m[2] = mm.getValue(0, 1); m[3] = mm.getValue(1, 1);
+                        m[4] = mm.getValue(2, 0); m[5] = mm.getValue(2, 1);
+                    }
+                } catch (Throwable ignored) {
+                }
+                PDResources inner = form.getResources();
+                if (inner == null) inner = res;
+                walk(readAll(stream.createInputStream()), inner, mul(m, ctm), depth + 1);
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
+    /** {@code m} applied first, then {@code n}. */
+    private static float[] mul(float[] m, float[] n) {
+        return new float[]{
+                m[0] * n[0] + m[1] * n[2],
+                m[0] * n[1] + m[1] * n[3],
+                m[2] * n[0] + m[3] * n[2],
+                m[2] * n[1] + m[3] * n[3],
+                m[4] * n[0] + m[5] * n[2] + n[4],
+                m[4] * n[1] + m[5] * n[3] + n[5]};
+    }
+
+    private static float num(List<Object> ops, int fromEnd) {
+        int i = ops.size() + fromEnd;
+        if (i < 0 || i >= ops.size()) return 0f;
+        Object o = ops.get(i);
+        return o instanceof Float ? (Float) o : 0f;
+    }
+
+    private static boolean isWs(char c) {
+        return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '\f' || c == '\0';
+    }
+
+    private static boolean isDelim(char c) {
+        return isWs(c) || c == '(' || c == ')' || c == '<' || c == '>' || c == '['
+                || c == ']' || c == '{' || c == '}' || c == '/' || c == '%';
+    }
+
+    /** Skips a literal string, honouring backslash escapes and nested parentheses. */
+    private static int skipString(String s, int i) {
+        int depth = 0;
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (c == '\\') { i += 2; continue; }
+            if (c == '(') depth++;
+            else if (c == ')') { depth--; if (depth == 0) return i + 1; }
+            i++;
+        }
+        return i;
+    }
+
+    private static int skipDict(String s, int i) {
+        int depth = 0;
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (c == '<' && i + 1 < s.length() && s.charAt(i + 1) == '<') { depth++; i += 2; continue; }
+            if (c == '>' && i + 1 < s.length() && s.charAt(i + 1) == '>') {
+                depth--;
+                i += 2;
+                if (depth == 0) return i;
+                continue;
+            }
+            i++;
+        }
+        return i;
+    }
+
+    private static int skipArray(String s, int i) {
+        int depth = 0;
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (c == '[') depth++;
+            else if (c == ']') { depth--; if (depth == 0) return i + 1; }
+            i++;
+        }
+        return i;
+    }
+
+    /** Skips the binary payload of an inline image: {@code BI ... ID <bytes> EI}. */
+    private static int skipInlineImage(String s, int i) {
+        int id = s.indexOf("ID", i);
+        if (id < 0) return s.length();
+        int p = id + 2;
+        while (p < s.length() - 1) {
+            if (s.charAt(p) == 'E' && s.charAt(p + 1) == 'I'
+                    && isWs(s.charAt(p - 1)) && (p + 2 >= s.length() || isDelim(s.charAt(p + 2)))) {
+                return p + 2;
+            }
+            p++;
+        }
+        return s.length();
+    }
+
+    private static String readAll(java.io.InputStream in) throws java.io.IOException {
+        java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream();
+        byte[] buf = new byte[8192];
+        int n;
+        while ((n = in.read(buf)) > 0) bo.write(buf, 0, n);
+        in.close();
+        return new String(bo.toByteArray(), java.nio.charset.StandardCharsets.ISO_8859_1);
+    }
+
+    private static int grey(float v) {
+        int c = Math.round(Math.max(0f, Math.min(1f, v)) * 255f);
+        return (c << 16) | (c << 8) | c;
+    }
+
+    private static int cmyk(float c, float m, float y, float k) {
+        int r = Math.round(255f * (1f - Math.min(1f, c + k)));
+        int g2 = Math.round(255f * (1f - Math.min(1f, m + k)));
+        int b = Math.round(255f * (1f - Math.min(1f, y + k)));
+        return ((r & 0xFF) << 16) | ((g2 & 0xFF) << 8) | (b & 0xFF);
     }
 
     private static float f(String s) {
@@ -2445,16 +2724,19 @@ public final class PdfToWord {
             List<String> row = new ArrayList<>();
             List<String> rowFonts = new ArrayList<>();
             List<Float> rowXs = new ArrayList<>();
+            List<Integer> rowCols = new ArrayList<>();
             for (int c = 0; c < ncol; c++) {
                 String str = glyphText(buckets.get(r).get(c));
                 if (!str.isEmpty()) filled++;
                 row.add(str);
                 rowFonts.add(fontOf(buckets.get(r).get(c)));
                 rowXs.add(glyphFirstX(buckets.get(r).get(c)));
+                rowCols.add(colorOf(buckets.get(r).get(c)));
             }
             t.rows.add(row);
             t.fonts.add(rowFonts);
             t.cellX.add(rowXs);
+            t.colors.add(rowCols);
         }
         // A QR code, a logo or a chart is drawn from the same rectangles a table is, so the
         // cells are real but the words are not there. A real table has text in a good share of
@@ -2517,6 +2799,14 @@ public final class PdfToWord {
     }
 
     /** The typeface the first drawn glyph of a cell carries; empty when the page did not say. */
+    /** The colour of the first glyph that draws something, or -1 for the default black. */
+    private static int colorOf(List<Glyph> gs) {
+        for (Glyph g : gs) {
+            if (g.text != null && !g.text.trim().isEmpty()) return g.color;
+        }
+        return -1;
+    }
+
     private static String fontOf(List<Glyph> gs) {
         for (Glyph g : gs) if (g.font != null && !g.font.isEmpty()) return g.font;
         return "";
@@ -2893,6 +3183,8 @@ public final class PdfToWord {
         for (int r = from; r < to; r++) {
             String[] line = new String[columns.size()];
             String[] lineFonts = new String[columns.size()];
+            int[] lineCols = new int[columns.size()];
+            java.util.Arrays.fill(lineCols, -1);
             float[] lineX = new float[columns.size()];
             java.util.Arrays.fill(lineX, Float.NaN);
             for (Line cell : rows.get(r)) {
@@ -2904,7 +3196,10 @@ public final class PdfToWord {
                 }
                 if (Float.isNaN(lineX[best])) lineX[best] = visibleX(cell.glyphs, cell.x);
                 line[best] = line[best] == null ? cell.text.trim() : line[best] + " " + cell.text.trim();
-                if (lineFonts[best] == null) lineFonts[best] = fontOf(cell.glyphs);
+                if (lineFonts[best] == null) {
+                    lineFonts[best] = fontOf(cell.glyphs);
+                    lineCols[best] = colorOf(cell.glyphs);
+                }
                 bottom = Math.max(bottom, cell.y);
                 left = Math.min(left, cell.x);
                 right = Math.max(right, cell.right);
@@ -2913,12 +3208,15 @@ public final class PdfToWord {
             List<String> texts = new ArrayList<>();
             List<String> textFonts = new ArrayList<>();
             List<Float> textXs = new ArrayList<>();
+            List<Integer> textCols = new ArrayList<>();
             for (String cell : line) texts.add(cell == null ? "" : cell);
             for (String f : lineFonts) textFonts.add(f == null ? "" : f);
             for (float x : lineX) textXs.add(x);
+            for (int c = 0; c < lineCols.length; c++) textCols.add(lineCols[c]);
             t.rows.add(texts);
             t.fonts.add(textFonts);
             t.cellX.add(textXs);
+            t.colors.add(textCols);
         }
         t.bottom = bottom;
         float[] cx2 = new float[columns.size() + 1];

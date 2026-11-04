@@ -476,6 +476,16 @@ public final class DocxWriter {
                                 .append("\" w:hAnsi=\"").append(f)
                                 .append("\" w:cs=\"").append(f).append("\"/>");
                     }
+                    // The colour the page drew this cell in. A cell is written as a string and
+                    // a font name, so without this every coloured table - a grey label column,
+                    // a navy header row - arrived in black.
+                    if (r < t.colors.size() && c < t.colors.get(r).size()) {
+                        int cellColor = t.colors.get(r).get(c);
+                        if (cellColor >= 0) {
+                            inner.append(String.format("<w:color w:val=\"%06X\"/>",
+                                    cellColor & 0xFFFFFF));
+                        }
+                    }
                     if (r == 0 && t.header) inner.append("<w:b/>");
                     inner.append("</w:rPr><w:t xml:space=\"preserve\">").append(esc(cell))
                             .append("</w:t></w:r>");
