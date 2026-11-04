@@ -350,9 +350,11 @@ public final class PdfToWord {
         for (Float x : columnStarts(rawLines)) {
             boolean inTable = false;
             for (Table t : firstPass) {
+                if (!rowSane(t, rawLines)) continue;
                 if (x >= t.left - 4 && x <= t.right + 4) { inTable = true; break; }
             }
             for (Table t : rowPass) {
+                if (!rowSane(t, rawLines)) continue;
                 if (x >= t.left - 4 && x <= t.right + 4) { inTable = true; break; }
             }
             if (!inTable) starts.add(x);
@@ -488,6 +490,36 @@ public final class PdfToWord {
                 if (keep.size() >= 1 && keep.size() <= 2) { starts.clear(); starts.addAll(keep); }
             }
         }
+        if (Boolean.getBoolean("p2w.nocol")) starts.clear();
+        // A gutter is not always empty space. A journal page separates its two columns with a
+        // hairline rule and sets the text right up to it, so the projection above sees no gap
+        // at all - the columns butt against the rule - and the page came out with no columns,
+        // interleaving the two of them line by line. The rule itself is the evidence.
+        if (!rules.vertical.isEmpty()) {
+            float cLo = Float.MAX_VALUE, cHi = -Float.MAX_VALUE;
+            for (Line l : rawLines) {
+                if (l.text.trim().isEmpty() || l.right <= l.x) continue;
+                cLo = Math.min(cLo, l.x);
+                cHi = Math.max(cHi, l.right);
+            }
+            List<Float> ruleGutters = new ArrayList<>();
+            for (float[] v : rules.vertical) {
+                float len = Math.abs(v[2] - v[1]);
+                if (len < pageHeight * 0.30f) continue;
+                float x = v[0];
+                if (x <= cLo + 60f || x >= cHi - 60f) continue;
+                boolean inTable = false;
+                for (Table t : firstPass) {
+                    if (!rowSane(t, rawLines)) continue;
+                    if (x >= t.left - 4 && x <= t.right + 4) { inTable = true; break; }
+                }
+                if (!inTable) ruleGutters.add(x);
+            }
+            if (ruleGutters.size() == 1) { starts.clear(); starts.add(ruleGutters.get(0)); }
+            else if (ruleGutters.size() == 2 && starts.isEmpty()) {
+                starts.clear(); starts.addAll(ruleGutters);
+            }
+        }
         List<Line> lines = toLines(glyphs, asBands(starts));
 
         // Rules come from the graphics engine with y measured up from the page bottom; glyphs
@@ -576,7 +608,13 @@ public final class PdfToWord {
                     if (hit) { covered++; break; }
                 }
             }
-            if (inside == 0 || covered * 100 / inside >= 60) solid.add(t);
+            // A table row is a baseline. A two-column page's gutter rule plus its header and
+            // footer rules form a rectangle that encloses the whole page, and the "table"
+            // built from it put a whole column of prose into one cell: the abstract-spanning
+            // journal page came out as four lines instead of thirty-nine. Counting baselines
+            // against rows catches that - a real table has about one baseline per row, a
+            // whole-page false one has thirty baselines and three rows.
+            if ((inside == 0 || covered * 100 / inside >= 60) && rowSane(t, lines)) solid.add(t);
             else for (Line line : lines) if (line.inside(t)) line.consumed = false;
         }
         tables = solid;
@@ -762,6 +800,39 @@ public final class PdfToWord {
         return page;
     }
 
+
+    /**
+     * A table row is a baseline, so a real table has about one baseline of text per row.
+     *
+     * <p>A two-column page draws its gutter as a vertical rule and often draws a rule under the
+     * masthead and one above the folio. Those three rules enclose the whole page, and the table
+     * built from them is a rectangle with two columns and three rows - into which every line of
+     * the page falls. The coverage test above then passes trivially, because one cell holding a
+     * whole column of prose contains every line in it. The journal page with an abstract
+     * spanning both columns came out as four lines instead of thirty-nine this way.
+     *
+     * <p>Thirty baselines under three rows is not a table. The same rectangle also suppressed
+     * the gutter as a column start, so the page lost its columns as well as its rows.
+     */
+    private static boolean rowSane(Table t, List<Line> lines) {
+        if (t.rows == null || t.rows.isEmpty()) return true;
+        int rowsN = t.rows.size();
+        int worst = 0;
+        for (List<String> row : t.rows) {
+            for (String raw : row) {
+                String c = raw.trim().replaceAll("\\s+", " ");
+                if (c.length() < 12) continue;
+                int n = 0;
+                for (Line line : lines) {
+                    if (!line.inside(t)) continue;
+                    String norm = line.text.trim().replaceAll("\\s+", " ");
+                    if (norm.length() > 3 && c.contains(norm)) n++;
+                }
+                if (n > worst) worst = n;
+            }
+        }
+        return worst <= Math.max(6, rowsN * 2);
+    }
 
     private static float topOf(Object o) {
         return o instanceof Para ? ((Para) o).top : ((Table) o).top;
