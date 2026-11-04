@@ -713,6 +713,8 @@ public final class PdfToWord {
         boolean bold, italic;
         /** Colour as 0xRRGGBB, or -1 when the page draws it in the default black. */
         int color = -1;
+        /** True when the baseline is not horizontal - a rotated stamp, a seal, a watermark. */
+        boolean rotated;
     }
 
     private static final class GlyphCollector extends PDFTextStripper {
@@ -749,6 +751,18 @@ public final class PdfToWord {
             g.bold = n.contains("bold") || n.contains("black") || n.contains("heavy")
                     || n.contains("semibold") || n.contains("demi");
             g.italic = n.contains("italic") || n.contains("oblique");
+            // A non-horizontal baseline. getDir() is the angle in degrees; the text matrix
+            // shear catches stamps whose glyphs are placed individually, where getDir()
+            // sometimes reports 0 because each glyph carries its own horizontal matrix.
+            try {
+                if (Math.abs(tp.getDir()) > 0.5f) {
+                    g.rotated = true;
+                } else {
+                    com.tom_roush.pdfbox.util.Matrix tm = tp.getTextMatrix();
+                    if (tm != null && Math.abs(tm.getShearY()) > 0.02f) g.rotated = true;
+                }
+            } catch (Throwable ignored) {
+            }
             out.add(g);
         }
     }
@@ -1025,6 +1039,18 @@ public final class PdfToWord {
         /** True when this line was cut out of a longer one at a wide gap: it is its own line
          *  and must never be merged back into the paragraph above it. */
         boolean hardEnd;
+        /**
+         * True when every glyph on this line sits on a non-horizontal baseline - a rotated
+         * stamp, a seal, a watermark.
+         *
+         * <p>A stamp is drawn over the page, not in its grid. When its characters were offered
+         * to the table builder along with everything else, a stamp lying across the lower rows
+         * broke the cell structure badly enough that the table was not emitted at all: measured
+         * on the 39 documents carrying a stamp or a table, 8 of 25 tables were missing and
+         * every one of those 8 was a stamped document. The line still appears in the output -
+         * it is only kept out of the grid.
+         */
+        boolean rotated;
 
         boolean inside(Table t) {
             float cx = (x + right) / 2f;
@@ -1103,6 +1129,13 @@ public final class PdfToWord {
             if (left >= iv.size() * 0.10f && right >= iv.size() * 0.10f) keep.add(mid);
         }
         return keep;
+    }
+
+    /** True when every glyph in this run is drawn on a non-horizontal baseline. */
+    private static boolean allRotated(List<Glyph> run) {
+        if (run.isEmpty()) return false;
+        for (Glyph g : run) if (!g.rotated) return false;
+        return true;
     }
 
     private static List<Line> toLines(List<Glyph> glyphs, List<float[]> gutters) {
@@ -1213,6 +1246,7 @@ public final class PdfToWord {
                 for (Glyph g : segment) right = Math.max(right, g.x + g.width);
                 line.right = right;
                 line.left = line.x;
+                line.rotated = allRotated(segment);
                 split.add(line);
             }
         }
@@ -2313,6 +2347,10 @@ public final class PdfToWord {
      */
     private static List<Table> buildTables(Rules rules, List<Line> lines, float pageWidth) {
         List<Table> out = new ArrayList<>();
+        // A stamp is not a table row. Its characters are drawn over the grid, not in it.
+        List<Line> uprightLines = new ArrayList<>(lines.size());
+        for (Line ln : lines) if (!ln.rotated) uprightLines.add(ln);
+        lines = uprightLines;
 
         // Short segments are decoration, not edges: a signature squiggle is a hundred 2 pt
         // strokes, and every one of them used to become a column.
@@ -2441,6 +2479,9 @@ public final class PdfToWord {
      * why a missing value leaves a gap in the right place instead of shifting the row.
      */
     private static List<Table> rowTables(List<Line> rawLines, List<Table> ruled, float pageWidth) {
+        List<Line> keep = new ArrayList<>(rawLines.size());
+        for (Line ln : rawLines) if (!ln.rotated) keep.add(ln);
+        rawLines = keep;
         List<Table> out = new ArrayList<>();
         if (rawLines.size() < 3) return out;
 
