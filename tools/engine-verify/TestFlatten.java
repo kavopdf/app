@@ -51,7 +51,9 @@ public class TestFlatten {
         // ---- 2. now flatten the same file ----
         File flat = new File(dir, "flat_out.pdf");
         try (PDDocument d = PDDocument.load(filled)) {
-            d.getDocumentCatalog().getAcroForm().flatten();
+            if (d.getDocumentCatalog().getAcroForm() != null) {
+                d.getDocumentCatalog().getAcroForm().flatten();
+            }
             d.save(flat);
         }
         System.out.println("\nafter flatten():");
@@ -62,6 +64,19 @@ public class TestFlatten {
         System.out.println("\n" + (pass ? "FLATTEN: PASS - the value is in the page content now"
                                          : "FLATTEN: FAIL"));
         if (!pass) System.exit(1);
+
+        // the value must be on the page exactly once, and the form gone
+        try (PDDocument d = PDDocument.load(filled)) {
+            boolean noForm = d.getDocumentCatalog().getAcroForm() == null;
+            String content = pageText(filled);
+            int n = 0, i = 0;
+            while ((i = content.indexOf("jalalpur", i)) >= 0) { n++; i += 8; }
+            boolean ok = n == 1 && noForm;
+            System.out.println("\n  value drawn on the page : " + n + " time(s)  (must be 1)");
+            System.out.println("  AcroForm removed        : " + noForm);
+            System.out.println("\n" + (ok ? "SINGLE COPY: PASS" : "SINGLE COPY: FAIL"));
+            if (!ok) System.exit(1);
+        }
     }
 
     static String pageText(File f) throws Exception {

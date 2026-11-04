@@ -203,8 +203,12 @@ public class TestEngine {
     File filled = new File(W, "filled.pdf");
     Map<String, String> vals = new HashMap<>(); vals.put("name", "Ravi Kumar");
     PdfEngine.fillForm(form, vals, filled);
-    List<PdfEngine.FormField> after = PdfEngine.listFormFields(filled);
-    check("form value set", after.size() == 1 && "Ravi Kumar".equals(after.get(0).value));
+    // fillForm flattens: the value is drawn onto the page and the interactive form is
+    // dropped, because leaving it in place made every viewer draw the value a second time
+    // (a viewer rebuilds an appearance from /V). So the value is checked where it lives
+    // now - on the page - and the form is expected to be gone.
+    check("form is flat after filling", PdfEngine.listFormFields(filled).isEmpty());
+    check("form value on the page", pageTextHas(filled, "Ravi Kumar"));
 
 
     System.out.println("== unlock variants ==");
@@ -421,4 +425,21 @@ public class TestEngine {
     d.close();
     return out;
   }
+
+    /** True when the page content stream contains this text. */
+    static boolean pageTextHas(File f, String want) {
+        try (PDDocument d = PDDocument.load(f)) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < d.getNumberOfPages(); i++) {
+                java.io.InputStream in = d.getPage(i).getContents();
+                java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream();
+                byte[] b = new byte[8192]; int n;
+                while ((n = in.read(b)) > 0) bo.write(b, 0, n);
+                sb.append(new String(bo.toByteArray(), "ISO-8859-1"));
+            }
+            return sb.toString().contains(want);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
