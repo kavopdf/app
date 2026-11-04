@@ -112,6 +112,8 @@ public final class PdfToWord {
     /** A table, as the cells a reader sees. */
     public static final class Table {
         public final List<List<String>> rows = new ArrayList<>();
+        /** The typeface each cell was drawn in, same shape as {@link #rows}. */
+        public final List<List<String>> fonts = new ArrayList<>();
         public boolean header;
         public float top, bottom, left, right;
         public int column;
@@ -2232,12 +2234,15 @@ public final class PdfToWord {
         int filled = 0;
         for (int r = 0; r < nrow; r++) {
             List<String> row = new ArrayList<>();
+            List<String> rowFonts = new ArrayList<>();
             for (int c = 0; c < ncol; c++) {
                 String str = glyphText(buckets.get(r).get(c));
                 if (!str.isEmpty()) filled++;
                 row.add(str);
+                rowFonts.add(fontOf(buckets.get(r).get(c)));
             }
             t.rows.add(row);
+            t.fonts.add(rowFonts);
         }
         // A QR code, a logo or a chart is drawn from the same rectangles a table is, so the
         // cells are real but the words are not there. A real table has text in a good share of
@@ -2258,6 +2263,12 @@ public final class PdfToWord {
             }
         }
         return t;
+    }
+
+    /** The typeface the first drawn glyph of a cell carries; empty when the page did not say. */
+    private static String fontOf(List<Glyph> gs) {
+        for (Glyph g : gs) if (g.font != null && !g.font.isEmpty()) return g.font;
+        return "";
     }
 
     /** Join a cell's glyphs into one string, in reading order. */
@@ -2415,6 +2426,7 @@ public final class PdfToWord {
             if (rows < 1 || cols < 2 || rows > 400 || cols > 40) continue;
 
             String[][] cells = new String[rows][cols];
+            String[][] faces = new String[rows][cols];
             for (Line line : lines) {
                 float cx = (line.x + line.right) / 2f;
                 int r = band(ys, line.y);
@@ -2422,6 +2434,7 @@ public final class PdfToWord {
                 if (r < 0 || c < 0) continue;
                 cells[r][c] = cells[r][c] == null
                         ? line.text.trim() : cells[r][c] + " " + line.text.trim();
+                if (faces[r][c] == null) faces[r][c] = fontOf(line.glyphs);
             }
 
             int filled = 0;
@@ -2443,10 +2456,15 @@ public final class PdfToWord {
             if (keep.size() < 2) continue;
             if (keep.size() < cols) {
                 String[][] trimmed = new String[rows][keep.size()];
+                String[][] trimmedFaces = new String[rows][keep.size()];
                 for (int r = 0; r < rows; r++) {
-                    for (int k = 0; k < keep.size(); k++) trimmed[r][k] = cells[r][keep.get(k)];
+                    for (int k = 0; k < keep.size(); k++) {
+                        trimmed[r][k] = cells[r][keep.get(k)];
+                        trimmedFaces[r][k] = faces[r][keep.get(k)];
+                    }
                 }
                 cells = trimmed;
+                faces = trimmedFaces;
                 cols = keep.size();
             }
 
@@ -2458,8 +2476,13 @@ public final class PdfToWord {
             t.header = rows > 1;
             for (int r = 0; r < rows; r++) {
                 List<String> row = new ArrayList<>();
-                for (int c = 0; c < cols; c++) row.add(cells[r][c] == null ? "" : cells[r][c]);
+                List<String> rowFonts = new ArrayList<>();
+                for (int c = 0; c < cols; c++) {
+                    row.add(cells[r][c] == null ? "" : cells[r][c]);
+                    rowFonts.add(faces[r][c] == null ? "" : faces[r][c]);
+                }
                 t.rows.add(row);
+                t.fonts.add(rowFonts);
             }
             out.add(t);
         }
@@ -2598,6 +2621,7 @@ public final class PdfToWord {
         float bottom = t.top, left = Float.MAX_VALUE, right = 0;
         for (int r = from; r < to; r++) {
             String[] line = new String[columns.size()];
+            String[] lineFonts = new String[columns.size()];
             for (Line cell : rows.get(r)) {
                 int best = 0;
                 float bestDistance = Float.MAX_VALUE;
@@ -2606,14 +2630,18 @@ public final class PdfToWord {
                     if (d < bestDistance) { bestDistance = d; best = c; }
                 }
                 line[best] = line[best] == null ? cell.text.trim() : line[best] + " " + cell.text.trim();
+                if (lineFonts[best] == null) lineFonts[best] = fontOf(cell.glyphs);
                 bottom = Math.max(bottom, cell.y);
                 left = Math.min(left, cell.x);
                 right = Math.max(right, cell.right);
                 cell.consumed = true;
             }
             List<String> texts = new ArrayList<>();
+            List<String> textFonts = new ArrayList<>();
             for (String cell : line) texts.add(cell == null ? "" : cell);
+            for (String f : lineFonts) textFonts.add(f == null ? "" : f);
             t.rows.add(texts);
+            t.fonts.add(textFonts);
         }
         t.bottom = bottom;
         t.left = left;

@@ -199,13 +199,27 @@ public final class DocxWriter {
             sb.append("<w:tr>");
             for (int c = 0; c < cols; c++) {
                 String cell = c < row.size() ? row.get(c) : "";
+                String face = r < t.fonts.size() && c < t.fonts.get(r).size()
+                        ? t.fonts.get(r).get(c) : "";
                 sb.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(width).append("\" w:type=\"dxa\"/>")
                         .append("</w:tcPr><w:p><w:pPr><w:pStyle w:val=\"TableText\"/></w:pPr>");
                 if (r == 0 && t.header && !cell.isEmpty()) {
-                    sb.append("<w:r><w:rPr><w:b/></w:rPr><w:t xml:space=\"preserve\">")
+                    sb.append("<w:r><w:rPr>");
+                    if (!face.isEmpty()) {
+                        sb.append("<w:rFonts w:ascii=\"").append(esc(face))
+                                .append("\" w:hAnsi=\"").append(esc(face))
+                                .append("\" w:cs=\"").append(esc(face)).append("\"/>");
+                    }
+                    sb.append("<w:b/></w:rPr><w:t xml:space=\"preserve\">")
                             .append(esc(cell)).append("</w:t></w:r>");
                 } else if (!cell.isEmpty()) {
-                    sb.append("<w:r><w:t xml:space=\"preserve\">").append(esc(cell))
+                    sb.append("<w:r>");
+                    if (!face.isEmpty()) {
+                        sb.append("<w:rPr><w:rFonts w:ascii=\"").append(esc(face))
+                                .append("\" w:hAnsi=\"").append(esc(face))
+                                .append("\" w:cs=\"").append(esc(face)).append("\"/></w:rPr>");
+                    }
+                    sb.append("<w:t xml:space=\"preserve\">").append(esc(cell))
                             .append("</w:t></w:r>");
                 }
                 sb.append("</w:p></w:tc>");
