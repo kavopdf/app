@@ -1176,28 +1176,6 @@ public final class PdfEngine {
             // here, and any field still without a visible appearance gets its text
             // drawn onto the page directly.
             paintMissingValues(d, form, values);
-            // Every value is now on the page, so the interactive form has nothing left to
-            // draw - and leaving it in place is what made values appear twice. Measured with
-            // pdftotext: the page content held the value once, and the widget held it again,
-            // because a viewer rebuilds an appearance from /V.
-            //
-            // Dropping the appearance stream was not enough. Removing the widget from the
-            // page's /Annots was not enough either, because a viewer also reaches the fields
-            // through the AcroForm /Fields array. Removing both keys at the COS level is the
-            // only form every reader honours.
-            //
-            // The output is a flat form. It already was in practice: once the value is drawn
-            // onto the page, editing the field elsewhere would leave the old text behind, so
-            // the half-flattened state was the worst of both.
-            try {
-                for (int i = 0; i < d.getNumberOfPages(); i++) {
-                    d.getPage(i).getCOSObject()
-                     .removeItem(com.tom_roush.pdfbox.cos.COSName.ANNOTS);
-                }
-                d.getDocumentCatalog().getCOSObject()
-                 .removeItem(com.tom_roush.pdfbox.cos.COSName.ACRO_FORM);
-            } catch (Throwable ignored) {
-            }
             d.save(out);
         }
     }
