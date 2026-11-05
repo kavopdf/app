@@ -3848,8 +3848,12 @@ public final class PdfToWord {
             // A table's own box is measured down from the top of the page, so the test is
             // made in that space - the shape is converted to it here and stored afterwards.
             float topDown = pageHeight + s.topPt;
-            // A rule is a hairline band or an outline; a header strip is neither.
-            boolean rule = Math.min(s.wPt, s.hPt) < 3f || s.fillRgb < 0;
+            // Only a HAIRLINE is a rule. An outline-only shape used to count as one too, which
+            // threw away every bordered box that encloses a table - the BILL TO / SHIP TO frames
+            // on the invoices are exactly that, a stroked rectangle around a detected table, and
+            // they vanished. A box is not a rule: Word draws the table's grid itself, but the
+            // frame around it belongs to the page.
+            boolean rule = Math.min(s.wPt, s.hPt) < 3f;
             if (rule && inTable(s.xPt, s.wPt, topDown, topDown + s.hPt, tables)) continue;
             s.topPt = topDown;
             if (s.topPt + s.hPt <= 0f || s.topPt >= pageHeight) continue;
