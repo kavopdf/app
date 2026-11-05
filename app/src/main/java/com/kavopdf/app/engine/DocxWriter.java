@@ -117,7 +117,11 @@ public final class DocxWriter {
         sb.append("<w:document xmlns:w=\"").append(NS_W).append("\" xmlns:r=\"").append(NS_R)
                 .append("\" xmlns:wp=\"").append(NS_WP).append("\" xmlns:a=\"").append(NS_A)
                 .append("\" xmlns:wps=\"").append(NS_WPS)
-                .append("\" xmlns:pic=\"").append(NS_PIC).append("\"><w:body>");
+                .append("\" xmlns:pic=\"").append(NS_PIC).append("\">")
+                // A PDF page is white. A DOCX page has no colour at all, so a viewer with a dark
+                // theme shows its own surface through it - the user's screenshots of file 20 came
+                // back as black text on a black page, every clause invisible. State the white.
+                .append("<w:background w:color=\"FFFFFF\"/><w:body>");
 
         // The page box the current section is set to. A section carries one page size, so a
         // file that mixes landscape and portrait pages gets a section break where the size

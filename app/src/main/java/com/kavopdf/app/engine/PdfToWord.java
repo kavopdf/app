@@ -3393,10 +3393,27 @@ public final class PdfToWord {
             }
         }
 
+        /** True when the current transformation matrix rotates or skews, so a rect is not a rect. */
+        private boolean ctmRotated() {
+            com.tom_roush.pdfbox.util.Matrix m = getGraphicsState().getCurrentTransformationMatrix();
+            if (m == null) return false;
+            // PDFBox's Matrix is row-major with getValue(row, col). The translation lives at
+            // (2,0)/(2,1) - NOT (0,2)/(1,2), which returns the wrong row - so the rotation and
+            // shear terms are (0,1) and (1,0).
+            return Math.abs(m.getValue(0, 1)) > 0.01f || Math.abs(m.getValue(1, 0)) > 0.01f;
+        }
+
         /** Adds a shape to the page, in PDF space, after the clip has had its say. */
         private void addShape(float[] r, int fill, float alpha, int line, float lineWidth) {
             if (r == null) return;
             if (r[2] - r[0] <= 0.01f && r[3] - r[1] <= 0.01f) return;
+            // A shape can only be an axis-aligned wps:wsp rect. Under a rotated CTM the path's
+            // bounding box is NOT the path: a stamp drawn as `re` inside a 15-degree matrix
+            // measures 207 x 106 pt on the page, and emitting that box paints a solid block over
+            // the invoice. Measured on file 01 of the corpus, which came back from the user with
+            // two red 207x106 slabs and a grey 240x75 one covering the text. Drop it instead;
+            // a rotated rectangle cannot be represented, and a wrong block is worse than nothing.
+            if (ctmRotated()) return;
             DocxWriter.Shape sh = new DocxWriter.Shape(r[0], -r[3], r[2] - r[0], r[3] - r[1]);
             sh.fillRgb = fill;
             sh.fillAlpha = alpha;
