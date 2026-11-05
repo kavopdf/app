@@ -107,6 +107,10 @@ public final class DocxWriter {
         int shapeSeq = 1;
         int anchorCount;
         int flowCount;
+        /** Bottom of the last flowing line, in PDF points from the page top. -1 = none yet. */
+        float lastBottom = -1f;
+        /** Set at a page break so the first line on a page carries no gap. */
+        boolean newPage = true;
     }
 
     // ------------------------------------------------------------------ document
@@ -153,6 +157,8 @@ public final class DocxWriter {
                         .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
                         .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr>")
                         .append("<w:r><w:br w:type=\"page\"/></w:r></w:p>");
+                ctx.newPage = true;
+                ctx.lastBottom = -1f;
             }
             if (page.blocks.isEmpty()) continue;
             for (Object block : page.blocks) {
@@ -395,6 +401,20 @@ public final class DocxWriter {
      * and it is the x of each line that the reader sees.
      */
     private static void para(StringBuilder sb, PdfToWord.Para p, Ctx ctx) {
+        // Body text belongs in the document flow. Putting every line in an anchored text box made
+        // the file a PDF wearing a .docx extension: it does not reflow, the app's viewer loses
+        // values, a dark theme shows its own surface behind it, and it does not look like a
+        // document at all. Only a line drawn on a non-horizontal baseline - a stamp, a watermark,
+        // a rotated label - genuinely floats, and only those still become a text box.
+        boolean anyRotated = false;
+        for (PdfToWord.Box b : p.boxes) if (b.rotated) anyRotated = true;
+        if (!p.boxes.isEmpty() && !anyRotated) {
+            for (PdfToWord.Box b : p.boxes) {
+                if (b.runs.isEmpty()) continue;
+                flowFromBox(sb, p, b, ctx);
+            }
+            return;
+        }
         if (!p.boxes.isEmpty()) {
             for (PdfToWord.Box b : p.boxes) {
                 if (b.runs.isEmpty()) continue;
@@ -460,6 +480,49 @@ public final class DocxWriter {
     }
 
     /** A paragraph with no page coordinates of its own: the old flowing behaviour. */
+    /**
+     * One PDF line as a real Word paragraph.
+     *
+     * <p>The x becomes {@code w:ind w:left}; the gap to the previous line becomes
+     * {@code w:spacing w:before}. The section has zero margins, so the page's own x is the indent.
+     * The vertical gap is kept so a form's label/value rows still sit apart, but it is clamped:
+     * a PDF that leaves 300 pt of white space must not push a line onto the next page.
+     */
+    private static void flowFromBox(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b, Ctx ctx) {
+        String text = b.text();
+        if (text.trim().isEmpty()) return;
+        ctx.flowCount++;
+        int leftTw = (int) Math.max(0L, Math.round(b.x * TWIPS_PER_PT));
+        int lineTw = (int) Math.max(1L, Math.round(Math.max(4f, b.size * LINE_FACTOR) * TWIPS_PER_PT));
+        int beforeTw = 0;
+        if (!ctx.newPage && ctx.lastBottom >= 0f) {
+            float gap = b.y - ctx.lastBottom;
+            // A line box is LINE_FACTOR tall; anything inside that is normal leading, not a gap.
+            float extra = gap - b.size * (LINE_FACTOR - 1f);
+            if (extra > 0f) beforeTw = (int) Math.min(1440L, Math.round(extra * TWIPS_PER_PT));
+        }
+        ctx.lastBottom = b.y + b.size * (LINE_FACTOR - 1f);
+        ctx.newPage = false;
+        sb.append("<w:p><w:pPr>");
+        if (p.heading > 0) {
+            sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
+        }
+        sb.append("<w:snapToGrid w:val=\"0\"/>")
+                .append("<w:spacing w:before=\"").append(beforeTw)
+                .append("\" w:after=\"0\" w:line=\"").append(lineTw)
+                .append("\" w:lineRule=\"exact\"/>")
+                .append("<w:ind w:left=\"").append(leftTw)
+                .append("\" w:right=\"0\" w:firstLine=\"0\"/>");
+        if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");
+        else if (p.align == 2) sb.append("<w:jc w:val=\"right\"/>");
+        sb.append("</w:pPr>");
+        for (PdfToWord.Run run : b.runs) {
+            if (run.text.isEmpty()) continue;
+            runXml(sb, run);
+        }
+        sb.append("</w:p>");
+    }
+
     private static void flowParagraph(StringBuilder sb, PdfToWord.Para p, Ctx ctx) {
         String text = p.text();
         if (text.trim().isEmpty()) return;
