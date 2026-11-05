@@ -238,6 +238,13 @@ public final class DocxWriter {
 
     /** How many column bands this page's paragraphs occupy, and the widest gutter between them. */
     private static int[] pageColumns(PdfToWord.Page page) {
+        // REVERTED to single column. Emitting w:cols w:num does divide the page, but every
+        // paragraph's w:ind w:left is measured from the PAGE edge, not from its column's edge, so
+        // inside a narrow column the indent exceeds the column width and the text wraps one
+        // character per line. Rendered on the 53-document corpus: a strip of single letters down
+        // the right edge of an otherwise correct page. Making the indent column-relative is a
+        // real change and needs its own measurement pass; until then one column is correct.
+        if (true) return new int[]{1, 0};
         java.util.TreeSet<Integer> seen = new java.util.TreeSet<>();
         java.util.TreeMap<Integer, float[]> band = new java.util.TreeMap<>();
         for (Object o : page.blocks) {
@@ -249,6 +256,17 @@ public final class DocxWriter {
             else { r[0] = Math.min(r[0], p.left); r[1] = Math.max(r[1], p.right); }
         }
         if (seen.size() <= 1) return new int[]{1, 0};
+        // A column band narrower than a sixth of the page is not a newspaper column - it is a
+        // margin artefact, a folio, or a stray line. Treating it as a column squeezes the body
+        // into a sliver: on the 53-document corpus that produced a strip of one character per
+        // line down the right edge of an otherwise correct page. Only divide the page when every
+        // band is a real column.
+        float pageW = 0f;
+        for (float[] r : band.values()) pageW = Math.max(pageW, r[1]);
+        if (pageW <= 0f) return new int[]{1, 0};
+        float narrowest = Float.MAX_VALUE;
+        for (float[] r : band.values()) narrowest = Math.min(narrowest, r[1] - r[0]);
+        if (narrowest < pageW / 6f) return new int[]{1, 0};
         // Widest gap between consecutive column bands, used as w:cols w:space.
         float gap = 0f;
         float[] prev = null;
