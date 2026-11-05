@@ -169,6 +169,17 @@ public final class PdfToWord {
          * is the only description that covers all three.
          */
         public final List<List<Float>> cellX = new ArrayList<>();
+        /**
+         * The x, in points, of the RIGHT edge of each cell's text - same shape as
+         * {@link #rows}, {@link Float#NaN} where the pass did not measure it.
+         *
+         * <p>Where a cell's text starts is not enough to lay it out: a column can be narrower
+         * than the words drawn in it, and then Word wraps them inside a 52 pt box - file 80's
+         * dealer name came out as "SUNRISE / FASTENE / RS PVT / LTD". With the measured right
+         * edge the writer can widen that cell over the empty cells beside it, which is what
+         * the page did, instead of re-wrapping a line the page never wrapped.
+         */
+        public final List<List<Float>> cellR = new ArrayList<>();
         /** The typeface each cell was drawn in, same shape as {@link #rows}. */
         public final List<List<String>> fonts = new ArrayList<>();
         /**
@@ -920,6 +931,7 @@ public final class PdfToWord {
 
         for (List<String> row : t.rows) Collections.reverse(row);
         reverseRows(t.cellX);
+        reverseRows(t.cellR);
         reverseRows(t.fonts);
         reverseRows(t.colors);
 
@@ -3421,6 +3433,7 @@ public final class PdfToWord {
             List<String> row = new ArrayList<>();
             List<String> rowFonts = new ArrayList<>();
             List<Float> rowXs = new ArrayList<>();
+            List<Float> rowRs = new ArrayList<>();
             List<Integer> rowCols = new ArrayList<>();
             for (int c = 0; c < ncol; c++) {
                 String str = glyphText(buckets.get(r).get(c));
@@ -3428,11 +3441,13 @@ public final class PdfToWord {
                 row.add(str);
                 rowFonts.add(fontOf(buckets.get(r).get(c)));
                 rowXs.add(glyphFirstX(buckets.get(r).get(c)));
+                rowRs.add(glyphLastRight(buckets.get(r).get(c)));
                 rowCols.add(colorOf(buckets.get(r).get(c)));
             }
             t.rows.add(row);
             t.fonts.add(rowFonts);
             t.cellX.add(rowXs);
+            t.cellR.add(rowRs);
             t.colors.add(rowCols);
         }
         // A QR code, a logo or a chart is drawn from the same rectangles a table is, so the
@@ -3895,6 +3910,12 @@ public final class PdfToWord {
             java.util.Arrays.fill(lineCols, -1);
             float[] lineX = new float[columns.size()];
             java.util.Arrays.fill(lineX, Float.NaN);
+            float[] lineR = new float[columns.size()];
+            java.util.Arrays.fill(lineR, Float.NaN);
+            // The baseline the first piece in each column was drawn on, so a second piece can
+            // be told apart: beside it on the same line, or under it on the next one.
+            float[] lineY = new float[columns.size()];
+            java.util.Arrays.fill(lineY, Float.NaN);
             for (Line cell : rows.get(r)) {
                 int best = 0;
                 float bestDistance = Float.MAX_VALUE;
@@ -3903,15 +3924,20 @@ public final class PdfToWord {
                     if (d < bestDistance) { bestDistance = d; best = c; }
                 }
                 if (Float.isNaN(lineX[best])) lineX[best] = visibleX(cell.glyphs, cell.x);
+                if (Float.isNaN(lineY[best])) lineY[best] = cell.y;
+                if (Float.isNaN(lineR[best]) || cell.right > lineR[best]) lineR[best] = cell.right;
                 String piece = cell.text.trim();
-                // A numbered item's marker is its own line, not the first word of the name.
-                // The page drew "1." at x=64 and "SUNRISE FASTENERS PVT LTD" at x=80 - eight
-                // points apart, under the gap that starts a new cell, so both fell into one
-                // cell and the document lost a line it plainly has. The reference text reads
-                // "1." then the name, and so does a person.
+                // A numbered item's marker is not part of the name: the page drew "1." at x=64
+                // and "SUNRISE FASTENERS PVT LTD" at x=80, eight points apart, under the gap
+                // that starts a new cell. Whether the name belongs on the next line of the cell
+                // or beside the marker on the same one is decided by the baselines, not by the
+                // wording: on file 80 the two sit 0.5 pt apart and read "1. SUNRISE FASTENERS
+                // PVT LTD" on one line, while the depot report's marker really is eight points
+                // above its name and has to keep its own line.
                 if (line[best] == null) {
                     line[best] = piece;
-                } else if (isListMarker(line[best]) && !isListMarker(piece)) {
+                } else if (isListMarker(line[best]) && !isListMarker(piece)
+                        && Math.abs(cell.y - lineY[best]) > 3f) {
                     line[best] = line[best] + "\n" + piece;
                 } else {
                     line[best] = line[best] + " " + piece;
@@ -3928,14 +3954,17 @@ public final class PdfToWord {
             List<String> texts = new ArrayList<>();
             List<String> textFonts = new ArrayList<>();
             List<Float> textXs = new ArrayList<>();
+            List<Float> textRs = new ArrayList<>();
             List<Integer> textCols = new ArrayList<>();
             for (String cell : line) texts.add(cell == null ? "" : cell);
             for (String f : lineFonts) textFonts.add(f == null ? "" : f);
             for (float x : lineX) textXs.add(x);
+            for (float rr : lineR) textRs.add(rr);
             for (int c = 0; c < lineCols.length; c++) textCols.add(lineCols[c]);
             t.rows.add(texts);
             t.fonts.add(textFonts);
             t.cellX.add(textXs);
+            t.cellR.add(textRs);
             t.colors.add(textCols);
         }
         t.bottom = bottom;
@@ -4054,6 +4083,16 @@ public final class PdfToWord {
         if (split < 2 || split > cols - 2) return t;
         if (widest < 90f) return t;
         if (pairRows(t, 0, split) < 2 || pairRows(t, split, cols) < 2) return t;
+        // A label/value pair on BOTH sides of the same baseline is not a form listed down the
+        // page: the two panels stand side by side, as they do on file 80, where "GSTIN" and
+        // "IFSC" share y=147.7. Collapsing that grid into one label column and one value
+        // column puts the right panel's label 232 pt into a 52 pt column, the indent is
+        // clamped to the column, and "IFSC" comes out one letter per line - measured as
+        // I/F/S/C stacked vertically in the .docx. The grid keeps its four columns instead.
+        for (int r = 0; r < t.rows.size(); r++) {
+            List<String> row = t.rows.get(r);
+            if (isPair(row, 0, split) && isPair(row, split, cols)) return t;
+        }
 
         Table out = new Table();
         // The record's own heading - the numbered line that is not a label/value pair - keeps
@@ -4066,6 +4105,7 @@ public final class PdfToWord {
             out.rows.add(new ArrayList<>(java.util.Arrays.asList(cellOf(t, r, c), "")));
             out.fonts.add(new ArrayList<>(java.util.Arrays.asList(fontOf(t, r, c), "")));
             out.cellX.add(new ArrayList<>(java.util.Arrays.asList(xOf(t, r, c), Float.NaN)));
+            out.cellR.add(new ArrayList<>(java.util.Arrays.asList(rOf(t, r, c), Float.NaN)));
             out.colors.add(new ArrayList<>(java.util.Arrays.asList(colorOf(t, r, c), -1)));
         }
         for (int side = 0; side < 2; side++) {
@@ -4082,6 +4122,8 @@ public final class PdfToWord {
                         fontOf(t, r, a), b < 0 ? "" : fontOf(t, r, b))));
                 out.cellX.add(new ArrayList<>(java.util.Arrays.asList(
                         xOf(t, r, a), b < 0 ? Float.NaN : xOf(t, r, b))));
+                out.cellR.add(new ArrayList<>(java.util.Arrays.asList(
+                        rOf(t, r, a), b < 0 ? Float.NaN : rOf(t, r, b))));
                 out.colors.add(new ArrayList<>(java.util.Arrays.asList(
                         colorOf(t, r, a), b < 0 ? -1 : colorOf(t, r, b))));
             }
@@ -4135,10 +4177,26 @@ public final class PdfToWord {
         return c < row.size() && row.get(c) != null ? row.get(c) : -1;
     }
 
+    private static float rOf(Table t, int r, int c) {
+        if (r >= t.cellR.size()) return Float.NaN;
+        List<Float> row = t.cellR.get(r);
+        return c < row.size() && row.get(c) != null ? row.get(c) : Float.NaN;
+    }
+
     private static float xOf(Table t, int r, int c) {
         if (r >= t.cellX.size()) return Float.NaN;
         List<Float> row = t.cellX.get(r);
         return c < row.size() && row.get(c) != null ? row.get(c) : Float.NaN;
+    }
+
+    /** The x of the right edge of the last glyph in the run, or NaN when it is empty. */
+    private static float glyphLastRight(List<Glyph> glyphs) {
+        float r = Float.NaN;
+        for (Glyph g : glyphs) {
+            float e = g.x + g.width;
+            if (Float.isNaN(r) || e > r) r = e;
+        }
+        return r;
     }
 
     /** True when the run holds labels and values rather than sentences. */

@@ -150,7 +150,7 @@ public final class DocxWriter {
                 if (block instanceof PdfToWord.Para) {
                     para(sb, (PdfToWord.Para) block, ctx);
                 } else if (block instanceof PdfToWord.Table) {
-                    table(sb, (PdfToWord.Table) block, ctx);
+                    table(sb, (PdfToWord.Table) block);
                 } else if (block instanceof Picture) {
                     picture(sb, (Picture) block, ctx);
                 }
@@ -374,7 +374,7 @@ public final class DocxWriter {
      * keeps the position it had on the page. Turning the cells into loose text boxes would
      * place the text and destroy the table, which is the one thing a conversion must not do.
      */
-    private static void table(StringBuilder sb, PdfToWord.Table t, Ctx ctx) {
+    private static void table(StringBuilder sb, PdfToWord.Table t) {
         int cols = 0;
         for (List<String> row : t.rows) cols = Math.max(cols, row.size());
         if (cols == 0) return;
@@ -396,11 +396,24 @@ public final class DocxWriter {
         }
         int totalTw = 0;
         for (int c = 0; c < cols; c++) totalTw += colTw[c];
-        float wPt = (float) (totalTw / TWIPS_PER_PT);
-        float hPt = Math.max(12f, t.bottom - t.top);
 
         StringBuilder inner = new StringBuilder(512);
+        // The table floats at its own page position - w:tblpPr takes page-relative
+        // coordinates - instead of sitting inside a text box.
+        //
+        // A text box has a fixed height and clips what does not fit: on file 80 the box was
+        // 44 pt tall, so of each dealer's six rows only the first two survived and the CIN,
+        // IFSC and Address rows were gone from the document. Worse, the box is carried by a
+        // wrapper paragraph, and that paragraph's own text is every cell of the table run
+        // together with no separator - which is the "1.SUNRISE FASTENERS PVT LTDGSTIN
+        // 29AABCS4821K1Z6..." a reader of the XML sees. A floating table is a table and
+        // nothing else: one w:p per cell, no wrapper, no clip.
         inner.append("<w:tbl><w:tblPr>")
+                .append("<w:tblpPr w:leftFromText=\"0\" w:rightFromText=\"0\"")
+                .append(" w:topFromText=\"0\" w:bottomFromText=\"0\"")
+                .append(" w:vertAnchor=\"page\" w:horzAnchor=\"page\"")
+                .append(" w:tblpX=\"").append(tw(x0)).append("\"")
+                .append(" w:tblpY=\"").append(tw(t.top)).append("\"/>")
                 .append("<w:tblW w:w=\"").append(totalTw).append("\" w:type=\"dxa\"/>")
                 .append("<w:tblBorders>")
                 .append("<w:top w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
@@ -452,9 +465,18 @@ public final class DocxWriter {
                 // empty cells beside it instead, which is what the page drew, and w:gridSpan is
                 // how OOXML says it: no cell has to be split, and every later cell in the row
                 // keeps its own left edge.
+                // A cell is also too narrow when the words drawn in it are wider than the
+                // cell is - the same merge, seen from the other side. File 80's dealer name
+                // starts at the left edge of a 52 pt column and runs 176 pt, so it stayed in
+                // that column and Word wrapped it as "SUNRISE / FASTENE / RS PVT / LTD".
+                // The page never wrapped it; the cell is widened over the empty cells beside
+                // it, and the line is left whole.
+                float textR = cellRTw(t, r, c);
                 int span = 1, spanTw = colTw[c];
-                while (insetTw >= spanTw && c + span < cols
-                        && cellAt(t, r, c + span).isEmpty()) {
+                while (c + span < cols && cellAt(t, r, c + span).isEmpty()) {
+                    boolean startsOutside = insetTw >= spanTw;
+                    boolean tooWide = !Float.isNaN(textR) && insetTw + textR > spanTw;
+                    if (!startsOutside && !tooWide) break;
                     spanTw += colTw[c + span];
                     span++;
                 }
@@ -505,13 +527,12 @@ public final class DocxWriter {
             inner.append("</w:tr>");
         }
         inner.append("</w:tbl>");
-        // A text box whose last child is a table is legal but some consumers expect a
-        // paragraph after it; one empty one costs nothing.
-        inner.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+        sb.append(inner);
+        // A table must be followed by a paragraph of its own: Word inserts one if it is not
+        // there, and a paragraph the writer did not place is a paragraph it cannot measure.
+        sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
                 .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
                 .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
-
-        anchor(sb, ctx, x0, t.top, wPt + 2f, hPt, inner.toString());
     }
 
     /** The text of cell (r, c), or "" when the row does not reach that far. */
@@ -521,6 +542,24 @@ public final class DocxWriter {
         if (c >= row.size()) return "";
         String s = row.get(c);
         return s == null ? "" : s;
+    }
+
+    /**
+     * How wide this cell's text is, in twips: from where it starts to where the page stopped
+     * drawing it. {@code Float.NaN} when the pass that built the table did not measure it.
+     */
+    private static float cellRTw(PdfToWord.Table t, int r, int c) {
+        if (r >= t.cellR.size()) return Float.NaN;
+        List<Float> rs = t.cellR.get(r);
+        if (c >= rs.size()) return Float.NaN;
+        Float right = rs.get(c);
+        if (right == null || right.isNaN()) return Float.NaN;
+        if (r >= t.cellX.size()) return Float.NaN;
+        List<Float> xs = t.cellX.get(r);
+        if (c >= xs.size()) return Float.NaN;
+        Float left = xs.get(c);
+        if (left == null || left.isNaN()) return Float.NaN;
+        return (float) (Math.max(0f, right - left) * TWIPS_PER_PT);
     }
 
     /**
@@ -572,6 +611,11 @@ public final class DocxWriter {
             }
         }
         return f;
+    }
+
+    /** Points to whole twips, the unit every w:* length uses. */
+    private static int tw(float pt) {
+        return Math.max(0, Math.round((float) (pt * TWIPS_PER_PT)));
     }
 
     private static String esc(String s) {
