@@ -8,6 +8,17 @@ The corpus: `p2w-batch-1.zip`, 80 documents, numbered 01-80.
 
 ---
 
+# CORPUS v3 — 75 documents, numbered 300-417
+
+Work on the third corpus (document *types*: medical, legal, finance, engineering, logistics,
+education, retail, forms, dev, diagrams, print media, PDF tricks) has started. It is recorded in
+`V3-BATCH-LOG.md` so the 80-document record above stays intact. Batch 1 (300-318, 15 documents)
+is done: 15 of 15 are one page in and one page out, every word of every page is present, and the
+batch found and fixed a coordinate-frame bug in the ruled-table pass that had been putting
+spurious tables round ordinary prose.
+
+---
+
 ## BATCH 1 — documents 01-20
 
 **Visual result: 14 excellent, 6 good, 0 broken.**
