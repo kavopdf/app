@@ -1,5 +1,21 @@
 # Remaining defects — to be worked at the very end
 
+## v3 corpus — batch 1 (300-318), found this pass
+
+These are new, from the document-type corpus. Recorded here so the final sweep works through
+them along with the rest.
+
+| Doc | Problem |
+|---|---|
+| **315_gazette_notification** | Three columns stack into one flow; the page reads down instead of across. Page count still 1/1. |
+| **311_fir_police_form** | The address cell overruns its column in the PDF itself, so its tail lands in the next cell; row pitch compressed by ~31 pt median. |
+| **314_tender_rfp_boq** | "8,39,69,600" renders as "8,39,69,60" — the last column is exactly as wide as the page's own text and the substituted face is wider. Needs a point or two of slack when a cell's drawn right edge sits on its text. |
+| **300, 302, 306, 314** | Vertical drift 22-42 pt median — the same flow-determined spacing class as below. |
+
+Fixed this pass and no longer open: the false table round prose on 316 (a rule's y was compared
+in the wrong frame), and the interleaved cell text on 311 ("6M0o0b6i7le").
+
+
 Everything here was found by rendering the .docx through LibreOffice and comparing it against the
 source PDF page by page, in batches of 20 over the 80-document corpus. Each entry names the batch,
 the document, what is wrong, and what was already tried.
