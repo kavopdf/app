@@ -64,6 +64,8 @@ public final class DocxWriter {
      * the PDF's.
      */
     private static final float ASCENT = 1.17f;
+    /** docPr ids for shapes start above the picture ids so the two never collide. */
+    private static final int SHAPE_ID_BASE = 100000;
     /** Line box height as a multiple of the font size. Generous: a tight exact height clips. */
     private static final float LINE_FACTOR = 1.30f;
 
@@ -156,6 +158,8 @@ public final class DocxWriter {
                     table(sb, (PdfToWord.Table) block);
                 } else if (block instanceof Picture) {
                     picture(sb, (Picture) block, ctx);
+                } else if (block instanceof Shape) {
+                    shape(sb, (Shape) block, ctx);
                 }
             }
         }
@@ -284,6 +288,99 @@ public final class DocxWriter {
                 .append(cx).append("\" cy=\"").append(cy).append("\"/></a:xfrm>")
                 .append("<a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom></pic:spPr>")
                 .append("</pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r></w:p>");
+    }
+
+    // ------------------------------------------------------------------ shapes
+
+    /**
+     * A rectangle the page paints: a masthead band, a coloured block, a table header strip,
+     * a sidebar box, a drawn rule, a page border.
+     *
+     * <p>Nothing used to carry these, so a document whose own name is white text on a navy
+     * band converted to white text on white paper - the words were there and could not be
+     * seen. The geometry is the path's own bounding box in points from the page's top-left;
+     * {@code fillRgb} is -1 for an outline only and {@code lineRgb} is -1 for a fill only.
+     */
+    public static final class Shape {
+        public float xPt, topPt, wPt, hPt;
+        /** Fill colour 0xRRGGBB, or -1 when the path is only stroked. */
+        public int fillRgb = -1;
+        /** Fill opacity 0..1, from the PDF's own {@code ca}. */
+        public float fillAlpha = 1f;
+        /** Outline colour 0xRRGGBB, or -1 when the path is only filled. */
+        public int lineRgb = -1;
+        public float lineWidthPt;
+
+        public Shape(float xPt, float topPt, float wPt, float hPt) {
+            this.xPt = xPt;
+            this.topPt = topPt;
+            this.wPt = wPt;
+            this.hPt = hPt;
+        }
+    }
+
+    private static String hex(int rgb) {
+        String h = Integer.toHexString(rgb & 0xFFFFFF).toUpperCase(java.util.Locale.ROOT);
+        while (h.length() < 6) h = "0" + h;
+        return h;
+    }
+
+    /**
+     * A shape pinned to the page, behind the text.
+     *
+     * <p>{@code behindDoc="1"} is what makes a masthead band a background instead of a lid:
+     * the band carries white words, and a shape in front of them would hide the very title
+     * it exists to make visible. A rule drawn behind text is still a rule.
+     */
+    private static void shape(StringBuilder sb, Shape s, Ctx ctx) {
+        int id = SHAPE_ID_BASE + (ctx.shapeSeq++);
+        long cx = Math.max(1, Math.round(s.wPt * EMU_PER_PT));
+        long cy = Math.max(1, Math.round(s.hPt * EMU_PER_PT));
+        long offX = Math.round(s.xPt * EMU_PER_PT);
+        long offY = Math.round(s.topPt * EMU_PER_PT);
+        int relHeight = 100000000 + (id & 0xFFFF);
+        sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                .append("<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr></w:pPr>")
+                .append("<w:r><w:drawing>")
+                .append("<wp:anchor distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"")
+                .append(" simplePos=\"0\" relativeHeight=\"").append(relHeight).append("\"")
+                .append(" behindDoc=\"1\" locked=\"0\" layoutInCell=\"1\" allowOverlap=\"1\">")
+                .append("<wp:simplePos x=\"0\" y=\"0\"/>")
+                .append("<wp:positionH relativeFrom=\"page\"><wp:posOffset>").append(offX)
+                .append("</wp:posOffset></wp:positionH>")
+                .append("<wp:positionV relativeFrom=\"page\"><wp:posOffset>").append(offY)
+                .append("</wp:posOffset></wp:positionV>")
+                .append("<wp:extent cx=\"").append(cx).append("\" cy=\"").append(cy).append("\"/>")
+                .append("<wp:effectExtent l=\"0\" t=\"0\" r=\"0\" b=\"0\"/>")
+                .append("<wp:wrapNone/>")
+                .append("<wp:docPr id=\"").append(id).append("\" name=\"Shape ").append(id)
+                .append("\"/>")
+                .append("<a:graphic><a:graphicData uri=\"").append(NS_WPS).append("\">")
+                .append("<wps:wsp><wps:cNvSpPr/><wps:spPr>")
+                .append("<a:xfrm><a:off x=\"0\" y=\"0\"/><a:ext cx=\"").append(cx)
+                .append("\" cy=\"").append(cy).append("\"/></a:xfrm>")
+                .append("<a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom>");
+        if (s.fillRgb >= 0) {
+            sb.append("<a:solidFill><a:srgbClr val=\"").append(hex(s.fillRgb)).append("\">");
+            if (s.fillAlpha < 0.999f) {
+                int a = Math.max(0, Math.min(100000, Math.round(s.fillAlpha * 100000f)));
+                sb.append("<a:alpha val=\"").append(a).append("\"/>");
+            }
+            sb.append("</a:srgbClr></a:solidFill>");
+        } else {
+            sb.append("<a:noFill/>");
+        }
+        if (s.lineRgb >= 0) {
+            long lw = Math.max(0, Math.round(s.lineWidthPt * EMU_PER_PT));
+            sb.append("<a:ln w=\"").append(lw).append("\"><a:solidFill><a:srgbClr val=\"")
+                    .append(hex(s.lineRgb)).append("\"/></a:solidFill></a:ln>");
+        } else {
+            sb.append("<a:ln><a:noFill/></a:ln>");
+        }
+        sb.append("</wps:spPr><wps:bodyPr anchor=\"t\" anchorCtr=\"0\"><a:noAutofit/></wps:bodyPr>")
+                .append("</wps:wsp></a:graphicData></a:graphic>")
+                .append("</wp:anchor></w:drawing></w:r></w:p>");
     }
 
     // ------------------------------------------------------------------ paragraphs

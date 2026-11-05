@@ -1,6 +1,7 @@
 package com.kavopdf.app.engine;
 
 import com.tom_roush.pdfbox.contentstream.PDFGraphicsStreamEngine;
+import com.tom_roush.pdfbox.contentstream.operator.Operator;
 import com.tom_roush.pdfbox.cos.COSArray;
 import com.tom_roush.pdfbox.cos.COSBase;
 import com.tom_roush.pdfbox.cos.COSDictionary;
@@ -13,6 +14,7 @@ import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
 import com.tom_roush.pdfbox.pdmodel.font.PDFont;
 import com.tom_roush.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import com.tom_roush.pdfbox.pdmodel.graphics.form.PDTransparencyGroup;
+import com.tom_roush.pdfbox.pdmodel.graphics.color.PDColor;
 import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImage;
 import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import com.tom_roush.pdfbox.pdmodel.graphics.shading.PDShading;
@@ -387,6 +389,7 @@ public final class PdfToWord {
                 report.notes.add("page " + (index + 1)
                         + " has no text layer and was not OCR'd - it comes out empty");
             }
+            attachShapes(page, rules, page.height, null);
             attachPictures(page, rules, page.height);
             return page;
         }
@@ -932,6 +935,9 @@ public final class PdfToWord {
                 report.tables++;
             }
         }
+        List<Table> written = new ArrayList<>();
+        for (Object o : ordered) if (o instanceof Table) written.add((Table) o);
+        attachShapes(page, rules, page.height, written);
         attachPictures(page, rules, page.height);
         return page;
     }
@@ -3151,6 +3157,16 @@ public final class PdfToWord {
          * through the transform in force when it was drawn, in PDF user space (y up).
          */
         final List<DocxWriter.Picture> pictures = new ArrayList<>();
+        /**
+         * The rectangles the page paints - bands, blocks, table header strips, sidebars,
+         * drawn rules, page borders - in draw order, in PDF user space (y up).
+         *
+         * <p>These were never read: the collector kept only the straight edges it needed to
+         * find tables, and every filled rectangle on every page was thrown away. A masthead
+         * band is the clearest cost - file 54's title is white text on navy, so without the
+         * band the document's own name converted to white on white.
+         */
+        final List<DocxWriter.Shape> shapes = new ArrayList<>();
     }
 
     private static final class RuleCollector extends PDFGraphicsStreamEngine {
@@ -3158,13 +3174,195 @@ public final class PdfToWord {
         private final android.graphics.Path path = new android.graphics.Path();
         private float startX, startY, lastX, lastY;
 
+        /**
+         * The bounding box of the path being built, in PDF user space.
+         *
+         * <p>NaN, not 0, is the empty value. Seeding these at 0.0 made every first path
+         * include the page origin, so a 64 pt masthead band came out as a rectangle from
+         * (0,0) to the band's far corner and the page was painted solid.
+         */
+        private float pxMin = Float.NaN, pyMin = Float.NaN;
+        private float pxMax = Float.NaN, pyMax = Float.NaN;
+        /** What the path is made of - a rectangle, one straight line, or something curved. */
+        private int pMoves, pLines, pCurves, pRects;
+        /** The single segment's own end points, for the axis-aligned line case. */
+        private float segX0 = Float.NaN, segY0 = Float.NaN, segX1 = Float.NaN, segY1 = Float.NaN;
+        /**
+         * A path can begin without the previous one ever being closed, so the flags are reset
+         * lazily at the first operator that adds geometry rather than trusted to be clean.
+         * Trusting them dropped the first rule on a page.
+         */
+        private boolean pathStarted;
+        /** The clip in force, as axis-aligned boxes. Bottom is the whole page. */
+        private final java.util.ArrayDeque<float[]> clips = new java.util.ArrayDeque<>();
+        /** The box a pending {@code W} asks for, applied when its path is painted. */
+        private float[] pendingClip;
+
         RuleCollector(PDPage page) {
             super(page);
+            PDRectangle box = page.getMediaBox();
+            clips.push(new float[]{0f, 0f, box.getWidth(), box.getHeight()});
+        }
+
+        /**
+         * {@code q} and {@code Q} save and restore the clip as part of the graphics state.
+         *
+         * <p>They have no callback on this engine, so the stack is kept here. Without it a
+         * page that fills the whole sheet and clips it to a band kept the whole sheet.
+         */
+        @Override
+        protected void processOperator(Operator operator, List<COSBase> arguments)
+                throws IOException {
+            String op = operator.getName();
+            if ("q".equals(op)) {
+                clips.push(clips.peek().clone());
+            } else if ("Q".equals(op)) {
+                if (clips.size() > 1) clips.pop();
+            }
+            super.processOperator(operator, arguments);
+        }
+
+        /** Forgets the path. Called whenever one is finished, and before a new one starts. */
+        private void resetPath() {
+            pxMin = pyMin = pxMax = pyMax = Float.NaN;
+            segX0 = segY0 = segX1 = segY1 = Float.NaN;
+            pMoves = pLines = pCurves = pRects = 0;
+        }
+
+        private void beginPath() {
+            if (!pathStarted) {
+                resetPath();
+                pathStarted = true;
+            }
+        }
+
+        private void grow(float x, float y) {
+            if (Float.isNaN(pxMin)) {
+                pxMin = pxMax = x;
+                pyMin = pyMax = y;
+                return;
+            }
+            if (x < pxMin) pxMin = x;
+            if (x > pxMax) pxMax = x;
+            if (y < pyMin) pyMin = y;
+            if (y > pyMax) pyMax = y;
+        }
+
+        private boolean pathEmpty() {
+            return Float.isNaN(pxMin) || Float.isNaN(pxMax);
+        }
+
+        /** The path's box, or null when it has no geometry. */
+        private float[] pathBox() {
+            return pathEmpty() ? null : new float[]{pxMin, pyMin, pxMax, pyMax};
+        }
+
+        /** The part of {@code r} that survives the clip, or null when none of it does. */
+        private float[] clipped(float[] r) {
+            if (r == null) return null;
+            float[] c = clips.peek();
+            float x0 = Math.max(r[0], c[0]), y0 = Math.max(r[1], c[1]);
+            float x1 = Math.min(r[2], c[2]), y1 = Math.min(r[3], c[3]);
+            if (x1 <= x0 || y1 <= y0) return null;
+            return new float[]{x0, y0, x1, y1};
+        }
+
+        /** Applies a {@code W} that is waiting for its painting operator. */
+        private void commitClip() {
+            if (pendingClip == null) return;
+            float[] c = clips.peek();
+            float x0 = Math.max(pendingClip[0], c[0]), y0 = Math.max(pendingClip[1], c[1]);
+            float x1 = Math.min(pendingClip[2], c[2]), y1 = Math.min(pendingClip[3], c[3]);
+            pendingClip = null;
+            if (x1 > x0 && y1 > y0) clips.push(new float[]{x0, y0, x1, y1});
+        }
+
+        /** A PDF colour as 0xRRGGBB, or -1 when it is a pattern or cannot be read. */
+        private static int rgbOf(PDColor colour) {
+            if (colour == null || colour.isPattern()) return -1;
+            try {
+                return colour.toRGB() & 0xFFFFFF;
+            } catch (Throwable t) {
+                return -1;
+            }
+        }
+
+        /** Adds a shape to the page, in PDF space, after the clip has had its say. */
+        private void addShape(float[] r, int fill, float alpha, int line, float lineWidth) {
+            if (r == null) return;
+            if (r[2] - r[0] <= 0.01f && r[3] - r[1] <= 0.01f) return;
+            DocxWriter.Shape sh = new DocxWriter.Shape(r[0], -r[3], r[2] - r[0], r[3] - r[1]);
+            sh.fillRgb = fill;
+            sh.fillAlpha = alpha;
+            sh.lineRgb = line;
+            sh.lineWidthPt = lineWidth;
+            rules.shapes.add(sh);
+        }
+
+        /**
+         * A filled path becomes its bounding rectangle.
+         *
+         * <p>Every filled path in the 80-file batch is drawn with {@code re}, so the box is
+         * the path exactly. A curved fill would become its box; measured over the batch there
+         * is not one larger than 4 pt square, so nothing a reader sees is mis-shaped.
+         */
+        private void emitFill(boolean alsoStroke) {
+            if (pathEmpty()) return;
+            int fill = rgbOf(getGraphicsState().getNonStrokingColor());
+            if (fill < 0) return;
+            float alpha = (float) getGraphicsState().getNonStrokeAlphaConstant();
+            int line = -1;
+            float lw = 0f;
+            if (alsoStroke) {
+                line = rgbOf(getGraphicsState().getStrokingColor());
+                lw = Math.max(0.1f, getGraphicsState().getLineWidth());
+            }
+            addShape(clipped(pathBox()), fill, alpha, line, lw);
+        }
+
+        /**
+         * A stroked path becomes an outline when it is a rectangle and a solid band when it
+         * is a single axis-aligned line.
+         *
+         * <p>A stroke sits astride the path, so the rectangle a reader sees is the path grown
+         * by half the line width - that is why file 60's 2.4 pt border measures 22.8,22.8
+         * rather than 24,24. A thin rule is written as a filled band rather than as the
+         * outline of a hairline rectangle: an outline that thin lands on fractional device
+         * pixels and all but disappears, and a 0.4 pt column rule must survive.
+         */
+        private void emitStroke() {
+            if (pathEmpty()) return;
+            int line = rgbOf(getGraphicsState().getStrokingColor());
+            if (line < 0) return;
+            float w = Math.max(0.1f, getGraphicsState().getLineWidth());
+            boolean rectangle = (pRects == 1 && pLines == 0 && pCurves == 0)
+                    || (pRects == 0 && pMoves == 1 && pLines == 4 && pCurves == 0);
+            if (rectangle) {
+                addShape(clipped(new float[]{pxMin - w / 2f, pyMin - w / 2f,
+                        pxMax + w / 2f, pyMax + w / 2f}), -1, 1f, line, w);
+                return;
+            }
+            if (pCurves == 0 && pLines == 1 && pRects == 0) {
+                if (Math.abs(segY1 - segY0) <= 0.8f) {
+                    float x0 = Math.min(segX0, segX1), x1 = Math.max(segX0, segX1);
+                    addShape(clipped(new float[]{x0, segY0 - w / 2f, x1, segY0 + w / 2f}),
+                            line, 1f, -1, 0f);
+                } else if (Math.abs(segX1 - segX0) <= 0.8f) {
+                    float y0 = Math.min(segY0, segY1), y1 = Math.max(segY0, segY1);
+                    addShape(clipped(new float[]{segX0 - w / 2f, y0, segX0 + w / 2f, y1}),
+                            line, 1f, -1, 0f);
+                }
+            }
+            // Anything else - a circle, a polygon that is not a rectangle - is dropped rather
+            // than drawn as its bounding box, which would put a square where a seal's ring is.
         }
 
         @Override
         public void appendRectangle(android.graphics.PointF p0, android.graphics.PointF p1,
                                     android.graphics.PointF p2, android.graphics.PointF p3) {
+            beginPath();
+            pRects++;
+            grow(p0.x, p0.y); grow(p1.x, p1.y); grow(p2.x, p2.y); grow(p3.x, p3.y);
             float minX = Math.min(Math.min(p0.x, p1.x), Math.min(p2.x, p3.x));
             float maxX = Math.max(Math.max(p0.x, p1.x), Math.max(p2.x, p3.x));
             float minY = Math.min(Math.min(p0.y, p1.y), Math.min(p2.y, p3.y));
@@ -3283,16 +3481,28 @@ public final class PdfToWord {
 
         @Override
         public void clip(android.graphics.Path.FillType fillType) {
+            // A W sets the clip from the path that is still being built; it takes effect when
+            // that path is painted, which is what commitClip() waits for.
+            pendingClip = pathBox();
         }
 
         @Override
         public void moveTo(float x, float y) {
+            beginPath();
+            pMoves++;
+            grow(x, y);
+            segX0 = segX1 = x;
+            segY0 = segY1 = y;
             startX = lastX = x;
             startY = lastY = y;
         }
 
         @Override
         public void lineTo(float x, float y) {
+            beginPath();
+            pLines++;
+            grow(x, y);
+            segX0 = lastX; segY0 = lastY; segX1 = x; segY1 = y;
             float dx = Math.abs(x - lastX), dy = Math.abs(y - lastY);
             if (dx <= 0.8f && dy > 2f) {
                 rules.vertical.add(new float[]{lastX, Math.min(lastY, y), Math.max(lastY, y)});
@@ -3305,6 +3515,9 @@ public final class PdfToWord {
 
         @Override
         public void curveTo(float x1, float y1, float x2, float y2, float x3, float y3) {
+            beginPath();
+            pCurves++;
+            grow(x1, y1); grow(x2, y2); grow(x3, y3);
             lastX = x3;
             lastY = y3;
         }
@@ -3322,18 +3535,33 @@ public final class PdfToWord {
 
         @Override
         public void endPath() {
+            commitClip();
+            resetPath();
+            pathStarted = false;
         }
 
         @Override
         public void strokePath() {
+            emitStroke();
+            commitClip();
+            resetPath();
+            pathStarted = false;
         }
 
         @Override
         public void fillPath(android.graphics.Path.FillType fillType) {
+            emitFill(false);
+            commitClip();
+            resetPath();
+            pathStarted = false;
         }
 
         @Override
         public void fillAndStrokePath(android.graphics.Path.FillType fillType) {
+            emitFill(true);
+            commitClip();
+            resetPath();
+            pathStarted = false;
         }
 
         @Override
@@ -3359,6 +3587,79 @@ public final class PdfToWord {
         }
     }
 
+    /**
+     * Puts the page's rectangles on the page, behind its words.
+     *
+     * <p>Two things are deliberately not carried. A shape that falls entirely off the paper is
+     * dropped - it is invisible in Word and only makes the file heavier. And a stroke drawn
+     * inside a table is dropped, because Word lays a table out itself: the page's row rules
+     * then run across the table's own rows at the wrong y and cut through every one of them,
+     * which is worse than the table having no rules at all. A filled strip inside a table is
+     * kept - that is the header's shading, and Word does not invent one.
+     */
+    private static void attachShapes(Page page, Rules rules, float pageHeight,
+                                     List<Table> tables) {
+        if (rules == null || rules.shapes.isEmpty()) return;
+        for (DocxWriter.Shape s : rules.shapes) {
+            // A table's own box is measured down from the top of the page, so the test is
+            // made in that space - the shape is converted to it here and stored afterwards.
+            float topDown = pageHeight + s.topPt;
+            // A rule is a hairline band or an outline; a header strip is neither.
+            boolean rule = Math.min(s.wPt, s.hPt) < 3f || s.fillRgb < 0;
+            if (rule && inTable(s.xPt, s.wPt, topDown, topDown + s.hPt, tables)) continue;
+            s.topPt = topDown;
+            if (s.topPt + s.hPt <= 0f || s.topPt >= pageHeight) continue;
+            if (s.xPt + s.wPt <= 0f || s.xPt >= page.width) continue;
+            page.blocks.add(s);
+        }
+    }
+
+    /**
+     * True when a drawn stroke belongs to one of the page's tables.
+     *
+     * <p>A table is drawn twice over and both drawings have to go. Word lays the table out
+     * itself, so a rule left at the PDF's y lands at a row boundary Word chose, not the one
+     * the PDF meant, and cuts through the row. Measured on file 50, seven row rules across a
+     * seven-row table; on file 42, eight.
+     *
+     * <p>Three cases, because the drawn rule and the detected cell box do not have the same
+     * extent. The cell box is the text area: it is inset from the drawn frame by the cell
+     * padding, and its last column can stop short of a rule that runs past the final cell
+     * (file 56's rules are 36 pt wider than the cells they close). So a hairline is matched
+     * on where it lies and how much of the table it spans, not on strict containment; a box
+     * is matched either inside the cell box or around it.
+     */
+    private static boolean inTable(float x, float w, float top, float bottom, List<Table> tables) {
+        if (tables == null || tables.isEmpty()) return false;
+        boolean thin = Math.min(w, bottom - top) < 3f;
+        for (Table t : tables) {
+            float tw = t.right - t.left, th = t.bottom - t.top;
+            if (tw <= 0 || th <= 0) continue;
+            if (thin) {
+                float pad = 16f;
+                if (w >= bottom - top) {                       // a horizontal rule
+                    if (top < t.top - pad || top > t.bottom + pad) continue;
+                    if (overlap(x, x + w, t.left, t.right) >= 0.5f * tw) return true;
+                } else {                                       // a vertical rule
+                    if (x < t.left - pad || x > t.right + pad) continue;
+                    if (overlap(top, bottom, t.top, t.bottom) >= 0.5f * th) return true;
+                }
+                continue;
+            }
+            float pad = 2f;
+            boolean inside = x >= t.left - pad && x + w <= t.right + pad
+                    && top >= t.top - pad && bottom <= t.bottom + pad;
+            boolean frame = t.left >= x - pad && t.right <= x + w + pad
+                    && t.top >= top - pad && t.bottom <= bottom + pad;
+            if (inside || frame) return true;
+        }
+        return false;
+    }
+
+    private static float overlap(float a0, float a1, float b0, float b1) {
+        return Math.max(0f, Math.min(a1, b1) - Math.max(a0, b0));
+    }
+
     private static Rules rulesOf(PDDocument doc, int index) {
         Rules out = new Rules();
         try {
@@ -3369,6 +3670,7 @@ public final class PdfToWord {
             out.vertical.addAll(collector.rules.vertical);
             out.images = collector.rules.images;
             out.pictures.addAll(collector.rules.pictures);
+            out.shapes.addAll(collector.rules.shapes);
         } catch (Throwable ignored) {
         }
         return out;
