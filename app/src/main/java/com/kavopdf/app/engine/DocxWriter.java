@@ -5,7 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -471,6 +474,24 @@ public final class DocxWriter {
             int width = Math.max(1, Math.round((float) (wPt * TWIPS_PER_PT / cols)));
             for (int c = 0; c < cols; c++) colTw[c] = width;
         }
+        // A cell whose text is exactly as wide as its column still wraps: the page drew
+        // "58,750.00" flush against the right border of a 49.5 pt column and the renderer put
+        // the last digit on the next line. There is no empty cell to the right of the LAST
+        // column to widen over, so that column gets the room its own text needs. The text is
+        // anchored at its indent, not at the right border, so widening the column moves the
+        // table's right rule and leaves the words where the page put them.
+        if (exact && cols > 0) {
+            long[] edges = new long[cols + 1];
+            for (int c = 0; c < cols; c++) edges[c + 1] = edges[c] + colTw[c];
+            int need = 0;
+            for (int r = 0; r < t.rows.size(); r++) {
+                float textR = cellRTw(t, r, cols - 1);
+                if (Float.isNaN(textR)) continue;
+                int inset = insetTw(t, r, cols - 1, x0, edges[cols - 1]);
+                need = Math.max(need, inset + Math.round(textR) + 20);
+            }
+            if (need > colTw[cols - 1]) colTw[cols - 1] = need;
+        }
         int totalTw = 0;
         for (int c = 0; c < cols; c++) totalTw += colTw[c];
 
@@ -569,6 +590,19 @@ public final class DocxWriter {
                 inner.append("</w:pPr>");
                 if (!cell.isEmpty()) {
                     inner.append("<w:r><w:rPr>");
+                    // The size the page drew this cell at. The paragraph style carries one
+                    // number for every table in the document - 10 pt - and the batch's tables
+                    // are drawn at 7.5 to 12 pt, so without this every cell is set at a size
+                    // the page never used. On file 22 the amounts are 8.5 pt: at the style's
+                    // 10 pt they are 17.6 % too wide for their column and Word wraps
+                    // "2,18,770.00" into "2,18,770.0" and "0".
+                    float sz = r < t.sizes.size() && c < t.sizes.get(r).size()
+                            ? t.sizes.get(r).get(c) : Float.NaN;
+                    if (!Float.isNaN(sz) && sz > 0f) {
+                        int half = Math.max(2, Math.round(sz * 2f));
+                        inner.append("<w:sz w:val=\"").append(half)
+                                .append("\"/><w:szCs w:val=\"").append(half).append("\"/>");
+                    }
                     if (!face.isEmpty()) {
                         String f = esc(faceName(face));
                         inner.append("<w:rFonts w:ascii=\"").append(f)
@@ -680,6 +714,19 @@ public final class DocxWriter {
             }
             if (tag) f = f.substring(7);
         }
+        // The fourteen faces every PDF viewer must provide are named by their PostScript
+        // names, and no word processor has a face called "Times-Roman": Word substitutes
+        // Times New Roman and LibreOffice substitutes a wide default sans, so the line was
+        // set in a different face from the one the PDF was drawn with. On file 31 that put
+        // the closing note 60 pt wider than its box - and the box does not wrap, it clips -
+        // so "…to the meeting." came out as "…to the ". Mapped, the same line renders at
+        // 56.1-359.8 pt against the PDF's 56.0-360.2, whole. The three families here are
+        // metrically identical to the PostScript originals, which is why the widths hold.
+        String base = f;
+        int dash = base.indexOf('-');
+        if (dash > 0) base = base.substring(0, dash);
+        String family = BASE14.get(base.toLowerCase(Locale.ROOT));
+        if (family != null) return family;
         String[] suffixes = {" Bold Italic", " Bold Oblique", " Italic", " Oblique",
                 " Bold", " Regular", " Roman", " Normal"};
         for (String suf : suffixes) {
@@ -688,6 +735,15 @@ public final class DocxWriter {
             }
         }
         return f;
+    }
+
+    /** PostScript's fourteen standard faces, keyed by family, to the family a Word file names. */
+    private static final Map<String, String> BASE14 = new HashMap<>();
+
+    static {
+        BASE14.put("times", "Times New Roman");
+        BASE14.put("helvetica", "Arial");
+        BASE14.put("courier", "Courier New");
     }
 
     /** Points to whole twips, the unit every w:* length uses. */

@@ -191,6 +191,17 @@ public final class PdfToWord {
         /** The typeface each cell was drawn in, same shape as {@link #rows}. */
         public final List<List<String>> fonts = new ArrayList<>();
         /**
+         * The point size each cell's text was drawn at - same shape as {@link #rows},
+         * {@link Float#NaN} where the pass did not measure it.
+         *
+         * <p>Without this every cell in every table was written at the paragraph style's own
+         * 10 pt. A cell is a string, a face and a size, and the size was the one thing the
+         * writer had no way to ask for: on file 22 the amounts are drawn at 8.5 pt and came
+         * out 17.6 % wider than the page, which is enough to push "2,18,770.00" out of a
+         * 45.15 pt column - the reader saw "2,18,770.0" with a lone "0" on the line below.
+         */
+        public final List<List<Float>> sizes = new ArrayList<>();
+        /**
          * The colour each cell's text was drawn in (0xRRGGBB, -1 for the default black), same
          * shape as {@link #rows}. Without it every table cell reached Word in black: measured on
          * the corpus, 37 of the 98 colour pairs the page-level pass had already found correctly
@@ -956,6 +967,7 @@ public final class PdfToWord {
         reverseRows(t.cellX);
         reverseRows(t.cellR);
         reverseRows(t.fonts);
+        reverseRows(t.sizes);
         reverseRows(t.colors);
 
         float lo = t.colX != null && t.colX.length > 0 ? t.colX[0] : t.left;
@@ -1744,6 +1756,23 @@ public final class PdfToWord {
         }
     }
 
+    /**
+     * How far apart, in points, two copies of the same character may be and still be one
+     * character drawn twice.
+     *
+     * <p>An OCR overlay re-draws the page's text at exactly the position the scanner saw it,
+     * so the two copies are the same cell: measured over the 80-document batch, all 23
+     * genuinely doubled glyphs sat at the identical x and y. A character that is merely
+     * NEARBY is a different character, and the old 1.2 pt window was wider than the advance
+     * of the letters it merged: at 8.5 pt an 'e' is 3.77 pt wide and the 'e' of "preventive"
+     * (x 364.03) swallowed the 'e' of the unit cell "Year" (x 362.88, 1.15 pt away, in the
+     * next column of the same baseline) - file 28 lost a letter and read "Y ar". At 1 pt a
+     * capital is 0.89 pt wide, so the second 'M' of "COMMERCE" went the same way on file 39
+     * ("COM ERCE"). Half a point is below the narrowest advance the batch contains, so two
+     * different characters can no longer be mistaken for one.
+     */
+    private static final float DUPLICATE_TOL = 0.5f;
+
     /** Drops the second copy of text that sits on top of the first, as OCR overlays do. */
     private static List<Glyph> dedupe(List<Glyph> in) {
         List<Glyph> out = new ArrayList<>(in.size());
@@ -1751,7 +1780,7 @@ public final class PdfToWord {
             boolean duplicate = false;
             for (int i = out.size() - 1; i >= 0 && i >= out.size() - 40; i--) {
                 Glyph p = out.get(i);
-                if (Math.abs(p.x - g.x) < 1.2f && Math.abs(p.y - g.y) < 1.2f
+                if (Math.abs(p.x - g.x) < DUPLICATE_TOL && Math.abs(p.y - g.y) < DUPLICATE_TOL
                         && p.text.equals(g.text)) {
                     duplicate = true;
                     break;
@@ -3631,6 +3660,7 @@ public final class PdfToWord {
         for (int r = 0; r < nrow; r++) {
             List<String> row = new ArrayList<>();
             List<String> rowFonts = new ArrayList<>();
+            List<Float> rowSizes = new ArrayList<>();
             List<Float> rowXs = new ArrayList<>();
             List<Float> rowRs = new ArrayList<>();
             List<Integer> rowCols = new ArrayList<>();
@@ -3639,12 +3669,14 @@ public final class PdfToWord {
                 if (!str.isEmpty()) filled++;
                 row.add(str);
                 rowFonts.add(fontOf(buckets.get(r).get(c)));
+                rowSizes.add(sizeOf(buckets.get(r).get(c)));
                 rowXs.add(glyphFirstX(buckets.get(r).get(c)));
                 rowRs.add(glyphLastRight(buckets.get(r).get(c)));
                 rowCols.add(colorOf(buckets.get(r).get(c)));
             }
             t.rows.add(row);
             t.fonts.add(rowFonts);
+            t.sizes.add(rowSizes);
             t.cellX.add(rowXs);
             t.cellR.add(rowRs);
             t.colors.add(rowCols);
@@ -3721,6 +3753,20 @@ public final class PdfToWord {
     private static String fontOf(List<Glyph> gs) {
         for (Glyph g : gs) if (g.font != null && !g.font.isEmpty()) return g.font;
         return "";
+    }
+
+    /**
+     * The size a cell's text was drawn at: the size of the glyphs that carry the words, not of
+     * an empty or zero-width one a marked-content sequence left behind.
+     */
+    private static float sizeOf(List<Glyph> gs) {
+        float best = Float.NaN;
+        for (Glyph g : gs) {
+            if (g.text == null || g.text.trim().isEmpty()) continue;
+            if (g.size <= 0f) continue;
+            if (Float.isNaN(best) || g.size > best) best = g.size;
+        }
+        return best;
     }
 
     /** Join a cell's glyphs into one string, in reading order. */
@@ -3890,6 +3936,8 @@ public final class PdfToWord {
 
             String[][] cells = new String[rows][cols];
             String[][] faces = new String[rows][cols];
+            float[][] sizes = new float[rows][cols];
+            for (float[] rowSize : sizes) java.util.Arrays.fill(rowSize, Float.NaN);
             // Where the first line written into each cell actually starts. A cell's text is not
             // at its rule: it is wherever the page drew it, centred, right-aligned or padded.
             float[][] firstX = new float[rows][cols];
@@ -3902,6 +3950,7 @@ public final class PdfToWord {
                 cells[r][c] = cells[r][c] == null
                         ? line.text.trim() : cells[r][c] + " " + line.text.trim();
                 if (faces[r][c] == null) faces[r][c] = fontOf(line.glyphs);
+                if (Float.isNaN(sizes[r][c])) sizes[r][c] = sizeOf(line.glyphs);
                 if (Float.isNaN(firstX[r][c])) firstX[r][c] = visibleX(line.glyphs, line.x);
             }
 
@@ -3957,14 +4006,17 @@ public final class PdfToWord {
             for (int r = 0; r < rows; r++) {
                 List<String> row = new ArrayList<>();
                 List<String> rowFonts = new ArrayList<>();
+                List<Float> rowSizes = new ArrayList<>();
                 List<Float> rowXs = new ArrayList<>();
                 for (int c = 0; c < cols; c++) {
                     row.add(cells[r][c] == null ? "" : cells[r][c]);
                     rowFonts.add(faces[r][c] == null ? "" : faces[r][c]);
+                    rowSizes.add(sizes[r][c]);
                     rowXs.add(firstX[r][c]);
                 }
                 t.rows.add(row);
                 t.fonts.add(rowFonts);
+                t.sizes.add(rowSizes);
                 t.cellX.add(rowXs);
             }
             out.add(t);
@@ -4105,6 +4157,8 @@ public final class PdfToWord {
         for (int r = from; r < to; r++) {
             String[] line = new String[columns.size()];
             String[] lineFonts = new String[columns.size()];
+            float[] lineSizes = new float[columns.size()];
+            java.util.Arrays.fill(lineSizes, Float.NaN);
             int[] lineCols = new int[columns.size()];
             java.util.Arrays.fill(lineCols, -1);
             float[] lineX = new float[columns.size()];
@@ -4143,6 +4197,7 @@ public final class PdfToWord {
                 }
                 if (lineFonts[best] == null) {
                     lineFonts[best] = fontOf(cell.glyphs);
+                    lineSizes[best] = sizeOf(cell.glyphs);
                     lineCols[best] = colorOf(cell.glyphs);
                 }
                 bottom = Math.max(bottom, cell.y);
@@ -4152,16 +4207,19 @@ public final class PdfToWord {
             }
             List<String> texts = new ArrayList<>();
             List<String> textFonts = new ArrayList<>();
+            List<Float> textSizes = new ArrayList<>();
             List<Float> textXs = new ArrayList<>();
             List<Float> textRs = new ArrayList<>();
             List<Integer> textCols = new ArrayList<>();
             for (String cell : line) texts.add(cell == null ? "" : cell);
             for (String f : lineFonts) textFonts.add(f == null ? "" : f);
+            for (float sz : lineSizes) textSizes.add(sz);
             for (float x : lineX) textXs.add(x);
             for (float rr : lineR) textRs.add(rr);
             for (int c = 0; c < lineCols.length; c++) textCols.add(lineCols[c]);
             t.rows.add(texts);
             t.fonts.add(textFonts);
+            t.sizes.add(textSizes);
             t.cellX.add(textXs);
             t.cellR.add(textRs);
             t.colors.add(textCols);
@@ -4303,6 +4361,7 @@ public final class PdfToWord {
             if (c < 0) continue;
             out.rows.add(new ArrayList<>(java.util.Arrays.asList(cellOf(t, r, c), "")));
             out.fonts.add(new ArrayList<>(java.util.Arrays.asList(fontOf(t, r, c), "")));
+            out.sizes.add(new ArrayList<>(java.util.Arrays.asList(sizeOf(t, r, c), Float.NaN)));
             out.cellX.add(new ArrayList<>(java.util.Arrays.asList(xOf(t, r, c), Float.NaN)));
             out.cellR.add(new ArrayList<>(java.util.Arrays.asList(rOf(t, r, c), Float.NaN)));
             out.colors.add(new ArrayList<>(java.util.Arrays.asList(colorOf(t, r, c), -1)));
@@ -4319,6 +4378,8 @@ public final class PdfToWord {
                         cellOf(t, r, a), b < 0 ? "" : cellOf(t, r, b))));
                 out.fonts.add(new ArrayList<>(java.util.Arrays.asList(
                         fontOf(t, r, a), b < 0 ? "" : fontOf(t, r, b))));
+                out.sizes.add(new ArrayList<>(java.util.Arrays.asList(
+                        sizeOf(t, r, a), b < 0 ? Float.NaN : sizeOf(t, r, b))));
                 out.cellX.add(new ArrayList<>(java.util.Arrays.asList(
                         xOf(t, r, a), b < 0 ? Float.NaN : xOf(t, r, b))));
                 out.cellR.add(new ArrayList<>(java.util.Arrays.asList(
@@ -4368,6 +4429,12 @@ public final class PdfToWord {
         if (r >= t.fonts.size()) return "";
         List<String> row = t.fonts.get(r);
         return c < row.size() && row.get(c) != null ? row.get(c) : "";
+    }
+
+    private static float sizeOf(Table t, int r, int c) {
+        if (r >= t.sizes.size()) return Float.NaN;
+        List<Float> row = t.sizes.get(r);
+        return c < row.size() && row.get(c) != null ? row.get(c) : Float.NaN;
     }
 
     private static int colorOf(Table t, int r, int c) {
