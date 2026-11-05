@@ -67,7 +67,7 @@ public final class DocxWriter {
     /** docPr ids for shapes start above the picture ids so the two never collide. */
     private static final int SHAPE_ID_BASE = 100000;
     /** Line box height as a multiple of the font size. Generous: a tight exact height clips. */
-    private static final float LINE_FACTOR = 1.30f;
+    private static final float LINE_FACTOR = 1.15f;
 
     private DocxWriter() {
     }
