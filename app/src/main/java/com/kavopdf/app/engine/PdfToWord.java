@@ -2913,7 +2913,9 @@ public final class PdfToWord {
                 continue;
             }
             Line prev = group.get(group.size() - 1);
-            if (sameParagraph(prev, line, pageWidth, blockRight)) {
+            if (sameRow(prev, line, pageWidth, rowWidth(group, line))) {
+                group.add(line);
+            } else if (sameParagraph(prev, line, pageWidth, blockRight)) {
                 group.add(line);
             } else {
                 out.add(buildPara(group, pageWidth, bands));
@@ -2923,6 +2925,86 @@ public final class PdfToWord {
         }
         if (!group.isEmpty()) out.add(buildPara(group, pageWidth, bands));
         return out;
+    }
+
+    /** True when every line of the group stands on the same baseline. */
+    private static boolean isRow(List<Line> group) {
+        Line first = group.get(0);
+        for (Line ln : group) {
+            float size = Math.max(first.size, ln.size);
+            if (Math.abs(ln.y - first.y) > Math.max(1.2f, size * 0.25f)) return false;
+        }
+        return true;
+    }
+
+    /** How many fields of one row are allowed to become tab stops. */
+    private static final int MAX_ROW_FIELDS = 6;
+
+    /**
+     * True when {@code next} is another field drawn on the same baseline as {@code prev} - the
+     * "Member Name" / ":" / "Ananya Rangappa" of a form, the four headings of a table.
+     *
+     * <p>These are one line of the document, not three. {@link #toLines} has to cut a baseline
+     * into segments so that two newspaper columns do not weld together, and the paragraph
+     * builder then treated each segment as its own paragraph. Word writes one paragraph per
+     * line, so a 22-row form became 66 paragraphs and ran onto a second sheet - file 21's
+     * one-page claim form spilled to two pages, with the value stranded far below its label.
+     *
+     * <p>The two segments are rejoined here, and only here, so that the writer can put them on
+     * one line with a tab stop at the x the page measured. Nothing is dropped, reordered or
+     * restyled: the fragments stay separate {@link Box}es and keep their own x and y.
+     */
+    private static boolean sameRow(Line prev, Line next, float pageWidth, int sofar) {
+        if (sofar >= MAX_ROW_FIELDS) return false;
+        // A rotated line has no horizontal baseline to share, and a stamp is an overlay.
+        if (prev.rotated || next.rotated) return false;
+        float size = Math.max(prev.size, next.size);
+        if (Math.abs(prev.y - next.y) > Math.max(1.2f, size * 0.25f)) return false;
+        if (Math.abs(prev.size - next.size) > size * 0.3f) return false;
+        if (startsWithBullet(next.text)) return false;
+        if (prev.column != next.column) {
+            // A label and its value can stand either side of a detected gutter: file 21 puts
+            // every label in column 0 and every value in column 1, so the column test alone
+            // kept them apart and the form still had two lines per row. They are one line.
+            //
+            // What tells that apart from two columns of running text is the white space: a
+            // label ends far short of the gutter and leaves 180 pt of nothing before its
+            // value, while a gutter between two columns of prose is 20-30 pt and the line on
+            // the left runs right up to it. Only the wide gap may cross a column boundary.
+            float across = next.x - prev.right;
+            if (across < Math.max(40f, size * 3f)) return false;
+        }
+        // A fragment that starts to the LEFT of where the previous one began is not a field of
+        // this row; leave it where it is.
+        if (next.x < prev.x - 0.5f) return false;
+        // A fragment that begins inside the field before it and ends inside it too is part of
+        // that field, not a new column: file 21 draws its colon at x=65 while "Member Name"
+        // runs 60..117, so the colon is painted over the label and the reader never sees it.
+        // It belongs on the row, but it must not become a tab stop - a stop behind the text is
+        // skipped by Word and the next field would jump.
+        boolean inside = next.x < prev.right - 0.5f && next.right <= prev.right + size;
+        if (inside) return true;
+        // Otherwise there has to be white space between the two fields, or the tab stop has
+        // nothing to move the text to.
+        float gap = next.x - prev.right;
+        if (gap < Math.max(1.5f, size * 0.15f)) return false;
+        // A tab stop past the paper is not a tab stop. Word would push the value onto the next
+        // line, which is the defect this merge exists to remove.
+        if (next.right > pageWidth + 1f) return false;
+        return true;
+    }
+
+    /** How many lines of {@code group} already stand on {@code next}'s baseline. */
+    private static int rowWidth(List<Line> group, Line next) {
+        int n = 0;
+        for (int i = group.size() - 1; i >= 0; i--) {
+            Line ln = group.get(i);
+            if (Math.abs(ln.y - next.y) > Math.max(1.2f, Math.max(ln.size, next.size) * 0.25f)) {
+                break;
+            }
+            n++;
+        }
+        return n;
     }
 
     /** Characters that begin a list item. */
@@ -2956,6 +3038,18 @@ public final class PdfToWord {
     }
 
     private static Para buildPara(List<Line> group, float pageWidth, int bands) {
+        // Fields on one baseline read left to right, whatever order the page drew them in. The
+        // row's tab stops are measured from its first box, so the box order IS the line.
+        if (group.size() > 1 && isRow(group)) {
+            List<Line> byX = new ArrayList<>(group);
+            Collections.sort(byX, new Comparator<Line>() {
+                @Override
+                public int compare(Line a, Line b) {
+                    return Float.compare(a.x, b.x);
+                }
+            });
+            group = byX;
+        }
         float l = Float.MAX_VALUE, r = -Float.MAX_VALUE;
         for (Line ln : group) { l = Math.min(l, ln.x); r = Math.max(r, ln.right); }
         Para p = new Para();
@@ -3020,6 +3114,7 @@ public final class PdfToWord {
         // The same words again, line by line, carrying the page's own coordinates and each
         // line's own styling. This is what lets the writer put a value back at x=300 instead
         // of at "indent 4".
+        boolean rowGroup = group.size() > 1 && isRow(group);
         for (Line line : group) {
             if (line.text.trim().isEmpty()) continue;
             Box box = new Box();
@@ -3043,6 +3138,22 @@ public final class PdfToWord {
             Box prevBox = p.boxes.isEmpty() ? null : p.boxes.get(p.boxes.size() - 1);
             if (prevBox != null && startsWithCombiningMark(line.text)
                     && Math.abs(prevBox.y - line.y) <= Math.max(2f, line.size * 0.5f)) {
+                prevBox.runs.addAll(lineRuns);
+                prevBox.right = Math.max(prevBox.right, line.right);
+                prevBox.bottom = Math.max(prevBox.bottom, line.bottom);
+                prevBox.length = prevBox.right - prevBox.x;
+                continue;
+            }
+            // A fragment of a row that starts inside the field before it is that field's own
+            // tail, not a new column: it gets no tab stop of its own, it joins the field. The
+            // space is what keeps the two words apart for a reader that only sees text - file
+            // 21's label and its colon would otherwise weld into "Member Name:".
+            if (rowGroup && prevBox != null
+                    && Math.abs(prevBox.y - line.y) <= Math.max(1.2f, size * 0.25f)
+                    && line.x < prevBox.right - 0.5f) {
+                Run leadRun = lineRuns.get(0);
+                prevBox.runs.add(new Run(" ", leadRun.bold, leadRun.italic, leadRun.sizePt,
+                        leadRun.font, leadRun.color));
                 prevBox.runs.addAll(lineRuns);
                 prevBox.right = Math.max(prevBox.right, line.right);
                 prevBox.bottom = Math.max(prevBox.bottom, line.bottom);

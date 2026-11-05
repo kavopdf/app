@@ -117,6 +117,8 @@ public final class DocxWriter {
         int flowTw;
         /** The page's own height in twips - the budget the flow must not exceed. */
         int budgetTw;
+        /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
+        float pageWidthPt = 595f;
     }
 
     // ------------------------------------------------------------------ document
@@ -168,6 +170,7 @@ public final class DocxWriter {
             ctx.lastBaseline = -1f;
             ctx.flowTw = 0;
             ctx.budgetTw = (int) Math.max(1L, Math.round(ph * TWIPS_PER_PT));
+            ctx.pageWidthPt = pw;
             if (page.blocks.isEmpty()) continue;
             for (Object block : page.blocks) {
                 if (block instanceof PdfToWord.Para) {
@@ -416,6 +419,14 @@ public final class DocxWriter {
         // a rotated label - genuinely floats, and only those still become a text box.
         boolean anyRotated = false;
         for (PdfToWord.Box b : p.boxes) if (b.rotated) anyRotated = true;
+        // A form row - a label and its value drawn on one baseline - is ONE line of the
+        // document. Written as one paragraph per field it was three lines, which is what made a
+        // one-page form two pages. It goes out as one paragraph with a tab stop at each field's
+        // measured x, so the value lands at 300 pt where the page put it.
+        if (!anyRotated && isRow(p.boxes)) {
+            flowRow(sb, p, ctx);
+            return;
+        }
         if (!p.boxes.isEmpty() && !anyRotated) {
             for (PdfToWord.Box b : p.boxes) {
                 if (b.runs.isEmpty()) continue;
@@ -460,6 +471,121 @@ public final class DocxWriter {
         // No page coordinates: an OCR block, an annotation, a filled form value. There is no
         // x to restore, so it goes into the flow rather than pretending to a position.
         flowParagraph(sb, p, ctx);
+    }
+
+    /**
+     * True when every box in the paragraph stands on one baseline - a form row, a table's
+     * heading row, a running footer.
+     */
+    private static boolean isRow(List<PdfToWord.Box> boxes) {
+        if (boxes.size() < 2) return false;
+        float y = boxes.get(0).y;
+        float size = boxes.get(0).size;
+        for (PdfToWord.Box b : boxes) size = Math.max(size, b.size);
+        float tol = Math.max(1.2f, size * 0.25f);
+        for (PdfToWord.Box b : boxes) if (Math.abs(b.y - y) > tol) return false;
+        return true;
+    }
+
+    /**
+     * One baseline's fields as one paragraph, with a tab stop at each field's measured x.
+     *
+     * <p>The paragraph is indented to the first field's x and every later field is reached by a
+     * {@code w:tab} at the x the PDF drew it at, relative to that indent. This is the only
+     * construct in Word that puts two strings on one line at two known x positions without a
+     * text box or a table, so the line keeps its place and the page keeps its height.
+     */
+    private static void flowRow(StringBuilder sb, PdfToWord.Para p, Ctx ctx) {
+        List<PdfToWord.Box> cols = new ArrayList<>();
+        for (PdfToWord.Box b : p.boxes) {
+            if (b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
+            cols.add(b);
+        }
+        if (cols.isEmpty()) return;
+        if (cols.size() == 1) {
+            flowFromBox(sb, p, cols.get(0), ctx);
+            return;
+        }
+        PdfToWord.Box first = cols.get(0);
+        float indent = first.x;
+        float size = first.size;
+        for (PdfToWord.Box b : cols) size = Math.max(size, b.size);
+        int leftTw = (int) Math.max(0L, Math.round(indent * TWIPS_PER_PT));
+        int lineTw = (int) Math.max(1L, Math.round(Math.max(4f, size * LINE_FACTOR) * TWIPS_PER_PT));
+
+        ctx.flowCount++;
+        int beforeTw = 0;
+        if (!ctx.newPage && ctx.lastBaseline >= 0f) {
+            // Same rule as flowFromBox: the paragraph already occupies a full line box, so the
+            // space still to add is the pitch minus that box. The row is one line however many
+            // fields it holds, so it is charged one line, not one per field.
+            float pitch = first.y - ctx.lastBaseline;
+            float prevLine = Math.max(4f, ctx.lastSize * LINE_FACTOR);
+            float extra = pitch - prevLine;
+            if (extra > 0f) beforeTw = (int) Math.min(1440L, Math.round(extra * TWIPS_PER_PT));
+        }
+        ctx.lastBaseline = first.y;
+        ctx.lastSize = size;
+        ctx.newPage = false;
+        if (ctx.budgetTw > 0 && ctx.flowTw + beforeTw + lineTw > ctx.budgetTw) {
+            beforeTw = Math.max(0, ctx.budgetTw - ctx.flowTw - lineTw);
+        }
+        ctx.flowTw += beforeTw + lineTw;
+
+        // A tab stop's position is measured from the page margin, NOT from the paragraph's own
+        // indent - the section has zero margins, so the page margin is x=0 and a stop is the
+        // page's own x. Subtracting the indent put every value one indent too far left (file
+        // 21's value landed at 240 pt instead of 300), and on file 16 it put the stop behind the
+        // text before it, so Word skipped it for the next one and the four column headings
+        // marched right across the page.
+        StringBuilder tabs = new StringBuilder();
+        for (int i = 1; i < cols.size(); i++) {
+            PdfToWord.Box b = cols.get(i), before = cols.get(i - 1);
+            float pos = b.x;
+            // The embedded face's advance is not the substituted face's: at the same point size
+            // Word's face can be a few per cent wider, and a tab stop that lands inside the text
+            // before it is skipped for the next one. Only ever push the stop clear, never left.
+            float clear = before.right * 1.06f + before.size * 0.4f;
+            boolean last = i == cols.size() - 1;
+            if (last && b.right > ctx.pageWidthPt - 2f && b.right > clear) {
+                // A field that ends at the paper's edge is right-aligned there. A right tab keeps
+                // its RIGHT edge where the page drew it, so a wider substitute grows inwards
+                // instead of wrapping the last word onto the next line.
+                int posTw = (int) Math.round(b.right * TWIPS_PER_PT);
+                tabs.append("<w:tab w:val=\"right\" w:pos=\"").append(posTw).append("\"/>");
+                continue;
+            }
+            if (clear > pos) pos = clear;
+            int posTw = (int) Math.round(pos * TWIPS_PER_PT);
+            tabs.append("<w:tab w:val=\"left\" w:pos=\"").append(posTw).append("\"/>");
+        }
+
+        sb.append("<w:p><w:pPr>")
+                .append("<w:snapToGrid w:val=\"0\"/>")
+                .append("<w:spacing w:before=\"").append(beforeTw)
+                .append("\" w:after=\"0\" w:line=\"").append(lineTw)
+                .append("\" w:lineRule=\"exact\"/>")
+                // A row is laid out by its tab stops, so it must not also be centred or pushed
+                // right: justification would move the first field off the indent the stops are
+                // measured from.
+                .append("<w:ind w:left=\"").append(leftTw)
+                .append("\" w:right=\"0\" w:firstLine=\"0\"/>")
+                .append("<w:tabs>").append(tabs).append("</w:tabs>")
+                .append("</w:pPr>");
+        for (int i = 0; i < cols.size(); i++) {
+            if (i > 0) {
+                // A space before the tab, not after it. Word discards white space immediately
+                // before a tab stop, so nothing moves on the page - but any reader that joins a
+                // paragraph's w:t elements (this project's own gate does) still sees two words
+                // instead of "Member NameAnanya Rangappa".
+                sb.append("<w:r><w:t xml:space=\"preserve\"> </w:t><w:tab/></w:r>");
+            }
+            for (PdfToWord.Run run : cols.get(i).runs) {
+                if (run.text.isEmpty()) continue;
+                runXml(sb, run);
+            }
+        }
+        sb.append("</w:p>");
     }
 
     /** One drawn line, as the single paragraph inside its own text box. */
