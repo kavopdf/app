@@ -404,9 +404,22 @@ public final class DocxWriter {
                 // get 12 % of slack, because the page's advance is measured in the font the
                 // PDF embedded and the same string set in the substituted face is a few per
                 // cent wider - enough to wrap the last word and clip it.
+                float advance = b.rotated && b.length > 0f ? b.length : b.right - b.x;
+                // The page's own advance is not always there to be trusted. A line whose glyphs
+                // all report zero width measures 0 pt wide, the 4 pt floor below then wins, and
+                // the box clips everything after the first character or two: file 69's clause
+                // "8. The job worker shall carry out the processes of desizing," reached Word as
+                // a 19 pt box holding 60 characters, and the render showed "8. " and nothing
+                // else. When the measured advance is less than half what the characters need at
+                // their own size, the measurement is the broken thing, so the character count
+                // decides the width instead.
+                int chars = 0;
+                for (PdfToWord.Run r : b.runs) chars += r.text.length();
+                float needed = chars * b.size * 0.5f;
+                if (advance < needed * 0.6f) advance = needed;
                 float wPt = b.rotated && b.length > 0f
-                        ? b.length + b.size * 1.5f
-                        : Math.max(4f, b.right - b.x) * 1.12f + b.size * 1.5f;
+                        ? Math.max(b.length, advance) + b.size * 1.5f
+                        : Math.max(4f, advance) * 1.12f + b.size * 1.5f;
                 float hPt = Math.max(4f, b.size * LINE_FACTOR);
                 anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString());
             }

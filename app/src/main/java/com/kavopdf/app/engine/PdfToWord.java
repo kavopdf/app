@@ -288,10 +288,52 @@ public final class PdfToWord {
             int count = doc.getNumberOfPages();
             result.report.pages = count;
             for (int i = 0; i < count; i++) {
-                result.pages.add(readPage(doc, i, hook, result.report));
+                Page read = readPage(doc, i, hook, result.report);
+                mergeClusterTails(read);
+                result.pages.add(read);
             }
         }
         return result;
+    }
+
+    /**
+     * Rejoins a paragraph that begins with a combining mark to the paragraph before it.
+     *
+     * <p>The converter cuts a drawn line wherever the typeface changes, and the cut can land
+     * inside a grapheme cluster: file 78 draws "केवल" as one line, the cut fell between "क" and
+     * "ेवल", and the two halves became two paragraphs - so Word started a text box with a lone
+     * vowel sign and drew the dotted circle a mark without a consonant gets. "पंजीकृत" broke the
+     * same way into "पंजीक" and "ृत".
+     *
+     * <p>A combining mark has no base of its own, so a paragraph that opens with one on the same
+     * baseline as the paragraph before it is that paragraph's tail, not a line of the document.
+     * Only text is joined - nothing is dropped, reordered or re-styled.
+     */
+    private static void mergeClusterTails(Page page) {
+        for (int i = 1; i < page.blocks.size(); i++) {
+            Object cur = page.blocks.get(i), prev = page.blocks.get(i - 1);
+            if (!(cur instanceof Para) || !(prev instanceof Para)) continue;
+            Para a = (Para) prev, b = (Para) cur;
+            if (a.boxes.isEmpty() || b.boxes.isEmpty()) continue;
+            Box tail = b.boxes.get(0);
+            if (!startsWithCombiningMark(tail.text())) continue;
+            Box last = a.boxes.get(a.boxes.size() - 1);
+            if (Math.abs(last.y - tail.y) > Math.max(2f, tail.size * 0.5f)) continue;
+            last.runs.addAll(tail.runs);
+            last.right = Math.max(last.right, tail.right);
+            last.bottom = Math.max(last.bottom, tail.bottom);
+            last.length = last.right - last.x;
+            b.boxes.remove(0);
+            if (b.boxes.isEmpty()) {
+                // The tail's own line still belongs in the plain-text output: joining the two
+                // halves for Word must not remove a line from the .txt, which is what the text
+                // metrics are read from. Measured when it did: char volume 99.91 -> 99.84 and
+                // word recall 99.67 -> 99.60.
+                a.lines.addAll(b.lines);
+                page.blocks.remove(i);
+                i--;
+            }
+        }
     }
 
     private static Page readPage(PDDocument doc, int index, OcrHook hook, Report report) {
@@ -2989,7 +3031,25 @@ public final class PdfToWord {
             box.length = line.length;
             box.rotated = line.rotated;
             box.angle = line.angle;
-            box.runs.addAll(runsOf(line));
+            List<Run> lineRuns = coalesceRuns(runsOf(line));
+            // A fragment that opens with a combining mark is not a line of its own - it is the
+            // tail of the word the previous fragment began. The page draws "केवल" as one line,
+            // but the converter cuts a line wherever the typeface changes, and the cut can land
+            // inside a cluster: "क" then "ेवल", "पंजीक" then "ृत". Each fragment became its
+            // own anchored text box, so Word opened the second one with a lone vowel sign and
+            // drew the dotted circle a missing consonant gets - file 78 reached Word as
+            // "के◌वल" and "पंजीकृ◌त". Joining the tail back onto the box it belongs to keeps the
+            // cluster in one paragraph, where a shaping engine can see it whole.
+            Box prevBox = p.boxes.isEmpty() ? null : p.boxes.get(p.boxes.size() - 1);
+            if (prevBox != null && startsWithCombiningMark(line.text)
+                    && Math.abs(prevBox.y - line.y) <= Math.max(2f, line.size * 0.5f)) {
+                prevBox.runs.addAll(lineRuns);
+                prevBox.right = Math.max(prevBox.right, line.right);
+                prevBox.bottom = Math.max(prevBox.bottom, line.bottom);
+                prevBox.length = prevBox.right - prevBox.x;
+                continue;
+            }
+            box.runs.addAll(lineRuns);
             p.boxes.add(box);
         }
 
@@ -3000,6 +3060,52 @@ public final class PdfToWord {
         p.bullet = bulletOf(text);
         if (p.bullet != null) p.indent = Math.max(1, p.indent);
         return p;
+    }
+
+    /**
+     * True when the first character that is not a space is a combining mark - a Devanagari
+     * matra, an Arabic harakah, a Thai vowel sign. Such a character has no base of its own and
+     * a renderer that starts a paragraph with one draws a dotted circle in front of it.
+     */
+    private static boolean startsWithCombiningMark(String s) {
+        if (s == null) return false;
+        for (int i = 0; i < s.length(); ) {
+            int cp = s.codePointAt(i);
+            if (!Character.isWhitespace(cp) && cp != ' ') {
+                int type = Character.getType(cp);
+                return type == Character.NON_SPACING_MARK
+                        || type == Character.COMBINING_SPACING_MARK
+                        || type == Character.ENCLOSING_MARK;
+            }
+            i += Character.charCount(cp);
+        }
+        return false;
+    }
+
+    /**
+     * Joins neighbouring runs that share every character property.
+     *
+     * <p>A run boundary inside a word is invisible in Latin text and fatal in a shaped script:
+     * a renderer that shapes one run at a time cannot see that "क" and "ेवल" are one cluster.
+     * Only runs whose bold, italic, size, typeface and colour all match are joined, so nothing
+     * a reader can see changes.
+     */
+    private static List<Run> coalesceRuns(List<Run> in) {
+        List<Run> out = new ArrayList<>(in.size());
+        for (Run r : in) {
+            if (r.text.isEmpty()) continue;
+            if (!out.isEmpty()) {
+                Run p = out.get(out.size() - 1);
+                if (p.bold == r.bold && p.italic == r.italic && p.color == r.color
+                        && Math.abs(p.sizePt - r.sizePt) < 0.01f && p.font.equals(r.font)) {
+                    out.set(out.size() - 1, new Run(p.text + r.text, p.bold, p.italic,
+                            p.sizePt, p.font, p.color));
+                    continue;
+                }
+            }
+            out.add(r);
+        }
+        return out;
     }
 
     /**
@@ -4133,7 +4239,15 @@ public final class PdfToWord {
                     prev = g;
                     continue;
                 }
-                if (gap > Math.max(1.5f, prev.size * 0.18f) && sb.length() > 0
+                // A glyph with no advance of its own is not a word boundary. A Devanagari
+                // vowel sign is drawn as a zero-width mark laid back over its consonant, so
+                // the next consonant starts forward of it and the gap measured after the mark
+                // means nothing - the pair was one cluster. This is the same rule
+                // textOf() already applies to a whole line; the cell path did not have it, so
+                // the Devanagari table's total row reached Word as "कु ल योग" out of the
+                // page's "कुल योग" - a space inside a word.
+                boolean prevAdvances = prev.width > prev.size * 0.05f;
+                if (prevAdvances && gap > Math.max(1.5f, prev.size * 0.18f) && sb.length() > 0
                         && sb.charAt(sb.length() - 1) != ' ') sb.append(' ');
             }
             sb.append(g.text);
