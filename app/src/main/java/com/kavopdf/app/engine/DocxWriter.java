@@ -629,7 +629,15 @@ public final class DocxWriter {
         int leftTw = (int) Math.max(0L, Math.round(b.x * TWIPS_PER_PT));
         int lineTw = (int) Math.max(1L, Math.round(Math.max(4f, b.size * LINE_FACTOR) * TWIPS_PER_PT));
         int beforeTw = 0;
-        if (!ctx.newPage && ctx.lastBaseline >= 0f) {
+        if (ctx.newPage) {
+            // The FIRST line on a page still has to land at its own y. The section carries zero
+            // margins, so without this it starts at the very top of the sheet: on file 21 every
+            // line measured 46 pt high against the PDF, a constant offset with the pitch already
+            // correct. Measured, not guessed - dy was -46.2, -48.3, -45.0, -46.6 over the first
+            // four lines of the page.
+            float topGap = b.y - Math.max(4f, b.size * LINE_FACTOR);
+            if (topGap > 0f) beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
+        } else if (ctx.lastBaseline >= 0f) {
             // The paragraph before this one is already a full line box tall, so the space that
             // still has to be added is the baseline-to-baseline pitch MINUS that whole box.
             // Subtracting only its leading - size * (LINE_FACTOR - 1) - left every flowing line
