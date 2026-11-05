@@ -107,10 +107,16 @@ public final class DocxWriter {
         int shapeSeq = 1;
         int anchorCount;
         int flowCount;
-        /** Bottom of the last flowing line, in PDF points from the page top. -1 = none yet. */
-        float lastBottom = -1f;
+        /** Baseline of the last flowing line, in PDF points from the page top. -1 = none yet. */
+        float lastBaseline = -1f;
+        /** Size of that line's text, so its line box can be measured. */
+        float lastSize = 0f;
         /** Set at a page break so the first line on a page carries no gap. */
         boolean newPage = true;
+        /** Flow height already spent on this page, in twips. */
+        int flowTw;
+        /** The page's own height in twips - the budget the flow must not exceed. */
+        int budgetTw;
     }
 
     // ------------------------------------------------------------------ document
@@ -158,8 +164,10 @@ public final class DocxWriter {
                         .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr>")
                         .append("<w:r><w:br w:type=\"page\"/></w:r></w:p>");
                 ctx.newPage = true;
-                ctx.lastBottom = -1f;
             }
+            ctx.lastBaseline = -1f;
+            ctx.flowTw = 0;
+            ctx.budgetTw = (int) Math.max(1L, Math.round(ph * TWIPS_PER_PT));
             if (page.blocks.isEmpty()) continue;
             for (Object block : page.blocks) {
                 if (block instanceof PdfToWord.Para) {
@@ -495,14 +503,29 @@ public final class DocxWriter {
         int leftTw = (int) Math.max(0L, Math.round(b.x * TWIPS_PER_PT));
         int lineTw = (int) Math.max(1L, Math.round(Math.max(4f, b.size * LINE_FACTOR) * TWIPS_PER_PT));
         int beforeTw = 0;
-        if (!ctx.newPage && ctx.lastBottom >= 0f) {
-            float gap = b.y - ctx.lastBottom;
-            // A line box is LINE_FACTOR tall; anything inside that is normal leading, not a gap.
-            float extra = gap - b.size * (LINE_FACTOR - 1f);
+        if (!ctx.newPage && ctx.lastBaseline >= 0f) {
+            // The paragraph before this one is already a full line box tall, so the space that
+            // still has to be added is the baseline-to-baseline pitch MINUS that whole box.
+            // Subtracting only its leading - size * (LINE_FACTOR - 1) - left every flowing line
+            // one font-size too low: on file 01 the 43 lines of the invoice drifted 115 pt by
+            // the middle of the page, so the flow ran off the end of the paper. The anchored
+            // stamp and every band were then laid out on page 2 and vanished from the render,
+            // and the BILL TO / SHIP TO headings slid down into the floating goods table.
+            float pitch = b.y - ctx.lastBaseline;
+            float prevLine = Math.max(4f, ctx.lastSize * LINE_FACTOR);
+            float extra = pitch - prevLine;
             if (extra > 0f) beforeTw = (int) Math.min(1440L, Math.round(extra * TWIPS_PER_PT));
         }
-        ctx.lastBottom = b.y + b.size * (LINE_FACTOR - 1f);
+        ctx.lastBaseline = b.y;
+        ctx.lastSize = b.size;
         ctx.newPage = false;
+        // A page's flow must end where the paper does. The gap above is clamped per line, but
+        // 43 of them add up, and a page whose flow overruns by a few points sends its last line
+        // - and every anchored shape after it - to a second sheet. Give up the gap instead.
+        if (ctx.budgetTw > 0 && ctx.flowTw + beforeTw + lineTw > ctx.budgetTw) {
+            beforeTw = Math.max(0, ctx.budgetTw - ctx.flowTw - lineTw);
+        }
+        ctx.flowTw += beforeTw + lineTw;
         sb.append("<w:p><w:pPr>");
         if (p.heading > 0) {
             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
@@ -673,23 +696,26 @@ public final class DocxWriter {
         for (int c = 0; c < cols; c++) totalTw += colTw[c];
 
         StringBuilder inner = new StringBuilder(512);
-        // The table floats at its own page position - w:tblpPr takes page-relative
-        // coordinates - instead of sitting inside a text box.
+        // The table is a real w:tbl in the flow, not a text box.
         //
         // A text box has a fixed height and clips what does not fit: on file 80 the box was
         // 44 pt tall, so of each dealer's six rows only the first two survived and the CIN,
         // IFSC and Address rows were gone from the document. Worse, the box is carried by a
         // wrapper paragraph, and that paragraph's own text is every cell of the table run
         // together with no separator - which is the "1.SUNRISE FASTENERS PVT LTDGSTIN
-        // 29AABCS4821K1Z6..." a reader of the XML sees. A floating table is a table and
-        // nothing else: one w:p per cell, no wrapper, no clip.
+        // 29AABCS4821K1Z6..." a reader of the XML sees. A w:tbl is a table and nothing else:
+        // one w:p per cell, no wrapper, no clip.
+        //
+        // It is inline, not floating. A floating table (w:tblpPr) is placed at the
+        // page's own y, but Word and LibreOffice then wrap the flowing text AROUND it: on
+        // file 01 the BILL TO heading at x=64 was shoved to x=528 and "State Code 33" to the
+        // left edge of the paper, because both sat inside the address box's band; on file 16
+        // the closing-balance sentence beside the ledger was squeezed into a five-line
+        // column. The flow is the document now, so the table belongs in it and the text keeps
+        // the indents the PDF drew.
         inner.append("<w:tbl><w:tblPr>")
-                .append("<w:tblpPr w:leftFromText=\"0\" w:rightFromText=\"0\"")
-                .append(" w:topFromText=\"0\" w:bottomFromText=\"0\"")
-                .append(" w:vertAnchor=\"page\" w:horzAnchor=\"page\"")
-                .append(" w:tblpX=\"").append(tw(x0)).append("\"")
-                .append(" w:tblpY=\"").append(tw(t.top)).append("\"/>")
                 .append("<w:tblW w:w=\"").append(totalTw).append("\" w:type=\"dxa\"/>")
+                .append("<w:tblInd w:w=\"").append(tw(x0)).append("\" w:type=\"dxa\"/>")
                 .append("<w:tblBorders>")
                 .append("<w:top w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
                 .append("<w:left w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")

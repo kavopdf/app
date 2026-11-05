@@ -107,7 +107,14 @@ def big_shapes(path):
             h = int(e.get('cy')) / 12700.0
         except Exception:
             continue
-        sf = wsp.find('.//' + A + 'solidFill')
+        # The shape's OWN fill, not any solidFill inside it. An outline-only shape writes
+        # <a:noFill/> followed by <a:ln><a:solidFill> for its border colour, and a descendant
+        # search matched that border and called every thin drawn rectangle a solid block: 19
+        # of the 21 documents were charged for boxes whose fill is noFill. A fill is a fill
+        # only when spPr itself declares one.
+        sp = wsp.find('.//' + WPS[:-3] + 'spPr')
+        if sp is None: continue
+        sf = sp.find(A + 'solidFill')
         if sf is None: continue
         # A large solid fill is a block over the page unless it is the page itself.
         if w * h > 3000 and w < 580 and h < 820:
