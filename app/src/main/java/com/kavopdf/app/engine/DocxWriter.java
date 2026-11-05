@@ -139,25 +139,35 @@ public final class DocxWriter {
         // file that mixes landscape and portrait pages gets a section break where the size
         // changes; every other page break stays a plain page break.
         float secW = 0, secH = 0;
+        int secCols = 1;
+        float secGap = 0f;
         boolean first = true;
         for (PdfToWord.Page page : result.pages) {
             float pw = page.width > 0 ? page.width : 595f;
             float ph = page.height > 0 ? page.height : 842f;
+            int[] pc = pageColumns(page);
+            int pCols = pc[0];
+            float pGap = pc[1];
             if (first) {
                 secW = pw;
                 secH = ph;
+                secCols = pCols;
+                secGap = pGap;
                 first = false;
-            } else if (Math.abs(pw - secW) > 0.5f || Math.abs(ph - secH) > 0.5f) {
+            } else if (Math.abs(pw - secW) > 0.5f || Math.abs(ph - secH) > 0.5f
+                    || pCols != secCols) {
                 // Close the section that just ended. A sectPr lives in the last paragraph of
                 // its section, and nextPage starts the new one on a fresh page - which is the
                 // page break this page needed anyway.
                 sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
                         .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
-                        .append("<w:sectPr>").append(sectPrXml(secW, secH))
+                        .append("<w:sectPr>").append(sectPrXml(secW, secH, secCols, secGap))
                         .append("<w:type w:val=\"nextPage\"/></w:sectPr>")
                         .append("</w:pPr></w:p>");
                 secW = pw;
                 secH = ph;
+                secCols = pCols;
+                secGap = pGap;
             } else {
                 // A page with nothing on it still has to advance the page counter, or every
                 // anchor after it lands one page too early.
@@ -185,7 +195,7 @@ public final class DocxWriter {
             }
         }
         // The section properties must be the LAST child of w:body.
-        sb.append("<w:sectPr>").append(sectPrXml(secW <= 0 ? 595f : secW, secH <= 0 ? 842f : secH))
+        sb.append("<w:sectPr>").append(sectPrXml(secW <= 0 ? 595f : secW, secH <= 0 ? 842f : secH, secCols, secGap))
                 .append("</w:sectPr>");
         sb.append("</w:body></w:document>");
         return sb.toString();
@@ -199,14 +209,54 @@ public final class DocxWriter {
      * 300 pt from the edge of the paper and from the start of the text area alike.
      */
     private static String sectPrXml(float wPt, float hPt) {
+        return sectPrXml(wPt, hPt, 1, 0);
+    }
+
+    /**
+     * A section, with the page divided into {@code cols} newspaper columns.
+     *
+     * <p>The engine has detected column bands for a long time - {@code Line.column} comes from the
+     * gutter edges and paragraphs are ordered column by column - but the writer always emitted
+     * {@code w:cols w:space="0"}, one column, so a page that reads ACROSS was written as a page
+     * that reads DOWN. That is why seven multi-column documents rendered two pages against one:
+     * the second column was appended below the first instead of beside it.
+     */
+    private static String sectPrXml(float wPt, float hPt, int cols, float gapPt) {
         int w = Math.max(1, Math.round((float) (wPt * TWIPS_PER_PT)));
         int h = Math.max(1, Math.round((float) (hPt * TWIPS_PER_PT)));
         String orient = wPt > hPt ? " w:orient=\"landscape\"" : "";
+        int gap = (int) Math.max(0L, Math.round(gapPt * TWIPS_PER_PT));
+        String colsXml = cols > 1
+                ? "<w:cols w:num=\"" + cols + "\" w:space=\"" + gap + "\" w:equalWidth=\"1\"/>"
+                : "<w:cols w:space=\"0\"/>";
         return "<w:pgSz w:w=\"" + w + "\" w:h=\"" + h + "\"" + orient + "/>"
                 + "<w:pgMar w:top=\"0\" w:right=\"0\" w:bottom=\"0\" w:left=\"0\""
                 + " w:header=\"0\" w:footer=\"0\" w:gutter=\"0\"/>"
-                + "<w:cols w:space=\"0\"/>"
+                + colsXml
                 + "<w:docGrid w:linePitch=\"360\"/>";
+    }
+
+    /** How many column bands this page's paragraphs occupy, and the widest gutter between them. */
+    private static int[] pageColumns(PdfToWord.Page page) {
+        java.util.TreeSet<Integer> seen = new java.util.TreeSet<>();
+        java.util.TreeMap<Integer, float[]> band = new java.util.TreeMap<>();
+        for (Object o : page.blocks) {
+            if (!(o instanceof PdfToWord.Para)) continue;
+            PdfToWord.Para p = (PdfToWord.Para) o;
+            seen.add(p.column);
+            float[] r = band.get(p.column);
+            if (r == null) band.put(p.column, new float[]{p.left, p.right});
+            else { r[0] = Math.min(r[0], p.left); r[1] = Math.max(r[1], p.right); }
+        }
+        if (seen.size() <= 1) return new int[]{1, 0};
+        // Widest gap between consecutive column bands, used as w:cols w:space.
+        float gap = 0f;
+        float[] prev = null;
+        for (float[] r : band.values()) {
+            if (prev != null) gap = Math.max(gap, r[0] - prev[1]);
+            prev = r;
+        }
+        return new int[]{seen.size(), Math.max(0, Math.round(gap))};
     }
 
     /** An image lifted out of the PDF and placed where it was. */
