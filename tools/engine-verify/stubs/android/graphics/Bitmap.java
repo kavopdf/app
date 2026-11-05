@@ -49,6 +49,7 @@ public class Bitmap {
   public Config getConfig(){return Config.ARGB_8888;}
   public int getPixel(int x,int y){return img.getRGB(x,y);}
   public void getPixels(int[] px,int off,int stride,int x,int y,int w,int h){ img.getRGB(x,y,w,h,px,off,stride); }
+  public void setPixels(int[] px,int off,int stride,int x,int y,int w,int h){ img.setRGB(x,y,w,h,px,off,stride); }
   public int getByteCount(){return img.getWidth()*img.getHeight()*4;}
   public void recycle(){recycled=true;}
   public boolean isRecycled(){return recycled;}

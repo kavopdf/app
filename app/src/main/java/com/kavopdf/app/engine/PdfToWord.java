@@ -136,6 +136,14 @@ public final class PdfToWord {
      */
     public static final class Box {
         public float x, y, right, size;
+        /** Bottom edge of the line's box on the page, y down. */
+        public float bottom;
+        /** The line's extent along its own baseline - the width a text box needs. */
+        public float length;
+        /** True when the line was drawn on a non-horizontal baseline. */
+        public boolean rotated;
+        /** The baseline's angle in degrees, clockwise. */
+        public float angle;
         public final List<Run> runs = new ArrayList<>();
 
         public String text() {
@@ -289,6 +297,12 @@ public final class PdfToWord {
         int chars = 0;
         for (Glyph g : glyphs) chars += g.text.length();
 
+        // Read once, here: the images a page draws are needed by every path below, including
+        // the one that has no text layer and returns early - a scanned page is nothing but one
+        // image, and reading it only on the text path is how it came out blank.
+        Rules rules = rulesOf(doc, index);
+        report.images += rules.images;
+
         // A filled form keeps its answers in the field's /V, never in the content stream, so
         // they are read on every page - not only on a page with no text layer. Without this a
         // filled form converted to Word kept its printed labels and lost every answer.
@@ -362,11 +376,9 @@ public final class PdfToWord {
                 report.notes.add("page " + (index + 1)
                         + " has no text layer and was not OCR'd - it comes out empty");
             }
+            attachPictures(page, rules, page.height);
             return page;
         }
-
-        Rules rules = rulesOf(doc, index);
-        report.images += rules.images;
 
         float pageWidth = pdPage.getMediaBox().getWidth();
         final float pageHeight = pdPage.getMediaBox().getHeight();
@@ -909,6 +921,7 @@ public final class PdfToWord {
                 report.tables++;
             }
         }
+        attachPictures(page, rules, page.height);
         return page;
     }
 
@@ -1774,6 +1787,19 @@ public final class PdfToWord {
         boolean rotated;
         /** True when this line is one character of a seal drawn as a ring. */
         boolean ring;
+        /**
+         * How long the line is ALONG its own baseline, in points.
+         *
+         * <p>{@link #right} minus {@link #x} is the line's width across the page, which on a
+         * vertical stamp is the height of the text, not its length. A text box sized from that
+         * width is 22 pt wide for a 50 pt date, so the date wrapped and the second half was
+         * clipped away.
+         */
+        float length;
+        /** The baseline's angle in degrees, clockwise, 0 for upright text. */
+        float angle;
+        /** Bottom edge of the line's box on the page, y down. */
+        float bottom;
 
         boolean inside(Table t) {
             float cx = (x + right) / 2f;
@@ -2026,6 +2052,23 @@ public final class PdfToWord {
         line.right = Math.max(right, left) + widest;
         line.y = top;
         line.rotated = true;
+        float bottom = -Float.MAX_VALUE;
+        for (Glyph g : seg) bottom = Math.max(bottom, g.py + g.size);
+        line.bottom = bottom;
+        // The extent along the baseline, and the angle it runs at. Both come from the
+        // direction the glyphs were really drawn in: a stamp's rotation lives in the form's
+        // own cm, so the text matrix is the only place that knows it.
+        Glyph seed = seg.get(0);
+        float dx = seed.tx == 0f && seed.ty == 0f ? 1f : seed.tx;
+        float dy = seed.tx == 0f && seed.ty == 0f ? 0f : seed.ty;
+        float minA = Float.MAX_VALUE, maxA = -Float.MAX_VALUE;
+        for (Glyph g : seg) {
+            float along = alongOf(g, seed, dx, dy);
+            minA = Math.min(minA, along);
+            maxA = Math.max(maxA, along);
+        }
+        line.length = Math.max(maxA - minA + widest, widest);
+        line.angle = (float) Math.toDegrees(Math.atan2(dy, dx));
         return line;
     }
 
@@ -2245,6 +2288,8 @@ public final class PdfToWord {
             line.y = g.py;
             line.left = g.px;
             line.right = g.px + Math.max(g.width, 1f);
+            line.bottom = g.py + g.size;
+            line.length = Math.max(g.width, 1f);
             line.rotated = true;
             line.ring = true;
             line.hardEnd = true;
@@ -2290,6 +2335,10 @@ public final class PdfToWord {
             box.y = ln.y;
             box.right = ln.right;
             box.size = ln.size;
+            box.bottom = ln.bottom;
+            box.length = ln.length;
+            box.rotated = ln.rotated;
+            box.angle = ln.angle;
             box.runs.addAll(runsOf(ln));
             p.boxes.add(box);
         }
@@ -2883,6 +2932,10 @@ public final class PdfToWord {
             box.y = line.y;
             box.right = line.right;
             box.size = line.size;
+            box.bottom = line.bottom;
+            box.length = line.length;
+            box.rotated = line.rotated;
+            box.angle = line.angle;
             box.runs.addAll(runsOf(line));
             p.boxes.add(box);
         }
@@ -3042,6 +3095,15 @@ public final class PdfToWord {
         final List<float[]> horizontal = new ArrayList<>();   // {y, x1, x2}
         final List<float[]> vertical = new ArrayList<>();     // {x, y1, y2}
         int images;
+        /**
+         * The raster images the page draws, in draw order, with the rectangle each one covers.
+         *
+         * <p>Nothing used to read these: {@code images} was counted for the report and the
+         * pixels were thrown away, so a scanned page converted to a blank Word page and a
+         * stamped PDF lost its stamp. The rectangle is the image's own unit square put
+         * through the transform in force when it was drawn, in PDF user space (y up).
+         */
+        final List<DocxWriter.Picture> pictures = new ArrayList<>();
     }
 
     private static final class RuleCollector extends PDFGraphicsStreamEngine {
@@ -3074,6 +3136,102 @@ public final class PdfToWord {
         @Override
         public void drawImage(PDImage pdImage) {
             rules.images++;
+            collectImage(pdImage);
+        }
+
+        /**
+         * Folds a mask image into the picture as its alpha channel.
+         *
+         * <p>The mask is usually a different size from the image it protects - a soft mask is
+         * often a quarter of it - so it is sampled by proportion rather than by index.
+         */
+        private android.graphics.Bitmap withMask(android.graphics.Bitmap src,
+                                                 android.graphics.Bitmap mask) {
+            int w = src.getWidth(), h = src.getHeight();
+            int mw = mask.getWidth(), mh = mask.getHeight();
+            if (w <= 0 || h <= 0 || mw <= 0 || mh <= 0) return src;
+            int[] px = new int[w * h];
+            src.getPixels(px, 0, w, 0, 0, w, h);
+            int[] mp = new int[mw * mh];
+            mask.getPixels(mp, 0, mw, 0, 0, mw, mh);
+            for (int y = 0; y < h; y++) {
+                int my = mh > 1 ? Math.min(mh - 1, y * mh / h) : 0;
+                for (int x = 0; x < w; x++) {
+                    int mx = mw > 1 ? Math.min(mw - 1, x * mw / w) : 0;
+                    int a = (mp[my * mw + mx] >> 16) & 0xFF;
+                    int c = px[y * w + x];
+                    px[y * w + x] = (a << 24) | (c & 0x00FFFFFF);
+                }
+            }
+            return android.graphics.Bitmap.createBitmap(px, w, h,
+                    android.graphics.Bitmap.Config.ARGB_8888);
+        }
+
+        /**
+         * Lifts one drawn image out, with the rectangle it covers on the page.
+         *
+         * <p>A PDF draws an image into the unit square and lets the transform in force stretch
+         * it, so the placement is that square's four corners through the current matrix -
+         * never the image's pixel size, which says nothing about where it lands.
+         */
+        private void collectImage(PDImage pdImage) {
+            if (pdImage == null || pdImage.isStencil()) return;
+            try {
+                com.tom_roush.pdfbox.util.Matrix ctm =
+                        getGraphicsState().getCurrentTransformationMatrix();
+                if (ctm == null) return;
+                float[] xs = new float[4];
+                float[] ys = new float[4];
+                float[][] corner = {{0, 0}, {1, 0}, {0, 1}, {1, 1}};
+                for (int i = 0; i < 4; i++) {
+                    android.graphics.PointF pt = ctm.transformPoint(corner[i][0], corner[i][1]);
+                    xs[i] = pt.x;
+                    ys[i] = pt.y;
+                }
+                float minX = xs[0], maxX = xs[0], minY = ys[0], maxY = ys[0];
+                for (int i = 1; i < 4; i++) {
+                    minX = Math.min(minX, xs[i]);
+                    maxX = Math.max(maxX, xs[i]);
+                    minY = Math.min(minY, ys[i]);
+                    maxY = Math.max(maxY, ys[i]);
+                }
+                // A hairline is a rule the page draws with an image, not a picture a reader
+                // would miss. Only something with area on the page is worth carrying over.
+                if (maxX - minX < 2f || maxY - minY < 2f) return;
+                android.graphics.Bitmap bmp = pdImage.getImage();
+                if (bmp == null) return;
+                // A scanned signature or a stamp with soft edges keeps its shape in an /SMask,
+                // not in the image's own samples. getImage() returns the colour plane alone, so
+                // the mask has to be folded in here or every transparent part of the picture
+                // arrives as an opaque black box over the words underneath it.
+                if (pdImage instanceof PDImageXObject) {
+                    android.graphics.Bitmap mask = null;
+                    try {
+                        PDImageXObject xo = (PDImageXObject) pdImage;
+                        PDImageXObject soft = xo.getSoftMask();
+                        if (soft != null) mask = soft.getImage();
+                        if (mask == null) {
+                            PDImageXObject hard = xo.getMask();
+                            if (hard != null) mask = hard.getImage();
+                        }
+                    } catch (Throwable ignored) {
+                    }
+                    if (mask != null) bmp = withMask(bmp, mask);
+                }
+                java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                if (!bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, bos)) return;
+                byte[] png = bos.toByteArray();
+                if (png.length < 64) return;
+                DocxWriter.Picture pic = new DocxWriter.Picture(png, 0f, 0f,
+                        maxX - minX, maxY - minY);
+                // PDF user space has y up from the bottom of the page; the .docx anchor is
+                // measured down from the top, so the top edge is the page height minus maxY.
+                pic.topPt = -maxY;
+                pic.xPt = minX;
+                rules.pictures.add(pic);
+            } catch (Throwable ignored) {
+                // One unreadable image must not cost the page its text.
+            }
         }
 
         @Override
@@ -3136,6 +3294,24 @@ public final class PdfToWord {
         }
     }
 
+    /**
+     * Puts the page's images on the page, pinned where they were drawn.
+     *
+     * <p>The y a PDF draws at counts up from the bottom of the page and a .docx anchor counts
+     * down from the top, so the top edge of the image is the page height minus its top in PDF
+     * space. An image drawn off the page is dropped: a picture pinned outside the paper is
+     * invisible in Word and only adds weight to the file.
+     */
+    private static void attachPictures(Page page, Rules rules, float pageHeight) {
+        if (rules == null || rules.pictures.isEmpty()) return;
+        for (DocxWriter.Picture pic : rules.pictures) {
+            pic.topPt = pageHeight + pic.topPt;
+            if (pic.topPt > pageHeight || pic.topPt + pic.hPt < 0) continue;
+            if (pic.xPt > page.width || pic.xPt + pic.wPt < 0) continue;
+            page.blocks.add(pic);
+        }
+    }
+
     private static Rules rulesOf(PDDocument doc, int index) {
         Rules out = new Rules();
         try {
@@ -3145,6 +3321,7 @@ public final class PdfToWord {
             out.horizontal.addAll(collector.rules.horizontal);
             out.vertical.addAll(collector.rules.vertical);
             out.images = collector.rules.images;
+            out.pictures.addAll(collector.rules.pictures);
         } catch (Throwable ignored) {
         }
         return out;

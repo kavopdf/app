@@ -188,17 +188,41 @@ public final class DocxWriter {
         public final int heightEmu;
         public float top;
         public int column;
+        /**
+         * Where the image sat on its page, in points from the page's top-left.
+         *
+         * <p>An image the PDF drew is not part of the text flow - it is pinned to a place on
+         * the paper. {@link #placed} says the position is known, and then the writer pins the
+         * picture there instead of dropping it into the flow at the end of the page.
+         */
+        public boolean placed;
+        public float xPt, topPt, wPt, hPt;
 
         public Picture(byte[] png, int widthEmu, int heightEmu) {
             this.png = png;
             this.widthEmu = widthEmu;
             this.heightEmu = heightEmu;
         }
+
+        public Picture(byte[] png, float xPt, float topPt, float wPt, float hPt) {
+            this.png = png;
+            this.xPt = xPt;
+            this.topPt = topPt;
+            this.wPt = wPt;
+            this.hPt = hPt;
+            this.placed = true;
+            this.widthEmu = (int) Math.max(1L, Math.round(wPt * EMU_PER_PT));
+            this.heightEmu = (int) Math.max(1L, Math.round(hPt * EMU_PER_PT));
+        }
     }
 
     private static void picture(StringBuilder sb, Picture p, Ctx ctx) {
         ctx.media.add(p.png);
         int id = ctx.media.size();
+        if (p.placed) {
+            anchoredPicture(sb, p, id, ctx);
+            return;
+        }
         sb.append("<w:p><w:r><w:drawing><wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">")
                 .append("<wp:extent cx=\"").append(p.widthEmu).append("\" cy=\"")
                 .append(p.heightEmu).append("\"/>")
@@ -216,6 +240,49 @@ public final class DocxWriter {
                 .append("</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>");
     }
 
+    /**
+     * An image pinned to the page at the place the PDF drew it.
+     *
+     * <p>{@code behindDoc="1"} puts it behind the text: a scan is the page's background and a
+     * stamp image is a mark on top of a page whose words are already there as text boxes. A
+     * picture in front of them would hide words, which is worse than the picture being under
+     * a stamp that does not overlap it.
+     */
+    private static void anchoredPicture(StringBuilder sb, Picture p, int id, Ctx ctx) {
+        long cx = Math.max(1, p.widthEmu);
+        long cy = Math.max(1, p.heightEmu);
+        long offX = Math.round(p.xPt * EMU_PER_PT);
+        long offY = Math.round(p.topPt * EMU_PER_PT);
+        int relHeight = 251658240 + (id & 0xFFFF);
+        sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                .append("<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr></w:pPr>")
+                .append("<w:r><w:drawing>")
+                .append("<wp:anchor distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"")
+                .append(" simplePos=\"0\" relativeHeight=\"").append(relHeight).append("\"")
+                .append(" behindDoc=\"1\" locked=\"0\" layoutInCell=\"1\" allowOverlap=\"1\">")
+                .append("<wp:simplePos x=\"0\" y=\"0\"/>")
+                .append("<wp:positionH relativeFrom=\"page\"><wp:posOffset>").append(offX)
+                .append("</wp:posOffset></wp:positionH>")
+                .append("<wp:positionV relativeFrom=\"page\"><wp:posOffset>").append(offY)
+                .append("</wp:posOffset></wp:positionV>")
+                .append("<wp:extent cx=\"").append(cx).append("\" cy=\"").append(cy).append("\"/>")
+                .append("<wp:effectExtent l=\"0\" t=\"0\" r=\"0\" b=\"0\"/>")
+                .append("<wp:wrapNone/>")
+                .append("<wp:docPr id=\"").append(id).append("\" name=\"Picture ").append(id)
+                .append("\"/>")
+                .append("<a:graphic><a:graphicData uri=\"")
+                .append("http://schemas.openxmlformats.org/drawingml/2006/picture\">")
+                .append("<pic:pic><pic:nvPicPr><pic:cNvPr id=\"").append(id)
+                .append("\" name=\"image").append(id).append(".png\"/><pic:cNvPicPr/></pic:nvPicPr>")
+                .append("<pic:blipFill><a:blip r:embed=\"rIdImg").append(id)
+                .append("\"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>")
+                .append("<pic:spPr><a:xfrm><a:off x=\"0\" y=\"0\"/><a:ext cx=\"")
+                .append(cx).append("\" cy=\"").append(cy).append("\"/></a:xfrm>")
+                .append("<a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom></pic:spPr>")
+                .append("</pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r></w:p>");
+    }
+
     // ------------------------------------------------------------------ paragraphs
 
     /**
@@ -227,10 +294,20 @@ public final class DocxWriter {
         if (!p.boxes.isEmpty()) {
             for (PdfToWord.Box b : p.boxes) {
                 if (b.runs.isEmpty()) continue;
-                float wPt = Math.max(4f, b.right - b.x) + b.size * 1.5f;
-                float hPt = Math.max(4f, b.size * LINE_FACTOR);
                 StringBuilder inner = new StringBuilder(256);
                 lineParagraph(inner, p, b);
+                // How wide the box has to be to hold the line unwrapped.
+                //
+                // A rotated line is measured along its own baseline, not across the page: on
+                // the 90-degree stamp b.right-b.x is the height of the text, so "31-03-2026"
+                // was given a 22 pt box, wrapped, and reached Word as "31-". The other lines
+                // get 12 % of slack, because the page's advance is measured in the font the
+                // PDF embedded and the same string set in the substituted face is a few per
+                // cent wider - enough to wrap the last word and clip it.
+                float wPt = b.rotated && b.length > 0f
+                        ? b.length + b.size * 1.5f
+                        : Math.max(4f, b.right - b.x) * 1.12f + b.size * 1.5f;
+                float hPt = Math.max(4f, b.size * LINE_FACTOR);
                 anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString());
             }
             return;
