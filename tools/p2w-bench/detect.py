@@ -362,26 +362,42 @@ class Render:
 
 
 def _prefix_seen(text, render):
-    """Longest prefix of `text` that the render still holds, at a word or character break.
+    """Longest prefix of `text` that the render holds and then STOPS at.
 
-    Returned as a length. Only boundaries a clipping box can actually stop at count: the
-    end of a word, or a hyphenated fragment ("31-03-2026" clipped to "31-"), so a prefix
-    that happens to match inside a different word is not mistaken for a clipped one.
+    Returned as a length, 0 when the render holds no prefix of it.
+
+    Two conditions, and both are needed. The prefix has to end where a clipping box can
+    actually stop - the end of a word, or a hyphenated fragment - so a prefix that merely
+    matches inside a longer word is not read as a clipped one. And the render must not carry
+    the next character after it: if the render has "31-0" anywhere then "31-" is not a
+    clipping, it is a coincidence.
+
+    The second condition is what makes a SHORT clip detectable. "31-03-2026" comes back as
+    "31-" - three characters - and the old rule demanded four plus half the string, so the
+    clearest clipping in the batch was reported as RENDER_MISSING, i.e. as "the box lost
+    everything" when it had lost only the tail. Measured on the 3.49.5 engine, file 03's
+    stamp date was the one of the three known clips the detector did not name.
     """
     hay = render.all
     best = 0
     for k in range(1, len(text)):
-        if text[:k] not in hay:
-            # A longer prefix cannot be present if this one is not - except when the match
-            # failed inside a word the render set differently, so keep looking a little.
-            if best and k - best > 12:
-                break
+        if text[k] == " " or not text[k].isalnum():
+            pass                      # a box can stop here
+        elif text[k - 1] in "-.,;:/":
+            pass                      # ... or just after a hyphen, comma, point
+        else:
             continue
-        nxt = text[k]
-        if nxt == " " or not (nxt.isalnum()):
-            best = k
-        elif k >= 5 and text[k - 1] in "-.,;:":
-            best = k
+        if len(text[:k].strip()) < 3:
+            continue
+        if text[:k] not in hay:
+            continue
+        # The render has to stop exactly here: the next non-space character must be absent.
+        j = k
+        while j < len(text) and text[j] == " ":
+            j += 1
+        if j < len(text) and text[:j + 1] in hay:
+            continue
+        best = k
     return best
 
 
@@ -415,7 +431,7 @@ def find_render_defects(name, docx, render):
             continue
         k = _prefix_seen(text, render)
         for lf in leaves[have:have + short]:
-            if k >= 4 and k >= min(8, len(text) // 2):
+            if k >= 3 and k < len(text):
                 add("CLIPPED", lf.page, text, kept=text[:k].strip(),
                     lost=text[k:].strip(), kept_chars=k, of_chars=len(text),
                     box=[round(v, 1) for v in lf.box] if lf.box else None)

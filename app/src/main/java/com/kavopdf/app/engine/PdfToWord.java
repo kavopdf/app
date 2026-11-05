@@ -1461,7 +1461,11 @@ public final class PdfToWord {
             ColourMark behind = null, ahead = null, loose = null;
             float behindAlong = Float.MAX_VALUE, aheadAlong = Float.MAX_VALUE, looseDist = 60f;
             for (ColourMark m : marks) {
-                if (m.rgb <= 0) continue;
+                // 0 is BLACK, not "no colour": a mark of #000000 used to be dropped here, so
+                // the only mark left near a glyph could be an invisible white copy of the same
+                // text. File 39's title is drawn twice - once in 1 pt white, once in black - and
+                // the white one won, which wrote a black heading as #FFFFFF.
+                if (m.rgb < 0) continue;
                 float dot = m.ux * dirx + m.uy * diry;
                 float dx = gx - m.x, dy = gy - m.y;
                 if (dot > 0.9f) {
@@ -1470,7 +1474,15 @@ public final class PdfToWord {
                     float perp = -dx * diry + dy * dirx;
                     if (Math.abs(perp) <= tol) {
                         if (along >= -tol) {
-                            if (along < behindAlong) { behindAlong = along; behind = m; }
+                            // "Nearest behind" must break a near-tie in favour of the mark drawn
+                            // LAST, because that is the colour in force: an operator paints the
+                            // text that follows it. File 39 draws an invisible 1 pt white copy of
+                            // its title on the very baseline and origin the visible black title
+                            // then uses, and the white mark sits a tenth of a point AHEAD of the
+                            // glyph - so it was the nearest "behind" one and a black heading was
+                            // written #FFFFFF. The title vanished from the Word file, and no text
+                            // metric moved: the characters were all still in the XML.
+                            if (along <= behindAlong) { behindAlong = along; behind = m; }
                         } else if (-along < aheadAlong) {
                             aheadAlong = -along; ahead = m;
                         }
@@ -1588,7 +1600,7 @@ public final class PdfToWord {
 
         /** Records the colour in force at the origin of {@code tm}, transformed by {@code ctm}. */
         private void addMark(float[] tm, float[] ctm, int rgb) {
-            if (rgb <= 0) return;
+            if (rgb < 0) return;
             float tx = tm[4], ty = tm[5];
             float px = tx * ctm[0] + ty * ctm[2] + ctm[4];
             float py = tx * ctm[1] + ty * ctm[3] + ctm[5];
@@ -2202,8 +2214,14 @@ public final class PdfToWord {
                     segments.add(run);
                     run = new ArrayList<>();
                 }
-                boolean wideGap = prev != null
-                        && (g.x - (prev.x + prev.width)) > outlier;
+                // A gap counts however it is signed: a baseline cluster holds glyphs that are
+                // not in x order, and on file 46 the chart's "57.3" (x=226) and "56.9" (x=304)
+                // sit 1 pt apart in y, so they clustered into one line whose second half lay
+                // 66 pt to the LEFT. The gap then read as -78 and only the positive test saw
+                // it, so the line was never cut: the box kept the first label's width, the
+                // second was clipped away, and the reader lost a number off the chart.
+                float gapPts = prev == null ? 0f : g.x - (prev.x + prev.width);
+                boolean wideGap = prev != null && gapPts > outlier;
                 boolean overlap = OS && prev != null && !g.rotated && !prev.rotated
                         && Math.abs(g.y - prev.y) <= 0.5f
                         && (g.x - (prev.x + prev.width)) < -Math.max(2f, g.size * OVF);
