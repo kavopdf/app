@@ -532,6 +532,11 @@ public final class DocxWriter {
                         ? Math.max(b.length, advance) + b.size * 1.5f
                         : Math.max(4f, advance) * 1.12f + b.size * 1.5f;
                 float hPt = Math.max(4f, b.size * LINE_FACTOR);
+                // REVERTED: placing the box on the rotated line's bounding area instead of its
+                // origin moved file 08's two stamps apart and put file 01's AUTHORISED SIGNATORY
+                // in a different wrong place. OOXML has no rotation a LibreOffice render honours,
+                // so a rotated stamp cannot be reproduced faithfully; the axis-aligned box at the
+                // line origin is at least stable. Recorded in REMAINING-DEFECTS.md.
                 anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString());
             }
             return;
