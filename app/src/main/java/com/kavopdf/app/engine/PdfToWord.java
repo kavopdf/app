@@ -646,18 +646,6 @@ public final class PdfToWord {
         }
         tables = keepTables;
 
-        // Text already sitting in a table cell must not also come out as body text: the bill of
-        // lading appeared twice, once as a run-on paragraph and once as its proper table.
-        java.util.HashSet<String> cellText = new java.util.HashSet<>();
-        for (Table t : tables) {
-            for (List<String> row : t.rows) {
-                for (String cell : row) {
-                    String norm = cell.trim().replaceAll("\\s+", " ");
-                    if (norm.length() > 3) cellText.add(norm);
-                }
-            }
-        }
-
         // A table that does not account for the lines drawn inside it is not a table. A menu
         // read as a two-row table swallowed fifty of its lines: they were marked consumed and
         // the table never wrote them. Such a table is dropped and its lines handed back.
@@ -687,6 +675,28 @@ public final class PdfToWord {
             else for (Line line : lines) if (line.inside(t)) line.consumed = false;
         }
         tables = solid;
+
+        // Text already sitting in a table cell must not also come out as body text: the bill of
+        // lading appeared twice, once as a run-on paragraph and once as its proper table.
+        //
+        // This set is built from the tables that SURVIVED, and it used to be built one step
+        // earlier, from every candidate. A candidate that the check above throws out still
+        // left its cells in this set, and any line whose text matched one of those cells was
+        // then skipped as "already written by a table" - by a table that was never written.
+        // On file 54 a whole-page rectangle made of the header and footer rules produced a
+        // candidate table whose cells were the page's own prose; the candidate was dropped
+        // and the running footer went with it, so "Indian Institute of Plantation Management
+        // * Bengaluru 560 056" and "Quarterly bulletin * Page 1" are absent from the .docx.
+        // File 63 lost its estate line and its kicker the same way.
+        java.util.HashSet<String> cellText = new java.util.HashSet<>();
+        for (Table t : tables) {
+            for (List<String> row : t.rows) {
+                for (String cell : row) {
+                    String norm = cell.trim().replaceAll("\\s+", " ");
+                    if (norm.length() > 3) cellText.add(norm);
+                }
+            }
+        }
 
         List<Line> body = new ArrayList<>();
         for (Line line : lines) {
@@ -2294,7 +2304,19 @@ public final class PdfToWord {
                 float gap = g.x - (prev.x + prev.width);
                 // A gap is a space. A negative gap means the next run starts inside the last
                 // one - text that ran past its cell - and the two must not be welded together.
-                if ((gap > g.size * 0.18f || gap < -g.size * 0.6f) && !endsWithSpace(sb)) {
+                //
+                // A glyph with no advance of its own is not a word boundary. A Devanagari vowel
+                // sign is drawn as a zero-width mark placed BACK over the consonant it belongs
+                // to and the next consonant then starts forward of it, so the gap measured
+                // after the mark is a real distance that means nothing: the pair was one
+                // cluster. Measured on file 40, "ke" + "TT/2025/4471" was cut into
+                // "ke TT/2025/4471" - a space inside a word - because the mark "e" carries
+                // width 0 and the following "TT" sat 2.39 pt (0.217 em) past it. The same
+                // split hit the Devanagari table (76) and the mixed-script line (78).
+                boolean prevAdvances = prev.width > prev.size * 0.05f;
+                if (prevAdvances
+                        && (gap > g.size * 0.18f || gap < -g.size * 0.6f)
+                        && !endsWithSpace(sb)) {
                     sb.append(' ');
                 }
             }
