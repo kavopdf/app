@@ -66,6 +66,37 @@ The corpus: `p2w-batch-1.zip`, 80 documents, numbered 01-80.
 
 ---
 
+
+---
+
+## BATCH 3 — documents 41-60
+
+**Visual result: 13 excellent, 6 good, 1 page-count defect.** The strongest batch so far.
+
+### Fixed in this batch
+- **Vector shapes reach the page.** 505 filled rectangles and rules across the corpus were missing
+  until 3.49.9; on 49, 54, 55 and 60 they are now present and correctly placed — the navy
+  background block on 49, the masthead band on 54, the sidebar box on 55, and on 60 the double page
+  border plus all four corner motifs.
+- **45_coloured_callout_box** — the callout's fill and border render.
+- **46_chart_coloured_labels** — the bar chart's bars render in their own colours, with the axis
+  labels on one tabbed line. This is the document that proves the "visual contents / graphs"
+  requirement is met.
+- **48_form_coloured_border** — the green border box renders.
+- **42_table_coloured_header** — header shading and alternating rows.
+- **43_red_stamp_over_black_text**, **44_coloured_underlined_hyperlinks**, **47_grey_body**,
+  **50_invoice_coloured_total_row** — colour per run reaches the cell and the line.
+
+### Not fixed — carried forward
+- **55_sidebar_box_beside_body** renders on 2 pages where the PDF has 1. The sidebar is stacked
+  after the body column rather than beside it; the box itself is now drawn correctly.
+- **52_one_cm_margin** — the body does not justify across the full 28.3 pt margin the way the page
+  does.
+- **58_header_rule_footer_rule** — the rules render but do not sit exactly on the page's y.
+- **59_landscape_mixed_portrait** — the section break survives and the page is landscape, but the
+  content is slightly compact against the page.
+- Same stamp-offset and table-pitch items as batches 1 and 2.
+
 ## KNOWN, ACROSS THE CORPUS — to be worked at the end
 1. Multi-column pages stack into one flow: **63, 64, 67, 77** each render 2 pages against 1.
 2. **77_arabic_rtl** — the description column collapses to a sliver; RTL column widths not honoured.
