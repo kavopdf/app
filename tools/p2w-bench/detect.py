@@ -23,9 +23,31 @@ drew, and the text a word processor actually renders.
   CLIPPED        a leaf paragraph whose text in the RENDER is a strict prefix of what
                  the XML holds: the tail is not wrapped, it is gone
   RENDER MISSING text the XML holds that appears nowhere in the render
+  SHAPE LOST     a PDF page that paints filled paths and stroked rules while its .docx
+                 carries fewer wps:wsp shapes than the page paints - the band or the rule
+                 was never written, and white text on that band is white-on-white
+  INVISIBLE TEXT a leaf whose every run is #FFFFFF (or carries no colour at all) while the
+                 PDF draws that same text in another colour: the characters are all in the
+                 XML, in order, and a reader sees nothing
+  ROTATED CLIP   a leaf whose source PDF line was drawn at an angle. The .docx box is
+                 horizontal and sits where the rotated line was, so its text runs off the
+                 page edge and across its siblings: the render holds the beginning of the
+                 string and the tail is gone
 
-Why the last three needed adding: every defect that mattered in the 3.49.6 batch was
-image-level or render-level. RuleCollector.drawImage counted images and threw the pixels
+The last three needed adding for a measured reason, three times over. Files 54, 62 and 63
+draw a masthead band and set the document's own title in white on it; the band was never
+written to the .docx, so the title was white on white and this file reported ZERO defects -
+it read text and image XObjects and never once looked at a drawn path. File 39 draws its
+title twice, a 1 pt white copy and then the black one the reader sees, and the converter
+wrote the black title as #FFFFFF: every character present, in order, every class passed it.
+File 03's 90-degree stamp is three lines of text written horizontally where the vertical
+ones were: they run off the right edge of the page and land on top of each other, and the
+render holds "VERIFIED " of "VERIFIED FOR AUDIT". CLIPPED saw that only by luck, because
+the cut happened to fall at a word break; its sibling "INTERNAL AUDIT CELL" fell through to
+RENDER MISSING, which says the box lost everything when it had lost its tail.
+
+Why IMAGE_LOST, CLIPPED and RENDER_MISSING needed adding: every defect that mattered in
+the 3.49.6 batch was image-level or render-level. RuleCollector.drawImage counted images and threw the pixels
 away, so a scanned page came out blank and three stamps vanished; and text boxes were
 sized to the exact PDF advance, so Word cut "31-03-2026" to "31-". None of the six text
 metrics moved when those were fixed, and this file reported the same 57 lines before and
@@ -61,6 +83,7 @@ the --json output and looks at `totals`.
 
 import argparse
 import json
+import math
 import os
 import re
 import shutil
@@ -80,16 +103,18 @@ W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 WP = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
 A = "http://schemas.openxmlformats.org/drawingml/2006/main"
 NS = {"w": W, "wp": WP, "a": A}
+NS_WPS = "http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
 
 EMU_PER_PT = 12700.0
 
 CLASSES = ("MISSING_TEXT", "MISSING_ROWS", "GLUED_WORDS",
            "WRAPPED", "DUPLICATED", "EMPTY_PAGE",
-           "IMAGE_LOST", "CLIPPED", "RENDER_MISSING")
+           "IMAGE_LOST", "CLIPPED", "RENDER_MISSING",
+           "SHAPE_LOST", "INVISIBLE_TEXT", "ROTATED_CLIP")
 
-# The three that need something other than word/document.xml: a look at the package's
-# media parts, and a render.
-RENDER_CLASSES = ("CLIPPED", "RENDER_MISSING")
+# The ones that need something other than word/document.xml: a look at the package's
+# media parts, at the paths the PDF painted, and at a render.
+RENDER_CLASSES = ("CLIPPED", "RENDER_MISSING", "ROTATED_CLIP")
 
 
 # ---------------------------------------------------------------- normalisation
@@ -129,6 +154,9 @@ class PdfDoc:
         self.path = path
         self.pages = []          # list of list of PdfLine
         self.image_pages = {}    # page number -> how many pictures that page draws
+        self.paint = {}          # page number -> (filled paths, stroked straight paths)
+        self.colours = {}        # page number -> squashed text -> list of (rgb, bbox)
+        self.rotated = {}        # page number -> squashed text -> (text, angle)
         doc = fitz.open(path)
         try:
             for pno in range(doc.page_count):
@@ -142,6 +170,7 @@ class PdfDoc:
                 if n_img:
                     self.image_pages[pno] = n_img
                 lines = []
+                colours = {}
                 for block in page.get_text("dict")["blocks"]:
                     if block.get("type") != 0:
                         continue
@@ -150,9 +179,74 @@ class PdfDoc:
                         if not norm(text):
                             continue
                         lines.append(PdfLine(text, pno, ln["bbox"]))
+                        # What colour each span was PAINTED. A run of white in the .docx
+                        # over text the PDF drew black is the white-on-white defect; a run
+                        # of white over text the PDF drew white is the document working.
+                        for sp in ln["spans"]:
+                            if not norm(sp["text"]):
+                                continue
+                            key = squash(text)
+                            colours.setdefault(key, []).append((sp["color"], ln["bbox"]))
+                        dx, dy = ln["dir"]
+                        if abs(dy) > 0.02:
+                            self.rotated.setdefault(pno, {}).setdefault(
+                                squash(text), (norm(text),
+                                               round(math.degrees(math.atan2(dy, dx)), 1)))
                 self.pages.append(lines)
+                if colours:
+                    self.colours[pno] = colours
+                self.paint[pno] = self._paint(page)
         finally:
             doc.close()
+
+    @staticmethod
+    def _paint(page):
+        """(filled paths, stroked straight paths) on one page, as a reader sees them.
+
+        One count per PAINTED PATH, not per path segment: a stamp frame drawn as four
+        `l` segments is one rectangle to the eye and one wps:wsp in the .docx, and
+        counting the segments made every framed page look short by three.
+
+        A curved stroke is not counted. The engine writes a filled path as its bounding
+        rectangle and a straight stroke as a band, but it deliberately drops a curved
+        stroke rather than replace a seal's ring with a square, so a curved path in the
+        count would be a defect the converter is right not to fix.
+        """
+        fills = rules = 0
+        for dr in page.get_drawings():
+            straight = all(
+                it[0] == "re"
+                or (it[0] == "l"
+                    and (abs(it[1].x - it[2].x) < 0.2 or abs(it[1].y - it[2].y) < 0.2))
+                for it in dr["items"])
+            if dr.get("fill") is not None:
+                fills += 1
+            elif dr.get("color") is not None and straight:
+                rules += 1
+        return (fills, rules)
+
+    def colour_at(self, pno, text, box):
+        """The colours the PDF painted `text` in, nearest the .docx box, or [].
+
+        A line can legitimately appear twice on a page - file 39 draws its title once in
+        1 pt white and once in black - so the box decides which copy is being asked
+        about. Taking every copy would call the white-on-white title "correctly white"
+        because a white copy exists somewhere on the page.
+        """
+        cands = self.colours.get(pno, {}).get(squash(text), [])
+        if not cands:
+            return []
+        if box:
+            cx, cy = box[0] + box[2] / 2.0, box[1] + box[3] / 2.0
+            cands = sorted(cands, key=lambda c: abs((c[1][0] + c[1][2]) / 2.0 - cx)
+                           + abs((c[1][1] + c[1][3]) / 2.0 - cy))
+            # The nearest copy only: a second copy 200 pt away is a different object.
+            return [cands[0][0]]
+        return [c[0] for c in cands]
+
+    def rotated_source(self, pno, text):
+        """(text, angle) when this .docx leaf came from a line drawn at an angle."""
+        return self.rotated.get(pno, {}).get(squash(text))
 
     @property
     def page_count(self):
@@ -177,7 +271,7 @@ class PdfLine:
 
 class Leaf:
     """One leaf paragraph: a w:p that contains no other w:p."""
-    __slots__ = ("text", "n", "squashed", "page", "box", "kind", "el")
+    __slots__ = ("text", "n", "squashed", "page", "box", "kind", "el", "colours")
 
     def __init__(self, text, page, box, kind, el):
         self.text = text
@@ -187,6 +281,9 @@ class Leaf:
         self.box = box                # (x, y, w, h) in points, or None
         self.kind = kind              # "textbox" | "flow" | "table"
         self.el = el
+        # One entry per non-blank run: "RRGGBB", or None when the run carries no colour.
+        # None is not white - in OOXML an absent colour is automatic, which is black.
+        self.colours = _run_colours(el)
 
     def __repr__(self):
         return "<leaf p%d %r>" % (self.page + 1, self.n[:40])
@@ -206,6 +303,25 @@ def _has_nested_p(el):
 
 def _text_of(el):
     return "".join(t.text or "" for t in el.iter("{%s}t" % W))
+
+
+def _run_colours(el):
+    """The colour of every non-blank run in a paragraph, in order.
+
+    Only w:r/w:rPr/w:color counts. A colour set on the paragraph's own rPr applies to
+    the paragraph mark, not to the text, and reading it would let one white paragraph
+    mark paint a whole line of black words white.
+    """
+    out = []
+    for r in el.iter("{%s}r" % W):
+        if not norm(_text_of(r)):
+            continue
+        c = r.find("{%s}rPr/{%s}color" % (W, W))
+        val = c.get("{%s}val" % W) if c is not None else None
+        if val is not None and not re.fullmatch(r"[0-9A-Fa-f]{6}", val or ""):
+            val = None            # "auto" and theme colours are not a hex value
+        out.append(val.upper() if val else None)
+    return tuple(out)
 
 
 def _anchor_box(anchor):
@@ -237,6 +353,9 @@ class DocxDoc:
         self.leaves = []
         self.page_count = 0
         self.media = []
+        self.shapes_on = {}       # page -> how many drawn shapes (wps:wsp) that page carries
+        self.table_on = {}        # page -> True when a real w:tbl sits on it
+        self.shape_boxes = []     # (page, x, y, w, h) of every drawn shape
         with zipfile.ZipFile(path) as z:
             self.media = [n for n in z.namelist() if n.startswith("word/media/")]
             xml = z.read("word/document.xml")
@@ -253,6 +372,11 @@ class DocxDoc:
                 continue
             for leaf in self._leaves_in(child, page):
                 self.leaves.append(leaf)
+            n_shape = self._shapes_in(child, page)
+            if n_shape:
+                self.shapes_on[page] = self.shapes_on.get(page, 0) + n_shape
+            if child.tag == "{%s}tbl" % W or child.find(".//{%s}tbl" % W) is not None:
+                self.table_on[page] = True
             # A page break or a next-page section ends the page after this child.
             if child.find(".//{%s}br[@{%s}type='page']" % (W, W)) is not None:
                 page += 1
@@ -268,6 +392,38 @@ class DocxDoc:
         # Anything anchored at a y beyond the page it was counted on still belongs to
         # the page the break counter put it on; the counter is the authority because
         # the converter writes one break per PDF page.
+
+    def _shapes_in(self, node, page):
+        """How many drawn shapes this body child carries.
+
+        A wps:wsp is TWO different things: a text box (it holds w:txbxContent) and a
+        painted rectangle or rule (it holds none). Counting every wps:wsp made the old
+        3.49.8 output look as if it carried the shapes it never wrote - file 39 has 24
+        wps:wsp and not one of them is a shape - so the text boxes are excluded here.
+        """
+        n = 0
+        for el in node.iter("{%s}wsp" % NS_WPS):
+            if el.find(".//{%s}txbxContent" % W) is not None:
+                continue
+            anchor = el
+            while anchor is not None and etree.QName(anchor).localname != "anchor":
+                anchor = anchor.getparent()
+            if anchor is not None:
+                self.shape_boxes.append((page,) + _anchor_box(anchor))
+            n += 1
+        return n
+
+    def covers(self, page, box):
+        """True when a drawn shape on this page sits behind the middle of `box`."""
+        if not box:
+            return False
+        cx, cy = box[0] + box[2] / 2.0, box[1] + box[3] / 2.0
+        for p, x, y, w, h in self.shape_boxes:
+            if p != page:
+                continue
+            if x - 1 <= cx <= x + w + 1 and y - 1 <= cy <= y + h + 1:
+                return True
+        return False
 
     def _leaves_in(self, node, page):
         """Yield the leaf paragraphs under one body child, in document order."""
@@ -401,7 +557,140 @@ def _prefix_seen(text, render):
     return best
 
 
-def find_render_defects(name, docx, render):
+def find_shape_defects(name, pdf, docx):
+    """SHAPE LOST: a page paints a band or a rule and the .docx does not carry it.
+
+    The page's own count comes from page.get_drawings(), one count per painted path: a
+    filled path is a fill, a stroked path made only of rectangles and axis-aligned lines
+    is a rule. Curved strokes are excluded - the converter drops a curve on purpose
+    rather than put a square where a seal's ring is.
+
+    The .docx side counts wps:wsp elements that hold no w:txbxContent. A text box is a
+    wps:wsp too, so a plain XML grep for the shape tag counts the text boxes and finds
+    nothing wrong: 3.49.8 wrote 24, 29, 36 and 45 wps:wsp on files 39, 54, 62 and 63 and
+    not one of them was a drawn shape. That is the namespace-blind count this class exists
+    to replace.
+
+    A page that became a real w:tbl is judged on its FILLS only, because the table
+    carries its own grid as w:tblBorders and those rules are not lost. Measured on the
+    80-document batch: with the rule the current engine reports 0 pages, without it 19 -
+    all 19 being table grids that are present as borders. The price is that a rule lying
+    outside a table on a table page is not counted; that blind spot is written down rather
+    than papered over.
+    """
+    out = []
+    for pno in range(pdf.page_count):
+        fills, rules = pdf.paint.get(pno, (0, 0))
+        if not (fills or rules):
+            continue
+        have = docx.shapes_on.get(pno, 0)
+        table = bool(docx.table_on.get(pno))
+        need = fills if table else fills + rules
+        if have >= need:
+            continue
+        out.append({"class": "SHAPE_LOST", "doc": name, "page": pno + 1,
+                    "detail": "%d filled path(s) and %d rule(s) painted, .docx carries %d "
+                              "shape(s)" % (fills, rules, have),
+                    "fills": fills, "rules": rules, "shapes": have, "needed": need,
+                    "missing": need - have, "table_on_page": table})
+    return out
+
+
+def find_invisible_text(name, pdf, docx):
+    """INVISIBLE TEXT: the .docx paints white what the PDF painted in another colour.
+
+    Two arms, both measured against the PDF's own span colours.
+
+      inverted  every run is #FFFFFF and the PDF draws that text in some other colour.
+                File 39: the title is black in the PDF and was written #FFFFFF, so the
+                document's own name was white on white. Every character present, in
+                order, so MISSING_TEXT, MISSING_ROWS and the render all pass it.
+      dropped   no run carries a colour (which Word resolves to black) while the PDF
+                draws the text white AND a shape sits behind it in the .docx. The text
+                then reads black on a dark band. Guarded on the shape because white text
+                with nothing behind it is SHAPE_LOST's finding, not this one's, and the
+                guard also keeps file 39's 1 pt white duplicate - which has no band under
+                it - out of the report.
+
+    What is deliberately NOT flagged: white text the PDF also draws white. Files 54, 62
+    and 63 set their masthead title in white on a navy band; those runs are right, and
+    flagging them would make every correct conversion of a masthead a defect.
+    """
+    out = []
+    for lf in docx.leaves:
+        if not lf.n or not lf.colours:
+            continue
+        white = all(c == "FFFFFF" for c in lf.colours)
+        blank = all(c is None for c in lf.colours)
+        if not (white or blank):
+            continue
+        pdf_rgb = pdf.colour_at(lf.page, lf.n, lf.box)
+        if not pdf_rgb:
+            continue
+        hexes = ["#%06X" % c for c in pdf_rgb]
+        if white and any(c != 0xFFFFFF for c in pdf_rgb):
+            out.append({"class": "INVISIBLE_TEXT", "doc": name, "page": lf.page + 1,
+                        "detail": "%r written #FFFFFF, the PDF draws it %s"
+                                  % (lf.n[:60], ", ".join(hexes)),
+                        "docx_colour": "FFFFFF", "pdf_colour": hexes[0],
+                        "kind": "inverted",
+                        "box": [round(v, 1) for v in lf.box] if lf.box else None})
+        elif blank and all(c == 0xFFFFFF for c in pdf_rgb) and docx.covers(lf.page, lf.box):
+            out.append({"class": "INVISIBLE_TEXT", "doc": name, "page": lf.page + 1,
+                        "detail": "%r carries no colour, the PDF draws it white on a band"
+                                  % lf.n[:60],
+                        "docx_colour": None, "pdf_colour": "#FFFFFF", "kind": "dropped",
+                        "box": [round(v, 1) for v in lf.box] if lf.box else None})
+    return out
+
+
+def _prefix_kept(squashed, hay):
+    """Length of the longest prefix of `squashed` (>= 3 chars) that `hay` contains."""
+    for k in range(len(squashed) - 1, 2, -1):
+        if squashed[:k] in hay:
+            return k
+    return 0
+
+
+def find_rotated_defects(name, pdf, docx, render):
+    """ROTATED CLIP: text from a line drawn at an angle that the render cuts short.
+
+    The .docx box is horizontal and sits where the rotated line was. On file 03 the box
+    starts at x=549 in a page 595 pt wide and holds 18 characters, so the render draws as
+    far as the page edge and stops: "VERIFIED FO" ends at x=599, "INTERNAL AUDIT " at 596.
+    The three lines of that stamp are also placed at the same y, so they overlap.
+
+    CLIPPED cannot own this: it asks whether the render holds a prefix that stops at a
+    WORD BREAK, and on a rotated box the cut lands wherever the overlap does. File 03 was
+    named by CLIPPED only because "VERIFIED" happens to end at a space, and its sibling
+    "INTERNAL AUDIT CELL" fell through to RENDER MISSING - which says the box lost
+    everything when it had lost its tail. Rotated leaves are therefore taken out of
+    find_render_defects and judged here, so each defect is named once.
+    """
+    out = []
+    for lf in docx.leaves:
+        src = pdf.rotated_source(lf.page, lf.n)
+        if src is None:
+            continue
+        text, angle = src
+        if len(lf.squashed) < 3 or lf.squashed in render.squashed:
+            continue
+        kept = _prefix_kept(lf.squashed, render.squashed)
+        if kept >= 3:
+            detail = "%r drawn at %s deg renders as %r" % (lf.n[:60], angle,
+                                                           text[:kept])
+            cls = "ROTATED_CLIP"
+        else:
+            detail = "%r drawn at %s deg appears nowhere in the render" % (lf.n[:60], angle)
+            cls = "ROTATED_CLIP"
+        out.append({"class": cls, "doc": name, "page": lf.page + 1, "detail": detail,
+                    "angle": angle, "kept": text[:kept], "lost": text[kept:],
+                    "kept_chars": kept, "of_chars": len(lf.squashed),
+                    "box": [round(v, 1) for v in lf.box] if lf.box else None})
+    return out
+
+
+def find_render_defects(name, docx, render, rotated=()):
     """CLIPPED and RENDER MISSING: what the XML holds that the render does not show."""
     out = []
 
@@ -417,6 +706,10 @@ def find_render_defects(name, docx, render):
         if len(lf.n) < 4:
             # Four characters is below the shortest line the batch contains that a box can
             # cut in two, and short strings are substrings of longer ones far too easily.
+            continue
+        if id(lf) in rotated:
+            # A rotated box is ROTATED_CLIP's: its cut lands wherever the overlap does, not
+            # at a word break, and judging it here reports the same defect twice.
             continue
         want.setdefault(lf.n, []).append(lf)
 
@@ -583,7 +876,17 @@ def find_defects(name, pdf, docx, render=None):
 
     # ---- h/i. CLIPPED, RENDER MISSING ------------------------------------
     if render is not None:
-        out.extend(find_render_defects(name, docx, render))
+        # Rotated leaves are named by ROTATED_CLIP, once, and not by CLIPPED as well.
+        rotated = {id(lf) for lf in docx.leaves
+                   if pdf.rotated_source(lf.page, lf.n) is not None}
+        out.extend(find_render_defects(name, docx, render, rotated))
+        out.extend(find_rotated_defects(name, pdf, docx, render))
+
+    # ---- j. SHAPE LOST ---------------------------------------------------
+    out.extend(find_shape_defects(name, pdf, docx))
+
+    # ---- k. INVISIBLE TEXT -----------------------------------------------
+    out.extend(find_invisible_text(name, pdf, docx))
 
     # duplicate counts need the final total per key
     dup_total = {}
@@ -704,7 +1007,7 @@ def main(argv=None):
         print("  no .docx produced for %d documents: %s"
               % (len(missing_docx), ", ".join(missing_docx[:5])))
     if not render_dir:
-        print("  CLIPPED and RENDER_MISSING were NOT RUN (pass --render or "
+        print("  CLIPPED, RENDER_MISSING and ROTATED_CLIP were NOT RUN (pass --render or "
               "--render-dir): a .docx has to be rendered before a clipped box can be seen")
     elif no_render:
         print("  no render for %d documents, so their CLIPPED/RENDER_MISSING are unknown: %s"
@@ -722,16 +1025,17 @@ def main(argv=None):
     if args.summary:
         print()
         print("PER DOCUMENT")
-        print("  %-52s %5s %5s %5s %5s %5s %5s %5s %5s %5s %6s"
+        print("  %-46s %5s %5s %5s %5s %5s %5s %5s %5s %5s %5s %5s %5s %6s"
               % ("document", "MISS", "ROWS", "GLUE", "WRAP", "DUP", "EMPTY",
-                 "IMG", "CLIP", "RMISS", "total"))
+                 "IMG", "CLIP", "RMISS", "SHP", "INV", "ROT", "total"))
         for name in sorted(per_doc):
             v = per_doc[name]
             c = v["counts"]
-            print("  %-52s %5d %5d %5d %5d %5d %5d %5d %5d %5d %6d"
+            print("  %-46s %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %6d"
                   % (name, c["MISSING_TEXT"], c["MISSING_ROWS"], c["GLUED_WORDS"],
                      c["WRAPPED"], c["DUPLICATED"], c["EMPTY_PAGE"],
-                     c["IMAGE_LOST"], c["CLIPPED"], c["RENDER_MISSING"], v["total"]))
+                     c["IMAGE_LOST"], c["CLIPPED"], c["RENDER_MISSING"],
+                     c["SHAPE_LOST"], c["INVISIBLE_TEXT"], c["ROTATED_CLIP"], v["total"]))
 
     if args.json:
         with open(args.json, "w") as fh:
