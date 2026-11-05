@@ -878,9 +878,22 @@ public final class DocxWriter {
         long[] edgeTw = new long[cols + 1];
         for (int c = 0; c < cols; c++) edgeTw[c + 1] = edgeTw[c] + colTw[c];
 
+        // The table has to occupy the vertical space the page gave it. Without a row height Word
+        // collapses every row to the height of its text, so a table drawn across 257 pt came out
+        // 128 pt tall and everything BELOW it slid up the page: file 72's bank statement was 75 pt
+        // high against its PDF, file 55's sidebar 141 pt low, and three documents spilled onto a
+        // second sheet. Measured on the corpus, the drift is worst in exactly the documents that
+        // contain a table and near zero in those that do not.
+        int rowCount = Math.max(1, t.rows.size());
+        float extentPt = t.bottom - t.top;
+        int rowTw = extentPt > 0f ? (int) Math.round(extentPt / rowCount * TWIPS_PER_PT) : 0;
         for (int r = 0; r < t.rows.size(); r++) {
             List<String> row = t.rows.get(r);
             inner.append("<w:tr>");
+            if (rowTw > 0) {
+                inner.append("<w:trPr><w:trHeight w:val=\"").append(rowTw)
+                     .append("\" w:hRule=\"atLeast\"/><w:cantSplit/></w:trPr>");
+            }
             int c = 0;
             while (c < cols) {
                 String cell = c < row.size() ? row.get(c) : "";
