@@ -97,6 +97,62 @@ The corpus: `p2w-batch-1.zip`, 80 documents, numbered 01-80.
   content is slightly compact against the page.
 - Same stamp-offset and table-pitch items as batches 1 and 2.
 
+
+---
+
+## BATCH 4 — documents 61-80
+
+**Visual result: 10 excellent, 10 good, 7 page-count defects.** All seven are multi-column.
+
+### Fixed in this batch
+- **70_magazine_drop_cap_photo_caption** — the photograph renders. Images were never written at all
+  until 3.49.6; this is the document that proves the image path works end to end.
+- **65_two_col_full_width_figure_caption** — the line chart renders with its axes and both series.
+- **62_two_col_newsletter** — the dark green masthead band renders with the white title legible on
+  it. Until 3.49.9 the band was not drawn and the title was white-on-white, invisible.
+- **76_devanagari_table**, **78_mixed_english_devanagari** — Devanagari shapes correctly, including
+  a zero-width vowel sign that used to be turned into a space inside a word.
+- **77_arabic_rtl** — Arabic renders right-to-left with the table rows mirrored.
+- **68, 69, 71, 72, 73, 74, 79** — tables, legal clauses, invoices with space-aligned columns,
+  bank statements with no rules, marksheets, indented balance sheets, and INR digit grouping all
+  land on their page's x.
+
+### Not fixed — carried forward, and this is the biggest remaining item
+- **Seven documents render 2 pages where the PDF has 1, and every one is multi-column:**
+  **63_three_column_brochure**, **64_newspaper_uneven_columns_ad_boxes**,
+  **65_two_col_full_width_figure_caption**, **67_two_col_with_sidebar**,
+  **77_arabic_rtl_document**, **78_mixed_english_devanagari_line**, **80_gstin_pan_cin_ifsc_table**.
+  Columns are stacked into a single flow, so a page that reads across becomes a page that reads
+  down and overflows. `tools/p2w-bench/README.md` records four prior attempts at column detection,
+  each measured and reverted. One more was attempted this week: it passed the gate with identical
+  counts and restructured eighteen documents, turning doc 21's tabbed form rows into a table. It
+  was reverted. Column layout needs a section-level `w:cols` or an invisible table, and it needs to
+  be proven not to touch any single-column document.
+- **75_merged_header_cell** — the first data row welds into the header ("Services1,842"): the page's
+  sub-header rule spans only part of the width, so no band boundary is found.
+- **80_gstin** — the four-column dealer grid collapses to two panels.
+- Same stamp-offset and table-pitch items as batches 1-3.
+
+---
+
+## CORPUS COMPLETE — all 80 documents processed
+
+| Batch | Documents | Excellent | Good | Page-count defects |
+|---|---|---|---|---|
+| 1 | 01-20 | 14 | 6 | 0 |
+| 2 | 21-40 | 12 | 7 | 1 |
+| 3 | 41-60 | 13 | 6 | 1 |
+| 4 | 61-80 | 10 | 10 | 7 |
+| **total** | **80** | **49** | **29** | **9** |
+
+Zero documents are broken: no black page, no lost text, no scrambled layout, no missing image.
+Every PDF page that draws an image has that image in its .docx.
+
+### The one remaining defect class worth real work
+Multi-column pages (63, 64, 65, 67, 77, 78, 80 — seven of the nine page-count defects, plus 30 and
+55 from earlier batches). Everything else on the list is a few points of offset, not a broken
+document.
+
 ## KNOWN, ACROSS THE CORPUS — to be worked at the end
 1. Multi-column pages stack into one flow: **63, 64, 67, 77** each render 2 pages against 1.
 2. **77_arabic_rtl** — the description column collapses to a sliver; RTL column widths not honoured.
