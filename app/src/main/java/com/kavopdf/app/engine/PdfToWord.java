@@ -2937,8 +2937,18 @@ public final class PdfToWord {
         return true;
     }
 
-    /** How many fields of one row are allowed to become tab stops. */
-    private static final int MAX_ROW_FIELDS = 6;
+    /**
+     * How many fields of one row are allowed to become tab stops.
+     *
+     * <p>This is a runaway guard, not a column limit. A row that has more fields than this
+     * loses its tail to a paragraph of its own, and because the paragraph carries the y the
+     * page measured for it while the row above is spaced to its own height, the orphan is
+     * laid over the row beneath - two rows of a job-work statement printed on top of each
+     * other. Seven fields is an ordinary accounting line (month, quantity, rate, amount, tax,
+     * total, invoice value), so the guard sits above that. It still stops a page-wide line of
+     * prose being chopped into a dozen tab stops.
+     */
+    private static final int MAX_ROW_FIELDS = 9;
 
     /**
      * True when {@code next} is another field drawn on the same baseline as {@code prev} - the
