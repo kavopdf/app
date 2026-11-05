@@ -152,7 +152,7 @@ public final class DocxWriter {
                 // its section, and nextPage starts the new one on a fresh page - which is the
                 // page break this page needed anyway.
                 sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
-                        .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
                         .append("<w:sectPr>").append(sectPrXml(secW, secH))
                         .append("<w:type w:val=\"nextPage\"/></w:sectPr>")
                         .append("</w:pPr></w:p>");
@@ -162,7 +162,7 @@ public final class DocxWriter {
                 // A page with nothing on it still has to advance the page counter, or every
                 // anchor after it lands one page too early.
                 sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
-                        .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
                         .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr>")
                         .append("<w:r><w:br w:type=\"page\"/></w:r></w:p>");
                 ctx.newPage = true;
@@ -283,7 +283,7 @@ public final class DocxWriter {
         long offY = Math.round(p.topPt * EMU_PER_PT);
         int relHeight = 251658240 + (id & 0xFFFF);
         sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
                 .append("<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr></w:pPr>")
                 .append("<w:r><w:drawing>")
                 .append("<wp:anchor distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"")
@@ -361,7 +361,7 @@ public final class DocxWriter {
         long offY = Math.round(s.topPt * EMU_PER_PT);
         int relHeight = 100000000 + (id & 0xFFFF);
         sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
                 .append("<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr></w:pPr>")
                 .append("<w:r><w:drawing>")
                 .append("<wp:anchor distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"")
@@ -562,7 +562,7 @@ public final class DocxWriter {
 
         sb.append("<w:p><w:pPr>")
                 .append("<w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:before=\"").append(beforeTw)
+                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"").append(beforeTw)
                 .append("\" w:after=\"0\" w:line=\"").append(lineTw)
                 .append("\" w:lineRule=\"exact\"/>")
                 // A row is laid out by its tab stops, so it must not also be centred or pushed
@@ -596,7 +596,7 @@ public final class DocxWriter {
             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
         }
         sb.append("<w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"").append(lineTw)
+                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"").append(lineTw)
                 .append("\" w:lineRule=\"exact\"/>")
                 // The anchor already put this line at its x; an indent here would move it off.
                 .append("<w:ind w:left=\"0\" w:right=\"0\" w:firstLine=\"0\"/>");
@@ -665,7 +665,7 @@ public final class DocxWriter {
             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
         }
         sb.append("<w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:before=\"").append(beforeTw)
+                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"").append(beforeTw)
                 .append("\" w:after=\"0\" w:line=\"").append(lineTw)
                 .append("\" w:lineRule=\"exact\"/>")
                 .append("<w:ind w:left=\"").append(leftTw)
@@ -748,7 +748,7 @@ public final class DocxWriter {
         int relHeight = 251658240 + (id & 0xFFFF);
 
         sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
                 .append("<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr></w:pPr>")
                 .append("<w:r><w:drawing>")
                 .append("<wp:anchor distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"")
@@ -922,7 +922,7 @@ public final class DocxWriter {
                 inner.append("</w:tcPr>")
                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
                         .append("<w:snapToGrid w:val=\"0\"/>")
-                        .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"200\" w:lineRule=\"exact\"/>");
+                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"200\" w:lineRule=\"exact\"/>");
                 if (insetTw > 0) inner.append("<w:ind w:left=\"").append(insetTw).append("\"/>");
                 inner.append("</w:pPr>");
                 if (!cell.isEmpty()) {
@@ -979,7 +979,7 @@ public final class DocxWriter {
         // A table must be followed by a paragraph of its own: Word inserts one if it is not
         // there, and a paragraph the writer did not place is a paragraph it cannot measure.
         sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
                 .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
     }
 
@@ -1169,7 +1169,7 @@ public final class DocxWriter {
         return "<w:style w:type=\"paragraph\" w:styleId=\"Heading" + level + "\">"
                 + "<w:name w:val=\"heading " + level + "\"/><w:basedOn w:val=\"Normal\"/>"
                 + "<w:next w:val=\"Normal\"/><w:qFormat/>"
-                + "<w:pPr><w:keepNext/><w:spacing w:before=\"" + (before * 120)
+                + "<w:pPr><w:keepNext/><w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"" + (before * 120)
                 + "\" w:after=\"60\"/><w:outlineLvl w:val=\"" + (level - 1) + "\"/></w:pPr>"
                 + "<w:rPr><w:b/><w:sz w:val=\"" + halfPoints + "\"/></w:rPr></w:style>";
     }
