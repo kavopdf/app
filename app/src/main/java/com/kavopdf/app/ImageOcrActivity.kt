@@ -42,7 +42,10 @@ class ImageOcrActivity : PdfActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.btnChoose.setOnClickListener { pickImages() }
         binding.btnRun.setOnClickListener { run() }
-        pickAfterEnter { pickImages() }
+        // A photo shared in from the gallery opens here with the image already staged,
+        // so the picker must not open on top of it.
+        val shared = sharedStreamUri
+        if (shared != null) onImagesChosen(listOf(shared)) else pickAfterEnter { pickImages() }
     }
 
 

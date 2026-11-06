@@ -32,7 +32,10 @@ class FormsActivity : PdfActivity() {
         setSupportActionBar(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.btnSave.setOnClickListener { save() }
-        pickAfterEnter { pickPdf() }
+        // A file shared in from another app is already being loaded - PdfActivity posts
+        // onPdfChosen for it - so the picker must not open on top of it and ask for the
+        // same document twice.
+        if (incomingUri == null) pickAfterEnter { pickPdf() }
     }
 
     override fun onPdfChosen(uri: Uri) {
@@ -54,9 +57,12 @@ class FormsActivity : PdfActivity() {
                     binding.btnSave.isEnabled = true
                     binding.btnSave.text = getString(R.string.action_fill_in_annotate)
                     binding.btnSave.setOnClickListener {
-                        // hand the same file over, so Annotate opens it directly
+                        // hand the same file over, so Annotate opens it directly.
+                        // It is kept, not tracked: this screen deletes its cache copies as it
+                        // closes, and it closes on the next line - Annotate takes ownership.
                         val here = source
                         if (here != null) {
+                            keepCacheFile(here)
                             startActivity(
                                 android.content.Intent(this, AnnotateActivity::class.java)
                                     .putExtra("com.kavopdf.app.EXTRA_PATH", here.absolutePath)

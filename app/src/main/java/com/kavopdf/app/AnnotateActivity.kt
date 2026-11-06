@@ -65,7 +65,9 @@ class AnnotateActivity : PdfActivity() {
         if (direct != null && File(direct).exists()) {
             // handed over by Fill forms: open the same PDF without asking again
             sourceName = File(direct).name
-            openFromPath(File(direct))
+            // Fill forms keeps its cache copy for this screen and closes, so this screen
+            // now owns the file and removes it when it closes.
+            openFromPath(trackCacheFile(File(direct)))
         }
 
         binding.overlay.imageView = binding.pageImage
@@ -143,7 +145,9 @@ class AnnotateActivity : PdfActivity() {
         selectTool(OverlayView.Tool.PEN, binding.toolPen)
         // When another screen handed us a file, open it directly - asking the user to
         // pick the same PDF a second time was pointless and confusing.
-        if (direct == null) pickAfterEnter { pickPdf() }
+        // A file handed over by Fill forms, or shared in from another app, is already
+        // open or opening; the picker would ask for it a second time.
+        if (direct == null && incomingUri == null) pickAfterEnter { pickPdf() }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

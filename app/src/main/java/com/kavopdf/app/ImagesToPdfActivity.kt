@@ -33,7 +33,16 @@ class ImagesToPdfActivity : PdfActivity() {
         binding.addButton.setOnClickListener { pickImages() }
         binding.actionButton.setOnClickListener { create() }
 
-        pickAfterEnter { pickImages() }
+        // A photo shared in from the gallery opens here with the image already staged,
+        // so the picker must not open on top of it.
+        val shared = sharedStreamUri
+        if (shared != null) {
+            files.add(PickedFile(shared, Files.displayName(this, shared)))
+            adapter.notifyDataSetChanged()
+            updateState()
+        } else {
+            pickAfterEnter { pickImages() }
+        }
     }
 
     override fun onImagesChosen(uris: List<Uri>) {

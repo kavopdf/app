@@ -44,7 +44,10 @@ class BookmarksActivity : PdfActivity() {
         binding.btnAdd.setOnClickListener { addRow("", rows.size + 1) }
         binding.btnSave.setOnClickListener { save() }
         render()
-        pickAfterEnter { pickPdf() }
+        // A file shared in from another app is already being loaded - PdfActivity posts
+        // onPdfChosen for it - so the picker must not open on top of it and ask for the
+        // same document twice.
+        if (incomingUri == null) pickAfterEnter { pickPdf() }
     }
 
     override fun onDestroy() {

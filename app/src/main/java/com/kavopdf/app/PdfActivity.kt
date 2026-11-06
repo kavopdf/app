@@ -181,6 +181,29 @@ abstract class PdfActivity : AppCompatActivity() {
         }
 
     /**
+     * A file another app shared straight into this screen, however the sender put it there.
+     *
+     * The two image screens are share targets in their own right, and a sender may leave the
+     * file in the intent data, in EXTRA_STREAM or in clipData. Every in-app launch sets none
+     * of the three, so this is null everywhere else.
+     */
+    protected val sharedStreamUri: Uri?
+        get() {
+            val i = intent ?: return null
+            i.data?.let { return it }
+            val extra: Uri? = if (android.os.Build.VERSION.SDK_INT >= 33) {
+                i.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                i.getParcelableExtra(Intent.EXTRA_STREAM)
+            }
+            if (extra != null) return extra
+            val clip = i.clipData
+            if (clip != null && clip.itemCount > 0) return clip.getItemAt(0).uri
+            return null
+        }
+
+    /**
      * Copy the picked PDF into the cache, asking for a password when the document is
      * protected. [onReady] always receives a file that can actually be opened.
      */
@@ -316,6 +339,19 @@ abstract class PdfActivity : AppCompatActivity() {
      */
     protected fun trackCacheFile(f: File): File {
         sessionFiles.add(f)
+        return f
+    }
+
+    /**
+     * Hand a tracked cache file to the screen being opened, instead of deleting it here.
+     *
+     * [onDestroy] removes every tracked file that was not kept. When this screen opens
+     * another screen on the same file and finishes - Fill forms handing its PDF to Annotate -
+     * that deletion would take the file out from under the screen that just received it.
+     * The receiving screen tracks it in turn, so it is still removed when the last one closes.
+     */
+    protected fun keepCacheFile(f: File): File {
+        keptFiles.add(f)
         return f
     }
 

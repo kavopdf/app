@@ -49,7 +49,10 @@ class OcrActivity : PdfActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.btnChoose.setOnClickListener { pickPdf() }
         binding.btnRun.setOnClickListener { run() }
-        pickAfterEnter { pickPdf() }
+        // A file shared in from another app is already being loaded - PdfActivity posts
+        // onPdfChosen for it - so the picker must not open on top of it and ask for the
+        // same document twice.
+        if (incomingUri == null) pickAfterEnter { pickPdf() }
     }
 
     override fun onPdfChosen(uri: Uri) {

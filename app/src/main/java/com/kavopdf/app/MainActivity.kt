@@ -101,8 +101,9 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         // The home screen may already be running when a file is shared in; the new intent
-        // arrives here rather than through onCreate.
-        intent.getStringExtra(PdfActivity.EXTRA_SOURCE_URI)?.let { sharedUri = it }
+        // arrives here rather than through onCreate. An intent with no file clears it, so a
+        // tool tapped later cannot pick up a document that was shared in earlier.
+        sharedUri = intent.getStringExtra(PdfActivity.EXTRA_SOURCE_URI)
     }
 
     private fun dispatch(action: Action) {

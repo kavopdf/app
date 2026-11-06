@@ -44,13 +44,17 @@ class ShareChoiceActivity : AppCompatActivity() {
             .show()
     }
 
-    /** The PDF the sharing app handed over, from either the share or the open intent. */
+    /**
+     * The PDF the sharing app handed over.
+     *
+     * This screen is registered for ACTION_SEND only (AndroidManifest.xml), so the file is
+     * always the EXTRA_STREAM. The ACTION_VIEW filter - where the file would arrive as
+     * intent.data - belongs to ViewerActivity, so reading intent.data here would be a branch
+     * that can never run.
+     */
     private fun sharedPdf(): Uri? {
         val intent = intent ?: return null
-        val raw = when (intent.action) {
-            Intent.ACTION_SEND -> intent.getParcelableExtra(Intent.EXTRA_STREAM)
-            else -> intent.data
-        } ?: return null
+        val raw = intent.getParcelableExtra(Intent.EXTRA_STREAM) ?: return null
         return runCatching { Uri.parse(raw.toString()) }.getOrNull()
     }
 
