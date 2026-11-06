@@ -24,6 +24,7 @@ import com.kavopdf.app.engine.DocxWriter
 import com.kavopdf.app.engine.PdfRepair
 import com.kavopdf.app.engine.PdfToWord
 import com.kavopdf.app.engine.PdfSigner
+import com.kavopdf.app.engine.TxtWriter
 import com.kavopdf.app.model.Action
 import com.kavopdf.app.util.Files
 import java.io.File
@@ -594,7 +595,7 @@ class ToolsActivity : PdfActivity() {
                         else getString(R.string.word_nothing_found)
                         throw com.kavopdf.app.util.UserFacing(reason)
                     }
-                    if (asTxt) PdfToWord.writeTxt(result, out) else DocxWriter.write(result, out)
+                    if (asTxt) TxtWriter.write(result, out) else DocxWriter.write(result, out)
                     wordReport = result.report
                     // Say what happened, including what could not be done. A conversion that
                     // silently dropped a table or a scanned page is worse than one that says so.
