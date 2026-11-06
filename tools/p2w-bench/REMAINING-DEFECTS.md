@@ -84,3 +84,38 @@ Verified across all 80 documents:
 - no floating text boxes except for genuinely rotated lines
 - no heading autospacing stacking on explicit spacing
 - no `w:trHeight` missing, so tables no longer collapse to text height
+
+---
+
+## v3 corpus — batch 2 (320-341), found this pass
+
+Worked with the same method as batch 1: convert, render both sides at 130 dpi, put PDF page and
+DOCX page side by side, and measure. Page counts are 15/15 correct and .txt position is 78.8 % or
+better everywhere, so what is left is content and drawing fidelity, not layout collapse.
+
+| Doc | Problem | Why it is not fixed yet |
+|---|---|---|
+| **323_credit_card_statement** | The right-hand **SPEND BY CATEGORY** panel loses its whole label column — "Travel", "Shopping", "Fuel", "Groceries", "Health" are in the PDF and in neither the .docx nor the .txt. Only "Other" survives, and the six amounts come through as loose paragraphs at x≈474 rather than as a table. Word recall 96.9 %, the only .txt check that fails in the batch. | The two summary panels are side by side and overlap vertically (REWARDS SUMMARY x 28-228 y 301-354, SPEND BY CATEGORY x 250-490 y 300-372). The rewards panel is found as a table; the labels at x=250 are 22 pt beyond its right edge, so `Line.inside()` — which tests the line's CENTRE against `t.right + 2` — does not claim them, yet they reach no block at all. The values at x=474 do survive. Needs a trace through the candidate-table passes on this one page. |
+| **323_credit_card_statement** | The header block is broken: "CREDIT LIMIT / Rs. 5,00,000 / AVAILABLE / Rs. 4,12,180" is turned into a table with two empty rows and pushed 28-32 pt down, and "Rs. 42,318.40" wraps onto a second line. | Same page, different pass: four short label/value pairs on two baselines read as a table. |
+| **322_mutual_fund_factsheet** | "EXPENSE RATIO", "FUND MANAGER", "A. Bose (since 2019)", "PORTFOLIO HOLDINGS (TOP 10)" and "SECTOR ALLOCATION" are swallowed as table rows with empty cells; the scheme-performance table absorbs the holdings table and its rows misalign. | Headings above and beside a table are being claimed by the table's band. This is the batch's most repeated defect and deserves its own pass. |
+| **322_mutual_fund_factsheet** | The **riskometer** — the circular gauge with its needle — is absent. Only the scattered labels "Low", "Moderately low", "Moderate", "High", "very high risk" remain, at the wrong y. | Vector class, below. |
+| **330_cad_drawing_sheet** | The hatched floor area renders as a **solid black rectangle**, and the circled "(A)" revision marker becomes a black blob. | Vector class: a path fill is emitted at full black instead of its own colour and pattern. |
+| **331_pid_diagram** | The legend's four symbol icons and the circled "P" markers on the drawing are missing; only the text labels survive. | Vector class: stroke-only paths with no fill are dropped. |
+| **335_msds_safety_data_sheet** | The three GHS hazard **pictograms** (red diamonds) are reduced to faint red fragments. | Vector class. |
+| **324_loan_amortisation_schedule** | Column widths are an even split: "Month" is about 78 pt where the page drew it 31 pt, and every amount column is correspondingly narrow. Rows, row pitch and page count are otherwise exact. | The row-based table pass found these tables but left `colX` null, so the writer fell back to even columns. The values are right; only the column edges are missing. |
+| **320_balance_sheet_statutory** | "Note 12 - Revenue from operations", the notes table's header row, comes out as a paragraph above the table instead of its first row; the amount column is shifted. | Header-row band boundary, same family as 75_merged_header_cell. |
+
+### The one class worth real work: vector graphics
+
+Four of the eight entries above are one thing. The engine carries raster images correctly — every
+PDF page that draws an image has it in `word/media/`, and 340's barcode, 323's barcode and 326's QR
+codes all render. What it does not carry is a **path**: a shape drawn with fills and strokes rather
+than a bitmap. Three distinct failures, all visible in this batch:
+
+1. a filled path with a pattern (330's hatch) is emitted as solid black
+2. a stroke-only path (331's legend icons, 322's riskometer circle and needle) is dropped entirely
+3. a path with a non-black fill and a thin outline (335's red diamonds) survives only partially
+
+That is a rendering change in `PdfEngine`, not `DocxWriter`, and it is worth more than any single
+document on this list. It should be taken as its own task, with a before/after on 322, 330, 331 and
+335 plus a whole-corpus gate, because a shape pass that goes wrong is how a page turns black.

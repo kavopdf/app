@@ -119,6 +119,16 @@ public final class DocxWriter {
         int budgetTw;
         /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
         float pageWidthPt = 595f;
+        /**
+         * True when the last block written on this page was a table.
+         *
+         * <p>A table's rendered height is not its PDF extent: every row is written at the
+         * page's row pitch but LibreOffice sets each cell's line box itself, so the table
+         * usually ends lower than t.bottom. Measuring the next block's spacer from t.bottom
+         * then adds that error again on top of itself. A table that follows a table therefore
+         * gets no spacer - the page had no prose between them to leave a gap for.
+         */
+        boolean lastWasTable;
     }
 
     // ------------------------------------------------------------------ document
@@ -186,7 +196,7 @@ public final class DocxWriter {
                 if (block instanceof PdfToWord.Para) {
                     para(sb, (PdfToWord.Para) block, ctx);
                 } else if (block instanceof PdfToWord.Table) {
-                    table(sb, (PdfToWord.Table) block);
+                    table(sb, (PdfToWord.Table) block, ctx);
                 } else if (block instanceof Picture) {
                     picture(sb, (Picture) block, ctx);
                 } else if (block instanceof Shape) {
@@ -480,6 +490,7 @@ public final class DocxWriter {
      * and it is the x of each line that the reader sees.
      */
     private static void para(StringBuilder sb, PdfToWord.Para p, Ctx ctx) {
+        ctx.lastWasTable = false;
         // Body text belongs in the document flow. Putting every line in an anchored text box made
         // the file a PDF wearing a .docx extension: it does not reflow, the app's viewer loses
         // values, a dark theme shows its own surface behind it, and it does not look like a
@@ -861,7 +872,7 @@ public final class DocxWriter {
      * keeps the position it had on the page. Turning the cells into loose text boxes would
      * place the text and destroy the table, which is the one thing a conversion must not do.
      */
-    private static void table(StringBuilder sb, PdfToWord.Table t) {
+    private static void table(StringBuilder sb, PdfToWord.Table t, Ctx ctx) {
         int cols = 0;
         for (List<String> row : t.rows) cols = Math.max(cols, row.size());
         if (cols == 0) return;
@@ -901,6 +912,32 @@ public final class DocxWriter {
         }
         int totalTw = 0;
         for (int c = 0; c < cols; c++) totalTw += colTw[c];
+
+        // A table starts where the page drew it. The flow before it ends on some baseline and
+        // the page put the table's top rule at t.top; the difference is real white space that
+        // nothing in the flow was accounting for, so a table sitting 40 pt below the last line
+        // of prose began at the prose's own y and every row and everything under it moved up
+        // by that much. A spacer paragraph of the measured height holds the gap open. It is a
+        // paragraph rather than w:spacing on the table because OOXML gives a table no
+        // before-spacing of its own.
+        int spacerTw = 0;
+        if (!ctx.newPage && !ctx.lastWasTable && ctx.lastBaseline >= 0f && t.top > ctx.lastBaseline) {
+            float prevLine = Math.max(4f, ctx.lastSize * LINE_FACTOR);
+            float extra = (t.top - ctx.lastBaseline) - prevLine;
+            // Only a gap the page really drew is worth a paragraph of its own. Below a line
+            // and a bit, the difference is the substitute face's line box, not white space,
+            // and charging it moved the table further down than the page had it.
+            if (extra >= prevLine * 1.2f) {
+                spacerTw = (int) Math.min(2880L, Math.round(extra * TWIPS_PER_PT));
+            }
+        }
+        if (spacerTw > 0) {
+            sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
+                    .append(spacerTw)
+                    .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+            ctx.flowTw += spacerTw;
+        }
 
         StringBuilder inner = new StringBuilder(512);
         // The table is a real w:tbl in the flow, not a text box.
@@ -1042,7 +1079,14 @@ public final class DocxWriter {
                                     cellColor & 0xFFFFFF));
                         }
                     }
-                    if (r == 0 && t.header) inner.append("<w:b/>");
+                    // Bold is a property of the face the page DREW the cell in. Guessing it
+                    // from "this is row zero of something that looks like a header" made a
+                    // bold first row out of tables whose header is not bold, and missed a
+                    // bold cell anywhere else. The face is the evidence; the header guess is
+                    // only the fallback for a cell whose face the page did not name.
+                    if (isBoldFace(face) || (r == 0 && t.header && face.isEmpty())) {
+                        inner.append("<w:b/>");
+                    }
                     // A cell can hold two lines of the page: a numbered item's marker sits on
                     // its own line above the name, and the page drew them eight points apart.
                     // One w:t would flatten them into "1. SUNRISE" again.
@@ -1064,9 +1108,36 @@ public final class DocxWriter {
         sb.append(inner);
         // A table must be followed by a paragraph of its own: Word inserts one if it is not
         // there, and a paragraph the writer did not place is a paragraph it cannot measure.
+        //
+        // It is 4 pt, not 1 twip. At one twip the paragraph is a zero-height line, and
+        // LibreOffice absorbed it into the table as an extra empty row - a table of 13 rows
+        // rendered 14, the bottom rule fell a row lower than the page's, and everything below
+        // the table started from the wrong y. 4 pt is below every font's line box, so it can
+        // never hold text, but it is a real line and stays a paragraph.
         sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
+                .append(POST_TABLE_TW).append("\" w:lineRule=\"exact\"/>")
                 .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+        // The table is part of the flow too. Left out of the accounting, the paragraph after it
+        // was spaced from the last line BEFORE the table, so a table's whole height was added
+        // on top of the next paragraph's gap and the flow ran long.
+        ctx.flowTw += (int) Math.round(Math.max(0f, extentPt) * TWIPS_PER_PT) + POST_TABLE_TW;
+        ctx.lastBaseline = t.bottom;
+        ctx.lastSize = 0f;
+        ctx.newPage = false;
+        ctx.lastWasTable = true;
+    }
+
+    /** The paragraph a table must be followed by: 4 pt, in twips. */
+    private static final int POST_TABLE_TW = 80;
+
+    /** True when the typeface the page named is itself a bold face. */
+    private static boolean isBoldFace(String face) {
+        if (face == null || face.isEmpty()) return false;
+        String f = face.toLowerCase(java.util.Locale.ROOT);
+        return f.contains("bold") || f.contains("black") || f.contains("heavy")
+                || f.endsWith("-bd") || f.contains(",bd")
+                || f.contains("semibold") || f.contains("demi");
     }
 
     /** The text of cell (r, c), or "" when the row does not reach that far. */

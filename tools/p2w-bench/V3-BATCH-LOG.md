@@ -64,3 +64,94 @@ now found (64_newspaper, identical text)**. No document got worse. `TestPdfToWor
 259 KB source file in one call, so the engine change is committed as
 `tools/p2w-bench/patches/3.53.0-rule-y-and-run-order.patch` and applies cleanly to the release
 commit with `git apply`. A run with a working push path should apply it and commit the source.
+
+---
+
+## BATCH 2 — documents 320-341 (15 documents)
+
+**Visual result: 10 excellent, 4 good, 1 needing work, 0 broken, 0 page-count defects.**
+Every one of the 15 is one page in and one page out — except **324_loan_amortisation_schedule**,
+which is 7 in and 7 out. Every .txt scores 78.8 % or better on line position; 14 of the 15 pass all
+five .txt checks.
+
+| Doc | Pages | .txt position | Verdict |
+|---|---|---|---|
+| 320_balance_sheet_statutory | 1/1 | 93.2 % | good |
+| 321_auditors_report | 1/1 | 100.0 % | excellent |
+| 322_mutual_fund_factsheet | 1/1 | 100.0 % | good — see below |
+| 323_credit_card_statement | 1/1 | 100.0 % | needs work — see below |
+| 324_loan_amortisation_schedule | 7/7 | 100.0 % | excellent |
+| 325_demat_holdings_statement | 1/1 | 100.0 % | excellent |
+| 326_itr_computation | 1/1 | 100.0 % | excellent |
+| 330_cad_drawing_sheet | 1/1 | 95.0 % | good — see below |
+| 331_pid_diagram | 1/1 | 100.0 % | good — see below |
+| 332_bom_on_drawing | 1/1 | 78.8 % | excellent |
+| 333_datasheet_spec_tables | 1/1 | 100.0 % | excellent |
+| 334_patent_document | 1/1 | 100.0 % | excellent |
+| 335_msds_safety_data_sheet | 1/1 | 100.0 % | good — see below |
+| 340_bill_of_lading | 1/1 | 100.0 % | excellent |
+| 341_shipping_manifest | 1/1 | 100.0 % | excellent |
+
+### Fixed in this batch
+
+- **The 3.53.0 engine change is now in the source, not only in a patch.** Batch 1 left
+  `patches/3.53.0-rule-y-and-run-order.patch` unapplied because the build sandbox had no push path.
+  It applies cleanly to HEAD, is applied, and is committed as source. `TestPdfToWord` 29/29,
+  `TestRealDocs` 96.8 / 97.0 / 81.7 — identical to the decimal.
+- **A table cell's .txt indent divided by a hardcoded 9 pt, not the size the cell was drawn at.**
+  `writeTxt()` wrote `x / (9 * 0.6)` for every cell of every table. A table set at 7.5 pt was
+  padded 20 % short and one at 12 pt 25 % long, so the whole table's columns landed in the wrong
+  place while the same document's body text scored 100 %. The divisor is now the cell's own size
+  from `Table.sizes`. Eight of the fifteen documents were under 60 % before this and all eight are
+  above it now:
+
+  | Doc | position before | after |
+  |---|---|---|
+  | 324_loan_amortisation_schedule | 1.7 % | **100.0 %** |
+  | 341_shipping_manifest | 1.3 % | **100.0 %** |
+  | 332_bom_on_drawing | 9.6 % | **78.8 %** |
+  | 330_cad_drawing_sheet | 20.0 % | **95.0 %** |
+  | 333_datasheet_spec_tables | 26.2 % | **100.0 %** |
+  | 325_demat_holdings_statement | 28.6 % | **100.0 %** |
+  | 320_balance_sheet_statutory | 41.1 % | **93.2 %** |
+  | 323_credit_card_statement | 46.2 % | **100.0 %** |
+
+  Only `writeTxt()` changed. Proof the .docx did not move: all 15 were converted before and after
+  and the entries inside each package were hashed, not the file bytes. **identical: 15,
+  different: 0.**
+
+- **A table now starts at the y the page drew it** (`DocxWriter.table`). The flow ended on some
+  baseline and the page put the table's top rule at `t.top`; the difference was white space nothing
+  accounted for, so the table began at the prose's own y and every row under it moved up. A
+  measured spacer paragraph now holds the gap open. It is only written when the gap is more than
+  1.2 line boxes — below that the difference is the substitute face's line box, not white space —
+  and never when the previous block was already a table, because a rendered table ends lower than
+  its PDF extent and the error would otherwise be charged twice.
+- **The paragraph after a table is 4 pt, not 1 twip.** At one twip it was a zero-height line and
+  LibreOffice absorbed it into the table as an extra row.
+- **Bold on a table's first row now comes from the cell's own face.** `r == 0 && t.header` was a
+  guess; it is now `isBoldFace(cellFace)`, with the header guess kept only as the fallback for a
+  cell whose face the page did not name.
+
+  Measured vertical error, median |dy| of lines matched by text, old writer against new:
+
+  | Doc | before | after |
+  |---|---|---|
+  | 324_loan_amortisation_schedule | 33.7 pt | **10.7 pt** |
+  | 322_mutual_fund_factsheet | 85.2 pt | **46.0 pt** |
+  | 323_credit_card_statement | 17.9 pt | **17.9 pt** (unchanged) |
+
+  Horizontal error is 0.1 pt on all three. No document in the batch got worse.
+
+### Regression, whole corpus
+
+All 75 v3 documents were converted and rendered through LibreOffice. **Page count against the PDF:
+74 of 75 match.** The one mismatch is **350_question_paper** (1 in, 2 out) and it is pre-existing:
+converted with the previous writer it also renders 2 pages, so this batch's changes did not cause it.
+
+### Carried forward
+
+The five defects recorded in `REMAINING-DEFECTS.md` under batch 2 — 322, 323, 324, 330, 331, 335 and
+320. The largest is a class, not a document: **vector graphics the page draws as paths are dropped
+or filled black**, and it is what makes 322's riskometer, 331's legend symbols and 335's GHS
+pictograms absent from the .docx.

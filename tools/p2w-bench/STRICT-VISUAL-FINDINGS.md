@@ -62,3 +62,52 @@ inside the BILL TO box.
      text — which defeats the point of a PDF-to-Word tool
 
    Recorded, not fixed. A decision is needed before either is done.
+
+---
+
+# Strict visual findings — v3 corpus, batch 2 (documents 320-341)
+
+Rendered both sides at 130 dpi and compared them side by side, one document per sheet, then
+measured every line matched by its text.
+
+## FIXED
+
+- **A table's start y, the paragraph under it, and a cell's bold** (`DocxWriter`, this pass).
+  The spacer, the 4 pt paragraph and the face-driven bold are described in `V3-BATCH-LOG.md`.
+  Effect on median vertical error: 324 goes 33.7 -> 10.7 pt, 322 85.2 -> 46.0 pt, 323 unchanged
+  at 17.9 pt. Horizontal error is 0.1 pt on all three.
+
+## EASY — one attempt each, worth taking
+
+**1. 320 — the notes table's header row is a paragraph, not the table's first row.**
+   "Note 12 - Revenue from operations" sits above the table it belongs in. The same band-boundary
+   miss as `75_merged_header_cell`.
+
+**2. 324 — the tables have no `colX`, so every column is an even split.**
+   Rows, row pitch and page count are already exact; only the column edges are wrong. The row-based
+   pass that found these tables has the cell x values — it is not passing them on.
+
+**3. 322 — headings beside and above a table are claimed by the table's band.**
+   Five headings become empty-celled rows. This is the batch's most repeated defect and the most
+   damaging to how the document reads.
+
+## HARD — a drawing problem, not a layout problem
+
+**4. Vector paths. Four documents: 322 (riskometer), 330 (hatch, revision marker), 331 (legend
+   icons, circled P), 335 (GHS pictograms).**
+   Rasters are correct everywhere — every barcode and QR code in this batch renders. Paths are not:
+   a patterned fill becomes solid black (330), a stroke-only path disappears (331, 322), and a
+   coloured fill with a thin outline is partly lost (335). This belongs in `PdfEngine` and needs its
+   own before/after plus a whole-corpus gate, because a shape pass that goes wrong is how a page
+   turns black.
+
+## CHECKED AND CLEAN
+
+- **340_bill_of_lading** — a full form: header band, two-column shipper/consignee blocks, a
+  six-column goods table, three signature boxes and a Code-128 barcode. Every field lands, the
+  barcode renders, and the page count is 1/1.
+- **341_shipping_manifest** — 304 .txt lines at 100 % position accuracy, 378 of 378 words.
+- **326_itr_computation** — the QR code renders; the three tax tables keep their own column edges.
+- **333_datasheet_spec_tables**, **334_patent_document**, **325_demat_holdings_statement**,
+  **321_auditors_report**, **332_bom_on_drawing** — no visible difference from the page beyond a
+  few points of vertical drift.
