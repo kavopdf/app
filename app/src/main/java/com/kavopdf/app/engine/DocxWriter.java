@@ -409,6 +409,16 @@ public final class DocxWriter {
         /** Outline colour 0xRRGGBB, or -1 when the path is only filled. */
         public int lineRgb = -1;
         public float lineWidthPt;
+        /**
+         * The preset geometry: 0 for a rectangle, 1 for an ellipse.
+         *
+         * <p>A page draws a circle as four Bezier curves that close on themselves. Its bounding
+         * box is a square, so emitting the box put a solid square where a seal's ring, an OMR
+         * bubble or a sheet-music note head belongs - and a stroke-only circle was dropped
+         * outright. The box is the right extent either way; only the outline drawn inside it
+         * differs, which is what this selects.
+         */
+        public int kind = 0;
 
         public Shape(float xPt, float topPt, float wPt, float hPt) {
             this.xPt = xPt;
@@ -459,7 +469,8 @@ public final class DocxWriter {
                 .append("<wps:wsp><wps:cNvSpPr/><wps:spPr>")
                 .append("<a:xfrm><a:off x=\"0\" y=\"0\"/><a:ext cx=\"").append(cx)
                 .append("\" cy=\"").append(cy).append("\"/></a:xfrm>")
-                .append("<a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom>");
+                .append("<a:prstGeom prst=\"").append(s.kind == 1 ? "ellipse" : "rect")
+                .append("\"><a:avLst/></a:prstGeom>");
         if (s.fillRgb >= 0) {
             sb.append("<a:solidFill><a:srgbClr val=\"").append(hex(s.fillRgb)).append("\">");
             if (s.fillAlpha < 0.999f) {

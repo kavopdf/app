@@ -115,10 +115,10 @@ better everywhere, so what is left is content and drawing fidelity, not layout c
 | **323_credit_card_statement** | The right-hand **SPEND BY CATEGORY** panel loses its whole label column — "Travel", "Shopping", "Fuel", "Groceries", "Health" are in the PDF and in neither the .docx nor the .txt. Only "Other" survives, and the six amounts come through as loose paragraphs at x≈474 rather than as a table. Word recall 96.9 %, the only .txt check that fails in the batch. | The two summary panels are side by side and overlap vertically (REWARDS SUMMARY x 28-228 y 301-354, SPEND BY CATEGORY x 250-490 y 300-372). The rewards panel is found as a table; the labels at x=250 are 22 pt beyond its right edge, so `Line.inside()` — which tests the line's CENTRE against `t.right + 2` — does not claim them, yet they reach no block at all. The values at x=474 do survive. Needs a trace through the candidate-table passes on this one page. |
 | **323_credit_card_statement** | The header block is broken: "CREDIT LIMIT / Rs. 5,00,000 / AVAILABLE / Rs. 4,12,180" is turned into a table with two empty rows and pushed 28-32 pt down, and "Rs. 42,318.40" wraps onto a second line. | Same page, different pass: four short label/value pairs on two baselines read as a table. |
 | **322_mutual_fund_factsheet** | "EXPENSE RATIO", "FUND MANAGER", "A. Bose (since 2019)", "PORTFOLIO HOLDINGS (TOP 10)" and "SECTOR ALLOCATION" are swallowed as table rows with empty cells; the scheme-performance table absorbs the holdings table and its rows misalign. | Headings above and beside a table are being claimed by the table's band. This is the batch's most repeated defect and deserves its own pass. |
-| **322_mutual_fund_factsheet** | The **riskometer** — the circular gauge with its needle — is absent. Only the scattered labels "Low", "Moderately low", "Moderate", "High", "very high risk" remain, at the wrong y. | Vector class, below. |
-| **330_cad_drawing_sheet** | The hatched floor area renders as a **solid black rectangle**, and the circled "(A)" revision marker becomes a black blob. | Vector class: a path fill is emitted at full black instead of its own colour and pattern. |
-| **331_pid_diagram** | The legend's four symbol icons and the circled "P" markers on the drawing are missing; only the text labels survive. | Vector class: stroke-only paths with no fill are dropped. |
-| **335_msds_safety_data_sheet** | The three GHS hazard **pictograms** (red diamonds) are reduced to faint red fragments. | Vector class. |
+| **322_mutual_fund_factsheet** | The **riskometer** — the circular gauge with its needle — is absent. Only the scattered labels "Low", "Moderately low", "Moderate", "High", "very high risk" remain, at the wrong y. | **Partly fixed 6 Nov** — the ring is now drawn as an ellipse. The needle is a filled polygon and is still its bounding box. |
+| **330_cad_drawing_sheet** | The hatched floor area renders as a **solid black rectangle**, and the circled "(A)" revision marker becomes a black blob. | **Partly fixed 6 Nov** — the compass ring is a ring again. The hatch is ~30 diagonal one-line strokes and is dropped, not black; the north arrow is a filled polygon and is still its box. |
+| **331_pid_diagram** | The legend's four symbol icons and the circled "P" markers on the drawing are missing; only the text labels survive. | **Fixed 6 Nov** for the circles — all 7 rings now draw. The pump triangles and gate-valve bowties inside them are filled/stroked polygons and are still open. |
+| **335_msds_safety_data_sheet** | The three GHS hazard **pictograms** (red diamonds) are reduced to faint red fragments. | Vector class. **Still open** — the pictograms are red-stroked rectangles, not ellipses, so this pass did not touch them. |
 | **324_loan_amortisation_schedule** | Column widths are an even split: "Month" is about 78 pt where the page drew it 31 pt, and every amount column is correspondingly narrow. Rows, row pitch and page count are otherwise exact. | The row-based table pass found these tables but left `colX` null, so the writer fell back to even columns. The values are right; only the column edges are missing. |
 | **320_balance_sheet_statutory** | "Note 12 - Revenue from operations", the notes table's header row, comes out as a paragraph above the table instead of its first row; the amount column is shifted. | Header-row band boundary, same family as 75_merged_header_cell. |
 
@@ -136,3 +136,44 @@ than a bitmap. Three distinct failures, all visible in this batch:
 That is a rendering change in `PdfEngine`, not `DocxWriter`, and it is worth more than any single
 document on this list. It should be taken as its own task, with a before/after on 322, 330, 331 and
 335 plus a whole-corpus gate, because a shape pass that goes wrong is how a page turns black.
+
+#### Sub-class 2 (stroke-only circles) and the filled-circle half of 1 — FIXED 6 Nov
+
+A page draws a circle or an ellipse as four Bezier curves that close on themselves. Its bounding
+box is a square, so the writer put a solid square where a ring belongs, and a stroke-only circle —
+being neither a rectangle nor a single line — was dropped before it ever reached the writer.
+
+`RuleCollector.pathIsEllipse()` now recognises that path (one move, four curves, no lines, no
+rects, ends on its start point, both extents over 2 pt) and `DocxWriter.Shape.kind` selects
+`prst="ellipse"` instead of `prst="rect"`. The extent needs no correction: a quarter arc's control
+points sit exactly on the ellipse's extremes, so the box is already right and only the outline
+drawn inside it changes.
+
+Measured over all 208 documents, old engine against new, on page count, words present, images and
+tables: **0 documents worse on any of the four, 17 documents improved.**
+
+| Doc | Before | After |
+|---|---|---|
+| **351_omr_answer_sheet** | 320 bubble outlines dropped, 29 filled bubbles were black squares | **349 ellipses drawn**, bubbles read as bubbles |
+| **331_pid_diagram** | legend symbols, instrument circles and pump circles absent | **7 ellipses**, the legend and both instrument loops read |
+| **405_sheet_music_lyrics** | 54 note heads were 6x4 pt black rectangles | 54 ellipses |
+| **360_restaurant_menu** | 20 dietary markers were squares | 20 ellipses |
+| **65_two_col_full_width_figure_caption** | 20 chart markers were squares | 20 ellipses |
+| **330_cad_drawing_sheet** | the compass was a free-standing black slab | the ring is drawn; the arrow inside is still its box |
+| **322_mutual_fund_factsheet** | riskometer ring absent | ring drawn |
+| 05, 60, 305, 312, 318, 332, 352, 371, 394, 400 | rings absent or boxed | rings drawn |
+
+Page count was re-rendered through LibreOffice for all 17 and is unchanged on every one.
+`TestPdfToWord` 29/29, `TestRealDocs` 96.8 / 97.0 / 81.7 — identical to the decimal.
+
+#### Still open in this class
+
+- **Filled polygons that are not ellipses.** A triangle, an arrowhead or a diamond is still emitted
+  as its bounding box, which is why 330's north arrow is a black block inside its now-correct ring
+  and 331's pump triangles and gate-valve bowties are still absent. Needs a freeform
+  (`a:custGeom`) shape, not a preset.
+- **335_msds_safety_data_sheet** — its four GHS pictograms are drawn as red-stroked *rectangles*
+  with a 1.6 pt outline, so they are emitted and are not this sub-class; what is missing is the
+  red diamond fill inside them. Unchanged by this pass and still open.
+- **330's hatch** — the floor hatching is ~30 diagonal one-line strokes, each of which is neither
+  axis-aligned nor a rectangle, so it is dropped. It is not black; it is absent.

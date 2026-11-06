@@ -262,3 +262,53 @@ compared on page count, words present, images and tables:
 - **364_event_ticket** — "WS24-4471-0082" is drawn twice on the page and appears once in the .docx.
 - **343_air_waybill, 361_product_catalogue_grid** — vertical drift 28.8 pt and 108.4 pt, the same
   flow-determined spacing class recorded for the 80-document corpus.
+
+---
+
+## VECTOR PASS — circles and ellipses, 6 Nov
+
+Not a batch: the one class `REMAINING-DEFECTS.md` called out as worth real work, taken as its own
+task because it spans four of the eight batch-2 defects and turns up in every corpus.
+
+**The defect.** A page draws a circle or an ellipse as four Bezier curves that close on themselves.
+The engine only ever wrote axis-aligned rectangles, so a *filled* circle went out as its bounding
+box — a solid square where a ring belongs — and a *stroke-only* circle, being neither a rectangle
+nor a single axis-aligned line, was dropped before it reached the writer at all.
+
+**The fix.** `RuleCollector.pathIsEllipse()` recognises the path (one move, four curves, no lines,
+no rects, ends within 1.5 pt of where it started, both extents over 2 pt). `DocxWriter.Shape.kind`
+then selects `prst="ellipse"` instead of `prst="rect"`. The extent needed no correction: a quarter
+arc's control points sit exactly on the ellipse's extremes, so the box is already the ellipse's box
+and only the outline drawn inside it changes. Nothing else about the shape path moved — the
+`ctmRotated()` guard, the clip, the fill/stroke colours and the `behindDoc` anchoring are as they
+were, so a document with no ellipses converts byte-identically.
+
+**Regression, all 208 documents, old engine against new**, comparing page count, words present,
+images and tables:
+
+| Measure | Result |
+|---|---|
+| documents worse on page count | **0** |
+| documents worse on words present (>2) | **0** |
+| images lost | **0** |
+| tables lost | **0** |
+| documents improved | **17** |
+
+Page count was then re-rendered through LibreOffice for all 17 changed documents and is unchanged
+on every one (65_two_col_full_width_figure_caption is 2 against the PDF's 1 before and after — the
+pre-existing multi-column defect, untouched here).
+
+`TestPdfToWord` **29/29**. `TestRealDocs` **96.8 / 97.0 / 81.7** — identical to the decimal.
+
+**What a reader now sees.** 351_omr_answer_sheet is the clearest: 320 bubble outlines that were
+simply absent, and 29 filled bubbles that were black squares, are now 349 bubbles, filled ones
+correctly filled — the sheet reads as an answer sheet. 331_pid_diagram's legend, both instrument
+loops and the pump circles are drawn for the first time. 405_sheet_music_lyrics' 54 note heads and
+360_restaurant_menu's 20 dietary markers are ellipses instead of rectangles. 330's compass is a
+ring rather than a free-standing black slab.
+
+**What is still open in this class**, recorded in `REMAINING-DEFECTS.md`: filled polygons that are
+not ellipses (330's north arrow, 331's pump triangles and gate-valve bowties) still go out as their
+bounding box and need `a:custGeom`, not a preset; 335's GHS pictograms are red-stroked rectangles
+rather than ellipses and were not touched; 330's hatch is ~30 diagonal one-line strokes and is
+dropped rather than drawn.

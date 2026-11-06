@@ -3566,8 +3566,28 @@ public final class PdfToWord {
             return Math.abs(m.getValue(0, 1)) > 0.01f || Math.abs(m.getValue(1, 0)) > 0.01f;
         }
 
+        /**
+         * True when the path being built is one closed ellipse.
+         *
+         * <p>A circle or an ellipse is four Bezier curves that start and end on the same point;
+         * a rounded rectangle adds the four straight sides between them, so the line count tells
+         * the two apart. The box of such a path is the ellipse's own extent, because a quarter
+         * arc's control points sit exactly on the extremes - so the extent needs no correction,
+         * only the outline drawn inside it.
+         */
+        private boolean pathIsEllipse() {
+            return pMoves == 1 && pCurves == 4 && pLines == 0 && pRects == 0
+                    && Math.abs(lastX - startX) < 1.5f && Math.abs(lastY - startY) < 1.5f
+                    && pxMax - pxMin > 2f && pyMax - pyMin > 2f;
+        }
+
         /** Adds a shape to the page, in PDF space, after the clip has had its say. */
         private void addShape(float[] r, int fill, float alpha, int line, float lineWidth) {
+            addShape(r, fill, alpha, line, lineWidth, 0);
+        }
+
+        /** As above, with the preset geometry: 0 a rectangle, 1 an ellipse. */
+        private void addShape(float[] r, int fill, float alpha, int line, float lineWidth, int kind) {
             if (r == null) return;
             if (r[2] - r[0] <= 0.01f && r[3] - r[1] <= 0.01f) return;
             // A shape can only be an axis-aligned wps:wsp rect. Under a rotated CTM the path's
@@ -3578,6 +3598,7 @@ public final class PdfToWord {
             // a rotated rectangle cannot be represented, and a wrong block is worse than nothing.
             if (ctmRotated()) return;
             DocxWriter.Shape sh = new DocxWriter.Shape(r[0], -r[3], r[2] - r[0], r[3] - r[1]);
+            sh.kind = kind;
             sh.fillRgb = fill;
             sh.fillAlpha = alpha;
             sh.lineRgb = line;
@@ -3603,7 +3624,7 @@ public final class PdfToWord {
                 line = rgbOf(getGraphicsState().getStrokingColor());
                 lw = Math.max(0.1f, getGraphicsState().getLineWidth());
             }
-            addShape(clipped(pathBox()), fill, alpha, line, lw);
+            addShape(clipped(pathBox()), fill, alpha, line, lw, pathIsEllipse() ? 1 : 0);
         }
 
         /**
@@ -3623,9 +3644,13 @@ public final class PdfToWord {
             float w = Math.max(0.1f, getGraphicsState().getLineWidth());
             boolean rectangle = (pRects == 1 && pLines == 0 && pCurves == 0)
                     || (pRects == 0 && pMoves == 1 && pLines == 4 && pCurves == 0);
-            if (rectangle) {
+            // A stroke-only circle used to be dropped: it is neither a rectangle nor a single
+            // line, and its box would have put a square where a ring belongs. It is an ellipse,
+            // so it is drawn as one.
+            boolean ellipse = pathIsEllipse();
+            if (rectangle || ellipse) {
                 addShape(clipped(new float[]{pxMin - w / 2f, pyMin - w / 2f,
-                        pxMax + w / 2f, pyMax + w / 2f}), -1, 1f, line, w);
+                        pxMax + w / 2f, pyMax + w / 2f}), -1, 1f, line, w, ellipse ? 1 : 0);
                 return;
             }
             if (pCurves == 0 && pLines == 1 && pRects == 0) {
