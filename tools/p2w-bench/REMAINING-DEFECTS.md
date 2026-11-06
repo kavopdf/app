@@ -16,6 +16,23 @@ Fixed this pass and no longer open: the false table round prose on 316 (a rule's
 in the wrong frame), and the interleaved cell text on 311 ("6M0o0b6i7le").
 
 
+## v3 corpus — batch 3 (342-371), found this pass
+
+| Doc | Problem |
+|---|---|
+| **350_question_paper** | 1 page in, 2 out: the MCQ block overflows. Pre-existing, unchanged by this pass. The .txt also fails TABLE CELLS and NO DUPLICATION. |
+| **353_admit_card** | The label/value block is emitted as a four-column table with the labels as header cells and "Aadhaar ending 4471" in a row of its own; the page sets each label above its value in a two-column band. |
+| **361_product_catalogue_grid** | Each card's text is drawn at the top of the card over its photograph instead of below it, and the second row of cards loses its text entirely. 108.4 pt median drift. |
+| **364_event_ticket** | "WS24-4471-0082" is drawn twice on the page and appears once in the .docx. |
+| **352_certificate_ornate_border, 371_experience_certificate** | .txt position 30.0 % and 36.4 %: rotated round seals whose text the page draws one character per baseline. A .txt has no rotation; body text on both is 100 %. |
+| **343_air_waybill** | 28.8 pt median vertical drift, the flow-determined spacing class. |
+
+Closed this pass: every document in all three corpora was re-converted and compared on page count,
+words, images and tables — no document got worse. The size a glyph is set at is now read exactly
+(it was rounded to a whole point), a table cell's exact line height is the row's own pitch instead
+of a constant 10 pt, and a size that is not a whole half-point rounds down so a column that was
+exactly wide enough does not start wrapping.
+
 Everything here was found by rendering the .docx through LibreOffice and comparing it against the
 source PDF page by page, in batches of 20 over the 80-document corpus. Each entry names the batch,
 the document, what is wrong, and what was already tried.

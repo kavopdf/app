@@ -684,7 +684,7 @@ public final class DocxWriter {
                 .append("\" w:lineRule=\"exact\"/>")
                 // The anchor already put this line at its x; an indent here would move it off.
                 .append("<w:ind w:left=\"0\" w:right=\"0\" w:firstLine=\"0\"/>");
-        int half = Math.round(b.size * 2f);
+        int half = halfPointsDown(b.size);
         if (half > 0) {
             sb.append("<w:rPr><w:sz w:val=\"").append(Math.min(3276, Math.max(2, half)))
                     .append("\"/></w:rPr>");
@@ -803,7 +803,7 @@ public final class DocxWriter {
         }
         if (run.bold) sb.append("<w:b/>");
         if (run.italic) sb.append("<w:i/>");
-        int half = Math.round(run.sizePt * 2f);
+        int half = halfPointsDown(run.sizePt);
         if (half > 0) {
             sb.append("<w:sz w:val=\"").append(Math.min(3276, Math.max(2, half))).append("\"/>");
             sb.append("<w:szCs w:val=\"").append(Math.min(3276, Math.max(2, half)))
@@ -997,6 +997,12 @@ public final class DocxWriter {
         int rowCount = Math.max(1, t.rows.size());
         float extentPt = t.bottom - t.top;
         int rowTw = extentPt > 0f ? (int) Math.round(extentPt / rowCount * TWIPS_PER_PT) : 0;
+        // The exact line height inside a cell was 200 twips - 10 pt - for every cell of every
+        // table in every document. A price list drawn at 5.8 pt on an 8.4 pt row pitch got a
+        // 10 pt line, so each of its 29 rows grew 1.6 pt taller than the page drew it and the
+        // table drifted 46 pt down the sheet by its last row. The line height is the row's own
+        // pitch: that is what makes a row the height the page gave it.
+        int cellLineTw = rowTw > 0 ? rowTw : 200;
         for (int r = 0; r < t.rows.size(); r++) {
             List<String> row = t.rows.get(r);
             inner.append("<w:tr>");
@@ -1045,7 +1051,8 @@ public final class DocxWriter {
                 inner.append("</w:tcPr>")
                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
                         .append("<w:snapToGrid w:val=\"0\"/>")
-                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"200\" w:lineRule=\"exact\"/>");
+                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
+                        .append(cellLineTw).append("\" w:lineRule=\"exact\"/>");
                 if (insetTw > 0) inner.append("<w:ind w:left=\"").append(insetTw).append("\"/>");
                 inner.append("</w:pPr>");
                 if (!cell.isEmpty()) {
@@ -1059,7 +1066,7 @@ public final class DocxWriter {
                     float sz = r < t.sizes.size() && c < t.sizes.get(r).size()
                             ? t.sizes.get(r).get(c) : Float.NaN;
                     if (!Float.isNaN(sz) && sz > 0f) {
-                        int half = Math.max(2, Math.round(sz * 2f));
+                        int half = Math.max(2, halfPointsDown(sz));
                         inner.append("<w:sz w:val=\"").append(half)
                                 .append("\"/><w:szCs w:val=\"").append(half).append("\"/>");
                     }
@@ -1130,6 +1137,21 @@ public final class DocxWriter {
 
     /** The paragraph a table must be followed by: 4 pt, in twips. */
     private static final int POST_TABLE_TW = 80;
+
+    /**
+     * A size in half-points, rounded DOWN.
+     *
+     * A page's size is not always a whole half-point: a dense price list is set at 5.8 pt.
+     * Rounding 5.8 up to 6.0 makes every glyph 3 % wider than the page drew it, and a column
+     * that was exactly wide enough stops being so. On 362 the last column is 21.3 pt and
+     * "485.27" needs 21.6 pt at 6.0, so every row wrapped to two lines and the table came out
+     * twice its drawn height. Rounding down never makes the substitute face wider than the
+     * page's, so a line the page did not wrap is not wrapped here either.
+     */
+    private static int halfPointsDown(float sizePt) {
+        if (!(sizePt > 0f)) return 20;
+        return Math.max(2, (int) Math.floor(sizePt * 2f));
+    }
 
     /** True when the typeface the page named is itself a bold face. */
     private static boolean isBoldFace(String face) {

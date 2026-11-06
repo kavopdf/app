@@ -1099,6 +1099,18 @@ public final class PdfToWord {
     static final class Glyph {
         String text;
         float x, y, width, size;
+        /**
+         * The size to a whole point - the value the word-boundary test has always used.
+         *
+         * <p>{@link #size} is now read exactly (a page that sets 5.8 pt reports 5.8, not 5),
+         * which is what the typeface is set at and what the .txt indent divides by. But the
+         * gap test that decides where a word ENDS was tuned against the whole-point value, and
+         * a page that letterspaces its capitals by about a fifth of an em sits right on the
+         * threshold: reading the size more precisely moved the boundary under it and turned
+         * "E L E C T I O N" into "ELECTION" on 39_small_caps_letter_spacing. How tall a glyph
+         * is and where its word ends are different questions, so they use different numbers.
+         */
+        float sizePt;
         String font;
         boolean bold, italic;
         /** Colour as 0xRRGGBB, or -1 when the page draws it in the default black. */
@@ -1268,7 +1280,15 @@ public final class PdfToWord {
             g.diry = (float) Math.sin(ang);
 
             g.width = tp.getWidthDirAdj();
-            g.size = tp.getFontSizeInPt() > 0 ? tp.getFontSizeInPt() : tp.getFontSize();
+            // getFontSizeInPt() is the size ROUNDED TO A WHOLE POINT: a page that sets
+            // 5.8 pt reports 5.0, and one that sets 6.5 reports 6.0. Every size in every
+            // document was therefore snapped to an integer, so a dense price list (362)
+            // rendered 14 % small and its .txt indent sat 15.7 % too far right - just
+            // outside the tolerance the position check allows. getFontSize() is the same
+            // number without the rounding; inPt is only the fallback for a font whose size
+            // the page did not name.
+            g.sizePt = tp.getFontSizeInPt() > 0 ? tp.getFontSizeInPt() : tp.getFontSize();
+            g.size = tp.getFontSize() > 0 ? tp.getFontSize() : tp.getFontSizeInPt();
             PDFont font = tp.getFont();
             g.font = font == null ? "" : font.getName();
             String n = g.font.toLowerCase(Locale.ROOT);
@@ -2476,9 +2496,17 @@ public final class PdfToWord {
                 // "ke TT/2025/4471" - a space inside a word - because the mark "e" carries
                 // width 0 and the following "TT" sat 2.39 pt (0.217 em) past it. The same
                 // split hit the Devanagari table (76) and the mixed-script line (78).
+                // The word-boundary test uses the size to a whole point, not the exact size.
+                // A page that letterspaces its capitals by about a fifth of an em sits exactly
+                // on this threshold, and reading the size more precisely (5.8 instead of 5)
+                // moved the boundary under it: on 39_small_caps_letter_spacing the same line
+                // came out "E L E C T ION OF T HE MANAGING" where it had been every letter
+                // apart. The threshold decides where a word ENDS, which is a coarser question
+                // than how tall the glyph is; rounding it keeps the grouping stable.
+                float gs = g.sizePt > 0f ? g.sizePt : Math.max(1f, Math.round(g.size));
                 boolean prevAdvances = prev.width > prev.size * 0.05f;
                 if (prevAdvances
-                        && (gap > g.size * 0.18f || gap < -g.size * 0.6f)
+                        && (gap > gs * 0.18f || gap < -gs * 0.6f)
                         && !endsWithSpace(sb)) {
                     sb.append(' ');
                 }
@@ -3272,7 +3300,8 @@ public final class PdfToWord {
             }
             if (prev != null) {
                 float gap = g.x - (prev.x + prev.width);
-                if ((gap > g.size * 0.18f || gap < -g.size * 0.6f) && lastOut != ' ') {
+                float gs = g.sizePt > 0f ? g.sizePt : Math.max(1f, Math.round(g.size));
+                if ((gap > gs * 0.18f || gap < -gs * 0.6f) && lastOut != ' ') {
                     cur.append(' ');
                     lastOut = ' ';
                 }

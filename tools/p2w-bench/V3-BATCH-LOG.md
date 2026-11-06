@@ -155,3 +155,110 @@ The five defects recorded in `REMAINING-DEFECTS.md` under batch 2 — 322, 323, 
 320. The largest is a class, not a document: **vector graphics the page draws as paths are dropped
 or filled black**, and it is what makes 322's riskometer, 331's legend symbols and 335's GHS
 pictograms absent from the .docx.
+
+---
+
+## BATCH 3 — documents 342-371 (15 documents)
+
+**Visual result: 10 excellent, 4 good, 1 needing work, 0 broken, 1 page-count defect (pre-existing).**
+Fourteen of the fifteen are one page in and one page out. **350_question_paper** is 1 in and 2 out,
+and it was 1 in and 2 out before this pass as well.
+
+| Doc | Pages | dy | .txt position | Verdict |
+|---|---|---|---|---|
+| 342_packing_list | 1/1 | 4.9 pt | 100.0 % | excellent |
+| 343_air_waybill | 1/1 | 28.8 pt | 97.4 % | good |
+| 344_customs_declaration | 1/1 | 6.1 pt | 93.8 % | excellent |
+| 350_question_paper | 1/2 | 160.6 pt | 100.0 % | needs work — see below |
+| 351_omr_answer_sheet | 1/1 | 6.5 pt | 100.0 % | excellent |
+| 352_certificate_ornate_border | 1/1 | 6.1 pt | 30.0 % | good — stamp glyphs, see below |
+| 353_admit_card | 1/1 | 58.6 pt | 100.0 % | good — see below |
+| 360_restaurant_menu | 1/1 | 16.8 pt | 88.4 % | excellent |
+| 361_product_catalogue_grid | 1/1 | 108.4 pt | 87.9 % | good — see below |
+| 362_price_list_dense | 1/1 | 4.3 pt | 77.9 % | excellent |
+| 363_warranty_card | 1/1 | 9.9 pt | 100.0 % | excellent |
+| 364_event_ticket | 1/1 | 3.5 pt | 100.0 % | excellent — one duplicate token, see below |
+| 365_recipe_card | 1/1 | 11.8 pt | 100.0 % | excellent |
+| 370_offer_letter | 1/1 | 7.2 pt | 100.0 % | excellent |
+| 371_experience_certificate | 1/1 | 5.0 pt | 36.4 % | good — stamp glyphs, see below |
+
+`dy` is the median |offset| of lines matched by their text between the PDF and the LibreOffice
+render. Horizontal error is 0.1 pt on all fifteen.
+
+### Fixed in this batch
+
+- **A glyph's size was being read rounded to a whole point.** `Glyph.size` came from
+  `TextPosition.getFontSizeInPt()`, which returns an integer: a page that sets 5.8 pt reported
+  5.0, and one that sets 6.5 reported 6.0. Every size in every document was snapped, so type was
+  set 14 % small wherever the page used a fractional size, and the .txt indent — which divides by
+  `x / (size * 0.6)` — landed 15.7 % too far right, just outside the tolerance the position check
+  allows. `getFontSize()` is the same number without the rounding.
+
+  Measured on **362_price_list_dense**, a three-column price list set at 5.8 pt: .txt position
+  **13.2 % -> 77.9 %**, vertical drift **26.5 pt -> 4.3 pt**.
+
+- **A table cell's exact line height was a constant.** Every cell of every table in every
+  document was written with `w:line="200"` — 10 pt — whatever the page had drawn. 362's rows are
+  8.4 pt apart, so each of its 29 rows came out 1.6 pt too tall and the table drifted 46 pt down
+  the sheet by its last row. The line height is now the row's own pitch, `rowTw`.
+
+- **A size that is not a whole half-point now rounds down, not up.** With the exact size read,
+  5.8 pt became `w:sz 12` (6.0 pt). 362's last column is 21.3 pt wide and "485.27" needs 21.6 pt
+  at 6.0, so **every row wrapped to two lines and the table came out twice its drawn height**
+  (17.3 pt per row against 8.4). `halfPointsDown()` never makes the substitute face wider than
+  the page's, so a line the page did not wrap is not wrapped here either.
+
+- **The word-boundary test keeps the whole-point size.** Reading the size exactly moved the gap
+  threshold under a letterspaced page: **39_small_caps_letter_spacing** turned
+  "E L E C T I O N" into "ELECTION" and the word counts went 7 missing -> 22. `Glyph.sizePt`
+  carries the old whole-point value and only the two `gap > size * 0.18f` tests use it. How tall
+  a glyph is and where its word ends are different questions.
+
+  Measured vertical error, median |dy|, old writer against new:
+
+  | Doc | before | after |
+  |---|---|---|
+  | 362_price_list_dense | 26.5 pt | **4.3 pt** |
+  | 342_packing_list | 11.8 pt | **4.9 pt** |
+  | 344_customs_declaration | 14.0 pt | **6.1 pt** |
+  | 351_omr_answer_sheet | 14.3 pt | **6.5 pt** |
+  | 353_admit_card | 51.6 pt | 58.6 pt |
+  | 360_restaurant_menu | 12.9 pt | 16.8 pt |
+  | 370_offer_letter | 5.9 pt | 7.2 pt |
+
+### Regression, all 208 documents
+
+Every document in all three corpora was converted with the old writer and the new one and
+compared on page count, words present, images and tables:
+
+| Measure | Result |
+|---|---|
+| page count worse | **0** |
+| missing words worse | **0** |
+| extra words worse (>2) | **0** |
+| images lost | **0** |
+| tables lost | **0** |
+| .txt position, mean | **92.8 % -> 93.4 %** |
+| .txt position, documents under 60 % | **12 -> 11** |
+| .txt position, documents improved | **12** |
+| .txt position, documents worse | **3** (375 scoring artefact, 383 and two-tables-stacked by 1.3-1.7 pt) |
+
+`gate.py --check` against `base80.json`: **no document got worse.** `TestPdfToWord` **29/29**.
+`TestRealDocs` **96.8 / 97.0 / 81.7** — identical to the decimal.
+
+### Not fixed — carried forward
+
+- **350_question_paper** — 1 page in, 2 out. The MCQ block overflows; pre-existing, unchanged by
+  this pass. The .txt also fails TABLE CELLS and NO DUPLICATION on this document.
+- **352_certificate_ornate_border, 371_experience_certificate** — .txt position 30.0 % and
+  36.4 %. Both are rotated round seals whose text the page draws one character at a time, each on
+  its own baseline, so every letter is its own .txt line at a different x. A .txt has no rotation
+  and cannot carry them; the body text on both scores 100 %.
+- **353_admit_card** — the label/value block ("REGISTER NUMBER" / "AE2024/447182") is emitted as a
+  four-column table with the labels as header cells and "Aadhaar ending 4471" in a row of its own,
+  where the page sets each label above its value in a two-column band.
+- **361_product_catalogue_grid** — each product card's text block is drawn at the top of the card,
+  over its photograph, instead of below it; the second row of cards loses its text altogether.
+- **364_event_ticket** — "WS24-4471-0082" is drawn twice on the page and appears once in the .docx.
+- **343_air_waybill, 361_product_catalogue_grid** — vertical drift 28.8 pt and 108.4 pt, the same
+  flow-determined spacing class recorded for the 80-document corpus.
