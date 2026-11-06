@@ -73,7 +73,14 @@ object CrashGuard {
      * app: the JIT has not compiled anything yet and the dex may still be optimising.
      * Learning from those runs made every later healthy run look fast.
      */
-    private const val COLD_MS = 60_000L
+    // 60 s was not long enough. The log shows Reader: page sizes judged at 26x and 34x its
+    // norm with the process only 62 s and 67 s old - the dex was still being optimised and
+    // nothing had been JIT-compiled yet. Two minutes covers the warm-up on a mid-range phone
+    // without hiding a real stall, which shows up on the second and third open anyway.
+    private const val COLD_MS = 120_000L
+
+    /** When each named task last finished, for the redundant-work check below. */
+    private val lastRun = HashMap<String, Long>()
 
     /** Compare one finished run against the norm and learn from it. */
     private fun note(context: Context?, name: String, pages: Int, bytes: Long, took: Long) {
@@ -94,6 +101,24 @@ object CrashGuard {
                     AppLog.Level.SLOW
                 )
             }
+            // The same task running twice in quick succession is redundant work, not a
+            // slow run: the log shows Reader: page sizes twice five seconds apart, both
+            // taking 15-20 s. Nothing told the user their device had just done the same job
+            // twice. This is separate from the SLOW dedupe, which only folds repeats of the
+            // same finding.
+            val now = android.os.SystemClock.elapsedRealtime()
+            val prev = lastRun[name]
+            if (prev != null && now - prev < 20_000L) {
+                AppLog.record(
+                    app,
+                    name,
+                    "ran twice in ${now - prev}ms - the same work was done again\n" +
+                            environment(app),
+                    AppLog.Level.SLOW
+                )
+            }
+            lastRun[name] = now
+
             norms.record(name, pages, bytes, took)   // healthy runs teach; a stall never does
             saveNorms(app, norms)
         } catch (_: Throwable) {

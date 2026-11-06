@@ -70,7 +70,13 @@ object AppLog {
                 }
                 var detailOut = detail
                 if (level == Level.SLOW) {
+                    // The key must not contain the measured duration. It used to be the
+                    // whole first line, so "took 15264ms, normal is 595ms" and "took 20107ms,
+                    // normal is 595ms" were two different keys and a repeat was never folded:
+                    // the log carried Reader: page sizes twice, five seconds apart. Everything
+                    // after the number is the same sentence, so the digits go.
                     val key = action + "|" + detail.lineSequence().firstOrNull().orEmpty()
+                        .replace(Regex("\\d+"), "#")
                     val now = System.currentTimeMillis()
                     if (key == lastSlow && now - lastSlowAt < 60000L) {
                         lastSlowCount++
