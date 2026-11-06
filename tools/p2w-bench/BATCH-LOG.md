@@ -179,3 +179,51 @@ document.
 4. Open the sheets and compare.
 5. Fix what is fixable in the batch; record what is not.
 6. Check page counts against the source for every document.
+
+---
+
+## 6 Nov — filled and stroked polygons are drawn as their own path
+
+**What was wrong.** The engine could draw a rectangle (`prst="rect"`) and, since the last pass, a
+circle (`prst="ellipse"`). Everything else a page draws as a path went out as its bounding box or
+was dropped: a triangle, an arrowhead, a diamond, a hatch stroke at an angle, a leader line, a
+curved road on a map. That is why 330's north arrow was a black block inside a correct ring, 331's
+pump triangles and gate-valve bowties were absent, 335's four GHS hazard pictograms were missing,
+382's arrows between the boxes did not exist, 394's river and highways were gone, and 400's speech
+bubbles had no tails.
+
+**The fix.** `RuleCollector` now records the path as it is built - `{0,x,y}` move, `{1,x,y}` line,
+`{2,x1,y1,x2,y2,x3,y3}` cubic - including the four sides of a `re`, because a page may mix a
+rectangle with other segments in one path object. `DocxWriter` writes those vertices as
+`a:custGeom` with `a:pathLst` when the path is neither an axis-aligned rectangle nor an ellipse,
+and keeps the preset geometry otherwise. Three details mattered:
+
+- **The frame.** Shapes are turned from PDF space into top-down page space in `attachShapes`, and
+  the path points have to make that same journey. Without it every hatch stroke collapsed onto
+  one line at the top of its own box, and nothing visible was drawn.
+- **Four lines are not a rectangle.** A diamond is four straight sides too. `pathIsAxisRect()`
+  checks that each side runs along the page's axes, so a rotated square is a diamond and not a box.
+- **Rotation.** A preset box under a rotated matrix is still dropped - its bounding box is not the
+  shape, and drawing the box paints slabs. A freeform is the page's own points already through the
+  matrix, so it is exact and is kept: the GHS pictograms are squares drawn under a 45-degree matrix.
+
+**Regression, all 208 documents, old engine against new** - page count, words present, images,
+tables:
+
+| Measure | Result |
+|---|---|
+| documents worse on words / tables / images | **0** |
+| documents changed | 23 (all gained drawn shapes; none lost any) |
+| page count, rendered through LibreOffice | identical on every changed document |
+| `.txt` output | byte-identical across the whole corpus |
+| `TestPdfToWord` | 29/29 |
+| `TestRealDocs` | 96.8 / 97.0 / 81.7 - identical to the decimal |
+
+**Measured, not just looked at.** 335's four pictograms: PDF path box 41.6..78.4 pt with a 1.6 pt
+stroke, colour (0.7529, 0, 0); .docx shape at x=40.8, y=70.8, 38.4 x 38.4 pt - the path grown by
+half the stroke, as the page draws it - with `srgbClr C00000`, which is 192,0,0, the same colour to
+the value.
+
+**Still open in this class.** Nothing: the whole class - fills, strokes, curves, rotated paths - is
+covered. 322's riskometer needle, 330's hatch and north arrow, 331's legend and both loops, 335's
+diamonds are closed. What remains on those pages is text placement, not drawing.

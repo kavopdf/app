@@ -410,15 +410,31 @@ public final class DocxWriter {
         public int lineRgb = -1;
         public float lineWidthPt;
         /**
-         * The preset geometry: 0 for a rectangle, 1 for an ellipse.
+         * The geometry: 0 for a rectangle, 1 for an ellipse, 2 for the freeform path in
+         * {@link #freeform}.
          *
          * <p>A page draws a circle as four Bezier curves that close on themselves. Its bounding
          * box is a square, so emitting the box put a solid square where a seal's ring, an OMR
          * bubble or a sheet-music note head belongs - and a stroke-only circle was dropped
          * outright. The box is the right extent either way; only the outline drawn inside it
          * differs, which is what this selects.
+         *
+         * <p>Everything else the page draws as a path - a triangle, an arrowhead, a diamond, a
+         * hatch stroke, a leader line - is neither preset, so it was drawn as its bounding box
+         * or dropped. Its own outline is carried in {@code freeform} instead.
          */
         public int kind = 0;
+        /**
+         * The path itself, for {@code kind == 2}: one entry per command, in PDF user space,
+         * with y counting up from the page bottom.
+         *
+         * <p>{@code {0,x,y}} moves, {@code {1,x,y}} draws a line, {@code {2,x1,y1,x2,y2,x3,y3}}
+         * draws a cubic. The writer turns each point into the shape's own top-left frame, so a
+         * shape carries the page's geometry and not a re-measured copy of it.
+         */
+        public java.util.List<float[]> freeform;
+        /** Whether the path is painted closed, which joins its last point back to its first. */
+        public boolean freeformClosed;
 
         public Shape(float xPt, float topPt, float wPt, float hPt) {
             this.xPt = xPt;
@@ -432,6 +448,51 @@ public final class DocxWriter {
         String h = Integer.toHexString(rgb & 0xFFFFFF).toUpperCase(java.util.Locale.ROOT);
         while (h.length() < 6) h = "0" + h;
         return h;
+    }
+
+    /**
+     * The shape's own geometry element: a preset box, a preset ellipse, or the page's path.
+     *
+     * <p>A freeform carries every point of the path the page drew, in the shape's own frame -
+     * {@code xPt}/{@code topPt} is that frame's top-left corner in points, and a PDF y counts
+     * up while this one counts down, so the y is mirrored inside the extent. Points are clamped
+     * to the extent: a path that runs a hair outside its own bounding box would otherwise be
+     * drawn outside the shape and lost.
+     */
+    private static String geom(Shape s, long cx, long cy) {
+        if (s.kind != 2 || s.freeform == null || s.freeform.isEmpty()) {
+            return "<a:prstGeom prst=\"" + (s.kind == 1 ? "ellipse" : "rect")
+                    + "\"><a:avLst/></a:prstGeom>";
+        }
+        StringBuilder g = new StringBuilder(64 + s.freeform.size() * 48);
+        g.append("<a:custGeom><a:avLst/><a:gdLst/><a:ahLst/><a:cxnLst/>")
+                .append("<a:rect l=\"0\" t=\"0\" r=\"0\" b=\"0\"/><a:pathLst>")
+                .append("<a:path w=\"").append(cx).append("\" h=\"").append(cy).append("\">");
+        for (float[] c : s.freeform) {
+            int type = (int) c[0];
+            if (type == 2) {
+                g.append("<a:cubicBezTo>");
+                for (int i = 1; i + 1 < c.length; i += 2) pt(g, s, cx, cy, c[i], c[i + 1]);
+                g.append("</a:cubicBezTo>");
+            } else {
+                g.append(type == 0 ? "<a:moveTo>" : "<a:lnTo>");
+                pt(g, s, cx, cy, c[1], c[2]);
+                g.append(type == 0 ? "</a:moveTo>" : "</a:lnTo>");
+            }
+        }
+        if (s.freeformClosed) g.append("<a:close/>");
+        return g.append("</a:path></a:pathLst></a:custGeom>").toString();
+    }
+
+    /** One point of a freeform, in the shape's own frame and in EMU. */
+    private static void pt(StringBuilder g, Shape s, long cx, long cy, float x, float y) {
+        long px = Math.round((x - s.xPt) * EMU_PER_PT);
+        long py = Math.round((y - s.topPt) * EMU_PER_PT);
+        if (px < 0) px = 0;
+        if (py < 0) py = 0;
+        if (px > cx) px = cx;
+        if (py > cy) py = cy;
+        g.append("<a:pt x=\"").append(px).append("\" y=\"").append(py).append("\"/>");
     }
 
     /**
@@ -469,8 +530,7 @@ public final class DocxWriter {
                 .append("<wps:wsp><wps:cNvSpPr/><wps:spPr>")
                 .append("<a:xfrm><a:off x=\"0\" y=\"0\"/><a:ext cx=\"").append(cx)
                 .append("\" cy=\"").append(cy).append("\"/></a:xfrm>")
-                .append("<a:prstGeom prst=\"").append(s.kind == 1 ? "ellipse" : "rect")
-                .append("\"><a:avLst/></a:prstGeom>");
+                .append(geom(s, cx, cy));
         if (s.fillRgb >= 0) {
             sb.append("<a:solidFill><a:srgbClr val=\"").append(hex(s.fillRgb)).append("\">");
             if (s.fillAlpha < 0.999f) {

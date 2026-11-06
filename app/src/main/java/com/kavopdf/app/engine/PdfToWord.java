@@ -3457,6 +3457,20 @@ public final class PdfToWord {
         /** The single segment's own end points, for the axis-aligned line case. */
         private float segX0 = Float.NaN, segY0 = Float.NaN, segX1 = Float.NaN, segY1 = Float.NaN;
         /**
+         * The path itself, one entry per operator, in PDF user space.
+         *
+         * <p>{@code {0,x,y}} move, {@code {1,x,y}} line, {@code {2,x1,y1,x2,y2,x3,y3}} cubic.
+         * A path that is neither a rectangle nor an ellipse used to go out as its bounding box
+         * - a triangle became a block, an arrowhead became a slab - or, when it was stroked
+         * only, was dropped. The vertices are what lets the writer draw the shape the page drew.
+         */
+        private java.util.ArrayList<float[]> cmds = new java.util.ArrayList<>();
+        /** Set once a path is too long to carry; it then falls back to its box as before. */
+        private boolean cmdsOverflow;
+        private boolean pathClosed;
+        /** A path longer than this is a rasterised picture, not a shape worth a freeform. */
+        private static final int MAX_CMDS = 512;
+        /**
          * A path can begin without the previous one ever being closed, so the flags are reset
          * lazily at the first operator that adds geometry rather than trusted to be clean.
          * Trusting them dropped the first rule on a page.
@@ -3496,6 +3510,20 @@ public final class PdfToWord {
             pxMin = pyMin = pxMax = pyMax = Float.NaN;
             segX0 = segY0 = segX1 = segY1 = Float.NaN;
             pMoves = pLines = pCurves = pRects = 0;
+            cmds = new java.util.ArrayList<>();
+            cmdsOverflow = false;
+            pathClosed = false;
+        }
+
+        /** Records one path operator, unless the path has grown past what a shape can carry. */
+        private void cmd(float[] c) {
+            if (cmdsOverflow) return;
+            if (cmds.size() >= MAX_CMDS) {
+                cmdsOverflow = true;
+                cmds = new java.util.ArrayList<>();
+                return;
+            }
+            cmds.add(c);
         }
 
         private void beginPath() {
@@ -3581,9 +3609,48 @@ public final class PdfToWord {
                     && pxMax - pxMin > 2f && pyMax - pyMin > 2f;
         }
 
+        /**
+         * True when the path is an axis-aligned rectangle.
+         *
+         * <p>Four straight lines are a rectangle only when each of them runs along the page's
+         * own axes. A diamond - a GHS hazard pictogram, a rotated tag - is also four lines, and
+         * treating it as a rectangle drew its bounding box instead: the diamond became a square
+         * outline, or was lost altogether when the outline fell on the table's own rules.
+         */
+        private boolean pathIsAxisRect() {
+            if (pCurves != 0 || pMoves != 1) return false;
+            if (cmdsOverflow || cmds.size() < 4 || cmds.size() > 5) return false;
+            if (cmds.get(0)[0] != 0) return false;
+            float sx = cmds.get(0)[1], sy = cmds.get(0)[2], px = sx, py = sy;
+            for (int i = 1; i < cmds.size(); i++) {
+                float[] c = cmds.get(i);
+                boolean horizontal = Math.abs(c[2] - py) <= 0.8f;
+                boolean vertical = Math.abs(c[1] - px) <= 0.8f;
+                if (!horizontal && !vertical) return false;
+                px = c[1];
+                py = c[2];
+            }
+            return Math.abs(px - sx) <= 1.5f && Math.abs(py - sy) <= 1.5f;
+        }
+
         /** Adds a shape to the page, in PDF space, after the clip has had its say. */
         private void addShape(float[] r, int fill, float alpha, int line, float lineWidth) {
             addShape(r, fill, alpha, line, lineWidth, 0);
+        }
+
+        /**
+         * Adds a shape that has already been built.
+         *
+         * <p>A preset box cannot survive a rotated matrix - its bounding box is not the shape,
+         * and drawing the box painted solid slabs over the page - so those are still dropped.
+         * A freeform is the page's own points, already through the matrix, so it is exact and
+         * is kept: a diamond hazard pictogram is a square drawn under a 45-degree matrix, and
+         * dropping it lost every GHS pictogram in the corpus.
+         */
+        private void addShape(DocxWriter.Shape sh) {
+            if (sh == null) return;
+            if (ctmRotated() && sh.kind != 2) return;
+            rules.shapes.add(sh);
         }
 
         /** As above, with the preset geometry: 0 a rectangle, 1 an ellipse. */
@@ -3624,7 +3691,50 @@ public final class PdfToWord {
                 line = rgbOf(getGraphicsState().getStrokingColor());
                 lw = Math.max(0.1f, getGraphicsState().getLineWidth());
             }
-            addShape(clipped(pathBox()), fill, alpha, line, lw, pathIsEllipse() ? 1 : 0);
+            float[] box = pathBox();
+            float[] cl = clipped(box);
+            boolean plainRect = pathIsAxisRect();
+            // A triangle, an arrowhead, a diamond, a glyph outline: the box is not the shape.
+            // Draw the path the page drew. A clipped path keeps the old box behaviour, because
+            // the clip is an axis-aligned box and the geometry is not.
+            if (!plainRect && !pathIsEllipse() && same(cl, box)) {
+                DocxWriter.Shape ff = freeform(cl, fill, alpha, line, lw);
+                if (ff != null) {
+                    addShape(ff);
+                    return;
+                }
+            }
+            addShape(cl, fill, alpha, line, lw, pathIsEllipse() ? 1 : 0);
+        }
+
+        /** True when two boxes are the same to a hundredth of a point. */
+        private static boolean same(float[] a, float[] b) {
+            if (a == null || b == null) return a == b;
+            for (int i = 0; i < 4; i++) if (Math.abs(a[i] - b[i]) > 0.01f) return false;
+            return true;
+        }
+
+        /**
+         * The path as a freeform shape, or null when there is no path worth carrying.
+         *
+         * <p>The vertices are the ones the page drew, so a triangle is a triangle and a hatch
+         * stroke is a line at its own angle rather than a dropped operator. A path with no
+         * drawn segment - a bare {@code m} - has no shape and falls back to the box.
+         */
+        private DocxWriter.Shape freeform(float[] box, int fill, float alpha, int line, float lw) {
+            if (cmdsOverflow || cmds.isEmpty() || box == null) return null;
+            int drawn = 0;
+            for (float[] c : cmds) if (c[0] != 0) drawn++;
+            if (drawn == 0) return null;
+            DocxWriter.Shape sh = new DocxWriter.Shape(box[0], -box[3], box[2] - box[0], box[3] - box[1]);
+            sh.kind = 2;
+            sh.freeform = cmds;
+            sh.freeformClosed = pathClosed;
+            sh.fillRgb = fill;
+            sh.fillAlpha = alpha;
+            sh.lineRgb = line;
+            sh.lineWidthPt = lw;
+            return sh;
         }
 
         /**
@@ -3642,8 +3752,7 @@ public final class PdfToWord {
             int line = rgbOf(getGraphicsState().getStrokingColor());
             if (line < 0) return;
             float w = Math.max(0.1f, getGraphicsState().getLineWidth());
-            boolean rectangle = (pRects == 1 && pLines == 0 && pCurves == 0)
-                    || (pRects == 0 && pMoves == 1 && pLines == 4 && pCurves == 0);
+            boolean rectangle = pathIsAxisRect();
             // A stroke-only circle used to be dropped: it is neither a rectangle nor a single
             // line, and its box would have put a square where a ring belongs. It is an ellipse,
             // so it is drawn as one.
@@ -3658,14 +3767,32 @@ public final class PdfToWord {
                     float x0 = Math.min(segX0, segX1), x1 = Math.max(segX0, segX1);
                     addShape(clipped(new float[]{x0, segY0 - w / 2f, x1, segY0 + w / 2f}),
                             line, 1f, -1, 0f);
+                    return;
                 } else if (Math.abs(segX1 - segX0) <= 0.8f) {
                     float y0 = Math.min(segY0, segY1), y1 = Math.max(segY0, segY1);
                     addShape(clipped(new float[]{segX0 - w / 2f, y0, segX0 + w / 2f, y1}),
                             line, 1f, -1, 0f);
+                    return;
                 }
             }
-            // Anything else - a circle, a polygon that is not a rectangle - is dropped rather
-            // than drawn as its bounding box, which would put a square where a seal's ring is.
+            // Everything else the page strokes - a triangle, a bowtie, a hatch stroke at an
+            // angle, a leader line, a partial arc - used to be dropped rather than drawn as
+            // its box. It is drawn as its own path. The box is grown by half the stroke so a
+            // path on the edge still has its line inside the shape.
+            float[] grown = new float[]{pxMin - w / 2f, pyMin - w / 2f,
+                    pxMax + w / 2f, pyMax + w / 2f};
+            float[] cl = clipped(grown);
+            if (same(cl, grown)) {
+                DocxWriter.Shape ff = freeform(grown, -1, 1f, line, w);
+                if (ff != null) {
+                    addShape(ff);
+                    return;
+                }
+            }
+            // A path the clip cuts, or one too long to carry, keeps the behaviour it had: four
+            // straight sides still read as a box, and a rotated stamp box that runs off the page
+            // edge is still drawn as the box it was before.
+            if (pCurves == 0 && (pRects > 0 || pLines == 4)) addShape(cl, -1, 1f, line, w, 0);
         }
 
         @Override
@@ -3687,6 +3814,15 @@ public final class PdfToWord {
                 rules.vertical.add(new float[]{minX, minY, maxY});
                 rules.vertical.add(new float[]{maxX, minY, maxY});
             }
+            // A path may mix a `re` with other segments - a hatch region clips a rectangle and
+            // then draws lines in the same path object - so the rectangle is part of the path
+            // the freeform carries. Leaving it out drew the lines but kept the rectangle's
+            // corners in the box, which put the whole path in the wrong frame.
+            cmd(new float[]{0, p0.x, p0.y});
+            cmd(new float[]{1, p1.x, p1.y});
+            cmd(new float[]{1, p2.x, p2.y});
+            cmd(new float[]{1, p3.x, p3.y});
+            pathClosed = true;
         }
 
         @Override
@@ -3806,6 +3942,7 @@ public final class PdfToWord {
             segY0 = segY1 = y;
             startX = lastX = x;
             startY = lastY = y;
+            cmd(new float[]{0, x, y});
         }
 
         @Override
@@ -3822,6 +3959,7 @@ public final class PdfToWord {
             }
             lastX = x;
             lastY = y;
+            cmd(new float[]{1, x, y});
         }
 
         @Override
@@ -3831,6 +3969,7 @@ public final class PdfToWord {
             grow(x1, y1); grow(x2, y2); grow(x3, y3);
             lastX = x3;
             lastY = y3;
+            cmd(new float[]{2, x1, y1, x2, y2, x3, y3});
         }
 
         @Override
@@ -3842,6 +3981,7 @@ public final class PdfToWord {
         public void closePath() {
             lastX = startX;
             lastY = startY;
+            pathClosed = true;
         }
 
         @Override
@@ -3923,6 +4063,15 @@ public final class PdfToWord {
             boolean rule = Math.min(s.wPt, s.hPt) < 3f;
             if (rule && inTable(s.xPt, s.wPt, topDown, topDown + s.hPt, tables)) continue;
             s.topPt = topDown;
+            // A freeform's points are in the page's own frame, where y counts up from the
+            // bottom; the shape now lives in the frame that counts down, so its points are
+            // moved into that frame with it. Without this the path was drawn mirrored about
+            // the shape's top edge and every hatch stroke collapsed onto one line.
+            if (s.freeform != null) {
+                for (float[] c : s.freeform) {
+                    for (int i = 2; i < c.length; i += 2) c[i] = pageHeight - c[i];
+                }
+            }
             if (s.topPt + s.hPt <= 0f || s.topPt >= pageHeight) continue;
             if (s.xPt + s.wPt <= 0f || s.xPt >= page.width) continue;
             page.blocks.add(s);
