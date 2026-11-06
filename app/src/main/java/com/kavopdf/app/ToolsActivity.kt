@@ -216,7 +216,7 @@ class ToolsActivity : PdfActivity() {
     override fun onTreeChosen(uri: Uri) {
         treeUri = uri
         binding.outputHint.visibility = View.VISIBLE
-        binding.outputHint.text = "Output folder: " + (uri.lastPathSegment ?: "folder")
+        binding.outputHint.text = getString(R.string.output_folder_prefix) + (uri.lastPathSegment ?: "folder")
         if (pendingRun) { pendingRun = false; onRun() }
     }
 
@@ -422,10 +422,10 @@ class ToolsActivity : PdfActivity() {
                 fAuthor = addField(getString(R.string.hint_author), InputType.TYPE_CLASS_TEXT, meta["author"] ?: "")
                 fSubject = addField(getString(R.string.hint_subject), InputType.TYPE_CLASS_TEXT, meta["subject"] ?: "")
                 fKeywords = addField(getString(R.string.hint_keywords), InputType.TYPE_CLASS_TEXT, meta["keywords"] ?: "")
-                fCreator = addField("Creator (application)", InputType.TYPE_CLASS_TEXT, meta["creator"] ?: "")
-                fProducer = addField("Producer", InputType.TYPE_CLASS_TEXT, meta["producer"] ?: "")
-                fCreated = addField("Creation date (yyyy-MM-dd HH:mm)", InputType.TYPE_CLASS_TEXT, meta["creationDate"] ?: "")
-                fModified = addField("Modified date (yyyy-MM-dd HH:mm)", InputType.TYPE_CLASS_TEXT, meta["modDate"] ?: "")
+                fCreator = addField(getString(R.string.hint_creator), InputType.TYPE_CLASS_TEXT, meta["creator"] ?: "")
+                fProducer = addField(getString(R.string.hint_producer), InputType.TYPE_CLASS_TEXT, meta["producer"] ?: "")
+                fCreated = addField(getString(R.string.hint_creation_date), InputType.TYPE_CLASS_TEXT, meta["creationDate"] ?: "")
+                fModified = addField(getString(R.string.hint_modified_date), InputType.TYPE_CLASS_TEXT, meta["modDate"] ?: "")
             }
             Action.PAGENUM -> {
                 fPagenumPlace = addSpinner(
@@ -438,6 +438,13 @@ class ToolsActivity : PdfActivity() {
                 fPagenumOpacity = addField(
                     getString(R.string.hint_opacity),
                     InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                )
+                // The format field was declared and read but never created, so the pattern was
+                // stuck on the default for every document and the read below was dead code.
+                fFormat = addField(
+                    getString(R.string.hint_pagenum_format),
+                    InputType.TYPE_CLASS_TEXT,
+                    "Page {n} of {total}"
                 )
             }
             Action.SPLIT -> {

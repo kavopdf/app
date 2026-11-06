@@ -545,7 +545,7 @@ class LinksActivity : PdfActivity() {
                                shape: Int = 0) {
         val src = source ?: return toast(getString(R.string.msg_pick_file_first))
         val page = current + 1
-        runAndSave(Files.suggestName(sourceName, "_linked")) { out ->
+        runAndSave(Files.suggestName(sourceName, "_links")) { out ->
             PdfEngine.addImageLink(src, page, shaped(pic, shape), xd, yd, w, h, opacity, url, out)
         }
     }

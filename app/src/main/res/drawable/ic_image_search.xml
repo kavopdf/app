@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="26dp"
+    android:height="26dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <group android:translateY="960">
+        <!-- An image frame with a magnifier inside it: a picture being searched. -->
+        <path android:fillColor="#FF000000" android:pathData="M200-200h560v-560H200v560Zm0 80q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z" />
+        <path android:fillColor="#FF000000" android:pathData="M480-320q-83 0-141.5-58.5T280-520q0-83 58.5-141.5T480-720q83 0 141.5 58.5T680-520q0 30-8.5 57T646-415l94 94-56 56-94-94q-23 17-50 25t-60 8Zm0-80q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Z" />
+    </group>
+</vector>
