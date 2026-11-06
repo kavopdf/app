@@ -60,3 +60,64 @@ STATUS: FIXED - `section_security` now reads "Security", matching the sign/verif
 **User impact:** Nothing breaks on an English device, but these five labels never follow a language change or a copy edit, unlike the rest of the screen.
 
 STATUS: FIXED - all five moved to string resources (`hint_creator`, `hint_producer`, `hint_creation_date`, `hint_modified_date`, `output_folder_prefix` at strings.xml:342-346) and referenced via `getString`; ToolsActivity.kt:425-428 (fields) and :219 (output folder line).
+
+---
+
+## Stage 2 — WIRING (second half)
+
+Scope: launchers, intent filters, the `EXTRA_SOURCE_URI` hand-off, manifest
+activities declared vs. started, and the seven places for the newest tools.
+
+What passed (recorded so it is not re-checked): 19 activity classes exist and all
+19 are declared; every `Intent(this, X::class.java)` target in the source
+(`MainActivity`, `ViewerActivity`, `ShareChoiceActivity`, `PagesActivity`,
+`MergeActivity`, `ImagesToPdfActivity`, `AnnotateActivity`, `FormsActivity`,
+`ToolsActivity`, `QrScanActivity`, `ScanToPdfActivity`, `BookmarksActivity`,
+`LogActivity`, `RedactActivity`, `LinksActivity`, `ImageOcrActivity`,
+`OcrActivity`, `CropActivity`, `CreatePdfActivity`) is declared, and no declared
+activity is unreachable — `PdfActivity` is abstract and correctly absent. All five
+launchers registered in `PdfActivity` (`openPdfLauncher`, `openPdfsLauncher`,
+`openImagesLauncher`, `openTreeLauncher`, `createDocLauncher`) and both save
+launchers (`createDocxLauncher`, `createTxtLauncher`) are actually launched. Every
+`Action` routed to `ToolsActivity` by the `else` branch has a `applyToolChrome()`
+heading and an `onRun()` branch. All fifteen `tools/check-*.py` guards pass on
+this commit (`check-tool-titles`, `check-pdf2word`, `check-repair`,
+`check-link-schemes`, `check-layouts`, `check-file-names`, `check-quality-paths`,
+`check-main-thread`, `check-preview-paths`, `check-render-quality`,
+`check-cache-sweep`, `check-detectors`, `check-background-work`,
+`check-bitmap-config`, `check-apk-config`).
+
+### P1 — "Fill in Annotate" hands over a cache file that the sending screen deletes on its way out
+**File:** app/src/main/java/com/kavopdf/app/FormsActivity.kt:62
+**What:** When a form has no AcroForm fields, the screen offers "Fill in Annotate" and passes `source.absolutePath` to `AnnotateActivity` — but `source` is a cache copy that `FormsActivity.finish()` deletes immediately afterwards, so the screen it just opened may find the file already gone.
+**Why I think so:** `FormsActivity.kt:91` sets `source = f`, where `f` came from `openPdf()`; `PdfActivity.kt:201` wraps that copy in `trackCacheFile(...)`, which adds it to `sessionFiles` (`PdfActivity.kt:318`). The hand-off puts `here.absolutePath` in the intent (`FormsActivity.kt:62`) and the very next statement is `finish()` (`FormsActivity.kt:67`). `PdfActivity.onDestroy()` then runs `CacheSweep.deleteNow(sessionFiles - keptFiles)` (`PdfActivity.kt:322-325`), and `CacheSweep.deleteNow` calls `f.delete()` on every entry (`util/CacheSweep.kt:66-69`). Nothing on this path adds the file to `keptFiles` — that set is only filled by the Open/Share buttons (`PdfActivity.kt:277`, `:284`). On the receiving side, `AnnotateActivity.kt:65` guards with `File(direct).exists()` and `AnnotateActivity.kt:339` opens the file with `ParcelFileDescriptor.open(f, MODE_READ_ONLY)` inside a background `runTask`, i.e. after a dispatcher hop — so whether the fd is opened before or after the sender's `onDestroy` is a race, and losing it means `FileNotFoundException` and "this file couldn't be read".
+**How to verify:** Read `FormsActivity.kt:56-68` next to `PdfActivity.kt:318-325`. Or, in a build, open any XFA form (an Indian bank or government form), tap "Fill in Annotate", and watch `adb logcat` for the `Annotate` open failing; the file under `cacheDir/work` is removed the moment Forms closes.
+**User impact:** The one route offered for XFA and field-less forms — the forms the app explicitly calls out as the common Indian case — either opens Annotate on an empty screen with a file picker, or shows "this file couldn't be read", depending on which thread wins.
+
+### P2 — Seven tool screens open the file picker on top of the PDF the share sheet already delivered
+**File:** app/src/main/java/com/kavopdf/app/PagesActivity.kt:51
+**What:** `PagesActivity`, `CropActivity`, `FormsActivity`, `BookmarksActivity`, `RedactActivity`, `OcrActivity` and `LinksActivity` call `pickAfterEnter { pickPdf() }` unconditionally, so when they are opened with a shared PDF they both load that PDF and throw the system picker at the user.
+**Why I think so:** `PdfActivity.onCreate` posts `onPdfChosen(uri)` for the `EXTRA_SOURCE_URI` extra (`PdfActivity.kt:172-174`), and `MainActivity.dispatch()` attaches that extra to every tool intent whenever a file was shared in (`MainActivity.kt:137-143`). `pickAfterEnter` launches the picker synchronously during `onCreate` (`PdfActivity.kt:421-427`), so the picker appears first and the shared document loads behind it. Two screens already guard against exactly this — `ToolsActivity.kt:131` (`if (incomingUri == null)`) and `AnnotateActivity.kt:146` (`if (direct == null)`), and `ViewerActivity.kt:56` chooses between the two — but the other seven do not, at `PagesActivity.kt:51`, `CropActivity.kt:45`, `FormsActivity.kt:35`, `BookmarksActivity.kt:47`, `RedactActivity.kt:62`, `OcrActivity.kt:52` and `LinksActivity.kt:73`.
+**How to verify:** `grep -rn "pickAfterEnter" app/src/main/java/com/kavopdf/app/` — nine hits; only the three above are conditional. Or share a PDF into the app, tap "Tools", then "Rotate pages", and watch the file picker open over a document that is already loading.
+**User impact:** The user is asked to choose a document they just chose, and if they pick a different one it silently replaces the file they shared.
+
+### P3 — `onNewIntent` in MainActivity and ViewerActivity cannot run: no launchMode is declared and nothing sends `FLAG_ACTIVITY_SINGLE_TOP`
+**File:** app/src/main/AndroidManifest.xml:26
+**What:** Both activities override `onNewIntent`, but neither declares `android:launchMode` (nor `singleTop`), and the only flag any caller adds is `FLAG_ACTIVITY_CLEAR_TOP`, so the override is unreachable and a second PDF opens a second reader instance instead.
+**Why I think so:** `MainActivity.kt:100-107` and `ViewerActivity.kt:83-87` both override `onNewIntent`, which the framework only calls when the intent carries `FLAG_ACTIVITY_SINGLE_TOP` or the activity is `singleTop`/`singleTask`/`singleInstance`. The manifest entries for `.MainActivity` (`AndroidManifest.xml:25-33`) and `.ViewerActivity` (`:35-46`) set no `launchMode`. `grep -rn "SINGLE_TOP" app/src` returns nothing; `ShareChoiceActivity.kt:78` uses `FLAG_ACTIVITY_CLEAR_TOP`, which under the default `standard` mode finishes and recreates the activity — `onCreate` gets the extra, not `onNewIntent`.
+**How to verify:** `grep -n "launchMode" app/src/main/AndroidManifest.xml` (no hit) and `grep -rn "onNewIntent\|SINGLE_TOP" app/src/main/java`. Then open two PDFs in a row from a file manager and press Back: two readers are stacked.
+**User impact:** Opening a second document from a file manager leaves the first reader buried in the back stack, and the careful "a file shared in while the home screen is already running" comment at `MainActivity.kt:103-104` describes a path that never executes.
+
+### P3 — ShareChoiceActivity reads `intent.data`, but it is only registered for ACTION_SEND, so that branch is dead
+**File:** app/src/main/java/com/kavopdf/app/ShareChoiceActivity.kt:52
+**What:** `sharedPdf()` falls back to `intent.data` "from either the share or the open intent", but the VIEW filter belongs to `ViewerActivity`, so this activity never receives an open intent and the `else` branch can never be taken.
+**Why I think so:** The manifest gives `ShareChoiceActivity` a single filter, `ACTION_SEND` with `application/pdf` (`AndroidManifest.xml:58-62`); the `ACTION_VIEW` filter with the same mime type is declared on `ViewerActivity` (`AndroidManifest.xml:41-45`). `ShareChoiceActivity.kt:50-53` still branches `when (intent.action) { Intent.ACTION_SEND -> …; else -> intent.data }`.
+**How to verify:** Compare the two intent filters in the manifest with `ShareChoiceActivity.kt:47-55`. Or tap a PDF in a file manager: it goes straight to the reader and this dialog never appears.
+**User impact:** Nothing breaks today, but the comment promises a shared/open parity the manifest does not provide — the "open" half of the dialog is unreachable, and the code that looks like it handles it cannot be tested.
+
+### P3 — The share and open filters accept only PDFs, so a shared image never reaches the two image tools
+**File:** app/src/main/AndroidManifest.xml:61
+**What:** Both entry-point filters declare `application/pdf` and nothing else, so `ImagesToPdfActivity` and `ImageOcrActivity` — the only tools that consume images — cannot be reached from the gallery's share sheet or an "open with" on a photo.
+**Why I think so:** The three `<data>` elements in the manifest are all `android:mimeType="application/pdf"` (`:44`, `:61`); there is no `image/*` filter anywhere. Both image screens read their input only through `openImagesLauncher` (`PdfActivity.kt:56-60`, launched by `ImagesToPdfActivity.kt:33`/`:36` and `ImageOcrActivity.kt:43`/`:45`), which is an in-app picker. `ShareChoiceActivity.sharedPdf()` would also reject a non-PDF, since it is registered for `application/pdf` only.
+**How to verify:** `grep -n "mimeType" app/src/main/AndroidManifest.xml` — three hits, all `application/pdf`. Then try "Share → KavoPDF" on a photo: the app is not in the list.
+**User impact:** A user who photographs a page and wants it turned into a searchable PDF must first open KavoPDF and hunt through the tool list; the share route they would naturally use is not offered.
