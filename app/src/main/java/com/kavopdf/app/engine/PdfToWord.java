@@ -454,7 +454,15 @@ public final class PdfToWord {
         // Tables are found from the drawn rules, so they can be located before any line is
         // split. A column start that falls inside one is that table's cell separator, not a
         // page column - splitting there would tear every row apart.
-        List<Table> firstPass = buildTables(rules, rawLines, pageWidth);
+        // The rules come out of the graphics engine with y measured up from the page bottom and
+        // the lines carry y measured down from the top. buildTables compares the two, so it has
+        // to be handed the rules in the lines' own frame. It was handed the raw ones: a rule at
+        // PDF y=524 was matched against a line at y=268, and on the warehousing agreement the
+        // schedule's rules were wrapped round two paragraphs of prose, which came out as a
+        // two-column table with "2.2 Invoices shall be raised monthly and paid within 30 days of
+        // receipt." squeezed into a 150 pt cell beside "3.1 ...".
+        Rules topRules = flipY(rules, pageHeight);
+        List<Table> firstPass = buildTables(topRules, rawLines, pageWidth);
 
         // Borderless tables are found here, before the column starts are filtered, so that a
         // table's cell positions are known to be cell separators. Otherwise the cells look
@@ -686,7 +694,7 @@ public final class PdfToWord {
         }
         List<Table> tables = findTables(edges, glyphs, pageWidth);
         if (tables.isEmpty()) {
-            tables = buildTables(rules, lines, pageWidth);
+            tables = buildTables(topRules, lines, pageWidth);
         }
         // The row-based pass finds tables drawn without vertical rules - a bill of quantities,
         // a bank statement, an ITR schedule. It used to run only when the ruled pass found
@@ -4298,6 +4306,43 @@ public final class PdfToWord {
         return sorted.get(0).x;
     }
 
+    /**
+     * Orders a cell's glyphs by the strings the page drew, or returns null when the page drew
+     * them in one straight run and the plain left-to-right sort is right.
+     *
+     * <p>A value that overruns its column is drawn over the label it runs into: on the FIR form
+     * the address ends "560067" while "Mobile" starts 19 pt before the address finishes. Sorting
+     * the two strings together by x interleaves their letters into "6M0o0b6i7le". Where x steps
+     * backwards the page began a new string, so each string is kept whole and the strings are
+     * ordered by where each one starts.
+     */
+    private static List<Glyph> orderedByRun(List<Glyph> gs) {
+        List<List<Glyph>> runs = new ArrayList<>();
+        List<Glyph> run = new ArrayList<>();
+        Glyph prev = null;
+        for (Glyph g : gs) {
+            if (prev != null && (g.x < prev.x - 0.5f || Math.abs(g.y - prev.y) > 2f)) {
+                runs.add(run);
+                run = new ArrayList<>();
+            }
+            run.add(g);
+            prev = g;
+        }
+        runs.add(run);
+        if (runs.size() < 2) return null;
+        Collections.sort(runs, new Comparator<List<Glyph>>() {
+            @Override
+            public int compare(List<Glyph> a, List<Glyph> b) {
+                float ay = a.get(0).y, by = b.get(0).y;
+                if (Math.abs(ay - by) > 2f) return Float.compare(ay, by);
+                return Float.compare(a.get(0).x, b.get(0).x);
+            }
+        });
+        List<Glyph> out = new ArrayList<>(gs.size());
+        for (List<Glyph> r : runs) out.addAll(r);
+        return out;
+    }
+
     /** A glyph that puts ink on the page - not a space. */
     private static boolean visible(Glyph g) {
         return g != null && g.text != null && !g.text.trim().isEmpty();
@@ -4345,14 +4390,17 @@ public final class PdfToWord {
     /** Join a cell's glyphs into one string, in reading order. */
     private static String glyphText(List<Glyph> gs) {
         if (gs.isEmpty()) return "";
-        List<Glyph> sorted = new ArrayList<>(gs);
-        Collections.sort(sorted, new Comparator<Glyph>() {
-            @Override
-            public int compare(Glyph a, Glyph b) {
-                if (Math.abs(a.y - b.y) > 2f) return Float.compare(a.y, b.y);
-                return Float.compare(a.x, b.x);
-            }
-        });
+        List<Glyph> sorted = orderedByRun(gs);
+        if (sorted == null) {
+            sorted = new ArrayList<>(gs);
+            Collections.sort(sorted, new Comparator<Glyph>() {
+                @Override
+                public int compare(Glyph a, Glyph b) {
+                    if (Math.abs(a.y - b.y) > 2f) return Float.compare(a.y, b.y);
+                    return Float.compare(a.x, b.x);
+                }
+            });
+        }
         java.util.List<Float> cg = new java.util.ArrayList<>();
         for (int k = 1; k < sorted.size(); k++) {
             Glyph a = sorted.get(k - 1), b = sorted.get(k);
@@ -4433,6 +4481,15 @@ public final class PdfToWord {
             if (t == null) continue;
             out.add(t);
         }
+        return out;
+    }
+
+    /** The same rules with y measured down from the top, the way a line carries it. */
+    private static Rules flipY(Rules in, float pageHeight) {
+        Rules out = new Rules();
+        for (float[] h : in.horizontal) out.horizontal.add(new float[]{pageHeight - h[0], h[1], h[2]});
+        for (float[] v : in.vertical) out.vertical.add(new float[]{v[0], pageHeight - v[2], pageHeight - v[1]});
+        out.images = in.images;
         return out;
     }
 
