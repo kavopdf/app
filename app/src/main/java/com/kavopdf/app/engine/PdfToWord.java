@@ -5309,7 +5309,21 @@ public final class PdfToWord {
                                 String c = parts[pi].trim();
                                 if (c.isEmpty()) continue;
                                 if (!Float.isNaN(cx) && cx > 0f) {
-                                    int pad = Math.min(400, Math.round(cx / (9f * 0.6f)));
+                                    // The column a cell's text belongs in is x / (size * 0.6),
+                                    // and the size is the size the page DREW the cell at - not
+                                    // a constant. This was 9 pt for every table in every
+                                    // document, so a table set at 7.5 pt was padded 20 % too
+                                    // little and a table set at 12 pt 25 % too much: on the
+                                    // batch it put 341_shipping_manifest at 1.3 % of lines
+                                    // within tolerance and 324_loan_amortisation at 1.7 %,
+                                    // while the same documents' body text scored 100 %.
+                                    float cs = 9f;
+                                    if (ri < t.sizes.size() && t.sizes.get(ri) != null
+                                            && ci < t.sizes.get(ri).size()) {
+                                        Float sv = t.sizes.get(ri).get(ci);
+                                        if (sv != null && sv > 0f) cs = sv;
+                                    }
+                                    int pad = Math.min(400, Math.round(cx / (cs * 0.6f)));
                                     for (int i = 0; i < pad; i++) sb.append(' ');
                                 }
                                 sb.append(c).append('\n');
