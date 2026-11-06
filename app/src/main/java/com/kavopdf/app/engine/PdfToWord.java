@@ -107,6 +107,17 @@ public final class PdfToWord {
          *  at a width the reader never saw. */
         public final List<String> lines = new ArrayList<>();
         /**
+         * The x, y and size of each entry in {@link #lines}, in the same order.
+         *
+         * <p>These exist for one reason: a .txt has no coordinates, so a line's position has to
+         * be rebuilt as leading spaces and blank lines at write time. Keeping the raw numbers
+         * here means that work happens in writeTxt() and nowhere else - the .docx path reads
+         * {@link #runs} and never touches any of these, so the document output cannot change.
+         */
+        public final List<Float> lineX = new ArrayList<>();
+        public final List<Float> lineY = new ArrayList<>();
+        public final List<Float> lineSize = new ArrayList<>();
+        /**
          * The same lines, with the coordinates the page actually used.
          *
          * <p>{@link #runs} is one run holding the whole paragraph, which is all a .txt or a
@@ -3075,20 +3086,14 @@ public final class PdfToWord {
         for (Line line : group) {
             String t = line.text.trim();
             if (t.isEmpty()) continue;
-            // A .txt has no coordinates, so a line's x has to become leading spaces or the
-            // position is lost. This list is only ever written to the plain-text file; the
-            // .docx carries indent through paragraph properties instead.
-            //
-            // Measured before this: line indent against the page x was 1.4 %, because every
-            // line was trimmed to column zero.
-            int pad = 0;
-            if (line.x > p.left + 1f) {
-                float cw = Math.max(1f, line.size * 0.5f);
-                pad = Math.min(60, Math.round((line.x - p.left) / cw));
-            }
-            StringBuilder lead = new StringBuilder(pad);
-            for (int i = 0; i < pad; i++) lead.append(' ');
-            p.lines.add(lead + t);
+            // The raw line and the coordinates it was drawn at. Turning x into leading spaces
+            // used to happen here, relative to the paragraph's own left - so a paragraph that
+            // was one line long always got zero indent and its position was lost. The padding
+            // is now worked out in writeTxt() against the page, which is the only consumer.
+            p.lines.add(t);
+            p.lineX.add(line.x);
+            p.lineY.add(line.y);
+            p.lineSize.add(line.size);
             if (prevText != null) {
                 if (prevText.endsWith("-") && t.length() > 0
                         && Character.isLowerCase(t.charAt(0))) {
@@ -5211,7 +5216,11 @@ public final class PdfToWord {
      */
     public static void writeTxt(Result result, File out) throws IOException {
         StringBuilder sb = new StringBuilder(1 << 14);
+        // The y of the last line written, so the next one can open up blank lines for the gap
+        // the page left. Reset per page: a page break is not a vertical gap.
+        float txtLastY = -1f;
         for (Page page : result.pages) {
+            txtLastY = -1f;
             for (Object block : page.blocks) {
                 if (block instanceof Table) {
                     Table t = (Table) block;
@@ -5219,14 +5228,34 @@ public final class PdfToWord {
                     // A .txt has no table. One cell per line keeps every line the PDF drew on
                     // a line of its own, which is what a reader searching the text expects; a
                     // "cell | cell" row glued them into a line that appears nowhere in the file.
-                    for (List<String> row : t.rows) {
-                        for (String cell : row) {
+                    for (int ri = 0; ri < t.rows.size(); ri++) {
+                        List<String> row = t.rows.get(ri);
+                        for (int ci = 0; ci < row.size(); ci++) {
+                            String cell = row.get(ci);
+                            // The x the page drew this cell's own text at, so the .txt can carry
+                            // it. Without this every cell started at column zero and a table's
+                            // columns were indistinguishable from body text.
+                            float cx = Float.NaN;
+                            if (t.cellX != null && ri < t.cellX.size()
+                                    && t.cellX.get(ri) != null && ci < t.cellX.get(ri).size()) {
+                                Float v = t.cellX.get(ri).get(ci);
+                                if (v != null) cx = v;
+                            }
+                            if (Float.isNaN(cx) && t.colX != null && ci < t.colX.length) {
+                                cx = t.colX[ci];
+                            }
                             // A cell that holds two lines of text is two lines in the document.
                             // Joining them with a space put words on a line that appears nowhere
                             // in the PDF, which is exactly what the line metrics measure.
-                            for (String part : cell.split("\n")) {
-                                String c = part.trim();
-                                if (!c.isEmpty()) sb.append(c).append('\n');
+                            String[] parts = cell.split("\n");
+                            for (int pi = 0; pi < parts.length; pi++) {
+                                String c = parts[pi].trim();
+                                if (c.isEmpty()) continue;
+                                if (!Float.isNaN(cx) && cx > 0f) {
+                                    int pad = Math.min(400, Math.round(cx / (9f * 0.6f)));
+                                    for (int i = 0; i < pad; i++) sb.append(' ');
+                                }
+                                sb.append(c).append('\n');
                             }
                         }
                     }
@@ -5238,13 +5267,34 @@ public final class PdfToWord {
                     if (para.lines.isEmpty()) {
                         sb.append(text).append("\n\n");
                     } else {
-                        // One line per line the PDF drew, and a blank line where the
-                        // paragraph ends. The paragraph itself is still one paragraph in the
-                        // .docx; only the plain-text file shows the original line structure.
-                        // No blank line after the paragraph. The reference text has none, and a
-                        // blank line per paragraph was pure noise: it made our file longer than
-                        // the document it came from and left no room to split lines further.
-                        for (String ln : para.lines) sb.append(ln).append('\n');
+                            // One line per line the PDF drew. A .txt has no coordinates, so the
+                        // only way to carry position is leading spaces for x and blank lines
+                        // for y. Both are worked out here, from the numbers buildPara kept,
+                        // and nowhere else: the .docx reads runs, never these lists.
+                        //
+                        // x -> spaces. A monospace cell is about 0.6 of the point size, so a
+                        // line at 300 pt starts near column 300 / (9 * 0.6) = 55. The old code
+                        // guessed 0.5 and then capped the indent at 60 spaces, which threw away
+                        // every position past roughly 240 pt.
+                        // y -> blank lines, from the gap to the line above.
+                        for (int li = 0; li < para.lines.size(); li++) {
+                            String ln = para.lines.get(li);
+                            float lx = li < para.lineX.size() ? para.lineX.get(li) : 0f;
+                            float ly = li < para.lineY.size() ? para.lineY.get(li) : 0f;
+                            float ls = li < para.lineSize.size() ? para.lineSize.get(li) : 9f;
+                            if (ls <= 0f) ls = 9f;
+                            float cell = Math.max(1f, ls * 0.6f);
+                            int pad = Math.min(400, Math.round(lx / cell));
+                            if (txtLastY >= 0f && ly > txtLastY) {
+                                int blanks = Math.round((ly - txtLastY) / (ls * 1.15f)) - 1;
+                                for (int b = 0; b < Math.min(12, Math.max(0, blanks)); b++) {
+                                    sb.append('\n');
+                                }
+                            }
+                            for (int i = 0; i < pad; i++) sb.append(' ');
+                            sb.append(ln).append('\n');
+                            txtLastY = ly;
+                        }
                     }
                 }
             }
