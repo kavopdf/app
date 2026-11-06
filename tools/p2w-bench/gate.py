@@ -179,6 +179,19 @@ def main():
                 regressed.append((b, k, was.get(k, 0), now.get(k, 0)))
             elif now.get(k, 0) < was.get(k, 0):
                 improved.append((b, k, was.get(k, 0), now.get(k, 0)))
+        # Page count and line count, each against this document's OWN baseline
+        # entry rather than against a ratio. A document that held three pages and
+        # now holds two has lost a page, and one that held 400 lines and now holds
+        # 380 has lost text; both are things the other five counts can miss, because
+        # a page of text moved into a text box keeps every word and every line.
+        # A page change in EITHER direction is a regression: the page count the PDF
+        # has is the only correct one, so a new page is as wrong as a lost page.
+        if now.get("pages", 0) != was.get("pages", 0):
+            regressed.append((b, "pages", was.get("pages", 0), now.get("pages", 0)))
+        if now.get("lines", 0) < was.get("lines", 0):
+            regressed.append((b, "lines", was.get("lines", 0), now.get("lines", 0)))
+        elif now.get("lines", 0) > was.get("lines", 0):
+            improved.append((b, "lines", was.get("lines", 0), now.get("lines", 0)))
     print(f"documents: {len(cur)}")
     if improved:
         print(f"IMPROVED: {len(improved)} counts")
