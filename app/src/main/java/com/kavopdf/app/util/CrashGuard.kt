@@ -60,9 +60,11 @@ object CrashGuard {
     fun <T> timed(context: Context?, name: String, pages: Int = 1, bytes: Long = 0L, block: () -> T): T {
         val started = System.currentTimeMillis()
         var finished = false
+        context?.applicationContext?.let { markTask(it, name) }
         return try {
             block().also { finished = true }
         } finally {
+            context?.applicationContext?.let { clearTask(it) }
             // a run that threw says nothing about how long this tool normally takes
             if (finished) note(context, name, pages, bytes, System.currentTimeMillis() - started)
         }
@@ -170,14 +172,20 @@ object CrashGuard {
         context: Context?,
         name: String,
         pages: Int = 1,
+        bytes: Long = 0L,
         block: suspend kotlinx.coroutines.CoroutineScope.() -> T
     ): T = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         val started = System.currentTimeMillis()
         var finished = false
+        context?.applicationContext?.let { markTask(it, name) }
         try {
             block().also { finished = true }
         } finally {
-            if (finished) note(context, name, pages, 0L, System.currentTimeMillis() - started)
+            context?.applicationContext?.let { clearTask(it) }
+            // bytes used to be hard-coded 0 here, so every task measured through io()
+            // learned its norm under the "? size" bucket and a 500-page file could never
+            // be told apart from a 5-page one.
+            if (finished) note(context, name, pages, bytes, System.currentTimeMillis() - started)
         }
     }
 
@@ -201,6 +209,17 @@ object CrashGuard {
         // normal and is never reported; an end while in front still is.
         try {
             val boot = app.getSharedPreferences("diag_boot", Context.MODE_PRIVATE)
+            // A task that started and never came back is the only trace a process kill
+            // leaves: without this the user reports "the app closed by itself" and the log
+            // has nothing at all. The marker is written when a task starts and cleared when
+            // it finishes, so anything still set here was cut off mid-run.
+            val killed = boot.getString("task", null)
+            if (killed != null) {
+                AppLog.record(app, killed,
+                    "started but never finished - the process was killed mid-run\n" +
+                            environment(app), false)
+                boot.edit().putString("task", null).apply()
+            }
             if (boot.getBoolean("running", false)) {
                 AppLog.record(app, "Previous launch crashed",
                     "the app stopped while it was in the foreground\n" + environment(app), false)
@@ -312,6 +331,31 @@ object CrashGuard {
         }
     }
 
+    /** Remember which task is running, so a kill mid-run leaves a trace. */
+    private fun markTask(app: Context, name: String) {
+        try {
+            app.getSharedPreferences("diag_boot", Context.MODE_PRIVATE)
+                .edit().putString("task", name).apply()
+        } catch (_: Throwable) {
+        }
+    }
+
+    private fun clearTask(app: Context) {
+        try {
+            app.getSharedPreferences("diag_boot", Context.MODE_PRIVATE)
+                .edit().putString("task", null).apply()
+        } catch (_: Throwable) {
+        }
+    }
+
+    /** Free megabytes on the partition the app writes to, or -1 if it cannot be read. */
+    private fun freeDiskMb(context: Context): Long = try {
+        val st = android.os.StatFs(context.filesDir.absolutePath)
+        st.availableBytes / 1048576L
+    } catch (_: Throwable) {
+        -1L
+    }
+
     /** Facts that make a report reproducible. */
     private fun environment(context: Context): String = try {
         val pi = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -327,6 +371,10 @@ object CrashGuard {
             // without it a system kill looks exactly like an app fault.
             append(" heap=").append((rt.totalMemory() - rt.freeMemory()) / 1048576)
                 .append("/").append(rt.maxMemory() / 1048576).append("MB")
+            // A save that fails because the phone is full is the most common "the app is
+            // broken" report that is not a code fault. Without the free space in the entry
+            // there is no way to tell it apart from a real bug afterwards.
+            append(" disk=").append(freeDiskMb(context)).append("MB free")
             try {
                 val mi = android.app.ActivityManager.MemoryInfo()
                 (context.getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager)
