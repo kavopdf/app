@@ -50,7 +50,9 @@ TOL_SIZE_PT = 0.5
 # A colour that has moved by less than this in each channel is the same colour to a
 # reader. Straight RGB distance, because a full CIE delta-E needs a colour library the
 # sandbox does not have and the difference it would make here is a fraction of one unit.
-TOL_COLOUR = 24
+# CIE76 delta-E 3 is the just-noticeable difference: below it two
+# colours are the same to an eye. Above it they are not.
+TOL_COLOUR = 3.0
 # There is deliberately NO pass mark here. A number invented in advance - 90 %, 95 % -
 # decides that a document is broken before anyone has measured what the converter
 # actually achieves, and a corpus at 5 % then fails every document for ever and a run
@@ -88,15 +90,42 @@ def base_font(name):
     return n.lower()
 
 
+def _lab(rgb):
+    """sRGB to CIE L*a*b*, so a colour difference means what an eye would call it."""
+    def lin(c):
+        c = c / 255.0
+        return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+    r, g, b = (lin(float(v)) for v in rgb)
+    x = (r * 0.4124 + g * 0.3576 + b * 0.1805) / 0.95047
+    y = (r * 0.2126 + g * 0.7152 + b * 0.0722) / 1.00000
+    z = (r * 0.0193 + g * 0.1192 + b * 0.9505) / 1.08883
+
+    def f(t):
+        return t ** (1.0 / 3.0) if t > 0.008856 else 7.787 * t + 16.0 / 116.0
+
+    fx, fy, fz = f(x), f(y), f(z)
+    return 116.0 * fy - 16.0, 500.0 * (fx - fy), 200.0 * (fy - fz)
+
+
 def colour_close(a, b):
+    """Are these two colours the same to a person?
+
+    The old test was Euclidean distance in raw RGB under 24. RGB is not a perceptual
+    space: the same numeric gap is a large step in a dark colour and an invisible one in
+    a light colour, and 24 was picked by hand. This uses CIE76 delta-E, where 3 is the
+    just-noticeable difference - a fact about human vision, not a number chosen here.
+    """
     if a is None or b is None:
         return True
-    if isinstance(a, int) and isinstance(b, int):
-        return (((a >> 16) & 255) - ((b >> 16) & 255)) ** 2 + \
-               (((a >> 8) & 255) - ((b >> 8) & 255)) ** 2 + \
-               ((a & 255) - (b & 255)) ** 2 <= TOL_COLOUR ** 2
     try:
-        return sum((int(x) - int(y)) ** 2 for x, y in zip(a, b)) <= TOL_COLOUR ** 2
+        if isinstance(a, int):
+            a = ((a >> 16) & 255, (a >> 8) & 255, a & 255)
+        if isinstance(b, int):
+            b = ((b >> 16) & 255, (b >> 8) & 255, b & 255)
+        la, lb = _lab(a), _lab(b)
+        de = sum((x - y) ** 2 for x, y in zip(la, lb)) ** 0.5
+        return de <= TOL_COLOUR
     except Exception:
         return True
 

@@ -59,7 +59,7 @@ def docx_text(path):
         z = zipfile.ZipFile(path)
         root = etree.fromstring(z.read('word/document.xml'))
     except Exception:
-        return [], 0, False
+        return [], 0, False, 0.0, 0.0
     leaves, pages = [], 0
     xml = z.read('word/document.xml').decode('utf-8', 'replace')
     hasbg = 'w:background' in xml
@@ -69,7 +69,18 @@ def docx_text(path):
         t = norm("".join((x.text or "") for x in p.iter(W + 't')))
         if t: leaves.append(t)
     pages = xml.count('<w:br w:type="page"/>') + xml.count('w:type="nextPage"') + 1
-    return leaves, pages, hasbg
+
+    # The page's own size, so a solid fill can be told apart from the page background
+    # without a hard-coded A4. Twips / 20 = points.
+    page_w = page_h = 0.0
+    for el in root.iter(W + 'pgSz'):
+        try:
+            page_w = float(el.get(W + 'w')) / 20.0
+            page_h = float(el.get(W + 'h')) / 20.0
+        except (TypeError, ValueError):
+            page_w = page_h = 0.0
+        break
+    return leaves, pages, hasbg, page_w, page_h
 
 def pdf_fills(path):
     """How many filled areas the PDF itself draws, so a correct band is not counted as a block."""
@@ -82,14 +93,18 @@ def pdf_fills(path):
             for dr in d.load_page(i).get_drawings():
                 if dr.get("fill") is not None and dr.get("rect") is not None:
                     r = dr["rect"]
-                    if r.width * r.height > 3000:
+                    # The page's own fill is the page, not a block. Compared
+                    # against this page's rect, so a Letter or landscape page is
+                    # judged by its own size and not by a hard-coded A4.
+                    pr = d.load_page(i).rect
+                    if not (r.width >= pr.width - 2 and r.height >= pr.height - 2):
                         n += 1
         d.close()
     except Exception:
         pass
     return n
 
-def big_shapes(path):
+def big_shapes(path, page_w, page_h):
     import zipfile
     from lxml import etree
     W = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
@@ -120,13 +135,15 @@ def big_shapes(path):
         if sp is None: continue
         sf = sp.find(A + 'solidFill')
         if sf is None: continue
-        # A block is a solid fill that is not the page itself. The old test was
-        # "bigger than 3000 pt2 and smaller than 580x820" - 3000 picked by hand, and the
-        # 580x820 pair a hard-coded A4 that would misjudge a Letter page or a landscape
-        # one. The page's own size is known here, so the page is excluded by comparing
+        # A block is a solid fill that is not the page itself. The old test was "bigger
+        # than 3000 pt2 and smaller than 580x820": 3000 picked by hand, and 580x820 a
+        # hard-coded A4 that would misjudge a Letter or a landscape page. This document's
+        # own page size is read from its pgSz, so the page is excluded by comparing
         # against it and no size threshold is needed at all.
-        if not (w >= page_w - 2 and h >= page_h - 2):
-            n += 1
+        if page_w and page_h:
+            if w >= page_w - 2 and h >= page_h - 2:
+                continue
+        n += 1
     return n
 
 def score_one(pdf, docx):
