@@ -196,21 +196,47 @@ def q6_charts(ref, got):
 
 
 def q7_codes(ref, got):
+    """QR and barcodes. There is no decoder in this sandbox, and that is reported.
+
+    pyzbar needs a system library, zxing-cpp and opencv are not installable because the
+    sandbox cannot reach a package index, and there is no pure-Python decoder. A question
+    that cannot be answered must say so, in words, rather than quietly returning
+    "unsure" - which reads like "probably fine" and lets a broken QR code through.
+    """
     try:
-        import pymupdf
+        from pyzbar.pyzbar import decode as zbar  # noqa: F401
     except ImportError:
-        return "unsure", "no decoder available"
-    try:
-        from pyzbar.pyzbar import decode as zbar
-        from PIL import Image
-        import io
-    except ImportError:
-        return "unsure", "pyzbar is not installed"
+        try:
+            import zxingcpp  # noqa: F401
+        except ImportError:
+            try:
+                import cv2  # noqa: F401
+            except ImportError:
+                return ("not measurable",
+                        "no QR decoder in this sandbox - look at the page yourself")
 
     def read(page):
+        from PIL import Image
+        import io
         pix = page.get_pixmap(dpi=200)
         img = Image.open(io.BytesIO(pix.tobytes("png")))
-        return [r.data.decode("utf-8", "replace") for r in zbar(img)]
+        try:
+            from pyzbar.pyzbar import decode as zbar
+            return [r.data.decode("utf-8", "replace") for r in zbar(img)]
+        except ImportError:
+            pass
+        try:
+            import zxingcpp
+            return [r.text for r in zxingcpp.read_barcodes(img)]
+        except ImportError:
+            pass
+        try:
+            import cv2, numpy as np
+            arr = np.array(img.convert("L"))
+            data, _pts, _ = cv2.QRCodeDetector().detectAndDecode(arr)
+            return [data] if data else []
+        except ImportError:
+            return []
 
     want = read(ref["page"])
     if not want:
@@ -279,7 +305,7 @@ def check(pdf_path, docx_path, workdir):
                 page_answers[name] = {"verdict": verdict, "detail": detail}
                 if verdict in ("no", "error"):
                     failed += 1
-                elif verdict == "unsure":
+                elif verdict in ("unsure", "not measurable"):
                     unsure += 1
             answers.append({"page": i + 1, "answers": page_answers})
 

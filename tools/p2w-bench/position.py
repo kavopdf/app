@@ -46,6 +46,11 @@ import tempfile
 # the layout engine chooses and drifts a little more.
 TOL_X_PT = 1.5
 TOL_Y_PT = 3.0
+TOL_SIZE_PT = 0.5
+# A colour that has moved by less than this in each channel is the same colour to a
+# reader. Straight RGB distance, because a full CIE delta-E needs a colour library the
+# sandbox does not have and the difference it would make here is a fraction of one unit.
+TOL_COLOUR = 24
 # There is deliberately NO pass mark here. A number invented in advance - 90 %, 95 % -
 # decides that a document is broken before anyone has measured what the converter
 # actually achieves, and a corpus at 5 % then fails every document for ever and a run
@@ -57,8 +62,38 @@ def norm(text):
     return re.sub(r"\s+", " ", text or "").strip().lower()
 
 
+def base_font(name):
+    """The family part of a font name, without the subset prefix or the style suffix."""
+    if not name:
+        return ""
+    n = name.split("+")[-1]
+    for suffix in ("-BoldItalic", "-BoldOblique", "-Bold", "-Italic", "-Oblique",
+                   "-Regular", "-Roman", "-Medium", "-Light", "-Black", "-Semibold"):
+        if n.endswith(suffix):
+            n = n[:-len(suffix)]
+    return n.lower()
+
+
+def colour_close(a, b):
+    if a is None or b is None:
+        return True
+    if isinstance(a, int) and isinstance(b, int):
+        return (((a >> 16) & 255) - ((b >> 16) & 255)) ** 2 + \
+               (((a >> 8) & 255) - ((b >> 8) & 255)) ** 2 + \
+               ((a & 255) - (b & 255)) ** 2 <= TOL_COLOUR ** 2
+    try:
+        return sum((int(x) - int(y)) ** 2 for x, y in zip(a, b)) <= TOL_COLOUR ** 2
+    except Exception:
+        return True
+
+
 def pdf_pages(path):
-    """Lines per page, so a page that moved is not compared with a page that did not."""
+    """Lines per page, with the size, font and colour the page actually drew.
+
+    A page that moved must not be compared with a page that did not, so the pages stay
+    separate. Size, font and colour come from the render because that is what a reader
+    sees; the tolerance table promises all three and no gate measured any of them.
+    """
     import pymupdf
     pages = []
     with pymupdf.open(path) as doc:
@@ -71,7 +106,11 @@ def pdf_pages(path):
                     if not norm(text):
                         continue
                     x0, y0, x1, y1 = line["bbox"]
-                    lines.append((text, x0, (y0 + y1) / 2.0))
+                    live = [s for s in spans if s.get("text", "").strip()]
+                    size = max((s.get("size", 0) for s in live), default=0)
+                    font = max(live, key=lambda s: len(s.get("text", ""))).get("font", "") if live else ""
+                    colour = live[0].get("color") if live else None
+                    lines.append((text, x0, (y0 + y1) / 2.0, size, font, colour))
             pages.append(lines)
     return pages
 
@@ -111,9 +150,10 @@ def score_document(pdf_path, docx_path, workdir):
         ref = ref_pages[pi]
         got = got_pages[pi]
         pool = {}
-        for text, x, y in got:
-            pool.setdefault(norm(text), []).append((x, y))
-        for text, x, y in ref:
+        for item in got:
+            pool.setdefault(norm(item[0]), []).append(item)
+        for item in ref:
+            text, x, y = item[0], item[1], item[2]
             total += 1
             key = norm(text)
             candidates = pool.get(key)
@@ -122,11 +162,12 @@ def score_document(pdf_path, docx_path, workdir):
                 out_of.append((text[:40], "no matching line", 0, 0))
                 continue
             best_i, best_d = 0, None
-            for i, (cx, cy) in enumerate(candidates):
-                d = abs(cy - y)
+            for i, cand in enumerate(candidates):
+                d = abs(cand[2] - y)
                 if best_d is None or d < best_d:
                     best_i, best_d = i, d
-            cx, cy = candidates.pop(best_i)
+            cand = candidates.pop(best_i)
+            cx, cy = cand[1], cand[2]
             dx, dy = cx - x, cy - y
             if abs(dx) <= TOL_X_PT and abs(dy) <= TOL_Y_PT:
                 within += 1
@@ -135,10 +176,53 @@ def score_document(pdf_path, docx_path, workdir):
 
     # Lines on a page the render does not have are lost, not unmeasured.
     for pi in range(common, len(ref_pages)):
-        for text, x, y in ref_pages[pi]:
+        for item in ref_pages[pi]:
+            text = item[0]
             total += 1
             unmatched += 1
             out_of.append((text[:40], "page missing in the render", 0, 0))
+
+    # Font size, font name and colour. The tolerance table promises all three and no
+    # gate measured any of them, so a document could have every word in the wrong size
+    # and pass everything. Sizes and names come from the render because that is what the
+    # reader sees; the docx XML declares them, and where the two disagree the render is
+    # the one that matters.
+    size_hits = size_total = 0
+    name_hits = name_total = 0
+    colour_hits = colour_total = 0
+    font_problems = []
+    for pi in range(common):
+        pool = {}
+        for item in got_pages[pi]:
+            pool.setdefault(norm(item[0]), []).append(item)
+        for item in ref_pages[pi]:
+            text, x, y, rsize, rfont, rcol = item
+            cand = pool.get(norm(text))
+            if not cand:
+                continue
+            best_i, best_d = 0, None
+            for i, c in enumerate(cand):
+                d = abs(c[2] - y)
+                if best_d is None or d < best_d:
+                    best_i, best_d = i, d
+            c = cand.pop(best_i)
+            _t, _x, _y, gsize, gfont, gcol = c
+            if rsize > 0 and gsize > 0:
+                size_total += 1
+                if abs(gsize - rsize) <= TOL_SIZE_PT:
+                    size_hits += 1
+                elif len(font_problems) < 5:
+                    font_problems.append("%-30s size %.1f -> %.1f" % (text[:30], rsize, gsize))
+            if rfont:
+                name_total += 1
+                if gfont and base_font(gfont) == base_font(rfont):
+                    name_hits += 1
+                elif len(font_problems) < 8:
+                    font_problems.append("%-30s font %s -> %s" % (text[:30], rfont, gfont))
+            if rcol is not None and gcol is not None:
+                colour_total += 1
+                if colour_close(rcol, gcol):
+                    colour_hits += 1
 
     return {
         "lines": total,
@@ -148,6 +232,10 @@ def score_document(pdf_path, docx_path, workdir):
         "pages_got": len(got_pages),
         "page_count_ok": len(ref_pages) == len(got_pages),
         "share": within / total if total else 0.0,
+        "size_share": size_hits / size_total if size_total else None,
+        "name_share": name_hits / name_total if name_total else None,
+        "colour_share": colour_hits / colour_total if colour_total else None,
+        "font_problems": font_problems,
         "worst": sorted(out_of, key=lambda r: -(abs(r[2]) + abs(r[3])))[:5],
         "ok": len(ref_pages) == len(got_pages),
     }
@@ -236,7 +324,16 @@ def main():
     print("")
     print("documents: %d   failed: %d   lines within tolerance: %.1f %%"
           % (len(results), len(failed), overall * 100))
-    print("tolerance: x %.1f pt, y %.1f pt" % (TOL_X_PT, TOL_Y_PT))
+    def share(key):
+        vals = [r[key] for r in scored if r.get(key) is not None]
+        return (sum(vals) / len(vals) * 100) if vals else None
+
+    print("tolerance: x %.1f pt, y %.1f pt, size %.1f pt, colour %d"
+          % (TOL_X_PT, TOL_Y_PT, TOL_SIZE_PT, TOL_COLOUR))
+    for label, key in (("font size", "size_share"), ("font name", "name_share"),
+                       ("colour", "colour_share")):
+        got = share(key)
+        print("  %-10s %s" % (label, "not measured" if got is None else "%.1f %%" % got))
     if base:
         print("compared against %s" % args.baseline)
     else:
