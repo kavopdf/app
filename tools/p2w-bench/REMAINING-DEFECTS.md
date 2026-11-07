@@ -361,3 +361,37 @@ Until then the floor stays where it was, because a metric that is understood to 
 is better than a metric that fires on 179 documents for a reason nobody can act on.
 
 **Tries: 0 of 3.**
+
+
+### D-06  Twenty-eight documents spill onto more pages than the PDF has
+
+**Severity: a page the PDF does not have is the first thing a reader notices.**
+
+Measured with `position.py` on 7 Nov, comparing the docx render's page count with the
+PDF's:
+
+    64_newspaper_uneven_columns_ad_boxes    docx 5 pages, PDF 1
+    350_question_paper                      docx 2 pages, PDF 1
+    63_three_column_brochure                docx 2 pages, PDF 1
+    20_numbered_list_separate_column_txtpos docx 2 pages, PDF 1
+    332_bom_on_drawing                      docx 2 pages, PDF 1
+    402_calendar_month_grid                 docx 2 pages, PDF 1
+    55_sidebar_box_beside_body              docx 2 pages, PDF 1
+    65_two_col_full_width_figure_caption    docx 2 pages, PDF 1
+
+28 of the 208 documents fail this way. `gate.py` counts page breaks it finds in the
+XML and reports 537 against the PDFs' 540, so three documents lose a page while these
+28 gain one - the two errors were hiding each other in the total.
+
+The cause is the same one behind D-01: the writer gives every paragraph an exact line
+height of size x 1.15 and a spacing-before taken from the measured gap. Both are close
+but neither is the page's real pitch, so the content is slightly taller than the page
+and the last few lines fall onto a second sheet. On 64_newspaper it is four extra
+sheets.
+
+**The fix to try.** The same one as D-01: take the line height from the model's own
+lineY gaps instead of a constant, and let the page's real bottom margin decide where
+the page ends. Do not shrink the content to fit - the page count is a measurement, and
+the only correct number is the PDF's.
+
+**Tries: 0 of 3.**
