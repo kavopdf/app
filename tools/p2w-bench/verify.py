@@ -22,6 +22,8 @@ TWO KINDS OF FINDING, TWO WAYS TO CHECK
     checked by a program and an unchecked finding is what this file exists to prevent:
 
         wraps:<text>     the PDF has <text> on one line and the render puts it on more
+        breaks:<text>    the same number of lines, broken at a different word
+        count:<text>     how many times the PDF holds <text>, against the render
         moved:<text>     the render puts <text> more than the y tolerance from the PDF
         missing:<text>   the PDF has <text> and the render does not
         extra:<text>     the render has <text> the PDF does not
@@ -199,17 +201,31 @@ def check_visual(claim, ref_lines, got_lines, ref, got):
         return "REFUTED", "the line breaks in the same place"
 
     if claim.startswith("moved:"):
+        # The WORST offset, not the first. "[08]" appears 25 times on 350_question_paper;
+        # comparing the first of each side gave 4.3 pt and called it verified, while the
+        # real damage is that six are gone and the rest are spread 36 pt apart where the
+        # PDF puts them 26 pt apart. The first occurrence is the least useful one to see.
         needle = claim.split(":", 1)[1].strip()
-        rl = [l for l in ref_lines if l["text"].startswith(needle)]
-        gl = [l for l in got_lines if l["text"].startswith(needle)]
+        rl = [l for l in ref_lines if l["text"].strip().startswith(needle)]
+        gl = [l for l in got_lines if l["text"].strip().startswith(needle)]
         if not rl or not gl:
             return "UNVERIFIABLE", "%r is not on both sides" % needle[:40]
-        ry = min(l["base"] for l in rl)
-        gy = min(l["base"] for l in gl)
-        d = gy - ry
-        return ("VERIFIED" if abs(d) > 3.0 else "REFUTED",
-                "%r at y=%.1f in the PDF, y=%.1f in the render, %.1f pt apart"
-                % (needle[:30], ry, gy, d))
+        if len(rl) == 1 and len(gl) == 1:
+            d = gl[0]["base"] - rl[0]["base"]
+            return ("VERIFIED" if abs(d) > 3.0 else "REFUTED",
+                    "%r at y=%.1f in the PDF, y=%.1f in the render, %.1f pt apart"
+                    % (needle[:30], rl[0]["base"], gl[0]["base"], d))
+        ry = [l["base"] for l in sorted(rl, key=lambda l: l["base"])]
+        gy = [l["base"] for l in sorted(gl, key=lambda l: l["base"])]
+        n = min(len(ry), len(gy))
+        worst = 0.0
+        for i in range(n):
+            worst = max(worst, abs(gy[i] - ry[i]))
+        if len(ry) != len(gy):
+            return "VERIFIED", "%d in the PDF, %d in the render, worst offset %.1f pt" % (
+                len(ry), len(gy), worst)
+        return ("VERIFIED" if worst > 3.0 else "REFUTED",
+                "%d on both sides, worst offset %.1f pt" % (len(ry), worst))
 
     if claim.startswith("missing:"):
         needle = claim.split(":", 1)[1].strip()
@@ -229,6 +245,19 @@ def check_visual(claim, ref_lines, got_lines, ref, got):
         gl = [l for l in got_lines if needle in l["text"]]
         return ("REFUTED" if rl or not gl else "VERIFIED",
                 "%d line(s) in the PDF, %d in the render" % (len(rl), len(gl)))
+
+    if claim.startswith("count:"):
+        # How many times the PDF holds this text against how many times the render does.
+        # On 350_question_paper the PDF has 25 marks and the render 19, and no claim could
+        # say so - moved: compared the first of each and reported 4.3 pt.
+        needle = claim.split(":", 1)[1].strip()
+        rn = sum(1 for l in ref_lines if l["text"].strip().startswith(needle))
+        gn = sum(1 for l in got_lines if l["text"].strip().startswith(needle))
+        if rn == 0:
+            return "UNVERIFIABLE", "the PDF has no %r either" % needle[:40]
+        if gn == rn:
+            return "REFUTED", "%d of %r on both sides" % (rn, needle[:24])
+        return "VERIFIED", "%d of %r in the PDF, %d in the render" % (rn, needle[:24], gn)
 
     if claim.startswith("overlap"):
         def pairs(ls):
