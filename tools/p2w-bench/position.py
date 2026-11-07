@@ -87,6 +87,30 @@ def colour_close(a, b):
         return True
 
 
+def declared_fonts(docx_path):
+    """The font names the .docx actually declares, read from its own XML.
+
+    Not from the render: LibreOffice substitutes a font the machine does not have, so a
+    render reports NotoSans where the file says DejaVuSans and a perfectly correct
+    document looks wrong. The XML is the only place the file's own choice is recorded.
+    """
+    import zipfile
+    import re as _re
+    try:
+        with zipfile.ZipFile(docx_path) as z:
+            xml = z.read("word/document.xml").decode("utf-8", "replace")
+    except Exception:
+        return None
+    names = []
+    for m in _re.finditer(r'<w:rFonts[^>]*>', xml):
+        tag = m.group(0)
+        for attr in ("w:ascii", "w:hAnsi", "w:cs"):
+            hit = _re.search(attr + r'="([^"]+)"', tag)
+            if hit:
+                names.append(hit.group(1))
+    return names
+
+
 def pdf_pages(path):
     """Lines per page, with the size, font and colour the page actually drew.
 
@@ -213,16 +237,33 @@ def score_document(pdf_path, docx_path, workdir):
                     size_hits += 1
                 elif len(font_problems) < 5:
                     font_problems.append("%-30s size %.1f -> %.1f" % (text[:30], rsize, gsize))
-            if rfont:
-                name_total += 1
-                if gfont and base_font(gfont) == base_font(rfont):
-                    name_hits += 1
-                elif len(font_problems) < 8:
-                    font_problems.append("%-30s font %s -> %s" % (text[:30], rfont, gfont))
+            # Font NAME is deliberately not compared here. The render substitutes any
+            # font the machine lacks - DejaVuSans comes back as NotoSans - so comparing
+            # names in a render marks a correct document wrong. The declared names are
+            # read from the .docx XML below and compared there.
             if rcol is not None and gcol is not None:
                 colour_total += 1
                 if colour_close(rcol, gcol):
                     colour_hits += 1
+
+    declared = declared_fonts(docx_path)
+    pdf_names = []
+    for pg in ref_pages:
+        for item in pg:
+            if item[4]:
+                pdf_names.append(base_font(item[4]))
+    declared_families = [base_font(n) for n in (declared or [])]
+    font_name_share = None
+    if pdf_names and declared_families:
+        want = {}
+        for n in pdf_names:
+            want[n] = want.get(n, 0) + 1
+        have = {}
+        for n in declared_families:
+            have[n] = have.get(n, 0) + 1
+        # every PDF family must be declared at least as many times as the PDF uses it
+        hit = sum(min(c, have.get(n, 0)) for n, c in want.items())
+        font_name_share = hit / max(1, sum(want.values()))
 
     return {
         "lines": total,
@@ -233,7 +274,7 @@ def score_document(pdf_path, docx_path, workdir):
         "page_count_ok": len(ref_pages) == len(got_pages),
         "share": within / total if total else 0.0,
         "size_share": size_hits / size_total if size_total else None,
-        "name_share": name_hits / name_total if name_total else None,
+        "name_share": font_name_share,
         "colour_share": colour_hits / colour_total if colour_total else None,
         "font_problems": font_problems,
         "worst": sorted(out_of, key=lambda r: -(abs(r[2]) + abs(r[3])))[:5],
@@ -334,6 +375,7 @@ def main():
                        ("colour", "colour_share")):
         got = share(key)
         print("  %-10s %s" % (label, "not measured" if got is None else "%.1f %%" % got))
+    print("  (font name is read from the .docx XML, not the render: a render substitutes)")
     if base:
         print("compared against %s" % args.baseline)
     else:
