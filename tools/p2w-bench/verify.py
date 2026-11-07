@@ -1,0 +1,266 @@
+#!/usr/bin/env python3
+"""Verify a finding against the PDF before anyone fixes anything.
+
+WHY THIS EXISTS
+    On 7 Nov the pipeline reported nine problems across five documents. Two of them were
+    false alarms: a "lost table" and a "lost chart" on a page that had neither. Both were
+    fixed at the source, but the lesson is the one that matters here - a finding is a
+    claim, and a claim is worth nothing until it has been checked against the page.
+
+    So no finding is fixed until it has been verified. One verification per finding, not
+    one per pass: a finding verified three times is the same answer three times.
+
+TWO KINDS OF FINDING, TWO WAYS TO CHECK
+    measure   a number the tools produced - reading order 88.5 %, page count 2 vs 1,
+              position off by 197 pt. Verified by re-deriving it from the PDF with code
+              that does not share the tool's path.
+    visual    something the eye saw on the side-by-side image - "this line wraps", "this
+              label sits lower", "this text is missing". Verified by going to the PDF and
+              measuring the specific claim.
+
+    The eye records a STRUCTURED claim, not a sentence, because a sentence cannot be
+    checked by a program and an unchecked finding is what this file exists to prevent:
+
+        wraps:<text>     the PDF has <text> on one line and the render puts it on more
+        moved:<text>     the render puts <text> more than the y tolerance from the PDF
+        missing:<text>   the PDF has <text> and the render does not
+        extra:<text>     the render has <text> the PDF does not
+        order            the rows are out of sequence
+        pagecount        the render has more or fewer pages than the PDF
+        overlap          the render overlaps lines the PDF keeps apart
+        shapes           the render has fewer shapes than the PDF
+
+THE FINDINGS FILE (tab separated, one line per finding)
+    id  document  page  kind  claim
+    F1  303_discharge_summary  1  measure  order
+    F2  303_discharge_summary  1  visual   wraps:WARNING SIGNS
+    F3  350_question_paper     1  visual   moved:[08]
+    F4  350_question_paper     1  measure  pagecount
+
+USAGE
+    python3 verify.py --findings F.tsv --corpus DIR --out DIR --rendered DIR
+
+EXIT
+    0  every finding was verified
+    1  at least one finding was REFUTED - it is not a defect, do not fix it
+    2  a finding could not be checked, or the input is wrong
+"""
+
+import argparse
+import os
+import sys
+
+
+def rows(lines):
+    """Lines grouped into the visual rows a reader traverses, band by band."""
+    out = []
+    for l in sorted(lines, key=lambda l: (l.get("base", l["bbox"][3]), l["bbox"][0])):
+        y = l.get("base", l["bbox"][3])
+        tol = max(1.5, 0.3 * (l.get("size") or 10))
+        if out and abs(out[-1][0] - y) <= tol:
+            out[-1][1].append(l)
+        else:
+            out.append([y, [l]])
+    res = []
+    for _y, ls in out:
+        ls.sort(key=lambda l: l["bbox"][0])
+        t = " ".join(" ".join(l["text"].split()) for l in ls).strip()
+        if t:
+            res.append(t)
+    return res
+
+
+def lines_of(page):
+    out = []
+    for b in page.get_text("dict")["blocks"]:
+        for l in b.get("lines", []):
+            t = "".join(s["text"] for s in l["spans"]).strip()
+            if t:
+                out.append({"text": t, "bbox": l["bbox"],
+                            "base": l["bbox"][3], "size": l["spans"][0]["size"]})
+    return out
+
+
+def check_measure(claim, ref, got):
+    """Re-derive a number the tools produced, without using the tool."""
+    c = claim.split(":", 1)[0].strip()
+    if c == "order":
+        a, b = rows(ref), rows(got)
+        import difflib
+        share = difflib.SequenceMatcher(None, a, b, autojunk=False).ratio()
+        return ("REFUTED" if share >= 1.0 else "VERIFIED",
+                "%d rows in the PDF, %d in the render, %.1f %% in sequence"
+                % (len(a), len(b), share * 100))
+    if c == "pagecount":
+        if ref.page_count != got.page_count:
+            return "VERIFIED", "%d pages in the PDF, %d in the render" % (
+                ref.page_count, got.page_count)
+        return "REFUTED", "both have %d pages" % ref.page_count
+    if c == "shapes":
+        def shapes(pg):
+            n = 0
+            for d in pg.get_drawings():
+                r = d["rect"]
+                if r.width >= 1.5 and r.height >= 1.5:
+                    n += 1
+            return n
+        a, b = shapes(ref), shapes(got)
+        return ("REFUTED" if b >= a else "VERIFIED",
+                "%d shapes in the PDF, %d in the render" % (a, b))
+    return "UNVERIFIABLE", "no measure check for '%s'" % c
+
+
+def check_visual(claim, ref_lines, got_lines, ref, got):
+    """Go to the PDF and measure the specific thing the eye said it saw."""
+    if claim.startswith("wraps:"):
+        needle = claim.split(":", 1)[1].strip()
+        rl = [l for l in ref_lines if needle in l["text"]]
+        gl = [l for l in got_lines if needle in l["text"]]
+        if not rl:
+            return "UNVERIFIABLE", "the PDF has no line containing %r" % needle[:40]
+        if len(rl) == 1 and len(gl) > 1:
+            return "VERIFIED", "1 line in the PDF, %d in the render" % len(gl)
+        if len(rl) == len(gl):
+            return "REFUTED", "%d line(s) on both sides" % len(rl)
+        return "VERIFIED", "%d line(s) in the PDF, %d in the render" % (len(rl), len(gl))
+
+    if claim.startswith("moved:"):
+        needle = claim.split(":", 1)[1].strip()
+        rl = [l for l in ref_lines if l["text"].startswith(needle)]
+        gl = [l for l in got_lines if l["text"].startswith(needle)]
+        if not rl or not gl:
+            return "UNVERIFIABLE", "%r is not on both sides" % needle[:40]
+        ry = min(l["base"] for l in rl)
+        gy = min(l["base"] for l in gl)
+        d = gy - ry
+        return ("VERIFIED" if abs(d) > 3.0 else "REFUTED",
+                "%r at y=%.1f in the PDF, y=%.1f in the render, %.1f pt apart"
+                % (needle[:30], ry, gy, d))
+
+    if claim.startswith("missing:"):
+        needle = claim.split(":", 1)[1].strip()
+        rl = [l for l in ref_lines if needle in l["text"]]
+        gl = [l for l in got_lines if needle in l["text"]]
+        if not rl:
+            return "UNVERIFIABLE", "the PDF has no %r either" % needle[:40]
+        return ("REFUTED" if gl else "VERIFIED",
+                "%d line(s) in the PDF, %d in the render" % (len(rl), len(gl)))
+
+    if claim.startswith("extra:"):
+        needle = claim.split(":", 1)[1].strip()
+        rl = [l for l in ref_lines if needle in l["text"]]
+        gl = [l for l in got_lines if needle in l["text"]]
+        return ("REFUTED" if rl or not gl else "VERIFIED",
+                "%d line(s) in the PDF, %d in the render" % (len(rl), len(gl)))
+
+    if claim.startswith("overlap"):
+        def pairs(ls):
+            n = 0
+            for i in range(len(ls)):
+                x0, y0, x1, y1 = ls[i]["bbox"]
+                for j in range(i + 1, len(ls)):
+                    a0, b0, a1, b1 = ls[j]["bbox"]
+                    if x0 < a1 and a0 < x1 and y0 < b1 and b0 < y1:
+                        if min(x1, a1) - max(x0, a0) > 1.0 and min(y1, b1) - max(y0, b0) > 1.0:
+                            n += 1
+            return n
+        a, b = pairs(ref_lines), pairs(got_lines)
+        return ("REFUTED" if b <= a else "VERIFIED",
+                "%d overlapping pairs in the PDF, %d in the render" % (a, b))
+
+    return "UNVERIFIABLE", "no visual check for '%s'" % claim[:40]
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--findings", required=True)
+    ap.add_argument("--corpus", required=True)
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--rendered", required=True)
+    a = ap.parse_args()
+
+    try:
+        import pymupdf
+    except ImportError:
+        print("verify: needs PyMuPDF")
+        return 2
+
+    if not os.path.isfile(a.findings):
+        print("verify: no findings file at %s" % a.findings)
+        return 2
+
+    findings = []
+    seen = set()
+    for line in open(a.findings, encoding="utf-8"):
+        line = line.rstrip("\n")
+        if not line or line.startswith("#"):
+            continue
+        f = line.split("\t")
+        if len(f) < 5:
+            continue
+        # One verification per finding. The same problem listed twice is one finding.
+        key = (f[1], f[2], f[3], f[4])
+        if key in seen:
+            print("skip  %-4s (already verified - same problem)" % f[0])
+            continue
+        seen.add(key)
+        findings.append(f[:5])
+
+    if not findings:
+        print("verify: no findings to check")
+        return 2
+
+    verified = refuted = unverifiable = 0
+    for fid, doc, page, kind, claim in findings:
+        pdf = os.path.join(a.corpus, doc + ".pdf")
+        rend = os.path.join(a.rendered, doc + ".pdf")
+        if not os.path.isfile(pdf) or not os.path.isfile(rend):
+            print("UNVERIFIABLE  %-4s %s p%s  %s (a file is missing)"
+                  % (fid, doc[:34], page, claim[:44]))
+            unverifiable += 1
+            continue
+        try:
+            with pymupdf.open(pdf) as r, pymupdf.open(rend) as g:
+                pi = max(0, int(page) - 1)
+                if pi >= r.page_count or pi >= g.page_count:
+                    print("UNVERIFIABLE  %-4s %s p%s  %s (page not on both sides)"
+                          % (fid, doc[:34], page, claim[:44]))
+                    unverifiable += 1
+                    continue
+                rp, gp = r[pi], g[pi]
+                if kind == "measure":
+                    verdict, why = check_measure(claim, rp, gp)
+                else:
+                    verdict, why = check_visual(claim, lines_of(rp), lines_of(gp), rp, gp)
+        except Exception as exc:
+            print("UNVERIFIABLE  %-4s %s p%s  %s (%s)"
+                  % (fid, doc[:34], page, claim[:44], type(exc).__name__))
+            unverifiable += 1
+            continue
+
+        mark = {"VERIFIED": "VERIFIED", "REFUTED": "REFUTED",
+                "UNVERIFIABLE": "UNVERIFIABLE"}[verdict]
+        print("%-12s  %-4s %-34s p%-2s %-6s %-28s %s"
+              % (mark, fid, doc[:34], page, kind, claim[:28], why[:70]))
+        if verdict == "VERIFIED":
+            verified += 1
+        elif verdict == "REFUTED":
+            refuted += 1
+        else:
+            unverifiable += 1
+
+    print("")
+    print("%d findings: %d verified, %d refuted, %d unverifiable"
+          % (len(findings), verified, refuted, unverifiable))
+    if refuted:
+        print("A refuted finding is not a defect. Do not fix it.")
+        return 1
+    if unverifiable:
+        print("An unverifiable finding needs a structured claim before it can be acted on.")
+        return 2
+    print("every finding was checked against the PDF")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

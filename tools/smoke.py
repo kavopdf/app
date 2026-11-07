@@ -146,6 +146,7 @@ def main():
     s = os.path.join(TOOLS, "sidebyside.py")
     l = os.path.join(TOOLS, "looked.py")
     t = os.path.join(TOOLS, "txt-guard.py")
+    vf = os.path.join(TOOLS, "verify.py")
 
     ok = True
     ok &= run("gate.py", [g, "--corpus", corpus, "--out", out,
@@ -157,6 +158,19 @@ def main():
     ok &= run("looked.py", [l, "--record", os.path.join(work, "LOOKED.tsv")], work)
     ok &= run("txt-guard.py", [t, "snapshot", "--dir", out,
                                "--save", os.path.join(work, "guard.json")], work)
+
+    # The verifier must run on an empty findings file without dying.
+    empty = os.path.join(work, "none.tsv")
+    open(empty, "w").write("# id\tdoc\tpage\tkind\tclaim\n")
+    r2 = subprocess.run([sys.executable, vf, "--findings", empty,
+                                         "--corpus", corpus, "--out", out,
+                                         "--rendered", out],
+                        capture_output=True, text=True, timeout=60)
+    if "Traceback" in (r2.stdout + r2.stderr):
+        print("FAIL  verify.py")
+        ok = False
+    else:
+        print("ok    %-14s ran" % "verify.py")
 
     print("")
     if ok:
