@@ -46,7 +46,7 @@ if "PDF_TO_WORD" not in enum:
     fails.append("Action.PDF_TO_WORD missing")
 if "Action.PDF_TO_WORD" not in home:
     fails.append("no home card for PDF to Word")
-for needle in ("Action.PDF_TO_WORD", "PdfToWord.convert", "DocxWriter.write", "PdfToWord.writeTxt"):
+for needle in ("Action.PDF_TO_WORD", "PdfToWord.convert", "DocxWriter.write", "TxtWriter.write"):
     if needle not in tools:
         fails.append(f"ToolsActivity does not handle {needle}")
 for s in ("tool_word", "tool_word_desc", "word_format_docx", "word_format_txt"):
