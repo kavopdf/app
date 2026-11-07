@@ -166,8 +166,13 @@ def emit_findings(record, visual_json, out_path):
                     continue
                 # "pagecount - this page should not exist" and friends: keep the token
                 claim = claim.split(" - ")[0].strip()
+                # pagecount is a MEASURE claim. Emitted as visual it cannot be checked at
+                # all: the extra page does not exist in the PDF, so the verifier has no
+                # page to compare it against and answers UNVERIFIABLE. The claim is about
+                # the document, not about a page.
+                kind = "measure" if claim.split(":")[0].strip() == "pagecount" else "visual"
                 n += 1
-                findings.append(("V%d" % n, doc, page, "visual", claim))
+                findings.append(("V%d" % n, doc, page, kind, claim))
 
     if visual_json and os.path.isfile(visual_json):
         # the computed questions that failed and can be expressed as a claim
