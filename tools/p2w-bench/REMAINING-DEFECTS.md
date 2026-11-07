@@ -395,3 +395,64 @@ the page ends. Do not shrink the content to fit - the page count is a measuremen
 the only correct number is the PDF's.
 
 **Tries: 0 of 3.**
+
+
+### D-07  Two fields on one baseline are joined into one sentence
+
+**Severity: a marks column or a right-aligned label becomes part of the sentence beside it.**
+
+Found on 350_question_paper, which came out as `[08] Write SQL queries for the following`,
+the marks column in front of the question it belongs to. The PDF has them on one baseline:
+
+    'Write SQL queries for the following: ...'   x= 50.0  y=147.5  x1=493.5
+    '[08]'                                       x=551.9  y=148.9
+
+and on form16-part-b:
+
+    'Certificate under section 203 ...'          x=144.3  y= 44.0  x1=451.0
+    'PART B'                                     x=519.3  y= 43.5  x1=552.8
+
+**Two separate causes, both confirmed by running the engine.**
+
+1. THE GAP TEST ONLY SEES A POSITIVE GAP. A baseline cluster does not hold its glyphs in
+   x order, so `[08]` arrives before `Write`, the gap between them reads -520, and
+   `gapPts > outlier` is false. The comment above that line has said "a gap counts however
+   it is signed" since file 46 lost a number off a chart for the same reason; the code
+   never did it. Changing it to `Math.abs(gapPts) > outlier` is correct and was measured.
+
+2. THE FIELDS ARE THEN PUT BACK IN CLUSTER ORDER, NOT READING ORDER. They are only
+   reversed for an RTL baseline, so an LTR baseline keeps whatever order the cluster held
+   them in. Sorting the segments by x - ascending LTR, descending RTL - is correct.
+
+**Measured with both changes on the 208-document corpus: 4 documents improved, 1 got worse.**
+
+    350_question_paper                    lines  85 -> 116   (+31)
+    417_rotate180_and_mirrored            lines   9 ->  11
+    46_chart_coloured_labels_body_text    lines  29 ->  30
+    69_two_col_legal_numbered_clauses     lines  51 ->  52
+    form16-part-b                         lines 113 -> 112   (-1)  REGRESSION
+
+The regression is real damage, not a count moving. On form16-part-b the old output kept
+`PART B` as its own paragraph, in its own place at the right of the page. With both
+changes it is joined into the sentence above it - `Certificate under section 203 ... PART B`
+- which is worse than either, because the label has lost its position and reads as part of
+the sentence. The cause is `sameRow()` in the paragraph grouping: two lines on one baseline
+are put in one group and `buildPara` joins their text with a space.
+
+So the changes were reverted, and this entry records them.
+
+**The fix to try.** All three parts together, because any two of them alone leave the
+regression or lose the improvement:
+
+    a. `Math.abs(gapPts) > outlier` in the baseline cut.
+    b. sort the cut segments by x, ascending for LTR and descending for RTL.
+    c. in the paragraph grouping, do not let `sameRow()` hold two lines together when
+       either of them is `hardEnd` and no gutter crosses the space between them. A table
+       cell has a rule separating it; a page header does not, and that is the difference
+       between a row and two fields.
+
+Part (c) is the one that has not been written yet. A first attempt must check the tables
+first - 8 of 25 tables were missing on stamped documents once when the grid and the
+paragraph grouping disagreed, and a change here can do the same.
+
+**Tries: 1 of 3** - the signed-gap and sort changes were tried and reverted.

@@ -2313,7 +2313,7 @@ public final class PdfToWord {
                 // order, so on 350_question_paper the marks column "[08]" (x=551.9) came
                 // first and the question (x=50) second, the gap read -520, the positive test
                 // saw nothing, and the two became one line reading "[08] Write SQL queries".
-                boolean wideGap = prev != null && Math.abs(gapPts) > outlier;
+                boolean wideGap = prev != null && gapPts > outlier;
                 boolean overlap = OS && prev != null && !g.rotated && !prev.rotated
                         && Math.abs(g.y - prev.y) <= 0.5f
                         && (g.x - (prev.x + prev.width)) < -Math.max(2f, g.size * OVF);
@@ -2332,18 +2332,7 @@ public final class PdfToWord {
             // are ordered from the right as well. Sorting them left to right mirrored every
             // table row on the Arabic document - the amount before the item number, and the
             // header read "المبلغ السعر الكمية الوصف البند" against "البند الوصف الكمية السعر المبلغ".
-            // A baseline cut into several fields must be put back into reading order. The
-            // glyphs arrive in whatever order the cluster held them, which is not x order -
-            // that is how the marks column ended up before the question it belongs to. Left
-            // to right for a left-to-right baseline, right to left for an RTL one.
-            if (segments.size() > 1) {
-                final boolean rtl = rtlDominant(raw.glyphs);
-                segments.sort((List<Glyph> s1, List<Glyph> s2) -> {
-                    float a = s1.isEmpty() ? 0f : s1.get(0).x;
-                    float b = s2.isEmpty() ? 0f : s2.get(0).x;
-                    return rtl ? Float.compare(b, a) : Float.compare(a, b);
-                });
-            }
+            if (segments.size() > 1 && rtlDominant(raw.glyphs)) Collections.reverse(segments);
 
             // A baseline cut into more than one segment is several fields, not one sentence.
             // None of those segments may be merged back into the line above it - that is what
