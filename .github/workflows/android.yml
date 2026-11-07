@@ -193,6 +193,20 @@ jobs:
           echo "checking $APK"
           python3 tools/verify-icon.py "$APK"
 
+      - name: Name the APK the way it is published
+        run: |
+          # The build writes app-release.apk. The release asset must be
+          # KavoPDF-<version>.apk: the file the user downloads has to say what it is and
+          # which version it is. "app-release.apk" says neither, and every version taken
+          # from the website would land on the phone under the same name.
+          VERSION=$(grep -oP 'versionName\s+"\K[^"]+' app/build.gradle | head -1)
+          if [ -z "$VERSION" ]; then echo "Could not read versionName from app/build.gradle"; exit 1; fi
+          APK=$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' ! -name 'KavoPDF-*' | head -1)
+          if [ -z "$APK" ]; then echo "No APK was produced"; exit 1; fi
+          mv "$APK" "app/build/outputs/apk/release/KavoPDF-${VERSION}.apk"
+          echo "named: KavoPDF-${VERSION}.apk"
+          ls -la app/build/outputs/apk/release/
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
