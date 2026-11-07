@@ -39,7 +39,10 @@ def family(f):
                   "DejaVuSans", "DejaVuSerif", "Noto", "Symbol"]:
         if known.lower() in f.lower():
             return known
-    return f[:20] if f else ""
+    # The whole name, never a prefix. Two fonts that share their first twenty
+    # characters - a family with several weights and widths does exactly that -
+    # would otherwise be counted as the same font.
+    return f
 
 
 def has_nested(el):

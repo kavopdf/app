@@ -1,12 +1,29 @@
 # Table accuracy: the metric that decides whether a PDF->Word conversion is usable.
 # Reference = pdfplumber's table extraction. Ours = the tables in the .docx.
-import os, sys, json, warnings
+import os
+from collections import Counter, sys, json, warnings
 warnings.filterwarnings("ignore")
 import pdfplumber, docx
 
 CMP = "/scratch/work/p2w/cmp"
 OUT = sys.argv[1]
 CACHE = "/scratch/work/p2w/tbl_ref.json"
+
+def cover(want, have):
+    """Share of the reference words the row actually holds, counting repeats.
+
+    A cell that holds "0.00" five times and a render that holds it once is four
+    words short, and a set comparison cannot see that: the word is present, so the
+    set matches. Counting occurrences is the only comparison that notices.
+    """
+    if not want:
+        return 0.0
+    total = sum(want.values())
+    if not total:
+        return 0.0
+    hit = sum(min(c, have.get(w, 0)) for w, c in want.items())
+    return hit / total
+
 
 def norm(s):
     return " ".join((s or "").split())
@@ -68,7 +85,7 @@ for base, rtabs in sorted(ref.items()):
     our_row_words = []
     for t in our_tabs:
         for r in t:
-            our_row_words.append(set(" ".join(r).split()))
+            our_row_words.append(Counter(" ".join(r).split()))
     r_hit = 0; r_tot = 0
     c_hit = 0; c_tot = 0
     for t in rtabs:
@@ -76,18 +93,18 @@ for base, rtabs in sorted(ref.items()):
             cells = [c for c in r if c]
             if not cells: continue
             r_tot += 1
-            want = set(" ".join(cells).split())
+            want = Counter(" ".join(cells).split())
             c_tot += len(cells)
             best = 0
             for ow in our_row_words:
                 if not want: continue
-                got = len(want & ow) / len(want)
+                got = cover(want, ow)
                 if got > best: best = got
             if best >= 0.95: r_hit += 1
             for c in cells:
-                w = set(c.split())
+                w = Counter(c.split())
                 if not w: continue
-                if any(len(w & ow) / len(w) >= 0.95 for ow in our_row_words): c_hit += 1
+                if any(cover(w, ow) >= 0.95 for ow in our_row_words): c_hit += 1
     tot_ref_rows += r_tot; hit_rows += r_hit
     tot_ref_cells += c_tot; hit_cells += c_hit
     per.append((r_hit / r_tot * 100 if r_tot else 100.0, base, r_tot))
