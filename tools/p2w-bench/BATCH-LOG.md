@@ -283,10 +283,10 @@ first fifteen of the 75.
 | G5 position, batch | 41.3 % of lines within tolerance; size 98.5 %, name 100 %, colour 100 % |
 | G6a the eye | 15 pages opened, 15 verdicts, 0 PENDING |
 | G6b the numbers | 8 of 15 failed a question |
-| verify | 15 findings: 12 VERIFIED, 3 REFUTED |
+| verify | 15 findings: 14 VERIFIED, 1 REFUTED |
 | combine | **10 PASS, 5 FAIL, 0 unlooked** |
 
-Three of the six refutations were the eye's own: 314's "truncated" totals are complete and at
+Six claims were refuted over the pass and withdrawn; four were the eye's own: 314's "truncated" totals are complete and at
 identical coordinates on both sides, 303's "wrap" is the render keeping a line the PDF clipped
 off its own page, and 301's two label claims were 0.5 pt apart. Each is written up in
 REMAINING-DEFECTS.md so the same claim is not made again.

@@ -73,5 +73,5 @@ numbers come from `position.py`, which rendered it at 100 %.
 
 v3 batch 1 (the first fifteen of the 75), re-processed from scratch under the
 eye-then-numbers order. 10 pass, 5 fail. Every finding above came back VERIFIED from
-verify.py against the PDF; two of the eye's first claims (314's truncated totals and
-303's wrap) were REFUTED and are recorded as corrected rather than fixed.
+verify.py against the PDF; the eye's first claims on 301 (two labels), 303 (the WARNING wrap)
+and 314 (both totals) were REFUTED and are recorded as corrected rather than fixed.

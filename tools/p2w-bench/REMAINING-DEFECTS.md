@@ -574,8 +574,9 @@ paragraph grouping disagreed, and a change here can do the same.
 
 Fifteen documents converted from the current engine, rendered through LibreOffice, opened one
 page at a time, measured, and every finding checked against the PDF by `verify.py` before it
-was written down. Twelve findings verified, six refuted - and four of the six refuted were the
-eye's or the tool's own mistake, which is the point of the step.
+was written down. The final pass checked 15 findings: 14 verified, 1 refuted. Six claims made
+earlier in the same pass were refuted and withdrawn - four of them the eye's own mistake -
+which is the point of the step.
 
 | Doc | Verified finding | Tries |
 |---|---|---|
