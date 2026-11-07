@@ -57,6 +57,7 @@ def main():
     ap.add_argument("--pages", default="", help="1,3,5 - default is every page")
     ap.add_argument("--all-pages", action="store_true")
     ap.add_argument("--dpi", type=int, default=DPI)
+    ap.add_argument("--record", help="append one row per page to this file, so \"did anyone look at it\" is answerable")
     args = ap.parse_args()
 
     if shutil.which("soffice") is None:
@@ -162,6 +163,16 @@ def main():
                 d.text((x + 4, 8), "%s  page %d of %d" % (label, i + 1, n), fill=(0, 0, 0))
                 sheet.paste(img, (x, head))
             print("  page %d: %.1f%% of pixels differ" % (i + 1, share))
+
+            if args.record:
+                # One row per page: document, page, pixel share, image, verdict, note.
+                # The verdict starts as PENDING and only a person who opened the image
+                # may change it. looked.py lists whatever is still PENDING.
+                new = not os.path.exists(args.record)
+                with open(args.record, "a", encoding="utf-8") as fh:
+                    if new:
+                        fh.write("# document\tpage\tdiffers%\timage\tverdict\tnote\n")
+                    fh.write("%s\t%d\t%.1f\t%s\tPENDING\t\n" % (args.doc, i + 1, share, name))
 
             name = os.path.join(dest, "page-%02d.png" % (i + 1))
             sheet.save(name)
