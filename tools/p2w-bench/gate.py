@@ -120,14 +120,18 @@ def big_shapes(path):
         if sp is None: continue
         sf = sp.find(A + 'solidFill')
         if sf is None: continue
-        # A large solid fill is a block over the page unless it is the page itself.
-        if w * h > 3000 and w < 580 and h < 820:
+        # A block is a solid fill that is not the page itself. The old test was
+        # "bigger than 3000 pt2 and smaller than 580x820" - 3000 picked by hand, and the
+        # 580x820 pair a hard-coded A4 that would misjudge a Letter page or a landscape
+        # one. The page's own size is known here, so the page is excluded by comparing
+        # against it and no size threshold is needed at all.
+        if not (w >= page_w - 2 and h >= page_h - 2):
             n += 1
     return n
 
 def score_one(pdf, docx):
     ref, pages = pdf_lines(pdf)
-    ours, dpages, hasbg = docx_text(docx)
+    ours, dpages, hasbg, page_w, page_h = docx_text(docx)
     refw, oursw = {}, {}
     for l in ref:
         for w in l.split(): refw[w] = refw.get(w, 0) + 1
