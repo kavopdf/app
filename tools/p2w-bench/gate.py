@@ -159,7 +159,7 @@ def score_one(pdf, docx):
     return {
         "missing": missing,
         "extra": extra,
-        "blocks": max(0, big_shapes(docx) - pdf_fills(pdf)),
+        "blocks": max(0, big_shapes(docx, page_w, page_h) - pdf_fills(pdf)),
         "nobg": 0 if hasbg else 1,
         "blank": 1 if (pages > 0 and not ours) else 0,
         "lines": len(ours),
