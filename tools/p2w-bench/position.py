@@ -1,0 +1,208 @@
+#!/usr/bin/env python3
+"""G5 - where did the text actually end up?
+
+WHY THIS EXISTS
+    Counts can stay clean while every line moves. A document can hold every word,
+    the right number of pages and the right number of lines, and still be laid out
+    somewhere other than where the PDF put it. Nothing in gate.py can see that.
+    This renders the .docx, reads back where each line landed, and compares it with
+    where the PDF drew it.
+
+WHY BOTH SIDES ARE RENDERED
+    The PDF's coordinates are the reference and are read directly. A .docx has no
+    absolute coordinates for body text - position emerges from margins, indent,
+    spacing and the flow of everything above it - so the only honest way to measure
+    where a line ended up is to lay the document out and read the result. Measuring
+    the XML instead would measure the declaration, not the position.
+
+MATCHING IS BY TEXT, NEVER BY INDEX
+    Index pairing shifts every line the moment one line is dropped, and the score
+    still looks healthy. Each PDF line is matched to a docx line with the same text,
+    and a line that finds no partner counts as a failure rather than silently
+    disappearing from the denominator.
+
+USAGE
+    python3 position.py --corpus PDF_DIR --out DOCX_DIR
+    python3 position.py --corpus PDF_DIR --out DOCX_DIR --json result.json
+    python3 position.py --corpus PDF_DIR --out DOCX_DIR --limit 20
+
+EXIT CODE
+    0  every document within tolerance
+    1  at least one document out of tolerance
+    2  the check could not run (LibreOffice or PyMuPDF missing)
+"""
+
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+
+# The tolerances are the ones agreed for a DOCX, in points. They are asymmetric on
+# purpose: x comes from an indent and can be exact, while y comes from the line height
+# the layout engine chooses and drifts a little more.
+TOL_X_PT = 1.5
+TOL_Y_PT = 3.0
+# A line must clear this share of lines to count as a pass for its document.
+PASS_SHARE = 0.90
+
+
+def norm(text):
+    return re.sub(r"\s+", " ", text or "").strip().lower()
+
+
+def pdf_lines(path):
+    """(text, x, y) for every line the PDF drew, in reading order."""
+    import pymupdf
+    out = []
+    with pymupdf.open(path) as doc:
+        for page in doc:
+            for block in page.get_text("dict")["blocks"]:
+                for line in block.get("lines", []):
+                    spans = line.get("spans") or []
+                    text = "".join(s.get("text", "") for s in spans)
+                    if not norm(text):
+                        continue
+                    x0, y0, x1, y1 = line["bbox"]
+                    out.append((text, x0, (y0 + y1) / 2.0))
+    return out
+
+
+def render(docx_path, workdir):
+    outdir = os.path.join(workdir, "r")
+    os.makedirs(outdir, exist_ok=True)
+    try:
+        subprocess.run(["soffice", "--headless", "--convert-to", "pdf",
+                        "--outdir", outdir, docx_path],
+                       check=True, capture_output=True, timeout=240)
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
+        return None
+    pdf = os.path.join(outdir, os.path.basename(docx_path)[:-5] + ".pdf")
+    return pdf if os.path.exists(pdf) else None
+
+
+def score_document(pdf_path, docx_path, workdir):
+    rendered = render(docx_path, workdir)
+    if not rendered:
+        return {"error": "could not render the docx"}
+
+    ref = pdf_lines(pdf_path)
+    got = pdf_lines(rendered)
+    if not ref:
+        return {"error": "the PDF has no text"}
+
+    # text -> list of positions, so each docx line is consumed once
+    pool = {}
+    for text, x, y in got:
+        pool.setdefault(norm(text), []).append((x, y))
+
+    within = 0
+    out_of = []
+    unmatched = 0
+    for text, x, y in ref:
+        key = norm(text)
+        candidates = pool.get(key)
+        if not candidates:
+            unmatched += 1
+            out_of.append((text[:40], "no matching line", 0, 0))
+            continue
+        # take the candidate closest in y, which is the one this line really is
+        best_i, best_d = 0, None
+        for i, (cx, cy) in enumerate(candidates):
+            d = abs(cy - y)
+            if best_d is None or d < best_d:
+                best_i, best_d = i, d
+        cx, cy = candidates.pop(best_i)
+        dx, dy = cx - x, cy - y
+        if abs(dx) <= TOL_X_PT and abs(dy) <= TOL_Y_PT:
+            within += 1
+        else:
+            out_of.append((text[:40], "%.1f,%.1f" % (dx, dy), dx, dy))
+
+    total = len(ref)
+    return {
+        "lines": total,
+        "within": within,
+        "unmatched": unmatched,
+        "share": within / total if total else 0.0,
+        "worst": sorted(out_of, key=lambda r: -(abs(r[2]) + abs(r[3])))[:5],
+        "ok": (within / total if total else 0.0) >= PASS_SHARE,
+    }
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--corpus", required=True)
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--json")
+    ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--verbose", action="store_true")
+    args = ap.parse_args()
+
+    if shutil.which("soffice") is None:
+        print("LibreOffice is not installed, so the docx side cannot be rendered")
+        return 2
+    try:
+        import pymupdf  # noqa: F401
+    except ImportError:
+        print("PyMuPDF is not installed")
+        return 2
+    if not os.path.isdir(args.corpus) or not os.path.isdir(args.out):
+        print("corpus and out must both be folders")
+        return 2
+
+    names = sorted(f for f in os.listdir(args.corpus) if f.lower().endswith(".pdf"))
+    if args.limit:
+        names = names[:args.limit]
+
+    results = []
+    workdir = tempfile.mkdtemp(prefix="position-")
+    for name in names:
+        base = name[:-4]
+        docx = os.path.join(args.out, base + ".docx")
+        if not os.path.isfile(docx):
+            results.append({"doc": base, "ok": False, "error": "no docx"})
+            continue
+        try:
+            r = score_document(os.path.join(args.corpus, name), docx, workdir)
+        except Exception as exc:
+            r = {"error": "check failed: " + str(exc)}
+        r["doc"] = base
+        results.append(r)
+
+    failed = [r for r in results if not r.get("ok")]
+    scored = [r for r in results if "share" in r]
+    overall = (sum(r["within"] for r in scored) /
+               max(1, sum(r["lines"] for r in scored))) if scored else 0.0
+
+    for r in results:
+        if r.get("ok"):
+            if args.verbose:
+                print("OK   %-44s %.1f %% of %d lines" %
+                      (r["doc"][:44], r["share"] * 100, r["lines"]))
+        else:
+            print("FAIL %-44s %s" % (r["doc"][:44], r.get("error", "")))
+            if "share" in r:
+                print("       %.1f %% of %d lines within tolerance" %
+                      (r["share"] * 100, r["lines"]))
+                for text, delta, _dx, _dy in r["worst"]:
+                    print("         %-40s off by %s pt" % (text, delta))
+
+    print("")
+    print("documents: %d   failed: %d   lines within tolerance: %.1f %%"
+          % (len(results), len(failed), overall * 100))
+    print("tolerance: x %.1f pt, y %.1f pt; a document passes at %.0f %%"
+          % (TOL_X_PT, TOL_Y_PT, PASS_SHARE * 100))
+
+    if args.json:
+        with open(args.json, "w") as fh:
+            json.dump(results, fh, indent=1)
+
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
