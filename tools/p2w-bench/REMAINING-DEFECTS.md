@@ -328,3 +328,36 @@ a sidebar legitimately uses one, and the gate says which document and how many s
 two cases can be told apart.
 
 **Tries: 0 of 3.**
+
+
+### D-05  The blocks count compares two populations that are not the same thing
+
+**Severity: a measurement defect, not a document defect. It makes one of the seven
+G2 numbers untrustworthy.**
+
+`gate.py` scores `blocks` as `big_shapes(docx) - pdf_fills(pdf)`.
+
+    big_shapes   counts solid fills inside wps:wsp shapes in the docx XML
+    pdf_fills    counts filled areas from PyMuPDF's get_drawings() in the PDF
+
+Those are not the same population. The writer emits a docx shape for every fill the PDF
+draws, and also for things the PDF does not express as a drawing - a table cell
+background, a paragraph shading, a shape whose fill comes from a style. So the
+difference is positive on almost every document and means nothing.
+
+The 3000 pt2 floor in both functions was hiding this: it dropped the small fills on both
+sides, which by luck left the two counts close enough that the difference stayed at 0 on
+the corpus. On 7 Nov I removed the floor while replacing the hard-coded 580x820 A4 with
+the page's own size, and 179 documents went from blocks 0 to blocks N. The floor was not
+protecting anything real - it was masking a metric that does not measure what it claims.
+
+**Do not fix this by tuning the floor.** The fix is to stop counting and start matching:
+for each filled region the docx draws, ask whether the PDF drew a filled region at the
+same place with the same colour, which is a positional comparison like G5's, and report
+how many docx fills have no partner in the PDF. That is a real number, and 0 is the only
+correct value.
+
+Until then the floor stays where it was, because a metric that is understood to be weak
+is better than a metric that fires on 179 documents for a reason nobody can act on.
+
+**Tries: 0 of 3.**

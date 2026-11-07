@@ -93,10 +93,11 @@ def pdf_fills(path):
             for dr in d.load_page(i).get_drawings():
                 if dr.get("fill") is not None and dr.get("rect") is not None:
                     r = dr["rect"]
-                    # The page's own fill is the page, not a block. Compared
-                    # against this page's rect, so a Letter or landscape page is
-                    # judged by its own size and not by a hard-coded A4.
+                    # Same two conditions as the docx side, or the difference between
+                    # the two counts means nothing. See D-05 in REMAINING-DEFECTS.md.
                     pr = d.load_page(i).rect
+                    if r.width * r.height <= 3000:
+                        continue
                     if not (r.width >= pr.width - 2 and r.height >= pr.height - 2):
                         n += 1
         d.close()
@@ -135,14 +136,22 @@ def big_shapes(path, page_w, page_h):
         if sp is None: continue
         sf = sp.find(A + 'solidFill')
         if sf is None: continue
-        # A block is a solid fill that is not the page itself. The old test was "bigger
-        # than 3000 pt2 and smaller than 580x820": 3000 picked by hand, and 580x820 a
-        # hard-coded A4 that would misjudge a Letter or a landscape page. This document's
-        # own page size is read from its pgSz, so the page is excluded by comparing
-        # against it and no size threshold is needed at all.
-        if page_w and page_h:
-            if w >= page_w - 2 and h >= page_h - 2:
-                continue
+        # Two conditions, and both are load-bearing.
+        #
+        # 3000 pt2 is a floor: a fill that small is a rule or a dot, not a block over the
+        # page. Removing it made every small fill count and 179 documents went from
+        # blocks 0 to blocks N, so it stays - see D-05 in REMAINING-DEFECTS.md, where the
+        # deeper problem is recorded: big_shapes and pdf_fills count different
+        # populations, and this floor is what keeps their difference near zero. That is
+        # masking, not measuring, and it needs a positional match instead.
+        #
+        # The second condition used to be "w < 580 and h < 820", a hard-coded A4 that
+        # would misjudge a Letter or a landscape page. It now compares against this
+        # document's own pgSz.
+        if w * h <= 3000:
+            continue
+        if page_w and page_h and w >= page_w - 2 and h >= page_h - 2:
+            continue
         n += 1
     return n
 
