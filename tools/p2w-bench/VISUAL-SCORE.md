@@ -169,3 +169,18 @@ reverted. See "Table height" in REMAINING-DEFECTS.md.
 | 2026-11-07 | 315_gazette_notification | FAIL | moved:The Gazette of India 55.9 pt down; order 29.1 % - three columns stack into one flow, the masthead lands after column 1 |
 | 2026-11-07 | 316_contract_with_schedules | PASS | four clauses and the SCHEDULE C table on the PDF page, 1/1 pages. shapes was claimed and REFUTED (1 on both sides) |
 | 2026-11-07 | 317_rti_response | PASS | heading, date block, five numbered points and the enclosure line all in place |
+| 2026-11-08 | 300_prescription_rx | FAIL | moved:Dr. Meera Krishnan 270.1 pt - the signature block is a flowed paragraph and the page's own 270 pt gap is clamped to 120 |
+| 2026-11-08 | 301_lab_report_panel | FAIL | moved:ANANYA RAO 26.2 pt down; order 78.7 % - the four-column header band's values are absorbed into the results table as an extra header row |
+| 2026-11-08 | 302_radiology_report | FAIL | moved:Dr. A. Bhat, MD, DNB (Radiodiagnosis) 231.5 pt up - the signature block, the same clamped-gap class |
+| 2026-11-08 | 303_discharge_summary | FAIL | breaks:WARNING SIGNS (the PDF's line ends at 'needed', no render line does); order 88.5 %, 25 rows against 27 |
+| 2026-11-08 | 304_package_insert_small_print | PASS | every heading and line break on the page, 0.4 % of pixels differ |
+| 2026-11-08 | 305_vaccination_certificate | FAIL | moved:This is a computer generated certificate 351.8 pt up; order 47.1 % |
+| 2026-11-08 | 306_clinical_protocol_synopsis | PASS | both tables, every row and every tick column on the PDF layout |
+| 2026-11-08 | 310_court_judgment | PASS | all eight numbered paragraphs and the JUDGE block on the page |
+| 2026-11-08 | 311_fir_police_form | FAIL | moved:Mobile 91.8 pt - the label is welded into the address cell (2 in the PDF, 1 in the render); order 90.2 % |
+| 2026-11-08 | 312_affidavit_stamp_paper | PASS | stamp box, five paragraphs, DEPONENT and the notary seal in place. order 60.9 % and emphasis 18/20 are measurement bugs - the eye passed, so the eye decides |
+| 2026-11-08 | 313_power_of_attorney | PASS | every paragraph, the SCHEDULE and both signature rules on the page |
+| 2026-11-08 | 314_tender_rfp_boq | FAIL | moved:Grand total -20.7 pt - both tables sit high because the model's table height is short |
+| 2026-11-08 | 315_gazette_notification | FAIL | moved:The Gazette of India 55.9 pt down; order 29.1 % - three columns stack into one flow |
+| 2026-11-08 | 316_contract_with_schedules | PASS | four clauses and the SCHEDULE C table on the page; shapes was claimed and REFUTED (1 on both sides) |
+| 2026-11-08 | 317_rti_response | PASS | heading, date block, five numbered points and the enclosure line in place |

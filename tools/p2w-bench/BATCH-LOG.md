@@ -333,3 +333,39 @@ notary box) is emitted 72 to 352 pt above where the page drew it, because a gap 
 120 pt is clamped. The evidence for each is in REMAINING-DEFECTS.md. 315 is its own defect
 (three columns stacked). 304's emphasis failure is a measurement artefact of half-point
 rounding, not a document defect, and is written up there too.
+
+## 8 Nov 2026 — v3 batch 1 (300-317), the first batch of the full re-process
+
+All 208 documents are being taken again from the first one, because the 70 done earlier were
+converted with tools that had no verifier and no eye-first rule, and a pass from them means
+nothing. This is document 1 to 15 of 208.
+
+Pipeline run in order: convert 75 v3 documents (23 s, 0 failed), G2 against base208.json
+("no document got worse"), 15 side-by-side pages written, every one of the 15 images opened
+and a verdict recorded BEFORE visual.py was allowed to print a number, then emit -> verify ->
+combine on the verified set.
+
+15 findings: 14 verified, 1 refuted, 0 unverifiable. 7 PASS, 8 FAIL.
+
+**The verifier earned its keep twice in one batch.** `moved:Dr. A. Bhat, MD, DNB (Radiology)`
+came back UNVERIFIABLE because the page says "(Radiodiagnosis)" - I had read the word off the
+image. `count:This is a computer generated certificate` came back REFUTED: 1 on both sides, not
+two as I thought I saw. Both were reworded and both then verified. A fix applied on either of
+the first readings would have edited a page that was already right.
+
+**Two documents fail on the eye and pass on the numbers: 300 and 302.** The eight questions do
+not measure the vertical position of a flowed paragraph - they measure reading order, overlap,
+overflow, images, tables, charts, codes and emphasis. A signature block lifted 270 pt up the
+page keeps its order, keeps inside the page, and overlaps nothing. That is a blind spot in the
+measurement layer, not in the document, and it is why the eye is the verdict.
+
+**Tried and rejected: per-row table heights.** The right shape of fix for 314 - every row gets
+what its own cells need instead of the average - and measurably wrong: on the 62 documents
+whose row heights it changed, 23 got worse, 7 better, worst 60.6 % -> 9.6 %. G2 passed on all
+208 because the damage is vertical and G2 does not look at vertical. Reverted, baseline
+untouched, 1 of 3 tries used. The row's own pitch is not in the model and cannot be guessed
+from character counts.
+
+**312 is a tool defect, not a document defect.** The eye passed it; the numbers failed it on
+reading order 60.9 % and emphasis 18 of 20. Recorded in REMAINING-DEFECTS.md so the final sweep
+repairs the measurement rather than the page.

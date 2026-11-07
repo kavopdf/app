@@ -911,3 +911,45 @@ within the row tolerance keep their x order, is the narrower change and has not 
 own even though the three tabs before it are correct and 430 is inside the page. A print
 inside `sameRow` for that pair never fires, so the two are not adjacent in `lines` at all and
 the cut is upstream of `sameRow` - in the segmentation that builds `lines`. Not yet found.
+
+---
+
+## v3 corpus — batch 1 (300-317), re-processed 8 Nov under the verifier
+
+Every document re-converted, re-rendered, every page opened and looked at, every finding
+checked against the PDF by verify.py, and the decision made on the verified set. 7 PASS,
+8 FAIL. 14 of the 15 findings held; the one refutation (316's shapes) was correctly not fixed.
+
+| Doc | Verified finding | Cause | Tries |
+|---|---|---|---|
+| **300_prescription_rx** | moved:Dr. Meera Krishnan 270.1 pt | clamped gap: the page's own 270 pt of white space between the advice block and the signature block is given up at the 120 pt ceiling. The page carries a table, so `pageFits` returns false and the gaps stay clamped. | 0 of 3 |
+| **302_radiology_report** | moved:Dr. A. Bhat, MD, DNB (Radiodiagnosis) 231.5 pt | same class, same cause | 0 of 3 |
+| **305_vaccination_certificate** | moved:This is a computer generated certificate 351.8 pt | same class; order 47.1 % is a second symptom of the same lift | 0 of 3 |
+| **301_lab_report_panel** | moved:ANANYA RAO 26.2 pt; order 78.7 % | the four-column label/value band is absorbed into the results table as an extra header row: the render's table has 33 rows against the PDF's 28, and the real header row is pushed down | 0 of 3 |
+| **311_fir_police_form** | moved:Mobile 91.8 pt; order 90.2 % | the address cell overruns its column in the PDF itself, so its tail lands in the next cell and the Mobile label is welded into the address string | 0 of 3 |
+| **314_tender_rfp_boq** | moved:Grand total -20.7 pt | table height: the model's extent over 9 rows is 13.15 pt a row and the page drew 15.0, so the drift grows 1.1 pt a row to 20.7 pt at the last row | 1 of 3, see below |
+| **315_gazette_notification** | moved:The Gazette of India 55.9 pt; order 29.1 % | three columns stack into one flow - unchanged, its own defect | 0 of 3 |
+| **303_discharge_summary** | breaks:WARNING SIGNS; order 88.5 % | the render breaks the warning line at a different word and carries two rows the PDF does not have; the substituted face is wider than the page's | 0 of 3 |
+
+**Tried 8 Nov and rejected: per-row table heights.** Every row was given the average of the
+page's extent, so a row needing more lines than the average grew past it and every line below
+the table carried the error. Each row was given what its own cells need, with the page's slack
+shared over the rows that could take it. It is the right shape of fix and it is NOT the fix:
+measured on the 62 documents whose row heights it changed, 23 got worse and 7 better, worst
+`balance-sheet-two-columns-of-figures` 60.6 % -> 9.6 % of lines in tolerance and
+`73_marksheet_subject_marks_grade` 54.7 % -> 6.2 %. G2 passed on all 208 - the damage is
+vertical, and G2 does not measure vertical. The row's own pitch is not in the model: `Table`
+carries `top`, `bottom`, `colX`, `cellX`, `cellR`, `sizes` and `colors`, and no per-row y, so a
+row height can only be guessed from the text. Guessing it from character counts over-estimates
+badly. Reverted; the baseline is untouched. 1 of 3 used.
+
+**Tried 7 Nov and still rejected: spending the page's white space on a page with a table.**
+`pageFits` returns false the moment a page carries a table, and every document in this batch
+carries one, which is why 300, 302 and 305 are still clamped. The reason is in the code: with
+table pages spending their gaps, 15 documents went from one sheet to two and 390 fell to 0.5 %
+of lines in tolerance. Blocked on the table height above, exactly as recorded.
+
+**The measurement that is wrong, not the document: 312_affidavit_stamp_paper.** The eye passed
+it and the numbers failed it - order 60.9 %, emphasis 18 of 20 lines "lost" bold. Both are
+tool bugs, not defects: the page sets most of its lines in a face the emphasis question cannot
+see. Recorded here so the final sweep repairs the tool rather than the document.
