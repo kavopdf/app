@@ -29,7 +29,7 @@ import os
 import sys
 
 
-def combine(record, visual_json, only=""):
+def combine(record, visual_json, only="", verified_json=""):
     """The document verdict, with the eye first.
 
     The eye caught four problems out of four on 7 Nov. The computed questions caught
@@ -53,8 +53,24 @@ def combine(record, visual_json, only=""):
             continue
         eye.setdefault(f[0], []).append({"page": int(f[1]), "verdict": f[4].strip().upper()})
 
+    # Where the verified findings are available, the decision is made on those. A raw
+    # benchmark number and a raw eight-question verdict are claims; only the verified ones
+    # have been checked against the PDF, and a comparison between two unchecked claims is
+    # a comparison between two opinions.
+    verified = {}
+    if verified_json and os.path.isfile(verified_json):
+        for f in json.load(open(verified_json, encoding="utf-8")):
+            if f.get("verdict") != "VERIFIED":
+                continue
+            verified.setdefault(f.get("document"), []).append(f)
+
     numbers = {}
-    if visual_json and os.path.isfile(visual_json):
+    if verified_json and os.path.isfile(verified_json):
+        # only VERIFIED measure findings count against a document
+        for doc, fs in verified.items():
+            measure = [f for f in fs if f.get("kind") == "measure"]
+            numbers[doc] = not measure
+    elif visual_json and os.path.isfile(visual_json):
         for r in json.load(open(visual_json, encoding="utf-8")):
             numbers[r.get("doc")] = bool(r.get("ok"))
 
@@ -68,6 +84,15 @@ def combine(record, visual_json, only=""):
         pages = eye[doc]
         pending = [p for p in pages if p["verdict"] == "PENDING"]
         eye_fail = [p for p in pages if p["verdict"] == "FAIL"]
+        if verified:
+            # The eye's FAIL counts only when a claim on that page was verified. An eye
+            # finding that the verifier refuted is not a defect, and counting it would
+            # make the eye look more reliable than it is.
+            vpages = {f.get("page") for f in verified.get(doc, [])
+                      if f.get("kind") == "visual"}
+            eye_fail = [p for p in eye_fail if p["page"] in vpages]
+            if eye_fail:
+                pending = []
         eye_pass = not pending and not eye_fail
         num_pass = numbers.get(doc)
         if num_pass is None:
@@ -112,10 +137,14 @@ def main():
     ap.add_argument("--combine", action="store_true",
                     help="the document verdict, eye first, numbers as evidence")
     ap.add_argument("--visual-json", default="")
+    ap.add_argument("--verified", default="",
+                    help="verify.py --json. When given, the decision is made on"
+                         " findings that were CHECKED against the PDF, not on"
+                         " the raw tool output")
     args = ap.parse_args()
 
     if args.combine:
-        return combine(args.record, args.visual_json, args.document)
+        return combine(args.record, args.visual_json, args.document, args.verified)
     if not os.path.isfile(args.record):
         print("no record at %s - no page has been looked at yet" % args.record)
         return 2

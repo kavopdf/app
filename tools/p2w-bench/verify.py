@@ -285,6 +285,9 @@ def main():
     ap.add_argument("--corpus", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--rendered", required=True)
+    ap.add_argument("--json", default="",
+                    help="write the per-finding verdicts here, so the decision"
+                         " can be made on verified data and not on raw tool output")
     a = ap.parse_args()
 
     try:
@@ -319,10 +322,14 @@ def main():
         return 2
 
     verified = refuted = unverifiable = 0
+    decided = []
     for fid, doc, page, kind, claim in findings:
         pdf = os.path.join(a.corpus, doc + ".pdf")
         rend = os.path.join(a.rendered, doc + ".pdf")
         if not os.path.isfile(pdf) or not os.path.isfile(rend):
+            decided.append({"id": fid, "document": doc, "page": int(page), "kind": kind,
+                            "claim": claim, "verdict": "UNVERIFIABLE",
+                            "why": "a file is missing"})
             print("UNVERIFIABLE  %-4s %s p%s  %s (a file is missing)"
                   % (fid, doc[:34], page, claim[:44]))
             unverifiable += 1
@@ -331,6 +338,10 @@ def main():
             with pymupdf.open(pdf) as r, pymupdf.open(rend) as g:
                 pi = max(0, int(page) - 1)
                 if pi >= r.page_count or pi >= g.page_count:
+                    decided.append({"id": fid, "document": doc, "page": int(page),
+                                    "kind": kind, "claim": claim,
+                                    "verdict": "UNVERIFIABLE",
+                                    "why": "page not on both sides"})
                     print("UNVERIFIABLE  %-4s %s p%s  %s (page not on both sides)"
                           % (fid, doc[:34], page, claim[:44]))
                     unverifiable += 1
@@ -342,11 +353,16 @@ def main():
                 else:
                     verdict, why = check_visual(claim, rlines, glines, rp, gp)
         except Exception as exc:
+            decided.append({"id": fid, "document": doc, "page": int(page), "kind": kind,
+                            "claim": claim, "verdict": "UNVERIFIABLE",
+                            "why": type(exc).__name__})
             print("UNVERIFIABLE  %-4s %s p%s  %s (%s)"
                   % (fid, doc[:34], page, claim[:44], type(exc).__name__))
             unverifiable += 1
             continue
 
+        decided.append({"id": fid, "document": doc, "page": int(page), "kind": kind,
+                        "claim": claim, "verdict": verdict, "why": why})
         mark = {"VERIFIED": "VERIFIED", "REFUTED": "REFUTED",
                 "UNVERIFIABLE": "UNVERIFIABLE"}[verdict]
         print("%-12s  %-4s %-34s p%-2s %-6s %-28s %s"
@@ -357,6 +373,10 @@ def main():
             refuted += 1
         else:
             unverifiable += 1
+
+    if a.json:
+        import json as _json
+        _json.dump(decided, open(a.json, "w"), indent=1)
 
     print("")
     print("%d findings: %d verified, %d refuted, %d unverifiable"
