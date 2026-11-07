@@ -132,3 +132,25 @@ One UNVERIFIABLE: `wraps:Board meeting`. The wraps check needs to follow the nee
 through the render, and the render splits the cell it is looking for - which is the defect. A
 claim that describes a split cannot be followed across the split. The page is not left on this
 claim: `pagecount` and `order` both verify on it.
+
+## Run 8 Nov, b80 batch 1 (01-20)
+
+32 findings, 22 verified, 1 refuted, 9 unverifiable. moved +9 (8 verified, 1 refuted), wraps +1
+(refuted), missing +1 (unverifiable), extra +1 (unverifiable), shapes +1 (unverifiable), order
++15 (all verified), pagecount +1 (verified), overlap 0.
+
+The nine unverifiable claims are one pattern, and it is the claim that is wrong, not the page:
+every rotated stamp is written by the writer as several lines ("AUTHORISED SIGNATORY" and
+"SUNRISE FASTENERS" are two lines of one stamp), so a claim that quotes the whole stamp as one
+string matches neither side. `moved:SANCTIONED`, one line of the stamp, verifies. The rule for
+the next run: a stamp claim quotes ONE line of the stamp, never the whole block.
+
+The one refuted claim is mine, not the document's: `wraps:Branch Manager, Kunigal Branch` on
+11_stamp_with_signature_image - both sides carry that line twice, so there was nothing to fix.
+This is the second time in two runs that a wraps claim read off a side-by-side has been refuted
+with "2 line(s) on both sides"; the eye is judging the stamp's position and blaming the wrap.
+
+`order` verified on 15 of 15 documents where it was claimed, including every document the eye
+passed. On 05 the eye passed and order read 62.5 %; that is the seal's per-character text, the
+measurement blind spot already recorded, and it is the only eye/numbers disagreement in the
+batch.

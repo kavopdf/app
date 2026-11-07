@@ -1238,3 +1238,51 @@ of lines in tolerance. Blocked on the table height above, exactly as recorded.
 it and the numbers failed it - order 60.9 %, emphasis 18 of 20 lines "lost" bold. Both are
 tool bugs, not defects: the page sets most of its lines in a face the emphasis question cannot
 see. Recorded here so the final sweep repairs the tool rather than the document.
+
+## b80 corpus — batch 1 (01-20), 8 Nov
+
+Twenty documents, 22 pages, every page opened before any number was read, 32 findings, 22
+verified, 1 refuted, 9 unverifiable. Seven pass, thirteen do not. All thirteen fails fall into
+two classes, and neither is new.
+
+### RECORDED-UNFIXABLE — the rotated stamp (01, 02, 03, 04, 08, 09, 10, 13)
+
+`moved:AUTHORISED SIGNATORY` 44.5 pt, `moved:GOODS RECEIVED IN ORDER`, `moved:INTERNAL AUDIT
+USE ONLY`, `moved:DUPLICATE ISSUED` -186.5 pt, `moved:PAID` -14.2 pt, `moved:FY 2024-25`
+17.0 pt, `moved:ORDER CONFIRMED`, `moved:प्रमाणित प्रतिलिपि` -17.0 pt. Every one of these is a
+stamp the page draws on a rotated baseline at 15, 90, 180 or -15 degrees; the writer anchors an
+axis-aligned box at the line's origin, so the text is upright and offset by the rotation.
+
+The one try this class is allowed has been spent, twice over: the code comment at `anchor()`
+records the attempt to place the box on the rotated line's bounding area, which moved file 08's
+two stamps apart and put file 01's AUTHORISED SIGNATORY somewhere else again, and it was
+reverted. OOXML has no text rotation a LibreOffice render honours. Recorded, not retried.
+
+What is NOT the rotation and may still be worth a try later: on 08 and 11 the stamp sits to the
+RIGHT of the page's own box by 10-20 pt even in x, and on 12 page 2 the stamp's text lands 56.4
+pt below the page's while its box is empty. That is a placement question, not a rotation one.
+0 of 3 used on the x placement.
+
+### OPEN — the same-baseline columns are still one flow, and it is what makes the page not fit
+
+06 (`moved:NET AMOUNT` 120.9 pt), 07 (`moved:Grand Total` 7.5 pt), 20 (`pagecount` 1 in / 2 out,
+`moved:I have read and understood` 101.4 pt), 12 (body 136.0 pt down on both pages). On 06 the
+page draws two columns under the table - "Amount in words / Pharmacist / Store timing /
+Prescription" on the left and "Sub Total / Discount / CGST / SGST / NET AMOUNT" on the right -
+and the model hands them over interleaved, one line from each, so the flow spends nine line
+pitches where the page spent five. On 20 each numbered item is a marker at x=64 and a paragraph
+at x=100 on the same baseline, and they arrive as two paragraphs, so every item takes two lines.
+
+This is D-07, and it is the whole reason these pages then lose their white space as well: the
+interleaved flow is taller than the sheet, `pageFits` returns false, the page falls back to the
+120 pt clamp, and the footer lands 110-275 pt above where the page draws it (measured on every
+document in this batch). Fixing the columns fixes the footer at the same time; fixing the footer
+alone would only hide it. **Tries: 0 of 3.** The signed-gap and sort attempts recorded under
+D-07 were measured (+4 documents, -1) and reverted; do not repeat them.
+
+### Blind spot to record, not a document defect
+
+15_stamp_on_scanned_page passes on the tool's verdict: its two stamp lines land within 2.5 pt.
+The eye failed it - the page draws a red box around the stamp and the box and its rotation are
+gone - but `shapes` came back UNVERIFIABLE, so nothing verified and the document passes. The
+same class as 13 above. Recorded so the final sweep does not read this row as a clean pass.

@@ -228,3 +228,23 @@ reverted. See "Table height" in REMAINING-DEFECTS.md.
 | 2026-11-08 | 415_inline_images | FAIL | moved:The checkerboard above is an inline image 153 pt - the inline image is gone and its caption has risen into its place |
 | 2026-11-08 | 417_rotate180_and_mirrored | FAIL | missing:Page 2 - mirrored text - page 1 is right, upright as /Rotate should give; page 2's mirrored line comes out a garbled reversal |
 | 2026-11-08 | 416_many_tiny_pages | PASS | 300 pages in and 300 out, every record's heading, serial/status/batch line and note on the PDF baselines. The moved claim I first recorded was my bbox-top read, not the baseline; the verifier put it at 1.7 pt |
+| 2026-11-08 | 01_stamp_rotated_15deg_upright | FAIL | moved:AUTHORISED SIGNATORY 44.5 pt and the footer 136.2 pt high - the 15-degree stamp is written axis-aligned, the settled rotated-stamp class |
+| 2026-11-08 | 02_stamp_rotated_15deg_upleft | FAIL | moved:GOODS RECEIVED IN ORDER - the stamp is axis-aligned and the footer sits 113.5 pt high; order 91.5 % |
+| 2026-11-08 | 03_stamp_vertical_90deg | FAIL | moved:INTERNAL AUDIT USE ONLY - the 90-degree stamp is axis-aligned and every line below it 189.1 pt down; order 16.0 % of 28 rows |
+| 2026-11-08 | 04_stamp_180deg_upside_down | FAIL | moved:DUPLICATE ISSUED -186.5 pt - the 180-degree stamp is written upright and the block below it 105.6 pt down |
+| 2026-11-08 | 05_round_company_seal_curved_text | PASS | seal, curved text and body on the PDF rows. order 62.5 % counts the seal's per-character text - measurement, the eye passed |
+| 2026-11-08 | 06_rect_paid_stamp_red_transparent | FAIL | moved:NET AMOUNT 120.9 pt - the totals column is interleaved with the left column into one flow, so the page no longer fits and its gaps are clamped |
+| 2026-11-08 | 07_stamp_over_table | FAIL | moved:Grand Total 7.5 pt and the footer 181.2 pt high - the page's gaps are clamped; the eye failed, no measure finding |
+| 2026-11-08 | 08_two_overlapping_stamps | FAIL | moved:PAID -14.2 pt - both stamps sit right of where the page draws them, and the footer 274.7 pt high |
+| 2026-11-08 | 09_stamp_font_not_embedded | FAIL | moved:FY 2024-25 17.0 pt - the stamp is drawn from the non-embedded face and sits right and lower than the page's |
+| 2026-11-08 | 10_stamp_as_image | FAIL | moved:ORDER CONFIRMED - the image stamp is placed off the page's box and the page's gaps are clamped, footer 195.2 pt high |
+| 2026-11-08 | 11_stamp_with_signature_image | FAIL | moved:SANCTIONED - the stamp sits right of the page's and the footer 158.6 pt high. My wraps claim was REFUTED: both sides carry two lines |
+| 2026-11-08 | 12_stamp_across_page_break | FAIL | moved:SUB-REGISTRAR 56.4 pt on page 2; the body sits 136.0 pt down on both pages and the stamp box is empty on page 2 |
+| 2026-11-08 | 13_stamp_non_english | FAIL | moved:प्रमाणित प्रतिलिपि -17.0 pt - the Devanagari stamp sits right of the page's and smaller; footer 192.2 pt high |
+| 2026-11-08 | 14_stamp_chars_positioned_td | PASS | the per-character positioned stamp text and the six-row table on the PDF rows; order 96.4 % |
+| 2026-11-08 | 15_stamp_on_scanned_page | PASS | the stamp's two lines land within 2.5 pt. The box's rotation is gone, but the shapes claim came back UNVERIFIABLE - recorded as a blind spot, not a pass of the eye |
+| 2026-11-08 | 16_right_aligned_amounts_txtpos | PASS | ledger rows, right-aligned amounts and the closing-balance sentence on the PDF rows |
+| 2026-11-08 | 17_three_column_widths_txtpos | PASS | trip sheet's three column groups and the revenue column at their PDF widths |
+| 2026-11-08 | 18_centred_heading_left_body_txtpos | PASS | centred head, five numbered items and the footer on the PDF lines |
+| 2026-11-08 | 19_hanging_indent_txtpos | PASS | hanging-indent clauses and the approval line on the PDF lines |
+| 2026-11-08 | 20_numbered_list_separate_column_txtpos | FAIL | pagecount 1 in / 2 out and moved:I have read and understood 101.4 pt - every numbered item is two paragraphs, the marker column and the text column |
