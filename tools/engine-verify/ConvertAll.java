@@ -15,12 +15,36 @@ import java.util.Arrays;
  * JVM per document is 90 % of the wall time when the conversion itself is 0.3 s.
  */
 public class ConvertAll {
+    /** The asset folder, looked for where it actually is rather than assumed. */
+    private static File findAssets() {
+        String[] candidates = {
+                "libs/aar/assets",
+                "tools/engine-verify/libs/aar/assets",
+                "../libs/aar/assets",
+        };
+        for (String c : candidates) {
+            File f = new File(c);
+            if (f.isDirectory()) return f;
+        }
+        return null;
+    }
+
     public static void main(String[] a) throws Exception {
         if (a.length < 2) {
             System.err.println("usage: ConvertAll <inDir> <outDir>");
             System.exit(2);
         }
-        File assets = new File(System.getProperty("p2w.assets", "libs/aar/assets"));
+        // The font resources are what make text extraction work at all. With the wrong
+        // path PDFBox returns no glyphs and every document converts to an empty file that
+        // still reports success - a rebuild on 7 Nov produced 208 blank documents and said
+        // "done: 208 files, 0 failed". So the path is found rather than assumed.
+        String configured = System.getProperty("p2w.assets");
+        File assets = configured != null ? new File(configured) : findAssets();
+        if (assets == null || !assets.isDirectory()) {
+            System.err.println("no PDFBox asset folder. Run this from tools/engine-verify, "
+                    + "or pass -Dp2w.assets=/path/to/libs/aar/assets");
+            System.exit(2);
+        }
         PDFBoxResourceLoader.init(new android.content.Context(
                 new android.content.res.AssetManager(assets)));
 
@@ -38,6 +62,15 @@ public class ConvertAll {
                 PdfToWord.classifyHeadings(r);
                 DocxWriter.write(r, new File(outDir, base + ".docx"));
                 PdfToWord.writeTxt(r, new File(outDir, base + ".txt"));
+                // An empty Result is not a conversion. It means the fonts did not load,
+                // or the page really holds nothing - and either way a .docx with no
+                // paragraphs must not be counted as a success.
+                if (r.paragraphCount() == 0) {
+                    System.err.println("EMPTY  " + in.getName()
+                            + " - no paragraphs, so this conversion did not work");
+                    bad++;
+                    continue;
+                }
                 System.out.println(base + "\tpages=" + r.report.pages
                         + "\tparagraphs=" + r.paragraphCount());
             } catch (Throwable t) {
