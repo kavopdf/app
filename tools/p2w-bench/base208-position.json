@@ -1,0 +1,9728 @@
+[
+ {
+  "lines": 83,
+  "within": 23,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.27710843373493976,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "SF/2025-26/0417  \u2022  Sunrise Fasteners Pv",
+    "0.1,-163.7",
+    0.09999847412109375,
+    -163.68923950195312
+   ],
+   [
+    "Page 1",
+    "0.2,-162.8",
+    0.1748046875,
+    -162.78927612304688
+   ],
+   [
+    "20,526.20",
+    "0.1,25.3",
+    0.086944580078125,
+    25.347259521484375
+   ],
+   [
+    "TOTAL PAYABLE",
+    "0.1,24.7",
+    0.100006103515625,
+    24.723770141601562
+   ],
+   [
+    "For SUNRISE FASTENERS PVT LTD",
+    "0.1,24.0",
+    0.100006103515625,
+    23.97674560546875
+   ]
+  ],
+  "ok": true,
+  "doc": "01_stamp_rotated_15deg_upright"
+ },
+ {
+  "lines": 88,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.011363636363636364,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "No. 8, Gandhi Bazaar Main Road",
+    "-245.9,-6.5",
+    -245.9000015258789,
+    -6.549720764160156
+   ],
+   [
+    "Basavanagudi, Bengaluru 560 004",
+    "-245.9,-6.5",
+    -245.9000015258789,
+    -6.549720764160156
+   ],
+   [
+    "No. 8, Gandhi Bazaar Main Road",
+    "246.1,-5.8",
+    246.10000610351562,
+    -5.799720764160156
+   ],
+   [
+    "Basavanagudi, Bengaluru 560 004",
+    "246.1,-5.8",
+    246.10000610351562,
+    -5.799720764160156
+   ],
+   [
+    "Anand Traders  \u2022  Challan AT/DC/2025/090",
+    "0.1,-167.0",
+    0.09999847412109375,
+    -166.98928833007812
+   ]
+  ],
+  "ok": true,
+  "doc": "02_stamp_rotated_15deg_upleft"
+ },
+ {
+  "lines": 99,
+  "within": 1,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.010101010101010102,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "1,60,412.55",
+    "0.1,181.2",
+    0.100006103515625,
+    181.15074157714844
+   ],
+   [
+    "Interest credited during the period: Rs.",
+    "0.1,180.9",
+    0.09999847412109375,
+    180.85324096679688
+   ],
+   [
+    "This is a system generated statement. Pl",
+    "0.1,180.8",
+    0.09999847412109375,
+    180.75326538085938
+   ],
+   [
+    "C/F \u2014 Closing Balance",
+    "0.1,180.3",
+    0.09999847412109375,
+    180.2507781982422
+   ],
+   [
+    "1,60,412.55",
+    "0.1,172.0",
+    0.100006103515625,
+    171.95079040527344
+   ]
+  ],
+  "ok": true,
+  "doc": "03_stamp_vertical_90deg"
+ },
+ {
+  "lines": 50,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.02,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "DUPLICATE ISSUED",
+    "-186.5,-31.0",
+    -186.5096206665039,
+    -31.046768188476562
+   ],
+   [
+    "CANCELLED",
+    "-186.5,11.5",
+    -186.50772094726562,
+    11.503219604492188
+   ],
+   [
+    "SVIT/FEE/25-26/11842  \u2022  Fee receipt  \u2022 ",
+    "0.1,-158.5",
+    0.09999847412109375,
+    -158.48928833007812
+   ],
+   [
+    "Page 1",
+    "0.2,-157.6",
+    0.1748046875,
+    -157.58932495117188
+   ],
+   [
+    "77,020.00",
+    "0.1,98.0",
+    0.100006103515625,
+    98.03826904296875
+   ]
+  ],
+  "ok": true,
+  "doc": "04_stamp_180deg_upside_down"
+ },
+ {
+  "lines": 81,
+  "within": 5,
+  "unmatched": 58,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.06172839506172839,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Sri Vinayaka Institute of Technology  \u2022 ",
+    "0.1,-264.3",
+    0.09999847412109375,
+    -264.2892150878906
+   ],
+   [
+    "Page 1",
+    "0.2,-263.4",
+    0.1748046875,
+    -263.3892517089844
+   ],
+   [
+    "Department of Computer Science and Engin",
+    "98.6,-5.3",
+    98.57034301757812,
+    -5.276218414306641
+   ],
+   [
+    "CERTIFICATE OF INTERNSHIP COMPLETION",
+    "76.6,-1.5",
+    76.60604858398438,
+    -1.5117034912109375
+   ],
+   [
+    "Ref: SVIT/CSE/INT/2025/214",
+    "0.1,-5.9",
+    0.09999847412109375,
+    -5.876224517822266
+   ]
+  ],
+  "ok": true,
+  "doc": "05_round_company_seal_curved_text"
+ },
+ {
+  "lines": 109,
+  "within": 6,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.05504587155963303,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Chandana Medicals  \u2022  Bill CM/25/8842  \u2022",
+    "0.1,-175.0",
+    0.09999847412109375,
+    -174.98928833007812
+   ],
+   [
+    "Page 1",
+    "0.2,-174.1",
+    0.1748046875,
+    -174.08932495117188
+   ],
+   [
+    "1,352.88",
+    "0.1,123.3",
+    0.103485107421875,
+    123.3472900390625
+   ],
+   [
+    "NET AMOUNT",
+    "0.1,122.7",
+    0.100006103515625,
+    122.72377014160156
+   ],
+   [
+    "72.48",
+    "0.1,121.5",
+    0.0947265625,
+    121.50028991699219
+   ]
+  ],
+  "ok": true,
+  "doc": "06_rect_paid_stamp_red_transparent"
+ },
+ {
+  "lines": 79,
+  "within": 5,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.06329113924050633,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Kaveri Textiles  \u2022  Invoice KT/JW/2025/2",
+    "0.1,-230.1",
+    0.09999847412109375,
+    -230.08926391601562
+   ],
+   [
+    "Page 1",
+    "0.2,-229.2",
+    0.1748046875,
+    -229.18930053710938
+   ],
+   [
+    "TAX INVOICE \u2014 JOB WORK",
+    "113.6,-3.9",
+    113.64990234375,
+    -3.9057273864746094
+   ],
+   [
+    "4,800.00",
+    "70.2,-5.8",
+    70.1500244140625,
+    -5.830474853515625
+   ],
+   [
+    "4,800.00",
+    "-62.9,-6.6",
+    -62.850006103515625,
+    -6.580474853515625
+   ]
+  ],
+  "ok": true,
+  "doc": "07_stamp_over_table"
+ },
+ {
+  "lines": 29,
+  "within": 7,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.2413793103448276,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Sri Lakshmi Fabrics  \u2022  Receipt SLF/PR/2",
+    "0.1,-319.3",
+    0.09999847412109375,
+    -319.28924560546875
+   ],
+   [
+    "Page 1",
+    "0.2,-318.4",
+    0.1748046875,
+    -318.3892517089844
+   ],
+   [
+    "PAYMENT RECEIPT",
+    "124.0,-3.7",
+    124.0421142578125,
+    -3.705718994140625
+   ],
+   [
+    "02-09-2025",
+    "0.8,-12.8",
+    0.84503173828125,
+    -12.77386474609375
+   ],
+   [
+    "Balance outstanding",
+    "0.1,-12.7",
+    0.09999847412109375,
+    -12.661712646484375
+   ]
+  ],
+  "ok": true,
+  "doc": "08_two_overlapping_stamps"
+ },
+ {
+  "lines": 23,
+  "within": 7,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.30434782608695654,
+  "size_share": 1.0,
+  "name_share": 0.9130434782608695,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Vijaya Prakash and Associates  \u2022  Charte",
+    "0.1,-208.5",
+    0.09999847412109375,
+    -208.48928833007812
+   ],
+   [
+    "Page 1",
+    "0.2,-207.6",
+    0.1748046875,
+    -207.58932495117188
+   ],
+   [
+    "Chartered Accountants",
+    "0.1,-9.8",
+    0.100006103515625,
+    -9.761749267578125
+   ],
+   [
+    "FY 2024-25",
+    "3.6,5.6",
+    3.6144866943359375,
+    5.590118408203125
+   ],
+   [
+    "Place: Bengaluru",
+    "0.1,-8.5",
+    0.09999847412109375,
+    -8.455459594726562
+   ]
+  ],
+  "ok": true,
+  "doc": "09_stamp_font_not_embedded"
+ },
+ {
+  "lines": 52,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.019230769230769232,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Bharat Agencies  \u2022  Order BA/SO/2025/771",
+    "0.1,-248.7",
+    0.09999847412109375,
+    -248.68923950195312
+   ],
+   [
+    "Page 1",
+    "0.2,-247.8",
+    0.1748046875,
+    -247.78927612304688
+   ],
+   [
+    "Total order value: Rs. 4,36,900.00  (Rup",
+    "0.1,23.9",
+    0.09999847412109375,
+    23.923751831054688
+   ],
+   [
+    "Delivery: 21 days from the date of this ",
+    "0.1,23.5",
+    0.09999847412109375,
+    23.500289916992188
+   ],
+   [
+    "Payment: 40% advance, 50% against profor",
+    "0.1,23.5",
+    0.09999847412109375,
+    23.500289916992188
+   ]
+  ],
+  "ok": true,
+  "doc": "10_stamp_as_image"
+ },
+ {
+  "lines": 24,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.08333333333333333,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Kaveri Grameena Bank  \u2022  Sanction KGB/AT",
+    "0.1,-212.1",
+    0.09999847412109375,
+    -212.08926391601562
+   ],
+   [
+    "Page 1",
+    "0.2,-211.2",
+    0.1748046875,
+    -211.18930053710938
+   ],
+   [
+    "KAVERI GRAMEENA BANK",
+    "0.6,-17.9",
+    0.574066162109375,
+    -17.878265380859375
+   ],
+   [
+    "KUNIGAL BRANCH",
+    "0.6,-13.4",
+    0.61669921875,
+    -13.357452392578125
+   ],
+   [
+    "SANCTIONED",
+    "0.6,-10.2",
+    0.588409423828125,
+    -10.235076904296875
+   ]
+  ],
+  "ok": true,
+  "doc": "11_stamp_with_signature_image"
+ },
+ {
+  "lines": 48,
+  "within": 2,
+  "unmatched": 2,
+  "pages_ref": 2,
+  "pages_got": 2,
+  "page_count_ok": true,
+  "share": 0.041666666666666664,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Agreement of Sale  \u2022  KAV/AGR/2025/0091 ",
+    "0.1,-165.0",
+    0.09999847412109375,
+    -164.98928833007812
+   ],
+   [
+    "SELLER: Rangappa Shivanna",
+    "0.1,-163.0",
+    0.09999847412109375,
+    -163.02423095703125
+   ],
+   [
+    "PURCHASER: Ananya Rangappa",
+    "0.1,-163.0",
+    0.09999847412109375,
+    -163.02423095703125
+   ],
+   [
+    "WITNESS 1: Muniyappa K.    WITNESS 2: Ch",
+    "0.1,-163.0",
+    0.09999847412109375,
+    -163.02423095703125
+   ],
+   [
+    "Ananya Rangappa",
+    "0.1,135.6",
+    0.100006103515625,
+    135.63827514648438
+   ]
+  ],
+  "ok": true,
+  "doc": "12_stamp_across_page_break"
+ },
+ {
+  "lines": 27,
+  "within": 6,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.2222222222222222,
+  "size_share": 1.0,
+  "name_share": 0.9259259259259259,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Karnataka Translation Bureau  \u2022  Certifi",
+    "0.1,-233.9",
+    0.09999847412109375,
+    -233.88925170898438
+   ],
+   [
+    "Page 1",
+    "0.2,-233.0",
+    0.1748046875,
+    -232.98928833007812
+   ],
+   [
+    "\u0915\u0928\u094d\u0928\u0921\u093c \u0905\u0928\u0941\u0935\u093e\u0926 \u0935\u093f\u092d\u093e\u0917, \u092c\u0947\u0902\u0917\u0932\u0941\u0930\u0941",
+    "0.6,-16.4",
+    0.61590576171875,
+    -16.431625366210938
+   ],
+   [
+    "Certified copy issued under the seal of ",
+    "0.1,12.5",
+    0.09999847412109375,
+    12.47576904296875
+   ],
+   [
+    "For KARNATAKA TRANSLATION BUREAU",
+    "0.1,12.5",
+    0.09999847412109375,
+    12.47576904296875
+   ]
+  ],
+  "ok": true,
+  "doc": "13_stamp_non_english"
+ },
+ {
+  "lines": 51,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0196078431372549,
+  "size_share": 1.0,
+  "name_share": 0.9607843137254902,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Inspection certificate QA/IC/2025/1147  ",
+    "0.1,-282.0",
+    0.09999847412109375,
+    -281.9892883300781
+   ],
+   [
+    "Page 1",
+    "0.2,-281.1",
+    0.1748046875,
+    -281.0893249511719
+   ],
+   [
+    "SUNRISE FASTENERS",
+    "0.8,-16.4",
+    0.82879638671875,
+    -16.366348266601562
+   ],
+   [
+    "QUALITY ASSURED",
+    "0.5,-8.1",
+    0.500823974609375,
+    -8.05767822265625
+   ],
+   [
+    "Sl",
+    "0.1,-6.6",
+    0.14443206787109375,
+    -6.580482482910156
+   ]
+  ],
+  "ok": true,
+  "doc": "14_stamp_chars_positioned_td"
+ },
+ {
+  "lines": 2,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "TRUE COPY",
+    "0.6,-10.1",
+    0.620208740234375,
+    -10.07769775390625
+   ],
+   [
+    "14 JUL 2025",
+    "0.7,-9.6",
+    0.689453125,
+    -9.562225341796875
+   ]
+  ],
+  "ok": true,
+  "doc": "15_stamp_on_scanned_page"
+ },
+ {
+  "lines": 64,
+  "within": 3,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.046875,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Sri Lakshmi Fabrics  \u2022  Ledger 2025-26 Q",
+    "0.1,-293.0",
+    0.09999847412109375,
+    -292.9892883300781
+   ],
+   [
+    "Page 1",
+    "0.2,-292.1",
+    0.1748046875,
+    -292.0893096923828
+   ],
+   [
+    "1,47,264.95",
+    "0.1,-34.9",
+    0.149993896484375,
+    -34.861724853515625
+   ],
+   [
+    "30-06-2025",
+    "0.1,-16.6",
+    0.09999847412109375,
+    -16.561737060546875
+   ],
+   [
+    "Closing balance c/f",
+    "0.1,-16.6",
+    0.09999847412109375,
+    -16.561737060546875
+   ]
+  ],
+  "ok": true,
+  "doc": "16_right_aligned_amounts_txtpos"
+ },
+ {
+  "lines": 42,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.047619047619047616,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "KSRTC Yeshwanthpur depot  \u2022  Trip sheet ",
+    "0.1,-294.4",
+    0.09999847412109375,
+    -294.3892517089844
+   ],
+   [
+    "Page 1",
+    "0.2,-293.5",
+    0.1748046875,
+    -293.48927307128906
+   ],
+   [
+    "ROUTE AND TIMING DETAILS",
+    "0.1,-6.1",
+    0.100006103515625,
+    -6.1232452392578125
+   ],
+   [
+    "TRIP",
+    "0.1,-6.1",
+    0.09999847412109375,
+    -6.1232452392578125
+   ],
+   [
+    "Verified by Depot Manager",
+    "0.1,-5.6",
+    0.100006103515625,
+    -5.630462646484375
+   ]
+  ],
+  "ok": true,
+  "doc": "17_three_column_widths_txtpos"
+ },
+ {
+  "lines": 23,
+  "within": 0,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Notice DIC/TMK/2025-26/0447  \u2022  District",
+    "0.1,-133.0",
+    0.09999847412109375,
+    -132.98928833007812
+   ],
+   [
+    "Page 1",
+    "0.2,-132.1",
+    0.1748046875,
+    -132.08932495117188
+   ],
+   [
+    "DISTRICT INDUSTRIES CENTRE, TUMAKURU",
+    "102.0,-6.4",
+    102.0,
+    -6.361717224121094
+   ],
+   [
+    "GOVERNMENT OF KARNATAKA",
+    "97.8,-2.5",
+    97.81771850585938,
+    -2.511707305908203
+   ],
+   [
+    "Notice No. DIC/TMK/2025-26/0447      Dat",
+    "92.9,-6.4",
+    92.93951416015625,
+    -6.361717224121094
+   ]
+  ],
+  "ok": true,
+  "doc": "18_centred_heading_left_body_txtpos"
+ },
+ {
+  "lines": 24,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.08333333333333333,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Sarvodaya Vidya Kendra  \u2022  Staff handboo",
+    "0.1,-145.9",
+    0.09999847412109375,
+    -145.88925170898438
+   ],
+   [
+    "Page 1",
+    "0.2,-145.0",
+    0.1748046875,
+    -144.98928833007812
+   ],
+   [
+    "Approved by the Governing Council on 28 ",
+    "0.1,-60.6",
+    0.09999847412109375,
+    -60.561737060546875
+   ],
+   [
+    "C.B.S.E. Affiliation No. 830441  \u2022  Hebb",
+    "0.1,-5.2",
+    0.09999847412109375,
+    -5.223247528076172
+   ],
+   [
+    "Section 4: Leave and Attendance",
+    "0.1,-4.9",
+    0.09999847412109375,
+    -4.880470275878906
+   ]
+  ],
+  "ok": true,
+  "doc": "19_hanging_indent_txtpos"
+ },
+ {
+  "lines": 33,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.06060606060606061,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "All disputes arising out of this scheme ",
+    "0.1,97.1",
+    0.09999847412109375,
+    97.06463623046875
+   ],
+   [
+    "shall be referred to arbitration as prov",
+    "0.1,97.0",
+    0.09999847412109375,
+    96.99794006347656
+   ],
+   [
+    "payment of a fee of one hundred rupees a",
+    "0.1,84.5",
+    0.09999847412109375,
+    84.4979248046875
+   ],
+   [
+    "8.",
+    "0.1,84.5",
+    0.09999847412109375,
+    84.47576904296875
+   ],
+   [
+    "Nomination is mandatory at the time of o",
+    "0.1,84.5",
+    0.09999847412109375,
+    84.464599609375
+   ]
+  ],
+  "ok": true,
+  "doc": "20_numbered_list_separate_column_txtpos"
+ },
+ {
+  "lines": 66,
+  "within": 3,
+  "unmatched": 36,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.045454545454545456,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "EPFO Bengaluru (East)  \u2022  Form 19  \u2022  Cl",
+    "0.1,-60.5",
+    0.09999847412109375,
+    -60.489227294921875
+   ],
+   [
+    "Page 1",
+    "0.2,-59.6",
+    0.1748046875,
+    -59.589263916015625
+   ],
+   [
+    "Signature / Thumb impression of member",
+    "0.1,-5.3",
+    0.100006103515625,
+    -5.299285888671875
+   ],
+   [
+    "Regional Office, Bengaluru (East)  \u2022  Bh",
+    "0.1,-5.2",
+    0.09999847412109375,
+    -5.223247528076172
+   ],
+   [
+    "Form prescribed under paragraph 72(7) of",
+    "0.1,-4.9",
+    0.09999847412109375,
+    -4.880470275878906
+   ]
+  ],
+  "ok": true,
+  "doc": "21_form_labels_x60_values_x300_txtpos"
+ },
+ {
+  "lines": 71,
+  "within": 7,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.09859154929577464,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Deccan Office Supplies  \u2022  Invoice DOS/2",
+    "0.1,-158.6",
+    0.09999847412109375,
+    -158.58926391601562
+   ],
+   [
+    "Page 1",
+    "0.2,-157.7",
+    0.1748046875,
+    -157.68930053710938
+   ],
+   [
+    "Invoice total",
+    "0.1,-12.3",
+    0.100006103515625,
+    -12.342971801757812
+   ],
+   [
+    "2,58,148.60",
+    "0.0,-12.3",
+    0.04901123046875,
+    -12.342971801757812
+   ],
+   [
+    "SGST @ 9%",
+    "0.1,-8.5",
+    0.100006103515625,
+    -8.542984008789062
+   ]
+  ],
+  "ok": true,
+  "doc": "22_invoice_four_columns_txtpos"
+ },
+ {
+  "lines": 66,
+  "within": 37,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.5606060606060606,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "With effect from 04 August 2025  \u2022  Room",
+    "132.6,-5.7",
+    132.62045288085938,
+    -5.680305480957031
+   ],
+   [
+    "CLASS TIMETABLE \u2014 III SEMESTER B.E. (CSE",
+    "128.0,-2.8",
+    128.01522827148438,
+    -2.7677841186523438
+   ],
+   [
+    "SVIT CSE  \u2022  Timetable III semester sect",
+    "0.1,-10.0",
+    0.09999847412109375,
+    -9.975067138671875
+   ],
+   [
+    "Page 1",
+    "0.2,-9.1",
+    0.1607666015625,
+    -9.075103759765625
+   ],
+   [
+    "LAB-A",
+    "0.2,6.4",
+    0.163330078125,
+    6.438453674316406
+   ]
+  ],
+  "ok": true,
+  "doc": "23_timetable_grid_txtpos"
+ },
+ {
+  "lines": 29,
+  "within": 5,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.1724137931034483,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Kaveri Grameena Bank  \u2022  Change of addre",
+    "0.1,-101.9",
+    0.09999847412109375,
+    -101.88925170898438
+   ],
+   [
+    "Page 1",
+    "0.2,-101.0",
+    0.1748046875,
+    -100.98928833007812
+   ],
+   [
+    "Kunigal Branch, Tumakuru District 572 13",
+    "0.1,-5.2",
+    0.09999847412109375,
+    -5.223247528076172
+   ],
+   [
+    "Ref: KGB/KUN/ADDR/2025/4471",
+    "0.1,-5.0",
+    0.09999847412109375,
+    -4.961723327636719
+   ],
+   [
+    "Account No. 0189 2210 4471",
+    "0.1,-4.6",
+    0.09999847412109375,
+    -4.561737060546875
+   ]
+  ],
+  "ok": true,
+  "doc": "24_address_block_indents_txtpos"
+ },
+ {
+  "lines": 39,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.05128205128205128,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Authorised Signatory",
+    "-299.9,-19.8",
+    -299.9000015258789,
+    -19.830474853515625
+   ],
+   [
+    "Date: 28-08-2025",
+    "-299.9,-19.8",
+    -299.9000015258789,
+    -19.830474853515625
+   ],
+   [
+    "Authorised Signatory",
+    "300.1,-19.1",
+    300.1000061035156,
+    -19.080474853515625
+   ],
+   [
+    "Date: 28-08-2025",
+    "300.1,-19.1",
+    300.1000061035156,
+    -19.080474853515625
+   ],
+   [
+    "Sri Lakshmi Fabrics  \u2022  Agreement SLF/AG",
+    "0.1,-20.4",
+    0.09999847412109375,
+    -20.389251708984375
+   ]
+  ],
+  "ok": true,
+  "doc": "25_signature_block_underscores_txtpos"
+ },
+ {
+  "lines": 23,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.08695652173913043,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "IJAEPS  \u2022  Volume 12, Number 3  \u2022  July ",
+    "0.1,-190.1",
+    0.09999847412109375,
+    -190.09927368164062
+   ],
+   [
+    "1  The authors are grateful to the Distr",
+    "0.1,-189.8",
+    0.09999847412109375,
+    -189.8179931640625
+   ],
+   [
+    "   establishment register, and to the vi",
+    "0.1,-189.8",
+    0.09999847412109375,
+    -189.8179931640625
+   ],
+   [
+    "   during the field work. All errors rem",
+    "0.1,-189.7",
+    0.09999847412109375,
+    -189.718017578125
+   ],
+   [
+    "Page 1",
+    "0.2,-189.2",
+    0.1748046875,
+    -189.19931030273438
+   ]
+  ],
+  "ok": true,
+  "doc": "26_footnote_marker_bottom_note_txtpos"
+ },
+ {
+  "lines": 33,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.030303030303030304,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "The Kunigal Herald  \u2022  14 September 2025",
+    "0.1,-108.1",
+    0.09999847412109375,
+    -108.08932495117188
+   ],
+   [
+    "Page 1",
+    "0.2,-98.9",
+    0.1748046875,
+    -98.88925170898438
+   ],
+   [
+    "In other news",
+    "0.1,49.1",
+    0.09999847412109375,
+    49.0758056640625
+   ],
+   [
+    "Second phase of the scheme",
+    "0.1,48.8",
+    0.100006103515625,
+    48.75700378417969
+   ],
+   [
+    "borewell located behind the post office ",
+    "0.1,48.4",
+    0.100006103515625,
+    48.40046691894531
+   ]
+  ],
+  "ok": true,
+  "doc": "27_two_column_left_short_txtpos"
+ },
+ {
+  "lines": 45,
+  "within": 2,
+  "unmatched": 7,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.044444444444444446,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "2",
+    "-272.8,34.1",
+    -272.75,
+    34.119529724121094
+   ],
+   [
+    "2",
+    "273.0,4.1",
+    273.0249938964844,
+    4.119529724121094
+   ],
+   [
+    "Bharat Agencies  \u2022  Proforma BA/PI/2025/",
+    "0.1,-205.1",
+    0.09999847412109375,
+    -205.08926391601562
+   ],
+   [
+    "Page 1",
+    "0.2,-204.2",
+    0.1748046875,
+    -204.18930053710938
+   ],
+   [
+    "9,600.00",
+    "34.8,24.4",
+    34.75,
+    24.369537353515625
+   ]
+  ],
+  "ok": true,
+  "doc": "28_value_overflows_cell_txtpos"
+ },
+ {
+  "lines": 52,
+  "within": 8,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.15384615384615385,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Hotel Sri Krishna Vilas  \u2022  Bill SKV/202",
+    "0.1,-195.9",
+    0.09999847412109375,
+    -195.88925170898438
+   ],
+   [
+    "Page 1",
+    "0.2,-195.0",
+    0.1748046875,
+    -194.98928833007812
+   ],
+   [
+    "Total",
+    "0.1,-11.8",
+    0.100006103515625,
+    -11.786712646484375
+   ],
+   [
+    "1,047.38",
+    "0.0,-11.8",
+    0.02398681640625,
+    -11.786712646484375
+   ],
+   [
+    "SGST @ 2.5%",
+    "0.1,-7.4",
+    0.100006103515625,
+    -7.4429779052734375
+   ]
+  ],
+  "ok": true,
+  "doc": "29_dot_leaders_txtpos"
+ },
+ {
+  "lines": 50,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "MBBS, MD - Reg. KMC/44821/2009",
+    "0.1,-300.8",
+    0.12908935546875,
+    -300.75054931640625
+   ],
+   [
+    "Not valid for medico-legal purposes. Ple",
+    "0.1,-300.8",
+    0.10000038146972656,
+    -300.75054931640625
+   ],
+   [
+    "pharmacy along with a photo ID. Medicine",
+    "0.1,-300.8",
+    0.10000038146972656,
+    -300.75054931640625
+   ],
+   [
+    "Dr. Meera Krishnan",
+    "0.1,-299.4",
+    0.142181396484375,
+    -299.4108581542969
+   ],
+   [
+    "Advice:",
+    "0.1,16.7",
+    0.10000038146972656,
+    16.6588134765625
+   ]
+  ],
+  "ok": true,
+  "doc": "300_prescription_rx"
+ },
+ {
+  "lines": 74,
+  "within": 0,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Consultant Pathologist - Reg. KMC/33120/",
+    "0.1,-195.7",
+    0.10000038146972656,
+    -195.65057373046875
+   ],
+   [
+    "H = above reference interval, L = below ",
+    "0.1,-195.7",
+    0.10000038146972656,
+    -195.65057373046875
+   ],
+   [
+    "MPL03184471",
+    "0.1,-195.3",
+    0.100006103515625,
+    -195.2706298828125
+   ],
+   [
+    "Dr. S. Ramesh, MD (Pathology)",
+    "0.1,-194.3",
+    0.10000038146972656,
+    -194.31089782714844
+   ],
+   [
+    "Interpretation",
+    "0.1,45.4",
+    0.10000038146972656,
+    45.438690185546875
+   ]
+  ],
+  "ok": true,
+  "doc": "301_lab_report_panel"
+ },
+ {
+  "lines": 33,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.030303030303030304,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Consultant Radiologist - Reg. KMC/28411/",
+    "0.2,-278.8",
+    0.1553955078125,
+    -278.75054931640625
+   ],
+   [
+    "This report is based on the images provi",
+    "0.1,-278.8",
+    0.10000038146972656,
+    -278.75054931640625
+   ],
+   [
+    "Dr. A. Bhat, MD, DNB (Radiodiagnosis)",
+    "0.1,-277.4",
+    0.121307373046875,
+    -277.4108581542969
+   ],
+   [
+    "T1, T2, FLAIR, DWI",
+    "0.1,-16.2",
+    0.100006103515625,
+    -16.241226196289062
+   ],
+   [
+    "Dr. Meera Krishnan",
+    "0.1,-16.2",
+    0.10000038146972656,
+    -16.241226196289062
+   ]
+  ],
+  "ok": true,
+  "doc": "302_radiology_report"
+ },
+ {
+  "lines": 45,
+  "within": 12,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.26666666666666666,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Resident Medical Officer",
+    "0.1,-243.6",
+    0.08872222900390625,
+    -243.57061767578125
+   ],
+   [
+    "Dr. Meera Krishnan, Consultant",
+    "0.2,-242.4",
+    0.161773681640625,
+    -242.37063598632812
+   ],
+   [
+    "ANANYA RAO, 34/F",
+    "0.1,6.2",
+    0.10000038146972656,
+    6.218544006347656
+   ],
+   [
+    "Review in chest medicine OPD on 25-03-20",
+    "0.1,6.1",
+    0.10000038146972656,
+    6.083831787109375
+   ],
+   [
+    "Treated with nebulised salbutamol and ip",
+    "0.1,5.3",
+    0.10000038146972656,
+    5.2837982177734375
+   ]
+  ],
+  "ok": true,
+  "doc": "303_discharge_summary"
+ },
+ {
+  "lines": 34,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.029411764705882353,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "starch glycolate, colloidal anhydrous si",
+    "0.1,-6.0",
+    0.10000038146972656,
+    -5.9986724853515625
+   ],
+   [
+    "containing hypromellose, titanium dioxid",
+    "0.1,-6.0",
+    0.10000038146972656,
+    -5.9986724853515625
+   ],
+   [
+    "Each tablet contains 500 mg amoxicillin ",
+    "0.1,-6.0",
+    0.10000038146972656,
+    -5.9986419677734375
+   ],
+   [
+    "potassium clavulanate). The other ingred",
+    "0.1,-6.0",
+    0.10000038146972656,
+    -5.9986419677734375
+   ],
+   [
+    "Marketing authorisation holder: Shreeji ",
+    "0.1,-6.0",
+    0.10000038146972656,
+    -5.9986419677734375
+   ]
+  ],
+  "ok": true,
+  "doc": "304_package_insert_small_print"
+ },
+ {
+  "lines": 85,
+  "within": 3,
+  "unmatched": 34,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.03529411764705882,
+  "size_share": 0.8627450980392157,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [
+   "T                              size 7.5 -> 6.5",
+   "I                              size 7.5 -> 6.5",
+   "O                              size 7.5 -> 6.5",
+   "A                              size 7.5 -> 6.5",
+   "R                              size 7.5 -> 6.5"
+  ],
+  "worst": [
+   [
+    "This is a computer generated certificate",
+    "0.1,-403.0",
+    0.10000038146972656,
+    -402.9505310058594
+   ],
+   [
+    "A",
+    "67.2,20.1",
+    67.17367553710938,
+    20.106124877929688
+   ],
+   [
+    "G",
+    "-57.7,20.7",
+    -57.73521423339844,
+    20.709564208984375
+   ],
+   [
+    "T",
+    "36.7,-38.5",
+    36.6761474609375,
+    -38.49085998535156
+   ],
+   [
+    "I",
+    "70.7,1.3",
+    70.72055053710938,
+    1.33251953125
+   ]
+  ],
+  "ok": true,
+  "doc": "305_vaccination_certificate"
+ },
+ {
+  "lines": 75,
+  "within": 26,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.3466666666666667,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Meridian Clinical Research Pvt Ltd, Beng",
+    "0.1,-8.2",
+    0.100006103515625,
+    -8.15081787109375
+   ],
+   [
+    "Sponsor",
+    "0.1,-8.2",
+    0.10000038146972656,
+    -8.15081787109375
+   ],
+   [
+    "A randomised, double-blind, placebo-cont",
+    "0.1,-7.4",
+    0.100006103515625,
+    -7.350830078125
+   ],
+   [
+    "Title",
+    "0.1,-7.4",
+    0.10000038146972656,
+    -7.350830078125
+   ],
+   [
+    "X",
+    "0.2,7.1",
+    0.16900634765625,
+    7.14923095703125
+   ]
+  ],
+  "ok": true,
+  "doc": "306_clinical_protocol_synopsis"
+ },
+ {
+  "lines": 37,
+  "within": 1,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.02702702702702703,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Important dates",
+    "0.1,136.7",
+    0.09999847412109375,
+    136.65081787109375
+   ],
+   [
+    "Registrar",
+    "0.1,134.9",
+    0.09999847412109375,
+    134.875732421875
+   ],
+   [
+    "Last date for payment of fee: 18 Septemb",
+    "0.1,134.4",
+    0.09999847412109375,
+    134.3570098876953
+   ],
+   [
+    "Sri Vinayaka Institute of Technology, Ke",
+    "0.1,133.4",
+    0.09999847412109375,
+    133.41952514648438
+   ],
+   [
+    "04",
+    "0.1,120.4",
+    0.09999847412109375,
+    120.42282104492188
+   ]
+  ],
+  "ok": true,
+  "doc": "30_mixed_font_sizes_one_baseline_txtpos"
+ },
+ {
+  "lines": 28,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "JUDGMENT",
+    "137.1,-3.0",
+    137.12777709960938,
+    -3.015472412109375
+   ],
+   [
+    "WRIT PETITION NO. 4471 OF 2023 (GM-RES)",
+    "95.7,-4.8",
+    95.69769287109375,
+    -4.785003662109375
+   ],
+   [
+    "DATED THIS THE 18TH DAY OF MARCH, 2024",
+    "94.2,-4.7",
+    94.21127319335938,
+    -4.735015869140625
+   ],
+   [
+    "IN THE HIGH COURT OF KARNATAKA AT BENGAL",
+    "92.8,-3.0",
+    92.778564453125,
+    -2.9654788970947266
+   ],
+   [
+    "Sd/-",
+    "0.1,-4.8",
+    0.13232421875,
+    -4.78497314453125
+   ]
+  ],
+  "ok": true,
+  "doc": "310_court_judgment"
+ },
+ {
+  "lines": 72,
+  "within": 9,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.125,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Copy forwarded to: Superintendent of Pol",
+    "0.1,-205.6",
+    0.10000038146972656,
+    -205.550537109375
+   ],
+   [
+    "8. Action taken: registered as FIR and i",
+    "0.1,32.1",
+    0.10000038146972656,
+    32.078948974609375
+   ],
+   [
+    "Signature of Officer in charge",
+    "0.1,31.2",
+    0.095672607421875,
+    31.219146728515625
+   ],
+   [
+    "Bengaluru Urban",
+    "0.1,-19.7",
+    0.100006103515625,
+    -19.6510009765625
+   ],
+   [
+    "Police Station",
+    "0.1,-19.7",
+    0.100006103515625,
+    -19.6510009765625
+   ]
+  ],
+  "ok": true,
+  "doc": "311_fir_police_form"
+ },
+ {
+  "lines": 53,
+  "within": 17,
+  "unmatched": 16,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.32075471698113206,
+  "size_share": 0.918918918918919,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [
+   "E                              size 7.5 -> 6.5",
+   "N                              size 7.5 -> 6.5",
+   "R                              size 7.5 -> 6.5"
+  ],
+  "worst": [
+   [
+    "Note: affidavits must be executed on sta",
+    "0.1,-119.2",
+    0.09999847412109375,
+    -119.15057373046875
+   ],
+   [
+    "BEFORE ME",
+    "0.1,-118.8",
+    0.09999847412109375,
+    -118.7706298828125
+   ],
+   [
+    "Notary Public, Bengaluru",
+    "0.1,-118.3",
+    0.09999847412109375,
+    -118.290771484375
+   ],
+   [
+    "N",
+    "-25.0,12.1",
+    -24.96728515625,
+    12.053009033203125
+   ],
+   [
+    "E",
+    "-10.1,21.6",
+    -10.137054443359375,
+    21.614227294921875
+   ]
+  ],
+  "ok": true,
+  "doc": "312_affidavit_stamp_paper"
+ },
+ {
+  "lines": 30,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "POWER OF ATTORNEY",
+    "121.1,-3.5",
+    121.08767700195312,
+    -3.5459136962890625
+   ],
+   [
+    "THIS POWER OF ATTORNEY is executed at Be",
+    "0.1,-6.2",
+    0.10708999633789062,
+    -6.17523193359375
+   ],
+   [
+    "ANANYA RAO, daughter of S. Rao, residing",
+    "0.1,-6.2",
+    0.10708999633789062,
+    -6.17523193359375
+   ],
+   [
+    "560066 (hereinafter called the \u201cPrincipa",
+    "0.1,-6.2",
+    0.10708999633789062,
+    -6.17523193359375
+   ],
+   [
+    "residing at 12/3, 4th Cross, Kadugodi, B",
+    "0.1,-6.2",
+    0.10708999633789062,
+    -6.17523193359375
+   ]
+  ],
+  "ok": true,
+  "doc": "313_power_of_attorney"
+ },
+ {
+  "lines": 79,
+  "within": 4,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.05063291139240506,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Meridian Consulting Pvt Ltd, 14 Residenc",
+    "0.1,-232.7",
+    0.10000038146972656,
+    -232.670654296875
+   ],
+   [
+    "lot",
+    "0.1,-26.6",
+    0.106475830078125,
+    -26.600982666015625
+   ],
+   [
+    "1",
+    "0.1,-26.6",
+    0.071685791015625,
+    -26.600982666015625
+   ],
+   [
+    "sqm",
+    "0.1,-24.4",
+    0.08709716796875,
+    -24.400970458984375
+   ],
+   [
+    "cum",
+    "0.1,-22.2",
+    0.091400146484375,
+    -22.200927734375
+   ]
+  ],
+  "ok": true,
+  "doc": "314_tender_rfp_boq"
+ },
+ {
+  "lines": 35,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.02857142857142857,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Uploaded by Dte. of Printing at Governme",
+    "0.1,-282.1",
+    0.10000038146972656,
+    -282.1304016113281
+   ],
+   [
+    "[No. 4/2/2024-WDRA]",
+    "0.1,-281.3",
+    0.10000038146972656,
+    -281.2706604003906
+   ],
+   [
+    "RAJESH KUMAR, Jt. Secy.",
+    "0.2,-244.4",
+    0.170806884765625,
+    -244.37063598632812
+   ],
+   [
+    "\"(3) Every warehouse shall maintain a di",
+    "0.1,181.1",
+    0.10809326171875,
+    181.11723709106445
+   ],
+   [
+    "be preserved for a period of not less th",
+    "0.1,181.1",
+    0.10809326171875,
+    181.1172103881836
+   ]
+  ],
+  "ok": true,
+  "doc": "315_gazette_notification"
+ },
+ {
+  "lines": 42,
+  "within": 4,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.09523809523809523,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Rate (INR)",
+    "0.1,-7.3",
+    0.1004638671875,
+    -7.344818115234375
+   ],
+   [
+    "Service",
+    "0.1,-7.3",
+    0.06219482421875,
+    -7.344818115234375
+   ],
+   [
+    "Unit",
+    "0.0,-7.3",
+    0.019989013671875,
+    -7.344818115234375
+   ],
+   [
+    "Storage",
+    "0.1,-6.5",
+    0.06219482421875,
+    -6.544830322265625
+   ],
+   [
+    "412.00",
+    "0.1,-6.5",
+    0.05438232421875,
+    -6.544830322265625
+   ]
+  ],
+  "ok": true,
+  "doc": "316_contract_with_schedules"
+ },
+ {
+  "lines": 26,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "No. CT/RTI/2024/00871",
+    "121.8,-4.8",
+    121.79730224609375,
+    -4.785003662109375
+   ],
+   [
+    "OFFICE OF THE PUBLIC INFORMATION OFFICER",
+    "99.2,-3.0",
+    99.17431640625,
+    -2.9654788970947266
+   ],
+   [
+    "Department of Commercial Taxes, Governme",
+    "79.6,-4.7",
+    79.60519409179688,
+    -4.735015869140625
+   ],
+   [
+    "Enclosure: fee receipt no. 4471 dated 26",
+    "0.1,-5.2",
+    0.10708999633789062,
+    -5.16485595703125
+   ],
+   [
+    "Date: 18 March 2024",
+    "0.1,-4.3",
+    0.10708999633789062,
+    -4.2551727294921875
+   ]
+  ],
+  "ok": true,
+  "doc": "317_rti_response"
+ },
+ {
+  "lines": 57,
+  "within": 5,
+  "unmatched": 18,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.08771929824561403,
+  "size_share": 0.8974358974358975,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [
+   "A                              size 7.5 -> 6.5",
+   "L                              size 7.5 -> 6.5",
+   "U                              size 7.5 -> 6.5",
+   "G                              size 7.5 -> 6.5"
+  ],
+  "worst": [
+   [
+    "Returnable within 30 days. If not served",
+    "0.1,-386.5",
+    0.09999847412109375,
+    -386.47064208984375
+   ],
+   [
+    "G",
+    "-32.7,-26.4",
+    -32.66546630859375,
+    -26.368484497070312
+   ],
+   [
+    "A",
+    "26.4,-21.8",
+    26.4315185546875,
+    -21.777206420898438
+   ],
+   [
+    "L",
+    "32.7,-8.8",
+    32.67645263671875,
+    -8.799957275390625
+   ],
+   [
+    "4471/2024",
+    "0.1,-15.2",
+    0.100006103515625,
+    -15.1510009765625
+   ]
+  ],
+  "ok": true,
+  "doc": "318_court_summons_form"
+ },
+ {
+  "lines": 29,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.034482758620689655,
+  "size_share": 1.0,
+  "name_share": 0.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "United Coffee Estates Company Limited  \u00b7",
+    "0.1,-100.6",
+    0.09999847412109375,
+    -100.60125732421875
+   ],
+   [
+    "Page 1",
+    "0.1,-99.7",
+    0.07598876953125,
+    -99.7012939453125
+   ],
+   [
+    "Registered Office: Kadur Post, Chikkamag",
+    "0.1,-5.7",
+    0.09999847412109375,
+    -5.695232391357422
+   ],
+   [
+    "CIN L01131KA1936PLC001147  \u00b7  Telephone ",
+    "0.1,-5.7",
+    0.09999847412109375,
+    -5.695232391357422
+   ],
+   [
+    "Note: Members are requested to bring the",
+    "0.1,-5.2",
+    0.09999847412109375,
+    -5.22528076171875
+   ]
+  ],
+  "ok": true,
+  "doc": "31_times_body_arial_headings"
+ },
+ {
+  "lines": 73,
+  "within": 17,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.2328767123287671,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Sd/-  CA R. Iyer, Partner (M.No. 214471)",
+    "0.1,-265.1",
+    0.10000038146972656,
+    -265.07061767578125
+   ],
+   [
+    "For R. Iyer & Associates, Chartered Acco",
+    "0.1,-264.4",
+    0.10000038146972656,
+    -264.44073486328125
+   ],
+   [
+    "Sd/-  S. Mehta, Director (DIN 04471182)",
+    "0.1,-263.9",
+    0.1243896484375,
+    -263.87060546875
+   ],
+   [
+    "As per our report of even date attached.",
+    "0.1,-263.5",
+    0.10000038146972656,
+    -263.4907531738281
+   ],
+   [
+    "For and on behalf of the Board",
+    "0.1,-263.4",
+    0.1243896484375,
+    -263.3907470703125
+   ]
+  ],
+  "ok": true,
+  "doc": "320_balance_sheet_statutory"
+ },
+ {
+  "lines": 34,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "INDEPENDENT AUDITOR'S REPORT",
+    "112.2,-3.0",
+    112.16018676757812,
+    -2.9654788970947266
+   ],
+   [
+    "To the Members of Shreeji Logistics Priv",
+    "0.1,-4.3",
+    0.10708999633789062,
+    -4.255149841308594
+   ],
+   [
+    "Report on the Audit of the Financial Sta",
+    "0.1,-4.3",
+    0.10708999633789062,
+    -4.2551116943359375
+   ],
+   [
+    "Opinion",
+    "0.1,-4.2",
+    0.10708999633789062,
+    -4.2301483154296875
+   ],
+   [
+    "1. We have audited the accompanying fina",
+    "0.1,-4.2",
+    0.10708999633789062,
+    -4.205169677734375
+   ]
+  ],
+  "ok": true,
+  "doc": "321_auditors_report"
+ },
+ {
+  "lines": 87,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.011494252873563218,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Moderate",
+    "0.1,154.5",
+    0.100006103515625,
+    154.47952270507812
+   ],
+   [
+    "High",
+    "0.1,154.5",
+    0.100006103515625,
+    154.47952270507812
+   ],
+   [
+    "very high risk",
+    "0.1,154.4",
+    0.11248779296875,
+    154.37948608398438
+   ],
+   [
+    "Investors understand that their principa",
+    "0.1,154.4",
+    0.0762939453125,
+    154.37948608398438
+   ],
+   [
+    "28.4",
+    "0.1,111.5",
+    0.11248779296875,
+    111.47891235351562
+   ]
+  ],
+  "ok": true,
+  "doc": "322_mutual_fund_factsheet"
+ },
+ {
+  "lines": 85,
+  "within": 3,
+  "unmatched": 5,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.03529411764705882,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Please pay before the due date to avoid ",
+    "0.1,-194.4",
+    0.10000038146972656,
+    -194.35052490234375
+   ],
+   [
+    "3,445",
+    "0.2,121.8",
+    0.1708984375,
+    121.79904174804688
+   ],
+   [
+    "2,419",
+    "0.2,121.7",
+    0.1708984375,
+    121.69903564453125
+   ],
+   [
+    "1,284",
+    "0.2,121.7",
+    0.1708984375,
+    121.69903564453125
+   ],
+   [
+    "3,120",
+    "0.2,121.6",
+    0.1708984375,
+    121.59902954101562
+   ]
+  ],
+  "ok": true,
+  "doc": "323_credit_card_statement"
+ },
+ {
+  "lines": 1496,
+  "within": 292,
+  "unmatched": 0,
+  "pages_ref": 7,
+  "pages_got": 7,
+  "page_count_ok": true,
+  "share": 0.19518716577540107,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "38,620.00",
+    "0.1,-515.1",
+    0.10760498046875,
+    -515.0827789306641
+   ],
+   [
+    "4,492,692.50",
+    "314.1,-21.1",
+    314.12191009521484,
+    -21.082759857177734
+   ],
+   [
+    "4,485,334.15",
+    "314.1,-20.4",
+    314.12191009521484,
+    -20.382808685302734
+   ],
+   [
+    "4,485,334.15",
+    "-313.9,6.4",
+    -313.8780975341797,
+    6.417240142822266
+   ],
+   [
+    "4,492,692.50",
+    "-313.9,5.6",
+    -313.8780975341797,
+    5.617191314697266
+   ]
+  ],
+  "ok": true,
+  "doc": "324_loan_amortisation_schedule"
+ },
+ {
+  "lines": 84,
+  "within": 42,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.5,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "This statement is generated electronical",
+    "0.1,-352.8",
+    0.10000038146972656,
+    -352.75054931640625
+   ],
+   [
+    "11,60,285.00",
+    "0.1,10.4",
+    0.11669921875,
+    10.438674926757812
+   ],
+   [
+    "Total portfolio value",
+    "0.1,9.8",
+    0.10000038146972656,
+    9.838668823242188
+   ],
+   [
+    "TRANSACTIONS DURING THE PERIOD",
+    "0.1,9.6",
+    0.10000038146972656,
+    9.578887939453125
+   ],
+   [
+    "BUY",
+    "0.1,8.1",
+    0.10369873046875,
+    8.071090698242188
+   ]
+  ],
+  "ok": true,
+  "doc": "325_demat_holdings_statement"
+ },
+ {
+  "lines": 74,
+  "within": 37,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.5,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "e-Filed under the Digital Signature of t",
+    "0.1,-218.1",
+    0.10000038146972656,
+    -218.050537109375
+   ],
+   [
+    "Tax",
+    "11.0,4.5",
+    11.015594482421875,
+    4.478912353515625
+   ],
+   [
+    "TAX COMPUTATION (NEW REGIME, SECTION 115",
+    "0.1,10.3",
+    0.10000038146972656,
+    10.278900146484375
+   ],
+   [
+    "I, ANANYA RAO, solemnly declare that to ",
+    "0.1,8.0",
+    0.10000038146972656,
+    7.958831787109375
+   ],
+   [
+    "ANANYA RAO",
+    "0.1,7.9",
+    0.134796142578125,
+    7.9088134765625
+   ]
+  ],
+  "ok": true,
+  "doc": "326_itr_computation"
+ },
+ {
+  "lines": 20,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.05,
+  "size_share": 1.0,
+  "name_share": 0.95,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Chapter IV  \u2022  Preparation of the cherry",
+    "0.1,-167.7",
+    0.09999847412109375,
+    -167.68923950195312
+   ],
+   [
+    "Page 1",
+    "0.2,-166.8",
+    0.1748046875,
+    -166.78927612304688
+   ],
+   [
+    "CHAPTER IV \u2014 OF THE PREPARATION OF THE C",
+    "91.3,-9.0",
+    91.33700561523438,
+    -8.999736785888672
+   ],
+   [
+    "Being a practical account of the methods",
+    "67.8,-8.1",
+    67.75859069824219,
+    -8.142955780029297
+   ],
+   [
+    "Printed at the Basel Mission Press, Mang",
+    "0.1,-16.1",
+    0.09999847412109375,
+    -16.099761962890625
+   ]
+  ],
+  "ok": true,
+  "doc": "32_serif_nondefault_body"
+ },
+ {
+  "lines": 40,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.025,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "19000",
+    "-189.9,-6.6",
+    -189.89999389648438,
+    -6.6160430908203125
+   ],
+   [
+    "19000",
+    "190.1,-5.1",
+    190.10000610351562,
+    -5.1160430908203125
+   ],
+   [
+    "SB",
+    "0.1,-131.5",
+    0.100006103515625,
+    -131.5458984375
+   ],
+   [
+    "By",
+    "0.1,-120.3",
+    0.100006103515625,
+    -120.34591674804688
+   ],
+   [
+    "Rev",
+    "0.1,-120.3",
+    0.10000038146972656,
+    -120.34591674804688
+   ]
+  ],
+  "ok": true,
+  "doc": "330_cad_drawing_sheet"
+ },
+ {
+  "lines": 26,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.038461538461538464,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "01",
+    "-219.9,-129.7",
+    -219.91879272460938,
+    -129.67579650878906
+   ],
+   [
+    "01",
+    "220.1,-127.9",
+    220.08119201660156,
+    -127.87579345703125
+   ],
+   [
+    "NOTE 3",
+    "0.1,-137.8",
+    0.100006103515625,
+    -137.77578735351562
+   ],
+   [
+    "RETURN",
+    "0.2,-136.9",
+    0.16259765625,
+    -136.916015625
+   ],
+   [
+    "V-102",
+    "0.1,-131.9",
+    0.084014892578125,
+    -131.87579345703125
+   ]
+  ],
+  "ok": true,
+  "doc": "331_pid_diagram"
+ },
+ {
+  "lines": 52,
+  "within": 13,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.25,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Surface treatment: hot dip galvanised to",
+    "164.4,3.3",
+    164.39999389648438,
+    3.2595672607421875
+   ],
+   [
+    "Notes: 1. All welds 5 mm fillet unless n",
+    "136.0,3.3",
+    136.0,
+    3.2595672607421875
+   ],
+   [
+    "4",
+    "0.1,-90.7",
+    0.08740234375,
+    -90.71600341796875
+   ],
+   [
+    "5",
+    "0.1,77.8",
+    0.08739852905273438,
+    77.78399658203125
+   ],
+   [
+    "2",
+    "0.1,73.7",
+    0.08740234375,
+    73.68399047851562
+   ]
+  ],
+  "ok": true,
+  "doc": "332_bom_on_drawing"
+ },
+ {
+  "lines": 122,
+  "within": 14,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.11475409836065574,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Shreeji Semiconductors Pvt Ltd | Pune 41",
+    "0.1,-212.4",
+    0.10000038146972656,
+    -212.35052490234375
+   ],
+   [
+    "V",
+    "0.1,-37.1",
+    0.0653076171875,
+    -37.05096435546875
+   ],
+   [
+    "-0.3",
+    "0.0,-37.1",
+    0.033782958984375,
+    -37.05096435546875
+   ],
+   [
+    "VDD+0.3",
+    "0.1,-22.4",
+    0.092620849609375,
+    -22.35101318359375
+   ],
+   [
+    "VREF = 4.096 V",
+    "0.1,-20.8",
+    0.100006103515625,
+    -20.828880310058594
+   ]
+  ],
+  "ok": true,
+  "doc": "333_datasheet_spec_tables"
+ },
+ {
+  "lines": 32,
+  "within": 13,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.40625,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Dated this 18th day of March 2024.  Appl",
+    "0.1,-179.5",
+    0.10000038146972656,
+    -179.4705810546875
+   ],
+   [
+    "1. A method for allocating pallet positi",
+    "0.1,23.1",
+    0.10000038146972656,
+    23.083831787109375
+   ],
+   [
+    "positions; and allocating the consignmen",
+    "0.1,23.0",
+    0.10000038146972656,
+    23.0338134765625
+   ],
+   [
+    "comprising a temperature class and a dwe",
+    "0.1,23.0",
+    0.10000038146972656,
+    23.008819580078125
+   ],
+   [
+    "occupancy.",
+    "0.1,23.0",
+    0.10000038146972656,
+    22.98382568359375
+   ]
+  ],
+  "ok": true,
+  "doc": "334_patent_document"
+ },
+ {
+  "lines": 47,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.02127659574468085,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "CAS no.",
+    "0.1,-8.9",
+    0.100006103515625,
+    -8.928878784179688
+   ],
+   [
+    "Concentration",
+    "0.1,-8.9",
+    0.100006103515625,
+    -8.928878784179688
+   ],
+   [
+    "Hazard class",
+    "0.1,-8.9",
+    0.100006103515625,
+    -8.928878784179688
+   ],
+   [
+    "Component",
+    "0.1,-8.9",
+    0.10000038146972656,
+    -8.928878784179688
+   ],
+   [
+    "1310-73-2",
+    "0.1,-8.1",
+    0.100006103515625,
+    -8.128890991210938
+   ]
+  ],
+  "ok": true,
+  "doc": "335_msds_safety_data_sheet"
+ },
+ {
+  "lines": 35,
+  "within": 14,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.4,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "BMR/SIG/DSN/2025/0447 Rev C  \u2022  Bengalur",
+    "0.1,-211.0",
+    0.09999847412109375,
+    -211.01724243164062
+   ],
+   [
+    "Page 1",
+    "0.1,-210.1",
+    0.0833740234375,
+    -210.11727905273438
+   ],
+   [
+    "not more than 0.5 s",
+    "0.1,-11.9",
+    0.100006103515625,
+    -11.8807373046875
+   ],
+   [
+    "Power interruption test",
+    "0.1,-11.9",
+    0.100006103515625,
+    -11.8807373046875
+   ],
+   [
+    "Failure to danger response",
+    "0.1,-11.9",
+    0.09999847412109375,
+    -11.8807373046875
+   ]
+  ],
+  "ok": true,
+  "doc": "33_sans_nondefault_body"
+ },
+ {
+  "lines": 50,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "SHJ202400871",
+    "0.1,-376.4",
+    0.100006103515625,
+    -376.35052490234375
+   ],
+   [
+    "Meas. (cbm)",
+    "0.2,-40.9",
+    0.152191162109375,
+    -40.880889892578125
+   ],
+   [
+    "No. of pkgs",
+    "0.1,-40.9",
+    0.149200439453125,
+    -40.880889892578125
+   ],
+   [
+    "Description of goods",
+    "0.1,-40.9",
+    0.100006103515625,
+    -40.880889892578125
+   ],
+   [
+    "Marks & nos.",
+    "0.1,-40.9",
+    0.10000038146972656,
+    -40.880889892578125
+   ]
+  ],
+  "ok": true,
+  "doc": "340_bill_of_lading"
+ },
+ {
+  "lines": 304,
+  "within": 97,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.3190789473684211,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "This manifest is generated from the vess",
+    "0.1,-105.5",
+    0.10000038146972656,
+    -105.51602172851562
+   ],
+   [
+    "Total packages: 4,412   |   Total gross ",
+    "0.1,-104.7",
+    0.10000038146972656,
+    -104.65628051757812
+   ],
+   [
+    "35.44",
+    "0.1,10.4",
+    0.1492919921875,
+    10.411544799804688
+   ],
+   [
+    "24",
+    "0.1,10.4",
+    0.14463043212890625,
+    10.411544799804688
+   ],
+   [
+    "INNSA",
+    "0.1,10.4",
+    0.140625,
+    10.411544799804688
+   ]
+  ],
+  "ok": true,
+  "doc": "341_shipping_manifest"
+ },
+ {
+  "lines": 52,
+  "within": 5,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.09615384615384616,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Authorised signatory",
+    "0.1,-403.2",
+    0.10000038146972656,
+    -403.1505432128906
+   ],
+   [
+    "For Shreeji Logistics Pvt Ltd",
+    "0.1,-402.3",
+    0.10000038146972656,
+    -402.290771484375
+   ],
+   [
+    "PUNE -> BENGALURU",
+    "0.1,9.0",
+    0.09999847412109375,
+    9.019134521484375
+   ],
+   [
+    "MADE IN INDIA",
+    "0.1,9.0",
+    0.09999847412109375,
+    9.019134521484375
+   ],
+   [
+    "material.",
+    "0.1,8.1",
+    0.100006103515625,
+    8.119171142578125
+   ]
+  ],
+  "ok": true,
+  "doc": "342_packing_list"
+ },
+ {
+  "lines": 39,
+  "within": 0,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "999-4471-8820",
+    "0.1,-423.1",
+    0.10000038146972656,
+    -423.0706481933594
+   ],
+   [
+    "Issuing carrier's agent",
+    "0.1,-35.1",
+    0.10000038146972656,
+    -35.07051086425781
+   ],
+   [
+    "Airport of departure",
+    "0.1,-35.1",
+    0.10000038146972656,
+    -35.07051086425781
+   ],
+   [
+    "Airport of destination",
+    "0.1,-35.1",
+    0.09999847412109375,
+    -35.07051086425781
+   ],
+   [
+    "Shipper's name and address",
+    "0.1,-35.1",
+    0.10000038146972656,
+    -35.07050704956055
+   ]
+  ],
+  "ok": true,
+  "doc": "343_air_waybill"
+ },
+ {
+  "lines": 65,
+  "within": 6,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.09230769230769231,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Assessing officer",
+    "0.1,-334.9",
+    0.10000038146972656,
+    -334.86029052734375
+   ],
+   [
+    "Exporter / authorised agent",
+    "0.1,-333.2",
+    0.100006103515625,
+    -333.2102966308594
+   ],
+   [
+    "E-mail: customs@shreeji.example | Genera",
+    "0.1,-332.7",
+    0.10000038146972656,
+    -332.73040771484375
+   ],
+   [
+    "AABCS9876E / 27AABCS9876E1Z2",
+    "0.1,-7.6",
+    0.100006103515625,
+    -7.580894470214844
+   ],
+   [
+    "2",
+    "0.1,-7.6",
+    0.100006103515625,
+    -7.580894470214844
+   ]
+  ],
+  "ok": true,
+  "doc": "344_customs_declaration"
+ },
+ {
+  "lines": 42,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.023809523809523808,
+  "size_share": 1.0,
+  "name_share": 0.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Annexure B  \u00b7  Batch control program  \u00b7 ",
+    "0.1,-155.2",
+    0.09999847412109375,
+    -155.22927856445312
+   ],
+   [
+    "Page 1",
+    "0.1,-154.3",
+    0.123992919921875,
+    -154.32931518554688
+   ],
+   [
+    "0020  PROGRAM-ID. PAYBATCH.",
+    "0.1,-4.6",
+    0.09999847412109375,
+    -4.6047821044921875
+   ],
+   [
+    "0070          ORGANIZATION IS INDEXED",
+    "0.1,-4.6",
+    0.09999847412109375,
+    -4.6047821044921875
+   ],
+   [
+    "0120  01  WS-COUNTERS.",
+    "0.1,-4.6",
+    0.09999847412109375,
+    -4.6047821044921875
+   ]
+  ],
+  "ok": true,
+  "doc": "34_monospace_document"
+ },
+ {
+  "lines": 104,
+  "within": 0,
+  "unmatched": 36,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "[08]",
+    "0.1,430.6",
+    0.119873046875,
+    430.64898681640625
+   ],
+   [
+    "[08]",
+    "0.1,360.4",
+    0.119873046875,
+    360.448974609375
+   ],
+   [
+    "[08]",
+    "0.1,280.2",
+    0.119873046875,
+    280.2490234375
+   ],
+   [
+    "[08]",
+    "0.1,226.0",
+    0.119873046875,
+    226.04904174804688
+   ],
+   [
+    "Explain the concept of normalisation wit",
+    "-21.9,171.4",
+    -21.899999618530273,
+    171.37890625
+   ]
+  ],
+  "ok": false,
+  "doc": "350_question_paper"
+ },
+ {
+  "lines": 66,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.015151515151515152,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Signature of candidate",
+    "0.1,-414.4",
+    0.10000038146972656,
+    -414.4303894042969
+   ],
+   [
+    "Signature of invigilator",
+    "0.1,-412.9",
+    0.0963134765625,
+    -412.9303894042969
+   ],
+   [
+    "OMR/2024/CS401/4471",
+    "0.1,-412.1",
+    0.100006103515625,
+    -412.0706481933594
+   ],
+   [
+    "15",
+    "0.1,-7.9",
+    0.0985107421875,
+    -7.920501708984375
+   ],
+   [
+    "30",
+    "0.1,-7.9",
+    0.0985107421875,
+    -7.920501708984375
+   ]
+  ],
+  "ok": true,
+  "doc": "351_omr_answer_sheet"
+ },
+ {
+  "lines": 40,
+  "within": 3,
+  "unmatched": 11,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.075,
+  "size_share": 0.9310344827586207,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [
+   "A                              size 7.5 -> 6.5",
+   "N                              size 7.5 -> 6.5"
+  ],
+  "worst": [
+   [
+    "Certificate no. MIT/APWA/2024/04471",
+    "0.1,-158.7",
+    0.146484375,
+    -158.73614501953125
+   ],
+   [
+    "Dr. S. Iyer, Director",
+    "0.1,-157.4",
+    0.1011962890625,
+    -157.396484375
+   ],
+   [
+    "Prof. A. Bose, Programme Head",
+    "0.1,-122.0",
+    0.14703369140625,
+    -121.99649047851562
+   ],
+   [
+    "E",
+    "66.9,0.0",
+    66.88995361328125,
+    0.0260467529296875
+   ],
+   [
+    "E",
+    "-56.9,-9.0",
+    -56.906463623046875,
+    -8.9931640625
+   ]
+  ],
+  "ok": true,
+  "doc": "352_certificate_ornate_border"
+ },
+ {
+  "lines": 45,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "AE2024447182",
+    "0.1,-269.9",
+    0.09999847412109375,
+    -269.87060546875
+   ],
+   [
+    "Controller of Examinations",
+    "0.1,-241.8",
+    0.1085205078125,
+    -241.7706298828125
+   ],
+   [
+    "Government Engineering College, K R Circ",
+    "0.1,65.9",
+    0.09999847412109375,
+    65.87890625
+   ],
+   [
+    "1. Carry this admit card and a photo ID ",
+    "0.1,65.0",
+    0.09999847412109375,
+    65.0191650390625
+   ],
+   [
+    "2. Reach the venue at least 60 minutes b",
+    "0.1,65.0",
+    0.09999847412109375,
+    65.0191650390625
+   ]
+  ],
+  "ok": true,
+  "doc": "353_admit_card"
+ },
+ {
+  "lines": 52,
+  "within": 23,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.4423076923076923,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "KSOU  \u2022  Provisional statement of marks ",
+    "0.1,-240.8",
+    0.09999847412109375,
+    -240.78521728515625
+   ],
+   [
+    "Page 1",
+    "0.1,-239.9",
+    0.1400146484375,
+    -239.88525390625
+   ],
+   [
+    "PASS",
+    "0.1,-28.2",
+    0.139007568359375,
+    -28.207199096679688
+   ],
+   [
+    "Computer Applications in Business",
+    "0.1,-11.2",
+    0.100006103515625,
+    -11.207199096679688
+   ],
+   [
+    "BCO-406",
+    "0.1,-11.2",
+    0.09999847412109375,
+    -11.207199096679688
+   ]
+  ],
+  "ok": true,
+  "doc": "35_four_typefaces_one_page"
+ },
+ {
+  "lines": 69,
+  "within": 2,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.028985507246376812,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "90",
+    "-430.8,-58.0",
+    -430.7597198486328,
+    -58.041168212890625
+   ],
+   [
+    "450",
+    "-424.0,28.5",
+    -423.95169830322266,
+    28.45880126953125
+   ],
+   [
+    "390",
+    "-414.2,18.8",
+    -414.1517028808594,
+    18.758773803710938
+   ],
+   [
+    "360",
+    "-416.4,9.0",
+    -416.35169982910156,
+    8.958786010742188
+   ],
+   [
+    "420",
+    "-390.8,-0.7",
+    -390.75169372558594,
+    -0.7412261962890625
+   ]
+  ],
+  "ok": true,
+  "doc": "360_restaurant_menu"
+ },
+ {
+  "lines": 33,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.030303030303030304,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Min order: 10 units",
+    "364.1,-344.8",
+    364.1000061035156,
+    -344.7606964111328
+   ],
+   [
+    "Min order: 10 units",
+    "-181.9,-346.1",
+    -181.9000015258789,
+    -346.11070251464844
+   ],
+   [
+    "Min order: 10 units",
+    "-181.9,-346.1",
+    -181.89999389648438,
+    -346.11070251464844
+   ],
+   [
+    "Meridian Industrial Supplies Pvt Ltd | P",
+    "0.1,-421.8",
+    0.10000038146972656,
+    -421.75054931640625
+   ],
+   [
+    "Code WP-1210",
+    "0.1,-206.6",
+    0.100006103515625,
+    -206.61068725585938
+   ]
+  ],
+  "ok": true,
+  "doc": "361_product_catalogue_grid"
+ },
+ {
+  "lines": 258,
+  "within": 90,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.3488372093023256,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Rates are subject to change without noti",
+    "0.1,-390.9",
+    0.10000038146972656,
+    -390.9303894042969
+   ],
+   [
+    "PRICE LIST - APRIL 2024",
+    "122.9,-2.9",
+    122.85528564453125,
+    -2.941783905029297
+   ],
+   [
+    "Effective 01-04-2024 | All rates in INR ",
+    "97.0,-6.3",
+    96.99070739746094,
+    -6.260730743408203
+   ],
+   [
+    "403.33",
+    "0.1,8.4",
+    0.11871337890625,
+    8.357437133789062
+   ],
+   [
+    "PA-1027",
+    "0.1,8.4",
+    0.10000038146972656,
+    8.357437133789062
+   ]
+  ],
+  "ok": true,
+  "doc": "362_price_list_dense"
+ },
+ {
+  "lines": 30,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Customer care: 1800-123-4471 (toll free)",
+    "0.1,-304.1",
+    0.09999847412109375,
+    -304.050537109375
+   ],
+   [
+    "Registered office: Plot 14, Peenya Indus",
+    "0.1,-304.1",
+    0.09999847412109375,
+    -304.050537109375
+   ],
+   [
+    "CONTACT",
+    "0.1,-16.5",
+    0.100006103515625,
+    -16.480865478515625
+   ],
+   [
+    "CUSTOMER NAME",
+    "0.1,-16.5",
+    0.09999847412109375,
+    -16.480865478515625
+   ],
+   [
+    "+91 98450 11223",
+    "0.1,-16.1",
+    0.100006103515625,
+    -16.141250610351562
+   ]
+  ],
+  "ok": true,
+  "doc": "363_warranty_card"
+ },
+ {
+  "lines": 21,
+  "within": 10,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.47619047619047616,
+  "size_share": 1.0,
+  "name_share": 0.9523809523809523,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Terms: entry subject to security screeni",
+    "0.1,-21.6",
+    0.09999847412109375,
+    -21.56072998046875
+   ],
+   [
+    "Carry a photo ID. Children below 12 not ",
+    "0.1,-21.6",
+    0.09999847412109375,
+    -21.56072998046875
+   ],
+   [
+    "TEAR-OFF STUB",
+    "0.1,-21.2",
+    0.09999847412109375,
+    -21.18084716796875
+   ],
+   [
+    "ANANYA RAO | DELEGATE | 12-14 SEP 2024",
+    "0.1,-20.7",
+    0.09999847412109375,
+    -20.700958251953125
+   ],
+   [
+    "WAREHOUSE SUMMIT 2024",
+    "0.1,6.1",
+    0.09999847412109375,
+    6.0960693359375
+   ]
+  ],
+  "ok": true,
+  "doc": "364_event_ticket"
+ },
+ {
+  "lines": 40,
+  "within": 2,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.05,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Tip: add a pinch of sugar to balance the",
+    "0.1,-207.9",
+    0.09999847412109375,
+    -207.8907470703125
+   ],
+   [
+    "2 tbsp",
+    "0.2,125.9",
+    0.1620941162109375,
+    125.8587646484375
+   ],
+   [
+    "Cornflour",
+    "0.1,-16.9",
+    0.09999847412109375,
+    -16.941238403320312
+   ],
+   [
+    "2 medium",
+    "0.1,-15.5",
+    0.143707275390625,
+    -15.541213989257812
+   ],
+   [
+    "Boiled potato, mashed",
+    "0.1,-15.5",
+    0.09999847412109375,
+    -15.541213989257812
+   ]
+  ],
+  "ok": true,
+  "doc": "365_recipe_card"
+ },
+ {
+  "lines": 29,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.06896551724137931,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Malnad Estates Private Limited  \u2022  Certi",
+    "0.1,-196.7",
+    0.09999847412109375,
+    -196.68923950195312
+   ],
+   [
+    "Page 1",
+    "0.2,-195.8",
+    0.1748046875,
+    -195.78927612304688
+   ],
+   [
+    "Estate Office: Sakleshpur, Hassan Distri",
+    "0.1,-6.3",
+    0.09999847412109375,
+    -6.299243927001953
+   ],
+   [
+    "This document is set in DejaVu Serif, em",
+    "0.1,-5.4",
+    0.09999847412109375,
+    -5.361724853515625
+   ],
+   [
+    "used on this page. A character outside t",
+    "0.1,-5.4",
+    0.09999847412109375,
+    -5.361724853515625
+   ]
+  ],
+  "ok": true,
+  "doc": "36_embedded_subset_font"
+ },
+ {
+  "lines": 37,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.05405405405405406,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "annum)",
+    "-43.3,-0.4",
+    -43.30645751953125,
+    -0.364898681640625
+   ],
+   [
+    "This offer is subject to satisfactory ve",
+    "0.1,23.7",
+    0.10708999633789062,
+    23.654632568359375
+   ],
+   [
+    "check. Please confirm acceptance by sign",
+    "0.1,23.7",
+    0.10708999633789062,
+    23.654632568359375
+   ],
+   [
+    "letter.",
+    "0.1,23.7",
+    0.10708999633789062,
+    23.654617309570312
+   ],
+   [
+    "We look forward to welcoming you to the ",
+    "0.1,23.7",
+    0.10708999633789062,
+    23.65460205078125
+   ]
+  ],
+  "ok": true,
+  "doc": "370_offer_letter"
+ },
+ {
+  "lines": 44,
+  "within": 3,
+  "unmatched": 21,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.06818181818181818,
+  "size_share": 0.9130434782608695,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [
+   "E                              size 7.5 -> 6.5",
+   "P                              size 7.5 -> 6.5"
+  ],
+  "worst": [
+   [
+    "This certificate is issued on request fo",
+    "0.1,-284.5",
+    0.09999847412109375,
+    -284.4505310058594
+   ],
+   [
+    "S. Mehta, Director - Human Resources",
+    "0.1,-283.1",
+    0.09999847412109375,
+    -283.1108703613281
+   ],
+   [
+    "Place: Pune",
+    "0.1,-282.7",
+    0.09999847412109375,
+    -282.7309875488281
+   ],
+   [
+    "Date: 18 March 2024",
+    "0.1,-282.7",
+    0.09999847412109375,
+    -282.7309875488281
+   ],
+   [
+    "S",
+    "32.8,-46.4",
+    32.8082275390625,
+    -46.408721923828125
+   ]
+  ],
+  "ok": true,
+  "doc": "371_experience_certificate"
+ },
+ {
+  "lines": 68,
+  "within": 20,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.29411764705882354,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Project / Task",
+    "0.1,-6.5",
+    0.09999847412109375,
+    -6.520912170410156
+   ],
+   [
+    "Sat 9",
+    "0.1,-6.5",
+    0.06805419921875,
+    -6.520912170410156
+   ],
+   [
+    "Tue 5",
+    "0.1,-6.5",
+    0.0648193359375,
+    -6.520912170410156
+   ],
+   [
+    "Wed 6",
+    "0.1,-6.5",
+    0.0640869140625,
+    -6.520912170410156
+   ],
+   [
+    "Total",
+    "0.1,-6.5",
+    0.0589599609375,
+    -6.520912170410156
+   ]
+  ],
+  "ok": true,
+  "doc": "372_timesheet_grid"
+ },
+ {
+  "lines": 32,
+  "within": 3,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.09375,
+  "size_share": 0.65625,
+  "name_share": 1.0,
+  "colour_share": 0.65625,
+  "font_problems": [
+   "Employee name                  size 6.0 -> 8.0",
+   "Employee code                  size 6.0 -> 8.0",
+   "Department                     size 6.0 -> 8.0",
+   "Designation                    size 6.0 -> 8.0",
+   "Date of joining                size 6.0 -> 8.0"
+  ],
+  "worst": [
+   [
+    "Form HR-04 rev 3 | Leave must be applied",
+    "0.1,-209.5",
+    0.09999847412109375,
+    -209.45050048828125
+   ],
+   [
+    "HR use",
+    "0.1,140.9",
+    0.100006103515625,
+    140.90939331054688
+   ],
+   [
+    "Manager signature",
+    "0.1,139.4",
+    0.100006103515625,
+    139.40939331054688
+   ],
+   [
+    "I declare that the particulars furnished",
+    "0.1,135.3",
+    0.09999847412109375,
+    135.29901123046875
+   ],
+   [
+    "applied for.",
+    "0.1,135.3",
+    0.09999847412109375,
+    135.27401733398438
+   ]
+  ],
+  "ok": true,
+  "doc": "373_leave_application_form"
+ },
+ {
+  "lines": 22,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.045454545454545456,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Total headcount: 68 permanent, 112 contr",
+    "0.1,-387.5",
+    0.09999847412109375,
+    -387.4907531738281
+   ],
+   [
+    "Vacancies: 2 (Inbound supervisor, Transp",
+    "0.1,-387.4",
+    0.09999847412109375,
+    -387.3907470703125
+   ],
+   [
+    "T. RAO",
+    "2.4,-15.4",
+    2.390869140625,
+    -15.36077880859375
+   ],
+   [
+    "P. NAIR",
+    "0.1,-15.4",
+    0.0970916748046875,
+    -15.36077880859375
+   ],
+   [
+    "S. BOSE",
+    "0.0,-15.4",
+    0.033294677734375,
+    -15.36077880859375
+   ]
+  ],
+  "ok": true,
+  "doc": "374_org_chart"
+ },
+ {
+  "lines": 459,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.004357298474945534,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "L",
+    "488.4,-204.8",
+    488.3599853515625,
+    -204.79437255859375
+   ],
+   [
+    "3",
+    "-517.5,-140.8",
+    -517.5186309814453,
+    -140.79437255859375
+   ],
+   [
+    "W",
+    "-458.8,-172.1",
+    -458.8313903808594,
+    -172.0943603515625
+   ],
+   [
+    "L",
+    "442.1,-188.1",
+    442.05999755859375,
+    -188.0943603515625
+   ],
+   [
+    "P",
+    "459.1,-137.8",
+    459.0885314941406,
+    -137.79434204101562
+   ]
+  ],
+  "ok": true,
+  "doc": "375_attendance_register"
+ },
+ {
+  "lines": 19,
+  "within": 14,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.7368421052631579,
+  "size_share": 1.0,
+  "name_share": 0.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Circular 14 of 2025  \u00b7  DCBEU Tumakuru d",
+    "0.1,-244.1",
+    0.09999847412109375,
+    -244.10125732421875
+   ],
+   [
+    "Page 1",
+    "0.1,-243.2",
+    0.07598876953125,
+    -243.2012939453125
+   ],
+   [
+    "Affiliated to the All India Bank Employe",
+    "0.1,-4.6",
+    0.09999847412109375,
+    -4.595256805419922
+   ],
+   [
+    "The circular is set in Times and Helveti",
+    "0.1,-3.8",
+    0.09999847412109375,
+    -3.8072662353515625
+   ],
+   [
+    "the receiving application must name a cl",
+    "0.1,-3.8",
+    0.09999847412109375,
+    -3.8072662353515625
+   ]
+  ],
+  "ok": true,
+  "doc": "37_font_not_embedded_substitution"
+ },
+ {
+  "lines": 20,
+  "within": 5,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.25,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "2024-03-18T03:19:02+05:30 INFO  batch 7 ",
+    "0.1,-4.6",
+    0.09999847412109375,
+    -4.5886383056640625
+   ],
+   [
+    "2024-03-18T03:12:41+05:30 INFO  starting",
+    "0.1,-4.5",
+    0.09999847412109375,
+    -4.488716125488281
+   ],
+   [
+    "2024-03-18T03:12:43+05:30 WARN  retry 1 ",
+    "0.1,-4.5",
+    0.09999847412109375,
+    -4.488716125488281
+   ],
+   [
+    "2024-03-18T03:12:44+05:30 ERROR duplicat",
+    "0.1,-4.5",
+    0.09999847412109375,
+    -4.488716125488281
+   ],
+   [
+    "2024-03-18T03:12:44+05:30 ERROR   DETAIL",
+    "0.1,-4.5",
+    0.09999847412109375,
+    -4.488716125488281
+   ]
+  ],
+  "ok": true,
+  "doc": "380_runbook_terminal_output"
+ },
+ {
+  "lines": 65,
+  "within": 26,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.4,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Distribution: Operations, Engineering, C",
+    "0.1,-289.9",
+    0.10000038146972656,
+    -289.85052490234375
+   ],
+   [
+    "Owner",
+    "0.1,-7.8",
+    0.100006103515625,
+    -7.80096435546875
+   ],
+   [
+    "Action",
+    "0.1,-7.8",
+    0.100006103515625,
+    -7.80096435546875
+   ],
+   [
+    "Time (IST)",
+    "0.1,-7.8",
+    0.10000038146972656,
+    -7.80096435546875
+   ],
+   [
+    "Event",
+    "0.1,-7.8",
+    0.09999847412109375,
+    -7.80096435546875
+   ]
+  ],
+  "ok": true,
+  "doc": "381_incident_report_timeline"
+ },
+ {
+  "lines": 29,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.034482758620689655,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "TRANSFORM",
+    "0.1,-129.2",
+    0.08538818359375,
+    -129.1562728881836
+   ],
+   [
+    "WMS",
+    "0.2,-125.1",
+    0.1642608642578125,
+    -125.05626678466797
+   ],
+   [
+    "dbt 1.7",
+    "0.1,-124.9",
+    0.1094970703125,
+    -124.91603088378906
+   ],
+   [
+    "CDC",
+    "0.1,-122.5",
+    0.100006103515625,
+    -122.49591064453125
+   ],
+   [
+    "Oracle 19c",
+    "0.1,-122.0",
+    0.08213043212890625,
+    -122.01603698730469
+   ]
+  ],
+  "ok": true,
+  "doc": "382_architecture_diagram"
+ },
+ {
+  "lines": 58,
+  "within": 25,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.43103448275862066,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "no",
+    "0.1,-20.7",
+    0.0709991455078125,
+    -20.6510009765625
+   ],
+   [
+    "Page size, 1-500, default 100",
+    "0.1,-9.4",
+    0.100006103515625,
+    -9.35101318359375
+   ],
+   [
+    "limit",
+    "0.1,-9.4",
+    0.10000038146972656,
+    -9.35101318359375
+   ],
+   [
+    "integer",
+    "0.1,-9.4",
+    0.09999847412109375,
+    -9.35101318359375
+   ],
+   [
+    "Filter by zone: ambient, chilled, frozen",
+    "0.1,-6.7",
+    0.100006103515625,
+    -6.6510009765625
+   ]
+  ],
+  "ok": true,
+  "doc": "383_api_docs_page"
+ },
+ {
+  "lines": 46,
+  "within": 14,
+  "unmatched": 3,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.30434782608695654,
+  "size_share": 1.0,
+  "name_share": 0.9782608695652174,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "SVIT Civil Engineering  \u2022  Project repor",
+    "0.1,-282.9",
+    0.09999847412109375,
+    -282.8892517089844
+   ],
+   [
+    "Page 1",
+    "0.2,-282.0",
+    0.1748046875,
+    -281.9892883300781
+   ],
+   [
+    "The mixes were prepared with a water to ",
+    "0.1,13.0",
+    0.09999847412109375,
+    12.96466064453125
+   ],
+   [
+    "measured by the slump flow test, and all",
+    "0.1,12.9",
+    0.09999847412109375,
+    12.89794921875
+   ],
+   [
+    "Head of Department: Dr. S. Vedavathi",
+    "0.1,12.5",
+    0.100006103515625,
+    12.457015991210938
+   ]
+  ],
+  "ok": true,
+  "doc": "38_faux_bold_italic_synthesised"
+ },
+ {
+  "lines": 403,
+  "within": 233,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.5781637717121588,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Units: Temp C, Cond uS/cm, TDS mg/L, Tur",
+    "0.1,-179.1",
+    0.10000038146972656,
+    -179.11602783203125
+   ],
+   [
+    "Below detection limit reported as < 0.01",
+    "0.1,-179.1",
+    0.10000038146972656,
+    -179.11602783203125
+   ],
+   [
+    "S17",
+    "0.1,3.3",
+    0.10000038146972656,
+    3.3036956787109375
+   ],
+   [
+    "S18",
+    "0.1,3.3",
+    0.10000038146972656,
+    3.3036956787109375
+   ],
+   [
+    "B-217",
+    "0.1,3.3",
+    0.09999847412109375,
+    3.3036956787109375
+   ]
+  ],
+  "ok": true,
+  "doc": "390_wide_data_appendix"
+ },
+ {
+  "lines": 16,
+  "within": 0,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Thank you for your feedback. Responses a",
+    "0.1,-402.5",
+    0.10000038146972656,
+    -402.4505310058594
+   ],
+   [
+    "WAREHOUSE OPERATOR SURVEY 2024",
+    "106.6,-2.9",
+    106.56890869140625,
+    -2.941783905029297
+   ],
+   [
+    "Section 3 - Service quality (please tick",
+    "96.3,-5.4",
+    96.30570983886719,
+    -5.4010009765625
+   ],
+   [
+    "Neutral",
+    "7.3,-6.4",
+    7.309295654296875,
+    -6.4010162353515625
+   ],
+   [
+    "Statement",
+    "0.1,-6.4",
+    0.10000038146972656,
+    -6.4010162353515625
+   ]
+  ],
+  "ok": true,
+  "doc": "391_survey_questionnaire_grid"
+ },
+ {
+  "lines": 21,
+  "within": 1,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.047619047619047616,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "> fit <- lm(cost ~ pallets + utilisation",
+    "0.1,-5.6",
+    0.10000038146972656,
+    -5.63477897644043
+   ],
+   [
+    "> summary(fit)",
+    "0.1,-5.6",
+    0.10000038146972656,
+    -5.63477897644043
+   ],
+   [
+    "Call:",
+    "0.1,-5.6",
+    0.10000038146972656,
+    -5.634777069091797
+   ],
+   [
+    "Residuals:",
+    "0.1,-5.6",
+    0.10000038146972656,
+    -5.634777069091797
+   ],
+   [
+    "-184.220  -42.115   -6.408   38.902  212",
+    "0.1,-5.6",
+    0.10000038146972656,
+    -5.634773254394531
+   ]
+  ],
+  "ok": true,
+  "doc": "392_statistical_console_output"
+ },
+ {
+  "lines": 23,
+  "within": 1,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.043478260869565216,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Wavelength (nm)",
+    "0.1,-189.6",
+    0.12020111083984375,
+    -189.55093383789062
+   ],
+   [
+    "Peak",
+    "0.1,-189.6",
+    0.11615753173828125,
+    -189.55093383789062
+   ],
+   [
+    "Absorbance",
+    "0.1,-189.6",
+    0.089996337890625,
+    -189.55093383789062
+   ],
+   [
+    "n to pi*",
+    "0.1,-188.9",
+    0.100006103515625,
+    -188.85098266601562
+   ],
+   [
+    "18.4",
+    "0.1,-188.9",
+    0.09918212890625,
+    -188.85098266601562
+   ]
+  ],
+  "ok": true,
+  "doc": "393_spectrum_peak_table"
+ },
+ {
+  "lines": 15,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Source: Survey of India toposheet 47/J/6",
+    "0.1,-275.1",
+    0.10000038146972656,
+    -275.1103515625
+   ],
+   [
+    "N",
+    "0.1,-274.6",
+    0.13525390625,
+    -274.63043212890625
+   ],
+   [
+    "Company facility",
+    "0.1,-274.6",
+    0.1243896484375,
+    -274.6304016113281
+   ],
+   [
+    "Utility / landmark",
+    "0.1,-274.6",
+    0.1243896484375,
+    -274.6304016113281
+   ],
+   [
+    "State highway",
+    "0.1,-274.6",
+    0.1243896484375,
+    -274.6304016113281
+   ]
+  ],
+  "ok": true,
+  "doc": "394_map_with_legend"
+ },
+ {
+  "lines": 24,
+  "within": 1,
+  "unmatched": 9,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.041666666666666664,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 0.9333333333333333,
+  "font_problems": [],
+  "worst": [
+   [
+    "Mysore Chamber of Commerce and Industry ",
+    "0.1,-246.8",
+    0.09999847412109375,
+    -246.78921508789062
+   ],
+   [
+    "Page 1",
+    "0.2,-245.9",
+    0.1748046875,
+    -245.88925170898438
+   ],
+   [
+    "T H E M Y S O R E C H A M B E R O F C O ",
+    "0.1,12.2",
+    0.09999847412109375,
+    12.16326904296875
+   ],
+   [
+    "Members are informed that the annual gen",
+    "0.1,10.0",
+    0.09999847412109375,
+    10.037857055664062
+   ],
+   [
+    "seventh of September, at the chamber hal",
+    "0.1,10.0",
+    0.09999847412109375,
+    10.034988403320312
+   ]
+  ],
+  "ok": true,
+  "doc": "39_small_caps_letter_spacing"
+ },
+ {
+  "lines": 25,
+  "within": 1,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.04,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "or we lose the",
+    "23.1,-219.9",
+    23.13751220703125,
+    -219.9010009765625
+   ],
+   [
+    "412 pallets",
+    "0.1,-236.8",
+    0.1428985595703125,
+    -236.80099487304688
+   ],
+   [
+    "RAVI",
+    "0.2,-229.5",
+    0.17372894287109375,
+    -229.54061889648438
+   ],
+   [
+    "waiting.",
+    "0.2,-228.6",
+    0.1681976318359375,
+    -228.60098266601562
+   ],
+   [
+    "Ship by noon",
+    "0.1,-228.1",
+    0.105010986328125,
+    -228.10098266601562
+   ]
+  ],
+  "ok": true,
+  "doc": "400_comic_page_speech_bubbles"
+ },
+ {
+  "lines": 24,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "CONTACT US",
+    "-722.9,-484.1",
+    -722.8868770599365,
+    -484.13203048706055
+   ],
+   [
+    "Meridian Industrial Parks Pvt Ltd",
+    "-672.3,-437.8",
+    -672.2858028411865,
+    -437.75272369384766
+   ],
+   [
+    "+91 20 4123 8890",
+    "-726.4,-353.8",
+    -726.3978633880615,
+    -353.7527542114258
+   ],
+   [
+    "leasing@meridian.example",
+    "-692.6,-381.8",
+    -692.5738887786865,
+    -381.7527542114258
+   ],
+   [
+    "Survey 142/2, Chakan, Pune 410501",
+    "-655.1,-409.8",
+    -655.061803817749,
+    -409.7527542114258
+   ]
+  ],
+  "ok": true,
+  "doc": "401_trifold_brochure"
+ },
+ {
+  "lines": 46,
+  "within": 4,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.08695652173913043,
+  "size_share": 0.9111111111111111,
+  "name_share": 1.0,
+  "colour_share": 0.9111111111111111,
+  "font_problems": [
+   "Holi                           size 6.0 -> 11.0",
+   "Audit                          size 6.0 -> 11.0",
+   "Review                         size 6.0 -> 11.0",
+   "Good Friday                    size 6.0 -> 11.0"
+  ],
+  "worst": [
+   [
+    "Good Friday",
+    "0.0,201.8",
+    0.0281982421875,
+    201.75936889648438
+   ],
+   [
+    "25",
+    "0.1,155.1",
+    0.09999847412109375,
+    155.05819702148438
+   ],
+   [
+    "27",
+    "0.1,155.1",
+    0.0641021728515625,
+    155.05819702148438
+   ],
+   [
+    "30",
+    "0.1,155.1",
+    0.060302734375,
+    155.05819702148438
+   ],
+   [
+    "26",
+    "0.0,155.1",
+    0.03209686279296875,
+    155.05819702148438
+   ]
+  ],
+  "ok": true,
+  "doc": "402_calendar_month_grid"
+ },
+ {
+  "lines": 28,
+  "within": 3,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.10714285714285714,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Solutions in tomorrow's edition. Clue 9 ",
+    "0.1,-239.6",
+    0.10000038146972656,
+    -239.550537109375
+   ],
+   [
+    "1",
+    "0.1,-7.7",
+    0.100006103515625,
+    -7.7003936767578125
+   ],
+   [
+    "11. Loading bay (4)",
+    "0.1,-7.4",
+    0.10000038146972656,
+    -7.380859375
+   ],
+   [
+    "10. Vehicle (3)",
+    "0.1,-7.4",
+    0.062225341796875,
+    -7.380859375
+   ],
+   [
+    "9. Not in stock (3,2,5)",
+    "0.1,-7.0",
+    0.10000038146972656,
+    -6.9808349609375
+   ]
+  ],
+  "ok": true,
+  "doc": "403_crossword_puzzle"
+ },
+ {
+  "lines": 33,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "SUDOKU - MEDIUM",
+    "120.0,-3.8",
+    120.0491943359375,
+    -3.762500762939453
+   ],
+   [
+    "Fill every row, column and 3x3 box with ",
+    "96.0,-9.4",
+    95.99790954589844,
+    -9.4010009765625
+   ],
+   [
+    "Difficulty: medium | Puzzle no. 4471 | A",
+    "92.0,-2.3",
+    91.99420166015625,
+    -2.2808837890625
+   ],
+   [
+    "5",
+    "0.1,-9.7",
+    0.0883026123046875,
+    -9.72342300415039
+   ],
+   [
+    "3",
+    "0.1,-9.7",
+    0.0883026123046875,
+    -9.72342300415039
+   ]
+  ],
+  "ok": true,
+  "doc": "404_sudoku_grid"
+ },
+ {
+  "lines": 37,
+  "within": 11,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.2972972972972973,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "G",
+    "-271.9,-9.1",
+    -271.8999938964844,
+    -9.08088493347168
+   ],
+   [
+    "G",
+    "272.1,-7.9",
+    272.1000061035156,
+    -7.880882263183594
+   ],
+   [
+    "G",
+    "-271.9,-3.4",
+    -271.8999938964844,
+    -3.3808746337890625
+   ],
+   [
+    "(c) 2024 Meridian Music Publishing. All ",
+    "0.1,-274.7",
+    0.09999847412109375,
+    -274.6505432128906
+   ],
+   [
+    "G",
+    "272.1,-2.2",
+    272.1000061035156,
+    -2.180877685546875
+   ]
+  ],
+  "ok": true,
+  "doc": "405_sheet_music_lyrics"
+ },
+ {
+  "lines": 31,
+  "within": 13,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.41935483870967744,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Machine readable zone - do not write bel",
+    "0.1,-293.2",
+    0.09999847412109375,
+    -293.2102966308594
+   ],
+   [
+    "This passport is the property of the Rep",
+    "0.1,-292.7",
+    0.09999847412109375,
+    -292.73040771484375
+   ],
+   [
+    "P<INDRAO<<ANANYA<<<<<<<<<<<<<<<<<<<<<<<<",
+    "0.1,-289.6",
+    0.09999847412109375,
+    -289.57122802734375
+   ],
+   [
+    "Z44718204IND9007128F3105032<<<<<<<<<<<<<",
+    "0.1,-289.6",
+    0.09999847412109375,
+    -289.57122802734375
+   ],
+   [
+    "BENGALURU",
+    "0.1,49.3",
+    0.100006103515625,
+    49.25877380371094
+   ]
+  ],
+  "ok": true,
+  "doc": "406_passport_mrz_page"
+ },
+ {
+  "lines": 15,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.06666666666666667,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "This card is the property of the company",
+    "0.1,-12.7",
+    0.09999847412109375,
+    -12.720489501953125
+   ],
+   [
+    "It must be carried at all times on premi",
+    "0.1,-12.7",
+    0.09999847412109375,
+    -12.720489501953125
+   ],
+   [
+    "Loss must be reported to security immedi",
+    "0.1,-12.7",
+    0.09999847412109375,
+    -12.720489501953125
+   ],
+   [
+    "If found, please return to the nearest o",
+    "0.1,-12.7",
+    0.09999847412109375,
+    -12.720489501953125
+   ],
+   [
+    "Emergency: +91 20 4123 8890",
+    "0.1,-12.7",
+    0.09999847412109375,
+    -12.720489501953125
+   ]
+  ],
+  "ok": true,
+  "doc": "407_id_card_front_back"
+ },
+ {
+  "lines": 30,
+  "within": 11,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.36666666666666664,
+  "size_share": 1.0,
+  "name_share": 0.06666666666666667,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "\u0905\u0928\u0941\u0935\u093e\u0926 \u092a\u094d\u0930\u092e\u093e\u0923 \u092a\u0924\u094d\u0930",
+    "0.1,-266.5",
+    0.09999847412109375,
+    -266.53692626953125
+   ],
+   [
+    "KTB/2025/4471",
+    "0.1,-264.9",
+    0.100006103515625,
+    -264.8890075683594
+   ],
+   [
+    "Page 1",
+    "0.1,-255.7",
+    0.1468505859375,
+    -255.68905639648438
+   ],
+   [
+    "\u091c\u093e\u0928\u0915\u093e\u0930\u0940",
+    "0.1,-14.4",
+    0.100006103515625,
+    -14.400032043457031
+   ],
+   [
+    "\u0935\u093f\u0935\u0930\u0923",
+    "0.1,-14.4",
+    0.10000228881835938,
+    -14.400032043457031
+   ]
+  ],
+  "ok": true,
+  "doc": "40_devanagari_shaping_font"
+ },
+ {
+  "lines": 7,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 0.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Quantity 1,000   Rate 78.00   Amount 78,",
+    "0.1,-339.9",
+    0.09999847412109375,
+    -339.9432182312012
+   ],
+   [
+    "Invoice line item - corrugated carton 5-",
+    "0.1,-339.9",
+    0.09999847412109375,
+    -339.9432144165039
+   ],
+   [
+    "The three blocks above are one Form XObj",
+    "0.1,-133.3",
+    0.09999847412109375,
+    -133.27621459960938
+   ],
+   [
+    "Invoice line item - corrugated carton 5-",
+    "0.1,43.9",
+    0.09999847412109375,
+    43.856773376464844
+   ],
+   [
+    "Quantity 1,000   Rate 78.00   Amount 78,",
+    "0.1,43.9",
+    0.09999847412109375,
+    43.856773376464844
+   ]
+  ],
+  "ok": true,
+  "doc": "410_form_xobject_reused"
+ },
+ {
+  "lines": 4,
+  "within": 1,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.25,
+  "size_share": 0.5,
+  "name_share": 0.0,
+  "colour_share": 1.0,
+  "font_problems": [
+   "NESTED FORM - scaled and rotat size 16.0 -> 10.0"
+  ],
+  "worst": [
+   [
+    "Above: one form placed inside another, s",
+    "0.1,-88.4",
+    0.09999847412109375,
+    -88.36924743652344
+   ],
+   [
+    "S",
+    "no matching line",
+    0,
+    0
+   ],
+   [
+    "O",
+    "no matching line",
+    0,
+    0
+   ]
+  ],
+  "ok": true,
+  "doc": "411_nested_xobject_transforms"
+ },
+ {
+  "lines": 15,
+  "within": 5,
+  "unmatched": 0,
+  "pages_ref": 5,
+  "pages_got": 5,
+  "page_count_ok": true,
+  "share": 0.3333333333333333,
+  "size_share": 1.0,
+  "name_share": 0.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "This is physical page 1 of the file.",
+    "0.1,-5.0",
+    0.09999847412109375,
+    -5.021018981933594
+   ],
+   [
+    "The PDF page labels give it a different,",
+    "0.1,-5.0",
+    0.09999847412109375,
+    -5.021018981933594
+   ],
+   [
+    "This is physical page 2 of the file.",
+    "0.1,-5.0",
+    0.09999847412109375,
+    -5.021018981933594
+   ],
+   [
+    "The PDF page labels give it a different,",
+    "0.1,-5.0",
+    0.09999847412109375,
+    -5.021018981933594
+   ],
+   [
+    "This is physical page 3 of the file.",
+    "0.1,-5.0",
+    0.09999847412109375,
+    -5.021018981933594
+   ]
+  ],
+  "ok": true,
+  "doc": "412_page_labels_roman"
+ },
+ {
+  "lines": 2,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 1.0,
+  "size_share": 1.0,
+  "name_share": 0.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [],
+  "ok": true,
+  "doc": "413_tagged_pdf_actualtext"
+ },
+ {
+  "lines": 2,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 0.0,
+  "colour_share": 0.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "The blue bar above is drawn with a lumin",
+    "0.1,-170.9",
+    0.09999847412109375,
+    -170.9312286376953
+   ],
+   [
+    "The text beside it is ordinary opaque te",
+    "0.1,-170.9",
+    0.09999847412109375,
+    -170.9312286376953
+   ]
+  ],
+  "ok": true,
+  "doc": "414_transparency_softmask"
+ },
+ {
+  "lines": 2,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 0.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "The checkerboard above is an inline imag",
+    "0.1,-150.9",
+    0.09999847412109375,
+    -150.93123626708984
+   ],
+   [
+    "It has no object number and lives inside",
+    "0.1,-150.9",
+    0.09999847412109375,
+    -150.9312286376953
+   ]
+  ],
+  "ok": true,
+  "doc": "415_inline_images"
+ },
+ {
+  "lines": 900,
+  "within": 300,
+  "unmatched": 0,
+  "pages_ref": 300,
+  "pages_got": 300,
+  "page_count_ok": true,
+  "share": 0.3333333333333333,
+  "size_share": 1.0,
+  "name_share": 0.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "This document has 300 pages, one record ",
+    "0.1,-8.3",
+    0.09999847412109375,
+    -8.319221496582031
+   ],
+   [
+    "This document has 300 pages, one record ",
+    "0.1,-8.3",
+    0.09999847412109375,
+    -8.319221496582031
+   ],
+   [
+    "This document has 300 pages, one record ",
+    "0.1,-8.3",
+    0.09999847412109375,
+    -8.319221496582031
+   ],
+   [
+    "This document has 300 pages, one record ",
+    "0.1,-8.3",
+    0.09999847412109375,
+    -8.319221496582031
+   ],
+   [
+    "This document has 300 pages, one record ",
+    "0.1,-8.3",
+    0.09999847412109375,
+    -8.319221496582031
+   ]
+  ],
+  "ok": true,
+  "doc": "416_many_tiny_pages"
+ },
+ {
+  "lines": 8,
+  "within": 1,
+  "unmatched": 4,
+  "pages_ref": 2,
+  "pages_got": 2,
+  "page_count_ok": true,
+  "share": 0.125,
+  "size_share": 1.0,
+  "name_share": 0.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "This page is stored upright but the page",
+    "0.1,-7.3",
+    0.09999847412109375,
+    -7.321006774902344
+   ],
+   [
+    "A reader shows it upside down; the text ",
+    "0.1,-7.3",
+    0.09999847412109375,
+    -7.321006774902344
+   ],
+   [
+    "A converter that ignores /Rotate outputs",
+    "0.1,-7.3",
+    0.09999847412109375,
+    -7.321006774902344
+   ],
+   [
+    "Page 2 - mirrored text",
+    "no matching line",
+    0,
+    0
+   ],
+   [
+    "This page is mirrored with a negative ho",
+    "no matching line",
+    0,
+    0
+   ]
+  ],
+  "ok": true,
+  "doc": "417_rotate180_and_mirrored"
+ },
+ {
+  "lines": 36,
+  "within": 5,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.1388888888888889,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Prakriti Organic Farms  \u2022  Price list 20",
+    "0.1,-186.3",
+    0.09999847412109375,
+    -186.28921508789062
+   ],
+   [
+    "Page 1",
+    "0.2,-185.4",
+    0.1748046875,
+    -185.38925170898438
+   ],
+   [
+    "365.00",
+    "0.1,-16.9",
+    0.123992919921875,
+    -16.92425537109375
+   ],
+   [
+    "Mustard oil, kachi ghani, 1 litre",
+    "0.1,-16.9",
+    0.09999847412109375,
+    -16.92425537109375
+   ],
+   [
+    "145.00",
+    "0.1,-16.3",
+    0.123992919921875,
+    -16.32421875
+   ]
+  ],
+  "ok": true,
+  "doc": "41_coloured_headings_white_bg"
+ },
+ {
+  "lines": 61,
+  "within": 27,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.4426229508196721,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "BESCOM  \u2022  RR No. 4471 221 889  \u2022  Billi",
+    "0.1,-283.8",
+    0.09999847412109375,
+    -283.7892150878906
+   ],
+   [
+    "Page 1",
+    "0.2,-282.9",
+    0.1748046875,
+    -282.8892517089844
+   ],
+   [
+    "130.00",
+    "0.0,-29.2",
+    0.04998779296875,
+    -29.161712646484375
+   ],
+   [
+    "139.90",
+    "0.1,-11.0",
+    0.149993896484375,
+    -10.961700439453125
+   ],
+   [
+    "388",
+    "0.1,-11.0",
+    0.100006103515625,
+    -10.961700439453125
+   ]
+  ],
+  "ok": true,
+  "doc": "42_table_coloured_header_alternating_rows"
+ },
+ {
+  "lines": 26,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.07692307692307693,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Vijaya Prakash and Associates  \u2022  Form 3",
+    "0.1,-114.3",
+    0.09999847412109375,
+    -114.28927612304688
+   ],
+   [
+    "Page 1",
+    "0.2,-105.1",
+    0.1748046875,
+    -105.08932495117188
+   ],
+   [
+    "Place: Bengaluru",
+    "0.1,-22.3",
+    0.09999847412109375,
+    -22.32421875
+   ],
+   [
+    "Date: 30 September 2025",
+    "0.1,-22.3",
+    0.09999847412109375,
+    -22.32421875
+   ],
+   [
+    "the assessee for the year under referenc",
+    "0.1,-16.3",
+    0.09999847412109375,
+    -16.267898559570312
+   ]
+  ],
+  "ok": true,
+  "doc": "43_red_stamp_over_black_text"
+ },
+ {
+  "lines": 25,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.08,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "KSOU  \u2022  Student circular  \u2022  Semester I",
+    "0.1,-202.7",
+    0.09999847412109375,
+    -202.68923950195312
+   ],
+   [
+    "Page 1",
+    "0.2,-201.8",
+    0.1748046875,
+    -201.78927612304688
+   ],
+   [
+    "Mukthagangotri, Mysuru 570 006  \u2022  www.k",
+    "0.1,-6.0",
+    0.09999847412109375,
+    -6.023235321044922
+   ],
+   [
+    "Circular No. KSOU/EXAM/2025-26/0447  \u2022  ",
+    "0.1,-5.3",
+    0.09999847412109375,
+    -5.261749267578125
+   ],
+   [
+    "Karnataka State Open University, Mysuru",
+    "0.1,-5.3",
+    0.09999847412109375,
+    -5.2617340087890625
+   ]
+  ],
+  "ok": true,
+  "doc": "44_coloured_underlined_hyperlinks"
+ },
+ {
+  "lines": 19,
+  "within": 10,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.5263157894736842,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Department of Horticulture  \u2022  Advisory ",
+    "0.1,-185.5",
+    0.09999847412109375,
+    -185.48928833007812
+   ],
+   [
+    "Page 1",
+    "0.2,-184.6",
+    0.1748046875,
+    -184.58932495117188
+   ],
+   [
+    "Directorate of Horticulture, Lalbagh, Be",
+    "0.1,-4.9",
+    0.09999847412109375,
+    -4.923259735107422
+   ],
+   [
+    "Kunigal, Tumakuru District  \u2022  08 Septem",
+    "0.1,-4.1",
+    0.09999847412109375,
+    -4.061737060546875
+   ],
+   [
+    "Fruit fly incidence has been reported in",
+    "0.1,-3.5",
+    0.09999847412109375,
+    -3.5085678100585938
+   ]
+  ],
+  "ok": true,
+  "doc": "45_coloured_callout_box"
+ },
+ {
+  "lines": 43,
+  "within": 17,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.3953488372093023,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "KMF  \u2022  Annual report extract 2024-25  \u2022",
+    "0.1,-138.2",
+    0.09999847412109375,
+    -138.18923950195312
+   ],
+   [
+    "Page 1",
+    "0.2,-137.3",
+    0.1748046875,
+    -137.28927612304688
+   ],
+   [
+    "63.4",
+    "0.1,-34.8",
+    0.108795166015625,
+    -34.765174865722656
+   ],
+   [
+    "70",
+    "0.1,-34.3",
+    0.08613204956054688,
+    -34.27024841308594
+   ],
+   [
+    "61.5",
+    "0.1,-32.2",
+    0.108795166015625,
+    -32.150856018066406
+   ]
+  ],
+  "ok": true,
+  "doc": "46_chart_coloured_labels_body_text"
+ },
+ {
+  "lines": 22,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.09090909090909091,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "NIRD  \u2022  Working paper 47  \u2022  Grey body ",
+    "0.1,-92.3",
+    0.09999847412109375,
+    -92.28927612304688
+   ],
+   [
+    "Page 1",
+    "0.2,-91.4",
+    0.1748046875,
+    -91.38931274414062
+   ],
+   [
+    "Keywords: rural livelihoods, indebtednes",
+    "0.1,-7.0",
+    0.09999847412109375,
+    -6.961700439453125
+   ],
+   [
+    "Rajendranagar, Hyderabad 500 030  \u2022  Min",
+    "0.1,-6.0",
+    0.09999847412109375,
+    -6.023235321044922
+   ],
+   [
+    "3.  Implications for policy",
+    "0.1,-5.5",
+    0.09999847412109375,
+    -5.5054779052734375
+   ]
+  ],
+  "ok": true,
+  "doc": "47_grey_body_black_headings"
+ },
+ {
+  "lines": 33,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.06060606060606061,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Kaveri Grameena Bank  \u2022  Account opening",
+    "0.1,-244.5",
+    0.09999847412109375,
+    -244.48928833007812
+   ],
+   [
+    "Page 1",
+    "0.2,-243.6",
+    0.1748046875,
+    -243.58932495117188
+   ],
+   [
+    "Signature of applicant",
+    "0.1,-6.3",
+    0.09999847412109375,
+    -6.330474853515625
+   ],
+   [
+    "Kunigal Branch  \u2022  IFSC KGBL0000441  \u2022  ",
+    "0.1,-6.0",
+    0.09999847412109375,
+    -6.023235321044922
+   ],
+   [
+    "Verified by the branch",
+    "0.1,-5.6",
+    0.100006103515625,
+    -5.580474853515625
+   ]
+  ],
+  "ok": true,
+  "doc": "48_form_coloured_border_coloured_values"
+ },
+ {
+  "lines": 20,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.1,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "SVIT  \u2022  Circular SVIT/ACA/2025-26/0447 ",
+    "0.1,-176.9",
+    0.09999847412109375,
+    -176.88925170898438
+   ],
+   [
+    "Page 1",
+    "0.2,-176.0",
+    0.1748046875,
+    -175.98928833007812
+   ],
+   [
+    "Copy to: all heads of department, notice",
+    "0.1,-9.4",
+    0.09999847412109375,
+    -9.380462646484375
+   ],
+   [
+    "Sri Vinayaka Institute of Technology",
+    "0.1,-8.9",
+    0.09999847412109375,
+    -8.861724853515625
+   ],
+   [
+    "Dean (Academics)",
+    "0.1,-7.9",
+    0.09999847412109375,
+    -7.9241943359375
+   ]
+  ],
+  "ok": true,
+  "doc": "49_coloured_background_block_paragraph"
+ },
+ {
+  "lines": 53,
+  "within": 16,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.3018867924528302,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Deccan Office Supplies  \u2022  Invoice DOS/2",
+    "0.1,-279.3",
+    0.09999847412109375,
+    -279.2892150878906
+   ],
+   [
+    "Page 1",
+    "0.2,-278.4",
+    0.1748046875,
+    -278.3892517089844
+   ],
+   [
+    "8,316.90",
+    "0.1,-33.7",
+    0.123992919921875,
+    -33.661712646484375
+   ],
+   [
+    "SGST @ 9%",
+    "0.1,-22.3",
+    0.100006103515625,
+    -22.261749267578125
+   ],
+   [
+    "CGST @ 9%",
+    "0.1,-17.7",
+    0.100006103515625,
+    -17.661712646484375
+   ]
+  ],
+  "ok": true,
+  "doc": "50_invoice_coloured_total_row"
+ },
+ {
+  "lines": 19,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.10526315789473684,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Margins: 2.0 cm on all four sides (56.7 ",
+    "0.1,-243.2",
+    0.10699844360351562,
+    -243.2149658203125
+   ],
+   [
+    "Office of the Deputy Commissioner (Comme",
+    "0.1,-5.3",
+    0.10699844360351562,
+    -5.339698791503906
+   ],
+   [
+    "No. CT/TMK/2025-26/0447          Date: 0",
+    "0.1,-4.5",
+    0.10699844360351562,
+    -4.473487854003906
+   ],
+   [
+    "Tumakuru Division",
+    "0.1,-3.7",
+    0.10699844360351562,
+    -3.65472412109375
+   ],
+   [
+    "Registered dealers falling under the Tum",
+    "0.1,-3.5",
+    0.10699844360351562,
+    -3.5015487670898438
+   ]
+  ],
+  "ok": true,
+  "doc": "51_two_cm_margins"
+ },
+ {
+  "lines": 38,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.02631578947368421,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Dividend declared on member shares",
+    "0.1,-41.2",
+    0.053501129150390625,
+    -41.177001953125
+   ],
+   [
+    "12%",
+    "0.0,-41.2",
+    0.0340576171875,
+    -41.177001953125
+   ],
+   [
+    "14%",
+    "0.0,-41.2",
+    0.0340576171875,
+    -41.177001953125
+   ],
+   [
+    "Net profit (Rs. lakh)",
+    "0.1,-39.1",
+    0.053501129150390625,
+    -39.076995849609375
+   ],
+   [
+    "42.6",
+    "0.0,-39.1",
+    0.02850341796875,
+    -39.076995849609375
+   ]
+  ],
+  "ok": true,
+  "doc": "52_one_cm_margin_wide_body"
+ },
+ {
+  "lines": 23,
+  "within": 7,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.30434782608695654,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Sarvodaya Vidya Kendra  \u2022  PTM report 13",
+    "0.1,-129.1",
+    0.09999847412109375,
+    -129.08926391601562
+   ],
+   [
+    "Page 1",
+    "0.2,-128.2",
+    0.1748046875,
+    -128.18930053710938
+   ],
+   [
+    "Note: headings above are set with 1.5 li",
+    "0.1,-50.8",
+    0.09999847412109375,
+    -50.780487060546875
+   ],
+   [
+    "Principal",
+    "0.1,-49.7",
+    0.09999847412109375,
+    -49.74298095703125
+   ],
+   [
+    "The meeting concluded at 1:00 p.m. with ",
+    "0.1,-49.3",
+    0.09999847412109375,
+    -49.32421875
+   ]
+  ],
+  "ok": true,
+  "doc": "53_single_space_body_15_headings"
+ },
+ {
+  "lines": 29,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.06896551724137931,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Indian Institute of Plantation Managemen",
+    "0.1,-320.9",
+    0.09999847412109375,
+    -320.9132385253906
+   ],
+   [
+    "Quarterly bulletin  \u2022  Page 1",
+    "0.1,-311.7",
+    0.143524169921875,
+    -311.7132263183594
+   ],
+   [
+    "above fifty hectares.",
+    "0.1,150.7",
+    0.100006103515625,
+    150.66974639892578
+   ],
+   [
+    "also records a shift towards mechanical ",
+    "0.1,150.6",
+    0.100006103515625,
+    150.6215591430664
+   ],
+   [
+    "the assistance of the board's subsidy sc",
+    "0.1,150.6",
+    0.100006103515625,
+    150.57337188720703
+   ]
+  ],
+  "ok": true,
+  "doc": "54_two_column_body_full_width_header_footer"
+ },
+ {
+  "lines": 41,
+  "within": 2,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.04878048780487805,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "PROJECT AT A GLANCE",
+    "0.1,175.8",
+    0.100006103515625,
+    175.8002700805664
+   ],
+   [
+    "NABARD loan assistance",
+    "0.1,175.8",
+    0.100006103515625,
+    175.77674865722656
+   ],
+   [
+    "31 August 2025",
+    "0.1,175.7",
+    0.100006103515625,
+    175.67678833007812
+   ],
+   [
+    "12 months",
+    "0.1,175.7",
+    0.100006103515625,
+    175.67678833007812
+   ],
+   [
+    "9",
+    "0.1,175.6",
+    0.100006103515625,
+    175.57678985595703
+   ]
+  ],
+  "ok": false,
+  "doc": "55_sidebar_box_beside_body"
+ },
+ {
+  "lines": 51,
+  "within": 14,
+  "unmatched": 3,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.27450980392156865,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Sri Lakshmi Fabrics  \u2022  Schedule of rate",
+    "0.1,-181.6",
+    0.09999847412109375,
+    -181.58926391601562
+   ],
+   [
+    "Page 1",
+    "0.2,-180.7",
+    0.1748046875,
+    -180.68930053710938
+   ],
+   [
+    "worker shall give thirty days notice of ",
+    "0.1,18.9",
+    0.09999847412109375,
+    18.941268920898438
+   ],
+   [
+    "and the table must not be re-aligned to ",
+    "0.1,18.9",
+    0.09999847412109375,
+    18.916366577148438
+   ],
+   [
+    "The table above is indented forty four p",
+    "0.1,18.9",
+    0.09999847412109375,
+    18.891433715820312
+   ]
+  ],
+  "ok": true,
+  "doc": "56_table_indented_from_margin"
+ },
+ {
+  "lines": 30,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 2,
+  "pages_got": 2,
+  "page_count_ok": true,
+  "share": 0.03333333333333333,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Project report  \u2022  Abstract  \u2022  Page 2 o",
+    "0.1,-283.2",
+    0.09999847412109375,
+    -283.1892395019531
+   ],
+   [
+    "Page 2",
+    "0.2,-282.3",
+    0.1748046875,
+    -282.2892761230469
+   ],
+   [
+    "by",
+    "146.5,-130.4",
+    146.46200561523438,
+    -130.42422485351562
+   ],
+   [
+    "August 2025",
+    "136.2,-130.4",
+    136.15780639648438,
+    -130.4241943359375
+   ],
+   [
+    "USN 1SV22CS047",
+    "129.6,-130.4",
+    129.62176513671875,
+    -130.42420959472656
+   ]
+  ],
+  "ok": true,
+  "doc": "57_centred_title_page_left_body_pages"
+ },
+ {
+  "lines": 21,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 2,
+  "pages_got": 2,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 0.8095238095238095,
+  "name_share": 1.0,
+  "colour_share": 0.8095238095238095,
+  "font_problems": [
+   "Bye-law 14 \u2014 Register of membe size 8.0 -> 11.5",
+   "BYE-LAW 14 \u2014 REGISTER OF MEMBE size 11.5 -> 8.0",
+   "Bye-law 14 \u2014 Register of membe size 8.0 -> 11.5",
+   "BYE-LAW 14 \u2014 REGISTER OF MEMBE size 11.5 -> 8.0"
+  ],
+  "worst": [
+   [
+    "Registered under the Karnataka Co-operat",
+    "0.1,-522.9",
+    0.09999847412109375,
+    -522.8892517089844
+   ],
+   [
+    "Page 1 of 2",
+    "0.1,-522.0",
+    0.13885498046875,
+    -521.9892578125
+   ],
+   [
+    "Registered under the Karnataka Co-operat",
+    "0.1,-509.1",
+    0.09999847412109375,
+    -509.0892639160156
+   ],
+   [
+    "Page 2 of 2",
+    "0.1,-508.2",
+    0.13885498046875,
+    -508.18927001953125
+   ],
+   [
+    "BYE-LAW 14 \u2014 REGISTER OF MEMBERS",
+    "367.7,-79.1",
+    367.70001220703125,
+    -79.11799454689026
+   ]
+  ],
+  "ok": true,
+  "doc": "58_header_rule_footer_rule"
+ },
+ {
+  "lines": 55,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 2,
+  "pages_got": 2,
+  "page_count_ok": true,
+  "share": 0.03636363636363636,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "SVIT Civil Engineering  \u2022  Site visit re",
+    "0.1,-228.7",
+    0.09999847412109375,
+    -228.68923950195312
+   ],
+   [
+    "Page 1",
+    "0.2,-227.8",
+    0.1748046875,
+    -227.78927612304688
+   ],
+   [
+    "SVIT Civil Engineering  \u2022  Site visit re",
+    "0.1,-174.3",
+    0.09999847412109375,
+    -174.27505493164062
+   ],
+   [
+    "Page 2",
+    "0.2,-173.4",
+    0.1607666015625,
+    -173.37506103515625
+   ],
+   [
+    "12.0 m x 8.0 m x 4.5 m",
+    "0.1,-67.6",
+    0.100006103515625,
+    -67.63028717041016
+   ]
+  ],
+  "ok": true,
+  "doc": "59_landscape_mixed_portrait"
+ },
+ {
+  "lines": 64,
+  "within": 9,
+  "unmatched": 43,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.140625,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "This page carries a decorative border dr",
+    "0.1,-245.4",
+    0.09999847412109375,
+    -245.407958984375
+   ],
+   [
+    "Y",
+    "73.7,21.6",
+    73.68063354492188,
+    21.594329833984375
+   ],
+   [
+    "Head, Department of CSE",
+    "0.1,-54.7",
+    0.09999847412109375,
+    -54.68048095703125
+   ],
+   [
+    "Dr. H. S. Prakash",
+    "0.1,-53.2",
+    0.09999847412109375,
+    -53.2242431640625
+   ],
+   [
+    "Principal",
+    "0.1,-30.9",
+    0.123992919921875,
+    -30.880462646484375
+   ]
+  ],
+  "ok": true,
+  "doc": "60_page_border"
+ },
+ {
+  "lines": 39,
+  "within": 3,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.07692307692307693,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Our data allow us to separate these expl",
+    "0.2,166.7",
+    0.1619873046875,
+    166.67898559570312
+   ],
+   [
+    "We observe the irrigation status of each",
+    "0.2,166.7",
+    0.1619873046875,
+    166.65731811523438
+   ],
+   [
+    "input use and the realised price, and we",
+    "0.2,166.6",
+    0.1619873046875,
+    166.6356201171875
+   ],
+   [
+    "distance to the nearest regulated market",
+    "0.2,166.6",
+    0.1619873046875,
+    166.61392211914062
+   ],
+   [
+    "the following section suggest that the s",
+    "0.2,166.6",
+    0.1619873046875,
+    166.59228515625
+   ]
+  ],
+  "ok": true,
+  "doc": "61_two_col_abstract_spanning"
+ },
+ {
+  "lines": 36,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "\u201cWe had given up on the second crop.",
+    "0.1,143.2",
+    0.09999847412109375,
+    143.21328735351562
+   ],
+   [
+    "This year we have sown ragi on the",
+    "0.1,143.2",
+    0.09999847412109375,
+    143.21328735351562
+   ],
+   [
+    "whole extent again.\u201d",
+    "0.1,143.2",
+    0.09999847412109375,
+    143.21328735351562
+   ],
+   [
+    "varieties of ragi.",
+    "0.2,141.3",
+    0.1619873046875,
+    141.31002807617188
+   ],
+   [
+    "a water charge of one hundred and twenty",
+    "0.1,141.3",
+    0.09999847412109375,
+    141.33419799804688
+   ]
+  ],
+  "ok": true,
+  "doc": "62_two_col_newsletter_pull_quote"
+ },
+ {
+  "lines": 45,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "free of charge on request, and cupping n",
+    "0.2,97.4",
+    0.17327880859375,
+    97.40230560302734
+   ],
+   [
+    "every consignment.",
+    "0.2,97.4",
+    0.17327880859375,
+    97.37328338623047
+   ],
+   [
+    "Rs. 31,200 per bag. Lots of less than tw",
+    "0.2,97.4",
+    0.17327880859375,
+    97.36038208007812
+   ],
+   [
+    "handling charge of Rs. 1,200 per lot. Sa",
+    "0.2,97.3",
+    0.17327880859375,
+    97.3313217163086
+   ],
+   [
+    "We offer washed arabica, screen 17 and a",
+    "0.2,97.3",
+    0.17327880859375,
+    97.31842803955078
+   ]
+  ],
+  "ok": false,
+  "doc": "63_three_column_brochure"
+ },
+ {
+  "lines": 77,
+  "within": 0,
+  "unmatched": 74,
+  "pages_ref": 1,
+  "pages_got": 5,
+  "page_count_ok": false,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 0.7532467532467533,
+  "colour_share": 0.6666666666666666,
+  "font_problems": [],
+  "worst": [
+   [
+    "CLASSIFIEDS",
+    "0.1,17.1",
+    0.100006103515625,
+    17.07674789428711
+   ],
+   [
+    "Friday, 19 September 2025  \u2022  Tumakuru  ",
+    "0.1,-10.3",
+    0.09999847412109375,
+    -10.299243927001953
+   ],
+   [
+    "THE TUMKURU TIMES",
+    "0.1,-4.3",
+    0.09999847412109375,
+    -4.274242401123047
+   ],
+   [
+    "Water scheme for Vinayaka Nagar to begin",
+    "no matching line",
+    0,
+    0
+   ],
+   [
+    "Two year delay ends\u037e 412 households to g",
+    "no matching line",
+    0,
+    0
+   ]
+  ],
+  "ok": false,
+  "doc": "64_newspaper_uneven_columns_ad_boxes"
+ },
+ {
+  "lines": 47,
+  "within": 2,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.0425531914893617,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "The results, presented in Figure 1, show",
+    "0.2,124.8",
+    0.1619873046875,
+    124.77896118164062
+   ],
+   [
+    "twenty five per cent of the shade canopy",
+    "0.2,124.8",
+    0.1619873046875,
+    124.75735473632812
+   ],
+   [
+    "mean of eleven per cent over the unthinn",
+    "0.2,124.7",
+    0.1619873046875,
+    124.73562622070312
+   ],
+   [
+    "heavier removal depressed yield after th",
+    "0.2,124.7",
+    0.1619873046875,
+    124.71395874023438
+   ],
+   [
+    "response appears to be mediated by the i",
+    "0.2,124.7",
+    0.1619873046875,
+    124.69223022460938
+   ]
+  ],
+  "ok": false,
+  "doc": "65_two_col_full_width_figure_caption"
+ },
+ {
+  "lines": 31,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.06451612903225806,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "1  IS 1479 (Part 1): 2016, Methods of te",
+    "0.1,-250.7",
+    0.09999847412109375,
+    -250.66921997070312
+   ],
+   [
+    "2  The interval is computed from the mil",
+    "0.1,-250.7",
+    0.09999847412109375,
+    -250.66921997070312
+   ],
+   [
+    "    receipt timestamp recorded at the ch",
+    "0.1,-250.7",
+    0.09999847412109375,
+    -250.66921997070312
+   ],
+   [
+    "3  Suspension is under clause 14(c) of t",
+    "0.1,-250.7",
+    0.09999847412109375,
+    -250.66921997070312
+   ],
+   [
+    "KMF  \u2022  Quality audit report  \u2022  Footnot",
+    "0.1,-250.5",
+    0.09999847412109375,
+    -250.50799560546875
+   ]
+  ],
+  "ok": true,
+  "doc": "66_two_col_footnotes_bottom"
+ },
+ {
+  "lines": 47,
+  "within": 2,
+  "unmatched": 4,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.0425531914893617,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "COURSE AT A GLANCE",
+    "0.1,350.9",
+    0.100006103515625,
+    350.87677001953125
+   ],
+   [
+    "CS403",
+    "0.1,350.9",
+    0.100006103515625,
+    350.876708984375
+   ],
+   [
+    "4 (3:0:1)",
+    "0.1,350.9",
+    0.100006103515625,
+    350.876708984375
+   ],
+   [
+    "III",
+    "0.1,350.9",
+    0.100006103515625,
+    350.876708984375
+   ],
+   [
+    "4 theory + 2 lab",
+    "0.1,350.9",
+    0.100006103515625,
+    350.876708984375
+   ]
+  ],
+  "ok": false,
+  "doc": "67_two_col_with_sidebar"
+ },
+ {
+  "lines": 74,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.013513513513513514,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Karnataka Journal of Co-operation  \u2022  Vo",
+    "0.1,-174.0",
+    0.09999847412109375,
+    -173.95794677734375
+   ],
+   [
+    "Page 1",
+    "0.1,-172.9",
+    0.12786865234375,
+    -172.907958984375
+   ],
+   [
+    "K. R. Gowda and S. Vedavathi",
+    "119.9,-4.0",
+    119.91265869140625,
+    -4.042980194091797
+   ],
+   [
+    "Volume 33  \u2022  Number 1  \u2022  January to Ma",
+    "108.0,-5.5",
+    108.04714965820312,
+    -5.499256134033203
+   ],
+   [
+    "KARNATAKA JOURNAL OF CO-OPERATION",
+    "87.4,-2.2",
+    87.40969848632812,
+    -2.1679954528808594
+   ]
+  ],
+  "ok": true,
+  "doc": "68_journal_wide_table_spanning"
+ },
+ {
+  "lines": 52,
+  "within": 1,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.019230769230769232,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "courts at Erode shall have exclusive jur",
+    "0.2,250.3",
+    0.1619873046875,
+    250.25027465820312
+   ],
+   [
+    "referred to arbitration.",
+    "0.2,250.2",
+    0.1619873046875,
+    250.22482299804688
+   ],
+   [
+    "10.",
+    "0.2,248.4",
+    0.1619873046875,
+    248.35031127929688
+   ],
+   [
+    "This agreement shall be governed by the ",
+    "0.2,241.0",
+    0.1619873046875,
+    240.97579956054688
+   ],
+   [
+    "The job worker shall maintain insurance ",
+    "0.1,208.5",
+    0.09999847412109375,
+    208.54891967773438
+   ]
+  ],
+  "ok": true,
+  "doc": "69_two_col_legal_numbered_clauses"
+ },
+ {
+  "lines": 24,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Malnad  \u2022  Quarterly letter  \u2022  Winter 2",
+    "0.1,-107.2",
+    0.09999847412109375,
+    -107.15802001953125
+   ],
+   [
+    "Page 1",
+    "0.1,-106.1",
+    0.12786865234375,
+    -106.1080322265625
+   ],
+   [
+    "light fruit, pulped on the disc pulper, ",
+    "0.1,45.7",
+    0.09999847412109375,
+    45.72004699707031
+   ],
+   [
+    "The pulping house runs from six in the e",
+    "0.1,45.7",
+    0.09999847412109375,
+    45.70750427246094
+   ],
+   [
+    "day.",
+    "0.1,45.6",
+    0.09999847412109375,
+    45.632591247558594
+   ]
+  ],
+  "ok": true,
+  "doc": "70_magazine_drop_cap_photo_caption"
+ },
+ {
+  "lines": 73,
+  "within": 6,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0821917808219178,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Anand Traders  \u2022  Invoice AT/2025/1188  ",
+    "0.1,-184.2",
+    0.09999847412109375,
+    -184.18923950195312
+   ],
+   [
+    "Page 1",
+    "0.2,-183.3",
+    0.1748046875,
+    -183.28927612304688
+   ],
+   [
+    " ---------------------------------------",
+    "0.1,15.9",
+    0.09999847412109375,
+    15.900772094726562
+   ],
+   [
+    "For ANAND TRADERS",
+    "0.1,15.7",
+    0.09999847412109375,
+    15.738250732421875
+   ],
+   [
+    "Note: this table has no drawn rules. The",
+    "0.1,15.3",
+    0.09999847412109375,
+    15.31951904296875
+   ]
+  ],
+  "ok": true,
+  "doc": "71_invoice_space_aligned_no_rules"
+ },
+ {
+  "lines": 80,
+  "within": 60,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.75,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Nagar Urban Co-operative Bank  \u2022  Curren",
+    "0.1,-216.0",
+    0.09999847412109375,
+    -215.98928833007812
+   ],
+   [
+    "Page 1",
+    "0.2,-215.1",
+    0.1748046875,
+    -215.08932495117188
+   ],
+   [
+    "1,180.00",
+    "10.4,-1.7",
+    10.399993896484375,
+    -1.746734619140625
+   ],
+   [
+    "Total debits: Rs. 7,32,410.00      Total",
+    "0.1,8.6",
+    0.09999847412109375,
+    8.55328369140625
+   ],
+   [
+    "Statement of account without drawn rules",
+    "0.1,7.9",
+    0.09999847412109375,
+    7.9007720947265625
+   ]
+  ],
+  "ok": true,
+  "doc": "72_bank_statement_no_rules_right_amounts"
+ },
+ {
+  "lines": 64,
+  "within": 17,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.265625,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "KSOU  \u2022  Statement of marks  \u2022  June 202",
+    "0.1,-332.2",
+    0.09999847412109375,
+    -332.1892395019531
+   ],
+   [
+    "Page 1",
+    "0.2,-331.3",
+    0.1748046875,
+    -331.28924560546875
+   ],
+   [
+    "Mukthagangotri, Mysuru 570 006",
+    "120.2,-6.8",
+    120.16943359375,
+    -6.780492782592773
+   ],
+   [
+    "50",
+    "0.1,-29.0",
+    0.100006103515625,
+    -28.961761474609375
+   ],
+   [
+    "PASS",
+    "0.1,-29.0",
+    0.0999755859375,
+    -28.961761474609375
+   ]
+  ],
+  "ok": true,
+  "doc": "73_marksheet_subject_marks_grade"
+ },
+ {
+  "lines": 54,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.018518518518518517,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Kaveri Textiles  \u2022  Balance sheet 31-03-",
+    "0.1,-221.6",
+    0.09999847412109375,
+    -221.58926391601562
+   ],
+   [
+    "Page 1",
+    "0.2,-220.7",
+    0.1748046875,
+    -220.68930053710938
+   ],
+   [
+    "                 TOTAL",
+    "37.1,-21.4",
+    37.099998474121094,
+    -21.4129638671875
+   ],
+   [
+    "                 Surplus in statement of",
+    "37.1,-19.6",
+    37.099998474121094,
+    -19.612960815429688
+   ],
+   [
+    "                 Provision for gratuity",
+    "37.1,-19.3",
+    37.099998474121094,
+    -19.312957763671875
+   ]
+  ],
+  "ok": true,
+  "doc": "74_balance_sheet_indented_subitems"
+ },
+ {
+  "lines": 51,
+  "within": 3,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.058823529411764705,
+  "size_share": 0.96,
+  "name_share": 1.0,
+  "colour_share": 0.94,
+  "font_problems": [
+   "Services                       size 7.5 -> 8.5",
+   "Km operated                    size 7.5 -> 8.5"
+  ],
+  "worst": [
+   [
+    "BMTC  \u2022  Depot performance August 2025  ",
+    "0.1,-360.2",
+    0.09999847412109375,
+    -360.1892395019531
+   ],
+   [
+    "Page 1",
+    "0.2,-359.3",
+    0.1748046875,
+    -359.28924560546875
+   ],
+   [
+    "Breakdowns",
+    "-61.9,-10.4",
+    -61.899993896484375,
+    -10.423248291015625
+   ],
+   [
+    "1,284.42",
+    "-30.2,15.3",
+    -30.25,
+    15.319541931152344
+   ],
+   [
+    "Chief Traffic Manager",
+    "0.1,45.2",
+    0.09999847412109375,
+    45.238250732421875
+   ]
+  ],
+  "ok": true,
+  "doc": "75_merged_header_cell_three_columns"
+ },
+ {
+  "lines": 43,
+  "within": 15,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.3488372093023256,
+  "size_share": 1.0,
+  "name_share": 0.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "\u0915\u0930\u094d\u0928\u093e\u091f\u0915 \u0930\u093e\u091c\u094d\u092f \u0905\u0928\u0941\u0935\u093e\u0926 \u0935\u093f\u092d\u093e\u0917",
+    "119.9,-2.5",
+    119.90000915527344,
+    -2.5
+   ],
+   [
+    "\u0909\u092a\u0930\u094d\u092f\u0941\u0915\u094d\u0924 \u0936\u0941\u0932\u094d\u0915 \u0915\u093e \u092d\u0941\u0917\u0924\u093e\u0928 \u0928\u0917\u0926 \u0905\u0925\u0935\u093e \u0921\u093f\u092e\u093e\u0902",
+    "0.1,16.1",
+    0.09999847412109375,
+    16.100006103515625
+   ],
+   [
+    "\u0930\u0938\u0940\u0926 \u0938\u0902\u0916\u094d\u092f\u093e \u0915\u0947\u091f\u0940\u092c\u0940/\u096e\u096e\u096f\u0967 \u0926\u093f\u0928\u093e\u0902\u0915 \u0966\u096b \u0938\u093f\u0924\u0902\u092c\u0930",
+    "0.1,16.1",
+    0.09999847412109375,
+    16.100006103515625
+   ],
+   [
+    "\u092f\u0939 \u0905\u0928\u0941\u0935\u093e\u0926 \u0915\u093e\u0930\u094d\u092f \u0915\u0928\u094d\u0928\u0921\u093c \u092d\u093e\u0937\u093e \u0938\u0947 \u0939\u093f\u0902\u0926\u0940 \u092d\u093e\u0937",
+    "0.1,16.1",
+    0.09999847412109375,
+    16.100006103515625
+   ],
+   [
+    "\u092a\u094d\u0930\u092e\u093e\u0923\u0928",
+    "0.1,16.1",
+    0.09999847412109375,
+    16.100006103515625
+   ]
+  ],
+  "ok": true,
+  "doc": "76_devanagari_table"
+ },
+ {
+  "lines": 39,
+  "within": 2,
+  "unmatched": 28,
+  "pages_ref": 1,
+  "pages_got": 4,
+  "page_count_ok": false,
+  "share": 0.05128205128205128,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "\u0627\u0644\u0628\u0646\u062f",
+    "-426.4,31.1",
+    -426.39998626708984,
+    31.100006103515625
+   ],
+   [
+    "\u0627\u0644\u0645\u0628\u0644\u063a",
+    "334.6,31.1",
+    334.59999084472656,
+    31.100006103515625
+   ],
+   [
+    "\u0627\u0644\u0648\u0635\u0641",
+    "-215.8,31.1",
+    -215.8000030517578,
+    31.100006103515625
+   ],
+   [
+    "\u0627\u0644\u0633\u0639\u0631",
+    "147.6,31.1",
+    147.59999084472656,
+    31.100006103515625
+   ],
+   [
+    "\u0627\u0644\u0643\u0645\u064a\u0629",
+    "-35.7,31.1",
+    -35.70001220703125,
+    31.100006103515625
+   ]
+  ],
+  "ok": false,
+  "doc": "77_arabic_rtl_document"
+ },
+ {
+  "lines": 34,
+  "within": 8,
+  "unmatched": 12,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.23529411764705882,
+  "size_share": 1.0,
+  "name_share": 0.17647058823529413,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "\u092e\u0941\u0916\u094d\u092f \u0905\u0928\u0941\u0935\u093e\u0926\u0915",
+    "0.1,124.0",
+    0.09999847412109375,
+    124.0
+   ],
+   [
+    ": ",
+    "0.1,111.3",
+    0.09999847412109375,
+    111.29998779296875
+   ],
+   [
+    "\u0918\u094b\u0937\u0923\u093e",
+    "0.1,98.7",
+    0.09999847412109375,
+    98.70001220703125
+   ],
+   [
+    "\u092f\u0939 \u0905\u0928\u0941\u0935\u093e\u0926 \u092e\u0942\u0932 \u0926\u0938\u094d\u0924\u093e\u0935\u0947\u091c \u0915\u0947 \u0905\u0928\u0941\u0930\u0942\u092a \u0939\u0948 \u0914\u0930 \u0907",
+    "0.1,98.7",
+    0.09999847412109375,
+    98.70001220703125
+   ],
+   [
+    "\u0926\u093f\u0928\u093e\u0902\u0915 \u0966\u096b \u0938\u093f\u0924\u0902\u092c\u0930 \u0968\u0966\u0968\u096b",
+    "0.1,98.7",
+    0.0999908447265625,
+    98.699951171875
+   ]
+  ],
+  "ok": false,
+  "doc": "78_mixed_english_devanagari_line"
+ },
+ {
+  "lines": 47,
+  "within": 13,
+  "unmatched": 16,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.2765957446808511,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Sri Lakshmi Fabrics  \u2022  Job work stateme",
+    "0.1,-352.1",
+    0.09999847412109375,
+    -352.0892639160156
+   ],
+   [
+    "Page 1",
+    "0.2,-351.2",
+    0.1748046875,
+    -351.18927001953125
+   ],
+   [
+    "\u2014",
+    "0.1,-12.8",
+    0.100006103515625,
+    -12.764213562011719
+   ],
+   [
+    "Total",
+    "0.1,-12.8",
+    0.09999847412109375,
+    -12.764213562011719
+   ],
+   [
+    "56",
+    "0.1,-12.8",
+    0.0999908447265625,
+    -12.764213562011719
+   ]
+  ],
+  "ok": true,
+  "doc": "79_inr_indian_digit_grouping_table"
+ },
+ {
+  "lines": 73,
+  "within": 19,
+  "unmatched": 10,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.2602739726027397,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Status: VERIFIED",
+    "0.1,95.9",
+    0.11505126953125,
+    95.85321044921875
+   ],
+   [
+    "Commercial Taxes  \u2022  Batch 4471  \u2022  ID i",
+    "0.1,-65.0",
+    0.09999847412109375,
+    -64.98928833007812
+   ],
+   [
+    "Page 1",
+    "0.2,-55.8",
+    0.1748046875,
+    -55.789276123046875
+   ],
+   [
+    "Deputy Commissioner (Commercial Taxes), ",
+    "0.1,14.8",
+    0.09999847412109375,
+    14.838226318359375
+   ],
+   [
+    "Identifiers appear here as whole tokens ",
+    "0.1,14.4",
+    0.09999847412109375,
+    14.419525146484375
+   ]
+  ],
+  "ok": true,
+  "doc": "80_gstin_pan_cin_ifsc_table"
+ },
+ {
+  "lines": 130,
+  "within": 21,
+  "unmatched": 74,
+  "pages_ref": 2,
+  "pages_got": 3,
+  "page_count_ok": false,
+  "share": 0.16153846153846155,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "claim otherwise. What the model does is ",
+    "0.2,227.7",
+    0.158294677734375,
+    227.73377990722656
+   ],
+   [
+    "None of these are addressed by the band ",
+    "0.2,227.7",
+    0.158294677734375,
+    227.73374938964844
+   ],
+   [
+    "cleanly, in a way that can be explained ",
+    "0.2,227.7",
+    0.158294677734375,
+    227.73374938964844
+   ],
+   [
+    "the headline number.",
+    "0.2,227.7",
+    0.158294677734375,
+    227.73374938964844
+   ],
+   [
+    "disagreements resolved by a third. Inter",
+    "0.2,227.7",
+    0.158294677734375,
+    227.7337188720703
+   ]
+  ],
+  "ok": false,
+  "doc": "academic-paper-ieee-2col-abstract"
+ },
+ {
+  "lines": 34,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "I declare that the particulars furnished",
+    "8.6,19.1",
+    8.645671844482422,
+    19.092132568359375
+   ],
+   [
+    "Application for admission to the first y",
+    "0.1,20.5",
+    0.14567184448242188,
+    20.463119506835938
+   ],
+   [
+    "Declaration",
+    "0.1,19.9",
+    0.14567184448242188,
+    19.86273193359375
+   ],
+   [
+    "15.  Aggregate marks obtained *",
+    "0.1,19.7",
+    0.14567184448242188,
+    19.707611083984375
+   ],
+   [
+    "16.  Aggregate percentage *",
+    "0.1,19.7",
+    0.14567184448242188,
+    19.707611083984375
+   ]
+  ],
+  "ok": true,
+  "doc": "admission-form-labels-left-boxes-right"
+ },
+ {
+  "lines": 75,
+  "within": 5,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.06666666666666667,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Admit card  \u00b7  B190402117  \u00b7  November 2",
+    "0.1,-336.7",
+    0.0803070068359375,
+    -336.7123107910156
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-335.2",
+    0.08160400390625,
+    -335.2123107910156
+   ],
+   [
+    "B-204",
+    "0.1,-126.7",
+    0.092315673828125,
+    -126.73347473144531
+   ],
+   [
+    "10:00 to 13:00",
+    "0.1,-89.9",
+    0.09991455078125,
+    -89.93348693847656
+   ],
+   [
+    "B-204",
+    "0.1,43.4",
+    0.092315673828125,
+    43.36650848388672
+   ]
+  ],
+  "ok": true,
+  "doc": "admit-card"
+ },
+ {
+  "lines": 44,
+  "within": 0,
+  "unmatched": 3,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 0.975609756097561,
+  "font_problems": [],
+  "worst": [
+   [
+    "We exited two low-margin contracts in th",
+    "0.1,115.9",
+    0.14567184448242188,
+    115.8887939453125
+   ],
+   [
+    "reduced revenue by roughly 40 crore on a",
+    "0.1,115.9",
+    0.14567184448242188,
+    115.8887939453125
+   ],
+   [
+    "improved margin by 70 basis points. The ",
+    "0.1,115.9",
+    0.14567184448242188,
+    115.8887939453125
+   ],
+   [
+    "popular internally. It was correct, and ",
+    "0.1,115.9",
+    0.14567184448242188,
+    115.8887939453125
+   ],
+   [
+    "numbers above it.",
+    "0.1,115.9",
+    0.14567184448242188,
+    115.8887939453125
+   ]
+  ],
+  "ok": true,
+  "doc": "annual-review-2col-uneven-columns"
+ },
+ {
+  "lines": 173,
+  "within": 49,
+  "unmatched": 2,
+  "pages_ref": 2,
+  "pages_got": 2,
+  "page_count_ok": true,
+  "share": 0.2832369942196532,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Orbit Polymers Pvt. Ltd.  \u00b7  Annual repo",
+    "0.1,-155.2",
+    0.0803070068359375,
+    -155.2122802734375
+   ],
+   [
+    "Page 2 of 2",
+    "0.1,-153.7",
+    0.08160400390625,
+    -153.7122802734375
+   ],
+   [
+    "Orbit Polymers Pvt. Ltd.  \u00b7  Annual repo",
+    "0.1,-138.5",
+    0.0803070068359375,
+    -138.5123291015625
+   ],
+   [
+    "Page 1 of 2",
+    "0.1,-137.0",
+    0.08160400390625,
+    -137.0123291015625
+   ],
+   [
+    "    Total",
+    "8.1,15.4",
+    8.080307006835938,
+    15.366546630859375
+   ]
+  ],
+  "ok": true,
+  "doc": "balance-sheet-and-profit-loss"
+ },
+ {
+  "lines": 95,
+  "within": 10,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.10526315789473684,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Kaveri Mills Limited  \u00b7  Annual Report 2",
+    "0.1,-344.2",
+    0.14567184448242188,
+    -344.1839599609375
+   ],
+   [
+    "66",
+    "0.2,-342.9",
+    0.1649169921875,
+    -342.8736572265625
+   ],
+   [
+    "1,677.68",
+    "-262.3,-17.3",
+    -262.25921630859375,
+    -17.25274658203125
+   ],
+   [
+    "1,755.13",
+    "-262.2,-17.3",
+    -262.1592102050781,
+    -17.25274658203125
+   ],
+   [
+    "1,755.13",
+    "262.4,5.3",
+    262.42431640625,
+    5.3472900390625
+   ]
+  ],
+  "ok": true,
+  "doc": "balance-sheet-two-columns-of-figures"
+ },
+ {
+  "lines": 585,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 5,
+  "pages_got": 5,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "HDFC Bank Ltd.  \u00b7  A/c 50100234567890",
+    "0.1,-85.9",
+    0.114959716796875,
+    -85.91229248046875
+   ],
+   [
+    "HDFC Bank Ltd.  \u00b7  A/c 50100234567890",
+    "0.1,-85.9",
+    0.114959716796875,
+    -85.91229248046875
+   ],
+   [
+    "HDFC Bank Ltd.  \u00b7  A/c 50100234567890",
+    "0.1,-85.9",
+    0.114959716796875,
+    -85.91229248046875
+   ],
+   [
+    "HDFC Bank Ltd.  \u00b7  A/c 50100234567890",
+    "0.1,-85.9",
+    0.114959716796875,
+    -85.91229248046875
+   ],
+   [
+    "HDFC Bank Ltd.  \u00b7  A/c 50100234567890",
+    "0.1,-85.9",
+    0.114959716796875,
+    -85.91229248046875
+   ]
+  ],
+  "ok": true,
+  "doc": "bank-statement-5-pages"
+ },
+ {
+  "lines": 197,
+  "within": 10,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.050761421319796954,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "0",
+    "0.1,-511.1",
+    0.1353759765625,
+    -511.13365173339844
+   ],
+   [
+    "0",
+    "0.1,176.5",
+    0.1353759765625,
+    176.4664306640625
+   ],
+   [
+    "0",
+    "0.1,133.3",
+    0.1353759765625,
+    133.26644897460938
+   ],
+   [
+    "0",
+    "0.1,125.7",
+    0.1353759765625,
+    125.66641235351562
+   ],
+   [
+    "0",
+    "0.1,111.8",
+    0.1353759765625,
+    111.81634521484375
+   ]
+  ],
+  "ok": false,
+  "doc": "bank-statement-horizontal-rules-only"
+ },
+ {
+  "lines": 152,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Sqm",
+    "0.2,-300.3",
+    0.15399169921875,
+    -300.25404357910156
+   ],
+   [
+    "Rmt",
+    "0.2,-208.3",
+    0.1729736328125,
+    -208.2540283203125
+   ],
+   [
+    "Nos",
+    "0.1,-153.1",
+    0.081573486328125,
+    -153.05398559570312
+   ],
+   [
+    "Tender PWD/2026/118  \u00b7  Schedule B",
+    "0.1,-150.8",
+    0.114959716796875,
+    -150.81231689453125
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-149.3",
+    0.14691162109375,
+    -149.31231689453125
+   ]
+  ],
+  "ok": true,
+  "doc": "boq-horizontal-rules-only"
+ },
+ {
+  "lines": 157,
+  "within": 2,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.012738853503184714,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Executive Engineer",
+    "0.1,52.6",
+    0.137176513671875,
+    52.601165771484375
+   ],
+   [
+    "Total estimated cost: Rupees Two Crore T",
+    "0.1,52.6",
+    0.114959716796875,
+    52.601165771484375
+   ],
+   [
+    "For Public Works Department, Pune",
+    "0.2,52.3",
+    0.1505126953125,
+    52.34600830078125
+   ],
+   [
+    "Division no. 4  \u00b7  Pune",
+    "0.2,52.2",
+    0.156707763671875,
+    52.240814208984375
+   ],
+   [
+    "Rates are inclusive of all taxes except ",
+    "0.1,52.1",
+    0.114959716796875,
+    52.1016845703125
+   ]
+  ],
+  "ok": true,
+  "doc": "boq-tender-bill-of-quantities"
+ },
+ {
+  "lines": 88,
+  "within": 1,
+  "unmatched": 13,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.011363636363636364,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "unglamorous work on procurement, plant",
+    "0.2,340.2",
+    0.173980712890625,
+    340.24224853515625
+   ],
+   [
+    "Revenue rose 9.4 per cent to 1,684 crore",
+    "0.2,340.2",
+    0.173980712890625,
+    340.24222564697266
+   ],
+   [
+    "company's history. This was not the resu",
+    "0.2,340.2",
+    0.173980712890625,
+    340.2422180175781
+   ],
+   [
+    "points to 16.1 per cent, the highest in ",
+    "0.2,340.2",
+    0.173980712890625,
+    340.24219512939453
+   ],
+   [
+    "utilisation and the mix of business we c",
+    "0.2,340.2",
+    0.173980712890625,
+    340.2421875
+   ]
+  ],
+  "ok": false,
+  "doc": "brochure-3col-with-sidebar-box"
+ },
+ {
+  "lines": 177,
+  "within": 1,
+  "unmatched": 32,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.005649717514124294,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "MSRTC",
+    "0.1,282.9",
+    0.09716796875,
+    282.9459228515625
+   ],
+   [
+    "19:00",
+    "0.1,282.7",
+    0.133392333984375,
+    282.68963623046875
+   ],
+   [
+    "4",
+    "0.1,281.9",
+    0.14410400390625,
+    281.93963623046875
+   ],
+   [
+    "21:45",
+    "0.1,281.9",
+    0.133392333984375,
+    281.93963623046875
+   ],
+   [
+    "Semi-luxury  \u00b7  non-AC",
+    "0.1,281.9",
+    0.0803070068359375,
+    281.9422912597656
+   ]
+  ],
+  "ok": false,
+  "doc": "bus-timetable-station-left-times-right"
+ },
+ {
+  "lines": 86,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.011627906976744186,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Delivery challan DPW/DC/26-27/1102  \u00b7  D",
+    "0.1,-223.4",
+    0.0803070068359375,
+    -223.412353515625
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-216.1",
+    0.08160400390625,
+    -216.1123046875
+   ],
+   [
+    "For Sunrise Industrial Fasteners Pvt. Lt",
+    "0.1,115.8",
+    0.0946044921875,
+    115.75106811523438
+   ],
+   [
+    "Received by",
+    "0.1,108.2",
+    0.14410400390625,
+    108.15106201171875
+   ],
+   [
+    "Store in-charge, Deccan Precision Works ",
+    "0.1,108.2",
+    0.0803070068359375,
+    108.15106201171875
+   ]
+  ],
+  "ok": true,
+  "doc": "delivery-challan"
+ },
+ {
+  "lines": 125,
+  "within": 0,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 0.9919354838709677,
+  "name_share": 1.0,
+  "colour_share": 0.9919354838709677,
+  "font_problems": [
+   "October 2026                   size 6.4 -> 7.0"
+  ],
+  "worst": [
+   [
+    "October 2026",
+    "-468.4,167.2",
+    -468.37467193603516,
+    167.2459373474121
+   ],
+   [
+    "2",
+    "417.5,-176.2",
+    417.48030853271484,
+    -176.2334747314453
+   ],
+   [
+    "2",
+    "-417.3,54.4",
+    -417.27979278564453,
+    54.366539001464844
+   ],
+   [
+    "MSEDCL  \u00b7  consumer 4411882004  \u00b7  bill ",
+    "0.1,-188.2",
+    0.0803070068359375,
+    -188.2122802734375
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-186.7",
+    0.08160400390625,
+    -186.7122802734375
+   ]
+  ],
+  "ok": true,
+  "doc": "electricity-bill"
+ },
+ {
+  "lines": 129,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "e-Way bill 3410 2288 4471  \u00b7  generated ",
+    "0.1,-115.4",
+    0.0803070068359375,
+    -115.412353515625
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-113.9",
+    0.08160400390625,
+    -113.912353515625
+   ],
+   [
+    "This is a computer generated e-way bill ",
+    "0.1,24.1",
+    0.0803070068359375,
+    24.122711181640625
+   ],
+   [
+    "Verify at ewaybillgst.gov.in",
+    "0.1,23.3",
+    0.143310546875,
+    23.335693359375
+   ],
+   [
+    "5,175.00",
+    "0.2,21.9",
+    0.1697998046875,
+    21.911422729492188
+   ]
+  ],
+  "ok": true,
+  "doc": "eway-bill"
+ },
+ {
+  "lines": 114,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 2,
+  "pages_got": 2,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Form 16 Part B  \u00b7  Nirvaan Packaging Ind",
+    "0.1,-185.1",
+    0.0803070068359375,
+    -185.1123046875
+   ],
+   [
+    "Page 1 of 2",
+    "0.1,-177.7",
+    0.08160400390625,
+    -177.7122802734375
+   ],
+   [
+    "Form 16 Part B  \u00b7  Nirvaan Packaging Ind",
+    "0.1,-166.0",
+    0.0803070068359375,
+    -166.0123291015625
+   ],
+   [
+    "Page 2 of 2",
+    "0.1,-158.7",
+    0.08160400390625,
+    -158.7122802734375
+   ],
+   [
+    "    (c) Professional tax under section 1",
+    "8.1,65.3",
+    8.112030029296875,
+    65.26652526855469
+   ]
+  ],
+  "ok": true,
+  "doc": "form16-part-b"
+ },
+ {
+  "lines": 106,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.009433962264150943,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Sunrise Industrial Fasteners Pvt. Ltd.  ",
+    "0.1,-205.1",
+    0.114959716796875,
+    -205.1123046875
+   ],
+   [
+    "BANK DETAILS",
+    "0.1,-149.8",
+    0.114959716796875,
+    -149.7603759765625
+   ],
+   [
+    "A/c no. 50200041234567  \u00b7  IFSC HDFC0000",
+    "0.1,-149.0",
+    0.114959716796875,
+    -149.03977966308594
+   ],
+   [
+    "Bank: HDFC Bank, Sector 44, Gurugram",
+    "0.1,-149.0",
+    0.114959716796875,
+    -149.03976440429688
+   ],
+   [
+    "Branch: Gurugram  \u00b7  MICR 110240011",
+    "0.1,-149.0",
+    0.114959716796875,
+    -149.03976440429688
+   ]
+  ],
+  "ok": true,
+  "doc": "gst-invoice-3line-items"
+ },
+ {
+  "lines": 85,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Kastura Home Products Pvt. Ltd.  \u00b7  This",
+    "0.1,-213.6",
+    0.14567184448242188,
+    -213.6123046875
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-212.1",
+    0.1162109375,
+    -212.1123046875
+   ],
+   [
+    "Authorised signatory",
+    "0.2,-176.0",
+    0.16900634765625,
+    -175.96939086914062
+   ],
+   [
+    "For Kastura Home Products Pvt. Ltd.",
+    "0.2,-175.9",
+    0.157623291015625,
+    -175.86422729492188
+   ],
+   [
+    "A. Deshpande",
+    "0.1,-175.6",
+    0.088104248046875,
+    -175.6090545654297
+   ]
+  ],
+  "ok": true,
+  "doc": "gst-invoice-horizontal-rules-only"
+ },
+ {
+  "lines": 373,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 4,
+  "pages_got": 4,
+  "page_count_ok": true,
+  "share": 0.005361930294906166,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Blue Harbour Logistics Pvt. Ltd.  \u00b7  GST",
+    "0.1,-388.3",
+    0.114959716796875,
+    -388.31231689453125
+   ],
+   [
+    "Blue Harbour Logistics Pvt. Ltd.  \u00b7  GST",
+    "0.1,-388.3",
+    0.114959716796875,
+    -388.31231689453125
+   ],
+   [
+    "Page 2 of 4",
+    "0.1,-386.8",
+    0.14691162109375,
+    -386.81231689453125
+   ],
+   [
+    "Page 3 of 4",
+    "0.1,-386.8",
+    0.14691162109375,
+    -386.81231689453125
+   ],
+   [
+    "Blue Harbour Logistics Pvt. Ltd.  \u00b7  GST",
+    "0.1,-370.0",
+    0.114959716796875,
+    -370.0123291015625
+   ]
+  ],
+  "ok": true,
+  "doc": "gst-invoice-multipage-item-table"
+ },
+ {
+  "lines": 98,
+  "within": 1,
+  "unmatched": 8,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.01020408163265306,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "4",
+    "334.8,161.9",
+    334.8149604797363,
+    161.8856658935547
+   ],
+   [
+    "Amount in words: Rupees Ten Lakh Ninety ",
+    "0.1,240.9",
+    0.114959716796875,
+    240.90113830566406
+   ],
+   [
+    "IGST is payable as inter-state supply. R",
+    "0.1,240.5",
+    0.114959716796875,
+    240.540771484375
+   ],
+   [
+    "Total",
+    "0.2,238.5",
+    0.17244338989257812,
+    238.48565673828125
+   ],
+   [
+    "9,24,240.00",
+    "0.0,238.5",
+    0.048583984375,
+    238.48565673828125
+   ]
+  ],
+  "ok": false,
+  "doc": "gst-invoice-with-qr-code"
+ },
+ {
+  "lines": 107,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Policy SGI/FIRE/2026/441182  \u00b7  Sahyadri",
+    "0.1,-88.5",
+    0.0803070068359375,
+    -88.5123291015625
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-81.2",
+    0.08160400390625,
+    -81.21234130859375
+   ],
+   [
+    "Authorised signatory",
+    "0.2,30.4",
+    0.151885986328125,
+    30.366546630859375
+   ],
+   [
+    "For Sahyadri General Insurance Co. Ltd.",
+    "0.1,30.1",
+    0.108978271484375,
+    30.11138916015625
+   ],
+   [
+    "Underwriting department",
+    "0.1,30.0",
+    0.102081298828125,
+    30.006195068359375
+   ]
+  ],
+  "ok": true,
+  "doc": "insurance-policy-schedule"
+ },
+ {
+  "lines": 87,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.022988505747126436,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "This is a computer generated invoice.",
+    "0.1,-275.2",
+    0.0803070068359375,
+    -275.23724365234375
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-273.9",
+    0.10455322265625,
+    -273.9032897949219
+   ],
+   [
+    "7318",
+    "0.1,-56.4",
+    0.122802734375,
+    -56.37315368652344
+   ],
+   [
+    "TAX INVOICE",
+    "0.1,-42.8",
+    0.119903564453125,
+    -42.8098087310791
+   ],
+   [
+    "DECCAN PRECISION WORKS LLP",
+    "0.1,-42.8",
+    0.0803070068359375,
+    -42.83405160903931
+   ]
+  ],
+  "ok": true,
+  "doc": "invoice-line-items-qty-rate-amount"
+ },
+ {
+  "lines": 114,
+  "within": 1,
+  "unmatched": 18,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.008771929824561403,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "    Section 80D \u2014 medical insurance",
+    "8.1,126.6",
+    8.145671844482422,
+    126.63192749023438
+   ],
+   [
+    "    Section 80CCD(1B) \u2014 national pension",
+    "8.1,125.9",
+    8.145671844482422,
+    125.93185424804688
+   ],
+   [
+    "    Section 80C \u2014 employees provident fu",
+    "8.1,125.1",
+    8.145671844482422,
+    125.13186645507812
+   ],
+   [
+    "    Income from other sources",
+    "8.1,122.9",
+    8.145671844482422,
+    122.93191528320312
+   ],
+   [
+    "Table 3. Computation of tax liability",
+    "0.1,130.4",
+    0.14567184448242188,
+    130.376708984375
+   ]
+  ],
+  "ok": false,
+  "doc": "itr-computation-with-slab-table"
+ },
+ {
+  "lines": 69,
+  "within": 13,
+  "unmatched": 4,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.18840579710144928,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "JOURNAL OF DOCUMENT ENGINEERING",
+    "0.1,-47.8",
+    0.11101913452148438,
+    -47.76982402801514
+   ],
+   [
+    "VOL. 41, NO. 2, PP. 118\u2013131, 2026",
+    "0.1,-46.7",
+    0.14080810546875,
+    -46.74480223655701
+   ],
+   [
+    "Prior work has approached the problem in",
+    "4.1,-41.8",
+    4.058319091796875,
+    -41.80085372924805
+   ],
+   [
+    "methods sort blocks by a computed column",
+    "4.1,-41.8",
+    4.058319091796875,
+    -41.80084228515625
+   ],
+   [
+    "vertical position; they are fast and int",
+    "4.1,-41.8",
+    4.058319091796875,
+    -41.80084228515625
+   ]
+  ],
+  "ok": true,
+  "doc": "journal-2col-with-footnotes"
+ },
+ {
+  "lines": 122,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 3,
+  "pages_got": 3,
+  "page_count_ok": true,
+  "share": 0.00819672131147541,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "6",
+    "-414.8,-87.0",
+    -414.8463439941406,
+    -87.01273345947266
+   ],
+   [
+    "SE/SIR/2026/0412  \u00b7  page 1 of 3",
+    "0.1,-466.2",
+    0.14567184448242188,
+    -466.2123107910156
+   ],
+   [
+    "Page 1 of 3",
+    "0.1,-464.7",
+    0.1162109375,
+    -464.7123107910156
+   ],
+   [
+    "SE/SIR/2026/0412  \u00b7  page 3 of 3",
+    "0.1,-456.6",
+    0.14567184448242188,
+    -456.6123046875
+   ],
+   [
+    "Page 3 of 3",
+    "0.1,-449.2",
+    0.1162109375,
+    -449.2123107910156
+   ]
+  ],
+  "ok": true,
+  "doc": "landscape-page-inside-portrait-document"
+ },
+ {
+  "lines": 43,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 0.9767441860465116,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "The last stretch before Losar, photograp",
+    "0.1,-92.9",
+    0.14567184448242188,
+    -92.92561340332031
+   ],
+   [
+    "The road leaves the valley at first ligh",
+    "0.1,-91.5",
+    0.14567184448242188,
+    -91.45479583740234
+   ],
+   [
+    "Kaza is not a town so much as a widening",
+    "0.2,-80.9",
+    0.158294677734375,
+    -80.85482788085938
+   ],
+   [
+    "switchbacks through deodar and then thro",
+    "0.1,-80.9",
+    0.14567184448242188,
+    -80.85479736328125
+   ],
+   [
+    "one market street, a bus stand that doub",
+    "0.2,-70.3",
+    0.158294677734375,
+    -70.25482177734375
+   ]
+  ],
+  "ok": true,
+  "doc": "magazine-2col-pullquote-spanning"
+ },
+ {
+  "lines": 107,
+  "within": 7,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.06542056074766354,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "This marksheet is issued provisionally a",
+    "0.1,-175.1",
+    0.14567184448242188,
+    -175.06793212890625
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-173.7",
+    0.1392822265625,
+    -173.73397827148438
+   ],
+   [
+    "100",
+    "0.1,-168.7",
+    0.07855224609375,
+    -168.6527099609375
+   ],
+   [
+    "A",
+    "0.1,-149.5",
+    0.12255859375,
+    -149.4527587890625
+   ],
+   [
+    "100",
+    "0.1,-94.3",
+    0.07855224609375,
+    -94.25273895263672
+   ]
+  ],
+  "ok": true,
+  "doc": "marksheet-subject-left-marks-right"
+ },
+ {
+  "lines": 164,
+  "within": 0,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Ganeshkhind, Pune 411007  \u00b7  Examination",
+    "106.6,-4.8",
+    106.59768676757812,
+    -4.844158172607422
+   ],
+   [
+    "CONSOLIDATED STATEMENT OF MARKS",
+    "100.6,-1.8",
+    100.590087890625,
+    -1.8217315673828125
+   ],
+   [
+    "Fourth year B.E. (Mechanical)  \u00b7  Examin",
+    "95.5,-2.9",
+    95.54811096191406,
+    -2.8833236694335938
+   ],
+   [
+    "SAVITRIBAI PHULE PUNE UNIVERSITY",
+    "91.3,-3.5",
+    91.28900146484375,
+    -3.5259246826171875
+   ],
+   [
+    "Final result: PASS  \u00b7  Class: FIRST CLAS",
+    "0.1,31.9",
+    0.114959716796875,
+    31.861419677734375
+   ]
+  ],
+  "ok": true,
+  "doc": "marksheet-university-consolidated"
+ },
+ {
+  "lines": 112,
+  "within": 5,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.044642857142857144,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "\u2014",
+    "230.0,-17.8",
+    229.96710205078125,
+    -17.833480834960938
+   ],
+   [
+    "\u2014",
+    "-229.7,-0.1",
+    -229.71957397460938,
+    -0.1334381103515625
+   ],
+   [
+    "Unlimited",
+    "-151.2,-77.5",
+    -151.2169952392578,
+    -77.53348541259766
+   ],
+   [
+    "\u2014",
+    "78.6,-131.9",
+    78.57830810546875,
+    -131.93348693847656
+   ],
+   [
+    "Vistara Telecom  \u00b7  +91 98200 44112  \u00b7  ",
+    "0.1,-165.9",
+    0.0803070068359375,
+    -165.912353515625
+   ]
+  ],
+  "ok": true,
+  "doc": "mobile-bill"
+ },
+ {
+  "lines": 255,
+  "within": 4,
+  "unmatched": 4,
+  "pages_ref": 2,
+  "pages_got": 2,
+  "page_count_ok": true,
+  "share": 0.01568627450980392,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Kaveri Asset Management Company  \u00b7  Foli",
+    "0.1,-288.6",
+    0.114959716796875,
+    -288.6123046875
+   ],
+   [
+    "Page 2 of 2",
+    "0.1,-287.1",
+    0.14691162109375,
+    -287.1123046875
+   ],
+   [
+    "Kaveri Asset Management Company  \u00b7  Foli",
+    "0.1,-227.4",
+    0.114959716796875,
+    -227.412353515625
+   ],
+   [
+    "Page 1 of 2",
+    "0.1,-225.9",
+    0.14691162109375,
+    -225.912353515625
+   ],
+   [
+    "SIP purchase",
+    "0.1,-215.1",
+    0.1362457275390625,
+    -215.11434936523438
+   ]
+  ],
+  "ok": true,
+  "doc": "mutual-fund-statement"
+ },
+ {
+  "lines": 123,
+  "within": 3,
+  "unmatched": 32,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.024390243902439025,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "company's history. This was not the resu",
+    "0.1,289.9",
+    0.0771942138671875,
+    289.90386962890625
+   ],
+   [
+    "second shift has not yet been staffed.",
+    "0.1,286.0",
+    0.0803070068359375,
+    286.00390625
+   ],
+   [
+    "14.1 per cent in the same period last ye",
+    "0.2,282.1",
+    0.173980712890625,
+    282.1038818359375
+   ],
+   [
+    "points to 16.1 per cent, the highest in ",
+    "0.1,272.2",
+    0.0771942138671875,
+    272.20391845703125
+   ],
+   [
+    "dependent on the Chennai hub, where the",
+    "0.1,268.3",
+    0.0803070068359375,
+    268.30389404296875
+   ]
+  ],
+  "ok": false,
+  "doc": "newsletter-3col-header-footer"
+ },
+ {
+  "lines": 62,
+  "within": 1,
+  "unmatched": 10,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.016129032258064516,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "willing to answer on record.",
+    "0.1,194.9",
+    0.0928955078125,
+    194.86993408203125
+   ],
+   [
+    "projected to do the same trip in twenty-",
+    "0.1,194.9",
+    0.0928955078125,
+    194.869873046875
+   ],
+   [
+    "central interchange. Whether that number",
+    "0.1,194.9",
+    0.0928955078125,
+    194.869873046875
+   ],
+   [
+    "first year of operation is the question ",
+    "0.1,194.9",
+    0.0928955078125,
+    194.869873046875
+   ],
+   [
+    "A separate proposal to extend the corrid",
+    "0.1,194.9",
+    0.0928955078125,
+    194.869873046875
+   ]
+  ],
+  "ok": false,
+  "doc": "newspaper-2col-fullwidth-headline"
+ },
+ {
+  "lines": 122,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 2,
+  "pages_got": 2,
+  "page_count_ok": true,
+  "share": 0.00819672131147541,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Page 2 of 2",
+    "471.9,789.3",
+    471.94414138793945,
+    789.2538118362427
+   ],
+   [
+    "IA/2026/07  \u00b7  page 2 of 2",
+    "-432.5,789.3",
+    -432.5428466796875,
+    789.2538118362427
+   ],
+   [
+    "Sl.",
+    "-489.4,-643.9",
+    -489.37109375,
+    -643.8940048217773
+   ],
+   [
+    "Audit no. IA/2026/07  \u00b7  page 2 of 2",
+    "399.5,-733.0",
+    399.54541778564453,
+    -733.0094795227051
+   ],
+   [
+    "11",
+    "-490.2,-607.1",
+    -490.1925048828125,
+    -607.0940170288086
+   ]
+  ],
+  "ok": true,
+  "doc": "one-page-rotated-180-degrees"
+ },
+ {
+  "lines": 92,
+  "within": 4,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.043478260869565216,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "AMOUNT (RS)",
+    "-260.2,-20.3",
+    -260.1728973388672,
+    -20.323348999023438
+   ],
+   [
+    "AMOUNT (RS)",
+    "260.4,-12.2",
+    260.41050720214844,
+    -12.223312377929688
+   ],
+   [
+    "Gross earnings",
+    "0.1,-91.2",
+    0.14567184448242188,
+    -91.16726684570312
+   ],
+   [
+    "YEAR TO DATE  (APRIL 2026 \u2014 SEPTEMBER 20",
+    "0.1,-90.8",
+    0.14567184448242188,
+    -90.83273315429688
+   ],
+   [
+    "This is a system generated pay slip and ",
+    "0.1,-90.7",
+    0.14567184448242188,
+    -90.71304321289062
+   ]
+  ],
+  "ok": true,
+  "doc": "payslip-label-left-amount-right"
+ },
+ {
+  "lines": 61,
+  "within": 1,
+  "unmatched": 8,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.01639344262295082,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "4.5 Leave without pay and the effect on ",
+    "0.1,272.1",
+    0.07637786865234375,
+    272.0563049316406
+   ],
+   [
+    "The employee will be issued a written no",
+    "0.1,271.7",
+    0.07637786865234375,
+    271.6932067871094
+   ],
+   [
+    "consecutive working days is treated as u",
+    "0.1,271.7",
+    0.07637786865234375,
+    271.6931457519531
+   ],
+   [
+    "no satisfactory explanation is received ",
+    "0.1,271.7",
+    0.07637786865234375,
+    271.6931457519531
+   ],
+   [
+    "period may be treated as a break in serv",
+    "0.1,271.7",
+    0.07637786865234375,
+    271.6931457519531
+   ]
+  ],
+  "ok": false,
+  "doc": "policy-2col-spanning-section-heading"
+ },
+ {
+  "lines": 253,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Nos",
+    "-269.2,-652.8",
+    -269.16668701171875,
+    -652.8409271240234
+   ],
+   [
+    "Mtr",
+    "-269.2,-488.8",
+    -269.1905975341797,
+    -488.84092712402344
+   ],
+   [
+    "Nos",
+    "0.1,-669.2",
+    0.13330078125,
+    -669.2408905029297
+   ],
+   [
+    "Pack of 10",
+    "-269.1,-308.4",
+    -269.1417999267578,
+    -308.4408874511719
+   ],
+   [
+    "Nos",
+    "-269.2,183.6",
+    -269.16668701171875,
+    183.5591278076172
+   ]
+  ],
+  "ok": true,
+  "doc": "price-list-2col-dense-right-aligned"
+ },
+ {
+  "lines": 163,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "6",
+    "0.1,-433.3",
+    0.14801025390625,
+    -433.3169403076172
+   ],
+   [
+    "6",
+    "0.1,-402.1",
+    0.14801025390625,
+    -402.1168670654297
+   ],
+   [
+    "12",
+    "0.1,-386.5",
+    0.14801025390625,
+    -386.5168151855469
+   ],
+   [
+    "2",
+    "0.1,-168.1",
+    0.14801025390625,
+    -168.11687469482422
+   ],
+   [
+    "12",
+    "0.1,-105.7",
+    0.14801025390625,
+    -105.71690368652344
+   ]
+  ],
+  "ok": true,
+  "doc": "price-list-right-aligned-amounts"
+ },
+ {
+  "lines": 106,
+  "within": 0,
+  "unmatched": 32,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Per metre, PVC insulated",
+    "0.1,270.6",
+    0.0803070068359375,
+    270.62896728515625
+   ],
+   [
+    "incl. GST",
+    "0.2,266.8",
+    0.15966796875,
+    266.845947265625
+   ],
+   [
+    "Submersible cable, 2.5 sq mm, 3 core",
+    "0.1,264.6",
+    0.0803070068359375,
+    264.55780029296875
+   ],
+   [
+    "\u20b9128",
+    "0.1,258.5",
+    0.08270263671875,
+    258.52288818359375
+   ],
+   [
+    "VDS-CB-025",
+    "0.1,253.0",
+    0.0803070068359375,
+    252.95223999023438
+   ]
+  ],
+  "ok": false,
+  "doc": "product-catalogue-code-left-price-right"
+ },
+ {
+  "lines": 107,
+  "within": 2,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.018691588785046728,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "PMC property tax receipt PMC/2026/441188",
+    "0.1,-106.1",
+    0.14567184448242188,
+    -106.1123046875
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-98.8",
+    0.1162109375,
+    -98.81231689453125
+   ],
+   [
+    "Amount in words: Rupees Nine Thousand Ni",
+    "0.1,26.3",
+    0.14567184448242188,
+    26.331893920898438
+   ],
+   [
+    "Tax superintendent",
+    "0.1,26.3",
+    0.088897705078125,
+    26.331878662109375
+   ],
+   [
+    "For Pune Municipal Corporation",
+    "0.1,26.1",
+    0.105926513671875,
+    26.07666015625
+   ]
+  ],
+  "ok": true,
+  "doc": "property-tax-receipt"
+ },
+ {
+  "lines": 106,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.009433962264150943,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Purchase order KHP/PO/26-27/0441  \u00b7  Kas",
+    "0.1,-182.5",
+    0.0803070068359375,
+    -182.5123291015625
+   ],
+   [
+    "Amount in words: Rupees Four Lakh Eighty",
+    "0.1,111.5",
+    0.0803070068359375,
+    111.46650695800781
+   ],
+   [
+    "Terms and conditions",
+    "0.1,111.1",
+    0.0803070068359375,
+    111.106201171875
+   ],
+   [
+    "1.  Goods must conform to the specificat",
+    "0.1,111.1",
+    0.0803070068359375,
+    111.10617065429688
+   ],
+   [
+    "2.  Each consignment must carry a test c",
+    "0.1,111.1",
+    0.0803070068359375,
+    111.10617065429688
+   ]
+  ],
+  "ok": true,
+  "doc": "purchase-order"
+ },
+ {
+  "lines": 64,
+  "within": 0,
+  "unmatched": 24,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "END SEMESTER EXAMINATION \u2014 NOVEMBER 2026",
+    "88.2,-3.0",
+    88.18418884277344,
+    -3.0345687866210938
+   ],
+   [
+    "B.E. (Mechanical Engineering) \u2014 Semester",
+    "85.5,-2.8",
+    85.46791076660156,
+    -2.8295440673828125
+   ],
+   [
+    "(An autonomous institute affiliated to S",
+    "81.9,-4.9",
+    81.85789489746094,
+    -4.88909912109375
+   ],
+   [
+    "consequences for work-in-progress invent",
+    "0.1,79.4",
+    0.10709381103515625,
+    79.3714599609375
+   ],
+   [
+    "Calculate the total time and the time pe",
+    "0.1,79.4",
+    0.10709381103515625,
+    79.3714599609375
+   ]
+  ],
+  "ok": true,
+  "doc": "question-paper-marks-right-margin"
+ },
+ {
+  "lines": 90,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "to support margin in the third quarter e",
+    "0.1,169.2",
+    0.0803070068359375,
+    169.24468994140625
+   ],
+   [
+    "The order book at the end of the quarter",
+    "0.1,169.2",
+    0.0803070068359375,
+    169.24462890625
+   ],
+   [
+    "per cent on the same period last year. T",
+    "0.1,169.2",
+    0.0803070068359375,
+    169.24462890625
+   ],
+   [
+    "the higher-margin precision range, which",
+    "0.1,169.2",
+    0.0803070068359375,
+    169.24462890625
+   ],
+   [
+    "cent of the order book against 29 per ce",
+    "0.1,169.2",
+    0.0803070068359375,
+    169.24462890625
+   ]
+  ],
+  "ok": true,
+  "doc": "report-2col-table-spanning-both-columns"
+ },
+ {
+  "lines": 138,
+  "within": 0,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 0.9852941176470589,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [
+   "Gross earnings                 size 8.0 -> 7.0",
+   "Net pay                        size 10.0 -> 7.0"
+  ],
+  "worst": [
+   [
+    "AMOUNT (RS)",
+    "-257.1,-33.3",
+    -257.1171875,
+    -33.27851104736328
+   ],
+   [
+    "AMOUNT (RS)",
+    "257.4,-31.9",
+    257.3662872314453,
+    -31.928504943847656
+   ],
+   [
+    "Meridian Textiles Ltd.  \u00b7  Salary slip O",
+    "0.1,-217.1",
+    0.14567184448242188,
+    -217.1123046875
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-215.6",
+    0.1162109375,
+    -215.6123046875
+   ],
+   [
+    "Net pay",
+    "3.1,74.3",
+    3.145671844482422,
+    74.30392456054688
+   ]
+  ],
+  "ok": true,
+  "doc": "salary-slip-corporate"
+ },
+ {
+  "lines": 102,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Deccan Precision Works LLP  \u00b7  Wage slip",
+    "0.1,-111.3",
+    0.0803070068359375,
+    -111.31231689453125
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-109.8",
+    0.08160400390625,
+    -109.81231689453125
+   ],
+   [
+    "\u2014",
+    "0.2,-79.3",
+    0.16851806640625,
+    -79.3334732055664
+   ],
+   [
+    "\u2014",
+    "0.1,-79.3",
+    0.059814453125,
+    -79.3334732055664
+   ],
+   [
+    "Token no.",
+    "0.1,-49.3",
+    0.100799560546875,
+    -49.33347797393799
+   ]
+  ],
+  "ok": true,
+  "doc": "salary-slip-factory-wages"
+ },
+ {
+  "lines": 468,
+  "within": 3,
+  "unmatched": 0,
+  "pages_ref": 3,
+  "pages_got": 3,
+  "page_count_ok": true,
+  "share": 0.00641025641025641,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Nirvaan Packaging Industries  \u00b7  stock r",
+    "0.1,-569.1",
+    0.114959716796875,
+    -569.1123199462891
+   ],
+   [
+    "Page 3 of 3",
+    "0.1,-567.6",
+    0.14691162109375,
+    -567.6123199462891
+   ],
+   [
+    "Nirvaan Packaging Industries  \u00b7  stock r",
+    "0.1,-246.5",
+    0.114959716796875,
+    -246.5123291015625
+   ],
+   [
+    "Page 1 of 3",
+    "0.1,-245.0",
+    0.14691162109375,
+    -245.0123291015625
+   ],
+   [
+    "Nirvaan Packaging Industries  \u00b7  stock r",
+    "0.1,-238.7",
+    0.114959716796875,
+    -238.7122802734375
+   ]
+  ],
+  "ok": true,
+  "doc": "table-across-page-break-repeated-header"
+ },
+ {
+  "lines": 64,
+  "within": 0,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.0,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Technical note DEG/2026/14  \u00b7  page 1 of",
+    "0.1,-173.2",
+    0.14567184448242188,
+    -173.2122802734375
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-171.7",
+    0.1162109375,
+    -171.7122802734375
+   ],
+   [
+    "We therefore model the page as a sequenc",
+    "0.2,83.1",
+    0.158294677734375,
+    83.13371276855469
+   ],
+   [
+    "Error analysis shows three recurring pat",
+    "0.2,81.5",
+    0.158294677734375,
+    81.53376770019531
+   ],
+   [
+    "text objects, one per column, which no g",
+    "0.2,81.5",
+    0.158294677734375,
+    81.53376770019531
+   ]
+  ],
+  "ok": true,
+  "doc": "table-inside-two-column-page"
+ },
+ {
+  "lines": 45,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 2,
+  "page_count_ok": false,
+  "share": 0.022222222222222223,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "144",
+    "0.1,234.8",
+    0.08660888671875,
+    234.76983642578125
+   ],
+   [
+    "141",
+    "0.1,222.8",
+    0.08660888671875,
+    222.76983642578125
+   ],
+   [
+    "11 Shareholder information and investor ",
+    "0.1,222.4",
+    0.13779830932617188,
+    222.44757080078125
+   ],
+   [
+    "132",
+    "0.1,210.9",
+    0.08660888671875,
+    210.86985778808594
+   ],
+   [
+    "10 Five year financial highlights . . . ",
+    "0.1,210.5",
+    0.13779830932617188,
+    210.547607421875
+   ]
+  ],
+  "ok": false,
+  "doc": "table-of-contents-dot-leaders"
+ },
+ {
+  "lines": 87,
+  "within": 1,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.011494252873563218,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Blue Harbour Logistics Pvt. Ltd.  \u00b7  man",
+    "0.1,-338.2",
+    0.0803070068359375,
+    -338.2123107910156
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-336.7",
+    0.08160400390625,
+    -336.7123107910156
+   ],
+   [
+    "Notes",
+    "0.1,33.0",
+    0.0803070068359375,
+    33.011383056640625
+   ],
+   [
+    "1.  Headcount includes contract labour d",
+    "0.1,32.9",
+    0.0803070068359375,
+    32.906219482421875
+   ],
+   [
+    "2.  Annual cost includes statutory contr",
+    "0.1,32.9",
+    0.0803070068359375,
+    32.906219482421875
+   ]
+  ],
+  "ok": true,
+  "doc": "table-with-merged-cells"
+ },
+ {
+  "lines": 215,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.004651162790697674,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Vehicle log sheet  \u00b7  MH-12-KT-4471  \u00b7  ",
+    "0.1,-117.5",
+    0.0803070068359375,
+    -117.5123291015625
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-116.0",
+    0.08160400390625,
+    -116.0123291015625
+   ],
+   [
+    "Total distance for the month: 3,890 km  ",
+    "0.1,29.8",
+    0.0803070068359375,
+    29.82171630859375
+   ],
+   [
+    "Columns, in order: date, from, to, dista",
+    "0.1,29.3",
+    0.0803070068359375,
+    29.328369140625
+   ],
+   [
+    "8,302",
+    "0.1,26.5",
+    0.097503662109375,
+    26.521728515625
+   ]
+  ],
+  "ok": true,
+  "doc": "table-with-no-header-row"
+ },
+ {
+  "lines": 137,
+  "within": 11,
+  "unmatched": 1,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.08029197080291971,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Deccan Precision Works LLP  \u00b7  productio",
+    "0.1,-326.2",
+    0.0803070068359375,
+    -326.2123107910156
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-324.7",
+    0.08160400390625,
+    -324.7123107910156
+   ],
+   [
+    "73",
+    "0.0,-57.7",
+    0.0460205078125,
+    -57.68862533569336
+   ],
+   [
+    "43.28",
+    "0.1,-39.3",
+    0.0919189453125,
+    -39.28861618041992
+   ],
+   [
+    "Apr 2026",
+    "0.1,-39.3",
+    0.0803070068359375,
+    -39.28861618041992
+   ]
+  ],
+  "ok": true,
+  "doc": "table-with-rotated-header"
+ },
+ {
+  "lines": 50,
+  "within": 1,
+  "unmatched": 2,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.02,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 0.8958333333333334,
+  "font_problems": [],
+  "worst": [
+   [
+    "Circular SH/PR/2026/11  \u00b7  Sunrise Hardw",
+    "0.1,-184.8",
+    0.14567184448242188,
+    -184.81231689453125
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-183.3",
+    0.1162109375,
+    -183.31231689453125
+   ],
+   [
+    "For Sunrise Hardware & Tools  \u00b7  pricing",
+    "0.1,-180.5",
+    0.14567184448242188,
+    -180.45867919921875
+   ],
+   [
+    "Internal note: do not circulate this rev",
+    "0.1,-179.1",
+    0.14567184448242188,
+    -179.08050537109375
+   ],
+   [
+    "304 line before the circular is released",
+    "0.1,-179.1",
+    0.14567184448242188,
+    -179.0804443359375
+   ]
+  ],
+  "ok": true,
+  "doc": "text-held-twice-shadow-text"
+ },
+ {
+  "lines": 72,
+  "within": 1,
+  "unmatched": 0,
+  "pages_ref": 1,
+  "pages_got": 1,
+  "page_count_ok": true,
+  "share": 0.013888888888888888,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "Packing list  \u00b7  invoice DPW/26-27/0418",
+    "0.1,-365.2",
+    0.0803070068359375,
+    -365.2123107910156
+   ],
+   [
+    "Page 1 of 1",
+    "0.1,-363.7",
+    0.08160400390625,
+    -363.7123107910156
+   ],
+   [
+    "The two tables above are separated by tw",
+    "0.1,19.3",
+    0.0803070068359375,
+    19.328399658203125
+   ],
+   [
+    "Packing supervised by: S. Kulkarni  \u00b7  c",
+    "0.1,19.3",
+    0.0803070068359375,
+    19.311370849609375
+   ],
+   [
+    "Wooden, ISPM 15",
+    "0.2,16.6",
+    0.15549468994140625,
+    16.621658325195312
+   ]
+  ],
+  "ok": true,
+  "doc": "two-tables-stacked-with-no-gap"
+ },
+ {
+  "lines": 513,
+  "within": 2,
+  "unmatched": 254,
+  "pages_ref": 3,
+  "pages_got": 5,
+  "page_count_ok": false,
+  "share": 0.003898635477582846,
+  "size_share": 1.0,
+  "name_share": 1.0,
+  "colour_share": 1.0,
+  "font_problems": [],
+  "worst": [
+   [
+    "24",
+    "0.1,340.8",
+    0.111968994140625,
+    340.8176727294922
+   ],
+   [
+    "2",
+    "0.1,340.8",
+    0.10028076171875,
+    340.8176727294922
+   ],
+   [
+    "25",
+    "0.1,215.0",
+    0.111968994140625,
+    215.01771545410156
+   ],
+   [
+    "1",
+    "0.1,215.0",
+    0.10028076171875,
+    215.01771545410156
+   ],
+   [
+    "Leave",
+    "0.1,180.4",
+    0.08477783203125,
+    180.417724609375
+   ]
+  ],
+  "ok": false,
+  "doc": "very-long-single-column-table"
+ }
+]
