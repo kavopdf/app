@@ -130,6 +130,87 @@ def combine(record, visual_json, only="", verified_json=""):
     return 1 if bad else 0
 
 
+def emit_findings(record, visual_json, out_path):
+    """Build the findings file the verifier reads.
+
+    This was the missing link in the pipeline. verify.py reads --findings and no tool
+    wrote one, so step 10 had no input and the order had a hole in it. A human was
+    expected to type the file by hand, which means in practice it would be skipped.
+
+    Two sources, both already produced by earlier steps:
+
+      LOOKED.tsv    the eye's verdict per page. A FAIL carries structured claims
+                    separated by " | " - breaks:<text>, moved:<text>, count:<text>.
+      visual.json   the eight computed questions. The ones that failed and have a claim
+                    type become measure findings: order, pagecount, shapes.
+
+    A claim the verifier does not understand is still emitted, so it comes back
+    UNVERIFIABLE and is visible rather than silently dropped.
+    """
+    import json
+
+    findings = []
+    n = 0
+    if os.path.isfile(record):
+        for line in open(record, encoding="utf-8"):
+            line = line.rstrip("\n")
+            if not line or line.startswith("#"):
+                continue
+            f = line.split("\t")
+            if len(f) < 6 or f[4].strip().upper() != "FAIL":
+                continue
+            doc, page, note = f[0], f[1], f[5].strip()
+            for part in note.split("|"):
+                claim = part.strip()
+                if not claim:
+                    continue
+                # "pagecount - this page should not exist" and friends: keep the token
+                claim = claim.split(" - ")[0].strip()
+                n += 1
+                findings.append(("V%d" % n, doc, page, "visual", claim))
+
+    if visual_json and os.path.isfile(visual_json):
+        # the computed questions that failed and can be expressed as a claim
+        MEASURE = {"reading order": "order", "page count": "pagecount", "charts": "shapes"}
+        for r in json.load(open(visual_json, encoding="utf-8")):
+            doc = r.get("doc")
+            if not doc:
+                continue
+            if not r.get("page_count_ok", True):
+                n += 1
+                findings.append(("M%d" % n, doc, 1, "measure", "pagecount"))
+            for pg in r.get("answers", []):
+                for qname, qa in (pg.get("answers") or {}).items():
+                    if qa.get("verdict") != "no":
+                        continue
+                    claim = MEASURE.get(qname)
+                    if not claim:
+                        continue
+                    n += 1
+                    findings.append(("M%d" % n, doc, pg.get("page", 1), "measure", claim))
+
+    # one row per distinct finding - the verifier dedupes too, but a file that already
+    # says a thing once is easier to read than one that says it three times
+    seen = set()
+    rows = []
+    for fid, doc, page, kind, claim in findings:
+        key = (doc, page, kind, claim)
+        if key in seen:
+            continue
+        seen.add(key)
+        rows.append((fid, doc, page, kind, claim))
+
+    with open(out_path, "w", encoding="utf-8") as fh:
+        fh.write("# id\tdocument\tpage\tkind\tclaim\n")
+        for fid, doc, page, kind, claim in rows:
+            fh.write("%s\t%s\t%s\t%s\t%s\n" % (fid, doc, page, kind, claim))
+
+    print("%d findings written to %s" % (len(rows), out_path))
+    for fid, doc, page, kind, claim in rows:
+        print("   %-5s %-34s p%-2s %-7s %s" % (fid, doc[:34], page, kind, claim[:44]))
+    return 0 if rows else 2
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--record", required=True)
@@ -137,12 +218,17 @@ def main():
     ap.add_argument("--combine", action="store_true",
                     help="the document verdict, eye first, numbers as evidence")
     ap.add_argument("--visual-json", default="")
+    ap.add_argument("--emit-findings", default="",
+                    help="build the findings file verify.py reads, from this"
+                         " record and the visual.py JSON")
     ap.add_argument("--verified", default="",
                     help="verify.py --json. When given, the decision is made on"
                          " findings that were CHECKED against the PDF, not on"
                          " the raw tool output")
     args = ap.parse_args()
 
+    if args.emit_findings:
+        return emit_findings(args.record, args.visual_json, args.emit_findings)
     if args.combine:
         return combine(args.record, args.visual_json, args.document, args.verified)
     if not os.path.isfile(args.record):
