@@ -86,6 +86,14 @@ for g in check-file-names check-tool-titles check-permissions check-pdf2word; do
   fi
 done
 
+# Parse proves a file is Python. This proves it works: on 7 Nov visual.py
+# lost its QUESTIONS list, parsed fine, and failed every document it was
+# given. The whole pipeline ran and reported five failures that were the
+# tool, not the documents.
+if ! python3 tools/smoke.py; then
+  fail "the bench tools do not run - see the traceback above"
+fi
+
 # a file added to the repo must not be a patch, a backup or a build leftover
 for bad in $(git status --porcelain 2>/dev/null | awk '{print $2}' | grep -E '\.(patch|orig|rej|bak|tmp)$|~$' || true); do
   fail "leftover file staged or untracked: $bad"

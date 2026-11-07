@@ -32,7 +32,9 @@ import sys
 import tempfile
 import zipfile
 
-TOOLS = os.path.dirname(os.path.abspath(__file__))
+# The bench tools live one level down. This file sits in tools/ so that
+# precommit can call it the same way it calls the other guards.
+TOOLS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "p2w-bench")
 
 
 def build_pair(work):
