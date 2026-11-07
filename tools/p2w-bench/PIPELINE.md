@@ -16,11 +16,12 @@ been through all of them and its findings have been verified.
     9. RECORD          looked.py - exit 0 only when every page has a verdict
    10. EMIT FINDINGS   looked.py --emit-findings - build the file step 11 reads
    11. VERIFY          verify.py --json - every finding, once, against the PDF
-   12. DECIDE          looked.py --combine --verified - on VERIFIED findings only
-   13. FIX             only findings that came back VERIFIED. Three tries, one for a stamp
-   14. RE-CHECK        after a fix: convert, render, LOOK, re-measure, G2 again
-   15. COMMIT          precommit.sh, then commit, then confirm the file landed
-   16. LOGS            defects, scores, baselines, the batch log
+   12. LEDGER          add this run's verify.py counts to CLAIM-LEDGER.md
+   13. DECIDE          looked.py --combine --verified - on VERIFIED findings only
+   14. FIX             only findings that came back VERIFIED. Three tries, one for a stamp
+   15. RE-CHECK        after a fix: convert, render, LOOK, re-measure, G2 again
+   16. COMMIT          precommit.sh, then commit, then confirm the file landed
+   17. LOGS            defects, scores, baselines, the batch log
 
 ## The commands, in order
 
@@ -42,6 +43,7 @@ been through all of them and its findings have been verified.
             --emit-findings F.tsv
     python3 tools/p2w-bench/verify.py --findings F.tsv --corpus DIR --out OUT \
             --rendered REND --json VERIFIED.json
+    # step 12: add VERIFIED.json's counts to tools/p2w-bench/CLAIM-LEDGER.md
     python3 tools/p2w-bench/looked.py --record LOOKED.tsv --combine \
             --verified VERIFIED.json
 
@@ -65,6 +67,28 @@ claims is comparing two opinions.
 
 ONE VERIFICATION PER FINDING. verify.py deduplicates on document, page, kind and claim, so
 the same problem is checked once however many times it is listed.
+
+## The claim ledger — why a refuted finding is still worth keeping
+
+A finding that comes back REFUTED is not a document defect. The pipeline correctly does not
+fix it. But it is not nothing either: a claim type that is refuted again and again is
+telling you about the TOOL.
+
+    the eye misreads the image        -> the eye's instruction is wrong
+    the verifier's check is wrong     -> the tool has a bug
+    the claim is too loosely worded   -> the claim vocabulary is missing something
+
+All three are fixable, and all three are invisible if the refuted finding is dropped.
+CLAIM-LEDGER.md is one table - claim type, verified, refuted, unverifiable - and step 12
+adds the run's counts to it.
+
+THE RULE: a document is never left FAIL on a claim type the verifier itself refutes. If it
+is, the problem is the claim or the check, not the page. Stop fixing documents on that
+claim type, work out which of the three causes it is, fix that, and say so in the run.
+
+A claim type with UNVERIFIABLE counts is not checkable at all: either the claim is worded
+too loosely - "looks wrong" instead of "moved:Resident Medical Officer" - or the verifier
+has no check for it. Both are fixable.
 
 ## What must not be reordered
 
