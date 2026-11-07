@@ -1,61 +1,39 @@
 # Visual score
 
-Share of documents whose every page answers all eight questions. The questions and
-their criteria are in the P2W brief; the tool that answers them is
-`tools/p2w-bench/visual.py`.
+The share of documents that pass the eight questions AND had every page looked at.
+Ratchets up. A document that passes the computed questions but whose pages were never
+opened is not counted here - `looked.py` decides that, not this file.
 
 ## How a document passes
 
-    A question is N/A - and passes - when the PDF has nothing of that kind on the page.
-    A page passes when every applicable question passes.
-    A document passes when every page passes.
+    1. sidebyside.py --record was run, and every page image was opened
+    2. every page has a verdict in LOOKED.tsv that is PASS, with what was seen
+    3. every applicable computed question passes
 
-## The ratchet
+## Measured
 
-    score fell    -> the change is reverted
-    score same    -> fine
-    score rose    -> accept, and record the new baseline
+| Date | Documents | Passed | Score | Note |
+|------|-----------|--------|-------|------|
+| 7 Nov | 3 | 0 | 0 % | first measurement, on 300/301/302/303 only |
 
-## History
+Not a baseline yet - three documents is not the corpus. It becomes one when a full
+batch has been through both halves of the check.
 
-| Date | Documents passing | Measured | What changed |
-|------|-------------------|----------|--------------|
-| 7 Nov | 0 / 4 | 4 | first run of visual.py, on the first four v3 documents |
-| 7 Nov | 12 / 13 | 13 | v3 batch 4 (372-394), after three measurement fixes in visual.py — rows compared by baseline and text instead of line index, and a soft hyphen's U+0000 treated as a space. The 0 / 4 row above was measured with the old index pairing and is superseded; those four have not been re-measured. |
+## What the first measurement found
 
-The first measurement is deliberately small: it exists to prove the tool answers the
-questions and to have a floor to climb from. It is not a claim about the corpus.
+    300_prescription_rx     2.3 % of pixels differ   QR identical, only drift
+    303_discharge_summary   3.7 % of pixels differ   WARNING SIGNS wraps to two lines;
+                                                     both signature labels sit lower
+                                                     than the PDF drew them
+    301_lab_report_panel    9 % of rows in sequence  every label first, then every value
 
-What it found on those four documents: reading order matched the PDF on 84 %, 9 %,
-76 % and 84 % of lines. That is a real defect class the count-based gate cannot see -
-every word can be present, in the right place, and in the wrong sequence.
+Two of those three were found by looking, not by any of the eight computed answers.
 
-## Why this is separate from the regression gate
+## The thresholds are gone
 
-`gate.py` counts words, blocks, pages and lines. A document can pass all of those and
-still look wrong: text in the wrong reading order, a chart drawn as grey rectangles, a
-QR code rendered too small to scan, an image region that is an empty white box. Those
-are what this score measures, and they are why the visual check is not optional.
-
-## What the batch-4 measurement changed
-
-The first measurement is only worth having if the questions are answered the same way twice, and
-three of the eight were not.
-
-Question 1 compared line *i* of the PDF with line *i* of the render. Rule 3 of the brief forbids
-index pairing, and it charged the writer for a construct it is required to use: three labels on one
-baseline become one paragraph with a tab stop at each label's x, so the two lines that are no
-longer separate shifted every line after them. 382_architecture_diagram scored 14 % on a page whose
-rows were all in the right place; it scores 67 % now, which is its real 77 pt drift.
-
-Grouping a row by the line's box top rather than its baseline split "TRANSPORT" off an org chart
-row: two fields on one baseline set in different faces report tops 3 pt apart. 374_org_chart went
-from 55 % to a pass on that alone.
-
-A soft hyphen or zero-width joiner reaches the text extractor as U+0000. It was kept in the PDF's
-text and dropped from the render's, so 391_survey_questionnaire_grid was charged for two words
-present on both sides. It is now a space — not deleted, because deleting it welds "strongly" to
-"agree".
-
-Question 7 had been answering `unsure` on every page: pyzbar needs a system libzbar this image does
-not carry and cannot install. It now falls back to OpenCV's QR and barcode decoders.
+Until 7 Nov the eight questions decided with numbers picked by hand: reading order
+passed at 95 %, a chart needed five paths and then half as many, emphasis needed a
+ratio of 1.05 and 85 % of it. Each is now a comparison with something the PDF says -
+1.0 for a sequence, zero-or-not for a path, the PDF's own heading lines for emphasis.
+A threshold nobody can justify decides a document is broken, or lets a broken one
+through, and neither can be argued with afterwards.

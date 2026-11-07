@@ -26,3 +26,22 @@ why page count and line count are now gate signals too.
 
 `reflines` for the corpus is 17777 and `refpages` is 540 - what the PDFs themselves
 hold. The gap to `lines` 15780 is the work: lines the converter is not yet producing.
+
+## 7 Nov — the measurement was repaired, and the baseline re-recorded with it
+
+    Trigger   the eight hand-picked thresholds in the visual gates were replaced, and
+              the colour test moved from Euclidean RGB distance under 24 to CIE76
+              delta-E under 3.
+    Result    base208.json:  identical on every field. The block test still uses the
+              3000 pt2 floor, so no count moved.
+              base208-position.json:  re-recorded. The aggregates came out the same to
+              one decimal - position 11.7, size 99.2, name 93.1, colour 98.9 - but 45
+              per-document fields moved, and a baseline recorded with a measurement that
+              no longer exists reports regressions that are not there.
+
+    Before    position 11.7 %   size 99.2 %   name 93.1 %   colour 98.9 %
+    After     position 11.7 %   size 99.2 %   name 93.1 %   colour 98.9 %
+
+Why this row exists even though the numbers did not move: a baseline is only meaningful
+against the measurement that produced it. Changing the formula and keeping the old file
+would have been the quiet kind of drift this file is here to make impossible.
