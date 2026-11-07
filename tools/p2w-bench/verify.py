@@ -113,35 +113,58 @@ def check_measure(claim, ref, got, ref_lines, got_lines, ref_doc, got_doc):
 def check_visual(claim, ref_lines, got_lines, ref, got):
     """Go to the PDF and measure the specific thing the eye said it saw."""
     if claim.startswith("wraps:"):
-        # The claim names the START of a line. Matching the start on both sides proves
-        # nothing - the first fragment of a wrapped line starts the same way. What has to
-        # be compared is the WHOLE PDF line: does that exact text appear as one line in
-        # the render, or are its words spread over more than one?
+        # A wrapped line's first fragment starts the same way as the whole line, so
+        # matching the start proves nothing. Containment proves nothing either: a render
+        # line that holds the PDF's line AND the line after it contains the first one
+        # completely, and the old check called that "on one line too".
+        #
+        # What the reader experiences is the line COUNT for that block of text. So the
+        # PDF's line and the one below it are taken together, and the render is asked how
+        # many lines it spends on the same words:
+        #
+        #   the render uses the same number      -> nothing wrong
+        #   fewer lines than the PDF             -> the render MERGED two lines into one
+        #   more lines than the PDF              -> the render WRAPPED one line into two
         needle = claim.split(":", 1)[1].strip()
         rl = [l for l in ref_lines if l["text"].strip().startswith(needle)]
         if not rl:
             rl = [l for l in ref_lines if needle in l["text"]]
         if not rl:
-            return "UNVERIFIABLE", "the PDF has no line starting %r" % needle[:40]
-        whole = max(rl, key=lambda l: len(l["text"]))["text"].strip()
-        flat = " ".join(" ".join(l["text"].split()) for l in got_lines)
-        if " ".join(whole.split()) in flat:
-            return "REFUTED", "the PDF's whole line is on one render line too"
-        # count how many render lines the PDF line's words are spread over
-        words = whole.split()
+            near = difflib.get_close_matches(needle, [l["text"] for l in ref_lines], n=1, cutoff=0.4)
+            hint = (" - did you mean %r?" % near[0][:60]) if near else ""
+            return "UNVERIFIABLE", "the PDF has no line starting %r%s" % (needle[:40], hint)
+
+        first = min(rl, key=lambda l: l["base"])
+        block = [first]
+        below = [l for l in ref_lines if l["base"] > first["base"] + 0.5]
+        if below:
+            block.append(min(below, key=lambda l: l["base"]))
+        words = " ".join(" ".join(l["text"].split()) for l in block).split()
+
+        # how many render lines the block's words are spent on
         spans = 0
         i = 0
         for l in got_lines:
-            t = " ".join(l["text"].split())
-            if not words:
+            if i >= len(words):
                 break
-            if words[i] in t:
+            t = " ".join(l["text"].split())
+            hit = False
+            while i < len(words) and words[i] in t:
+                i += 1
+                hit = True
+            if hit:
                 spans += 1
-                while i < len(words) and words[i] in t:
-                    i += 1
-        if spans > 1:
-            return "VERIFIED", "the PDF has this on one line; the render spreads it over %d" % spans
-        return "UNVERIFIABLE", "could not follow the line's words through the render"
+        if i < len(words):
+            return "UNVERIFIABLE", "could not follow %d of %d words through the render" % (
+                len(words) - i, len(words))
+
+        if spans == len(block):
+            return "REFUTED", "%d line(s) on both sides" % len(block)
+        if spans < len(block):
+            return "VERIFIED", "the PDF has %d line(s); the render MERGES them into %d" % (
+                len(block), spans)
+        return "VERIFIED", "the PDF has %d line(s); the render WRAPS them into %d" % (
+            len(block), spans)
 
     if claim.startswith("moved:"):
         needle = claim.split(":", 1)[1].strip()
@@ -161,7 +184,10 @@ def check_visual(claim, ref_lines, got_lines, ref, got):
         rl = [l for l in ref_lines if needle in l["text"]]
         gl = [l for l in got_lines if needle in l["text"]]
         if not rl:
-            return "UNVERIFIABLE", "the PDF has no %r either" % needle[:40]
+            near = difflib.get_close_matches(needle, [l["text"] for l in ref_lines],
+                                             n=1, cutoff=0.4)
+            hint = (" - the closest line in the PDF is %r" % near[0][:60]) if near else ""
+            return "UNVERIFIABLE", "the PDF has no %r either%s" % (needle[:40], hint)
         return ("REFUTED" if gl else "VERIFIED",
                 "%d line(s) in the PDF, %d in the render" % (len(rl), len(gl)))
 
