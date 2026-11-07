@@ -348,10 +348,23 @@ def q8_emphasis(ref, got):
     stores a size at.
     """
     def body_size(lines):
-        sizes = sorted(l["size"] for l in lines if l["size"] > 0)
+        """The size most of the text is set at.
+
+        Not the median: on a page with two lines, a 12 pt body and a 22 pt heading, the
+        median of [12, 22] is 22, so the body was read as the heading and the question
+        answered n/a on a page that plainly has a heading. The most common size is the
+        body by definition. On a tie the smaller wins, because a heading is the rarer of
+        the two.
+        """
+        sizes = [l["size"] for l in lines if l["size"] > 0]
         if not sizes:
             return 0.0
-        return sizes[len(sizes) // 2]
+        counts = {}
+        for v in sizes:
+            key = round(v, 1)
+            counts[key] = counts.get(key, 0) + 1
+        best = max(counts.values())
+        return min(v for v, c in counts.items() if c == best)
 
     ref_body = body_size(ref["lines"])
     got_body = body_size(got["lines"])
