@@ -12,11 +12,6 @@ opened is not counted here - `looked.py` decides that, not this file.
 
 ## Measured
 
-| Date | Documents | Passed | Score | Note |
-|------|-----------|--------|-------|------|
-| 7 Nov | 3 | 0 | 0 % | first measurement, on 300/301/302/303 only |
-| 7 Nov | 2 | 1 | 50 % | after the D-01 pitch fix: 316 PASS, 303 FAIL (WARNING SIGNS wraps) |
-
 Not a baseline yet - three documents is not the corpus. It becomes one when a full
 batch has been through both halves of the check.
 
