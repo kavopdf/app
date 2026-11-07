@@ -50,8 +50,8 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Install PyMuPDF
-        run: pip install pymupdf
+      - name: Install the measurement libraries
+        run: pip install pymupdf lxml
 
       - name: Get the corpus
         run: |

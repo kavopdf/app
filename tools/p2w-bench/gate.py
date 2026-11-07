@@ -49,7 +49,11 @@ def pdf_lines(path):
 
 def docx_text(path):
     import zipfile
-    from lxml import etree
+    try:
+        from lxml import etree
+    except ImportError:
+        raise SystemExit("gate.py needs lxml to read the .docx XML. "
+                         "pip install lxml, then run it again.")
     W = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
     try:
         z = zipfile.ZipFile(path)
