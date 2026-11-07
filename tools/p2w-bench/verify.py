@@ -47,6 +47,7 @@ EXIT
 """
 
 import argparse
+import difflib
 import os
 import sys
 
@@ -165,6 +166,37 @@ def check_visual(claim, ref_lines, got_lines, ref, got):
                 len(block), spans)
         return "VERIFIED", "the PDF has %d line(s); the render WRAPS them into %d" % (
             len(block), spans)
+
+    if claim.startswith("breaks:"):
+        # The same number of lines, broken at a different word. Neither a wrap (more
+        # lines) nor a merge (fewer) - the reader gets the same shape with the wrong
+        # break in it, which is what 303_discharge_summary does to its WARNING SIGNS line.
+        needle = claim.split(":", 1)[1].strip()
+        rl = [l for l in ref_lines if l["text"].strip().startswith(needle)]
+        if not rl:
+            rl = [l for l in ref_lines if needle in l["text"]]
+        if not rl:
+            return "UNVERIFIABLE", "the PDF has no line starting %r" % needle[:40]
+        first = min(rl, key=lambda l: l["base"])
+        words = " ".join(first["text"].split()).split()
+        if not words:
+            return "UNVERIFIABLE", "the PDF's line is empty"
+        # the last word of the PDF's line must end a render line, and the next word of
+        # the PDF must start the following one - otherwise the break moved
+        last = words[-1]
+        rl_hit = [i for i, l in enumerate(got_lines) if " ".join(l["text"].split()).endswith(last)]
+        if not rl_hit:
+            return "VERIFIED", "the PDF's line ends at %r and no render line does" % last
+        i = rl_hit[0]
+        if i + 1 < len(got_lines):
+            nxt = " ".join(got_lines[i + 1]["text"].split())
+            pdf_next = [l for l in ref_lines if l["base"] > first["base"] + 0.5]
+            if pdf_next:
+                pn = " ".join(min(pdf_next, key=lambda l: l["base"])["text"].split())
+                if pn and not nxt.startswith(pn.split()[0]):
+                    return "VERIFIED", "the PDF breaks after %r; the render continues %r" % (
+                        last, nxt[:40])
+        return "REFUTED", "the line breaks in the same place"
 
     if claim.startswith("moved:"):
         needle = claim.split(":", 1)[1].strip()
