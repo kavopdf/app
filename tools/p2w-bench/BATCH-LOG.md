@@ -369,3 +369,44 @@ from character counts.
 **312 is a tool defect, not a document defect.** The eye passed it; the numbers failed it on
 reading order 60.9 % and emphasis 18 of 20. Recorded in REMAINING-DEFECTS.md so the final sweep
 repairs the measurement rather than the page.
+
+## 8 Nov — b80 batch 2 (21-40)
+
+Twenty documents, one page each, every page opened before any number was read. 10 findings,
+9 verified, 0 refuted, 1 unverifiable. 16 PASS, 4 FAIL.
+
+**The batch splits cleanly into the sixteen that match and the four that do not.** The sixteen
+are text-placement pages — forms, invoices, timetables, dot leaders, four typefaces, an
+embedded subset, a non-embedded substitution — and on all of them the word set is identical to
+the PDF's and every row sits on the page's row. That is the first batch where the whole
+"ordinary document" half came through without a finding.
+
+**The four failures are four different causes, none of them the page's fault.**
+
+    27  a two-column page laid out as one flow: the right column's whole block is 54 pt low
+        and 27 pt right, 33 rows in the render against the page's 27.
+    30  a 20 pt number and an 11 pt heading on one baseline come out as two lines, so every
+        numbered section grows a line and the date that shared the heading's line drops again.
+    38  text drawn twice at the same y to fake bold is emitted twice, because the glyph dedupe
+        looks back 40 glyphs and the doubled line is 74 long.
+    39  a letter-spaced heading loses its word spaces: NOTICETOMEMBERS.
+
+**Two documents the eye passed and the numbers failed, and the eye was right on both.** 28's
+description deliberately overruns its cell and 40 is reshaped Devanagari; reading order pairs
+rows by text, so neither page has rows to pair. `looked.py --combine` named both correctly.
+That is the third document on this one blind spot across three batches — it wants a tool fix
+before the final sweep counts those pages.
+
+**One claim could not be checked at all.** `missing:NOTICE TO MEMBERS` on 39 came back
+UNVERIFIABLE because the page writes the heading with letter spacing too, so the needle is
+absent from the PDF as well. The defect is real; it is carried by the verified `order` finding
+on the same page. Not fixed, not dropped.
+
+**One fix tried, and the ratchet turned it down.** 38's duplicate subtitle is the glyph dedupe
+looking back only 40 glyphs at a 74-character doubled line. Widening the window to 400 does
+exactly what it should - the subtitle comes out once - and G2 rejected it: `missing` rose on
+38, 39 and text-held-twice-shadow-text. The metric compares word multisets against a PDF text
+layer that holds faux-bold and shadow text twice, so it rewards copying the duplicate. The fix
+was reverted, the baseline untouched, and the reason written into REMAINING-DEFECTS.md: until
+`missing` stops counting a doubled layer as two words, a correct fix cannot pass G2. 38 is at
+1 of 3 tries. 27, 30 and 39 have not been started.

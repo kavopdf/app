@@ -18,18 +18,18 @@ This table is the diagnostic. One row per claim type, updated at the end of ever
 
 | Claim type | Verified | Refuted | Unverifiable | What it means |
 |---|---|---|---|---|
-| moved: | 31 | 4 | 0 | the workhorse: 374 -329.3 pt, 375 -172.4, 381 240.8, 393 132.7, 401 -484.1 all held. 8 Nov v3 batch 2 added 8 verified. Re-checked after the gap-clamp fix, 3 of those 8 came back REFUTED (318 7.8 pt, 320 8.9, 325 9.4 stayed VERIFIED on the residual; 326 2.4, 333 0.6, 340 0.1 were refuted by the fix, which is the outcome a fix should produce). The one earlier refutation was mine - "Employee name" was 2.6 pt out, inside the 3.0 pt tolerance, and I had read the cell grid wrong |
-| count: | 0 | 0 | 0 | |
+| moved: | 33 | 4 | 0 | the workhorse: 374 -329.3 pt, 375 -172.4, 381 240.8, 393 132.7, 401 -484.1 all held. 8 Nov v3 batch 2 added 8 verified. Re-checked after the gap-clamp fix, 3 of those 8 came back REFUTED (318 7.8 pt, 320 8.9, 325 9.4 stayed VERIFIED on the residual; 326 2.4, 333 0.6, 340 0.1 were refuted by the fix, which is the outcome a fix should produce). The one earlier refutation was mine - "Employee name" was 2.6 pt out, inside the 3.0 pt tolerance, and I had read the cell grid wrong |
+| count: | 1 | 0 | 0 | 38's subtitle is drawn twice on the page to fake bold and once on both sides of a line in the render; the count held |
 | breaks: | 1 | 0 | 0 | |
 | wraps: | 0 | 1 | 0 | one refutation, 303's WARNING SIGNS: the eye saw one line on the PDF and two in the render, and the verifier counted 2 on both sides. The eye misread a line the page had already wrapped at the right margin - the claim was right in form and wrong in fact, which is what the verifier is for |
-| missing: | 0 | 0 | 0 | |
+| missing: | 0 | 0 | 1 | 39's NOTICE TO MEMBERS is UNVERIFIABLE - the page writes the heading with letter spacing, so its text layer reads collapsed too and the needle is not there on either side |
 | extra: | 0 | 0 | 0 | |
 | pagecount | 4 | 0 | 0 | 8 Nov: 330 and 332 both 1 page in, 2 out, verified twice (once from the eye's FAIL, once from the computed question). Both are drawing pages whose dimension lines and tables overflow |
 | overlap | 1 | 1 | 0 | 401 held (3 pairs against the PDF's 0). 393 was refuted by a check that only compares LINE boxes: the peak table and the caption are drawn over the CHART, and a table over a picture is not a line overlap. The eye was right and the check is blind |
 | shapes | 0 | 2 | 1 | 400 lost one speech bubble's outline and the claim came back UNVERIFIABLE - there is no visual check for a shape count at all, only the "charts" measure question, which answers "yes" on 5 paths against 4. 316 came back REFUTED: the question said "1 in the PDF, 0 in the docx" and verify.py counted 1 on both sides, so the charts question is what is wrong |
 | emphasis (not a type yet) | 0 | 0 | 1 | 380's Escalation line is bold in the render and regular in the PDF. q8 only asks whether a line the PDF emphasised KEPT its size; a line the render emphasised on its own is invisible to it |
 | columns (not a type yet) | 0 | 0 | 1 | 383's RESPONSE FIELDS table has a fourth empty column and row rules the PDF does not draw. No claim type describes a table's shape |
-| order (measure) | 24 | 0 | 0 | 373 91.9 %, 400 42.1 %, 401 50.0 % - all three agreed with what the eye saw. 7 Nov batch: 301 78.7 %, 303 88.5 %, 305 47.1 %, 311 90.2 %, 312 60.9 %, 315 29.1 % all held against the PDF, but only five of the six agreed with the eye: 312 was passed on sight, so that row is a measurement bug, not a document defect. 8 Nov batch 2 added 9 verified, and 2 of them disagreed with the eye (331 93.3 %, 334 89.7 %, both passed on sight): reading order on a page of a drawing or a figure is the same measurement bug |
+| order (measure) | 30 | 0 | 0 | 373 91.9 %, 400 42.1 %, 401 50.0 % - all three agreed with what the eye saw. 7 Nov batch: 301 78.7 %, 303 88.5 %, 305 47.1 %, 311 90.2 %, 312 60.9 %, 315 29.1 % all held against the PDF, but only five of the six agreed with the eye: 312 was passed on sight, so that row is a measurement bug, not a document defect. 8 Nov batch 2 added 9 verified, and 2 of them disagreed with the eye (331 93.3 %, 334 89.7 %, both passed on sight): reading order on a page of a drawing or a figure is the same measurement bug |
 
 ## The rule
 
@@ -154,3 +154,22 @@ with "2 line(s) on both sides"; the eye is judging the stamp's position and blam
 passed. On 05 the eye passed and order read 62.5 %; that is the seal's per-character text, the
 measurement blind spot already recorded, and it is the only eye/numbers disagreement in the
 batch.
+
+## Run 8 Nov, b80 batch 2 (21-40)
+
+10 findings, 9 verified, 0 refuted, 1 unverifiable. moved +2 (both verified), count +1
+(verified), missing +1 (unverifiable), order +6 (all verified).
+
+Six of the ten findings are the `order` question, and two of those six disagree with the eye:
+28 (79.1 %) and 40 (92.7 %). Both are the same shape as the 331/334 disagreement in batch 2 of
+v3 - reading order pairs rows by text, and on a page whose cells deliberately overrun, or whose
+script is reshaped, a row has no counterpart to pair with. `looked.py --combine` named both
+"eye (numbers wrong - repair the tool)" and both documents stay PASS. That is now three
+documents on this one blind spot; it is a tool repair, not a page repair.
+
+The UNVERIFIABLE is the useful one this run. `missing:NOTICE TO MEMBERS` on 39 is a real
+defect - the render joins every word of a letter-spaced heading - but the page's own text
+layer is written the same spaced way, so the needle is absent on both sides and the check
+cannot fire. The finding survives on `order` alone. A claim whose needle does not exist on
+the PDF is the fourth form of the vocabulary gap: not too loose, not missing a check, but
+pointing at text the page never spells the way a reader sees it.

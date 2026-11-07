@@ -248,3 +248,23 @@ reverted. See "Table height" in REMAINING-DEFECTS.md.
 | 2026-11-08 | 18_centred_heading_left_body_txtpos | PASS | centred head, five numbered items and the footer on the PDF lines |
 | 2026-11-08 | 19_hanging_indent_txtpos | PASS | hanging-indent clauses and the approval line on the PDF lines |
 | 2026-11-08 | 20_numbered_list_separate_column_txtpos | FAIL | pagecount 1 in / 2 out and moved:I have read and understood 101.4 pt - every numbered item is two paragraphs, the marker column and the text column |
+| 2026-11-08 | 21_form_labels_x60_values_x300_txtpos | PASS | labels and values on the page's rows, word set identical to the PDF |
+| 2026-11-08 | 22_invoice_four_columns_txtpos | PASS | four columns, quantities, rates and amounts on the PDF rows |
+| 2026-11-08 | 23_timetable_grid_txtpos | PASS | grid rules and every period cell on the page's rows, word set identical |
+| 2026-11-08 | 24_address_block_indents_txtpos | PASS | indented address blocks and the signature block on the PDF rows |
+| 2026-11-08 | 25_signature_block_underscores_txtpos | PASS | both signature rules and the annexure rates on the PDF rows |
+| 2026-11-08 | 26_footnote_marker_bottom_note_txtpos | PASS | footnote marker and the bottom note on the page's lines |
+| 2026-11-08 | 27_two_column_left_short_txtpos | FAIL | moved:Residents of the ward - 129.7 pt in the PDF, 183.4 in the render, the whole right column block sits 54 pt low |
+| 2026-11-08 | 28_value_overflows_cell_txtpos | PASS | the overflow row sits where the page draws it. order 79.1 % is a measurement blind spot - the page's description deliberately overruns its cell, so the row bands do not pair |
+| 2026-11-08 | 29_dot_leaders_txtpos | PASS | dot leaders and right-aligned amounts on the PDF rows |
+| 2026-11-08 | 30_mixed_font_sizes_one_baseline_txtpos | FAIL | moved:Counselling and seat allotment - 192.6 pt in the PDF, 222.3 in the render; the 01 drops onto a line of its own |
+| 2026-11-08 | 31_times_body_arial_headings | PASS | Times body and sans headings on the page's lines |
+| 2026-11-08 | 32_serif_nondefault_body | PASS | serif body and italic headings on the PDF lines |
+| 2026-11-08 | 33_sans_nondefault_body | PASS | sans body, heading band and table on the PDF rows |
+| 2026-11-08 | 34_monospace_document | PASS | courier column alignment held, every statement on its PDF line |
+| 2026-11-08 | 35_four_typefaces_one_page | PASS | four faces, marks table and totals line on the PDF rows |
+| 2026-11-08 | 36_embedded_subset_font | PASS | subset face renders, field table and both paragraphs on the PDF rows |
+| 2026-11-08 | 37_font_not_embedded_substitution | PASS | substituted faces and every line on the PDF baselines |
+| 2026-11-08 | 38_faux_bold_italic_synthesised | FAIL | count:Study of self-compacting concrete - the page draws the subtitle twice at y=118.2 to fake bold and the render carries both copies on one line, so the subtitle appears twice |
+| 2026-11-08 | 39_small_caps_letter_spacing | FAIL | the letter-spaced headings lose their spaces - NOTICE TO MEMBERS renders as NOTICETOMEMBERS. order 86.5 % of 18 rows |
+| 2026-11-08 | 40_devanagari_shaping_font | PASS | Devanagari shapes correctly, table and paragraphs on the PDF rows. order 92.7 % is a measurement blind spot - the shaping pass pairs rows by text |

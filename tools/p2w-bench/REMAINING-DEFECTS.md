@@ -1,5 +1,86 @@
 # Remaining defects — to be worked at the very end
 
+## b80 corpus — batch 2 (21-40), 8 Nov
+
+Twenty documents, one page each. Every page opened before any number was read; every finding
+verified against the PDF; 10 findings, 9 verified, 0 refuted, 1 unverifiable. Sixteen documents
+pass, four do not.
+
+### OPEN — the right column of a two-column page is 54 pt low
+
+27_two_column_left_short_txtpos. `moved:Residents of the ward` verified: y=129.7 in the PDF,
+y=183.4 in the render. The left column is right; the right column's whole block, from its first
+paragraph through "Second phase of the scheme" and "By our correspondent", sits 54 pt lower and
+about 27 pt further right. Reading order 70.0 % of 27 rows, 33 rows in the render against 27.
+The two columns are being laid out as one flow with a gap, not as two measured columns.
+**Tries: 0 of 3.**
+
+### OPEN — a heading whose number and text share one baseline is split onto two lines
+
+30_mixed_font_sizes_one_baseline_txtpos. `moved:Counselling and seat allotment` verified:
+y=192.6 in the PDF, y=222.3 in the render. The page sets the 20 pt "01" and the 11 pt heading on
+ONE baseline; the render puts the number on its own line and the heading under it, so every one
+of the four numbered sections grows a line and the "Reporting date" that shared the heading's
+line drops to a third. Reading order 69.4 % of 22 rows, 27 rows in the render. **Tries: 0 of 3.**
+
+### OPEN — text drawn twice to fake bold is emitted twice
+
+38_faux_bold_italic_synthesised. `count:Study of self-compacting concrete` verified: the PDF
+draws the subtitle twice at the identical y=118.2, which is how this file synthesises bold. The
+render joins both copies into one paragraph, so the subtitle reads
+"Study of self-compacting concrete using quarry dust as partial replacement Study of
+self-compacting concrete using" and wraps onto a second line. The cause is the glyph dedupe in
+`PdfToWord.dedupe`: it looks back only 40 glyphs, and a 74-character doubled line puts the
+second copy of each glyph 74 positions away, outside the window. Reading order 85.7 % of 17
+rows, emphasis 2 of 7 lost.
+
+**Tried and reverted (1 of 3).** The window was widened from 40 glyphs to a named
+DUPLICATE_WINDOW of 400. It does exactly what it says: 38's subtitle comes out once and the
+paragraph reads correctly. G2 across 208 documents rejected it - `missing` went 4 -> 14 on 38,
+7 -> 8 on 39 and 0 -> 8 on text-held-twice-shadow-text. The reason is in the metric, not the
+fix: `missing` compares word multisets, and on a faux-bold or shadow page the PDF's own text
+layer holds the text twice, so the metric REWARDS copying the duplicate. A fix that makes the
+page right cannot pass G2 until `missing` stops counting a doubled text layer as two words.
+The change was reverted and the baseline left alone, as the ratchet requires. **Tries: 1 of 3.**
+
+### OPEN — a letter-spaced heading loses its word spaces
+
+39_small_caps_letter_spacing. The page sets its headings as per-glyph positioned text at a
+1 pt nominal size with wide advances - the way a PDF fakes small caps and tracking. The render
+carries the right characters but the spaces collapse: "THE MYSCORE CHAMBER OF COMMERCE AND
+INDUSTRY" renders as "THEMYSCORECHAMBEROFCOMMERCEANDINDUSTRY" and "NOTICE TO MEMBERS" as
+"NOTICETOMEMBERS". The paragraph's own text layer still has the spaces, so the loss is in the
+advance, not the string. Reading order 86.5 % of 18 rows, 19 rows in the render.
+`missing:NOTICE TO MEMBERS` came back UNVERIFIABLE because the page's text layer is spaced the
+same way, so the claim is carried by the measured finding only. **Tries: 0 of 3.**
+
+### Measurement blind spots found this pass - repair the tool, not the page
+
+    order on 28_value_overflows_cell_txtpos   79.1 %, 20 rows in the PDF against 23 in the
+        render. The eye passed the page and it is right: the page's description deliberately
+        overruns its cell ("the amount in column 5 begins before the previous cell has ended,
+        which is the failure mode this file tests"), so the row bands cannot pair. The extra
+        rows are the overflow being cut where the page cut it.
+    order on 40_devanagari_shaping_font       92.7 %, 20 against 21 rows. The eye passed it.
+        Reading order pairs rows by text and the shaping pass gives the render a different
+        string for a conjunct, so one row cannot pair.
+
+Both were named by `looked.py --combine` as "eye (numbers wrong - repair the tool)" and both
+documents stay PASS.
+
+### A claim that could not be checked
+
+    missing:NOTICE TO MEMBERS on 39   UNVERIFIABLE - "the PDF has no 'NOTICE TO MEMBERS'
+        either", because the page writes the heading with letter spacing and its text layer
+        reads the same collapsed way. The defect is real and the measured `order` finding on
+        the same page is VERIFIED, so the document is not left on this claim.
+
+### One PASS is worth a note
+
+35_four_typefaces_one_page carries the header word "Secured" twice in the docx text layer (188
+words in the PDF against 189) but the page renders one header row and the eye sees one. Not
+recorded as a finding; noted so the final sweep re-checks it rather than re-reading it as new.
+
 ## v3 corpus — batch 5 (402-417), 8 Nov
 
 Fourteen documents, all one page except 412 (five) and 417 (two); 416_many_tiny_pages is
