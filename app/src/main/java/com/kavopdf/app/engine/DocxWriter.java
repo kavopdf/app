@@ -869,6 +869,7 @@ public final class DocxWriter {
         float required = 0f;
         float prevBase = -1f;
         float prevBox = 0f;
+        float prevSize = 0f;
         boolean firstLine = true;
         for (Object block : page.blocks) {
             if (block instanceof PdfToWord.Para) {
@@ -894,23 +895,45 @@ public final class DocxWriter {
                 required += gap + box;
                 prevBase = top;
                 prevBox = box;
+                prevSize = size;
                 firstLine = false;
             } else if (block instanceof PdfToWord.Table) {
-                // A page with a table does not spend its white space, whatever its extent. The
-                // model's table height is the one measurement still known to be short: rows are
-                // emitted w:trHeight hRule="atLeast", so a cell whose text wraps grows the row and
-                // the render's table is taller than t.bottom - t.top. Every line below the table
-                // already lands too low by that error, and spending a gap after it adds the error a
-                // second time. Measured on this change: with table pages spending their gaps, 15
-                // documents went from one sheet to two - 341, 330, 75, 80, eway-bill, form16-part-b,
-                // insurance-policy-schedule, marksheet, mutual-fund-statement, question-paper,
-                // table-with-merged-cells, text-held-twice-shadow-text, very-long-single-column-table,
-                // 373 and journal-2col-with-footnotes - and 390_wide_data_appendix fell from 57.8 %
-                // of lines in tolerance to 0.5 %. See "Table height" in REMAINING-DEFECTS.md.
-                return false;
+                // A table is charged what the model says it is tall, plus the spacer the flow
+                // puts above it and the 4 pt paragraph Word requires after it. Before this the
+                // whole page gave up its white space the moment it held a table at all, which
+                // was a blanket rule standing in for a measurement: on 318 the page's own gap
+                // between its last box and its footer is 480 pt and the clamped 120 pt put that
+                // footer 337 pt too high.
+                //
+                // The blanket rule was there because the model's table height can be SHORT - a
+                // cell whose text wraps grows its w:trHeight row - so a page that spent its gaps
+                // could be pushed past the paper. Measured on the 208-document corpus: 15
+                // documents went from one sheet to two when the rule was removed. So the table's
+                // height is not taken on trust here. It is charged, and the page only spends its
+                // gaps when the arithmetic still fits the sheet with TABLE_SLACK_PT to spare for
+                // a table that grows. Where the arithmetic says it does not fit, the page keeps
+                // the clamped gaps exactly as before. See "Table height" in REMAINING-DEFECTS.md.
+                PdfToWord.Table t = (PdfToWord.Table) block;
+                float gapAbove = 0f;
+                if (firstLine) {
+                    gapAbove = Math.max(0f, t.top);
+                } else if (prevBase >= 0f && t.top > prevBase) {
+                    // The flow's spacer paragraph: the measured gap less one line of the
+                    // previous text, and only when that is worth a paragraph of its own.
+                    float prevLine = Math.max(4f, prevSize * LINE_FACTOR);
+                    float extra = (t.top - prevBase) - prevLine;
+                    if (extra >= prevLine * 1.2f) gapAbove = Math.min(144f, extra);
+                }
+                required += gapAbove + Math.max(0f, t.bottom - t.top) + POST_TABLE_TW / 20f;
+                // After a table the previous baseline is the table's bottom edge and it carries
+                // no line box of its own, exactly as the writer sets it.
+                prevBase = t.bottom;
+                prevBox = 0f;
+                prevSize = 0f;
+                firstLine = false;
             }
         }
-        return required <= ph + 0.5f;
+        return required <= ph + 0.5f - TABLE_SLACK_PT;
     }
 
     /**
@@ -1426,6 +1449,17 @@ public final class DocxWriter {
 
     /** The paragraph a table must be followed by: 4 pt, in twips. */
     private static final int POST_TABLE_TW = 80;
+
+    /**
+     * How much room a page must have left before it may spend the gaps it drew, in points.
+     *
+     * <p>The model's table height is a measurement of the PDF's own table, and a cell whose
+     * text wraps grows its {@code w:trHeight} row in the render. The slack is what a table may
+     * grow by before the page no longer fits: 12 pt is one row of 10 pt text plus its padding,
+     * which is the smallest growth a wrapped cell can cause. A page that cannot spare it keeps
+     * the clamped gaps, which is the behaviour every document had before this change.
+     */
+    private static final float TABLE_SLACK_PT = 12f;
 
     /**
      * A size in half-points, rounded DOWN.
