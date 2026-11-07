@@ -457,3 +457,67 @@ a pagecount defect - a measure claim - discarded the eye's own FAIL and the docu
 PASS. 330 and 332 both came out PASS with a verified 1-in/2-out page count behind them. Any
 verified finding on the page now backs the eye. `tools/smoke.py` and `tools/precommit.sh` both
 pass; the change was exercised on this batch, not just parsed.
+
+---
+
+## v3 batch 3 (341-371, 16 documents), 7 Nov — the page spends its own white space
+
+    documents          16   (341 was never scored, so it came with this batch)
+    pages looked at    17   (350 renders two)
+    eye verdicts       17 recorded, 0 PENDING
+    findings           27 emitted, 21 VERIFIED, 6 REFUTED, 0 UNVERIFIABLE
+    verdict            6 pass, 10 fail
+
+### The fix this pass — DocxWriter.pageFits
+
+`GAP_CAP_TW` (120 pt) clamps the white space between two lines, and that clamp is what
+put a page's footer 250-360 pt too high on every document whose content ends well above
+the foot of the sheet. Raising the cap outright was tried on 7 Nov, passed G2 and was
+reverted because 315_gazette_notification went from one sheet to two.
+
+`pageFits` walks the page's own blocks through the same line box solver the flow uses and
+answers one question: if every gap the page drew were spent, would the content still fit
+the paper? If yes the gaps are spent (ceiling 1000 pt, still bounded because a malformed
+PDF can report a y of 100000 pt); if not the old 120 pt clamp stands. A page holding a
+table never spends its gaps, because the model's table height is still short by the rows
+that grow — measured on this change, letting table pages spend their gaps sent 15
+documents from one sheet to two.
+
+| Measure, all 208 documents | before | after |
+|---|---|---|
+| lines within tolerance (G5) | 36.0 % | **38.1 %** |
+| documents improved / worse on G5 | - | **32 / 0** |
+| documents whose page count changed | - | **0** |
+| G2 words, blocks, page fill, overflow | - | no document got worse |
+
+Note: `base208-position.json` still holds the pre-D-01 numbers, so G5 against the baseline
+reports the same fifteen documents as debt that D-01 recorded. Against the code as it
+stood at the start of this run the change is 32 better, 0 worse.
+
+### Fixed by it
+
+- **352** — "Dr. S. Iyer, Director" and "Prof. A. Bose, Programme Head" were 102.2 and
+  65.4 pt high; both are on the PDF's baseline now.
+- **361** — the card text sat on top of the photograph; every card now reads name,
+  dimensions, MRP, code and minimum order below the image.
+- **371** — "S. Mehta, Director - Human Resources", "Place: Pune", "Date: 18 March 2024"
+  and the closing note were 230.5 pt high; all four are at the foot of the page again.
+
+### What the eye caught that the numbers did not
+
+- **364** — the tear-off stub's "WS24-4471-0082" is missing; the main block has it. Only
+  a count of the text finds it, and only after looking at the stub.
+- **350** — the question labels "1a.", "1b." are broken onto their own lines, so each
+  question's text starts a line below its number.
+
+### What the numbers caught that the eye did not
+
+- **344, 351, 353, 363, 370** — five documents whose tables make the page ineligible for
+  the gap fix. Their footers, signature labels and venue block are still 107-360 pt high.
+  That is the table-height blocker, not this change.
+
+### Disagreements recorded
+
+**352** and **371** pass by eye while question 1 (reading order) still fails. Both are
+`_rows()` measuring a page whose blocks are ordered by the model rather than by the band
+sort; the documents are right and the tool is wrong. Repair the tool, not the document.

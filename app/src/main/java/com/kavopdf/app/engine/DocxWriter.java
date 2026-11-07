@@ -109,6 +109,33 @@ public final class DocxWriter {
      */
     private static final int GAP_CAP_TW = 2400;
 
+    /**
+     * The ceiling on a gap when the page's own content fits the sheet, in twips (1000 pt).
+     *
+     * <p>{@link #GAP_CAP_TW} exists because a gap is white space the flow cannot always afford,
+     * not because 120 pt is a rule about layout. When the page's own content fits inside the
+     * paper - which {@link #pageFits} measures by walking the page's blocks through this very
+     * line box solver - the white space costs nothing: the flow ends where the page ends, and
+     * giving the gap up is what puts a page's footer 250 pt too high (344's "Assessing officer"
+     * 284 pt, 363's customer-care line 251 pt, 371's signature block 230 pt, 351's signature
+     * lines 360 pt).
+     *
+     * <p>Still a ceiling, and still for the reason given above: a malformed PDF can report a y of
+     * 100000 pt, and the per-page budget clamp in {@code flowFromBox} is the second guard.
+     *
+     * <p>TRIED 7 Nov and reverted: raising {@link #GAP_CAP_TW} itself. It fixed the same class and
+     * G2 passed across 208, but 315_gazette_notification went from one sheet to two, because its
+     * three columns are still stacked into one flow - its content is three columns long and only
+     * fitted a sheet while the gaps were being clamped. Spending the gap only on a page whose
+     * content fits is what separates 315 (it does not fit) from 344 (it does).
+     */
+    private static final int GAP_CAP_SPEND_TW = 20000;
+
+    /** The ceiling this page's gaps get - see {@link #GAP_CAP_SPEND_TW}. */
+    private static int gapCapTw(Ctx ctx) {
+        return ctx.spendGaps ? GAP_CAP_SPEND_TW : GAP_CAP_TW;
+    }
+
     private DocxWriter() {
     }
 
@@ -163,6 +190,8 @@ public final class DocxWriter {
         int flowTw;
         /** The page's own height in twips - the budget the flow must not exceed. */
         int budgetTw;
+        /** True when this page's own content fits the sheet, so its white space can be spent. */
+        boolean spendGaps;
         /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
         float pageWidthPt = 595f;
         /**
@@ -237,6 +266,7 @@ public final class DocxWriter {
             ctx.lastLinePt = 0f;
             ctx.flowTw = 0;
             ctx.budgetTw = (int) Math.max(1L, Math.round(ph * TWIPS_PER_PT));
+            ctx.spendGaps = pageFits(page, ph);
             ctx.pageWidthPt = pw;
             if (page.blocks.isEmpty()) continue;
             for (Object block : page.blocks) {
@@ -727,7 +757,7 @@ public final class DocxWriter {
             }
         } else if (pitch > 0f) {
             float extra = pitch - (1f - LINE_BASE) * ctx.lastLinePt - LINE_BASE * linePt;
-            if (extra > 0f) beforeTw = (int) Math.min(GAP_CAP_TW, Math.round(extra * TWIPS_PER_PT));
+            if (extra > 0f) beforeTw = (int) Math.min(gapCapTw(ctx), Math.round(extra * TWIPS_PER_PT));
         }
         int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
         ctx.lastLinePt = linePt;
@@ -820,6 +850,67 @@ public final class DocxWriter {
             runXml(sb, run);
         }
         sb.append("</w:p>");
+    }
+
+    /**
+     * Does this page's own content fit inside the paper?
+     *
+     * <p>Walked through the same line box solver the flow uses, in the same order, so the answer
+     * is the height the flow would need if every gap the page drew were spent. A page of stacked
+     * columns fails this even though every block's y is on the page, because the flow lays the
+     * columns one after another rather than on top of one another - which is exactly the case
+     * that rejected the plain cap raise (315_gazette_notification).
+     *
+     * <p>A table's height is the model's own {@code bottom - top}; where that under-measures a
+     * table whose rows grow, this returns false and the page keeps the clamped gaps, which is the
+     * behaviour that was there before.
+     */
+    private static boolean pageFits(PdfToWord.Page page, float ph) {
+        float required = 0f;
+        float prevBase = -1f;
+        float prevBox = 0f;
+        boolean firstLine = true;
+        for (Object block : page.blocks) {
+            if (block instanceof PdfToWord.Para) {
+                PdfToWord.Para p = (PdfToWord.Para) block;
+                float top = Float.MAX_VALUE;
+                float size = 0f;
+                for (PdfToWord.Box b : p.boxes) {
+                    if (b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
+                    if (b.y < top) top = b.y;
+                    if (b.size > size) size = b.size;
+                }
+                if (top == Float.MAX_VALUE) continue;
+                float pitch = firstLine || prevBase < 0f ? -1f : top - prevBase;
+                float box = flowLinePt(pitch, size, prevBox);
+                float gap;
+                if (firstLine) {
+                    gap = Math.max(0f, top - LINE_BASE * box);
+                } else if (pitch > 0f) {
+                    gap = Math.max(0f, pitch - (1f - LINE_BASE) * prevBox - LINE_BASE * box);
+                } else {
+                    gap = 0f;
+                }
+                required += gap + box;
+                prevBase = top;
+                prevBox = box;
+                firstLine = false;
+            } else if (block instanceof PdfToWord.Table) {
+                // A page with a table does not spend its white space, whatever its extent. The
+                // model's table height is the one measurement still known to be short: rows are
+                // emitted w:trHeight hRule="atLeast", so a cell whose text wraps grows the row and
+                // the render's table is taller than t.bottom - t.top. Every line below the table
+                // already lands too low by that error, and spending a gap after it adds the error a
+                // second time. Measured on this change: with table pages spending their gaps, 15
+                // documents went from one sheet to two - 341, 330, 75, 80, eway-bill, form16-part-b,
+                // insurance-policy-schedule, marksheet, mutual-fund-statement, question-paper,
+                // table-with-merged-cells, text-held-twice-shadow-text, very-long-single-column-table,
+                // 373 and journal-2col-with-footnotes - and 390_wide_data_appendix fell from 57.8 %
+                // of lines in tolerance to 0.5 %. See "Table height" in REMAINING-DEFECTS.md.
+                return false;
+            }
+        }
+        return required <= ph + 0.5f;
     }
 
     /**
@@ -920,7 +1011,7 @@ public final class DocxWriter {
             // wider than the box can carry - a diagram's boxes 90 pt apart, a footer 422 pt below
             // the text - still needs spacing, and flowLinePt has refused to put that in the box.
             float extra = pitch - (1f - LINE_BASE) * ctx.lastLinePt - LINE_BASE * linePt;
-            if (extra > 0f) beforeTw = (int) Math.min(GAP_CAP_TW, Math.round(extra * TWIPS_PER_PT));
+            if (extra > 0f) beforeTw = (int) Math.min(gapCapTw(ctx), Math.round(extra * TWIPS_PER_PT));
         }
         int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
         ctx.lastLinePt = linePt;

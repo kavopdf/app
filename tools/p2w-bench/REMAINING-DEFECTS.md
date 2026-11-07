@@ -742,3 +742,33 @@ Centred lines carried `w:ind w:left` = their measured x *and* `w:jc="center"`, a
 centres inside the indent, so every centred heading was pushed right by half of it: 310 +92.8
 pt, 317 +99.2 pt, 313 +121.1 pt. The alignment now places the line; the indent is cleared for a
 line centred on the paper and becomes the page's own extent for one centred in a column.
+
+---
+
+## Closed 7 Nov — the page spends its own white space
+
+`DocxWriter.pageFits` closes the footer/end-block half of D-01's vertical class on every
+page whose content fits the sheet and holds no table. Measured over 208: 32 documents
+improved on G5, 0 worse, 0 page counts changed, G2 clean. 352, 361 and 371 of batch 3 are
+fixed by it; 344, 351, 353, 363 and 370 are the same defect on a page that carries a
+table, and stay open on the table height below.
+
+## OPEN — batch 3 (341-371), found this pass
+
+| Doc | Problem | Tries |
+|---|---|---|
+| **344, 351, 353, 363, 370** | The page's footer, signature labels or venue block still sit 107-360 pt too high. Each of these pages holds a table, so `pageFits` refuses to spend the gap, because the model's table height is short by the rows that grow. **Blocked on the table height**, not on the gap rule. | 0 of 3 |
+| **343_air_waybill** | The Pieces cell is drawn "12" and the render wraps it into "1" and "2" — the column is exactly as wide as the page's own text and the substituted face is wider. Same class as 314's "8,39,69,60". | 0 of 3 |
+| **360_restaurant_menu** | Five MAINS prices (420, 360, 390, 450, 90) fall onto the line below their dish: the leader dots fill the column and the price has nowhere to go. 17 rows in the PDF against 22 in the render. | 0 of 3 |
+| **365_recipe_card** | "2 tbsp" splits into "2" and "tbsp", and "to taste" into "to" and "taste": the amount column is 30 pt wide where the page drew 36. | 0 of 3 |
+| **370_offer_letter** | "Provident fund (employer contribution)" and "Performance bonus (target)" wrap in a component column narrower than the page's. | 0 of 3 |
+| **353_admit_card** | The label/value block is emitted as a four-column table with the labels as header cells, so VENUE and INSTRUCTIONS TO CANDIDATES land 107.7 pt low. The page sets each label above its value in a two-column band. | 0 of 3 |
+| **364_event_ticket** | The tear-off stub's "WS24-4471-0082" is missing; the PDF draws it twice, the render once. | 0 of 3 |
+| **350_question_paper** | Still 1 page in, 2 out — the MCQ block overflows. New this pass: the question labels "1a." and "1b." are broken onto their own lines, so each question's text starts a line below its number. | 0 of 3 |
+
+### Measurement bugs found this pass, for the tool not the document
+
+**352** and **371** pass by eye while `visual.py` question 1 fails: 46.8 % and 61.5 % of
+rows in sequence. Both documents are right — every line is on the PDF's baseline — so
+`_rows()` is grouping bands differently from the model's own order. Repair the question,
+not the document.
