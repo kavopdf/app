@@ -53,40 +53,46 @@ def render_pdf(src, outdir):
     return src
 
 
-def page_data(pdf_path):
-    import pymupdf
+def page_data(doc):
+    """Everything the eight questions need, read while the document is still open.
+
+    The document must stay open: a page object is a handle into its document, and the
+    moment that document closes every call on it raises. The first version returned the
+    page handle and then closed the document, so the image question and the QR question
+    threw every single time and the catch-all turned each of them into "unsure" - which
+    passes. Two of the eight questions were therefore never asked.
+    """
     pages = []
-    with pymupdf.open(pdf_path) as doc:
-        for page in doc:
-            d = page.get_text("dict")
-            lines = []
-            for block in d["blocks"]:
-                for line in block.get("lines", []):
-                    spans = line.get("spans") or []
-                    text = "".join(s.get("text", "") for s in spans)
-                    if not norm(text):
-                        continue
-                    sizes = [s.get("size", 0) for s in spans if s.get("text", "").strip()]
-                    lines.append({
-                        "text": text,
-                        "bbox": line["bbox"],
-                        "size": max(sizes) if sizes else 0,
-                        "bold": any("bold" in (s.get("font", "").lower()) for s in spans),
-                    })
-            images = []
-            for img in page.get_images(full=True):
-                try:
-                    images.append(page.get_image_bbox(img))
-                except Exception:
-                    pass
-            drawings = page.get_drawings()
-            pages.append({
-                "lines": lines,
-                "images": images,
-                "drawings": drawings,
-                "rect": page.rect,
-                "page": page,
-            })
+    for page in doc:
+        d = page.get_text("dict")
+        lines = []
+        for block in d["blocks"]:
+            for line in block.get("lines", []):
+                spans = line.get("spans") or []
+                text = "".join(s.get("text", "") for s in spans)
+                if not norm(text):
+                    continue
+                sizes = [s.get("size", 0) for s in spans if s.get("text", "").strip()]
+                lines.append({
+                    "text": text,
+                    "bbox": line["bbox"],
+                    "size": max(sizes) if sizes else 0,
+                    "bold": any("bold" in (s.get("font", "").lower()) for s in spans),
+                })
+        images = []
+        for img in page.get_images(full=True):
+            try:
+                images.append(page.get_image_bbox(img))
+            except Exception:
+                pass
+        pages.append({
+            "lines": lines,
+            "images": images,
+            "drawings": page.get_drawings(),
+            "rect": page.rect,
+            "page": page,
+            "pixmap": page.get_pixmap(dpi=200),
+        })
     return pages
 
 
@@ -146,10 +152,11 @@ def q4_images(ref, got):
                 blank += 1
                 continue
             samples = pix.samples
-            if len(set(samples[i] for i in range(0, len(samples), max(1, len(samples) // 400)))) < 3:
+            step = max(1, len(samples) // 400)
+            if len(set(samples[i] for i in range(0, len(samples), step))) < 3:
                 blank += 1
         except Exception:
-            pass
+            blank += 1
     if blank == 0:
         return "yes", ""
     return "no", "%d image regions are blank" % blank
@@ -251,22 +258,30 @@ def check(pdf_path, docx_path, workdir):
     got_pdf = render_pdf(docx_path, workdir + "/got")
     if not ref_pdf or not got_pdf:
         return {"error": "could not render one side"}
-    ref = page_data(ref_pdf)
-    got = page_data(got_pdf)
 
+    import pymupdf
     answers = []
     failed = 0
-    for i in range(min(len(ref), len(got))):
-        page_answers = {}
-        for name, fn in QUESTIONS:
-            try:
-                verdict, detail = fn(ref[i], got[i])
-            except Exception as exc:
-                verdict, detail = "unsure", str(exc)[:60]
-            page_answers[name] = {"verdict": verdict, "detail": detail}
-            if verdict == "no":
-                failed += 1
-        answers.append({"page": i + 1, "answers": page_answers})
+    unsure = 0
+    with pymupdf.open(ref_pdf) as refdoc, pymupdf.open(got_pdf) as gotdoc:
+        ref = page_data(refdoc)
+        got = page_data(gotdoc)
+        for i in range(min(len(ref), len(got))):
+            page_answers = {}
+            for name, fn in QUESTIONS:
+                try:
+                    verdict, detail = fn(ref[i], got[i])
+                except Exception as exc:
+                    # An exception is NOT a pass. It is reported as a failure of the
+                    # check itself, so a broken question cannot hide behind "unsure"
+                    # and look like a document that passed.
+                    verdict, detail = "error", "%s: %s" % (type(exc).__name__, str(exc)[:70])
+                page_answers[name] = {"verdict": verdict, "detail": detail}
+                if verdict in ("no", "error"):
+                    failed += 1
+                elif verdict == "unsure":
+                    unsure += 1
+            answers.append({"page": i + 1, "answers": page_answers})
 
     return {
         "pages_ref": len(ref),
@@ -274,6 +289,7 @@ def check(pdf_path, docx_path, workdir):
         "page_count_ok": len(ref) == len(got),
         "answers": answers,
         "failed": failed,
+        "unsure": unsure,
         "ok": failed == 0 and len(ref) == len(got),
     }
 
@@ -326,7 +342,7 @@ def main():
                       % (r.get("pages_got", 0), r.get("pages_ref", 0)))
             for page in r.get("answers", []):
                 for name, a in page["answers"].items():
-                    if a["verdict"] == "no":
+                    if a["verdict"] in ("no", "error"):
                         print("       page %d  %-14s %s" % (page["page"], name, a["detail"]))
 
     print("")
