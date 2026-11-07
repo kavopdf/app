@@ -126,23 +126,42 @@ def main():
                     canvas.paste(imgs[k], (0, 0))
                     imgs[k] = canvas
 
-            # difference panel: where the two pages disagree, in red on the PDF's grey
-            diff = ImageChops.difference(imgs[0].convert("RGB"), imgs[1].convert("RGB")).convert("L")
-            diff = diff.point(lambda v: 255 if v > 48 else 0)
+            # Difference panel: where the two pages disagree, in red on the PDF's grey.
+            #
+            # Both sides are blurred first. Every glyph is a hard edge, and the converter's
+            # line height is a constant where it should be the measured pitch (D-01), so
+            # text lands three to six points from where the PDF drew it. Compared raw, that
+            # half-line drift lights up every letter on the page and the panel says
+            # "everything differs" - true, and useless. Blurring absorbs the drift and
+            # leaves the differences that matter: a block that moved, a block that is
+            # missing, a table whose columns changed, an image that is not there.
+            from PIL import ImageFilter
+            a = imgs[0].convert("L").filter(ImageFilter.GaussianBlur(2))
+            b = imgs[1].convert("L").filter(ImageFilter.GaussianBlur(2))
+            diff = ImageChops.difference(a, b).point(lambda v: 255 if v > 70 else 0)
             panel = imgs[0].convert("RGB").point(lambda v: v // 3)
             panel.paste((255, 0, 0), mask=diff)
+
+            # One number beside the panel, so "a few pixels" and "half the page" are not
+            # the same thing to read.
+            differing = sum(diff.histogram()[255:]) if hasattr(diff, "histogram") else 0
+            total_px = diff.width * diff.height
+            share = 100.0 * differing / max(1, total_px)
 
             pad, head = 8, 26
             total_w = w * 3 + pad * 4
             total_h = h + head + pad * 2
             sheet = Image.new("RGB", (total_w, total_h), (255, 255, 255))
             d = ImageDraw.Draw(sheet)
-            for idx, (img, label) in enumerate(((imgs[0], "PDF"),
-                                                (imgs[1], "DOCX"),
-                                                (panel, "DIFFERENCE (red = differs)"))):
+            labels = ("PDF", "DOCX",
+                      "DIFFERENCE  %.1f%% of pixels  (red = differs)" % share)
+            for idx, (img, label) in enumerate(((imgs[0], labels[0]),
+                                                (imgs[1], labels[1]),
+                                                (panel, labels[2]))):
                 x = pad + idx * (w + pad)
                 d.text((x + 4, 8), "%s  page %d of %d" % (label, i + 1, n), fill=(0, 0, 0))
                 sheet.paste(img, (x, head))
+            print("  page %d: %.1f%% of pixels differ" % (i + 1, share))
 
             name = os.path.join(dest, "page-%02d.png" % (i + 1))
             sheet.save(name)
