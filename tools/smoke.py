@@ -74,21 +74,45 @@ def build_pair(work):
     return pdf_path, docx_path
 
 
+# The marks of a BROKEN tool, as opposed to a tool that worked and found problems.
+#
+# This distinction is the whole point. visual.py exits 1 when a document fails its eight
+# questions, and that is the tool doing its job; looked.py exits 1 while a page is
+# PENDING, and that is also its job. A smoke test that failed on a non-zero exit would
+# have to be given a perfect document to pass, and then it would stop testing the tools
+# and start testing the fixture.
+BROKEN = (
+    "Traceback (most recent call last)",
+    "is not defined",
+    "check failed",
+    "can't open file",
+    "No module named",
+    "TypeError",
+    "AttributeError",
+    "NameError",
+    "usage:",
+)
+
+
 def run(label, args, work):
-    r = subprocess.run([sys.executable] + args, cwd=work,
-                       capture_output=True, text=True, timeout=180)
-    out = (r.stdout or "") + (r.stderr or "")
-    if r.returncode != 0 and "not installed" not in out.lower():
-        print("FAIL  %s" % label)
-        print("\n".join("      " + ln for ln in out.strip().split("\n")[-12:]))
+    try:
+        r = subprocess.run([sys.executable] + args, cwd=work,
+                           capture_output=True, text=True, timeout=180)
+    except subprocess.TimeoutExpired:
+        print("FAIL  %s  (timed out - it hung, which is a break too)" % label)
         return False
-    # A tool that answers "check failed" is a broken tool, whatever it exited with.
-    for bad in ("is not defined", "check failed", "Traceback"):
+    out = (r.stdout or "") + (r.stderr or "")
+    for bad in BROKEN:
         if bad in out:
             print("FAIL  %s  (said: %s)" % (label, bad))
             print("\n".join("      " + ln for ln in out.strip().split("\n")[-12:]))
             return False
-    print("ok    %s" % label)
+    if not out.strip():
+        print("FAIL  %s  (said nothing at all)" % label)
+        return False
+    # A verdict of FAIL on the fixture is fine. The tool ran.
+    verdict = "found problems" if "FAIL" in out else "clean"
+    print("ok    %-14s ran (%s)" % (label, verdict))
     return True
 
 
@@ -131,8 +155,8 @@ def main():
     ok &= run("sidebyside.py", [s, "--corpus", corpus, "--out", out, "--doc", "smoke",
                                 "--record", os.path.join(work, "LOOKED.tsv")], work)
     ok &= run("looked.py", [l, "--record", os.path.join(work, "LOOKED.tsv")], work)
-    ok &= run("txt-guard.py", [t, "snapshot", "--out", out,
-                               "--file", os.path.join(work, "guard.json")], work)
+    ok &= run("txt-guard.py", [t, "snapshot", "--dir", out,
+                               "--save", os.path.join(work, "guard.json")], work)
 
     print("")
     if ok:
