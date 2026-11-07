@@ -269,3 +269,27 @@ two two-column pages: the table height is still under-measured, so text after a 
 from the wrong y and the old flow was compensating. The position baseline is deliberately
 NOT re-recorded, so that debt stays visible. Details and the reverted spacer experiment are
 in REMAINING-DEFECTS.md under D-01 and D-06.
+
+
+## 2026-11-07 - v3 batch 1 (300-315) re-processed from scratch
+
+The corpus work restarts at the first document: the 70 documents processed before this pass
+were done without a verifier and without the eye, so their pass meant nothing. This is the
+first fifteen of the 75.
+
+| Step | Result |
+|---|---|
+| convert, 15 documents | 15 docx + 15 txt, 0 failed, 28 s for all 75 |
+| G5 position, batch | 41.3 % of lines within tolerance; size 98.5 %, name 100 %, colour 100 % |
+| G6a the eye | 15 pages opened, 15 verdicts, 0 PENDING |
+| G6b the numbers | 8 of 15 failed a question |
+| verify | 15 findings: 12 VERIFIED, 3 REFUTED |
+| combine | **10 PASS, 5 FAIL, 0 unlooked** |
+
+Three of the six refutations were the eye's own: 314's "truncated" totals are complete and at
+identical coordinates on both sides, 303's "wrap" is the render keeping a line the PDF clipped
+off its own page, and 301's two label claims were 0.5 pt apart. Each is written up in
+REMAINING-DEFECTS.md so the same claim is not made again.
+
+Open and named: 301 and 302 (a label/value band emitted cell by cell), 311 (address welds the
+Mobile label), 312 (notary tail 72.2 pt high, box empty), 315 (three columns stacked).

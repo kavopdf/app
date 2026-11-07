@@ -566,3 +566,41 @@ first - 8 of 25 tables were missing on stamped documents once when the grid and 
 paragraph grouping disagreed, and a change here can do the same.
 
 **Tries: 1 of 3** - the signed-gap and sort changes were tried and reverted.
+
+
+---
+
+## OPEN - v3 corpus, batch 1 (300-315), re-processed 7 Nov under the eye + verify pipeline
+
+Fifteen documents converted from the current engine, rendered through LibreOffice, opened one
+page at a time, measured, and every finding checked against the PDF by `verify.py` before it
+was written down. Twelve findings verified, six refuted - and four of the six refuted were the
+eye's or the tool's own mistake, which is the point of the step.
+
+| Doc | Verified finding | Tries |
+|---|---|---|
+| **301_lab_report_panel** | `moved:ANANYA RAO` 26.2 pt, `moved:COLLECTED` 8.0 pt; reading order 78.7 %, 28 rows in the PDF against 33 in the render. The four-column band (PATIENT / AGE-SEX / REFERRED BY / COLLECTED) is emitted one cell per paragraph, so the row is four baselines that drift left to right instead of one. | 0 of 3 |
+| **302_radiology_report** | `moved:PATIENT NAME` -8.6 pt. Same band, same cause: the first label of a label/value band leaves its row. The rest of the page is exact and the reading order is 100 %. | 0 of 3 |
+| **311_fir_police_form** | `moved:Mobile` - 2 in the PDF, 1 in the render, worst offset 91.8 pt. The address cell overruns into the Mobile cell on the page itself, and the render welds the two texts into one run, so the label leaves its column. Reading order 90.2 %. | 0 of 3 |
+| **312_affidavit_stamp_paper** | `moved:BEFORE ME` and `moved:Note: affidavits`, both exactly -72.2 pt. The notary box is drawn at its own y but empty, the footnote sits inside it, and the BEFORE ME block is pushed above the box. Reading order 58.0 %. The whole tail is 72.2 pt high, which is the spacing-before cap on the ~183 pt gap above the notary block (GAP_CAP_TW 120 pt). | 0 of 3 |
+| **315_gazette_notification** | `moved:publication in the Official Gazette` +184.8 pt, `moved:The Gazette of India` +55.9 pt; reading order 29.1 %, 21 rows against 34. The three columns stack into one flow and the masthead drops below PUBLISHED BY AUTHORITY. Column bands are not detected on this page, so no `w:cols` is written. | 0 of 3 |
+
+### Refuted this pass - do not "fix" these
+
+| Claim | What the PDF actually says |
+|---|---|
+| `missing:8,39,69,600` and `missing:9,90,84,128` on 314 | Both totals are present and identical: x 467.7-513.0 on both sides. The eye misread a 130 dpi image; the last digit is there. |
+| `wraps:WARNING SIGNS` on 303 | The PDF's own line runs 28.0 to 596.7 on a 595.28 pt page - it overruns its margin by 1.4 pt and the tail "more than 4 times a day" is drawn off the page and lost. The render wraps it inside the margin and keeps every word. The render is the better page. |
+| `moved:AGE / SEX` and `moved:PATIENT` on 301 | Both within 0.5 pt. The band defect is real, but it is not these two labels; the verified claims are the two above. |
+| `shapes` on 316 | 1 shape in the PDF, 1 in the render. |
+
+### Two tool alarms to repair, not documents
+
+- **303_discharge_summary, reading order 88.5 %.** The render has 27 rows to the PDF's 25
+  because it wrapped the line the PDF clipped. Question 1 counts rows, so a render that keeps
+  text the PDF lost is scored as an order error. The comparison should be on the text, not the
+  row count.
+- **305_vaccination_certificate, reading order 47.1 % and "205 shapes in the PDF, 12 in the
+  render".** The seal is rotated text drawn one character per baseline, so the PDF's own rows
+  are single characters; the 205 shapes are the QR module squares, which the render carries as
+  one image. Both are the known rotated-stamp and image-as-image limits, not defects.
