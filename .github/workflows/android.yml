@@ -176,6 +176,9 @@ jobs:
       - name: Guard - PDF to Word keeps its extraction stages and wiring
         run: python3 tools/check-pdf2word.py
 
+      - name: Guard - nothing ships in the APK that the APK does not use
+        run: python3 tools/check-dead-classes.py
+
       - name: Guard - no unexpected permissions
         run: |
           python3 -m pip install --quiet pyaxmlparser
