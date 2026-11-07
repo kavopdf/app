@@ -199,3 +199,18 @@ reverted. See "Table height" in REMAINING-DEFECTS.md.
 | 2026-11-08 | 334_patent_document | PASS | title, abstract, FIG. 1 and all five claims on the page. order 89.7 % is a measurement artifact, the eye passed |
 | 2026-11-08 | 335_msds_safety_data_sheet | PASS | eight numbered sections, the pictogram row and the composition table all in place |
 | 2026-11-08 | 340_bill_of_lading | PASS | every cell of the form and the barcode caption now exact. Was 293.1 pt out before the gap clamp fix |
+| 2026-11-08 | 341_shipping_manifest | FAIL | pagecount - 1 page in, 2 out; the manifest table spills onto a second sheet |
+| 2026-11-08 | 342_packing_list | PASS | header, exporter block, four-row table, totals, marks box, declaration and signature on the PDF baselines |
+| 2026-11-08 | 343_air_waybill | FAIL | order 90.3 % of 15 rows; the Pieces cell that set "12" as "1" over "2" was fixed this run (was 17 rows), one line still outside tolerance |
+| 2026-11-08 | 344_customs_declaration | PASS | title band, two-column field grid, item table, CLEARED stamp and both boxes in place |
+| 2026-11-08 | 350_question_paper | FAIL | pagecount - 1 page in, 2 out; order 39.3 % of 52 rows, every question is one paragraph with a gap |
+| 2026-11-08 | 351_omr_answer_sheet | FAIL | rules - 11 rules in the PDF, 32 in the render; the bubble grid is drawn inside a ruled table the page does not have |
+| 2026-11-08 | 352_certificate_ornate_border | PASS | ornate double border, five text blocks, the seal and both signatures on the PDF rows. order 46.8 % is the seal's per-character text - measurement, the eye passed |
+| 2026-11-08 | 353_admit_card | FAIL | moved:DATE OF BIRTH 81.0 pt - the label/value band is emitted as separate rows; order 63.0 % |
+| 2026-11-08 | 360_restaurant_menu | FAIL | order 61.5 % of 17 rows - the right column's dot-leader tab stop runs past the margin and each price wraps to the next line |
+| 2026-11-08 | 361_product_catalogue_grid | PASS | all six cards with image, title, price, code and barcode on the PDF grid |
+| 2026-11-08 | 362_price_list_dense | PASS | three column groups, every row of every group in place, footer line in place |
+| 2026-11-08 | 363_warranty_card | PASS | title box, product block, six terms, sticker box, QR and both footers on the PDF rows. order 87.0 % counts the QR modules - measurement, the eye passed |
+| 2026-11-08 | 364_event_ticket | FAIL | missing:ADMIT ONE - the rotated sidebar label is gone; only a clipped "WAREHOU" survives at x=565 |
+| 2026-11-08 | 365_recipe_card | FAIL | wraps:2 tbs, wraps:to taste - the amount column is fragmented into three grid columns and every two-word cell breaks; order 89.7 % |
+| 2026-11-08 | 370_offer_letter | PASS | letterhead, ref, address, subject, body, five-row table and signature block on the PDF baselines. order 93.1 % and the shapes claim both came back measurement |

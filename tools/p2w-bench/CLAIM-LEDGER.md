@@ -98,3 +98,18 @@ the thing that was wrong, not the check:
 The rule that held: a claim whose TEXT is wrong comes back UNVERIFIABLE or REFUTED and costs
 one round trip, while a fix applied on the same reading would have edited a page that was
 already right.
+
+## Run 8 Nov, v3 batch 3 (341-370)
+
+19 findings, 18 verified, 1 refuted, 0 unverifiable. moved +1, missing +1, wraps +2, rules +1,
+order +10, pagecount +2, shapes +1 refuted.
+
+`rules` is new this run. 351_omr_answer_sheet's extra table rules were real and no claim type
+could say so: `extra:1` came back REFUTED because "1" matches sixteen lines, and the page was
+about to be recorded PASS behind a false alarm. It now reads 11 rules in the PDF against 32 in
+the render and VERIFIED. This is the case PIPELINE.md calls "the claim vocabulary is missing
+something", and it is the same gap that left 380 and 383 unverified on 7 Nov.
+
+Two needles were too short to be claims and both were refuted on a substring: `wraps:12` matched
+"ACC-447112". The defect behind it was real - the row count said 17 against 15 - so the finding
+was kept on the measured claim and the visual one dropped. A two-character needle is not a claim.

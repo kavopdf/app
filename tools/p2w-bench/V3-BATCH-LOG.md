@@ -585,3 +585,45 @@ UNVERIFIABLE, and combine counts an eye FAIL only where a claim was VERIFIED. Th
 recorded FAIL in VISUAL-SCORE.md: a document is PASS only when every finding on it was
 verified, and these two were not checked at all. The repair is a claim type and a check, not a
 document fix.
+
+## v3 batch 3 (341-370) — 8 Nov
+
+Fifteen documents, 17 pages, every page opened before any number was read. 19 findings: 18
+verified, 1 refuted, 0 unverifiable. **7 pass, 8 fail.**
+
+| Document | Pages | Verdict | Verified finding |
+|---|---|---|---|
+| 341_shipping_manifest | 2 | FAIL | pagecount - 1 in, 2 out |
+| 342_packing_list | 1 | PASS | - |
+| 343_air_waybill | 1 | FAIL | order 90.3 % of 15 rows (the "12" cell fixed this run) |
+| 344_customs_declaration | 1 | PASS | - |
+| 350_question_paper | 2 | FAIL | pagecount, order 39.3 % of 52 rows |
+| 351_omr_answer_sheet | 1 | FAIL | rules - 11 in the PDF, 32 in the render |
+| 352_certificate_ornate_border | 1 | PASS | eye; order 46.8 % is the seal - measurement |
+| 353_admit_card | 1 | FAIL | moved:DATE OF BIRTH 81.0 pt, order 63.0 % |
+| 360_restaurant_menu | 1 | FAIL | order 61.5 %, 17 rows in and 22 out |
+| 361_product_catalogue_grid | 1 | PASS | - |
+| 362_price_list_dense | 1 | PASS | - |
+| 363_warranty_card | 1 | PASS | eye; order 87.0 % counts QR modules - measurement |
+| 364_event_ticket | 1 | FAIL | missing:ADMIT ONE - rotated sidebar text |
+| 365_recipe_card | 1 | FAIL | wraps:2 tbs, wraps:to taste, order 89.7 % |
+| 370_offer_letter | 1 | PASS | eye; order 93.1 % and shapes both measurement |
+
+### What changed in the code
+
+A table cell that cannot be widened over its neighbours now gives up inset instead of breaking
+its value. 343's "12" was set as "1" over "2"; it is now one line, the row count is the page's
+15 and reading order went 81.2 -> 90.3 %. G2 across 208: no document got worse.
+
+verify.py gained a `rules` claim, so a page whose text is right and whose borders are wrong can
+be verified instead of argued about.
+
+### What the eye caught that no number did
+
+351's ruled grid - the eight questions passed it. 360's prices wrapping to the left margin -
+reading order only said 61.5 %, and the reason took opening the page. 364's rotated sidebar -
+the numbers said 88.9 % of 14 rows and never mentioned that a whole line was gone.
+
+### What the numbers caught that the eye missed
+
+Nothing, this batch. Three numbers failed where the eye passed and all three are measurement.

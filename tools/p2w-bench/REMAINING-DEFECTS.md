@@ -1,5 +1,103 @@
 # Remaining defects — to be worked at the very end
 
+## v3 corpus — batch 3 (341-370), 8 Nov
+
+Fifteen documents, one page each except 341 and 350. Every page opened before any number was
+read; every finding verified against the PDF; 19 findings, 18 verified, 1 refuted, 0
+unverifiable. Seven documents pass, eight do not.
+
+### FIXED this run: a cell that cannot be widened still has to hold its value on one line
+
+343_air_waybill sets "12" in the Pieces column. The column is 1120 twips and the page drew the
+value 949 twips into it, so Word had 171 twips to set a 190-twip string in and broke it: "1" on
+the row's baseline, "2" on the next. The row the page draws once arrived twice, and the whole
+table below it moved - reading order 81.2 %, 17 rows against the PDF's 15.
+
+The existing widening rule could not help: it widens a cell over the empty cells beside it, and
+"1,144.0" is in the cell to its right. So the inset gives way instead, by the few twips that let
+the text fit, capped at the cell's own left edge. `w:noWrap` was tried first because it says
+exactly what the page did - keep the value whole and let it overrun - and LibreOffice ignores it
+on a fixed-layout table, so it was reverted rather than committed.
+
+Measured: 15 rows against the PDF's 15, reading order 81.2 -> 90.3 %. The cell's x moves from
+67.60 to 65.60 against the page's 67.46, so that one line is 1.86 pt out on a 1.5 pt tolerance -
+a value broken in half is the worse defect and this is the trade that was taken.
+
+G2 across 208 documents: no document got worse. TestPdfToWord 29/29, TestRealDocs
+96.8 / 97.0 / 81.7 unchanged. precommit.sh --all: every bench tool ran, the engine compiles,
+G2 clean.
+
+### TOOL FIXED this run: a claim type for rules, so a page with the wrong borders can fail
+
+351_omr_answer_sheet draws its bubble grid as bare circles. The render put a ruled table round
+it. Every claim in the vocabulary was about TEXT - `extra:` could only ask how many lines
+contained a character - so the eye saw it and nothing could check it, which is the third of the
+three causes PIPELINE.md names: the claim vocabulary is missing something. `rules` is now a
+claim type: it counts thin filled rectangles on each side. 11 in the PDF, 32 in the render.
+VERIFIED. The same gap left 380 and 383 PASS-with-a-note on 7 Nov.
+
+### OPEN — the right column's dot leaders run past the margin and each price wraps
+
+360_restaurant_menu. Reading order 61.5 % of 17 rows, and the render has 22. The PDF sets each
+item, a leader and a right-aligned price inside a column. The render's tab stop for the price
+sits beyond the column's right edge, so the price falls to the next line at the left margin:
+420, 360, 390, 450 and one more all sit one row too low, each on the line of the item above.
+`wraps:` cannot see it - the wrapped line carries no word from the PDF's line - and the measured
+evidence is the row count, 17 against 22. **Tries: 0 of 3.**
+
+### OPEN — the amount column is fragmented into three grid columns
+
+365_recipe_card. `wraps:2 tbs` and `wraps:to taste` verified; "as needed" and "2 medium" stopped
+wrapping once the inset fix above landed, so four of six are still broken. The table is emitted
+with four grid columns - 3316, 398, 378, 128 - where the page draws two, and the amount cell is
+a 506-twip span across two of the fragments. The column bands are being read from the leader
+dots, not from the page's own two boxes. **Tries: 0 of 3.**
+
+### OPEN — a page of numbered questions runs onto a second sheet
+
+350_question_paper, 1 page in and 2 out, reading order 39.3 % of 52 rows. Each question is one
+paragraph carrying a gap after it, so 60 rows are spent where the page spends 52 and the paper
+grows a sheet. The row pitch is measurable - the page's own baselines - and is the same
+"line height from the model" cause as D-01, seen on a paragraph that is not body text.
+**Tries: 0 of 3.**
+
+### OPEN — a manifest table spills onto a second sheet
+
+341_shipping_manifest, 1 page in and 2 out. The second sheet holds an empty ruled grid and a
+stray red footer: the table's rows are charged more height than the page gave them. Same class
+as the entry above and as the short-table entry from batch 2, from the tall side.
+**Tries: 0 of 3.**
+
+### OPEN — a label/value band is emitted as separate rows
+
+353_admit_card. `moved:DATE OF BIRTH` verified at 81.0 pt; reading order 63.0 % of 25 rows.
+The page draws three label/value pairs on one band - REGISTER NUMBER, APPLICATION ID, then the
+name, then DATE OF BIRTH - and the render gives each its own table row, so the block is nearly
+three times as tall and everything under it moves. This is D-02 in a new document, and the
+same shape as the four-column band on 322 and 323. **Tries: 0 of 3.**
+
+### OPEN — the rotated sidebar label is gone
+
+364_event_ticket. `missing:ADMIT ONE` verified: the PDF holds the line rotated 90 degrees at
+x=560.7, 19.7 to 210.0; the render has a clipped "WAREHOU" at x=565 and nothing else. This is
+the wall the rotated stamps hit - OOXML has no text rotation a LibreOffice render honours - and
+it is the ONE try this class gets. Recorded, not retried. **Tries: 1 of 1.**
+
+### MEASUREMENT — reading order on a page whose figures are drawn as shapes
+
+352 (46.8 %), 363 (87.0 %) and 370 (93.1 %) all came back VERIFIED and all three passed on
+sight. 363's 22 rows against 24 is the QR code's modules counted as rows; 370's 29 against 29 is
+a band split inside a table; 352's 21 against 26 is the round seal, which the page draws one
+character per baseline. This is the fourth to sixth sighting of the same measurement bug and the
+eye decides. Recorded, not fixed. **Not a document defect.**
+
+### Refuted this pass - do not "fix" these
+
+    wraps:12 on 343       the verifier matched "ACC-447112" - a two-character needle is not a claim
+    extra:1 on 351        "1" matched sixteen lines; the defect was real and the claim was wrong,
+                          which is what produced the `rules` claim type above
+    shapes on 370         1 shape in the PDF, 1 in the render
+
 ## v3 corpus — batch 1 (300-318), found this pass
 
 These are new, from the document-type corpus. Recorded here so the final sweep works through

@@ -200,6 +200,26 @@ def check_visual(claim, ref_lines, got_lines, ref, got):
                         last, nxt[:40])
         return "REFUTED", "the line breaks in the same place"
 
+    if claim == "rules":
+        # A rule is a thin filled rectangle: a table border, a box, a row divider. Every
+        # other claim here is about TEXT, so a page whose text is perfect and whose rules
+        # are wrong had no way to say so - 351_omr_answer_sheet draws its bubble grid as
+        # bare circles and the render put a ruled table round it, and "extra:1" could only
+        # count lines containing the character 1. The eye saw it and the vocabulary could
+        # not, which is the third of the three causes PIPELINE.md names.
+        def rules(pg):
+            n = 0
+            for d in pg.get_drawings():
+                r = d["rect"]
+                horizontal = r.height <= 1.2 and r.width >= 4.0
+                vertical = r.width <= 1.2 and r.height >= 4.0
+                if horizontal or vertical:
+                    n += 1
+            return n
+        a, b = rules(ref), rules(got)
+        return ("VERIFIED" if b > a else "REFUTED",
+                "%d rules in the PDF, %d in the render" % (a, b))
+
     if claim.startswith("moved:"):
         # The WORST offset, not the first. "[08]" appears 25 times on 350_question_paper;
         # comparing the first of each side gave 4.3 pt and called it verified, while the

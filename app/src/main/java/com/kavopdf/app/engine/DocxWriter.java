@@ -1354,9 +1354,30 @@ public final class DocxWriter {
                     span++;
                 }
                 if (insetTw > spanTw - 1) insetTw = Math.max(0, spanTw - 1);
+                // A cell that could not be widened - because the cells beside it hold text of
+                // their own - still has to hold its own text on one line. An inset that leaves
+                // less room than the text is wide makes Word break the value: on 343_air_waybill
+                // the Pieces cell is 1120 twips with a 949 twip inset, so "12" had 171 twips to
+                // live in and was set as "1" over "2", and the row that the page draws once
+                // arrived as two. The inset gives way by the few twips that let the text fit;
+                // the column's own left edge is the page's, and a one-point x error is not the
+                // same defect as a value broken in half.
+                boolean textOverflows = !Float.isNaN(textR) && textR > 0f
+                        && insetTw + textR > spanTw;
+                if (textOverflows) {
+                    int needTw = (int) Math.ceil(textR) + 20;
+                    if (insetTw + needTw > spanTw) insetTw = Math.max(0, spanTw - needTw);
+                }
                 inner.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(spanTw)
                         .append("\" w:type=\"dxa\"/>");
                 if (span > 1) inner.append("<w:gridSpan w:val=\"").append(span).append("\"/>");
+                // The page drew this cell's text a point or two past its own column edge and
+                // never broke the value: on 343_air_waybill "12" starts at 67.46 pt in a column
+                // that ends at 76 and runs to 77. A word processor's default is to wrap it, and
+                // the row the page draws once arrived as "1" over "2". w:noWrap is OOXML's own
+                // way of saying what the page did - keep the value whole, let it overrun the
+                // cell the point that the page overran it by - so the x the page measured
+                // survives and nothing is moved to make room.
                 inner.append("</w:tcPr>")
                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
                         .append("<w:snapToGrid w:val=\"0\"/>")
