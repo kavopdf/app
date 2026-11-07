@@ -235,7 +235,60 @@ afterwards to prove the drift actually fell. A previous attempt to move the cons
 "did nothing" - that is expected, because a constant cannot match a document whose
 pitch is 1.168 while another's is 1.20. It has to be measured, not tuned.
 
-**Tries: 0 of 3.**
+**Tries: 1 of 3 - see the measurement below.**
+
+### D-01 as measured on 7 Nov: the line box is the page's own pitch
+
+**What the renderer actually does.** A one-paragraph probe with zero margins was rendered
+through LibreOffice at nine box heights (9.2 to 37 pt) and four faces (Liberation Sans and
+Serif, DejaVu Sans and Serif), including one box shorter than its own em. In every case
+`boxHeight - baselineY` came to 0.2 of the box, within the 0.05 pt the render quantises to.
+The baseline sits at 0.8 of an exact-height box, whatever the font and whatever the size.
+So the advance from one baseline to the next is
+
+    (1 - 0.8) * previous box + 0.8 * this box + spacing-before
+
+and a baseline is placed by choosing the box, not by tuning a constant.
+
+**The change** (`DocxWriter.flowFromBox`, `flowRow`, and the `LINE_BASE` constant). The box
+is solved from that equation using the pitch the model already carries - `b.y` minus the
+previous baseline - floored at the font size, because a box shorter than the em clips the
+glyphs, and capped at the font's own line box, because a box taller than that spends slack
+the next line has to pay for (a 37 pt gap above a form row became a 37 pt box, and the next
+row then landed 5.2 pt low). Whatever the box cannot hold goes to spacing-before, still
+capped at 120 pt. The first line of a page is lifted by 0.8 of its box instead of by a whole
+box, and after a table the previous box counts as zero, because a table's bottom edge is not
+a baseline.
+
+**Measured across all 208 documents.**
+
+| Measure | Before | After |
+|---|---|---|
+| lines within tolerance (G5) | 11.7 % | **26.3 %** |
+| documents improved / worse on G5 | - | **157 / 15** |
+| G2 words, blocks, page fill, overflow | - | **no document got worse** |
+| documents spilling onto an extra page | 28 | 30 |
+| TestPdfToWord / TestRealDocs | 29/29, 96.8 / 97.0 / 81.7 | identical |
+
+**The fifteen that got worse are one class, not fifteen.** Thirteen of them contain a table
+and two are two-column pages: 390_wide_data_appendix, 23_timetable_grid_txtpos,
+72_bank_statement_no_rules_right_amounts, 330_cad_drawing_sheet,
+38_faux_bold_italic_synthesised, 40_devanagari_shaping_font,
+academic-paper-ieee-2col-abstract, balance-sheet-and-profit-loss, 13_stamp_non_english,
+annual-review-2col-uneven-columns, 325_demat_holdings_statement, 362_price_list_dense,
+333_datasheet_spec_tables, journal-2col-with-footnotes, magazine-2col-pullquote-spanning.
+The text is now exactly on the page's own baselines; what is left is the table height below,
+which under-measures a table whose rows grow, so everything after a table starts from the
+wrong y - and the old, slightly-too-tall flow was accidentally compensating for it.
+
+**Therefore the position baseline is not re-recorded on this run.** `base208-position.json`
+still holds the pre-change numbers, so those fifteen show up as debt on every G5 run rather
+than being baked into the ratchet. Re-record it when the table height is right.
+
+**Also tried and reverted.** Charging the pre-table spacer as
+`(t.top - baseline) - 0.2 * previous box` - the same rule the flow now uses - put 390's
+table 10.6 pt low instead of 3.7 pt, because a table's first row does not begin where the
+spacer paragraph ends. Reverted; the table's own top y stays open below.
 
 ### D-02  Row grouping: cells from different rows merged onto one line
 
@@ -443,7 +496,15 @@ lineY gaps instead of a constant, and let the page's real bottom margin decide w
 the page ends. Do not shrink the content to fit - the page count is a measurement, and
 the only correct number is the PDF's.
 
-**Tries: 0 of 3.**
+**Tries: 1 of 3.** The pitch fix above was the fix this entry asked for, and it did not
+move the count: 28 documents spilled before it and 30 after, two of them new
+(330_cad_drawing_sheet and journal-2col-with-footnotes, both an EMPTY second page - the
+overflow is a few points, not a page's worth). Because the text now sits on the page's own
+baselines, the remaining overflow is not the text's height any more: it is the table height
+(rows are `atLeast`, so a wrapping cell grows the row and the model's `t.bottom` is short),
+the trailing 4 pt placeholder paragraph after a table, and where a multi-column section
+breaks its columns. Measured on the two new spills: 330's page 1 ends at 592.0 pt on a 595 pt
+sheet, journal-2col's at 840.1 on 842, and neither has any text on page 2.
 
 
 ### D-07  Two fields on one baseline are joined into one sentence

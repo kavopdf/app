@@ -68,6 +68,20 @@ public final class DocxWriter {
     private static final int SHAPE_ID_BASE = 100000;
     /** Line box height as a multiple of the font size. Generous: a tight exact height clips. */
     private static final float LINE_FACTOR = 1.15f;
+    /**
+     * Where the baseline sits inside a {@code w:lineRule="exact"} line box: this fraction of the
+     * box height below its top.
+     *
+     * <p>Measured, not assumed. A one-paragraph probe with zero margins was rendered through
+     * LibreOffice at seven box heights and four faces - 9.2, 11, 13, 14.95, 15.18, 20, 23, 34.5,
+     * 37 pt, Liberation Sans/Serif and DejaVu Sans/Serif, and one box shorter than its own em -
+     * and in every case {@code boxHeight - baselineY} came to 0.2 of the box, to within the
+     * 0.05 pt the render quantises to. The ratio does not follow the font size or the face; it
+     * follows the box. So a baseline is placed by choosing the box, and the space above a line
+     * is {@code (1 - LINE_BASE) * previousBox} while the space from the box top to the baseline
+     * is {@code LINE_BASE * box}.
+     */
+    private static final float LINE_BASE = 0.8f;
 
     /**
      * Ceiling on the vertical gap one paragraph may ask for, in twips (120 pt).
@@ -127,6 +141,12 @@ public final class DocxWriter {
         float lastBaseline = -1f;
         /** Size of that line's text, so its line box can be measured. */
         float lastSize = 0f;
+        /**
+         * The height of the line box just emitted, which decides where the next baseline falls:
+         * the previous box's lower 0.2 em of slack is part of the advance. 0 after a table, whose
+         * bottom edge is a box edge and not a baseline.
+         */
+        float lastLinePt = 0f;
         /** Set at a page break so the first line on a page carries no gap. */
         boolean newPage = true;
         /** Flow height already spent on this page, in twips. */
@@ -204,6 +224,7 @@ public final class DocxWriter {
                 ctx.newPage = true;
             }
             ctx.lastBaseline = -1f;
+            ctx.lastLinePt = 0f;
             ctx.flowTw = 0;
             ctx.budgetTw = (int) Math.max(1L, Math.round(ph * TWIPS_PER_PT));
             ctx.pageWidthPt = pw;
@@ -682,19 +703,26 @@ public final class DocxWriter {
         float size = first.size;
         for (PdfToWord.Box b : cols) size = Math.max(size, b.size);
         int leftTw = (int) Math.max(0L, Math.round(indent * TWIPS_PER_PT));
-        int lineTw = (int) Math.max(1L, Math.round(Math.max(4f, size * LINE_FACTOR) * TWIPS_PER_PT));
-
-        ctx.flowCount++;
+        // Same rule as flowFromBox: the row is one line however many fields it holds, so it is
+        // charged one pitch, not one per field.
+        float pitch = !ctx.newPage && ctx.lastBaseline >= 0f ? first.y - ctx.lastBaseline : -1f;
+        float linePt = flowLinePt(pitch, size, ctx.lastLinePt);
         int beforeTw = 0;
-        if (!ctx.newPage && ctx.lastBaseline >= 0f) {
-            // Same rule as flowFromBox: the paragraph already occupies a full line box, so the
-            // space still to add is the pitch minus that box. The row is one line however many
-            // fields it holds, so it is charged one line, not one per field.
-            float pitch = first.y - ctx.lastBaseline;
-            float prevLine = Math.max(4f, ctx.lastSize * LINE_FACTOR);
-            float extra = pitch - prevLine;
+        if (ctx.newPage) {
+            float topGap = first.y - LINE_BASE * linePt;
+            if (topGap > 0f) {
+                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
+            } else if (first.y > 0f) {
+                linePt = Math.min(linePt, Math.max(size, first.y / LINE_BASE));
+            }
+        } else if (pitch > 0f) {
+            float extra = pitch - (1f - LINE_BASE) * ctx.lastLinePt - LINE_BASE * linePt;
             if (extra > 0f) beforeTw = (int) Math.min(GAP_CAP_TW, Math.round(extra * TWIPS_PER_PT));
         }
+        int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
+        ctx.lastLinePt = linePt;
+
+        ctx.flowCount++;
         ctx.lastBaseline = first.y;
         ctx.lastSize = size;
         ctx.newPage = false;
@@ -784,6 +812,46 @@ public final class DocxWriter {
         sb.append("</w:p>");
     }
 
+    /**
+     * The line box a flowing line is given, in points.
+     *
+     * <p>The height is not a constant. A PDF sets each line at its own baseline, and the distance
+     * between two of them is the pitch the page actually used: 1.168 * size on
+     * 303_discharge_summary, 1.20 on others. A single factor cannot be both, and with
+     * {@code w:lineRule="exact"} every box that is the wrong height moves the line below it and
+     * the error accumulates - 3.5 pt at the top of 303's page, 6.3 pt by its fourth paragraph,
+     * and on 28 documents the flow grew taller than the paper and spilled onto a second sheet
+     * (D-01 and D-06 in REMAINING-DEFECTS.md).
+     *
+     * <p>So the box is the measured pitch, and the paragraph then needs no spacing-before at all:
+     * one box is one pitch. Two limits are real and are not tuning:
+     *
+     * <ul>
+     *   <li>a box shorter than the em clips the top of the glyphs, and flowing text cannot
+     *       reproduce baselines that overlap, so the size is a floor;</li>
+     *   <li>a gap wider than {@link #GAP_CAP_TW} is the page's own white space rather than
+     *       leading, so it goes to spacing-before where it is already capped, not to the box.</li>
+     * </ul>
+     *
+     * @param pitch      the distance from the previous baseline on this page, or -1 when unknown
+     * @param size       the line's font size
+     * @param prevLinePt the height of the line box just emitted, 0 after a table
+     */
+    private static float flowLinePt(float pitch, float size, float prevLinePt) {
+        float natural = Math.max(4f, size * LINE_FACTOR);
+        if (pitch <= 0f) return natural;
+        // The advance from one baseline to the next is the rest of the previous box plus this
+        // line's part above its own baseline: (1 - LINE_BASE) * prev + LINE_BASE * this. Solve it
+        // for this box so that it comes out at exactly the pitch the page used.
+        float solved = (pitch - (1f - LINE_BASE) * prevLinePt) / LINE_BASE;
+        // Two limits, both real. A box shorter than the em clips the top of the glyphs, and a
+        // box taller than the font's own line box spends the page's slack where the next line
+        // has to pay for it: on 303 the 37 pt gap above a form row became a 37 pt box, the next
+        // row then owed 7.4 pt of its slack and landed 5.2 pt low. Anything the box cannot hold
+        // goes to spacing-before, which is where a gap belongs.
+        return Math.max(4f, Math.min(natural, Math.max(size, solved)));
+    }
+
     /** A paragraph with no page coordinates of its own: the old flowing behaviour. */
     /**
      * One PDF line as a real Word paragraph.
@@ -798,29 +866,35 @@ public final class DocxWriter {
         if (text.trim().isEmpty()) return;
         ctx.flowCount++;
         int leftTw = (int) Math.max(0L, Math.round(b.x * TWIPS_PER_PT));
-        int lineTw = (int) Math.max(1L, Math.round(Math.max(4f, b.size * LINE_FACTOR) * TWIPS_PER_PT));
+        // The pitch this page used between this baseline and the one above it. Measured, so the
+        // box is the page's own line height rather than a guess at it - see flowLinePt.
+        float pitch = !ctx.newPage && ctx.lastBaseline >= 0f ? b.y - ctx.lastBaseline : -1f;
+        float linePt = flowLinePt(pitch, b.size, ctx.lastLinePt);
         int beforeTw = 0;
         if (ctx.newPage) {
             // The FIRST line on a page still has to land at its own y. The section carries zero
             // margins, so without this it starts at the very top of the sheet: on file 21 every
             // line measured 46 pt high against the PDF, a constant offset with the pitch already
             // correct. Measured, not guessed - dy was -46.2, -48.3, -45.0, -46.6 over the first
-            // four lines of the page.
-            float topGap = b.y - Math.max(4f, b.size * LINE_FACTOR);
-            if (topGap > 0f) beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
-        } else if (ctx.lastBaseline >= 0f) {
-            // The paragraph before this one is already a full line box tall, so the space that
-            // still has to be added is the baseline-to-baseline pitch MINUS that whole box.
-            // Subtracting only its leading - size * (LINE_FACTOR - 1) - left every flowing line
-            // one font-size too low: on file 01 the 43 lines of the invoice drifted 115 pt by
-            // the middle of the page, so the flow ran off the end of the paper. The anchored
-            // stamp and every band were then laid out on page 2 and vanished from the render,
-            // and the BILL TO / SHIP TO headings slid down into the floating goods table.
-            float pitch = b.y - ctx.lastBaseline;
-            float prevLine = Math.max(4f, ctx.lastSize * LINE_FACTOR);
-            float extra = pitch - prevLine;
+            // four lines of the page. The lift is the part of the box above its baseline, and
+            // where the box is taller than the space the page leaves, the box is shortened to
+            // fit rather than the line being placed below its own y.
+            float topGap = b.y - LINE_BASE * linePt;
+            if (topGap > 0f) {
+                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
+            } else if (b.y > 0f) {
+                linePt = Math.min(linePt, Math.max(b.size, b.y / LINE_BASE));
+            }
+        } else if (pitch > 0f) {
+            // Where the previous baseline is, plus the rest of its box, plus this line's own part
+            // above its baseline, plus this gap, must equal the pitch the page used. Only a gap
+            // wider than the box can carry - a diagram's boxes 90 pt apart, a footer 422 pt below
+            // the text - still needs spacing, and flowLinePt has refused to put that in the box.
+            float extra = pitch - (1f - LINE_BASE) * ctx.lastLinePt - LINE_BASE * linePt;
             if (extra > 0f) beforeTw = (int) Math.min(GAP_CAP_TW, Math.round(extra * TWIPS_PER_PT));
         }
+        int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
+        ctx.lastLinePt = linePt;
         ctx.lastBaseline = b.y;
         ctx.lastSize = b.size;
         ctx.newPage = false;
@@ -1010,6 +1084,11 @@ public final class DocxWriter {
         int spacerTw = 0;
         if (!ctx.newPage && !ctx.lastWasTable && ctx.lastBaseline >= 0f && t.top > ctx.lastBaseline) {
             float prevLine = Math.max(4f, ctx.lastSize * LINE_FACTOR);
+            // MEASURED AND REVERTED: charging the spacer as (t.top - baseline) minus this line's
+            // own slack below its baseline - the rule the flow itself now uses - put 390's table
+            // 10.6 pt low instead of 3.7, because a table's first row does not start at the
+            // spacer's end. The spacer stays as it was; the table's own top y is recorded in
+            // REMAINING-DEFECTS.md and is not fixed here.
             float extra = (t.top - ctx.lastBaseline) - prevLine;
             // Only a gap the page really drew is worth a paragraph of its own. Below a line
             // and a bit, the difference is the substitute face's line box, not white space,
@@ -1218,6 +1297,9 @@ public final class DocxWriter {
         ctx.flowTw += (int) Math.round(Math.max(0f, extentPt) * TWIPS_PER_PT) + POST_TABLE_TW;
         ctx.lastBaseline = t.bottom;
         ctx.lastSize = 0f;
+        // The table's bottom edge is where its content ended, not a baseline inside a line box,
+        // so there is no slack of its own to carry into the next line's advance.
+        ctx.lastLinePt = 0f;
         ctx.newPage = false;
         ctx.lastWasTable = true;
     }

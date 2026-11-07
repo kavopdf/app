@@ -227,3 +227,45 @@ the value.
 **Still open in this class.** Nothing: the whole class - fills, strokes, curves, rotated paths - is
 covered. 322's riskometer needle, 330's hatch and north arrow, 331's legend and both loops, 335's
 diamonds are closed. What remains on those pages is text placement, not drawing.
+
+---
+
+## 7 Nov - the flow is placed on the page's own pitch (D-01)
+
+**What was wrong.** Every flowing line was given a line box of `size * 1.15` and the gap to
+the line above went to spacing-before. That is right only when the page's own pitch is
+1.15 x size; 303_discharge_summary sets 13 pt text at 15.18 pt (1.168), other documents at
+1.20, and a document that sets two sizes on one page drifts even when the pitch is right.
+
+**What the renderer does.** Probed directly rather than guessed: nine box heights and four
+faces, and in every case the baseline sat at 0.8 of the exact line box. So the advance
+between two baselines is `0.2 * previous box + 0.8 * this box + spacing-before`, and the
+box can be solved from the pitch the model already carries.
+
+**The change.** `DocxWriter.flowFromBox` and `flowRow` solve that equation; `LINE_BASE`
+records the measured 0.8. Floor: the font size, because a shorter box clips. Ceiling: the
+font's own line box, because a taller one spends slack the next line pays for. The rest
+becomes spacing-before, still capped at 120 pt.
+
+**Measured, all 208 documents**
+
+| Gate | Result |
+|---|---|
+| G1 build | javac clean, TestPdfToWord 29/29, TestRealDocs 96.8 / 97.0 / 81.7 - identical |
+| G2 regression | **no document got worse** |
+| G5 position | **11.7 % -> 26.3 %** of lines within tolerance; 157 documents improved, 15 worse |
+| page count | 28 spilling -> 30 (both new ones an empty second page, a few points of overflow) |
+| precommit | tier 1, 2 and 3 all pass |
+
+**The eye, on the two documents opened this run.** 303_discharge_summary: every body line
+now sits on its PDF row (it was 3.5 to 6.3 pt high and growing); the remaining difference is
+`WARNING SIGNS: ...` wrapping to a second line, which is the substitute face being wider, and
+the table rows sitting ~3 pt low. 316_contract_with_schedules: body, headings, the schedule
+table and the signature row all on the PDF's own baselines - it goes from 9.5 % to 100 % of
+lines within tolerance.
+
+**Left open, and named.** The fifteen documents that got worse are thirteen with tables and
+two two-column pages: the table height is still under-measured, so text after a table starts
+from the wrong y and the old flow was compensating. The position baseline is deliberately
+NOT re-recorded, so that debt stays visible. Details and the reverted spacer experiment are
+in REMAINING-DEFECTS.md under D-01 and D-06.

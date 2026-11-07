@@ -1,33 +1,52 @@
-# Visual score — one row per document
+# Visual score
 
-The 09:00 digest reads this file. It counts the PASS rows to answer "how many documents
-are completely done, out of 208", and it works out the remaining days from the dates.
+The share of documents that pass the eight questions AND had every page looked at.
+Ratchets up. A document that passes the computed questions but whose pages were never
+opened is not counted here - `looked.py` decides that, not this file.
 
-A document is PASS only when every page was looked at, every finding was verified against
-the PDF, and no verified finding is left open. Processing a document is not passing it.
+## How a document passes
 
-Rows are appended, never edited: if a document appears more than once, the LAST row is the
-truth.
+    1. sidebyside.py --record was run, and every page image was opened
+    2. every page has a verdict in LOOKED.tsv that is PASS, with what was seen
+    3. every applicable computed question passes
 
-| Date | Document | Verdict | Why |
-|------|----------|---------|-----|
-| 2026-11-07 | 79_inr_indian_digit_grouping_table | PASS | table, amounts and Indian digit grouping all match |
-| 2026-11-07 | 300_prescription_rx | PASS | QR identical, table and header match, 2.3 % of pixels differ |
-| 2026-11-07 | 303_discharge_summary | FAIL | breaks:WARNING SIGNS, moved:Resident Medical Officer (193.6 pt) |
-| 2026-11-07 | 350_question_paper | FAIL | wraps:Write SQL queries, count:[08] 17 vs 13, pagecount 2 vs 1 |
-| 2026-11-07 | 01_stamp_rotated_15deg_upright | FAIL | stamp position, 2 text boxes (G3) |
-| 2026-11-07 | 64_newspaper_uneven_columns_ad_boxes | FAIL | reading order 7.1 %, 5 pages against the PDF's 1 |
+## Measured
 
-## What this file is not
+| Date | Documents | Passed | Score | Note |
+|------|-----------|--------|-------|------|
+| 7 Nov | 3 | 0 | 0 % | first measurement, on 300/301/302/303 only |
+| 7 Nov | 2 | 1 | 50 % | after the D-01 pitch fix: 316 PASS, 303 FAIL (WARNING SIGNS wraps) |
 
-It is not a summary of batches, and it is not a place to record that a batch ran. Only a
-document that has been through all seventeen steps and holds no open verified finding goes
-in here as PASS. The counts above are the four documents examined by hand on 7 Nov while
-the pipeline was being built; the corpus work starts from here.
+Not a baseline yet - three documents is not the corpus. It becomes one when a full
+batch has been through both halves of the check.
 
-## Why the dates matter
+## What the first measurement found
 
-The digest computes the rate as PASS documents divided by the days between the first PASS
-row and today, then divides what is left by that rate. With fewer than two days of history
-it says "not enough data yet" instead of a number, because a rate from one day is not a
-rate.
+    300_prescription_rx     2.3 % of pixels differ   QR identical, only drift
+    303_discharge_summary   3.7 % of pixels differ   WARNING SIGNS wraps to two lines;
+                                                     both signature labels sit lower
+                                                     than the PDF drew them
+    301_lab_report_panel    9 % of rows in sequence  every label first, then every value
+
+Two of those three were found by looking, not by any of the eight computed answers.
+
+## The thresholds are gone
+
+Until 7 Nov the eight questions decided with numbers picked by hand: reading order
+passed at 95 %, a chart needed five paths and then half as many, emphasis needed a
+ratio of 1.05 and 85 % of it. Each is now a comparison with something the PDF says -
+1.0 for a sequence, zero-or-not for a path, the PDF's own heading lines for emphasis.
+A threshold nobody can justify decides a document is broken, or lets a broken one
+through, and neither can be argued with afterwards.
+
+## Documents opened on 7 Nov, after the D-01 pitch fix
+
+| Document | Page | Verdict | What was seen |
+|---|---|---|---|
+| 303_discharge_summary | 1 | FAIL | `wraps:WARNING SIGNS` - the PDF sets the warning on one line to the right margin, the render breaks it after "than 4". Body text otherwise on its own rows; table rows ~3 pt low. |
+| 316_contract_with_schedules | 1 | PASS | body, headings, schedule table and signature row all on the PDF's own baselines. |
+
+`visual.py` agreed with the eye on 303 - reading order 88.5 % of 25 rows, the wrap being the
+difference - and could not render 316 ("could not render one side"), which is a tool failure
+and not a document verdict; it is the LibreOffice render after a killed run, and 316's
+numbers come from `position.py`, which rendered it at 100 %.
