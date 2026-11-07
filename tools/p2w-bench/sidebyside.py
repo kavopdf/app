@@ -58,6 +58,7 @@ def main():
     ap.add_argument("--all-pages", action="store_true")
     ap.add_argument("--dpi", type=int, default=DPI)
     ap.add_argument("--record", help="append one row per page to this file, so \"did anyone look at it\" is answerable")
+    ap.add_argument("--images", help="where to write the PNGs. Default: a _images folder beside the docx output, so the docx output stays only docx")
     args = ap.parse_args()
 
     if shutil.which("soffice") is None:
@@ -89,7 +90,16 @@ def main():
         print("could not render the docx")
         return 1
 
-    dest = os.path.join(args.outdir if hasattr(args, "outdir") else args.out, args.doc)
+    # The images were written inside the docx output folder, one directory per document,
+    # so `out/` stopped being a folder of docx and became a folder of docx and image
+    # folders. Anything that iterates that directory has to skip them. They go in their
+    # own tree now.
+    if args.images:
+        base_dir = args.images
+    else:
+        base_dir = os.path.join(os.path.dirname(os.path.abspath(args.out)) or ".",
+                                "_images")
+    dest = os.path.join(base_dir, args.doc)
     os.makedirs(dest, exist_ok=True)
 
     with pymupdf.open(pdf_path) as ref, pymupdf.open(rendered) as got:
@@ -181,8 +191,16 @@ def main():
 
         print("wrote %d image(s) to %s" % (written, dest))
         if ref.page_count != got.page_count:
-            print("NOTE: %d pages in the PDF, %d in the render - a page is missing"
-                  % (ref.page_count, got.page_count))
+            # Say which way round it is. The old message said "a page is missing"
+            # whichever direction the difference went, so a document that spilled onto
+            # four extra sheets read as though it had lost one.
+            if got.page_count < ref.page_count:
+                print("NOTE: %d pages in the PDF, %d in the render - %d page(s) LOST"
+                      % (ref.page_count, got.page_count, ref.page_count - got.page_count))
+            else:
+                print("NOTE: %d page(s) in the PDF, %d in the render - the docx SPILLS onto"
+                      " %d extra page(s)"
+                      % (ref.page_count, got.page_count, got.page_count - ref.page_count))
         print("")
         print("Now view them and answer the eight questions by looking:")
         for f in sorted(os.listdir(dest))[:5]:
