@@ -195,6 +195,18 @@ def main():
             continue
         cur[b] = score_one(os.path.join(a.corpus, f), d)
 
+    # A run that could not score the corpus can neither judge it nor record a baseline.
+    # This guard used to sit below the baseline write, so a run with no converted
+    # documents wrote 208 empty entries and every run after it passed - a baseline of
+    # zeros is worse than no baseline, because it looks like evidence.
+    scored = sum(1 for v in cur.values() if "error" not in v)
+    if scored < len(files):
+        print("documents scored: %d of %d - %d could not be scored"
+              % (scored, len(files), len(files) - scored))
+        print("A gate that did not see the corpus cannot judge it, and must not record a"
+              " baseline. FAILED.")
+        return 1
+
     if not a.check:
         json.dump(cur, open(a.baseline, "w"), indent=1, sort_keys=True)
         tot = {k: sum(v.get(k, 0) for v in cur.values() if isinstance(v, dict)) for k in
