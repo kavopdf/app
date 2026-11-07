@@ -104,6 +104,7 @@ def render_line_count(docx_path, workdir):
             return None
     lines = 0
     pages = 0
+    widest = 0.0
     with pymupdf.open(pdf) as doc:
         pages = doc.page_count
         for page in doc:
@@ -111,7 +112,11 @@ def render_line_count(docx_path, workdir):
                 for line in block.get("lines", []):
                     if line.get("spans"):
                         lines += 1
-    return {"lines": lines, "pages": pages}
+                        x0, _y0, x1, _y1 = line["bbox"]
+                        w = x1 - x0
+                        if w > widest:
+                            widest = w
+    return {"lines": lines, "pages": pages, "widest_pt": widest}
 
 
 def check_one(docx_path, workdir):
@@ -145,10 +150,19 @@ def check_one(docx_path, workdir):
         moved = (wide_layout["lines"] != narrow_layout["lines"]
                  or wide_layout["pages"] != narrow_layout["pages"])
         result["reflow"] = "changed" if moved else "identical"
-        if not moved and wide_layout["lines"] > 1:
-            # One line cannot re-wrap, so a single-line document is not evidence of
-            # anything. More than one line that does not move is.
-            problems.append("layout did not change when the page width changed")
+
+        if not moved:
+            # A layout that does not move only means something if it COULD have moved.
+            # If the widest line on the page is already narrower than the narrow page,
+            # no amount of narrowing can wrap it, and reporting that as a defect would
+            # send a run chasing a document whose layout is perfectly fine. Measured,
+            # not assumed: this is the widest line the render actually produced.
+            narrow_pt = NARROW_TWIPS / 20.0
+            widest = wide_layout.get("widest_pt", 0.0)
+            if widest and widest < narrow_pt:
+                result["reflow"] = "not measurable - the widest line is %.0f pt, inside the %.0f pt narrow page" % (widest, narrow_pt)
+            elif wide_layout["lines"] > 1:
+                problems.append("layout did not change when the page width changed")
 
     result["problems"] = problems
     result["ok"] = not problems
