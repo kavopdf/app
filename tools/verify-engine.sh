@@ -21,6 +21,8 @@ javac -d out $(find stubs -name '*.java')
 
 CP="out:libs/aar/classes.jar:libs/aar/assets:libs/bcprov.jar:libs/bcpkix.jar:libs/bcutil.jar"
 
+printf "%s" "$CP" > /tmp/engine-cp.txt
+
 echo "== compiling the real engine + tests =="
 javac -cp "$CP" -d out $(find ../../app/src/main/java -name '*.java') TestEngine.java TestEncrypt.java TestBookmarks.java TestReport.java TestFonts.java TestNorms.java TestFallback.java TestOrder.java TestFlatten.java TestMeta.java TestImagePdf.java TestCachePolicy.java TestStalls.java
 

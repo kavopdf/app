@@ -16,7 +16,84 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ---------------------------------------------------------------------------
+  # The regression gate, on every push.
+  #
+  # gate.py compares 208 converted documents against base208.json and fails on any
+  # document that got worse. It was not in CI, and on 7 Nov a change to a tool script
+  # was committed, reverted by a later commit from a stale copy, and nothing noticed
+  # until it was read by hand.
+  #
+  # This is the job that makes a regression unable to ship: if a document gets worse,
+  # this fails, the build job is not reached, and no APK is published.
+  # ---------------------------------------------------------------------------
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Get the corpus
+        run: |
+          mkdir -p /tmp/corpus
+          curl -sL -o /tmp/v3.zip  https://github.com/kavopdf/app/releases/download/corpus-v1/pdf-to-word-test-corpus-v3.zip
+          curl -sL -o /tmp/b80.zip https://github.com/kavopdf/app/releases/download/corpus-v1/p2w-batch-1.zip
+          curl -sL -o /tmp/g53.zip https://github.com/kavopdf/app/releases/download/corpus-v1/p2w-all-groups.zip
+          unzip -qo /tmp/v3.zip -d /tmp/corpus/v3
+          unzip -qo /tmp/b80.zip -d /tmp/corpus/b80
+          unzip -qo /tmp/g53.zip -d /tmp/corpus/g53
+          find /tmp/corpus -name '*.pdf' -exec cp --backup=numbered {} /tmp/corpus/ \; 2>/dev/null || true
+          echo "corpus: $(ls /tmp/corpus/*.pdf | wc -l) documents"
+
+      - name: Install PyMuPDF
+        run: pip install pymupdf
+
+      - name: Compile the engine
+        run: |
+          bash tools/verify-engine.sh
+          mkdir -p /tmp/out
+          CP="$(ls -d ~/.m2/repository/com/tom-roush/pdfbox-android/*/pdfbox-android-*.aar 2>/dev/null | head -1)"
+          echo "compiled"
+
+      - name: Convert the corpus and run the gate
+        run: |
+          set -e
+          mkdir -p /tmp/docx
+          cat > /tmp/RunAll.java <<'JAVA'
+          import com.kavopdf.app.engine.*; import java.io.File;
+          public class RunAll { public static void main(String[] a) throws Exception {
+            File in=new File(a[0]), o=new File(a[1]); o.mkdirs();
+            File[] fs=in.listFiles((d,n)->n.toLowerCase().endsWith(".pdf"));
+            java.util.Arrays.sort(fs);
+            for (File f: fs) { try {
+              PdfToWord.Result r = PdfToWord.convert(f, null, null);
+              PdfToWord.classifyHeadings(r);
+              DocxWriter.write(r, new File(o, f.getName().replaceAll("(?i)\\.pdf$","")+".docx"));
+            } catch (Throwable t) {} }
+            System.out.println("converted"); } }
+          JAVA
+          echo "runner written"
+          # the classpath the engine verify step leaves behind
+          CP=$(cat /tmp/engine-cp.txt 2>/dev/null || echo "")
+          if [ -z "$CP" ]; then
+            echo "The engine classpath was not recorded by verify-engine.sh."
+            echo "This job cannot run the gate, and a check that cannot run must not"
+            echo "report success - so it fails and says why."
+            exit 1
+          fi
+          javac -nowarn -cp "$CP" -d /tmp/cls /tmp/RunAll.java
+          java -cp "/tmp/cls:$CP" RunAll /tmp/corpus /tmp/docx
+          python3 tools/p2w-bench/gate.py --corpus /tmp/corpus --out /tmp/docx \
+                  --baseline tools/p2w-bench/base208.json --check
+
   build:
+    needs: regression
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
