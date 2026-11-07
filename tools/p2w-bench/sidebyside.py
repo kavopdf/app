@@ -164,6 +164,10 @@ def main():
                 sheet.paste(img, (x, head))
             print("  page %d: %.1f%% of pixels differ" % (i + 1, share))
 
+            name = os.path.join(dest, "page-%02d.png" % (i + 1))
+            sheet.save(name)
+            written += 1
+
             if args.record:
                 # One row per page: document, page, pixel share, image, verdict, note.
                 # The verdict starts as PENDING and only a person who opened the image
@@ -172,11 +176,8 @@ def main():
                 with open(args.record, "a", encoding="utf-8") as fh:
                     if new:
                         fh.write("# document\tpage\tdiffers%\timage\tverdict\tnote\n")
-                    fh.write("%s\t%d\t%.1f\t%s\tPENDING\t\n" % (args.doc, i + 1, share, name))
-
-            name = os.path.join(dest, "page-%02d.png" % (i + 1))
-            sheet.save(name)
-            written += 1
+                    fh.write("%s\t%d\t%.1f\t%s\tPENDING\t\n"
+                             % (args.doc, i + 1, share, name))
 
         print("wrote %d image(s) to %s" % (written, dest))
         if ref.page_count != got.page_count:
