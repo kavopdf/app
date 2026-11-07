@@ -90,6 +90,22 @@ A claim type with UNVERIFIABLE counts is not checkable at all: either the claim 
 too loosely - "looks wrong" instead of "moved:Resident Medical Officer" - or the verifier
 has no check for it. Both are fixable.
 
+## The Run column — three numbers the report could not give before
+
+Every row in VISUAL-SCORE.md carries the start time of the run that produced it, HH:MM, in
+the Run column. That is the whole reason the column exists:
+
+    documents per run     group the rows by Run and count them
+    minutes per document  the run's duration divided by its rows
+    minutes per problem   the run's duration divided by the findings that run verified
+
+Write it as the run's start time, not the time you finished the document - one value per run
+is what makes the grouping work.
+
+Do not estimate it. If you do not know the start time, leave the column as `-` rather than
+inventing one; a wrong number here is worse than an empty one, because the report presents
+it as measured.
+
 ## What must not be reordered
 
 - G1 before G2. A build that does not compile makes G2 meaningless.

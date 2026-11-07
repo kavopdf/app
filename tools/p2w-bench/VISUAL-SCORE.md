@@ -53,23 +53,23 @@ numbers come from `position.py`, which rendered it at 100 %.
 
 ## The record - one row per document, appended, last row wins
 
-| Date | Document | Verdict | Why |
+| Date | Run | Document | Verdict | Why |
 |---|---|---|---|
-| 2026-11-07 | 300_prescription_rx | PASS | header band, patient box, Rx table, advice, signature and QR all on their own rows; only the trailing signature block flows higher than the page-bottom anchor |
-| 2026-11-07 | 301_lab_report_panel | FAIL | moved:ANANYA RAO 26.2 pt, moved:COLLECTED 8.0 pt - the four-column form band is emitted cell by cell on drifting baselines |
-| 2026-11-07 | 302_radiology_report | FAIL | moved:PATIENT NAME -8.6 pt - the patient band's first label leaves its own row |
-| 2026-11-07 | 303_discharge_summary | PASS | body, table and signature on the PDF's rows; the PDF's own WARNING line overruns its margin by 1.4 pt and loses its tail, the render wraps and keeps it - reading order 88.5 % is a measurement alarm |
-| 2026-11-07 | 304_package_insert_small_print | PASS | every heading and paragraph on the PDF's own baselines |
-| 2026-11-07 | 305_vaccination_certificate | PASS | masthead, name block, dose table and QR match; the round seal is a rotated stamp, axis-aligned by the OOXML limit - reading order 47.1 % is the seal |
-| 2026-11-07 | 306_clinical_protocol_synopsis | PASS | synopsis table and schedule-of-assessments grid carry the PDF's rows and marks |
-| 2026-11-07 | 310_court_judgment | PASS | heading, parties, numbered paragraphs and the Sd/- JUDGE row on the PDF's baselines |
-| 2026-11-07 | 311_fir_police_form | FAIL | moved:Mobile - the Mobile label welds onto the address cell and leaves its column; reading order 90.2 % |
-| 2026-11-07 | 312_affidavit_stamp_paper | FAIL | moved:BEFORE ME and moved:Note: affidavits, both 72.2 pt high - the notary box renders empty with the footnote inside it |
-| 2026-11-07 | 313_power_of_attorney | PASS | title, recitals, schedule and the signature rule on the PDF's baselines |
-| 2026-11-07 | 314_tender_rfp_boq | PASS | BOQ rows and amount column exact; every total keeps every digit, 8,39,69,600 at x 467.7-513.0 on both sides |
-| 2026-11-07 | 315_gazette_notification | FAIL | moved:publication in the Official Gazette +184.8 pt, moved:The Gazette of India +55.9 pt - the three columns stack into one flow |
-| 2026-11-07 | 316_contract_with_schedules | PASS | clauses and the Schedule C table on the PDF's baselines |
-| 2026-11-07 | 317_rti_response | PASS | letter head, subject, numbered points and signature block on the PDF's baselines |
+| 2026-11-07 | - | 300_prescription_rx | PASS | header band, patient box, Rx table, advice, signature and QR all on their own rows; only the trailing signature block flows higher than the page-bottom anchor |
+| 2026-11-07 | - | 301_lab_report_panel | FAIL | moved:ANANYA RAO 26.2 pt, moved:COLLECTED 8.0 pt - the four-column form band is emitted cell by cell on drifting baselines |
+| 2026-11-07 | - | 302_radiology_report | FAIL | moved:PATIENT NAME -8.6 pt - the patient band's first label leaves its own row |
+| 2026-11-07 | - | 303_discharge_summary | PASS | body, table and signature on the PDF's rows; the PDF's own WARNING line overruns its margin by 1.4 pt and loses its tail, the render wraps and keeps it - reading order 88.5 % is a measurement alarm |
+| 2026-11-07 | - | 304_package_insert_small_print | PASS | every heading and paragraph on the PDF's own baselines |
+| 2026-11-07 | - | 305_vaccination_certificate | PASS | masthead, name block, dose table and QR match; the round seal is a rotated stamp, axis-aligned by the OOXML limit - reading order 47.1 % is the seal |
+| 2026-11-07 | - | 306_clinical_protocol_synopsis | PASS | synopsis table and schedule-of-assessments grid carry the PDF's rows and marks |
+| 2026-11-07 | - | 310_court_judgment | PASS | heading, parties, numbered paragraphs and the Sd/- JUDGE row on the PDF's baselines |
+| 2026-11-07 | - | 311_fir_police_form | FAIL | moved:Mobile - the Mobile label welds onto the address cell and leaves its column; reading order 90.2 % |
+| 2026-11-07 | - | 312_affidavit_stamp_paper | FAIL | moved:BEFORE ME and moved:Note: affidavits, both 72.2 pt high - the notary box renders empty with the footnote inside it |
+| 2026-11-07 | - | 313_power_of_attorney | PASS | title, recitals, schedule and the signature rule on the PDF's baselines |
+| 2026-11-07 | - | 314_tender_rfp_boq | PASS | BOQ rows and amount column exact; every total keeps every digit, 8,39,69,600 at x 467.7-513.0 on both sides |
+| 2026-11-07 | - | 315_gazette_notification | FAIL | moved:publication in the Official Gazette +184.8 pt, moved:The Gazette of India +55.9 pt - the three columns stack into one flow |
+| 2026-11-07 | - | 316_contract_with_schedules | PASS | clauses and the Schedule C table on the PDF's baselines |
+| 2026-11-07 | - | 317_rti_response | PASS | letter head, subject, numbered points and signature block on the PDF's baselines |
 
 v3 batch 1 (the first fifteen of the 75), re-processed from scratch under the
 eye-then-numbers order. 10 pass, 5 fail. Every finding above came back VERIFIED from
@@ -83,33 +83,49 @@ sides, identical text, identical order, and question 1 still scores it 94.9 %.
 
 | Date | Document | Verdict | Why |
 |---|---|---|---|
-| 2026-11-07 | 318_court_summons_form | FAIL | moved:Returnable within 30 days 337.6 pt up; the SERVICE checkbox glyphs leave their labels |
-| 2026-11-07 | 320_balance_sheet_statutory | PASS | profit-and-loss rows, note column, notes extract and both signature blocks on the PDF baselines |
-| 2026-11-07 | 321_auditors_report | PASS | headings, six numbered paragraphs and the auditor block wrap at the PDF line breaks |
-| 2026-11-07 | 322_mutual_fund_factsheet | FAIL | moved:EXPENSE RATIO 34.9 pt, moved:FUND MANAGER 54.5 pt, moved:RISKOMETER 71.3 pt |
-| 2026-11-07 | 323_credit_card_statement | FAIL | 42 shapes in the PDF against 17 in the render - 25 bars lost; reading order 63.5 % |
-| 2026-11-07 | 324_loan_amortisation_schedule | PASS | all 240 rows on seven pages keep month order, six columns and every figure |
-| 2026-11-07 | 325_demat_holdings_statement | FAIL | moved:This statement is generated electronically 306.5 pt up |
-| 2026-11-07 | 326_itr_computation | PASS | every line present in order; the 94.9 % is a row-band measurement bug, not a defect |
-| 2026-11-07 | 330_cad_drawing_sheet | FAIL | pagecount: 1 page in the PDF, 2 in the render |
-| 2026-11-07 | 331_pid_diagram | FAIL | reading order 93.3 % and the label sequence 50.0 % - diagram labels reorder around the shapes |
-| 2026-11-07 | 332_bom_on_drawing | FAIL | pagecount 1 in / 2 out; 15 shapes in the PDF against 0 in the render |
-| 2026-11-07 | 333_datasheet_spec_tables | PASS | three spec tables and the pin table keep every cell and row |
-| 2026-11-07 | 334_patent_document | FAIL | moved:16 19.5 pt down; reading order 89.7 % |
-| 2026-11-07 | 335_msds_safety_data_sheet | PASS | pictograms, eight numbered sections and the composition table on the PDF baselines |
-| 2026-11-07 | 340_bill_of_lading | PASS | every band, the item table, the signature row and the barcode on the PDF rows |
-| 2026-11-07 | 300_prescription_rx | FAIL | moved:Not valid for medico-legal purposes 270.2 pt up; moved:Dr. Meera Krishnan 270.1 pt up |
-| 2026-11-07 | 301_lab_report_panel | FAIL | moved:ANANYA RAO 26.2 pt down; moved:H = above reference interval 146.9 pt up; reading order 78.7 % |
-| 2026-11-07 | 302_radiology_report | FAIL | moved:Dr. A. Bhat 231.5 pt up; moved:This report is based on the images provided 231.5 pt up |
-| 2026-11-07 | 303_discharge_summary | FAIL | moved:ANANYA RAO, 34/F 8.2 pt down off its row; moved:Resident Medical Officer 192.7 pt up |
-| 2026-11-07 | 304_package_insert_small_print | PASS | six headings keep their weight, every line breaks where the PDF breaks; the emphasis question fails only because 6.8 pt rounds to 6.5 |
-| 2026-11-07 | 305_vaccination_certificate | FAIL | moved:This is a computer generated certificate 351.8 pt up; the round seal's characters land one per baseline |
-| 2026-11-07 | 306_clinical_protocol_synopsis | PASS | both tables keep every row and every X in its own cell, page count 1/1 |
-| 2026-11-07 | 310_court_judgment | PASS | centred heading on the page centre after the indent fix, eight numbered paragraphs wrap at the PDF breaks |
-| 2026-11-07 | 311_fir_police_form | FAIL | moved:Copy forwarded to 162.5 pt up; moved:Signature of Officer in charge 27.2 pt down; reading order 90.2 % |
-| 2026-11-07 | 312_affidavit_stamp_paper | FAIL | moved:BEFORE ME 72.2 pt up, its box left empty; moved:Notary Public, Bengaluru 72.2 pt up |
-| 2026-11-07 | 313_power_of_attorney | PASS | heading, five clauses, schedule and witness block on the PDF baselines |
-| 2026-11-07 | 314_tender_rfp_boq | FAIL | moved:Meridian Consulting Pvt Ltd 189.7 pt up; moved:lot 13.4 pt up |
-| 2026-11-07 | 315_gazette_notification | FAIL | three columns stacked into one flow; moved:[No. 4/2/2024-WDRA] 229.5 pt up; reading order 29.1 % |
-| 2026-11-07 | 316_contract_with_schedules | PASS | table, schedule and signature row on the PDF baselines; q6's 1-against-0 shape count was refuted 1 against 1 |
-| 2026-11-07 | 317_rti_response | PASS | centred heading on the page centre after the indent fix, five numbered points in order |
+| 2026-11-07 | - | 318_court_summons_form | FAIL | moved:Returnable within 30 days 337.6 pt up; the SERVICE checkbox glyphs leave their labels |
+| 2026-11-07 | - | 320_balance_sheet_statutory | PASS | profit-and-loss rows, note column, notes extract and both signature blocks on the PDF baselines |
+| 2026-11-07 | - | 321_auditors_report | PASS | headings, six numbered paragraphs and the auditor block wrap at the PDF line breaks |
+| 2026-11-07 | - | 322_mutual_fund_factsheet | FAIL | moved:EXPENSE RATIO 34.9 pt, moved:FUND MANAGER 54.5 pt, moved:RISKOMETER 71.3 pt |
+| 2026-11-07 | - | 323_credit_card_statement | FAIL | 42 shapes in the PDF against 17 in the render - 25 bars lost; reading order 63.5 % |
+| 2026-11-07 | - | 324_loan_amortisation_schedule | PASS | all 240 rows on seven pages keep month order, six columns and every figure |
+| 2026-11-07 | - | 325_demat_holdings_statement | FAIL | moved:This statement is generated electronically 306.5 pt up |
+| 2026-11-07 | - | 326_itr_computation | PASS | every line present in order; the 94.9 % is a row-band measurement bug, not a defect |
+| 2026-11-07 | - | 330_cad_drawing_sheet | FAIL | pagecount: 1 page in the PDF, 2 in the render |
+| 2026-11-07 | - | 331_pid_diagram | FAIL | reading order 93.3 % and the label sequence 50.0 % - diagram labels reorder around the shapes |
+| 2026-11-07 | - | 332_bom_on_drawing | FAIL | pagecount 1 in / 2 out; 15 shapes in the PDF against 0 in the render |
+| 2026-11-07 | - | 333_datasheet_spec_tables | PASS | three spec tables and the pin table keep every cell and row |
+| 2026-11-07 | - | 334_patent_document | FAIL | moved:16 19.5 pt down; reading order 89.7 % |
+| 2026-11-07 | - | 335_msds_safety_data_sheet | PASS | pictograms, eight numbered sections and the composition table on the PDF baselines |
+| 2026-11-07 | - | 340_bill_of_lading | PASS | every band, the item table, the signature row and the barcode on the PDF rows |
+| 2026-11-07 | - | 300_prescription_rx | FAIL | moved:Not valid for medico-legal purposes 270.2 pt up; moved:Dr. Meera Krishnan 270.1 pt up |
+| 2026-11-07 | - | 301_lab_report_panel | FAIL | moved:ANANYA RAO 26.2 pt down; moved:H = above reference interval 146.9 pt up; reading order 78.7 % |
+| 2026-11-07 | - | 302_radiology_report | FAIL | moved:Dr. A. Bhat 231.5 pt up; moved:This report is based on the images provided 231.5 pt up |
+| 2026-11-07 | - | 303_discharge_summary | FAIL | moved:ANANYA RAO, 34/F 8.2 pt down off its row; moved:Resident Medical Officer 192.7 pt up |
+| 2026-11-07 | - | 304_package_insert_small_print | PASS | six headings keep their weight, every line breaks where the PDF breaks; the emphasis question fails only because 6.8 pt rounds to 6.5 |
+| 2026-11-07 | - | 305_vaccination_certificate | FAIL | moved:This is a computer generated certificate 351.8 pt up; the round seal's characters land one per baseline |
+| 2026-11-07 | - | 306_clinical_protocol_synopsis | PASS | both tables keep every row and every X in its own cell, page count 1/1 |
+| 2026-11-07 | - | 310_court_judgment | PASS | centred heading on the page centre after the indent fix, eight numbered paragraphs wrap at the PDF breaks |
+| 2026-11-07 | - | 311_fir_police_form | FAIL | moved:Copy forwarded to 162.5 pt up; moved:Signature of Officer in charge 27.2 pt down; reading order 90.2 % |
+| 2026-11-07 | - | 312_affidavit_stamp_paper | FAIL | moved:BEFORE ME 72.2 pt up, its box left empty; moved:Notary Public, Bengaluru 72.2 pt up |
+| 2026-11-07 | - | 313_power_of_attorney | PASS | heading, five clauses, schedule and witness block on the PDF baselines |
+| 2026-11-07 | - | 314_tender_rfp_boq | FAIL | moved:Meridian Consulting Pvt Ltd 189.7 pt up; moved:lot 13.4 pt up |
+| 2026-11-07 | - | 315_gazette_notification | FAIL | three columns stacked into one flow; moved:[No. 4/2/2024-WDRA] 229.5 pt up; reading order 29.1 % |
+| 2026-11-07 | - | 316_contract_with_schedules | PASS | table, schedule and signature row on the PDF baselines; q6's 1-against-0 shape count was refuted 1 against 1 |
+| 2026-11-07 | - | 317_rti_response | PASS | centred heading on the page centre after the indent fix, five numbered points in order |
+
+## The Run column
+
+It holds the start time of the run that examined the document, HH:MM. With it the report
+can work out three things it could not before:
+
+    documents per run     group the rows by Run and count them
+    minutes per document  the run's duration divided by its rows
+    minutes per problem   the run's duration divided by the findings that run verified
+
+Without it the only number available is a daily average, which hides the difference between
+a run that did 20 documents and one that did 3.
+
+The rows written before this column existed carry `-`, because their run is not known and
+guessing it would put a wrong number in the report. Grouping starts from the next run.
+
