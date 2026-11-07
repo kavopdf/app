@@ -129,3 +129,28 @@ sides, identical text, identical order, and question 1 still scores it 94.9 %.
 | 2026-11-07 | 365_recipe_card | FAIL | wraps:Cornflour - "2 tbsp" splits across two lines |
 | 2026-11-07 | 370_offer_letter | FAIL | wraps:Provident fund (employer contribution) - the component column is too narrow |
 | 2026-11-07 | 371_experience_certificate | PASS | signature, place and date back at the foot of the page after the gap fix |
+
+## v3 batch 4 (372-401, 15 documents), 7 Nov - looked at, measured, verified, and no fix passed the ratchet
+
+15 pages, 15 verdicts, no page PENDING. 18 findings emitted, 13 VERIFIED, 2 REFUTED,
+3 UNVERIFIABLE. 6 pass, 9 fail. Nothing was fixed: the one fix this batch earned - the
+table height that clamps a page's foot - regressed 39 documents on page count and was
+reverted. See "Table height" in REMAINING-DEFECTS.md.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-07 | 372_timesheet_grid | PASS | header band, timesheet grid, both signature rules and the note sit on the PDF's own rows |
+| 2026-11-07 | 373_leave_application_form | FAIL | moved:ANANYA RAO 17.1 pt, moved:Earned 100.3 pt - the label-over-value cells are emitted as side-by-side columns |
+| 2026-11-07 | 374_org_chart | FAIL | moved:Total headcount -329.3 pt, moved:Vacancies -329.3 pt - the page's foot is clamped by the table blocker |
+| 2026-11-07 | 375_attendance_register | FAIL | moved:Verified by -172.4 pt, moved:P = present -172.3 pt |
+| 2026-11-07 | 380_runbook_terminal_output | FAIL | the Escalation line is bold in the render and regular in the PDF - emphasis has no claim type, so verify.py answers UNVERIFIABLE |
+| 2026-11-07 | 381_incident_report_timeline | FAIL | moved:Distribution: Operations, Engineering, Customer Success 240.8 pt up |
+| 2026-11-07 | 382_architecture_diagram | PASS | all seven boxes, their labels and every connector on the PDF's own coordinates |
+| 2026-11-07 | 383_api_docs_page | FAIL | the RESPONSE FIELDS table carries a fourth empty column and row rules the PDF does not draw - no claim type describes a table's shape |
+| 2026-11-07 | 390_wide_data_appendix | PASS | header band, 21 columns and every figure on the PDF's rows; the eye first read the header as S.No and both sides say Sample |
+| 2026-11-07 | 391_survey_questionnaire_grid | PASS | header band, eight statement rows and every tick in its own column |
+| 2026-11-07 | 392_statistical_console_output | PASS | every coefficient row and both summary blocks on the PDF's lines |
+| 2026-11-07 | 393_spectrum_peak_table | FAIL | moved:Figure 1: absorbance spectrum 132.7 pt up - the peak table is drawn over the chart and the table below it is empty |
+| 2026-11-07 | 394_map_with_legend | PASS | boundary, roads, river, four markers and the legend box on the PDF's coordinates |
+| 2026-11-07 | 400_comic_page_speech_bubbles | FAIL | reading order 42.1 % - 23 rows in the render against the PDF's 15, and one speech bubble loses its outline |
+| 2026-11-07 | 401_trifold_brochure | FAIL | overlap 3 pairs against the PDF's 0; moved:CONTACT US -484.1 pt - the three panels stack instead of standing side by side |

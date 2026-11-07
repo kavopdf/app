@@ -801,3 +801,51 @@ The last-column case never had that problem because nothing follows it.
 **Reverted, baseline untouched. Tries: 1 of 3.** The next attempt should keep each
 column's drawn edge and give the text room without moving the rules — a negative right
 inset or a wider cell that overhangs its neighbour — rather than widening the column.
+
+
+## Table height, second attempt (7 Nov, v3 batch 4) - measured, and REJECTED by the ratchet
+
+`pageFits` refused to spend a page's white space whenever the page held a table, because the
+model's table height (`bottom - top`) is short: rows are emitted `w:trHeight hRule="atLeast"`,
+so a cell whose text wraps grows the row. That is what keeps 374's "Total headcount" 329 pt
+high, 375's "Verified by" 172 pt, 381's "Distribution:" 241 pt and 393's figure caption 133 pt.
+
+This pass measured the growth instead of assuming it. `cellR - cellX` is the width the page
+drew that cell's text at and `colX` is the column it has to fit into, so the lines the emitted
+cell takes is that width over that column; summed over the rows, plus one line for every cell
+that has to wrap (a renderer breaks at a space, not at the column edge), plus one line for every
+newline already in a cell's string (a form's label-over-value cell), that is the table's
+emitted height. `pageFits` then adds it and decides as before.
+
+It works, on the documents it was aimed at:
+
+| document | line | PDF | before | after |
+|---|---|---|---|---|
+| 374_org_chart | Total headcount | 746.2 | 416.9 | 747.9 |
+| 375_attendance_register | Verified by | 552.0 | 379.6 | 550.9 |
+| 381_incident_report_timeline | Distribution: Operations | 777.0 | 536.2 | 782.1 |
+| 393_spectrum_peak_table | Figure 1: absorbance spectrum | 307.1 | 174.4 | 306.8 |
+| 373_leave_application_form | ANANYA RAO | 122.9 | 140.0 | 140.0 (1 sheet, not 2) |
+
+And it is rejected anyway. Rendered against `base208.json` over all 208 documents it sends
+**39 documents from one sheet to two** (first form, without the wrap slack: 40; the newline
+count alone took 373 back to one sheet, the wrap slack took one more document). 64_newspaper
+goes 1 -> 5, 77_arabic_rtl 1 -> 4, 330, 332, 341, 350, 402, 55, 59, 63, 65, 67, 75, 78,
+academic-paper-ieee-2col, bank-statement, boq-tender, brochure-3col, bus-timetable, eway-bill,
+gst-invoice-3line-items, gst-invoice-with-qr-code, insurance-policy-schedule,
+itr-computation-with-slab-table and 16 more. Zero documents got better on page count.
+
+So the estimate is still short somewhere, and the wrap slack does not find it (40 -> 39). The
+next thing to measure, in this order: (a) how many tables even HAVE `cellX`/`cellR` populated -
+where they are absent every cell counts as one line and the estimate collapses to the model's
+own extent, which is the bug being fixed; (b) the spacer paragraph above a table, which
+`pageFits` charges at the writer's 144 pt cap but the flow may realise differently; (c) the
+`prevBox = 0` reset after a table, which makes the next paragraph's pitch the whole gap from
+`t.bottom`. Reverted with `git checkout`; `base208.json` untouched.
+
+Also open from this batch, and both are TOOL gaps rather than document defects:
+
+| Gap | Evidence |
+|---|---|
+| **q8 emphasis is one-directional** | 380_runbook_terminal_output's "Escalation:" line is bold in the render and regular in the PDF. q8 asks only whether a line the PDF emphasised kept its size, so a line the render emphasised on its own passes. 380 is FAIL on the eye and PASS on the numbers. |
+| **no claim type for a table's shape, and none for a shape count** | 383's RESPONSE FIELDS table carries a fourth empty column and row rules the PDF does not draw; 400 loses one speech bubble's outline. `shapes` exists in the vocabulary and has no check; `columns` does not exist at all. Both came back UNVERIFIABLE, and PIPELINE's rule is that a document is not PASS while a finding on it is unchecked - 380 and 383 are recorded FAIL for that reason although `looked.py --combine` calls them PASS. |

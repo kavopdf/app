@@ -521,3 +521,67 @@ stood at the start of this run the change is 32 better, 0 worse.
 **352** and **371** pass by eye while question 1 (reading order) still fails. Both are
 `_rows()` measuring a page whose blocks are ordered by the model rather than by the band
 sort; the documents are right and the tool is wrong. Repair the tool, not the document.
+
+
+## v3 batch 4 (372-401, 15 documents), 7 Nov — looked at first, then measured
+
+    documents          15   (372, 373, 374, 375, 380, 381, 382, 383, 390, 391, 392, 393, 394, 400, 401)
+    pages looked at    15   (every one of the fifteen renders one sheet, as the PDF does)
+    eye verdicts       15 recorded, 0 PENDING
+    findings           18 emitted, 13 VERIFIED, 2 REFUTED, 3 UNVERIFIABLE
+    verdict            6 pass, 9 fail
+    fixed              nothing - the one fix this batch earned failed the ratchet and was reverted
+
+### What the eye caught that the numbers did not
+
+- **393** — the peak table is drawn ON TOP of the absorbance chart and the table below the
+  chart is empty: borders, a header band, no text. q2 overlap answered "0 overlapping pairs in
+  the PDF, 0 in the render" and REFUTED the claim, because it compares line boxes and a table
+  over a picture is not a line overlap. The document is wrong and the check is blind.
+- **383** — the RESPONSE FIELDS table carries a fourth empty column after Description, and row
+  rules the PDF never draws. All eight questions pass.
+- **380** — the "Escalation:" line is bold in the render and regular in the PDF. q8 passed it:
+  it asks whether a line the PDF emphasised kept its size, and this line was never emphasised
+  in the PDF.
+- **401** — the trifold's three panels stack instead of standing side by side: "MERIDIAN
+  WAREHOUSE SOLUTIONS" is printed over the CONTACT US address block. Numbers agreed here
+  (overlap 3 against 0, reading order 48.6 %, "CONTACT US" 484 pt up).
+
+### What the numbers caught that the eye did not
+
+- **400** — reading order 42.1 %: 23 rows in the render against the PDF's 15, and the
+  bottom-left speech bubble loses its outline. The eye saw the missing bubble and not the
+  scale of the reorder.
+
+### Two claims refuted, and both were mine
+
+- **373 "Employee name"** — 2.6 pt out, inside the 3.0 pt tolerance. I read the PDF's
+  label-over-value cells as side-by-side columns and expected the label to have moved. The
+  cell grid IS wrong on 373 (V2 and V3 held, 17.1 and 100.3 pt), but not that label.
+- **390 "wraps:S.No"** — the PDF has no line starting "S.No"; both sides say "Sample". I
+  misread the rendered header at 130 dpi. 390 is PASS.
+
+### The fix that was earned and did not survive
+
+Every failing document except 373, 380, 383, 400 and 401 fails on one cause: the page's own
+white space is clamped at 120 pt, so anything under a table lands 130-330 pt too high.
+`pageFits` already spends the gaps on table-free pages; it refuses on any page holding a
+table because the model's table height is short by the rows that wrap.
+
+This pass measured that growth (`cellR - cellX` over the column width, plus a line for each
+wrap and a line for each newline already in a cell) and fed it to `pageFits`. On the five
+documents it was aimed at it put every footer on the PDF's baseline: 374 416.9 -> 747.9 against
+746.2, 375 379.6 -> 550.9 against 552.0, 381 536.2 -> 782.1 against 777.0, 393 174.4 -> 306.8
+against 307.1.
+
+Rendered over all 208 it sends 39 documents from one sheet to two and improves none on page
+count. The ratchet rejects it: reverted, `base208.json` untouched, the measurement and the
+three next things to look at recorded in REMAINING-DEFECTS.md under "Table height".
+
+### Disagreements recorded
+
+**380** and **383** pass `looked.py --combine` because their only findings came back
+UNVERIFIABLE, and combine counts an eye FAIL only where a claim was VERIFIED. They are
+recorded FAIL in VISUAL-SCORE.md: a document is PASS only when every finding on it was
+verified, and these two were not checked at all. The repair is a claim type and a check, not a
+document fix.
