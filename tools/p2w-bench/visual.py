@@ -231,11 +231,10 @@ def q4_images(ref, got):
         len(got_images), len(set(got_samples)), len(set(ref_samples)))
 
 
-def q5_tables(ref, got):
-    if not ref["drawings"]:
-        return "n/a", ""
+def _rules(drawings):
+    """How many horizontal and vertical rules a set of drawings holds."""
     h = v = 0
-    for d in got["drawings"]:
+    for d in drawings:
         for item in d.get("items", []):
             if item[0] == "l":
                 p, q = item[1], item[2]
@@ -249,27 +248,61 @@ def q5_tables(ref, got):
                     h += 1
                 if r.width < 1.5:
                     v += 1
+    return h, v
+
+
+def _is_rule(d):
+    """A drawing that is only thin lines is a rule, not a shape."""
+    items = d.get("items", [])
+    if not items:
+        return True
+    for item in items:
+        if item[0] == "l":
+            p, q = item[1], item[2]
+            if abs(p.y - q.y) >= 1.0 and abs(p.x - q.x) >= 1.0:
+                return False
+        elif item[0] == "re":
+            r = item[1]
+            if r.height >= 1.5 and r.width >= 1.5:
+                return False
+        else:
+            return False
+    return True
+
+
+def q5_tables(ref, got):
+    """Is the table still a table?
+
+    The PDF decides whether there is a table at all. The old test only asked whether the
+    PDF had ANY drawing, so on 350_question_paper - one header rule, no table - it went
+    on to count the docx's rules, found none, and reported a table had been lost. There
+    was never a table. A question that cannot be asked is n/a, and an n/a passes.
+    """
+    ref_h, ref_v = _rules(ref["drawings"])
+    if not (ref_h >= 2 and ref_v >= 2):
+        return "n/a", ""
+    h, v = _rules(got["drawings"])
     if h >= 2 and v >= 2:
         return "yes", "%d horizontal, %d vertical rules" % (h, v)
-    return "no", "only %d horizontal and %d vertical rules" % (h, v)
+    return "no", "the PDF draws %d horizontal and %d vertical rules, the docx %d and %d" % (
+        ref_h, ref_v, h, v)
 
 
 def q6_charts(ref, got):
     """Does the chart's drawing survive?
 
-    No threshold. The old version asked for five paths in the PDF and half as many in
-    the docx - two numbers picked by hand, and both wrong: a chart drawn with three
-    paths was called 'nothing here', and a chart that lost half its lines passed. The
-    question is whether what the PDF drew is still drawn, so the counts are compared
-    and reported.
+    A rule is not a chart. The old test counted every drawing in the PDF, so a single
+    header rule made 350_question_paper look like a chart that had lost all its paths.
+    Rules are excluded from both sides, and if the PDF draws no shape there is no chart
+    to check.
     """
-    ref_paths = len(ref["drawings"])
-    if ref_paths == 0:
+    ref_shapes = [d for d in ref["drawings"] if not _is_rule(d)]
+    if not ref_shapes:
         return "n/a", ""
-    got_paths = len(got["drawings"])
-    if got_paths == 0:
-        return "no", "the PDF draws %d paths here and the docx draws none" % ref_paths
-    return "yes", "%d paths in the PDF, %d in the docx" % (ref_paths, got_paths)
+    got_shapes = [d for d in got["drawings"] if not _is_rule(d)]
+    if not got_shapes:
+        return "no", "the PDF draws %d shapes here and the docx draws none" % len(ref_shapes)
+    return "yes", "%d shapes in the PDF, %d in the docx" % (len(ref_shapes), len(got_shapes))
 
 
 def q7_codes(ref, got):
