@@ -184,3 +184,18 @@ reverted. See "Table height" in REMAINING-DEFECTS.md.
 | 2026-11-08 | 315_gazette_notification | FAIL | moved:The Gazette of India 55.9 pt down; order 29.1 % - three columns stack into one flow |
 | 2026-11-08 | 316_contract_with_schedules | PASS | four clauses and the SCHEDULE C table on the page; shapes was claimed and REFUTED (1 on both sides) |
 | 2026-11-08 | 317_rti_response | PASS | heading, date block, five numbered points and the enclosure line in place |
+| 2026-11-08 | 318_court_summons_form | FAIL | moved:Returnable within 30 days 7.8 pt - the table above it renders 7.8 pt shorter than the model's own extent. Was 337.6 pt: the 120 pt gap clamp on table pages, fixed this run |
+| 2026-11-08 | 320_balance_sheet_statutory | FAIL | moved:As per our report of even date 8.9 pt - the same short-table class. Was 215.1 pt before the gap clamp fix |
+| 2026-11-08 | 321_auditors_report | PASS | six paragraphs, the signature block and the firm registration line all on the PDF page |
+| 2026-11-08 | 322_mutual_fund_factsheet | FAIL | moved:EXPENSE RATIO 34.9 pt - the four-column header band splits into two rows, EXPENSE RATIO and FUND MANAGER falling to the second |
+| 2026-11-08 | 323_credit_card_statement | FAIL | moved:CREDIT LIMIT 32.4 pt - the same band split, CREDIT LIMIT and AVAILABLE on a row of their own |
+| 2026-11-08 | 324_loan_amortisation_schedule | PASS | seven pages, all 240 rows of the schedule in place, page count 7 in and 7 out |
+| 2026-11-08 | 325_demat_holdings_statement | FAIL | moved:This statement is generated electronically 9.4 pt - the short-table class. Was 306.5 pt before the gap clamp fix |
+| 2026-11-08 | 326_itr_computation | FAIL | order 94.9 % - Place: Bengaluru sits 31 pt high and the slab table's last row is one row out |
+| 2026-11-08 | 330_cad_drawing_sheet | FAIL | pagecount - 1 page in, 2 out: the dimension lines and the north arrow spill onto a second sheet |
+| 2026-11-08 | 331_pid_diagram | PASS | every box, valve and legend entry on the page. order 93.3 % is a measurement artifact, the eye passed |
+| 2026-11-08 | 332_bom_on_drawing | FAIL | pagecount - 1 page in, 2 out: the bill of materials table and the assembly drawing split across two sheets |
+| 2026-11-08 | 333_datasheet_spec_tables | PASS | all three specification tables and the footer now exact. Was 167.5 pt out before the gap clamp fix |
+| 2026-11-08 | 334_patent_document | PASS | title, abstract, FIG. 1 and all five claims on the page. order 89.7 % is a measurement artifact, the eye passed |
+| 2026-11-08 | 335_msds_safety_data_sheet | PASS | eight numbered sections, the pictogram row and the composition table all in place |
+| 2026-11-08 | 340_bill_of_lading | PASS | every cell of the form and the barcode caption now exact. Was 293.1 pt out before the gap clamp fix |

@@ -56,6 +56,54 @@ three `visual.py` measurement bugs that had been reporting defects that were not
 pairing in question 1, box-top instead of baseline for grouping a row, and U+0000 from a soft hyphen
 kept on one side of the comparison only.
 
+## v3 corpus — batch 2 (318-340), 8 Nov
+
+### FIXED this run: a page with a table kept the 120 pt gap clamp
+
+`DocxWriter.pageFits` returned `false` the moment a page held a table, so every table page
+gave up its white space. On 318 the page's own gap between its last box and its footer is
+480 pt and the clamp put that footer 337.6 pt too high. The same clamp lifted the signature
+and footer blocks on 320 (215.1 pt), 325 (306.5), 326 (175.6), 333 (167.5) and 340 (293.1).
+
+A table is now charged its model height, the spacer above it and the 4 pt paragraph after
+it, and the page spends its gaps only when the arithmetic still fits the sheet with 12 pt of
+slack for a table whose rows grow. Where it does not fit, the clamped gaps stay.
+
+Measured: G2 across 208 documents, no document got worse. TestPdfToWord 29/29, TestRealDocs
+96.8 / 97.0 / 81.7 unchanged. 326, 333 and 340's footers now land within 2.4 pt of the PDF.
+
+### OPEN — a table renders shorter than the model's own extent: 7.8 to 9.4 pt
+
+318, 320, 325. Everything below the table shifts by one constant: on 318 the SERVICE box,
+TAKE NOTICE and the footer are all exactly 7.8 pt high. The render's table is 7.8 pt shorter
+than `t.bottom - t.top`, so the gap the flow now spends starts from the wrong place.
+
+Rows are emitted `w:trHeight hRule="atLeast"` at the row's own pitch, cell margins are 0,
+so the difference is in how the renderer sizes a row against the pitch the PDF drew. This is
+the same "Table height" entry as the batch-4 blocker, seen from the other side (short rather
+than tall). **Tries: 1 of 3.**
+
+### OPEN — the four-column header band splits into two rows
+
+322 (`moved:EXPENSE RATIO` 34.9 pt) and 323 (`moved:CREDIT LIMIT` 32.4 pt). The page draws
+four label/value pairs as one band: labels on one baseline, values 10 pt below. The model
+puts columns 1-2 on the first row and columns 3-4 on the second, so the table starts a row
+early and everything under it moves. D-02 in a new document. **Tries: 0 of 3.**
+
+### OPEN — a drawing page overflows to a second sheet
+
+330 and 332, both 1 page in and 2 out. The overflow is the drawing itself, not the text: the
+dimension lines, the north arrow and the assembly outline are anchored shapes that take no
+room in the flow, and 332's bill-of-materials table follows them onto sheet 2. The page-count
+check catches it, nothing in the model predicts it. **Tries: 0 of 3.**
+
+### MEASUREMENT — reading order on a drawing or a figure page
+
+331 (93.3 %) and 334 (89.7 %) both came back VERIFIED and both were passed on sight: the
+rows are the same rows, drawn at the same x, and the sequence differs only inside a figure.
+This is the third sighting of the same measurement bug (312 was the first). The eye decides,
+and the disagreement is recorded rather than fixed. **Not a document defect.**
+
 ## A. Multi-column pages still overflow to a second sheet — 3 documents
 
 Fixed this pass: 63, 67, 78, 80 and 55 now render 1 page against 1 (they were 2). Sections now carry
