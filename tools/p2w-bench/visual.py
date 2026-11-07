@@ -521,6 +521,9 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--json")
     ap.add_argument("--pages", action="append", default=[])
+    ap.add_argument("--verify", action="store_true",
+                    help="print every verdict with the numbers it was decided"
+                         " on, so a finding can be checked against the PDF")
     args = ap.parse_args()
 
     if shutil.which("soffice") is None:
@@ -558,6 +561,16 @@ def main():
             print("OK   " + r["doc"][:52])
         else:
             print("FAIL " + r["doc"][:52] + "  " + r.get("error", ""))
+        # --verify shows the working: every verdict with the numbers behind
+        # it, not only the failures. A false alarm is visible here before
+        # anyone fixes anything.
+        if getattr(args, "verify", False) and r.get("answers"):
+            for pg in r["answers"]:
+                for qname, qa in pg["answers"].items():
+                    if qa["verdict"] == "n/a":
+                        continue
+                    print("      page %-2d %-15s %-6s %s" % (
+                        pg["page"], qname, qa["verdict"], qa["detail"][:90]))
             if not r.get("page_count_ok", True):
                 print("       %d pages in the render against the PDF's %d"
                       % (r.get("pages_got", 0), r.get("pages_ref", 0)))
