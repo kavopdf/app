@@ -64,6 +64,14 @@ public final class TxtWriter {
         if (result.pages != null) {
             for (PdfToWord.Page page : result.pages) {
                 if (page == null || page.blocks == null) continue;
+                // A multi-page .txt with no page marker is one long run of text: a
+                // reader cannot tell where one page ended, and a line that belongs to
+                // page 4 looks exactly like a line that belongs to page 1. The model
+                // already numbers its pages, so the marker costs nothing and adds
+                // nothing to a single-page document.
+                if (sb.length() > 0 && result.pages.size() > 1) {
+                    sb.append('\n').append("--- page ").append(page.number).append(" ---\n\n");
+                }
                 float pitch = pagePitch(page, docPitch);
                 float lastY = -1f;
                 for (Object block : page.blocks) {
