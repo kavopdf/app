@@ -113,3 +113,22 @@ something", and it is the same gap that left 380 and 383 unverified on 7 Nov.
 Two needles were too short to be claims and both were refuted on a substring: `wraps:12` matched
 "ACC-447112". The defect behind it was real - the row count said 17 against 15 - so the finding
 was kept on the measured claim and the visual one dropped. A two-character needle is not a claim.
+
+## Run 8 Nov, v3 batch 5 (402-417)
+
+17 findings, 14 verified, 2 refuted, 1 unverifiable. moved +3, count +1, missing +1, rules +2
+(both refuted after the fix), order +4, pagecount +2, shapes +1 (refuted by the tool fix), wraps
++1 unverifiable.
+
+Both `rules` findings were real and both were the same cause, which is the useful part: the
+writer bordered every table whatever pass found it, so two whitespace tables arrived with a box
+the page never drew. A claim type that verifies on two documents for one reason is worth more
+than the two documents.
+
+The refuted pair matters too. `rules` on 403 and 406 came back 0 against 0 after the fix, which
+is how the ledger proves the fix landed rather than the finding going quiet.
+
+One UNVERIFIABLE: `wraps:Board meeting`. The wraps check needs to follow the needle's words
+through the render, and the render splits the cell it is looking for - which is the defect. A
+claim that describes a split cannot be followed across the split. The page is not left on this
+claim: `pagecount` and `order` both verify on it.

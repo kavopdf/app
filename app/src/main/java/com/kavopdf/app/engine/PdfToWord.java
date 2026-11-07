@@ -222,6 +222,18 @@ public final class PdfToWord {
          */
         public final List<List<Integer>> colors = new ArrayList<>();
         public boolean header;
+        /**
+         * Did the page draw the lines that make this a table?
+         *
+         * <p>Two passes build tables. The ruled pass reads the edges the page draws, so its
+         * tables are ruled by construction. The row pass infers cells from whitespace alone -
+         * a passport's field grid, a crossword's two clue columns - and on those pages the
+         * page draws no line at all. The writer used to put a full single-line border on every
+         * table whatever pass found it, so a whitespace table arrived with a box the page
+         * never had: 11 rules on 403 where the page draws none, 19 on 406. A border is a claim
+         * about the page, so it is only drawn where the page made one.
+         */
+        public boolean ruled = true;
         public float top, bottom, left, right;
         public int column;
     }
@@ -4998,6 +5010,7 @@ public final class PdfToWord {
         if (columns.size() < 2 || columns.size() > 24) return null;
 
         Table t = new Table();
+        t.ruled = false;
         t.top = rows.get(from).get(0).y;
         float bottom = t.top, left = Float.MAX_VALUE, right = 0;
         for (int r = from; r < to; r++) {
@@ -5198,6 +5211,7 @@ public final class PdfToWord {
         }
 
         Table out = new Table();
+        out.ruled = t.ruled;
         // The record's own heading - the numbered line that is not a label/value pair - keeps
         // its place at the top, because it introduces both panels.
         for (int r = 0; r < t.rows.size(); r++) {

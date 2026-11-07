@@ -214,3 +214,16 @@ reverted. See "Table height" in REMAINING-DEFECTS.md.
 | 2026-11-08 | 364_event_ticket | FAIL | missing:ADMIT ONE - the rotated sidebar label is gone; only a clipped "WAREHOU" survives at x=565 |
 | 2026-11-08 | 365_recipe_card | FAIL | wraps:2 tbs, wraps:to taste - the amount column is fragmented into three grid columns and every two-word cell breaks; order 89.7 % |
 | 2026-11-08 | 370_offer_letter | PASS | letterhead, ref, address, subject, body, five-row table and signature block on the PDF baselines. order 93.1 % and the shapes claim both came back measurement |
+| 2026-11-08 | 402_calendar_month_grid | FAIL | pagecount 1 in / 2 out, order 72.0 % of 12 rows; the 7-row calendar is charged more height than the page gave it and Board meeting wraps inside its cell |
+| 2026-11-08 | 403_crossword_puzzle | PASS | grid, all 12 numbers, both clue columns and the footer on the PDF lines. Was FAIL on rules 0 vs 11: the clue columns carried a box the page never draws, fixed this run |
+| 2026-11-08 | 404_sudoku_grid | FAIL | rules 8 in the PDF against 20 in the render - the 3x3 box rules are thick filled rules on the page and every line in the render is the same hairline, so the puzzle loses its structure |
+| 2026-11-08 | 405_sheet_music_lyrics | PASS | title, chord row, three staves with their lyrics and the footer all on the PDF lines |
+| 2026-11-08 | 406_passport_mrz_page | FAIL | moved:BENGALURU 43.2 pt - the Place of birth value falls out of its row and the Sex value takes a line of its own. Was 50.7 pt and 19 invented rules before the border fix |
+| 2026-11-08 | 407_id_card_front_back | PASS | both card faces, photo, terms block, two barcodes and the caption in place |
+| 2026-11-08 | 410_form_xobject_reused | FAIL | moved:Invoice line item 62.2 pt - all three Form XObject blocks sit about 61 pt above where the page draws them |
+| 2026-11-08 | 411_nested_xobject_transforms | FAIL | count:NESTED FORM 1 in the PDF against 2 in the render - the heading is emitted a second time inside the rotated nested form |
+| 2026-11-08 | 412_page_labels_roman | PASS | five pages, each heading and both lines on the PDF baselines |
+| 2026-11-08 | 413_tagged_pdf_actualtext | PASS | the ActualText replacement is what the render carries, which is what the text layer says |
+| 2026-11-08 | 414_transparency_softmask | PASS | blue bar at the page's own rect and fill, both text lines in place. The charts FAIL was the tool counting an erased grey rect and missing a bar written as four border lines |
+| 2026-11-08 | 415_inline_images | FAIL | moved:The checkerboard above is an inline image 153 pt - the inline image is gone and its caption has risen into its place |
+| 2026-11-08 | 417_rotate180_and_mirrored | FAIL | missing:Page 2 - mirrored text - page 1 is right, upright as /Rotate should give; page 2's mirrored line comes out a garbled reversal |

@@ -170,7 +170,14 @@ else
     rm -rf /tmp/precommit-docx && mkdir -p /tmp/precommit-docx
     cat > /tmp/RunAll.java <<'JAVA'
 import com.kavopdf.app.engine.*; import java.io.File;
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 public class RunAll { public static void main(String[] a) throws Exception {
+  // Without this the fonts never load, every page yields no text and the whole corpus
+  // converts to empty documents - which G2 then reads as 208 regressions. It is the one
+  // line ConvertAll has and this runner did not, and it made tier 3 unusable.
+  File assets = new File(a[2]);
+  PDFBoxResourceLoader.init(new android.content.Context(
+      new android.content.res.AssetManager(assets)));
   File in=new File(a[0]), o=new File(a[1]); o.mkdirs();
   File[] fs=in.listFiles((d,n)->n.toLowerCase().endsWith(".pdf"));
   java.util.Arrays.sort(fs);
@@ -182,7 +189,8 @@ public class RunAll { public static void main(String[] a) throws Exception {
   System.out.println("done"); } }
 JAVA
     if javac -nowarn -cp "/tmp/precommit-out:$CP" -d /tmp/precommit-out /tmp/RunAll.java >/dev/null 2>&1; then
-      java -cp "/tmp/precommit-out:$CP" RunAll /scratch/work/corpus /tmp/precommit-docx >/dev/null 2>&1
+      java -cp "/tmp/precommit-out:$CP" RunAll /scratch/work/corpus /tmp/precommit-docx \
+            "$(echo "$CP" | tr ':' '\n' | grep 'assets' | head -1)" >/dev/null 2>&1
       if python3 tools/p2w-bench/gate.py --corpus /scratch/work/corpus \
             --out /tmp/precommit-docx \
             --baseline tools/p2w-bench/base208.json --check >/tmp/g2.$$ 2>&1; then

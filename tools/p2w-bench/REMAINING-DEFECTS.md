@@ -1,5 +1,123 @@
 # Remaining defects — to be worked at the very end
 
+## v3 corpus — batch 5 (402-417), 8 Nov
+
+Fourteen documents, all one page except 412 (five) and 417 (two); 416_many_tiny_pages is
+300 pages and is worked separately below. Every page opened before any number was read; every finding verified
+against the PDF; 17 findings, 14 verified, 2 refuted, 1 unverifiable. Six documents pass,
+seven do not, one unlooked.
+
+### FIXED this run: a table the page never ruled must not be drawn ruled
+
+`DocxWriter` put the same six single-line borders on every `w:tbl` it wrote, whatever pass had
+found the table. Two passes build tables and they are not the same claim: the ruled pass reads
+edges the page actually draws, and the row pass infers cells from whitespace alone. On
+403_crossword_puzzle the ACROSS and DOWN columns are two whitespace columns and the page draws
+no line anywhere near them; the render boxed them, 11 rules against the page's 0. On
+406_passport_mrz_page the field grid is the same story at 19 against 0.
+
+`Table` now carries `ruled`, set false by `buildRowTable` and inherited by `keyValuePanels`.
+`DocxWriter.borders()` writes the hairline when it is true and the same six slots as `w:none`
+when it is not - "none" rather than an absent element, because an absent `w:tblBorders` falls
+back to the table style and the default style draws exactly the box this removes.
+
+Measured: 403 11 -> 0 rules, 406 19 -> 0, both findings REFUTED. 406's `moved:BENGALURU` fell
+from 50.7 to 43.2 pt as a side effect, because the borders were charging each row height.
+G2 across 208 documents: no document got worse. precommit.sh --all: every bench tool ran, the
+engine compiles, TestPdfToWord 29/29, G2 clean.
+
+### TOOL FIXED this run: the charts question could not see a filled bar
+
+414_transparency_softmask draws a grey rectangle, a white one over exactly the same rect, then
+the blue bar. The page shows one shape. Two separate faults in `visual.py` made the question
+report "the PDF draws 3 shapes here and the docx draws none" about a bar that was in the right
+place with the right fill, which the eye had already passed:
+
+    `_is_rule`      LibreOffice exports a solid bar as four border lines, so the item-by-item
+                    test called the render's bar a rule and threw it away. PyMuPDF hands the
+                    PDF's own bar over as one filled rect, so only one side lost it.
+    eraser          the grey rect is invisible under the white one, and both were counted.
+
+A drawing with a fill and real extent in both directions is now a shape whatever it was written
+down as, and an exact white cover drops both members of the pair. 414 now reads 1 against 1.
+Unfilled outlines stay rules, which is what a page border is.
+
+### OPEN — the calendar's rows are charged more height than the page gave them
+
+402_calendar_month_grid, 1 page in and 2 out, order 72.0 % of 12 rows, 6 shapes in the PDF and
+0 in the render. The month grid is a 7-row table whose annotations - "8 Holi", "18 Audit",
+"25 Board meeting" - are the second line of a cell on the page. The render gives each cell more
+height than the page did, so the table outgrows the sheet and an empty grid plus a stray footer
+land on page 2, and "Board meeting" wraps to two lines inside its cell. Same class as the
+short-table and tall-table entries from batch 2 and 3. **Tries: 0 of 3.**
+
+### OPEN — the 3x3 box rules come out as hairlines
+
+404_sudoku_grid. `rules` verified: 8 filled rules in the PDF against 20 in the render. The page
+draws the 3x3 separators as thick filled rules and the other six as strokes; the writer gives
+every cell edge the same `w:sz="6"` hairline, so the puzzle loses the only thing that makes it
+a sudoku. The claim counts rules and the count does differ, so this is not the measurement
+blind spot it first looked like - it is a border-weight that is not carried from the model.
+**Tries: 0 of 3.**
+
+### OPEN — the passport field grid loses its row pairing
+
+406_passport_mrz_page. `moved:BENGALURU` verified at 43.2 pt: the page draws "Place of birth"
+and "BENGALURU" as a label/value pair on one band, and the render leaves the Place of birth row
+empty while BENGALURU moves down to the Place of issue row. "Sex" and its value "F" separate the
+same way, F taking a line of its own. This is D-02/D-07 in a new document. **Tries: 0 of 3.**
+
+### OPEN — every block sits about 61 pt above the page
+
+410_form_xobject_reused. `moved:Invoice line item` verified: 3 on both sides, worst offset
+62.2 pt, and the offset is uniform across all seven bands - three Form XObject blocks and the
+note under them. A uniform lift of that size is the first-line rule, not per-paragraph spacing:
+the model's own first baseline is not being used. Same family as D-01. **Tries: 0 of 3.**
+
+### OPEN — the heading is emitted twice
+
+411_nested_xobject_transforms. `count:NESTED FORM` verified: 1 in the PDF, 2 in the render. The
+page holds one heading, then a nested form that is scaled 1.6x and rotated 90 degrees, whose own
+content is two single characters ("S" and "O"). The render emits the heading a second time in
+place of the rotated form's content. Reading order 57.1 % of 4 rows and one emphasised line lost
+are the same defect seen from two other angles. **Tries: 0 of 3.**
+
+### OPEN — the inline image is dropped
+
+415_inline_images. `moved:The checkerboard above is an inline image` verified: the caption sits
+at y=265.3 in the PDF and y=112.3 in the render, 153 pt high, exactly the height of the image it
+has risen into. The page draws the checkerboard as an inline image (BI ... ID ... EI) and PyMuPDF
+reports 0 images and 0 drawings for the page, so nothing in the image pass sees it. The caption
+is the checkable half of the defect; the image is the cause. **Tries: 0 of 3.**
+
+### OPEN — a mirrored page comes out as a garbled reversal
+
+417_rotate180_and_mirrored. Page 1 is right - the page says /Rotate 180, the render is upright,
+which is what ignoring the rotation should give. Page 2 is mirrored with a negative horizontal
+scale and its text layer reads "Page 2 - mirrored text"; the render produces
+"t xet der orri \tm" and " - 2 egaP", the string reversed with letters split and a tab inside it.
+`missing:Page 2` verified 1 in the PDF against 0 in the render. **Tries: 0 of 3.**
+
+### Refuted this pass - do not "fix" these
+
+    rules on 403        0 in the PDF, 0 in the render, once the invented box was removed
+    rules on 406        0 in the PDF, 0 in the render, same fix
+
+### Unverifiable this pass
+
+    wraps:Board meeting on 402   "could not follow 14 of 16 words through the render". The
+                                 defect is real and is covered by the pagecount and order
+                                 findings; the needle is a cell whose text the render splits,
+                                 which is what the wraps check needs to follow. Not fixed.
+
+### A stale row, found while checking this change did not cause it
+
+304_package_insert_small_print is recorded PASS on 8 Nov and now fails `emphasis` - 6 of 9
+emphasised lines lost their bold - on the current code. Checked against a pristine build of HEAD
+in a separate worktree and it fails identically there, so this run did not cause it: the row was
+written against an earlier build and the emphasis question has since moved. Any PASS row older
+than the current code has to be re-taken before the final sweep counts it.
+
 ## v3 corpus — batch 3 (341-370), 8 Nov
 
 Fifteen documents, one page each except 341 and 350. Every page opened before any number was

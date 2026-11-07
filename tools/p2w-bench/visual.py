@@ -276,10 +276,22 @@ def _rules(drawings):
 
 
 def _is_rule(d):
-    """A drawing that is only thin lines is a rule, not a shape."""
+    """A drawing that is only thin lines is a rule, not a shape.
+
+    A FILLED rectangle is a shape however it was written down. LibreOffice exports a solid
+    bar as four border lines, so the item-by-item test below called 414's blue bar a rule
+    and threw it away - and only on the render side, because PyMuPDF hands the PDF's own
+    bar over as one filled rect. The charts question then said "the PDF draws 1 shapes
+    here and the docx draws none" about a bar that is in the right place with the right
+    fill. An unfilled outline stays a rule: that is what a page border is.
+    """
     items = d.get("items", [])
     if not items:
         return True
+    r = d.get("rect")
+    if d.get("fill") is not None and r is not None \
+            and r.width >= 1.5 and r.height >= 1.5:
+        return False
     for item in items:
         if item[0] == "l":
             p, q = item[1], item[2]
@@ -292,6 +304,46 @@ def _is_rule(d):
         else:
             return False
     return True
+
+
+def _is_white(fill):
+    """A fill that paints the paper's own colour and hides whatever is under it."""
+    if not fill:
+        return False
+    try:
+        r, g, b = fill[:3]
+    except (TypeError, ValueError):
+        return False
+    return r >= 0.97 and g >= 0.97 and b >= 0.97
+
+
+def _visible_shapes(drawings):
+    """The shapes a reader can actually see.
+
+    414_transparency_softmask draws a grey rectangle, then a white one over exactly the
+    same rect, then the blue bar. The grey is erased before anyone sees it, so the page
+    shows one shape. Counting raw drawings gave 3 against the render's 1 and failed a
+    document whose bar is in the right place with the right fill - the eye had passed it.
+    A pair like that is one eraser: neither member is visible, so neither is counted.
+    Only an exact cover drops a pair, which is why this does not quietly discount the
+    white boxes that are genuinely visible on a coloured page.
+    """
+    shapes = [d for d in drawings if not _is_rule(d)]
+    dropped = set()
+    for i, d in enumerate(shapes):
+        r = d.get("rect")
+        if r is None:
+            continue
+        for j in range(i + 1, len(shapes)):
+            lr = shapes[j].get("rect")
+            if lr is None or not _is_white(shapes[j].get("fill")):
+                continue
+            if (lr.x0 <= r.x0 + 0.5 and lr.y0 <= r.y0 + 0.5
+                    and lr.x1 >= r.x1 - 0.5 and lr.y1 >= r.y1 - 0.5):
+                dropped.add(i)
+                dropped.add(j)
+                break
+    return [d for k, d in enumerate(shapes) if k not in dropped]
 
 
 def q5_tables(ref, got):
@@ -320,10 +372,10 @@ def q6_charts(ref, got):
     Rules are excluded from both sides, and if the PDF draws no shape there is no chart
     to check.
     """
-    ref_shapes = [d for d in ref["drawings"] if not _is_rule(d)]
+    ref_shapes = _visible_shapes(ref["drawings"])
     if not ref_shapes:
         return "n/a", ""
-    got_shapes = [d for d in got["drawings"] if not _is_rule(d)]
+    got_shapes = _visible_shapes(got["drawings"])
     if not got_shapes:
         return "no", "the PDF draws %d shapes here and the docx draws none" % len(ref_shapes)
     return "yes", "%d shapes in the PDF, %d in the docx" % (len(ref_shapes), len(got_shapes))

@@ -1176,6 +1176,26 @@ public final class DocxWriter {
      * keeps the position it had on the page. Turning the cells into loose text boxes would
      * place the text and destroy the table, which is the one thing a conversion must not do.
      */
+    /**
+     * The table's borders, as the page drew them.
+     *
+     * <p>A ruled table gets the single hairline the page's own edges stand for. An unruled one
+     * gets the same six slots set to "none" rather than no w:tblBorders element at all: absent
+     * borders fall back to the table style, and the default style draws a box, which is exactly
+     * the box 403 and 406 were carrying.
+     */
+    private static String borders(boolean ruled) {
+        String v = ruled ? "single" : "none";
+        StringBuilder b = new StringBuilder("<w:tblBorders>");
+        for (String side : new String[]{"top", "left", "bottom", "right", "insideH", "insideV"}) {
+            b.append("<w:").append(side).append(" w:val=\"").append(v).append("\"");
+            if (ruled) b.append(" w:sz=\"6\" w:color=\"999999\"");
+            else b.append(" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"");
+            b.append("/>");
+        }
+        return b.append("</w:tblBorders>").toString();
+    }
+
     private static void table(StringBuilder sb, PdfToWord.Table t, Ctx ctx) {
         int cols = 0;
         for (List<String> row : t.rows) cols = Math.max(cols, row.size());
@@ -1269,14 +1289,7 @@ public final class DocxWriter {
         inner.append("<w:tbl><w:tblPr>")
                 .append("<w:tblW w:w=\"").append(totalTw).append("\" w:type=\"dxa\"/>")
                 .append("<w:tblInd w:w=\"").append(tw(x0)).append("\" w:type=\"dxa\"/>")
-                .append("<w:tblBorders>")
-                .append("<w:top w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
-                .append("<w:left w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
-                .append("<w:bottom w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
-                .append("<w:right w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
-                .append("<w:insideH w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
-                .append("<w:insideV w:val=\"single\" w:sz=\"6\" w:color=\"999999\"/>")
-                .append("</w:tblBorders>")
+                .append(borders(t.ruled))
                 .append("<w:tblLayout w:type=\"fixed\"/>")
                 // Word's default cell margin is 0.19 cm (108 twips) on each side. Left at the
                 // default, every cell's text sat 6 pt right of where the page had it - a
