@@ -309,6 +309,35 @@ and then by x within a row, which is what `visual.py`'s `_rows()` already comput
 
 **Tries: 0 of 3.**
 
+
+### A note added 7 Nov, after checking the findings against the PDF
+
+The reading-order question compares the docx's row sequence with the PDF's. On a form
+with side-by-side fields the PDF's own y order is not the reading order, and the
+comparison then penalises a docx that reads the page better than the PDF draws it.
+
+303_discharge_summary, page 1, sorted by y as the PDF holds it:
+
+    y=63.9  x= 28   'PATIENT'
+    y=64.7  x=230   'WARD / BED'
+    y=64.7  x=380   'CONSULTANT'
+    y=73.5  x=230   'Medical ICU-2 / 07'
+    y=73.5  x=380   'Dr. Meera Krishnan'
+    y=73.8  x= 28   'ANANYA RAO, 34/F'      <- the patient's name, last
+
+`ANANYA RAO` belongs beside `PATIENT`, and a reader would put it there. A docx that
+does is scored as out of sequence against a PDF whose raw order is the wrong one. The
+88.5 % on that document is therefore not evidence of a defect - it may be evidence of
+a better document.
+
+Do not "fix" this by making the docx copy the PDF's y order; that would be worse for a
+reader. The question needs to compare against a reading order derived from the page -
+fields grouped by band and read left to right within a band - rather than against the
+order the PDF happens to store its lines in.
+
+Until then, a reading-order failure on a form or a table page is a question, not a
+verdict: open the image and look before recording it as a defect.
+
 ### D-04  Body text inside text boxes
 
 **Severity: 2 of the 8 documents the structure gate measured.**
