@@ -227,3 +227,4 @@ reverted. See "Table height" in REMAINING-DEFECTS.md.
 | 2026-11-08 | 414_transparency_softmask | PASS | blue bar at the page's own rect and fill, both text lines in place. The charts FAIL was the tool counting an erased grey rect and missing a bar written as four border lines |
 | 2026-11-08 | 415_inline_images | FAIL | moved:The checkerboard above is an inline image 153 pt - the inline image is gone and its caption has risen into its place |
 | 2026-11-08 | 417_rotate180_and_mirrored | FAIL | missing:Page 2 - mirrored text - page 1 is right, upright as /Rotate should give; page 2's mirrored line comes out a garbled reversal |
+| 2026-11-08 | 416_many_tiny_pages | PASS | 300 pages in and 300 out, every record's heading, serial/status/batch line and note on the PDF baselines. The moved claim I first recorded was my bbox-top read, not the baseline; the verifier put it at 1.7 pt |

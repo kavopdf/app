@@ -98,6 +98,19 @@ scale and its text layer reads "Page 2 - mirrored text"; the render produces
 "t xet der orri \tm" and " - 2 egaP", the string reversed with letters split and a tab inside it.
 `missing:Page 2` verified 1 in the PDF against 0 in the render. **Tries: 0 of 3.**
 
+### 416_many_tiny_pages — checked, and my own number was the wrong one
+
+300 pages, one record each. Every page opened: all 300 match the page on their heading, their
+serial/status/batch line and the 300-page note, and the render is 300 pages against the PDF's
+300.
+
+I measured a 4.32 pt first-line offset on all 300 pages and recorded a `moved:` claim on it.
+The verifier refuted it: 'Record 001 of 300' sits at y=94.9 in the PDF and y=93.2 in the
+render, 1.7 pt, inside the 3.0 pt tolerance. The 4.32 pt was the block's bbox top, which is the
+tallest ascender in the line, not the baseline. **The document was right and my measurement was
+wrong** - which is the whole reason step 11 exists, and it cost one round trip instead of a fix
+applied to a page that was already correct.
+
 ### Refuted this pass - do not "fix" these
 
     rules on 403        0 in the PDF, 0 in the render, once the invented box was removed
