@@ -29,6 +29,7 @@ and is the one thing the user has ruled out.
 | T2 | Blank lines came from a guessed multiplier on the line's own size | Median of the gaps the page actually left between consecutive lines, measured per page, capped at 10 | 6 Nov |
 | T4 | Every amount sat at its cell's left edge, so a column of figures was not a column | A numeric cell drawn flush against its cell's right edge is right-aligned in that cell | 6 Nov |
 | T5 | Trailing spaces were kept and the file had no guaranteed final newline | Trailing spaces trimmed, file always ends with a newline, UTF-8 without a BOM | 6 Nov |
+| T6 | A multi-page .txt had no page boundary at all | Tried a "--- page N ---" marker. **Removed**: it is text the PDF does not contain, and a .txt is supposed to hold what the page shows. Blank lines already separate the pages the way the PDF does. Closed as NOT DONE, deliberately. |
 | T8 | A row of eight columns produced a two-hundred-character line nobody could follow | Rows wider than the readable width fall back to one cell per line | 6 Nov |
 
 ## Closed - cannot fix

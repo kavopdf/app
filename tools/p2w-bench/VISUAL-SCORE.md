@@ -18,20 +18,41 @@ their criteria are in the P2W brief; the tool that answers them is
 
 ## History
 
-| Date | Documents passing | Measured | What changed |
-|------|-------------------|----------|--------------|
-| 7 Nov | 0 / 4 | 4 | first run of visual.py, on the first four v3 documents |
+| Date | Passing | Measured | What changed |
+|------|---------|----------|--------------|
+| 7 Nov | 0 / 3 | 3 | first real run of visual.py |
 
-The first measurement is deliberately small: it exists to prove the tool answers the
-questions and to have a floor to climb from. It is not a claim about the corpus.
+The three documents measured were 301_lab_report_panel, 302_radiology_report and
+303_discharge_summary. All three failed, all three on reading order.
 
-What it found on those four documents: reading order matched the PDF on 84 %, 9 %,
-76 % and 84 % of lines. That is a real defect class the count-based gate cannot see -
-every word can be present, in the right place, and in the wrong sequence.
+## What the first run answered, question by question
+
+| Question | Verdict |
+|----------|---------|
+| reading order | **no** on all three |
+| overlap | no on one, yes on two |
+| inside page | yes on all three |
+| images | yes on one, n/a on two |
+| tables | yes on all three |
+| charts | yes on two, n/a on one |
+| QR / barcode | **not measurable** - no decoder in the sandbox, looked at by eye |
+| emphasis | yes on all three |
+
+## The reading-order defect
+
+On 301 the PDF reads label, value, label, value:
+
+    patient -> ananya rao -> age / sex -> 34 / female -> referred by -> dr. meera
+
+and the docx reads every label first, then every value:
+
+    patient -> age / sex -> referred by -> collected -> 34 / female -> dr. meera
+
+Every word is present and in the right place. Only the sequence is wrong, which is
+exactly the class of defect no count-based gate can see.
 
 ## Why this is separate from the regression gate
 
 `gate.py` counts words, blocks, pages and lines. A document can pass all of those and
 still look wrong: text in the wrong reading order, a chart drawn as grey rectangles, a
-QR code rendered too small to scan, an image region that is an empty white box. Those
-are what this score measures, and they are why the visual check is not optional.
+QR code rendered too small to scan, an image region that is an empty white box.
