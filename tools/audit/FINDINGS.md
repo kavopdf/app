@@ -126,11 +126,3 @@ STATUS: FIXED - `ImagesToPdfActivity` and `ImageOcrActivity` are exported ACTION
 **Why I think so:** The three `<data>` elements in the manifest are all `android:mimeType="application/pdf"` (`:44`, `:61`); there is no `image/*` filter anywhere. Both image screens read their input only through `openImagesLauncher` (`PdfActivity.kt:56-60`, launched by `ImagesToPdfActivity.kt:33`/`:36` and `ImageOcrActivity.kt:43`/`:45`), which is an in-app picker. `ShareChoiceActivity.sharedPdf()` would also reject a non-PDF, since it is registered for `application/pdf` only.
 **How to verify:** `grep -n "mimeType" app/src/main/AndroidManifest.xml` — three hits, all `application/pdf`. Then try "Share → KavoPDF" on a photo: the app is not in the list.
 **User impact:** A user who photographs a page and wants it turned into a searchable PDF must first open KavoPDF and hunt through the tool list; the share route they would naturally use is not offered.
-
-### P2 — `useHighestRefreshRate()` is never called, and its own comment says it is
-
-**File:** app/src/main/java/com/kavopdf/app/util/Display.kt:20
-**What:** The function's doc comment reads "Called from every screen, because the rate belongs to the window and each activity gets a fresh one." Nothing calls it. `grep -rn "useHighestRefreshRate" app/src` returns only the declaration.
-**Why I think so:** Every Kotlin and Java file under app/src was searched for the name; the only hit is the function itself. No activity, fragment or base class invokes it.
-**How to verify:** `grep -rn "useHighestRefreshRate" app/src/main` — one hit, the definition.
-**User impact:** The app never asks for a rate above the display default, so on a 120 Hz phone it runs at 60 Hz. The comment claims otherwise, which is worse than not having the function: a reader believes the work is done.
