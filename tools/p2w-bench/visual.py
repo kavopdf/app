@@ -61,47 +61,47 @@ def render_pdf(src, outdir):
     return src
 
 
-def page_data(pdf_path):
+def page_data(doc):
+    """Everything the eight questions need, read while the document is open."""
     import pymupdf
     pages = []
-    with pymupdf.open(pdf_path) as doc:
-        for page in doc:
-            d = page.get_text("dict")
-            lines = []
-            for block in d["blocks"]:
-                for line in block.get("lines", []):
-                    spans = line.get("spans") or []
-                    text = "".join(s.get("text", "") for s in spans)
-                    if not norm(text):
-                        continue
-                    sizes = [s.get("size", 0) for s in spans if s.get("text", "").strip()]
-                    origins = [s["origin"][1] for s in spans if s.get("origin")]
-                    lines.append({
-                        "text": text,
-                        "bbox": line["bbox"],
-                        # The baseline, not the box's top. A line's box top is the font's
-                        # ascender, so two fields on ONE baseline set in different faces
-                        # report tops 3 pt apart: on an org chart that split "TRANSPORT"
-                        # off its own row and charged the page for a row that is not
-                        # there. The baseline is the same number for both.
-                        "base": min(origins) if origins else line["bbox"][3],
-                        "size": max(sizes) if sizes else 0,
-                        "bold": any("bold" in (s.get("font", "").lower()) for s in spans),
-                    })
-            images = []
-            for img in page.get_images(full=True):
-                try:
-                    images.append(page.get_image_bbox(img))
-                except Exception:
-                    pass
-            drawings = page.get_drawings()
-            pages.append({
-                "lines": lines,
-                "images": images,
-                "drawings": drawings,
-                "rect": page.rect,
-                "page": page,
-            })
+    for page in doc:
+        d = page.get_text("dict")
+        lines = []
+        for block in d["blocks"]:
+            for line in block.get("lines", []):
+                spans = line.get("spans") or []
+                text = "".join(s.get("text", "") for s in spans)
+                if not norm(text):
+                    continue
+                sizes = [s.get("size", 0) for s in spans if s.get("text", "").strip()]
+                origins = [s["origin"][1] for s in spans if s.get("origin")]
+                lines.append({
+                    "text": text,
+                    "bbox": line["bbox"],
+                    # The baseline, not the box's top. A line's box top is the font's
+                    # ascender, so two fields on ONE baseline set in different faces
+                    # report tops 3 pt apart: on an org chart that split "TRANSPORT"
+                    # off its own row and charged the page for a row that is not
+                    # there. The baseline is the same number for both.
+                    "base": min(origins) if origins else line["bbox"][3],
+                    "size": max(sizes) if sizes else 0,
+                    "bold": any("bold" in (s.get("font", "").lower()) for s in spans),
+                })
+        images = []
+        for img in page.get_images(full=True):
+            try:
+                images.append(page.get_image_bbox(img))
+            except Exception:
+                pass
+        drawings = page.get_drawings()
+        pages.append({
+            "lines": lines,
+            "images": images,
+            "drawings": drawings,
+            "rect": page.rect,
+            "page": page,
+        })
     return pages
 
 
@@ -237,12 +237,12 @@ def q7_codes(ref, got):
     try:
         import pymupdf
     except ImportError:
-        return "unsure", "no decoder available"
+        return "not measurable", "PyMuPDF is not installed"
     import io
     try:
         from PIL import Image
     except ImportError:
-        return "unsure", "Pillow is not installed"
+        return "not measurable", "Pillow is not installed"
     # Two decoders, tried in turn. pyzbar needs the system libzbar, which this image does
     # not carry and cannot apt-install; OpenCV decodes QR and the common 1-D symbologies
     # in-process, so a page with a code can be answered instead of reported UNSURE.
@@ -288,7 +288,8 @@ def q7_codes(ref, got):
 
     want = read(ref["page"])
     if want is None:
-        return "unsure", "no decoder available (pyzbar needs libzbar; OpenCV absent)"
+        return ("not measurable",
+                "no QR decoder in this sandbox - look at the page yourself")
     if not want:
         return "n/a", ""
     have = read(got["page"]) or []
@@ -303,7 +304,7 @@ def q8_emphasis(ref, got):
     ref_sizes = sorted(l["size"] for l in ref["lines"] if l["size"] > 0)
     got_sizes = sorted(l["size"] for l in got["lines"] if l["size"] > 0)
     if not ref_sizes or not got_sizes:
-        return "unsure", "no font sizes reported"
+        return "not measurable", "no font sizes reported"
     ref_body = ref_sizes[len(ref_sizes) // 2]
     got_body = got_sizes[len(got_sizes) // 2]
     ref_head = ref_sizes[-1]
@@ -334,30 +335,47 @@ def check(pdf_path, docx_path, workdir):
     got_pdf = render_pdf(docx_path, workdir + "/got")
     if not ref_pdf or not got_pdf:
         return {"error": "could not render one side"}
-    ref = page_data(ref_pdf)
-    got = page_data(got_pdf)
 
+    import pymupdf
     answers = []
     failed = 0
-    for i in range(min(len(ref), len(got))):
-        page_answers = {}
-        for name, fn in QUESTIONS:
-            try:
-                verdict, detail = fn(ref[i], got[i])
-            except Exception as exc:
-                verdict, detail = "unsure", str(exc)[:60]
-            page_answers[name] = {"verdict": verdict, "detail": detail}
-            if verdict == "no":
-                failed += 1
-        answers.append({"page": i + 1, "answers": page_answers})
+    unsure = 0
+    pages_ref = pages_got = 0
+    # Both documents stay open while the questions run. A page is a handle into its
+    # document: the moment that document closes, every call on the page raises. An
+    # earlier version returned the page handles and closed the documents, so the image
+    # question and the QR question threw on every page of every document and the
+    # catch-all recorded them as "unsure" - which passes. Two of the eight questions
+    # were never actually asked.
+    with pymupdf.open(ref_pdf) as refdoc, pymupdf.open(got_pdf) as gotdoc:
+        ref = page_data(refdoc)
+        got = page_data(gotdoc)
+        pages_ref, pages_got = len(ref), len(got)
+        for i in range(min(len(ref), len(got))):
+            page_answers = {}
+            for name, fn in QUESTIONS:
+                try:
+                    verdict, detail = fn(ref[i], got[i])
+                except Exception as exc:
+                    # An exception is NOT a pass. A question that could not run is a
+                    # failure of the check, and saying so is the only honest answer.
+                    verdict = "error"
+                    detail = "%s: %s" % (type(exc).__name__, str(exc)[:70])
+                page_answers[name] = {"verdict": verdict, "detail": detail}
+                if verdict in ("no", "error"):
+                    failed += 1
+                elif verdict in ("unsure", "not measurable"):
+                    unsure += 1
+            answers.append({"page": i + 1, "answers": page_answers})
 
     return {
-        "pages_ref": len(ref),
-        "pages_got": len(got),
-        "page_count_ok": len(ref) == len(got),
+        "pages_ref": pages_ref,
+        "pages_got": pages_got,
+        "page_count_ok": pages_ref == pages_got,
         "answers": answers,
         "failed": failed,
-        "ok": failed == 0 and len(ref) == len(got),
+        "unsure": unsure,
+        "ok": failed == 0 and pages_ref == pages_got,
     }
 
 
@@ -409,7 +427,7 @@ def main():
                       % (r.get("pages_got", 0), r.get("pages_ref", 0)))
             for page in r.get("answers", []):
                 for name, a in page["answers"].items():
-                    if a["verdict"] == "no":
+                    if a["verdict"] in ("no", "error"):
                         print("       page %d  %-14s %s" % (page["page"], name, a["detail"]))
 
     print("")
