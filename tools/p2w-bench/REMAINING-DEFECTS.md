@@ -97,6 +97,14 @@ dimension lines, the north arrow and the assembly outline are anchored shapes th
 room in the flow, and 332's bill-of-materials table follows them onto sheet 2. The page-count
 check catches it, nothing in the model predicts it. **Tries: 0 of 3.**
 
+### G3 STRUCTURE — 318 puts its seal's text in 31 text boxes
+
+`reflow.py` fails 318_court_summons_form: 31 text boxes, and body text inside one cannot be
+edited or reflowed. The text is the round court seal, which the page draws one character per
+baseline round a circle. Identical count before and after this run's engine change (62
+`txbxContent` tags either side), so it is pre-existing and not caused here. A .docx has no
+rotated text, which is the same wall the rotated stamps hit. **Tries: 0 of 3.**
+
 ### MEASUREMENT — reading order on a drawing or a figure page
 
 331 (93.3 %) and 334 (89.7 %) both came back VERIFIED and both were passed on sight: the
