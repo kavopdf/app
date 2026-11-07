@@ -96,6 +96,16 @@ public final class DocxWriter {
      * sheet (373_leave_application_form's footer sits 422 pt below the signature row and
      * leaving that gap open pushed the footer onto a second page, whose tables the model
      * under-measures by the same amount).
+     *
+     * <p>TRIED 7 Nov and reverted: raising the ceiling to 24000 twips (600 pt) so the page's own
+     * white space is spent whenever the budget still has room. It fixed the class it was aimed at
+     * - 300's footer went from 270.1 pt high to 8.2, 302's signature block from 232.0 to 14.0,
+     * 311's "Copy forwarded to" from 162.1 to 27.0, 314's footer from 189.7 to 27.0 - and G2
+     * across 208 documents passed. It was rejected because 315_gazette_notification went from one
+     * sheet to two: its three columns are still stacked into one flow (its own defect below), so
+     * its content is three columns long and only fitted a sheet while the gaps were being
+     * clamped. The ratchet says a document that gets worse rejects the change. Spend the gap
+     * again once 315's columns are real columns, or once the table height below is right.
      */
     private static final int GAP_CAP_TW = 2400;
 
@@ -866,6 +876,25 @@ public final class DocxWriter {
         if (text.trim().isEmpty()) return;
         ctx.flowCount++;
         int leftTw = (int) Math.max(0L, Math.round(b.x * TWIPS_PER_PT));
+        int rightTw = 0;
+        // A line the page centred is placed by w:jc, and LibreOffice centres it inside the
+        // paragraph's own indents. Leaving w:ind w:left at the measured x therefore pushed every
+        // centred heading to the RIGHT by half of it: 310's heading 92.8 pt, 317's 99.2 pt,
+        // 313's "POWER OF ATTORNEY" 121.1 pt, while the PDF drew all three on the page's centre.
+        // The alignment is the position, so the indent must not double it. A line centred on the
+        // paper keeps the whole text area; one centred inside a column gets the page's own extent
+        // back as symmetric indents, so its centre is the centre the page used.
+        if (p.align == 1) {
+            float centre = (b.x + b.right) / 2f;
+            if (Math.abs(centre - ctx.pageWidthPt / 2f) > 2f) {
+                rightTw = (int) Math.max(0L, Math.round((ctx.pageWidthPt - b.right) * TWIPS_PER_PT));
+            } else {
+                leftTw = 0;
+            }
+        } else if (p.align == 2) {
+            leftTw = 0;
+            rightTw = (int) Math.max(0L, Math.round((ctx.pageWidthPt - b.right) * TWIPS_PER_PT));
+        }
         // The pitch this page used between this baseline and the one above it. Measured, so the
         // box is the page's own line height rather than a guess at it - see flowLinePt.
         float pitch = !ctx.newPage && ctx.lastBaseline >= 0f ? b.y - ctx.lastBaseline : -1f;
@@ -914,7 +943,7 @@ public final class DocxWriter {
                 .append("\" w:after=\"0\" w:line=\"").append(lineTw)
                 .append("\" w:lineRule=\"exact\"/>")
                 .append("<w:ind w:left=\"").append(leftTw)
-                .append("\" w:right=\"0\" w:firstLine=\"0\"/>");
+                .append("\" w:right=\"").append(rightTw).append("\" w:firstLine=\"0\"/>");
         if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");
         else if (p.align == 2) sb.append("<w:jc w:val=\"right\"/>");
         sb.append("</w:pPr>");

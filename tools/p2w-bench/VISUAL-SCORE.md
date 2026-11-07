@@ -98,3 +98,18 @@ sides, identical text, identical order, and question 1 still scores it 94.9 %.
 | 2026-11-07 | 334_patent_document | FAIL | moved:16 19.5 pt down; reading order 89.7 % |
 | 2026-11-07 | 335_msds_safety_data_sheet | PASS | pictograms, eight numbered sections and the composition table on the PDF baselines |
 | 2026-11-07 | 340_bill_of_lading | PASS | every band, the item table, the signature row and the barcode on the PDF rows |
+| 2026-11-07 | 300_prescription_rx | FAIL | moved:Not valid for medico-legal purposes 270.2 pt up; moved:Dr. Meera Krishnan 270.1 pt up |
+| 2026-11-07 | 301_lab_report_panel | FAIL | moved:ANANYA RAO 26.2 pt down; moved:H = above reference interval 146.9 pt up; reading order 78.7 % |
+| 2026-11-07 | 302_radiology_report | FAIL | moved:Dr. A. Bhat 231.5 pt up; moved:This report is based on the images provided 231.5 pt up |
+| 2026-11-07 | 303_discharge_summary | FAIL | moved:ANANYA RAO, 34/F 8.2 pt down off its row; moved:Resident Medical Officer 192.7 pt up |
+| 2026-11-07 | 304_package_insert_small_print | PASS | six headings keep their weight, every line breaks where the PDF breaks; the emphasis question fails only because 6.8 pt rounds to 6.5 |
+| 2026-11-07 | 305_vaccination_certificate | FAIL | moved:This is a computer generated certificate 351.8 pt up; the round seal's characters land one per baseline |
+| 2026-11-07 | 306_clinical_protocol_synopsis | PASS | both tables keep every row and every X in its own cell, page count 1/1 |
+| 2026-11-07 | 310_court_judgment | PASS | centred heading on the page centre after the indent fix, eight numbered paragraphs wrap at the PDF breaks |
+| 2026-11-07 | 311_fir_police_form | FAIL | moved:Copy forwarded to 162.5 pt up; moved:Signature of Officer in charge 27.2 pt down; reading order 90.2 % |
+| 2026-11-07 | 312_affidavit_stamp_paper | FAIL | moved:BEFORE ME 72.2 pt up, its box left empty; moved:Notary Public, Bengaluru 72.2 pt up |
+| 2026-11-07 | 313_power_of_attorney | PASS | heading, five clauses, schedule and witness block on the PDF baselines |
+| 2026-11-07 | 314_tender_rfp_boq | FAIL | moved:Meridian Consulting Pvt Ltd 189.7 pt up; moved:lot 13.4 pt up |
+| 2026-11-07 | 315_gazette_notification | FAIL | three columns stacked into one flow; moved:[No. 4/2/2024-WDRA] 229.5 pt up; reading order 29.1 % |
+| 2026-11-07 | 316_contract_with_schedules | PASS | table, schedule and signature row on the PDF baselines; q6's 1-against-0 shape count was refuted 1 against 1 |
+| 2026-11-07 | 317_rti_response | PASS | centred heading on the page centre after the indent fix, five numbered points in order |

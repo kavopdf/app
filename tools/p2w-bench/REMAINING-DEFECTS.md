@@ -651,3 +651,94 @@ Fifteen documents converted, every page looked at, every finding verified agains
   `pagecount` is one - therefore dropped the eye's FAIL and 330 and 332 came out **PASS with a
   verified 1-page-in/2-out defect behind them**. Any verified finding on the page now backs the
   eye. After the fix: 330 and 332 FAIL, decided by both.
+
+---
+
+## OPEN — v3 batch 1 (300-317), re-run 7 Nov with the eye and the verifier
+
+Every line below is a finding that came back VERIFIED from `verify.py` against the PDF, not an
+impression. Positions are the PDF's own baseline against the render's.
+
+### E-01  A block far down the page is emitted 72-352 pt too high — 8 documents, one cause
+
+| Doc | Line | PDF y | render y | offset |
+|---|---|---|---|---|
+| 300_prescription_rx | Not valid for medico-legal purposes | 793.5 | 523.3 | **-270.2** |
+| 300_prescription_rx | Dr. Meera Krishnan | 793.0 | 522.9 | -270.1 |
+| 301_lab_report_panel | H = above reference interval | 783.5 | 636.6 | **-146.9** |
+| 302_radiology_report | Dr. A. Bhat | 695.8 | 464.3 | **-231.5** |
+| 302_radiology_report | This report is based on the images provided | 773.5 | 542.0 | -231.5 |
+| 303_discharge_summary | Resident Medical Officer | 735.6 | 542.9 | **-192.7** |
+| 305_vaccination_certificate | This is a computer generated certificate | 783.5 | 431.7 | **-351.8** |
+| 311_fir_police_form | Copy forwarded to: Superintendent of Police | 793.5 | 631.0 | **-162.5** |
+| 312_affidavit_stamp_paper | BEFORE ME / Notary Public, Bengaluru | 683.6 | 611.4 | **-72.2** |
+| 314_tender_rfp_boq | Meridian Consulting Pvt Ltd (footer) | 793.5 | 603.8 | **-189.7** |
+| 315_gazette_notification | [No. 4/2/2024-WDRA] | 723.6 | 494.1 | -229.5 |
+
+Cause: `DocxWriter.GAP_CAP_TW` = 2400 twips (120 pt). Any measured gap wider than that is
+clamped, and the page's own bottom white space is not spent.
+
+**Tries: 2 of 3.** Try 1 was the 72 pt ceiling -> 120 pt (fixed 393 and 394). Try 2, 7 Nov:
+24000 twips. It fixed the class - 300 -270.2 -> -8.2, 302 -232.0 -> -14.0, 311 -162.1 -> -27.0,
+314 -189.7 -> -27.0 - and passed G2 on all 208 documents, but **315_gazette_notification went
+from one sheet to two** and the ratchet rejects it. Reverted, and the reason is written into the
+constant's javadoc so it is not tried again blind.
+
+The third try has to be one of these, not another constant:
+- give 315's three columns real `w:cols` sections (its own defect, F-01 below), which frees the
+  page budget it is currently borrowing from the clamped gaps; or
+- place the last block on a page at its measured y only when the flow's own y is trusted - i.e.
+  after the table height below is right.
+
+### E-02  A label/value band is emitted value by value, not row by row — 301, 303
+
+301's header band: the PDF draws `PATIENT | AGE/SEX | REFERRED BY | COLLECTED` on one row and
+`ANANYA RAO | 34/Female | Dr. Meera Krishnan | 18/03/2024 07:42` on the next. The render puts
+`PATIENT`, then `AGE / SEX`, then `34 / Female`, then `Dr. Meera Krishnan`, then `ANANYA RAO` -
+the name lands 26.2 pt below the row it belongs to, and `COLLECTED` gets a row of its own
+(28 rows in the PDF against 33 in the render, 78.7 % in sequence). 303 is the same shape: the
+patient's name sits 8.2 pt below `Medical ICU-2 / 07` and `Dr. Meera Krishnan` beside it.
+
+This is D-02 (row grouping) and D-03 (reading order) in this batch's clothes. **Tries: 0 of 3
+for D-02, 0 of 3 for D-03** — nothing has been tried here yet.
+
+### E-03  312's notary block is outside its own box
+
+`BEFORE ME / Notary Public, Bengaluru` is drawn at y=683.6 inside a ruled box that starts at
+681.4. The render puts the text 72.2 pt higher and draws the box empty, so the page shows an
+empty rectangle with the words floating above it. Same cause as E-01 (the gap between the
+"Note:" line and the box is clamped), so it closes with E-01 rather than on its own.
+
+### E-04  315's three columns are one column
+
+The page sets three columns of a gazette notification side by side, each with its own rule.
+The render stacks them into a single flow: 21 rows in the PDF against 34 in the render, 29.1 %
+in sequence, and the tail of the page 229.5 pt high. Page count is still 1/1, but only because
+the clamped gaps are hiding how long the stacked flow is - this is also what rejected E-01's
+fix.
+
+### E-05  304's emphasis question is measuring half-point rounding, not a defect
+
+The PDF sets the body at 6.2 pt and the six numbered headings at 6.8. OOXML stores half-points,
+so the writer emits 6.0 and 6.5. The gap the page has is 0.6 pt; the render's is 0.5 pt;
+`q8_emphasis` requires more than `body + 0.5`, so all six headings count as "lost" while they
+are in fact bold and half a point larger, exactly as the page drew them. The document is fine.
+The tool needs the tolerance applied to the gap: a heading keeps its emphasis when its own size
+is within the half-point tolerance of the PDF's and it is still larger than the body. Not
+changed on 7 Nov because changing a question changes every document's verdict and that needs
+its own measured pass over all 208.
+
+### Refuted this pass, and not to be claimed again
+
+- **316's shapes** - q6 counted 1 shape in the PDF and 0 in the render; `verify.py` counted 1
+  against 1 in the render. The table's header band is drawn; the document passes.
+- The four claims the previous pass withdrew stand withdrawn: 314's totals are complete and at
+  identical coordinates, 303's "wrap" is the render keeping a line the PDF clips off its own
+  page, and 301's two label claims were 0.5 pt apart.
+
+### Fixed this pass
+
+Centred lines carried `w:ind w:left` = their measured x *and* `w:jc="center"`, and LibreOffice
+centres inside the indent, so every centred heading was pushed right by half of it: 310 +92.8
+pt, 317 +99.2 pt, 313 +121.1 pt. The alignment now places the line; the indent is cleared for a
+line centred on the paper and becomes the page's own extent for one centred in a column.

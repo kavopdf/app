@@ -293,3 +293,43 @@ REMAINING-DEFECTS.md so the same claim is not made again.
 
 Open and named: 301 and 302 (a label/value band emitted cell by cell), 311 (address welds the
 Mobile label), 312 (notary tail 72.2 pt high, box empty), 315 (three columns stacked).
+
+---
+
+## v3 batch 1 (300-317), pass 2 — the centring fix and the trailing-gap class
+
+The batch was run again from the start of the corpus with the eye before the numbers, as
+PIPELINE.md orders. Same fifteen documents, 15 pages, one page each.
+
+| Step | Result |
+|---|---|
+| convert, 208 documents | 208 docx + 208 txt, 0 failed, 52 s |
+| G2 before anything | no document got worse |
+| G6a the eye | 15 pages opened, 15 verdicts, 0 PENDING |
+| G6b the numbers | 8 of 15 failed a question |
+| emit findings | 24 findings written (18 visual, 6 measure) |
+| verify | 23 VERIFIED, 1 REFUTED, 0 UNVERIFIABLE |
+| combine | **6 PASS, 9 FAIL, 0 unlooked** |
+| G5 position, batch | 41.8 % of lines within tolerance; size 98.5 %, name 100 %, colour 100 % |
+
+**Fixed this pass: centred lines were pushed right by their own indent.** `flowFromBox` wrote
+`w:ind w:left` = the line's measured x on every paragraph and then `w:jc="center"` on the ones
+the page centred. LibreOffice centres inside the indents, so the two added up: 310's heading
+rendered at x=217.4 where the page drew it at 124.6, 317's at 240.9 against 141.7, 313's at
+334.4 against 213.3. A centred line is now positioned by its alignment and not by an indent.
+Measured after: 310 155.1 (centre 297.75 against the page's 297.6), 317 170.0 (297.7), 313
+227.7 (297.7) - the centre is exact and the residual x is the substituted face's width.
+G2 across 208: no document worse. Page counts unchanged on all fifteen.
+
+**Tried and rejected: spending the page's white space.** Raising `GAP_CAP_TW` from 2400 to
+24000 twips fixed the class this batch is full of - 300's footer 270.1 -> 8.2 pt, 302's
+signature block 232.0 -> 14.0, 311's "Copy forwarded to" 162.1 -> 27.0, 314's footer 189.7 ->
+27.0 - and G2 passed on all 208. It was rejected because 315_gazette_notification went from one
+sheet to two. Recorded in REMAINING-DEFECTS.md with the numbers, not just the outcome.
+
+**The class that is left is one defect, not eight.** 300, 301, 302, 303, 305, 311, 312 and 314
+all lose the same thing: a block that sits far down the page (a footer, a signature row, a
+notary box) is emitted 72 to 352 pt above where the page drew it, because a gap wider than
+120 pt is clamped. The evidence for each is in REMAINING-DEFECTS.md. 315 is its own defect
+(three columns stacked). 304's emphasis failure is a measurement artefact of half-point
+rounding, not a document defect, and is written up there too.
