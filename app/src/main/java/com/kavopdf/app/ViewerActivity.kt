@@ -38,6 +38,8 @@ class ViewerActivity : PdfActivity() {
     /** true once the link list has arrived for the open document */
     private var linksReady = false
     private var tapRetryPending = false
+    /** How many background passes the current tap has already made. */
+    private var tapRetryCount = 0
     private var lastMissKey: String? = null
     private var matches: List<PdfEngine.Match> = emptyList()
     private var matchIndex = -1
@@ -97,12 +99,23 @@ class ViewerActivity : PdfActivity() {
     }
 
     private fun show(file: File) {
+        var openedPfd: ParcelFileDescriptor? = null
+        var openedRenderer: PageRenderer? = null
         try {
             val descriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
-            pfd = descriptor
+            openedPfd = descriptor
             val raw = PdfRenderer(descriptor)
             val pr = PageRenderer(raw)
+            openedRenderer = pr
+            // A second document can arrive in this same instance (singleTop plus
+            // onNewIntent), so the previous pair has to be closed here: the only other
+            // close is in onDestroy, which sees just the last one and leaked a native
+            // renderer and an open descriptor per document opened.
+            try { renderer?.close() } catch (_: Exception) { }
+            try { pfd?.close() } catch (_: Exception) { }
+            pfd = descriptor
             renderer = pr
+            tapRetryCount = 0
             textIndex = null
             pagesHint = pr.pageCount
             sizes.clear()   // filled in the background below; the page shows at once
@@ -163,6 +176,12 @@ class ViewerActivity : PdfActivity() {
                 linksReady = true
             }
         } catch (t: Throwable) {
+            // Close what this call opened before giving up, so a document that fails to
+            // open does not leave its descriptor behind either.
+            if (openedRenderer != null && renderer === openedRenderer) renderer = null
+            if (openedPfd != null && pfd === openedPfd) pfd = null
+            try { openedRenderer?.close() } catch (_: Exception) { }
+            try { openedPfd?.close() } catch (_: Exception) { }
             AppLog.problem(applicationContext, "Open", t)
             toast(getString(R.string.msg_could_not_open))
         }
@@ -313,6 +332,11 @@ class ViewerActivity : PdfActivity() {
         val ph = size?.getOrElse(1) { 0f } ?: 0f
         if (pw <= 0f || ph <= 0f || !linksReady) {
             if (tapRetryPending) return
+            // Bounded: a document whose page sizes never resolve used to re-enter this
+            // method for as long as the screen was open, re-parsing the whole PDF on
+            // every pass. Two background attempts is all a tap is worth.
+            if (tapRetryCount >= MAX_TAP_RETRIES) return
+            tapRetryCount++
             tapRetryPending = true
             val f = current ?: return
             lifecycleScope.launch {
@@ -336,6 +360,8 @@ class ViewerActivity : PdfActivity() {
             }
             return
         }
+        // The data is here, so the next tap starts its budget again.
+        tapRetryCount = 0
 
         val pageLinks = links[position + 1]
         if (pageLinks.isNullOrEmpty()) return
@@ -442,5 +468,7 @@ class ViewerActivity : PdfActivity() {
         private const val BASE_FACTOR = 2.0f
         private const val MAX_FACTOR = 4.0f
         private const val MAX_WIDTH = 2800
+        /** Background attempts a single tap may make while page data is missing. */
+        private const val MAX_TAP_RETRIES = 2
     }
 }

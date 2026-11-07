@@ -101,6 +101,11 @@ class PagesActivity : PdfActivity() {
             }) {
                 source = f
                 val d = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY)
+                // Closing the previous pair here is what stops a second document from
+                // leaking a native renderer and an open descriptor: onDestroy only ever
+                // sees the last one.
+                try { renderer?.close() } catch (_: Exception) { }
+                try { pfd?.close() } catch (_: Exception) { }
                 pfd = d
                 val r = PdfRenderer(d)
                 renderer = PageRenderer(r)

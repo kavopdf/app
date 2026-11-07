@@ -84,6 +84,7 @@ class RedactActivity : PdfActivity() {
                 renderedWidth.clear()
                 // sizes come from the renderer below, so the file is opened once
                 val d = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY)
+                try { renderer?.close() } catch (_: Exception) { }
                 try { pfd?.close() } catch (_: Exception) { }
                 pfd = d
                 val r = PdfRenderer(d)

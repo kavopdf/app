@@ -79,6 +79,8 @@ class LinksActivity : PdfActivity() {
     private companion object {
         const val DARK_ON_LIGHT = 0xFF10131A.toInt()
         const val LIGHT_ON_DARK = 0xFFFFFFFF.toInt()
+        /** Long-edge cap for a picture used as a shaped link. */
+        const val SHAPE_MAX_DIM = 1600
     }
 
     private var manualMode = false
@@ -560,23 +562,44 @@ class LinksActivity : PdfActivity() {
      */
     private fun shaped(pic: java.io.File, shape: Int): java.io.File {
         if (shape == 0) return pic
-        val src = android.graphics.BitmapFactory.decodeFile(pic.absolutePath) ?: return pic
+        // Bounded, like every other picture path: a 4000x3000 photo decoded whole held
+        // 48 MB for the source and 36 MB for the mask at once, on top of the page the
+        // screen is already showing.
+        val src = decodeBounded(pic, SHAPE_MAX_DIM) ?: return pic
         val side = minOf(src.width, src.height).coerceAtLeast(1)
         val outBmp = android.graphics.Bitmap.createBitmap(side, side, android.graphics.Bitmap.Config.ARGB_8888)
-        val c = android.graphics.Canvas(outBmp)
-        val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
-        val path = android.graphics.Path()
-        if (shape == 2) {
-            path.addCircle(side / 2f, side / 2f, side / 2f, android.graphics.Path.Direction.CW)
-        } else {
-            val r = side * 0.18f
-            path.addRoundRect(0f, 0f, side.toFloat(), side.toFloat(), r, r, android.graphics.Path.Direction.CW)
+        try {
+            val c = android.graphics.Canvas(outBmp)
+            val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+            val path = android.graphics.Path()
+            if (shape == 2) {
+                path.addCircle(side / 2f, side / 2f, side / 2f, android.graphics.Path.Direction.CW)
+            } else {
+                val r = side * 0.18f
+                path.addRoundRect(0f, 0f, side.toFloat(), side.toFloat(), r, r, android.graphics.Path.Direction.CW)
+            }
+            c.clipPath(path)
+            c.drawBitmap(src, (side - src.width) / 2f, (side - src.height) / 2f, paint)
+            val f = java.io.File(cacheDir, "link_shape_" + System.currentTimeMillis() + ".png")
+            java.io.FileOutputStream(f).use { outBmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
+            return f
+        } finally {
+            outBmp.recycle()
+            src.recycle()
         }
-        c.clipPath(path)
-        c.drawBitmap(src, (side - src.width) / 2f, (side - src.height) / 2f, paint)
-        val f = java.io.File(cacheDir, "link_shape_" + System.currentTimeMillis() + ".png")
-        java.io.FileOutputStream(f).use { outBmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
-        return f
+    }
+
+    /** Decode a file at no more than [maxDim] on its long edge. */
+    private fun decodeBounded(pic: java.io.File, maxDim: Int): android.graphics.Bitmap? {
+        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        android.graphics.BitmapFactory.decodeFile(pic.absolutePath, bounds)
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+        var sample = 1
+        while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= maxDim) sample *= 2
+        val opts = android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
+        return try {
+            android.graphics.BitmapFactory.decodeFile(pic.absolutePath, opts)
+        } catch (_: Throwable) { null }
     }
 
 }

@@ -103,17 +103,17 @@ class QrScanActivity : PdfActivity() {
     private val pickImageLauncher =
         registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.GetContent()) { uri ->
             if (uri == null) return@registerForActivityResult
-            val bmp = runCatching {
-                contentResolver.openInputStream(uri)?.use {
-                    android.graphics.BitmapFactory.decodeStream(it)
-                }
-            }.getOrNull()
+            // Bounded, like every other image path in the app: a full 48 MP photo is
+            // 192 MB as ARGB_8888, and the OutOfMemoryError was swallowed by runCatching
+            // so the user was simply told the image could not be read.
+            val bmp = decodeBounded(uri, GALLERY_MAX_DIM)
             if (bmp == null) {
                 toast(getString(R.string.msg_failed, "image"))
                 return@registerForActivityResult
             }
             val sc = scanner
             if (sc == null) {
+                bmp.recycle()
                 toast(getString(R.string.msg_failed, "scanner"))
                 return@registerForActivityResult
             }
@@ -123,7 +123,27 @@ class QrScanActivity : PdfActivity() {
                     if (first != null) onFound(first) else toast(getString(R.string.qr_none_found))
                 }
                 .addOnFailureListener { toast(getString(R.string.msg_failed, "scan")) }
+                .addOnCompleteListener { bmp.recycle() }
         }
+
+    /** Decode a gallery picture at no more than [maxDim] on its long edge. */
+    private fun decodeBounded(uri: Uri, maxDim: Int): android.graphics.Bitmap? {
+        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        try {
+            contentResolver.openInputStream(uri)?.use {
+                android.graphics.BitmapFactory.decodeStream(it, null, bounds)
+            }
+        } catch (_: Exception) { return null }
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+        var sample = 1
+        while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= maxDim) sample *= 2
+        val opts = android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
+        return try {
+            contentResolver.openInputStream(uri)?.use {
+                android.graphics.BitmapFactory.decodeStream(it, null, opts)
+            }
+        } catch (_: Exception) { null }
+    }
 
     @OptIn(ExperimentalGetImage::class)
     private fun analyse(proxy: ImageProxy) {
@@ -211,5 +231,10 @@ class QrScanActivity : PdfActivity() {
         runCatching { cameraExecutor.shutdown() }
         provider = null
         camera = null
+    }
+
+    private companion object {
+        /** Long-edge cap for a gallery picture: far more than a code needs. */
+        const val GALLERY_MAX_DIM = 1600
     }
 }

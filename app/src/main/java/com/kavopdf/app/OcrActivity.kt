@@ -66,6 +66,7 @@ class OcrActivity : PdfActivity() {
             }) {
                 source = f
                 val d = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY)
+                try { renderer?.close() } catch (_: Exception) { }
                 try { pfd?.close() } catch (_: Exception) { }
                 pfd = d
                 val r = PdfRenderer(d)
