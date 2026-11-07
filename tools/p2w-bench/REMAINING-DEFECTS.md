@@ -271,3 +271,60 @@ actually use.
 G2 must pass across all 208 first. Then G5's "lines within tolerance" must rise and
 G6's reading-order share must rise. A fix that passes G2 but does not move G5 or G6
 has not fixed either of these.
+
+
+### D-03  Reading order: every label first, then every value
+
+**Severity: affects the documents the visual gate measured, 3 of 3.**
+
+Measured on `301_lab_report_panel`, PDF page 1 against the rendered docx:
+
+    PDF   metropolis pathology lab
+          nabl accredited | lab id mh-4471 | report no. mpl/2024/0318/
+          patient
+          ananya rao
+          age / sex
+          34 / female
+          referred by
+          dr. meera krishnan
+
+    DOCX  metropolis pathology lab
+          nabl accredited | lab id mh-4471 | report no. mpl/2024/0318/
+          patient
+          age / sex
+          referred by
+          collected
+          34 / female
+          dr. meera krishnan
+
+The PDF reads label, value, label, value. The docx reads every label, then every value.
+Every word is present and at the right coordinates; only the sequence is wrong, which is
+why no count-based gate can see it and why `visual.py` question 1 exists.
+
+**The fix to try.** The paragraph order in the body follows the block order in
+`Page.blocks`. If the page groups a form's labels before its values, that order is
+inherited. The order should come from the page's own reading order - the same
+top-to-bottom, left-to-right sequence a reader follows - sorted by the row's baseline
+and then by x within a row, which is what `visual.py`'s `_rows()` already computes.
+
+**Tries: 0 of 3.**
+
+### D-04  Body text inside text boxes
+
+**Severity: 2 of the 8 documents the structure gate measured.**
+
+    FAIL 305_vaccination_certificate   48 text boxes
+    FAIL 312_affidavit_stamp_paper     27 text boxes
+
+`reflow.py` reports the count. Body text in a text box cannot be edited or reflowed,
+and a document built that way measures perfectly while not being a Word document.
+
+The other six documents in that run report zero text boxes and are not affected, so
+this is not a whole-corpus problem - it is these documents and any like them.
+
+**The fix to try.** Find what makes these two take the text-box path and give them the
+flowing-paragraph path the other six already use. Do not ban text boxes: a watermark or
+a sidebar legitimately uses one, and the gate says which document and how many so the
+two cases can be told apart.
+
+**Tries: 0 of 3.**
