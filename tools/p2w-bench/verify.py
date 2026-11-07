@@ -337,7 +337,12 @@ def main():
         try:
             with pymupdf.open(pdf) as r, pymupdf.open(rend) as g:
                 pi = max(0, int(page) - 1)
-                if pi >= r.page_count or pi >= g.page_count:
+                # A pagecount claim is about the document, not about a page. The eye sees
+                # the extra sheet and records it against that page, which is the right
+                # place to record it - but that page does not exist in the PDF, so the
+                # guard below rejected the one claim the eye was most sure about.
+                whole_doc = claim.split(":")[0].strip() == "pagecount"
+                if not whole_doc and (pi >= r.page_count or pi >= g.page_count):
                     decided.append({"id": fid, "document": doc, "page": int(page),
                                     "kind": kind, "claim": claim,
                                     "verdict": "UNVERIFIABLE",
@@ -346,7 +351,8 @@ def main():
                           % (fid, doc[:34], page, claim[:44]))
                     unverifiable += 1
                     continue
-                rp, gp = r[pi], g[pi]
+                rp = r[min(pi, r.page_count - 1)]
+                gp = g[min(pi, g.page_count - 1)]
                 rlines, glines = lines_of(rp), lines_of(gp)
                 if kind == "measure":
                     verdict, why = check_measure(claim, rp, gp, rlines, glines, r, g)
