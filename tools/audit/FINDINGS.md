@@ -126,3 +126,67 @@ STATUS: FIXED - `ImagesToPdfActivity` and `ImageOcrActivity` are exported ACTION
 **Why I think so:** The three `<data>` elements in the manifest are all `android:mimeType="application/pdf"` (`:44`, `:61`); there is no `image/*` filter anywhere. Both image screens read their input only through `openImagesLauncher` (`PdfActivity.kt:56-60`, launched by `ImagesToPdfActivity.kt:33`/`:36` and `ImageOcrActivity.kt:43`/`:45`), which is an in-app picker. `ShareChoiceActivity.sharedPdf()` would also reject a non-PDF, since it is registered for `application/pdf` only.
 **How to verify:** `grep -n "mimeType" app/src/main/AndroidManifest.xml` — three hits, all `application/pdf`. Then try "Share → KavoPDF" on a photo: the app is not in the list.
 **User impact:** A user who photographs a page and wants it turned into a searchable PDF must first open KavoPDF and hunt through the tool list; the share route they would naturally use is not offered.
+
+---
+
+## Stage 3 — CRASH PATHS
+
+Scope: the app's own screens and views (`app/src/main/java/com/kavopdf/app/*.kt`,
+`ui/*.kt`, `util/*.kt`) — null dereferences, `get()`/`first()` on possibly empty
+lists, array indexing, number parsing, stream lifetime, bitmap and cursor handling,
+`findViewById` and intent-extra null checks. The PDF engine (`engine/*.java`) is
+stage 4 and was not read here except where a caller depends on its return shape.
+
+What passed (recorded so it is not re-checked): no `!!` outside a `runCatching`
+(one site, `LinksActivity.kt:518`, and it is inside the `runCatching` that guards
+it); every number taken from a text field goes through `toIntOrNull` /
+`toFloatOrNull` — there is no bare `Integer.parseInt` or `String.toInt()` on user
+input anywhere in the Kotlin; every stream is opened inside `.use`
+(`openInputStream`, `openOutputStream`, `FileInputStream`, `FileOutputStream` —
+grep without `.use` returns only imports); every `uris.first()` / `files.first()` /
+`pages[0]` / `items[pos]` site is preceded by an `isEmpty` or `indices` check
+(`ImagesToPdfActivity.kt:73`, `MergeActivity.kt:64`, `OcrActivity.kt:82`,
+`PagesActivity.kt:125`, `CreatePdfActivity.kt:265-266`, `AnnotateActivity.kt:190`+`:218`);
+every id used with `findViewById` exists in its layout (`pwInput`, `busyText`,
+`confirmTitle`/`confirmMessage`/`confirmNegative`/`confirmPositive`,
+`successMsg`/`successIcon`/`successOpen`/`successShare`/`successClose`,
+`statusIcon`/`statusTitle`/`statusSub`/`details`/`btnClose`); `view_spinner.xml`
+really has a `<Spinner>` root, so the five `inflate(...) as Spinner` casts cannot
+throw `ClassCastException`; `parseRanges`/`parsePages` (`ToolsActivity.kt:1095`,
+`OcrActivity.kt:126`) use `getOrNull`/`toIntOrNull` and clamp to the page count, so a
+range like `1-999999999` builds no huge list.
+
+### P2 — Opening a second document in the reader leaks the first document's PdfRenderer and file descriptor
+**File:** app/src/main/java/com/kavopdf/app/ViewerActivity.kt:101
+**What:** `show()` opens a new `ParcelFileDescriptor` and a new `PdfRenderer` for every document and assigns them over `pfd` and `renderer` without closing the previous pair, so each document opened in the same activity instance leaks one renderer and one descriptor.
+**Why I think so:** `show()` does `pfd = descriptor` (line 102) and `renderer = pr` (line 105) with no `renderer?.close()` before either, and the only close is in `onDestroy()` (lines 435-436), which closes just the last pair. `onNewIntent` (line 83) reaches `openUri` → `show()` on the same instance because the manifest now sets `launchMode="singleTop"` (`AndroidManifest.xml:40`), so tapping PDF B in a file manager while A is open re-enters `show()` and drops A's renderer. The same shape appears in the five other screens that can open a second file from their own choose button: `RedactActivity.kt:86-90` (closes the old `pfd` but never the old `renderer`), `OcrActivity.kt:68-72`, `CropActivity.kt:62-65`, `PagesActivity.kt:103-106`, `AnnotateActivity.kt:308-312` and `:343-347`. In all six, `renderer?.close()` appears exactly once, in `onDestroy`.
+**How to verify:** `grep -n "renderer = \|renderer?.close" app/src/main/java/com/kavopdf/app/ViewerActivity.kt` — one assignment at 105, one close at 435 inside `onDestroy`. In a build, open a PDF, then tap a second PDF in a file manager, and watch `adb shell ls /proc/<pid>/fd | wc -l` and `adb shell dumpsys meminfo <pkg>` grow by one descriptor and one renderer per document.
+**User impact:** Each document opened in a session leaves a native renderer and an open descriptor behind. After enough documents the process runs out of descriptors and pages stop opening at all — "this file couldn't be read" on a file that is perfectly fine — while native memory climbs until the reader is killed in the background.
+
+### P2 — A tap on a page whose size is unknown re-launches itself forever
+**File:** app/src/main/java/com/kavopdf/app/ViewerActivity.kt:314
+**What:** When the size of the tapped page is not known yet, `onPageTap` starts a coroutine that fetches the sizes and then calls `onPageTap` again with no attempt counter, so if the size never arrives it re-enters itself for as long as the screen is open.
+**Why I think so:** lines 314-337: the retry branch sets `tapRetryPending = true` (316), launches (318), clears the flag in `finally` (332-334) and then calls `onPageTap(position, fx, fy)` (335). The re-entry sees the same `pw <= 0f` (312-314) with the flag already cleared, so it takes the retry branch again — there is no counter and no `return` after the recursive call. The size list is what can stay empty: `PdfEngine.pageDisplaySizes` (`engine/PdfEngine.java:269-279`) reads `p.getCropBox()` for every page and throws if any page has none, and the caller wraps the call as `runCatching { … }.getOrDefault(emptyList())` (`ViewerActivity.kt:321-323`), storing an empty list that is fetched again on every pass. `linksReady` meanwhile does become true, because `PdfEngine.allPageLinks` swallows its own exceptions and returns an empty map (`PdfEngine.java:2037-2050`), so only the size half of the condition keeps the loop alive.
+**How to verify:** Read `ViewerActivity.kt:311-337` — no counter, no `return` after the recursive call. In a build, open a PDF that pdfbox rejects but `PdfRenderer` still draws (a repaired or hand-edited file), tap a page, and watch the activity log: one "Reader: page sizes" entry per pass, indefinitely.
+**User impact:** On such a document one tap becomes a loop that re-parses the whole PDF on a background thread over and over until the user leaves the reader: the phone heats up, the battery drains, and the tap never does anything.
+
+### P2 — Annotate writes the tap point into the instance state but never reads it back, so a photo chosen after a recreate is dropped
+**File:** app/src/main/java/com/kavopdf/app/AnnotateActivity.kt:157
+**What:** `onSaveInstanceState` stores `pendingFx`/`pendingFy` so the "tap where the picture goes" survives the image picker, but `onCreate` never reads either key, so after a recreate the point is gone and the chosen photo is discarded without a word.
+**Why I think so:** `pendingFx`/`pendingFy` appear in exactly five places — declared at 55-56, assigned in `startStamp` at 502-503, written to the bundle at 157-158, and read as a fallback in `onImagesChosen` at 538. There is no `savedInstanceState?.getFloat(…)` anywhere in the file, and `onCreate` takes `savedInstanceState` at 58-59 and does not touch it. The comment at 154-156 says "The image picker can have the system recreate us; without this the tap point was lost" — the restore half of that fix is missing. `onImagesChosen` then takes the `point == null` branch at 540 and returns without placing anything.
+**How to verify:** `grep -n "pendingFx\|savedInstanceState" app/src/main/java/com/kavopdf/app/AnnotateActivity.kt` — no `getFloat`. In a build, enable Developer options → "Don't keep activities", open a PDF, choose the Image tool, tap the page, pick a photo and come back: no picture is placed and nothing is said.
+**User impact:** On a low-memory phone — exactly the case the comment was written for — the image tool silently loses the picture the user just chose, and the only way forward is to tap and pick again.
+
+### P2 — The gallery QR scan decodes the photo at full resolution, so ordinary phone photos fail with "could not read image"
+**File:** app/src/main/java/com/kavopdf/app/QrScanActivity.kt:106
+**What:** `pickImageLauncher` decodes the chosen picture with a bare `BitmapFactory.decodeStream`, with no `inJustDecodeBounds`/`inSampleSize` pass, unlike every other image path in the app.
+**Why I think so:** lines 106-110 open the stream and decode it whole; there is no bounds pass. Every other decode is bounded — `AnnotateActivity.decodeBounded` (`AnnotateActivity.kt:548-566`), `CreatePdfActivity.decodeBounded` (`CreatePdfActivity.kt:296-313`), `PdfEngine.decodeImage(file, OCR_MAX)` (`ImageOcrActivity.kt:86`), `PdfEngine.decodeUpright(file, 400)` (`ScanToPdfActivity.kt:135`). A 48 MP photo (8000×6000) is 192 MB as ARGB_8888, and because the decode is wrapped in `runCatching`, the `OutOfMemoryError` is swallowed and the user is shown `msg_failed` instead of a scan. The bitmap is also never recycled after `scanner.process(...)` (line 120).
+**How to verify:** Read `QrScanActivity.kt:103-126` next to `AnnotateActivity.kt:548-566`. In a build, put a QR code in a full-resolution photo from a recent phone and use QR → from gallery: the app says it could not read the image, while the same photo shrunk in a gallery editor scans.
+**User impact:** The one way to scan a code you cannot point the camera at — a screenshot, a photo of a poster, an image someone sent — fails on the photos people actually have, and reports only that the image could not be read.
+
+### P3 — Applying a shaped image link decodes the picture whole and recycles neither bitmap
+**File:** app/src/main/java/com/kavopdf/app/LinksActivity.kt:563
+**What:** `shaped()` decodes the source image at full size, allocates a second full-size square bitmap for the mask, and recycles neither `src` nor `outBmp`.
+**Why I think so:** line 563 is `BitmapFactory.decodeFile(pic.absolutePath)` with no bounds pass; line 565 allocates `side × side` ARGB_8888 where `side` is the image's short edge; and after the PNG is written at 578 the function returns at 579 with both bitmaps still allocated. Every other place that builds a bitmap from a picture recycles it (`AnnotateActivity.kt:592`, `CreatePdfActivity.kt:344`, `OcrActivity.kt:109`, `RedactActivity.kt:195`). A 4000×3000 photo therefore holds 48 MB for `src` and 36 MB for `outBmp` at the same moment, on top of the page bitmap the screen is already showing.
+**How to verify:** `grep -n "recycle" app/src/main/java/com/kavopdf/app/LinksActivity.kt` — no hit inside `shaped()` (561-580). In a build, add an image link from a large photo with the Circle or Rounded shape and watch the heap: both bitmaps stay until a GC.
+**User impact:** Adding a circle or rounded image link from a full-size photo can push a mid-range phone into an `OutOfMemoryError`, and the failure surfaces from the surrounding task as "this file couldn't be read" — nothing about the picture, which is what actually went wrong.
