@@ -772,3 +772,32 @@ table, and stay open on the table height below.
 rows in sequence. Both documents are right — every line is on the PDF's baseline — so
 `_rows()` is grouping bands differently from the model's own order. Repair the question,
 not the document.
+
+## TRIED and REVERTED 7 Nov — every column gets the room its own text needs
+
+**Aimed at:** the wrap class, where a cell's text is exactly as wide as its column and the
+substituted face is wider — 343's Pieces "12" becomes "1" and "2", 365's "2 tbsp" becomes
+"2" and "tbsp", 370's "Provident fund (employer contribution)" wraps, and it is the same
+cause as 314's "8,39,69,60".
+
+**The change.** The last-column rule was generalised to every column: a column whose text
+reaches its drawn right edge is widened to hold that text, taking the room from the slack
+to the right of the table and stopping when the slack is gone.
+
+**Measured over all 208 documents, against the code as it stood before the try:**
+G2 clean, but **14 documents worse on G5 and 1 better** — 362_price_list_dense 29.5 % to
+3.9 %, 42_table_coloured_header_alternating_rows 47.5 % to 23.0 %, 73_marksheet 54.7 % to
+31.2 %, 80_gstin 34.2 % to 19.2 %, 300_prescription 34.0 % to 22.0 %, 56_table_indented
+47.1 % to 35.3 %, 35_four_typefaces 57.7 % to 46.2 %, 326_itr 70.3 % to 59.5 %,
+72_bank_statement 33.8 % to 23.8 %, 79_inr_grouping 38.3 % to 34.0 %,
+75_merged_header 9.8 % to 7.8 %, 314 17.7 % to 16.5 %. Only 343 improved, 66.7 % to 69.2 %.
+77_arabic_rtl_document did go from four sheets to two, which is a real gain, but it does
+not buy the rest.
+
+**Why.** Widening an inner column moves every rule after it and re-derives the insets of
+the cells to its right, so a table that was on the page's own column edges no longer is.
+The last-column case never had that problem because nothing follows it.
+
+**Reverted, baseline untouched. Tries: 1 of 3.** The next attempt should keep each
+column's drawn edge and give the text room without moving the rules — a negative right
+inset or a wider cell that overhangs its neighbour — rather than widening the column.
