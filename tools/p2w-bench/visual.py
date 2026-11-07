@@ -442,6 +442,22 @@ def check(pdf_path, docx_path, workdir):
     }
 
 
+
+# The eight questions, in the order they are asked. This list went missing on 7 Nov when
+# an edit replaced q8 and everything after it, and nothing noticed: the file parsed, and
+# every document reported "check failed: name 'QUESTIONS' is not defined". tools/smoke.py
+# now runs the tools instead of only parsing them.
+QUESTIONS = [
+    ("reading order", lambda r, g: q1_reading_order(r, g)),
+    ("overlap", lambda r, g: q2_overlap(g)),
+    ("inside page", lambda r, g: q3_inside(r, g)),
+    ("images", lambda r, g: q4_images(r, g)),
+    ("tables", lambda r, g: q5_tables(r, g)),
+    ("charts", lambda r, g: q6_charts(r, g)),
+    ("codes", lambda r, g: q7_codes(r, g)),
+    ("emphasis", lambda r, g: q8_emphasis(r, g)),
+]
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--corpus", required=True)
