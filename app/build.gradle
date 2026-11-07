@@ -19,8 +19,8 @@ android {
         // them changes nothing that is displayed and takes roughly a megabyte off the APK.
         // If a translation is ever added, its folder has to be added here too.
         resConfigs "en"
-        versionCode 289
-        versionName "3.52.2"
+        versionCode 290
+        versionName "3.53.0"
 
         ndk {
             // Real phones are ARM. The x86/x86_64 slices only exist for emulators
