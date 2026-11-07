@@ -154,34 +154,58 @@ def q1_reading_order(ref, got):
     return "no", "only %.1f %% of %d rows in the same sequence" % (share * 100, len(a))
 
 
-def q2_overlap(got):
-    boxes = [l["bbox"] for l in got["lines"]]
-    hits = 0
-    for i in range(len(boxes)):
-        x0, y0, x1, y1 = boxes[i]
-        for j in range(i + 1, len(boxes)):
-            a0, b0, a1, b1 = boxes[j]
-            if x0 < a1 and a0 < x1 and y0 < b1 and b0 < y1:
-                ox = min(x1, a1) - max(x0, a0)
-                oy = min(y1, b1) - max(y0, b0)
-                # touching boxes share an edge; real overlap has area
-                if ox > 1.0 and oy > 1.0:
-                    hits += 1
-    if hits == 0:
-        return "yes", ""
-    return "no", "%d overlapping line pairs" % hits
+def q2_overlap(ref, got):
+    """Does the docx overlap text the PDF keeps apart?
+
+    Compared against the PDF, not against zero. A stamp drawn over a line is a real
+    overlap in the PDF, and a docx that reproduces the page faithfully has it too; the
+    old test counted every overlap in the docx and reported the document broken for
+    copying the page correctly. What matters is overlaps the PDF does not have.
+    """
+    def pairs(lines):
+        boxes = [l["bbox"] for l in lines]
+        n = 0
+        for i in range(len(boxes)):
+            x0, y0, x1, y1 = boxes[i]
+            for j in range(i + 1, len(boxes)):
+                a0, b0, a1, b1 = boxes[j]
+                if x0 < a1 and a0 < x1 and y0 < b1 and b0 < y1:
+                    ox = min(x1, a1) - max(x0, a0)
+                    oy = min(y1, b1) - max(y0, b0)
+                    # touching boxes share an edge; real overlap has area
+                    if ox > 1.0 and oy > 1.0:
+                        n += 1
+        return n
+
+    ref_hits = pairs(ref["lines"])
+    got_hits = pairs(got["lines"])
+    if got_hits <= ref_hits:
+        return "yes", "%d overlapping pairs, the PDF has %d" % (got_hits, ref_hits)
+    return "no", "%d overlapping pairs where the PDF has %d" % (got_hits, ref_hits)
 
 
 def q3_inside(ref, got):
-    w, h = got["rect"].width, got["rect"].height
-    out = 0
-    for l in got["lines"]:
-        x0, y0, x1, y1 = l["bbox"]
-        if x0 < -2 or y0 < -2 or x1 > w + 2 or y1 > h + 2:
-            out += 1
-    if out == 0:
-        return "yes", ""
-    return "no", "%d lines outside the page" % out
+    """Does the docx push text off the page that the PDF keeps on it?
+
+    Compared against the PDF. Some pages legitimately draw text past the edge - a
+    bleed tab, a wide table - and a docx that reproduces it is not at fault. The old test
+    counted every line outside the docx page and called the document broken for matching
+    the page it was given.
+    """
+    def outside(lines, rect):
+        w, h = rect.width, rect.height
+        n = 0
+        for l in lines:
+            x0, y0, x1, y1 = l["bbox"]
+            if x0 < -2 or y0 < -2 or x1 > w + 2 or y1 > h + 2:
+                n += 1
+        return n
+
+    ref_out = outside(ref["lines"], ref["rect"])
+    got_out = outside(got["lines"], got["rect"])
+    if got_out <= ref_out:
+        return "yes", "%d lines outside the page, the PDF has %d" % (got_out, ref_out)
+    return "no", "%d lines outside the page where the PDF has %d" % (got_out, ref_out)
 
 
 def q4_images(ref, got):
@@ -482,7 +506,7 @@ def check(pdf_path, docx_path, workdir):
 # now runs the tools instead of only parsing them.
 QUESTIONS = [
     ("reading order", lambda r, g: q1_reading_order(r, g)),
-    ("overlap", lambda r, g: q2_overlap(g)),
+    ("overlap", lambda r, g: q2_overlap(r, g)),
     ("inside page", lambda r, g: q3_inside(r, g)),
     ("images", lambda r, g: q4_images(r, g)),
     ("tables", lambda r, g: q5_tables(r, g)),

@@ -310,6 +310,26 @@ and then by x within a row, which is what `visual.py`'s `_rows()` already comput
 **Tries: 0 of 3.**
 
 
+
+### Correction, 7 Nov — the note below was wrong and is withdrawn
+
+I wrote the note below after reading the PDF's lines sorted by raw y, and concluded that
+88.5 % on 303_discharge_summary was a false alarm because the PDF's own order put the
+patient's name last. That was wrong: `_rows()` does not sort by raw y. It groups lines
+into bands and sorts left to right inside a band, so the PDF's rows are already:
+
+    row 1  'PATIENT'  'WARD / BED'  'CONSULTANT'
+    row 2  'ANANYA RAO, 34/F'  'Medical ICU-2 / 07'  'Dr. Meera Krishnan'
+
+which is the correct reading order, with the patient's name where it belongs. So the
+88.5 % is a real finding: the docx's row order genuinely differs from a reading order the
+PDF already has. It is not ambiguous and it is not a false alarm.
+
+The lesson is the one this whole check is about: a finding is verified against the code
+that produced it, not against a hand re-derivation that skips that code.
+
+The note below is kept only so the mistake is on the record.
+
 ### A note added 7 Nov, after checking the findings against the PDF
 
 The reading-order question compares the docx's row sequence with the PDF's. On a form
