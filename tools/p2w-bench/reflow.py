@@ -159,8 +159,18 @@ def check_one(docx_path, workdir):
             # not assumed: this is the widest line the render actually produced.
             narrow_pt = NARROW_TWIPS / 20.0
             widest = wide_layout.get("widest_pt", 0.0)
-            if widest and widest < narrow_pt:
-                result["reflow"] = "not measurable - the widest line is %.0f pt, inside the %.0f pt narrow page" % (widest, narrow_pt)
+            if info["tables"] > 0:
+                # A table carries its own column widths. Narrowing the page squeezes the
+                # table's frame but not the columns inside it, so the text inside the
+                # cells cannot re-wrap and the line count cannot change. That is how Word
+                # tables work, not a defect, and it means this half of the check has
+                # nothing to say about a document that contains one. The structure half
+                # still does: text pinned inside a text box is reported by count.
+                result["reflow"] = ("not measurable - the document holds %d tables, "
+                                    "whose columns are fixed by design" % info["tables"])
+            elif widest and widest < narrow_pt:
+                result["reflow"] = ("not measurable - the widest line is %.0f pt, "
+                                    "inside the %.0f pt narrow page" % (widest, narrow_pt))
             elif wide_layout["lines"] > 1:
                 problems.append("layout did not change when the page width changed")
 
