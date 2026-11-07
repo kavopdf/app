@@ -312,3 +312,99 @@ not ellipses (330's north arrow, 331's pump triangles and gate-valve bowties) st
 bounding box and need `a:custGeom`, not a preset; 335's GHS pictograms are red-stroked rectangles
 rather than ellipses and were not touched; 330's hatch is ~30 diagonal one-line strokes and is
 dropped rather than drawn.
+
+## BATCH 4 — documents 372-394 (13 documents)
+
+**Visual result, after the measurement fixes below: 12 of 13 pass all eight questions.**
+`373_leave_application_form` fails: the page draws "Employee signature | Manager signature |
+HR use" as one row and the .docx has it as two paragraphs 3 pt apart (see REMAINING-DEFECTS).
+
+| Doc | Pages | G5 lines within tolerance | Visual | Verdict |
+|---|---|---|---|---|
+| 372_timesheet_grid | 1/1 | 20/68 · 29.4 % | pass | grid holds, rows drift |
+| 373_leave_application_form | 1/1 | 3/32 · 9.4 % | **fail** | row split, reflow fail |
+| 374_org_chart | 1/1 | 1/22 · 4.5 % | pass | labels land on their boxes |
+| 375_attendance_register | 1/1 | 2/459 · 0.4 % | pass | rows taller than the page's |
+| 380_runbook_terminal_output | 1/1 | 5/20 · 25.0 % | pass | monospace block |
+| 381_incident_report_timeline | 1/1 | 26/65 · 40.0 % | pass | |
+| 382_architecture_diagram | 1/1 | 1/29 · 3.4 % | pass | labels 77 pt high, see below |
+| 383_api_docs_page | 1/1 | 25/58 · 43.1 % | pass | |
+| 390_wide_data_appendix | 1/1 | 233/403 · 57.8 % | pass | best in the batch |
+| 391_survey_questionnaire_grid | 1/1 | 0/16 · 0.0 % | pass | |
+| 392_statistical_console_output | 1/1 | 1/21 · 4.8 % | pass | |
+| 393_spectrum_peak_table | 1/1 | 1/23 · 4.3 % | pass | table 141.6 pt high, see below |
+| 394_map_with_legend | 1/1 | 0/15 · 0.0 % | pass | legend 227.1 pt high, see below |
+
+Corpus-wide G5 for the batch: **25.8 % of lines within tolerance**. Every page is one page in and
+one page out, so the page count is right throughout; it is the y that is not.
+
+### What changed this pass
+
+**The gap ceiling went from 72 pt to 120 pt** (`DocxWriter.GAP_CAP_TW`). A gap between two lines
+is a measurement and the writer was discarding every part of it above 72 pt. On
+393_spectrum_peak_table the table under the chart was 141.6 pt too high, on 394_map_with_legend
+the legend 227.1 pt, on 382_architecture_diagram the first label 77 pt. Both of the first two now
+hold their rows in order; 382 still loses 77 pt because its first gap is 212 pt.
+
+Why 120 and not unlimited: 373_leave_application_form's footer sits 422 pt below the signature
+row, and leaving that gap open pushed the footer onto a second page — a document that was one page
+became two. The tables above it are the reason: their rows are `w:trHeight hRule="atLeast"` and a
+cell that wraps grows the row, so the model under-measures a table's height and the flow's own
+accounting is short by that much. 120 pt is the largest ceiling that kept every document on its
+own page across the whole corpus.
+
+**Three measurement bugs in `visual.py`**, all of which had been reporting defects that were not
+there:
+
+- Question 1 compared line *i* of the PDF with line *i* of the render. Rule 3 of the brief
+  forbids index pairing, and it charged a row for every field: a page whose three labels share
+  one baseline becomes one Word paragraph with a tab stop at each, so the two extra "missing"
+  lines shifted every line after them. 382 scored 14 % that way. Rows are now grouped by
+  baseline and compared by their text: 382 scores 67 % for its real 77 pt drift, and 374 goes
+  from 55 % to a pass.
+- A line's box top is the font's ascender, so two fields on one baseline set in different faces
+  reported tops 3 pt apart and split "TRANSPORT" off its own row. Grouping is now on the
+  baseline.
+- A soft hyphen or zero-width joiner comes out of a PDF as U+0000. It was kept on one side and
+  not the other, which charged 391_survey_questionnaire_grid for two words that are present in
+  both. Control characters are now a space, not deleted — deleting them welds "strongly" to
+  "agree".
+
+Question 7 answered `unsure` on every page because pyzbar needs a system libzbar this image does
+not carry. It now falls back to OpenCV's QR and barcode decoders, so a page with a code is
+answered instead of reported.
+
+### Tried and measured, not shipped
+
+**Anchoring every flowed line to its own measured y.** Instead of one pitch below the line before
+it, each paragraph would be placed at the y the page drew it at, which is what the drift above
+really needs: shapes take no room in the flow, so text under a chart closes the gap the chart left.
+Measured on the whole corpus and the batch:
+
+| Measure | Result |
+|---|---|
+| documents worse on G2 counts | **0** |
+| 380_runbook_terminal_output, G5 | 25.0 % -> **100.0 %** |
+| 394_map_with_legend | 0.0 % -> **93.3 %** |
+| 392_statistical_console_output | 4.8 % -> **95.2 %** |
+| 382_architecture_diagram | 3.4 % -> **72.4 %** |
+| 390_wide_data_appendix | 57.8 % -> **0.5 %** |
+| 373 and 390 page count | 1 -> **2** |
+| batch G5 | 25.8 % -> 11.9 % |
+
+Reverted. The cause of the harm is the same under-measured table height: where a table has been
+through the page, the flow's own height is a guess, so a target y adds the error a second time.
+A hybrid (anchor only while no table has been through the page) was also measured: 11.6 %, 390
+still 0.5 %, and it left 374 at 54.5 % instead of 100 %. The table height has to be right before
+this can work; it is recorded in REMAINING-DEFECTS.md with these numbers.
+
+### Gates
+
+| Gate | Result |
+|---|---|
+| G1 build | `javac` clean |
+| G2 regression, all 208 | **no document got worse** |
+| G3 structure, batch 4 | 12 pass, 1 fail (373 — pre-existing, fails identically on the old build) |
+| G4 txt isolation | **identical: 18, different: 0** |
+| G5 position, batch 4 | 25.8 % of lines within tolerance — open, see REMAINING-DEFECTS |
+| G6 visual, batch 4 | **12 of 13 documents pass all eight questions** |

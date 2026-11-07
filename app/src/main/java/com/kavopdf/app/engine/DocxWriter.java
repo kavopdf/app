@@ -69,6 +69,22 @@ public final class DocxWriter {
     /** Line box height as a multiple of the font size. Generous: a tight exact height clips. */
     private static final float LINE_FACTOR = 1.15f;
 
+    /**
+     * Ceiling on the vertical gap one paragraph may ask for, in twips (120 pt).
+     *
+     * <p>A gap is a measurement - the distance between two baselines the page drew - and must
+     * be kept, because a diagram's boxes stand 90 pt apart and clamping that to 72 pt walks
+     * every label on the page upwards. On 393_spectrum_peak_table and 394_map_with_legend that
+     * put the table and the legend 141.6 pt and 227.1 pt above where the page drew them, and
+     * both now hold their rows. The ceiling is not a layout rule: it is there because a
+     * malformed PDF can report a y of 100000 pt, and because a gap larger than this on a real
+     * page is the page's own white space, which the flow cannot spend without overflowing the
+     * sheet (373_leave_application_form's footer sits 422 pt below the signature row and
+     * leaving that gap open pushed the footer onto a second page, whose tables the model
+     * under-measures by the same amount).
+     */
+    private static final int GAP_CAP_TW = 2400;
+
     private DocxWriter() {
     }
 
@@ -677,7 +693,7 @@ public final class DocxWriter {
             float pitch = first.y - ctx.lastBaseline;
             float prevLine = Math.max(4f, ctx.lastSize * LINE_FACTOR);
             float extra = pitch - prevLine;
-            if (extra > 0f) beforeTw = (int) Math.min(1440L, Math.round(extra * TWIPS_PER_PT));
+            if (extra > 0f) beforeTw = (int) Math.min(GAP_CAP_TW, Math.round(extra * TWIPS_PER_PT));
         }
         ctx.lastBaseline = first.y;
         ctx.lastSize = size;
@@ -803,7 +819,7 @@ public final class DocxWriter {
             float pitch = b.y - ctx.lastBaseline;
             float prevLine = Math.max(4f, ctx.lastSize * LINE_FACTOR);
             float extra = pitch - prevLine;
-            if (extra > 0f) beforeTw = (int) Math.min(1440L, Math.round(extra * TWIPS_PER_PT));
+            if (extra > 0f) beforeTw = (int) Math.min(GAP_CAP_TW, Math.round(extra * TWIPS_PER_PT));
         }
         ctx.lastBaseline = b.y;
         ctx.lastSize = b.size;

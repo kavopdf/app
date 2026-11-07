@@ -41,6 +41,21 @@ Work through this only after the other corpora are processed.
 
 ---
 
+## v3 corpus — batch 4 (372-394), found this pass
+
+| Doc | Problem | Tries |
+|---|---|---|
+| **393_spectrum_peak_table, 394_map_with_legend, 382_architecture_diagram** | Text drawn under a drawing lands too high: the table under 393's chart by 141.6 pt, 394's legend by 227.1 pt, 382's first label by 77 pt. A chart, a map's roads and a diagram's boxes are anchored shapes — they draw where the page drew them and take **no room in the flow** — so the text beneath them closes the gap they left. The gap ceiling is now 120 pt instead of 72 pt, which fixed 393 and 394's row order; 382's first gap is 212 pt and is still lost. | 1 of 3 — see the anchor attempt below |
+| **The flow-anchor attempt (all three, above)** | Placing every flowed line at its own measured y instead of one pitch below the line before it. Measured over 208 documents: **0 documents worse on G2**, and 380 goes to 100 % of lines in tolerance, 394 to 93.3 %, 392 to 95.2 %, 382 to 72.4 %. But 390_wide_data_appendix fell from 57.8 % to 0.5 % and 373 and 390 both went from one page to two, because a table's real height exceeds the model's, so a target y adds that error a second time. A hybrid (anchor only until a table has been through the page) gave 11.6 % and left 390 at 0.5 %. **Blocked on the table height below** — not on the idea. | 2 of 3 used |
+| **Table height (the blocker above)** | Rows are emitted `w:trHeight hRule="atLeast"`, so a cell whose text wraps grows the row and the table is taller than `t.bottom - t.top`. On 373 two tables are short by ~186 pt in the flow's accounting; on 375 (459 lines, all in one table) only 0.4 % of lines land within tolerance, on 390 57.8 %. Until the model's table height matches the render's, no absolute-y placement can be trusted after a table. | 0 of 3 |
+| **373_leave_application_form** | The page draws "Employee signature \| Manager signature \| HR use" as ONE row; the .docx has it as two paragraphs 3 pt apart, because the model splits the line into two paragraphs at the wide x gap and Word cannot put two paragraphs on one line. Merging them in the writer would be the fix, but it lowers the leaf-paragraph count that G2 reads as "lines", which the gate defines as a regression. Also fails G3 reflow (fails identically on the pre-change build — pre-existing, not caused here). | 1 of 3 |
+| **375_attendance_register, 390_wide_data_appendix** | Row pitch: a 13-19 row table is taller in the render than on the page, so every row after the first drifts. Same root as the table height entry above. | 0 of 3 |
+
+Fixed this pass and no longer open: 393 and 394's reading order (the 120 pt gap ceiling), and the
+three `visual.py` measurement bugs that had been reporting defects that were not there — line-index
+pairing in question 1, box-top instead of baseline for grouping a row, and U+0000 from a soft hyphen
+kept on one side of the comparison only.
+
 ## A. Multi-column pages still overflow to a second sheet — 3 documents
 
 Fixed this pass: 63, 67, 78, 80 and 55 now render 1 page against 1 (they were 2). Sections now carry

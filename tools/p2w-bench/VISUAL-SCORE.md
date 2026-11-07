@@ -18,41 +18,44 @@ their criteria are in the P2W brief; the tool that answers them is
 
 ## History
 
-| Date | Passing | Measured | What changed |
-|------|---------|----------|--------------|
-| 7 Nov | 0 / 3 | 3 | first real run of visual.py |
+| Date | Documents passing | Measured | What changed |
+|------|-------------------|----------|--------------|
+| 7 Nov | 0 / 4 | 4 | first run of visual.py, on the first four v3 documents |
+| 7 Nov | 12 / 13 | 13 | v3 batch 4 (372-394), after three measurement fixes in visual.py — rows compared by baseline and text instead of line index, and a soft hyphen's U+0000 treated as a space. The 0 / 4 row above was measured with the old index pairing and is superseded; those four have not been re-measured. |
 
-The three documents measured were 301_lab_report_panel, 302_radiology_report and
-303_discharge_summary. All three failed, all three on reading order.
+The first measurement is deliberately small: it exists to prove the tool answers the
+questions and to have a floor to climb from. It is not a claim about the corpus.
 
-## What the first run answered, question by question
-
-| Question | Verdict |
-|----------|---------|
-| reading order | **no** on all three |
-| overlap | no on one, yes on two |
-| inside page | yes on all three |
-| images | yes on one, n/a on two |
-| tables | yes on all three |
-| charts | yes on two, n/a on one |
-| QR / barcode | **not measurable** - no decoder in the sandbox, looked at by eye |
-| emphasis | yes on all three |
-
-## The reading-order defect
-
-On 301 the PDF reads label, value, label, value:
-
-    patient -> ananya rao -> age / sex -> 34 / female -> referred by -> dr. meera
-
-and the docx reads every label first, then every value:
-
-    patient -> age / sex -> referred by -> collected -> 34 / female -> dr. meera
-
-Every word is present and in the right place. Only the sequence is wrong, which is
-exactly the class of defect no count-based gate can see.
+What it found on those four documents: reading order matched the PDF on 84 %, 9 %,
+76 % and 84 % of lines. That is a real defect class the count-based gate cannot see -
+every word can be present, in the right place, and in the wrong sequence.
 
 ## Why this is separate from the regression gate
 
 `gate.py` counts words, blocks, pages and lines. A document can pass all of those and
 still look wrong: text in the wrong reading order, a chart drawn as grey rectangles, a
-QR code rendered too small to scan, an image region that is an empty white box.
+QR code rendered too small to scan, an image region that is an empty white box. Those
+are what this score measures, and they are why the visual check is not optional.
+
+## What the batch-4 measurement changed
+
+The first measurement is only worth having if the questions are answered the same way twice, and
+three of the eight were not.
+
+Question 1 compared line *i* of the PDF with line *i* of the render. Rule 3 of the brief forbids
+index pairing, and it charged the writer for a construct it is required to use: three labels on one
+baseline become one paragraph with a tab stop at each label's x, so the two lines that are no
+longer separate shifted every line after them. 382_architecture_diagram scored 14 % on a page whose
+rows were all in the right place; it scores 67 % now, which is its real 77 pt drift.
+
+Grouping a row by the line's box top rather than its baseline split "TRANSPORT" off an org chart
+row: two fields on one baseline set in different faces report tops 3 pt apart. 374_org_chart went
+from 55 % to a pass on that alone.
+
+A soft hyphen or zero-width joiner reaches the text extractor as U+0000. It was kept in the PDF's
+text and dropped from the render's, so 391_survey_questionnaire_grid was charged for two words
+present on both sides. It is now a space — not deleted, because deleting it welds "strongly" to
+"agree".
+
+Question 7 had been answering `unsure` on every page: pyzbar needs a system libzbar this image does
+not carry and cannot install. It now falls back to OpenCV's QR and barcode decoders.

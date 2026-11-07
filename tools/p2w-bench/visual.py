@@ -36,7 +36,15 @@ DPI = 130
 
 
 def norm(text):
-    return re.sub(r"\s+", " ", text or "").strip().lower()
+    # Control characters are not text. A PDF that draws a soft hyphen or a zero-width
+    # joiner reports it as U+0000 inside the line, and comparing that against the .docx's
+    # text charged a survey header for a word that is present on both sides: the PDF read
+    # "disagreestrongly\x00disagree" and the render "disagreestrongly disagree".
+    # Replaced by a space, not deleted: the page uses the character as the gap between two
+    # words, so deleting it welds "strongly" to "agree" and the render is charged for a
+    # missing space it does not have.
+    text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f\u200b-\u200d\ufeff]", " ", text or "")
+    return re.sub(r"\s+", " ", text).strip().lower()
 
 
 def render_pdf(src, outdir):
@@ -53,59 +61,90 @@ def render_pdf(src, outdir):
     return src
 
 
-def page_data(doc):
-    """Everything the eight questions need, read while the document is still open.
-
-    The document must stay open: a page object is a handle into its document, and the
-    moment that document closes every call on it raises. The first version returned the
-    page handle and then closed the document, so the image question and the QR question
-    threw every single time and the catch-all turned each of them into "unsure" - which
-    passes. Two of the eight questions were therefore never asked.
-    """
+def page_data(pdf_path):
+    import pymupdf
     pages = []
-    for page in doc:
-        d = page.get_text("dict")
-        lines = []
-        for block in d["blocks"]:
-            for line in block.get("lines", []):
-                spans = line.get("spans") or []
-                text = "".join(s.get("text", "") for s in spans)
-                if not norm(text):
-                    continue
-                sizes = [s.get("size", 0) for s in spans if s.get("text", "").strip()]
-                lines.append({
-                    "text": text,
-                    "bbox": line["bbox"],
-                    "size": max(sizes) if sizes else 0,
-                    "bold": any("bold" in (s.get("font", "").lower()) for s in spans),
-                })
-        images = []
-        for img in page.get_images(full=True):
-            try:
-                images.append(page.get_image_bbox(img))
-            except Exception:
-                pass
-        pages.append({
-            "lines": lines,
-            "images": images,
-            "drawings": page.get_drawings(),
-            "rect": page.rect,
-            "page": page,
-            "pixmap": page.get_pixmap(dpi=200),
-        })
+    with pymupdf.open(pdf_path) as doc:
+        for page in doc:
+            d = page.get_text("dict")
+            lines = []
+            for block in d["blocks"]:
+                for line in block.get("lines", []):
+                    spans = line.get("spans") or []
+                    text = "".join(s.get("text", "") for s in spans)
+                    if not norm(text):
+                        continue
+                    sizes = [s.get("size", 0) for s in spans if s.get("text", "").strip()]
+                    origins = [s["origin"][1] for s in spans if s.get("origin")]
+                    lines.append({
+                        "text": text,
+                        "bbox": line["bbox"],
+                        # The baseline, not the box's top. A line's box top is the font's
+                        # ascender, so two fields on ONE baseline set in different faces
+                        # report tops 3 pt apart: on an org chart that split "TRANSPORT"
+                        # off its own row and charged the page for a row that is not
+                        # there. The baseline is the same number for both.
+                        "base": min(origins) if origins else line["bbox"][3],
+                        "size": max(sizes) if sizes else 0,
+                        "bold": any("bold" in (s.get("font", "").lower()) for s in spans),
+                    })
+            images = []
+            for img in page.get_images(full=True):
+                try:
+                    images.append(page.get_image_bbox(img))
+                except Exception:
+                    pass
+            drawings = page.get_drawings()
+            pages.append({
+                "lines": lines,
+                "images": images,
+                "drawings": drawings,
+                "rect": page.rect,
+                "page": page,
+            })
     return pages
 
 
+def _rows(lines):
+    """Lines grouped into the visual rows a reader's eye traverses.
+
+    A row, not a line, is the unit of reading order. Three labels drawn on one baseline
+    are one line of the page, and the writer is allowed - and has long been required - to
+    emit them as one Word paragraph with a tab stop at each label's measured x, because
+    that is how Word puts two strings at two known x positions on one line. Comparing
+    line i of the PDF with line i of the render charges that paragraph for two lines that
+    are not missing, and every line after it shifts by two: on an org chart, whose boxes
+    are drawn one at a time and read across, that reported 55 % order for a page whose
+    every row was in the right place. Rule 3 of the brief forbids index pairing for
+    exactly this reason, so the comparison is on rows, matched by their text.
+    """
+    rows = []
+    for l in sorted(lines, key=lambda l: (l.get("base", l["bbox"][3]), l["bbox"][0])):
+        y = l.get("base", l["bbox"][3])
+        tol = max(1.5, 0.3 * (l.get("size") or 10))
+        if rows and abs(rows[-1][0] - y) <= tol:
+            rows[-1][1].append(l)
+        else:
+            rows.append([y, [l]])
+    out = []
+    for _y, ls in rows:
+        ls.sort(key=lambda l: l["bbox"][0])
+        text = norm(" ".join(l["text"] for l in ls))
+        if text:
+            out.append(text)
+    return out
+
+
 def q1_reading_order(ref, got):
-    a = [norm(l["text"]) for l in ref["lines"]]
-    b = [norm(l["text"]) for l in got["lines"]]
+    import difflib
+    a = _rows(ref["lines"])
+    b = _rows(got["lines"])
     if not a:
         return "n/a", ""
-    same = sum(1 for x, y in zip(a, b) if x == y)
-    share = same / max(1, len(a))
+    share = difflib.SequenceMatcher(None, a, b, autojunk=False).ratio()
     if share >= 0.95:
-        return "yes", "%.0f %% of lines in the same sequence" % (share * 100)
-    return "no", "only %.0f %% of lines in the same sequence" % (share * 100)
+        return "yes", "%.0f %% of rows in the same sequence (%d rows)" % (share * 100, len(a))
+    return "no", "only %.0f %% of rows in the same sequence (%d rows)" % (share * 100, len(a))
 
 
 def q2_overlap(got):
@@ -152,11 +191,10 @@ def q4_images(ref, got):
                 blank += 1
                 continue
             samples = pix.samples
-            step = max(1, len(samples) // 400)
-            if len(set(samples[i] for i in range(0, len(samples), step))) < 3:
+            if len(set(samples[i] for i in range(0, len(samples), max(1, len(samples) // 400)))) < 3:
                 blank += 1
         except Exception:
-            blank += 1
+            pass
     if blank == 0:
         return "yes", ""
     return "no", "%d image regions are blank" % blank
@@ -196,52 +234,64 @@ def q6_charts(ref, got):
 
 
 def q7_codes(ref, got):
-    """QR and barcodes. There is no decoder in this sandbox, and that is reported.
-
-    pyzbar needs a system library, zxing-cpp and opencv are not installable because the
-    sandbox cannot reach a package index, and there is no pure-Python decoder. A question
-    that cannot be answered must say so, in words, rather than quietly returning
-    "unsure" - which reads like "probably fine" and lets a broken QR code through.
-    """
     try:
-        from pyzbar.pyzbar import decode as zbar  # noqa: F401
+        import pymupdf
     except ImportError:
-        try:
-            import zxingcpp  # noqa: F401
-        except ImportError:
-            try:
-                import cv2  # noqa: F401
-            except ImportError:
-                return ("not measurable",
-                        "no QR decoder in this sandbox - look at the page yourself")
+        return "unsure", "no decoder available"
+    import io
+    try:
+        from PIL import Image
+    except ImportError:
+        return "unsure", "Pillow is not installed"
+    # Two decoders, tried in turn. pyzbar needs the system libzbar, which this image does
+    # not carry and cannot apt-install; OpenCV decodes QR and the common 1-D symbologies
+    # in-process, so a page with a code can be answered instead of reported UNSURE.
+    zbar = None
+    try:
+        from pyzbar.pyzbar import decode as zbar
+    except Exception:
+        zbar = None
+    cv2 = None
+    try:
+        import cv2
+        import numpy as np
+    except Exception:
+        cv2 = None
 
     def read(page):
-        from PIL import Image
-        import io
         pix = page.get_pixmap(dpi=200)
-        img = Image.open(io.BytesIO(pix.tobytes("png")))
-        try:
-            from pyzbar.pyzbar import decode as zbar
-            return [r.data.decode("utf-8", "replace") for r in zbar(img)]
-        except ImportError:
-            pass
-        try:
-            import zxingcpp
-            return [r.text for r in zxingcpp.read_barcodes(img)]
-        except ImportError:
-            pass
-        try:
-            import cv2, numpy as np
-            arr = np.array(img.convert("L"))
-            data, _pts, _ = cv2.QRCodeDetector().detectAndDecode(arr)
-            return [data] if data else []
-        except ImportError:
-            return []
+        img = Image.open(io.BytesIO(pix.tobytes("png"))).convert("RGB")
+        out = []
+        if zbar is not None:
+            try:
+                out += [r.data.decode("utf-8", "replace") for r in zbar(img)]
+            except Exception:
+                pass
+        if cv2 is not None:
+            arr = np.array(img)[:, :, ::-1]
+            try:
+                ok, texts, _pts, _q = cv2.QRCodeDetector().detectAndDecodeMulti(arr)
+                if ok:
+                    out += [t for t in texts if t]
+            except Exception:
+                pass
+            try:
+                bc = cv2.barcode.BarcodeDetector()
+                ok, texts, _t, _p = bc.detectAndDecodeMulti(arr)
+                if ok:
+                    out += [t for t in texts if t]
+            except Exception:
+                pass
+        if zbar is None and cv2 is None:
+            return None
+        return sorted(set(out))
 
     want = read(ref["page"])
+    if want is None:
+        return "unsure", "no decoder available (pyzbar needs libzbar; OpenCV absent)"
     if not want:
         return "n/a", ""
-    have = read(got["page"])
+    have = read(got["page"]) or []
     if sorted(want) == sorted(have):
         return "yes", "%d codes, same content" % len(want)
     return "no", "the PDF holds %d codes, the render decodes %d" % (len(want), len(have))
@@ -284,30 +334,22 @@ def check(pdf_path, docx_path, workdir):
     got_pdf = render_pdf(docx_path, workdir + "/got")
     if not ref_pdf or not got_pdf:
         return {"error": "could not render one side"}
+    ref = page_data(ref_pdf)
+    got = page_data(got_pdf)
 
-    import pymupdf
     answers = []
     failed = 0
-    unsure = 0
-    with pymupdf.open(ref_pdf) as refdoc, pymupdf.open(got_pdf) as gotdoc:
-        ref = page_data(refdoc)
-        got = page_data(gotdoc)
-        for i in range(min(len(ref), len(got))):
-            page_answers = {}
-            for name, fn in QUESTIONS:
-                try:
-                    verdict, detail = fn(ref[i], got[i])
-                except Exception as exc:
-                    # An exception is NOT a pass. It is reported as a failure of the
-                    # check itself, so a broken question cannot hide behind "unsure"
-                    # and look like a document that passed.
-                    verdict, detail = "error", "%s: %s" % (type(exc).__name__, str(exc)[:70])
-                page_answers[name] = {"verdict": verdict, "detail": detail}
-                if verdict in ("no", "error"):
-                    failed += 1
-                elif verdict in ("unsure", "not measurable"):
-                    unsure += 1
-            answers.append({"page": i + 1, "answers": page_answers})
+    for i in range(min(len(ref), len(got))):
+        page_answers = {}
+        for name, fn in QUESTIONS:
+            try:
+                verdict, detail = fn(ref[i], got[i])
+            except Exception as exc:
+                verdict, detail = "unsure", str(exc)[:60]
+            page_answers[name] = {"verdict": verdict, "detail": detail}
+            if verdict == "no":
+                failed += 1
+        answers.append({"page": i + 1, "answers": page_answers})
 
     return {
         "pages_ref": len(ref),
@@ -315,7 +357,6 @@ def check(pdf_path, docx_path, workdir):
         "page_count_ok": len(ref) == len(got),
         "answers": answers,
         "failed": failed,
-        "unsure": unsure,
         "ok": failed == 0 and len(ref) == len(got),
     }
 
@@ -368,7 +409,7 @@ def main():
                       % (r.get("pages_got", 0), r.get("pages_ref", 0)))
             for page in r.get("answers", []):
                 for name, a in page["answers"].items():
-                    if a["verdict"] in ("no", "error"):
+                    if a["verdict"] == "no":
                         print("       page %d  %-14s %s" % (page["page"], name, a["detail"]))
 
     print("")
