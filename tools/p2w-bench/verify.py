@@ -81,21 +81,21 @@ def lines_of(page):
     return out
 
 
-def check_measure(claim, ref, got):
+def check_measure(claim, ref, got, ref_lines, got_lines, ref_doc, got_doc):
     """Re-derive a number the tools produced, without using the tool."""
     c = claim.split(":", 1)[0].strip()
     if c == "order":
-        a, b = rows(ref), rows(got)
+        a, b = rows(ref_lines), rows(got_lines)
         import difflib
         share = difflib.SequenceMatcher(None, a, b, autojunk=False).ratio()
         return ("REFUTED" if share >= 1.0 else "VERIFIED",
                 "%d rows in the PDF, %d in the render, %.1f %% in sequence"
                 % (len(a), len(b), share * 100))
     if c == "pagecount":
-        if ref.page_count != got.page_count:
+        if ref_doc.page_count != got_doc.page_count:
             return "VERIFIED", "%d pages in the PDF, %d in the render" % (
-                ref.page_count, got.page_count)
-        return "REFUTED", "both have %d pages" % ref.page_count
+                ref_doc.page_count, got_doc.page_count)
+        return "REFUTED", "both have %d pages" % ref_doc.page_count
     if c == "shapes":
         def shapes(pg):
             n = 0
@@ -113,16 +113,35 @@ def check_measure(claim, ref, got):
 def check_visual(claim, ref_lines, got_lines, ref, got):
     """Go to the PDF and measure the specific thing the eye said it saw."""
     if claim.startswith("wraps:"):
+        # The claim names the START of a line. Matching the start on both sides proves
+        # nothing - the first fragment of a wrapped line starts the same way. What has to
+        # be compared is the WHOLE PDF line: does that exact text appear as one line in
+        # the render, or are its words spread over more than one?
         needle = claim.split(":", 1)[1].strip()
-        rl = [l for l in ref_lines if needle in l["text"]]
-        gl = [l for l in got_lines if needle in l["text"]]
+        rl = [l for l in ref_lines if l["text"].strip().startswith(needle)]
         if not rl:
-            return "UNVERIFIABLE", "the PDF has no line containing %r" % needle[:40]
-        if len(rl) == 1 and len(gl) > 1:
-            return "VERIFIED", "1 line in the PDF, %d in the render" % len(gl)
-        if len(rl) == len(gl):
-            return "REFUTED", "%d line(s) on both sides" % len(rl)
-        return "VERIFIED", "%d line(s) in the PDF, %d in the render" % (len(rl), len(gl))
+            rl = [l for l in ref_lines if needle in l["text"]]
+        if not rl:
+            return "UNVERIFIABLE", "the PDF has no line starting %r" % needle[:40]
+        whole = max(rl, key=lambda l: len(l["text"]))["text"].strip()
+        flat = " ".join(" ".join(l["text"].split()) for l in got_lines)
+        if " ".join(whole.split()) in flat:
+            return "REFUTED", "the PDF's whole line is on one render line too"
+        # count how many render lines the PDF line's words are spread over
+        words = whole.split()
+        spans = 0
+        i = 0
+        for l in got_lines:
+            t = " ".join(l["text"].split())
+            if not words:
+                break
+            if words[i] in t:
+                spans += 1
+                while i < len(words) and words[i] in t:
+                    i += 1
+        if spans > 1:
+            return "VERIFIED", "the PDF has this on one line; the render spreads it over %d" % spans
+        return "UNVERIFIABLE", "could not follow the line's words through the render"
 
     if claim.startswith("moved:"):
         needle = claim.split(":", 1)[1].strip()
@@ -168,6 +187,8 @@ def check_visual(claim, ref_lines, got_lines, ref, got):
         return ("REFUTED" if b <= a else "VERIFIED",
                 "%d overlapping pairs in the PDF, %d in the render" % (a, b))
 
+    if claim.split(":")[0].strip() == "pagecount":
+        return "UNVERIFIABLE", "pagecount is a measure finding, not a visual one"
     return "UNVERIFIABLE", "no visual check for '%s'" % claim[:40]
 
 
@@ -228,10 +249,11 @@ def main():
                     unverifiable += 1
                     continue
                 rp, gp = r[pi], g[pi]
+                rlines, glines = lines_of(rp), lines_of(gp)
                 if kind == "measure":
-                    verdict, why = check_measure(claim, rp, gp)
+                    verdict, why = check_measure(claim, rp, gp, rlines, glines, r, g)
                 else:
-                    verdict, why = check_visual(claim, lines_of(rp), lines_of(gp), rp, gp)
+                    verdict, why = check_visual(claim, rlines, glines, rp, gp)
         except Exception as exc:
             print("UNVERIFIABLE  %-4s %s p%s  %s (%s)"
                   % (fid, doc[:34], page, claim[:44], type(exc).__name__))
