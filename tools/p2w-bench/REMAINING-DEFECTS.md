@@ -177,3 +177,82 @@ Measured across all 208 documents: 0 worse on page count, words, images or table
 gaining drawn shapes; `.txt` byte-identical.
 
 
+---
+
+## OPEN - found by the position and visual gates, 7 Nov
+
+These two were invisible to every count-based gate. `gate.py` reported "no document
+got worse" on all 208 documents while both were present. They are the reason G5 and
+G6 exist.
+
+### D-01  Vertical drift: every line sits higher than the PDF drew it, and the error grows down the page
+
+**Severity: affects most documents. This is the biggest single defect in the corpus.**
+
+Measured on `303_discharge_summary`, PDF page 1 against the rendered docx:
+
+| Line | PDF y | DOCX y | Delta |
+|------|-------|--------|-------|
+| DISCHARGE SUMMARY | 12.12 | 8.60 | -3.52 |
+| Shriram Multispeciality Hospital | 27.30 | 22.90 | -4.40 |
+| PATIENT | 63.92 | 57.60 | -6.32 |
+| ANANYA RAO, 34/F | 73.78 | 68.10 | -5.68 |
+
+**Root cause, already located.** `DocxWriter.java:70` sets `LINE_FACTOR = 1.15` and
+line 669 writes `w:line = size * LINE_FACTOR` with `lineRule="exact"`. The page has
+zero margins (`pgMar top="0"`), so the first line starts at whatever the line box
+gives it.
+
+The PDF's own pitch on this document is 15.18 pt for 13 pt text - a ratio of **1.168**,
+not 1.15. The docx therefore sets each line 0.23 pt too short, and because
+`lineRule="exact"` stacks those short boxes, the error accumulates down the page:
+3.5 pt at the first line, 6.3 pt by the fourth paragraph.
+
+**The fix to try.** The model already carries the truth: `Para.lineY` holds each
+line's real y, and `Para.lineSize` its size. The pitch is therefore *measurable* per
+line pair and does not need a constant at all. Set `w:line` from the measured gap
+between this line and the previous one, falling back to `size * LINE_FACTOR` only when
+there is no previous line on the page.
+
+**Why this is not a one-line change.** `LINE_FACTOR` touches every document, so it
+must go through G2 across all 208 before anything is kept, and G5 must be re-measured
+afterwards to prove the drift actually fell. A previous attempt to move the constant
+"did nothing" - that is expected, because a constant cannot match a document whose
+pitch is 1.168 while another's is 1.20. It has to be measured, not tuned.
+
+**Tries: 0 of 3.**
+
+### D-02  Row grouping: cells from different rows merged onto one line
+
+**Severity: affects tables where row baselines differ by a few points.**
+
+Measured on `303_discharge_summary`, PDF page 1 against the rendered docx:
+
+    PDF   PATIENT    y=63.92  |  WARD / BED  y=64.68     <- two cells, one visual row
+          ANANYA RAO y=73.78  |  Medical ICU y=73.54     <- two cells, next row
+
+    DOCX  PATIENT    y=57.60  |  WARD / BED  y=57.60  |  CONSULTANT y=60.80
+          Medical ICU y=68.10                            <- ANANYA RAO is gone from here
+
+The PDF keeps the cells in two rows because their baselines differ by 0.76 pt. The
+docx put three cells on one row - the third cell's baseline is 2.9 pt away from the
+other two and was treated as the same row - and the value cell that should sit beside
+`ANANYA RAO` ended up somewhere else.
+
+**The fix to try.** The row tolerance in `buildTables` decides this, and it is
+currently wide enough to swallow a 2.9 pt difference. It should come from the table's
+own measured row pitch (the median gap between row baselines in that table), not from
+a constant, so a table set tight and a table set loose each get the tolerance they
+actually use.
+
+**Tries: 0 of 3.**
+
+### How to verify either fix
+
+    python3 tools/p2w-bench/gate.py --corpus DIR --out DIR --baseline tools/p2w-bench/base208.json --check
+    python3 tools/p2w-bench/position.py --corpus DIR --out DIR --verbose
+    python3 tools/p2w-bench/visual.py --corpus DIR --out DIR
+
+G2 must pass across all 208 first. Then G5's "lines within tolerance" must rise and
+G6's reading-order share must rise. A fix that passes G2 but does not move G5 or G6
+has not fixed either of these.
