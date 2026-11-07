@@ -54,12 +54,13 @@ def norm(text):
     return re.sub(r"\s+", " ", text or "").strip().lower()
 
 
-def pdf_lines(path):
-    """(text, x, y) for every line the PDF drew, in reading order."""
+def pdf_pages(path):
+    """Lines per page, so a page that moved is not compared with a page that did not."""
     import pymupdf
-    out = []
+    pages = []
     with pymupdf.open(path) as doc:
         for page in doc:
+            lines = []
             for block in page.get_text("dict")["blocks"]:
                 for line in block.get("lines", []):
                     spans = line.get("spans") or []
@@ -67,9 +68,9 @@ def pdf_lines(path):
                     if not norm(text):
                         continue
                     x0, y0, x1, y1 = line["bbox"]
-                    out.append((text, x0, (y0 + y1) / 2.0))
-    return out
-
+                    lines.append((text, x0, (y0 + y1) / 2.0))
+            pages.append(lines)
+    return pages
 
 def render(docx_path, workdir):
     outdir = os.path.join(workdir, "r")
@@ -89,47 +90,64 @@ def score_document(pdf_path, docx_path, workdir):
     if not rendered:
         return {"error": "could not render the docx"}
 
-    ref = pdf_lines(pdf_path)
-    got = pdf_lines(rendered)
-    if not ref:
+    ref_pages = pdf_pages(pdf_path)
+    got_pages = pdf_pages(rendered)
+    if not any(ref_pages):
         return {"error": "the PDF has no text"}
 
-    # text -> list of positions, so each docx line is consumed once
-    pool = {}
-    for text, x, y in got:
-        pool.setdefault(norm(text), []).append((x, y))
-
+    # A page that moved must not be compared with a page that did not: flattening both
+    # sides into one list reports a line on page 3 as hundreds of points away from the
+    # same line on page 1, which is a measurement artefact and not a defect. Pages are
+    # compared in order, and only as far as both sides have pages.
+    common = min(len(ref_pages), len(got_pages))
     within = 0
+    total = 0
     out_of = []
     unmatched = 0
-    for text, x, y in ref:
-        key = norm(text)
-        candidates = pool.get(key)
-        if not candidates:
-            unmatched += 1
-            out_of.append((text[:40], "no matching line", 0, 0))
-            continue
-        # take the candidate closest in y, which is the one this line really is
-        best_i, best_d = 0, None
-        for i, (cx, cy) in enumerate(candidates):
-            d = abs(cy - y)
-            if best_d is None or d < best_d:
-                best_i, best_d = i, d
-        cx, cy = candidates.pop(best_i)
-        dx, dy = cx - x, cy - y
-        if abs(dx) <= TOL_X_PT and abs(dy) <= TOL_Y_PT:
-            within += 1
-        else:
-            out_of.append((text[:40], "%.1f,%.1f" % (dx, dy), dx, dy))
+    for pi in range(common):
+        ref = ref_pages[pi]
+        got = got_pages[pi]
+        pool = {}
+        for text, x, y in got:
+            pool.setdefault(norm(text), []).append((x, y))
+        for text, x, y in ref:
+            total += 1
+            key = norm(text)
+            candidates = pool.get(key)
+            if not candidates:
+                unmatched += 1
+                out_of.append((text[:40], "no matching line", 0, 0))
+                continue
+            best_i, best_d = 0, None
+            for i, (cx, cy) in enumerate(candidates):
+                d = abs(cy - y)
+                if best_d is None or d < best_d:
+                    best_i, best_d = i, d
+            cx, cy = candidates.pop(best_i)
+            dx, dy = cx - x, cy - y
+            if abs(dx) <= TOL_X_PT and abs(dy) <= TOL_Y_PT:
+                within += 1
+            else:
+                out_of.append((text[:40], "%.1f,%.1f" % (dx, dy), dx, dy))
 
-    total = len(ref)
+    # Lines on a page the render does not have are lost, not unmeasured.
+    for pi in range(common, len(ref_pages)):
+        for text, x, y in ref_pages[pi]:
+            total += 1
+            unmatched += 1
+            out_of.append((text[:40], "page missing in the render", 0, 0))
+
     return {
         "lines": total,
         "within": within,
         "unmatched": unmatched,
+        "pages_ref": len(ref_pages),
+        "pages_got": len(got_pages),
+        "page_count_ok": len(ref_pages) == len(got_pages),
         "share": within / total if total else 0.0,
         "worst": sorted(out_of, key=lambda r: -(abs(r[2]) + abs(r[3])))[:5],
-        "ok": (within / total if total else 0.0) >= PASS_SHARE,
+        "ok": (within / total if total else 0.0) >= PASS_SHARE
+              and len(ref_pages) == len(got_pages),
     }
 
 
@@ -185,6 +203,9 @@ def main():
                       (r["doc"][:44], r["share"] * 100, r["lines"]))
         else:
             print("FAIL %-44s %s" % (r["doc"][:44], r.get("error", "")))
+            if not r.get("page_count_ok", True):
+                print("       %d pages in the render against the PDF's %d"
+                      % (r.get("pages_got", 0), r.get("pages_ref", 0)))
             if "share" in r:
                 print("       %.1f %% of %d lines within tolerance" %
                       (r["share"] * 100, r["lines"]))
