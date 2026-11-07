@@ -151,8 +151,13 @@ def render(docx_path, workdir):
     return pdf if os.path.exists(pdf) else None
 
 
-def score_document(pdf_path, docx_path, workdir):
-    rendered = render(docx_path, workdir)
+def score_document(pdf_path, docx_path, workdir, rendered=None):
+    # A caller that has already rendered the whole folder passes the pdf in.
+    # LibreOffice takes about a second and a half to start, and starting it
+    # once per document is most of the cost of a corpus run: one invocation
+    # over two hundred files is minutes faster than two hundred invocations.
+    if rendered is None:
+        rendered = render(docx_path, workdir)
     if not rendered:
         return {"error": "could not render the docx"}
 
@@ -290,6 +295,8 @@ def main():
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--baseline", help="a previous --json result; any document whose "
                                        "score fell below its own entry is a regression")
+    ap.add_argument("--rendered", help="a folder holding already-rendered <name>.pdf "
+                                       "for each docx; skips the per-document render")
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args()
 
@@ -317,8 +324,13 @@ def main():
         if not os.path.isfile(docx):
             results.append({"doc": base, "ok": False, "error": "no docx"})
             continue
+        pre = None
+        if args.rendered:
+            cand = os.path.join(args.rendered, base + ".pdf")
+            if os.path.isfile(cand):
+                pre = cand
         try:
-            r = score_document(os.path.join(args.corpus, name), docx, workdir)
+            r = score_document(os.path.join(args.corpus, name), docx, workdir, pre)
         except Exception as exc:
             r = {"error": "check failed: " + str(exc)}
         r["doc"] = base
