@@ -75,3 +75,26 @@ v3 batch 1 (the first fifteen of the 75), re-processed from scratch under the
 eye-then-numbers order. 10 pass, 5 fail. Every finding above came back VERIFIED from
 verify.py against the PDF; the eye's first claims on 301 (two labels), 303 (the WARNING wrap)
 and 314 (both totals) were REFUTED and are recorded as corrected rather than fixed.
+
+v3 batch 2 (318-340), re-processed from scratch under the eye-then-numbers order: 23 pages
+looked at, 30 findings emitted, 20 verified, 10 refuted. 7 pass, 8 fail. Every FAIL names a
+claim verify.py held against the PDF. 326 passes on a named measurement bug: 74 lines on both
+sides, identical text, identical order, and question 1 still scores it 94.9 %.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-07 | 318_court_summons_form | FAIL | moved:Returnable within 30 days 337.6 pt up; the SERVICE checkbox glyphs leave their labels |
+| 2026-11-07 | 320_balance_sheet_statutory | PASS | profit-and-loss rows, note column, notes extract and both signature blocks on the PDF baselines |
+| 2026-11-07 | 321_auditors_report | PASS | headings, six numbered paragraphs and the auditor block wrap at the PDF line breaks |
+| 2026-11-07 | 322_mutual_fund_factsheet | FAIL | moved:EXPENSE RATIO 34.9 pt, moved:FUND MANAGER 54.5 pt, moved:RISKOMETER 71.3 pt |
+| 2026-11-07 | 323_credit_card_statement | FAIL | 42 shapes in the PDF against 17 in the render - 25 bars lost; reading order 63.5 % |
+| 2026-11-07 | 324_loan_amortisation_schedule | PASS | all 240 rows on seven pages keep month order, six columns and every figure |
+| 2026-11-07 | 325_demat_holdings_statement | FAIL | moved:This statement is generated electronically 306.5 pt up |
+| 2026-11-07 | 326_itr_computation | PASS | every line present in order; the 94.9 % is a row-band measurement bug, not a defect |
+| 2026-11-07 | 330_cad_drawing_sheet | FAIL | pagecount: 1 page in the PDF, 2 in the render |
+| 2026-11-07 | 331_pid_diagram | FAIL | reading order 93.3 % and the label sequence 50.0 % - diagram labels reorder around the shapes |
+| 2026-11-07 | 332_bom_on_drawing | FAIL | pagecount 1 in / 2 out; 15 shapes in the PDF against 0 in the render |
+| 2026-11-07 | 333_datasheet_spec_tables | PASS | three spec tables and the pin table keep every cell and row |
+| 2026-11-07 | 334_patent_document | FAIL | moved:16 19.5 pt down; reading order 89.7 % |
+| 2026-11-07 | 335_msds_safety_data_sheet | PASS | pictograms, eight numbered sections and the composition table on the PDF baselines |
+| 2026-11-07 | 340_bill_of_lading | PASS | every band, the item table, the signature row and the barcode on the PDF rows |

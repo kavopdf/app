@@ -88,8 +88,11 @@ def combine(record, visual_json, only="", verified_json=""):
             # The eye's FAIL counts only when a claim on that page was verified. An eye
             # finding that the verifier refuted is not a defect, and counting it would
             # make the eye look more reliable than it is.
-            vpages = {f.get("page") for f in verified.get(doc, [])
-                      if f.get("kind") == "visual"}
+            # Any verified finding on the page backs the eye, whatever its kind. Keeping
+            # only the "visual" ones dropped the eye's FAIL whenever the same defect had
+            # been recorded as a measure claim - pagecount is one - and the document then
+            # came out PASS with a verified 1-page-in/2-out defect behind it.
+            vpages = {f.get("page") for f in verified.get(doc, [])}
             eye_fail = [p for p in eye_fail if p["page"] in vpages]
             if eye_fail:
                 pending = []

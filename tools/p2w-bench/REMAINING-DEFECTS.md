@@ -605,3 +605,49 @@ which is the point of the step.
   render".** The seal is rotated text drawn one character per baseline, so the PDF's own rows
   are single characters; the 205 shapes are the QR module squares, which the render carries as
   one image. Both are the known rotated-stamp and image-as-image limits, not defects.
+
+---
+
+## v3 corpus — batch 2 (318-340), found this pass
+
+Fifteen documents converted, every page looked at, every finding verified against the PDF.
+7 pass, 8 fail. Every claim below came back VERIFIED from verify.py.
+
+| Doc | Problem | Tries |
+|---|---|---|
+| **318_court_summons_form** | `moved:Returnable within 30 days` — y 783.6 in the PDF, 446.0 in the render, 337.6 pt up. The line is anchored to the page bottom and the flow emits it straight after the last flowed line. Same class as 325 below and as 312's 72.2 pt. Also seen by eye and not in the text layer: the two SERVICE checkbox glyphs detach from their labels and drop onto their own two baselines, so one label loses its box and two boxes lose their labels. Reading order 60.0 %, 26 rows in the PDF against 24. | 0 of 3 |
+| **322_mutual_fund_factsheet** | `moved:EXPENSE RATIO` 34.9 pt, `moved:FUND MANAGER` 54.5 pt, `moved:RISKOMETER` 71.3 pt. The four-KPI band (NAV / NAV DATE / FUND SIZE / EXPENSE RATIO / FUND MANAGER) is emitted one cell per paragraph so the labels and their values land on drifting baselines; the RISKOMETER block and its dial scale words follow the same drift. Reading order 75.9 %, 37 rows against 42. | 0 of 3 |
+| **323_credit_card_statement** | Reading order 63.5 %, 29 rows against 34, and **42 shapes in the PDF against 17 in the render** — the 25 bars of the SPEND BY CATEGORY bar chart are lost. The four category labels survive (verified: 1 line each) but move out of their rows, which is why `missing:` was refuted. | 0 of 3 |
+| **325_demat_holdings_statement** | `moved:This statement is generated electronically` — y 763.5 in the PDF, 457.0 in the render, 306.5 pt up. Page-bottom anchored line emitted in the flow. Reading order 92.3 % is a band-grouping artifact on this page (84 lines both sides, same text): PAN / STATEMENT PERIOD / ABCPR1234K sort differently inside one band. The footer is the real defect. | 0 of 3 |
+| **330_cad_drawing_sheet** | Page count 1 in the PDF, 2 in the render. The drawing overflows the sheet. Reading order 86.5 %, 18 rows against 19. | 0 of 3 |
+| **331_pid_diagram** | Reading order 93.3 %, 22 rows against 23, and the label sequence is 50.0 % by text: TT1 / FT1 / 01, P-101 A/B, V-102, NOTE 3 and the LEGEND block all change places. The legend text itself survives (verified 1 line each; `missing:` refuted) — it is the anchored diagram labels that reorder around the shapes. | 0 of 3 |
+| **332_bom_on_drawing** | Page count 1 in the PDF, 2 in the render, and **15 shapes in the PDF against 0 in the render** — the drawing frame, its division lines and the five balloons do not survive; only the BOM table does. Reading order 90.9 %, 17 rows against 16. | 0 of 3 |
+| **334_patent_document** | `moved:16` 19.5 pt down, and reading order 89.7 %, 28 rows against 30. The FIG. 1 reference numeral 16 leaves its arrow. Everything else on the page is exact: 32 lines both sides, same text, 96.9 % in sequence. | 0 of 3 |
+
+### Refuted this pass - do not "fix" these
+
+| Claim | What the PDF actually says |
+|---|---|
+| `missing:Travel`, `missing:Fuel`, `missing:Groceries`, `missing:Health` on 323 | All four are in the render, 1 line each. They move out of their rows; they are not lost. |
+| `missing:Centrifugal pump`, `missing:Gate valve`, `missing:Field instrument` on 331 | All three are in the render, 1 line each. The legend text is present; the diagram around it reorders. |
+| `wraps:Power` on 333 | The PDF sets `Power` on two lines as well. The Type column is that narrow on the page itself. |
+| `extra:SH202400871` on 340 | Neither side has it as text: the barcode and its caption are vector paths on both. The eye still sees the caption twice in the render (y 884 and under the barcode); see the tool alarm below. |
+
+### Three tool alarms to repair, not documents
+
+- **326_itr_computation, reading order 94.9 %.** 74 lines on both sides, identical text, identical
+  order, 0 differences by `difflib`. Question 1 groups lines into rows by band, and one band
+  splits differently, so the row sequence drops a row and the document is scored as an order
+  error. Same class as 303 in batch 1. The comparison should be on text, not on row count.
+- **340_bill_of_lading.** The barcode group is vector, so `extra:` cannot see a duplicated
+  caption. The render carries "SH202400871" at y 884 and again under the barcode at y 1425
+  where the PDF has one. Needs a shapes-level duplicate check, not a text one.
+- **324_loan_amortisation_schedule page 7.** visual.py says "1 shape in the PDF, 0 in the
+  render"; verify.py says 1 and 1. The header band is a filled rect in the PDF and a shaded
+  paragraph in the render. Two shape counters disagreeing on the same page is a measurement
+  bug in one of them.
+- **looked.py, the combiner - FIXED and committed this pass.** The eye's FAIL was kept only
+  when a *visual* finding verified on that page. A defect recorded as a measure claim -
+  `pagecount` is one - therefore dropped the eye's FAIL and 330 and 332 came out **PASS with a
+  verified 1-page-in/2-out defect behind them**. Any verified finding on the page now backs the
+  eye. After the fix: 330 and 332 FAIL, decided by both.

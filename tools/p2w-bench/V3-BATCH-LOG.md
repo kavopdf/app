@@ -408,3 +408,52 @@ this can work; it is recorded in REMAINING-DEFECTS.md with these numbers.
 | G4 txt isolation | **identical: 18, different: 0** |
 | G5 position, batch 4 | 25.8 % of lines within tolerance — open, see REMAINING-DEFECTS |
 | G6 visual, batch 4 | **12 of 13 documents pass all eight questions** |
+
+
+---
+
+## Batch 2 - 318 to 340, reprocessed from the first document
+
+The brief restarts all 208 documents because the first 70 were processed before the eye-first
+order, the verifier and the smoke test existed. Batch 1 (300-317) was already redone under the
+current order and is in VISUAL-SCORE.md. This pass takes the next fifteen.
+
+    documents          15
+    pages looked at    23  (324 has seven, 330 and 332 render two)
+    eye verdicts       15 recorded, 0 PENDING
+    findings           30 emitted, 20 VERIFIED, 10 REFUTED, 0 UNVERIFIABLE
+    verdict            7 pass, 8 fail
+
+### Gates
+
+| Gate | Result |
+|---|---|
+| Toolchain | JDK 17.0.13, verify-engine.sh FONTS: PASS, ConvertAll 208 files / 0 failed in 66 s |
+| G1 build | `javac` clean |
+| G2 regression, all 208 | **no document got worse** |
+| G6a the eye | 23 images opened before visual.py was run |
+| G6b numbers | 15 documents, 10 failed the eight questions |
+| Verify | 20 of 30 claims held against the PDF |
+| Combine | eye first, then verified data; 1 disagreement left (326, a tool alarm) |
+
+### What the eye caught that the numbers did not
+
+- **318** - the two SERVICE checkbox glyphs sit on their own baselines, so a label loses its box
+  and two boxes lose their labels. The text layer cannot see it: the boxes are vector on the PDF.
+- **340** - the barcode caption appears twice in the render. Also invisible to the text layer.
+- **325** - a 306.5 pt footer move. The eye read the footer as matching at first and was wrong;
+  the two text layers settled it.
+
+### What the numbers caught that the eye did not
+
+- **323** - 25 of the 42 bars are gone. The eye saw the block was wrong and blamed the labels,
+  which were all present.
+- **322** - three verified label moves in the KPI band, 34.9 to 71.3 pt.
+
+### Fixed this pass
+
+`looked.py --combine` kept the eye's FAIL only when a *visual* finding verified on that page, so
+a pagecount defect - a measure claim - discarded the eye's own FAIL and the document was called
+PASS. 330 and 332 both came out PASS with a verified 1-in/2-out page count behind them. Any
+verified finding on the page now backs the eye. `tools/smoke.py` and `tools/precommit.sh` both
+pass; the change was exercised on this batch, not just parsed.
