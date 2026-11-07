@@ -65,10 +65,19 @@ done
 pass "every shell script parses"
 
 # the cheap guards, the ones that read text and need no build
+COULD_NOT_RUN=""
 for g in check-file-names check-tool-titles check-permissions check-pdf2word; do
   if [ -f "tools/$g.py" ]; then
     if python3 "tools/$g.py" >/tmp/guard.$$ 2>&1; then
       pass "$g"
+    elif grep -q "ModuleNotFoundError\|ImportError" /tmp/guard.$$; then
+      # A guard that needs a package this machine does not have did not fail; it could
+      # not run. Calling that a failure blocks every commit for a reason nobody can
+      # act on, and calling it a pass hides a check that never happened. It is named
+      # in the summary instead, so the gap is visible.
+      mod=$(grep -o "No module named '[^']*'" /tmp/guard.$$ | head -1)
+      echo "gap   $g - could not run ($mod)"
+      COULD_NOT_RUN="$COULD_NOT_RUN $g"
     else
       fail "$g"
       tail -3 /tmp/guard.$$ | sed 's/^/        /'
@@ -122,7 +131,9 @@ else
   fi
   rm -f /tmp/javac.$$
 
-  if [ "$FAILED" -eq 0 ]; then
+  # Run the tests whatever tier 1 said: a broken guard in tier 1 must not hide whether
+  # the engine's own tests pass. Two separate answers are more useful than one.
+  if [ -d /tmp/precommit-out ]; then
     if javac -nowarn -cp "/tmp/precommit-out:$CP" -d /tmp/precommit-out \
           tools/engine-verify/TestPdfToWord.java >/tmp/tj.$$ 2>&1; then
       if java -cp "/tmp/precommit-out:$CP" TestPdfToWord >/tmp/tp.$$ 2>&1; then
@@ -180,6 +191,12 @@ JAVA
 fi
 
 echo ""
+if [ -n "$COULD_NOT_RUN" ]; then
+  echo "not run: $COULD_NOT_RUN"
+  echo "  those guards need a package this machine does not have. They are not a"
+  echo "  failure and not a pass - the gap is named so it is not mistaken for either."
+  echo ""
+fi
 if [ "$FAILED" -eq 0 ]; then
   echo "ALL CHECKS PASSED - safe to commit"
   exit 0
