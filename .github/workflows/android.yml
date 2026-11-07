@@ -27,6 +27,17 @@ jobs:
   # This is the job that makes a regression unable to ship: if a document gets worse,
   # this fails, the build job is not reached, and no APK is published.
   # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # The regression gate, on every push.
+  #
+  # gate.py compares 208 converted documents against base208.json and fails on any
+  # document that got worse. It was not in CI, and on 7 Nov a change to a tool script
+  # was committed, overwritten by a later commit made from a stale copy, and nothing
+  # noticed until it was read by hand.
+  #
+  # The build job needs this one, so a document that got worse stops the APK instead of
+  # shipping inside it.
+  # ---------------------------------------------------------------------------
   regression:
     runs-on: ubuntu-latest
     steps:
@@ -39,56 +50,44 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Get the corpus
-        run: |
-          mkdir -p /tmp/corpus
-          curl -sL -o /tmp/v3.zip  https://github.com/kavopdf/app/releases/download/corpus-v1/pdf-to-word-test-corpus-v3.zip
-          curl -sL -o /tmp/b80.zip https://github.com/kavopdf/app/releases/download/corpus-v1/p2w-batch-1.zip
-          curl -sL -o /tmp/g53.zip https://github.com/kavopdf/app/releases/download/corpus-v1/p2w-all-groups.zip
-          unzip -qo /tmp/v3.zip -d /tmp/corpus/v3
-          unzip -qo /tmp/b80.zip -d /tmp/corpus/b80
-          unzip -qo /tmp/g53.zip -d /tmp/corpus/g53
-          find /tmp/corpus -name '*.pdf' -exec cp --backup=numbered {} /tmp/corpus/ \; 2>/dev/null || true
-          echo "corpus: $(ls /tmp/corpus/*.pdf | wc -l) documents"
-
       - name: Install PyMuPDF
         run: pip install pymupdf
 
-      - name: Compile the engine
+      - name: Get the corpus
         run: |
-          bash tools/verify-engine.sh
-          mkdir -p /tmp/out
-          CP="$(ls -d ~/.m2/repository/com/tom-roush/pdfbox-android/*/pdfbox-android-*.aar 2>/dev/null | head -1)"
-          echo "compiled"
+          set -e
+          mkdir -p /tmp/corpus /tmp/zips
+          curl -sL -o /tmp/zips/v3.zip  https://github.com/kavopdf/app/releases/download/corpus-v1/pdf-to-word-test-corpus-v3.zip
+          curl -sL -o /tmp/zips/b80.zip https://github.com/kavopdf/app/releases/download/corpus-v1/p2w-batch-1.zip
+          curl -sL -o /tmp/zips/g53.zip https://github.com/kavopdf/app/releases/download/corpus-v1/p2w-all-groups.zip
+          for n in v3 b80 g53; do
+            unzip -qo /tmp/zips/$n.zip -d /tmp/zips/$n
+            find /tmp/zips/$n -name '*.pdf' -exec cp {} /tmp/corpus/ \;
+          done
+          count=$(ls /tmp/corpus/*.pdf 2>/dev/null | wc -l)
+          echo "corpus: $count documents"
+          if [ "$count" -lt 200 ]; then
+            echo "Expected 208 documents and got $count. The corpus did not download."
+            echo "A gate that runs on an empty corpus passes everything, so this fails."
+            exit 1
+          fi
+
+      - name: Verify the engine and record its classpath
+        run: bash tools/verify-engine.sh
 
       - name: Convert the corpus and run the gate
         run: |
           set -e
           mkdir -p /tmp/docx
-          cat > /tmp/RunAll.java <<'JAVA'
-          import com.kavopdf.app.engine.*; import java.io.File;
-          public class RunAll { public static void main(String[] a) throws Exception {
-            File in=new File(a[0]), o=new File(a[1]); o.mkdirs();
-            File[] fs=in.listFiles((d,n)->n.toLowerCase().endsWith(".pdf"));
-            java.util.Arrays.sort(fs);
-            for (File f: fs) { try {
-              PdfToWord.Result r = PdfToWord.convert(f, null, null);
-              PdfToWord.classifyHeadings(r);
-              DocxWriter.write(r, new File(o, f.getName().replaceAll("(?i)\\.pdf$","")+".docx"));
-            } catch (Throwable t) {} }
-            System.out.println("converted"); } }
-          JAVA
-          echo "runner written"
-          # the classpath the engine verify step leaves behind
-          CP=$(cat /tmp/engine-cp.txt 2>/dev/null || echo "")
-          if [ -z "$CP" ]; then
-            echo "The engine classpath was not recorded by verify-engine.sh."
-            echo "This job cannot run the gate, and a check that cannot run must not"
-            echo "report success - so it fails and says why."
-            exit 1
-          fi
-          javac -nowarn -cp "$CP" -d /tmp/cls /tmp/RunAll.java
-          java -cp "/tmp/cls:$CP" RunAll /tmp/corpus /tmp/docx
+          # verify-engine.sh works from tools/engine-verify and leaves a classpath
+          # relative to that folder, so the converter must run there too.
+          cd tools/engine-verify
+          CP=$(cat /tmp/engine-cp.txt)
+          javac -nowarn -cp "$CP" -d out ConvertAll.java
+          java -cp "$CP" ConvertAll /tmp/corpus /tmp/docx
+          cd "$GITHUB_WORKSPACE"
+          converted=$(ls /tmp/docx/*.docx 2>/dev/null | wc -l)
+          echo "converted: $converted documents"
           python3 tools/p2w-bench/gate.py --corpus /tmp/corpus --out /tmp/docx \
                   --baseline tools/p2w-bench/base208.json --check
 

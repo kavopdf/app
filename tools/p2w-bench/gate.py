@@ -169,6 +169,18 @@ def main():
         return 0
 
     base = json.load(open(a.baseline))
+
+    # A gate that scored almost nothing passes everything. If the corpus did not
+    # download, or the converter produced nothing, every count is zero, nothing is
+    # worse than its baseline, and this prints "no document got worse" - a clean bill
+    # of health for a run that never happened. It fails instead, and says how many it
+    # expected.
+    if len(cur) < len(base):
+        missing = len(base) - len(cur)
+        print(f"documents scored: {len(cur)} of {len(base)} - {missing} missing")
+        print("A gate that did not see the corpus cannot judge it. FAILED.")
+        return 1
+
     regressed, improved = [], []
     for b, now in cur.items():
         was = base.get(b)
