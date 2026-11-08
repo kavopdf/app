@@ -1634,6 +1634,44 @@ The other four improve and none regress.
 This guard comes out when D-08 lands: once the columns are written as columns, a columned
 page fits too and may spend its white space.
 
+### D-10  Text the page draws twice for weight comes out twice
+
+**Severity: 2 documents - 38_faux_bold_italic_synthesised and 411_nested_xobject_transforms.**
+
+A PDF has no bold weight it cannot load, so a page that wants bold draws the same glyph twice
+with a sub-point offset. `dedupe()` already exists for the OCR overlay case and requires
+`|dx| < 0.5 pt`, `|dy| < 0.5 pt` and identical text. A faux-bold offset is larger than that,
+so both copies survive and the line reads doubled.
+
+| Document | verified finding |
+|---|---|
+| 38_faux_bold_italic_synthesised | `count:Study of self-compacting concrete` - the subtitle is drawn twice at y=118.2 |
+| 411_nested_xobject_transforms | `count:NESTED FORM 1` - 1 in the PDF, 2 in the render |
+
+**Why widening DUPLICATE_TOL does not work, and this is measured, not guessed.** The tolerance
+is 0.5 pt because 1.2 pt merged genuinely different characters: file 28 read "Y ar" (the 'e' of
+"preventive" at x 364.03 swallowed the 'e' of "Year" at x 362.88) and file 39 read "COM ERCE".
+Those two 'e's are 1.15 pt apart and an 'e' at 8.5 pt is 3.77 pt wide - so an
+advance-overlap test does not separate them either: 1.15 is 30 % of the advance, which looks
+exactly like faux bold. Any position-only window that catches faux bold also catches that pair.
+
+**The two options, neither taken yet**
+
+a. Line-level dedupe: after lines are built, two lines with identical text and a y within a
+   small fraction of the line height keep one. Cheaper to reason about, but a table that
+   legitimately repeats a row would lose it, so the y window has to be tighter than a row
+   pitch and the rule needs measuring on 324_loan_amortisation_schedule (240 repeated rows)
+   before it can ship.
+
+b. Word-context: a faux-bold copy has the same neighbouring glyphs at the same offsets; the
+   two 'e's of "preventive" and "Year" do not. This separates the cases correctly but costs a
+   comparison over the neighbourhood for every glyph, and `dedupe` runs on every glyph of
+   every page.
+
+Option (a) is the one to try first, with 324 as the regression document that decides it.
+
+**Tries: 0 of 3.** The analysis is done; the fix is not written.
+
 
 ## CLOSED - the gate counted a row merge as lost text, 8 Nov
 
