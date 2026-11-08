@@ -1402,9 +1402,30 @@ public final class DocxWriter {
         int cellLineTw = rowTw > 0 ? rowTw : 200;
         for (int r = 0; r < t.rows.size(); r++) {
             List<String> row = t.rows.get(r);
+            // The row's own line height, never smaller than its own text. cellLineTw is the
+            // table's extent divided by its row count, which is an average - correct only when
+            // the rows are evenly spaced. On a page with a tall header row, a merged cell or a
+            // wrapped value that average is smaller than the row's text needs, so the line was
+            // set below the type size and the text rode up over the rule above it. That is what
+            // the light-mode screenshots show on 03 and 04: "III Semester, B.E. Computer
+            // Science" sitting on its own border. The type size is the floor, and a row whose
+            // text needs more than the average gets more.
+            int rowLineTw = cellLineTw;
+            for (int q = 0; q < row.size(); q++) {
+                if (q >= cols) break;
+                float sz = 0f;
+                if (r < t.fonts.size() && q < t.fonts.get(r).size() && t.fonts.get(r).get(q) != null) {
+                    String fn = t.fonts.get(r).get(q);
+                    int sp = fn.indexOf(' ');
+                    if (sp > 0) {
+                        try { sz = Float.parseFloat(fn.substring(0, sp)); } catch (Exception ignored) { }
+                    }
+                }
+                if (sz > 0f) rowLineTw = Math.max(rowLineTw, (int) Math.round(sz * 1.25f * TWIPS_PER_PT));
+            }
             inner.append("<w:tr>");
             if (rowTw > 0) {
-                inner.append("<w:trPr><w:trHeight w:val=\"").append(rowTw)
+                inner.append("<w:trPr><w:trHeight w:val=\"").append(Math.max(rowTw, rowLineTw))
                      .append("\" w:hRule=\"atLeast\"/><w:cantSplit/></w:trPr>");
             }
             int c = 0;
@@ -1470,7 +1491,7 @@ public final class DocxWriter {
                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
                         .append("<w:snapToGrid w:val=\"0\"/>")
                         .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
-                        .append(cellLineTw).append("\" w:lineRule=\"exact\"/>");
+                        .append(rowLineTw).append("\" w:lineRule=\"exact\"/>");
                 if (insetTw > 0) inner.append("<w:ind w:left=\"").append(insetTw).append("\"/>");
                 inner.append("</w:pPr>");
                 if (!cell.isEmpty()) {
