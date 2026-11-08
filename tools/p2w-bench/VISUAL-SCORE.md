@@ -365,3 +365,16 @@ batch was looked at again from the new renders.
 documents were decided by the eye against the numbers (301, 305, 312) - all three are the
 row-banding blind spot in the order question, recorded in REMAINING-DEFECTS.md, not page
 defects.
+
+## A stale row is not a verdict
+
+A FAIL row records what the eye and the verifier saw on the date in its Date column. The
+engine changes between runs, so a row written before a fix can name a reason that no longer
+exists.
+
+Verified on 8 Nov: every one of the 208 documents now produces the same page count as its
+PDF, so any FAIL row whose reason is only `pagecount` is out of date. Those rows are not
+edited - the history is the point - but they must be re-read before they are counted as
+failures. The 09:00 digest counts PASS rows, so a stale FAIL overstates the work left, never
+understates it, which is the safe direction to be wrong in.
+

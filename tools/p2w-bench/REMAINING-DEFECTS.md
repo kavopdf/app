@@ -831,7 +831,21 @@ is better than a metric that fires on 179 documents for a reason nobody can act 
 **Tries: 0 of 3.**
 
 
-### D-06  Twenty-eight documents spill onto more pages than the PDF has
+### D-06  Twenty-eight documents spill onto more pages than the PDF has — FIXED 8 Nov
+
+**FIXED. Measured 8 Nov across all 208: every document's page count now equals its PDF's.**
+
+    same page count : 208
+    spill (extra)   :   0
+    short (missing) :   0
+
+The fix was the one this entry asked for and it landed as D-01: the line height comes from
+the model's own lineY gaps instead of a constant. It was committed as "place every flowing
+line on the page's own measured pitch". Nothing was shrunk to fit - the content is the same
+size it was, and the page simply ends where the paper does.
+
+The numbers below are what this entry said before that fix, kept because they are the reason
+it was worth doing.
 
 **Severity: a page the PDF does not have is the first thing a reader notices.**
 
@@ -872,6 +886,23 @@ the trailing 4 pt placeholder paragraph after a table, and where a multi-column 
 breaks its columns. Measured on the two new spills: 330's page 1 ends at 592.0 pt on a 595 pt
 sheet, journal-2col's at 840.1 on 842, and neither has any text on page 2.
 
+
+#### Verified on 8 Nov — the eight that were still listed as spilling
+
+These were re-converted and measured: all eight now produce one page where the PDF has one.
+
+    330_cad_drawing_sheet              2 -> 1  ✅
+    332_bom_on_drawing                 2 -> 1  ✅
+    341_shipping_manifest              2 -> 1  ✅
+    350_question_paper                 2 -> 1  ✅
+    402_calendar_month_grid            2 -> 1  ✅
+    bus-timetable-station-left-right   2 -> 1  ✅
+    303_discharge_summary              ok      ✅
+    56_table_indented_from_margin      ok      ✅
+
+Their FAIL rows in VISUAL-SCORE.md still carry the old pagecount reason. The page count is
+no longer the reason any of them fails - what remains is listed there beside it (order,
+breaks, shapes, cell width), and those are MEDIUM and HARD work, not this entry.
 
 ### D-07  Two fields on one baseline are joined into one sentence
 
