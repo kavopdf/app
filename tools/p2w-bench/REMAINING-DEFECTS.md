@@ -2025,6 +2025,43 @@ before changing anything.
 
 **Tries: 0 of 3** - diagnosed, not started.
 
+**The line is `cols < 2`, and the cause is the overlap test.** Printing every rule group:
+
+    TBLGRP size=23 top=92.0 bot=793.89 left=56.0 right=539.276 ys=19 xs=2 rows=18 cols=1
+
+`xs` holds only the band's own two edges, so `cols` is 1 and `if (cols < 2) continue` throws the
+table away. The vertical rules are present - 12 of them - but every one is rejected by
+
+    float overlap = Math.min(v[2], bottom) - Math.max(v[1], top);
+    if (overlap < (bottom - top) * 0.5f) continue;
+
+An invoice's column rules span only the item rows, well under half the page height, so not one
+of them is added to `xs`.
+
+**The fix, written and measured on one document.** Track whether any rule was added; if none
+was, derive the columns from where the text sits - every line inside the band contributes its
+left and right edge, the gaps between those are the gutters, and the widest gutters (up to eight,
+each at least 6 pt) become boundaries.
+
+Measured on 04_stamp_180deg_upside_down after the change:
+
+    before: w:tbl 0, w:tr 0, paragraphs 31
+    after:  w:tbl 1, w:tr 18, paragraphs 6
+
+The table exists and the words have moved into it. **But it is not right yet:** only two columns
+are found where the invoice has six, and the first row's cells are empty. So the band derivation
+needs to produce more boundaries than it does - probably because the gutter threshold of 6 pt is
+too high for this invoice's column spacing, or because sorting every line's span rather than
+clustering them merges neighbours.
+
+**Not shipped.** The change is written and compiles and is a real improvement on one document,
+but it has not been run through the 208-document gate, and a two-column table with empty cells
+could easily be worse than the paragraphs it replaces. Four wrong hypotheses today are enough
+reason to measure before committing. The next session should apply the patch, run `gate.py` on
+208, and ship it only if no document gets worse.
+
+
+
 **Fourth measurement, same day - and it clears all three earlier guesses at once.** Printing the
 candidate list immediately before the `containsAnother` loop:
 
