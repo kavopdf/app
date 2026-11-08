@@ -2025,6 +2025,38 @@ before changing anything.
 
 **Tries: 0 of 3** - diagnosed, not started.
 
+**Third measurement, same day.** A print inside the solidity filter produced nothing at all:
+
+    (no TBLFILTER lines)
+    04_stamp_180deg_upside_down  pages=1  paragraphs=31
+
+So the loop never ran, which means `tables` was already empty when it got there. The solidity
+filter is not the one dropping this grid either - and neither was the `vs.size() < 2` guard,
+which passed with 23 horizontal and 12 vertical rules found.
+
+The only filter between `buildTables` and the solidity loop is the one that drops an outer box
+containing an inner table:
+
+    boolean inside = b.left >= a.left - 4 && b.right <= a.right + 4
+            && b.top >= a.top - 4 && b.bottom <= a.bottom + 4;
+    if (inside && smaller) { containsAnother = true; break; }
+    if (!containsAnother) keepTables.add(a);
+
+An invoice is a page-wide form box with the item grid inside it, so the outer box is meant to be
+dropped and the inner grid kept. If both candidates overlap so that each counts as containing
+the other, both go, and nothing is left.
+
+**Next step, precisely:** print the candidate list - count, and each table's box - immediately
+before and after the `containsAnother` loop. That will show whether nothing was built, one box
+was built and dropped, or two boxes dropped each other. Do not change the filter until that
+print says which.
+
+**Three wrong hypotheses in one afternoon - row height, the vertical-rule guard, and the
+solidity filter.** Each was plausible from reading the code and none survived a measurement.
+The lesson worth keeping: print the counts before editing the condition.
+
+
+
 **Cause found, same day.** `buildTables` opens with
 
     if (hs.size() < 2 || vs.size() < 2) return out;      // PdfToWord.java, buildTables
