@@ -3469,3 +3469,52 @@ one-line reversal if that judgement is wrong.
 **All three patches touch `DocxWriter.java` and all three are based on blob `26b4fd8`**, so they must
 be applied in sequence with a three-way merge, not in parallel.
 
+
+
+**The section breaks are gone, and it works - five variants built and rendered.**
+
+The brief's ordering did not survive measurement. The 62-shaped page was built five ways and each
+rendered with `soffice`:
+
+    V0  current, continuous sections            2 pages   layout correct, two pages
+    V1a one 2-col section, no breaks            1 page    WRONG - everything pours into column 1,
+                                                          right column empty, masthead squeezed
+    V1b w:br w:type="column" around the element  2 pages   WRONG - a column break moves to the next
+                                                          column, it does not widen a line
+    V1c full-width para carrying w:cols num="1"  3 pages   WRONG - w:cols is a section property, so
+                                                          that is still a section break
+    V2  full-width element as a 1-row table      1 page    WRONG - confined to its column,
+        inside the 2-col section                          x1 = 297 of 595
+    V3  the columns become the table's columns   1 page    CORRECT - bands span to 595,
+                                                          columns at x=0 and x=298
+
+So idea 1 is impossible in OOXML and idea 2 does not span inside a two-column section. Idea 2 done
+differently - one table row, one cell per column, with the page's full-width bands as ordinary
+paragraphs above and below it - works and needs no section at all. That is what shipped. Idea 3
+survives only as a scoped fallback: if a page interleaves full-width content with column content, a
+table cannot describe it, so the page is written as a single-column flow. That is why
+`newspaper-2col-fullwidth-headline` is one page and correctly ordered rather than one page and
+scrambled.
+
+**Two more bugs found on the way.** The `blockSpan * 0.62` test compared a paragraph against the
+widest paragraph on the page, which on two of the four documents *is* one column's width - so every
+column line was called full-width, which is why 62 had **six** breaks rather than two. And the
+column pass welds a left-column line and a right-column line onto one baseline: 62's "For the
+ayacutdars of Halagere..." reports a right edge of 526 pt although the page drew it to 281 pt, and
+that is what tore a left-column sentence in two.
+
+**Measured.** 62 renders as **one page** where it was two, with 0 continuous breaks, one `w:sectPr`
+and a single column. Corpus-wide `<w:type w:val="continuous"/>` goes **30 to 0**.
+`annual-review-2col-uneven-columns` and `newspaper-2col-fullwidth-headline` both go **2 pages to 1**.
+Reading order: 34 paragraphs read masthead, headline, deck, *all* of the left column, *all* of the
+right column, footer; in the render all 36 PDF lines are present with **dx = 0 on every line and dy
+within 3 pt**, 0 unmatched, 0 extra. Gate **no document got worse**, 208/208 scored, 23 counts
+improved. `verify-engine.sh` exits 0 with **433 PASS and 0 failures**.
+
+**Not fixed:** `journal-2col-with-footnotes` is still two pages, as it was on the baseline. Its page
+is 69 full-width lines, the column pass finds no band, `columnPage()` declines and the flow overflows
+by about 27 pt because the substituted font wraps six rows into two lines. That is a font-metrics
+problem, not a section-break one.
+
+**Patch:** `patches/D8-C-sections-without-sections.patch`, one file, `DocxWriter.java`, +426/-49.
+
