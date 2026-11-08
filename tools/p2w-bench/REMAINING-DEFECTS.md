@@ -2898,3 +2898,44 @@ anything is changed:
 
 **Tries: 0 of 3.** Diagnosed; the stroke is not carried anywhere in the model today.
 
+
+
+**Second cause found, and it is the missing line itself.** The thickness is one half of the
+report; the absent side is the other, and it has nothing to do with stroke width.
+
+`Table.ruled` defaults to true, and `rowTables` - the whitespace pass that infers cells from the
+gaps between words rather than from drawn edges - sets it false:
+
+    Table t = new Table();
+    t.ruled = false;
+
+`DocxWriter.borders(false)` then writes all six sides as
+
+    <w:top w:val="none" w:sz="0" w:space="0" w:color="auto"/>
+
+Measured on two documents that do draw their rules, `79_inr_indian_digit_grouping_table` and
+`80_gstin_pan_cin_ifsc_table`, the generated tables carry exactly that: every side `none`. A box
+the page closed on four sides comes out with no sides at all.
+
+So the flag is not describing the page, it is describing which pass found the table. A table the
+whitespace pass found may still be ruled on the page - the pass simply did not look at the edges.
+
+**The fix for both halves, written and compiled but not measured.** `DocxWriter` gains
+`edgeStroke(t, shapes)`: it looks for stroke-only shapes lying on the table's own four sides and
+returns the median width and the most common colour, or null when nothing lies there. The border
+call becomes
+
+    boolean ruled = stroke == null ? t.ruled : true;
+    borders(ruled, stroke[0], stroke[1]);
+
+so a table with strokes on its edges is ruled whatever the flag says, at the page's own weight
+and colour (`w:sz` is eighths of a point, so 0.5 pt is sz=4), and a table with nothing on its
+edges keeps the old behaviour.
+
+It compiled clean against the engine stubs. It was **not** run through the gate - the sandbox was
+recycled mid-change - so it is not shipped. The next session applies it and runs `gate.py` over
+208 before committing: the `blocks` metric counts solid regions, and a border that changes from
+grey to black could move it.
+
+**Tries: 1 of 3.** The first attempt reached a compiling patch and no measurement.
+
