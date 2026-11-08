@@ -1422,15 +1422,67 @@ public final class DocxWriter {
      * the box 403 and 406 were carrying.
      */
     private static String borders(boolean ruled) {
+        return borders(ruled, 0.75f, 0x999999);
+    }
+
+    /**
+     * The table's borders, at the weight and colour the page drew them.
+     *
+     * <p>Every ruled table used to get a 0.75 pt grey hairline on all six sides whatever the page
+     * drew, so a table ruled at 0.5 pt came out heavy, one at 1.5 pt came out thin, and a black
+     * rule came out grey. That is the inconsistency the user reports.
+     *
+     * <p>{@code w:sz} is in eighths of a point: a 0.5 pt rule is sz="4", a 1 pt rule sz="8".
+     */
+    private static String borders(boolean ruled, float widthPt, int rgb) {
         String v = ruled ? "single" : "none";
+        int sz = Math.max(2, Math.min(48, Math.round(widthPt * 8f)));
+        String colour = String.format("%06X", rgb & 0xFFFFFF);
         StringBuilder b = new StringBuilder("<w:tblBorders>");
         for (String side : new String[]{"top", "left", "bottom", "right", "insideH", "insideV"}) {
             b.append("<w:").append(side).append(" w:val=\"").append(v).append("\"");
-            if (ruled) b.append(" w:sz=\"6\" w:color=\"999999\"");
+            if (ruled) b.append(" w:sz=\"").append(sz).append("\" w:color=\"").append(colour).append("\"");
             else b.append(" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"");
             b.append("/>");
         }
         return b.append("</w:tblBorders>").toString();
+    }
+
+    /**
+     * The stroke the page drew along this table's own edges.
+     *
+     * <p>Finds the stroke-only shapes that lie on one of the table's four sides and returns the
+     * median width and the most common colour, or null when nothing lies there. The median
+     * rather than the mean, so one stray rule from a neighbouring box cannot move the border.
+     */
+    private static float[] edgeStroke(PdfToWord.Table t, java.util.List<Shape> shapes) {
+        if (shapes == null || shapes.isEmpty()) return null;
+        java.util.List<Float> widths = new ArrayList<>();
+        java.util.Map<Integer, Integer> colours = new java.util.HashMap<>();
+        float tol = 2.5f;
+        for (Shape s : shapes) {
+            if (s.lineRgb < 0 || s.fillRgb >= 0) continue;
+            boolean onTop = Math.abs(s.topPt - t.top) <= tol
+                    && s.xPt <= t.right + tol && s.xPt + s.wPt >= t.left - tol;
+            boolean onBottom = Math.abs(s.topPt + s.hPt - t.bottom) <= tol
+                    && s.xPt <= t.right + tol && s.xPt + s.wPt >= t.left - tol;
+            boolean onLeft = Math.abs(s.xPt - t.left) <= tol
+                    && s.topPt <= t.bottom + tol && s.topPt + s.hPt >= t.top - tol;
+            boolean onRight = Math.abs(s.xPt + s.wPt - t.right) <= tol
+                    && s.topPt <= t.bottom + tol && s.topPt + s.hPt >= t.top - tol;
+            if (!(onTop || onBottom || onLeft || onRight)) continue;
+            widths.add(Math.max(0.1f, s.lineWidthPt));
+            int c = s.lineRgb & 0xFFFFFF;
+            colours.put(c, colours.getOrDefault(c, 0) + 1);
+        }
+        if (widths.isEmpty()) return null;
+        java.util.Collections.sort(widths);
+        float median = widths.get(widths.size() / 2);
+        int best = 0, bestCount = -1;
+        for (java.util.Map.Entry<Integer, Integer> e : colours.entrySet()) {
+            if (e.getValue() > bestCount) { bestCount = e.getValue(); best = e.getKey(); }
+        }
+        return new float[]{median, best};
     }
 
     private static void table(StringBuilder sb, PdfToWord.Table t, Ctx ctx) {
@@ -1523,10 +1575,19 @@ public final class DocxWriter {
         // the closing-balance sentence beside the ledger was squeezed into a five-line
         // column. The flow is the document now, so the table belongs in it and the text keeps
         // the indents the PDF drew.
+        // The stroke the page drew on this table's own edges, or null when it drew none.
+        float[] stroke = edgeStroke(t, ctx.curShapes);
         inner.append("<w:tbl><w:tblPr>")
                 .append("<w:tblW w:w=\"").append(totalTw).append("\" w:type=\"dxa\"/>")
                 .append("<w:tblInd w:w=\"").append(tw(x0)).append("\" w:type=\"dxa\"/>")
-                .append(borders(t.ruled))
+                .append(borders(
+                        // The page's own stroke decides whether this table is ruled, not the
+                        // flag alone. A table found by the whitespace pass carries ruled=false,
+                        // so all six borders were written as "none" - and a box the page closed
+                        // on four sides came out with no sides at all. That is the missing line.
+                        (stroke == null ? t.ruled : true),
+                        (stroke == null ? 0.75f : stroke[0]),
+                        (stroke == null ? 0x999999 : (int) stroke[1])))
                 .append("<w:tblLayout w:type=\"fixed\"/>")
                 // Word's default cell margin is 0.19 cm (108 twips) on each side. Left at the
                 // default, every cell's text sat 6 pt right of where the page had it - a
