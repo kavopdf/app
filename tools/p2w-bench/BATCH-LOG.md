@@ -410,3 +410,53 @@ layer that holds faux-bold and shadow text twice, so it rewards copying the dupl
 was reverted, the baseline untouched, and the reason written into REMAINING-DEFECTS.md: until
 `missing` stops counting a doubled layer as two words, a correct fix cannot pass G2. 38 is at
 1 of 3 tries. 27, 30 and 39 have not been started.
+
+## b80 batch 3 (41-60) — 8 Nov
+
+Twenty documents, 23 pages in the PDF and 24 in the render. Every page opened before any number
+was read. 20 findings: 16 verified, 1 refuted, 0 unverifiable. **15 pass, 5 fail.**
+
+| Document | Pages | Verdict | Verified finding |
+|---|---|---|---|
+| 41_coloured_headings_white_bg | 1 | PASS | - |
+| 42_table_coloured_header_alternating_rows | 1 | PASS | - |
+| 43_red_stamp_over_black_text | 1 | PASS | eye; order 81.6 % is the stamp's row banding - measurement |
+| 44_coloured_underlined_hyperlinks | 1 | PASS | - |
+| 45_coloured_callout_box | 1 | PASS | - |
+| 46_chart_coloured_labels_body_text | 1 | PASS | eye; order 85.7 % counts chart labels as rows - measurement |
+| 47_grey_body_black_headings | 1 | PASS | - |
+| 48_form_coloured_border_coloured_values | 1 | PASS | - |
+| 49_coloured_background_block_paragraph | 1 | PASS | - |
+| 50_invoice_coloured_total_row | 1 | PASS | eye; order 92.3 % splits the total row off the words line - measurement |
+| 51_two_cm_margins | 1 | PASS | - |
+| 52_one_cm_margin_wide_body | 1 | PASS | - |
+| 53_single_space_body_15_headings | 1 | PASS | - |
+| 54_two_column_body_full_width_header_footer | 1 | FAIL | moved:On the domestic side 153.6 pt - the right column is laid out after the left |
+| 55_sidebar_box_beside_body | 2 | FAIL | pagecount 1 in / 2 out, moved:PROJECT AT A GLANCE 227.7 pt, shapes 1 / 0 |
+| 56_table_indented_from_margin | 1 | FAIL | missing:640.00 - the Rate cell is 0.5 pt too narrow and the last digit wraps |
+| 57_centred_title_page_left_body_pages | 2 | FAIL | moved:SRI VINAYAKA INSTITUTE OF TECHNOLOGY -126.4 pt |
+| 58_header_rule_footer_rule | 2 | PASS | - |
+| 59_landscape_mixed_portrait | 2 | PASS | - |
+| 60_page_border | 1 | FAIL | moved:Dr. S. Vedavathi 20.8 pt - the block is pushed onto the seal |
+
+### What changed in the code
+
+`verify.py`'s `rules` check compared counts one way only, so a rule the render DROPPED could never
+be verified. Both directions now count. That exposed a second fault in the same test: the
+classifier's `height <= 1.2` excluded the render's own 1.2000000476 pt band, which made
+58_header_rule_footer_rule look like it had lost a rule it had not. The bound is now a named
+`RULE_MAX_PT = 1.5`, commented as a classification bound rather than a tolerance. G2 across 208:
+no document got worse. precommit.sh: every bench tool ran, ALL CHECKS PASSED.
+
+### What the eye caught that no number did
+
+54's right column 154 pt low and 55's missing sidebar box - reading order said 21.7 % and 70.3 %
+and neither number says WHICH column moved or that a box is gone. 60's date landing on the seal:
+`overlap` reported 6 pairs against the PDF's 34 and called it clean.
+
+### What the numbers caught that the eye missed
+
+56's "640.00" breaking into "640.0" over "0" inside its cell. At 130 dpi the last digit is a
+smudge under the row rule; the row diff found it in one line. And 58 in reverse: the eye recorded
+a missing footer rule that is there, 0.4 pt of grey the side-by-side image does not show. Both
+directions of error, in one batch, on the same run.

@@ -268,3 +268,23 @@ reverted. See "Table height" in REMAINING-DEFECTS.md.
 | 2026-11-08 | 38_faux_bold_italic_synthesised | FAIL | count:Study of self-compacting concrete - the page draws the subtitle twice at y=118.2 to fake bold and the render carries both copies on one line, so the subtitle appears twice |
 | 2026-11-08 | 39_small_caps_letter_spacing | FAIL | the letter-spaced headings lose their spaces - NOTICE TO MEMBERS renders as NOTICETOMEMBERS. order 86.5 % of 18 rows |
 | 2026-11-08 | 40_devanagari_shaping_font | PASS | Devanagari shapes correctly, table and paragraphs on the PDF rows. order 92.7 % is a measurement blind spot - the shaping pass pairs rows by text |
+| 2026-11-08 | 41_coloured_headings_white_bg | PASS | coloured section headings and the price column on the page lines |
+| 2026-11-08 | 42_table_coloured_header_alternating_rows | PASS | navy header, alternating row shading and every figure on the page rows |
+| 2026-11-08 | 43_red_stamp_over_black_text | PASS | red stamp in place over the body text; order 81.6 % is a measurement blind spot - the stamp's lines band differently from the page's |
+| 2026-11-08 | 44_coloured_underlined_hyperlinks | PASS | blue underlined link list and the right-hand URLs on the page lines |
+| 2026-11-08 | 45_coloured_callout_box | PASS | amber-ruled callout box with its pale fill in the page position |
+| 2026-11-08 | 46_chart_coloured_labels_body_text | PASS | twelve bars in the page colours with their value labels and axis; order 85.7 % counts chart labels as rows |
+| 2026-11-08 | 47_grey_body_black_headings | PASS | grey body under black headings, every clause on the page lines |
+| 2026-11-08 | 48_form_coloured_border_coloured_values | PASS | ruled form box, label column and bold values on the page rows |
+| 2026-11-08 | 49_coloured_background_block_paragraph | PASS | navy filled block with white text, body on the page lines |
+| 2026-11-08 | 50_invoice_coloured_total_row | PASS | six-line invoice table and the navy total row with its amount; order 92.3 % splits the total row off the words line |
+| 2026-11-08 | 51_two_cm_margins | PASS | page frame at 2 cm and every paragraph inside it on the page lines |
+| 2026-11-08 | 52_one_cm_margin_wide_body | PASS | wide body block, green header row and right-aligned figures |
+| 2026-11-08 | 53_single_space_body_15_headings | PASS | single-spaced body under 15 pt headings, page lines held |
+| 2026-11-08 | 54_two_column_body_full_width_header_footer | FAIL | moved:On the domestic side 153.6 pt and moved:The institute 153.8 pt - the right column is laid out after the left one, not beside it |
+| 2026-11-08 | 55_sidebar_box_beside_body | FAIL | pagecount 1 in and 2 out, moved:PROJECT AT A GLANCE 227.7 pt, shapes 1 in the PDF and 0 in the render |
+| 2026-11-08 | 56_table_indented_from_margin | FAIL | missing:640.00 - the Rate cell is 22.9 pt wide and the value needs 23.4, so the last digit wraps onto its own line inside the cell |
+| 2026-11-08 | 57_centred_title_page_left_body_pages | FAIL | moved:SRI VINAYAKA INSTITUTE OF TECHNOLOGY -243.4 pt; the title page block sits at the top of the sheet instead of the page's centre band |
+| 2026-11-08 | 58_header_rule_footer_rule | PASS | header and footer rules both present; the eye missed the 0.4 pt footer rule at 130 dpi and the rule test was excluding a 1.2000000476 pt band |
+| 2026-11-08 | 59_landscape_mixed_portrait | PASS | portrait page and the landscape sheet with its five-row measurements table on the page rows |
+| 2026-11-08 | 60_page_border | FAIL | moved:Dr. S. Vedavathi 20.8 pt - the right signature block and the date are pushed down onto the seal's top arc |

@@ -1367,3 +1367,113 @@ D-07 were measured (+4 documents, -1) and reverted; do not repeat them.
 The eye failed it - the page draws a red box around the stamp and the box and its rotation are
 gone - but `shapes` came back UNVERIFIABLE, so nothing verified and the document passes. The
 same class as 13 above. Recorded so the final sweep does not read this row as a clean pass.
+
+## b80 corpus — batch 3 (41-60), 8 Nov
+
+Twenty documents, 23 pages in the PDF and 24 in the render (55 spills). Every page opened before
+any number was read; every finding verified against the PDF; 20 findings, 16 verified, 1 refuted,
+0 unverifiable after the fixes below. **15 pass, 5 fail.**
+
+### FIXED this run (tool): the rules check could only see one direction
+
+`verify.py`'s `rules` test returned VERIFIED only when `b > a` - more rules in the render than in
+the PDF. That was written for 351_omr_answer_sheet, where the render put a ruled grid round a
+bubble sheet the page leaves unruled. It cannot see a MISSING rule at all, so every dropped rule
+came back REFUTED and passed. Both directions now count, and a difference in either direction is
+VERIFIED.
+
+Fixing that exposed a second fault in the same test, and it is the interesting one. With the
+one-way test gone, 58_header_rule_footer_rule's `rules` claim came back VERIFIED at "3 rules in
+the PDF, 2 in the render". It was a false alarm. The page draws three stroke-only rules
+(y=54.0, 57.0 and 781.9); the render draws all three as filled bands. The classifier accepted
+`height <= 1.2`, and LibreOffice exports a 1.2 pt border as a rect **1.2000000476837158** pt high,
+so the widest rule on the page was excluded from the render's count. The bound is now
+`RULE_MAX_PT = 1.5`, named and commented as a CLASSIFICATION bound - "this rectangle is a line,
+not a box" - not a positional tolerance, because nothing in the test is compared against the
+other side's coordinate. 58 is 3 and 3, REFUTED, and the document passes.
+
+**The eye was wrong on 58 and the numbers were wrong on 58**, in opposite directions, and the two
+errors cancelled into a plausible-looking defect. At 130 dpi the 0.4 pt grey footer rule is not
+visible in the side-by-side image; I recorded `rules` on it and could not see the rule at all.
+The lesson is the one the pipeline is built on: a FAIL needs both the eye and the check, and
+"the eye saw it" is not evidence when the thing is a hairline.
+
+### OPEN — the right column of a two-column page is laid out after the left one
+
+54_two_column_body_full_width_header_footer. `moved:On the domestic side` VERIFIED at y=116.5 in
+the PDF against y=270.1 in the render, 153.6 pt; `moved:The institute` 153.8 pt. Reading order
+21.7 % of 17 rows, 29 rows in the render against 17. The two columns are one flow with a gap, not
+two measured columns - the same cause as 27 in batch 2, and the same fix. **Tries: 0 of 3.**
+
+### OPEN — a sidebar box beside the body loses its box and spills the page
+
+55_sidebar_box_beside_body. `pagecount` VERIFIED 1 in the PDF and 2 in the render;
+`moved:PROJECT AT A GLANCE` VERIFIED 147.8 pt against 375.5, 227.7 pt; `shapes` VERIFIED 1 in the
+PDF and 0 in the render. The box is drawn at the page's right, its eight field pairs inside it.
+The render has no box, puts the field pairs at the foot of page 1 as body text, and adds a second
+sheet carrying an empty blue-ruled rectangle. **Tries: 0 of 3.**
+
+### OPEN — a table cell 0.5 pt too narrow breaks its value
+
+56_table_indented_from_margin. `missing:640.00` VERIFIED - 1 line in the PDF, 0 in the render.
+The PDF sets the Rate cell's "640.00" from x=396.6 to 420.0, 23.4 pt wide, with the Remarks column
+starting at 428.0. The render's cell is 458 twips (22.9 pt) and its text needs 23.4, so the last
+digit wraps onto a line of its own inside the cell and the row the page draws once arrives as two.
+Reading order 93.0 % of 21 rows, 22 rows in the render.
+
+**Tried and reverted (1 of 3).** `DocxWriter`'s comment has promised `w:noWrap` since the 343 fix
+and nothing ever wrote it. Emitting `<w:noWrap/>` when `textOverflows` is true does put the
+element in `word/document.xml` with the value whole in a single `w:t` - and LibreOffice ignores it
+for a fixed-width cell and wraps anyway. The cell is short by 0.5 pt, not by an inset: the inset
+is already 0 and the existing `textOverflows` path has nothing left to give up. What is left is
+the column width itself, which is the page's own edge. Reverted; the baseline is untouched.
+**Tries: 1 of 3.**
+
+### OPEN — a centred title page is set at the top of the sheet
+
+57_centred_title_page_left_body_pages, page 1 of 2. `moved:SRI VINAYAKA INSTITUTE OF TECHNOLOGY`
+VERIFIED at y=243.2 in the PDF against y=116.8 in the render, -126.4 pt. The whole title block -
+institute, rule, title, the two subtitle lines, "by", the name, the guide and the department -
+sits 126 pt high, and the block's own 20 pt leading is not carried. Page 2 is correct and left
+aligned, so this is the centred band on a title page, not the body flow. **Tries: 0 of 3.**
+
+### OPEN — a right-hand signature block is pushed down onto the seal
+
+60_page_border. `moved:Dr. S. Vedavathi` VERIFIED at y=472.2 in the PDF against y=493.0, 20.8 pt.
+`overlap` came back REFUTED - 34 overlapping pairs in the PDF against 6 in the render - because
+the seal's curved text overlaps itself many times on the page and the render's does not, so the
+count cannot see the date landing on the seal's top arc. The eye can, and the moved finding is
+the same defect measured. Reading order 48.1 % of 32 rows, 22 rows in the render. **Tries: 0 of 3.**
+
+### Measurement blind spots found this pass - repair the tool, not the page
+
+    order on 43_red_stamp_over_black_text   81.6 %, 23 rows in the PDF against 26. The eye
+        passed and it is right: the stamp's four lines band with the body lines differently on
+        the two sides, so the row sequences cannot pair. 3 extra rows, all stamp.
+    order on 46_chart_coloured_labels_body_text  85.7 %, 27 against 29. The chart's twelve
+        value labels band as two rows in the PDF and three in the render. Chart labels are not
+        reading order.
+    order on 50_invoice_coloured_total_row   92.3 %, 19 against 20. "TOTAL PAYABLE" sits in a
+        table row whose baseline is 2 pt off the "Amount in words" line, so the render splits a
+        row the PDF draws as one. Same family as D-01.
+
+All three were named by `looked.py --combine` as "eye (numbers wrong - repair the tool)" and all
+three documents stay PASS. The third time 43/46/50's pattern has appeared: reading order pairs
+rows by text, and any page where the two sides band a row differently is scored as a sequence
+break. That is now the single largest measurement bug in the tool and wants a fix before the
+final sweep counts these pages.
+
+### A claim that could not be checked
+
+    overlap on 60   REFUTED, 34 pairs in the PDF against 6 in the render. The check counts
+        overlaps the PDF has and the render does not, which is right in principle; on a page
+        with a curved-text seal the PDF's own overlaps swamp it. The real defect is carried by
+        the verified `moved:Dr. S. Vedavathi` on the same page.
+
+### One more thing the wraps claim cannot see
+
+`wraps:Shrinkage and fastness testing` came back REFUTED - "2 line(s) on both sides" - on the
+page where a value really is broken in half. The check follows the block's words through the
+render's lines, and the PDF's word is `640.00` while the render's are `640.0` and `0`, so the
+follow stops. `missing:640.00` verifies the same defect. The wraps check needs to match on
+characters, not words, before it can be trusted on a broken number.

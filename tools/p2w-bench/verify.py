@@ -207,17 +207,36 @@ def check_visual(claim, ref_lines, got_lines, ref, got):
         # bare circles and the render put a ruled table round it, and "extra:1" could only
         # count lines containing the character 1. The eye saw it and the vocabulary could
         # not, which is the third of the three causes PIPELINE.md names.
+        # A stroke of width w reaches the page as a filled band about w tall: the PDF here
+        # draws 58's rules as zero-height stroked lines and the renderer exports each as a
+        # filled rect 0.4 to 1.2 pt high. The old cut-off was exactly 1.2, and the render
+        # reports 1.2000000476837158 for a 1.2 pt border, so the widest rule on the page
+        # was excluded from the render's count and the page was charged with a missing
+        # rule it did not miss. RULE_MAX_PT is a CLASSIFICATION bound for "this rectangle
+        # is a line, not a box", not a positional tolerance: nothing here is compared
+        # against the other side's coordinate. A box is many points thick, so a bound half
+        # a point above the widest hairline the writer emits separates the two cleanly.
+        RULE_MAX_PT = 1.5
+
         def rules(pg):
             n = 0
             for d in pg.get_drawings():
                 r = d["rect"]
-                horizontal = r.height <= 1.2 and r.width >= 4.0
-                vertical = r.width <= 1.2 and r.height >= 4.0
+                horizontal = r.height <= RULE_MAX_PT and r.width >= 4.0
+                vertical = r.width <= RULE_MAX_PT and r.height >= 4.0
                 if horizontal or vertical:
                     n += 1
             return n
         a, b = rules(ref), rules(got)
-        return ("VERIFIED" if b > a else "REFUTED",
+        # The claim is "the rules on this page do not match the page's", not "there are
+        # too many of them". It was written one-way (b > a) when 351 was the case that
+        # needed it - a ruled grid drawn round a bubble sheet that the page leaves
+        # unruled. A check that can only see one direction of a difference turns every
+        # MISSING rule into a false pass, which is the failure PIPELINE.md names as "the
+        # verifier's check is wrong". Both directions now count.
+        if a == b:
+            return "REFUTED", "%d rules on both sides" % a
+        return ("VERIFIED",
                 "%d rules in the PDF, %d in the render" % (a, b))
 
     if claim.startswith("moved:"):

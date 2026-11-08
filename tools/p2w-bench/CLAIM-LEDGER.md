@@ -18,10 +18,10 @@ This table is the diagnostic. One row per claim type, updated at the end of ever
 
 | Claim type | Verified | Refuted | Unverifiable | What it means |
 |---|---|---|---|---|
-| moved: | 33 | 4 | 0 | the workhorse: 374 -329.3 pt, 375 -172.4, 381 240.8, 393 132.7, 401 -484.1 all held. 8 Nov v3 batch 2 added 8 verified. Re-checked after the gap-clamp fix, 3 of those 8 came back REFUTED (318 7.8 pt, 320 8.9, 325 9.4 stayed VERIFIED on the residual; 326 2.4, 333 0.6, 340 0.1 were refuted by the fix, which is the outcome a fix should produce). The one earlier refutation was mine - "Employee name" was 2.6 pt out, inside the 3.0 pt tolerance, and I had read the cell grid wrong |
+| moved: | 38 | 4 | 0 | the workhorse: 374 -329.3 pt, 375 -172.4, 381 240.8, 393 132.7, 401 -484.1 all held. 8 Nov v3 batch 2 added 8 verified. Re-checked after the gap-clamp fix, 3 of those 8 came back REFUTED (318 7.8 pt, 320 8.9, 325 9.4 stayed VERIFIED on the residual; 326 2.4, 333 0.6, 340 0.1 were refuted by the fix, which is the outcome a fix should produce). The one earlier refutation was mine - "Employee name" was 2.6 pt out, inside the 3.0 pt tolerance, and I had read the cell grid wrong |
 | count: | 1 | 0 | 0 | 38's subtitle is drawn twice on the page to fake bold and once on both sides of a line in the render; the count held |
 | breaks: | 1 | 0 | 0 | |
-| wraps: | 0 | 1 | 0 | one refutation, 303's WARNING SIGNS: the eye saw one line on the PDF and two in the render, and the verifier counted 2 on both sides. The eye misread a line the page had already wrapped at the right margin - the claim was right in form and wrong in fact, which is what the verifier is for |
+| wraps: | 0 | 2 | 0 | one refutation, 303's WARNING SIGNS: the eye saw one line on the PDF and two in the render, and the verifier counted 2 on both sides. The eye misread a line the page had already wrapped at the right margin - the claim was right in form and wrong in fact, which is what the verifier is for |
 | missing: | 0 | 0 | 1 | 39's NOTICE TO MEMBERS is UNVERIFIABLE - the page writes the heading with letter spacing, so its text layer reads collapsed too and the needle is not there on either side |
 | extra: | 0 | 0 | 0 | |
 | pagecount | 4 | 0 | 0 | 8 Nov: 330 and 332 both 1 page in, 2 out, verified twice (once from the eye's FAIL, once from the computed question). Both are drawing pages whose dimension lines and tables overflow |
@@ -173,3 +173,19 @@ layer is written the same spaced way, so the needle is absent on both sides and 
 cannot fire. The finding survives on `order` alone. A claim whose needle does not exist on
 the PDF is the fourth form of the vocabulary gap: not too loose, not missing a check, but
 pointing at text the page never spells the way a reader sees it.
+
+## b80 batch 3 (41-60), 8 Nov — what this run added
+
+20 findings, 16 verified, 1 refuted, 0 unverifiable. moved: +5 verified, pagecount: +2,
+missing: +1, order: +7. The two refutations both name a tool fault, and both are written up
+in REMAINING-DEFECTS.md:
+
+    rules   2 refuted, and both were FALSE ALARMS caused by the check, not the page. The
+            one-way `b > a` test was replaced with a two-way comparison, and the classifier's
+            `height <= 1.2` was excluding a 1.2000000476 pt band - the widest rule on
+            58_header_rule_footer_rule. With RULE_MAX_PT = 1.5 the page is 3 and 3, and 58
+            passes. A claim type that refutes on a hairline is the tool talking.
+    wraps   1 refuted on 56_table_indented_from_margin, where a value really is broken. The
+            check follows words, the PDF holds `640.00` and the render `640.0` + `0`, so the
+            follow stops and the block reads as two lines on both sides. `missing:640.00`
+            verified the same defect. wraps must match on characters, not words.
