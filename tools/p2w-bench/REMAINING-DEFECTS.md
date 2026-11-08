@@ -2025,6 +2025,37 @@ before changing anything.
 
 **Tries: 0 of 3** - diagnosed, not started.
 
+**Fourth measurement, same day - and it clears all three earlier guesses at once.** Printing the
+candidate list immediately before the `containsAnother` loop:
+
+    TBLPRE  count=0
+    TBLPOST count=0
+
+The list is empty before any filter runs. So `findTables`, `buildTables` and `rowPass` together
+produce nothing on this page, despite 23 horizontal and 12 vertical rules being present. The
+`containsAnother` filter, the solidity filter and the `vs.size() < 2` guard are all innocent -
+none of them ever saw a table.
+
+**Where the rejection actually happens:** inside `buildTables`, per horizontal-rule group. The
+candidates for rejection there are, in order:
+
+    if (group.size() < 2) continue;
+    if (bottom - top < 12 || right - left < 30) continue;
+    if (rows < 1 || cols < 2 || rows > 400 || cols > 40) continue;
+
+plus `findTables` itself and `rowPass`.
+
+**Next step, precisely:** print inside the group loop - `group.size()`, `top`, `bottom`, `left`,
+`right`, `ys.size()` after `mergeNear`, and `xs.size()` - for every group. That single print
+names the line. Do not touch any condition until it does.
+
+**Four wrong hypotheses in one afternoon: row height, the vertical-rule guard, the solidity
+filter, the containsAnother filter.** Each was plausible from reading the code; none survived
+being measured. The pattern is consistent enough to write down as a rule: on this codebase,
+print the count at the point of suspicion before editing the condition that guards it.
+
+
+
 **Third measurement, same day.** A print inside the solidity filter produced nothing at all:
 
     (no TBLFILTER lines)
