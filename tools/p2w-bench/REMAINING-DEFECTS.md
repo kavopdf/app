@@ -2621,3 +2621,47 @@ with the text kept as real words. `runXml` emits no `w:spacing` today.
 
 **Tries: 1 of 3** - the threshold attempt, rejected as the wrong layer.
 
+
+## v3 corpus — batch 1 (300-317), second pass 8 Nov 17:25
+
+Fifteen documents re-converted from scratch and put through all seventeen steps again, every page
+opened before any number was read. Thirteen findings, 12 verified, 0 refuted, 1 unverifiable.
+Nine pass, six fail. The four defects already recorded below (301, 303, 305, 311) re-measured to
+the same numbers; two are new. No fix was attempted this run.
+
+### NEW — a table's cell text is placed one row high
+
+314_tender_rfp_boq. `moved:Sub-total` verified: the PDF puts it at y=390.5, the render at 366.3,
+-24.2 pt. The table's own rules are right: 288.4 in the PDF against 288.5 in the render, and both
+carry a 15.0 pt pitch. What is wrong is the text inside the cells - "Earthwork in excavation in
+ordinary soil" is at y=278.0 on the page and y=265.2 in the render, which is above the table's own
+top rule. So this is not the row-height question the first pass suspected; the rows are the page's
+own pitch and the cell content is offset by one row. Reading order on the page is 100 %, so the
+measure layer does not see it. **Tries: 0 of 3.**
+
+### NEW — a three-column page's footer is placed at the end of the flow
+
+315_gazette_notification. `moved:RAJESH KUMAR, Jt. Secy.` verified: y=723.6 on the page, y=793.4 in
+the render, +69.8 pt. The page's columns end at y=265 and the two footer lines sit at 723.6 and
+747.3, well below them; the render carries the footer to the foot of the sheet instead. Reading
+order 47.1 % of 21 rows, 30 rows in the render, is the same defect seen from the column side.
+**Tries: 0 of 3.**
+
+### Re-measured, unchanged
+
+- 301_lab_report_panel `moved:MPL03184471` 34.3 pt, `moved:REFERRED BY` 8.0 pt - the band entry above.
+- 303_discharge_summary `breaks:WARNING SIGNS` - the page's line ends at "needed", the render puts
+  "day." on a second line. This is the second run in which the claim held; the note in the batch-1
+  section that it no longer fails is out of date.
+- 305_vaccination_certificate - the seal's arc text is emitted as horizontal runs ("TIONAL",
+  "IMMUNISATION"), 8-10 pt left of their glyphs, order 47.1 %. The eye's `shapes` claim came back
+  UNVERIFIABLE again: verify.py still has no shape-count check, so the defect is only visible
+  through the order question.
+- 311_fir_police_form `missing:560067` - "Bengaluru 560067" welded to "Mobile"; the table's top y
+  entry above still stands.
+
+### The one disagreement
+
+312_affidavit_stamp_paper passed on sight while the computed order question answered 67.6 % of 34
+rows. That is the known measurement bug on a page whose rows the render joins with tabs, not a
+document defect, and the document is PASS.

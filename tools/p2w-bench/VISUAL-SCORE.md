@@ -524,3 +524,18 @@ They are left as they are rather than edited by hand, because a row is evidence 
 at a run and rewriting it by hand would make the file say something no run observed. The next
 full visual run will overwrite them with what it actually finds.
 
+| 2026-11-08 | 300_prescription_rx | PASS | header band, patient box, Rx table, advice, signature and QR all in place |
+| 2026-11-08 | 301_lab_report_panel | FAIL | moved:MPL03184471 (34.3 pt) and moved:REFERRED BY (8.0 pt) - the four-column label/value band is emitted one field per paragraph |
+| 2026-11-08 | 302_radiology_report | PASS | letterhead, patient band, findings and impression paragraphs, signature |
+| 2026-11-08 | 303_discharge_summary | FAIL | breaks:WARNING SIGNS - the PDF's line ends at 'needed', the render puts 'day.' on a second line |
+| 2026-11-08 | 304_package_insert_small_print | PASS | six numbered sections in small print, one column, every paragraph whole |
+| 2026-11-08 | 305_vaccination_certificate | FAIL | the circular seal's arc text is emitted as horizontal runs - 'TIONAL' and 'IMMUNISATION' land 8-10 pt left of their glyphs, reading order 47.1 % of 27 rows |
+| 2026-11-08 | 306_clinical_protocol_synopsis | PASS | synopsis table and the schedule-of-assessments grid, every column in place |
+| 2026-11-08 | 310_court_judgment | PASS | cause title, eight numbered paragraphs and the signature block |
+| 2026-11-08 | 311_fir_police_form | FAIL | missing:560067 - the render welds 'Bengaluru 560067' to 'Mobile', and the table sits 15.7 pt high |
+| 2026-11-08 | 312_affidavit_stamp_paper | PASS | stamp paper box, five paragraphs, verification and the notary seal; eye passed, order 67.6 % is the known tab-joined-row measurement bug |
+| 2026-11-08 | 313_power_of_attorney | PASS | title, four numbered clauses, schedule and signature lines |
+| 2026-11-08 | 314_tender_rfp_boq | FAIL | moved:Sub-total -24.2 pt: the BOQ's own rules land within 0.1 pt of the page's (15.0 pt pitch, 288.4 vs 288.5), but the cell text sits one row high - 'Earthwork' at 265.2 against the page's 278.0 |
+| 2026-11-08 | 315_gazette_notification | FAIL | moved:RAJESH KUMAR, Jt. Secy. +69.8 pt - the three-column page's footer is placed at the flow's end instead of at the page's own y; order 47.1 % of 21 rows |
+| 2026-11-08 | 316_contract_with_schedules | PASS | five numbered clauses and the Schedule C charges table |
+| 2026-11-08 | 317_rti_response | PASS | letter head, date, six numbered points and the enclosure line |
