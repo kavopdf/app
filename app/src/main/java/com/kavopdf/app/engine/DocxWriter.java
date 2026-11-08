@@ -1568,11 +1568,34 @@ public final class DocxWriter {
         // The exact line height inside a cell was 200 twips - 10 pt - for every cell of every
         // table in every document. A price list drawn at 5.8 pt on an 8.4 pt row pitch got a
         // 10 pt line, so each of its 29 rows grew 1.6 pt taller than the page drew it and the
-        // table drifted 46 pt down the sheet by its last row. The line height is the row's own
-        // pitch: that is what makes a row the height the page gave it.
+        // table drifted 46 pt down the sheet by its last row. The line was then set to the
+        // row's whole pitch instead, which fixes that case and breaks a different one: a cell
+        // the page drew on TWO lines is charged the pitch twice and the row doubles. That is
+        // 402_calendar_month_grid, whose six-week grid arrived as nine rows and pushed the
+        // page's own footer onto a second sheet.
+        //
+        // The pitch is already carried by the row's own w:trHeight hRule="atLeast". So a cell
+        // that holds ONE line keeps the pitch as its line height, exactly as before - that is
+        // what puts a single line at the foot of its row, which is where most of this corpus's
+        // tables drew it, and changing it moved 42 documents' cell text away from the page.
+        // A cell that holds SEVERAL lines is the case that was wrong: charging the pitch to
+        // every line charged the row twice over and doubled it. There the line is the cell's
+        // own text - 1.25 em of its size, below - and the row stays the page's own pitch.
         int cellLineTw = rowTw > 0 ? rowTw : 200;
+        int naturalLineTw = rowTw > 0 ? Math.min(rowTw, 200) : 200;
         for (int r = 0; r < t.rows.size(); r++) {
             List<String> row = t.rows.get(r);
+            // Does any cell of this row hold more than one line of the page? A numbered item's
+            // marker, a calendar's holiday name under its date, a two-line address in a box.
+            int rowParts = 1;
+            for (int q = 0; q < row.size() && q < cols; q++) {
+                String cv = row.get(q);
+                if (cv == null) continue;
+                int n = 1;
+                for (int i = 0; i < cv.length(); i++) if (cv.charAt(i) == '\n') n++;
+                if (n > rowParts) rowParts = n;
+            }
+            int baseLineTw = rowParts > 1 ? naturalLineTw : cellLineTw;
             // The row's own line height, never smaller than its own text. cellLineTw is the
             // table's extent divided by its row count, which is an average - correct only when
             // the rows are evenly spaced. On a page with a tall header row, a merged cell or a
@@ -1581,7 +1604,7 @@ public final class DocxWriter {
             // the light-mode screenshots show on 03 and 04: "III Semester, B.E. Computer
             // Science" sitting on its own border. The type size is the floor, and a row whose
             // text needs more than the average gets more.
-            int rowLineTw = cellLineTw;
+            int rowLineTw = baseLineTw;
             for (int q = 0; q < row.size(); q++) {
                 if (q >= cols) break;
                 float sz = 0f;
