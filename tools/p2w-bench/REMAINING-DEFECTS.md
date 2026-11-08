@@ -3363,3 +3363,39 @@ that would push it over is a positioning error, not a page to add.
 **Tries: 0 of 3.** Root cause measured; not started. The two subagent reports behind this are in
 `/scratch/output/` as the white-patch, stamp, section and border work proceeds.
 
+
+
+**Deeper: the budget cap already exists and cannot help.**
+
+`DocxWriter` already caps space-before to the page budget at two places:
+
+    if (ctx.budgetTw > 0 && ctx.flowTw + beforeTw + lineTw > ctx.budgetTw) {
+        beforeTw = Math.max(0, ctx.budgetTw - ctx.flowTw - lineTw);
+    }
+    ctx.flowTw += beforeTw + lineTw;
+
+It zeroes `beforeTw` once the budget is spent, but `flowTw` keeps growing by `lineTw` for every
+paragraph after that. So the cap cannot stop the overflow - it only stops the overflow being
+caused by gaps.
+
+Which leaves the real question: **why does 01_stamp need 1277 pt of flow for content the PDF drew in
+842?** 78 paragraphs at roughly 10 pt each is 780 pt of line boxes, and the gaps add 477. For that
+to exceed the page, the PDF's lines must overlap - several paragraphs sharing one baseline - or
+some lines must be written twice.
+
+01_stamp has **zero tables**, so this is not cell text on a shared row. Something in the paragraph
+pass is emitting more paragraphs than the page has baselines.
+
+**Where to look next, in order:**
+1. Count the PDF's distinct baselines on page 1 (`page.get_text("words")`, group by y) and compare
+   with the 78 paragraphs. If the counts differ, find which paragraphs share a y and why the
+   grouping did not merge them.
+2. Check whether `sameRow` / `rowMates` is splitting one visual row into several paragraphs when the
+   fields are far apart in x.
+3. Check the footer: `#67` carries `before=258.7` for a single line. Its predecessor is at y≈450 and
+   the footer at y≈790, so the gap is real - but if the footer is ALSO written as a normal flow
+   paragraph, the flow spends 259 pt to reach a line the page drew at the bottom. A footer may
+   belong in a section footer, not in the flow.
+
+**Tries: 0 of 3.** Two levels of cause measured; the third is the paragraph count itself.
+
