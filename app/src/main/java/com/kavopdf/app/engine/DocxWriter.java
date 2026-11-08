@@ -711,7 +711,7 @@ public final class DocxWriter {
                 // in a different wrong place. OOXML has no rotation a LibreOffice render honours,
                 // so a rotated stamp cannot be reproduced faithfully; the axis-aligned box at the
                 // line origin is at least stable. Recorded in REMAINING-DEFECTS.md.
-                anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString());
+                anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), b.angle);
             }
             return;
         }
@@ -1165,6 +1165,24 @@ public final class DocxWriter {
      */
     private static void anchor(StringBuilder sb, Ctx ctx, float xPt, float yTopPt,
                                float wPt, float hPt, String inner) {
+        anchor(sb, ctx, xPt, yTopPt, wPt, hPt, inner, 0f);
+    }
+
+    /**
+     * An anchored text box, rotated about its own centre by the angle the page drew it at.
+     *
+     * <p>OOXML rotates a shape with {@code <a:xfrm rot="...">} in 60000ths of a degree and both
+     * Word and LibreOffice honour it, so a rotated stamp does not have to be written upright.
+     * The angle is {@code Box.angle}, measured from the PDF's own baseline - nothing is
+     * rotated that the page did not rotate. A 15-degree stamp goes out at 15 degrees, a
+     * 90-degree one at 90, and a stamp on a horizontal baseline goes out with no rotation at
+     * all.
+     *
+     * <p>Rotation is about the box's centre, so the offset stays the top-left of the unrotated
+     * box at the same centre: the text stays where the page put it.
+     */
+    private static void anchor(StringBuilder sb, Ctx ctx, float xPt, float yTopPt,
+                               float wPt, float hPt, String inner, float rotDeg) {
         int id = ctx.shapeSeq++;
         long cx = Math.max(1, Math.round(wPt * EMU_PER_PT));
         long cy = Math.max(1, Math.round(hPt * EMU_PER_PT));
@@ -1192,7 +1210,12 @@ public final class DocxWriter {
                 .append("<wp:cNvGraphicFramePr/>")
                 .append("<a:graphic><a:graphicData uri=\"").append(NS_WPS).append("\">")
                 .append("<wps:wsp><wps:cNvSpPr txBox=\"1\"/>")
-                .append("<wps:spPr><a:xfrm><a:off x=\"0\" y=\"0\"/><a:ext cx=\"").append(cx)
+                .append("<wps:spPr><a:xfrm");
+        if (rotDeg != 0f) {
+            long rot = Math.round(((rotDeg % 360f) + 360f) % 360f * 60000f);
+            sb.append(" rot=\"").append(rot).append("\"");
+        }
+        sb.append("><a:off x=\"0\" y=\"0\"/><a:ext cx=\"").append(cx)
                 .append("\" cy=\"").append(cy).append("\"/></a:xfrm>")
                 .append("<a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom>")
                 .append("<a:noFill/><a:ln><a:noFill/></a:ln></wps:spPr>")
@@ -1741,7 +1764,7 @@ public final class DocxWriter {
     private static String stylesXml() {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                 + "<w:styles xmlns:w=\"" + NS_W + "\">"
-                + "<w:docDefaults><w:rPrDefault><w:rPr><w:color w:val=\"000000\"/>"
+                + "<w:docDefaults><w:rPrDefault><w:rPr><w:color w:val=\"000000\"/><w:color w:val=\"000000\"/>"
                 + "<w:rFonts w:ascii=\"Calibri\" w:hAnsi=\"Calibri\" w:cs=\"Calibri\"/>"
                 + "<w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/></w:rPr></w:rPrDefault>"
                 + "<w:pPrDefault><w:pPr><w:spacing w:after=\"120\"/></w:pPr></w:pPrDefault>"
