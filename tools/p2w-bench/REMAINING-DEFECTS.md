@@ -3399,3 +3399,36 @@ pass is emitting more paragraphs than the page has baselines.
 
 **Tries: 0 of 3.** Two levels of cause measured; the third is the paragraph count itself.
 
+
+
+**The root cause, measured.**
+
+    PDF 01_stamp page 1:  241 words, 35 distinct baselines
+    generated .docx:      78 paragraphs with text
+    only 10 of those carry tab stops
+
+**78 paragraphs for 35 baselines.** More than two paragraphs for every baseline the page drew, and
+43 of them are extra. Text that the page put side by side on one baseline is being written as one
+paragraph after another, so the flow stacks it vertically instead of placing it across.
+
+The arithmetic matches the overflow exactly. An invoice's item rows are about five items by seven
+columns - 35 cells on 5 baselines. Written as paragraphs that is 35 x 10 pt = 350 pt where the page
+spent 5 x 10 pt = 50 pt, a 300 pt excess, and the flow was 435 pt over the page.
+
+**So this is D-14 seen from the other side.** Where the table pass misses a table, its cells do not
+vanish - they become loose paragraphs, each on its own line, and the page grows. The `sameRow`
+grouping that is supposed to put fields from one baseline onto one line with tab stops only did so
+for 10 of the 78 paragraphs here.
+
+**The fix is one of two, and both are measurable:**
+1. Build the table, so the cells are cells. That is D-14's work and it is now shipping for many
+   documents - `04_stamp_180` gets 2 tables where it had none.
+2. Where no table can be built, put every line that shares a baseline onto ONE paragraph with tab
+   stops at their measured x. The machinery exists (`sameRow`, `rowMates`, `w:tabs`); it is not
+   firing for cells that sit far apart in x.
+
+**Test to hold it to:** paragraphs-with-text must not exceed the PDF's distinct baselines on a page
+by more than a small margin, and the sum of `w:before + w:line` must not exceed the page height.
+
+**Tries: 0 of 3.** Three levels of cause measured; the fix is not started.
+
