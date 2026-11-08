@@ -2025,6 +2025,32 @@ before changing anything.
 
 **Tries: 0 of 3** - diagnosed, not started.
 
+**Second correction, same day - and the first guess was wrong too.** The guess recorded above
+(that `buildTables` bails because there are no vertical rules) is not what happens. Measured on
+the document:
+
+    TBLDEBUG hs=23 vs=12 rawH=23 rawV=12
+
+Twenty-three horizontal and twelve vertical rules are found. The guard passes easily, the table
+is built, and then it is thrown away a few lines later by the solidity filter:
+
+    if ((inside == 0 || covered * 100 / inside >= 60) && rowSane(t, lines)) solid.add(t);
+
+A table is kept only when at least 60% of the lines inside its bounds match a cell, and when
+`rowSane` agrees. When either fails the table is dropped and its lines are handed back to the
+paragraph path - which is exactly the output that was observed: no `<w:tbl>` at all, the grid's
+words spread across plain paragraphs.
+
+**So the question is which of the two fails on this invoice, and why.** The next step is to
+print `inside`, `covered` and `rowSane`'s reason for this table rather than to change either
+threshold. A 60% floor that is right for a menu or a two-column page may be wrong for an invoice
+whose header band and footer note sit inside the table's bounds without belonging to any cell.
+
+**The wrong guess must not ship.** The change that removed the `vs.size() < 2` half of the guard
+was written on the wrong hypothesis and is reverted; the guard stays as it is.
+
+
+
 **Cause found, same day.** `buildTables` opens with
 
     if (hs.size() < 2 || vs.size() < 2) return out;      // PdfToWord.java, buildTables
