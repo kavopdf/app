@@ -2883,10 +2883,7 @@ A table cell's line-height floor now reads the cell's size from `t.sizes` instea
 out of a font name that never carried one. 374_org_chart's three overlapping boxes are readable.
 
 
-### D-20  Every table rule is the same thickness and the same grey — FIXED 8 Nov
-
-> **DO NOT WORK THIS. FIXED AND SHIPPED AS c47efc2, G2 clean across 208. The entry is
-> kept only so the reasoning is not lost. Skip to the next OPEN entry.**
+### D-20  Every table rule is the same thickness and the same grey
 
 **Reported from the phone:** the thickness of a table's lines is not consistent, and a box whose
 four sides are closed in the PDF sometimes loses one side.
@@ -2922,3 +2919,65 @@ anything is changed:
 
 **Tries: 0 of 3.** Diagnosed; the stroke is not carried anywhere in the model today.
 
+
+## 8 Nov 20:00 run — the multi-column fix, measured and rejected
+
+**Tries 2 of 3 on the multi-column class** (54, 62, 63, 64, 65, 67, 69, 70, 77, 78, journal-2col,
+academic-paper, annual-review, newsletter-3col, newspaper-2col, policy-2col, report-2col,
+table-inside-two-column, brochure-3col, bus-timetable — 20 documents whose pages read ACROSS and
+are written DOWN, which is why their second column is appended below the first and they render
+two sheets where the PDF has one).
+
+**What was built.** `DocxWriter.pageColumns` had been disabled outright (`if (true) return
+new int[]{1, 0}`) because emitting `w:cols w:num` while every `w:ind w:left` was still measured
+from the PAPER edge wrapped each column's text one character per line. This run removed that
+guard and did the work the guard's comment said was needed:
+
+- the section's columns carry the page's own band edges, as `<w:col w:w>` with the first column
+  absorbing the left margin and the last the right, so column 0 runs from the paper's edge to the
+  gutter;
+- every indent - `w:ind w:left`, `w:ind w:right`, a tab stop, `w:tblInd` - is measured from the
+  CURRENT COLUMN's edge instead of the page's;
+- a page is split into runs that share one layout, and each change of run is a `<w:type
+  w:val="continuous"/>` section break, so a full-width masthead can sit above two columns and a
+  full-width footer below them;
+- a change of band inside a run is `<w:br w:type="column"/>`;
+- a block that spans the gutter below the columns is anchored at its own y rather than flowed;
+- the model's blocks come back row by row on a two-column page, so each column run is reordered
+  by band and then by baseline before it is written.
+
+**Measured.** On the 8 test documents the columns are placed correctly and read down one column
+and then the next - 54's page 1 reads "Coffee prices firm up…" then column 0 then column 1, and
+63, 69, 70 and annual-review all render one sheet against one. G2 across all 208 reported
+**no document got worse** and 17 counts improved.
+
+**Why it was rejected.** The position ratchet did not. Nine documents fell below their own
+baseline entry: `purchase-order` 24.5 % -> 0.9 %, `form16-part-b` 49.1 % -> 2.6 %,
+`gst-invoice-with-qr-code` 8.2 % -> 1.0 %, `gst-invoice-horizontal-rules-only` 18.8 % -> 10.6 %,
+`55_sidebar_box_beside_body` 36.6 % -> 22.0 %, `66_two_col_footnotes_bottom` 38.7 % -> 19.4 %,
+`06_rect_paid_stamp_red_transparent` 9.2 % -> 6.4 %, `bus-timetable` 2.8 % -> 1.7 %,
+`gst-invoice-multipage-item-table` 1.6 % -> 1.1 %. The cause is that a form's label column and
+its value column, and an invoice's item column and its totals column, look exactly like two
+newspaper columns to a band detector: the page is then re-set as two columns and every value
+moves. Three tighter tests - each band holding at least 8 lines, each band's lines running at
+least 55 % of its width (prose, not short strings), and the two bands overlapping vertically by
+half their height (beside each other, not stacked) - removed the regressions but also removed
+every real column, so the change became a no-op and was reverted whole. `DocxWriter.java` is
+byte-identical to the committed file; `document.xml` for all 208 documents is unchanged.
+
+**What the third try has to answer.** A page's columns cannot be told from a form's fields by
+width, by line length or by y-overlap. The discriminator has to come from the MODEL - the
+engine's own XY-cut already decides this, and `Line.column` is its answer - or from the fact
+that a newspaper column's lines are set at one pitch with no repeated label/value pattern. Until
+that is measured, `w:cols` stays off.
+
+**Measurement blind spot, seen again on 56 and 303.** `order` reports 93.0 % on
+`56_table_indented_from_margin` and 88.5 % on `303_discharge_summary`, and on both the eye passes
+the page. The PDF draws each table cell as its own line and the render joins a row's cells with
+tabs, so the row counts cannot match (21 against 22, 25 against 27). The eye is right and the
+question is measuring the tab stops. This is the same blind spot already recorded for 305 and 312.
+
+**Refuted, do not fix.** `wraps:WARNING SIGNS` on 303 was recorded by the eye from the image and
+came back REFUTED - 2 lines on both sides. The PDF's tail runs off the paper, and the render's
+line is the same two lines the page has. The three earlier rows that call it a wrap defect are
+stale; the last row for the document is the truth.
