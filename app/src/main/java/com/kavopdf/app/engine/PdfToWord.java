@@ -8,6 +8,7 @@ import com.tom_roush.pdfbox.cos.COSDictionary;
 import com.tom_roush.pdfbox.cos.COSName;
 import com.tom_roush.pdfbox.cos.COSString;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.rendering.PDFRenderer;
 import com.tom_roush.pdfbox.pdmodel.PDPage;
 import com.tom_roush.pdfbox.pdmodel.PDResources;
 import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
@@ -456,6 +457,7 @@ public final class PdfToWord {
             }
             attachShapes(page, rules, page.height, null);
             attachPictures(page, rules, page.height);
+        stampPictures(doc, index, page, report);
             return page;
         }
 
@@ -1012,6 +1014,7 @@ public final class PdfToWord {
         for (Object o : ordered) if (o instanceof Table) written.add((Table) o);
         attachShapes(page, rules, page.height, written);
         attachPictures(page, rules, page.height);
+        stampPictures(doc, index, page, report);
         return page;
     }
 
@@ -4154,6 +4157,60 @@ public final class PdfToWord {
      * space. An image drawn off the page is dropped: a picture pinned outside the paper is
      * invisible in Word and only adds weight to the file.
      */
+
+    private static void stampPictures(PDDocument doc, int index, Page page, Report report) {
+        java.util.List<Para> stamps = new ArrayList<>();
+        float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE;
+        float maxX = -Float.MAX_VALUE, maxY = -Float.MAX_VALUE;
+        for (Object b : page.blocks) {
+            if (!(b instanceof Para)) continue;
+            Para p = (Para) b;
+            boolean rotated = false;
+            for (Box box : p.boxes) if (box.rotated) rotated = true;
+            if (!rotated) continue;
+            stamps.add(p);
+            for (Box box : p.boxes) {
+                minX = Math.min(minX, Math.min(box.x, box.right));
+                maxX = Math.max(maxX, Math.max(box.x, box.right));
+                minY = Math.min(minY, box.y - box.size);
+                maxY = Math.max(maxY, box.y + box.size * 0.4f);
+            }
+        }
+        System.out.println("STAMPDEBUG page=" + index + " blocks=" + page.blocks.size() + " stamps=" + stamps.size());
+        if (stamps.isEmpty()) return;
+        float pad = 3f;
+        minX = Math.max(0f, minX - pad); minY = Math.max(0f, minY - pad);
+        maxX = Math.min(page.width, maxX + pad); maxY = Math.min(page.height, maxY + pad);
+        float wPt = maxX - minX, hPt = maxY - minY;
+        if (wPt <= 2f || hPt <= 2f) return;
+        android.graphics.Bitmap full = null;
+        try {
+            PDFRenderer renderer = new PDFRenderer(doc);
+            float dpi = 300f;
+            full = renderer.renderImageWithDPI(index, dpi);
+            if (full == null) return;
+            float scale = dpi / 72f;
+            int px = Math.max(0, Math.round(minX * scale));
+            int py = Math.max(0, Math.round(minY * scale));
+            int pw = Math.min(full.getWidth() - px, Math.round(wPt * scale));
+            int ph = Math.min(full.getHeight() - py, Math.round(hPt * scale));
+            if (pw <= 0 || ph <= 0) return;
+            android.graphics.Bitmap crop = android.graphics.Bitmap.createBitmap(full, px, py, pw, ph);
+            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+            if (!crop.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, bos)) return;
+            DocxWriter.Picture pic = new DocxWriter.Picture(bos.toByteArray(), minX, minY, wPt, hPt);
+            for (Para p : stamps) page.blocks.remove(p);
+            page.blocks.add(pic);
+            if (report != null) report.images++;
+            System.out.println("STAMPDEBUG rasterised " + pw + "x" + ph);
+        } catch (Throwable t) {
+            System.out.println("STAMPDEBUG FAILED " + t.getClass().getSimpleName() + " " + t.getMessage());
+            return;
+        } finally {
+            if (full != null) full.recycle();
+        }
+    }
+
     private static void attachPictures(Page page, Rules rules, float pageHeight) {
         if (rules == null || rules.pictures.isEmpty()) return;
         for (DocxWriter.Picture pic : rules.pictures) {
