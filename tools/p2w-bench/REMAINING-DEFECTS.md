@@ -2547,3 +2547,77 @@ Written, it changes nothing: a hand-patched copy of 402 with `<w:noWrap/>` on th
 honour it and the element was reverted rather than committed as dead code. The next try has to
 make room instead - a narrower inset, or a cell widened over a neighbour that holds only its own
 annotation. **Tries: 1 of 3.**
+
+### D-15  White patches over the page in Google Docs dark mode — FIXED 8 Nov
+
+The user converted documents on v3.53.0, opened them in Google Docs and photographed them in
+both themes. In dark mode every table came out covered in white rectangles with the text inside
+them still black.
+
+Inspected the files rather than guessing: `w:shd` and `w:fill` were both zero, so it was not
+table shading. The white was `<w:background w:color="FFFFFF"/>`, added on purpose after an
+earlier report of black text on a black page - right for a viewer that honours the stated
+background, wrong for one that inverts the page and paints the white back on top.
+
+**Fixed** by carrying the colour on the text instead: no `w:background`, and
+`<w:color w:val="000000"/>` in `docDefaults` in styles.xml. `gate.py`'s `nobg` metric checked
+for the background, so it checks for the default colour now - a rule that encoded the old
+decision, and the old decision was the bug.
+
+**Verified:** 208 documents, gate reports no document worse.
+
+### D-16  A rotated stamp cannot be rebuilt as text — it is rasterised — FIXED 8 Nov
+
+The user's requirement, in their words: wherever a stamp is, it must be exactly as the PDF has
+it - same place, same shape and size, same outline, and the content inside it the same. In
+iLovePDF and Acrobat a stamp's text is not editable either.
+
+Five measured attempts, each rejected for its own reason:
+
+| Try | Change | Result |
+|---|---|---|
+| 1 | write the box upright | text in the wrong place; outline and text are separate objects and drift |
+| 2 | `<a:xfrm rot>` from `Box.angle` | 15 and 90 degrees correct; LibreOffice ignores `rot` on a text box, so 180 still renders upright |
+| 3 | a rotated line with angle 0 is a 180-degree stamp | attribute written (rot=10800000), still ignored by the renderer |
+| 4 | bind the outline to the text box as its `<a:ln>` border | drift gone, rotation still ignored |
+| 5 | `behindDoc="1"` so the stamp sits under the page's text | correct on its own account; does not change the render |
+
+**Fixed** by rasterising: `stampPictures` finds the rotated paragraphs on a page, takes the union
+of their boxes plus padding, renders that area at 300 dpi with `PDFRenderer`, crops it and puts
+it in the page's blocks as an anchored picture in place of the text. Outline, text, angle, size
+and position are the page's own by construction.
+
+The words are kept as the picture's alt text (`descr` on `wp:docPr`) and `gate.py` folds that
+into its word comparison, so a rasterised stamp is neither missing nor extra.
+
+**Verified as far as the sandbox allows:** the detection runs and finds both stamps on
+04_stamp_180deg_upside_down; the render then fails on `android.graphics.Canvas.getMatrix()`,
+which the sandbox's Android stubs do not have. Confirmation needs a device.
+
+### D-17  A table row is never given less line height than its own text — FIXED 8 Nov
+
+`cellLineTw` was the table's extent divided by its row count - an average, right only when rows
+are evenly spaced. On a page with a tall header, a merged cell or a wrapped value that average is
+smaller than the row's text needs, so the line was set below the type size and the text rode up
+over the rule above it.
+
+**Fixed** by giving each row its own text size as a floor. Superseded the same day by commit
+6624a3a, which found the sharper statement of the same problem - a cell's line is a line of text,
+not the row's pitch - and measured page-count mismatches 20 to 16 with G2 clean.
+
+### D-18  Letter-spaced capitals are written as literal spaces — OPEN
+
+`39_small_caps_letter_spacing` sets its headings in letter-spaced capitals. The extractor sees a
+gap between every letter and keeps it, so `NOTICE TO MEMBERS` arrives as
+`N O T I C E T O M E M B E R S` with the word boundaries gone.
+
+A threshold tweak does not fix it: the word-boundary test is `gap > gs * 0.18f` in two places,
+and lowering both to 0.15 left the output unchanged, because the gaps are already being written
+as spaces before that test matters. That change was reverted and never committed.
+
+The fix is two halves: recognise a line whose gaps are uniform and small as letter-spaced, with
+the word gaps as the outliers rather than the rule, and write it as `w:spacing w:val` on the run
+with the text kept as real words. `runXml` emits no `w:spacing` today.
+
+**Tries: 1 of 3** - the threshold attempt, rejected as the wrong layer.
+
