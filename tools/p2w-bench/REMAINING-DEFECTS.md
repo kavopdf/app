@@ -1557,6 +1557,53 @@ each cell is right, so this is a column-order question in `buildTables`, not a t
 Separate from D-08 and needs its own fix.
 
 ---
+#### D-08 as attempted on 8 Nov — the patch compiles, the measurement did not finish
+
+A full attempt was made and NOT committed, because it could not be verified. What it
+established is worth keeping, because every one of these was found the hard way.
+
+**The five edits, in the order they must be made**
+
+1. `pageColumns()` — delete the `if (true) return new int[]{1, 0};` that disabled it. The real
+   body below it already builds the band map; it runs once that line goes.
+2. `pageColumns()` — add the spanning guard. A block in band 0 whose width is more than about
+   1.6x the first band's is full width (an abstract, a masthead, a wide table); that page must
+   stay one column, because a full-width block cannot live inside a column and the section
+   split that would fix it is not written.
+3. `Ctx` — add `float bandLeft;` and `float bandRight;`. Set them per page, right where
+   `ctx.spendGaps` is set: both 0 when `pCols == 1`, and the first band's edges when it is
+   greater.
+4. `flowFromBox()` — `leftTw` becomes `(b.x - bandL)`, and every
+   `(ctx.pageWidthPt - b.right)` becomes `(bandR - b.right)`. That is what stops the text
+   wrapping one character per line. `w:jc center` then centres inside the band on its own,
+   because the indents are the band's width — no extra work.
+5. `flowRow()` — leave it page-relative. Its tab stops are absolute page coordinates, so
+   shifting the indent without shifting the stops moves the fields off their columns.
+
+**The two traps that cost the most time**
+
+- `flowRow()` declares `int leftTwRaw`, not `int leftTw`. A blind rename of `int leftTw` hits
+  the wrong one and the row function loses its variable, which surfaces as
+  "cannot find symbol: variable b" at the `w:ind` line, not at the declaration.
+- A `float pageW` added to `pageColumns()` collides with the one the real body already
+  declares. Name it something else.
+
+**Why it was not committed**
+
+Page counts looked like regressions on three documents — 324 7->13, 416 300->599,
+417 2->3 — but the counting method was wrong: it counted `w:type="page"` occurrences, and a
+columned section writes `<w:type w:val="nextPage"/>`, so the new sections inflate the count.
+The real page count needs a render, and the position measurement needs about 24 s a document,
+which is 80 minutes for 208 and does not fit one sandbox call. Both have to run before this
+change can be judged.
+
+**Tries: 1 of 3** — the attempt was made, the measurement could not be completed, so it does
+not count as a fix and it does not count as a failure of the approach.
+
+**Next attempt starts here:** make the five edits, convert the 75 v3 documents and the 20
+b80 documents that carry columns, render them, and compare page counts from the RENDER (not
+from the XML) plus the position share against base208-position.json. Only then commit.
+
 ### D-09  The page's own white space is spent only where the columns are real
 
 **FIXED 8 Nov.** GAP_CAP_TW clamps a gap at 120 pt, which is why a page's footer or
