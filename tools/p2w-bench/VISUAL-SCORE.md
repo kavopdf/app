@@ -20,6 +20,7 @@ opened is not counted here - `looked.py` decides that, not this file.
 | 8 Nov | 15 | 12 | 80 % | v3 batch 1 re-run after the gap fix: 3 fail (303 breaks, 311 weld, 315 columns) |
 | 8 Nov | 13 | 6 | 46 % | g53 batch 3, the tax-invoice class: 7 fail, after two engine fixes cleared 9 of the 13 documents of the spill and the dropped header line |
 | 8 Nov | 10 | 5 | 50 % | the D group, and the corpus is now fully scored: 113 PASS / 95 FAIL of 208, last row per document |
+| 8 Nov | 15 | 8 | 53 % | v3 batch 1 final sweep: 7 fail (301, 303, 305, 306, 311, 314, 315), 306 new on a 7.2 pt table-extent finding |
 
 Not a baseline yet - three documents is not the corpus. It becomes one when a full
 batch has been through both halves of the check.
@@ -558,3 +559,28 @@ full visual run will overwrite them with what it actually finds.
 | 2026-11-08 | 56_table_indented_from_margin | PASS | re-checked 8 Nov 20:20: eye pass - the rate table is indented 44 pt from the margin with all nine rows and both signature blocks. The numbers' order 93.0 % of 21 rows is the tab-joined-row measurement bug, recorded as a blind spot, not a defect |
 | 2026-11-08 | bus-timetable-station-left-times-right | FAIL | pagecount verified 1 in / 2 out, moved:10:15 verified at 66.8 pt (the DEPART and ARRIVE cells are stacked), order 4.0 % of 39 rows against 60 |
 | 2026-11-08 | 303_discharge_summary | FAIL | order 88.5 % of 25 rows, the tab-joined-row measurement bug; the eye's wraps:WARNING SIGNS was REFUTED by the verifier - 2 lines on both sides - so no wrap defect was fixed |
+
+## v3 batch 1 (300-317) - final sweep, 8 Nov 21:03 - 15 documents, every page looked at, every finding verified
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-08 | 300_prescription_rx | PASS | header band, patient box, Rx table, advice, signature and QR all on the page's lines |
+| 2026-11-08 | 301_lab_report_panel | FAIL | moved:MPL03184471 34.3 pt, moved:REFERRED BY 8.0 pt - the four-column label/value band is emitted one field per paragraph |
+| 2026-11-08 | 302_radiology_report | PASS | letterhead, patient band, findings and impression, signature on the page's lines |
+| 2026-11-08 | 303_discharge_summary | FAIL | breaks:WARNING SIGNS verified - the PDF's line ends at 'needed' and no render line does |
+| 2026-11-08 | 304_package_insert_small_print | PASS | six numbered sections in small print, every paragraph whole |
+| 2026-11-08 | 305_vaccination_certificate | FAIL | moved:IMMUNISATION unverifiable - the seal's arc text is drawn per glyph, so the needle is on neither side; order 47.1 % of 27 rows |
+| 2026-11-08 | 306_clinical_protocol_synopsis | FAIL | moved:SCHEDULE OF ASSESSMENTS 7.2 pt high - the synopsis table above renders 7.2 pt short of the page's own extent |
+| 2026-11-08 | 310_court_judgment | PASS | cause title, eight numbered paragraphs and the signature block |
+| 2026-11-08 | 311_fir_police_form | FAIL | missing:560067 and moved:Mobile 61.3 pt - the pin is cut at the cell edge and '60067Mobile' welded |
+| 2026-11-08 | 312_affidavit_stamp_paper | PASS | stamp paper box, five paragraphs, verification and the notary seal; eye passed, order 67.6 % is the tab-joined-row measurement bug |
+| 2026-11-08 | 313_power_of_attorney | PASS | title, four numbered clauses, schedule and signature lines |
+| 2026-11-08 | 314_tender_rfp_boq | FAIL | moved:Sub-total 27.0 pt - the BOQ's rows render taller than the page's own 12.2 pt pitch |
+| 2026-11-08 | 315_gazette_notification | FAIL | moved:RAJESH KUMAR 69.8 pt, order 47.1 % of 21 rows - the three-column page's footer sits at the flow's end |
+| 2026-11-08 | 316_contract_with_schedules | PASS | five numbered clauses and the Schedule C charges table |
+| 2026-11-08 | 317_rti_response | PASS | letter head, date, six numbered points and the enclosure line |
+
+8 pass, 7 fail. 16 findings, 14 verified, 1 refuted (314 wraps:Average annual turnover - 2 lines on
+both sides), 1 unverifiable (305 moved:IMMUNISATION). One disagreement: 312's eye passed while the
+numbers failed on order 67.6 % - the tab-joined-row measurement bug, not a document defect. 306 is
+new to this list: the synopsis table renders 7.2 pt short and the heading under it rides up.

@@ -749,3 +749,42 @@ and the PDF's own text layer holds the same weld ("Strongly\x00agree Agree"). Lo
 the render is right and the document passes. On 374 the opposite happened - the eye passed three
 overlapping lines at 130 dpi that the overlap question counted exactly. Both are why the eye and
 the numbers are recorded separately.
+
+
+## 8 Nov, 21:03 IST - v3 batch 1 taken through the final sweep
+
+Sandbox was empty: toolchain rebuilt (Temurin 17.0.21, PDFBox-Android 2.0.27.0, the three corpus
+assets at 75 / 80 / 53), all 208 documents converted and G2 reported **no document got worse**
+before anything was looked at. 15 documents, one page each, all seventeen steps in order.
+
+**Result: 8 pass, 7 fail.** Every page was opened at 130 dpi before visual.py was run, so the
+verdicts are the eye's. 16 findings emitted, 14 verified against the PDF, 1 refuted, 1
+unverifiable.
+
+    301  moved:MPL03184471 34.3 pt, moved:REFERRED BY 8.0 pt   the label/value band, one field per paragraph
+    303  breaks:WARNING SIGNS                                  the PDF's line ends at "needed", no render line does
+    305  order 47.1 % of 27 rows, moved:IMMUNISATION unverifiable   the seal's legend is per glyph on both sides
+    306  moved:SCHEDULE OF ASSESSMENTS 7.2 pt                   the synopsis table renders 7.2 pt short of its extent
+    311  missing:560067, moved:Mobile 61.3 pt                   the pin is cut at the cell edge and "60067Mobile" welded
+    314  moved:Sub-total 27.0 pt                                the BOQ's rows render taller than the page's 12.2 pt pitch
+    315  moved:RAJESH KUMAR 69.8 pt, order 47.1 % of 21 rows     the three-column footer sits at the flow's end
+
+**Refuted, not fixed.** 314's `wraps:Average annual turnover` - 2 lines on both sides. The eye
+read a wrap that the page has too.
+
+**Unverifiable.** 305's `moved:IMMUNISATION`: both sides draw the seal's legend one glyph at a
+time, so the needle is a string on neither side. The defect is real and already recorded; what is
+missing is a claim type for arc text, not a document fix.
+
+**One disagreement, and it is the tool.** 312's eye passed the page while `order` reported 67.6 %
+of 34 rows - the same count on both sides, a different sequence, because the PDF draws each cell
+as its own line and the render joins a row's cells with tabs. That blind spot is now recorded
+four times; it is not a document defect and nothing was fixed on it.
+
+**306 is new.** It passed on an earlier pass and fails now on a verified 7.2 pt: the synopsis
+table above the schedule heading is written from `extent / rowCount`, and a table whose row count
+and extent disagree by part of a row comes out short by that part. Tries: 0 of 3, entry open.
+
+**No fix shipped this run.** The seven open findings are all engine-wide classes with measurements
+already recorded (the table row pitch, the band of label/value pairs, the multi-column flow); none
+was attempted blind at the end of a run.
