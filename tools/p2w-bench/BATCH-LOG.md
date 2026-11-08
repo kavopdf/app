@@ -827,3 +827,42 @@ compiled, TestPdfToWord 29/29, G2 clean, ALL CHECKS PASSED.
 re-processed under the current tools; 342-371 now carry verdicts from this run. Next: v3 batch 4
 (372-394), then b80.
 
+
+---
+
+# b80 batch 1 (01-20), 9 Nov 02:05
+
+20 documents, 21 pages, all seventeen steps in order, every page opened at 130 dpi before any number
+was read. 34 findings emitted, 32 verified, 1 refuted, 1 unverifiable. 8 pass, 12 fail.
+
+**The batch is the stamp corpus, and it is the batch that had no claim type.** 01-15 are fifteen ways of
+stamping a page - 15 degrees, 90, 180, a circular seal, two overlapping, a non-embedded face, a scan -
+and 16-20 are the txtpos pages. Nine of the fifteen stamps are rotated, and a rotated stamp is written
+as a text box carrying `<a:xfrm rot>`. The geometry in the .docx is right; LibreOffice draws the words
+level anyway (ST-A §5, measured, five attempts). Every claim the eye could make reported on the wrong
+property, so the nine documents came back UNVERIFIABLE and their FAIL stood on nothing:
+
+    moved:AUTHORISED SIGNATORY   3.9 pt across, 3.5 pt down - inside every tolerance
+    missing:GOODS RECEIVED       the words are in the render's text layer, just clipped
+    count:PAID                   1 on both sides
+
+**Fix shipped: `rotated:<text>`, a tenth claim type.** It compares the PDF line's writing direction with
+the render's. 01 15.0->0.0, 02 15.0->0.0, 03 90.0->0.0, 04 180.0->0.0, 06 8.0->0.0, 07 12.0->0.0,
+08 9.0->0.0, 09 11.0->0.0 - nine verified findings where there were nine unverifiable ones. First
+written modulo 180 and it refuted 04: a line's dir is its writing direction, so 180 degrees is upside
+down, not level. The full-turn comparison is what shipped, and 04 verifies.
+
+**What the batch did not fix, and why.** The rotated stamp itself is the settled class - the renderer
+cannot rotate glyphs in a text box, and ST-A measured five ways to try. The footer riding above the
+page's own line (01 125.3 pt, 02 130.8, 03 255.1, 04 130.8, 07 182.9, 14 229.6) is D-01's remaining
+half: `pageFits` spends the page's white space only on a page with no table, and every one of these
+carries one. 20's number and its clause are two paragraphs, so each item starts its text a line below
+its number - D-07's family, measured on 8 Nov (+4 documents, -1) and reverted.
+
+**G2 was not re-run: no engine file changed.** The only code change is in verify.py, which gate.py does
+not call. The baseline is untouched.
+
+**precommit** ran with ENGINE_CP pointed at the freshly built engine: every bench tool ran, verify.py
+exercised the new check, ALL CHECKS PASSED.
+
+**Where the corpus stands.** b80 batches 1 is done under the current tools. Next: b80 batch 2 (21-40).

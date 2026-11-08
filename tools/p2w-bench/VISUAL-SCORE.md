@@ -674,3 +674,44 @@ at 130 dpi and as the missing claim type the ledger already names.
 | 2026-11-09 | 394_map_with_legend | PASS | site polygon, river, roads, markers, legend, scale bar and compass |
 | 2026-11-09 | 400_comic_page_speech_bubbles | FAIL | moved:MEANWHILE verified 173.8 pt high - the bottom panel and its whole block ride above the row-2 panels, and reading order is 80.0 % of 15 rows |
 | 2026-11-09 | 401_trifold_brochure | FAIL | missing:CONTACT US - the rotated back panel is drawn 79 pt right of the page's 743, so its lines run off the sheet and the render loses them. The indent defect that put WHY CHAKAN on the cover panel is fixed |
+
+b80 batch 1 (01-15 stamps, 16-20 txtpos), re-processed from scratch on 9 Nov: 20 documents, 21 pages,
+every page opened at 130 dpi before visual.py was run. 34 findings emitted, 32 verified, 1 refuted,
+1 unverifiable. 8 pass, 12 fail.
+
+One tool fix shipped: `rotated:<text>` is a tenth claim type, and it exists because nine of these
+documents could not be claimed at all. A 15-degree stamp is written as a text box carrying
+`<a:xfrm rot>`; the geometry is right and LibreOffice draws the words level. `moved:` measured the
+words 3.9 pt across and called them in tolerance, `missing:` found them in the render's text layer,
+`count:` matched on both sides - so every one of the nine came back UNVERIFIABLE and the document's
+FAIL had nothing behind it. The check compares the PDF line's writing direction with the render's:
+'15.0 degrees in the PDF, 0.0 in the render'. First written modulo 180, which refuted 04 - an
+upside-down stamp is not the same line as an upright one - and the full-turn comparison fixed it.
+
+Everything else in this batch is a known class: the rotated stamp (settled, D-16/ST-A), the footer
+that rides above the page's own line on a page carrying a table (D-01's remaining half, blocked on
+table height), and 20's number-and-clause on separate paragraphs (D-07's family, measured and
+reverted on 8 Nov). No new engine fix was warranted and none was made.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-09 | 01_stamp_rotated_15deg_upright | FAIL | rotated:AUTHORISED SIGNATORY - 15.0 degrees in the PDF, 0.0 in the render; the footer 125.3 pt high |
+| 2026-11-09 | 02_stamp_rotated_15deg_upleft | FAIL | rotated:GOODS RECEIVED - 15.0 degrees in the PDF, 0.0 in the render; the footer 130.8 pt high |
+| 2026-11-09 | 03_stamp_vertical_90deg | FAIL | rotated:INTERNAL AUDIT - 90.0 degrees in the PDF, 0.0 in the render; the footer 255.1 pt high |
+| 2026-11-09 | 04_stamp_180deg_upside_down | FAIL | rotated:DUPLICATE ISSUED - 180.0 degrees in the PDF, 0.0 in the render; the footer 130.8 pt high |
+| 2026-11-09 | 05_round_company_seal_curved_text | FAIL | the seal's arc text lands across the body 600 pt above the seal; moved:BENGALURU is UNVERIFIABLE because the arc is drawn one glyph at a time |
+| 2026-11-09 | 06_rect_paid_stamp_red_transparent | FAIL | rotated:PAID - 8.0 degrees in the PDF, 0.0 in the render |
+| 2026-11-09 | 07_stamp_over_table | FAIL | rotated:QUALITY APPROVED - 12.0 degrees in the PDF, 0.0 in the render; moved:KAVERI TEXTILES 30.9 pt, footer 182.9 pt high |
+| 2026-11-09 | 08_two_overlapping_stamps | FAIL | rotated:PAID - 9.0 degrees in the PDF, 0.0 in the render |
+| 2026-11-09 | 09_stamp_font_not_embedded | FAIL | rotated:AUDITED - 11.0 degrees in the PDF, 0.0 in the render |
+| 2026-11-09 | 10_stamp_as_image | PASS | stamp, table and totals all on the page's own rows |
+| 2026-11-09 | 11_stamp_with_signature_image | PASS | stamp, signature squiggle and the four body blocks in place; order 88.4 % is the tab-joined-row blind spot |
+| 2026-11-09 | 12_stamp_across_page_break | PASS | both pages: agreement body, schedule of property and the SUB-REGISTRAR stamp |
+| 2026-11-09 | 13_stamp_non_english | PASS | the Kannada stamp is drawn at its angle and its words survive |
+| 2026-11-09 | 14_stamp_chars_positioned_td | FAIL | moved:Inspection certificate QA/IC/2025/1147 - the footer sits 229.6 pt above the page's own line |
+| 2026-11-09 | 15_stamp_on_scanned_page | FAIL | moved:TRUE COPY -78.3 pt across and 722.5 pt up; the 9-degree stamp lands at the top of the sheet |
+| 2026-11-09 | 16_right_aligned_amounts_txtpos | PASS | ledger rows, right-aligned amounts and the closing balance line |
+| 2026-11-09 | 17_three_column_widths_txtpos | PASS | 0.0 % of pixels differ |
+| 2026-11-09 | 18_centred_heading_left_body_txtpos | PASS | 0.0 % of pixels differ |
+| 2026-11-09 | 19_hanging_indent_txtpos | PASS | 0.0 % of pixels differ |
+| 2026-11-09 | 20_numbered_list_separate_column_txtpos | FAIL | moved:2. 12.4 pt - the number and its clause are two paragraphs, so every item starts its text a line below its number |

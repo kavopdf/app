@@ -3616,3 +3616,23 @@ whole strings ("CONTACT US", "Meridian Industrial Parks Pvt Ltd", "Survey 142/2,
 410501", "leasing@meridian.example", "+91 20 4123 8890") as single `w:t` runs, so this is placement,
 not writing. **Tries: 0 of 3.**
 
+
+---
+
+## b80 batch 1 (01-20), 9 Nov - what this batch found
+
+Twelve documents FAIL. Every finding is in a class this file already names; nothing new was opened, and
+no fix was attempted on any of them this run. The counts are the verified ones.
+
+| Doc | Finding | Class | Tries |
+|---|---|---|---|
+| **01, 02, 03, 04, 06, 07, 08, 09** | `rotated:` verified - the stamp is drawn at 15/90/180/8/12/9/11 degrees in the PDF and at 0.0 in the render | The settled rotated-stamp class (D-16, ST-A §5). The .docx geometry is correct; LibreOffice will not rotate glyphs inside a text box. One try, then record - do not retry | 3 of 3 |
+| **01, 02, 03, 04, 07, 14** | The footer sits 125.3 to 255.1 pt above the page's own line | D-01's remaining half. `pageFits` refuses to spend the gap on a page carrying a table, and these all carry one - blocked on the model's table height, not on the gap rule | 0 of 3 |
+| **05_round_company_seal_curved_text** | The seal's arc text lands across the body, 600 pt above the seal | The rotated class seen on text drawn one glyph at a time. No claim type can carry it: there is no line in the PDF's text layer to measure, so the FAIL rests on the eye alone | 1 of 3 |
+| **15_stamp_on_scanned_page** | `moved:TRUE COPY` -78.3 pt across, 722.5 pt up; the 9-degree stamp lands at the top of the sheet | The rotated class with a worse anchor. The box is written at y=69.0 pt where the page draws it at y=742.1, so `anchorAt()`'s rotated-offset solve is 673 pt out on a page whose only other content is the scan | 1 of 3 |
+| **20_numbered_list_separate_column_txtpos** | `moved:2.` 12.4 pt: the number and its clause are two paragraphs, so every item starts its text a line below its number | D-07's family - two fields on one baseline. Measured 8 Nov (+4 documents, -1) and reverted | 0 of 3 |
+
+**One measurement bug, for the tool and not the document.** `order` failed on 11 (88.4 % of 21 rows) and
+12 (97.9 % of 23, 82.4 % of 16) while both pages are right on sight. Same cause as 312, 331, 334 and
+305: the page draws each table cell as its own line and the render joins a row's cells, so the row counts
+cannot match. Fifth and sixth occurrences.

@@ -18,7 +18,7 @@ This table is the diagnostic. One row per claim type, updated at the end of ever
 
 | Claim type | Verified | Refuted | Unverifiable | What it means |
 |---|---|---|---|---|
-| moved: | 59 | 4 | 0 | the workhorse: 374 -329.3 pt, 375 -172.4, 381 240.8, 393 132.7, 401 -484.1 all held. 8 Nov v3 batch 2 added 8 verified. Re-checked after the gap-clamp fix, 3 of those 8 came back REFUTED (318 7.8 pt, 320 8.9, 325 9.4 stayed VERIFIED on the residual; 326 2.4, 333 0.6, 340 0.1 were refuted by the fix, which is the outcome a fix should produce). The one earlier refutation was mine - "Employee name" was 2.6 pt out, inside the 3.0 pt tolerance, and I had read the cell grid wrong |
+| moved: | 68 | 4 | 1 | the workhorse: 374 -329.3 pt, 375 -172.4, 381 240.8, 393 132.7, 401 -484.1 all held. 8 Nov v3 batch 2 added 8 verified. Re-checked after the gap-clamp fix, 3 of those 8 came back REFUTED (318 7.8 pt, 320 8.9, 325 9.4 stayed VERIFIED on the residual; 326 2.4, 333 0.6, 340 0.1 were refuted by the fix, which is the outcome a fix should produce). The one earlier refutation was mine - "Employee name" was 2.6 pt out, inside the 3.0 pt tolerance, and I had read the cell grid wrong |
 | count: | 7 | 2 | 0 | 8 Nov v3 batch 2: five `count:` claims on 323's spend-by-category labels (Travel, Shopping, Fuel, Groceries, Health) all verified - the page draws six labels against six amounts and the render keeps only the amounts. This is the type to use when a word occurs more than once on the page, because `missing:` refutes on the first hit anywhere. One refutation the same run: 326's `count:Taxable amount` - the header cell spans two grid columns and python-docx reports it twice, so 1 on both sides. Earlier: 38's subtitle is drawn twice on the page to fake bold and once on both sides of a line in the render; the count held |
 | breaks: | 5 | 0 | 0 | 8 Nov v3 batch 2: 318's TAKE NOTICE line held - the PDF's line ends at "your", the render carries "absence." onto it and no render line ends there. Earlier: 8 Nov re-run of v3 batch 1: 303's WARNING SIGNS held as a `breaks` claim - the PDF's line ends at "needed" and no render line does, because the PDF's own line overruns the paper by 1.4 pt and its tail never reaches the page |
 | wraps: | 1 | 5 | 0 | one refutation, 303's WARNING SIGNS: the eye saw one line on the PDF and two in the render, and the verifier counted 2 on both sides. The eye misread a line the page had already wrapped at the right margin - the claim was right in form and wrong in fact, which is what the verifier is for |
@@ -26,11 +26,12 @@ This table is the diagnostic. One row per claim type, updated at the end of ever
 | extra: | 1 | 0 | 0 | 8 Nov re-run of v3 batch 1: 312's `extra:NOTARY` held - the circular seal's arc text is drawn twice in the render and once on the page. First use of this type |
 | pagecount | 5 | 0 | 0 | 8 Nov: 330 and 332 both 1 page in, 2 out, verified twice (once from the eye's FAIL, once from the computed question). Both are drawing pages whose dimension lines and tables overflow |
 | overlap | 1 | 1 | 0 | 401 held (3 pairs against the PDF's 0). 393 was refuted by a check that only compares LINE boxes: the peak table and the caption are drawn over the CHART, and a table over a picture is not a line overlap. The eye was right and the check is blind |
-| shapes | 2 | 4 | 2 | 400 lost one speech bubble's outline and the claim came back UNVERIFIABLE - there is no visual check for a shape count at all, only the "charts" measure question, which answers "yes" on 5 paths against 4. 316 came back REFUTED: the question said "1 in the PDF, 0 in the docx" and verify.py counted 1 on both sides, so the charts question is what is wrong |
+| shapes | 2 | 5 | 2 | 400 lost one speech bubble's outline and the claim came back UNVERIFIABLE - there is no visual check for a shape count at all, only the "charts" measure question, which answers "yes" on 5 paths against 4. 316 came back REFUTED: the question said "1 in the PDF, 0 in the docx" and verify.py counted 1 on both sides, so the charts question is what is wrong |
+| rotated: | 9 | 0 | 0 | NEW 9 Nov, b80 batch 1. The type that was missing: nine stamp documents whose only defect is an ANGLE could not be claimed by any of the other nine. Every check reported on the wrong property - `moved:` found the words 3.9 pt across on 02 and called them in tolerance, `missing:` found them in the render's text layer, `count:` matched 1 against 1 - so all nine came back UNVERIFIABLE and the document's FAIL stood on nothing. It compares the PDF line's writing direction with the render's: 01 15.0->0.0, 02 15.0->0.0, 03 90.0->0.0, 04 180.0->0.0, 06 8.0->0.0, 07 12.0->0.0, 08 9.0->0.0, 09 11.0->0.0. Written modulo 180 at first and it refuted 04, because a line's dir is its writing direction and 180 degrees is upside down, not level; the full-turn comparison is what shipped |
 | emphasis (not a type yet) | 0 | 0 | 2 | 380's Escalation line is bold in the render and regular in the PDF. q8 only asks whether a line the PDF emphasised KEPT its size; a line the render emphasised on its own is invisible to it |
 | rules | 2 | 0 | 0 | 9 Nov v3 batch 4 added one: 373_leave_application_form, 11 rules in the PDF against 28 in the render, because every label/value cell is written as two table rows. First use was 8 Nov: 351_omr_answer_sheet, 13 rules in the PDF against 32 in the render - a ruled grid drawn round rows 16-45 of a bubble sheet the page leaves unruled. Both directions count, because a check that can only see "too many" turns every missing rule into a false pass |
 | columns (not a type yet) | 0 | 0 | 1 | 383's RESPONSE FIELDS table has a fourth empty column and row rules the PDF does not draw. No claim type describes a table's shape |
-| order (measure) | 50 | 0 | 0 | 9 Nov v3 batch 4 added 2: 400 at 80.0 % of 15 rows, 401 at 72.2 % of 18. Earlier: 373 91.9 %, 400 42.1 %, 401 50.0 % - all three agreed with what the eye saw. 7 Nov batch: 301 78.7 %, 303 88.5 %, 305 47.1 %, 311 90.2 %, 312 60.9 %, 315 29.1 % all held against the PDF, but only five of the six agreed with the eye: 312 was passed on sight, so that row is a measurement bug, not a document defect. 8 Nov batch 2 added 9 verified, and 2 of them disagreed with the eye (331 93.3 %, 334 89.7 %, both passed on sight): reading order on a page of a drawing or a figure is the same measurement bug. 8 Nov second pass of v3 batch 1 added 6 verified; 1 of the 6 disagreed with the eye (305 47.1 %, passed on sight - the PDF draws every table cell as its own line and the render joins a row's cells with tabs, so 27 rows against 24 can never match) |
+| order (measure) | 64 | 0 | 0 | 9 Nov v3 batch 4 added 2: 400 at 80.0 % of 15 rows, 401 at 72.2 % of 18. Earlier: 373 91.9 %, 400 42.1 %, 401 50.0 % - all three agreed with what the eye saw. 7 Nov batch: 301 78.7 %, 303 88.5 %, 305 47.1 %, 311 90.2 %, 312 60.9 %, 315 29.1 % all held against the PDF, but only five of the six agreed with the eye: 312 was passed on sight, so that row is a measurement bug, not a document defect. 8 Nov batch 2 added 9 verified, and 2 of them disagreed with the eye (331 93.3 %, 334 89.7 %, both passed on sight): reading order on a page of a drawing or a figure is the same measurement bug. 8 Nov second pass of v3 batch 1 added 6 verified; 1 of the 6 disagreed with the eye (305 47.1 %, passed on sight - the PDF draws every table cell as its own line and the render joins a row's cells with tabs, so 27 rows against 24 can never match) |
 
 ### 8 Nov 21:03, v3 batch 1 final sweep - what this run added
 
@@ -475,3 +476,25 @@ one this file already carries: when the render has lost the text, the claim is `
 lines on the page lost their weight. `visual.py` answers the question; no claim type can carry it, so
 the document's FAIL rests on `rules`, which is the same cause seen a different way. Until `emphasis`
 is a type, a page whose only defect is weight cannot be recorded as a defect at all.
+
+### 9 Nov 02:05, b80 batch 1 (20 documents) - what this run added
+
+34 findings: `rotated:` 9 verified (new type), `moved:` 9 verified and 1 unverifiable (05's seal, drawn
+per glyph on both sides so no line exists to measure), `order` 14 verified, `shapes` 1 refuted (12 page 2:
+2 shapes on both sides, 2 large on both sides - the question, not the page).
+
+**The unverifiable one is a vocabulary gap, named rather than dropped.** 05_round_company_seal_curved_text
+draws its arc one glyph per position, so the PDF's own text layer has no line for the verifier to compare.
+`rotated:` cannot fire either, for the same reason. The eye sees the arc land across the body 600 pt above
+the seal and there is no claim that can carry it; the document's FAIL rests on the eye alone and is recorded
+as such. The fix would be a check that compares glyph positions, not lines.
+
+**`order` disagreed with the eye twice more, the same way as before.** 11 (88.4 % of 21 rows) and 12
+(97.9 % of 23, 82.4 % of 16) both pass on sight; both pages draw each table cell as its own line and the
+render joins a row's cells, so the row counts cannot match. Fourth and fifth occurrences of the same
+blind spot.
+
+**A page count the eye got wrong.** 20 was recorded FAIL on `pagecount` - the side-by-side sheet appeared
+to show two footers - and the verifier answered REFUTED, "both have 1 pages". PyMuPDF agrees: one page,
+one footer at y=831. The eye was reading the second panel's label as a second page. The FAIL stands on
+`moved:2.` (12.4 pt) instead, which is the real defect.

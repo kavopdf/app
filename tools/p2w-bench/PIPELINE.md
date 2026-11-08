@@ -134,6 +134,8 @@ it as measured.
     pagecount        the render has more or fewer pages than the PDF
     overlap          the render overlaps lines the PDF keeps apart
     shapes           the render has fewer shapes than the PDF
+    rotated:<text>   the PDF draws <text> on a slanted baseline and the render level
+                     (added 9 Nov; 1 degree, full turn - 180 is not 0)
 
 A claim the verifier does not understand comes back UNVERIFIABLE and is not fixed.
 

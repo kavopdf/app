@@ -31,6 +31,16 @@ TWO KINDS OF FINDING, TWO WAYS TO CHECK
         pagecount        the render has more or fewer pages than the PDF
         overlap          the render overlaps lines the PDF keeps apart
         shapes           the render has fewer shapes than the PDF
+        rotated:<text>   the PDF draws <text> on a slanted baseline and the render level
+
+    rotated: exists because nine documents in b80 batch 1 could not be claimed at all.
+    A 15-degree stamp is written as a text box carrying <a:xfrm rot>; the .docx geometry
+    is right and LibreOffice draws the words level anyway. Every other claim type
+    reported on the wrong thing - moved: measured 3.9 pt across and called it in
+    tolerance, missing: found the words in the render's text layer, count: matched on
+    both sides - so the eye's finding came back UNVERIFIABLE and the document's FAIL was
+    left with nothing behind it. The defect is an ANGLE, so the vocabulary needs a word
+    for an angle. Tolerance 1 degree: the smallest rotation in the corpus is 9.
 
 THE FINDINGS FILE (tab separated, one line per finding)
     id  document  page  kind  claim
@@ -50,6 +60,7 @@ EXIT
 
 import argparse
 import difflib
+import math
 import os
 import sys
 
@@ -79,7 +90,12 @@ def lines_of(page):
         for l in b.get("lines", []):
             t = "".join(s["text"] for s in l["spans"]).strip()
             if t:
-                out.append({"text": t, "bbox": l["bbox"],
+                # The angle the page drew this line at, in degrees. dir is a unit
+                # vector along the baseline, so a 90-degree stamp reads 90 and a line
+                # written level reads 0. rotated: is the only claim that uses it.
+                dx, dy = (l.get("dir") or (1.0, 0.0))[:2]
+                ang = math.degrees(math.atan2(dy, dx))
+                out.append({"text": t, "bbox": l["bbox"], "angle": ang,
                             "base": l["bbox"][3], "size": l["spans"][0]["size"]})
     return out
 
@@ -334,6 +350,31 @@ def check_visual(claim, ref_lines, got_lines, ref, got):
         if gn == rn:
             return "REFUTED", "%d of %r on both sides" % (rn, needle[:24])
         return "VERIFIED", "%d of %r in the PDF, %d in the render" % (rn, needle[:24], gn)
+
+    if claim.startswith("rotated:"):
+        # The page draws this text on a slanted baseline; the render draws it level.
+        # Compared as an ANGLE, not as a position: on 02 the stamp's words land 3.9 pt
+        # across and 3.5 pt down - inside every tolerance - and are still wrong, because
+        # the page turned them 15 degrees and the render did not.
+        needle = claim.split(":", 1)[1].strip()
+        rl = [l for l in ref_lines if l["text"].strip().startswith(needle)]
+        gl = [l for l in got_lines if l["text"].strip().startswith(needle)]
+        if not rl:
+            return "UNVERIFIABLE", "the PDF has no %r" % needle[:40]
+        if not gl:
+            return "UNVERIFIABLE", "%r is in the PDF but not in the render" % needle[:40]
+        ra = abs(rl[0].get("angle", 0.0))
+        ga = abs(gl[0].get("angle", 0.0))
+        # Compared over the full turn, not modulo 180. A text line's dir is its WRITING
+        # direction, so 180 degrees is upside-down text, not the same line as 0 - and
+        # 04_stamp_180deg is exactly that case: measured modulo 180 the check called it
+        # REFUTED and told the pipeline to stop fixing a stamp that is visibly inverted.
+        d = abs((ra - ga + 180.0) % 360.0 - 180.0)
+        if d <= 1.0:
+            return "REFUTED", "%r at %.1f degrees in the PDF, %.1f in the render" % (
+                needle[:24], ra, ga)
+        return "VERIFIED", "%r at %.1f degrees in the PDF, %.1f in the render" % (
+            needle[:24], ra, ga)
 
     if claim.startswith("overlap"):
         def pairs(ls):
