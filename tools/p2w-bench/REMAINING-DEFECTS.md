@@ -2023,7 +2023,7 @@ stroke drawn inside a table - so the question is whether the rules were detected
 discarded, or never detected. Dump the `Rules` the pass found for page 1 of that document
 before changing anything.
 
-**Tries: 2 of 3** - diagnosed, two attempts measured and both rejected.
+**Tries: 3 of 3 - CLOSED, no code shipped.** Three attempts measured, all three rejected.
 
 **Fifth measurement - the column fix, run through the gate, REJECTED.** Two versions were tried
 and both are recorded here so neither is repeated.
@@ -2057,7 +2057,7 @@ more text than the band's own lines do. The second guard is the one that matters
 swallows words, and comparing the cell text back against the band's line text would catch it
 before the table is kept.
 
-**Tries: 2 of 3 on this defect.** One attempt left.
+
 
 
 **Fourth measurement, same day - and it clears all three earlier guesses at once.** Printing the
@@ -2700,3 +2700,27 @@ order 47.1 % of 21 rows, 30 rows in the render, is the same defect seen from the
 312_affidavit_stamp_paper passed on sight while the computed order question answered 67.6 % of 34
 rows. That is the known measurement bug on a page whose rows the render joins with tabs, not a
 document defect, and the document is PASS.
+
+
+**Third attempt, also rejected - CLOSED, three tries spent.** The stricter version required four
+lines to share a boundary rather than three, and added a guard that throws the whole derivation
+away unless the band holds at least two lines per column and six characters per column. Measured
+over 208 documents:
+
+    333_datasheet_spec_tables            missing   0 -> 2
+    333_datasheet_spec_tables            lines   122 -> 86
+    price-list-2col-dense-right-aligned  missing   0 -> 7
+    REGRESSED: 3 counts - DO NOT SHIP
+
+Identical to the second attempt. Both regressing documents pass the guard, so the guard is not
+the part that is wrong - the premise is. On those two pages the band really does look like a
+grid by every measure available here, and the words that go missing are the ones the table
+claims and then does not write.
+
+**CLOSED. Three tries spent, no code shipped.** The invoice table in 04_stamp_180deg stays as
+paragraphs. That is worse than a correct table and better than a wrong one that loses words.
+
+If this is picked up again it needs a different idea, not a tighter threshold: compare the
+table's cell text back against the band's line text word for word and reject on any word that
+does not survive, rather than inferring safety from counts. That check belongs in the table
+builder, not in this derivation, and it would also protect the ruled path from the same failure.
