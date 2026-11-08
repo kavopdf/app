@@ -3481,3 +3481,66 @@ and Docs' own Download as PDF, with Show section breaks and Show non-printing ch
 
 **Source:** the report is `D8-D-google-docs-support.md`.
 
+
+
+**Table borders: the exact reason `04` gets `none`, measured.**
+
+`04`'s two tables are found by the **row/whitespace pass**, so `t.ruled` is false and `t.top /
+t.bottom / t.left / t.right` are the **text's ink extents** - the first row's baseline, the last
+row's baseline, the first glyph's x, the last glyph's right edge - not the rectangle the page strokes
+around the block. `edgeStroke` accepts a stroke only within **2.5 pt** of one of those four bounds,
+and the drawn boxes sit **4.0 to 24.1 pt outside** them, so `widths` stays empty and it returns null.
+
+    T1 student block   bounds 184.000 / 64.000 / 443.513 / 212.000   drawn panel 169.7-220.3, 55.7-539.6
+                       edge gaps 14.300 / 8.300 / 8.300 / 96.063     0 of 4 shapes match
+    T2 fee items       bounds 244.300 / 67.247 / 522.000 / 334.300  drawn box  231.65-358.35, 55.65-526.35
+                       edge gaps 12.650 / 24.050 / 11.597 / 4.350   0 of 4 shapes match
+
+The nearest miss in the whole document is T2's **right edge at 4.350 pt** - 1.5 pt past tolerance.
+Only 4 of the page's 10 shapes reach the geometry test; the other 6 are fills with `lineRgb < 0`, and
+the page's interior row rules never become shapes at all.
+
+`23_timetable_grid_txtpos` works because it is found by the **ruled** pass: `ruled=true`, bounds are
+the drawn frame itself, and its single stroke-only shape is off by 0.400 / 0.400 / 0.400 / 0.290 pt.
+
+**Two consequences for the fix.** Raising the tolerance cannot serve both tables - T2 needs at least
+4.35 for one edge but 12.65 for the top and 24.05 for the bottom, and T1's right edge needs 96.06
+because its shape is a full-width panel, not a table rule. And **T1's six `none` sides are arguably
+correct**: the page draws no rules on that block, so only T2's six are a real loss.
+
+**Stamp: the exact cause of the drift, measured.**
+
+Both stamps are **four separate content-stream objects** - two stroked `re S` rectangles and two
+`BT..TD..TJ` text objects, each in its own `q..Q`, each repeating an identical `cm`. Nothing binds
+text to outline except that repeated matrix, and there is no `/Rotate` and no form XObject.
+
+At 15 degrees the outline's axis-aligned bounding box is **205.950 x 104.675 pt** against a true
+rectangle of **198.424 x 55.200** - **96.8 % more area**. The first baseline origin sits **25.88 pt
+in from the rect's left edge, 36.28 pt below its top, and 86.89 pt to the left of the rectangle's
+centre**. That lever arm is the whole bug.
+
+`anchor()` sets `wp:posOffset` to the **baseline origin as the box's top-left**, `wp:extent` to the
+**text-tight box** (`advance + 1.5 em` by `1.15 em`), and `a:xfrm/@rot` correctly. But OOXML rotates
+about the **box centre**, so the displacement is `(R - I) * (-w/2, +h/2)` - linear in the box width:
+
+    15 degrees    (+5.12, +22.21) and (+5.69, +26.53) pt   1.59 and 1.89 em too low
+                  the first baseline ends 3.29 pt BELOW the rectangle's bottom edge
+    180 degrees   (+136.88, -20.23) and (+195.91, -20.23) pt   a full box width
+                  CANCELLED starts at x=486.77 while the rect's right edge is 481.79
+
+Different per line, which is why the user sees the text move sometimes and the outline other times.
+Second cause: the outline is a different object with different geometry - an AABB 96.8 % too large,
+or the text-tight border 39.10 pt too short, and only one of the two rectangles is ever consumed.
+Third: measured in LibreOffice, the frame rotates and the glyphs do not.
+
+**The construction that reproduces both stamps to under 0.001 pt:** make the box **the stamp's own
+rectangle**, centre it on the rectangle's centre, and place the text with the body insets rather than
+by moving the box - for file 01 line 1 that is `lIns=25.883, tIns=19.900,
+posOffset=(168.0008, 460.7983)`.
+
+**And the raster fallback would not have worked anyway:** its crop rectangle misses **50.4 pt of the
+top and 16.4 pt of the bottom** of file 01's outline, so even a working PNG path would have clipped
+the stamp.
+
+**Reports:** `TB-B-why-none.md`, `ST-B-drift-geometry.md`.
+
