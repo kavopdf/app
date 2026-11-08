@@ -2885,6 +2885,9 @@ out of a font name that never carried one. 374_org_chart's three overlapping box
 
 ### D-20  Every table rule is the same thickness and the same grey — FIXED 8 Nov
 
+> **DO NOT WORK THIS. FIXED AND SHIPPED AS c47efc2, G2 clean across 208. The entry is
+> kept only so the reasoning is not lost. Skip to the next OPEN entry.**
+
 **Reported from the phone:** the thickness of a table's lines is not consistent, and a box whose
 four sides are closed in the PDF sometimes loses one side.
 
