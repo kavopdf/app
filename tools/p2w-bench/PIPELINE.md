@@ -136,3 +136,29 @@ it as measured.
     shapes           the render has fewer shapes than the PDF
 
 A claim the verifier does not understand comes back UNVERIFIABLE and is not fixed.
+
+## A stamp is rasterised, not rebuilt as text
+
+A rotated stamp is not written as text. `PdfToWord.stampPictures` finds the rotated paragraphs
+on a page, takes the union of their boxes plus three points of padding, renders that area of the
+PDF page at 300 dpi, crops it, and puts it in the page's blocks as an anchored picture in place
+of the text.
+
+Why, in one line each, because five attempts were measured before this was accepted:
+
+- written upright, the text lands where the page did not put it;
+- `<a:xfrm rot>` is written and ignored - LibreOffice drops rotation on a text box, and its
+  documented limit is that bitmaps rotate only in 90-degree steps;
+- the outline and the text were two objects with two position calculations, and they drifted.
+
+A picture has none of those failure modes: outline, text, angle, size and position are the
+page's own by construction.
+
+**Two things follow for anyone reading a converted file.**
+
+1. The stamp's words are no longer in the text layer. They are written as the picture's alt text
+   (`descr` on `wp:docPr`), so a screen reader reads them and a search finds them.
+2. `gate.py` folds that alt text into the document's word list before comparing, so a rasterised
+   stamp is neither missing nor extra. If you add a comparison that reads the document as text,
+   fold the alt text in the same way or every stamp document will look like it lost words.
+

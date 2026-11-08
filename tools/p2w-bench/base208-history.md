@@ -82,3 +82,15 @@ count exactly, 0 spill and 0 short. The metric under-counts any document that ca
 section break, and it is left as-is for now because the baseline was recorded with it - but
 anyone reading `pages 537 vs refpages 540` as three lost pages is reading a counting artifact.
 
+
+## 8 Nov - stamp rasterisation, and why the baseline is owed
+
+`stampPictures` now rasterises a rotated stamp instead of writing it as text. The words are kept
+as the picture's alt text and `gate.py` reads them, so the word counts should be unchanged - but
+that has not been measured end to end, because the sandbox's Android stubs cannot run
+`PDFRenderer` (`android.graphics.Canvas.getMatrix()` is missing there).
+
+**A re-baseline is owed once an APK has converted the corpus on a device.** Until then the
+stored baseline is the pre-rasterisation one, and a run that reports a stamp document as worse
+should be checked against the alt-text path before it is believed.
+
