@@ -781,9 +781,10 @@ of 34 rows - the same count on both sides, a different sequence, because the PDF
 as its own line and the render joins a row's cells with tabs. That blind spot is now recorded
 four times; it is not a document defect and nothing was fixed on it.
 
-**306 is new.** It passed on an earlier pass and fails now on a verified 7.2 pt: the synopsis
-table above the schedule heading is written from `extent / rowCount`, and a table whose row count
-and extent disagree by part of a row comes out short by that part. Tries: 0 of 3, entry open.
+**306 is new.** It passed on an earlier pass and fails now on a verified 7.2 pt. Both PDFs' rules
+were measured: the render's first table starts at 39.4 where the page puts it at 46.0, and its
+rows run at 16.60 pt against the page's 17.00. That is 6.6 pt of the known table-top spacer plus
+4.4 pt of `TABLE_BORDER_TW` over-charging eleven rows - two causes, one number. Tries: 0 of 3.
 
 **No fix shipped this run.** The seven open findings are all engine-wide classes with measurements
 already recorded (the table row pitch, the band of label/value pairs, the multi-column flow); none

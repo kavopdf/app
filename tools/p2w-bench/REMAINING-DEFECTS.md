@@ -3106,11 +3106,26 @@ attempted in this run.
 ### OPEN - the synopsis table renders 7.2 pt short of its extent, and the heading under it rides up
 
 306_clinical_protocol_synopsis. `moved:SCHEDULE OF ASSESSMENTS` verified: y=250.9 in the PDF,
-y=243.7 in the render, 7.2 pt. The table above it is written from `(t.bottom - t.top) / rows`
-as every table is, so a table whose row count and whose extent disagree by one row's share
-comes out short by exactly that share and everything below it follows. The row pitch of that
-table is 12.2 pt; 7.2 pt is 0.59 of a row, which is what a merged header row would leave behind.
-**Tries: 0 of 3.** Diagnosed from the two coordinates; the row model has not been dumped yet.
+y=243.7 in the render, 7.2 pt. Measured this run, both PDFs' horizontal rules:
+
+    PDF   46.0  63.0  80.0  97.0 ... 233.0    eleven rows at a 17.00 pt pitch
+    REND  39.4  56.0  72.6  89.2 ... 222.0    eleven rows at a 16.60 pt pitch
+
+So there are two separate errors and they add up to the 7.2 pt:
+
+1. **The table's top rule is 6.6 pt high** (39.4 against 46.0). The model has the previous
+   paragraph at `top=27.0` and the table at `top=46.0`; the spacer before the table charges
+   `(t.top - lastBaseline) - lastSize*LINE_FACTOR` and drops the gap altogether below 1.2 lines.
+   This is the same defect 311 carries at 15.7 pt and it is the entry above.
+2. **The pitch is 0.4 pt short on every row.** `rowTw` is `(t.bottom - t.top) / rows` less
+   `TABLE_BORDER_TW` (15 twips, 0.75 pt), on the reasoning that a collapsed border puts half a
+   rule inside the row at each edge. Here the render's rows come out 16.60 pt against the page's
+   17.00, so the renderer is adding back about 0.35 pt of that 0.75 and the subtraction
+   over-charges by 0.4. On eleven rows that is 4.4 pt, and 6.6 + 4.4 is the 7.2 the heading moved.
+
+**Tries: 0 of 3.** Nothing was changed: the spacer has one measured attempt already reverted
+(390, see above), and a change to `TABLE_BORDER_TW` moves every ruled table in all 208 documents
+and has to be measured against the position ratchet before it can be believed.
 
 ### OPEN - the arc text of a seal is per glyph, so a `moved:` claim on it is unverifiable
 
