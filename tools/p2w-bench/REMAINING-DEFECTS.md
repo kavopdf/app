@@ -1,5 +1,24 @@
 # Remaining defects — to be worked at the very end
 
+## STATUS - READ THIS FIRST
+
+Three entries below are **FIXED AND SHIPPED**. Do not work them, do not reopen them, do not
+re-derive them. The reasoning is kept so it is not lost; the code is already in the tree.
+
+| Entry | Status | Shipped as | Measured |
+|---|---|---|---|
+| **D-08** columns, sections, reading order | **FIXED 8 Nov** | `a81ca28`, `685ce4b`, `3078b62` | G2 clean on 208, three times |
+| **D-14** the invoice table | **FIXED 8 Nov** | `265cda1` | G2 clean on 208; 127 documents carry tables where 112 did, 212 `w:tbl` where 183 |
+| **D-20** table rule thickness and the missing side | **FIXED 8 Nov** | `c47efc2` | G2 clean on 208; 55 tables that were `none` are ruled, widths now 3-10 eighths, 55 borders black |
+
+Still open and yours: **D-18** (letter-spacing, 1/3 tries) and **D-19** (a figure written as loose
+anchors, 0/3 tries), plus the batch work.
+
+A note on editing this file: headings get rewritten by tooling, and a marker added to a heading has
+been lost before. If you need to record a status, put it in this block or append a section at the
+end of the file, not in a heading.
+
+
 ## v3 corpus — batch 1 (300-317), re-run 8 Nov 08:38
 
 Fifteen documents, one page each, all seventeen steps in order, every page opened before any number
@@ -1650,7 +1669,7 @@ characters, not words, before it can be trusted on a broken number.
 Ten documents fail and nine of them are the same defect. Every finding below came back
 VERIFIED from `verify.py` against the PDF; nothing here is an opinion.
 
-### D-08  A page set in two or three columns is written as one flow
+### D-08  A page set in two or three columns is written as one flow — FIXED 8 Nov
 
 **Severity: the largest single class in this batch - nine of twenty documents.**
 
@@ -2012,7 +2031,7 @@ baselines - the table-height family below, not the gap. **Tries: 0 of 3.**
 315_gazette_notification is not re-listed: its failure is D-08 (a page set in two or three
 columns is written as one flow), which is open with its own tries and is the next class to
 work.
-### D-14  The invoice table in 04_stamp_180deg is not written as a table at all
+### D-14  The invoice table in 04_stamp_180deg is not written as a table at all — FIXED 8 Nov
 
 **Found 8 Nov while investigating what looked like a row-height problem. It is not.**
 
@@ -2883,7 +2902,7 @@ A table cell's line-height floor now reads the cell's size from `t.sizes` instea
 out of a font name that never carried one. 374_org_chart's three overlapping boxes are readable.
 
 
-### D-20  Every table rule is the same thickness and the same grey
+### D-20  Every table rule is the same thickness and the same grey — FIXED 8 Nov
 
 **Reported from the phone:** the thickness of a table's lines is not consistent, and a box whose
 four sides are closed in the PDF sometimes loses one side.
