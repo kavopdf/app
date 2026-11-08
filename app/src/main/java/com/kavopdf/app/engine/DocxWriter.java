@@ -711,7 +711,13 @@ public final class DocxWriter {
                 // in a different wrong place. OOXML has no rotation a LibreOffice render honours,
                 // so a rotated stamp cannot be reproduced faithfully; the axis-aligned box at the
                 // line origin is at least stable. Recorded in REMAINING-DEFECTS.md.
-                anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), b.angle);
+                // A stamp drawn upside down has a HORIZONTAL baseline, so its measured angle is
+                // 0 and the box would go out upright. The page still flagged it as rotated - that
+                // flag comes from the text matrix, not from the angle - so a rotated line whose
+                // angle is 0 is a 180-degree stamp. Nothing is forced: an unrotated line never
+                // reaches this branch, because only b.rotated lines become a text box at all.
+                float stampRot = b.rotated && Math.abs(b.angle) < 1f ? 180f : b.angle;
+                anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), stampRot);
             }
             return;
         }
