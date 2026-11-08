@@ -3096,3 +3096,57 @@ breaks; the prototype for that is a separate piece of work.
 **Tries: 3 of 3 on the guard question. No code shipped.** What is now known is where the test
 belongs and what its numbers are.
 
+
+
+**The continuous-section approach, built and measured.** Ten prototype .docx files were made from
+raw XML and converted with LibreOffice; every claim below is a measured coordinate, not a reading of
+the spec. All three required shapes render on ONE page with correct reading order:
+
+    heading + 2col + full-width paragraph + 2col     1 page   full-width element 439.3 pt
+                                                              against a 199.0 pt column
+    the same with a table in the middle              1 page   rules 482.9 pt = full measure
+    a three-column version                           1 page   full-width element 439.3 pt
+
+The break is carried by the **last paragraph of the section it ends**, in its `pPr`; the final
+section's `sectPr` sits directly under `<w:body>`:
+
+    <w:p><w:pPr><w:sectPr><w:type w:val="continuous"/>{PG}<w:cols w:num="1"/></w:sectPr></w:pPr>...
+    <w:p>...body...</w:p>
+    <w:p><w:pPr><w:sectPr><w:type w:val="continuous"/>{PG}<w:cols w:num="2"/></w:sectPr></w:pPr>...
+    <w:p><w:pPr><w:sectPr><w:type w:val="continuous"/>{PG}<w:cols w:num="1"/></w:sectPr></w:pPr>...
+    <w:p>...body...</w:p>
+    <w:sectPr><w:type w:val="continuous"/>{PG}<w:cols w:num="2"/></w:sectPr>
+
+`{PG}` is `w:pgSz` + `w:pgMar` repeated byte-for-byte in **every** `sectPr` - nothing is inherited
+between sections.
+
+**Four findings that change how this has to be written.**
+
+1. **The last section is unbalanced.** A continuous break balances the section it ENDS, but the
+   final section fills column 1 to the bottom margin first. Measured on a 60-line block: B01-B50
+   all in column 0 down to y=767.2, then B51-B60 restarting at y=201.2 in column 1. A trailing
+   element makes it balance like the others.
+2. **Balancing reflows the text**, so the PDF's own column break cannot be reproduced by geometry
+   alone. `<w:br w:type="column"/>` overrides it: measured, it forced exactly 15/5 in a 20-line
+   block.
+3. **Two of the earlier "known facts" did not survive measurement.** `w:equalWidth="false"` is NOT
+   mandatory for LibreOffice - it honours `<w:col w:w>` with the attribute absent and only ignores
+   widths on `equalWidth="true"`; LibreOffice's default is false, the opposite of Word. Keep
+   emitting the attribute for Word, not for LibreOffice. And a `w:num` that disagrees with the
+   `w:col` count was tolerated. Only an asymmetric 6000/3200 test discriminates this; a symmetric
+   one cannot, because the equal-split value is the same number.
+4. **Correct output XML is not sufficient.** Page-wide `(y, x)` or column-major sorting is not a
+   valid reading order once a full-width element exists - the flow resets there. The prototype's
+   own first pass mis-ordered the page until the extractor was made to reset flow at each
+   full-width band.
+
+The adjacent-same-count bug reproduced exactly: `A01..A10, B01..B20, A11..A20`. `nextColumn` and an
+omitted `w:type` both produced two pages. A table cannot carry a `sectPr`, so it needs a zero-height
+carrier paragraph after `</w:tbl>` - costs 2.9 pt.
+
+**So D-08 is two changes, not one.** The extractor must segment the page at full-width bands and
+order each segment column by column; the writer must emit one continuous section per segment. Both
+halves are now specified and measured. Reports: `D08-corpus-analysis.md`,
+`D08-false-positive-diagnosis.md`, `D08-continuous-sections-prototype.md`, plus ten prototype
+.docx files that reproduce every number above.
+
