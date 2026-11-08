@@ -2883,7 +2883,7 @@ A table cell's line-height floor now reads the cell's size from `t.sizes` instea
 out of a font name that never carried one. 374_org_chart's three overlapping boxes are readable.
 
 
-### D-20  Every table rule is the same thickness and the same grey
+### D-20  Every table rule is the same thickness and the same grey — FIXED 8 Nov
 
 **Reported from the phone:** the thickness of a table's lines is not consistent, and a box whose
 four sides are closed in the PDF sometimes loses one side.
