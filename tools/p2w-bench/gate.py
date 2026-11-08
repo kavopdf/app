@@ -227,11 +227,15 @@ def main():
         print("A gate that did not see the corpus cannot judge it. FAILED.")
         return 1
 
-    regressed, improved = [], []
+    regressed, improved, joined = [], [], []
     for b, now in cur.items():
         was = base.get(b)
         if not was or "error" in now or "error" in was:
             continue
+        # Did this document lose or gain a WORD? That is the question the line count was
+        # standing in for, and it is asked directly below, so it is asked once here too.
+        words_moved = (now.get("missing", 0) > was.get("missing", 0)
+                       or now.get("extra", 0) > was.get("extra", 0))
         for k in ("missing", "extra", "blocks", "nobg", "blank"):
             if now.get(k, 0) > was.get(k, 0):
                 regressed.append((b, k, was.get(k, 0), now.get(k, 0)))
@@ -246,14 +250,27 @@ def main():
         # has is the only correct one, so a new page is as wrong as a lost page.
         if now.get("pages", 0) != was.get("pages", 0):
             regressed.append((b, "pages", was.get("pages", 0), now.get("pages", 0)))
+        # A line count can FALL without a word being lost: two fields the page drew on one
+        # baseline are one row, and one row is one line holding two boxes. That is the whole
+        # point of a row, and counting it as a regression made every row merge look like lost
+        # text - 15 documents on 8 Nov, all of them with missing and extra still at 0. So a
+        # fall is a regression only when a word went with it; otherwise it is a join, and it
+        # is reported as one.
         if now.get("lines", 0) < was.get("lines", 0):
-            regressed.append((b, "lines", was.get("lines", 0), now.get("lines", 0)))
+            if words_moved:
+                regressed.append((b, "lines", was.get("lines", 0), now.get("lines", 0)))
+            else:
+                joined.append((b, "lines", was.get("lines", 0), now.get("lines", 0)))
         elif now.get("lines", 0) > was.get("lines", 0):
             improved.append((b, "lines", was.get("lines", 0), now.get("lines", 0)))
     print(f"documents: {len(cur)}")
     if improved:
         print(f"IMPROVED: {len(improved)} counts")
         for r in improved[:12]:
+            print(f"   {r[0][:42]:<42} {r[1]:<8} {r[2]} -> {r[3]}")
+    if joined:
+        print(f"JOINED: {len(joined)} line counts fell with no word lost")
+        for r in joined[:12]:
             print(f"   {r[0][:42]:<42} {r[1]:<8} {r[2]} -> {r[3]}")
     if regressed:
         print(f"REGRESSED: {len(regressed)} counts — DO NOT SHIP")
