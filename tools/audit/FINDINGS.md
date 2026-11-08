@@ -272,3 +272,72 @@ by an `isEmpty()`/size check or live in a loop bounded by `size() - 1`
 
 **STATUS: FIXED** - the count is now `emptyBefore - empty.size()`, the pages this function actually gave a stream to, and the message uses it; the `attached >= 0` guard that could never fail is now `attached > 0`. TestRepair (188 passed) and TestRepairFixtures (1258 passed). PdfRepair.java:1730, :1788.
 
+---
+
+## Stage 5 — SECURITY
+
+Scope: every exported component and whether it needs a permission; hardcoded keys,
+passwords and tokens; file paths built from input; the FileProvider configuration;
+WebView settings; `android:allowBackup`; and every place the app writes something
+into a log or into a file that outlives the screen.
+
+What passed (recorded so it is not re-checked): no WebView anywhere in the source,
+so there is no `setJavaScriptEnabled`, no `addJavascriptInterface` and no
+file-access setting to get wrong. No hardcoded key, password or token — the only
+`password` strings in the tree are resource lookups and PDFBox arguments; the
+release signing config reads every secret from `System.getenv` (app/build.gradle:38-44)
+and no keystore, `.jks` or credential file is tracked. `android:allowBackup="false"`
+and `android:usesCleartextTraffic="false"` are both set (AndroidManifest.xml:17,21)
+and INTERNET is removed from the merged manifest with `tools:node="remove"`, pinned
+by `tools/check-permissions.py`. The FileProvider exposes exactly one path,
+`<cache-path name="work" path="work/"/>`, with `exported="false"` and
+`grantUriPermissions="true"` (file_paths.xml:4, AndroidManifest.xml:196-201), and
+`Files.uriFor` uses the same authority string the manifest declares. Nothing is
+ever written to external storage — `getExternalCacheDir`, `getExternalFilesDir` and
+`Environment.getExternalStorageDirectory` have zero hits. The five exported
+activities are all justified by an intent filter a share sheet or a file manager
+needs (`MainActivity` launcher, `ViewerActivity` VIEW pdf, `ShareChoiceActivity`
+SEND pdf, `ImagesToPdfActivity` and `ImageOcrActivity` SEND image/*) and none of
+them performs a privileged action without the user pressing something. Link
+launching from a document is restricted to http/https/mailto/tel in both the reader
+(`LINK_SCHEMES`, ViewerActivity.kt:467) and the QR scanner (QrScanActivity.kt:200-201),
+and `tools/check-link-schemes.py` pins the reader half. `AppLog` escapes tabs and
+newlines, so a document cannot forge log lines, and the log lives in `filesDir`,
+outside the FileProvider path. Passwords are never logged: `askPassword` keeps the
+value in a local and passes it straight to `PdfEngine.decrypt`.
+
+### P2 — Redaction throws the page away but leaves the document properties that name the author
+**File:** app/src/main/java/com/kavopdf/app/engine/PdfEngine.java:2935
+**What:** `applyRedaction()` replaces the page's content stream, resources and annotations, but nothing on the redaction path touches the document's `/Info` dictionary or the catalog's XMP `/Metadata` stream, so the redacted file still carries Author, Title, Creator and Producer.
+**Why I think so:** `applyRedaction` (2935-2960) does four things — clear annotations, clear resources, reset the box, draw the bitmap — and `redactPagesLazy` (2911-2933) then calls `d.save(out)`. Neither mentions `getDocumentInformation()` or `COSName.METADATA`. The app already has the exact call that would do it, `clearMetadata()` at 1025-1029, and its only caller is the separate metadata tool (`ToolsActivity.kt` METADATA branch); `RedactActivity.kt:186` calls `redactPagesLazy` and nothing after it.
+**How to verify:** `grep -n "clearMetadata\|getDocumentInformation" app/src/main/java/com/kavopdf/app/engine/PdfEngine.java` — `clearMetadata` appears once, at its own definition. In a build: redact a page of a PDF whose Author is set, then open the result with the app's own Metadata tool (or `strings out.pdf | grep -i "/Author"`) — the Author is unchanged.
+**User impact:** the user blackens their name on a page, saves, and sends a file whose properties still say who wrote it. The page content really is gone, which makes the leftover property the more misleading of the two.
+
+### P2 — A picture of the user's signature is written on every draw and can never be deleted
+**File:** app/src/main/java/com/kavopdf/app/SignatureStore.kt:23
+**What:** `SignatureStore.save()` is called unconditionally each time a signature is drawn, writing `filesDir/signature.png`, and `SignatureStore.clear()` — the only way to remove it — has no caller anywhere in the app.
+**Why I think so:** `grep -rn "SignatureStore"` gives four call sites, all `load` or `save` (AnnotateActivity.kt:487 and :543, CreatePdfActivity.kt:452 and :504); `clear()` at SignatureStore.kt:39-41 is never called and there is no button or string that would call it. The save is unconditional inside the dialog's positive handler (`SignatureStore.save(this, dlg.pad.toBitmap())` at AnnotateActivity.kt:543), with no prompt and no opt-out. `filesDir` is not swept by `CacheSweep`, which only looks at `cacheDir` (CacheSweep.kt:51-55), so the file survives every cleanup the app performs.
+**How to verify:** `grep -rn "SignatureStore.clear" app/src/main/java` — no hits. In a build: draw one signature in Annotate, close the app, `adb shell run-as com.kavopdf.app ls -l files/signature.png` — the PNG is there, and nothing in the UI removes it.
+**User impact:** a bitmap of the user's handwritten signature — the mark they would use to sign a cheque — is kept on the device indefinitely. The app's own promise is that nothing leaves the device and that the user controls their files; here there is no switch, no "forget my signature", and clearing app data is the only way out.
+
+### P2 — Split builds its output path from a display name another app supplies, without `Files.sanitize`
+**File:** app/src/main/java/com/kavopdf/app/engine/PdfEngine.java:412
+**What:** `splitToFiles` names each part `new File(outDir, baseName + "_part" + n + ".pdf")`, where `baseName` is `Files.baseName(sourceName)` — the `DISPLAY_NAME` handed over by whichever app or provider supplied the PDF — and that string never passes through `Files.sanitize`, so a name containing `../` resolves outside the working directory.
+**Why I think so:** `ToolsActivity.kt:727` sets `val base = Files.baseName(sourceName)` and passes it at 733. `sourceName` comes from `Files.displayName()` (`ToolsActivity.kt:159`), which returns whatever `OpenableColumns.DISPLAY_NAME` holds (Files.kt:15-24) with no filtering; `baseName` only strips the extension (Files.kt:93-96). Every other output name in the app goes through `Files.suggestName`, which calls `sanitize` (Files.kt:38, 98-99) and replaces `/` and everything outside `[A-Za-z0-9._-]` with `_`. Split is the one path that does not.
+**How to verify:** reason it once: `outDir` is `cacheDir/work` and a display name of `../../files/x.pdf` gives `baseName = ../../files/x`, so the destination resolves to `files/x_part1.pdf` inside the app's private storage. Or share a PDF named `../../files/x.pdf` into KavoPDF from a test app, run Split with any range, and `adb shell run-as com.kavopdf.app ls files/`.
+**User impact:** the *name* of a document can decide where the app writes. The fixed `_partN.pdf` suffix means no existing file is overwritten, so this is not arbitrary file destruction, but the app ends up writing into directories its own code never intends, and a name with a slash in it simply fails the split with an error the user cannot explain.
+
+### P3 — Compress claims to strip identifying metadata but leaves Author, Creator and Producer
+**File:** app/src/main/java/com/kavopdf/app/engine/PdfEngine.java:823
+**What:** The comment above the block says "strip identifying metadata", but only Title, Subject and Keywords are cleared; Author, Creator and Producer — the three fields that actually name a person or their machine — are left as they were.
+**Why I think so:** 824-827 is `PDDocumentInformation info = d.getDocumentInformation(); info.setTitle(null); info.setSubject(null); info.setKeywords(null);` and then `d.save(out)`. There is no `setAuthor`, `setCreator` or `setProducer` on this path, and the complete version of the operation, `clearMetadata()` at 1025-1029, is not called from `compress`. The same file already reads all six fields for the metadata tool (891-899), so the omission is not an oversight about which fields exist.
+**How to verify:** read 820-828. In a build: compress a PDF written by Word or LibreOffice (Author = the user's name), then look at the result's properties — Title and Subject are gone, Author and Creator are not.
+**User impact:** a user who compresses a document "to send it" still ships their name and the name of the software on their machine inside the file, while the source comment says the identifying metadata was stripped.
+
+### P3 — The "link blocked" log entry writes a URL taken from inside the PDF into the persistent, exportable activity log
+**File:** app/src/main/java/com/kavopdf/app/ViewerActivity.kt:419
+**What:** When a link inside an opened document uses a scheme the reader refuses, the first 120 characters of that URL are written to the activity log, and the Log screen can export the whole log as a PDF the user may then share.
+**Why I think so:** line 420 is `AppLog.record(this, "Link blocked", (scheme ?: "no scheme") + ": " + target.take(120), false)` where `target` is the URL parsed out of the document's `/Link` annotation. `AppLog` writes it to `filesDir/kavopdf-activity.log` (AppLog.kt:113) and `LogActivity.exportPdf()` (LogActivity.kt:109-115) turns every entry, details included, into a PDF. A document link can carry anything — a token in a query string, a `mailto:` address, a `file:///` path — so content the app decided was unsafe to *open* is still safe to *store*.
+**How to verify:** `grep -n "Link blocked" -A2 app/src/main/java/com/kavopdf/app/ViewerActivity.kt`. In a build: open a PDF whose link is `javascript:x?token=abc`, tap it, then open Log — the full URL is listed, and Export produces a PDF containing it.
+**User impact:** a document the user only opened leaves its links, and whatever identifies them in a query string, in a log that is later exported and sent to someone while reporting a problem — the one path by which anything from this app leaves the device.
+
