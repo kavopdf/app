@@ -2025,6 +2025,28 @@ before changing anything.
 
 **Tries: 0 of 3** - diagnosed, not started.
 
+**Cause found, same day.** `buildTables` opens with
+
+    if (hs.size() < 2 || vs.size() < 2) return out;      // PdfToWord.java, buildTables
+
+so a grid needs at least two horizontal rules AND at least two vertical rules before it is
+considered a table at all. The invoice in 04_stamp_180 is drawn with horizontal rules only -
+row lines, no column lines - which is how a very large share of modern invoices are designed.
+`vs` is empty, the method returns before it looks at a single word, and the whole grid falls
+through to the paragraph path.
+
+That is why the table vanished rather than coming out wrong.
+
+**The fix:** a grid with horizontal rules and no vertical ones is still a table, and its
+columns have to come from where the text actually sits rather than from rules that are not
+there. The machinery for that already exists - the column-band logic that groups text into
+bands by the gaps between runs, used for multi-column pages - so this is a matter of deriving
+`xs` from the row's own text positions when `vs` is empty, not of inventing a new method.
+Guard it: only when the row's text forms stable bands across at least two rows, or an ordinary
+paragraph with one rule under it becomes a table.
+
+
+
 
 ## OPEN - g53 corpus, batch 2 (B 14-20, C 21-26), found this pass, 8 Nov
 
