@@ -781,7 +781,8 @@ public final class PdfToWord {
             // journal page came out as four lines instead of thirty-nine. Counting baselines
             // against rows catches that - a real table has about one baseline per row, a
             // whole-page false one has thirty baselines and three rows.
-            if ((inside == 0 || covered * 100 / inside >= 60) && rowSane(t, lines)) solid.add(t);
+            if ((inside == 0 || covered * 100 / inside >= 60) && rowSane(t, lines)
+                    && cellsFilled(t)) solid.add(t);
             else for (Line line : lines) if (line.inside(t)) line.consumed = false;
         }
         tables = solid;
@@ -1094,6 +1095,31 @@ public final class PdfToWord {
      * <p>Thirty baselines under three rows is not a table. The same rectangle also suppressed
      * the gutter as a column start, so the page lost its columns as well as its rows.
      */
+    /**
+     * A candidate table whose cells are almost all empty is a drawing, not a table.
+     *
+     * <p>332_bom_on_drawing's upright frame is three vertical strips crossed by a few
+     * dividers, and the only text inside it is six circled part numbers. The line grid
+     * round those numbers is a perfect 7 x 3 rectangle, so it passed every test there was
+     * and went out as a bordered table: the render drew 68 rules where the page draws 43,
+     * and the circled numbers were pulled into cells 33 pt from where the page put them.
+     * A real table carries text in most of its cells - the same page's bill of materials
+     * fills all 42 - so the fill rate separates the two without naming any one document.
+     */
+    private static boolean cellsFilled(Table t) {
+        if (t.rows == null || t.rows.isEmpty()) return true;
+        int cells = 0, filled = 0;
+        for (List<String> row : t.rows) {
+            for (String raw : row) {
+                cells++;
+                if (raw != null && !raw.trim().isEmpty()) filled++;
+            }
+        }
+        // Three real cells is the floor: the smallest real table here is two rows by two
+        // columns, and a quarter of the grid is a conservative share to call a table filled.
+        return filled >= 3 && filled * 100 >= cells * 25;
+    }
+
     private static boolean rowSane(Table t, List<Line> lines) {
         if (t.rows == null || t.rows.isEmpty()) return true;
         int rowsN = t.rows.size();

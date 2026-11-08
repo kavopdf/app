@@ -584,3 +584,30 @@ full visual run will overwrite them with what it actually finds.
 both sides), 1 unverifiable (305 moved:IMMUNISATION). One disagreement: 312's eye passed while the
 numbers failed on order 67.6 % - the tab-joined-row measurement bug, not a document defect. 306 is
 new to this list: the synopsis table renders 7.2 pt short and the heading under it rides up.
+
+## v3 batch 2 (318-340) - final sweep, 8 Nov 23:09 - 15 documents, 22 pages, every page looked at, every finding verified
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-08 | 318_court_summons_form | FAIL | breaks:TAKE NOTICE ... determined in your verified - the PDF's line ends at "your" and no render line does; the render fits "absence." onto the same line |
+| 2026-11-08 | 320_balance_sheet_statutory | PASS | statutory profit and loss, sixteen rows and the notes extract, every figure in its column |
+| 2026-11-08 | 321_auditors_report | PASS | letterhead, opinion, basis, five numbered paragraphs and the signature block, line for line |
+| 2026-11-08 | 322_mutual_fund_factsheet | PASS | nav band, both tables, the riskometer dial and the footer; eye passed, the numbers failed on reading order only - the tab-joined-row measurement bug |
+| 2026-11-08 | 323_credit_card_statement | FAIL | count:Travel, count:Shopping, count:Fuel, count:Groceries, count:Health all verified - the spend-by-category block keeps its six amounts and loses five of its six labels |
+| 2026-11-08 | 324_loan_amortisation_schedule | PASS | seven sheets, forty amortisation rows each, every figure in its column; the last sheet is blank in the PDF and blank in the render |
+| 2026-11-08 | 325_demat_holdings_statement | PASS | holder band, seven holdings and three transactions in their columns; eye passed, the numbers failed on reading order only - the tab-joined-row measurement bug |
+| 2026-11-08 | 326_itr_computation | FAIL | moved:Total tax payable verified at x 163.1->135.3, y 390.9->377.3 - the three summary rows are emitted below the tax table instead of in it |
+| 2026-11-08 | 330_cad_drawing_sheet | PASS | plan, dimension labels, revision table and title block on the page positions; eye passed, the numbers failed on reading order only - the tab-joined-row measurement bug |
+| 2026-11-08 | 331_pid_diagram | PASS | both pumps, the valves, the loop, the legend box and the note |
+| 2026-11-08 | 332_bom_on_drawing | FAIL | moved:2 6.8 pt and moved:5 7.6 pt after the cellsFilled fix; before it the frame was written as an invented 7x3 table at 33.1 pt with 68 rules against the page's 43 |
+| 2026-11-08 | 333_datasheet_spec_tables | PASS | three spec tables, every parameter and every pin row in its column |
+| 2026-11-08 | 334_patent_document | PASS | form 1 head, abstract, the fig 1 boxes and five claims |
+| 2026-11-08 | 335_msds_safety_data_sheet | PASS | four pictograms, eight numbered sections and the composition table |
+| 2026-11-08 | 340_bill_of_lading | PASS | every box, two item rows, the total line and the barcode |
+
+11 pass, 4 fail. 18 findings, 16 verified, 2 refuted (326 count:Taxable amount - the header cell
+spans two grid columns and python-docx reports it twice; 332 order - 100 % after the fix). Three
+disagreements, all the same measurement bug: 322, 325 and 330 passed the eye and failed the
+numbers on reading order alone, because the PDF draws each cell as its own line and the render
+joins a row's cells with tabs. That blind spot is now recorded seven times and is not a document
+defect.

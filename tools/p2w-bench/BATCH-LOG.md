@@ -754,3 +754,38 @@ measurements and the one try.
 
 **Where the corpus stands.** 208 of 208 documents have a row in VISUAL-SCORE.md. 303 is still
 FAIL, now on a verified finding rather than an unverifiable one. The final sweep has not started.
+
+
+## 8 Nov, 23:09 IST - v3 batch 2 taken through the final sweep, one engine fix
+
+Sandbox was empty again: toolchain rebuilt (Temurin 17.0.21, PDFBox-Android 2.0.27.0), the three
+corpus assets at 75 / 80 / 53, all 208 converted in one run and G2 reported **no document got
+worse** before anything was looked at. 15 documents, 22 pages, the seventeen steps in order.
+
+**Result: 11 pass, 4 fail.** Every page was opened at 130 dpi before visual.py was run. 18
+findings emitted, 16 verified, 2 refuted.
+
+    318  breaks:TAKE NOTICE ... determined in your     the render fits "absence." on the line
+    323  count:Travel/Shopping/Fuel/Groceries/Health   five of six bar-chart labels are gone
+    326  moved:Total tax payable 13.6 pt low           three summary rows sit outside the table
+    332  moved:2 6.8 pt, moved:5 7.6 pt                 after the fix; 33.1 pt before it
+
+**The one fix shipped.** 332's rack frame was being written as a table: a perfect 7 x 3 rectangle
+of dividers holding six circled part numbers, 21 cells of which 2 held text. `PdfToWord.cellsFilled`
+now requires three filled cells and a quarter of the grid, and the dropped candidate hands its
+lines back. Across 208: G2 clean, 26 counts improved, none worse; on 332 the worst offset fell
+136.1 pt to 8.0 pt, `rules` 68 to 58, reading order 94.1 % to 100 %.
+
+**Two instrument repairs, no source change.** `missing:` is count-blind - it refutes when the
+needle appears anywhere - so 323's five lost labels were re-recorded as `count:` and all five
+verified. `rules` overstates because the page draws each cell border as a short segment and the
+render draws one long line; 332's 25 "extra" rules are at most 15 real. Both are written up in
+REMAINING-DEFECTS.md.
+
+**Three disagreements, one cause.** 322, 325 and 330 passed the eye and failed the numbers on
+reading order alone. That is the tab-joined-row measurement bug, recorded seven times now.
+
+**The position ratchet was not usable and that was already known.** `base208-position.json`
+reports 10 of these 15 as regressed against the *unmodified* engine too - 334's control run scores
+12.5 % against the file's 100 %. The 22:00 entry above says why, and this run judged the fix the
+way that entry says to: control and candidate both rendered here, compared to each other.
