@@ -1557,6 +1557,36 @@ each cell is right, so this is a column-order question in `buildTables`, not a t
 Separate from D-08 and needs its own fix.
 
 ---
+### D-09  The page's own white space is spent only where the columns are real
+
+**FIXED 8 Nov.** GAP_CAP_TW clamps a gap at 120 pt, which is why a page's footer or
+signature block lands 200-270 pt too high: the PDF left 270 pt of white space below the
+last line and the writer gives it up. Raising the ceiling was tried on 7 Nov and reverted
+because 315_gazette_notification went from one sheet to two - its three columns are still
+stacked into one flow (D-08), so its content is three columns long and only fitted a sheet
+while the gaps were being clamped.
+
+`hasColumnBands(page)` now gates the spending: a page that has any block in a column band
+above 0 keeps the 120 pt ceiling, and only a page whose blocks all sit in band 0 may spend
+its white space. That separates 315 (columned, keeps the clamp) from 300 and 302 (single
+flow, may spend).
+
+Measured on 8 Nov, position share within tolerance, higher is better:
+
+| Document | before | after | pages |
+|---|---|---|---|
+| 300_prescription_rx | 0.0 % | **24.0 %** | 1/1 |
+| 302_radiology_report | 3.0 % | **9.1 %** | 1/1 |
+| 311_fir_police_form | 12.5 % | **2.8 %** | 1/1 |
+| 314_tender_rfp_boq | 5.1 % | **17.7 %** | 1/1 |
+| 315_gazette_notification | 2.9 % | **2.9 %** | 1/1 |
+
+315 is unchanged to the decimal and still one sheet, which is the whole point of the guard.
+The other four improve and none regress.
+
+This guard comes out when D-08 lands: once the columns are written as columns, a columned
+page fits too and may spend its white space.
+
 
 ## CLOSED - the gate counted a row merge as lost text, 8 Nov
 

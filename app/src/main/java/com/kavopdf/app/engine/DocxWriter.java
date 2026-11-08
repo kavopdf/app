@@ -266,7 +266,7 @@ public final class DocxWriter {
             ctx.lastLinePt = 0f;
             ctx.flowTw = 0;
             ctx.budgetTw = (int) Math.max(1L, Math.round(ph * TWIPS_PER_PT));
-            ctx.spendGaps = pageFits(page, ph);
+            ctx.spendGaps = pageFits(page, ph) && !hasColumnBands(page);
             ctx.pageWidthPt = pw;
             if (page.blocks.isEmpty()) continue;
             for (Object block : page.blocks) {
@@ -865,6 +865,28 @@ public final class DocxWriter {
      * table whose rows grow, this returns false and the page keeps the clamped gaps, which is the
      * behaviour that was there before.
      */
+    /**
+     * Whether this page is set in more than one column.
+     *
+     * <p>Gaps may only be spent on a page whose content already fits the sheet. A page set in
+     * two or three columns does not fit, because the writer still puts the columns into one
+     * flow (D-08): its content is every column's worth of text stacked, so it is several
+     * times the paper's height. Spending the page's white space on such a page is what made
+     * 315_gazette_notification go from one sheet to two when the ceiling was raised on
+     * 7 Nov - the gap was the only thing holding it to a sheet.
+     *
+     * <p>So the gap is spent only where the columns are real, which today means only on a
+     * page that has none. When D-08 lands, this guard comes out and the gap is spent on
+     * columned pages too.
+     */
+    private static boolean hasColumnBands(PdfToWord.Page page) {
+        for (Object block : page.blocks) {
+            if (block instanceof PdfToWord.Para && ((PdfToWord.Para) block).column > 0) return true;
+            if (block instanceof PdfToWord.Table && ((PdfToWord.Table) block).column > 0) return true;
+        }
+        return false;
+    }
+
     private static boolean pageFits(PdfToWord.Page page, float ph) {
         float required = 0f;
         float prevBase = -1f;
