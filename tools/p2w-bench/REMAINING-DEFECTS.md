@@ -3051,3 +3051,48 @@ right and the remaining failures are a guard question, not an architecture quest
 **Tries: 2 of 3.** One attempt left. The full reports are `D08-corpus-analysis.md` and
 `D08-ooxml-research.md`.
 
+
+
+**Attempt 3, and the reason attempts 1 and 2 could not have worked.**
+
+`pageColumns` does not see columns. It sees the two halves of a page that was already cut. `PdfToWord`
+calls `toLines(glyphs, asBands(starts))`, and `asBands` removes a four-point slice `[x-5, x-1]` from
+every line, so a line crossing the gutter arrives as a left fragment ending at x-5 and a right
+fragment starting at x-1. By the time any guard runs, every band is about half the page wide and
+the gutter between them is 4-12 pt **by construction**.
+
+Measured on the three false positives and a control set:
+
+    doc                              page  band widths        gutter   guards
+    12_stamp_across_page_break        1    248.36 / 229.20    5.70     all pass
+    12_stamp_across_page_break        2    203.38 / 274.27    5.61     all pass
+    academic-paper-ieee-2col          1    245.80 / 253.12    5.68     pass - and correctly
+    academic-paper-ieee-2col          2    247.31 / 253.26    4.00     all pass
+    form16-part-b                     1    274.23 / 223.83   12.17     all pass
+    form16-part-b                     2    216.91 / 288.33    5.00     all pass
+
+The gutter cap never fires on anything - the largest real gutter in the control set is 19.80 pt and
+every false positive is under 12.2 pt, so a 30 pt cap is 1.5x above both populations. The width
+ratio passes because page halves are equal by definition. The narrow-band test passes because a
+page half is 203-274 pt, far above pageW/8. **All three guards were measuring the wrong thing.**
+
+**The test that works, measured.** A band is a column only if it is filled with prose. On the
+**un-split** lines, excluding spanning lines (width > 0.62 x content span - the rule `keep0` already
+uses), count each band's lines whose width is at least 50 % of the widest band's ink width, and
+require **at least 3 in every band**.
+
+Worst false positive: **1** qualifying line (form16 p2, 12_stamp p2, and the IEEE page 2 where the
+only line is the running head). Best genuine two-column page: **5**. Most genuine pages: 8-23. The
+threshold sits in an empty gap.
+
+**It has to be evaluated on `rawLines` inside `PdfToWord`, not in `pageColumns`.** After the cut, a
+fragment of prose is full-measure and a Para can no longer answer the question.
+
+**Two things this does not solve.** Four control documents (three 3-column pages and the sidebar
+page) also fail the test, because their band split is already wrong for a different reason. And the
+spanning elements - 21 of the 24 multi-column documents, 69 in all - still need continuous section
+breaks; the prototype for that is a separate piece of work.
+
+**Tries: 3 of 3 on the guard question. No code shipped.** What is now known is where the test
+belongs and what its numbers are.
+
