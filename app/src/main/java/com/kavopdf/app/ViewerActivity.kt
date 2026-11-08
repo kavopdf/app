@@ -416,8 +416,12 @@ class ViewerActivity : PdfActivity() {
         // scanner has always been this strict, the PDF path was not.
         if (uri == null || scheme !in LINK_SCHEMES) {
             toast(getString(R.string.msg_failed, "this link cannot be opened"))
+            // The scheme only. The URL itself is untrusted content from inside the
+            // document - a query string can carry a token and a mailto: carries an
+            // address - and this log outlives the screen and can be exported as a PDF,
+            // so a link the reader refused to open must not be written down either.
             com.kavopdf.app.util.AppLog.record(
-                this, "Link blocked", (scheme ?: "no scheme") + ": " + target.take(120), false
+                this, "Link blocked", scheme ?: "no scheme", false
             )
             return
         }

@@ -531,18 +531,32 @@ class AnnotateActivity : PdfActivity() {
         dlg.inkRed.setOnClickListener { ink = getColor(R.color.swatch_red); dlg.pad.setInkColor(ink) }
         dlg.clear.setOnClickListener { dlg.pad.clear() }
 
-        val dialog = AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this)
             .setTitle(R.string.tool_signature)
             .setView(dlg.root)
             .setPositiveButton(R.string.action_add, null)
             .setNegativeButton(R.string.action_cancel, null)
-            .create()
+        // The drawn signature is kept in filesDir so the next document need not draw it
+        // again, and until now nothing in the app could remove it - a picture of the
+        // user's handwriting stayed on the device for good. This is the way out, offered
+        // only when there is something to forget.
+        val hasSaved = SignatureStore.has(this)
+        if (hasSaved) builder.setNeutralButton(R.string.action_forget_saved, null)
+        val dialog = builder.create()
         dialog.setOnShowListener {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 if (dlg.pad.isEmpty()) { toast(getString(R.string.msg_enter_text)); return@setOnClickListener }
                 SignatureStore.save(this, dlg.pad.toBitmap())
                 placeStamp(dlg.pad.toBitmap())
                 dialog.dismiss()
+            }
+            if (hasSaved) {
+                // null listener above, so tapping it does not also throw away the pad
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+                    SignatureStore.clear(this)
+                    toast(getString(R.string.msg_saved_signature_forgotten))
+                    dialog.getButton(AlertDialog.BUTTON_NEUTRAL).isEnabled = false
+                }
             }
         }
         dialog.show()

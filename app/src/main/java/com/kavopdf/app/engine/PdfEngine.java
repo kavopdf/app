@@ -401,6 +401,14 @@ public final class PdfEngine {
     }
 
     public static List<File> splitToFiles(File src, List<int[]> ranges1based, File outDir, String baseName) throws Exception {
+        // baseName comes from the PDF's DISPLAY_NAME, which another app or provider
+        // supplies and nothing validates: a name of "../../files/x" would otherwise
+        // resolve outside outDir and write where this app never intends. The rule is the
+        // same one Files.sanitize applies to every other output name, kept here as well
+        // so that every caller of this method is covered, not just today's one.
+        String safeBase = (baseName == null || baseName.isEmpty())
+                ? "document"
+                : baseName.replaceAll("[^A-Za-z0-9._-]", "_");
         List<File> created = new ArrayList<>();
         try (PDDocument in = open(src)) {
             int total = in.getNumberOfPages();
@@ -409,7 +417,7 @@ public final class PdfEngine {
                 int from = Math.max(1, Math.min(r[0], r[1]));
                 int to = Math.min(total, Math.max(r[0], r[1]));
                 if (from > to) continue;
-                File dest = new File(outDir, baseName + "_part" + (idx++) + ".pdf");
+                File dest = new File(outDir, safeBase + "_part" + (idx++) + ".pdf");
                 try (PDDocument part = new PDDocument()) {
                     for (int i = from; i <= to; i++) part.importPage(in.getPage(i - 1));
                     part.save(dest);
@@ -821,10 +829,11 @@ public final class PdfEngine {
                 if (res != null) compressResources(d, res, seenImages, seenResources, maxDimension, jpegQuality, 0);
             }
             // strip identifying metadata (small but free)
-            PDDocumentInformation info = d.getDocumentInformation();
-            info.setTitle(null);
-            info.setSubject(null);
-            info.setKeywords(null);
+            // This used to clear Title, Subject and Keywords only, leaving Author, Creator
+            // and Producer - the three fields that name a person and their machine, and
+            // the three a user compressing a file "to send it" most needs gone. Wipe the
+            // whole /Info dictionary and the XMP packet instead, as the metadata tool does.
+            clearDocumentMetadata(d);
             d.save(out);
         }
     }
@@ -1012,10 +1021,19 @@ public final class PdfEngine {
     /** Remove every document property, including the XMP metadata stream. */
     public static void clearMetadata(File src, File out) throws Exception {
         try (PDDocument d = open(src)) {
-            d.setDocumentInformation(new PDDocumentInformation());
-            d.getDocumentCatalog().getCOSObject().removeItem(COSName.METADATA);
+            clearDocumentMetadata(d);
             d.save(out);
         }
+    }
+
+    /**
+     * Wipe the /Info dictionary and the catalog's XMP packet on a document that is
+     * already open. A PDF names its author in both places, and the screens that promise
+     * to remove identifying data have to remove both or the promise is half kept.
+     */
+    private static void clearDocumentMetadata(PDDocument d) {
+        d.setDocumentInformation(new PDDocumentInformation());
+        d.getDocumentCatalog().getCOSObject().removeItem(COSName.METADATA);
     }
 
     private static java.util.Calendar parseDate(String s) {
@@ -2890,6 +2908,11 @@ public final class PdfEngine {
                 applied++;
             }
             if (applied == 0) throw new IllegalArgumentException("Nothing to redact");
+            // The page is gone, but the document still said who wrote it: /Info and the
+            // XMP packet name Author, Creator and Producer independently of any page.
+            // A redacted file that keeps them is more misleading than one that never
+            // promised anything, so they go with the page.
+            clearDocumentMetadata(d);
             d.save(out);
         }
     }
@@ -2927,6 +2950,8 @@ public final class PdfEngine {
                 }
             }
             if (applied == 0) throw new IllegalArgumentException("Nothing to redact");
+            // Same reason as redactPages: the properties are not on the page.
+            clearDocumentMetadata(d);
             d.save(out);
         }
     }

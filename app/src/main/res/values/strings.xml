@@ -287,6 +287,8 @@
     <string name="action_fill_in_annotate">Fill it in Annotate &amp; sign</string>
     <string name="action_use_saved">Use saved</string>
     <string name="msg_no_saved_signature">No saved signature yet - draw one and tap Add</string>
+    <string name="action_forget_saved">Forget saved</string>
+    <string name="msg_saved_signature_forgotten">Saved signature deleted</string>
     <string name="msg_required_missing">%1$s is required - please fill it</string>
     <string name="msg_check_format">Check the format of %1$s</string>
     <string name="msg_could_not_read">That file could not be read. Try another PDF.</string>
