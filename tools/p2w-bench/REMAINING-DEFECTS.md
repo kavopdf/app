@@ -3714,3 +3714,50 @@ own. Three extra rows in the render. **Tries: 0 of 3.**
 document is a deliberate stress case: the description in column 2 is longer than the column
 width. The render keeps every value (the eye's `missing:Nos` and `overlap` were both refuted),
 but it spends three more rows on the page than the PDF does. **Tries: 0 of 3.**
+
+---
+
+## 9 Nov, 04:07 IST — the page-count spill class, re-measured on the current build
+
+The corpus was converted and G2 reported **no document got worse** before anything else was done.
+Page counts were then measured for all 208 documents (PDF pages against the LibreOffice render of
+the current .docx). **Twelve documents still spill; sixteen that used to have been cleared** by the
+D-01/D-06 line-height work, which is why this class is now small enough to work one document at a
+time rather than as one engine change.
+
+    350_question_paper                     1 -> 2    62_two_col_newsletter_pull_quote    1 -> 2
+    64_newspaper_uneven_columns_ad_boxes   1 -> 5    annual-review-2col-uneven-columns   1 -> 2
+    itr-computation-with-slab-table        1 -> 2    journal-2col-with-footnotes         1 -> 2
+    mutual-fund-statement                  2 -> 3    newsletter-3col-header-footer       1 -> 2
+    newspaper-2col-fullwidth-headline      1 -> 2    price-list-right-aligned-amounts    1 -> 2
+    product-catalogue-code-left-price-right 1 -> 2   text-held-twice-shadow-text         1 -> 2
+
+### OPEN — the rightmost column of a table is narrower than the render's own face  (price list)
+
+price-list-right-aligned-amounts. The price column is 36.0 pt (720 twips) and the page's own
+"1,845.00" is measured at 719 twips inside it - the column was sized to its content, to the twip.
+The render sets the same string in DejaVuSans at 8.5 pt and needs about 930 twips, so the last
+digit goes onto a line of its own; every one of the 38 rows then costs two lines instead of one
+and the list spills a whole sheet. **Tries: 1 of 3.**
+
+**Try 1 - widen the rightmost column when the page filled it to its edge.** The existing branch
+already widens that column by `textR + 20` twips, which is one point of slack; it was raised to
+`textR * 1.30 + 20`, gated on the measured text being within a band of the column's own width so
+that a column the page itself OVERRAN (the gridSpan path) is untouched. Measured three times:
+
+    1.30, band 0.92-1.06   spill 12 -> 11 (price-list fixed), G2 clean, position: 365_recipe_card 30.0 % -> 17.5 %
+    1.30, band 0.96-1.02   same: 365_recipe_card still 30.0 % -> 17.5 %
+    1.30, every row full   spill 12 -> 20, position: 11 new regressions - worse in every direction
+
+365_recipe_card's second table also has a last column whose text ends exactly on the column's right
+edge ("2 tbsp" at 250.0 in a column ending at 250.0), so no band separates it from the price list.
+All three were reverted; **no engine file changed and the baseline is untouched.**
+
+**A fourth thing was measured and is worth not retrying.** `<w:noWrap/>` on the rightmost cell -
+OOXML's own "keep this line whole" - is written and **ignored by LibreOffice in a fixed-layout
+table**: 38 cells carried it and the price column still broke its last digit onto the second line.
+
+**What is left.** The model records the PDF's advance, not the render's. A fix that does not guess
+has to know the substitute face's width for the cell's own string and size at write time - either a
+measured advance table for the faces the writer substitutes, or the cell's width taken from the
+string rather than from the page. That is the next thing to build here, not another constant.

@@ -931,3 +931,45 @@ tells them apart. Tries: 1 of 3.
 PdfToWord.java is 291 KB and the write path is GITHUB_COMMIT_MULTIPLE_FILES only (`git push`
 and the blobs API both answer 403 for this App), so the file was edited on disk inside one
 program and committed from what the program read.
+
+---
+
+## 9 Nov, 04:07 IST — the spill class, and a fix the ratchet rejected
+
+Sandbox was empty, so the toolchain was rebuilt from scratch (Temurin 17.0.21, PDFBox-Android
+2.0.27.0, the three corpus assets at 75 / 80 / 53) and all 208 documents converted: 208 files,
+0 failed. **G2: no document got worse**, against the committed baseline, before any document work.
+
+The batch was the page-count spill class, because it is the largest single class left in the score
+(12 documents) and it is the one the score's own FAIL reasons name most often. Page counts were
+measured for all 208 first: **12 spill, 16 that used to have been cleared** by the D-01/D-06
+line-height work.
+
+Twelve documents were rendered side by side at 130 dpi and every page image was opened before
+visual.py was run. What the eye saw, in one line each:
+
+    350_question_paper        module headings and their questions overlap; the page runs onto a second sheet
+    62_two_col_newsletter     the masthead band is gone and the pull quote has left its box; second sheet
+    64_newspaper              three columns became a three-column table, one word-group per row, 5 sheets
+    annual-review-2col        close, but the logo is missing and the two columns run one line long
+    itr-computation           close; the slab table's rows are a little taller than the page's pitch
+    journal-2col              the right column collapses to a 40 pt strip of stacked fragments
+    mutual-fund-statement     close; the holdings table's rows are taller and it takes a third sheet
+    newsletter-3col           the header band is gone and the columns collapse into fragments
+    newspaper-2col            the photograph is missing and both columns collapse into fragments
+    price-list                every price wraps its last digit; 38 rows cost two lines each
+    product-catalogue         a paragraph-pitch document, not a table; runs 20 pt long
+    text-held-twice           the heading is emitted twice on one line and the table below it moves
+
+None of the twelve passes, and none of them was called fixed this run.
+
+**One fix was attempted and rejected.** The price column is 36.0 pt and the page's "1,845.00" is
+719 of its 720 twips; the render's DejaVuSans needs about 930 and breaks the last digit off. A
+widen-the-last-column change fixed it (spill 12 -> 11, G2 clean) and the position ratchet caught
+365_recipe_card going 30.0 % -> 17.5 %, whose own last column ends exactly on its right edge too.
+Two narrower gates and one stricter one were measured; all three were reverted, no engine file
+changed, and the baseline is untouched. The measurements, including the fact that LibreOffice
+ignores `<w:noWrap/>` in a fixed-layout table, are in REMAINING-DEFECTS.md.
+
+Nothing was committed as a fix because nothing was fixed. The record is the twelve measurements
+and the three rejected tries.
