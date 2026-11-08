@@ -48,15 +48,31 @@ would have been the quiet kind of drift this file is here to make impossible.
 
 ## 8 Nov 2026 — verified, not changed
 
-Re-converted all 208 and re-recorded the baseline to see whether anything had moved. Nothing
-had: `missing 133, extra 243, blocks 0, nobg 0, blank 0, pages 537, refpages 540` — identical
-to the recorded baseline on every field. So the baseline was left alone and no new row was
-needed for it.
+Re-converted all 208 and re-recorded the baseline to see whether anything had moved.
 
-What that proves is worth writing down: the line-pitch fix (D-01) and the gap-spending guard
-(D-09) changed how the documents LOOK without changing any of these seven counts. A baseline
-of counts cannot see a line that moved onto the right baseline; only the position measure can.
-That is why `base208-position.json` exists as a second ratchet.
+| field | 6 Nov | 8 Nov |
+|---|---|---|
+| missing | 133 | 133 |
+| extra | 243 | 243 |
+| blocks | 0 | 0 |
+| nobg | 0 | 0 |
+| blank | 0 | 0 |
+| pages | 537 | 537 |
+| **lines** | **15780** | **15769** |
+
+Six of the seven counts are identical. **`lines` fell by 11**, which is the line-pitch fix
+(D-01) merging lines the old constant had split. Eleven lines across 208 documents is a small
+number and it is a real change, so it is written down rather than called "identical" - a
+record that rounds away the one field that moved is how a ratchet stops ratcheting.
+
+The baseline was still left alone: `gate.py --check` reported no document worse, and a fall in
+`lines` with `missing` unchanged means lines were joined, not lost. But the honest statement is
+"one field moved and the move is an improvement", not "nothing moved".
+
+What that also proves: the line-pitch fix and the gap-spending guard changed how the documents
+LOOK without moving six of these seven counts. A baseline of counts cannot see a line that
+moved onto the right baseline; only the position measure can. That is why
+`base208-position.json` exists as a second ratchet.
 
 **A measurement defect found while checking this.** `gate.py`'s `pages` count reads 537
 against the PDFs' 540, which looks like three documents losing a page. They are not: a section

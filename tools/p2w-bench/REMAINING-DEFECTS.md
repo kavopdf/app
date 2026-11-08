@@ -887,9 +887,15 @@ PDF's:
     55_sidebar_box_beside_body              docx 2 pages, PDF 1
     65_two_col_full_width_figure_caption    docx 2 pages, PDF 1
 
-28 of the 208 documents fail this way. `gate.py` counts page breaks it finds in the
-XML and reports 537 against the PDFs' 540, so three documents lose a page while these
-28 gain one - the two errors were hiding each other in the total.
+28 of the 208 documents failed this way before the fix. `gate.py` counts page breaks it finds in the
+XML and reported 537 against the PDFs' 540, so three documents lost a page while these
+28 gained one - the two errors were hiding each other in the total.
+
+**That 537-vs-540 gap is itself a counting artifact, found on 8 Nov.** A section break written
+as `<w:type w:val="nextPage"/>` starts a new page in Word and `gate.py` counts only
+`<w:br w:type="page"/>`. Counting both gives 208 documents matching their PDF's page count
+exactly, 0 spill and 0 short. Anyone reading "537 against 540" as three lost pages is reading
+the artifact, not the documents.
 
 The cause is the same one behind D-01: the writer gives every paragraph an exact line
 height of size x 1.15 and a spacing-before taken from the measured gap. Both are close
