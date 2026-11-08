@@ -3243,3 +3243,64 @@ drifts 13.08 pt, more than one of the false tables' Symbol column at 12.20 pt.
 leave the joint count alone.** Reports: `D14-B-word-guard.md`, `D14-D-two-regressions.md`,
 `D14-C-table-detection-research.md`, `D14-E-rule-geometry.md`.
 
+
+## 8 Nov 22:00 — the table's top y: two measured attempts, both rejected
+
+The one defect behind the per-block offsets recorded above on 300 / 302 / 306 / 311 / 314 / 316
+(the "table and band top y" note) was worked this run and is still open. Both attempts are
+measured, both were reverted, and the tree is clean.
+
+**The unit error, stated once.** The spacer before a table is charged as
+`(t.top - lastBaseline) - prevLine`, where `prevLine = lastSize * 1.15` is the whole line box.
+But the flow does not resume at the baseline: `flowLinePt` and `LINE_BASE = 0.8` put the end of
+a line's box at `lastBaseline + (1 - LINE_BASE) * lastLinePt`, i.e. 20 % of the box, not 100 %.
+So every spacer is short by `LINE_BASE * lastLinePt` - 7.4 pt on a 9.2 pt line - and 311's
+first table misses the threshold on that alone: `top=66.0 lastBase=46.0 lastLinePt=9.2
+extra=10.8` against a floor of `prevLine * 1.2 = 11.04`, so the spacer is dropped entirely and
+the table lands 16.1 pt high (PDF 72.1, render 56.0).
+
+**Try 1 - the corrected base, floor lowered to 1 pt.** `extra = t.top - (lastBaseline +
+(1-LINE_BASE)*lastLinePt)`, emitted whenever `extra >= 1.0`. G2 across 208 clean. Position,
+compared against the control render of the same corpus in the same sandbox: **37 documents
+better, 28 worse**, overall 25.5 % -> 29.1 %, and page-count failures 19 -> 25. The floor is what
+does the damage: it fires on gaps that are the substitute face's line box, not white space.
+Reverted.
+
+**Try 2 - the corrected base, floor left at `prevLine * 1.2`.** G2 across 208 clean. **33 better,
+16 worse**, overall 25.5 % -> 32.6 %, page-count failures 19 -> 23. The wins are large and real -
+372_timesheet_grid 2.9 -> 100, 375_attendance_register 8.3 -> 100, 393_spectrum_peak_table
+13.0 -> 95.7, 362_price_list_dense 8.9 -> 91.1, 332_bom_on_drawing 3.8 -> 84.6,
+300_prescription_rx 32.0 -> 74.0. The losses are large too - 351_omr_answer_sheet 90.9 -> 0.0,
+404_sudoku_grid 72.7 -> 6.1, marksheet-subject-left-marks-right 62.6 -> 0.9,
+303_discharge_summary 51.1 -> 6.7. Reverted: the ratchet rejects a fix that makes any document
+worse, and 16 is not a rounding error.
+
+**Why the corrected base cannot be the whole answer.** `t.top` is not reliably the table's visual
+top. On 390_wide_data_appendix `top=48.2` while the page draws its first row's text at 44.1 - the
+top rule the detector found is 4.1 pt BELOW the first text - so charging the full gap there puts
+the table 10.6 pt low instead of 3.7, which is the revert already recorded in `DocxWriter`'s
+comment. On 311 the same field is 6.1 pt ABOVE the first text. One field cannot carry both. The
+fix that would settle it is the one already written down for the flow: record the page's own
+first-row baseline in `Table` and charge the gap to that, not to a detected rule. That is a
+model change in `PdfToWord.java` and is not attempted here.
+
+**Tries: 2 of 3 on the spacer formula.** One left, and it is the model change, not a constant.
+
+## 8 Nov 22:00 — `base208-position.json` does not reproduce in a fresh sandbox
+
+The position ratchet could not be used as written this run, and that is worth knowing before the
+next run trusts it. The control - the **unmodified** engine's output, rendered in the same
+sandbox, measured against the committed `base208-position.json` - reports **31 documents
+REGRESSED**, including `36_embedded_subset_font 100.0 % -> 31.0 %` and
+`325_demat_holdings_statement 98.8 % -> 8.3 %`, at an overall 25.5 % against the 11.7 % the file
+holds. Nothing was changed to produce it. The stored baseline was recorded under a different
+LibreOffice/font environment, so its per-document shares are not comparable here.
+
+Two consequences, both followed this run:
+
+1. A fix must be judged by comparing two renders **made in the same sandbox** - the control and
+   the candidate - not by the stored file. Both attempts above were judged that way, and both
+   would have looked like a 30-document regression if judged against the file.
+2. The baseline must **not** be re-recorded to make it match. Re-recording it here would launder
+   the environment difference into the ratchet and hide a real regression later. It is left
+   alone, and the position numbers in this entry are the same-sandbox comparison instead.
