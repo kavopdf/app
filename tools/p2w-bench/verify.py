@@ -100,16 +100,38 @@ def check_measure(claim, ref, got, ref_lines, got_lines, ref_doc, got_doc):
                 ref_doc.page_count, got_doc.page_count)
         return "REFUTED", "both have %d pages" % ref_doc.page_count
     if c == "shapes":
+        # A count alone is blind to the two things that actually go wrong with a drawing.
+        # On 352_certificate_ornate_border the page draws two page-sized border rectangles and
+        # the render draws twelve corner curls instead: 12 against 12, so a count called it
+        # refuted while the border was gone. On 371 the seal's two rings come out as 16 x 9 pt
+        # blobs: 2 against 2, refuted again, with the ring missing.
+        #
+        # So a shape is also classified by SIZE. BIG_FRAC is a CLASSIFICATION bound, not a
+        # positional tolerance, in the same sense as RULE_MAX_PT below: a frame or a seal ring
+        # covers a real fraction of the paper, a curl or a glyph does not, and nothing here is
+        # compared against the other side's coordinate. A tenth of a per cent of an A4 page is
+        # 50 pt2 - 7 x 7 pt - which no corner ornament reaches and every border, seal and panel
+        # outline exceeds.
+        BIG_FRAC = 0.001
+
         def shapes(pg):
-            n = 0
+            n = big = 0
+            area = max(1.0, pg.rect.width * pg.rect.height)
             for d in pg.get_drawings():
                 r = d["rect"]
                 if r.width >= 1.5 and r.height >= 1.5:
                     n += 1
-            return n
+                    if (r.width * r.height) >= BIG_FRAC * area:
+                        big += 1
+            return n, big
         a, b = shapes(ref), shapes(got)
-        return ("REFUTED" if b >= a else "VERIFIED",
-                "%d shapes in the PDF, %d in the render" % (a, b))
+        if a[0] != b[0] or a[1] != b[1]:
+            return ("VERIFIED",
+                    "%d shapes in the PDF (%d large), %d in the render (%d large)"
+                    % (a[0], a[1], b[0], b[1]))
+        return ("REFUTED",
+                "%d shapes in the PDF, %d in the render, %d large on both sides"
+                % (a[0], b[0], a[1]))
     return "UNVERIFIABLE", "no measure check for '%s'" % c
 
 

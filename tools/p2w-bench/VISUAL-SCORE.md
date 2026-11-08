@@ -18,6 +18,7 @@ opened is not counted here - `looked.py` decides that, not this file.
 | 7 Nov | 2 | 1 | 50 % | after the D-01 pitch fix: 316 PASS, 303 FAIL (WARNING SIGNS wraps) |
 | 8 Nov | 13 | 4 | 31 % | g53 batch 1, the multi-column class: 9 fail, 8 of them on pagecount |
 | 8 Nov | 15 | 12 | 80 % | v3 batch 1 re-run after the gap fix: 3 fail (303 breaks, 311 weld, 315 columns) |
+| 2026-11-09 | 15 | 4 | 27 % | v3 batch 3 after the column-edge fix: 11 fail, 20 findings verified 1 refuted |
 | 8 Nov | 13 | 6 | 46 % | g53 batch 3, the tax-invoice class: 7 fail, after two engine fixes cleared 9 of the 13 documents of the spill and the dropped header line |
 | 8 Nov | 10 | 5 | 50 % | the D group, and the corpus is now fully scored: 113 PASS / 95 FAIL of 208, last row per document |
 | 8 Nov | 15 | 8 | 53 % | v3 batch 1 final sweep: 7 fail (301, 303, 305, 306, 311, 314, 315), 306 new on a 7.2 pt table-extent finding |
@@ -611,3 +612,28 @@ disagreements, all the same measurement bug: 322, 325 and 330 passed the eye and
 numbers on reading order alone, because the PDF draws each cell as its own line and the render
 joins a row's cells with tabs. That blind spot is now recorded seven times and is not a document
 defect.
+
+v3 batch 3 (342-371), processed from scratch: 15 documents, 16 pages, every page opened at 130 dpi
+before visual.py was run. 21 findings emitted, 20 verified, 1 refuted. 4 pass, 11 fail. Two engine
+fixes shipped this run, both measured: the column-edge subtraction in DocxWriter (which put three
+lines at x=0.1) and the size-aware shapes check in verify.py (which had called two real losses
+refuted because the counts happened to match).
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-09 | 342_packing_list | PASS | header band, exporter and consignee block, five-column table, total line, marks box and declaration |
+| 2026-11-09 | 343_air_waybill | FAIL | order 81.2 % of 15 rows, 17 in the render - each "1,144.00" cell wraps its last 0 onto a line of its own |
+| 2026-11-09 | 344_customs_declaration | FAIL | moved:CLEARED verified 9.8 pt high; the eye saw the stamp off its place and the numbers held it |
+| 2026-11-09 | 350_question_paper | FAIL | pagecount 1 -> 2: page 1 runs on to a second sheet |
+| 2026-11-09 | 351_omr_answer_sheet | FAIL | rules 13 in the PDF, 32 in the render - a ruled grid is drawn round rows 16-45 |
+| 2026-11-09 | 352_certificate_ornate_border | FAIL | shapes 12 (8 large) in the PDF, 12 (4 large) in the render - both page borders are gone, only the corner curls are drawn |
+| 2026-11-09 | 353_admit_card | FAIL | moved:Controller of Examinations 47.6 pt low - the Paper table above it is charged more height than the page's rows |
+| 2026-11-09 | 360_restaurant_menu | FAIL | moved:Butter Naan 149.1 pt up - the four menu groups are drawn as tables with a tighter row pitch than the page |
+| 2026-11-09 | 361_product_catalogue_grid | PASS | six product cards in two rows of three, image, name, MRP, code and barcode in each |
+| 2026-11-09 | 362_price_list_dense | PASS | six columns of item, code and price with the heading and the footnote |
+| 2026-11-09 | 363_warranty_card | PASS | warranty box, six terms, sticker box, QR and the register URL under its own text |
+| 2026-11-09 | 364_event_ticket | FAIL | count:WS24-4471-0082 2 in the PDF, 1 in the render - the tear-off stub loses its ticket number |
+| 2026-11-09 | 365_recipe_card | FAIL | wraps:to taste - the PDF has 2 lines, the render wraps them into 3 |
+| 2026-11-09 | 370_offer_letter | FAIL | moved:6,00,000 13.0 pt high - the offer table's rows are shorter than the page's own pitch |
+| 2026-11-09 | 371_experience_certificate | FAIL | shapes 2 large in the PDF, 0 in the render - the seal's two rings come out as 16 x 9 pt blobs |
+

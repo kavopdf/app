@@ -3469,139 +3469,102 @@ one-line reversal if that judgement is wrong.
 **All three patches touch `DocxWriter.java` and all three are based on blob `26b4fd8`**, so they must
 be applied in sequence with a three-way merge, not in parallel.
 
+## v3 corpus — batch 3 (342-371), 9 Nov 00:07 IST
 
+Fifteen documents, sixteen pages, all seventeen steps in order, every page opened at 130 dpi
+before any number was read. Twenty-one findings, 20 verified, 1 refuted, 0 unverifiable.
+Four pass, eleven fail. Two fixes shipped, both measured.
 
-**The section breaks are gone, and it works - five variants built and rendered.**
+### FIXED — w:ind w:left is measured from a column edge the section does not have
 
-The brief's ordering did not survive measurement. The 62-shaped page was built five ways and each
-rendered with `soffice`:
+353_admit_card, 363_warranty_card and 364_event_ticket each had a line the PDF draws inside the
+page's own column land at x=0.1: "GM" (PDF x=150.0), the register URL (x=320.0) and the tear-off
+stub line "ANANYA RAO | DELEGATE | 12-14 SEP 2024" (x=52.0). The .txt carried all three at the
+right column, so the model was right and the writer was wrong.
 
-    V0  current, continuous sections            2 pages   layout correct, two pages
-    V1a one 2-col section, no breaks            1 page    WRONG - everything pours into column 1,
-                                                          right column empty, masthead squeezed
-    V1b w:br w:type="column" around the element  2 pages   WRONG - a column break moves to the next
-                                                          column, it does not widen a line
-    V1c full-width para carrying w:cols num="1"  3 pages   WRONG - w:cols is a section property, so
-                                                          that is still a section break
-    V2  full-width element as a 1-row table      1 page    WRONG - confined to its column,
-        inside the 2-col section                          x1 = 297 of 595
-    V3  the columns become the table's columns   1 page    CORRECT - bands span to 595,
-                                                          columns at x=0 and x=298
+`DocxWriter.bandLeftTw` subtracted the page's column left edge from a paragraph's indent whenever
+the page carried more than one `Para.column` value. That subtraction is only correct when the
+SECTION declares `w:cols w:num>1`; with one column `w:ind w:left` is measured from the page edge,
+and the page margins are zero, so the measured x already is the indent. The three pages emit
+`<w:cols w:space="0"/>` - one column - and still had the edge taken off.
 
-So idea 1 is impossible in OOXML and idea 2 does not span inside a two-column section. Idea 2 done
-differently - one table row, one cell per column, with the page's full-width bands as ordinary
-paragraphs above and below it - works and needs no section at all. That is what shipped. Idea 3
-survives only as a scoped fallback: if a page interleaves full-width content with column content, a
-table cannot describe it, so the page is written as a single-column flow. That is why
-`newspaper-2col-fullwidth-headline` is one page and correctly ordered rather than one page and
-scrambled.
+The fix is a `ctx.secCols` field, set from the same `pageColumns` decision that writes the sectPr,
+and one guard in `bandLeftTw`. Measured: 96 of 208 documents change, 1946 paragraph indents; G2
+clean on 208 (no document worse, 26 counts improved, identical to the control run); batch G5
+18.0 % of lines within tolerance -> 26.2 %; the three lines above now measure 150.1, 320.1 and
+52.1 pt against the page's 150.0, 320.0 and 52.0.
 
-**Two more bugs found on the way.** The `blockSpan * 0.62` test compared a paragraph against the
-widest paragraph on the page, which on two of the four documents *is* one column's width - so every
-column line was called full-width, which is why 62 had **six** breaks rather than two. And the
-column pass welds a left-column line and a right-column line onto one baseline: 62's "For the
-ayacutdars of Halagere..." reports a right edge of 526 pt although the page drew it to 281 pt, and
-that is what tore a left-column sentence in two.
+### FIXED — the verifier's `shapes` check could not see a shape change size
 
-**Measured.** 62 renders as **one page** where it was two, with 0 continuous breaks, one `w:sectPr`
-and a single column. Corpus-wide `<w:type w:val="continuous"/>` goes **30 to 0**.
-`annual-review-2col-uneven-columns` and `newspaper-2col-fullwidth-headline` both go **2 pages to 1**.
-Reading order: 34 paragraphs read masthead, headline, deck, *all* of the left column, *all* of the
-right column, footer; in the render all 36 PDF lines are present with **dx = 0 on every line and dy
-within 3 pt**, 0 unmatched, 0 extra. Gate **no document got worse**, 208/208 scored, 23 counts
-improved. `verify-engine.sh` exits 0 with **433 PASS and 0 failures**.
+352_certificate_ornate_border draws two page-sized border rectangles; the render draws twelve
+corner curls and no border. 12 shapes against 12, so `shapes` answered REFUTED and the finding
+was about to be dropped. 371_experience_certificate's seal is two rings of 84 x 84 and 74 x 74 pt;
+the render has two 16 x 9 pt blobs, 2 against 2, refuted again.
 
-**Not fixed:** `journal-2col-with-footnotes` is still two pages, as it was on the baseline. Its page
-is 69 full-width lines, the column pass finds no band, `columnPage()` declines and the flow overflows
-by about 27 pt because the substituted font wraps six rows into two lines. That is a font-metrics
-problem, not a section-break one.
+`verify.py` now classifies every shape by size as well as counting it. BIG_FRAC = 0.001 of the
+page is a CLASSIFICATION bound, not a positional tolerance, in the same sense as RULE_MAX_PT: a
+frame, a seal ring or a panel edge covers a real fraction of the paper, a curl or a glyph does not.
+Both findings then verified: 352 "12 shapes in the PDF (8 large), 12 in the render (4 large)",
+371 "2 (2 large) against 2 (0 large)".
 
-**Patch:** `patches/D8-C-sections-without-sections.patch`, one file, `DocxWriter.java`, +426/-49.
+### OPEN — both page borders are missing from the ornate certificate (352)
 
+Verified. The page's two frame rectangles are 810 x 563 pt and 798 x 551 pt at (16,16) and
+(22,22) - both drawn larger than the 595 pt paper and clipped to it. The render keeps the four
+corner curls and drops both frames. The writer emits twelve shapes on that page and none of them
+is a frame, so the two big rectangles are being classified as something other than a block and
+never reach the page. **Tries: 0 of 3.**
 
+### OPEN — the seal's rings collapse to 16 x 9 pt (371, 352)
 
-**Correction: my own measurement of this entry was stale, and the real defect was elsewhere.**
+Verified. Same wall as the arc text: the two concentric rings of 84 x 84 and 74 x 74 pt come out
+as 16 x 9 pt blobs, and the arc text is drawn as joined word fragments ("SH", "REEJI", "LOGI T
+ICS") where the page draws one glyph per position. This is the D-16 family seen from the
+drawing side: OOXML has no rotation a LibreOffice render honours. **Tries: 0 of 3.**
 
-The 78-paragraphs-for-35-baselines figure was measured on the build *before* the table work shipped.
-On the current build `base208.json` records **67 lines** for `01_stamp` and its item grid is already a
-`w:tbl` - 42 of those 67 paragraphs are table cells - so its **body flow is 573.8 pt on an 841.9 pt
-page**, not the 1277 pt overflow this entry was opened on. The D-14 table work had already fixed it.
+### OPEN — the tear-off stub loses its ticket number (364)
 
-**What was actually wrong, and is now fixed.** A clause audit over **3,247 same-baseline pairs**
-across all 208 documents, with `sameRow` instrumented to name the clause that fires, found the
-predicate is not the bottleneck it looked like - it accepts **81 %** of pairs. The rejecting clauses
-in order: `across-column-gap` 246, `rotated` 188, `past-paper` 66, `ACCEPT-inside` 44,
-`baseline-dy` 43, `gap-too-small` 12, `different-size-needs-12pt-gap` 11, `size-ratio-2.5` 8.
+`count:WS24-4471-0082` verified 2 in the PDF, 1 in the render. The page draws the number twice,
+at y=227.5 in the ticket body and y=347.6 in the tear-off stub; the render keeps the first and
+drops the stub's. The stub's other line is present and correct, so the line is being dropped
+rather than the box. **Tries: 0 of 3.**
 
-Two real defects:
+### OPEN — the four menu groups are written as tables with a tighter pitch (360)
 
-1. **`rotated` was firing on a whole page.** An upside-down page - every glyph at 180 degrees - had
-   every line flagged as a stamp, so **112 of 114** same-baseline pairs were refused and **15
-   baselines became 61 paragraphs**. A new page-level `uprightIfPageIsUpsideDown` clears the flag only
-   when nothing on the page is upright, so a 180-degree stamp over an ordinary page is untouched.
-2. **A row was measured against `group.get(size - 1)`**, which after `addRowMates` is a field on the
-   *right* - and `sameRow` rejects anything to its left. Rows whose left-hand fields arrived later in
-   the column order were cut in two: "Account holder" / "NIRVAAN PACKAGING INDUSTRIES" / "Account
-   no. ..." is now one row with tab stops. `prevOnBaseline` fixes the reference line; `sameRow` itself
-   is unchanged.
+`moved:Butter Naan` verified 149.1 pt up (PDF y=444.0, render y=294.9). The page draws four
+two-column groups as plain rows at a 20 pt pitch; the render writes them as tables whose row
+pitch is ~15 pt, so the second pair of groups - and everything below them - rises by the
+difference. Same class as 314 and the calendar entry above: a table's row height is not the
+page's pitch. **Tries: 0 of 3.**
 
-**Measured:** paragraphs with text **16,520 to 16,433**, body paragraphs **5,370 to 5,283**, tab-stop
-paragraphs **825 to 845**, pages where paragraphs exceed baselines **61 to 52**, documents where body
-flow exceeds the page budget **16 to 15**, pair accept rate **81.0 % to 84.1 %**. Eleven documents
-changed and **none gained a paragraph**. Gate **no document got worse** - 12 joins, 26 improved
-counts, no page-count change. Engine tests 29/29 and 3/3.
+### OPEN — the offer table's rows are shorter than the page's (370)
 
-**Still at risk, and it is a different model:** `05_round_company_seal_curved_text`. The cause is the
-seal ring - `ringPara` writes **one paragraph per ring character**, 60 of its 80 body paragraphs - not
-baseline grouping. Diagnosed and quantified, not changed; folding the ring into one paragraph is a
-stamp/seal model change.
+`moved:6,00,000` verified 13.0 pt high (PDF y=338.6, render y=325.6), and every row of the
+eight-row table carries the same 13 pt by the bottom. 29 rows on both sides, 93.1 % in sequence,
+so this is height, not order. **Tries: 0 of 3.**
 
-**One flow rise to weigh:** `form16-part-b` goes **864 to 1057 pt**, already over budget before. That
-is the price of a correct row.
+### OPEN — the Paper table is charged more height than the page's rows (353)
 
-**Patch:** `patches/EX-A-baseline-grouping.patch`, one file, `PdfToWord.java`.
+`moved:Controller of Examinations` verified 47.6 pt low. Every line below the two-row Paper
+table is 19.5 to 24.3 pt low (VENUE, INSTRUCTIONS, the venue line, the barcode caption), so the
+table itself is over-charged ~19.5 pt before the footer picks up the rest. **Tries: 0 of 3.**
 
+### OPEN — a value split across two spans wraps one character early (343)
 
+The page draws each "1,144.00" cell as two spans on one baseline - "1,144.0" and "0" - so it
+reads as one line to the eye and as two lines to the verifier. The render breaks it as "1,144."
+and "0", one character earlier, which costs the page two extra rows (15 in the PDF, 17 in the
+render) and is what `order` scores at 81.2 %. The claim vocabulary has no way to say "one
+character", and `wraps:` refuted twice on it. **Tries: 0 of 3.**
 
-**The page budget, shipped - and the 1277 pt was my own counting error.**
+### OPEN — the offer letter's body is narrower than the page's (370, second finding)
 
-**The number was wrong.** `1277 pt` for `01_stamp` is reproducible only by counting `w:before` and
-`w:line` **inside the stamp's anchored text boxes**: raw 1170.4 pt, in-flow **681.8 pt** on an 841.9 pt
-page. The page was never over in LibreOffice. And the `#67 before=258.7 pt` quoted earlier does not
-exist on this build - the largest is **120.0 pt**, already held down by `GAP_CAP_TW`. Two errors, both
-mine, and both the kind that a measurement of the file's own XML would have caught.
+The table's amount column lands at x=443.9, which is right, but the body paragraph's right edge
+sits 24 pt left of the page's. Not recorded as a finding this run because the eye did not name
+it and no claim was raised; it is noted here so the next pass measures it rather than rediscovers
+it. **Tries: 0 of 3.**
 
-**What shipped.** The literal instruction - clamp the line height of the remaining paragraphs - clamps
-exactly **one** line per page: the guard fires, leaves zero room, and everything after it takes the
-break path. `table-of-contents-dot-leaders` needs 907.8 pt on 841.9 spread over about 57 lines, so it
-was generalised: measure the page off its own XML (`w:before + w:line + w:trHeight`, top-level only),
-then re-write it with every box and gap scaled by `budget / height`, floored at 0.85 and at the type's
-own ascent. A page that already fits is written once and is byte-identical - **196 of 208 documents are
-unchanged**, 12 change.
+### Refuted, not fixed
 
-    pages whose flow exceeds the paper (of 540)     11 real  ->  4
-    documents rendering the PDF's page count       189/208   ->  196/208   (7 fixed, none gained)
-    gate                                           "no document got worse", exit 0
-
-The five stamp documents' flow sums are **unchanged** - 681.8 / 675.3 / 541.1 / 586.4 / 819.0 pt on
-841.9 - all render 1/1, and their `document.xml` is **byte-identical** before and after.
-
-**Two things deliberately not done.** A hard break is in the code as `BREAK_WHEN_UNFITTABLE`, **off by
-default**: on, the flow never exceeds a breakable page (4 to 3 over) but the gate gains two
-`pages 1 -> 2` counts on documents that render two pages either way. The clean gate was chosen; flip
-one constant for the guarantee. And moving the footer into a section footer was rejected on numbers:
-the writer has **no header/footer notion at all** - 0 `w:footerReference` in 208 outputs, `w:header="0"
-w:footer="0"` - so it needs a new part, a relationship, four `sectPr` sites and a non-zero
-`w:footer`/bottom margin, **which moves every anchored shape on every page**, and it would recover only
-120 pt on a document that is not over.
-
-**Still over by 40-96 pt, four pages:** `350_question_paper`, `itr-computation-with-slab-table`,
-`newsletter-3col-header-footer`, `product-catalogue-code-left-price-right`. Closing those needs real
-columns (D-08) or a shrinkable table model.
-
-**Tests:** TestEngine 81/81, TestPdfToWord 29/29, TestRealDocs 3/3. `verify-engine.sh` was not run end
-to end - its OCR, redaction, repair and APK stages do not touch `DocxWriter` and exceed one command
-budget.
-
-**Patch:** `patches/EX-B-page-budget.patch`.
+343's `wraps:1,144.0` - see the entry above. The eye was wrong: the page splits the cell too.
 

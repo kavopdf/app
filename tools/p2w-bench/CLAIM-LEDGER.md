@@ -18,16 +18,18 @@ This table is the diagnostic. One row per claim type, updated at the end of ever
 
 | Claim type | Verified | Refuted | Unverifiable | What it means |
 |---|---|---|---|---|
-| moved: | 52 | 4 | 0 | the workhorse: 374 -329.3 pt, 375 -172.4, 381 240.8, 393 132.7, 401 -484.1 all held. 8 Nov v3 batch 2 added 8 verified. Re-checked after the gap-clamp fix, 3 of those 8 came back REFUTED (318 7.8 pt, 320 8.9, 325 9.4 stayed VERIFIED on the residual; 326 2.4, 333 0.6, 340 0.1 were refuted by the fix, which is the outcome a fix should produce). The one earlier refutation was mine - "Employee name" was 2.6 pt out, inside the 3.0 pt tolerance, and I had read the cell grid wrong |
-| count: | 6 | 1 | 0 | 8 Nov v3 batch 2: five `count:` claims on 323's spend-by-category labels (Travel, Shopping, Fuel, Groceries, Health) all verified - the page draws six labels against six amounts and the render keeps only the amounts. This is the type to use when a word occurs more than once on the page, because `missing:` refutes on the first hit anywhere. One refutation the same run: 326's `count:Taxable amount` - the header cell spans two grid columns and python-docx reports it twice, so 1 on both sides. Earlier: 38's subtitle is drawn twice on the page to fake bold and once on both sides of a line in the render; the count held |
+| moved: | 56 | 4 | 0 | the workhorse: 374 -329.3 pt, 375 -172.4, 381 240.8, 393 132.7, 401 -484.1 all held. 8 Nov v3 batch 2 added 8 verified. Re-checked after the gap-clamp fix, 3 of those 8 came back REFUTED (318 7.8 pt, 320 8.9, 325 9.4 stayed VERIFIED on the residual; 326 2.4, 333 0.6, 340 0.1 were refuted by the fix, which is the outcome a fix should produce). The one earlier refutation was mine - "Employee name" was 2.6 pt out, inside the 3.0 pt tolerance, and I had read the cell grid wrong |
+| count: | 7 | 2 | 0 | 8 Nov v3 batch 2: five `count:` claims on 323's spend-by-category labels (Travel, Shopping, Fuel, Groceries, Health) all verified - the page draws six labels against six amounts and the render keeps only the amounts. This is the type to use when a word occurs more than once on the page, because `missing:` refutes on the first hit anywhere. One refutation the same run: 326's `count:Taxable amount` - the header cell spans two grid columns and python-docx reports it twice, so 1 on both sides. Earlier: 38's subtitle is drawn twice on the page to fake bold and once on both sides of a line in the render; the count held |
 | breaks: | 5 | 0 | 0 | 8 Nov v3 batch 2: 318's TAKE NOTICE line held - the PDF's line ends at "your", the render carries "absence." onto it and no render line ends there. Earlier: 8 Nov re-run of v3 batch 1: 303's WARNING SIGNS held as a `breaks` claim - the PDF's line ends at "needed" and no render line does, because the PDF's own line overruns the paper by 1.4 pt and its tail never reaches the page |
-| wraps: | 0 | 3 | 0 | one refutation, 303's WARNING SIGNS: the eye saw one line on the PDF and two in the render, and the verifier counted 2 on both sides. The eye misread a line the page had already wrapped at the right margin - the claim was right in form and wrong in fact, which is what the verifier is for |
+| wraps: | 1 | 5 | 0 | one refutation, 303's WARNING SIGNS: the eye saw one line on the PDF and two in the render, and the verifier counted 2 on both sides. The eye misread a line the page had already wrapped at the right margin - the claim was right in form and wrong in fact, which is what the verifier is for |
 | missing: | 3 | 0 | 2 | 39's NOTICE TO MEMBERS is UNVERIFIABLE - the page writes the heading with letter spacing, so its text layer reads collapsed too and the needle is not there on either side |
 | extra: | 1 | 0 | 0 | 8 Nov re-run of v3 batch 1: 312's `extra:NOTARY` held - the circular seal's arc text is drawn twice in the render and once on the page. First use of this type |
-| pagecount | 4 | 0 | 0 | 8 Nov: 330 and 332 both 1 page in, 2 out, verified twice (once from the eye's FAIL, once from the computed question). Both are drawing pages whose dimension lines and tables overflow |
+| pagecount | 5 | 0 | 0 | 8 Nov: 330 and 332 both 1 page in, 2 out, verified twice (once from the eye's FAIL, once from the computed question). Both are drawing pages whose dimension lines and tables overflow |
 | overlap | 1 | 1 | 0 | 401 held (3 pairs against the PDF's 0). 393 was refuted by a check that only compares LINE boxes: the peak table and the caption are drawn over the CHART, and a table over a picture is not a line overlap. The eye was right and the check is blind |
-| shapes | 0 | 2 | 2 | 400 lost one speech bubble's outline and the claim came back UNVERIFIABLE - there is no visual check for a shape count at all, only the "charts" measure question, which answers "yes" on 5 paths against 4. 316 came back REFUTED: the question said "1 in the PDF, 0 in the docx" and verify.py counted 1 on both sides, so the charts question is what is wrong |
+| shapes | 2 | 4 | 2 | 400 lost one speech bubble's outline and the claim came back UNVERIFIABLE - there is no visual check for a shape count at all, only the "charts" measure question, which answers "yes" on 5 paths against 4. 316 came back REFUTED: the question said "1 in the PDF, 0 in the docx" and verify.py counted 1 on both sides, so the charts question is what is wrong |
 | emphasis (not a type yet) | 0 | 0 | 1 | 380's Escalation line is bold in the render and regular in the PDF. q8 only asks whether a line the PDF emphasised KEPT its size; a line the render emphasised on its own is invisible to it |
+
+| rules | 1 | 0 | 0 | new type, added 8 Nov and first used here: 351_omr_answer_sheet, 13 rules in the PDF against 32 in the render - a ruled grid drawn round rows 16-45 of a bubble sheet the page leaves unruled. Both directions count, because a check that can only see "too many" turns every missing rule into a false pass |
 | columns (not a type yet) | 0 | 0 | 1 | 383's RESPONSE FIELDS table has a fourth empty column and row rules the PDF does not draw. No claim type describes a table's shape |
 | order (measure) | 48 | 0 | 0 | 373 91.9 %, 400 42.1 %, 401 50.0 % - all three agreed with what the eye saw. 7 Nov batch: 301 78.7 %, 303 88.5 %, 305 47.1 %, 311 90.2 %, 312 60.9 %, 315 29.1 % all held against the PDF, but only five of the six agreed with the eye: 312 was passed on sight, so that row is a measurement bug, not a document defect. 8 Nov batch 2 added 9 verified, and 2 of them disagreed with the eye (331 93.3 %, 334 89.7 %, both passed on sight): reading order on a page of a drawing or a figure is the same measurement bug. 8 Nov second pass of v3 batch 1 added 6 verified; 1 of the 6 disagreed with the eye (305 47.1 %, passed on sight - the PDF draws every table cell as its own line and the render joins a row's cells with tabs, so 27 rows against 24 can never match) |
 
@@ -435,3 +437,29 @@ re-run with x=28.0/16.6 and y=398.3/401.1, which is what the page actually shows
 What the eye saw in the title is the letter spacing, not missing text - the same reading the D
 group recorded for 391's welded header. The claim type cannot express it, so it is not a defect
 and nothing was fixed on it.
+
+## 9 Nov - v3 batch 3, and what the refutations were telling us
+
+20 verified, 1 refuted, 0 unverifiable over 21 findings. Two of the three refutations this run
+were the same fault in the tool, and the third was the eye.
+
+**`shapes` was a count, and a count cannot see a shape change size.** 352_certificate_ornate_border
+draws two page-sized border rectangles and twelve corner curls; the render draws twelve curls and
+no border. 12 against 12, so the check answered REFUTED while the frame was gone. 371's seal is two
+rings of 84 x 84 and 74 x 74 pt; the render has two 16 x 9 pt blobs. 2 against 2, refuted again. The
+check now classifies each shape by size as well - a shape covering more than a tenth of a per cent
+of the page is a frame, a ring or a panel edge, not an ornament - and both findings came back
+VERIFIED with the numbers that show it: 352 "8 large against 4 large", 371 "2 large against 0
+large". This is the row the ledger has been asking for since 400 and 316: the check was wrong, not
+the pages.
+
+**`wraps:` refuted twice on 343, and the eye was wrong both times.** The eye read "1,144.00" as one
+line on the page and two in the render. The page draws that cell as two spans that sit on one
+baseline and look like one line; the render breaks it one character earlier. The claim cannot
+express "one character", so it refutes. Recorded as an eye-instruction problem: a cell whose value
+is split across spans looks whole to the eye.
+
+**`count:Butter Naan` refuted, and the claim kind was wrong.** The word is on both sides; what the
+eye actually saw was the whole BREADS & RICE block 149 pt above where the page puts it, because the
+four menu groups are written as tables with a tighter row pitch. Re-recorded as `moved:Butter Naan`
+and verified at 149.1 pt. `count:` answers "is it there", not "is it where it was".

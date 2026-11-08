@@ -209,6 +209,17 @@ public final class DocxWriter {
         /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
         float pageWidthPt = 595f;
         /**
+         * How many columns the section being written actually declares, from pageColumns.
+         *
+         * <p>This is the only thing that decides whether w:ind w:left is measured from the page
+         * edge or from a column edge. It has to be the SECTION's count, not the count of distinct
+         * Para.column values on the page: a page whose paragraphs carry two column numbers while
+         * the section declares one column has no column edge to subtract, and subtracting one
+         * moved the text to x=0.1. Measured on the v3 batch-3 run: 353's "GM" (x=150 in the PDF),
+         * 363's register URL (x=320) and 364's tear-off stub line (x=52) all landed at x=0.1.
+         */
+        int secCols = 1;
+        /**
          * True when the last block written on this page was a table.
          *
          * <p>A table's rendered height is not its PDF extent: every row is written at the
@@ -255,6 +266,7 @@ public final class DocxWriter {
                 secH = ph;
                 secCols = pCols;
                 secGap = pGap;
+                ctx.secCols = pCols;
                 first = false;
             } else if (Math.abs(pw - secW) > 0.5f || Math.abs(ph - secH) > 0.5f
                     || pCols != secCols) {
@@ -278,6 +290,7 @@ public final class DocxWriter {
                 secH = ph;
                 secCols = pCols;
                 secGap = pGap;
+                ctx.secCols = pCols;
             } else {
                 // A page with nothing on it still has to advance the page counter, or every
                 // anchor after it lands one page too early.
@@ -420,6 +433,12 @@ public final class DocxWriter {
     /** How many column bands this page's paragraphs occupy, and the widest gutter between them. */
     /** The left edge of the column a paragraph sits in, in twips, or 0 for a one-column page. */
     private static int bandLeftTw(Ctx ctx, int column) {
+        // w:ind w:left is measured from the PAGE edge unless the section itself declares
+        // w:cols w:num>1. The page margins are zero, so with one column the page edge IS x=0 and
+        // the measured x is already the indent. Subtracting a column's left edge there took the
+        // text off the page: on v3 batch 3 it put three lines at x=0.1 that the PDF draws at 52,
+        // 150 and 320 pt. Only a section that really is divided may measure from its column.
+        if (ctx.secCols <= 1) return 0;
         if (ctx.colLeft == null || ctx.colLeft.size() <= 1) return 0;
         Float left = ctx.colLeft.get(column);
         return left == null ? 0 : (int) Math.round(left * TWIPS_PER_PT);

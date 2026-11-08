@@ -789,3 +789,41 @@ reading order alone. That is the tab-joined-row measurement bug, recorded seven 
 reports 10 of these 15 as regressed against the *unmodified* engine too - 334's control run scores
 12.5 % against the file's 100 %. The 22:00 entry above says why, and this run judged the fix the
 way that entry says to: control and candidate both rendered here, compared to each other.
+
+## 9 Nov, 00:07 IST - v3 batch 3, two fixes, both measured
+
+Sandbox empty again: Temurin 17.0.21, PDFBox-Android 2.0.27.0, the three corpus assets at
+75 / 80 / 53, all 208 converted in one run, G2 **no document got worse** before anything was
+looked at. 15 documents, 16 pages, the seventeen steps in order.
+
+**Result: 4 pass, 11 fail.** Every page opened at 130 dpi before visual.py ran. 21 findings
+emitted, 20 verified, 1 refuted, 0 unverifiable.
+
+**Fix 1 - the column edge that is not there.** 353, 363 and 364 each had a line the page draws
+inside its own column land at x=0.1 ("GM" at 150, the register URL at 320, the stub line at 52).
+`DocxWriter.bandLeftTw` was subtracting the page's column left edge from `w:ind w:left` whenever
+the page carried more than one `Para.column` value, but `w:ind w:left` is measured from the PAGE
+edge unless the SECTION declares `w:cols w:num>1` - and those three pages emit one column. New
+`ctx.secCols`, set from the same `pageColumns` decision that writes the sectPr, and one guard.
+96 of 208 documents change, 1946 indents; G2 clean; batch G5 18.0 % -> 26.2 % of lines within
+tolerance; the three lines now measure 150.1, 320.1 and 52.1 against 150.0, 320.0 and 52.0.
+
+**Fix 2 - the verifier could not see a shape change size.** 352 draws two page-sized border
+rectangles and the render draws twelve corner curls instead: 12 against 12, REFUTED, with the
+frame gone. 371's seal rings are 84 x 84 and 74 x 74 pt and come out as 16 x 9 blobs: 2 against
+2, REFUTED. `shapes` now classifies by size as well as counting (BIG_FRAC 0.001 of the page, a
+classification bound like RULE_MAX_PT), and both verified - 352 "8 large against 4 large", 371
+"2 large against 0 large". That is the ledger's shapes row answered: the check was wrong.
+
+**Three refutations, three different lessons.** 343's `wraps:1,144.0` twice - the page draws that
+cell as two spans on one baseline, so the eye read one line and the verifier counted two; the
+eye's instruction is what is wrong. 360's `count:Butter Naan` - the word was on both sides and
+what the eye saw was the block 149 pt high; re-recorded as `moved:` and verified.
+
+**precommit** ran with ENGINE_CP pointed at /scratch/work/libs: every bench tool ran, the engine
+compiled, TestPdfToWord 29/29, G2 clean, ALL CHECKS PASSED.
+
+**Where the corpus stands.** 208 of 208 have a row in VISUAL-SCORE.md. v3 batches 1, 2 and 3 are
+re-processed under the current tools; 342-371 now carry verdicts from this run. Next: v3 batch 4
+(372-394), then b80.
+
