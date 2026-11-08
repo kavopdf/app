@@ -2023,7 +2023,42 @@ stroke drawn inside a table - so the question is whether the rules were detected
 discarded, or never detected. Dump the `Rules` the pass found for page 1 of that document
 before changing anything.
 
-**Tries: 0 of 3** - diagnosed, not started.
+**Tries: 2 of 3** - diagnosed, two attempts measured and both rejected.
+
+**Fifth measurement - the column fix, run through the gate, REJECTED.** Two versions were tried
+and both are recorded here so neither is repeated.
+
+Version 1 took the gaps between line spans. It produced two columns on
+04_stamp_180deg_upside_down, because one wide line - the "Amount in words" sentence, which spans
+the whole table - pushed the running right edge past every column boundary. Defeated by a single
+long line.
+
+Version 2 counted where lines BEGIN instead: cluster the start x of every line in the band, and a
+column edge is a cluster that several rows share. With a 12 pt cluster radius and at least three
+lines per cluster it finds seven cells on 04_stamp_180 - close to the invoice's six, with the
+content landing in sensible places:
+
+    row2: Date | Receipt No. | SVIT/FEE/25 |  | 1SV22CS047 |  |
+
+Measured over 208 documents against base208.json:
+
+    333_datasheet_spec_tables            missing   0 -> 2
+    333_datasheet_spec_tables            lines   122 -> 86
+    price-list-2col-dense-right-aligned  missing   0 -> 7
+    REGRESSED: 3 counts - DO NOT SHIP
+
+**Not shipped.** The heuristic is too eager: on two documents it turns prose into a table and the
+words inside those cells stop being counted. That is a real regression, not a measurement
+artefact, and the gate caught it.
+
+**What to try next:** require more evidence before accepting a boundary - at least four lines per
+cluster rather than three, and reject the whole derivation if the resulting table's cells hold
+more text than the band's own lines do. The second guard is the one that matters: a false table
+swallows words, and comparing the cell text back against the band's line text would catch it
+before the table is kept.
+
+**Tries: 2 of 3 on this defect.** One attempt left.
+
 
 **Fourth measurement, same day - and it clears all three earlier guesses at once.** Printing the
 candidate list immediately before the `containsAnother` loop:
