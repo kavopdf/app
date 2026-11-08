@@ -403,3 +403,27 @@ Two things this run found about the instruments:
 The `order` question failed on 2 of 15 pages. On 371 it is the seal's per-glyph arc text and on
 400 it is the panels' text; both pages the eye also failed. That is the first batch where the
 order question and the eye agreed on every page it fired on.
+
+## 8 Nov 19:40 - one document re-checked, and the `moved:` check repaired
+
+303_discharge_summary, one page, every step in order. Four findings: 2 verified, 1 refuted,
+1 unverifiable.
+
+The run found a hole in the verifier rather than in the page. `moved:<text>` compared the y of
+the two lines and nothing else, so a line drawn 11.4 pt to the LEFT of where the page put it -
+seven times the 1.5 pt x tolerance, and the very defect the eye had reported - came back REFUTED
+with the note "2.8 pt apart". The check now compares both axes against the tolerances every gate
+uses, x 1.5 and y 3.0, and reports both numbers. `moved:WARNING SIGNS` came back VERIFIED on the
+re-run with x=28.0/16.6 and y=398.3/401.1, which is what the page actually shows.
+
+    moved      verified 1   refuted 1   unverifiable 0     (the refuted one was the same claim
+                                                            before the check was repaired)
+    count      verified 0   refuted 1   unverifiable 0
+    wraps      verified 0   refuted 0   unverifiable 1     "wraps:4 times a day" - the PDF has no
+                                                            line STARTING there, only one containing it
+    order      verified 1   refuted 0   unverifiable 0
+
+`count:DISCHARGE SUMMARY` was refuted and correctly so: the words are present once on both sides.
+What the eye saw in the title is the letter spacing, not missing text - the same reading the D
+group recorded for 391's welded header. The claim type cannot express it, so it is not a defect
+and nothing was fixed on it.

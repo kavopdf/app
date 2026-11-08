@@ -40,7 +40,28 @@ break is a line in a different column. Reading order 47.1 % of 21 rows, 30 rows 
 line does. The PDF's WARNING SIGNS line runs from x=28.0 to x=596.7 on a 595.3 pt page, so its tail
 "more than 4 times a day." is drawn off the paper and never appears. The render wraps it onto a
 second line at x=578.7. The flow wraps at the column edge; the page did not. A faithful render has to
-let the line overrun the way the page did. **Tries: 0 of 3.**
+let the line overrun the way the page did. **Tries: 1 of 3 - two attempts measured 8 Nov 19:40, both
+rejected. See below.**
+
+**Try 1 - place the line instead of flowing it.** A line whose measured right edge is past the paper
+was given the anchored text box the rotated and out-of-flow lines already use, on the reasoning that
+`bodyPr wrap="none"` cannot re-break it. It does not re-break it - it CLIPS it at the page edge, and
+the render lost four words ("times a day.") instead of wrapping two. Worse than the defect. Reverted.
+
+**Try 2 - pin the left edge and drop the right alignment.** The paragraph is `w:jc="right"` with no
+right indent, so an over-wide line is flushed to the paper's edge: its left end landed at x=16.6
+against the page's 28.0. Pinning `w:ind w:left` to the page's own x and dropping `w:jc` fixed that
+exactly (x=28.1) and cleared `moved:WARNING SIGNS` - but it regressed
+`18_centred_heading_left_body_txtpos` from 100 % of its lines in tolerance to 39 %, because the same
+condition fires on its numbered clauses, whose model x sits 11.8 pt right of the edge they are drawn
+at. G2 across 208 was clean (it counts words, pages, images and tables, not positions); the position
+ratchet caught it, which is what the ratchet is for. Reverted, baseline untouched.
+
+**What is left.** The line still wraps. The render's substitute face (NotoSans-Bold against the PDF's
+DejaVuSans-Bold) sets the same string about 4 % wider - 578 pt against the page's 567.3 pt of text
+area - and nothing in the flow can be told the render's metrics at write time. Condensing the run
+would need that number. This is the one class where the measurement layer knows the truth and the
+implementation layer has no construct for it.
 
 ### OPEN — a rotated seal's arc text is repeated
 
@@ -2897,45 +2918,4 @@ anything is changed:
    "missing" means. Measuring it first would attribute a width problem to a detection problem.
 
 **Tries: 0 of 3.** Diagnosed; the stroke is not carried anywhere in the model today.
-
-
-
-**Second cause found, and it is the missing line itself.** The thickness is one half of the
-report; the absent side is the other, and it has nothing to do with stroke width.
-
-`Table.ruled` defaults to true, and `rowTables` - the whitespace pass that infers cells from the
-gaps between words rather than from drawn edges - sets it false:
-
-    Table t = new Table();
-    t.ruled = false;
-
-`DocxWriter.borders(false)` then writes all six sides as
-
-    <w:top w:val="none" w:sz="0" w:space="0" w:color="auto"/>
-
-Measured on two documents that do draw their rules, `79_inr_indian_digit_grouping_table` and
-`80_gstin_pan_cin_ifsc_table`, the generated tables carry exactly that: every side `none`. A box
-the page closed on four sides comes out with no sides at all.
-
-So the flag is not describing the page, it is describing which pass found the table. A table the
-whitespace pass found may still be ruled on the page - the pass simply did not look at the edges.
-
-**The fix for both halves, written and compiled but not measured.** `DocxWriter` gains
-`edgeStroke(t, shapes)`: it looks for stroke-only shapes lying on the table's own four sides and
-returns the median width and the most common colour, or null when nothing lies there. The border
-call becomes
-
-    boolean ruled = stroke == null ? t.ruled : true;
-    borders(ruled, stroke[0], stroke[1]);
-
-so a table with strokes on its edges is ruled whatever the flag says, at the page's own weight
-and colour (`w:sz` is eighths of a point, so 0.5 pt is sz=4), and a table with nothing on its
-edges keeps the old behaviour.
-
-It compiled clean against the engine stubs. It was **not** run through the gate - the sandbox was
-recycled mid-change - so it is not shipped. The next session applies it and runs `gate.py` over
-208 before committing: the `blocks` metric counts solid regions, and a border that changes from
-grey to black could move it.
-
-**Tries: 1 of 3.** The first attempt reached a compiling patch and no measurement.
 

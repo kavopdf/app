@@ -554,3 +554,4 @@ full visual run will overwrite them with what it actually finds.
 | 2026-11-08 | 393_spectrum_peak_table | PASS | the spectrum chart and the five-column peak table on the page's rows |
 | 2026-11-08 | 394_map_with_legend | PASS | polygon, river, both roads, every marker, the legend, scale bar and north arrow |
 | 2026-11-08 | 400_comic_page_speech_bubbles | FAIL | moved:412 pallets -166.2 pt, moved:MEANWHILE, AT THE LOADING DOCK -159.6 pt, moved:Ship by noon -166.9 pt - the third row of panels is a sheet high and its bubble text rises to the panel top |
+| 2026-11-08 | 303_discharge_summary | FAIL | moved:WARNING SIGNS verified on both axes - x=28.0 in the PDF against 16.6 in the render, 11.4 pt and seven times the x tolerance, with 2.8 pt on y; the line also wraps, order 88.5 % of 25 rows with 27 in the render. Two fixes measured and reverted - see REMAINING-DEFECTS.md |

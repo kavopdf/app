@@ -24,7 +24,7 @@ TWO KINDS OF FINDING, TWO WAYS TO CHECK
         wraps:<text>     the PDF has <text> on one line and the render puts it on more
         breaks:<text>    the same number of lines, broken at a different word
         count:<text>     how many times the PDF holds <text>, against the render
-        moved:<text>     the render puts <text> more than the y tolerance from the PDF
+        moved:<text>     the render puts <text> more than the x or y tolerance from the PDF
         missing:<text>   the PDF has <text> and the render does not
         extra:<text>     the render has <text> the PDF does not
         order            the rows are out of sequence
@@ -250,10 +250,25 @@ def check_visual(claim, ref_lines, got_lines, ref, got):
         if not rl or not gl:
             return "UNVERIFIABLE", "%r is not on both sides" % needle[:40]
         if len(rl) == 1 and len(gl) == 1:
+            # Both axes, not just y. A line can sit on the page's own baseline and still be
+            # in the wrong place: 303's WARNING SIGNS line is 2.8 pt low - inside the 3.0 pt
+            # y tolerance - and 11.4 pt to the LEFT, because a right-aligned paragraph with
+            # no right indent is flushed to the paper's edge instead of the page's own
+            # x=28.0. Checking y alone called that REFUTED and the eye looked wrong when it
+            # was right. The tolerances are the ones every gate uses: x 1.5, y 3.0.
             d = gl[0]["base"] - rl[0]["base"]
-            return ("VERIFIED" if abs(d) > 3.0 else "REFUTED",
-                    "%r at y=%.1f in the PDF, y=%.1f in the render, %.1f pt apart"
-                    % (needle[:30], rl[0]["base"], gl[0]["base"], d))
+            dx = gl[0]["bbox"][0] - rl[0]["bbox"][0]
+            if abs(d) > 3.0 or abs(dx) > 1.5:
+                return ("VERIFIED",
+                        "%r at x=%.1f y=%.1f in the PDF, x=%.1f y=%.1f in the render - "
+                        "%.1f pt down, %.1f pt across"
+                        % (needle[:30], rl[0]["bbox"][0], rl[0]["base"],
+                           gl[0]["bbox"][0], gl[0]["base"], d, dx))
+            return ("REFUTED",
+                    "%r at x=%.1f y=%.1f in the PDF, x=%.1f y=%.1f in the render - within "
+                    "tolerance on both axes"
+                    % (needle[:30], rl[0]["bbox"][0], rl[0]["base"],
+                       gl[0]["bbox"][0], gl[0]["base"]))
         ry = [l["base"] for l in sorted(rl, key=lambda l: l["base"])]
         gy = [l["base"] for l in sorted(gl, key=lambda l: l["base"])]
         n = min(len(ry), len(gy))

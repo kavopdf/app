@@ -734,3 +734,23 @@ That is the verify-before-fix rule earning its place twice in one document.
 
 **Where the corpus stands.** 208 of 208 have a row; 119 PASS, 89 FAIL. 16 documents still render
 the wrong number of pages and every one of them is a multi-column page stacked into a single flow.
+
+## 8 Nov, 19:40 IST - verifier repaired, one document, two fixes measured and rejected
+
+Sandbox was empty again: toolchain rebuilt (Temurin 17.0.21, PDFBox-Android, the three corpus
+assets at 75 / 80 / 53), all 208 converted, rendered and taken through G2 and the position gate
+before anything changed. G2 clean at the start; position 29.4 % of lines in tolerance.
+
+**The repair.** `verify.py`'s `moved:` check compared y only. A line 11.4 pt left of where the
+page drew it - seven times the x tolerance - was REFUTED and the eye looked wrong. It now compares
+both axes and reports both. Tested on 303's findings before and after: REFUTED -> VERIFIED.
+
+**The two fixes, both rejected.** Placing an over-wide line in an anchored box clips it at the
+page edge and lost four words; pinning its left indent fixed the x exactly and regressed
+`18_centred_heading_left_body_txtpos` from 100 % to 39 % of lines in tolerance. G2 was clean on
+the second one - it counts words, pages, images and tables and cannot see a position - and the
+position ratchet caught it. Both reverted, baseline untouched. REMAINING-DEFECTS.md carries the
+measurements and the one try.
+
+**Where the corpus stands.** 208 of 208 documents have a row in VISUAL-SCORE.md. 303 is still
+FAIL, now on a verified finding rather than an unverifiable one. The final sweep has not started.
