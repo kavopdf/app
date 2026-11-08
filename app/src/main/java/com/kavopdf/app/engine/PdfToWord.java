@@ -3870,8 +3870,22 @@ public final class PdfToWord {
             // so it is drawn as one.
             boolean ellipse = pathIsEllipse();
             if (rectangle || ellipse) {
-                addShape(clipped(new float[]{pxMin - w / 2f, pyMin - w / 2f,
-                        pxMax + w / 2f, pyMax + w / 2f}), -1, 1f, line, w, ellipse ? 1 : 0);
+                float[] grownRing = clipped(new float[]{pxMin - w / 2f, pyMin - w / 2f,
+                        pxMax + w / 2f, pyMax + w / 2f});
+                // A ring drawn under a rotated matrix - the two circles of a "PAID" stamp are
+                // set inside a 0.99/-0.14 cm - cannot be a preset ellipse: addShape drops every
+                // preset shape when the CTM is rotated, because the box is not the shape. The
+                // path's own curve points are already through that matrix, so carry them as a
+                // freeform and the ring survives. Nothing that drew before changes: this branch
+                // is only reached where the ellipse was being dropped.
+                if (ellipse && ctmRotated()) {
+                    DocxWriter.Shape ring = freeform(grownRing, -1, 1f, line, w);
+                    if (ring != null) {
+                        addShape(ring);
+                        return;
+                    }
+                }
+                addShape(grownRing, -1, 1f, line, w, ellipse ? 1 : 0);
                 return;
             }
             if (pCurves == 0 && pLines == 1 && pRects == 0) {
