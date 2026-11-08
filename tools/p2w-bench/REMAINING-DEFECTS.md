@@ -1991,6 +1991,40 @@ baselines - the table-height family below, not the gap. **Tries: 0 of 3.**
 315_gazette_notification is not re-listed: its failure is D-08 (a page set in two or three
 columns is written as one flow), which is open with its own tries and is the next class to
 work.
+### D-14  The invoice table in 04_stamp_180deg is not written as a table at all
+
+**Found 8 Nov while investigating what looked like a row-height problem. It is not.**
+
+The user reported, from a phone screenshot, that in light mode the table rows overlap their own
+borders - "III Semester, B.E. Computer Science" sitting on the rule above it, "SI" and
+"Particulars" on separate lines, row numbers outside their cells. The first reading was that
+the row height was wrong. That was wrong.
+
+Inspected the generated file:
+
+    w:tbl: 0   w:tr: 0   w:tc: 0   w:txbxContent: 2
+    txbx0: text = "DUPLICATE ISSUED"
+    txbx1: text = "CANCELLED"
+
+There is no table in the document. Not a table with bad rows - no `<w:tbl>` element at all.
+The invoice's SI / Particulars / HSN / Qty / Rate / Amount grid was emitted as plain
+paragraphs, which is exactly why the columns do not line up, why a header reads as two lines,
+and why row numbers float between rows: there are no cells for them to sit in.
+
+The two text boxes are the stamp, which is correct - that is what D-13 rasterises.
+
+**So the work on row height was addressing a symptom of a missing table.** The row-height
+change (a row is never given less line height than its own text needs) is still right on its
+own account and stays; it just was not this.
+
+**What to investigate next:** why the rules pass did not recognise this grid as a table. The
+page draws it with horizontal and vertical rules, and `attachShapes` deliberately drops a
+stroke drawn inside a table - so the question is whether the rules were detected and then
+discarded, or never detected. Dump the `Rules` the pass found for page 1 of that document
+before changing anything.
+
+**Tries: 0 of 3** - diagnosed, not started.
+
 
 ## OPEN - g53 corpus, batch 2 (B 14-20, C 21-26), found this pass, 8 Nov
 
