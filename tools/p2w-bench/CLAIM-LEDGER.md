@@ -284,3 +284,27 @@ the other, and this is the third run to want one.
 either side. It is not in this table's verified column because it was re-recorded as PASS once
 the verifier had checked it. The refutation belongs here as a note: a red difference panel is
 a rendering artefact, and reading one as a defect is the eye's failure mode on dense tables.
+
+## g53 batch 3 (C 27-39), 8 Nov
+
+23 findings: 22 verified, 0 refuted, 1 unverifiable.
+
+| claim type | verified | refuted | unverifiable |
+|---|---|---|---|
+| order | 11 | 0 | 0 |
+| pagecount | 4 | 0 | 0 |
+| moved | 3 | 0 | 0 |
+| wraps | 2 | 0 | 1 |
+| overlap | 1 | 0 | 0 |
+| shapes | 1 | 0 | 0 |
+| **total** | **22** | **0** | **1** |
+
+Eleven of the twenty-two are `order` again, and ten of those eleven are on pages the eye
+passed - the row-banding blind spot, still the largest claim type in the ledger.
+
+The unverifiable one is `wraps:Rate` on gst-invoice-with-qr-code: the header is one word in a
+column too narrow for it, so the render sets it as "Rat" over "e" and the verifier cannot
+follow a word that is not whole on the render side. The defect is real and visible, and the
+document is FAIL anyway on a verified `order` finding, so nothing is left on that claim. This
+is the second run to want a claim form for "a word the render breaks", which `wraps` almost
+is: it needs the word to survive as a word before it can count the lines it takes.

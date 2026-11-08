@@ -583,3 +583,73 @@ method rather than from the archaeology.
 `breaks:05:45` on the bus timetable is a separate, smaller defect: the TIME column is too narrow
 for `05:45` and the cell wraps it after the colon, which is also what spills that page.
 
+
+
+# g53 corpus - batch 3 (C 27-39), 8 Nov - the tax-invoice class
+
+Thirteen documents, 14 pages in the PDF. Every page opened before any number was read; every
+finding verified against the PDF. 23 findings: 22 verified, 0 refuted, 1 unverifiable.
+**6 pass, 7 fail** - and the two engine fixes below took nine spills and six dropped header
+lines off the batch first.
+
+## What the batch looked like before anything was fixed
+
+Every tax invoice in the batch had its title on the page's header line, beside the company
+name. Every one of them rendered with the title 50 to 111 pt lower, on a line of its own, and
+everything below it pushed down with it. Six documents. Five of those then spilled a second
+sheet, because the flow had grown by the three lines the right-hand block needed.
+
+That is D-07, and the interesting part is that the model already had the machinery to fix it:
+`sameRow()` decides when two fields on one baseline are one row, and the writer already sets a
+row's fields with tab stops at their measured x. What it did not have was a way to notice the
+pair, because the paragraph grouping sorts by column first - every line of column 0, then every
+line of column 1 - and by the time the title was offered, the previous line was the last line
+of the left block, 23 pt away, and not a row.
+
+## The two fixes
+
+**`addRowMates()` - fields on one baseline are one row.** Before the sort, every line is
+offered to the leftmost line of its own baseline, and accepted only if `sameRow()` says so.
+A paragraph of one line takes mates; a paragraph that already flows over several baselines does
+not, because that is prose and a field from another column belongs beside its own line. That
+one distinction is what the earlier attempt at this got wrong.
+
+G2 across 208 documents: no document got worse, 49 documents have fewer lines with no word
+lost. The two attempts recorded under D-07 in November had measured +4 documents and -1; this
+one is +49 and 0.
+
+**`TABLE_BORDER_TW` - a row is asked for the pitch less the rule it is drawn with.** The second
+cause was under the first: with the header where the page drew it, tables were still 0.8 pt a
+row taller than the page's own pitch, and a 38-row table lost a sheet to its own rules. The
+renderer adds the table's border to every row - half of the top rule and half of the bottom rule
+lie inside the row's box - so the 6/8 pt hairline costs 0.75 pt a row. Measured by rendering
+the same table with and without its borders: 19.2 pt pitch with them, 18.4 without, against the
+page's own 18.4. The row height now subtracts the 15 twips the writer's own border is worth.
+
+## What is left
+
+Six defects on seven documents, all written up in REMAINING-DEFECTS.md with what was measured:
+the last table of a page still breaking four rows early (0.1 pt a row of slack, not 0.8), a Rate
+column too narrow for its own header, three header boxes drawn shorter than their text, table 5
+of the mutual fund statement arriving as loose lines, a signature block charged from the
+table's bottom edge with the page's gap unspent, and one column header wrapped in the render.
+
+## The eye, the numbers, and the one time the eye was wrong
+
+Four documents passed the eye and failed `order`: delivery-challan, electricity-bill,
+form16-part-b and gst-invoice-multipage-item-table. All four are the row-banding blind spot and
+`looked.py --combine` names them "eye (numbers wrong - repair the tool)". They stay PASS.
+
+The eye was wrong once. On insurance-policy-schedule it recorded `moved:Authorised signature`;
+the page's line is "Authorised signatory", and the claim as written came back UNVERIFIABLE
+because that string exists on neither side. Re-recorded against the text the page actually
+holds, it verified at 8.4 pt. The lesson is the one the pipeline keeps teaching: a claim that
+names text the page does not hold cannot be checked, and the fault is the claim.
+
+## Where the corpus stands
+
+181 documents had a row in VISUAL-SCORE.md before this batch, 27 did not. This batch scores 13
+of them, leaving 14: the four C-group documents after these (property-tax-receipt,
+purchase-order, salary-slip-corporate, salary-slip-factory-wages) and the ten D-group documents
+(landscape and rotated pages, tables across a page break, merged cells, shadow text). The final
+sweep over all 208 has not started.

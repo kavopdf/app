@@ -996,6 +996,15 @@ paragraph grouping disagreed, and a change here can do the same.
 
 **Tries: 1 of 3** - the signed-gap and sort changes were tried and reverted.
 
+**PART (c) WRITTEN AND MEASURED, 8 Nov - see "g53 batch 3" below.** The three parts together
+were not what was needed. Parts (a) and (b) - the signed gap and the x sort - are still not in
+the engine; part (c) alone, written as "attach a line to the leftmost line of its own baseline
+when `sameRow()` already accepts the pair, and keep them as a row", clears the defect on 49 of
+208 documents with no word lost and no document worse. The reason the first attempt failed is
+now measurable: it joined the two fields into ONE sentence with a space, which lost the
+label's position; a row keeps each field at its own measured x with a tab stop, so
+form16-part-b - the document that regressed by one line - gains a line instead.
+
 
 ---
 
@@ -2000,3 +2009,106 @@ blocks and taking the columns in turn inside each run - is the part that is righ
 kept; only the container changes.
 
 **Tries: 1 of 3.** Reverted. G2 across 208 was never reached because nothing qualified.
+
+## g53 corpus - batch 3 (C 27-39), 8 Nov - two engine fixes, and what they did not reach
+
+Thirteen documents, 14 pages. Every page opened first, every finding verified: 23 findings, 22
+verified, 0 refuted, 1 unverifiable. At the start of the batch **nine of the thirteen spilled a
+sheet and six dropped a header line**; at the end two spilled and one dropped. Both causes were
+one cause each, and both are now in the engine.
+
+### FIXED this run (engine): fields on one baseline are written as a row, not as the next line
+
+This is D-07 part (c), the part that had not been written. `toParagraphs` sorts by column
+before it groups, so an invoice's title - drawn at the same y as its company name, 149 pt to
+the right - arrived after the whole left block and took a line of its own. `addRowMates()` now
+attaches a line to the leftmost line of its own baseline when `sameRow()` already accepts the
+pair, and the paragraph they form is a row, which `buildPara` sorts by x and the writer sets
+with a tab stop at each measured x. Nothing new is decided: `sameRow()` is the predicate the
+grouping already used, and it is what tells a field from a cell (the wide gap, no rule between
+them, no paper between them).
+
+Measured: gst-invoice-3line-items 50.1 pt -> on the page's own baseline, 2 sheets -> 1;
+itr-computation-with-slab-table 111.1 pt -> 0.7 pt; delivery-challan and
+gst-invoice-multipage-item-table 107.1 pt -> 0.
+
+**G2 across 208 documents: no document got worse, and 49 documents have fewer lines with no
+word lost.** That is the number the two earlier attempts at this could not get: they joined the
+fields with a space into one sentence, which lost the position and cost form16-part-b a line.
+Written as a row the fields keep their own x, and form16-part-b gains instead of losing.
+
+### FIXED this run (engine): a table row is asked for the page's pitch less the rule it is drawn with
+
+The renderer adds the table's own border to every row. With collapsed borders half of the top
+rule and half of the bottom rule lie inside the row's box, so the `w:sz="6"` hairline the writer
+draws made every row 0.75 pt taller than the `w:trHeight` it asked for, and a 38-row table
+drifted 30 pt down its own sheet. `rowTw` now subtracts `TABLE_BORDER_TW = 15` twips - the same
+6/8 pt `borders()` writes, not a fitted constant.
+
+Measured by rendering itr-computation-with-slab-table's own table twice, once with its borders
+stripped: 19.2 pt pitch with them, 18.4 pt without, against the page's own 18.4 pt. After the
+fix the pitch is 18.5. G2 clean, and gst-invoice-with-qr-code and
+marksheet-university-consolidated each came back from 2 sheets to 1.
+
+### OPEN - the last table of a page still runs past the sheet
+
+itr-computation-with-slab-table. `pagecount` 1 in, 2 out. Tables 1 and 2 now start on the
+page's own y (165.9 against 165.2) and table 3 starts at 690.9 against 690.9, but the table
+breaks four rows early and the tail arrives on a second sheet. The row pitch of that table is
+18.5 pt against the page's 18.4, so this is the same slack as above, not yet gone: the pitch
+is 0.1 pt over rather than 0.8, and 38 rows of it still cost the sheet. The next thing to
+measure is whether `extent/rowCount` is the right pitch for a table whose last row is a
+different height from the rest. **Tries: 0 of 3.**
+
+### OPEN - a table with two ruled columns is drawn narrower than the page's own text
+
+gst-invoice-with-qr-code. `wraps:Rate` - the header and the values below it are broken over two
+lines ("Rat" / "e", "3.00" / "0", "47.5" / "7"). The Rate column is wide enough on the page and
+not in the render, so the cell is being measured from the wrong edge or the widths are an even
+split where the page drew uneven ones. Reading order 55.4 % of 28 rows against 37 is the same
+defect seen as text. **Tries: 0 of 3.**
+
+### OPEN - the SUPPLIER and BILLED TO boxes are drawn shorter than their own text
+
+gst-invoice-3line-items. `overlap` verified: 0 overlapping pairs in the PDF, 3 in the render.
+The box rules run through "Unit 7, Sector 14, Industrial Estate" and the two address lines
+beside it. The three header panels are drawn as a table whose rows are the page's own height,
+but the cell text wraps to two lines inside a one-line row. Same family as the three-column
+band on 301/302. **Tries: 0 of 3.**
+
+### OPEN - table 5 is set as loose lines, not as a table
+
+mutual-fund-statement. `pagecount` 2 in, 3 out; `moved:Account number` 44.9 pt;
+`wraps:Purchase value (Rs)`; `shapes` 3 in the PDF against 0. The page's "Bank / Account
+number / Mandate status / Email" panel is a ruled two-column table and arrives as a list of
+label-and-value lines, which is also what spills the third sheet. The header row of that table
+is on sheet 3 with nothing under it. **Tries: 0 of 3.**
+
+### OPEN - the signature block of a ruled table sits above where the page drew it
+
+gst-invoice-horizontal-rules-only. `moved:A. Deshpande` -84.7 pt: the table is now the page's
+own height, so the block that follows it is charged from the table's bottom edge, and the gap
+the page left between them is not being spent. The reverse of the usual direction, and the
+same class as 325's footer. **Tries: 0 of 3.**
+
+### OPEN - a column header that fits on the page is wrapped in the render
+
+marksheet-university-consolidated. `wraps:Maximum marks` verified: the PDF has 2 lines, the
+render wraps them into 3. The column is "Maximum marks" on one line on the page; the render
+breaks it after "Maximum". A column width question, one column, one document - the smallest of
+the six. **Tries: 0 of 3.**
+
+### A claim that could not be checked
+
+    wraps:Rate on gst-invoice-with-qr-code  UNVERIFIABLE - the render sets "Rate" as "Rat"
+        over "e", and the verifier cannot follow a word that is not whole on the render side.
+        The defect is real and the document is FAIL on a verified `order` finding, so nothing
+        is left standing on this claim. Recorded so the final sweep does not read it as clean.
+
+### The eye was wrong once, and the verifier said so
+
+The eye recorded `moved:Authorised signature` on insurance-policy-schedule. The page's line is
+"Authorised signatory", 8.4 pt from where the render put it. The claim as written came back
+UNVERIFIABLE ("not on both sides") - the string did not exist on either side - and the
+re-recorded claim verified. A claim that names text the page does not hold cannot be checked,
+and the fix is the claim, not the check.

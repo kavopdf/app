@@ -18,6 +18,7 @@ opened is not counted here - `looked.py` decides that, not this file.
 | 7 Nov | 2 | 1 | 50 % | after the D-01 pitch fix: 316 PASS, 303 FAIL (WARNING SIGNS wraps) |
 | 8 Nov | 13 | 4 | 31 % | g53 batch 1, the multi-column class: 9 fail, 8 of them on pagecount |
 | 8 Nov | 15 | 12 | 80 % | v3 batch 1 re-run after the gap fix: 3 fail (303 breaks, 311 weld, 315 columns) |
+| 8 Nov | 13 | 6 | 46 % | g53 batch 3, the tax-invoice class: 7 fail, after two engine fixes cleared 9 of the 13 documents of the spill and the dropped header line |
 
 Not a baseline yet - three documents is not the corpus. It becomes one when a full
 batch has been through both halves of the check.
@@ -409,3 +410,35 @@ is the next thing to take. Recorded in REMAINING-DEFECTS.md.
 Five documents passed the eye and failed a computed question. All five are the reading-order
 question on a page whose rows band differently from the PDF's - the measurement blind spot
 already recorded, not a page defect.
+
+## g53 corpus - batch 3 (C 27-39), 8 Nov - the tax-invoice and statement class
+
+Thirteen documents, 14 pages in the PDF. Every page opened before any number was read; every
+finding verified against the PDF. 23 findings: 22 verified, 0 refuted, 1 unverifiable.
+**6 pass, 7 fail.**
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-08 | delivery-challan | PASS | company header line, both tables and the totals in place; the rotated stamp sits lower than the page drew it, the settled stamp limit |
+| 2026-11-08 | electricity-bill | PASS | bill head, consumer grid, both charge tables and the net amount on the page rows |
+| 2026-11-08 | eway-bill | PASS | consignor and consignee boxes, both tables, every value in place |
+| 2026-11-08 | form16-part-b | PASS | PART B on the certificate line, table 1 at the page's own y on page 1, table 2 and the verification block on page 2 |
+| 2026-11-08 | gst-invoice-3line-items | FAIL | overlap - 0 overlapping pairs in the PDF, 3 in the render: the SUPPLIER and BILLED TO box rules run through the address lines |
+| 2026-11-08 | gst-invoice-horizontal-rules-only | FAIL | moved:A. Deshpande -84.7 pt: the signature block sits 85 pt above where the page drew it |
+| 2026-11-08 | gst-invoice-multipage-item-table | PASS | TAX INVOICE on the header line and all four sheets: rows 1-11, 12-22, 23-33, row 34 with the total and the signature |
+| 2026-11-08 | gst-invoice-with-qr-code | FAIL | wraps:Rate - the Rate header and its values are broken over two lines in a column too narrow; order 55.4 % of 28 rows against 37 |
+| 2026-11-08 | insurance-policy-schedule | FAIL | moved:Authorised signatory 8.4 pt, and the table below it runs 0.9 pt a row taller than the page's pitch |
+| 2026-11-08 | itr-computation-with-slab-table | FAIL | pagecount - table 3 runs past the sheet and finishes on a second one; tables 1 and 2 now start on the page's own y |
+| 2026-11-08 | marksheet-university-consolidated | FAIL | wraps:Maximum marks - one line on the page, two in the render |
+| 2026-11-08 | mobile-bill | PASS | both tables, the amount column and the words line on the page rows |
+| 2026-11-08 | mutual-fund-statement | FAIL | pagecount 2 in / 3 out, wraps:Purchase value (Rs), moved:Account number 44.9 pt - table 5 is set as loose lines, not a table |
+
+Five of the seven failures were measured on the engine as it stood at the start of this batch:
+nine of the thirteen documents spilled a sheet and six dropped a header line, all from one
+cause. Both fixes are in the engine and committed; what is left on these seven is written up
+in REMAINING-DEFECTS.md.
+
+Four documents passed the eye and failed `order` - delivery-challan, electricity-bill,
+form16-part-b and gst-invoice-multipage-item-table. All four are the row-banding blind spot
+(D-03), named by `looked.py --combine` as "eye (numbers wrong - repair the tool)". The pages
+are faithful and the documents stay PASS.
