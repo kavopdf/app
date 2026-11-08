@@ -2981,3 +2981,73 @@ question is measuring the tab stops. This is the same blind spot already recorde
 came back REFUTED - 2 lines on both sides. The PDF's tail runs off the paper, and the render's
 line is the same two lines the page has. The three earlier rows that call it a wrap defect are
 stale; the last row for the document is the truth.
+
+
+**Attempt 2: the indent was the wrong suspect, and two measured reports now say what the real
+shape of this is.**
+
+The reverted code carried a comment explaining why: "every paragraph's `w:ind w:left` is measured
+from the PAGE edge, not from its column's edge". **That is false.** Measured against LibreOffice
+with a hand-built file: inside a `w:cols` section, indent 0 puts the line at x=56.8, 720 twips at
+92.8, 1440 at 128.8 - exactly 20 twips per point from the column's own edge. `w:ind w:left` is
+column-relative by definition.
+
+What actually broke it was the arithmetic: offsets were being computed from page coordinates, so a
+column-2 paragraph asked for about 5179 twips of indent - wider than the column - and wrapped one
+character per line. Subtracting the band's own left before writing the indent fixes it.
+
+So `pageColumns` is enabled, `Ctx.colLeft` carries each band's left edge per page, and both indent
+sites subtract it.
+
+**Two measured facts about the corpus that the guards have to fit.** From a per-document pass over
+all 208 PDFs with PyMuPDF:
+
+- **24 documents are genuinely multi-column** - 18 two-column, 6 three-column, none four. (32 have
+  a column marker in the name and 31 a column mention in a verdict; 12 of those names overstate
+  the geometry.)
+- **Gutters run 14-26 pt, median 17.** A rule tuned above 30 pt would miss the class entirely.
+- **14 of the 18 two-column splits are within 5 pt of equal width**; 3 of the 6 three-column ones
+  are within 7 pt of equal thirds.
+- **21 of the 24 carry spanning elements** - 69 in all - a full-width masthead, a chart or photo
+  crossing the gutter, a table across both columns, or footnotes set across the full measure.
+- 20 of the 24 currently FAIL, and 15 of those failures are a page-count spill or a column block
+  landing at the end of the flow, which is this defect's signature.
+
+**What attempt 2 measured.** With the columns enabled and the indent column-relative, over 208
+documents the gate reported four regressions, every one a page count that came DOWN - the columns
+were finally beside each other instead of stacked, so the content took fewer sheets:
+
+    412_page_labels_roman              pages 5 -> 3
+    academic-paper-ieee-2col-abstract   pages 2 -> 1
+    gst-invoice-multipage-item-table   pages 4 -> 2
+    one-page-rotated-180-degrees       pages 2 -> 1
+
+Three of those are documents that are not multi-column at all, so the detection was too eager. Two
+guards were added from the measured corpus facts - a gutter wider than 30 pt is a margin, and the
+widest band may not exceed the narrowest by more than 1.43x - and the regression count fell from
+four to three:
+
+    12_stamp_across_page_break         pages 2 -> 1
+    academic-paper-ieee-2col-abstract  pages 2 -> 1
+    form16-part-b                      pages 2 -> 1
+
+**Still DO NOT SHIP - three documents lose a page they should keep.** But the direction is now
+right and the remaining failures are a guard question, not an architecture question.
+
+**What is left, in order:**
+
+1. Make the remaining three guards right. `academic-paper-ieee-2col-abstract` is the known hard
+   case: its page 1 is two-column and **page 2 is single-column in the PDF**, with the right half
+   empty but for the running head - so the detection must be decided per page, not per document,
+   and something about page 2 is still reading as two bands.
+2. Spanning elements. 21 of the 24 documents have them, and the research is unambiguous: a
+   paragraph escapes the column flow by ending the column section and starting a single-column
+   section with `<w:type w:val="continuous"/>` - not `w:framePr`, not a text box. A page with a
+   masthead, two columns and a full-width table is three sections on one page. Two traps found by
+   measurement: `w:equalWidth="false"` is mandatory if you emit `w:col` widths, and two adjacent
+   continuous sections with the same column count break reading order in LibreOffice (A0, A1,
+   B0..B3, A2, A3) - so adjacent bands with identical geometry must be merged into one section.
+
+**Tries: 2 of 3.** One attempt left. The full reports are `D08-corpus-analysis.md` and
+`D08-ooxml-research.md`.
+
