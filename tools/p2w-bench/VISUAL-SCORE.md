@@ -715,3 +715,37 @@ reverted on 8 Nov). No new engine fix was warranted and none was made.
 | 2026-11-09 | 18_centred_heading_left_body_txtpos | PASS | 0.0 % of pixels differ |
 | 2026-11-09 | 19_hanging_indent_txtpos | PASS | 0.0 % of pixels differ |
 | 2026-11-09 | 20_numbered_list_separate_column_txtpos | FAIL | moved:2. 12.4 pt - the number and its clause are two paragraphs, so every item starts its text a line below its number |
+
+## 9 Nov, 03:07 IST - b80 batch 2 (21-40), the typeface and text-position batch
+
+Twenty documents, one page each, all seventeen steps in order. Every page opened at 130 dpi
+before visual.py was run. Fifteen pass, five fail. Eleven findings emitted, nine verified
+against the PDF, two refuted, none unverifiable.
+
+Position for the batch: 47.8 % of lines within tolerance (x 1.5 pt, y 3.0 pt, size 0.5 pt,
+colour CIE76 3), font size 100.0 %, font name 80.0 %, colour 99.7 %. These are the txtpos
+documents, so a line tolerance of about half is the batch's own character, not a regression:
+no baseline was moved.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-09 | 21_form_labels_x60_values_x300_txtpos | PASS | label/value band at x=60 and x=300, 15 rows, declaration, certificate block and footer |
+| 2026-11-09 | 22_invoice_four_columns_txtpos | PASS | four columns, 12 item rows, tax block and amount-in-words line |
+| 2026-11-09 | 23_timetable_grid_txtpos | PASS | 7 day rows x 7 period columns, every code in its cell, legend and Principal |
+| 2026-11-09 | 24_address_block_indents_txtpos | PASS | nested address indents stepwise, enclosures and signature block |
+| 2026-11-09 | 25_signature_block_underscores_txtpos | PASS | two signature blocks with rules, annexure rates table, witnesses |
+| 2026-11-09 | 26_footnote_marker_bottom_note_txtpos | PASS | abstract, body, the marker line and the bottom footnote |
+| 2026-11-09 | 27_two_column_left_short_txtpos | FAIL | moved:In other news verified y 472.2 -> 501.9 (29.7 pt); order 84.2 % of 27 rows, 30 in the render |
+| 2026-11-09 | 28_value_overflows_cell_txtpos | FAIL | order 79.1 % of 20 rows, 23 in the render; missing:Nos and overlap both REFUTED |
+| 2026-11-09 | 29_dot_leaders_txtpos | PASS | dot leaders to every price, totals block right aligned |
+| 2026-11-09 | 30_mixed_font_sizes_one_baseline_txtpos | FAIL | wraps:ADMISSION NOTIFICATION 2025-26 verified 2 lines -> 3; B.E. / B.Tech. - First Year left the heading's baseline |
+| 2026-11-09 | 31_times_body_arial_headings | PASS | heading band, numbered resolutions, proxy paragraph and signature |
+| 2026-11-09 | 32_serif_nondefault_body | PASS | serif body with italic headings, four paragraphs, imprint line |
+| 2026-11-09 | 33_sans_nondefault_body | PASS | section bar, six-row timing table, two paragraphs, prepared/approved line |
+| 2026-11-09 | 34_monospace_document | PASS | 36 numbered lines in column, PICTURE clauses aligned, closing note |
+| 2026-11-09 | 35_four_typefaces_one_page | PASS | marks table, total line, faces note and signature line |
+| 2026-11-09 | 36_embedded_subset_font | PASS | eight-row certificate table, certification paragraph, signature block |
+| 2026-11-09 | 37_font_not_embedded_substitution | PASS | circular head, subject line, two body paragraphs and signature |
+| 2026-11-09 | 38_faux_bold_italic_synthesised | FAIL | count:Study of self-compacting concrete using quarry dust as partial replacement verified 2 in the PDF, 1 in the render - both copies joined into one paragraph |
+| 2026-11-09 | 39_small_caps_letter_spacing | FAIL | moved:N O T I C E T O M E M B E R S verified 13.2 pt low; the tracked heading loses its letter spacing, 172 pt wide in the PDF against 116 in the render |
+| 2026-11-09 | 40_devanagari_shaping_font | PASS | devanagari head, dates, paragraph, six-row table and signature |

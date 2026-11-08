@@ -3636,3 +3636,59 @@ no fix was attempted on any of them this run. The counts are the verified ones.
 12 (97.9 % of 23, 82.4 % of 16) while both pages are right on sight. Same cause as 312, 331, 334 and
 305: the page draws each table cell as its own line and the render joins a row's cells, so the row counts
 cannot match. Fifth and sixth occurrences.
+
+
+## b80 batch 2 (21-40) - five OPEN, none fixed yet
+
+### OPEN - a faux-bold line longer than 40 characters is kept twice  (38)
+
+38_faux_bold_italic_synthesised. `count:Study of self-compacting concrete using quarry dust as
+partial replacement` verified: 2 in the PDF, 1 in the render - and the render's one line holds
+both copies, so it reads doubled.
+
+The page fakes bold by drawing the same text twice at the same x and y (a stroke over a fill).
+`PdfToWord.dedupe()` exists for exactly this and its tolerance is right (DUPLICATE_TOL 0.5 pt,
+chosen so two different characters 1.15 pt apart are not merged). The window is not:
+
+    for (int i = out.size() - 1; i >= 0 && i >= out.size() - 40; i--)
+
+Forty glyphs is shorter than the subtitle's 74 characters, so when the second copy starts, the
+first copy's matching glyph is out of range and nothing is dropped. Every faux-bold run longer
+than 40 characters in the corpus has this defect; shorter ones are already clean.
+
+The fix is to replace the fixed look-back with a position index (x, y and text rounded to
+0.5 pt) so the window is the page, not 40 glyphs. NOT SHIPPED: PdfToWord.java is 291 KB, and
+the only write path that works (GITHUB_COMMIT_MULTIPLE_FILES) requires the whole file in one
+call; `git push` and the blobs API both return 403 for this App. **Tries: 0 of 3.**
+
+### OPEN - a tracked (letter-spaced) line loses its tracking  (39)
+
+39_small_caps_letter_spacing. `moved:N O T I C E T O M E M B E R S` verified: the PDF puts it
+at y=118.4, the render 13.2 pt lower, and the line is 172 pt wide in the PDF against 116 pt in
+the render. The characters survive - the text layer has the same string with its spaces - but
+the per-glyph advances do not: the render sets them at normal width, so the heading shrinks and
+the gap that a tracked line needs before the next block is lost. Body text on the same page is
+correct, so this is specific to runs carrying per-glyph offsets. **Tries: 0 of 3.**
+
+### OPEN - a second field on a heading's baseline becomes its own paragraph  (30)
+
+30_mixed_font_sizes_one_baseline_txtpos. `wraps:ADMISSION NOTIFICATION 2025-26` verified: the
+PDF has 2 lines, the render 3. The page sets "B.E. / B.Tech. - First Year" at 9 pt on the
+heading's own baseline (y=112.2, x=56.0); the render emits it as a separate right-aligned
+paragraph at x=406.1, y=135.7. Reading order 93.3 % of 22 rows, 23 in the render. This is
+D-07's family, and D-07 already records that the signed-gap and sort changes were measured
+(+4 documents, -1) and reverted. **Tries: 0 of 3.**
+
+### OPEN - a two-column page gains three rows and drifts 30 pt  (27)
+
+27_two_column_left_short_txtpos. `moved:In other news` verified y 472.2 -> 501.9, and `order`
+84.2 % of 27 rows with 30 in the render. The right column runs 10 lines on both sides but its
+last line lands 20 pt lower, and the "In other news" block below inherits the drift plus its
+own. Three extra rows in the render. **Tries: 0 of 3.**
+
+### OPEN - the same three extra rows on a table whose description overruns its cell  (28)
+
+28_value_overflows_cell_txtpos. `order` verified 79.1 % of 20 rows, 23 in the render. The
+document is a deliberate stress case: the description in column 2 is longer than the column
+width. The render keeps every value (the eye's `missing:Nos` and `overlap` were both refuted),
+but it spends three more rows on the page than the PDF does. **Tries: 0 of 3.**

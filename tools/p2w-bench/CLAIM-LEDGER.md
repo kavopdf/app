@@ -498,3 +498,28 @@ blind spot.
 to show two footers - and the verifier answered REFUTED, "both have 1 pages". PyMuPDF agrees: one page,
 one footer at y=831. The eye was reading the second panel's label as a second page. The FAIL stands on
 `moved:2.` (12.4 pt) instead, which is the real defect.
+
+
+## 9 Nov, 03:07 IST - b80 batch 2 (21-40)
+
+11 findings: 9 verified, 2 refuted, 0 unverifiable.
+
+| claim type | verified | refuted | unverifiable |
+|---|---|---|---|
+| `moved:` | 2 | 0 | 0 |
+| `wraps:` | 1 | 0 | 0 |
+| `count:` | 1 | 0 | 0 |
+| `missing:` | 0 | 1 | 0 |
+| `overlap` | 0 | 1 | 0 |
+| `order` (measure) | 5 | 0 | 0 |
+
+The two refuted are both 28_value_overflows_cell_txtpos, and both were the eye reading a
+description that overruns its cell as a lost value. `missing:Nos` answered "2 line(s) in the
+PDF, 2 in the render" and `overlap` answered "4 overlapping pairs in the PDF, 0 in the render"
+- the page overlaps and the render does not. Neither was fixed, and the document's FAIL rests
+on the verified `order` instead. That is the ledger doing its job: an eye finding that the PDF
+contradicts is not a defect.
+
+`count:` earned its place on 38. `wraps:` and `breaks:` both came back REFUTED there because
+the PDF holds the line twice (faux bold) and the line-count comparison saw 2 on both sides;
+`count:` names the real difference, 2 against 1.

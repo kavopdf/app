@@ -866,3 +866,52 @@ not call. The baseline is untouched.
 exercised the new check, ALL CHECKS PASSED.
 
 **Where the corpus stands.** b80 batches 1 is done under the current tools. Next: b80 batch 2 (21-40).
+
+
+## 9 Nov, 03:07 IST - b80 batch 2 (21-40), taken through all seventeen steps
+
+Sandbox was empty again: Temurin 17.0.13, PDFBox-Android 2.0.27.0 and the three corpus assets
+at 75 / 80 / 53, all re-fetched. The JVM would not start until `ulimit -v unlimited` was set -
+the pod's default of 1.5 GB is what produces "Could not allocate compressed class space", and
+it is the address-space limit, not the heap, that has to move.
+
+**Result: 15 pass, 5 fail.** Eleven findings, nine verified, two refuted, none unverifiable.
+
+    27  moved:In other news            verified y 472.2 -> 501.9 (29.7 pt); order 84.2 % of 27 rows, 30 in the render
+    28  order                          verified 79.1 % of 20 rows, 23 in the render
+    30  wraps:ADMISSION NOTIFICATION   verified 2 lines -> 3
+    38  count:Study of self-compacting verified 2 in the PDF, 1 in the render
+    39  moved:N O T I C E T O M E M    verified 13.2 pt low
+
+**38 is a new class, and the cause is named.** The faux-bold subtitle is drawn TWICE by the
+page, at the identical x and y - that is how the PDF fakes a bold face, a stroke over a fill.
+`PdfToWord.dedupe()` is supposed to drop the second copy, and it has the right tolerance
+(0.5 pt), but it only looks back 40 glyphs: `for (int i = out.size() - 1; i >= 0 && i >= out.size() - 40; i--)`.
+The subtitle is 74 characters, so the second copy's first glyph is 74 positions after the
+first copy's, and the window never reaches it. The writer then joined both copies into one
+paragraph and the line reads doubled on the page. Every faux-bold line longer than 40
+characters in the corpus has the same defect. The fix is a position index instead of a fixed
+look-back; it could not be shipped this run because PdfToWord.java is 291 KB and the only
+working write path (GITHUB_COMMIT_MULTIPLE_FILES) needs the whole file in one call.
+
+**30 is D-07's family, measured again.** The page sets "ADMISSION NOTIFICATION 2025-26" at
+21 pt and "B.E. / B.Tech. - First Year" at 9 pt on ONE baseline (y=112.2). The render keeps
+the first and sets the second as its own right-aligned paragraph at x=406.1, y=135.7.
+
+**39 is a new class: tracked text loses its tracking.** The page sets its headings with letter
+spacing on every glyph, and the text layer keeps it as literal spaces ("N O T I C E T O
+M E M B E R S"). The render has the same characters but sets them at their normal advances,
+so the heading shrinks from 172 pt wide to 116 pt and drops 13.2 pt. The body text on the same
+page is untouched and correct - the defect is specific to tracked runs.
+
+**The eye was wrong once, and the numbers were right.** 30 passed on first sight at 130 dpi in
+the three-panel sheet; the small caps line looked like it was beside the heading. Zoomed to 3x
+it is plainly one line below it. That is a reminder that a one-line vertical move of 23 pt is
+invisible in a 522-px panel.
+
+**Two claims refuted, neither fixed.** 28's `missing:Nos` - "2 line(s) in the PDF, 2 in the
+render"; the description overruns its cell but the unit value is still there. 28's `overlap` -
+"4 overlapping pairs in the PDF, 0 in the render"; the page itself overlaps and the render does
+not, so the claim was the wrong way round. The document still fails on the verified order.
+
+**No engine fix shipped this run.** G2 was not re-run because no engine file changed.
