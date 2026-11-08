@@ -8,7 +8,6 @@ import com.tom_roush.pdfbox.cos.COSDictionary;
 import com.tom_roush.pdfbox.cos.COSName;
 import com.tom_roush.pdfbox.cos.COSString;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
-import com.tom_roush.pdfbox.rendering.PDFRenderer;
 import com.tom_roush.pdfbox.pdmodel.PDPage;
 import com.tom_roush.pdfbox.pdmodel.PDResources;
 import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
@@ -235,6 +234,20 @@ public final class PdfToWord {
          * about the page, so it is only drawn where the page made one.
          */
         public boolean ruled = true;
+        /**
+         * Did the page draw the rules <em>inside</em> this table - the row separators
+         * ({@code innerH}) and the column separators ({@code innerV}) - as opposed to only the
+         * box around it?
+         *
+         * <p>A table the whitespace pass found has bounds that are its TEXT's ink, so the frame
+         * the page draws round it is off those bounds and {@code DocxWriter.pageDrewRule} cannot
+         * put it on the four outer sides without help. The rules inside the band can be read
+         * here, where the page's own rule list is in hand. 04_stamp_180deg's fee table has five
+         * row separators and no column separator; the student block above it has neither, only
+         * the panel the page draws round it. Writing all six sides for both would draw four
+         * lines the page never drew, so each side is decided on its own evidence.
+         */
+        public boolean innerH, innerV;
         public float top, bottom, left, right;
         public int column;
     }
@@ -465,7 +478,6 @@ public final class PdfToWord {
             }
             attachShapes(page, rules, page.height, null);
             attachPictures(page, rules, page.height);
-        stampPictures(doc, index, page, report);
             return page;
         }
 
@@ -492,6 +504,7 @@ public final class PdfToWord {
         // like page columns, and the heading above the table gets a later column than the
         // table itself - which puts the heading after the table in the output.
         List<Table> rowPass = rowTables(rawLines, firstPass, pageWidth);
+        for (Table t : rowPass) markInnerRules(t, topRules);
 
         List<Float> starts = new ArrayList<>();
         for (Float x : columnStarts(rawLines)) {
@@ -667,6 +680,7 @@ public final class PdfToWord {
                 starts.clear(); starts.addAll(ruleGutters);
             }
         }
+        uprightIfPageIsUpsideDown(glyphs);
         List<Line> lines = toLines(glyphs, asBands(starts));
         List<Line> ring = new ArrayList<>();
         for (java.util.Iterator<Line> it = lines.iterator(); it.hasNext(); ) {
@@ -1024,7 +1038,6 @@ public final class PdfToWord {
         for (Object o : ordered) if (o instanceof Table) written.add((Table) o);
         attachShapes(page, rules, page.height, written);
         attachPictures(page, rules, page.height);
-        stampPictures(doc, index, page, report);
         return page;
     }
 
@@ -2348,6 +2361,34 @@ public final class PdfToWord {
         return line;
     }
 
+    /**
+     * Clears the rotated flag when the WHOLE page is drawn upside down.
+     *
+     * <p>A page printed the wrong way up is not a page of stamps. Every glyph on it is turned
+     * 180 degrees, which {@code TextPosition.getDir()} reports as a non-zero direction, so every
+     * glyph was flagged {@link Glyph#rotated}: {@code sameRow} then refused all 112 pairs of
+     * fields that stood on a shared baseline, and the page's 15 baselines came out as 61
+     * paragraphs - one per field, stacked one above the other, which is the flow that runs off
+     * the sheet. A reader turns the sheet, not each word, and the baseline is horizontal either
+     * way, so the page's text is offered as upright.
+     *
+     * <p>Only when nothing on the page is upright: a 180-degree stamp laid over an ordinary page
+     * (04_stamp_180deg_upside_down, 08_two_overlapping_stamps) is still an overlay and keeps its
+     * flag, and so does any page whose text does not run along a horizontal baseline.
+     */
+    private static void uprightIfPageIsUpsideDown(List<Glyph> glyphs) {
+        int turned = 0;
+        for (Glyph g : glyphs) {
+            if (g.text == null || g.text.trim().isEmpty()) continue;
+            if (!g.rotated) return;                     // an upright glyph: an ordinary page
+            if (Math.abs(g.diry) > 0.25f) return;       // the baseline is not horizontal
+            if (g.dirx >= 0f) return;                   // not turned round
+            turned++;
+        }
+        if (turned == 0) return;
+        for (Glyph g : glyphs) g.rotated = false;
+    }
+
     private static List<Line> toLines(List<Glyph> glyphs, List<float[]> gutters) {
         // A seal drawn as a ring of characters is not a block of text and has no baseline to
         // cluster on: every character sits on its own tangent. It is taken out of the page's
@@ -3175,10 +3216,14 @@ public final class PdfToWord {
                 addRowMates(group, line);
                 continue;
             }
-            Line prev = group.get(group.size() - 1);
-            if (sameRow(prev, line, pageWidth, rowWidth(group, line))) {
+            Line last = group.get(group.size() - 1);
+            // A row is measured against its own field on this baseline; prose is measured
+            // against the line above it, which is what sameParagraph() is about. Using the
+            // row's field for both stopped a paragraph continuing: the line above and the
+            // field beside it share a baseline, so the y-gap a paragraph needs was zero.
+            if (sameRow(prevOnBaseline(group, line), line, pageWidth, rowWidth(group, line))) {
                 group.add(line);
-            } else if (sameParagraph(prev, line, pageWidth, blockRight)) {
+            } else if (sameParagraph(last, line, pageWidth, blockRight)) {
                 group.add(line);
             } else {
                 out.add(buildPara(group, pageWidth, bands));
@@ -3189,6 +3234,38 @@ public final class PdfToWord {
         }
         if (!group.isEmpty()) out.add(buildPara(group, pageWidth, bands));
         return out;
+    }
+
+    /**
+     * The line of {@code group} that a new line should be measured against.
+     *
+     * <p>Usually the last line added, and that is what this returns when the group holds no
+     * field to the left of the new line on its baseline. The exception is a row: once a field
+     * from another column has been attached to it, the group's last line is that field, and
+     * {@link #sameRow} rejects a field that begins to the LEFT of the one it is compared with.
+     * So a row whose left-hand fields came later in the column order - the "Account holder /
+     * NIRVAAN PACKAGING INDUSTRIES / Account no. 50100234567890" of a bank statement, the
+     * "NAV (GROWTH) / AUM / EXPENSE RATIO / FUND MANAGER" header of a fund factsheet - was cut
+     * in two, one row plus its own tail, one pair of paragraphs per baseline. Measuring the new
+     * line against the group's last field that stands on its baseline and ends before it begins
+     * lets a row grow to the right whatever order its fields were offered in.
+     *
+     * <p>Measured on the 208-document corpus: 16520 paragraphs with text became 16467, 10
+     * documents lost paragraphs, none gained one (bank-statement-5-pages 560 -> 545,
+     * 63_three_column_brochure 29 -> 16, brochure-3col-with-sidebar-box 57 -> 44,
+     * 322_mutual_fund_factsheet 82 -> 80). {@code sameRow} still decides what a row is;
+     * nothing here widens it.
+     */
+    private static Line prevOnBaseline(List<Line> group, Line next) {
+        Line last = group.get(group.size() - 1);
+        Line best = null;
+        for (Line g : group) {
+            if (g.x > next.x) continue;
+            float size = Math.max(g.size, next.size);
+            if (Math.abs(g.y - next.y) > Math.max(1.2f, size * 0.25f)) continue;
+            if (best == null || g.x > best.x) best = g;
+        }
+        return best == null ? last : best;
     }
 
     /**
@@ -4312,65 +4389,6 @@ public final class PdfToWord {
      * invisible in Word and only adds weight to the file.
      */
 
-    private static void stampPictures(PDDocument doc, int index, Page page, Report report) {
-        java.util.List<Para> stamps = new ArrayList<>();
-        float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE;
-        float maxX = -Float.MAX_VALUE, maxY = -Float.MAX_VALUE;
-        for (Object b : page.blocks) {
-            if (!(b instanceof Para)) continue;
-            Para p = (Para) b;
-            boolean rotated = false;
-            for (Box box : p.boxes) if (box.rotated) rotated = true;
-            if (!rotated) continue;
-            stamps.add(p);
-            for (Box box : p.boxes) {
-                minX = Math.min(minX, Math.min(box.x, box.right));
-                maxX = Math.max(maxX, Math.max(box.x, box.right));
-                minY = Math.min(minY, box.y - box.size);
-                maxY = Math.max(maxY, box.y + box.size * 0.4f);
-            }
-        }
-        System.out.println("STAMPDEBUG page=" + index + " blocks=" + page.blocks.size() + " stamps=" + stamps.size());
-        if (stamps.isEmpty()) return;
-        float pad = 3f;
-        minX = Math.max(0f, minX - pad); minY = Math.max(0f, minY - pad);
-        maxX = Math.min(page.width, maxX + pad); maxY = Math.min(page.height, maxY + pad);
-        float wPt = maxX - minX, hPt = maxY - minY;
-        if (wPt <= 2f || hPt <= 2f) return;
-        android.graphics.Bitmap full = null;
-        try {
-            PDFRenderer renderer = new PDFRenderer(doc);
-            float dpi = 300f;
-            full = renderer.renderImageWithDPI(index, dpi);
-            if (full == null) return;
-            float scale = dpi / 72f;
-            int px = Math.max(0, Math.round(minX * scale));
-            int py = Math.max(0, Math.round(minY * scale));
-            int pw = Math.min(full.getWidth() - px, Math.round(wPt * scale));
-            int ph = Math.min(full.getHeight() - py, Math.round(hPt * scale));
-            if (pw <= 0 || ph <= 0) return;
-            android.graphics.Bitmap crop = android.graphics.Bitmap.createBitmap(full, px, py, pw, ph);
-            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
-            if (!crop.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, bos)) return;
-            StringBuilder stampText = new StringBuilder();
-            for (Para p : stamps) {
-                if (stampText.length() > 0) stampText.append(' ');
-                stampText.append(p.text());
-            }
-            DocxWriter.Picture pic = new DocxWriter.Picture(bos.toByteArray(), minX, minY, wPt, hPt);
-            pic.text = stampText.toString();
-            for (Para p : stamps) page.blocks.remove(p);
-            page.blocks.add(pic);
-            if (report != null) report.images++;
-            System.out.println("STAMPDEBUG rasterised " + pw + "x" + ph);
-        } catch (Throwable t) {
-            System.out.println("STAMPDEBUG FAILED " + t.getClass().getSimpleName() + " " + t.getMessage());
-            return;
-        } finally {
-            if (full != null) full.recycle();
-        }
-    }
-
     private static void attachPictures(Page page, Rules rules, float pageHeight) {
         if (rules == null || rules.pictures.isEmpty()) return;
         for (DocxWriter.Picture pic : rules.pictures) {
@@ -4481,6 +4499,36 @@ public final class PdfToWord {
         } catch (Throwable ignored) {
         }
         return out;
+    }
+
+    /**
+     * Reads, from the rules the page drew, whether it drew the separators inside this table.
+     *
+     * <p>Only the whitespace pass needs this: its tables carry ink bounds rather than the
+     * rectangle the page strokes, so the writer can see the frame around them but not what the
+     * page drew across them. A rule counts when it runs inside the table's band - not along its
+     * own top or bottom - and covers at least half the table's width (or height, for a column
+     * separator). One rule of either kind is enough to say the page drew a grid rather than a
+     * panel.
+     */
+    private static void markInnerRules(Table t, Rules rules) {
+        if (rules == null) return;
+        float w = t.right - t.left, h = t.bottom - t.top;
+        if (w <= 0f || h <= 0f) return;
+        for (float[] r : rules.horizontal) {                       // {y, x1, x2}
+            if (r[0] <= t.top + 1f || r[0] >= t.bottom - 1f) continue;
+            if (Math.min(r[2], t.right) - Math.max(r[1], t.left) >= w * 0.5f) {
+                t.innerH = true;
+                break;
+            }
+        }
+        for (float[] r : rules.vertical) {                          // {x, y1, y2}
+            if (r[0] <= t.left + 1f || r[0] >= t.right - 1f) continue;
+            if (Math.min(r[2], t.bottom) - Math.max(r[1], t.top) >= h * 0.5f) {
+                t.innerV = true;
+                break;
+            }
+        }
     }
 
     /**

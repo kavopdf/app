@@ -131,9 +131,226 @@ public final class DocxWriter {
      */
     private static final int GAP_CAP_SPEND_TW = 20000;
 
+    /**
+     * The most a page's flow may be compressed to make it fit the paper: 85 % of its measured
+     * height.
+     *
+     * <p>A page that has to lose more than a sixth of itself was not mis-measured by a sixth -
+     * its content really is taller than the sheet, which today means a page whose columns are
+     * stacked into one flow (D-08) or a table the model under-measures. Compressing those only
+     * makes a wrong layout smaller and illegible, so past this floor the flow keeps its own
+     * heights and the page overruns exactly as it did before this guard existed.
+     */
+    private static final float SQUEEZE_FLOOR = 0.85f;
+
+    /**
+     * Whether a page that cannot be squeezed to fit gets a deliberate page break instead of
+     * silently overrunning.
+     *
+     * <p>OFF, and that is a measured decision, not a default. Four pages in the 208 still come
+     * out taller than their paper after squeezing - {@code 350_question_paper},
+     * {@code itr-computation-with-slab-table}, {@code newsletter-3col-header-footer} and
+     * {@code product-catalogue-code-left-price-right}, which need 1.21, 1.09, 1.17 and 1.22
+     * times the paper's height because their columns are still stacked into one flow (D-08) or a
+     * slab table's rows cannot shrink below their own type. Turned ON, this flag breaks those
+     * pages deliberately: measured over the corpus, the pages left over the paper go from 4 to 3
+     * (the break cannot rescue a page whose overflow is a table that is already written) and the
+     * gate gains two "pages 1 -> 2" counts on documents whose render is two pages either way. A
+     * break a reader cannot see is not worth a regression the project measures, so the flag stays
+     * off and the four pages are reported instead of papered over.
+     */
+    private static final boolean BREAK_WHEN_UNFITTABLE = false;
+
+    /**
+     * Twips kept back from every page's budget, so the page's own measured height can never sit
+     * a twip above the paper.
+     *
+     * <p>The guard works in whole twips and rounds each attribute it writes; the paragraph
+     * carriers that hold an anchored picture or a text box add one twip each and are not part of
+     * the flow. Two twips is a tenth of a point - a fifth of a pixel at 200 dpi - and it is the
+     * difference between a page that ends at the paper's edge and a page whose measured sum is
+     * one twip past it, which the corpus check reads as an overflow.
+     */
+    private static final int PAGE_ROUNDING_TW = 2;
+
     /** The ceiling this page's gaps get - see {@link #GAP_CAP_SPEND_TW}. */
     private static int gapCapTw(Ctx ctx) {
         return ctx.spendGaps ? GAP_CAP_SPEND_TW : GAP_CAP_TW;
+    }
+
+    /**
+     * Charges one paragraph against the page's budget, and says how much of it may be used.
+     *
+     * <p>The budget is the page's own height, because {@code w:before + w:line} summed down a
+     * page IS the height the flow occupies - the section has zero margins, so the text area and
+     * the paper are the same box. A sum larger than the paper is a second page: the reader's,
+     * not ours, and at a place the reader chooses. The guard this replaces zeroed
+     * {@code beforeTw} once the budget was spent and then went on adding {@code lineTw} for
+     * every paragraph after it, so it could slow the overrun but never stop it (D-21: a one-page
+     * PDF came back as two pages in Google Docs).
+     *
+     * <p>Three steps, in the order the page itself would give them up:
+     * <ol>
+     *   <li>the gap above the line goes first - white space is not content, and the old guard
+     *       already did this much;</li>
+     *   <li>then the line's own box is shortened to the room that is left, so the page ends
+     *       exactly where the paper does. The box is never taken below the ascent the type needs
+     *       to sit in ({@link #LINE_BASE} of the em), so the last line is not clipped and not
+     *       overlapped - and only one line per page is ever shortened, because a shortened line
+     *       leaves no room and the next paragraph takes the third step;</li>
+     *   <li>if not even that fits, the page is full and the caller writes a deliberate page
+     *       break. A break the writer places is a page the writer chose, at the last baseline
+     *       the page itself drew; the alternative is the renderer inventing one wherever its own
+     *       line model runs out.</li>
+     * </ol>
+     *
+     * @param beforeTw the gap the page drew above this line, in twips
+     * @param lineTw   the line's own box, in twips
+     * @param size     the line's font size, so the ascent floor is the type's own
+     * @return {@code {before, line}} in twips, or null when the page is full and must be broken
+     */
+    /**
+     * The height a written page occupies, read off its own XML: every {@code w:before} plus every
+     * {@code w:line} plus every row's {@code w:trHeight}.
+     *
+     * <p>This is the test the page has to pass - the flow's own before and line, summed down the
+     * page, must not exceed the paper - so it is measured on the page and not on the model that
+     * produced it. A model that agrees with itself while the page overruns is the defect this
+     * guard exists to catch.
+     */
+    private static final String BEFORE = "w:before=\"";
+    private static final String LINE = "w:line=\"";
+    private static final String TRHEIGHT = "w:trHeight w:val=\"";
+
+    private static int spacingTw(CharSequence xml) {
+        int sum = 0;
+        int depth = 0;              // inside a w:tbl
+        int i = 0;
+        int n = xml.length();
+        while (i < n) {
+            if (startsWith(xml, "<w:tbl>", i)) {
+                depth++;
+                i += 7;
+            } else if (startsWith(xml, "</w:tbl>", i)) {
+                if (depth > 0) depth--;
+                i += 8;
+            } else if (startsWith(xml, "<w:txbxContent>", i)) {
+                // A text box is placed at a y, not flowed, so its paragraphs are not the page's
+                // height. Counting them is how a one-page document measures at 1277 pt on an
+                // 842 pt page (D-21) - the stamp's own boxes are most of that number.
+                depth++;
+                i += 15;
+            } else if (startsWith(xml, "</w:txbxContent>", i)) {
+                if (depth > 0) depth--;
+                i += 16;
+            } else if (startsWith(xml, BEFORE, i) || startsWith(xml, LINE, i)) {
+                // A cell's line is not the page's height: the row it sits in already carries
+                // that height as its own w:trHeight, and counting both charges a table twice.
+                int j = i + (startsWith(xml, BEFORE, i) ? BEFORE.length() : LINE.length());
+                if (depth == 0) sum += digits(xml, j);
+                i = j;
+            } else if (startsWith(xml, TRHEIGHT, i)) {
+                sum += digits(xml, i + TRHEIGHT.length());
+                i += TRHEIGHT.length();
+            } else {
+                i++;
+            }
+        }
+        return sum;
+    }
+
+    /** The integer starting at {@code from}, or 0 when there is none. */
+    private static int digits(CharSequence xml, int from) {
+        int v = 0, i = from;
+        boolean any = false;
+        while (i < xml.length() && xml.charAt(i) >= '0' && xml.charAt(i) <= '9') {
+            v = v * 10 + (xml.charAt(i) - '0');
+            i++;
+            any = true;
+        }
+        return any ? v : 0;
+    }
+
+    /** Does {@code xml} hold {@code needle} at {@code at}? */
+    private static boolean startsWith(CharSequence xml, String needle, int at) {
+        if (at + needle.length() > xml.length()) return false;
+        for (int j = 0; j < needle.length(); j++) {
+            if (xml.charAt(at + j) != needle.charAt(j)) return false;
+        }
+        return true;
+    }
+
+    /** One twip value as the page will really write it, through the squeeze factor. */
+    private static int twScale(int tw, float squeeze) {
+        return squeeze == 1f ? tw : (int) Math.max(0L, Math.round(tw * squeeze));
+    }
+
+    private static int[] fitPage(Ctx ctx, int beforeTw, int lineTw, float size) {
+        if (ctx.measuring) {
+            // Measuring a page: the gap is given up exactly as the old guard gave it up once the
+            // budget was spent, but no line is shortened and nothing is broken - the answer this
+            // pass exists to produce is how tall the page really is.
+            int roomM = ctx.budgetTw - ctx.flowTw;
+            int gapM = Math.max(0, Math.min(beforeTw, roomM - lineTw));
+            ctx.flowTw += gapM + lineTw;
+            return new int[]{gapM, lineTw};
+        }
+        if (ctx.budgetTw <= 0) {
+            ctx.flowTw += beforeTw + lineTw;
+            return new int[]{beforeTw, lineTw};
+        }
+        int room = ctx.budgetTw - ctx.flowTw;
+        if (beforeTw + lineTw <= room) {
+            ctx.flowTw += beforeTw + lineTw;
+            return new int[]{beforeTw, lineTw};
+        }
+        // 1. the gap goes first.
+        int gap = Math.max(0, Math.min(beforeTw, room - lineTw));
+        room = ctx.budgetTw - ctx.flowTw - gap;
+        if (lineTw <= room) {
+            ctx.flowTw += gap + lineTw;
+            return new int[]{gap, lineTw};
+        }
+        // 2. the box is shortened to what is left, down to the ascent but no further.
+        int ascent = (int) Math.max(1L, Math.round(LINE_BASE * Math.max(4f, size) * TWIPS_PER_PT));
+        if (room >= ascent) {
+            ctx.flowTw = ctx.budgetTw;
+            ctx.fitted++;
+            return new int[]{0, room};
+        }
+        // 3. the page is full and cannot be squeezed any further. See
+        // BREAK_WHEN_UNFITTABLE: by default the line keeps its own height and the page overruns
+        // exactly as it did before this guard existed - the guard is not allowed to trade a
+        // reader-visible page for a bookkeeping one.
+        if (BREAK_WHEN_UNFITTABLE && ctx.flowTw > 0) return null;
+        ctx.flowTw += lineTw;
+        return new int[]{0, lineTw};
+    }
+
+    /**
+     * A deliberate page break, and the flow starts again at the top of the new sheet.
+     *
+     * <p>{@code w:br w:type="page"} is the same instruction a section break with
+     * {@code w:type w:val="nextPage"} gives, and it is what the writer already uses to end a
+     * page the PDF itself ended. The budget guard writes one only where the page is genuinely
+     * full, so the break lands on the last baseline the page drew rather than wherever the
+     * reader's own line model happens to run out.
+     *
+     * <p>The paragraph that carries the break is the same one-twip carrier the writer already
+     * uses for an empty page, so it adds no height of its own: a break paragraph with a real
+     * line height would be the very overflow this guard exists to prevent.
+     */
+    private static void breakPage(StringBuilder sb, Ctx ctx) {
+        sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr>")
+                .append("<w:r><w:br w:type=\"page\"/></w:r></w:p>");
+        ctx.brokePage++;
+        ctx.flowTw = 0;
+        ctx.newPage = true;
+        ctx.lastBaseline = -1f;
+        ctx.lastLinePt = 0f;
+        ctx.lastWasTable = false;
     }
 
     private DocxWriter() {
@@ -142,6 +359,10 @@ public final class DocxWriter {
     public static void write(PdfToWord.Result result, File out) throws IOException {
         Ctx ctx = new Ctx();
         String documentXml = documentXml(result, ctx);
+        if (System.getProperty("p2w.debugFlow") != null) {
+            System.err.println("FLOWDOC " + out.getName() + " fitted=" + ctx.fitted
+                    + " broke=" + ctx.brokePage);
+        }
         String rels = documentRels(ctx.media);
         String contentTypes = contentTypes(ctx.media.size());
 
@@ -209,16 +430,13 @@ public final class DocxWriter {
         /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
         float pageWidthPt = 595f;
         /**
-         * How many columns the section being written actually declares, from pageColumns.
+         * The page's own height in points.
          *
-         * <p>This is the only thing that decides whether w:ind w:left is measured from the page
-         * edge or from a column edge. It has to be the SECTION's count, not the count of distinct
-         * Para.column values on the page: a page whose paragraphs carry two column numbers while
-         * the section declares one column has no column edge to subtract, and subtracting one
-         * moved the text to x=0.1. Measured on the v3 batch-3 run: 353's "GM" (x=150 in the PDF),
-         * 363's register URL (x=320) and 364's tear-off stub line (x=52) all landed at x=0.1.
+         * <p>Needed by a 180-degree stamp and nothing else: PDFBox reports such a line's
+         * position in a frame turned with the text, so both of its coordinates are mirrored
+         * about the page and have to be put back before they mean anything.
          */
-        int secCols = 1;
+        float pageHeightPt = 842f;
         /**
          * True when the last block written on this page was a table.
          *
@@ -229,6 +447,24 @@ public final class DocxWriter {
          * gets no spacer - the page had no prose between them to leave a gap for.
          */
         boolean lastWasTable;
+        /** Paragraphs whose own box was shortened so the page ended exactly at the paper. */
+        int fitted;
+        /** Deliberate page breaks the budget guard had to write. */
+        int brokePage;
+        /** Pages written so far, so the debug trace can name the page it is talking about. */
+        int pageSeq;
+        /**
+         * How much of its measured height this page's flow may keep, 1 = all of it.
+         *
+         * <p>Set only for a page whose own flow is taller than the paper: every line box and
+         * every gap written for that page is multiplied by it, so the flow ends exactly where
+         * the paper does. The accounting that the budget guard does stays in the page's own
+         * units - the budget is divided by this factor instead - so the pitch solver keeps
+         * comparing boxes with boxes and does not chase its own scaling.
+         */
+        float squeeze = 1f;
+        /** True while a page is being measured rather than written for the reader. */
+        boolean measuring;
     }
 
     // ------------------------------------------------------------------ document
@@ -266,7 +502,6 @@ public final class DocxWriter {
                 secH = ph;
                 secCols = pCols;
                 secGap = pGap;
-                ctx.secCols = pCols;
                 first = false;
             } else if (Math.abs(pw - secW) > 0.5f || Math.abs(ph - secH) > 0.5f
                     || pCols != secCols) {
@@ -290,7 +525,6 @@ public final class DocxWriter {
                 secH = ph;
                 secCols = pCols;
                 secGap = pGap;
-                ctx.secCols = pCols;
             } else {
                 // A page with nothing on it still has to advance the page counter, or every
                 // anchor after it lands one page too early.
@@ -312,7 +546,7 @@ public final class DocxWriter {
             ctx.lastLinePt = 0f;
             ctx.positioned = false;
             ctx.flowTw = 0;
-            ctx.budgetTw = (int) Math.max(1L, Math.round(ph * TWIPS_PER_PT));
+            ctx.budgetTw = (int) Math.max(1L, Math.round(ph * TWIPS_PER_PT) - PAGE_ROUNDING_TW);
             // pageFits is the measurement; hasColumnBands was a proxy for it and it over-fired.
             // A form page has vertical gutters between its field columns, so the column pass
             // gives those rows column > 0 and the proxy read the page as set in columns. The
@@ -327,6 +561,7 @@ public final class DocxWriter {
                         + " ph=" + ph);
             }
             ctx.pageWidthPt = pw;
+            ctx.pageHeightPt = ph;
             // The page's own outlines, so a label drawn inside one can be anchored to it and a
             // stamp can find the frame the page drew around it. It was declared and never set,
             // which is why the stamp's border search never matched anything.
@@ -336,56 +571,103 @@ public final class DocxWriter {
             }
             ctx.curShapes = outlines;
             if (page.blocks.isEmpty()) continue;
-            // A page set in columns, with a full-width element in the middle of it, is more than
-            // one section: the columns before the element, the element, and the columns after it.
-            // Without the breaks the element is poured into a column like everything else.
+            // ---- the page's flow, measured before it is written ----
             //
-            // The carrier is a zero-height paragraph holding the sectPr, because a sectPr has to
-            // live in a pPr and a table cannot carry one. Measured on a prototype: a table with a
-            // carrier after it costs 2.9 pt and spans correctly.
-            float blockSpan = 0f;
-            for (Object bb : page.blocks) {
-                if (bb instanceof PdfToWord.Para) {
-                    PdfToWord.Para q = (PdfToWord.Para) bb;
-                    blockSpan = Math.max(blockSpan, q.right - q.left);
-                }
-            }
-            int curCols = page.columns;
-            for (Object block : page.blocks) {
-                if (page.columns > 1 && blockSpan > 0f) {
-                    boolean full = false;
-                    if (block instanceof PdfToWord.Para) {
-                        PdfToWord.Para q = (PdfToWord.Para) block;
-                        full = q.right - q.left > blockSpan * 0.62f;
-                    } else if (block instanceof PdfToWord.Table) {
-                        PdfToWord.Table q = (PdfToWord.Table) block;
-                        full = q.right - q.left > blockSpan * 0.62f;
+            // The guard can only fill the page if it knows how much room the page needs BEFORE
+            // it starts giving room away: a line already written cannot be made shorter. So the
+            // page is written once in measuring mode - the page's own gaps, given up exactly as
+            // the old guard gave them up, but no line shortened and no break - and that pass is
+            // read for two numbers: the height the flow needs, and the height it actually
+            // occupies once written. When the second is more than the paper, the page is written
+            // again with every box and gap scaled by budget/height. A page that already fits is
+            // written once and comes out exactly as it did before this guard existed.
+            //
+            // The page is measured off its own XML, not off the writer's running total, because
+            // the running total is the writer's model of the page and this is the page: the
+            // carriers that hold an anchored picture or a text box add a twip each and are not
+            // charged to the flow, and a page must not overrun by the twips the model forgot.
+            //
+            // Both passes write through the same code and the same model objects, so every side
+            // effect of the first pass is undone before the second: the media list is truncated,
+            // an anchored shape marked consumed is un-marked, and the id counters are reset.
+            int pageBudgetTw = ctx.budgetTw;
+            java.util.List<Boolean> consumedMark = new ArrayList<>();
+            for (Shape sh : outlines) consumedMark.add(sh.consumed);
+            int mediaMark = ctx.media.size();
+            int shapeMark = ctx.shapeSeq, anchorMark = ctx.anchorCount, flowMark = ctx.flowCount;
+            int fittedMark = ctx.fitted, brokeMark = ctx.brokePage;
+            StringBuilder pg = new StringBuilder(1 << 12);
+
+            ctx.measuring = true;
+            pageBody(pg, page, ctx, pw, ph, secGap);
+            ctx.measuring = false;
+            int needTw = ctx.flowTw;
+            int writtenTw = spacingTw(pg);
+            // What the page carries that the flow is not charged for. Kept out of the budget the
+            // guard works to, so that the page's own w:before + w:line + w:trHeight is what
+            // ends at the paper's edge and not the model's idea of it.
+            int overheadTw = Math.max(0, writtenTw - ctx.flowTw);
+            float usedF = 1f;
+
+            if (writtenTw > pageBudgetTw) {
+                // budget/height first, then corrected by what the pass really wrote, because a
+                // squeezed page also gives up less of its own gap and the two do not scale quite
+                // alike. Each attempt is kept only if it is the best one: the corrections are not
+                // guaranteed to be monotone (a table whose rows are held at their type size stops
+                // shrinking while the prose around it keeps going), so the page that is used is
+                // the shortest one measured, never simply the last one tried.
+                String bestXml = null;
+                int bestWritten = writtenTw;
+                float f = Math.min(1f, Math.max(SQUEEZE_FLOOR, (float) pageBudgetTw / (float) needTw));
+                for (int attempt = 0; attempt < 3; attempt++) {
+                    ctx.media.subList(mediaMark, ctx.media.size()).clear();
+                    ctx.shapeSeq = shapeMark;
+                    ctx.anchorCount = anchorMark;
+                    ctx.flowCount = flowMark;
+                    ctx.fitted = fittedMark;
+                    ctx.brokePage = brokeMark;
+                    for (int i = 0; i < outlines.size(); i++) {
+                        outlines.get(i).consumed = consumedMark.get(i);
                     }
-                    int want = full ? 1 : page.columns;
-                    if (want != curCols) {
-                        sb.append("<w:p><w:pPr><w:sectPr>")
-                          .append(sectPrXml(pw, ph, curCols, secGap))
-                          .append("<w:type w:val=\"continuous\"/></w:sectPr></w:pPr></w:p>");
-                        curCols = want;
-                        ctx.lastBaseline = -1f;
-                        ctx.newPage = false;
-                        ctx.flowTw = 0;
+                    pg.setLength(0);
+                    ctx.squeeze = f;
+                    ctx.flowTw = 0;
+                    ctx.lastBaseline = -1f;
+                    ctx.lastLinePt = 0f;
+                    ctx.positioned = false;
+                    ctx.newPage = true;
+                    ctx.lastWasTable = false;
+                    ctx.budgetTw = Math.max(1, pageBudgetTw - overheadTw);
+                    pageBody(pg, page, ctx, pw, ph, secGap);
+                    int w = spacingTw(pg);
+                    if (w < bestWritten) {
+                        bestWritten = w;
+                        bestXml = pg.toString();
+                        usedF = f;
                     }
+                    if (w <= pageBudgetTw) break;
+                    float next = Math.min(1f, f * (float) pageBudgetTw / (float) w);
+                    if (next <= SQUEEZE_FLOOR) {
+                        if (f == SQUEEZE_FLOOR) break;
+                        next = SQUEEZE_FLOOR;
+                    }
+                    f = next;
                 }
-                if (block instanceof PdfToWord.Para) {
-                    para(sb, (PdfToWord.Para) block, ctx);
-                } else if (block instanceof PdfToWord.Table) {
-                    table(sb, (PdfToWord.Table) block, ctx);
-                } else if (block instanceof Picture) {
-                    picture(sb, (Picture) block, ctx);
-                } else if (block instanceof Shape) {
-                    if (!((Shape) block).consumed) shape(sb, (Shape) block, ctx);
+                if (bestXml != null) {
+                    pg.setLength(0);
+                    pg.append(bestXml);
+                    writtenTw = bestWritten;
                 }
+                ctx.squeeze = 1f;
+                ctx.budgetTw = pageBudgetTw;
             }
-            if (page.columns > 1 && curCols != page.columns) {
-                sb.append("<w:p><w:pPr><w:sectPr>")
-                  .append(sectPrXml(pw, ph, curCols, secGap))
-                  .append("<w:type w:val=\"continuous\"/></w:sectPr></w:pPr></w:p>");
+            sb.append(pg);
+            if (System.getProperty("p2w.debugFlow") != null) {
+                System.err.println("FLOW page=" + (++ctx.pageSeq)
+                        + " flowTw=" + ctx.flowTw + " budgetTw=" + ctx.budgetTw
+                        + " overTw=" + (ctx.flowTw - ctx.budgetTw)
+                        + " needTw=" + needTw + " writtenTw=" + writtenTw
+                        + " overheadTw=" + overheadTw + " f=" + usedF);
             }
         }
         // The section properties must be the LAST child of w:body.
@@ -393,6 +675,73 @@ public final class DocxWriter {
                 .append("</w:sectPr>");
         sb.append("</w:body></w:document>");
         return sb.toString();
+    }
+
+    /**
+     * One page's blocks, in the order the page drew them.
+     *
+     * <p>This was the body of {@code documentXml}'s page loop. It is a method because the budget
+     * guard has to be able to run it twice: once with no budget to measure the page's own
+     * height, and - only when that height is more than the paper - once more with every box
+     * scaled to fit. It writes nothing outside {@code sb} except through {@code ctx}, and every
+     * side effect of that is undone between the two runs.
+     */
+    private static void pageBody(StringBuilder sb, PdfToWord.Page page, Ctx ctx,
+                                 float pw, float ph, float secGap) {
+        // A page set in columns, with a full-width element in the middle of it, is more than
+        // one section: the columns before the element, the element, and the columns after it.
+        // Without the breaks the element is poured into a column like everything else.
+        //
+        // The carrier is a zero-height paragraph holding the sectPr, because a sectPr has to
+        // live in a pPr and a table cannot carry one. Measured on a prototype: a table with a
+        // carrier after it costs 2.9 pt and spans correctly.
+        float blockSpan = 0f;
+        for (Object bb : page.blocks) {
+            if (bb instanceof PdfToWord.Para) {
+                PdfToWord.Para q = (PdfToWord.Para) bb;
+                blockSpan = Math.max(blockSpan, q.right - q.left);
+            }
+        }
+        int curCols = page.columns;
+        for (Object block : page.blocks) {
+            if (page.columns > 1 && blockSpan > 0f) {
+                boolean full = false;
+                if (block instanceof PdfToWord.Para) {
+                    PdfToWord.Para q = (PdfToWord.Para) block;
+                    full = q.right - q.left > blockSpan * 0.62f;
+                } else if (block instanceof PdfToWord.Table) {
+                    PdfToWord.Table q = (PdfToWord.Table) block;
+                    full = q.right - q.left > blockSpan * 0.62f;
+                }
+                int want = full ? 1 : page.columns;
+                if (want != curCols) {
+                    sb.append("<w:p><w:pPr><w:sectPr>")
+                      .append(sectPrXml(pw, ph, curCols, secGap))
+                      .append("<w:type w:val=\"continuous\"/></w:sectPr></w:pPr></w:p>");
+                    curCols = want;
+                    ctx.lastBaseline = -1f;
+                    ctx.newPage = false;
+                    // flowTw is NOT reset here. A continuous section break starts a new column on
+                    // the SAME sheet, so the page's budget is still the page's budget; resetting
+                    // it made the guard start again halfway down the page, which is how a page
+                    // measured at 842 pt could still be written at 844.
+                }
+            }
+            if (block instanceof PdfToWord.Para) {
+                para(sb, (PdfToWord.Para) block, ctx);
+            } else if (block instanceof PdfToWord.Table) {
+                table(sb, (PdfToWord.Table) block, ctx);
+            } else if (block instanceof Picture) {
+                picture(sb, (Picture) block, ctx);
+            } else if (block instanceof Shape) {
+                if (!((Shape) block).consumed) shape(sb, (Shape) block, ctx);
+            }
+        }
+        if (page.columns > 1 && curCols != page.columns) {
+            sb.append("<w:p><w:pPr><w:sectPr>")
+              .append(sectPrXml(pw, ph, curCols, secGap))
+              .append("<w:type w:val=\"continuous\"/></w:sectPr></w:pPr></w:p>");
+        }
     }
 
     /**
@@ -433,12 +782,6 @@ public final class DocxWriter {
     /** How many column bands this page's paragraphs occupy, and the widest gutter between them. */
     /** The left edge of the column a paragraph sits in, in twips, or 0 for a one-column page. */
     private static int bandLeftTw(Ctx ctx, int column) {
-        // w:ind w:left is measured from the PAGE edge unless the section itself declares
-        // w:cols w:num>1. The page margins are zero, so with one column the page edge IS x=0 and
-        // the measured x is already the indent. Subtracting a column's left edge there took the
-        // text off the page: on v3 batch 3 it put three lines at x=0.1 that the PDF draws at 52,
-        // 150 and 320 pt. Only a section that really is divided may measure from its column.
-        if (ctx.secCols <= 1) return 0;
         if (ctx.colLeft == null || ctx.colLeft.size() <= 1) return 0;
         Float left = ctx.colLeft.get(column);
         return left == null ? 0 : (int) Math.round(left * TWIPS_PER_PT);
@@ -894,35 +1237,75 @@ public final class DocxWriter {
                         ? Math.max(b.length, advance) + b.size * 1.5f
                         : Math.max(4f, advance) * 1.12f + b.size * 1.5f;
                 float hPt = Math.max(4f, b.size * LINE_FACTOR);
-                // REVERTED: placing the box on the rotated line's bounding area instead of its
-                // origin moved file 08's two stamps apart and put file 01's AUTHORISED SIGNATORY
-                // in a different wrong place. OOXML has no rotation a LibreOffice render honours,
-                // so a rotated stamp cannot be reproduced faithfully; the axis-aligned box at the
-                // line origin is at least stable. Recorded in REMAINING-DEFECTS.md.
-                // A stamp drawn upside down has a HORIZONTAL baseline, so its measured angle is
-                // 0 and the box would go out upright. The page still flagged it as rotated - that
-                // flag comes from the text matrix, not from the angle - so a rotated line whose
-                // angle is 0 is a 180-degree stamp. Nothing is forced: an unrotated line never
-                // reaches this branch, because only b.rotated lines become a text box at all.
-                float stampRot = b.rotated && Math.abs(b.angle) < 1f ? 180f : b.angle;
-                // The stamp's own outline, if the page drew one around it: an unfilled, stroked
-                // shape whose box covers this line. It becomes the border of this text box and
-                // is marked consumed so it is not drawn a second time somewhere else.
-                int borderRgb = -1;
-                float borderW = 0.6f;
-                if (ctx.curShapes != null) {
-                    for (Shape sh : ctx.curShapes) {
-                        if (sh.consumed || sh.fillRgb >= 0 || sh.lineRgb < 0) continue;
-                        if (sh.xPt > b.right + 4f || sh.xPt + sh.wPt < b.x - 4f) continue;
-                        if (sh.topPt > b.y + b.size * 3f || sh.topPt + sh.hPt < b.y - b.size * 3f) continue;
-                        sh.consumed = true;
-                        borderRgb = sh.lineRgb;
-                        borderW = Math.max(0.4f, sh.lineWidthPt);
-                        break;
-                    }
+                // A stamp is drawn on a rotated baseline, and it is written as the page's own
+                // rectangle with the text placed inside it by the box's insets.
+                //
+                // WHY THIS AND NOT A TEXT-TIGHT BOX. The page draws a stamp as four separate
+                // objects that share one `cm`: two stroked rectangles and two text objects. What
+                // ties the text to the outline is that repeated matrix and nothing else, so the
+                // only faithful reconstruction is the rectangle itself plus where the baseline
+                // sits inside it. The text-tight box was neither: at 15 degrees the outline's
+                // axis-aligned bounding box is 205.95 x 104.68 pt against a true rectangle of
+                // 198.42 x 55.20 - 96.8 % too much area - and the box was 207 x 16, so whichever
+                // of the two was used, the outline and the text were measured from different
+                // shapes and the reader saw one move against the other.
+                //
+                // WHY THE INSETS AND NOT THE OFFSET. `<a:xfrm rot>` turns a box about its
+                // CENTRE. Writing the baseline origin into wp:posOffset therefore moves the text
+                // by (R - I) . (-w/2, +h/2) the moment the box is turned - +5.1/+22.2 pt on 01's
+                // first line, +136.9/-20.2 and +195.9/-20.2 pt on 04's, a full box width. Putting
+                // the box on the rectangle's own centre makes that term zero by construction, and
+                // the baseline is then placed by lIns/tIns, which rotate with the box. The
+                // reconstruction reproduces every stamp to under 0.001 pt.
+                float lineAngle = b.rotated && Math.abs(b.angle) < 1f ? 180f : b.angle;
+                // Where the page really put the baseline origin.
+                //
+                // Box.x/Box.y come from TextPosition.getXDirAdj()/getYDirAdj(), which are
+                // measured along the baseline in a frame turned with the text. For 15 and 90
+                // degrees that frame happens to agree with the page; for a 180-degree stamp it
+                // does not, and both coordinates come back mirrored: on 04 the page's own
+                // origin for CANCELLED is (444.266, 407.660) and the box said (151.010,
+                // 434.230), which is 595.276-444.266 and 841.890-407.660. Every earlier version
+                // placed the box from the mirrored pair, which is why 04's stamp has measured
+                // 294 and 353 pt from where the page draws it no matter what else changed.
+                float px = b.x, py = b.y;
+                if (b.rotated && Math.abs(b.angle) < 1f) {
+                    px = ctx.pageWidthPt - b.x;
+                    py = ctx.pageHeightPt - b.y;
                 }
-                anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), stampRot,
-                        borderRgb, borderW);
+                Frame frame = frameOf(ctx.curShapes, px, py, lineAngle);
+                if (frame != null) {
+                    // The rectangle becomes this box's border, once: the stamp's inner rectangle
+                    // is a different shape and is still drawn by shape(), which is how a
+                    // double-ruled stamp keeps both of its rules.
+                    int rgb = -1;
+                    float lw = 0.6f;
+                    if (!frame.shape.consumed) {
+                        frame.shape.consumed = true;
+                        rgb = frame.shape.lineRgb;
+                        lw = Math.max(0.4f, frame.shape.lineWidthPt);
+                    }
+                    // tIns is measured to the top of the text, not to its baseline, so one
+                    // ascent comes off - the same convention every upright box in this writer
+                    // uses. It can go slightly negative for a line that hugs the frame's top
+                    // edge; the box's own top is then the clamp.
+                    float lIns = Math.max(0f, frame.lIns);
+                    float tIns = Math.max(0f, frame.tIns - ASCENT * b.size);
+                    anchorAt(sb, ctx, frame.cx, frame.cy, frame.w / 2f, frame.h / 2f,
+                            frame.w, frame.h, inner.toString(), lineAngle, rgb, lw, lIns, tIns);
+                } else {
+                    // No rectangle around this line - the per-glyph text of a round seal, a
+                    // rotated label on a drawing. There is no frame to bind to, so the line is
+                    // placed on its own origin with no rotation: the run starts at the left end
+                    // of what the page drew, and a line drawn right-to-left (file 04) starts at
+                    // the other end because that is where its left end is.
+                    double dirX = Math.cos(Math.toRadians(lineAngle));
+                    float startX = px;
+                    if (dirX <= -0.5) startX = px - b.length;
+                    else if (Math.abs(dirX) < 0.5) startX = px - b.length / 2f;
+                    anchorAt(sb, ctx, startX, py, 0f, ASCENT * b.size, wPt, hPt,
+                            inner.toString(), 0f, -1, 0.6f, 0f, 0f);
+                }
             }
             return;
         }
@@ -986,16 +1369,37 @@ public final class DocxWriter {
             if (extra > 0f) beforeTw = (int) Math.min(gapCapTw(ctx), Math.round(extra * TWIPS_PER_PT));
         }
         int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
+        // The squeeze factor is 1 on every page whose own flow already fits the paper; on the
+        // pages it is not, the guard is handed the heights the page will really be written with,
+        // so its accounting is the document's own w:before + w:line and not an estimate of it.
+        int[] fit = fitPage(ctx, twScale(beforeTw, ctx.squeeze), twScale(lineTw, ctx.squeeze), size);
+        if (fit == null) {
+            // The page is full. Break it here, deliberately, and let the row be the first line
+            // of the new sheet - which means it takes its own y as its top gap, exactly as the
+            // page's first line does.
+            breakPage(sb, ctx);
+            float topGap = first.y - LINE_BASE * linePt;
+            if (topGap > 0f) {
+                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
+            } else {
+                beforeTw = 0;
+                if (first.y > 0f) linePt = Math.min(linePt, Math.max(size, first.y / LINE_BASE));
+            }
+            lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
+            fit = fitPage(ctx, twScale(beforeTw, ctx.squeeze), twScale(lineTw, ctx.squeeze), size);
+            if (fit == null) fit = new int[]{0, lineTw};
+        }
+        beforeTw = fit[0];
+        lineTw = fit[1];
+        // The box the pitch solver compares next time is the page's own, not the squeezed one:
+        // the page's baselines are what they are, and a squeezed box that fed back into the
+        // solver would chase its own scaling down the page.
         ctx.lastLinePt = linePt;
 
         ctx.flowCount++;
         ctx.lastBaseline = first.y;
         ctx.lastSize = size;
         ctx.newPage = false;
-        if (ctx.budgetTw > 0 && ctx.flowTw + beforeTw + lineTw > ctx.budgetTw) {
-            beforeTw = Math.max(0, ctx.budgetTw - ctx.flowTw - lineTw);
-        }
-        ctx.flowTw += beforeTw + lineTw;
 
         // A tab stop's position is measured from the page margin, NOT from the paragraph's own
         // indent - the section has zero margins, so the page margin is x=0 and a stop is the
@@ -1304,17 +1708,34 @@ public final class DocxWriter {
             }
         }
         int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
+        // A page's flow must end where the paper does. The gap above is clamped per line, but
+        // 43 of them add up, and a page whose flow overruns by a few points sends its last line
+        // - and every anchored shape after it - to a second sheet. Give up the gap first, then
+        // the slack in the last line's own box, and only then break the page.
+        int[] fit = fitPage(ctx, twScale(beforeTw, ctx.squeeze), twScale(lineTw, ctx.squeeze), b.size);
+        if (fit == null) {
+            // The page is full. Break it here, deliberately, and place this line as the first
+            // line of the new sheet: its own y decides its top gap, which is the same rule the
+            // page's first line follows.
+            breakPage(sb, ctx);
+            float topGap = b.y - LINE_BASE * linePt;
+            if (topGap > 0f) {
+                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
+            } else {
+                beforeTw = 0;
+                if (b.y > 0f) linePt = Math.min(linePt, Math.max(b.size, b.y / LINE_BASE));
+            }
+            lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
+            fit = fitPage(ctx, twScale(beforeTw, ctx.squeeze), twScale(lineTw, ctx.squeeze), b.size);
+            if (fit == null) fit = new int[]{0, lineTw};
+        }
+        beforeTw = fit[0];
+        lineTw = fit[1];
+        // The box the pitch solver compares next time is the page's own, not the squeezed one.
         ctx.lastLinePt = linePt;
         ctx.lastBaseline = b.y;
         ctx.lastSize = b.size;
         ctx.newPage = false;
-        // A page's flow must end where the paper does. The gap above is clamped per line, but
-        // 43 of them add up, and a page whose flow overruns by a few points sends its last line
-        // - and every anchored shape after it - to a second sheet. Give up the gap instead.
-        if (ctx.budgetTw > 0 && ctx.flowTw + beforeTw + lineTw > ctx.budgetTw) {
-            beforeTw = Math.max(0, ctx.budgetTw - ctx.flowTw - lineTw);
-        }
-        ctx.flowTw += beforeTw + lineTw;
         sb.append("<w:p><w:pPr>");
         if (p.heading > 0) {
             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
@@ -1408,8 +1829,9 @@ public final class DocxWriter {
      * 90-degree one at 90, and a stamp on a horizontal baseline goes out with no rotation at
      * all.
      *
-     * <p>Rotation is about the box's centre, so the offset stays the top-left of the unrotated
-     * box at the same centre: the text stays where the page put it.
+     * <p>Rotation is about the box's centre, so the offset is NOT the top-left of the box: it is
+     * solved for in {@link #anchorAt} so that the text's own origin lands on the page's, before
+     * and after the turn.
      */
     private static void anchor(StringBuilder sb, Ctx ctx, float xPt, float yTopPt,
                                float wPt, float hPt, String inner, float rotDeg) {
@@ -1422,17 +1844,164 @@ public final class DocxWriter {
      * <p>The outline used to be a separate Shape and the text a separate text box, each with
      * its own position arithmetic, and they drifted apart - the user's report is precise:
      * sometimes the outline shifts, sometimes the text inside it. Binding the outline to the
-     * box that holds the text makes that impossible: there is one object, one position, and
-     * the border is drawn around the text by the same shape that places it.
+     * box that holds the text removes that, but only where the outline really is the text's own
+     * box; a stamp's frame is not, and binding it there drew a thin rectangle round one line of
+     * the stamp instead of its frame. A stamp is written by {@link #frameOf} instead: the box is
+     * the page's rectangle and the text is placed inside it, so there is still one object and
+     * one geometry. Where an outline is neither, it is left to {@code shape()} and drawn from
+     * the page's own path, so its geometry is the page's own and there is no second position
+     * calculation to drift from.
      */
     private static void anchor(StringBuilder sb, Ctx ctx, float xPt, float yTopPt,
                                float wPt, float hPt, String inner, float rotDeg,
                                int borderRgb, float borderWpt) {
+        // No rotation on this path: the top-left of the unrotated box IS where the text's
+        // frame starts, and for rotDeg == 0 anchorAt reduces to exactly this.
+        anchorAt(sb, ctx, xPt, yTopPt, 0f, 0f, wPt, hPt, inner, rotDeg, borderRgb, borderWpt);
+    }
+
+    /**
+     * The rectangle the page drew around a rotated line, in the line's own frame.
+     *
+     * <p>A stamp's frame is a stroked, unfilled rectangle that shares the line's rotation, and
+     * the line's baseline origin sits inside it. That is the whole test: rotation, containment,
+     * four corners, no fill. Nothing is guessed from sizes, so a stamp's frame is found by what
+     * it is and not by how big it happens to be, and the largest such rectangle wins - a stamp
+     * drawn with a double rule has an inner rectangle too, and the inner one is not the frame.
+     *
+     * <p>The frame's own axes come from the LINE, not from the order the path happened to be
+     * drawn in. {@code u} is the direction the text advances and {@code v} is a quarter turn
+     * from it, so {@code lIns}/{@code tIns} below are the baseline's position along and across
+     * the reading direction - which is exactly what {@code bodyPr}'s insets mean once the box
+     * carries the same rotation.
+     */
+    private static final class Frame {
+        float cx, cy, w, h;
+        /** Where the baseline origin sits inside the rectangle, along and across the reading. */
+        float lIns, tIns;
+        Shape shape;
+    }
+
+    private static Frame frameOf(java.util.List<Shape> shapes, float px, float py, float angle) {
+        if (shapes == null) return null;
+        double th = Math.toRadians(angle);
+        double ux = Math.cos(th), uy = Math.sin(th);
+        double vx = -Math.sin(th), vy = Math.cos(th);
+        Frame best = null;
+        float bestArea = 0f;
+        for (Shape s : shapes) {
+            if (s.fillRgb >= 0 || s.lineRgb < 0) continue;
+            java.util.List<float[]> pts = new ArrayList<>();
+            if (s.kind == 2 && s.freeform != null) {
+                for (float[] c : s.freeform) {
+                    int type = (int) c[0];
+                    if (type == 0 || type == 1) pts.add(new float[]{c[1], c[2]});
+                    else if (type == 2) pts.add(new float[]{c[c.length - 2], c[c.length - 1]});
+                }
+            } else if (s.kind == 0) {
+                // A rectangle drawn with `re` comes through as a preset box, which carries no
+                // rotation - so it is only usable where its bounding box IS the rectangle,
+                // i.e. where the page turned it by a whole quarter turn. 04's 180-degree frame
+                // is exactly that case, and it is the only one in the corpus.
+                double c = Math.abs(Math.cos(th));
+                if (c > 0.02 && c < 0.98) continue;
+                pts.add(new float[]{s.xPt, s.topPt});
+                pts.add(new float[]{s.xPt + s.wPt, s.topPt});
+                pts.add(new float[]{s.xPt + s.wPt, s.topPt + s.hPt});
+                pts.add(new float[]{s.xPt, s.topPt + s.hPt});
+            } else {
+                continue;
+            }
+            if (pts.size() != 4) continue;
+            double cx = 0, cy = 0;
+            for (float[] p : pts) { cx += p[0]; cy += p[1]; }
+            cx /= 4.0; cy /= 4.0;
+            // A rectangle's corners are the furthest points along its own axes, so the extents
+            // come straight out of the four corners and no edge order is needed.
+            float w = 0f, h = 0f;
+            for (float[] p : pts) {
+                w = Math.max(w, 2f * (float) Math.abs((p[0] - cx) * ux + (p[1] - cy) * uy));
+                h = Math.max(h, 2f * (float) Math.abs((p[0] - cx) * vx + (p[1] - cy) * vy));
+            }
+            if (w < 8f || h < 4f) continue;
+            // The shape has to share the line's rotation. Its longest edge is the one along the
+            // reading direction for every stamp in the corpus; for a frame that is taller than
+            // it is wide that is the edge the text runs down.
+            double ex = 0, ey = 0, el = 0;
+            for (int i = 0; i < 4; i++) {
+                float[] p = pts.get(i), q = pts.get((i + 1) % 4);
+                double dx = q[0] - p[0], dy = q[1] - p[1], len = Math.hypot(dx, dy);
+                if (len > el) { el = len; ex = dx / len; ey = dy / len; }
+            }
+            if (el <= 0 || Math.abs(ex * ux + ey * uy) < 0.985) continue;
+            double p0x = cx - (w / 2.0) * ux - (h / 2.0) * vx;
+            double p0y = cy - (w / 2.0) * uy - (h / 2.0) * vy;
+            double lIns = (px - p0x) * ux + (py - p0y) * uy;
+            double tIns = (px - p0x) * vx + (py - p0y) * vy;
+            if (lIns < -2.0 || lIns > w + 2.0 || tIns < -2.0 || tIns > h + 2.0) continue;
+            if (w * h > bestArea) {
+                bestArea = w * h;
+                best = new Frame();
+                best.cx = (float) cx; best.cy = (float) cy;
+                best.w = w; best.h = h;
+                best.lIns = (float) lIns; best.tIns = (float) tIns;
+                best.shape = s;
+            }
+        }
+        return best;
+    }
+
+    /**
+     * An anchored text box whose local point (lx, ly) lands on the page point (pageX, pageY)
+     * once the box has been rotated by {@code rotDeg} about its own centre.
+     *
+     * <p>{@code <a:xfrm rot>} turns the box about its CENTRE, so the offset written in
+     * {@code wp:positionH/V} is not where the text starts - it is where the unrotated box's
+     * top-left would be. Writing the line's origin there therefore moves the text by
+     * {@code R(rot) . (L - centre)} as soon as the box is turned, which is 135 pt on file 01 and
+     * the reason a rotated stamp never sat where the page drew it. The offset is solved for
+     * here instead:
+     *
+     * <pre>  off = P - centre - R(rot) . (L - centre)  </pre>
+     *
+     * <p>with R the clockwise rotation the {@code rot} attribute means in a frame whose y counts
+     * down the page. For {@code rotDeg == 0} this is exactly {@code P - L}, so an unrotated box
+     * is placed where it always was.
+     *
+     * <p>Both renderers then agree on where the text STARTS: Word draws the run along the rotated
+     * baseline from that point, LibreOffice rotates the frame but not the glyphs and draws them
+     * horizontally from that same point (see D-16 in REMAINING-DEFECTS.md - Writer has no
+     * arbitrary text rotation, in any OOXML spelling). The anchor is the same in both, so the
+     * measurement below is a measurement of the geometry and not of one renderer's bug.
+     */
+    private static void anchorAt(StringBuilder sb, Ctx ctx, float pageX, float pageY,
+                                 float lx, float ly, float wPt, float hPt, String inner,
+                                 float rotDeg, int borderRgb, float borderWpt) {
+        anchorAt(sb, ctx, pageX, pageY, lx, ly, wPt, hPt, inner, rotDeg, borderRgb, borderWpt,
+                0f, 0f);
+    }
+
+    /**
+     * The same, with the text placed inside the box by its insets rather than at its corner.
+     *
+     * <p>This is what makes a stamp one object. The box IS the rectangle the page drew, its
+     * border IS the page's stroke, and the text is put where the page put it inside that
+     * rectangle - so there is one geometry and no second position calculation to drift from.
+     */
+    private static void anchorAt(StringBuilder sb, Ctx ctx, float pageX, float pageY,
+                                 float lx, float ly, float wPt, float hPt, String inner,
+                                 float rotDeg, int borderRgb, float borderWpt,
+                                 float lInsPt, float tInsPt) {
+        double th = Math.toRadians(rotDeg);
+        double cos = Math.cos(th), sin = Math.sin(th);
+        double dx = lx - wPt / 2.0, dy = ly - hPt / 2.0;
+        float offXpt = (float) (pageX - wPt / 2.0 - (cos * dx - sin * dy));
+        float offYpt = (float) (pageY - hPt / 2.0 - (sin * dx + cos * dy));
         int id = ctx.shapeSeq++;
         long cx = Math.max(1, Math.round(wPt * EMU_PER_PT));
         long cy = Math.max(1, Math.round(hPt * EMU_PER_PT));
-        long offX = Math.round(xPt * EMU_PER_PT);
-        long offY = Math.round(yTopPt * EMU_PER_PT);
+        long offX = Math.round(offXpt * EMU_PER_PT);
+        long offY = Math.round(offYpt * EMU_PER_PT);
         int relHeight = 251658240 + (id & 0xFFFF);
 
         sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
@@ -1484,7 +2053,10 @@ public final class DocxWriter {
                 .append("<wps:txbx><w:txbxContent>").append(inner).append("</w:txbxContent></wps:txbx>")
                 // wrap="none": the box must not re-wrap the line it holds, or a long line
                 // would break at the box width and the second half would land under the first.
-                .append("<wps:bodyPr wrap=\"none\" lIns=\"0\" tIns=\"0\" rIns=\"0\" bIns=\"0\"")
+                .append("<wps:bodyPr wrap=\"none\" lIns=\"")
+                .append(Math.round(lInsPt * EMU_PER_PT)).append("\" tIns=\"")
+                .append(Math.round(tInsPt * EMU_PER_PT))
+                .append("\" rIns=\"0\" bIns=\"0\"")
                 .append(" anchor=\"t\" anchorCtr=\"0\"><a:noAutofit/></wps:bodyPr>")
                 .append("</wps:wsp></a:graphicData></a:graphic>")
                 .append("</wp:anchor></w:drawing></w:r></w:p>");
@@ -1499,34 +2071,32 @@ public final class DocxWriter {
      * place the text and destroy the table, which is the one thing a conversion must not do.
      */
     /**
-     * The table's borders, as the page drew them.
+     * The table's borders: one weight and one colour, on every ruled table.
      *
-     * <p>A ruled table gets the single hairline the page's own edges stand for. An unruled one
-     * gets the same six slots set to "none" rather than no w:tblBorders element at all: absent
-     * borders fall back to the table style, and the default style draws a box, which is exactly
-     * the box 403 and 406 were carrying.
+     * <p>Every side the page drew a rule on gets the one hairline every ruled table gets; every
+     * side it did not gets "none" - never no w:tblBorders element at all, because absent borders
+     * fall back to the table style and the default style draws a box, which is exactly the box
+     * 403 and 406 were carrying. The four outer sides are {@code outer}, the row separators
+     * {@code innerH} and the column separators {@code innerV}; a table the ruled pass found has
+     * all three, because there the bounds ARE the drawn grid.
+     *
+     * <p>The weight used to be read off the stroke the page drew (c47efc2), so one corpus
+     * carried sz 3, 4, 5, 6, 8 and 10 at once: a table ruled at 0.5 pt came out heavier than
+     * one ruled at 1.25 pt, and the user's verdict was that table lines must not be thick in
+     * one place and thin in another. 23_timetable_grid_txtpos is the document they called
+     * correct, and every one of its borders is sz="6" in 000000 - so that is the single
+     * weight and the single colour. It is also the weight {@link #TABLE_BORDER_TW} is measured
+     * from, so the row pitch the writer asks for stays true.
      */
-    private static String borders(boolean ruled) {
-        return borders(ruled, 0.75f, 0x999999);
-    }
-
-    /**
-     * The table's borders, at the weight and colour the page drew them.
-     *
-     * <p>Every ruled table used to get a 0.75 pt grey hairline on all six sides whatever the page
-     * drew, so a table ruled at 0.5 pt came out heavy, one at 1.5 pt came out thin, and a black
-     * rule came out grey. That is the inconsistency the user reports.
-     *
-     * <p>{@code w:sz} is in eighths of a point: a 0.5 pt rule is sz="4", a 1 pt rule sz="8".
-     */
-    private static String borders(boolean ruled, float widthPt, int rgb) {
-        String v = ruled ? "single" : "none";
-        int sz = Math.max(2, Math.min(48, Math.round(widthPt * 8f)));
-        String colour = String.format("%06X", rgb & 0xFFFFFF);
+    private static String borders(boolean outer, boolean innerH, boolean innerV) {
         StringBuilder b = new StringBuilder("<w:tblBorders>");
-        for (String side : new String[]{"top", "left", "bottom", "right", "insideH", "insideV"}) {
-            b.append("<w:").append(side).append(" w:val=\"").append(v).append("\"");
-            if (ruled) b.append(" w:sz=\"").append(sz).append("\" w:color=\"").append(colour).append("\"");
+        for (String side : TABLE_SIDES) {
+            boolean drawn = "insideH".equals(side) ? innerH
+                    : "insideV".equals(side) ? innerV
+                    : outer;
+            b.append("<w:").append(side).append(" w:val=\"").append(drawn ? "single" : "none").append("\"");
+            if (drawn) b.append(" w:sz=\"").append(TABLE_RULE_SZ)
+                    .append("\" w:color=\"").append(TABLE_RULE_COLOUR).append("\"");
             else b.append(" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"");
             b.append("/>");
         }
@@ -1534,17 +2104,41 @@ public final class DocxWriter {
     }
 
     /**
-     * The stroke the page drew along this table's own edges.
-     *
-     * <p>Finds the stroke-only shapes that lie on one of the table's four sides and returns the
-     * median width and the most common colour, or null when nothing lies there. The median
-     * rather than the mean, so one stray rule from a neighbouring box cannot move the border.
+     * The one weight every ruled table is drawn at, in eighths of a point: 6/8 pt = 0.75 pt.
+     * See {@link #borders} for why this is a constant and not the page's own stroke.
      */
-    private static float[] edgeStroke(PdfToWord.Table t, java.util.List<Shape> shapes) {
-        if (shapes == null || shapes.isEmpty()) return null;
-        java.util.List<Float> widths = new ArrayList<>();
-        java.util.Map<Integer, Integer> colours = new java.util.HashMap<>();
+    private static final int TABLE_RULE_SZ = 6;
+    /** The one colour every ruled table is drawn in: black, as 23_timetable has it. */
+    private static final String TABLE_RULE_COLOUR = "000000";
+    /** The six sides a {@code w:tblBorders} element carries. */
+    private static final String[] TABLE_SIDES =
+            {"top", "left", "bottom", "right", "insideH", "insideV"};
+
+    /**
+     * Did the page draw a rule on this table?
+     *
+     * <p>Two shapes say yes. A stroke lying along one of the table's four sides - the grid the
+     * ruled pass reads, which puts the rule on the cell boundary itself.
+     *
+     * <p>And a stroke-only box that frames the table. The whitespace pass measures a table's
+     * bounds from its TEXT, so the frame the page draws round it is not on those bounds: on
+     * 04_stamp_180deg the box round the first table starts 8.3 pt left of the table's first
+     * character, 14.3 pt above its first row and 96.1 pt right of its last, because the last
+     * column's text stops short of the drawn right edge. No edge test with a 2.5 pt tolerance
+     * can see that box, which is why the document came out with all six sides "none" while the
+     * page drew a full grid.
+     *
+     * <p>The frame counts only when it follows the table - the table covers at least half the
+     * frame's width and half its height - so a page border, or a box a table merely sits inside,
+     * is not read as a table rule. Measured on the 208-document corpus: 29 tables that the
+     * whitespace pass found inside a frame the page drew are ruled by this test, and the four
+     * documents whose frame is not a table rule (406's passport frame, 351's OMR sheet, 363's
+     * warranty card, 364's ticket) keep the "none" they have today.
+     */
+    private static boolean pageDrewRule(PdfToWord.Table t, java.util.List<Shape> shapes) {
+        if (shapes == null || shapes.isEmpty()) return false;
         float tol = 2.5f;
+        float tw = t.right - t.left, th = t.bottom - t.top;
         for (Shape s : shapes) {
             if (s.lineRgb < 0 || s.fillRgb >= 0) continue;
             boolean onTop = Math.abs(s.topPt - t.top) <= tol
@@ -1555,19 +2149,14 @@ public final class DocxWriter {
                     && s.topPt <= t.bottom + tol && s.topPt + s.hPt >= t.top - tol;
             boolean onRight = Math.abs(s.xPt + s.wPt - t.right) <= tol
                     && s.topPt <= t.bottom + tol && s.topPt + s.hPt >= t.top - tol;
-            if (!(onTop || onBottom || onLeft || onRight)) continue;
-            widths.add(Math.max(0.1f, s.lineWidthPt));
-            int c = s.lineRgb & 0xFFFFFF;
-            colours.put(c, colours.getOrDefault(c, 0) + 1);
+            if (onTop || onBottom || onLeft || onRight) return true;
+            // A rule, not a frame: a hairline band cannot be the box a table sits in.
+            if (s.wPt < 8f || s.hPt < 8f) continue;
+            boolean encloses = t.top >= s.topPt - tol && t.bottom <= s.topPt + s.hPt + tol
+                    && t.left >= s.xPt - tol && t.right <= s.xPt + s.wPt + tol;
+            if (encloses && tw >= s.wPt * 0.5f && th >= s.hPt * 0.5f) return true;
         }
-        if (widths.isEmpty()) return null;
-        java.util.Collections.sort(widths);
-        float median = widths.get(widths.size() / 2);
-        int best = 0, bestCount = -1;
-        for (java.util.Map.Entry<Integer, Integer> e : colours.entrySet()) {
-            if (e.getValue() > bestCount) { bestCount = e.getValue(); best = e.getKey(); }
-        }
-        return new float[]{median, best};
+        return false;
     }
 
     private static void table(StringBuilder sb, PdfToWord.Table t, Ctx ctx) {
@@ -1635,6 +2224,7 @@ public final class DocxWriter {
             }
         }
         if (spacerTw > 0) {
+            spacerTw = twScale(spacerTw, ctx.squeeze);
             sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
                     .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
                     .append(spacerTw)
@@ -1660,19 +2250,25 @@ public final class DocxWriter {
         // the closing-balance sentence beside the ledger was squeezed into a five-line
         // column. The flow is the document now, so the table belongs in it and the text keeps
         // the indents the PDF drew.
-        // The stroke the page drew on this table's own edges, or null when it drew none.
-        float[] stroke = edgeStroke(t, ctx.curShapes);
+        // The page's own rules decide whether this table is ruled, not the flag alone. A table
+        // found by the whitespace pass carries ruled=false, so all six borders were written as
+        // "none" - and a box the page closed on four sides came out with no sides at all. That
+        // is the missing line on 04_stamp_180deg, whose grid the page draws round every table.
+        // The same answer decides the row height, because a rule that is drawn is a rule the
+        // renderer adds to the row, and {@link #TABLE_BORDER_TW} is that rule's height.
+        boolean ruledTable = t.ruled || pageDrewRule(t, ctx.curShapes);
         inner.append("<w:tbl><w:tblPr>")
                 .append("<w:tblW w:w=\"").append(totalTw).append("\" w:type=\"dxa\"/>")
                 .append("<w:tblInd w:w=\"").append(tw(x0)).append("\" w:type=\"dxa\"/>")
-                .append(borders(
-                        // The page's own stroke decides whether this table is ruled, not the
-                        // flag alone. A table found by the whitespace pass carries ruled=false,
-                        // so all six borders were written as "none" - and a box the page closed
-                        // on four sides came out with no sides at all. That is the missing line.
-                        (stroke == null ? t.ruled : true),
-                        (stroke == null ? 0.75f : stroke[0]),
-                        (stroke == null ? 0x999999 : (int) stroke[1])))
+                // Each side on its own evidence. The ruled pass reads the grid itself, so its
+                // tables are ruled all over; a whitespace table has a frame round it (the four
+                // outer sides) and separators inside it only where the page drew them. A table
+                // with no frame at all keeps all six "none" even when a rule crosses its band:
+                // that rule is as likely the edge of a filled band as a drawn separator, and a
+                // line the page did not draw is the defect 403 and 406 came back with.
+                .append(borders(ruledTable,
+                        ruledTable && (t.ruled || t.innerH),
+                        ruledTable && (t.ruled || t.innerV)))
                 .append("<w:tblLayout w:type=\"fixed\"/>")
                 // Word's default cell margin is 0.19 cm (108 twips) on each side. Left at the
                 // default, every cell's text sat 6 pt right of where the page had it - a
@@ -1710,7 +2306,7 @@ public final class DocxWriter {
         // borders - 19.2 pt pitch with them, 18.4 pt without, against the page's own 18.4 pt,
         // and the 0.8 pt a row of that table drifted by is the 38 rows of a page losing a sheet
         // to nothing but its own rules. An unruled table draws no rule and keeps its full pitch.
-        if (rowTw > 0 && t.ruled) rowTw = Math.max(1, rowTw - TABLE_BORDER_TW);
+        if (rowTw > 0 && ruledTable) rowTw = Math.max(1, rowTw - TABLE_BORDER_TW);
         // The exact line height inside a cell was 200 twips - 10 pt - for every cell of every
         // table in every document. A price list drawn at 5.8 pt on an 8.4 pt row pitch got a
         // 10 pt line, so each of its 29 rows grew 1.6 pt taller than the page drew it and the
@@ -1767,9 +2363,20 @@ public final class DocxWriter {
                         && t.sizes.get(r).get(q) != null ? t.sizes.get(r).get(q) : 0f;
                 if (sz > 0f) rowLineTw = Math.max(rowLineTw, (int) Math.round(sz * 1.25f * TWIPS_PER_PT));
             }
+            // A table is part of the page's height, so a squeezed page squeezes it too - but
+            // never below the type it holds: a row that shrinks past its own text is a row whose
+            // text is clipped, and the reader cannot read the page that was saved. rowLineTw
+            // already carries the type-size floor, so the floor is taken before the scaling and
+            // the scaled row is held at it.
+            int typeFloorTw = rowLineTw;
+            int rowHeightTw = Math.max(rowTw, rowLineTw);
+            if (ctx.squeeze != 1f) {
+                rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
+                rowLineTw = Math.max(typeFloorTw, twScale(rowLineTw, ctx.squeeze));
+            }
             inner.append("<w:tr>");
             if (rowTw > 0) {
-                inner.append("<w:trPr><w:trHeight w:val=\"").append(Math.max(rowTw, rowLineTw))
+                inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
                      .append("\" w:hRule=\"atLeast\"/><w:cantSplit/></w:trPr>");
             }
             int c = 0;
@@ -1911,7 +2518,11 @@ public final class DocxWriter {
         // The table is part of the flow too. Left out of the accounting, the paragraph after it
         // was spaced from the last line BEFORE the table, so a table's whole height was added
         // on top of the next paragraph's gap and the flow ran long.
-        ctx.flowTw += (int) Math.round(Math.max(0f, extentPt) * TWIPS_PER_PT) + POST_TABLE_TW;
+        // Charged as the page will write it: the extent through the squeeze, because the rows
+        // above were written through it too. A charge that ignores the squeeze is a page that
+        // believes it has room it does not have.
+        ctx.flowTw += twScale((int) Math.round(Math.max(0f, extentPt) * TWIPS_PER_PT), ctx.squeeze)
+                + POST_TABLE_TW;
         ctx.lastBaseline = t.bottom;
         ctx.lastSize = 0f;
         // The table's bottom edge is where its content ended, not a baseline inside a line box,
