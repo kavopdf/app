@@ -3323,3 +3323,43 @@ Two consequences, both followed this run:
 2. The baseline must **not** be re-recorded to make it match. Re-recording it here would launder
    the environment difference into the ratchet and hide a real regression later. It is left
    alone, and the position numbers in this entry are the same-sandbox comparison instead.
+
+
+### D-21  A one-page PDF comes back as two pages in Google Docs
+
+**Reported from the phone on 3.53.1:** `01_stamp_rotated_15deg_upright` and
+`04_stamp_180deg_upside_down` are one page in the PDF and two in the .docx. The user says it
+happens on many documents, not those two.
+
+**Measured.** Rendering the generated files with LibreOffice gives one page for both - which is why
+this was never caught here. The flow's own arithmetic says otherwise:
+
+    01_stamp   w:line total 800 pt  +  w:before total 477 pt  = 1277 pt   page 841.9 pt
+    04_stamp   w:line total 533 pt  +  w:before total 493 pt  = 1026 pt   page 841.9 pt
+
+The flow is 51 % and 22 % taller than the page. LibreOffice squeezes it; Google Docs does not, and
+starts a second page.
+
+**Where the excess is, in 01_stamp:**
+
+    #67  before=258.7 pt  line=9.2  "SF/2025-26/0417 ... Page 1"   the footer
+    # 0  before= 49.3 pt  line=18.4 "SUNRISE FASTENERS PVT LTD"
+    #66  before= 28.8 pt  line=9.2  "Authorised Signatory"
+    # 4  before= 24.5 pt  line=12.1 "TAX INVOICE"
+    # 7  before= 22.6 pt  line=9.2  "BILL TO SHIP TO"
+    #65  before= 19.4 pt  line=9.2
+    # 5  before= 17.3 pt  line=10.3
+
+Those seven carry 420.6 pt of the 477. The other 74 paragraphs carry 57 pt between them.
+
+**The shape of the bug.** `w:line` is already the page's own pitch - 37 paragraphs in 01 carry
+`w:line=14` for 9 pt text - and `w:before` is added on top of it. Where the page put two blocks a
+real distance apart, `before` is right; where a line simply sits on the next pitch, `before` must be
+zero and is not always. The flow therefore spends more vertical space than the page has.
+
+**The target.** Sum of `w:before + w:line` over a page must not exceed the page height. Anything
+that would push it over is a positioning error, not a page to add.
+
+**Tries: 0 of 3.** Root cause measured; not started. The two subagent reports behind this are in
+`/scratch/output/` as the white-patch, stamp, section and border work proceeds.
+
