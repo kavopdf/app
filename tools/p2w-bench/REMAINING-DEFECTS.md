@@ -1694,7 +1694,32 @@ slightly offset. A shadow is drawn in a different colour, usually grey or black 
 coloured fill. So the rule has to compare colour as well as position, and that needs
 measuring against both 38 and text-held-twice-shadow-text before it can ship.
 
-**Tries: 1 of 3** for D-10.
+**Tries: 3 of 3. NOT FIXED — every attempt was rejected by the gate.**
+
+All three were measured on the full 208, and the gate decided each one. None shipped.
+
+| Try | Rule | Result |
+|---|---|---|
+| 1 | identical text + same position (y within size/4) | fixed both targets, but **lost 76 words** from text-held-twice-shadow-text and 10 from 38 |
+| 2 | + same colour | identical result - the shadow is drawn in the same default black, so colour does not separate them |
+| 3 | identical text + **y within 0.3 pt** + x within size/4 | shadow loss fell from 76 to **8**; 38 still loses 10 |
+
+Try 3 is close and is the right direction: a faux-bold copy is the same glyphs nudged
+sideways, so its baseline does not move, while a shadow is offset diagonally. A 0.3 pt window
+still catches some of the shadow, and 38 still loses text for a reason none of the three rules
+explain - it loses 10 words under every variant, which suggests its loss is not the dedupe at
+all but something the extra pass disturbs downstream.
+
+**What would be needed to close it:** instrument the offsets actually present in 38 and in
+text-held-twice-shadow-text - dump every pair of identical-text lines with their dx, dy, colour
+and size - and choose the window from that data rather than from a guess. Three guesses have now
+been measured and all three were wrong; the fourth should be read off the document.
+
+**Status: CLOSED-UNFIXABLE for this pass.** The defect stays open in the sense that 2 documents
+still read a doubled line, but the tries are spent and the next attempt needs the instrumentation
+above, not another guess.
+
+
 
 
 
