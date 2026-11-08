@@ -5260,11 +5260,20 @@ public final class PdfToWord {
         while (i < rows.size()) {
             if (rows.get(i).size() < 2) { i++; continue; }
             int j = i + 1;
+            // End the run at a loose pair instead of rejecting the whole run. tightRows asked
+            // the spacing question of the entire run, so on a fee receipt - where the key/value
+            // fields sit 26 pt and 32 pt above an 18 pt item grid - the page was one run and one
+            // loose pair above the grid discarded the invoice with it.
             while (j < rows.size() && rows.get(j).size() >= 2
-                    && alignedStart(rows.get(i), rows.get(j))) j++;
-            if (j - i >= 3 && shortCells(rows, i, j) && tightRows(rows, i, j)) {
+                    && alignedStart(rows.get(i), rows.get(j))
+                    && rowGapOk(rows, j - 1, j)) j++;
+            if (j - i >= 3 && shortCells(rows, i, j)) {
                 Table t = keyValuePanels(buildRowTable(rows, i, j));
-                if (t != null) out.add(t);
+                // Every word of the lines the table covers must survive in its cells. A false
+                // table claims lines and then does not write them - the one failure mode a
+                // percentage guard cannot see. Measured: a genuine space-aligned invoice loses
+                // 0 of 216 tokens, while two false tables lost 5 of 223 and 36 of 760.
+                if (t != null && wordsSurvive(t, coveredLines(rows, i, j))) out.add(t);
             }
             i = Math.max(j, i + 1);
         }
@@ -5643,6 +5652,47 @@ public final class PdfToWord {
      * <p>Separate boxes placed on a page also line up in a grid, but they are spread out over
      * the page; a table's rows follow one another at roughly the line spacing.
      */
+    /** True when the vertical gap between two neighbouring rows is a table's, not a page's. */
+    private static boolean rowGapOk(List<List<Line>> rows, int a, int b) {
+        float gap = rows.get(b).get(0).y - rows.get(a).get(0).y;
+        float size = rows.get(a).get(0).size;
+        return gap <= Math.max(size * 2.4f, 16f);
+    }
+
+    /** Every line the rows from..to cover, for the word-survival check. */
+    private static List<Line> coveredLines(List<List<Line>> rows, int from, int to) {
+        List<Line> out = new ArrayList<>();
+        for (int r = from; r < to; r++) out.addAll(rows.get(r));
+        return out;
+    }
+
+    /**
+     * True when every word of the given lines survives somewhere in the table's cells.
+     *
+     * <p>A multiset, not an order check: cutting a line at its gaps, joining pieces, a list
+     * marker on its own line and a panel read key by key all survive it. Only a word that is
+     * genuinely lost rejects the table.
+     */
+    private static boolean wordsSurvive(Table t, List<Line> lines) {
+        java.util.Map<String, Integer> want = new java.util.HashMap<>();
+        for (Line l : lines) { if (!l.rotated) addWords(want, l.text); }
+        if (want.isEmpty()) return true;
+        java.util.Map<String, Integer> got = new java.util.HashMap<>();
+        for (List<String> row : t.rows) for (String cell : row) addWords(got, cell);
+        for (java.util.Map.Entry<String, Integer> e : want.entrySet()) {
+            Integer have = got.get(e.getKey());
+            if (have == null || have < e.getValue()) return false;
+        }
+        return true;
+    }
+
+    private static void addWords(java.util.Map<String, Integer> into, String text) {
+        if (text == null) return;
+        for (String w : text.trim().split("\\s+")) {
+            if (!w.isEmpty()) into.put(w, into.getOrDefault(w, 0) + 1);
+        }
+    }
+
     private static boolean tightRows(List<List<Line>> rows, int from, int to) {
         for (int r = from; r + 1 < to; r++) {
             float gap = rows.get(r + 1).get(0).y - rows.get(r).get(0).y;
