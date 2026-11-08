@@ -1243,7 +1243,15 @@ public final class DocxWriter {
                 .append("<w:r><w:drawing>")
                 .append("<wp:anchor distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"")
                 .append(" simplePos=\"0\" relativeHeight=\"").append(relHeight).append("\"")
-                .append(" behindDoc=\"0\" locked=\"0\" layoutInCell=\"1\" allowOverlap=\"1\">")
+                // behindDoc="1": a stamp is a mark ON the paper, not a lid over it. In front, the
+                // box pushed the table text aside and the stamp's own text landed across the
+                // totals column - which is what the user's screenshot shows. Behind, the page's
+                // text flows over it as it does in the PDF, which is where the stamp was drawn.
+                //
+                // This alone does NOT make a rotated stamp look right: LibreOffice ignores
+                // <a:xfrm rot> on a text box, so the 180-degree stamp still comes out upright.
+                // It is a correct change on its own account, not the fix. See D-13.
+                .append(" behindDoc=\"1\" locked=\"0\" layoutInCell=\"1\" allowOverlap=\"1\">")
                 .append("<wp:simplePos x=\"0\" y=\"0\"/>")
                 .append("<wp:positionH relativeFrom=\"page\"><wp:posOffset>").append(offX)
                 .append("</wp:posOffset></wp:positionH>")
