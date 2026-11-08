@@ -460,3 +460,73 @@ and neither number says WHICH column moved or that a box is gone. 60's date land
 smudge under the row rule; the row diff found it in one line. And 58 in reverse: the eye recorded
 a missing footer rule that is there, 0.4 pt of grey the side-by-side image does not show. Both
 directions of error, in one batch, on the same run.
+
+## b80 batch 4 (61-80), 8 Nov
+
+Twenty documents, thirty pages, every page opened. Ten pass, ten fail. The batch is one
+class of defect seen ten times: a page whose body is set in two or three columns comes out
+as a single flow, so the second column is appended below the first and the page spills.
+
+| Document | pages | verdict | what was found |
+|---|---|---|---|
+| 61_two_col_abstract_spanning | 1 | PASS | two columns held; order 52.9 % is row banding, not the page |
+| 62_two_col_newsletter_pull_quote | 1 | FAIL | masthead's date is its own paragraph, whole page +28.0 pt |
+| 63_three_column_brochure | 1 -> 2 | FAIL | three columns stacked, +29.5 pt from the top |
+| 64_newspaper_uneven_columns_ad_boxes | 1 -> 5 | FAIL | columns become a three-column table of fragments |
+| 65_two_col_full_width_figure_caption | 1 -> 2 | FAIL | chart taken apart, caption 168.0 pt low |
+| 66_two_col_footnotes_bottom | 1 | PASS | two columns and footnotes at the page foot |
+| 67_two_col_with_sidebar | 1 -> 2 | FAIL | sidebar box lost, its text 355.4 pt low |
+| 68_journal_wide_table_spanning | 1 | PASS | two columns and the full-width table |
+| 69_two_col_legal_numbered_clauses | 1 | FAIL | clause number on its own baseline, +12.0 pt |
+| 70_magazine_drop_cap_photo_caption | 1 | FAIL | masthead and strapline are two paragraphs, +13.5 pt |
+| 71_invoice_space_aligned_no_rules | 1 | PASS | borderless table, columns and amounts right |
+| 72_bank_statement_no_rules_right_amounts | 1 | PASS | thirty rows on the page baselines |
+| 73_marksheet_subject_marks_grade | 1 | PASS | eight rows, marks and grades in their columns |
+| 74_balance_sheet_indented_subitems | 1 | PASS | indent hierarchy and both figure columns held |
+| 75_merged_header_cell_three_columns | 1 -> 2 | FAIL | merged header becomes an empty band and adds a column |
+| 76_devanagari_table | 1 | PASS | Devanagari shapes, table and notices on the page rows |
+| 77_arabic_rtl_document | 1 -> 2 | FAIL | invoice number split at its slashes, table columns reversed |
+| 78_mixed_english_devanagari_line | 1 -> 2 | FAIL | Latin and Devanagari runs split onto four baselines |
+| 79_inr_indian_digit_grouping_table | 1 | PASS | Indian grouping held in the table and the words line |
+| 80_gstin_pan_cin_ifsc_table | 1 | PASS | five dealer boxes with their rules |
+
+### What changed in the code
+
+`sameRow()` refused to join two fields on one baseline unless they were set within 30 % of
+each other's size. A masthead and the date beside it, a letterhead and its strapline, a
+price list's heading and its note are all rows at two sizes, so the smaller field was never
+joined, became a paragraph of its own, and landed a whole line box lower than the page drew
+it - taking every line after it. The test is now `ROW_SIZE_RATIO = 2.5`, with
+`ROW_FIELD_GAP_PT = 12` of white space required once the two differ by more than
+`ROW_SIZE_SAME = 1.3`, so a table's two cells are not joined on a size difference. What
+makes a row is a shared baseline; that is tested, and size is not what makes a row.
+
+Measured on the 208-document corpus, rendered and matched line by line:
+
+| Document | lines on the page before | after |
+|---|---|---|
+| eway-bill | 1 / 129, 2 pages | 33 / 129, 1 page |
+| table-across-page-break-repeated-header | 3 / 468 | 194 / 468 |
+| very-long-single-column-table | 3 / 513, 6 pages | 129 / 513, 3 pages - the PDF's own count |
+| table-with-no-header-row | 1 / 215 | 67 / 215 |
+| two-tables-stacked-with-no-gap | 1 / 72 | 48 / 72 |
+| one-page-rotated-180-degrees | 1 / 122 | 43 / 122 |
+| landscape-page-inside-portrait-document | 1 / 122 | 17 / 122 |
+| table-with-merged-cells | 3 / 86, 2 pages | 3 / 86, 1 page |
+
+Fifteen documents lost a line count and none of them lost a word: `missing` and `extra`
+were unchanged on all 208. That exposed the second fault, in the gate itself - see
+`gate.py`'s `lines` rule in REMAINING-DEFECTS.md. G2 across 208 after the repair: no
+document got worse, one improved, fifteen joined.
+
+### What the eye caught that no number did
+
+Ten documents in a row whose pages were never two columns. `reading order` reported 22.5 %
+to 62.5 % and never said the reason; 64's five sheets are the reason, and only opening the
+page shows a newspaper's three columns turned into a three-column table of fragments.
+
+### What the numbers caught that the eye missed
+
+Everything about 72, 73 and 74. At 130 dpi their tables read as overlapping rows and the
+eye called all three FAIL; cropped at 220 dpi the rows are clean and every figure is in its
+column. All three pass. The reverse of the usual error, in the same batch.

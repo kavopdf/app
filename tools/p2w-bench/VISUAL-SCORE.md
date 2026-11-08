@@ -288,3 +288,28 @@ reverted. See "Table height" in REMAINING-DEFECTS.md.
 | 2026-11-08 | 58_header_rule_footer_rule | PASS | header and footer rules both present; the eye missed the 0.4 pt footer rule at 130 dpi and the rule test was excluding a 1.2000000476 pt band |
 | 2026-11-08 | 59_landscape_mixed_portrait | PASS | portrait page and the landscape sheet with its five-row measurements table on the page rows |
 | 2026-11-08 | 60_page_border | FAIL | moved:Dr. S. Vedavathi 20.8 pt - the right signature block and the date are pushed down onto the seal's top arc |
+
+### b80 batch 4 (61-80), 8 Nov - the multi-column class
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-08 | 61_two_col_abstract_spanning | PASS | two columns and the spanning abstract box, 39 lines within 0.2 pt; order 52.9 % is a measurement blind spot - row banding counts a two-column page twice |
+| 2026-11-08 | 62_two_col_newsletter_pull_quote | FAIL | moved:Tank rehabilitation restores water to nine villages 28.0 pt - the masthead's right-hand date becomes its own paragraph and pushes the whole page down |
+| 2026-11-08 | 63_three_column_brochure | FAIL | moved:THE ESTATE 29.5 pt, pagecount 1 in and 2 out - three columns stacked into one flow |
+| 2026-11-08 | 64_newspaper_uneven_columns_ad_boxes | FAIL | pagecount 1 in and 5 out - three unequal columns become a three-column table of column fragments |
+| 2026-11-08 | 65_two_col_full_width_figure_caption | FAIL | moved:Figure 1 168.0 pt, pagecount 1 in and 2 out - the chart is taken apart and the two columns stacked |
+| 2026-11-08 | 66_two_col_footnotes_bottom | PASS | two columns, footnotes at the page foot, every line on the page coordinates; order 38.5 % is the same row-banding blind spot |
+| 2026-11-08 | 67_two_col_with_sidebar | FAIL | moved:COURSE AT A GLANCE 355.4 pt, pagecount 1 in and 2 out - the sidebar box is lost and its text joins the body flow |
+| 2026-11-08 | 68_journal_wide_table_spanning | PASS | two text columns and the full-width table on the page rows |
+| 2026-11-08 | 69_two_col_legal_numbered_clauses | FAIL | moved:The principal shall supply grey fabric 12.0 pt - each clause number sits on its own baseline above the clause |
+| 2026-11-08 | 70_magazine_drop_cap_photo_caption | FAIL | moved:The harvest that begins in the dark 13.5 pt - the masthead and its strapline are two paragraphs, so the strapline's box pushes the page down |
+| 2026-11-08 | 71_invoice_space_aligned_no_rules | PASS | borderless table with every column on the page column and the amounts right; order 94.3 % |
+| 2026-11-08 | 72_bank_statement_no_rules_right_amounts | PASS | thirty statement rows on the page baselines with the debit and credit columns kept |
+| 2026-11-08 | 73_marksheet_subject_marks_grade | PASS | eight subject rows on the page baselines, marks and grades in their columns |
+| 2026-11-08 | 74_balance_sheet_indented_subitems | PASS | indented sub-items keep their hierarchy and both figure columns |
+| 2026-11-08 | 75_merged_header_cell_three_columns | FAIL | moved:Yeshwanthpur 36.1 pt, pagecount 1 in and 2 out - the merged header cell becomes an empty band and adds a column |
+| 2026-11-08 | 76_devanagari_table | PASS | Devanagari shapes, five-row table and the notice paragraphs on the page rows |
+| 2026-11-08 | 77_arabic_rtl_document | FAIL | moved:2025 0884 38.0 pt, pagecount 1 in and 2 out - the invoice number is split at its slashes and the table's columns are reversed |
+| 2026-11-08 | 78_mixed_english_devanagari_line | FAIL | wraps:Amount paid - the Latin and Devanagari runs are split onto four baselines, pagecount 1 in and 2 out |
+| 2026-11-08 | 79_inr_indian_digit_grouping_table | PASS | four-row table with Indian digit grouping and the words line under it |
+| 2026-11-08 | 80_gstin_pan_cin_ifsc_table | PASS | five dealer boxes with their rules and both identifier columns on the page rows; order 92.3 % is the row-banding blind spot |
