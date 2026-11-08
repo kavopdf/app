@@ -1910,6 +1910,24 @@ public final class PdfToWord {
         float x, right, y, size, left;
         int column;
         boolean consumed;
+        /**
+         * The fields that stand on this line's own baseline in ANOTHER column.
+         *
+         * <p>A page places text at an absolute x and y, so an invoice's title and its company
+         * name are two runs at the same y and nothing more. A DOCX has flow: the writer can put
+         * both on one line with a tab stop at the measured x, but only if the model hands them
+         * over together. The column order separates them - every line of column 0, then every
+         * line of column 1 - so the title arrived after the whole left block and took a line of
+         * its own, pushing everything below it down the sheet.
+         *
+         * <p>Measured on gst-invoice-3line-items: 'TAX INVOICE' is at y=43.54 and the company
+         * name at y=42.38 on the same page, and the render put the title 50.1 pt lower.
+         * gst-invoice-multipage-item-table 107.1 pt, delivery-challan 107.1 pt, and
+         * itr-computation-with-slab-table 111.1 pt, all the same cause.
+         */
+        List<Line> rowMates;
+        /** True when this line was attached to another line's row and must not start one. */
+        boolean mate;
         /** True when this line was cut out of a longer one at a wide gap: it is its own line
          *  and must never be merged back into the paragraph above it. */
         boolean hardEnd;
@@ -2951,6 +2969,28 @@ public final class PdfToWord {
         List<Para> out = new ArrayList<>();
         if (lines.isEmpty()) return out;
 
+        // Fields on one baseline, before the column order can separate them. A row is a row
+        // whichever column its fields were put in, and the sort below is by column first, so
+        // without this the title of a page arrives after the whole left block instead of on
+        // the line the page drew it. Only a line in a DIFFERENT column is attached, and only
+        // when sameRow() already accepts the pair - that predicate holds the rule for what
+        // makes two fields one row (a wide gap, no rule between them, no paper between them),
+        // and it is the same predicate the grouping below uses, so nothing new is decided here.
+        if (!row) {
+            for (Line a : lines) {
+                if (a.rotated || a.mate) continue;
+                for (Line b : lines) {
+                    if (b == a || b.rotated || b.mate) continue;
+                    if (b.column == a.column) continue;
+                    if (b.x < a.x) continue;
+                    if (!sameRow(a, b, pageWidth, 0)) continue;
+                    if (a.rowMates == null) a.rowMates = new ArrayList<>();
+                    a.rowMates.add(b);
+                    b.mate = true;
+                }
+            }
+        }
+
         Collections.sort(lines, new Comparator<Line>() {
             @Override
             public int compare(Line a, Line b) {
@@ -2972,8 +3012,10 @@ public final class PdfToWord {
         List<Line> group = new ArrayList<>();
         for (Line line : lines) {
             if (line.text.trim().isEmpty()) continue;
+            if (line.mate) continue;
             if (group.isEmpty()) {
                 group.add(line);
+                addRowMates(group, line);
                 continue;
             }
             Line prev = group.get(group.size() - 1);
@@ -2985,10 +3027,36 @@ public final class PdfToWord {
                 out.add(buildPara(group, pageWidth, bands));
                 group = new ArrayList<>();
                 group.add(line);
+                addRowMates(group, line);
             }
         }
         if (!group.isEmpty()) out.add(buildPara(group, pageWidth, bands));
         return out;
+    }
+
+    /**
+     * Puts the fields standing on {@code line}'s baseline into the paragraph it starts.
+     *
+     * <p>Only a paragraph of one line takes mates: a paragraph that already flows over several
+     * baselines is prose, and a field from another column belongs beside its own line, not at
+     * the end of a sentence. That distinction is what D-07 lost when the fields were joined
+     * with a space - "Certificate under section 203 ... PART B" - instead of being written as
+     * a row. Here they stay separate lines of one group, so {@code buildPara} sorts them by x
+     * and the writer sets each at its own measured x with a tab stop.
+     */
+    private static void addRowMates(List<Line> group, Line line) {
+        if (group.size() != 1 || line.rowMates == null) return;
+        List<Line> mates = new ArrayList<>(line.rowMates);
+        Collections.sort(mates, new Comparator<Line>() {
+            @Override
+            public int compare(Line a, Line b) {
+                return Float.compare(a.x, b.x);
+            }
+        });
+        for (Line m : mates) {
+            m.mate = true;
+            group.add(m);
+        }
     }
 
     /** True when every line of the group stands on the same baseline. */
