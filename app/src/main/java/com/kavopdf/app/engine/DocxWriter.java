@@ -323,7 +323,42 @@ public final class DocxWriter {
             }
             ctx.curShapes = outlines;
             if (page.blocks.isEmpty()) continue;
+            // A page set in columns, with a full-width element in the middle of it, is more than
+            // one section: the columns before the element, the element, and the columns after it.
+            // Without the breaks the element is poured into a column like everything else.
+            //
+            // The carrier is a zero-height paragraph holding the sectPr, because a sectPr has to
+            // live in a pPr and a table cannot carry one. Measured on a prototype: a table with a
+            // carrier after it costs 2.9 pt and spans correctly.
+            float blockSpan = 0f;
+            for (Object bb : page.blocks) {
+                if (bb instanceof PdfToWord.Para) {
+                    PdfToWord.Para q = (PdfToWord.Para) bb;
+                    blockSpan = Math.max(blockSpan, q.right - q.left);
+                }
+            }
+            int curCols = page.columns;
             for (Object block : page.blocks) {
+                if (page.columns > 1 && blockSpan > 0f) {
+                    boolean full = false;
+                    if (block instanceof PdfToWord.Para) {
+                        PdfToWord.Para q = (PdfToWord.Para) block;
+                        full = q.right - q.left > blockSpan * 0.62f;
+                    } else if (block instanceof PdfToWord.Table) {
+                        PdfToWord.Table q = (PdfToWord.Table) block;
+                        full = q.right - q.left > blockSpan * 0.62f;
+                    }
+                    int want = full ? 1 : page.columns;
+                    if (want != curCols) {
+                        sb.append("<w:p><w:pPr><w:sectPr>")
+                          .append(sectPrXml(pw, ph, curCols, secGap))
+                          .append("<w:type w:val=\"continuous\"/></w:sectPr></w:pPr></w:p>");
+                        curCols = want;
+                        ctx.lastBaseline = -1f;
+                        ctx.newPage = false;
+                        ctx.flowTw = 0;
+                    }
+                }
                 if (block instanceof PdfToWord.Para) {
                     para(sb, (PdfToWord.Para) block, ctx);
                 } else if (block instanceof PdfToWord.Table) {
@@ -333,6 +368,11 @@ public final class DocxWriter {
                 } else if (block instanceof Shape) {
                     if (!((Shape) block).consumed) shape(sb, (Shape) block, ctx);
                 }
+            }
+            if (page.columns > 1 && curCols != page.columns) {
+                sb.append("<w:p><w:pPr><w:sectPr>")
+                  .append(sectPrXml(pw, ph, curCols, secGap))
+                  .append("<w:type w:val=\"continuous\"/></w:sectPr></w:pPr></w:p>");
             }
         }
         // The section properties must be the LAST child of w:body.
