@@ -162,3 +162,40 @@ page's own by construction.
    stamp is neither missing nor extra. If you add a comparison that reads the document as text,
    fold the alt text in the same way or every stamp document will look like it lost words.
 
+
+## What changed on 8 Nov, for anyone running this pipeline
+
+Read this before touching a measurement or a threshold. Every item below cost a wrong guess.
+
+**1. `gate.py`'s `nobg` no longer means what its name says.** It used to check for
+`<w:background w:color="FFFFFF"/>`. That background was added so a dark reader would not show
+black text on a black page, and it caused a worse problem: Google Docs dark mode paints the
+white back over the inverted page, so every table came out under white patches. The colour now
+lives on the text as a document default, so `nobg` checks for `<w:color w:val="000000"/>` in
+`docDefaults`. A run that reports `nobg` rising is reporting a missing default colour, not a
+missing background.
+
+**2. `gate.py` folds picture alt text into its word comparison.** A rasterised stamp keeps its
+words as `descr` on `wp:docPr`, and `_alt_text` reads them. Any new comparison that reads the
+document as text must fold that in the same way, or every stamp document will look like it lost
+words.
+
+**3. Do not try to rotate a stamp's text box.** Five attempts were measured and all five failed:
+written upright the text lands in the wrong place; `<a:xfrm rot>` is written and LibreOffice
+ignores it on a text box; angle 0 on a rotated line (the 180-degree case) is written and still
+ignored; binding the outline to the box fixes the drift and not the rotation; `behindDoc="1"` is
+correct on its own account and does not change the render. The stamp is rasterised. That is the
+answer, and D-16 tabulates the five failures.
+
+**4. Before editing a condition, print the count at the point of suspicion.** Four hypotheses
+about why an invoice table was missing were each plausible from reading the code and each died
+on a measurement: the row height, the `vs.size() < 2` guard (23 horizontal and 12 vertical rules
+were found), the solidity filter (it never ran), and the `containsAnother` filter (no candidates
+reached it). The answer came from printing the rule groups, which showed `xs=2 rows=18 cols=1`
+and named the line `if (cols < 2) continue`. One print would have saved an afternoon.
+
+**5. Two commits are worth knowing about when reading a diff.** `6624a3a` superseded the
+row-height fix with a sharper statement of the same problem - a cell's line is a line of text,
+not the row's pitch - and measured page-count mismatches 20 to 16. `8320115` re-recorded
+`base208.json`, so the stored baseline is newer than any note written before it.
+
