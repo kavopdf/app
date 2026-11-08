@@ -2860,3 +2860,41 @@ class as 315_gazette_notification's footer. **Tries: 0 of 3.**
 
 A table cell's line-height floor now reads the cell's size from `t.sizes` instead of parsing it
 out of a font name that never carried one. 374_org_chart's three overlapping boxes are readable.
+
+
+### D-20  Every table rule is the same thickness and the same grey
+
+**Reported from the phone:** the thickness of a table's lines is not consistent, and a box whose
+four sides are closed in the PDF sometimes loses one side.
+
+**Cause, one line in `DocxWriter.borders`:**
+
+    if (ruled) b.append(" w:sz=\"6\" w:color=\"999999\"");
+
+Every ruled table in every document gets a 0.75 pt grey hairline on all six sides, whatever the
+page drew. A PDF that rules its table at 0.5 pt comes out heavy; one that rules at 1.5 pt comes
+out thin; a black rule comes out grey. That is the inconsistency the user sees, and it is not a
+rendering artefact - the width and the colour are simply not carried.
+
+**Why a side goes missing.** The model cannot carry them: `Rules.horizontal` is
+`float[]{y, x0, x1}` and `Rules.vertical` is `float[]{x, y0, y1}` - position and extent, no
+stroke. So the writer has nothing to be faithful to and writes a constant. When a box's side is
+absent from the output, one of two things has happened, and they need telling apart before
+anything is changed:
+
+  a. the side was never detected as a rule at all - the shortest-segment filter in `buildTables`
+     drops horizontal segments under 12 pt and vertical under 6 pt, and a short box side can fall
+     under that; or
+  b. the table was never built, so its rules were handed to `attachShapes` instead, and the
+     shape path drops a stroke drawn inside a table on purpose.
+
+**The fix has two halves and they belong together.**
+
+1. Carry the stroke. `Rules.horizontal` and `Rules.vertical` gain width and colour, filled where
+   the path is stroked, and `borders()` writes the page's own `w:sz` and `w:color` per side
+   instead of a constant. A table whose sides differ in weight then keeps that difference.
+2. Then, and only then, look at the missing side - because a correct stroke model changes what
+   "missing" means. Measuring it first would attribute a width problem to a detection problem.
+
+**Tries: 0 of 3.** Diagnosed; the stroke is not carried anywhere in the model today.
+
