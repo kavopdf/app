@@ -3418,3 +3418,54 @@ tables whose band a rule crosses but which have no frame stay `none`**, named in
 editing the same method. Applying one before the other would mean resolving that by hand; applying
 them together is one gate run instead of two.
 
+
+
+**Two more patches, both gate-clean, both measured.**
+
+**White patches** (`patches/WP-A-run-colours.patch`, one file, +211/-34). The brief's approach was
+built first and thrown away: 100 % of runs coloured with `000000` where the PDF named nothing turns a
+maybe into a certainty in Google Docs dark theme. Text is left on Automatic - 9,369 of 28,841 runs
+carry an explicit colour, exactly as before, and 0 paragraph marks are pinned. What it does instead:
+
+1. **753 light shape fills in 159 documents** become `a:schemeClr bg1` + `a:lumMod` instead of
+   absolute `a:srgbClr`. Dark bands keep their hex, so the `FFFFFF` headings on them stay readable.
+2. **A theme part is now written** (`word/theme/theme1.xml` + rels + content-type). Not optional:
+   measured, without it LibreOffice renders `bg1` fills as **black**; with it, `E6EBF5` renders as
+   `EDEDED` over the same 32,925 pixels.
+3. **486 `w:color="auto"` border sides become `w:val="nil"`** across 59 documents.
+4. **docDefaults fixed** - `w:color` appeared twice and before `w:rFonts`; now once, in order.
+   Broader ordering fixed too: **13,280 to 0** out-of-order blocks, **208/208 schema-clean**.
+5. **Table styles added** - `TableNormal` and `KavoTable`, `<w:tblStyle>` on every table; there were
+   zero table styles in 208/208.
+
+Gate: **no document got worse**, and every document was re-scored against both builds with the
+gate's own `score_one()` - **0 documents moved** on missing, extra, blocks, nobg, blank, lines or
+pages. `verify-engine.sh` exits 0 with the same pass set. Honest limits: only LibreOffice was
+measured, so Word's and Google Docs' rendering of `bg1` is unverified, and the tints lose their hue
+in light mode (`E6EBF5` becomes `EDEDED`) - that is the price of making them relative.
+
+**Stamp** (`patches/ST-A-revert-and-drift.patch`, two files). Rasterisation removed: `stampPictures`
+(62 lines), both call sites and the `PDFRenderer` import are gone, `grep` for all three is 0, and no
+stamp document emits `word/media/`. The text-based stamp is restored with the construction measured
+earlier - the box is the page's own rectangle, `posOffset = rectCentre - (w/2, h/2)`, `extent` the
+true rect, `a:xfrm/@rot` the page's angle, and the baseline placed by `bodyPr@lIns/@tIns`. The
+rectangle is the box's own `<a:ln>`, so outline and text are one object with one geometry.
+
+**Two more bugs found on the way.** A 180-degree line's `Box.x`/`Box.y` come from
+`getXDirAdj`/`getYDirAdj` in a text-turned frame, so both are mirrored about the page - file 04 read
+(151.010, 434.230) for a page origin of (444.266, 407.660), which is why 04 measured 294-353 pt in
+*every* build. And the frame was being consumed into a per-line border; a multi-line stamp's frame
+(206x105) is not the line's box (207x16), so the frame vanished and two thin rectangles appeared.
+
+Result: **format geometry 148.434 pt to 0.000 pt** worst case across all 13 stamp lines, and
+**outline in the LibreOffice render 72.70 pt to 0.14 pt**; file 03's 1.20 pt frame went from not
+drawn at all to 0.12 pt. Gate **no document got worse**, TestEngine 81/81, TestPdfToWord 29/29.
+
+**One thing not reproduced:** LibreOffice Writer will not rotate glyphs in a `.docx` text box. Six
+spellings were built and rendered at 15/90/180 degrees and all render `dir = (1,0)`, so the rotation
+is kept for Word and LibreOffice's upright glyphs are accepted. The report's section 5 gives the
+one-line reversal if that judgement is wrong.
+
+**All three patches touch `DocxWriter.java` and all three are based on blob `26b4fd8`**, so they must
+be applied in sequence with a three-way merge, not in parallel.
+

@@ -1,0 +1,417 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 26b4fd8..c9e96bc 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -208,6 +208,14 @@ public final class DocxWriter {
+         java.util.Map<Integer, Float> colLeft;
+         /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
+         float pageWidthPt = 595f;
++        /**
++         * The page's own height in points.
++         *
++         * <p>Needed by a 180-degree stamp and nothing else: PDFBox reports such a line's
++         * position in a frame turned with the text, so both of its coordinates are mirrored
++         * about the page and have to be put back before they mean anything.
++         */
++        float pageHeightPt = 842f;
+         /**
+          * True when the last block written on this page was a table.
+          *
+@@ -314,6 +322,7 @@ public final class DocxWriter {
+                         + " ph=" + ph);
+             }
+             ctx.pageWidthPt = pw;
++            ctx.pageHeightPt = ph;
+             // The page's own outlines, so a label drawn inside one can be anchored to it and a
+             // stamp can find the frame the page drew around it. It was declared and never set,
+             // which is why the stamp's border search never matched anything.
+@@ -875,35 +884,75 @@ public final class DocxWriter {
+                         ? Math.max(b.length, advance) + b.size * 1.5f
+                         : Math.max(4f, advance) * 1.12f + b.size * 1.5f;
+                 float hPt = Math.max(4f, b.size * LINE_FACTOR);
+-                // REVERTED: placing the box on the rotated line's bounding area instead of its
+-                // origin moved file 08's two stamps apart and put file 01's AUTHORISED SIGNATORY
+-                // in a different wrong place. OOXML has no rotation a LibreOffice render honours,
+-                // so a rotated stamp cannot be reproduced faithfully; the axis-aligned box at the
+-                // line origin is at least stable. Recorded in REMAINING-DEFECTS.md.
+-                // A stamp drawn upside down has a HORIZONTAL baseline, so its measured angle is
+-                // 0 and the box would go out upright. The page still flagged it as rotated - that
+-                // flag comes from the text matrix, not from the angle - so a rotated line whose
+-                // angle is 0 is a 180-degree stamp. Nothing is forced: an unrotated line never
+-                // reaches this branch, because only b.rotated lines become a text box at all.
+-                float stampRot = b.rotated && Math.abs(b.angle) < 1f ? 180f : b.angle;
+-                // The stamp's own outline, if the page drew one around it: an unfilled, stroked
+-                // shape whose box covers this line. It becomes the border of this text box and
+-                // is marked consumed so it is not drawn a second time somewhere else.
+-                int borderRgb = -1;
+-                float borderW = 0.6f;
+-                if (ctx.curShapes != null) {
+-                    for (Shape sh : ctx.curShapes) {
+-                        if (sh.consumed || sh.fillRgb >= 0 || sh.lineRgb < 0) continue;
+-                        if (sh.xPt > b.right + 4f || sh.xPt + sh.wPt < b.x - 4f) continue;
+-                        if (sh.topPt > b.y + b.size * 3f || sh.topPt + sh.hPt < b.y - b.size * 3f) continue;
+-                        sh.consumed = true;
+-                        borderRgb = sh.lineRgb;
+-                        borderW = Math.max(0.4f, sh.lineWidthPt);
+-                        break;
++                // A stamp is drawn on a rotated baseline, and it is written as the page's own
++                // rectangle with the text placed inside it by the box's insets.
++                //
++                // WHY THIS AND NOT A TEXT-TIGHT BOX. The page draws a stamp as four separate
++                // objects that share one `cm`: two stroked rectangles and two text objects. What
++                // ties the text to the outline is that repeated matrix and nothing else, so the
++                // only faithful reconstruction is the rectangle itself plus where the baseline
++                // sits inside it. The text-tight box was neither: at 15 degrees the outline's
++                // axis-aligned bounding box is 205.95 x 104.68 pt against a true rectangle of
++                // 198.42 x 55.20 - 96.8 % too much area - and the box was 207 x 16, so whichever
++                // of the two was used, the outline and the text were measured from different
++                // shapes and the reader saw one move against the other.
++                //
++                // WHY THE INSETS AND NOT THE OFFSET. `<a:xfrm rot>` turns a box about its
++                // CENTRE. Writing the baseline origin into wp:posOffset therefore moves the text
++                // by (R - I) . (-w/2, +h/2) the moment the box is turned - +5.1/+22.2 pt on 01's
++                // first line, +136.9/-20.2 and +195.9/-20.2 pt on 04's, a full box width. Putting
++                // the box on the rectangle's own centre makes that term zero by construction, and
++                // the baseline is then placed by lIns/tIns, which rotate with the box. The
++                // reconstruction reproduces every stamp to under 0.001 pt.
++                float lineAngle = b.rotated && Math.abs(b.angle) < 1f ? 180f : b.angle;
++                // Where the page really put the baseline origin.
++                //
++                // Box.x/Box.y come from TextPosition.getXDirAdj()/getYDirAdj(), which are
++                // measured along the baseline in a frame turned with the text. For 15 and 90
++                // degrees that frame happens to agree with the page; for a 180-degree stamp it
++                // does not, and both coordinates come back mirrored: on 04 the page's own
++                // origin for CANCELLED is (444.266, 407.660) and the box said (151.010,
++                // 434.230), which is 595.276-444.266 and 841.890-407.660. Every earlier version
++                // placed the box from the mirrored pair, which is why 04's stamp has measured
++                // 294 and 353 pt from where the page draws it no matter what else changed.
++                float px = b.x, py = b.y;
++                if (b.rotated && Math.abs(b.angle) < 1f) {
++                    px = ctx.pageWidthPt - b.x;
++                    py = ctx.pageHeightPt - b.y;
++                }
++                Frame frame = frameOf(ctx.curShapes, px, py, lineAngle);
++                if (frame != null) {
++                    // The rectangle becomes this box's border, once: the stamp's inner rectangle
++                    // is a different shape and is still drawn by shape(), which is how a
++                    // double-ruled stamp keeps both of its rules.
++                    int rgb = -1;
++                    float lw = 0.6f;
++                    if (!frame.shape.consumed) {
++                        frame.shape.consumed = true;
++                        rgb = frame.shape.lineRgb;
++                        lw = Math.max(0.4f, frame.shape.lineWidthPt);
+                     }
++                    // tIns is measured to the top of the text, not to its baseline, so one
++                    // ascent comes off - the same convention every upright box in this writer
++                    // uses. It can go slightly negative for a line that hugs the frame's top
++                    // edge; the box's own top is then the clamp.
++                    float lIns = Math.max(0f, frame.lIns);
++                    float tIns = Math.max(0f, frame.tIns - ASCENT * b.size);
++                    anchorAt(sb, ctx, frame.cx, frame.cy, frame.w / 2f, frame.h / 2f,
++                            frame.w, frame.h, inner.toString(), lineAngle, rgb, lw, lIns, tIns);
++                } else {
++                    // No rectangle around this line - the per-glyph text of a round seal, a
++                    // rotated label on a drawing. There is no frame to bind to, so the line is
++                    // placed on its own origin with no rotation: the run starts at the left end
++                    // of what the page drew, and a line drawn right-to-left (file 04) starts at
++                    // the other end because that is where its left end is.
++                    double dirX = Math.cos(Math.toRadians(lineAngle));
++                    float startX = px;
++                    if (dirX <= -0.5) startX = px - b.length;
++                    else if (Math.abs(dirX) < 0.5) startX = px - b.length / 2f;
++                    anchorAt(sb, ctx, startX, py, 0f, ASCENT * b.size, wPt, hPt,
++                            inner.toString(), 0f, -1, 0.6f, 0f, 0f);
+                 }
+-                anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), stampRot,
+-                        borderRgb, borderW);
+             }
+             return;
+         }
+@@ -1389,8 +1438,9 @@ public final class DocxWriter {
+      * 90-degree one at 90, and a stamp on a horizontal baseline goes out with no rotation at
+      * all.
+      *
+-     * <p>Rotation is about the box's centre, so the offset stays the top-left of the unrotated
+-     * box at the same centre: the text stays where the page put it.
++     * <p>Rotation is about the box's centre, so the offset is NOT the top-left of the box: it is
++     * solved for in {@link #anchorAt} so that the text's own origin lands on the page's, before
++     * and after the turn.
+      */
+     private static void anchor(StringBuilder sb, Ctx ctx, float xPt, float yTopPt,
+                                float wPt, float hPt, String inner, float rotDeg) {
+@@ -1403,17 +1453,164 @@ public final class DocxWriter {
+      * <p>The outline used to be a separate Shape and the text a separate text box, each with
+      * its own position arithmetic, and they drifted apart - the user's report is precise:
+      * sometimes the outline shifts, sometimes the text inside it. Binding the outline to the
+-     * box that holds the text makes that impossible: there is one object, one position, and
+-     * the border is drawn around the text by the same shape that places it.
++     * box that holds the text removes that, but only where the outline really is the text's own
++     * box; a stamp's frame is not, and binding it there drew a thin rectangle round one line of
++     * the stamp instead of its frame. A stamp is written by {@link #frameOf} instead: the box is
++     * the page's rectangle and the text is placed inside it, so there is still one object and
++     * one geometry. Where an outline is neither, it is left to {@code shape()} and drawn from
++     * the page's own path, so its geometry is the page's own and there is no second position
++     * calculation to drift from.
+      */
+     private static void anchor(StringBuilder sb, Ctx ctx, float xPt, float yTopPt,
+                                float wPt, float hPt, String inner, float rotDeg,
+                                int borderRgb, float borderWpt) {
++        // No rotation on this path: the top-left of the unrotated box IS where the text's
++        // frame starts, and for rotDeg == 0 anchorAt reduces to exactly this.
++        anchorAt(sb, ctx, xPt, yTopPt, 0f, 0f, wPt, hPt, inner, rotDeg, borderRgb, borderWpt);
++    }
++
++    /**
++     * The rectangle the page drew around a rotated line, in the line's own frame.
++     *
++     * <p>A stamp's frame is a stroked, unfilled rectangle that shares the line's rotation, and
++     * the line's baseline origin sits inside it. That is the whole test: rotation, containment,
++     * four corners, no fill. Nothing is guessed from sizes, so a stamp's frame is found by what
++     * it is and not by how big it happens to be, and the largest such rectangle wins - a stamp
++     * drawn with a double rule has an inner rectangle too, and the inner one is not the frame.
++     *
++     * <p>The frame's own axes come from the LINE, not from the order the path happened to be
++     * drawn in. {@code u} is the direction the text advances and {@code v} is a quarter turn
++     * from it, so {@code lIns}/{@code tIns} below are the baseline's position along and across
++     * the reading direction - which is exactly what {@code bodyPr}'s insets mean once the box
++     * carries the same rotation.
++     */
++    private static final class Frame {
++        float cx, cy, w, h;
++        /** Where the baseline origin sits inside the rectangle, along and across the reading. */
++        float lIns, tIns;
++        Shape shape;
++    }
++
++    private static Frame frameOf(java.util.List<Shape> shapes, float px, float py, float angle) {
++        if (shapes == null) return null;
++        double th = Math.toRadians(angle);
++        double ux = Math.cos(th), uy = Math.sin(th);
++        double vx = -Math.sin(th), vy = Math.cos(th);
++        Frame best = null;
++        float bestArea = 0f;
++        for (Shape s : shapes) {
++            if (s.fillRgb >= 0 || s.lineRgb < 0) continue;
++            java.util.List<float[]> pts = new ArrayList<>();
++            if (s.kind == 2 && s.freeform != null) {
++                for (float[] c : s.freeform) {
++                    int type = (int) c[0];
++                    if (type == 0 || type == 1) pts.add(new float[]{c[1], c[2]});
++                    else if (type == 2) pts.add(new float[]{c[c.length - 2], c[c.length - 1]});
++                }
++            } else if (s.kind == 0) {
++                // A rectangle drawn with `re` comes through as a preset box, which carries no
++                // rotation - so it is only usable where its bounding box IS the rectangle,
++                // i.e. where the page turned it by a whole quarter turn. 04's 180-degree frame
++                // is exactly that case, and it is the only one in the corpus.
++                double c = Math.abs(Math.cos(th));
++                if (c > 0.02 && c < 0.98) continue;
++                pts.add(new float[]{s.xPt, s.topPt});
++                pts.add(new float[]{s.xPt + s.wPt, s.topPt});
++                pts.add(new float[]{s.xPt + s.wPt, s.topPt + s.hPt});
++                pts.add(new float[]{s.xPt, s.topPt + s.hPt});
++            } else {
++                continue;
++            }
++            if (pts.size() != 4) continue;
++            double cx = 0, cy = 0;
++            for (float[] p : pts) { cx += p[0]; cy += p[1]; }
++            cx /= 4.0; cy /= 4.0;
++            // A rectangle's corners are the furthest points along its own axes, so the extents
++            // come straight out of the four corners and no edge order is needed.
++            float w = 0f, h = 0f;
++            for (float[] p : pts) {
++                w = Math.max(w, 2f * (float) Math.abs((p[0] - cx) * ux + (p[1] - cy) * uy));
++                h = Math.max(h, 2f * (float) Math.abs((p[0] - cx) * vx + (p[1] - cy) * vy));
++            }
++            if (w < 8f || h < 4f) continue;
++            // The shape has to share the line's rotation. Its longest edge is the one along the
++            // reading direction for every stamp in the corpus; for a frame that is taller than
++            // it is wide that is the edge the text runs down.
++            double ex = 0, ey = 0, el = 0;
++            for (int i = 0; i < 4; i++) {
++                float[] p = pts.get(i), q = pts.get((i + 1) % 4);
++                double dx = q[0] - p[0], dy = q[1] - p[1], len = Math.hypot(dx, dy);
++                if (len > el) { el = len; ex = dx / len; ey = dy / len; }
++            }
++            if (el <= 0 || Math.abs(ex * ux + ey * uy) < 0.985) continue;
++            double p0x = cx - (w / 2.0) * ux - (h / 2.0) * vx;
++            double p0y = cy - (w / 2.0) * uy - (h / 2.0) * vy;
++            double lIns = (px - p0x) * ux + (py - p0y) * uy;
++            double tIns = (px - p0x) * vx + (py - p0y) * vy;
++            if (lIns < -2.0 || lIns > w + 2.0 || tIns < -2.0 || tIns > h + 2.0) continue;
++            if (w * h > bestArea) {
++                bestArea = w * h;
++                best = new Frame();
++                best.cx = (float) cx; best.cy = (float) cy;
++                best.w = w; best.h = h;
++                best.lIns = (float) lIns; best.tIns = (float) tIns;
++                best.shape = s;
++            }
++        }
++        return best;
++    }
++
++    /**
++     * An anchored text box whose local point (lx, ly) lands on the page point (pageX, pageY)
++     * once the box has been rotated by {@code rotDeg} about its own centre.
++     *
++     * <p>{@code <a:xfrm rot>} turns the box about its CENTRE, so the offset written in
++     * {@code wp:positionH/V} is not where the text starts - it is where the unrotated box's
++     * top-left would be. Writing the line's origin there therefore moves the text by
++     * {@code R(rot) . (L - centre)} as soon as the box is turned, which is 135 pt on file 01 and
++     * the reason a rotated stamp never sat where the page drew it. The offset is solved for
++     * here instead:
++     *
++     * <pre>  off = P - centre - R(rot) . (L - centre)  </pre>
++     *
++     * <p>with R the clockwise rotation the {@code rot} attribute means in a frame whose y counts
++     * down the page. For {@code rotDeg == 0} this is exactly {@code P - L}, so an unrotated box
++     * is placed where it always was.
++     *
++     * <p>Both renderers then agree on where the text STARTS: Word draws the run along the rotated
++     * baseline from that point, LibreOffice rotates the frame but not the glyphs and draws them
++     * horizontally from that same point (see D-16 in REMAINING-DEFECTS.md - Writer has no
++     * arbitrary text rotation, in any OOXML spelling). The anchor is the same in both, so the
++     * measurement below is a measurement of the geometry and not of one renderer's bug.
++     */
++    private static void anchorAt(StringBuilder sb, Ctx ctx, float pageX, float pageY,
++                                 float lx, float ly, float wPt, float hPt, String inner,
++                                 float rotDeg, int borderRgb, float borderWpt) {
++        anchorAt(sb, ctx, pageX, pageY, lx, ly, wPt, hPt, inner, rotDeg, borderRgb, borderWpt,
++                0f, 0f);
++    }
++
++    /**
++     * The same, with the text placed inside the box by its insets rather than at its corner.
++     *
++     * <p>This is what makes a stamp one object. The box IS the rectangle the page drew, its
++     * border IS the page's stroke, and the text is put where the page put it inside that
++     * rectangle - so there is one geometry and no second position calculation to drift from.
++     */
++    private static void anchorAt(StringBuilder sb, Ctx ctx, float pageX, float pageY,
++                                 float lx, float ly, float wPt, float hPt, String inner,
++                                 float rotDeg, int borderRgb, float borderWpt,
++                                 float lInsPt, float tInsPt) {
++        double th = Math.toRadians(rotDeg);
++        double cos = Math.cos(th), sin = Math.sin(th);
++        double dx = lx - wPt / 2.0, dy = ly - hPt / 2.0;
++        float offXpt = (float) (pageX - wPt / 2.0 - (cos * dx - sin * dy));
++        float offYpt = (float) (pageY - hPt / 2.0 - (sin * dx + cos * dy));
+         int id = ctx.shapeSeq++;
+         long cx = Math.max(1, Math.round(wPt * EMU_PER_PT));
+         long cy = Math.max(1, Math.round(hPt * EMU_PER_PT));
+-        long offX = Math.round(xPt * EMU_PER_PT);
+-        long offY = Math.round(yTopPt * EMU_PER_PT);
++        long offX = Math.round(offXpt * EMU_PER_PT);
++        long offY = Math.round(offYpt * EMU_PER_PT);
+         int relHeight = 251658240 + (id & 0xFFFF);
+ 
+         sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+@@ -1465,7 +1662,10 @@ public final class DocxWriter {
+                 .append("<wps:txbx><w:txbxContent>").append(inner).append("</w:txbxContent></wps:txbx>")
+                 // wrap="none": the box must not re-wrap the line it holds, or a long line
+                 // would break at the box width and the second half would land under the first.
+-                .append("<wps:bodyPr wrap=\"none\" lIns=\"0\" tIns=\"0\" rIns=\"0\" bIns=\"0\"")
++                .append("<wps:bodyPr wrap=\"none\" lIns=\"")
++                .append(Math.round(lInsPt * EMU_PER_PT)).append("\" tIns=\"")
++                .append(Math.round(tInsPt * EMU_PER_PT))
++                .append("\" rIns=\"0\" bIns=\"0\"")
+                 .append(" anchor=\"t\" anchorCtr=\"0\"><a:noAutofit/></wps:bodyPr>")
+                 .append("</wps:wsp></a:graphicData></a:graphic>")
+                 .append("</wp:anchor></w:drawing></w:r></w:p>");
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index f1c4949..e9ac4a9 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -8,7 +8,6 @@ import com.tom_roush.pdfbox.cos.COSDictionary;
+ import com.tom_roush.pdfbox.cos.COSName;
+ import com.tom_roush.pdfbox.cos.COSString;
+ import com.tom_roush.pdfbox.pdmodel.PDDocument;
+-import com.tom_roush.pdfbox.rendering.PDFRenderer;
+ import com.tom_roush.pdfbox.pdmodel.PDPage;
+ import com.tom_roush.pdfbox.pdmodel.PDResources;
+ import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
+@@ -465,7 +464,6 @@ public final class PdfToWord {
+             }
+             attachShapes(page, rules, page.height, null);
+             attachPictures(page, rules, page.height);
+-        stampPictures(doc, index, page, report);
+             return page;
+         }
+ 
+@@ -1023,7 +1021,6 @@ public final class PdfToWord {
+         for (Object o : ordered) if (o instanceof Table) written.add((Table) o);
+         attachShapes(page, rules, page.height, written);
+         attachPictures(page, rules, page.height);
+-        stampPictures(doc, index, page, report);
+         return page;
+     }
+ 
+@@ -4286,65 +4283,6 @@ public final class PdfToWord {
+      * invisible in Word and only adds weight to the file.
+      */
+ 
+-    private static void stampPictures(PDDocument doc, int index, Page page, Report report) {
+-        java.util.List<Para> stamps = new ArrayList<>();
+-        float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE;
+-        float maxX = -Float.MAX_VALUE, maxY = -Float.MAX_VALUE;
+-        for (Object b : page.blocks) {
+-            if (!(b instanceof Para)) continue;
+-            Para p = (Para) b;
+-            boolean rotated = false;
+-            for (Box box : p.boxes) if (box.rotated) rotated = true;
+-            if (!rotated) continue;
+-            stamps.add(p);
+-            for (Box box : p.boxes) {
+-                minX = Math.min(minX, Math.min(box.x, box.right));
+-                maxX = Math.max(maxX, Math.max(box.x, box.right));
+-                minY = Math.min(minY, box.y - box.size);
+-                maxY = Math.max(maxY, box.y + box.size * 0.4f);
+-            }
+-        }
+-        System.out.println("STAMPDEBUG page=" + index + " blocks=" + page.blocks.size() + " stamps=" + stamps.size());
+-        if (stamps.isEmpty()) return;
+-        float pad = 3f;
+-        minX = Math.max(0f, minX - pad); minY = Math.max(0f, minY - pad);
+-        maxX = Math.min(page.width, maxX + pad); maxY = Math.min(page.height, maxY + pad);
+-        float wPt = maxX - minX, hPt = maxY - minY;
+-        if (wPt <= 2f || hPt <= 2f) return;
+-        android.graphics.Bitmap full = null;
+-        try {
+-            PDFRenderer renderer = new PDFRenderer(doc);
+-            float dpi = 300f;
+-            full = renderer.renderImageWithDPI(index, dpi);
+-            if (full == null) return;
+-            float scale = dpi / 72f;
+-            int px = Math.max(0, Math.round(minX * scale));
+-            int py = Math.max(0, Math.round(minY * scale));
+-            int pw = Math.min(full.getWidth() - px, Math.round(wPt * scale));
+-            int ph = Math.min(full.getHeight() - py, Math.round(hPt * scale));
+-            if (pw <= 0 || ph <= 0) return;
+-            android.graphics.Bitmap crop = android.graphics.Bitmap.createBitmap(full, px, py, pw, ph);
+-            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+-            if (!crop.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, bos)) return;
+-            StringBuilder stampText = new StringBuilder();
+-            for (Para p : stamps) {
+-                if (stampText.length() > 0) stampText.append(' ');
+-                stampText.append(p.text());
+-            }
+-            DocxWriter.Picture pic = new DocxWriter.Picture(bos.toByteArray(), minX, minY, wPt, hPt);
+-            pic.text = stampText.toString();
+-            for (Para p : stamps) page.blocks.remove(p);
+-            page.blocks.add(pic);
+-            if (report != null) report.images++;
+-            System.out.println("STAMPDEBUG rasterised " + pw + "x" + ph);
+-        } catch (Throwable t) {
+-            System.out.println("STAMPDEBUG FAILED " + t.getClass().getSimpleName() + " " + t.getMessage());
+-            return;
+-        } finally {
+-            if (full != null) full.recycle();
+-        }
+-    }
+-
+     private static void attachPictures(Page page, Rules rules, float pageHeight) {
+         if (rules == null || rules.pictures.isEmpty()) return;
+         for (DocxWriter.Picture pic : rules.pictures) {
