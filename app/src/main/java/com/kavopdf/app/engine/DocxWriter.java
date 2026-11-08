@@ -192,6 +192,16 @@ public final class DocxWriter {
         int budgetTw;
         /** True when this page's own content fits the sheet, so its white space can be spent. */
         boolean spendGaps;
+        /**
+         * True once this page's flow has run out of room to spend its own gaps.
+         *
+         * <p>A page that leaves more white space than the flow may spend has stopped being a
+         * flow: the lines below that gap are placed on the page, not spaced from the line above
+         * them. Clamping the gap instead (the behaviour this replaces) is a lie the render
+         * believes - on 331_pid_diagram the clamp put the diagram's "CHILLED WATER" label 114 pt
+         * above the box it belongs to, and every label after it drifted with it.
+         */
+        boolean positioned;
         /** The shapes on the page being written, so a stamp can find its own outline. */
         java.util.List<Shape> curShapes;
         /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
@@ -277,6 +287,7 @@ public final class DocxWriter {
             }
             ctx.lastBaseline = -1f;
             ctx.lastLinePt = 0f;
+            ctx.positioned = false;
             ctx.flowTw = 0;
             ctx.budgetTw = (int) Math.max(1L, Math.round(ph * TWIPS_PER_PT));
             // pageFits is the measurement; hasColumnBands was a proxy for it and it over-fired.
@@ -293,6 +304,14 @@ public final class DocxWriter {
                         + " ph=" + ph);
             }
             ctx.pageWidthPt = pw;
+            // The page's own outlines, so a label drawn inside one can be anchored to it and a
+            // stamp can find the frame the page drew around it. It was declared and never set,
+            // which is why the stamp's border search never matched anything.
+            java.util.List<Shape> outlines = new ArrayList<>();
+            for (Object block : page.blocks) {
+                if (block instanceof Shape) outlines.add((Shape) block);
+            }
+            ctx.curShapes = outlines;
             if (page.blocks.isEmpty()) continue;
             for (Object block : page.blocks) {
                 if (block instanceof PdfToWord.Para) {
@@ -553,6 +572,49 @@ public final class DocxWriter {
         }
     }
 
+
+    /**
+     * The closed outline a line of text was drawn inside, or null.
+     *
+     * <p>A diagram's equipment box, a legend swatch, a stamp's frame: the page draws a rectangle
+     * and writes the label inside it. The label is not body text and must not be laid out by the
+     * flow - the flow puts it after the previous line, so on 331_pid_diagram "CHILLED WATER" left
+     * its box and landed 114 pt above it, and because the flow then measured the page as longer
+     * than the paper the page could not spend its own gaps either.
+     *
+     * <p>The box that holds it is a real outline the page stroked and did not fill (a filled
+     * rectangle is a masthead band or a header strip, and text over one of those is ordinary
+     * text). It has to be big enough to be a box rather than a rule, and it has to contain the
+     * line's own extent - a label that overhangs its box was drawn as free text and stays in the
+     * flow.
+     */
+    private static Shape containerOf(java.util.List<Shape> shapes, PdfToWord.Box b) {
+        if (shapes == null) return null;
+        for (Shape s : shapes) {
+            if (s.consumed || s.lineRgb < 0 || s.fillRgb >= 0) continue;
+            if (s.kind != 0) continue;
+            if (s.wPt < b.size * 3f || s.hPt < b.size * 1.5f) continue;
+            if (b.x < s.xPt - 1f || b.right > s.xPt + s.wPt + 1f) continue;
+            if (b.y < s.topPt - 1f || b.y > s.topPt + s.hPt + 1f) continue;
+            return s;
+        }
+        return null;
+    }
+
+    /**
+     * One line as a text box at the position the page drew it.
+     *
+     * <p>Used where the flow cannot be the truth: a label inside a drawn outline, a stamp, and
+     * every line on a page whose own white space is wider than the flow may spend.
+     */
+    private static void anchorBox(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b, Ctx ctx) {
+        StringBuilder inner = new StringBuilder(256);
+        lineParagraph(inner, p, b);
+        float wPt = Math.max(4f, b.right - b.x) * 1.12f + b.size * 1.5f;
+        float hPt = Math.max(4f, b.size * LINE_FACTOR);
+        anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), 0f, -1, 0.6f);
+    }
+
     private static String hex(int rgb) {
         String h = Integer.toHexString(rgb & 0xFFFFFF).toUpperCase(java.util.Locale.ROOT);
         while (h.length() < 6) h = "0" + h;
@@ -682,6 +744,15 @@ public final class DocxWriter {
         // document. Written as one paragraph per field it was three lines, which is what made a
         // one-page form two pages. It goes out as one paragraph with a tab stop at each field's
         // measured x, so the value lands at 300 pt where the page put it.
+        // A page whose flow has run out of room places its lines instead: a row of fields is
+        // anchored field by field at the x the page drew each one, not tabbed across a flow.
+        if (ctx.positioned && !anyRotated) {
+            for (PdfToWord.Box b : p.boxes) {
+                if (b.runs.isEmpty()) continue;
+                anchorBox(sb, p, b, ctx);
+            }
+            return;
+        }
         if (!anyRotated && isRow(p.boxes)) {
             flowRow(sb, p, ctx);
             return;
@@ -689,6 +760,13 @@ public final class DocxWriter {
         if (!p.boxes.isEmpty() && !anyRotated) {
             for (PdfToWord.Box b : p.boxes) {
                 if (b.runs.isEmpty()) continue;
+                // A label the page drew inside a closed outline belongs to that outline, not to
+                // the flow - see containerOf. It is anchored where the page put it, and the
+                // outline itself is drawn by shape() as it always was.
+                if (ctx.positioned || containerOf(ctx.curShapes, b) != null) {
+                    anchorBox(sb, p, b, ctx);
+                    continue;
+                }
                 flowFromBox(sb, p, b, ctx);
             }
             return;
@@ -948,6 +1026,12 @@ public final class DocxWriter {
         float prevBox = 0f;
         float prevSize = 0f;
         boolean firstLine = true;
+        // The same outlines para() consults, so a label it anchors is not charged to the flow
+        // here either. Two measures of one page must not disagree about what is in the flow.
+        java.util.List<Shape> outlines = new ArrayList<>();
+        for (Object block : page.blocks) {
+            if (block instanceof Shape) outlines.add((Shape) block);
+        }
         for (Object block : page.blocks) {
             if (block instanceof PdfToWord.Para) {
                 PdfToWord.Para p = (PdfToWord.Para) block;
@@ -955,6 +1039,7 @@ public final class DocxWriter {
                 float size = 0f;
                 for (PdfToWord.Box b : p.boxes) {
                     if (b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
+                    if (containerOf(outlines, b) != null) continue;
                     if (b.y < top) top = b.y;
                     if (b.size > size) size = b.size;
                 }
@@ -1111,7 +1196,19 @@ public final class DocxWriter {
             // wider than the box can carry - a diagram's boxes 90 pt apart, a footer 422 pt below
             // the text - still needs spacing, and flowLinePt has refused to put that in the box.
             float extra = pitch - (1f - LINE_BASE) * ctx.lastLinePt - LINE_BASE * linePt;
-            if (extra > 0f) beforeTw = (int) Math.min(gapCapTw(ctx), Math.round(extra * TWIPS_PER_PT));
+            if (extra > 0f) {
+                // A gap wider than the flow may spend is not a gap, it is a position. Clamping it
+                // puts the line somewhere the page never put it, and every line after it drifts
+                // with it: on 331_pid_diagram the clamp landed the diagram's "CHILLED WATER"
+                // label 114 pt above the box that holds it. Anchoring the line at its own y is
+                // what the page did, and from here on the page is placed rather than flowed.
+                if (extra * TWIPS_PER_PT > gapCapTw(ctx)) {
+                    ctx.positioned = true;
+                    anchorBox(sb, p, b, ctx);
+                    return;
+                }
+                beforeTw = (int) Math.round(extra * TWIPS_PER_PT);
+            }
         }
         int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
         ctx.lastLinePt = linePt;

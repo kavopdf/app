@@ -2025,32 +2025,6 @@ before changing anything.
 
 **Tries: 0 of 3** - diagnosed, not started.
 
-**Second correction, same day - and the first guess was wrong too.** The guess recorded above
-(that `buildTables` bails because there are no vertical rules) is not what happens. Measured on
-the document:
-
-    TBLDEBUG hs=23 vs=12 rawH=23 rawV=12
-
-Twenty-three horizontal and twelve vertical rules are found. The guard passes easily, the table
-is built, and then it is thrown away a few lines later by the solidity filter:
-
-    if ((inside == 0 || covered * 100 / inside >= 60) && rowSane(t, lines)) solid.add(t);
-
-A table is kept only when at least 60% of the lines inside its bounds match a cell, and when
-`rowSane` agrees. When either fails the table is dropped and its lines are handed back to the
-paragraph path - which is exactly the output that was observed: no `<w:tbl>` at all, the grid's
-words spread across plain paragraphs.
-
-**So the question is which of the two fails on this invoice, and why.** The next step is to
-print `inside`, `covered` and `rowSane`'s reason for this table rather than to change either
-threshold. A 60% floor that is right for a menu or a two-column page may be wrong for an invoice
-whose header band and footer note sit inside the table's bounds without belonging to any cell.
-
-**The wrong guess must not ship.** The change that removed the `vs.size() < 2` half of the guard
-was written on the wrong hypothesis and is reverted; the guard stays as it is.
-
-
-
 **Cause found, same day.** `buildTables` opens with
 
     if (hs.size() < 2 || vs.size() < 2) return out;      // PdfToWord.java, buildTables
@@ -2406,3 +2380,58 @@ document stays PASS.
 tolerance, and its worst entries are seven copies of "Within limit" paired against each other at
 -175 and +46 pt. Matching by text cannot pair a repeated cell value, so that share understates the
 page. The one-off offsets that are real - header, footer, first row - are all under 10 pt.
+
+## v3 corpus — batch 2 (318-340), run 8 Nov 09:36
+
+Fifteen documents, 21 pages, all seventeen steps in order, every page opened before any number
+was read, and every page opened again after the fix. Two findings were real and both were fixed
+in one engine change. Seven pages still fail the computed reading-order question and the eye
+passes all seven - that is a measurement bug, recorded below, not a document defect.
+
+### FIXED — a line the flow cannot reach is now placed, not clamped
+
+331_pid_diagram. `moved:CHILLED WATER` verified: y=270.7 in the PDF, y=156.6 in the render,
+-114.1 pt. The page sets a diagram: the title at y=28, then 233 pt of white space, then the
+equipment boxes and their labels. `flowFromBox` charged that 233 pt gap as `w:spacing w:before`
+but clamped it at GAP_CAP_TW (120 pt), so the label left its box and every label after it
+drifted with it. `pageFits` said the page did not fit (required 640.1 pt against a 595.3 pt
+sheet) and it was right: the flow is linear, so spending all of the page's gaps would have
+pushed the footer onto a second sheet.
+
+The fix is in `DocxWriter`: a gap wider than the flow may spend is not a gap, it is a position.
+`flowFromBox` now anchors that line at its own measured x and y and sets `Ctx.positioned`; from
+there to the end of the page every line - and every field of a row - is anchored where the page
+drew it, instead of being spaced from the line above. Two smaller parts of the same change:
+`Ctx.curShapes` was declared and never assigned, so the stamp-border search never matched
+anything, and it is now filled per page; and a label drawn inside a closed outline
+(`containerOf`) is anchored to it rather than flowed.
+
+### FIXED — the same cause was putting a drawing on a second sheet
+
+332_bom_on_drawing. `pagecount` verified (1 page in the PDF, 2 in the render) and `shapes`
+verified (15 shapes in the PDF, 0 on the render's first sheet). The drawing's labels overran the
+sheet, the overflow carried the anchored shapes to page 2, and the first sheet was left with the
+BOM table and none of the drawing. With the labels placed rather than flowed the page fits: one
+sheet, 15 shapes, the assembly and its bubbles 1-5 in place.
+
+Measured across all 208: G2 no document got worse (5 counts improved, all line counts falling
+with no word lost), `TestPdfToWord` 29/29, `TestRealDocs` 3/3, and page counts unchanged on the
+spot checks (315 stays one sheet, 344 and 371 unchanged).
+
+### OPEN — the reading-order question fires on pages the eye passes
+
+Seven documents in this batch (318, 322, 323, 325, 326, 330, 332) report `order` between 60.0 %
+and 94.1 % in sequence while every page reads correctly and the eye passes it. 318 is the
+clearest: 26 rows in the PDF against 24 in the render, 60.0 % in sequence, on a one-page court
+form whose fields, table, notice and seal all sit where the page put them. This is the D-03
+class: the rows are grouped by band and sorted left to right, and on a form page the bands and
+the tab-joined rows do not agree. It is a QUESTION, not a verdict, and `looked.py --combine`
+correctly lets the eye win. **Tries: 0 of 3 on the tool.** The tool, not the documents, is what
+needs the work: nine `order` verifications in this run produced no document defect.
+
+### Measurement blind spots found this pass - repair the tool, not the page
+
+    order on 318, 322, 323, 325, 326, 330, 332   the seven above.
+    shapes on 332 (first pass)                  15 in the PDF, 0 in the render - true at the
+        time, caused by the page overflow, and gone once the page fitted. Not a blind spot but
+        a real finding the fix closed.

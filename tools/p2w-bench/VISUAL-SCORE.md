@@ -496,4 +496,18 @@ per field (301), a table's own top y not reproduced (311), a column pitch taken 
 (315), a rotated seal's arc text repeated (312), and a line the PDF drew past the right margin being
 wrapped instead (303). None of them was fixed this run; each is recorded with its measurement and
 its tries.
-
+| 2026-11-08 | 318_court_summons_form | PASS | cause title, cause table, notice and the court seal; the PDF's notice line overruns its margin and the render keeps the word |
+| 2026-11-08 | 320_balance_sheet_statutory | PASS | both statements, every figure in its column and the signature block |
+| 2026-11-08 | 321_auditors_report | PASS | six numbered paragraphs, the basis and key-audit-matter heads and the signature block |
+| 2026-11-08 | 322_mutual_fund_factsheet | PASS | scheme, holdings and sector tables, the riskometer dial and the footer note |
+| 2026-11-08 | 323_credit_card_statement | PASS | ledger, rewards summary, spend-by-category bars and the barcode |
+| 2026-11-08 | 324_loan_amortisation_schedule | PASS | seven sheets, 40 rows each, every figure in its column; the last sheet is the header alone on both sides |
+| 2026-11-08 | 325_demat_holdings_statement | PASS | holdings table, transaction table and the portfolio total |
+| 2026-11-08 | 326_itr_computation | PASS | both schedules, the verification block and the QR |
+| 2026-11-08 | 330_cad_drawing_sheet | PASS | plan, dimension strings, revision table and title block; the hatched zone renders as a grey fill |
+| 2026-11-08 | 331_pid_diagram | PASS | every label back inside its equipment box after the anchored-position fix |
+| 2026-11-08 | 332_bom_on_drawing | PASS | one sheet now; the BOM table and the assembly drawing with its bubbles |
+| 2026-11-08 | 333_datasheet_spec_tables | PASS | three spec tables, every value in its column |
+| 2026-11-08 | 334_patent_document | PASS | form, abstract, FIG.1 boxes with their labels and the claims |
+| 2026-11-08 | 335_msds_safety_data_sheet | PASS | eight numbered sections, the pictograms and the composition table |
+| 2026-11-08 | 340_bill_of_lading | PASS | party boxes, goods table, totals and the barcode |

@@ -659,3 +659,61 @@ verified finding rather than on a tool that had no verifier.
 **Where the corpus stands.** 15 of 208 re-processed under the new rules. The 208 rows already in
 VISUAL-SCORE.md are the previous pass and do not count; the final sweep is the only place a document
 is called finished.
+
+## BATCH 2 — documents 318-340 (15 documents, 21 pages)
+
+**Visual result: 15 pass, 0 fail.** Every page opened before a number was read, every finding
+verified against the PDF, and every page opened again after the fix.
+
+| document | pages | verdict | note |
+|---|---|---|---|
+| 318_court_summons_form | 1 | PASS | form, table, notice, seal |
+| 320_balance_sheet_statutory | 1 | PASS | both statements, every figure |
+| 321_auditors_report | 1 | PASS | six numbered paragraphs, signature block |
+| 322_mutual_fund_factsheet | 1 | PASS | three tables, riskometer, footer note |
+| 323_credit_card_statement | 1 | PASS | ledger, rewards, spend bars, barcode |
+| 324_loan_amortisation_schedule | 7 | PASS | 40 rows a sheet, every figure |
+| 325_demat_holdings_statement | 1 | PASS | holdings, transactions, total |
+| 326_itr_computation | 1 | PASS | both schedules, QR |
+| 330_cad_drawing_sheet | 1 | PASS | plan, dimensions, title block |
+| 331_pid_diagram | 1 | PASS | **fixed** - labels back inside their boxes |
+| 332_bom_on_drawing | 1 | PASS | **fixed** - one sheet, drawing present |
+| 333_datasheet_spec_tables | 1 | PASS | three spec tables |
+| 334_patent_document | 1 | PASS | form, abstract, FIG.1, claims |
+| 335_msds_safety_data_sheet | 1 | PASS | eight sections, pictograms |
+| 340_bill_of_lading | 1 | PASS | party boxes, goods table, barcode |
+
+### Fixed in this batch
+
+**A gap the flow cannot spend is a position, not a gap.** `flowFromBox` clamped every
+`w:spacing w:before` at 120 pt, so a page that leaves more white space than that had its lines
+put somewhere the page never put them. On **331_pid_diagram** the 233 pt between the title and
+the first equipment box became 120 pt and "CHILLED WATER" landed 114.1 pt above the box that
+holds it. `pageFits` was not wrong to refuse the page its gaps - the flow is linear and spending
+them all would have pushed the footer onto a second sheet - so the clamp could not simply be
+raised. Instead the line is now anchored at its own measured x and y, and every line after it on
+that page is placed the same way. Rows of fields are anchored field by field on such a page
+rather than tabbed across a flow.
+
+The same change fixed **332_bom_on_drawing**, which was spilling onto a second sheet: the
+overflow had carried all 15 of the drawing's anchored shapes with it, leaving the first sheet
+with a BOM table and no drawing.
+
+Also in this change: `Ctx.curShapes` was declared and never assigned, so the search for a stamp's
+own outline never matched anything. It is filled per page now, and a label drawn inside a closed
+outline is anchored to that outline (`containerOf`).
+
+### Measured
+
+G2 across all 208: **no document got worse**, 5 counts improved (line counts falling with no word
+lost). `TestPdfToWord` 29/29, `TestRealDocs` 3/3, `tools/precommit.sh --all` exit 0. Page counts
+spot-checked after the change: 315 stays one sheet, 344 and 371 unchanged, 332 down from two
+sheets to one.
+
+### Not fixed — carried forward
+
+Seven pages report the computed reading-order question between 60.0 % and 94.1 % in sequence
+while the eye passes all seven (318, 322, 323, 325, 326, 330, 332). Nine `order` verifications in
+this run, no document defect behind any of them. Recorded in REMAINING-DEFECTS.md as a tool
+problem: the rows are grouped by band and sorted left to right, and on a form page the bands and
+the tab-joined rows do not agree.

@@ -345,3 +345,25 @@ have continued` are each broken across lines on one side. That is the second run
 claim form for a phrase the render splits, and the second run where the measured `order`
 finding on the same page carried the defect instead.
 
+
+## v3 batch 2 (318-340, 15 documents), 8 Nov 09:36 run
+
+| claim type | verified | refuted | unverifiable |
+|---|---|---|---|
+| moved | 1 | 0 | 0 |
+| pagecount | 2 | 0 | 0 |
+| shapes | 1 | 0 | 0 |
+| order | 8 | 0 | 0 |
+| **total** | **12** | **0** | **0** |
+
+The first pass verified all twelve findings and nothing was refuted. Two of them were real
+document defects and were fixed (see REMAINING-DEFECTS.md, batch 2). The other ten were the
+`order` question on eight pages plus `shapes` on 332, and every one of them was a MEASUREMENT
+bug: the eye passed all eight pages and was right. After the fix the second pass emitted seven
+findings, all `order`, all verified, all measurement. That is nine `order` verifications in one
+run with zero document defects behind them - the strongest signal yet that the order question
+needs repair, not the pages.
+
+The `shapes` finding on 332 (`15 shapes in the PDF, 0 in the render`) was true of the first
+pass and gone after the fix, because the drawing's own shapes had been pushed onto a second
+sheet by the flow overrun.
