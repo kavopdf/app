@@ -1356,6 +1356,15 @@ public final class DocxWriter {
         int rowCount = Math.max(1, t.rows.size());
         float extentPt = t.bottom - t.top;
         int rowTw = extentPt > 0f ? (int) Math.round(extentPt / rowCount * TWIPS_PER_PT) : 0;
+        // The rule the writer draws is added to every row by the renderer, so a row asked for
+        // the page's own pitch arrives that much taller. With collapsed borders half of the top
+        // rule and half of the bottom rule lie INSIDE the row's box: the 6-eighth-point hairline
+        // below puts 0.375 pt of each into the row, 0.75 pt in all. Measured on
+        // itr-computation-with-slab-table by rendering the same table with and without its
+        // borders - 19.2 pt pitch with them, 18.4 pt without, against the page's own 18.4 pt,
+        // and the 0.8 pt a row of that table drifted by is the 38 rows of a page losing a sheet
+        // to nothing but its own rules. An unruled table draws no rule and keeps its full pitch.
+        if (rowTw > 0 && t.ruled) rowTw = Math.max(1, rowTw - TABLE_BORDER_TW);
         // The exact line height inside a cell was 200 twips - 10 pt - for every cell of every
         // table in every document. A price list drawn at 5.8 pt on an 8.4 pt row pitch got a
         // 10 pt line, so each of its 29 rows grew 1.6 pt taller than the page drew it and the
@@ -1520,6 +1529,15 @@ public final class DocxWriter {
 
     /** The paragraph a table must be followed by: 4 pt, in twips. */
     private static final int POST_TABLE_TW = 80;
+
+    /**
+     * What the table's own hairline adds to the height of every row, in twips.
+     *
+     * <p>6/8 pt = 0.75 pt = 15 twips, and it is the {@code w:sz="6"} in {@link #borders} that
+     * says so - the same number, not a fitted one. Half of the top rule and half of the bottom
+     * rule fall inside a row with collapsed borders, so one hairline, not two.
+     */
+    private static final int TABLE_BORDER_TW = 15;
 
     /**
      * How much room a page must have left before it may spend the gaps it drew, in points.
