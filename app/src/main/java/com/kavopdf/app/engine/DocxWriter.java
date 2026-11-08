@@ -192,6 +192,8 @@ public final class DocxWriter {
         int budgetTw;
         /** True when this page's own content fits the sheet, so its white space can be spent. */
         boolean spendGaps;
+        /** The shapes on the page being written, so a stamp can find its own outline. */
+        java.util.List<Shape> curShapes;
         /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
         float pageWidthPt = 595f;
         /**
@@ -292,7 +294,7 @@ public final class DocxWriter {
                 } else if (block instanceof Picture) {
                     picture(sb, (Picture) block, ctx);
                 } else if (block instanceof Shape) {
-                    shape(sb, (Shape) block, ctx);
+                    if (!((Shape) block).consumed) shape(sb, (Shape) block, ctx);
                 }
             }
         }
@@ -527,6 +529,13 @@ public final class DocxWriter {
         public java.util.List<float[]> freeform;
         /** Whether the path is painted closed, which joins its last point back to its first. */
         public boolean freeformClosed;
+        /**
+         * True once this shape has been folded into something else - a stamp's outline becomes
+         * the border of the text box that holds the stamp, so drawing it again would put a
+         * second rectangle in a slightly different place, which is exactly the drift the user
+         * reported: sometimes the outline shifts, sometimes the text inside it does.
+         */
+        public boolean consumed;
 
         public Shape(float xPt, float topPt, float wPt, float hPt) {
             this.xPt = xPt;
@@ -717,7 +726,24 @@ public final class DocxWriter {
                 // angle is 0 is a 180-degree stamp. Nothing is forced: an unrotated line never
                 // reaches this branch, because only b.rotated lines become a text box at all.
                 float stampRot = b.rotated && Math.abs(b.angle) < 1f ? 180f : b.angle;
-                anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), stampRot);
+                // The stamp's own outline, if the page drew one around it: an unfilled, stroked
+                // shape whose box covers this line. It becomes the border of this text box and
+                // is marked consumed so it is not drawn a second time somewhere else.
+                int borderRgb = -1;
+                float borderW = 0.6f;
+                if (ctx.curShapes != null) {
+                    for (Shape sh : ctx.curShapes) {
+                        if (sh.consumed || sh.fillRgb >= 0 || sh.lineRgb < 0) continue;
+                        if (sh.xPt > b.right + 4f || sh.xPt + sh.wPt < b.x - 4f) continue;
+                        if (sh.topPt > b.y + b.size * 3f || sh.topPt + sh.hPt < b.y - b.size * 3f) continue;
+                        sh.consumed = true;
+                        borderRgb = sh.lineRgb;
+                        borderW = Math.max(0.4f, sh.lineWidthPt);
+                        break;
+                    }
+                }
+                anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), stampRot,
+                        borderRgb, borderW);
             }
             return;
         }
@@ -1189,6 +1215,21 @@ public final class DocxWriter {
      */
     private static void anchor(StringBuilder sb, Ctx ctx, float xPt, float yTopPt,
                                float wPt, float hPt, String inner, float rotDeg) {
+        anchor(sb, ctx, xPt, yTopPt, wPt, hPt, inner, rotDeg, -1, 0f);
+    }
+
+    /**
+     * The same, with the stamp's own outline drawn as the box's border.
+     *
+     * <p>The outline used to be a separate Shape and the text a separate text box, each with
+     * its own position arithmetic, and they drifted apart - the user's report is precise:
+     * sometimes the outline shifts, sometimes the text inside it. Binding the outline to the
+     * box that holds the text makes that impossible: there is one object, one position, and
+     * the border is drawn around the text by the same shape that places it.
+     */
+    private static void anchor(StringBuilder sb, Ctx ctx, float xPt, float yTopPt,
+                               float wPt, float hPt, String inner, float rotDeg,
+                               int borderRgb, float borderWpt) {
         int id = ctx.shapeSeq++;
         long cx = Math.max(1, Math.round(wPt * EMU_PER_PT));
         long cy = Math.max(1, Math.round(hPt * EMU_PER_PT));
@@ -1224,7 +1265,16 @@ public final class DocxWriter {
         sb.append("><a:off x=\"0\" y=\"0\"/><a:ext cx=\"").append(cx)
                 .append("\" cy=\"").append(cy).append("\"/></a:xfrm>")
                 .append("<a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom>")
-                .append("<a:noFill/><a:ln><a:noFill/></a:ln></wps:spPr>")
+                .append("<a:noFill/>");
+        if (borderRgb >= 0) {
+            sb.append("<a:ln w=\"").append(Math.max(6350, Math.round(borderWpt * EMU_PER_PT)))
+              .append("\"><a:solidFill><a:srgbClr val=\"")
+              .append(String.format("%06X", borderRgb & 0xFFFFFF))
+              .append("\"/></a:solidFill></a:ln>");
+        } else {
+            sb.append("<a:ln><a:noFill/></a:ln>");
+        }
+        sb.append("</wps:spPr>")
                 .append("<wps:txbx><w:txbxContent>").append(inner).append("</w:txbxContent></wps:txbx>")
                 // wrap="none": the box must not re-wrap the line it holds, or a long line
                 // would break at the box width and the second half would land under the first.
