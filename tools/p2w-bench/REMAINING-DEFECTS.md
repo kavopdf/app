@@ -2724,3 +2724,48 @@ If this is picked up again it needs a different idea, not a tighter threshold: c
 table's cell text back against the band's line text word for word and reject on any word that
 does not survive, rather than inferring safety from counts. That check belongs in the table
 builder, not in this derivation, and it would also protect the ruled path from the same failure.
+
+
+### D-19  A figure is written as dozens of loose anchors, so it splits across a page
+
+**Reported from the phone on v3.53.0:** a one-page PDF came back as two pages, with the chart's
+top half on page one and the rest of it on page two. The user says this is not one document - it
+happens on many of them.
+
+Reproduced on `65_two_col_full_width_figure_caption`. Measured on the generated file:
+
+    PDF pages:          1
+    DOCX page breaks:   0
+    tables: 0   txbxContent: 25   images: 0
+    anchored shapes:    74
+
+There is no page break in the document at all, and that is the point: 74 anchored shapes are
+pinned to absolute positions on the page, and when their combined vertical extent passes the
+page's own height the viewer has nowhere to put the overflow except a new page. The chart's
+labels, its axis, its grid lines and its plotted lines are 74 separate objects, each with its own
+position arithmetic, so nothing in the file says "this is one figure and it must not be broken".
+
+The PDF itself draws the figure as a full-width block spanning both columns of a two-column page,
+which is exactly the case the classification sheet the user supplied calls out: vector paths that
+overlap structural layout components must be isolated into a bounded box, rasterised to a PNG and
+removed from the flow.
+
+**The fix is the one already built for stamps, generalised.** `stampPictures` in `PdfToWord`
+already finds a cluster of positioned objects, renders that area of the PDF page at 300 dpi,
+crops it and writes it as a single anchored `Picture` with the text kept as alt text. A figure is
+the same problem with a different trigger: instead of "rotated lines", the trigger is a dense
+cluster of shapes and text boxes occupying a rectangle that no single paragraph accounts for.
+
+**Two things have to be got right, and both are measurable.**
+
+1. The trigger. A stamp is unambiguous - a rotated line. A figure is not: a table's own rules, a
+   page border and a masthead band are also clusters of shapes, and rasterising those would undo
+   the work that made them real tables and real backgrounds. The trigger should be a rectangle
+   holding many shapes AND many text lines AND no table, which is what a chart looks like and what
+   a table, a border and a band do not.
+2. The alt text. A rasterised figure loses its labels from the text layer. They must go into the
+   picture's `descr` the same way a stamp's do, or `gate.py` will report every figure document as
+   having lost words - it already folds `descr` in, so this is free if the text is passed.
+
+**Tries: 0 of 3.** Diagnosed and measured; not started.
+
