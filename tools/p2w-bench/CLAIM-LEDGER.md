@@ -321,3 +321,27 @@ Three findings, three verified. `moved:M. Sathe` is the signature block 36.9 pt 
 rule the page drew it under. The two `order` findings are the row-banding blind spot again,
 both on pages the eye passed - salary-slip-corporate's page is faithful and its order is
 93.8 %, which is the D-03 class and not a defect.
+
+## The D group (10 documents), 8 Nov
+
+| claim type | verified | refuted | unverifiable |
+|---|---|---|---|
+| moved | 4 | 1 | 2 |
+| wraps | 1 | 1 | 0 |
+| pagecount | 2 | 0 | 0 |
+| order | 4 | 0 | 0 |
+| **total** | **11** | **2** | **2** |
+
+`moved:Table 1. Metric weights and results (per cent)` was REFUTED at y=108.9 in the PDF
+against y=108.6 in the render: the table itself did not move, only the prose around it. The
+eye had listed it as part of the two-column complaint and the verifier was right to split it.
+`wraps:Revision of trade prices for fasteners and fittings` was REFUTED - the PDF's own text
+layer holds the line twice, so both sides count two lines. The document still fails on
+`pagecount` and `order`, both verified, so nothing is left on that claim.
+
+Two UNVERIFIABLE, both the same shape: the string is not on both sides as one string.
+`SAHAYDRI ELECTRICALS PVT. LTD.` and `and a false boundary splits a paragraph that should
+have continued` are each broken across lines on one side. That is the second run to want a
+claim form for a phrase the render splits, and the second run where the measured `order`
+finding on the same page carried the defect instead.
+

@@ -19,6 +19,7 @@ opened is not counted here - `looked.py` decides that, not this file.
 | 8 Nov | 13 | 4 | 31 % | g53 batch 1, the multi-column class: 9 fail, 8 of them on pagecount |
 | 8 Nov | 15 | 12 | 80 % | v3 batch 1 re-run after the gap fix: 3 fail (303 breaks, 311 weld, 315 columns) |
 | 8 Nov | 13 | 6 | 46 % | g53 batch 3, the tax-invoice class: 7 fail, after two engine fixes cleared 9 of the 13 documents of the spill and the dropped header line |
+| 8 Nov | 10 | 5 | 50 % | the D group, and the corpus is now fully scored: 113 PASS / 95 FAIL of 208, last row per document |
 
 Not a baseline yet - three documents is not the corpus. It becomes one when a full
 batch has been through both halves of the check.
@@ -446,3 +447,22 @@ Four documents passed the eye and failed `order` - delivery-challan, electricity
 form16-part-b and gst-invoice-multipage-item-table. All four are the row-banding blind spot
 (D-03), named by `looked.py --combine` as "eye (numbers wrong - repair the tool)". The pages
 are faithful and the documents stay PASS.
+
+## The D group - landscape and rotated pages, tables across a break, merged cells, shadow text (10 documents, 8 Nov)
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-08 | landscape-page-inside-portrait-document | PASS | section break now starts a page - the landscape sheet's header lands at 46.6 pt against the page's 47.6, was 0.4; table and footer carry the corpus-wide 8.8 pt table-top gap |
+| 2026-11-08 | one-page-rotated-180-degrees | FAIL | moved:Corrective actions closed within 30 days - the upside-down table is un-rotated to the top and an empty ruled grid is left below, order 6.7 % of 15 rows |
+| 2026-11-08 | table-across-page-break-repeated-header | PASS | header repeated on all three sheets, rows 1-42 and the closing stock line on the page rows |
+| 2026-11-08 | table-inside-two-column-page | FAIL | order 79.5 % of 40 rows against 43 - the two columns are collapsed into one flow so the right column runs down the left |
+| 2026-11-08 | table-with-merged-cells | FAIL | order 62.2 % of 24 rows against 21, moved:West -9.7 pt, wraps:Headcount by quarter 2 lines into 3 - the merged Region cell is split |
+| 2026-11-08 | table-with-no-header-row | PASS | 30 rows, every value and the no-header note on the page rows |
+| 2026-11-08 | table-with-rotated-header | FAIL | moved:Downtime (hrs) -27.0 pt, moved:Cost per piece (Rs) -33.0 pt, order 81.1 % - the vertical header labels land inside the May 2026 row |
+| 2026-11-08 | text-held-twice-shadow-text | FAIL | pagecount 1 in / 2 out, order 59.6 % of 21 rows against 26 - the shadow copy is emitted as a second line and pushes the sheet over |
+| 2026-11-08 | two-tables-stacked-with-no-gap | PASS | both tables, the totals row and the pallet row on the page rows |
+| 2026-11-08 | very-long-single-column-table | PASS | 96 rows over three sheets, header repeated, footer on the page rows |
+
+Five pass, five fail. This closes the corpus: 208 of 208 documents now have a row, and the
+final sweep over all 208 is the only place one is called finished.
+

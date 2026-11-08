@@ -684,3 +684,31 @@ on presence rather than count, which is why two lost rings still answered yes.
 198 documents have a row in VISUAL-SCORE.md, 10 do not - all ten are the D group: landscape
 and rotated pages, tables across a page break, merged cells, shadow text, a rotated header.
 The final sweep over all 208 has not started.
+
+## The D group - the last ten documents, 8 Nov 13:05
+
+Ten documents, eighteen pages, all seventeen steps in order, every page opened before any number
+was read. Seventeen findings, 13 verified, 2 refuted, 2 unverifiable. Five pass, five fail.
+
+**The engine change.** A section break now sets `ctx.newPage`, which is what the plain page-break
+branch already did. Without it the first line of a landscape section was laid at y=0: the pitch
+was measured against the previous page's baseline, came out hugely negative, and no space-before
+was written. `landscape-page-inside-portrait-document` page 2 went from a 47.6 pt page-level
+offset to 1.0 pt on the header and 8.8 pt on the footer. G2 across 208: no document got worse.
+
+**What the eye caught that the eight questions could not.** The landscape page passed all eight
+on every page, before and after the fix. None of the eight measures an absolute y, so a page laid
+at the top edge of the sheet answers "reading order yes, overlap yes, inside page yes". The eye
+saw it at once and `position.py` confirmed it at 47.6 pt. That is the blind spot this batch
+found, and it is worth adding a ninth question rather than leaving it to the eye.
+
+**What the eye got wrong.** Two claims came back REFUTED. `moved:Table 1. Metric weights and
+results (per cent)` was at y=108.9 against y=108.6 - the table did not move, only the prose under
+it did. `wraps:Revision of trade prices for fasteners and fittings` counted two lines on both
+sides because the PDF's own text layer holds the line twice. Neither was fixed, which is the
+point of verifying before fixing.
+
+**Where the corpus stands.** 208 of 208 documents have a row in VISUAL-SCORE.md: 113 PASS and 95
+FAIL on the last row recorded for each. The 95 are the backlog the final sweep has to work, and
+every one of them needs either a fix or three tries and a CLOSED-UNFIXABLE entry. The final sweep
+over all 208 has not started, and it is the only place a document is called finished.

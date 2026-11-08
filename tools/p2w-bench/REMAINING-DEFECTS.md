@@ -2174,3 +2174,81 @@ worse. **Tries: 0 of 3.**
         charts question passes on presence, not on count, so two lost rings read as a pass.
         The eye is what caught the stamp. A count-based shape question would have said no on
         this page; that is the change to make, and it is D-05's neighbour.
+
+## The D group (10 documents), 8 Nov - the last ten, and the fix that closed the landscape page
+
+Ten documents, eighteen pages, all seventeen steps in order. Every page was opened before any
+number was read. Seventeen findings, 13 verified, 2 refuted, 2 unverifiable. Five documents
+pass, five do not.
+
+### FIXED this run: a section break is a new page, and the writer did not say so
+
+`landscape-page-inside-portrait-document` sets page 2 landscape inside a portrait file, so the
+writer closes the portrait section and opens a landscape one. The plain page-break branch set
+`ctx.newPage = true`; the section-break branch did not. Everything downstream of that flag
+assumed a continuation: `para()` measured the pitch against the PREVIOUS page's last baseline
+(47.6 - 700, a large negative), found no positive gap, wrote no space-before, and laid the whole
+landscape page at y=0. The header rendered at y=0.4 where the page drew it at y=47.6, the table
+9.2 pt low, and the footer 55 pt off.
+
+One line in the section-break branch. G2 across 208: no document got worse, 49 line counts still
+fall with no word lost. Re-measured: header 46.6 against 47.6, footer 548.3 against 557.1.
+
+What is left on the page is 8.8 pt, and it is not this defect - it is the corpus-wide table-top
+gap the spacer comment in `DocxWriter.table()` already records, the same one that puts 4-6 pt on
+every other table document in this batch. It stays OPEN below.
+
+### OPEN - a page rotated 180 degrees is un-rotated by the text and not by the rules
+
+`one-page-rotated-180-degrees` p2. `moved:Corrective actions closed within 30 days` verified:
+y=559.6 in the PDF, y=283.4 in the render. The whole sheet is drawn upside down - the note says
+so - and the engine reads it correctly and emits the rows in the right order, which is the hard
+part and it works. What it does not do is move the table's RULES with the text: the render shows
+rows 11-20 as borderless lines at the top of the sheet and an empty five-column ruled grid in the
+lower half where the page actually put the table. `order` 6.7 % of 15 rows. **Tries: 0 of 3.**
+The next try is to carry the page's rotation into the table geometry, so a 180 page's rules are
+flipped about the page centre before the table is built.
+
+### OPEN - a two-column page is still laid out as one flow
+
+`table-inside-two-column-page`. `order` 79.5 % of 40 rows against 43. Table 1 stays at the top
+right where the page drew it (`moved:` on it was REFUTED, y=108.9 against y=108.6), but every
+paragraph under it runs down the LEFT column at full width and the right column stays empty. This
+is the same cause as `27_two_column_left_short_txtpos`, whose right column sits 54 pt low, and
+`w:cols` was reverted once already for a reason recorded in `pageColumns()`. **Tries: 0 of 3.**
+
+### OPEN - a merged cell is split into a row of its own, and the group header grows a line
+
+`table-with-merged-cells`. `moved:West` verified at y=157.7 against y=148.0; `wraps:Headcount by
+quarter` verified at 2 lines in the PDF against 3 in the render; `order` 62.2 % of 24 rows
+against 21. The Region column's vertical merge is not carried, so the group label takes a row the
+page gave to its first member and every band under it shifts. **Tries: 0 of 3.**
+
+### OPEN - a rotated header row is emitted inside the first data row
+
+`table-with-rotated-header`. `moved:Downtime (hrs)` verified -27.0 pt, `moved:Cost per piece (Rs)`
+verified -33.0 pt, `order` 81.1 % of 17 rows against 20. The page draws ten column labels rotated
+90 degrees in a tall header band. The render has no header row at all: the labels are joined into
+the `May 2026` row, which then reads "May 2026 Month 57,802 Headcount 139 Produced...". OOXML has
+no text rotation a LibreOffice render honours, so the labels cannot be drawn vertically - but they
+can be put in a header ROW above the table instead of inside row 1. **Tries: 0 of 3.**
+
+### OPEN - a shadow copy of a line is emitted as a second line
+
+`text-held-twice-shadow-text`. `pagecount` verified 1 in / 2 out, `order` 59.6 % of 21 rows
+against 26. The subtitle is drawn twice at one baseline; the render emits both copies as visible
+text, which wraps and pushes the sheet over. This is the same family as D-38 (faux bold, 1 of 3
+tried and reverted) and carries the same blocker: `missing` rewards a doubled text layer, so a
+fix that makes the page right cannot pass G2 until `missing` stops counting it. **Tries: 0 of 3.**
+
+### Two measurement notes, both on pages the eye passed
+
+`table-across-page-break-repeated-header` fails the emphasis question on page 3: "1 of 3
+emphasised lines lost it, e.g. Closing stock value as on 30 September 2". The line is bold on
+both sides and the page is faithful; the question counts size, not weight, which is D-09. The
+document stays PASS.
+
+`position.py` on `landscape-page-inside-portrait-document` reads 27.9 % of 122 lines within
+tolerance, and its worst entries are seven copies of "Within limit" paired against each other at
+-175 and +46 pt. Matching by text cannot pair a repeated cell value, so that share understates the
+page. The one-off offsets that are real - header, footer, first row - are all under 10 pt.

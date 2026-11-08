@@ -254,6 +254,14 @@ public final class DocxWriter {
                         .append("<w:sectPr>").append(sectPrXml(secW, secH, secCols, secGap))
                         .append("<w:type w:val=\"nextPage\"/></w:sectPr>")
                         .append("</w:pPr></w:p>");
+                // A section break starts a fresh sheet exactly as w:br does, so the first line
+                // of the new section has to take its position from the page's own top edge.
+                // Without this the branch fell through to the continuation path, the pitch was
+                // measured against the PREVIOUS page's last baseline (a large negative), no
+                // space-before was written, and the whole page was laid at y=0. On
+                // landscape-page-inside-portrait-document that put the landscape page 47.6 pt
+                // above where the PDF drew it - header at y=0.4 against the page's y=47.6.
+                ctx.newPage = true;
                 secW = pw;
                 secH = ph;
                 secCols = pCols;
