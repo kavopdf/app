@@ -1670,7 +1670,33 @@ b. Word-context: a faux-bold copy has the same neighbouring glyphs at the same o
 
 Option (a) is the one to try first, with 324 as the regression document that decides it.
 
-**Tries: 0 of 3.** The analysis is done; the fix is not written.
+**TRIED 8 Nov and REJECTED: line-level dedupe.** `dedupeLines()` was written - two lines
+with identical text and a y within a quarter of the type size keep one - and it did fix the
+targets: 38's subtitle went from two copies to one and 411's "NESTED FORM" from two to one.
+The gate rejected it, correctly:
+
+| Document | counts | verdict |
+|---|---|---|
+| 411_nested_xobject_transforms | extra 6 -> 0, lines 3 -> 2 | improved |
+| 38_faux_bold_italic_synthesised | **missing 4 -> 14** | lost 10 words |
+| text-held-twice-shadow-text | **missing 0 -> 76**, lines 47 -> 42 | lost 76 words |
+
+`text-held-twice-shadow-text` holds its text twice on purpose - the second copy is the drop
+shadow - and its two copies sit closer together than a quarter of the type size, so the rule
+ate it. That is the third document this defect needs, and it is the one that decides the
+design: a dedupe that keeps the first copy cannot tell a faux-bold copy from a deliberate
+shadow copy, because at line level they are the same thing.
+
+**What that leaves.** The two copies differ only in colour and weight, not in position or
+text, so position and text cannot separate them. The separating signal has to be the one the
+page actually used to mean "bolder": the copy is drawn in the same colour as the first and
+slightly offset. A shadow is drawn in a different colour, usually grey or black against a
+coloured fill. So the rule has to compare colour as well as position, and that needs
+measuring against both 38 and text-held-twice-shadow-text before it can ship.
+
+**Tries: 1 of 3** for D-10.
+
+
 
 
 ## CLOSED - the gate counted a row merge as lost text, 8 Nov
