@@ -3432,3 +3432,52 @@ by more than a small margin, and the sum of `w:before + w:line` must not exceed 
 
 **Tries: 0 of 3.** Three levels of cause measured; the fix is not started.
 
+
+
+**What Google Docs actually does, researched - and it changes two things.**
+
+Two assumptions behind this entry were wrong. Google Docs has had newspaper columns since September
+2016 (`Format > Columns`, one to three) and continuous section breaks since May 2019
+(`Insert > Break`). The constructs are modelled; the failures are subtler.
+
+**1. The extra page is structural, not accumulated spacing.** The arithmetic settles it: A4 with
+36 pt margins leaves 769.9 pt of content area. The 1,248 pt of flow, split into two columns, is
+624 pt per column - **146 pt of headroom**, and even a 20 % line-height growth fits. What does not
+fit is the same 1,248 pt linearised into **one** column: 1.62 pages. So the column block is
+collapsing to a single column, and that is what the 78-paragraphs-for-35-baselines measurement was
+seeing from the other side.
+
+**2. Google Docs changes the line rule to auto.** Measured, not inferred: on import Docs keeps
+`w:line` but changes `w:lineRule` from `exact` to `auto`, so the value becomes a **multiple** of the
+paragraph's line height rather than an absolute height. Twelve-point text with 11 pt exact leading
+grows about 15 %. The API confirms the model - `lineSpacing` is a percentage where normal is 100,
+with no absolute field.
+
+**That second point is not a multi-column issue.** The whole positioning model here stands on
+`w:lineRule="exact"`. If the reader is Google Docs, every document is being re-spaced by a
+percentage, not placed at a height. An empty paragraph used as an exact-height spacer collapses: one
+measured case took a 145 pt spacer to about 14 pt.
+
+**What this converter must avoid, ranked by how likely each is to cause an extra page:**
+1. Letting the column block linearise to one column - 1,248 pt becomes 1.62 pages.
+2. Relying on `continuous` surviving as continuous - Docs has no authored field for the section
+   type; `SectionStyle.sectionType` is documented as output-only, so any boundary may become a page
+   break.
+3. Spending the 146 pt of headroom - every Docs section break forces a newline and costs a
+   paragraph box that Word does not charge for.
+4. Using `w:lineRule="exact"` to control height.
+5. Using an exact-height empty paragraph as a spacer or as reserved room for a drawing.
+6. Assuming an anchored drawing is out of flow - `behindDoc` survives, but the anchor re-tethers to
+   a paragraph and a text box becomes a drawing.
+7. Emitting more than three columns - Docs caps at three and may fall back to one.
+
+**One thing that is preserved:** `behindDoc` survives Word import since May 2021, which is why the
+stamp sits behind the text. Whether `a:xfrm rot` survives is not stated anywhere and Docs has no
+body rotation control, so a load-bearing rotation cannot be assumed to survive.
+
+**What would settle the remaining fork** - whether the column block linearises or the continuous
+break becomes a page break - is one three-way render of an affected page: LibreOffice, Google Docs,
+and Docs' own Download as PDF, with Show section breaks and Show non-printing characters on.
+
+**Source:** the report is `D8-D-google-docs-support.md`.
+
