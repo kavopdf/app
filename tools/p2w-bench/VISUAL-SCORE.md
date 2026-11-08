@@ -378,3 +378,34 @@ edited - the history is the point - but they must be re-read before they are cou
 failures. The 09:00 digest counts PASS rows, so a stale FAIL overstates the work left, never
 understates it, which is the safe direction to be wrong in.
 
+
+## g53 corpus - batch 2 (B 14-20, C 21-26), 8 Nov - the statements class
+
+Thirteen documents, 15 pages in the PDF. Every page opened before any number was read.
+26 findings: 25 verified, 0 refuted, 1 unverifiable. **7 pass, 6 fail.**
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-08 | admit-card | PASS | candidate field grid, examination schedule and five instructions; order 84.2 % and one overlap are measurement, the page is faithful |
+| 2026-11-08 | balance-sheet-and-profit-loss | PASS | balance sheet and statement of profit and loss, both year columns on the page rows |
+| 2026-11-08 | bank-statement-5-pages | PASS | five statement pages, every row and the closing balance; order 78.9 % counts the header band twice |
+| 2026-11-08 | bank-statement-horizontal-rules-only | FAIL | pagecount - 1 page in the PDF, 2 in the render; the 28 rows are set taller than the page drew them and the table runs past the sheet |
+| 2026-11-08 | boq-horizontal-rules-only | PASS | five schedule sections, every quantity, rate and amount on the page rows |
+| 2026-11-08 | boq-tender-bill-of-quantities | FAIL | pagecount - 1 page in, 2 out; the table grows and the signature block is pushed off the sheet |
+| 2026-11-08 | invoice-line-items-qty-rate-amount | PASS | table, totals and words line on the page rows; the eye's extra:DUE claim was REFUTED, 0 lines on either side |
+| 2026-11-08 | marksheet-subject-left-marks-right | FAIL | wraps:A+ 90 - the grading scale is one line on the page and the render spends three |
+| 2026-11-08 | payslip-label-left-amount-right | FAIL | moved:Net pay for the month 116.4 pt - the earnings and deductions tables are set with taller rows |
+| 2026-11-08 | price-list-right-aligned-amounts | PASS | 24 items with code, MOQ and the right-aligned trade price; order 96.6 % is measurement |
+| 2026-11-08 | product-catalogue-code-left-price-right | FAIL | pagecount - 1 page in the PDF, 2 in the render; order 88.2 % of 104 rows |
+| 2026-11-08 | question-paper-marks-right-margin | PASS | ten numbered questions and the marks column at the right margin; order 95.7 % is measurement |
+| 2026-11-08 | table-of-contents-dot-leaders | FAIL | pagecount - 1 page in, 2 out; order 8.2 % of 24 rows against 49, the entries are set with growing gaps |
+
+Four of the six failures are one cause: a table whose rows are set taller than the page drew
+them. The row pitch, the cell line height and the cell margins are all already the page's own
+numbers, so the excess is not in the writer's arithmetic - it is in what the render adds to a
+row the writer asked for with `w:hRule="atLeast"`. That is a measurement, not a guess, and it
+is the next thing to take. Recorded in REMAINING-DEFECTS.md.
+
+Five documents passed the eye and failed a computed question. All five are the reading-order
+question on a page whose rows band differently from the PDF's - the measurement blind spot
+already recorded, not a page defect.

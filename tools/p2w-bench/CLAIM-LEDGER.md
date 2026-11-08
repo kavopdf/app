@@ -257,3 +257,30 @@ omitted the colon the PDF draws ("Copy forwarded to:"), so `startswith` never ma
 
 Six `order` findings verified and all six were decided for the document by the eye. That is
 the row-banding blind spot (D-03) showing up as a claim type, not as a defect.
+
+## g53 batch 2 (B 14-20, C 21-26), 8 Nov - the statements class
+
+26 findings: 25 verified, 0 refuted, 1 unverifiable.
+
+| claim type | verified | refuted | unverifiable |
+|---|---|---|---|
+| pagecount | 7 | 0 | 0 |
+| order | 15 | 0 | 0 |
+| moved | 2 | 0 | 0 |
+| wraps | 1 | 0 | 0 |
+| extra | 0 | 0 | 1 |
+| **total** | **25** | **0** | **1** |
+
+Fifteen of the twenty-five are `order`, and thirteen of those fifteen were decided for the
+document by the eye - the row-banding blind spot (D-03) again, now the single largest claim
+type in the ledger. The five documents it passed are the five the eye passed.
+
+The unverifiable one is `moved:Directors' report` on the table of contents: the entry is two
+lines in the render and one line in the PDF, so the needle is not a line on both sides. The
+claim vocabulary has no form for a phrase that is a whole line on one side and a fragment on
+the other, and this is the third run to want one.
+
+`extra:DUE 10 September` was recorded by the eye on the invoice and **refuted** - 0 lines on
+either side. It is not in this table's verified column because it was re-recorded as PASS once
+the verifier had checked it. The refutation belongs here as a note: a red difference panel is
+a rendering artefact, and reading one as a defect is the eye's failure mode on dense tables.

@@ -1910,3 +1910,93 @@ baselines - the table-height family below, not the gap. **Tries: 0 of 3.**
 315_gazette_notification is not re-listed: its failure is D-08 (a page set in two or three
 columns is written as one flow), which is open with its own tries and is the next class to
 work.
+
+## OPEN - g53 corpus, batch 2 (B 14-20, C 21-26), found this pass, 8 Nov
+
+Thirteen documents, 15 pages in the PDF. Every page opened before any number was read; every
+finding checked against the PDF. 26 findings: 25 verified, 0 refuted, 1 unverifiable.
+**7 pass, 6 fail.**
+
+### OPEN - a table's rows are set taller than the page drew them
+
+bank-statement-horizontal-rules-only (28 rows on one sheet, the render spills to two),
+boq-tender-bill-of-quantities (22 rows plus the signature block, spills to two),
+product-catalogue-code-left-price-right (one sheet in, two out), and the same cause behind
+payslip-label-left-amount-right's 116.4 pt drop and table-of-contents-dot-leaders' 8.2 %.
+`pagecount` VERIFIED on all four: 1 page in the PDF, 2 in the render.
+
+The writer is already giving the table the page's own numbers: `rowTw` is
+`(t.bottom - t.top) / rows`, the cell line height is `rowTw` with `w:lineRule="exact"`, and
+`w:tblCellMar` is zero on every side. So the excess is not in the arithmetic. It is added by
+the render to a row the writer asked for with `w:hRule="atLeast"`, and it accumulates - the
+drift is invisible at row 1 and is a whole sheet by row 28. The measurement to take first is
+one table rendered row by row: the height LibreOffice actually gives a row against `rowTw`.
+Do not tune `rowTw` until that number exists; the last two attempts at this class were tuned
+by eye and reverted. **Tries: 0 of 3.**
+
+### OPEN - the grading scale is one line on the page and three in the render
+
+marksheet-subject-left-marks-right, page 1. `wraps:A+ 90` VERIFIED - the PDF sets the whole
+"A+ 90 - 100 GP 10 A 80 - 89 GP 9 ... F 0 - 39 GP 0" scale on one baseline and the render
+spends three lines on it, so "D 40 - 49", "GP 5", "F" and "GP 0" break onto their own lines at
+the right margin. The line is wider than the text area the render gives it: the page's own
+advance is narrower than the substituted face's, the same class as D-11 on 303. **Tries: 0 of 3.**
+
+### OPEN - the earnings and deductions tables are set with taller rows
+
+payslip-label-left-amount-right, page 1. `moved:Net pay for the month` VERIFIED - y=327.8 in
+the PDF, y=444.2 in the render. Two tables sit side by side on the page and the render sets
+each row about twice the page's height, so the whole block below them is 116 pt low. Same
+cause as the table row height above; it is one defect seen twice. **Tries: 0 of 3.**
+
+### UNVERIFIABLE this pass - the claim, not the page
+
+`moved:Directors' report` on table-of-contents-dot-leaders came back UNVERIFIABLE: the entry
+is two lines in the render ("04" over "Directors' report"), so the needle is not a line on
+both sides. The document fails on `pagecount` anyway. The claim vocabulary needs a form that
+can name a phrase which is a whole line on one side and a fragment on the other.
+
+### Refuted this pass - the eye was wrong and the verifier caught it
+
+`extra:DUE 10 September` on invoice-line-items-qty-rate-amount: 0 lines in the PDF, 0 in the
+render. The line the eye read on the difference panel is not text on either side. The
+document passes. This is the second time a red difference panel has been read as a defect.
+
+## TRIED - the two-column page, 8 Nov, try 1 of 3
+
+The largest open class: `pagecount` VERIFIED on seven g53 batch-1 documents, all of them pages
+that read ACROSS and are written as pages that read DOWN.
+
+**What was built.** `columnBands()` derives a {left, right} pair per column from the model;
+`colXml()` writes one `w:col w:w` per band so Word's columns start where the page's did;
+`columnBreak()` emits `w:br w:type="column"` at each column change and restarts the flow
+budget; every indent and every tab stop became column-relative (`b.x - colLeft`) instead of
+page-absolute. All of it compiles and runs.
+
+**What it measured, and why it is not committed.** Rendered on three of the seven:
+newsletter-3col-header-footer came out at **30 pages**, report-2col at 4, policy-2col at 4.
+Two causes, both found by measurement and both real:
+
+    the band's right edge was taken as the column's maximum, so ONE full-width masthead
+    stretched column 0 across the whole page and every ordinary line then counted as
+    "spanning". That produced 58 column breaks in an 82-paragraph document, and each break
+    after the last column starts a new page.
+
+Fixing the extent (a band's right edge is the furthest line of THAT column that does not cross
+the gutter) fixed the break count, but the corpus then answered the real question: **0 of 208
+documents qualify.** Every multi-column page in this corpus has at least one block that crosses
+a gutter - a masthead, a spanning table, a full-width rule, a photo - and a columned section has
+no way to hold such a block. Word's answer is a continuous section break around each spanning
+element, and LibreOffice's handling of continuous multi-column sections is exactly the thing
+that is not worth betting 208 documents on.
+
+**The method for try 2, and it is not the same one.** Do not use `w:cols` at all. A run of
+columns is a borderless table with one cell per band: cell widths from the measured bands,
+zero cell margins, each cell holding its column's paragraphs in order, spanning blocks as
+normal full-width paragraphs between the tables. That is how the target format builds a page
+that reads across, it needs no continuous sections, and it renders the same in LibreOffice as
+in Word. The reorder that try 1 built - `orderedBlocks()`, segmenting the page at spanning
+blocks and taking the columns in turn inside each run - is the part that is right and should be
+kept; only the container changes.
+
+**Tries: 1 of 3.** Reverted. G2 across 208 was never reached because nothing qualified.
