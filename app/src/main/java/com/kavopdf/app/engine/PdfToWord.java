@@ -4198,7 +4198,13 @@ public final class PdfToWord {
             android.graphics.Bitmap crop = android.graphics.Bitmap.createBitmap(full, px, py, pw, ph);
             java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
             if (!crop.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, bos)) return;
+            StringBuilder stampText = new StringBuilder();
+            for (Para p : stamps) {
+                if (stampText.length() > 0) stampText.append(' ');
+                stampText.append(p.text());
+            }
             DocxWriter.Picture pic = new DocxWriter.Picture(bos.toByteArray(), minX, minY, wPt, hPt);
+            pic.text = stampText.toString();
             for (Para p : stamps) page.blocks.remove(p);
             page.blocks.add(pic);
             if (report != null) report.images++;

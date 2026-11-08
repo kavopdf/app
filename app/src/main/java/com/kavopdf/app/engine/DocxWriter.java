@@ -424,6 +424,14 @@ public final class DocxWriter {
          */
         public boolean placed;
         public float xPt, topPt, wPt, hPt;
+        /**
+         * What this picture says, as text. A stamp is rasterised from the page so that its
+         * outline, its words and its angle cannot drift apart - and then its words are no
+         * longer in the document's text layer. Writing them as the picture's alt text puts
+         * them back: a screen reader reads them, a search finds them, and the gate's word
+         * comparison can see them. The picture is the appearance; this is the content.
+         */
+        public String text;
 
         public Picture(byte[] png, int widthEmu, int heightEmu) {
             this.png = png;
@@ -454,7 +462,7 @@ public final class DocxWriter {
                 .append("<wp:extent cx=\"").append(p.widthEmu).append("\" cy=\"")
                 .append(p.heightEmu).append("\"/>")
                 .append("<wp:docPr id=\"").append(id).append("\" name=\"Picture ").append(id)
-                .append("\"/>")
+                .append("\" descr=\"").append(esc(p.text == null ? "" : p.text)).append("\"/>")
                 .append("<a:graphic><a:graphicData uri=\"")
                 .append("http://schemas.openxmlformats.org/drawingml/2006/picture\">")
                 .append("<pic:pic><pic:nvPicPr><pic:cNvPr id=\"").append(id)

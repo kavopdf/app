@@ -64,6 +64,22 @@ def _has_default_colour(z):
     return 'w:color w:val="000000"' in st or 'w:color w:val="000"' in st
 
 
+def _alt_text(path):
+    """Words a document carries as a picture's alt text.
+
+    A rotated stamp is rasterised from the page so its outline, its words and its angle cannot
+    drift from each other, which takes those words out of the text layer. They are written as
+    the picture's alt text instead - the picture is the appearance, the alt text is the content.
+    A word comparison that ignored them would report every stamp document as having lost words.
+    """
+    try:
+        import zipfile
+        xml = zipfile.ZipFile(path).read("word/document.xml").decode("utf-8", "replace")
+    except Exception:
+        return ""
+    return " ".join(re.findall(r'<wp:docPr[^>]*?descr="([^"]*)"', xml))
+
+
 def docx_text(path):
     import zipfile
     try:
@@ -175,6 +191,9 @@ def big_shapes(path, page_w, page_h):
 def score_one(pdf, docx):
     ref, pages = pdf_lines(pdf)
     ours, dpages, hasbg, page_w, page_h = docx_text(docx)
+    _alt = _alt_text(docx)
+    if _alt.strip():
+        ours.append(_alt)
     refw, oursw = {}, {}
     for l in ref:
         for w in l.split(): refw[w] = refw.get(w, 0) + 1
