@@ -183,20 +183,24 @@ public final class NormStore {
         NormStore store = new NormStore();
         if (text == null || text.trim().isEmpty()) return store;
         for (String line : text.split("\n")) {
-            int eq = line.indexOf('=');
-            if (eq <= 0) continue;
-            String k = line.substring(0, eq).trim();
-            if (k.startsWith("rej=")) {
-                // a saved reject streak
-                String body = k.substring(4);
+            // A reject streak is written as "rej=<key>:<n>" (toText, above). The first '='
+            // in that line is the one after "rej", so splitting on '=' first left k as
+            // "rej" - the startsWith("rej=") test could never be true and every saved
+            // streak was dropped, silently, into the number parser below.
+            if (line.startsWith("rej=")) {
+                String body = line.substring(4);
                 int c = body.lastIndexOf(':');
                 if (c > 0) {
                     try {
-                        store.rejects.put(body.substring(0, c), Integer.parseInt(body.substring(c + 1).trim()));
+                        store.rejects.put(body.substring(0, c).trim(),
+                                Integer.parseInt(body.substring(c + 1).trim()));
                     } catch (NumberFormatException ignored) { }
                 }
                 continue;
             }
+            int eq = line.indexOf('=');
+            if (eq <= 0) continue;
+            String k = line.substring(0, eq).trim();
             String[] parts = line.substring(eq + 1).split(",");
             List<Long> vals = new ArrayList<>();
             for (String p : parts) {

@@ -215,10 +215,13 @@ public final class PdfEngine {
                     float px, py;
                     switch (r) {
                         case 90:  px = yd;      py = xd;      break;
-                        // A 180-degree page is upside down, so BOTH axes flip. Flipping only
-                        // x put the crop on the wrong half of the page: a rectangle taken from
-                        // the top of a rotated page landed at the bottom of the document.
-                        case 180: px = w - xd;  py = h - yd;  break;
+                        // A 180-degree page is turned end for end: the horizontal axis mirrors
+                        // (px = w - xd) but the vertical one does NOT, because the display's y
+                        // is already measured downwards and the turn leaves it running the same
+                        // way. Flipping y as well mirrored the crop vertically, so a band taken
+                        // from the top of the page was kept from the bottom. The other three
+                        // display->page mappings in this class all agree with py = yd here.
+                        case 180: px = w - xd;  py = yd;      break;
                         case 270: px = w - yd;  py = h - xd;  break;
                         default:  px = xd;      py = h - yd;  break;
                     }
@@ -1838,23 +1841,49 @@ public final class PdfEngine {
         try (PDDocument d = open(src)) {
             PositionedText pt = positionedText(d);
             float[][] geom = pageGeom(d);
-            int n = pt.chars.size();
+            // One entry per CHARACTER, not per TextPosition. getUnicode() is free to return
+            // more than one char - a ligature ("fi", "ffl") or a surrogate pair - and the
+            // text string, the per-glyph boxes and pageOf all have to line up with the
+            // offsets into that string, or every search highlight after the first ligature
+            // lands on the wrong glyph and wordsOnPage reads past the end of the arrays.
+            int entries = pt.chars.size();
+            int n = 0;
+            for (int i = 0; i < entries; i++) n += pt.chars.get(i).length();
             float[] gx = new float[n], gy = new float[n], gw = new float[n], gh = new float[n];
             int[] pageOf = new int[n];
             StringBuilder b = new StringBuilder(n);
             List<Integer> breaks = new ArrayList<>();
-            for (int i = 0; i < n; i++) {
+            int c = 0;
+            for (int i = 0; i < entries; i++) {
                 com.tom_roush.pdfbox.text.TextPosition tp = pt.pos.get(i);
-                b.append(pt.chars.get(i));
-                pageOf[i] = pt.page.get(i);
+                String u = pt.chars.get(i);
+                int pg = pt.page.get(i);
                 if (tp == null) {
-                    breaks.add(i);
+                    // the word-break marker PositionedText inserts after each string
+                    breaks.add(c);
+                    for (int j = 0; j < u.length(); j++) {
+                        b.append(u.charAt(j));
+                        pageOf[c++] = pg;
+                    }
                     continue;
                 }
-                gx[i] = tp.getXDirAdj();
-                gh[i] = tp.getHeightDir();
-                gy[i] = tp.getYDirAdj() - gh[i];
-                gw[i] = tp.getWidthDirAdj();
+                float x = tp.getXDirAdj();
+                float hh = tp.getHeightDir();
+                float y = tp.getYDirAdj() - hh;
+                float ww = tp.getWidthDirAdj();
+                int len = u.length();
+                // Share the glyph's advance between its chars, so a match on one char of a
+                // ligature gets its share of the box and a match on the whole ligature gets
+                // the whole box back when indexBox takes the union.
+                for (int j = 0; j < len; j++) {
+                    b.append(u.charAt(j));
+                    pageOf[c] = pg;
+                    gx[c] = x + ww * j / len;
+                    gy[c] = y;
+                    gw[c] = ww / len;
+                    gh[c] = hh;
+                    c++;
+                }
             }
             int[] spaces = new int[breaks.size()];
             for (int i = 0; i < breaks.size(); i++) spaces[i] = breaks.get(i);

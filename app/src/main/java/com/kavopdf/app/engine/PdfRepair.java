@@ -1727,6 +1727,7 @@ public final class PdfRepair {
             // nothing is attached, so a page whose content is genuinely gone is never handed
             // someone else's content.
             if (empty.isEmpty()) return;
+            int emptyBefore = empty.size();      // pages with no content before adoption starts
 
             // The orphan pool is built from the bytes, not from the cross-reference: the whole
             // fault is that these streams never entered the object pool the parser built.
@@ -1780,16 +1781,14 @@ public final class PdfRepair {
                     }
                 }
             }
-            int attached = pages - empty.size() - (pages - empty.size());
-            if (attached >= 0) {
-                int n = 0;
-                for (int i = 0; i < pages; i++) {
-                    if (doc.getPage(i).getCOSObject().getDictionaryObject(COSName.CONTENTS) != null) n++;
-                }
-                if (n > 0 && n <= pages) {
-                    r.actions.add("attached " + (pages - empty.size())
-                            + " orphaned content stream(s) back to their pages");
-                }
+            // How many pages THIS function gave a stream to: the ones that were empty when
+            // it started and are not any more. The old expression subtracted itself and was
+            // always 0, while the message counted every page that ended up with content -
+            // so a file where one stream was recovered reported all of its pages as repaired.
+            int attached = emptyBefore - empty.size();
+            if (attached > 0) {
+                r.actions.add("attached " + attached
+                        + " orphaned content stream(s) back to their pages");
             }
         } catch (Throwable ignored) {
         }
@@ -2230,9 +2229,14 @@ public final class PdfRepair {
                 }
                 walked++;
                 PDPage page = check.getPage(i);
-                boolean contentMissing =
-                        page.getCOSObject().getDictionaryObject(COSName.CONTENTS) != null
-                                && page.getContents() == null;
+                boolean contentMissing = false;
+                if (page.getCOSObject().getDictionaryObject(COSName.CONTENTS) != null) {
+                    // getContents() CREATES a stream when /Contents is present, so it has to be
+                    // closed here too: this probe runs once per page of every file inspected.
+                    java.io.InputStream probe = page.getContents();
+                    if (probe == null) contentMissing = true;
+                    else probe.close();
+                }
                 if (contentMissing || danglingContent(page)) {
                     // The content is not in the file at all: blank, and said so. This is
                     // checked before "partial", because a page with no content cannot be
@@ -2399,8 +2403,12 @@ public final class PdfRepair {
             try {
                 java.io.InputStream in = page.getContents();
                 if (in == null) return false;
-                content = new String(com.tom_roush.pdfbox.io.IOUtils.toByteArray(in),
-                        java.nio.charset.StandardCharsets.ISO_8859_1);
+                try {
+                    content = new String(com.tom_roush.pdfbox.io.IOUtils.toByteArray(in),
+                            java.nio.charset.StandardCharsets.ISO_8859_1);
+                } finally {
+                    in.close();
+                }
             } catch (Throwable t) {
                 return true;                    // the stream itself will not decode
             }
@@ -2486,8 +2494,13 @@ public final class PdfRepair {
         try {
             java.io.InputStream in = page.getContents();
             if (in == null) return false;
-            String content = stripStrings(new String(
-                    com.tom_roush.pdfbox.io.IOUtils.toByteArray(in),
+            byte[] bytes;
+            try {
+                bytes = com.tom_roush.pdfbox.io.IOUtils.toByteArray(in);
+            } finally {
+                in.close();
+            }
+            String content = stripStrings(new String(bytes,
                     java.nio.charset.StandardCharsets.ISO_8859_1));
             int q = 0, Q = 0, bt = 0, et = 0;
             int i = 0;

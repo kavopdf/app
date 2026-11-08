@@ -234,12 +234,16 @@ by an `isEmpty()`/size check or live in a loop bounded by `size() - 1`
 **How to verify:** read `PdfEngine.java:216-222` next to `:2108-2120`. In a build: open a two-column page, rotate it 180° in the app, crop the top half, and look at the result — the bottom half is kept.
 **User impact:** on any page whose /Rotate is 180 (an upside-down scan, or a page the user rotated twice), Crop keeps the wrong half of the page; the file is written without an error, so the user only finds out by opening the output.
 
+**STATUS: FIXED** - `cropPages` now maps a 180 degree page as `px = w - xd; py = yd`, matching `displayBoxToPage`, `addTextLayer` and the text-link writer; the y axis was being flipped twice. Checked against a rendered 180 degree page: the page-space band that displays at the top-left is x 200-300, y 0-100, and cropping the displayed top-left 100x100 now returns exactly that band (fully black), not the blank mirror. PdfEngine.java:224.
+
 ### P2 — The text index assumes one glyph is one character, so a ligature or a surrogate pair shifts every later highlight and makes `wordsOnPage` read past its arrays
 **File:** app/src/main/java/com/kavopdf/app/engine/PdfEngine.java:1841
 **What:** `indexText` sizes `gx/gy/gw/gh/pageOf` from `pt.chars.size()` (one entry per TextPosition) but builds `TextIndex.text` by appending those same entries, and `TextPosition.getUnicode()` may be several characters long, so from the first ligature ("fi", "ffl") or surrogate pair on, every offset into `text` is larger than the glyph index it is used as.
 **Why I think so:** `PositionedText.writeString` (1723-1732) adds one list entry per TextPosition (`chars.add(u)` at 1727), `indexText` takes `int n = pt.chars.size()` and allocates `new float[n]` for each array (1841-1842) plus `int[] pageOf = new int[n]`, then builds `StringBuilder b` by appending the same entries (1845-1846), so `b.length() >= n` with equality only when every unicode string is exactly one char. `wordsOnPage` loops `i <= idx.text.length()` and evaluates `idx.gw[i]` (1916) — for `i >= n` that is an `ArrayIndexOutOfBoundsException`. `searchIndex` (1885-1905) finds the match in `hay` (a copy of `text`, and a second length-changing copy when `matchCase` is false, e.g. 'İ'.toLowerCase()) and passes those offsets to `indexBox` (1866) and `pageOf[k]` (1895), which index the per-glyph arrays — so the highlight box is computed from the wrong glyph.
 **How to verify:** `grep -n "float\[\] gx = new float\[n\]" app/src/main/java/com/kavopdf/app/engine/PdfEngine.java` (one hit, 1842) and read 1841-1858 against 1723-1732. In a build: open a LaTeX- or InDesign-set PDF, search a word that appears after the first ligature on the page — the highlight sits one glyph to the left for each ligature before it.
 **User impact:** in the reader, search results are highlighted on the wrong word in any document with typographic ligatures or emoji, and the tap-to-copy word extractor would throw instead of returning words if it were called.
+
+**STATUS: FIXED** - `indexText` now allocates `gx/gy/gw/gh/pageOf` and builds `text` per CHARACTER: every char of a multi-char `getUnicode()` gets its share of the glyph's advance, and the word-break marker keeps its index in the same arrays. Checked on a PDF whose ToUnicode maps one glyph to "fi": text.length() == gx.length (4 == 4), `searchIndex("Z")` now finds the hit the misaligned index dropped, and `wordsOnPage` returns "fiZ" instead of reading past the arrays. PdfEngine.java:1844.
 
 ### P2 — The repair page loop opens a content stream per page and never closes three of them
 **File:** app/src/main/java/com/kavopdf/app/engine/PdfRepair.java:2235
@@ -248,6 +252,8 @@ by an `isEmpty()`/size check or live in a loop bounded by `size() - 1`
 **How to verify:** `grep -n "page.getContents()" app/src/main/java/com/kavopdf/app/engine/PdfRepair.java` — five hits; only 2302 is followed by a close. In a build, run the repair path over a 300-page file and watch the open descriptor count and heap with `adb shell dumpsys meminfo <pkg>`.
 **User impact:** a long damaged file leaves hundreds of streams open in the middle of the operation that already has the most memory pressure, which is where an out-of-memory kill is most likely to lose the work.
 
+**STATUS: FIXED** - the `contentMissing` probe now closes the stream it creates, and `drawsBrokenResource` and `unbalancedContent` close theirs in a `finally`. All four `page.getContents()` sites in this file are now closed; only the one in `paintsSomething` already was. PdfRepair.java:2231, :2405, :2496.
+
 ### P3 — The saved reject streak is never read back, so the adaptive timing norm restarts on every launch
 **File:** app/src/main/java/com/kavopdf/app/engine/NormStore.java:186
 **What:** `fromText` splits each line at the first '=' and then tests `k.startsWith("rej=")`, but a streak line is written as `rej=<key>:<n>`, so the first '=' is the one after "rej" and `k` is always `"rej"` — the branch can never be taken and every streak is dropped when the store is loaded.
@@ -255,10 +261,14 @@ by an `isEmpty()`/size check or live in a loop bounded by `size() - 1`
 **How to verify:** reason over one line, or run it on a JVM: `"rej=ocr|2-5|M:2".indexOf('=')` is 3, so `k` is `"rej"`. Then `grep -n "rej=" app/src/main/java/com/kavopdf/app/engine/NormStore.java` — two hits, writer at 170 and the unreachable test at 189.
 **User impact:** the "three slow runs in a row and the stale norm is thrown away" rule only works inside one session; after the app is closed and reopened, a device that has genuinely become slower needs three more slow runs before it stops being measured against a norm it can no longer meet.
 
+**STATUS: FIXED** - `fromText` tests `line.startsWith("rej=")` before splitting on '=', so the streak branch is reachable and `body` is the `<key>:<n>` part. TestNorms: 13 passed, 0 failed. NormStore.java:190.
+
 ### P3 — `attached` in `adoptOrphanContent` is always zero, and the repair log reports the page count as the number of streams attached
 **File:** app/src/main/java/com/kavopdf/app/engine/PdfRepair.java:1783
 **What:** `int attached = pages - empty.size() - (pages - empty.size());` subtracts the same expression from itself, so it is always 0 and the `if (attached >= 0)` guard under it can never fail; the message it then writes counts every page that now has content, not the streams this function attached.
 **Why I think so:** 1783 is the only assignment of `attached` and 1784 is its only read. The text added at 1791-1792 is `"attached " + (pages - empty.size()) + " orphaned content stream(s)"`, and `empty` has had every adopted page removed from it, so `pages - empty.size()` is the number of pages with content after adoption — the intended number is that value minus the pages that already had content.
 **How to verify:** read 1783-1793. In a build, repair a 5-page file that has one orphaned stream: the report says five streams were attached.
 **User impact:** the repair summary shown to the user overstates what was repaired, so a partial recovery reads as a complete one.
+
+**STATUS: FIXED** - the count is now `emptyBefore - empty.size()`, the pages this function actually gave a stream to, and the message uses it; the `attached >= 0` guard that could never fail is now `attached > 0`. TestRepair (188 passed) and TestRepairFixtures (1258 passed). PdfRepair.java:1730, :1788.
 
