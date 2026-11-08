@@ -246,6 +246,14 @@ public final class PdfToWord {
         /** The page box in points. A .docx section has to be told, or a landscape page comes
          *  out portrait and every x on it is measured against the wrong width. */
         public float width, height;
+        /**
+         * How many newspaper columns this page is set in - decided here, from the page's own
+         * unsplit lines, because by the time the writer sees the blocks the page has already
+         * been cut at the gutter and every band is half a page wide by construction.
+         */
+        public int columns = 1;
+        /** The gutter between those columns, in points. */
+        public float columnGap;
     }
 
     /** What the conversion could and could not do. */
@@ -464,6 +472,7 @@ public final class PdfToWord {
         float pageWidth = pdPage.getMediaBox().getWidth();
         final float pageHeight = pdPage.getMediaBox().getHeight();
         List<Line> rawLines = toLines(glyphs, new ArrayList<float[]>());
+        page.columns = proseColumns(rawLines, pageWidth);
 
         // Tables are found from the drawn rules, so they can be located before any line is
         // split. A column start that falls inside one is that table's cell separator, not a
@@ -2003,6 +2012,78 @@ public final class PdfToWord {
 
     /** Zero-coverage x-ranges of the glyphs in these lines, keeping only gaps with real
      *  columns on both sides. Used by the whole-page pass and by the per-band pass. */
+    /**
+     * How many newspaper columns this page is set in, decided from the page's own lines.
+     *
+     * <p>The writer cannot answer this. `asBands` cuts a four-point slice out of every line at the
+     * gutter, so a line crossing it arrives as two fragments and every band is half a page wide by
+     * construction - which is why three documents that are not multi-column at all were being
+     * divided: their "gutter" measured 4-12 pt and their "columns" were page halves.
+     *
+     * <p>A band is a column only if it is filled with prose. Spanning lines are dropped first
+     * (wider than 62 % of the content span - the rule `keep0` already uses), the rest are clustered
+     * by left edge, and each band must hold at least three lines whose width is half the widest
+     * band's ink width. Measured on the corpus: the worst false positive has one such line, the
+     * best genuine two-column page has five, most have eight to twenty-three.
+     */
+    private static int proseColumns(List<Line> rawLines, float pageWidth) {
+        if (rawLines == null || rawLines.size() < 6 || pageWidth <= 0f) return 1;
+        float minX = Float.MAX_VALUE, maxX = -Float.MAX_VALUE;
+        for (Line l : rawLines) { minX = Math.min(minX, l.x); maxX = Math.max(maxX, l.right); }
+        float span = maxX - minX;
+        if (span <= 0f) return 1;
+        java.util.List<Line> prose = new java.util.ArrayList<>();
+        for (Line l : rawLines) {
+            if (l.rotated) continue;
+            if (l.right - l.x > span * 0.62f) continue;
+            prose.add(l);
+        }
+        if (prose.size() < 6) return 1;
+        java.util.Collections.sort(prose, new java.util.Comparator<Line>() {
+            public int compare(Line a, Line b) { return Float.compare(a.x, b.x); }
+        });
+        // Cluster the left edges. A gutter is a run of x values with nothing in it.
+        java.util.List<float[]> bands = new java.util.ArrayList<>();   // {left, right, ink}
+        float curLeft = prose.get(0).x, curRight = prose.get(0).right;
+        for (int i = 1; i < prose.size(); i++) {
+            Line l = prose.get(i);
+            if (l.x - curRight > 8f) {
+                bands.add(new float[]{curLeft, curRight, 0f});
+                curLeft = l.x; curRight = l.right;
+            } else {
+                curRight = Math.max(curRight, l.right);
+            }
+        }
+        bands.add(new float[]{curLeft, curRight, 0f});
+        if (bands.size() < 2 || bands.size() > 4) return 1;
+        // Ink width of the widest band, and how many prose lines each band really holds.
+        float widest = 0f;
+        for (float[] b : bands) widest = Math.max(widest, b[1] - b[0]);
+        if (widest <= 0f) return 1;
+        int[] qualifying = new int[bands.size()];
+        for (Line l : prose) {
+            for (int b = 0; b < bands.size(); b++) {
+                if (l.x >= bands.get(b)[0] - 2f && l.right <= bands.get(b)[1] + 2f) {
+                    if (l.right - l.x >= widest * 0.5f) qualifying[b]++;
+                    break;
+                }
+            }
+        }
+        for (int q : qualifying) if (q < 3) return 1;
+        // Newspaper columns are about the same width as each other, and the gutter is narrow.
+        float widestBand = 0f, thinnestBand = Float.MAX_VALUE;
+        for (float[] b : bands) {
+            float w2 = b[1] - b[0];
+            widestBand = Math.max(widestBand, w2);
+            thinnestBand = Math.min(thinnestBand, w2);
+        }
+        if (thinnestBand < widestBand * 0.7f) return 1;
+        float gap = 0f;
+        for (int b = 1; b < bands.size(); b++) gap = Math.max(gap, bands.get(b)[0] - bands.get(b - 1)[1]);
+        if (gap > 30f) return 1;
+        return bands.size();
+    }
+
     private static List<Float> keep0(List<Line> rawLines, float fullWidth) {
         List<float[]> iv = new ArrayList<>();
         float lo = Float.MAX_VALUE, hi = -Float.MAX_VALUE;

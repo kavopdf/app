@@ -204,6 +204,8 @@ public final class DocxWriter {
         boolean positioned;
         /** The shapes on the page being written, so a stamp can find its own outline. */
         java.util.List<Shape> curShapes;
+        /** Left edge of each column band on this page, in points, by Para.column. */
+        java.util.Map<Integer, Float> colLeft;
         /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
         float pageWidthPt = 595f;
         /**
@@ -286,6 +288,14 @@ public final class DocxWriter {
                 ctx.newPage = true;
             }
             ctx.lastBaseline = -1f;
+            java.util.Map<Integer, Float> colLeft = new java.util.HashMap<>();
+            for (Object b4 : page.blocks) {
+                if (!(b4 instanceof PdfToWord.Para)) continue;
+                PdfToWord.Para pp = (PdfToWord.Para) b4;
+                Float was = colLeft.get(pp.column);
+                if (was == null || pp.left < was) colLeft.put(pp.column, pp.left);
+            }
+            ctx.colLeft = colLeft;
             ctx.lastLinePt = 0f;
             ctx.positioned = false;
             ctx.flowTw = 0;
@@ -368,7 +378,23 @@ public final class DocxWriter {
     }
 
     /** How many column bands this page's paragraphs occupy, and the widest gutter between them. */
+    /** The left edge of the column a paragraph sits in, in twips, or 0 for a one-column page. */
+    private static int bandLeftTw(Ctx ctx, int column) {
+        if (ctx.colLeft == null || ctx.colLeft.size() <= 1) return 0;
+        Float left = ctx.colLeft.get(column);
+        return left == null ? 0 : (int) Math.round(left * TWIPS_PER_PT);
+    }
+
     private static int[] pageColumns(PdfToWord.Page page) {
+        // The decision is made in PdfToWord.proseColumns, from the page's UNSPLIT lines. It cannot
+        // be made here: asBands cuts a four-point slice out of every line at the gutter, so by the
+        // time a Para exists every band is half a page wide by construction and the "gutter"
+        // between them is 4-12 pt whatever the page really is.
+        if (page.columns > 1) return new int[]{page.columns, Math.round(page.columnGap)};
+        return new int[]{1, 0};
+    }
+
+    private static int[] pageColumnsOld(PdfToWord.Page page) {
         // REVERTED to single column. Emitting w:cols w:num does divide the page, but every
         // paragraph's w:ind w:left is measured from the PAGE edge, not from its column's edge, so
         // inside a narrow column the indent exceeds the column width and the text wraps one
@@ -948,7 +974,7 @@ public final class DocxWriter {
                 // A row is laid out by its tab stops, so it must not also be centred or pushed
                 // right: justification would move the first field off the indent the stops are
                 // measured from.
-                .append("<w:ind w:left=\"").append(leftTw)
+                .append("<w:ind w:left=\"").append(Math.max(0, leftTw - bandLeftTw(ctx, p.column)))
                 .append("\" w:right=\"0\" w:firstLine=\"0\"/>")
                 .append("<w:tabs>").append(tabs).append("</w:tabs>")
                 .append("</w:pPr>");
@@ -1238,7 +1264,7 @@ public final class DocxWriter {
                 .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"").append(beforeTw)
                 .append("\" w:after=\"0\" w:line=\"").append(lineTw)
                 .append("\" w:lineRule=\"exact\"/>")
-                .append("<w:ind w:left=\"").append(leftTw)
+                .append("<w:ind w:left=\"").append(Math.max(0, leftTw - bandLeftTw(ctx, p.column)))
                 .append("\" w:right=\"").append(rightTw).append("\" w:firstLine=\"0\"/>");
         if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");
         else if (p.align == 2) sb.append("<w:jc w:val=\"right\"/>");
