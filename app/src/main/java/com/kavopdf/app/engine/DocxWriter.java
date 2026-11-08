@@ -427,6 +427,18 @@ public final class DocxWriter {
         java.util.List<Shape> curShapes;
         /** Left edge of each column band on this page, in points, by Para.column. */
         java.util.Map<Integer, Float> colLeft;
+        /**
+         * How many columns the section this page belongs to actually declares.
+         *
+         * <p>It is not the same number as {@code colLeft.size()}. A form or a brochure panel
+         * page has vertical gutters, so the column pass gives its field rows column 1, 2 and 3
+         * while the section still declares ONE column - the writer never emits {@code w:cols
+         * w:num} for it. Subtracting that column's left edge from a page-relative indent then
+         * collapses the paragraph to x=0. On 401_trifold_brochure the middle panel's heading
+         * and its first line were drawn on top of the cover panel, 300.6 pt left of where the
+         * page put them, and the section said one column all along.
+         */
+        int secCols = 1;
         /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
         float pageWidthPt = 595f;
         /**
@@ -543,6 +555,7 @@ public final class DocxWriter {
                 if (was == null || pp.left < was) colLeft.put(pp.column, pp.left);
             }
             ctx.colLeft = colLeft;
+            ctx.secCols = secCols;
             ctx.lastLinePt = 0f;
             ctx.positioned = false;
             ctx.flowTw = 0;
@@ -782,6 +795,10 @@ public final class DocxWriter {
     /** How many column bands this page's paragraphs occupy, and the widest gutter between them. */
     /** The left edge of the column a paragraph sits in, in twips, or 0 for a one-column page. */
     private static int bandLeftTw(Ctx ctx, int column) {
+        // Only a section that really is set in columns may subtract one. See Ctx.secCols: on a
+        // one-column section the paragraph's w:ind is measured from the page edge, so a
+        // column-relative indent has nothing to be relative to and lands the line at x=0.
+        if (ctx.secCols <= 1) return 0;
         if (ctx.colLeft == null || ctx.colLeft.size() <= 1) return 0;
         Float left = ctx.colLeft.get(column);
         return left == null ? 0 : (int) Math.round(left * TWIPS_PER_PT);

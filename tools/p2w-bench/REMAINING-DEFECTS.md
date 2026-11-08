@@ -3568,3 +3568,51 @@ it. **Tries: 0 of 3.**
 
 343's `wraps:1,144.0` - see the entry above. The eye was wrong: the page splits the cell too.
 
+## v3 corpus — batch 4 (372-401), run 9 Nov
+
+Fifteen documents, one page each, all seventeen steps in order, every page opened before any number
+was read. Six findings on the first pass, six verified; five after the fix, five verified. Twelve
+pass, three fail.
+
+### FIXED — a paragraph's indent was made column-relative on a one-column section
+
+**Shipped this run.** `DocxWriter.bandLeftTw` subtracted the column's left edge from `w:ind w:left`
+whenever the column pass had found more than one band. It never asked whether the section those
+paragraphs belong to actually declares columns, and for a form page or a brochure panel it does not:
+the writer emits `w:cols` with no `w:num`, so every indent is measured from the page edge. The
+subtraction put the line at x=0.
+
+Measured on 401_trifold_brochure: the middle panel's heading and its first line were drawn on top of
+the cover panel, x=0.1 against the page's 300.6. After the fix, 300.8. It also corrected the x of
+400_comic_page_speech_bubbles' bottom block (30.1 against the page's 30.0, was 2.1).
+
+The gate: G2 clean on 208 ("no document got worse"), position ratchet clean on 208 - no REGRESSED
+line - at 28.5 % of lines in tolerance. All 15 batch documents changed, so all 15 pages were
+re-opened after the fix.
+
+### OPEN — a table cell that holds a label and a value is written as two rows
+
+373_leave_application_form. `rules` verified: 11 rules in the PDF, 28 in the render. The page puts
+"Employee name" and "ANANYA RAO" on two baselines inside ONE cell; the writer splits them into two
+table rows, so six extra dividers cut across the field block and the cell's bottom edge lands where
+the page has none. The same paragraph carries both lines in one run joined by `w:br`, which is why
+the value also loses its bold (15 of 17 emphasised lines; the ledger's "emphasis" gap). One cause,
+two symptoms: a cell is not a row. **Tries: 0 of 3.**
+
+### OPEN — a comic page's bottom panel is placed 173.8 pt above the page's own position
+
+400_comic_page_speech_bubbles. `moved:MEANWHILE` verified: y=681.7 in the PDF, 507.9 in the render,
+and "412 pallets waiting." and "DRIVER" carry the identical 173.8 pt. x is correct after this run's
+fix, so it is a vertical placement, not a column one: the three rows of panels are laid as a flow
+and the third row's gap is spent from the wrong baseline. Reading order 80.0 % of 15 rows, and the
+render overlaps three line pairs where the page overlaps two. **Tries: 0 of 3.**
+
+### OPEN — a rotated back panel is placed 79 pt past where the page draws it
+
+401_trifold_brochure. `missing:CONTACT US` verified: 1 line in the PDF, 0 in the render. The PDF
+draws the rotated CONTACT US block at x=743 on an 841.9 pt page; the render draws it at 822, so its
+four lines end at 846.6 and run off the sheet, and the text layer loses them. The .docx holds the
+whole strings ("CONTACT US", "Meridian Industrial Parks Pvt Ltd", "Survey 142/2, Chakan, Pune
+410501", "leasing@meridian.example", "+91 20 4123 8890") as single `w:t` runs, so this is placement,
+not writing. **Tries: 0 of 3.**
+

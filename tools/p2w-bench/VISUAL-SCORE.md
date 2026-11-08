@@ -637,3 +637,40 @@ refuted because the counts happened to match).
 | 2026-11-09 | 370_offer_letter | FAIL | moved:6,00,000 13.0 pt high - the offer table's rows are shorter than the page's own pitch |
 | 2026-11-09 | 371_experience_certificate | FAIL | shapes 2 large in the PDF, 0 in the render - the seal's two rings come out as 16 x 9 pt blobs |
 
+v3 batch 4 (372-401), processed from scratch on 9 Nov: 15 documents, 15 pages, every page opened
+at 130 dpi before visual.py was run. 6 findings emitted on the first pass, 6 verified, 0 refuted;
+after the fix 5 findings, 5 verified. 12 pass, 3 fail.
+
+One engine fix shipped, and it is the fix for a whole class of page. `bandLeftTw` subtracted the
+column's left edge from a paragraph's indent whenever the column pass had found more than one band -
+but a form or a brochure panel page has gutters, so its paragraphs carry column 1, 2 and 3 while the
+section still declares ONE column and the writer never emits `w:cols w:num`. The subtraction then
+collapsed the line to x=0. On 401_trifold_brochure the middle panel's heading and first line were
+drawn on top of the cover panel, 300.6 pt left of where the page put them; after the fix they sit at
+300.8 against the page's 300.6. It also corrected the x of 400's bottom block (-27.9 pt -> 0.1).
+G2 clean on 208, position ratchet clean on 208 (no REGRESSED line), 28.5 % of lines in tolerance
+against the 11.7 % recorded in the baseline.
+
+The eye passed 373_leave_application_form and the numbers caught it: 15 of 17 emphasised lines had
+lost their bold. Re-opened the page at 2.4x and the eye agreed - "ANANYA RAO", "Operations
+Analytics" and "12-04-2021" are bold in the PDF and regular in the render, because the writer joins
+the label and the value into one run with a `w:br` and emits no `w:b`. Recorded as an eye blind spot
+at 130 dpi and as the missing claim type the ledger already names.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-09 | 372_timesheet_grid | PASS | header band, five project rows, day columns, totals and signatures all in place |
+| 2026-11-09 | 373_leave_application_form | FAIL | rules 11 in the PDF, 28 in the render - every label/value cell is split into two table rows, so six extra dividers cut through the field block, and the values lose their bold |
+| 2026-11-09 | 374_org_chart | PASS | four levels of boxes and every connector, footnote lines at the foot |
+| 2026-11-09 | 375_attendance_register | PASS | employee column and 31 day columns with the P/A marks, footer legend |
+| 2026-11-09 | 380_runbook_terminal_output | PASS | four numbered steps, four dark code blocks, escalation line |
+| 2026-11-09 | 381_incident_report_timeline | PASS | header band, summary, eight-row timeline table, action items table |
+| 2026-11-09 | 382_architecture_diagram | PASS | seven boxes, connectors, edge labels and the footer notes |
+| 2026-11-09 | 383_api_docs_page | PASS | header band, four tables, request and response blocks |
+| 2026-11-09 | 390_wide_data_appendix | PASS | 21-column measurement table, all header labels and 12 sample rows |
+| 2026-11-09 | 391_survey_questionnaire_grid | PASS | nine statements, five rating columns, tick marks in the right cells, comment rules |
+| 2026-11-09 | 392_statistical_console_output | PASS | R console output line for line, coefficient table, signif codes |
+| 2026-11-09 | 393_spectrum_peak_table | PASS | spectrum chart and the three-row peak table |
+| 2026-11-09 | 394_map_with_legend | PASS | site polygon, river, roads, markers, legend, scale bar and compass |
+| 2026-11-09 | 400_comic_page_speech_bubbles | FAIL | moved:MEANWHILE verified 173.8 pt high - the bottom panel and its whole block ride above the row-2 panels, and reading order is 80.0 % of 15 rows |
+| 2026-11-09 | 401_trifold_brochure | FAIL | missing:CONTACT US - the rotated back panel is drawn 79 pt right of the page's 743, so its lines run off the sheet and the render loses them. The indent defect that put WHY CHAKAN on the cover panel is fixed |
