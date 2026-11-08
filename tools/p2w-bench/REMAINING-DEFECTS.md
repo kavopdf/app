@@ -3544,3 +3544,51 @@ the stamp.
 
 **Reports:** `TB-B-why-none.md`, `ST-B-drift-geometry.md`.
 
+
+
+**White patches: an audit over all 208 documents reverses the first instinct.**
+
+The first instinct was to push an explicit `w:color` onto every run so nothing is inherited. The
+audit says that would make things worse, and it corrects two facts the entry above states wrongly.
+
+**Corrected facts.** There is **no `word/theme/theme1.xml`** in any of the 208 documents and **zero**
+`w:themeColor`, `w:themeFill` or `a:schemeClr` references anywhere, so nothing here is
+theme-inherited and the "theme's lt1/dk1 gets remapped" hypothesis has nothing to act on. And the six
+`wps:wsp` shapes in `62_two_col` do not carry `1A4233` and `D9E6D9` as fills: measured, they are
+`1A4233` twice, `F0F0E6`, `BFBFBF` twice and one explicit `a:noFill`. `D9E6D9` is a **text** colour on
+the subtitle runs. All six have an explicit `a:ln` and a fill.
+
+**Why more explicitness is the wrong direction for text.** Google's dark theme adapts text left on
+*Automatic* and leaves an explicit `#000000` alone - so explicit black goes **invisible** on a dark
+canvas. Pushing `000000` onto the 325 uncoloured runs would convert a maybe into a certainty. The
+correct direction for text is to **remove the decision**, not pin it.
+
+**What is actually painting white, ranked:**
+
+1. **Light shape fills** in `wps:spPr/a:solidFill` - `E6EBF5` eight times in
+   `23_timetable_grid_txtpos`, `F0F0E6` in `62_two_col`, `F5E6E6` in `02_stamp`, plus `BFBFBF`.
+   **14:1 against a dark canvas.** These are *already explicit absolute hex*, which is exactly why no
+   reader remaps them. The remedy is **background-relative** (`a:schemeClr bg1` with a luminance
+   modulation), not more explicitness.
+2. **`w:color="auto"` on table borders** - 30 sides in the five documents the user opened, **486**
+   across the corpus. `auto` is inherited by definition and resolves to whatever the reader thinks a
+   line is, usually the flipped text colour.
+3. **`docDefaults/rPrDefault/w:color`** decides **325 of 414** runs in those five documents (19,472
+   of 28,841 corpus-wide) - and it is **schema-invalid**: `w:color` appears **twice** and precedes
+   `rFonts`. **12,456 of 28,435 `rPr` blocks (43.8 %) are out of schema order; only 23 of 208
+   documents are clean.**
+4. **Paragraph-mark `pPr/rPr/w:color`** - 69 marks across the five, none coloured.
+5. **No `w:style` of `type="table"` at all** - zero in 208/208 - latent for the 81 documents that
+   have tables and no borders.
+
+**Cleared as non-causes:** `w:shd` (0), `w:highlight` (0), `word/media` (empty in all five), shape
+z-order (all `behindDoc="1"`), `theme1.xml` (absent), `settings.xml` (absent, so no
+`clrSchemeMapping`). **`<w:background>` absent is correct** - the page must stay reader-painted.
+
+**Two hazards when touching colour.** The `FFFFFF` headings in `01` (`TAX INVOICE`), `02`
+(`DELIVERY CHALLAN`), `04` (`FEE RECEIPT`) and `62` (masthead) are locked to dark bands behind them -
+change one without the other and light mode breaks. And `D9E6D9` in `62` is **12.9:1 on dark but
+1.29:1 on white** - a light-mode hazard, not a dark-mode one.
+
+**Report:** `WP-B-inheritance-audit.md`.
+
