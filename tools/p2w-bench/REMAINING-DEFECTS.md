@@ -3518,3 +3518,46 @@ problem, not a section-break one.
 
 **Patch:** `patches/D8-C-sections-without-sections.patch`, one file, `DocxWriter.java`, +426/-49.
 
+
+
+**Correction: my own measurement of this entry was stale, and the real defect was elsewhere.**
+
+The 78-paragraphs-for-35-baselines figure was measured on the build *before* the table work shipped.
+On the current build `base208.json` records **67 lines** for `01_stamp` and its item grid is already a
+`w:tbl` - 42 of those 67 paragraphs are table cells - so its **body flow is 573.8 pt on an 841.9 pt
+page**, not the 1277 pt overflow this entry was opened on. The D-14 table work had already fixed it.
+
+**What was actually wrong, and is now fixed.** A clause audit over **3,247 same-baseline pairs**
+across all 208 documents, with `sameRow` instrumented to name the clause that fires, found the
+predicate is not the bottleneck it looked like - it accepts **81 %** of pairs. The rejecting clauses
+in order: `across-column-gap` 246, `rotated` 188, `past-paper` 66, `ACCEPT-inside` 44,
+`baseline-dy` 43, `gap-too-small` 12, `different-size-needs-12pt-gap` 11, `size-ratio-2.5` 8.
+
+Two real defects:
+
+1. **`rotated` was firing on a whole page.** An upside-down page - every glyph at 180 degrees - had
+   every line flagged as a stamp, so **112 of 114** same-baseline pairs were refused and **15
+   baselines became 61 paragraphs**. A new page-level `uprightIfPageIsUpsideDown` clears the flag only
+   when nothing on the page is upright, so a 180-degree stamp over an ordinary page is untouched.
+2. **A row was measured against `group.get(size - 1)`**, which after `addRowMates` is a field on the
+   *right* - and `sameRow` rejects anything to its left. Rows whose left-hand fields arrived later in
+   the column order were cut in two: "Account holder" / "NIRVAAN PACKAGING INDUSTRIES" / "Account
+   no. ..." is now one row with tab stops. `prevOnBaseline` fixes the reference line; `sameRow` itself
+   is unchanged.
+
+**Measured:** paragraphs with text **16,520 to 16,433**, body paragraphs **5,370 to 5,283**, tab-stop
+paragraphs **825 to 845**, pages where paragraphs exceed baselines **61 to 52**, documents where body
+flow exceeds the page budget **16 to 15**, pair accept rate **81.0 % to 84.1 %**. Eleven documents
+changed and **none gained a paragraph**. Gate **no document got worse** - 12 joins, 26 improved
+counts, no page-count change. Engine tests 29/29 and 3/3.
+
+**Still at risk, and it is a different model:** `05_round_company_seal_curved_text`. The cause is the
+seal ring - `ringPara` writes **one paragraph per ring character**, 60 of its 80 body paragraphs - not
+baseline grouping. Diagnosed and quantified, not changed; folding the ring into one paragraph is a
+stamp/seal model change.
+
+**One flow rise to weigh:** `form16-part-b` goes **864 to 1057 pt**, already over budget before. That
+is the price of a correct row.
+
+**Patch:** `patches/EX-A-baseline-grouping.patch`, one file, `PdfToWord.java`.
+

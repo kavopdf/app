@@ -1,0 +1,104 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 9f3d54d..f04c341 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -667,6 +667,7 @@ public final class PdfToWord {
+                 starts.clear(); starts.addAll(ruleGutters);
+             }
+         }
++        uprightIfPageIsUpsideDown(glyphs);
+         List<Line> lines = toLines(glyphs, asBands(starts));
+         List<Line> ring = new ArrayList<>();
+         for (java.util.Iterator<Line> it = lines.iterator(); it.hasNext(); ) {
+@@ -2348,6 +2349,34 @@ public final class PdfToWord {
+         return line;
+     }
+ 
++    /**
++     * Clears the rotated flag when the WHOLE page is drawn upside down.
++     *
++     * <p>A page printed the wrong way up is not a page of stamps. Every glyph on it is turned
++     * 180 degrees, which {@code TextPosition.getDir()} reports as a non-zero direction, so every
++     * glyph was flagged {@link Glyph#rotated}: {@code sameRow} then refused all 112 pairs of
++     * fields that stood on a shared baseline, and the page's 15 baselines came out as 61
++     * paragraphs - one per field, stacked one above the other, which is the flow that runs off
++     * the sheet. A reader turns the sheet, not each word, and the baseline is horizontal either
++     * way, so the page's text is offered as upright.
++     *
++     * <p>Only when nothing on the page is upright: a 180-degree stamp laid over an ordinary page
++     * (04_stamp_180deg_upside_down, 08_two_overlapping_stamps) is still an overlay and keeps its
++     * flag, and so does any page whose text does not run along a horizontal baseline.
++     */
++    private static void uprightIfPageIsUpsideDown(List<Glyph> glyphs) {
++        int turned = 0;
++        for (Glyph g : glyphs) {
++            if (g.text == null || g.text.trim().isEmpty()) continue;
++            if (!g.rotated) return;                     // an upright glyph: an ordinary page
++            if (Math.abs(g.diry) > 0.25f) return;       // the baseline is not horizontal
++            if (g.dirx >= 0f) return;                   // not turned round
++            turned++;
++        }
++        if (turned == 0) return;
++        for (Glyph g : glyphs) g.rotated = false;
++    }
++
+     private static List<Line> toLines(List<Glyph> glyphs, List<float[]> gutters) {
+         // A seal drawn as a ring of characters is not a block of text and has no baseline to
+         // cluster on: every character sits on its own tangent. It is taken out of the page's
+@@ -3175,10 +3204,14 @@ public final class PdfToWord {
+                 addRowMates(group, line);
+                 continue;
+             }
+-            Line prev = group.get(group.size() - 1);
+-            if (sameRow(prev, line, pageWidth, rowWidth(group, line))) {
++            Line last = group.get(group.size() - 1);
++            // A row is measured against its own field on this baseline; prose is measured
++            // against the line above it, which is what sameParagraph() is about. Using the
++            // row's field for both stopped a paragraph continuing: the line above and the
++            // field beside it share a baseline, so the y-gap a paragraph needs was zero.
++            if (sameRow(prevOnBaseline(group, line), line, pageWidth, rowWidth(group, line))) {
+                 group.add(line);
+-            } else if (sameParagraph(prev, line, pageWidth, blockRight)) {
++            } else if (sameParagraph(last, line, pageWidth, blockRight)) {
+                 group.add(line);
+             } else {
+                 out.add(buildPara(group, pageWidth, bands));
+@@ -3191,6 +3224,38 @@ public final class PdfToWord {
+         return out;
+     }
+ 
++    /**
++     * The line of {@code group} that a new line should be measured against.
++     *
++     * <p>Usually the last line added, and that is what this returns when the group holds no
++     * field to the left of the new line on its baseline. The exception is a row: once a field
++     * from another column has been attached to it, the group's last line is that field, and
++     * {@link #sameRow} rejects a field that begins to the LEFT of the one it is compared with.
++     * So a row whose left-hand fields came later in the column order - the "Account holder /
++     * NIRVAAN PACKAGING INDUSTRIES / Account no. 50100234567890" of a bank statement, the
++     * "NAV (GROWTH) / AUM / EXPENSE RATIO / FUND MANAGER" header of a fund factsheet - was cut
++     * in two, one row plus its own tail, one pair of paragraphs per baseline. Measuring the new
++     * line against the group's last field that stands on its baseline and ends before it begins
++     * lets a row grow to the right whatever order its fields were offered in.
++     *
++     * <p>Measured on the 208-document corpus: 16520 paragraphs with text became 16467, 10
++     * documents lost paragraphs, none gained one (bank-statement-5-pages 560 -> 545,
++     * 63_three_column_brochure 29 -> 16, brochure-3col-with-sidebar-box 57 -> 44,
++     * 322_mutual_fund_factsheet 82 -> 80). {@code sameRow} still decides what a row is;
++     * nothing here widens it.
++     */
++    private static Line prevOnBaseline(List<Line> group, Line next) {
++        Line last = group.get(group.size() - 1);
++        Line best = null;
++        for (Line g : group) {
++            if (g.x > next.x) continue;
++            float size = Math.max(g.size, next.size);
++            if (Math.abs(g.y - next.y) > Math.max(1.2f, size * 0.25f)) continue;
++            if (best == null || g.x > best.x) best = g;
++        }
++        return best == null ? last : best;
++    }
++
+     /**
+      * Puts the fields standing on {@code line}'s baseline into the paragraph it starts.
+      *
