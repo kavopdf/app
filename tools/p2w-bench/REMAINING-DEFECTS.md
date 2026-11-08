@@ -1,5 +1,77 @@
 # Remaining defects — to be worked at the very end
 
+## v3 corpus — batch 1 (300-317), re-run 8 Nov 08:38
+
+Fifteen documents, one page each, all seventeen steps in order, every page opened before any number
+was read. Eleven findings, 11 verified, 0 refuted, 0 unverifiable. Ten pass, five fail. No fix was
+attempted this run; the measurements below are the work items.
+
+### OPEN — a band of label/value pairs is emitted one field per paragraph
+
+301_lab_report_panel. `moved:MPL03184471` verified: 2 on both sides, worst offset 34.3 pt. The page
+sets a four-column band - PATIENT / AGE-SEX / REFERRED BY / COLLECTED over their values, then
+SAMPLE / BARCODE / REPORTED / STATUS over theirs. Each pair shares one baseline on the page. The
+render puts the four labels at 61.2, 64.4, 69.5 and 72.7 pt and the values at 81.5, 89.0, 89.0 and
+91.0, so the band reads ragged and its extra height pushes the ten-row table 19.9 pt down. Reading
+order 80.0 % of 28 rows, 32 rows in the render. **Tries: 0 of 3.**
+
+### OPEN — a table's own top y is not reproduced
+
+311_fir_police_form. `missing:560067` verified: the PDF holds "Bengaluru 560067", the render holds
+"Bengaluru 5 60067Mobile" - a space inside the pin and the Mobile label welded on. Separately the
+whole first table sits 15.7 pt high: the page puts its first row at y=72.1, the render at 56.4, and
+every row carries the same 15.7 pt. The spacer the writer emits before a table charges
+`(t.top - baseline) - lastSize*1.15`, which is one line short of the previous paragraph's own box
+bottom; when that comes out below 1.2 lines the spacer is dropped altogether, which is what happens
+here. **Tries: 0 of 3.**
+
+### OPEN — a column's line pitch is taken across the column break
+
+315_gazette_notification. `moved:into force on the date of their` verified: y=214.8 in the PDF,
+y=284.6 in the render, 69.8 pt. Column 1 holds 18 lines on both sides but runs from 66.7 to 208.0 in
+the PDF and 63.2 to 278.1 in the render - a pitch of 8.3 pt against 12.6. The model interleaves the
+three columns and the writer measures each line's pitch against the previous line, which at a column
+break is a line in a different column. Reading order 47.1 % of 21 rows, 30 rows in the render.
+**Tries: 0 of 3.**
+
+### OPEN — a line the PDF drew past the right margin is wrapped instead
+
+303_discharge_summary. `breaks:WARNING SIGNS` verified: the PDF's line ends at "needed" and no render
+line does. The PDF's WARNING SIGNS line runs from x=28.0 to x=596.7 on a 595.3 pt page, so its tail
+"more than 4 times a day." is drawn off the paper and never appears. The render wraps it onto a
+second line at x=578.7. The flow wraps at the column edge; the page did not. A faithful render has to
+let the line overrun the way the page did. **Tries: 0 of 3.**
+
+### OPEN — a rotated seal's arc text is repeated
+
+312_affidavit_stamp_paper. `extra:NOTARY` verified: 0 on the PDF side, 1 in the render. The seal is a
+circular notary stamp drawn as per-glyph rotated text; the render carries "OCATE AND NOTARY" and a
+second "VOCATE", so the arc reads twice. This is the rotated-stamp class - OOXML has no text rotation
+a LibreOffice render honours - so it gets ONE try and then a CLOSED-UNFIXABLE entry. The bench also
+cannot rasterise it: `PDFRenderer.renderImageWithDPI` throws `NoSuchMethodError Canvas.getMatrix()`
+against the JVM stubs, so the raster fallback is not exercised here. **Tries: 0 of 3 (1 allowed).**
+
+### Measurement blind spots found this pass - repair the tool, not the page
+
+    emphasis on 304_package_insert_small_print   6 of 9 emphasised lines "lost" it. The render's
+        headings are bold DejaVuSans-Bold with <w:b/>, and the page drew them bold. q8 compares a
+        line's SIZE, and a bold heading keeps its size, so the loss it reports is not a weight test
+        at all. The eye passes the page and is right.
+
+    order on 305_vaccination_certificate         47.1 % of 27 rows. The PDF draws every table cell as
+        its own line and the render joins a row's cells with tabs, so the row counts cannot match:
+        27 rows in the PDF, 24 in the render. The eye passes the page and is right.
+
+    position on 300 / 302 / 306 / 314 / 316       a uniform per-block offset the eye cannot see at
+        130 dpi: 12.4 pt on 300's medicine table, 9.3 on 302's label band, 4.7 on 306, 6.4 on 314,
+        3.2 on 316. All in the same direction - the block sits high - so they are one defect, the
+        table and band top y, recorded above on 311.
+
+    width on 310 / 313 / 317                      the centred heading renders 17.5 % narrower
+        (346 pt against 285.3 pt on 310) because the page tracks the line - 1.2 to 1.5 pt of extra
+        advance per glyph - and the run carries no `w:spacing`. Centring is right: both centres are
+        at 297.6. This is the 39_small_caps_letter_spacing family and is not fixed.
+
 ## b80 corpus — batch 2 (21-40), 8 Nov
 
 Twenty documents, one page each. Every page opened before any number was read; every finding

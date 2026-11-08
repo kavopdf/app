@@ -466,3 +466,34 @@ are faithful and the documents stay PASS.
 Five pass, five fail. This closes the corpus: 208 of 208 documents now have a row, and the
 final sweep over all 208 is the only place one is called finished.
 
+
+## v3 corpus — batch 1 (300-317), re-run 8 Nov 08:38 — the second pass, every page looked at again
+
+Fifteen documents, fifteen pages, all seventeen steps in order. Every page was opened and judged
+before any number was read. Eleven findings, 11 verified, 0 refuted, 0 unverifiable. Ten pass, five
+fail, and one document where the eye and the numbers disagree.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-08 | 300_prescription_rx | PASS | Rx, medicine table, advice, signature and QR on the page rows; the table sits 12.4 pt high, under what the eye can see |
+| 2026-11-08 | 301_lab_report_panel | FAIL | moved:MPL03184471 verified, worst offset 34.3 pt - the four-column patient band is emitted as four paragraphs on drifting baselines, and the band's extra height pushes the table 19.9 pt down |
+| 2026-11-08 | 302_radiology_report | PASS | label band, findings and the signature block where the PDF drew them; the labels sit 9.3 pt high, under what the eye can see |
+| 2026-11-08 | 303_discharge_summary | FAIL | breaks:WARNING SIGNS verified - the PDF's line overruns its margin by 1.4 pt and its tail is off the paper; the render wraps it onto a second line |
+| 2026-11-08 | 304_package_insert_small_print | PASS | six numbered sections, bold heads and every line break the same; the emphasis question reports 6 of 9 lost and the render is bold - tool blind spot |
+| 2026-11-08 | 305_vaccination_certificate | PASS | table, seal and QR in place; the eye passed and the numbers failed, so the order question is the measurement bug - the PDF draws each cell as its own line and the render joins them with tabs |
+| 2026-11-08 | 306_clinical_protocol_synopsis | PASS | synopsis table and the schedule grid complete, marks in their cells; the table sits 4.7 pt high |
+| 2026-11-08 | 310_court_judgment | PASS | cause title, eight numbered paragraphs and the JUDGE block; the centred heading renders 17.5 % narrower because the page tracks it and the run carries no w:spacing |
+| 2026-11-08 | 311_fir_police_form | FAIL | missing:560067 verified - the render breaks the pin as '5 60067' and welds the Mobile label onto the address cell |
+| 2026-11-08 | 312_affidavit_stamp_paper | FAIL | extra:NOTARY verified - the circular notary seal repeats its arc text, the PDF draws it once; the seal is a rotated stamp, one try only |
+| 2026-11-08 | 313_power_of_attorney | PASS | recitals, four numbered powers, schedule and witness rules |
+| 2026-11-08 | 314_tender_rfp_boq | PASS | both tables complete, the tax rows under the BOQ, every sub-total figure whole; the BOQ table sits 6.4 pt high |
+| 2026-11-08 | 315_gazette_notification | FAIL | moved:into force on the date of their verified, 69.8 pt - the three columns run 70 pt long and push the footer down the sheet; the column pitch is 12.6 pt against the page's 8.3 |
+| 2026-11-08 | 316_contract_with_schedules | PASS | four clauses, schedules A and B and the schedule C charge table; the charge table sits 3.2 pt high |
+| 2026-11-08 | 317_rti_response | PASS | letter head, five numbered points and the enclosure line |
+
+The five fails are all one of three causes: a band of label/value pairs split into one paragraph
+per field (301), a table's own top y not reproduced (311), a column pitch taken across a column break
+(315), a rotated seal's arc text repeated (312), and a line the PDF drew past the right margin being
+wrapped instead (303). None of them was fixed this run; each is recorded with its measurement and
+its tries.
+

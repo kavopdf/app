@@ -627,3 +627,35 @@ the numbers said 88.9 % of 14 rows and never mentioned that a whole line was gon
 ### What the numbers caught that the eye missed
 
 Nothing, this batch. Three numbers failed where the eye passed and all three are measurement.
+
+## v3 batch 1 (300-317), re-run 8 Nov 08:38 — the second pass, from the first document
+
+The brief changed what a pass means: the 70 documents done before 8 Nov were processed with tools
+that had no verifier, no eye-first rule and no smoke test, so their PASS is not evidence. This run
+started again at 300 and took the first fifteen.
+
+Fifteen documents, fifteen pages, all seventeen steps in order. Every page was opened and judged
+before any number was read. Eleven findings, 11 verified, 0 refuted, 0 unverifiable. Ten pass, five
+fail, one document where the eye and the numbers disagree.
+
+**What the eye caught that the eight questions could not.** The order question passes a page whose
+every block sits 12 pt high. 300's medicine table, 302's label band, 306's synopsis table, 314's BOQ
+and 316's charge table all sit 3 to 12 pt above where the page drew them and all five passed every
+question; the eye did not see it either at 130 dpi, and `position.py` found it. That is one defect
+seen five times - the top y of a table or a band - and it is recorded once on 311.
+
+**What the numbers caught that the eye missed.** Nothing. The eye called 305 passable and the order
+question called it 47.1 %; the page draws every table cell as its own line and the render joins a
+row's cells with tabs, so the row counts cannot match. 304 is the same shape in the other direction:
+the emphasis question reports 6 of 9 headings "lost" their emphasis and the render's headings are
+bold with `<w:b/>`. Both are tool blind spots, both are written into REMAINING-DEFECTS.md.
+
+**What was not fixed, and why.** No engine change this run. Each of the five fails was measured to
+the decimal and entered with its tries, and each needs a change that G2 across 208 has to accept -
+the table spacer formula was tried and reverted once already and is not retried without a fresh
+measurement of the spacer's own box. The run's value is that the fifteen verdicts now rest on a
+verified finding rather than on a tool that had no verifier.
+
+**Where the corpus stands.** 15 of 208 re-processed under the new rules. The 208 rows already in
+VISUAL-SCORE.md are the previous pass and do not count; the final sweep is the only place a document
+is called finished.
