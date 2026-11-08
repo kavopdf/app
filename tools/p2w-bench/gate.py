@@ -11,7 +11,7 @@ WHAT IT DOES
         missing   PDF words absent from the .docx text
         extra     .docx words absent from the PDF
         blocks    solid regions the PDF does not have
-        nobg      the .docx declares no page fill
+        nobg      the .docx declares no default text colour
         overflow  text placed outside the page box
         blank     a page with no text at all
     Then compares against a stored baseline. A document may improve freely; it may not get worse.
@@ -47,6 +47,23 @@ def pdf_lines(path):
         pass
     return out, pages
 
+def _has_default_colour(z):
+    """True when styles.xml declares a default text colour.
+
+    This replaced a check for <w:background w:color="FFFFFF"/> in document.xml. That
+    background was added so a dark reader would not show black text on a black page, and it
+    caused a worse problem: Google Docs dark mode paints the stated white back on top of the
+    inverted page, so every table came out covered in white patches. The colour now lives on
+    the text as a document default, which is where a reader looks before deciding what "black"
+    means on its own surface - so that is what is checked.
+    """
+    try:
+        st = z.read("word/styles.xml").decode("utf-8", "replace")
+    except Exception:
+        return False
+    return 'w:color w:val="000000"' in st or 'w:color w:val="000"' in st
+
+
 def docx_text(path):
     import zipfile
     try:
@@ -62,7 +79,7 @@ def docx_text(path):
         return [], 0, False, 0.0, 0.0
     leaves, pages = [], 0
     xml = z.read('word/document.xml').decode('utf-8', 'replace')
-    hasbg = 'w:background' in xml
+    hasbg = _has_default_colour(z)
     for p in root.iter(W + 'p'):
         if p.findall('.//' + W + 'p'):
             continue

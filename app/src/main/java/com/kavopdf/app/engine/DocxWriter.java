@@ -215,10 +215,13 @@ public final class DocxWriter {
                 .append("\" xmlns:wp=\"").append(NS_WP).append("\" xmlns:a=\"").append(NS_A)
                 .append("\" xmlns:wps=\"").append(NS_WPS)
                 .append("\" xmlns:pic=\"").append(NS_PIC).append("\">")
-                // A PDF page is white. A DOCX page has no colour at all, so a viewer with a dark
-                // theme shows its own surface through it - the user's screenshots of file 20 came
-                // back as black text on a black page, every clause invisible. State the white.
-                .append("<w:background w:color=\"FFFFFF\"/><w:body>");
+                // No w:background. It was added to stop a dark reader showing black text on a
+                // black page, and it worked - by painting the page white. In Google Docs dark
+                // mode that white is painted back on top of the inverted page, so the user's
+                // screenshots came back full of white patches over the tables. The colour is
+                // carried by the TEXT instead, as a default in styles.xml, which is where a
+                // reader looks before it decides what "black" means on its own surface.
+                .append("<w:body>");
 
         // The page box the current section is set to. A section carries one page size, so a
         // file that mixes landscape and portrait pages gets a section break where the size
@@ -1720,7 +1723,7 @@ public final class DocxWriter {
     private static String stylesXml() {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                 + "<w:styles xmlns:w=\"" + NS_W + "\">"
-                + "<w:docDefaults><w:rPrDefault><w:rPr>"
+                + "<w:docDefaults><w:rPrDefault><w:rPr><w:color w:val=\"000000\"/>"
                 + "<w:rFonts w:ascii=\"Calibri\" w:hAnsi=\"Calibri\" w:cs=\"Calibri\"/>"
                 + "<w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/></w:rPr></w:rPrDefault>"
                 + "<w:pPrDefault><w:pPr><w:spacing w:after=\"120\"/></w:pPr></w:pPrDefault>"
