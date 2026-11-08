@@ -173,7 +173,17 @@ def emit_findings(record, visual_json, out_path):
                 # all: the extra page does not exist in the PDF, so the verifier has no
                 # page to compare it against and answers UNVERIFIABLE. The claim is about
                 # the document, not about a page.
-                kind = "measure" if claim.split(":")[0].strip() == "pagecount" else "visual"
+                #
+                # order and shapes are the same story, and 371_experience_certificate on
+                # 8 Nov is why they are here. The eye opened the page, saw the seal's two
+                # circles gone and the arc letters stacked, and had no way to say it:
+                # "shapes" went to the visual checks, which have no check for it, so the
+                # claim came back UNVERIFIABLE and the document's FAIL was left backed by
+                # nothing. verify.py already implements both under check_measure - the
+                # vocabulary was the only thing missing. A claim type the verifier cannot
+                # check is a defect in the claim, not in the page.
+                kind = ("measure" if claim.split(":")[0].strip()
+                        in ("pagecount", "order", "shapes") else "visual")
                 n += 1
                 findings.append(("V%d" % n, doc, page, kind, claim))
 

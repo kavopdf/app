@@ -367,3 +367,39 @@ needs repair, not the pages.
 The `shapes` finding on 332 (`15 shapes in the PDF, 0 in the render`) was true of the first
 pass and gone after the fix, because the drawing's own shapes had been pushed onto a second
 sheet by the flow overrun.
+
+
+## v3 batch 4 (371-400, 15 documents), 8 Nov 12:36 run
+
+| claim type | verified | refuted | unverifiable |
+|---|---|---|---|
+| order | 2 | 0 | 0 |
+| moved | 4 | 0 | 0 |
+| overlap | 1 | 0 | 0 |
+| shapes | 0 | 1 | 0 |
+| **total** | **7** | **1** | **0** |
+
+The first pass emitted 14 findings from the eye's notes; five of them were the prose half of a
+note, which is not a claim, and came back UNVERIFIABLE - my own wording error, not the tool's.
+They were dropped and the notes reduced to claims only.
+
+Two things this run found about the instruments:
+
+    shapes    371_experience_certificate. The eye saw the seal's two circles gone and said
+              `shapes`. Emitted as a visual claim it came back UNVERIFIABLE - check_visual has
+              no shapes check - so the document's FAIL was left backed by nothing. verify.py
+              has implemented `shapes` under check_measure all along; only the vocabulary was
+              missing. looked.py now routes `shapes` and `order` to the measure checks, which
+              is the "the claim vocabulary is missing something" cause in PIPELINE.md.
+
+    shapes    371 again, and this one is a real disagreement between two tools. visual.py's
+              charts question says "the PDF draws 2 shapes here and the docx draws none"
+              because it drops rules and white rects before counting. verify.py's `shapes`
+              check counts every drawing of 1.5 pt or more and answers "2 shapes in the PDF,
+              2 in the render" - REFUTED. One word, two definitions. Until they agree, a
+              shapes finding can be both true and refuted, and the document still fails on
+              `order`, so nothing was fixed on it. Recorded in REMAINING-DEFECTS.md.
+
+The `order` question failed on 2 of 15 pages. On 371 it is the seal's per-glyph arc text and on
+400 it is the panels' text; both pages the eye also failed. That is the first batch where the
+order question and the eye agreed on every page it fired on.

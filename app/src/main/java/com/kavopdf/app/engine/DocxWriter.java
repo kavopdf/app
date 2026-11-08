@@ -1605,16 +1605,20 @@ public final class DocxWriter {
             // Science" sitting on its own border. The type size is the floor, and a row whose
             // text needs more than the average gets more.
             int rowLineTw = baseLineTw;
-            for (int q = 0; q < row.size(); q++) {
-                if (q >= cols) break;
-                float sz = 0f;
-                if (r < t.fonts.size() && q < t.fonts.get(r).size() && t.fonts.get(r).get(q) != null) {
-                    String fn = t.fonts.get(r).get(q);
-                    int sp = fn.indexOf(' ');
-                    if (sp > 0) {
-                        try { sz = Float.parseFloat(fn.substring(0, sp)); } catch (Exception ignored) { }
-                    }
-                }
+            for (int q = 0; q < row.size() && q < cols; q++) {
+                // The cell's own point size, from the size table the model keeps.
+                //
+                // This read the size off the FONT NAME string - it took the text before the
+                // first space and parsed it as a number - and the names the model holds are
+                // plain family names ("DejaVuSans-Bold", "ABCDEF+DejaVuSans"). The parse
+                // threw every time, sz stayed 0 and this floor never ran: the "type size is
+                // the floor" fix below was dead code from the day it was written. On
+                // 374_org_chart the box rows have a 5.35 pt pitch and 7 pt text, so the
+                // label and the name under it were printed on top of each other - which is
+                // the exact case the floor exists for. t.sizes is the same number the cell's
+                // w:sz is written from, so the line and the type now agree.
+                float sz = r < t.sizes.size() && q < t.sizes.get(r).size()
+                        && t.sizes.get(r).get(q) != null ? t.sizes.get(r).get(q) : 0f;
                 if (sz > 0f) rowLineTw = Math.max(rowLineTw, (int) Math.round(sz * 1.25f * TWIPS_PER_PT));
             }
             inner.append("<w:tr>");

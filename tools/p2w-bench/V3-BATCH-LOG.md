@@ -717,3 +717,35 @@ while the eye passes all seven (318, 322, 323, 325, 326, 330, 332). Nine `order`
 this run, no document defect behind any of them. Recorded in REMAINING-DEFECTS.md as a tool
 problem: the rows are grouped by band and sorted left to right, and on a form page the bands and
 the tab-joined rows do not agree.
+
+
+## BATCH 4 — documents 371-400 (15 documents)
+
+**12 pass, 3 fail.** Every one is one page in and one page out. Every page opened at 130 dpi
+before any number was read; every finding verified against the PDF before anything was fixed.
+
+### Fixed in this batch
+
+- **A table cell's line floor was dead code.** `DocxWriter` never set a cell's exact line height
+  below 1.25 em of its type - except that it read the type size off the font NAME string, the
+  parse threw on every cell, and the floor never ran. 374_org_chart's org-chart boxes have a
+  5.35 pt row pitch and 7 pt type, so the label and the name under it printed on top of each
+  other. The floor now reads `t.sizes`; the row went to 8.75 pt and the boxes read correctly.
+  Across all 208 documents: G2 clean, position 57 improved and 0 worse.
+
+### Carried forward
+
+- **373** — a table's row pitch is its extent over its row count, an average; the Reason row is
+  one line short and its text sits on the rule.
+- **371** — the notary-style seal: per-glyph arc text plus two circles, and the certificate's
+  body text arrives in 28 text boxes.
+- **400** — the third strip of comic panels is drawn a sheet high and its bubble text rises to
+  the panel top.
+
+### Notes on the instruments
+
+The eye misread 391_survey_questionnaire_grid: the five Likert headers look welded in the render
+and the PDF's own text layer holds the same weld ("Strongly\x00agree Agree"). Looked at closely,
+the render is right and the document passes. On 374 the opposite happened - the eye passed three
+overlapping lines at 130 dpi that the overlap question counted exactly. Both are why the eye and
+the numbers are recorded separately.

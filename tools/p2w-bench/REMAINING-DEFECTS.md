@@ -2769,3 +2769,94 @@ cluster of shapes and text boxes occupying a rectangle that no single paragraph 
 
 **Tries: 0 of 3.** Diagnosed and measured; not started.
 
+
+
+## v3 corpus — batch 4 (371-400), re-run 8 Nov 12:36
+
+Fifteen documents, one page each, all seventeen steps in order, every page opened before any
+number was read. First pass: 14 findings, 5 verified, 1 refuted, 7 unverifiable (five of those
+were the prose half of an eye note, which is not a claim - my wording error). After the fix and
+the re-look: 12 pass, 3 fail, 7 findings emitted, 6 verified, 1 refuted, 0 unverifiable.
+
+### FIXED — a table cell's line floor was dead code, and the text on the page's box rows overlapped
+
+374_org_chart. `overlap` verified: 0 overlapping pairs in the PDF, 3 in the render. In the three
+bottom boxes the label and the name under it were printed on top of each other - "INBOUND" and
+"P. NAIR" on one line, and the same in OUTBOUND and MAINTENANCE.
+
+**Cause.** `DocxWriter` has a floor for a cell's exact line height: never below 1.25 em of the
+cell's own type size. It read that size off the FONT NAME string - the text before the first
+space, parsed as a number - and the names the model holds are plain family names
+("DejaVuSans-Bold", "ABCDEF+DejaVuSans"). `Float.parseFloat` threw on every cell, `sz` stayed 0
+and the floor never ran. It has been dead code since the day it was written, which is also why
+the "III Semester, B.E. Computer Science sitting on its own border" case it was written for was
+never fixed. The size was in the model all along as `t.sizes`, the same number the cell's `w:sz`
+is written from.
+
+**Fix.** The floor reads `t.sizes`. On 374 the row line and `w:trHeight` went 107 twips (5.35 pt
+for 7 pt type) to 175 twips (8.75 pt); the boxes now read correctly.
+
+**Measured.** G2 across all 208: no document got worse, and `base208.json` did not change at all
+(row heights are not one of its metrics). Position across all 208 against the recorded baseline:
+29.4 % of lines within tolerance, **57 documents improved, 0 worse**. The position baseline is
+re-recorded with this commit.
+
+**What it costs.** A table's row pitch is its extent divided by its row count - an average - so
+where the page's own pitch is larger than 1.25 em the row is still short, and the content below
+the table moves down by the difference. On 374 the footer under the org chart now sits 7 pt low.
+That is the next item, and it is the same one 373 fails on.
+
+### OPEN — a table's row pitch is its extent divided by its row count, not the page's own pitch
+
+373_leave_application_form. `moved:Family function at native place` verified: y=269.9 in the PDF,
+y=247.5 in the render, 22.4 pt. The Reason row is one line short, so the text is drawn across the
+row's own rule.
+
+This is the same defect the 374 fix stopped from overlapping, and it is not fixed by it: 373's
+cells hold ONE line each, so the floor is not what sets their height - `rowTw` is, and `rowTw` is
+`(t.bottom - t.top) / rows`, an average over rows the page did not space evenly. The model has no
+per-row y: `Table` carries `top`, `bottom`, `left`, `right` and nothing else. A fix has to record
+the page's own row baselines in the model and use the gap between them, which is the D-01/D-06
+answer already written down for the flow. **Tries: 0 of 3.** (The 374 footer is this same item.)
+
+### OPEN — the seal's arc text and its two circles
+
+371_experience_certificate. `order` verified: 28 rows in the PDF, 24 in the render, 61.5 % in
+sequence. The seal is per-glyph rotated text with two concentric circles; the render stacks the
+glyphs and draws no circle. `reflow.py` also reports 28 text boxes holding body text - the
+certificate's paragraphs arrive as boxes, so they cannot reflow.
+
+This is the rotated-stamp class. `stampPictures` did not trigger (STAMPDEBUG reports stamps=0 for
+the page) because the seal's glyphs are not a rotated paragraph, and the raster fallback is not
+exercised here (`PDFRenderer.renderImageWithDPI` throws `NoSuchMethodError Canvas.getMatrix()`
+against the JVM stubs). **Tries: 0 of 3 (1 allowed).**
+
+### OPEN — the third row of panels is a sheet high
+
+400_comic_page_speech_bubbles. Three `moved` findings verified: `412 pallets` -166.2 pt,
+`MEANWHILE, AT THE LOADING DOCK...` -159.6 pt, `Ship by noon` -166.9 pt, and `order` 68.8 % of 15
+rows with 17 in the render. The page's third strip of panels is drawn near the foot of the sheet;
+the render closes the gap above it and the caption and bubble text rise to the panel tops. The
+bubbles themselves are drawn on both sides - it is the vertical flow between the panels, the same
+class as 315_gazette_notification's footer. **Tries: 0 of 3.**
+
+### Measurement defects found this pass - repair the tool, not the page
+
+    shapes, two definitions    371. visual.py's charts question drops rules and white rects
+        before counting and answers "2 in the PDF, 0 in the docx". verify.py's `shapes` counts
+        every drawing of 1.5 pt or more and answers "2 in the PDF, 2 in the render" - REFUTED.
+        One word, two definitions, and a finding that can be true and refuted at once. The
+        document fails on `order` either way, so nothing was fixed on it.
+
+    a note is not a claim        five findings came back UNVERIFIABLE because I wrote the eye's
+        prose after the "|" separator. Everything after "|" is a claim. The vocabulary is fine;
+        the note was wrong.
+
+    emphasis on 373 / 371      15 of 17 and 11 of 13 lines "lost" their emphasis. q8 compares a
+        line's SIZE, and bold text keeps its size, so the loss it reports is not a weight test.
+        The eye passes those lines and is right. Same blind spot as 304.
+
+### Fixed in this batch, in one line
+
+A table cell's line-height floor now reads the cell's size from `t.sizes` instead of parsing it
+out of a font name that never carried one. 374_org_chart's three overlapping boxes are readable.

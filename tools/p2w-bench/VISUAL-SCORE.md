@@ -539,3 +539,18 @@ full visual run will overwrite them with what it actually finds.
 | 2026-11-08 | 315_gazette_notification | FAIL | moved:RAJESH KUMAR, Jt. Secy. +69.8 pt - the three-column page's footer is placed at the flow's end instead of at the page's own y; order 47.1 % of 21 rows |
 | 2026-11-08 | 316_contract_with_schedules | PASS | five numbered clauses and the Schedule C charges table |
 | 2026-11-08 | 317_rti_response | PASS | letter head, date, six numbered points and the enclosure line |
+| 2026-11-08 | 371_experience_certificate | FAIL | order - 28 rows in the PDF, 24 in the render, 61.5 % in sequence; the seal's arc text is emitted per glyph and its two circles are not drawn |
+| 2026-11-08 | 372_timesheet_grid | PASS | grid, every day column and the totals row on the page's rows; the navy band is back |
+| 2026-11-08 | 373_leave_application_form | FAIL | moved:Family function at native place -22.4 pt: the Reason row is one line short, so its text sits on the row rule |
+| 2026-11-08 | 374_org_chart | PASS | the three bottom boxes print label, name and staff on their own lines after the cell-line floor was made to work; the footer under the table now sits 7 pt low |
+| 2026-11-08 | 375_attendance_register | PASS | navy band, 12 employee rows and 31 day columns on the page's grid |
+| 2026-11-08 | 380_runbook_terminal_output | PASS | navy band, four numbered steps and their dark code blocks on the page's lines |
+| 2026-11-08 | 381_incident_report_timeline | PASS | title band, summary, timeline table and action items on the page's rows |
+| 2026-11-08 | 382_architecture_diagram | PASS | six boxes, their fills, every arrow and label on the page's positions |
+| 2026-11-08 | 383_api_docs_page | PASS | navy band, both spec tables, the curl block and the JSON response |
+| 2026-11-08 | 390_wide_data_appendix | PASS | eleven columns and all 17 records, every figure in its column |
+| 2026-11-08 | 391_survey_questionnaire_grid | PASS | five Likert headers and every tick in its column; the PDF's own text layer holds the same welded header ("Strongly\\x00agree Agree"), so the eye's first read was wrong |
+| 2026-11-08 | 392_statistical_console_output | PASS | monospace console output, coefficient table and the note, line for line |
+| 2026-11-08 | 393_spectrum_peak_table | PASS | the spectrum chart and the five-column peak table on the page's rows |
+| 2026-11-08 | 394_map_with_legend | PASS | polygon, river, both roads, every marker, the legend, scale bar and north arrow |
+| 2026-11-08 | 400_comic_page_speech_bubbles | FAIL | moved:412 pallets -166.2 pt, moved:MEANWHILE, AT THE LOADING DOCK -159.6 pt, moved:Ship by noon -166.9 pt - the third row of panels is a sheet high and its bubble text rises to the panel top |
