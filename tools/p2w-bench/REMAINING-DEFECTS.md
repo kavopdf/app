@@ -2112,3 +2112,65 @@ The eye recorded `moved:Authorised signature` on insurance-policy-schedule. The 
 UNVERIFIABLE ("not on both sides") - the string did not exist on either side - and the
 re-recorded claim verified. A claim that names text the page does not hold cannot be checked,
 and the fix is the claim, not the check.
+
+## g53 corpus — batch 4 (the four C-group documents), 8 Nov
+
+Four documents, one page each, the last of the C group and the first four with no row in
+VISUAL-SCORE.md. Every page opened before any number was read; every finding verified
+against the PDF; 3 findings, 3 verified, 0 refuted, 0 unverifiable. Three documents pass,
+one does not.
+
+### CLOSED — a ring drawn under a rotated matrix was dropped, 8 Nov
+
+property-tax-receipt. The PMC "PAID" stamp is two concentric circles drawn as Bézier curves
+inside a `0.99 -0.14 0.14 0.99 cm` - a matrix about 8 degrees off axis. `pathIsEllipse` found
+the ellipse correctly, but the ellipse branch hands the path to `addShape(box, ..., kind=1)`,
+and that overload returns early whenever the CTM is rotated: a preset ellipse's bounding box
+is not the shape, so the ring was dropped and the stamp came out as three bare words
+(PMC / PAID / 12 OCT 2026) with nothing around them. The eye found it on the page and
+`visual.py`'s charts question reported "4 shapes in the PDF, 2 in the docx" while still
+answering yes - a second, smaller blind spot, recorded below.
+
+**Fixed.** When the path is an ellipse and the CTM is rotated, the branch now builds a
+freeform from the path's own curve points, which are already through that matrix. Reached
+only where the ellipse was being dropped, so nothing that drew before changes. G2 across
+208 documents: no document got worse. Charts on the page now 4 of 4, and the rings draw at
+the page's own radii.
+
+### OPEN — the signature block sits 37 pt above the rule it belongs to
+
+purchase-order. `moved:M. Sathe` verified: y=669.2 in the PDF, y=632.5 in the render,
+-36.9 pt. The rule itself is right - 664.8 in the PDF, 664.6 in the render - so the shape is
+placed correctly and the TEXT has moved, not the line. The whole block moved: "For Kastura
+Home Products Pvt. Ltd." 615.4 -> 578.5, "Purchase manager" 678.5 -> 641.9, each about
+-37 pt, so the name now sits above the signature rule instead of under it.
+
+The cause is in the vertical charge, not the placement. The gap the page gives from
+"5. Invoice must quote this purchase order number..." (y=438) to "For Kastura..." (y=615) is
+177.4 pt. The paragraph carries `w:before="2400"` (120 pt) with `w:line="161"
+w:lineRule="exact"`, and the render spends 127.6 pt of that gap - 50 pt short. An exact line
+rule is swallowing part of the space-before, the same family as D-01: the paragraph's height
+is being taken from the writer's own line rule instead of from the model's own gaps. The
+terms list above it is also 12.9 pt low ("5. Invoice" 438 -> 450.9), so the two errors are
+in opposite directions and do not cancel.
+
+**Not fixed this pass.** Changing how space-before is charged under an exact line rule
+moves every paragraph in the corpus, and this run had no budget for a G2 that came back
+worse. **Tries: 0 of 3.**
+
+### Measurement blind spots found this pass - repair the tool, not the page
+
+    emphasis on salary-slip-corporate   16 of 37 emphasised lines "lost it", e.g. Basic
+        salary. The question calls a line emphasised when it is more than half a point
+        larger than the page's body size. This page sets its earnings rows at 7.8 pt with a
+        7.0 pt body - 0.8 pt of emphasis. The render rounds every size to the OOXML half
+        point, so 7.8 comes back 7.5, which is exactly body + 0.5 and fails a strict ">".
+        `position.py` puts font size at 99.6 % within its own 0.5 pt tolerance, so the page
+        is right and the question is measuring at the edge of the granularity the format
+        stores sizes at. Fix: compare against body + the size tolerance, not body + half of
+        it twice, or carry the emphasis on the rounded size the format can actually hold.
+
+    charts on property-tax-receipt   "4 shapes in the PDF, 2 in the docx" answered yes. The
+        charts question passes on presence, not on count, so two lost rings read as a pass.
+        The eye is what caught the stamp. A count-based shape question would have said no on
+        this page; that is the change to make, and it is D-05's neighbour.

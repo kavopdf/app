@@ -653,3 +653,34 @@ of them, leaving 14: the four C-group documents after these (property-tax-receip
 purchase-order, salary-slip-corporate, salary-slip-factory-wages) and the ten D-group documents
 (landscape and rotated pages, tables across a page break, merged cells, shadow text). The final
 sweep over all 208 has not started.
+
+## g53 batch 4 - the four C-group documents, 8 Nov 12:04
+
+Four documents with no row in VISUAL-SCORE.md, one page each, all seventeen steps in order.
+Three pass, one fails on a verified finding.
+
+**The engine change: a ring under a rotated matrix.** The PMC stamp on property-tax-receipt
+is two concentric circles drawn as Bézier curves inside an 8-degree matrix. `pathIsEllipse`
+recognised them, but the ellipse branch goes through the `addShape` overload that drops
+every preset shape when the CTM is rotated, because a rotated box is not the shape. The
+rings went and the stamp came out as three words. The branch now builds a freeform from the
+path's own curve points - already through the matrix - when the CTM is rotated. It is
+reached only where the ellipse was being dropped, so no document that drew before changed.
+G2 across 208: no document got worse, 49 line counts still fall with no word lost.
+
+**What is left on purchase-order.** The signature rule is placed correctly to a fifth of a
+point; the text above it has moved 37 pt up, because an exact line rule spends 127.6 pt of a
+177.4 pt space-before. Written up in REMAINING-DEFECTS.md with the two measurements, not
+attempted: it moves every paragraph in the corpus and needed a G2 this run did not have.
+
+**Two measurement blind spots, both on pages the eye passed.** The emphasis question counts
+a line as emphasised only when it is more than half a point above the body size, and the
+render rounds 7.8 to 7.5, so 16 honest rows on salary-slip-corporate read as lost emphasis
+while `position.py` has font size at 99.6 % inside tolerance. And the charts question passes
+on presence rather than count, which is why two lost rings still answered yes.
+
+## Where the corpus stands
+
+198 documents have a row in VISUAL-SCORE.md, 10 do not - all ten are the D group: landscape
+and rotated pages, tables across a page break, merged cells, shadow text, a rotated header.
+The final sweep over all 208 has not started.

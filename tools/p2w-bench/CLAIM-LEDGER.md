@@ -308,3 +308,16 @@ follow a word that is not whole on the render side. The defect is real and visib
 document is FAIL anyway on a verified `order` finding, so nothing is left on that claim. This
 is the second run to want a claim form for "a word the render breaks", which `wraps` almost
 is: it needs the word to survive as a word before it can count the lines it takes.
+
+## g53 batch 4 (the four C-group documents), 8 Nov 12:04
+
+| claim type | verified | refuted | unverifiable |
+|---|---|---|---|
+| moved | 1 | 0 | 0 |
+| order | 2 | 0 | 0 |
+| **total** | **3** | **0** | **0** |
+
+Three findings, three verified. `moved:M. Sathe` is the signature block 36.9 pt above the
+rule the page drew it under. The two `order` findings are the row-banding blind spot again,
+both on pages the eye passed - salary-slip-corporate's page is faithful and its order is
+93.8 %, which is the D-03 class and not a defect.

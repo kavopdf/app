@@ -432,6 +432,10 @@ finding verified against the PDF. 23 findings: 22 verified, 0 refuted, 1 unverif
 | 2026-11-08 | marksheet-university-consolidated | FAIL | wraps:Maximum marks - one line on the page, two in the render |
 | 2026-11-08 | mobile-bill | PASS | both tables, the amount column and the words line on the page rows |
 | 2026-11-08 | mutual-fund-statement | FAIL | pagecount 2 in / 3 out, wraps:Purchase value (Rs), moved:Account number 44.9 pt - table 5 is set as loose lines, not a table |
+| 2026-11-08 | property-tax-receipt | PASS | the two rings of the PMC stamp now draw, carried as a freeform under the rotated matrix; header grid, table 1 and the amount in words on the page rows |
+| 2026-11-08 | purchase-order | FAIL | moved:M. Sathe -36.9 pt: the signature block sits 37 pt above the rule the page drew it under |
+| 2026-11-08 | salary-slip-corporate | PASS | both tables, the net pay line and the YTD table on the page rows; the numbers fail on order and emphasis, both measurement (D-09) |
+| 2026-11-08 | salary-slip-factory-wages | PASS | both tables, the deduction column and the amount in words on the page rows |
 
 Five of the seven failures were measured on the engine as it stood at the start of this batch:
 nine of the thirteen documents spilled a sheet and six dropped a header line, all from one
