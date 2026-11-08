@@ -1600,3 +1600,83 @@ is reported as JOINED. The word-level checks - missing, extra, blocks, nobg, bla
 gate hard and are still compared in both directions. Measured after the repair: G2 across
 208, no document got worse, one improved, fifteen joined. `base208.json` was re-recorded on
 that run and committed with the source.
+
+---
+
+## OPEN - g53 corpus, batch 1 (A 1-10, B 11-13), found this pass, 8 Nov
+
+Thirteen documents, 14 pages in the PDF against 22 in the render. Every page opened before any
+number was read; every finding checked against the PDF. 34 findings: 32 verified, 1 refuted,
+1 unverifiable. **4 pass, 9 fail.** Eight of the nine fail on `pagecount`, and seven of those
+eight are multi-column pages - the class D-06 has been waiting on.
+
+### OPEN - a two-column page's second column is charged to the page's height as well
+
+journal-2col-with-footnotes, policy-2col-spanning-section-heading,
+report-2col-table-spanning-both-columns, newsletter-3col-header-footer,
+newspaper-2col-fullwidth-headline, academic-paper-ieee-2col-abstract,
+brochure-3col-with-sidebar-box.
+
+`pagecount` VERIFIED on every one of them: 1 page in the PDF, 2 in the render (academic-paper
+2 in, 3 out). `order` VERIFIED on the same pages - 92.3 % of 57 rows on journal, 51.2 % of 35 on
+report, 32.3 % of 57 on newsletter, 28.6 % of 41 on newspaper, 31.6 % of 41 on policy,
+61.7 % of 68 on academic-paper, 37.9 % of 43 on brochure.
+
+The flow is one vertical stack of per-line paragraphs, and every column's lines are charged to
+that same stack. A page that reads ACROSS is written as a page that reads DOWN, so its content
+is as tall as all its columns added together. `pageFits` then returns false, `spendGaps` is off
+(`hasColumnBands`), and the page falls back to the clamped 120 pt gaps - which is why these
+pages lose their white space as well as their second column.
+
+`pageColumns` already measures the bands correctly and `sectPrXml` already knows how to write
+`w:cols w:num`. It is short-circuited to one column because every `w:ind w:left` is measured
+from the PAGE edge: inside a real column the indent exceeds the column width and the text wraps
+one character per line (measured on the 53-document corpus, recorded in the method comment).
+So the fix is two parts, and neither is optional: emit the page's real column count as explicit
+`w:col` widths, and make each paragraph's left and right indent relative to its own column's
+edges. `p.column` is already on every Para and Table, so the writer has the index it needs.
+
+**Not attempted this pass** - it touches every multi-column document in the corpus and needs its
+own G2 pass across all 208. **Tries: 0 of 3.**
+
+### OPEN - a departure time splits after the colon in a table cell
+
+bus-timetable-station-left-times-right, page 1. `breaks:05:45` VERIFIED - the PDF sets the
+departure on one line and no render line ends with it; the render continues `10:15` on the next
+line, so the cell holds `05` over `45`. Every row of the table does it, and the extra height is
+what spills the page: `pagecount` VERIFIED 1 in, 2 out, `order` 4.0 % of 39 rows.
+
+This is the same class as 56_table_indented_from_margin (a cell 0.5 pt too narrow) but it is not
+the same fix: here the TIME column is narrow because the table is being laid out across the page
+width and the widths are equal shares. `w:noWrap` was tried on 56 and LibreOffice ignores it for
+a fixed-width cell. What is left is the column width itself. **Tries: 0 of 3.**
+
+### OPEN - the masthead's separate lines are merged into one
+
+annual-review-2col-uneven-columns, page 1. `wraps:KAVERI MILLS LIMITED` VERIFIED - the PDF has
+2 lines, the render merges them into 1. The page draws the company name, the CIN and the
+"Annual Review 2025-26 - Letter from the Chair" strapline as three fields on the masthead band;
+the render sets them as one sentence, and `order` is 57.9 % of 34 rows.
+
+This is D-07 again (two fields on one baseline joined into one sentence) on a masthead rather
+than a form row. The signed-gap and sort attempts recorded under D-07 were measured and
+reverted; do not repeat them. **Tries: 0 of 3.**
+
+### OPEN - a sidebar box loses its box and its values leave the page
+
+brochure-3col-with-sidebar-box, page 1. `shapes` VERIFIED 4 in the PDF and 0 in the render;
+`pagecount` 1 in, 2 out; `order` 37.9 % of 43 rows. The "AT A GLANCE" panel is drawn as a
+bordered box with eight label/value pairs inside it. The render has no box, and the values are
+set at the page's right edge while the labels stay in the middle column - the panel's fields
+are not being joined into rows. `moved:1,994` came back UNVERIFIABLE because the value is not a
+line of its own on both sides, which is itself the symptom.
+
+Same family as 55_sidebar_box_beside_body. **Tries: 0 of 3.**
+
+### Refuted this pass - not a defect
+
+`overlap` on price-list-2col-dense-right-aligned: 0 overlapping pairs in the PDF, 0 in the
+render. At 130 dpi the PACK and PRICE header cells read as though they collide; at the text
+level they do not. The document passes, and the eye's instruction for a dense two-column price
+list is what is wrong, not the page. Recorded so the final sweep does not re-open it.
+

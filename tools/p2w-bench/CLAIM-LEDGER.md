@@ -214,3 +214,25 @@ false alarms. The difference is not that the verifier got better; it is that thr
 written from the 130 dpi image (72, 73, 74) were checked at 220 dpi before they were
 recorded, found clean, and never entered the findings file. A finding that is not written
 cannot be refuted, and that is the right place for it to die.
+
+## g53 corpus, batch 1 - the run of 8 Nov
+
+| claim type | verified | refuted | unverifiable |
+|---|---|---|---|
+| pagecount | 16 | 0 | 0 |
+| order | 11 | 0 | 0 |
+| shapes | 3 | 0 | 0 |
+| wraps | 1 | 0 | 0 |
+| breaks | 1 | 0 | 0 |
+| moved | 0 | 0 | 1 |
+| overlap | 0 | 1 | 0 |
+| **total** | **32** | **1** | **1** |
+
+`pagecount` is 16 of 32 verified findings, and every one of them is the same defect: a
+multi-column page written as one flow. That is the claim type to work next, not the document.
+
+`moved:1,994` came back UNVERIFIABLE because the value is not a line of its own on both sides -
+the claim was written against a sidebar whose label and value are separate fields, and neither
+side sets them as one line. A `moved:` claim needs text that is a line on both sides; the
+brochure's real evidence is `shapes` and `pagecount`, both of which verified.
+

@@ -16,6 +16,7 @@ opened is not counted here - `looked.py` decides that, not this file.
 |------|-----------|--------|-------|------|
 | 7 Nov | 3 | 0 | 0 % | first measurement, on 300/301/302/303 only |
 | 7 Nov | 2 | 1 | 50 % | after the D-01 pitch fix: 316 PASS, 303 FAIL (WARNING SIGNS wraps) |
+| 8 Nov | 13 | 4 | 31 % | g53 batch 1, the multi-column class: 9 fail, 8 of them on pagecount |
 
 Not a baseline yet - three documents is not the corpus. It becomes one when a full
 batch has been through both halves of the check.
@@ -313,3 +314,24 @@ reverted. See "Table height" in REMAINING-DEFECTS.md.
 | 2026-11-08 | 78_mixed_english_devanagari_line | FAIL | wraps:Amount paid - the Latin and Devanagari runs are split onto four baselines, pagecount 1 in and 2 out |
 | 2026-11-08 | 79_inr_indian_digit_grouping_table | PASS | four-row table with Indian digit grouping and the words line under it |
 | 2026-11-08 | 80_gstin_pan_cin_ifsc_table | PASS | five dealer boxes with their rules and both identifier columns on the page rows; order 92.3 % is the row-banding blind spot |
+
+### g53 corpus - batch 1 (A 1-10, B 11-13), 8 Nov - the multi-column class
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-08 | academic-paper-ieee-2col-abstract | FAIL | pagecount - 2 pages in the PDF, 3 in the render; order 61.7 % of 68 rows, 0.0 % of 43 on page 2 |
+| 2026-11-08 | admission-form-labels-left-boxes-right | PASS | twenty-two numbered fields, every box on its rule, declaration band at the foot |
+| 2026-11-08 | annual-review-2col-uneven-columns | FAIL | wraps:KAVERI MILLS LIMITED - the PDF's two masthead lines are merged into one; order 57.9 % of 34 rows |
+| 2026-11-08 | balance-sheet-two-columns-of-figures | PASS | both figure columns on the page baselines, 25 rows in sequence |
+| 2026-11-08 | brochure-3col-with-sidebar-box | FAIL | pagecount 1 in, 2 out; shapes 4 in the PDF and 0 in the render; order 37.9 % of 43 rows |
+| 2026-11-08 | bus-timetable-station-left-times-right | FAIL | breaks:05:45 - every departure time splits after the colon; pagecount 1 in, 2 out; order 4.0 % of 39 rows |
+| 2026-11-08 | journal-2col-with-footnotes | FAIL | pagecount 1 in, 2 out - the second sheet is blank; order 92.3 % of 57 rows |
+| 2026-11-08 | magazine-2col-pullquote-spanning | PASS | two columns, photo and pull quote on the page rows; order 76.3 % is the row-banding blind spot |
+| 2026-11-08 | newsletter-3col-header-footer | FAIL | pagecount 1 in, 2 out; shapes 3 in the PDF and 0 in the render; order 32.3 % of 57 rows |
+| 2026-11-08 | newspaper-2col-fullwidth-headline | FAIL | pagecount 1 in, 2 out - the photograph is pushed to the second sheet; order 28.6 % of 41 rows |
+| 2026-11-08 | policy-2col-spanning-section-heading | FAIL | pagecount 1 in, 2 out; shapes 1 in the PDF and 0 in the render; order 31.6 % of 41 rows |
+| 2026-11-08 | price-list-2col-dense-right-aligned | PASS | 46 rows in sequence, 420 rules in both; the eye's overlap claim was REFUTED, 0 pairs either side |
+| 2026-11-08 | report-2col-table-spanning-both-columns | FAIL | pagecount 1 in, 2 out - the second sheet carries only the footer rule; order 51.2 % of 35 rows |
+
+Thirteen documents, 14 pages in the PDF and 22 in the render, every page opened before any
+number was read. 34 findings: 32 verified, 1 refuted, 1 unverifiable. **4 pass, 9 fail.**

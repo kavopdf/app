@@ -530,3 +530,56 @@ page shows a newspaper's three columns turned into a three-column table of fragm
 Everything about 72, 73 and 74. At 130 dpi their tables read as overlapping rows and the
 eye called all three FAIL; cropped at 220 dpi the rows are clean and every figure is in its
 column. All three pass. The reverse of the usual error, in the same batch.
+
+---
+
+# g53 corpus - batch 1 (A/academic-paper-ieee-2col-abstract to B/bus-timetable-station-left-times-right)
+
+The first batch of the 53-document group corpus, and the first batch that is almost entirely the
+multi-column class: ten A-group documents that read across a page, three B-group documents that
+read down a two-column table.
+
+Thirteen documents, 14 pages in the PDF and 22 in the render. Every page opened before any number
+was read. 34 findings: 32 verified, 1 refuted, 1 unverifiable. **4 pass, 9 fail.**
+
+| Document | Pages | Verdict | Verified finding |
+|---|---|---|---|
+| academic-paper-ieee-2col-abstract | 2 -> 3 | FAIL | pagecount, order 61.7 % of 68 rows |
+| admission-form-labels-left-boxes-right | 1 | PASS | - |
+| annual-review-2col-uneven-columns | 1 | FAIL | wraps:KAVERI MILLS LIMITED, order 57.9 % |
+| balance-sheet-two-columns-of-figures | 1 | PASS | - |
+| brochure-3col-with-sidebar-box | 1 -> 2 | FAIL | pagecount, shapes 4 -> 0, order 37.9 % |
+| bus-timetable-station-left-times-right | 1 -> 2 | FAIL | breaks:05:45, pagecount, order 4.0 % |
+| journal-2col-with-footnotes | 1 -> 2 | FAIL | pagecount, order 92.3 % |
+| magazine-2col-pullquote-spanning | 1 | PASS | eye; order 76.3 % is the row-banding blind spot |
+| newsletter-3col-header-footer | 1 -> 2 | FAIL | pagecount, shapes 3 -> 0, order 32.3 % |
+| newspaper-2col-fullwidth-headline | 1 -> 2 | FAIL | pagecount, order 28.6 % |
+| policy-2col-spanning-section-heading | 1 -> 2 | FAIL | pagecount, shapes 1 -> 0, order 31.6 % |
+| price-list-2col-dense-right-aligned | 1 | PASS | eye; the overlap claim was REFUTED 0 and 0 |
+| report-2col-table-spanning-both-columns | 1 -> 2 | FAIL | pagecount, order 51.2 % |
+
+### What the numbers said, and what the eye said
+
+Eight of the nine failures are `pagecount`, and `pagecount` is 16 of the 32 verified findings.
+That is not nine documents with nine problems: it is one defect - a page that reads across being
+written as a page that reads down - seen on nine pages. The eye found the same thing without
+being told: on every one of the seven multi-column documents the render put the whole of the
+second column below the first, so the page ran past the sheet.
+
+The eye was wrong once and the verifier caught it. On price-list-2col-dense-right-aligned the
+PACK and PRICE header cells read as though they collide at 130 dpi; `overlap` came back REFUTED
+with 0 pairs on both sides and the document passes on all eight computed questions. The lesson is
+the one 58_header_rule_footer_rule taught: at 130 dpi a tight gap looks like a collision.
+
+### What was not fixed, and why
+
+No code was changed this pass. The one fix that clears eight of these nine documents is the
+two-column section - emit the page's real `w:cols` and make every `w:ind` relative to its own
+column - and it touches every multi-column document in all 208. It needs its own G2 pass and a
+render of the whole corpus to prove it, and it was not attempted blind. It is written up in
+REMAINING-DEFECTS.md with the two parts it needs, both named, so the next run starts from the
+method rather than from the archaeology.
+
+`breaks:05:45` on the bus timetable is a separate, smaller defect: the TIME column is too narrow
+for `05:45` and the cell wraps it after the colon, which is also what spills that page.
+
