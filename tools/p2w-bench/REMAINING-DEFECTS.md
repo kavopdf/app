@@ -3388,3 +3388,33 @@ page - `missing:` only works for text that is unique.
 render draws one full-length line. 332's 43 against 68 is 25 "extra" rules of which at most 15
 are real. Not fixed here - a rule count needs to merge collinear segments on both sides before
 it can be compared - but recorded so the next run does not chase it as a document defect.
+
+
+**A patch that fixes it, gate-clean, waiting to be applied.**
+
+A parallel attempt produced a working patch (`tools/p2w-bench/patches/TB-A-uniform-borders.patch`,
+applies cleanly to `df547d6`, touches `DocxWriter.java` and `PdfToWord.java`, 125 additions and 57
+deletions). It is measured, not proposed:
+
+    borders() now writes ONE constant sz="6" / colour 000000 on every ruled table
+    each side is decided on its own evidence: the outer four from the frame the page drew,
+      insideH/insideV from the rules the page drew ACROSS the table's band
+    edgeStroke became pageDrewRule, which additionally accepts a stroke-only box whose
+      interior contains the table and which the table covers at least half of
+
+Result across the corpus: the six weights collapse to one - **912 sides single/sz=6, 360 none**.
+`04_stamp_180` goes from 12 sides of `none/sz=0` to **9 drawn sides at sz=6** (T1 four outer sides
+with no separators inside, T2 four outer plus insideH) and 3 `none`. `23_timetable` is unchanged at
+six sides of sz=6. **28 tables that had no borders now have their drawn sides, and no table lost a
+border.** Gate: **no document got worse**, 22 counts improved; `verify-engine.sh` exits 0.
+
+**One correction to an earlier note in this entry.** The student block in `04` *does* have a rule -
+a 0.60 pt grey stroked rectangle - it simply has nothing inside it. So per-side evidence gives it
+four sides rather than leaving it fully open, which is the same rule applied side by side. **13
+tables whose band a rule crosses but which have no frame stay `none`**, named in the report:
+403, 406, 351, 363, 364 and others.
+
+**Not applied yet, deliberately.** It touches `DocxWriter.borders()`, and the schema-order work is
+editing the same method. Applying one before the other would mean resolving that by hand; applying
+them together is one gate run instead of two.
+
