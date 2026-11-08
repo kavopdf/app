@@ -3142,3 +3142,49 @@ nearest and it counts paths, not glyph runs. **Tries: 0 of 3 on the claim vocabu
 numbers failing while the eye passes. The PDF draws each table cell as its own line and the
 render joins a row's cells with tabs, so the sequence cannot match even when the count does
 (34 and 34 here). Recorded as a tool blind spot, not a document defect; no fix attempted.
+
+
+**Attempt 4 - two subagent reports changed the diagnosis, and the fix is close but not safe yet.**
+
+**What the page really is.** There is no outer form box. The 700 pt band is the letterhead rule at
+y=92 welded to the footer rule at y=793.89, and the weld is not a marginal 60 %: the grouping
+compares each rule only against `g.get(0)`, and every rule on the page lies wholly inside that
+span, so all 23 scored a **100 % overlap** with the first member. Nothing could ever start a second
+group. The real item grid is y 232-358, 8 rules, 7 rows, header `Sl | Particulars | Amount (Rs.)`.
+
+**The height gate was our own invention.** None of Camelot, Tabula, pdf2docx or pdfplumber measures
+how far down a vertical rule reaches before calling it a column edge. Camelot counts joints (a
+horizontal crossing a vertical); pdf2docx takes `sorted(v_strokes)` and never measures reach;
+pdfplumber uses `edge_min_length=3`. The `overlap < height * 0.5` test rejected every rule on an
+invoice, whose column lines are drawn only beside the item rows.
+
+**Two changes were made and measured.** Group horizontals by **equal extent**
+(`|dx0| <= 2 && |dx1| <= 2`) instead of first-member overlap, and accept a vertical rule when it
+crosses at least two horizontals instead of when it spans half the band.
+
+Result on the target document - the table appears:
+
+    w:tbl: 1   w:tr: 7
+    row0: ["Sl Particulars", "Amount (Rs.)"]
+    row1: ["1 Tuition Fee", "58,750.00"]
+    row2: ["2 University F", "6,120.00"]
+
+**But the gate rejects it:**
+
+    333_datasheet_spec_tables   missing 0 -> 2,   lines 122 -> 86
+    33_sans_nondefault_body     extra   0 -> 4
+    351_omr_answer_sheet        lines  65 -> 3        <- 62 of 65 lines lost
+    2 conversions failed
+
+The joint count is too permissive: it builds tables where there is no table, and a false table
+swallows the words it claims. **DO NOT SHIP.**
+
+**What is missing, and it is one piece.** The research named it: Camelot rejects a table whose
+columns are more than 90 % empty, and pdf2docx requires at least two real columns. Add that reject
+to the derived-table path and re-measure - the invoice's grid has content in every column, and a
+false table on 351_omr does not.
+
+**Tries: 4 of 3 - the allowance is spent, but the remaining step is one guard with a measured
+target.** Three subagent reports back this: `D14-E-rule-geometry.md`,
+`D14-C-table-detection-research.md`, plus `D14-D-two-regressions.md` when it lands.
+
