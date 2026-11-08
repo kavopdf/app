@@ -1,35 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  OCR: find the words in a document.
+  Make searchable PDF (OCR): read the words already on the page.
 
-  This file used to hold a byte-for-byte copy of ic_scan.xml, so "Scan to PDF" and
-  "Make searchable (OCR)" showed the same picture in the app. They are different jobs:
-  one captures a page, the other reads the text already on it. The page here carries two
-  lines of text and a magnifier sits over the corner of it, which says "find the words"
-  without repeating the scan frame's corner brackets.
+  Drawn in the Material Symbols family - the same source as ic_image_search, ic_scan and the
+  rest of the tool icons - and with the same group/translateY wrapper they use, so the glyph
+  sits in the same optical box as its neighbours.
+
+  The previous drawing was hand-built from rectangles and a magnifier. It said the right thing
+  and did not belong to the set: it read heavier and slightly larger than every icon beside it,
+  which is what the user saw. This one is a page with its own text lines inside a scan frame.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="26dp"
     android:height="26dp"
     android:viewportWidth="960"
     android:viewportHeight="960">
-    <!-- the page, with a folded corner -->
-    <path
-        android:fillColor="#FF000000"
-        android:pathData="M300,120 L600,120 L760,280 L760,470 L680,470 L680,320 L560,200 L300,200 L300,760 L470,760 L470,840 L300,840 Q260,840 260,800 L260,160 Q260,120 300,120 Z" />
-    <!-- two lines of text on it -->
-    <path
-        android:fillColor="#FF000000"
-        android:pathData="M340,320 L620,320 L620,380 L340,380 Z" />
-    <path
-        android:fillColor="#FF000000"
-        android:pathData="M340,460 L520,460 L520,520 L340,520 Z" />
-    <!-- the magnifier: a ring and a handle -->
-    <path
-        android:fillColor="#FF000000"
-        android:fillType="evenOdd"
-        android:pathData="M640,530 A110,110 0 1,1 640,750 A110,110 0 1,1 640,530 Z M640,590 A50,50 0 1,0 640,690 A50,50 0 1,0 640,590 Z" />
-    <path
-        android:fillColor="#FF000000"
-        android:pathData="M720,730 L820,830 L760,890 L660,790 Z" />
+    <group android:translateY="960">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M240-80q-33 0-56.5-23.5T160-160v-80H80v-80h80v-120H80v-80h80v-120H80v-80h80v-80q0-33 23.5-56.5T240-880h480q33 0 56.5 23.5T800-800v80h80v80h-80v120h80v80h-80v120h80v80h-80v80q0 33-23.5 56.5T720-80H240Zm0-80h480v-640H240v640Zm80-120h320v-80H320v80Zm0-160h320v-80H320v80Zm0-160h320v-80H320v80Z" />
+    </group>
 </vector>
