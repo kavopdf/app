@@ -566,7 +566,7 @@ These two were invisible to every count-based gate. `gate.py` reported "no docum
 got worse" on all 208 documents while both were present. They are the reason G5 and
 G6 exist.
 
-### D-01  Vertical drift: every line sits higher than the PDF drew it, and the error grows down the page
+### D-01  Vertical drift: every line sits higher than the PDF drew it — FIXED 7 Nov
 
 **Severity: affects most documents. This is the biggest single defect in the corpus.**
 
@@ -655,6 +655,26 @@ than being baked into the ratchet. Re-record it when the table height is right.
 `(t.top - baseline) - 0.2 * previous box` - the same rule the flow now uses - put 390's
 table 10.6 pt low instead of 3.7 pt, because a table's first row does not begin where the
 spacer paragraph ends. Reverted; the table's own top y stays open below.
+
+#### What the fix was, and how it is known to have worked
+
+`LINE_FACTOR = 1.15` was replaced by the page's own pitch: each flowing line's line box is
+the gap the model measured between that line and the one above it, so the line sits on the
+baseline the PDF drew rather than a constant fraction above it. Committed as "place every
+flowing line on the page's own measured pitch".
+
+The proof is D-06, which had the same cause. Measured on 8 Nov across all 208 documents:
+
+    same page count as the PDF : 208
+    spill (extra pages)        :   0
+    short (missing pages)      :   0
+
+Before this fix, 28 documents produced a page the PDF did not have, because every line was
+slightly too tall and the error accumulated down the page until the last lines fell onto a
+second sheet. All 28 are now correct. That is a whole-corpus consequence of one line height,
+so it is the strongest evidence available without a device.
+
+`Tries: 1 of 3` in this entry is therefore out of date - it was fixed on the first attempt.
 
 ### D-02  Row grouping: cells from different rows merged onto one line
 
