@@ -3561,3 +3561,47 @@ is the price of a correct row.
 
 **Patch:** `patches/EX-A-baseline-grouping.patch`, one file, `PdfToWord.java`.
 
+
+
+**The page budget, shipped - and the 1277 pt was my own counting error.**
+
+**The number was wrong.** `1277 pt` for `01_stamp` is reproducible only by counting `w:before` and
+`w:line` **inside the stamp's anchored text boxes**: raw 1170.4 pt, in-flow **681.8 pt** on an 841.9 pt
+page. The page was never over in LibreOffice. And the `#67 before=258.7 pt` quoted earlier does not
+exist on this build - the largest is **120.0 pt**, already held down by `GAP_CAP_TW`. Two errors, both
+mine, and both the kind that a measurement of the file's own XML would have caught.
+
+**What shipped.** The literal instruction - clamp the line height of the remaining paragraphs - clamps
+exactly **one** line per page: the guard fires, leaves zero room, and everything after it takes the
+break path. `table-of-contents-dot-leaders` needs 907.8 pt on 841.9 spread over about 57 lines, so it
+was generalised: measure the page off its own XML (`w:before + w:line + w:trHeight`, top-level only),
+then re-write it with every box and gap scaled by `budget / height`, floored at 0.85 and at the type's
+own ascent. A page that already fits is written once and is byte-identical - **196 of 208 documents are
+unchanged**, 12 change.
+
+    pages whose flow exceeds the paper (of 540)     11 real  ->  4
+    documents rendering the PDF's page count       189/208   ->  196/208   (7 fixed, none gained)
+    gate                                           "no document got worse", exit 0
+
+The five stamp documents' flow sums are **unchanged** - 681.8 / 675.3 / 541.1 / 586.4 / 819.0 pt on
+841.9 - all render 1/1, and their `document.xml` is **byte-identical** before and after.
+
+**Two things deliberately not done.** A hard break is in the code as `BREAK_WHEN_UNFITTABLE`, **off by
+default**: on, the flow never exceeds a breakable page (4 to 3 over) but the gate gains two
+`pages 1 -> 2` counts on documents that render two pages either way. The clean gate was chosen; flip
+one constant for the guarantee. And moving the footer into a section footer was rejected on numbers:
+the writer has **no header/footer notion at all** - 0 `w:footerReference` in 208 outputs, `w:header="0"
+w:footer="0"` - so it needs a new part, a relationship, four `sectPr` sites and a non-zero
+`w:footer`/bottom margin, **which moves every anchored shape on every page**, and it would recover only
+120 pt on a document that is not over.
+
+**Still over by 40-96 pt, four pages:** `350_question_paper`, `itr-computation-with-slab-table`,
+`newsletter-3col-header-footer`, `product-catalogue-code-left-price-right`. Closing those needs real
+columns (D-08) or a shrinkable table model.
+
+**Tests:** TestEngine 81/81, TestPdfToWord 29/29, TestRealDocs 3/3. `verify-engine.sh` was not run end
+to end - its OCR, redaction, repair and APK stages do not touch `DocxWriter` and exceed one command
+budget.
+
+**Patch:** `patches/EX-B-page-budget.patch`.
+
