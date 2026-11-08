@@ -90,7 +90,13 @@ as the picture's alt text and `gate.py` reads them, so the word counts should be
 that has not been measured end to end, because the sandbox's Android stubs cannot run
 `PDFRenderer` (`android.graphics.Canvas.getMatrix()` is missing there).
 
-**A re-baseline is owed once an APK has converted the corpus on a device.** Until then the
-stored baseline is the pre-rasterisation one, and a run that reports a stamp document as worse
-should be checked against the alt-text path before it is believed.
+**Corrected the same day: the baseline has since been re-recorded, but not for this reason.**
+Commit 8320115 (the p2w run at 16:32) re-recorded `base208.json` after its own line-placement
+change, and its run reported G2 clean. So the stored baseline is newer than this note assumed.
+
+That does not close the question above. The baseline now reflects a build whose stamp path has
+still never executed - `PDFRenderer` cannot run in the sandbox - so a stamp document's entry in
+it says nothing about what a rasterised stamp will do. The first device run that converts a
+stamp document is still the first real evidence, and the alt-text path is still what it should
+be checked against.
 
