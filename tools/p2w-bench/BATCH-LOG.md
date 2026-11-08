@@ -914,4 +914,20 @@ render"; the description overruns its cell but the unit value is still there. 28
 "4 overlapping pairs in the PDF, 0 in the render"; the page itself overlaps and the render does
 not, so the claim was the wrong way round. The document still fails on the verified order.
 
-**No engine fix shipped this run.** G2 was not re-run because no engine file changed.
+**One fix was attempted on 38 and G2 rejected it.** The diagnosis is above; the fix was a
+position index in `dedupe()` instead of the 40-glyph look-back. Two attempts measured:
+
+    try 1a  position index on (x, y, text)         38 correct, but 39's .txt lost the first letter of its masthead
+    try 1b  + the following glyph must coincide    39 byte-identical, 38 correct - G2 REGRESSED on 2 counts
+
+        38_faux_bold_italic_synthesised    missing   4 -> 14
+        text-held-twice-shadow-text        missing   0 -> 8
+
+Reverted; the baseline is untouched and no engine file changed. The measurement is the useful
+part and it is in REMAINING-DEFECTS.md: "same character at the same point" is an OCR overlay,
+a faux-bold stroke over a fill, and a deliberate shadow text, and only the glyph's render mode
+tells them apart. Tries: 1 of 3.
+
+PdfToWord.java is 291 KB and the write path is GITHUB_COMMIT_MULTIPLE_FILES only (`git push`
+and the blobs API both answer 403 for this App), so the file was edited on disk inside one
+program and committed from what the program read.

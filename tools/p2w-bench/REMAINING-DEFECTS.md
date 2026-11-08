@@ -3656,10 +3656,32 @@ Forty glyphs is shorter than the subtitle's 74 characters, so when the second co
 first copy's matching glyph is out of range and nothing is dropped. Every faux-bold run longer
 than 40 characters in the corpus has this defect; shorter ones are already clean.
 
-The fix is to replace the fixed look-back with a position index (x, y and text rounded to
-0.5 pt) so the window is the page, not 40 glyphs. NOT SHIPPED: PdfToWord.java is 291 KB, and
-the only write path that works (GITHUB_COMMIT_MULTIPLE_FILES) requires the whole file in one
-call; `git push` and the blobs API both return 403 for this App. **Tries: 0 of 3.**
+The obvious fix is to replace the fixed look-back with a position index so the window is the
+page, not 40 glyphs. **Try 1 did exactly that and was REJECTED by G2.** Two attempts were
+measured on 9 Nov; both reverted, baseline untouched.
+
+**Try 1a - position index on (x, y, text).** Drops the second copy wherever it is. 38's
+subtitle came out once, correct. But 39_small_caps_letter_spacing lost the first letter of its
+masthead: that page draws the same words twice on one baseline, once plain and once tracked,
+and the tracked copy puts every letter at the plain copy's own x with a space between them. On
+position and text alone the first 'T' is a duplicate, and the .txt read "H E M Y S O R E ...".
+
+**Try 1b - also require the FOLLOWING glyph to coincide.** Tells the two mastheads apart: after
+the plain 'T' comes 'H', after the tracked 'T' comes a space. 39 was then byte-identical to the
+pristine build and 38 read correctly. **G2 across 208: REGRESSED, 2 counts - do not ship.**
+
+    38_faux_bold_italic_synthesised    missing   4 -> 14
+    text-held-twice-shadow-text        missing   0 -> 8
+
+**What that measured, and it is the useful part.** "Same character at the same point" is not
+one thing on these pages. It is an OCR overlay (drop the copy), a faux-bold stroke over a fill
+(drop the copy), and a deliberate shadow text that the document is *about* (keep both). The
+40-glyph window separated the third from the first two only by distance, which is not a
+principle but is what the baseline holds. The fix needs a signal that tells a stroke copy from
+a fill copy: the glyph's render mode. GlyphCollector already reads rendering mode (it skips
+mode 3 for invisible text) but `Glyph` carries no field for it, so the change is a new field
+plus the collector that fills it - more than a dedupe rewrite, and not something to land blind
+at the end of a run. **Tries: 1 of 3.**
 
 ### OPEN - a tracked (letter-spaced) line loses its tracking  (39)
 
