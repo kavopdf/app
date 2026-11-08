@@ -3188,3 +3188,58 @@ false table on 351_omr does not.
 target.** Three subagent reports back this: `D14-E-rule-geometry.md`,
 `D14-C-table-detection-research.md`, plus `D14-D-two-regressions.md` when it lands.
 
+
+
+**Attempt 5 - my joint-count route fails, and there is a measured route that works.**
+
+I added the Camelot 90 %-empty-column reject and a word-survival guard on top of the equal-extent
+grouping and the joint count. The invoice table appears, but the gate still rejects:
+
+    320_balance_sheet_statutory   missing 0 -> 2,  lines 71 -> 67
+    333_datasheet_spec_tables     missing 0 -> 2,  lines 122 -> 86
+    351_omr_answer_sheet          lines 65 -> 3
+    2 conversions failed
+
+The word guard does not save it, and the reason is now clear: the guard checks the words of the
+lines **inside** the table's bounds, but the loss is of lines **outside** them, which are marked
+consumed when the table is kept. The joint count is the wrong lever.
+
+**The route that works, measured.** A parallel attempt on the text-derived path, not the ruled
+path, reports:
+
+    04_stamp_180deg_upside_down   0 -> 2 <w:tbl>, 27 <w:tc>
+                                  the invoice grid is 6 rows x 3 cells
+                                  (Sl | Particulars | Amount (Rs.) + 5 items)
+    333_datasheet_spec_tables     back to baseline exactly: missing 0, lines 122 -> 122
+    price-list-2col-...           missing 0
+    gate over 208                 REGRESSED: 0, "no document got worse", exit 0
+                                  (21 counts improved)
+    TestPdfToWord 29/29, TestRealDocs 3/3, TestNorms 13/13, TestOrder PASS
+
+It has two pieces:
+
+1. **`wordsSurvive`** - a word-multiset containment check between the lines a derived table covers
+   and its cells, zero tolerance, applied only to `!t.ruled`. A multiset rather than an order
+   check, so cutting a line at its gaps, joining pieces, a list marker on its own line and a panel
+   read key by key all survive; only a genuinely lost word rejects. On rejection the existing
+   `else` branch clears `line.consumed` and the lines go back to the paragraph path.
+   It fired **once** in 208 documents - on `06_rect_paid_stamp_red_transparent`, a 9x7 derived
+   table that would have swallowed "QUALITY KAVERI TEXTILES APPROVED". That is the D-14 failure
+   mode caught in the act, and the existing 60 %-of-lines test cannot see it.
+
+2. **`rowGapOk`** - the spacing question was being asked of the whole run, and on the fee receipt
+   the key/value fields sit 26 pt and 32 pt above an 18 pt item grid, so the page was one run and
+   one loose pair of rows discarded the invoice grid with it. Asking it of each neighbouring pair
+   lets a break in spacing end the run instead of the table.
+
+A separate diagnosis of the two documents my route broke reached the same rule independently:
+"reject the derived table unless every word of the band's lines survives in the table's cells -
+multiset containment, zero tolerance". Measured behind it: a genuine space-aligned invoice loses
+0 of 216 tokens; the two false tables lose 5 of 223 (2.2 %) and 36 of 760 (4.7 %). A percentage
+guard would pass both, and no geometric guard works at all - the genuine invoice's own Rate column
+drifts 13.08 pt, more than one of the false tables' Symbol column at 12.20 pt.
+
+**So the next session should implement `wordsSurvive` + `rowGapOk` on the text-derived path and
+leave the joint count alone.** Reports: `D14-B-word-guard.md`, `D14-D-two-regressions.md`,
+`D14-C-table-detection-research.md`, `D14-E-rule-geometry.md`.
+
