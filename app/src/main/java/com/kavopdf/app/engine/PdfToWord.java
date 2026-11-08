@@ -3013,6 +3013,24 @@ public final class PdfToWord {
      * prose being chopped into a dozen tab stops.
      */
     private static final int MAX_ROW_FIELDS = 9;
+    /**
+     * How much larger one field of a row may be than another before they stop being one row.
+     *
+     * <p>Two fields on one baseline are one row whatever size they are set at: a masthead and
+     * the date beside it, a letterhead and its strapline, a price list's heading and its note.
+     * The test used to be 30 % - near enough to demand the two be set at the same size - so the
+     * smaller field was never joined to the row. It became a paragraph of its own and landed a
+     * whole line box below where the page drew it, taking every line after it with it: 62 +28 pt,
+     * 63 +29 pt, 70 +13 pt. What makes a row is a shared baseline, and that is tested above;
+     * size is not what makes a row. The bound stays because a row's tab stops are measured from
+     * its first box, and a caption three times the height of the heading beside it is a different
+     * kind of page - a poster, not a letterhead.
+     */
+    private static final float ROW_SIZE_RATIO = 2.5f;
+    /** Above this ratio the two fields must be separated by ROW_FIELD_GAP_PT, not cell padding. */
+    private static final float ROW_SIZE_SAME = 1.3f;
+    /** The smallest white space that separates two fields rather than two cells of a table. */
+    private static final float ROW_FIELD_GAP_PT = 12f;
 
     /**
      * True when {@code next} is another field drawn on the same baseline as {@code prev} - the
@@ -3034,7 +3052,8 @@ public final class PdfToWord {
         if (prev.rotated || next.rotated) return false;
         float size = Math.max(prev.size, next.size);
         if (Math.abs(prev.y - next.y) > Math.max(1.2f, size * 0.25f)) return false;
-        if (Math.abs(prev.size - next.size) > size * 0.3f) return false;
+        // Size is not what makes a row - the shared baseline above is. See ROW_SIZE_RATIO.
+        if (size > Math.min(prev.size, next.size) * ROW_SIZE_RATIO) return false;
         if (startsWithBullet(next.text)) return false;
         if (prev.column != next.column) {
             // A label and its value can stand either side of a detected gutter: file 21 puts
@@ -3065,6 +3084,14 @@ public final class PdfToWord {
         // A tab stop past the paper is not a tab stop. Word would push the value onto the next
         // line, which is the defect this merge exists to remove.
         if (next.right > pageWidth + 1f) return false;
+        // A row whose fields are set at DIFFERENT sizes needs a real gap between them: a masthead
+        // and the date beside it, a letterhead and its strapline. Two cells of a table are set at
+        // different sizes too, but a rule separates them and the gap is 2-6 pt of cell padding -
+        // joining those changed the row heights of table-with-rotated-header and moved two of its
+        // rows 6.7 and 11.6 pt off the page. The gap is what tells a field from a cell.
+        if (size > Math.min(prev.size, next.size) * ROW_SIZE_SAME && gap < ROW_FIELD_GAP_PT) {
+            return false;
+        }
         return true;
     }
 
