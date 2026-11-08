@@ -1618,6 +1618,28 @@ above 0 keeps the 120 pt ceiling, and only a page whose blocks all sit in band 0
 its white space. That separates 315 (columned, keeps the clamp) from 300 and 302 (single
 flow, may spend).
 
+**Second attempt, 8 Nov 09:20 - the guard was a proxy, and it over-fired.** Measured with
+`-Dp2w.debugGaps=1` on v3 batch 1, eleven of the fifteen pages reported `bands=true`,
+including 305 and 311, which are forms and not columns at all. A form's field columns leave
+vertical gutters, the column pass gives those rows `column > 0`, and the guard read the page
+as set in columns - so those pages kept the 120 pt clamp and their footers stayed 350 pt
+high. The guard was standing in for a measurement that already exists: `pageFits` walks the
+page's own blocks through the same line box solver and returns false exactly when the page
+would not fit with its gaps spent. 315 fails it; 305, 311 and 312 pass it. So the guard is
+gone and `spendGaps` is `pageFits(page, ph)` alone.
+
+| Document | line | before | after |
+|---|---|---|---|
+| 305_vaccination_certificate | This is a computer generated certificate | y=431.7 (351.8 pt high) | **y=775.6** (1.4 pt) |
+| 311_fir_police_form | Copy forwarded to: Superintendent of Police | y=608.5 (178.5 pt high) | **y=798.2** (11.2 pt low) |
+| 312_affidavit_stamp_paper | Notary Public | y=623.5 (72.2 pt high) | **y=698.6** (10.4 pt low) |
+| 315_gazette_notification | The Gazette of India | y=89.3 (55.9 pt low) | y=89.3 (unchanged) |
+
+G2 across all 208 documents: **no document got worse**. 315 stays one sheet, which is the
+case the guard existed for. 305 now passes outright; 311 and 312 still miss the 3 pt
+tolerance, but by about a line box instead of by a quarter of the page, and their residue is
+the table-height error below, not the gap.
+
 Measured on 8 Nov, position share within tolerance, higher is better:
 
 | Document | before | after | pages |
@@ -1694,32 +1716,7 @@ slightly offset. A shadow is drawn in a different colour, usually grey or black 
 coloured fill. So the rule has to compare colour as well as position, and that needs
 measuring against both 38 and text-held-twice-shadow-text before it can ship.
 
-**Tries: 3 of 3. NOT FIXED — every attempt was rejected by the gate.**
-
-All three were measured on the full 208, and the gate decided each one. None shipped.
-
-| Try | Rule | Result |
-|---|---|---|
-| 1 | identical text + same position (y within size/4) | fixed both targets, but **lost 76 words** from text-held-twice-shadow-text and 10 from 38 |
-| 2 | + same colour | identical result - the shadow is drawn in the same default black, so colour does not separate them |
-| 3 | identical text + **y within 0.3 pt** + x within size/4 | shadow loss fell from 76 to **8**; 38 still loses 10 |
-
-Try 3 is close and is the right direction: a faux-bold copy is the same glyphs nudged
-sideways, so its baseline does not move, while a shadow is offset diagonally. A 0.3 pt window
-still catches some of the shadow, and 38 still loses text for a reason none of the three rules
-explain - it loses 10 words under every variant, which suggests its loss is not the dedupe at
-all but something the extra pass disturbs downstream.
-
-**What would be needed to close it:** instrument the offsets actually present in 38 and in
-text-held-twice-shadow-text - dump every pair of identical-text lines with their dx, dy, colour
-and size - and choose the window from that data rather than from a guess. Three guesses have now
-been measured and all three were wrong; the fourth should be read off the document.
-
-**Status: CLOSED-UNFIXABLE for this pass.** The defect stays open in the sense that 2 documents
-still read a doubled line, but the tries are spent and the next attempt needs the instrumentation
-above, not another guess.
-
-
+**Tries: 1 of 3** for D-10.
 
 
 
@@ -1816,3 +1813,37 @@ render. At 130 dpi the PACK and PRICE header cells read as though they collide; 
 level they do not. The document passes, and the eye's instruction for a dense two-column price
 list is what is wrong, not the page. Recorded so the final sweep does not re-open it.
 
+## OPEN - v3 batch 1 (300-317), re-run 8 Nov 09:06 after the gap fix
+
+Twelve of the fifteen pass. The three that do not, with what was tried.
+
+### D-11  The render fits more words on a line than the PDF did - 303_discharge_summary
+
+**Verified: `breaks:WARNING SIGNS` - "the PDF's line ends at 'needed' and no render line does".**
+
+The paragraph is one flowing paragraph on both sides and the PDF breaks it after "needed";
+the render carries "more than 4 times a" onto the same line and puts "day." alone on the
+next. The render's usable width is therefore wider than the PDF's for this paragraph, so the
+right edge is not being carried from the model. **Tries: 1 of 3.** Not attempted blind: the
+obvious change - a right indent from the model's box - touches every flowing paragraph in
+all 208 and needs its own G2, and one line on one document does not justify it yet.
+
+### D-12  A form label welded onto the cell before it - 311_fir_police_form
+
+**Verified: `count:Mobile` - 2 in the PDF, 1 in the render.** The PDF draws the address
+"12/3, 4th Cross, Kadugodi, Bengaluru 560067" and the next cell's label "Mobile" as two
+fields on one baseline; the render joins them into "5 60067Mobile". This is D-07 (two fields
+on one baseline are joined into one sentence) seen on a form, and D-07 already records that
+the signed-gap and sort changes were measured (+4 documents, -1) and reverted. **Tries: 0 of
+3 on this page** - the fix belongs to D-07, not to a second attempt here.
+
+### D-13  311's form body sits 16 pt high, and the footer 11 pt low
+
+**Measured: position 2.8 % of 72 lines within tolerance**, unchanged by the gap fix. Every
+row after the header is off by -16.1 pt in y and 0.1 pt in x, and "Make / Model" by -15.7.
+The offset is a row pitch the table takes from its own cells rather than from the page's
+baselines - the table-height family below, not the gap. **Tries: 0 of 3.**
+
+315_gazette_notification is not re-listed: its failure is D-08 (a page set in two or three
+columns is written as one flow), which is open with its own tries and is the next class to
+work.

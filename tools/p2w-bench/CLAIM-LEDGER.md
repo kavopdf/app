@@ -236,3 +236,24 @@ the claim was written against a sidebar whose label and value are separate field
 side sets them as one line. A `moved:` claim needs text that is a line on both sides; the
 brochure's real evidence is `shapes` and `pagecount`, both of which verified.
 
+## v3 batch 1 (300-317), re-run 8 Nov 09:06 - after the gap fix
+
+| claim type | verified | refuted | unverifiable |
+|---|---|---|---|
+| order | 6 | 0 | 0 |
+| moved | 1 | 0 | 0 |
+| count | 1 | 0 | 0 |
+| breaks | 1 | 0 | 0 |
+| **total** | **9** | **0** | **0** |
+
+Every finding verified and none refuted, which is the first run where that is true. The
+first pass of the same batch, before the fix, was 9 verified / 1 refuted / 2 unverifiable:
+the refuted one was `wraps:WARNING SIGNS`, where the eye read a wrap and the page holds two
+lines on both sides - the claim should have been `breaks:`, and as `breaks:` it verified.
+The two unverifiable ones were wording: `moved:Copy forwarded to Superintendent of Police`
+omitted the colon the PDF draws ("Copy forwarded to:"), so `startswith` never matched, and
+`extra:560067Mobile` is not a line on either side - the welded label is better claimed as
+`count:Mobile`.
+
+Six `order` findings verified and all six were decided for the document by the eye. That is
+the row-banding blind spot (D-03) showing up as a claim type, not as a defect.

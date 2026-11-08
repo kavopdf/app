@@ -17,6 +17,7 @@ opened is not counted here - `looked.py` decides that, not this file.
 | 7 Nov | 3 | 0 | 0 % | first measurement, on 300/301/302/303 only |
 | 7 Nov | 2 | 1 | 50 % | after the D-01 pitch fix: 316 PASS, 303 FAIL (WARNING SIGNS wraps) |
 | 8 Nov | 13 | 4 | 31 % | g53 batch 1, the multi-column class: 9 fail, 8 of them on pagecount |
+| 8 Nov | 15 | 12 | 80 % | v3 batch 1 re-run after the gap fix: 3 fail (303 breaks, 311 weld, 315 columns) |
 
 Not a baseline yet - three documents is not the corpus. It becomes one when a full
 batch has been through both halves of the check.
@@ -335,3 +336,32 @@ reverted. See "Table height" in REMAINING-DEFECTS.md.
 
 Thirteen documents, 14 pages in the PDF and 22 in the render, every page opened before any
 number was read. 34 findings: 32 verified, 1 refuted, 1 unverifiable. **4 pass, 9 fail.**
+
+### v3 corpus - batch 1 (300-317), re-run 8 Nov 09:06 under the gap fix
+
+Fifteen documents, one page each, every page opened before any number was read. The first
+run of this batch found five failures; after the D-09 gap fix four of them closed and the
+batch was looked at again from the new renders.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-08 | 300_prescription_rx | PASS | Rx table, advice and the footer on the page rows; the footer is 8.2 pt from the PDF after the gap fix |
+| 2026-11-08 | 301_lab_report_panel | PASS | panel band, ten-row table and the signature block in place; order 78.7 % is the row-banding blind spot |
+| 2026-11-08 | 302_radiology_report | PASS | signature block at the foot where the PDF drew it |
+| 2026-11-08 | 303_discharge_summary | FAIL | breaks:WARNING SIGNS - the PDF's line ends at "needed" and no render line does |
+| 2026-11-08 | 304_package_insert_small_print | PASS | six numbered sections, bold heads, the same line breaks |
+| 2026-11-08 | 305_vaccination_certificate | PASS | footer line 1.4 pt from the PDF after the gap fix, was 351.8 pt high |
+| 2026-11-08 | 306_clinical_protocol_synopsis | PASS | synopsis table and the schedule grid complete, marks in their cells |
+| 2026-11-08 | 310_court_judgment | PASS | cause title, eight numbered paragraphs and the JUDGE block |
+| 2026-11-08 | 311_fir_police_form | FAIL | count:Mobile - the standalone Mobile label is welded onto the address cell |
+| 2026-11-08 | 312_affidavit_stamp_paper | PASS | notary box and its label together at the foot, 10.4 pt from the PDF, was 72.2 pt |
+| 2026-11-08 | 313_power_of_attorney | PASS | recitals, four numbered powers, schedule and witness rules |
+| 2026-11-08 | 314_tender_rfp_boq | PASS | both tables complete, the tax rows under the BOQ |
+| 2026-11-08 | 315_gazette_notification | FAIL | moved:The Gazette of India 55.9 pt - the three columns are still one flow (D-08) |
+| 2026-11-08 | 316_contract_with_schedules | PASS | four clauses, schedules A and B, the schedule C charge table |
+| 2026-11-08 | 317_rti_response | PASS | letter head, five numbered points and the enclosure line |
+
+**12 pass, 3 fail.** 9 findings, all 9 verified against the PDF, none refuted. Three
+documents were decided by the eye against the numbers (301, 305, 312) - all three are the
+row-banding blind spot in the order question, recorded in REMAINING-DEFECTS.md, not page
+defects.

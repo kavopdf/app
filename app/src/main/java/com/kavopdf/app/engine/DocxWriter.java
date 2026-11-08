@@ -266,7 +266,19 @@ public final class DocxWriter {
             ctx.lastLinePt = 0f;
             ctx.flowTw = 0;
             ctx.budgetTw = (int) Math.max(1L, Math.round(ph * TWIPS_PER_PT));
-            ctx.spendGaps = pageFits(page, ph) && !hasColumnBands(page);
+            // pageFits is the measurement; hasColumnBands was a proxy for it and it over-fired.
+            // A form page has vertical gutters between its field columns, so the column pass
+            // gives those rows column > 0 and the proxy read the page as set in columns. The
+            // page then gave up its white space and put its footer 350 pt too high - which is
+            // exactly what 305 and 311 did. pageFits already answers the real question (would
+            // the flow, gaps and all, fit the sheet?) and 315, the case the proxy existed for,
+            // fails it because its three columns are still stacked into one flow.
+            ctx.spendGaps = pageFits(page, ph);
+            if (System.getProperty("p2w.debugGaps") != null) {
+                System.err.println("GAPS fits=" + pageFits(page, ph)
+                        + " bands=" + hasColumnBands(page) + " spend=" + ctx.spendGaps
+                        + " ph=" + ph);
+            }
             ctx.pageWidthPt = pw;
             if (page.blocks.isEmpty()) continue;
             for (Object block : page.blocks) {
