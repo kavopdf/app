@@ -1477,3 +1477,96 @@ page where a value really is broken in half. The check follows the block's words
 render's lines, and the PDF's word is `640.00` while the render's are `640.0` and `0`, so the
 follow stops. `missing:640.00` verifies the same defect. The wraps check needs to match on
 characters, not words, before it can be trusted on a broken number.
+
+---
+
+## OPEN - b80 batch 4 (61-80), found this pass, 8 Nov
+
+Ten documents fail and nine of them are the same defect. Every finding below came back
+VERIFIED from `verify.py` against the PDF; nothing here is an opinion.
+
+### D-08  A page set in two or three columns is written as one flow
+
+**Severity: the largest single class in this batch - nine of twenty documents.**
+
+The engine detects column bands (`Line.column`) and orders paragraphs down one column and
+then the next, so the READING ORDER is right. `DocxWriter.pageColumns()` then returns
+`{1, 0}` unconditionally, so the page is written as one column: the second column's text
+lands below the first, the page becomes twice as tall as the paper, and it spills.
+
+| Document | pages in / out | verified finding |
+|---|---|---|
+| 62_two_col_newsletter_pull_quote | 1 / 1 | moved:Tank rehabilitation restores water to nine villages 28.0 pt |
+| 63_three_column_brochure | 1 / 2 | moved:THE ESTATE 29.5 pt |
+| 64_newspaper_uneven_columns_ad_boxes | 1 / 5 | pagecount, 50 rows in the PDF against 7 in the render |
+| 65_two_col_full_width_figure_caption | 1 / 2 | moved:Figure 1 168.0 pt, 37 shapes in the PDF and 0 in the render |
+| 67_two_col_with_sidebar | 1 / 2 | moved:COURSE AT A GLANCE 355.4 pt, 1 shape in the PDF and 0 in the render |
+| 75_merged_header_cell_three_columns | 1 / 2 | moved:Yeshwanthpur 36.1 pt, 5 shapes in the PDF and 0 in the render |
+
+**Why it is not simply `w:cols`.** That was tried and reverted, and the reason is written
+into `pageColumns()`: a paragraph's `w:ind w:left` is measured from the PAGE edge, so
+inside a narrow column the indent exceeds the column width and the text wraps one character
+per line. Turning `w:cols` back on without making the indent column-relative produces a
+strip of single letters down the right edge of an otherwise correct page.
+
+**The fix to try, in one piece.**
+
+    a. `pageColumns()` returns the real band count, and `Ctx` carries each band's left and
+       right edge for the page being written.
+    b. `flowFromBox` writes `w:ind w:left = b.x - bandLeft` and
+       `w:ind w:right = bandRight - b.right`, and a centred line is centred inside its
+       band, not inside the paper.
+    c. A block that spans the bands - a full-width abstract, a full-width table, a
+       newspaper's masthead - closes the columned section and opens a one-column section,
+       which is what `sectPrXml` already knows how to write.
+
+Part (c) is the one that has to exist before (a) can ship: 61, 65, 68 and 69 all put a
+full-width block between or above their columns, and a page-wide section with two columns
+would cut that block in half.
+
+**Tries: 0 of 3.** Not started. 61, 66, 68, 69, 71 and 80 already pass with one column,
+so whatever is built must leave those six alone.
+
+### OPEN - two fields on one baseline, split instead of joined
+
+`69_two_col_legal_numbered_clauses` puts each clause number on its own baseline 12.0 pt
+above its clause, and `70_magazine_drop_cap_photo_caption` puts a masthead and its
+strapline in two paragraphs so the strapline's line box pushes the page down 13.5 pt.
+This is D-07's part (c) from the other side: D-07 is about fields being joined that should
+not be, and these are fields NOT joined that should be.
+
+The cause found this pass is narrower than D-07's: `buildPara`'s line list is sorted by
+`(column, y)` when the page is not a row, so on a page with detected column bands the two
+fields are far apart in the iteration and `sameRow()` never sees them as neighbours. 69 is
+the case that shows it - the number is in column 0 and its text in column 1.
+
+### OPEN - a mixed-script line is split at its script boundary
+
+`78_mixed_english_devanagari_line` breaks `Amount paid: Rs. 4,200.00` into four baselines
+(`Amount paid` / `:` / `Rs` / `. 4,200.00`) and `77_arabic_rtl_document` breaks
+`ME/INV/ 2025 0884` at its slashes. Every fragment is on the page, but on its own line.
+This is what makes 78 and 77 spill onto a second sheet. Cause not yet located; the two
+documents share it with 76_devanagari_table, which does NOT break, so whatever the split
+is it is not "any line with two scripts".
+
+### OPEN - an RTL table is written with its columns in the other order
+
+`77_arabic_rtl_document`'s five-column table comes out mirrored: the PDF puts the item
+column at the right and the amount at the left, the render the other way round. The text of
+each cell is right, so this is a column-order question in `buildTables`, not a text one.
+Separate from D-08 and needs its own fix.
+
+---
+
+## CLOSED - the gate counted a row merge as lost text, 8 Nov
+
+`gate.py` treated any fall in a document's line count as a regression, on the reasoning
+that "one that held 400 lines and now holds 380 has lost text". A row merge makes two lines
+one, so every correct row merge read as lost text: 15 documents when `sameRow()` was
+widened, with `missing` and `extra` unchanged on all 208.
+
+A fall is now a regression only when a word went with it (`words_moved`), and otherwise it
+is reported as JOINED. The word-level checks - missing, extra, blocks, nobg, blank - still
+gate hard and are still compared in both directions. Measured after the repair: G2 across
+208, no document got worse, one improved, fifteen joined. `base208.json` was re-recorded on
+that run and committed with the source.

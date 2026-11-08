@@ -189,3 +189,28 @@ in REMAINING-DEFECTS.md:
             check follows words, the PDF holds `640.00` and the render `640.0` + `0`, so the
             follow stops and the block reads as two lines on both sides. `missing:640.00`
             verified the same defect. wraps must match on characters, not words.
+
+## b80 batch 4 (61-80), 8 Nov — what this run added
+
+45 findings, 45 verified, 0 refuted, 0 unverifiable. That is the first clean sweep in the
+ledger, and it is worth saying why: every claim this batch was written AFTER the page was
+measured, not guessed from the image. `moved:` +15, `pagecount:` +13, `order:` +11,
+`shapes:` +4, `wraps:` +1.
+
+    moved      15 verified. The batch's claim of choice, because the defect it describes
+               is positional: a column stacked below another column puts text somewhere
+               else on the paper and leaves its x alone. moved: compares y, so it fires.
+    pagecount  13 verified. Nine of them are the same document's sheets counted once each.
+    order      11 verified, and 4 of the 11 are the tool talking. `rows()` bands lines by
+               y across the whole page, so on a two-column page each visual row is counted
+               twice - 61 reports 29 PDF rows against 39 render rows for a page whose 39
+               lines are all within 0.2 pt. The four eye-passed / numbers-failed documents
+               in this batch (61, 66, 71, 80) are all that, and all four are recorded PASS.
+
+### The refutation that did not happen
+
+Nothing was refuted this run, and that is the opposite of 7 Nov, where two of nine were
+false alarms. The difference is not that the verifier got better; it is that three FAILs
+written from the 130 dpi image (72, 73, 74) were checked at 220 dpi before they were
+recorded, found clean, and never entered the findings file. A finding that is not written
+cannot be refuted, and that is the right place for it to die.
