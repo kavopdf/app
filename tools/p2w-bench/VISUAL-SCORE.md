@@ -511,6 +511,7 @@ its tries.
 | 2026-11-08 | 334_patent_document | PASS | form, abstract, FIG.1 boxes with their labels and the claims |
 | 2026-11-08 | 335_msds_safety_data_sheet | PASS | eight numbered sections, the pictograms and the composition table |
 | 2026-11-08 | 340_bill_of_lading | PASS | party boxes, goods table, totals and the barcode |
+| 2026-11-08 | 402_calendar_month_grid | FAIL | wraps:Board meeting verified - one line on the page, two in the render, and the annotation cell is 76 pt wide; the page count is now right (the grid no longer doubles its annotated rows), and the footer sits 4.2 pt high |
 
 ## Rows older than 8 Nov are suspect
 

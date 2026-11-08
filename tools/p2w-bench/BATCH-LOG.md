@@ -712,3 +712,25 @@ point of verifying before fixing.
 FAIL on the last row recorded for each. The 95 are the backlog the final sweep has to work, and
 every one of them needs either a fix or three tries and a CLOSED-UNFIXABLE entry. The final sweep
 over all 208 has not started, and it is the only place a document is called finished.
+
+## 8 Nov, later pass — one engine fix, one document verified end to end
+
+Run started 16:03 IST. Sandbox was empty: toolchain rebuilt (Temurin 17, PDFBox-Android 2.0.27.0,
+the three corpus assets at 75 / 80 / 53), all 208 documents converted, rendered, and taken through
+G2 and the position gate before anything was changed. Starting state: 208 rows in VISUAL-SCORE.md,
+119 PASS and 89 FAIL on the last row of each, 20 documents rendering more pages than their PDF.
+
+**The fix.** A table cell's exact line height was the row's whole pitch, so a cell the page drew on
+two lines doubled its row. One line keeps the pitch (unchanged); several lines take 1.25 em of the
+cell's own size. Page-count mismatches 20 -> 16, position 29.2 % -> 29.3 %, G2 clean. Committed,
+and the file on the remote confirmed by sha.
+
+**One document taken all the way.** 402_calendar_month_grid: images made, page opened, verdict
+FAIL, eight questions run, findings emitted, verified against the PDF, combined. Six findings: 3
+verified (wraps:Board meeting, the footer 4.2 pt high, reading order 88 % of 12 rows with 13 in the
+render), 2 refuted, 1 unverifiable. The two refuted ones were the eye's: "MARCH 2024" and "MON"
+looked displaced in the difference image and are 0.8 pt and 0.5 pt from where the page drew them.
+That is the verify-before-fix rule earning its place twice in one document.
+
+**Where the corpus stands.** 208 of 208 have a row; 119 PASS, 89 FAIL. 16 documents still render
+the wrong number of pages and every one of them is a multi-column page stacked into a single flow.

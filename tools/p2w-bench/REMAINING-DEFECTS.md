@@ -2025,43 +2025,6 @@ before changing anything.
 
 **Tries: 0 of 3** - diagnosed, not started.
 
-**The line is `cols < 2`, and the cause is the overlap test.** Printing every rule group:
-
-    TBLGRP size=23 top=92.0 bot=793.89 left=56.0 right=539.276 ys=19 xs=2 rows=18 cols=1
-
-`xs` holds only the band's own two edges, so `cols` is 1 and `if (cols < 2) continue` throws the
-table away. The vertical rules are present - 12 of them - but every one is rejected by
-
-    float overlap = Math.min(v[2], bottom) - Math.max(v[1], top);
-    if (overlap < (bottom - top) * 0.5f) continue;
-
-An invoice's column rules span only the item rows, well under half the page height, so not one
-of them is added to `xs`.
-
-**The fix, written and measured on one document.** Track whether any rule was added; if none
-was, derive the columns from where the text sits - every line inside the band contributes its
-left and right edge, the gaps between those are the gutters, and the widest gutters (up to eight,
-each at least 6 pt) become boundaries.
-
-Measured on 04_stamp_180deg_upside_down after the change:
-
-    before: w:tbl 0, w:tr 0, paragraphs 31
-    after:  w:tbl 1, w:tr 18, paragraphs 6
-
-The table exists and the words have moved into it. **But it is not right yet:** only two columns
-are found where the invoice has six, and the first row's cells are empty. So the band derivation
-needs to produce more boundaries than it does - probably because the gutter threshold of 6 pt is
-too high for this invoice's column spacing, or because sorting every line's span rather than
-clustering them merges neighbours.
-
-**Not shipped.** The change is written and compiles and is a real improvement on one document,
-but it has not been run through the 208-document gate, and a two-column table with empty cells
-could easily be worse than the paragraphs it replaces. Four wrong hypotheses today are enough
-reason to measure before committing. The next session should apply the patch, run `gate.py` on
-208, and ship it only if no document gets worse.
-
-
-
 **Fourth measurement, same day - and it clears all three earlier guesses at once.** Printing the
 candidate list immediately before the `containsAnother` loop:
 
@@ -2535,3 +2498,52 @@ needs the work: nine `order` verifications in this run produced no document defe
     shapes on 332 (first pass)                  15 in the PDF, 0 in the render - true at the
         time, caused by the page overflow, and gone once the page fitted. Not a blind spot but
         a real finding the fix closed.
+
+## 8 Nov, later pass — the cell line height (one engine fix, measured)
+
+The calendar entry above is closed. Its cause was not the calendar: it was the line height inside
+a table cell. A row's height is carried by `w:trHeight hRule="atLeast"`, and the cell's paragraph
+was ALSO given the row's whole pitch as its exact line height. One line then filled the row, which
+is what that was for, but a cell the page drew on two lines - "8" over "Holi", "25" over "Board
+meeting" - was charged the pitch twice and the row doubled. 402's six-week grid arrived as nine
+rows, its footer was pushed onto a second sheet, and the same thing was happening in every table
+in the corpus that annotates a cell.
+
+The fix, in `DocxWriter.table`: a cell that holds one line keeps the pitch as its line height,
+exactly as before; a cell that holds several lines takes 1.25 em of its own size, so two lines
+cost two lines and the row stays the page's own pitch.
+
+Measured on 208 documents, current build, before and after:
+
+| | before | after |
+|---|---|---|
+| documents whose render has the wrong page count | 20 | 16 |
+| lines within position tolerance | 29.2 % | 29.3 % |
+| documents failing the position gate | 20 | 16 |
+| G2 | clean | clean |
+
+Page count fixed on 402_calendar_month_grid, 373_leave_application_form,
+75_merged_header_cell_three_columns and 77_arabic_rtl_document. Committed as
+"fix(docx): a cell's line is a line of text, not the row's pitch".
+
+### OPEN — two documents moved away from the page for that fix, and why
+
+- **373_leave_application_form** 12.5 % -> 6.2 % of lines in tolerance, but its page count went
+  2 -> 1, which is the thing it was failing on. The trade is recorded, not hidden.
+- **76_devanagari_table** 37.2 % -> 16.3 %, page count unchanged. Its table's rows are NOT evenly
+  pitched: the PDF draws them 15.1, 29.2, 14.9, 14.8, 14.9, 15.5 pt, and the writer charges every
+  row the average, `(t.bottom - t.top) / rows`. The old doubling happened to land on 34 pt against
+  the page's 29.2; the new line height lands on 20.8. The real fix is a per-row height taken from
+  the model's own row edges, and the model has no per-row y - `Table` carries rows, colX, cellX,
+  cellR, fonts, sizes, colors and top/bottom, and nothing per row. **Tries: 1 of 3.**
+
+### The wrap inside a cell — one try spent, and it failed
+
+402's "Board meeting" is one line on the page and two in the render: the annotation cell is 76 pt
+wide and the string is wider. The code's own comment promised `w:noWrap` ("keep the value whole,
+let it overrun the cell the point that the page overran it by") and the element was never written.
+Written, it changes nothing: a hand-patched copy of 402 with `<w:noWrap/>` on that cell renders
+"Board" and "meeting" on two lines exactly as before, in LibreOffice. So the render does not
+honour it and the element was reverted rather than committed as dead code. The next try has to
+make room instead - a narrower inset, or a cell widened over a neighbour that holds only its own
+annotation. **Tries: 1 of 3.**
