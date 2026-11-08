@@ -45,3 +45,24 @@ hold. The gap to `lines` 15780 is the work: lines the converter is not yet produ
 Why this row exists even though the numbers did not move: a baseline is only meaningful
 against the measurement that produced it. Changing the formula and keeping the old file
 would have been the quiet kind of drift this file is here to make impossible.
+
+## 8 Nov 2026 — verified, not changed
+
+Re-converted all 208 and re-recorded the baseline to see whether anything had moved. Nothing
+had: `missing 133, extra 243, blocks 0, nobg 0, blank 0, pages 537, refpages 540` — identical
+to the recorded baseline on every field. So the baseline was left alone and no new row was
+needed for it.
+
+What that proves is worth writing down: the line-pitch fix (D-01) and the gap-spending guard
+(D-09) changed how the documents LOOK without changing any of these seven counts. A baseline
+of counts cannot see a line that moved onto the right baseline; only the position measure can.
+That is why `base208-position.json` exists as a second ratchet.
+
+**A measurement defect found while checking this.** `gate.py`'s `pages` count reads 537
+against the PDFs' 540, which looks like three documents losing a page. They are not: a section
+break written as `<w:type w:val="nextPage"/>` starts a new page in Word, and `gate.py` counts
+only `<w:br w:type="page"/>`. Counting both gives 208 documents matching their PDF's page
+count exactly, 0 spill and 0 short. The metric under-counts any document that carries a
+section break, and it is left as-is for now because the baseline was recorded with it - but
+anyone reading `pages 537 vs refpages 540` as three lost pages is reading a counting artifact.
+

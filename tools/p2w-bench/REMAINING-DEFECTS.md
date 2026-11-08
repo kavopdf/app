@@ -851,6 +851,12 @@ is better than a metric that fires on 179 documents for a reason nobody can act 
 **Tries: 0 of 3.**
 
 
+#### D-05 status on 8 Nov — still a measurement defect, not a document defect
+
+The `blocks` count compares two populations that are not the same thing, and it reads 0 on all
+208 because of it. Nothing about a document is wrong when this number looks wrong; the number
+is. It stays open as a measurement defect and must not be "fixed" by changing a document.
+
 ### D-06  Twenty-eight documents spill onto more pages than the PDF has — FIXED 8 Nov
 
 **FIXED. Measured 8 Nov across all 208: every document's page count now equals its PDF's.**
