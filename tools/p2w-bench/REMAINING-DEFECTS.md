@@ -4462,3 +4462,62 @@ y=636.9 instead of y=557.2, at the page's foot, and card 5's box closes without 
 the row on one line, the render spends three. The description column is measured from the page and
 "Earth Leakage Circuit Breaker 40A, 30 mA" is 2.6 pt wider than the column it is given, so "30 mA"
 goes to a second line and the next row is pushed down. **Tries: 0 of 3.**
+
+
+### D-25  A stamp must be built from separate objects, not one text box
+
+**Reported from the phone with screenshots, and this is the clearest description of the stamp
+problem so far.**
+
+The user edited the same stamp in Google Docs across three conversions and compared what selects:
+
+    iLovePDF (green)   IN ORDER            selects on its own
+                       GOODS RECEIVED      selects on its own
+                       both frame lines    select on their own
+                       -> the two frame lines cannot drift, because neither is tied to the text
+
+    ours, 02           the whole stamp is NOT EDITABLE AT ALL
+
+    ours, 01 and 04    inner frame         selects on its own
+                       GOODS RECEIVED      selects on its own
+                       OUTER FRAME + IN ORDER   select TOGETHER as one object
+                       -> the outer frame drifts against the inner one, which is the drift the
+                          user has been reporting all along
+
+**So the requirement is object separation, and it is the whole answer.** Every part of the stamp -
+each frame line and each line of text - must be its own selectable object. Nothing that can move
+independently may be grouped with anything else. Where two parts are one object, they cannot drift;
+where they are separate, they cannot be made to drift.
+
+**Two causes, both in the current writer.**
+
+1. **The outer frame is the text box's own `<a:ln>` border.** That was done deliberately - commit
+   `5013433`, "the stamp outline becomes the text box's own border" - to stop the outline and the
+   text being two objects with two position calculations. It stopped *that* drift and created a
+   different one: the outer frame is now welded to `IN ORDER`'s text box, so it moves with that text
+   and not with the inner frame.
+2. **The stamp lives inside `wps:txbx`.** Google Docs renders a text box as a drawing and cannot put
+   a caret inside it, so the whole stamp is uneditable there - which is exactly what the user sees
+   on 02.
+
+**The fix, in order.**
+
+1. **No text box for a stamp.** Write each line of the stamp as an ordinary paragraph, so Google Docs
+   can select and edit it, and place it with the paragraph's own indent and space-before rather than
+   with a box. This is what makes the text editable, and it is what the 01/04 stamps already do.
+2. **Each frame is its own freeform shape**, not a border on anything. The outer frame and the inner
+   frame are two shapes with their own coordinates, so neither can move with the other or with a
+   line of text.
+3. **Rotation goes into the shape's coordinates**, not into a rotation attribute - the same conclusion
+   the research reached, and it means a frame's geometry is fixed at the moment it is written.
+4. **Nothing is consumed into anything else.** `Shape.consumed` exists so a stamp's outline can
+   become a text box's border; with no text box that flag must not be set for a stamp frame.
+
+**Test:** in the .docx, the number of independently addressable objects inside a stamp must equal the
+number of parts the page draws - two frames and two text lines for `02`, four objects. And in Google
+Docs each of those must select on its own.
+
+**Also reported in the same message, and it belongs to D-22:** on `04_stamp_180deg_upside_down` the
+180-degree stamp now renders and is correct in orientation, but the inner lines are **far too faded
+on one side**. That is the stroke colour and opacity of a shape, not a stamp structure problem.
+
