@@ -642,3 +642,23 @@ band-join measurement again (F and BENGALURU share one baseline on the page), bu
 number was right about the page for a different reason - the row it could not match is the row whose
 value is missing.
 
+
+
+### 9 Nov 10:06, b80 batch 4 (61-80) - what this run added
+
+36 findings from 20 documents, 36 verified, 0 refuted, 0 unverifiable: moved 12, pagecount 6 (62
+once, 64 five times - one per sheet), order 13, shapes 3 (61, 62, 64), wraps 1 (71).
+
+Every claim type used this run was checkable, and every one held. That is the first batch with no
+UNVERIFIABLE at all, and it is what the narrower claims buy: `moved:4 theory + 2 lab` names one line
+of 38 rather than "the sidebar is wrong", and `wraps:Earth Leakage Circuit Breaker 40A` names the
+row rather than the table.
+
+The `order` claims are not the tab-join measurement bug this time. On 61, 65, 66, 67 and 69 the row
+COUNT itself differs (29 against 37, 30 against 35, 21 against 28, 38 against 44, 29 against 38)
+because the two columns that share baselines on the page are handed over as one flow. When the count
+differs the sequence share is measuring the page, not the tool.
+
+`pagecount` was recorded once per sheet on 64, which is what the eye saw - five sheets where the
+page has one. verify.py deduplicates on document, page, kind and claim, so five sheets are five
+findings, all verified, and all one cause.

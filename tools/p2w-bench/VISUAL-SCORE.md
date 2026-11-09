@@ -24,6 +24,7 @@ opened is not counted here - `looked.py` decides that, not this file.
 | 8 Nov | 15 | 8 | 53 % | v3 batch 1 final sweep: 7 fail (301, 303, 305, 306, 311, 314, 315), 306 new on a 7.2 pt table-extent finding |
 | 2026-11-09 | 15 | 9 | 60 % | v3 318-340: 6 fail, 21 findings 21 verified 0 refuted; 3 pass on the eye against an order finding (the tab-join measurement bug) |
 | 2026-11-09 | 15 | 9 | 60 % | v3 341-370: 6 fail, 14 findings 14 verified 0 refuted; 3 pass on the eye against an order finding (band join), 1 shapes claim refuted (352's border is exact) |
+| 2026-11-09 | 20 | 7 | 35 % | b80 61-80, the multi-column class again: 13 fail, 36 findings 36 verified 0 refuted; 5 of the 13 are the same-baseline column flow |
 
 Not a baseline yet - three documents is not the corpus. It becomes one when a full
 batch has been through both halves of the check.
@@ -865,3 +866,33 @@ size. Run started 09:02 IST.
 | 2026-11-09 | 414_transparency_softmask | FAIL | shapes verified 3 drawings in the PDF 1 in the render; the luminosity-masked bar is also drawn red where the page draws blue |
 | 2026-11-09 | 415_inline_images | FAIL | moved:The checkerboard verified 149 pt; the inline image is blank in the render and the two lines under it rise to the top of the page |
 | 2026-11-09 | 417_rotate180_and_mirrored | FAIL | missing:Page 2 verified; page 1 is right (/Rotate 180 ignored on purpose, the render upright as the page's note asks), page 2's mirrored text comes out as reversed per-glyph runs |
+
+## b80 corpus - batch 4 (61-80), 9 Nov 10:06
+
+Twenty documents, twenty-five pages (64 carries five, 62 two). Every page opened before any number
+was read; every finding verified against the PDF: 36 findings, 36 verified, 0 refuted, 0 unverifiable.
+Seven pass, thirteen fail. The eye and the numbers agreed on all twenty - no disagreement to name.
+Run started 10:06 IST.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-09 | 61_two_col_abstract_spanning | FAIL | moved:market for perishable produce verified 61.2 pt; the two columns share baselines on the page and the flow gives each line its own, and the abstract's grey band is gone (shapes 1 against 0) |
+| 2026-11-09 | 62_two_col_newsletter_pull_quote | FAIL | moved:Tank rehabilitation verified 55.9 pt across - the body sits at x=0.1 where the page puts it at 56.0, the masthead's dark green band is not drawn (3 shapes against 0) and the page spills to a second sheet |
+| 2026-11-09 | 63_three_column_brochure | PASS | three columns, the crop band, the photograph strip and the footer in the page's places; 45 lines, all 45 matched |
+| 2026-11-09 | 64_newspaper_uneven_columns_ad_boxes | FAIL | pagecount verified 5 sheets against 1, moved:Water scheme for verified 156.9 pt across; the body is emitted as a table so the text runs down four vertical strips |
+| 2026-11-09 | 65_two_col_full_width_figure_caption | FAIL | moved:heavier removal depressed yield verified 41.4 pt; the right column's paragraphs are spread over separate baselines |
+| 2026-11-09 | 66_two_col_footnotes_bottom | FAIL | moved:dispersion across societies verified 71.6 pt; the same column flow, the footnotes and the sign-off block stay put |
+| 2026-11-09 | 67_two_col_with_sidebar | FAIL | moved:4 theory + 2 lab verified 23.7 pt; the sidebar's label and value pairs are one flow, so its rows drift and its box grows |
+| 2026-11-09 | 68_journal_wide_table_spanning | PASS | the six-column table with its header band and the two columns of body text; worst offset 15.3 pt on the last column |
+| 2026-11-09 | 69_two_col_legal_numbered_clauses | FAIL | moved:Either party verified 215.5 pt across - the clause numbers are their own paragraphs, so they interleave with other clauses' bodies and one line lands at x=540 |
+| 2026-11-09 | 70_magazine_drop_cap_photo_caption | FAIL | moved:The harvest that begins in the dark verified 14.8 pt; everything under the masthead sits a line low and the drop cap lands beside the third line |
+| 2026-11-09 | 71_invoice_space_aligned_no_rules | FAIL | wraps:Earth Leakage Circuit Breaker 40A verified - one line on the page, two in the render |
+| 2026-11-09 | 72_bank_statement_no_rules_right_amounts | PASS | twenty-eight rows with debit, credit and balance right aligned and the totals line; worst row drift 10.8 pt |
+| 2026-11-09 | 73_marksheet_subject_marks_grade | PASS | eight subject rows with marks and grades in their columns and the totals line |
+| 2026-11-09 | 74_balance_sheet_indented_subitems | PASS | indented sub-items, the two figure columns and the signature block |
+| 2026-11-09 | 75_merged_header_cell_three_columns | FAIL | moved:1,842 verified 22.2 pt up and 21.4 pt across - the first data row's figures are drawn in the merged header band |
+| 2026-11-09 | 76_devanagari_table | PASS | the Devanagari letter, its fee table and the signature block |
+| 2026-11-09 | 77_arabic_rtl_document | FAIL | moved:1380000 verified 374.5 pt across - the table's column order is reversed, amount at the left where the page puts it at the right |
+| 2026-11-09 | 78_mixed_english_devanagari_line | FAIL | moved:Amount paid verified 9.7 pt; the runs that share one baseline on the page arrive as four stacked lines |
+| 2026-11-09 | 79_inr_indian_digit_grouping_table | PASS | the Indian-grouped figures, the GST column and the remittance block |
+| 2026-11-09 | 80_gstin_pan_cin_ifsc_table | FAIL | moved:Status: VERIFIED verified, worst offset 78.8 pt - the fifth card's status line is drawn at the foot of the page instead of inside its box |

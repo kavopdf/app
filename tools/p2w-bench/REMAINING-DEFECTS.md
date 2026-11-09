@@ -4378,3 +4378,87 @@ exists, it is simply thrown away before it reaches a rule.
 variation that matched nothing), and do not make the borders a constant (attempt 2, what ships now).
 Both were tried and both are wrong for the same reason - neither is a measurement of the side.
 
+
+
+## b80 corpus — batch 4 (61-80), re-run 9 Nov 10:06
+
+Twenty documents, twenty-five pages, all seventeen steps in order. Thirty-six findings, 36 verified,
+0 refuted, 0 unverifiable. Seven pass, thirteen fail. The eye and the numbers agreed on all twenty
+documents, which is the first batch where that has happened.
+
+Five of the thirteen failures are one cause, and it is D-07 below: **the two columns that share a
+baseline on the page are still handed over as one interleaved flow**, so each line gets its own
+baseline and the column that starts level ends 40 to 72 pt low. Measured this run:
+
+    61  moved:market for perishable produce        61.2 pt   order 63.6 % of 29 rows, 37 in the render
+    65  moved:heavier removal depressed yield      41.4 pt   order 76.9 % of 30 rows, 35 in the render
+    66  moved:dispersion across societies          71.6 pt   order 57.1 % of 21 rows, 28 in the render
+    69  moved:Either party                       215.5 pt across   order 47.8 % of 29 rows, 38 in render
+    67  moved:4 theory + 2 lab                     23.7 pt   order 78.0 % of 38 rows, 44 in the render
+
+On 61 the abstract's grey band is gone as well (`shapes` 1 in the PDF, 0 in the render). On 69 the
+cause is visible in the .docx: the clause number "3." and its body are two paragraphs, so the numbers
+interleave with other clauses' text and one line lands at x=540, past the right margin. That is the
+same paragraph-per-field split as 301's label/value band, seen on a legal document.
+
+**No fix shipped this run.** D-07 has 0 of 3 tries and the two attempts recorded under it were
+measured and reverted; a third blind attempt at the end of a batch is what the 7 Nov note warns
+against. The measurements above are the work item for the next run, and they are the fifth to
+seventh independent recordings of the same cause.
+
+### OPEN — the masthead's filled band is not drawn and the page spills to a second sheet
+
+62_two_col_newsletter_pull_quote. `pagecount` verified 1 in the PDF, 2 in the render; `shapes`
+verified 3 drawings in the PDF, 0 in the render; `moved:Tank rehabilitation restores water to nine
+villages` verified 55.9 pt across. The body is emitted at `w:ind left="0"` with the section's
+`pgMar left="0"`, so every line starts at x=0.1 where the page starts it at x=56.0, and the pull
+quote that the page sets in the left column is drawn in the right one at x=311.8. The dark green
+band that fills the masthead is not in the render at all; a dark rectangle does appear at the top of
+the second sheet, so the shaded paragraph and the page's own text have come apart. **Tries: 0 of 3.**
+
+### OPEN — the newspaper body is emitted as a table
+
+64_newspaper_uneven_columns_ad_boxes. `pagecount` verified 1 in the PDF, 5 in the render;
+`moved:Water scheme for` verified 156.9 pt across; `order` verified 50 rows in the PDF, 7 in the
+render, 7.0 % in sequence. The page's two unequal text columns plus the classifieds box are handed
+over as a four-column table with empty cells, so the prose runs down four vertical strips of two or
+three words and the sheet count goes from one to five. This is the document the 7 Nov note names
+("64_newspaper takes five sheets where the PDF has one"). **Tries: 0 of 3.**
+
+### OPEN — a merged header band absorbs the first data row
+
+75_merged_header_cell_three_columns. `moved:1,842` verified 22.2 pt across and 21.4 pt up;
+`order` verified 16 rows in the PDF, 18 in the render, 70.6 % in sequence. The page's header band is
+"Depot | SCHEDULED (over three columns) | Fleet held | Breakdowns" and it is empty of figures. The
+render draws the first depot's five figures inside that band, so the depot names sit one row below
+their own values and a blank row is added at the foot. **Tries: 0 of 3.**
+
+### OPEN — an RTL table's column order is reversed
+
+77_arabic_rtl_document. `moved:1380000` verified 374.5 pt across; `order` verified 26.7 % of 21 rows
+with 24 in the render. The page draws البند الوصف الكمية السعر المبلغ left to right with the amount
+at x=105.8; the render draws the same five headers mirrored, so the amount lands at x=480.3 and every
+cell is under the wrong heading. The prose above the table is placed correctly, so this is the
+table's own direction bit, not the paragraph's. **Tries: 0 of 3.**
+
+### OPEN — runs that share one baseline arrive as stacked lines
+
+78_mixed_english_devanagari_line. `moved:Amount paid` verified 9.7 pt; `order` verified 21 rows in
+the PDF, 31 in the render, 61.5 % in sequence. The page sets "Amount paid Rs. 4,200.00 केवल चार हज़ार
+दो सौ रुपये" as four runs on one baseline at x=62.5, 129.4, 147.6 and 198.5. The render stacks them:
+"Amount paid" at y=387.0, ":" at 399.5, "Rs" at 412.1, ". 4,200.00" at 424.6. "Invoice No KTB
+/2025/4471" goes the same way. This is D-07's mirror image - the same-baseline join - and it is the
+first document in the corpus where the run split is the whole defect. **Tries: 0 of 3.**
+
+### OPEN — a status line falls out of its box to the foot of the page
+
+80_gstin_pan_cin_ifsc_table. `moved:Status: VERIFIED` verified, 5 on both sides, worst offset
+78.8 pt. Cards 1 to 4 keep their "Status: VERIFIED" inside the box at x=469.2; the fifth is drawn at
+y=636.9 instead of y=557.2, at the page's foot, and card 5's box closes without it. **Tries: 0 of 3.**
+
+### OPEN — a cell's line wraps where the page keeps it on one
+
+71_invoice_space_aligned_no_rules. `wraps:Earth Leakage Circuit Breaker 40A` verified: the page has
+the row on one line, the render spends three. The description column is measured from the page and
+"Earth Leakage Circuit Breaker 40A, 30 mA" is 2.6 pt wider than the column it is given, so "30 mA"
+goes to a second line and the next row is pushed down. **Tries: 0 of 3.**

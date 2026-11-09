@@ -1082,3 +1082,33 @@ mirrored page (417, one try allowed).
 
 413 was checked and passed: the ActualText key replaces the page's glyph line, which is the
 document's whole point, and that is a design decision worth writing down rather than a defect.
+
+
+## 9 Nov 10:06 IST — b80 batch 4 (61-80), re-run from the start
+
+Twenty documents, twenty-five pages, every page opened before any number was read, all seventeen
+steps in order. 7 PASS, 13 FAIL. 36 findings: 36 verified, 0 refuted, 0 unverifiable. No fix
+shipped, and the batch log says so rather than implying one.
+
+The eye and the numbers agreed on all twenty documents for the first time. Five of the thirteen
+failures are D-07, the same-baseline column flow, recorded for the fifth to seventh time with
+measurements: 61 at 61.2 pt, 65 at 41.4, 66 at 71.6, 67 at 23.7 and 69 at 215.5 pt across.
+
+What is new in this batch, and what makes it worth reading:
+
+- 77 reverses an RTL table's column order. The amount sits at x=480.3 where the page puts it at
+  105.8, and every cell is under the wrong heading while the prose above is placed correctly. That
+  points at the table's own direction bit, not at the paragraph.
+- 78 is D-07 the other way round: four runs that share one baseline on the page are four stacked
+  lines in the render, and "Invoice No KTB /2025/4471" goes with them.
+- 64 is the document the 7 Nov note names: the newspaper's two unequal columns and its classifieds
+  box are emitted as a four-column table, so the prose runs down strips of two or three words and
+  one sheet becomes five.
+- 62 puts the whole body at x=0.1 where the page puts it at 56.0, loses the masthead's filled band
+  (3 drawings against 0) and spills to a second sheet.
+- 75 draws the first depot's figures inside the merged header band, so every depot name sits one row
+  below its own values.
+
+Nothing was fixed: every one of the thirteen is an engine-wide class already recorded, and the two
+attempts on D-07 were measured and reverted. A third attempt made blind at the end of a batch is
+what the 7 Nov note warns against.
