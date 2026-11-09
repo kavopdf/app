@@ -4767,3 +4767,42 @@ row-height work. And the shape / `<a:ln>` path was already correct and is unmodi
 **This settles the D-25 caveat too.** A merged stamp frame carried one stroke weight because there was
 only one weight to carry; with per-side strokes a merged frame can keep the thinner inner rule.
 
+
+
+**A patch that removes the accumulation, gate-clean.**
+`patches/D26-A-cumulative.patch`, two files.
+
+**The change.** `DocxWriter` no longer derives `w:before` from the pitch between two *PDF* baselines.
+It keeps `ctx.flowY` - where the reader will actually put the last baseline, built from the twips that
+were written - and computes the gap as `targetY - top of this paragraph`, then re-syncs after every
+paragraph. **The gap only ever existed when it was positive**, so a negative one was written as zero
+and the line landed low, once per line, forever. That is the whole of the cumulative drift.
+
+**Proving it surfaced a second, independent accumulator:** every table row was written at the table's
+extent divided by its row count - 1.45 pt wrong per row on the ledger. `PdfToWord.Table` now carries
+the page's own row edges (`rowEdge`) and the table's top edge (`rowTopPt`).
+
+**Measured, median dy / worst dy / share within 3 pt:**
+
+    document                              before              after
+    16_right_aligned_amounts          10.5 / 38.2 / 16 %   2.0 / 2.0 / 100 %
+    20_numbered_list_separate_column  51.1 / 101.4 / 15 %  1.7 / 13.5 / 52 %
+    21_form_labels_x60_values_x300     0.9 / 2.4 / 100 %   0.9 / 2.4 / 100 %
+    79_inr_indian_digit_grouping_table 2.3 / 9.0 / 61 %    8.4 / 9.3 / 13 %
+    80_gstin_pan_cin_ifsc_table        5.8 / 79.7 / 16 %   3.6 / 90.8 / 43 %
+
+**The accumulation is gone where it was measured:** corr(y, dy) goes from -0.653 to +0.110 on doc 16
+and from +0.723 to -0.195 on doc 20, and the last line's error is now equal to the first line's.
+
+**Honestly not clean:** doc 79's median *rose* from 2.3 to 8.4, because its compressed rows had been
+cancelling a pre-existing table-top error that exact rows now expose - a uniform ~6 pt offset with
+0.9 pt of drift instead of 15 pt of drift. Two documents outside the brief (303, 318) do the same. The
+fix needs a per-row *baseline* in the model, not just a per-row edge; it is described in section 6 of
+the report and is not in this patch.
+
+**This overlaps the row-height work.** The `rowEdge` change here and that agent's `w:trHeight` change
+both decide a row's height, and they must be reconciled rather than applied blind. The per-row
+baseline that would fix doc 79 is the natural place for them to meet.
+
+Gate: **no document got worse** over 208, three line-count improvements. Tests 29/29 and 3/3.
+
