@@ -4588,169 +4588,69 @@ by counting `w:before`/`w:line` *inside* the stamp's anchored text boxes. In-flo
 substituted font wraps six rows into two lines. Font metrics, not page budget.
 
 
+## g53 corpus — batch 1 (1-13), 9 Nov 11:02
 
-**Two multi-column documents measured, and the two failures are different - but the cause is one.**
+Thirteen documents, twenty pages, all seventeen steps in order, every page opened before any number
+was read. 19 findings: 18 verified, 1 refuted, 0 unverifiable. Seven pass, six fail. G2 clean on 208
+before the batch (`documents: 208 / no document got worse`). No fix was attempted this run; nothing
+here was changed in the engine, so the baseline is untouched.
 
-   62_two_col_newsletter_pull_quote    PDF 1 page, 595x842
-                                       DOCX w:cols num=2 x4, sectPr x7, 44 paragraphs, TWO PAGES
-   63_three_column_brochure            PDF 1 page, 842x595 landscape
-                                       DOCX NO w:cols at all, sectPr x1, 23 paragraphs, mixed order
+### OPEN — a two-column body is emitted as one wide flow, with a fragment in a narrow column
 
-**62** detects the columns correctly and its paragraph order is right - masthead, headline, deck,
-body. But it carries **seven sections and four column blocks**, because the continuous section breaks
-shipped for a full-width element are being emitted for this page too, and Google Docs turns a
-continuous break into a page break. That is the second page.
+`academic-paper-ieee-2col-abstract`. `moved:Our evaluation corpus is drawn from three sources`
+verified: y=235.0 in the PDF and 144.9 pt lower in the render, x within 0.2. Order 79.7 % of 68 rows,
+75 in the render. The abstract paragraph and the first section's body are drawn in two columns on the
+page; the render sets the abstract across the full measure and leaves a 3-word-wide strip of the
+second column beside it. Page 2, which holds the results table and the references in two columns, is
+right. So this is page 1's band structure, not the document. **Tries: 0 of 3.**
 
-**63** does not detect columns at all. `pageColumns` returns one, so the page is written as a single
-flow, and the order comes out interleaved - the three column headers land on one line, then
-`Malnad Estates was established...`, then `The`, then `of the Baba Budan hills...`. Left and middle
-column mixed.
+### OPEN — a letter whose body is in text boxes is emitted twice, and spills to a second sheet
 
-**The cause both share: `w:cols` is flow-based and cannot hold a position.** Word decides for itself
-where column one ends and column two begins; it does not honour the point where the page broke the
-column. So even with perfect detection the paragraphs mix, because a paragraph from the left column
-can be flowed into the right column at the wrong height. This is not a detection bug in 62 - the
-detection is right and the output is still wrong.
+`annual-review-2col-uneven-columns`. Four verified findings: `pagecount` (1 page in the PDF, 2 in the
+render), `order` 5.6 % of 34 rows, `shapes` 1 against 0, `moved:KAVERI MILLS LIMITED` 45.3 pt across
+and 18.6 pt down. reflow.py says the same thing from the structure side: "3 text boxes - body text
+inside one cannot be edited or reflowed". The page 2 image is the page-1 letter again in a single
+narrow column, so the same words are written twice: once into the text boxes that hold the page's
+place, once into the flow. The masthead's dark band is the lost shape. **Tries: 0 of 3.**
 
-**And that is why iLovePDF's columns are table cells.** A cell is a fixed rectangle, not a position in
-a flow, so nothing can move between columns. The V3 variant built during the D-08 work reached the
-same conclusion from measurement - "the columns become the table's columns", verified as the only one
-of six variants that rendered as one page with the right reading order - but that patch was never
-merged because it conflicted with the borders and stamp work.
+### OPEN — an indented table row is inset 9.1 pt further than the page drew it
 
-**The fix is to merge it, not to tune the column detection further.** Detection is already right on
-62 and the output is still wrong; no amount of detection improvement changes that, because the defect
-is in the representation.
+`balance-sheet-and-profit-loss`. `moved:(d) Other current assets` verified: x=45.5 on the page, 54.6
+in the render (9.1 pt), y +5.7. The same 9.1 pt is carried by every indented row on both pages
+(`(a) Inventories` 9.1/5.2, `(b) Trade receivables` 9.1/5.4, `(c) Cash and cash equivalents` 9.1/5.7,
+`(d) Other current assets` 9.1/5.9, `Total` 9.1/6.2), so it is one number applied to every row of the
+band, not a per-row measurement. The cell XML carries `<w:ind w:left="210"/>` (10.5 pt) and the cell
+text has no leading spaces, so the inset is coming from the cell's own x - which means the table's
+grid, not the paragraph, is where the 9.1 pt lives. Separately the Total row's first cell is too
+narrow and "Total" is set as "Tot al"; that is the already-recorded narrow-cell class.
+**Tries: 0 of 3.**
 
+### OPEN — a three-column brochure's third column sits 25 pt low and its box 48 pt too tall
 
+`brochure-3col-with-sidebar-box`. `moved:AT A GLANCE` verified: y=479.2 on the page, 512.9 in the
+render (33.7 pt down, x within 0.2). Every line of the third column carries the same 12.2 pt across
+and 25.2 pt down, and the box's ruled frame is 48 pt taller than the page's. Order 94.3 % of 43 rows.
+The first two columns are right. **Tries: 0 of 3.**
 
-## STATE AFTER THE v3.53.4 DEVICE PASS
+### OPEN — a table row's cells are joined on one line where the page ended the row
 
-The user tested on the phone and reported item by item. This is what stands.
+`bus-timetable-station-left-times-right`. `breaks:Shivshahi` verified: the page ends the row after
+"seater", the render continues "05:45" on the same line. Order 96.2 % of 39 rows. The first
+`moved:04:30` claim was REFUTED - 2 on both sides, worst offset 2.1 pt - so the times themselves are
+in the page's places and the defect is the row boundary alone. **Tries: 0 of 3.**
 
-### Confirmed fixed on the device
+### OPEN — a table's whole block sits 27 pt low by the time it reaches the signature
 
-| | |
-|---|---|
-| **White patches** | two PDFs converted in Google Docs dark mode on the phone, no patches. Closed. |
-| **Extra pages** | `01_stamp_rotated_15deg_upright` and `04_stamp_180deg_upside_down` are one page, as the PDFs are. Closed. |
-| **180-degree stamp orientation** | renders and is the right way up. Closed. |
+`delivery-challan`. `moved:Received by` verified: y=371.2 on the page, 398.8 in the render (27.6 pt
+down, x within 0.1). Order 82.8 % of 28 rows, 30 in the render. The header block is right (14
+October 2026 +34.0, GSTIN +33.7) and the drift grows through the six-row goods table, so the rows are
+being charged more height than the page gave them - the same class as 314's cell offset and 324's
+table-top offset. **Tries: 0 of 3.**
 
-### Still open, in the user's words
+### MEASUREMENT — three documents where the eye passed and the order question failed
 
-1. **Line thickness and opacity.** In the PDF some rules are thick and some thin, some strong and
-   some faint; in the .docx they are all one weight and one colour. That is D-22 - a stroked shape now
-   carries its alpha, but a **table border is still a constant**, because `Rules` cannot carry a
-   stroke and has to be given one.
-2. **A stamp's parts are grouped wrongly.** In the commercial output the **two frame lines select
-   together** and each text line separately - which is why their frames cannot drift. Here the outer
-   frame is welded to `IN ORDER` and the inner frame is on its own, so the two frames drift. And
-   `02`'s stamp is inside a text box, which Google Docs cannot put a caret in, so it is not editable
-   at all. That is D-25.
-3. **The 180-degree stamp's inner lines are far too faded on one side.** Stroke colour and opacity,
-   not structure - part of D-22.
-4. **Multi-column pages.** Two failures, one cause:
-   - `62` is one page in the PDF and **two in the .docx**, because it carries seven sections and the
-     continuous section breaks become page breaks in Google Docs. **`63` does not have the two-page
-     problem** - only the mixing.
-   - **Both mix side-by-side paragraphs.** `w:cols` is flow-based and cannot hold a position: Word
-     decides where column one ends, so a paragraph from the left column is flowed into the right one
-     at the wrong height. Detection is already correct on `62` and the output is still wrong, so this
-     is a representation defect, not a detection one.
-   - The fix is to merge the V3 variant from the D-08 work - columns become a table's columns, a
-     fixed rectangle rather than a position in a flow - which was the only one of six variants
-     measured to give one page and the right order. It was never merged because it conflicted with
-     the borders and stamp changes.
-
-### The order to take them in
-
-1. **D-22**, because it is the user's first complaint and it touches every document with a rule.
-2. **D-25**, the stamp's object separation, because it is the difference between a stamp that can be
-   edited and one that cannot.
-3. **The multi-column representation**, because it is a patch already measured and waiting.
-
-
-
-## Automatic verification, because the device cannot be in the loop
-
-The user cannot keep installing an APK and converting PDFs by hand. `tools/p2w-bench/verify_visual.py`
-does the comparison without a device: it renders the generated .docx back to PDF with LibreOffice and
-measures it against the source.
-
-    python3 tools/p2w-bench/verify_visual.py <source.pdf> <generated.docx>
-
-It reports three things the user has been reporting by eye, and it catches all three:
-
-**1. Position.** Every PDF line is matched to a line in the render by its text, and the horizontal
-and vertical distance is measured. It reports the median, the worst, and the share within 3 pt and
-10 pt.
-
-**2. Reading order.** This is the one that was missing from the first version and it is the one that
-matters most here. Position can be perfect while the order is wrong - which is exactly what the user
-means by "side-by-side paragraphs are mixed". The check walks the render in document order, maps each
-line back to its index in the PDF's reading order, and reports the longest ascending run as a share of
-all lines. A page whose columns are interleaved scores low even though every line sits in the right
-place.
-
-**3. Structure.** The patterns a reader can trip over regardless of how the file renders here:
-continuous section breaks (a page break in Google Docs), multi-column sections (`w:cols` is
-flow-based), text boxes (not editable in Google Docs), explicit shading fills, `schemeClr`
-references, a colour inside `docDefaults`, a missing `settings.xml`, a page background, and whether
-every border side shares one weight.
-
-**Measured on the user's own failing documents:**
-
-    62_two_col_newsletter_pull_quote   1 page pdf, 2 docx   25% within 10 pt   order 33%
-                                       6 continuous sections, 4 column sections
-    63_three_column_brochure           1 page both          100% within 3 pt   order 13%  <-- mixing
-    02_stamp_rotated_15deg_upleft      1 page both          41% within 10 pt   order 20%
-
-**63 is the case that proves the reading-order check is necessary.** Its positions are perfect - median
-0.9 pt, every line within 3 pt - and it still selects as interleaved text, because the paragraphs are
-written in the wrong order. No position metric would ever have caught it.
-
-
-
-### D-26  Line drift is universal, and it has two measurable causes
-
-**Reported from the phone:** in any PDF, one or two lines are always off - and it does not matter
-what they belong to, a table, a paragraph or anything else. It is a universal problem, not a defect
-of a particular document.
-
-**Measured with `verify_visual.py` over five documents.** For each line the render's y is compared
-with the PDF's y, and the correlation between the line's position on the page and its error says
-whether the error accumulates:
-
-    document                            lines  median dy  worst    >3pt   corr(y,dy)  reading
-    16_right_aligned_amounts_txtpos       64    -10.5     -38.2    54/64   -0.65      CUMULATIVE
-    20_numbered_list_separate_column      33    +51.1    +101.4    28/33   +0.72      CUMULATIVE
-    21_form_labels_x60_values_x300        30     +0.9      +2.4     0/30   +0.17      near-perfect
-    79_inr_indian_digit_grouping_table    31     -1.2      -9.0    12/31   -0.26      random
-    80_gstin_pan_cin_ifsc_table           63     -5.7     +79.7    53/63   -0.09      random
-
-**Two distinct causes, and they need different fixes.**
-
-1. **Cumulative drift** - `16` and `20`, with correlations of -0.65 and +0.72. The error grows with
-   the line's position on the page, which means it is being *accumulated*: `w:before` and `w:line`
-   are computed incrementally, each one relative to the previous line, so every rounding error is
-   carried into the next. Over 33 lines that reaches 101 pt - half a page.
-2. **Row height error** - `80` and `79`, with correlations near zero but a large share of lines over
-   3 pt (`80` has 53 of 63). The error is not cumulative, so it is per-row: a table row is landing at
-   a height that is not the page's row pitch.
-
-**The most useful number in the table is `21`.** Median 0.9 pt, worst 2.4 pt, zero lines over 3 pt.
-The positioning logic *can* be exact; the documents that are wrong have something specific broken,
-and this is not a limitation of the format or of the reader.
-
-**The fixes.**
-
-- **For the cumulative case:** compute `w:before` from the paragraph's **absolute** y in the PDF rather
-  than relative to the previous baseline, or re-sync the running position whenever the accumulated
-  error passes a threshold. Incremental computation is what turns a 0.3 pt rounding into 101 pt.
-- **For the row case:** set `w:trHeight` to the page's own row pitch exactly, not to a height derived
-  from the text.
-
-**Test:** `verify_visual.py` reports `within 3 pt` and `within 10 pt` per document, and the median and
-worst dy. The target is `21`'s numbers across the corpus, and any document below 90 % within 10 pt is
-a document with a specific cause to find - not a document to average away.
-
+`admit-card` (84.2 % of 29 rows), `bank-statement-horizontal-rules-only` (40.0 % of 38 rows, 57 in the
+render) and `boq-tender-bill-of-quantities` (95.9 % of 36 rows). All three images show the page's own
+columns, rows and values in their places, and on the bank statement the row count itself differs (38
+against 57) which is the tab-join count bug the 8 Nov batch already named. These are PASS documents
+and a tool to repair, not pages to fix. **Tries: 0 of 3 on the tool.**

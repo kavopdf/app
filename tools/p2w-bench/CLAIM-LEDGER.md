@@ -662,3 +662,18 @@ differs the sequence share is measuring the page, not the tool.
 `pagecount` was recorded once per sheet on 64, which is what the eye saw - five sheets where the
 page has one. verify.py deduplicates on document, page, kind and claim, so five sheets are five
 findings, all verified, and all one cause.
+
+### 9 Nov 11:02, g53 batch 1 (1-13) - what this run added
+
+19 findings from 13 documents, 18 verified, 1 refuted, 0 unverifiable: moved 6, pagecount 2, order 8,
+breaks 1, shapes 1.
+
+The refuted one is worth keeping: `moved:04:30` on `bus-timetable-station-left-times-right` came back
+"2 on both sides, worst offset 2.1 pt" - the times are in the page's places and the eye had read the
+row drift as a time drift. Replaced with `breaks:Shivshahi`, which verified, and the document still
+fails on the row boundary it really has. That is the verifier doing its job: a loosely worded claim
+would have sent a fix at the wrong thing.
+
+Three PASS documents disagree with the order question (`admit-card`, `bank-statement-horizontal-rules-only`,
+`boq-tender-bill-of-quantities`). On the bank statement the row count differs 38 against 57, so the
+sequence share is measuring the tab-join count bug rather than the page. Recorded, not fixed here.

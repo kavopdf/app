@@ -896,3 +896,27 @@ Run started 10:06 IST.
 | 2026-11-09 | 78_mixed_english_devanagari_line | FAIL | moved:Amount paid verified 9.7 pt; the runs that share one baseline on the page arrive as four stacked lines |
 | 2026-11-09 | 79_inr_indian_digit_grouping_table | PASS | the Indian-grouped figures, the GST column and the remittance block |
 | 2026-11-09 | 80_gstin_pan_cin_ifsc_table | FAIL | moved:Status: VERIFIED verified, worst offset 78.8 pt - the fifth card's status line is drawn at the foot of the page instead of inside its box |
+
+## g53 corpus - batch 1 (1-13), 9 Nov 11:02
+
+Thirteen documents, twenty pages (academic-paper and annual-review two each, bank-statement-5-pages
+five). Every page opened before any number was read; every finding verified against the PDF:
+19 findings, 18 verified, 1 refuted, 0 unverifiable. Seven pass, six fail. Three disagreements, all
+the eye passing where the order question failed on a page the render joins with tabs - the known
+measurement bug, recorded below rather than counted against the document.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-09 | academic-paper-ieee-2col-abstract | FAIL | moved:Our evaluation corpus is drawn from three sources verified (y=235.0 in the PDF, 144.9 pt low) and order 79.7 % of 68 rows; the two-column body arrives as one wide flow with a fragment in a narrow column |
+| 2026-11-09 | admission-form-labels-left-boxes-right | PASS | 22 label/box rows, the declaration block and both signature boxes in the page's places |
+| 2026-11-09 | admit-card | PASS | header table and eight schedule rows in place; order 84.2 % is the tab-join measurement bug |
+| 2026-11-09 | annual-review-2col-uneven-columns | FAIL | pagecount verified (1 page in, 2 out), order 5.6 % of 34 rows, shapes 1 against 0, moved:KAVERI MILLS LIMITED 45.3 pt across and 18.6 down - the letter's text is in text boxes and is emitted twice |
+| 2026-11-09 | balance-sheet-and-profit-loss | FAIL | moved:(d) Other current assets 9.1 pt across and 6.2 down, moved:For S. Krishnan & Associates on page 2; every indented row carries the same 9.1 pt and "Total" is set as "Tot al" |
+| 2026-11-09 | balance-sheet-two-columns-of-figures | PASS | both figure columns, the note and the two signature blocks in place |
+| 2026-11-09 | bank-statement-5-pages | PASS | five sheets, 28 rows each, header band and closing balance in place |
+| 2026-11-09 | bank-statement-horizontal-rules-only | PASS | 28 rows and the statement summary block at the foot; order 40.0 % of 38 rows is the tab-join measurement bug |
+| 2026-11-09 | boq-horizontal-rules-only | PASS | schedule B rows, the total and the signature line in place |
+| 2026-11-09 | boq-tender-bill-of-quantities | PASS | 22 items, sub-total, GST and grand total in place; order 95.9 % of 36 rows is the tab-join measurement bug |
+| 2026-11-09 | brochure-3col-with-sidebar-box | FAIL | moved:AT A GLANCE verified 33.7 pt down and order 94.3 % of 43 rows - the third column's text sits 25.2 pt low and the box is 48 pt too tall |
+| 2026-11-09 | bus-timetable-station-left-times-right | FAIL | breaks:Shivshahi verified - the page breaks after "seater", the render continues "05:45"; order 96.2 % of 39 rows |
+| 2026-11-09 | delivery-challan | FAIL | moved:Received by verified 27.6 pt down and order 82.8 % of 28 rows - the table is 33.7 pt low by the signature block |

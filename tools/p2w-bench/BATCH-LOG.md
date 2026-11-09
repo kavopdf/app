@@ -1112,3 +1112,31 @@ What is new in this batch, and what makes it worth reading:
 Nothing was fixed: every one of the thirteen is an engine-wide class already recorded, and the two
 attempts on D-07 were measured and reverted. A third attempt made blind at the end of a batch is
 what the 7 Nov note warns against.
+
+## 9 Nov 11:02 IST — g53 batch 1 (1-13), re-run from the start
+
+Thirteen documents, twenty pages, every page opened before any number was read, all seventeen steps in
+order. 7 PASS, 6 FAIL. 19 findings: 18 verified, 1 refuted, 0 unverifiable. No fix shipped.
+
+The batch is the multi-column and the table class, and it reads the same way the b80 batch did: the
+page's own furniture is in its place, and what is wrong is where a band of the page is placed when the
+page holds more than one column or a table that grows.
+
+- `academic-paper-ieee-2col-abstract` p1 puts the abstract across the full measure and leaves a
+  three-word strip of the second column beside it; p2, the same two columns with the results table,
+  is right. One page's band, not the document.
+- `annual-review-2col-uneven-columns` is the clearest case of the run: the letter is written twice -
+  once into text boxes (reflow.py counts 3) and once into the flow - so one sheet becomes two, and
+  the masthead's band is the shape that goes missing.
+- `balance-sheet-and-profit-loss` carries one number, 9.1 pt, on every indented row of both pages.
+  A single constant applied to a band is worth finding in the code: it is not a per-row measurement.
+- `brochure-3col-with-sidebar-box` moves only its third column (25.2 pt down) and grows its box 48 pt.
+- `delivery-challan` drifts 27.6 pt through six rows, and `bus-timetable` breaks one row where the page
+  ended it.
+
+What the run learned about the instruments: three documents passed on sight while the order question
+failed - `admit-card` 84.2 %, `bank-statement-horizontal-rules-only` 40.0 %, `boq-tender` 95.9 % - and
+on the bank statement the row count itself is 57 against the page's 38, which is the tab-join count
+bug, not the page. They are PASS and the tool is what needs repairing. One eye claim was refuted:
+`moved:04:30` on the bus timetable, 2.1 pt, inside tolerance. The claim was replaced with
+`breaks:Shivshahi`, which verified.
