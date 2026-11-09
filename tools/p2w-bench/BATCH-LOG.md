@@ -1055,3 +1055,30 @@ made the ornate border look like a plain rectangle; at 300 dpi it is identical t
 and the `shapes` claim came back REFUTED. On 350 the eye believed the PDF's own footer text
 "PDF page 1 of 2" and called the page count a match; PyMuPDF counts one page, so `pagecount`
 verified at 1 against 2.
+
+## 9 Nov 09:02 IST — v3 batch 5 (402-417), re-run from the start
+
+Thirteen documents, eighteen pages, every page looked at, all seventeen steps in order. 6 PASS,
+7 FAIL. 11 findings: 11 verified, 0 refuted, 0 unverifiable. G2 across 208 clean ("no document got
+worse"), G5 ratchet clean on the batch (0 failed), no baseline moved.
+
+416_many_tiny_pages is deferred to its own run: 300 pages is 300 side-by-side images, and it is the
+only document in the corpus that size.
+
+The eye was wrong twice and the numbers caught both, which is the first run in which that has
+happened in the eye's favour-of-the-tool direction twice.
+
+- 402 the eye passed the calendar. `order` said 88.0 % of 12 rows with 13 in the render, and it was
+  right: the 25 cell wraps "Board meeting" onto two lines where the page keeps it on one.
+- 406 the eye passed the passport. `count:BENGALURU` found the Place of birth value missing
+  outright - 2 on the page, 1 in the render, and only 1 in the .docx, so the model dropped it. That
+  is the first `count:` claim on a repeated WORD rather than a repeated number, and the most
+  valuable finding of the run.
+
+The seven that stand are recorded in REMAINING-DEFECTS.md: a wrapping cell (402), a dropped repeated
+value (406), the space above a page's first block (410, 411 - one cause), a nested form's lost scale
+(411), an unapplied luminosity soft mask (414), an inline image that draws nothing (415) and a
+mirrored page (417, one try allowed).
+
+413 was checked and passed: the ActualText key replaces the page's glyph line, which is the
+document's whole point, and that is a design decision worth writing down rather than a defect.

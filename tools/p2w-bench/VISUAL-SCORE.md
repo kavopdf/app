@@ -841,3 +841,27 @@ Nine pass, six fail. Run started 08:08 IST.
 | 2026-11-09 | 364_event_ticket | PASS | ticket band, delegate block, rotated edge text, tear-off stub and barcode (order 88.9 % is the rotated edge text joining a band) |
 | 2026-11-09 | 365_recipe_card | FAIL | wraps:to taste verified; the ingredient amounts wrap onto a second line, so 2 tbsp becomes 2 over tbsp |
 | 2026-11-09 | 370_offer_letter | PASS | letterhead, ref and date, subject, salary table, acceptance paragraph and signature block (order 93.1 % is the table header band split) |
+
+## v3 corpus - batch 5 (402-417), 9 Nov
+
+Thirteen documents, eighteen pages (412 carries five, 417 two). Every page opened before any
+number was read; every finding verified against the PDF: 11 findings, 11 verified, 0 refuted,
+0 unverifiable. Six pass, seven fail. 416_many_tiny_pages (300 pages) is deferred to its own run,
+because a page-by-page look at it is 300 images and it is the only document in the corpus that
+size. Run started 09:02 IST.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-09 | 402_calendar_month_grid | FAIL | wraps:Board meeting verified; the 25 cell wraps onto two lines where the page keeps Board meeting on one, which also makes 13 rows against the page's 12 |
+| 2026-11-09 | 403_crossword_puzzle | PASS | 15x15 grid with its numbering, both clue columns and the footer in the page's places |
+| 2026-11-09 | 404_sudoku_grid | PASS | 9x9 grid, the given digits and every box rule match |
+| 2026-11-09 | 405_sheet_music_lyrics | PASS | three staves, chord symbols above them and the lyric lines below |
+| 2026-11-09 | 406_passport_mrz_page | FAIL | count:BENGALURU verified 2 in the PDF 1 in the render; the Place of birth value is dropped where Place of issue keeps its own, and the .docx holds it once, so the loss is in the model, not the render |
+| 2026-11-09 | 407_id_card_front_back | PASS | both cards, photo, barcode and the terms block |
+| 2026-11-09 | 410_form_xobject_reused | FAIL | moved:Invoice line item verified 62.2 pt worst; all three XObject blocks sit 57.7 pt high because the blank space above the first block is not reproduced |
+| 2026-11-09 | 411_nested_xobject_transforms | FAIL | moved:NESTED FORM verified 35.6 pt; the nested form's 1.6x scale is lost, so the 16 pt title comes out 10 pt and the rotated copy is pushed to x=-3.6 |
+| 2026-11-09 | 412_page_labels_roman | PASS | all five pages, cover, front matter and body, with the page labels the file declares |
+| 2026-11-09 | 413_tagged_pdf_actualtext | PASS | ActualText honoured by design: the glyph line is replaced by the key's text, which is the document's own point, and line 2 matches |
+| 2026-11-09 | 414_transparency_softmask | FAIL | shapes verified 3 drawings in the PDF 1 in the render; the luminosity-masked bar is also drawn red where the page draws blue |
+| 2026-11-09 | 415_inline_images | FAIL | moved:The checkerboard verified 149 pt; the inline image is blank in the render and the two lines under it rise to the top of the page |
+| 2026-11-09 | 417_rotate180_and_mirrored | FAIL | missing:Page 2 verified; page 1 is right (/Rotate 180 ignored on purpose, the render upright as the page's note asks), page 2's mirrored text comes out as reversed per-glyph runs |

@@ -4226,3 +4226,65 @@ LibreOffice draws the words upright and visibly wrong.
 path. `PDFBox` can give the glyph outlines; the work is in emitting them as `a:quadBezTo` /
 `a:cubicBezTo` inside the freeform, and it is a self-contained change to the stamp writer.
 
+
+## v3 corpus — batch 5 (402-417), 9 Nov 09:02 IST
+
+Seven verified findings, none fixed this run. Every one was checked against the PDF with
+verify.py before it was written down; 11 findings, 11 verified, 0 refuted, 0 unverifiable.
+
+### OPEN — a cell's text wraps where the page keeps it on one line
+
+402_calendar_month_grid. `wraps:Board meeting` verified: 2 lines in the PDF, 3 in the render.
+The 25 cell carries "Board meeting" on one line on the page and "Board" / "meeting" on two in the
+render, which also makes the page 13 rows against the page's 12. The cell's own width is set from
+the grid, so this is the cell-width class, not a flow wrap. **Tries: 0 of 3.**
+
+### OPEN — a repeated value on one page is emitted once
+
+406_passport_mrz_page. `count:BENGALURU` verified: 2 in the PDF, 1 in the render. The page sets
+BENGALURU twice - once as the Place of birth value at y=196.5 and once as Place of issue at
+y=248.5. The render keeps only the second, and the .docx text holds BENGALURU once, so the line is
+lost before the writer, in the model. This is the most valuable of the seven: a repeated value is
+common (a city, a company, a status) and nothing in the pipeline has looked for it before, because
+`missing:` refutes on the first hit anywhere and `count:` had only ever been used on numbers.
+**Tries: 0 of 3.**
+
+### OPEN — the blank space above the first block on a page is not reproduced
+
+410_form_xobject_reused. `moved:Invoice line item` verified, worst offset 62.2 pt. The page's
+first XObject block starts at y=159.1; the render starts it at y=101.4. All three blocks and the
+note under them carry the same ~57.7 pt. The page opens with empty space and the flow starts at the
+top margin instead. Same class as 411's title, so one cause is likely to fix both.
+**Tries: 0 of 3.**
+
+### OPEN — a nested form's scale and rotation are lost
+
+411_nested_xobject_transforms. `moved:NESTED FORM` verified at 35.6 pt, and the size is wrong too:
+the page draws the title at 16 pt and the render at 10 pt. The page places a form inside another
+form scaled 1.6x and rotated 90 degrees; the render drops the scale, keeps the words at their
+unscaled size and pushes the rotated copy to x=-3.6, off the paper. **Tries: 0 of 3.**
+
+### OPEN — a luminosity soft mask is not applied, and its bar keeps the wrong colour
+
+414_transparency_softmask. `shapes` verified: 3 drawings in the PDF, 1 in the render. The page
+draws a bar through a luminosity soft mask, so it reads blue; the render fills it red, which is the
+colour of the group before the mask, and drops the two drawings that make the mask. **No claim type
+covers a colour**, so the colour half of this finding is recorded here rather than in the ledger -
+`shapes` is what the verifier can see. **Tries: 0 of 3.**
+
+### OPEN — an inline image is emitted but draws nothing
+
+415_inline_images. `moved:The checkerboard above is an inline image` verified at 149 pt. The page
+draws a checkerboard with `BI ... ID ... EI` inside the content stream; the render's .docx holds one
+image object but the page shows no bars, and the two lines that follow rise to y=101 where the page
+puts them at 250. An image that is present, counted and invisible is exactly what the "real pixel
+variance, not presence" rule exists for. **Tries: 0 of 3.**
+
+### OPEN — a mirrored page comes out as reversed per-glyph runs
+
+417_rotate180_and_mirrored. `missing:Page 2` verified: 1 line in the PDF, 0 in the render. Page 2 is
+mirrored with a negative horizontal scale. The page's text layer still reads "Page 2 - mirrored
+text"; the render writes each glyph separately and in reverse, so it reads "t xet der orri / m /
+- 2 egaP". This is the rotated-stamp class with a mirror instead of an angle: OOXML has no
+horizontal mirror, so the answer is the raster path the stamps already use - ONE try, then record.
+**Tries: 0 of 3 (1 allowed).**
