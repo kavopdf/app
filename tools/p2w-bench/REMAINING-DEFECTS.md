@@ -3848,3 +3848,44 @@ LibreOffice render honours. **Tries: 1 of 3 (1 allowed) - closed.**
 `get_drawings()` returns it with a height of 0.3 pt, which the `>= 1.5` filter drops on both
 sides. A page whose only missing element is a hairline rule cannot be claimed with `shapes`;
 `rules` is the type that can see it, and it was not claimed. Nothing was fixed on it.
+
+## v3 corpus — batch 1 (300-317), third pass 9 Nov 06:05
+
+Fifteen documents re-converted from scratch, all seventeen steps in order, every page opened before
+any number was read. Nine findings on sight, 15 emitted with the measure findings, 13 verified, 2
+refuted, 0 unverifiable. Eight pass, seven fail. No fix attempted this run: every verified finding
+falls in a class already measured and settled, and the two that are new are recorded here.
+
+G2 across 208: no document got worse. G5 on the batch: 0 documents failed the ratchet, 34.4 % of
+lines within tolerance (x 1.5, y 3.0, size 0.5, colour 3), font size 98.5 %, name 100.0 %, colour
+100.0 %. No baseline moved.
+
+### The seven failures, and why none is a fresh fix
+
+- **301** `moved:MPL03184471` 8.7 pt (was 34.3 on 8 Nov) - the four-column label/value band is
+  emitted one field per paragraph, so the values sit ragged under their labels. D-07 family.
+- **303** `breaks:WARNING SIGNS` - 1 of 3 tries used, two rejected on 8 Nov. Unchanged.
+- **305** `order` 42.9 % of 27 rows - the seal's arc text is written as horizontal runs. The
+  `moved:NATIONAL IMMUNISATION` claim was REFUTED because it matched the title line; the vocabulary
+  has no arc-text claim, the same gap recorded on 60_page_border.
+- **306** `moved:Sponsor` 4.7 pt high - a table's own top y, the spacer rule that was measured and
+  reverted (see the note in DocxWriter). The eye read the render's table as indented; the verifier
+  put x at 31.0 against 31.1, so the indent was the eye's misreading of the panel scale. Worth
+  recording as an eye error, not a document defect.
+- **311** `missing:560067` and `moved:Mobile` 66.9 pt - D-07. The page draws "Mobile" at x=291
+  inside the address line's own x range (141-312.5), so the two fields genuinely overlap and the
+  join is the documented defect, not a threshold.
+- **314** `moved:Sub-total` -24.2 pt - NEW, and it is the row-pitch class commit `6624a3a`
+  settled: the page's rows are 15.0 pt apart and the render's are 13.2, so the drift grows down the
+  table (first row -12.8, Sub-total -24.2). Sizing rows to the page's pitch was measured before and
+  made page counts worse (20 to 16 mismatches by doing the opposite), so this is recorded, not
+  retried.
+- **315** `moved:RAJESH KUMAR, Jt. Secy.` +69.8 pt - NEW. The three columns end at y=265 and the
+  two footer lines sit at 723.6 and 747.3; the render carries them to the foot of the sheet because
+  they are emitted after the column flow. Needs the footer to be placed at its own measured y on a
+  page whose columns do not reach it. **Tries: 0 of 3.** Next run's first fix.
+
+### The one disagreement
+
+312_affidavit_stamp_paper passed on sight while `order` answered 63.8 % of 34 rows. Known
+measurement bug on a page whose rows the render joins with tabs; the document is PASS.

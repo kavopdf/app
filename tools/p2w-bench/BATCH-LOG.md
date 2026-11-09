@@ -1018,3 +1018,22 @@ the writer's contract, not a threshold, and it needs its own run with the positi
 
 **One refuted finding.** `shapes` on 57 - a hairline rule is 0.3 pt tall, so `get_drawings()`
 drops it on both sides. `rules` is the claim type that can see it.
+
+## 9 Nov 06:05 IST — v3 batch 1 (300-317), third pass, all 208 re-run from scratch
+
+Fifteen documents, 15 pages, every page looked at, all seventeen steps in order. 8 PASS, 7 FAIL.
+15 findings: 13 verified, 2 refuted, 0 unverifiable. G2 across 208 clean, G5 ratchet clean on the
+batch (0 failed), no baseline moved.
+
+The eye was wrong twice and the verifier caught both. On 306 the render's table looked indented by
+a third of the page in the side-by-side panel; the verifier put x at 31.1 against the page's 31.0,
+so the indentation was my misreading of the panel scale and the real offset is 4.7 pt of y. On 305
+the claim named NATIONAL IMMUNISATION, which the page holds twice - in the title and around the
+seal - and the verifier answered against the title. A claim that names a string the page repeats is
+not checkable; that is the third time this has cost a finding, and the vocabulary still has no way
+to say "the arc text around the seal".
+
+The batch's one genuinely new defect is 315's footer: a three-column page whose columns end at
+y=265 and whose two footer lines are drawn at 723.6 and 747.3 comes back with the footer at the
+foot of the sheet, +69.8 pt, because it is emitted after the column flow. 314's table drift is the
+row-pitch class `6624a3a` settled and is recorded rather than retried.

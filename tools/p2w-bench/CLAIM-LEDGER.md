@@ -539,3 +539,19 @@ The unverifiable `missing:` is the seal's arc text on 60 - one glyph per positio
 so no line spells KENGERI CAMPUS on either side. That is the vocabulary's gap, not the page's:
 an arc-text claim would need to compare glyph positions, which is what `rotated:` does for a
 single slanted line and does not do for a ring.
+
+## 9 Nov 06:05 IST — v3 batch 1 (300-317), third pass
+
+15 findings emitted, 13 verified, 2 refuted, 0 unverifiable. By claim type: `moved:` +5
+verified, +2 refuted; `breaks:` +1 verified; `missing:` +1 verified; `order:` +6 verified.
+
+Both refuted claims are the same mistake on the eye's side: the claim named a string that the
+page holds twice. `moved:NATIONAL IMMUNISATION` on 305 was answered against the title line
+NATIONAL IMMUNISATION REGISTRY at y=33.1, where the render is 0.5 pt off - the eye meant the
+seal's arc text, which no line spells. `moved:REFERRED BY` on 301 was a re-measure of an 8.0 pt
+finding from 8 Nov and came back 0.5 pt apart on both axes: that finding was a false alarm on
+the previous pass and is now refuted, which is the ledger earning its keep.
+
+The `order` finding on 312 is verified (63.8 % of 34 rows) while the eye passed the page. That is
+the tab-joined-rows measurement bug recorded on 8 Nov, not a document defect: the eye decides and
+the document is PASS, and the row here is the repair ticket for the tool.

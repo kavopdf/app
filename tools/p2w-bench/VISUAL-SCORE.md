@@ -785,3 +785,18 @@ the engine did not change this run, so no baseline was touched.
 | 2026-11-09 | 58_header_rule_footer_rule | PASS | header rule with the by-law label and the footer rule, on both pages |
 | 2026-11-09 | 59_landscape_mixed_portrait | PASS | portrait page then landscape page, the landscape table's every column and row in place |
 | 2026-11-09 | 60_page_border | FAIL | missing:KENGERI CAMPUS unverifiable (per-glyph arc); the seal's arc text is gone, only the rings and SEAL 2025 remain |
+| 2026-11-09 | 300_prescription_rx | PASS | header band, patient box, four-row Rx table, advice block, signature and QR code |
+| 2026-11-09 | 301_lab_report_panel | FAIL | moved:MPL03184471 verified 8.7 pt; the label/value band is emitted one field per paragraph so the four values sit ragged, and order 94.7 % |
+| 2026-11-09 | 302_radiology_report | PASS | header rule, patient and study band, findings and impression in the page's own order |
+| 2026-11-09 | 303_discharge_summary | FAIL | breaks:WARNING SIGNS verified; the page's line runs past the paper and the render wraps 4 times a day. onto a second line |
+| 2026-11-09 | 304_package_insert_small_print | PASS | small print leaflet, seven numbered sections, contents of the pack, marketing block |
+| 2026-11-09 | 305_vaccination_certificate | FAIL | order 42.9 % of 27 rows, 29 in the render; the seal's arc text is written as horizontal runs (moved:NATIONAL IMMUNISATION refuted, it matched the title) |
+| 2026-11-09 | 306_clinical_protocol_synopsis | FAIL | moved:Sponsor verified 4.7 pt high; the assessment table's first row sits 4.7 pt above the page's (x verified correct, the eye read it as an indent) |
+| 2026-11-09 | 310_court_judgment | PASS | centred cause title, between/and block, eight numbered paragraphs, Sd/- JUDGE |
+| 2026-11-09 | 311_fir_police_form | FAIL | missing:560067 verified; Bengaluru 560067 arrives as Bengaluru 5 60067Mobile, and moved:Mobile 66.9 pt - the D-07 baseline join |
+| 2026-11-09 | 312_affidavit_stamp_paper | PASS | stamp paper box, affidavit body, deponent and verification, notary seal with its arc text |
+| 2026-11-09 | 313_power_of_attorney | PASS | centred title, four numbered powers, schedule, principal and witness rules |
+| 2026-11-09 | 314_tender_rfp_boq | FAIL | moved:Sub-total verified -24.2 pt; the rows run at 13.2 pt against the page's 15.0 so the drift grows down the table |
+| 2026-11-09 | 315_gazette_notification | FAIL | moved:RAJESH KUMAR, Jt. Secy. verified +69.8 pt; the three-column page's footer is placed at the end of the flow, order 47.1 % |
+| 2026-11-09 | 316_contract_with_schedules | PASS | four numbered clauses, schedule A and C with its four-row charges table, signature rules |
+| 2026-11-09 | 317_rti_response | PASS | letterhead, date, subject line, six numbered points, enclosure |
