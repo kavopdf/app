@@ -921,6 +921,24 @@ public final class DocxWriter {
     }
 
     /** Top edge of a block's own boxes, in points from the page top. -1 when it has none. */
+    /**
+     * True when every row of the table is the same height.
+     *
+     * <p>Absolute placement of a table's top edge is only needed where the rows are NOT evenly
+     * spaced - a taller header, a wrapped address, a merged cell. For an even grid the average
+     * the writer used before was exactly right, and measuring on 23_timetable_grid_txtpos showed
+     * the absolute rule taking it from 6.8 pt to 28.3 pt. So the rule is applied where it helps
+     * and not where it hurts.
+     */
+    private static boolean evenlySpaced(float[] edge) {
+        if (edge == null || edge.length < 3) return true;
+        float first = edge[1] - edge[0];
+        for (int i = 2; i < edge.length; i++) {
+            if (Math.abs((edge[i] - edge[i - 1]) - first) > 0.75f) return false;
+        }
+        return true;
+    }
+
     private static float blockTop(Object b) {
         if (b instanceof PdfToWord.Para) {
             float t = Float.MAX_VALUE;
@@ -3614,7 +3632,8 @@ public final class DocxWriter {
         // paragraph rather than w:spacing on the table because OOXML gives a table no
         // before-spacing of its own.
         int spacerTw = 0;
-        if (!ctx.newPage && !ctx.lastWasTable && ctx.flowY >= 0f && !Float.isNaN(t.rowTopPt)) {
+        if (!ctx.newPage && !ctx.lastWasTable && ctx.flowY >= 0f && !Float.isNaN(t.rowTopPt)
+                && !evenlySpaced(t.rowEdge)) {
             // The table's top is placed ABSOLUTELY, from the flow's real position (D-26): the
             // spacer is the distance from where the reader will be to where the page drew the
             // table's top edge. The arithmetic this replaces measured that distance from the
@@ -3622,7 +3641,13 @@ public final class DocxWriter {
             // ever since, which is the defect REMAINING-DEFECTS.md records as unfixed.
             float prevLine = Math.max(4f, ctx.lastSize * LINE_FACTOR);
             float extraAbs = t.rowTopPt - flowTopPt(ctx);
-            if (extraAbs >= prevLine * 1.2f) {
+            // Any positive gap is real for a table: its top edge is a RULE the page drew, not a
+            // line box the substitute face guessed at. The line-and-a-bit threshold below is
+            // right for the baseline arithmetic, where a small difference is the face's own
+            // leading - but applied here it dropped a genuine 17.3 pt gap and put
+            // 23_timetable_grid_txtpos' whole grid that far above the page. Measured: every line
+            // of its header sat at dy -17.3.
+            if (extraAbs >= 2f) {
                 spacerTw = (int) Math.min(2880L, Math.round(extraAbs * TWIPS_PER_PT));
             }
         } else if (!ctx.newPage && !ctx.lastWasTable && ctx.lastBaseline >= 0f && t.top > ctx.lastBaseline) {
