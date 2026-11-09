@@ -575,3 +575,32 @@ The three `order` findings on 325, 326 and 330 are verified while the eye passed
 All three are the tab-joined-rows measurement bug: a row of table cells reads as one string in
 the render and as separate strings in the PDF, so the sequence never matches. The eye decides,
 the documents are PASS, and these rows are the repair ticket for the tool.
+
+
+## 9 Nov 08:08 IST — v3 341-370, re-run from the start
+
+16 pages, 16 findings emitted, 14 verified, 1 refuted, 0 unverifiable after the record was
+corrected mid-run. By claim type: `order:` +8 verified, `rules:` +2 verified, `pagecount:` +2
+verified (the same document, both pages), `moved:` +1 verified, `wraps:` +1 verified, `shapes:`
++1 REFUTED.
+
+The `shapes` refutation is the eye's mistake and it is worth writing down. 352's ornate border
+was claimed gone on the strength of the 120 dpi side-by-side panel; the verifier answered
+"12 shapes in the PDF, 12 in the render, 8 large on both sides" and a 300 dpi crop of the
+top-left corner shows the outer rule, the inner rule and the corner curl identical on both
+sides. The panel is a third of a page wide - a 2.5 pt rule and a 6 pt curl cannot be judged in
+it. That is the second time this run's eye has been wrong about a fine detail (the first was
+350's page count, where the eye believed the PDF's own footer text "PDF page 1 of 2" instead of
+counting the pages). Both were caught because the claim was structured and the verifier went to
+the page.
+
+`rules` is now the highest-value claim type in the batch: it is the only one that can say "the
+render draws a line the page does not", and it caught 351 and 360, two documents whose text is
+perfect. Both are `nil`-side regressions - the writer borders a table the page leaves open - and
+the frame guard that was supposed to prevent exactly this is documented as excluding 351 and 360
+by name while doing no such thing today.
+
+The three `order` findings on 353, 364 and 370 are verified while the eye passed the page, and
+`--combine` decided all three on the eye. They are the band-join measurement: a render row that
+holds two of the page's lines in one band, or a rotated edge text joining the row it sits beside.
+Repair ticket for the tool, not a defect in the documents.

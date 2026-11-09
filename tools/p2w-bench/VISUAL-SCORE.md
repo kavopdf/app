@@ -23,6 +23,7 @@ opened is not counted here - `looked.py` decides that, not this file.
 | 8 Nov | 10 | 5 | 50 % | the D group, and the corpus is now fully scored: 113 PASS / 95 FAIL of 208, last row per document |
 | 8 Nov | 15 | 8 | 53 % | v3 batch 1 final sweep: 7 fail (301, 303, 305, 306, 311, 314, 315), 306 new on a 7.2 pt table-extent finding |
 | 2026-11-09 | 15 | 9 | 60 % | v3 318-340: 6 fail, 21 findings 21 verified 0 refuted; 3 pass on the eye against an order finding (the tab-join measurement bug) |
+| 2026-11-09 | 15 | 9 | 60 % | v3 341-370: 6 fail, 14 findings 14 verified 0 refuted; 3 pass on the eye against an order finding (band join), 1 shapes claim refuted (352's border is exact) |
 
 Not a baseline yet - three documents is not the corpus. It becomes one when a full
 batch has been through both halves of the check.
@@ -816,3 +817,27 @@ the engine did not change this run, so no baseline was touched.
 | 2026-11-09 | 334_patent_document | PASS | form heading, title, abstract, the three-box figure with arrows, five claims, footer |
 | 2026-11-09 | 335_msds_safety_data_sheet | PASS | four hazard diamonds, sections 1-8, the CAS table, footnote |
 | 2026-11-09 | 340_bill_of_lading | PASS | shipper/consignee/notify grid, vessel band, cargo table with total, on-board clause, three signature boxes, barcode |
+
+## v3 corpus - batch 3 (341-370), 9 Nov
+
+Fifteen documents, sixteen pages (350 carries two). Every page opened before any number was read;
+every finding verified against the PDF: 14 findings, 14 verified, 0 refuted, 0 unverifiable.
+Nine pass, six fail. Run started 08:08 IST.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-09 | 341_shipping_manifest | PASS | 12-column manifest table with all 24 rows, header band, totals line and footer in the page's own places |
+| 2026-11-09 | 342_packing_list | PASS | carton table, totals line, marks and numbers box, declaration and signature |
+| 2026-11-09 | 343_air_waybill | FAIL | moved:Declared value verified +7.0 pt; the fourth label of the header band sits low while the other three are on the page's baseline, 2 overlap pairs |
+| 2026-11-09 | 344_customs_declaration | PASS | IEC/customs grid, item table, total value line, CLEARED stamp and both signature boxes |
+| 2026-11-09 | 350_question_paper | FAIL | pagecount verified 1 page in the PDF and 2 in the render; the five modules spill onto a second sheet, order 40.7 % of 52 rows |
+| 2026-11-09 | 351_omr_answer_sheet | FAIL | rules verified 13 in the PDF 15 in the render; the bubble grid is put in a ruled table box the page does not draw and the last rows spill below it |
+| 2026-11-09 | 352_certificate_ornate_border | FAIL | order verified 21 rows in the PDF 25 in the render; the seal's arc text is emitted as horizontal runs. shapes REFUTED - the ornate border and its corner curls are exact |
+| 2026-11-09 | 353_admit_card | PASS | photo box, register band, paper table, venue, instructions, QR and barcode (order 78.4 % is the band-join measurement) |
+| 2026-11-09 | 360_restaurant_menu | FAIL | rules verified 5 in the PDF 13 in the render; both menu blocks are enclosed in ruled boxes the page does not draw, with empty rows between items |
+| 2026-11-09 | 361_product_catalogue_grid | PASS | six product cards with image, title, price, code, min order and barcode |
+| 2026-11-09 | 362_price_list_dense | PASS | three groups of 19 rows of code, name and price in the page's three columns |
+| 2026-11-09 | 363_warranty_card | PASS | header box, model band, six numbered terms, sticker box, QR and footer |
+| 2026-11-09 | 364_event_ticket | PASS | ticket band, delegate block, rotated edge text, tear-off stub and barcode (order 88.9 % is the rotated edge text joining a band) |
+| 2026-11-09 | 365_recipe_card | FAIL | wraps:to taste verified; the ingredient amounts wrap onto a second line, so 2 tbsp becomes 2 over tbsp |
+| 2026-11-09 | 370_offer_letter | PASS | letterhead, ref and date, subject, salary table, acceptance paragraph and signature block (order 93.1 % is the table header band split) |

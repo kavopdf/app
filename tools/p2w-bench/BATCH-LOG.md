@@ -1037,3 +1037,21 @@ The batch's one genuinely new defect is 315's footer: a three-column page whose 
 y=265 and whose two footer lines are drawn at 723.6 and 747.3 comes back with the footer at the
 foot of the sheet, +69.8 pt, because it is emitted after the column flow. 314's table drift is the
 row-pitch class `6624a3a` settled and is recorded rather than retried.
+
+## 9 Nov 08:08 IST — v3 batch 3 (341-370), re-run from the start
+
+Fifteen documents, sixteen pages, every page looked at, all seventeen steps in order. 9 PASS,
+6 FAIL. 14 findings: 14 verified, 0 refuted, 0 unverifiable, after the record was corrected
+once mid-run.
+
+Two findings from the 8 Nov pass of this batch are gone and both fixes held: 352's ornate
+border with its corner curls is exact, and 360's menu block no longer sits 149 pt high. The
+six that remain are recorded in REMAINING-DEFECTS.md: a table bordered where the page draws no
+rule (351, 360 — one cause, a `nil`-side regression), a spilled second sheet (350), a wrapped
+ingredient amount (365), the seal's arc text (352) and a header band label 7.0 pt low (343).
+
+The eye was wrong twice and the verifier caught both. On 352 the low-DPI side-by-side panel
+made the ornate border look like a plain rectangle; at 300 dpi it is identical to the page's,
+and the `shapes` claim came back REFUTED. On 350 the eye believed the PDF's own footer text
+"PDF page 1 of 2" and called the page count a match; PyMuPDF counts one page, so `pagecount`
+verified at 1 against 2.

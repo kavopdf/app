@@ -4072,70 +4072,88 @@ rotate.
 routing is measured behaviour, not a documented contract.
 
 
+---
 
-## GROUND TRUTH - two commercial .docx files, read directly
+## v3 corpus - batch 3 (341-370), re-run 9 Nov 08:08 - the six open findings
 
-The user supplied a document converted by **iLovePDF** (Solid Documents backend) and one by **Adobe
-Acrobat**, from the same PDFs that fail here. Both are measured, not inferred. The user's verdict:
-**iLovePDF's output is the best of the two**, so it is the target.
+Fifteen documents, sixteen pages, all seventeen steps in order, every page opened before any
+number was read. 14 findings, 14 verified, 0 refuted, 0 unverifiable. Nine pass, six fail.
 
-### White patches - the answer, from the files themselves
+The batch was processed once before, on 8 Nov. Two of that run's findings are gone: 352's
+ornate border and its corner curls are now exact (a `shapes` claim today comes back REFUTED,
+12 shapes and 8 large on both sides, and the 300 dpi crop confirms it), and 360's menu block
+no longer sits 149 pt high. Both fixes held. What follows is what is still wrong.
 
-| | iLovePDF | Adobe | ours |
-|---|---|---|---|
-| `w:shd` fills | **5** | **0** | **753** |
-| `w:color` inside `docDefaults` | **no** | **no** | **yes** |
-| `word/settings.xml` | **yes** | **yes** | **no** |
-| `a:schemeClr` | **0** | **0** | **753** |
-| `w:background` | absent | absent | absent |
-| `word/theme/theme1.xml` | present | present | present |
-| images (`word/media/`) | **0** | **0** | - |
-| table-border colour | `000000` x133 | none | `nil` |
+### OPEN - a table is bordered where the page draws no rule (351, 360)
 
-**Adobe emits no shading fills at all. iLovePDF emits five, one pink tint `F4E5E5`.** We emit 753.
-A fill is the only thing that can be a white patch: no fill, no patch.
+Two documents, one cause, and it is a REGRESSION against the D-20 work rather than a new defect.
 
-**Neither writes a colour inside `docDefaults`** - only `rFonts`, `sz`, `szCs`, `lang`. Ours does, and
-that element decides 325 of 414 runs.
+    351_omr_answer_sheet   `rules` verified: 13 rules in the PDF, 15 in the render. The bubble
+                           grid is put inside a ruled table box the page does not draw, and
+                           rows 16-45 spill below it. An earlier run measured this as 13
+                           against 32, so the writer has improved and is still wrong.
 
-**Neither uses `a:schemeClr` anywhere.** So the `bg1` + `lumMod` direction was wrong, and the research
-that said so was right.
+    360_restaurant_menu    `rules` verified: 5 rules in the PDF, 13 in the render. Both menu
+                           blocks arrive inside a box. The page draws only the five heading
+                           rules.
 
-**And the finding that reverses an earlier instinct:** iLovePDF carries an explicit colour on only
-**98 of 365 runs** and Adobe on **178 of 558** - the rest inherit. **Inheritance is fine.** "Give every
-run an explicit colour" was wrong twice over: it is not what the good output does, and done with
-`000000` it makes dark mode worse.
+`DocxWriter.table()` decides this at `ruledTable = t.ruled || pageDrewRule(t, ctx.curShapes)`,
+and `pageDrewRule`'s frame test is `encloses && tw >= s.wPt * 0.5f && th >= s.hPt * 0.5f`. Its
+own comment says the guard exists so that "a page border, or a box a table merely sits inside,
+is not read as a table rule", and it names 351 and 360 among the four documents that keep
+`nil`. Today both are ruled, so the guard is not doing what it says - either the table's bounds
+moved under it or `t.ruled` is set by the ruled pass on a page that draws no grid.
 
-### The stamp - iLovePDF's exact architecture
+**Before editing the condition, print it.** The count at the point of suspicion is not yet
+taken: nobody has printed, for these two documents, whether `t.ruled` is true or
+`pageDrewRule` returned true, and which shape satisfied it. That print is the first step of
+try 1 - the 8 Nov note in PIPELINE.md records four plausible hypotheses that each died on a
+measurement, and this is the same shape of question. **Tries: 0 of 3.**
 
-```xml
-<mc:AlternateContent>
-  <mc:Choice Requires="wps">
-    <w:drawing><wp:anchor behindDoc="0" ...>
-      <wp:positionH relativeFrom="page"><wp:posOffset>2447311</wp:posOffset></wp:positionH>
-      <wp:positionV relativeFrom="paragraph"><wp:posOffset>132227</wp:posOffset></wp:positionV>
-      <wp:extent cx="951230" cy="190500"/>
-      <wps:wsp><wps:cNvSpPr txBox="1"/>
-        <a:xfrm rot="840000"><a:off x="0" y="0"/><a:ext cx="951230" cy="190500"/></a:xfrm>
-        <a:prstGeom prst="rect">
-  <mc:Fallback>
-    <w:pict><v:group coordorigin="2976,128" coordsize="3112,1767"
-       path="m2976,1133l5818,1894,6087,889,3245,128,2976,1133xe"
-       filled="false" stroked="true"
-       strokeweight=".600003pt" strokecolor="#0c6b2d">
-```
+### OPEN - a two-column label/value block wraps its value (365)
 
-This is exactly the hybrid the research predicted, and it is the first time it has been seen in a
-shipping product:
+365_recipe_card. `wraps:to taste` verified: the PDF has 2 lines, the render wraps them into 3.
+"2 tbsp" arrives as "2" over "tbsp", and "to taste" as "to" over "taste". The amounts column is
+sized from the page's own column edge and the substitute face is wider, which is the same class
+as 314's clipped character and the +20 twips of last-column slack the writer already gives a
+table's last column - but this block is not emitted as a table, so that slack never applies.
+**Tries: 0 of 3.**
 
-- **`mc:Choice Requires="wps"`** carries a DrawingML text box with `a:xfrm rot="840000"` (14 degrees)
-  - the branch **Word** renders correctly.
-- **`mc:Fallback`** carries a **VML `v:group` whose path has the rotation baked into its
-  coordinates** - `path="m2976,1133l5818,1894,6087,889,3245,128,2976,1133xe"`, four corners, no
-  rotation attribute at all - the branch **LibreOffice** renders correctly.
-- The stroke carries the page's own weight and colour: **`strokeweight=".600003pt"
-  strokecolor="#0c6b2d"`**. That is D-22's requirement, satisfied by a shipping converter.
-- **No image.** `word/media/` is empty in both files.
+### OPEN - the question paper spills onto a second sheet (350)
 
-**So the two open problems now have a blueprint read off a working product rather than derived.**
+350_question_paper. `pagecount` verified: 1 page in the PDF, 2 in the render. The page holds
+five modules and section B; the render breaks after module 5b. The PDF's own footer text reads
+"PDF page 1 of 2", which is the corpus generator's label and NOT a second page - PyMuPDF counts
+one, and the eye believed the label on the first pass. This is the recorded 28-document spill
+class: the render's flow is taller than the page. **Tries: 0 of 3.**
 
+### OPEN - the seal's arc text is emitted as horizontal runs (352)
+
+352_certificate_ornate_border. `order` verified: 21 rows in the PDF, 25 in the render, 52.2 %.
+The difference is the seal's ring of per-glyph text - "ANANYA RAO", "MERIDIAN INSTITUTE OF
+TECHNOLOGY", "INDIA", "2024" - which the page draws around the circle and the render bands
+differently. Same family as 305, 312 and 318, and the vocabulary still has no claim that
+describes a ring. **Tries: 0 of 3 (1 allowed - rotated/stamp class).**
+
+### OPEN - the fourth label of a header band sits 7 pt low (343)
+
+343_air_waybill. `moved:Declared value` verified: x=264.0 y=167.3 in the PDF, x=264.1 y=174.3
+in the render. The other three labels of the band - Airport of departure, Airport of
+destination, Currency - are on the page's baseline, and the two overlap pairs come from this
+label landing on the value below it. The label/value band is the D-01/D-06 family: the pitch
+is taken from the previous line rather than from the model's own lineY gaps. **Tries: 0 of 3.**
+
+### Measurement notes from this pass
+
+    order on 353, 364, 370        verified, and the eye passed all three pages. 353 is a band
+                                  join (the render puts "8842117702" before "AE2024/447182"
+                                  inside one visual row), 364 is the rotated edge text joining
+                                  a band, 370 is a table header split after "Component".
+                                  `looked.py --combine` named all three "eye (numbers wrong -
+                                  repair the tool)" and all three stay PASS.
+
+    shapes on 352                 REFUTED, and correctly: 12 shapes and 8 large on both sides.
+                                  The eye read the low-DPI side-by-side panel as a plain
+                                  rectangle. At 300 dpi the border, the inner rule and the
+                                  corner curls are identical to the page's. Recorded as an
+                                  eye-instruction failure, not a page defect.
