@@ -973,3 +973,48 @@ ignores `<w:noWrap/>` in a fixed-layout table, are in REMAINING-DEFECTS.md.
 
 Nothing was committed as a fix because nothing was fixed. The record is the twelve measurements
 and the three rejected tries.
+
+## 9 Nov, 05:03 IST - b80 batch 3 (41-60) taken through all seventeen steps
+
+Sandbox was empty: toolchain rebuilt (Temurin 17.0.21, PDFBox-Android 2.0.27.0, the three corpus
+assets at 75 / 80 / 53), all 208 documents converted and G2 reported **no document got worse**
+before anything was looked at. Twenty documents, 23 pages, every page opened at 130 dpi before
+visual.py ran.
+
+**Result: 13 pass, 7 fail.** 19 findings emitted, 15 verified against the PDF, 1 refuted, 3
+unverifiable. This is the colour batch and no document failed on colour: navy header bands,
+alternating fills, a green form border with green values, a yellow callout, a navy block with
+white text, grey body under black headings and blue underlined links all came through intact.
+
+    46  moved:60.2 4.9 pt, order 85.7 %     the chart is rebuilt larger, gridlines gone, labels inside the bars
+    52  moved:434.2 -12.7 pt                the table's header row is collapsed and its text is clipped
+    54  moved:twenty dollars per tonne 54.9, moved:above fifty hectares 110.0, order 31.8 %
+                                            both columns are poured into one flow at twice their pitch
+    55  shapes 1 -> 2, moved:restored under the project 10.8 pt
+                                            the sidebar loses its fill; same one-flow cause as 54
+    56  moved:Shrinkage and fastness testing -11.8 pt
+                                            the header row is collapsed and clipped
+    57  moved:SRI VINAYAKA INSTITUTE OF TECHNOLOGY -126.4 pt
+                                            the title block climbs the sheet instead of staying centred
+    60  missing:KENGERI CAMPUS unverifiable  the seal's arc text is not written at all
+
+**Two engine tries, both measured, both reverted.** The multi-column class (54, 55) was taken
+first because it affects more documents than anything else left.
+
+1. A line's pitch measured against the previous line IN ITS OWN COLUMN (`Ctx.colLast`). Measured
+   on 54: the docx was byte-identical to the old one, because the doubling does not come from
+   the pitch - each paragraph already advances one pitch - but from two columns' lines sharing
+   one flow, so a column's own lines are two paragraphs apart. No-op. Reverted.
+2. The XY-cut's vertical scan let the full-width header hide the gutter: one spanning item makes
+   every later gap negative, so no vertical cut was ever found. Taking the spanning items out of
+   the vote (the 62 % rule `keep0` already uses) does put the paragraphs in column order and
+   does fix the pitch - and makes the render WORSE, because a column-major order in a one-column
+   flow stacks column 2 below column 1. Reverted, engine untouched, baseline untouched.
+
+**What is left for 54/55.** Emit a real `w:cols` section and let the flow fill column 1 before
+column 2. `secCols` and the continuous-section break are already in DocxWriter; what blocks it
+is the paragraph-per-line model, which pins every line to its measured x. That is a change to
+the writer's contract, not a threshold, and it needs its own run with the position ratchet.
+
+**One refuted finding.** `shapes` on 57 - a hairline rule is 0.3 pt tall, so `get_drawings()`
+drops it on both sides. `rules` is the claim type that can see it.

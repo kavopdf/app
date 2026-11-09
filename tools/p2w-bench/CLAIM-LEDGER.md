@@ -523,3 +523,19 @@ contradicts is not a defect.
 `count:` earned its place on 38. `wraps:` and `breaks:` both came back REFUTED there because
 the PDF holds the line twice (faux bold) and the line-count comparison saw 2 on both sides;
 `count:` names the real difference, 2 against 1.
+
+## 9 Nov 05:03 IST — b80 batch 3 (41-60)
+
+19 findings emitted, 15 verified, 1 refuted, 3 unverifiable. Added to the table by claim type:
+moved: +7 verified, +2 unverifiable; shapes: +1 verified, +1 refuted; missing: +1 unverifiable;
+order: +7 verified.
+
+The two unverifiable `moved:` claims are the same blind spot twice: 57.3 on 46 is a value label
+the render drops or merges, so the string is on one side only, and Compacted sludge bed on 59
+is a table cell whose words the render joins with the cell beside it. Both are the cell-versus-
+line difference already recorded four times, and neither is a document defect.
+
+The unverifiable `missing:` is the seal's arc text on 60 - one glyph per position on the page,
+so no line spells KENGERI CAMPUS on either side. That is the vocabulary's gap, not the page's:
+an arc-text claim would need to compare glyph positions, which is what `rotated:` does for a
+single slanted line and does not do for a ring.

@@ -3761,3 +3761,90 @@ table**: 38 cells carried it and the price column still broke its last digit ont
 has to know the substitute face's width for the cell's own string and size at write time - either a
 measured advance table for the faces the writer substitutes, or the cell's width taken from the
 string rather than from the page. That is the next thing to build here, not another constant.
+
+## b80 corpus — batch 3 re-run (41-60), 9 Nov 05:03
+
+Twenty documents, 23 pages, all seventeen steps in order, every page opened at 130 dpi before
+any number was read. 19 findings: 15 verified, 1 refuted, 3 unverifiable. Thirteen documents
+pass; seven fail, and every one of the seven rests on a verified finding.
+
+The batch is the colour-and-layout class: coloured headings, coloured table headers and
+alternating rows, callout boxes, margins, two-column bodies, a page border. The colours are
+faithful in all of them - navy header bands, alternating fills, green form borders, the yellow
+callout, the navy block with white text - which is the first time a whole colour batch has come
+through with no colour finding at all.
+
+### OPEN — a chart is rebuilt at a different scale, and its value labels land inside the bars
+
+46_chart_coloured_labels_body_text. `moved:60.2` verified: 4.9 pt low. The larger defect is not
+the offset: the page's chart is drawn as bars, a frame, gridlines and twelve value labels above
+their bars, and the render draws the same bars bigger, with no gridlines and with the labels
+sitting inside the bar tops (57.3 and 60.2 both overlap their own bar). Reading order 85.7 % of
+27 rows, 29 in the render. **Tries: 0 of 3.**
+
+### OPEN — a table's first row is collapsed, so its header text is clipped
+
+52_one_cm_margin_wide_body and 56_table_indented_from_margin, one cause. On 52 the header row
+of "Financial highlights for 2024-25" is a single clipped line - `Particulars` is cut through
+the ascenders by the table's top border - and every row below runs at a tighter pitch than the
+page's, so `moved:434.2` verified at -12.7 pt and `moved:Shrinkage and fastness testing` at
+-11.8 pt. The row's own `w:trHeight` is 268 twips (13.4 pt) with `w:line="268" w:lineRule=
+"exact"` for 8.5 pt text, so the box is tall enough on paper; what the render does with it is
+what needs measuring before anything is changed. **Tries: 0 of 3 each.**
+
+### OPEN — a two-column body is poured into one flow, so each column runs at twice its pitch
+
+54_two_column_body_full_width_header_footer. `moved:twenty dollars per tonne` verified 54.9 pt
+low, `moved:above fifty hectares` 110.0 pt low, order 31.8 % of 17 rows against 27 in the
+render. The model reads the page correctly - both columns are found (`starts=[298.0]`, 16 lines
+in band 0 and 13 in band 1) and `toParagraphs` returns them column by column - and the writer
+then emits them band by band, because the XY-cut puts them back in that order. Both columns
+keep their own x, so the page looks like two columns while every line is one pitch too far
+down. **Tries: 1 of 3.**
+
+**Try 1 - make the spanning header stop hiding the gutter.** The XY-cut's vertical scan carries
+the widest right edge seen so far, so one full-width line makes every later gap negative: the
+header runs to x=430, past the second column's 308, and no vertical cut was ever found. The
+spanning items were taken out of the vote (the same 62 % rule `keep0` and `assignSegments`
+already use) and put back into the pieces afterwards. Measured on 54: the paragraphs come out
+column by column, the pitch is right at 11.9 pt, and the render is WORSE - the second column is
+now poured below the first, because the section is still one column and a column-major order in
+a one-column flow stacks the columns instead of setting them beside each other. Before the
+change both columns sat at their own x with doubled leading; after it the geometry is gone.
+Reverted, engine untouched. The real fix is the one D-08 half did: emit a real `w:cols` section
+for the page and let the flow fill column 1 before column 2 - `secCols` and `sectionBreak` are
+already in DocxWriter, and what stops it is the paragraph-per-line model, which places every
+line at its own measured x rather than letting the section do it.
+
+### OPEN — a sidebar beside the body loses its fill
+
+55_sidebar_box_beside_body. `shapes` verified: 1 shape in the PDF, 2 in the render, both large -
+the sidebar's outline is drawn twice and its fill is not drawn at all, so the box reads white
+where the page fills it. `moved:restored under the project` verified 10.8 pt low, which is the
+same one-flow cause as 54 seen on a shorter column. **Tries: 0 of 3.**
+
+### OPEN — a title page's block is not where the page centred it
+
+57_centred_title_page_left_body_pages, page 1. `moved:SRI VINAYAKA INSTITUTE OF TECHNOLOGY`
+verified -126.4 pt: the page puts the institute line at y=243.2 and the render at y=116.8, so
+the whole block climbs the sheet. Page 2 of the same document is exact. `shapes` was claimed
+for the rule under the campus line and came back REFUTED - 0 shapes on both sides, because a
+hairline rule is not a drawing of 1.5 pt in both axes - so the rule is unclaimed, not absent.
+**Tries: 0 of 3.**
+
+### CLOSED-UNFIXABLE (rotated class) — a seal's arc text is not written at all
+
+60_page_border. `missing:KENGERI CAMPUS` came back UNVERIFIABLE: the page draws the arc one
+glyph per position, so its text layer holds "K E N G E R I" and no line spells the words. The
+render keeps the two rings and SEAL/2025 and drops every arc glyph. Order 38.1 % of 32 rows,
+verified, is what carries the document. This is the 05_round_company_seal class and it gets ONE
+try: the rasteriser cannot be exercised here (`PDFRenderer.renderImageWithDPI` throws
+`NoSuchMethodError Canvas.getMatrix()` against the JVM stubs), and OOXML has no arc text a
+LibreOffice render honours. **Tries: 1 of 3 (1 allowed) - closed.**
+
+### The one refuted finding, and it is the tool
+
+`shapes` on 57: "0 shapes in the PDF, 0 in the render". A rule is a stroked line, and
+`get_drawings()` returns it with a height of 0.3 pt, which the `>= 1.5` filter drops on both
+sides. A page whose only missing element is a hairline rule cannot be claimed with `shapes`;
+`rules` is the type that can see it, and it was not claimed. Nothing was fixed on it.

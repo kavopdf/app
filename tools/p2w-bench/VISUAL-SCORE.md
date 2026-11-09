@@ -749,3 +749,39 @@ no baseline was moved.
 | 2026-11-09 | 38_faux_bold_italic_synthesised | FAIL | count:Study of self-compacting concrete using quarry dust as partial replacement verified 2 in the PDF, 1 in the render - both copies joined into one paragraph |
 | 2026-11-09 | 39_small_caps_letter_spacing | FAIL | moved:N O T I C E T O M E M B E R S verified 13.2 pt low; the tracked heading loses its letter spacing, 172 pt wide in the PDF against 116 in the render |
 | 2026-11-09 | 40_devanagari_shaping_font | PASS | devanagari head, dates, paragraph, six-row table and signature |
+
+## 9 Nov 05:03 IST — b80 batch 3 (41-60), the colour and layout class
+
+Twenty documents, 23 pages, every page opened at 130 dpi before visual.py ran, every finding
+verified against the PDF. Thirteen pass, seven fail. Nineteen findings: fifteen verified, one
+refuted, three unverifiable.
+
+No colour finding at all in a batch whose whole subject is colour: navy header bands,
+alternating row fills, green form borders and values, the yellow callout, the navy block with
+white text, grey body under black headings and blue underlined links all came through.
+
+Position for the batch was not recorded - the position ratchet runs at the end of a batch and
+the engine did not change this run, so no baseline was touched.
+
+| Date | Document | Verdict | Why |
+|---|---|---|---|
+| 2026-11-09 | 41_coloured_headings_white_bg | PASS | green title and brown section headings, three sections, nine items, footer rule |
+| 2026-11-09 | 42_table_coloured_header_alternating_rows | PASS | navy header band, alternating row fill, seven rows, right-aligned amounts |
+| 2026-11-09 | 43_red_stamp_over_black_text | PASS | rasterised red stamp at its own angle over the body text, signature block |
+| 2026-11-09 | 44_coloured_underlined_hyperlinks | PASS | five blue underlined links with grey urls, circular body and signature |
+| 2026-11-09 | 45_coloured_callout_box | PASS | yellow callout with its border, body above and below, signature block |
+| 2026-11-09 | 46_chart_coloured_labels_body_text | FAIL | moved:60.2 verified 4.9 pt; the chart is rebuilt larger, its gridlines are gone and the value labels sit inside the bars |
+| 2026-11-09 | 47_grey_body_black_headings | PASS | grey body text under black headings, three numbered sections, keywords line |
+| 2026-11-09 | 48_form_coloured_border_coloured_values | PASS | green form border, bold green values, twelve label rows, declaration |
+| 2026-11-09 | 49_coloured_background_block_paragraph | PASS | navy block with four lines of white text, body below it |
+| 2026-11-09 | 50_invoice_coloured_total_row | PASS | navy header and total row, six item rows, right-aligned amounts, amount in words |
+| 2026-11-09 | 51_two_cm_margins | PASS | 2 cm margins on all sides, border box, three paragraphs, signature block |
+| 2026-11-09 | 52_one_cm_margin_wide_body | FAIL | moved:434.2 verified -12.7 pt; the table's header row is collapsed and its text is clipped at the top edge |
+| 2026-11-09 | 53_single_space_body_15_headings | PASS | 1.5 line headings, single-spaced body, four paragraphs, note and signature |
+| 2026-11-09 | 54_two_column_body_full_width_header_footer | FAIL | moved:twenty dollars per tonne verified 54.9 pt, moved:above fifty hectares 110.0 pt; the columns are poured into one flow and each runs at twice its pitch |
+| 2026-11-09 | 55_sidebar_box_beside_body | FAIL | shapes verified 1 against 2; the sidebar loses its fill, and moved:restored under the project 10.8 pt low |
+| 2026-11-09 | 56_table_indented_from_margin | FAIL | moved:Shrinkage and fastness testing verified -11.8 pt; the header row is collapsed and clipped, the rows run tighter than the page |
+| 2026-11-09 | 57_centred_title_page_left_body_pages | FAIL | moved:SRI VINAYAKA INSTITUTE OF TECHNOLOGY verified -126.4 pt; the title block sits at the top of the sheet instead of centred |
+| 2026-11-09 | 58_header_rule_footer_rule | PASS | header rule with the by-law label and the footer rule, on both pages |
+| 2026-11-09 | 59_landscape_mixed_portrait | PASS | portrait page then landscape page, the landscape table's every column and row in place |
+| 2026-11-09 | 60_page_border | FAIL | missing:KENGERI CAMPUS unverifiable (per-glyph arc); the seal's arc text is gone, only the rings and SEAL 2025 remain |
