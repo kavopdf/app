@@ -4247,6 +4247,19 @@ y=248.5. The render keeps only the second, and the .docx text holds BENGALURU on
 lost before the writer, in the model. This is the most valuable of the seven: a repeated value is
 common (a city, a company, a status) and nothing in the pipeline has looked for it before, because
 `missing:` refutes on the first hit anywhere and `count:` had only ever been used on numbers.
+
+The model, dumped with a probe on 9 Nov (paragraph and table blocks, in page order):
+
+    [table 5 rows]  Surname/Given names, RAO/ANANYA, Nationality/Date of birth,
+                    INDIAN/12-07-1990, Sex/Place of birth        <- ends on a LABEL row
+    paragraph       PHOTOGRAPH  (top=200, x=83.9, the photo box)
+    paragraph       F           (top=203, x=190)                 <- the value, orphaned
+    [table 6 rows]  Date of issue/Date of expiry ... Place of issue/BENGALURU ...
+
+So the grid is cut at the photo box, which sits between the Sex column and the Place of birth
+column. The table closes after the label row; F survives as a stray paragraph and BENGALURU is
+dropped altogether, even though it is at x=380, the same x every other right-hand value in the
+table uses. The loss is in the table's closing path, not in the writer and not in the render.
 **Tries: 0 of 3.**
 
 ### OPEN — the blank space above the first block on a page is not reproduced
