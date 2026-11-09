@@ -4669,3 +4669,43 @@ The user tested on the phone and reported item by item. This is what stands.
    edited and one that cannot.
 3. **The multi-column representation**, because it is a patch already measured and waiting.
 
+
+
+## Automatic verification, because the device cannot be in the loop
+
+The user cannot keep installing an APK and converting PDFs by hand. `tools/p2w-bench/verify_visual.py`
+does the comparison without a device: it renders the generated .docx back to PDF with LibreOffice and
+measures it against the source.
+
+    python3 tools/p2w-bench/verify_visual.py <source.pdf> <generated.docx>
+
+It reports three things the user has been reporting by eye, and it catches all three:
+
+**1. Position.** Every PDF line is matched to a line in the render by its text, and the horizontal
+and vertical distance is measured. It reports the median, the worst, and the share within 3 pt and
+10 pt.
+
+**2. Reading order.** This is the one that was missing from the first version and it is the one that
+matters most here. Position can be perfect while the order is wrong - which is exactly what the user
+means by "side-by-side paragraphs are mixed". The check walks the render in document order, maps each
+line back to its index in the PDF's reading order, and reports the longest ascending run as a share of
+all lines. A page whose columns are interleaved scores low even though every line sits in the right
+place.
+
+**3. Structure.** The patterns a reader can trip over regardless of how the file renders here:
+continuous section breaks (a page break in Google Docs), multi-column sections (`w:cols` is
+flow-based), text boxes (not editable in Google Docs), explicit shading fills, `schemeClr`
+references, a colour inside `docDefaults`, a missing `settings.xml`, a page background, and whether
+every border side shares one weight.
+
+**Measured on the user's own failing documents:**
+
+    62_two_col_newsletter_pull_quote   1 page pdf, 2 docx   25% within 10 pt   order 33%
+                                       6 continuous sections, 4 column sections
+    63_three_column_brochure           1 page both          100% within 3 pt   order 13%  <-- mixing
+    02_stamp_rotated_15deg_upleft      1 page both          41% within 10 pt   order 20%
+
+**63 is the case that proves the reading-order check is necessary.** Its positions are perfect - median
+0.9 pt, every line within 3 pt - and it still selects as interleaved text, because the paragraphs are
+written in the wrong order. No position metric would ever have caught it.
+
