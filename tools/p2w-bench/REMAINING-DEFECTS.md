@@ -4654,3 +4654,32 @@ render) and `boq-tender-bill-of-quantities` (95.9 % of 36 rows). All three image
 columns, rows and values in their places, and on the bank statement the row count itself differs (38
 against 57) which is the tab-join count bug the 8 Nov batch already named. These are PASS documents
 and a tool to repair, not pages to fix. **Tries: 0 of 3 on the tool.**
+
+
+## `visual_score.py` - the drift as a number, for the whole corpus
+
+`verify_visual.py` scores one document. `visual_score.py` scores all of them and prints the worst
+first, so a defect that is universal stops being a complaint and becomes a number.
+
+    python3 tools/p2w-bench/visual_score.py --corpus <pdfdir> --out <docxdir> --top 25 --json out.json
+
+It prints a header of six corpus-wide counts and then a table of the worst documents:
+
+    median of medians       how far a line typically sits from where the page drew it
+    pages match the PDF     how many documents render the same page count
+    within 3 pt  (>=90%)    how many documents place almost every line within 3 pt
+    within 10 pt (>=90%)    the looser version of the same
+    reading order (>=90%)   how many read in the page's order - low here with a high w3 means the
+                            positions are right and the ORDER is wrong, which is what "paragraphs
+                            are mixed" means
+    cumulative drift        how many documents have |corr| > 0.5 between a line's y and its error,
+                            which is the signature of the error being accumulated rather than local
+
+**These six numbers are the measure for D-26 and for the multi-column work.** A fix that does not move
+them has not fixed anything, and that is the point: the gate counts words and pages, and the user's
+complaints are about position and order, which the gate cannot see at all.
+
+**Not yet run end to end** - the sandbox was recycled between writing it and having a corpus to point
+it at. It is the same comparison `verify_visual.py` performs, wrapped in a loop with the aggregate
+counts added, and `verify_visual.py` has been run against five real documents.
+
