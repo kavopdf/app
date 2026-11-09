@@ -4718,3 +4718,52 @@ its aggregate numbers are flat. And **a merged frame carries one stroke weight**
 rule is drawn at the outer rule's weight - which collides with D-22 and has to be settled when both
 are in.
 
+
+
+**A patch that fixes it, gate-clean, waiting to be applied.**
+`patches/d22-per-side-strokes.patch`, two files, +426/-34, no new source files. Proof script
+`tools/p2w-bench/compare_strokes.py`.
+
+**The model, parallel and not widened.** `Rules` gained `hStroke` / `vStroke`, each entry
+`{widthPt, rgb, alpha}` at the same index as the rule it belongs to, plus `addH/addV` and
+`hStrokeAt/vStrokeAt`. The arrays `{y,x1,x2}` / `{x,y1,y2}` are untouched, so the eleven existing
+readers cannot misread them. `rulesOf()`, `flipY()` and the pair-table rebuild were taught to carry
+the list, or the indices part.
+
+**Recording.** `RuleCollector.strokeOf()` reads `getLineWidth()`, the stroking colour and
+`getAlphaConstant()` at both sites. **One addition the brief did not name:** a rule is recorded while
+the path is *built*, so the real stroke is stamped at the paint operator (`strokePath`,
+`fillAndStrokePath`, `fillPath`). A fill-only `re` previously described its edges with the PDF's
+default 1 pt and no colour - **that is where "0.5 pt grey became 1 pt black" came from.** A fill-only
+thin band is a hairline, so it gets its own thickness and its fill colour as the stroke.
+
+**Six sides.** `Table.sideStroke[6]`; `markSideStrokes()` matches each outer side to the rule on that
+edge (2.5 pt tolerance, 24 pt for ink-bounded whitespace tables), each inner side by dominance (most
+rules, then most length - not a median), and lends a rule-less side the stroke the table *is* ruled at.
+
+**Opacity has no home in `w:tblBorders`** - the element has only `w:val`, `w:sz`, `w:space`, `w:color`.
+So a faint rule is written as the colour it looks like on white, `c' = c·a + 255(1−a)`. 396 of 900
+sides (44 %) are `sz=4 9B9B9B` because of it. The limitation is stated in the report, not hidden.
+`sz = clamp(round(w*8), 2, 96)` and the clamp never engaged - the range actually used is 3…16.
+
+**Measured, before and after, against every drawn rule in the PDF:**
+
+    sides matching a drawn PDF line     495/900 (55.0 %)  ->  895/900 (99.4 %)
+    distinct (sz, colour) strokes       1 (8/000000 x900) ->  14
+    documents at 0 %                   21                ->  0
+    documents at 100 %                 -                 ->  97
+    tables with non-uniform sides       0                 ->  32
+
+55 documents improved. **One got worse:** `07_stamp_over_table`, 6/6 to 5/6, because a green 1.44 pt
+stamp box drawn *over* the table wins the inner-side dominance. Not special-cased, and the report says
+why. Five misses remain, each explained. Gate: **no document got worse**. Engine suites 81/81, 29/29,
+3/3, hostile 9/9, fonts PASS.
+
+**Known limits, all in the report.** Opacity is a blended colour. Drawn-versus-`nil` is deliberately
+untouched, so `360_restaurant_menu` still claims four sides the page never draws - a *drawnness* bug,
+not a stroke one. `TABLE_BORDER_TW` still charges the old 0.75 pt to row heights, which matters to the
+row-height work. And the shape / `<a:ln>` path was already correct and is unmodified.
+
+**This settles the D-25 caveat too.** A merged stamp frame carried one stroke weight because there was
+only one weight to carry; with per-side strokes a merged frame can keep the thinner inner rule.
+
