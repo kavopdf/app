@@ -4188,3 +4188,41 @@ is taken from the previous line rather than from the model's own lineY gaps. **T
                                   rectangle. At 300 dpi the border, the inner rule and the
                                   corner curls are identical to the page's. Recorded as an
                                   eye-instruction failure, not a page defect.
+
+
+**Why the iLovePDF architecture cannot be copied directly, and what can be.**
+
+iLovePDF's `mc:Fallback` is a VML `v:group` carrying the outline as a `path` with the rotation
+baked into its coordinates, **plus the text as a `w:pict` picture**. That second part is the
+blocker: they have a working rasteriser on their side and this app does not.
+
+Measured, twice: LibreOffice 7.4 **ignores VML `style="rotation:N"` completely** at 15, 90 and 180
+degrees - the shape does not even move. So a plain VML text box in the fallback would fix nothing.
+Only the path-baked-into-coordinates form works, and that needs the text rasterised.
+
+And the rasteriser is exactly what failed on the user's device:
+
+    2026-11-08 12:48:36   FAIL   Page render failed   IllegalStateException: page 1
+
+So **the stamp's LibreOffice branch is blocked on Android's `PDFRenderer`, not on the XML.** Writing
+a half-fallback now would make LibreOffice show something worse than the upright glyphs it shows
+today, which at least draw the right words in the wrong orientation.
+
+**The route that needs no rasteriser at all - and it is the dual-layer construction:**
+
+- The **outline** becomes a freeform `a:custGeom` with the rotation **baked into its corner
+  coordinates** - no rotation attribute anywhere. Measured 0.05 pt in the research pass.
+- The **text** sits in the same shape as a `w:vanish` run, and in a `w:framePr` paragraph as real
+  text, so the words stay extractable and selectable.
+- LibreOffice renders this correctly because the geometry is transformed and the text is not
+  rotated at all - which is the one thing that renderer can do.
+
+**The trade-off, stated plainly:** in LibreOffice the lettering would be drawn as vector outlines
+rather than as selectable glyphs, so it looks right and copies wrong there. In Word and Google Docs
+the `mc:Choice` branch gives real rotated text. That is a better outcome than today's, where
+LibreOffice draws the words upright and visibly wrong.
+
+**What this needs before it can be built:** converting each glyph of the stamp's text into an outline
+path. `PDFBox` can give the glyph outlines; the work is in emitting them as `a:quadBezTo` /
+`a:cubicBezTo` inside the freeform, and it is a self-contained change to the stamp writer.
+
