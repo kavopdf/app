@@ -4709,3 +4709,48 @@ every border side shares one weight.
 0.9 pt, every line within 3 pt - and it still selects as interleaved text, because the paragraphs are
 written in the wrong order. No position metric would ever have caught it.
 
+
+
+### D-26  Line drift is universal, and it has two measurable causes
+
+**Reported from the phone:** in any PDF, one or two lines are always off - and it does not matter
+what they belong to, a table, a paragraph or anything else. It is a universal problem, not a defect
+of a particular document.
+
+**Measured with `verify_visual.py` over five documents.** For each line the render's y is compared
+with the PDF's y, and the correlation between the line's position on the page and its error says
+whether the error accumulates:
+
+    document                            lines  median dy  worst    >3pt   corr(y,dy)  reading
+    16_right_aligned_amounts_txtpos       64    -10.5     -38.2    54/64   -0.65      CUMULATIVE
+    20_numbered_list_separate_column      33    +51.1    +101.4    28/33   +0.72      CUMULATIVE
+    21_form_labels_x60_values_x300        30     +0.9      +2.4     0/30   +0.17      near-perfect
+    79_inr_indian_digit_grouping_table    31     -1.2      -9.0    12/31   -0.26      random
+    80_gstin_pan_cin_ifsc_table           63     -5.7     +79.7    53/63   -0.09      random
+
+**Two distinct causes, and they need different fixes.**
+
+1. **Cumulative drift** - `16` and `20`, with correlations of -0.65 and +0.72. The error grows with
+   the line's position on the page, which means it is being *accumulated*: `w:before` and `w:line`
+   are computed incrementally, each one relative to the previous line, so every rounding error is
+   carried into the next. Over 33 lines that reaches 101 pt - half a page.
+2. **Row height error** - `80` and `79`, with correlations near zero but a large share of lines over
+   3 pt (`80` has 53 of 63). The error is not cumulative, so it is per-row: a table row is landing at
+   a height that is not the page's row pitch.
+
+**The most useful number in the table is `21`.** Median 0.9 pt, worst 2.4 pt, zero lines over 3 pt.
+The positioning logic *can* be exact; the documents that are wrong have something specific broken,
+and this is not a limitation of the format or of the reader.
+
+**The fixes.**
+
+- **For the cumulative case:** compute `w:before` from the paragraph's **absolute** y in the PDF rather
+  than relative to the previous baseline, or re-sync the running position whenever the accumulated
+  error passes a threshold. Incremental computation is what turns a 0.3 pt rounding into 101 pt.
+- **For the row case:** set `w:trHeight` to the page's own row pitch exactly, not to a height derived
+  from the text.
+
+**Test:** `verify_visual.py` reports `within 3 pt` and `within 10 pt` per document, and the median and
+worst dy. The target is `21`'s numbers across the corpus, and any document below 90 % within 10 pt is
+a document with a specific cause to find - not a document to average away.
+
