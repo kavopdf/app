@@ -2194,7 +2194,7 @@ public final class DocxWriter {
                 // the box on the rectangle's own centre makes that term zero by construction, and
                 // the baseline is then placed by lIns/tIns, which rotate with the box. The
                 // reconstruction reproduces every stamp to under 0.001 pt.
-                float lineAngle = b.rotated && Math.abs(b.angle) < 1f ? 180f : b.angle;
+                float lineAngle = mirrored(b) ? 180f : b.angle;
                 // Where the page really put the baseline origin.
                 //
                 // Box.x/Box.y come from TextPosition.getXDirAdj()/getYDirAdj(), which are
@@ -2206,7 +2206,7 @@ public final class DocxWriter {
                 // placed the box from the mirrored pair, which is why 04's stamp has measured
                 // 294 and 353 pt from where the page draws it no matter what else changed.
                 float px = b.x, py = b.y;
-                if (b.rotated && Math.abs(b.angle) < 1f) {
+                if (mirrored(b)) {
                     px = ctx.pageWidthPt - b.x;
                     py = ctx.pageHeightPt - b.y;
                 }
@@ -2990,17 +2990,33 @@ public final class DocxWriter {
     }
 
     /**
+     * Is this line a whole turn round - a 180-degree stamp - rather than one character of a ring?
+     *
+     * <p>Both arrive with {@code rotated} set and {@code angle} 0, and the two need opposite
+     * treatment. A 180-degree line's {@code x}/{@code y} come back mirrored, so the writer
+     * mirrors them back to place it. A ring character's do not: {@code ringLines} writes the
+     * page point straight into the line, and mirroring THAT puts the character at
+     * {@code (pageWidth - x, pageHeight - y)} - on 352_certificate_ornate_border, whose page is
+     * landscape, a 333 pt lift that moved the whole seal to the top of the sheet and made it the
+     * worst mover in the corpus.
+     */
+    private static boolean mirrored(PdfToWord.Box b) {
+        return b.rotated && Math.abs(b.angle) < 1f && !b.ring;
+    }
+
+    /**
      * The stamp's frame around one line, in the page's own coordinates.
      *
      * <p>Both callers - the writer, and the pass that orders a page's blocks - have to agree
      * about where a line's baseline really is, so the mirroring a 180-degree line needs is
-     * applied in one place. PDFBox reports a turned line's origin in a frame turned with it, so
-     * on a 180-degree stamp both coordinates come back mirrored about the page.
+     * applied in one place (see {@link #mirrored}). PDFBox reports a turned line's origin in a
+     * frame turned with it, so on a 180-degree stamp both coordinates come back mirrored about
+     * the page.
      */
     private static Frame frameOfLine(java.util.List<Shape> shapes, PdfToWord.Box b, Ctx ctx) {
-        float angle = b.rotated && Math.abs(b.angle) < 1f ? 180f : b.angle;
+        float angle = mirrored(b) ? 180f : b.angle;
         float px = b.x, py = b.y;
-        if (b.rotated && Math.abs(b.angle) < 1f) {
+        if (mirrored(b)) {
             px = ctx.pageWidthPt - b.x;
             py = ctx.pageHeightPt - b.y;
         }
@@ -3366,7 +3382,7 @@ public final class DocxWriter {
         double th = Math.toRadians(lineAngle);
         float cosA = (float) Math.cos(th), sinA = (float) Math.sin(th);
         float startX, topPt;
-        if (b.rotated && Math.abs(b.angle) < 1f) {
+        if (mirrored(b)) {
             // Mirrored: the page-space top is the mirror of the box's own BOTTOM.
             topPt = ctx.pageHeightPt - b.y - (1f - LINE_BASE) * linePt;
             startX = px - len;
@@ -3729,13 +3745,25 @@ public final class DocxWriter {
         // paragraph rather than w:spacing on the table because OOXML gives a table no
         // before-spacing of its own.
         int spacerTw = 0;
-        if (!ctx.newPage && !ctx.lastWasTable && ctx.flowY >= 0f && !Float.isNaN(t.rowTopPt)
-                && !evenlySpaced(t.rowEdge)) {
+        if (!ctx.newPage && !ctx.lastWasTable && ctx.flowY >= 0f && !Float.isNaN(t.rowTopPt)) {
             // The table's top is placed ABSOLUTELY, from the flow's real position (D-26): the
             // spacer is the distance from where the reader will be to where the page drew the
             // table's top edge. The arithmetic this replaces measured that distance from the
             // previous PDF baseline less a line - and a table's top has been a few points out
             // ever since, which is the defect REMAINING-DEFECTS.md records as unfixed.
+            // WHY THE EVEN-GRID EXEMPTION IS GONE. This branch used to run only where
+            // evenlySpaced(t.rowEdge) was FALSE - a taller header, a wrapped address, a merged
+            // cell - on the reasoning that for an even grid "the average the writer used before
+            // was exactly right". It is not, and the error is not in the rows at all: it is in
+            // where the table STARTS. On marksheet-university-consolidated every table is a
+            // perfect grid (edges 100/118/136, 156/175/193..., pitch 18.4 pt), so every table
+            // took the `t.top` fallback below, whose line-and-a-bit threshold then dropped the
+            // gap entirely: the page put the first table's top rule at y=100 and the render at
+            // 86.75, a 13.25 pt lift carried by the table and by everything under it. The rows
+            // were right the whole time; only the top was wrong. This is the "table-top offset -
+            // one constant per page" that REMAINING-DEFECTS.md has recorded as unfixed since
+            // D-26, and an even grid is where it was worst, because that is the case the guard
+            // excluded.
             float prevLine = Math.max(4f, ctx.lastSize * LINE_FACTOR);
             float extraAbs = t.rowTopPt - flowTopPt(ctx);
             // Any positive gap is real for a table: its top edge is a RULE the page drew, not a
@@ -3996,12 +4024,21 @@ public final class DocxWriter {
                 // arrived as two. The inset gives way by the few twips that let the text fit;
                 // the column's own left edge is the page's, and a one-point x error is not the
                 // same defect as a value broken in half.
+                // The TEST and the CORRECTION have to be the same arithmetic. They were not:
+                // the test asked whether the text was wider than the room it had (no slack at
+                // all) and the correction then asked for a point more than the text is wide. A
+                // cell that overran its room by less than a point therefore never took the
+                // correction - and a point is exactly the margin this substitution lives on.
+                // gst-invoice-with-qr-code's Rate column is 840 twips with a 551 twip inset
+                // (the value is right-aligned, so the inset carries the alignment), which leaves
+                // 289 twips for 286 twips of "Rate": the page's own face fits it with three
+                // twips to spare, the render's does not, and the word broke as "Rat" over "e".
+                // A cell the page drew on one line became two, every row of the table doubled -
+                // 18.4 pt on the page, 35 pt in the render - and everything under it moved.
+                int needTw = Float.isNaN(textR) ? 0 : (int) Math.ceil(textR) + 20;
                 boolean textOverflows = !Float.isNaN(textR) && textR > 0f
-                        && insetTw + textR > spanTw;
-                if (textOverflows) {
-                    int needTw = (int) Math.ceil(textR) + 20;
-                    if (insetTw + needTw > spanTw) insetTw = Math.max(0, spanTw - needTw);
-                }
+                        && insetTw + needTw > spanTw;
+                if (textOverflows) insetTw = Math.max(0, spanTw - needTw);
                 inner.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(spanTw)
                         .append("\" w:type=\"dxa\"/>");
                 if (span > 1) inner.append("<w:gridSpan w:val=\"").append(span).append("\"/>");

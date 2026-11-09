@@ -157,6 +157,18 @@ public final class PdfToWord {
         public boolean rotated;
         /** The baseline's angle in degrees, clockwise. */
         public float angle;
+        /**
+         * One character of a seal drawn round a ring - see {@code ringLines}.
+         *
+         * <p>A ring's characters are the ONE place where a rotated line's {@code x}/{@code y}
+         * are already page coordinates. Everywhere else {@code x}/{@code y} come from
+         * {@code getXDirAdj()}/{@code getYDirAdj()}, which are measured in a frame turned with
+         * the text, and a line turned a whole 180 degrees therefore comes back mirrored - which
+         * is why the writer mirrors it back. A ring character carries no such turn: it sits at
+         * the page point it was drawn at, and mirroring it is what put 352's seal 333 pt up the
+         * page. This flag is how the writer can tell the two apart.
+         */
+        public boolean ring;
         public final List<Run> runs = new ArrayList<>();
 
         public String text() {
@@ -2738,6 +2750,7 @@ public final class PdfToWord {
             box.length = ln.length;
             box.rotated = ln.rotated;
             box.angle = ln.angle;
+            box.ring = ln.ring;
             box.runs.addAll(runsOf(ln));
             p.boxes.add(box);
         }
@@ -3594,6 +3607,7 @@ public final class PdfToWord {
             box.length = line.length;
             box.rotated = line.rotated;
             box.angle = line.angle;
+            box.ring = line.ring;
             List<Run> lineRuns = coalesceRuns(runsOf(line));
             // A fragment that opens with a combining mark is not a line of its own - it is the
             // tail of the word the previous fragment began. The page draws "केवल" as one line,
