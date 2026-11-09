@@ -4334,3 +4334,47 @@ files were read directly and both turned out to be the same engine. Four things 
 is the specification. Reading it took minutes; three rounds of derivation from the format spec did
 not get there.
 
+
+
+### D-22 (continued) - the plan, with the code sites named
+
+**The user confirmed on v3.53.4 that this is not fixed.** In the PDF some rules are thick and some
+thin, some dark and some faint; in the .docx they are all one weight and one colour. The first half
+of D-22 shipped - a stroked `Shape` now carries its own `lineAlpha` from the PDF's `CA` - but a
+**table border is still a constant**: `TABLE_RULE_SZ = 8` and `TABLE_RULE_COLOUR = "000000"` on all
+six sides of every table.
+
+**Why it is not a one-line change.** The model cannot carry the stroke:
+
+    Rules.horizontal   float[]{y, x1, x2}      position and extent only
+    Rules.vertical     float[]{x, y1, y2}      no width, no colour, no alpha
+
+The recording sites are `PdfToWord.java` around **4172-4177** (a `re` becomes four edges) and
+**4318-4320** (a straight segment). At both, `getGraphicsState().getLineWidth()` and the stroke
+colour are in hand - they are already read at **4039** and **4102** for the shape path - so the data
+exists, it is simply thrown away before it reaches a rule.
+
+**The change, in order, with the safe route marked:**
+
+1. **Add parallel lists rather than widening the arrays.** `Rules` gains
+   `List<float[]> hStroke` and `List<float[]> vStroke`, each entry `{widthPt, rgb}` at the same index
+   as the rule it belongs to. Widening `float[]{y,x1,x2}` to five elements would touch every reader
+   of `rules.horizontal` and `rules.vertical` and one missed reader is a silent misread; a parallel
+   list cannot break a reader that does not know about it.
+2. **Record the stroke** at both sites: `getGraphicsState().getLineWidth()` and the stroke colour.
+3. **`DocxWriter.borders` takes six weights and six colours**, one per side, from the rule that
+   actually lies on that side - not a median (that was the first attempt and it produced numbers
+   corresponding to nothing), and not a constant (that is what ships now).
+4. **Opacity has no home in `w:tblBorders`** - the element has `w:val`, `w:sz`, `w:space`, `w:color`
+   and nothing else. A faint rule must therefore be expressed as a **lighter colour** (blend toward
+   the page) rather than as an alpha, and that limitation is to be recorded, not hidden. A stroked
+   *shape* keeps true alpha, which is already shipped.
+5. **Test:** for each document, take every drawn line in the PDF with its width and colour and every
+   line the writer emits, and compare pair by pair. The metric is the share that match within
+   tolerance, and it must rise. "The borders are uniform" is not the test, and neither is "they
+   differ" - the test is that each one matches the page.
+
+**What not to do:** do not take a median of the strokes near a table (attempt 1, produced arbitrary
+variation that matched nothing), and do not make the borders a constant (attempt 2, what ships now).
+Both were tried and both are wrong for the same reason - neither is a measurement of the side.
+
