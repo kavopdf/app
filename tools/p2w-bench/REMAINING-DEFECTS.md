@@ -4849,3 +4849,68 @@ independently removed the same `extent / rowCount` average. Applying both blind 
 average's removal twice. The per-row baseline that the cumulative report asks for in its section 6 is
 where they meet.
 
+
+
+**A patch that turns columns into cells, gate-clean.** `patches/COL-A-columns-as-cells.patch`.
+
+The D8-C approach was re-applied by hand because its patch no longer applies - `pageBody()` now runs
+twice, `ctx.secCols` was added, and `fitPage()` returns `null` instead of clamping. Multi-column pages
+are now written as a fixed-geometry layout table, one cell per column and one row per band, with the
+full-width bands as ordinary paragraphs, and **every continuous section break is deleted**.
+Corpus-wide: `<w:type w:val="continuous"/>` **26 to 0**, `w:cols w:num="2..9"` **17 to 0**.
+
+**Two inputs had drifted and had to be rebuilt.** `page.columns` was computed *before* the gutter
+detectors finished, so five of six documents reported `columns = 1`; it now comes from the final
+`starts` list. And `ctx.colLeft` is the wrong source for column edges - newspaper's masthead is
+tagged column 1 so its edge read 99.7 pt against 303, and 63 has no entry at all for columns 1-2;
+edges now come from the page's own recurring fragment left edges. The band is the longest run of
+baselines where two columns are *both* set, so a drop cap or an "Edition 2026" line cannot drag it up
+over the masthead.
+
+**Four geometry defects D8-C never met:** cell indents subtracted the wrong edge (63 wrapped to one
+character per line, three pages), the row height was declared as the band's, `hRule="atLeast"` let
+LibreOffice size the row to the rest of the sheet, and bands were written in block order rather than
+top to bottom.
+
+**Measured:**
+
+    document                             pages     within 10 pt      reading order
+    62_two_col_newsletter_pull_quote      2 -> 1    25 -> 100 %       33 -> 89 %
+    63_three_column_brochure              1 -> 1   100 ->  96 %       13 -> 96 %
+    newspaper-2col-fullwidth-headline     2 -> 1     0 ->  97 %      100 -> 98 %
+    brochure-3col-with-sidebar-box        1 -> 1     1 ->  64 %       33 -> 92 %
+    annual-review-2col-uneven-columns     2 -> 1    23 -> 100 %       36 -> 96 %
+    journal-2col-with-footnotes           2 -> 1     0 ->  45 %       56 -> 52 %
+
+**62 is the document the user reported:** two pages to one, 25 % to 100 % within 10 pt, reading order
+33 % to 89 % - the mixing is what they described, and it is largely gone. **63's reading order goes
+13 % to 96 %**, which was its whole complaint.
+
+**Two flags, not hidden.** 63's worst dy is now 34.4 pt where it was 1.8 - one heading row lands a
+line low; the order is fixed and the position is slightly worse. And `brochure-3col` loses five source
+lines (88 % matched, was 98 %) and is still only 64 % within 10 pt - the weakest of the six and the
+first place to look next. `journal` deliberately gets no table, because a footnote spans both columns
+inside the band, so it falls back to single-column flow as the brief required.
+
+Gate: **no document got worse**, 26 counts improved, 0 regressed. `TestPdfToWord` 29/29, `TestNorms`
+13/13, `verify-engine.sh` clean.
+
+### Integration plan for the five patches
+
+All five are gate-clean **individually** and none has been applied. They overlap:
+
+| patch | files | touches |
+|---|---|---|
+| D-25 stamp objects | DocxWriter, PdfToWord | `stampFrames`, `orderStamps`, `Shape.consumed` |
+| D-22 per-side strokes | DocxWriter, PdfToWord | `Rules` model, `borders()`, `TABLE_RULE_SZ` |
+| D-26-A cumulative | DocxWriter, PdfToWord | `ctx.flowY`, `w:before`, `rowEdge`, `rowTopPt` |
+| D-26-B row heights | DocxWriter, PdfToWord | `w:trHeight`, `rowH`, `rowLead` |
+| COL-A columns | DocxWriter, PdfToWord | `pageBody()`, `page.columns`, `ctx.colLeft` |
+
+**Order matters.** D-22 first (it changes the `Rules` model that D-26-A reads). Then D-26-A, then
+D-26-B - and those two must be **merged by hand**, not stacked, because both removed the same
+`extent / rowCount` average. Then D-25, then COL-A last (it rewrites `pageBody()`, which everything
+else passes through).
+
+**Every step re-gated.** A patch that is clean alone is not necessarily clean on top of another.
+
