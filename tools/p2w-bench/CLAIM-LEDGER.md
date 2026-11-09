@@ -604,3 +604,23 @@ The three `order` findings on 353, 364 and 370 are verified while the eye passed
 `--combine` decided all three on the eye. They are the band-join measurement: a render row that
 holds two of the page's lines in one band, or a rotated edge text joining the row it sits beside.
 Repair ticket for the tool, not a defect in the documents.
+
+### The 351/360 rules regression: try 1 measured, then reverted
+
+`rules` is now the only claim type that can say "the render draws a line the page does not",
+and on 351 and 360 it was right. The print at the point of suspicion named the cause in one
+line: `pageDrewRule`'s four side tests ask whether a shape's EDGE is near the table's edge and
+whether its extent overlaps the table, but never whether the shape is a rule. A 7.8 x 7.8 pt
+vegetarian marker square and an 8.7 x 8.7 pt bubble were each counted as a table's left and
+bottom rule.
+
+Classifying a shape the way the bench already does elsewhere fixed the claim exactly - 360's
+rules 13 -> 5 against the page's 5, 351's 15 -> 11 with the four box sides gone and the page's
+own 11 renderable rules kept - and the position ratchet rejected it anyway: 360 fell from
+11.6 % to 2.9 % of lines in tolerance and its second menu block jumped 200 pt up the page. A
+drawn border is what makes the renderer give a row the height the writer asked for, so the row
+pitch and the border cannot be decided by separate flags on the same table. Reverted, baseline
+untouched, and the next try starts from the page's measured row pitch instead.
+
+This is the ratchet doing its job on a fix that was right about the claim it targeted and wrong
+about the page underneath it.

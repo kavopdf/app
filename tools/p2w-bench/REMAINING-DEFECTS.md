@@ -4104,11 +4104,42 @@ is not read as a table rule", and it names 351 and 360 among the four documents 
 `nil`. Today both are ruled, so the guard is not doing what it says - either the table's bounds
 moved under it or `t.ruled` is set by the ruled pass on a page that draws no grid.
 
-**Before editing the condition, print it.** The count at the point of suspicion is not yet
-taken: nobody has printed, for these two documents, whether `t.ruled` is true or
-`pageDrewRule` returned true, and which shape satisfied it. That print is the first step of
-try 1 - the 8 Nov note in PIPELINE.md records four plausible hypotheses that each died on a
-measurement, and this is the same shape of question. **Tries: 0 of 3.**
+**Try 1 - the print, then the fix, then the ratchet saying no. 9 Nov, measured and reverted.**
+
+The print was taken first and it named the cause in one line. Neither `t.ruled` nor the frame
+branch was responsible: the SIDE tests were. `pageDrewRule`'s four side tests check only that a
+shape's edge is within 2.5 pt of the table's edge and that its extent overlaps the table, and
+they never ask whether the shape is a RULE at all.
+
+    PROBE side-match t=40.0,120.0,563.3,242.0 shape=39.6,135.6,7.8,7.8  left=true
+    PROBE table ruled=false final=true bounds=40.0,120.0,563.3,242.0 shapes=45
+
+That shape is 360's 7.8 x 7.8 pt vegetarian marker square, 0.4 pt from the table's left edge.
+On 351 it is an 8.7 x 8.7 pt bubble whose bottom lands 2.35 pt above the grid's bottom. Both
+made a side "drawn", and one drawn side turns all six borders on.
+
+The fix classified a shape the way the bench already does everywhere else - a rule is a band
+thin in one direction and long in the other, `RULE_MAX_PT` 2.0 (the corpus's widest drawn rule
+is D-20's 1.25 pt border) - and applied it to the four side tests. It works on the claim it
+targets: **360's rule count goes 13 -> 5 against the page's 5**, and **351's goes 15 -> 11**
+(the four box sides gone, the page's own 11 renderable rules kept; the page draws 13 because
+two of its ten barcode bars merge in the render, which is unchanged by this and present before).
+
+**Then the position ratchet rejected it.** `360_restaurant_menu` 11.6 % -> 2.9 % of lines in
+tolerance, and the second menu block jumps 200 pt up the page. The reason is a second coupling
+nobody had written down: a drawn border is what makes LibreOffice give the row the height the
+writer asks for. Take the border off and every row loses about 8 pt, so seven rows of a menu
+lose 56 pt and everything below moves up. Splitting the two questions - row height from the old
+wide test, borders from the narrow one - was tried as try 1b and **measured the same 2.9 %**:
+the row height the writer requests already assumes the border, so the pitch cannot be held by
+that flag at all.
+
+**What the next try has to do.** Take the row pitch from the page's own measured row baseline
+gaps, the same source D-01/D-06 use for line pitch, and stop deriving it from `ruledTable`.
+Then the border question is free to answer only the border question. That is a model change in
+the writer's row-height path, not a threshold, and it needs its own run with the position
+ratchet - which is exactly what refused this one. Reverted; `DocxWriter.java` is byte-identical
+to the committed version and the baseline is untouched. **Tries: 2 of 3.**
 
 ### OPEN - a two-column label/value block wraps its value (365)
 
