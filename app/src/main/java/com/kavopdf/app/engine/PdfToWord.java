@@ -248,6 +248,27 @@ public final class PdfToWord {
          * lines the page never drew, so each side is decided on its own evidence.
          */
         public boolean innerH, innerV;
+        /**
+         * The stroke the page drew on each of the table's six sides, in
+         * {@link DocxWriter#TABLE_SIDES} order - {@code {top, left, bottom, right, insideH,
+         * insideV}} - each {@code {widthPt, rgb, alpha}}, or null where no rule this pass could
+         * see lies on that side.
+         *
+         * <p>D-22. {@code w:tblBorders} carried one constant weight and one constant colour on
+         * all six sides of every table (see {@code DocxWriter.borders}), so a table the page
+         * ruled at 0.4 pt in grey came out at 1 pt in black and a table the page ruled at 2 pt
+         * came out at 1 pt too. The user's words: some rules are thick, some thin, some dark,
+         * some faint, and in the .docx they were all one weight and one colour. Each side now
+         * carries the stroke of the rule that actually lies on it - filled by
+         * {@code PdfToWord.markSideStrokes}, where the page's own rule list is in hand.
+         *
+         * <p>Null is not "undrawn": whether a side is drawn is still decided by {@link #ruled},
+         * {@link #innerH} and {@link #innerV}. Null only means no rule of its own was read, and
+         * {@code markSideStrokes} then lends it the stroke the table's other rules are drawn at;
+         * a table with no rule at all leaves it null, and the writer falls back to the old
+         * constant - so a side that used to be right stays right.
+         */
+        public final float[][] sideStroke = new float[6][];
         public float top, bottom, left, right;
         public int column;
     }
@@ -800,6 +821,11 @@ public final class PdfToWord {
             else for (Line line : lines) if (line.inside(t)) line.consumed = false;
         }
         tables = solid;
+        // Every table that survives carries the stroke the page drew on each of its six sides,
+        // read here - the last point at which the page's own rule list is still in hand and the
+        // table's bounds are final. D-22: the writer used to draw all six at one constant
+        // weight and one constant colour whatever the page did.
+        for (Table t : tables) markSideStrokes(t, topRules);
 
         // Text already sitting in a table cell must not also come out as body text: the bill of
         // lading appeared twice, once as a run-on paragraph and once as its proper table.
@@ -3762,6 +3788,47 @@ public final class PdfToWord {
     static final class Rules {
         final List<float[]> horizontal = new ArrayList<>();   // {y, x1, x2}
         final List<float[]> vertical = new ArrayList<>();     // {x, y1, y2}
+        /**
+         * The stroke each horizontal rule was drawn with: {@code {widthPt, rgb, alpha}}, at the
+         * SAME index as its rule in {@link #horizontal}.
+         *
+         * <p>D-22: a rule's weight and opacity are the page's own, and the model had nowhere to
+         * keep them - a rule was three floats of geometry, so every table border downstream was
+         * written at one constant weight and one constant colour however the page drew it.
+         *
+         * <p>These are PARALLEL lists, not wider arrays. Widening {@code {y, x1, x2}} to six
+         * floats would silently misread at every existing reader of {@code rules.horizontal}
+         * (there are eleven of them, in the column pass, the table passes and the row pass), and
+         * a reader that does not know about the extra elements reads index 1 and 2 as the
+         * segment's ends - a wrong answer, not a compile error. A list nobody reads yet cannot
+         * break anybody. Add through {@link #addH} / {@link #addV} so the two lists stay in step.
+         */
+        final List<float[]> hStroke = new ArrayList<>();
+        /** The stroke each vertical rule was drawn with, at the same index as {@link #vertical}. */
+        final List<float[]> vStroke = new ArrayList<>();
+
+        /** Records a horizontal rule and the stroke it was drawn with, index for index. */
+        void addH(float[] rule, float[] stroke) {
+            horizontal.add(rule);
+            hStroke.add(stroke);
+        }
+
+        /** Records a vertical rule and the stroke it was drawn with, index for index. */
+        void addV(float[] rule, float[] stroke) {
+            vertical.add(rule);
+            vStroke.add(stroke);
+        }
+
+        /** The stroke at a horizontal rule's index, or null when the lists have parted. */
+        float[] hStrokeAt(int i) {
+            return i >= 0 && i < hStroke.size() ? hStroke.get(i) : null;
+        }
+
+        /** The stroke at a vertical rule's index, or null when the lists have parted. */
+        float[] vStrokeAt(int i) {
+            return i >= 0 && i < vStroke.size() ? vStroke.get(i) : null;
+        }
+
         int images;
         /**
          * The raster images the page draws, in draw order, with the rectangle each one covers.
@@ -3800,6 +3867,8 @@ public final class PdfToWord {
         private float pxMax = Float.NaN, pyMax = Float.NaN;
         /** What the path is made of - a rectangle, one straight line, or something curved. */
         private int pMoves, pLines, pCurves, pRects;
+        /** How many rules the lists held when the current path started (see stampPathRules). */
+        private int pathRulesH, pathRulesV;
         /** The single segment's own end points, for the axis-aligned line case. */
         private float segX0 = Float.NaN, segY0 = Float.NaN, segX1 = Float.NaN, segY1 = Float.NaN;
         /**
@@ -3859,6 +3928,10 @@ public final class PdfToWord {
             cmds = new java.util.ArrayList<>();
             cmdsOverflow = false;
             pathClosed = false;
+            // The rule lists' sizes at the start of this path: the rules this path adds are the
+            // ones the paint operator will be told about when it arrives.
+            pathRulesH = rules.horizontal.size();
+            pathRulesV = rules.vertical.size();
         }
 
         /** Records one path operator, unless the path has grown past what a shape can carry. */
@@ -4054,6 +4127,69 @@ public final class PdfToWord {
             addShape(cl, fill, alpha, line, lw, pathIsEllipse() ? 1 : 0);
         }
 
+        /**
+         * The stroke in force right now, as {@code {widthPt, rgb, alpha}} - the weight, the
+         * colour and the constant alpha the page will paint the current path with.
+         *
+         * <p>The same three values the shape path already reads (4039, 4102 and
+         * {@code addShape}). A rule was recorded as geometry alone, so the page's 0.4 pt grey
+         * grid rule and its 2 pt black frame arrived at the writer as the same thing.
+         */
+        private float[] strokeOf() {
+            int rgb = rgbOf(getGraphicsState().getStrokingColor());
+            // No stroke colour in force means there is no stroke to describe. A `re` that the
+            // page only FILLS is still a table-border candidate here, and its four edges used to
+            // be recorded with the PDF's default line width (1 pt) and no colour at all - which
+            // is how a 0.5 pt grey grid rule came out as a 1 pt black border. Record nothing and
+            // the side falls back to the table's own stroke instead.
+            if (rgb < 0) return null;
+            float w = Math.max(0.1f, getGraphicsState().getLineWidth());
+            float a = (float) getGraphicsState().getAlphaConstant();
+            return new float[]{w, rgb, a};
+        }
+
+        /**
+         * Gives the rules this path added the stroke the path is actually painted with.
+         *
+         * <p>A rule is recorded while the path is being BUILT, and the paint operator comes
+         * after it: {@code re ... S} strokes, {@code re ... f} fills and paints no line at all.
+         * The graphics state during construction is usually the one that paints, but not when a
+         * page draws a filled band and leaves a stroking colour set from earlier - 07_stamp_
+         * over_table then reported a 1.5 pt green column separator inside a table the page rules
+         * in 0.7 pt black. So the stroke is stamped here, at the operator, where it is known.
+         *
+         * <p>A fill-only path that is a thin band IS a hairline: the band's thickness is the
+         * weight and its fill colour is the colour, which is how most generators draw a rule. Any
+         * other fill-only path paints no rule, and its edges keep no stroke at all - the table
+         * border then falls back to the table's own stroke rather than to a colour nothing on the
+         * page uses.
+         */
+        private void stampPathRules(boolean stroked) {
+            float[] stroke = stroked ? strokeOf() : bandFillStroke();
+            for (int i = Math.max(0, pathRulesH); i < rules.horizontal.size(); i++) {
+                if (i < rules.hStroke.size()) rules.hStroke.set(i, stroke);
+            }
+            for (int i = Math.max(0, pathRulesV); i < rules.vertical.size(); i++) {
+                if (i < rules.vStroke.size()) rules.vStroke.set(i, stroke);
+            }
+        }
+
+        /** The stroke a fill-only path implies: a thin band is a hairline, anything else none. */
+        private float[] bandFillStroke() {
+            if (Float.isNaN(pxMin)) return null;
+            if (pCurves != 0) return null;
+            boolean rect = pRects == 1 && pLines == 0;
+            boolean quad = pLines == 4 && pRects == 0;
+            if (!rect && !quad) return null;
+            int fill = rgbOf(getGraphicsState().getNonStrokingColor());
+            if (fill < 0) return null;
+            float alpha = (float) getGraphicsState().getNonStrokeAlphaConstant();
+            float hgt = pyMax - pyMin, wid = pxMax - pxMin;
+            if (hgt <= 1.5f && wid > 2f) return new float[]{Math.max(0.1f, hgt), fill, alpha};
+            if (wid <= 1.5f && hgt > 2f) return new float[]{Math.max(0.1f, wid), fill, alpha};
+            return null;
+        }
+
         /** True when two boxes are the same to a hundredth of a point. */
         private static boolean same(float[] a, float[] b) {
             if (a == null || b == null) return a == b;
@@ -4167,14 +4303,20 @@ public final class PdfToWord {
             float maxX = Math.max(Math.max(p0.x, p1.x), Math.max(p2.x, p3.x));
             float minY = Math.min(Math.min(p0.y, p1.y), Math.min(p2.y, p3.y));
             float maxY = Math.max(Math.max(p0.y, p1.y), Math.max(p2.y, p3.y));
-            // A rectangle is a table border candidate: keep all four edges.
+            // A rectangle is a table border candidate: keep all four edges, each with the
+            // stroke the page is drawing the path with right now. The width, the colour and
+            // the alpha are all in the graphics state at this point, and they are the ones a
+            // `S` after this `re` will paint with. (A `re` that is only filled, never stroked,
+            // records the fill-only stroke it did not use; see D-22's note in the report - a
+            // path's own paint operator is not visible here.)
+            float[] stroke = strokeOf();
             if (maxX - minX > 2) {
-                rules.horizontal.add(new float[]{minY, minX, maxX});
-                rules.horizontal.add(new float[]{maxY, minX, maxX});
+                rules.addH(new float[]{minY, minX, maxX}, stroke);
+                rules.addH(new float[]{maxY, minX, maxX}, stroke);
             }
             if (maxY - minY > 2) {
-                rules.vertical.add(new float[]{minX, minY, maxY});
-                rules.vertical.add(new float[]{maxX, minY, maxY});
+                rules.addV(new float[]{minX, minY, maxY}, stroke);
+                rules.addV(new float[]{maxX, minY, maxY}, stroke);
             }
             // A path may mix a `re` with other segments - a hatch region clips a rectangle and
             // then draws lines in the same path object - so the rectangle is part of the path
@@ -4314,10 +4456,15 @@ public final class PdfToWord {
             grow(x, y);
             segX0 = lastX; segY0 = lastY; segX1 = x; segY1 = y;
             float dx = Math.abs(x - lastX), dy = Math.abs(y - lastY);
+            // The stroke this segment will be painted with: the same three values the shape
+            // path reads at 4039 and 4102, taken here so a rule keeps the page's own weight.
+            float[] stroke = null;
             if (dx <= 0.8f && dy > 2f) {
-                rules.vertical.add(new float[]{lastX, Math.min(lastY, y), Math.max(lastY, y)});
+                stroke = strokeOf();
+                rules.addV(new float[]{lastX, Math.min(lastY, y), Math.max(lastY, y)}, stroke);
             } else if (dy <= 0.8f && dx > 2f) {
-                rules.horizontal.add(new float[]{lastY, Math.min(lastX, x), Math.max(lastX, x)});
+                stroke = strokeOf();
+                rules.addH(new float[]{lastY, Math.min(lastX, x), Math.max(lastX, x)}, stroke);
             }
             lastX = x;
             lastY = y;
@@ -4355,6 +4502,7 @@ public final class PdfToWord {
 
         @Override
         public void strokePath() {
+            stampPathRules(true);
             emitStroke();
             commitClip();
             resetPath();
@@ -4363,6 +4511,7 @@ public final class PdfToWord {
 
         @Override
         public void fillPath(android.graphics.Path.FillType fillType) {
+            stampPathRules(false);
             emitFill(false);
             commitClip();
             resetPath();
@@ -4371,6 +4520,7 @@ public final class PdfToWord {
 
         @Override
         public void fillAndStrokePath(android.graphics.Path.FillType fillType) {
+            stampPathRules(true);
             emitFill(true);
             commitClip();
             resetPath();
@@ -4495,6 +4645,10 @@ public final class PdfToWord {
             collector.processPage(page);
             out.horizontal.addAll(collector.rules.horizontal);
             out.vertical.addAll(collector.rules.vertical);
+            // The strokes travel with their rules or the parallel lists part here, and every
+            // index after this point reads another rule's weight. D-22.
+            out.hStroke.addAll(collector.rules.hStroke);
+            out.vStroke.addAll(collector.rules.vStroke);
             out.images = collector.rules.images;
             out.pictures.addAll(collector.rules.pictures);
             out.shapes.addAll(collector.rules.shapes);
@@ -4531,6 +4685,182 @@ public final class PdfToWord {
                 break;
             }
         }
+    }
+
+    /** How far off a table's own edge a rule may sit and still be that side's rule. */
+    private static final float SIDE_TOL = 2.5f;
+    /**
+     * How far off it may sit when the table's bounds are its TEXT's ink rather than the
+     * rectangle the page strokes - the whitespace pass measures ink, so the frame the page
+     * draws round a table can stand 8 to 15 pt outside it (04_stamp_180deg: 8.3 pt left of the
+     * first character, 14.3 pt above the first row).
+     */
+    private static final float SIDE_FRAME_TOL = 24f;
+
+    /**
+     * Records, on the table, the stroke the page drew along each of its six sides (D-22).
+     *
+     * <p>Called where the page's own rule list is in hand - the same place
+     * {@link #markInnerRules} is called, and in the lines' own frame (y down). Each side is
+     * matched on its own: the outer four against the rules that lie along that edge, the two
+     * inner sides against the rules that run across the table's band.
+     *
+     * <p>Which rule wins when several lie on one side. On an outer edge the NEAREST rule wins -
+     * a table whose top edge is also the bottom edge of the band above it has two rules within
+     * tolerance and the one the table's own line is the nearer. Across an inner side the rule
+     * that covers the most length wins, so a 12-row grid reports the weight it is ruled at
+     * twelve times rather than the one odd rule some generator drew once. Both are a real rule
+     * on that side; neither is a median over the page, which is what the earlier attempt
+     * computed and why its numbers matched no drawn line anywhere.
+     */
+    private static void markSideStrokes(Table t, Rules rules) {
+        if (rules == null) return;
+        float w = t.right - t.left, h = t.bottom - t.top;
+        if (w <= 0f || h <= 0f) return;
+        t.sideStroke[0] = edgeStroke(rules, true, t.top, t.left, t.right, w);      // top
+        t.sideStroke[2] = edgeStroke(rules, true, t.bottom, t.left, t.right, w);   // bottom
+        t.sideStroke[1] = edgeStroke(rules, false, t.left, t.top, t.bottom, h);    // left
+        t.sideStroke[3] = edgeStroke(rules, false, t.right, t.top, t.bottom, h);   // right
+        t.sideStroke[4] = insideStroke(rules, true, t.top, t.bottom, t.left, t.right, w);   // insideH
+        t.sideStroke[5] = insideStroke(rules, false, t.left, t.right, t.top, t.bottom, h);  // insideV
+        // A side the page drew no rule along still gets a weight, because the side is written
+        // either way. It takes the table's own stroke rather than the writer's old constant.
+        float[] tableStroke = bandStroke(rules, t);
+        if (tableStroke != null) {
+            for (int i = 0; i < 6; i++) if (t.sideStroke[i] == null) t.sideStroke[i] = tableStroke;
+        }
+    }
+
+    /**
+     * The stroke of the rule lying along one outer edge of a table, or null.
+     *
+     * @param horizontal true for a rule that runs across the page, matched on its y
+     * @param at         the edge's coordinate in the rules' own frame
+     * @param a0,a1      the extent the rule has to cover, along the table's other axis
+     * @param span       the table's size along that axis, for the half-coverage test
+     */
+    private static float[] edgeStroke(Rules rules, boolean horizontal, float at,
+                                      float a0, float a1, float span) {
+        List<float[]> geom = horizontal ? rules.horizontal : rules.vertical;
+        float[] best = null;
+        float bestDistance = Float.MAX_VALUE;
+        for (int i = 0; i < geom.size(); i++) {
+            float[] g = geom.get(i);
+            float distance = Math.abs(g[0] - at);
+            if (distance > SIDE_FRAME_TOL) continue;
+            // Half the table's width has to lie on the rule: a 3 pt tick beside the corner is
+            // not the table's edge, and neither is the page frame.
+            if (Math.min(g[2], a1) - Math.max(g[1], a0) < span * 0.5f) continue;
+            float[] stroke = horizontal ? rules.hStrokeAt(i) : rules.vStrokeAt(i);
+            if (stroke == null) continue;
+            // Exact beats frame, then the nearest wins; a tie goes to the heavier rule, which
+            // is the one a reader sees as the edge.
+            boolean exact = distance <= SIDE_TOL;
+            if (best == null) {
+                best = stroke;
+                bestDistance = distance;
+                continue;
+            }
+            boolean bestExact = bestDistance <= SIDE_TOL;
+            if (exact != bestExact) {
+                if (exact) { best = stroke; bestDistance = distance; }
+                continue;
+            }
+            if (distance < bestDistance - 0.01f) {
+                best = stroke;
+                bestDistance = distance;
+            } else if (Math.abs(distance - bestDistance) <= 0.01f && stroke[0] > best[0]) {
+                best = stroke;
+            }
+        }
+        return best;
+    }
+
+    /**
+     * The stroke the page rules one inner side of a table at, or null.
+     *
+     * <p>An inner side is one element in {@code w:tblBorders} for every separator of that
+     * direction, so the rules inside the band have to be reduced to one answer: the stroke
+     * carrying the most length wins. A row separator that is 0.4 pt grey for twelve rows and a
+     * single 2 pt black line under the header row report 0.4 pt grey, which is what the table
+     * is ruled at.
+     */
+    private static float[] insideStroke(Rules rules, boolean horizontal, float lo, float hi,
+                                        float a0, float a1, float span) {
+        java.util.LinkedHashMap<String, float[]> byStroke = new java.util.LinkedHashMap<>();
+        tally(byStroke, rules, horizontal, lo + 1f, hi - 1f, a0, a1, span);
+        return dominant(byStroke);
+    }
+
+    /**
+     * The stroke this table's own rules are drawn at, for a side that has no rule of its own.
+     *
+     * <p>A table the page rules only across (303_discharge_summary draws 35 horizontal rules at
+     * 0.4 pt and not one vertical rule) still has six sides in {@code w:tblBorders}, because the
+     * ruled pass put its bounds on the grid. Two of those sides have no rule to read a weight
+     * off. The constant that stood in for them was 1 pt black against a table ruled at 0.4 pt
+     * black - a side visibly heavier than every other side of the same table, which is the very
+     * thing D-22 is about. So a side with no rule of its own takes the stroke the table's rules
+     * ARE drawn at: the stroke carrying the most length among the rules that lie anywhere on or
+     * inside the table. It is the table's own ink, not a median over the page.
+     */
+    private static float[] bandStroke(Rules rules, Table t) {
+        float w = t.right - t.left, h = t.bottom - t.top;
+        java.util.LinkedHashMap<String, float[]> byStroke = new java.util.LinkedHashMap<>();
+        // The frame tolerance, not the side tolerance: a whitespace table's bounds are its ink,
+        // so the rules round it stand up to 15 pt outside its own band (see SIDE_FRAME_TOL).
+        tally(byStroke, rules, true, t.top - SIDE_FRAME_TOL, t.bottom + SIDE_FRAME_TOL,
+                t.left, t.right, w);
+        tally(byStroke, rules, false, t.left - SIDE_FRAME_TOL, t.right + SIDE_FRAME_TOL,
+                t.top, t.bottom, h);
+        return dominant(byStroke);
+    }
+
+    /**
+     * Adds the rules that cross one band to a per-stroke running total of covered length.
+     *
+     * @param lo,hi the band's edges, in the rules' own frame, exclusive
+     * @param a0,a1 the extent a rule has to cover, along the table's other axis
+     * @param span  the table's size along that axis, for the half-coverage test
+     */
+    private static void tally(java.util.LinkedHashMap<String, float[]> byStroke, Rules rules,
+                              boolean horizontal, float lo, float hi,
+                              float a0, float a1, float span) {
+        List<float[]> geom = horizontal ? rules.horizontal : rules.vertical;
+        for (int i = 0; i < geom.size(); i++) {
+            float[] g = geom.get(i);
+            if (g[0] <= lo || g[0] >= hi) continue;
+            float cover = Math.min(g[2], a1) - Math.max(g[1], a0);
+            if (cover < span * 0.5f) continue;
+            float[] stroke = horizontal ? rules.hStrokeAt(i) : rules.vStrokeAt(i);
+            if (stroke == null) continue;
+            String key = Math.round(stroke[0] * 8f) + "|" + (int) stroke[1] + "|"
+                    + Math.round(stroke[2] * 20f);
+            float[] acc = byStroke.get(key);
+            // {rules, covered length, widthPt, rgb, alpha} - the rule COUNT decides, because one
+            // long rule that crosses the band is as likely a stamp's edge or a band's outline as
+            // a separator, while the twelve rules a grid is ruled with are the grid.
+            if (acc == null) byStroke.put(key, new float[]{1f, cover, stroke[0], stroke[1], stroke[2]});
+            else { acc[0] += 1f; acc[1] += cover; }
+        }
+    }
+
+    /**
+     * The stroke the most rules in a {@link #tally} are drawn with, or null when it is empty.
+     *
+     * <p>Most rules, then most covered length. Counting the rules rather than summing their
+     * length is what keeps a stamp's green outline - one 1.5 pt rule lying inside a table's band
+     * on 07_stamp_over_table - from being read as the weight the table's column separators are
+     * ruled at. The length is the tie-break, so two strokes used equally often resolve to the one
+     * that covers more of the table.
+     */
+    private static float[] dominant(java.util.LinkedHashMap<String, float[]> byStroke) {
+        float[] best = null;
+        for (float[] acc : byStroke.values()) {
+            if (best == null || acc[0] > best[0]
+                    || (acc[0] == best[0] && acc[1] > best[1])) best = acc;
+        }
+        return best == null ? null : new float[]{best[2], best[3], best[4]};
     }
 
     /**
@@ -5085,6 +5415,10 @@ public final class PdfToWord {
         Rules out = new Rules();
         for (float[] h : in.horizontal) out.horizontal.add(new float[]{pageHeight - h[0], h[1], h[2]});
         for (float[] v : in.vertical) out.vertical.add(new float[]{v[0], pageHeight - v[2], pageHeight - v[1]});
+        // A stroke is a weight and a colour, not a coordinate: it is the same in either frame,
+        // so the parallel lists are copied across unchanged and keep their indices.
+        out.hStroke.addAll(in.hStroke);
+        out.vStroke.addAll(in.vStroke);
         out.images = in.images;
         return out;
     }
@@ -5597,6 +5931,8 @@ public final class PdfToWord {
 
         Table out = new Table();
         out.ruled = t.ruled;
+        // The rebuilt record stands where the old one stood, so it keeps the page's strokes.
+        for (int i = 0; i < 6; i++) out.sideStroke[i] = t.sideStroke[i];
         // The record's own heading - the numbered line that is not a label/value pair - keeps
         // its place at the top, because it introduces both panels.
         for (int r = 0; r < t.rows.size(); r++) {

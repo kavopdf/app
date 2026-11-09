@@ -2179,26 +2179,34 @@ public final class DocxWriter {
      * place the text and destroy the table, which is the one thing a conversion must not do.
      */
     /**
-     * The table's borders: one weight and one colour, on every ruled table.
+     * The table's borders: each of the six sides at its own weight and its own colour.
      *
-     * <p>Every side the page drew a rule on gets the one hairline every ruled table gets; every
-     * side it did not gets "none" - never no w:tblBorders element at all, because absent borders
+     * <p>Every side the page drew a rule on gets that side's OWN weight and colour - D-22: the
+     * six sides are six arguments now, one per side, taken from the rule that actually lies on
+     * that side ({@link PdfToWord.Table#sideStroke}). A side the page did not draw gets "nil" -
+     * never no w:tblBorders element at all, because absent borders
      * fall back to the table style and the default style draws a box, which is exactly the box
      * 403 and 406 were carrying. The four outer sides are {@code outer}, the row separators
      * {@code innerH} and the column separators {@code innerV}; a table the ruled pass found has
      * all three, because there the bounds ARE the drawn grid.
      *
-     * <p>The weight used to be read off the stroke the page drew (c47efc2), so one corpus
-     * carried sz 3, 4, 5, 6, 8 and 10 at once: a table ruled at 0.5 pt came out heavier than
-     * one ruled at 1.25 pt, and the user's verdict was that table lines must not be thick in
-     * one place and thin in another. 23_timetable_grid_txtpos is the document they called
-     * correct, and every one of its borders is sz="6" in 000000 - so that is the single
-     * weight and the single colour. It is also the weight {@link #TABLE_BORDER_TW} is measured
-     * from, so the row pitch the writer asks for stays true.
+     * <p>The history matters, because this has now been the other way twice. The weight used to
+     * be read off the stroke the page drew (c47efc2), but off the PAGE's stroke rather than the
+     * rule on the side being written, so a table ruled at 0.5 pt came out heavier than one ruled
+     * at 1.25 pt and the numbers matched no line anywhere; the answer then was one constant
+     * (D-22's predecessor). D-22 is the third state and the one the user asked for: the page's
+     * own weight and opacity, side by side on the same table, so a table ruled at 0.4 pt grey
+     * inside a 2 pt black frame comes out that way. A table whose six sides genuinely differ
+     * will look uneven - that is the page, not a bug.
+     *
+     * <p>A side with no stroke ({@code sideStroke} null) keeps the old constant, sz 8 in
+     * 000000, so nothing that used to be right changes.
      */
-    private static String borders(boolean outer, boolean innerH, boolean innerV) {
+    private static String borders(int[] sideSz, String[] sideColour,
+                                  boolean outer, boolean innerH, boolean innerV) {
         StringBuilder b = new StringBuilder("<w:tblBorders>");
-        for (String side : TABLE_SIDES) {
+        for (int i = 0; i < TABLE_SIDES.length; i++) {
+            String side = TABLE_SIDES[i];
             boolean drawn = "insideH".equals(side) ? innerH
                     : "insideV".equals(side) ? innerV
                     : outer;
@@ -2206,33 +2214,72 @@ public final class DocxWriter {
             // by definition - a reader resolves it to whatever it thinks a line is, usually the
             // flipped text colour - and it was written on 486 sides across 59 documents. A side
             // the page did not draw is no line at all, and "nil" says that without naming a
-            // colour that someone else will decide. The weight stays one constant: the user's
-            // verdict was that table lines must not be thick in one place and thin in another.
+            // colour that someone else will decide.
             b.append("<w:").append(side).append(" w:val=\"").append(drawn ? "single" : "nil").append("\"");
-            if (drawn) b.append(" w:sz=\"").append(TABLE_RULE_SZ)
-                    .append("\" w:color=\"").append(TABLE_RULE_COLOUR).append("\"");
+            if (drawn) b.append(" w:sz=\"").append(sideSz[i])
+                    .append("\" w:color=\"").append(sideColour[i]).append("\"");
             b.append("/>");
         }
         return b.append("</w:tblBorders>").toString();
     }
 
     /**
-     * The one weight every ruled table is drawn at, in eighths of a point: 6/8 pt = 0.75 pt.
-     * See {@link #borders} for why this is a constant and not the page's own stroke.
-     */
-    /**
-     * The one weight every ruled table is drawn at, in eighths of a point: 8/8 pt = 1 pt.
+     * The weight a side falls back to when the page's own stroke for it was not read: sz 8, in
+     * eighths of a point, so 1 pt.
      *
      * <p>Measured off the two commercial converters, which are the same engine and produce
      * byte-identical styles, settings and theme parts: every one of their six table sides is
-     * <code>w:sz="8" w:color="000000"</code>. This writer used 6 (0.75 pt), which is lighter than
-     * the page draws and lighter than the market leader. One weight and one colour still - the
-     * user's requirement is that the line matches the page, and where the page rules its table
-     * evenly that is a single weight.
+     * <code>w:sz="8" w:color="000000"</code>. That is still the fallback, but it is no longer
+     * the answer for every side: since D-22 a side carries the weight of the rule that lies on
+     * it, and this value only stands in where no rule could be read (see {@link #borders}).
      */
     private static final int TABLE_RULE_SZ = 8;
-    /** The one colour every ruled table is drawn in: black, as 23_timetable has it. */
+    /** The colour a side falls back to when the page's own stroke for it was not read. */
     private static final String TABLE_RULE_COLOUR = "000000";
+    /**
+     * The range {@code w:sz} accepts, in eighths of a point: 2 (0.25 pt) to 96 (12 pt).
+     *
+     * <p>Outside it the value is invalid and a reader is free to drop the border or the whole
+     * table property. A page rule of 0.1 pt - a hairline, and the PDF spec allows one - rounds
+     * to sz 1 and would be thrown away; a 14 pt bar rounds to 112 and is not a table border. So
+     * a width read off the page is clamped into the range rather than written as read.
+     */
+    private static final int TABLE_RULE_SZ_MIN = 2;
+    private static final int TABLE_RULE_SZ_MAX = 96;
+
+    /**
+     * A stroke width in points as {@code w:sz}, in eighths of a point, clamped to 2..96.
+     *
+     * <p>0.1 pt clamps to sz 2 (0.25 pt) and anything at or above 12 pt clamps to sz 96. The
+     * clamp is a real loss of fidelity at both ends - a 0.1 pt hairline is drawn a quarter point
+     * thick - and it is the narrower loss: a border outside the range is not a border at all.
+     */
+    private static int szOf(float widthPt) {
+        int sz = Math.round(Math.max(0.1f, widthPt) * 8f);
+        return Math.max(TABLE_RULE_SZ_MIN, Math.min(TABLE_RULE_SZ_MAX, sz));
+    }
+
+    /**
+     * A border's colour: the page's own, blended toward the white page by the rule's opacity.
+     *
+     * <p>{@code w:tblBorders} has no opacity - the element carries only {@code w:val},
+     * {@code w:sz}, {@code w:space} and {@code w:color} - so a faint rule cannot be written as
+     * a black rule at 30 % alpha. It is written as the colour that rule looks like on white:
+     * {@code c' = c*a + 255*(1-a)} per channel. A 30 % black hairline becomes D8D8D8, which is
+     * what a reader sees on the page. This is an approximation - on a page whose background is
+     * not white it is the wrong direction, and where a rule overlaps another rule the blend is
+     * not the page's - and it is stated in the report rather than hidden.
+     */
+    private static String borderColour(float[] stroke) {
+        int rgb = (int) stroke[1];
+        if (rgb < 0) return TABLE_RULE_COLOUR;
+        float a = stroke.length > 2 ? Math.max(0f, Math.min(1f, stroke[2])) : 1f;
+        if (a >= 0.999f) return hex(rgb);
+        int r = Math.round(((rgb >> 16) & 0xFF) * a + 255f * (1f - a));
+        int g = Math.round(((rgb >> 8) & 0xFF) * a + 255f * (1f - a));
+        int b = Math.round((rgb & 0xFF) * a + 255f * (1f - a));
+        return hex((r << 16) | (g << 8) | b);
+    }
     /** The six sides a {@code w:tblBorders} element carries. */
     private static final String[] TABLE_SIDES =
             {"top", "left", "bottom", "right", "insideH", "insideV"};
@@ -2380,6 +2427,15 @@ public final class DocxWriter {
         // The same answer decides the row height, because a rule that is drawn is a rule the
         // renderer adds to the row, and {@link #TABLE_BORDER_TW} is that rule's height.
         boolean ruledTable = t.ruled || pageDrewRule(t, ctx.curShapes);
+        // Six weights and six colours, one per side, read off the rule that lies on that side
+        // (D-22). A side with no stroke keeps the old constant, so nothing that was right moves.
+        int[] sideSz = new int[6];
+        String[] sideColour = new String[6];
+        for (int i = 0; i < 6; i++) {
+            float[] stroke = t.sideStroke[i];
+            sideSz[i] = stroke == null ? TABLE_RULE_SZ : szOf(stroke[0]);
+            sideColour[i] = stroke == null ? TABLE_RULE_COLOUR : borderColour(stroke);
+        }
         inner.append("<w:tbl><w:tblPr>")
                 .append("<w:tblW w:w=\"").append(totalTw).append("\" w:type=\"dxa\"/>")
                 .append("<w:tblInd w:w=\"").append(tw(x0)).append("\" w:type=\"dxa\"/>")
@@ -2392,7 +2448,7 @@ public final class DocxWriter {
                 // with no frame at all keeps all six undrawn even when a rule crosses its band:
                 // that rule is as likely the edge of a filled band as a drawn separator, and a
                 // line the page did not draw is the defect 403 and 406 came back with.
-                .append(borders(ruledTable,
+                .append(borders(sideSz, sideColour, ruledTable,
                         ruledTable && (t.ruled || t.innerH),
                         ruledTable && (t.ruled || t.innerV)))
                 .append("<w:tblLayout w:type=\"fixed\"/>")
