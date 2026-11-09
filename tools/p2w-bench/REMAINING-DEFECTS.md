@@ -3932,30 +3932,57 @@ in place inside the ring, so only the arc moves. Reading order 50.0 % of 26 rows
 render. This is the same family as the arc-text gap noted for 60 and 305, and the first time a
 claim has measured it. **Tries: 0 of 3.**
 
-### MEASURED 9 Nov 07:25 — the table-cell text sits at the top of its row, the page puts it lower
 
-The row boxes are right and the text inside them is not. On 324 the top rule is at y=60.0 in the
-PDF and at y=60.0 in the render, every row is 13.0 pt on both sides, and row 1's text is at
-y=83.5 in the PDF against 78.0 in the render. The render places a cell's baseline at
-`rowTop + ascent` (73 + 5.25 = 78.25); the page places it near the bottom of the row
-(`rowBottom - descent`, 86 - 1.75 = 84.25). That is why the offset is a constant for a table and
-scales with the row height, not with the number of rows.
+### D-22  A line's weight and opacity must be the page's own, everywhere
 
-Measured over the eight table documents in this batch, matched by text, `render - PDF` baseline:
+**Reported from the phone, and it corrects D-20.** The user's words: table lines must not all be
+one weight - they need the thickness **and the opacity** the PDF draws, and this must hold for the
+whole PDF-to-Word conversion, not only for tables.
 
-    324_loan_amortisation_schedule   n=171  median -5.5   min -5.5   max -0.3
-    320_balance_sheet_statutory      n= 68  median -8.6   min -10.3  max -0.3
-    333_datasheet_spec_tables        n=101  median -18.4  min -24.1  max -0.3
-    326_itr_computation              n= 65  median -4.6   min -16.6  max +8.2
-    340_bill_of_lading               n= 50  median -1.1   min -4.5   max +0.9
-    325_demat_holdings_statement     n= 72  median -0.8   min -2.5   max +8.2
+**This is not a reversal of the earlier complaint; it is the same requirement read properly.** The
+earlier report was that lines came out thick in one place and thin in another. That was true, and the
+cause was that the first attempt took the **median** of whatever strokes it found near a table - a
+number that corresponded to nothing on the page. The fix at the time was to make every table border
+one constant, which stopped the *arbitrary* variation but replaced it with a different wrong answer:
+now nothing matches the page.
 
-Every document with a table is high, by an amount that grows with the row height. 320 and 340
-pass the eye with -8.6 and -1.1, which is why this has never been a FAIL on its own; it is the
-same cause as 311's 15.7 pt and 324's 5.5 pt and it is what 333's 24.0 pt accumulates from.
+The requirement is fidelity. A page that rules its table at one weight must come out at that weight. A
+page that rules the header 1.5 pt and the rows 0.5 pt must come out with 1.5 and 0.5. A rule drawn at
+40 % opacity must come out at 40 %. The test is not "are they all equal" and not "are they all
+different" - it is **does each line match the line the page drew**.
 
-The hypothesis, not yet tried: a cell whose row is taller than its text is bottom-aligned on the
-page, so the cell wants `w:vAlign w:val="bottom"`, and today it is written top-aligned.
-**Tries: 0 of 3.** Not attempted this run because the change touches every table in all 208
-documents and the position ratchet (`base208-position.json`) needs a render of all 208 to accept
-it; a fix that ships without that run is the 7 Nov mistake again.
+**What is missing in the model, measured.**
+
+    Shape.fillAlpha       present - from the PDF's `ca`
+    Shape.lineRgb         present
+    Shape.lineWidthPt     present
+    Shape.lineAlpha       ABSENT  <- stroke opacity is never read and never written
+
+    DocxWriter.TABLE_RULE_SZ       = 6        a constant
+    DocxWriter.TABLE_RULE_COLOUR   = "000000" a constant
+    per-side width / colour / opacity on a table border: none
+
+So a stroked shape carries weight and colour but not opacity, and a table border carries neither - it
+is a constant on all six sides of every table.
+
+**What the fix has to do.**
+
+1. **Read the stroke's alpha.** The PDF graphics state carries `CA` for stroke opacity alongside `ca`
+   for fill. Capture it per path alongside `lineWidthPt` and `lineRgb`, on the same `Shape`.
+2. **Write it.** `<a:ln>` takes `<a:solidFill><a:srgbClr val="..."><a:alpha val="..."/></a:srgbClr>`;
+   the machinery for alpha already exists in `alphaXml` and is used for fills.
+3. **Table borders per side, from the page.** Each of the six sides takes its own weight, colour and
+   opacity from the rule the page drew on that side - not a median, not a constant. Where the page
+   drew one rule across the whole table, all six come out equal, which is what `23_timetable` wants.
+   Where it drew the header heavier, the header comes out heavier. `w:sz` is eighths of a point, so
+   the resolution is 0.125 pt; opacity has no field in `w:tblBorders` and must go on the run or be
+   accepted as a limitation - **that needs deciding, and the decision recorded.**
+4. **Everywhere, not just tables.** The same weight and opacity for every stroked shape the writer
+   emits, so a box, a rule and a table border all agree with the page.
+
+**Test to hold it to:** for each document, take every drawn line in the PDF with its width and alpha,
+and every line the writer emits with its width and alpha, and compare them pair by pair. The metric is
+the share that match within tolerance, and it must rise - not "the borders are uniform".
+
+**Tries: 0 of 3.** Requirement recorded; the model change is not started.
+
