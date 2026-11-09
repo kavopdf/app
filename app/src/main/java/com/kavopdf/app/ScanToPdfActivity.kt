@@ -10,6 +10,7 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -42,7 +43,7 @@ class ScanToPdfActivity : PdfActivity() {
 
     private val pages = ArrayList<File>()
 
-    private val askCamera =
+    private val askCamera: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) startCamera()
             else cameraDenied { askCamera.launch(Manifest.permission.CAMERA) }

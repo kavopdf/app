@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -42,7 +43,7 @@ class QrScanActivity : PdfActivity() {
     private var paused = false
     private var torchOn = false
 
-    private val askCamera =
+    private val askCamera: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) startCamera()
             else cameraDenied { askCamera.launch(Manifest.permission.CAMERA) }
