@@ -4622,3 +4622,50 @@ merged because it conflicted with the borders and stamp work.
 62 and the output is still wrong; no amount of detection improvement changes that, because the defect
 is in the representation.
 
+
+
+## STATE AFTER THE v3.53.4 DEVICE PASS
+
+The user tested on the phone and reported item by item. This is what stands.
+
+### Confirmed fixed on the device
+
+| | |
+|---|---|
+| **White patches** | two PDFs converted in Google Docs dark mode on the phone, no patches. Closed. |
+| **Extra pages** | `01_stamp_rotated_15deg_upright` and `04_stamp_180deg_upside_down` are one page, as the PDFs are. Closed. |
+| **180-degree stamp orientation** | renders and is the right way up. Closed. |
+
+### Still open, in the user's words
+
+1. **Line thickness and opacity.** In the PDF some rules are thick and some thin, some strong and
+   some faint; in the .docx they are all one weight and one colour. That is D-22 - a stroked shape now
+   carries its alpha, but a **table border is still a constant**, because `Rules` cannot carry a
+   stroke and has to be given one.
+2. **A stamp's parts are grouped wrongly.** In the commercial output the **two frame lines select
+   together** and each text line separately - which is why their frames cannot drift. Here the outer
+   frame is welded to `IN ORDER` and the inner frame is on its own, so the two frames drift. And
+   `02`'s stamp is inside a text box, which Google Docs cannot put a caret in, so it is not editable
+   at all. That is D-25.
+3. **The 180-degree stamp's inner lines are far too faded on one side.** Stroke colour and opacity,
+   not structure - part of D-22.
+4. **Multi-column pages.** Two failures, one cause:
+   - `62` is one page in the PDF and **two in the .docx**, because it carries seven sections and the
+     continuous section breaks become page breaks in Google Docs. **`63` does not have the two-page
+     problem** - only the mixing.
+   - **Both mix side-by-side paragraphs.** `w:cols` is flow-based and cannot hold a position: Word
+     decides where column one ends, so a paragraph from the left column is flowed into the right one
+     at the wrong height. Detection is already correct on `62` and the output is still wrong, so this
+     is a representation defect, not a detection one.
+   - The fix is to merge the V3 variant from the D-08 work - columns become a table's columns, a
+     fixed rectangle rather than a position in a flow - which was the only one of six variants
+     measured to give one page and the right order. It was never merged because it conflicted with
+     the borders and stamp changes.
+
+### The order to take them in
+
+1. **D-22**, because it is the user's first complaint and it touches every document with a rule.
+2. **D-25**, the stamp's object separation, because it is the difference between a stamp that can be
+   edited and one that cannot.
+3. **The multi-column representation**, because it is a patch already measured and waiting.
+
