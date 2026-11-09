@@ -79,9 +79,12 @@ class ImageOcrActivity : PdfActivity() {
                     // Copy first, then decode that one copy. The picture the recogniser reads
                     // is the same picture that goes onto the page, so an image is decoded once
                     // instead of twice and the boxes cannot drift away from what is shown.
-                    val file = withContext(Dispatchers.IO) {
+                    val copy = withContext(Dispatchers.IO) {
                         runCatching { Files.copyToCache(this@ImageOcrActivity, uri) }.getOrNull()
                     } ?: continue
+                    // Tracked, so this screen removes the copy when it closes: an untracked
+                    // picture stayed in the cache until the 45-minute sweep.
+                    val file = trackCacheFile(copy)
                     val bmp = withContext(Dispatchers.IO) {
                         runCatching { PdfEngine.decodeImage(file, OCR_MAX) }.getOrNull()
                     } ?: continue

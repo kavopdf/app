@@ -73,7 +73,8 @@ class ImagesToPdfActivity : PdfActivity() {
         if (files.isEmpty()) { toast(getString(R.string.msg_need_one_image)); return }
         val base = Files.baseName(files.first().name)
         runAndSave(Files.sanitize(base + ".pdf")) { out ->
-            val inputs = files.map { Files.copyToCache(this, it.uri) }
+            // Tracked, or every picture is left behind in the cache when the screen closes.
+            val inputs = files.map { trackCacheFile(Files.copyToCache(this, it.uri)) }
             PdfEngine.imagesToPdf(inputs, out)
         }
     }

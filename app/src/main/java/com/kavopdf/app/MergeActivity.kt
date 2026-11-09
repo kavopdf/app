@@ -64,7 +64,10 @@ class MergeActivity : PdfActivity() {
         if (files.size < 2) { toast(getString(R.string.msg_need_two)); return }
         val name = Files.suggestName(files.first().name, "_merged")
         runAndSave(name) { out ->
-            val inputs = files.map { Files.copyToCache(this, it.uri) }
+            // Tracked, or the copies outlive the screen: this is the user's own document,
+            // duplicated in full in the cache, and nothing else would remove it before the
+            // 45-minute sweep.
+            val inputs = files.map { trackCacheFile(Files.copyToCache(this, it.uri)) }
             PdfEngine.merge(inputs, out)
         }
     }

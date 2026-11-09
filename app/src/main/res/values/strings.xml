@@ -275,6 +275,9 @@
     <string name="scan_none">No pages captured yet</string>
     <string name="scan_count">%1$d page(s) captured</string>
     <string name="msg_camera_needed">Camera access is needed for this feature</string>
+    <string name="msg_camera_needed_body">This screen cannot work without the camera. Allow it here, or turn it on later in Settings ▸ Apps ▸ KavoPDF ▸ Permissions.</string>
+    <string name="action_allow_camera">Allow camera</string>
+    <string name="action_open_settings">Open settings</string>
     <string name="action_copy">Copy</string>
     <string name="action_contents">Contents</string>
     <string name="msg_no_outline">This PDF has no outline. Create one with the Bookmarks tool.</string>

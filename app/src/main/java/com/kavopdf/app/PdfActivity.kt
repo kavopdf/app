@@ -1,15 +1,19 @@
 package com.kavopdf.app
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.kavopdf.app.util.Busy
 import com.kavopdf.app.util.AppLog
@@ -31,8 +35,13 @@ abstract class PdfActivity : AppCompatActivity() {
     protected lateinit var busy: Busy
     private var pendingProducer: ((File) -> Unit)? = null
 
-    /** Cache files this screen made, removed when it closes. */
-    private val sessionFiles = ArrayList<File>()
+    /**
+     * Cache files this screen made, removed when it closes.
+     *
+     * Synchronised because a copy made inside a background task is registered from that
+     * task's thread, while [onDestroy] reads and clears the list on the main thread.
+     */
+    private val sessionFiles = java.util.Collections.synchronizedList(ArrayList<File>())
 
     /** The one file the user shared or opened - another app may still be reading it. */
     private val keptFiles = HashSet<File>()
@@ -164,6 +173,15 @@ abstract class PdfActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // 120 Hz panels stay at 60 unless the window asks for more.
         useHighestRefreshRate()
+        // Every screen that inherits this one is showing a document the user brought in
+        // for their own reasons. Without this flag the last page read is copied into the
+        // system recents thumbnail - where it stays after the app is closed - and any
+        // screenshot or screen recorder can capture it. FLAG_SECURE stops both, and the
+        // app never captures its own window.
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE
+        )
         com.kavopdf.app.util.CrashGuard.step("Opened: " + javaClass.simpleName)
         busy = Busy(this)
 
@@ -357,9 +375,12 @@ abstract class PdfActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        val removable = sessionFiles.filter { it !in keptFiles }
+        val removable = synchronized(sessionFiles) {
+            val taken = sessionFiles.filter { it !in keptFiles }
+            sessionFiles.clear()
+            taken
+        }
         com.kavopdf.app.util.CacheSweep.deleteNow(removable)
-        sessionFiles.clear()
         keptFiles.clear()
         // Whatever this screen did not make - other screens' leftovers - ages out here too,
         // so the cache does not wait for the next cold start to be tidied.
@@ -448,6 +469,47 @@ abstract class PdfActivity : AppCompatActivity() {
     }
 
     protected fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+
+    /**
+     * What to do when the camera permission was refused.
+     *
+     * A toast on its own leaves the camera screens with a black preview, a button that
+     * does nothing and no way forward: after the second refusal the system stops showing
+     * the dialog at all, so asking again from [onCreate] asks nothing. This says why the
+     * permission is needed and offers the one action that can still fix it - another
+     * request while the system is still willing to show it, and the app's settings page
+     * once it is not.
+     *
+     * @param ask launches this screen's own permission request
+     */
+    protected fun cameraDenied(ask: () -> Unit) {
+        if (isFinishing || isDestroyed) return
+        val canAsk = shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.msg_camera_needed)
+            .setMessage(R.string.msg_camera_needed_body)
+            .setPositiveButton(
+                if (canAsk) R.string.action_allow_camera else R.string.action_open_settings
+            ) { _, _ -> if (canAsk) ask() else openAppSettings() }
+            .setNegativeButton(R.string.action_cancel, null)
+            .create()
+            .show()
+    }
+
+    /** This app's own page in system Settings, where a refused permission can be granted. */
+    protected fun openAppSettings() {
+        val i = Intent(
+            android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.fromParts("package", packageName, null)
+        )
+        runCatching { startActivity(i) }
+            .onFailure { toast(getString(R.string.msg_camera_needed)) }
+    }
+
+    /** True when the camera permission is held right now. */
+    protected fun hasCamera(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+            PackageManager.PERMISSION_GRANTED
 
     /**
      * Open a picker only once this screen has finished sliding in. Launching it

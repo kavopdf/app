@@ -4,7 +4,6 @@ import com.kavopdf.app.util.AppLog
 import com.kavopdf.app.util.Files
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.Gravity
@@ -45,7 +44,8 @@ class ScanToPdfActivity : PdfActivity() {
 
     private val askCamera =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) startCamera() else toast(getString(R.string.msg_camera_needed))
+            if (granted) startCamera()
+            else cameraDenied { askCamera.launch(Manifest.permission.CAMERA) }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,9 +58,14 @@ class ScanToPdfActivity : PdfActivity() {
         binding.btnTorch.setOnClickListener { toggleTorch() }
         refresh()
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED
-        ) startCamera() else askCamera.launch(Manifest.permission.CAMERA)
+        if (hasCamera()) startCamera() else askCamera.launch(Manifest.permission.CAMERA)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Coming back from Settings after allowing the camera: bind it now instead of
+        // waiting for a restart, so the screen the user just unblocked actually works.
+        if (capture == null && hasCamera()) startCamera()
     }
 
     private fun startCamera() {
@@ -84,7 +89,12 @@ class ScanToPdfActivity : PdfActivity() {
     }
 
     private fun shoot() {
-        val ic = capture ?: return
+        val ic = capture ?: run {
+            // No camera bound: the permission was refused, or the camera failed to open.
+            // A tap that does nothing at all is the one thing this screen cannot say.
+            cameraDenied { askCamera.launch(Manifest.permission.CAMERA) }
+            return
+        }
         binding.btnCapture.isEnabled = false
         ic.takePicture(cameraExecutor, object : ImageCapture.OnImageCapturedCallback() {
             override fun onCaptureSuccess(image: ImageProxy) {
@@ -140,7 +150,14 @@ class ScanToPdfActivity : PdfActivity() {
             del.setImageResource(R.drawable.ic_close)
             del.setBackgroundColor(0x99000000.toInt())
             del.contentDescription = getString(R.string.action_delete)
-            del.setOnClickListener { pages.removeAt(index); refresh() }
+            del.setOnClickListener {
+                // The list entry is only the name of a JPEG in cache/work. Dropping the
+                // entry alone left the photograph - the page the user decided not to
+                // keep - on the device until the 45-minute cache sweep ran.
+                val gone = pages.removeAt(index)
+                runCatching { gone.delete() }
+                refresh()
+            }
             cell.addView(del)
             strip.addView(cell)
         }

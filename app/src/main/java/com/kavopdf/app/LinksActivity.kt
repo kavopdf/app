@@ -434,7 +434,9 @@ class LinksActivity : PdfActivity() {
         val uri = uris.firstOrNull() ?: return
         runTask(getString(R.string.msg_processing), onDone = done@{ f ->
             if (f == null) return@done
-            imgLinkFile = f
+            // Tracked here, on the main thread, once the copy exists: the picture is the
+            // user's own file, duplicated in the cache, and only this screen removes it.
+            imgLinkFile = trackCacheFile(f)
             askImageLink(f)
         }) {
             Files.copyToCache(this, uri)

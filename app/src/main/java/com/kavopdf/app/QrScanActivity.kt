@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -45,7 +44,8 @@ class QrScanActivity : PdfActivity() {
 
     private val askCamera =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) startCamera() else toast(getString(R.string.msg_camera_needed))
+            if (granted) startCamera()
+            else cameraDenied { askCamera.launch(Manifest.permission.CAMERA) }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,9 +74,13 @@ class QrScanActivity : PdfActivity() {
             runCatching { startActivity(Intent.createChooser(i, null)) }
         }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED
-        ) startCamera() else askCamera.launch(Manifest.permission.CAMERA)
+        if (hasCamera()) startCamera() else askCamera.launch(Manifest.permission.CAMERA)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Back from Settings with the camera allowed: bind it without asking again.
+        if (camera == null && hasCamera()) startCamera()
     }
 
     private fun startCamera() {

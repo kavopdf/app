@@ -58,8 +58,11 @@ class BookmarksActivity : PdfActivity() {
 
     override fun onPdfChosen(uri: Uri) {
         lifecycleScope.launch {
-            val f = withContext(Dispatchers.IO) { runCatching { Files.copyToCache(this@BookmarksActivity, uri) }.getOrNull() }
-            if (f == null) return@launch toast(getString(R.string.msg_failed, "copy"))
+            val copy = withContext(Dispatchers.IO) { runCatching { Files.copyToCache(this@BookmarksActivity, uri) }.getOrNull() }
+            if (copy == null) return@launch toast(getString(R.string.msg_failed, "copy"))
+            // Tracked on the main thread, after the copy exists: the screen deletes what it
+            // made when it closes, and an untracked copy sat in the cache for 45 minutes.
+            val f = trackCacheFile(copy)
             source = f
             sourceName = Files.displayName(this@BookmarksActivity, uri)
             binding.fileName.text = sourceName
