@@ -4071,3 +4071,71 @@ rotate.
 **Unmeasured:** Word's rendering of the `wps` branch - no Word in this environment. And the `wpc`
 routing is measured behaviour, not a documented contract.
 
+
+
+## GROUND TRUTH - two commercial .docx files, read directly
+
+The user supplied a document converted by **iLovePDF** (Solid Documents backend) and one by **Adobe
+Acrobat**, from the same PDFs that fail here. Both are measured, not inferred. The user's verdict:
+**iLovePDF's output is the best of the two**, so it is the target.
+
+### White patches - the answer, from the files themselves
+
+| | iLovePDF | Adobe | ours |
+|---|---|---|---|
+| `w:shd` fills | **5** | **0** | **753** |
+| `w:color` inside `docDefaults` | **no** | **no** | **yes** |
+| `word/settings.xml` | **yes** | **yes** | **no** |
+| `a:schemeClr` | **0** | **0** | **753** |
+| `w:background` | absent | absent | absent |
+| `word/theme/theme1.xml` | present | present | present |
+| images (`word/media/`) | **0** | **0** | - |
+| table-border colour | `000000` x133 | none | `nil` |
+
+**Adobe emits no shading fills at all. iLovePDF emits five, one pink tint `F4E5E5`.** We emit 753.
+A fill is the only thing that can be a white patch: no fill, no patch.
+
+**Neither writes a colour inside `docDefaults`** - only `rFonts`, `sz`, `szCs`, `lang`. Ours does, and
+that element decides 325 of 414 runs.
+
+**Neither uses `a:schemeClr` anywhere.** So the `bg1` + `lumMod` direction was wrong, and the research
+that said so was right.
+
+**And the finding that reverses an earlier instinct:** iLovePDF carries an explicit colour on only
+**98 of 365 runs** and Adobe on **178 of 558** - the rest inherit. **Inheritance is fine.** "Give every
+run an explicit colour" was wrong twice over: it is not what the good output does, and done with
+`000000` it makes dark mode worse.
+
+### The stamp - iLovePDF's exact architecture
+
+```xml
+<mc:AlternateContent>
+  <mc:Choice Requires="wps">
+    <w:drawing><wp:anchor behindDoc="0" ...>
+      <wp:positionH relativeFrom="page"><wp:posOffset>2447311</wp:posOffset></wp:positionH>
+      <wp:positionV relativeFrom="paragraph"><wp:posOffset>132227</wp:posOffset></wp:positionV>
+      <wp:extent cx="951230" cy="190500"/>
+      <wps:wsp><wps:cNvSpPr txBox="1"/>
+        <a:xfrm rot="840000"><a:off x="0" y="0"/><a:ext cx="951230" cy="190500"/></a:xfrm>
+        <a:prstGeom prst="rect">
+  <mc:Fallback>
+    <w:pict><v:group coordorigin="2976,128" coordsize="3112,1767"
+       path="m2976,1133l5818,1894,6087,889,3245,128,2976,1133xe"
+       filled="false" stroked="true"
+       strokeweight=".600003pt" strokecolor="#0c6b2d">
+```
+
+This is exactly the hybrid the research predicted, and it is the first time it has been seen in a
+shipping product:
+
+- **`mc:Choice Requires="wps"`** carries a DrawingML text box with `a:xfrm rot="840000"` (14 degrees)
+  - the branch **Word** renders correctly.
+- **`mc:Fallback`** carries a **VML `v:group` whose path has the rotation baked into its
+  coordinates** - `path="m2976,1133l5818,1894,6087,889,3245,128,2976,1133xe"`, four corners, no
+  rotation attribute at all - the branch **LibreOffice** renders correctly.
+- The stroke carries the page's own weight and colour: **`strokeweight=".600003pt"
+  strokecolor="#0c6b2d"`**. That is D-22's requirement, satisfied by a shipping converter.
+- **No image.** `word/media/` is empty in both files.
+
+**So the two open problems now have a blueprint read off a working product rather than derived.**
+
