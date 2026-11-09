@@ -3889,3 +3889,45 @@ lines within tolerance (x 1.5, y 3.0, size 0.5, colour 3), font size 98.5 %, nam
 
 312_affidavit_stamp_paper passed on sight while `order` answered 63.8 % of 34 rows. Known
 measurement bug on a page whose rows the render joins with tabs; the document is PASS.
+
+
+## v3 318-340 — the six failures, recorded 9 Nov 07:20
+
+### OPEN — a table's own top y is not reproduced (more evidence)
+
+324_loan_amortisation_schedule (all seven pages) and 332_bom_on_drawing. `moved:4,164,306.09`
+verified -5.5 pt on page 1 and the same on pages 2 to 6; `moved:8.40` verified -5.2 pt. The
+table is the right size and the right pitch - on 324 the row numbers are 13.0 pt apart on both
+sides and row 1 is 5.5 pt high in the render, row 40 the same 5.5 pt - so this is the spacer
+before the table being one cell-inset short, not a row-height error. Same entry as 311's 15.7 pt
+below. **Tries: 0 of 3.** The code is the `spacerTw` block in `DocxWriter.java`; the
+`extra >= prevLine * 1.2` gate and the `- prevLine` subtraction are both suspects, and a
+previous attempt that subtracted this line's slack put 390's table 10.6 pt LOW instead.
+
+### OPEN — a table's rows are pitched short and rules cut the text
+
+333_datasheet_spec_tables. `moved:SPI clock frequency` verified: y=333.3 in the PDF, y=309.3 in
+the render, 24.0 pt over nine rows, so about 2.7 pt a row. The render's rules cross "Continuous
+conversion" and "CS high", and all three tables carry one or two empty rows at the foot where
+the writer closed the table with rows the page does not have. **Tries: 0 of 3.**
+
+### OPEN — the riskometer's legend and caption are emitted as flow paragraphs
+
+322_mutual_fund_factsheet. `moved:very high risk` verified 70.0 pt. The page draws the four
+legend steps inside the dial and the caption under it; the render puts the legend after the
+dial in the flow and the caption 70 pt below. **Tries: 0 of 3.**
+
+### OPEN — a bar chart's category labels are lost
+
+323_credit_card_statement. `count:Shopping` verified 3 in the PDF and 2 in the render, and the
+same for Fuel, Groceries and Health; `moved:Other` verified 58.3 pt. The six labels of the
+spend-by-category bars are not in the document at all - only the bars and the six values -
+while "Other" survives as a paragraph at the foot. **Tries: 0 of 3.**
+
+### OPEN — a seal's ring of per-glyph text is scattered
+
+318_court_summons_form. `moved:B` verified 160.5 pt: the arc glyphs are on the page, at x=90 to
+140, y=490 to 528, where the PDF puts them at x=446 to 496, y=300 to 335. INDIA and 2024 stay
+in place inside the ring, so only the arc moves. Reading order 50.0 % of 26 rows, 30 in the
+render. This is the same family as the arc-text gap noted for 60 and 305, and the first time a
+claim has measured it. **Tries: 0 of 3.**
