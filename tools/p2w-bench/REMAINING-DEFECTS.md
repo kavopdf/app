@@ -4301,3 +4301,36 @@ text"; the render writes each glyph separately and in reverse, so it reads "t xe
 - 2 egaP". This is the rotated-stamp class with a mirror instead of an angle: OOXML has no
 horizontal mirror, so the answer is the raster path the stamps already use - ONE try, then record.
 **Tries: 0 of 3 (1 allowed).**
+
+
+### CONFIRMED FIXED on the device - white patches
+
+**From the user, on v3.53.4, Google Docs dark mode, mobile:** two PDFs converted, **no white
+patches**. The defect that was open for three attempts, and that three of my own approaches failed
+to fix, is closed.
+
+What finally worked was not a theory. The user supplied a .docx from iLovePDF and one from Adobe
+Acrobat, converted from the same PDFs that failed here, and said iLovePDF's output was the best. Both
+files were read directly and both turned out to be the same engine. Four things came out of them:
+
+1. **No fill element at all** for a decorative tint - not `<a:noFill/>`, nothing. Adobe emits zero
+   `w:shd` fills and iLovePDF five, against 753 here.
+2. **No `w:color` inside `docDefaults`.** It decided 325 of 414 runs and removed the one adaptation
+   hook a reader has - Automatic text is the only thing every dark mode flips.
+3. **`word/settings.xml` is written**, with `clrSchemeMapping` and without
+   `displayBackgroundShape`.
+4. **No `a:schemeClr` anywhere.** Both files use none.
+
+**The three approaches that failed, recorded so they are not retried:**
+- Removing `<w:background w:color="FFFFFF"/>` - insufficient; the patches stayed.
+- Pushing explicit `000000` onto every run - **built, measured and thrown away**: Google Docs dark
+  theme adapts Automatic text but leaves an explicit black alone, so black goes *invisible*.
+- Expressing light fills as `a:schemeClr bg1` with `a:lumMod` - **neutralised and costly**: `bg1` is
+  an alias for `lt1`, which is `FFFFFF` in every Office theme, so it either resolves at import to a
+  pure white patch or is dropped; and the hue loss is arithmetic, because `E6EBF5` has S=0.429 and
+  `EEEEEE` has S=0.000 and no attribute can create saturation from zero.
+
+**The lesson worth keeping:** when a competitor's output does not have a defect ours does, their file
+is the specification. Reading it took minutes; three rounds of derivation from the format spec did
+not get there.
+
