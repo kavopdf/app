@@ -269,6 +269,31 @@ public final class PdfToWord {
          * constant - so a side that used to be right stays right.
          */
         public final float[][] sideStroke = new float[6][];
+        /**
+         * The y of every row's top edge, in points, with one more entry than there are rows -
+         * the last entry is the bottom edge of the last row. Null when the pass that built the
+         * table did not know them.
+         *
+         * <p>The writer gave every row the table's extent divided by its row count, which is only
+         * true of a table whose rows are evenly spaced. A ledger with a taller header, a wrapped
+         * address or a merged cell does not have those, and every row below the odd one out then
+         * sits a little further from the page than the row above it: 1.45 pt a row on
+         * 16_right_aligned_amounts, 38 pt by the foot of the table, and it is why the error there
+         * correlated with y. These are the page's own row edges, so each row can be given the
+         * height the page gave it (D-26, cause 2).
+         */
+        public float[] rowEdge;
+        /**
+         * The y of the table's first row's TOP edge, in points, when the pass that built the
+         * table could tell where that edge is ({@link Float#NaN} otherwise).
+         *
+         * <p>{@link #rowEdge} gives each row its own height, but its first entry is not always
+         * the table's top: the grid pass reads a cell's rectangle, whose y is the rule BELOW the
+         * row's text (on 16_right_aligned_amounts the first entry is 156 pt while the page's
+         * first baseline is 148 and the row's top edge is 137). Placing the table from the first
+         * entry therefore put it one pitch low. This is the edge the flow is placed against.
+         */
+        public float rowTopPt = Float.NaN;
         public float top, bottom, left, right;
         public int column;
     }
@@ -5158,6 +5183,15 @@ public final class PdfToWord {
             left = Math.min(left, c[0]); right = Math.max(right, c[2]);
         }
         t.top = top; t.bottom = bottom; t.left = left; t.right = right;
+        // The page's own row edges, so a row can be given its own height instead of the average.
+        // A cell's rectangle carries the rule BELOW its row, so the first edge is one pitch above
+        // the first cell's y and row r's top is the cell y of row r-1.
+        float firstPitch = nrow > 1 ? Math.max(1f, R.get(1) - R.get(0)) : Math.max(1f, bottom - R.get(0));
+        float[] rowEdge = new float[nrow + 1];
+        rowEdge[0] = R.get(0) - firstPitch;
+        for (int r = 1; r <= nrow; r++) rowEdge[r] = R.get(r - 1);
+        t.rowEdge = rowEdge;
+        t.rowTopPt = rowEdge[0];
         float[] cx = new float[ncol + 1];
         for (int i = 0; i < ncol; i++) cx[i] = C.get(i);
         cx[ncol] = right;
@@ -5561,6 +5595,12 @@ public final class PdfToWord {
             t.bottom = bottom;
             t.left = left;
             t.right = right;
+            // The grid's own row rules: rows = ys.size() - 1 and row r is ys[r]..ys[r+1]. A rule
+            // is a row's top edge, so the first one is the table's top.
+            float[] rowEdge = new float[rows + 1];
+            for (int r = 0; r <= rows; r++) rowEdge[r] = ys.get(r);
+            t.rowEdge = rowEdge;
+            t.rowTopPt = rowEdge[0];
             // The rule positions the columns were cut at, so the .docx can use the same widths
             // instead of five equal ones.
             float[] colX = new float[cols + 1];
@@ -5732,6 +5772,9 @@ public final class PdfToWord {
         t.ruled = false;
         t.top = rows.get(from).get(0).y;
         float bottom = t.top, left = Float.MAX_VALUE, right = 0;
+        // The baseline each row was drawn on, so the row can be given the height the page gave
+        // it rather than the table's average (D-26, cause 2).
+        List<Float> rowTops = new ArrayList<>();
         for (int r = from; r < to; r++) {
             String[] line = new String[columns.size()];
             String[] lineFonts = new String[columns.size()];
@@ -5801,8 +5844,23 @@ public final class PdfToWord {
             t.cellX.add(textXs);
             t.cellR.add(textRs);
             t.colors.add(textCols);
+            float rowY = Float.MAX_VALUE;
+            for (Line cell : rows.get(r)) rowY = Math.min(rowY, cell.y);
+            rowTops.add(rowY == Float.MAX_VALUE ? (rowTops.isEmpty() ? t.top : rowTops.get(rowTops.size() - 1)) : rowY);
         }
         t.bottom = bottom;
+        // One more entry than there are rows: the last row's bottom edge is one row pitch below
+        // its own top, because the last baseline the page drew is a baseline and not an edge.
+        float[] rowEdge = new float[rowTops.size() + 1];
+        for (int i = 0; i < rowTops.size(); i++) rowEdge[i] = rowTops.get(i);
+        float lastPitch = rowTops.size() >= 2
+                ? Math.max(1f, rowEdge[rowTops.size() - 1] - rowEdge[rowTops.size() - 2])
+                : Math.max(1f, bottom - (rowTops.isEmpty() ? t.top : rowEdge[0]));
+        rowEdge[rowTops.size()] = (rowTops.isEmpty() ? t.top : rowEdge[rowTops.size() - 1]) + lastPitch;
+        t.rowEdge = rowEdge;
+        // These edges are baselines, so the table's top edge is one ascent (DocxWriter.LINE_BASE
+        // of the row's own pitch) above the first one.
+        t.rowTopPt = rowEdge[0] - 0.8f * lastPitch;
         float[] cx2 = new float[columns.size() + 1];
         for (int i = 0; i < columns.size(); i++) cx2[i] = columns.get(i);
         cx2[columns.size()] = Math.max(right, columns.get(columns.size() - 1));
