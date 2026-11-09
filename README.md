@@ -194,7 +194,7 @@ Framework, so **no storage permission is requested** and the app works fully off
 
 ## Building
 
-Gradle 8.7 / AGP 8.6.1 / Kotlin 2.1.0, JDK 17, compileSdk 35, minSdk 24.
+Gradle 8.11.1 / AGP 8.9.1 / Kotlin 2.1.0, JDK 17, compileSdk 36, minSdk 24.
 
 ```bash
 gradle :app:assembleDebug          # debug build

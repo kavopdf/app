@@ -85,8 +85,13 @@ public final class TxtWriter {
         String clean = sb.toString()
                 .replaceAll("[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F]", " ")
                 .replace("\t", "    ");
-        java.nio.file.Files.write(out.toPath(),
-                clean.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        // java.nio.file.Files.write is API 26 and minSdk is 24, so the bytes go through a
+        // FileOutputStream: on Android 7.0/7.1 the nio call threw NoClassDefFoundError and
+        // PDF-to-text failed on every document.
+        byte[] bytes = clean.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        try (java.io.OutputStream fos = new java.io.FileOutputStream(out)) {
+            fos.write(bytes);
+        }
     }
 
     /** Writes one paragraph, opening blank lines for the gap the page left above it. */

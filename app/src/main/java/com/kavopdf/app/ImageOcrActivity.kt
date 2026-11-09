@@ -65,7 +65,11 @@ class ImageOcrActivity : PdfActivity() {
             busy.show(getString(R.string.image_ocr_working, 1, uris.size))
             val pages = ArrayList<PdfEngine.PageText>()
             val text = StringBuilder()
-            val flat = runCatching { Files.newFile(this@ImageOcrActivity, "imgflat.pdf") }.getOrNull()
+            // Tracked, so this screen removes the flattened working PDF when it closes:
+            // untracked, a copy of the user's pictures sat in the cache until the sweep.
+            val flat = runCatching {
+                trackCacheFile(Files.newFile(this@ImageOcrActivity, "imgflat.pdf"))
+            }.getOrNull()
             if (flat == null) {
                 busy.dismiss()
                 toast(getString(R.string.msg_failed, "PDF"))

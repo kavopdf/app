@@ -427,6 +427,7 @@ STATUS: FIXED - all five copies are registered with `trackCacheFile`, so `PdfAct
 **User impact:** the same as the entry above, at three sites the previous list missed: unlocking or watermarking a large document leaves a second full copy of it in the cache after the screen has closed.
 **Status note:** noticed while fixing the entry above; not fixed in the same run, because it is outside what that finding listed.
 
+STATUS: FIXED - all three sites now register the copy they make: ToolsActivity.kt:169 (Unlock) and ToolsActivity.kt:1140 (watermark picture) go through `trackCacheFile(...)`, and ImageOcrActivity.kt:71 registers `imgflat.pdf` the same way. `trackCacheFile` adds to the synchronised `sessionFiles`, which `PdfActivity.onDestroy` deletes, so all three are removed when the screen closes. `tools/check-cache-sweep.py` passes; no engine file was touched.
 ---
 
 ## Stage 7 — CONFIG (API level, SDK targets, build config)
@@ -451,6 +452,7 @@ ViewerActivity.kt:72) and fall back to the old form; `longVersionCode` is guarde
 **How to verify:** read `app/build.gradle:8` and `:14`. Upload a build to the Play Console internal track — the release is blocked with "your app must target API level 36" until both `compileSdk` and `targetSdk` are raised (raising `targetSdk` alone will not compile, because `compileSdk 35` cannot resolve the 36 APIs).
 **User impact:** no update can be shipped at all. The version on Play stays at 3.53.4 (versionCode 294) — every fix in this audit, including the P0/P1 ones, is stuck on the developer's machine, and on devices running Android 16 the listing is already hidden for new users.
 
+STATUS: FIXED - compileSdk 36, buildToolsVersion 36.0.0 and targetSdk 36 (app/build.gradle:21, :22, :27), AGP 8.6.1 -> 8.9.1 (build.gradle:4, the first AGP that supports API 36) and Gradle 8.7 -> 8.11.1 (android.yml:142, :144, required by AGP 8.9); CI now installs platforms;android-36 and build-tools;36.0.0 (android.yml:114) and README.md:197 states the new matrix. NOT compiled here - this sandbox has no Android SDK, so Android CI on push is the first compile of the raised SDK.
 ### P1 — PDF-to-text calls `java.nio.file.Files`, which does not exist on the app's own minimum SDK
 **File:** app/src/main/java/com/kavopdf/app/engine/TxtWriter.java:88
 **What:** `TxtWriter.write()` ends with `java.nio.file.Files.write(out.toPath(), …)`, but `java.nio.file` was only added to Android in API 26 and `minSdk` is 24, so on Android 7.0/7.1 the class is missing and the conversion fails every time.
@@ -458,6 +460,7 @@ ViewerActivity.kt:72) and fall back to the old form; `longVersionCode` is guarde
 **How to verify:** `grep -n "coreLibraryDesugaring" app/build.gradle` — no hits. `grep -rn "java.nio.file" app/src/main/java` — the three lines above. On an API 24 or 25 device (or an emulator at API 24), run PDF to text on any PDF: it ends with the generic "could not read" toast and no .txt is written. `PdfActivity.runTask` catches `Throwable`, so this arrives as a failed tool rather than a visible crash — which is why it has not been noticed.
 **User impact:** on Android 7.0/7.1 the PDF-to-text tool never works, repair silently skips its orphaned-content pass, and compress silently skips its keep-the-original safety net. The user sees "could not read" on a file that is perfectly fine.
 
+STATUS: FIXED - all three sites are java.io now: TxtWriter.java:92 writes the bytes through a FileOutputStream, PdfEngine.java:819-820 copies the kept original with buffered streams, and PdfRepair.java:255 calls the class's own `readAll(File)` instead of `Files.readAllBytes`. `grep -rn "java.nio.file" app/src/main/java` returns no hits. Verified with a real toolchain this run: the engine compiles against pdfbox-android 2.0.27.0, TestPdfToWord reports 29 passed / 0 failed, and tier 3 (G2 over all 208 corpus documents against base208.json) reports no document got worse.
 ### P2 — Crop and Create PDF are rebuilt on a dark-mode switch or a window resize and come back with no document
 **File:** app/src/main/AndroidManifest.xml:137
 **What:** `CropActivity` and `CreatePdfActivity` declare `configChanges="orientation|screenSize|keyboardHidden"`, missing the `screenLayout|smallestScreenSize|uiMode` that the other 20 activities declare, so those three changes destroy and recreate the screen — and neither screen saves the document it has open.
@@ -465,12 +468,15 @@ ViewerActivity.kt:72) and fall back to the old form; `longVersionCode` is guarde
 **How to verify:** `sed -n '135,144p' app/src/main/AndroidManifest.xml` against `:41`. In a build: open Crop, pick a PDF, drag the crop handles, then toggle dark mode from the quick-settings tile (or drag the app into split-screen) — the picker reappears and the crop rectangle is gone. The same toggle on Annotate keeps the document.
 **User impact:** a crop or a hand-drawn annotation is thrown away by something as ordinary as the phone switching to dark mode at sunset, and the user is dropped back on the file picker with no explanation.
 
+STATUS: FIXED - both activities now declare the same six-value list as the other 20: `orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode` at AndroidManifest.xml:137 (CropActivity) and :142 (CreatePdfActivity), so a uiMode, screenLayout or smallestScreenSize change reaches `onConfigurationChanged` instead of recreating the screen and losing `source`/`current`.
 ### P3 — Minification is off, so `proguard-rules.pro` is dead weight and the release APK ships unshrunk
 **File:** app/build.gradle:47
 **What:** `minifyEnabled false` and `shrinkResources false` in the release block, while `proguardFiles` still points at a 60-line rule file that therefore never runs.
 **Why I think so:** lines 47-49 set `minifyEnabled false`, `shrinkResources false` and `proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'`; the rule file itself opens with "Minification is currently OFF, so none of this affects the shipped APK". Nothing verifies those `-keep` rules, so the first release built with R8 on is untested — and the same build file spends real effort on APK size elsewhere (`resConfigs "en"` with a comment about a megabyte, `abiFilters` with a comment about 22 MB, the BouncyCastle `pqc` exclusion with a comment about 4 MB). R8 is the one lever that is switched off, and it is worth more than all three.
 **How to verify:** `grep -n "minifyEnabled\|shrinkResources" app/build.gradle`. Build a release AAB and compare its size with `minifyEnabled true` — the delta is the whole of the unused library code, which the keep-everything rules above would still trim only partly.
 **User impact:** a larger download than the app needs, on the budget phones the `armeabi-v7a` filter exists to serve, and no obfuscation of the engine's class names.
+
+STATUS: OPEN - verified real: app/build.gradle:75-76 still set `minifyEnabled false` and `shrinkResources false` next to `proguardFiles ... 'proguard-rules.pro'`, so those rules never run. NOT fixed in this run, on purpose: turning R8 on changes the shipped artefact, and its failure mode is reflection inside pdfbox-android and ML Kit - a release that builds, passes every guard here, and then fails to convert at runtime. This sandbox has no Android SDK, no device and no instrumentation test, so nothing available could catch that, and the zero-regression rule on the conversion path makes an unverified R8 config the wrong change to make blind. It needs a release build with R8 enabled plus a conversion smoke test on a device.
 
 ### P3 — A release build with no keystore configured succeeds and produces an unsigned APK
 **File:** app/build.gradle:35
@@ -479,3 +485,4 @@ ViewerActivity.kt:72) and fall back to the old form; `longVersionCode` is guarde
 **How to verify:** `sed -n '33,55p' app/build.gradle`. Set `KEYSTORE_PATH` to a path that does not exist and run `./gradlew assembleRelease` — the build succeeds and the output is named `app-release-unsigned.apk`.
 **User impact:** a release that looks like it worked cannot be uploaded, and the failure only shows up at the Play Console upload rather than at the build.
 
+STATUS: FIXED - the signing state is read once at script level (app/build.gradle:12-14) and a task-graph check (app/build.gradle:139-155) now fails any release build whose KEYSTORE_PATH is set but does not resolve - the typo or missing-keystore case the finding describes - and logs a named warning when KEYSTORE_PATH is unset, instead of both cases silently producing app-release-unsigned.apk. CI exports KEYSTORE_PATH only when the keystore was actually decoded (android.yml:156) and no longer hard-codes the path on the build step, so its deliberate unsigned build still succeeds.

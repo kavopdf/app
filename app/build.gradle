@@ -3,15 +3,28 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+// Signing state, read once at script level so both the android block below and the
+// task-graph check at the end of this file can see it. KEYSTORE_PATH unset is a decision
+// to build unsigned (CI does this when no keystore secret exists) and is announced;
+// KEYSTORE_PATH set to something that is not there is a mistake - a typo, a keystore not
+// copied onto the build machine - and it used to fall through to the unsigned path exactly
+// as an unset one did, so the first sign of trouble was the Play upload.
+def keystorePath = System.getenv("KEYSTORE_PATH")
+def keystoreConfigured = keystorePath != null && !keystorePath.isEmpty()
+def keystoreMissing = keystoreConfigured && !file(keystorePath).exists()
+
 android {
     namespace 'com.kavopdf.app'
-    compileSdk 35
-    buildToolsVersion "35.0.0"
+    // Play requires API 36 for every new app and every update since 31 Aug 2026
+    // (extension to 1 Nov 2026 also passed), so compileSdk and targetSdk are both 36.
+    // Raising targetSdk alone would not compile: compileSdk is what resolves the APIs.
+    compileSdk 36
+    buildToolsVersion "36.0.0"
 
     defaultConfig {
         applicationId "com.kavopdf.app"
         minSdk 24
-        targetSdk 35
+        targetSdk 36
 
         // Only English. The app has no translations of its own - res/ has just values and
         // values-night - but resources.arsc was carrying about 120 languages of strings
@@ -43,9 +56,8 @@ android {
 
     signingConfigs {
         release {
-            def path = System.getenv("KEYSTORE_PATH")
-            if (path != null && !path.isEmpty() && file(path).exists()) {
-                storeFile file(path)
+            if (keystoreConfigured && !keystoreMissing) {
+                storeFile file(keystorePath)
                 storePassword System.getenv("KEYSTORE_PASSWORD")
                 keyAlias System.getenv("KEY_ALIAS")
                 keyPassword System.getenv("KEY_PASSWORD")
@@ -58,8 +70,7 @@ android {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            def ks = System.getenv("KEYSTORE_PATH")
-            if (ks != null && !ks.isEmpty() && file(ks).exists()) {
+            if (keystoreConfigured && !keystoreMissing) {
                 signingConfig signingConfigs.release
             }
         }
@@ -117,4 +128,25 @@ dependencies {
     // On-device OCR. The model is bundled in the APK: fully offline, no
     // Google Play Services and no extra permissions.
     implementation 'com.google.mlkit:text-recognition:16.0.1'
+}
+
+// A release build that is not signed cannot be uploaded, and it used to say nothing: the
+// signingConfig was simply left unset and Gradle produced app-release-unsigned.apk with a
+// green build. Now a KEYSTORE_PATH that is set but does not resolve fails the release
+// build, where the cause is obvious, and a release build with no keystore at all says so
+// in the log - CI builds unsigned on purpose when the keystore secret is absent, so that
+// case warns rather than fails.
+gradle.taskGraph.whenReady { graph ->
+    def buildingRelease = graph.allTasks.any { it.name.toLowerCase().contains("release") }
+    if (!buildingRelease) return
+    if (keystoreMissing) {
+        throw new GradleException("KEYSTORE_PATH is set to '" + keystorePath + "' but no file "
+                + "exists there, so this release build would be unsigned and could not be "
+                + "uploaded. Point KEYSTORE_PATH at the keystore, or unset it to build "
+                + "unsigned on purpose.")
+    }
+    if (!keystoreConfigured) {
+        logger.warn("KAVOPDF: KEYSTORE_PATH is not set, so this release build is UNSIGNED "
+                + "(app-release-unsigned.apk) and cannot be uploaded to Play.")
+    }
 }

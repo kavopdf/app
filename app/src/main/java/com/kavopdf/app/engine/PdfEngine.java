@@ -813,8 +813,15 @@ public final class PdfEngine {
         // re-encoded. When that happens the original is simply kept, so compressing
         // never costs the user space.
         if (out.length() >= before) {
-            java.nio.file.Files.copy(src.toPath(), out.toPath(),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            // Copied with streams rather than java.nio.file.Files.copy, which is API 26:
+            // on Android 7.0/7.1 that call threw and the keep-the-original safety net
+            // silently did not happen.
+            try (java.io.InputStream in = new java.io.FileInputStream(src);
+                 java.io.OutputStream keep = new java.io.FileOutputStream(out)) {
+                byte[] buf = new byte[1 << 16];
+                int n;
+                while ((n = in.read(buf)) > 0) keep.write(buf, 0, n);
+            }
         }
     }
 

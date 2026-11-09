@@ -250,7 +250,9 @@ public final class PdfRepair {
             // than letting the app die for want of memory.
             long freeHeap = freeHeapBytes();
             if (src.length() <= freeHeap / 3) {
-                adoptOrphanContent(doc, java.nio.file.Files.readAllBytes(src.toPath()), r);
+                // readAll, not java.nio.file.Files.readAllBytes: nio.file is API 26 and
+                // minSdk is 24, so on Android 7.0/7.1 this pass threw instead of running.
+                adoptOrphanContent(doc, readAll(src), r);
             } else {
                 r.findings.add("the file is " + (src.length() / (1024 * 1024)) + " MB and only "
                         + (freeHeap / (1024 * 1024)) + " MB of memory is free - the search for"

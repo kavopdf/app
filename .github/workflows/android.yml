@@ -111,7 +111,7 @@ jobs:
           echo "sdkmanager=$SDKMANAGER"
           if [ -n "$SDKMANAGER" ]; then
             yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
-            yes | "$SDKMANAGER" "platform-tools" "platforms;android-35" "build-tools;35.0.0" "platforms;android-34" "build-tools;34.0.0" >/dev/null 2>&1 || true
+            yes | "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0" "platforms;android-35" "build-tools;35.0.0" "platforms;android-34" "build-tools;34.0.0" >/dev/null 2>&1 || true
           fi
           echo "Installed platforms:"; ls "$ANDROID_HOME/platforms" || true
           echo "Installed build-tools:"; ls "$ANDROID_HOME/build-tools" || true
@@ -136,11 +136,12 @@ jobs:
           fi
           echo "gradle.properties is clean"
 
-      - name: Install Gradle 8.7
+      - name: Install Gradle 8.11.1
         run: |
-          curl -sSL -o /tmp/gradle.zip https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          # AGP 8.9.1, needed for compileSdk 36, requires Gradle 8.11.1 or newer.
+          curl -sSL -o /tmp/gradle.zip https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
           unzip -q /tmp/gradle.zip -d /opt
-          echo "/opt/gradle-8.7/bin" >> "$GITHUB_PATH"
+          echo "/opt/gradle-8.11.1/bin" >> "$GITHUB_PATH"
 
       - name: Verify PDF engine against real PDFBox (39 checks)
         run: bash tools/verify-engine.sh
@@ -149,16 +150,21 @@ jobs:
         run: |
           if [ -n "${KEYSTORE_BASE64}" ]; then
             echo "${KEYSTORE_BASE64}" | base64 -d > "${RUNNER_TEMP}/release.jks"
+            # Exported only when the file really is there: the build fails a release when
+            # KEYSTORE_PATH is set and does not resolve, so an empty secret must leave it
+            # unset rather than pointing at a file that was never written.
+            echo "KEYSTORE_PATH=${RUNNER_TEMP}/release.jks" >> "$GITHUB_ENV"
             echo "Keystore decoded."
           else
-            echo "No keystore secret found; the APK will be built unsigned."
+            echo "No keystore secret found; the APK will be built unsigned and the build says so."
           fi
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Build signed release APK
         env:
-          KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          # KEYSTORE_PATH comes from the decode step above, and only when the keystore
+          # really exists - a path that does not resolve now fails the release build.
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}

@@ -164,7 +164,9 @@ class ToolsActivity : PdfActivity() {
                 buildParams(emptyMap())
                 binding.btnRun.isEnabled = true
             }) {
-                val f = Files.copyToCache(this, uri)
+                // Tracked, so this screen removes the copy when it closes: an untracked
+                // copy of a still-encrypted file stayed in the cache until the sweep.
+                val f = trackCacheFile(Files.copyToCache(this, uri))
                 // Picking the wrong file is a user mistake, not an app failure: it is said plainly
             // and never logged as a problem, or the log fills with failures that are not bugs.
             if (!Files.looksLikePdf(f)) throw com.kavopdf.app.util.UserFacing(
@@ -1133,7 +1135,9 @@ class ToolsActivity : PdfActivity() {
             wmImage = f
             toast(getString(R.string.msg_watermark_image_ready))
         }) {
-            Files.copyToCache(this, uri)
+            // Tracked: the picture is the user's own file, duplicated in the cache, and
+            // only this screen removes it.
+            trackCacheFile(Files.copyToCache(this, uri))
         }
     }
 

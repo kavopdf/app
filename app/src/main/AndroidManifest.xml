@@ -134,12 +134,12 @@
             android:name=".CropActivity"
             android:exported="false"
             android:label="@string/tool_crop"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
         <activity
             android:name=".CreatePdfActivity"
             android:exported="false"
             android:label="@string/tool_create_pdf"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
