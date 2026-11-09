@@ -4016,6 +4016,7 @@ public final class PdfToWord {
             sh.fillAlpha = alpha;
             sh.lineRgb = line;
             sh.lineWidthPt = lineWidth;
+            sh.lineAlpha = (float) getGraphicsState().getAlphaConstant();
             rules.shapes.add(sh);
         }
 
@@ -4080,6 +4081,7 @@ public final class PdfToWord {
             sh.fillAlpha = alpha;
             sh.lineRgb = line;
             sh.lineWidthPt = lw;
+            sh.lineAlpha = (float) getGraphicsState().getAlphaConstant();
             return sh;
         }
 

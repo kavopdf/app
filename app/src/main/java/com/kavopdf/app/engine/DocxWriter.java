@@ -994,6 +994,14 @@ public final class DocxWriter {
         public int lineRgb = -1;
         public float lineWidthPt;
         /**
+         * Stroke opacity 0..1, from the PDF's own {@code CA}.
+         *
+         * <p>The fill's alpha was carried from the start; the stroke's was not, so a rule drawn
+         * at 40 % came out solid. The user's requirement is that a line's weight AND its opacity
+         * are the page's own, everywhere - not only in tables.
+         */
+        public float lineAlpha = 1f;
+        /**
          * The geometry: 0 for a rectangle, 1 for an ellipse, 2 for the freeform path in
          * {@link #freeform}.
          *
@@ -1173,7 +1181,9 @@ public final class DocxWriter {
         if (s.lineRgb >= 0) {
             long lw = Math.max(0, Math.round(s.lineWidthPt * EMU_PER_PT));
             sb.append("<a:ln w=\"").append(lw).append("\"><a:solidFill><a:srgbClr val=\"")
-                    .append(hex(s.lineRgb)).append("\"/></a:solidFill></a:ln>");
+                    .append(hex(s.lineRgb)).append("\">")
+                    .append(alphaXml(s.lineAlpha))
+                    .append("</a:srgbClr></a:solidFill></a:ln>");
         } else {
             sb.append("<a:ln><a:noFill/></a:ln>");
         }
