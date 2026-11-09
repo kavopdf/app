@@ -3986,3 +3986,88 @@ the share that match within tolerance, and it must rise - not "the borders are u
 
 **Tries: 0 of 3.** Requirement recorded; the model change is not started.
 
+
+
+### D-23  The white patches: what Adobe and iLovePDF do that we do not
+
+**The user's decisive observation.** The same phone, the same Google Docs dark mode: documents
+converted by **Adobe Acrobat and iLovePDF show no white patches**, ours do. That settles three things
+at once.
+
+1. It is the mobile native theme, not a desktop filter or an extension - so the cause is in the file.
+2. **Google Docs CAN render a .docx without white patches.** The research that concluded "no OOXML
+   representation will fix them" was wrong, and the proof is a competitor's output.
+3. Therefore a correct representation exists and is worth finding rather than working around.
+
+**Three fixes, all small, all measured against the corpus.**
+
+1. **Stop emitting decorative light fills.** 753 fills in 159 documents are absolute hex -
+   `E6EBF5`, `F0F0E6`, `F5E6E6`, `BFBFBF`, `C9C9C9`, `FFFFFF`. Absolute hex carries no licence for a
+   reader to adapt it, so dark mode leaves it alone and it reads as a white patch. A decorative tint
+   barely distinguishable from the page *is* no fill on a dark page: omit `w:shd` and `<a:noFill/>`.
+   Only a meaning-bearing fill stays, and then as a mid-luminance colour that reads on both canvases.
+2. **`w:val="nil"` back to `w:val="auto"` on table borders.** `nil` **deletes** the border; `auto`
+   resolves to the reader's own text colour, which is what a border should follow. 486 sides were
+   changed to `nil` and that was wrong.
+3. **Remove `w:color` from `docDefaults`.** It decides 325 of 414 runs in the five documents the user
+   opened, and Automatic text is the only thing every reader's dark mode flips. Pinning a colour
+   there - any colour - removes the one adaptation hook there is.
+
+**Do not use `a:schemeClr bg1` with `a:lumMod`.** Two independent research passes agree it is the
+wrong tool: `bg1` is an alias for `lt1`, which is `FFFFFF` in every Office theme, so a light fill
+expressed on it either resolves at import to a *pure* white patch or is dropped; and the hue loss is
+arithmetic, not tuning - `E6EBF5` (S=0.429) becomes `EEEEEE` (S=0.000) because `lumMod` multiplies a
+luminance whose saturation is already zero. No attribute on `bg1` can create saturation from zero.
+
+**Two corrections to work already shipped.** The `nil` change above, and the theme part: `a:theme`
+requires **all three** of `clrScheme`, `fontScheme` and `fmtScheme` - a `clrScheme`-only theme is
+invalid - and `dk1`/`lt1` must stay `<a:sysClr val="windowText" lastClr="000000"/>` /
+`<a:sysClr val="window" lastClr="FFFFFF"/>`, because that system-colour indirection is itself the
+adaptation hook. Keep `w:background` absent: a saved page colour suppresses Word's automatic dark page
+entirely.
+
+**Still the open question:** which surface the user looked at. Answered now - the mobile app.
+
+### D-24  A rotated stamp: the architecture, from five research passes
+
+**What the best converters do.** `pdf2docx` does not rotate, flatten or preserve - it **drops**:
+`Line.text_direction` knows only horizontal, bottom-to-top or IGNORE, and every line that is neither
+is filtered out. At 30 degrees the stamp text is gone entirely and one raster image of the outline
+region is left. LibreOffice's `pdfimport` **does** solve it, in ODF: every glyph line becomes a
+`draw:frame` + `draw:text-box` whose `draw:transform="rotate(0.523598775598299) translate(...)"`
+carries the matrix, and the ODT round trip reproduces `dir=[0.866,-0.5]` exactly. But its **DOCX
+export** emits exactly what we already tried - `a:xfrm rot` plus `wps:txbx` - and re-rendered by
+LibreOffice that file's text comes out `dir=[1,0]`. **LibreOffice's own PDF-to-DOCX fails in
+LibreOffice's own renderer.**
+
+**It is a reader bug, not a format limitation.** ECMA-376 says `bodyPr@rot` is independent and "if
+not specified, the rotation of the accompanying shape is used"; `bodyPr@upright` exists only because
+text normally follows its shape; Microsoft states "when you rotate an object, any text within the
+object will rotate with it". LibreOffice cannot, because a DOCX shape's text becomes a Writer text
+frame and Writer frames cannot rotate. Thirteen docx constructs were built and measured in
+LibreOffice 7.4.7.2 - rotated text box, autoshape with `a:ln`, `bodyPr@rot`, VML `rotation:`, even
+90-degree shape rotation - and **every one renders glyphs horizontal**. Only two things rotate: a
+picture, and 90-degree text.
+
+**The architecture that works: a renderer-dispatched hybrid.**
+
+- The **outline** is a freeform with the rotation **baked into its corner coordinates** - no rotation
+  attribute at all. Measured 0.05 pt.
+- The **text** sits in `mc:AlternateContent`: `mc:Choice Requires="wpc"` carries the spec-correct
+  rotated `wps` text box for **Word**; `mc:Fallback` carries a rotated raster of that same text for
+  **LibreOffice**; and a `w:vanish` run keeps the string extractable.
+- The dispatch is **measured, not assumed**: LibreOffice supports `wps` but not `wpc`, so with
+  `Requires="wpc"` it takes the Fallback and renders the rotated image at the exact footprint. One
+  file, both renderers correct.
+
+**This also respects the user's rejection.** They objected to the stamp's *text* being a screenshot.
+Here the real text is always present as a `w:vanish` run and as the Word branch - the raster exists
+only in the LibreOffice fallback, at the exact footprint, and it is the only thing that renderer can
+rotate.
+
+**Runner-up, only if Word is guaranteed:** LibreOffice's own architecture, `wps:wsp` + `a:xfrm rot` +
+`wps:txbx`.
+
+**Unmeasured:** Word's rendering of the `wps` branch - no Word in this environment. And the `wpc`
+routing is measured behaviour, not a documented contract.
+
