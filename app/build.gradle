@@ -23,9 +23,20 @@ android {
         versionName "3.53.4"
 
         ndk {
-            // Real phones are ARM. The x86/x86_64 slices only exist for emulators
-            // and would add ~22 MB to the download.
-            abiFilters 'arm64-v8a', 'armeabi-v7a'
+            // Real phones are ARM; x86_64 exists so the app can be installed on the
+            // emulator that the automated pipeline converts documents on.
+            //
+            // DECIDED 2026-11-09: the x86_64 slice is included in the SHIPPING apk, not
+            // in a separate test build. The reason is that a test build is not the thing
+            // the user runs, and "the fix shipped" has to be proven on the artefact that
+            // ships. The cost is real and was measured rather than guessed: the ARM-only
+            // apk is 38 MB and the comment here previously estimated +22 MB for the extra
+            // slice, so expect roughly 60 MB.
+            //
+            // If that becomes unacceptable, the right answer is an Android App Bundle for
+            // Play (per-device ABI delivery) rather than dropping x86_64 - dropping it
+            // would make the pipeline unable to test the app at all.
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
         }
         vectorDrawables { useSupportLibrary true }
     }
