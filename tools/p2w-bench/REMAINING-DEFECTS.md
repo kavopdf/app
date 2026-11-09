@@ -4587,3 +4587,38 @@ by counting `w:before`/`w:line` *inside* the stamp's anchored text boxes. In-flo
 69 full-width lines, the column pass finds no band, and the flow overflows about 27 pt because the
 substituted font wraps six rows into two lines. Font metrics, not page budget.
 
+
+
+**Two multi-column documents measured, and the two failures are different - but the cause is one.**
+
+   62_two_col_newsletter_pull_quote    PDF 1 page, 595x842
+                                       DOCX w:cols num=2 x4, sectPr x7, 44 paragraphs, TWO PAGES
+   63_three_column_brochure            PDF 1 page, 842x595 landscape
+                                       DOCX NO w:cols at all, sectPr x1, 23 paragraphs, mixed order
+
+**62** detects the columns correctly and its paragraph order is right - masthead, headline, deck,
+body. But it carries **seven sections and four column blocks**, because the continuous section breaks
+shipped for a full-width element are being emitted for this page too, and Google Docs turns a
+continuous break into a page break. That is the second page.
+
+**63** does not detect columns at all. `pageColumns` returns one, so the page is written as a single
+flow, and the order comes out interleaved - the three column headers land on one line, then
+`Malnad Estates was established...`, then `The`, then `of the Baba Budan hills...`. Left and middle
+column mixed.
+
+**The cause both share: `w:cols` is flow-based and cannot hold a position.** Word decides for itself
+where column one ends and column two begins; it does not honour the point where the page broke the
+column. So even with perfect detection the paragraphs mix, because a paragraph from the left column
+can be flowed into the right column at the wrong height. This is not a detection bug in 62 - the
+detection is right and the output is still wrong.
+
+**And that is why iLovePDF's columns are table cells.** A cell is a fixed rectangle, not a position in
+a flow, so nothing can move between columns. The V3 variant built during the D-08 work reached the
+same conclusion from measurement - "the columns become the table's columns", verified as the only one
+of six variants that rendered as one page with the right reading order - but that patch was never
+merged because it conflicted with the borders and stamp work.
+
+**The fix is to merge it, not to tune the column detection further.** Detection is already right on
+62 and the output is still wrong; no amount of detection improvement changes that, because the defect
+is in the representation.
+
