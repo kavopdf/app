@@ -4559,3 +4559,31 @@ introduced by a change meant to fix a different one.
 own. And in the .docx the stamp must be three objects for `02` - one shape holding both frames, plus
 one paragraph per text line - not four and not one.
 
+
+
+### CONFIRMED FIXED on the device - extra pages
+
+**From the user, on v3.53.4:** `01_stamp_rotated_15deg_upright` and
+`04_stamp_180deg_upside_down` no longer come back as two pages. They are one page, as the PDF is.
+
+Two changes did it, and neither was the one this entry was opened on:
+
+- **EX-B, the page budget.** A page whose flow exceeds the paper is measured off its own XML
+  (`w:before + w:line + w:trHeight`, top-level only) and rewritten with every box and gap scaled by
+  `budget / height`, floored at 0.85 and at the type's own ascent. Pages that already fit are written
+  once and byte-identical: 196 of 208 documents unchanged, 12 changed.
+- **EX-A, the baseline grouping.** A row was being measured against `group.get(size - 1)`, which
+  after `addRowMates` is a field on the *right* - and `sameRow` rejects anything to its left - so rows
+  whose left-hand fields arrived later in the column order were cut in two. `prevOnBaseline` fixed
+  the reference. Also, `rotated` was firing on a whole page: an upside-down page had every line
+  flagged as a stamp, refusing 112 of 114 same-baseline pairs and turning 15 baselines into 61
+  paragraphs.
+
+**The 1277 pt figure this entry was opened on was my own counting error** - it is reproducible only
+by counting `w:before`/`w:line` *inside* the stamp's anchored text boxes. In-flow the same page was
+681.8 pt on an 841.9 pt page and was never over.
+
+**Not fixed, and a different cause:** `journal-2col-with-footnotes` is still two pages. Its page is
+69 full-width lines, the column pass finds no band, and the flow overflows about 27 pt because the
+substituted font wraps six rows into two lines. Font metrics, not page budget.
+
