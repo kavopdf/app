@@ -426,3 +426,56 @@ STATUS: FIXED - all five copies are registered with `trackCacheFile`, so `PdfAct
 **How to verify:** read ToolsActivity.kt:160-180 and :1130-1140, and ImageOcrActivity.kt:66-72, next to PdfActivity.kt:336-348.
 **User impact:** the same as the entry above, at three sites the previous list missed: unlocking or watermarking a large document leaves a second full copy of it in the cache after the screen has closed.
 **Status note:** noticed while fixing the entry above; not fixed in the same run, because it is outside what that finding listed.
+
+---
+
+## Stage 7 — CONFIG (API level, SDK targets, build config)
+
+Scope: `app/build.gradle`, `build.gradle`, `gradle.properties`, `AndroidManifest.xml` and every
+`java.*` / `android.*` call in `app/src/main/java` checked against `minSdk 24`. Read for this
+stage: all 8 `Build.VERSION` guards, the `signingConfigs` / `buildTypes` / `packaging` blocks,
+`proguard-rules.pro`, and the `configChanges` list on all 22 activities.
+
+What passed (recorded so it is not re-checked): every `tooltipText` use is guarded
+(`SDK_INT >= 26`, AnnotateActivity.kt:126, CreatePdfActivity.kt:104); both
+`getParcelableExtra(String, Class)` calls are guarded (`SDK_INT >= 33`, PdfActivity.kt:212,
+ViewerActivity.kt:72) and fall back to the old form; `longVersionCode` is guarded
+(`SDK_INT >= 28`, LogActivity.kt:155, CrashGuard.kt:365); `Context.getColor(int)` needs 23 and
+`minSdk` is 24; `Map.getOrDefault` / `computeIfAbsent` need 24 and `minSdk` is 24; `resConfigs`,
+`abiFilters` and the SEND/VIEW filters are pinned by `tools/check-apk-config.py` and pass.
+
+### P1 — The app targets API 35, and Google Play has required API 36 for every update since 31 August 2026
+**File:** app/build.gradle:14
+**What:** `targetSdk 35` (and `compileSdk 35` at line 8) while Play now rejects any new app or app update that does not target Android 16 / API 36.
+**Why I think so:** `defaultConfig` sets `minSdk 24` and `targetSdk 35`, and `compileSdk 35` at the top of the `android` block — the same numbers are restated in `README.md:197`. Play Console Help states that from 31 August 2026 new apps and app updates must target Android 16 (API level 36) or higher, with an extension to 1 November 2026 that has now also passed. Nothing in the repo mentions 36 at all: `grep -n "36" app/build.gradle` returns no hits, and there is no `android.suppressUnsupportedCompileSdk` or toolchain pin that would explain the lag.
+**How to verify:** read `app/build.gradle:8` and `:14`. Upload a build to the Play Console internal track — the release is blocked with "your app must target API level 36" until both `compileSdk` and `targetSdk` are raised (raising `targetSdk` alone will not compile, because `compileSdk 35` cannot resolve the 36 APIs).
+**User impact:** no update can be shipped at all. The version on Play stays at 3.53.4 (versionCode 294) — every fix in this audit, including the P0/P1 ones, is stuck on the developer's machine, and on devices running Android 16 the listing is already hidden for new users.
+
+### P1 — PDF-to-text calls `java.nio.file.Files`, which does not exist on the app's own minimum SDK
+**File:** app/src/main/java/com/kavopdf/app/engine/TxtWriter.java:88
+**What:** `TxtWriter.write()` ends with `java.nio.file.Files.write(out.toPath(), …)`, but `java.nio.file` was only added to Android in API 26 and `minSdk` is 24, so on Android 7.0/7.1 the class is missing and the conversion fails every time.
+**Why I think so:** `app/build.gradle:13` sets `minSdk 24`; `compileOptions` (lines 60-63) sets only `sourceCompatibility` / `targetCompatibility` and there is no `coreLibraryDesugaringEnabled` and no `coreLibraryDesugaring` dependency anywhere in either gradle file, so nothing back-ports `java.nio.file` (the desugarer covers `java.time`, `java.util.stream`, `java.util.function` and `Optional`, not `java.nio.file`). `java.io.File.toPath()` is likewise API 26. Three call sites are unguarded: TxtWriter.java:88 (`Files.write`), PdfEngine.java:816 (`Files.copy`, the "compressed file came out larger, keep the original" branch) and PdfRepair.java:253 (`Files.readAllBytes`, the orphaned-content scan). None is inside a `Build.VERSION` check — there are only 8 guards in the whole source and none covers these files. `TxtWriter.write` is on the direct path of the PDF-to-text tool (`ToolsActivity.kt:598`) and of `PdfToWord.java:6360`, so it is reached on every run, not on an edge case.
+**How to verify:** `grep -n "coreLibraryDesugaring" app/build.gradle` — no hits. `grep -rn "java.nio.file" app/src/main/java` — the three lines above. On an API 24 or 25 device (or an emulator at API 24), run PDF to text on any PDF: it ends with the generic "could not read" toast and no .txt is written. `PdfActivity.runTask` catches `Throwable`, so this arrives as a failed tool rather than a visible crash — which is why it has not been noticed.
+**User impact:** on Android 7.0/7.1 the PDF-to-text tool never works, repair silently skips its orphaned-content pass, and compress silently skips its keep-the-original safety net. The user sees "could not read" on a file that is perfectly fine.
+
+### P2 — Crop and Create PDF are rebuilt on a dark-mode switch or a window resize and come back with no document
+**File:** app/src/main/AndroidManifest.xml:137
+**What:** `CropActivity` and `CreatePdfActivity` declare `configChanges="orientation|screenSize|keyboardHidden"`, missing the `screenLayout|smallestScreenSize|uiMode` that the other 20 activities declare, so those three changes destroy and recreate the screen — and neither screen saves the document it has open.
+**Why I think so:** every other activity in the manifest carries the full six-value list (lines 41, 68-132); only lines 137 and 142 are short. Both screens override `onConfigurationChanged` and rely on it: `CropActivity.kt:118-121` re-renders the current page from `current`, which only exists because the activity was not recreated. Neither class has an `onSaveInstanceState` — `grep -n "onSaveInstanceState" CropActivity.kt CreatePdfActivity.kt` returns nothing, and `source`, `sizes`, `current` and the whole `OverlayView` drawing are plain fields. On recreate `incomingUri` is null again, so `CropActivity.onCreate` (line 48) runs `pickAfterEnter { pickPdf() }` and the file picker opens on top of a screen that has forgotten everything.
+**How to verify:** `sed -n '135,144p' app/src/main/AndroidManifest.xml` against `:41`. In a build: open Crop, pick a PDF, drag the crop handles, then toggle dark mode from the quick-settings tile (or drag the app into split-screen) — the picker reappears and the crop rectangle is gone. The same toggle on Annotate keeps the document.
+**User impact:** a crop or a hand-drawn annotation is thrown away by something as ordinary as the phone switching to dark mode at sunset, and the user is dropped back on the file picker with no explanation.
+
+### P3 — Minification is off, so `proguard-rules.pro` is dead weight and the release APK ships unshrunk
+**File:** app/build.gradle:47
+**What:** `minifyEnabled false` and `shrinkResources false` in the release block, while `proguardFiles` still points at a 60-line rule file that therefore never runs.
+**Why I think so:** lines 47-49 set `minifyEnabled false`, `shrinkResources false` and `proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'`; the rule file itself opens with "Minification is currently OFF, so none of this affects the shipped APK". Nothing verifies those `-keep` rules, so the first release built with R8 on is untested — and the same build file spends real effort on APK size elsewhere (`resConfigs "en"` with a comment about a megabyte, `abiFilters` with a comment about 22 MB, the BouncyCastle `pqc` exclusion with a comment about 4 MB). R8 is the one lever that is switched off, and it is worth more than all three.
+**How to verify:** `grep -n "minifyEnabled\|shrinkResources" app/build.gradle`. Build a release AAB and compare its size with `minifyEnabled true` — the delta is the whole of the unused library code, which the keep-everything rules above would still trim only partly.
+**User impact:** a larger download than the app needs, on the budget phones the `armeabi-v7a` filter exists to serve, and no obfuscation of the engine's class names.
+
+### P3 — A release build with no keystore configured succeeds and produces an unsigned APK
+**File:** app/build.gradle:35
+**What:** `signingConfigs.release` only sets `storeFile` when `KEYSTORE_PATH` is present and resolves to an existing file, and `buildTypes.release` only assigns `signingConfig` under the same condition — so a misconfigured or missing environment silently yields `app-release-unsigned.apk` with no warning.
+**Why I think so:** lines 33-44 wrap the whole `storeFile`/`storePassword`/`keyAlias`/`keyPassword` block in `if (path != null && !path.isEmpty() && file(path).exists())`, and lines 50-53 repeat the same guard before `signingConfig signingConfigs.release`. A path that is set but wrong (a typo, a keystore not copied onto the build machine) falls through the `file(path).exists()` test exactly as an unset one does, and Gradle has nothing to fail on — an empty `signingConfigs.release` is legal.
+**How to verify:** `sed -n '33,55p' app/build.gradle`. Set `KEYSTORE_PATH` to a path that does not exist and run `./gradlew assembleRelease` — the build succeeds and the output is named `app-release-unsigned.apk`.
+**User impact:** a release that looks like it worked cannot be uploaded, and the failure only shows up at the Play Console upload rather than at the build.
+
