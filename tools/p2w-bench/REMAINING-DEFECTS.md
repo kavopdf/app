@@ -3931,3 +3931,31 @@ while "Other" survives as a paragraph at the foot. **Tries: 0 of 3.**
 in place inside the ring, so only the arc moves. Reading order 50.0 % of 26 rows, 30 in the
 render. This is the same family as the arc-text gap noted for 60 and 305, and the first time a
 claim has measured it. **Tries: 0 of 3.**
+
+### MEASURED 9 Nov 07:25 — the table-cell text sits at the top of its row, the page puts it lower
+
+The row boxes are right and the text inside them is not. On 324 the top rule is at y=60.0 in the
+PDF and at y=60.0 in the render, every row is 13.0 pt on both sides, and row 1's text is at
+y=83.5 in the PDF against 78.0 in the render. The render places a cell's baseline at
+`rowTop + ascent` (73 + 5.25 = 78.25); the page places it near the bottom of the row
+(`rowBottom - descent`, 86 - 1.75 = 84.25). That is why the offset is a constant for a table and
+scales with the row height, not with the number of rows.
+
+Measured over the eight table documents in this batch, matched by text, `render - PDF` baseline:
+
+    324_loan_amortisation_schedule   n=171  median -5.5   min -5.5   max -0.3
+    320_balance_sheet_statutory      n= 68  median -8.6   min -10.3  max -0.3
+    333_datasheet_spec_tables        n=101  median -18.4  min -24.1  max -0.3
+    326_itr_computation              n= 65  median -4.6   min -16.6  max +8.2
+    340_bill_of_lading               n= 50  median -1.1   min -4.5   max +0.9
+    325_demat_holdings_statement     n= 72  median -0.8   min -2.5   max +8.2
+
+Every document with a table is high, by an amount that grows with the row height. 320 and 340
+pass the eye with -8.6 and -1.1, which is why this has never been a FAIL on its own; it is the
+same cause as 311's 15.7 pt and 324's 5.5 pt and it is what 333's 24.0 pt accumulates from.
+
+The hypothesis, not yet tried: a cell whose row is taller than its text is bottom-aligned on the
+page, so the cell wants `w:vAlign w:val="bottom"`, and today it is written top-aligned.
+**Tries: 0 of 3.** Not attempted this run because the change touches every table in all 208
+documents and the position ratchet (`base208-position.json`) needs a render of all 208 to accept
+it; a fix that ships without that run is the 7 Nov mistake again.
