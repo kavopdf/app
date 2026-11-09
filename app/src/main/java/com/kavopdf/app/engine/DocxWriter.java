@@ -1176,9 +1176,8 @@ public final class DocxWriter {
                 .append(geom(s, cx, cy));
         if (s.fillRgb >= 0) {
             fillXml(sb, s.fillRgb, s.fillAlpha);
-        } else {
-            sb.append("<a:noFill/>");
         }
+        // A shape with no fill gets no fill element at all, matching the commercial files.
         if (s.lineRgb >= 0) {
             long lw = Math.max(0, Math.round(s.lineWidthPt * EMU_PER_PT));
             sb.append("<a:ln w=\"").append(lw).append("\"><a:solidFill><a:srgbClr val=\"")
@@ -1245,7 +1244,10 @@ public final class DocxWriter {
             // FFFFFF in every Office theme, so that either resolves at import to a pure white
             // patch or is dropped - and it loses the hue in light mode either way, because
             // E6EBF5 has S=0.429 and EEEEEE has S=0.000.
-            sb.append("<a:noFill/>");
+            // Write NOTHING - not even <a:noFill/>. Measured on the two commercial files:
+            // a:noFill 0 and a:solidFill 8, so they simply do not declare a fill. Declaring
+            // "no fill" is not the same as not declaring one, and it left 10,201 elements
+            // across the corpus that had no purpose.
         } else {
             sb.append("<a:solidFill><a:srgbClr val=\"").append(hex(rgb)).append("\">")
                     .append(alphaXml(alpha)).append("</a:srgbClr></a:solidFill>");
@@ -2218,7 +2220,17 @@ public final class DocxWriter {
      * The one weight every ruled table is drawn at, in eighths of a point: 6/8 pt = 0.75 pt.
      * See {@link #borders} for why this is a constant and not the page's own stroke.
      */
-    private static final int TABLE_RULE_SZ = 6;
+    /**
+     * The one weight every ruled table is drawn at, in eighths of a point: 8/8 pt = 1 pt.
+     *
+     * <p>Measured off the two commercial converters, which are the same engine and produce
+     * byte-identical styles, settings and theme parts: every one of their six table sides is
+     * <code>w:sz="8" w:color="000000"</code>. This writer used 6 (0.75 pt), which is lighter than
+     * the page draws and lighter than the market leader. One weight and one colour still - the
+     * user's requirement is that the line matches the page, and where the page rules its table
+     * evenly that is a single weight.
+     */
+    private static final int TABLE_RULE_SZ = 8;
     /** The one colour every ruled table is drawn in: black, as 23_timetable has it. */
     private static final String TABLE_RULE_COLOUR = "000000";
     /** The six sides a {@code w:tblBorders} element carries. */
