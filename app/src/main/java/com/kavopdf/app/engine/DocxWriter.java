@@ -69,6 +69,15 @@ public final class DocxWriter {
     /** Line box height as a multiple of the font size. Generous: a tight exact height clips. */
     private static final float LINE_FACTOR = 1.15f;
     /**
+     * Where a shape's fill stops being a colour of its own and becomes a shade of the page.
+     *
+     * <p>HSL L of 0.72 is the point above which a filled band reads as a white patch on a dark
+     * canvas. It catches the tints the user's own files carry - E6EBF5, F0F0E6, F5E6E6, BFBFBF,
+     * C9C9C9, FFFFFF - and leaves a mid-tone or a dark band alone, because those carry dark or
+     * white text that must not move.
+     */
+    private static final double LIGHT_FILL = 0.72;
+    /**
      * Where the baseline sits inside a {@code w:lineRule="exact"} line box: this fraction of the
      * box height below its top.
      *
@@ -372,6 +381,7 @@ public final class DocxWriter {
             put(zip, "_rels/.rels", rootRels());
             put(zip, "word/document.xml", documentXml);
             put(zip, "word/styles.xml", stylesXml());
+            put(zip, "word/theme/theme1.xml", themeXml());
             put(zip, "word/_rels/document.xml.rels", rels);
             put(zip, "docProps/core.xml", coreXml(result));
             put(zip, "docProps/app.xml", appXml());
@@ -1156,12 +1166,7 @@ public final class DocxWriter {
                 .append("\" cy=\"").append(cy).append("\"/></a:xfrm>")
                 .append(geom(s, cx, cy));
         if (s.fillRgb >= 0) {
-            sb.append("<a:solidFill><a:srgbClr val=\"").append(hex(s.fillRgb)).append("\">");
-            if (s.fillAlpha < 0.999f) {
-                int a = Math.max(0, Math.min(100000, Math.round(s.fillAlpha * 100000f)));
-                sb.append("<a:alpha val=\"").append(a).append("\"/>");
-            }
-            sb.append("</a:srgbClr></a:solidFill>");
+            fillXml(sb, s.fillRgb, s.fillAlpha);
         } else {
             sb.append("<a:noFill/>");
         }
@@ -1175,6 +1180,65 @@ public final class DocxWriter {
         sb.append("</wps:spPr><wps:bodyPr anchor=\"t\" anchorCtr=\"0\"><a:noAutofit/></wps:bodyPr>")
                 .append("</wps:wsp></a:graphicData></a:graphic>")
                 .append("</wp:anchor></w:drawing></w:r></w:p>");
+    }
+
+    /**
+     * The lightness (HSL L, 0..1) of a 0xRRGGBB colour.
+     *
+     * <p>Lightness, not luminance: what makes a filled band read as a white patch on a dark
+     * canvas is how light it is, and HSL L is the same number Word's own colour picker shows
+     * for the tint.
+     */
+    private static double lightness(int rgb) {
+        int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+        return (Math.max(r, Math.max(g, b)) + Math.min(r, Math.min(g, b))) / 510.0;
+    }
+
+    /**
+     * A shape's fill, written so a light band follows the page instead of cutting a hole in it.
+     *
+     * <p>Every fill used to be an absolute {@code a:srgbClr}. That is the most explicit thing
+     * that can be written and it is exactly why no reader remaps it: a band the page drew as
+     * E6EBF5 stays E6EBF5 whatever the reader's canvas is, so in Google Docs dark mode it is a
+     * white patch - 14:1 against the page around it. Measured across the corpus: 753 of 7,392
+     * shape fills are light (E6EBF5 x18 in 23_timetable_grid_txtpos, F0F0E6 in 62_two_col,
+     * F5E6E6 in 02_stamp, BFBFBF x87, C9C9C9 x182, FFFFFF x199).
+     *
+     * <p>The colour such a band actually has is not an absolute one - it is "a shade of
+     * whatever the page background is", which is what {@code a:schemeClr bg1} with
+     * {@code a:lumMod} says, and it is the only form of the colour that a reader is free to
+     * re-resolve against its own canvas. Word and LibreOffice resolve bg1 from the theme - which
+     * is why this patch also writes the theme part the package never had, see themeXml() - so
+     * the band renders as the same light tint it renders as today, and a reader that inverts its
+     * canvas can resolve bg1 to the inverted one instead of being handed a hex it must honour.
+     *
+     * <p>Measured in LibreOffice, which is the only one of the three that can be run here: with
+     * the theme part, E6EBF5 (23_timetable) comes out EDEDED over the same 32,925 pixels the page
+     * filled; without it, the same fill comes out 000000. The hue of the tint is lost - a tint of
+     * white has no hue to keep, only a lightness - which is the price of making it relative.
+     *
+     * <p>Only light fills are written this way. A dark band carries white text - the FFFFFF
+     * headings in 01, 02, 04 and 62 sit on one - and must stay dark in light mode, so a fill
+     * below the threshold keeps its absolute hex. Dark fills are not the reported defect: a
+     * dark band on a dark canvas is not a patch, and inverting it would make its white text
+     * disappear.
+     */
+    private static void fillXml(StringBuilder sb, int rgb, float alpha) {
+        double l = lightness(rgb);
+        if (l >= LIGHT_FILL) {
+            sb.append("<a:solidFill><a:schemeClr val=\"bg1\"><a:lumMod val=\"")
+                    .append(Math.round(l * 100000.0)).append("\"/>").append(alphaXml(alpha))
+                    .append("</a:schemeClr></a:solidFill>");
+        } else {
+            sb.append("<a:solidFill><a:srgbClr val=\"").append(hex(rgb)).append("\">")
+                    .append(alphaXml(alpha)).append("</a:srgbClr></a:solidFill>");
+        }
+    }
+
+    private static String alphaXml(float alpha) {
+        if (alpha >= 0.999f) return "";
+        int a = Math.max(0, Math.min(100000, Math.round(alpha * 100000f)));
+        return "<a:alpha val=\"" + a + "\"/>";
     }
 
     // ------------------------------------------------------------------ paragraphs
@@ -1447,6 +1511,10 @@ public final class DocxWriter {
         }
 
         sb.append("<w:p><w:pPr>")
+                // w:tabs comes first, before w:snapToGrid. CT_PPr defines a sequence and tabs
+                // precedes snapToGrid in it; written last - which it was - every one of these
+                // paragraphs was out of schema order. The tab stops themselves are unchanged.
+                .append("<w:tabs>").append(tabs).append("</w:tabs>")
                 .append("<w:snapToGrid w:val=\"0\"/>")
                 .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"").append(beforeTw)
                 .append("\" w:after=\"0\" w:line=\"").append(lineTw)
@@ -1456,7 +1524,6 @@ public final class DocxWriter {
                 // measured from.
                 .append("<w:ind w:left=\"").append(Math.max(0, leftTw - bandLeftTw(ctx, p.column)))
                 .append("\" w:right=\"0\" w:firstLine=\"0\"/>")
-                .append("<w:tabs>").append(tabs).append("</w:tabs>")
                 .append("</w:pPr>");
         for (int i = 0; i < cols.size(); i++) {
             if (i > 0) {
@@ -1807,11 +1874,16 @@ public final class DocxWriter {
                     .append("\" w:hAnsi=\"").append(face)
                     .append("\" w:cs=\"").append(face).append("\"/>");
         }
+        if (run.bold) sb.append("<w:b/>");
+        if (run.italic) sb.append("<w:i/>");
+        // Only when the page named one. A run with no w:color is left on Automatic, which is
+        // what a reader adapts to its own canvas - pinning 000000 here would make every such
+        // run invisible in Google Docs dark mode, which leaves an explicit black alone. The
+        // colour is written after w:b/w:i because that is where the schema puts it; a reader
+        // that validates rPr and drops what it cannot place loses it otherwise.
         if (run.color >= 0) {
             sb.append(String.format("<w:color w:val=\"%06X\"/>", run.color & 0xFFFFFF));
         }
-        if (run.bold) sb.append("<w:b/>");
-        if (run.italic) sb.append("<w:i/>");
         int half = halfPointsDown(run.sizePt);
         if (half > 0) {
             sb.append("<w:sz w:val=\"").append(Math.min(3276, Math.max(2, half))).append("\"/>");
@@ -2111,10 +2183,15 @@ public final class DocxWriter {
             boolean drawn = "insideH".equals(side) ? innerH
                     : "insideV".equals(side) ? innerV
                     : outer;
-            b.append("<w:").append(side).append(" w:val=\"").append(drawn ? "single" : "none").append("\"");
+            // w:val="nil", not "none" with sz="0" w:color="auto". "auto" is an inherited colour
+            // by definition - a reader resolves it to whatever it thinks a line is, usually the
+            // flipped text colour - and it was written on 486 sides across 59 documents. A side
+            // the page did not draw is no line at all, and "nil" says that without naming a
+            // colour that someone else will decide. The weight stays one constant: the user's
+            // verdict was that table lines must not be thick in one place and thin in another.
+            b.append("<w:").append(side).append(" w:val=\"").append(drawn ? "single" : "nil").append("\"");
             if (drawn) b.append(" w:sz=\"").append(TABLE_RULE_SZ)
                     .append("\" w:color=\"").append(TABLE_RULE_COLOUR).append("\"");
-            else b.append(" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"");
             b.append("/>");
         }
         return b.append("</w:tblBorders>").toString();
@@ -2277,10 +2354,13 @@ public final class DocxWriter {
         inner.append("<w:tbl><w:tblPr>")
                 .append("<w:tblW w:w=\"").append(totalTw).append("\" w:type=\"dxa\"/>")
                 .append("<w:tblInd w:w=\"").append(tw(x0)).append("\" w:type=\"dxa\"/>")
+                // A named table style, so the table carries a style of its own rather than
+                // falling back on a reader's default. It draws no borders and sets no colour.
+                .append("<w:tblStyle w:val=\"KavoTable\"/>")
                 // Each side on its own evidence. The ruled pass reads the grid itself, so its
                 // tables are ruled all over; a whitespace table has a frame round it (the four
                 // outer sides) and separators inside it only where the page drew them. A table
-                // with no frame at all keeps all six "none" even when a rule crosses its band:
+                // with no frame at all keeps all six undrawn even when a rule crosses its band:
                 // that rule is as likely the edge of a filled band as a drawn separator, and a
                 // line the page did not draw is the defect 403 and 406 came back with.
                 .append(borders(ruledTable,
@@ -2464,6 +2544,34 @@ public final class DocxWriter {
                 inner.append("</w:pPr>");
                 if (!cell.isEmpty()) {
                     inner.append("<w:r><w:rPr>");
+                    // Written in schema order - rFonts, b, color, sz, szCs. It was sz, szCs,
+                    // rFonts, color, b, which is not the order the schema defines; a reader
+                    // that validates rPr drops what it cannot place.
+                    if (!face.isEmpty()) {
+                        String f = esc(faceName(face));
+                        inner.append("<w:rFonts w:ascii=\"").append(f)
+                                .append("\" w:hAnsi=\"").append(f)
+                                .append("\" w:cs=\"").append(f).append("\"/>");
+                    }
+                    // Bold is a property of the face the page DREW the cell in. Guessing it
+                    // from "this is row zero of something that looks like a header" made a
+                    // bold first row out of tables whose header is not bold, and missed a
+                    // bold cell anywhere else. The face is the evidence; the header guess is
+                    // only the fallback for a cell whose face the page did not name.
+                    if (isBoldFace(face) || (r == 0 && t.header && face.isEmpty())) {
+                        inner.append("<w:b/>");
+                    }
+                    // The colour the page drew this cell in. A cell is written as a string and
+                    // a font name, so without this every coloured table - a grey label column,
+                    // a navy header row - arrived in black. A cell whose page named no colour
+                    // stays on Automatic, exactly as a run does.
+                    if (r < t.colors.size() && c < t.colors.get(r).size()) {
+                        int cellColor = t.colors.get(r).get(c);
+                        if (cellColor >= 0) {
+                            inner.append(String.format("<w:color w:val=\"%06X\"/>",
+                                    cellColor & 0xFFFFFF));
+                        }
+                    }
                     // The size the page drew this cell at. The paragraph style carries one
                     // number for every table in the document - 10 pt - and the batch's tables
                     // are drawn at 7.5 to 12 pt, so without this every cell is set at a size
@@ -2476,30 +2584,6 @@ public final class DocxWriter {
                         int half = Math.max(2, halfPointsDown(sz));
                         inner.append("<w:sz w:val=\"").append(half)
                                 .append("\"/><w:szCs w:val=\"").append(half).append("\"/>");
-                    }
-                    if (!face.isEmpty()) {
-                        String f = esc(faceName(face));
-                        inner.append("<w:rFonts w:ascii=\"").append(f)
-                                .append("\" w:hAnsi=\"").append(f)
-                                .append("\" w:cs=\"").append(f).append("\"/>");
-                    }
-                    // The colour the page drew this cell in. A cell is written as a string and
-                    // a font name, so without this every coloured table - a grey label column,
-                    // a navy header row - arrived in black.
-                    if (r < t.colors.size() && c < t.colors.get(r).size()) {
-                        int cellColor = t.colors.get(r).get(c);
-                        if (cellColor >= 0) {
-                            inner.append(String.format("<w:color w:val=\"%06X\"/>",
-                                    cellColor & 0xFFFFFF));
-                        }
-                    }
-                    // Bold is a property of the face the page DREW the cell in. Guessing it
-                    // from "this is row zero of something that looks like a header" made a
-                    // bold first row out of tables whose header is not bold, and missed a
-                    // bold cell anywhere else. The face is the evidence; the header guess is
-                    // only the fallback for a cell whose face the page did not name.
-                    if (isBoldFace(face) || (r == 0 && t.header && face.isEmpty())) {
-                        inner.append("<w:b/>");
                     }
                     // A cell can hold two lines of the page: a numbered item's marker sits on
                     // its own line above the name, and the page drew them eight points apart.
@@ -2731,6 +2815,7 @@ public final class DocxWriter {
                 .append("<Default Extension=\"png\" ContentType=\"image/png\"/>")
                 .append("<Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/>")
                 .append("<Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/>")
+                .append("<Override PartName=\"/word/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/>")
                 .append("<Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\"/>")
                 .append("<Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\"/>")
                 .append("</Types>");
@@ -2750,7 +2835,8 @@ public final class DocxWriter {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>")
                 .append("<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">")
-                .append("<Relationship Id=\"rIdStyles\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/>");
+                .append("<Relationship Id=\"rIdStyles\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/>")
+                .append("<Relationship Id=\"rIdTheme\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/>");
         for (int i = 0; i < media.size(); i++) {
             sb.append("<Relationship Id=\"rIdImg").append(i + 1)
                     .append("\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/image\" Target=\"media/image")
@@ -2760,22 +2846,116 @@ public final class DocxWriter {
         return sb.toString();
     }
 
+    /**
+     * The theme part the package was missing.
+     *
+     * <p>None of the 208 documents carried a theme, and that was invisible while every colour
+     * was an absolute {@code a:srgbClr}. It stopped being invisible the moment a light fill was
+     * written as {@code a:schemeClr bg1}: {@code bg1} means "the page background", and there was
+     * no page background for a reader to resolve it against. Measured, not assumed - the same
+     * document rendered through LibreOffice with no theme part put the fill down as 000000
+     * (black bands where the page had E6EBF5), and with this part it renders EDEDED in the same
+     * 32,925 pixels the page filled. So the theme is not decoration here; without it the fill
+     * change is a regression.
+     *
+     * <p>lt1/window is the light background the fills are a shade of; dk1 is the text. Both are
+     * sysClr with a lastClr, which is the form a reader that has its own idea of "window" and
+     * "window text" can map to its own canvas instead of being told a hex.
+     */
+    private static String themeXml() {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+                + "<a:theme xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" name=\"Kavo\">"
+                + "<a:themeElements><a:clrScheme name=\"Kavo\">"
+                + "<a:dk1><a:sysClr val=\"windowText\" lastClr=\"000000\"/></a:dk1>"
+                + "<a:lt1><a:sysClr val=\"window\" lastClr=\"FFFFFF\"/></a:lt1>"
+                + "<a:dk2><a:srgbClr val=\"44546A\"/></a:dk2>"
+                + "<a:lt2><a:srgbClr val=\"E7E6E6\"/></a:lt2>"
+                + "<a:accent1><a:srgbClr val=\"4472C4\"/></a:accent1>"
+                + "<a:accent2><a:srgbClr val=\"ED7D31\"/></a:accent2>"
+                + "<a:accent3><a:srgbClr val=\"A5A5A5\"/></a:accent3>"
+                + "<a:accent4><a:srgbClr val=\"FFC000\"/></a:accent4>"
+                + "<a:accent5><a:srgbClr val=\"5B9BD5\"/></a:accent5>"
+                + "<a:accent6><a:srgbClr val=\"70AD47\"/></a:accent6>"
+                + "<a:hlink><a:srgbClr val=\"0563C1\"/></a:hlink>"
+                + "<a:folHlink><a:srgbClr val=\"954F72\"/></a:folHlink></a:clrScheme>"
+                + "<a:fontScheme name=\"Kavo\">"
+                + "<a:majorFont><a:latin typeface=\"Calibri\"/><a:ea typeface=\"\"/><a:cs typeface=\"\"/></a:majorFont>"
+                + "<a:minorFont><a:latin typeface=\"Calibri\"/><a:ea typeface=\"\"/><a:cs typeface=\"\"/></a:minorFont>"
+                + "</a:fontScheme>"
+                + "<a:fmtScheme name=\"Kavo\">"
+                + "<a:fillStyleLst><a:solidFill><a:schemeClr val=\"phClr\"/></a:solidFill>"
+                + "<a:solidFill><a:schemeClr val=\"phClr\"/></a:solidFill>"
+                + "<a:solidFill><a:schemeClr val=\"phClr\"/></a:solidFill></a:fillStyleLst>"
+                + "<a:lnStyleLst><a:ln><a:solidFill><a:schemeClr val=\"phClr\"/></a:solidFill></a:ln>"
+                + "<a:ln><a:solidFill><a:schemeClr val=\"phClr\"/></a:solidFill></a:ln>"
+                + "<a:ln><a:solidFill><a:schemeClr val=\"phClr\"/></a:solidFill></a:ln></a:lnStyleLst>"
+                + "<a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle>"
+                + "<a:effectStyle><a:effectLst/></a:effectStyle>"
+                + "<a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst>"
+                + "<a:bgFillStyleLst><a:solidFill><a:schemeClr val=\"phClr\"/></a:solidFill>"
+                + "<a:solidFill><a:schemeClr val=\"phClr\"/></a:solidFill>"
+                + "<a:solidFill><a:schemeClr val=\"phClr\"/></a:solidFill></a:bgFillStyleLst>"
+                + "</a:fmtScheme></a:themeElements></a:theme>";
+    }
+
     private static String stylesXml() {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                 + "<w:styles xmlns:w=\"" + NS_W + "\">"
-                + "<w:docDefaults><w:rPrDefault><w:rPr><w:color w:val=\"000000\"/><w:color w:val=\"000000\"/>"
+                // w:color appears ONCE and after w:rFonts. It used to appear twice and before
+                // the font: two <w:color> elements in one rPr is not a valid CT_RPr (the
+                // element has maxOccurs=1), and a validator is entitled to reject the whole
+                // property block - colour, font and size with it.
+                + "<w:docDefaults><w:rPrDefault><w:rPr>"
                 + "<w:rFonts w:ascii=\"Calibri\" w:hAnsi=\"Calibri\" w:cs=\"Calibri\"/>"
+                + "<w:color w:val=\"000000\"/>"
                 + "<w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/></w:rPr></w:rPrDefault>"
                 + "<w:pPrDefault><w:pPr><w:spacing w:after=\"120\"/></w:pPr></w:pPrDefault>"
                 + "</w:docDefaults>"
                 + "<w:style w:type=\"paragraph\" w:default=\"1\" w:styleId=\"Normal\">"
                 + "<w:name w:val=\"Normal\"/></w:style>"
                 + heading(1, 32, 1) + heading(2, 28, 2) + heading(3, 24, 3)
+                // A document with tables and no table style has no statement of what its
+                // tables' borders are, so a reader falls back to its own default table style -
+                // which draws a box. 127 of the 208 documents carry a w:tbl; not one of them
+                // had a style to fall back on. The style declares no borders and no colour, so it
+                // changes nothing on the page: the per-table w:tblBorders still say what the
+                // page drew, and direct formatting wins over a style.
+                + tableStyles()
                 + "<w:style w:type=\"paragraph\" w:styleId=\"TableText\">"
                 + "<w:name w:val=\"Table Text\"/><w:basedOn w:val=\"Normal\"/>"
                 + "<w:pPr><w:spacing w:after=\"0\" w:before=\"0\"/></w:pPr>"
                 + "<w:rPr><w:sz w:val=\"20\"/></w:rPr></w:style>"
                 + "</w:styles>";
+    }
+
+    /**
+     * The table styles the document declares.
+     *
+     * <p>There was no {@code w:style w:type="table"} at all in any of the 208 documents, so a
+     * reader opening one of the 127 that carry a {@code w:tbl} had nothing to tell it what those
+     * tables' borders are and fell back to its own default table style - the one that draws a
+     * box. 59 of them carry a table with no borders at all, which is the case that box ruins.
+     * Both styles here say "no borders, no colour": the borders a page really drew are on the
+     * table itself, in {@code w:tblBorders}, and direct formatting beats a style, so nothing
+     * on the page changes. What changes is that the document now answers the question instead
+     * of leaving it to the reader.
+     */
+    private static String tableStyles() {
+        StringBuilder b = new StringBuilder();
+        b.append("<w:style w:type=\"table\" w:default=\"1\" w:styleId=\"TableNormal\">")
+                .append("<w:name w:val=\"Normal Table\"/><w:uiPriority w:val=\"99\"/>")
+                .append("<w:tblPr><w:tblCellMar>")
+                .append("<w:top w:w=\"0\" w:type=\"dxa\"/><w:left w:w=\"0\" w:type=\"dxa\"/>")
+                .append("<w:bottom w:w=\"0\" w:type=\"dxa\"/><w:right w:w=\"0\" w:type=\"dxa\"/>")
+                .append("</w:tblCellMar></w:tblPr></w:style>");
+        b.append("<w:style w:type=\"table\" w:styleId=\"KavoTable\">")
+                .append("<w:name w:val=\"Kavo Table\"/><w:basedOn w:val=\"TableNormal\"/>")
+                .append("<w:tblPr><w:tblBorders>");
+        for (String side : new String[]{"top", "left", "bottom", "right", "insideH", "insideV"}) {
+            b.append("<w:").append(side).append(" w:val=\"nil\"/>");
+        }
+        b.append("</w:tblBorders></w:tblPr></w:style>");
+        return b.toString();
     }
 
     private static String heading(int level, int halfPoints, int before) {
