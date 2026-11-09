@@ -4521,3 +4521,41 @@ Docs each of those must select on its own.
 180-degree stamp now renders and is correct in orientation, but the inner lines are **far too faded
 on one side**. That is the stroke colour and opacity of a shape, not a stamp structure problem.
 
+
+
+**CORRECTION to the entry above - the pairing is the opposite of what I first wrote.**
+
+The user corrected it plainly: in the Adobe and iLovePDF files **the two frame lines select
+TOGETHER**, and *that* is why they do not drift. The text lines select separately. So the correct
+grouping is:
+
+    both frame lines   -> ONE object      so they cannot drift against each other
+    IN ORDER           -> its own object
+    GOODS RECEIVED     -> its own object
+
+and what this writer produces is:
+
+    inner frame        -> its own object          wrong: it should be inside the same object as the
+                                                  outer frame
+    OUTER FRAME + IN ORDER -> one object          wrong: a frame is welded to a line of text
+
+**The frame was welded to the wrong thing.** `5013433` made the outer frame the text box's own
+`<a:ln>` border - so the outer frame travels with `IN ORDER`'s box while the inner frame travels on
+its own, and the two frames drift apart. That is the whole of the reported drift, and it was
+introduced by a change meant to fix a different one.
+
+**The fix, corrected.**
+
+1. **Both frames in ONE shape.** The outer and the inner rectangle become a single freeform path with
+   both rectangles in it. Then no geometry can separate them: they are one object with one set of
+   coordinates.
+2. **Each line of text its own paragraph**, not a text box, so Google Docs can put a caret in it -
+   which is what makes 02 editable, as the 01 and 04 stamps already are.
+3. **No frame is a border on anything.** The frame shape and the text paragraphs are siblings, not
+   parent and child.
+4. **`Shape.consumed` is never set for a stamp frame** once there is no text box to consume it into.
+
+**Test:** in Google Docs, the two frame lines must select as ONE object, and each line of text as its
+own. And in the .docx the stamp must be three objects for `02` - one shape holding both frames, plus
+one paragraph per text line - not four and not one.
+
