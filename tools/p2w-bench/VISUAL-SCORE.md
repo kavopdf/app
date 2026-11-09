@@ -22,6 +22,7 @@ opened is not counted here - `looked.py` decides that, not this file.
 | 8 Nov | 13 | 6 | 46 % | g53 batch 3, the tax-invoice class: 7 fail, after two engine fixes cleared 9 of the 13 documents of the spill and the dropped header line |
 | 8 Nov | 10 | 5 | 50 % | the D group, and the corpus is now fully scored: 113 PASS / 95 FAIL of 208, last row per document |
 | 8 Nov | 15 | 8 | 53 % | v3 batch 1 final sweep: 7 fail (301, 303, 305, 306, 311, 314, 315), 306 new on a 7.2 pt table-extent finding |
+| 2026-11-09 | 15 | 9 | 60 % | v3 318-340: 6 fail, 21 findings 21 verified 0 refuted; 3 pass on the eye against an order finding (the tab-join measurement bug) |
 
 Not a baseline yet - three documents is not the corpus. It becomes one when a full
 batch has been through both halves of the check.
@@ -800,3 +801,18 @@ the engine did not change this run, so no baseline was touched.
 | 2026-11-09 | 315_gazette_notification | FAIL | moved:RAJESH KUMAR, Jt. Secy. verified +69.8 pt; the three-column page's footer is placed at the end of the flow, order 47.1 % |
 | 2026-11-09 | 316_contract_with_schedules | PASS | four numbered clauses, schedule A and C with its four-row charges table, signature rules |
 | 2026-11-09 | 317_rti_response | PASS | letterhead, date, subject line, six numbered points, enclosure |
+| 2026-11-09 | 318_court_summons_form | FAIL | moved:B verified 160.5 pt; the seal's arc text is scattered to the page's left edge, order 50.0 % |
+| 2026-11-09 | 320_balance_sheet_statutory | PASS | statement of profit and loss, the notes table and both signature blocks in the page's own places |
+| 2026-11-09 | 321_auditors_report | PASS | six numbered sections, bold headings, signature block |
+| 2026-11-09 | 322_mutual_fund_factsheet | FAIL | moved:very high risk verified 70.0 pt; the riskometer legend and caption sit below the dial, order 89.2 % |
+| 2026-11-09 | 323_credit_card_statement | FAIL | count:Shopping verified 3 in the PDF 2 in the render; the spend-by-category labels are gone, moved:Other 58.3 pt |
+| 2026-11-09 | 324_loan_amortisation_schedule | FAIL | moved:4,164,306.09 verified -5.5 pt; the schedule's table sits 5.5 pt high on all seven pages |
+| 2026-11-09 | 325_demat_holdings_statement | PASS | holder band, seven-column ISIN table, total value, transactions table (order 92.3 % is the tab-join measurement bug) |
+| 2026-11-09 | 326_itr_computation | PASS | name band, schedule table, tax computation table, verification and QR code (order 94.9 % is the same measurement bug) |
+| 2026-11-09 | 330_cad_drawing_sheet | PASS | dimension lines with labels, column dots, hatch, north arrow, both title tables (order 81.1 % is the same measurement bug) |
+| 2026-11-09 | 331_pid_diagram | PASS | two pumps, valves, pipe runs with arrows, legend box, footer |
+| 2026-11-09 | 332_bom_on_drawing | FAIL | moved:8.40 verified -5.2 pt; the BOM table sits 5.2 pt high and its header row lost the grey fill |
+| 2026-11-09 | 333_datasheet_spec_tables | FAIL | moved:SPI clock frequency verified -24.0 pt; section 2's rows are pitched short so rules cut through the text |
+| 2026-11-09 | 334_patent_document | PASS | form heading, title, abstract, the three-box figure with arrows, five claims, footer |
+| 2026-11-09 | 335_msds_safety_data_sheet | PASS | four hazard diamonds, sections 1-8, the CAS table, footnote |
+| 2026-11-09 | 340_bill_of_lading | PASS | shipper/consignee/notify grid, vessel band, cargo table with total, on-board clause, three signature boxes, barcode |

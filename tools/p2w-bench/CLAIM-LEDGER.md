@@ -555,3 +555,23 @@ the previous pass and is now refuted, which is the ledger earning its keep.
 The `order` finding on 312 is verified (63.8 % of 34 rows) while the eye passed the page. That is
 the tab-joined-rows measurement bug recorded on 8 Nov, not a document defect: the eye decides and
 the document is PASS, and the row here is the repair ticket for the tool.
+
+
+## 9 Nov 07:20 IST — v3 318-340, first pass
+
+21 findings emitted, 21 verified, 0 refuted, 0 unverifiable. By claim type: `moved:` +10
+verified (nine of them the same table offset), `count:` +4 verified, `order:` +6 verified.
+
+One claim was refuted and then reworded, and the reword is the lesson. `missing:INDIA` on 318
+came back REFUTED - "1 line in the PDF, 1 in the render" - because the seal's words are all
+there; the verifier was right and the eye had named the wrong fault. The arc glyphs are drawn
+on the page at x=90 to x=140, y=490 to y=528 where the PDF puts them at x=446 to x=496, y=300
+to y=335: nothing is missing, everything is 160 pt away. `moved:B` says that and verified at
+160.5 pt. A ring of per-glyph text still has no claim that describes it, and `moved:<first
+glyph>` is a poor stand-in - it is the fourth time the arc-text vocabulary gap has cost a
+finding.
+
+The three `order` findings on 325, 326 and 330 are verified while the eye passed the page.
+All three are the tab-joined-rows measurement bug: a row of table cells reads as one string in
+the render and as separate strings in the PDF, so the sequence never matches. The eye decides,
+the documents are PASS, and these rows are the repair ticket for the tool.

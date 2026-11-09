@@ -789,3 +789,33 @@ rows run at 16.60 pt against the page's 17.00. That is 6.6 pt of the known table
 **No fix shipped this run.** The seven open findings are all engine-wide classes with measurements
 already recorded (the table row pitch, the band of label/value pairs, the multi-column flow); none
 was attempted blind at the end of a run.
+
+
+## v3 318-340 — 9 Nov 07:20, fifteen documents, 21 pages
+
+All seventeen steps in order, every page opened before any number was read. Fifteen findings
+by eye, six measure findings from the eight questions; 21 verified, 0 refuted, 0 unverifiable.
+Nine pass, six fail.
+
+| Document | Pages | Verdict | Verified finding |
+|---|---|---|---|
+| 318_court_summons_form | 1 | FAIL | moved:B 160.5 pt - the seal's arc text lands at the page's left edge |
+| 320_balance_sheet_statutory | 1 | PASS | - |
+| 321_auditors_report | 1 | PASS | - |
+| 322_mutual_fund_factsheet | 1 | FAIL | moved:very high risk 70.0 pt - the riskometer legend and caption fall below the dial |
+| 323_credit_card_statement | 1 | FAIL | count:Shopping 3 against 2 - the spend-by-category labels are gone |
+| 324_loan_amortisation_schedule | 7 | FAIL | moved:4,164,306.09 -5.5 pt - the table sits 5.5 pt high on every page |
+| 325_demat_holdings_statement | 1 | PASS | order 92.3 % - the tab-join measurement bug |
+| 326_itr_computation | 1 | PASS | order 94.9 % - the same measurement bug |
+| 330_cad_drawing_sheet | 1 | PASS | order 81.1 % - the same measurement bug |
+| 331_pid_diagram | 1 | PASS | - |
+| 332_bom_on_drawing | 1 | FAIL | moved:8.40 -5.2 pt - the BOM table sits 5.2 pt high, header fill lost |
+| 333_datasheet_spec_tables | 1 | FAIL | moved:SPI clock frequency -24.0 pt - section 2's rows are pitched short |
+| 334_patent_document | 1 | PASS | - |
+| 335_msds_safety_data_sheet | 1 | PASS | - |
+| 340_bill_of_lading | 1 | PASS | - |
+
+What the six failures have in common: four of them are the same table-top offset (324, 332,
+and the diagnosed 311), one is a table whose rows are pitched short (333), and two are
+out-of-flow furniture that the writer emits as flow paragraphs (318's arc, 322's legend,
+323's bar labels). Nothing here is a new class of defect.
