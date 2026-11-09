@@ -4683,3 +4683,38 @@ complaints are about position and order, which the gate cannot see at all.
 it at. It is the same comparison `verify_visual.py` performs, wrapped in a loop with the aggregate
 counts added, and `verify_visual.py` has been run against five real documents.
 
+
+
+**A patch that fixes it, gate-clean, waiting to be applied.** `patches/D25-A-stamp-objects.patch`,
+one file, `DocxWriter.java`, +355/-22.
+
+1. **Both frame lines are one freeform shape.** `stampFrames()` groups a page's stroked, unfilled
+   rectangles by shared centre and parallel edges, and `mergedFrame()` writes them as a single Shape
+   whose path holds one closed sub-path per rule. Measured, not guessed: on this corpus a stamp's two
+   rules share a centre to **0.00 pt** at the same angle, and the nearest rules of two *different*
+   stamps are **54.5 pt** apart. `geom()` gained command type 3 = `<a:close/>`, because
+   `freeformClosed` can only close the last sub-path.
+2. **Each line of stamp text is an ordinary paragraph**, placed by its own `w:ind w:left` and
+   `w:spacing w:before`. `wps:txbx` across the stamp corpus is now **0** - which is what makes the
+   stamp editable in Google Docs.
+3. **`orderStamps()`** - required, and not in the brief. The engine reads a stamp *after* the page's
+   words, and a paragraph cannot be given a position above the flow point, so left in place 02's
+   `IN ORDER` landed **226 pt below its frame**. Moving the stamp paragraphs to where their own y
+   falls puts them back inside the frame without touching the footer's gap.
+4. **No frame is a border; `Shape.consumed` is now set nowhere.** Frames carry a new
+   `Shape.stampFrame` flag instead, excluded from `containerOf` - otherwise 04's axis-aligned 180-degree
+   frame swallows `Round Off`.
+
+**Measured.** `02` is exactly **three objects**: one shape with two closed sub-paths plus two
+paragraphs. `01/03/04/06/07/08` keep their object count with a different composition - the two rules
+are one object and no text box carries a frame. `verify_visual`: pages 1/1 unchanged on all five, dy
+median 4.3 to 4.9, and **worst dy improved on all five** (207.9 to 137.8 at the median of the five) -
+the worst line is the footer, not the stamp. Gate **no document got worse**, `verify-engine.sh` passes
+end to end, `TestPdfToWord` 29/29.
+
+**Two caveats, both in the report.** `03`'s vertical stamp text got worse on one line - 107.5 pt
+against under 28 pt - because a 90-degree line's `Box.y` is mid-frame rather than the baseline start;
+its aggregate numbers are flat. And **a merged frame carries one stroke weight**, so the thinner inner
+rule is drawn at the outer rule's weight - which collides with D-22 and has to be settled when both
+are in.
+
