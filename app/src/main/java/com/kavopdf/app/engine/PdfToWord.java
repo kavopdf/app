@@ -5204,12 +5204,21 @@ public final class PdfToWord {
         }
         t.top = top; t.bottom = bottom; t.left = left; t.right = right;
         // The page's own row edges, so a row can be given its own height instead of the average.
-        // A cell's rectangle carries the rule BELOW its row, so the first edge is one pitch above
-        // the first cell's y and row r's top is the cell y of row r-1.
-        float firstPitch = nrow > 1 ? Math.max(1f, R.get(1) - R.get(0)) : Math.max(1f, bottom - R.get(0));
+        //
+        // These cells come from intersectionsToCells, which emits each one as
+        // {left, top, right, bottom} - a rectangle bounded by the four rules that close it. So a
+        // cell's y IS the rule ABOVE its row: the first cell's y is the table's own top edge and
+        // the lowest cell's bottom is its foot. (The comment here used to claim the opposite -
+        // that a cell's y was the rule BELOW its row - and derived the table's top as one pitch
+        // above the first cell. Nothing was below that invented edge, so the top rule landed one
+        // row-pitch too high and the header row was handed its neighbour's pitch: on
+        // 23_timetable_grid_txtpos the page draws its rules at y=140,166,206,...,406 with the
+        // header 26 pt tall and every day row 40 pt, and the model came out 114,140,166,...,366 -
+        // a grid starting 26 pt high, with two 26 pt rows where the page has 26 and 40, and 14 pt
+        // short by the foot, so every row below the header drifted further up the sheet.)
         float[] rowEdge = new float[nrow + 1];
-        rowEdge[0] = R.get(0) - firstPitch;
-        for (int r = 1; r <= nrow; r++) rowEdge[r] = R.get(r - 1);
+        for (int r = 0; r < nrow; r++) rowEdge[r] = R.get(r);
+        rowEdge[nrow] = Math.max(R.get(nrow - 1) + 1f, bottom);
         t.rowEdge = rowEdge;
         t.rowTopPt = rowEdge[0];
         float[] cx = new float[ncol + 1];
