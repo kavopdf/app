@@ -382,6 +382,7 @@ public final class DocxWriter {
             put(zip, "word/document.xml", documentXml);
             put(zip, "word/styles.xml", stylesXml());
             put(zip, "word/theme/theme1.xml", themeXml());
+            put(zip, "word/settings.xml", settingsXml());
             put(zip, "word/_rels/document.xml.rels", rels);
             put(zip, "docProps/core.xml", coreXml(result));
             put(zip, "docProps/app.xml", appXml());
@@ -1236,9 +1237,15 @@ public final class DocxWriter {
     private static void fillXml(StringBuilder sb, int rgb, float alpha) {
         double l = lightness(rgb);
         if (l >= LIGHT_FILL) {
-            sb.append("<a:solidFill><a:schemeClr val=\"bg1\"><a:lumMod val=\"")
-                    .append(Math.round(l * 100000.0)).append("\"/>").append(alphaXml(alpha))
-                    .append("</a:schemeClr></a:solidFill>");
+            // No fill at all. A decorative tint barely distinguishable from the page IS no fill
+            // on a dark page, and a fill is the only thing that can be a white patch - so the
+            // good converters emit none: measured, Adobe writes ZERO w:shd fills and iLovePDF
+            // five, where this writer emitted 753 across 159 documents. The earlier attempt
+            // expressed them as a:schemeClr bg1 with a lumMod; bg1 is an alias for lt1, which is
+            // FFFFFF in every Office theme, so that either resolves at import to a pure white
+            // patch or is dropped - and it loses the hue in light mode either way, because
+            // E6EBF5 has S=0.429 and EEEEEE has S=0.000.
+            sb.append("<a:noFill/>");
         } else {
             sb.append("<a:solidFill><a:srgbClr val=\"").append(hex(rgb)).append("\">")
                     .append(alphaXml(alpha)).append("</a:srgbClr></a:solidFill>");
@@ -2826,6 +2833,7 @@ public final class DocxWriter {
                 .append("<Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/>")
                 .append("<Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/>")
                 .append("<Override PartName=\"/word/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/>")
+                .append("<Override PartName=\"/word/settings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml\"/>")
                 .append("<Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\"/>")
                 .append("<Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\"/>")
                 .append("</Types>");
@@ -2846,7 +2854,8 @@ public final class DocxWriter {
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>")
                 .append("<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">")
                 .append("<Relationship Id=\"rIdStyles\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/>")
-                .append("<Relationship Id=\"rIdTheme\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/>");
+                .append("<Relationship Id=\"rIdTheme\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/>")
+                .append("<Relationship Id=\"rIdSettings\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings\" Target=\"settings.xml\"/>");
         for (int i = 0; i < media.size(); i++) {
             sb.append("<Relationship Id=\"rIdImg").append(i + 1)
                     .append("\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/image\" Target=\"media/image")
@@ -2872,6 +2881,31 @@ public final class DocxWriter {
      * sysClr with a lastClr, which is the form a reader that has its own idea of "window" and
      * "window text" can map to its own canvas instead of being told a hex.
      */
+    /**
+     * {@code word/settings.xml}.
+     *
+     * <p>Both commercial converters write one and this writer never did. The part carries
+     * {@code clrSchemeMapping}, which tells a reader which theme slot each colour name means, and
+     * it deliberately carries NO {@code displayBackgroundShape}: per the specification that
+     * setting means the page background is painted, and a painted page colour suppresses Word's
+     * own automatic dark page.
+     */
+    private static String settingsXml() {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+                + "<w:settings xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\">"
+                + "<w:zoom w:percent=\"100\"/>"
+                + "<w:defaultTabStop w:val=\"720\"/>"
+                + "<w:characterSpacingControl w:val=\"doNotCompress\"/>"
+                + "<w:compat>"
+                + "<w:compatSetting w:name=\"compatibilityMode\" w:uri=\"http://schemas.microsoft.com/office/word\" w:val=\"15\"/>"
+                + "</w:compat>"
+                + "<w:clrSchemeMapping w:bg1=\"light1\" w:t1=\"dark1\" w:bg2=\"light2\" w:t2=\"dark2\""
+                + " w:accent1=\"accent1\" w:accent2=\"accent2\" w:accent3=\"accent3\""
+                + " w:accent4=\"accent4\" w:accent5=\"accent5\" w:accent6=\"accent6\""
+                + " w:hyperlink=\"hyperlink\" w:followedHyperlink=\"followedHyperlink\"/>"
+                + "</w:settings>";
+    }
+
     private static String themeXml() {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                 + "<a:theme xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" name=\"Kavo\">"
@@ -2911,13 +2945,13 @@ public final class DocxWriter {
     private static String stylesXml() {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                 + "<w:styles xmlns:w=\"" + NS_W + "\">"
-                // w:color appears ONCE and after w:rFonts. It used to appear twice and before
-                // the font: two <w:color> elements in one rPr is not a valid CT_RPr (the
-                // element has maxOccurs=1), and a validator is entitled to reject the whole
-                // property block - colour, font and size with it.
+                // NO w:color here at all. It used to be 000000, which decided 325 of 414 runs
+                // and removed the one adaptation hook a reader has: Automatic text is the only
+                // thing every dark mode flips. Measured on the files the user supplied - the
+                // iLovePDF output carries an explicit colour on 98 of 365 runs and the Adobe one
+                // on 178 of 558, and neither writes a colour in docDefaults at all.
                 + "<w:docDefaults><w:rPrDefault><w:rPr>"
                 + "<w:rFonts w:ascii=\"Calibri\" w:hAnsi=\"Calibri\" w:cs=\"Calibri\"/>"
-                + "<w:color w:val=\"000000\"/>"
                 + "<w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/></w:rPr></w:rPrDefault>"
                 + "<w:pPrDefault><w:pPr><w:spacing w:after=\"120\"/></w:pPr></w:pPrDefault>"
                 + "</w:docDefaults>"
