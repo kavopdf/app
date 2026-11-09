@@ -4914,3 +4914,64 @@ else passes through).
 
 **Every step re-gated.** A patch that is clean alone is not necessarily clean on top of another.
 
+
+
+## HANDOVER: the two defects that block the APK
+
+Four patches are integrated and committed (`4bc9575`, then `10ed429`) and the gate is clean over
+208 with 26 counts improved. **The APK must not ship until these two are fixed**, per the user's
+instruction to fix everything first.
+
+### 1. `23_timetable_grid_txtpos` - a regression, measured 6.8 pt before and 28.3 pt now
+
+    median dy 28.3 pt   worst 64.7   within 3 pt 6 %   reading order 21 %
+
+**What is known, from the line-by-line comparison:**
+
+- Every header line sits at **dy -17.3** (`DAY`, and all six period labels `09:00-09:55` through
+  `03:45-04:40`), so the whole grid is 17.3 pt **above** where the page drew it.
+- Rows below the header sit at **dy -24.7** (`MON`, `DS`, `M-III`), so the error grows downward by
+  7.4 pt over the first row boundary.
+- The generated document has **one table with 7 `w:trHeight` entries**, which is far too few for a
+  timetable of this shape.
+- `w:before` on the first paragraph is **899 twips = 45 pt**.
+
+**Two fixes were tried and neither moved the number**, both gate-clean and both kept because they are
+right on their own terms: gating absolute table placement on `!evenlySpaced(t.rowEdge)`, and lowering
+the table spacer threshold from `prevLine * 1.2f` to `2f`. So the fault is **not** where the table is
+placed.
+
+**Next step, precisely:** dump the generated `<w:tbl>` row by row - cell count, `w:trHeight`,
+`w:gridSpan`, the text of each cell - and put it beside the PDF's own horizontal rule ys from
+`page.get_drawings()`. The PDF side is a grid of rules; the docx side has 7 rows. The question to
+answer is whether rows are being **merged** or **dropped** in `PdfToWord`'s table build for this page,
+which would explain both the 17.3 pt offset and the growing error without any placement change being
+able to fix it.
+
+### 2. `02_stamp_rotated_15deg_upleft` - the stamp's paragraphs are in the wrong document order
+
+    median dy 8.5 pt   worst 144.5   within 3 pt 28 %   reading order 19 %
+
+Positions are mostly right and the **order** is wrong, which is exactly what `orderStamps()` was
+added to fix in D-25. It is not working for this document.
+
+**Next step, precisely:** the three stamp objects exist (one shape holding both frames, two
+paragraphs) - confirm that, then read the order in which those paragraphs appear in
+`word/document.xml` and compare it with their y in the PDF. `orderStamps()` moves a stamp's
+paragraphs to where their own y falls; if `IN ORDER` (the upper line) still comes after
+`GOODS RECEIVED`, the move is not happening or is being undone by the block ordering that runs later.
+
+### What is already right, and must not be lost
+
+    structural, 208 documents: continuous sections 0, w:cols 0, a:schemeClr 0, w:shd fills 0,
+                               settings.xml 208/208, docDefaults colour 0
+
+    62_two_col_newsletter      1 page  1.0 pt  100 % within 3 pt  order 89 %  (was 2 pages / 25 % / 33 %)
+    63_three_column_brochure   1 page  0.8 pt   96 %              order 96 %  (was 13 % order)
+    16_right_aligned_amounts   1 page  2.0 pt   92 %              order 91 %  (was 10.5 pt / 16 %)
+    20_numbered_list           1 page  0.9 pt   85 %              order 64 %  (was 51.1 pt / 15 %)
+    80_gstin_pan_cin_ifsc      1 page  1.2 pt   84 %              order 11 %  (was 16 % within 3 pt)
+
+**Any change made for these two defects must be re-measured against this table**, because the four
+patches that produced it were integrated by hand and the gate alone cannot see position or order.
+
