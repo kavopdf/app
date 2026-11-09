@@ -32,8 +32,8 @@ android {
         // them changes nothing that is displayed and takes roughly a megabyte off the APK.
         // If a translation is ever added, its folder has to be added here too.
         resConfigs "en"
-        versionCode 296
-        versionName "3.53.6"
+        versionCode 297
+        versionName "3.53.7"
 
         ndk {
             // Real phones are ARM; x86_64 exists so the app can be installed on the
