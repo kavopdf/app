@@ -101,6 +101,21 @@ public final class PdfToWord {
          * read after the page's own words.
          */
         public boolean stamp;
+        /**
+         * True when this paragraph is a short line the page drew inside the vertical band of a
+         * table that follows it, and which the table pass did not take into a cell - a form's
+         * "AFFIX PHOTOGRAPH" box beside its own candidate table, a margin label beside a grid.
+         *
+         * <p>Such a line is not part of the page's flow: it sits BESIDE the table, at a y the
+         * flow reaches only after the table. Written as a flowed paragraph it charges the page
+         * for its own height first, and the table - which the writer places at its own measured
+         * top - is pushed down by exactly that much. Measured on admit-card: one constant
+         * +19.4 pt step from the table to the foot of the sheet, 17.2 pt median dy, 15 % of
+         * lines within 10 pt. The writer therefore places these lines with {@code w:framePr}
+         * ({@link com.kavopdf.app.engine.DocxWriter} - see {@code stampLine}), which anchors
+         * them at their own page point and charges the flow nothing.
+         */
+        public boolean pinned;
         public int column;           // which column band it sits in
         /** The lines the PDF actually drew, in order. A .txt has no paragraph concept, so the
          *  plain-text output keeps them instead of hard-wrapping a paragraph back into lines
@@ -2945,6 +2960,20 @@ public final class PdfToWord {
             hValid = smaller <= 0 || overlap >= smaller * 0.3f;
         }
 
+        // A lone small element that sits inside the vertical span of the group beside it is a
+        // row-mate, not a column of its own. The GST invoice's header is three blocks side by
+        // side - the company name on the left, the monogram "TC" in the middle, "TAX INVOICE"
+        // and the number on the right - and the monogram is one glyph pair, so the widest
+        // vertical gap on that band falls either side of it and the cut lifted it into a band
+        // ahead of the letterhead. The letterhead then started a row late and every line under
+        // it inherited the offset: the page measured 18.8 pt low from top to bottom while its
+        // table rows were already exact. Keeping the monogram in the letterhead's own row is
+        // what puts the page back.
+        if (vValid && bestVi > 0
+                && rowMate(byX.subList(0, bestVi), byX.subList(bestVi, byX.size()))) {
+            vValid = false;
+        }
+
         // Prefer the column cut: a page is more often read down a column than split across.
         // A horizontal cut needs a clearly wider gap, or it separates a paragraph from its own
         // next line and the text comes out in the wrong order.
@@ -2973,6 +3002,60 @@ public final class PdfToWord {
 
     private static float bottomOf(Object o) {
         return o instanceof Para ? ((Para) o).top : ((Table) o).bottom;
+    }
+
+    /**
+     * True when one side of a vertical cut is a lone small element sitting inside the other
+     * side's vertical span - the same row of the page, not a band beside it.
+     *
+     * <p>The tolerance is the element's own text size, not a measured number of points: one
+     * line of type is a line tall whatever the size on the page, so an element no taller than
+     * twice its own type - a line or two, with the leading they carry - is a row-mate of a band
+     * that spans at least twice that. A block of prose or a table is taller than its type and
+     * never qualifies, and the element has to be wholly inside the other side's span rather
+     * than merely overlapping it, which is what keeps two real columns from being welded.
+     */
+    private static boolean rowMate(List<Object> a, List<Object> b) {
+        return sideIsRowMate(a, b) || sideIsRowMate(b, a);
+    }
+
+    private static boolean sideIsRowMate(List<Object> side, List<Object> other) {
+        if (side.size() != 1 || other.size() < 2) return false;
+        float oTop = Float.MAX_VALUE, oBot = -Float.MAX_VALUE;
+        for (Object o : other) {
+            oTop = Math.min(oTop, topOf(o));
+            oBot = Math.max(oBot, bottomExtent(o));
+        }
+        float sTop = Float.MAX_VALUE, sBot = -Float.MAX_VALUE, tol = 0f;
+        for (Object o : side) {
+            float size = textSizeOf(o);
+            if (size <= 0f) return false;                       // a table is never a row-mate
+            if (bottomExtent(o) - topOf(o) > size * 2f) return false;     // a block, not a line
+            sTop = Math.min(sTop, topOf(o));
+            sBot = Math.max(sBot, bottomExtent(o));
+            tol = Math.max(tol, size * 0.5f);
+        }
+        // The other side must be a band rather than another line, and the small element must
+        // lie within it - not merely overlap it - before it can be called part of its row.
+        if (oBot - oTop < (sBot - sTop) * 2f) return false;
+        return sTop >= oTop - tol && sBot <= oBot + tol;
+    }
+
+    /** The real bottom of an item on the page. {@link #bottomOf} is the top of a paragraph on
+     *  purpose - that is where the cut orders it from - so a paragraph's own extent is read
+     *  from the lines it drew. */
+    private static float bottomExtent(Object o) {
+        if (!(o instanceof Para)) return ((Table) o).bottom;
+        Para p = (Para) o;
+        float b = p.top;
+        for (Box box : p.boxes) b = Math.max(b, box.bottom);
+        for (Float y : p.lineY) b = Math.max(b, y + p.size());
+        return b;
+    }
+
+    /** The point size the item's type is set in, or 0 for anything that is not text. */
+    private static float textSizeOf(Object o) {
+        return o instanceof Para ? ((Para) o).size() : 0f;
     }
 
     private static List<Float> columnStarts(List<Line> lines) {
@@ -5371,9 +5454,38 @@ public final class PdfToWord {
         return -1;
     }
 
+    /**
+     * The face a cell's text was drawn in: the one most of its characters were drawn in.
+     *
+     * <p>Not the face of the first glyph. A salary slip draws its amount as the rupee sign in
+     * one face and the digits in another - "\u20b9" in DejaVuSans 7.36, "5,616.00" in
+     * LiberationSans 8 - and taking the first glyph's face set the whole cell in DejaVuSans,
+     * whose digits are 13.5 % wider: "\u20b95,616.00" came out 40.7 pt wide against the 35.8 pt
+     * the page drew, and in a column the page had made exactly wide enough it wrapped, "\u20b95,616.0"
+     * over "0". One extra line box per row put every row below it 12.6 pt further down.
+     *
+     * <p>The face that carries the characters is the one the value is read in, so that is the
+     * face the cell is set in; the glyph or two the page borrowed from a fallback face are left
+     * to the renderer's own fallback, exactly as the page left them. Ties keep the first face
+     * seen, so a cell drawn in one face is unchanged.
+     */
     private static String fontOf(List<Glyph> gs) {
-        for (Glyph g : gs) if (g.font != null && !g.font.isEmpty()) return g.font;
-        return "";
+        java.util.LinkedHashMap<String, Integer> chars =
+                new java.util.LinkedHashMap<String, Integer>();
+        String best = null;
+        int most = 0;
+        for (Glyph g : gs) {
+            if (g.font == null || g.font.isEmpty()) continue;
+            int n = g.text == null ? 1 : Math.max(1, g.text.length());
+            Integer seen = chars.get(g.font);
+            int total = seen == null ? n : seen + n;
+            chars.put(g.font, total);
+            if (total > most) {
+                most = total;
+                best = g.font;
+            }
+        }
+        return best == null ? "" : best;
     }
 
     /**
@@ -5676,6 +5788,122 @@ public final class PdfToWord {
     }
 
     /**
+     * The column positions of a run of cells, as their left edges, and the right edge each
+     * column's text ends on where the column has one.
+     *
+     * <p>A column's position is where its cells start - except where the page right-aligned
+     * them. A right-aligned column has no common start at all: every figure begins wherever
+     * its own width leaves it, so "\u20b95,616.00" starts 25 pt left of "\u20b90.00" and the two
+     * end on the same point. Clustering the starts alone therefore reads one column of amounts
+     * as two. On salary-slip-corporate the deductions amounts start at 504.2, 507.6, 514.1,
+     * 520.8 and 529.7 pt - a 25.5 pt spread, wider than the 18 pt a start is allowed to drift -
+     * so the column was cut into one 25 pt wide and one 30 pt wide, and "\u20b9200.00" does not
+     * fit in 30 pt. It wrapped onto a second line and every row below it drifted one line box:
+     * 57.5 pt median, 259.5 pt worst, reading order 47 %.
+     *
+     * <p>So two starts are one column when the cells behind them share a right edge as well as
+     * when they share a left one. The right-edge tolerance is half the text's own size, which
+     * is a safe width because the row cutter only breaks a row at a gap wider than
+     * max(9 pt, 1.1 x the size): two cells it kept apart cannot end within half a size of each
+     * other by accident. A column only takes a right edge when every cell in it agrees to that
+     * tolerance, so a left-aligned column - whose rights are as varied as its text - never
+     * claims one, and only a genuinely right-aligned column merges.
+     */
+    private static void columnStarts(List<Line> cells, List<Float> out, List<Float> outRight) {
+        List<Line> sorted = new ArrayList<>(cells);
+        Collections.sort(sorted, new Comparator<Line>() {
+            @Override
+            public int compare(Line a, Line b) {
+                return Float.compare(a.x, b.x);
+            }
+        });
+
+        // Left edges first, with the drift a start is allowed to have: a column's cells are not
+        // always drawn at exactly the same x, but they are always within a few points of it.
+        List<List<Line>> groups = new ArrayList<>();
+        List<Float> starts = new ArrayList<>();
+        for (Line cell : sorted) {
+            if (starts.isEmpty() || Math.abs(cell.x - starts.get(starts.size() - 1)) > 18f) {
+                starts.add(cell.x);
+                groups.add(new ArrayList<Line>());
+            }
+            groups.get(groups.size() - 1).add(cell);
+        }
+
+        // Then merge the neighbours that are one right-aligned column: adjacent groups only,
+        // because a column that sits between two others is not part of either.
+        boolean merged = true;
+        while (merged) {
+            merged = false;
+            for (int i = 0; i + 1 < groups.size(); i++) {
+                if (!shareRightEdge(groups.get(i), groups.get(i + 1))) continue;
+                groups.get(i).addAll(groups.get(i + 1));
+                groups.remove(i + 1);
+                starts.remove(i + 1);
+                merged = true;
+                break;
+            }
+        }
+
+        for (List<Line> g : groups) {
+            float left = Float.MAX_VALUE;
+            for (Line c : g) left = Math.min(left, c.x);
+            out.add(left);
+            outRight.add(rightEdge(g));
+        }
+    }
+
+    /**
+     * The right edge these cells all end on, or {@code NaN} when they do not share one.
+     *
+     * <p>Half the size the text is drawn at is the whole tolerance, and it is enough: the row
+     * cutter only breaks a row at a gap wider than max(9 pt, 1.1 x the size), so two cells it
+     * kept apart cannot end within half a size of each other by accident. A left-aligned
+     * column's rights are as varied as its text, so it never passes this test and never claims
+     * a right edge - which is what keeps the rule to the columns that really are right-aligned.
+     */
+    private static float rightEdge(List<Line> g) {
+        float lo = Float.MAX_VALUE, hi = -Float.MAX_VALUE, size = 0f;
+        for (Line c : g) {
+            lo = Math.min(lo, c.right);
+            hi = Math.max(hi, c.right);
+            size = Math.max(size, c.size);
+        }
+        return hi - lo <= Math.max(1f, 0.5f * size) ? hi : Float.NaN;
+    }
+
+    /** Do these two groups of cells end on one right edge? */
+    private static boolean shareRightEdge(List<Line> a, List<Line> b) {
+        List<Line> both = new ArrayList<Line>(a.size() + b.size());
+        both.addAll(a);
+        both.addAll(b);
+        return !Float.isNaN(rightEdge(both));
+    }
+
+    /**
+     * Which column a cell belongs to: the one whose start it shares, else the one whose right
+     * edge it shares, else the nearest start. A right-aligned cell is nowhere near its column's
+     * start - that is what right-aligned means - so the right edge is what places it.
+     */
+    private static int columnOf(List<Float> columns, List<Float> colRight, Line cell) {
+        float tol = Math.max(1f, 0.5f * cell.size);
+        for (int c = 0; c < columns.size(); c++) {
+            if (Math.abs(columns.get(c) - cell.x) <= 18f) return c;
+        }
+        for (int c = 0; c < colRight.size(); c++) {
+            float r = colRight.get(c);
+            if (!Float.isNaN(r) && Math.abs(r - cell.right) <= tol) return c;
+        }
+        int best = 0;
+        float bestDistance = Float.MAX_VALUE;
+        for (int c = 0; c < columns.size(); c++) {
+            float d = Math.abs(columns.get(c) - cell.x);
+            if (d < bestDistance) { bestDistance = d; best = c; }
+        }
+        return best;
+    }
+
+    /**
      * Rebuilds a table that has no drawn lines, from the rows its cells sit on.
      *
      * <p>Each raw line is cut at its own wide gaps, so a row becomes the cells a reader sees.
@@ -5797,18 +6025,15 @@ public final class PdfToWord {
         return Math.abs(ax - bx) <= 14f;
     }
 
-    /** Builds the table, placing each cell in the nearest of the run's column positions. */
+    /** Builds the table, placing each cell in the column the run's own edges put it in. */
     private static Table buildRowTable(List<List<Line>> rows, int from, int to) {
-        List<Float> rawStarts = new ArrayList<>();
-        for (int r = from; r < to; r++) for (Line cell : rows.get(r)) rawStarts.add(cell.x);
-        Collections.sort(rawStarts);
-
+        List<Line> run = new ArrayList<>();
+        for (int r = from; r < to; r++) run.addAll(rows.get(r));
         List<Float> columns = new ArrayList<>();
-        for (Float x : rawStarts) {
-            if (columns.isEmpty() || Math.abs(x - columns.get(columns.size() - 1)) > 18f) {
-                columns.add(x);
-            }
-        }
+        // The right edge of each column, NaN where the column has no common one. A right-aligned
+        // column is described by this edge and not by its starts - see columnStarts.
+        List<Float> colRight = new ArrayList<>();
+        columnStarts(run, columns, colRight);
         if (columns.size() < 2 || columns.size() > 24) return null;
 
         Table t = new Table();
@@ -5834,12 +6059,7 @@ public final class PdfToWord {
             float[] lineY = new float[columns.size()];
             java.util.Arrays.fill(lineY, Float.NaN);
             for (Line cell : rows.get(r)) {
-                int best = 0;
-                float bestDistance = Float.MAX_VALUE;
-                for (int c = 0; c < columns.size(); c++) {
-                    float d = Math.abs(columns.get(c) - cell.x);
-                    if (d < bestDistance) { bestDistance = d; best = c; }
-                }
+                int best = columnOf(columns, colRight, cell);
                 if (Float.isNaN(lineX[best])) lineX[best] = visibleX(cell.glyphs, cell.x);
                 if (Float.isNaN(lineY[best])) lineY[best] = cell.y;
                 if (Float.isNaN(lineR[best]) || cell.right > lineR[best]) lineR[best] = cell.right;

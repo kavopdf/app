@@ -828,6 +828,10 @@ public final class DocxWriter {
         // read in - the per-line blocks the column pass produces interleave the two columns, and
         // grouping them by band puts each column back together.
         if (columnPage(sb, page, ctx, pw)) return;
+        // Which of this page's short lines are drawn beside a table rather than in its text, and
+        // so must not charge the flow. Decided from the page's own geometry before anything is
+        // written, so both of the budget guard's passes see the same answer (see pinShortParas).
+        pinShortParas(page);
         for (Object block : page.blocks) emitBlock(sb, block, ctx);
     }
 
@@ -2113,6 +2117,16 @@ public final class DocxWriter {
         // a rotated label - genuinely floats, and only those still become a text box.
         boolean anyRotated = false;
         for (PdfToWord.Box b : p.boxes) if (b.rotated) anyRotated = true;
+        // A short line the page drew INSIDE a table's vertical band, which the table pass did
+        // not take into a cell, is not in the page's flow: it sits beside the table at a y the
+        // flow only reaches after the table. Written as a flowed paragraph it charges the page
+        // for its own height first, and the table - which table() places at its own measured
+        // top - is pushed down by exactly that. It is written as a frame instead, at the point
+        // the page drew it, and charges the flow nothing. See pinShortParas().
+        if (p.pinned && !anyRotated && !ctx.positioned) {
+            framedBoxes(sb, p, ctx);
+            return;
+        }
         // A form row - a label and its value drawn on one baseline - is ONE line of the
         // document. Written as one paragraph per field it was three lines, which is what made a
         // one-page form two pages. It goes out as one paragraph with a tab stop at each field's
@@ -2243,6 +2257,140 @@ public final class DocxWriter {
         // No page coordinates: an OCR block, an annotation, a filled form value. There is no
         // x to restore, so it goes into the flow rather than pretending to a position.
         flowParagraph(sb, p, ctx);
+    }
+
+    /**
+     * A paragraph longer than this many drawn lines is prose, not a label left beside a table.
+     *
+     * <p>One line is the shape of every case this rule is for - a form's "AFFIX PHOTOGRAPH"
+     * box, a margin note beside a grid, a rotated-adjacent label - and a two-line paragraph is
+     * allowed because a label that wraps inside a small box is still a label. Anything longer
+     * is a paragraph of the page's text, and framing it would take real flow height off the
+     * page.
+     */
+    private static final int PIN_MAX_LINES = 2;
+
+    /**
+     * Mark the short paragraphs the page drew inside the band of the table that follows them.
+     *
+     * <p>THE DEFECT. admit-card draws a photo box beside its own candidate table: "AFFIX" on the
+     * baseline at y=99.9 and "PHOTOGRAPH" at 107.9, while the table's first row of fields starts
+     * at 103.3. The table pass does not take those two lines - they are in no cell - so they
+     * survive as paragraphs of their own, and the flow charged the page for both before the
+     * table began. The table is placed absolutely from its own measured top edge
+     * ({@code rowTopPt}, see {@link #table}), so the whole table then started one paragraph too
+     * low and everything under it with it: one constant +19.4 pt step from the table to the
+     * footer, 17.2 pt median dy over the sheet, 15 % of lines within 10 pt, reading order 35 %.
+     *
+     * <p>THE RULE, AND WHY IT IS DERIVED RATHER THAN NAMED. The engine never reads the words. It
+     * asks the page four questions, and every one of them is geometry the page already carries:
+     * <ol>
+     *   <li>is this block short - {@link #PIN_MAX_LINES} lines or fewer, none of them on a turned
+     *       baseline? A label beside a table is; a paragraph of the page's prose is not;</li>
+     *   <li>does a table follow it, with no paragraph of prose in between? (A picture or a shape
+     *       may sit between them - neither is in the flow.)</li>
+     *   <li>is the table's own band known - {@code rowTopPt} and {@code bottom}?</li>
+     *   <li>does this line's own box lie IN that band, rather than above it or below it? A
+     *       heading above a table ends above the table's top edge and is left alone; the photo
+     *       box starts above the first row's text and runs past it, which is what makes it a
+     *       line drawn inside the table's band;</li>
+     *   <li>and is it BESIDE the table rather than over it - its box ending left of the table's
+     *       left edge, or starting right of the table's right edge?</li>
+     * </ol>
+     * A block that answers yes to all five was drawn beside a table rather than in the page's
+     * text, and the flow must not charge for it. The last two are "not part of that table" made
+     * literal: a cell's text is inside the table's own span, and the table pass had the chance to
+     * take it and did not - so this block and the table are siblings, not a cell and its
+     * contents.
+     *
+     * <p>WHY THE HORIZONTAL TEST IS THERE, MEASURED. Without it the rule also fired on two lines
+     * that are INSIDE a table's span and must stay in the flow: the dash rule the page drew across
+     * the head of a space-aligned invoice (71_invoice_space_aligned_no_rules, box 56..345 inside
+     * the table's 56..539) and the prose of a page whose whole body the row pass read as one
+     * table (price-list-2col-dense-right-aligned, box 39.7..348.6 inside 39.7..555.6). Both are
+     * text the table is made of, and taking their height off the page moves the table they belong
+     * to. Every case the rule is for - admit-card's photo box at x 529..546 against a table
+     * ending at 456, a risk grade at 360..371 beside a table ending at 278 - is outside it.
+     *
+     * <p>Measured on the 208-document corpus with {@code -Dp2w.debugPin}: the rule fires on the
+     * photo boxes of the admit-card family and nowhere else - see the report.
+     */
+    private static void pinShortParas(PdfToWord.Page page) {
+        java.util.List<Object> blocks = page.blocks;
+        boolean debug = System.getProperty("p2w.debugPin") != null;
+        for (int i = 0; i < blocks.size(); i++) {
+            if (!(blocks.get(i) instanceof PdfToWord.Para)) continue;
+            PdfToWord.Para p = (PdfToWord.Para) blocks.get(i);
+            if (p.pinned || p.stamp || p.boxes.isEmpty() || p.boxes.size() > PIN_MAX_LINES) continue;
+            PdfToWord.Table t = tableAfter(blocks, i + 1);
+            if (t == null || Float.isNaN(t.rowTopPt) || !(t.bottom > t.rowTopPt)) continue;
+            float top = Float.MAX_VALUE, bottom = -Float.MAX_VALUE;
+            float lineLeft = Float.MAX_VALUE, lineRight = -Float.MAX_VALUE;
+            boolean skip = false;
+            for (PdfToWord.Box b : p.boxes) {
+                if (b.rotated || b.runs.isEmpty() || b.text().trim().isEmpty()) {
+                    skip = true;
+                    break;
+                }
+                // The line's own box, measured exactly as the writer will measure it: the part
+                // above the baseline is LINE_BASE of the box, the part below is the rest.
+                float linePt = Math.max(4f, b.size * LINE_FACTOR);
+                top = Math.min(top, b.y - LINE_BASE * linePt);
+                bottom = Math.max(bottom, Math.max(b.bottom, b.y));
+                lineLeft = Math.min(lineLeft, b.x);
+                lineRight = Math.max(lineRight, b.right);
+            }
+            if (skip || top == Float.MAX_VALUE) continue;
+            // In the table's band: the box starts above the table's first row and ends below
+            // its top edge. A heading or a caption above the table ends above it and fails here.
+            if (top >= t.bottom || bottom <= t.rowTopPt) continue;
+            // Beside the table, not over it: a cell's text lies inside the table's own span.
+            if (lineRight > t.left + 1f && lineLeft < t.right - 1f) continue;
+            p.pinned = true;
+            if (debug) {
+                System.err.println("PIN page=" + page.number + " text=" + p.boxes.get(0).text()
+                        + " y=" + p.boxes.get(0).y + " box=" + top + ".." + bottom
+                        + " tableTop=" + t.rowTopPt + " tableBottom=" + t.bottom
+                        + " tableX=" + t.left + ".." + t.right
+                        + " lineX=" + p.boxes.get(0).x + ".." + p.boxes.get(0).right);
+            }
+        }
+    }
+
+    /**
+     * The first table that follows block {@code from}, or null when prose comes first.
+     *
+     * <p>A paragraph of the page's own text between the candidate and the table means the
+     * candidate is not beside the table - it is simply the line above it, in the flow. A
+     * picture or a shape is not in the flow and does not break the band.
+     */
+    private static PdfToWord.Table tableAfter(java.util.List<Object> blocks, int from) {
+        for (int j = from; j < blocks.size(); j++) {
+            Object o = blocks.get(j);
+            if (o instanceof PdfToWord.Table) return (PdfToWord.Table) o;
+            if (o instanceof PdfToWord.Para
+                    && ((PdfToWord.Para) o).boxes.size() > PIN_MAX_LINES) return null;
+        }
+        return null;
+    }
+
+    /**
+     * A pinned paragraph: each of its lines written as the frame {@link #stampLine} writes, at
+     * the point the page drew it.
+     *
+     * <p>The frame machinery is the same one a stamp uses - {@code w:framePr} with
+     * {@code w:wrap="none"} and an absolute page anchor - so this is not a second way of
+     * placing text: the paragraph stays a paragraph (selectable, editable, in the document's
+     * order), it lands on the page's own coordinates, and it adds nothing to the height of the
+     * sheet. A horizontal line is the simplest case of that machinery: the angle is zero, so the
+     * corner of the line's box is its baseline's origin less the part of the box above the
+     * baseline, and the width is the line's own advance.
+     */
+    private static void framedBoxes(StringBuilder sb, PdfToWord.Para p, Ctx ctx) {
+        for (PdfToWord.Box b : p.boxes) {
+            if (b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
+            stampLine(sb, p, b, ctx, b.x, b.y, 0f, b.right - b.x);
+        }
     }
 
     /**
@@ -2484,6 +2632,10 @@ public final class DocxWriter {
         for (Object block : page.blocks) {
             if (block instanceof PdfToWord.Para) {
                 PdfToWord.Para p = (PdfToWord.Para) block;
+                // A pinned line is written as a frame and charges the flow nothing, exactly as a
+                // stamp's line does - the two measures of a page must not disagree about what is
+                // in its flow.
+                if (p.pinned) continue;
                 float top = Float.MAX_VALUE;
                 float size = 0f;
                 for (PdfToWord.Box b : p.boxes) {
