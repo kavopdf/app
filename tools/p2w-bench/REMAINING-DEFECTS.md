@@ -4806,3 +4806,46 @@ baseline that would fix doc 79 is the natural place for them to meet.
 
 Gate: **no document got worse** over 208, three line-count improvements. Tests 29/29 and 3/3.
 
+
+
+**A second patch for the same root cause, from a different direction.**
+`patches/D26-B.patch`.
+
+**It found the same bug the cumulative patch found, independently:** `DocxWriter.table()` set every
+row to `(t.bottom - t.top) / rowCount`, and the cell line box to that same average. **The average was
+the bug.**
+
+`PdfToWord` now measures, per row, `rowH` - the distance between the two rules bounding the row, in
+both rule-reading passes - and `rowLead`, how far below its top rule the row's first baseline was
+drawn. `DocxWriter` writes `w:trHeight` as that pitch, `hRule="exact"` when the pitch holds the row's
+text and `atLeast` when it does not, with a line box of `lead / 0.8` so the baseline lands back on the
+page's. Cell margins needed no change: `w:tblCellMar` is already zero on all four sides everywhere,
+verified against the rendered pitch rather than assumed.
+
+**Measured, median dy / worst dy / within 3 pt:**
+
+    gst-invoice-multipage   8.5 -> 1.5    worst 380.4 -> 381.2    2 % -> 54 %
+    23_timetable            6.8 -> 6.0    worst  12.1 ->  6.0     15 % -> 12 %
+    invoice-line-items     19.4 -> 14.9   worst  22.3 -> 21.1      5 % ->  5 %
+    80_gstin                unchanged - 5.8 / 79.7 / 16 %
+    79_inr                  unchanged - 2.3 / 9.0 / 61 %
+
+**The two documents this defect was opened on did not improve, and that is stated plainly.** Both are
+tables the page draws **no grid inside** - their bounds are text baselines, not a rule box, so there
+is no pitch to read. Three ways of giving them one were tried and measured and reverted: baseline
+deltas (median 5.8 to 24.3), page rules plus moving the table's bottom (**gate failure - two documents
+lost a line of text**), and page rules plus moving the top (the whole table jumped 13.4 pt up).
+
+Gate: **no document got worse** over 208; `verify-engine.sh` fully green.
+
+**What both patches together make clear: what is left is one constant per page.** With the drift gone,
+the largest remaining error on every table page is the **table-top offset** - a single constant that
+`DocxWriter` already records as a separate, unfixed defect. That is now the next thing worth fixing,
+and it is a smaller and better-defined job than either of these two.
+
+**These two patches must be reconciled, not stacked.** Both changed how a row's height is decided -
+this one by `w:trHeight` from `rowH`, the cumulative one by `rowEdge` and `rowTopPt` - and both
+independently removed the same `extent / rowCount` average. Applying both blind would apply the
+average's removal twice. The per-row baseline that the cumulative report asks for in its section 6 is
+where they meet.
+

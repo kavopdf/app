@@ -1,0 +1,228 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 9216473..36de32a 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -2449,6 +2449,21 @@ public final class DocxWriter {
+         // A cell that holds SEVERAL lines is the case that was wrong: charging the pitch to
+         // every line charged the row twice over and doubled it. There the line is the cell's
+         // own text - 1.25 em of its size, below - and the row stays the page's own pitch.
++        //
++        // THE PAGE'S OWN ROW PITCH. rowTw above is the table's extent divided by its row count,
++        // and that is an average: it is the page's pitch only when every row of the table is
++        // the same height, and a page with a tall header row, a merged cell or one row of
++        // wrapped text does not have even rows. Every row was then written at the average and
++        // each one landed at a height the page never drew - D-26 cause 2. It is per row, not
++        // cumulative: on 80_gstin_pan_cin_ifsc_table the correlation between y and error was
++        // -0.09 while 53 of 63 lines sat more than 3 pt off, and on
++        // invoice-line-items-qty-rate-amount every row was about 19 pt low.
++        //
++        // t.rowH is that pitch, measured by the pass that read the page: the distance between
++        // the two rules that bound each row. When the pass could not measure it - a table found
++        // by whitespace alone has no rules to measure between - the list is a different size and
++        // the average is used, exactly as before.
++        boolean perRowPitch = t.rowH.size() == t.rows.size();
+         int cellLineTw = rowTw > 0 ? rowTw : 200;
+         int naturalLineTw = rowTw > 0 ? Math.min(rowTw, 200) : 200;
+         for (int r = 0; r < t.rows.size(); r++) {
+@@ -2463,7 +2478,35 @@ public final class DocxWriter {
+                 for (int i = 0; i < cv.length(); i++) if (cv.charAt(i) == '\n') n++;
+                 if (n > rowParts) rowParts = n;
+             }
++            // This row's own pitch, when the page gave one: the distance between the two rules
++            // that bound it, which is the height the page really gave the row. The average above
++            // is used only when the pass could not measure it.
++            int rowPitchRawTw = 0;
++            if (perRowPitch) {
++                float pitchPt = t.rowH.get(r);
++                if (pitchPt > 0.5f) rowPitchRawTw = (int) Math.round(pitchPt * TWIPS_PER_PT);
++            }
++            // The height the row is asked for is the page's own pitch, with nothing taken off for
++            // the rule the renderer draws inside it: a row written "exact" is that height and
++            // nothing more, and subtracting the hairline made every exact row 0.75 pt short
++            // (measured: a rendered pitch of 19.25 pt against the page's 20 on
++            // 79_inr_indian_digit_grouping_table). The average path keeps its old subtraction.
++            int rowPitchTw = rowPitchRawTw > 0 ? rowPitchRawTw : rowTw;
++            // A single line sits in its row where the PAGE drew it. rowLead is the distance
++            // from the row's top rule down to that line's baseline, and a line box puts its
++            // baseline at LINE_BASE of its own height - so a box of lead / LINE_BASE lands the
++            // baseline on the page's. Without this a row of the right height still put its text
++            // in the wrong place: on 23_timetable_grid_txtpos the rows are a uniform 40 pt and
++            // the page draws the period labels 16.8 pt into the row, while the table's average
++            // line box of 37.25 pt put them 24 pt in - every line 12 pt low, which is a bigger
++            // error than the row-height defect this change removes.
+             int baseLineTw = rowParts > 1 ? naturalLineTw : cellLineTw;
++            if (rowParts == 1 && t.rowLead.size() == t.rows.size()) {
++                float leadPt = t.rowLead.get(r);
++                if (leadPt > 0.5f) {
++                    baseLineTw = (int) Math.max(1L, Math.round(leadPt * TWIPS_PER_PT / LINE_BASE));
++                }
++            }
+             // The row's own line height, never smaller than its own text. cellLineTw is the
+             // table's extent divided by its row count, which is an average - correct only when
+             // the rows are evenly spaced. On a page with a tall header row, a merged cell or a
+@@ -2495,15 +2538,30 @@ public final class DocxWriter {
+             // already carries the type-size floor, so the floor is taken before the scaling and
+             // the scaled row is held at it.
+             int typeFloorTw = rowLineTw;
+-            int rowHeightTw = Math.max(rowTw, rowLineTw);
++            int rowHeightTw = Math.max(rowPitchTw, rowLineTw);
+             if (ctx.squeeze != 1f) {
+                 rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
+                 rowLineTw = Math.max(typeFloorTw, twScale(rowLineTw, ctx.squeeze));
++                rowPitchTw = Math.max(typeFloorTw, twScale(rowPitchTw, ctx.squeeze));
++            }
++            // How tall the cell's paragraphs really are: one line per w:br, each set at
++            // rowLineTw. hRule="exact" makes the row that height and CLIPS whatever is taller, so
++            // exact is only used when the page's own pitch already holds the row's text. A row
++            // whose pitch is smaller than its text keeps "atLeast" and grows: a clipped row is a
++            // page the reader cannot read, which is worse than a row 2 pt low.
++            int contentTw = rowLineTw * rowParts;
++            boolean rowExact = rowPitchRawTw > 0 && rowPitchRawTw >= contentTw;
++            if (rowExact) {
++                rowHeightTw = rowPitchRawTw;
++                if (ctx.squeeze != 1f) {
++                    rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
++                }
+             }
+             inner.append("<w:tr>");
+-            if (rowTw > 0) {
++            if (rowTw > 0 || rowPitchTw > 0) {
+                 inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
+-                     .append("\" w:hRule=\"atLeast\"/><w:cantSplit/></w:trPr>");
++                     .append("\" w:hRule=\"").append(rowExact ? "exact" : "atLeast")
++                     .append("\"/><w:cantSplit/></w:trPr>");
+             }
+             int c = 0;
+             while (c < cols) {
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 6aa9127..7a0df1f 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -221,6 +221,34 @@ public final class PdfToWord {
+          * were thrown away here, because a cell is written as a string and a font name.
+          */
+         public final List<List<Integer>> colors = new ArrayList<>();
++        /**
++         * The height the PAGE gave each row, in points - one entry per row, in row order.
++         *
++         * <p>It is the distance between the two horizontal rules that bound the row. Empty when
++         * the pass that built the table did not measure it - a table found by whitespace alone
++         * draws no rules, and a band between two baselines is not a row box - in which case the
++         * writer falls back on the table's extent divided by its row count.
++         *
++         * <p>That average is the defect this list exists to remove: it is correct only when
++         * every row of the table is the same height, and a page with a tall header, a merged
++         * cell or one row of wrapped text does not have even rows. Each row then landed at a
++         * height the page never drew, which is D-26 cause 2 - 80_gstin_pan_cin_ifsc_table had
++         * 53 of its 63 lines more than 3 pt from where the page drew them, and the error was
++         * per row rather than cumulative (correlation between y and error -0.09).
++         */
++        public final List<Float> rowH = new ArrayList<>();
++        /**
++         * How far below its own top rule the first line of each row was drawn, in points - one
++         * entry per row, in row order. Empty when the pass did not measure it.
++         *
++         * <p>A row's height is only half of where its text lands: the other half is where in
++         * the row the page put it. On 23_timetable_grid_txtpos the rows are a uniform 40 pt and
++         * the page draws the period labels 16.8 pt below the row's top rule - so a row given the
++         * right height but the table's average line box still puts every line 12 pt low, which
++         * is what the render measured. The lead is a baseline, so the writer can place it
++         * exactly: a line box of lead / 0.8 puts its baseline back on the page's.
++         */
++        public final List<Float> rowLead = new ArrayList<>();
+         public boolean header;
+         /**
+          * Did the page draw the lines that make this a table?
+@@ -4833,6 +4861,21 @@ public final class PdfToWord {
+         cx[ncol] = right;
+         t.colX = cx;
+         t.header = nrow > 1;
++        // The page's own row pitch: the two rules that bound each row. R holds the top edge of
++        // every row, in ascending y, so row r runs from R[r] to R[r+1] - and the last row runs
++        // to the bottom of the lowest cell, which is where the page's last rule is.
++        for (int r = 0; r < nrow; r++) {
++            float yTop = R.get(r);
++            float yBot = r + 1 < nrow ? R.get(r + 1) : bottom;
++            t.rowH.add(Math.max(0f, yBot - yTop));
++            // The baseline of the first line the page drew in this row, measured from the
++            // row's own top rule - the vertical half of the same measurement.
++            float base = Float.MAX_VALUE;
++            for (int c = 0; c < ncol; c++) {
++                for (Glyph g : buckets.get(r).get(c)) base = Math.min(base, g.y);
++            }
++            t.rowLead.add(base == Float.MAX_VALUE ? 0f : Math.max(0f, base - yTop));
++        }
+         int filled = 0;
+         for (int r = 0; r < nrow; r++) {
+             List<String> row = new ArrayList<>();
+@@ -5176,6 +5219,10 @@ public final class PdfToWord {
+             // at its rule: it is wherever the page drew it, centred, right-aligned or padded.
+             float[][] firstX = new float[rows][cols];
+             for (float[] rowX : firstX) java.util.Arrays.fill(rowX, Float.NaN);
++            // The topmost baseline in each row, so the writer can put the text back where the
++            // page drew it inside the row it now measures correctly.
++            float[] rowBaseY = new float[rows];
++            java.util.Arrays.fill(rowBaseY, Float.MAX_VALUE);
+             for (Line line : lines) {
+                 float cx = (line.x + line.right) / 2f;
+                 int r = band(ys, line.y);
+@@ -5186,6 +5233,7 @@ public final class PdfToWord {
+                 if (faces[r][c] == null) faces[r][c] = fontOf(line.glyphs);
+                 if (Float.isNaN(sizes[r][c])) sizes[r][c] = sizeOf(line.glyphs);
+                 if (Float.isNaN(firstX[r][c])) firstX[r][c] = visibleX(line.glyphs, line.x);
++                if (line.y < rowBaseY[r]) rowBaseY[r] = line.y;
+             }
+ 
+             int filled = 0;
+@@ -5237,6 +5285,14 @@ public final class PdfToWord {
+             colX[cols] = right;
+             t.colX = colX;
+             t.header = rows > 1;
++            // ys are the page's own horizontal rules, so the row pitch is the gap between two
++            // of them - measured, not the region's height divided by its row count.
++            for (int r = 0; r < rows; r++) {
++                float yTop = ys.get(r);
++                t.rowH.add(Math.max(0f, ys.get(r + 1) - yTop));
++                t.rowLead.add(rowBaseY[r] == Float.MAX_VALUE
++                        ? 0f : Math.max(0f, rowBaseY[r] - yTop));
++            }
+             for (int r = 0; r < rows; r++) {
+                 List<String> row = new ArrayList<>();
+                 List<String> rowFonts = new ArrayList<>();
+@@ -5469,6 +5525,16 @@ public final class PdfToWord {
+             t.colors.add(textCols);
+         }
+         t.bottom = bottom;
++        // A table the whitespace pass found has no rules of its own, so it has no rows to
++        // measure: its bounds are its TEXT's baselines and the band between two baselines is
++        // not a row box. Giving its rows the baseline deltas was measured and rejected - the
++        // rows of 80_gstin_pan_cin_ifsc_table came out 16/14/14/14 pt, whose sum is 58 pt
++        // against the 44 pt its own extent charges the flow, and each of its five dealer blocks
++        // pushed the next one 11 pt further down the page (median dy 5.8 -> 24.3). Using the
++        // page's drawn rules instead fixed the pitch on 79_inr_indian_digit_grouping_table but
++        // only by moving the table's bottom onto the rule box, which made the table swallow the
++        // next line: 326_itr_computation lost "Tax before cess 1,82,100" from its slab table.
++        // The rows of these tables stay unmeasured and the writer keeps its average.
+         float[] cx2 = new float[columns.size() + 1];
+         for (int i = 0; i < columns.size(); i++) cx2[i] = columns.get(i);
+         cx2[columns.size()] = Math.max(right, columns.get(columns.size() - 1));
+@@ -5610,6 +5676,9 @@ public final class PdfToWord {
+             out.cellX.add(new ArrayList<>(java.util.Arrays.asList(xOf(t, r, c), Float.NaN)));
+             out.cellR.add(new ArrayList<>(java.util.Arrays.asList(rOf(t, r, c), Float.NaN)));
+             out.colors.add(new ArrayList<>(java.util.Arrays.asList(colorOf(t, r, c), -1)));
++            // The heading keeps its own row height, taken from the row it came from.
++            if (t.rowH.size() == t.rows.size()) out.rowH.add(t.rowH.get(r));
++            if (t.rowLead.size() == t.rows.size()) out.rowLead.add(t.rowLead.get(r));
+         }
+         for (int side = 0; side < 2; side++) {
+             int from = side == 0 ? 0 : split;
+@@ -5631,6 +5700,9 @@ public final class PdfToWord {
+                         rOf(t, r, a), b < 0 ? Float.NaN : rOf(t, r, b))));
+                 out.colors.add(new ArrayList<>(java.util.Arrays.asList(
+                         colorOf(t, r, a), b < 0 ? -1 : colorOf(t, r, b))));
++                // A panel row is still the row the page drew, at the page's own pitch.
++                if (t.rowH.size() == t.rows.size()) out.rowH.add(t.rowH.get(r));
++                if (t.rowLead.size() == t.rows.size()) out.rowLead.add(t.rowLead.get(r));
+             }
+         }
+         // The label column is as wide as the left panel's label column was; the value column
