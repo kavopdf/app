@@ -4243,8 +4243,21 @@ public final class DocxWriter {
         if (dash > 0) base = base.substring(0, dash);
         String family = BASE14.get(base.toLowerCase(Locale.ROOT));
         if (family != null) return family;
+        // A PDF names a face two ways: "Liberation Sans Bold" (a space, the PostScript full
+        // name) and "LiberationSans-Bold" (a hyphen, the family-with-style form every
+        // FreeType/ghostscript-produced file in this corpus uses). Only the space form was
+        // stripped, so the hyphen form went into w:rFonts whole - and "LiberationSans-Bold"
+        // is not a family any machine has: fontconfig resolves it to Noto Sans, whose
+        // advances are ~10 % wider than the face the page was drawn in. A line that fitted
+        // its column on the page by 3 pt then did not fit in the reader, LibreOffice broke it
+        // in two, and a table row declared atLeast one pitch tall became two - the doubled
+        // header row of table-with-merged-cells and boq-tender-bill-of-quantities, where
+        // "Quantity" (28.39 pt at 7 pt Liberation Sans Bold on the page) has 31.39 pt of
+        // column and Noto Sans Bold sets it 30.9 pt and breaks it after "Quantit".
         String[] suffixes = {" Bold Italic", " Bold Oblique", " Italic", " Oblique",
-                " Bold", " Regular", " Roman", " Normal"};
+                " Bold", " Regular", " Roman", " Normal",
+                "-BoldItalic", "-BoldOblique", "-Bold", "-Italic", "-Oblique",
+                "-Regular", "-Roman", "-Normal", ",Bold", ",Italic", ",BoldItalic"};
         for (String suf : suffixes) {
             if (f.length() > suf.length() && f.endsWith(suf)) {
                 return f.substring(0, f.length() - suf.length());
