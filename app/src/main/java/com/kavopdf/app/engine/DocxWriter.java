@@ -295,6 +295,18 @@ public final class DocxWriter {
     }
 
     private static int[] fitPage(Ctx ctx, int beforeTw, int lineTw, float size) {
+        if (ctx.inColumn) {
+            // A cell's flow is bounded by its ROW's height, which is written as the table's
+            // w:trHeight, not by the sheet: the page's budget has already been spent by the
+            // bands above the table. Charging the cell against it would squeeze or break a
+            // column that the row is holding, and a page break inside a cell is not a thing.
+            // The page's squeeze factor still applies - the row is measured from what the cell
+            // really writes, so a squeezed page has to squeeze inside the cells too.
+            int b2 = twScale(beforeTw, ctx.squeeze);
+            int l2 = twScale(lineTw, ctx.squeeze);
+            ctx.flowTw += b2 + l2;
+            return new int[]{b2, l2};
+        }
         if (ctx.measuring) {
             // Measuring a page: the gap is given up exactly as the old guard gave it up once the
             // budget was spent, but no line is shortened and nothing is broken - the answer this
@@ -472,6 +484,37 @@ public final class DocxWriter {
          * page put them, and the section said one column all along.
          */
         int secCols = 1;
+        /**
+         * The y, in points, that the next paragraph's box must start below - the bottom edge of
+         * a layout table, or the top edge of a column cell. {@code -1} when there is none.
+         *
+         * <p>A table is not a baseline: {@link #lastBaseline} cannot describe where a row ends,
+         * because the renderer decides the row's height from its own line boxes. So the block
+         * after a table is placed against the table's measured bottom instead of being spaced
+         * from the line above it, which is the only way the page's own y survives a table.
+         */
+        float afterTablePt = -1f;
+        /**
+         * True while writing the inside of a layout-table cell.
+         *
+         * <p>A cell's text starts at the column's own left edge, so every indent inside it is
+         * measured from that edge rather than from the paper. Outside a cell the paper is the
+         * origin and nothing is subtracted.
+         */
+        boolean inColumn;
+        /** The right edge of the current column cell, in points - the width an indent is from. */
+        float cellRightPt;
+        /**
+         * The left edge of the current column cell, in points.
+         *
+         * <p>Inside a cell the text starts at the CELL's edge, so every page-relative indent has
+         * to have that edge taken off it. It cannot be read from {@link #colLeft}: that map is
+         * keyed by the band the column pass tagged a block with, and on a page whose gutters the
+         * detector only partly found there is no entry for the later columns at all
+         * (63_three_column_brochure's three columns are all tagged 0). The indent then stayed
+         * page-relative, exceeded the cell's own width, and every line wrapped to one character.
+         */
+        float cellLeftPt;
         /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
         float pageWidthPt = 595f;
         /**
@@ -593,6 +636,10 @@ public final class DocxWriter {
             ctx.secCols = secCols;
             ctx.lastLinePt = 0f;
             ctx.positioned = false;
+            ctx.inColumn = false;
+            ctx.cellLeftPt = 0f;
+            ctx.cellRightPt = 0f;
+            ctx.afterTablePt = -1f;
             ctx.flowTw = 0;
             ctx.budgetTw = (int) Math.max(1L, Math.round(ph * TWIPS_PER_PT) - PAGE_ROUNDING_TW);
             // pageFits is the measurement; hasColumnBands was a proxy for it and it over-fired.
@@ -693,6 +740,10 @@ public final class DocxWriter {
                     ctx.positioned = false;
                     ctx.newPage = true;
                     ctx.lastWasTable = false;
+                    ctx.inColumn = false;
+                    ctx.cellLeftPt = 0f;
+                    ctx.cellRightPt = 0f;
+                    ctx.afterTablePt = -1f;
                     ctx.budgetTw = Math.max(1, pageBudgetTw - overheadTw);
                     pageBody(pg, page, ctx, pw, ph, secGap);
                     int w = spacingTw(pg);
@@ -744,77 +795,741 @@ public final class DocxWriter {
      */
     private static void pageBody(StringBuilder sb, PdfToWord.Page page, Ctx ctx,
                                  float pw, float ph, float secGap) {
-        // A page set in columns, with a full-width element in the middle of it, is more than
-        // one section: the columns before the element, the element, and the columns after it.
-        // Without the breaks the element is poured into a column like everything else.
+        // A page set in newspaper columns is written as a fixed-geometry layout table - one
+        // row, one cell per column - and its section stays single-column.
         //
-        // The carrier is a zero-height paragraph holding the sectPr, because a sectPr has to
-        // live in a pPr and a table cannot carry one. Measured on a prototype: a table with a
-        // carrier after it costs 2.9 pt and spans correctly.
-        // Every pass writes the page again from scratch, so what an earlier pass has already
-        // drawn is forgotten here. Without this the second pass writes no stamp frame at all.
-        if (ctx.curShapes != null) for (Shape sh : ctx.curShapes) sh.stampDrawn = false;
-        float blockSpan = 0f;
-        for (Object bb : page.blocks) {
-            if (bb instanceof PdfToWord.Para) {
-                PdfToWord.Para q = (PdfToWord.Para) bb;
-                blockSpan = Math.max(blockSpan, q.right - q.left);
+        // WHY NOT CONTINUOUS SECTION BREAKS. Until now a full-width element between the columns
+        // was given a section of its own, and the boundaries were <w:type w:val="continuous"/>.
+        // Word and LibreOffice honour that. Google Docs does not: it turns every continuous
+        // break into a PAGE break, so a one-page newsletter arrived as two pages. Measured on
+        // 62_two_col_newsletter_pull_quote - six continuous breaks, 474 pt of flow on an 842 pt
+        // sheet, two pages in Google Docs.
+        //
+        // A paragraph cannot carry a column count of its own (w:cols is a section property), so
+        // no arrangement of paragraphs reproduces "full-width band, then two columns" on one
+        // sheet without a section break. A table can: the columns become the table's columns, a
+        // full-width band is simply a paragraph above or below it, and nothing in the document
+        // is a section. The words also come out in column order, which is the order the page is
+        // read in - the per-line blocks the column pass produces interleave the two columns, and
+        // grouping them by band puts each column back together.
+        if (columnPage(sb, page, ctx, pw)) return;
+        for (Object block : page.blocks) emitBlock(sb, block, ctx);
+    }
+
+    /**
+     * The column each box of a cross-gutter "row" belongs to, or null when the block is a
+     * genuine full-width line.
+     *
+     * <p>Returns an array parallel to {@code p.boxes} when the boxes fall in two or more
+     * different columns - the column pass cut a line at the gutter and left both halves on one
+     * baseline - and null when the block is a single line running the width of the paper, or
+     * when its boxes all sit in one column after all.
+     */
+    private static int[] splitColumns(Object block, float[] edge, int n) {
+        if (!(block instanceof PdfToWord.Para)) return null;
+        PdfToWord.Para q = (PdfToWord.Para) block;
+        if (q.boxes.size() < 2) return null;
+        // Each fragment belongs to the column it sits INSIDE. A column's line is often cut
+        // again wherever the typeface changes, so a row can hold six word-fragments in its first
+        // column before the second column's fragment even begins - brochure-3col's "Every Kastura
+        // product is made from ..." is one such row - and only the FIRST fragment in a column
+        // starts at that column's edge.
+        int[] part = new int[q.boxes.size()];
+        boolean mixed = false;
+        float[] firstX = new float[n];
+        for (int c = 0; c < n; c++) firstX[c] = Float.MAX_VALUE;
+        for (int k = 0; k < part.length; k++) {
+            PdfToWord.Box bx = q.boxes.get(k);
+            int c = 0;
+            // The edges are clustered averages, so a fragment can start a few points LEFT of its
+            // column's own edge - brochure-3col's third column measures 395.3 from most of its
+            // rows and one row starts it at 392 - and a strict comparison would put that
+            // fragment in the column before it and then reject the row for crossing an edge.
+            while (c + 1 < n && bx.x >= edge[c + 1] - 20f) c++;
+            // A box that runs PAST the next column's edge was never cut: it is one line across
+            // the paper. The running footer is exactly that - its words and its page number are
+            // two boxes, and the words run the whole width - and splitting it put "Page 1" at
+            // the top of the right column instead of at the foot of the page.
+            if (bx.right > edge[c + 1] + 1f) return null;
+            part[k] = c;
+            firstX[c] = Math.min(firstX[c], bx.x);
+            if (k > 0 && part[k] != part[k - 1]) mixed = true;
+        }
+        if (!mixed) return null;
+        // A masthead is not a cut row: its issue date sits at the third column's x but is
+        // right-aligned there, so it starts two hundred points into the column, while a fragment
+        // the column pass cut begins at the column's own edge.
+        for (int c = 0; c < n; c++) {
+            if (firstX[c] == Float.MAX_VALUE) continue;
+            if (firstX[c] - edge[c] > COLUMN_START_TOL) return null;
+        }
+        // A row whose boxes are merely spread across the page is not a cut line: a masthead
+        // holds the paper's name at the left and the issue date at the right, and there is a
+        // wide empty gutter between them that the page drew on purpose. What tells the two apart
+        // is where each fragment STARTS - a line the column pass cut begins at its own column's
+        // left edge, while a masthead's date is right-aligned and starts two hundred points into
+        // the last column - and columnAt has already refused every fragment that starts at no
+        // column's edge. A coverage ratio cannot tell them apart: a ragged row, whose last
+        // column's line stops short of the measure, covers only seven tenths of the width it
+        // spans and would be thrown out along with the masthead.
+        return part;
+    }
+
+    /** A copy of {@code p} holding one of its boxes - one column's half of a cross-gutter row. */
+    private static PdfToWord.Para oneBoxPara(PdfToWord.Para p, PdfToWord.Box b, int column) {
+        PdfToWord.Para q = new PdfToWord.Para();
+        q.runs.addAll(b.runs);
+        q.heading = p.heading;
+        q.align = p.align;
+        q.indent = p.indent;
+        q.bullet = p.bullet;
+        q.stamp = p.stamp;
+        q.top = b.y;
+        q.left = b.x;
+        q.right = b.right;
+        q.column = column;
+        q.boxes.add(b);
+        return q;
+    }
+
+    /**
+     * Writes a page that is set in newspaper columns, as a fixed-geometry layout table.
+     *
+     * <p>The page becomes one table: a single row with one cell per column, at the x the page
+     * drew each column at, plus the page's own full-width bands above and below it as ordinary
+     * paragraphs. Nothing in the result is a section, so nothing in the result is a continuous
+     * section break - which is the whole point, because Google Docs renders every continuous
+     * break as a page break.
+     *
+     * <p>It also puts the words in the order the page is read in. The column pass works on
+     * unsplit lines and emits one block per line, so the blocks of the two columns interleave;
+     * grouping them by band restores "all of the left column, then all of the right column".
+     *
+     * <p>A cell is a fixed rectangle, not a position in a flow. That is why this is a table and
+     * not {@code w:cols}: with {@code w:cols} the reader decides where column one ends, so a
+     * paragraph from the left column is flowed into the right one at the wrong height, and the
+     * reading order comes out interleaved even when every line lands in the right place - which
+     * is exactly what 63_three_column_brochure did (100 % of lines within 3 pt, 13 % order).
+     *
+     * @return true when the page was written this way. False when the page's column geometry
+     *         cannot be trusted, or when its prose never actually sits in the bands the column
+     *         pass found - then the caller's plain flow is the honest answer.
+     */
+    /** A page's column geometry: the left edge of every column, and the paper's right edge. */
+    private static final class ColGeom {
+        float[] edge;
+    }
+
+    /** Top edge of a block's own boxes, in points from the page top. -1 when it has none. */
+    private static float blockTop(Object b) {
+        if (b instanceof PdfToWord.Para) {
+            float t = Float.MAX_VALUE;
+            for (PdfToWord.Box z : ((PdfToWord.Para) b).boxes) {
+                if (z.runs.isEmpty()) continue;
+                t = Math.min(t, z.y - LINE_BASE * z.size);
+            }
+            return t == Float.MAX_VALUE ? -1f : t;
+        }
+        if (b instanceof PdfToWord.Table) return ((PdfToWord.Table) b).top;
+        return -1f;
+    }
+
+    /** Bottom edge of a block's own boxes, in points from the page top. -1 when it has none. */
+    private static float blockBottom(Object b) {
+        if (b instanceof PdfToWord.Para) {
+            float r = -Float.MAX_VALUE;
+            for (PdfToWord.Box z : ((PdfToWord.Para) b).boxes) {
+                if (z.runs.isEmpty()) continue;
+                r = Math.max(r, z.bottom > 0f ? z.bottom : z.y + z.size);
+            }
+            return r == -Float.MAX_VALUE ? -1f : r;
+        }
+        if (b instanceof PdfToWord.Table) return ((PdfToWord.Table) b).bottom;
+        return -1f;
+    }
+
+    /** How far a fragment may start from its column's left edge and still be that column's line. */
+    private static final float COLUMN_START_TOL = 40f;
+
+    /**
+     * The column whose left edge a fragment starts at, or -1 when it starts at none of them.
+     *
+     * <p>NEAREST edge, not "the last edge it is past". The edges are read off the page's own rows
+     * and are a point or two out from any one row's fragments - brochure-3col's third column is
+     * measured at 395.3 from most of its rows and one row starts at 392 - and a threshold test
+     * would put that fragment in the second column and then reject the row as a masthead.
+     */
+    private static int columnAt(float x, float[] edge, int n) {
+        int best = -1;
+        float bestD = COLUMN_START_TOL;
+        for (int c = 0; c < n; c++) {
+            float d = Math.abs(x - edge[c]);
+            if (d <= bestD) { bestD = d; best = c; }
+        }
+        return best;
+    }
+
+    /**
+     * True for a decorative initial: one narrow glyph where a column's first line would be.
+     *
+     * <p>annual-review-2col-uneven-columns opens with a 6 pt "K" drop cap drawn on the masthead's
+     * own baseline. It is a single narrow box, so it is not a column line - but it is inside
+     * column 0, so counting it when the band is measured drags the band's top up over the
+     * masthead, and the masthead then reads as full-width content INSIDE the columns and the page
+     * is refused.
+     */
+    private static boolean dropCap(PdfToWord.Para q) {
+        if (q.boxes.size() != 1) return false;
+        PdfToWord.Box z = q.boxes.get(0);
+        return z.right - z.x < 20f;
+    }
+
+    /**
+     * The page's column edges, read off the page's own ROWS, or null when it is not set in
+     * columns.
+     *
+     * <p>The column pass tags each block with the band it was cut into, and that tag is the
+     * obvious source for the edges - but it is not a reliable one. A page's full-width masthead
+     * can be tagged with the last band (newspaper-2col-fullwidth-headline's "THE MORNING LEDGER"
+     * is at x=100 and is tagged column 1, so the second column's left edge reads as 99.7 pt
+     * against the 303 pt the page drew it at), and a page whose gutters the detector only partly
+     * found carries one band for three columns (63_three_column_brochure, whose three columns are
+     * all tagged 0).
+     *
+     * <p>A ROW that holds more than one fragment is direct evidence and needs no tag. Project the
+     * boxes of those rows only - a single-fragment row is a plain line and says nothing about
+     * where a column ends - and the x-ranges nothing covers are the gutters. Restricting the
+     * projection to multi-fragment rows is what makes it work where the page-wide projection in
+     * PdfToWord does not: a deck line set across the first column and a little beyond it
+     * ("Single estate arabica from the Baba Budan hills ...") covers the gutter on a whole-page
+     * projection, but it is a single box on its own row, so it is not projected here.
+     *
+     * <p>The vertical band the columns occupy is then the run of rows that really are column
+     * rows: every fragment starts at its own column's left edge (see
+     * {@link #COLUMN_START_TOL}). A masthead is not one of those - its issue date starts two
+     * hundred points into the last column, right-aligned - so it does not stretch the band up
+     * over itself, and it stays a full-width paragraph above the table.
+     */
+    private static ColGeom rowColumnEdges(PdfToWord.Page page, float pw) {
+        java.util.List<PdfToWord.Para> rows = new ArrayList<>();
+        for (Object b : page.blocks) {
+            if (b instanceof PdfToWord.Para && ((PdfToWord.Para) b).boxes.size() >= 2) {
+                rows.add((PdfToWord.Para) b);
             }
         }
-        int curCols = page.columns;
-        for (Object block : page.blocks) {
-            if (page.columns > 1 && blockSpan > 0f) {
-                boolean full = false;
-                if (block instanceof PdfToWord.Para) {
-                    PdfToWord.Para q = (PdfToWord.Para) block;
-                    full = q.right - q.left > blockSpan * 0.62f;
-                } else if (block instanceof PdfToWord.Table) {
-                    PdfToWord.Table q = (PdfToWord.Table) block;
-                    full = q.right - q.left > blockSpan * 0.62f;
-                }
-                int want = full ? 1 : page.columns;
-                if (want != curCols) {
-                    sb.append("<w:p><w:pPr><w:sectPr>")
-                      .append(sectPrXml(pw, ph, curCols, secGap))
-                      .append("<w:type w:val=\"continuous\"/></w:sectPr></w:pPr></w:p>");
-                    curCols = want;
-                    ctx.lastBaseline = -1f;
-                    // A new column is a new flow: its lines are placed from the column's own
-                    // top, so the running position on the sheet is no longer known.
-                    ctx.flowY = -1f;
-                    ctx.flowBoxPt = 0f;
-                    ctx.newPage = false;
-                    // flowTw is NOT reset here. A continuous section break starts a new column on
-                    // the SAME sheet, so the page's budget is still the page's budget; resetting
-                    // it made the guard start again halfway down the page, which is how a page
-                    // measured at 842 pt could still be written at 844.
-                }
+        // Three rows is the least that can evidence a column layout; below that a row of two
+        // fragments is a form field or a kerning accident, not a gutter.
+        if (rows.size() < 3) return null;
+
+        // A column's left edge is where its lines START, and that is the one thing a multi-
+        // fragment row says that a projection does not. Projecting the fragments and reading the
+        // uncovered strips fails on exactly the pages this exists for: a row whose middle column
+        // has ended - brochure-3col's "is the reason the tools are still in kitchens that
+        // utilisation ..." holds a fragment in the first column and one in the last, and its
+        // first fragment runs straight across the gutter between them - and a deck line set
+        // across the first column and a little beyond it covers the gutter on 63 as well.
+        //
+        // Left edges do not have that problem. Every row of a band starts its first column at the
+        // same x, so that x recurs once per row, while a masthead's issue date and a deck's
+        // overhang are one-offs. Clustering the fragments' left edges and keeping the ones that
+        // recur is therefore the gutter's own evidence, and it is not confused by a row that is
+        // missing a column.
+        java.util.List<Float> xs = new ArrayList<>();
+        for (PdfToWord.Para q : rows) {
+            for (PdfToWord.Box z : q.boxes) {
+                if (z.runs.isEmpty() || z.right <= z.x) continue;
+                xs.add(z.x);
             }
-            if (block instanceof PdfToWord.Para) {
-                para(sb, (PdfToWord.Para) block, ctx);
-            } else if (block instanceof PdfToWord.Table) {
-                table(sb, (PdfToWord.Table) block, ctx);
-            } else if (block instanceof Picture) {
-                picture(sb, (Picture) block, ctx);
-            } else if (block instanceof Shape) {
-                Shape sh = (Shape) block;
-                if (sh.stampFrame) {
-                    // D-25: a stamp's frame is ONE object holding every rule of that stamp, and
-                    // it is written once - where its outermost rule sits in the page's order.
-                    Shape host = sh.mergedHost == null ? sh : sh.mergedHost;
-                    if (!host.stampDrawn) {
-                        host.stampDrawn = true;
-                        if (host.mergedShape != null) shape(sb, host.mergedShape, ctx);
-                    }
-                } else if (!sh.consumed) {
-                    shape(sb, sh, ctx);
+        }
+        if (xs.size() < 6) return null;
+        java.util.Collections.sort(xs);
+        java.util.List<float[]> cand = new ArrayList<>();       // {x, count}
+        float cur = xs.get(0);
+        int curN = 1;
+        for (int i = 1; i < xs.size(); i++) {
+            float v = xs.get(i);
+            if (v - cur <= 8f) { cur = (cur * curN + v) / (curN + 1); curN++; }
+            else { cand.add(new float[]{cur, curN}); cur = v; curN = 1; }
+        }
+        cand.add(new float[]{cur, curN});
+        int need = Math.max(3, Math.round(rows.size() * 0.3f));
+        java.util.List<Float> starts = new ArrayList<>();
+        for (float[] c : cand) if (c[1] >= need) starts.add(c[0]);
+        if (starts.size() < 2 || starts.size() > 4) return null;
+
+        float[] edge = new float[starts.size() + 1];
+        for (int i = 0; i < starts.size(); i++) edge[i] = starts.get(i);
+        edge[edge.length - 1] = pw;
+        int n = edge.length - 1;
+        // Every column has to be a real column: an edge outside the paper, or one a kerning
+        // artefact away from its neighbour, is not a gutter.
+        for (int c = 1; c < edge.length; c++) {
+            if (edge[c] <= edge[c - 1] + 20f || edge[c] > pw) return null;
+        }
+
+        // The vertical band is decided by the caller, from the page's own baselines: a column
+        // exists where two columns are both set, not where one line happens to start at a
+        // column's x.
+        ColGeom g = new ColGeom();
+        g.edge = edge;
+        return g;
+    }
+
+    private static boolean columnPage(StringBuilder sb, PdfToWord.Page page, Ctx ctx, float pw) {
+        int n = page.columns;
+        // The edges come from the page's rows when they show columns (see rowColumnEdges), and
+        // from the column pass's own tags when they do not.
+        ColGeom geom = rowColumnEdges(page, pw);
+        float[] edge;
+        if (geom != null) {
+            edge = geom.edge;
+            n = edge.length - 1;
+        } else {
+            if (n < 2 || ctx.colLeft == null || ctx.colLeft.size() < n) return false;
+            // The left edge of a column is the MEDIAN of its blocks' left edges, not the
+            // smallest. Ctx.colLeft is the smallest, and on a page whose masthead is tagged with
+            // the last band that smallest is the masthead's - newspaper-2col-fullwidth-headline's
+            // "THE MORNING LEDGER" sits at x=100 and is tagged column 1, so the second column's
+            // edge reads as 99.7 pt against the 303 pt the page sets it at, and every line of the
+            // first column then straddles that "gutter" and is refused. One block out of thirty
+            // cannot move a median.
+            edge = new float[n + 1];
+            for (int c = 0; c < n; c++) {
+                java.util.List<Float> lefts = new ArrayList<>();
+                for (Object b : page.blocks) {
+                    if (!(b instanceof PdfToWord.Para)) continue;
+                    PdfToWord.Para q = (PdfToWord.Para) b;
+                    if (q.column != c || q.left <= 0f) continue;
+                    lefts.add(q.left);
+                }
+                if (lefts.isEmpty()) return false;
+                java.util.Collections.sort(lefts);
+                edge[c] = lefts.get(lefts.size() / 2);
+                if (c > 0 && edge[c] <= edge[c - 1] + 1f) return false;
+            }
+            if (edge[n - 1] >= pw - 1f) return false;
+            edge[n] = pw;
+        }
+        if (n < 2) return false;
+        float gutter = edge[1];
+
+        // Where each block belongs: a column index, -1 for a block drawn across the gutter, and
+        // -2 for a block that is positioned rather than flowed (a picture, a drawn shape).
+        //
+        // The extent comes from the block's own LINE BOXES, not from the paragraph's left/right.
+        // The column pass widens a paragraph that straddles a band cut: 62's "For the ayacutdars
+        // of Halagere, Yediyur and seven other" reports right = 526 pt although the page drew it
+        // to 281 pt, and on the paragraph's own numbers it reads as a full-width headline. It
+        // was that misreading that made the old code break the page into six sections.
+        int nb = page.blocks.size();
+        int[] home = new int[nb];
+        for (int i = 0; i < nb; i++) {
+            Object b = page.blocks.get(i);
+            float l = 0f, r = 0f;
+            boolean known = false;
+            if (b instanceof PdfToWord.Para) {
+                PdfToWord.Para q = (PdfToWord.Para) b;
+                l = Float.MAX_VALUE;
+                r = -Float.MAX_VALUE;
+                for (PdfToWord.Box bx : q.boxes) {
+                    if (bx.runs.isEmpty()) continue;
+                    l = Math.min(l, bx.x);
+                    r = Math.max(r, bx.right);
+                    known = true;
+                }
+                if (!known && q.right > q.left) {
+                    l = q.left;
+                    r = q.right;
+                    known = true;
+                }
+            } else if (b instanceof PdfToWord.Table) {
+                PdfToWord.Table q = (PdfToWord.Table) b;
+                l = q.left;
+                r = q.right;
+                known = r > l;
+            }
+            if (!known) {
+                home[i] = -2;
+            } else if (l < gutter - 1f && r > gutter + 1f) {
+                home[i] = -1;
+            } else {
+                int c = 0;
+                while (c + 1 < n && l >= edge[c + 1] - 1f) c++;
+                home[i] = c;
+            }
+        }
+
+        // The band the columns occupy, vertically: the baselines on which TWO columns are both
+        // set. That is what a column is - the two of them standing side by side - and it is the
+        // only test that tells the columns from header furniture that merely sits at a column's
+        // x. brochure-3col-with-sidebar-box's "Edition 2026" starts at the third column's edge and
+        // annual-review-2col-uneven-columns' 6 pt "K" is a drop cap in the first, and both are
+        // ALONE on their baseline, on the masthead's own lines; counting either as column
+        // content drags the band's top up over the masthead, and the masthead then reads as
+        // full-width text inside the columns and the page is refused.
+        float[] bTop = new float[nb];
+        int[] bMask = new int[nb];
+        for (int i = 0; i < nb; i++) {
+            Object b = page.blocks.get(i);
+            bTop[i] = blockTop(b);
+            bMask[i] = 0;
+            if (b instanceof PdfToWord.Para) {
+                for (PdfToWord.Box z : ((PdfToWord.Para) b).boxes) {
+                    if (z.runs.isEmpty() || z.right <= z.x) continue;
+                    int c = columnAt(z.x, edge, n);
+                    if (c >= 0) bMask[i] |= 1 << c;
                 }
             }
         }
-        if (page.columns > 1 && curCols != page.columns) {
-            sb.append("<w:p><w:pPr><w:sectPr>")
-              .append(sectPrXml(pw, ph, curCols, secGap))
-              .append("<w:type w:val=\"continuous\"/></w:sectPr></w:pPr></w:p>");
+        java.util.List<Float> shared = new ArrayList<>();
+        for (int i = 0; i < nb; i++) {
+            if (bMask[i] == 0 || bTop[i] < 0f) continue;
+            int m = 0;
+            for (int j = 0; j < nb; j++) {
+                if (bMask[j] == 0 || bTop[j] < 0f) continue;
+                if (Math.abs(bTop[j] - bTop[i]) <= 3f) m |= bMask[j];
+            }
+            if (Integer.bitCount(m) >= 2) shared.add(bTop[i]);
+        }
+        if (shared.isEmpty()) {
+            // A page whose columns do not share a baseline - a newspaper whose two columns are
+            // set on their own leading - still has a band: the extent of the blocks that are in
+            // a column. A full-width element drawn inside it will be refused below, which is the
+            // honest answer for those pages.
+            for (int i = 0; i < nb; i++) {
+                if (home[i] < 0 || bTop[i] < 0f) continue;
+                shared.add(bTop[i]);
+            }
+        }
+        if (shared.isEmpty()) return false;
+        java.util.Collections.sort(shared);
+        // The band is the longest RUN of shared baselines. A single shared line is not columns:
+        // a brochure's header puts its title at the first column's x and its edition line at the
+        // third's, and they sit on one baseline 65 pt above the body. Two columns are a run of
+        // shared baselines, one line apart; a lone one is furniture.
+        float colTop = shared.get(0);
+        int runBest = 1, runCur = 1;
+        float runStart = shared.get(0);
+        for (int i = 1; i < shared.size(); i++) {
+            float gap = shared.get(i) - shared.get(i - 1);
+            if (gap <= 40f) {
+                runCur++;
+            } else {
+                runCur = 1;
+                runStart = shared.get(i);
+            }
+            if (runCur > runBest) { runBest = runCur; colTop = runStart; }
+        }
+        float colBottom = -Float.MAX_VALUE;
+        for (int i = 0; i < nb; i++) {
+            boolean inCells = home[i] >= 0
+                    || (home[i] == -1 && splitColumns(page.blocks.get(i), edge, n) != null);
+            if (!inCells || bTop[i] < colTop - 3f) continue;
+            colBottom = Math.max(colBottom, blockBottom(page.blocks.get(i)));
+        }
+        // A page whose bands the column pass detected but whose prose never sits in them - a
+        // page of full-width lines that a vertical gutter on a form mis-tagged - is not a column
+        // page at all.
+        if (colBottom <= colTop) return false;
+
+        // Everything above the band is a band of its own, everything below is another, and what
+        // is left between them has to be column content. That is the shape a table can describe:
+        // a full-width band, then the columns, then a full-width band.
+        //
+        // A full-width block drawn INSIDE the band is the shape it cannot: a newspaper whose
+        // headline and byline sit between column fragments. Forcing that into a table both moves
+        // its text out of the columns and repeats it, so the page is written as an ordinary
+        // single-column flow instead - one page with a correct order beats one page with a
+        // scrambled one.
+        float tol = 2f;
+        java.util.TreeSet<Integer> used = new java.util.TreeSet<>();
+        @SuppressWarnings("unchecked")
+        java.util.List<Object>[] cells = new java.util.List[n];
+        for (int c = 0; c < n; c++) cells[c] = new ArrayList<>();
+        java.util.List<Object> before = new ArrayList<>();
+        java.util.List<Object> after = new ArrayList<>();
+        for (int i = 0; i < nb; i++) {
+            Object b = page.blocks.get(i);
+            float t = blockTop(b), bt = blockBottom(b);
+            if (home[i] == -2 || t < 0f || bt <= 0f) {
+                // Positioned rather than flowed - a picture or a drawn shape. It carries its own
+                // x and y, so it goes after the table and lands where the page put it.
+                after.add(b);
+                continue;
+            }
+            if (bt <= colTop + tol) { before.add(b); continue; }
+            if (t >= colBottom - tol) { after.add(b); continue; }
+            if (home[i] >= 0) {
+                // The cell's own edge is the column's edge, so the indent inside it is measured
+                // from that edge (bandLeftTw). Take the column from the geometry just computed
+                // rather than from the tag the column pass left on the paragraph, so the two
+                // cannot disagree about which edge to subtract.
+                if (b instanceof PdfToWord.Para) ((PdfToWord.Para) b).column = home[i];
+                cells[home[i]].add(b);
+                used.add(home[i]);
+                continue;
+            }
+            // A block drawn across the gutter is usually a masthead, a headline or a running
+            // footer - one line that really does run the width of the paper. But the column pass
+            // also cuts LINES at the gutter and keeps both halves on one baseline, so a "row" of
+            // two boxes can hold the bottom of the left column's line and the top of the right
+            // column's, and its extent then reads as full width when it is nothing of the kind.
+            // 62's "For the ayacutdars of Halagere, Yediyur and seven other" is one of those:
+            // its second box is the right column's "The forum has requested the deputy
+            // commissioner to take up". Such a block belongs to two cells, not to a band, so it
+            // is split by box.
+            int[] parts = splitColumns(b, edge, n);
+            if (parts != null) {
+                PdfToWord.Para q = (PdfToWord.Para) b;
+                for (int k = 0; k < q.boxes.size(); k++) {
+                    cells[parts[k]].add(oneBoxPara(q, q.boxes.get(k), parts[k]));
+                    used.add(parts[k]);
+                }
+                continue;
+            }
+            return false;
+        }
+        // One cell holding everything is not a column page either: it is a single flow whose
+        // lines happened to be tagged with bands. Checked before anything is written, so a
+        // refusal leaves the caller's flow untouched.
+        if (used.size() < 2) return false;
+
+        // The bands are written in the order the page drew them, top to bottom.
+        //
+        // Not in block order: the block pass orders a page by column and then by y, so a
+        // decorative initial can come before a masthead that sits ABOVE it - annual-review's "K"
+        // drop cap is block 0 and the letterhead is block 1, though the letterhead is 8 pt
+        // higher. A flow cannot put the second paragraph above the first, so the letterhead got
+        // no space before it and the whole page below it moved down by the drop cap's height.
+        sortByTop(before);
+        sortByTop(after);
+        for (Object b : before) emitBlock(sb, b, ctx);
+
+        // The table's grid: each column at the page's own edges, the last one running to the
+        // paper's edge. The cell margins are zero, so a cell's text edge IS the column's edge -
+        // which is what bandLeftTw() subtracts from every indent inside it.
+        int[] gridTw = new int[n];
+        int totalTw = 0;
+        for (int c = 0; c < n; c++) {
+            gridTw[c] = (int) Math.max(1L, Math.round((edge[c + 1] - edge[c]) * TWIPS_PER_PT));
+            totalTw += gridTw[c];
+        }
+        int indTw = (int) Math.max(0L, Math.round(edge[0] * TWIPS_PER_PT));
+
+        // The band's vertical extent, from the boxes the page drew.
+        float bandTop = Float.MAX_VALUE, bandBottom = -Float.MAX_VALUE;
+        for (int c = 0; c < n; c++) {
+            for (Object b : cells[c]) {
+                float t = blockTop(b), bt = blockBottom(b);
+                if (t < 0f || bt <= 0f) continue;
+                bandTop = Math.min(bandTop, t);
+                bandBottom = Math.max(bandBottom, bt);
+            }
+        }
+        if (bandBottom <= bandTop) return false;
+        // The row's top edge is where the FLOW has got to, not the band's first baseline: the
+        // table is placed after the paragraphs above it, so its top is the bottom of the last of
+        // them, and each cell's first line is then spaced from that edge by exactly the gap the
+        // page left. Measuring from the band's top instead dropped the gap between the deck and
+        // the columns, and put 62's left column 15 pt above the page's y.
+        //
+        // The band's top is the fallback for a page whose bands came out taller than the flow
+        // that precedes them - which cannot happen on a well-measured page, and must not put the
+        // table below the paper if it does.
+        float flowTopPt = ctx.flowTw / (float) TWIPS_PER_PT;
+        float rowTopPt = flowTopPt <= bandTop + 0.5f ? flowTopPt : bandTop;
+
+        // ONE ROW PER BAND, not one row for the whole page.
+        //
+        // A page can be set in columns more than once - a brochure whose three columns carry one
+        // block of prose and then a second block of specifications below it. The page reads
+        // band by band: all three columns of the first band, then all three of the second. A
+        // single row cannot say that; it says "all of column one, then all of column two", which
+        // is why 63_three_column_brochure still scored 33 % on reading order with its lines all
+        // in the right place. A row per band says it exactly, and the bands are where the page
+        // left a gap across EVERY column at once.
+        java.util.List<float[]> subs = new java.util.ArrayList<>();
+        {
+            java.util.List<float[]> iv = new ArrayList<>();
+            for (int c = 0; c < n; c++) {
+                for (Object b : cells[c]) {
+                    float t = blockTop(b), bt = blockBottom(b);
+                    if (t < 0f || bt <= 0f) continue;
+                    iv.add(new float[]{t, bt});
+                }
+            }
+            if (iv.isEmpty()) return false;
+            java.util.Collections.sort(iv, new java.util.Comparator<float[]>() {
+                public int compare(float[] a, float[] b) { return Float.compare(a[0], b[0]); }
+            });
+            float curT = iv.get(0)[0], curB = iv.get(0)[1];
+            for (int i = 1; i < iv.size(); i++) {
+                // A gap that no column fills is the end of a band. 30 pt is two or three lines of
+                // body type: less than that is the leading between two lines, or the slack under a
+                // short line, and not a band break. Measured on the six column documents: at 12 pt
+                // 62_two_col_newsletter_pull_quote splits at its pull quote and its reading order
+                // falls from 89 % to 75 %, while 63_three_column_brochure is unaffected; at 30 pt
+                // both hold (62 at 89 %, 63 at 96 %).
+                if (iv.get(i)[0] - curB > 30f) {
+                    subs.add(new float[]{curT, curB});
+                    curT = iv.get(i)[0];
+                    curB = iv.get(i)[1];
+                } else {
+                    curB = Math.max(curB, iv.get(i)[1]);
+                }
+            }
+            subs.add(new float[]{curT, curB});
+        }
+
+        String noBorder = "<w:top w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"
+                + "<w:left w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"
+                + "<w:bottom w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"
+                + "<w:right w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"
+                + "<w:insideH w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"
+                + "<w:insideV w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>";
+
+        sb.append("<w:tbl><w:tblPr>")
+                .append("<w:tblW w:w=\"").append(totalTw).append("\" w:type=\"dxa\"/>")
+                .append("<w:tblInd w:w=\"").append(indTw).append("\" w:type=\"dxa\"/>")
+                .append("<w:tblBorders>").append(noBorder).append("</w:tblBorders>")
+                .append("<w:tblLayout w:type=\"fixed\"/>")
+                .append("<w:tblCellMar><w:top w:w=\"0\" w:type=\"dxa\"/>")
+                .append("<w:left w:w=\"0\" w:type=\"dxa\"/>")
+                .append("<w:bottom w:w=\"0\" w:type=\"dxa\"/>")
+                .append("<w:right w:w=\"0\" w:type=\"dxa\"/></w:tblCellMar>")
+                .append("</w:tblPr><w:tblGrid>");
+        for (int c = 0; c < n; c++) {
+            sb.append("<w:gridCol w:w=\"").append(gridTw[c]).append("\"/>");
+        }
+        sb.append("</w:tblGrid>");
+
+        float rowEndPt = rowTopPt;
+        for (int band = 0; band < subs.size(); band++) {
+            float subTop = subs.get(band)[0], subBottom = subs.get(band)[1];
+            // Each cell is written first and measured, because the row's height is the TALLEST
+            // cell's, not the band's.
+            StringBuilder[] cellXml = new StringBuilder[n];
+            int[] cellTw = new int[n];
+            for (int c = 0; c < n; c++) {
+                cellXml[c] = new StringBuilder(1 << 10);
+                // Each cell is a flow of its own, and it starts where the row starts: the first
+                // line's gap is measured from there, not from the line above the table.
+                ctx.inColumn = true;
+                ctx.cellLeftPt = edge[c];
+                ctx.cellRightPt = edge[c + 1];
+                ctx.afterTablePt = rowEndPt;
+                ctx.lastBaseline = -1f;
+                ctx.lastLinePt = 0f;
+                ctx.newPage = false;
+                ctx.positioned = false;
+                ctx.lastWasTable = false;
+                boolean any = false;
+                for (Object b : cells[c]) {
+                    float t = blockTop(b);
+                    if (t < subTop - 0.5f || t > subBottom + 0.5f) continue;
+                    emitBlock(cellXml[c], b, ctx);
+                    any = true;
+                }
+                // A cell must hold a block-level element, and a table must be followed by a
+                // paragraph inside its cell. A 1-twip line is the cheapest one there is.
+                if (!any) {
+                    cellXml[c].append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                            .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\"")
+                            .append(" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+                            .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+                }
+                ctx.inColumn = false;
+                cellTw[c] = flowTwOf(cellXml[c]);
+            }
+            int rowTw = 1;
+            for (int c = 0; c < n; c++) rowTw = Math.max(rowTw, cellTw[c]);
+            // hRule EXACT, at the height the cells really write.
+            //
+            // "atLeast" is the obvious choice and it is wrong here. LibreOffice then decides the
+            // row from its own model of the cell content, and on a page that already carries a
+            // band above the columns it sizes the row to the rest of the sheet:
+            // annual-review-2col-uneven-columns declared a 364 pt row and got one that ended at
+            // the foot of the paper, so the running footer - and the anchored shapes after it -
+            // were pushed onto a second, empty page. Measured: hRule="atLeast" -> 2 pages,
+            // hRule="exact" -> 1 page, all 41 lines present.
+            //
+            // Exact is safe because every paragraph in a cell is written with w:lineRule="exact"
+            // and its own w:before, so the height of the cell's content IS this sum - the
+            // renderer has no line-box of its own to add to it.
+            sb.append("<w:tr><w:trPr><w:cantSplit/>")
+                    .append("<w:trHeight w:val=\"").append(rowTw)
+                    .append("\" w:hRule=\"exact\"/></w:trPr>");
+            for (int c = 0; c < n; c++) {
+                sb.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(gridTw[c])
+                        .append("\" w:type=\"dxa\"/><w:vAlign w:val=\"top\"/></w:tcPr>")
+                        .append(cellXml[c]).append("</w:tc>");
+            }
+            sb.append("</w:tr>");
+            rowEndPt = rowEndPt + rowTw / (float) TWIPS_PER_PT;
+        }
+        sb.append("</w:tbl>");
+
+        // Everything after the columns - the running footer, and any picture or shape drawn on
+        // the page - continues the flow from the last row's real bottom edge.
+        ctx.afterTablePt = rowEndPt;
+        ctx.lastBaseline = -1f;
+        ctx.lastLinePt = 0f;
+        ctx.newPage = false;
+        ctx.positioned = false;
+        ctx.lastWasTable = false;
+        ctx.flowTw = Math.max(ctx.flowTw, (int) Math.round(rowEndPt * TWIPS_PER_PT));
+        for (Object b : after) emitBlock(sb, b, ctx);
+        return true;
+    }
+
+    /**
+     * The height a cell's own paragraphs occupy: every {@code w:before} plus every
+     * {@code w:line} in it.
+     *
+     * <p>{@link #spacingTw} deliberately ignores the spacing inside a table, because a row's
+     * height is carried by its {@code w:trHeight} and counting both would charge the page twice.
+     * That is the right rule for the PAGE and the wrong one for the ROW, whose height is exactly
+     * this sum for its tallest cell.
+     */
+    private static int flowTwOf(CharSequence xml) {
+        int sum = 0;
+        int i = 0;
+        while (i < xml.length()) {
+            if (startsWith(xml, BEFORE, i)) {
+                sum += digits(xml, i + BEFORE.length());
+                i += BEFORE.length();
+            } else if (startsWith(xml, LINE, i)) {
+                sum += digits(xml, i + LINE.length());
+                i += LINE.length();
+            } else {
+                i++;
+            }
+        }
+        return sum;
+    }
+
+    /** Orders a page's bands top to bottom, as the page drew them. */
+    private static void sortByTop(java.util.List<Object> blocks) {
+        java.util.Collections.sort(blocks, new java.util.Comparator<Object>() {
+            public int compare(Object a, Object b) {
+                float ta = blockTop(a), tb = blockTop(b);
+                if (ta < 0f) return tb < 0f ? 0 : 1;
+                if (tb < 0f) return -1;
+                return Float.compare(ta, tb);
+            }
+        });
+    }
+
+    /** Writes one of a page's blocks. */
+    private static void emitBlock(StringBuilder sb, Object block, Ctx ctx) {
+        if (block instanceof PdfToWord.Para) {
+            para(sb, (PdfToWord.Para) block, ctx);
+        } else if (block instanceof PdfToWord.Table) {
+            table(sb, (PdfToWord.Table) block, ctx);
+        } else if (block instanceof Picture) {
+            picture(sb, (Picture) block, ctx);
+        } else if (block instanceof Shape) {
+            if (!((Shape) block).consumed) shape(sb, (Shape) block, ctx);
         }
     }
 
@@ -856,21 +1571,31 @@ public final class DocxWriter {
     /** How many column bands this page's paragraphs occupy, and the widest gutter between them. */
     /** The left edge of the column a paragraph sits in, in twips, or 0 for a one-column page. */
     private static int bandLeftTw(Ctx ctx, int column) {
-        // Only a section that really is set in columns may subtract one. See Ctx.secCols: on a
-        // one-column section the paragraph's w:ind is measured from the page edge, so a
-        // column-relative indent has nothing to be relative to and lands the line at x=0.
-        if (ctx.secCols <= 1) return 0;
+        if (ctx.inColumn) return (int) Math.round(ctx.cellLeftPt * TWIPS_PER_PT);
+        // Only a layout-table CELL may subtract one. A cell's text edge IS its column's edge, so
+        // the indent inside it is measured from that edge and the page's own x has to come off.
+        // Outside a cell the paragraph's w:ind is measured from the page edge, so a
+        // column-relative indent has nothing to be relative to and lands the line at x=0 - which
+        // is what a form page did, whose vertical gutters give its field rows column 1, 2 and 3
+        // while nothing on the page is set in columns at all (401_trifold_brochure, 300.6 pt).
+        if (!ctx.inColumn) return 0;
         if (ctx.colLeft == null || ctx.colLeft.size() <= 1) return 0;
         Float left = ctx.colLeft.get(column);
         return left == null ? 0 : (int) Math.round(left * TWIPS_PER_PT);
     }
 
     private static int[] pageColumns(PdfToWord.Page page) {
-        // The decision is made in PdfToWord.proseColumns, from the page's UNSPLIT lines. It cannot
-        // be made here: asBands cuts a four-point slice out of every line at the gutter, so by the
-        // time a Para exists every band is half a page wide by construction and the "gutter"
-        // between them is 4-12 pt whatever the page really is.
-        if (page.columns > 1) return new int[]{page.columns, Math.round(page.columnGap)};
+        // The page's SECTION is always one column, whatever the page's own column count is.
+        //
+        // A page set in newspaper columns is written as a layout table instead - see
+        // columnPage(). A section's columns are set by w:cols and a paragraph cannot carry a
+        // column count of its own, so the only way to hold a full-width band and two columns on
+        // one sheet is to make the columns the table's columns. That is also the only structure
+        // Google Docs renders on one page: it does not honour a continuous section break, and
+        // turns each one into a page break (see the note in pageBody).
+        //
+        // The page's own column count is still read by columnPage(), from page.columns - it is
+        // the DETECTION that matters, not the section.
         return new int[]{1, 0};
     }
 
@@ -1529,11 +2254,33 @@ public final class DocxWriter {
         // charged one pitch, not one per field.
         float pitch = !ctx.newPage && ctx.lastBaseline >= 0f ? first.y - ctx.lastBaseline : -1f;
         float linePt = flowLinePt(pitch, size, ctx.lastLinePt);
-        // Absolute, not incremental: the gap is measured from where the reader really put the
-        // line above, so no rounding or clamped gap is carried down the page (D-26).
-        float[] pl = place(ctx, first.y, size, pitch, linePt);
-        linePt = pl[1];
-        int beforeTw = (int) Math.round(Math.min(pl[0], gapCapTw(ctx)));
+        int beforeTw = 0;
+        if (ctx.afterTablePt >= 0f) {
+            // Same rule as flowFromBox: the row is placed against the table's measured edge
+            // rather than spaced from a baseline that the table replaced.
+            float topPt = first.y - LINE_BASE * linePt;
+            float edgeGap = topPt - ctx.afterTablePt;
+            ctx.afterTablePt = -1f;
+            if (edgeGap * TWIPS_PER_PT > gapCapTw(ctx)) {
+                // Too far below the table to be a gap - a running footer on the last line of
+                // the sheet. It is a position, so the row's fields are anchored where the page
+                // drew them rather than spaced from the table's bottom edge.
+                ctx.positioned = true;
+                for (PdfToWord.Box ab : cols) anchorBox(sb, p, ab, ctx);
+                return;
+            }
+            beforeTw = (int) Math.max(0L, Math.round(edgeGap * TWIPS_PER_PT));
+        } else if (ctx.newPage) {
+            float topGap = first.y - LINE_BASE * linePt;
+            if (topGap > 0f) {
+                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
+            } else if (first.y > 0f) {
+                linePt = Math.min(linePt, Math.max(size, first.y / LINE_BASE));
+            }
+        } else if (pitch > 0f) {
+            float extra = pitch - (1f - LINE_BASE) * ctx.lastLinePt - LINE_BASE * linePt;
+            if (extra > 0f) beforeTw = (int) Math.min(gapCapTw(ctx), Math.round(extra * TWIPS_PER_PT));
+        }
         int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
         // The squeeze factor is 1 on every page whose own flow already fits the paper; on the
         // pages it is not, the guard is handed the heights the page will really be written with,
@@ -1916,7 +2663,18 @@ public final class DocxWriter {
         // The alignment is the position, so the indent must not double it. A line centred on the
         // paper keeps the whole text area; one centred inside a column gets the page's own extent
         // back as symmetric indents, so its centre is the centre the page used.
-        if (p.align == 1) {
+        if (ctx.inColumn) {
+            // Inside a column cell the cell IS the column: it is exactly as wide as the band the
+            // page drew, so a centred line is centred by w:jc against zero indents, and a
+            // right-aligned one is measured from the cell's right edge rather than the paper's.
+            if (p.align == 1) {
+                leftTw = 0;
+            } else if (p.align == 2) {
+                leftTw = 0;
+                rightTw = (int) Math.max(0L,
+                        Math.round((ctx.cellRightPt - b.right) * TWIPS_PER_PT));
+            }
+        } else if (p.align == 1) {
             float centre = (b.x + b.right) / 2f;
             if (Math.abs(centre - ctx.pageWidthPt / 2f) > 2f) {
                 rightTw = (int) Math.max(0L, Math.round((ctx.pageWidthPt - b.right) * TWIPS_PER_PT));
@@ -1931,28 +2689,82 @@ public final class DocxWriter {
         // box is the page's own line height rather than a guess at it - see flowLinePt.
         float pitch = !ctx.newPage && ctx.lastBaseline >= 0f ? b.y - ctx.lastBaseline : -1f;
         float linePt = flowLinePt(pitch, b.size, ctx.lastLinePt);
-        // Absolute placement (D-26): the gap is the distance from where the reader really put
-        // the line above to where this one belongs, not the pitch between two PDF baselines.
-        float[] pl = place(ctx, b.y, b.size, pitch, linePt);
-        linePt = pl[1];
-        if (!ctx.newPage && ctx.flowY >= 0f && pl[0] > gapCapTw(ctx)) {
-            // A gap wider than the flow may spend is not a gap, it is a position. Clamping it
-            // puts the line somewhere the page never put it, and every line after it drifts
-            // with it: on 331_pid_diagram the clamp landed the diagram's "CHILLED WATER"
-            // label 114 pt above the box that holds it. Anchoring the line at its own y is what
-            // the page did, and from here on the page is placed rather than flowed.
-            ctx.positioned = true;
-            anchorBox(sb, p, b, ctx);
-            // The anchored line is on the sheet at its own y, so the flow resumes from there.
-            ctx.flowY = b.y;
-            ctx.flowBoxPt = 0f;
-            return;
+        int beforeTw = 0;
+        if (ctx.afterTablePt >= 0f) {
+            // The box above this one is a layout table - or the top of a column cell - and a
+            // table's height is decided by the renderer from its own line boxes, not by the
+            // page's baselines. So this line is placed against the measured edge: the gap is
+            // exactly what the page left between that edge and this line's box top.
+            float topPt = b.y - LINE_BASE * linePt;
+            float edgeGap = topPt - ctx.afterTablePt;
+            ctx.afterTablePt = -1f;
+            // Inside a cell a wide gap is SPACE, not a position: the cell is a fixed rectangle
+            // whose height is measured from exactly what it writes, so spending the gap keeps the
+            // line where the page put it and keeps it as text. Anchoring it instead made a text
+            // box - not editable in Google Docs - and on brochure-3col-with-sidebar-box, whose
+            // columns hold more than one band, that turned 24 lines into text boxes.
+            if (!ctx.inColumn && edgeGap * TWIPS_PER_PT > gapCapTw(ctx)) {
+                // A footer 340 pt below the columns is not a gap the flow may spend, it is a
+                // position - the rule the pitch branch below already applies. Spending what the
+                // cap allows instead put 62's running footer 246 pt above the foot of the page.
+                ctx.positioned = true;
+                anchorBox(sb, p, b, ctx);
+                return;
+            }
+            beforeTw = (int) Math.max(0L, Math.round(edgeGap * TWIPS_PER_PT));
+        } else if (ctx.newPage) {
+            // The FIRST line on a page still has to land at its own y. The section carries zero
+            // margins, so without this it starts at the very top of the sheet: on file 21 every
+            // line measured 46 pt high against the PDF, a constant offset with the pitch already
+            // correct. Measured, not guessed - dy was -46.2, -48.3, -45.0, -46.6 over the first
+            // four lines of the page. The lift is the part of the box above its baseline, and
+            // where the box is taller than the space the page leaves, the box is shortened to
+            // fit rather than the line being placed below its own y.
+            float topGap = b.y - LINE_BASE * linePt;
+            if (topGap > 0f) {
+                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
+            } else if (b.y > 0f) {
+                linePt = Math.min(linePt, Math.max(b.size, b.y / LINE_BASE));
+            }
+        } else if (pitch > 0f) {
+            // Where the previous baseline is, plus the rest of its box, plus this line's own part
+            // above its baseline, plus this gap, must equal the pitch the page used. Only a gap
+            // wider than the box can carry - a diagram's boxes 90 pt apart, a footer 422 pt below
+            // the text - still needs spacing, and flowLinePt has refused to put that in the box.
+            float extra = pitch - (1f - LINE_BASE) * ctx.lastLinePt - LINE_BASE * linePt;
+            if (extra > 0f) {
+                // A gap wider than the flow may spend is not a gap, it is a position. Clamping it
+                // puts the line somewhere the page never put it, and every line after it drifts
+                // with it: on 331_pid_diagram the clamp landed the diagram's "CHILLED WATER"
+                // label 114 pt above the box that holds it. Anchoring the line at its own y is
+                // what the page did, and from here on the page is placed rather than flowed.
+                // Same rule inside a cell: a gap between two bands of the same column is space
+                // the cell can hold, not a reason to float the line out of the text.
+                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)) {
+                    ctx.positioned = true;
+                    anchorBox(sb, p, b, ctx);
+                    return;
+                }
+                beforeTw = (int) Math.round(extra * TWIPS_PER_PT);
+            }
         }
         // The FIRST line on a page has to land at its own y too, and place() does that: the
         // section carries zero margins, so the flow starts at the paper's top edge and the gap
         // is the whole distance down to the top of this line's box (file 21 used to sit 46 pt
         // high on every line without it).
-        int beforeTw = (int) Math.round(Math.min(pl[0], gapCapTw(ctx)));
+        // D-26-A's absolute gap, kept as the fallback. COL-A's branches below decide first -
+        // the table edge, the first line on a page, or the page's own pitch - and where none of
+        // them had anything to say, the distance from where the reader really put the line above
+        // is what places this one, with no rounding carried down the page.
+        int absBeforeTw = 0;
+        if (ctx.flowY >= 0f) {
+            float absTop = b.y - LINE_BASE * linePt;
+            absBeforeTw = (int) Math.max(0L,
+                    Math.round(Math.min(absTop - ctx.flowY, gapCapTw(ctx) / TWIPS_PER_PT) * TWIPS_PER_PT));
+        }
+        if (beforeTw == 0 && absBeforeTw > 0 && !ctx.newPage && ctx.afterTablePt < 0f) {
+            beforeTw = absBeforeTw;
+        }
         int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
         // A page's flow must end where the paper does. The gap above is clamped per line, but
         // 43 of them add up, and a page whose flow overruns by a few points sends its last line
@@ -2348,18 +3160,6 @@ public final class DocxWriter {
             }
             blocks.add(at, p);
         }
-    }
-
-    /** Where a block starts on the page, in points from its top, for ordering only. */
-    private static float blockTop(Object b) {
-        if (b instanceof PdfToWord.Para) return ((PdfToWord.Para) b).top;
-        if (b instanceof PdfToWord.Table) return ((PdfToWord.Table) b).top;
-        if (b instanceof Picture) {
-            Picture p = (Picture) b;
-            return p.placed ? p.topPt : p.top;
-        }
-        if (b instanceof Shape) return ((Shape) b).topPt;
-        return 0f;
     }
 
     /**

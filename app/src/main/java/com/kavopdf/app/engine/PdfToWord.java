@@ -726,6 +726,26 @@ public final class PdfToWord {
                 starts.clear(); starts.addAll(ruleGutters);
             }
         }
+        // The page's column count is the number of bands the cut actually made, not the earlier
+        // proseColumns() estimate.
+        //
+        // proseColumns() runs at the top of this method, before any of the three gutter
+        // detectors below has finished - it clusters the raw lines' left edges and requires the
+        // bands to be near-equal in width, so it answers 1 for a page whose columns are uneven
+        // and for a page whose gutter is only visible to the glyph projection or to a vertical
+        // rule. `starts` is the list the cut is really made from (asBands), so it is the only
+        // honest answer to "how many columns is this page set in", and it is the one the writer
+        // needs: it groups the page's blocks back into the bands they were cut out of, so a
+        // count that disagrees with `starts` would put a block in the wrong cell.
+        //
+        // Capped at 4 because that is the widest newspaper grid the block pass is built for
+        // (proseColumns refuses more), and a page that needed five would be a table.
+        page.columns = starts.isEmpty() ? 1 : Math.min(4, starts.size() + 1);
+        if (page.columns > 1 && !starts.isEmpty()) {
+            float gLo = Float.MAX_VALUE;
+            for (int k = 1; k < starts.size(); k++) gLo = Math.min(gLo, starts.get(k) - starts.get(k - 1));
+            page.columnGap = gLo == Float.MAX_VALUE ? 0f : gLo;
+        }
         uprightIfPageIsUpsideDown(glyphs);
         List<Line> lines = toLines(glyphs, asBands(starts));
         List<Line> ring = new ArrayList<>();
