@@ -230,14 +230,29 @@ public final class DocxWriter {
     private static final String BEFORE = "w:before=\"";
     private static final String LINE = "w:line=\"";
     private static final String TRHEIGHT = "w:trHeight w:val=\"";
+    private static final String FRAMEPR = "<w:framePr";
+    private static final String PARA_END = "</w:p>";
 
     private static int spacingTw(CharSequence xml) {
         int sum = 0;
         int depth = 0;              // inside a w:tbl
+        boolean framed = false;     // inside a paragraph that carries a w:framePr
         int i = 0;
         int n = xml.length();
         while (i < n) {
-            if (startsWith(xml, "<w:tbl>", i)) {
+            if (startsWith(xml, FRAMEPR, i)) {
+                // A framed paragraph is placed at a y, not flowed - it is a stamp line, and a
+                // stamp is drawn OVER the page. Its own w:before/w:line are not the page's
+                // height: charging them makes a one-page document measure taller than its paper
+                // and sends its last line to a second sheet, which is exactly what a text box
+                // used to do (see the w:txbxContent branch below). The flag is cleared at the
+                // end of the paragraph that carries it, so a frame never hides a later line.
+                framed = true;
+                i += FRAMEPR.length();
+            } else if (framed && startsWith(xml, PARA_END, i)) {
+                framed = false;
+                i += PARA_END.length();
+            } else if (startsWith(xml, "<w:tbl>", i)) {
                 depth++;
                 i += 7;
             } else if (startsWith(xml, "</w:tbl>", i)) {
@@ -256,7 +271,7 @@ public final class DocxWriter {
                 // A cell's line is not the page's height: the row it sits in already carries
                 // that height as its own w:trHeight, and counting both charges a table twice.
                 int j = i + (startsWith(xml, BEFORE, i) ? BEFORE.length() : LINE.length());
-                if (depth == 0) sum += digits(xml, j);
+                if (depth == 0 && !framed) sum += digits(xml, j);
                 i = j;
             } else if (startsWith(xml, TRHEIGHT, i)) {
                 sum += digits(xml, i + TRHEIGHT.length());
@@ -2474,6 +2489,14 @@ public final class DocxWriter {
                 for (PdfToWord.Box b : p.boxes) {
                     if (b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
                     if (containerOf(outlines, b) != null) continue;
+                    // A line on a turned baseline is never part of the flow: para() writes it
+                    // either as a framed paragraph (a stamp - T02-A) or as an anchored box (a
+                    // rotated label). Charging it here made this measure disagree with the
+                    // writer about the same page - two stamp lines charged 34 pt a page the
+                    // writer never wrote - and that alone decided `spendGaps`, which is what
+                    // puts a running footer at its own y. Measured: 02's footer sat 117 pt above
+                    // the foot of the page with the stamp charged and lands on it without.
+                    if (b.rotated) continue;
                     if (b.y < top) top = b.y;
                     if (b.size > size) size = b.size;
                 }
@@ -3172,9 +3195,17 @@ public final class DocxWriter {
         if (stamps.isEmpty()) return;
         blocks.removeAll(stamps);
         for (PdfToWord.Para p : stamps) {
+            // Compare like with like. The other blocks are placed by blockTop(), which is the
+            // top of a line's BOX (y - LINE_BASE * size); Para.top is a different quantity -
+            // for a turned line it is the origin PDFBox reports in the line's own frame - so
+            // mixing the two put a stamp line after a prose line it sits above. On 02, IN ORDER
+            // is at box top 473.2 and "Goods dispatched in good condition" at 478.6, and the
+            // mixed comparison filed the stamp under the prose.
+            float pTop = blockTop(p);
+            if (pTop < 0f) pTop = p.top;
             int at = blocks.size();
             for (int i = 0; i < blocks.size(); i++) {
-                if (blockTop(blocks.get(i)) > p.top) { at = i; break; }
+                if (blockTop(blocks.get(i)) > pTop) { at = i; break; }
             }
             blocks.add(at, p);
         }
@@ -3276,17 +3307,34 @@ public final class DocxWriter {
     }
 
     /**
-     * One line of stamp text, as an ordinary paragraph placed by its indent and space-before.
+     * One line of stamp text: a real paragraph, held at the page's own (x, y) by {@code w:framePr}.
      *
-     * <p>This is the other half of D-25. The stamp used to be a {@code wps:txbx} text box, and
-     * Google Docs renders a text box as a drawing and cannot put a caret inside it - the user's
-     * "the stamp is not editable at all" on 02. A paragraph can be selected, edited and typed
-     * into in every reader, so each line of the stamp is one.
+     * <p>This is the other half of D-25, and T02-A is why it is a frame and no longer a flowed
+     * paragraph. The stamp used to be a {@code wps:txbx} text box, and Google Docs renders a
+     * text box as a drawing and cannot put a caret inside it - the user's "the stamp is not
+     * editable at all" on 02. A paragraph can be selected, edited and typed into in every
+     * reader, so each line of the stamp is one, and it stays one here.
      *
-     * <p>It is placed exactly as the rest of the page's text is placed: {@code w:ind w:left} at
-     * the x the line starts at and {@code w:spacing w:before} for the gap above its baseline. No
-     * box, no rotation attribute, nothing anchored. The frame is a sibling written by
-     * {@code shape()}, so neither part can move the other.
+     * <p>WHAT WAS WRONG WITH PLACING IT BY {@code w:ind} AND {@code w:spacing}. A flow only goes
+     * downwards. A stamp is drawn OVER the page: its lines sit at a y the prose beside them has
+     * already passed, and {@code w:spacing w:before} cannot be negative, so the paragraph lands
+     * at whichever is lower - its own y or the flow's position - and then every line after it
+     * inherits the overshoot. Measured on the five stamp documents before this change: the
+     * stamp's own lines landed 11 pt (02), 39-117 pt (03), 60 pt (04), 33-87 pt (08) and 80-87 pt
+     * (01) below their y, the prose below them was pushed down by the same amount, and on 03 and
+     * 04 one stamp line ("VERIFIED FOR AUDIT", "DUPLICATE ISSUED") was not in the render at all.
+     * {@code orderStamps()} could not fix that: it moves a paragraph in the block list, and no
+     * position in a flow is above the flow's own point.
+     *
+     * <p>WHAT A FRAME DOES. {@code w:framePr} is a paragraph property - not a drawing, not a
+     * text box - that takes the paragraph out of the flow and anchors it at an absolute page
+     * point with {@code w:wrap="none"}. So the paragraph is still a paragraph (selectable,
+     * editable, in the document's order, {@code wps:txbx} stays 0), and it is where the page put
+     * it, and it adds nothing to the height of the page it sits on. The point written is the
+     * corner of the line's own box in page space, taken from the baseline's origin and the
+     * line's angle - not the origin itself, which is a different point for every angle but a
+     * horizontal one. The glyphs then sit in the frame exactly as they sit in a flowed line of
+     * the same box.
      *
      * <p>The glyphs of a line the page drew at an angle come out upright here: OOXML has no text
      * rotation that LibreOffice honours, which is the recorded renderer limit (D-16) and not
@@ -3296,21 +3344,70 @@ public final class DocxWriter {
      */
     private static void stampLine(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b, Ctx ctx,
                                   float px, float py, float lineAngle, float advance) {
-        double dirX = Math.cos(Math.toRadians(lineAngle));
-        float startX = px;
-        if (dirX <= -0.5) startX = px - b.length;
-        else if (Math.abs(dirX) < 0.5) startX = px - b.length / 2f;
-        PdfToWord.Box flat = new PdfToWord.Box();
-        flat.x = startX;
-        flat.right = startX + Math.max(advance, b.length);
-        flat.y = py;
-        flat.size = b.size;
-        flat.bottom = py + Math.max(4f, b.size * LINE_FACTOR);
-        flat.length = b.length;
-        flat.rotated = false;
-        flat.angle = 0f;
-        flat.runs.addAll(b.runs);
-        flowFromBox(sb, p, flat, ctx);
+        String text = b.text();
+        if (text.trim().isEmpty()) return;
+        // The line's own box, measured exactly as a flowed line's is, so the glyphs land at the
+        // same place inside the frame as they would inside a paragraph of the same height.
+        float linePt = flowLinePt(-1f, b.size, 0f);
+        float len = Math.max(b.length, advance);
+        // THE CORNER OF THE LINE'S BOX IN PAGE SPACE, from the one point the engine has: the
+        // baseline's origin. Reading it as if it were the corner is the second half of the
+        // defect - the stamp's words were 39 pt low on 01, 69 pt on 03 and 12 pt on 04 while the
+        // frame they belong to was drawn in the right place, which is the "the frame drifts"
+        // the user reported. A turned baseline is not a horizontal one:
+        //
+        //   * the box top is the top of the whole baseline, not the y of its first glyph, so a
+        //     line that rises to the right starts at the BOTTOM of its own box (01, 08);
+        //   * the ascent is measured across the baseline, so on a 90-degree line it is a
+        //     displacement along x and moves the box top by nothing at all (03);
+        //   * and a 180-degree line's origin comes back MIRRORED, so the part of the box above
+        //     its baseline is below it on the page - the box has to be mirrored, not the point
+        //     (04, and D-25's note on the mirrored pair).
+        double th = Math.toRadians(lineAngle);
+        float cosA = (float) Math.cos(th), sinA = (float) Math.sin(th);
+        float startX, topPt;
+        if (b.rotated && Math.abs(b.angle) < 1f) {
+            // Mirrored: the page-space top is the mirror of the box's own BOTTOM.
+            topPt = ctx.pageHeightPt - b.y - (1f - LINE_BASE) * linePt;
+            startX = px - len;
+        } else {
+            topPt = Math.min(py, py + len * sinA) - LINE_BASE * linePt * Math.abs(cosA);
+            startX = Math.min(px, px + len * cosA);
+            // A line that runs UP the page rather than across it. Its own box is one glyph wide
+            // and a hundred points tall, and the words are written upright - OOXML has no
+            // rotation LibreOffice honours (D-16) - so the one thing that can be kept is that
+            // the line stays on the paper: it is centred on the column the page drew it in, which
+            // is where it was before and where the reader can still see it.
+            if (Math.abs(cosA) < 0.5f) startX = px - len / 2f;
+        }
+        int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
+        int xTw = (int) Math.max(0L, Math.round(startX * TWIPS_PER_PT));
+        int yTw = (int) Math.max(0L, Math.round(topPt * TWIPS_PER_PT));
+        // Wide enough for the line unwrapped. A frame wraps its own text at w:w, so a box that
+        // is a point too narrow turns "GOODS RECEIVED" into two lines inside the stamp.
+        float boxW = len + b.size * 1.5f;
+        // And never off the paper. A stamp is drawn at the edge of the page by definition, so a
+        // line whose upright text is wider than the room to the right of it would be cut off by
+        // the page edge instead of the frame - measured on 03, where the vertical line at x=541
+        // had 54 pt of paper left and 113 pt of text, and the render held "VERIFIED FO".
+        startX = Math.max(0f, Math.min(startX, ctx.pageWidthPt - boxW));
+        int wTw = (int) Math.max(1L, Math.round(boxW * TWIPS_PER_PT));
+        sb.append("<w:p><w:pPr>")
+                .append("<w:framePr w:w=\"").append(wTw)
+                .append("\" w:h=\"").append(lineTw)
+                .append("\" w:hRule=\"exact\" w:wrap=\"none\" w:vAnchor=\"page\" w:hAnchor=\"page\"")
+                .append(" w:x=\"").append(xTw).append("\" w:y=\"").append(yTw).append("\"/>")
+                .append("<w:snapToGrid w:val=\"0\"/>")
+                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\"")
+                .append(" w:before=\"0\" w:after=\"0\" w:line=\"").append(lineTw)
+                .append("\" w:lineRule=\"exact\"/>")
+                .append("<w:ind w:left=\"0\" w:right=\"0\" w:firstLine=\"0\"/>")
+                .append("</w:pPr>");
+        for (PdfToWord.Run run : b.runs) {
+            if (run.text.isEmpty()) continue;
+            runXml(sb, run);
+        }
+        sb.append("</w:p>");
     }
 
     /**
