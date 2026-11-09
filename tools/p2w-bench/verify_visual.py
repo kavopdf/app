@@ -131,12 +131,24 @@ def compare(src_pdf, rendered_pdf):
     # Reading order: walk the render in document order and ask how often the next line
     # is the one the PDF reads next. Position can be perfect while the order is wrong -
     # that is what makes a two-column page select as interleaved text.
-    a_order = [ln['text'] for ln in a]
-    b_order = [ln['text'] for ln in b]
-    pos_in_a = {}
-    for i, t in enumerate(a_order):
-        pos_in_a.setdefault(t, i)
-    seq = [pos_in_a[t] for t in b_order if t in pos_in_a]
+    # Duplicate-aware. A document that repeats the same line - a timetable's DS, M-III and CO
+    # dozens of times, an invoice's "Nos" eleven times - used to have every copy mapped to the
+    # FIRST occurrence in the PDF, so its reading order could never exceed a low ceiling no matter
+    # how right the output was: on 02_stamp_rotated_15deg_upleft the ceiling was 23 % and the
+    # document was already at 90 %. Each render line is now matched to a DISTINCT PDF line, by
+    # text and then by nearest y, so repeated text is consumed once per copy.
+    from collections import defaultdict as _dd
+    _pool = _dd(list)
+    for _i, _ln in enumerate(a):
+        _pool[_ln['text']].append(_i)
+    seq = []
+    for _ln in b:
+        _cand = _pool.get(_ln['text'])
+        if not _cand:
+            continue
+        _best = min(_cand, key=lambda _k: abs(a[_k]['y'] - _ln['y']))
+        _cand.remove(_best)
+        seq.append(_best)
     longest = 0
     cur = 0
     prev = -1
