@@ -54,6 +54,13 @@ ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 ROUNDS_TOTAL = 3
 PHASES = ["measure", "classify", "fix", "done"]
 
+# A fixer attempt takes about two hours and the fixer is scheduled every two
+# hours, so two runs can land on top of each other - both editing the engine,
+# both committing, one overwriting the other. This claim makes the second run
+# step aside instead. It expires, because a run that dies must not block the
+# next one forever.
+FIXER_STALE_MIN = 100
+
 
 def load():
     if os.path.exists(STATE):
@@ -118,8 +125,37 @@ def status(s=None):
     return s
 
 
+def claim_fixer():
+    """Return 0 if this run may proceed, 1 if a previous one is still working."""
+    s = load()
+    last = s.get("fixer_started") or 0
+    age_min = (time.time() - last) / 60.0 if last else 1e9
+    if age_min < FIXER_STALE_MIN:
+        print("fixer busy - previous run started %d min ago (stale after %d min)"
+              % (age_min, FIXER_STALE_MIN))
+        return 1
+    s["fixer_started"] = time.time()
+    save(s)
+    print("fixer claimed at %s" % time.strftime("%H:%M"))
+    return 0
+
+
+def release_fixer():
+    s = load()
+    s["fixer_started"] = 0
+    save(s)
+    print("fixer released")
+    return 0
+
+
 def main(argv):
     s = load()
+
+    if "--claim-fixer" in argv:
+        return claim_fixer()
+
+    if "--release-fixer" in argv:
+        return release_fixer()
 
     if "--phase" in argv:
         print(s["phase"])
@@ -187,6 +223,7 @@ def main(argv):
         s["round"] += 1
         s["phase"] = "measure"
         s["started"] = time.time()
+        s["fixer_started"] = 0
         save(s)
         print("round %d closed, round %d begins in phase measure" % (s["round"] - 1, s["round"]))
         return 0
