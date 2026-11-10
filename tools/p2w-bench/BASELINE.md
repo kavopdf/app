@@ -42,12 +42,12 @@ as measured; only the verdict is closed.
 | 18_centred_heading_left_body_txtpos | 53/58 | FAIL | 18_median_dy, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
 | 19_hanging_indent_txtpos | 52/58 | FAIL | 09_font_names, 23_line_pitch, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
 | 20_numbered_list_separate_column_txtpos | 47/58 | FAIL | 09_font_names, 19_worst_dy, 20_within_10pt, 22_reading_order, 26_text_overlap, 29_blank_where_ink_was, 32_stroke_lines, 41_block_spacing, 42_alignment_mix, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 21_form_labels_x60_values_x300_txtpos |  |  |  |  |  |
-| 22_invoice_four_columns_txtpos |  |  |  |  |  |
-| 23_timetable_grid_txtpos |  |  |  |  |  |
-| 24_address_block_indents_txtpos |  |  |  |  |  |
-| 25_signature_block_underscores_txtpos |  |  |  |  |  |
-| 26_footnote_marker_bottom_note_txtpos |  |  |  |  |  |
+| 21_form_labels_x60_values_x300_txtpos | 43/58 | FAIL | 01_page_count, 07_table_rows, 09_font_names, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
+| 22_invoice_four_columns_txtpos | 37/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 36_underline_rules, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
+| 23_timetable_grid_txtpos | 46/58 | FAIL | 09_font_names, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
+| 24_address_block_indents_txtpos | 49/58 | FAIL | 09_font_names, 18_median_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
+| 25_signature_block_underscores_txtpos | 39/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
+| 26_footnote_marker_bottom_note_txtpos | 50/58 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
 | 27_two_column_left_short_txtpos |  |  |  |  |  |
 | 28_value_overflows_cell_txtpos |  |  |  |  |  |
 | 29_dot_leaders_txtpos |  |  |  |  |  |
