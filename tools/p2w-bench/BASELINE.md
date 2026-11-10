@@ -32,11 +32,11 @@ as measured; only the verdict is closed.
 | 08_two_overlapping_stamps | 36/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 11_bold_runs, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
 | 09_stamp_font_not_embedded | 45/58 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
 | 10_stamp_as_image | 37/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 53_embedded_faces, 54_image_dpi, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 11_stamp_with_signature_image |  |  |  |  |  |
-| 12_stamp_across_page_break |  |  |  |  |  |
-| 13_stamp_non_english |  |  |  |  |  |
-| 14_stamp_chars_positioned_td |  |  |  |  |  |
-| 15_stamp_on_scanned_page |  |  |  |  |  |
+| 11_stamp_with_signature_image | 41/58 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 11_bold_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 41_block_spacing, 47_margins, 53_embedded_faces, 54_image_dpi | 2a68de6 | 10 Nov |
+| 12_stamp_across_page_break | 39/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 11_bold_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 36_underline_rules, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
+| 13_stamp_non_english | 45/58 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
+| 14_stamp_chars_positioned_td | 47/58 | FAIL | 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 18_median_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 35_rotation, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
+| 15_stamp_on_scanned_page | 42/58 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 10_font_sizes, 13_text_colours, 17_matched_runs, 22_reading_order, 23_line_pitch, 31_pages_lost_their_text, 32_stroke_lines, 35_rotation, 41_block_spacing, 42_alignment_mix, 45_char_accuracy, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
 | 16_right_aligned_amounts_txtpos |  |  |  |  |  |
 | 17_three_column_widths_txtpos |  |  |  |  |  |
 | 18_centred_heading_left_body_txtpos |  |  |  |  |  |
