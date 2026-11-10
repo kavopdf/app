@@ -687,7 +687,11 @@ def compare(src_path, gd_path):
 
     checks["17_matched_runs"] = (len(s_runs), matched,
                                  matched >= int(len(s_runs) * 0.9))
-    checks["18_median_dy"] = (0, med_dy, med_dy < 3.0)
+    # abs(), because med_dy is signed. Without it a document shifted UP by any
+    # amount passed: med_dy = -12 is less than 3, so the comparison said fine
+    # while every line sat twelve points above where it belonged. Found by
+    # mutating a real document upward and watching this check stay green.
+    checks["18_median_dy"] = (0, med_dy, abs(med_dy) < 3.0)
     checks["19_worst_dy"] = (0, worst_dy, worst_dy < 15.0)
     # With no matched runs there is nothing to be within 10 pt of; reporting 0 %
     # made a blank or text-free page fail for having no text to measure.
