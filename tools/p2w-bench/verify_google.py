@@ -55,6 +55,8 @@ def runs(page):
                     "size": round(sp["size"], 1),
                     "font": sp.get("font", ""),
                     "colour": sp.get("color", 0),
+                    "weight": ("b" if (sp.get("flags", 0) & 16) else "") +
+                              ("i" if (sp.get("flags", 0) & 2) else ""),
                 })
     return out
 
@@ -88,6 +90,345 @@ def colour_close(a, b, tol=0.06):
 # ----------------------------------------------------------------------------
 # the 31 checks
 # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# checks 32-48: the ones the first 31 did not make
+#
+# Added after an audit asked what the side-by-side comparison actually catches.
+# It caught position well and everything else shallowly: fonts and colours were
+# compared as SETS rather than per span, images and links as COUNTS rather than
+# by position or target, and stroked lines - every table border in the corpus -
+# were not read at all, because the only drawing attribute looked at was fill.
+#
+# The proof was one file: 80_gstin_pan_cin_ifsc_table has 0 filled shapes and 7
+# stroked lines. A table whose borders are the only thing defining its structure
+# was invisible to the verifier.
+# ----------------------------------------------------------------------------
+import difflib
+
+
+def _strokes(page):
+    """Stroked paths: table rules, borders, underlines. Never looked at before."""
+    out = []
+    for d in page.get_drawings():
+        col = d.get("color")
+        if col is None:
+            continue
+        r = d["rect"]
+        out.append({"rect": r, "width": round(d.get("width") or 0, 2), "colour": col})
+    return out
+
+
+def _span_flags(sp):
+    """PyMuPDF: bit0 superscript, bit1 italic, bit4 bold."""
+    f = sp.get("flags", 0)
+    return {"sup": bool(f & 1), "ital": bool(f & 2), "bold": bool(f & 16)}
+
+
+def extra_checks(src, gd, s_runs, g_runs, pairs):
+    """Return checks 32-48. pairs is [(source_run, render_run), ...] already matched."""
+    c = {}
+
+    # ---- 32 stroke lines ---------------------------------------------------
+    def stroke_stats(doc):
+        n, widths = 0, []
+        for p in doc:
+            for st in _strokes(p):
+                n += 1
+                if st["width"]:
+                    widths.append(st["width"])
+        widths.sort()
+        med = widths[len(widths) // 2] if widths else 0
+        return n, round(med, 2)
+
+    s_n, s_w = stroke_stats(src)
+    g_n, g_w = stroke_stats(gd)
+    c["32_stroke_lines"] = (s_n, g_n, s_n == 0 or g_n >= max(1, int(s_n * 0.8)))
+
+    # ---- 33 border over text ----------------------------------------------
+    # A line that crosses a text span's box means the rule is drawn through the
+    # words - the defect the user reported by eye and nothing measured.
+    def borders_over_text(doc):
+        hits = 0
+        for p in doc:
+            lines = _strokes(p)
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                for ln in blk.get("lines", []):
+                    for sp in ln.get("spans", []):
+                        if not sp.get("text", "").strip():
+                            continue
+                        x0, y0, x1, y1 = sp["bbox"]
+                        for st in lines:
+                            r = st["rect"]
+                            thin = r.height <= 2.5
+                            if not thin:
+                                continue
+                            if r.y0 > y0 + 1.5 and r.y0 < y1 - 1.5 \
+                                    and r.x0 < x1 - 2 and r.x1 > x0 + 2:
+                                hits += 1
+                                break
+        return hits
+
+    s_bot = borders_over_text(src)
+    g_bot = borders_over_text(gd)
+    c["33_border_over_text"] = (s_bot, g_bot, g_bot <= s_bot + max(1, s_bot // 5))
+
+    # ---- 34 per-span style -------------------------------------------------
+    # Size, colour and weight of each matched span, not just how many distinct
+    # values exist somewhere in the document.
+    ok_size = ok_col = ok_weight = 0
+    for s_sp, g_sp in pairs:
+        if abs(s_sp["size"] - g_sp["size"]) <= 0.6:
+            ok_size += 1
+        if s_sp["colour"] == g_sp["colour"]:
+            ok_col += 1
+        if s_sp["weight"] == g_sp["weight"]:
+            ok_weight += 1
+    tot = max(1, len(pairs))
+    none = not pairs
+    c["34a_span_size_match"] = (100, 0 if none else round(100 * ok_size / tot),
+                                none or ok_size >= tot * 0.85)
+    c["34b_span_colour_match"] = (100, 0 if none else round(100 * ok_col / tot),
+                                  none or ok_col >= tot * 0.85)
+    c["34c_span_weight_match"] = (100, 0 if none else round(100 * ok_weight / tot),
+                                  none or ok_weight >= tot * 0.85)
+
+    # ---- 35 rotation -------------------------------------------------------
+    def rotated(doc):
+        n = 0
+        for p in doc:
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                for ln in blk.get("lines", []):
+                    d = ln.get("dir", (1, 0))
+                    if abs(d[1]) > 0.02 or d[0] < 0.98:
+                        n += 1
+        return n
+
+    s_r = rotated(src)
+    g_r = rotated(gd)
+    c["35_rotation"] = (s_r, g_r, s_r == 0 or g_r >= max(1, int(s_r * 0.6)))
+
+    # ---- 36 underline / strike --------------------------------------------
+    # No underline flag in the text model, so count thin strokes sitting just
+    # under a baseline - an approximation, and named as one.
+    def rules_under_text(doc):
+        n = 0
+        for p in doc:
+            lines = [s for s in _strokes(p) if s["rect"].height <= 2.5]
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                for ln in blk.get("lines", []):
+                    for sp in ln.get("spans", []):
+                        if not sp.get("text", "").strip():
+                            continue
+                        x0, y0, x1, y1 = sp["bbox"]
+                        for st in lines:
+                            r = st["rect"]
+                            if y1 - 2.5 <= r.y0 <= y1 + 2.5 and r.x0 < x1 and r.x1 > x0:
+                                n += 1
+                                break
+        return n
+
+    s_u = rules_under_text(src)
+    g_u = rules_under_text(gd)
+    c["36_underline_rules"] = (s_u, g_u, g_u >= max(1, int(s_u * 0.7)) if s_u else True)
+
+    # ---- 37 super / subscript ---------------------------------------------
+    def scripts(doc):
+        n = 0
+        for p in doc:
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                for ln in blk.get("lines", []):
+                    for sp in ln.get("spans", []):
+                        if sp.get("text", "").strip() and (sp.get("flags", 0) & 1):
+                            n += 1
+        return n
+
+    s_sc, g_sc = scripts(src), scripts(gd)
+    c["37_super_subscript"] = (s_sc, g_sc, s_sc == 0 or g_sc >= max(1, int(s_sc * 0.7)))
+
+    # ---- 38 list markers ---------------------------------------------------
+    def markers(doc):
+        n = 0
+        for p in doc:
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                for ln in blk.get("lines", []):
+                    for sp in ln.get("spans", []):
+                        t = sp.get("text", "").strip()
+                        if not t:
+                            continue
+                        if t[0] in "\u2022\u25cf\u25aa\u2023\u2043-*\u00b7" or \
+                                (t[0].isdigit() and t[1:3] in (". ", ") ")):
+                            n += 1
+                            break
+        return n
+
+    s_m, g_m = markers(src), markers(gd)
+    c["38_list_markers"] = (s_m, g_m, s_m == 0 or g_m >= max(1, int(s_m * 0.7)))
+
+    # ---- 39 image position -------------------------------------------------
+    def img_boxes(doc):
+        boxes = []
+        for p in doc:
+            for im in p.get_image_info():
+                b = im["bbox"]
+                boxes.append((round(b[0] / 8), round(b[1] / 8)))
+        return boxes
+
+    s_ib, g_ib = img_boxes(src), img_boxes(gd)
+    if not s_ib:
+        c["39_image_position"] = (0, len(g_ib), True)
+    else:
+        common = len(set(s_ib) & set(g_ib))
+        c["39_image_position"] = (len(s_ib), common, common >= max(1, int(len(s_ib) * 0.6)))
+
+    # ---- 40 link targets ---------------------------------------------------
+    def link_targets(doc):
+        out = set()
+        for p in doc:
+            for l in p.get_links():
+                if l.get("uri"):
+                    out.add(l["uri"])
+        return out
+
+    s_l, g_l = link_targets(src), link_targets(gd)
+    c["40_link_targets"] = (len(s_l), len(s_l & g_l), s_l == g_l or (not s_l))
+
+    # ---- 41 block spacing --------------------------------------------------
+    def block_gaps(doc):
+        gaps = []
+        for p in doc[:1]:
+            ys = sorted({round(b["bbox"][1], 1) for b in p.get_text("dict")["blocks"]
+                         if b.get("type") == 0})
+            gaps += [round(b - a, 1) for a, b in zip(ys, ys[1:]) if 1 < b - a < 300]
+        gaps.sort()
+        return gaps[len(gaps) // 2] if gaps else 0
+
+    s_bg, g_bg = block_gaps(src), block_gaps(gd)
+    c["41_block_spacing"] = (s_bg, g_bg, s_bg == 0 or abs(g_bg - s_bg) <= 3.0)
+
+    # ---- 42 alignment ------------------------------------------------------
+    def align_mix(doc):
+        left = right = centre = 0
+        for p in doc:
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                bx0, _, bx1, _ = blk["bbox"]
+                for ln in blk.get("lines", []):
+                    lx0, _, lx1, _ = ln["bbox"]
+                    w = bx1 - bx0
+                    if w < 10:
+                        continue
+                    if lx0 - bx0 < 4:
+                        left += 1
+                    elif bx1 - lx1 < 4:
+                        right += 1
+                    elif abs((lx0 + lx1) / 2 - (bx0 + bx1) / 2) < 6:
+                        centre += 1
+        return (left, right, centre)
+
+    s_al, g_al = align_mix(src), align_mix(gd)
+    same = sum(min(a, b) for a, b in zip(s_al, g_al))
+    tot_al = max(1, sum(s_al))
+    c["42_alignment_mix"] = (sum(s_al), same,
+                             sum(s_al) == 0 or same >= tot_al * 0.7)
+
+    # ---- 43 horizontal placement ------------------------------------------
+    # The old 21_median_dx only looked at the median, which hides a whole column
+    # shifted. This asks how many spans are horizontally close, span by span.
+    near_x = sum(1 for s_sp, g_sp in pairs if abs(g_sp["x"] - s_sp["x"]) <= 10)
+    tot_p = max(1, len(pairs))
+    c["43_within_10pt_x"] = (100, round(100 * near_x / tot_p),
+                             (not pairs) or near_x >= tot_p * 0.9)
+
+    # ---- 44 header / footer ------------------------------------------------
+    def edge_text(doc):
+        n = 0
+        for p in doc:
+            H = p.rect.height
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                y = blk["bbox"][1]
+                if y < H * 0.10 or y > H * 0.90:
+                    n += 1
+        return n
+
+    s_e, g_e = edge_text(src), edge_text(gd)
+    c["44_header_footer"] = (s_e, g_e, s_e == 0 or g_e >= max(1, int(s_e * 0.7)))
+
+    # ---- 45 character accuracy --------------------------------------------
+    s_txt = "".join(s_sp["text"] for s_sp in s_runs)
+    g_txt = "".join(g_sp["text"] for g_sp in g_runs)
+    ratio = round(100 * difflib.SequenceMatcher(None, s_txt, g_txt).quick_ratio())
+    c["45_char_accuracy"] = (100, ratio, ratio >= 97)
+
+    # ---- 46 text crossing a rule (per span) --------------------------------
+    def spans_crossing(doc):
+        n = 0
+        for p in doc:
+            lines = [s for s in _strokes(p) if s["rect"].height <= 2.5]
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                for ln in blk.get("lines", []):
+                    for sp in ln.get("spans", []):
+                        if not sp.get("text", "").strip():
+                            continue
+                        x0, y0, x1, y1 = sp["bbox"]
+                        for st in lines:
+                            r = st["rect"]
+                            if r.y0 > y0 + 1.5 and r.y0 < y1 - 1.5 and r.x0 < x1 and r.x1 > x0:
+                                n += 1
+                                break
+        return n
+
+    s_c, g_c = spans_crossing(src), spans_crossing(gd)
+    c["46_text_crossing_rule"] = (s_c, g_c, g_c <= s_c + max(1, s_c // 5))
+
+    # ---- 47 margins --------------------------------------------------------
+    def extents(doc):
+        out = []
+        for p in doc[:1]:
+            xs0, ys0, xs1, ys1 = [], [], [], []
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                b = blk["bbox"]
+                xs0.append(b[0]); ys0.append(b[1]); xs1.append(b[2]); ys1.append(b[3])
+            if xs0:
+                out.append((round(min(xs0)), round(min(ys0)), round(max(xs1)), round(max(ys1))))
+        return out[0] if out else (0, 0, 0, 0)
+
+    s_ex, g_ex = extents(src), extents(gd)
+    ok_margin = all(abs(a - b) <= 12 for a, b in zip(s_ex, g_ex))
+    c["47_margins"] = (s_ex, g_ex, ok_margin)
+
+    # ---- 48 image area -----------------------------------------------------
+    def img_area(doc):
+        tot = 0
+        for p in doc:
+            for im in p.get_image_info():
+                b = im["bbox"]
+                tot += max(0, (b[2] - b[0])) * max(0, (b[3] - b[1]))
+        return round(tot)
+
+    s_ia, g_ia = img_area(src), img_area(gd)
+    c["48_image_area"] = (s_ia, g_ia,
+                          s_ia == 0 or g_ia >= s_ia * 0.5)
+
+    return c
+
+
 def compare(src_path, gd_path):
     src = fitz.open(src_path)
     gd = fitz.open(gd_path)
@@ -200,6 +541,7 @@ def compare(src_path, gd_path):
         by_text[norm_word(r["text"])].append(r)
 
     dys, dxs, matched = [], [], 0
+    pairs = []
     for r in s_runs:
         cands = by_text.get(norm_word(r["text"]))
         if not cands:
@@ -208,6 +550,7 @@ def compare(src_path, gd_path):
         dys.append(best["y"] - r["y"])
         dxs.append(best["x"] - r["x"])
         matched += 1
+        pairs.append((r, best))
 
     def median(v):
         if not v:
@@ -316,6 +659,8 @@ def compare(src_path, gd_path):
         if s_has and not g_has:
             empty_pages += 1
     checks["31_pages_lost_their_text"] = (0, empty_pages, empty_pages == 0)
+
+    checks.update(extra_checks(src, gd, s_runs, g_runs, pairs))
 
     src.close()
     gd.close()
