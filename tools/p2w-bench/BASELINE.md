@@ -62,11 +62,11 @@ as measured; only the verdict is closed.
 | 310_court_judgment | 53/59 | FAIL | 03_word_count, 04_words_missing, 18_median_dy, 22_reading_order, 43_within_10pt_x, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 311_fir_police_form | 47/59 | FAIL | 03_word_count, 04_words_missing, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 312_affidavit_stamp_paper | 40/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 32_stroke_lines, 35_rotation, 41_block_spacing, 47_margins, 53_embedded_faces, 56_rtl_runs, 59_shape_anchor | 2a68de6 | 11 Nov |
-| 313_power_of_attorney |  |  |  |  |  |
-| 314_tender_rfp_boq |  |  |  |  |  |
-| 315_gazette_notification |  |  |  |  |  |
-| 316_contract_with_schedules |  |  |  |  |  |
-| 317_rti_response |  |  |  |  |  |
+| 313_power_of_attorney | 55/59 | FAIL | 18_median_dy, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 314_tender_rfp_boq | 50/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 25_invisible_text, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 315_gazette_notification | 50/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 26_text_overlap, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 316_contract_with_schedules | 54/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 317_rti_response | 56/59 | FAIL | 18_median_dy, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 318_court_summons_form |  |  |  |  |  |
 | 31_times_body_arial_headings |  |  |  |  |  |
 | 320_balance_sheet_statutory |  |  |  |  |  |
