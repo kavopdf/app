@@ -95,7 +95,9 @@ ratchet
   FAIL - the bar fell
 ```
 
-Exit **0** the bar held or rose, **1** something fell, **2** could not run.
+Exit **0** the bar held or rose, **1** something fell. It has no third code: with no
+BASELINE.md to read there is nothing to compare and it exits 0, which is why a cron must
+never treat 0 as proof that measurement happened - check the row count for that.
 
 It holds, per document, the best score ever reached AND the set of failing checks at
 that point. Two things count as a regression: the score falling, and a check that
@@ -152,7 +154,8 @@ python3 tools/p2w-bench/classify.py --attempt "<exact class name>" --outcome kep
 python3 tools/p2w-bench/classify.py --top <n>        # how many classes the table lists
 ```
 
-Writes `DEFECT-CLASSES.md` and `ATTEMPTS.json`. Prints:
+Writes `DEFECT-CLASSES.md` on every run. `ATTEMPTS.json` appears only when the first
+attempt is recorded with `--attempt` - a plain run does not create it. Prints:
 
 ```
 documents measured : 20
@@ -202,8 +205,11 @@ python3 tools/p2w-bench/hypothesis.py --add "<exact class name>" "<theory>" \
 Writes `HYPOTHESES.md`, one section per class. `--next` prints only the untested
 theories; when nothing is left it says so and tells you to form a new one.
 
-A duplicate hypothesis is refused rather than recorded twice. RULED OUT entries each
-cost a calibration run — do not re-test one without new evidence, and if you do, say
+Recording the same theory again with a different result updates it in place, so a theory
+first written as UNTESTED can later become RULED OUT without leaving a stale line that
+`--next` keeps offering. Recording the same result twice changes nothing.
+
+RULED OUT entries each cost a calibration run — do not re-test one without new evidence, and if you do, say
 what changed.
 
 ---

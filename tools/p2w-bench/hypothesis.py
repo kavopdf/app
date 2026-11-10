@@ -87,10 +87,19 @@ def add(cls, text, result, evidence):
     if evidence:
         entry += "\n  evidence: %s" % evidence.strip()
     entry += "\n  recorded: %s" % time.strftime("%Y-%m-%d %H:%M")
-    # the same hypothesis twice is noise, not a record
-    for existing in sections[cls]:
+    # The same theory, tested later, is not a duplicate - it is the same theory
+    # with a result now. Refusing to update it would leave an UNTESTED entry that
+    # has been tested, and --next would keep offering work already done. So an
+    # existing entry is rewritten in place; only an identical result is refused.
+    for i, existing in enumerate(sections[cls]):
         if text.strip().lower() in existing.lower():
-            print("already recorded for this class - not adding a duplicate")
+            if existing.split("\n")[0].startswith("- %s -" % label) and (
+                    not evidence or ("evidence: " + evidence.strip()) in existing):
+                print("already recorded for this class with this result - nothing to change")
+                return 0
+            sections[cls][i] = entry
+            save(sections)
+            print("%s: %s (updated)" % (label, text.strip()[:60]))
             return 0
     sections[cls].append(entry)
     save(sections)
