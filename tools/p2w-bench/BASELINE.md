@@ -21,7 +21,7 @@ under "Class 20_within_10pt — CLOSED UNFIXABLE". The score and the failed chec
 as measured; only the verdict is closed.
 
 | document | score | verdict | failed checks | engine | measured |
-|---|---|---|---|---|
+|---|---|---|---|---|---|
 | 01_stamp_rotated_15deg_upright | 15/31 | REOPENED | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | 2a68de6 | 2026-11-10 |
 | 02_stamp_rotated_15deg_upleft | 21/31 | REOPENED | 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | 2a68de6 | 2026-11-10 |
 | 03_stamp_vertical_90deg | 13/31 | REOPENED | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | 2a68de6 | 2026-11-10 |
@@ -81,7 +81,7 @@ as measured; only the verdict is closed.
 | 331_pid_diagram | 20/31 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 10_font_sizes, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was | a927365 | 2026-11-10 |
 | 332_bom_on_drawing | 25/31 | REOPENED | 19_worst_dy, 20_within_10pt, 22_reading_order, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | a927365 | 2026-11-10 |
 | 333_datasheet_spec_tables | 24/31 | REOPENED | 01_page_count, 19_worst_dy, 20_within_10pt, 24_page_breaks, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | a927365 | 2026-11-10 |
-| 334_patent_document | 24/31 | REOPENED | 02_text_run_count, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | a927365 | 2026-11-10 |
+| 334_patent_document |  |  |  |  |  |
 | 335_msds_safety_data_sheet | 24/31 | REOPENED | 02_text_run_count, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | a927365 | 2026-11-10 |
 | 33_sans_nondefault_body | 29/31 | REOPENED | 20_within_10pt, 22_reading_order — Google Docs has no exact line spacing, so no line box is honoured | 392ce95 | 2026-11-10 |
 | 340_bill_of_lading | 21/31 | REOPENED | 02_text_run_count, 07_table_rows, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | 392ce95 | 2026-11-10 |
@@ -89,7 +89,7 @@ as measured; only the verdict is closed.
 | 342_packing_list | 21/31 | REOPENED | 03_word_count, 04_words_missing, 05_words_extra, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | 392ce95 | 2026-11-10 |
 | 343_air_waybill | 19/31 | REOPENED | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 14_filled_shapes, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | 392ce95 | 2026-11-10 |
 | 344_customs_declaration | 24/31 | REOPENED | 03_word_count, 04_words_missing, 19_worst_dy, 20_within_10pt, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | 392ce95 | 2026-11-10 |
-| 34_monospace_document | 29/31 | REOPENED | 19_worst_dy, 20_within_10pt — Google Docs has no exact line spacing, so no line box is honoured | 392ce95 | 2026-11-10 |
+| 34_monospace_document |  |  |  |  |  |
 | 350_question_paper | 13/31 | REOPENED | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 07_table_rows, 16_numeric_runs, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 26_text_overlap, 27_text_off_page, 28_clipped_at_edge, 29_blank_where_ink_was — Google Docs has no exact line spacing, so no line box is honoured | 392ce95 | 2026-11-10 |
 | 351_omr_answer_sheet | 25/31 | REOPENED | 01_page_count, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks — Google Docs has no exact line spacing, so no line box is honoured | 392ce95 | 2026-11-10 |
 | 352_certificate_ornate_border | 14/31 | REOPENED | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | 392ce95 | 2026-11-10 |
@@ -143,94 +143,93 @@ as measured; only the verdict is closed.
 | 44_coloured_underlined_hyperlinks | 23/31 | FAIL | 02_text_run_count, 07_table_rows, 09_font_names, 15_links, 18_median_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was | f679dde | 2026-11-10 |
 | 45_coloured_callout_box | 30/31 | FAIL | 09_font_names | f679dde | 2026-11-10 |
 | 46_chart_coloured_labels_body_text | 22/31 | FAIL | 02_text_run_count, 07_table_rows, 09_font_names, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 30_ink_where_blank_was | f679dde | 2026-11-10 |
-| 47_grey_body_black_headings |  |  |  |  |
-| 48_form_coloured_border_coloured_values |  |  |  |  |
-| 49_coloured_background_block_paragraph |  |  |  |  |
-| 50_invoice_coloured_total_row |  |  |  |  |
-| 51_two_cm_margins |  |  |  |  |
-| 52_one_cm_margin_wide_body |  |  |  |  |
-| 53_single_space_body_15_headings |  |  |  |  |
-| 54_two_column_body_full_width_header_footer |  |  |  |  |
-| 55_sidebar_box_beside_body |  |  |  |  |
-| 56_table_indented_from_margin |  |  |  |  |
-| 57_centred_title_page_left_body_pages |  |  |  |  |
-| 58_header_rule_footer_rule |  |  |  |  |
-| 59_landscape_mixed_portrait |  |  |  |  |
-| 60_page_border |  |  |  |  |
-| 61_two_col_abstract_spanning |  |  |  |  |
-| 62_two_col_newsletter_pull_quote |  |  |  |  |
-| 63_three_column_brochure |  |  |  |  |
-| 64_newspaper_uneven_columns_ad_boxes |  |  |  |  |
-| 65_two_col_full_width_figure_caption |  |  |  |  |
-| 66_two_col_footnotes_bottom |  |  |  |  |
-| 67_two_col_with_sidebar |  |  |  |  |
-| 68_journal_wide_table_spanning |  |  |  |  |
-| 69_two_col_legal_numbered_clauses |  |  |  |  |
-| 70_magazine_drop_cap_photo_caption |  |  |  |  |
-| 71_invoice_space_aligned_no_rules |  |  |  |  |
-| 72_bank_statement_no_rules_right_amounts |  |  |  |  |
-| 73_marksheet_subject_marks_grade |  |  |  |  |
-| 74_balance_sheet_indented_subitems |  |  |  |  |
-| 75_merged_header_cell_three_columns |  |  |  |  |
-| 76_devanagari_table |  |  |  |  |
-| 77_arabic_rtl_document |  |  |  |  |
-| 78_mixed_english_devanagari_line |  |  |  |  |
-| 79_inr_indian_digit_grouping_table |  |  |  |  |
-| 80_gstin_pan_cin_ifsc_table |  |  |  |  |
-| academic-paper-ieee-2col-abstract |  |  |  |  |
-| admission-form-labels-left-boxes-right |  |  |  |  |
-| admit-card |  |  |  |  |
-| annual-review-2col-uneven-columns |  |  |  |  |
-| balance-sheet-and-profit-loss |  |  |  |  |
-| balance-sheet-two-columns-of-figures |  |  |  |  |
-| bank-statement-5-pages |  |  |  |  |
-| bank-statement-horizontal-rules-only |  |  |  |  |
-| boq-horizontal-rules-only |  |  |  |  |
-| boq-tender-bill-of-quantities |  |  |  |  |
-| brochure-3col-with-sidebar-box |  |  |  |  |
-| bus-timetable-station-left-times-right |  |  |  |  |
-| delivery-challan |  |  |  |  |
-| electricity-bill |  |  |  |  |
-| eway-bill |  |  |  |  |
-| form16-part-b |  |  |  |  |
-| gst-invoice-3line-items |  |  |  |  |
-| gst-invoice-horizontal-rules-only |  |  |  |  |
-| gst-invoice-multipage-item-table |  |  |  |  |
-| gst-invoice-with-qr-code |  |  |  |  |
-| insurance-policy-schedule |  |  |  |  |
-| invoice-line-items-qty-rate-amount |  |  |  |  |
-| itr-computation-with-slab-table |  |  |  |  |
-| journal-2col-with-footnotes |  |  |  |  |
-| landscape-page-inside-portrait-document |  |  |  |  |
-| magazine-2col-pullquote-spanning |  |  |  |  |
-| marksheet-subject-left-marks-right |  |  |  |  |
-| marksheet-university-consolidated |  |  |  |  |
-| mobile-bill |  |  |  |  |
-| mutual-fund-statement |  |  |  |  |
-| newsletter-3col-header-footer |  |  |  |  |
-| newspaper-2col-fullwidth-headline |  |  |  |  |
-| one-page-rotated-180-degrees |  |  |  |  |
-| payslip-label-left-amount-right |  |  |  |  |
-| policy-2col-spanning-section-heading |  |  |  |  |
-| price-list-2col-dense-right-aligned |  |  |  |  |
-| price-list-right-aligned-amounts |  |  |  |  |
-| product-catalogue-code-left-price-right |  |  |  |  |
-| property-tax-receipt |  |  |  |  |
-| purchase-order |  |  |  |  |
-| question-paper-marks-right-margin |  |  |  |  |
-| report-2col-table-spanning-both-columns |  |  |  |  |
-| salary-slip-corporate |  |  |  |  |
-| salary-slip-factory-wages |  |  |  |  |
-| table-across-page-break-repeated-header |  |  |  |  |
-| table-inside-two-column-page |  |  |  |  |
-| table-of-contents-dot-leaders |  |  |  |  |
-| table-with-merged-cells |  |  |  |  |
-| table-with-no-header-row |  |  |  |  |
-| table-with-rotated-header |  |  |  |  |
-| text-held-twice-shadow-text |  |  |  |  |
-| two-tables-stacked-with-no-gap |  |  |  |  |
-| very-long-single-column-table |  |  |  |  |
-
+| 47_grey_body_black_headings |  |  |  |  |  |
+| 48_form_coloured_border_coloured_values |  |  |  |  |  |
+| 49_coloured_background_block_paragraph |  |  |  |  |  |
+| 50_invoice_coloured_total_row |  |  |  |  |  |
+| 51_two_cm_margins |  |  |  |  |  |
+| 52_one_cm_margin_wide_body |  |  |  |  |  |
+| 53_single_space_body_15_headings |  |  |  |  |  |
+| 54_two_column_body_full_width_header_footer |  |  |  |  |  |
+| 55_sidebar_box_beside_body |  |  |  |  |  |
+| 56_table_indented_from_margin |  |  |  |  |  |
+| 57_centred_title_page_left_body_pages |  |  |  |  |  |
+| 58_header_rule_footer_rule |  |  |  |  |  |
+| 59_landscape_mixed_portrait |  |  |  |  |  |
+| 60_page_border |  |  |  |  |  |
+| 61_two_col_abstract_spanning |  |  |  |  |  |
+| 62_two_col_newsletter_pull_quote |  |  |  |  |  |
+| 63_three_column_brochure |  |  |  |  |  |
+| 64_newspaper_uneven_columns_ad_boxes |  |  |  |  |  |
+| 65_two_col_full_width_figure_caption |  |  |  |  |  |
+| 66_two_col_footnotes_bottom |  |  |  |  |  |
+| 67_two_col_with_sidebar |  |  |  |  |  |
+| 68_journal_wide_table_spanning |  |  |  |  |  |
+| 69_two_col_legal_numbered_clauses |  |  |  |  |  |
+| 70_magazine_drop_cap_photo_caption |  |  |  |  |  |
+| 71_invoice_space_aligned_no_rules |  |  |  |  |  |
+| 72_bank_statement_no_rules_right_amounts |  |  |  |  |  |
+| 73_marksheet_subject_marks_grade |  |  |  |  |  |
+| 74_balance_sheet_indented_subitems |  |  |  |  |  |
+| 75_merged_header_cell_three_columns |  |  |  |  |  |
+| 76_devanagari_table |  |  |  |  |  |
+| 77_arabic_rtl_document |  |  |  |  |  |
+| 78_mixed_english_devanagari_line |  |  |  |  |  |
+| 79_inr_indian_digit_grouping_table |  |  |  |  |  |
+| 80_gstin_pan_cin_ifsc_table |  |  |  |  |  |
+| academic-paper-ieee-2col-abstract |  |  |  |  |  |
+| admission-form-labels-left-boxes-right |  |  |  |  |  |
+| admit-card |  |  |  |  |  |
+| annual-review-2col-uneven-columns |  |  |  |  |  |
+| balance-sheet-and-profit-loss |  |  |  |  |  |
+| balance-sheet-two-columns-of-figures |  |  |  |  |  |
+| bank-statement-5-pages |  |  |  |  |  |
+| bank-statement-horizontal-rules-only |  |  |  |  |  |
+| boq-horizontal-rules-only |  |  |  |  |  |
+| boq-tender-bill-of-quantities |  |  |  |  |  |
+| brochure-3col-with-sidebar-box |  |  |  |  |  |
+| bus-timetable-station-left-times-right |  |  |  |  |  |
+| delivery-challan |  |  |  |  |  |
+| electricity-bill |  |  |  |  |  |
+| eway-bill |  |  |  |  |  |
+| form16-part-b |  |  |  |  |  |
+| gst-invoice-3line-items |  |  |  |  |  |
+| gst-invoice-horizontal-rules-only |  |  |  |  |  |
+| gst-invoice-multipage-item-table |  |  |  |  |  |
+| gst-invoice-with-qr-code |  |  |  |  |  |
+| insurance-policy-schedule |  |  |  |  |  |
+| invoice-line-items-qty-rate-amount |  |  |  |  |  |
+| itr-computation-with-slab-table |  |  |  |  |  |
+| journal-2col-with-footnotes |  |  |  |  |  |
+| landscape-page-inside-portrait-document |  |  |  |  |  |
+| magazine-2col-pullquote-spanning |  |  |  |  |  |
+| marksheet-subject-left-marks-right |  |  |  |  |  |
+| marksheet-university-consolidated |  |  |  |  |  |
+| mobile-bill |  |  |  |  |  |
+| mutual-fund-statement |  |  |  |  |  |
+| newsletter-3col-header-footer |  |  |  |  |  |
+| newspaper-2col-fullwidth-headline |  |  |  |  |  |
+| one-page-rotated-180-degrees |  |  |  |  |  |
+| payslip-label-left-amount-right |  |  |  |  |  |
+| policy-2col-spanning-section-heading |  |  |  |  |  |
+| price-list-2col-dense-right-aligned |  |  |  |  |  |
+| price-list-right-aligned-amounts |  |  |  |  |  |
+| product-catalogue-code-left-price-right |  |  |  |  |  |
+| property-tax-receipt |  |  |  |  |  |
+| purchase-order |  |  |  |  |  |
+| question-paper-marks-right-margin |  |  |  |  |  |
+| report-2col-table-spanning-both-columns |  |  |  |  |  |
+| salary-slip-corporate |  |  |  |  |  |
+| salary-slip-factory-wages |  |  |  |  |  |
+| table-across-page-break-repeated-header |  |  |  |  |  |
+| table-inside-two-column-page |  |  |  |  |  |
+| table-of-contents-dot-leaders |  |  |  |  |  |
+| table-with-merged-cells |  |  |  |  |  |
+| table-with-no-header-row |  |  |  |  |  |
+| table-with-rotated-header |  |  |  |  |  |
+| text-held-twice-shadow-text |  |  |  |  |  |
+| two-tables-stacked-with-no-gap |  |  |  |  |  |
+| very-long-single-column-table |  |  |  |  |  |
 ## Reopened 2026-11-10
 
 90 rows were marked CLOSED-UNFIXABLE, most of them on the single claim that Google Docs has
