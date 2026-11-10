@@ -145,27 +145,31 @@ def main():
     w = fresh()
     rc, out = run_stdout(w, "verify_google.py", "--list-checks")
     uni = [l.strip() for l in out.split() if l.strip()]
+    # The fixtures must use the count the verifier actually has. Written as 58,
+    # they went stale the moment check 59 was added - the same hardcoded
+    # denominator this whole pipeline is built to avoid.
+    N = len(uni)
     # a mark from the same universe, nothing changed
-    json.dump({"a": {"best": 56, "out_of": 58, "failed": ["09_font_names"],
+    json.dump({"a": {"best": N - 2, "out_of": N, "failed": ["09_font_names"],
                      "universe": uni}}, open(os.path.join(w, "RATCHET.json"), "w"))
-    baseline_row(w, ["| a | 56/58 | FAIL | 09_font_names | e | d |"])
+    baseline_row(w, ["| a | %d/%d | FAIL | 09_font_names | e | d |" % (N - 2, N)])
     rc, _ = run(w, "ratchet.py")
     check("exit 0 when the bar held", rc == 0, "got %d" % rc)
-    baseline_row(w, ["| a | 50/58 | FAIL | 09_font_names | e | d |"])
+    baseline_row(w, ["| a | %d/%d | FAIL | 09_font_names | e | d |" % (N - 8, N)])
     rc, _ = run(w, "ratchet.py")
     check("exit 1 when the score fell", rc == 1, "got %d" % rc)
     # the same score, but a check that used to pass now fails
-    json.dump({"a": {"best": 56, "out_of": 58,
+    json.dump({"a": {"best": N - 2, "out_of": N,
                      "failed": ["09_font_names", "20_within_10pt"],
                      "universe": uni}}, open(os.path.join(w, "RATCHET.json"), "w"))
-    baseline_row(w, ["| a | 56/58 | FAIL | 09_font_names, 32_stroke_lines | e | d |"])
+    baseline_row(w, ["| a | %d/%d | FAIL | 09_font_names, 32_stroke_lines | e | d |" % (N - 2, N)])
     rc, out = run(w, "ratchet.py")
     check("exit 1 when a check that passed now fails", rc == 1, "got %d" % rc)
     check("says which check newly failed", "32_stroke_lines" in out)
     # a mark taken by a smaller verifier must not bind
     json.dump({"a": {"best": 31, "out_of": 50, "failed": ["09_font_names"],
                      "universe": uni[:31]}}, open(os.path.join(w, "RATCHET.json"), "w"))
-    baseline_row(w, ["| a | 31/58 | FAIL | 09_font_names, 49_page_size | e | d |"])
+    baseline_row(w, ["| a | 31/%d | FAIL | 09_font_names, 49_page_size | e | d |" % N])
     rc, _ = run(w, "ratchet.py")
     check("a weaker verifier's mark does not bind", rc == 0, "got %d" % rc)
     # documented: only 0 and 1 exist

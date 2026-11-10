@@ -22,42 +22,42 @@ as measured; only the verdict is closed.
 
 | document | score | verdict | failed checks | engine | measured |
 |---|---|---|---|---|---|
-| 01_stamp_rotated_15deg_upright | 37/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 02_stamp_rotated_15deg_upleft | 44/58 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 30_ink_where_blank_was, 35_rotation, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 03_stamp_vertical_90deg | 35/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 41_block_spacing, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 04_stamp_180deg_upside_down | 33/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 07_table_rows, 09_font_names, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 47_margins, 53_embedded_faces, 55_orientation_mix, 56_rtl_runs | 2a68de6 | 10 Nov |
-| 05_round_company_seal_curved_text | 32/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 09_font_names, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 36_underline_rules, 41_block_spacing, 45_char_accuracy, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 06_rect_paid_stamp_red_transparent | 36/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 41_block_spacing, 43_within_10pt_x, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 07_stamp_over_table | 37/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 08_two_overlapping_stamps | 36/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 11_bold_runs, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 09_stamp_font_not_embedded | 45/58 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 10_stamp_as_image | 37/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 53_embedded_faces, 54_image_dpi, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 11_stamp_with_signature_image | 41/58 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 11_bold_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 41_block_spacing, 47_margins, 53_embedded_faces, 54_image_dpi | 2a68de6 | 10 Nov |
-| 12_stamp_across_page_break | 39/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 11_bold_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 36_underline_rules, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 13_stamp_non_english | 45/58 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 14_stamp_chars_positioned_td | 47/58 | FAIL | 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 18_median_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 35_rotation, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 15_stamp_on_scanned_page | 42/58 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 10_font_sizes, 13_text_colours, 17_matched_runs, 22_reading_order, 23_line_pitch, 31_pages_lost_their_text, 32_stroke_lines, 35_rotation, 41_block_spacing, 42_alignment_mix, 45_char_accuracy, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 16_right_aligned_amounts_txtpos | 37/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 36_underline_rules, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 17_three_column_widths_txtpos | 42/58 | FAIL | 02_text_run_count, 07_table_rows, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 42_alignment_mix, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 18_centred_heading_left_body_txtpos | 53/58 | FAIL | 18_median_dy, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 19_hanging_indent_txtpos | 52/58 | FAIL | 09_font_names, 23_line_pitch, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 20_numbered_list_separate_column_txtpos | 47/58 | FAIL | 09_font_names, 19_worst_dy, 20_within_10pt, 22_reading_order, 26_text_overlap, 29_blank_where_ink_was, 32_stroke_lines, 41_block_spacing, 42_alignment_mix, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 21_form_labels_x60_values_x300_txtpos | 43/58 | FAIL | 01_page_count, 07_table_rows, 09_font_names, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 22_invoice_four_columns_txtpos | 37/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 36_underline_rules, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 23_timetable_grid_txtpos | 46/58 | FAIL | 09_font_names, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 24_address_block_indents_txtpos | 49/58 | FAIL | 09_font_names, 18_median_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 25_signature_block_underscores_txtpos | 39/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 26_footnote_marker_bottom_note_txtpos | 50/58 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 27_two_column_left_short_txtpos | 53/58 | FAIL | 19_worst_dy, 20_within_10pt, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 28_value_overflows_cell_txtpos | 42/58 | FAIL | 02_text_run_count, 06_table_columns, 07_table_rows, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 43_within_10pt_x, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 29_dot_leaders_txtpos | 39/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 09_font_names, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 300_prescription_rx | 40/58 | FAIL | 01_page_count, 03_word_count, 04_words_missing, 05_words_extra, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 26_text_overlap, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 54_image_dpi, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 301_lab_report_panel | 45/58 | FAIL | 01_page_count, 02_text_run_count, 14_filled_shapes, 18_median_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 302_radiology_report | 47/58 | FAIL | 03_word_count, 04_words_missing, 05_words_extra, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 303_discharge_summary | 41/58 | FAIL | 02_text_run_count, 05_words_extra, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces, 54_image_dpi | 2a68de6 | 10 Nov |
-| 304_package_insert_small_print | 50/58 | FAIL | 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch, 26_text_overlap, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 305_vaccination_certificate | 36/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 14_filled_shapes, 17_matched_runs, 18_median_dy, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 32_stroke_lines, 35_rotation, 41_block_spacing, 45_char_accuracy, 47_margins, 53_embedded_faces, 55_orientation_mix, 56_rtl_runs | 2a68de6 | 10 Nov |
-| 306_clinical_protocol_synopsis | 49/58 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
+| 01_stamp_rotated_15deg_upright |  |  |  |  |  |
+| 02_stamp_rotated_15deg_upleft |  |  |  |  |  |
+| 03_stamp_vertical_90deg |  |  |  |  |  |
+| 04_stamp_180deg_upside_down |  |  |  |  |  |
+| 05_round_company_seal_curved_text |  |  |  |  |  |
+| 06_rect_paid_stamp_red_transparent |  |  |  |  |  |
+| 07_stamp_over_table |  |  |  |  |  |
+| 08_two_overlapping_stamps |  |  |  |  |  |
+| 09_stamp_font_not_embedded |  |  |  |  |  |
+| 10_stamp_as_image |  |  |  |  |  |
+| 11_stamp_with_signature_image |  |  |  |  |  |
+| 12_stamp_across_page_break |  |  |  |  |  |
+| 13_stamp_non_english |  |  |  |  |  |
+| 14_stamp_chars_positioned_td |  |  |  |  |  |
+| 15_stamp_on_scanned_page |  |  |  |  |  |
+| 16_right_aligned_amounts_txtpos |  |  |  |  |  |
+| 17_three_column_widths_txtpos |  |  |  |  |  |
+| 18_centred_heading_left_body_txtpos |  |  |  |  |  |
+| 19_hanging_indent_txtpos |  |  |  |  |  |
+| 20_numbered_list_separate_column_txtpos |  |  |  |  |  |
+| 21_form_labels_x60_values_x300_txtpos |  |  |  |  |  |
+| 22_invoice_four_columns_txtpos |  |  |  |  |  |
+| 23_timetable_grid_txtpos |  |  |  |  |  |
+| 24_address_block_indents_txtpos |  |  |  |  |  |
+| 25_signature_block_underscores_txtpos |  |  |  |  |  |
+| 26_footnote_marker_bottom_note_txtpos |  |  |  |  |  |
+| 27_two_column_left_short_txtpos |  |  |  |  |  |
+| 28_value_overflows_cell_txtpos |  |  |  |  |  |
+| 29_dot_leaders_txtpos |  |  |  |  |  |
+| 300_prescription_rx |  |  |  |  |  |
+| 301_lab_report_panel |  |  |  |  |  |
+| 302_radiology_report |  |  |  |  |  |
+| 303_discharge_summary |  |  |  |  |  |
+| 304_package_insert_small_print |  |  |  |  |  |
+| 305_vaccination_certificate |  |  |  |  |  |
+| 306_clinical_protocol_synopsis |  |  |  |  |  |
 | 30_mixed_font_sizes_one_baseline_txtpos |  |  |  |  |  |
 | 310_court_judgment |  |  |  |  |  |
 | 311_fir_police_form |  |  |  |  |  |

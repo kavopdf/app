@@ -106,6 +106,60 @@ def colour_close(a, b, tol=0.06):
 import difflib
 
 
+def _shapes(page):
+    """Everything on the page that can anchor text: drawn outlines and placed images.
+
+    A stamp is an outline with text inside it. The outline is a vector path, not
+    text, so every existing position check looks straight past it - they compare
+    text to text, and a stamp whose outline slid twenty points away while its text
+    stayed put passes all of them. That is the failure this check exists for.
+
+    Images count as anchors too, because a converter is allowed to draw an outline
+    as an image; what matters is that the text still sits in the same place
+    relative to whatever encloses it.
+    """
+    out = []
+    for d in page.get_drawings():
+        r = d["rect"]
+        if r.width >= 8 and r.height >= 8:
+            out.append(r)
+    try:
+        for img in page.get_images(full=True):
+            for r in page.get_image_rects(img[0]):
+                if r.width >= 8 and r.height >= 8:
+                    out.append(r)
+    except Exception:
+        pass
+    return out
+
+
+def _anchor(page, rs):
+    """For each run, where its centre sits inside the smallest shape containing it.
+
+    Returns None for a run with no shape around it. The answer is a fraction of the
+    shape, not a page coordinate, so a stamp that moves as one piece reads as
+    unchanged here - that is a position error and checks 18 and 19 already own it.
+    Only text moving relative to ITS OWN outline shows up as a difference.
+    """
+    shapes = _shapes(page)
+    out = []
+    for r in rs:
+        cx, cy = (r["x"] + r["x1"]) / 2.0, (r["y"] + r["y1"]) / 2.0
+        best = None
+        for sh in shapes:
+            # fitz.Rect is x0/y0/x1/y1, not x/y - the run dicts use x/y, which is
+            # what made this crash on its first run.
+            if sh.x0 <= cx <= sh.x1 and sh.y0 <= cy <= sh.y1:
+                if best is None or sh.width * sh.height < best.width * best.height:
+                    best = sh
+        if best is None:
+            out.append(None)
+        else:
+            out.append(((cx - best.x0) / max(1e-6, best.width),
+                        (cy - best.y0) / max(1e-6, best.height)))
+    return out
+
+
 def _strokes(page):
     """Stroked paths: table rules, borders, underlines. Never looked at before."""
     out = []
@@ -241,6 +295,33 @@ def extra_checks2(src, gd):
 
     s_rtl, g_rtl = rtl_runs(src), rtl_runs(gd)
     c["56_rtl_runs"] = (s_rtl, g_rtl, s_rtl == 0 or g_rtl >= max(1, int(s_rtl * 0.5)))
+
+    # ---- 59 shape anchor ---------------------------------------------------
+    # Does text stay in the same place inside the outline that encloses it?
+    # Two ways to fail, both seen on stamps: the outline moves and leaves its text
+    # behind, or the text moves and leaves its outline. Neither changes the text's
+    # page position enough for the median checks, and neither is visible to any
+    # check that only compares text to text.
+    ANCHOR_TOL = 0.12      # a tenth of the outline is drift, not rendering noise
+    lost, moved, anchored = 0, 0, 0
+    for si in range(min(src.page_count, gd.page_count)):
+        sp, gp = src[si], gd[si]
+        sruns, gruns = runs(sp), runs(gp)
+        sa, ga = _anchor(sp, sruns), _anchor(gp, gruns)
+        for i, a in enumerate(sa):
+            if a is None:
+                continue          # nothing enclosed it in the source either
+            anchored += 1
+            if i >= len(ga) or ga[i] is None:
+                lost += 1         # the outline went away, or moved off the text
+                continue
+            b = ga[i]
+            if abs(a[0] - b[0]) > ANCHOR_TOL or abs(a[1] - b[1]) > ANCHOR_TOL:
+                moved += 1        # text and outline no longer agree
+    # source = how many runs had an outline around them, render = how many still
+    # sit in the same place inside one. A raw drift count would read as
+    # "source=1 render=1" for one good run and one bad run alike.
+    c["59_shape_anchor"] = (anchored, anchored - (lost + moved), (lost + moved) == 0)
 
     return c
 

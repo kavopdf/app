@@ -33,14 +33,13 @@ Prints one line per document, then one line per failing check:
 `--json out.json` adds every check with its source and render value, plus
 `document`, `source_file`, `render_file`, `passed`, `total`, `ok`, `failed`.
 
-`--list-checks` prints the 58 check ids, one per line. Use this when you need the
+`--list-checks` prints every check id, one per line. The count has grown 31, 50, 58, 59 - Use this when you need the
 denominator — never write a total from memory.
 
 Exit codes: **0** every check passed, **1** at least one failed, **2** could not run
 (a missing or unreadable PDF).
 
-The denominator is whatever `total` the script reports. It has been 31, then 50,
-then 58. Never hardcode it.
+The denominator is whatever `total` the script reports. Never hardcode it.
 
 Deterministic: the same pair twice gives byte-identical output, so a changed result
 means the document changed, not the measurement.

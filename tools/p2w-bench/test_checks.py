@@ -205,6 +205,27 @@ def cases():
         p.insert_text((500, 600), "PAID", fontsize=20, rotate=90)
     out.append(("rotated text dropped", rotated_text, base, ["35_rotation"], None))
 
+    # ---- 59 shape anchor ---------------------------------------------------
+    # A stamp is an outline with text inside it. These two cases are the failure
+    # modes the user described: the outline moves and leaves its text, and the
+    # text moves and leaves its outline. The second one is the important test -
+    # on that pair 59 is the ONLY check that fails, which is the whole reason it
+    # was added.
+    def stamp(p, shape_dx=0, text_dy=0):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+        p.draw_rect(fitz.Rect(360 + shape_dx, 560, 520 + shape_dx, 640),
+                    color=(0.75, 0.05, 0.05), width=2)
+        p.insert_text((400, 610 + text_dy), "PAID", fontsize=26, color=(0.75, 0.05, 0.05))
+
+    out.append(("stamp outline moved off its text",
+                stamp, lambda p: stamp(p, shape_dx=55),
+                ["59_shape_anchor"], None))
+    out.append(("stamp text moved out of its outline",
+                stamp, lambda p: stamp(p, text_dy=34),
+                ["59_shape_anchor"], None))
+
     return out
 
 
