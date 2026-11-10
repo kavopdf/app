@@ -39,8 +39,11 @@ BASE = os.path.join(HERE, "BASELINE.md")
 RATCHET = os.path.join(HERE, "RATCHET.json")
 
 
+CHECK_RE = re.compile(r"^\d{2}[a-c]?_[a-z_]+$")
+
+
 def read_scores():
-    """{document: (score, out_of)} for every row that has a score."""
+    """{document: (score, out_of, frozenset(failed checks))} for every scored row."""
     out = {}
     if not os.path.exists(BASE):
         return out
@@ -51,8 +54,12 @@ def read_scores():
         if not cells or not cells[0] or cells[0].lower() == "document":
             continue
         m = re.match(r"(\d+)\s*/\s*(\d+)", cells[1] if len(cells) > 1 else "")
-        if m:
-            out[cells[0]] = (int(m.group(1)), int(m.group(2)))
+        if not m:
+            continue
+        failed = frozenset(
+            c.strip() for c in (cells[3] if len(cells) > 3 else "").split(",")
+            if CHECK_RE.match(c.strip()))
+        out[cells[0]] = (int(m.group(1)), int(m.group(2)), failed)
     return out
 
 
@@ -78,18 +85,34 @@ def main(argv):
 
     regressions = []
     new_marks = []
-    for doc, (score, out_of) in scores.items():
+    for doc, (score, out_of, failed) in scores.items():
         prev = ratchet.get(doc)
         if prev is None:
             new_marks.append((doc, score, out_of))
             if not check_only:
-                ratchet[doc] = {"best": score, "out_of": out_of}
+                ratchet[doc] = {"best": score, "out_of": out_of,
+                                "failed": sorted(failed)}
             continue
+
         best = prev.get("best", 0)
+        prev_failed = frozenset(prev.get("failed", []))
+
+        # Two ways to regress, and the second one is the one a score cannot see.
+        # A fix can make one check pass and another fail: the score stays at 30 of
+        # 50, a score-only ratchet says nothing got worse, and a defect has quietly
+        # replaced another. So a check that used to pass and now fails is a
+        # regression even when the total is unchanged or higher.
         if score < best:
-            regressions.append((doc, score, best, out_of))
-        elif score > best and not check_only:
-            ratchet[doc] = {"best": score, "out_of": out_of}
+            regressions.append((doc, score, best, out_of,
+                                sorted(prev_failed - failed), "score fell"))
+        else:
+            new_failures = sorted(failed - prev_failed)
+            if new_failures:
+                regressions.append((doc, score, best, out_of,
+                                    new_failures, "check(s) newly failing"))
+            elif not check_only and (score > best or len(failed) < len(prev_failed)):
+                ratchet[doc] = {"best": max(score, best), "out_of": out_of,
+                                "failed": sorted(failed)}
 
     if not check_only:
         json.dump(ratchet, open(RATCHET, "w", encoding="utf-8"), indent=2, sort_keys=True)
@@ -107,9 +130,10 @@ def main(argv):
     if regressions:
         fail = True
         print("  REGRESSED: %d document(s) below their best ever score" % len(regressions))
-        for doc, score, best, out_of in sorted(regressions)[:15]:
-            print("      %-44s %2d/%d  was %2d/%d  (-%d)"
-                  % (doc[:44], score, out_of, best, out_of, best - score))
+        for doc, score, best, out_of, checks, why in sorted(regressions)[:15]:
+            print("      %-40s %2d/%d was %2d/%d  %s%s"
+                  % (doc[:40], score, out_of, best, out_of, why,
+                     (": " + ", ".join(checks[:4])) if checks else ""))
         if len(regressions) > 15:
             print("      ... and %d more" % (len(regressions) - 15))
     if strict and total < measured_all:
