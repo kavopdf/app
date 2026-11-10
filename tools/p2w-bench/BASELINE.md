@@ -7,7 +7,7 @@ The instrument: the docx goes to Drive, Drive converts it to a Google Doc, that
 document is exported as PDF, and the export is compared to the original. See
 `VERIFY-GOOGLE.md` for the pipeline and `verify_google.py` for the checks.
 
-Newest rows were measured with engine **392ce95** (v3.53.12). Every row carries the commit it
+Newest rows were measured with engine **c2616d5** (v3.53.12). Every row carries the commit it
 was measured with, because a score without a commit cannot tell a fix from a stale build.
 
 This file is written by the hourly baseline cron. Rows are never deleted; a
@@ -96,26 +96,26 @@ re-run of a document replaces its own row.
 | 365_recipe_card | 27/31 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
 | 36_embedded_subset_font | 20/31 | FAIL | 01_page_count, 02_text_run_count, 07_table_rows, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
 | 370_offer_letter | 26/31 | FAIL | 02_text_run_count, 19_worst_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
-| 371_experience_certificate |  |  |  |  |
-| 372_timesheet_grid |  |  |  |  |
-| 373_leave_application_form |  |  |  |  |
-| 374_org_chart |  |  |  |  |
-| 375_attendance_register |  |  |  |  |
-| 37_font_not_embedded_substitution |  |  |  |  |
-| 380_runbook_terminal_output |  |  |  |  |
-| 381_incident_report_timeline |  |  |  |  |
-| 382_architecture_diagram |  |  |  |  |
-| 383_api_docs_page |  |  |  |  |
-| 38_faux_bold_italic_synthesised |  |  |  |  |
-| 390_wide_data_appendix |  |  |  |  |
-| 391_survey_questionnaire_grid |  |  |  |  |
-| 392_statistical_console_output |  |  |  |  |
-| 393_spectrum_peak_table |  |  |  |  |
-| 394_map_with_legend |  |  |  |  |
-| 39_small_caps_letter_spacing |  |  |  |  |
-| 400_comic_page_speech_bubbles |  |  |  |  |
-| 401_trifold_brochure |  |  |  |  |
-| 402_calendar_month_grid |  |  |  |  |
+| 371_experience_certificate | 20/31 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 17_matched_runs, 18_median_dy, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was | c2616d5 | 2026-11-10 |
+| 372_timesheet_grid | 27/31 | FAIL | 19_worst_dy, 20_within_10pt, 25_invisible_text, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
+| 373_leave_application_form | 22/31 | FAIL | 02_text_run_count, 07_table_rows, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
+| 374_org_chart | 20/31 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
+| 375_attendance_register | 24/31 | FAIL | 01_page_count, 19_worst_dy, 20_within_10pt, 21_median_dx, 24_page_breaks, 25_invisible_text, 29_blank_where_ink_was | c2616d5 | 2026-11-10 |
+| 37_font_not_embedded_substitution | 31/31 | PASS |  | c2616d5 | 2026-11-10 |
+| 380_runbook_terminal_output | 27/31 | FAIL | 14_filled_shapes, 19_worst_dy, 20_within_10pt, 25_invisible_text | c2616d5 | 2026-11-10 |
+| 381_incident_report_timeline | 24/31 | FAIL | 02_text_run_count, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
+| 382_architecture_diagram | 24/31 | FAIL | 02_text_run_count, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
+| 383_api_docs_page | 26/31 | FAIL | 14_filled_shapes, 19_worst_dy, 20_within_10pt, 25_invisible_text, 26_text_overlap | c2616d5 | 2026-11-10 |
+| 38_faux_bold_italic_synthesised | 16/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
+| 390_wide_data_appendix | 26/31 | FAIL | 01_page_count, 19_worst_dy, 20_within_10pt, 24_page_breaks, 25_invisible_text | c2616d5 | 2026-11-10 |
+| 391_survey_questionnaire_grid | 23/31 | FAIL | 03_word_count, 04_words_missing, 05_words_extra, 11_bold_runs, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order | c2616d5 | 2026-11-10 |
+| 392_statistical_console_output | 26/31 | FAIL | 03_word_count, 04_words_missing, 19_worst_dy, 20_within_10pt, 23_line_pitch | c2616d5 | 2026-11-10 |
+| 393_spectrum_peak_table | 27/31 | FAIL | 19_worst_dy, 20_within_10pt, 29_blank_where_ink_was, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
+| 394_map_with_legend | 24/31 | FAIL | 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
+| 39_small_caps_letter_spacing | 19/31 | FAIL | 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 10_font_sizes, 11_bold_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
+| 400_comic_page_speech_bubbles | 21/31 | FAIL | 02_text_run_count, 07_table_rows, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
+| 401_trifold_brochure | 15/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 07_table_rows, 14_filled_shapes, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 21_median_dx, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
+| 402_calendar_month_grid | 20/31 | FAIL | 01_page_count, 02_text_run_count, 13_text_colours, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was | c2616d5 | 2026-11-10 |
 | 403_crossword_puzzle |  |  |  |  |
 | 404_sudoku_grid |  |  |  |  |
 | 405_sheet_music_lyrics |  |  |  |  |
