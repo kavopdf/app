@@ -118,6 +118,8 @@ python3 tools/p2w-bench/round.py --advance       # measure -> classify -> fix
 python3 tools/p2w-bench/round.py --close-round   # archive, empty scores, next round or done
 python3 tools/p2w-bench/round.py --claim-fixer   # 0 = go, 1 = another run is working
 python3 tools/p2w-bench/round.py --release-fixer
+python3 tools/p2w-bench/round.py --claim-baseline    / --release-baseline
+python3 tools/p2w-bench/round.py --claim-classifier  / --release-classifier
 python3 tools/p2w-bench/round.py --apk-status    # 0 = may ship, 1 = no (prints why)
 python3 tools/p2w-bench/round.py --mark-apk-shipped <version>
 python3 tools/p2w-bench/round.py --force-round <n>   # set the round by hand; recovery only
@@ -138,8 +140,12 @@ round 1 of 3   phase: measure
 `ATTEMPTS-round-<n>.json`, empties every score, clears the fixer claim and the
 shipped mark, and moves the phase. It survives a missing BASELINE.md.
 
-The fixer claim expires after 100 minutes on its own, so a run that dies cannot
-block the next one. Always `--release-fixer` when you finish, even on failure.
+Every cron claims its own slot before working, so an overrun cannot put two runs
+of the same cron in the same phase at once - the same ten empty rows measured
+twice, and the later commit overwriting the earlier one. The stale window is per
+cron, sized to one run: fixer 100 minutes, baseline 45, classifier 20. A run that
+dies cannot block the next one, and a live run is never mistaken for a dead one.
+Always release the claim when you finish, even on failure.
 
 ---
 

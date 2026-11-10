@@ -182,10 +182,14 @@ def main():
     rc, out = run_stdout(w, "round.py", "--phase")
     check("--advance moves measure to classify", out.strip() == "classify", repr(out.strip()))
     run(w, "round.py", "--advance")
-    rc, _ = run(w, "round.py", "--claim-fixer")
-    check("--claim-fixer allows the first run", rc == 0, "got %d" % rc)
-    rc, _ = run(w, "round.py", "--claim-fixer")
-    check("--claim-fixer refuses a second", rc == 1, "got %d" % rc)
+    for name in ("fixer", "baseline", "classifier"):
+        rc, _ = run(w, "round.py", "--claim-%s" % name)
+        first = rc
+        rc, _ = run(w, "round.py", "--claim-%s" % name)
+        second = rc
+        run(w, "round.py", "--release-%s" % name)
+        check("--claim-%s allows then refuses" % name, first == 0 and second == 1,
+              "first %d, second %d" % (first, second))
     s = json.load(open(os.path.join(w, "ROUND.json")))
     s["fixer_started"] = 0
     json.dump(s, open(os.path.join(w, "ROUND.json"), "w"))

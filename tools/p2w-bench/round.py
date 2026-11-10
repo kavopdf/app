@@ -59,7 +59,12 @@ PHASES = ["measure", "classify", "fix", "done"]
 # both committing, one overwriting the other. This claim makes the second run
 # step aside instead. It expires, because a run that dies must not block the
 # next one forever.
+# Each cron claims its slot before working, so an overrun cannot put two runs of
+# the same cron in the same phase at once. The stale window is per cron, sized to
+# how long one run actually takes: a dead run must not block the next one forever,
+# and a live run must never be mistaken for a dead one.
 FIXER_STALE_MIN = 100
+CLAIM_STALE_MIN = {"fixer": 100, "baseline": 45, "classifier": 20}
 
 
 def load():
@@ -128,27 +133,42 @@ def status(s=None):
     return s
 
 
-def claim_fixer():
-    """Return 0 if this run may proceed, 1 if a previous one is still working."""
+def claim(name):
+    """Return 0 if this run may proceed, 1 if a previous one is still working.
+
+    The fixer had this first because its runs are the longest, but a baseline run
+    that overruns an hour would put two runs on the same ten empty rows: the same
+    documents measured twice, and the later commit overwriting the earlier one.
+    """
     s = load()
-    last = s.get("fixer_started") or 0
+    key = "%s_started" % name
+    limit = CLAIM_STALE_MIN.get(name, 60)
+    last = s.get(key) or 0
     age_min = (time.time() - last) / 60.0 if last else 1e9
-    if age_min < FIXER_STALE_MIN:
-        print("fixer busy - previous run started %d min ago (stale after %d min)"
-              % (age_min, FIXER_STALE_MIN))
+    if age_min < limit:
+        print("%s busy - previous run started %d min ago (stale after %d min)"
+              % (name, age_min, limit))
         return 1
-    s["fixer_started"] = time.time()
+    s[key] = time.time()
     save(s)
-    print("fixer claimed at %s" % time.strftime("%H:%M"))
+    print("%s claimed at %s" % (name, time.strftime("%H:%M")))
     return 0
+
+
+def release(name):
+    s = load()
+    s["%s_started" % name] = 0
+    save(s)
+    print("%s released" % name)
+    return 0
+
+
+def claim_fixer():
+    return claim("fixer")
 
 
 def release_fixer():
-    s = load()
-    s["fixer_started"] = 0
-    save(s)
-    print("fixer released")
-    return 0
+    return release("fixer")
 
 
 def main(argv):
@@ -178,10 +198,26 @@ def main(argv):
         return 0
 
     if "--claim-fixer" in argv:
-        return claim_fixer()
+        return claim("fixer")
 
     if "--release-fixer" in argv:
-        return release_fixer()
+        return release("fixer")
+
+    # Written out rather than generated, so the flag is greppable in the source.
+    # A tool that checks the interface reference against the code cannot see a
+    # flag built from a format string, and a reference it cannot check is a
+    # reference that drifts.
+    if "--claim-baseline" in argv:
+        return claim("baseline")
+
+    if "--release-baseline" in argv:
+        return release("baseline")
+
+    if "--claim-classifier" in argv:
+        return claim("classifier")
+
+    if "--release-classifier" in argv:
+        return release("classifier")
 
     if "--phase" in argv:
         print(s["phase"])
@@ -254,6 +290,8 @@ def main(argv):
         s["phase"] = "measure"
         s["started"] = time.time()
         s["fixer_started"] = 0
+        s["baseline_started"] = 0
+        s["classifier_started"] = 0
         s["apk_shipped"] = ""
         save(s)
         print("round %d closed, round %d begins in phase measure" % (s["round"] - 1, s["round"]))
