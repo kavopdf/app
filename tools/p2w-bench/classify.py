@@ -56,6 +56,8 @@ MAX_HOURS = 24        # one full day per class - the hard limit
 MAX_ATTEMPTS = 12     # twelve tries inside that day, about 24 hours of real work
 MAX_REQUEUES = 3      # a class that keeps improving gets three fresh days, then stops
 JACCARD = 0.55        # how alike two checks must be to count as one cause
+UNIVERSAL = 0.90      # a check failing on this share of documents cannot discriminate
+MAX_CLASS_CHECKS = 6  # a class bigger than this names no single cause
 
 CHECK_RE = re.compile(r"^\d{2}[a-c]?_[a-z_]+$")
 
@@ -91,7 +93,44 @@ def save_ledger(led):
     json.dump(led, open(LEDGER, "w", encoding="utf-8"), indent=2, sort_keys=True)
 
 
-def cluster(doc_sets):
+def split_oversized(groups, doc_sets):
+    """A class of seventeen checks names no single cause.
+
+    When most documents fail most checks, everything co-occurs and the threshold
+    merges the corpus into one unactionable blob. So any group too large to name
+    a cause is re-clustered on its own at a stricter threshold, repeatedly, until
+    the parts are small enough to be worth attacking one at a time.
+    """
+    out = []
+    for g in groups:
+        if len(g) <= MAX_CLASS_CHECKS:
+            out.append(g)
+            continue
+        threshold = JACCARD
+        parts = [g]
+        while threshold < 0.95:
+            threshold = min(0.95, threshold + 0.10)
+            parts = cluster({c: doc_sets[c] for c in g}, threshold)
+            if max(len(p) for p in parts) <= MAX_CLASS_CHECKS:
+                break
+        out.extend(parts)
+    return out
+
+
+def build_groups(doc_sets, measured_count):
+    """The one grouping both classify and subclusters use."""
+    total = measured_count or 1
+    universal = {c for c, ds in doc_sets.items()
+                 if len(ds) >= max(10, UNIVERSAL * total)}
+    groups = []
+    rest = {c: ds for c, ds in doc_sets.items() if c not in universal}
+    if rest:
+        groups.extend(split_oversized(cluster(rest), doc_sets))
+    groups.extend([[c] for c in sorted(universal)])
+    return groups
+
+
+def cluster(doc_sets, threshold=None):
     """Union checks that fail on largely the same documents. Data decides."""
     names = list(doc_sets)
     parent = {n: n for n in names}
@@ -107,13 +146,14 @@ def cluster(doc_sets):
         if ra != rb:
             parent[rb] = ra
 
+    t = JACCARD if threshold is None else threshold
     for i, a in enumerate(names):
         for b in names[i + 1:]:
             sa, sb = doc_sets[a], doc_sets[b]
             if not sa or not sb:
                 continue
             j = len(sa & sb) / len(sa | sb)
-            if j >= JACCARD:
+            if j >= t:
                 union(a, b)
 
     groups = defaultdict(list)
@@ -142,8 +182,9 @@ def subclusters(cls_name, top=8):
         if failed:
             docs[r["doc"]] = failed
 
-    classes = cluster({c: {d for d, f in docs.items() if c in f} for c in
-                       {x for f in docs.values() for x in f}})
+    doc_sets = {c: {d for d, f in docs.items() if c in f}
+                for c in {x for f in docs.values() for x in f}}
+    classes = build_groups(doc_sets, len(docs))
     target = None
     for group in classes:
         group = sorted(group, key=lambda c: -sum(1 for f in docs.values() if c in f))
@@ -162,20 +203,29 @@ def subclusters(cls_name, top=8):
         print("class %r has no documents" % cls_name)
         return 1
 
+    # A universal check co-fails with everything, so grouping on it would put the
+    # whole class in one bucket and say nothing. It is excluded from the grouping
+    # signal for the same reason it is excluded from the merge graph.
+    total = len(docs) or 1
+    universal = {c for c, ds in
+                 {x: {d for d, f in docs.items() if x in f}
+                  for x in {y for f in docs.values() for y in f}}.items()
+                 if len(ds) >= max(10, UNIVERSAL * total)}
+
     # how often each outside check appears among this class's documents
     freq = Counter()
     for d in members:
-        for c in docs[d] - own:
+        for c in (docs[d] - own) - universal:
             freq[c] += 1
     if not freq:
-        print("class %r is clean: every document fails only the class's own checks"
-              % cls_name)
-        print("one cause, %d documents" % len(members))
+        print("class %r: %d documents, no discriminating outside check" % (cls_name, len(members)))
+        print("every document fails the same set, so the class is one cause and the")
+        print("whole class moves together - or nothing in the data separates them yet.")
         return 0
 
     groups = defaultdict(list)
     for d in members:
-        extras = docs[d] - own
+        extras = (docs[d] - own) - universal
         best = max(extras, key=lambda c: (freq[c], c)) if extras else None
         groups[best or "(only the class checks)"].append(d)
 
@@ -262,7 +312,12 @@ def main(argv):
             else:
                 prose[c] += 1
 
-    groups = cluster(doc_sets) if doc_sets else []
+    # A check that fails on almost every document carries no information about
+    # WHICH sub-cause a document has - it is a systematic defect. Its Jaccard
+    # against every other universal check is near 1.0, so merging on it produced
+    # a class of 21 checks covering all 20 documents, which no fixer can act on.
+    # Universal checks become their own classes; the rest cluster among themselves.
+    groups = build_groups(doc_sets, len(measured)) if doc_sets else []
     led = load_ledger()
     now = time.time()
 

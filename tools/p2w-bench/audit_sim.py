@@ -30,7 +30,9 @@ import subprocess
 import sys
 import tempfile
 
-SRC = "/scratch/work/d1/R/tools/p2w-bench"
+# the tools live next to this file - a hardcoded sandbox path made this
+# script unrunnable anywhere except the pod it was written on
+SRC = os.path.dirname(os.path.abspath(__file__))
 FILES = ["round.py", "classify.py", "ratchet.py", "verify_google.py"]
 
 results = []
