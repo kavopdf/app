@@ -172,7 +172,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
 
     s_bot = borders_over_text(src)
     g_bot = borders_over_text(gd)
-    c["33_border_over_text"] = (s_bot, g_bot, g_bot <= s_bot + max(1, s_bot // 5))
+    c["33_border_over_text"] = (s_bot, g_bot, g_bot <= s_bot + s_bot // 5)
 
     # ---- 34 per-span style -------------------------------------------------
     # Size, colour and weight of each matched span, not just how many distinct
@@ -393,7 +393,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
         return n
 
     s_c, g_c = spans_crossing(src), spans_crossing(gd)
-    c["46_text_crossing_rule"] = (s_c, g_c, g_c <= s_c + max(1, s_c // 5))
+    c["46_text_crossing_rule"] = (s_c, g_c, g_c <= s_c + s_c // 5)
 
     # ---- 47 margins --------------------------------------------------------
     def extents(doc):
