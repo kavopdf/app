@@ -119,7 +119,10 @@ def status(s=None):
     elif s["phase"] == "fix":
         print("  next             : fixer runs until no class is OPEN")
     else:
-        print("  next             : nothing - all %d rounds are done" % s["rounds_total"])
+        shipped = s.get("apk_shipped") or ""
+        print("  apk shipped      : %s" % (shipped or "not yet"))
+        print("  next             : %s" % ("nothing - already shipped" if shipped
+                                            else "the APK cron ships once, on its next run"))
     for h in s.get("history", [])[-4:]:
         print("  was: round %s %s -> %s" % (h.get("round"), h.get("phase"), h.get("at", "")))
     return s
@@ -150,6 +153,25 @@ def release_fixer():
 
 def main(argv):
     s = load()
+
+    if "--apk-status" in argv:
+        # "may ship" only when every round is finished and nothing was shipped yet.
+        if s.get("phase") != "done":
+            print("phase is %s - not done" % s.get("phase"))
+            return 1
+        done = s.get("apk_shipped") or ""
+        if done:
+            print("already shipped %s - nothing to do" % done)
+            return 1
+        print("may ship - all %s rounds done, nothing shipped yet" % s.get("rounds_total"))
+        return 0
+
+    if "--mark-apk-shipped" in argv:
+        v = argv[argv.index("--mark-apk-shipped") + 1] if "--mark-apk-shipped" in argv else "yes"
+        s["apk_shipped"] = v
+        save(s)
+        print("apk marked shipped: %s" % v)
+        return 0
 
     if "--claim-fixer" in argv:
         return claim_fixer()
@@ -228,6 +250,7 @@ def main(argv):
         s["phase"] = "measure"
         s["started"] = time.time()
         s["fixer_started"] = 0
+        s["apk_shipped"] = ""
         save(s)
         print("round %d closed, round %d begins in phase measure" % (s["round"] - 1, s["round"]))
         return 0
