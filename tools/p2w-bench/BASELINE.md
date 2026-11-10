@@ -7,7 +7,7 @@ The instrument: the docx goes to Drive, Drive converts it to a Google Doc, that
 document is exported as PDF, and the export is compared to the original. See
 `VERIFY-GOOGLE.md` for the pipeline and `verify_google.py` for the checks.
 
-Newest rows were measured with engine **a927365** (v3.53.12). Every row carries the commit it
+Newest rows were measured with engine **392ce95** (v3.53.12). Every row carries the commit it
 was measured with, because a score without a commit cannot tell a fix from a stale build.
 
 This file is written by the hourly baseline cron. Rows are never deleted; a
@@ -76,26 +76,26 @@ re-run of a document replaces its own row.
 | 333_datasheet_spec_tables | 24/31 | FAIL | 01_page_count, 19_worst_dy, 20_within_10pt, 24_page_breaks, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
 | 334_patent_document | 24/31 | FAIL | 02_text_run_count, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
 | 335_msds_safety_data_sheet | 24/31 | FAIL | 02_text_run_count, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
-| 33_sans_nondefault_body |  |  |  |  |
-| 340_bill_of_lading |  |  |  |  |
-| 341_shipping_manifest |  |  |  |  |
-| 342_packing_list |  |  |  |  |
-| 343_air_waybill |  |  |  |  |
-| 344_customs_declaration |  |  |  |  |
-| 34_monospace_document |  |  |  |  |
-| 350_question_paper |  |  |  |  |
-| 351_omr_answer_sheet |  |  |  |  |
-| 352_certificate_ornate_border |  |  |  |  |
-| 353_admit_card |  |  |  |  |
-| 35_four_typefaces_one_page |  |  |  |  |
-| 360_restaurant_menu |  |  |  |  |
-| 361_product_catalogue_grid |  |  |  |  |
-| 362_price_list_dense |  |  |  |  |
-| 363_warranty_card |  |  |  |  |
-| 364_event_ticket |  |  |  |  |
-| 365_recipe_card |  |  |  |  |
-| 36_embedded_subset_font |  |  |  |  |
-| 370_offer_letter |  |  |  |  |
+| 33_sans_nondefault_body | 29/31 | FAIL | 20_within_10pt, 22_reading_order | 392ce95 | 2026-11-10 |
+| 340_bill_of_lading | 21/31 | FAIL | 02_text_run_count, 07_table_rows, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
+| 341_shipping_manifest | 25/31 | FAIL | 01_page_count, 19_worst_dy, 20_within_10pt, 24_page_breaks, 25_invisible_text, 29_blank_where_ink_was | 392ce95 | 2026-11-10 |
+| 342_packing_list | 21/31 | FAIL | 03_word_count, 04_words_missing, 05_words_extra, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
+| 343_air_waybill | 19/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 14_filled_shapes, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
+| 344_customs_declaration | 24/31 | FAIL | 03_word_count, 04_words_missing, 19_worst_dy, 20_within_10pt, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
+| 34_monospace_document | 29/31 | FAIL | 19_worst_dy, 20_within_10pt | 392ce95 | 2026-11-10 |
+| 350_question_paper | 13/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 07_table_rows, 16_numeric_runs, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 26_text_overlap, 27_text_off_page, 28_clipped_at_edge, 29_blank_where_ink_was | 392ce95 | 2026-11-10 |
+| 351_omr_answer_sheet | 25/31 | FAIL | 01_page_count, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks | 392ce95 | 2026-11-10 |
+| 352_certificate_ornate_border | 14/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
+| 353_admit_card | 21/31 | FAIL | 02_text_run_count, 11_bold_runs, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
+| 35_four_typefaces_one_page | 30/31 | FAIL | 22_reading_order | 392ce95 | 2026-11-10 |
+| 360_restaurant_menu | 22/31 | FAIL | 02_text_run_count, 06_table_columns, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
+| 361_product_catalogue_grid | 28/31 | FAIL | 14_filled_shapes, 19_worst_dy, 25_invisible_text | 392ce95 | 2026-11-10 |
+| 362_price_list_dense | 27/31 | FAIL | 03_word_count, 04_words_missing, 20_within_10pt, 22_reading_order | 392ce95 | 2026-11-10 |
+| 363_warranty_card | 26/31 | FAIL | 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch | 392ce95 | 2026-11-10 |
+| 364_event_ticket | 22/31 | FAIL | 03_word_count, 04_words_missing, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text | 392ce95 | 2026-11-10 |
+| 365_recipe_card | 27/31 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
+| 36_embedded_subset_font | 20/31 | FAIL | 01_page_count, 02_text_run_count, 07_table_rows, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
+| 370_offer_letter | 26/31 | FAIL | 02_text_run_count, 19_worst_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was | 392ce95 | 2026-11-10 |
 | 371_experience_certificate |  |  |  |  |
 | 372_timesheet_grid |  |  |  |  |
 | 373_leave_application_form |  |  |  |  |
