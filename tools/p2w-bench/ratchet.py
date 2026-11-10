@@ -32,6 +32,7 @@ USAGE
 import json
 import os
 import re
+import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -78,6 +79,25 @@ def main(argv):
 
     scores = read_scores()
     ratchet = load_ratchet()
+    # The universe is EVERY check the verifier knows, not just the ones that
+    # failed. Using the failed set was wrong: a check that passed at the mark is
+    # in neither set, so if it fails later the comparison never sees it and the
+    # regression is invisible. verify_google.py --list-checks reports the real
+    # list, and it is discovered rather than hard-coded, so adding a check cannot
+    # leave a stale universe behind.
+    universe = set()
+    try:
+        out = subprocess.check_output(
+            [sys.executable, os.path.join(HERE, "verify_google.py"), "--list-checks"],
+            stderr=subprocess.DEVNULL, timeout=120, text=True)
+        universe = {l.strip() for l in out.splitlines() if l.strip()}
+    except Exception:
+        # Fall back to what the rows themselves mention. Weaker, and reported.
+        for _doc, (_s, _o, _f) in scores.items():
+            universe |= _f
+        if universe:
+            print("  NOTE: could not read the check list from verify_google.py; "
+                  "comparing only the %d checks these rows mention" % len(universe))
 
     if not scores:
         print("ratchet: no scored documents in BASELINE.md - nothing to check")
@@ -91,28 +111,45 @@ def main(argv):
             new_marks.append((doc, score, out_of))
             if not check_only:
                 ratchet[doc] = {"best": score, "out_of": out_of,
-                                "failed": sorted(failed)}
+                                "failed": sorted(failed),
+                                "universe": sorted(universe)}
             continue
 
         best = prev.get("best", 0)
         prev_failed = frozenset(prev.get("failed", []))
+        prev_universe = frozenset(prev.get("universe", []))
+
+        # The verifier gains checks. A document measured at 45 of 50 that now
+        # scores 44 of 58 has not regressed - eight new checks arrived and it
+        # failed one of them. Comparing raw counts across two different
+        # denominators would call that a regression on every document in the
+        # corpus and make the ratchet useless the day a check is added.
+        # So only checks that existed at BOTH marks are compared.
+        common = prev_universe & universe
+        if not common:
+            # No recorded universe (older mark): fall back to the check ids that
+            # appear in either failed set, which is all we can know.
+            common = prev_failed | failed
+        same_denominator = (out_of == prev.get("out_of", out_of))
 
         # Two ways to regress, and the second one is the one a score cannot see.
         # A fix can make one check pass and another fail: the score stays at 30 of
         # 50, a score-only ratchet says nothing got worse, and a defect has quietly
         # replaced another. So a check that used to pass and now fails is a
         # regression even when the total is unchanged or higher.
-        if score < best:
+        new_failures = sorted((failed & common) - prev_failed)
+
+        if same_denominator and score < best:
             regressions.append((doc, score, best, out_of,
-                                sorted(prev_failed - failed), "score fell"))
-        else:
-            new_failures = sorted(failed - prev_failed)
-            if new_failures:
-                regressions.append((doc, score, best, out_of,
-                                    new_failures, "check(s) newly failing"))
-            elif not check_only and (score > best or len(failed) < len(prev_failed)):
-                ratchet[doc] = {"best": max(score, best), "out_of": out_of,
-                                "failed": sorted(failed)}
+                                new_failures, "score fell"))
+        elif new_failures:
+            regressions.append((doc, score, best, out_of,
+                                new_failures, "check(s) newly failing"))
+        elif not check_only and (score > best or
+                                 len(failed & common) < len(prev_failed & common)):
+            ratchet[doc] = {"best": max(score, best), "out_of": out_of,
+                            "failed": sorted(failed),
+                            "universe": sorted(universe)}
 
     if not check_only:
         json.dump(ratchet, open(RATCHET, "w", encoding="utf-8"), indent=2, sort_keys=True)

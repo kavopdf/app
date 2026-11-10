@@ -1,7 +1,7 @@
 # Google-render baseline
 
 Every document, measured by `verify_google.py` against the PDF that Google Docs
-itself exports. A document passes only when all 31 checks pass.
+itself exports. A document passes only when every check passes.
 
 The instrument: the docx goes to Drive, Drive converts it to a Google Doc, that
 document is exported as PDF, and the export is compared to the original. See
@@ -241,15 +241,19 @@ monotonic, honoured, at about 95 % of the value asked. The classes are open agai
 open class in the corpus. The measurement lives in `calibrate.py`; the fix it implies is a
 multiplier of 1/0.95 where the engine writes the line height.
 
-## Re-baselined 2026-11-10 for the 50-check verifier
+## Re-baselined 2026-11-10 - the verifier now carries 58 checks
 
-The verifier grew from 31 checks to 50. Seventeen were added because an audit asked what
+The verifier grew from 31 to 58. Twenty-seven were added in two audits that asked what
 the comparison actually catches and the answer was: position well, everything else
 shallowly. Fonts and colours were compared as sets rather than per span, images and links
 as counts rather than by position or target, and stroked lines were not read at all -
 which is every table border in the corpus, and the defect reported by eye as 'the table
 border is drawn over the text'.
 
-Scores from the 31-check verifier are not comparable with these, so every score cell is
+Scores from an older verifier are not comparable with these, so every score cell is
 empty again and the whole corpus is being re-measured. The old table is kept unchanged as
 BASELINE-31checks.md.
+
+The denominator is whatever `verify_google.py` prints - 58 today. Rows written by an
+older verifier keep their own denominator, and `ratchet.py` compares only the checks that
+existed at both marks, so adding a check never reads as a regression on every document.

@@ -23,7 +23,7 @@ THRESHOLDS (a document passes only if every one holds)
   position      median dy < 3 pt, worst dy < 15 pt, within 10 pt > 95 %, order > 95 %
   visual        no invisible text, no text-on-text, no page overflow, no extra page
 """
-import sys, json, re, collections
+import os, sys, json, re, collections
 
 try:
     import fitz  # PyMuPDF
@@ -800,7 +800,27 @@ def compare(src_path, gd_path):
     }
 
 
+def all_check_ids():
+    """Every check id this verifier knows, discovered by running it on two empty
+    documents. Nothing is hard-coded, so adding a check updates the universe
+    automatically and a stale list cannot silently hide a regression."""
+    import tempfile
+    d = tempfile.mkdtemp(prefix="ids-")
+    a = os.path.join(d, "a.pdf")
+    b = os.path.join(d, "b.pdf")
+    for path in (a, b):
+        doc = fitz.open()
+        doc.new_page()
+        doc.save(path)
+        doc.close()
+    return sorted(compare(a, b)["checks"])
+
+
 def main(argv):
+    if "--list-checks" in argv:
+        for cid in all_check_ids():
+            print(cid)
+        return 0
     if len(argv) < 3:
         print(__doc__)
         return 2

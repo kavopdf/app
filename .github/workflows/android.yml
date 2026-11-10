@@ -27,22 +27,13 @@ jobs:
   # This is the job that makes a regression unable to ship: if a document gets worse,
   # this fails, the build job is not reached, and no APK is published.
   # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
-  # The regression gate, on every push.
-  #
-  # gate.py compares 208 converted documents against base208.json and fails on any
-  # document that got worse. It was not in CI, and on 7 Nov a change to a tool script
-  # was committed, overwritten by a later commit made from a stale copy, and nothing
-  # noticed until it was read by hand.
-  #
-  # The build job needs this one, so a document that got worse stops the APK instead of
-  # shipping inside it.
-  # ---------------------------------------------------------------------------
   regression:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # google-gate.sh asks git for the engine commit
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -71,6 +62,30 @@ jobs:
             echo "A gate that runs on an empty corpus passes everything, so this fails."
             exit 1
           fi
+
+      # ---------------------------------------------------------------------
+      # The gates that see what gate.py cannot.
+      #
+      # gate.py scores blank, blocks, extra, lines, missing, nobg, pages and
+      # reflines. Not one of those moves when text lands in the wrong place - the
+      # w:framePr change passed this gate, shipped as 3.53.5 and broke the stamp on
+      # the phone with every count identical. base208.json has no position field at
+      # all, so this gate can never see a position regression no matter how the
+      # thresholds are set.
+      #
+      # ratchet.py is the one that can: it holds, per document, the best score ever
+      # reached AND the set of failing checks at that point, and fails if either
+      # falls. It reads committed files only, so it runs here without a network.
+      #
+      # It is not a substitute for the Google render - only a Drive round trip can
+      # see what Docs does - but it stops a commit that lowers a document's record,
+      # and that is free.
+      # ---------------------------------------------------------------------
+      - name: Ratchet - no document may fall below its best ever record
+        run: |
+          set -e
+          python3 tools/p2w-bench/ratchet.py --check
+          bash tools/p2w-bench/google-gate.sh
 
       - name: Verify the engine and record its classpath
         run: bash tools/verify-engine.sh
