@@ -894,9 +894,10 @@
       "41_block_spacing",
       "47_margins",
       "53_embedded_faces",
-      "54_image_dpi"
+      "54_image_dpi",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -955,7 +956,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "12_stamp_across_page_break": {
@@ -978,9 +980,10 @@
       "36_underline_rules",
       "47_margins",
       "53_embedded_faces",
-      "55_orientation_mix"
+      "55_orientation_mix",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -1039,7 +1042,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "13_stamp_non_english": {
@@ -1056,9 +1060,10 @@
       "30_ink_where_blank_was",
       "35_rotation",
       "47_margins",
-      "53_embedded_faces"
+      "53_embedded_faces",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -1117,7 +1122,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "14_stamp_chars_positioned_td": {
@@ -1132,9 +1138,10 @@
       "25_invisible_text",
       "35_rotation",
       "47_margins",
-      "53_embedded_faces"
+      "53_embedded_faces",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -1193,7 +1200,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "15_stamp_on_scanned_page": {
@@ -1214,9 +1222,10 @@
       "42_alignment_mix",
       "45_char_accuracy",
       "47_margins",
-      "53_embedded_faces"
+      "53_embedded_faces",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -1275,11 +1284,12 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "16_right_aligned_amounts_txtpos": {
-    "best": 37,
+    "best": 38,
     "failed": [
       "01_page_count",
       "02_text_run_count",
@@ -1302,7 +1312,7 @@
       "53_embedded_faces",
       "55_orientation_mix"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -1361,11 +1371,12 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "17_three_column_widths_txtpos": {
-    "best": 42,
+    "best": 43,
     "failed": [
       "02_text_run_count",
       "07_table_rows",
@@ -1383,7 +1394,7 @@
       "47_margins",
       "53_embedded_faces"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -1442,11 +1453,12 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "18_centred_heading_left_body_txtpos": {
-    "best": 53,
+    "best": 54,
     "failed": [
       "18_median_dy",
       "32_stroke_lines",
@@ -1454,7 +1466,7 @@
       "47_margins",
       "53_embedded_faces"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -1513,11 +1525,12 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "19_hanging_indent_txtpos": {
-    "best": 52,
+    "best": 53,
     "failed": [
       "09_font_names",
       "23_line_pitch",
@@ -1526,7 +1539,7 @@
       "47_margins",
       "53_embedded_faces"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -1585,11 +1598,12 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "20_numbered_list_separate_column_txtpos": {
-    "best": 47,
+    "best": 48,
     "failed": [
       "09_font_names",
       "19_worst_dy",
@@ -1602,7 +1616,7 @@
       "47_margins",
       "53_embedded_faces"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -1661,7 +1675,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "21_form_labels_x60_values_x300_txtpos": {
