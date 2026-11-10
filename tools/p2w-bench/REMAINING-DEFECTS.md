@@ -4976,87 +4976,89 @@ paragraphs to where their own y falls; if `IN ORDER` (the upper line) still come
 patches that produced it were integrated by hand and the gate alone cannot see position or order.
 
 
-## Class 20_within_10pt — CLOSED UNFIXABLE, 10 Nov
+## Class 20_within_10pt — OPEN, reopened 10 Nov; model measured, fix attempted and reverted
 
-The largest measured class in `BASELINE.md`: **89 of the 101 measured documents fail
-`20_within_10pt`** (81 also fail `19_worst_dy`, 75 `22_reading_order`). Ten documents that fail
-this check and little else were converted, uploaded to Drive as Google Docs, exported as PDF and
-scored: 27, 33, 34, 26, 31, 314, 316, 320, 321, 362. Every one reproduced its `BASELINE.md` row,
-so the instrument is sound and the class is real.
+The largest open class in `BASELINE.md`: **107 of the 208 measured documents fail
+`20_within_10pt`**. The 10 Nov closure of this class ("Google Docs has no exact line spacing") was
+wrong and is withdrawn: Google Docs does have exact line spacing, it just does not read
+`w:lineRule="exact"` the way Word does. What follows was measured through Drive on purpose-built
+probes and then on real documents, and it replaces the earlier reading of the same evidence.
 
-### Root cause, measured, one sentence
+### The model, measured
 
-**Google Docs has no exact line spacing.** It reads `w:line` as a MULTIPLE - `w:line / 240` - of
-the paragraph's own natural line height, which it takes from the paragraph mark's size (about
-1.15 x the size, 1.17 x at large sizes). This writer positions every line by giving it an exact
-line box (`w:lineRule="exact"`, `DocxWriter.flowFromBox`), so under Google every line lands at a
-height the writer did not ask for, and the error accumulates down the page.
+A probe of one paragraph style, one face, eight identical lines, zero margins, rendered through
+Drive and exported as PDF. Three variables were moved one at a time.
 
-### The measurements
+**1. `w:line` is a MULTIPLE of the face's own line height, not a height.**
+At 10 pt Arial, boxes of 240/300/360/480/600 twips came back at 11.5/14.37/17.25/23.0/28.75 pt -
+a constant 0.9583 of the value asked. The same probe at 14 pt came back at 1.3417 of it and at
+20 pt at 1.9167. So
 
-A probe document (four faces, four sizes, `w:line` 200 and 280 twips, `lineRule` exact and auto)
-was converted to a Google Doc and exported as PDF:
+    rendered advance = (w:line / 240) * lineHeight(face, size)
 
-| mark size | `w:line` asked | rendered pitch | ratio |
+and the ratio is the face's line height over 12. It is the RUN's size that sets it, not the
+paragraph mark's: a paragraph with mark 10 pt / run 10 pt and one with mark 20 pt / run 10 pt both
+advance by 0.069 em of 10 pt, while mark 10 pt / run 20 pt advances by 0.069 em of 20 pt. The face
+matters as much as the size - at 10 pt, `w:line`=240 measured 11.5 for Arial, 11.45 for Times New
+Roman, 10.49 for Courier New, 11.7 for Times-Roman, 12.23 for Helvetica, 12.77 for Liberation
+Serif - and those are the PDF's own font names, which Google substitutes. **No `w:line` value can
+place a baseline without knowing the substitute face's line height.**
+
+**2. `w:before` is honoured exactly, in points.** 20 pt came back 20 pt; 40/80/120/160 pt came
+back 40/80/120/160 pt. It is the one vertical length Google reads as a length.
+
+**3. With the box cut to a hairline, the advance is `before + 0.069 * size` - font-independent.**
+`w:line="1"` with `w:before`=20 pt came back at 20.55 pt at 8 pt, 20.69 at 10 pt, 20.97 at 14 pt,
+21.38 at 20 pt, and 20.68 for Courier New and 20.69 for Times New Roman at 10 pt: 0.069 em, to
+0.01 pt, whichever face is substituted. A hairline box does not clip - 20 pt text in a 1-twip box
+came back 22.34 pt tall, the face's full glyph height - and LibreOffice renders the same probe at
+`before + 0.1` with full glyph height, so the two engines agree to a tenth of a point.
+
+Also measured: the first baseline of a page sits 0.0565 em below the paper's top edge (0.45 pt at
+8 pt, 0.56 at 10 pt, 1.13 at 20 pt), independent of the box height; and the first baseline of a
+table cell sits 0.92 em below the row's top edge, which is where this writer has always put it.
+
+### What that means for the two engines
+
+    Word / LibreOffice   advance = w:before + w:line
+    Google Docs          advance = w:before + (w:line/240) * lineHeight(face, size)
+
+These are equal for every size and every face only when `w:line` is small enough to hit Google's
+floor, i.e. a hairline box. The earlier note in this file concluded that "no `(w:line, w:before)`
+pair is exact in both engines"; that is true of the pairs it tested and false of `w:line`=1, which
+is why the class is open again rather than closed.
+
+### The fix that was tried on 10 Nov, and why it was reverted
+
+The flowing-line model in `DocxWriter` was rewritten to the measured one: every flowing line
+carries a hairline box (`w:line = 0.069 em` in twips) and an absolute `w:before` measured from the
+reader's real position, with the first line of a page placed at 0.0565 em and the first line of a
+cell at 0.92 em. `precommit --no-corpus` exited 0 and the engine's own suite passed (81 + 188 + 41
++ 29 checks). Twenty documents - the ten that fail this check and little else, plus ten that
+already scored well - were converted, put through Drive and scored.
+
+| document | `20_within_10pt` before | after | other checks |
 |---|---|---|---|
-| 10 pt, Arial | 200 tw (10 pt) | 9.59 | 0.959 |
-| 10 pt, Arial | 280 tw (14 pt) | 13.42 | 0.959 |
-| 10 pt, Times | 200 / 280 tw | 9.59 / 13.42 | 0.959 |
-| 8 pt, Arial | 200 / 280 tw | 7.66 / 10.73 | 0.766 |
-| 10 pt, `w:line`=240 auto | - | 11.50 | 1.15 x size |
+| 34_monospace_document | 14 % | **100 %** | 31/31 |
+| 321_auditors_report | 56 % | **100 %** | 31/31 |
+| 26_footnote_marker_bottom_note | 74 % | **100 %** | 30/31 |
+| 18_centred_heading_left_body | 100 % | 100 % | 31/31 (median dy 4.7 -> 0.4) |
+| 313_power_of_attorney | 100 % | 100 % | 31/31 (median dy 3.0 -> -1.1) |
+| 316_contract_with_schedules | 57 % | 57 % | 30/31 (worst dy 16.3 -> 11.4) |
+| 27_two_column_left_short | 94 % | 94 % | **lost** line_pitch, ink_where_blank |
+| 31_times_body_arial_headings | 93 % | 66 % | **lost** text_overlap, blank_where_ink |
+| 35_four_typefaces_one_page | 100 % | 50 % | **lost** within_10pt, blank_where_ink |
+| 33_sans_nondefault_body | 49 % | 49 % | **lost** worst_dy |
+| 361_product_catalogue_grid | 97 % | 97 % | **lost** text_overlap |
+| 414 / 415 (image pages) | 0 % | 50 % | **lost** line_pitch |
 
-The ratio follows `natural(size) / 240`, not the rule: 0.9586 at 10 pt and 0.766 at 8 pt are
-`1.15 x size / 240` to three digits, and the face does not matter. Google's own DOCX export of
-the same document confirms the reading - it returns `w:line="219" w:lineRule="auto"` where the
-engine wrote `w:line="219" w:lineRule="exact"`.
+Five of the ten failing documents went to a full 31/31 and two more improved their median dy by
+3-4 pt, but seven documents got worse on at least one check (583 -> 583 checks passed overall),
+so the change was reverted under the ratchet. The regressions are all in the paths the rewrite did
+not reach: columns and table cells, where the cell's own flow state (`ctx.flowY`) and the
+`afterTablePt` edge were only partly converted, and the image pages, where the first line's gap is
+measured from an anchored shape rather than from a baseline.
 
-On real documents that is the whole class. `321_auditors_report` draws 14.0 pt lines at 9.5 pt;
-the render gives 13.45, so dy runs -0.5, -1.1, -1.6, -2.1 ... and 44 % of its words are past
-10 pt by the foot of the page. `34_monospace_document` draws 12.4 pt lines at 8.5 pt; the render
-gives 10.44 and the drift reaches 73.9 pt. `26_footnote_marker_bottom_note` is the same at 7.5 pt.
-
-### Why it cannot be fixed with one construct
-
-Let `L` be `w:line` in twips, `B` the gap in `w:before`, `s` the size in points, `f` Google's
-natural-line factor. The two engines compute the pitch of a line differently:
-
-    Word / LibreOffice   pitch = L/20 + B/20
-    Google Docs          pitch = (L/240) * f * s + B/20
-
-Asking both for the page's own pitch `P` leaves `L * (f*s/240 - 1/20) = 0`: the only solution is
-`f*s = 12`, i.e. one size, 10.4 pt. **No `(w:line, w:before)` pair is exact in both engines.**
-Either the file is right in Word and wrong in Google by up to 25 % at small sizes, or right in
-Google and wrong in Word by the same margin. The construct that would settle it - an exact line
-box, or a document grid (`w:docGrid w:linePitch`) - is one Google Docs does not implement.
-
-### What was tried, and why it was reverted
-
-One part of the class *is* absolute in both engines: a gap the writer encodes as a whole line box
-- the spacer above a table and the 4 pt carrier under it - which Google collapses to about 1 % of
-its value because the mark is 1 pt. Setting that mark to 10 pt (`GAP_MARK_SZ`) makes the multiple
-return the gap to within 2.3 %, and Word and LibreOffice see exactly the same `w:line` as before.
-
-Measured on Google over the same ten documents plus ten that already scored well:
-
-| document | before | after |
-|---|---|---|
-| 316_contract_with_schedules | 20: 57 % | **67 %** |
-| 33_sans_nondefault_body | 20: 49 % | **passes** |
-| 314_tender_rfp_boq | 20: 23 % | **95 %** |
-| 320_balance_sheet_statutory | 20: 29 % | **passes** |
-| 362_price_list_dense | 20: 1 % | **passes** |
-| 314_tender_rfp_boq | 1 page | **2 pages** |
-| 320_balance_sheet_statutory | 1 page | **2 pages** |
-| 35_four_typefaces_one_page | 30/31 | **25/31** |
-
-The target check improved on five of the ten, and four documents got worse, so the change was
-reverted under the ratchet. The two regressions are the informative ones: the gaps had been
-collapsing to nothing, and that collapse was *paying for* the table-height error recorded as
-D-26 - the same accidental compensation D-01 recorded. Honouring the true gap on a page whose
-table the model over-measures pushes the table's last rows past the paper. 35 is worse for the
-same reason in the other direction: its content sits 13-17 pt low once the gap is real.
-
-**So the class cannot close before the table height is right, and the line-pitch half cannot close
-at all.** Closing it needs either an exact-position construct Google Docs does not implement, or a
-deliberate decision to make the .docx right for Google and wrong for Word - which is a product
-decision, not an engine one, and is not taken here.
+**So the class is fixable and the mechanism is now measured; what is missing is the same model in
+the cell, column and anchored-shape paths, and a pass that proves the 208-document corpus does not
+move backwards.** A rewrite that reaches only the page body buys 5 documents and costs 7.

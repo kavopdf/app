@@ -21,9 +21,24 @@ WHAT IT FOUND
       asked 18 pt -> 17.1 measured   ratio 0.950
       asked 24 pt -> 22.8 measured   ratio 0.950
 
-  Consistent and linear. So exact line spacing is available, just scaled, and an
-  engine that wants a pitch of P should write P / 0.95. That is a multiplier, not
-  a redesign, and it is the single largest position defect in the corpus.
+  Consistent and linear - and that reading was still only half the model. Those
+  probes all used one face at 10-12 pt, where the ratio happens to be 0.95. Moving
+  the size and the face as well (240/300/360/480/600 twips at 10 pt, the same
+  probe at 14 pt and at 20 pt, and six faces at 10 pt) shows what the ratio is:
+
+      rendered advance = (w:line / 240) * lineHeight(face, size)
+
+  0.9583 at 10 pt Arial, 1.3417 at 14 pt, 1.9167 at 20 pt, and 1.049 / 1.170 /
+  1.223 / 1.277 for Courier New / Times-Roman / Helvetica / Liberation Serif at
+  10 pt. So w:line is a MULTIPLE of the face's line height, and no value of it
+  places a baseline without knowing the substitute face. Do NOT write P / 0.95:
+  that multiplier is one face at one size.
+
+  What Google does honour exactly is w:before (20 pt came back 20 pt, 160 pt came
+  back 160 pt), and with the box cut to a hairline the advance is
+  before + 0.069 * size whichever face is substituted (0.069 em to 0.01 pt over
+  8/10/14/20 pt Arial and 10 pt Courier New and Times New Roman). That is the
+  construct to build on; see REMAINING-DEFECTS.md, class 20_within_10pt.
 
 HOW TO USE IT
   When a class looks unfixable because "Docs does not support X", build the
@@ -32,6 +47,11 @@ HOW TO USE IT
   failed experiment is still evidence, and it stops the next run repeating it.
 
   python3 calibrate.py <a.pdf> <b.pdf> ...     # compare pitches of several exports
+
+  A probe worth rebuilding: one paragraph style, one face, 8 identical lines,
+  zero margins, w:line = 240/300/360/480/600 with lineRule="exact". Then repeat
+  it at another size, at another face, with w:line="1" plus a w:before, and with
+  a mixed mark/run size. Those four runs are what the numbers above come from.
 """
 import sys
 import warnings
