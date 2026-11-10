@@ -122,7 +122,80 @@ def cluster(doc_sets):
     return list(groups.values())
 
 
+def subclusters(cls_name, top=8):
+    """Split one class into the sub-causes hiding inside it.
+
+    A class of 126 documents is rarely one cause. If forty of them also fail
+    22_reading_order and fifty also fail 32_stroke_lines, the class is two or
+    three defects wearing one name, and a fixer that treats it as one will fix
+    the largest group and then report the rest as hard.
+
+    Documents are grouped by the check they fail most often across the class,
+    excluding the class's own checks. The biggest group is the one worth
+    attacking first.
+    """
+    rows = [r for r in read_baseline(os.path.join(HERE, "BASELINE.md"))
+            if re.match(r"\d+\s*/\s*\d+", r["score"])]
+    docs = {}
+    for r in rows:
+        failed = {c.strip() for c in r["failed"].split(",") if CHECK_RE.match(c.strip())}
+        if failed:
+            docs[r["doc"]] = failed
+
+    classes = cluster({c: {d for d, f in docs.items() if c in f} for c in
+                       {x for f in docs.values() for x in f}})
+    target = None
+    for group in classes:
+        group = sorted(group, key=lambda c: -sum(1 for f in docs.values() if c in f))
+        name = group[0] if len(group) == 1 else "%s (+%d)" % (group[0], len(group) - 1)
+        if name == cls_name or group[0] == cls_name or cls_name in name:
+            target = group
+            break
+    if target is None:
+        print("no class matching %r - run classify.py first, then copy the exact name"
+              % cls_name)
+        return 1
+
+    own = set(target)
+    members = [d for d, f in docs.items() if f & own]
+    if not members:
+        print("class %r has no documents" % cls_name)
+        return 1
+
+    # how often each outside check appears among this class's documents
+    freq = Counter()
+    for d in members:
+        for c in docs[d] - own:
+            freq[c] += 1
+    if not freq:
+        print("class %r is clean: every document fails only the class's own checks"
+              % cls_name)
+        print("one cause, %d documents" % len(members))
+        return 0
+
+    groups = defaultdict(list)
+    for d in members:
+        extras = docs[d] - own
+        best = max(extras, key=lambda c: (freq[c], c)) if extras else None
+        groups[best or "(only the class checks)"].append(d)
+
+    print("class %r - %d documents, %d outside checks" % (cls_name, len(members), len(freq)))
+    print("")
+    for label, ds in sorted(groups.items(), key=lambda kv: -len(kv[1]))[:top]:
+        print("  %3d docs  with %s" % (len(ds), label))
+        print("            e.g. %s" % ", ".join(sorted(ds)[:3]))
+    if len(groups) > top:
+        print("  ... and %d smaller groups" % (len(groups) - top))
+    print("")
+    print("Start with the largest group. Fixing it moves that many documents;")
+    print("the rest are a different cause and need their own calibration.")
+    return 0
+
+
 def main(argv):
+    if "--subclusters" in argv:
+        return subclusters(argv[argv.index("--subclusters") + 1])
+
     # ---- attempt recording mode -------------------------------------------
     if "--attempt" in argv:
         cls = argv[argv.index("--attempt") + 1]
