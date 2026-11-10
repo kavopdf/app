@@ -32,8 +32,8 @@ android {
         // them changes nothing that is displayed and takes roughly a megabyte off the APK.
         // If a translation is ever added, its folder has to be added here too.
         resConfigs "en"
-        versionCode 301
-        versionName "3.53.11"
+        versionCode 302
+        versionName "3.53.12"
 
         ndk {
             // Real phones are ARM. These two slices are the whole shipping apk and they
