@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Image to searchable PDF: a picture with a magnifier over it.
+
+  Material Symbols "image_search", 26dp, the same 960 viewport and translateY wrapper
+  as every other tool icon. Chosen from ten options; it says "look inside a picture",
+  which is what the tool does, and it does not read as a page the way Scan and PDF to
+  Word already do.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="26dp"
     android:height="26dp"
     android:viewportWidth="960"
     android:viewportHeight="960">
     <group android:translateY="960">
-        <!-- An image frame with a magnifier inside it: a picture being searched. -->
-        <path android:fillColor="#FF000000" android:pathData="M200-200h560v-560H200v560Zm0 80q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z" />
-        <path android:fillColor="#FF000000" android:pathData="M480-320q-83 0-141.5-58.5T280-520q0-83 58.5-141.5T480-720q83 0 141.5 58.5T680-520q0 30-8.5 57T646-415l94 94-56 56-94-94q-23 17-50 25t-60 8Zm0-80q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Z" />
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M240-280h480L597-444q-11-2-22.5-5t-22.5-7L450-320l-90-120-120 160Zm-40 160q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h200v80H200v560h560v-213l80 80v133q0 33-23.5 56.5T760-120H200Zm280-360Zm382 56L738-548q-21 14-45 21t-51 7q-74 0-126-52.5T464-700q0-75 52.5-127.5T644-880q75 0 127.5 52.5T824-700q0 27-8 52t-20 46l122 122-56 56ZM644-600q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Z" />
     </group>
 </vector>
