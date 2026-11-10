@@ -465,9 +465,10 @@
       "41_block_spacing",
       "47_margins",
       "53_embedded_faces",
-      "55_orientation_mix"
+      "55_orientation_mix",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -526,7 +527,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "07_stamp_over_table": {
@@ -551,9 +553,10 @@
       "35_rotation",
       "47_margins",
       "53_embedded_faces",
-      "55_orientation_mix"
+      "55_orientation_mix",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -612,7 +615,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "08_two_overlapping_stamps": {
@@ -638,9 +642,10 @@
       "35_rotation",
       "47_margins",
       "53_embedded_faces",
-      "55_orientation_mix"
+      "55_orientation_mix",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -699,7 +704,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "09_stamp_font_not_embedded": {
@@ -716,9 +722,10 @@
       "32_stroke_lines",
       "35_rotation",
       "47_margins",
-      "53_embedded_faces"
+      "53_embedded_faces",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -777,7 +784,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "10_stamp_as_image": {
@@ -802,9 +810,10 @@
       "47_margins",
       "53_embedded_faces",
       "54_image_dpi",
-      "55_orientation_mix"
+      "55_orientation_mix",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -863,7 +872,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "11_stamp_with_signature_image": {
