@@ -120,28 +120,6 @@ public final class PdfToWord {
          * margin over "Name of candidate". See {@code DocxWriter.pinnedBoxes}.
          */
         public boolean pinned;
-        /**
-         * True when every line of this paragraph was drawn INSIDE a filled band the page
-         * painted across the paper - a masthead strip, a letterhead bar, a coloured header.
-         *
-         * <p>Such a line belongs on the band, at the y the page drew it. Written as an ordinary
-         * flowed paragraph it lands slightly lower than the page put it, because a flow places
-         * a line by its {@code w:before} plus an exact {@code w:line} and each line's own box is
-         * a little taller than the page's pitch; the error then accumulates down the band.
-         * Measured before the fix: on salary-slip the {@code CIN ... TAN} line came out at
-         * 75.4-86.4 against a band that ends at 79.4, and on gst-invoice-with-qr-code the
-         * {@code GSTIN ... CIN} line at 69.8-80.8 and {@code Date ...} at 73.4-79.9 against a
-         * band ending at 73.7 - text that belongs ON the coloured band ended up on white below
-         * it, and it looks displaced.
-         *
-         * <p>The writer therefore places these lines with {@code wp:anchor} at their own page
-         * point ({@link com.kavopdf.app.engine.DocxWriter} - see {@code anchorBox}), in a
-         * one-twip wrapper paragraph so the flow never moves. It is deliberately NOT
-         * {@code w:framePr}: Google Docs ignores frame positioning entirely and renders such a
-         * paragraph as ordinary body text at the left margin, which is the same defect in a
-         * different place.
-         */
-        public boolean inBand;
         public int column;           // which column band it sits in
         /** The lines the PDF actually drew, in order. A .txt has no paragraph concept, so the
          *  plain-text output keeps them instead of hard-wrapping a paragraph back into lines

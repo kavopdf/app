@@ -832,10 +832,6 @@ public final class DocxWriter {
         // so must not charge the flow. Decided from the page's own geometry before anything is
         // written, so both of the budget guard's passes see the same answer (see pinShortParas).
         pinShortParas(page);
-        // Which of this page's lines were drawn on a filled band, and so must be placed at the
-        // page's own y rather than flowed. Same place as pinShortParas, for the same reason:
-        // decided once, from the page's geometry, before anything is written (see pinBandParas).
-        pinBandParas(page);
         for (Object block : page.blocks) emitBlock(sb, block, ctx);
     }
 
@@ -1928,32 +1924,11 @@ public final class DocxWriter {
      * every line on a page whose own white space is wider than the flow may spend.
      */
     private static void anchorBox(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b, Ctx ctx) {
-        anchorBox(sb, p, b, ctx, ASCENT);
-    }
-
-    /**
-     * The same box, with the line's BASELINE put on the page's own baseline.
-     *
-     * <p>{@link #anchorBox} places the box top {@link #ASCENT} em above the baseline, and a
-     * text box then puts the baseline {@link #LINE_BASE} of the box's own height below its top.
-     * Those two do not agree: the baseline comes out at
-     * {@code ASCENT - LINE_BASE * LINE_FACTOR} = 0.25 em ABOVE the page's, which is invisible on
-     * a stamp and is not invisible on a header band. Measured on the corpus: every anchored
-     * band line was high by exactly 0.24-0.25 em of its own size (12 pt line -3.05 pt, 10.5 pt
-     * -2.65, 9.7 pt -2.37, 6.8 pt -1.75), which is that constant and nothing else.
-     *
-     * <p>So this overload takes the top offset in em and the caller passes
-     * {@code LINE_BASE * LINE_FACTOR} - the document's own convention for where a baseline sits
-     * in a box of a given height - instead of {@link #ASCENT}. The result is that the baseline
-     * lands on {@code b.y}, which is what the page drew.
-     */
-    private static void anchorBox(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b, Ctx ctx,
-                                  float topEm) {
         StringBuilder inner = new StringBuilder(256);
         lineParagraph(inner, p, b);
         float wPt = Math.max(4f, b.right - b.x) * 1.12f + b.size * 1.5f;
         float hPt = Math.max(4f, b.size * LINE_FACTOR);
-        anchor(sb, ctx, b.x, b.y - topEm * b.size, wPt, hPt, inner.toString(), 0f, -1, 0.6f);
+        anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), 0f, -1, 0.6f);
     }
 
     private static String hex(int rgb) {
@@ -2156,10 +2131,6 @@ public final class DocxWriter {
         // for its own height first, and the table - which table() places at its own measured
         // top - is pushed down by exactly that. It is anchored at the point the page drew it
         // instead, and charges the flow nothing. See pinShortParas().
-        if (p.inBand && !anyRotated && !ctx.positioned) {
-            bandBoxes(sb, p, ctx);
-            return;
-        }
         if (p.pinned && !anyRotated && !ctx.positioned) {
             pinnedBoxes(sb, p, ctx);
             return;
@@ -2454,126 +2425,6 @@ public final class DocxWriter {
     }
 
     /**
-     * A band narrower than this fraction of the paper is not a masthead band.
-     *
-     * <p>A masthead strip is painted EDGE TO EDGE - it bleeds to the trim, so its width is the
-     * paper's own. A panel inside the text column is not: it starts and ends at the margins. The
-     * two populations are cleanly separated and the corpus says so - measured over the 208
-     * documents, every masthead fill spans 1.000 of the paper (0.0..595.3 on A4, 0.0..841.9 on
-     * the landscape pages) and every content panel spans 0.906 (28.0..567.3). At 0.9 both
-     * matched and the rule took 22 paragraphs of grey code panel on
-     * 380_runbook_terminal_output, 383_api_docs_page and their family out of the flow; at 0.99
-     * only the mastheads do. A code panel's lines are the page's body text and belong in the
-     * flow.
-     */
-    private static final float BAND_MIN_WIDTH_FRAC = 0.99f;
-
-    /** A band taller than this fraction of the paper is a panel or a page background. */
-    private static final float BAND_MAX_HEIGHT_FRAC = 0.25f;
-
-    /**
-     * True when this filled shape is a rectangle, however the page happened to draw it.
-     *
-     * <p>A band is usually a path rather than a preset rectangle - on salary-slip and on
-     * gst-invoice-with-qr-code the masthead is a four-point closed freeform, so testing
-     * {@code kind == 0} alone matched nothing and the rule silently did nothing. A path counts
-     * only when its own points are the four corners of its bounding box: a triangle, an
-     * arrowhead or a seal's circle has a box too, and its box is not its fill.
-     */
-    private static boolean isBandRect(Shape s) {
-        if (s.kind == 0) return true;
-        if (s.kind != 2 || s.freeform == null) return false;
-        if (s.freeform.size() != 4) return false;
-        float right = s.xPt + s.wPt, bottom = s.topPt + s.hPt;
-        for (float[] c : s.freeform) {
-            if ((int) c[0] == 2) return false;              // a curve is not a corner
-            if (c.length < 3) return false;
-            boolean onX = Math.abs(c[1] - s.xPt) <= 0.5f || Math.abs(c[1] - right) <= 0.5f;
-            boolean onY = Math.abs(c[2] - s.topPt) <= 0.5f || Math.abs(c[2] - bottom) <= 0.5f;
-            if (!onX || !onY) return false;
-        }
-        return true;
-    }
-
-    /**
-     * Mark the paragraphs the page drew on a filled band.
-     *
-     * <p>THE DEFECT. The band is not too short. The header's words are ordinary flowed
-     * paragraphs, placed by {@code w:before} plus an exact {@code w:line}, so each line lands a
-     * little lower than the page put it and the error accumulates down the strip. Measured: on
-     * salary-slip-corporate the {@code CIN ... TAN} line came out at 75.4-86.4 against a band
-     * ending at 79.4; on gst-invoice-with-qr-code the {@code GSTIN ... CIN} line at 69.8-80.8
-     * and {@code Date ...} at 73.4-79.9 against a band ending at 73.7. Words that belong ON the
-     * coloured band therefore sat on white below it.
-     *
-     * <p>THE RULE, DERIVED FROM GEOMETRY. The engine never reads the words. A band is a fill the
-     * page itself painted: a rectangle, however the page drew it ({@link #isBandRect}), that is
-     * filled and not a stamp's frame, spanning the paper ({@link #BAND_MIN_WIDTH_FRAC}) and short
-     * enough to be a strip rather than a panel ({@link #BAND_MAX_HEIGHT_FRAC}). A paragraph
-     * belongs on it when EVERY line of it has its BASELINE inside that rectangle - a line that
-     * was drawn beside or below the band keeps its own place in the flow.
-     *
-     * <p>WHY THE WIDTH TEST IS LOAD-BEARING. A table's own row shading is a fill too, and the
-     * rows of a striped table are exactly the shape this rule is looking for: on salary-slip the
-     * three banded rows at 430.8-449.2, 467.6-486.0 and 504.4-522.8 would all have matched, and
-     * anchoring their cells would take the row height away from the table that owns them. A
-     * table row is at most as wide as the table; a masthead band runs the width of the paper.
-     * That single test is what separates the two.
-     *
-     * <p>Measured with {@code -Dp2w.debugBand} on the 208-document corpus - see the report.
-     */
-    private static void pinBandParas(PdfToWord.Page page) {
-        boolean debug = System.getProperty("p2w.debugBand") != null;
-        java.util.List<Shape> bands = new ArrayList<>();
-        for (Object o : page.blocks) {
-            if (!(o instanceof Shape)) continue;
-            Shape s = (Shape) o;
-            if (s.fillRgb < 0 || s.consumed || s.stampFrame) continue;
-            if (!isBandRect(s)) continue;
-            if (page.width <= 0f || page.height <= 0f) continue;
-            if (s.wPt < page.width * BAND_MIN_WIDTH_FRAC) continue;
-            if (s.hPt < 4f || s.hPt > page.height * BAND_MAX_HEIGHT_FRAC) continue;
-            bands.add(s);
-        }
-        if (bands.isEmpty()) return;
-        for (Object o : page.blocks) {
-            if (!(o instanceof PdfToWord.Para)) continue;
-            PdfToWord.Para p = (PdfToWord.Para) o;
-            if (p.stamp || p.pinned || p.inBand || p.boxes.isEmpty()) continue;
-            boolean anyRotated = false;
-            for (PdfToWord.Box b : p.boxes) if (b.rotated) anyRotated = true;
-            if (anyRotated) continue;
-            Shape owner = null;
-            for (Shape s : bands) {
-                boolean all = true;
-                for (PdfToWord.Box b : p.boxes) {
-                    if (b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
-                    // The BASELINE is the datum a line is drawn on, and it is the one number
-                    // that is always the page's own. Box.bottom is not filled in on this path
-                    // (it reads 0), and guessing a descent from the em put the CIN line's foot
-                    // 5 pt below the band on salary-slip, so the line that most needed this
-                    // rule was the one it missed. A descender that hangs a point below the
-                    // band edge hangs there in the PDF too - that is the page's business.
-                    if (b.x < s.xPt - 0.6f || b.right > s.xPt + s.wPt + 0.6f
-                            || b.y < s.topPt - 0.6f || b.y > s.topPt + s.hPt + 0.6f) {
-                        all = false;
-                        break;
-                    }
-                }
-                if (all) { owner = s; break; }
-            }
-            if (owner == null) continue;
-            p.inBand = true;
-            if (debug) {
-                System.err.println("BAND page=" + page.number + " text=" + p.boxes.get(0).text()
-                        + " lines=" + p.boxes.size()
-                        + " band=" + owner.topPt + ".." + (owner.topPt + owner.hPt)
-                        + " x=" + owner.xPt + ".." + (owner.xPt + owner.wPt));
-            }
-        }
-    }
-
-    /**
      * A pinned paragraph: each of its lines anchored where the page drew it, as the text box
      * {@link #anchorBox} writes.
      *
@@ -2594,7 +2445,8 @@ public final class DocxWriter {
      * inside a closed outline belongs to the outline rather than to the flow (see
      * {@link #containerOf}). A drawing's page-relative offset is the one positioning construct
      * Google Docs honours, so the words land on the rectangle there, in Word and in LibreOffice
-     * alike. Each line is its own drawing, so no two of them can drift against each other.     *
+     * alike. Each line is its own drawing, so no two of them can drift against each other.
+     *
      * <p>AND IT STILL COSTS THE FLOW NOTHING. The wrapper paragraph is one twip tall
      * ({@code w:line="1" w:lineRule="exact"}), so the table that follows is placed from the
      * flow's position exactly as it was while the frame held the flow still - the 19.4 pt step
@@ -2605,60 +2457,6 @@ public final class DocxWriter {
             if (b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
             anchorBox(sb, p, b, ctx);
         }
-    }
-
-    /**
-     * A paragraph the page drew on a filled band: each line as an anchored text box at the
-     * page's own point.
-     *
-     * <p>This is {@link #anchorBox}, the construct a rotated stamp and a label inside a drawn
-     * outline already use - a {@code wp:anchor} drawing with a one-twip wrapper paragraph. It
-     * is used here for the reason the band defect exists at all: the band's words are the
-     * page's own text at the page's own y, and a flow cannot reproduce a y it did not choose.
-     *
-     * <p>WHY NOT A FRAME. The first attempt at this fix wrote the same lines with
-     * {@code w:framePr} and measured well in LibreOffice, but it cannot ship: Google Docs
-     * ignores frame positioning entirely and renders such a paragraph as ordinary body text at
-     * the LEFT MARGIN. That was confirmed on a real phone for the stamp and for admit-card's
-     * "AFFIX PHOTOGRAPH" - the words left the band and the photo box and went to the margin.
-     * A {@code wp:anchor} is a drawing, and every reader honours a drawing's page offset.
-     *
-     * <p>THE TEXT STAYS TEXT. {@code lineParagraph} writes real runs inside the box's
-     * {@code txbxContent}, so the words are selectable, editable and searchable, and they are
-     * still in the document's text (gate.py reads them out of the {@code w:t} leaves). Nothing
-     * here is rasterised.
-     *
-     * <p>THE FLOW DOES NOT MOVE. {@link #anchorBox} wraps the drawing in a paragraph whose
-     * {@code w:line} is one twip, and {@code para()} returns without the flowed {@code resync},
-     * so the only height the flow pays for a band line is that twip. What the flow is then told
-     * is the truth about where the reader really is - see the note in the body - and the next
-     * flowed paragraph and the table below compute their own space-before from their own
-     * measured target ({@link #place} is absolute), so the table below the masthead keeps the
-     * top the page gave it. {@code pageFits} skips these paragraphs for the same reason: the
-     * two measures of one page must not disagree about what is in its flow.
-     */
-    private static void bandBoxes(StringBuilder sb, PdfToWord.Para p, Ctx ctx) {
-        int lines = 0;
-        for (PdfToWord.Box b : p.boxes) {
-            if (b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
-            // On the baseline, not 0.25 em above it - see the overload's note. A band is 34 pt
-            // tall and the words have to stay on it.
-            anchorBox(sb, p, b, ctx, LINE_BASE * LINE_FACTOR);
-            lines++;
-        }
-        if (lines == 0) return;
-        // WHERE THE READER REALLY IS. Each anchored line carries a one-twip wrapper paragraph
-        // and that is the only height the flow pays for it, so the reader is still at the top of
-        // the sheet however far down the band it drew. Recording that is what keeps the flow
-        // from moving: a table below the masthead measures its own spacer from this position
-        // (see {@link #table}), and if the position were left unknown - {@code flowY < 0} on the
-        // page's first block - the spacer branch would not run at all and the table would start
-        // 4 pt above the top rule the page drew. Measured on salary-slip-corporate: table top
-        // 91.35 against the page's 95.35 with the position left unknown, 95.25 with it recorded.
-        float topPt = ctx.newPage || ctx.flowY < 0f
-                ? 0f : ctx.flowY + (1f - LINE_BASE) * ctx.flowBoxPt;
-        resync(ctx, topPt, 0, lines);
-        ctx.newPage = false;
     }
 
     /**
@@ -2904,9 +2702,6 @@ public final class DocxWriter {
                 // stamp's line does - the two measures of a page must not disagree about what is
                 // in its flow.
                 if (p.pinned) continue;
-                // A line on a filled band is written as an anchored box and charges the flow
-                // nothing either, for the same reason.
-                if (p.inBand) continue;
                 float top = Float.MAX_VALUE;
                 float size = 0f;
                 for (PdfToWord.Box b : p.boxes) {
