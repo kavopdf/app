@@ -32,6 +32,7 @@ WHAT IT FOUND
 USAGE
   python3 prove_checks.py
 """
+import glob
 import json
 import os
 import random
@@ -45,8 +46,14 @@ import fitz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 VERIFY = os.path.join(HERE, "verify_google.py")
-CORPUS = "/scratch/work/a3/corpus"
-WORK = "/scratch/work/a3/proof"
+# Paths are given, not assumed. The first version of this file hardcoded
+# /scratch/work/a3, the sandbox directory of the session that wrote it, so the
+# tool was committed to the repository and could not run anywhere else - the same
+# mistake audit_sim.py made. Defaults are relative to this file and to a temporary
+# directory, so a fresh clone works.
+CORPUS = os.environ.get("P2W_CORPUS", os.path.join(HERE, "..", "..", "corpus"))
+WORK = os.environ.get("P2W_WORK", tempfile.mkdtemp(prefix="prove-"))
+RENDERS = os.environ.get("P2W_RENDERS", "")   # optional: pdfs rendered from the engine
 
 BASE = "01_stamp_rotated_15deg_upright.pdf"
 IMG_DOC = "10_stamp_as_image.pdf"
@@ -54,13 +61,26 @@ LINK_DOC = "44_coloured_underlined_hyperlinks.pdf"
 
 
 def run(src, gd):
-    out = tempfile.mktemp(suffix=".json")
-    subprocess.run([sys.executable, VERIFY, src, gd, "--json", out], capture_output=True)
+    """Measure a pair, and return None rather than crashing when it cannot.
+
+    tempfile.mktemp returned a path under /scratch/tmp, which does not exist, so
+    verify_google.py never wrote the file and the open() below raised instead of
+    reporting. A proof harness that dies on the first missing file proves nothing.
+    """
+    fd, out = tempfile.mkstemp(suffix=".json")
+    os.close(fd)
+    subprocess.run([sys.executable, VERIFY, src, gd, "--json", out],
+                   capture_output=True)
     try:
-        return json.load(open(out))
+        with open(out) as f:
+            return json.load(f)
+    except Exception:
+        return None
     finally:
-        if os.path.exists(out):
+        try:
             os.remove(out)
+        except OSError:
+            pass
 
 
 def path(name):
@@ -313,9 +333,9 @@ def real_evidence():
     fired, varied = set(), set()
     values = {}
     pairs = 0
-    for g in sorted(glob.glob("/scratch/work/a3/gd/*.pdf")):
+    for g in sorted(glob.glob(os.path.join(RENDERS, "*.pdf"))) if RENDERS else []:
         name = os.path.basename(g)
-        src = os.path.join("/scratch/work/a3/one", name)
+        src = os.path.join(CORPUS, name)
         if not os.path.exists(src):
             continue
         pairs += 1
@@ -331,16 +351,36 @@ def real_evidence():
 
 
 def main():
+    if not os.path.isdir(CORPUS) or not glob.glob(os.path.join(CORPUS, "*.pdf")):
+        print("corpus not found at %s" % CORPUS)
+        print("")
+        print("This tool proves every check can fire, on real documents. It needs the corpus:")
+        print("    gh release download corpus-v1 --repo kavopdf/app \\")
+        print("        --pattern p2w-all-groups.zip -O c.zip && unzip -qo c.zip -d t")
+        print("    P2W_CORPUS=<dir with the pdfs> python3 prove_checks.py")
+        print("")
+        print("Optional: P2W_RENDERS=<dir of pdfs the engine produced> adds the real-render stage.")
+        return 2
     os.makedirs(WORK, exist_ok=True)
     ids = subprocess.run([sys.executable, VERIFY, "--list-checks"],
                          capture_output=True, text=True).stdout.split()
     print("checks: %d" % len(ids))
 
+    if not RENDERS:
+        print("note: no P2W_RENDERS given, so the real-render stage is skipped. Every check")
+        print("      proven below is proven by mutating a real document; the rest are reported")
+        print("      unproven rather than assumed. Give P2W_RENDERS=<dir of engine-produced")
+        print("      pdfs> for the full proof.")
+        print("")
     pairs, fired, varied = real_evidence()
     print("real evidence: %d documents converted and rendered, %d checks fired, "
           "%d more discriminated" % (pairs, len(fired), len(varied - fired)))
 
     ctrl = run(path(BASE), path(BASE))
+    if ctrl is None:
+        print("control could not be measured: %s is missing or unreadable" % BASE)
+        print("nothing below would mean anything without a clean control, so this stops here.")
+        return 2
     print("control (a document against itself): %d/%d, %d failing"
           % (ctrl["passed"], ctrl["total"], len(ctrl["failed"])))
     if ctrl["failed"]:

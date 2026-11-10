@@ -750,7 +750,24 @@ def compare(src_path, gd_path):
                 clipped += 1
 
     checks["25_invisible_text"] = (0, invisible, invisible == 0)
-    checks["26_text_overlap"] = (0, on_text, on_text <= max(2, len(g_runs) // 50))
+    # 26 compares the RENDER against the SOURCE, not against zero. A stamp printed
+    # over a line of text is text-on-text in the original, and a perfect conversion
+    # reproduces it - so counting absolute overlaps failed a document against
+    # itself (57/58 on a self-comparison). Only overlaps the source did not have
+    # are a defect.
+    s_on_text = 0
+    for p in src:
+        rs = runs(p)
+        for r in rs:
+            for o in rs:
+                if o is r:
+                    continue
+                if (r["x"] < o["x1"] - 1 and r["x1"] > o["x"] + 1 and
+                        r["y"] < o["y1"] - 1 and r["y1"] > o["y"] + 1):
+                    s_on_text += 1
+                    break
+    checks["26_text_overlap"] = (s_on_text, on_text,
+                                 on_text <= max(s_on_text, 2, len(g_runs) // 50))
     checks["27_text_off_page"] = (0, off_page, off_page == 0)
     checks["28_clipped_at_edge"] = (0, clipped, clipped <= max(2, len(g_runs) // 50))
 
