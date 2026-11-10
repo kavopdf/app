@@ -53,11 +53,11 @@ as measured; only the verdict is closed.
 | 29_dot_leaders_txtpos | 39/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 09_font_names, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
 | 300_prescription_rx | 40/58 | FAIL | 01_page_count, 03_word_count, 04_words_missing, 05_words_extra, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 26_text_overlap, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 54_image_dpi, 55_orientation_mix | 2a68de6 | 10 Nov |
 | 301_lab_report_panel | 45/58 | FAIL | 01_page_count, 02_text_run_count, 14_filled_shapes, 18_median_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
-| 302_radiology_report |  |  |  |  |  |
-| 303_discharge_summary |  |  |  |  |  |
-| 304_package_insert_small_print |  |  |  |  |  |
-| 305_vaccination_certificate |  |  |  |  |  |
-| 306_clinical_protocol_synopsis |  |  |  |  |  |
+| 302_radiology_report | 47/58 | FAIL | 03_word_count, 04_words_missing, 05_words_extra, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
+| 303_discharge_summary | 41/58 | FAIL | 02_text_run_count, 05_words_extra, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces, 54_image_dpi | 2a68de6 | 10 Nov |
+| 304_package_insert_small_print | 50/58 | FAIL | 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch, 26_text_overlap, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
+| 305_vaccination_certificate | 36/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 14_filled_shapes, 17_matched_runs, 18_median_dy, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 32_stroke_lines, 35_rotation, 41_block_spacing, 45_char_accuracy, 47_margins, 53_embedded_faces, 55_orientation_mix, 56_rtl_runs | 2a68de6 | 10 Nov |
+| 306_clinical_protocol_synopsis | 49/58 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
 | 30_mixed_font_sizes_one_baseline_txtpos |  |  |  |  |  |
 | 310_court_judgment |  |  |  |  |  |
 | 311_fir_police_form |  |  |  |  |  |
