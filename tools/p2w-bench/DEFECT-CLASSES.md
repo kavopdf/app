@@ -7,69 +7,15 @@ the same class only when they fail on largely the same documents (Jaccard >= 0.5
 A check that fails on its own stays on its own, so a genuinely different defect cannot
 be swallowed by a class it does not belong to.
 
-Documents measured: **139 of 208**
+Documents measured: **0 of 208**
 
-Limits: one full day (24 hours) per class, 6 attempts inside it, and a class that
+Limits: one full day (24 hours) per class, 12 attempts inside it, and a class that
 improves but does not pass gets its day restarted - up to 3 times, after which it is
 parked as not converging. A parked class is skipped by the fixer and kept with its reason.
 A parked class is skipped by the fixer and kept here with its reason.
 
 | # | class | documents | share | checks in class | attempts | requeues | status |
 |---|---|---|---|---|---|---|---|
-| 1 | 03_word_count (+1) | 60 | 43% | 03_word_count, 04_words_missing | 0 | 0 | OPEN |
-| 2 | 23_line_pitch | 56 | 40% | 23_line_pitch | 0 | 0 | OPEN |
-| 3 | 18_median_dy | 53 | 38% | 18_median_dy | 0 | 0 | OPEN |
-| 4 | 09_font_names | 44 | 32% | 09_font_names | 0 | 0 | OPEN |
-| 5 | 01_page_count (+1) | 41 | 29% | 01_page_count, 24_page_breaks | 0 | 0 | OPEN |
-| 6 | 17_matched_runs | 35 | 25% | 17_matched_runs | 0 | 0 | OPEN |
-| 7 | 07_table_rows | 34 | 24% | 07_table_rows | 0 | 0 | OPEN |
-| 8 | 25_invisible_text | 31 | 22% | 25_invisible_text | 0 | 0 | OPEN |
-| 9 | 05_words_extra | 30 | 22% | 05_words_extra | 0 | 0 | OPEN |
-| 10 | 14_filled_shapes | 27 | 19% | 14_filled_shapes | 0 | 0 | OPEN |
-| 11 | 30_ink_where_blank_was | 26 | 19% | 30_ink_where_blank_was | 0 | 0 | OPEN |
-| 12 | 27_text_off_page | 22 | 16% | 27_text_off_page | 0 | 0 | OPEN |
-| 13 | 06_table_columns | 20 | 14% | 06_table_columns | 0 | 0 | OPEN |
-| 14 | 11_bold_runs | 19 | 14% | 11_bold_runs | 0 | 0 | OPEN |
-| 15 | 16_numeric_runs | 19 | 14% | 16_numeric_runs | 0 | 0 | OPEN |
-| 16 | 26_text_overlap | 13 | 9% | 26_text_overlap | 0 | 0 | OPEN |
-| 17 | 10_font_sizes | 4 | 3% | 10_font_sizes | 0 | 0 | OPEN |
-| 18 | 13_text_colours | 2 | 1% | 13_text_colours | 0 | 0 | OPEN |
-| 19 | 21_median_dx | 2 | 1% | 21_median_dx | 0 | 0 | OPEN |
-| 20 | 28_clipped_at_edge | 1 | 1% | 28_clipped_at_edge | 0 | 0 | OPEN |
 
 ## Documents per class
 
-- **03_word_count (+1)** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down
-- **23_line_pitch** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent
-- **18_median_dy** — 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent
-- **09_font_names** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down
-- **01_page_count (+1)** — 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text
-- **17_matched_runs** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 07_stamp_over_table
-- **07_table_rows** — 01_stamp_rotated_15deg_upright, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 08_two_overlapping_stamps
-- **25_invisible_text** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 04_stamp_180deg_upside_down, 07_stamp_over_table
-- **05_words_extra** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down
-- **14_filled_shapes** — 23_timetable_grid_txtpos, 300_prescription_rx, 301_lab_report_panel, 305_vaccination_certificate
-- **30_ink_where_blank_was** — 334_patent_document, 403_crossword_puzzle, 404_sudoku_grid, 405_sheet_music_lyrics
-- **27_text_off_page** — 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 08_two_overlapping_stamps
-- **06_table_columns** — 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 28_value_overflows_cell_txtpos, 29_dot_leaders_txtpos
-- **11_bold_runs** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 08_two_overlapping_stamps
-- **16_numeric_runs** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent
-- **26_text_overlap** — 06_rect_paid_stamp_red_transparent, 17_three_column_widths_txtpos, 20_numbered_list_separate_column_txtpos, 300_prescription_rx
-- **10_font_sizes** — 15_stamp_on_scanned_page, 304_package_insert_small_print, 331_pid_diagram, 39_small_caps_letter_spacing
-- **13_text_colours** — 15_stamp_on_scanned_page, 402_calendar_month_grid
-- **21_median_dx** — 375_attendance_register, 401_trifold_brochure
-- **28_clipped_at_edge** — 350_question_paper
-
-## Parked
-
-- **19_worst_dy (+3)** — 25.0 hours open without a kept fix (limit 24)
-
-## Non-check text in the failed column
-
-Ignored. It means the column is not clean:
-
-- 20_within_10pt (120)
-- so no line box is honoured (87)
-- 30_ink_where_blank_was — Google Docs has no exact line spacing (60)
-- 29_blank_where_ink_was — Google Docs has no exact line spacing (6)
-- 25_invisible_text — Google Docs has no exact line spacing (5)
