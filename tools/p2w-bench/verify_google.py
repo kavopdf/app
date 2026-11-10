@@ -149,13 +149,16 @@ def compare(src_path, gd_path):
     # Substitution renames a family (Arial -> Liberation Sans) so the names cannot be
     # compared, but a family that vanishes entirely is a loss. Require the render to carry
     # at least 80 % as many distinct faces as the source.
+    # A source with no fonts has nothing to lose; failing it is a false positive.
     checks["09_font_names"] = (len(s_fonts), len(g_fonts),
+                               len(s_fonts) == 0 or
                                len(g_fonts) >= max(1, int(len(s_fonts) * 0.8)))
 
     s_sizes = collections.Counter(r["size"] for r in s_runs)
     g_sizes = collections.Counter(r["size"] for r in g_runs)
     common = sum(1 for k in s_sizes if k in g_sizes)
     checks["10_font_sizes"] = (len(s_sizes), common,
+                               len(s_sizes) == 0 or
                                common >= max(1, int(len(s_sizes) * 0.8)))
 
     def bold_count(rs):
@@ -171,11 +174,15 @@ def compare(src_path, gd_path):
     s_cols = collections.Counter(r["colour"] for r in s_runs)
     g_cols = collections.Counter(r["colour"] for r in g_runs)
     checks["13_text_colours"] = (len(s_cols), len(g_cols),
+                                 len(s_cols) == 0 or
                                  len(g_cols) >= max(1, int(len(s_cols) * 0.8)))
 
     s_fill = sum(1 for p in src for _ in fill_rects(p))
     g_fill = sum(1 for p in gd for _ in fill_rects(p))
-    checks["14_filled_shapes"] = (s_fill, g_fill, g_fill >= max(1, int(s_fill * 0.5)))
+    # Many documents legitimately contain no filled shapes. Requiring >= 1 when the
+    # source has none failed every such document - a false positive, not a defect.
+    checks["14_filled_shapes"] = (s_fill, g_fill,
+                                  s_fill == 0 or g_fill >= max(1, int(s_fill * 0.5)))
 
     s_links = sum(len(p.get_links()) for p in src)
     g_links = sum(len(p.get_links()) for p in gd)
@@ -218,7 +225,9 @@ def compare(src_path, gd_path):
                                  matched >= int(len(s_runs) * 0.9))
     checks["18_median_dy"] = (0, med_dy, med_dy < 3.0)
     checks["19_worst_dy"] = (0, worst_dy, worst_dy < 15.0)
-    checks["20_within_10pt"] = (100, within10, within10 > 95)
+    # With no matched runs there is nothing to be within 10 pt of; reporting 0 %
+    # made a blank or text-free page fail for having no text to measure.
+    checks["20_within_10pt"] = (100, within10, (not dys) or within10 > 95)
     checks["21_median_dx"] = (0, med_dx, abs(med_dx) < 3.0)
 
     # reading order: the sequence of normalised words

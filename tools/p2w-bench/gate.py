@@ -1,6 +1,21 @@
 #!/usr/bin/env python3
 """Per-document regression gate for PDF->Word.
 
+WHAT THIS DOES NOT SEE  - read before trusting it
+    This scores blank, blocks, extra, lines, missing, nobg, pages, reflines and
+    refpages. Not one of those moves when text lands in the wrong place.
+
+    On 10 Nov a change to w:framePr passed this gate, shipped as 3.53.5, and broke
+    the stamp on the phone: every count was identical and the text had moved. The
+    gate was not wrong; it was being asked a question it cannot answer.
+
+    Position, reading order, line pitch and overlap are measured by
+    verify_google.py against a PDF exported from Google Docs itself. That is the
+    instrument for "does the user see what the PDF shows". This one is for "did the
+    converter lose any words or pages", which is cheap and worth keeping.
+
+    Use this in CI. Do not use it as evidence that a document looks right.
+
 WHY THIS EXISTS
     For two days every metric went up and the output went down: a black page, values missing,
     solid blocks over an invoice. Nothing compared one build against the last one, so a fix for
