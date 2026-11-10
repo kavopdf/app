@@ -22,11 +22,11 @@ as measured; only the verdict is closed.
 
 | document | score | verdict | failed checks | engine | measured |
 |---|---|---|---|---|---|
-| 01_stamp_rotated_15deg_upright |  |  |  |  |  |
-| 02_stamp_rotated_15deg_upleft |  |  |  |  |  |
-| 03_stamp_vertical_90deg |  |  |  |  |  |
-| 04_stamp_180deg_upside_down |  |  |  |  |  |
-| 05_round_company_seal_curved_text |  |  |  |  |  |
+| 01_stamp_rotated_15deg_upright | 37/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 10 Nov |
+| 02_stamp_rotated_15deg_upleft | 44/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 30_ink_where_blank_was, 35_rotation, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 10 Nov |
+| 03_stamp_vertical_90deg | 35/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 41_block_spacing, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 10 Nov |
+| 04_stamp_180deg_upside_down | 33/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 07_table_rows, 09_font_names, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 47_margins, 53_embedded_faces, 55_orientation_mix, 56_rtl_runs, 59_shape_anchor | 2a68de6 | 10 Nov |
+| 05_round_company_seal_curved_text | 32/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 09_font_names, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 36_underline_rules, 41_block_spacing, 45_char_accuracy, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 10 Nov |
 | 06_rect_paid_stamp_red_transparent |  |  |  |  |  |
 | 07_stamp_over_table |  |  |  |  |  |
 | 08_two_overlapping_stamps |  |  |  |  |  |
