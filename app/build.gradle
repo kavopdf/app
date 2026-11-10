@@ -36,19 +36,18 @@ android {
         versionName "3.53.8"
 
         ndk {
-            // Real phones are ARM; x86_64 exists so the app can be installed on the
-            // emulator that the automated pipeline converts documents on.
+            // Real phones are ARM. These two slices are the whole shipping apk and they
+            // are all it needs: 39,995,639 bytes at 3.53.8.
             //
-            // DECIDED 2026-11-09: the x86_64 slice is included in the SHIPPING apk, not
-            // in a separate test build. The reason is that a test build is not the thing
-            // the user runs, and "the fix shipped" has to be proven on the artefact that
-            // ships. The cost is real and was measured rather than guessed: the ARM-only
-            // apk is 38 MB and the comment here previously estimated +22 MB for the extra
-            // slice, so expect roughly 60 MB.
+            // x86_64 was here for a while and is deliberately gone. It was added on
+            // 2026-11-09 so the app could be installed on a GitHub Actions emulator for
+            // automated conversion testing. That pipeline was never built, so the slice
+            // was never used, and it cost 17.6 MB of download for nothing - 40 MB became
+            // 57.6 MB at 3.53.6. It was reverted before 3.53.8.
             //
-            // If that becomes unacceptable, the right answer is an Android App Bundle for
-            // Play (per-device ABI delivery) rather than dropping x86_64 - dropping it
-            // would make the pipeline unable to test the app at all.
+            // If the emulator pipeline is ever built, add x86_64 back in the same commit
+            // that starts using it, not before. An Android App Bundle would avoid the cost
+            // altogether, because Play delivers only the slice each device needs.
             abiFilters 'arm64-v8a', 'armeabi-v7a'
         }
         vectorDrawables { useSupportLibrary true }
