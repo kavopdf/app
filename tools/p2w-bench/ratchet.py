@@ -125,10 +125,23 @@ def main(argv):
         # denominators would call that a regression on every document in the
         # corpus and make the ratchet useless the day a check is added.
         # So only checks that existed at BOTH marks are compared.
+        # A mark is only a standard if it was taken by the SAME set of checks.
+        # Comparing the intersection is not enough: a mark taken by a smaller
+        # verifier lets its old passes gate a stronger one, so every check added
+        # since reads as newly failing and the document is condemned for having
+        # been measured with a weaker instrument. A different universe means the
+        # mark is stale, not that the document got worse - so it is replaced.
+        if prev_universe and prev_universe != universe:
+            if not check_only:
+                ratchet[doc] = {"best": score, "out_of": out_of,
+                                "failed": sorted(failed),
+                                "universe": sorted(universe)}
+            continue
+
         common = prev_universe & universe
         if not common:
-            # No recorded universe (older mark): fall back to the check ids that
-            # appear in either failed set, which is all we can know.
+            # No recorded universe (a mark from before universes were recorded):
+            # fall back to the check ids in either failed set, all we can know.
             common = prev_failed | failed
         same_denominator = (out_of == prev.get("out_of", out_of))
 
