@@ -32,8 +32,8 @@ android {
         // them changes nothing that is displayed and takes roughly a megabyte off the APK.
         // If a translation is ever added, its folder has to be added here too.
         resConfigs "en"
-        versionCode 297
-        versionName "3.53.7"
+        versionCode 298
+        versionName "3.53.8"
 
         ndk {
             // Real phones are ARM; x86_64 exists so the app can be installed on the
@@ -49,7 +49,7 @@ android {
             // If that becomes unacceptable, the right answer is an Android App Bundle for
             // Play (per-device ABI delivery) rather than dropping x86_64 - dropping it
             // would make the pipeline unable to test the app at all.
-            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+            abiFilters 'arm64-v8a', 'armeabi-v7a'
         }
         vectorDrawables { useSupportLibrary true }
     }
