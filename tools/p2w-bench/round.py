@@ -206,7 +206,11 @@ def main(argv):
         # Reset for the next round: every score empty, so the baseline has work
         # to do again and the ratchet is the only thing that remembers the past.
         out = []
-        for line in open(BASE, encoding="utf-8"):
+        # A missing BASELINE.md must not crash a round close - the archive and
+        # the phase move still have to happen, or the pipeline is stuck forever
+        # in a round it cannot leave.
+        base_lines = open(BASE, encoding="utf-8").readlines() if os.path.exists(BASE) else []
+        for line in base_lines:
             if line.startswith("| ") and not line.startswith("|---"):
                 cells = [c.strip() for c in line.strip().strip("|").split("|")]
                 if cells and cells[0] and cells[0].lower() != "document":
