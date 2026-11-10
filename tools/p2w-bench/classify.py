@@ -53,7 +53,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 LEDGER = os.path.join(HERE, "ATTEMPTS.json")
 
 MAX_HOURS = 24        # one full day per class - the hard limit
-MAX_ATTEMPTS = 3      # and no more than three tries inside that day
+MAX_ATTEMPTS = 6      # six tries inside that day, about 12 hours of real work
+MAX_REQUEUES = 3      # a class that keeps improving gets three fresh days, then stops
 JACCARD = 0.55        # how alike two checks must be to count as one cause
 
 CHECK_RE = re.compile(r"^\d{2}[a-c]?_[a-z_]+$")
@@ -130,20 +131,46 @@ def main(argv):
             outcome = argv[argv.index("--outcome") + 1]
         led = load_ledger()
         e = led.setdefault(cls, {"first_seen": time.time(), "attempts": 0,
-                                 "last": 0, "outcomes": []})
+                                 "last": 0, "outcomes": [], "requeues": 0})
+        e.setdefault("requeues", 0)
         e["attempts"] += 1
         e["last"] = time.time()
         e["outcomes"].append(outcome)
-        if e["attempts"] >= MAX_ATTEMPTS and outcome != "kept":
-            e["status"] = "PARKED"
-            e["reason"] = "%d attempts without a kept fix" % e["attempts"]
-        elif outcome == "kept":
+
+        if outcome == "kept":
             e["status"] = "FIXED"
             e["reason"] = "fix kept and proven"
-        else:
-            e["status"] = "OPEN"
+
+        elif outcome == "improved":
+            # The class moved but did not pass. It is not stuck, it is working, so
+            # it gets a fresh day rather than being parked on the clock. Bounded by
+            # MAX_REQUEUES: a class that improves a little every day forever is not
+            # converging, and pretending otherwise is how a fixer loops slowly
+            # instead of quickly.
+            e["requeues"] += 1
+            if e["requeues"] > MAX_REQUEUES:
+                e["status"] = "PARKED"
+                e["reason"] = ("improved on %d separate days without converging (limit %d)"
+                               % (e["requeues"], MAX_REQUEUES))
+            else:
+                e["first_seen"] = time.time()   # the day restarts
+                e["attempts"] = 0
+                e["status"] = "OPEN"
+                e["reason"] = "improved - day restarted (requeue %d of %d)" % (
+                    e["requeues"], MAX_REQUEUES)
+
+        else:  # reverted or error - real progress was not made
+            if e["attempts"] >= MAX_ATTEMPTS:
+                e["status"] = "PARKED"
+                e["reason"] = "%d attempts without progress (limit %d)" % (
+                    e["attempts"], MAX_ATTEMPTS)
+            else:
+                e["status"] = "OPEN"
+                e["reason"] = ""
+
         save_ledger(led)
-        print("%s: attempts=%d status=%s" % (cls, e["attempts"], e.get("status")))
+        print("%s: attempts=%d requeues=%d status=%s  %s" % (
+            cls, e["attempts"], e["requeues"], e.get("status"), e.get("reason", "")))
         return 0
 
     top = 20
@@ -180,6 +207,7 @@ def main(argv):
         name = g[0] if len(g) == 1 else "%s (+%d)" % (g[0], len(g) - 1)
         entry = led.get(name, {})
         attempts = entry.get("attempts", 0)
+        requeues = entry.get("requeues", 0)
         status = entry.get("status", "OPEN")
         hours_open = round((now - entry["first_seen"]) / 3600, 1) if entry else 0
         reason = entry.get("reason", "")
@@ -192,7 +220,7 @@ def main(argv):
                 reason = "%s attempts without a kept fix (limit %s)" % (attempts, MAX_ATTEMPTS)
         classes.append({
             "name": name, "checks": g, "docs": docs,
-            "attempts": attempts, "status": status,
+            "attempts": attempts, "requeues": requeues, "status": status,
             "hours": hours_open, "reason": reason,
         })
 
@@ -216,15 +244,18 @@ def main(argv):
            "A check that fails on its own stays on its own, so a genuinely different defect cannot",
            "be swallowed by a class it does not belong to.\n",
            "Documents measured: **%d of %d**\n" % (len(measured), len(base)),
-           "Limits: a class is PARKED after %d attempts without a kept fix, or %d hours open."
-           % (MAX_ATTEMPTS, MAX_HOURS),
+           "Limits: one full day (%d hours) per class, %d attempts inside it, and a class that"
+           % (MAX_HOURS, MAX_ATTEMPTS),
+           "improves but does not pass gets its day restarted - up to %d times, after which it is"
+           % MAX_REQUEUES,
+           "parked as not converging. A parked class is skipped by the fixer and kept with its reason.",
            "A parked class is skipped by the fixer and kept here with its reason.\n",
-           "| # | class | documents | share | checks in class | attempts | status |",
-           "|---|---|---|---|---|---|---|"]
+           "| # | class | documents | share | checks in class | attempts | requeues | status |",
+           "|---|---|---|---|---|---|---|---|"]
     for i, c in enumerate(classes[:top], 1):
-        out.append("| %d | %s | %d | %d%% | %s | %d | %s |" % (
+        out.append("| %d | %s | %d | %d%% | %s | %d | %d | %s |" % (
             i, c["name"], len(c["docs"]), round(100 * len(c["docs"]) / total),
-            ", ".join(c["checks"]), c["attempts"], c["status"]))
+            ", ".join(c["checks"]), c["attempts"], c.get("requeues", 0), c["status"]))
 
     out.append("\n## Documents per class\n")
     for c in classes[:top]:

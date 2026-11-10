@@ -9,31 +9,33 @@ be swallowed by a class it does not belong to.
 
 Documents measured: **139 of 208**
 
-Limits: a class is PARKED after 3 attempts without a kept fix, or 24 hours open.
+Limits: one full day (24 hours) per class, 6 attempts inside it, and a class that
+improves but does not pass gets its day restarted - up to 3 times, after which it is
+parked as not converging. A parked class is skipped by the fixer and kept with its reason.
 A parked class is skipped by the fixer and kept here with its reason.
 
-| # | class | documents | share | checks in class | attempts | status |
-|---|---|---|---|---|---|---|
-| 1 | 03_word_count (+1) | 60 | 43% | 03_word_count, 04_words_missing | 0 | OPEN |
-| 2 | 23_line_pitch | 56 | 40% | 23_line_pitch | 0 | OPEN |
-| 3 | 18_median_dy | 53 | 38% | 18_median_dy | 0 | OPEN |
-| 4 | 09_font_names | 44 | 32% | 09_font_names | 0 | OPEN |
-| 5 | 01_page_count (+1) | 41 | 29% | 01_page_count, 24_page_breaks | 0 | OPEN |
-| 6 | 17_matched_runs | 35 | 25% | 17_matched_runs | 0 | OPEN |
-| 7 | 07_table_rows | 34 | 24% | 07_table_rows | 0 | OPEN |
-| 8 | 25_invisible_text | 31 | 22% | 25_invisible_text | 0 | OPEN |
-| 9 | 05_words_extra | 30 | 22% | 05_words_extra | 0 | OPEN |
-| 10 | 14_filled_shapes | 27 | 19% | 14_filled_shapes | 0 | OPEN |
-| 11 | 30_ink_where_blank_was | 26 | 19% | 30_ink_where_blank_was | 0 | OPEN |
-| 12 | 27_text_off_page | 22 | 16% | 27_text_off_page | 0 | OPEN |
-| 13 | 06_table_columns | 20 | 14% | 06_table_columns | 0 | OPEN |
-| 14 | 11_bold_runs | 19 | 14% | 11_bold_runs | 0 | OPEN |
-| 15 | 16_numeric_runs | 19 | 14% | 16_numeric_runs | 0 | OPEN |
-| 16 | 26_text_overlap | 13 | 9% | 26_text_overlap | 0 | OPEN |
-| 17 | 10_font_sizes | 4 | 3% | 10_font_sizes | 0 | OPEN |
-| 18 | 13_text_colours | 2 | 1% | 13_text_colours | 0 | OPEN |
-| 19 | 21_median_dx | 2 | 1% | 21_median_dx | 0 | OPEN |
-| 20 | 28_clipped_at_edge | 1 | 1% | 28_clipped_at_edge | 0 | OPEN |
+| # | class | documents | share | checks in class | attempts | requeues | status |
+|---|---|---|---|---|---|---|---|
+| 1 | 03_word_count (+1) | 60 | 43% | 03_word_count, 04_words_missing | 0 | 0 | OPEN |
+| 2 | 23_line_pitch | 56 | 40% | 23_line_pitch | 0 | 0 | OPEN |
+| 3 | 18_median_dy | 53 | 38% | 18_median_dy | 0 | 0 | OPEN |
+| 4 | 09_font_names | 44 | 32% | 09_font_names | 0 | 0 | OPEN |
+| 5 | 01_page_count (+1) | 41 | 29% | 01_page_count, 24_page_breaks | 0 | 0 | OPEN |
+| 6 | 17_matched_runs | 35 | 25% | 17_matched_runs | 0 | 0 | OPEN |
+| 7 | 07_table_rows | 34 | 24% | 07_table_rows | 0 | 0 | OPEN |
+| 8 | 25_invisible_text | 31 | 22% | 25_invisible_text | 0 | 0 | OPEN |
+| 9 | 05_words_extra | 30 | 22% | 05_words_extra | 0 | 0 | OPEN |
+| 10 | 14_filled_shapes | 27 | 19% | 14_filled_shapes | 0 | 0 | OPEN |
+| 11 | 30_ink_where_blank_was | 26 | 19% | 30_ink_where_blank_was | 0 | 0 | OPEN |
+| 12 | 27_text_off_page | 22 | 16% | 27_text_off_page | 0 | 0 | OPEN |
+| 13 | 06_table_columns | 20 | 14% | 06_table_columns | 0 | 0 | OPEN |
+| 14 | 11_bold_runs | 19 | 14% | 11_bold_runs | 0 | 0 | OPEN |
+| 15 | 16_numeric_runs | 19 | 14% | 16_numeric_runs | 0 | 0 | OPEN |
+| 16 | 26_text_overlap | 13 | 9% | 26_text_overlap | 0 | 0 | OPEN |
+| 17 | 10_font_sizes | 4 | 3% | 10_font_sizes | 0 | 0 | OPEN |
+| 18 | 13_text_colours | 2 | 1% | 13_text_colours | 0 | 0 | OPEN |
+| 19 | 21_median_dx | 2 | 1% | 21_median_dx | 0 | 0 | OPEN |
+| 20 | 28_clipped_at_edge | 1 | 1% | 28_clipped_at_edge | 0 | 0 | OPEN |
 
 ## Documents per class
 
