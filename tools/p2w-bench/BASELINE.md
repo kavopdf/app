@@ -7,7 +7,7 @@ The instrument: the docx goes to Drive, Drive converts it to a Google Doc, that
 document is exported as PDF, and the export is compared to the original. See
 `VERIFY-GOOGLE.md` for the pipeline and `verify_google.py` for the checks.
 
-Newest rows were measured with engine **2a68de6** (v3.53.12). Every row carries the commit it
+Newest rows were measured with engine **a927365** (v3.53.12). Every row carries the commit it
 was measured with, because a score without a commit cannot tell a fix from a stale build.
 
 This file is written by the hourly baseline cron. Rows are never deleted; a
@@ -56,26 +56,26 @@ re-run of a document replaces its own row.
 | 311_fir_police_form | 24/31 | FAIL | 03_word_count, 04_words_missing, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was | 2a68de6 | 2026-11-10 |
 | 312_affidavit_stamp_paper | 19/31 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was | 2a68de6 | 2026-11-10 |
 | 313_power_of_attorney | 30/31 | FAIL | 18_median_dy | 2a68de6 | 2026-11-10 |
-| 314_tender_rfp_boq |  |  |  |  |
-| 315_gazette_notification |  |  |  |  |
-| 316_contract_with_schedules |  |  |  |  |
-| 317_rti_response |  |  |  |  |
-| 318_court_summons_form |  |  |  |  |
-| 31_times_body_arial_headings |  |  |  |  |
-| 320_balance_sheet_statutory |  |  |  |  |
-| 321_auditors_report |  |  |  |  |
-| 322_mutual_fund_factsheet |  |  |  |  |
-| 323_credit_card_statement |  |  |  |  |
-| 324_loan_amortisation_schedule |  |  |  |  |
-| 325_demat_holdings_statement |  |  |  |  |
-| 326_itr_computation |  |  |  |  |
-| 32_serif_nondefault_body |  |  |  |  |
-| 330_cad_drawing_sheet |  |  |  |  |
-| 331_pid_diagram |  |  |  |  |
-| 332_bom_on_drawing |  |  |  |  |
-| 333_datasheet_spec_tables |  |  |  |  |
-| 334_patent_document |  |  |  |  |
-| 335_msds_safety_data_sheet |  |  |  |  |
+| 314_tender_rfp_boq | 27/31 | FAIL | 19_worst_dy, 20_within_10pt, 25_invisible_text, 30_ink_where_blank_was | a927365 | 2026-11-10 |
+| 315_gazette_notification | 26/31 | FAIL | 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 26_text_overlap | a927365 | 2026-11-10 |
+| 316_contract_with_schedules | 29/31 | FAIL | 19_worst_dy, 20_within_10pt | a927365 | 2026-11-10 |
+| 317_rti_response | 31/31 | PASS |  | a927365 | 2026-11-10 |
+| 318_court_summons_form | 19/31 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was | a927365 | 2026-11-10 |
+| 31_times_body_arial_headings | 28/31 | FAIL | 19_worst_dy, 20_within_10pt, 22_reading_order | a927365 | 2026-11-10 |
+| 320_balance_sheet_statutory | 27/31 | FAIL | 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
+| 321_auditors_report | 29/31 | FAIL | 19_worst_dy, 20_within_10pt | a927365 | 2026-11-10 |
+| 322_mutual_fund_factsheet | 19/31 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 11_bold_runs, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
+| 323_credit_card_statement | 19/31 | FAIL | 01_page_count, 03_word_count, 04_words_missing, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
+| 324_loan_amortisation_schedule | 25/31 | FAIL | 06_table_columns, 07_table_rows, 19_worst_dy, 20_within_10pt, 23_line_pitch, 25_invisible_text | a927365 | 2026-11-10 |
+| 325_demat_holdings_statement | 27/31 | FAIL | 02_text_run_count, 06_table_columns, 22_reading_order, 25_invisible_text | a927365 | 2026-11-10 |
+| 326_itr_computation | 21/31 | FAIL | 01_page_count, 02_text_run_count, 07_table_rows, 14_filled_shapes, 18_median_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 30_ink_where_blank_was | a927365 | 2026-11-10 |
+| 32_serif_nondefault_body | 26/31 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
+| 330_cad_drawing_sheet | 23/31 | FAIL | 03_word_count, 04_words_missing, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
+| 331_pid_diagram | 20/31 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 10_font_sizes, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was | a927365 | 2026-11-10 |
+| 332_bom_on_drawing | 25/31 | FAIL | 19_worst_dy, 20_within_10pt, 22_reading_order, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
+| 333_datasheet_spec_tables | 24/31 | FAIL | 01_page_count, 19_worst_dy, 20_within_10pt, 24_page_breaks, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
+| 334_patent_document | 24/31 | FAIL | 02_text_run_count, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
+| 335_msds_safety_data_sheet | 24/31 | FAIL | 02_text_run_count, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was | a927365 | 2026-11-10 |
 | 33_sans_nondefault_body |  |  |  |  |
 | 340_bill_of_lading |  |  |  |  |
 | 341_shipping_manifest |  |  |  |  |
