@@ -2161,14 +2161,14 @@
     ]
   },
   "27_two_column_left_short_txtpos": {
-    "best": 53,
+    "best": 54,
     "failed": [
       "19_worst_dy",
       "32_stroke_lines",
       "47_margins",
       "53_embedded_faces"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -2227,7 +2227,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "28_value_overflows_cell_txtpos": {
@@ -2246,9 +2247,10 @@
       "32_stroke_lines",
       "41_block_spacing",
       "47_margins",
-      "53_embedded_faces"
+      "53_embedded_faces",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -2307,11 +2309,12 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "29_dot_leaders_txtpos": {
-    "best": 39,
+    "best": 40,
     "failed": [
       "01_page_count",
       "02_text_run_count",
@@ -2332,7 +2335,7 @@
       "53_embedded_faces",
       "55_orientation_mix"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -2391,7 +2394,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "300_prescription_rx": {
@@ -2413,9 +2417,10 @@
       "47_margins",
       "53_embedded_faces",
       "54_image_dpi",
-      "55_orientation_mix"
+      "55_orientation_mix",
+      "59_shape_anchor"
     ],
-    "out_of": 58,
+    "out_of": 59,
     "universe": [
       "01_page_count",
       "02_text_run_count",
@@ -2474,7 +2479,8 @@
       "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
-      "56_rtl_runs"
+      "56_rtl_runs",
+      "59_shape_anchor"
     ]
   },
   "301_lab_report_panel": {
