@@ -54,7 +54,7 @@ LEDGER = os.path.join(HERE, "ATTEMPTS.json")
 
 MAX_HOURS = 24        # one full day per class - the hard limit
 MAX_ATTEMPTS = 6      # six tries inside that day, about 12 hours of real work
-MAX_REQUEUES = 3      # a class that keeps improving gets three fresh days, then stops
+MAX_REQUEUES = 12     # a class that keeps improving gets twelve fresh days, then stops
 JACCARD = 0.55        # how alike two checks must be to count as one cause
 
 CHECK_RE = re.compile(r"^\d{2}[a-c]?_[a-z_]+$")
