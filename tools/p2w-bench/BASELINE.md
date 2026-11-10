@@ -7,7 +7,7 @@ The instrument: the docx goes to Drive, Drive converts it to a Google Doc, that
 document is exported as PDF, and the export is compared to the original. See
 `VERIFY-GOOGLE.md` for the pipeline and `verify_google.py` for the checks.
 
-Newest rows were measured with engine **c2616d5** (v3.53.12). Every row carries the commit it
+Newest rows were measured with engine **f679dde** (v3.53.12). Every row carries the commit it
 was measured with, because a score without a commit cannot tell a fix from a stale build.
 
 This file is written by the hourly baseline cron. Rows are never deleted; a
@@ -123,26 +123,26 @@ as measured; only the verdict is closed.
 | 400_comic_page_speech_bubbles | 21/31 | CLOSED-UNFIXABLE | 02_text_run_count, 07_table_rows, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | c2616d5 | 2026-11-10 |
 | 401_trifold_brochure | 15/31 | CLOSED-UNFIXABLE | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 07_table_rows, 14_filled_shapes, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 21_median_dx, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | c2616d5 | 2026-11-10 |
 | 402_calendar_month_grid | 20/31 | CLOSED-UNFIXABLE | 01_page_count, 02_text_run_count, 13_text_colours, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was — Google Docs has no exact line spacing, so no line box is honoured | c2616d5 | 2026-11-10 |
-| 403_crossword_puzzle |  |  |  |  |
-| 404_sudoku_grid |  |  |  |  |
-| 405_sheet_music_lyrics |  |  |  |  |
-| 406_passport_mrz_page |  |  |  |  |
-| 407_id_card_front_back |  |  |  |  |
-| 40_devanagari_shaping_font |  |  |  |  |
-| 410_form_xobject_reused |  |  |  |  |
-| 411_nested_xobject_transforms |  |  |  |  |
-| 412_page_labels_roman |  |  |  |  |
-| 413_tagged_pdf_actualtext |  |  |  |  |
-| 414_transparency_softmask |  |  |  |  |
-| 415_inline_images |  |  |  |  |
-| 416_many_tiny_pages |  |  |  |  |
-| 417_rotate180_and_mirrored |  |  |  |  |
-| 41_coloured_headings_white_bg |  |  |  |  |
-| 42_table_coloured_header_alternating_rows |  |  |  |  |
-| 43_red_stamp_over_black_text |  |  |  |  |
-| 44_coloured_underlined_hyperlinks |  |  |  |  |
-| 45_coloured_callout_box |  |  |  |  |
-| 46_chart_coloured_labels_body_text |  |  |  |  |
+| 403_crossword_puzzle | 24/31 | FAIL | 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was | f679dde | 2026-11-10 |
+| 404_sudoku_grid | 23/31 | FAIL | 01_page_count, 18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was | f679dde | 2026-11-10 |
+| 405_sheet_music_lyrics | 17/31 | FAIL | 01_page_count, 02_text_run_count, 06_table_columns, 07_table_rows, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was | f679dde | 2026-11-10 |
+| 406_passport_mrz_page | 25/31 | FAIL | 03_word_count, 04_words_missing, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch | f679dde | 2026-11-10 |
+| 407_id_card_front_back | 27/31 | FAIL | 14_filled_shapes, 19_worst_dy, 20_within_10pt, 23_line_pitch | f679dde | 2026-11-10 |
+| 40_devanagari_shaping_font | 14/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 07_table_rows, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was | f679dde | 2026-11-10 |
+| 410_form_xobject_reused | 27/31 | FAIL | 19_worst_dy, 20_within_10pt, 29_blank_where_ink_was, 30_ink_where_blank_was | f679dde | 2026-11-10 |
+| 411_nested_xobject_transforms | 24/31 | FAIL | 03_word_count, 04_words_missing, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch | f679dde | 2026-11-10 |
+| 412_page_labels_roman | 27/31 | FAIL | 19_worst_dy, 20_within_10pt, 23_line_pitch, 30_ink_where_blank_was | f679dde | 2026-11-10 |
+| 413_tagged_pdf_actualtext | 31/31 | PASS | — | f679dde | 2026-11-10 |
+| 414_transparency_softmask | 29/31 | FAIL | 19_worst_dy, 20_within_10pt | f679dde | 2026-11-10 |
+| 415_inline_images | 29/31 | FAIL | 19_worst_dy, 20_within_10pt | f679dde | 2026-11-10 |
+| 416_many_tiny_pages | 26/31 | FAIL | 19_worst_dy, 20_within_10pt, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was | f679dde | 2026-11-10 |
+| 417_rotate180_and_mirrored | 22/31 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 17_matched_runs, 18_median_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was | f679dde | 2026-11-10 |
+| 41_coloured_headings_white_bg | 15/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was | f679dde | 2026-11-10 |
+| 42_table_coloured_header_alternating_rows | 15/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was | f679dde | 2026-11-10 |
+| 43_red_stamp_over_black_text | 21/31 | FAIL | 03_word_count, 04_words_missing, 07_table_rows, 09_font_names, 11_bold_runs, 17_matched_runs, 18_median_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was | f679dde | 2026-11-10 |
+| 44_coloured_underlined_hyperlinks | 23/31 | FAIL | 02_text_run_count, 07_table_rows, 09_font_names, 15_links, 18_median_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was | f679dde | 2026-11-10 |
+| 45_coloured_callout_box | 30/31 | FAIL | 09_font_names | f679dde | 2026-11-10 |
+| 46_chart_coloured_labels_body_text | 22/31 | FAIL | 02_text_run_count, 07_table_rows, 09_font_names, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 30_ink_where_blank_was | f679dde | 2026-11-10 |
 | 47_grey_body_black_headings |  |  |  |  |
 | 48_form_coloured_border_coloured_values |  |  |  |  |
 | 49_coloured_background_block_paragraph |  |  |  |  |
