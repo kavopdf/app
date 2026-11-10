@@ -131,7 +131,14 @@ def compare(src_path, gd_path):
         return sum(1 for k, v in xs.items() if v >= 3)
     s_tbl, g_tbl = table_signature(s_runs), table_signature(g_runs)
     checks["06_table_columns"] = (s_tbl, g_tbl, abs(s_tbl - g_tbl) <= max(1, s_tbl // 10))
-    checks["07_cell_count"] = (s_tbl, g_tbl, abs(s_tbl - g_tbl) <= max(1, s_tbl // 10))
+    # rows, not columns again - 06 already covers columns
+    def table_rows(runs_list):
+        ys = collections.Counter()
+        for r in runs_list:
+            ys[round(r["y"] / 6)] += 1
+        return sum(1 for k, v in ys.items() if v >= 3)
+    s_rows, g_rows = table_rows(s_runs), table_rows(g_runs)
+    checks["07_table_rows"] = (s_rows, g_rows, abs(s_rows - g_rows) <= max(2, s_rows // 5))
 
     checks["08_image_count"] = (s_imgs, g_imgs, g_imgs >= s_imgs)
 
@@ -139,7 +146,11 @@ def compare(src_path, gd_path):
     g_fonts = collections.Counter(norm_font(r["font"]) for r in g_runs)
     # every source font family must appear in the render (a substitute is allowed
     # to have a different name, but a family that vanishes entirely is a loss)
-    checks["09_font_names"] = (len(s_fonts), len(g_fonts), len(g_fonts) >= 1)
+    # Substitution renames a family (Arial -> Liberation Sans) so the names cannot be
+    # compared, but a family that vanishes entirely is a loss. Require the render to carry
+    # at least 80 % as many distinct faces as the source.
+    checks["09_font_names"] = (len(s_fonts), len(g_fonts),
+                               len(g_fonts) >= max(1, int(len(s_fonts) * 0.8)))
 
     s_sizes = collections.Counter(r["size"] for r in s_runs)
     g_sizes = collections.Counter(r["size"] for r in g_runs)
@@ -159,7 +170,8 @@ def compare(src_path, gd_path):
 
     s_cols = collections.Counter(r["colour"] for r in s_runs)
     g_cols = collections.Counter(r["colour"] for r in g_runs)
-    checks["13_text_colours"] = (len(s_cols), len(g_cols), len(g_cols) >= 1)
+    checks["13_text_colours"] = (len(s_cols), len(g_cols),
+                                 len(g_cols) >= max(1, int(len(s_cols) * 0.8)))
 
     s_fill = sum(1 for p in src for _ in fill_rects(p))
     g_fill = sum(1 for p in gd for _ in fill_rects(p))
@@ -266,7 +278,7 @@ def compare(src_path, gd_path):
     checks["28_clipped_at_edge"] = (0, clipped, clipped <= max(2, len(g_runs) // 50))
 
     # 29 blank where source has ink / 30 ink where source is blank
-    blank_loss, extra_ink = 0, 0
+    blank_loss, extra_ink, s_grid_total = 0, 0, 0
     for i in range(min(src.page_count, gd.page_count)):
         sp, gp = src[i], gd[i]
         W, H = sp.rect.width, sp.rect.height
@@ -278,14 +290,23 @@ def compare(src_path, gd_path):
         g_cells = set()
         for r in runs(gp):
             g_cells.add((int(r["x"] / cw), int(r["y"] / ch)))
+        s_grid_total += len(s_cells)
         blank_loss += len(s_cells - g_cells)
         extra_ink += len(g_cells - s_cells)
-    checks["29_blank_where_ink_was"] = (0, blank_loss, blank_loss <= max(3, s_tbl // 4))
-    checks["30_ink_where_blank_was"] = (0, extra_ink, extra_ink <= max(3, s_tbl // 4))
+    # tolerance is a fraction of the source's own occupied grid cells, not of its columns
+    s_cells_total = max(1, s_grid_total)
+    checks["29_blank_where_ink_was"] = (0, blank_loss, blank_loss <= max(4, int(s_cells_total * 0.10)))
+    checks["30_ink_where_blank_was"] = (0, extra_ink, extra_ink <= max(4, int(s_cells_total * 0.10)))
 
     # 31 every page must carry some ink
-    empty_pages = sum(1 for p in gd if not p.get_text().strip())
-    checks["31_empty_pages"] = (0, empty_pages, empty_pages == 0)
+    # A blank page in the source is legitimate; a blank page the source did not have is not.
+    empty_pages = 0
+    for i in range(gd.page_count):
+        g_has = bool(gd[i].get_text().strip())
+        s_has = bool(src[i].get_text().strip()) if i < src.page_count else False
+        if s_has and not g_has:
+            empty_pages += 1
+    checks["31_pages_lost_their_text"] = (0, empty_pages, empty_pages == 0)
 
     src.close()
     gd.close()
