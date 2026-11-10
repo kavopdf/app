@@ -33,26 +33,26 @@ re-run of a document replaces its own row.
 | 19_hanging_indent_txtpos | 29/31 | FAIL | 09_font_names, 23_line_pitch | 2026-11-10 |
 | 20_numbered_list_separate_column_txtpos | 25/31 | FAIL | 09_font_names, 19_worst_dy, 20_within_10pt, 22_reading_order, 26_text_overlap, 29_blank_where_ink_was | 2026-11-10 |
 | 21_form_labels_x60_values_x300_txtpos | 20/31 | FAIL | 01_page_count, 07_table_rows, 09_font_names, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 30_ink_where_blank_was | 2026-11-10 |
-| 22_invoice_four_columns_txtpos |  |  |  |  |
-| 23_timetable_grid_txtpos |  |  |  |  |
-| 24_address_block_indents_txtpos |  |  |  |  |
-| 25_signature_block_underscores_txtpos |  |  |  |  |
-| 26_footnote_marker_bottom_note_txtpos |  |  |  |  |
-| 27_two_column_left_short_txtpos |  |  |  |  |
-| 28_value_overflows_cell_txtpos |  |  |  |  |
-| 29_dot_leaders_txtpos |  |  |  |  |
-| 300_prescription_rx |  |  |  |  |
-| 301_lab_report_panel |  |  |  |  |
-| 302_radiology_report |  |  |  |  |
-| 303_discharge_summary |  |  |  |  |
-| 304_package_insert_small_print |  |  |  |  |
-| 305_vaccination_certificate |  |  |  |  |
-| 306_clinical_protocol_synopsis |  |  |  |  |
-| 30_mixed_font_sizes_one_baseline_txtpos |  |  |  |  |
-| 310_court_judgment |  |  |  |  |
-| 311_fir_police_form |  |  |  |  |
-| 312_affidavit_stamp_paper |  |  |  |  |
-| 313_power_of_attorney |  |  |  |  |
+| 22_invoice_four_columns_txtpos | 15/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was | 2026-11-10 |
+| 23_timetable_grid_txtpos | 23/31 | FAIL | 09_font_names, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was | 2026-11-10 |
+| 24_address_block_indents_txtpos | 25/31 | FAIL | 09_font_names, 18_median_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was | 2026-11-10 |
+| 25_signature_block_underscores_txtpos | 16/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was | 2026-11-10 |
+| 26_footnote_marker_bottom_note_txtpos | 27/31 | FAIL | 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch | 2026-11-10 |
+| 27_two_column_left_short_txtpos | 29/31 | FAIL | 19_worst_dy, 20_within_10pt | 2026-11-10 |
+| 28_value_overflows_cell_txtpos | 20/31 | FAIL | 02_text_run_count, 06_table_columns, 07_table_rows, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was | 2026-11-10 |
+| 29_dot_leaders_txtpos | 16/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 09_font_names, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was | 2026-11-10 |
+| 300_prescription_rx | 18/31 | FAIL | 01_page_count, 03_word_count, 04_words_missing, 05_words_extra, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 26_text_overlap, 30_ink_where_blank_was | 2026-11-10 |
+| 301_lab_report_panel | 23/31 | FAIL | 01_page_count, 02_text_run_count, 14_filled_shapes, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 30_ink_where_blank_was | 2026-11-10 |
+| 302_radiology_report | 25/31 | FAIL | 03_word_count, 04_words_missing, 05_words_extra, 19_worst_dy, 20_within_10pt, 22_reading_order | 2026-11-10 |
+| 303_discharge_summary | 20/31 | FAIL | 02_text_run_count, 05_words_extra, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was | 2026-11-10 |
+| 304_package_insert_small_print | 26/31 | FAIL | 10_font_sizes, 19_worst_dy, 20_within_10pt, 23_line_pitch, 26_text_overlap | 2026-11-10 |
+| 305_vaccination_certificate | 18/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 14_filled_shapes, 17_matched_runs, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was | 2026-11-10 |
+| 306_clinical_protocol_synopsis | 26/31 | FAIL | 19_worst_dy, 20_within_10pt, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was | 2026-11-10 |
+| 30_mixed_font_sizes_one_baseline_txtpos | 14/31 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 07_table_rows, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was | 2026-11-10 |
+| 310_court_judgment | 28/31 | FAIL | 03_word_count, 04_words_missing, 22_reading_order | 2026-11-10 |
+| 311_fir_police_form | 24/31 | FAIL | 03_word_count, 04_words_missing, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was | 2026-11-10 |
+| 312_affidavit_stamp_paper | 19/31 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was | 2026-11-10 |
+| 313_power_of_attorney | 30/31 | FAIL | 18_median_dy | 2026-11-10 |
 | 314_tender_rfp_boq |  |  |  |  |
 | 315_gazette_notification |  |  |  |  |
 | 316_contract_with_schedules |  |  |  |  |
