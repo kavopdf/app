@@ -48,10 +48,10 @@ as measured; only the verdict is closed.
 | 24_address_block_indents_txtpos | 49/58 | FAIL | 09_font_names, 18_median_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
 | 25_signature_block_underscores_txtpos | 39/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
 | 26_footnote_marker_bottom_note_txtpos | 50/58 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
-| 27_two_column_left_short_txtpos |  |  |  |  |  |
-| 28_value_overflows_cell_txtpos |  |  |  |  |  |
-| 29_dot_leaders_txtpos |  |  |  |  |  |
-| 300_prescription_rx |  |  |  |  |  |
+| 27_two_column_left_short_txtpos | 53/58 | FAIL | 19_worst_dy, 20_within_10pt, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
+| 28_value_overflows_cell_txtpos | 42/58 | FAIL | 02_text_run_count, 06_table_columns, 07_table_rows, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 43_within_10pt_x, 47_margins, 53_embedded_faces | 2a68de6 | 10 Nov |
+| 29_dot_leaders_txtpos | 39/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 09_font_names, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 10 Nov |
+| 300_prescription_rx | 40/58 | FAIL | 01_page_count, 03_word_count, 04_words_missing, 05_words_extra, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 26_text_overlap, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 54_image_dpi, 55_orientation_mix | 2a68de6 | 10 Nov |
 | 301_lab_report_panel |  |  |  |  |  |
 | 302_radiology_report |  |  |  |  |  |
 | 303_discharge_summary |  |  |  |  |  |
