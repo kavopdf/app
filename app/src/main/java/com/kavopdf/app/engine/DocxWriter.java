@@ -230,29 +230,13 @@ public final class DocxWriter {
     private static final String BEFORE = "w:before=\"";
     private static final String LINE = "w:line=\"";
     private static final String TRHEIGHT = "w:trHeight w:val=\"";
-    private static final String FRAMEPR = "<w:framePr";
-    private static final String PARA_END = "</w:p>";
-
     private static int spacingTw(CharSequence xml) {
         int sum = 0;
         int depth = 0;              // inside a w:tbl
-        boolean framed = false;     // inside a paragraph that carries a w:framePr
         int i = 0;
         int n = xml.length();
         while (i < n) {
-            if (startsWith(xml, FRAMEPR, i)) {
-                // A framed paragraph is placed at a y, not flowed - it is a stamp line, and a
-                // stamp is drawn OVER the page. Its own w:before/w:line are not the page's
-                // height: charging them makes a one-page document measure taller than its paper
-                // and sends its last line to a second sheet, which is exactly what a text box
-                // used to do (see the w:txbxContent branch below). The flag is cleared at the
-                // end of the paragraph that carries it, so a frame never hides a later line.
-                framed = true;
-                i += FRAMEPR.length();
-            } else if (framed && startsWith(xml, PARA_END, i)) {
-                framed = false;
-                i += PARA_END.length();
-            } else if (startsWith(xml, "<w:tbl>", i)) {
+            if (startsWith(xml, "<w:tbl>", i)) {
                 depth++;
                 i += 7;
             } else if (startsWith(xml, "</w:tbl>", i)) {
@@ -271,7 +255,7 @@ public final class DocxWriter {
                 // A cell's line is not the page's height: the row it sits in already carries
                 // that height as its own w:trHeight, and counting both charges a table twice.
                 int j = i + (startsWith(xml, BEFORE, i) ? BEFORE.length() : LINE.length());
-                if (depth == 0 && !framed) sum += digits(xml, j);
+                if (depth == 0) sum += digits(xml, j);
                 i = j;
             } else if (startsWith(xml, TRHEIGHT, i)) {
                 sum += digits(xml, i + TRHEIGHT.length());
@@ -2278,7 +2262,30 @@ public final class DocxWriter {
                     py = ctx.pageHeightPt - b.y;
                 }
                 Frame frame = frameOf(ctx.curShapes, px, py, lineAngle);
-                if (frame != null) {
+                // IS THIS LINE ONE OF A STAMP'S? The one authority on that question is
+                // groupStamps(): it decides which of a page's turned lines belong to one stamp,
+                // and it does so from the page's geometry alone. The writer therefore asks it
+                // back - is this box in the group it built - instead of asking the weaker
+                // question "is there a rectangle near this line", which is what it used to do.
+                //
+                // WHY THAT DISTINCTION IS THE WHOLE DEFECT. frameOf() accepts a frame that
+                // groupStamps() deliberately rejected, and the old fallback branch wrote those
+                // lines as w:framePr paragraphs. Exactly two documents in the 208 still reached
+                // it: 08's "02-09-2025", a 9-degree line whose nearest stroked box is the
+                // axis-aligned table border it lies across (frameIsRect says no - the shape is
+                // not a rectangle at the line's angle, so binding the line to it would rewrite
+                // the table's border as a rotated rectangle the page never drew), and 352's
+                // seal, whose letters are placed one by one round a ring and each sit on the
+                // certificate's own border (ring characters are never grouped - doing so
+                // collapsed the roundel and lost three words). Google Docs ignores w:framePr
+                // positioning outright, so on a phone those paragraphs rendered as ordinary
+                // body text at the left margin. There is no third construct to give them: what
+                // they are is a rotated label on a drawing, which is the case below.
+                Shape host = frame == null ? null
+                        : (frame.shape.mergedHost == null ? frame.shape : frame.shape.mergedHost);
+                java.util.List<PdfToWord.Box> stampLines =
+                        host == null ? null : ctx.stampText.get(host);
+                if (stampLines != null && stampLines.contains(b)) {
                     // T02-B: a line the page drew inside a stamp's frame goes into that stamp's
                     // ONE object - a rotated text box that carries the frame and the text
                     // together (see stampBox). It is written once, where the first of the
@@ -2294,27 +2301,33 @@ public final class DocxWriter {
                     // fixed is kept: the frame's rules are still one geometry (stampFrames),
                     // the stamp's place in the page's order is still its own y (orderStamps),
                     // and a stamp still charges the page nothing (pageFits, spacingTw).
-                    Shape host = frame.shape.mergedHost == null
-                            ? frame.shape : frame.shape.mergedHost;
-                    java.util.List<PdfToWord.Box> stampLines = ctx.stampText.get(host);
-                    if (stampLines == null || stampLines.isEmpty()) {
-                        // A frame with no other line to keep it company - written on its own,
-                        // exactly as before.
-                        stampLine(sb, p, b, ctx, px, py, lineAngle, advance);
-                    } else if (ctx.stampWritten.add(host)) {
+                    if (ctx.stampWritten.add(host)) {
                         stampBox(sb, stampLines, frame, lineAngle, ctx);
                     }
                 } else {
-                    // No rectangle around this line - the per-glyph text of a round seal, a
-                    // rotated label on a drawing. There is no frame to bind to, so the line is
-                    // placed on its own origin with no rotation: the run starts at the left end
-                    // of what the page drew, and a line drawn right-to-left (file 04) starts at
-                    // the other end because that is where its left end is.
+                    // Not a stamp line: no rectangle around this line, or a rectangle that is
+                    // not this line's own frame (see above) - the per-glyph text of a round
+                    // seal, a rotated label on a drawing, a label lying across a table rule.
+                    // There is no frame to bind to, so the line is placed on its own origin with
+                    // no rotation: the run starts at the left end of what the page drew, and a
+                    // line drawn right-to-left (file 04) starts at the other end because that
+                    // is where its left end is.
                     double dirX = Math.cos(Math.toRadians(lineAngle));
                     float startX = px;
                     if (dirX <= -0.5) startX = px - b.length;
                     else if (Math.abs(dirX) < 0.5) startX = px - b.length / 2f;
-                    anchorAt(sb, ctx, startX, py, 0f, ASCENT * b.size, wPt, hPt,
+                    // WHERE IN THE BOX THE BASELINE SITS. A line that had a rectangle but is not
+                    // a stamp line used to be placed by a frame, and a frame puts the top of
+                    // the line's box {@link #LINE_BASE} of its height above the baseline. The
+                    // exact inset reproduces that placement exactly - {@code LINE_BASE *
+                    // LINE_FACTOR} em puts the baseline on {@code b.y}, which is where the page
+                    // drew it (see the second {@link #anchorBox}) - so swapping the construct
+                    // moves nothing: measured on 352, dy is 0.8 pt median and 23.0 pt worst,
+                    // against the frame's 0.6 and 23.0. A line with no rectangle at all keeps
+                    // the {@link #ASCENT} it has always had, because every other such line in
+                    // the corpus is measured against that.
+                    float topEm = frame != null ? LINE_BASE * LINE_FACTOR : ASCENT;
+                    anchorAt(sb, ctx, startX, py, 0f, topEm * b.size, wPt, hPt,
                             inner.toString(), 0f, -1, 0.6f, 0f, 0f);
                 }
             }
@@ -2561,13 +2574,11 @@ public final class DocxWriter {
     }
 
     /**
-     * A pinned paragraph: each of its lines written as the frame {@link #stampLine} writes, at
-     * the point the page drew it.
      * A pinned paragraph: each of its lines anchored where the page drew it, as the text box
      * {@link #anchorBox} writes.
      *
      * <p>WHY THIS IS NO LONGER THE FRAME A STAMP USES. These lines were written as
-     * {@code w:framePr} paragraphs, exactly as {@link #stampLine} writes a stamp, and the frame
+     * {@code w:framePr} paragraphs, exactly as a stamp line was, and the frame
      * did what it was added for: LibreOffice honoured it and admit-card's median dy fell from
      * 17.2 pt to 2.4 pt. On a real phone in Google Docs the words were nowhere near the photo
      * box - they rendered clipped at the left margin, across "Name of candidate". Google Docs
@@ -3961,115 +3972,6 @@ public final class DocxWriter {
         m.freeform = cmds;
         m.freeformClosed = false;
         return m;
-    }
-
-    /**
-     * One turned line as a real paragraph, held at the page's own (x, y) by {@code w:framePr}.
-     *
-     * <p>WHERE THIS IS STILL USED, after T02-B. A stamp proper is now ONE rotated text box
-     * carrying its frame and its text ({@link #stampBox}), because Google Docs ignores
-     * {@code w:framePr} and rendered a framed stamp as black upright words at the left margin
-     * plus a frame alone on a second page. What is left here is every turned line that is not a
-     * stamp: a label a page drew at an angle inside a rectangle that is not that line's own frame
-     * ({@link #frameIsRect} says no), a seal's per-glyph ring, and - with {@code lineAngle} 0 -
-     * a short line drawn beside a table ({@link #framedBoxes}). Those keep exactly the placement
-     * they had, which is what keeps the 208-document gate where it was.
-     *
-     * <p>WHY A FRAME AND NOT A FLOWED PARAGRAPH (the measurement behind D-25/T02-A).
-     *
-     * <p>WHAT WAS WRONG WITH PLACING IT BY {@code w:ind} AND {@code w:spacing}. A flow only goes
-     * downwards. A stamp is drawn OVER the page: its lines sit at a y the prose beside them has
-     * already passed, and {@code w:spacing w:before} cannot be negative, so the paragraph lands
-     * at whichever is lower - its own y or the flow's position - and then every line after it
-     * inherits the overshoot. Measured on the five stamp documents before this change: the
-     * stamp's own lines landed 11 pt (02), 39-117 pt (03), 60 pt (04), 33-87 pt (08) and 80-87 pt
-     * (01) below their y, the prose below them was pushed down by the same amount, and on 03 and
-     * 04 one stamp line ("VERIFIED FOR AUDIT", "DUPLICATE ISSUED") was not in the render at all.
-     * {@code orderStamps()} could not fix that: it moves a paragraph in the block list, and no
-     * position in a flow is above the flow's own point.
-     *
-     * <p>WHAT A FRAME DOES. {@code w:framePr} is a paragraph property - not a drawing, not a
-     * text box - that takes the paragraph out of the flow and anchors it at an absolute page
-     * point with {@code w:wrap="none"}. So the paragraph is still a paragraph (selectable,
-     * editable, in the document's order, {@code wps:txbx} stays 0), and it is where the page put
-     * it, and it adds nothing to the height of the page it sits on. The point written is the
-     * corner of the line's own box in page space, taken from the baseline's origin and the
-     * line's angle - not the origin itself, which is a different point for every angle but a
-     * horizontal one. The glyphs then sit in the frame exactly as they sit in a flowed line of
-     * the same box.
-     *
-     * <p>The glyphs of a line the page drew at an angle come out upright here: OOXML has no text
-     * rotation that LibreOffice honours, which is the recorded renderer limit (D-16) and not
-     * something this writer can fix. What the paragraph does give is the line's own position and
-     * its own editability, and the frame around it keeps its angle because the angle is in the
-     * frame's path.
-     */
-    private static void stampLine(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b, Ctx ctx,
-                                  float px, float py, float lineAngle, float advance) {
-        String text = b.text();
-        if (text.trim().isEmpty()) return;
-        // The line's own box, measured exactly as a flowed line's is, so the glyphs land at the
-        // same place inside the frame as they would inside a paragraph of the same height.
-        float linePt = flowLinePt(-1f, b.size, 0f);
-        float len = Math.max(b.length, advance);
-        // THE CORNER OF THE LINE'S BOX IN PAGE SPACE, from the one point the engine has: the
-        // baseline's origin. Reading it as if it were the corner is the second half of the
-        // defect - the stamp's words were 39 pt low on 01, 69 pt on 03 and 12 pt on 04 while the
-        // frame they belong to was drawn in the right place, which is the "the frame drifts"
-        // the user reported. A turned baseline is not a horizontal one:
-        //
-        //   * the box top is the top of the whole baseline, not the y of its first glyph, so a
-        //     line that rises to the right starts at the BOTTOM of its own box (01, 08);
-        //   * the ascent is measured across the baseline, so on a 90-degree line it is a
-        //     displacement along x and moves the box top by nothing at all (03);
-        //   * and a 180-degree line's origin comes back MIRRORED, so the part of the box above
-        //     its baseline is below it on the page - the box has to be mirrored, not the point
-        //     (04, and D-25's note on the mirrored pair).
-        double th = Math.toRadians(lineAngle);
-        float cosA = (float) Math.cos(th), sinA = (float) Math.sin(th);
-        float startX, topPt;
-        if (mirrored(b)) {
-            // Mirrored: the page-space top is the mirror of the box's own BOTTOM.
-            topPt = ctx.pageHeightPt - b.y - (1f - LINE_BASE) * linePt;
-            startX = px - len;
-        } else {
-            topPt = Math.min(py, py + len * sinA) - LINE_BASE * linePt * Math.abs(cosA);
-            startX = Math.min(px, px + len * cosA);
-            // A line that runs UP the page rather than across it. Its own box is one glyph wide
-            // and a hundred points tall, and the words are written upright - OOXML has no
-            // rotation LibreOffice honours (D-16) - so the one thing that can be kept is that
-            // the line stays on the paper: it is centred on the column the page drew it in, which
-            // is where it was before and where the reader can still see it.
-            if (Math.abs(cosA) < 0.5f) startX = px - len / 2f;
-        }
-        int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
-        int xTw = (int) Math.max(0L, Math.round(startX * TWIPS_PER_PT));
-        int yTw = (int) Math.max(0L, Math.round(topPt * TWIPS_PER_PT));
-        // Wide enough for the line unwrapped. A frame wraps its own text at w:w, so a box that
-        // is a point too narrow turns "GOODS RECEIVED" into two lines inside the stamp.
-        float boxW = len + b.size * 1.5f;
-        // And never off the paper. A stamp is drawn at the edge of the page by definition, so a
-        // line whose upright text is wider than the room to the right of it would be cut off by
-        // the page edge instead of the frame - measured on 03, where the vertical line at x=541
-        // had 54 pt of paper left and 113 pt of text, and the render held "VERIFIED FO".
-        startX = Math.max(0f, Math.min(startX, ctx.pageWidthPt - boxW));
-        int wTw = (int) Math.max(1L, Math.round(boxW * TWIPS_PER_PT));
-        sb.append("<w:p><w:pPr>")
-                .append("<w:framePr w:w=\"").append(wTw)
-                .append("\" w:h=\"").append(lineTw)
-                .append("\" w:hRule=\"exact\" w:wrap=\"none\" w:vAnchor=\"page\" w:hAnchor=\"page\"")
-                .append(" w:x=\"").append(xTw).append("\" w:y=\"").append(yTw).append("\"/>")
-                .append("<w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\"")
-                .append(" w:before=\"0\" w:after=\"0\" w:line=\"").append(lineTw)
-                .append("\" w:lineRule=\"exact\"/>")
-                .append("<w:ind w:left=\"0\" w:right=\"0\" w:firstLine=\"0\"/>")
-                .append("</w:pPr>");
-        for (PdfToWord.Run run : b.runs) {
-            if (run.text.isEmpty()) continue;
-            runXml(sb, run);
-        }
-        sb.append("</w:p>");
     }
 
     /**
