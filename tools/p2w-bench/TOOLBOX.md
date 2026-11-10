@@ -155,7 +155,8 @@ Always release the claim when you finish, even on failure.
 ```
 python3 tools/p2w-bench/classify.py
 python3 tools/p2w-bench/classify.py --subclusters "<exact class name>"
-python3 tools/p2w-bench/classify.py --attempt "<exact class name>" --outcome kept|improved|reverted|error
+python3 tools/p2w-bench/classify.py --attempt "<exact class name>" --moved <n> --total <n>
+python3 tools/p2w-bench/classify.py --attempt "<exact class name>" --outcome error
 python3 tools/p2w-bench/classify.py --top <n>        # how many classes the table lists
 ```
 
@@ -190,9 +191,18 @@ class '47_margins' - 20 documents, 32 outside checks
 Copy the class name exactly as printed, including the `(+N)` suffix. If it says no
 class matches, run `classify.py` first and copy from the output.
 
-Attempt outcomes: `kept` (target passes on at least half, nothing worse),
-`improved` (moved on at least a third, nothing worse, day restarts up to 3 times),
-`reverted`, `error`. Limits: one day per class, 12 attempts, 3 requeues.
+The outcome is COMPUTED from `--moved` and `--total`, not chosen:
+
+```
+moved 12 of 20 (60%) -> kept        the target now passes on at least half
+moved  8 of 20 (40%) -> improved    moved on at least a third; day restarts, up to 3 times
+moved  3 of 20 (15%) -> reverted    real progress was not made
+```
+
+`--outcome kept` or `--outcome improved` without numbers is refused, and a claim
+that disagrees with the numbers is refused and NOT recorded. `--outcome error` is
+accepted without numbers, because an attempt that found no root cause has nothing
+to count. Limits: one day per class, 12 attempts, 3 requeues.
 
 ---
 
@@ -246,6 +256,31 @@ If it reports nothing measured on the current engine, say so plainly: the APK is
 then unverified by Google. Do not quietly publish.
 
 ---
+
+## commit-gate.sh — an engine change may not be committed without its evidence
+
+**Used by:** fixer, before every commit.
+
+```
+bash tools/commit-gate.sh            # 0 = commit, 1 = do not
+bash tools/commit-gate.sh --status   # report only, changes nothing
+```
+
+Exits 0 immediately when the engine did not change - there is nothing to prove.
+When it did, three things are required and the gate refuses on any of them:
+
+```
+ratchet.py exits 0                     no document fell
+precommit.sh --no-corpus exits 0       it builds, the guards pass
+BASELINE.md, RESULTS.jsonl, RATCHET.json changed in the same working tree
+```
+
+The third is the one that matters. "I ran the ratchet" is a claim;
+"RATCHET.json changed with the engine" is evidence, and evidence cannot be
+misremembered. On pass it writes `.p2w-gate-ok` with the engine hash and the time.
+
+A CI job re-checks the same thing on every push: an engine change whose commit
+does not also touch those files turns the build red, so it can never ship.
 
 ## precommit.sh — build and sanity before any commit
 

@@ -242,12 +242,29 @@ def main():
           "| 47_margins " in body or "| 47_margins |" in body, "not found alone")
     rc, out = run(w, "classify.py", "--subclusters", "47_margins")
     check("--subclusters finds a class by its printed name", rc == 0, "got %d" % rc)
-    rc, out = run(w, "classify.py", "--attempt", "47_margins", "--outcome", "kept")
-    check("--attempt kept marks the class FIXED", "FIXED" in out, out.strip()[:60])
-    rc, out = run(w, "classify.py", "--attempt", "22_reading_order", "--outcome", "improved")
-    check("--attempt improved restarts the day", "requeue" in out, out.strip()[:60])
-    rc, out = run(w, "classify.py", "--attempt", "22_reading_order", "--outcome", "reverted")
-    check("--attempt reverted counts against the limit", "attempts=" in out, out.strip()[:60])
+    # The outcome is computed from the numbers. A fixer cannot call something kept
+    # when the numbers say improved, and cannot claim either without numbers.
+    rc, out = run(w, "classify.py", "--attempt", "47_margins", "--moved", "12", "--total", "20")
+    check("12 of 20 moved is computed as kept", "kept" in out and "FIXED" in out,
+          out.strip()[:70])
+    rc, out = run(w, "classify.py", "--attempt", "22_reading_order", "--moved", "8", "--total", "20")
+    check("8 of 20 moved is computed as improved", "improved" in out and "requeue" in out,
+          out.strip()[:70])
+    rc, out = run(w, "classify.py", "--attempt", "09_font_names", "--moved", "3", "--total", "20")
+    check("3 of 20 moved is computed as reverted", "reverted" in out, out.strip()[:70])
+
+    rc, out = run(w, "classify.py", "--attempt", "11_bold_runs", "--moved", "8",
+                  "--total", "20", "--outcome", "kept")
+    check("a claim the numbers contradict is refused", rc == 1, "got %d" % rc)
+    check("and it says what the numbers actually were", "improved" in out, out.strip()[:70])
+    rc, out = run(w, "classify.py", "--attempt", "36_underline_rules", "--outcome", "kept")
+    check("kept without numbers is refused", rc == 1, "got %d" % rc)
+    rc, out = run(w, "classify.py", "--attempt", "42_alignment_mix", "--outcome", "error")
+    check("error needs no numbers", rc == 0, "got %d" % rc)
+    led = json.load(open(os.path.join(w, "ATTEMPTS.json")))
+    check("a refused attempt is not recorded",
+          "11_bold_runs" not in led and "36_underline_rules" not in led,
+          "ledger holds %s" % sorted(led))
     shutil.rmtree(w, ignore_errors=True)
 
     # ---------------- hypothesis.py ----------------

@@ -8,6 +8,20 @@ surfaces two hours later inside a run nobody is watching.
 
 So every `--flag` written in TOOLBOX.md is checked against the source it names. A
 flag that is documented but absent, or absent but documented, fails this check.
+
+Getting this right took three attempts, and the mistakes are worth keeping:
+
+  1. A plain text search counted `git log --format` - git's flag, not ours - and
+     counted flags named in comments. It reported six mismatches, three of them
+     imaginary, which is the quickest way to get a check ignored.
+
+  2. A strict search for `"--flag" in argv` fixed that and broke the other
+     direction: a flag passed to a helper, `num("--moved")`, was invisible, so
+     four working flags were reported as undocumented.
+
+  3. This version strips comments and docstrings first, then takes string
+     literals. A flag named in prose is not a flag the code accepts; a flag in a
+     string literal is, however it is later used.
 """
 import os
 import re
@@ -30,7 +44,20 @@ SOURCES = {
 SHELL = {
     "google-gate.sh": os.path.join(HERE, "google-gate.sh"),
     "precommit.sh": os.path.join(HERE, "..", "precommit.sh"),
+    "commit-gate.sh": os.path.join(HERE, "..", "commit-gate.sh"),
 }
+
+# flags a shell script passes through to another program rather than handling
+PASS_THROUGH = {"--no-corpus"}   # named in prose, handled by precommit
+INTERNAL = {"--list-checks"}     # ratchet calls verify_google with it
+
+
+def strip_noise(src):
+    """Remove comments and docstrings before looking for flags."""
+    src = re.sub(r'"""(?:.|\n)*?"""', "", src)
+    src = re.sub(r"'''(?:.|\n)*?'''", "", src)
+    src = re.sub(r"#[^\n]*", "", src)
+    return src
 
 
 def flags_in(text):
@@ -39,27 +66,21 @@ def flags_in(text):
 
 
 def parsed_flags(src, shell=False):
-    """Only flags the code actually reads.
+    """Every flag the code itself handles, with the prose removed first.
 
-    A plain text search counts `git log --format`, a flag that belongs to git and
-    not to us, and counts a flag named in a comment. Both made the check report
-    mismatches that were not real, which is the quickest way to get a check
-    ignored. So a flag counts only if the code parses it: `"--flag" in argv` or
-    `argv.index("--flag")` in Python, `--flag)` in a shell case block.
+    A shell script also carries flags that belong to the programs it calls -
+    `git log --format`, `git diff --cached`. Those are not its interface, so for a
+    shell script a flag counts only when the script dispatches on it: a `--flag)`
+    case arm, or a `" --flag"` string it compares against. Python has no such
+    ambiguity, so any string literal counts - which covers `"--flag" in argv`,
+    `argv.index("--flag")` and a helper call like `num("--moved")` alike.
     """
-    found = set()
+    src = strip_noise(src)
     if shell:
-        found |= set(re.findall(r"^\s*(--[a-z][a-z-]+)\)", src, flags=re.M))
-        found |= set(re.findall(r'^\s*(--[a-z][a-z-]+)\)', src, flags=re.M))
-    else:
-        found |= set(re.findall(r'"(?:--[a-z][a-z-]+)"\s+in\s+argv', src) and [])
-        for m in re.finditer(r'\[?\s*"(--[a-z][a-z-]+)"\s+in\s+argv', src):
-            found.add(m.group(1))
-        for m in re.finditer(r'argv\.index\("(--[a-z][a-z-]+)"\)', src):
-            found.add(m.group(1))
-        for m in re.finditer(r'"(--[a-z][a-z-]+)"\s+in\s+argv', src):
-            found.add(m.group(1))
-    return found
+        found = set(re.findall(r"^\s*(--[a-z][a-z-]+)\)", src, flags=re.M))
+        found |= set(re.findall(r'"(--[a-z][a-z-]+)"', src))
+        return found
+    return set(re.findall(r'"(--[a-z][a-z-]+)"', src))
 
 
 def main():
@@ -68,7 +89,6 @@ def main():
         return 1
     doc = open(DOC, encoding="utf-8").read()
 
-    # split the document into tool sections by "## <tool>"
     sections = re.split(r"^## ", doc, flags=re.M)
     problems = []
     checked = 0
@@ -91,16 +111,16 @@ def main():
         src_flags = parsed_flags(src, shell=(tool in SHELL))
         doc_flags = flags_in(sec)
 
-        # flags the document promises but the code does not implement
-        missing = sorted(f for f in doc_flags if f not in src_flags)
+        missing = sorted(f for f in doc_flags
+                         if f not in src_flags and f not in PASS_THROUGH)
         if missing:
             problems.append("%s: documented but not in the code: %s"
                             % (tool, ", ".join(missing)))
 
-        # flags the code implements but the document never mentions
         undocumented = sorted(f for f in src_flags
                               if f not in doc_flags
-                              and f not in ("--help", "--version", "--quiet", "--strict"))
+                              and f not in ("--help", "--version", "--quiet", "--strict")
+                              and f not in INTERNAL)
         if undocumented:
             problems.append("%s: in the code but undocumented: %s"
                             % (tool, ", ".join(undocumented)))

@@ -249,9 +249,46 @@ def main(argv):
     # ---- attempt recording mode -------------------------------------------
     if "--attempt" in argv:
         cls = argv[argv.index("--attempt") + 1]
-        outcome = "kept"
-        if "--outcome" in argv:
-            outcome = argv[argv.index("--outcome") + 1]
+        claimed = argv[argv.index("--outcome") + 1] if "--outcome" in argv else None
+
+        # The outcome is computed from the numbers, not chosen by the run.
+        # "kept" and "improved" were two words a fixer could pick between, and the
+        # difference between them is the difference between an honest report and a
+        # flattering one. Numbers cannot be talked into a better answer.
+        def num(flag):
+            if flag not in argv:
+                return None
+            try:
+                return int(argv[argv.index(flag) + 1].split("/")[0])
+            except (ValueError, IndexError):
+                return None
+
+        moved = num("--moved")
+        total = num("--total")
+
+        if moved is None or total is None or total <= 0:
+            if claimed in ("kept", "improved"):
+                print("refused: '%s' needs numbers. Pass --moved <n> --total <n> so the" % claimed)
+                print("outcome is computed rather than asserted. A run that cannot say how")
+                print("many documents moved has not measured anything.")
+                return 1
+            outcome = claimed or "error"
+        else:
+            ratio = float(moved) / float(total)
+            if ratio >= 0.5:
+                outcome = "kept"
+            elif ratio >= 1.0 / 3.0:
+                outcome = "improved"
+            else:
+                outcome = "reverted"
+            if claimed and claimed != outcome:
+                print("refused: you said '%s' but %d of %d documents moved, which is '%s'."
+                      % (claimed, moved, total, outcome))
+                print("Record what happened, not what you hoped. Re-run without --outcome")
+                print("to record the computed result.")
+                return 1
+            print("moved %d of %d (%.0f%%) -> %s" % (moved, total, ratio * 100, outcome))
+
         led = load_ledger()
         e = led.setdefault(cls, {"first_seen": time.time(), "attempts": 0,
                                  "last": 0, "outcomes": [], "requeues": 0})

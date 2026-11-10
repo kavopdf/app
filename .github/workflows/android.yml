@@ -64,6 +64,45 @@ jobs:
           fi
 
       # ---------------------------------------------------------------------
+      # An engine change must carry its evidence in the same commit.
+      #
+      # The fixer prompt says "do not commit without the ratchet". A prompt is a
+      # promise; this is the check that makes it a fact. "I ran the ratchet" is a
+      # claim, "RATCHET.json changed in the same commit as the engine" is evidence,
+      # and evidence cannot be misremembered at 3am.
+      #
+      # A commit that fails this is visible forever, and the build job is never
+      # reached, so nothing that skipped its proof can ever ship.
+      # ---------------------------------------------------------------------
+      - name: An engine change must carry its evidence
+        run: |
+          set -e
+          ENGINE=app/src/main/java/com/kavopdf/app/engine
+          BASE=$(git rev-parse HEAD~1 2>/dev/null || echo "")
+          if [ -z "$BASE" ]; then
+            echo "no parent commit - first commit, nothing to compare"; exit 0
+          fi
+          if git diff --quiet "$BASE" HEAD -- "$ENGINE"; then
+            echo "engine unchanged in this commit - no evidence required"; exit 0
+          fi
+          echo "engine changed - checking the evidence travelled with it"
+          MISSING=0
+          for f in BASELINE.md RESULTS.jsonl RATCHET.json; do
+            if git diff --quiet "$BASE" HEAD -- "tools/p2w-bench/$f"; then
+              echo "FAIL  tools/p2w-bench/$f did not change in the same commit"
+              MISSING=1
+            else
+              echo "ok    $f changed with the engine"
+            fi
+          done
+          if [ "$MISSING" -ne 0 ]; then
+            echo ""
+            echo "An engine change with no measurement is a fix nobody checked."
+            echo "Commit the numbers with the code, or revert the engine."
+            exit 1
+          fi
+
+      # ---------------------------------------------------------------------
       # The gates that see what gate.py cannot.
       #
       # gate.py scores blank, blocks, extra, lines, missing, nobg, pages and
