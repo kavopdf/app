@@ -152,6 +152,10 @@ def release_fixer():
 
 
 def main(argv):
+    # Every cron calls this first. A hint here reaches all four on every run, which
+    # is cheaper than hoping four prompts stay in step. stderr, because --phase must
+    # print one bare word on stdout for $(...).
+    sys.stderr.write("interface: tools/p2w-bench/TOOLBOX.md - read the sections for the tools you use\n")
     s = load()
 
     if "--apk-status" in argv:
