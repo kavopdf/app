@@ -843,6 +843,9 @@ def main(argv):
             print("    %-28s source=%-8s render=%-8s" % (k, c["source"], c["render"]))
     if out:
         with open(out, "w") as f:
+            res["document"] = os.path.splitext(os.path.basename(src))[0]
+            res["source_file"] = src
+            res["render_file"] = gd
             json.dump(res, f, indent=2)
     return 0 if res["ok"] else 1
 

@@ -148,8 +148,14 @@ def main(argv):
         # Archive the finished round so its numbers are never lost.
         if os.path.exists(BASE):
             shutil.copy(BASE, os.path.join(HERE, "ROUND-%d.md" % s["round"]))
+        # Always write the archive, even when nothing was attempted. A round that
+        # closed with zero attempts is a fact worth keeping - it means the fixer
+        # never ran, or every class was already parked - and silence would hide it.
         if os.path.exists(ATTEMPTS):
             shutil.copy(ATTEMPTS, os.path.join(HERE, "ATTEMPTS-round-%d.json" % s["round"]))
+        else:
+            json.dump({}, open(os.path.join(HERE, "ATTEMPTS-round-%d.json" % s["round"]),
+                               "w", encoding="utf-8"), indent=2)
 
         s.setdefault("history", []).append(
             {"round": s["round"], "phase": "closed", "scored": scored,
