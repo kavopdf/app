@@ -22,16 +22,16 @@ as measured; only the verdict is closed.
 
 | document | score | verdict | failed checks | engine | measured |
 |---|---|---|---|---|---|
-| 01_stamp_rotated_15deg_upright |  |  |  |  |  |
-| 02_stamp_rotated_15deg_upleft |  |  |  |  |  |
-| 03_stamp_vertical_90deg |  |  |  |  |  |
-| 04_stamp_180deg_upside_down |  |  |  |  |  |
-| 05_round_company_seal_curved_text |  |  |  |  |  |
-| 06_rect_paid_stamp_red_transparent |  |  |  |  |  |
-| 07_stamp_over_table |  |  |  |  |  |
-| 08_two_overlapping_stamps |  |  |  |  |  |
-| 09_stamp_font_not_embedded |  |  |  |  |  |
-| 10_stamp_as_image |  |  |  |  |  |
+| 01_stamp_rotated_15deg_upright | 37/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 2026-11-10 |
+| 02_stamp_rotated_15deg_upleft | 44/58 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 30_ink_where_blank_was, 35_rotation, 47_margins, 53_embedded_faces | 2a68de6 | 2026-11-10 |
+| 03_stamp_vertical_90deg | 35/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 41_block_spacing, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 2026-11-10 |
+| 04_stamp_180deg_upside_down | 33/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 07_table_rows, 09_font_names, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 47_margins, 53_embedded_faces, 55_orientation_mix, 56_rtl_runs | 2a68de6 | 2026-11-10 |
+| 05_round_company_seal_curved_text | 32/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 09_font_names, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 36_underline_rules, 41_block_spacing, 45_char_accuracy, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 2026-11-10 |
+| 06_rect_paid_stamp_red_transparent | 36/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 41_block_spacing, 43_within_10pt_x, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 2026-11-10 |
+| 07_stamp_over_table | 37/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 2026-11-10 |
+| 08_two_overlapping_stamps | 36/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 11_bold_runs, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 2026-11-10 |
+| 09_stamp_font_not_embedded | 45/58 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 53_embedded_faces | 2a68de6 | 2026-11-10 |
+| 10_stamp_as_image | 37/58 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 53_embedded_faces, 54_image_dpi, 55_orientation_mix | 2a68de6 | 2026-11-10 |
 | 11_stamp_with_signature_image |  |  |  |  |  |
 | 12_stamp_across_page_break |  |  |  |  |  |
 | 13_stamp_non_english |  |  |  |  |  |
