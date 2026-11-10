@@ -52,16 +52,16 @@ as measured; only the verdict is closed.
 | 28_value_overflows_cell_txtpos | 42/59 | FAIL | 02_text_run_count, 06_table_columns, 07_table_rows, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 43_within_10pt_x, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 29_dot_leaders_txtpos | 40/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 09_font_names, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 11 Nov |
 | 300_prescription_rx | 40/59 | FAIL | 01_page_count, 03_word_count, 04_words_missing, 05_words_extra, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 26_text_overlap, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 54_image_dpi, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
-| 301_lab_report_panel |  |  |  |  |  |
-| 302_radiology_report |  |  |  |  |  |
-| 303_discharge_summary |  |  |  |  |  |
-| 304_package_insert_small_print |  |  |  |  |  |
-| 305_vaccination_certificate |  |  |  |  |  |
-| 306_clinical_protocol_synopsis |  |  |  |  |  |
-| 30_mixed_font_sizes_one_baseline_txtpos |  |  |  |  |  |
-| 310_court_judgment |  |  |  |  |  |
-| 311_fir_police_form |  |  |  |  |  |
-| 312_affidavit_stamp_paper |  |  |  |  |  |
+| 301_lab_report_panel | 45/59 | FAIL | 01_page_count, 02_text_run_count, 14_filled_shapes, 18_median_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 302_radiology_report | 48/59 | FAIL | 03_word_count, 04_words_missing, 05_words_extra, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 303_discharge_summary | 41/59 | FAIL | 02_text_run_count, 05_words_extra, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces, 54_image_dpi, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 304_package_insert_small_print | 51/59 | FAIL | 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch, 26_text_overlap, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 305_vaccination_certificate | 36/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 14_filled_shapes, 17_matched_runs, 18_median_dy, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 32_stroke_lines, 35_rotation, 41_block_spacing, 45_char_accuracy, 47_margins, 53_embedded_faces, 55_orientation_mix, 56_rtl_runs, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 306_clinical_protocol_synopsis | 49/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 30_mixed_font_sizes_one_baseline_txtpos | 37/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 07_table_rows, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was, 41_block_spacing, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 310_court_judgment | 53/59 | FAIL | 03_word_count, 04_words_missing, 18_median_dy, 22_reading_order, 43_within_10pt_x, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 311_fir_police_form | 47/59 | FAIL | 03_word_count, 04_words_missing, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 312_affidavit_stamp_paper | 40/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 32_stroke_lines, 35_rotation, 41_block_spacing, 47_margins, 53_embedded_faces, 56_rtl_runs, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 313_power_of_attorney |  |  |  |  |  |
 | 314_tender_rfp_boq |  |  |  |  |  |
 | 315_gazette_notification |  |  |  |  |  |
