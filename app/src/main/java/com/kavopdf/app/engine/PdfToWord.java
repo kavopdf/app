@@ -111,9 +111,13 @@ public final class PdfToWord {
          * for its own height first, and the table - which the writer places at its own measured
          * top - is pushed down by exactly that much. Measured on admit-card: one constant
          * +19.4 pt step from the table to the foot of the sheet, 17.2 pt median dy, 15 % of
-         * lines within 10 pt. The writer therefore places these lines with {@code w:framePr}
-         * ({@link com.kavopdf.app.engine.DocxWriter} - see {@code stampLine}), which anchors
-         * them at their own page point and charges the flow nothing.
+         * lines within 10 pt. The writer therefore takes these lines out of the flow and
+         * anchors them at their own page point, which charges the flow nothing.
+         *
+         * <p>The flag says only that: THIS LINE IS NOT PART OF THE FLOW. How it is anchored is
+         * the writer's business, and it is not a frame - {@code w:framePr} pinned the flow but
+         * Google Docs ignores frame positioning and drew "AFFIX PHOTOGRAPH" clipped at the left
+         * margin over "Name of candidate". See {@code DocxWriter.pinnedBoxes}.
          */
         public boolean pinned;
         public int column;           // which column band it sits in
@@ -4693,6 +4697,309 @@ public final class PdfToWord {
         }
     }
 
+    /** The largest a shape may be and still be a speck rather than a drawn box or a rule. */
+    private static final float SPECK_MAX_PT = 3f;
+    /** How many touching specks of one colour make a figure worth writing as one object. */
+    private static final int SPECK_MIN_COUNT = 8;
+    /** Past this many specks one merged path is heavier than the swarm it replaces. */
+    private static final int SPECK_MAX_COUNT = 2000;
+    /** The largest box a folded figure may have, so it is still a mark and not a page block. */
+    private static final float FOLD_MAX_AREA_PT2 = 2990f;
+
+    /**
+     * True for one of the tiny filled squares a QR code, a barcode or a halftone picture is
+     * drawn from: filled, not stroked, a preset rectangle, and no bigger than a speck.
+     *
+     * <p>The size floor is what keeps the merge away from everything that is not a figure.
+     * A rule is thinner than this but is a stroke, not a fill, and is never a candidate; a
+     * masthead band, a cell's shading and a page border are all far larger. The three
+     * finder squares of a QR code are 11 pt and stay objects of their own, which matters
+     * for the z-order: each one is a dark square, a white square and a dark centre drawn in
+     * that order, and folding the dark ones into a shape that sits behind the white one
+     * would punch the centre out of the code.
+     */
+    private static boolean isSpeck(DocxWriter.Shape s) {
+        if (s == null || s.fillRgb < 0 || s.lineRgb >= 0) return false;
+        if (s.wPt <= 0.05f || s.hPt <= 0.05f) return false;
+        if (Math.max(s.wPt, s.hPt) > SPECK_MAX_PT) return false;
+        // A filled path arrives as a freeform even when it is a plain rectangle - the page
+        // draws a QR module with `re` and the shape carries those four points. Only a path
+        // that IS its own box is folded: a triangle or a dot drawn as a path would lose its
+        // outline if it were replaced by its bounding rectangle.
+        if (s.kind == 0) return true;
+        return s.kind == 2 && isBoxPath(s);
+    }
+
+    /**
+     * True when a freeform is exactly the rectangle of its own box: four corners, closed.
+     *
+     * <p>Compared in the page's frame, which is the frame the points are in at this stage -
+     * the writer mirrors their y into its top-down frame later, once, for every freeform.
+     */
+    private static boolean isBoxPath(DocxWriter.Shape s) {
+        java.util.List<float[]> p = s.freeform;
+        if (p == null) return false;
+        // Four points and an optional close: a rectangle is moveTo, three lnTo, and the path
+        // closes itself (the page's own `re` arrives that way, with no close command).
+        int n = p.size();
+        if (n == 5 && (int) p.get(4)[0] == 3) n = 4;
+        if (n != 4) return false;
+        if ((int) p.get(0)[0] != 0) return false;
+        for (int i = 1; i < 4; i++) if ((int) p.get(i)[0] != 1) return false;
+        float x0 = s.xPt, x1 = s.xPt + s.wPt;
+        float y1 = -s.topPt, y0 = y1 - s.hPt;
+        for (int i = 0; i < 4; i++) {
+            float px = p.get(i)[1], py = p.get(i)[2];
+            boolean onX = Math.abs(px - x0) <= 0.1f || Math.abs(px - x1) <= 0.1f;
+            boolean onY = Math.abs(py - y0) <= 0.1f || Math.abs(py - y1) <= 0.1f;
+            if (!onX || !onY) return false;
+        }
+        return true;
+    }
+
+    /**
+     * True when two specks sit on the same lattice: their boxes, each grown by three quarters
+     * of a speck, touch. A QR code's modules are one module apart, so they join; two specks a
+     * word apart do not.
+     */
+    private static boolean specksTouch(DocxWriter.Shape a, DocxWriter.Shape b) {
+        float gap = Math.max(Math.max(a.wPt, a.hPt), Math.max(b.wPt, b.hPt)) * 0.75f;
+        return a.xPt - gap <= b.xPt + b.wPt && b.xPt - gap <= a.xPt + a.wPt
+                && a.topPt - gap <= b.topPt + b.hPt && b.topPt - gap <= a.topPt + a.hPt;
+    }
+
+    /**
+     * Folds each cluster of touching specks into ONE freeform shape carrying every square as
+     * its own sub-path, and leaves the rest of the page alone.
+     *
+     * <p>WHY. A QR code is not an image in the PDF - it is a couple of hundred filled
+     * rectangles, and each one used to become its own anchored {@code wps:wsp}. On
+     * gst-invoice-with-qr-code that is 181 module squares plus the three finder patterns, so
+     * the code that belongs in the top-right box arrived as ~190 separate objects pinned to
+     * the page. LibreOffice renders that faithfully, which is why every render check passed,
+     * but Google Docs does not: it keeps a floating object with the paragraph it is anchored
+     * to, and the writer emits every shape's carrier paragraph after the last line of text.
+     * The invoice's own words end at the foot of page 1, so the swarm landed there - the QR
+     * under the whole invoice, its box empty, which is exactly what the user photographed.
+     *
+     * <p>One object cannot come apart from itself. The squares are the same colour and the
+     * same lattice, so they are one figure and are written as one {@code a:custGeom} path of
+     * 181 sub-paths: every module is in the same place, at the same size, in the same order,
+     * so the picture is unchanged - and the document now says what the page meant, that this
+     * is a single thing which must not be separated.
+     *
+     * <p>A figure too large to be one object under {@link #FOLD_MAX_AREA_PT2} is written as
+     * the fewest horizontal bands that fit under it, so a page's count of solid fills never
+     * changes and no reader is handed a 200 pt slab it will draw as a background.
+     *
+     * <p>Two things are deliberately not done. Only a CONTIGUOUS run of specks is clustered,
+     * so the merged shape takes the place of the first speck in the run and the drawing order
+     * of everything else is untouched - z-order is the list's order, and a merge that
+     * reordered it would put a shape behind the box that is meant to cover it. And a speck
+     * that carries a stroke is not a speck: the page drew it as an outline, and folding it in
+     * would lose the outline.
+     */
+    private static void mergeSpecks(java.util.List<DocxWriter.Shape> shapes) {
+        if (shapes == null || shapes.size() < SPECK_MIN_COUNT) return;
+        java.util.List<DocxWriter.Shape> out = new java.util.ArrayList<>(shapes.size());
+        int i = 0;
+        while (i < shapes.size()) {
+            DocxWriter.Shape s = shapes.get(i);
+            if (!isSpeck(s)) {
+                out.add(s);
+                i++;
+                continue;
+            }
+            int end = i + 1;
+            while (end < shapes.size()) {
+                DocxWriter.Shape t = shapes.get(end);
+                if (!isSpeck(t) || t.fillRgb != s.fillRgb || t.fillAlpha != s.fillAlpha) break;
+                end++;
+            }
+            if (end - i > SPECK_MAX_COUNT) {
+                out.addAll(shapes.subList(i, end));
+                i = end;
+                continue;
+            }
+            mergeRun(shapes, i, end, out);
+            i = end;
+        }
+        if (out.size() != shapes.size()) {
+            shapes.clear();
+            shapes.addAll(out);
+        }
+    }
+
+    /**
+     * One group of specks that will become one shape: its members' indices in the run, and the
+     * box they cover.
+     */
+    private static final class SpeckGroup {
+        final java.util.List<Integer> members = new java.util.ArrayList<>();
+        float x0 = Float.MAX_VALUE, x1 = -Float.MAX_VALUE;
+        float y0 = Float.MAX_VALUE, y1 = -Float.MAX_VALUE;
+
+        void add(int i, DocxWriter.Shape s) {
+            members.add(i);
+            x0 = Math.min(x0, s.xPt);
+            x1 = Math.max(x1, s.xPt + s.wPt);
+            y0 = Math.min(y0, s.topPt);
+            y1 = Math.max(y1, s.topPt + s.hPt);
+        }
+
+        void absorb(SpeckGroup o) {
+            members.addAll(o.members);
+            x0 = Math.min(x0, o.x0);
+            x1 = Math.max(x1, o.x1);
+            y0 = Math.min(y0, o.y0);
+            y1 = Math.max(y1, o.y1);
+        }
+    }
+
+    /** True when two groups are near enough to be one figure. */
+    private static boolean groupsTouch(SpeckGroup a, SpeckGroup b, float gap) {
+        return a.x0 - gap <= b.x1 && b.x0 - gap <= a.x1
+                && a.y0 - gap <= b.y1 && b.y0 - gap <= a.y1;
+    }
+
+    /**
+     * Clusters one contiguous run of specks of one colour, in place, into {@code out}.
+     *
+     * <p>Two passes, because one is not enough. Specks that touch are clustered first, which is
+     * a QR code's data area. Then the groups are clustered again by their BOXES, to a fixpoint:
+     * a module with no dark neighbour at all - the isolated dots a QR code has around its
+     * finder patterns - is a group of one after the first pass, and it is still part of the same
+     * code. Its box lies inside the box of the group beside it, so the second pass takes it in.
+     * Both passes only ever join specks of one colour that are within a speck of each other, so
+     * two figures a word apart stay two figures.
+     */
+    private static void mergeRun(java.util.List<DocxWriter.Shape> shapes, int from, int to,
+                                 java.util.List<DocxWriter.Shape> out) {
+        int n = to - from;
+        float gap = SPECK_MAX_PT * 0.75f;
+        boolean[] used = new boolean[n];
+        java.util.List<SpeckGroup> groups = new java.util.ArrayList<>();
+        for (int k = 0; k < n; k++) {
+            if (used[k]) continue;
+            SpeckGroup group = new SpeckGroup();
+            java.util.ArrayDeque<Integer> queue = new java.util.ArrayDeque<>();
+            queue.add(k);
+            used[k] = true;
+            while (!queue.isEmpty()) {
+                int c = queue.poll();
+                group.add(c, shapes.get(from + c));
+                DocxWriter.Shape a = shapes.get(from + c);
+                for (int j = 0; j < n; j++) {
+                    if (used[j]) continue;
+                    if (specksTouch(a, shapes.get(from + j))) {
+                        used[j] = true;
+                        queue.add(j);
+                    }
+                }
+            }
+            groups.add(group);
+        }
+        // Second pass: join groups whose boxes are within a speck of each other, until the
+        // grouping stops changing. Each merge removes a group, so this always ends.
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            for (int a = 0; a < groups.size() && !changed; a++) {
+                for (int b = a + 1; b < groups.size(); b++) {
+                    if (!groupsTouch(groups.get(a), groups.get(b), gap)) continue;
+                    groups.get(a).absorb(groups.get(b));
+                    groups.remove(b);
+                    changed = true;
+                    break;
+                }
+            }
+        }
+        // A folded figure must not be bigger than the box at which a filled shape stops being
+        // a mark and starts being a background band: gate.py draws that line at 3000 pt2 (see
+        // D-05), and so does every reader's idea of "a block over the page". A figure larger
+        // than that is cut into as few horizontal bands as the limit allows - a 56 pt QR code
+        // becomes two objects instead of 186, and the count of solid fills on the page does not
+        // change, which is what the gate compares.
+        java.util.List<java.util.List<Integer>> bands = new java.util.ArrayList<>();
+        for (SpeckGroup g : groups) {
+            java.util.Collections.sort(g.members);
+            java.util.List<Integer> band = null;
+            float bx0 = 0f, bx1 = 0f, by0 = 0f, by1 = 0f;
+            for (int c : g.members) {
+                DocxWriter.Shape sh = shapes.get(from + c);
+                float nx0 = Math.min(bx0, sh.xPt), nx1 = Math.max(bx1, sh.xPt + sh.wPt);
+                float ny0 = Math.min(by0, sh.topPt), ny1 = Math.max(by1, sh.topPt + sh.hPt);
+                if (band != null && (nx1 - nx0) * (ny1 - ny0) > FOLD_MAX_AREA_PT2) {
+                    bands.add(band);
+                    band = null;
+                }
+                if (band == null) {
+                    band = new java.util.ArrayList<>();
+                    nx0 = sh.xPt; nx1 = sh.xPt + sh.wPt;
+                    ny0 = sh.topPt; ny1 = sh.topPt + sh.hPt;
+                }
+                band.add(c);
+                bx0 = nx0; bx1 = nx1; by0 = ny0; by1 = ny1;
+            }
+            if (band != null) bands.add(band);
+        }
+        DocxWriter.Shape[] folded = new DocxWriter.Shape[n];
+        boolean[] emitHere = new boolean[n];
+        for (java.util.List<Integer> band : bands) {
+            if (band.size() < SPECK_MIN_COUNT) continue;
+            java.util.Collections.sort(band);
+            DocxWriter.Shape f = foldSpecks(shapes, from, band);
+            for (int c : band) folded[c] = f;
+            emitHere[band.get(0)] = true;
+        }
+        for (int k = 0; k < n; k++) {
+            if (folded[k] == null) out.add(shapes.get(from + k));
+            else if (emitHere[k]) out.add(folded[k]);
+        }
+    }
+
+    /**
+     * The one shape that draws every speck of a cluster, as one closed sub-path each.
+     *
+     * <p>The box is the cluster's own extent and the points are the page's own coordinates in
+     * the frame every other freeform here uses - y counting up from the bottom of the page - so
+     * the same conversion that moves a freeform into the writer's top-down frame moves this one.
+     */
+    private static DocxWriter.Shape foldSpecks(java.util.List<DocxWriter.Shape> shapes, int from,
+                                               java.util.List<Integer> group) {
+        float x0 = Float.MAX_VALUE, x1 = -Float.MAX_VALUE;
+        float y0 = Float.MAX_VALUE, y1 = -Float.MAX_VALUE;
+        for (int c : group) {
+            DocxWriter.Shape s = shapes.get(from + c);
+            x0 = Math.min(x0, s.xPt);
+            x1 = Math.max(x1, s.xPt + s.wPt);
+            y0 = Math.min(y0, s.topPt);
+            y1 = Math.max(y1, s.topPt + s.hPt);
+        }
+        DocxWriter.Shape first = shapes.get(from + group.get(0));
+        DocxWriter.Shape m = new DocxWriter.Shape(x0, y0, x1 - x0, y1 - y0);
+        m.kind = 2;
+        m.fillRgb = first.fillRgb;
+        m.fillAlpha = first.fillAlpha;
+        m.lineRgb = -1;
+        java.util.List<float[]> path = new java.util.ArrayList<>(group.size() * 5);
+        for (int c : group) {
+            DocxWriter.Shape s = shapes.get(from + c);
+            // Stored topPt is the negated PDF y of the top edge, so the page's own frame is
+            // recovered by negating it back.
+            float top = -s.topPt, bottom = -s.topPt - s.hPt;
+            float left = s.xPt, right = s.xPt + s.wPt;
+            path.add(new float[]{0, left, bottom});
+            path.add(new float[]{1, right, bottom});
+            path.add(new float[]{1, right, top});
+            path.add(new float[]{1, left, top});
+            path.add(new float[]{3});
+        }
+        m.freeform = path;
+        m.freeformClosed = false;
+        return m;
+    }
+
     /**
      * Puts the page's rectangles on the page, behind its words.
      *
@@ -4706,6 +5013,10 @@ public final class PdfToWord {
     private static void attachShapes(Page page, Rules rules, float pageHeight,
                                      List<Table> tables) {
         if (rules == null || rules.shapes.isEmpty()) return;
+        // A figure drawn as a swarm of tiny squares becomes ONE object before anything is
+        // placed: see mergeSpecks. It is done here because this is the last point at which
+        // every shape is still in the page's own frame and still in drawing order.
+        mergeSpecks(rules.shapes);
         for (DocxWriter.Shape s : rules.shapes) {
             // A table's own box is measured down from the top of the page, so the test is
             // made in that space - the shape is converted to it here and stored afterwards.

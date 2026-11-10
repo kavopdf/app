@@ -485,6 +485,18 @@ public final class DocxWriter {
         boolean positioned;
         /** The shapes on the page being written, so a stamp can find its own outline. */
         java.util.List<Shape> curShapes;
+        /**
+         * The lines of each stamp, keyed by the shape that carries that stamp's frame.
+         *
+         * <p>A stamp is written as ONE object - its frame and every line of its text inside one
+         * text box - so the writer has to know, when it meets the first of those lines, which
+         * other lines belong with it. That is what this map answers, and it is rebuilt for every
+         * page and every pass (see {@link #groupStamps}).
+         */
+        java.util.Map<Shape, java.util.List<PdfToWord.Box>> stampText =
+                new java.util.HashMap<>();
+        /** The stamps already written on this pass, so a stamp is written once. */
+        java.util.Set<Shape> stampWritten = new java.util.HashSet<>();
         /** Left edge of each column band on this page, in points, by Para.column. */
         java.util.Map<Integer, Float> colLeft;
         /**
@@ -827,6 +839,10 @@ public final class DocxWriter {
         // is a section. The words also come out in column order, which is the order the page is
         // read in - the per-line blocks the column pass produces interleave the two columns, and
         // grouping them by band puts each column back together.
+        // Which of the page's turned lines belong to one stamp, and which shape carries its
+        // frame. Rebuilt here rather than once per page because the page is written several
+        // times by the budget guard, and each pass must write every stamp again.
+        groupStamps(page, ctx.curShapes, ctx);
         if (columnPage(sb, page, ctx, pw)) return;
         // Which of this page's short lines are drawn beside a table rather than in its text, and
         // so must not charge the flow. Decided from the page's own geometry before anything is
@@ -1566,7 +1582,15 @@ public final class DocxWriter {
         } else if (block instanceof Picture) {
             picture(sb, (Picture) block, ctx);
         } else if (block instanceof Shape) {
-            if (!((Shape) block).consumed) shape(sb, (Shape) block, ctx);
+            Shape s = (Shape) block;
+            // A stamp whose frame is carried by its own text box is drawn BY that box, once,
+            // with both rules from the one geometry (see stampBox). Drawing the rule here as
+            // well would put a second copy of the frame on the page.
+            if (s.stampFrame
+                    && ctx.stampText.containsKey(s.mergedHost == null ? s : s.mergedHost)) {
+                return;
+            }
+            if (!s.consumed) shape(sb, s, ctx);
         }
     }
 
@@ -2121,10 +2145,10 @@ public final class DocxWriter {
         // not take into a cell, is not in the page's flow: it sits beside the table at a y the
         // flow only reaches after the table. Written as a flowed paragraph it charges the page
         // for its own height first, and the table - which table() places at its own measured
-        // top - is pushed down by exactly that. It is written as a frame instead, at the point
-        // the page drew it, and charges the flow nothing. See pinShortParas().
+        // top - is pushed down by exactly that. It is anchored at the point the page drew it
+        // instead, and charges the flow nothing. See pinShortParas().
         if (p.pinned && !anyRotated && !ctx.positioned) {
-            framedBoxes(sb, p, ctx);
+            pinnedBoxes(sb, p, ctx);
             return;
         }
         // A form row - a label and its value drawn on one baseline - is ONE line of the
@@ -2226,18 +2250,31 @@ public final class DocxWriter {
                 }
                 Frame frame = frameOf(ctx.curShapes, px, py, lineAngle);
                 if (frame != null) {
-                    // D-25: a line the page drew inside a stamp's frame is a paragraph, not a
-                    // text box, and the frame is not its border.
+                    // T02-B: a line the page drew inside a stamp's frame goes into that stamp's
+                    // ONE object - a rotated text box that carries the frame and the text
+                    // together (see stampBox). It is written once, where the first of the
+                    // stamp's lines falls in the page's order, so the box is at the point in
+                    // the document a reader would expect and the lines after it are unchanged.
                     //
-                    // The frame used to BE this box's <a:ln> border (5013433). That welded the
-                    // outer rule to one line of TEXT while the inner rule stayed on its own, so
-                    // the two rules could drift apart - the drift the user reported for months -
-                    // and, because the whole stamp then lived in wps:txbx, Google Docs could not
-                    // put a caret in any of it. Both rules are now one freeform shape written by
-                    // shape() (see stampFrames/mergedFrame) and this line is an ordinary
-                    // paragraph placed by its indent and space-before (see stampLine). The frame
-                    // and the text are siblings, and neither carries the other's geometry.
-                    stampLine(sb, p, b, ctx, px, py, lineAngle, advance);
+                    // WHY A TEXT BOX AGAIN. ae72de3 wrote each line as a w:framePr paragraph,
+                    // which LibreOffice honours and Google Docs does not: on a phone the words
+                    // came out black and upright at the LEFT MARGIN and the frame landed alone
+                    // on a second, empty page. The construct before it - wps:wsp with
+                    // <a:xfrm rot> - renders tilted and in place in Google Docs (v3.53.4's
+                    // device screenshot), so the stamp is that construct again. What ae72de3
+                    // fixed is kept: the frame's rules are still one geometry (stampFrames),
+                    // the stamp's place in the page's order is still its own y (orderStamps),
+                    // and a stamp still charges the page nothing (pageFits, spacingTw).
+                    Shape host = frame.shape.mergedHost == null
+                            ? frame.shape : frame.shape.mergedHost;
+                    java.util.List<PdfToWord.Box> stampLines = ctx.stampText.get(host);
+                    if (stampLines == null || stampLines.isEmpty()) {
+                        // A frame with no other line to keep it company - written on its own,
+                        // exactly as before.
+                        stampLine(sb, p, b, ctx, px, py, lineAngle, advance);
+                    } else if (ctx.stampWritten.add(host)) {
+                        stampBox(sb, stampLines, frame, lineAngle, ctx);
+                    }
                 } else {
                     // No rectangle around this line - the per-glyph text of a round seal, a
                     // rotated label on a drawing. There is no frame to bind to, so the line is
@@ -2375,21 +2412,37 @@ public final class DocxWriter {
     }
 
     /**
-     * A pinned paragraph: each of its lines written as the frame {@link #stampLine} writes, at
-     * the point the page drew it.
+     * A pinned paragraph: each of its lines anchored where the page drew it, as the text box
+     * {@link #anchorBox} writes.
      *
-     * <p>The frame machinery is the same one a stamp uses - {@code w:framePr} with
-     * {@code w:wrap="none"} and an absolute page anchor - so this is not a second way of
-     * placing text: the paragraph stays a paragraph (selectable, editable, in the document's
-     * order), it lands on the page's own coordinates, and it adds nothing to the height of the
-     * sheet. A horizontal line is the simplest case of that machinery: the angle is zero, so the
-     * corner of the line's box is its baseline's origin less the part of the box above the
-     * baseline, and the width is the line's own advance.
+     * <p>WHY THIS IS NO LONGER THE FRAME A STAMP USES. These lines were written as
+     * {@code w:framePr} paragraphs, exactly as {@link #stampLine} writes a stamp, and the frame
+     * did what it was added for: LibreOffice honoured it and admit-card's median dy fell from
+     * 17.2 pt to 2.4 pt. On a real phone in Google Docs the words were nowhere near the photo
+     * box - they rendered clipped at the left margin, across "Name of candidate". Google Docs
+     * ignores {@code w:framePr} positioning outright and draws the paragraph as ordinary body
+     * text, so a property only some readers implement is not a fix; it is a measurement of
+     * LibreOffice. The flow must not be charged for these lines, and the reader that would not
+     * honour the frame must still be able to place them.
+     *
+     * <p>WHY A TEXT BOX IS RIGHT HERE THOUGH IT IS WRONG FOR A STAMP. A stamp is the document's
+     * own words and the user edits them, so a stamp line has to stay a paragraph (D-25). This
+     * line is the LABEL OF A DRAWN RECTANGLE - "AFFIX PHOTOGRAPH" inside the photo box - and
+     * the writer already places that kind of label with {@link #anchorBox}: a label the page drew
+     * inside a closed outline belongs to the outline rather than to the flow (see
+     * {@link #containerOf}). A drawing's page-relative offset is the one positioning construct
+     * Google Docs honours, so the words land on the rectangle there, in Word and in LibreOffice
+     * alike. Each line is its own drawing, so no two of them can drift against each other.
+     *
+     * <p>AND IT STILL COSTS THE FLOW NOTHING. The wrapper paragraph is one twip tall
+     * ({@code w:line="1" w:lineRule="exact"}), so the table that follows is placed from the
+     * flow's position exactly as it was while the frame held the flow still - the 19.4 pt step
+     * does not come back.
      */
-    private static void framedBoxes(StringBuilder sb, PdfToWord.Para p, Ctx ctx) {
+    private static void pinnedBoxes(StringBuilder sb, PdfToWord.Para p, Ctx ctx) {
         for (PdfToWord.Box b : p.boxes) {
             if (b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
-            stampLine(sb, p, b, ctx, b.x, b.y, 0f, b.right - b.x);
+            anchorBox(sb, p, b, ctx);
         }
     }
 
@@ -3380,6 +3433,235 @@ public final class DocxWriter {
     }
 
     /**
+     * Which of a page's turned lines belong to one stamp, keyed by the shape that carries its
+     * frame.
+     *
+     * <p>The lines of a stamp are not marked as a group by the engine: they arrive as separate
+     * paragraphs, read after the page's own words. What ties them together is the geometry they
+     * share - each line's baseline falls inside the SAME rectangle, which is what
+     * {@link #frameOfLine} answers - so the grouping is that answer and nothing else. A rotated
+     * line with no rectangle round it (a ring's per-glyph text, a label on a drawing) is not a
+     * stamp line and is left out, so it keeps the placement it had.
+     *
+     * <p>The map is rebuilt for every page and every pass, and the "already written" set is
+     * cleared with it: the budget guard writes a page up to three times, and each pass has to
+     * write every stamp again.
+     */
+    private static void groupStamps(PdfToWord.Page page, java.util.List<Shape> outlines, Ctx ctx) {
+        ctx.stampText.clear();
+        ctx.stampWritten.clear();
+        if (outlines == null || outlines.isEmpty()) return;
+        for (Object o : page.blocks) {
+            if (!(o instanceof PdfToWord.Para)) continue;
+            for (PdfToWord.Box b : ((PdfToWord.Para) o).boxes) {
+                if (!b.rotated || b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
+                // A ring character is not a stamp line. A seal's letters are placed one by one
+                // round a circle, each with its own angle (see ringLines), and the box they sit
+                // nearest to is the document's own border - so grouping them would put a
+                // certificate's whole roundel into one text box and rewrite its text. They keep
+                // the placement they had.
+                if (b.ring) continue;
+                Frame f = frameOfLine(outlines, b, ctx);
+                if (f == null) continue;
+                // AND IS IT REALLY A RECTANGLE AT THIS LINE'S ANGLE? The box this method builds
+                // carries its path expressed in the line's own axes, which is only faithful when
+                // the shape IS that rectangle. It is not always: 08's "02-09-2025" is a 9-degree
+                // line whose nearest stroked box is the axis-aligned table border it sits over,
+                // and frameOf accepts it because 9 degrees is close to a whole quarter turn. Fed
+                // to the box, those corners are re-read in a 9-degree frame and the table's
+                // border comes out as a rotated rectangle that the page never drew. A shape whose
+                // corners do not land on the frame's own corners is not this line's frame, and
+                // the line is left exactly as it was.
+                if (!frameIsRect(f, mirrored(b) ? 180f : b.angle)) continue;
+                Shape host = f.shape.mergedHost == null ? f.shape : f.shape.mergedHost;
+                java.util.List<PdfToWord.Box> lines = ctx.stampText.get(host);
+                if (lines == null) {
+                    lines = new ArrayList<>();
+                    ctx.stampText.put(host, lines);
+                }
+                lines.add(b);
+            }
+        }
+    }
+
+    /**
+     * Do the frame's own corners land on the corners of the rectangle {@link #frameOf} measured?
+     *
+     * <p>That is the same question as "is this shape a rectangle turned to this line's angle",
+     * asked in the coordinates the stamp's box is written in. A rectangle at the line's angle maps
+     * onto the frame's own (0,0)-(w,h) box exactly; anything else - an axis-aligned rule a few
+     * degrees off the line, a path that is not a rectangle at all - lands somewhere inside it, and
+     * writing THAT into the box would move the page's own geometry.
+     */
+    private static boolean frameIsRect(Frame f, float lineAngle) {
+        float[][] c = rectCorners(f.shape);
+        if (c == null) return false;
+        double th = Math.toRadians(lineAngle);
+        double ux = Math.cos(th), uy = Math.sin(th), vx = -Math.sin(th), vy = Math.cos(th);
+        float p0x = (float) (f.cx - (f.w / 2.0) * ux - (f.h / 2.0) * vx);
+        float p0y = (float) (f.cy - (f.w / 2.0) * uy - (f.h / 2.0) * vy);
+        float tol = Math.max(1.5f, 0.02f * Math.min(f.w, f.h));
+        for (float[] p : c) {
+            float lx = (float) ((p[0] - p0x) * ux + (p[1] - p0y) * uy);
+            float ly = (float) ((p[0] - p0x) * vx + (p[1] - p0y) * vy);
+            if (Math.min(Math.abs(lx), Math.abs(lx - f.w)) > tol) return false;
+            if (Math.min(Math.abs(ly), Math.abs(ly - f.h)) > tol) return false;
+        }
+        return true;
+    }
+
+    /**
+     * A stamp as ONE object: its frame and every line of its text, in a single rotated text box.
+     *
+     * <p>WHAT THIS REPLACES, AND WHY. ae72de3 wrote each line of a stamp as a {@code w:framePr}
+     * paragraph and the frame as separate shapes, because LibreOffice honours a frame and a
+     * paragraph is editable. Google Docs does not honour {@code w:framePr}: the defect this
+     * method answers was confirmed on a real phone - "IN ORDER" and "GOODS RECEIVED" arrived as
+     * plain black upright text at the LEFT MARGIN and the green frame landed alone on a second,
+     * otherwise empty page. The construct before ae72de3 was a {@code wps:wsp} text box with
+     * {@code <a:xfrm rot>}, and v3.53.4's device screenshot shows that one working: the stamp
+     * green, tilted about 15 degrees, inside its frame, on one page.
+     *
+     * <p>So the stamp is that construct again, and it is still ONE object. The box carries
+     * <ul>
+     *   <li>both of the page's rules, as closed sub-paths of one {@code a:custGeom} - so the two
+     *       rules cannot drift against each other, which is what D-25 asked for and what
+     *       {@link #stampFrames}/{@link #mergedFrame} still produce;</li>
+     *   <li>every line of the stamp's text in {@code w:txbxContent}, placed inside the box at
+     *       its own measured position;</li>
+     *   <li>and one {@code <a:xfrm rot>}, so the frame AND the words turn together.</li>
+     * </ul>
+     * There is no second object to move against the first, and no {@code w:framePr} anywhere in
+     * a stamp.
+     *
+     * <p>THE GEOMETRY, AND WHY IT IS EXPRESSED IN THE BOX'S OWN FRAME. {@code <a:xfrm rot>} turns
+     * a shape about its CENTRE, so the path inside it must be the shape BEFORE the turn: the
+     * rectangle as the page's own text frame saw it, {@code frame.w} by {@code frame.h}, with
+     * {@code u} along the reading direction. Each rule's corners are the page's corners projected
+     * onto those two axes, and each line's baseline is projected the same way - so the text sits
+     * inside the frame by construction, and the rotation puts the whole thing back on the page.
+     * The anchor is then placed by {@link #anchorShape}, which solves for the offset such that the
+     * box's local (0,0) lands on the frame's own corner after the turn.
+     *
+     * <p>NOTHING IS CHARGED TO THE PAGE. The drawing is anchored in a zero-height carrier
+     * paragraph and its text lives in {@code w:txbxContent}, which {@link #spacingTw} does not
+     * count - so a stamp cannot lengthen the page it is drawn on and cannot send a line to a
+     * second sheet.
+     */
+    private static void stampBox(StringBuilder sb, java.util.List<PdfToWord.Box> lines,
+                                 Frame frame, float lineAngle, Ctx ctx) {
+        double th = Math.toRadians(lineAngle);
+        double ux = Math.cos(th), uy = Math.sin(th);
+        double vx = -Math.sin(th), vy = Math.cos(th);
+        // The frame's own corner in page space: local (0, 0) of the box.
+        float p0x = (float) (frame.cx - (frame.w / 2.0) * ux - (frame.h / 2.0) * vx);
+        float p0y = (float) (frame.cy - (frame.w / 2.0) * uy - (frame.h / 2.0) * vy);
+
+        // Each line's baseline in the box's own frame, and the top of its line box, which is
+        // where a paragraph has to start for its glyphs to land on the page's baseline.
+        int n = lines.size();
+        float[] lx = new float[n], top = new float[n], lpt = new float[n];
+        for (int i = 0; i < n; i++) {
+            PdfToWord.Box b = lines.get(i);
+            float px = b.x, py = b.y;
+            if (mirrored(b)) {
+                // A 180-degree line's origin comes back mirrored about the page (see
+                // {@link #mirrored}); the box's own frame is turned with it, so it has to be put
+                // back before it means anything here.
+                px = ctx.pageWidthPt - b.x;
+                py = ctx.pageHeightPt - b.y;
+            }
+            lx[i] = (float) ((px - p0x) * ux + (py - p0y) * uy);
+            float ly = (float) ((px - p0x) * vx + (py - p0y) * vy);
+            lpt[i] = flowLinePt(-1f, b.size, 0f);
+            top[i] = ly - LINE_BASE * lpt[i];
+        }
+        // The page's own order, not the order the lines were detected in.
+        Integer[] order = new Integer[n];
+        for (int i = 0; i < n; i++) order[i] = i;
+        final float[] sortKey = top;
+        java.util.Arrays.sort(order, new java.util.Comparator<Integer>() {
+            public int compare(Integer a, Integer b) {
+                return Float.compare(sortKey[a], sortKey[b]);
+            }
+        });
+
+        // The frame: every rule of this stamp, projected into the box's own frame. Both rules in
+        // one path, which is what keeps them from drifting against each other.
+        Shape local = new Shape(0f, 0f, Math.max(0.1f, frame.w), Math.max(0.1f, frame.h));
+        local.kind = 2;
+        java.util.List<float[]> cmds = new ArrayList<>();
+        Shape merged = frame.shape.mergedShape;
+        if (merged != null && merged.freeform != null && !merged.freeform.isEmpty()) {
+            for (float[] c : merged.freeform) {
+                int type = (int) c[0];
+                if (type == 3) {
+                    cmds.add(new float[]{3f});
+                    continue;
+                }
+                cmds.add(new float[]{type,
+                        (float) ((c[1] - p0x) * ux + (c[2] - p0y) * uy),
+                        (float) ((c[1] - p0x) * vx + (c[2] - p0y) * vy)});
+            }
+        } else {
+            // One rule only - the frame is the box itself.
+            cmds.add(new float[]{0f, 0f, 0f});
+            cmds.add(new float[]{1f, frame.w, 0f});
+            cmds.add(new float[]{1f, frame.w, frame.h});
+            cmds.add(new float[]{1f, 0f, frame.h});
+            cmds.add(new float[]{3f});
+        }
+        local.freeform = cmds;
+        local.freeformClosed = false;
+        long cx = Math.max(1, Math.round(frame.w * EMU_PER_PT));
+        long cy = Math.max(1, Math.round(frame.h * EMU_PER_PT));
+        String geomXml = geom(local, cx, cy);
+
+        // The stroke the page drew, with its own weight and opacity.
+        long lw = Math.max(0, Math.round(frame.shape.lineWidthPt * EMU_PER_PT));
+        String lnXml = "<a:ln w=\"" + lw + "\"><a:solidFill><a:srgbClr val=\""
+                + hex(frame.shape.lineRgb) + "\">" + alphaXml(frame.shape.lineAlpha)
+                + "</a:srgbClr></a:solidFill></a:ln>";
+
+        // The words, each paragraph at its own measured place inside the box. A text box lays its
+        // paragraphs out downwards from its top inset, so the first one gets the gap it needs and
+        // every later one gets the distance from the bottom of the line above it.
+        StringBuilder inner = new StringBuilder(256);
+        float cursor = 0f;
+        for (int k = 0; k < n; k++) {
+            int i = order[k];
+            float before = Math.max(0f, top[i] - cursor);
+            cursor = cursor + before + lpt[i];
+            int beforeTw = (int) Math.round(before * TWIPS_PER_PT);
+            int lineTw = (int) Math.max(1L, Math.round(lpt[i] * TWIPS_PER_PT));
+            int indTw = (int) Math.max(0L, Math.round(lx[i] * TWIPS_PER_PT));
+            inner.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
+                    .append(beforeTw).append("\" w:after=\"0\" w:line=\"").append(lineTw)
+                    .append("\" w:lineRule=\"exact\"/>")
+                    .append("<w:ind w:left=\"").append(indTw)
+                    .append("\" w:right=\"0\" w:firstLine=\"0\"/></w:pPr>");
+            for (PdfToWord.Run run : lines.get(i).runs) {
+                if (run.text.isEmpty()) continue;
+                runXml(inner, run);
+            }
+            inner.append("</w:p>");
+        }
+        if (System.getProperty("p2w.debugStamp") != null) {
+            System.err.println("STAMP angle=" + lineAngle + " frame=" + frame.w + "x" + frame.h
+                    + " centre=" + frame.cx + "," + frame.cy + " p0=" + p0x + "," + p0y
+                    + " lines=" + n);
+            for (int k = 0; k < n; k++) {
+                int i = order[k];
+                System.err.println("   line " + k + " lx=" + lx[i] + " top=" + top[i]
+                        + " pt=" + lpt[i] + " text=" + lines.get(i).text());
+            }
+        }
+        anchorShape(sb, ctx, p0x, p0y, 0f, 0f, frame.w, frame.h, lineAngle,
+                geomXml, lnXml, inner.toString(), 0f, 0f);
+    }
+
+    /**
      * Fold every stamp's concentric frame rules into one freeform shape.
      *
      * <p>This is the whole of D-25's first requirement. The user's report, corrected: in the
@@ -3475,13 +3757,18 @@ public final class DocxWriter {
     }
 
     /**
-     * One line of stamp text: a real paragraph, held at the page's own (x, y) by {@code w:framePr}.
+     * One turned line as a real paragraph, held at the page's own (x, y) by {@code w:framePr}.
      *
-     * <p>This is the other half of D-25, and T02-A is why it is a frame and no longer a flowed
-     * paragraph. The stamp used to be a {@code wps:txbx} text box, and Google Docs renders a
-     * text box as a drawing and cannot put a caret inside it - the user's "the stamp is not
-     * editable at all" on 02. A paragraph can be selected, edited and typed into in every
-     * reader, so each line of the stamp is one, and it stays one here.
+     * <p>WHERE THIS IS STILL USED, after T02-B. A stamp proper is now ONE rotated text box
+     * carrying its frame and its text ({@link #stampBox}), because Google Docs ignores
+     * {@code w:framePr} and rendered a framed stamp as black upright words at the left margin
+     * plus a frame alone on a second page. What is left here is every turned line that is not a
+     * stamp: a label a page drew at an angle inside a rectangle that is not that line's own frame
+     * ({@link #frameIsRect} says no), a seal's per-glyph ring, and - with {@code lineAngle} 0 -
+     * a short line drawn beside a table ({@link #framedBoxes}). Those keep exactly the placement
+     * they had, which is what keeps the 208-document gate where it was.
+     *
+     * <p>WHY A FRAME AND NOT A FLOWED PARAGRAPH (the measurement behind D-25/T02-A).
      *
      * <p>WHAT WAS WRONG WITH PLACING IT BY {@code w:ind} AND {@code w:spacing}. A flow only goes
      * downwards. A stamp is drawn OVER the page: its lines sit at a y the prose beside them has
@@ -3619,6 +3906,32 @@ public final class DocxWriter {
                                  float lx, float ly, float wPt, float hPt, String inner,
                                  float rotDeg, int borderRgb, float borderWpt,
                                  float lInsPt, float tInsPt) {
+        String ln;
+        if (borderRgb >= 0) {
+            ln = "<a:ln w=\"" + Math.max(6350, Math.round(borderWpt * EMU_PER_PT))
+                    + "\"><a:solidFill><a:srgbClr val=\""
+                    + String.format("%06X", borderRgb & 0xFFFFFF)
+                    + "\"/></a:solidFill></a:ln>";
+        } else {
+            ln = "<a:ln><a:noFill/></a:ln>";
+        }
+        anchorShape(sb, ctx, pageX, pageY, lx, ly, wPt, hPt, rotDeg,
+                "<a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom>", ln, inner,
+                lInsPt, tInsPt);
+    }
+
+    /**
+     * The anchor itself, with the box's geometry and stroke given rather than assumed.
+     *
+     * <p>Split out of {@link #anchorAt} so that a stamp can bring its own {@code a:custGeom} -
+     * both of its rules in one path - without a second copy of this element order. Everything
+     * here is the schema's: simplePos, positionH, positionV, extent, effectExtent, wrap, docPr,
+     * cNvGraphicFramePr, graphic. A reader that sees them out of order refuses the file.
+     */
+    private static void anchorShape(StringBuilder sb, Ctx ctx, float pageX, float pageY,
+                                    float lx, float ly, float wPt, float hPt, float rotDeg,
+                                    String geomXml, String lnXml, String inner,
+                                    float lInsPt, float tInsPt) {
         double th = Math.toRadians(rotDeg);
         double cos = Math.cos(th), sin = Math.sin(th);
         double dx = lx - wPt / 2.0, dy = ly - hPt / 2.0;
@@ -3666,16 +3979,9 @@ public final class DocxWriter {
         }
         sb.append("><a:off x=\"0\" y=\"0\"/><a:ext cx=\"").append(cx)
                 .append("\" cy=\"").append(cy).append("\"/></a:xfrm>")
-                .append("<a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom>")
-                .append("<a:noFill/>");
-        if (borderRgb >= 0) {
-            sb.append("<a:ln w=\"").append(Math.max(6350, Math.round(borderWpt * EMU_PER_PT)))
-              .append("\"><a:solidFill><a:srgbClr val=\"")
-              .append(String.format("%06X", borderRgb & 0xFFFFFF))
-              .append("\"/></a:solidFill></a:ln>");
-        } else {
-            sb.append("<a:ln><a:noFill/></a:ln>");
-        }
+                .append(geomXml)
+                .append("<a:noFill/>")
+                .append(lnXml);
         sb.append("</wps:spPr>")
                 .append("<wps:txbx><w:txbxContent>").append(inner).append("</w:txbxContent></wps:txbx>")
                 // wrap="none": the box must not re-wrap the line it holds, or a long line
