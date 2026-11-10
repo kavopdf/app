@@ -33,6 +33,11 @@ set -u
 cd "$(dirname "$0")/.." || exit 2
 
 FORCE_ALL=0
+# The corpus tier used to look only at /scratch/work/corpus, a path from the
+# session that wrote it, so tier 3 could not run anywhere else and anyone without
+# that exact directory got a hard failure. The directory is now taken from the
+# environment with the old path as the default.
+CORPUS_DIR="${P2W_CORPUS:-/scratch/work/corpus}"
 NO_CORPUS=0
 for arg in "$@"; do
   case "$arg" in
@@ -161,8 +166,8 @@ else
   echo "=== tier 3: did any document get worse ==="
   if [ "$NO_CORPUS" -eq 1 ]; then
     echo "skipped by --no-corpus"
-  elif [ ! -d /scratch/work/corpus ]; then
-    echo "no /scratch/work/corpus - tier 3 cannot run."
+  elif [ ! -d "$CORPUS_DIR" ]; then
+    echo "no corpus at $CORPUS_DIR - tier 3 cannot run."
     echo "Run it before committing an engine change: a document that got worse is a"
     echo "regression, and every count can stay clean while one does."
     FAILED=1
@@ -189,9 +194,9 @@ public class RunAll { public static void main(String[] a) throws Exception {
   System.out.println("done"); } }
 JAVA
     if javac -nowarn -cp "/tmp/precommit-out:$CP" -d /tmp/precommit-out /tmp/RunAll.java >/dev/null 2>&1; then
-      java -cp "/tmp/precommit-out:$CP" RunAll /scratch/work/corpus /tmp/precommit-docx \
+      java -cp "/tmp/precommit-out:$CP" RunAll "$CORPUS_DIR" /tmp/precommit-docx \
             "$(echo "$CP" | tr ':' '\n' | grep 'assets' | head -1)" >/dev/null 2>&1
-      if python3 tools/p2w-bench/gate.py --corpus /scratch/work/corpus \
+      if python3 tools/p2w-bench/gate.py --corpus "$CORPUS_DIR" \
             --out /tmp/precommit-docx \
             --baseline tools/p2w-bench/base208.json --check >/tmp/g2.$$ 2>&1; then
         pass "G2: $(grep -o 'no document got worse' /tmp/g2.$$ || echo passed)"

@@ -47,7 +47,7 @@ import fitz
 HERE = os.path.dirname(os.path.abspath(__file__))
 VERIFY = os.path.join(HERE, "verify_google.py")
 # Paths are given, not assumed. The first version of this file hardcoded
-# /scratch/work/a3, the sandbox directory of the session that wrote it, so the
+# a sandbox directory of the session that wrote it, so the
 # tool was committed to the repository and could not run anywhere else - the same
 # mistake audit_sim.py made. Defaults are relative to this file and to a temporary
 # directory, so a fresh clone works.
