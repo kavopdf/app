@@ -124,6 +124,127 @@ def _span_flags(sp):
     return {"sup": bool(f & 1), "ital": bool(f & 2), "bold": bool(f & 16)}
 
 
+# ----------------------------------------------------------------------------
+# checks 49-56: the things nothing measured at all
+#
+# Added after asking what a conversion can get wrong that none of the first 48
+# checks would notice. Each of these is a real failure mode that would pass
+# silently today.
+# ----------------------------------------------------------------------------
+
+
+def extra_checks2(src, gd):
+    """Return checks 49-56. Independent of the text runs."""
+    c = {}
+
+    # ---- 49 page size ------------------------------------------------------
+    # The one that can move everything. If Google Docs exports Letter where the
+    # PDF was A4, every coordinate on every page is wrong by a few percent and
+    # the position checks would blame the engine for a page-size mismatch.
+    def sizes(doc):
+        return [(round(p.rect.width, 1), round(p.rect.height, 1)) for p in doc]
+
+    s_sz, g_sz = sizes(src), sizes(gd)
+    same = sum(1 for a, b in zip(s_sz, g_sz) if abs(a[0] - b[0]) <= 1.5 and abs(a[1] - b[1]) <= 1.5)
+    c["49_page_size"] = (len(s_sz), same, s_sz and same == min(len(s_sz), len(g_sz)))
+
+    # ---- 50 annotations ----------------------------------------------------
+    # Links are counted elsewhere; sticky notes, highlights and free text are not.
+    def annots(doc):
+        n = 0
+        for p in doc:
+            n += sum(1 for a in p.annots() if a.type[1] not in ("Link", "Widget"))
+        return n
+
+    s_a, g_a = annots(src), annots(gd)
+    c["50_annotations"] = (s_a, g_a, s_a == 0 or g_a >= max(1, int(s_a * 0.5)))
+
+    # ---- 51 form fields ----------------------------------------------------
+    def fields(doc):
+        n = 0
+        for p in doc:
+            n += sum(1 for w in p.widgets())
+        return n
+
+    s_f, g_f = fields(src), fields(gd)
+    c["51_form_fields"] = (s_f, g_f, s_f == 0 or g_f >= max(1, int(s_f * 0.5)))
+
+    # ---- 52 outline / bookmarks -------------------------------------------
+    def outline(doc):
+        try:
+            return len(doc.get_toc())
+        except Exception:
+            return 0
+
+    s_o, g_o = outline(src), outline(gd)
+    c["52_outline"] = (s_o, g_o, s_o == 0 or g_o >= max(1, int(s_o * 0.5)))
+
+    # ---- 53 embedded font names -------------------------------------------
+    # 09_font_names counts distinct faces. This asks whether the FACE ITSELF
+    # survived, which is what decides whether the metrics are the same.
+    def faces(doc):
+        out = set()
+        for p in doc:
+            for f in p.get_fonts():
+                name = (f[3] or "").split("+")[-1].strip().lower()
+                if name:
+                    out.add(name)
+        return out
+
+    s_fa, g_fa = faces(src), faces(gd)
+    kept = len(s_fa & g_fa)
+    c["53_embedded_faces"] = (len(s_fa), kept,
+                              len(s_fa) == 0 or kept >= max(1, int(len(s_fa) * 0.5)))
+
+    # ---- 54 image resolution ----------------------------------------------
+    # 08 counts images and 48 measures area; neither notices a 300 dpi logo
+    # arriving as a 40 dpi smear.
+    def img_dpi(doc):
+        vals = []
+        for p in doc:
+            for im in p.get_image_info():
+                w_px = im.get("width") or 0
+                b = im["bbox"]
+                w_pt = max(1.0, b[2] - b[0])
+                if w_px and w_pt:
+                    vals.append(w_px / (w_pt / 72.0))
+        vals.sort()
+        return round(vals[len(vals) // 2]) if vals else 0
+
+    s_d, g_d = img_dpi(src), img_dpi(gd)
+    c["54_image_dpi"] = (s_d, g_d, s_d == 0 or g_d >= s_d * 0.6)
+
+    # ---- 55 page count per size -------------------------------------------
+    # A mixed-orientation document that comes out all one size is wrong even if
+    # the page COUNT matches.
+    def orientation_mix(doc):
+        land = sum(1 for p in doc if p.rect.width > p.rect.height)
+        return (land, len(doc) - land)
+
+    s_om, g_om = orientation_mix(src), orientation_mix(gd)
+    c["55_orientation_mix"] = (s_om, g_om, s_om == g_om)
+
+    # ---- 56 text direction -------------------------------------------------
+    # RTL documents whose direction is lost read backwards while every word is
+    # still present in the right place.
+    def rtl_runs(doc):
+        n = 0
+        for p in doc:
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                for ln in blk.get("lines", []):
+                    d = ln.get("dir", (1, 0))
+                    if d[0] < 0:
+                        n += 1
+        return n
+
+    s_rtl, g_rtl = rtl_runs(src), rtl_runs(gd)
+    c["56_rtl_runs"] = (s_rtl, g_rtl, s_rtl == 0 or g_rtl >= max(1, int(s_rtl * 0.5)))
+
+    return c
+
+
 def extra_checks(src, gd, s_runs, g_runs, pairs):
     """Return checks 32-48. pairs is [(source_run, render_run), ...] already matched."""
     c = {}
@@ -661,6 +782,7 @@ def compare(src_path, gd_path):
     checks["31_pages_lost_their_text"] = (0, empty_pages, empty_pages == 0)
 
     checks.update(extra_checks(src, gd, s_runs, g_runs, pairs))
+    checks.update(extra_checks2(src, gd))
 
     src.close()
     gd.close()
