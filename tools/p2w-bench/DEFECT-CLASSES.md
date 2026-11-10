@@ -12,51 +12,55 @@ Documents measured: **139 of 208**
 Limits: a class is PARKED after 3 attempts without a kept fix, or 24 hours open.
 A parked class is skipped by the fixer and kept here with its reason.
 
-| # | class | documents | share | area | checks | attempts | status |
-|---|---|---|---|---|---|---|---|
-| 1 | vertical drift +3 | 126 | 91% | position: line height | 19_worst_dy, 22_reading_order, 29_blank_where_ink_was, 02_text_run_count | 0 | OPEN |
-| 2 | text lost or duplicated [03_word_count] | 60 | 43% | text: extraction | 03_word_count, 04_words_missing | 0 | OPEN |
-| 3 | line spacing | 56 | 40% | position: line height | 23_line_pitch | 0 | OPEN |
-| 4 | vertical drift | 53 | 38% | position: line height | 18_median_dy | 0 | OPEN |
-| 5 | font substitution | 44 | 32% | fonts: family | 09_font_names | 0 | OPEN |
-| 6 | extra pages | 41 | 29% | layout: overflow | 01_page_count, 24_page_breaks | 0 | OPEN |
-| 7 | text unmatchable | 35 | 25% | position: gross | 17_matched_runs | 0 | OPEN |
-| 8 | table structure [07_table_rows] | 34 | 24% | tables: grid | 07_table_rows | 0 | OPEN |
-| 9 | invisible text | 31 | 22% | colours: contrast | 25_invisible_text | 0 | OPEN |
-| 10 | text lost or duplicated [05_words_extra] | 30 | 22% | text: extraction | 05_words_extra | 0 | OPEN |
-| 11 | shading lost | 27 | 19% | colours: fill | 14_filled_shapes | 0 | OPEN |
-| 12 | content shifted | 26 | 19% | position: gross | 30_ink_where_blank_was | 0 | OPEN |
-| 13 | text off page | 22 | 16% | position: bounds | 27_text_off_page | 0 | OPEN |
-| 14 | table structure [06_table_columns] | 20 | 14% | tables: grid | 06_table_columns | 0 | OPEN |
-| 15 | bold or italic lost [11_bold_runs] | 19 | 14% | fonts: run properties | 11_bold_runs | 0 | OPEN |
-| 16 | numbers lost | 19 | 14% | text: extraction | 16_numeric_runs | 0 | OPEN |
-| 17 | text overlap | 13 | 9% | position: collision | 26_text_overlap | 0 | OPEN |
-| 18 | font size drift | 4 | 3% | fonts: size | 10_font_sizes | 0 | OPEN |
-| 19 | text colour wrong | 2 | 1% | colours: run | 13_text_colours | 0 | OPEN |
-| 20 | horizontal drift | 2 | 1% | position: indent | 21_median_dx | 0 | OPEN |
+| # | class | documents | share | checks in class | attempts | status |
+|---|---|---|---|---|---|---|
+| 1 | 03_word_count (+1) | 60 | 43% | 03_word_count, 04_words_missing | 0 | OPEN |
+| 2 | 23_line_pitch | 56 | 40% | 23_line_pitch | 0 | OPEN |
+| 3 | 18_median_dy | 53 | 38% | 18_median_dy | 0 | OPEN |
+| 4 | 09_font_names | 44 | 32% | 09_font_names | 0 | OPEN |
+| 5 | 01_page_count (+1) | 41 | 29% | 01_page_count, 24_page_breaks | 0 | OPEN |
+| 6 | 17_matched_runs | 35 | 25% | 17_matched_runs | 0 | OPEN |
+| 7 | 07_table_rows | 34 | 24% | 07_table_rows | 0 | OPEN |
+| 8 | 25_invisible_text | 31 | 22% | 25_invisible_text | 0 | OPEN |
+| 9 | 05_words_extra | 30 | 22% | 05_words_extra | 0 | OPEN |
+| 10 | 14_filled_shapes | 27 | 19% | 14_filled_shapes | 0 | OPEN |
+| 11 | 30_ink_where_blank_was | 26 | 19% | 30_ink_where_blank_was | 0 | OPEN |
+| 12 | 27_text_off_page | 22 | 16% | 27_text_off_page | 0 | OPEN |
+| 13 | 06_table_columns | 20 | 14% | 06_table_columns | 0 | OPEN |
+| 14 | 11_bold_runs | 19 | 14% | 11_bold_runs | 0 | OPEN |
+| 15 | 16_numeric_runs | 19 | 14% | 16_numeric_runs | 0 | OPEN |
+| 16 | 26_text_overlap | 13 | 9% | 26_text_overlap | 0 | OPEN |
+| 17 | 10_font_sizes | 4 | 3% | 10_font_sizes | 0 | OPEN |
+| 18 | 13_text_colours | 2 | 1% | 13_text_colours | 0 | OPEN |
+| 19 | 21_median_dx | 2 | 1% | 21_median_dx | 0 | OPEN |
+| 20 | 28_clipped_at_edge | 1 | 1% | 28_clipped_at_edge | 0 | OPEN |
 
 ## Documents per class
 
-- **vertical drift +3** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down
-- **text lost or duplicated [03_word_count]** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down
-- **line spacing** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent
-- **vertical drift** — 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent
-- **font substitution** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down
-- **extra pages** — 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text
-- **text unmatchable** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 07_stamp_over_table
-- **table structure [07_table_rows]** — 01_stamp_rotated_15deg_upright, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 08_two_overlapping_stamps
-- **invisible text** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 04_stamp_180deg_upside_down, 07_stamp_over_table
-- **text lost or duplicated [05_words_extra]** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down
-- **shading lost** — 23_timetable_grid_txtpos, 300_prescription_rx, 301_lab_report_panel, 305_vaccination_certificate
-- **content shifted** — 334_patent_document, 403_crossword_puzzle, 404_sudoku_grid, 405_sheet_music_lyrics
-- **text off page** — 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 08_two_overlapping_stamps
-- **table structure [06_table_columns]** — 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 28_value_overflows_cell_txtpos, 29_dot_leaders_txtpos
-- **bold or italic lost [11_bold_runs]** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 08_two_overlapping_stamps
-- **numbers lost** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent
-- **text overlap** — 06_rect_paid_stamp_red_transparent, 17_three_column_widths_txtpos, 20_numbered_list_separate_column_txtpos, 300_prescription_rx
-- **font size drift** — 15_stamp_on_scanned_page, 304_package_insert_small_print, 331_pid_diagram, 39_small_caps_letter_spacing
-- **text colour wrong** — 15_stamp_on_scanned_page, 402_calendar_month_grid
-- **horizontal drift** — 375_attendance_register, 401_trifold_brochure
+- **03_word_count (+1)** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down
+- **23_line_pitch** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent
+- **18_median_dy** — 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent
+- **09_font_names** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down
+- **01_page_count (+1)** — 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text
+- **17_matched_runs** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 07_stamp_over_table
+- **07_table_rows** — 01_stamp_rotated_15deg_upright, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 08_two_overlapping_stamps
+- **25_invisible_text** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 04_stamp_180deg_upside_down, 07_stamp_over_table
+- **05_words_extra** — 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down
+- **14_filled_shapes** — 23_timetable_grid_txtpos, 300_prescription_rx, 301_lab_report_panel, 305_vaccination_certificate
+- **30_ink_where_blank_was** — 334_patent_document, 403_crossword_puzzle, 404_sudoku_grid, 405_sheet_music_lyrics
+- **27_text_off_page** — 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 08_two_overlapping_stamps
+- **06_table_columns** — 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 28_value_overflows_cell_txtpos, 29_dot_leaders_txtpos
+- **11_bold_runs** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 08_two_overlapping_stamps
+- **16_numeric_runs** — 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent
+- **26_text_overlap** — 06_rect_paid_stamp_red_transparent, 17_three_column_widths_txtpos, 20_numbered_list_separate_column_txtpos, 300_prescription_rx
+- **10_font_sizes** — 15_stamp_on_scanned_page, 304_package_insert_small_print, 331_pid_diagram, 39_small_caps_letter_spacing
+- **13_text_colours** — 15_stamp_on_scanned_page, 402_calendar_month_grid
+- **21_median_dx** — 375_attendance_register, 401_trifold_brochure
+- **28_clipped_at_edge** — 350_question_paper
+
+## Parked
+
+- **19_worst_dy (+3)** — 25.0 hours open without a kept fix (limit 24)
 
 ## Non-check text in the failed column
 

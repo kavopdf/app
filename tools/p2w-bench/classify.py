@@ -22,16 +22,21 @@ WHY THE CLASSES ARE NOT HAND-WRITTEN
   disjoint sets they are certainly not. Checks are merged by connected components
   at a Jaccard threshold, so a check that fails on its own stays on its own.
 
-  The hand-written table survives only as a HINT - a human label and a root-cause
-  area shown next to the cluster. It never decides the grouping.
+  Nothing here is hand-written any more, not even the names. A class is called
+  after the check that touches the most documents - "19_worst_dy (+3)" - and
+  nothing else. Every human label is an interpretation written before the data was
+  seen, and a wrong one sends the fixer after the wrong cause: an earlier version
+  labelled a cluster "vertical drift" and a fixer told to fix vertical drift would
+  have chased four different faults at once. The fixer reads the check ids and
+  works out the cause itself, which is the only place that judgement belongs.
 
 WHY THERE IS A LEDGER
   A fixer without a clock loops. It picks the top class, fails, picks the top
   class, fails, and a week later the same class is still on top and nothing else
   has been touched. Every attempt is recorded here with a first-seen time and a
-  count, and a class that has had MAX_ATTEMPTS tries or has been open longer than
-  MAX_HOURS without its score moving is PARKED: skipped, with the reason kept, so
-  the fixer moves on and the record survives.
+  count. A class gets ONE FULL DAY - MAX_HOURS - and at most MAX_ATTEMPTS tries
+  inside it; when either limit is reached it is PARKED, skipped by the fixer, and
+  kept in the file with its reason so the record survives and the work moves on.
 
 USAGE
   python3 tools/p2w-bench/classify.py [--top N]
@@ -47,64 +52,9 @@ from collections import Counter, defaultdict
 HERE = os.path.dirname(os.path.abspath(__file__))
 LEDGER = os.path.join(HERE, "ATTEMPTS.json")
 
-MAX_ATTEMPTS = 3      # tries per class before it is parked
-MAX_HOURS = 24        # wall-clock hours a class may stay open
+MAX_HOURS = 24        # one full day per class - the hard limit
+MAX_ATTEMPTS = 3      # and no more than three tries inside that day
 JACCARD = 0.55        # how alike two checks must be to count as one cause
-
-# Human labels only. These never group anything - they are shown beside a
-# cluster so a reader recognises it, and the area hints at where to look.
-CHECK_HINT = {
-    "01_page_count": ("extra pages", "layout: overflow"),
-    "24_page_breaks": ("extra pages", "layout: overflow"),
-    "31_pages_lost_their_text": ("blank page", "layout: overflow"),
-    "02_text_run_count": ("text split or merged", "text: run boundaries"),
-    "03_word_count": ("text lost or duplicated", "text: extraction"),
-    "04_words_missing": ("text lost or duplicated", "text: extraction"),
-    "05_words_extra": ("text lost or duplicated", "text: extraction"),
-    "16_numeric_runs": ("numbers lost", "text: extraction"),
-    "45_char_accuracy": ("characters wrong", "text: encoding"),
-    "09_font_names": ("font substitution", "fonts: family"),
-    "10_font_sizes": ("font size drift", "fonts: size"),
-    "34a_span_size_match": ("font size drift", "fonts: size"),
-    "34c_span_weight_match": ("bold or italic lost", "fonts: run properties"),
-    "11_bold_runs": ("bold or italic lost", "fonts: run properties"),
-    "12_italic_runs": ("bold or italic lost", "fonts: run properties"),
-    "13_text_colours": ("text colour wrong", "colours: run"),
-    "34b_span_colour_match": ("text colour wrong", "colours: run"),
-    "14_filled_shapes": ("shading lost", "colours: fill"),
-    "25_invisible_text": ("invisible text", "colours: contrast"),
-    "32_stroke_lines": ("borders missing", "drawing: strokes"),
-    "33_border_over_text": ("borders over text", "drawing: z-order"),
-    "46_text_crossing_rule": ("borders over text", "drawing: z-order"),
-    "36_underline_rules": ("underline lost", "drawing: decoration"),
-    "06_table_columns": ("table structure", "tables: grid"),
-    "07_table_rows": ("table structure", "tables: grid"),
-    "08_image_count": ("image missing", "images: extraction"),
-    "39_image_position": ("image misplaced", "images: placement"),
-    "48_image_area": ("image resized", "images: placement"),
-    "15_links": ("hyperlink lost", "links: extraction"),
-    "40_link_targets": ("hyperlink target", "links: extraction"),
-    "17_matched_runs": ("text unmatchable", "position: gross"),
-    "18_median_dy": ("vertical drift", "position: line height"),
-    "19_worst_dy": ("vertical drift", "position: line height"),
-    "20_within_10pt": ("vertical drift", "position: line height"),
-    "21_median_dx": ("horizontal drift", "position: indent"),
-    "43_within_10pt_x": ("horizontal drift", "position: indent"),
-    "22_reading_order": ("reading order", "position: block order"),
-    "23_line_pitch": ("line spacing", "position: line height"),
-    "41_block_spacing": ("paragraph spacing", "position: paragraph gap"),
-    "42_alignment_mix": ("alignment", "position: alignment"),
-    "44_header_footer": ("header or footer", "layout: margins"),
-    "47_margins": ("page margins", "layout: margins"),
-    "26_text_overlap": ("text overlap", "position: collision"),
-    "27_text_off_page": ("text off page", "position: bounds"),
-    "28_clipped_at_edge": ("text clipped", "position: bounds"),
-    "29_blank_where_ink_was": ("content shifted", "position: gross"),
-    "30_ink_where_blank_was": ("content shifted", "position: gross"),
-    "35_rotation": ("rotation lost", "drawing: transform"),
-    "37_super_subscript": ("super/subscript lost", "fonts: run properties"),
-    "38_list_markers": ("bullets lost", "text: list structure"),
-}
 
 CHECK_RE = re.compile(r"^\d{2}[a-c]?_[a-z_]+$")
 
@@ -222,28 +172,28 @@ def main(argv):
         docs = set()
         for c in g:
             docs |= doc_sets[c]
-        hint_name, area = CHECK_HINT.get(g[0], (g[0], "unmapped"))
-        # A cluster whose checks carry different hints is a group the data found,
-        # not one a human named. Say so instead of pretending it has a single
-        # identity, and name it after the check that touches the most documents.
-        distinct = {CHECK_HINT.get(c, (c, ""))[0] for c in g}
-        if len(distinct) == 1:
-            name = hint_name
-        else:
-            name = "%s +%d" % (hint_name, len(distinct) - 1)
+        # The class is named after the check that touches the most documents,
+        # and nothing else. Any human label would be an interpretation written
+        # before the data was seen, and a wrong label sends the fixer after the
+        # wrong cause - which is exactly what a hard-coded map did. The fixer
+        # reads the check ids and works out the cause itself.
+        name = g[0] if len(g) == 1 else "%s (+%d)" % (g[0], len(g) - 1)
         entry = led.get(name, {})
         attempts = entry.get("attempts", 0)
         status = entry.get("status", "OPEN")
         hours_open = round((now - entry["first_seen"]) / 3600, 1) if entry else 0
+        reason = entry.get("reason", "")
         if entry and status == "OPEN":
-            if attempts >= MAX_ATTEMPTS:
+            if hours_open >= MAX_HOURS:
                 status = "PARKED"
-            elif hours_open >= MAX_HOURS:
+                reason = "%s hours open without a kept fix (limit %s)" % (hours_open, MAX_HOURS)
+            elif attempts >= MAX_ATTEMPTS:
                 status = "PARKED"
+                reason = "%s attempts without a kept fix (limit %s)" % (attempts, MAX_ATTEMPTS)
         classes.append({
             "name": name, "checks": g, "docs": docs,
-            "area": area, "attempts": attempts, "status": status,
-            "hours": hours_open,
+            "attempts": attempts, "status": status,
+            "hours": hours_open, "reason": reason,
         })
 
     # Two unrelated clusters can land on the same label. Disambiguate rather than
@@ -269,11 +219,11 @@ def main(argv):
            "Limits: a class is PARKED after %d attempts without a kept fix, or %d hours open."
            % (MAX_ATTEMPTS, MAX_HOURS),
            "A parked class is skipped by the fixer and kept here with its reason.\n",
-           "| # | class | documents | share | area | checks | attempts | status |",
-           "|---|---|---|---|---|---|---|---|"]
+           "| # | class | documents | share | checks in class | attempts | status |",
+           "|---|---|---|---|---|---|---|"]
     for i, c in enumerate(classes[:top], 1):
-        out.append("| %d | %s | %d | %d%% | %s | %s | %d | %s |" % (
-            i, c["name"], len(c["docs"]), round(100 * len(c["docs"]) / total), c["area"],
+        out.append("| %d | %s | %d | %d%% | %s | %d | %s |" % (
+            i, c["name"], len(c["docs"]), round(100 * len(c["docs"]) / total),
             ", ".join(c["checks"]), c["attempts"], c["status"]))
 
     out.append("\n## Documents per class\n")
@@ -284,7 +234,7 @@ def main(argv):
     if parked:
         out.append("\n## Parked\n")
         for c in parked:
-            out.append("- **%s** — %s" % (c["name"], led.get(c["name"], {}).get("reason", "limit reached")))
+            out.append("- **%s** — %s" % (c["name"], c.get("reason") or "limit reached"))
 
     if prose:
         out.append("\n## Non-check text in the failed column\n")
@@ -292,11 +242,6 @@ def main(argv):
         for k, v in prose.most_common(5):
             out.append("- %s (%d)" % (k[:90], v))
 
-    unmapped = sorted(c for c in doc_sets if c not in CHECK_HINT)
-    if unmapped:
-        out.append("\n## Checks with no hint\n")
-        for k in unmapped:
-            out.append("- %s (%d)" % (k, len(doc_sets[k])))
 
     open(os.path.join(HERE, "DEFECT-CLASSES.md"), "w", encoding="utf-8").write("\n".join(out) + "\n")
 
@@ -304,7 +249,7 @@ def main(argv):
     print("checks firing      : %d" % len(doc_sets))
     print("classes (data-driven): %d" % len(classes))
     for c in classes[:10]:
-        print("  %-30s %3d docs  %-26s %s" % (c["name"][:30], len(c["docs"]), c["area"], c["status"]))
+        print("  %-34s %3d docs  %s" % (c["name"][:34], len(c["docs"]), c["status"]))
     return 0
 
 
