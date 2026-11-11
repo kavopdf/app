@@ -64,8 +64,26 @@ class ViewerActivity : PdfActivity() {
         binding.pager.orientation = ViewPager2.ORIENTATION_VERTICAL
 
         wireSearch()
-        val uri: Uri? = incomingUri(intent)
-        if (uri != null) openUri(uri) else pickPdf()
+        // The file can arrive two ways and BOTH were being acted on.
+        //
+        // PdfActivity.onCreate posts onPdfChosen when the file came as EXTRA_SOURCE_URI -
+        // which is what MainActivity's tool dispatch sends - and incomingUri(intent) below
+        // reads intent.data, EXTRA_STREAM and clipData. MainActivity sets clipData as well,
+        // so opening the reader from the home screen opened the same document twice: the
+        // copy, the parse, the page count and the renderer all ran twice. The activity log
+        // shows it plainly - "ViewerActivity:Working ran twice in 488ms", with Reader: page
+        // sizes and Reader: outline and links twice beside it.
+        //
+        // It is also why the reader used to crash with "Already closed": the second show()
+        // closed the renderer the first had just opened, while that renderer's page callback
+        // was still attached to the pager.
+        //
+        // When the base class already holds the file it hands it over itself, so this reads
+        // the intent only when the base class has nothing.
+        if (incomingUri == null) {
+            val uri: Uri? = incomingUri(intent)
+            if (uri != null) openUri(uri) else pickPdf()
+        }
     }
 
     /**

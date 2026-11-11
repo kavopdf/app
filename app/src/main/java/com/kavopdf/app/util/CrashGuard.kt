@@ -125,7 +125,11 @@ object CrashGuard {
                 AppLog.record(
                     app,
                     name,
-                    "ran twice in ${now - prev.at}ms - the same work was done again\n" +
+                    // Say what was worked on. Without it "ran twice in 488ms" cannot be
+                    // judged: it looks the same whether one document was opened twice or
+                    // two different documents were opened a moment apart.
+                    "ran twice in ${now - prev.at}ms - the same work was done again " +
+                            "(${NormStore.bucket(pages)} pages, ${NormStore.sizeBucket(bytes)} size)\n" +
                             environment(app),
                     AppLog.Level.DUPLICATE
                 )
