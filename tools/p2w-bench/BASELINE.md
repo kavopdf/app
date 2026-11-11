@@ -92,11 +92,11 @@ as measured; only the verdict is closed.
 | 34_monospace_document | 53/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 350_question_paper | 34/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 07_table_rows, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 26_text_overlap, 27_text_off_page, 28_clipped_at_edge, 29_blank_where_ink_was, 32_stroke_lines, 41_block_spacing, 45_char_accuracy, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 11 Nov |
 | 351_omr_answer_sheet | 47/59 | FAIL | 01_page_count, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
-| 352_certificate_ornate_border |  |  |  |  |  |
-| 353_admit_card |  |  |  |  |  |
-| 35_four_typefaces_one_page |  |  |  |  |  |
-| 360_restaurant_menu |  |  |  |  |  |
-| 361_product_catalogue_grid |  |  |  |  |  |
+| 352_certificate_ornate_border | 31/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 11_bold_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 36_underline_rules, 41_block_spacing, 45_char_accuracy, 47_margins, 53_embedded_faces, 54_image_dpi, 55_orientation_mix, 56_rtl_runs, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 353_admit_card | 44/59 | FAIL | 02_text_run_count, 11_bold_runs, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 42_alignment_mix, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 35_four_typefaces_one_page | 54/59 | FAIL | 18_median_dy, 22_reading_order, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 360_restaurant_menu | 46/59 | FAIL | 02_text_run_count, 06_table_columns, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 44_header_footer, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 361_product_catalogue_grid | 50/59 | FAIL | 14_filled_shapes, 18_median_dy, 19_worst_dy, 25_invisible_text, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces, 54_image_dpi | 2a68de6 | 11 Nov |
 | 362_price_list_dense |  |  |  |  |  |
 | 363_warranty_card |  |  |  |  |  |
 | 364_event_ticket |  |  |  |  |  |
