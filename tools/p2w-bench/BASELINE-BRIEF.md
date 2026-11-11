@@ -36,16 +36,19 @@ STEP 0b - READ THE INTERFACE OF THE TOOLS YOU WILL USE
   before you run either tool - the exit code meanings in particular, because 0 means passed and
   1 means failed for verify_google.py, and confusing those two writes a false PASS into the table.
 
-WHY YOU COMMIT ALL TEN AT ONCE, AND WHY YOU MUST COMMIT BEFORE STOPPING
-  One commit per run, carrying all ten documents. That is what was asked for and it is what the
-  history reads best: one batch, one commit, ten rows.
+WHY YOU COMMIT AFTER EVERY SINGLE DOCUMENT
+  Ten documents and then one commit was the rule, and it cost nine hours. Ten runs in a row
+  measured ten documents each and committed nothing: the work existed for eleven minutes inside
+  a sandbox and then the sandbox was gone. The repository never moved off 130.
 
-  The risk this carries is real and it is the one that cost a whole day already: a run that
-  measures ten and then dies before committing leaves the repository exactly where it was, and
-  the next run measures the same ten again. So the rule is not "commit at the end", it is
-  "never stop without committing". If you are running out of time at document seven, commit the
-  seven you have, say so in the table, and let the next run take the rest. An uncommitted
-  measurement is a measurement that did not happen.
+  A commit at the end is a bet that the run reaches the end. It does not, and when it does not
+  the whole run is lost - not most of it, all of it. A commit after each document is not a bet:
+  whatever has been measured is in the repository before the next document starts, and a run
+  that dies at document seven has still moved the corpus by seven.
+
+  So: measure one, record it, commit it, then start the next. The commit message names that one
+  document. Ten small commits in a run is the correct shape for work that can be cut off at any
+  moment without warning - and it has been cut off, ten times.
 
 WHAT YOU MEASURE
   The engine's docx goes to Drive, Drive converts it to a Google Doc, that document is exported
@@ -82,6 +85,17 @@ WHEN SOMETHING FAILS
   After three failures on one item: SKIP it, leave its row empty, write one line in
   tools/p2w-bench/INCIDENTS.md, and continue. One skipped document with a recorded
   reason is a result; a run that died retrying is not.
+
+STEP 0c - LEAVE A TRAIL, BECAUSE A DEAD RUN WRITES NOTHING
+  Before any work, append one line to tools/p2w-bench/RUN-LOG.md and commit it:
+      | <date> <HH:MM> | started | engine <ENGINE>, phase <PHASE> |
+  Then after each stage below, append one more line and commit again:
+      converted 10 / measured 10 / recorded / ratchet held / committing
+  Why: on 11 Nov ten runs in a row measured ten documents each and committed none, and
+  there was no way to tell where they died - the cron keeps no output, and a run that
+  dies before its first commit leaves no trace at all. One line per stage costs nothing
+  and turns the next failure into a fact instead of a guess.
+  If you never reach a stage, its line is missing - that is the answer.
 
 STEP 1 - CORPUS AND BUILD
   gh release download corpus-v1 --repo kavopdf/app --pattern pdf-to-word-test-corpus-v3.zip -O c1.zip
@@ -132,7 +146,7 @@ STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING ONCE AT THE END
     h. DELETE the Drive file: GOOGLEDRIVE_GOOGLE_DRIVE_DELETE_FOLDER_OR_FILE_ACTION(fileId=<id>)
     i. Write its row into BASELINE.md IN THE LOCAL CLONE straight away - six columns, never rebuild
        the file from a fetched string, that deleted 119 rows on 10 Nov.
-    j. AFTER THE TENTH DOCUMENT, and BEFORE STOPPING EARLY for any reason:
+    j. AFTER EVERY DOCUMENT - not after the tenth, after each one:
          python3 tools/p2w-bench/record.py res/*.json --round <round from ROUND.json> --engine $ENGINE
          python3 tools/p2w-bench/ratchet.py
          python3 tools/p2w-bench/record.py restxt/*.json --round <round from ROUND.json> --engine $ENGINE --txt
@@ -219,7 +233,7 @@ RULES
   tools/p2w-bench/docnames.py rather than writing it from memory.
   Claim the slot before working, release it before finishing - even on failure.
   Read the TOOLBOX.md sections for your tools before you start - the exit codes especially.
-  Commit the whole run's ten before you finish - never hold a run's work in memory only.
+  Commit after every document - never hold a measurement in memory only.
   Do not advance the phase unless every row has a score AND txt_gap.py prints 0.
   Never report PASS unless verify_google.py exited 0.
   Never estimate a number. Never leave a Google Doc behind.
