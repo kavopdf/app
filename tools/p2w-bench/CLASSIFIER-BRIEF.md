@@ -57,6 +57,22 @@ OUTPUT IS A SMALL TABLE
     | Top class | 19_worst_dy (+3) · 126 docs |
     | Ratchet | held |
 
+WHEN SOMETHING FAILS
+  Read tools/p2w-bench/RETRY.md before you retry anything. Classify the error first:
+  transient (rate limit, 429, 5xx, timeout) clears and is worth waiting for;
+  permanent (401, 404, "Resource not accessible", no space) never clears and is
+  not; already-done means the state you wanted is the state you have.
+      bash tools/retry.sh --classify "<the error text>"
+      bash tools/retry.sh -- <command>
+  NEVER retry a write without checking whether the first one landed - a commit, a
+  release or an upload that failed to answer may have succeeded. Read first.
+  Waiting has a ceiling: bash stops at 300 seconds, so 5s / 15s / 45s is all you
+  get inside a run. Beyond that, stop cleanly, release your claim, and let the next
+  scheduled run try again.
+  After three failures on one item: SKIP it, leave its row empty, write one line in
+  tools/p2w-bench/INCIDENTS.md, and continue. One skipped document with a recorded
+  reason is a result; a run that died retrying is not.
+
 STEP 1 - CLASSIFY
   python3 tools/p2w-bench/classify.py
   Writes tools/p2w-bench/DEFECT-CLASSES.md: one row per class with document count, share of the

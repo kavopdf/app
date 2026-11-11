@@ -45,6 +45,7 @@ SHELL = {
     "google-gate.sh": os.path.join(HERE, "google-gate.sh"),
     "precommit.sh": os.path.join(HERE, "..", "precommit.sh"),
     "commit-gate.sh": os.path.join(HERE, "..", "commit-gate.sh"),
+    "retry.sh": os.path.join(HERE, "..", "retry.sh"),
 }
 
 # flags a shell script passes through to another program rather than handling

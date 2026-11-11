@@ -257,6 +257,42 @@ then unverified by Google. Do not quietly publish.
 
 ---
 
+## retry.sh — run a command, and decide whether retrying can help
+
+**Used by:** all four crons, for any command that talks to the network.
+
+```
+bash tools/retry.sh -- <command...>
+bash tools/retry.sh --tries 4 -- <command...>
+bash tools/retry.sh --classify "<the error text>"
+bash tools/retry.sh --quiet -- <command...>
+```
+
+Classifies the failure before retrying anything:
+
+```
+transient    rate limit, 429, 502/503/504, connection reset, timeout
+             wait 5s, 15s, 45s. Three tries.
+permanent    bad credentials, 401, 404, "Resource not accessible", no space
+             stop at once. Retrying a missing permission just costs two minutes.
+already-done "destination path already exists" - the state you wanted is the state
+             you have. Exit 0 and continue.
+unknown      neither pattern matched. One retry, then stop.
+```
+
+`--classify` prints the class for a piece of error text and exits 0, so a cron can
+ask which of the four it is instead of guessing.
+
+Exit 0 means the command succeeded or was already done. Any other code is the
+command's own, after the last attempt.
+
+The backoff is capped at 65 seconds in total because bash stops at 300 seconds in
+this environment. Anything longer is the next scheduled run's job.
+
+**Never wrap a write in this without a way to check whether the first attempt
+landed.** A release or an upload that failed to answer may have succeeded, and the
+retry then does the work twice. See RETRY.md.
+
 ## commit-gate.sh — an engine change may not be committed without its evidence
 
 **Used by:** fixer, before every commit.

@@ -314,6 +314,88 @@ def main():
           any(d.startswith("reset-") for d in os.listdir(os.path.join(w, "archive"))))
     shutil.rmtree(w, ignore_errors=True)
 
+    # ---------------- retry.sh ----------------
+    print("retry.sh")
+    RETRY = os.path.join(HERE, "..", "retry.sh")
+
+    def retry(*args):
+        r = subprocess.run(["bash", RETRY] + list(args), capture_output=True, text=True)
+        return r.returncode, (r.stdout + r.stderr).strip()
+
+    for text, want in [
+        ("API rate limit exceeded for 1.2.3.4", "transient"),
+        ("You have exceeded a secondary rate limit", "transient"),
+        ("HttpError 429: Too Many Requests", "transient"),
+        ("502 Bad Gateway", "transient"),
+        ("fatal: unable to access: Connection reset by peer", "transient"),
+        ("Bad credentials", "permanent"),
+        ("403 Resource not accessible by integration", "permanent"),
+        ("404 Not Found", "permanent"),
+        ("no space left on device", "permanent"),
+        ("403 Forbidden", "permanent"),
+        ("fatal: destination path already exists", "already-done"),
+        ("something entirely unexpected", "unknown"),
+    ]:
+        rc, out = retry("--classify", text)
+        check("classify %-42s" % ('"' + text[:40] + '"'), out == want,
+              "expected %s, got %s" % (want, out))
+
+    # a permanent failure must not be retried: one attempt, then stop
+    d = tempfile.mkdtemp(prefix="rt-")
+    counter = os.path.join(d, "n")
+    script = os.path.join(d, "perm.sh")
+    open(script, "w").write(
+        "#!/bin/bash\nN=$(cat %s 2>/dev/null || echo 0); N=$((N+1)); echo $N > %s\n"
+        "echo 'Bad credentials'; exit 1\n" % (counter, counter))
+    os.chmod(script, 0o755)
+    rc, out = retry("--", script)
+    check("a permanent failure is attempted once, not three times",
+          open(counter).read().strip() == "1", "attempts: %s" % open(counter).read().strip())
+    check("and it says so plainly", "PERMANENT" in out, out[-90:])
+
+    # a transient failure retries and gives up at the limit
+    open(counter, "w").write("0")
+    script2 = os.path.join(d, "trans.sh")
+    open(script2, "w").write(
+        "#!/bin/bash\nN=$(cat %s 2>/dev/null || echo 0); N=$((N+1)); echo $N > %s\n"
+        "echo '429 Too Many Requests'; exit 1\n" % (counter, counter))
+    os.chmod(script2, 0o755)
+    rc, out = retry("--tries", "2", "--", script2)
+    check("a transient failure retries up to the limit",
+          open(counter).read().strip() == "2", "attempts: %s" % open(counter).read().strip())
+    check("and it names the next run as the retry", "next scheduled run" in out, out[-90:])
+
+    # a command that works first time is not retried
+    open(counter, "w").write("0")
+    script3 = os.path.join(d, "ok.sh")
+    open(script3, "w").write(
+        "#!/bin/bash\nN=$(cat %s 2>/dev/null || echo 0); N=$((N+1)); echo $N > %s\nexit 0\n"
+        % (counter, counter))
+    os.chmod(script3, 0o755)
+    rc, out = retry("--", script3)
+    check("a command that succeeds is run once", rc == 0 and open(counter).read().strip() == "1",
+          "rc %d, attempts %s" % (rc, open(counter).read().strip()))
+
+    # already-done counts as success
+    open(counter, "w").write("0")
+    script4 = os.path.join(d, "exists.sh")
+    open(script4, "w").write(
+        "#!/bin/bash\necho 'fatal: destination path already exists'; exit 128\n")
+    os.chmod(script4, 0o755)
+    rc, out = retry("--", script4)
+    check("already-done exits 0 rather than failing the cron", rc == 0, "rc %d" % rc)
+
+    # the documents the crons are told to read must exist
+    for f in ("RETRY.md", "INCIDENTS.md", "LESSONS.md"):
+        check("%s exists for the crons to read" % f, os.path.exists(os.path.join(HERE, f)))
+    for name in ("BASELINE", "CLASSIFIER", "FIXER"):
+        b = os.path.join(HERE, "%s-BRIEF.md" % name)
+        body = open(b, encoding="utf-8").read() if os.path.exists(b) else ""
+        check("%s brief tells the cron what to do when something fails" % name,
+              "RETRY.md" in body and "INCIDENTS.md" in body)
+
+    shutil.rmtree(d, ignore_errors=True)
+
     # ---------------- summary ----------------
     print("")
     total = ok + len(bad)
