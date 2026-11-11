@@ -19,6 +19,12 @@
 #   The third is the one that catches a fixer which reverted nothing, changed
 #   nothing, and committed anyway.
 #
+#   THE .TXT HALF IS GATED TOO, once it has been measured at least once. One
+#   conversion writes both outputs from the same model, so a change made for the
+#   .docx can move the .txt, and only its own store can see that. Until
+#   RESULTS-TXT.jsonl exists there is nothing to move and the gate says so rather
+#   than demanding a file that does not exist yet.
+#
 # USAGE
 #   bash tools/commit-gate.sh
 #   exit 0 -> safe to commit, and .p2w-gate-ok records what was proven
@@ -34,10 +40,16 @@ cd "$REPO" || exit 1
 ENGINE_DIR="app/src/main/java/com/kavopdf/app/engine"
 BENCH="tools/p2w-bench"
 EVIDENCE="BASELINE.md RESULTS.jsonl RATCHET.json"
+EVIDENCE_TXT="RESULTS-TXT.jsonl RATCHET-TXT.json"
 OK_FILE=".p2w-gate-ok"
 
 say() { printf '%s\n' "$*"; }
 bad() { printf '  FAIL  %s\n' "$*"; }
+
+# The .txt half is gated only once it has been measured at least once. Before that
+# there is no store to move, and demanding one would block every commit for a file
+# that does not exist yet.
+txt_live() { [ -f "$BENCH/RESULTS-TXT.jsonl" ]; }
 
 engine_changed() {
   ! git diff --quiet HEAD -- "$ENGINE_DIR" 2>/dev/null && return 0
@@ -62,6 +74,14 @@ if [ "${1:-}" = "--status" ]; then
     if file_changed "$BENCH/$f"; then say "  $f : changed"
     else say "  $f : unchanged"; fi
   done
+  if txt_live; then
+    for f in $EVIDENCE_TXT; do
+      if file_changed "$BENCH/$f"; then say "  $f : changed"
+      else say "  $f : unchanged"; fi
+    done
+  else
+    say "  .txt half        : not measured yet - not gated"
+  fi
   [ -f "$OK_FILE" ] && say "  gate token       : present ($(cat "$OK_FILE"))" \
                     || say "  gate token       : none"
   exit 0
@@ -87,6 +107,19 @@ else
   FAILED=1
 fi
 
+# ---- 1b. the .txt ratchet -------------------------------------------------
+# Separate store, separate marks. One conversion writes both outputs from the same
+# model, so a change made for the .docx can move the .txt, and only this half can see it.
+if txt_live; then
+  if python3 "$BENCH/ratchet.py" --txt >"$LOG" 2>&1; then
+    say "  ok    ratchet --txt - the .txt bar held or rose"
+  else
+    bad "ratchet --txt - a .txt fell below its best"
+    grep -E "REGRESSED|->|below" "$LOG" | head -6 | sed 's/^/        /'
+    FAILED=1
+  fi
+fi
+
 # ---- 2. it builds ---------------------------------------------------------
 if bash tools/precommit.sh --no-corpus >"$LOG" 2>&1; then
   say "  ok    precommit  - builds, guards pass"
@@ -107,6 +140,17 @@ for f in $EVIDENCE; do
     FAILED=1
   fi
 done
+
+if txt_live; then
+  for f in $EVIDENCE_TXT; do
+    if file_changed "$BENCH/$f"; then
+      say "  ok    $f changed with it"
+    else
+      bad "$f is unchanged - the engine moved and the .txt numbers did not"
+      FAILED=1
+    fi
+  done
+fi
 
 # ATTEMPTS.json appears on the first recorded attempt, so it may legitimately
 # be absent on a first run; once it exists it must move with the engine.

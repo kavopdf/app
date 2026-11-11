@@ -409,6 +409,12 @@ misremembered. On pass it writes `.p2w-gate-ok` with the engine hash and the tim
 A CI job re-checks the same thing on every push: an engine change whose commit
 does not also touch those files turns the build red, so it can never ship.
 
+**The .txt half is gated too**, once `RESULTS-TXT.jsonl` exists: the .txt ratchet (see the
+ratchet.py section for how to ask for that store) must exit 0, and `RESULTS-TXT.jsonl` and
+`RATCHET-TXT.json` must both have moved with the engine. Before the first .txt measurement
+there is no store to move, so the gate reports "not measured yet - not gated" and demands
+nothing. `--status` shows which half is live.
+
 ## precommit.sh — build and sanity before any commit
 
 **Used by:** fixer, APK.

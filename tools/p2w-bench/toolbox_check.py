@@ -108,6 +108,13 @@ def main():
             continue
 
         path = SOURCES.get(tool) or SHELL[tool]
+        # Resolve against this file, not the caller's working directory. The python
+        # entries are bare file names while the shell ones are built from HERE, so
+        # running this from the repo root - which is where the gates and the briefs
+        # invoke every other tool - found none of the eleven and reported all eleven
+        # as missing sources.
+        if not os.path.isabs(path):
+            path = os.path.join(HERE, path)
         if not os.path.exists(path):
             problems.append("%s: source file not found at %s" % (tool, path))
             continue

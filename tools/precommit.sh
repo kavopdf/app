@@ -99,6 +99,33 @@ if ! python3 tools/smoke.py; then
   fail "the bench tools do not run - see the traceback above"
 fi
 
+# The verifier test suites. Each proves that its verifier fires on a case built to make
+# it fire AND stays quiet on a case built to pass - a check that never fires is
+# decoration, and one that always fires condemns every document.
+#
+# Run them only when the verifier or its own test file changed, the same rule the
+# 51-file repair suite follows: pay for it when it is relevant, not on every build.
+# --all forces them.
+changed() {
+  ! git diff --quiet HEAD -- "$1" 2>/dev/null && return 0
+  ! git diff --cached --quiet -- "$1" 2>/dev/null && return 0
+  return 1
+}
+for pair in "verify_google.py:test_checks.py" "verify_txt.py:test_txt_checks.py"; do
+  v="${pair%%:*}"; t="${pair##*:}"
+  [ -f "tools/p2w-bench/$v" ] || continue
+  [ -f "tools/p2w-bench/$t" ] || continue
+  if [ "$FORCE_ALL" -eq 1 ] || changed "tools/p2w-bench/$v" || changed "tools/p2w-bench/$t"; then
+    if python3 "tools/p2w-bench/$t" >/tmp/vt.$$ 2>&1; then
+      pass "$t"
+    else
+      fail "$t"
+      tail -4 /tmp/vt.$$ | sed 's/^/        /'
+    fi
+    rm -f /tmp/vt.$$
+  fi
+done
+
 # a file added to the repo must not be a patch, a backup or a build leftover
 for bad in $(git status --porcelain 2>/dev/null | awk '{print $2}' | grep -E '\.(patch|orig|rej|bak|tmp)$|~$' || true); do
   fail "leftover file staged or untracked: $bad"
