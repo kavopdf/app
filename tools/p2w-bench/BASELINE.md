@@ -77,12 +77,12 @@ as measured; only the verdict is closed.
 | 325_demat_holdings_statement | 51/59 | FAIL | 02_text_run_count, 06_table_columns, 22_reading_order, 25_invisible_text, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 326_itr_computation | 44/59 | FAIL | 01_page_count, 02_text_run_count, 07_table_rows, 14_filled_shapes, 18_median_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 32_serif_nondefault_body | 50/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
-| 330_cad_drawing_sheet |  |  |  |  |  |
-| 331_pid_diagram |  |  |  |  |  |
-| 332_bom_on_drawing |  |  |  |  |  |
-| 333_datasheet_spec_tables |  |  |  |  |  |
+| 330_cad_drawing_sheet | 44/59 | FAIL | 03_word_count, 04_words_missing, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 44_header_footer, 45_char_accuracy, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 331_pid_diagram | 39/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 10_font_sizes, 11_bold_runs, 16_numeric_runs, 17_matched_runs, 18_median_dy, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 32_stroke_lines, 36_underline_rules, 41_block_spacing, 42_alignment_mix, 45_char_accuracy, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 332_bom_on_drawing | 48/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 333_datasheet_spec_tables | 46/59 | FAIL | 01_page_count, 18_median_dy, 19_worst_dy, 20_within_10pt, 24_page_breaks, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 334_patent_document |  |  |  |  |  |
-| 335_msds_safety_data_sheet |  |  |  |  |  |
+| 335_msds_safety_data_sheet | 46/59 | FAIL | 02_text_run_count, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 33_sans_nondefault_body |  |  |  |  |  |
 | 340_bill_of_lading |  |  |  |  |  |
 | 341_shipping_manifest |  |  |  |  |  |
