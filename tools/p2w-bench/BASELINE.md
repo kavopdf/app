@@ -117,11 +117,11 @@ as measured; only the verdict is closed.
 | 390_wide_data_appendix | 48/59 | FAIL | 01_page_count, 18_median_dy, 19_worst_dy, 20_within_10pt, 24_page_breaks, 25_invisible_text, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 391_survey_questionnaire_grid | 46/59 | FAIL | 03_word_count, 04_words_missing, 05_words_extra, 11_bold_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 392_statistical_console_output | 50/59 | FAIL | 03_word_count, 04_words_missing, 18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
-| 393_spectrum_peak_table |  |  |  |  |  |
-| 394_map_with_legend |  |  |  |  |  |
-| 39_small_caps_letter_spacing |  |  |  |  |  |
-| 400_comic_page_speech_bubbles |  |  |  |  |  |
-| 401_trifold_brochure |  |  |  |  |  |
+| 393_spectrum_peak_table | 49/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 54_image_dpi, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 394_map_with_legend | 47/59 | FAIL | 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 39_small_caps_letter_spacing | 41/59 | FAIL | 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 10_font_sizes, 11_bold_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 34c_span_weight_match, 41_block_spacing, 43_within_10pt_x, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 400_comic_page_speech_bubbles | 41/59 | FAIL | 02_text_run_count, 07_table_rows, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 37_super_subscript, 41_block_spacing, 42_alignment_mix, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 401_trifold_brochure | 33/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 07_table_rows, 14_filled_shapes, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 21_median_dx, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 41_block_spacing, 43_within_10pt_x, 45_char_accuracy, 47_margins, 53_embedded_faces, 55_orientation_mix, 56_rtl_runs, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 402_calendar_month_grid |  |  |  |  |  |
 | 403_crossword_puzzle |  |  |  |  |  |
 | 404_sudoku_grid |  |  |  |  |  |
