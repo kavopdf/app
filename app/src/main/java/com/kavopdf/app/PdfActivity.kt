@@ -361,8 +361,6 @@ abstract class PdfActivity : AppCompatActivity() {
             }
             list.addView(row)
         }
-        view.findViewById<android.widget.Button>(R.id.openWithCancel)
-            .setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 

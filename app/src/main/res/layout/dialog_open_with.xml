@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- The "Open with" list.
-     A plain view rather than the stock dialog's adapter, for one reason: the Cancel has to
-     be an outlined pill like every other confirmation in this app. A bare text button
-     sitting under a list of apps reads as another row of the list. -->
+     No Cancel row and no Cancel button: a tap anywhere outside the card dismisses it, and so
+     does back. A third way to close a list of two apps is one control too many. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -28,15 +27,4 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:orientation="vertical" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/openWithCancel"
-        style="@style/Widget.KavoPDF.Button.Outlined"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="24dp"
-        android:minWidth="120dp"
-        android:text="@string/action_cancel" />
 </LinearLayout>
