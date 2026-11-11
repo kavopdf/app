@@ -132,11 +132,11 @@ as measured; only the verdict is closed.
 | 410_form_xobject_reused | 51/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 29_blank_where_ink_was, 30_ink_where_blank_was, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 411_nested_xobject_transforms | 45/59 | FAIL | 03_word_count, 04_words_missing, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 34a_span_size_match, 35_rotation, 41_block_spacing, 42_alignment_mix, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 412_page_labels_roman | 52/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch, 30_ink_where_blank_was, 41_block_spacing, 53_embedded_faces | 2a68de6 | 11 Nov |
-| 413_tagged_pdf_actualtext |  |  |  |  |  |
-| 414_transparency_softmask |  |  |  |  |  |
-| 415_inline_images |  |  |  |  |  |
-| 416_many_tiny_pages |  |  |  |  |  |
-| 417_rotate180_and_mirrored |  |  |  |  |  |
+| 413_tagged_pdf_actualtext | 58/59 | FAIL | 53_embedded_faces | 2a68de6 | 11 Nov |
+| 414_transparency_softmask | 53/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 34b_span_colour_match, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 415_inline_images | 54/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 416_many_tiny_pages | 51/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 41_block_spacing, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 417_rotate180_and_mirrored | 46/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 17_matched_runs, 18_median_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was, 35_rotation, 45_char_accuracy, 53_embedded_faces, 56_rtl_runs | 2a68de6 | 11 Nov |
 | 41_coloured_headings_white_bg |  |  |  |  |  |
 | 42_table_coloured_header_alternating_rows |  |  |  |  |  |
 | 43_red_stamp_over_black_text |  |  |  |  |  |
