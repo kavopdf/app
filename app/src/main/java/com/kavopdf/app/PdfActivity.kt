@@ -375,14 +375,19 @@ abstract class PdfActivity : AppCompatActivity() {
      */
     private fun findAnApp(file: File) {
         if (isFinishing || isDestroyed) return
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle(R.string.no_app_title)
             .setItems(
                 arrayOf(getString(R.string.no_app_find), getString(R.string.action_cancel))
             ) { _, which ->
                 if (which == 0) searchStore(file)
             }
-            .show()
+            .create()
+        // MaterialAlertDialogBuilder draws its own window background and ignores the one
+        // ThemeOverlay.KavoPDF.Dialog sets, so this dialog came out a shade lighter than
+        // every other one in the app. Setting it here puts it back with the rest.
+        dialog.window?.setBackgroundDrawableResource(R.drawable.bg_dialog_rounded)
+        dialog.show()
     }
 
     /**

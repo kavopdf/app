@@ -41,7 +41,7 @@ class ShareChoiceActivity : AppCompatActivity() {
             return
         }
 
-        MaterialAlertDialogBuilder(this)
+        val dialog = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.share_choice_title)
             .setItems(
                 arrayOf(
@@ -53,7 +53,12 @@ class ShareChoiceActivity : AppCompatActivity() {
                 finish()
             }
             .setOnCancelListener { finish() }
-            .show()
+            .create()
+        // MaterialAlertDialogBuilder draws its own window background and ignores the one
+        // ThemeOverlay.KavoPDF.Dialog sets, so this dialog came out a shade lighter than
+        // every other one in the app. Setting it here puts it back with the rest.
+        dialog.window?.setBackgroundDrawableResource(R.drawable.bg_dialog_rounded)
+        dialog.show()
     }
 
     /**
