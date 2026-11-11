@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.kavopdf.app.util.Files
 import com.kavopdf.app.util.ThemeUtil
 
 /**
@@ -37,6 +38,15 @@ class ShareChoiceActivity : AppCompatActivity() {
 
         val uri = sharedPdf()
         if (uri == null) {
+            finish()
+            return
+        }
+
+        // Chosen from the app's own "Open with" list, so the answer is already given: the
+        // user tapped their own app to open the file, not to be asked what to do with it.
+        // Asking again put a second question between two taps that meant one thing.
+        if (intent?.getBooleanExtra(Files.EXTRA_INTERNAL_READ, false) == true) {
+            openReader(uri)
             finish()
             return
         }

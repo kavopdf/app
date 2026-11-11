@@ -96,6 +96,12 @@ object Files {
         }
     }
 
+    /**
+     * Set when this app launches its own share-choice screen from the "Open with" list.
+     * The user has already answered the question that screen exists to ask.
+     */
+    const val EXTRA_INTERNAL_READ = "com.kavopdf.app.extra.INTERNAL_READ"
+
     private fun viewIntent(context: Context, file: File): Intent =
         Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uriFor(context, file), mimeOf(file))
@@ -123,11 +129,18 @@ object Files {
      * resolve the same intent back to this list and the user would be asked twice.
      */
     fun openWith(context: Context, file: File, target: android.content.pm.ResolveInfo): Boolean {
+        // This list can contain KavoPDF itself, because the app declares the VIEW filter.
+        // When the user picks their own app from it they are saying "open this" from inside
+        // the app they are already in - so the share-choice screen must not ask them again
+        // whether they want to read it or work on it. It goes straight to the reader.
+        val own = target.activityInfo.packageName == context.packageName
         val intent = viewIntent(context, file).setComponent(
             android.content.ComponentName(
                 target.activityInfo.packageName, target.activityInfo.name
             )
-        )
+        ).apply {
+            if (own) putExtra(EXTRA_INTERNAL_READ, true)
+        }
         return try {
             context.startActivity(intent)
             true
