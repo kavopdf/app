@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.view.WindowManager
 import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import android.widget.Toast
@@ -173,15 +172,12 @@ abstract class PdfActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // 120 Hz panels stay at 60 unless the window asks for more.
         useHighestRefreshRate()
-        // Every screen that inherits this one is showing a document the user brought in
-        // for their own reasons. Without this flag the last page read is copied into the
-        // system recents thumbnail - where it stays after the app is closed - and any
-        // screenshot or screen recorder can capture it. FLAG_SECURE stops both, and the
-        // app never captures its own window.
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
-        )
+        // FLAG_SECURE used to be set here, to keep the page out of the recents thumbnail.
+        // It also made every screenshot and every screen recording of the app fail, which
+        // is not a trade the user agreed to: they photograph their own documents, and a
+        // document viewer that refuses to be photographed is a viewer they cannot use.
+        // Android offers no flag that hides a screen from recents without also blocking
+        // capture, so the recents thumbnail is the cost of a usable app.
         com.kavopdf.app.util.CrashGuard.step("Opened: " + javaClass.simpleName)
         busy = Busy(this)
 
