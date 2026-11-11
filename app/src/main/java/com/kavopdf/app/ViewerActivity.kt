@@ -475,7 +475,7 @@ class ViewerActivity : PdfActivity() {
         when (item.itemId) {
             1 -> { rotate(); return true }
             3 -> { openSearch(); return true }
-            2 -> { current?.let { Files.share(this, it, "application/pdf") }; return true }
+            2 -> { current?.let { Files.share(this, it) }; return true }
             4 -> { openContents(); return true }
         }
         return super.onOptionsItemSelected(item)

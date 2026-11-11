@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
+import com.kavopdf.app.R
 import java.io.File
 import java.io.FileOutputStream
 
@@ -64,28 +65,61 @@ object Files {
     private fun uriFor(context: Context, file: File): Uri =
         FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
 
-    fun share(context: Context, file: File, mime: String) {
+    /**
+     * The type of a file this app writes. There are exactly three outputs and each has one
+     * correct answer, so the answer comes from the file rather than from the caller.
+     *
+     * It used to be a default parameter - `mime: String = "application/pdf"` on showSuccess -
+     * and every caller left it alone, so a .docx result was announced to Android as a PDF.
+     * The chooser then offered every PDF viewer for a Word file and none of them could open
+     * it, and a .txt result was offered PDF viewers too.
+     */
+    fun mimeOf(file: File): String = when (file.extension.lowercase(java.util.Locale.US)) {
+        "pdf" -> "application/pdf"
+        "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "txt" -> "text/plain"
+        else -> "application/octet-stream"
+    }
+
+    fun share(context: Context, file: File) {
         val i = Intent(Intent.ACTION_SEND).apply {
-            type = mime
+            type = mimeOf(file)
             putExtra(Intent.EXTRA_STREAM, uriFor(context, file))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         try {
             context.startActivity(Intent.createChooser(i, null))
         } catch (_: Exception) {
-            android.widget.Toast.makeText(context, "No app can share this file", android.widget.Toast.LENGTH_LONG).show()
+            android.widget.Toast.makeText(
+                context, context.getString(R.string.msg_no_app_share), android.widget.Toast.LENGTH_LONG
+            ).show()
         }
     }
 
-    fun openWith(context: Context, file: File, mime: String) {
+    /**
+     * Hand the file to whichever app can open it.
+     *
+     * Returns false ONLY when nothing on this phone declares the file's type - the one case
+     * where the caller has something useful to offer, a store search. A failure with an app
+     * that does exist is reported here and returns true: offering to install another app
+     * would answer a question the user did not ask, and telling them "no app can open this"
+     * when one exists would be false.
+     */
+    fun openWith(context: Context, file: File): Boolean {
         val i = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uriFor(context, file), mime)
+            setDataAndType(uriFor(context, file), mimeOf(file))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        try {
+        return try {
             context.startActivity(i)
+            true
+        } catch (_: android.content.ActivityNotFoundException) {
+            false
         } catch (_: Exception) {
-            android.widget.Toast.makeText(context, "No app can open this file", android.widget.Toast.LENGTH_LONG).show()
+            android.widget.Toast.makeText(
+                context, context.getString(R.string.msg_no_app_open), android.widget.Toast.LENGTH_LONG
+            ).show()
+            true
         }
     }
 

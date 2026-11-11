@@ -349,4 +349,12 @@
     <string name="hint_creation_date">Creation date (yyyy-MM-dd HH:mm)</string>
     <string name="hint_modified_date">Modified date (yyyy-MM-dd HH:mm)</string>
     <string name="output_folder_prefix">Output folder: </string>
+
+    <!-- The "no app can open this" dialog. Same shape as share_choice_*, so the two
+         questions this app asks are asked the same way. -->
+    <string name="no_app_title">Open this file with other apps</string>
+    <string name="no_app_find">Find an app</string>
+    <string name="msg_no_app_open">No app can open this file</string>
+    <string name="msg_no_app_share">No app can share this file</string>
+    <string name="msg_no_store">Could not open the Play Store</string>
 </resources>

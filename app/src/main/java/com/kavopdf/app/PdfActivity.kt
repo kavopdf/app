@@ -287,7 +287,7 @@ abstract class PdfActivity : AppCompatActivity() {
     }
 
     /** A friendly "all done" popup with Share and Open result. */
-    protected fun showSuccess(message: String, file: File?, mime: String = "application/pdf") {
+    protected fun showSuccess(message: String, file: File?) {
         if (isFinishing || isDestroyed) return
         val view = layoutInflater.inflate(R.layout.dialog_success, null)
         view.findViewById<TextView>(R.id.successMsg).text = message
@@ -310,16 +310,17 @@ abstract class PdfActivity : AppCompatActivity() {
         open.isEnabled = file != null
         share.isEnabled = file != null
         open.setOnClickListener {
-            file?.let {
-                keptFiles.add(it)
-                Files.openWith(this, it, mime)
-            }
+            val chosen = file ?: return@setOnClickListener
+            keptFiles.add(chosen)
+            // The sheet goes first so the "no app" dialog below is the only one on screen:
+            // two stacked dialogs is the bug that put the repair receipt over this sheet.
             dialog.dismiss()
+            if (!Files.openWith(this, chosen)) findAnApp(chosen)
         }
         share.setOnClickListener {
             file?.let {
                 keptFiles.add(it)
-                Files.share(this, it, mime)
+                Files.share(this, it)
             }
         }
         view.findViewById<View>(R.id.successClose).setOnClickListener { dialog.dismiss() }
@@ -328,6 +329,58 @@ abstract class PdfActivity : AppCompatActivity() {
             window?.setGravity(android.view.Gravity.CENTER)
             window?.attributes = window?.attributes?.apply { y = 0 }
         }.show()
+    }
+
+    /**
+     * Nothing on this phone can open the file, so offer the one thing that can change that.
+     *
+     * Deliberately the same shape as the dialog that asks "read it or work on it" when a PDF
+     * is shared in - a title and two rows - because this app already asks that question that
+     * way, and a second dialog style would be one more thing to learn.
+     */
+    private fun findAnApp(file: File) {
+        if (isFinishing || isDestroyed) return
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.no_app_title)
+            .setItems(
+                arrayOf(getString(R.string.no_app_find), getString(R.string.action_cancel))
+            ) { _, which ->
+                if (which == 0) searchStore(file)
+            }
+            .show()
+    }
+
+    /**
+     * The store's own search for this format. Play Store first; if it is not on the phone,
+     * the same search on the web - handed to whatever browser the user has made their
+     * default, which is why no browser is named here. Neither step needs the INTERNET
+     * permission: this app opens no connection, it hands a URL to an app that already has one.
+     */
+    private fun searchStore(file: File) {
+        val q = Uri.encode(file.extension.lowercase(java.util.Locale.US))
+        if (openStoreLink("market://search?q=" + q)) return
+        if (!openStoreLink("https://play.google.com/store/search?q=" + q + "&c=apps")) {
+            toast(getString(R.string.msg_no_store))
+        }
+    }
+
+    /**
+     * Open one of the two store links, and only those.
+     *
+     * Both strings here are literals this app builds, but the scheme is checked anyway:
+     * this is the same rule the reader applies to a link inside a PDF, and it means this
+     * function cannot become a way to launch intent://, file:// or content:// if it is ever
+     * handed a string from somewhere else.
+     */
+    private fun openStoreLink(url: String): Boolean {
+        val uri = Uri.parse(url)
+        if (uri.scheme?.lowercase(java.util.Locale.US) !in STORE_SCHEMES) return false
+        return try {
+            startActivity(Intent(Intent.ACTION_VIEW, uri))
+            true
+        } catch (_: Exception) {
+            false
+        }
     }
 
     // ---- overridable hooks -------------------------------------------------
@@ -405,6 +458,9 @@ abstract class PdfActivity : AppCompatActivity() {
     companion object {
         /** A PDF handed over by another app, so the tool screen opens with it already chosen. */
         const val EXTRA_SOURCE_URI = "com.kavopdf.app.extra.SOURCE_URI"
+
+        /** The only schemes the "find an app" row will hand to the system. */
+        private val STORE_SCHEMES = setOf("market", "https")
 
         const val DOCX_MIME =
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
