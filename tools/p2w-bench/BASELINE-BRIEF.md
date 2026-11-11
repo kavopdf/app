@@ -63,6 +63,7 @@ OUTPUT IS A SMALL TABLE
     | Round / phase | 1 · measure |
     | Measured this run | 10 |
     | Scored so far | 40 / 208 |
+    | txt backfill left | 130 |
     | Ratchet | held |
     | Engine | 2a68de6 |
 
@@ -167,6 +168,30 @@ STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING ONCE AT THE END
   leave its row empty - never write a PASS you did not measure.
   KavoPDF-Verify must be empty when you finish.
 
+STEP 3b - THE .txt BACKFILL
+  Every document measured before the .txt half was fixed has a row in RESULTS.jsonl and
+  none in RESULTS-TXT.jsonl. STEP 2 takes the first rows whose SCORE cell is empty, so it
+  never revisits them - without this step those documents would never get a .txt at all,
+  and round 2's .txt ratchet would have nothing to compare them against.
+
+      python3 tools/p2w-bench/txt_gap.py --count     # how many are still missing
+      python3 tools/p2w-bench/txt_gap.py --list 10   # the first ten, one per line
+
+  Take up to ten of them. For each:
+    a. Copy the PDF from all/ into one/ and run ConvertAll one out1 - the same command as
+       STEP 3. It writes both outputs; this time only the .txt is used.
+    b. python3 tools/p2w-bench/verify_txt.py all/<name>.pdf out1/<name>.txt --json restxt/<name>.json
+    c. Do NOT touch its BASELINE.md row. It is already scored and correct, and rewriting it
+       would make the table disagree with RESULTS.jsonl.
+  Then:
+      python3 tools/p2w-bench/record.py restxt/*.json --round <round from ROUND.json> --engine $ENGINE --txt
+      python3 tools/p2w-bench/ratchet.py --txt
+      commit RATCHET-TXT.json and RESULTS-TXT.jsonl
+  This is local work - no Drive upload, no Google Doc, no export - so it is the cheapest
+  document you will measure in a run. It sits AFTER the ten and their commit on purpose:
+  if the run runs out of time here, the ten are already safe.
+  If --count prints 0, skip this step entirely. The gap is closed.
+
 STEP 4 - RATCHET
   ratchet.py exits 1 if a document fell below its best score OR a check that used to pass now fails.
   If it does, do NOT revert your rows - measurement is not the cause. Report the regressed documents
@@ -180,9 +205,13 @@ STEP 5 - RELEASE THE SLOT, THEN CLEAN UP
 
 STEP 6 - HAND OVER WHEN EVERYTHING IS MEASURED
   Count the rows with a score. If ALL 208 have one:
+      python3 tools/p2w-bench/txt_gap.py --count      # this must print 0
       python3 tools/p2w-bench/round.py --advance      (measure -> classify)
+  Both, in that order. A .docx table with 208 rows and a .txt store with 78 of them is not
+  a finished baseline: the classifier reads the .docx half, and the .txt ratchet would have
+  nothing to hold, so nothing after this would ever go back for the rest.
+  If some rows are still empty, or txt_gap.py does not print 0, do NOT advance.
   Commit ROUND.json. Output 'phase measure complete - classifier is next'.
-  If some rows are still empty, do NOT advance.
 
 RULES
   Do not change app/src/**. Do not fix anything.
@@ -191,6 +220,6 @@ RULES
   Claim the slot before working, release it before finishing - even on failure.
   Read the TOOLBOX.md sections for your tools before you start - the exit codes especially.
   Commit the whole run's ten before you finish - never hold a run's work in memory only.
-  Do not advance the phase unless every row has a score.
+  Do not advance the phase unless every row has a score AND txt_gap.py prints 0.
   Never report PASS unless verify_google.py exited 0.
   Never estimate a number. Never leave a Google Doc behind.

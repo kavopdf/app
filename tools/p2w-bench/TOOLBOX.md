@@ -334,6 +334,27 @@ corpus is not contiguous - 37_font_... sits inside that range, and 376 to 379 ar
 the corpus at all. The commit log is the only record of what was measured, so the list is
 read from the file rather than remembered.
 
+## txt_gap.py — documents that have a .docx score but no .txt score
+
+**Used by:** baseline, before STEP 3b and before it advances the phase.
+
+```
+python3 tools/p2w-bench/txt_gap.py --count        # how many are missing
+python3 tools/p2w-bench/txt_gap.py --list 10      # the first ten, one per line
+python3 tools/p2w-bench/txt_gap.py --list 10 --all   # every one, ignoring the limit
+```
+
+Reads RESULTS.jsonl and RESULTS-TXT.jsonl, and prints the documents in the first store
+and not the second. A store that does not exist is treated as an empty one, so on a
+fresh corpus this prints 130 rather than failing. Always exits 0 - an empty gap is a
+result, not a failure.
+
+It exists because the .txt half wrote its verdict into a directory that did not exist,
+so the 130 documents measured before that was fixed have a .docx row and no .txt row.
+The baseline takes the first rows whose SCORE cell is empty and never revisits a filled
+one, so without something that points at the hole those documents would never get a .txt
+at all - and round 2's .txt ratchet would have nothing to compare them against.
+
 ## verify_txt.py — does the .txt describe the same document as the source PDF?
 
 **Used by:** the fixer, on the .txt half of the tool. Separate from verify_google.py,
