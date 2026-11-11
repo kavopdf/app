@@ -75,11 +75,21 @@ WHEN SOMETHING FAILS
 
 STEP 1 - CLASSIFY
   python3 tools/p2w-bench/classify.py
+  python3 tools/p2w-bench/classify.py --txt
+
+  The tool has two outputs and each is classified on its own. The first command
+  writes DEFECT-CLASSES.md for the .docx half (checks 01 to 59); the second writes
+  DEFECT-CLASSES-TXT.md for the .txt half (checks t01 to t05). Both files are
+  inputs to the fixer, which takes the largest OPEN class from either - so a .txt
+  class that is never classified is a class the fixer can never choose.
   Writes tools/p2w-bench/DEFECT-CLASSES.md: one row per class with document count, share of the
   measured corpus, the checks in the class, attempts, requeues and status.
 
 STEP 2 - RATCHET
   python3 tools/p2w-bench/ratchet.py --check
+  python3 tools/p2w-bench/ratchet.py --txt --check
+  Both halves. Each ratchet sees only its own store, so one passing says nothing
+  about the other. If either exits 1, report it and do not advance the phase.
   Exit 0 the bar held, 1 something fell. It compares the score AND the set of failing checks, so a
   fix that trades one check for another is caught even when the score is unchanged. Report any
   regressed documents; the fixer must see them.
@@ -94,7 +104,8 @@ STEP 3 - SANITY CHECK
 
 STEP 4 - RELEASE, COMMIT AND HAND OVER
       python3 tools/p2w-bench/round.py --release-classifier
-  Commit DEFECT-CLASSES.md and ROUND.json (and classify.py only if you fixed a bug).
+  Commit DEFECT-CLASSES.md, DEFECT-CLASSES-TXT.md and ROUND.json
+  (and classify.py only if you fixed a bug).
   Then advance the phase so the fixer can start:
       python3 tools/p2w-bench/round.py --advance      (classify -> fix)
   Commit ROUND.json again. Use GITHUB_COMMIT_MULTIPLE_FILES. git push FAILS.
