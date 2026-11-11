@@ -137,11 +137,11 @@ as measured; only the verdict is closed.
 | 415_inline_images | 54/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 416_many_tiny_pages | 51/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 41_block_spacing, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 417_rotate180_and_mirrored | 46/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 17_matched_runs, 18_median_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was, 35_rotation, 45_char_accuracy, 53_embedded_faces, 56_rtl_runs | 2a68de6 | 11 Nov |
-| 41_coloured_headings_white_bg |  |  |  |  |  |
-| 42_table_coloured_header_alternating_rows |  |  |  |  |  |
-| 43_red_stamp_over_black_text |  |  |  |  |  |
-| 44_coloured_underlined_hyperlinks |  |  |  |  |  |
-| 45_coloured_callout_box |  |  |  |  |  |
+| 41_coloured_headings_white_bg | 39/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix | 2a68de6 | 11 Nov |
+| 42_table_coloured_header_alternating_rows | 39/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 43_red_stamp_over_black_text | 44/59 | FAIL | 03_word_count, 04_words_missing, 07_table_rows, 09_font_names, 11_bold_runs, 17_matched_runs, 18_median_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 44_coloured_underlined_hyperlinks | 46/59 | FAIL | 02_text_run_count, 07_table_rows, 09_font_names, 15_links, 18_median_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was, 32_stroke_lines, 36_underline_rules, 40_link_targets, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 45_coloured_callout_box | 55/59 | FAIL | 09_font_names, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 46_chart_coloured_labels_body_text |  |  |  |  |  |
 | 47_grey_body_black_headings |  |  |  |  |  |
 | 48_form_coloured_border_coloured_values |  |  |  |  |  |
