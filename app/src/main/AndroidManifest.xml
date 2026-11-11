@@ -33,24 +33,23 @@
             </intent-filter>
         </activity>
 
+        <!-- The reader has no intent filter: every way into it is an explicit intent from
+             this app. Opening a PDF from another app lands on ShareChoiceActivity below, so
+             the reader is not exported. -->
         <activity
             android:name=".ViewerActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/tool_view"
             android:launchMode="singleTop"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="application/pdf" />
-            </intent-filter>
-        </activity>
+            android:windowSoftInputMode="adjustResize" />
 
-        <!-- Sharing a PDF from another app. The share sheet cannot tell "read this" from
-             "work on this", so it lands here and asks once: reader, or the tool list with the
-             file already in hand. Tapping a PDF in a file manager still goes straight to the
-             reader through the VIEW filter above. -->
+        <!-- A PDF arriving from another app, by either route. The share sheet cannot tell
+             "read this" from "work on this", and neither can "Open with" from a file manager,
+             so both land here and ask once: reader, or the tool list with the file already in
+             hand. One filter per action because the file travels differently in each - a share
+             puts it in EXTRA_STREAM, a view puts it in intent.data - and one activity answering
+             both keeps the question in one place. -->
         <activity
             android:name=".ShareChoiceActivity"
             android:exported="true"
@@ -59,6 +58,11 @@
             android:theme="@style/Theme.KavoPDF.Transparent">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/pdf" />
             </intent-filter>

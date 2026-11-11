@@ -45,15 +45,22 @@ class ShareChoiceActivity : AppCompatActivity() {
     }
 
     /**
-     * The PDF the sharing app handed over.
+     * The PDF another app handed over.
      *
-     * This screen is registered for ACTION_SEND only (AndroidManifest.xml), so the file is
-     * always the EXTRA_STREAM. The ACTION_VIEW filter - where the file would arrive as
-     * intent.data - belongs to ViewerActivity, so reading intent.data here would be a branch
-     * that can never run.
+     * Two ways in, and the file travels differently in each, so both are read here:
+     *
+     *   ACTION_SEND - a share sheet. The file is in EXTRA_STREAM.
+     *   ACTION_VIEW - "Open with" from a file manager or a browser. The file is in intent.data.
+     *
+     * This screen answers both (AndroidManifest.xml), so a PDF opened from a file manager
+     * asks the same question a shared one does instead of landing in the reader with no way
+     * back to the tools.
      */
     private fun sharedPdf(): Uri? {
         val intent = intent ?: return null
+        if (intent.action == Intent.ACTION_VIEW) {
+            intent.data?.let { return it }
+        }
         // THE DECLARED TYPE IS THE FIX. getParcelableExtra is generic, and written without
         // an expected type - with the elvis below whose other side is `return null`, i.e.
         // Nothing - Kotlin left T unconstrained and the bytecode cast the result to Void:
