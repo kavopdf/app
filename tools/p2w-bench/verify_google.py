@@ -266,13 +266,46 @@ def extra_checks2(src, gd):
     # ---- 53 embedded font names -------------------------------------------
     # 09_font_names counts distinct faces. This asks whether the FACE ITSELF
     # survived, which is what decides whether the metrics are the same.
+    #
+    # Google Docs has none of the Liberation families and substitutes on import.
+    # Some substitutes are metric-identical by design - Liberation was built as a
+    # drop-in for Arial, Times and Courier, which is why fontconfig resolves
+    # "Arial" to LiberationSans-Regular.ttf on a machine with no Arial - and some
+    # are not: a docx asking for Liberation Serif comes back as Arial, a serif
+    # turned into a sans, 8.9% wider on the same string.
+    #
+    # Comparing raw names cannot tell those two cases apart, so it fails a correct
+    # conversion and passes nothing. Comparing FAMILIES through the equivalence
+    # that is actually true keeps the check honest: serif-to-Times passes,
+    # serif-to-Arial still fails, because it is a different face.
+    SAME_FACE = {
+        "liberationsans": "arial", "arial": "arial",
+        "liberationserif": "timesnewroman", "timesnewroman": "timesnewroman",
+        "liberationmono": "couriernew", "couriernew": "couriernew",
+    }
+
+    def family(name):
+        n = (name or "").split("+")[-1].strip().lower()
+        # "MT" and "PSMT" are PostScript suffixes that sit AFTER the style, so
+        # they have to come off first: Arial-BoldMT is arial+bold+mt, not a bold
+        # family called "arial-bold".
+        for suf in ("psmt", "mt"):
+            if n.endswith(suf):
+                n = n[:-len(suf)]
+                break
+        for suf in ("-bolditalic", "-boldoblique", "-bold", "-italic", "-oblique", "-regular"):
+            if n.endswith(suf):
+                n = n[:-len(suf)]
+                break
+        return SAME_FACE.get(n, n)
+
     def faces(doc):
         out = set()
         for p in doc:
             for f in p.get_fonts():
-                name = (f[3] or "").split("+")[-1].strip().lower()
-                if name:
-                    out.add(name)
+                fam = family(f[3])
+                if fam:
+                    out.add(fam)
         return out
 
     s_fa, g_fa = faces(src), faces(gd)

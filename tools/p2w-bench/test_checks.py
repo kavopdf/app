@@ -236,6 +236,26 @@ def cases():
     out.append(("text pushed off the page by the conversion", on_page, off_page,
                 ["27_text_off_page"], None))
 
+    # ---- 53: a substituted face is not automatically a kept face -----------
+    # Liberation Serif arriving as Times New Roman is the same metrics and must
+    # pass; arriving as a sans is a different face and must still fail. Built from
+    # real font files, because base-14 names cannot express this.
+    SERIF = "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"
+    SANS = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+
+    if os.path.exists(SERIF) and os.path.exists(SANS):
+        def serif_only(p):
+            p.insert_font(fontname="FS", fontfile=SERIF)
+            p.insert_text((72, 100), "Invoice number 12345", fontsize=12, fontname="FS")
+
+        def sans_only(p):
+            p.insert_font(fontname="FN", fontfile=SANS)
+            p.insert_text((72, 130), "Total amount 4,500", fontsize=12, fontname="FN")
+
+        out.append(("the same faces keep 53 clean", serif_only, serif_only, [], None))
+        out.append(("a different face still fails 53", serif_only, sans_only,
+                    ["53_embedded_faces"], None))
+
     # ---- 59 shape anchor ---------------------------------------------------
     # A stamp is an outline with text inside it. These two cases are the failure
     # modes the user described: the outline moves and leaves its text, and the
