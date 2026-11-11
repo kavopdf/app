@@ -293,6 +293,28 @@ this environment. Anything longer is the next scheduled run's job.
 landed.** A release or an upload that failed to answer may have succeeded, and the
 retry then does the work twice. See RETRY.md.
 
+## docnames.py — the exact documents a run measured, for the commit message
+
+**Used by:** baseline, before every commit.
+
+```
+python3 tools/p2w-bench/docnames.py             # comma-separated, ready to paste
+python3 tools/p2w-bench/docnames.py --count     # just how many
+python3 tools/p2w-bench/docnames.py --long      # one per line, for reading
+python3 tools/p2w-bench/docnames.py --since <rev>   # compare against another commit
+```
+
+Reads BASELINE.md, compares it with the same file at HEAD, and prints every document
+whose row changed. Always exits 0 - a commit message that cannot be generated is not a
+reason to stop a measurement run. Prints "no document changed" when nothing did.
+
+It exists because a range is a guess dressed as a summary. On 11 Nov the baseline wrote
+"(375-382)" for a batch of five: 375_attendance_register, 37_font_not_embedded_substitution,
+380_runbook_terminal_output, 381_incident_report_timeline, 382_architecture_diagram. The
+corpus is not contiguous - 37_font_... sits inside that range, and 376 to 379 are not in
+the corpus at all. The commit log is the only record of what was measured, so the list is
+read from the file rather than remembered.
+
 ## commit-gate.sh — an engine change may not be committed without its evidence
 
 **Used by:** fixer, before every commit.

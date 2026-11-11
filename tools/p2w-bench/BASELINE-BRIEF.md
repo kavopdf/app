@@ -117,6 +117,21 @@ STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING EVERY FIVE
          python3 tools/p2w-bench/ratchet.py
          commit BASELINE.md, RATCHET.json and RESULTS.jsonl with GITHUB_COMMIT_MULTIPLE_FILES
        git push FAILS - never try it.
+
+       THE COMMIT MESSAGE NAMES EVERY DOCUMENT. Do not write a range:
+         wrong:  baseline: measure 5 more documents (375-382)
+         right:  baseline: measure 5 documents (375_attendance_register,
+                 37_font_not_embedded_substitution, 380_runbook_terminal_output,
+                 381_incident_report_timeline, 382_architecture_diagram)
+       "(375-382)" reads as eight documents when five were measured, because the
+       corpus is not contiguous - 37_font_not_embedded_substitution sits inside that
+       range and 376 to 379 are not in the corpus at all. A range is a guess dressed
+       as a summary, and the commit log is the only record of what was measured.
+
+       Do not write the list from memory either. Ask for it:
+         python3 tools/p2w-bench/docnames.py            # comma-separated, ready to paste
+         python3 tools/p2w-bench/docnames.py --count    # just the number
+       It reads BASELINE.md and prints exactly the documents whose row changed.
   A 403 mentioning a rate limit: wait 60 s, retry once. A second failure means SKIP that document and
   leave its row empty - never write a PASS you did not measure.
   KavoPDF-Verify must be empty when you finish.
@@ -140,6 +155,8 @@ STEP 6 - HAND OVER WHEN EVERYTHING IS MEASURED
 
 RULES
   Do not change app/src/**. Do not fix anything.
+  Name every document in a commit message. Never a range - get the list from
+  tools/p2w-bench/docnames.py rather than writing it from memory.
   Claim the slot before working, release it before finishing - even on failure.
   Read the TOOLBOX.md sections for your tools before you start - the exit codes especially.
   Commit every five documents - never hold a run's work in memory only.

@@ -314,6 +314,58 @@ def main():
           any(d.startswith("reset-") for d in os.listdir(os.path.join(w, "archive"))))
     shutil.rmtree(w, ignore_errors=True)
 
+    # ---------------- docnames.py ----------------
+    print("docnames.py")
+    d = tempfile.mkdtemp(prefix="dn-")
+    subprocess.run(["git", "init", "-q"], cwd=d, capture_output=True)
+    bench = os.path.join(d, "tools", "p2w-bench")
+    os.makedirs(bench, exist_ok=True)
+    shutil.copy(os.path.join(HERE, "docnames.py"), bench)
+    base = os.path.join(bench, "BASELINE.md")
+    head = ("| document | score | verdict | failed checks | engine | measured |\n"
+            "|---|---|---|---|---|---|\n"
+            "| 375_attendance_register | 47/59 | FAIL | x | e | d |\n"
+            "| 37_font_not_embedded_substitution | 55/59 | FAIL | y | e | d |\n"
+            "| 380_runbook_terminal_output | 50/59 | FAIL | z | e | d |\n")
+    open(base, "w", encoding="utf-8").write(head)
+    subprocess.run(["git", "add", "-A"], cwd=d, capture_output=True)
+    subprocess.run(["git", "-c", "user.email=a@b", "-c", "user.name=a",
+                    "commit", "-qm", "base"], cwd=d, capture_output=True)
+
+    def dn(*args):
+        r = subprocess.run([PY, os.path.join(bench, "docnames.py")] + list(args),
+                           cwd=d, capture_output=True, text=True)
+        return r.returncode, r.stdout.strip()
+
+    rc, out = dn()
+    check("docnames says so when nothing changed", out == "no document changed", out)
+
+    # one row moves: exactly that name comes back
+    open(base, "w", encoding="utf-8").write(head.replace("| 47/59 |", "| 48/59 |"))
+    rc, out = dn()
+    check("docnames names the document that changed", out == "375_attendance_register", out)
+    rc, out = dn("--count")
+    check("--count agrees", out == "1", out)
+
+    # the case that fooled the range: 375 and 37 are both inside "375-382"
+    open(base, "w", encoding="utf-8").write(
+        head.replace("| 47/59 |", "| 48/59 |").replace("| 55/59 |", "| 56/59 |"))
+    rc, out = dn()
+    check("docnames lists both, and never a range",
+          "375_attendance_register" in out and "37_font_not_embedded_substitution" in out
+          and "-" not in out.replace("_", ""), out)
+    rc, out = dn("--long")
+    check("--long puts one per line", len(out.split("\n")) == 2, repr(out))
+
+    rc, out = dn("--count")
+    check("docnames always exits 0", rc == 0, "rc %d" % rc)
+    shutil.rmtree(d, ignore_errors=True)
+
+    # the brief must carry the rule
+    body = open(os.path.join(HERE, "BASELINE-BRIEF.md"), encoding="utf-8").read()
+    check("the baseline brief forbids a range in the commit message",
+          "docnames.py" in body and "Never a range" in body)
+
     # ---------------- retry.sh ----------------
     print("retry.sh")
     RETRY = os.path.join(HERE, "..", "retry.sh")
