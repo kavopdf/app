@@ -30,8 +30,13 @@ object AppLog {
 
     private val lock = Any()
 
-    /** Three outcomes, because "slow" is not a failure. */
-    enum class Level { OK, SLOW, FAIL }
+    /**
+     * Four outcomes. "Slow" is not a failure, and neither is redundant work: a task that
+     * ran twice is a different finding from one that ran slowly, and filing it as SLOW
+     * made the log's RESULT column say something untrue - "ran twice in 5ms" was listed
+     * as slow when five milliseconds is the opposite of slow.
+     */
+    enum class Level { OK, SLOW, DUPLICATE, FAIL }
 
     data class Entry(val time: Long, val level: Level, val action: String, val detail: String) {
         val ok: Boolean get() = level == Level.OK
@@ -69,7 +74,7 @@ object AppLog {
                     f.writeText(lines.drop(lines.size / 2).joinToString("\n") + "\n")
                 }
                 var detailOut = detail
-                if (level == Level.SLOW) {
+                if (level == Level.SLOW || level == Level.DUPLICATE) {
                     // The key must not contain the measured duration. It used to be the
                     // whole first line, so "took 15264ms, normal is 595ms" and "took 20107ms,
                     // normal is 595ms" were two different keys and a repeat was never folded:
@@ -124,6 +129,9 @@ object AppLog {
             val level = when (p[1]) {
                 "OK" -> Level.OK
                 "SLOW" -> Level.SLOW
+                // Without this branch a DUPLICATE line read back from the file became a
+                // FAILURE: the same entry changed meaning when the log was reopened.
+                "DUPLICATE" -> Level.DUPLICATE
                 else -> Level.FAIL
             }
             Entry(p[0].toLongOrNull() ?: 0L, level, p[2], unescape(p.drop(3).joinToString("\t")))
@@ -145,6 +153,7 @@ object AppLog {
     fun label(level: Level): String = when (level) {
         Level.OK -> "OK  "
         Level.SLOW -> "SLOW"
+        Level.DUPLICATE -> "DUP "
         Level.FAIL -> "FAIL"
     }
 

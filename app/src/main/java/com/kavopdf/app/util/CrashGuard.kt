@@ -81,8 +81,11 @@ object CrashGuard {
     // without hiding a real stall, which shows up on the second and third open anyway.
     private const val COLD_MS = 120_000L
 
-    /** When each named task last finished, for the redundant-work check below. */
-    private val lastRun = HashMap<String, Long>()
+    /** What the last run of a task was, so a repeat can be judged against it. */
+    private class LastRun(val at: Long, val took: Long, val pages: Int, val bytes: Long)
+
+    /** The last run of each named task, for the redundant-work check below. */
+    private val lastRun = HashMap<String, LastRun>()
 
     /** Compare one finished run against the norm and learn from it. */
     private fun note(context: Context?, name: String, pages: Int, bytes: Long, took: Long) {
@@ -103,29 +106,54 @@ object CrashGuard {
                     AppLog.Level.SLOW
                 )
             }
-            // The same task running twice in quick succession is redundant work, not a
-            // slow run: the log shows Reader: page sizes twice five seconds apart, both
-            // taking 15-20 s. Nothing told the user their device had just done the same job
-            // twice. This is separate from the SLOW dedupe, which only folds repeats of the
-            // same finding.
+            // The same task running twice is redundant work, not a slow run: the log shows
+            // Reader: page sizes twice five seconds apart, both taking 15-20 s. Nothing told
+            // the user their device had just done the same job twice. It is filed as
+            // DUPLICATE rather than SLOW, and AppLog folds repeats of it the same way it
+            // folds repeats of a slow finding - both are "the same thing again".
             val now = android.os.SystemClock.elapsedRealtime()
             val prev = lastRun[name]
-            if (prev != null && now - prev < 20_000L) {
+            // A repeat is redundant work only when it is the SAME work. Two different
+            // documents opened in one screen are two things the user asked for, and the
+            // page count and byte size already arrive in this function - they are what
+            // tell the two apart, so no new field was needed to know it.
+            if (prev != null &&
+                prev.pages == pages &&
+                prev.bytes == bytes &&
+                now - prev.at < duplicateWindow(prev.took)
+            ) {
                 AppLog.record(
                     app,
                     name,
-                    "ran twice in ${now - prev}ms - the same work was done again\n" +
+                    "ran twice in ${now - prev.at}ms - the same work was done again\n" +
                             environment(app),
-                    AppLog.Level.SLOW
+                    AppLog.Level.DUPLICATE
                 )
             }
-            lastRun[name] = now
+            lastRun[name] = LastRun(now, took, pages, bytes)
 
             norms.record(name, pages, bytes, took)   // healthy runs teach; a stall never does
             saveNorms(app, norms)
         } catch (_: Throwable) {
         }
     }
+
+    /**
+     * How soon a repeat is the same work rather than the user asking again.
+     *
+     * The window was a flat twenty seconds, and a flat window cannot tell the two apart.
+     * This device's log carried "ran twice in 2ms" for a task that finishes in
+     * milliseconds and "ran twice in 11140ms" for a reader task that takes fifteen
+     * seconds. The first is a double invocation; the second is a run that began while the
+     * first was still going. Both are redundant and both should be reported. But a 2 ms
+     * task repeating twenty seconds later is the user doing it again, and the flat window
+     * called that redundant too.
+     *
+     * Two run-lengths, floored at one second: long enough to catch a re-entry that
+     * overlaps the previous run, short enough that a deliberate second action is not
+     * counted.
+     */
+    private fun duplicateWindow(took: Long): Long = maxOf(1_000L, 2L * took)
 
     /**
      * Bumped whenever the norms learned by an older build no longer describe this

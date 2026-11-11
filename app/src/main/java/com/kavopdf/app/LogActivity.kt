@@ -55,6 +55,8 @@ class LogActivity : PdfActivity() {
                         when (e.level) {
                             com.kavopdf.app.util.AppLog.Level.OK -> R.color.text_primary
                             com.kavopdf.app.util.AppLog.Level.SLOW -> R.color.text_primary
+                            // Redundant work is not a failure; it must not paint red.
+                            com.kavopdf.app.util.AppLog.Level.DUPLICATE -> R.color.text_primary
                             else -> R.color.danger
                         }
                     )
