@@ -114,25 +114,36 @@ object CrashGuard {
             val now = android.os.SystemClock.elapsedRealtime()
             val prev = lastRun[name]
             // A repeat is redundant work only when it is the SAME work. Two different
-            // documents opened in one screen are two things the user asked for, and the
-            // page count and byte size already arrive in this function - they are what
-            // tell the two apart, so no new field was needed to know it.
-            if (prev != null &&
-                prev.pages == pages &&
-                prev.bytes == bytes &&
-                now - prev.at < duplicateWindow(prev.took)
-            ) {
-                AppLog.record(
-                    app,
-                    name,
-                    // Say what was worked on. Without it "ran twice in 488ms" cannot be
-                    // judged: it looks the same whether one document was opened twice or
-                    // two different documents were opened a moment apart.
-                    "ran twice in ${now - prev.at}ms - the same work was done again " +
-                            "(${NormStore.bucket(pages)} pages, ${NormStore.sizeBucket(bytes)} size)\n" +
-                            environment(app),
-                    AppLog.Level.DUPLICATE
-                )
+            // documents opened in one screen are two things the user asked for, and the page
+            // count and byte size that arrive here are what tell them apart.
+            //
+            // But 1 page and 0 bytes are the DEFAULT, not a measurement. pagesHint is set
+            // inside the work itself, so the first run of a task reports the default and a
+            // second run reports the real count - 1 against 12. Comparing those as though
+            // they described two different documents would hide the very duplicate this
+            // check exists to find, and only by luck did it not: both runs of the reader's
+            // double load happened to read the hint before either had set it.
+            //
+            // So a default on either side means "unknown", and the time window alone
+            // decides. That errs towards reporting, which is the right way to err: a
+            // duplicate that is shown and turns out to be nothing costs a glance, and one
+            // that is hidden costs a bug.
+            if (prev != null) {
+                val samePages = prev.pages == pages || prev.pages == 1 || pages == 1
+                val sameBytes = prev.bytes == bytes || prev.bytes == 0L || bytes == 0L
+                if (samePages && sameBytes && now - prev.at < duplicateWindow(prev.took)) {
+                    AppLog.record(
+                        app,
+                        name,
+                        // Say what was worked on. Without it "ran twice in 488ms" cannot be
+                        // judged: it looks the same whether one document was opened twice or
+                        // two different documents were opened a moment apart.
+                        "ran twice in ${now - prev.at}ms - the same work was done again " +
+                                "(${NormStore.bucket(pages)} pages, ${NormStore.sizeBucket(bytes)} size)\n" +
+                                environment(app),
+                        AppLog.Level.DUPLICATE
+                    )
+                }
             }
             lastRun[name] = LastRun(now, took, pages, bytes)
 
