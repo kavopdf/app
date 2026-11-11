@@ -97,11 +97,11 @@ as measured; only the verdict is closed.
 | 35_four_typefaces_one_page | 54/59 | FAIL | 18_median_dy, 22_reading_order, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 360_restaurant_menu | 46/59 | FAIL | 02_text_run_count, 06_table_columns, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 44_header_footer, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 361_product_catalogue_grid | 50/59 | FAIL | 14_filled_shapes, 18_median_dy, 19_worst_dy, 25_invisible_text, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces, 54_image_dpi | 2a68de6 | 11 Nov |
-| 362_price_list_dense |  |  |  |  |  |
-| 363_warranty_card |  |  |  |  |  |
-| 364_event_ticket |  |  |  |  |  |
-| 365_recipe_card |  |  |  |  |  |
-| 36_embedded_subset_font |  |  |  |  |  |
+| 362_price_list_dense | 51/59 | FAIL | 03_word_count, 04_words_missing, 18_median_dy, 20_within_10pt, 22_reading_order, 42_alignment_mix, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 363_warranty_card | 49/59 | FAIL | 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 364_event_ticket | 42/59 | FAIL | 03_word_count, 04_words_missing, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 32_stroke_lines, 35_rotation, 41_block_spacing, 42_alignment_mix, 45_char_accuracy, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 365_recipe_card | 52/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 36_embedded_subset_font | 44/59 | FAIL | 01_page_count, 02_text_run_count, 07_table_rows, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 30_ink_where_blank_was, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 370_offer_letter |  |  |  |  |  |
 | 371_experience_certificate |  |  |  |  |  |
 | 372_timesheet_grid |  |  |  |  |  |
