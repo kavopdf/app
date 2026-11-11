@@ -176,6 +176,7 @@ def main(argv):
     # is cheaper than hoping four prompts stay in step. stderr, because --phase must
     # print one bare word on stdout for $(...).
     sys.stderr.write("interface: tools/p2w-bench/TOOLBOX.md - read the sections for the tools you use\n")
+    sys.stderr.write("brief:     tools/p2w-bench/{BASELINE,CLASSIFIER,FIXER}-BRIEF.md - yours is your instruction set\n")
     s = load()
 
     if "--apk-status" in argv:
