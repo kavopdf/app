@@ -112,11 +112,11 @@ as measured; only the verdict is closed.
 | 380_runbook_terminal_output | 50/59 | FAIL | 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 25_invisible_text, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 381_incident_report_timeline | 47/59 | FAIL | 02_text_run_count, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 382_architecture_diagram | 44/59 | FAIL | 02_text_run_count, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 36_underline_rules, 41_block_spacing, 42_alignment_mix, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
-| 383_api_docs_page |  |  |  |  |  |
-| 38_faux_bold_italic_synthesised |  |  |  |  |  |
-| 390_wide_data_appendix |  |  |  |  |  |
-| 391_survey_questionnaire_grid |  |  |  |  |  |
-| 392_statistical_console_output |  |  |  |  |  |
+| 383_api_docs_page | 49/59 | FAIL | 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 25_invisible_text, 26_text_overlap, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 38_faux_bold_italic_synthesised | 40/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 390_wide_data_appendix | 48/59 | FAIL | 01_page_count, 18_median_dy, 19_worst_dy, 20_within_10pt, 24_page_breaks, 25_invisible_text, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 391_survey_questionnaire_grid | 46/59 | FAIL | 03_word_count, 04_words_missing, 05_words_extra, 11_bold_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 392_statistical_console_output | 50/59 | FAIL | 03_word_count, 04_words_missing, 18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 393_spectrum_peak_table |  |  |  |  |  |
 | 394_map_with_legend |  |  |  |  |  |
 | 39_small_caps_letter_spacing |  |  |  |  |  |
