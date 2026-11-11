@@ -4,7 +4,7 @@ Instruction set for the KavoPDF P2W classifier cron (step 2 of 3).
 THIS FILE IS THE CRON'S PROMPT. The cron wakes, reads the phase, and when the
 phase is its own it reads this file and follows it exactly. Nothing here is
 optional and nothing has been shortened - the text below is the prompt the cron
-used to carry inline, moved here so that a wake-up on a phase that is not its own costs one line instead of the whole instruction set
+used to carry inline, moved here so that a wake-up on a phase that is not its own costs one line instead of the whole instruction set.
 
 Edit this file to change the cron's behaviour: no cron update is needed, and the
 change is versioned in git.
