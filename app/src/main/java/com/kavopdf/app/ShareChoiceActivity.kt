@@ -1,13 +1,11 @@
 package com.kavopdf.app
 
-import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.kavopdf.app.util.CrashGuard
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.kavopdf.app.util.ThemeUtil
 
 /**
  * What KavoPDF asks when a PDF is shared into it from another app.
@@ -18,44 +16,20 @@ import com.kavopdf.app.util.CrashGuard
  *
  * It owns no view of its own - it shows a dialog over whatever the user was looking at and
  * finishes immediately.
- *
- * A SHARE TARGET MUST NEVER KILL THE APP. This is the only screen that can be launched by
- * another application, with an intent this app did not build, on a process that was not
- * running a moment ago. Anything that goes wrong here is reported and closed, never thrown:
- * a crash on this screen means the user taps a PDF in their file manager and the app they
- * chose simply disappears.
  */
 class ShareChoiceActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeUtil.apply(this)
         super.onCreate(savedInstanceState)
 
-        // The theme stays the one the manifest declares - Theme.KavoPDF.Transparent, so the
-        // dialog floats over the sending app. ThemeUtil.apply() used to run here and replace
-        // it with the opaque accent theme, which threw away the translucency this screen
-        // exists for. The accent still reaches the dialog: the transparent theme inherits
-        // materialAlertDialogTheme from Theme.KavoPDF.
-        try {
-            ask()
-        } catch (t: Throwable) {
-            // Never let this screen take the process down. Report it and get out of the way.
-            CrashGuard.problem(this, "ShareChoice:Opening", t)
-            finish()
-        }
-    }
-
-    private fun ask() {
         val uri = sharedPdf()
         if (uri == null) {
             finish()
             return
         }
 
-        // androidx AlertDialog, not MaterialAlertDialogBuilder. Every other screen in this
-        // app uses this one; this screen was the only place that required the activity theme
-        // to carry the Material dialog attributes, which is one more thing that can be wrong
-        // on a screen launched by someone else's intent.
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle(R.string.share_choice_title)
             .setItems(
                 arrayOf(
@@ -63,11 +37,7 @@ class ShareChoiceActivity : AppCompatActivity() {
                     getString(R.string.share_choice_tools)
                 )
             ) { _, which ->
-                try {
-                    if (which == 0) openReader(uri) else openTools(uri)
-                } catch (t: Throwable) {
-                    CrashGuard.problem(this, "ShareChoice:Launch", t)
-                }
+                if (which == 0) openReader(uri) else openTools(uri)
                 finish()
             }
             .setOnCancelListener { finish() }
@@ -77,33 +47,23 @@ class ShareChoiceActivity : AppCompatActivity() {
     /**
      * The PDF the sharing app handed over.
      *
-     * Three places it can be, in the order Android puts it there:
-     *
-     * 1. `EXTRA_STREAM` - what a share sheet normally sends. Read with the typed accessor on
-     *    API 33+, because the untyped one is deprecated and can hand back a class this
-     *    process cannot cast.
-     * 2. `clipData` - newer senders attach the file here instead, and an intent with a null
-     *    `EXTRA_STREAM` is common enough that treating it as "no file" loses the share.
-     * 3. `intent.data` - not expected from ACTION_SEND, but it costs one line to accept.
+     * This screen is registered for ACTION_SEND only (AndroidManifest.xml), so the file is
+     * always the EXTRA_STREAM. The ACTION_VIEW filter - where the file would arrive as
+     * intent.data - belongs to ViewerActivity, so reading intent.data here would be a branch
+     * that can never run.
      */
     private fun sharedPdf(): Uri? {
         val intent = intent ?: return null
-
-        val stream: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            runCatching { intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri }.getOrNull()
-        }
-        if (stream != null) return stream
-
-        val fromClip = intent.clipData
-            ?.takeIf { it.itemCount > 0 }
-            ?.getItemAt(0)
-            ?.uri
-        if (fromClip != null) return fromClip
-
-        return intent.data
+        // THE DECLARED TYPE IS THE FIX. getParcelableExtra is generic, and written without
+        // an expected type - with the elvis below whose other side is `return null`, i.e.
+        // Nothing - Kotlin left T unconstrained and the bytecode cast the result to Void:
+        //
+        //   java.lang.ClassCastException: android.net.Uri$HierarchicalUri cannot be cast to
+        //   java.lang.Void, in ShareChoiceActivity, on every share from another app.
+        //
+        // `Uri?` forces T = Uri, so the cast is (Uri). Do not drop the annotation.
+        val raw: Uri? = intent.getParcelableExtra(Intent.EXTRA_STREAM) ?: return null
+        return raw
     }
 
     private fun openReader(uri: Uri) {
@@ -130,7 +90,7 @@ class ShareChoiceActivity : AppCompatActivity() {
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         // Set as a property, not chained: Kotlin maps setClipData/getClipData to a property,
         // and the setter returns Unit, so ".setClipData(x).addFlags(y)" does not compile.
-        intent.clipData = ClipData.newRawUri("", uri)
+        intent.clipData = android.content.ClipData.newRawUri("", uri)
         startActivity(intent)
     }
 }
