@@ -142,11 +142,11 @@ as measured; only the verdict is closed.
 | 43_red_stamp_over_black_text | 44/59 | FAIL | 03_word_count, 04_words_missing, 07_table_rows, 09_font_names, 11_bold_runs, 17_matched_runs, 18_median_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 44_coloured_underlined_hyperlinks | 46/59 | FAIL | 02_text_run_count, 07_table_rows, 09_font_names, 15_links, 18_median_dy, 20_within_10pt, 22_reading_order, 30_ink_where_blank_was, 32_stroke_lines, 36_underline_rules, 40_link_targets, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 45_coloured_callout_box | 55/59 | FAIL | 09_font_names, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
-| 46_chart_coloured_labels_body_text |  |  |  |  |  |
-| 47_grey_body_black_headings |  |  |  |  |  |
-| 48_form_coloured_border_coloured_values |  |  |  |  |  |
-| 49_coloured_background_block_paragraph |  |  |  |  |  |
-| 50_invoice_coloured_total_row |  |  |  |  |  |
+| 46_chart_coloured_labels_body_text | 44/59 | FAIL | 02_text_run_count, 07_table_rows, 09_font_names, 14_filled_shapes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 30_ink_where_blank_was, 32_stroke_lines, 36_underline_rules, 41_block_spacing, 42_alignment_mix, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 47_grey_body_black_headings | 51/59 | FAIL | 09_font_names, 18_median_dy, 20_within_10pt, 23_line_pitch, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 48_form_coloured_border_coloured_values | 46/59 | FAIL | 02_text_run_count, 07_table_rows, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 49_coloured_background_block_paragraph | 55/59 | FAIL | 09_font_names, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 50_invoice_coloured_total_row | 37/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 09_font_names, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 51_two_cm_margins |  |  |  |  |  |
 | 52_one_cm_margin_wide_body |  |  |  |  |  |
 | 53_single_space_body_15_headings |  |  |  |  |  |
