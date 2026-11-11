@@ -205,6 +205,37 @@ def cases():
         p.insert_text((500, 600), "PAID", fontsize=20, rotate=90)
     out.append(("rotated text dropped", rotated_text, base, ["35_rotation"], None))
 
+    # ---- 25 and 27: a defect is text that BECAME invisible or left the page --
+    # The source already having it is the document's own shape, not a conversion
+    # fault. Seven corpus documents failed against themselves before this.
+    def white_on_white(p):
+        text(p, 72, 100, "Invoice number 12345")
+        p.draw_rect(fitz.Rect(60, 120, 400, 150), color=None, fill=(1, 1, 1))
+        p.insert_text((72, 142), "hidden watermark", fontsize=11, color=(1, 1, 1))
+
+    out.append(("invisible text the source already had", white_on_white, white_on_white,
+                [], None))
+
+    def became_invisible(p):
+        text(p, 72, 100, "Invoice number 12345")
+        p.draw_rect(fitz.Rect(60, 120, 400, 150), color=None, fill=(1, 1, 1))
+        p.insert_text((72, 142), "hidden watermark", fontsize=11, color=(0, 0, 0))
+
+    out.append(("text turned invisible by the conversion", became_invisible, white_on_white,
+                ["25_invisible_text"], None))
+
+    def on_page(p):
+        text(p, 72, 100, "Invoice number 12345")
+        p.insert_text((72, 300), "edge marker", fontsize=11)
+
+    def off_page(p):
+        text(p, 72, 100, "Invoice number 12345")
+        p.insert_text((-40, 300), "edge marker", fontsize=11)
+
+    out.append(("text already off the page in the source", off_page, off_page, [], None))
+    out.append(("text pushed off the page by the conversion", on_page, off_page,
+                ["27_text_off_page"], None))
+
     # ---- 59 shape anchor ---------------------------------------------------
     # A stamp is an outline with text inside it. These two cases are the failure
     # modes the user described: the outline moves and leaves its text, and the

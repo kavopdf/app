@@ -160,6 +160,36 @@ def _anchor(page, rs):
     return out
 
 
+def _visual_counts(doc):
+    """Invisible text and off-page text, measured the same way for either document.
+
+    25 and 27 used to count these in the render alone and compare to zero, which
+    meant a document that genuinely has text matching its background - white on
+    white, a watermark, text on a coloured band - failed against ITSELF. Seven of
+    the 208 corpus documents did exactly that. The measurement is now taken from
+    the source too, so only text that BECAME invisible or left the page counts as
+    a defect. Same bug as 26_text_overlap, same fix.
+    """
+    invisible = off_page = 0
+    for p in doc:
+        W, H = p.rect.width, p.rect.height
+        fills = fill_rects(p)
+        rs = runs(p)
+        for r in rs:
+            for f in fills:
+                fr = f["rect"]
+                if fr.contains(fitz.Point(r["x"] + 1, r["y"] + 1)):
+                    tr = (((r["colour"] >> 16) & 255) / 255.0,
+                          ((r["colour"] >> 8) & 255) / 255.0,
+                          (r["colour"] & 255) / 255.0)
+                    if colour_close(tr, f["fill"], 0.08):
+                        invisible += 1
+                    break
+            if r["x"] < -1 or r["y"] < -1 or r["x1"] > W + 1 or r["y1"] > H + 1:
+                off_page += 1
+    return invisible, off_page
+
+
 def _strokes(page):
     """Stroked paths: table rules, borders, underlines. Never looked at before."""
     out = []
@@ -801,20 +831,14 @@ def compare(src_path, gd_path):
                                 src.page_count == gd.page_count)
 
     # ---- VISUAL (25-31) -----------------------------------------------------
-    invisible, on_text, off_page, clipped = 0, 0, 0, 0
+    s_invisible, s_off_page = _visual_counts(src)
+    invisible, off_page = _visual_counts(gd)
+
+    on_text, clipped = 0, 0
     for p in gd:
         W, H = p.rect.width, p.rect.height
-        fills = fill_rects(p)
         rs = runs(p)
         for r in rs:
-            # 28 text drawn in the same colour as the shape behind it
-            for f in fills:
-                fr = f["rect"]
-                if fr.contains(fitz.Point(r["x"] + 1, r["y"] + 1)):
-                    tr = ((r["colour"] >> 16) & 255) / 255.0, ((r["colour"] >> 8) & 255) / 255.0, (r["colour"] & 255) / 255.0
-                    if colour_close(tr, f["fill"], 0.08):
-                        invisible += 1
-                    break
             # 26 text boxes overlapping other text
             for o in rs:
                 if o is r:
@@ -823,14 +847,14 @@ def compare(src_path, gd_path):
                         r["y"] < o["y1"] - 1 and r["y1"] > o["y"] + 1):
                     on_text += 1
                     break
-            # 27 text outside the page
-            if r["x"] < -1 or r["y"] < -1 or r["x1"] > W + 1 or r["y1"] > H + 1:
-                off_page += 1
             # 31 text clipped at the edge
             if r["x"] < 1 or r["x1"] > W - 1:
                 clipped += 1
 
-    checks["25_invisible_text"] = (0, invisible, invisible == 0)
+    # 25 and 27 compare the render against the source. Text that was already
+    # invisible, or already off the page, is the document's own shape, and a
+    # faithful conversion reproduces it.
+    checks["25_invisible_text"] = (s_invisible, invisible, invisible <= s_invisible)
     # 26 compares the RENDER against the SOURCE, not against zero. A stamp printed
     # over a line of text is text-on-text in the original, and a perfect conversion
     # reproduces it - so counting absolute overlaps failed a document against
@@ -849,7 +873,7 @@ def compare(src_path, gd_path):
                     break
     checks["26_text_overlap"] = (s_on_text, on_text,
                                  on_text <= max(s_on_text, 2, len(g_runs) // 50))
-    checks["27_text_off_page"] = (0, off_page, off_page == 0)
+    checks["27_text_off_page"] = (s_off_page, off_page, off_page <= s_off_page)
     checks["28_clipped_at_edge"] = (0, clipped, clipped <= max(2, len(g_runs) // 50))
 
     # 29 blank where source has ink / 30 ink where source is blank
