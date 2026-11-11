@@ -343,26 +343,27 @@ abstract class PdfActivity : AppCompatActivity() {
     private fun chooseApp(file: File, openers: List<android.content.pm.ResolveInfo>) {
         if (isFinishing || isDestroyed) return
         val pm = packageManager
-        val labels = openers.map { it.loadLabel(pm) }
-        val icons = openers.map { it.loadIcon(pm) }
-        val adapter = object : android.widget.BaseAdapter() {
-            override fun getCount(): Int = openers.size
-            override fun getItem(position: Int): Any = openers[position]
-            override fun getItemId(position: Int): Long = position.toLong()
-            override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup?): View {
-                val row = convertView
-                    ?: layoutInflater.inflate(R.layout.row_app_choice, parent, false)
-                row.findViewById<android.widget.ImageView>(R.id.appIcon)
-                    .setImageDrawable(icons[position])
-                row.findViewById<TextView>(R.id.appName).text = labels[position]
-                return row
+        // A plain view rather than the stock dialog's adapter, so the Cancel is an outlined
+        // pill like every other confirmation in this app instead of a bare text button that
+        // reads as one more row of the list.
+        val view = layoutInflater.inflate(R.layout.dialog_open_with, null)
+        val list = view.findViewById<android.widget.LinearLayout>(R.id.openWithList)
+        val dialog = AlertDialog.Builder(this).setView(view).setCancelable(true).create()
+        dialog.window?.setBackgroundDrawableResource(R.drawable.bg_dialog_rounded)
+        for (info in openers) {
+            val row = layoutInflater.inflate(R.layout.row_app_choice, list, false)
+            row.findViewById<android.widget.ImageView>(R.id.appIcon)
+                .setImageDrawable(info.loadIcon(pm))
+            row.findViewById<TextView>(R.id.appName).text = info.loadLabel(pm)
+            row.setOnClickListener {
+                dialog.dismiss()
+                Files.openWith(this, file, info)
             }
+            list.addView(row)
         }
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.open_with_title)
-            .setAdapter(adapter) { _, which -> Files.openWith(this, file, openers[which]) }
-            .setNegativeButton(R.string.action_cancel, null)
-            .show()
+        view.findViewById<android.widget.Button>(R.id.openWithCancel)
+            .setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     /**
