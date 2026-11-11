@@ -24,6 +24,16 @@ class ViewerActivity : PdfActivity() {
 
     private lateinit var binding: ActivityViewerBinding
     private var renderer: PageRenderer? = null
+
+    /**
+     * The pager callback this screen registered.
+     *
+     * Held so a second document can unregister it. ViewerActivity is singleTop and
+     * onNewIntent runs show() again, and every show() used to register another callback
+     * without removing the last one - so after a second document the first document's
+     * callback was still attached, holding a renderer that show() had just closed.
+     */
+    private var pagerCallback: ViewPager2.OnPageChangeCallback? = null
     private var pfd: ParcelFileDescriptor? = null
     private var current: File? = null
     /** the outline, loaded once when the file opens so Contents is instant */
@@ -117,10 +127,16 @@ class ViewerActivity : PdfActivity() {
             renderer = pr
             tapRetryCount = 0
             textIndex = null
-            pagesHint = pr.pageCount
+            // Read once, and never ask the renderer again. The callback below used to call
+            // pr.pageCount on every page change; when a second document arrived in this
+            // same instance show() closed the previous renderer, the pager's next layout
+            // still dispatched onPageSelected to the old callback, and PdfRenderer threw
+            // IllegalStateException: Already closed on the main thread.
+            val pageCount = pr.pageCount
+            pagesHint = pageCount
             sizes.clear()   // filled in the background below; the page shows at once
             val adapter = ViewerAdapter(
-                pr.pageCount, pr, lifecycleScope,
+                pageCount, pr, lifecycleScope,
                 rotationProvider = { viewRotation },
                 baseWidthProvider = { (resources.displayMetrics.widthPixels * BASE_FACTOR).toInt() },
                 onZoom = { zoomed -> binding.pager.isUserInputEnabled = !zoomed },
@@ -140,12 +156,17 @@ class ViewerActivity : PdfActivity() {
                 itemAnimator = null
                 setItemViewCacheSize(3)
             }
-            binding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            // One callback at a time. Registering a second one over the first is what made
+            // the reader crash on the document after the first.
+            pagerCallback?.let { binding.pager.unregisterOnPageChangeCallback(it) }
+            val callback = object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
-                    updateIndicator(position, pr.pageCount)
+                    updateIndicator(position, pageCount)
                 }
-            })
-            updateIndicator(0, pr.pageCount)
+            }
+            pagerCallback = callback
+            binding.pager.registerOnPageChangeCallback(callback)
+            updateIndicator(0, pageCount)
             outline = emptyList()
             // All three are CPU-bound: opening and parsing the same document. Run
             // side by side they simply share the CPU and each takes three times as
