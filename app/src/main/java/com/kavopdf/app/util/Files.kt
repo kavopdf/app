@@ -96,40 +96,46 @@ object Files {
         }
     }
 
-    /**
-     * Hand the file to whichever app can open it.
-     *
-     * Returns false ONLY when nothing on this phone declares the file's type - the one case
-     * where the caller has something useful to offer, a store search. A failure with an app
-     * that does exist is reported here and returns true: offering to install another app
-     * would answer a question the user did not ask, and telling them "no app can open this"
-     * when one exists would be false.
-     */
-    fun openWith(context: Context, file: File): Boolean {
-        val i = Intent(Intent.ACTION_VIEW).apply {
+    private fun viewIntent(context: Context, file: File): Intent =
+        Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uriFor(context, file), mimeOf(file))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        // Ask first, then choose. A chooser built for nothing shows Android's own "no apps
-        // can perform this action" page, and this app would never get to offer the one thing
-        // that helps. queryIntentActivities needs the <queries> entries in AndroidManifest.xml
-        // on Android 11 and later, or every app is invisible to it.
-        val canOpen = context.packageManager
-            .queryIntentActivities(i, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)
-            .isNotEmpty()
-        if (!canOpen) return false
+
+    /**
+     * The activities that can open this file. Empty means nothing on the phone declares the
+     * type, which is the caller's cue to offer a store search instead.
+     *
+     * Flag 0 rather than MATCH_DEFAULT_ONLY: an app whose VIEW filter omits CATEGORY_DEFAULT
+     * still opens the file when it is named explicitly, and filtering it out here would make
+     * a phone that does have a viewer look as though it has none.
+     *
+     * Needs the <queries> entries in AndroidManifest.xml on Android 11 and later. Without
+     * them every other app is invisible to this call and the answer is always empty.
+     */
+    fun openersFor(context: Context, file: File): List<android.content.pm.ResolveInfo> =
+        context.packageManager.queryIntentActivities(viewIntent(context, file), 0)
+
+    /**
+     * Hand the file to the one app the user picked from that list.
+     *
+     * Explicit, by component, so the system never gets a second chance to choose - it would
+     * resolve the same intent back to this list and the user would be asked twice.
+     */
+    fun openWith(context: Context, file: File, target: android.content.pm.ResolveInfo): Boolean {
+        val intent = viewIntent(context, file).setComponent(
+            android.content.ComponentName(
+                target.activityInfo.packageName, target.activityInfo.name
+            )
+        )
         return try {
-            // ALWAYS the chooser, even when exactly one app matches. Left to itself Android
-            // opens that single app straight away - so a phone with one Word viewer skipped
-            // the list entirely and the file went into whichever app happened to be there.
-            // The user asked to choose; this is what choosing looks like.
-            context.startActivity(Intent.createChooser(i, null))
+            context.startActivity(intent)
             true
         } catch (_: Exception) {
             android.widget.Toast.makeText(
                 context, context.getString(R.string.msg_no_app_open), android.widget.Toast.LENGTH_LONG
             ).show()
-            true
+            false
         }
     }
 

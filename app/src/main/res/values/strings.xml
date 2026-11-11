@@ -352,6 +352,7 @@
 
     <!-- The "no app can open this" dialog. Same shape as share_choice_*, so the two
          questions this app asks are asked the same way. -->
+    <string name="open_with_title">Open with</string>
     <string name="no_app_title">Open this file with other apps</string>
     <string name="no_app_find">Find an app</string>
     <string name="msg_no_app_open">No app can open this file</string>

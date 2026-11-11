@@ -315,7 +315,8 @@ abstract class PdfActivity : AppCompatActivity() {
             // The sheet goes first so the "no app" dialog below is the only one on screen:
             // two stacked dialogs is the bug that put the repair receipt over this sheet.
             dialog.dismiss()
-            if (!Files.openWith(this, chosen)) findAnApp(chosen)
+            val openers = Files.openersFor(this, chosen)
+            if (openers.isEmpty()) findAnApp(chosen) else chooseApp(chosen, openers)
         }
         share.setOnClickListener {
             file?.let {
@@ -329,6 +330,39 @@ abstract class PdfActivity : AppCompatActivity() {
             window?.setGravity(android.view.Gravity.CENTER)
             window?.attributes = window?.attributes?.apply { y = 0 }
         }.show()
+    }
+
+    /**
+     * The apps that can open the result, as a list of our own.
+     *
+     * Not Intent.createChooser. When exactly one app matches, the system's resolver finishes
+     * itself and forwards straight to that app, so the list never appears - a phone with a
+     * single Word viewer skipped the list entirely and put the file into it. No flag and no
+     * extra makes a chooser show a single entry, so the list is ours.
+     */
+    private fun chooseApp(file: File, openers: List<android.content.pm.ResolveInfo>) {
+        if (isFinishing || isDestroyed) return
+        val pm = packageManager
+        val labels = openers.map { it.loadLabel(pm) }
+        val icons = openers.map { it.loadIcon(pm) }
+        val adapter = object : android.widget.BaseAdapter() {
+            override fun getCount(): Int = openers.size
+            override fun getItem(position: Int): Any = openers[position]
+            override fun getItemId(position: Int): Long = position.toLong()
+            override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup?): View {
+                val row = convertView
+                    ?: layoutInflater.inflate(R.layout.row_app_choice, parent, false)
+                row.findViewById<android.widget.ImageView>(R.id.appIcon)
+                    .setImageDrawable(icons[position])
+                row.findViewById<TextView>(R.id.appName).text = labels[position]
+                return row
+            }
+        }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.open_with_title)
+            .setAdapter(adapter) { _, which -> Files.openWith(this, file, openers[which]) }
+            .setNegativeButton(R.string.action_cancel, null)
+            .show()
     }
 
     /**
