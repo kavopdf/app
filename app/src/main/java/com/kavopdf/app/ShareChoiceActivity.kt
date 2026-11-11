@@ -20,7 +20,19 @@ import com.kavopdf.app.util.ThemeUtil
 class ShareChoiceActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        ThemeUtil.apply(this)
+        // MERGE the accent into the theme the manifest declares. Do not replace it.
+        //
+        // ThemeUtil.apply() calls setTheme(), which swaps Theme.KavoPDF.Transparent for the
+        // opaque accent theme - and that threw away the two things this screen is:
+        // windowIsTranslucent, so the dialog floats over the app the PDF came from, and
+        // windowAnimationStyle = @null, so it appears in place instead of sliding in like a
+        // full screen. With both gone the screen animated as a plain activity, and it did so
+        // differently depending on who launched it, because a share sheet starts it inside
+        // the sending task and a file manager's "Open with" starts it in a new one.
+        //
+        // applyStyle takes only the items the accent theme actually declares - its colours -
+        // and leaves every window attribute from Theme.KavoPDF.Transparent untouched.
+        theme.applyStyle(ThemeUtil.themeRes(this), true)
         super.onCreate(savedInstanceState)
 
         val uri = sharedPdf()

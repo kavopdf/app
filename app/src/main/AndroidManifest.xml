@@ -11,6 +11,26 @@
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
 
+    <!-- Android 11 and later only let an app see other apps it has declared an interest in.
+         These are the three formats this app writes: "Open result" has to know whether
+         anything on the phone can take the file before it offers a chooser, and without these
+         entries every other app is invisible to queryIntentActivities and the answer would
+         always be "nothing". -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="application/pdf" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
+
     <application
         android:name=".KavoPdfApp"
         android:allowBackup="false"
