@@ -107,11 +107,11 @@ as measured; only the verdict is closed.
 | 372_timesheet_grid | 50/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 25_invisible_text, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 373_leave_application_form | 43/59 | FAIL | 02_text_run_count, 07_table_rows, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 34a_span_size_match, 34b_span_colour_match, 41_block_spacing, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 374_org_chart | 42/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 42_alignment_mix, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
-| 375_attendance_register |  |  |  |  |  |
-| 37_font_not_embedded_substitution |  |  |  |  |  |
-| 380_runbook_terminal_output |  |  |  |  |  |
-| 381_incident_report_timeline |  |  |  |  |  |
-| 382_architecture_diagram |  |  |  |  |  |
+| 375_attendance_register | 47/59 | FAIL | 01_page_count, 19_worst_dy, 20_within_10pt, 21_median_dx, 24_page_breaks, 25_invisible_text, 29_blank_where_ink_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 37_font_not_embedded_substitution | 55/59 | FAIL | 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
+| 380_runbook_terminal_output | 50/59 | FAIL | 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 25_invisible_text, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 381_incident_report_timeline | 47/59 | FAIL | 02_text_run_count, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 382_architecture_diagram | 44/59 | FAIL | 02_text_run_count, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 36_underline_rules, 41_block_spacing, 42_alignment_mix, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 383_api_docs_page |  |  |  |  |  |
 | 38_faux_bold_italic_synthesised |  |  |  |  |  |
 | 390_wide_data_appendix |  |  |  |  |  |
