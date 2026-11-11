@@ -89,13 +89,19 @@ WHEN SOMETHING FAILS
 STEP 0c - LEAVE A TRAIL, BECAUSE A DEAD RUN WRITES NOTHING
   Before any work, append one line to tools/p2w-bench/RUN-LOG.md and commit it:
       | <date> <HH:MM> | started | engine <ENGINE>, phase <PHASE> |
-  Then after each stage below, append one more line and commit again:
-      converted 10 / measured 10 / recorded / ratchet held / committing
+  Then append one more line at each stage and commit again:
+      converted <name> / measured <name> / recorded <name> / committed <name>
+  One line per document, not per batch - the run commits per document now, so the log
+  moves at the same pace as the corpus.
   Why: on 11 Nov ten runs in a row measured ten documents each and committed none, and
   there was no way to tell where they died - the cron keeps no output, and a run that
   dies before its first commit leaves no trace at all. One line per stage costs nothing
   and turns the next failure into a fact instead of a guess.
   If you never reach a stage, its line is missing - that is the answer.
+  IF THIS FIRST COMMIT FAILS, STOP. Do not measure anything. Output the exact error and
+  stop. This line is the cheapest possible test of the one thing that has been failing
+  for ten hours, and measuring ten documents before discovering the commit is broken is
+  exactly how those ten hours were spent.
 
 STEP 1 - CORPUS AND BUILD
   gh release download corpus-v1 --repo kavopdf/app --pattern pdf-to-word-test-corpus-v3.zip -O c1.zip
@@ -119,7 +125,7 @@ STEP 2 - WHICH TEN
   Read tools/p2w-bench/BASELINE.md. Take the first 10 rows whose SCORE cell is empty.
   If none are empty, go to STEP 6.
 
-STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING ONCE AT THE END
+STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING AFTER EACH
   For each of the 10:
     a. Convert it: copy the PDF into one/ and run ConvertAll one out1.
        That one run writes BOTH outputs - out1/<name>.docx and out1/<name>.txt -
@@ -202,8 +208,10 @@ STEP 3b - THE .txt BACKFILL
       python3 tools/p2w-bench/ratchet.py --txt
       commit RATCHET-TXT.json and RESULTS-TXT.jsonl
   This is local work - no Drive upload, no Google Doc, no export - so it is the cheapest
-  document you will measure in a run. It sits AFTER the ten and their commit on purpose:
-  if the run runs out of time here, the ten are already safe.
+  document you will measure in a run. It sits AFTER the ten, and after each of them is
+  already committed, on purpose: if the run runs out of time here, the ten are safe.
+  If ConvertAll wrote no .txt for one of them, say so in RUN-LOG.md and move on - a
+  missing output is a finding, not a reason to stop.
   If --count prints 0, skip this step entirely. The gap is closed.
 
 STEP 4 - RATCHET
