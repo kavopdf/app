@@ -65,7 +65,7 @@ beyond that      stop cleanly, release your claim, record it, and let the next
                  scheduled run try again. That run is free and it is already set.
 ```
 
-This is why the baseline commits every five documents and why every claim expires
+This is why the baseline commits everything it measured before it stops, and why every claim expires
 on its own: a run that dies must not take its work or the next run with it.
 
 ---

@@ -209,6 +209,11 @@ def main(argv):
         # two code paths. "render" here is the .txt - the name is the one the chain
         # already speaks, not a claim about what kind of file it is.
         out = argv[argv.index("--json") + 1]
+        # The run may be told to write into a directory it has not made yet - that is
+        # exactly how the .txt half measured nothing for a whole day: restxt/ never existed,
+        # so this line raised FileNotFoundError on every document and the half stayed empty.
+        os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
+
         with open(out, "w", encoding="utf-8") as f:
             json.dump({
                 "document": os.path.splitext(os.path.basename(src))[0],

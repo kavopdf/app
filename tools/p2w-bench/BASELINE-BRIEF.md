@@ -36,11 +36,16 @@ STEP 0b - READ THE INTERFACE OF THE TOOLS YOU WILL USE
   before you run either tool - the exit code meanings in particular, because 0 means passed and
   1 means failed for verify_google.py, and confusing those two writes a false PASS into the table.
 
-WHY YOU COMMIT EVERY FIVE DOCUMENTS
-  A previous run measured for fourteen minutes and committed nothing, so the whole run vanished and
-  the table still showed zero. Whatever went wrong, the fix is the same: never hold more than five
-  documents of uncommitted work. If the run dies at document nine, the first five are already in
-  the repository and the next run continues from there.
+WHY YOU COMMIT ALL TEN AT ONCE, AND WHY YOU MUST COMMIT BEFORE STOPPING
+  One commit per run, carrying all ten documents. That is what was asked for and it is what the
+  history reads best: one batch, one commit, ten rows.
+
+  The risk this carries is real and it is the one that cost a whole day already: a run that
+  measures ten and then dies before committing leaves the repository exactly where it was, and
+  the next run measures the same ten again. So the rule is not "commit at the end", it is
+  "never stop without committing". If you are running out of time at document seven, commit the
+  seven you have, say so in the table, and let the next run take the rest. An uncommitted
+  measurement is a measurement that did not happen.
 
 WHAT YOU MEASURE
   The engine's docx goes to Drive, Drive converts it to a Google Doc, that document is exported
@@ -82,7 +87,11 @@ STEP 1 - CORPUS AND BUILD
   gh release download corpus-v1 --repo kavopdf/app --pattern p2w-batch-1.zip -O c2.zip
   gh release download corpus-v1 --repo kavopdf/app --pattern p2w-all-groups.zip -O c3.zip
   unzip -qo c1.zip -d t ; unzip -qo c2.zip -d t ; unzip -qo c3.zip -d t
-  mkdir -p all ; find t -name '*.pdf' -exec cp -n {} all/ \;
+  mkdir -p all out1 res gd restxt ; find t -name '*.pdf' -exec cp -n {} all/ \;
+  Every directory the steps below write into is made here, in one line. restxt/ was
+  missing from this line, so the .txt measurement wrote into a directory that did not
+  exist and raised FileNotFoundError on every single document - the .txt half measured
+  nothing for a day while the run still reported its ten.
   Expect exactly 208 PDFs.
   bash tools/verify-engine.sh
   CP=/scratch/work/libs/aar/classes.jar:/scratch/work/libs/bcprov.jar:/scratch/work/libs/bcpkix.jar:/scratch/work/libs/bcutil.jar:out
@@ -95,7 +104,7 @@ STEP 2 - WHICH TEN
   Read tools/p2w-bench/BASELINE.md. Take the first 10 rows whose SCORE cell is empty.
   If none are empty, go to STEP 6.
 
-STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING EVERY FIVE
+STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING ONCE AT THE END
   For each of the 10:
     a. Convert it: copy the PDF into one/ and run ConvertAll one out1.
        That one run writes BOTH outputs - out1/<name>.docx and out1/<name>.txt -
@@ -122,12 +131,15 @@ STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING EVERY FIVE
     h. DELETE the Drive file: GOOGLEDRIVE_GOOGLE_DRIVE_DELETE_FOLDER_OR_FILE_ACTION(fileId=<id>)
     i. Write its row into BASELINE.md IN THE LOCAL CLONE straight away - six columns, never rebuild
        the file from a fetched string, that deleted 119 rows on 10 Nov.
-    j. AFTER EVERY FIFTH DOCUMENT and after the last one:
+    j. AFTER THE TENTH DOCUMENT, and BEFORE STOPPING EARLY for any reason:
          python3 tools/p2w-bench/record.py res/*.json --round <round from ROUND.json> --engine $ENGINE
          python3 tools/p2w-bench/ratchet.py
          python3 tools/p2w-bench/record.py restxt/*.json --round <round from ROUND.json> --engine $ENGINE --txt
          python3 tools/p2w-bench/ratchet.py --txt
-         commit BASELINE.md, RATCHET.json, RESULTS.jsonl, RATCHET-TXT.json and RESULTS-TXT.jsonl
+         commit BASELINE.md, RATCHET.json, RESULTS.jsonl - and, when the run has produced
+         them, RATCHET-TXT.json and RESULTS-TXT.jsonl. Never put a file in the commit list
+         that does not exist: one missing path fails the whole commit, and every row you
+         measured is lost with it.
 
          The two halves keep separate stores on purpose. A .txt regression and a .docx
          regression are fixed by different code in different classes, and one number
@@ -178,7 +190,7 @@ RULES
   tools/p2w-bench/docnames.py rather than writing it from memory.
   Claim the slot before working, release it before finishing - even on failure.
   Read the TOOLBOX.md sections for your tools before you start - the exit codes especially.
-  Commit every five documents - never hold a run's work in memory only.
+  Commit the whole run's ten before you finish - never hold a run's work in memory only.
   Do not advance the phase unless every row has a score.
   Never report PASS unless verify_google.py exited 0.
   Never estimate a number. Never leave a Google Doc behind.

@@ -1001,6 +1001,11 @@ def main(argv):
             c = res["checks"][k]
             print("    %-28s source=%-8s render=%-8s" % (k, c["source"], c["render"]))
     if out:
+        # The run may be told to write into a directory it has not made yet - that is
+        # exactly how the .txt half measured nothing for a whole day: restxt/ never existed,
+        # so this line raised FileNotFoundError on every document and the half stayed empty.
+        os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
+
         with open(out, "w") as f:
             res["document"] = os.path.splitext(os.path.basename(src))[0]
             res["source_file"] = src
