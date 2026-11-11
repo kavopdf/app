@@ -39,12 +39,58 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BASE = os.path.join(HERE, "BASELINE.md")
 RATCHET = os.path.join(HERE, "RATCHET.json")
 
+# The .txt marks live apart from the .docx marks for the same reason the results do: a
+# regression in one must never be able to hide behind a good score in the other.
+RATCHET_TXT = os.path.join(HERE, "RATCHET-TXT.json")
+RESULTS_TXT = os.path.join(HERE, "RESULTS-TXT.jsonl")
 
-CHECK_RE = re.compile(r"^\d{2}[a-c]?_[a-z_]+$")
+
+# The .txt checks are t01..t05 rather than 01..59, so one pattern would silently drop
+# every one of them and the ratchet would guard nothing at all.
+CHECK_RE = re.compile(r"^(?:\d{2}[a-c]?|t\d{2})_[a-z_]+$")
+
+
+# Set by main(). A module flag rather than a parameter threaded through four functions,
+# because read_scores, load_ratchet and the universe lookup all need it and none of them
+# is called from anywhere but main.
+TXT_MODE = False
+
+
+def read_scores_txt():
+    """{document: (score, out_of, failed)} from the .txt store, latest row per document.
+
+    There is no BASELINE-TXT.md. The .docx path keeps a hand-written table because a
+    human reads it; the .txt path has no reader but this one, so the store is the truth
+    and a second table would be a second thing to fall out of step.
+    """
+    out = {}
+    if not os.path.exists(RESULTS_TXT):
+        return out
+    latest = {}
+    for line in open(RESULTS_TXT, encoding="utf-8"):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            e = json.loads(line)
+        except Exception:
+            continue
+        key = (e.get("round", 0), e.get("engine", ""))
+        doc = e.get("doc")
+        if not doc:
+            continue
+        if doc not in latest or key >= latest[doc][0]:
+            latest[doc] = (key, e)
+    for doc, (_k, e) in latest.items():
+        out[doc] = (e.get("score") or 0, e.get("total") or 0,
+                    frozenset(e.get("failed") or []))
+    return out
 
 
 def read_scores():
     """{document: (score, out_of, frozenset(failed checks))} for every scored row."""
+    if TXT_MODE:
+        return read_scores_txt()
     out = {}
     if not os.path.exists(BASE):
         return out
@@ -65,15 +111,18 @@ def read_scores():
 
 
 def load_ratchet():
-    if os.path.exists(RATCHET):
+    path = RATCHET_TXT if TXT_MODE else RATCHET
+    if os.path.exists(path):
         try:
-            return json.load(open(RATCHET, encoding="utf-8"))
+            return json.load(open(path, encoding="utf-8"))
         except Exception:
             return {}
     return {}
 
 
 def main(argv):
+    global TXT_MODE
+    TXT_MODE = "--txt" in argv
     check_only = "--check" in argv
     strict = "--strict" in argv
 
@@ -88,7 +137,9 @@ def main(argv):
     universe = set()
     try:
         out = subprocess.check_output(
-            [sys.executable, os.path.join(HERE, "verify_google.py"), "--list-checks"],
+            [sys.executable,
+             os.path.join(HERE, "verify_txt.py" if TXT_MODE else "verify_google.py"),
+             "--list-checks"],
             stderr=subprocess.DEVNULL, timeout=120, text=True)
         universe = {l.strip() for l in out.splitlines() if l.strip()}
     except Exception:
@@ -100,7 +151,8 @@ def main(argv):
                   "comparing only the %d checks these rows mention" % len(universe))
 
     if not scores:
-        print("ratchet: no scored documents in BASELINE.md - nothing to check")
+        print("ratchet: no scored documents in %s - nothing to check"
+          % ("RESULTS-TXT.jsonl" if TXT_MODE else "BASELINE.md"))
         return 0
 
     regressions = []
@@ -165,7 +217,8 @@ def main(argv):
                             "universe": sorted(universe)}
 
     if not check_only:
-        json.dump(ratchet, open(RATCHET, "w", encoding="utf-8"), indent=2, sort_keys=True)
+        json.dump(ratchet, open(RATCHET_TXT if TXT_MODE else RATCHET, "w",
+                                encoding="utf-8"), indent=2, sort_keys=True)
 
     total = len(scores)
     measured_all = len([1 for l in open(BASE, encoding="utf-8")

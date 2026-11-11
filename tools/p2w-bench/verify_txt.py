@@ -203,20 +203,26 @@ def main(argv):
         print("    %-26s source=%-10s txt=%s" % (cid, s, t))
 
     if "--json" in argv:
+        # The same shape verify_google.py writes, down to the key names. record.py,
+        # ratchet.py and classify.py already read "checks" with a "source" and a
+        # "render" in each, and a second dialect would mean every one of them needed
+        # two code paths. "render" here is the .txt - the name is the one the chain
+        # already speaks, not a claim about what kind of file it is.
         out = argv[argv.index("--json") + 1]
         with open(out, "w", encoding="utf-8") as f:
             json.dump({
-                "document": os.path.basename(src),
-                "txt": os.path.basename(txt),
+                "document": os.path.splitext(os.path.basename(src))[0],
                 "source_file": src,
-                "txt_file": txt,
+                "render_file": txt,
+                "source": src,
+                "render": txt,
                 "passed": passed,
                 "total": len(CHECKS),
                 "ok": not failed,
-                "failed": failed,
-                "values": {cid: {"source": checks[cid][0], "txt": checks[cid][1],
-                                 "ok": checks[cid][2]} for cid in CHECKS},
-            }, f)
+                "failed": sorted(failed),
+                "checks": {cid: {"source": checks[cid][0], "render": checks[cid][1],
+                                 "ok": bool(checks[cid][2])} for cid in CHECKS},
+            }, f, indent=2)
 
     return 0 if not failed else 1
 

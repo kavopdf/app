@@ -59,7 +59,51 @@ JACCARD = 0.55        # how alike two checks must be to count as one cause
 UNIVERSAL = 0.90      # a check failing on this share of documents cannot discriminate
 MAX_CLASS_CHECKS = 6  # a class bigger than this names no single cause
 
-CHECK_RE = re.compile(r"^\d{2}[a-c]?_[a-z_]+$")
+CHECK_RE = re.compile(r"^(?:\d{2}[a-c]?|t\d{2})_[a-z_]+$")
+
+
+RESULTS_TXT = os.path.join(HERE, "RESULTS-TXT.jsonl")
+
+
+def read_txt_results():
+    """The .txt rows, in the same shape read_baseline returns, latest row per document.
+
+    The .docx path reads a table a human also reads; the .txt path has no such table and
+    does not need one, so the store is read directly rather than kept in step by hand.
+    """
+    rows = []
+    if not os.path.exists(RESULTS_TXT):
+        return rows
+    latest = {}
+    for line in open(RESULTS_TXT, encoding="utf-8"):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            e = json.loads(line)
+        except Exception:
+            continue
+        doc = e.get("doc")
+        if not doc:
+            continue
+        key = (e.get("round", 0), e.get("engine", ""))
+        if doc not in latest or key >= latest[doc][0]:
+            latest[doc] = (key, e)
+    for doc, (_k, e) in sorted(latest.items()):
+        rows.append({
+            "doc": doc,
+            "score": "%s/%s" % (e.get("score") or 0, e.get("total") or 0),
+            "failed": ", ".join(e.get("failed") or []),
+        })
+    return rows
+
+
+def _rows_for_mode():
+    """The rows classify works on. The .txt half has no hand-written table to read, so
+    under --txt the store is the truth; otherwise it is BASELINE.md as before."""
+    if "--txt" in sys.argv:
+        return read_txt_results()
+    return read_baseline(os.path.join(HERE, "BASELINE.md"))
 
 
 def read_baseline(path):
@@ -174,7 +218,7 @@ def subclusters(cls_name, top=8):
     excluding the class's own checks. The biggest group is the one worth
     attacking first.
     """
-    rows = [r for r in read_baseline(os.path.join(HERE, "BASELINE.md"))
+    rows = [r for r in _rows_for_mode()
             if re.match(r"\d+\s*/\s*\d+", r["score"])]
     docs = {}
     for r in rows:
@@ -337,7 +381,7 @@ def main(argv):
     if "--top" in argv:
         top = int(argv[argv.index("--top") + 1])
 
-    base = read_baseline(os.path.join(HERE, "BASELINE.md"))
+    base = _rows_for_mode()
     measured = [r for r in base if re.match(r"\d+\s*/\s*\d+", r["score"])]
 
     doc_sets = defaultdict(set)
@@ -439,7 +483,11 @@ def main(argv):
             out.append("- %s (%d)" % (k[:90], v))
 
 
-    open(os.path.join(HERE, "DEFECT-CLASSES.md"), "w", encoding="utf-8").write("\n".join(out) + "\n")
+    # The two halves get their own file. Writing both into DEFECT-CLASSES.md meant a
+    # classify --txt run replaced the .docx class list with the .txt one, and the fixer
+    # reads that file to decide what to attack next.
+    name = "DEFECT-CLASSES-TXT.md" if "--txt" in sys.argv else "DEFECT-CLASSES.md"
+    open(os.path.join(HERE, name), "w", encoding="utf-8").write("\n".join(out) + "\n")
 
     print("documents measured : %d" % len(measured))
     print("checks firing      : %d" % len(doc_sets))

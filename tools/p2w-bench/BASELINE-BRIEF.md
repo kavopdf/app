@@ -98,6 +98,16 @@ STEP 2 - WHICH TEN
 STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING EVERY FIVE
   For each of the 10:
     a. Convert it: copy the PDF into one/ and run ConvertAll one out1.
+       That one run writes BOTH outputs - out1/<name>.docx and out1/<name>.txt -
+       and both are measured. The .docx goes through Drive to a PDF; the .txt is
+       compared locally: no upload, no Drive file, no export.
+    a2. Measure the .txt against the same source PDF:
+          python3 tools/p2w-bench/verify_txt.py all/<name>.pdf out1/<name>.txt --json restxt/<name>.json
+        exit 0 every check passed, 1 at least one failed, 2 could not run. If
+        out1/<name>.txt does not exist the conversion dropped an output - record that,
+        do not skip it silently. The .txt is never compared to the Google PDF: it is
+        our own file, and the only question is whether it describes the page the
+        source PDF drew.
     b. Copy the docx to /scratch/output/ (upload only accepts saved files).
     c. upload(path=<copy>, tool_slug="GOOGLEDRIVE_CREATE_FILE", toolkit="googledrive") -> s3key
     d. GOOGLEDRIVE_CREATE_FILE(name=<short>, mimeType="application/vnd.google-apps.document",
@@ -115,7 +125,16 @@ STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING EVERY FIVE
     j. AFTER EVERY FIFTH DOCUMENT and after the last one:
          python3 tools/p2w-bench/record.py res/*.json --round <round from ROUND.json> --engine $ENGINE
          python3 tools/p2w-bench/ratchet.py
-         commit BASELINE.md, RATCHET.json and RESULTS.jsonl with GITHUB_COMMIT_MULTIPLE_FILES
+         python3 tools/p2w-bench/record.py restxt/*.json --round <round from ROUND.json> --engine $ENGINE --txt
+         python3 tools/p2w-bench/ratchet.py --txt
+         commit BASELINE.md, RATCHET.json, RESULTS.jsonl, RATCHET-TXT.json and RESULTS-TXT.jsonl
+
+         The two halves keep separate stores on purpose. A .txt regression and a .docx
+         regression are fixed by different code in different classes, and one number
+         covering both would let either hide behind the other.
+         BASELINE.md carries the .docx rows only - it is the table a human reads, and
+         the .txt has no such table. Its rows live in RESULTS-TXT.jsonl and its marks in
+         RATCHET-TXT.json, both of which ratchet.py --txt maintains.
        git push FAILS - never try it.
 
        THE COMMIT MESSAGE NAMES EVERY DOCUMENT. Do not write a range:

@@ -34,6 +34,7 @@ STEP 0 - IS IT YOUR TURN, AND IS ANYONE ELSE STILL WORKING?
 STEP 0b - READ THE INTERFACE OF THE TOOLS YOU WILL USE  ** BEFORE ANYTHING ELSE **
       sed -n '/## hypothesis.py/,/## calibrate.py/p' tools/p2w-bench/TOOLBOX.md
       sed -n '/## classify.py/,/## hypothesis.py/p' tools/p2w-bench/TOOLBOX.md
+      sed -n '/## verify_txt.py/,/## commit-gate.sh/p' tools/p2w-bench/TOOLBOX.md
       sed -n '/## record.py/,/## ratchet.py/p' tools/p2w-bench/TOOLBOX.md
       sed -n '/## ratchet.py/,/## round.py/p' tools/p2w-bench/TOOLBOX.md
       sed -n '/## commit-gate.sh/,/## precommit.sh/p' tools/p2w-bench/TOOLBOX.md
@@ -102,9 +103,27 @@ STEP 1 - BUILD
 
 STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   Read tools/p2w-bench/DEFECT-CLASSES.md and tools/p2w-bench/ATTEMPTS.json.
+  The .txt half has its own list in DEFECT-CLASSES-TXT.md. If either file is
+  missing or older than the store it describes, rebuild it first:
+      python3 tools/p2w-bench/classify.py
+      python3 tools/p2w-bench/classify.py --txt
+  ATTEMPTS.json is shared: a class id is unique whichever half it came from.
   Classes are data-driven groups of checks that fail on largely the same documents, named after the
   leading check id, e.g. '19_worst_dy (+3)'. Do not invent a friendlier name.
   Take the top class whose status is OPEN. SKIP every class marked PARKED or FIXED.
+
+  THE TOOL HAS TWO OUTPUTS AND EACH IS MEASURED SEPARATELY:
+      python3 tools/p2w-bench/classify.py          the .docx half, checks 01 to 59
+      python3 tools/p2w-bench/classify.py --txt    the .txt half, checks t01 to t05
+  Run BOTH and take the largest OPEN class from either. A t01..t05 class belongs to
+  the .txt half; every other id belongs to the .docx half. Which half you are in
+  decides which verifier and which ratchet you use for the rest of the run:
+      .docx   verify_google.py    ratchet.py
+      .txt    verify_txt.py       ratchet.py --txt
+  Never measure a .txt class with the .docx tools or gate it with the .docx ratchet,
+  and never the reverse: the two stores are separate on purpose, so one half's
+  regression cannot hide behind the other half's good score. Both outputs ship in
+  the same APK from the same conversion, so a .txt class is not second-class work.
 
   IF NO CLASS IS OPEN, THE ROUND IS FINISHED:
       python3 tools/p2w-bench/round.py --release-fixer
@@ -193,6 +212,10 @@ STEP 6 - PROVE IT ON GOOGLE, THEN DECIDE THE OUTCOME
 
 STEP 7 - THE RATCHET DECIDES  ** THIS IS THE REGRESSION RULE **
   python3 tools/p2w-bench/ratchet.py
+  python3 tools/p2w-bench/ratchet.py --txt
+  BOTH, whichever half you fixed. One conversion writes both outputs from the same
+  model, so a change made for the .docx can move the .txt and the reverse - and
+  each ratchet can only see its own half. If either exits 1 the fix is REJECTED.
   It holds, per document, the best score ever reached AND the set of failing checks at that point,
   and compares only checks that existed at both marks - so a newly added check is never read as a
   regression, and a check that used to pass and now fails is caught even when the score is

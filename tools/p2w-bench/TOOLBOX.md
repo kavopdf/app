@@ -72,6 +72,12 @@ document through Drive again. Exit **0** found, **1** no record.
 
 ---
 
+
+**`--txt`** writes to `RESULTS-TXT.jsonl` instead of `RESULTS.jsonl`, and `--show --txt`
+reads that store. The .txt half keeps its own record because a .txt regression and a
+.docx regression are fixed by different code in different classes; one file covering both
+would make them indistinguishable.
+
 ## ratchet.py — the regression rule
 
 **Used by:** all four. Baseline runs it after measuring, classifier runs `--check`,
@@ -105,6 +111,13 @@ checks that existed at both marks, and a mark taken by a smaller verifier does n
 bind a larger one. Do not try to out-think it and do not edit `RATCHET.json` by hand.
 
 ---
+
+
+**`--txt`** uses `RATCHET-TXT.json` and takes its scores from `RESULTS-TXT.jsonl` and its
+check universe from `verify_txt.py --list-checks`. There is no BASELINE-TXT.md: the .docx
+path keeps a table a human also reads, and the .txt path has no reader but this one, so
+the store is the truth. Both ratchets must be run - one conversion writes both outputs,
+and each can only see its own half.
 
 ## round.py — whose turn it is
 
@@ -205,6 +218,12 @@ accepted without numbers, because an attempt that found no root cause has nothin
 to count. Limits: one day per class, 12 attempts, 3 requeues.
 
 ---
+
+
+**`--txt`** reads `RESULTS-TXT.jsonl` instead of `BASELINE.md`, so the classes it reports
+are the .txt checks `t01` to `t05` rather than the .docx checks `01` to `59`. Run both and
+take the largest OPEN class from either; which half you are in decides whether the rest of
+the run uses `verify_google.py` with `ratchet.py` or `verify_txt.py` with `ratchet.py --txt`.
 
 ## hypothesis.py — what earlier attempts already ruled out
 

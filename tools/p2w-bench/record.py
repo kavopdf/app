@@ -35,12 +35,18 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 STORE = os.path.join(HERE, "RESULTS.jsonl")
 
+# The .txt half of the tool keeps its own store. One file would make a .txt regression
+# and a .docx regression indistinguishable in the record, and the two are fixed by
+# different code in different classes.
+STORE_TXT = os.path.join(HERE, "RESULTS-TXT.jsonl")
 
-def load():
-    if not os.path.exists(STORE):
+
+def load(store=None):
+    store = store or STORE
+    if not os.path.exists(store):
         return []
     out = []
-    for line in open(STORE, encoding="utf-8"):
+    for line in open(store, encoding="utf-8"):
         line = line.strip()
         if not line:
             continue
@@ -51,14 +57,15 @@ def load():
     return out
 
 
-def append(entries):
+def append(entries, store=None):
     """Append, replacing any earlier line for the same (round, engine, doc)."""
-    existing = load()
+    store = store or STORE
+    existing = load(store)
     key = lambda e: (e.get("round"), e.get("engine"), e.get("doc"))
     index = {key(e): e for e in existing}
     for e in entries:
         index[key(e)] = e
-    with open(STORE, "w", encoding="utf-8") as f:
+    with open(store, "w", encoding="utf-8") as f:
         for e in sorted(index.values(), key=lambda e: (e.get("round", 0),
                                                        e.get("doc", ""))):
             f.write(json.dumps(e, sort_keys=True) + "\n")
@@ -93,6 +100,7 @@ def main(argv):
                           % (k, src, ren, "FAIL" if k in e.get("failed", []) else "pass"))
         return 0
 
+    store = STORE_TXT if "--txt" in argv else STORE
     rnd = int(argv[argv.index("--round") + 1]) if "--round" in argv else 0
     engine = argv[argv.index("--engine") + 1] if "--engine" in argv else ""
     files = [a for a in argv[1:] if a.endswith(".json")]
@@ -119,7 +127,7 @@ def main(argv):
             "values": j.get("checks", {}),
         })
 
-    total = append(entries)
+    total = append(entries, store)
     print("record: %d documents recorded from %d files, %d in the store"
           % (len(entries), len(files), total))
     return 0
