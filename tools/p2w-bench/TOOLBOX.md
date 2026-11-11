@@ -315,6 +315,56 @@ corpus is not contiguous - 37_font_... sits inside that range, and 376 to 379 ar
 the corpus at all. The commit log is the only record of what was measured, so the list is
 read from the file rather than remembered.
 
+## verify_txt.py — does the .txt describe the same document as the source PDF?
+
+**Used by:** the fixer, on the .txt half of the tool. Separate from verify_google.py,
+which measures the .docx half; neither can hide a regression in the other.
+
+```
+python3 tools/p2w-bench/verify_txt.py <source.pdf> <output.txt>
+python3 tools/p2w-bench/verify_txt.py <source.pdf> <output.txt> --json out.json
+python3 tools/p2w-bench/verify_txt.py --list-checks
+```
+
+Exit 0 every check passed, 1 at least one failed, 2 could not run.
+
+Five checks, covering the four things a .txt can actually carry:
+
+| check | what it asks |
+|---|---|
+| t01_word_accuracy | the source's words are all there (>= 98%) |
+| t02_position | a line's x survives as its leading spaces (>= 90% within 2 chars) |
+| t03_symbols | every non-ASCII character in the source is in the .txt |
+| t04_structure | the page drew N rows, the .txt has about N lines (<= 1.5x) |
+| t05_completeness | a PDF with text produces a .txt with text |
+
+It does not measure fonts or colours. A .txt has neither, and a number for them would
+mean nothing.
+
+Sample real output:
+
+```
+372_timesheet_grid.txt                   4/5 FAIL
+    t04_structure              source=12         txt=68
+```
+
+That is the whole point of the check: the page drew twelve rows, the .txt has sixty-eight
+lines, because every table cell went on a line of its own. A 17-row attendance register
+becomes 459 lines. Half the corpus is over 1.8x.
+
+## test_txt_checks.py — does each txt check fire, and stay quiet?
+
+**Used by:** anyone changing verify_txt.py.
+
+```
+python3 tools/p2w-bench/test_txt_checks.py        summary
+python3 tools/p2w-bench/test_txt_checks.py -v     every case
+```
+
+Seven cases, each changing exactly one thing, so a check that fires can only be the one
+that was meant to. A check that never fires is decoration; a check that always fires
+condemns every document and hides the real defect behind its noise.
+
 ## commit-gate.sh — an engine change may not be committed without its evidence
 
 **Used by:** fixer, before every commit.

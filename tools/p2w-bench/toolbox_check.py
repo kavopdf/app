@@ -40,6 +40,8 @@ SOURCES = {
     "hypothesis.py": "hypothesis.py",
     "reset_round.py": "reset_round.py",
     "docnames.py": "docnames.py",
+    "verify_txt.py": "verify_txt.py",
+    "test_txt_checks.py": "test_txt_checks.py",
     "calibrate.py": "calibrate.py",
 }
 SHELL = {
