@@ -72,11 +72,11 @@ as measured; only the verdict is closed.
 | 320_balance_sheet_statutory | 50/59 | FAIL | 18_median_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
 | 321_auditors_report | 54/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 322_mutual_fund_factsheet | 41/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 11_bold_runs, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 44_header_footer, 45_char_accuracy, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
-| 323_credit_card_statement |  |  |  |  |  |
-| 324_loan_amortisation_schedule |  |  |  |  |  |
-| 325_demat_holdings_statement |  |  |  |  |  |
-| 326_itr_computation |  |  |  |  |  |
-| 32_serif_nondefault_body |  |  |  |  |  |
+| 323_credit_card_statement | 42/59 | FAIL | 01_page_count, 03_word_count, 04_words_missing, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 324_loan_amortisation_schedule | 48/59 | FAIL | 06_table_columns, 07_table_rows, 18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch, 25_invisible_text, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 325_demat_holdings_statement | 51/59 | FAIL | 02_text_run_count, 06_table_columns, 22_reading_order, 25_invisible_text, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 326_itr_computation | 44/59 | FAIL | 01_page_count, 02_text_run_count, 07_table_rows, 14_filled_shapes, 18_median_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 11 Nov |
+| 32_serif_nondefault_body | 50/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 330_cad_drawing_sheet |  |  |  |  |  |
 | 331_pid_diagram |  |  |  |  |  |
 | 332_bom_on_drawing |  |  |  |  |  |
