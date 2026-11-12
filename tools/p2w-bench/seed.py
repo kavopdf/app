@@ -117,6 +117,12 @@ def main(argv):
     with open(BASE, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
+    try:
+        sys.path.insert(0, HERE)
+        from trace import note
+        note("seed", "added %d row(s) to BASELINE.md" % len(missing))
+    except Exception:
+        pass
     print("\nadded %d row(s) - BASELINE.md now lists %d" % (len(missing), len(known) + len(missing)))
     print("The baseline will measure them like any other empty row.")
     return 0

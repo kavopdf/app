@@ -71,23 +71,6 @@ def load():
     return sections
 
 
-def _cap(sections):
-    """Unused. Kept only so an old import cannot break; it no longer drops anything.
-
-    This used to collapse everything past the eighth entry into one line. That was wrong
-    on both counts. It was not needed - a full day of attempts is seventy-two entries and
-    7,250 tokens, and a measured run of a cron read 23,000 tokens of files without
-    difficulty - and it cost quality, because a theory ruled out on attempt two is exactly
-    what attempt twenty must not repeat, and the collapsed line threw it away.
-
-    The file keeps every entry. `show` is where the size is controlled: it prints the older
-    entries as one line each and the recent ones in full, so the reader still sees that a
-    theory was tried and what it proved, without reading four hundred words of evidence
-    for something already settled.
-    """
-    return sections
-
-
 def save(sections):
     out = [HEADER]
     for cls in sorted(sections):

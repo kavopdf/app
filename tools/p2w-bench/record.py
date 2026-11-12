@@ -79,6 +79,16 @@ def _trim_values(index):
         if eng not in engines:
             engines.append(eng)
     keep = set(engines[-KEEP_VALUES_FOR:]) if len(engines) > KEEP_VALUES_FOR else set(engines)
+    # A committed engine is a reference, and a reference does not expire. The baseline row
+    # carries source=N render=N for every check - the numbers that say how far off the
+    # conversion was and in which direction - and the fixer reads them with
+    # `record.py --show <doc>` before forming any theory. Trimming those away to save space
+    # would leave it knowing only that a check failed, never by how much.
+    #
+    # Only dirty engines are history: each attempt writes twenty rows under its own id and
+    # none of them is a reference to anything. Keeping the last two of those bounds the file
+    # without touching the row the whole comparison is built on.
+    keep |= {e for e in engines if "-d" not in e}
     for e in index.values():
         if e.get("engine") not in keep:
             e.pop("values", None)
@@ -94,6 +104,10 @@ def append(entries, store=None):
     for e in entries:
         index[key(e)] = e
     _trim_values(index)
+    try:
+        note("record", "%d row(s) written, store now holds %d" % (len(entries), len(index)))
+    except NameError:
+        pass
     with open(store, "w", encoding="utf-8") as f:
         for e in sorted(index.values(), key=lambda e: (e.get("round", 0),
                                                        e.get("doc", ""))):

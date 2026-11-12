@@ -1145,3 +1145,59 @@ Both findings are the same kind: a brief describing something no code produces. 
 gates all check that numbers *agree with each other*; none checks that a promise in prose is
 kept by a tool. That is why §23's reverted attempt and this section's missing rows both survived
 a day of auditing — they were invisible to every comparison the pipeline makes.
+
+---
+
+## 27. Verifying the context work found three things wrong with it
+
+Every change from the token/context pass was re-checked against the thing it was supposed to
+protect. Three were wrong.
+
+### The baseline lost its values
+
+`_trim_values` kept the raw numbers for the last two engines. Sound reasoning, wrong edge: the
+**baseline** is an engine id too, and it is the oldest, so it was the first to be trimmed.
+
+Those are the numbers that matter most. A baseline row carries `source=N render=N` for every
+check — how far off the conversion was and in which direction — and the fixer reads exactly that
+with `record.py --show <doc>` before it forms any theory. Trimming it would have left the run
+knowing only that a check failed, never by how much.
+
+A committed engine is a reference and a reference does not expire, so the rule is now: keep the
+last two engines **plus every engine whose id has no `-d` suffix**. Only attempt rows are
+history. Verified with five engines: the baseline keeps its values, the last two attempts keep
+theirs, the two older attempts do not, and the file stays bounded.
+
+### The classify.py section grew three extra sections
+
+The brief reads TOOLBOX sections by range — `/## classify.py/,/## hypothesis.py/`. That range was
+written when those two sections were adjacent. Adding `seed.py`, `code.py` and `trace.py` between
+them silently turned "the classify section" (2,614 bytes) into four sections (5,037 bytes).
+
+Nothing broke; the fixer simply read more than it asked for, which is the failure mode this whole
+pass exists to prevent. The range is now `/## classify.py/,/## seed.py/`, and `code.py` gets its
+own range because the fixer does need that one.
+
+Checked all seven ranges against the real file: each returns exactly the sections it names.
+
+### Dead code left behind
+
+Reverting the hypotheses cap left `_cap()` defined and never called. Removed — an unused function
+that used to delete data is the kind of thing someone re-enables by accident.
+
+### Two tools never wrote to the trace
+
+`record.py` and `seed.py` both change files the pipeline depends on and neither wrote a line.
+Both do now.
+
+### Verified end to end
+
+A full simulated attempt, in a scratch clone, on three real corpus documents: claim writes its
+RUN-LOG line, the engine id is unique to the diff, the rows record under it, the theory is filed,
+`--attempt` verifies against the **baseline** and accepts `1 of 3`, the engine reverts, and the
+commit gate passes because the theory and the attempt arrived together. `ATTEMPTS.json` shows the
+attempt. The trace shows every step.
+
+One thing the simulation showed that is worth stating: `--attempt` refuses when the measured
+documents have no baseline row — "the store says 0 of 0". That is correct, and it means the fixer
+can only verify against documents the baseline actually measured.
