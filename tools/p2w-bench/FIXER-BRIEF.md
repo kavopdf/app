@@ -48,6 +48,14 @@ STEP 0c - READ WHAT ALREADY COST US TIME
   Ten to fifteen lines, each one a mistake somebody already paid for. Read them before you form a
   theory - every one of them will otherwise be repeated by you.
 
+      grep -A20 "the docx says" tools/p2w-bench/DEFECTS.md
+  One measured fact you must not re-derive: how Google renames fonts. Measured on 12 Nov from
+  Google's own export - one docx carrying seven faces, converted by Drive, exported back, each
+  marker word read with its rendered font. Liberation Serif, Liberation Sans, Liberation Mono and
+  DejaVu Serif all come back as ArialMT; DejaVu Sans as Verdana; Times New Roman survives as
+  TimesNewRomanPSMT. That is what 53_embedded_faces is failing on. Do not spend a Drive round trip
+  per document re-measuring it.
+
 WHAT THE VERIFIER IS
   59 checks: text, position, reading order, borders, per-span size/colour/weight, rotation, link
   targets, margins, character accuracy, alignment, image position and dpi, page size, orientation,
