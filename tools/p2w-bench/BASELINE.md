@@ -186,7 +186,7 @@ as measured; only the verdict is closed.
 | bank-statement-5-pages | 40/59 | FAIL | 01_page_count, 07_table_rows, 10_font_sizes, 12_italic_runs, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 26_text_overlap, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 12 Nov |
 | bank-statement-horizontal-rules-only | 42/59 | FAIL | 01_page_count, 02_text_run_count, 06_table_columns, 07_table_rows, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 47_margins, 55_orientation_mix | 2a68de6 | 12 Nov |
 | boq-horizontal-rules-only | 43/59 | FAIL | 01_page_count, 02_text_run_count, 06_table_columns, 07_table_rows, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 55_orientation_mix | 2a68de6 | 12 Nov |
-| boq-tender-bill-of-quantities |  |  |  |  |  |
+| boq-tender-bill-of-quantities | 51/59 | FAIL | 09_font_names, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 47_margins | 2a68de6 | 12 Nov |
 | brochure-3col-with-sidebar-box |  |  |  |  |  |
 | bus-timetable-station-left-times-right |  |  |  |  |  |
 | delivery-challan |  |  |  |  |  |

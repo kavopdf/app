@@ -42,3 +42,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 11:11 | baseline | measured bank-statement-5-pages 40/59 docx, bank-statement-5-pages.txt 4/5 FAIL txt |
 | 12 Nov 11:11 | baseline | measured bank-statement-horizontal-rules-only 42/59 docx, bank-statement-horizontal-rules-only.txt 4/5 FAIL txt |
 | 12 Nov 11:12 | baseline | measured boq-horizontal-rules-only 43/59 docx, boq-horizontal-rules-only.txt 4/5 FAIL txt |
+| 12 Nov 11:12 | baseline | measured boq-tender-bill-of-quantities 51/59 docx, boq-tender-bill-of-quantities.txt 4/5 FAIL txt |
