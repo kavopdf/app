@@ -25,3 +25,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 10:01 | started | phase measure |
 | 12 Nov 10:03 | baseline | corpus 208 pdfs, engine built (2a68de6) |
 | 12 Nov 10:04 | baseline | measured 76_devanagari_table 45/59 docx, 4/5 txt |
+| 12 Nov 10:05 | baseline | measured 77_arabic_rtl_document 36/59 docx, 77_arabic_rtl_document.txt               1/5 FAIL txt |
