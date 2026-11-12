@@ -382,3 +382,75 @@ the comparison, so extra outlines in the render are invisible to it.
    with a bookmark tree — then those three checks become evidence instead of decoration.
 2. Decide whether `52_outline` should catch outlines the render *adds*, not only ones it
    loses. Today it can only fail in one direction.
+
+---
+
+## 13. The baseline, tightened — 8 checks now ask for 90%, and the ratchet can be reset
+
+Done at the round boundary on the user's instruction: round 1 is measured and archived, so
+rounds 2 and 3 measure with a stricter yardstick.
+
+### What was loose, and what it hid
+
+The checks were written with generous floors so they would not fail on substitution noise.
+Measured against round 1's own values, three of those floors were hiding real losses:
+
+| check | was | now | documents that newly fail |
+|---|---|---|---|
+| `50_annotations` | 50% | 90% | 0 — no corpus document carries annotations |
+| `51_form_fields` | 50% | 90% | 0 — none carries an AcroForm |
+| `52_outline` | 50% | 90% | 0 — none carries a bookmark tree |
+| `56_rtl_runs` | 50% | 90% | 0 — all ten RTL documents already fail |
+| `37_super_subscript` | 70% | 90% | 0 — all three already fail |
+| `38_list_markers` | 70% | 90% | 0 — the two that fail already fail |
+| `14_filled_shapes` | 50% | 80% | **12** |
+| `44_header_footer` | 70% | 90% | **14** |
+
+26 documents that lost between 10% and 30% of their filled shapes or their header and footer
+text were passing. They now fail, and the fixer will be pointed at them.
+
+A check at 50% says half of a document may vanish and the document still counts as correct.
+That is not a measurement, and it cannot support a 99% claim.
+
+### What was deliberately left loose
+
+`32_stroke_lines` stays at 80%. Its counter walks `page.get_drawings()` and keeps only paths
+with a stroke colour, so a table rule exported as a filled rectangle instead of a stroked
+line is invisible to it. Tightening it would fail documents that look right — measured at
+21 more failures, and every one of them is unverified. A false positive costs the fixer a
+day; the loss is already caught by `06_table_columns` and `07_table_rows`.
+
+`36_underline_rules` stays at 70% for the same reason: an underline may render as a border.
+
+### The ratchet had to be resettable
+
+Tightening a check lowers every score it touches. The ratchet keeps the best score a
+document ever reached, permanently, so the fixer's first measurement in the fix phase would
+have been below the old mark and refused — the pipeline would have stopped dead, and the
+refusal would have looked like a regression that never happened.
+
+`ratchet.py --reset --reason "..."` archives the store with a timestamp and empties it. A
+reason is mandatory and a blank one is refused: a silent reset erases the only record that
+the corpus ever scored higher. Both stores were reset today, and both archives are in the
+repository:
+
+    RATCHET-20261112-095333.json        208 marks, the old yardstick
+    RATCHET-TXT-20261112-095333.json    208 marks, the old yardstick
+
+### The gap this leaves, stated plainly
+
+Round 1's fix phase now runs with an empty mark set, so only the twenty documents a run
+measures carry a mark. A fix that hurt one of the other 188 would not be caught until round
+2 re-measures it — and round 2's first measurement sets that document's mark, so the loss
+would become the new standard rather than a regression.
+
+Round 2 measures all 208 before its fix phase starts, so rounds 2 and 3 have full
+protection. Round 1's fix phase does not, and that is the price of changing the yardstick
+between rounds rather than at the very start.
+
+### Verified
+
+A PDF against itself still scores **59/59** on five documents, so no threshold became
+over-strict. Two different PDFs still score 35/59. `test_checks.py` 23/23 and
+`test_txt_checks.py` 7/7 still pass, which means every check still fires on a pair that
+differs and still passes on a pair that does not.

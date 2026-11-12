@@ -241,7 +241,7 @@ def extra_checks2(src, gd):
         return n
 
     s_a, g_a = annots(src), annots(gd)
-    c["50_annotations"] = (s_a, g_a, s_a == 0 or g_a >= max(1, int(s_a * 0.5)))
+    c["50_annotations"] = (s_a, g_a, s_a == 0 or g_a >= max(1, int(s_a * 0.9)))
 
     # ---- 51 form fields ----------------------------------------------------
     def fields(doc):
@@ -251,7 +251,7 @@ def extra_checks2(src, gd):
         return n
 
     s_f, g_f = fields(src), fields(gd)
-    c["51_form_fields"] = (s_f, g_f, s_f == 0 or g_f >= max(1, int(s_f * 0.5)))
+    c["51_form_fields"] = (s_f, g_f, s_f == 0 or g_f >= max(1, int(s_f * 0.9)))
 
     # ---- 52 outline / bookmarks -------------------------------------------
     def outline(doc):
@@ -261,7 +261,7 @@ def extra_checks2(src, gd):
             return 0
 
     s_o, g_o = outline(src), outline(gd)
-    c["52_outline"] = (s_o, g_o, s_o == 0 or g_o >= max(1, int(s_o * 0.5)))
+    c["52_outline"] = (s_o, g_o, s_o == 0 or g_o >= max(1, int(s_o * 0.9)))
 
     # ---- 53 embedded font names -------------------------------------------
     # 09_font_names counts distinct faces. This asks whether the FACE ITSELF
@@ -365,7 +365,7 @@ def extra_checks2(src, gd):
         return n
 
     s_rtl, g_rtl = rtl_runs(src), rtl_runs(gd)
-    c["56_rtl_runs"] = (s_rtl, g_rtl, s_rtl == 0 or g_rtl >= max(1, int(s_rtl * 0.5)))
+    c["56_rtl_runs"] = (s_rtl, g_rtl, s_rtl == 0 or g_rtl >= max(1, int(s_rtl * 0.9)))
 
     # ---- 59 shape anchor ---------------------------------------------------
     # Does text stay in the same place inside the outline that encloses it?
@@ -524,7 +524,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
         return n
 
     s_sc, g_sc = scripts(src), scripts(gd)
-    c["37_super_subscript"] = (s_sc, g_sc, s_sc == 0 or g_sc >= max(1, int(s_sc * 0.7)))
+    c["37_super_subscript"] = (s_sc, g_sc, s_sc == 0 or g_sc >= max(1, int(s_sc * 0.9)))
 
     # ---- 38 list markers ---------------------------------------------------
     def markers(doc):
@@ -545,7 +545,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
         return n
 
     s_m, g_m = markers(src), markers(gd)
-    c["38_list_markers"] = (s_m, g_m, s_m == 0 or g_m >= max(1, int(s_m * 0.7)))
+    c["38_list_markers"] = (s_m, g_m, s_m == 0 or g_m >= max(1, int(s_m * 0.9)))
 
     # ---- 39 image position -------------------------------------------------
     def img_boxes(doc):
@@ -637,7 +637,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
         return n
 
     s_e, g_e = edge_text(src), edge_text(gd)
-    c["44_header_footer"] = (s_e, g_e, s_e == 0 or g_e >= max(1, int(s_e * 0.7)))
+    c["44_header_footer"] = (s_e, g_e, s_e == 0 or g_e >= max(1, int(s_e * 0.9)))
 
     # ---- 45 character accuracy --------------------------------------------
     s_txt = "".join(s_sp["text"] for s_sp in s_runs)
@@ -796,7 +796,7 @@ def compare(src_path, gd_path):
     # Many documents legitimately contain no filled shapes. Requiring >= 1 when the
     # source has none failed every such document - a false positive, not a defect.
     checks["14_filled_shapes"] = (s_fill, g_fill,
-                                  s_fill == 0 or g_fill >= max(1, int(s_fill * 0.5)))
+                                  s_fill == 0 or g_fill >= max(1, int(s_fill * 0.8)))
 
     s_links = sum(len(p.get_links()) for p in src)
     g_links = sum(len(p.get_links()) for p in gd)

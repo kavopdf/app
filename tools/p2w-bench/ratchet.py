@@ -32,8 +32,10 @@ USAGE
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BASE = os.path.join(HERE, "BASELINE.md")
@@ -125,6 +127,41 @@ def main(argv):
     TXT_MODE = "--txt" in argv
     check_only = "--check" in argv
     strict = "--strict" in argv
+
+    # ---- --reset -----------------------------------------------------------
+    # When the YARDSTICK changes, every old mark is measuring a different thing and
+    # comparing against it is not a ratchet, it is a false alarm. Tightening a check
+    # from 0.7 to 0.9 on 12 Nov would have failed 26 documents that had not moved.
+    #
+    # So the marks are archived with the reason, and the store starts empty: every
+    # document sets a fresh mark on its next measurement. The archive is the record
+    # that the numbers changed meaning, and a reason is mandatory - a silent reset
+    # would erase the only evidence that the corpus ever scored higher.
+    if "--reset" in argv:
+        reason = ""
+        if "--reason" in argv:
+            i = argv.index("--reason")
+            if i + 1 < len(argv):
+                reason = argv[i + 1].strip()
+        if not reason:
+            print("refused: --reset needs --reason \"<why the yardstick changed>\"")
+            print("A reset without a reason erases the record of what the old marks meant.")
+            return 1
+        path = RATCHET_TXT if TXT_MODE else RATCHET
+        if os.path.exists(path):
+            stamp = time.strftime("%Y%m%d-%H%M%S")
+            archive = path.replace(".json", "-%s.json" % stamp)
+            shutil.copy(path, archive)
+            old = json.load(open(path, encoding="utf-8"))
+            print("archived %s -> %s (%d marks)" % (os.path.basename(path),
+                                                    os.path.basename(archive), len(old)))
+        else:
+            print("nothing to archive - %s does not exist yet" % os.path.basename(path))
+        json.dump({}, open(path, "w", encoding="utf-8"), indent=2)
+        print("cleared %s - every document sets a fresh mark on its next measurement"
+              % os.path.basename(path))
+        print("reason: %s" % reason)
+        return 0
 
     scores = read_scores()
     ratchet = load_ratchet()
