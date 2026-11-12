@@ -59,3 +59,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 12:13 | baseline | measured invoice-line-items-qty-rate-amount 49/59 docx, invoice-line-items-qty-rate-amount.txt 4/5 txt |
 | 12 Nov 12:14 | baseline | measured itr-computation-with-slab-table 43/59 docx, itr-computation-with-slab-table.txt 4/5 txt |
 | 12 Nov 12:14 | baseline | measured journal-2col-with-footnotes 43/59 docx, journal-2col-with-footnotes.txt 5/5 txt |
+| 12 Nov 12:15 | baseline | measured landscape-page-inside-portrait-document 47/59 docx, landscape-page-inside-portrait-document.txt 4/5 txt |
