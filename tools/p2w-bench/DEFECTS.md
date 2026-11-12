@@ -1574,3 +1574,53 @@ Three attempts, three different shapes: one ruled out a theory with numbers, one
 cause with a calibration, one is still waiting to be measured. The ledger carried each one to the
 next. That is the handoff working as designed — and the reason §30's follow-up rule and this
 section's patch rule matter more than they look.
+
+---
+
+## 34. The bottleneck was eighty sequential Google calls, not thinking — so the ₹100 is not needed
+
+The question was whether ₹100 of API credit could make the fixing faster. It would not, and the
+reason is worth writing down: **nothing in the slow part is a thinking problem.**
+
+### Where an attempt's eleven minutes actually go
+
+| stage | time | can an API change it? |
+|---|---|---|
+| build | 1–2 min | no — it is a javac run |
+| classify | 1 min | no |
+| calibration | 2–3 min | no — three docx through Drive |
+| **twenty documents through Drive** | **~4 min** | **no — it is Google's latency** |
+| ratchet, record, commit | 1 min | no |
+
+The largest single cost is twenty documents pushed through Drive. Each document is **four
+sequential calls** — upload, `CREATE_FILE`, `EXPORT`, download-and-verify — so twenty is **eighty
+round trips**. At roughly three seconds each that is four minutes of waiting on Google, not on us.
+
+### The free fix
+
+Batches of five. The same eighty calls, five in flight at a time, is about one minute for the same
+work and the same API. The brief now says so, and says five rather than twenty because twenty at
+once is a burst that looks like abuse — and its failure mode is exactly what happened at 21:54:
+a blocked round, not an error you can retry.
+
+That is roughly **three minutes saved per attempt, nine per run**, for nothing.
+
+### What ₹100 of API credit would and would not buy
+
+**Would not:** faster conversion (Google's), faster builds (javac's), or better root causes (the
+cron's own model already does the reasoning, and it already escalates to three subagents when it
+is stuck). An external model in that loop adds a second opinion, not speed.
+
+**Would:** nothing structural. ₹100 is about $1.20 — a few million tokens. The pipeline's reading
+is already 13,000 tokens a run; the money would buy a thousand runs of reading the pipeline does
+not need.
+
+### The honest conclusion
+
+Spend nothing. The three real levers, in order:
+
+1. **Batch the Drive round** — 3 min per attempt, free, done here.
+2. **Three attempts per run** — 3× the day's work, free, done in §31.
+3. **`code.py` instead of reading the engine** — keeps a run's reading small, free, done in §22.
+
+An API key would sit unused while Google's export queue did the same work at the same speed.

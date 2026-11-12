@@ -304,6 +304,22 @@ STEP 5 - FIX IT, IN ONE PLACE
 STEP 6 - PROVE IT ON GOOGLE, THEN DECIDE THE OUTCOME
   Convert the same 10 plus 10 that already scored well. Run all 20 through Drive and
   verify_google.py, recording the new numbers with record.py.
+
+  DO THE DRIVE ROUND IN BATCHES OF FIVE, NOT ONE DOCUMENT AFTER ANOTHER. Each document is four
+  sequential calls - upload, CREATE_FILE, EXPORT, download - so twenty one at a time is eighty
+  round trips: about four minutes of pure Google latency, the largest single cost in an attempt.
+  Five at a time is one minute for the same work and the same API:
+
+      upload all five, then CREATE_FILE all five, then EXPORT all five, then verify all five
+
+  Five, not twenty. Twenty at once is a burst that looks like abuse, and the failure arrives as a
+  blocked round rather than an error you can retry - which is what happened at 21:54 after five
+  calibration uploads.
+
+  This is the only place in the pipeline where parallel calls are right. The baseline measures one
+  document at a time on purpose: it commits after each, so a run that dies keeps what it finished.
+  Here the twenty are one measurement and one commit, so batching costs nothing.
+
   Count how many of the failing documents actually moved. That number decides the outcome - you do
   not choose it:
     kept      the target checks now pass on at least half the failing documents
