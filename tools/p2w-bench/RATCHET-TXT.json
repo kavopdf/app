@@ -309,5 +309,19 @@
       "t04_structure",
       "t05_completeness"
     ]
+  },
+  "68_journal_wide_table_spanning": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
   }
 }
