@@ -180,7 +180,7 @@ as measured; only the verdict is closed.
 | academic-paper-ieee-2col-abstract | 46/59 | FAIL | 02_text_run_count, 09_font_names, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 26_text_overlap, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 37_super_subscript, 47_margins | 2a68de6 | 12 Nov |
 | admission-form-labels-left-boxes-right | 46/59 | FAIL | 02_text_run_count, 09_font_names, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 12 Nov |
 | admit-card | 46/59 | FAIL | 03_word_count, 04_words_missing, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
-| annual-review-2col-uneven-columns |  |  |  |  |  |
+| annual-review-2col-uneven-columns | 45/59 | FAIL | 01_page_count, 09_font_names, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 25_invisible_text, 32_stroke_lines, 41_block_spacing, 47_margins, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 12 Nov |
 | balance-sheet-and-profit-loss |  |  |  |  |  |
 | balance-sheet-two-columns-of-figures |  |  |  |  |  |
 | bank-statement-5-pages |  |  |  |  |  |

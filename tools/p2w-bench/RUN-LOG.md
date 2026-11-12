@@ -32,3 +32,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 10:07 | baseline | measured academic-paper-ieee-2col-abstract 46/59 docx, academic-paper-ieee-2col-abstract.txt    5/5 PASS txt |
 | 12 Nov 10:07 | baseline | measured admission-form-labels-left-boxes-right 46/59 docx, admission-form-labels-left-boxes-right.t 5/5 PASS txt |
 | 12 Nov 10:07 | baseline | measured admit-card 46/59 docx, admit-card.txt                           4/5 FAIL txt |
+| 12 Nov 10:08 | baseline | measured annual-review-2col-uneven-columns 45/59 docx, annual-review-2col-uneven-columns.txt    5/5 PASS txt |
