@@ -104,6 +104,15 @@ WHEN SOMETHING FAILS
   tools/p2w-bench/INCIDENTS.md, and continue. One skipped document with a recorded
   reason is a result; a run that died retrying is not.
 
+  Then exempt it, or the pipeline will never close:
+      python3 tools/p2w-bench/exempt.py --add --half txt  --doc <name> --reason "<why>"
+      python3 tools/p2w-bench/exempt.py --add --half docx --doc <name> --reason "<why>"
+  The measure gate refuses to advance while any row is unscored or any text row is missing,
+  which is correct - and it means one document that genuinely cannot be converted would hold
+  the gate shut forever while every round measured the other 207 and never closed. The
+  exemption is how a run says "I stopped trying, here is why". It is not a hiding place: the
+  document is named, with its reason, in a file committed with everything else.
+
 STEP 1 - CORPUS AND BUILD
   gh release download corpus-v1 --repo kavopdf/app --pattern pdf-to-word-test-corpus-v3.zip -O c1.zip
   gh release download corpus-v1 --repo kavopdf/app --pattern p2w-batch-1.zip -O c2.zip
@@ -259,16 +268,19 @@ STEP 5 - RELEASE THE SLOT, THEN CLEAN UP
   nobody holds.
 
 STEP 6 - HAND OVER WHEN EVERYTHING IS MEASURED
-  Count the rows with a score. If ALL 208 have one:
-      python3 tools/p2w-bench/txt_gap.py --count      # this must print 0
+      python3 tools/p2w-bench/measure_gate.py
+  One command, one answer. Exit 0 means the baseline is complete and you may advance:
       python3 tools/p2w-bench/round.py --advance      (measure -> classify)
-  Both, in that order. A .docx table with 208 rows and a .txt store with 78 of them is not
-  a finished baseline: the classifier reads the .docx half, and the .txt ratchet would have
-  nothing to hold, so nothing after this would ever go back for the rest.
-  If some rows are still empty, or txt_gap.py does not print 0, do NOT advance - go back
-  to STEP 3b and keep filling the text store. A run that reaches this step with a gap and
-  stops has done nothing, and the next run will find exactly the same gap.
-  Commit ROUND.json. Output 'phase measure complete - classifier is next'.
+      commit ROUND.json
+      output 'phase measure complete - classifier is next'
+  Exit 1 means not yet, and the lines above it say which half is short: rows still unscored,
+  the backfill gap, and this round's own text gap. Do NOT advance on exit 1.
+
+  Why one command rather than three checks in a paragraph: getting this wrong has two
+  failure modes and both look like success. Advance on the word half alone and the text
+  store stays short forever, because nothing downstream ever comes back for it. Refuse
+  while one unconvertible document holds the gate and every round measures 207 documents
+  and never closes. The rule belongs in code, where it is tested.
 
 RULES
   Do not change app/src/**. Do not fix anything.
