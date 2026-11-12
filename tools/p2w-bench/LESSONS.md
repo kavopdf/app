@@ -68,3 +68,10 @@ everything else: what went wrong in the work itself.
   asked — rendered as 3.16 pt and every table rose 10.6 pt. Charge a measured gap in `w:before`,
   which is honoured exactly and face-independent, and keep `w:line="1"`. Read the spacer's mark
   size before trusting any `w:line` in it.
+
+- **The measurement rig costs more than the theory.** The patched engine was built in 48 s, but
+  ConvertOne.class was not in `out/` and `java` was not on PATH until `build-engine.sh`'s JDK at
+  /scratch/work/.p2w-jdk/jdk was exported — and the platform `upload` tool refuses any path outside
+  /scratch/output, so each docx must be copied there before it can be staged for Drive. Twenty
+  minutes of a 45-minute slot went on those three, not on the fix. Do them first, next time, in one
+  command, before touching the class.

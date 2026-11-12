@@ -53,3 +53,8 @@ claim and after each step; it is not code and cannot break anything.
 | 12 Nov 21:54 | fixer | classify | 43 classes from 208 documents |
 | 12 Nov 21:54 | ? | commit-gate | started |
 | 12 Nov 22:46 | fixer | claim | fixer claimed the slot |
+| 12 Nov 22:46 | fixer | build-engine | started |
+| 12 Nov 22:48 | fixer | build-engine | started |
+| 12 Nov 22:52 | fixer | hypothesis | 20_within_10pt (+4) -> confirmed |
+| 12 Nov 22:52 | fixer | attempt | 20_within_10pt (+4) -> error (OPEN) |
+| 12 Nov 22:52 | fixer | classify | 43 classes from 208 documents |
