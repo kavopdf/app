@@ -214,11 +214,17 @@ STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING AFTER EACH
   leave its row empty - never write a PASS you did not measure.
   KavoPDF-Verify must be empty when you finish.
 
-STEP 3b - THE .txt BACKFILL
-  Every document measured before the .txt half was fixed has a row in RESULTS.jsonl and
-  none in RESULTS-TXT.jsonl. STEP 2 takes the first rows whose SCORE cell is empty, so it
-  never revisits them - without this step those documents would never get a .txt at all,
-  and round 2's .txt ratchet would have nothing to compare them against.
+STEP 3b - THE .txt BACKFILL (round 1 only, and it ends)
+  This step exists for one reason and one moment: the .txt half was added to the pipeline
+  after 130 documents had already been measured, so those documents have a row in
+  RESULTS.jsonl and none in RESULTS-TXT.jsonl. STEP 2 takes the first rows whose SCORE cell
+  is empty, so it never revisits them, and without this step they would never get a .txt at
+  all - and round 2's .txt ratchet would have nothing to compare them against.
+
+  IT DOES NOT APPLY TO ROUNDS 2 AND 3. There the whole pipeline runs together: every
+  document is measured for both halves in the same loop, so the text row is written at the
+  same moment as the word row and nothing is left over to repair. The gap reads 0 from the
+  first run of round 2 and this step skips itself. Do not invent work for it.
 
       python3 tools/p2w-bench/txt_gap.py --count     # how many are still missing
       python3 tools/p2w-bench/txt_gap.py --list 10   # the first ten, one per line
@@ -238,7 +244,8 @@ STEP 3b - THE .txt BACKFILL
   already committed, on purpose: if the run runs out of time here, the ten are safe.
   If ConvertAll wrote no .txt for one of them, say so in RUN-LOG.md and move on - a
   missing output is a finding, not a reason to stop.
-  If --count prints 0, skip this step entirely. The gap is closed.
+  If --count prints 0, skip this step entirely - the gap is closed and this step is
+  finished for good. It reads 0 from the first run of round 2 onward.
 
 STEP 4 - RATCHET
   ratchet.py exits 1 if a document fell below its best score OR a check that used to pass now fails.
