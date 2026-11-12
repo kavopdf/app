@@ -1051,3 +1051,37 @@ hundred words of evidence for something settled an hour ago.
 The two changes I reasoned about hardest — the trim and the code tool — were checked against
 every reader before landing. The one I reasoned about least, and described most confidently,
 was the one that took something away.
+
+---
+
+## 25. "Did it move" compared against the wrong engine
+
+`compute_moved` took the last two engine ids in the store and asked how many documents improved
+between them. That is the wrong question, and it was wrong in two ways.
+
+**Two attempts are independent experiments.** Each one starts from the committed engine, tries a
+change, measures, and is reverted if the change does not work. So the question is never "did this
+beat the previous attempt" — it is "did this beat what ships". Comparing attempt N against
+attempt N−1 credits a document that attempt N−1 already fixed to attempt N as well, and with the
+contaminated `-dirty` id from §23 the "previous attempt" was a mixture of two.
+
+**The damage was one step away.** The store held `[2a68de6, 2a68de6-dirty]`. The next attempt
+would have written a third id, and the comparison would have run against the contaminated one —
+verifying a new fix against rows that belong to two different engines.
+
+### The fix
+
+A dirty id is `<hash>-d<six hex of the diff>`; a committed id is the bare hash. So the last id
+without a `-d` suffix is the baseline, and the last id overall is this attempt:
+
+    new_eng = engines[-1]
+    clean   = [e for e in engines[:-1] if "-d" not in e]
+    old_eng = clean[-1] if clean else engines[-2]
+
+Tested with three engines: baseline all ten documents failing, attempt one fixing four,
+attempt two fixing a different four. Attempt two now reports `4 of 10` — its own count against
+the baseline. The old code would have compared it against attempt one and reported a number
+belonging to neither.
+
+It also makes the contaminated rows harmless going forward: whatever `2a68de6-dirty` holds, the
+next attempt is measured against `2a68de6`, which is clean.

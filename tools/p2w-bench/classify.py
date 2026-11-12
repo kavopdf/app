@@ -394,7 +394,21 @@ def compute_moved(cls_name):
     if len(engines) < 2:
         return 0, 0, False
 
-    old_eng, new_eng = engines[-2], engines[-1]
+    # "Before" is the last COMMITTED engine, not the one before this attempt.
+    #
+    # Two attempts are independent experiments: each one starts from the committed engine,
+    # tries a change, and is reverted if it does not work. So the question is never "did
+    # this beat the previous attempt" - it is "did this beat what ships". Comparing the last
+    # two engines instead was wrong twice over: it compared an attempt against another
+    # attempt, and when two attempts shared an engine id (which the bare "-dirty" suffix
+    # made possible) it compared the baseline against a mixture of both.
+    #
+    # A dirty id is "<hash>-d<six hex of the diff>"; a committed one is the bare hash. So
+    # the last id without a "-d" suffix is the baseline, and the last id overall is this
+    # attempt.
+    new_eng = engines[-1]
+    clean = [e for e in engines[:-1] if "-d" not in e]
+    old_eng = clean[-1] if clean else engines[-2]
     moved = failing = 0
     for doc, by_eng in per_doc.items():
         if old_eng not in by_eng or new_eng not in by_eng:
