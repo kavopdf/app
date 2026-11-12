@@ -18,3 +18,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 08:13 | baseline | txt backfill: 10 more documents recorded (01_stamp_rotated_15deg_upright .. 10_stamp_as_image), gap 129 -> 119 |
 | 12 Nov 08:13 | baseline | note: pre-existing 'probe-commit-test' text file left in KavoPDF-Verify by an earlier probe run; not created by this run, left in place |
 | 12 Nov 08:14 | baseline | ratchet held (docx 140/208 scored, txt 21/208); slot released |
+| 12 Nov 09:06 | baseline | started | phase measure |
