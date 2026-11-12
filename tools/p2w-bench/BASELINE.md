@@ -155,7 +155,7 @@ as measured; only the verdict is closed.
 | 56_table_indented_from_margin | 48/59 | FAIL | 02_text_run_count, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 12 Nov |
 | 57_centred_title_page_left_body_pages | 48/59 | FAIL | 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 12 Nov |
 | 58_header_rule_footer_rule | 48/59 | FAIL | 02_text_run_count, 07_table_rows, 19_worst_dy, 20_within_10pt, 22_reading_order, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces | 2a68de6 | 12 Nov |
-| 59_landscape_mixed_portrait |  |  |  |  |  |
+| 59_landscape_mixed_portrait | 40/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 09_font_names, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 53_embedded_faces, 55_orientation_mix, 59_shape_anchor | 2a68de6 | 12 Nov |
 | 60_page_border |  |  |  |  |  |
 | 61_two_col_abstract_spanning |  |  |  |  |  |
 | 62_two_col_newsletter_pull_quote |  |  |  |  |  |
