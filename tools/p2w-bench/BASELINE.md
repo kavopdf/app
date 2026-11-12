@@ -165,7 +165,7 @@ as measured; only the verdict is closed.
 | 66_two_col_footnotes_bottom | 41/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 09_font_names, 10_font_sizes, 16_numeric_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 32_stroke_lines, 41_block_spacing, 42_alignment_mix, 45_char_accuracy, 47_margins, 53_embedded_faces | 2a68de6 | 12 Nov |
 | 67_two_col_with_sidebar | 45/59 | FAIL | 03_word_count, 04_words_missing, 07_table_rows, 09_font_names, 19_worst_dy, 20_within_10pt, 22_reading_order, 26_text_overlap, 29_blank_where_ink_was, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 12 Nov |
 | 68_journal_wide_table_spanning | 42/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 07_table_rows, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 41_block_spacing, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 12 Nov |
-| 69_two_col_legal_numbered_clauses |  |  |  |  |  |
+| 69_two_col_legal_numbered_clauses | 41/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 07_table_rows, 10_font_sizes, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 42_alignment_mix, 45_char_accuracy, 47_margins, 53_embedded_faces | 2a68de6 | 12 Nov |
 | 70_magazine_drop_cap_photo_caption |  |  |  |  |  |
 | 71_invoice_space_aligned_no_rules |  |  |  |  |  |
 | 72_bank_statement_no_rules_right_amounts |  |  |  |  |  |
