@@ -42,6 +42,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 import time
 
@@ -233,7 +234,36 @@ def main(argv):
         return 0
 
     if "--advance" in argv:
-        i = PHASES.index(s["phase"])
+        phase = s["phase"]
+
+        # fix does not advance. The only way out of fix is --close-round, which archives the
+        # round, blanks every score and starts the next one. --apk-status returns 0 the
+        # moment the phase reads done, so a single wrong --advance from fix would let the APK
+        # cron publish with rounds 2 and 3 never run and nothing archived. Refuse it here
+        # rather than trust every reader of every brief to know which of the two to call.
+        if phase == "fix":
+            print("refused: fix does not advance. Use --close-round, which archives the round,")
+            print("blanks the scores and starts the next one. Advancing from fix to done would")
+            print("ship the app with rounds 2 and 3 never run.")
+            return 1
+
+        # measure and classify may only hand over when their work is actually finished. The
+        # gates are tools, not sentences in a brief: every phase transition passes through
+        # this branch, so nothing downstream can skip the check by misreading an instruction.
+        gate = {"measure": "measure_gate.py", "classify": "classify_gate.py"}.get(phase)
+        if gate:
+            path = os.path.join(HERE, gate)
+            if not os.path.exists(path):
+                print("refused: %s is missing, so %s cannot be proved finished" % (gate, phase))
+                return 1
+            r = subprocess.run([sys.executable, path], capture_output=True, text=True)
+            if r.returncode != 0:
+                print("refused: %s is not finished - the phase stays at %s" % (phase, phase))
+                for line in (r.stdout or r.stderr).strip().splitlines():
+                    print("  " + line)
+                return 1
+
+        i = PHASES.index(phase)
         if i < len(PHASES) - 1:
             s.setdefault("history", []).append(
                 {"round": s["round"], "phase": s["phase"], "at": time.strftime("%Y-%m-%d %H:%M")})

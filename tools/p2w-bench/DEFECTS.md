@@ -187,3 +187,30 @@ the engine build fix are working together, which is what the eighteen silent run
 | 5.3 — wire `verify_toolbox.py` | optional | small benefit, nothing breaks without it |
 | 5.4 — rewrite `README.md` | optional | cosmetic, no runtime effect |
 | everything else | **nothing** | fixed, or verified as not a defect |
+
+---
+
+## 8. The phase gates — two holes, found and closed 12 Nov
+
+`round.py --advance` moved the phase on command. It validated nothing, so every rule about
+"the classifier may not start until 208 + 208 are measured" lived in a brief, and a brief is
+followed by an agent that can misread it.
+
+| # | hole | what it allowed | fixed |
+|---|---|---|---|
+| 8.1 | `--advance` did no checking at all | the phase could move with 0 documents measured | **yes** — measure now runs `measure_gate.py` and classify runs `classify_gate.py`; a non-zero exit leaves the phase where it is |
+| 8.2 | `--advance` from **fix** jumped straight to **done** | `--apk-status` returns 0 the moment the phase reads done, so one wrong `--advance` would have shipped the APK with rounds 2 and 3 never run and nothing archived | **yes** — refused. The only way out of fix is `--close-round` |
+
+Also closed while in there:
+
+- `measure_gate.py` never compared `BASELINE.md` with `RESULTS.jsonl`. A row scored in the
+  table with no line in the store - a commit that half-succeeded - would have passed. Both
+  must now agree.
+- `measure_gate.py` reported a missing `txt_gap.py` as "backfill gap -1", which reads like a
+  number. It now says the tool could not be read, and refuses either way.
+
+**Verified by `gate_test.py`** — 17 cases, all passing: incomplete measure, txt gap, table
+and store disagreeing, a stale class file, a short txt class file, a missing class file, the
+fix refusal, that the APK still cannot ship from fix, that `--close-round` still works and
+still archives, that `done` still allows a ship, and that a missing gate refuses instead of
+crashing.

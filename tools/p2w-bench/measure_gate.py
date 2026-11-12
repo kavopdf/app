@@ -61,6 +61,32 @@ def rows():
     return out
 
 
+def store_docs():
+    """Distinct documents in RESULTS.jsonl.
+
+    BASELINE.md is a table a human reads and RESULTS.jsonl is what the tools read, and
+    nothing before this compared them. A row can be scored in the table while its store
+    line never landed - a commit that half-succeeded, a write that died with the sandbox -
+    and the gate would have called that finished. Both must agree before the phase moves.
+    """
+    docs = set()
+    store = os.path.join(HERE, "RESULTS.jsonl")
+    if not os.path.exists(store):
+        return docs
+    with open(store, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+            except ValueError:
+                continue
+            if row.get("doc"):
+                docs.add(row["doc"])
+    return docs
+
+
 def state():
     ex = exempt()
     all_rows = rows()
@@ -71,6 +97,7 @@ def state():
     return {
         "total": len(all_rows),
         "scored": len(scored),
+        "stored": len(store_docs()),
         "exempt_docx": len(ex["docx"]),
         "exempt_txt": len(ex["txt"]),
         "blocked_docx": blocked_docx,
@@ -78,13 +105,22 @@ def state():
 
 
 def gap(args):
+    """The gap, or None when the tool could not be run.
+
+    None is not zero. A missing or broken txt_gap.py used to come back as -1 and print
+    'gap -1', which reads like a number and hides the real problem - the tool that answers
+    the question is not there. The gate refuses either way, but it has to say which.
+    """
     import subprocess
-    r = subprocess.run([sys.executable, os.path.join(HERE, "txt_gap.py"), "--count"] + args,
+    path = os.path.join(HERE, "txt_gap.py")
+    if not os.path.exists(path):
+        return None
+    r = subprocess.run([sys.executable, path, "--count"] + args,
                        capture_output=True, text=True)
     try:
         return int(r.stdout.strip())
     except ValueError:
-        return -1
+        return None
 
 
 def round_of():
@@ -128,7 +164,7 @@ def main(argv):
     engine = engine_hash()
 
     backfill = gap([])
-    this_round = gap(["--round", str(rnd), "--engine", engine]) if engine else -1
+    this_round = gap(["--round", str(rnd), "--engine", engine]) if engine else 0
 
     # The gate blocks on two things only: a word row that cannot be scored, and the
     # round-1 backfill hole. It deliberately does NOT block on this_round.
@@ -141,14 +177,28 @@ def main(argv):
     # the text half was added after 130 documents had already been measured.
     #
     # The number is still printed: a text row that went missing should be visible.
-    ok = (not s["blocked_docx"]) and backfill == 0
+    # The table and the store must agree. scored == stored in a healthy run; a difference
+    # means a row is scored that has no store line, or a store line exists for a row the
+    # table does not show - either way the corpus is not what it claims to be.
+    consistent = s["scored"] == s["stored"]
+
+    ok = ((not s["blocked_docx"]) and backfill == 0 and consistent
+          and backfill is not None)
 
     if "--quiet" not in argv:
-        print("docx   %d/%d scored, %d exempt, %d still blocking"
-              % (s["scored"], s["total"], s["exempt_docx"], len(s["blocked_docx"])))
+        print("docx   %d/%d scored, %d exempt, %d still blocking, %d in the store"
+              % (s["scored"], s["total"], s["exempt_docx"], len(s["blocked_docx"]),
+                 s["stored"]))
+        if s["scored"] != s["stored"]:
+            print("       table and store disagree: %d scored, %d stored - the corpus is not"
+                  % (s["scored"], s["stored"]))
+            print("       what it claims. Re-run the rows that are missing from the store.")
         if s["blocked_docx"][:5]:
             print("       blocking: %s" % ", ".join(s["blocked_docx"][:5]))
-        print("txt    backfill gap %d, %d exempt" % (backfill, s["exempt_txt"]))
+        if backfill is None:
+            print("txt    the backfill gap could not be read - txt_gap.py is missing or broken")
+        else:
+            print("txt    backfill gap %d, %d exempt" % (backfill, s["exempt_txt"]))
         print("round  %d text rows missing for round %s on engine %s%s"
               % (this_round, rnd, engine or "?",
                  "" if this_round == 0 else "  (reported, not blocking)"))
