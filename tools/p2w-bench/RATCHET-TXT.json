@@ -391,5 +391,20 @@
       "t04_structure",
       "t05_completeness"
     ]
+  },
+  "74_balance_sheet_indented_subitems": {
+    "best": 3,
+    "failed": [
+      "t02_position",
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
   }
 }
