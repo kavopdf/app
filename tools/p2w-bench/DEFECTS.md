@@ -588,3 +588,28 @@ capitals and read as a verdict nobody chose.
 | the slot | stale after a timeout, so two runs cannot work the same rows |
 | `calibrate.py` | measures the renderer instead of assuming it - the lesson that recovered 36 documents |
 | the control in STEP 7 | a document against itself must score full marks before the verifier is blamed |
+
+---
+
+## 16. The class file listed twenty of the forty-three classes it had just computed
+
+`classify.py` builds the table from `classes[:top]` with `top = 20`, and the same cap applied
+to the per-class document list below it. On this corpus it computes **43** classes and wrote
+**20**.
+
+Nothing noticed, because nothing compared the two numbers. `classify_gate` reads
+"Documents measured: 208 of 208" and is satisfied; the file looks complete; the table is
+sorted, so the twenty it showed were the twenty largest.
+
+The failure arrives quietly and later: the fixer picks the largest OPEN class, works it, and
+moves on. After twenty classes are FIXED or PARKED it looks in the file, finds nothing OPEN,
+and closes the round — while twenty-three classes are still OPEN and were never written down.
+A round that closes early is the one mistake this pipeline cannot recover from, because the
+next round's numbers are built on it.
+
+Both the table and the per-class list now carry every class. `--top` still limits the console
+summary, which is what it was always for.
+
+Verified: 43 computed, 43 in the file; the .txt half 4 and 4. The test builds a 30-class
+fixture and asserts the file's row count equals the count the tool reported, so a cap
+reintroduced anywhere fails immediately.

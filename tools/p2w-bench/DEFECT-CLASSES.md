@@ -35,6 +35,29 @@ parked as not converging. A parked class is skipped by the fixer and kept here w
 | 18 | 06_table_columns | 42 | 20% | 06_table_columns | 0 | 0 | OPEN |
 | 19 | 14_filled_shapes | 35 | 17% | 14_filled_shapes | 0 | 0 | OPEN |
 | 20 | 27_text_off_page | 31 | 15% | 27_text_off_page | 0 | 0 | OPEN |
+| 21 | 35_rotation | 30 | 14% | 35_rotation | 0 | 0 | OPEN |
+| 22 | 26_text_overlap | 30 | 14% | 26_text_overlap | 0 | 0 | OPEN |
+| 23 | 16_numeric_runs | 28 | 13% | 16_numeric_runs | 0 | 0 | OPEN |
+| 24 | 42_alignment_mix | 28 | 13% | 42_alignment_mix | 0 | 0 | OPEN |
+| 25 | 11_bold_runs | 26 | 12% | 11_bold_runs | 0 | 0 | OPEN |
+| 26 | 45_char_accuracy | 23 | 11% | 45_char_accuracy | 0 | 0 | OPEN |
+| 27 | 36_underline_rules | 17 | 8% | 36_underline_rules | 0 | 0 | OPEN |
+| 28 | 43_within_10pt_x | 15 | 7% | 43_within_10pt_x | 0 | 0 | OPEN |
+| 29 | 54_image_dpi | 12 | 6% | 54_image_dpi | 0 | 0 | OPEN |
+| 30 | 56_rtl_runs | 10 | 5% | 56_rtl_runs | 0 | 0 | OPEN |
+| 31 | 44_header_footer | 7 | 3% | 44_header_footer | 0 | 0 | OPEN |
+| 32 | 12_italic_runs | 6 | 3% | 12_italic_runs | 0 | 0 | OPEN |
+| 33 | 13_text_colours | 4 | 2% | 13_text_colours | 0 | 0 | OPEN |
+| 34 | 34c_span_weight_match | 4 | 2% | 34c_span_weight_match | 0 | 0 | OPEN |
+| 35 | 34a_span_size_match | 3 | 1% | 34a_span_size_match | 0 | 0 | OPEN |
+| 36 | 37_super_subscript | 3 | 1% | 37_super_subscript | 0 | 0 | OPEN |
+| 37 | 28_clipped_at_edge | 2 | 1% | 28_clipped_at_edge | 0 | 0 | OPEN |
+| 38 | 34b_span_colour_match | 2 | 1% | 34b_span_colour_match | 0 | 0 | OPEN |
+| 39 | 21_median_dx | 2 | 1% | 21_median_dx | 0 | 0 | OPEN |
+| 40 | 38_list_markers | 2 | 1% | 38_list_markers | 0 | 0 | OPEN |
+| 41 | 31_pages_lost_their_text | 1 | 0% | 31_pages_lost_their_text | 0 | 0 | OPEN |
+| 42 | 15_links (+1) | 1 | 0% | 15_links, 40_link_targets | 0 | 0 | OPEN |
+| 43 | 33_border_over_text (+1) | 1 | 0% | 33_border_over_text, 46_text_crossing_rule | 0 | 0 | OPEN |
 
 ## Documents per class
 
@@ -58,3 +81,26 @@ parked as not converging. A parked class is skipped by the fixer and kept here w
 - **06_table_columns** — 42 docs: 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 28_value_overflows_cell_txtpos, 29_dot_leaders_txtpos (+38 more)
 - **14_filled_shapes** — 35 docs: 23_timetable_grid_txtpos, 300_prescription_rx, 301_lab_report_panel, 305_vaccination_certificate (+31 more)
 - **27_text_off_page** — 31 docs: 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 08_two_overlapping_stamps (+27 more)
+- **35_rotation** — 30 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+26 more)
+- **26_text_overlap** — 30 docs: 06_rect_paid_stamp_red_transparent, 17_three_column_widths_txtpos, 20_numbered_list_separate_column_txtpos, 300_prescription_rx (+26 more)
+- **16_numeric_runs** — 28 docs: 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent (+24 more)
+- **42_alignment_mix** — 28 docs: 15_stamp_on_scanned_page, 17_three_column_widths_txtpos, 20_numbered_list_separate_column_txtpos, 331_pid_diagram (+24 more)
+- **11_bold_runs** — 26 docs: 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 08_two_overlapping_stamps (+22 more)
+- **45_char_accuracy** — 23 docs: 05_round_company_seal_curved_text, 15_stamp_on_scanned_page, 305_vaccination_certificate, 322_mutual_fund_factsheet (+19 more)
+- **36_underline_rules** — 17 docs: 05_round_company_seal_curved_text, 12_stamp_across_page_break, 16_right_aligned_amounts_txtpos, 22_invoice_four_columns_txtpos (+13 more)
+- **43_within_10pt_x** — 15 docs: 06_rect_paid_stamp_red_transparent, 28_value_overflows_cell_txtpos, 310_court_judgment, 39_small_caps_letter_spacing (+11 more)
+- **54_image_dpi** — 12 docs: 10_stamp_as_image, 11_stamp_with_signature_image, 300_prescription_rx, 303_discharge_summary (+8 more)
+- **56_rtl_runs** — 10 docs: 04_stamp_180deg_upside_down, 305_vaccination_certificate, 312_affidavit_stamp_paper, 318_court_summons_form (+6 more)
+- **44_header_footer** — 7 docs: 322_mutual_fund_factsheet, 330_cad_drawing_sheet, 360_restaurant_menu, 62_two_col_newsletter_pull_quote (+3 more)
+- **12_italic_runs** — 6 docs: 62_two_col_newsletter_pull_quote, balance-sheet-and-profit-loss, bank-statement-5-pages, gst-invoice-multipage-item-table (+2 more)
+- **13_text_colours** — 4 docs: 15_stamp_on_scanned_page, 402_calendar_month_grid, 65_two_col_full_width_figure_caption, magazine-2col-pullquote-spanning
+- **34c_span_weight_match** — 4 docs: 39_small_caps_letter_spacing, balance-sheet-and-profit-loss, magazine-2col-pullquote-spanning, product-catalogue-code-left-price-right
+- **34a_span_size_match** — 3 docs: 373_leave_application_form, 411_nested_xobject_transforms, payslip-label-left-amount-right
+- **37_super_subscript** — 3 docs: 400_comic_page_speech_bubbles, academic-paper-ieee-2col-abstract, journal-2col-with-footnotes
+- **28_clipped_at_edge** — 2 docs: 350_question_paper, marksheet-subject-left-marks-right
+- **34b_span_colour_match** — 2 docs: 373_leave_application_form, 414_transparency_softmask
+- **21_median_dx** — 2 docs: 375_attendance_register, 401_trifold_brochure
+- **38_list_markers** — 2 docs: 40_devanagari_shaping_font, balance-sheet-and-profit-loss
+- **31_pages_lost_their_text** — 1 docs: 15_stamp_on_scanned_page
+- **15_links (+1)** — 1 docs: 44_coloured_underlined_hyperlinks
+- **33_border_over_text (+1)** — 1 docs: 77_arabic_rtl_document

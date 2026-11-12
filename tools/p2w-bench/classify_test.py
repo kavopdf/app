@@ -194,6 +194,37 @@ def main():
 
     print()
     print("=" * 78)
+    print("10. THE CLASS FILE LISTS EVERY CLASS IT FOUND")
+    print("=" * 78)
+    # classify.py computed 43 classes and wrote 20 of them, because the table was built
+    # from classes[:top] with top=20. Once the first twenty were FIXED or PARKED the fixer
+    # would find nothing to pick while twenty-three were still OPEN, and a fixer with
+    # nothing to pick closes the round.
+    d = _tf.mkdtemp()
+    b = _os.path.join(d, "tools", "p2w-bench")
+    _os.makedirs(b)
+    _shutil.copy(_os.path.join(src, "classify.py"), _os.path.join(b, "classify.py"))
+    # 30 documents, each failing one distinct check - so 30 classes, above the old cap.
+    rows = ["| document | score | engine | failed |", "|---|---|---|---|"]
+    for i in range(30):
+        rows.append("| d%02d | 58/59 | FAIL | %02d_check_%s |" % (i, i, "abcdefghij"[i % 10]))
+    open(_os.path.join(b, "BASELINE.md"), "w").write("\n".join(rows) + "\n")
+    r = _sp.run([sys.executable, _os.path.join(b, "classify.py")],
+                capture_output=True, text=True, cwd=d)
+    out = (r.stdout or "") + (r.stderr or "")
+    said = 0
+    for line in out.split("\n"):
+        if "classes (data-driven)" in line:
+            said = int(line.split(":")[-1].strip())
+    written = 0
+    path = _os.path.join(b, "DEFECT-CLASSES.md")
+    if _os.path.exists(path):
+        written = sum(1 for ln in open(path) if ln.startswith("| ") and ln[2:3].isdigit())
+    check("more than twenty classes were computed", said > 20, True)
+    check("and every one of them is in the file", written, said)
+
+    print()
+    print("=" * 78)
     if FAILS:
         print("%d FAILED: %s" % (len(FAILS), ", ".join(FAILS)))
         return 1

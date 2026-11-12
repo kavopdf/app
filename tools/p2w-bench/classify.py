@@ -624,13 +624,18 @@ def main(argv):
            "parked as not converging. A parked class is skipped by the fixer and kept here with its reason.\n",
            "| # | class | documents | share | checks in class | attempts | requeues | status |",
            "|---|---|---|---|---|---|---|---|"]
-    for i, c in enumerate(classes[:top], 1):
+    # EVERY class goes in the file, not the first twenty. The classifier computes 43 on
+    # this corpus and the file listed 20, so once the top twenty were FIXED or PARKED the
+    # fixer would find no class to pick while twenty-three were still OPEN - and a fixer
+    # with nothing to pick closes the round. --top still limits the console summary, which
+    # is what it was for.
+    for i, c in enumerate(classes, 1):
         out.append("| %d | %s | %d | %d%% | %s | %d | %d | %s |" % (
             i, c["name"], len(c["docs"]), round(100 * len(c["docs"]) / total),
             ", ".join(c["checks"]), c["attempts"], c.get("requeues", 0), c["status"]))
 
     out.append("\n## Documents per class\n")
-    for c in classes[:top]:
+    for c in classes:
         # The count is printed, and the list is marked as truncated when it is: the
         # table above says 203 documents and this line used to show four of them with
         # no hint that more existed, so the two halves of the same file disagreed.
