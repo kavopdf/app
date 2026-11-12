@@ -1490,5 +1490,20 @@
       "t04_structure",
       "t05_completeness"
     ]
+  },
+  "policy-2col-spanning-section-heading": {
+    "best": 3,
+    "failed": [
+      "t02_position",
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
   }
 }

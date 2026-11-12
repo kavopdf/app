@@ -73,3 +73,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 13:15 | baseline | measured newspaper-2col-fullwidth-headline 37/59 docx, newspaper-2col-fullwidth-headline.txt 4/5 txt |
 | 12 Nov 13:16 | baseline | measured one-page-rotated-180-degrees 40/59 docx, one-page-rotated-180-degrees.txt 3/5 txt |
 | 12 Nov 13:16 | baseline | measured payslip-label-left-amount-right 37/59 docx, payslip-label-left-amount-right.txt 4/5 txt |
+| 12 Nov 13:16 | baseline | measured policy-2col-spanning-section-heading 44/59 docx, policy-2col-spanning-section-heading.txt 3/5 txt |
