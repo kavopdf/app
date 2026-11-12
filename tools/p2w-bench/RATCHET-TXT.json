@@ -264,7 +264,139 @@
       "t05_completeness"
     ]
   },
+  "21_form_labels_x60_values_x300_txtpos": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "22_invoice_four_columns_txtpos": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "23_timetable_grid_txtpos": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "24_address_block_indents_txtpos": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "25_signature_block_underscores_txtpos": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "26_footnote_marker_bottom_note_txtpos": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "27_two_column_left_short_txtpos": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "28_value_overflows_cell_txtpos": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "29_dot_leaders_txtpos": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
   "300_prescription_rx": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "301_lab_report_panel": {
     "best": 4,
     "failed": [
       "t04_structure"
