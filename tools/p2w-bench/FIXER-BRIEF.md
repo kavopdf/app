@@ -175,6 +175,12 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   finish, written down so you would not have to rediscover it. Switching to a smaller class
   leaves it sitting, and it cost a slot to write.
 
+  A CONFIRMED hypothesis whose class measurement did not run is the highest-value work there is.
+  The theory is already proved on one document; what is missing is the twenty-document run that
+  decides kept, improved or reverted. Do not re-derive it and do not form a rival theory - apply it
+  and measure it. A confirmed-but-unmeasured entry names its patch in the evidence line
+  (patches/<name>.patch), and applying a saved patch is one git apply.
+
   On 12 Nov this happened. A run left "the table-cell path (rowLineTw) is where the class's
   dominant documents live" marked UNTESTED. The next run took 53_embedded_faces instead - a
   smaller class, while the top class was OPEN - and the theory waited a whole slot. The run after

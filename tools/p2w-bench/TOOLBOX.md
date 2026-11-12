@@ -239,6 +239,19 @@ the run uses `verify_google.py` with `ratchet.py` or `verify_txt.py` with `ratch
   a measured row, never reorders. Exit 1 when the corpus directory is missing or empty: an
   empty directory means the download failed, and seeding from it would look like success.
 
+## patches/ - a fix that was proved but never measured
+
+    tools/p2w-bench/patches/<name>.patch     git apply <file>
+    tools/p2w-bench/patches/<name>.md        the reasoning, the numbers, why it was not shipped
+
+  A run that confirms a fix on one document and then cannot run the twenty-document measurement
+  saves it here instead of losing it. That is not a failure - the theory is proved, the class
+  outcome is not, and the difference is one measurement.
+
+  A CONFIRMED entry in HYPOTHESES.md that names a patch here is the highest-value work available
+  to the next run: apply it, measure twenty documents, decide kept/improved/reverted. Do not form
+  a rival theory while a proved patch is sitting unmeasured.
+
 ## code.py — the part of the engine you need, not the file
 
     python3 tools/p2w-bench/code.py --outline                 one line per file

@@ -1508,3 +1508,69 @@ order. Three attempts held in a sandbox that dies is zero attempts kept.
 The slot semantics, the commit gate, the ratchet, the attempt ledger, the hypothesis handoff, and
 the honesty rules are all exactly as they were. The change is how much work happens between
 claiming and releasing, and every attempt still passes the same gates an attempt passed before.
+
+---
+
+## 33. The 21:47 run found the root cause, and then could not finish it
+
+This is the first run that did what the pipeline was built to do.
+
+### What it found
+
+`20_within_10pt` had been read as a line-pitch bug on 203 documents. It is not. Dumping the
+per-line `dy` of one document showed the whole page sits 2.6 pt low and then takes **one 10 pt
+step at the top of a table** — a step, not a drift.
+
+Five docx variants through Drive, varying only the spacer paragraph before the table:
+
+| spacer | first-row dy |
+|---|---|
+| as emitted — `w:line=276` exact, mark `sz=2` | −13.59 |
+| spacer deleted | −16.75 |
+| `w:line=1` | −16.58 |
+| `w:line=240` auto | −14.00 |
+| **`w:before=276` `w:line=1`** | **−2.78** |
+
+The cause: **`w:line` is a multiple of the paragraph mark's line height, not the document's.** This
+spacer's mark is `sz=2` — one point — so 276 twips, 13.8 pt asked, rendered as **3.16 pt**. The
+table rose 10.6 pt and every row under it.
+
+And the sign was opposite to what the previous attempt had guessed: the spacer was too *short*,
+not too tall. Deleting it made things worse.
+
+One line changed, on one document: `dy` −13.59 → −2.78, `18_median_dy` FAIL → pass, 51/59 → 53/59.
+
+### What it could not do
+
+The twenty-document measurement did not run — Drive was blocked mid-run. So the class outcome is
+unknown, and the attempt was recorded as `error`, honestly, rather than claimed as `kept`.
+
+The patch is saved: `tools/p2w-bench/patches/table-spacer-before-not-line.patch`, one `append()` in
+`DocxWriter` around line 4157, with the measured numbers in its comment.
+
+Drive was working again minutes later, so the block was transient — most likely the burst from
+five calibration uploads plus the earlier runs. `RETRY.md` already classifies rate limits as
+transient and the brief already points at it; the run followed that and stopped rather than
+looping.
+
+### Two gaps this exposed
+
+**Nothing told the next run to pick the patch up.** `patches/` was not mentioned anywhere in the
+brief or TOOLBOX — the path existed only inside one HYPOTHESES entry. A proved fix that nobody
+applies is the most expensive kind of wasted work, because the proof cost five calibration
+rounds.
+
+The brief now says a CONFIRMED hypothesis whose class measurement did not run is the
+highest-value work available: apply it, measure twenty documents, decide. Do not re-derive it and
+do not form a rival theory. TOOLBOX gained a `patches/` section explaining what the folder is for.
+
+**A Google Doc was left behind.** `p2w_34_mono` from the 19:46 run is still in the verify folder,
+against the brief's own "Never leave a Google Doc in Drive". Left in place rather than deleted —
+it is not mine to remove — but noted here so the cleanup rule gets enforced rather than repeated.
+
+### What this proves about the loop
+
+Three attempts, three different shapes: one ruled out a theory with numbers, one found the real
+cause with a calibration, one is still waiting to be measured. The ledger carried each one to the
+next. That is the handoff working as designed — and the reason §30's follow-up rule and this
+section's patch rule matter more than they look.
