@@ -863,3 +863,77 @@ what to use instead — `record.py --show`, `classify.py`, `hypothesis.py --show
 of the fixed read — and all nine lessons are load-bearing. Trimming it would cost quality to
 save 1.8 KB. `REMAINING-DEFECTS.md` at 328 KB is history the fixer never reads; archiving it
 would risk the parking step that writes to it, so it gets the warning instead.
+
+---
+
+## 22. The biggest thing a run read was the engine source, and the brief told it to read all of it
+
+After the growing files were bounded, the token arithmetic was still bad, and the reason was
+not a log or a ledger. It was one sentence.
+
+> Then read the engine code that produces what fails — **all of it**, not just the function with
+> the obvious name.
+
+Measured:
+
+| file | bytes | lines | tokens if read whole |
+|---|---|---|---|
+| DocxWriter.java | 288,746 | 4,906 | **72,186** |
+| PdfToWord.java | 346,229 | 6,893 | **86,557** |
+| TxtWriter.java | 15,117 | 332 | 3,779 |
+
+About **1.6 lakh tokens** for two files — most of a context window, spent before any work
+begins. The first real attempt is the proof of what that costs: it changed two methods,
+`flowFromBox` and `flowRow`, and out of eleven minutes had about two left for thinking after
+reading and building.
+
+"Read all of it" was never diligence. A fix touches a method and the callers that feed it.
+
+### `code.py`
+
+    --outline [file]        every class and method with its line range
+    --method <name>         one method, whole, with line numbers
+    --find <text> [-c N]    definition, call site, and any comment nearby
+    --callers <name>        every line that mentions it
+    --file <name> --lines A-B   an exact range
+
+Measured against the same file:
+
+| what | bytes | tokens | share of the file |
+|---|---|---|---|
+| DocxWriter.java whole | 288,746 | 72,186 | 100% |
+| `--outline` of it | 6,578 | 1,644 | **2.3%** |
+| `--method spacingTw` | 1,935 | 483 | **0.7%** |
+| `--find flowFromBox` | 2,003 | 500 | **0.7%** |
+| `--outline` with no file | ~300 | 75 | summary of all nine |
+
+`--find` turned out to be worth more than its size suggests: searching `flowFromBox` returned
+the call site at line 2165 *and* a comment at line 133 saying that raising `GAP_CAP_TW` had been
+tried on 7 November and reverted. That is the half of the answer a method body never contains,
+and it cost 2 KB.
+
+### What changed in the brief
+
+STEP 4 now says "the part of it, not the file", names the six commands, states the numbers, and
+tells the run to follow the trail — outline, then the method that fails, then `--callers` for
+what feeds it — widening only when the narrow read is genuinely not enough.
+
+### Tested
+
+`code_test.py`, twenty cases: the outline is under a tenth of the file; no file named gives a
+summary rather than nine outlines; `--method` returns a whole body with its signature and closing
+brace; an unknown method exits 1 and points at `--outline`; `--find` prints line numbers and the
+file; an absent string exits 1; `--callers` finds several mentions; `--file --lines` prints the
+range it was asked for; and line 233 prints exactly what line 233 of the source says.
+
+### The arithmetic now
+
+| component | before | now |
+|---|---|---|
+| brief + toolbox + lessons | 8,786 | 9,053 |
+| hypothesis section | 7,250 (grew to 29 KB) | 800 (capped at 8) |
+| tool output | 1,500 | 1,500 |
+| **engine code** | **72,186** (whole file) | **~1,600** (outline + one method) |
+| **per run** | **~89,700** | **~13,000** |
+
+An 85% cut, and none of it came from removing a rule or skipping a read that mattered.

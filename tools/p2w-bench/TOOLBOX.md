@@ -225,6 +225,22 @@ are the .txt checks `t01` to `t05` rather than the .docx checks `01` to `59`. Ru
 take the largest OPEN class from either; which half you are in decides whether the rest of
 the run uses `verify_google.py` with `ratchet.py` or `verify_txt.py` with `ratchet.py --txt`.
 
+## code.py — the part of the engine you need, not the file
+
+    python3 tools/p2w-bench/code.py --outline                 one line per file
+    python3 tools/p2w-bench/code.py --outline DocxWriter      every method, with its range
+    python3 tools/p2w-bench/code.py --method spacingTw        one method, whole
+    python3 tools/p2w-bench/code.py --find flowFromBox -c 8   definition, call site, comments
+    python3 tools/p2w-bench/code.py --callers rowLineTw       every line that touches it
+    python3 tools/p2w-bench/code.py --file DocxWriter --lines 233-268
+
+  DocxWriter.java is 288,746 bytes and PdfToWord.java is 346,229 - about 1.6 lakh tokens
+  between them. Reading either whole ends a run before it starts. The outline of one file
+  is 1,644 tokens; one method is 483; a --find is 2 KB and carries the call site and any
+  "tried and reverted" comment with it.
+
+  It reads the same source the compiler reads and edits nothing.
+
 ## trace.py
 
     python3 tools/p2w-bench/trace.py --show 40    # the last 40 lines

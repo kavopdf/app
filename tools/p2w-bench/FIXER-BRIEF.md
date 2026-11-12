@@ -215,9 +215,31 @@ STEP 4 - UNDERSTAND IT - AND DO NOT RE-MEASURE WHAT IS ALREADY MEASURED
   It prints source=<value> render=<value> for each check - how far off and in which direction.
   Read that FIRST for the documents in your sub-group. Only push a document through Drive again
   when the record has no line for it, or when you have just changed the engine.
-  Then read the engine code that produces what fails - all of it, not just the function with the
-  obvious name. Instrument it: dump the boxes, the line boxes, the OOXML you emit, and compare
-  against what the PDF actually contains. Name ONE root cause.
+  Then read the engine code that produces what fails - the part of it, not the file.
+
+      python3 tools/p2w-bench/code.py --outline                 one line per file
+      python3 tools/p2w-bench/code.py --outline DocxWriter      every method, with its range
+      python3 tools/p2w-bench/code.py --method spacingTw        one method, whole
+      python3 tools/p2w-bench/code.py --find flowFromBox -c 8   where it is defined AND called
+      python3 tools/p2w-bench/code.py --callers rowLineTw       every line that touches it
+      python3 tools/p2w-bench/code.py --file DocxWriter --lines 233-268
+
+  This brief used to say "all of it, not just the function with the obvious name", and that
+  sentence costs 72,186 tokens for DocxWriter.java and 86,557 for PdfToWord.java - about 1.6
+  lakh between them, most of a context window spent before any work begins. The first real
+  attempt changed two methods, flowFromBox and flowRow; it did not need 4,906 lines to find
+  them, and what it had left afterwards was two minutes of thinking out of eleven.
+
+  The outline of one file is 1,644 tokens against 72,186 for the file. One method is 483. A
+  --find gives the definition, the call site and any comment that says the idea was tried and
+  reverted - the half of the answer the body does not contain.
+
+  Follow the trail rather than reading the map whole: outline, then the method that fails,
+  then --callers for what feeds it. Widen with --file --lines only when the narrow read is
+  genuinely not enough, and record in HYPOTHESES.md what you found and where.
+
+  Instrument it: dump the boxes, the line boxes, the OOXML you emit, and compare against what
+  the PDF actually contains. Name ONE root cause.
 
 STEP 4b - RESEARCH, BUT NEVER AS PROOF
   When: 20 minutes stuck, or when the fix rests on an assumption about Google Docs that nobody has
