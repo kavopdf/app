@@ -138,6 +138,132 @@
       "t05_completeness"
     ]
   },
+  "11_stamp_with_signature_image": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "12_stamp_across_page_break": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "13_stamp_non_english": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "14_stamp_chars_positioned_td": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "15_stamp_on_scanned_page": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "16_right_aligned_amounts_txtpos": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "17_three_column_widths_txtpos": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "18_centred_heading_left_body_txtpos": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "19_hanging_indent_txtpos": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "20_numbered_list_separate_column_txtpos": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
   "300_prescription_rx": {
     "best": 4,
     "failed": [
