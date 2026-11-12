@@ -282,6 +282,14 @@ def extra_checks2(src, gd):
         "liberationsans": "arial", "arial": "arial",
         "liberationserif": "timesnewroman", "timesnewroman": "timesnewroman",
         "liberationmono": "couriernew", "couriernew": "couriernew",
+        # Measured from Google's own export on 12 Nov, one docx carrying every face:
+        #   Liberation Serif/Sans/Mono -> ArialMT, DejaVu Sans -> Verdana,
+        #   DejaVu Serif -> ArialMT, Times New Roman -> TimesNewRomanPSMT, Arial -> ArialMT.
+        # A sans face arriving as another sans face is a rename, not a loss, so those are
+        # mapped to what Google produces. A serif arriving as Arial is a loss, and stays
+        # unmapped on purpose - that is the defect the engine has to fix.
+        "dejavusans": "verdana", "verdana": "verdana",
+        "dejavuserif": "timesnewroman",
     }
 
     def family(name):
