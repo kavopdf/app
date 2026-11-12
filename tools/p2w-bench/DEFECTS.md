@@ -454,3 +454,17 @@ A PDF against itself still scores **59/59** on five documents, so no threshold b
 over-strict. Two different PDFs still score 35/59. `test_checks.py` 23/23 and
 `test_txt_checks.py` 7/7 still pass, which means every check still fires on a pair that
 differs and still passes on a pair that does not.
+
+### A trap in the reset, found by walking into it
+
+`ratchet.py` without `--check` reads BASELINE.md and **raises** the marks. So resetting and
+then running the tool to see whether it passes puts all 208 marks straight back — from
+BASELINE.md, which still holds the old yardstick's scores. The reset looks done and is not,
+and the fixer would have been refused on its first measurement for a reason nobody could see.
+
+This was done once while verifying the reset. Checked afterwards: the store held 208 marks
+and 402 KB, not zero and 2 bytes. Both stores were reset again and verified with
+`--check`, which compares without raising.
+
+Anyone resetting a store must verify with `--check` and look at the size, not at the
+"PASS - the bar held" line, which an empty store and a full one both print.
