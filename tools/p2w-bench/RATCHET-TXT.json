@@ -285,5 +285,17 @@
       "t04_structure",
       "t05_completeness"
     ]
+  },
+  "66_two_col_footnotes_bottom": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
   }
 }
