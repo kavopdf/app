@@ -114,12 +114,22 @@ STEP 1 - CORPUS AND BUILD
   exist and raised FileNotFoundError on every single document - the .txt half measured
   nothing for a day while the run still reported its ten.
   Expect exactly 208 PDFs.
-  bash tools/verify-engine.sh
-  CP=/scratch/work/libs/aar/classes.jar:/scratch/work/libs/bcprov.jar:/scratch/work/libs/bcpkix.jar:/scratch/work/libs/bcutil.jar:out
-  cd tools/engine-verify
-  javac -nowarn -cp "$CP" -d out /scratch/work/base/app/src/main/java/com/kavopdf/app/engine/*.java
-  javac -nowarn -cp "$CP" -d out ConvertAll.java
-  Java flags always: -XX:+UseSerialGC -XX:ActiveProcessorCount=1 -XX:CompressedClassSpaceSize=128m -XX:MaxMetaspaceSize=512m -Xmx900m -Djava.awt.headless=true -Dp2w.assets=/scratch/work/libs/aar/assets ; ulimit -v unlimited.
+  bash tools/p2w-bench/build-engine.sh
+  This one script fetches the libraries if they are missing, fetches a JDK if the image has
+  none, and compiles the stubs, the engine and ConvertAll. Everything it needs is inside the
+  clone, so a fresh clone is a working build. It replaces two things that were wrong:
+    - it used to call tools/verify-engine.sh, which downloads the same libraries and then runs
+      the whole 39-check behavioural suite. That suite measures the engine; this run measures
+      the corpus. It was minutes of the run's budget spent on a question nobody was asking.
+    - the libraries went into tools/engine-verify/libs/ while this line pointed javac at
+      /scratch/work/libs/, outside the clone. /scratch/work does not survive a recycled
+      sandbox, so on a fresh pod the compile failed and the run had nothing to convert.
+  Then, for the rest of the run:
+      cd tools/engine-verify
+      CP=out:libs/aar/classes.jar:libs/bcprov.jar:libs/bcpkix.jar:libs/bcutil.jar
+  Java flags always: -XX:+UseSerialGC -XX:ActiveProcessorCount=1 -XX:CompressedClassSpaceSize=128m -XX:MaxMetaspaceSize=512m -Xmx900m -Djava.awt.headless=true -Djava.io.tmpdir=/scratch/work/tmp -Dp2w.assets=libs/aar/assets ; ulimit -v unlimited.
+  The tmpdir is set because /tmp on this image is 64 MB and the JVM writes its shared-memory
+  file there - it is not worth a run to find out that it filled up.
 
 STEP 2 - WHICH TEN
   Read tools/p2w-bench/BASELINE.md. Take the first 10 rows whose SCORE cell is empty.

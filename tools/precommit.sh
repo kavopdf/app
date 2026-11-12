@@ -149,16 +149,23 @@ fi
 if [ "$CHANGED_ENGINE" -eq 0 ]; then
   echo "skipped - no engine file changed"
 else
-  if [ ! -x /scratch/work/jdk/bin/javac ] && ! command -v javac >/dev/null 2>&1; then
+  if [ ! -x /scratch/work/.p2w-jdk/jdk/bin/javac ] && [ ! -x /scratch/work/jdk/bin/javac ] && ! command -v javac >/dev/null 2>&1; then
     echo "no JDK - tier 2 and 3 cannot run. Say so; do not commit blind."
     exit 2
   fi
-  export JAVA_HOME="${JAVA_HOME:-/scratch/work/jdk}"
+  export JAVA_HOME="${JAVA_HOME:-$( [ -x /scratch/work/.p2w-jdk/jdk/bin/javac ] && echo /scratch/work/.p2w-jdk/jdk || echo /scratch/work/jdk )}"
   export PATH="$JAVA_HOME/bin:$PATH"
   export _JAVA_OPTIONS="-XX:+UseSerialGC -XX:ActiveProcessorCount=1 -XX:CompressedClassSpaceSize=128m -XX:MaxMetaspaceSize=512m -Xmx900m -Djava.awt.headless=true"
   ulimit -v unlimited 2>/dev/null
 
-  CP="${ENGINE_CP:-/scratch/work/libs/aar/classes.jar:/scratch/work/libs/aar/assets:/scratch/work/libs/bcprov.jar:/scratch/work/libs/bcpkix.jar:/scratch/work/libs/bcutil.jar}"
+  # The libraries live in the clone, where tools/p2w-bench/build-engine.sh puts them.
+  # This default used to point at /scratch/work/libs, outside the repository - a path that
+  # exists only if someone built it by hand in that sandbox, and /scratch/work does not
+  # survive a recycled pod. On a fresh one every engine commit failed here for a reason
+  # that had nothing to do with the code being committed.
+  HERE="$(cd "$(dirname "$0")" && pwd)"
+  EV="$HERE/engine-verify"
+  CP="${ENGINE_CP:-$EV/out:$EV/libs/aar/classes.jar:$EV/libs/aar/assets:$EV/libs/bcprov.jar:$EV/libs/bcpkix.jar:$EV/libs/bcutil.jar}"
 
   rm -rf /tmp/precommit-out && mkdir -p /tmp/precommit-out
   if javac -nowarn -cp "$CP" -d /tmp/precommit-out \

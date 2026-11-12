@@ -95,10 +95,12 @@ WHEN SOMETHING FAILS
 
 STEP 1 - BUILD
 ===================================================================
-  bash tools/verify-engine.sh
-  CP=/scratch/work/libs/aar/classes.jar:/scratch/work/libs/bcprov.jar:/scratch/work/libs/bcpkix.jar:/scratch/work/libs/bcutil.jar:out
-  cd tools/engine-verify ; javac -nowarn -cp "$CP" -d out /scratch/work/fix/app/src/main/java/com/kavopdf/app/engine/*.java ; javac -nowarn -cp "$CP" -d out ConvertAll.java
-  Java flags always: -XX:+UseSerialGC -XX:ActiveProcessorCount=1 -XX:CompressedClassSpaceSize=128m -XX:MaxMetaspaceSize=512m -Xmx900m -Djava.awt.headless=true -Dp2w.assets=/scratch/work/libs/aar/assets ; ulimit -v unlimited.
+  bash tools/p2w-bench/build-engine.sh
+  Libraries and a JDK come from the clone itself, so this works on a fresh sandbox. It does
+  not run verify-engine.sh's 39-check suite - run that separately when you need it, because
+  it measures the engine and this step only needs the engine to exist.
+  Then: cd tools/engine-verify ; CP=out:libs/aar/classes.jar:libs/bcprov.jar:libs/bcpkix.jar:libs/bcutil.jar
+  Java flags always: -XX:+UseSerialGC -XX:ActiveProcessorCount=1 -XX:CompressedClassSpaceSize=128m -XX:MaxMetaspaceSize=512m -Xmx900m -Djava.awt.headless=true -Djava.io.tmpdir=/scratch/work/tmp -Dp2w.assets=libs/aar/assets ; ulimit -v unlimited.
   Corpus: gh release download corpus-v1 --repo kavopdf/app for the three zips; unzip into t; copy all PDFs into all/ (expect 208).
 
 STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
