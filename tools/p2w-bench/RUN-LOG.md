@@ -79,3 +79,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 14:10 | started | phase measure |
 | 12 Nov 14:13 | baseline | measured price-list-2col-dense-right-aligned 35/59 docx, 3/5 txt |
 | 12 Nov 14:13 | baseline | measured price-list-right-aligned-amounts 38/59 docx, 4/5 txt |
+| 12 Nov 14:13 | baseline | measured price-list-right-aligned-amounts 38/59 docx, 4/5 txt |
