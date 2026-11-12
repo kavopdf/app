@@ -1264,3 +1264,65 @@ The first version failed that second test: it flagged correct multi-line `strfti
 body of the `ist()` helper itself, filename stamps, and the classifier's own 20-minute slot. All
 four were fixed by narrowing the check rather than by silencing it — silencing a finding without
 proving it false is how a real one gets lost later.
+
+---
+
+## 29. The fixer cron, checked item by item
+
+### It works
+
+The 20:40 run did more than any before it. From the trace and the ledger:
+
+    20:43  claim, evidence committed before any engine work
+    20:44  build-engine
+    20:45  classify, both halves
+    20:49  hypothesis -> ruled out
+    20:49  hypothesis -> untested
+    20:49  attempt -> error (OPEN)
+    20:50  commit
+
+And the analysis was real. It took the previous attempt's next hypothesis — "the table-cell
+pitch (`rowLineTw`) is where the class's dominant documents live" — converted
+`362_price_list_dense` with the **current** engine and measured it against Google's own export:
+257 of 258 lines matched, `dy` 2.6 pt on the page's first line, jumping to 13.6 pt at the table's
+first row and only 16.7 pt at the page foot. That ruled the hypothesis out properly: one ~10 pt
+step at the table's top plus 3 pt of drift over 257 lines is not a per-line pitch error. It then
+named the next one — the empty spacer paragraph before the table, `w:line=276` where the PDF's
+gap is 21.6 pt — with the exact test to run on it.
+
+That is the loop working. It spent its budget on analysis and recorded honestly rather than
+shipping an unverified change.
+
+### Two things were wrong
+
+**The slot leaked.** The run committed its `error` outcome and left `fixer_started` claimed.
+"Releasing the slot matters even when the run failed" has been a sentence at the end of STEP 9
+since the slot existed, and it was ignored — the same shape as every other defect in this file:
+a rule written in prose that nothing enforces. Nothing broke that time, because the next run was
+57 minutes later and the claim goes stale at 45, but the margin was luck.
+
+`commit-gate.sh` now refuses a commit while the fixer's slot is claimed. Every run passes
+through that gate before it commits, so it is the one place the release can be made a fact.
+Verified both ways: claimed → exit 1 with the command to run, released → exit 0.
+
+**The cron's own prompt taught a wrong model.** It said the three silent runs failed because
+"by the time that was done there was no room left to do any work" — the token theory that was
+measured and disproved: a test read 93 KB of files and finished in five minutes, twice what the
+fixer ever read. The prompt now states what was actually shown — acting before reading is what
+fixed it, and reading is cheap next to the engine source, which `code.py` exists to avoid.
+
+### Checked and sound
+
+| item | verdict |
+|---|---|
+| schedule | `40 * * * *`, hourly, offset from baseline :00 and classifier :20 |
+| next fire | 21:40, nothing queued behind it |
+| failures | 0 consecutive |
+| claim / stale | 45 minutes, above the longest run and below the gap between slots |
+| engine id | hash of the diff, unique per engine state |
+| attempt ledger | recorded both attempts; `attempts=2` on the class |
+| hypotheses | kept in full, older ones summarised by `show`, nothing dropped |
+| the gate | refuses an unrecorded reverted attempt, and now an unreleased slot |
+| every tool the brief names | exists |
+| every limit the brief states | matches the code (24 attempts, 24 hours, 3 requeues, 45 minutes, 96 ceiling) |
+| every TOOLBOX range | returns the sections it names and no others |

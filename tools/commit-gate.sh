@@ -97,6 +97,31 @@ except Exception:
     pass
 " 2>/dev/null || true
 
+# A run that commits must have released the slot first.
+#
+# "Releasing the slot matters even when the run failed" has been a sentence at the end of
+# STEP 9 since the slot existed, and on 12 Nov the 20:43 run committed its error outcome and
+# left the slot claimed. Nothing broke that time - the next run was 57 minutes later and the
+# claim goes stale at 45 - but the margin was luck, not design.
+#
+# Every run passes through this gate before it commits, so this is the one place where the
+# release can be made a fact instead of a promise.
+if [ -f "$BENCH/ROUND.json" ]; then
+  python3 - "$BENCH/ROUND.json" <<'PY' || exit 1
+import json, sys
+try:
+    s = json.load(open(sys.argv[1]))
+except Exception:
+    sys.exit(0)
+if s.get("fixer_started"):
+    print("  FAIL  the fixer slot is still claimed - release it before you commit")
+    print("  FAIL  python3 tools/p2w-bench/round.py --release-fixer")
+    print("  FAIL  a slot left claimed blocks the next run for 45 minutes for no reason")
+    sys.exit(1)
+PY
+  say "  ok    slot released"
+fi
+
 if ! engine_changed; then
   # A reverted attempt is still an attempt.
   #
