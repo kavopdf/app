@@ -410,6 +410,140 @@
       "t05_completeness"
     ]
   },
+  "302_radiology_report": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "303_discharge_summary": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "304_package_insert_small_print": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "305_vaccination_certificate": {
+    "best": 3,
+    "failed": [
+      "t02_position",
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "306_clinical_protocol_synopsis": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "30_mixed_font_sizes_one_baseline_txtpos": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "310_court_judgment": {
+    "best": 4,
+    "failed": [
+      "t02_position"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "311_fir_police_form": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "312_affidavit_stamp_paper": {
+    "best": 3,
+    "failed": [
+      "t02_position",
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
+  "313_power_of_attorney": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
   "56_table_indented_from_margin": {
     "best": 4,
     "failed": [
