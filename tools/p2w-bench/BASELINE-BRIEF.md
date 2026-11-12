@@ -12,10 +12,28 @@ change is versioned in git.
 
 You are step 1 of 3 in the KavoPDF PDF-to-Word pipeline. You MEASURE. You never fix, never change app/src/**.
 
-STEP 0 - IS IT YOUR TURN?
+STEP 0 - IS IT YOUR TURN? THEN PROVE YOU CAN WRITE TO THE REPOSITORY
   git clone https://github.com/kavopdf/app /scratch/work/base ; cd /scratch/work/base
   PHASE=$(python3 tools/p2w-bench/round.py --phase)
   If PHASE is not 'measure', output exactly 'not my turn - phase is <PHASE>' and STOP.
+
+  NOW, BEFORE YOU READ ANYTHING ELSE, BEFORE THE CORPUS, BEFORE A SINGLE CONVERSION:
+  append this line to the end of tools/p2w-bench/RUN-LOG.md and commit that one file to
+  main with GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main):
+
+      | <today's date> <HH:MM> | started | phase <PHASE> |
+
+  IF THAT COMMIT FAILS, STOP. Do not measure one document. Output the exact error and stop.
+  Do not continue and hope to commit later. Eighteen runs have now done exactly that: each
+  spent eleven minutes converting documents and then ended without writing a single row to
+  the repository, and the work died with the sandbox every time. A run that cannot commit
+  has produced nothing, so finding that out in the first minute costs one minute instead of
+  eleven.
+
+  This line is also the run's heartbeat. Append one more line at each stage as you go -
+  after the build, after each document is measured, after each commit - so that a run which
+  dies at any point leaves a record of how far it got. A stage with no line was never
+  reached, and that is the answer to "why did nothing happen".
 
 STEP 0a - CLAIM THE SLOT
       python3 tools/p2w-bench/round.py --claim-baseline
@@ -85,23 +103,6 @@ WHEN SOMETHING FAILS
   After three failures on one item: SKIP it, leave its row empty, write one line in
   tools/p2w-bench/INCIDENTS.md, and continue. One skipped document with a recorded
   reason is a result; a run that died retrying is not.
-
-STEP 0c - LEAVE A TRAIL, BECAUSE A DEAD RUN WRITES NOTHING
-  Before any work, append one line to tools/p2w-bench/RUN-LOG.md and commit it:
-      | <date> <HH:MM> | started | engine <ENGINE>, phase <PHASE> |
-  Then append one more line at each stage and commit again:
-      converted <name> / measured <name> / recorded <name> / committed <name>
-  One line per document, not per batch - the run commits per document now, so the log
-  moves at the same pace as the corpus.
-  Why: on 11 Nov ten runs in a row measured ten documents each and committed none, and
-  there was no way to tell where they died - the cron keeps no output, and a run that
-  dies before its first commit leaves no trace at all. One line per stage costs nothing
-  and turns the next failure into a fact instead of a guess.
-  If you never reach a stage, its line is missing - that is the answer.
-  IF THIS FIRST COMMIT FAILS, STOP. Do not measure anything. Output the exact error and
-  stop. This line is the cheapest possible test of the one thing that has been failing
-  for ten hours, and measuring ten documents before discovering the commit is broken is
-  exactly how those ten hours were spent.
 
 STEP 1 - CORPUS AND BUILD
   gh release download corpus-v1 --repo kavopdf/app --pattern pdf-to-word-test-corpus-v3.zip -O c1.zip
