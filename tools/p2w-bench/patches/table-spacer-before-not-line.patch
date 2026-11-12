@@ -1,0 +1,24 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4a621bd..bee4319 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -4154,10 +4154,17 @@ public final class DocxWriter {
+         }
+         if (spacerTw > 0) {
+             spacerTw = twScale(spacerTw, ctx.squeeze);
++            // MEASURED (12 Nov, 362_price_list_dense, 5 variants through Drive): the gap goes in
++            // w:before, NOT in w:line. w:line is a multiple of the PARAGRAPH MARK's line height,
++            // and this spacer's mark is sz=2 (1 pt), so w:line=276 -- 13.8 pt asked -- rendered as
++            // 3.16 pt: the table rose 10.6 pt and every row under it with it. Varying only the
++            // spacer: line=276 -> first row dy -13.59; line=1 -> -16.75; line=240 auto -> -14.00;
++            // before=276 line=1 -> -2.78, and 18_median_dy went FAIL -> pass (51/59 -> 53/59).
++            // w:before is honoured exactly and is face-independent; w:line is neither.
+             sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+-                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
++                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
+                     .append(spacerTw)
+-                    .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
++                    .append("\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+             ctx.flowTw += spacerTw;
+             // The spacer is a line of its own: the table now starts at the flow's position
+             // after it, which is the y the page drew the table's top at.

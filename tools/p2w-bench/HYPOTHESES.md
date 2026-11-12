@@ -25,9 +25,13 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: 362_price_list_dense converted with the current engine (2a68de6) and measured against Google's own export: 257 of 258 lines matched, dy = 2.6 pt on the page's first line, jumps to 13.6 pt at the table's first row and reaches only 16.7 pt at the page foot. That is one ~10 pt step at the table's top plus ~3 pt of drift over the whole 257-line table (0.012 pt/line), not a per-line pitch error inside the cells. Code: cells emit PdfToWord.Para through emitBlock -> para -> flowFromBox, the same method the reverted body-flow attempt already changed, so there is no separate cell pitch path to fix.
   recorded: 2026-11-12 20:49
 
-- UNTESTED - The ~10 pt table-top offset is the empty spacer paragraph emitted before the table (362 emits w:before=0 w:line=276 exact before the first w:tbl); Google renders it taller than the gap the flow already charged
-  evidence: 362_price_list_dense document.xml: the subtitle paragraph is w:line=149 and the spacer before the table is w:line=276 (=13.8 pt asked); the PDF's gap between the subtitle baseline (y=47.1) and the table's first row (y=68.7) is 21.6 pt. Measured dy steps +9.8 pt exactly at the table's first row. Test: vary only the spacer's w:line and read the first row's dy.
-  recorded: 2026-11-12 20:49
+- CONFIRMED - The ~10 pt table-top offset is the empty spacer paragraph emitted before the table
+  evidence: 362_price_list_dense, 5 docx variants through Drive, ONLY the spacer varied: as emitted (w:line=276 exact, mark sz=2) first-row dy -13.59; spacer deleted -16.75; w:line=1 -16.58; w:line=240 auto -14.00. The spacer as emitted contributes 3.16 pt of the 13.8 pt asked, so the table rises 10.6 pt and every row under it. NOTE THE SIGN: the spacer is too SHORT, not too tall as the untested entry guessed - removing it made the table 3.2 pt worse, not better.
+  recorded: 2026-11-12 21:54
+
+- CONFIRMED - Charging the spacer gap in w:before with w:line=1 (hairline) puts the table's top where the page drew it
+  evidence: Same document, one line changed in the spacer: w:before=276 w:line=1 -> first-row dy -13.59 -> -2.78 (page base offset is -2.7 to -3.8), 18_median_dy FAIL -> pass, 51/59 -> 53/59. w:before is honoured exactly and face-independent; w:line is a multiple of the PARAGRAPH MARK's line height (sz=2 -> 1 pt), which is why 276 twips bought 3.16 pt. Confirmed on ONE document - the 20-document measurement did not run, so the class outcome is untested. Patch: tools/p2w-bench/patches/table-spacer-before-not-line.patch (one append() in DocxWriter around line 4157).
+  recorded: 2026-11-12 21:54
 
 
 ## 53_embedded_faces

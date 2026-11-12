@@ -62,3 +62,9 @@ everything else: what went wrong in the work itself.
   2.6 pt low and then took one 10 pt step at the top of a table. Two numbers per document cannot
   tell a drift from a step — dump the per-line dy of one document before forming a theory.
   Cost: two attempts spent on line-pitch models that the shape of the error did not support.
+
+- **`w:line` is a multiple of the PARAGRAPH MARK's line height, not the document's.** The table
+  spacer is an empty paragraph with `w:sz w:val="2"` (a 1 pt mark), so `w:line="276"` — 13.8 pt
+  asked — rendered as 3.16 pt and every table rose 10.6 pt. Charge a measured gap in `w:before`,
+  which is honoured exactly and face-independent, and keep `w:line="1"`. Read the spacer's mark
+  size before trusting any `w:line` in it.
