@@ -55,11 +55,10 @@ ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 ROUNDS_TOTAL = 3
 PHASES = ["measure", "classify", "fix", "done"]
 
-# A fixer attempt takes about two hours and the fixer is scheduled every two
-# hours, so two runs can land on top of each other - both editing the engine,
-# both committing, one overwriting the other. This claim makes the second run
-# step aside instead. It expires, because a run that dies must not block the
-# next one forever.
+# A fixer attempt takes twelve to twenty-five minutes and the fixer is scheduled hourly,
+# so two runs can land on top of each other - both editing the engine, both committing, one
+# overwriting the other. This claim makes the second run step aside instead. It expires,
+# because a run that dies must not block the next one for ever.
 # Each cron claims its slot before working, so an overrun cannot put two runs of
 # the same cron in the same phase at once. The stale window is per cron, sized to
 # how long one run actually takes: a dead run must not block the next one forever,

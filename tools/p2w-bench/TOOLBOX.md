@@ -155,7 +155,7 @@ shipped mark, and moves the phase. It survives a missing BASELINE.md.
 Every cron claims its own slot before working, so an overrun cannot put two runs
 of the same cron in the same phase at once - the same ten empty rows measured
 twice, and the later commit overwriting the earlier one. The stale window is per
-cron, sized to one run: fixer 100 minutes, baseline 45, classifier 20. A run that
+cron, sized to one run: fixer 45 minutes, baseline 45, classifier 20. A run that
 dies cannot block the next one, and a live run is never mistaken for a dead one.
 Always release the claim when you finish, even on failure.
 
@@ -215,7 +215,7 @@ moved  3 of 20 (15%) -> reverted    real progress was not made
 `--outcome kept` or `--outcome improved` without numbers is refused, and a claim
 that disagrees with the numbers is refused and NOT recorded. `--outcome error` is
 accepted without numbers, because an attempt that found no root cause has nothing
-to count. Limits: one day per class, 12 attempts, 3 requeues.
+to count. Limits: one day per class, 24 attempts, 3 requeues.
 
 ---
 
