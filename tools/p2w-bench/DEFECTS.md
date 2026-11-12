@@ -321,3 +321,64 @@ documents... Treat it as one cause with 8 symptoms, not 8 causes."
 | class size distribution | 41 singletons, 4 pairs, 1 triple — the checks genuinely differ |
 
 `classify_test.py` is new: 13 cases covering all of the above.
+
+---
+
+## 12. Baseline measurement audit — sound where it runs, three checks unproven
+
+**DEFERRED TO ROUND 2 BY INSTRUCTION.** Nothing here is changed now. Recorded so it is
+not lost: the measurement is not to be touched until round 2 begins.
+
+### What was verified and holds
+
+| test | result |
+|---|---|
+| denominator | `total = 59` on all 200 rows — one corpus, one set of checks |
+| score arithmetic | `score == total - len(failed)` on all 200 — no drift |
+| values completeness | every row carries exactly 59 values — nothing sampled out |
+| control: a PDF against itself | **59/59** on five different documents — no check is over-strict |
+| reverse: two different PDFs | **35/59** and **42/59** — the checks do fire |
+| `test_checks.py` | 23/23 — every check tested on a pair that differs and a pair that does not |
+| `test_txt_checks.py` | 7/7 |
+
+So the arithmetic is real, the comparison is against the actual Google render, and the
+verifier neither passes everything nor condemns everything.
+
+### The gap: three checks the corpus never exercises
+
+Seven checks never fired across 200 documents. Four of them are real evidence — those
+documents do carry the feature and the check passed:
+
+| check | documents that carry it | verdict |
+|---|---|---|
+| `08_image_count` | 14 | exercised, passes |
+| `39_image_position` | 15 | exercised, passes |
+| `48_image_area` | 5+ | exercised, passes |
+| `49_page_size` | 200 (all have pages) | exercised, passes |
+
+Three are not evidence at all — the source count is 0 on **all 200** documents, so the
+check short-circuits to pass every time:
+
+| check | source value | why it never fires |
+|---|---|---|
+| `50_annotations` | 0 on all 200 | no PDF in the corpus carries annotations |
+| `51_form_fields` | 0 on all 200 | none carries an AcroForm |
+| `52_outline` | 0 on all 200 | none carries a bookmark tree |
+
+The corpus has documents named `form16-part-b`, `311_fir_police_form` and
+`21_form_labels_x60_values_x300_txtpos`, but they are form **designs** — drawn boxes — not
+interactive forms. Nothing in the 208 exercises those three checks, so a regression in how
+the engine handles annotations, form fields or outlines would ship unseen.
+
+### One discrepancy worth noting
+
+`52_outline` reports source 0 and render 1–3 on several documents: the Google export adds
+bookmarks the source never had. The check passes because `s_o == 0` short-circuits before
+the comparison, so extra outlines in the render are invisible to it.
+
+### What round 2 should do
+
+1. Add to the corpus a PDF carrying real annotations, one with AcroForm fields, and one
+   with a bookmark tree — then those three checks become evidence instead of decoration.
+2. Decide whether `52_outline` should catch outlines the render *adds*, not only ones it
+   loses. Today it can only fail in one direction.
