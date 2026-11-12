@@ -176,7 +176,7 @@ as measured; only the verdict is closed.
 | 77_arabic_rtl_document | 36/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 07_table_rows, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 33_border_over_text, 43_within_10pt_x, 45_char_accuracy, 46_text_crossing_rule, 47_margins, 55_orientation_mix | 2a68de6 | 12 Nov |
 | 78_mixed_english_devanagari_line | 41/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 07_table_rows, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was, 43_within_10pt_x, 47_margins, 55_orientation_mix | 2a68de6 | 12 Nov |
 | 79_inr_indian_digit_grouping_table | 46/59 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 12 Nov |
-| 80_gstin_pan_cin_ifsc_table |  |  |  |  |  |
+| 80_gstin_pan_cin_ifsc_table | 42/59 | FAIL | 03_word_count, 04_words_missing, 07_table_rows, 09_font_names, 11_bold_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 41_block_spacing, 42_alignment_mix, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 12 Nov |
 | academic-paper-ieee-2col-abstract |  |  |  |  |  |
 | admission-form-labels-left-boxes-right |  |  |  |  |  |
 | admit-card |  |  |  |  |  |

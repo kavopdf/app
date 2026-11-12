@@ -606,5 +606,19 @@
       "t04_structure",
       "t05_completeness"
     ]
+  },
+  "80_gstin_pan_cin_ifsc_table": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
   }
 }
