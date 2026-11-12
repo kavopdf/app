@@ -82,3 +82,8 @@ everything else: what went wrong in the work itself.
   51/59 and 1 page, and cost six minutes of chasing a phantom regression. Export `application/pdf`.
   Staged upload keys also expire: nineteen uploaded together and used five minutes later all failed
   with a bare "Failed"; a fresh upload converted immediately. Stage, convert, export, repeat.
+
+- **The ratchet reads `BASELINE.md`, not `RESULTS.jsonl`.** A fixer that records its twenty rows and
+  runs `ratchet.py` gets PASS on the unchanged baseline — it compares the baseline with itself. Write
+  the attempt's rows into `BASELINE.md` first, then run it: on 13 Nov that turned a PASS into
+  "REGRESSED: 4" on the same measurement. Cost: a green ratchet that had seen nothing.

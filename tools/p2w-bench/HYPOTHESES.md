@@ -41,6 +41,18 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: Corrected rig (Drive Doc exported as PDF, not docx). 362_price_list_dense 51/59 -> 53/59, 20_within_10pt FAIL -> pass, 18_median_dy pass; 316_contract_with_schedules 54/59 -> 55/59 (20_within_10pt still fails, render 67/100); 27_two_column_left_short_txtpos 54/59 -> 54/59 (unchanged, 20_within_10pt still fails); control 413_tagged_pdf_actualtext 58/59 -> 58/59 (reproduces baseline exactly, no regression). 4 of the 20 documents ran; the class outcome is still uncomputed.
   recorded: 2026-11-13 00:00
 
+- CONFIRMED - The spacer-before patch moves the class's table documents to pass
+  evidence: 20 documents through Drive on engine 2a68de6-dc3d644, Google PDF export, verifier 59 checks: 20_within_10pt FAIL->pass on 362_price_list_dense (51/59->53/59) and balance-sheet-two-columns-of-figures (40/59->44/59, also 07_table_rows, 18_median_dy, 29_blank_where_ink_was now pass). 10 controls held their scores: 15_stamp_on_scanned_page 42, 19_hanging_indent_txtpos 53, 310_court_judgment 53, 317_rti_response 56, 45_coloured_callout_box 55, 54_two_column... 50, 413_tagged_pdf_actualtext 58; 331_pid_diagram 39->40, 371_experience_certificate 40->41, table-with-no-header-row 54->55. The mechanism holds: the table top lands where the page drew it.
+  recorded: 2026-11-13 00:53
+
+- RULED OUT - The spacer-before patch is safe to ship
+  evidence: Same 20-document round, ratchet exit 1: 4 documents below their mark. NEWLY FAILING checks on documents whose score did not fall: 362_price_list_dense 44_header_footer, 316_contract_with_schedules 59_shape_anchor. Score fell: 40_devanagari_shaping_font 37->36 (30_ink_where_blank_was), newsletter-3col-header-footer 40->39 (14_filled_shapes). The target moved on only 2 of the 10 failing documents (20%, below the third that 'improved' needs). Engine reverted.
+  recorded: 2026-11-13 00:53
+
+- UNTESTED - The regressions are documents where the emitted spacerTw exceeds the gap the page actually drew, so charging it in w:before pushes the table and everything under it down past where the page drew them; clamp the spacer to the measured gap rather than the flow remainder
+  evidence: The patch makes the spacer render at its full asked height (276 twips = 13.8 pt) where before it rendered 3.16 pt, so the table and all following flow move DOWN by ~10.6 pt. On 362 and balance-sheet that is the correction; on 40_devanagari, newsletter-3col, 316 and 362's header/footer the new position is worse, which is what an over-large spacer looks like. Untested: no clamp has been built.
+  recorded: 2026-11-13 00:53
+
 
 ## 53_embedded_faces
 

@@ -113,3 +113,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 22:46 | fixer | slot claimed - fixer running |
 | 12 Nov 23:48 | fixer | slot claimed - fixer running |
 | 13 Nov 00:46 | fixer | slot claimed - fixer running |
+| 13 Nov 00:53 | fixer | round 1: applied the confirmed table-spacer patch (w:before carries the gap, w:line=1), 20 documents through Drive on 2a68de6-dc3d644: 20_within_10pt FAIL->pass on 362_price_list_dense (51->53) and balance-sheet-two-columns (40->44), 10 controls held; ratchet exit 1 with 4 regressions (362 44_header_footer, 316 59_shape_anchor newly failing; 40_devanagari 37->36, newsletter-3col 40->39), 3 of 18 moved; engine reverted |
