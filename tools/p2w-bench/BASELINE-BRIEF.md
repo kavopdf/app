@@ -23,6 +23,17 @@ STEP 0 - IS IT YOUR TURN? THEN PROVE YOU CAN WRITE TO THE REPOSITORY
 
       | <today's date> <HH:MM> | started | phase <PHASE> |
 
+  Read the clock for every row you add to RUN-LOG.md - never estimate it:
+
+      TZ=Asia/Kolkata date '+%d %b %H:%M'
+
+  Both parts matter. The sandbox clock is UTC, five and a half hours behind the times this
+  file already carries, so a bare date writes a row that is wrong by more than the mistake
+  this note exists to stop. And an estimated row writes a time the run never had: on 12 Nov
+  the 09:06 run committed its last document at 09:16:55 and logged 09:48, which made an
+  eleven-minute run look like a forty-minute one. A row like that is worse than no row,
+  because it looks like evidence and it is not.
+
   IF THAT COMMIT FAILS, STOP. Do not measure one document. Output the exact error and stop.
   Do not continue and hope to commit later. Eighteen runs have now done exactly that: each
   spent eleven minutes converting documents and then ended without writing a single row to
