@@ -92,3 +92,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 15:05 | started | phase measure |
 | 12 Nov 15:09 | baseline | measured table-inside-two-column-page 48/59 docx, 5/5 txt |
 | 12 Nov 15:10 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders 46/59 docx 4/5 txt |
+| 12 Nov 15:10 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders, table-with-merged-cells 51/59 docx 4/5 txt |
