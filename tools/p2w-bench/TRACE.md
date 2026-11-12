@@ -42,3 +42,4 @@ claim and after each step; it is not code and cannot break anything.
 | 12 Nov 20:49 | fixer | classify | 43 classes from 208 documents |
 | 12 Nov 20:49 | fixer | classify --txt | 4 classes from 208 documents |
 | 12 Nov 20:50 | ? | commit-gate | started |
+| 12 Nov 21:47 | fixer | claim | fixer claimed the slot |
