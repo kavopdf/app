@@ -198,7 +198,7 @@ as measured; only the verdict is closed.
 | gst-invoice-multipage-item-table | 45/59 | FAIL | 02_text_run_count, 06_table_columns, 10_font_sizes, 12_italic_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | gst-invoice-with-qr-code | 43/59 | FAIL | 02_text_run_count, 10_font_sizes, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 42_alignment_mix, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | insurance-policy-schedule | 48/59 | FAIL | 02_text_run_count, 10_font_sizes, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
-| invoice-line-items-qty-rate-amount |  |  |  |  |  |
+| invoice-line-items-qty-rate-amount | 49/59 | FAIL | 02_text_run_count, 10_font_sizes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | itr-computation-with-slab-table |  |  |  |  |  |
 | journal-2col-with-footnotes |  |  |  |  |  |
 | landscape-page-inside-portrait-document |  |  |  |  |  |
