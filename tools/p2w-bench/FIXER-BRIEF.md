@@ -22,7 +22,8 @@ STEP 0 - IS IT YOUR TURN, AND IS ANYONE ELSE STILL WORKING?
   PHASE=$(python3 tools/p2w-bench/round.py --phase)
   If PHASE is not 'fix', output exactly 'not my turn - phase is <PHASE>' and STOP.
 
-  THEN CLAIM THE SLOT. This cron runs every two hours and one attempt takes about two hours,
+  THEN CLAIM THE SLOT. This cron runs every half hour and one attempt takes twelve to twenty-five
+  minutes,
   so an overrun would put two runs in the same phase at once - both editing the engine, both
   committing, one overwriting the other, and no error message anywhere.
       python3 tools/p2w-bench/round.py --claim-fixer
@@ -30,7 +31,7 @@ STEP 0 - IS IT YOUR TURN, AND IS ANYONE ELSE STILL WORKING?
   'previous fixer run still active' and STOP. Do not touch anything.
   If it exits 0, commit ROUND.json, RUN-LOG.md AND TRACE.md immediately, in ONE commit, so the
   claim is visible to the next run and to anyone watching from outside.
-  The claim expires after 100 minutes on its own, so a run that dies cannot block the next one.
+  The claim expires after 45 minutes on its own, so a run that dies costs one slot and no more.
 
   All three, and before you build. On 12 Nov a fixer run worked for seventeen minutes and left
   no commit at all: no claim, no log line, nothing to tell a working run from one that never
@@ -53,7 +54,7 @@ STEP 0b - READ THE INTERFACE OF THE TOOLS YOU WILL USE  ** BEFORE ANYTHING ELSE 
   TOOLBOX.md is the exact interface of every tool you will call: the command, a sample of the real
   output, the exit codes, what it writes, and what it must not be used for. You will use more tools
   than any other cron, so read these five sections before you start. Guessing a flag wastes a slot
-  that costs two hours.
+  that costs a slot.
 
 STEP 0c - READ WHAT ALREADY COST US TIME
       cat tools/p2w-bench/LESSONS.md
@@ -165,7 +166,8 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   Output 'round <n> closed'. Then STOP - do not start a fix.
 
   THE LIMITS - this is what stops a loop:
-    one problem type gets ONE FULL DAY (24 hours) and at most 12 attempts inside it.
+    one problem type gets ONE FULL DAY (24 hours) and at most 48 attempts inside it - one per
+    half-hour slot. The day is the limit; the number of tries follows the schedule.
     A class that IMPROVES but does not pass gets its day restarted, up to 3 times.
     Absolute maximum for one class: 4 days, 48 attempts, then parked permanently.
 
@@ -290,7 +292,7 @@ STEP 9 - RELEASE THE SLOT, THEN COMMIT THROUGH THE GATE
   Commit app/src (unless reverted), BASELINE.md, DEFECT-CLASSES.md, ATTEMPTS.json, HYPOTHESES.md,
   LESSONS.md, RATCHET.json, RESULTS.jsonl and ROUND.json together. Message names the round, class,
   root cause, calibration numbers, before/after and outcome. git push FAILS. Delete every Doc.
-  Releasing the slot matters even when the run failed - otherwise the next run waits 100 minutes
+  Releasing the slot matters even when the run failed - otherwise the next run waits 45 minutes
   for a claim that nobody holds.
 
 STEP 10 - PARKING A CLASS IS NOT A SURRENDER
@@ -342,7 +344,7 @@ RULES
   Read LESSONS.md before forming a theory, and TOOLBOX.md before calling any tool.
   Claim the slot before working, release it before finishing - even on failure.
   Read the hypothesis ledger BEFORE forming a theory, and write to it before finishing.
-  One day per class, twelve tries inside it, progress buys up to three more days.
+  One day per class, up to forty-eight tries inside it, progress buys up to three more days.
   Never attempt a PARKED class. Always record the attempt, with numbers, honestly.
   Read the recorded numbers before measuring again.
   Calibrate before you conclude. Measure before you claim. The gate before you commit.

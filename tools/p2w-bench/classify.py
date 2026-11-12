@@ -53,7 +53,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 LEDGER = os.path.join(HERE, "ATTEMPTS.json")
 
 MAX_HOURS = 24        # one full day per class - the hard limit
-MAX_ATTEMPTS = 12     # twelve tries inside that day, about 24 hours of real work
+MAX_ATTEMPTS = 48     # 48 tries inside that day - one per half-hour slot. A run takes
+                      # twelve to twenty-five minutes and releases its slot, so the gaps
+                      # between them were idle: twelve tries in twenty-four hours left the
+                      # machine working about a fifth of the day. The day is the limit; the
+                      # number of tries inside it follows the schedule.
 MAX_REQUEUES = 3      # a class that keeps improving gets three fresh days, then stops
 JACCARD = 0.55        # how alike two checks must be to count as one cause
 UNIVERSAL = 0.90      # a check failing on this share of documents cannot discriminate

@@ -65,7 +65,11 @@ PHASES = ["measure", "classify", "fix", "done"]
 # how long one run actually takes: a dead run must not block the next one forever,
 # and a live run must never be mistaken for a dead one.
 FIXER_STALE_MIN = 100
-CLAIM_STALE_MIN = {"fixer": 100, "baseline": 45, "classifier": 20}
+# The fixer's stale limit sits above its longest run and below its two-slot gap. A run that
+# finishes releases the slot itself, so this governs only a run that died: 45 minutes means a
+# crash costs one slot, and a live run of up to forty-five minutes is never doubled - two runs
+# editing the engine at once would each revert the other's fix.
+CLAIM_STALE_MIN = {"fixer": 45, "baseline": 45, "classifier": 20}
 
 
 def load():
