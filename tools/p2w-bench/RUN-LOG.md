@@ -76,3 +76,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 13:16 | baseline | measured policy-2col-spanning-section-heading 44/59 docx, policy-2col-spanning-section-heading.txt 3/5 txt |
 | 12 Nov 13:18 | baseline | txt backfill: 10 more documents recorded (324_loan_amortisation_schedule, 325_demat_holdings_statement, 326_itr_computation, 32_serif_nondefault_body, 330_cad_drawing_sheet, 331_pid_diagram, 332_bom_on_drawing, 333_datasheet_spec_tables, 334_patent_document, 335_msds_safety_data_sheet), gap 79 -> 69 |
 | 12 Nov 13:18 | baseline | ratchet held (docx 190/208 scored, txt 121/208, backfill gap 69); measure gate NOT READY (18 rows unscored); slot released |
+| 12 Nov 14:10 | started | phase measure |
