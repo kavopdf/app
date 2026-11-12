@@ -93,3 +93,35 @@ The other 32 classes are in `DEFECT-CLASSES.md`; the fixer reads that file, not 
 | **Round 2 / 3 .txt backfill** | they are not needed: in those rounds both halves are measured in the same loop. The round gap is printed, not gating | never — by design |
 | **APK** | ships once, when round 3 closes | after round 3 |
 | **DejaVu Serif's own row in the map** | it is mapped to `timesnewroman` on the assumption the engine will write Times New Roman. If the engine instead picks another serif, re-measure | when 2.3 is fixed |
+
+---
+
+## 5. Found by the repo sweep, 12 Nov — recorded, not fixed
+
+A pass over the whole repo and the commit history, looking for work that was started and
+then dropped. These are all `fixed = no`. Nothing here is being acted on today.
+
+| # | what | why it matters | fixed |
+|---|---|---|---|
+| 5.1 | **`ATTEMPTS.json` has no writer.** `round.py` reads, archives and deletes it; `verify_toolbox.py` writes it only as a test fixture; no production tool ever creates it. `TOOLBOX.md` says it "appears only when the first class is opened" and nothing opens a class. | `FIXER-BRIEF.md` opens STEP 2 by reading it, and closes by committing it. On the fixer's first run the read finds nothing and the commit names a file that does not exist — which is the exact failure that stopped the baseline committing for eighteen runs. | **no** |
+| 5.2 | **`HYPOTHESES.md` only exists if the fixer follows the brief exactly.** `hypothesis.py` creates it on `--add`, and `FIXER-BRIEF.md` does instruct `--add`. A bare `hypothesis.py` prints usage and exits 2. | Conditional, not broken — but the commit list names it, so a fixer that skips the `--add` step fails to commit. | **no** |
+| 5.3 | **`verify_toolbox.py` is orphaned.** Nothing calls it: not a brief, not `precommit.sh`, not CI, not `smoke.py`. | It is the only thing that tests what `TOOLBOX.md` *claims* rather than which flags it names. A reference can be flag-perfect and still lie, and nothing checks. | **no** |
+| 5.4 | **`README.md` and `TOOLBOX.md` name ten files that do not exist:** `detect.py`, `score.py`, `fidelity2.py`, `score_ids.py`, `score_tables.py`, `IDS.md`, `TABLES.md`, `WORK-MAP.md`, `DETECTOR-PROOF.md`, `BASELINE-TXT.md`. | Stale documentation from the benchmark era. `TOOLBOX.md` listing `BASELINE-TXT.md` contradicts `ratchet.py`'s own comment, which says there is no such file. A reader believes both. | **no** |
+
+Clean: there is no `TODO`, `FIXME`, `XXX` or `HACK` anywhere in `tools/` source.
+
+---
+
+## 6. Where the baseline actually is, 12 Nov 09:16
+
+| | |
+|---|---|
+| docx measured | 145 of 208 |
+| txt measured | 26 of 208 |
+| backfill gap | 119 |
+| phase | measure, round 1 |
+| commits | one per document, flowing |
+| last batch | 15 closed — documents 66 to 75 |
+
+Healthy. The per-document commit, the heartbeat-first ordering and the engine build fix are
+all working together, which is what the eighteen silent runs were missing.
