@@ -613,3 +613,38 @@ summary, which is what it was always for.
 Verified: 43 computed, 43 in the file; the .txt half 4 and 4. The test builds a 30-class
 fixture and asserts the file's row count equals the count the tool reported, so a cap
 reintroduced anywhere fails immediately.
+
+---
+
+## 17. A fixer run that worked for seventeen minutes and left nothing at all
+
+On 12 Nov the fixer's first real run started at 16:46 and ended at 17:03 — seventeen minutes,
+status **succeeded** — and the repository showed no commit, no claim, no log line and no
+attempt. There was no way, from outside, to tell it apart from a run that never started.
+
+Every tool it would have used was tested afterwards and all of them work: `round.py --phase`
+prints `fix`, `--claim-fixer` exits 0 and sets the slot, `build-engine.sh` builds the engine in
+about five minutes, `classify.py` lists the 43 classes, `--subclusters` splits the top one, and
+`hypothesis.py --show` answers. So the tools were not the cause, and the run's own output is
+not retrievable — the cron reports `output_summary: null`.
+
+What is certain is the shape of the hole: **the only early commit in the whole brief was an
+instruction**, "commit ROUND.json immediately so the claim is visible to the next run". Every
+other commit comes at STEP 9, at the very end. So a run that skipped that one sentence, or
+tried it and failed, would leave nothing until the end — and a run that then stopped early
+would leave nothing at all, while still reporting success.
+
+### The fix: the tool writes the evidence
+
+`round.py --claim-fixer` now appends its own line to RUN-LOG.md the moment the slot is taken:
+
+    | 12 Nov 17:34 | fixer | slot claimed - fixer running |
+
+A tool cannot forget to write it. The brief now asks for ROUND.json and RUN-LOG.md in one
+commit straight after the claim, and says plainly that a run which has not made that commit
+has not started, whatever else it is doing.
+
+While adding it, the timestamp was written with `time.strftime`, which on this image is UTC —
+five and a half hours behind every other row in the file. That is the same mistake the
+RUN-LOG's own note exists to stop, so `round.py` now has an `ist()` helper and the claim line
+goes through it. Verified: the line reads 17:34 when the sandbox clock says 12:04.

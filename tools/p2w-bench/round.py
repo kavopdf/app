@@ -134,6 +134,14 @@ def status(s=None):
     return s
 
 
+def ist(fmt="%d %b %H:%M"):
+    """The wall clock this pipeline writes in. The sandbox is UTC; every row in every
+    file here is IST, and a bare strftime writes a time five and a half hours behind the
+    rows around it."""
+    t = time.gmtime(time.time() + 5 * 3600 + 30 * 60)
+    return time.strftime(fmt, t)
+
+
 def claim(name):
     """Return 0 if this run may proceed, 1 if a previous one is still working.
 
@@ -152,7 +160,21 @@ def claim(name):
         return 1
     s[key] = time.time()
     save(s)
-    print("%s claimed at %s" % (name, time.strftime("%H:%M")))
+    print("%s claimed at %s" % (name, ist("%H:%M")))
+
+    # The claim leaves its own line in RUN-LOG.md, written by the tool rather than by the
+    # run. "Commit ROUND.json immediately" is an instruction, and an instruction is a
+    # promise: the fixer ran for seventeen minutes on 12 Nov and left no commit at all, so
+    # from outside it was impossible to tell a working run from one that never started.
+    # A tool that writes the evidence cannot forget to.
+    try:
+        log = os.path.join(HERE, "RUN-LOG.md")
+        if os.path.exists(log):
+            with open(log, "a", encoding="utf-8") as f:
+                f.write("| %s | %s | slot claimed - %s running |\n"
+                        % (ist("%d %b %H:%M"), name, name))
+    except Exception:
+        pass
     return 0
 
 
