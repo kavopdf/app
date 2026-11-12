@@ -1201,3 +1201,66 @@ attempt. The trace shows every step.
 One thing the simulation showed that is worth stating: `--attempt` refuses when the measured
 documents have no baseline row — "the store says 0 of 0". That is correct, and it means the fixer
 can only verify against documents the baseline actually measured.
+
+---
+
+## 28. The audit types, and the tool that runs eleven of them
+
+Twenty defects were found on 12 Nov. Not one was "the conversion is wrong". Every one was the
+pipeline believing something untrue about itself. They were found by hand, one at a time, each
+after the user asked "are you sure" — which does not scale to three rounds and three months.
+
+So the types are now a list, and the list is a program.
+
+### The fifteen types
+
+| | type | what it looks like | found by |
+|---|---|---|---|
+| **A** | silent no-op | a step reports success and leaves nothing (§17) | `--evidence` |
+| **B** | prose-code drift | a brief promises what no tool does (§16, §19, §26) | `--tools --numbers` |
+| **C** | comparison blind spot | a gate checks X == Y while Z is missing (§9, §12) | `--gates` |
+| **D** | claim without proof | a number nobody recomputes (§15) | `--numbers` |
+| **E** | data corruption | ids collide, rows overwrite (§15, §23) | `--ids` |
+| **F** | dead end | a state you cannot leave (§10, §23) | `--states` |
+| **G** | wrong question | measures the right thing badly (§25) | *a person* |
+| **H** | silent truncation | reads part and says all (§11, §16) | `--caps` |
+| **I** | order dependence | works until something moves (§27) | `--ranges` |
+| **J** | clock | UTC written into a file of IST (§17, §27) | `--clock` |
+| **K** | dead code | defined, never called (§24, §27) | `--dead` |
+| **L** | test that does not test | a check that never fires (§12, §14) | `--mutation` |
+| **M** | fixture mismatch | test data unlike reality (§27) | *a person* |
+| **N** | resource growth | a file that grows until unusable (§21, §22) | `--growth` |
+| **O** | wrong default | the obvious choice is the harmful one (§19, §24) | *a person* |
+
+Eleven are decidable by machine. Four need judgement about meaning: whether the question is the
+right one, whether a fixture resembles the real world, whether a default is safe.
+
+### `audit.py`
+
+    python3 tools/p2w-bench/audit.py            every check
+    python3 tools/p2w-bench/audit.py --ranges   one check
+    python3 tools/p2w-bench/audit.py --quiet    only the failures
+
+Each check prints the evidence it judged, so a disagreement can be checked rather than argued.
+
+### It found five real things on its first run
+
+1. `CLASSIFIER-BRIEF.md` read `/## classify.py/,/## hypothesis.py/` — five sections, three of
+   them tools that brief never uses.
+2. `FIXER-BRIEF.md` read `/## verify_txt.py/,/## commit-gate.sh/` — pulled in `test_txt_checks.py`
+   as well.
+3. `round.py` wrote `time.strftime` into both ROUND.json history entries — UTC, in a file of IST.
+4. `claim_fixer()` and `release_fixer()` were defined and never called; the CLI uses `claim("fixer")`.
+5. (from §27) the baseline's own values were being trimmed.
+
+### And it was made to prove itself
+
+Four bugs were planted on purpose — a wrong number in a brief, an unreferenced function, a UTC
+timestamp, a range widened to swallow a section — and the tool caught all four with the right
+label. A detector that has never been seen to fire is not evidence, and a detector that fires on
+correct code gets ignored, so both directions were checked before it was trusted.
+
+The first version failed that second test: it flagged correct multi-line `strftime` calls, the
+body of the `ist()` helper itself, filename stamps, and the classifier's own 20-minute slot. All
+four were fixed by narrowing the check rather than by silencing it — silencing a finding without
+proving it false is how a real one gets lost later.

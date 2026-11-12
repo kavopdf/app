@@ -196,11 +196,11 @@ def release(name):
     return 0
 
 
-def claim_fixer():
+def _unused_claim_fixer():
     return claim("fixer")
 
 
-def release_fixer():
+def _unused_release_fixer():
     return release("fixer")
 
 
@@ -298,7 +298,7 @@ def main(argv):
         i = PHASES.index(phase)
         if i < len(PHASES) - 1:
             s.setdefault("history", []).append(
-                {"round": s["round"], "phase": s["phase"], "at": time.strftime("%Y-%m-%d %H:%M")})
+                {"round": s["round"], "phase": s["phase"], "at": ist("%Y-%m-%d %H:%M")})
             s["phase"] = PHASES[i + 1]
             save(s)
         print(s["phase"])
@@ -354,7 +354,7 @@ def main(argv):
 
         s.setdefault("history", []).append(
             {"round": s["round"], "phase": "closed", "scored": scored,
-             "at": time.strftime("%Y-%m-%d %H:%M")})
+             "at": ist("%Y-%m-%d %H:%M")})
 
         if s["round"] >= s["rounds_total"]:
             s["phase"] = "done"

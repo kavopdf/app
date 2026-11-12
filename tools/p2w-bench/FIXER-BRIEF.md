@@ -65,7 +65,7 @@ STEP 0b - READ THE INTERFACE OF THE TOOLS YOU WILL USE  ** BEFORE ANYTHING ELSE 
       sed -n '/## hypothesis.py/,/## calibrate.py/p' tools/p2w-bench/TOOLBOX.md
       sed -n '/## classify.py/,/## seed.py/p' tools/p2w-bench/TOOLBOX.md
       sed -n '/## code.py/,/## trace.py/p' tools/p2w-bench/TOOLBOX.md
-      sed -n '/## verify_txt.py/,/## commit-gate.sh/p' tools/p2w-bench/TOOLBOX.md
+      sed -n '/## verify_txt.py/,/## test_txt_checks.py/p' tools/p2w-bench/TOOLBOX.md
       sed -n '/## record.py/,/## ratchet.py/p' tools/p2w-bench/TOOLBOX.md
       sed -n '/## ratchet.py/,/## round.py/p' tools/p2w-bench/TOOLBOX.md
       sed -n '/## commit-gate.sh/,/## precommit.sh/p' tools/p2w-bench/TOOLBOX.md

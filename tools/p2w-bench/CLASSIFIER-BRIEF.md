@@ -26,7 +26,7 @@ STEP 0a - CLAIM THE SLOT
   The claim expires after 20 minutes on its own. RELEASE IT at STEP 4, even if you failed.
 
 STEP 0b - READ THE INTERFACE OF THE TOOLS YOU WILL USE
-      sed -n '/## classify.py/,/## hypothesis.py/p' tools/p2w-bench/TOOLBOX.md
+      sed -n '/## classify.py/,/## seed.py/p' tools/p2w-bench/TOOLBOX.md
       sed -n '/## ratchet.py/,/## round.py/p' tools/p2w-bench/TOOLBOX.md
   TOOLBOX.md carries the exact command, a sample of the real output, the exit codes and what each
   tool writes. Read those two sections first. ratchet.py exits 1 when something regressed and that
