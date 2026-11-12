@@ -251,10 +251,20 @@ STEP 3b - THE .txt BACKFILL (round 1 only, and it ends)
   is empty, so it never revisits them, and without this step they would never get a .txt at
   all - and round 2's .txt ratchet would have nothing to compare them against.
 
-  IT DOES NOT APPLY TO ROUNDS 2 AND 3. There the whole pipeline runs together: every
-  document is measured for both halves in the same loop, so the text row is written at the
-  same moment as the word row and nothing is left over to repair. The gap reads 0 from the
-  first run of round 2 and this step skips itself. Do not invent work for it.
+  IT DOES NOT APPLY TO ROUNDS 2 AND 3, AND YOU DO NOT HAVE TO DECIDE THAT.
+
+      python3 -c "import json;print(json.load(open('tools/p2w-bench/ROUND.json'))['round'])"
+
+  If that prints anything other than 1, SKIP THIS STEP ENTIRELY. Do not run txt_gap.py, do
+  not convert anything, do not reason about it. Rounds 2 and 3 measure both halves in the
+  same loop as STEP 3 - ConvertAll writes the .txt and a2 verifies it in the same pass as
+  the word file - so there is never anything left over to repair. The step exists for one
+  hole, that hole was in round 1, and it does not come back.
+
+  The gap also cannot reappear on its own: the text store already holds every document from
+  round 1, so a document missing its round-2 text row still appears in the store and the
+  document-set gap stays 0. If txt_gap.py ever printed a non-zero number in round 2 or 3,
+  that would be a row deleted from the store - a finding for INCIDENTS.md, not a backfill.
 
       python3 tools/p2w-bench/txt_gap.py --count     # how many are still missing
       python3 tools/p2w-bench/txt_gap.py --list 60   # the first sixty, one per line
