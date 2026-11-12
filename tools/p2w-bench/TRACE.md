@@ -59,3 +59,12 @@ claim and after each step; it is not code and cannot break anything.
 | 12 Nov 22:52 | fixer | attempt | 20_within_10pt (+4) -> error (OPEN) |
 | 12 Nov 22:52 | fixer | classify | 43 classes from 208 documents |
 | 12 Nov 23:48 | fixer | claim | fixer claimed the slot |
+| 12 Nov 23:49 | fixer | build-engine | started |
+| 12 Nov 23:50 | fixer | classify | 43 classes from 208 documents |
+| 12 Nov 23:50 | fixer | build-engine | started |
+| 13 Nov 00:00 | fixer | ratchet | held or rose |
+| 13 Nov 00:00 | fixer | ratchet --txt | held or rose |
+| 13 Nov 00:00 | fixer | hypothesis | 20_within_10pt (+4) -> confirmed |
+| 13 Nov 00:00 | fixer | attempt | 20_within_10pt (+4) -> error (OPEN) |
+| 13 Nov 00:00 | fixer | classify | 43 classes from 208 documents |
+| 13 Nov 00:00 | ? | commit-gate | started |

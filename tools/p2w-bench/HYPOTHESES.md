@@ -37,6 +37,10 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: Patch applied and measured on Google's render for 2 documents before the slot ran out: 362_price_list_dense 51/59 -> 53/59 and 20_within_10pt now passes (18_median_dy FAIL->pass), electricity-bill 45/59 -> 45/59 unchanged (its 20_within_10pt render is still 23 of 100, 19_worst_dy 198.6 - a different cause). 0 of 2 regressed. The 20-document round was NOT run: only 2 documents reached Drive, so the class outcome is still uncomputed. Engine reverted, patch at patches/table-spacer-before-not-line.patch.
   recorded: 2026-11-12 22:52
 
+- CONFIRMED - The spacer-before patch holds when re-measured through a Google PDF export
+  evidence: Corrected rig (Drive Doc exported as PDF, not docx). 362_price_list_dense 51/59 -> 53/59, 20_within_10pt FAIL -> pass, 18_median_dy pass; 316_contract_with_schedules 54/59 -> 55/59 (20_within_10pt still fails, render 67/100); 27_two_column_left_short_txtpos 54/59 -> 54/59 (unchanged, 20_within_10pt still fails); control 413_tagged_pdf_actualtext 58/59 -> 58/59 (reproduces baseline exactly, no regression). 4 of the 20 documents ran; the class outcome is still uncomputed.
+  recorded: 2026-11-13 00:00
+
 
 ## 53_embedded_faces
 

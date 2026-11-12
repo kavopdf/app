@@ -75,3 +75,10 @@ everything else: what went wrong in the work itself.
   /scratch/output, so each docx must be copied there before it can be staged for Drive. Twenty
   minutes of a 45-minute slot went on those three, not on the fix. Do them first, next time, in one
   command, before touching the class.
+
+- **The Drive round must export the Google Doc as PDF, not as docx.** `verify_google.py`'s second
+  argument is Google's own render; a docx export is laid out by LibreOffice instead, and it is a
+  different instrument. It scored 362_price_list_dense 38/59 with 12 pages where the baseline says
+  51/59 and 1 page, and cost six minutes of chasing a phantom regression. Export `application/pdf`.
+  Staged upload keys also expire: nineteen uploaded together and used five minutes later all failed
+  with a bare "Failed"; a fresh upload converted immediately. Stage, convert, export, repeat.
