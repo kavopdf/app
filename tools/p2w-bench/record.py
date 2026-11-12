@@ -57,6 +57,34 @@ def load(store=None):
     return out
 
 
+KEEP_VALUES_FOR = 2     # engines whose raw values are still worth keeping
+
+
+def _trim_values(index):
+    """Drop the raw values from all but the last few engines.
+
+    A row carries `values` - every one of the 59 checks with its source and rendered
+    number - and that is about 4 KB. The fixer measures twenty documents under a new
+    engine id on every attempt, so twenty-four attempts a day added roughly 2 MB a day:
+    a week would have made this file 14 MB and a single `cat` would have been fatal.
+
+    Nothing reads `values` except a person looking at one document. The classifier groups
+    on `failed`, the ratchet compares `failed` and the score, the gates count documents.
+    So the last two engines keep theirs - enough for a before/after - and every older row
+    keeps its score and its failed list, which is everything the pipeline uses.
+    """
+    engines = []
+    for e in index.values():
+        eng = e.get("engine")
+        if eng not in engines:
+            engines.append(eng)
+    keep = set(engines[-KEEP_VALUES_FOR:]) if len(engines) > KEEP_VALUES_FOR else set(engines)
+    for e in index.values():
+        if e.get("engine") not in keep:
+            e.pop("values", None)
+    return index
+
+
 def append(entries, store=None):
     """Append, replacing any earlier line for the same (round, engine, doc)."""
     store = store or STORE
@@ -65,6 +93,7 @@ def append(entries, store=None):
     index = {key(e): e for e in existing}
     for e in entries:
         index[key(e)] = e
+    _trim_values(index)
     with open(store, "w", encoding="utf-8") as f:
         for e in sorted(index.values(), key=lambda e: (e.get("round", 0),
                                                        e.get("doc", ""))):

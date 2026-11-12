@@ -794,3 +794,72 @@ more than any prompt change.
 attempt recorded "13:22" for work done at 18:52, five and a half hours before it happened. Every
 other timestamp in this directory is IST. Fixed, and the entry now reads 19:14 when the sandbox
 clock says 13:44.
+
+---
+
+## 21. What a run reads, and what grows until it cannot work
+
+The fixer's fixed cost is measured, and so is the part that grows.
+
+### Read on every run, whether or not it is needed
+
+    FIXER-BRIEF.md          23,115 bytes
+    TOOLBOX, six sections    9,280 bytes
+    LESSONS.md               2,750 bytes
+                            ----------
+                            35,145 bytes  ~ 8,800 tokens
+
+That is the floor. Nothing below it can be cut without cutting a rule.
+
+### Grows over time
+
+| file | now | grows by | read by the fixer? |
+|---|---|---|---|
+| **RESULTS.jsonl** | 913 KB | **+2 MB a day** | no — through `record.py --show` |
+| REMAINING-DEFECTS.md | 328 KB | per park | no — it only appends |
+| BASELINE.md | 66 KB | stable | no — through `classify.py` |
+| DEFECTS.md | 39 KB | per finding | no — it is the ledger for a person |
+| RUN-LOG.md | 15 KB | +14 KB a day | no — it only appends |
+| **HYPOTHESES.md** | 1.8 KB | **+29 KB a day** | yes — its own class only |
+| DEFECT-CLASSES.md | 10 KB | with classes | no — `classify.py` prints the top ten |
+| TRACE.md | 1.4 KB | capped at 400 lines | no |
+
+Two of those mattered enough to change.
+
+### RESULTS.jsonl — four kilobytes a row, and every attempt adds twenty
+
+A row carries `values`: all 59 checks with their source and rendered number. That is 4 KB.
+The fixer measures twenty documents under a new engine id on every attempt, twenty-four
+attempts a day, so the file grew by about **2 MB a day** — 14 MB in a week, and one `cat`
+of it would have ended a run before it started, looking exactly like nothing happened.
+
+Nothing reads `values` except a person looking at one document. The classifier groups on
+`failed`, the ratchet compares `failed` and the score, the gates count documents.
+`record.py` now keeps `values` for the **last two engines** — enough for a before and an
+after — and every older row keeps its score and its failed list, which is everything the
+pipeline uses. The file stops growing with history and starts tracking only the recent one.
+
+### HYPOTHESES.md — the fixer reads this one, so its growth was the expensive kind
+
+Three entries per attempt, twenty-four attempts a day, about 29 KB a day — and the fixer
+reads its class section on every attempt. By the end of a day it would be reading a class's
+entire history to find the one entry that shapes the next try.
+
+`hypothesis.py` now keeps the last **eight entries** of each class in full and collapses
+everything before them into a single line: "2 earlier entries collapsed on 2026-11-12 — the
+last 8 are below". Tested at twelve entries: nine lines, 991 bytes, and the newest eight
+intact.
+
+### The warning that costs nothing
+
+Four files are large enough to end a run by being read, and each has a tool that prints the
+slice that was actually wanted. The brief now opens with them, by name and by size, and says
+what to use instead — `record.py --show`, `classify.py`, `hypothesis.py --show`,
+`trace.py --show`, or `wc -l` and `head -3` for a file's shape.
+
+### Left alone, deliberately
+
+`LESSONS.md` is 50 lines against its own "capped at fifteen" rule, but it is 2.75 KB — 0.7%
+of the fixed read — and all nine lessons are load-bearing. Trimming it would cost quality to
+save 1.8 KB. `REMAINING-DEFECTS.md` at 328 KB is history the fixer never reads; archiving it
+would risk the parking step that writes to it, so it gets the warning instead.

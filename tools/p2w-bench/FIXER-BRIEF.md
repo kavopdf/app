@@ -44,6 +44,23 @@ STEP 0 - IS IT YOUR TURN, AND IS ANYONE ELSE STILL WORKING?
   engine and the trace touches nothing. Six small commits that show the path are worth more than
   one at the end: a run that dies between two steps then leaves the steps it did finish.
 
+NEVER READ THESE FILES WHOLE  ** THIS IS HOW A RUN DIES **
+    RESULTS.jsonl          913 KB   - four kilobytes a row, every check's numbers
+    REMAINING-DEFECTS.md   328 KB   - five thousand lines of history
+    BASELINE.md             66 KB   - 208 rows you do not need to see
+    DEFECTS.md              39 KB   - the ledger for a person, not for you
+
+  Reading one of them whole ends the run before it starts, and it looks like nothing
+  happened. Each has a tool that prints the slice you actually need:
+
+      python3 tools/p2w-bench/record.py --show <document>          one document, last three engines
+      python3 tools/p2w-bench/record.py --show <doc> --check <id>  one check on one document
+      python3 tools/p2w-bench/classify.py                          the classes, largest first
+      python3 tools/p2w-bench/hypothesis.py --show "<class>"       what was tried on this class
+      python3 tools/p2w-bench/trace.py --show 40                   what the tools did
+
+  If you want a file's shape, ask for its shape - `wc -l`, `head -3` - not the file.
+
 STEP 0b - READ THE INTERFACE OF THE TOOLS YOU WILL USE  ** BEFORE ANYTHING ELSE **
       sed -n '/## hypothesis.py/,/## calibrate.py/p' tools/p2w-bench/TOOLBOX.md
       sed -n '/## classify.py/,/## hypothesis.py/p' tools/p2w-bench/TOOLBOX.md

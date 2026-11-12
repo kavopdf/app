@@ -41,6 +41,8 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 LEDGER = os.path.join(HERE, "HYPOTHESES.md")
 RESULTS = {"ruled-out": "RULED OUT", "confirmed": "CONFIRMED", "untested": "UNTESTED"}
+
+KEEP_PER_CLASS = 8      # entries kept in full; older ones collapse into one line
 HEADER = (
     "# Hypotheses - what was tried, and what it proved\n\n"
     "One section per defect class. Written by `hypothesis.py`, read by every attempt\n"
@@ -69,7 +71,33 @@ def load():
     return sections
 
 
+def _cap(sections):
+    """Keep the last few entries of each class in full and collapse the rest.
+
+    A fixer attempt records about three entries - one confirmed, one ruled out, one
+    untested - and it now runs twenty-four times a day. Left alone the file grows by
+    roughly 29 KB a day, and the fixer reads its own class section on every attempt, so
+    the cost compounds: by the end of a day it would be reading a class's entire history
+    to find the one entry that matters.
+
+    The last eight are the ones that shape the next attempt. Everything before them is
+    history, and a single line saying how much is enough to know it exists.
+    """
+    for cls, entries in list(sections.items()):
+        if len(entries) <= KEEP_PER_CLASS:
+            continue
+        older = entries[:-KEEP_PER_CLASS]
+        kept = entries[-KEEP_PER_CLASS:]
+        summary = "- %d earlier entries collapsed on %s - the last %d are below" % (
+            len(older), time.strftime("%Y-%m-%d",
+                                      time.gmtime(time.time() + 5 * 3600 + 30 * 60)),
+            KEEP_PER_CLASS)
+        sections[cls] = [summary] + kept
+    return sections
+
+
 def save(sections):
+    sections = _cap(sections)
     out = [HEADER]
     for cls in sorted(sections):
         out.append("## %s\n" % cls)
