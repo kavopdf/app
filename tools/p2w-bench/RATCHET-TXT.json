@@ -349,5 +349,19 @@
       "t04_structure",
       "t05_completeness"
     ]
+  },
+  "71_invoice_space_aligned_no_rules": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
   }
 }
