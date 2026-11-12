@@ -648,3 +648,53 @@ While adding it, the timestamp was written with `time.strftime`, which on this i
 five and a half hours behind every other row in the file. That is the same mistake the
 RUN-LOG's own note exists to stop, so `round.py` now has an `ist()` helper and the claim line
 goes through it. Verified: the line reads 17:34 when the sandbox clock says 12:04.
+
+---
+
+## 18. Tracking what a run actually did — a trace the tools write, not the run
+
+A cron run is a black box from outside. It reports succeeded or failed, its output is not
+retrievable (`output_summary` is null), and the only durable evidence is a commit. So when the
+fixer worked for seventeen minutes on 12 Nov and left nothing, there was no way to tell whether
+it had failed at the clone, the build, the class pick, the calibration or the measurement. Every
+one of those tools works when called by hand, which means the failure was somewhere between
+them — and nothing recorded the path.
+
+An instruction to log is a promise. A tool that logs is a fact.
+
+### `trace.py`
+
+`TRACE.md`, one line per tool call, appended and trimmed to 400 lines:
+
+    | 12 Nov 17:48 | fixer | claim        | fixer claimed the slot |
+    | 12 Nov 17:48 | fixer | classify     | 43 classes from 208 documents |
+    | 12 Nov 17:48 | fixer | ratchet      | held or rose |
+    | 12 Nov 17:48 | fixer | ratchet --txt| held or rose |
+
+The run name comes from the slots ROUND.json already keeps, so a line knows which cron wrote it
+without being told. The timestamp goes through an `ist()` helper, because the sandbox is UTC and
+every other row in this directory is IST.
+
+Wired into: `round.py` (claim), `classify.py` (classes, attempts), `ratchet.py` (held or
+regressed, both halves), `build-engine.sh` (started, built), `commit-gate.sh` (started),
+`hypothesis.py` (theory recorded), `record.py`.
+
+Every entry point is wrapped in `try/except`. A trace that raises would turn a working run into
+a failed one, which is worse than no trace at all.
+
+### How it becomes visible
+
+The brief now asks for ROUND.json, RUN-LOG.md and TRACE.md in one commit straight after the
+claim, and for TRACE.md alone to be committed again after each step — build, class picked,
+calibration, measurement, outcome. Six small commits that show the path beat one at the end,
+because a run that dies between two steps then leaves the steps it did finish.
+
+TRACE.md is explicitly not code, so it is committed without the commit gate: the gate exists to
+guard the engine, and the trace touches nothing. That matters — the fixer is told never to
+commit outside the gate, and this is the one safe exception.
+
+### What it does not fix
+
+It cannot make a run commit. If a run never commits, the trace dies with its sandbox. What it
+does is make the commit cheap and automatic in content: the agent does not have to remember what
+to write, only to send one file it did not author.

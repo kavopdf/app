@@ -134,6 +134,12 @@ def status(s=None):
     return s
 
 
+try:
+    from trace import note
+except Exception:
+    def note(*a, **k):
+        pass
+
 def ist(fmt="%d %b %H:%M"):
     """The wall clock this pipeline writes in. The sandbox is UTC; every row in every
     file here is IST, and a bare strftime writes a time five and a half hours behind the
@@ -161,6 +167,7 @@ def claim(name):
     s[key] = time.time()
     save(s)
     print("%s claimed at %s" % (name, ist("%H:%M")))
+    note("claim", "%s claimed the slot" % name)
 
     # The claim leaves its own line in RUN-LOG.md, written by the tool rather than by the
     # run. "Commit ROUND.json immediately" is an instruction, and an instruction is a

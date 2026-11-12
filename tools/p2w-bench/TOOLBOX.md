@@ -225,6 +225,19 @@ are the .txt checks `t01` to `t05` rather than the .docx checks `01` to `59`. Ru
 take the largest OPEN class from either; which half you are in decides whether the rest of
 the run uses `verify_google.py` with `ratchet.py` or `verify_txt.py` with `ratchet.py --txt`.
 
+## trace.py
+
+    python3 tools/p2w-bench/trace.py --show 40    # the last 40 lines
+    python3 tools/p2w-bench/trace.py --clear
+
+  TRACE.md, written by the tools themselves - claim, classify, attempt, ratchet, build,
+  commit-gate. It is the only record of what a run actually did: a cron reports succeeded
+  or failed and its output is not retrievable, so a run that dies between two steps leaves
+  its path here and nowhere else.
+
+  Commit it with the claim and after each step. It is not code, it touches nothing, and it
+  cannot break a build - so it is safe to commit at any moment, unlike the engine.
+
 ## hypothesis.py — what earlier attempts already ruled out
 
 **Used by:** fixer only.

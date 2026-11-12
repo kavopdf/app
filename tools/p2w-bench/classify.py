@@ -300,6 +300,12 @@ def subclusters(cls_name, top=8):
     return 0
 
 
+try:
+    from trace import note
+except Exception:
+    def note(*a, **k):
+        pass
+
 def current_class_names():
     """The class names exactly as main() writes them - the only valid ledger keys."""
     base = _rows_for_mode()
@@ -536,6 +542,7 @@ def main(argv):
                 e["reason"] = ""
 
         save_ledger(led)
+        note("attempt", "%s -> %s (%s)" % (cls, outcome, e.get("status")))
         print("%s: attempts=%d requeues=%d status=%s  %s" % (
             cls, e["attempts"], e["requeues"], e.get("status"), e.get("reason", "")))
         return 0
@@ -663,6 +670,8 @@ def main(argv):
     name = "DEFECT-CLASSES-TXT.md" if "--txt" in sys.argv else "DEFECT-CLASSES.md"
     open(os.path.join(HERE, name), "w", encoding="utf-8").write("\n".join(out) + "\n")
 
+    note("classify%s" % (" --txt" if "--txt" in argv else ""),
+         "%d classes from %d documents" % (len(classes), len(measured)))
     print("documents measured : %d" % len(measured))
     print("checks firing      : %d" % len(doc_sets))
     print("classes (data-driven): %d" % len(classes))

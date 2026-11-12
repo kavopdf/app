@@ -28,15 +28,20 @@ STEP 0 - IS IT YOUR TURN, AND IS ANYONE ELSE STILL WORKING?
       python3 tools/p2w-bench/round.py --claim-fixer
   If it exits 1 it printed how long the previous run has been going. Output exactly
   'previous fixer run still active' and STOP. Do not touch anything.
-  If it exits 0, commit ROUND.json AND RUN-LOG.md immediately, in ONE commit, so the claim is
-  visible to the next run and to anyone watching from outside.
+  If it exits 0, commit ROUND.json, RUN-LOG.md AND TRACE.md immediately, in ONE commit, so the
+  claim is visible to the next run and to anyone watching from outside.
   The claim expires after 100 minutes on its own, so a run that dies cannot block the next one.
 
-  Both files, and before you build. On 12 Nov a fixer run worked for seventeen minutes and left
+  All three, and before you build. On 12 Nov a fixer run worked for seventeen minutes and left
   no commit at all: no claim, no log line, nothing to tell a working run from one that never
-  started - and the run reported success. --claim-fixer now writes its own RUN-LOG line, so this
-  one commit is the whole of the evidence. A run that has not made it has not started, whatever
-  else it is doing.
+  started - and the run reported success. --claim-fixer now writes its own RUN-LOG line and every
+  tool writes TRACE.md, so this one commit is the whole of the evidence. A run that has not made
+  it has not started, whatever else it is doing.
+
+  TRACE.md IS NOT CODE. Commit it again after each step - build, class picked, calibration,
+  measurement, outcome - without running the commit gate, because the gate exists to guard the
+  engine and the trace touches nothing. Six small commits that show the path are worth more than
+  one at the end: a run that dies between two steps then leaves the steps it did finish.
 
 STEP 0b - READ THE INTERFACE OF THE TOOLS YOU WILL USE  ** BEFORE ANYTHING ELSE **
       sed -n '/## hypothesis.py/,/## calibrate.py/p' tools/p2w-bench/TOOLBOX.md

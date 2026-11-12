@@ -39,6 +39,12 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BASE = os.path.join(HERE, "BASELINE.md")
+try:
+    from trace import note
+except Exception:
+    def note(*a, **k):
+        pass
+
 RATCHET = os.path.join(HERE, "RATCHET.json")
 
 # The .txt marks live apart from the .docx marks for the same reason the results do: a
@@ -267,6 +273,8 @@ def main(argv):
     print("  new documents, first mark : %d" % len(new_marks))
 
     fail = False
+    note("ratchet%s" % (" --txt" if TXT_MODE else ""),
+         ("REGRESSED %d" % len(regressions)) if regressions else "held or rose")
     if regressions:
         fail = True
         print("  REGRESSED: %d document(s) below their best ever score" % len(regressions))

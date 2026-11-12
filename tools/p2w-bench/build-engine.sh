@@ -18,6 +18,16 @@
 # fetched from Adoptium if the image does not have one - the same download the JDK came
 # from when this was worked out by hand.
 set -euo pipefail
+HERE_SELF="$(cd "$(dirname "$0")" && pwd)"
+tr() { python3 "$HERE_SELF/trace.py" >/dev/null 2>&1; python3 -c "
+import sys; sys.path.insert(0,'$HERE_SELF')
+try:
+    from trace import note
+    note('build-engine', '''$1''')
+except Exception:
+    pass
+" 2>/dev/null || true; }
+tr "started"
 cd "$(dirname "$0")/../engine-verify"
 
 # /tmp on this image is 64 MB and already full - a JDK is 180 MB, so it goes on /scratch.

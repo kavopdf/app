@@ -79,6 +79,12 @@ def save(sections):
     open(LEDGER, "w", encoding="utf-8").write("\n".join(out))
 
 
+try:
+    from trace import note
+except Exception:
+    def note(*a, **k):
+        pass
+
 def add(cls, text, result, evidence):
     # The class name is the section key, exactly as it is the ledger key in
     # classify.py --attempt. An unvalidated one files the reasoning under a class that
@@ -110,6 +116,7 @@ def add(cls, text, result, evidence):
     if evidence:
         entry += "\n  evidence: %s" % evidence.strip()
     entry += "\n  recorded: %s" % time.strftime("%Y-%m-%d %H:%M")
+    note("hypothesis", "%s -> %s" % (cls, result))
     # The same theory, tested later, is not a duplicate - it is the same theory
     # with a result now. Refusing to update it would leave an UNTESTED entry that
     # has been tested, and --next would keep offering work already done. So an

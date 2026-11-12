@@ -88,6 +88,14 @@ if [ "${1:-}" = "--status" ]; then
 fi
 
 say "commit-gate"
+python3 -c "
+import sys; sys.path.insert(0,'tools/p2w-bench')
+try:
+    from trace import note
+    note('commit-gate', 'started')
+except Exception:
+    pass
+" 2>/dev/null || true
 
 if ! engine_changed; then
   say "  engine unchanged - nothing to prove"
