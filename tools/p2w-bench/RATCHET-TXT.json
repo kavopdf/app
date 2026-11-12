@@ -632,5 +632,17 @@
       "t04_structure",
       "t05_completeness"
     ]
+  },
+  "admission-form-labels-left-boxes-right": {
+    "best": 5,
+    "failed": [],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
   }
 }
