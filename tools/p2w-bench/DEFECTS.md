@@ -937,3 +937,65 @@ range it was asked for; and line 233 prints exactly what line 233 of the source 
 | **per run** | **~89,700** | **~13,000** |
 
 An 85% cut, and none of it came from removing a rule or skipping a read that mattered.
+
+---
+
+## 23. A reverted attempt left no trace, and the class would have been retried for ever
+
+Found by reading the 19:53 commit, not by looking for it.
+
+    p2w round 1 fixer: 53_embedded_faces - face-name SUBSTITUTE map tried,
+    53 passed on 2 of 10 docs, kept=0 on 8, 317 fell 56->55; engine reverted, ruled out
+
+A real attempt: a theory, ten documents through Drive, an honest negative result, the engine
+reverted. But `ATTEMPTS.json` still held one entry, for `20_within_10pt (+4)`, and
+`53_embedded_faces` still showed **attempts=0** in DEFECT-CLASSES.md.
+
+### Why
+
+`commit-gate.sh` opened with:
+
+    if ! engine_changed; then
+      say "  engine unchanged - nothing to prove"
+      exit 0
+    fi
+
+A run that reverts its change leaves the engine unchanged — so the gate exited before checking
+anything, including the ATTEMPTS rule it already had. The class stayed at zero attempts, was
+the largest OPEN class again on the next run, and would have been picked and re-attempted every
+hour for ever: a loop with no end, no error message, and a hypothesis ledger filling with
+ruled-out theories for a class the pipeline believed had never been tried.
+
+Recording a theory without recording the attempt is the exact shape of the bug, so the gate now
+refuses it whether or not the engine survived:
+
+    if HYPOTHESES.md changed but ATTEMPTS.json did not -> exit 1
+
+The ratchet and precommit checks stay engine-specific, because they really are about code that
+is going to ship.
+
+### The second bug, found while repairing the first
+
+The engine id was `2a68de6-dirty` — the commit hash plus the literal word "dirty". That is the
+same string for every attempt. `record.py` keys rows by (round, engine, doc), so the second
+attempt of the day **overwrote the first attempt's measurements**, and `compute_moved` compared
+the baseline against a mixture of two different engines.
+
+It showed up immediately when trying to record the missed attempt: the store said "6 of 17
+moved", which is neither the 20 documents of the first attempt nor the 10 of the second. 35%
+would also have been read as `improved`, triggering a requeue for an attempt that was reverted.
+
+The suffix is now a hash of the diff:
+
+    ENGINE="$ENGINE-d$(git diff -- engine/ | sha1sum | cut -c1-6)"
+
+One id per engine state, the same id for the same state, and reverting back to clean gives the
+clean hash again. Verified: two different edits produce two different ids.
+
+### What was not repaired
+
+The twenty `2a68de6-dirty` rows in RESULTS.jsonl cannot be attributed to either attempt, so the
+19:53 attempt is deliberately left unrecorded. Recording it with the store's mixed numbers would
+have marked a reverted attempt as `improved` and bought it a requeue it did not earn. The class
+stays OPEN at zero attempts, gets a clean attempt next hour under a unique engine id, and records
+properly then. One duplicate attempt is cheaper than a wrong outcome.

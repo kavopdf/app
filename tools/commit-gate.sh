@@ -98,7 +98,26 @@ except Exception:
 " 2>/dev/null || true
 
 if ! engine_changed; then
-  say "  engine unchanged - nothing to prove"
+  # A reverted attempt is still an attempt.
+  #
+  # This used to exit here, before any check. On 12 Nov a run changed the engine, measured
+  # ten documents, reverted the change and committed - so the engine was unchanged, the gate
+  # said "nothing to prove", and ATTEMPTS.json was never touched. The class stayed at
+  # attempts=0 and was picked again on the next run, and the one after that: a loop with no
+  # end, no error, and a hypothesis ledger quietly filling with ruled-out theories for a
+  # class the pipeline believed had never been tried.
+  #
+  # Recording a theory without recording the attempt is the exact shape of that bug, so the
+  # gate now refuses it whether or not the engine survived.
+  if [ -f "$BENCH/HYPOTHESES.md" ] && file_changed "$BENCH/HYPOTHESES.md"; then
+    if [ ! -f "$BENCH/ATTEMPTS.json" ] || ! file_changed "$BENCH/ATTEMPTS.json"; then
+      bad "HYPOTHESES.md records a theory but ATTEMPTS.json records no attempt"
+      bad "A reverted attempt still counts - run classify.py --attempt <class> --moved N --total M"
+      exit 1
+    fi
+    say "  engine unchanged, but an attempt was recorded - that is allowed"
+  fi
+  say "  engine unchanged - nothing else to prove"
   exit 0
 fi
 

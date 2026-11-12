@@ -101,8 +101,15 @@ TWO PROVEN FACTS - DO NOT RE-LITIGATE
 ENGINE HASH
       ENGINE=$(git log -1 --format=%h -- app/src/main/java/com/kavopdf/app/engine/)
       [ -n "$(git diff --name-only -- app/src/main/java/com/kavopdf/app/engine/)" ] \
-          && ENGINE="$ENGINE-dirty"
+          && ENGINE="$ENGINE-d$(git diff -- app/src/main/java/com/kavopdf/app/engine/ | sha1sum | cut -c1-6)"
   Never git HEAD.
+
+  The suffix is a hash of the diff, not the word "dirty". A bare "-dirty" is the same string
+  for every attempt, and record.py keys rows by (round, engine, doc) - so the second attempt
+  of the day overwrote the first one's measurements, and compute_moved compared the baseline
+  against a mixture of two different engines. A content hash makes the id mean what it says:
+  one id per engine state, the same id for the same state, and reverting back to clean gives
+  the clean hash again.
 
   The second line is not decoration. That command reports the last COMMITTED change to the
   engine, and this brief commits at STEP 9 - after STEP 6 has already measured. Without the
