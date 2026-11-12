@@ -53,6 +53,14 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: The patch makes the spacer render at its full asked height (276 twips = 13.8 pt) where before it rendered 3.16 pt, so the table and all following flow move DOWN by ~10.6 pt. On 362 and balance-sheet that is the correction; on 40_devanagari, newsletter-3col, 316 and 362's header/footer the new position is worse, which is what an over-large spacer looks like. Untested: no clamp has been built.
   recorded: 2026-11-13 00:53
 
+- RULED OUT - The 13 Nov regressions come from spacers whose scaled gap is zero being changed from w:line=0 to w:line=1
+  evidence: Refined patch (engine 2a68de6-d2a3183): emit the shipped spacer shape when the scaled gap is 0, the w:before form only for a real gap. Re-measured the 5 affected documents through Drive, Google PDF export: every score identical to the unrefined build - 362_price_list_dense 53/59, 316_contract_with_schedules 55/59, 40_devanagari_shaping_font 36/59, newsletter-3col-header-footer 39/59, balance-sheet-two-columns-of-figures 44/59 - and the same four checks still newly failing (44_header_footer, 59_shape_anchor, 30_ink_where_blank_was, 14_filled_shapes). Those documents carry real gaps, not zero ones, so the regressions come from the spacer's height, not from its zero case.
+  recorded: 2026-11-13 00:57
+
+- CONFIRMED - A document can gain the class's check and lose another in the same render, so the patch must be judged per check and not per score: 362_price_list_dense rose 51->53 with 20_within_10pt passing while 44_header_footer began failing
+  evidence: 362_price_list_dense on engine 2a68de6-dc3d644: 51/59 -> 53/59, 20_within_10pt FAIL->pass, and 44_header_footer newly failing. The score rose and the ratchet still rejected it. Any future spacer work on this class has to clear 44_header_footer and 59_shape_anchor as well as move 20_within_10pt.
+  recorded: 2026-11-13 00:57
+
 
 ## 53_embedded_faces
 
