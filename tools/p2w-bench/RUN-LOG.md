@@ -47,3 +47,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 11:14 | baseline | measured bus-timetable-station-left-times-right 51/59 docx, bus-timetable-station-left-times-right.txt 4/5 FAIL txt |
 | 12 Nov 11:14 | baseline | measured delivery-challan 42/59 docx, delivery-challan.txt 4/5 FAIL txt |
 | 12 Nov 11:15 | baseline | measured electricity-bill 45/59 docx, electricity-bill.txt 4/5 FAIL txt |
+| 12 Nov 11:15 | baseline | measured eway-bill 47/59 docx, eway-bill.txt 4/5 FAIL txt |

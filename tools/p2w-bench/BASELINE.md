@@ -191,7 +191,7 @@ as measured; only the verdict is closed.
 | bus-timetable-station-left-times-right | 51/59 | FAIL | 02_text_run_count, 09_font_names, 10_font_sizes, 18_median_dy, 22_reading_order, 23_line_pitch, 32_stroke_lines, 47_margins | 2a68de6 | 12 Nov |
 | delivery-challan | 42/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | electricity-bill | 45/59 | FAIL | 03_word_count, 04_words_missing, 10_font_sizes, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 44_header_footer, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
-| eway-bill |  |  |  |  |  |
+| eway-bill | 47/59 | FAIL | 02_text_run_count, 10_font_sizes, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | form16-part-b |  |  |  |  |  |
 | gst-invoice-3line-items |  |  |  |  |  |
 | gst-invoice-horizontal-rules-only |  |  |  |  |  |
