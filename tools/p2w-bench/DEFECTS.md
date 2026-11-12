@@ -241,3 +241,33 @@ by it.
 
 Tested in `gate_test.py`: a document listed twice, a duplicate store row, a duplicate plus a
 missing row whose counts still match, and a clean 208 that must still advance.
+
+---
+
+## 10. A round closes from fix, and only with nothing open — 12 Nov
+
+`--close-round` had no guard either. Tested from every phase:
+
+| called from | what happened |
+|---|---|
+| measure | round 1 archived, round 2 started in measure — the fix phase never ran |
+| classify | round 2 started — no class was ever worked |
+| fix, zero attempts | round 2 started — nothing fixed |
+
+And the escalation: **three calls from measure** reach round 3, set the phase to `done`, and
+`--apk-status` answers `may ship`. An app published with no measurement finished and nothing
+fixed, from three calls that each looked like routine housekeeping.
+
+The intended rule was in the brief: the fixer closes the round when its STEP 2 finds no class
+still OPEN. Nothing enforced it.
+
+| # | hole | fixed |
+|---|---|---|
+| 10.1 | `--close-round` worked from any phase | **yes** — refused unless the phase is `fix` |
+| 10.2 | It did not check whether any class was still OPEN | **yes** — refuses and names them; a class that is PARKED or FIXED does not block, because parking is how the fixer moves on |
+
+While writing the test for 10.2 I found a third thing: the guard matched `OPEN` only in the
+**last** column. A column added to the class table would have turned it into a gate that
+never fires. It now matches the cell wherever it sits, and the test fixture uses the real
+eight-column shape so a format change shows up in the test rather than in a round that
+closed with work still open.

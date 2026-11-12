@@ -273,6 +273,40 @@ def main(argv):
         return 0
 
     if "--close-round" in argv:
+        # A round closes from fix, and only when no class is still OPEN.
+        #
+        # Without this, --close-round worked from any phase: three calls from measure reach
+        # round 3, set the phase to done, and --apk-status then answers "may ship" - an app
+        # published with no measurement finished and nothing fixed. Tested before this
+        # guard existed: measure, close, close, close, ship.
+        if s["phase"] != "fix":
+            print("refused: a round closes from fix, and the phase is %s." % s["phase"])
+            print("Closing from here would archive a round whose fix phase never ran and start")
+            print("the next one with nothing fixed. Three such calls reach done, and done is what")
+            print("lets the app ship.")
+            return 1
+
+        still_open = []
+        for name in ("DEFECT-CLASSES.md", "DEFECT-CLASSES-TXT.md"):
+            path = os.path.join(HERE, name)
+            if not os.path.exists(path):
+                continue
+            for line in open(path, encoding="utf-8"):
+                if not line.startswith("| "):
+                    continue
+                cells = [c.strip() for c in line.strip().strip("|").split("|")]
+                # "OPEN" is a cell, not necessarily the last one - a column added to the
+                # class table must not turn this gate into one that never fires.
+                if len(cells) >= 3 and "OPEN" in cells:
+                    still_open.append(cells[1])
+        if still_open:
+            print("refused: %d class(es) are still OPEN - the round is not finished."
+                  % len(still_open))
+            for c in still_open[:5]:
+                print("  %s" % c)
+            print("Fix them, or let the fixer park them with a reason, then close the round.")
+            return 1
+
         total, scored = rows()
         # Archive the finished round so its numbers are never lost.
         if os.path.exists(BASE):

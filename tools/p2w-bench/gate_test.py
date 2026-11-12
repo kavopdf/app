@@ -53,9 +53,14 @@ def build(phase="measure", round_no=1,
 
     # class files
     def classfile(path, measured, total):
+        # The real table is eight columns with the status last, and the gate must not
+        # depend on that position - the fixture matches the real shape so a format change
+        # shows up here rather than in a round that closed with work still open.
         with open(path, "w", encoding="utf-8") as f:
             f.write("# Defect classes\n\nDocuments measured: **%d of %d**\n\n"
-                    "| rank | class | docs |\n|---|---|---|\n| 1 | 53_embedded_faces | 9 |\n"
+                    "| rank | class | docs | share | checks | attempts | requeues | status |\n"
+                    "|---|---|---|---|---|---|---|---|\n"
+                    "| 1 | 53_embedded_faces | 9 | 90%% | 53_embedded_faces | 0 | 0 | OPEN |\n"
                     % (measured, total))
     if class_docx is not None:
         classfile(os.path.join(b, "DEFECT-CLASSES.md"), class_docx, N)
@@ -179,6 +184,41 @@ r = json.load(open(os.path.join(b, "ROUND.json")))
 check("close-round still works", (rc3, r["phase"], r["round"]), (0, "measure", 2))
 check("close-round wrote the archive",
       os.path.exists(os.path.join(b, "ROUND-1.md")), True)
+
+print()
+print("=" * 78)
+print("A ROUND CLOSES FROM FIX, AND ONLY WITH NOTHING OPEN")
+print("=" * 78)
+
+d, b = build(phase="measure", round_no=1)
+rc, out = run(b, "--close-round")
+check("close-round from measure refuses", (rc, phase_of(b)), (1, "measure"))
+
+d, b = build(phase="classify", round_no=1, class_docx=N, class_txt=N)
+rc, out = run(b, "--close-round")
+check("close-round from classify refuses", (rc, phase_of(b)), (1, "classify"))
+
+d, b = build(phase="fix", round_no=1, class_docx=N, class_txt=N)
+rc, out = run(b, "--close-round")
+check("close-round with an OPEN class refuses", (rc, phase_of(b)), (1, "fix"))
+
+d, b = build(phase="fix", round_no=1, class_docx=N, class_txt=N)
+# sab classes PARKED kar do
+for f in ("DEFECT-CLASSES.md", "DEFECT-CLASSES-TXT.md"):
+    p = os.path.join(b, f)
+    t = open(p, encoding="utf-8").read().replace("| 1 | 53_embedded_faces | 9 |", "| 1 | 53_embedded_faces | 9 |")
+    t = t.replace("OPEN", "PARKED")
+    open(p, "w", encoding="utf-8").write(t)
+rc, out = run(b, "--close-round")
+r = json.load(open(os.path.join(b, "ROUND.json")))
+check("close-round with everything parked works", (rc, r["phase"], r["round"]), (0, "measure", 2))
+
+d, b = build(phase="measure", round_no=1)
+for _ in range(3):
+    run(b, "--close-round")
+rc, out = run(b, "--apk-status")
+check("three close-rounds can no longer reach done", rc, 1)
+check("  and the phase is still measure", phase_of(b), "measure")
 
 print()
 print("=" * 78)
