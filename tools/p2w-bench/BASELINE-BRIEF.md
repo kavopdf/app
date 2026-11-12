@@ -134,7 +134,22 @@ STEP 1 - CORPUS AND BUILD
 
 STEP 2 - WHICH TEN
   Read tools/p2w-bench/BASELINE.md. Take the first 10 rows whose SCORE cell is empty.
-  If none are empty, go to STEP 6.
+
+  If some are empty, do STEP 3, then STEP 3b, then STEP 4 and STEP 5.
+
+  If NONE are empty, the word file is finished and you do not measure anything this run -
+  but check the text file before going to STEP 6:
+
+      python3 tools/p2w-bench/txt_gap.py --count
+
+  If that prints anything other than 0, go to STEP 3b and do the backfill, then STEP 4
+  and STEP 5, and STOP - do not go to STEP 6. The .docx half being complete does not make
+  the baseline complete: the two halves are measured by different tools and kept in
+  different stores, and a run that skipped the backfill because the word rows were full
+  would leave the text store short forever, because STEP 6 refuses to advance on a gap and
+  nothing would ever come back for it.
+
+  Only when the word rows are all full AND txt_gap.py prints 0 do you go to STEP 6.
 
 STEP 3 - ONE DOCUMENT AT A TIME, COMMITTING AFTER EACH
   For each of the 10:
@@ -243,7 +258,9 @@ STEP 6 - HAND OVER WHEN EVERYTHING IS MEASURED
   Both, in that order. A .docx table with 208 rows and a .txt store with 78 of them is not
   a finished baseline: the classifier reads the .docx half, and the .txt ratchet would have
   nothing to hold, so nothing after this would ever go back for the rest.
-  If some rows are still empty, or txt_gap.py does not print 0, do NOT advance.
+  If some rows are still empty, or txt_gap.py does not print 0, do NOT advance - go back
+  to STEP 3b and keep filling the text store. A run that reaches this step with a gap and
+  stops has done nothing, and the next run will find exactly the same gap.
   Commit ROUND.json. Output 'phase measure complete - classifier is next'.
 
 RULES
