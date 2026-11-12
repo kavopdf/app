@@ -27,6 +27,17 @@ STEP 0 - IS IT YOUR TURN? THEN PROVE YOU CAN WRITE TO THE REPOSITORY
 
       TZ=Asia/Kolkata date '+%d %b %H:%M'
 
+  ONE ROW PER DOCUMENT, AND ONE NAME IN IT. The row is
+
+      | <date> <HH:MM> | baseline | measured <name> <score>/<total> docx, <n>/5 txt |
+
+  where <name> is the single document that row is about - the one you just finished.
+  On 12 Nov a run wrote the names of every document still on its list into one row, so
+  the log said a document called "table-inside-two-column-page, table-of-contents-dot-
+  leaders, table-with-merged-cells, ..." had been measured at 46/59. The data was
+  correct; the row was not, and a row that names eight documents as one is worse than
+  no row, because it reads as a fact.
+
   Both parts matter. The sandbox clock is UTC, five and a half hours behind the times this
   file already carries, so a bare date writes a row that is wrong by more than the mistake
   this note exists to stop. And an estimated row writes a time the run never had: on 12 Nov
