@@ -468,3 +468,52 @@ and 402 KB, not zero and 2 bytes. Both stores were reset again and verified with
 
 Anyone resetting a store must verify with `--check` and look at the size, not at the
 "PASS - the bar held" line, which an empty store and a full one both print.
+
+---
+
+## 14. The three checks that were decoration, and the documents that make them evidence
+
+Section 12 found that 50_annotations, 51_form_fields and 52_outline each reported a source
+count of 0 on **all 208** documents. Not one of them could fail. A check that cannot fail is
+not a measurement, and a regression in how the engine handles annotations, form fields or
+bookmarks would have shipped unseen through all three rounds.
+
+Tightening their thresholds (section 13, 50% to 90%) fixed how much loss they tolerate. It
+could not make them run.
+
+### Three documents, added to the corpus
+
+Ordinary Indian paperwork that happens to carry the feature - not fixtures built to trip a
+check, and each one a document the tool should convert correctly anyway:
+
+| document | carries | exercises |
+|---|---|---|
+| `600_reviewed_invoice_with_annotations` | a GST invoice marked up by a reviewer: highlight, underline, strikeout, a sticky note, a free-text comment, a stamp — **6 annotations** | `50_annotations` |
+| `601_fillable_admission_form` | an admission form whose boxes are real fields: **11 AcroForm widgets** — text inputs, checkboxes, a combobox | `51_form_fields` |
+| `602_bookmarked_annual_report` | a three-page annual report with a **6-entry bookmark tree** | `52_outline` |
+
+They ship as a fourth corpus zip, `p2w-round2-additions.zip`, in the `corpus-v1` release.
+The brief downloads it as `c4.zip` and now expects **211** PDFs rather than 208.
+
+### Tested in both directions
+
+Each document against itself scores **59/59**, so none of them is a document the verifier
+would fail on its own account.
+
+Then the feature was removed and the pair compared:
+
+| pair | result | check |
+|---|---|---|
+| 600 with 6 annotations vs the same file stripped to 0 | **50/59 FAIL** | `50_annotations` fails |
+| 601 with 11 fields vs the same file stripped to 0 | **53/59 FAIL** | `51_form_fields` fails |
+| 602 with 6 bookmarks vs the same file with the tree cleared | **58/59 FAIL** | `52_outline` fails |
+
+All three now fire. A check that fails when the thing it measures is removed, and passes when
+the file is compared to itself, is the only kind worth having.
+
+### What this changes for the rounds
+
+Round 1 stays 208 - it is measured and archived. Round 2 will measure 211, so the three
+documents enter the pipeline there and their checks become live evidence from that point on.
+The classifier and the gates are data-driven and read the count from the stores, so nothing
+else needed changing.

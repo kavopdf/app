@@ -149,13 +149,18 @@ STEP 1 - CORPUS AND BUILD
   gh release download corpus-v1 --repo kavopdf/app --pattern pdf-to-word-test-corpus-v3.zip -O c1.zip
   gh release download corpus-v1 --repo kavopdf/app --pattern p2w-batch-1.zip -O c2.zip
   gh release download corpus-v1 --repo kavopdf/app --pattern p2w-all-groups.zip -O c3.zip
-  unzip -qo c1.zip -d t ; unzip -qo c2.zip -d t ; unzip -qo c3.zip -d t
+  gh release download corpus-v1 --repo kavopdf/app --pattern p2w-round2-additions.zip -O c4.zip
+  unzip -qo c1.zip -d t ; unzip -qo c2.zip -d t ; unzip -qo c3.zip -d t ; unzip -qo c4.zip -d t
   mkdir -p all out1 res gd restxt ; find t -name '*.pdf' -exec cp -n {} all/ \;
   Every directory the steps below write into is made here, in one line. restxt/ was
   missing from this line, so the .txt measurement wrote into a directory that did not
   exist and raised FileNotFoundError on every single document - the .txt half measured
   nothing for a day while the run still reported its ten.
-  Expect exactly 208 PDFs.
+  Expect exactly 211 PDFs. The last three arrived on 12 Nov for one reason: 50_annotations,
+  51_form_fields and 52_outline reported a source count of 0 on all 208 documents, so each
+  one short-circuited to pass every time and none of them was ever evidence. 600 carries six
+  annotations, 601 carries eleven form fields, 602 carries a six-entry bookmark tree. If the
+  count is not 211, the c4 line above did not run.
   bash tools/p2w-bench/build-engine.sh
   This one script fetches the libraries if they are missing, fetches a JDK if the image has
   none, and compiles the stubs, the engine and ConvertAll. Everything it needs is inside the
