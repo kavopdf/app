@@ -29,3 +29,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 10:05 | baseline | measured 78_mixed_english_devanagari_line 41/59 docx, 78_mixed_english_devanagari_line.txt     4/5 FAIL txt |
 | 12 Nov 10:06 | baseline | measured 79_inr_indian_digit_grouping_table 46/59 docx, 79_inr_indian_digit_grouping_table.txt   3/5 FAIL txt |
 | 12 Nov 10:06 | baseline | measured 80_gstin_pan_cin_ifsc_table 42/59 docx, 80_gstin_pan_cin_ifsc_table.txt          4/5 FAIL txt |
+| 12 Nov 10:07 | baseline | measured academic-paper-ieee-2col-abstract 46/59 docx, academic-paper-ieee-2col-abstract.txt    5/5 PASS txt |
