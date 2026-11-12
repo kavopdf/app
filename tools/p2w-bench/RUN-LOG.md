@@ -53,3 +53,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 12:05 | started | phase measure |
 | 12 Nov 12:10 | baseline | measured gst-invoice-3line-items 46/59 docx, gst-invoice-3line-items.txt 4/5 txt |
 | 12 Nov 12:11 | baseline | measured gst-invoice-horizontal-rules-only 42/59 docx, gst-invoice-horizontal-rules-only.txt 4/5 txt |
+| 12 Nov 12:12 | baseline | measured gst-invoice-multipage-item-table 45/59 docx, gst-invoice-multipage-item-table.txt 4/5 txt |
