@@ -159,7 +159,7 @@ as measured; only the verdict is closed.
 | 60_page_border | 32/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 09_font_names, 11_bold_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 35_rotation, 41_block_spacing, 45_char_accuracy, 47_margins, 53_embedded_faces, 55_orientation_mix, 56_rtl_runs, 59_shape_anchor | 2a68de6 | 12 Nov |
 | 61_two_col_abstract_spanning | 48/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 18_median_dy, 19_worst_dy, 20_within_10pt, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 12 Nov |
 | 62_two_col_newsletter_pull_quote | 41/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 07_table_rows, 12_italic_runs, 17_matched_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 44_header_footer, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 12 Nov |
-| 63_three_column_brochure |  |  |  |  |  |
+| 63_three_column_brochure | 43/59 | FAIL | 02_text_run_count, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 44_header_footer, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 12 Nov |
 | 64_newspaper_uneven_columns_ad_boxes |  |  |  |  |  |
 | 65_two_col_full_width_figure_caption |  |  |  |  |  |
 | 66_two_col_footnotes_bottom |  |  |  |  |  |
