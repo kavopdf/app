@@ -194,7 +194,7 @@ as measured; only the verdict is closed.
 | eway-bill | 47/59 | FAIL | 02_text_run_count, 10_font_sizes, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | form16-part-b | 50/59 | FAIL | 02_text_run_count, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins | 2a68de6 | 12 Nov |
 | gst-invoice-3line-items | 46/59 | FAIL | 02_text_run_count, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 42_alignment_mix, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
-| gst-invoice-horizontal-rules-only |  |  |  |  |  |
+| gst-invoice-horizontal-rules-only | 42/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 06_table_columns, 07_table_rows, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 45_char_accuracy, 47_margins | 2a68de6 | 12 Nov |
 | gst-invoice-multipage-item-table |  |  |  |  |  |
 | gst-invoice-with-qr-code |  |  |  |  |  |
 | insurance-policy-schedule |  |  |  |  |  |
