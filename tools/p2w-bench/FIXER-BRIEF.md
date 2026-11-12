@@ -348,10 +348,22 @@ STEP 8c - KEEP GOING UNTIL THE SLOT IS NEARLY SPENT  ** THIS IS WHAT MAKES THE D
       date +%s          # note this at the claim
       date +%s          # and here
 
-  If less than 35 minutes have passed since the claim, go back to STEP 2 and start another attempt.
-  Take the next OPEN class in the list rather than the same one again - the top class has just had
-  its try, and the queue is the ledger. If the class you just worked still has UNTESTED hypotheses
-  and is still the top class, it comes up first anyway.
+  Start another attempt only if FEWER THAN 25 MINUTES have passed since the claim. Take the next
+  OPEN class in the list rather than the same one again - the top class has just had its try, and
+  the queue is the ledger. If the class you just worked still has UNTESTED hypotheses and is still
+  the top class, it comes up first anyway.
+
+  Twenty-five, not thirty-five, because the check is made BEFORE an attempt starts and an attempt
+  can take twenty-five minutes when it needs calibration and twenty documents. Starting one at
+  minute 34 and having it run long would put the run past the 45-minute claim and the next run
+  would begin on top of it - two runs on the engine, each reverting the other. At 25 the worst
+  case lands exactly on the limit.
+
+  AND IF THE RUN ITSELF PASSES 40 MINUTES, ABANDON WHAT YOU ARE DOING:
+      git checkout -- app/src
+      python3 tools/p2w-bench/round.py --release-fixer
+      record the attempt as 'error', commit, stop.
+  An abandoned attempt costs one try. An overrun costs two runs' work and corrupts the store.
 
   Each attempt commits on its own, before the next one begins:
       hypothesis.py --add ... ; classify.py --attempt ... ; classify.py
@@ -359,9 +371,9 @@ STEP 8c - KEEP GOING UNTIL THE SLOT IS NEARLY SPENT  ** THIS IS WHAT MAKES THE D
   A run that does three attempts and dies before the fourth has still kept three. A run that keeps
   all three in its sandbox and dies has kept nothing.
 
-  At 35 minutes: stop. Do STEP 8b for the last attempt, then STEP 9 - release the slot and commit
-  through the gate. The slot goes stale at 45 minutes, so 35 is the ceiling: a run that works past
-  it would have its claim expire while it is still going, and the next run would start on top of it.
+  Do STEP 8b for the last attempt, then STEP 9 - release the slot and commit through the gate. The
+  slot goes stale at 45 minutes and that is the hard ceiling: a run that works past it would have
+  its claim expire while it is still going, and the next run would start on top of it.
 
   Three attempts per run is three times the day's work. Do not skip the commit between them to save
   time - that is how three attempts become zero.

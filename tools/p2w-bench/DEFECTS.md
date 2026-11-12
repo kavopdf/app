@@ -1449,3 +1449,62 @@ because it happened to be at the top of the list all evening.
 `One class per run` in the RULES section became `one class at a time`, because it now contradicts
 the step above it — and a brief that contradicts itself is how the next run picks whichever half
 it read last.
+
+---
+
+## 32. What changed between one attempt and three, and the risks that come with it
+
+### The difference
+
+| | before | after |
+|---|---|---|
+| attempts per run | 1 | up to 3 |
+| run length | 6–11 minutes | up to ~35 |
+| slot used | 12 of 45 | 25–35 of 45 |
+| idle per hour | 33 minutes | ~15 |
+| classes per run | 1 | up to 3 |
+| commits per run | 2 | up to 6 |
+| attempts per day | 24 | up to 72 |
+| which limit binds a class | `MAX_ATTEMPTS` 24 = one day | `MAX_HOURS` 24 first, because classes rotate |
+
+### The risks, named
+
+**1. Slot overrun — the real one, and the first version had it.**
+
+The first rule was "start another attempt if under 35 minutes have passed". The check happens
+*before* an attempt starts, and an attempt can take twenty-five minutes when it needs calibration
+and twenty documents. One started at minute 34 and running long would put the run past the
+45-minute claim — and the next run would begin on top of it, two runs editing the engine, each
+reverting the other's work.
+
+Changed to two rules that bound it from both ends:
+
+    start another only if FEWER THAN 25 MINUTES have passed     (25 + 25 = 45, the limit)
+    if the run itself passes 40 MINUTES, abandon and release    (a hard stop regardless)
+
+An abandoned attempt costs one try. An overrun costs two runs and corrupts the store.
+
+**2. Drive traffic roughly triples.** One attempt is about 80 calls (20 documents × ~4), so the
+pipeline goes from ~120 calls an hour to ~280. The baseline cron already ran at that rate without
+trouble, so this is a watch-item rather than a blocker — but it is the reason to keep an eye on
+the first few multi-attempt runs.
+
+**3. A run that stops after one attempt anyway.** No harm: it behaves exactly as before. The loop
+is an opportunity, not a requirement.
+
+**4. A class getting hammered.** If the top class keeps having untested hypotheses, attempts one
+to three all go to it. That is the intent — §30 made the follow-up binding — and it is bounded by
+`MAX_HOURS`, so a class cannot be hammered past its day.
+
+**5. Repo churn.** Up to six commits a run, 24 runs a day, so 100–150 commits daily. They are
+small and each one is a separate attempt's evidence, which is exactly what §23 wanted: a run that
+dies between attempts must leave the ones it finished.
+
+**6. Losing work mid-loop.** The reason the step says *commit, then look at the clock* — in that
+order. Three attempts held in a sandbox that dies is zero attempts kept.
+
+### What did not change
+
+The slot semantics, the commit gate, the ratchet, the attempt ledger, the hypothesis handoff, and
+the honesty rules are all exactly as they were. The change is how much work happens between
+claiming and releasing, and every attempt still passes the same gates an attempt passed before.
