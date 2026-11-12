@@ -1,7 +1,13 @@
 {
   "baseline_started": 0,
-  "history": [],
-  "phase": "measure",
+  "history": [
+    {
+      "at": "2026-11-12 09:46",
+      "phase": "measure",
+      "round": 1
+    }
+  ],
+  "phase": "classify",
   "round": 1,
   "rounds_total": 3,
   "started": 1794327166
