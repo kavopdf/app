@@ -99,6 +99,16 @@ OUTPUT IS A SMALL TABLE
     | Ratchet | held |
     | Engine | 2a68de6 |
 
+  Every number in that table is read from a command, not remembered:
+      python3 tools/p2w-bench/round.py                                        round, phase, scored
+      wc -l < tools/p2w-bench/RESULTS.jsonl                                   scored so far
+      python3 tools/p2w-bench/txt_gap.py --count                              backfill left
+      python3 tools/p2w-bench/ratchet.py            exit 0 held, exit 1 not   ratchet
+      git log -1 --format=%h -- app/src/main/java/com/kavopdf/app/engine/     engine
+  A report whose numbers cannot be reproduced from those commands is a guess wearing a
+  table, and it is worse than a short report because it reads as evidence. If a command
+  fails, the row says unknown - it is never filled in.
+
 WHEN SOMETHING FAILS
   Read tools/p2w-bench/RETRY.md before you retry anything. Classify the error first:
   transient (rate limit, 429, 5xx, timeout) clears and is worth waiting for;

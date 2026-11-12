@@ -305,6 +305,13 @@ OUTPUT IS A SMALL TABLE, AND IT NAMES WHAT DID NOT WORK
     | Commit gate | passed |
     | Engine | <new hash> |
 
+  'Numbers from' is a claim about provenance, so make it true: every figure above is copied
+  out of RESULTS.jsonl, RATCHET.json, ATTEMPTS.json or the calibration output that produced
+  it. Nothing is recalled and nothing is rounded into looking better. A number you did not
+  measure this run is labelled as not measured, not filled in - the ratchet and the commit
+  gate both read these files, so a report that disagrees with them is a report nobody can
+  act on.
+
 The 'Did NOT move' row is not optional. A report that lists only what worked is a
 summary, not a result.
 

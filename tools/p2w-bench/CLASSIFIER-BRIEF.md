@@ -57,6 +57,14 @@ OUTPUT IS A SMALL TABLE
     | Top class | 19_worst_dy (+3) · 126 docs |
     | Ratchet | held |
 
+  Every number in that table is copied from something that printed it, not remembered:
+      python3 tools/p2w-bench/round.py                round, phase, scored, open classes
+      wc -l < tools/p2w-bench/RESULTS.jsonl           documents measured
+      classify.py's own summary line                  checks firing, classes, top class
+      python3 tools/p2w-bench/ratchet.py              exit 0 held, exit 1 not
+  If classify.py did not print a number, the row says unknown. The ranking is the one thing
+  in this pipeline nobody can eyeball, so a made-up figure here is a made-up queue.
+
 WHEN SOMETHING FAILS
   Read tools/p2w-bench/RETRY.md before you retry anything. Classify the error first:
   transient (rate limit, 429, 5xx, timeout) clears and is worth waiting for;
