@@ -69,6 +69,18 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: Clamp variant measured 13 Nov 01:45 run: 362 53/59 with 44_header_footer newly failing; 316 55/59 with 59_shape_anchor newly failing; newsletter-3col 39/59 with 14_filled_shapes newly failing; 40_devanagari fully restored by the clamp (37/59, no newly failing). Untested: nobody has measured whether those three documents' page-flow crosses a band, e.g. by dumping the page count and the y of the flow after the table.
   recorded: 2026-11-13 01:49
 
+- CONFIRMED - The class's mass is not the table spacer: 187 of 208 documents fail 20_within_10pt, 70 of them with worst_dy over 100 pt and 56 with a page count that differs from the source, so the ~10.6 pt table-top correction can only ever reach the near-miss tail
+  evidence: RESULTS.jsonl, engine 2a68de6, 208 rows: 187 fail 20_within_10pt; render value buckets <50:133, 50-69:30, 70-79:2, 80-89:14, >=90:8; 70 rows have 19_worst_dy>100; 56 rows have 01_page_count render != source. Near-miss set (within_10pt>=80 and worst_dy<60) is only 16 rows. The spacer patch's own 20-document round moved 2 of 10 failing documents.
+  recorded: 2026-11-13 04:43
+
+- CONFIRMED - The 86 worst documents that keep the source's page count and score under 50% on 20_within_10pt are dominated by the 47_margins element at x=0, not by line pitch: 83 of the 86 also fail 47_margins and 84 fail 18_median_dy with a large negative constant offset
+  evidence: RESULTS.jsonl, engine 2a68de6: of 131 failing rows whose page count matches the source, 86 score <50 on 20_within_10pt; among those 86 the co-failing checks are 20_within_10pt 86, 18_median_dy 84, 47_margins 83, 19_worst_dy 80, 29_blank_where_ink_was 66, 22_reading_order 65. Median dy on the examples is a constant shift, not a drift: 304_package_insert_small_print -44.8, 23_timetable_grid_txtpos -30.6, 303_discharge_summary -19.4; 47_margins render x0 is 0 against source x0 28/56 on 23 and 303.
+  recorded: 2026-11-13 04:43
+
+- UNTESTED - Suppressing whitespace-only anchored text boxes in the emitter removes the x=0 element, so 47_margins stops reporting it and the class's 86 worst documents recover their left extent
+  evidence: Follows the CONFIRMED 13 Nov 03:48 entry for 47_margins: on 362_price_list_dense the only spans at x=0 are two single spaces, and on 316_contract_with_schedules three single spaces, while every real table span and the table frame match the source within 2 pt. The engine emits every paragraph as a wp:anchor at its page x (DocxWriter.java:26, anchor() at 3138), so a whitespace-only paragraph whose PDF x is 0 becomes a text block at x=0 that Google's export reports and the source PDF does not. Untested: no guard was built and no Google measurement was run.
+  recorded: 2026-11-13 04:43
+
 
 ## 47_margins
 
