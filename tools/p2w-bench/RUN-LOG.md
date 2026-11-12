@@ -67,3 +67,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 13:13 | baseline | measured magazine-2col-pullquote-spanning 36/59 docx, magazine-2col-pullquote-spanning.txt 4/5 txt |
 | 12 Nov 13:15 | baseline | measured marksheet-subject-left-marks-right 41/59 docx, marksheet-subject-left-marks-right.txt 4/5 txt |
 | 12 Nov 13:15 | baseline | measured marksheet-university-consolidated 49/59 docx, marksheet-university-consolidated.txt 4/5 txt |
+| 12 Nov 13:15 | baseline | measured mobile-bill 48/59 docx, mobile-bill.txt 4/5 txt |
