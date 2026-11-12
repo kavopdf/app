@@ -25,3 +25,10 @@ claim and after each step; it is not code and cannot break anything.
 | 12 Nov 18:52 | fixer | classify | 43 classes from 208 documents |
 | 12 Nov 18:52 | ? | commit-gate | started |
 | 12 Nov 19:46 | fixer | claim | fixer claimed the slot |
+| 12 Nov 19:46 | fixer | classify | 43 classes from 208 documents |
+| 12 Nov 19:46 | fixer | classify --txt | 4 classes from 208 documents |
+| 12 Nov 19:47 | fixer | build-engine | started |
+| 12 Nov 19:48 | fixer | build-engine | started |
+| 12 Nov 19:52 | fixer | hypothesis | 53_embedded_faces -> ruled-out |
+| 12 Nov 19:52 | ? | classify | 43 classes from 208 documents |
+| 12 Nov 19:52 | ? | classify | 43 classes from 208 documents |

@@ -9,7 +9,7 @@ be swallowed by a class it does not belong to.
 
 Documents measured: **208 of 208**
 
-Limits: one full day (24 hours) per class, 12 attempts inside it, and a class that
+Limits: one full day (24 hours) per class, 24 attempts inside it, and a class that
 improves but does not pass gets its day restarted - up to 3 times, after which it is
 parked as not converging. A parked class is skipped by the fixer and kept here with its reason.
 

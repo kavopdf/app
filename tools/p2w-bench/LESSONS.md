@@ -48,3 +48,11 @@ everything else: what went wrong in the work itself.
   `RATCHET.json` was `{}`, so `ratchet.py` printed *208 first marks* and PASS while eight of
   twenty documents had actually fallen, two of them by adding a page. Compare against
   `BASELINE.md` yourself before believing a green ratchet on a fresh round.
+
+- **Writing the family Google substitutes with does not make Google report it back.**
+  Mapping Liberation Serif/Mono to Times New Roman/Courier New (the "fix already known"
+  in DEFECTS.md) made 53_embedded_faces pass on 2 of 10 documents only; on the other 8
+  the export reported kept=0 of 1-8 source faces, including a doc that emitted nothing
+  but Courier New. The name we write is not the name that comes back, so check 53 has to
+  be calibrated against a docx we know Google renders in that family before the map is
+  extended again. Cost: one slot, 10 Drive round trips, engine reverted.
