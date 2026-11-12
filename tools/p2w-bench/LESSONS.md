@@ -87,3 +87,8 @@ everything else: what went wrong in the work itself.
   runs `ratchet.py` gets PASS on the unchanged baseline — it compares the baseline with itself. Write
   the attempt's rows into `BASELINE.md` first, then run it: on 13 Nov that turned a PASS into
   "REGRESSED: 4" on the same measurement. Cost: a green ratchet that had seen nothing.
+- **`classify.py --attempt` counts 'moved' against the PREVIOUS ENGINE, not the baseline.** An attempt that
+  only refines a patch the last run reverted scores 0 moved even when it beats the baseline on the same
+  documents (362 51->53, balance-sheet 40->44, and 40_devanagari restored to 37), because the row-by-row
+  comparison is new engine vs last engine. Read the baseline deltas from `res/*.json` against `RESULTS.jsonl`
+  and say in the report which comparison the number is; do not re-record a number the store refuses.

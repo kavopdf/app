@@ -61,6 +61,14 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: 362_price_list_dense on engine 2a68de6-dc3d644: 51/59 -> 53/59, 20_within_10pt FAIL->pass, and 44_header_footer newly failing. The score rose and the ratchet still rejected it. Any future spacer work on this class has to clear 44_header_footer and 59_shape_anchor as well as move 20_within_10pt.
   recorded: 2026-11-13 00:57
 
+- RULED OUT - Clamping the spacer to the gap the page's own baseline arithmetic gives (smaller of flow-model gap and (t.top - lastBaseline) - prevLine) removes the over-large spacers
+  evidence: Clamp + w:before emission, 5 documents through Drive on the patched engine, Google PDF export, 59 checks: 362_price_list_dense 51->53 (20_within_10pt and 18_median_dy now pass, but 44_header_footer newly fails), balance-sheet 40->44 (4 now pass, none newly fail), 40_devanagari 37->37 with NO newly failing check (the patch without the clamp had 37->36 via 30_ink_where_blank_was - the clamp fixed that one), newsletter-3col 40->39 (14_filled_shapes newly failing), 316 54->55 (59_shape_anchor newly failing). So the clamp removes 1 of the 4 regressions but not the other 3; the ratchet would still reject.
+  recorded: 2026-11-13 01:49
+
+- UNTESTED - The remaining regressions are not spacer height: 44_header_footer on 362, 59_shape_anchor on 316 and 14_filled_shapes on newsletter-3col are header/footer, shape-anchor and filled-shape checks, so the extra 10.6 pt the spacer now occupies moves a page's flow across a band those checks measure rather than placing the table wrongly
+  evidence: Clamp variant measured 13 Nov 01:45 run: 362 53/59 with 44_header_footer newly failing; 316 55/59 with 59_shape_anchor newly failing; newsletter-3col 39/59 with 14_filled_shapes newly failing; 40_devanagari fully restored by the clamp (37/59, no newly failing). Untested: nobody has measured whether those three documents' page-flow crosses a band, e.g. by dumping the page count and the y of the flow after the table.
+  recorded: 2026-11-13 01:49
+
 
 ## 53_embedded_faces
 
