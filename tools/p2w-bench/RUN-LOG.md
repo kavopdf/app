@@ -88,3 +88,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 14:17 | baseline | measured salary-slip-factory-wages 49/59 docx, 4/5 txt |
 | 12 Nov 14:18 | baseline | measured table-across-page-break-repeated-header 49/59 docx, 4/5 txt |
 | 12 Nov 14:19 | baseline | txt backfill: 10 more documents recorded (33_sans_nondefault_body, 340_bill_of_lading, 341_shipping_manifest, 342_packing_list, 343_air_waybill, 344_customs_declaration, 34_monospace_document, 350_question_paper, 351_omr_answer_sheet, 352_certificate_ornate_border), gap 69 -> 59 |
+| 12 Nov 14:19 | baseline | ratchet held (docx 200/208 scored, txt 141/208, backfill gap 59); measure gate NOT READY (8 rows unscored); slot released |
