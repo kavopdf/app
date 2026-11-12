@@ -33,3 +33,12 @@ claim and after each step; it is not code and cannot break anything.
 | 12 Nov 19:52 | ? | classify | 43 classes from 208 documents |
 | 12 Nov 19:52 | ? | classify | 43 classes from 208 documents |
 | 12 Nov 20:43 | fixer | claim | fixer claimed the slot |
+| 12 Nov 20:44 | fixer | build-engine | started |
+| 12 Nov 20:45 | fixer | classify | 43 classes from 208 documents |
+| 12 Nov 20:45 | fixer | classify --txt | 4 classes from 208 documents |
+| 12 Nov 20:49 | fixer | hypothesis | 20_within_10pt (+4) -> ruled-out |
+| 12 Nov 20:49 | fixer | hypothesis | 20_within_10pt (+4) -> untested |
+| 12 Nov 20:49 | fixer | attempt | 20_within_10pt (+4) -> error (OPEN) |
+| 12 Nov 20:49 | fixer | classify | 43 classes from 208 documents |
+| 12 Nov 20:49 | fixer | classify --txt | 4 classes from 208 documents |
+| 12 Nov 20:50 | ? | commit-gate | started |

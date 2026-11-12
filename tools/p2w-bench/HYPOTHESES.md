@@ -21,6 +21,14 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: electricity-bill and 362_price_list_dense are table/form documents; their body-flow lines are a minority, and both moved less than the body-only model predicts (6->6, 1->15)
   recorded: 2026-11-12 13:22
 
+- RULED OUT - The class's dominant table documents fail because the line pitch inside the cells (rowLineTw) is wrong
+  evidence: 362_price_list_dense converted with the current engine (2a68de6) and measured against Google's own export: 257 of 258 lines matched, dy = 2.6 pt on the page's first line, jumps to 13.6 pt at the table's first row and reaches only 16.7 pt at the page foot. That is one ~10 pt step at the table's top plus ~3 pt of drift over the whole 257-line table (0.012 pt/line), not a per-line pitch error inside the cells. Code: cells emit PdfToWord.Para through emitBlock -> para -> flowFromBox, the same method the reverted body-flow attempt already changed, so there is no separate cell pitch path to fix.
+  recorded: 2026-11-12 20:49
+
+- UNTESTED - The ~10 pt table-top offset is the empty spacer paragraph emitted before the table (362 emits w:before=0 w:line=276 exact before the first w:tbl); Google renders it taller than the gap the flow already charged
+  evidence: 362_price_list_dense document.xml: the subtitle paragraph is w:line=149 and the spacer before the table is w:line=276 (=13.8 pt asked); the PDF's gap between the subtitle baseline (y=47.1) and the table's first row (y=68.7) is 21.6 pt. Measured dy steps +9.8 pt exactly at the table's first row. Test: vary only the spacer's w:line and read the first row's dy.
+  recorded: 2026-11-12 20:49
+
 
 ## 53_embedded_faces
 

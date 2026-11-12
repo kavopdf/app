@@ -56,3 +56,9 @@ everything else: what went wrong in the work itself.
   but Courier New. The name we write is not the name that comes back, so check 53 has to
   be calibrated against a docx we know Google renders in that family before the map is
   extended again. Cost: one slot, 10 Drive round trips, engine reverted.
+
+- **A class's median and worst dy do not say WHERE the error starts.** `20_within_10pt` read as a
+  line-pitch bug on 203 documents; dumping per-line dy for one of them showed the whole page was
+  2.6 pt low and then took one 10 pt step at the top of a table. Two numbers per document cannot
+  tell a drift from a step — dump the per-line dy of one document before forming a theory.
+  Cost: two attempts spent on line-pitch models that the shape of the error did not support.
