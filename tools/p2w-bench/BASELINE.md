@@ -200,7 +200,7 @@ as measured; only the verdict is closed.
 | insurance-policy-schedule | 48/59 | FAIL | 02_text_run_count, 10_font_sizes, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | invoice-line-items-qty-rate-amount | 49/59 | FAIL | 02_text_run_count, 10_font_sizes, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | itr-computation-with-slab-table | 43/59 | FAIL | 01_page_count, 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 24_page_breaks, 29_blank_where_ink_was, 30_ink_where_blank_was, 45_char_accuracy, 47_margins, 55_orientation_mix | 2a68de6 | 12 Nov |
-| journal-2col-with-footnotes |  |  |  |  |  |
+| journal-2col-with-footnotes | 43/59 | FAIL | 02_text_run_count, 06_table_columns, 07_table_rows, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 37_super_subscript, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 12 Nov |
 | landscape-page-inside-portrait-document |  |  |  |  |  |
 | magazine-2col-pullquote-spanning |  |  |  |  |  |
 | marksheet-subject-left-marks-right |  |  |  |  |  |
