@@ -257,9 +257,22 @@ STEP 3b - THE .txt BACKFILL (round 1 only, and it ends)
   first run of round 2 and this step skips itself. Do not invent work for it.
 
       python3 tools/p2w-bench/txt_gap.py --count     # how many are still missing
-      python3 tools/p2w-bench/txt_gap.py --list 10   # the first ten, one per line
+      python3 tools/p2w-bench/txt_gap.py --list 60   # the first sixty, one per line
 
-  Take up to ten of them. For each:
+  Take ALL of them, up to sixty in one run. Do not stop at ten.
+
+  The .txt path is roughly five times cheaper than the .docx path - there is no Drive upload,
+  no Google Doc and no export, only ConvertAll and verify_txt, about six seconds a document
+  against thirty. Ten of them take a minute; the whole remaining gap is a few minutes of work.
+  Leaving it at ten spent six hours on six minutes of compute.
+
+  Do it in two passes, not one document at a time. Nothing here is committed per document -
+  the results go in one batch at the end - so a shell loop is safe and is the difference
+  between two commands and a hundred:
+      for n in <the list>; do cp all/$n.pdf one/; <ConvertAll> one out1; done
+      for n in <the list>; do python3 tools/p2w-bench/verify_txt.py all/$n.pdf \
+          out1/$n.txt --json restxt/$n.json; done
+
     a. Copy the PDF from all/ into one/ and run ConvertAll one out1 - the same command as
        STEP 3. It writes both outputs; this time only the .txt is used.
     b. python3 tools/p2w-bench/verify_txt.py all/<name>.pdf out1/<name>.txt --json restxt/<name>.json
