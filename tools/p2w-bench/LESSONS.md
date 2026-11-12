@@ -30,13 +30,10 @@ everything else: what went wrong in the work itself.
   Cost: two committed tools that proved nothing, and nobody noticed because nobody
   ran them from a fresh clone.
 
-- **A check that never fires is not evidence.** 26 of 58 checks fired on twelve
-  real documents; the rest had to be proven by value variation or targeted
-  mutation. A check that silently always passes hides the defect it was written
-  for.
-
-- **A median hides the defect.** A fix can raise the median and lower the worst
-  case. Read `19_worst_dy`, not only `18_median_dy`.
+- **Quantify the class's distribution before choosing a patch.** Eight attempts went to the
+  table spacer on a class of 187 documents whose render value was below 50 % on 133 of them and
+  above 100 pt off on 70: the spacer could only ever reach the 16 near-misses. Bucket the failing
+  rows by render value and by page count first, then pick the patch the biggest bucket needs.
 
 - **A class of 126 documents is rarely one cause.** Grouping on a check that fails
   on almost every document produces one unactionable blob. Use `--subclusters`.
