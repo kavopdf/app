@@ -18,11 +18,13 @@
     "status": "OPEN"
   },
   "47_margins": {
-    "attempts": 1,
+    "attempts": 3,
     "first_seen": 1794518680.890611,
-    "last": 1794518680.8906147,
+    "last": 1794521923.5603442,
     "outcomes": [
-      "error"
+      "error",
+      "error",
+      "reverted"
     ],
     "reason": "",
     "requeues": 0,

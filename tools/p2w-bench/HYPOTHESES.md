@@ -84,6 +84,18 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: 362_price_list_dense emits w:tblInd=600 (30 pt) and the source's page-1 x0 is 30; LibreOffice renders the same docx at x0=30.1, exactly right, while Google reports x0=0. No patch was built and nothing was measured on Google this run, so the fix is untested - the correlation above is markup plus the LibreOffice render, not a Google measurement.
   recorded: 2026-11-13 02:54
 
+- RULED OUT - Google drops w:tblInd when w:tblStyle is emitted after it in w:tblPr (CT_TblPrBase is a sequence, so an out-of-order child is discarded)
+  evidence: Patch moved w:tblStyle to the first child of w:tblPr in the emitter at DocxWriter:4202, rebuilt, converted 362 and 316, Google PDF export: 362 51/59 and 316 55/59 with 47_margins still render x0=0 - byte-for-byte the baseline checks. Then a purpose-built 5-variant probe docx (one page, pgMar 0, one 4000-twip table each) through Drive: V1 tblInd=600 alone text x=30.0; V2 tblStyle FIRST + tblInd=600 text x=30.0; V5 no tblInd x=0.0. Element order changes nothing; Google honours tblInd either way.
+  recorded: 2026-11-13 03:48
+
+- RULED OUT - Google does not honour w:tblInd the way LibreOffice does, so a table whose tblInd is ignored starts at the page edge
+  evidence: Same 5-variant probe through Drive, Google PDF export: V1 tblInd=600 -> text x=30.0 (exactly 600 twips = 30 pt); V5 same table with no tblInd -> x=0.0. Google honours it. V3 floating w:tblpPr tblpX=600 -> x=36.0 (also honoured, but placed out of flow at the page top); V4 tblInd=0 + cell paragraph w:ind left=600 -> x=30.0.
+  recorded: 2026-11-13 03:48
+
+- CONFIRMED - The x=0 element 47_margins reports is a whitespace-only span anchored at x=0; the table and drawing paths place their content correctly, so the check is reading invisible text as ink
+  evidence: 362_price_list_dense Google PDF: every table span starts at x=30.0, identical to the source's 30.0, and the frame/right edge is within 2 pt; the only spans at x=0 are two single spaces at y 52.9 and 302.6. 316_contract_with_schedules: table frame drawings at 78.0..519.0 vs source 77.6..517.6, and again the only x=0 spans are three single spaces (y 472.7, 560.7, 633.1). 413 and 310 have no such span and pass 47_margins. So on these two documents the class is a space-only paragraph emitted with positionH=0, not a lost table indent.
+  recorded: 2026-11-13 03:48
+
 
 ## 53_embedded_faces
 
