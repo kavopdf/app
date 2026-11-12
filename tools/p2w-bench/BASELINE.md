@@ -219,7 +219,7 @@ as measured; only the verdict is closed.
 | purchase-order | 44/59 | FAIL | 02_text_run_count, 06_table_columns, 07_table_rows, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | question-paper-marks-right-margin | 47/59 | FAIL | 02_text_run_count, 06_table_columns, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins | 2a68de6 | 12 Nov |
 | report-2col-table-spanning-both-columns | 48/59 | FAIL | 02_text_run_count, 07_table_rows, 09_font_names, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins | 2a68de6 | 12 Nov |
-| salary-slip-corporate |  |  |  |  |  |
+| salary-slip-corporate | 39/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 05_words_extra, 06_table_columns, 09_font_names, 10_font_sizes, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 43_within_10pt_x, 44_header_footer, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | salary-slip-factory-wages |  |  |  |  |  |
 | table-across-page-break-repeated-header |  |  |  |  |  |
 | table-inside-two-column-page |  |  |  |  |  |
