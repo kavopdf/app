@@ -225,7 +225,7 @@ as measured; only the verdict is closed.
 | table-inside-two-column-page | 48/59 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins | 2a68de6 | 12 Nov |
 | table-of-contents-dot-leaders | 46/59 | FAIL | 07_table_rows, 09_font_names, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 41_block_spacing, 47_margins | 2a68de6 | 12 Nov |
 | table-with-merged-cells | 51/59 | FAIL | 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
-| table-with-no-header-row |  |  |  |  |  |
+| table-with-no-header-row | 54/59 | FAIL | 09_font_names, 10_font_sizes, 18_median_dy, 22_reading_order, 47_margins | 2a68de6 | 12 Nov |
 | table-with-rotated-header |  |  |  |  |  |
 | text-held-twice-shadow-text |  |  |  |  |  |
 | two-tables-stacked-with-no-gap |  |  |  |  |  |
