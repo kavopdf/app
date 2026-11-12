@@ -999,3 +999,55 @@ The twenty `2a68de6-dirty` rows in RESULTS.jsonl cannot be attributed to either 
 have marked a reverted attempt as `improved` and bought it a requeue it did not earn. The class
 stays OPEN at zero attempts, gets a clean attempt next hour under a unique engine id, and records
 properly then. One duplicate attempt is cheaper than a wrong outcome.
+
+---
+
+## 24. One of the context changes cost quality, and it was the wrong one to make
+
+The user asked whether the token work had compromised anything. Most of it had not. One piece
+had, and it was the piece I had reasoned about least.
+
+### What is safe, checked rather than assumed
+
+**`RESULTS.jsonl` values trim.** Grepped every tool: `values` is read in exactly one place,
+`record.py --show`, which prints one document for a person. The classifier groups on `failed`,
+the ratchet compares `failed` and the score, the gates count documents, `compute_moved` reads
+`failed`. Dropping it from all but the last two engines loses nothing the pipeline uses.
+
+**`code.py`.** It replaces "read all 4,906 lines" with an outline, a method and its callers —
+and `--find` surfaced a comment at line 133 saying the idea had been tried on 7 November and
+reverted, which reading the file whole would have buried among four thousand other lines. The
+risk is under-reading, so the brief no longer says "widen **only** when the narrow read is not
+enough"; it says widen whenever the narrow read does not explain the behaviour, because the
+point is to read what you need, not to read as little as possible.
+
+**The brief's warnings.** They add 1 KB and remove a way to end a run by accident.
+
+### What was wrong
+
+`hypothesis.py` collapsed every entry past the eighth into a single line. The reasoning was
+that a class gets twenty-four attempts a day and the fixer reads its own section each time.
+
+Both halves of that were wrong:
+
+- **It was not needed.** Twenty-four attempts is seventy-two entries, about 29 KB, 7,250
+  tokens. The measured test read 93,420 bytes — 23,000 tokens — and finished in five minutes.
+  7,250 was never the problem.
+- **It cost quality.** The ledger exists so that attempt twenty does not repeat what attempt
+  two ruled out. Collapsing threw away the ruled-out theories — precisely the entries with the
+  most value per word — and kept the untested one-liners.
+
+The file now keeps every entry. The size is controlled in `show` instead: entries older than
+the last eight print as their first line, the recent ones print in full.
+
+    file:  12 entries, 1,582 bytes - nothing dropped
+    show:    981 bytes - 4 one-line summaries, then the last 8 with evidence
+
+So a reader still learns that a theory was tried and what it proved, without reading four
+hundred words of evidence for something settled an hour ago.
+
+### The lesson
+
+The two changes I reasoned about hardest — the trim and the code tool — were checked against
+every reader before landing. The one I reasoned about least, and described most confidently,
+was the one that took something away.

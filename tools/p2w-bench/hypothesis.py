@@ -72,32 +72,23 @@ def load():
 
 
 def _cap(sections):
-    """Keep the last few entries of each class in full and collapse the rest.
+    """Unused. Kept only so an old import cannot break; it no longer drops anything.
 
-    A fixer attempt records about three entries - one confirmed, one ruled out, one
-    untested - and it now runs twenty-four times a day. Left alone the file grows by
-    roughly 29 KB a day, and the fixer reads its own class section on every attempt, so
-    the cost compounds: by the end of a day it would be reading a class's entire history
-    to find the one entry that matters.
+    This used to collapse everything past the eighth entry into one line. That was wrong
+    on both counts. It was not needed - a full day of attempts is seventy-two entries and
+    7,250 tokens, and a measured run of a cron read 23,000 tokens of files without
+    difficulty - and it cost quality, because a theory ruled out on attempt two is exactly
+    what attempt twenty must not repeat, and the collapsed line threw it away.
 
-    The last eight are the ones that shape the next attempt. Everything before them is
-    history, and a single line saying how much is enough to know it exists.
+    The file keeps every entry. `show` is where the size is controlled: it prints the older
+    entries as one line each and the recent ones in full, so the reader still sees that a
+    theory was tried and what it proved, without reading four hundred words of evidence
+    for something already settled.
     """
-    for cls, entries in list(sections.items()):
-        if len(entries) <= KEEP_PER_CLASS:
-            continue
-        older = entries[:-KEEP_PER_CLASS]
-        kept = entries[-KEEP_PER_CLASS:]
-        summary = "- %d earlier entries collapsed on %s - the last %d are below" % (
-            len(older), time.strftime("%Y-%m-%d",
-                                      time.gmtime(time.time() + 5 * 3600 + 30 * 60)),
-            KEEP_PER_CLASS)
-        sections[cls] = [summary] + kept
     return sections
 
 
 def save(sections):
-    sections = _cap(sections)
     out = [HEADER]
     for cls in sorted(sections):
         out.append("## %s\n" % cls)
@@ -176,6 +167,21 @@ def show(cls, only_next=False):
         print("no hypotheses recorded for %r" % cls)
         print("nothing has been tried on this class yet - start with a calibration run")
         return 1
+    # Older entries print as one line each; the recent ones print in full.
+    #
+    # The file keeps everything, because a theory ruled out on attempt two is what attempt
+    # twenty must not repeat. But nobody needs the four-hundred-word evidence of something
+    # settled long ago - they need to know it was tried and what it proved. So the first
+    # line of each old entry is enough, and the last few keep their evidence.
+    if not only_next and len(entries) > KEEP_PER_CLASS:
+        older = entries[:-KEEP_PER_CLASS]
+        print("%d earlier entries for %r - first line of each, oldest first:" % (
+            len(older), cls))
+        for e in older:
+            print("  " + e.split("\n")[0])
+        print("\nThe last %d, in full:\n" % KEEP_PER_CLASS)
+        entries = entries[-KEEP_PER_CLASS:]
+
     if only_next:
         live = [e for e in entries if "UNTESTED" in e.split("\n")[0]]
         if live:

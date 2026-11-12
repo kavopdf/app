@@ -242,8 +242,10 @@ STEP 4 - UNDERSTAND IT - AND DO NOT RE-MEASURE WHAT IS ALREADY MEASURED
   reverted - the half of the answer the body does not contain.
 
   Follow the trail rather than reading the map whole: outline, then the method that fails,
-  then --callers for what feeds it. Widen with --file --lines only when the narrow read is
-  genuinely not enough, and record in HYPOTHESES.md what you found and where.
+  then --callers for what feeds it. Widen whenever the narrow read does not explain the
+  behaviour - the point is to read what you need, not to read as little as possible, and
+  --file --lines will give you any range in the file. Record in HYPOTHESES.md what you found
+  and where.
 
   Instrument it: dump the boxes, the line boxes, the OOXML you emit, and compare against what
   the PDF actually contains. Name ONE root cause.
