@@ -35,3 +35,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 10:08 | baseline | measured annual-review-2col-uneven-columns 45/59 docx, annual-review-2col-uneven-columns.txt    5/5 PASS txt |
 | 12 Nov 10:08 | baseline | measured balance-sheet-and-profit-loss 39/59 docx, balance-sheet-and-profit-loss.txt        4/5 FAIL txt |
 | 12 Nov 10:09 | baseline | txt backfill: 10 more documents recorded (21_form_labels_x60_values_x300_txtpos, 22_invoice_four_columns_txtpos, 23_timetable_grid_txtpos, 24_address_block_indents_txtpos, 25_signature_block_underscores_txtpos, 26_footnote_marker_bottom_note_txtpos, 27_two_column_left_short_txtpos, 28_value_overflows_cell_txtpos, 29_dot_leaders_txtpos, 301_lab_report_panel), gap 109 -> 99 |
+| 12 Nov 10:09 | baseline | ratchet held (docx 160/208 scored, txt 61/208, backfill gap 99); measure gate NOT READY (48 rows unscored); slot released |
