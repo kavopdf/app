@@ -709,16 +709,20 @@ documents through Drive, ratchet, revert, commit, release. The slot was then fre
 minutes of actual work each, is roughly 2.4 hours of work in a 24-hour day.
 
 The two-hour gap was not arbitrary. It was the number that made `MAX_ATTEMPTS = 12` span one
-full day: 12 runs × 2 hours = 24 hours. The day was the limit the user asked for, and the
-attempt count was chosen to fit inside it. So the gaps could not be closed without moving both.
+full day: 12 runs × 2 hours = 24 hours. The day was the limit the user asked for, and the attempt
+count was chosen to fit inside it. So the gaps could not be closed without moving both.
 
 ### What changed
 
 | | was | now | why |
 |---|---|---|---|
-| schedule | `40 */2 * * *` — 12/day | `10,40 * * * *` — 48/day | a slot every half hour, offset from the baseline at :00 and the classifier at :20 |
-| `MAX_ATTEMPTS` | 12 | **48** | one per slot, so the day is still the limit: 48 × 30 min = 24 h |
-| slot stale | 100 min | **45 min** | above the longest run, below the two-slot gap |
+| schedule | `40 */2 * * *` — 12/day | `40 * * * *` — **24/day** | hourly, still offset from the baseline at :00 and the classifier at :20 |
+| `MAX_ATTEMPTS` | 12 | **24** | one per slot, so the day is still the limit: 24 × 1 h = 24 h |
+| slot stale | 100 min | **45 min** | above the longest run, below the one-hour gap |
+
+Half-hourly was the first choice and the platform refused it: the minimum interval is 3600
+seconds. Hourly is therefore the fastest this cron can fire, and 24 tries a day is the most a
+day can hold.
 
 The stale limit matters more than it looks. A run that finishes releases its own slot, so the
 number only governs a run that died — but if it is shorter than a live run, the next slot starts
@@ -728,10 +732,10 @@ a crash costs one slot and a live run is never doubled.
 
 ### What this costs
 
-A class that will not converge now burns 48 attempts instead of 12 before it is parked — the
-same 24 hours, four times the tries. That is the intent: the machine was idle and the tries are
-free. Drive traffic roughly doubles, to about 140 calls an hour, which is the rate the baseline
-already ran at without trouble.
+A class that will not converge now burns 24 attempts instead of 12 before it is parked — the same
+24 hours, twice the tries. That is the intent: the machine was idle and the tries are free.
+Drive traffic roughly doubles to about 140 calls an hour, the rate the baseline already ran at
+without trouble.
 
 The brief's own text said "one attempt takes about two hours" and "the claim expires after 100
 minutes". Both were wrong — the attempt takes twelve to twenty-five minutes — and are corrected

@@ -22,7 +22,7 @@ STEP 0 - IS IT YOUR TURN, AND IS ANYONE ELSE STILL WORKING?
   PHASE=$(python3 tools/p2w-bench/round.py --phase)
   If PHASE is not 'fix', output exactly 'not my turn - phase is <PHASE>' and STOP.
 
-  THEN CLAIM THE SLOT. This cron runs every half hour and one attempt takes twelve to twenty-five
+  THEN CLAIM THE SLOT. This cron runs every hour and one attempt takes twelve to twenty-five
   minutes,
   so an overrun would put two runs in the same phase at once - both editing the engine, both
   committing, one overwriting the other, and no error message anywhere.
@@ -166,8 +166,8 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   Output 'round <n> closed'. Then STOP - do not start a fix.
 
   THE LIMITS - this is what stops a loop:
-    one problem type gets ONE FULL DAY (24 hours) and at most 48 attempts inside it - one per
-    half-hour slot. The day is the limit; the number of tries follows the schedule.
+    one problem type gets ONE FULL DAY (24 hours) and at most 24 attempts inside it - one per
+    hourly slot. The day is the limit; the number of tries follows the schedule.
     A class that IMPROVES but does not pass gets its day restarted, up to 3 times.
     Absolute maximum for one class: 4 days, 48 attempts, then parked permanently.
 
@@ -344,7 +344,7 @@ RULES
   Read LESSONS.md before forming a theory, and TOOLBOX.md before calling any tool.
   Claim the slot before working, release it before finishing - even on failure.
   Read the hypothesis ledger BEFORE forming a theory, and write to it before finishing.
-  One day per class, up to forty-eight tries inside it, progress buys up to three more days.
+  One day per class, up to twenty-four tries inside it, progress buys up to three more days.
   Never attempt a PARKED class. Always record the attempt, with numbers, honestly.
   Read the recorded numbers before measuring again.
   Calibrate before you conclude. Measure before you claim. The gate before you commit.
