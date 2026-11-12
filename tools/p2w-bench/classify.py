@@ -59,7 +59,11 @@ JACCARD = 0.55        # how alike two checks must be to count as one cause
 UNIVERSAL = 0.90      # a check failing on this share of documents cannot discriminate
 MAX_CLASS_CHECKS = 6  # a class bigger than this names no single cause
 
-CHECK_RE = re.compile(r"^(?:\d{2}[a-c]?|t\d{2})_[a-z_]+$")
+# The suffix carries digits: 20_within_10pt and 43_within_10pt_x are real checks, and
+# [a-z_]+ dropped both on the floor. 20_within_10pt fails on 91% of the corpus - the
+# second largest defect there is - and the classifier never saw it, so it never became
+# a class and the fixer was never pointed at it.
+CHECK_RE = re.compile(r"^(?:\d{2}[a-c]?|t\d{2})_[a-z0-9_]+$")
 
 
 RESULTS_TXT = os.path.join(HERE, "RESULTS-TXT.jsonl")
@@ -137,13 +141,21 @@ def save_ledger(led):
     json.dump(led, open(LEDGER, "w", encoding="utf-8"), indent=2, sort_keys=True)
 
 
-def split_oversized(groups, doc_sets):
+def split_oversized(groups, doc_sets, unsplittable=None):
     """A class of seventeen checks names no single cause.
 
     When most documents fail most checks, everything co-occurs and the threshold
     merges the corpus into one unactionable blob. So any group too large to name
     a cause is re-clustered on its own at a stricter threshold, repeatedly, until
     the parts are small enough to be worth attacking one at a time.
+
+    A threshold cannot separate checks that fail on exactly the same documents, and
+    that case used to leave an oversized class in place without a word - the invariant
+    this function exists to keep, quietly broken. It is not a bad split when it
+    happens: identical document sets mean one cause with several symptoms, which is
+    one engine change, not several. So the class stays whole and the caller is told,
+    because a class of eight that could not be split for a reason is a different
+    thing from a class of eight nobody looked at.
     """
     out = []
     for g in groups:
@@ -157,11 +169,13 @@ def split_oversized(groups, doc_sets):
             parts = cluster({c: doc_sets[c] for c in g}, threshold)
             if max(len(p) for p in parts) <= MAX_CLASS_CHECKS:
                 break
+        if unsplittable is not None and max(len(p) for p in parts) > MAX_CLASS_CHECKS:
+            unsplittable.append(len(g))
         out.extend(parts)
     return out
 
 
-def build_groups(doc_sets, measured_count):
+def build_groups(doc_sets, measured_count, unsplittable=None):
     """The one grouping both classify and subclusters use."""
     total = measured_count or 1
     universal = {c for c, ds in doc_sets.items()
@@ -169,7 +183,7 @@ def build_groups(doc_sets, measured_count):
     groups = []
     rest = {c: ds for c, ds in doc_sets.items() if c not in universal}
     if rest:
-        groups.extend(split_oversized(cluster(rest), doc_sets))
+        groups.extend(split_oversized(cluster(rest), doc_sets, unsplittable))
     groups.extend([[c] for c in sorted(universal)])
     return groups
 
@@ -398,7 +412,8 @@ def main(argv):
     # against every other universal check is near 1.0, so merging on it produced
     # a class of 21 checks covering all 20 documents, which no fixer can act on.
     # Universal checks become their own classes; the rest cluster among themselves.
-    groups = build_groups(doc_sets, len(measured)) if doc_sets else []
+    unsplittable = []
+    groups = build_groups(doc_sets, len(measured), unsplittable) if doc_sets else []
     led = load_ledger()
     now = time.time()
 
@@ -492,6 +507,11 @@ def main(argv):
     print("documents measured : %d" % len(measured))
     print("checks firing      : %d" % len(doc_sets))
     print("classes (data-driven): %d" % len(classes))
+    for _n in unsplittable:
+        print("note: a class of %d checks could not be split below %d - its checks fail"
+              % (_n, MAX_CLASS_CHECKS))
+        print("      on exactly the same documents, so there is nothing to split on.")
+        print("      Treat it as one cause with %d symptoms, not %d causes." % (_n, _n))
     for c in classes[:10]:
         print("  %-34s %3d docs  %s" % (c["name"][:34], len(c["docs"]), c["status"]))
     return 0

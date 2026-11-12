@@ -271,3 +271,53 @@ While writing the test for 10.2 I found a third thing: the guard matched `OPEN` 
 never fires. It now matches the cell wherever it sits, and the test fixture uses the real
 eight-column shape so a format change shows up in the test rather than in a round that
 closed with work still open.
+
+---
+
+## 11. Two classifier bugs — the checks it could not see, and the split it could not make — 12 Nov
+
+Found by auditing the classifier on the user's instruction, before trusting a single
+number it produces.
+
+### 11.1 The pattern that hid two checks, one of them the second largest defect
+
+`CHECK_RE` ended in `[a-z_]+`. Two real check ids carry digits in the suffix:
+`20_within_10pt` and `43_within_10pt_x`. Both were dropped while parsing BASELINE.md,
+silently. `20_within_10pt` fails on 182 of 200 documents — 91%, the second largest defect
+in the corpus — and it never became a class, so the fixer was never pointed at it.
+
+Measured: the classifier reported 50 checks firing. The stores hold 52. After the fix it
+reports 52, and `20_within_10pt` appears at rank 3 with 182 documents.
+
+The regression test reads `verify_google.all_check_ids()` and `verify_txt.all_check_ids()`
+directly and asserts every emitted id matches the pattern. A check added tomorrow fails
+that test unless the pattern accepts it, which is the failure that was missing.
+
+### 11.2 The split that gave up without saying so
+
+`split_oversized` re-clusters an oversized class at a stricter threshold until the parts
+fit under `MAX_CLASS_CHECKS`. A threshold cannot separate checks that fail on exactly the
+same documents — their Jaccard is 1.0 at any threshold — so the loop reached 0.95, left the
+class oversized, and `out.extend(parts)` added it anyway. The invariant the function exists
+to keep was broken in silence.
+
+Tested: eight checks on the same 70 of 100 documents produced one class of eight against a
+limit of six, with nothing printed.
+
+The class stays whole, because identical document sets mean one cause with several symptoms
+and cutting it at six would be arbitrary. What changed is that it is now said out loud:
+"a class of 8 checks could not be split below 6 — its checks fail on exactly the same
+documents... Treat it as one cause with 8 symptoms, not 8 causes."
+
+### 11.3 What the audit found sound
+
+| item | result |
+|---|---|
+| chaining in the real data | none — worst multi-check class has min Jaccard 0.81 |
+| universal filter | correct — 2 checks at 90%+, each its own class |
+| naming | after the check touching the most documents, as documented |
+| ranking | by union size, largest first |
+| ledger limits | PARKED at 24h or 12 attempts, as specified |
+| class size distribution | 41 singletons, 4 pairs, 1 triple — the checks genuinely differ |
+
+`classify_test.py` is new: 13 cases covering all of the above.
