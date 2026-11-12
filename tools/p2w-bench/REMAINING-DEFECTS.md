@@ -4978,6 +4978,55 @@ patches that produced it were integrated by hand and the gate alone cannot see p
 
 ## Class 20_within_10pt — OPEN, reopened 10 Nov; model measured, fix attempted and reverted
 
+### Attempt 12 Nov — the advance mechanism measured, body-only conversion reverted
+
+The 10 Nov reading was re-measured from scratch with three probes that differ only in how one
+12 pt advance is written, and it holds exactly:
+
+| probe | written | advance measured |
+|---|---|---|
+| A | `w:line=240` exact, `w:before=0` | **11.5 pt** (asked 12) |
+| B | `w:line=14`, `w:before=226` | **11.99 pt** |
+| C | `w:line=1`, `w:before=239` | 12.64 pt |
+
+So the advance is `w:before + 0.069 em`, face-independent, and `w:line` is a multiple of the
+substitute face's line height. A body line written the way the engine writes it today loses 4 %
+of its pitch on every line, which is the drift: the flow creeps up the page and the deeper the
+page, the further it has gone.
+
+`DocxWriter.googleBox()` was added and applied to the two page-body emitters (`flowFromBox`,
+`flowRow`) only, leaving the internal `before + line` accounting, the page-fit guard, the table
+edge and the cell path untouched. Twenty documents went through Drive.
+
+| document | `20_within_10pt` before | after | score |
+|---|---|---|---|
+| 62_two_col_newsletter_pull_quote | 7 | **100** | 41/59 |
+| balance-sheet-and-profit-loss | 7 | **53** | 38/59 (was 39) |
+| 362_price_list_dense | 1 | **15** | 51/59 (was 50) |
+| 390_wide_data_appendix | 1 | 1 | 49/59 |
+| electricity-bill | 6 | 6 | 45/59 |
+| 57_centred_title_page_left_body_pages | 0 | 0 | 47/59 (was 48) |
+| 311_fir_police_form | 3 | 7 | 45/59 (was 47) |
+| 332_bom_on_drawing | 4 | 4 | 46/59 (was 48) |
+| report-2col-table-spanning-both-columns | 4 | 7 | 47/59 (was 48) |
+| 70_magazine_drop_cap_photo_caption | 4 | 4 | 46/59 (was 46) |
+| 305_vaccination_certificate | 100 | 46 | 35/59 (was 36) |
+| 325_demat_holdings_statement | 99 | 100 | 47/59 (was 51) |
+| 15_stamp_on_scanned_page | 0 | 0 | 40/59 (was 42) |
+| the eight remaining control documents | 100 | 100 | unchanged |
+
+`classify.py --attempt` computed **3 of 18 moved (17 %) -> reverted**. Eight of the twenty scored
+lower than baseline: the flow is placed 0.2 em lower than the model believes on every line, which
+put 311 and 332 onto a second page (`01_page_count`, `24_page_breaks`, `55_orientation_mix`) and
+cost `27_text_off_page`, `39_image_position`, `44_header_footer` elsewhere. The engine change was
+reverted with `git checkout -- app/src`.
+
+**What this rules out:** converting the page-body flow alone. The three documents that moved are
+the three whose lines are body text; `electricity-bill` and `362_price_list_dense` are table
+documents and barely moved, because their lines are `rowLineTw` cell paragraphs this change never
+reached. **What is still untested:** the same hairline-plus-`w:before` model in the cell path,
+together with a correction for the 0.2 em the box gives back when it becomes a hairline.
+
 The largest open class in `BASELINE.md`: **107 of the 208 measured documents fail
 `20_within_10pt`**. The 10 Nov closure of this class ("Google Docs has no exact line spacing") was
 wrong and is withdrawn: Google Docs does have exact line spacing, it just does not read

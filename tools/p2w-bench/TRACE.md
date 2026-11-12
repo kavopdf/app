@@ -7,3 +7,20 @@ claim and after each step; it is not code and cannot break anything.
 | time | run | tool | what happened |
 |---|---|---|---|
 | 12 Nov 18:41 | fixer | claim | fixer claimed the slot |
+| 12 Nov 18:42 | fixer | build-engine | started |
+| 12 Nov 18:43 | fixer | classify | 43 classes from 208 documents |
+| 12 Nov 18:43 | fixer | classify --txt | 4 classes from 208 documents |
+| 12 Nov 18:46 | fixer | build-engine | started |
+| 12 Nov 18:46 | fixer | build-engine | started |
+| 12 Nov 18:47 | fixer | build-engine | started |
+| 12 Nov 18:52 | fixer | ratchet | held or rose |
+| 12 Nov 18:52 | fixer | ratchet --txt | held or rose |
+| 12 Nov 18:52 | fixer | hypothesis | 20_within_10pt (+4) -> confirmed |
+| 12 Nov 18:52 | fixer | hypothesis | 20_within_10pt (+4) -> ruled-out |
+| 12 Nov 18:52 | fixer | hypothesis | 20_within_10pt (+4) -> untested |
+| 12 Nov 18:52 | fixer | classify | 43 classes from 208 documents |
+| 12 Nov 18:52 | fixer | ratchet | held or rose |
+| 12 Nov 18:52 | fixer | ratchet --txt | held or rose |
+| 12 Nov 18:52 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
+| 12 Nov 18:52 | fixer | classify | 43 classes from 208 documents |
+| 12 Nov 18:52 | ? | commit-gate | started |

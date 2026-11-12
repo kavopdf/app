@@ -43,3 +43,8 @@ everything else: what went wrong in the work itself.
 
 - **A number in a report that is not in a file is a guess.** Every figure comes
   from `RESULTS.jsonl` or `BASELINE.md`, or it does not go in the report.
+
+- **The ratchet cannot see a regression in a round whose marks were never taken.**
+  `RATCHET.json` was `{}`, so `ratchet.py` printed *208 first marks* and PASS while eight of
+  twenty documents had actually fallen, two of them by adding a page. Compare against
+  `BASELINE.md` yourself before believing a green ratchet on a fresh round.

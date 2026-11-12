@@ -102,3 +102,6 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 15:16 | baseline | ratchet held (docx 208/208 scored, txt 208/208, backfill gap 0); measure gate READY; slot released |
 | 12 Nov 15:16 | baseline | phase measure complete - advanced to classify |
 | 12 Nov 18:41 | fixer | slot claimed - fixer running |
+| 12 Nov 18:52 | fixer | round 1: class 20_within_10pt (+4), 3 probes through Drive confirmed the advance model (240 twips -> 11.5 pt, hairline+226 -> 11.99 pt) |
+| 12 Nov 19:21 | fixer | 20 documents through Drive: 3 of 18 moved (62 7->100, balance-sheet 7->53, price-list 1->15), 8 of 20 below baseline; attempt recorded reverted, engine reverted |
+| 12 Nov 19:24 | fixer | slot released; class left OPEN with 1 attempt |
