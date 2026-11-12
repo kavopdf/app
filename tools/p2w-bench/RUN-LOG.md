@@ -12,3 +12,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 |---|---|---|
 | 12 Nov probe | probe | commit test |
 | 12 Nov 07:25 | size-probe | testing a 796 KB commit payload |
+| 12 Nov 08:02 | baseline | started | phase measure |
