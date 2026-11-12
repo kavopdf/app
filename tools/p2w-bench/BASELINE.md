@@ -217,7 +217,7 @@ as measured; only the verdict is closed.
 | product-catalogue-code-left-price-right | 44/59 | FAIL | 07_table_rows, 09_font_names, 10_font_sizes, 11_bold_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 32_stroke_lines, 34c_span_weight_match, 36_underline_rules, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 12 Nov |
 | property-tax-receipt | 47/59 | FAIL | 03_word_count, 04_words_missing, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 35_rotation, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | purchase-order | 44/59 | FAIL | 02_text_run_count, 06_table_columns, 07_table_rows, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
-| question-paper-marks-right-margin |  |  |  |  |  |
+| question-paper-marks-right-margin | 47/59 | FAIL | 02_text_run_count, 06_table_columns, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins | 2a68de6 | 12 Nov |
 | report-2col-table-spanning-both-columns |  |  |  |  |  |
 | salary-slip-corporate |  |  |  |  |  |
 | salary-slip-factory-wages |  |  |  |  |  |

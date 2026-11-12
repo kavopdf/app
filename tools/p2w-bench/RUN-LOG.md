@@ -82,3 +82,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 14:14 | baseline | measured product-catalogue-code-left-price-right 44/59 docx, 5/5 txt |
 | 12 Nov 14:14 | baseline | measured property-tax-receipt 47/59 docx, 4/5 txt |
 | 12 Nov 14:15 | baseline | measured purchase-order 44/59 docx, 4/5 txt |
+| 12 Nov 14:15 | baseline | measured question-paper-marks-right-margin 47/59 docx, 4/5 txt |
