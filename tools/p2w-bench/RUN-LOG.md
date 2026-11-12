@@ -55,3 +55,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 12:11 | baseline | measured gst-invoice-horizontal-rules-only 42/59 docx, gst-invoice-horizontal-rules-only.txt 4/5 txt |
 | 12 Nov 12:12 | baseline | measured gst-invoice-multipage-item-table 45/59 docx, gst-invoice-multipage-item-table.txt 4/5 txt |
 | 12 Nov 12:12 | baseline | measured gst-invoice-with-qr-code 43/59 docx, gst-invoice-with-qr-code.txt 4/5 txt |
+| 12 Nov 12:13 | baseline | measured insurance-policy-schedule 48/59 docx, insurance-policy-schedule.txt 4/5 txt |
