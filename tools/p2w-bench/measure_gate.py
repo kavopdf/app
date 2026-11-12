@@ -61,6 +61,36 @@ def rows():
     return out
 
 
+def duplicates(names):
+    """Names that appear more than once, each listed once."""
+    seen, dups = set(), set()
+    for n in names:
+        if n in seen:
+            dups.add(n)
+        seen.add(n)
+    return sorted(dups)
+
+
+def store_rows():
+    """Every row of RESULTS.jsonl as a dict."""
+    out = []
+    store = os.path.join(HERE, "RESULTS.jsonl")
+    if not os.path.exists(store):
+        return out
+    with open(store, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+            except ValueError:
+                continue
+            if row.get("doc"):
+                out.append(row)
+    return out
+
+
 def store_docs():
     """Distinct documents in RESULTS.jsonl.
 
@@ -94,10 +124,19 @@ def state():
     unscored = [d for d, ok in all_rows if not ok]
     # A document exempted for the word half is allowed to stay unscored.
     blocked_docx = [d for d in unscored if d not in ex["docx"]]
+    stored_rows = store_rows()
+    stored_set = {r["doc"] for r in stored_rows}
+    scored_set = set(scored)
+
     return {
         "total": len(all_rows),
         "scored": len(scored),
-        "stored": len(store_docs()),
+        "stored": len(stored_set),
+        "dup_table": duplicates([d for d, _ in all_rows]),
+        "dup_store": duplicates(["%s|%s|%s" % (r.get("round"), r.get("engine"), r["doc"])
+                                 for r in stored_rows]),
+        "in_table_not_store": sorted(scored_set - stored_set),
+        "in_store_not_table": sorted(stored_set - scored_set),
         "exempt_docx": len(ex["docx"]),
         "exempt_txt": len(ex["txt"]),
         "blocked_docx": blocked_docx,
@@ -177,10 +216,16 @@ def main(argv):
     # the text half was added after 130 documents had already been measured.
     #
     # The number is still printed: a text row that went missing should be visible.
-    # The table and the store must agree. scored == stored in a healthy run; a difference
-    # means a row is scored that has no store line, or a store line exists for a row the
-    # table does not show - either way the corpus is not what it claims to be.
-    consistent = s["scored"] == s["stored"]
+    # The table and the store must describe the same SET of documents, not merely the same
+    # number of them. Counting alone misses the worst case: one document listed twice and
+    # another missing gives 208 rows against a store of 208, and the counts agree while the
+    # table no longer covers one of the documents. Duplicates are checked separately so the
+    # reason is named rather than inferred from a difference.
+    consistent = (s["scored"] == s["stored"]
+                  and not s["in_table_not_store"]
+                  and not s["in_store_not_table"]
+                  and not s["dup_table"]
+                  and not s["dup_store"])
 
     ok = ((not s["blocked_docx"]) and backfill == 0 and consistent
           and backfill is not None)
@@ -189,10 +234,19 @@ def main(argv):
         print("docx   %d/%d scored, %d exempt, %d still blocking, %d in the store"
               % (s["scored"], s["total"], s["exempt_docx"], len(s["blocked_docx"]),
                  s["stored"]))
-        if s["scored"] != s["stored"]:
-            print("       table and store disagree: %d scored, %d stored - the corpus is not"
-                  % (s["scored"], s["stored"]))
-            print("       what it claims. Re-run the rows that are missing from the store.")
+        if s["dup_table"]:
+            print("       BASELINE.md lists %d document(s) more than once: %s"
+                  % (len(s["dup_table"]), ", ".join(s["dup_table"][:5])))
+        if s["dup_store"]:
+            print("       RESULTS.jsonl holds %d duplicate row(s) for the same round and"
+                  % len(s["dup_store"]))
+            print("       engine: %s" % ", ".join(s["dup_store"][:5]))
+        if s["in_table_not_store"]:
+            print("       scored in BASELINE.md but absent from the store: %s"
+                  % ", ".join(s["in_table_not_store"][:5]))
+        if s["in_store_not_table"]:
+            print("       in the store but not scored in BASELINE.md: %s"
+                  % ", ".join(s["in_store_not_table"][:5]))
         if s["blocked_docx"][:5]:
             print("       blocking: %s" % ", ".join(s["blocked_docx"][:5]))
         if backfill is None:

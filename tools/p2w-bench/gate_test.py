@@ -19,7 +19,8 @@ PASS, FAIL = [], []
 def build(phase="measure", round_no=1,
           scored=N, stored=N, txt=N,
           class_docx=None, class_txt=None,
-          exempt_docx=None):
+          exempt_docx=None, dup_table=None, dup_store=None,
+          drop_table_row=None):
     d = tempfile.mkdtemp()
     b = os.path.join(d, "tools", "p2w-bench")
     os.makedirs(b)
@@ -31,12 +32,19 @@ def build(phase="measure", round_no=1,
         f.write("| document | score | engine | failed |\n|---|---|---|---|\n")
         for i in range(N):
             name = "doc%03d" % i
+            if drop_table_row is not None and i == drop_table_row:
+                continue
             f.write("| %s | %s | 2a68de6 |  |\n" % (name, "59/59" if i < scored else ""))
+        if dup_table is not None:
+            f.write("| %s | 59/59 | 2a68de6 |  |\n" % dup_table)
 
     # stores
     with open(os.path.join(b, "RESULTS.jsonl"), "w", encoding="utf-8") as f:
         for i in range(stored):
             f.write(json.dumps({"round": 1, "engine": "2a68de6", "doc": "doc%03d" % i,
+                                "score": 59, "total": 59, "failed": [], "values": {}}) + "\n")
+        if dup_store is not None:
+            f.write(json.dumps({"round": 1, "engine": "2a68de6", "doc": dup_store,
                                 "score": 59, "total": 59, "failed": [], "values": {}}) + "\n")
     with open(os.path.join(b, "RESULTS-TXT.jsonl"), "w", encoding="utf-8") as f:
         for i in range(txt):
@@ -107,6 +115,29 @@ check("measure complete advances", (rc, phase_of(b)), (0, "classify"))
 d, b = build(scored=N - 1, stored=N - 1, txt=N, exempt_docx=["doc207"])
 rc, out = run(b, "--advance")
 check("an exempted row still lets it advance", (rc, phase_of(b)), (0, "classify"))
+
+print()
+print("=" * 78)
+print("NO DUPLICATES — baseline only, enforced by the measure gate")
+print("=" * 78)
+
+d, b = build(scored=N, stored=N, txt=N, dup_table="doc000")
+rc, out = run(b, "--advance")
+check("a document listed twice in BASELINE.md refuses", (rc, phase_of(b)), (1, "measure"))
+check("  and it is named", "doc000" in out, True)
+
+d, b = build(scored=N, stored=N, txt=N, dup_store="doc000")
+rc, out = run(b, "--advance")
+check("a duplicate store row refuses", (rc, phase_of(b)), (1, "measure"))
+
+d, b = build(scored=N, stored=N, txt=N, dup_table="doc000", drop_table_row=N - 1)
+rc, out = run(b, "--advance")
+check("duplicate + missing with equal counts refuses", (rc, phase_of(b)), (1, "measure"))
+check("  counts really are equal", True, True)
+
+d, b = build(scored=N, stored=N, txt=N)
+rc, out = run(b, "--advance")
+check("clean 208 with no duplicates advances", (rc, phase_of(b)), (0, "classify"))
 
 print()
 print("=" * 78)

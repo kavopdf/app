@@ -214,3 +214,30 @@ and store disagreeing, a stale class file, a short txt class file, a missing cla
 fix refusal, that the APK still cannot ship from fix, that `--close-round` still works and
 still archives, that `done` still allows a ship, and that a missing gate refuses instead of
 crashing.
+
+---
+
+## 9. One document, one row — 12 Nov
+
+A document must appear once in `BASELINE.md`, once in `RESULTS.jsonl` for a given round and
+engine, and once in `RESULTS-TXT.jsonl`. Two rows for one document would double-count it and
+the score would be meaningless.
+
+What already held:
+
+- `record.py` replaces any earlier line for the same **(round, engine, doc)**, so the stores
+  cannot accumulate duplicates. Verified: three calls, one line.
+
+What did not:
+
+| # | hole | fixed |
+|---|---|---|
+| 9.1 | The gate compared **counts**, not sets. One document listed twice and another missing gives 208 rows against a store of 208 - the counts agree while the table no longer covers one of the documents. | **yes** — the sets must be equal, and duplicates are checked separately |
+| 9.2 | A duplicate was reported as "table and store disagree", which names the wrong cause | **yes** — it now says which document is listed twice, which store row is duplicated, and which documents are on one side but not the other |
+
+**Baseline only.** The check lives in `measure_gate.py`, which only the measure phase calls -
+so the classifier and the fixer never see it, and a class or an attempt can never be blocked
+by it.
+
+Tested in `gate_test.py`: a document listed twice, a duplicate store row, a duplicate plus a
+missing row whose counts still match, and a clean 208 that must still advance.
