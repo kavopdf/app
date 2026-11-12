@@ -741,3 +741,56 @@ The brief's own text said "one attempt takes about two hours" and "the claim exp
 minutes". Both were wrong — the attempt takes twelve to twenty-five minutes — and are corrected
 in the same commit, because a brief that misstates its own timings teaches the next run to
 misjudge its budget.
+
+---
+
+## 20. Twelve minutes is enough — what the first real attempt actually did
+
+The question was whether a twelve-minute run can touch a class of 203 documents. The trace and
+the hypothesis ledger say it can, and they say why: the run does not have to solve the class, it
+has to rule out one approach and leave the next one named.
+
+The whole of the first attempt, from the trace:
+
+    18:41  claim
+    18:42  build-engine started
+    18:43  classify - 43 classes from 208 documents
+    18:46  build-engine started   (after the code change)
+    18:47  build-engine started   (after reverting it)
+    18:52  ratchet held, ratchet --txt held
+    18:52  hypothesis -> confirmed
+    18:52  hypothesis -> ruled-out
+    18:52  hypothesis -> untested
+    18:52  attempt -> reverted (OPEN)
+    18:52  commit-gate started
+
+What it produced in eleven minutes:
+
+1. **A renderer fact, measured rather than assumed.** Three probes through Drive established
+   that Google renders `w:line` as a multiple of the substitute face's line height — 12 pt asked
+   gives 11.5 pt, and the advance is `w:before + 0.069 em`, face-independent.
+2. **A real code change** — converting the page-body flow to a hairline box plus absolute
+   `w:before` — built and measured on twenty documents.
+3. **An honest result**: one of the ten failing documents moved. Reverted, and the outcome
+   recorded as `reverted`, not `improved`.
+4. **The next hypothesis, named**: the same hairline-plus-before model in the *table-cell* path
+   (`rowLineTw`), because `electricity-bill` and `362_price_list_dense` are table documents and
+   both moved less than the body-only model predicts.
+
+That is the shape the process was built for. Twenty-four of those a day is four hours of measured
+experiments on one class, and each one starts where the last finished instead of at the beginning.
+
+### The cost that matters
+
+Of the eleven minutes, about five went to building and about five to measuring twenty documents
+through Drive. Roughly two minutes were the actual thinking and editing. That ratio is fine while
+the ledger carries the reasoning forward — it is the ledger, not the run, that has to remember —
+but it does mean the build and the measurement are the budget, and shortening either is worth
+more than any prompt change.
+
+### One bug found while reading the result
+
+`hypothesis.py` stamped entries with `time.strftime`, which on this image is UTC: the first
+attempt recorded "13:22" for work done at 18:52, five and a half hours before it happened. Every
+other timestamp in this directory is IST. Fixed, and the entry now reads 19:14 when the sandbox
+clock says 13:44.

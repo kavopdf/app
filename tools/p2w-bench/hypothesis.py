@@ -115,7 +115,11 @@ def add(cls, text, result, evidence):
     entry = "- %s - %s" % (label, text.strip())
     if evidence:
         entry += "\n  evidence: %s" % evidence.strip()
-    entry += "\n  recorded: %s" % time.strftime("%Y-%m-%d %H:%M")
+    # IST, not the sandbox clock. Every other timestamp in this directory is IST and the
+    # sandbox is UTC: the first real attempt recorded "13:22" for work done at 18:52, which
+    # reads as a hypothesis five and a half hours older than the attempt that wrote it.
+    entry += "\n  recorded: %s" % time.strftime(
+        "%Y-%m-%d %H:%M", time.gmtime(time.time() + 5 * 3600 + 30 * 60))
     note("hypothesis", "%s -> %s" % (cls, result))
     # The same theory, tested later, is not a duplicate - it is the same theory
     # with a result now. Refusing to update it would leave an UNTESTED entry that
