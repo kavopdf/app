@@ -193,7 +193,8 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
     one problem type gets ONE FULL DAY (24 hours) and at most 24 attempts inside it - one per
     hourly slot. The day is the limit; the number of tries follows the schedule.
     A class that IMPROVES but does not pass gets its day restarted, up to 3 times.
-    Absolute maximum for one class: 4 days, 48 attempts, then parked permanently.
+    Absolute maximum for one class: 4 days and 96 attempts - 24 on the first day and 24
+    after each of the 3 requeues - then parked permanently.
 
 STEP 2b - READ WHAT IS ALREADY KNOWN, BEFORE FORMING ANY THEORY  ** DO THIS FIRST **
       python3 tools/p2w-bench/hypothesis.py --show "<exact class name>"

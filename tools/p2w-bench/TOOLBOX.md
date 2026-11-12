@@ -225,6 +225,20 @@ are the .txt checks `t01` to `t05` rather than the .docx checks `01` to `59`. Ru
 take the largest OPEN class from either; which half you are in decides whether the rest of
 the run uses `verify_google.py` with `ratchet.py` or `verify_txt.py` with `ratchet.py --txt`.
 
+## seed.py - every corpus document gets a row, or nothing measures it
+
+    python3 tools/p2w-bench/seed.py --corpus all
+    python3 tools/p2w-bench/seed.py --corpus all --dry-run
+
+  BASELINE.md is a hand-built table, and the baseline takes "the first 10 rows whose score
+  is empty". A document in the corpus with no row is therefore never chosen, never measured,
+  never classified and never fixed - and no gate notices, because measure_gate compares the
+  table against the store and both would agree while a document is absent.
+
+  seed.py appends an empty row for every corpus PDF that has none. Idempotent, never touches
+  a measured row, never reorders. Exit 1 when the corpus directory is missing or empty: an
+  empty directory means the download failed, and seeding from it would look like success.
+
 ## code.py — the part of the engine you need, not the file
 
     python3 tools/p2w-bench/code.py --outline                 one line per file

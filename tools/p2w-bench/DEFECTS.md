@@ -1085,3 +1085,63 @@ belonging to neither.
 
 It also makes the contaminated rows harmless going forward: whatever `2a68de6-dirty` holds, the
 next attempt is measured against `2a68de6`, which is clean.
+
+---
+
+## 26. Step-by-step logic audit of the whole pipeline
+
+Walked measure → classify → fix → close → repeat → ship, reading the phase machine and all
+three briefs against the code they describe.
+
+### Found: a dead end that would have swallowed the round-2 plan
+
+The baseline chooses its work with one sentence: "take the first 10 rows whose SCORE cell is
+empty". `BASELINE.md` is a hand-built table. So a document that exists in the corpus but has no
+row is never chosen, never measured, never classified and never fixed — and **no gate notices**,
+because `measure_gate` compares the table against the store and both would have said 208.
+
+Three documents were added to the corpus on 12 Nov (`600_reviewed_invoice_with_annotations`,
+`601_fillable_admission_form`, `602_bookmarked_annual_report`) for one reason: `50_annotations`,
+`51_form_fields` and `52_outline` had been passing vacuously on a source count of zero, and these
+three carry six annotations, eleven form fields and a six-entry bookmark tree. §14 of this file
+recorded the plan: "Round 2 will measure 211, so the three documents enter the pipeline there."
+
+They would not have entered anything. Nothing adds a row.
+
+`seed.py` now does: it reads the corpus directory, reads the table, and appends an empty row for
+every PDF that has none. Idempotent, never touches a measured row, never reorders, `--dry-run`
+for a look first, and exit 1 when the corpus directory is missing or empty — an empty directory
+means the download failed, and seeding from it would look exactly like success.
+
+The brief now checks the corpus count (`test "$(ls all/*.pdf | wc -l)" = "211"`) and then runs
+`seed.py`, before the build. `seed_test.py` covers it in seven cases, including that a scored row
+is untouched and that an empty corpus fails.
+
+### Found: a number in the brief that the code does not produce
+
+"Absolute maximum for one class: 4 days, **48 attempts**." With `MAX_ATTEMPTS = 24` and
+`MAX_REQUEUES = 3`, a requeue resets the attempt count and restarts the day, so the real ceiling
+is 24 × 4 = **96**. Corrected.
+
+### Checked and found sound
+
+| step | verdict |
+|---|---|
+| phase machine | `--advance` refuses from `fix`; only `--close-round` leaves it |
+| `--close-round` | refuses unless phase is `fix` and no class cell reads OPEN; PARKED and FIXED do not block |
+| close-round reset | archives BASELINE and ATTEMPTS, blanks scores, bumps the round, clears the slots and `apk_shipped` |
+| `--apk-status` | returns 0 only at phase `done` with nothing shipped |
+| measure_gate | refuses on duplicate rows, duplicate documents, unscored rows, store/table mismatch, and the txt gap |
+| classify_gate | compares each class file's document count against its own store |
+| the 24-hour limit | enforced, but at display time in `classify.py` — the table shows PARKED and the fixer skips it, which is where it has to act |
+| fixer STEP 2 | rebuilds a stale class file before picking; takes the largest OPEN from either half |
+| fixer STEP 7 | both ratchets, and a control test before anyone may blame the verifier |
+| fixer STEP 9 | release, then commit through the gate |
+| round 2/3 | the classifier rewrites the class files from the fresh store, so round 1's statuses cannot leak forward |
+
+### The shape of what was missed
+
+Both findings are the same kind: a brief describing something no code produces. The pipeline's
+gates all check that numbers *agree with each other*; none checks that a promise in prose is
+kept by a tool. That is why §23's reverted attempt and this section's missing rows both survived
+a day of auditing — they were invisible to every comparison the pipeline makes.

@@ -161,6 +161,22 @@ STEP 1 - CORPUS AND BUILD
   one short-circuited to pass every time and none of them was ever evidence. 600 carries six
   annotations, 601 carries eleven form fields, 602 carries a six-entry bookmark tree. If the
   count is not 211, the c4 line above did not run.
+
+      test "$(ls all/*.pdf 2>/dev/null | wc -l)" = "211" \
+          || { echo "corpus is $(ls all/*.pdf | wc -l) PDFs, expected 211 - a zip did not land"; exit 1; }
+
+  Then make sure every one of them has a row:
+
+      python3 tools/p2w-bench/seed.py --corpus all
+
+  This step exists because nothing else does it. The table is how work is chosen - "the first
+  10 rows whose score is empty" - so a document in the corpus with no row is never measured,
+  never classified and never fixed, and no gate notices: measure_gate compares the table against
+  the store and both would say 208. The three documents added on 12 Nov would have entered
+  nothing at all, and the checks they exist to prove would have stayed vacuous. seed.py appends
+  an empty row for every corpus PDF that has none, and running it twice adds nothing the second
+  time.
+
   bash tools/p2w-bench/build-engine.sh
   This one script fetches the libraries if they are missing, fetches a JDK if the image has
   none, and compiles the stubs, the engine and ConvertAll. Everything it needs is inside the
