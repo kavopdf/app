@@ -130,6 +130,70 @@ def main():
 
     print()
     print("=" * 78)
+    print("9. --attempt REFUSES WHAT IT CANNOT PROVE")
+    print("=" * 78)
+    import json as _json
+    import os as _os
+    import shutil as _shutil
+    import subprocess as _sp
+    import tempfile as _tf
+
+    src = _os.path.dirname(_os.path.abspath(__file__))
+
+    def attempt_fixture(two_engines=True, moved=8, claim=8, total=20, cls="18_median_dy"):
+        d = _tf.mkdtemp()
+        b = _os.path.join(d, "tools", "p2w-bench")
+        _os.makedirs(b)
+        for f in ("classify.py",):
+            _shutil.copy(_os.path.join(src, f), _os.path.join(b, f))
+        rows = ["| document | score | engine | failed |", "|---|---|---|---|"]
+        for i in range(total):
+            rows.append("| d%02d | 57/59 | FAIL | 20_within_10pt, 18_median_dy |" % i)
+        open(_os.path.join(b, "BASELINE.md"), "w").write("\n".join(rows) + "\n")
+        with open(_os.path.join(b, "RESULTS.jsonl"), "w") as f:
+            for i in range(total):
+                f.write(_json.dumps({"round": 1, "engine": "e1", "doc": "d%02d" % i,
+                                     "score": 57, "total": 59,
+                                     "failed": ["20_within_10pt", "18_median_dy"],
+                                     "values": {}}) + "\n")
+            if two_engines:
+                for i in range(total):
+                    ok = i < moved
+                    f.write(_json.dumps({"round": 1, "engine": "e2", "doc": "d%02d" % i,
+                                         "score": 59 if ok else 57, "total": 59,
+                                         "failed": [] if ok else ["20_within_10pt", "18_median_dy"],
+                                         "values": {}}) + "\n")
+        args = [sys.executable, _os.path.join(b, "classify.py"), "--attempt", cls]
+        if claim is not None:
+            args += ["--moved", str(claim), "--total", str(total)]
+        r = _sp.run(args, capture_output=True, text=True, cwd=d)
+        return r.returncode, (r.stdout or "") + (r.stderr or "")
+
+    rc, out = attempt_fixture(claim=999)
+    check("a count larger than its denominator is refused", rc, 1)
+    check("  and it says so", "More documents moved than were" in out, True)
+
+    rc, out = attempt_fixture(claim=-5)
+    check("a negative count is refused", rc, 1)
+
+    rc, out = attempt_fixture(claim=8)
+    check("the number the store agrees with is accepted", rc, 0)
+
+    rc, out = attempt_fixture(claim=15)
+    check("a number the store disagrees with is refused", rc, 1)
+    check("  and it names the true number", "the store says 8 of 20" in out, True)
+
+    rc, out = attempt_fixture(two_engines=False, claim=5, total=10)
+    check("one engine means nothing could have moved, so it refuses", rc, 1)
+    check("  and it says why", "only one engine" in out, True)
+
+    rc, out = attempt_fixture(cls="koi bhi bakwas naam", claim=8)
+    check("a class name that does not exist is refused", rc, 1)
+    check("  and it says the ledger is keyed by the exact name",
+          "is not a class" in out, True)
+
+    print()
+    print("=" * 78)
     if FAILS:
         print("%d FAILED: %s" % (len(FAILS), ", ".join(FAILS)))
         return 1

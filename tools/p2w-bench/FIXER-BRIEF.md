@@ -70,7 +70,16 @@ TWO PROVEN FACTS - DO NOT RE-LITIGATE
 
 ENGINE HASH
       ENGINE=$(git log -1 --format=%h -- app/src/main/java/com/kavopdf/app/engine/)
+      [ -n "$(git diff --name-only -- app/src/main/java/com/kavopdf/app/engine/)" ] \
+          && ENGINE="$ENGINE-dirty"
   Never git HEAD.
+
+  The second line is not decoration. That command reports the last COMMITTED change to the
+  engine, and this brief commits at STEP 9 - after STEP 6 has already measured. Without the
+  suffix, a fix's new rows carry the OLD engine hash, record.py replaces the rows they should
+  sit beside, and the before-state is gone: the next run cannot tell what the document looked
+  like before the fix, and nothing can check whether it moved. It also labels code that is not
+  in any commit with the hash of one that is.
 
 ===================================================================
 NO EXCUSES

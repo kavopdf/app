@@ -517,3 +517,74 @@ Round 1 stays 208 - it is measured and archived. Round 2 will measure 211, so th
 documents enter the pipeline there and their checks become live evidence from that point on.
 The classifier and the gates are data-driven and read the count from the stores, so nothing
 else needed changing.
+
+---
+
+## 15. The fixer audit — four ways a fix could be recorded as working when it was not
+
+The fixer is the only cron that changes code, so a bug here does not produce a bad report, it
+produces a bad app. Each of these was tested before it was fixed, and each test is now in
+`classify_test.py` so it cannot come back quietly.
+
+### 15.1 A count larger than its own denominator was accepted
+
+    --attempt "..." --moved 999 --total 20
+    -> moved 999 of 20 (4995%) -> kept
+    -> status FIXED
+
+`kept` sets the class to FIXED, and a FIXED class is skipped by every later run. So one
+invented number removes a defect from the pipeline permanently. A count of documents that
+moved cannot exceed the documents that were measured; `moved > total` and `moved < 0` are now
+refused.
+
+### 15.2 The number was a claim, and nothing checked it
+
+The comment above that code said "numbers cannot be talked into a better answer", which is
+true only if the run does not supply the numbers. It did. `--moved 10 --total 20` marked a
+class FIXED without a single document having moved, and the brief promised the opposite: "the
+tool will refuse the claim and say what the numbers actually were".
+
+`--attempt` now reads the store itself. For the class's own checks, it compares each
+document's last two engine rows: a document moved if at least one of those checks was failing
+before and none of them fails now. A claim that disagrees is refused with the true number.
+
+    refused: you said 15 of 20 moved; the store says 8 of 20.
+
+If the store holds only one engine, nothing was measured against a changed engine, so nothing
+can have moved - refused too, with that reason.
+
+### 15.3 The engine hash did not change until after the measurement
+
+    ENGINE=$(git log -1 --format=%h -- .../engine/)
+
+That reports the last **committed** change, and the brief commits at STEP 9 - after STEP 6 has
+already measured. So a fix's rows carried the OLD hash, `record.py` replaced the rows they
+should have sat beside, and the before-state was destroyed. That is what made 15.2
+unverifiable, and it also labelled code that exists in no commit with the hash of one that
+does.
+
+The brief now appends `-dirty` when the engine folder differs from HEAD, so a fix's
+measurements get their own engine id and the previous state survives.
+
+### 15.4 The ledger was keyed by an unchecked string
+
+    --attempt "koi bhi bakwas naam" --moved 5 --total 10
+    -> koi bhi bakwas naam: attempts=1 status=FIXED
+
+A typo in the class name wrote the attempt against nothing. The real class kept its attempt
+count at zero, so it would run to twelve attempts that were never counted and then be parked
+for not converging, while the ledger filled with names nothing could match. `--attempt` and
+`hypothesis.py --add` now refuse a name that is not a class, and `--add` also refuses a
+`--result` that is not `ruled-out`, `confirmed` or `untested` - an unknown one was filed in
+capitals and read as a verdict nobody chose.
+
+### What was checked and found sound
+
+| item | result |
+|---|---|
+| `commit-gate.sh` | refuses unless the ratchet holds on BOTH halves, precommit passes, and BASELINE/RESULTS/RATCHET all changed with the engine |
+| outcome thresholds | kept at 50%, improved at a third, reverted below - matches the brief |
+| a claimed outcome that disagrees with the computed one | already refused |
+| the slot | stale after a timeout, so two runs cannot work the same rows |
+| `calibrate.py` | measures the renderer instead of assuming it - the lesson that recovered 36 documents |
+| the control in STEP 7 | a document against itself must score full marks before the verifier is blamed |

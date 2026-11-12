@@ -80,6 +80,29 @@ def save(sections):
 
 
 def add(cls, text, result, evidence):
+    # The class name is the section key, exactly as it is the ledger key in
+    # classify.py --attempt. An unvalidated one files the reasoning under a class that
+    # does not exist, so the next attempt on the real class reads an empty section and
+    # repeats the work this entry was written to prevent.
+    try:
+        import classify as _C
+        known = _C.current_class_names()
+    except Exception:
+        known = []
+    if known and cls not in known:
+        print("refused: %r is not a class - the section would be filed under nothing." % cls)
+        near = [k for k in known if cls.split(" (")[0] in k or k.split(" (")[0] in cls]
+        if near:
+            print("Did you mean:")
+            for k in near[:5]:
+                print("    %s" % k)
+        else:
+            print("Run classify.py and copy a name from the table exactly.")
+        return 1
+    if result not in RESULTS:
+        print("refused: --result %r is not one of %s." % (result, ", ".join(sorted(RESULTS))))
+        print("An unknown result is filed in capitals and reads as a verdict nobody chose.")
+        return 1
     sections = load()
     sections.setdefault(cls, [])
     label = RESULTS.get(result, result.upper())

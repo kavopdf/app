@@ -300,6 +300,104 @@ def subclusters(cls_name, top=8):
     return 0
 
 
+def current_class_names():
+    """The class names exactly as main() writes them - the only valid ledger keys."""
+    base = _rows_for_mode()
+    docs = {}
+    for r in base:
+        failed = {c.strip() for c in (r.get("failed") or "").split(",")
+                  if CHECK_RE.match(c.strip())}
+        if failed:
+            docs[r["doc"]] = failed
+    if not docs:
+        return []
+    doc_sets = {c: {d for d, f in docs.items() if c in f}
+                for c in {x for f in docs.values() for x in f}}
+    names = []
+    for g in build_groups(doc_sets, len(docs)):
+        g = sorted(g, key=lambda c: -len(doc_sets[c]))
+        names.append(g[0] if len(g) == 1 else "%s (+%d)" % (g[0], len(g) - 1))
+    return names
+
+
+def compute_moved(cls_name):
+    """How many documents the class actually moved, read from the store.
+
+    Returns (moved, failing_before, verified). verified is False when the store holds
+    only one engine, which means nothing was measured against a changed engine and no
+    document can have moved.
+
+    "Moved" is the brief's definition: at least one of the class's checks was failing
+    on this document before, and none of them fails now. A document that was already
+    passing every one of them is not counted either way - it proves nothing about this
+    fix.
+    """
+    base = _rows_for_mode()
+    docs = {}
+    for r in base:
+        failed = {c.strip() for c in (r.get("failed") or "").split(",")
+                  if CHECK_RE.match(c.strip())}
+        if failed:
+            docs[r["doc"]] = failed
+    if not docs:
+        return 0, 0, False
+    doc_sets = {c: {d for d, f in docs.items() if c in f}
+                for c in {x for f in docs.values() for x in f}}
+    target = None
+    for g in build_groups(doc_sets, len(docs)):
+        g = sorted(g, key=lambda c: -len(doc_sets[c]))
+        name = g[0] if len(g) == 1 else "%s (+%d)" % (g[0], len(g) - 1)
+        if name == cls_name:
+            target = set(g)
+            break
+    if target is None:
+        return 0, 0, False
+
+    # BASELINE.md carries no engine column - read_baseline returns doc, score and the
+    # failed set only - so the before/after comparison has to come from the store.
+    store = os.path.join(HERE, "RESULTS-TXT.jsonl" if "--txt" in sys.argv else "RESULTS.jsonl")
+    if not os.path.exists(store):
+        return 0, 0, False
+    # doc -> {engine: failed set}, in the order the file lists the engines
+    per_doc = {}
+    engines = []
+    for line in open(store, encoding="utf-8"):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            r = json.loads(line)
+        except ValueError:
+            continue
+        eng = r.get("engine")
+        if eng is None:
+            continue
+        if eng not in engines:
+            engines.append(eng)
+        raw = r.get("failed") or []
+        if isinstance(raw, str):
+            raw = raw.split(",")
+        failed = {c.strip() for c in raw if CHECK_RE.match(str(c).strip())}
+        per_doc.setdefault(r.get("doc"), {})[eng] = failed
+
+    if len(engines) < 2:
+        return 0, 0, False
+
+    old_eng, new_eng = engines[-2], engines[-1]
+    moved = failing = 0
+    for doc, by_eng in per_doc.items():
+        if old_eng not in by_eng or new_eng not in by_eng:
+            continue
+        before = by_eng[old_eng] & target
+        after = by_eng[new_eng] & target
+        if not before:
+            continue
+        failing += 1
+        if not after:
+            moved += 1
+    return moved, failing, True
+
+
 def main(argv):
     if "--subclusters" in argv:
         return subclusters(argv[argv.index("--subclusters") + 1])
@@ -308,6 +406,26 @@ def main(argv):
     if "--attempt" in argv:
         cls = argv[argv.index("--attempt") + 1]
         claimed = argv[argv.index("--outcome") + 1] if "--outcome" in argv else None
+
+        # The class name is the ledger KEY. An unvalidated one creates an entry for a
+        # class that does not exist: the attempt is recorded against nothing, the real
+        # class never sees it and keeps its own attempt count at zero until it is
+        # parked for not converging, and the ledger fills with names nobody can match.
+        # Tested before this guard: --attempt "koi bhi bakwas naam" was accepted and
+        # marked FIXED.
+        known = current_class_names()
+        if cls not in known:
+            print("refused: %r is not a class. The ledger is keyed by the exact name," % cls)
+            print("so recording under a name that is not in DEFECT-CLASSES.md writes the")
+            print("attempt against nothing and leaves the real class at zero attempts.")
+            near = [k for k in known if cls.split(" (")[0] in k or k.split(" (")[0] in cls]
+            if near:
+                print("Did you mean:")
+                for k in near[:5]:
+                    print("    %s" % k)
+            else:
+                print("Run classify.py and copy a name from the table exactly.")
+            return 1
 
         # The outcome is computed from the numbers, not chosen by the run.
         # "kept" and "improved" were two words a fixer could pick between, and the
@@ -324,6 +442,20 @@ def main(argv):
         moved = num("--moved")
         total = num("--total")
 
+        # A number bigger than its own denominator is not a strong claim, it is a typo
+        # or a lie, and either way it used to be accepted: --moved 999 --total 20
+        # printed "moved 999 of 20 (4995%) -> kept" and marked the class FIXED, which
+        # removes it from the pipeline permanently. Nothing is easier to check than this.
+        if moved is not None and total is not None:
+            if moved < 0:
+                print("refused: --moved %d is negative - a count of documents cannot be" % moved)
+                return 1
+            if total > 0 and moved > total:
+                print("refused: --moved %d of --total %d. More documents moved than were" % (moved, total))
+                print("measured. That is a typo or an invented number, and either one marks the")
+                print("class FIXED on evidence that does not exist.")
+                return 1
+
         if moved is None or total is None or total <= 0:
             if claimed in ("kept", "improved"):
                 print("refused: '%s' needs numbers. Pass --moved <n> --total <n> so the" % claimed)
@@ -332,6 +464,23 @@ def main(argv):
                 return 1
             outcome = claimed or "error"
         else:
+            # The claim is checked against the store, not taken on trust. The comment
+            # above says numbers cannot be talked into a better answer - that is only
+            # true if the numbers are not supplied by the run that wants them. Tested
+            # before this: --moved 10 --total 20 marked a class FIXED without a single
+            # document having moved, and FIXED is permanent.
+            actual, failing, verified = compute_moved(cls)
+            if not verified:
+                print("refused: the store holds only one engine, so nothing was measured")
+                print("against a changed engine and no document can have moved. Check that")
+                print("ENGINE carries the -dirty suffix when the engine folder is modified.")
+                return 1
+            if actual != moved:
+                print("refused: you said %d of %d moved; the store says %d of %d."
+                      % (moved, total, actual, failing))
+                print("The store compares the last two engines row by row. Record what")
+                print("happened: --moved %d --total %d" % (actual, failing))
+                return 1
             ratio = float(moved) / float(total)
             if ratio >= 0.5:
                 outcome = "kept"
