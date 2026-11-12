@@ -70,6 +70,21 @@ Do not re-test one without new evidence, and if you do, say what changed.
   recorded: 2026-11-13 01:49
 
 
+## 47_margins
+
+- CONFIRMED - The 47_margins failure is one element pinned to the page's left edge, not a page shift: the rightmost extent and the top extent are already correct, so a uniform offset is ruled out by the data itself
+  evidence: 208 recorded rows, 186 report render x0=0. Delta medians over the 189 failing rows: x0 -43 (71 of them at -60), y0 -1 (178 of 189 within 10 pt), x1 +3, y1 -6. A real left shift of ~56 pt would move x1 by the same -56; it does not, so exactly one element sits at x=0 while the rest of the page is placed correctly.
+  recorded: 2026-11-13 02:54
+
+- CONFIRMED - The element at x=0 comes from the table or the drawing path, not the body-flow path: body paragraphs are placed exactly, so the left offset a table carries (w:tblInd) or a shape carries (wp:posOffset) is what Google loses
+  evidence: Control, measured on all 208 converted docx against the recorded rows: the 12 documents with no w:tbl and no w:drawing reproduce the source's left edge exactly - 310 57/57, 412 56/56, 413 56/56, 416 56/56, 417 56/56, 410 56/56, 392 28/28, 304 14/14, 78 62/62. By contrast 0 of the 192 documents containing at least one table or one drawing passes 47_margins (tbl=0/draw=0: 5 pass, 7 fail; every other cell of the table 0 pass). Body-flow placement is therefore exact and the defect is confined to the table and drawing emitters.
+  recorded: 2026-11-13 02:54
+
+- UNTESTED - Google does not honour w:tblInd the way LibreOffice does, so a table's left offset must be carried by something Google renders: pgMar left is 0 in every docx the engine emits, so a table whose tblInd is ignored starts at the page edge
+  evidence: 362_price_list_dense emits w:tblInd=600 (30 pt) and the source's page-1 x0 is 30; LibreOffice renders the same docx at x0=30.1, exactly right, while Google reports x0=0. No patch was built and nothing was measured on Google this run, so the fix is untested - the correlation above is markup plus the LibreOffice render, not a Google measurement.
+  recorded: 2026-11-13 02:54
+
+
 ## 53_embedded_faces
 
 - RULED OUT - Naming the metric-compatible family Google renders (Liberation Serif/Mono -> Times New Roman/Courier New, DejaVu Serif -> Times New Roman, DejaVu Sans -> Verdana) in w:rFonts makes Google keep the face
