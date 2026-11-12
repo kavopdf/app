@@ -169,6 +169,20 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   leading check id, e.g. '19_worst_dy (+3)'. Do not invent a friendlier name.
   Take the top class whose status is OPEN. SKIP every class marked PARKED or FIXED.
 
+  IF THE TOP CLASS HAS AN UNTESTED HYPOTHESIS, THAT IS THIS RUN'S WORK:
+      python3 tools/p2w-bench/hypothesis.py --next "<top class>"
+  An untested theory is the previous run's last instruction to you - the one thing it could not
+  finish, written down so you would not have to rediscover it. Switching to a smaller class
+  leaves it sitting, and it cost a slot to write.
+
+  On 12 Nov this happened. A run left "the table-cell path (rowLineTw) is where the class's
+  dominant documents live" marked UNTESTED. The next run took 53_embedded_faces instead - a
+  smaller class, while the top class was OPEN - and the theory waited a whole slot. The run after
+  that picked it up, tested it in seven minutes and ruled it out with numbers.
+
+  Switch classes only when the top class is PARKED, FIXED, or its day is spent. Not because
+  another class looks easier: the queue is the ledger, not the run's preference.
+
   THE TOOL HAS TWO OUTPUTS AND EACH IS MEASURED SEPARATELY:
       python3 tools/p2w-bench/classify.py          the .docx half, checks 01 to 59
       python3 tools/p2w-bench/classify.py --txt    the .txt half, checks t01 to t05

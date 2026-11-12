@@ -1326,3 +1326,68 @@ fixed it, and reading is cheap next to the engine source, which `code.py` exists
 | every tool the brief names | exists |
 | every limit the brief states | matches the code (24 attempts, 24 hours, 3 requeues, 45 minutes, 96 ceiling) |
 | every TOOLBOX range | returns the sections it names and no others |
+
+---
+
+## 30. How a run with no memory knows what to do next — and where the handoff leaks
+
+Every fixer run starts from nothing. It is not resumed, it is not told what happened last time.
+The handoff is seven files, and the brief names each one:
+
+| file | what the next run gets from it |
+|---|---|
+| `DEFECT-CLASSES.md` | which classes exist, their size, status and attempt count |
+| `ATTEMPTS.json` | how many tries each class has had, what each outcome was, requeues |
+| `HYPOTHESES.md` | every theory tried on the class, what the evidence showed, what is still untested |
+| `RESULTS.jsonl` | the numbers, so nothing is measured twice |
+| `TRACE.md` | what the last runs actually did, step by step |
+| `LESSONS.md` | mistakes that cost real time |
+| `RUN-LOG.md` | the narrative, for a person reading it |
+
+The chain is what makes twenty-four stateless runs into one continuous piece of work. Attempt
+twelve is supposed to start where attempt eleven finished.
+
+### It worked, and it leaked
+
+The record from 12 Nov:
+
+    18:41  attempt 1 on 20_within_10pt
+           left: UNTESTED - "the table-cell path (rowLineTw) is where the class's documents live"
+
+    19:46  attempt 2 took 53_embedded_faces instead - a different, smaller class
+           the untested theory waited a whole slot
+
+    20:43  attempt 3 came back to 20_within_10pt, tested it in seven minutes, ruled it out
+           with numbers (257 of 258 lines matched; one 10 pt step at the table's top)
+           left: UNTESTED - "the ~10 pt offset is the spacer paragraph before the table"
+
+So the chain recovers — attempt 3 did exactly what attempt 1 asked — but attempt 2 broke it by
+switching classes. The brief said "take the top class whose status is OPEN", and the top class
+was `20_within_10pt` at 203 documents, OPEN, one attempt in. Attempt 2 took the third one.
+
+Nothing forbade it. The brief described the ledger as a resource to consult, not as a queue to
+work through, so a run was free to prefer a class that looked more tractable. One slot in three
+was spent that way.
+
+### The rule is now binding
+
+STEP 2 says plainly that if the top class has an untested hypothesis, testing it **is** the run's
+work — with `hypothesis.py --next`, and the 12 Nov example as the reason. Switching classes is
+allowed only when the top class is PARKED, FIXED, or its day is spent.
+
+    Switch classes only when the top class is PARKED, FIXED, or its day is spent.
+    Not because another class looks easier: the queue is the ledger, not the run's preference.
+
+### Why the other six files matter less than they look
+
+`HYPOTHESES.md` is the one that carries intent. The others carry facts:
+
+- `ATTEMPTS.json` stops a run repeating a class that has been tried to death.
+- `RESULTS.jsonl` stops it re-measuring what is already measured.
+- `DEFECT-CLASSES.md` tells it where to look.
+- `TRACE.md` and `RUN-LOG.md` are for the person watching, not for the run.
+- `LESSONS.md` stops it repeating a mistake that cost someone a day.
+
+Only the hypothesis ledger says "here is what I could not finish, and here is the test I would
+run next". That is why losing an entry there costs more than losing a log line — and why §24's
+collapsing cap was the wrong change even though it looked like housekeeping.
