@@ -152,7 +152,7 @@ as measured; only the verdict is closed.
 | 53_single_space_body_15_headings | 52/59 | FAIL | 09_font_names, 18_median_dy, 20_within_10pt, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 54_two_column_body_full_width_header_footer | 50/59 | FAIL | 03_word_count, 04_words_missing, 09_font_names, 22_reading_order, 25_invisible_text, 32_stroke_lines, 41_block_spacing, 47_margins, 53_embedded_faces | 2a68de6 | 11 Nov |
 | 55_sidebar_box_beside_body | 44/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 09_font_names, 17_matched_runs, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 26_text_overlap, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 11 Nov |
-| 56_table_indented_from_margin |  |  |  |  |  |
+| 56_table_indented_from_margin | 48/59 | FAIL | 02_text_run_count, 09_font_names, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 12 Nov |
 | 57_centred_title_page_left_body_pages |  |  |  |  |  |
 | 58_header_rule_footer_rule |  |  |  |  |  |
 | 59_landscape_mixed_portrait |  |  |  |  |  |
