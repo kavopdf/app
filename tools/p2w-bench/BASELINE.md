@@ -207,7 +207,7 @@ as measured; only the verdict is closed.
 | marksheet-university-consolidated | 49/59 | FAIL | 06_table_columns, 09_font_names, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | mobile-bill | 48/59 | FAIL | 02_text_run_count, 10_font_sizes, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | mutual-fund-statement | 43/59 | FAIL | 03_word_count, 04_words_missing, 07_table_rows, 10_font_sizes, 12_italic_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
-| newsletter-3col-header-footer |  |  |  |  |  |
+| newsletter-3col-header-footer | 40/59 | FAIL | 02_text_run_count, 03_word_count, 04_words_missing, 07_table_rows, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 42_alignment_mix, 47_margins, 53_embedded_faces, 59_shape_anchor | 2a68de6 | 12 Nov |
 | newspaper-2col-fullwidth-headline |  |  |  |  |  |
 | one-page-rotated-180-degrees |  |  |  |  |  |
 | payslip-label-left-amount-right |  |  |  |  |  |
