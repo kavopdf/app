@@ -206,7 +206,7 @@ as measured; only the verdict is closed.
 | marksheet-subject-left-marks-right | 41/59 | FAIL | 02_text_run_count, 05_words_extra, 06_table_columns, 07_table_rows, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 26_text_overlap, 28_clipped_at_edge, 29_blank_where_ink_was, 30_ink_where_blank_was, 41_block_spacing, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | marksheet-university-consolidated | 49/59 | FAIL | 06_table_columns, 09_font_names, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | mobile-bill | 48/59 | FAIL | 02_text_run_count, 10_font_sizes, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
-| mutual-fund-statement |  |  |  |  |  |
+| mutual-fund-statement | 43/59 | FAIL | 03_word_count, 04_words_missing, 07_table_rows, 10_font_sizes, 12_italic_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 25_invisible_text, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 47_margins, 59_shape_anchor | 2a68de6 | 12 Nov |
 | newsletter-3col-header-footer |  |  |  |  |  |
 | newspaper-2col-fullwidth-headline |  |  |  |  |  |
 | one-page-rotated-180-degrees |  |  |  |  |  |
