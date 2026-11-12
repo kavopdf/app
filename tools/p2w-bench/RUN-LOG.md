@@ -19,3 +19,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 12 Nov 08:13 | baseline | note: pre-existing 'probe-commit-test' text file left in KavoPDF-Verify by an earlier probe run; not created by this run, left in place |
 | 12 Nov 08:14 | baseline | ratchet held (docx 140/208 scored, txt 21/208); slot released |
 | 12 Nov 09:06 | baseline | started | phase measure |
+| 12 Nov 09:45 | baseline | 10 documents measured, each committed (66_two_col_footnotes_bottom, 67_two_col_with_sidebar, 68_journal_wide_table_spanning, 69_two_col_legal_numbered_clauses, 70_magazine_drop_cap_photo_caption, 71_invoice_space_aligned_no_rules, 72_bank_statement_no_rules_right_amounts, 73_marksheet_subject_marks_grade, 74_balance_sheet_indented_subitems, 75_merged_header_cell_three_columns) |
