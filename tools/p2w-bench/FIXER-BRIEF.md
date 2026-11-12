@@ -338,6 +338,34 @@ STEP 8 - RECORD WHAT YOU LEARNED, THEN THE ATTEMPT
   A run that fixes nothing but leaves a RULED OUT entry has still saved the next attempt two
   hours. A run that leaves nothing at all has wasted the slot.
 
+STEP 8c - KEEP GOING UNTIL THE SLOT IS NEARLY SPENT  ** THIS IS WHAT MAKES THE DAY COUNT **
+  One attempt takes about ten minutes and the slot is good for forty-five. That left thirty-three
+  minutes of every hour doing nothing - the machine worked about a fifth of the day, and the cron
+  cannot fire more often than hourly.
+
+  So after each attempt, commit what it produced, then check the clock:
+
+      date +%s          # note this at the claim
+      date +%s          # and here
+
+  If less than 35 minutes have passed since the claim, go back to STEP 2 and start another attempt.
+  Take the next OPEN class in the list rather than the same one again - the top class has just had
+  its try, and the queue is the ledger. If the class you just worked still has UNTESTED hypotheses
+  and is still the top class, it comes up first anyway.
+
+  Each attempt commits on its own, before the next one begins:
+      hypothesis.py --add ... ; classify.py --attempt ... ; classify.py
+      commit DEFECT-CLASSES.md, ATTEMPTS.json, HYPOTHESES.md, RESULTS.jsonl, RATCHET.json, ROUND.json
+  A run that does three attempts and dies before the fourth has still kept three. A run that keeps
+  all three in its sandbox and dies has kept nothing.
+
+  At 35 minutes: stop. Do STEP 8b for the last attempt, then STEP 9 - release the slot and commit
+  through the gate. The slot goes stale at 45 minutes, so 35 is the ceiling: a run that works past
+  it would have its claim expire while it is still going, and the next run would start on top of it.
+
+  Three attempts per run is three times the day's work. Do not skip the commit between them to save
+  time - that is how three attempts become zero.
+
 STEP 8b - WRITE THE LESSON, IF THERE IS ONE
   If this attempt failed in a way that will repeat on another class, add ONE line to
   tools/p2w-bench/LESSONS.md: what happened, and what it cost. Not a rule, not a reminder - a
@@ -403,7 +431,8 @@ The 'Did NOT move' row is not optional. A report that lists only what worked is 
 summary, not a result.
 
 RULES
-  One class per run. Never fix a document.
+  One class at a time. Never fix a document. A run may work several classes - STEP 8c - but it
+  finishes one attempt on one class before it starts the next, and commits in between.
   Be honest. A failed fix reported plainly is worth more than a vague success.
   Read LESSONS.md before forming a theory, and TOOLBOX.md before calling any tool.
   Claim the slot before working, release it before finishing - even on failure.

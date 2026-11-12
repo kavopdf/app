@@ -1391,3 +1391,61 @@ allowed only when the top class is PARKED, FIXED, or its day is spent.
 Only the hypothesis ledger says "here is what I could not finish, and here is the test I would
 run next". That is why losing an entry there costs more than losing a log line — and why §24's
 collapsing cap was the wrong change even though it looked like housekeeping.
+
+---
+
+## 31. The slot was three times longer than the work, and nothing used the difference
+
+One attempt takes about ten minutes. The slot is good for forty-five. The cron cannot fire more
+often than hourly — the platform's minimum interval is 3600 seconds, and half-hourly was tried and
+refused.
+
+So every hour had thirty-three idle minutes, and the machine worked roughly a fifth of the day:
+twenty-four attempts a day out of a day that could hold seventy-two.
+
+### The two ways to close it
+
+**Self-triggering** — the run fires the next run when it finishes. It would give about 120 runs a
+day, and it was rejected: a chain that triggers itself has no natural stop, the cron id would have
+to live in the prompt, and 120 attempts a day would burn `MAX_ATTEMPTS` 24 in five hours, breaking
+the one-full-day-per-class rule the whole design rests on.
+
+**More attempts per run** — one run claims the slot, builds once, then works attempts back to
+back until the slot is nearly spent. No new machinery, no self-trigger, and the slot semantics stay
+exactly as they are.
+
+### STEP 8c
+
+    date +%s   # at the claim
+    ...attempt, record, COMMIT...
+    date +%s   # if under 35 minutes, go back to STEP 2
+
+Three things make it safe:
+
+- **35 minutes, not 45.** The claim goes stale at 45. A run that works past it would have its claim
+  expire while it is still going, and the next run would start on top of it — two runs editing the
+  engine, each reverting the other.
+- **A commit between attempts.** A run that does three attempts and dies before the fourth has kept
+  three. A run that holds all three in its sandbox and dies has kept nothing. This is the whole
+  reason the step says commit first, then look at the clock.
+- **The next OPEN class, not the same one again.** The top class has just had its try. If it still
+  has untested hypotheses it comes up first anyway, so the follow-up rule from §30 is not broken —
+  the queue is still the ledger.
+
+### What it changes
+
+| | before | after |
+|---|---|---|
+| attempts per run | 1 | up to 3 |
+| attempts per day | 24 | up to 72 |
+| slot used | 12 of 45 minutes | 35 of 45 |
+| `MAX_ATTEMPTS` 24 means | exactly one day | about eight hours of slots |
+
+The last row is the one to watch. Classes rotate under STEP 8c, so no single class collects
+twenty-four attempts in eight hours — but `MAX_HOURS` (24) is now the binding limit rather than
+`MAX_ATTEMPTS`, which is the right way round: a class is parked because its day is spent, not
+because it happened to be at the top of the list all evening.
+
+`One class per run` in the RULES section became `one class at a time`, because it now contradicts
+the step above it — and a brief that contradicts itself is how the next run picks whichever half
+it read last.
