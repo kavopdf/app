@@ -472,8 +472,7 @@ def main(argv):
            % (MAX_HOURS, MAX_ATTEMPTS),
            "improves but does not pass gets its day restarted - up to %d times, after which it is"
            % MAX_REQUEUES,
-           "parked as not converging. A parked class is skipped by the fixer and kept with its reason.",
-           "A parked class is skipped by the fixer and kept here with its reason.\n",
+           "parked as not converging. A parked class is skipped by the fixer and kept here with its reason.\n",
            "| # | class | documents | share | checks in class | attempts | requeues | status |",
            "|---|---|---|---|---|---|---|---|"]
     for i, c in enumerate(classes[:top], 1):
@@ -483,7 +482,13 @@ def main(argv):
 
     out.append("\n## Documents per class\n")
     for c in classes[:top]:
-        out.append("- **%s** — %s" % (c["name"], ", ".join(sorted(c["docs"])[:4]) or "none"))
+        # The count is printed, and the list is marked as truncated when it is: the
+        # table above says 203 documents and this line used to show four of them with
+        # no hint that more existed, so the two halves of the same file disagreed.
+        docs = sorted(c["docs"])
+        more = "" if len(docs) <= 4 else " (+%d more)" % (len(docs) - 4)
+        out.append("- **%s** — %d docs: %s%s" % (
+            c["name"], len(docs), ", ".join(docs[:4]) or "none", more))
 
     parked = [c for c in classes if c["status"] == "PARKED"]
     if parked:

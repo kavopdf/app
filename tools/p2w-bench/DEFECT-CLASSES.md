@@ -7,15 +7,54 @@ the same class only when they fail on largely the same documents (Jaccard >= 0.5
 A check that fails on its own stays on its own, so a genuinely different defect cannot
 be swallowed by a class it does not belong to.
 
-Documents measured: **0 of 208**
+Documents measured: **208 of 208**
 
 Limits: one full day (24 hours) per class, 12 attempts inside it, and a class that
 improves but does not pass gets its day restarted - up to 3 times, after which it is
-parked as not converging. A parked class is skipped by the fixer and kept with its reason.
-A parked class is skipped by the fixer and kept here with its reason.
+parked as not converging. A parked class is skipped by the fixer and kept here with its reason.
 
 | # | class | documents | share | checks in class | attempts | requeues | status |
 |---|---|---|---|---|---|---|---|
+| 1 | 20_within_10pt (+4) | 203 | 98% | 20_within_10pt, 18_median_dy, 19_worst_dy, 22_reading_order, 30_ink_where_blank_was | 0 | 0 | OPEN |
+| 2 | 47_margins | 203 | 98% | 47_margins | 0 | 0 | OPEN |
+| 3 | 53_embedded_faces | 157 | 75% | 53_embedded_faces | 0 | 0 | OPEN |
+| 4 | 32_stroke_lines | 135 | 65% | 32_stroke_lines | 0 | 0 | OPEN |
+| 5 | 29_blank_where_ink_was | 134 | 64% | 29_blank_where_ink_was | 0 | 0 | OPEN |
+| 6 | 59_shape_anchor | 121 | 58% | 59_shape_anchor | 0 | 0 | OPEN |
+| 7 | 02_text_run_count | 111 | 53% | 02_text_run_count | 0 | 0 | OPEN |
+| 8 | 03_word_count (+1) | 94 | 45% | 03_word_count, 04_words_missing | 0 | 0 | OPEN |
+| 9 | 23_line_pitch | 92 | 44% | 23_line_pitch | 0 | 0 | OPEN |
+| 10 | 09_font_names | 80 | 38% | 09_font_names | 0 | 0 | OPEN |
+| 11 | 41_block_spacing | 74 | 36% | 41_block_spacing | 0 | 0 | OPEN |
+| 12 | 07_table_rows | 58 | 28% | 07_table_rows | 0 | 0 | OPEN |
+| 13 | 01_page_count (+2) | 57 | 27% | 01_page_count, 24_page_breaks, 55_orientation_mix | 0 | 0 | OPEN |
+| 14 | 10_font_sizes | 57 | 27% | 10_font_sizes | 0 | 0 | OPEN |
+| 15 | 25_invisible_text | 55 | 26% | 25_invisible_text | 0 | 0 | OPEN |
+| 16 | 17_matched_runs | 53 | 25% | 17_matched_runs | 0 | 0 | OPEN |
+| 17 | 05_words_extra | 45 | 22% | 05_words_extra | 0 | 0 | OPEN |
+| 18 | 06_table_columns | 42 | 20% | 06_table_columns | 0 | 0 | OPEN |
+| 19 | 14_filled_shapes | 35 | 17% | 14_filled_shapes | 0 | 0 | OPEN |
+| 20 | 27_text_off_page | 31 | 15% | 27_text_off_page | 0 | 0 | OPEN |
 
 ## Documents per class
 
+- **20_within_10pt (+4)** — 203 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+199 more)
+- **47_margins** — 203 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+199 more)
+- **53_embedded_faces** — 157 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+153 more)
+- **32_stroke_lines** — 135 docs: 01_stamp_rotated_15deg_upright, 05_round_company_seal_curved_text, 08_two_overlapping_stamps, 09_stamp_font_not_embedded (+131 more)
+- **29_blank_where_ink_was** — 134 docs: 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text (+130 more)
+- **59_shape_anchor** — 121 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+117 more)
+- **02_text_run_count** — 111 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+107 more)
+- **03_word_count (+1)** — 94 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+90 more)
+- **23_line_pitch** — 92 docs: 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent (+88 more)
+- **09_font_names** — 80 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+76 more)
+- **41_block_spacing** — 74 docs: 03_stamp_vertical_90deg, 05_round_company_seal_curved_text, 06_rect_paid_stamp_red_transparent, 11_stamp_with_signature_image (+70 more)
+- **07_table_rows** — 58 docs: 01_stamp_rotated_15deg_upright, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 08_two_overlapping_stamps (+54 more)
+- **01_page_count (+2)** — 57 docs: 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text (+53 more)
+- **10_font_sizes** — 57 docs: 15_stamp_on_scanned_page, 304_package_insert_small_print, 331_pid_diagram, 39_small_caps_letter_spacing (+53 more)
+- **25_invisible_text** — 55 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 04_stamp_180deg_upside_down, 07_stamp_over_table (+51 more)
+- **17_matched_runs** — 53 docs: 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 07_stamp_over_table (+49 more)
+- **05_words_extra** — 45 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+41 more)
+- **06_table_columns** — 42 docs: 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 28_value_overflows_cell_txtpos, 29_dot_leaders_txtpos (+38 more)
+- **14_filled_shapes** — 35 docs: 23_timetable_grid_txtpos, 300_prescription_rx, 301_lab_report_panel, 305_vaccination_certificate (+31 more)
+- **27_text_off_page** — 31 docs: 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 08_two_overlapping_stamps (+27 more)
