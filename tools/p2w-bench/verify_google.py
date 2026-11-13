@@ -35,7 +35,7 @@ except ImportError:
 # ----------------------------------------------------------------------------
 # helpers
 # ----------------------------------------------------------------------------
-def runs(page):
+def runs(page, page_no=0):
     """Every text span on a page, with the attributes we compare."""
     out = []
     for blk in page.get_text("dict")["blocks"]:
@@ -47,6 +47,7 @@ def runs(page):
                 if not t.strip():
                     continue
                 out.append({
+                    "page": page_no,
                     "text": t,
                     "x": round(sp["bbox"][0], 2),
                     "y": round(sp["bbox"][1], 2),
@@ -959,11 +960,14 @@ def compare(src_path, gd_path):
     checks = {}
 
     # ---- gather -------------------------------------------------------------
+    # Each run carries its page. The matcher below needs it: without a page, a source run on
+    # page 1 can be paired with a render run on page 7 that holds the same word, and the
+    # resulting dy is a page offset reported as a placement error.
     s_runs, g_runs = [], []
-    for p in src:
-        s_runs += runs(p)
-    for p in gd:
-        g_runs += runs(p)
+    for i, p in enumerate(src):
+        s_runs += runs(p, i)
+    for i, p in enumerate(gd):
+        g_runs += runs(p, i)
 
     s_text = " ".join(r["text"] for r in s_runs)
     g_text = " ".join(r["text"] for r in g_runs)
@@ -1069,22 +1073,62 @@ def compare(src_path, gd_path):
                                  abs(s_digits - g_digits) <= max(3, s_digits // 10))
 
     # ---- POSITION (17-24) ---------------------------------------------------
-    # match each source run to its nearest render run by text
-    by_text = collections.defaultdict(list)
-    for r in g_runs:
-        by_text[norm_word(r["text"])].append(r)
+    # Match each source run to a render run on the SAME PAGE, consuming it once, and joining
+    # adjacent runs when the render split a span.
+    #
+    # The old matcher bucketed by text across the whole document and took the nearest by
+    # |dy|+|dx| with no page constraint and no consumption. Measured on 13 Nov, constructed:
+    #   - a render that splits one span leaves no exact match, so the run was DROPPED from
+    #     dys; with every span split the pair set is empty and 18/19/20/21 all passed;
+    #   - one render run could satisfy several source runs, so a duplicate word reported a
+    #     dy of 200 pt on a span that had not moved;
+    #   - page 1's TOTAL could pair with page 7's TOTAL, reporting a page offset as placement.
+    # On the 208-row record 56 documents had under 90 % of their source runs matched, 23 under
+    # 70 %, and 4 of the 21 that PASSED this check passed on less than half their runs.
+    by_page = collections.defaultdict(lambda: collections.defaultdict(list))
+    for j, c in enumerate(g_runs):
+        by_page[c["page"]][norm_word(c["text"])].append(j)
 
     dys, dxs, matched = [], [], 0
     pairs = []
+    used = set()
+
+    def _split_span(r):
+        """Unused render runs on r's page and baseline that join to r's text."""
+        want = norm_word(r["text"])
+        near = [j for j, c in enumerate(g_runs)
+                if j not in used and c["page"] == r["page"]
+                and abs(c["y"] - r["y"]) <= 1.0 and c["x"] >= r["x"] - 1.0]
+        near.sort(key=lambda j: g_runs[j]["x"])
+        for k0 in range(min(3, len(near))):
+            span = [near[k0]]
+            joined = norm_word(g_runs[near[k0]]["text"])
+            k = k0
+            while joined != want and want.startswith(joined) and k + 1 < len(near):
+                k += 1
+                span.append(near[k])
+                joined += norm_word(g_runs[near[k]]["text"])
+            if joined == want:
+                return span
+        return []
+
     for r in s_runs:
-        cands = by_text.get(norm_word(r["text"]))
+        cands = [j for j in by_page.get(r["page"], {}).get(norm_word(r["text"]), [])
+                 if j not in used]
+        joined = False
+        if not cands:
+            cands = _split_span(r)
+            joined = bool(cands)
         if not cands:
             continue
-        best = min(cands, key=lambda c: abs(c["y"] - r["y"]) + abs(c["x"] - r["x"]))
-        dys.append(best["y"] - r["y"])
-        dxs.append(best["x"] - r["x"])
+        best = min(cands, key=lambda j: abs(g_runs[j]["y"] - r["y"]) +
+                                     abs(g_runs[j]["x"] - r["x"]))
+        for j in (cands if joined else [best]):
+            used.add(j)
+        dys.append(g_runs[best]["y"] - r["y"])
+        dxs.append(g_runs[best]["x"] - r["x"])
         matched += 1
-        pairs.append((r, best))
+        pairs.append((r, g_runs[best]))
 
     def median(v):
         if not v:
@@ -1098,8 +1142,10 @@ def compare(src_path, gd_path):
     within10 = round(100.0 * sum(1 for d in dys if abs(d) <= 10) / max(1, len(dys)))
     med_dx = round(median(dxs), 1)
 
+    # ceil, not int: int(2 * 0.9) is 1, so a two-run document passed on one match. The stated
+    # rule is 90 % and a floor of the product is not 90 %.
     checks["17_matched_runs"] = (len(s_runs), matched,
-                                 matched >= int(len(s_runs) * 0.9))
+                                 matched >= -(-len(s_runs) * 9 // 10))
     # abs(), because med_dy is signed. Without it a document shifted UP by any
     # amount passed: med_dy = -12 is less than 3, so the comparison said fine
     # while every line sat twelve points above where it belonged. Found by
