@@ -4637,6 +4637,18 @@ public final class DocxWriter {
         // so "…to the meeting." came out as "…to the ". Mapped, the same line renders at
         // 56.1-359.8 pt against the PDF's 56.0-360.2, whole. The three families here are
         // metrically identical to the PostScript originals, which is why the widths hold.
+        // MT and PSMT are PostScript foundry suffixes and they sit AFTER the style, so they
+        // have to come off the whole name first: Arial-BoldMT is arial+bold+mt, not a bold
+        // family called "arial-bold". Without this the engine wrote "ArialMT" and
+        // "TimesNewRomanPSMT" into w:rFonts whole - names no reader has, so every one of those
+        // runs was substituted. The bench's own checker has always stripped these
+        // (verify_google.py), which is why the two sides disagreed about what a face is called.
+        for (String suf : new String[]{"PSMT", "PS", "MT"}) {
+            if (f.length() > suf.length() && f.toUpperCase(Locale.ROOT).endsWith(suf)) {
+                f = f.substring(0, f.length() - suf.length());
+                break;
+            }
+        }
         String base = f;
         int dash = base.indexOf('-');
         if (dash > 0) base = base.substring(0, dash);
@@ -4654,7 +4666,11 @@ public final class DocxWriter {
         // "Quantity" (28.39 pt at 7 pt Liberation Sans Bold on the page) has 31.39 pt of
         // column and Noto Sans Bold sets it 30.9 pt and breaks it after "Quantit".
         String[] suffixes = {" Bold Italic", " Bold Oblique", " Italic", " Oblique",
-                " Bold", " Regular", " Roman", " Normal",
+                // " Roman" was in this list and it turned "Times New Roman" - a FAMILY name,
+                // the commonest face in any Word-produced PDF - into "Times New", which no
+                // reader has. The hyphen form "-Roman" below is the PostScript style suffix and
+                // stays; the space form is a family.
+                " Bold", " Regular", " Normal",
                 "-BoldItalic", "-BoldOblique", "-Bold", "-Italic", "-Oblique",
                 "-Regular", "-Roman", "-Normal", ",Bold", ",Italic", ",BoldItalic"};
         for (String suf : suffixes) {
@@ -4672,6 +4688,12 @@ public final class DocxWriter {
         BASE14.put("times", "Times New Roman");
         BASE14.put("helvetica", "Arial");
         BASE14.put("courier", "Courier New");
+        // Identity entries, so the strip above has somewhere to land. "TimesNewRomanPSMT" is
+        // how Google and Word both name the face; after PSMT comes off it reads
+        // "TimesNewRoman", which no reader has either - the family is "Times New Roman".
+        BASE14.put("arial", "Arial");
+        BASE14.put("timesnewroman", "Times New Roman");
+        BASE14.put("couriernew", "Courier New");
     }
 
     /** Points to whole twips, the unit every w:* length uses. */
