@@ -85,6 +85,18 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: 304_package_insert_small_print, engine 2a68de6: 17 flowed paragraphs, no table and no anchor; sectPr margins all 0 and first paragraph w:before=296 twips=14.8 pt against the PDF's first line top 16.4 pt, so the top of the page is placed correctly. Recorded: 18_median_dy -44.8, 19_worst_dy +90.8, 20_within_10pt 12/100, 23_line_pitch 5.0 against source 7.8. Dominant run size 6.2 pt with w:line=143 twips (7.15 pt asked); calibrate.py's model (line/240)*1.15*size predicts 4.25 pt for that pair, measured 5.0 - direction right, constant not. Untested: no per-line dy dump through Drive and no scaled-w:line build has been measured.
   recorded: 2026-11-13 05:44
 
+- CONFIRMED - Google renders w:line as a multiple of the substitute face's line height, so the flowed pitch asked in twips comes back short and the error accumulates down the page; emitting the advance as a hairline box (w:line=1) plus w:before = advance - 0.069*size reproduces the page's own pitch face-independently
+  evidence: Patched engine 2a68de6-d80a524, 20 documents through Drive, Google PDF export, 59 checks. 304_package_insert_small_print 51->58, 20_within_10pt 12->100, 18_median_dy -44.8 -> pass, 23_line_pitch 5.0 -> pass; emitted w:before=147 twips (7.35 pt) + 0.069*6.2 = 7.78 pt against the PDF's 7.8 pt pitch. 34_monospace_document 53->56, 334_patent_document 47->53, 321_auditors_report 54->57. 3 of the 10 failing documents now PASS the target check outright and 4 of 10 moved the right way.
+  recorded: 2026-11-13 06:56
+
+- RULED OUT - The hairline-plus-before flow emitter is safe to ship as it stands
+  evidence: Same 20-document round, engine 2a68de6-d80a524: ratchet.py FAIL - 6 documents below their best. 317_rti_response 56/59 same score but 41_block_spacing newly failing; 35_four_typefaces_one_page 54->53; 49_coloured_background_block_paragraph 55->54 (14_filled_shapes); 57_centred_title_page_left_body_pages 48/59 same score but 27_text_off_page and 44_header_footer newly failing; academic-paper-ieee-2col-abstract 46->41 (01_page_count, 07_table_rows, 23_line_pitch, 24_page_breaks); table-with-no-header-row 54->53 with 20_within_10pt newly failing. Reverted with git checkout -- app/src; patch kept at patches/hairline-flow-before.patch.
+  recorded: 2026-11-13 06:56
+
+- UNTESTED - The hairline box changes the page budget the fitter sees: it takes a line's height out of w:line and puts it in w:before, but fitPage still works to linePt*20, so a page near its bottom or a band boundary breaks a line early or late - which is exactly the shape of the six regressions (academic-paper gained 01_page_count and 24_page_breaks, 57_centred gained 44_header_footer, 317 gained 41_block_spacing). Feed fitPage and spacingTw the hairline advance, not the model box
+  evidence: Engine 2a68de6-d80a524, 20 documents: every document that LOST a check lost one that depends on where the flow lands on the page (page count, page breaks, header/footer band, block spacing), while every document that GAINED passed the checks that depend only on pitch (18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch). 304 gained 7 and lost 0. Untested: no build has fed the hairline advance to fitPage.
+  recorded: 2026-11-13 06:56
+
 
 ## 47_margins
 

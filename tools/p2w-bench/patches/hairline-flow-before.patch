@@ -1,0 +1,59 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4a621bd..1471470 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -92,6 +92,15 @@ public final class DocxWriter {
+      */
+     private static final float LINE_BASE = 0.8f;
+ 
++    /**
++     * How much of a hairline line box a baseline sits below its top, as a fraction of the font
++     * size. Measured through Drive by calibrate.py: with {@code w:line="1"} the advance is
++     * {@code w:before + 0.069 * size} to 0.01 pt over 8/10/14/20 pt Arial and 10 pt Courier New
++     * and Times New Roman - it does not follow the substituted face, which is why this is the
++     * construct to place a line with and a scaled {@code w:line} is not.
++     */
++    private static final float HAIRLINE_EM = 0.069f;
++
+     /**
+      * Ceiling on the vertical gap one paragraph may ask for, in twips (120 pt).
+      *
+@@ -3048,21 +3057,35 @@ public final class DocxWriter {
+         }
+         beforeTw = fit[0];
+         lineTw = fit[1];
++        // What Google does with the box, measured (calibrate.py, and again on 304_package_insert_
++        // small_print): w:line is a MULTIPLE of the substitute face's line height, not an exact
++        // height. 143 twips on a 6.2 pt face advanced 5.0 pt where 7.15 was asked, and over 17
++        // flowed lines that is the -44.8 pt median the record carries. What Google honours
++        // exactly is w:before, and with the box cut to a hairline the advance is
++        // before + 0.069 * size whichever face is substituted. So the advance this model has
++        // already solved for goes out as a hairline box plus that much w:before, and the model
++        // that decides where the line lands is left exactly as it was.
++        float advancePt = (1f - LINE_BASE) * ctx.lastLinePt + LINE_BASE * linePt
++                + beforeTw / (float) TWIPS_PER_PT;
++        int hairTw = 1;
++        int hairBeforeTw = (int) Math.max(0L,
++                Math.round((advancePt - HAIRLINE_EM * b.size) * TWIPS_PER_PT));
+         // The box the pitch solver compares next time is the page's own, not the squeezed one.
+         ctx.lastLinePt = linePt;
+         ctx.lastBaseline = b.y;
+         ctx.lastSize = b.size;
+         ctx.newPage = false;
+         // Re-sync to what was written, so the next paragraph is measured from the reader's
+-        // position rather than from the PDF's (D-26).
++        // position rather than from the PDF's (D-26). The bookkeeping keeps the model's own
++        // box and gap; only the XML that leaves the engine carries the hairline.
+         resync(ctx, flowTopPt(ctx), beforeTw, lineTw);
+         sb.append("<w:p><w:pPr>");
+         if (p.heading > 0) {
+             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
+         }
+         sb.append("<w:snapToGrid w:val=\"0\"/>")
+-                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"").append(beforeTw)
+-                .append("\" w:after=\"0\" w:line=\"").append(lineTw)
++                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"").append(hairBeforeTw)
++                .append("\" w:after=\"0\" w:line=\"").append(hairTw)
+                 .append("\" w:lineRule=\"exact\"/>")
+                 .append("<w:ind w:left=\"").append(Math.max(0, leftTw - bandLeftTw(ctx, p.column)))
+                 .append("\" w:right=\"").append(rightTw).append("\" w:firstLine=\"0\"/>");
