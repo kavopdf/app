@@ -130,6 +130,15 @@ path keeps a table a human also reads, and the .txt path has no reader but this 
 the store is the truth. Both ratchets must be run - one conversion writes both outputs,
 and each can only see its own half.
 
+    python3 tools/p2w-bench/round.py --release-fixer [--force]
+      Release the fixer slot. Exit 1 with a refusal when the run is under 25 minutes old and has
+      recorded fewer than two attempts - the slot is good for 45 minutes and one attempt takes
+      ten, so releasing there hands the rest of the hour to nobody. `--force` releases anyway and
+      writes a FORCED line into RUN-LOG.md; use it for a broken build, a blocked Drive or an empty
+      class list, and say why in INCIDENTS.md.
+      It does not refuse when no class is still OPEN: a finished round must be able to release and
+      close, or this check would block the only exit from the fix phase.
+
 ## round.py — whose turn it is
 
 **Used by:** all four.

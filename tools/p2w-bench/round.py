@@ -191,11 +191,82 @@ def claim(name):
     return 0
 
 
-def release(name):
+def _attempts_this_run():
+    """How many attempt lines the trace holds since the last claim."""
+    path = os.path.join(HERE, "TRACE.md")
+    if not os.path.exists(path):
+        return 0
+    n, seen_claim = 0, False
+    for line in open(path, encoding="utf-8"):
+        if "| claim |" in line:
+            n, seen_claim = 0, True
+        elif seen_claim and "| attempt |" in line:
+            n += 1
+    return n
+
+
+def release(name, force=False):
+    """Release a slot, and for the fixer, refuse to waste it.
+
+    WHY THIS IS A REFUSAL AND NOT A SENTENCE
+      The brief has said since 13 Nov, twice, that an attempt recorded as 'error' is not a reason
+      to stop - once as a restructured STEP 9 and once as an explicit paragraph. Sixteen runs
+      later the average is 1.1 attempts against a target of 3, fourteen of them did exactly one,
+      and the slot is used six minutes of forty-five. Instructions are promises; this is the check
+      that makes it one.
+
+      A fixer run that has been going less than 25 minutes and has recorded fewer than two
+      attempts is not finished, whatever it thinks. It still holds the slot, the brief still tells
+      it to go back to STEP 2, and releasing now hands 39 idle minutes to nobody.
+
+      --force is the way out, and it exists for the honest cases: the build is broken, Drive is
+      blocked, the class list is empty. It prints a line into RUN-LOG.md so a forced release is
+      visible rather than silent.
+    """
     s = load()
+    started = s.get("%s_started" % name) or 0
+    # A finished round is not a wasted slot. When no class is still OPEN the run's work is done
+    # and it must be able to release and close - otherwise this check would block the only exit
+    # from the fix phase, which is a worse bug than the one it fixes.
+    any_open = False
+    for fname in ("DEFECT-CLASSES.md", "DEFECT-CLASSES-TXT.md"):
+        fp = os.path.join(HERE, fname)
+        if not os.path.exists(fp):
+            continue
+        for line in open(fp, encoding="utf-8"):
+            if line.startswith("| ") and line.rstrip().endswith("| OPEN |"):
+                any_open = True
+                break
+        if any_open:
+            break
+
+    if name == "fixer" and started and not force and s.get("phase") == "fix" and any_open:
+        age = (time.time() - started) / 60.0
+        done = _attempts_this_run()
+        if age < 25 and done < 2:
+            print("refused: this run is %d minutes old with %d attempt(s) recorded." % (age, done))
+            print("The slot is good for 45 minutes and one attempt takes about ten. Go back to")
+            print("STEP 2, take the next OPEN class and do another one - an attempt recorded as")
+            print("'error' is recorded, and is not a reason to stop.")
+            print("If you genuinely cannot continue - the build is broken, Drive is blocked, the")
+            print("class list is empty - release with: round.py --release-fixer --force")
+            return 1
+        if done < 2:
+            print("fixer: releasing after %d minute(s) with %d attempt(s) - past the 25-minute mark,"
+                  % (age, done))
     s["%s_started" % name] = 0
     save(s)
-    print("%s released" % name)
+    if force:
+        try:
+            log = os.path.join(HERE, "RUN-LOG.md")
+            with open(log, "a", encoding="utf-8") as f:
+                f.write("| %s | %s | slot FORCED released - see INCIDENTS.md for why |\n"
+                        % (ist("%d %b %H:%M"), name))
+        except Exception:
+            pass
+        print("%s released (forced)" % name)
+    else:
+        print("%s released" % name)
     return 0
 
 
@@ -230,7 +301,7 @@ def main(argv):
         return claim("fixer")
 
     if "--release-fixer" in argv:
-        return release("fixer")
+        return release("fixer", force="--force" in argv)
 
     # Written out rather than generated, so the flag is greppable in the source.
     # A tool that checks the interface reference against the code cannot see a

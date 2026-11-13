@@ -544,6 +544,13 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
   THE REST OF THIS STEP, once the loop above says stop:
       python3 tools/p2w-bench/round.py --release-fixer
       bash tools/commit-gate.sh
+    The release now REFUSES a wasted slot: if the run is under 25 minutes old with fewer than two
+    attempts recorded, it exits 1 and tells you to go back to STEP 2. That is the same rule as the
+    question above, made mechanical, because as a sentence it was ignored for sixteen runs - 1.1
+    attempts each against a target of three, six minutes of a forty-five minute slot.
+    If you genuinely cannot continue - the build is broken, Drive is blocked, the class list is
+    empty - release with `--release-fixer --force`, which prints a line into RUN-LOG.md so a forced
+    release is visible rather than silent, and write the reason in INCIDENTS.md.
   The gate exits 0 only when the engine change carries its evidence: the ratchet held, precommit
   passed, and BASELINE.md, RESULTS.jsonl and RATCHET.json all changed in the same working tree as
   the engine. Exit 1 means NO COMMIT - it prints which of the three is missing. Do not commit

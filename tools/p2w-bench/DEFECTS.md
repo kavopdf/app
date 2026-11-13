@@ -2316,3 +2316,63 @@ measurement tool quietly answering a different question from the one it was aske
 it produced went into the ledger as fact. Five attempts' worth of "0 of N" may be understated.
 A pipeline whose numbers are wrong cannot be audited at all — which is why this was worth chasing
 through the store's sort order rather than writing it off as one run's complaint.
+
+---
+
+## 45. Sixteen runs, never three attempts — so the loop became a refusal
+
+The question was whether the fixer has ever done three attempts in one run. The answer is no, and
+the table is worth looking at because it is the whole case:
+
+    18:41 1   00:46 2   04:40 1   07:40 1
+    19:46 0   01:45 1   05:41 1   08:40 1
+    20:43 1   02:50 1   06:47 1
+    21:47 1   03:44 2   06:57 1
+    22:46 1
+    23:48 1
+
+Sixteen runs. Fourteen did exactly one attempt. Two did two, both before any of the loop work.
+Average 1.1 against a target of three, six minutes of a forty-five minute slot.
+
+Two instruction fixes had already been applied and both failed:
+
+- **§36** moved the loop from a step of its own into STEP 9's opening question, because runs read
+  straight past a step that is only a condition. The 07:40 run after that did one attempt.
+- **§40** said plainly that an attempt recorded as `error` is recorded and is not a reason to stop.
+  The 08:40 run after that did one attempt.
+
+Both were correct readings of what had gone wrong, and neither changed the behaviour. A sentence
+in a brief is a promise, and this pipeline's own history is a list of promises that were not kept
+until something checked them: the slot release, the attempt ledger, the engine id, the evidence
+files. Every one of those became reliable the day a tool refused instead of a paragraph asking.
+
+### So the release refuses now
+
+    python3 tools/p2w-bench/round.py --release-fixer
+
+Exit 1 when the run is under 25 minutes old **and** has recorded fewer than two attempts, with the
+next step spelled out. The slot is good for 45 minutes and one attempt takes ten; releasing at six
+hands thirty-nine minutes to nobody.
+
+Three cases, all tested:
+
+| state | behaviour |
+|---|---|
+| 0 attempts, under 25 minutes, classes still OPEN | refused, exit 1 |
+| same, with `--force` | released, exit 0, a FORCED line in RUN-LOG.md |
+| no class still OPEN in either half | released, exit 0 — a finished round is not a wasted slot |
+
+That last row is the trap this check would otherwise have set: `--close-round` is reached through
+`--release-fixer`, so a refusal there would block the only exit from the fix phase. Worse than the
+bug it fixes. Both class files are checked, because the `.txt` half has its own list and a round is
+not finished while either has an OPEN row.
+
+`--force` exists for the honest cases — a broken build, a blocked Drive, an empty class list — and
+it is deliberately noisy: a line in RUN-LOG.md, and the reason belongs in INCIDENTS.md. A silent
+override would be the same promise in a new costume.
+
+### What this says about the pattern
+
+Six times today the same shape has appeared: a rule written in prose, ignored, then made mechanical.
+The brief does not lack instructions. It lacked enforcement, and a run at three in the morning
+follows what the tools do, not what a paragraph says.
