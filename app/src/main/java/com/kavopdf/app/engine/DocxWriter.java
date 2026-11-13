@@ -4696,6 +4696,31 @@ public final class DocxWriter {
                 rowLineTw = Math.max(typeFloorTw, twScale(rowLineTw, ctx.squeeze));
             }
             writtenRowsTw += Math.max(0, Math.max(rowTwHere, rowLineTw));
+            // THE ROW'S OWN TOP EDGE IN THE PAGE'S COORDINATES, when the pass that built the
+            // table measured the row edges. The cells below are placed from it.
+            //
+            // From the PAGE's edges, not from the flow's position. Placing them from the flow
+            // was built and measured first and it costs a document: on
+            // 64_newspaper_uneven_columns_ad_boxes the flow's own position is 15 pt high, so
+            // every cell inherited that 15 pt and the ad grid came back at 102.4 where the page
+            // has it at 122.0 - 07_table_rows 6 -> 12 and 46_text_crossing_rule 0 -> 17. The
+            // page's row edges carry no flow error at all, and a cell's distance below its own
+            // row's top is exactly what this is asking for.
+            //
+            // The two passes record their edges differently: the ruled pass's rowEdge are the
+            // rules the page drew, while the whitespace pass's are the rows' first BASELINES
+            // (see PdfToWord, where rowTopPt is rowEdge[0] less LINE_BASE of a pitch). Reading
+            // a baseline as an edge would put every cell of a whitespace table on its row's top
+            // rule, so the baseline is converted back to an edge here.
+            float rowTopPagePt = Float.NaN;
+            if (exactRows) {
+                float edgePt = rowEdge[r];
+                if (!t.ruled) {
+                    float pitchHere = rowEdge[r + 1] - rowEdge[r];
+                    if (pitchHere > 0.5f && pitchHere < 2000f) edgePt -= LINE_BASE * pitchHere;
+                }
+                rowTopPagePt = edgePt;
+            }
             inner.append("<w:tr>");
             if (rowTwHere > 0) {
                 inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
@@ -4819,8 +4844,45 @@ public final class DocxWriter {
                 // not a bug.
                 float cellSz = r < t.sizes.size() && c < t.sizes.get(r).size()
                         && t.sizes.get(r).get(c) != null ? t.sizes.get(r).get(c) : 0f;
+                // The page's own baseline for this cell, when the pass that built the table
+                // measured it. This is the fix for the offset REMAINING-DEFECTS.md records as
+                // unfixed: the writer put EVERY cell at LINE_BASE of the row's pitch, so a page
+                // that drew its cell text at 0.65 of the pitch came back 0.15 * pitch low on
+                // every row - a constant +2.75 pt on 318_court_summons_form's 18 pt rows, over a
+                // 2.6 pt tolerance. Measured over 2,343 table runs whose row the page bounds with
+                // rules: the page's own fraction spans 0.0-0.9, quartiles 0.53/0.576/0.67, and
+                // 95 of 2,343 are at the 0.8 the writer assumed.
+                //
+                // The row must not grow, so the request is clamped to the row's own written
+                // height: before + box is the cell's content height, and w:trHeight is "atLeast".
+                //
+                // AND THE BASELINE MUST BE AT LEAST ONE ASCENT BELOW THE ROW'S TOP EDGE. A
+                // baseline nearer than the text is tall puts the glyphs above the row's top rule,
+                // which is not something a page draws: where the measurement says that, the
+                // model's row edge is wrong and not the placement. On
+                // 64_newspaper_uneven_columns_ad_boxes the ad grid's rows are 56 pt tall and the
+                // measured baseline sits 2.9 pt below one of them - 46_text_crossing_rule went
+                // 0 -> 15 and 07_table_rows 6 -> 10. Those cells keep the old foot-of-the-row
+                // placement; the page's fraction is used only where it is a placement at all.
+                float cellBaseY = yOf(t, r, c);
+                boolean cellPlaced = false;
                 int cellBoxTw = rowLineTw, cellBeforeTw = 0;
-                if (rowParts == 1 && cellSz > 0f) {
+                if (rowParts == 1 && cellSz > 0f && !Float.isNaN(cellBaseY)
+                        && !Float.isNaN(rowTopPagePt)) {
+                    float wantPt = cellBaseY - rowTopPagePt;
+                    float roomPt = rowHeightTw / (float) TWIPS_PER_PT;
+                    if (wantPt >= LINE_BASE * cellSz && wantPt <= roomPt) {
+                        int boxTw = (int) Math.max(1L,
+                                Math.round(hairlinePt(cellSz) * TWIPS_PER_PT));
+                        int beforeTw = (int) Math.round(
+                                (wantPt - LINE_BASE * boxTw / (float) TWIPS_PER_PT) * TWIPS_PER_PT);
+                        int capTw = Math.max(0, rowHeightTw - boxTw);
+                        cellBoxTw = boxTw;
+                        cellBeforeTw = Math.max(0, Math.min(beforeTw, capTw));
+                        cellPlaced = true;
+                    }
+                }
+                if (!cellPlaced && rowParts == 1 && cellSz > 0f) {
                     cellBoxTw = (int) Math.max(1L, Math.round(hairlinePt(cellSz) * TWIPS_PER_PT));
                     // The baseline inside a box sits LINE_BASE of the box below its top, and the
                     // old pair (before=0, box=rowLineTw) put it at LINE_BASE * rowLineTw - the
@@ -5007,6 +5069,15 @@ public final class DocxWriter {
         if (c >= row.size()) return "";
         String s = row.get(c);
         return s == null ? "" : s;
+    }
+
+    /** The page y of this cell's first baseline, or NaN when the pass did not measure it. */
+    private static float yOf(PdfToWord.Table t, int r, int c) {
+        if (r >= t.cellY.size()) return Float.NaN;
+        List<Float> ys = t.cellY.get(r);
+        if (c >= ys.size()) return Float.NaN;
+        Float y = ys.get(c);
+        return y == null ? Float.NaN : y;
     }
 
     /**

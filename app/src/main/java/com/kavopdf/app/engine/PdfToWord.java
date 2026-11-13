@@ -232,6 +232,28 @@ public final class PdfToWord {
          * the page did, instead of re-wrapping a line the page never wrapped.
          */
         public final List<List<Float>> cellR = new ArrayList<>();
+        /**
+         * The y, in points, of the baseline each cell's FIRST line was drawn on - same shape as
+         * {@link #rows}, {@link Float#NaN} where the pass did not measure it.
+         *
+         * <p>Where a cell's text sits INSIDE its row is not a constant, and the writer assumed it
+         * was: every cell was placed at {@code DocxWriter.LINE_BASE} of the row's pitch, i.e. four
+         * fifths of the way down, on the reasoning that this corpus draws cell text at the foot of
+         * its row. Measured on the 211-document corpus, over the 2,343 table runs whose own row is
+         * bounded by rules the page drew, the page's baseline sits at a FRACTION OF THE PITCH that
+         * spans 0.0 to 0.9 - quartiles 0.53 / 0.576 / 0.67, modes 0.6 and 0.7 - and only 95 of
+         * them are at 0.8. On 318_court_summons_form the page puts its cell text 11.75 pt below an
+         * 18 pt row's top edge (0.653) where the writer asked for 14.4 (0.8), so every one of its
+         * 12 cell runs came back +2.75 pt low - the constant offset REMAINING-DEFECTS.md has
+         * recorded as the unfixed table-top error since D-26.
+         *
+         * <p>It is NOT a table-top error: the table's own top rule renders within 0.2 pt of the
+         * page's on that document and on every constructed probe, and a 10 pt change to the
+         * spacer moves the whole table 10 pt. What is wrong is the cell's baseline inside the row,
+         * so this is where the page drew it, exactly as {@link #cellX} records where it started
+         * horizontally.
+         */
+        public final List<List<Float>> cellY = new ArrayList<>();
         /** The typeface each cell was drawn in, same shape as {@link #rows}. */
         public final List<List<String>> fonts = new ArrayList<>();
         /**
@@ -1208,6 +1230,7 @@ public final class PdfToWord {
         for (List<String> row : t.rows) Collections.reverse(row);
         reverseRows(t.cellX);
         reverseRows(t.cellR);
+        reverseRows(t.cellY);
         reverseRows(t.fonts);
         reverseRows(t.sizes);
         reverseRows(t.colors);
@@ -5912,6 +5935,7 @@ public final class PdfToWord {
             List<Float> rowSizes = new ArrayList<>();
             List<Float> rowXs = new ArrayList<>();
             List<Float> rowRs = new ArrayList<>();
+            List<Float> rowBaseYs = new ArrayList<>();
             List<Integer> rowCols = new ArrayList<>();
             for (int c = 0; c < ncol; c++) {
                 String str = glyphText(buckets.get(r).get(c));
@@ -5921,6 +5945,7 @@ public final class PdfToWord {
                 rowSizes.add(sizeOf(buckets.get(r).get(c)));
                 rowXs.add(glyphFirstX(buckets.get(r).get(c)));
                 rowRs.add(glyphLastRight(buckets.get(r).get(c)));
+                rowBaseYs.add(glyphFirstBaseline(buckets.get(r).get(c)));
                 rowCols.add(colorOf(buckets.get(r).get(c)));
             }
             t.rows.add(row);
@@ -5928,6 +5953,7 @@ public final class PdfToWord {
             t.sizes.add(rowSizes);
             t.cellX.add(rowXs);
             t.cellR.add(rowRs);
+            t.cellY.add(rowBaseYs);
             t.colors.add(rowCols);
         }
         // A QR code, a logo or a chart is drawn from the same rectangles a table is, so the
@@ -6281,6 +6307,10 @@ public final class PdfToWord {
             // at its rule: it is wherever the page drew it, centred, right-aligned or padded.
             float[][] firstX = new float[rows][cols];
             for (float[] rowX : firstX) java.util.Arrays.fill(rowX, Float.NaN);
+            // And the baseline of that first line, for the same reason: the cell's text is
+            // placed inside its row from the page's own y, not from a fixed fraction of the pitch.
+            float[][] firstY = new float[rows][cols];
+            for (float[] rowY : firstY) java.util.Arrays.fill(rowY, Float.NaN);
             for (Line line : lines) {
                 float cx = (line.x + line.right) / 2f;
                 int r = band(ys, line.y);
@@ -6291,6 +6321,7 @@ public final class PdfToWord {
                 if (faces[r][c] == null) faces[r][c] = fontOf(line.glyphs);
                 if (Float.isNaN(sizes[r][c])) sizes[r][c] = sizeOf(line.glyphs);
                 if (Float.isNaN(firstX[r][c])) firstX[r][c] = visibleX(line.glyphs, line.x);
+                if (Float.isNaN(firstY[r][c])) firstY[r][c] = line.y;
             }
 
             int filled = 0;
@@ -6314,8 +6345,10 @@ public final class PdfToWord {
                 String[][] trimmed = new String[rows][keep.size()];
                 String[][] trimmedFaces = new String[rows][keep.size()];
                 float[][] trimmedX = new float[rows][keep.size()];
+                float[][] trimmedY = new float[rows][keep.size()];
                 for (int r = 0; r < rows; r++) {
                     for (int k = 0; k < keep.size(); k++) {
+                        trimmedY[r][k] = firstY[r][keep.get(k)];
                         trimmed[r][k] = cells[r][keep.get(k)];
                         trimmedFaces[r][k] = faces[r][keep.get(k)];
                         trimmedX[r][k] = firstX[r][keep.get(k)];
@@ -6324,6 +6357,7 @@ public final class PdfToWord {
                 cells = trimmed;
                 faces = trimmedFaces;
                 firstX = trimmedX;
+                firstY = trimmedY;
                 cols = keep.size();
             }
 
@@ -6353,16 +6387,19 @@ public final class PdfToWord {
                 List<String> rowFonts = new ArrayList<>();
                 List<Float> rowSizes = new ArrayList<>();
                 List<Float> rowXs = new ArrayList<>();
+                List<Float> rowYs = new ArrayList<>();
                 for (int c = 0; c < cols; c++) {
                     row.add(cells[r][c] == null ? "" : cells[r][c]);
                     rowFonts.add(faces[r][c] == null ? "" : faces[r][c]);
                     rowSizes.add(sizes[r][c]);
                     rowXs.add(firstX[r][c]);
+                    rowYs.add(firstY[r][c]);
                 }
                 t.rows.add(row);
                 t.fonts.add(rowFonts);
                 t.sizes.add(rowSizes);
                 t.cellX.add(rowXs);
+                t.cellY.add(rowYs);
             }
             out.add(t);
         }
@@ -6688,6 +6725,11 @@ public final class PdfToWord {
             t.sizes.add(textSizes);
             t.cellX.add(textXs);
             t.cellR.add(textRs);
+            // Where each cell's own first line sits, so the writer can place it inside the row
+            // from the page's y instead of at a fixed fraction of the row's pitch.
+            List<Float> textYs = new ArrayList<>();
+            for (float y : lineY) textYs.add(y);
+            t.cellY.add(textYs);
             t.colors.add(textCols);
             float rowY = Float.MAX_VALUE;
             for (Line cell : rows.get(r)) rowY = Math.min(rowY, cell.y);
@@ -6848,6 +6890,7 @@ public final class PdfToWord {
             out.sizes.add(new ArrayList<>(java.util.Arrays.asList(sizeOf(t, r, c), Float.NaN)));
             out.cellX.add(new ArrayList<>(java.util.Arrays.asList(xOf(t, r, c), Float.NaN)));
             out.cellR.add(new ArrayList<>(java.util.Arrays.asList(rOf(t, r, c), Float.NaN)));
+            out.cellY.add(new ArrayList<>(java.util.Arrays.asList(yOf(t, r, c), Float.NaN)));
             out.colors.add(new ArrayList<>(java.util.Arrays.asList(colorOf(t, r, c), -1)));
         }
         for (int side = 0; side < 2; side++) {
@@ -6868,6 +6911,8 @@ public final class PdfToWord {
                         xOf(t, r, a), b < 0 ? Float.NaN : xOf(t, r, b))));
                 out.cellR.add(new ArrayList<>(java.util.Arrays.asList(
                         rOf(t, r, a), b < 0 ? Float.NaN : rOf(t, r, b))));
+                out.cellY.add(new ArrayList<>(java.util.Arrays.asList(
+                        yOf(t, r, a), b < 0 ? Float.NaN : yOf(t, r, b))));
                 out.colors.add(new ArrayList<>(java.util.Arrays.asList(
                         colorOf(t, r, a), b < 0 ? -1 : colorOf(t, r, b))));
             }
@@ -6937,6 +6982,30 @@ public final class PdfToWord {
         if (r >= t.cellX.size()) return Float.NaN;
         List<Float> row = t.cellX.get(r);
         return c < row.size() && row.get(c) != null ? row.get(c) : Float.NaN;
+    }
+
+    private static float yOf(Table t, int r, int c) {
+        if (r >= t.cellY.size()) return Float.NaN;
+        List<Float> row = t.cellY.get(r);
+        return c < row.size() && row.get(c) != null ? row.get(c) : Float.NaN;
+    }
+
+    /**
+     * The baseline of the first line a cell holds, or NaN when the cell is empty.
+     *
+     * <p>{@link Glyph#y} is the baseline, measured along the baseline and y downwards, so on a
+     * cell the page drew on two lines this is the upper line's - which is the one the row's own
+     * height is measured from. Rotated glyphs are skipped: on those the baseline is not a page
+     * coordinate.
+     */
+    private static Float glyphFirstBaseline(List<Glyph> gs) {
+        if (gs == null || gs.isEmpty()) return Float.NaN;
+        float y = Float.NaN;
+        for (Glyph g : gs) {
+            if (g.rotated || !visible(g)) continue;
+            if (Float.isNaN(y) || g.y < y) y = g.y;
+        }
+        return y;
     }
 
     /** The x of the right edge of the last glyph in the run, or NaN when it is empty. */
