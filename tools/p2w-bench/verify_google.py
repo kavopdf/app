@@ -579,6 +579,204 @@ def _span_flags(sp):
 
 
 # ----------------------------------------------------------------------------
+# A RULE IS A SEGMENT, NOT A DRAWING OBJECT (32_stroke_lines)
+#
+# The old 32 counted drawing objects: s_n on the source, g_n on the render, pass when
+# g_n >= 0.8 * s_n. Measured on the 211-document corpus, that number is not a count of
+# rules - it is 7,979 objects of which 1,653 are 2-D outlines (a 300x400 pt table
+# outline is ONE "stroke line") and 1,948 are exactly 13.00 pt table-cell segments. On
+# a table-heavy document s_n is a cell count. It is also blind to position, length,
+# thickness and colour, so a rule lost on page 3 is paid for by a rule gained on
+# page 1, and 20 % of a document's rules can vanish inside the floor for free.
+#
+# A rule here is one straight axis-aligned SEGMENT of ink:
+#   thin      perpendicular extent <= 4.0 pt (stroke width, or filled-band thickness)
+#   long      along-axis extent   >= 10.0 pt
+#   isolated  neither end runs into another segment (3 pt past each end is empty)
+#   painted   it has ink that is not the page colour
+# So a 300x400 pt outline is four rules, and it cannot be traded against a rule
+# elsewhere. `thin` and `long` are the calibrated detector's values; `isolated` is what
+# separates a rule from a table grid, because a cell edge ends at a T-junction.
+#
+# PRESERVED means: every isolated rule the source draws is still drawn on the SAME page
+# of the render, same orientation, within TOL pt across the rule, covering at least
+# OVERLAP of its own length. Per rule, per page - so a gain can never pay for a loss.
+#
+# Isolation is asked of the SOURCE only. The grid's geometry is re-derived by the
+# renderer from the table model and is 06/07's question; on the render side we only ask
+# "is there ink of this shape here", because a rule that came back as a closed box or a
+# table border is still painted. Requiring isolation on the render side is a false
+# positive factory: on 64_newspaper_uneven_columns_ad_boxes all four rules are on the
+# render within 0.8 pt and all four read "lost".
+#
+# TOL is 24 pt, and it is chosen from measurement, not taste. Across 1,042 matched pairs
+# the perpendicular residual is p50 0.02 / p99 8.57 pt; the engine places a standalone
+# rule absolutely and the renderer honours it. The residual is not a continuum, it is
+# two populations: rules that did not move at all (max 1.74 pt) and table borders that
+# moved with the table they cap (6-22 pt). 24 pt is the smallest tolerance at which the
+# verdict stops changing - fails by tolerance: 2 pt 28, 4 pt 28, 6 pt 28, 8 pt 24,
+# 12 pt 17, 16 pt 15, 20 pt 15, 24 pt 14, 30 pt 14, 45 pt 14 - and at 2 pt, 24 of the 28
+# failures are documents 18_displacement already fails, i.e. a tight tolerance turns 32
+# into a second vote for displacement. Matching is 1:1, so no tolerance can hide a lost
+# rule behind its neighbour.
+#
+# PAINTED is not decoration: a pale rule written as a shape with neither fill nor line
+# painted nothing in any renderer (972 of 7,380 anchors), and it took this check from 26
+# failures to 6. Without the ink test the engine can satisfy 32 by emitting geometry that
+# draws nothing - and the old count literally preferred it: deleting a rule reads g_n=25,
+# drawing it white reads g_n=26.
+# ----------------------------------------------------------------------------
+RULE_THIN = 4.0
+RULE_LONG = 10.0
+RULE_GAP = 3.0
+RULE_BAND = 4.0
+RULE_TOL = 24.0
+RULE_OVERLAP = 0.80
+PAGE_WHITE = 0.94
+
+
+def _rgb3(c):
+    if c is None:
+        return None
+    if len(c) == 1:
+        return (c[0],) * 3
+    if len(c) == 3:
+        return tuple(c)
+    return None
+
+
+def _paints(col, alpha):
+    """Does this paint anything on a white page?"""
+    if col is None:
+        return False
+    if alpha is not None and alpha <= 0.02:
+        return False
+    lum = 0.299 * col[0] + 0.587 * col[1] + 0.114 * col[2]
+    if alpha is not None and alpha < 0.999:
+        lum = lum * alpha + (1 - alpha)
+    return lum < PAGE_WHITE
+
+
+def _rule_segments(page):
+    """Every straight axis-aligned segment the page draws.
+
+    perp is the coordinate across the segment (y for horizontal, x for vertical);
+    a..b is its extent along it. A filled band counts whether it is a `re` or a closed
+    `l`/`qu` path with a fill - the latter is how LibreOffice draws every cell border,
+    and missing it reads a correct render as 1,009 rules against 11,983 segments.
+    """
+    out = []
+    for d in page.get_drawings():
+        w = d.get("width")
+        col = _rgb3(d.get("color"))
+        s_alpha = d.get("stroke_opacity")
+        fill = _rgb3(d.get("fill"))
+        f_alpha = d.get("fill_opacity")
+        r = d["rect"]
+        stroked = col is not None and w is not None and _paints(col, s_alpha)
+        filled = fill is not None and _paints(fill, f_alpha)
+        t_s = max(0.05, float(w)) if w is not None else 0.05
+        if filled and not stroked:
+            h, wd = r.height, r.width
+            if h <= RULE_BAND and wd > h:
+                out.append({"o": "h", "perp": (r.y0 + r.y1) / 2.0, "a": r.x0, "b": r.x1,
+                            "t": max(0.05, h), "col": fill})
+            elif wd <= RULE_BAND and h > wd:
+                out.append({"o": "v", "perp": (r.x0 + r.x1) / 2.0, "a": r.y0, "b": r.y1,
+                            "t": max(0.05, wd), "col": fill})
+            continue
+        for item in d.get("items", []):
+            kind = item[0]
+            if kind == "l":
+                p1, p2 = item[1], item[2]
+                dx, dy = abs(p2.x - p1.x), abs(p2.y - p1.y)
+                if dy <= 0.8 and dx >= 1 and stroked:
+                    out.append({"o": "h", "perp": (p1.y + p2.y) / 2.0,
+                                "a": min(p1.x, p2.x), "b": max(p1.x, p2.x),
+                                "t": t_s, "col": col})
+                elif dx <= 0.8 and dy >= 1 and stroked:
+                    out.append({"o": "v", "perp": (p1.x + p2.x) / 2.0,
+                                "a": min(p1.y, p2.y), "b": max(p1.y, p2.y),
+                                "t": t_s, "col": col})
+            elif kind in ("re", "qu"):
+                rr = item[1] if kind == "re" else item[1].rect
+                if stroked:
+                    for perp, a, b, o in ((rr.y0, rr.x0, rr.x1, "h"),
+                                          (rr.y1, rr.x0, rr.x1, "h"),
+                                          (rr.x0, rr.y0, rr.y1, "v"),
+                                          (rr.x1, rr.y0, rr.y1, "v")):
+                        out.append({"o": o, "perp": perp, "a": a, "b": b,
+                                    "t": t_s, "col": col})
+    return out
+
+
+def _rule_touches(seg, others, gap):
+    """True when another segment crosses, meets or abuts either end of seg."""
+    lo, hi = seg["a"] - gap, seg["b"] + gap
+    for o in others:
+        if o is seg:
+            continue
+        if not (lo <= o["perp"] <= hi):
+            continue
+        if o["o"] != seg["o"]:
+            if not (o["a"] - gap <= seg["perp"] <= o["b"] + gap):
+                continue
+            if abs(o["perp"] - seg["a"]) <= gap or abs(o["perp"] - seg["b"]) <= gap:
+                return True
+        elif abs(o["perp"] - seg["perp"]) <= gap and (
+                abs(o["b"] - seg["a"]) <= gap or abs(o["a"] - seg["b"]) <= gap):
+            return True
+    return False
+
+
+def _rules(page, isolated=True):
+    segs = _rule_segments(page)
+    out = []
+    for s in segs:
+        if s["t"] > RULE_THIN or (s["b"] - s["a"]) < RULE_LONG:
+            continue
+        if isolated and _rule_touches(s, segs, RULE_GAP):
+            continue
+        out.append(s)
+    return out
+
+
+def _doc_rules(doc, isolated=True):
+    out = []
+    for i, p in enumerate(doc):
+        for s in _rules(p, isolated):
+            s = dict(s)
+            s["page"] = i
+            out.append(s)
+    return out
+
+
+def _rules_lost(src_rules, ren_segs, tol=RULE_TOL, overlap=RULE_OVERLAP):
+    """Every source rule that no render segment on its own page covers. 1:1."""
+    by_page = {}
+    for s in ren_segs:
+        by_page.setdefault((s["page"], s["o"]), []).append(s)
+    lost, matched = [], 0
+    for s in src_rules:
+        cands = by_page.get((s["page"], s["o"]), [])
+        L = s["b"] - s["a"]
+        best, best_key = None, None
+        for o in cands:
+            ov = min(s["b"], o["b"]) - max(s["a"], o["a"])
+            if ov <= 0 or ov < overlap * L or abs(o["perp"] - s["perp"]) > tol:
+                continue
+            key = (abs(o["perp"] - s["perp"]), -ov)
+            if best_key is None or key < best_key:
+                best, best_key = o, key
+        if best is None:
+            lost.append(s)
+        else:
+            cands.remove(best)
+            matched += 1
+    return matched, lost
+
+
+# ----------------------------------------------------------------------------
 # checks 49-56: the things nothing measured at all
 #
 # Added after asking what a conversion can get wrong that none of the first 48
@@ -1453,20 +1651,15 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     c = {}
 
     # ---- 32 stroke lines ---------------------------------------------------
-    def stroke_stats(doc):
-        n, widths = 0, []
-        for p in doc:
-            for st in _strokes(p):
-                n += 1
-                if st["width"]:
-                    widths.append(st["width"])
-        widths.sort()
-        med = widths[len(widths) // 2] if widths else 0
-        return n, round(med, 2)
-
-    s_n, s_w = stroke_stats(src)
-    g_n, g_w = stroke_stats(gd)
-    c["32_stroke_lines"] = (s_n, g_n, s_n == 0 or g_n >= max(1, int(s_n * 0.8)))
+    # A rule is a segment, not a drawing object; preserved means the same rule is on
+    # the same page of the render. See _rules() for the definition, the calibration and
+    # why isolation is asked of the source only. The verdict is a count of LOST RULES,
+    # not a ratio of counts: a document with no isolated rule passes and says so with a
+    # source of 0, rather than inventing a denominator out of table grid it does not own.
+    s_rules = _doc_rules(src, isolated=True)
+    g_segs = _doc_rules(gd, isolated=False)
+    _, s_lost = _rules_lost(s_rules, g_segs)
+    c["32_stroke_lines"] = (len(s_rules), len(s_lost), not s_lost)
 
     # ---- 33 RETIRED 13 Nov: it was 46 with a 2 pt inset ---------------------
     # 33 and 46 were the same question twice. Both walked every span, both kept the same

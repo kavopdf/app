@@ -428,12 +428,6 @@ def _strip_line_art(doc, pick):
     return n
 
 
-def mut_rules_removed(doc):
-    """32: take the rules away. The check allows 80 % of the source count, so a
-    document with sixteen rules needs eleven or fewer left; removing all of them
-    is unambiguous. Adding one rule (mut_rule) can never fail a floor."""
-    return _strip_line_art(doc, lambda p: [s["rect"] for s in _thin(doc)(p)])
-
 
 def _text_under(doc, pred):
     """Spans whose text satisfies pred, per page, with their line."""
@@ -469,6 +463,38 @@ def _retype(p, spans, make_text, size_of, dy=1.0):
 def _is_rotated(ln):
     d = ln.get("dir", (1, 0))
     return abs(d[1]) > 0.02 or d[0] < 0.98
+
+
+def mut_one_rule_removed(doc):
+    """32: take ONE rule away.
+
+    The check is a per-rule question, so one rule is enough and is the strict test. The
+    old case here removed every rule at once, which only ever proved the 80 % count floor
+    - and a floor of 80 % means a document may lose a fifth of its rules and pass. This
+    removes a single isolated rule, the smallest thing the check exists to see, and it
+    must fire on a document that otherwise passes.
+    """
+    sys.path.insert(0, HERE)
+    import verify_google as _v
+    rules = [r for r in _v._doc_rules(doc, isolated=True)]
+    if not rules:
+        return 0
+    victim = max(rules, key=lambda r: r["b"] - r["a"])
+    p = doc[victim["page"]]
+    t = max(2.0, victim["t"] + 1.0)
+    if victim["o"] == "h":
+        rect = fitz.Rect(victim["a"] - 1, victim["perp"] - t / 2,
+                         victim["b"] + 1, victim["perp"] + t / 2)
+    else:
+        rect = fitz.Rect(victim["perp"] - t / 2, victim["a"] - 1,
+                         victim["perp"] + t / 2, victim["b"] + 1)
+    # A white rectangle over a rule proves nothing: the path stays in the content stream
+    # and get_drawings() still returns it. The line art has to be REMOVED.
+    p.add_redact_annot(rect)
+    p.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE,
+                       graphics=fitz.PDF_REDACT_LINE_ART_REMOVE_IF_TOUCHED,
+                       text=fitz.PDF_REDACT_TEXT_NONE)
+    return 1
 
 
 def mut_text_unrotated(doc):
@@ -954,7 +980,7 @@ CASES = {
     "29_blank_where_ink_was":   ("render", mut_blank, BASE, "ink removed"),
     "30_ink_where_blank_was":   ("render", mut_rule, BASE, "ink added"),
     "31_pages_lost_their_text": ("render", mut_blank, BASE, "the page left blank"),
-    "32_stroke_lines":          ("render", mut_rules_removed, BASE, "every rule removed"),
+    "32_stroke_lines":          ("render", mut_one_rule_removed, BASE, "one rule removed"),
     "34a_span_size_match":      ("render", mut_restyle, BASE, "30% of spans resized"),
     "34b_span_colour_match":    ("render", mut_restyle, BASE, "30% of spans recoloured"),
     "34c_span_weight_match":    ("render", mut_bold, BASE, "35% of spans made bold"),

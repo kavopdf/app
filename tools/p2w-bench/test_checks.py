@@ -220,10 +220,21 @@ def cases():
     out.append(("text shifted right", base, shifted_x, ["43_within_10pt_x"], None))
 
     # ---- 32 stroke lines ---------------------------------------------------
-    def no_lines(p):
+    # The fixture is a STANDALONE rule, not a table grid. 32 counts rules, not drawing
+    # objects, and a rule is a segment whose ends sit in white space: a cell edge ends at
+    # a T-junction and is excluded on purpose, because the grid's geometry is re-derived
+    # by the renderer and 06_table_columns / 07_table_rows own it. A grid fixture here
+    # would be testing the population the check deliberately does not measure - it would
+    # pass a document that lost its table (06/07 fail that) and say nothing about a rule.
+    def with_rule(p):
         text(p, 72, 100, "Invoice number 12345")
         text(p, 72, 130, "Total amount 4,500")
-    out.append(("borders removed", base, no_lines, ["32_stroke_lines"], None))
+        p.draw_line((72, 170), (400, 170), color=(0, 0, 0), width=1)
+
+    def no_rule(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+    out.append(("standalone rule removed", with_rule, no_rule, ["32_stroke_lines"], None))
 
     # ---- 46 a rule drawn over text (33 retired - it was this check with a
     # 2 pt inset on each end, and the two agreed on all 208 corpus documents) ---
