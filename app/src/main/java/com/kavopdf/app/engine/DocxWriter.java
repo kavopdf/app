@@ -664,6 +664,16 @@ public final class DocxWriter {
         float squeeze = 1f;
         /** True while a page is being measured rather than written for the reader. */
         boolean measuring;
+        /**
+         * True when the block about to be written is followed by a paragraph of the page's own.
+         *
+         * <p>A table needs a carrier paragraph after it only when the next thing is NOT a
+         * paragraph - another table, or the end of the page, where Word would otherwise insert
+         * one it did not place. Where the page's own next block IS a paragraph, that paragraph
+         * already is the carrier Word wants, and writing a second one charges the page 4 pt of
+         * nothing (see {@link #POST_TABLE_TW}).
+         */
+        boolean nextIsPara;
     }
 
     // ------------------------------------------------------------------ document
@@ -932,7 +942,12 @@ public final class DocxWriter {
         // so must not charge the flow. Decided from the page's own geometry before anything is
         // written, so both of the budget guard's passes see the same answer (see pinShortParas).
         pinShortParas(page);
-        for (Object block : page.blocks) emitBlock(sb, block, ctx);
+        for (int bi = 0; bi < page.blocks.size(); bi++) {
+            Object block = page.blocks.get(bi);
+            ctx.nextIsPara = bi + 1 < page.blocks.size()
+                    && page.blocks.get(bi + 1) instanceof PdfToWord.Para;
+            emitBlock(sb, block, ctx);
+        }
     }
 
     /**
@@ -4410,7 +4425,21 @@ public final class DocxWriter {
         // borders - 19.2 pt pitch with them, 18.4 pt without, against the page's own 18.4 pt,
         // and the 0.8 pt a row of that table drifted by is the 38 rows of a page losing a sheet
         // to nothing but its own rules. An unruled table draws no rule and keeps its full pitch.
-        if (rowTw > 0 && ruledTable) rowTw = Math.max(1, rowTw - TABLE_BORDER_TW);
+        // NOT SUBTRACTED. A ruled row was written TABLE_BORDER_TW (0.75 pt) short of the page's
+        // own pitch, on the theory that the renderer adds that rule to the row. Measured, it does
+        // not: a row whose height is set by w:trHeight renders at that height with or without its
+        // borders (trHeight=260 -> 13.0 pt either way), and only a row whose height is decided by
+        // its own CONTENT pays the rule (content 21.0 -> 21.7 bordered, 21.0 without). So the
+        // subtraction made every w:trHeight-driven row 0.75 pt short - and because it was applied
+        // to every row of every ruled table, the error was one sign and cumulative: on
+        // 324_loan_amortisation_schedule, 13.0 pt rows written as 245 twips (12.25 pt) put the
+        // rows out by +1.3, +0.5, -0.2, -1.0 ... -5.5 pt down one table, and six pages of that
+        // document failed 18_displacement for it. With the subtraction gone the same document's
+        // rows land on the page's pitch and 18_displacement passes 6 pages of 6.
+        //
+        // The border is therefore a rendering artefact the page must not pay for, in the row
+        // height or in the budget: the row is written at the page's pitch, and the flow charge
+        // after the loop reads the same number these rows are written at.
         // The exact line height inside a cell was 200 twips - 10 pt - for every cell of every
         // table in every document. A price list drawn at 5.8 pt on an 8.4 pt row pitch got a
         // 10 pt line, so each of its 29 rows grew 1.6 pt taller than the page drew it and the
@@ -4434,6 +4463,9 @@ public final class DocxWriter {
         // (D-26, cause 2). Where the edges are not known, the average is used exactly as before.
         float[] rowEdge = t.rowEdge;
         boolean exactRows = rowEdge != null && rowEdge.length == t.rows.size() + 1;
+        // The height this table is really written at: the sum of the row heights below. It is
+        // what the page budget must read (see the flow charge after the loop).
+        int writtenRowsTw = 0;
         for (int r = 0; r < t.rows.size(); r++) {
             List<String> row = t.rows.get(r);
             // This row's own pitch. A ruled table's rule lies inside the row's box, so it comes
@@ -4443,7 +4475,9 @@ public final class DocxWriter {
                 float pitchPt = rowEdge[r + 1] - rowEdge[r];
                 if (pitchPt > 0.5f && pitchPt < 2000f) {
                     rowTwHere = (int) Math.round(pitchPt * TWIPS_PER_PT);
-                    if (ruledTable) rowTwHere = Math.max(1, rowTwHere - TABLE_BORDER_TW);
+                    // The page's own pitch, not the pitch less the rule - see above. This is the
+                    // path that carries a ruled table whose rows the page bounds with rules, and
+                    // it is where the cumulative drift lived.
                 }
             }
             // The line inside the cell follows the row it is in: a cell's text is drawn at the
@@ -4497,6 +4531,7 @@ public final class DocxWriter {
                 rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
                 rowLineTw = Math.max(typeFloorTw, twScale(rowLineTw, ctx.squeeze));
             }
+            writtenRowsTw += Math.max(0, Math.max(rowTwHere, rowLineTw));
             inner.append("<w:tr>");
             if (rowTwHere > 0) {
                 inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
@@ -4723,18 +4758,23 @@ public final class DocxWriter {
         // rendered 14, the bottom rule fell a row lower than the page's, and everything below
         // the table started from the wrong y. 4 pt is below every font's line box, so it can
         // never hold text, but it is a real line and stays a paragraph.
-        sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
-                .append(POST_TABLE_TW).append("\" w:lineRule=\"exact\"/>")
-                .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+        boolean carrier = !ctx.nextIsPara;
+        if (carrier) {
+            sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
+                    .append(POST_TABLE_TW).append("\" w:lineRule=\"exact\"/>")
+                    .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+        }
         // The table is part of the flow too. Left out of the accounting, the paragraph after it
         // was spaced from the last line BEFORE the table, so a table's whole height was added
         // on top of the next paragraph's gap and the flow ran long.
         // Charged as the page will write it: the extent through the squeeze, because the rows
         // above were written through it too. A charge that ignores the squeeze is a page that
         // believes it has room it does not have.
-        ctx.flowTw += twScale((int) Math.round(Math.max(0f, extentPt) * TWIPS_PER_PT), ctx.squeeze)
-                + POST_TABLE_TW;
+        ctx.flowTw += (writtenRowsTw > 0
+                ? twScale(writtenRowsTw, ctx.squeeze)
+                : twScale((int) Math.round(Math.max(0f, extentPt) * TWIPS_PER_PT), ctx.squeeze))
+                + (carrier ? POST_TABLE_TW : 0);
         ctx.lastBaseline = t.bottom;
         ctx.lastSize = 0f;
         // The table's bottom edge is where its content ended, not a baseline inside a line box,
@@ -4743,7 +4783,7 @@ public final class DocxWriter {
         // The flow's real position after a table is the table's bottom edge plus the 4 pt carrier
         // Word requires after it, because that carrier is a line the next paragraph starts under
         // (D-26: the position is where the reader is, not where the PDF drew).
-        ctx.flowY = t.bottom + POST_TABLE_TW / (float) TWIPS_PER_PT;
+        ctx.flowY = t.bottom + (carrier ? POST_TABLE_TW / (float) TWIPS_PER_PT : 0f);
         ctx.flowBoxPt = 0f;
         ctx.newPage = false;
         ctx.lastWasTable = true;

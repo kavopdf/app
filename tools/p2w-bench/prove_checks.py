@@ -220,6 +220,27 @@ def mut_rule(doc):
                     color=(0, 0, 0), width=2)
 
 
+def mut_addtext(doc):
+    """One line of the page drawn a second time - the fault 05 exists to catch.
+
+    05 was paired with mut_rule, which draws a LINE: a rule carries no characters, so the
+    mutation could never move a text check and the proof was vacuous. Measured: on
+    table-of-contents-dot-leaders, 05 read 0 and passed both before and after mut_rule.
+    A duplicated line is the mutation that matches the check's own doctrine
+    (verify_txt.py:137, "one duplicated line"), and it fires.
+    """
+    p = doc[0]
+    blk = [b for b in p.get_text("dict")["blocks"] if b.get("type") == 0]
+    for b in blk:
+        for ln in b.get("lines", []):
+            for sp in ln.get("spans", []):
+                if sp["text"].strip():
+                    p.insert_text((sp["bbox"][0], p.rect.height - 30),
+                                  sp["text"], fontsize=max(6, sp["size"]))
+                    return
+    return
+
+
 def mut_invisible(doc):
     p = doc[0]
     p.draw_rect(fitz.Rect(40, 300, p.rect.width - 40, 360), color=None,
@@ -1154,7 +1175,7 @@ CASES = {
     "01_page_count":            ("render", mut_addpage, BASE, "a page added"),
     "02_text_run_count":        ("render", mut_restyle, BASE, "30% of spans restyled"),
     "04_chars_missing":         ("render", mut_blank, BASE, "the page's text removed"),
-    "05_words_extra":           ("render", mut_rule, BASE, "extra ink drawn"),
+    "05_chars_extra":           ("render", mut_addtext, BASE, "one line drawn a second time"),
     "06_table_columns":         ("render", mut_shift, BASE, "the page shifted"),
     "07_table_rows":            ("render", mut_shift, BASE, "the page shifted"),
     "08_image_count":           ("render", mut_drop_images, IMG_DOC, "the image removed"),
@@ -1163,18 +1184,25 @@ CASES = {
     # 53_embedded_faces carries the family question now, with a .docx mutation that the
     # engine actually writes. See verify_google.py, "09_font_names RETIRED".
     "10_font_sizes":            ("render", mut_big, BASE, "a much larger size used"),
-    "11_bold_runs":             ("render", mut_bold, BASE, "35% of spans made bold"),
+    # 11_bold_runs RETIRED 13 Nov - a count of runs whose FACE NAME says bold, contradicted by
+    # 34c (which reads the flag) on 22 of the 26 documents it failed. Its mutation below is
+    # 34c's, and 34c's line still carries it. See verify_google.py, "11_bold_runs RETIRED".
     "12_italic_runs":           ("render", mut_bold, BASE, "span styling changed"),
     "13_text_colours":          ("render", mut_restyle, BASE, "30% of spans recoloured"),
     "14_filled_shapes":         ("render", mut_invisible, BASE, "a filled rectangle added"),
     "15_links":                 ("render", mut_drop_links, LINK_DOC, "every link removed"),
-    "16_numeric_runs":          ("render", mut_blank, BASE, "the page's text removed"),
+    # 16_numeric_runs RETIRED 13 Nov - counted runs containing a digit, so a changed digit
+    # read 1 -> 1 and passed, and a three-run document could lose every digit and pass. Its
+    # mutation was mut_blank, which is 04_chars_missing's case too and stays there.
     "17_matched_runs":          ("render", mut_blank, BASE, "nothing left to match"),
     "18_displacement":          ("render", mut_shift, BASE, "everything shifted vertically"),
     # 19_worst_dy used to sit here with the SAME mutation and the SAME description as 18 - the
     # proof set never contained a document that told the two apart, which is the shape of a
     # question asked twice. It is now the tail clause of 18; see verify_google.py.
-    "21_median_dx":             ("render", lambda d: mut_shift(d, dx=10), BASE, "shifted sideways"),
+    # 21_median_dx RETIRED 13 Nov, folded into 43_within_10pt_x. Its mutation was the same
+    # sideways shift as 43's and the same document - one question, two votes. 43's line below
+    # still proves the fold: a uniform dx=10 fires it through the median clause as well as
+    # through the 10 pt window.
     "22_reading_order":         ("render", mut_blank, BASE, "the page's order destroyed"),
     "23_line_pitch":            ("render", mut_line_pitch, MONO_DOC, "one block's pitch doubled"),
     "24_page_breaks":           ("render", mut_droppage, BASE, "a page dropped"),

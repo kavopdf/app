@@ -1544,8 +1544,26 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
             ok_col += 1
         if s_sp["weight"] == g_sp["weight"]:
             ok_weight += 1
+    # NO PAIRS IS SAID OUT LOUD, NOT SHOWN AS ZERO. With nothing paired all three reported
+    # render=0 with ok=True, which on the page reads as a total style loss that passed.
+    # 15_stamp_on_scanned_page is exactly that row (34b render 0, ok True, because the render
+    # has no text at all - 31_pages_lost_their_text and 04 own that loss). The verdict is
+    # right and stays: a document with no pairs has no style question left to ask.
+    #
+    # A MINIMUM SAMPLE WAS CONSIDERED AND REJECTED. 414_transparency_softmask fails 34b on 2
+    # pairs and 411_nested_xobject_transforms fails 34a on 2, and a gate of n >= 10 was tried
+    # on 13 Nov. It removed the check's only self-contained proof - test_checks' "one span
+    # resized" and "one span recoloured" are 3-span fixtures and both stopped firing - and
+    # nothing in the record shows either of those two verdicts is WRONG. A small denominator
+    # is not evidence of a bad verdict, and 2 of 2 spans being recoloured is a true answer.
     tot = max(1, len(pairs))
     none = not pairs
+    if none and s_runs:
+        # `and s_runs` is load-bearing: all_check_ids() discovers the universe by comparing two
+        # EMPTY documents, so an unconditional print here would land in --list-checks output
+        # and be read as a check id.
+        print("34a/34b/34c: no span paired, so size, colour and weight are unmeasured "
+              "rather than zero")
     c["34a_span_size_match"] = (100, 0 if none else round(100 * ok_size / tot),
                                 none or ok_size >= tot * 0.85)
     c["34b_span_colour_match"] = (100, 0 if none else round(100 * ok_col / tot),
@@ -1807,18 +1825,51 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
         return (left, right, centre)
 
     s_al, g_al = align_mix(src), align_mix(gd)
-    same = sum(min(a, b) for a, b in zip(s_al, g_al))
-    tot_al = max(1, sum(s_al))
-    c["42_alignment_mix"] = (sum(s_al), same,
-                             sum(s_al) == 0 or same >= tot_al * 0.7)
+    # THE COUNTS ARE NOT COMPARABLE, SO THE MIX IS. `same = sum(min(a, b))` is at most the
+    # RENDER's qualifying line count, so `same >= 0.7 * sum(s_al)` was a test of how many
+    # lines the render put on a document edge, not of where they went: any render with
+    # fewer than 70 % of the source's qualifying lines failed whatever its alignment was.
+    # Constructed 13 Nov: 24 left-aligned lines against 16 left-aligned lines - the same
+    # alignment on both sides - read (24, 16) and FAILED. And every one of the 28 failures
+    # in the 211-document store has a render/source ratio under 0.70 (362_price_list_dense
+    # 174 -> 63, 331_pid_diagram 23 -> 2, newsletter-3col-header-footer 120 -> 80, i.e. 67 %
+    # and failing by four lines).
+    #
+    # The question is the SHARE of qualifying lines at each of the three edges, which a
+    # line count cannot move. A floor of 8 source lines keeps a two-line document from
+    # being judged on a share, and 0.15 is the drift one line in seven can cause.
+    # Redefinition, not a loosening: mut_alignment (41 left, 1 right, 0 centre -> 6, 0, 36)
+    # still fires at 0.86 drift, and a right-aligned column turned flush left still fires.
+    tot_al = sum(s_al)
+    if tot_al == 0:
+        c["42_alignment_mix"] = (0, 0, True)
+    else:
+        g_tot = sum(g_al)
+        s_share = [a / float(tot_al) for a in s_al]
+        g_share = [a / float(g_tot) for a in g_al] if g_tot else [0.0, 0.0, 0.0]
+        drift = max(abs(a - b) for a, b in zip(s_share, g_share))
+        # the LEFT share is what the report shows: it is the quantity the verdict uses, and
+        # a raw count pair cannot be compared between two documents of different length
+        c["42_alignment_mix"] = (round(100 * s_share[0]), round(100 * g_share[0]),
+                                 tot_al < 8 or drift <= 0.15)
 
     # ---- 43 horizontal placement ------------------------------------------
     # The old 21_median_dx only looked at the median, which hides a whole column
     # shifted. This asks how many spans are horizontally close, span by span.
+    #
+    # 21_median_dx IS FOLDED IN HERE, not merely dropped. A uniform shift of the whole
+    # document moves every span by the same amount, so a 4.3 pt shift leaves every span
+    # inside the 10 pt window and this check read 91 % and PASSED (constructed 13 Nov;
+    # 375_attendance_register is the same shape at 4.3 pt). The median is the document-level
+    # clause a per-span window structurally cannot see, and it is the one thing 21 answered
+    # that 43 did not - so 43 carries it now and 21 has no question of its own left.
     near_x = sum(1 for s_sp, g_sp in pairs if abs(g_sp["x"] - s_sp["x"]) <= 10)
     tot_p = max(1, len(pairs))
+    ddx = [g_sp["x"] - s_sp["x"] for s_sp, g_sp in pairs]
+    med_dx_p = round(statistics.median(ddx), 1) if ddx else 0.0
     c["43_within_10pt_x"] = (100, round(100 * near_x / tot_p),
-                             (not pairs) or near_x >= tot_p * 0.9)
+                             ((not pairs) or near_x >= tot_p * 0.9)
+                             and abs(med_dx_p) < 3.0)
 
     # ---- 44 header / footer ------------------------------------------------
     def edge_text(doc):
@@ -2458,7 +2509,35 @@ def compare(src_path, gd_path, docx_path=None):
     g_chars = collections.Counter(norm_text(g_text))
     chars_missing = s_chars - g_chars
     checks["04_chars_missing"] = (0, sum(chars_missing.values()), not chars_missing)
-    checks["05_words_extra"] = (0, len(extra), len(extra) <= max(1, sum(s_words.values()) // 100))
+    # 05 was `len(extra) <= max(1, sum(s_words.values()) // 100)` - a count of TYPES on the
+    # left against a budget derived from TOKENS on the right. The two sides were not the
+    # same quantity, so the predicate could not be read as a tolerance at all.
+    #
+    # THE UNITS, proved by construction on a controlled pair (1,353-token source, one line
+    # drawn 200 more times): extra TYPES 1, extra TOKENS 66-300 depending on the line, budget
+    # 13 - and `len(extra)` is 1, so the check PASSES a render that added 300 words. The
+    # understatement is the ratio of the two counts, which is unbounded: one repeated type
+    # hides any number of copies. In the store (RESULTS.jsonl, engine 2a68de6) 114 of 208
+    # documents read exactly 1 extra type and pass, which is the same fault at rest.
+    #
+    # THE UNIT is the character, for the reason 04 moved - a word boundary is the
+    # extractor's, not the document's - and the measurement is harsher here than it was for
+    # 04. Of the 23 documents the old predicate failed on a 211-document LibreOffice render
+    # of this corpus, 257 of 257 extra word types were a contiguous substring of the
+    # render's own text, i.e. every one was a fragment rather than a new word, and 14 of the
+    # 23 had gained NOT ONE CHARACTER - a document cannot be failed for adding text when its
+    # character multiset is unchanged.
+    #
+    # ZERO TOLERANCE, not a percentage. 04 states "not one thing may be missing"; the same
+    # sentence in the other direction is "not one thing may be added", and a budget is what
+    # lets the fault this check exists for walk through it: drawing one line of a document a
+    # second time - the "one duplicated line" verify_txt.py:137 names - reads 1-4 extra types
+    # and 8-26 extra characters against budgets of 13-25, so a 1 % budget passed it on 3 of
+    # the 4 documents it was tried on. Zero tolerance caught all 4. Measured over 211: zero
+    # tolerance fires on 9, a 1 % character budget on 8 - one document apart, and the budget
+    # is the side that misses.
+    chars_extra = g_chars - s_chars
+    checks["05_chars_extra"] = (0, sum(chars_extra.values()), not chars_extra)
 
     # tables: count of distinct column x-positions that repeat down the page
     def table_signature(runs_list):
@@ -2519,24 +2598,53 @@ def compare(src_path, gd_path, docx_path=None):
                                len(s_sizes) == 0 or
                                common >= max(1, int(len(s_sizes) * 0.8)))
 
-    def bold_count(rs):
-        return sum(1 for r in rs if "bold" in norm_font(r["font"]))
-    # Same rule as 02: a bold run split in two is still bold. 4 of the 6 rows where this fired
-    # with render > source pass the per-span weight check 34c - the boldness is right and only
-    # the segmentation moved.
-    checks["11_bold_runs"] = (bold_count(s_runs), bold_count(g_runs),
-                              bold_count(g_runs) >= bold_count(s_runs) - max(2, bold_count(s_runs) // 5))
+    # 11_bold_runs RETIRED 13 Nov. It asked "how many bold runs", which is two questions it
+    # cannot answer and one that is already answered:
+    #
+    #   - IT READS THE FACE NAME, 34c READS THE FLAG. bold_count() tests `"bold" in
+    #     norm_font(font)`; 34c tests `flags & 16`. Where they disagree the flag is right and
+    #     the name is wrong, because a renderer may embolden without renaming the face.
+    #     Measured on the 211-document store: of the 26 documents 11 failed, 23 have 34c at
+    #     88-100 % with ok=True - 05_round_company_seal_curved_text reads 66 bold runs -> 3
+    #     while 34c reads 100 %, 371_experience_certificate 30 -> 2 at 100 %, 60_page_border
+    #     52 -> 5 at 94 %. Only 3 of the 26 fail 34c. That is the 10_font_sizes/34a signature
+    #     exactly: a count contradicted by the per-span matcher at ~100 %.
+    #   - ITS SLACK IS BLIND ON SMALL DOCUMENTS. The tolerance is `s - max(2, s // 5)`, so
+    #     with one or two bold runs a document may lose ALL of them and pass. Constructed:
+    #     one bold run made regular reads source=1 render=0 and PASSES, while 34c fails it.
+    #   - THE LOSS IT WOULD CATCH IS 17's. If the render loses bold spans outright, the pairs
+    #     shrink and 34c (a share of pairs) cannot see it - but 17_matched_runs can, and does:
+    #     05 pairs 20 of 83 runs and fails 17. Run LOSS is 17's question, run SEGMENTATION is
+    #     what 02_text_run_count was retired for, and per-span weight is 34c's.
 
     def italic_count(rs):
         return sum(1 for r in rs if "italic" in norm_font(r["font"]) or "oblique" in norm_font(r["font"]))
     checks["12_italic_runs"] = (italic_count(s_runs), italic_count(g_runs),
                                 abs(italic_count(s_runs) - italic_count(g_runs)) <= max(2, italic_count(s_runs) // 5))
 
-    s_cols = collections.Counter(r["colour"] for r in s_runs)
-    g_cols = collections.Counter(r["colour"] for r in g_runs)
-    checks["13_text_colours"] = (len(s_cols), len(g_cols),
-                                 len(s_cols) == 0 or
-                                 len(g_cols) >= max(1, int(len(s_cols) * 0.8)))
+    # A SET, NOT A COUNT. This compared the NUMBER of distinct colours, so it could not see
+    # a colour CHANGE: a span recoloured to a colour the document already uses leaves both
+    # counts where they were. Constructed 13 Nov: four colours, one span recoloured - 13
+    # read 4 -> 4 and passed, 34b read 75 % and failed. That is the same mistake
+    # 39_image_position made ("a set numerator against a list denominator") and the same
+    # shape 10_font_sizes made against 34a.
+    # Compared with colour_same(), not with ==, so CMYK black and RGB black are one colour -
+    # exact int equality here is what REMAINING-DEFECTS.md:205 still records as 34b's defect
+    # and it was the same defect in this line.
+    # 13 is NOT a duplicate of 34b, and the store says so: 13 fails 4 documents, 34b fails 2,
+    # and the two sets are disjoint. 34b judges only the spans that PAIRED, so a colour that
+    # vanished with its span is invisible to it (402_calendar_month_grid: 4 colours -> 2, 04
+    # passes, 17_matched 45 of 46, 34b reads 91 %). This keeps that signal.
+    # THE FLOOR IS EQUALITY, because a set is not a sample: this file already holds that
+    # rule twice - 15_links (`s_links == 0 or g_links >= s_links`) and 40_link_targets
+    # (`s_l == g_l or not s_l`). A colour that is GONE is gone; 80 % of four colours rounds
+    # down to three, so the percentage floor let one colour of four disappear silently.
+    # A render carrying MORE colours is not a loss and still passes.
+    s_col_set = {r["colour"] for r in s_runs}
+    g_col_set = {r["colour"] for r in g_runs}
+    kept_cols = sum(1 for a in s_col_set if any(colour_same(a, b) for b in g_col_set))
+    checks["13_text_colours"] = (len(s_col_set), kept_cols,
+                                 len(s_col_set) == 0 or kept_cols == len(s_col_set))
 
     s_fill = sum(1 for p in src for _ in fill_rects(p))
     g_fill = sum(1 for p in gd for _ in fill_rects(p))
@@ -2549,10 +2657,21 @@ def compare(src_path, gd_path, docx_path=None):
     g_links = sum(len(p.get_links()) for p in gd)
     checks["15_links"] = (s_links, g_links, s_links == 0 or g_links >= s_links)
 
-    s_digits = sum(1 for r in s_runs if any(c.isdigit() for c in r["text"]))
-    g_digits = sum(1 for r in g_runs if any(c.isdigit() for c in r["text"]))
-    checks["16_numeric_runs"] = (s_digits, g_digits,
-                                 abs(s_digits - g_digits) <= max(3, s_digits // 10))
+    # 16_numeric_runs RETIRED 13 Nov. It counted RUNS CONTAINING A DIGIT, which is neither
+    # the number of numbers nor their content:
+    #
+    #   - IT CANNOT SEE A CHANGED DIGIT, which is the numeric defect that matters. Constructed:
+    #     "Total amount 4500" against "Total amount 4508" reads 1 -> 1 and passes; 04_chars_missing
+    #     (character-level since fbef7ac) fails it.
+    #   - ITS FLOOR IS ABSOLUTE. The tolerance is `max(3, s // 10)`, so a document with three
+    #     numeric runs may lose every digit and pass: constructed, "Qty 12 / Rate 34 / Amount 56"
+    #     against "Qty / Rate / Amount" reads 3 -> 0 and PASSES.
+    #   - IT IS STRICTLY WEAKER THAN 04 ON THE CORPUS. On the 211-document store all 28
+    #     documents it fails also fail 04_words_missing (now 04_chars_missing) - 0 of 28 are
+    #     exclusive - and 21 of the 28 fail in the GAIN direction (350_question_paper 76 -> 115,
+    #     price-list-2col-dense-right-aligned 198 -> 237), i.e. the render split one numeric run
+    #     into several. That is a property of the extractor's grouping, which is the ground
+    #     02_text_run_count was retired on.
 
     # ---- POSITION (17-24) ---------------------------------------------------
     # Match each source run to a render run on the SAME PAGE, consuming it once, and joining
@@ -2752,7 +2871,16 @@ def compare(src_path, gd_path, docx_path=None):
                 or worst_here > TAIL_FACTOR):
             bad_pages.append(pg)
     checks["18_displacement"] = (0, len(bad_pages), not bad_pages)
-    checks["21_median_dx"] = (0, med_dx, abs(med_dx) < 3.0)
+    # 21_median_dx RETIRED 13 Nov - folded into 43_within_10pt_x, which now carries its
+    # median clause. It was the median-only half of one question, and both of the documents
+    # it fired on were already failed by other checks in the same store:
+    #   375_attendance_register  med_dx 4.3   also fails 19_worst_dy, 20_within_10pt, 47_margins
+    #   401_trifold_brochure     med_dx 300.9 also fails 18/19/20, 43_within_10pt_x, 47_margins
+    # so it decided no document's verdict on its own. Its unique signal - a uniform sideways
+    # shift, which a per-span 10 pt window cannot see - is kept, in 43. med_dx itself is still
+    # computed here because 29/30 bucket the render in the source's frame with it.
+    # (This is the same fold as 19_worst_dy into 18_displacement, and for the same reason: two
+    # summaries of one population, one vote each.)
 
     # Reading order: a TORN LINE, not an LCS over two extractors' sequences.
     #

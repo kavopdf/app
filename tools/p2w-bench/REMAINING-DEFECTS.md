@@ -281,3 +281,51 @@ the pre-fix size. It is not today's, and no run should quote it as if the space 
 
 Reconciled figure for anything downstream: **`47_margins` = 205 of 211 documents, measured on
 engine `2a68de6`, pre-`57f521d`** (`BASELINE.md`; `DEFECT-CLASSES.md:19`).
+
+## The fourteen tail checks - what was measured, what was stale, what was retired (13 Nov)
+
+Worked in order of the store's own document count. No corpus was available to this pass, so
+every claim below is either a constructed pair through `compare()` (reproducible: the scripts
+are `probe.py`/`probe2.py`/`probe3.py` in the session work dir, all built with PyMuPDF from
+nothing), a line of code, or a query over `RESULTS.jsonl`.
+
+**Two entries in the table at `:196-210` are STALE - the code already fixed them.** Do not
+re-investigate:
+
+- `34b_span_colour_match` (`:205`) - "exact 24-bit int equality where the int encodes the
+  colour space". `colour_same()` is perceptual at HEAD (CIEDE2000 <= 6.0, plus the
+  `CMYK_BLACK = 0x231f20` clause), landed in `995290a` 13:25. The 2 documents that fail 34b
+  were measured BEFORE that (store snapshot `RATCHET-20261113-084751`, 08:47), so 414's 0 %
+  is a pre-fix number. Same line in 13_text_colours was exact `Counter` equality; it uses
+  `colour_same()` now.
+- `38_list_markers` (`:204`) - "the marker must carry its trailing space inside one span ...
+  two-digit markers never count". `NUM_MARK` handles both, `995290a` 13:25. Its 2 failures
+  predate it.
+
+**Three checks are RETIRED in this pass, each with a constructed proof that it cannot answer
+its own question** - `11_bold_runs`, `16_numeric_runs`, `21_median_dx`. Reasons are in
+`verify_google.py` beside where each one stood; the short form is that 11 reads the face NAME
+where 34c reads the flag and is contradicted on 22 of its 26 documents, 16 counts runs
+containing a digit (a changed digit reads 1 -> 1 and passes; three numeric runs may lose every
+digit and pass), and 21's median is now a clause of 43.
+
+**Two are REDEFINED**, so their old marks are not comparable and the body digest moves:
+`42_alignment_mix` (shares, not counts - it failed by arithmetic whenever the render had fewer
+than 70 % of the source's qualifying lines) and `13_text_colours` (a set compared with
+`colour_same`, floor equality like 15/40, not a count).
+
+**Kept, with the question stated, because the evidence does not condemn them:** `01_page_count`
+(57 documents, nearly all src=1 render=2 - a real engine defect, the page budget, and the check
+is a plain equality that no ruler change can improve), `27_text_off_page` (28 of 31 are exactly
+ONE run past an edge - real, but the check reports no magnitude, so the tail cannot be
+triaged), `28_clipped_at_edge` (4, real, already fixed once in `c4b379a`), `36_underline_rules`
+(its 18 failures predate `_stroke_pictures`; a rule drawn as a raster band now reads 1 on both
+sides - re-measure before touching it), `34a/34b/34c` (survivors; the 10_font_sizes duplicate
+retirement is still OUTSTANDING - 10 is live at HEAD), `43_within_10pt_x` (the only per-span
+horizontal check, now carrying 21's median clause).
+
+**And one thing this pass could not do:** there is no measurement of these fourteen checks
+anywhere in the repository that describes HEAD. `RESULTS.jsonl`'s 208 rows are engine
+`2a68de6`, and every ruler fix of 13 Nov (10:08-15:34) landed after the last snapshot
+(08:47). Every class number in `DEFECT-CLASSES.md` is therefore a pre-fix number, which that
+file already says at `:163`.
