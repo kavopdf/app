@@ -712,6 +712,24 @@ def extra_checks2(src, gd, docx_path=None):
         "timesnew": "timesnewroman", "timesnewromanps": "timesnewroman",
         "courier": "couriernew", "courierps": "couriernew",
         "couriernewps": "couriernew",
+        # THE FOUR THE ENGINE ITSELF PERFORMS, and they were missing. DocxWriter.BASE14 maps
+        # Liberation Sans / Serif / Mono onto Arial / Times New Roman / Courier New
+        # (DocxWriter.java:4796-4801, 5a09931 on 13 Nov 15:47) because Google Docs has no
+        # Liberation and substitutes a serif with a sans. This table refused that rename, so
+        # 53 read every Liberation document as a lost family: MEASURED on the 211-document
+        # corpus against the .docx HEAD's engine writes, 129 documents fail 53 without these
+        # four lines and 6 with them - and the 6 are exactly the six this check's own comment
+        # names (364_event_ticket, 600_reviewed_invoice_with_annotations,
+        # 601_fillable_admission_form, payslip-label-left-amount-right,
+        # price-list-right-aligned-amounts, salary-slip-corporate).
+        #
+        # This is the narrow version of the bucket this table used to carry. The old
+        # liberation->arial bucket was removed on 13 Nov because it hid a real loss on
+        # 350_question_paper: a .docx naming DejaVu Serif where the source drew Times New
+        # Roman. That case is not this one - DejaVu is not what the engine substitutes, and
+        # nothing here maps DejaVu.
+        "liberationsans": "arial", "liberationserif": "timesnewroman",
+        "liberationmono": "couriernew",
     }
 
     def family(name):
