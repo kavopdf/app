@@ -393,26 +393,33 @@ STEP 8 - RECORD WHAT YOU LEARNED, THEN THE ATTEMPT
   A run that fixes nothing but leaves a RULED OUT entry has still saved the next attempt two
   hours. A run that leaves nothing at all has wasted the slot.
 
-STEP 8c - KEEP GOING UNTIL THE SLOT IS NEARLY SPENT  ** THIS IS WHAT MAKES THE DAY COUNT **
-  One attempt takes about ten minutes and the slot is good for forty-five. That left thirty-three
-  minutes of every hour doing nothing - the machine worked about a fifth of the day, and the cron
-  cannot fire more often than hourly.
+STEP 8b - WRITE THE LESSON, IF THERE IS ONE
+  If this attempt failed in a way that will repeat on another class, add ONE line to
+  tools/p2w-bench/LESSONS.md: what happened, and what it cost. Not a rule, not a reminder - a
+  lesson. If it would not change what the next attempt does, do not write it. The file is capped
+  at fifteen lines; a lesson that stops mattering gets deleted rather than left to grow.
 
-  So after each attempt, commit what it produced, then check the clock:
+STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
 
-      date +%s          # note this at the claim
-      date +%s          # and here
+  This step opens with a question because it is the one that decides how much a run is worth, and
+  it was a separate step before this - STEP 8c - which runs read straight past on their way from
+  STEP 8 to here. Fourteen runs on 12 and 13 Nov averaged 1.1 attempts each against a target of 3.
 
-  Start another attempt only if FEWER THAN 25 MINUTES have passed since the claim. Take the next
-  OPEN class in the list rather than the same one again - the top class has just had its try, and
-  the queue is the ledger. If the class you just worked still has UNTESTED hypotheses and is still
-  the top class, it comes up first anyway.
+      date +%s          # now, minus the number you wrote at the claim
 
-  Twenty-five, not thirty-five, because the check is made BEFORE an attempt starts and an attempt
-  can take twenty-five minutes when it needs calibration and twenty documents. Starting one at
-  minute 34 and having it run long would put the run past the 45-minute claim and the next run
-  would begin on top of it - two runs on the engine, each reverting the other. At 25 the worst
-  case lands exactly on the limit.
+  UNDER 25 MINUTES, and the last attempt was recorded cleanly?
+      Go back to STEP 2 and start another attempt on the next OPEN class. Do NOT release the slot,
+      do NOT claim it again, do NOT commit here - each attempt already committed its own files in
+      STEP 8, which is why going back is safe.
+
+  OTHERWISE - 25 minutes or more, or the last attempt could not be recorded, or the round is
+  finished, or the build is broken:
+      release the slot, run the gate, commit, stop. That is the rest of this step.
+
+  Twenty-five and not thirty-five, because the check is made BEFORE an attempt starts and an
+  attempt can take twenty-five minutes when it needs calibration and twenty documents. Starting one
+  at minute 34 and having it run long would put the run past the 45-minute claim and the next run
+  would begin on top of it. At 25 the worst case lands exactly on the limit.
 
   AND IF THE RUN ITSELF PASSES 40 MINUTES, ABANDON WHAT YOU ARE DOING:
       git checkout -- app/src
@@ -420,33 +427,7 @@ STEP 8c - KEEP GOING UNTIL THE SLOT IS NEARLY SPENT  ** THIS IS WHAT MAKES THE D
       record the attempt as 'error', commit, stop.
   An abandoned attempt costs one try. An overrun costs two runs' work and corrupts the store.
 
-  Each attempt commits on its own, before the next one begins:
-      hypothesis.py --add ... ; classify.py --attempt ... ; classify.py
-      commit DEFECT-CLASSES.md, ATTEMPTS.json, HYPOTHESES.md, RESULTS.jsonl, RATCHET.json, ROUND.json
-  A run that does three attempts and dies before the fourth has still kept three. A run that keeps
-  all three in its sandbox and dies has kept nothing.
-
-  THE SLOT IS STILL YOURS BETWEEN ATTEMPTS. Do not release it and do not claim it again - it is held
-  from STEP 0 until STEP 9, across every attempt in the run. Releasing between attempts and
-  re-claiming is not a harmless habit: it is what produced two claims ten minutes apart on the
-  morning of 13 Nov, because the commit gate used to refuse a commit while the slot was claimed and
-  the run worked around it the only way it could. That check is gone; the release belongs at STEP 9
-  and nowhere else.
-
-  Do STEP 8b for the last attempt, then STEP 9 - release the slot and commit through the gate. The
-  slot goes stale at 45 minutes and that is the hard ceiling: a run that works past it would have
-  its claim expire while it is still going, and the next run would start on top of it.
-
-  Three attempts per run is three times the day's work. Do not skip the commit between them to save
-  time - that is how three attempts become zero.
-
-STEP 8b - WRITE THE LESSON, IF THERE IS ONE
-  If this attempt failed in a way that will repeat on another class, add ONE line to
-  tools/p2w-bench/LESSONS.md: what happened, and what it cost. Not a rule, not a reminder - a
-  lesson. If it would not change what the next attempt does, do not write it. The file is capped
-  at fifteen lines; a lesson that stops mattering gets deleted rather than left to grow.
-
-STEP 9 - RELEASE THE SLOT, THEN COMMIT THROUGH THE GATE
+  THE REST OF THIS STEP, once the loop above says stop:
       python3 tools/p2w-bench/round.py --release-fixer
       bash tools/commit-gate.sh
   The gate exits 0 only when the engine change carries its evidence: the ratchet held, precommit
@@ -505,7 +486,7 @@ The 'Did NOT move' row is not optional. A report that lists only what worked is 
 summary, not a result.
 
 RULES
-  One class at a time. Never fix a document. A run may work several classes - STEP 8c - but it
+  One class at a time. Never fix a document. A run may work several classes - STEP 9 - but it
   finishes one attempt on one class before it starts the next, and commits in between.
   Be honest. A failed fix reported plainly is worth more than a vague success.
   Read LESSONS.md before forming a theory, and TOOLBOX.md before calling any tool.

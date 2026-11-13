@@ -1694,3 +1694,46 @@ All three were found by reading what the night produced, not by any check I had 
 caused were both introduced *after* the audit that was supposed to catch that class of problem:
 §34's batching advice and §29's slot check. A change made quickly, at the end of a long session, is
 exactly the change that needs the audit re-run — and neither was.
+
+---
+
+## 36. The three-attempt loop was never running — 1.1 attempts a run, target 3
+
+Fourteen runs on 12 and 13 Nov averaged **1.1 attempts each**. Two runs managed two. None managed
+three.
+
+The trace says why. Every run went STEP 8 → `commit-gate`, straight to STEP 9, and the loop
+instruction sat in a step of its own — STEP 8c — between them. Runs read past it on their way to
+what they knew was the end. A step that is only a condition, placed between two steps that are
+actions, is a step that gets skipped.
+
+It was made worse by two things already fixed in §35: the commit gate refused a commit while the
+slot was claimed, so the between-attempt commit failed and the run had to release and re-claim to
+get past it — the 06:47/06:57 pair is that — and the staging-key bug meant most attempts ended in
+`error`, which a run reasonably treats as a reason to stop.
+
+### The fix: put the question where the answer cannot be skipped
+
+STEP 9 now opens with the loop rather than following it:
+
+    STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
+        date +%s   minus the claim time
+        UNDER 25 MINUTES and the last attempt recorded cleanly?
+            -> go back to STEP 2. Do NOT release, do NOT re-claim, do NOT commit here.
+        OTHERWISE
+            -> release, gate, commit, stop.
+
+A run cannot reach the release without answering it, because the release is now the second half of
+the same step instead of the step after. The condition is no longer something to notice; it is the
+gate on the way out.
+
+STEP 8c is gone as a heading. The two references to it — this explanation and one line in RULES —
+were updated, because a brief that names a step that no longer exists is how a run learns to
+improvise.
+
+### What to watch
+
+The next run that records an attempt cleanly and still has time left should show **two attempts in
+one claim**, and the trace should show no second `claim` line. That is the whole test. If it shows
+one attempt again, the loop is being skipped for a reason this change did not address, and the
+trace will say where it stopped.
