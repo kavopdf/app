@@ -132,7 +132,7 @@ def cases():
         text(p, 72, 100, "Invoice number")
         text(p, 72, 130, "Total amount 4,500")
         table(p, 72, 200, 3, 3)
-    out.append(("word missing", base, missing_word, ["04_words_missing"], None))
+    out.append(("word missing", base, missing_word, ["04_chars_missing"], None))
 
     # ---- 18/19/20 vertical shift ------------------------------------------
     def shifted(p):
@@ -186,7 +186,7 @@ def cases():
         text(p, 72, 100, "Invoice number 12346")
         text(p, 72, 130, "Total amount 4,500")
         table(p, 72, 200, 3, 3)
-    out.append(("one digit changed", base, one_char, ["04_words_missing"], None))
+    out.append(("one digit changed", base, one_char, ["04_chars_missing"], None))
 
     # ---- 47 margins --------------------------------------------------------
     def narrow(p):
