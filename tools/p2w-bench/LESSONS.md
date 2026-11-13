@@ -110,3 +110,10 @@ everything else: what went wrong in the work itself.
   Google renders, and 53_embedded_faces read `kept=0` on 157 of 208 documents whatever the
   engine wrote. The 12 Nov mapping theory was recorded RULED OUT by that blind instrument.
   Before trusting a class of >50 % of the corpus, print the two value sets the check compares.
+
+- **A class that will not move may be a number, not a defect.** 63 checks were audited on 13 Nov
+  against seven shapes found in one of them; fifteen were wrong. `47_margins` failed 182 of 187
+  documents because a lone space at x=0 counted as a margin. `53_embedded_faces` read 141 because
+  the rows were measured by a normaliser that could not pass a correct conversion. Before spending
+  a day on a class, ask whether the number is a property of the document or of the tool that made
+  it. The open ones are in REMAINING-DEFECTS.md.

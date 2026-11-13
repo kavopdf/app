@@ -159,3 +159,65 @@ measured from an anchored shape rather than from a baseline.
 the cell, column and anchored-shape paths, and a pass that proves the 208-document corpus does not
 move backwards.** A rewrite that reaches only the page body buys 5 documents and costs 7.
 
+
+## THE MEASUREMENT IS NOT TRUSTWORTHY YET - read this before you believe any class number
+
+63 checks were audited on 13 Nov against seven defect shapes found in one of them. **15 were
+fixed. About 15 are still open.** They are listed here so you know which numbers to distrust,
+not so you fix them.
+
+**DO NOT EDIT `verify_google.py` OR `verify_txt.py` TO MAKE A CLASS PASS.** The checks are the
+measurement. A class that goes green because the ruler moved is worse than a class that stays
+red, because nobody will ever look at it again. The remaining verifier defects are being fixed
+as pipeline infrastructure, by whoever owns the pipeline, not by a fixer run.
+
+### What was already fixed, and what that means for your numbers
+
+Fifteen defects across ten checks, in commits 87a08d1, 62a1792, c4b379a, 57f521d and 229faa9:
+
+    53_embedded_faces   seven defects - the check could not pass a correct conversion
+    28_clipped_at_edge  failed a document against its own copy
+    47_margins          a lone space at x=0 failed 182 of 187 documents
+    08_image_count      counted the resource dictionary, not drawn images
+    02_text_run_count   failed a document for splitting a run in two
+    11_bold_runs        same
+    39_image_position   a set numerator against a list denominator
+    42_alignment_mix    every block gave a 'left' by construction
+    44_header_footer    a hard boundary with no tolerance
+
+**Consequence: every class number in DEFECT-CLASSES.md was produced by a ruler that was wrong in
+at least one of those ways.** `47_margins` failed 182 of 187 documents partly because of a space.
+`53_embedded_faces` read 141 because 10 Nov rows scored 100% and 11 Nov 99% against a blind
+normaliser; on the 17 rows measured after the fix, 1 failed. Treat the current class list as a
+starting point, not as fact, until the baseline re-measures on the current engine.
+
+### Still open, and which class numbers they make suspect
+
+| check | rows it decides | what is wrong | what a fix would have to decide |
+|---|---|---|---|
+| `59_shape_anchor` | 110 of 187 | pairs source runs to render runs **by index**, not by text. One rect with "Alpha"/"Beta" drawn in reverse order gives source=2 render=0 and fails, with the text unmoved and 18_median_dy at 0.0 | whether to pair by text like `_pair_runs` does, and what to do when a run has no match |
+| `32_stroke_lines` | 145 of 233 | counts drawing **paths**, not rules. Seven hairlines as seven paths vs one path with seven subpaths gives 7 vs 1. Worse: `_strokes` keeps a drawing only if `color is not None`, so rules drawn as **filled** 0.8 pt rects count as zero and are invisible to 14, 32, 33 and 36 at once | whether a thin filled rect is a rule, and how to group subpaths |
+| `41_block_spacing` | 81 of 233 | measures how the extractor **grouped blocks**, not the spacing. Identical glyph rows grouped as `[72,90,200,218]` vs `[72,90,200]` read 18 vs 110 | whether spacing can be measured from baselines instead of block tops |
+| `45_char_accuracy` | 24 of 233 | drops whitespace-only spans and joins with no separator, so segmentation changes the answer; and `quick_ratio` is order-blind, so reordering cannot be seen | what "character accuracy" should mean when 22_reading_order already owns order |
+| `t04_structure` | 137 of 208 | compares **baselines** against **txt lines**. A 20-row table transcribed to one line reads 20 vs 1 and passes; one baseline of 8 cells transcribed faithfully to 8 lines reads 1 vs 8 and fails | what the txt row unit is |
+| `37_super_subscript` | 229 vacuous | only the superscript flag bit exists; PyMuPDF has no subscript bit, so a document whose only script text is subscript gives 0 and passes unconditionally | whether to detect subscript by baseline offset |
+| `38_list_markers` | 3 | the marker must carry its trailing space inside one span, so a render that emits "1." and "First item" separately never counts; and two-digit markers never count on either side | how to detect a list marker across span boundaries |
+| `34b_span_colour_match` | 3 | exact 24-bit int equality where the int encodes the colour space: CMYK black is 0x231f20, RGB black is 0x000000 | whether to compare perceptually |
+| `54_image_dpi` | 10, unfixable | compares the original's dpi against Google's re-encode; every source above 160 dpi fails for ever | whether the check should exist |
+| `56_rtl_runs` | 8, none the RTL doc | source reads 0 on 179 of 187, including the corpus's only Arabic document | whether direction is recoverable at all |
+| `29/30` | unknown | a uniform 2.5 pt horizontal shift passes 18/19/20/21 but makes both fire, because the 24.79 pt lattice treats any offset above ~2.4 pt as every line vanishing | the lattice tolerance |
+| `17_matched_runs` | unknown | `int(0.9*12)` is 10, so 12 runs with 10 matched passes against a stated 90% rule | the floor |
+| `16_numeric_runs` | unknown | cannot fail a 3-span document: every digit lost still reads source 3, render 0, ok | the minimum sample |
+
+### The one thing worth knowing above all of it
+
+The seven shapes found in `53_embedded_faces` were all one of two mistakes:
+
+    1. the number measured what the producer DECLARED, not what it DREW
+    2. one side normalised and the other did not
+
+Every defect in the table above is one of those two, in a check nobody had audited. When a class
+looks impossible to move, the first question is not "what does the engine do wrong" but "is this
+number a property of the document or a property of the tool that made it".
+
+`47_margins` cost four attempts and a day. It was a space.

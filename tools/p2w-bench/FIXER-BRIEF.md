@@ -348,6 +348,17 @@ STEP 5 - FIX IT, IN ONE COHERENT CHANGE
   app/src/main/java/com/kavopdf/app/engine/ only. Forbidden because Google Docs ignores them:
   w:framePr.
 
+  NEVER EDIT verify_google.py OR verify_txt.py. They are the measurement, not the work. A class
+  that turns green because the ruler moved is worse than a class that stays red, because nobody
+  will ever look at it again. On 13 Nov fifteen defects were found inside those files - a lone
+  space at x=0 counted as a margin and failed 182 of 187 documents; a font normaliser could not
+  pass a correct conversion, which made one class read 141 when the truth on the only rows
+  measured since was 1 of 17. Every one of them made a class look worse than it was, and every one
+  was found by auditing the checker, never by fixing a document. The ones still open are listed in
+  REMAINING-DEFECTS.md under "THE MEASUREMENT IS NOT TRUSTWORTHY YET" - read that before you
+  conclude a class is unfixable, and if you believe a number is wrong, say so in INCIDENTS.md and
+  move to another class. Do not change the check yourself.
+
   WHAT IS FORBIDDEN, AND WHAT IS NOT  ** this rule has been misread in both directions **
     FORBIDDEN - keying on IDENTITY: a filename, a document's text, its title, its page count.
         if (doc.name.equals("362_price_list_dense")) shiftBy(10);
