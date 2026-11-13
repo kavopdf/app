@@ -154,10 +154,30 @@ def _shapes(page):
     relative to whatever encloses it.
     """
     out = []
-    for d in page.get_drawings():
+    hs, vs = [], []          # thin rules, kept so an outline drawn as four
+    for d in page.get_drawings():   # separate line paths can be rebuilt
         r = d["rect"]
         if r.width >= 8 and r.height >= 8:
             out.append(r)
+        elif r.width >= 8 and r.height < 8:
+            hs.append(r)     # a horizontal rule (also a filled hairline)
+        elif r.height >= 8 and r.width < 8:
+            vs.append(r)     # a vertical rule
+    # Two rules that are adjacent in y, with a vertical rule standing at each end, are
+    # one closed face of the page's drawing - the same shape whether it arrived as one
+    # rect, as four line paths, or as four filled hairlines. Without this an outline
+    # drawn as lines is not a shape at all (a horizontal line is 0 pt tall), so the
+    # text inside it looks unanchored and the check cannot see the frame it is about.
+    hs.sort(key=lambda r: r.y0)
+    for a, b in zip(hs, hs[1:]):
+        if b.y0 - a.y0 < 8:
+            continue
+        x0, x1 = min(a.x0, b.x0), max(a.x1, b.x1)
+        if x1 - x0 < 8:
+            continue
+        if (any(abs(v.x0 - x0) <= 2 and v.y0 <= a.y0 + 2 and v.y1 >= b.y0 - 2 for v in vs)
+                and any(abs(v.x1 - x1) <= 2 and v.y0 <= a.y0 + 2 and v.y1 >= b.y0 - 2 for v in vs)):
+            out.append(fitz.Rect(x0, a.y0, x1, b.y0))
     try:
         for img in page.get_images(full=True):
             for r in page.get_image_rects(img[0]):
@@ -537,18 +557,60 @@ def extra_checks2(src, gd):
     # check that only compares text to text.
     ANCHOR_TOL = 0.12      # a tenth of the outline is drift, not rendering noise
     lost, moved, anchored = 0, 0, 0
+
+    def _match(r, gruns, by, used):
+        """The unused render runs whose text is r's - whole, or as adjacent pieces.
+
+        The render is free to reorder spans (draw order is not reading order) and 02
+        already declares that GAINING runs is legal, so pairing source run i with
+        render run i compares two unrelated runs whenever either happens. Match on the
+        text instead; index order then cannot decide the answer. A split - "Beta" into
+        "Be" + "ta" - leaves no exact match, so fall back to joining unused runs on the
+        same baseline while the join stays a prefix of the source text.
+        """
+        want = norm_word(r["text"])
+        free = [j for j in by.get(want, []) if j not in used]
+        if free:
+            return [min(free, key=lambda j: abs(gruns[j]["y"] - r["y"]) +
+                                            abs(gruns[j]["x"] - r["x"]))]
+        near = [j for j in range(len(gruns))
+                if j not in used and abs(gruns[j]["y"] - r["y"]) <= 1.0
+                and gruns[j]["x"] >= r["x"] - 1.0]
+        near.sort(key=lambda j: gruns[j]["x"])
+        for k0 in range(min(3, len(near))):
+            joined, span = "", [near[k0]]
+            joined = norm_word(gruns[near[k0]]["text"])
+            k = k0
+            while want.startswith(joined) and k + 1 < len(near):
+                k += 1
+                span.append(near[k])
+                joined += norm_word(gruns[near[k]]["text"])
+                if joined == want:
+                    return span
+        return []
+
     for si in range(min(src.page_count, gd.page_count)):
         sp, gp = src[si], gd[si]
         sruns, gruns = runs(sp), runs(gp)
         sa, ga = _anchor(sp, sruns), _anchor(gp, gruns)
+        by = collections.defaultdict(list)      # text -> render run indices
+        for j, g in enumerate(gruns):
+            by[norm_word(g["text"])].append(j)
+        used = set()
         for i, a in enumerate(sa):
             if a is None:
                 continue          # nothing enclosed it in the source either
             anchored += 1
-            if i >= len(ga) or ga[i] is None:
-                lost += 1         # the outline went away, or moved off the text
+            js = _match(sruns[i], gruns, by, used)
+            if not js:
+                lost += 1         # its text is not in the render at all
                 continue
-            b = ga[i]
+            used.update(js)
+            bs = [ga[j] for j in js if ga[j] is not None]
+            if not bs:
+                moved += 1        # text is there, but no longer inside any outline
+                continue
+            b = bs[0]
             if abs(a[0] - b[0]) > ANCHOR_TOL or abs(a[1] - b[1]) > ANCHOR_TOL:
                 moved += 1        # text and outline no longer agree
     # source = how many runs had an outline around them, render = how many still

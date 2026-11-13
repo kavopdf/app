@@ -1,0 +1,44 @@
+--- c5/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java	2026-11-13 05:39:24.736671513 +0000
++++ engine/PdfToWord.java	2026-11-13 05:46:30.492884002 +0000
+@@ -4262,8 +4262,10 @@
+             boolean plainRect = pathIsAxisRect();
+             // A triangle, an arrowhead, a diamond, a glyph outline: the box is not the shape.
+             // Draw the path the page drew. A clipped path keeps the old box behaviour, because
+-            // the clip is an axis-aligned box and the geometry is not.
+-            if (!plainRect && !pathIsEllipse() && same(cl, box)) {
++            // the clip is an axis-aligned box and the geometry is not. A plain rectangle is
++            // excluded for the same reason - its box IS the shape - except under a rotated
++            // matrix, where addShape refuses the preset outright and the fill was lost.
++            if (ctmRotated() || (!plainRect && !pathIsEllipse() && same(cl, box))) {
+                 DocxWriter.Shape ff = freeform(cl, fill, alpha, line, lw);
+                 if (ff != null) {
+                     addShape(ff);
+@@ -4390,13 +4392,21 @@
+             if (rectangle || ellipse) {
+                 float[] grownRing = clipped(new float[]{pxMin - w / 2f, pyMin - w / 2f,
+                         pxMax + w / 2f, pyMax + w / 2f});
+-                // A ring drawn under a rotated matrix - the two circles of a "PAID" stamp are
+-                // set inside a 0.99/-0.14 cm - cannot be a preset ellipse: addShape drops every
+-                // preset shape when the CTM is rotated, because the box is not the shape. The
+-                // path's own curve points are already through that matrix, so carry them as a
+-                // freeform and the ring survives. Nothing that drew before changes: this branch
+-                // is only reached where the ellipse was being dropped.
+-                if (ellipse && ctmRotated()) {
++                // A shape drawn under a rotated matrix cannot be a preset box or ellipse:
++                // addShape drops every preset shape when the CTM is rotated, because the box is
++                // not the shape. The path's own points are already through that matrix, so carry
++                // them as a freeform and the shape survives. Nothing that drew before changes:
++                // this branch is only reached where the preset was being dropped.
++                //
++                // The ellipse was covered first - the two circles of a "PAID" stamp - and the
++                // RECTANGLE was left out. A `re` under a 90 or 180 degree matrix is still
++                // axis-aligned in page space, so it takes the rectangle branch below and was
++                // dropped: the frame of every quarter-turn stamp reached the .docx as nothing,
++                // with its text still placed correctly. That is a shape the page has and the
++                // render does not, which is the one thing 59_shape_anchor exists to catch
++                // (measured: 03_stamp_vertical_90deg 80 anchored runs in the source, 9 in the
++                // render; 04_stamp_180deg_upside_down 32 and 2).
++                if (ctmRotated()) {
+                     DocxWriter.Shape ring = freeform(grownRing, -1, 1f, line, w);
+                     if (ring != null) {
+                         addShape(ring);
