@@ -74,7 +74,7 @@ MARKER_DOC = "admission-form-labels-left-boxes-right.pdf"
 MONO_DOC = "34_monospace_document.pdf"
 
 
-def run(src, gd):
+def run(src, gd, docx=None):
     """Measure a pair, and return None rather than crashing when it cannot.
 
     tempfile.mktemp returned a path under /scratch/tmp, which does not exist, so
@@ -83,8 +83,10 @@ def run(src, gd):
     """
     fd, out = tempfile.mkstemp(suffix=".json")
     os.close(fd)
-    subprocess.run([sys.executable, VERIFY, src, gd, "--json", out],
-                   capture_output=True)
+    cmd = [sys.executable, VERIFY, src, gd, "--json", out]
+    if docx:
+        cmd += ["--docx", docx]
+    subprocess.run(cmd, capture_output=True)
     try:
         with open(out) as f:
             return json.load(f)
@@ -95,6 +97,25 @@ def run(src, gd):
             os.remove(out)
         except OSError:
             pass
+
+
+def find_docx(srcfile):
+    """The engine's .docx for this source, where the pipeline keeps it."""
+    stem = os.path.splitext(os.path.basename(srcfile))[0]
+    for cand in (os.path.join(os.path.dirname(srcfile), "..", "out1", stem + ".docx"),
+                 os.path.join(os.path.dirname(srcfile), stem + ".docx"),
+                 os.path.join(WORK, stem + ".docx")):
+        if os.path.exists(cand):
+            return cand
+    return None
+
+
+def render_for(srcfile):
+    """The engine-produced render for this source, when P2W_RENDERS was given."""
+    if not RENDERS:
+        return None
+    cand = os.path.join(RENDERS, os.path.basename(srcfile))
+    return cand if os.path.exists(cand) else None
 
 
 def path(name):
@@ -253,8 +274,12 @@ def _face_class(name):
 def mut_font_drop(doc):
     """Re-draw every span in a face from a DIFFERENT style class.
 
-    53_embedded_faces counts the families the SOURCE draws with that the render
-    no longer draws with, so it can only fail when the render LOSES a family.
+    NO LONGER 53's CASE - kept because it proves 09_font_names, which still reads the
+    render. 53 now reads the .docx (13 Nov), so a mutation of the RENDER cannot move it;
+    its case is `mut_docx_face` below.
+
+    History: 53_embedded_faces counted the families the SOURCE draws with that the render
+    no longer draws with, so it could only fail when the render LOST a family.
     `mut_font` above ADDS one - "tiro" is Times-Roman, a serif - to a document
     that already draws its own face. The intersection can only grow, so 53 could
     not fail and had never been proved (PROVE-GAPS.md). This mutator goes the
@@ -834,7 +859,38 @@ def mut_line_pitch(doc, factors=(2.0, 1.6, 0.6)):
     _reflow(p, moves)
 
 
-# check -> ("render" | "source", mutation, document, description)
+def mut_docx_face(path):
+    """Rewrite the engine's .docx so a family the source DREW WITH is no longer named.
+
+    This is the mutation 53 needs and the one it never had. 53 fails on LOSS, and a face
+    can only be lost where the engine writes it: w:rFonts in word/document.xml. The
+    render-side mutations cannot prove it any more, because 53 no longer reads the render
+    at all - mut_font_drop redraws the RENDER, and a check that measures the .docx cannot
+    see it. The least-used declared face is renamed to a name no SAME_FACE entry maps, so
+    exactly one family disappears and every other family keeps its share. Returns the path
+    of the mutated copy.
+    """
+    import zipfile, re as _re, collections as _c
+    zin = zipfile.ZipFile(path)
+    xml = zin.read("word/document.xml").decode("utf-8")
+    faces = _c.Counter(_re.findall(r'w:ascii="([^"]*)"', xml))
+    if not faces:
+        raise RuntimeError("no w:rFonts in the .docx")
+    victim = min(faces, key=lambda k: (faces[k], k))
+    dst = os.path.join(WORK, "mut_53_%s.docx"
+                       % os.path.splitext(os.path.basename(path))[0])
+    zout = zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED)
+    for item in zin.infolist():
+        data = zin.read(item.filename)
+        if item.filename == "word/document.xml":
+            data = xml.replace('w:ascii="%s"' % victim,
+                               'w:ascii="NoSuchFace"').encode("utf-8")
+        zout.writestr(item, data)
+    zout.close()
+    return dst
+
+
+# check -> ("render" | "source" | "docx", mutation, document, description)
 CASES = {
     "01_page_count":            ("render", mut_addpage, BASE, "a page added"),
     "02_text_run_count":        ("render", mut_restyle, BASE, "30% of spans restyled"),
@@ -892,7 +948,9 @@ CASES = {
     "50_annotations":           ("source", src_annot, BASE, "an annotation dropped"),
     "51_form_fields":           ("source", src_widget, BASE, "a form field dropped"),
     "52_outline":               ("source", src_toc, BASE, "the outline dropped"),
-    "53_embedded_faces":        ("render", mut_font_drop, BASE, "the drawn family lost"),
+    # 53 reads the .docx, so its mutation has to be a .docx. "docx" hands the mutation the
+    # engine's own file and measures the same pair with the mutated copy.
+    "53_embedded_faces":        ("docx", mut_docx_face, BASE, "a drawn family dropped from the .docx"),
     "54_image_dpi":             ("render", mut_image_shrink, IMG_DOC, "the image resolution changed"),
     "55_orientation_mix":       ("render", mut_landscape, BASE, "the page turned landscape"),
     "56_rtl_runs":              ("source", mut_rtl, BASE, "a reversed run the render does not have"),
@@ -977,18 +1035,40 @@ def main():
         if not os.path.exists(srcfile):
             unproven.append((cid, "%s missing from the corpus" % docname))
             continue
-        d = fitz.open(srcfile)
-        try:
-            fn(d)
-        except Exception as e:
-            d.close()
-            unproven.append((cid, "mutation failed: %s" % str(e)[:40]))
-            continue
-        out = save(d, "mut_%s.pdf" % cid)
-        if direction == "render":
-            res = run(srcfile, out)
+        if direction == "docx":
+            # A .docx mutation: the same source and the same render, with the engine's file
+            # swapped for the mutated one. The render is held fixed on purpose - a re-render
+            # would move the position checks and the "how many others moved" number would
+            # describe the renderer, not this check. The control is the same pair with the
+            # unmutated .docx, and it must pass or the fire proves nothing.
+            docx = find_docx(srcfile)
+            if not docx:
+                unproven.append((cid, "no .docx beside %s" % docname))
+                continue
+            gd = render_for(srcfile) or srcfile
+            ctrl = run(srcfile, gd, docx=docx)
+            if ctrl is None or cid in ctrl["failed"]:
+                unproven.append((cid, "the control already fails - nothing to prove"))
+                continue
+            try:
+                mut = fn(docx)
+            except Exception as e:
+                unproven.append((cid, "mutation failed: %s" % str(e)[:40]))
+                continue
+            res = run(srcfile, gd, docx=mut)
         else:
-            res = run(out, srcfile)
+            d = fitz.open(srcfile)
+            try:
+                fn(d)
+            except Exception as e:
+                d.close()
+                unproven.append((cid, "mutation failed: %s" % str(e)[:40]))
+                continue
+            out = save(d, "mut_%s.pdf" % cid)
+            if direction == "render":
+                res = run(srcfile, out)
+            else:
+                res = run(out, srcfile)
         others = [k for k in res["failed"] if k != cid]
         if cid in res["failed"]:
             proven.append((cid, why, len(others)))

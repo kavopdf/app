@@ -26,7 +26,8 @@ THRESHOLDS (a document passes only if every one holds)
                 also be under 15 pt (19_worst_dy); order > 95 %
   visual        no invisible text, no text-on-text, no page overflow, no extra page
 """
-import os, sys, json, re, collections, statistics, difflib, math
+import os, sys, json, re, collections, statistics, difflib, math, zipfile
+import xml.etree.ElementTree as ET
 
 try:
     import fitz  # PyMuPDF
@@ -434,8 +435,15 @@ def _strokes(page):
     Proven by construction on 13 Nov with 14 hand-written PDFs differing only in how the same
     seven rules were drawn: seven stroked paths read 7, the same seven as one path with seven
     subpaths read 1, and the same seven as filled 0.8 pt rects read 0 - the SAME answer as a
-    render with no rules at all. Loss and drawing style were indistinguishable, and 102 of the
-    145 failing rows read render == 0.
+    render with no rules at all. Loss and drawing style were indistinguishable, and 94 of the
+    137 failing rows read render == 0 (RESULTS.jsonl, one row per document, re-counted 13 Nov).
+
+    AND THE RENDER SIDE HAS NO VECTOR PATHS AT ALL (13 Nov, second finding). Google Docs
+    exports every anchored shape in the .docx as one raster image: on 207 of the 211 corpus
+    documents the render's 08_image_count equals the .docx <w:drawing> count exactly, and
+    the median difference is zero. A rule the engine emitted perfectly still reads 0 here,
+    because get_drawings() returns vector paths and a picture is not one. So the band test
+    below fixes the DOCX side only; _stroke_pictures() fixes the render side.
 
     The 1.5 pt / 2 pt test is not new: PdfToWord.bandFillStroke() uses exactly it ("a fill-only
     path that is a thin band IS a hairline, which is how most generators draw a rule"), and so
@@ -456,6 +464,75 @@ def _strokes(page):
                 out.append({"rect": r, "width": round(w, 2), "colour": fill})
             continue
         out.append({"rect": r, "width": round(d.get("width") or 0, 2), "colour": col})
+    out.extend(_stroke_pictures(page))
+    return out
+
+
+# A rule that arrived as a picture, not a path.
+#
+# Google Docs renders each anchored shape as one image, so on the render side a rule is a
+# thin band of pixels and nothing else. This is the same 1.5 pt / 2 pt band test _strokes()
+# applies to fills, plus a pixel test: a blank placeholder - and the engine writes one for
+# every light rule whose fill it suppressed - is thin and has no ink, and must not count as
+# a rule that survived.
+_INK_CACHE = {}
+
+
+def _picture_has_ink(page, xref, rect):
+    """True when the picture actually has dark pixels in it.
+
+    A pixel counts as ink when it is not fully transparent and not white. 0.94 is the same
+    "close enough to white to be the page" bound 25_invisible_text uses for colour.
+    """
+    if not xref:
+        return False
+    key = (page.number, xref)
+    if key in _INK_CACHE:
+        return _INK_CACHE[key]
+    ok = False
+    try:
+        pix = fitz.Pixmap(page.parent, xref)
+        if pix.n - pix.alpha > 3:
+            pix = fitz.Pixmap(fitz.csRGB, pix)
+        samp = pix.samples
+        n = pix.n
+        step = max(1, (pix.width * pix.height) // 20000)
+        seen = ink = 0
+        for i in range(0, pix.width * pix.height, step):
+            o = i * n
+            a = samp[o + 3] if pix.alpha else 255
+            seen += 1
+            if a <= 16:
+                continue
+            lum = (samp[o] * 0.299 + samp[o + 1] * 0.587 + samp[o + 2] * 0.114) / 255.0
+            if lum < 0.94:
+                ink += 1
+        ok = seen > 0 and ink >= max(1, int(seen * 0.30))
+    except Exception:
+        ok = False
+    _INK_CACHE[key] = ok
+    return ok
+
+
+def _stroke_pictures(page):
+    """Rules the renderer drew as pictures: thin band, and ink in it."""
+    out = []
+    try:
+        infos = page.get_image_info(xrefs=True)
+    except Exception:
+        return out
+    for info in infos:
+        r = fitz.Rect(info["bbox"])
+        h, w = r.height, r.width
+        if h <= 1.5 and w > 2:
+            thin = h
+        elif w <= 1.5 and h > 2:
+            thin = w
+        else:
+            continue
+        if not _picture_has_ink(page, info.get("xref"), r):
+            continue
+        out.append({"rect": r, "width": round(thin, 2), "colour": None})
     return out
 
 
@@ -565,55 +642,48 @@ def extra_checks2(src, gd, docx_path=None):
     c["52_outline"] = (s_o, g_o, s_o == 0 or g_o >= max(1, int(s_o * 0.9)))
 
     # ---- 53 embedded font names -------------------------------------------
-    # 09_font_names counts distinct faces. This asks whether the FACE ITSELF
-    # survived, which is what decides whether the metrics are the same.
+    # 09_font_names counts distinct faces and allows the count to fall by 20 %; it never
+    # asks WHICH face went. This asks, for every family the source PDF DRAWS WITH, whether
+    # the converted document still puts that text in that family - which is what decides
+    # whether the metrics, the glyph coverage and the look survive.
     #
-    # Google Docs has none of the Liberation families and substitutes on import.
-    # Some substitutes are metric-identical by design - Liberation was built as a
-    # drop-in for Arial, Times and Courier, which is why fontconfig resolves
-    # "Arial" to LiberationSans-Regular.ttf on a machine with no Arial - and some
-    # are not: a docx asking for Liberation Serif comes back as Arial, a serif
-    # turned into a sans, 8.9% wider on the same string.
+    # MEASURED ON THE .DOCX, NOT ON THE RENDER. Until 13 Nov this compared the source
+    # against the PDF the renderer exports, and that is the wrong side of the pipeline. The
+    # engine's own decision is written into the .docx: DocxWriter.runXml writes w:rFonts
+    # w:ascii for every run that has a face (DocxWriter.java:3108-3112) and w:b/w:i carry
+    # the style. Everything else - Google's substitution, LibreOffice's fontconfig, whether
+    # the machine has Liberation installed - is somebody else's decision, and a check that
+    # reads it cannot be moved by a fix to the engine. Measured on this corpus, 13 Nov: the
+    # render-side 53 fired on 1 of 3 documents under an engine change that removed EVERY
+    # face (DocxWriter writing one constant family, engine rebuilt, corpus re-converted and
+    # re-rendered); this one fires on 3 of 3. Same correction, same reasoning, as 54.
     #
-    # Comparing raw names cannot tell those two cases apart, so it fails a correct
-    # conversion and passes nothing. Comparing FAMILIES through the equivalence
-    # that is actually true keeps the check honest: serif-to-Times passes,
-    # serif-to-Arial still fails, because it is a different face.
+    # WHAT "THE SAME FAMILY" MEANS. Names cannot be compared raw: a PDF names a face two
+    # ways ("Liberation Sans Bold", "LiberationSans-Bold"), carries a subset tag
+    # ("KLGWYD+Liberation Sans Bold") and a foundry suffix ("ArialMT",
+    # "TimesNewRomanPSMT"), and PyMuPDF truncates span["font"] to 24 characters. Style is
+    # not family - bold is w:b - and the fourteen standard faces are mapped to the names a
+    # reader has, exactly as DocxWriter.BASE14 does. What is NOT forgiven is one family
+    # arriving as another: a serif as a sans is a loss and stays a loss.
     SAME_FACE = {
-        # THE BASE-14 NAMES THE ENGINE ITSELF REWRITES. DocxWriter.BASE14 maps
+        # ONLY THE RENAMES THE ENGINE ITSELF PERFORMS. DocxWriter.BASE14 maps
         # times->Times New Roman, helvetica->Arial, courier->Courier New, deliberately and
-        # correctly - no reader has a face called "Helvetica". This table knew none of the
-        # three, so a source PDF carrying "Helvetica" produced family "helvetica", Google's
-        # export of the engine's "Arial" produced "arial", and the intersection was empty: a
-        # correct conversion scored as a lost face. Measured over the published corpus on
-        # 13 Nov, Helvetica appears in 53 of 53 documents.
-        # These are equivalences, not forgiveness - Helvetica/Arial, Times/Times New Roman and
-        # Courier/Courier New are metric-compatible by design. Declaring a serif face equal to
-        # a sans face would be the other thing, and is not done here.
+        # correctly - no reader has a face called "Helvetica", and the three are
+        # metric-compatible with their PostScript originals by design. Those three are the
+        # whole table, because they are the whole of what the engine substitutes.
+        #
+        # The four buckets this table used to carry (liberationsans->arial,
+        # dejavusans->verdana, dejavuserif->timesnewroman, dejavusansmono->couriernew) were
+        # added because GOOGLE substitutes, and they are what made a real loss invisible:
+        # measured 13 Nov on 350_question_paper, a .docx that names DejaVu Serif where the
+        # source drew Times New Roman reads 2 of 2 kept under the buckets and 1 of 2 here.
+        # On the .docx side the engine does not substitute, so the buckets can only hide a
+        # loss. Dropping them changes NO document's verdict on this corpus: 6 either way.
         "helvetica": "arial", "helveticaps": "arial", "arialps": "arial",
         "times": "timesnewroman", "timesroman": "timesnewroman",
         "timesnew": "timesnewroman", "timesnewromanps": "timesnewroman",
         "courier": "couriernew", "courierps": "couriernew",
         "couriernewps": "couriernew",
-        "liberationsans": "arial", "arial": "arial",
-        "liberationserif": "timesnewroman", "timesnewroman": "timesnewroman",
-        "liberationmono": "couriernew", "couriernew": "couriernew",
-        # Measured from Google's own export on 12 Nov, one docx carrying every face:
-        #   Liberation Serif/Sans/Mono -> ArialMT, DejaVu Sans -> Verdana,
-        #   DejaVu Serif -> ArialMT, Times New Roman -> TimesNewRomanPSMT, Arial -> ArialMT.
-        # A sans face arriving as another sans face is a rename, not a loss, so those are
-        # mapped to what Google produces. A serif arriving as Arial is a loss, and stays
-        # unmapped on purpose - that is the defect the engine has to fix.
-        "dejavusans": "verdana", "verdana": "verdana",
-        "dejavuserif": "timesnewroman",
-        # DejaVu Sans Mono is in the corpus (13 of 199 documents carry it) and had no
-        # entry, so it read as a vanished family while every glyph survived: Google
-        # substitutes Courier New, a monospace for a monospace. Same reasoning as
-        # dejavusans above - a rename inside a class is not a loss. A mono arriving as
-        # a PROPORTIONAL face still fails, and must, because that changes the metrics.
-        "dejavusansmono": "couriernew", "liberationsansmono": "couriernew",
-        "liberationserifmono": "couriernew", "notosansmono": "couriernew",
-        "dejavusansmonooblique": "couriernew",
     }
 
     def family(name):
@@ -692,7 +762,7 @@ def extra_checks2(src, gd, docx_path=None):
         return SAME_FACE.get(n, n)
 
     def faces(doc):
-        """The families this PDF actually DRAWS with - not the ones it merely declares.
+        """The families this PDF actually DRAWS with, and how many characters each carries.
 
         p.get_fonts() returns the page's /Resources /Font dictionary: every face the page
         COULD use, including one no glyph ever touches, including faces inherited from a
@@ -702,14 +772,15 @@ def extra_checks2(src, gd, docx_path=None):
         it in zero spans.
 
         That made the two sides of this check different measurements: the source side was
-        "families declared somewhere on a page", the Google side was "families Google drew".
-        A document could fail on a face nothing was drawn in, and no engine change could ever
+        "families declared somewhere on a page", the other was "families actually used". A
+        document could fail on a face nothing was drawn in, and no engine change could ever
         fix it because there was nothing to fix.
 
-        Drawn spans on both sides is the honest comparison - the same question asked of both
-        files: which families does this document put ink on the page with.
+        Characters, not a set, because "present" is not the question. A family carried by one
+        stray run out of three hundred is a family that did not survive; the weight is what
+        tells those apart. See SHARE_FLOOR below for the measured cut.
         """
-        out = set()
+        out = collections.Counter()
         for p in doc:
             drawn = False
             try:
@@ -719,23 +790,141 @@ def extra_checks2(src, gd, docx_path=None):
             for b in blocks:
                 for line in b.get("lines", []):
                     for span in line.get("spans", []):
+                        t = span.get("text", "")
+                        if not t.strip():
+                            continue
                         fam = family(span.get("font"))
                         if fam:
-                            out.add(fam)
+                            out[fam] += len(t)
                             drawn = True
             if not drawn:
                 # An image-only page has resources and no spans. Fall back to the dictionary
-                # so such a page is not silently read as "no fonts, therefore fine".
+                # so such a page is not silently read as "no fonts, therefore fine". Weight 0:
+                # a family that is only declared has to be carried, but it must not inflate a
+                # share it never had.
                 for f in p.get_fonts():
                     fam = family(f[3])
                     if fam:
-                        out.add(fam)
+                        out[fam] += 0
         return out
 
-    s_fa, g_fa = faces(src), faces(gd)
-    kept = len(s_fa & g_fa)
-    c["53_embedded_faces"] = (len(s_fa), kept,
-                              len(s_fa) == 0 or kept >= max(1, int(len(s_fa) * 0.5)))
+    def docx_faces(path):
+        """family -> characters carried by the runs of the engine's .docx that DECLARE it.
+
+        The .docx is a zip: word/document.xml holds the runs, word/styles.xml the styles and
+        the document defaults. A run's face resolves in the order a reader resolves it - its
+        own w:rPr/w:rFonts, then its paragraph style (following w:basedOn), then
+        w:docDefaults. DocxWriter writes w:rFonts on every run that has a face
+        (DocxWriter.java:3108) and Calibri in docDefaults (DocxWriter.java:4853), so a run
+        that resolves to the default is a run the engine could not name - counted, and
+        counted as a loss, because Calibri is not the face the source drew.
+
+        Text in tables and in text boxes is included: they are runs like any other, and
+        "table cells carry their typeface" is a defect this corpus already had.
+        """
+        NS = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+
+        def qn(tag):
+            return NS + tag
+
+        z = zipfile.ZipFile(path)
+        styles = ET.fromstring(z.read("word/styles.xml"))
+        default = None
+        for rf in styles.iter(qn("rFonts")):
+            if rf.get(qn("ascii")):
+                default = rf.get(qn("ascii"))
+                break
+        style_face, based = {}, {}
+        for st in styles.findall(qn("style")):
+            sid = st.get(qn("styleId"))
+            rf = st.find(".//" + qn("rPr") + "/" + qn("rFonts"))
+            if rf is not None and rf.get(qn("ascii")):
+                style_face[sid] = rf.get(qn("ascii"))
+            bo = st.find(qn("basedOn"))
+            if bo is not None:
+                based[sid] = bo.get(qn("val"))
+
+        def from_style(sid, depth=0):
+            if sid in style_face:
+                return style_face[sid]
+            if sid in based and depth < 5:
+                return from_style(based[sid], depth + 1)
+            return None
+
+        body = ET.fromstring(z.read("word/document.xml"))
+        out = collections.Counter()
+        for p in body.iter(qn("p")):
+            psid = None
+            ppr = p.find(qn("pPr"))
+            if ppr is not None and ppr.find(qn("pStyle")) is not None:
+                psid = ppr.find(qn("pStyle")).get(qn("val"))
+            for r in p.findall(qn("r")):
+                text = "".join(t.text or "" for t in r.findall(qn("t")))
+                if not text.strip():
+                    continue
+                face = None
+                rpr = r.find(qn("rPr"))
+                if rpr is not None and rpr.find(qn("rFonts")) is not None:
+                    face = rpr.find(qn("rFonts")).get(qn("ascii"))
+                if not face:
+                    face = from_style(psid) if psid else None
+                out[family(face or default or "Calibri")] += len(text)
+        return out
+
+    # HOW MUCH OF A FAMILY HAS TO SURVIVE. Measured over the 211 documents on 13 Nov, per
+    # (document, family) pair, as the ratio of the family's share of characters in the .docx
+    # to its share of characters in the PDF - share, not count, so that text the engine drops
+    # outright (03/04's question, not this one) does not fire this check as well.
+    #   372 pairs in all. 365 sit at 0.86 or above; the median is 1.000.
+    #   6 sit at 0.06 or below, and 4 of those are 0.000 - the family is not named at all:
+    #     dejavusansmono on 364_event_ticket (the ticket code arrives proportional),
+    #     timesnewroman on 600_reviewed_invoice_with_annotations ("APPROVED" is dropped
+    #       with the face, so 03/04 fire there too - that one is a shared signal),
+    #     zapfdingbats on 601_fillable_admission_form (a checkbox glyph),
+    #     dejavusans on price-list-right-aligned-amounts (38 rupee signs);
+    #     the two partial ones, 0.040 and 0.059, are the rupee sign on
+    #     payslip-label-left-amount-right and salary-slip-corporate - the character is still
+    #     in the .docx, in Liberation Sans, so no text check fires and this is the only
+    #     check that sees it.
+    #   1 sits at exactly 0.500 (4 characters of dejavusans in newsletter-3col-header-footer).
+    # The band between 0.06 and 0.50 is EMPTY - not one pair in 372 lands in it. Any floor
+    # from 0.07 to 0.49 fails the same 6 documents (measured at 0.07, 0.10, 0.15, 0.20,
+    # 0.25, 0.30, 0.40 and 0.49; every one gives 6). 0.25 is chosen because it is inside
+    # that band and at least 4.2x from either edge - 4.2x above the highest observed loss,
+    # 2x below the lowest observed survivor - so it is not a knife edge on a data point, and
+    # a new document has to be wrong by more than a factor of four to move it.
+    SHARE_FLOOR = 0.25
+
+    s_fa = faces(src)
+    d_fa = docx_faces(docx_path) if docx_path else None
+    if d_fa is None:
+        # No .docx to read. The render answers a different question - it is the exporter's
+        # substitution, not the engine's decision - so it cannot fail this check. Say so on
+        # stderr rather than passing silently, because a run that forgets --docx measures
+        # nothing here and should be visible as such. Same rule as 54.
+        print("53_embedded_faces: no .docx given, faces unmeasured (the render carries %d of "
+              "%d source families, which is the renderer's choice, not the engine's)"
+              % (len(set(s_fa) & set(faces(gd))), len(s_fa)), file=sys.stderr)
+        c["53_embedded_faces"] = (len(s_fa), 0, True)
+    else:
+        s_tot = sum(s_fa.values()) or 1
+        d_tot = sum(d_fa.values()) or 1
+        lost = []
+        for fam, chars in s_fa.items():
+            want = chars / s_tot
+            got = d_fa.get(fam, 0) / d_tot
+            # A family the source only DECLARES (weight 0) has no share to lose; it only has
+            # to be present - and `faces` keeps such a family only when the page drew nothing
+            # at all, where the dictionary is the only evidence there is.
+            ratio = (got / want) if want else (1.0 if got else 0.0)
+            if ratio < SHARE_FLOOR:
+                lost.append((fam, round(ratio, 3), chars))
+        kept = len(s_fa) - len(lost)
+        if lost:
+            print("53_embedded_faces: %s" % ", ".join(
+                "%s kept %.0f%% of %d chars" % (f, r * 100, ch) for f, r, ch in lost),
+                file=sys.stderr)
+        c["53_embedded_faces"] = (len(s_fa), kept, len(s_fa) == 0 or not lost)
 
     # ---- 54 image resolution ----------------------------------------------
     # 08 counts images and 48 measures area; neither notices a 300 dpi logo

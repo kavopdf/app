@@ -69,6 +69,40 @@ public final class DocxWriter {
     /** Line box height as a multiple of the font size. Generous: a tight exact height clips. */
     private static final float LINE_FACTOR = 1.15f;
     /**
+     * The line box a flow line is written with, as a multiple of its font size: a HAIRLINE.
+     *
+     * <p>Google Docs and Word read {@code w:line} differently, and only one value of it means
+     * the same thing to both. Word (and LibreOffice) advance by {@code w:before + w:line/20}.
+     * Google advances by {@code w:before + max((w:line/240) * lineHeight(face, size), 0.069 *
+     * size)} - a MULTIPLE OF THE SUBSTITUTE FACE'S LINE HEIGHT with a floor at 0.069 em
+     * (calibrate.py: 0.9583 at 10 pt Arial, 1.049 Courier New, 1.170 Times, 1.223 Helvetica,
+     * 1.277 Liberation Serif). So an {@code w:line} written as a fraction of the em - the
+     * {@link #LINE_FACTOR} box this file used to emit - is charged {@code r} times over by
+     * Google for a face whose {@code r} is not 1.15, and the error is
+     * {@code size * (0.0958 * r * size - 1.15)} per line: -2.2 pt at 7.4 pt (the corpus
+     * median run size), 0.0 at 10 pt, +1.25 at 11 pt. One sign, every line, so it accumulates
+     * down the page: 20_line_placement measures that sum, and a page of uniform body text
+     * exceeds one pitch within about five lines whatever its layout is.
+     *
+     * <p>The floor is the only part of Google's charge that does not follow the face. Put the
+     * box inside the floor and BOTH renderers charge exactly 0.069 em:
+     * {@code (w:line/240) * r * size <= 0.069 * size} for every measured {@code r} while
+     * {@code w:line <= 16.56/1.277 = 12.97} twips, and {@code w:line/20 = 0.069 * size} when
+     * {@code w:line = 1.38 * size}. So {@code w:line = 1.38 * size} is the one box that makes
+     * the two agree, and the gap ({@code w:before}) carries the rest of the pitch.
+     *
+     * <p>NOT A CONSTANT 12 TWIPS. A constant box is exact for Google at every size and wrong
+     * for Word/LO by {@code 0.6 - 0.069 * size} per line, which is what made an earlier
+     * attempt at this class worse under LibreOffice (median |dy| 1.22 -> 2.09 pitch). Scaling
+     * the box with the type is what makes it right in both.
+     *
+     * <p>Above {@code size = 12/r} the floor stops binding and Google's charge becomes
+     * quadratic in the size, so the two cannot be made to agree there; the residue is
+     * {@code 0.069 * size * (r * size / 12 - 1)}, 0.17 pt a line at 12 pt, and it is BOUNDED
+     * rather than cumulative because the type size is.
+     */
+    private static final float HAIRLINE_EM = 0.069f;
+    /**
      * Where a shape's fill stops being a colour of its own and becomes a shade of the page.
      *
      * <p>HSL L of 0.72 is the point above which a filled band reads as a white patch on a dark
@@ -2500,7 +2534,9 @@ public final class DocxWriter {
         // Same rule as flowFromBox: the row is one line however many fields it holds, so it is
         // charged one pitch, not one per field.
         float pitch = !ctx.newPage && ctx.lastBaseline >= 0f ? first.y - ctx.lastBaseline : -1f;
-        float linePt = flowLinePt(pitch, size, ctx.lastLinePt);
+        // The hairline box, the same one flowFromBox writes: a row of fields is a line of the
+        // same flow, and two boxes for one flow is two rulers on one page.
+        float linePt = hairlinePt(size);
         int beforeTw = 0;
         if (ctx.afterTablePt >= 0f) {
             // Same rule as flowFromBox: the row is placed against the table's measured edge
@@ -2798,6 +2834,11 @@ public final class DocxWriter {
      * @param size       the line's font size
      * @param prevLinePt the height of the line box just emitted, 0 after a table
      */
+    /** The hairline line box a flow line is written with: {@code w:line = 1.38 * size} twips. */
+    private static float hairlinePt(float size) {
+        return HAIRLINE_EM * Math.max(1f, size);
+    }
+
     private static float flowLinePt(float pitch, float size, float prevLinePt) {
         float natural = Math.max(4f, size * LINE_FACTOR);
         if (pitch <= 0f) return natural;
@@ -2947,7 +2988,10 @@ public final class DocxWriter {
         // The pitch this page used between this baseline and the one above it. Measured, so the
         // box is the page's own line height rather than a guess at it - see flowLinePt.
         float pitch = !ctx.newPage && ctx.lastBaseline >= 0f ? b.y - ctx.lastBaseline : -1f;
-        float linePt = flowLinePt(pitch, b.size, ctx.lastLinePt);
+        // The box is a hairline, not a fraction of the em: see HAIRLINE_EM. It is the same
+        // number for every renderer, so the gap below is the whole of the pitch and nothing
+        // accumulates down the page.
+        float linePt = hairlinePt(b.size);
         int beforeTw = 0;
         if (ctx.afterTablePt >= 0f) {
             // The box above this one is a layout table - or the top of a column cell - and a
@@ -4411,11 +4455,37 @@ public final class DocxWriter {
                 // way of saying what the page did - keep the value whole, let it overrun the
                 // cell the point that the page overran it by - so the x the page measured
                 // survives and nothing is moved to make room.
+                // THE CELL'S LINE BOX IS THE SAME QUESTION AS THE FLOW'S. A cell that holds one
+                // line of the page is charged that row's pitch, and the two renderers read the
+                // w:line that carries it differently (see HAIRLINE_EM): Google charges a
+                // multiple of the substitute face's line height, so a 10 pt row pitch written as
+                // w:line=200 puts a 7 pt cell's text 0.8 * 5.5 = 4.4 pt lower in Google than in
+                // Word. The row height is w:trHeight's business, so the box may be a hairline
+                // here too: the gap carries the rest of the pitch and both renderers charge
+                // 0.069 em. A cell the page drew on SEVERAL lines keeps the old box - there the
+                // box IS the line advance, and a hairline would collapse the cell.
+                float cellSz = r < t.sizes.size() && c < t.sizes.get(r).size()
+                        && t.sizes.get(r).get(c) != null ? t.sizes.get(r).get(c) : 0f;
+                int cellBoxTw = rowLineTw, cellBeforeTw = 0;
+                if (rowParts == 1 && cellSz > 0f) {
+                    cellBoxTw = (int) Math.max(1L, Math.round(hairlinePt(cellSz) * TWIPS_PER_PT));
+                    // The baseline inside a box sits LINE_BASE of the box below its top, and the
+                    // old pair (before=0, box=rowLineTw) put it at LINE_BASE * rowLineTw - the
+                    // foot of the row, which is where this corpus draws its cell text. Keep that
+                    // foot: before = LINE_BASE * (rowLineTw - box), so
+                    // before + LINE_BASE * box = LINE_BASE * rowLineTw, unchanged. Writing
+                    // before = rowLineTw - box instead moved every cell 0.2 * row pitch lower
+                    // and 18_median_dy went 64 -> 100 documents.
+                    cellBeforeTw = Math.max(0,
+                            Math.round(LINE_BASE * (rowLineTw - cellBoxTw)));
+                }
                 inner.append("</w:tcPr>")
                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
                         .append("<w:snapToGrid w:val=\"0\"/>")
-                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
-                        .append(rowLineTw).append("\" w:lineRule=\"exact\"/>");
+                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
+                        .append(cellBeforeTw)
+                        .append("\" w:after=\"0\" w:line=\"")
+                        .append(cellBoxTw).append("\" w:lineRule=\"exact\"/>");
                 if (insetTw > 0) inner.append("<w:ind w:left=\"").append(insetTw).append("\"/>");
                 inner.append("</w:pPr>");
                 if (!cell.isEmpty()) {
