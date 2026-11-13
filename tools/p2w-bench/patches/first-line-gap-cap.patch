@@ -1,0 +1,40 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 503772c..63ca788 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -2520,7 +2520,7 @@ public final class DocxWriter {
+         } else if (ctx.newPage) {
+             float topGap = first.y - LINE_BASE * linePt;
+             if (topGap > 0f) {
+-                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
++                beforeTw = (int) Math.min(gapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
+             } else if (first.y > 0f) {
+                 linePt = Math.min(linePt, Math.max(size, first.y / LINE_BASE));
+             }
+@@ -2540,7 +2540,7 @@ public final class DocxWriter {
+             breakPage(sb, ctx);
+             float topGap = first.y - LINE_BASE * linePt;
+             if (topGap > 0f) {
+-                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
++                beforeTw = (int) Math.min(gapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
+             } else {
+                 beforeTw = 0;
+                 if (first.y > 0f) linePt = Math.min(linePt, Math.max(size, first.y / LINE_BASE));
+@@ -2981,7 +2981,7 @@ public final class DocxWriter {
+             // fit rather than the line being placed below its own y.
+             float topGap = b.y - LINE_BASE * linePt;
+             if (topGap > 0f) {
+-                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
++                beforeTw = (int) Math.min(gapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
+             } else if (b.y > 0f) {
+                 linePt = Math.min(linePt, Math.max(b.size, b.y / LINE_BASE));
+             }
+@@ -3037,7 +3037,7 @@ public final class DocxWriter {
+             breakPage(sb, ctx);
+             float topGap = b.y - LINE_BASE * linePt;
+             if (topGap > 0f) {
+-                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
++                beforeTw = (int) Math.min(gapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
+             } else {
+                 beforeTw = 0;
+                 if (b.y > 0f) linePt = Math.min(linePt, Math.max(b.size, b.y / LINE_BASE));
