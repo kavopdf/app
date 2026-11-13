@@ -2058,7 +2058,14 @@ public final class DocxWriter {
                 .append("\" cy=\"").append(cy).append("\"/></a:xfrm>")
                 .append(geom(s, cx, cy));
         if (s.fillRgb >= 0) {
-            fillXml(sb, s.fillRgb, s.fillAlpha);
+            // A hairline with no line is painted by its fill and by nothing else. Suppressing a
+            // light fill (see fillXml) then leaves a shape with neither a fill nor a line, and
+            // a rule the page drew comes out as blank paper - the largest remaining class,
+            // 32_stroke_lines. So a fill-only hairline keeps its fill whatever its lightness;
+            // the dark-mode white patch fillXml exists to avoid is a BAND, which has an area,
+            // and a 0.3 pt rule has none. Same 1.5 pt / 2 pt test as PdfToWord.bandFillStroke
+            // and verify_google._strokes.
+            fillXml(sb, s.fillRgb, s.fillAlpha, s.lineRgb < 0 && isHairline(s));
         }
         // A shape with no fill gets no fill element at all, matching the commercial files.
         if (s.lineRgb >= 0) {
@@ -2085,6 +2092,18 @@ public final class DocxWriter {
     private static double lightness(int rgb) {
         int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
         return (Math.max(r, Math.max(g, b)) + Math.min(r, Math.min(g, b))) / 510.0;
+    }
+
+    /**
+     * Is this shape a rule - a thin band whose only paint is its fill?
+     *
+     * <p>One side at or under 1.5 pt and the other over 2 pt. The same test
+     * {@code PdfToWord.bandFillStroke} uses to call a fill-only path a hairline, and the one
+     * {@code verify_google._strokes} uses to count it.
+     */
+    private static boolean isHairline(Shape s) {
+        float lo = Math.min(s.wPt, s.hPt), hi = Math.max(s.wPt, s.hPt);
+        return lo <= 1.5f && hi > 2f;
     }
 
     /**
@@ -2117,8 +2136,16 @@ public final class DocxWriter {
      * disappear.
      */
     private static void fillXml(StringBuilder sb, int rgb, float alpha) {
+        fillXml(sb, rgb, alpha, false);
+    }
+
+    /**
+     * @param mustPaint the fill is the only thing painting this shape, so it is written even
+     *                  when it is light. See {@link #isHairline} and {@link #shape}.
+     */
+    private static void fillXml(StringBuilder sb, int rgb, float alpha, boolean mustPaint) {
         double l = lightness(rgb);
-        if (l >= LIGHT_FILL) {
+        if (l >= LIGHT_FILL && !mustPaint) {
             // No fill at all. A decorative tint barely distinguishable from the page IS no fill
             // on a dark page, and a fill is the only thing that can be a white patch - so the
             // good converters emit none: measured, Adobe writes ZERO w:shd fills and iLovePDF

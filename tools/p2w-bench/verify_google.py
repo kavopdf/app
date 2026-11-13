@@ -345,13 +345,18 @@ def _shapes(page):
     return out
 
 
-def _anchor(page, rs):
-    """For each run, where its centre sits inside the smallest shape containing it.
+def _anchors(page, rs):
+    """For each run: where its centre sits inside the smallest shape containing it,
+    AND which shape that was.
 
-    Returns None for a run with no shape around it. The answer is a fraction of the
-    shape, not a page coordinate, so a stamp that moves as one piece reads as
-    unchanged here - that is a position error and checks 18 and 19 already own it.
-    Only text moving relative to ITS OWN outline shows up as a difference.
+    Returns None for a run with no shape around it, else (fx, fy, rect) where fx/fy
+    are fractions of the shape and rect is the shape itself. The rect is returned
+    because the fraction alone is not comparable between two documents: "the smallest
+    shape containing the centre" is an answer about a SET of boxes, and two producers
+    that draw the same table with different primitives give different sets (a cell
+    rect per cell on one side, one assembled face per band on the other), so the
+    fraction is then measured against a different object and reads as movement when
+    nothing moved. 59 compares the rect before it trusts the fraction.
     """
     shapes = _shapes(page)
     out = []
@@ -368,8 +373,13 @@ def _anchor(page, rs):
             out.append(None)
         else:
             out.append(((cx - best.x0) / max(1e-6, best.width),
-                        (cy - best.y0) / max(1e-6, best.height)))
+                        (cy - best.y0) / max(1e-6, best.height), best))
     return out
+
+
+def _anchor(page, rs):
+    """Fractions only - the shape's identity is dropped. Use _anchors for 59."""
+    return [None if a is None else (a[0], a[1]) for a in _anchors(page, rs)]
 
 
 def _clipped_count(doc):
@@ -1021,12 +1031,38 @@ def extra_checks2(src, gd, docx_path=None):
 
     # ---- 59 shape anchor ---------------------------------------------------
     # Does text stay in the same place inside the outline that encloses it?
-    # Two ways to fail, both seen on stamps: the outline moves and leaves its text
-    # behind, or the text moves and leaves its outline. Neither changes the text's
-    # page position enough for the median checks, and neither is visible to any
-    # check that only compares text to text.
-    ANCHOR_TOL = 0.12      # a tenth of the outline is drift, not rendering noise
-    lost, moved, anchored = 0, 0, 0
+    #
+    # REDEFINED 13 Nov - the old form was 123 documents, uninvestigated, and it is not
+    # one defect. As it stood it compared each run's centre AS A FRACTION OF ITS
+    # SMALLEST ENCLOSING SHAPE against ANCHOR_TOL = 0.12 and failed the document if a
+    # single run was out. Both halves of that are wrong on this corpus, and measured:
+    #
+    #  1. The fraction's unit is the shape's own size, so the tolerance in points is
+    #     0.12 x the box, and it is a different number on every run. Constructed
+    #     (/scratch/work/probe): a 40 pt box passes at 4 pt and fails at 5; a 12 pt box
+    #     passes at 1 pt and fails at 2. A table row is 12-20 pt, so the check fires at
+    #     1.4-2.4 pt - under 18_displacement's own FLOOR (1.5 pt), a third of its cap
+    #     (4.5 pt), and with no allowance of any kind.
+    #  2. "Smallest shape containing the centre" is not the same OBJECT on the two
+    #     sides. A table the page drew as one rect per cell comes back as a grid of
+    #     rules, and _shapes assembles the widest pair of horizontal rules into ONE face
+    #     per band - so a cell's run is re-based from an 80 pt box onto a 320 pt one.
+    #     Constructed, 16 cells over 4 columns: 12 of 16 runs fail with every character
+    #     on both sides at the same coordinates and no line anywhere out of place.
+    #
+    # What is left when those two are removed is the defect the check was written for,
+    # so it is now judged only where it can be judged, in points:
+    #   lost      the text is in the render and NO shape encloses it - the outline went
+    #             (the rotated-CTM drop, PdfToWord.java:4231, is the known source)
+    #   unjudged  the render's enclosing box is a different object; the fraction would
+    #             be measured against the wrong rectangle, so it is not compared
+    #   moved     the SAME box on both sides, and the text sits > ANCHOR_TOL_PT off it
+    # A page fails on the same budget 18_displacement uses, not on one stray run.
+    ANCHOR_TOL_PT = 3.0        # points, not a fraction of whatever box encloses the run
+    ANCHOR_RECT_TOL = 2.0      # pt; the two boxes are the same object within this
+    ANCHOR_BUDGET = 5          # per cent of the page's judged runs, as 18 uses
+    lost, moved, unjudged, anchored = 0, 0, 0, 0
+    anchor_bad_pages = []
 
     def _match(r, gruns, by, used):
         """The unused render runs whose text is r's - whole, or as adjacent pieces.
@@ -1059,34 +1095,90 @@ def extra_checks2(src, gd, docx_path=None):
                     return span
         return []
 
+    def _same_box(a, b):
+        return (abs(a.x0 - b.x0) <= ANCHOR_RECT_TOL and abs(a.y0 - b.y0) <= ANCHOR_RECT_TOL
+                and abs(a.x1 - b.x1) <= ANCHOR_RECT_TOL and abs(a.y1 - b.y1) <= ANCHOR_RECT_TOL)
+
+    def _box_moved(a, gshapes):
+        """The source box, reproduced at its own SIZE somewhere else on the page.
+
+        This is the difference the check turns on, and it cannot be read off the run's
+        own enclosing shape: a box that slid 55 pt off its text and a table cell that
+        came back as a band BOTH leave the run enclosed by a rectangle that is not the
+        source's. What separates them is whether the source's rectangle still exists as
+        a shape of the same size. If it does, the outline moved and the text did not -
+        the defect. If it does not, the page was drawn with different primitives and
+        this run is not evidence either way.
+        """
+        for sh in gshapes:
+            if (abs(sh.width - a.width) <= ANCHOR_RECT_TOL
+                    and abs(sh.height - a.height) <= ANCHOR_RECT_TOL):
+                return True
+        return False
+
     for si in range(min(src.page_count, gd.page_count)):
         sp, gp = src[si], gd[si]
         sruns, gruns = runs(sp), runs(gp)
-        sa, ga = _anchor(sp, sruns), _anchor(gp, gruns)
+        sa, ga = _anchors(sp, sruns), _anchors(gp, gruns)
+        gshapes = _shapes(gp)
         by = collections.defaultdict(list)      # text -> render run indices
         for j, g in enumerate(gruns):
             by[norm_word(g["text"])].append(j)
         used = set()
+        n_judged = n_out = 0
         for i, a in enumerate(sa):
             if a is None:
                 continue          # nothing enclosed it in the source either
-            anchored += 1
             js = _match(sruns[i], gruns, by, used)
             if not js:
                 lost += 1         # its text is not in the render at all
+                n_judged += 1
+                n_out += 1
                 continue
             used.update(js)
             bs = [ga[j] for j in js if ga[j] is not None]
             if not bs:
-                moved += 1        # text is there, but no longer inside any outline
+                lost += 1         # text is there, but no longer inside any outline
+                n_judged += 1
+                n_out += 1
                 continue
-            b = bs[0]
-            if abs(a[0] - b[0]) > ANCHOR_TOL or abs(a[1] - b[1]) > ANCHOR_TOL:
-                moved += 1        # text and outline no longer agree
-    # source = how many runs had an outline around them, render = how many still
-    # sit in the same place inside one. A raw drift count would read as
-    # "source=1 render=1" for one good run and one bad run alike.
-    c["59_shape_anchor"] = (anchored, anchored - (lost + moved), (lost + moved) == 0)
+            sb, gb = a[2], bs[0][2]
+            if not _same_box(sb, gb):
+                if _box_moved(sb, gshapes):
+                    moved += 1    # the outline is on the page, somewhere else
+                    n_judged += 1
+                    n_out += 1
+                else:
+                    # A different rectangle encloses it and the source's is nowhere on
+                    # the page - a cell rect that came back as a band, a band that came
+                    # back as the page. The fraction is not comparable, and this run is
+                    # not evidence either way.
+                    unjudged += 1
+                continue
+            n_judged += 1
+            sx = (sruns[i]["x"] + sruns[i]["x1"]) / 2.0
+            sy = (sruns[i]["y"] + sruns[i]["y1"]) / 2.0
+            gx = sum(gruns[j]["x"] + gruns[j]["x1"] for j in js) / (2.0 * len(js))
+            gy = sum(gruns[j]["y"] + gruns[j]["y1"] for j in js) / (2.0 * len(js))
+            if (abs((gx - gb.x0) - (sx - sb.x0)) > ANCHOR_TOL_PT
+                    or abs((gy - gb.y0) - (sy - sb.y0)) > ANCHOR_TOL_PT):
+                moved += 1        # same box, text no longer in the same place in it
+                n_out += 1
+            else:
+                anchored += 1     # same box, same place in it
+        if n_judged and (n_out > max(2, -(-n_judged * ANCHOR_BUDGET // 100))
+                         or n_out == n_judged):
+            anchor_bad_pages.append(si)
+    # source = the runs this could decide, render = how many of those still sit in the
+    # same place inside the SAME box. A raw drift count would read as "source=1
+    # render=1" for one good run and one bad run alike.
+    c["59_shape_anchor"] = (anchored + lost + moved, anchored, not anchor_bad_pages)
+    if unjudged:
+        # Never silent: on a document whose boxes are drawn with different primitives on
+        # the two sides this check decides very little, and that must be visible as the
+        # number it is rather than as a pass.
+        print("59_shape_anchor: %d anchored run(s) unjudged - the render's enclosing box "
+              "is a different rectangle from the source's" % unjudged, file=sys.stderr)
 
     # ---- 60 text column right edge -----------------------------------------
     # NOTHING MEASURED THIS BEFORE. 43_within_10pt_x compares a span's x - its LEFT edge -
