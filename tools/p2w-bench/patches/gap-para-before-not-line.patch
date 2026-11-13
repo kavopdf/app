@@ -1,0 +1,72 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 503772c..bd20fd6 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -4154,10 +4154,7 @@ public final class DocxWriter {
+         }
+         if (spacerTw > 0) {
+             spacerTw = twScale(spacerTw, ctx.squeeze);
+-            sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+-                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
+-                    .append(spacerTw)
+-                    .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
++            gapPara(sb, spacerTw);
+             ctx.flowTw += spacerTw;
+             // The spacer is a line of its own: the table now starts at the flow's position
+             // after it, which is the y the page drew the table's top at.
+@@ -4488,10 +4485,7 @@ public final class DocxWriter {
+         // rendered 14, the bottom rule fell a row lower than the page's, and everything below
+         // the table started from the wrong y. 4 pt is below every font's line box, so it can
+         // never hold text, but it is a real line and stays a paragraph.
+-        sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+-                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
+-                .append(POST_TABLE_TW).append("\" w:lineRule=\"exact\"/>")
+-                .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
++        gapPara(sb, POST_TABLE_TW);
+         // The table is part of the flow too. Left out of the accounting, the paragraph after it
+         // was spaced from the last line BEFORE the table, so a table's whole height was added
+         // on top of the next paragraph's gap and the flow ran long.
+@@ -4514,6 +4508,43 @@ public final class DocxWriter {
+         ctx.lastWasTable = true;
+     }
+ 
++    /**
++     * An empty paragraph that holds a measured gap open, {@code gapTw} twips tall.
++     *
++     * <p>The height is written as {@code w:before} with a one-twip box, NOT as {@code w:line}.
++     * The two engines read a line box differently and this is the one paragraph where the two
++     * readings can be made to agree:
++     *
++     * <pre>
++     *   Word / LibreOffice  height = w:before + w:line/20
++     *   Google Docs         height = w:before + max((w:line/240)*lineHeight(face,size),
++     *                                               0.069*size)
++     * </pre>
++     *
++     * <p>They are equal when {@code w:line/20 == 0.069*size}, i.e. {@code w:line == 1.38*size}.
++     * The gap paragraph's only run is the 1 pt paragraph mark ({@code <w:sz w:val="2"/>}), so
++     * that value is 1.38 twips and 1 twip is within 0.02 pt of it. Written the old way - all of
++     * the gap in {@code w:line} - Google reads 13.8 pt of white space as 1.15 x lineHeight of a
++     * 1 pt run and gives back about 1.3 pt, and everything below the gap rises by the rest.
++     *
++     * <p>Measured on 362_price_list_dense: the 276-twip gap above its table came out 13.8 pt in
++     * LibreOffice and ~1.3 pt under Google's own formula, so the table and its 256 runs sat
++     * about 12.5 pt high. That document's 20_within_10pt is 1 %, and 2 of its 258 runs are above
++     * the gap. The one-twip box is the only place the two models coincide, which is why the fix
++     * belongs here and not in the flowing-line box.
++     */
++    private static void gapPara(StringBuilder sb, int gapTw) {
++        int line = 1;
++        int before = Math.max(0, gapTw - line);
++        sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
++                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
++                .append(before)
++                .append("\" w:after=\"0\" w:line=\"")
++                .append(line)
++                .append("\" w:lineRule=\"exact\"/>")
++                .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
++    }
++
+     /** The paragraph a table must be followed by: 4 pt, in twips. */
+     private static final int POST_TABLE_TW = 80;
+ 

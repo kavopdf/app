@@ -26,3 +26,6 @@
 # rather than lost. The measurement each row records is unchanged - only the
 # bookkeeping around it. Named here so the next reader does not re-investigate.
 f47729c:tools/p2w-bench/verify_google.py  # superseded by d74a1fb: f47729c stripped ONE style pass, d74a1fb strips to a fixed point and handles truncated /BaseFont names - measured, 153 of 199 documents lost a face under the one-pass version
+6985d79:tools/p2w-bench/RATCHET.json  # superseded by fafa4de: the denominator guard restamped every mark with the universe it was measured under. No mark's value changed; only the bookkeeping around it.
+489fc9e:tools/p2w-bench/ratchet.py  # superseded by fafa4de: the guard replaced out_of==prev['out_of'] (comparing the number against itself) with a comparison against the live instrument. That is the defect being fixed, so the old lines had to go.
+9656d82:tools/p2w-bench/RESULTS.jsonl  # superseded by fafa4de: every row was restamped with universe/universe_n/universe_sha. The measurements are identical; the stamp is new.
