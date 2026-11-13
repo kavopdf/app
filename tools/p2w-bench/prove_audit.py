@@ -19,15 +19,28 @@ import subprocess
 import sys
 import tempfile
 
-REPO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "R")
+# The repo this script lives in: tools/p2w-bench/ -> three levels up. It used to be a hardcoded
+# sibling "R", which only worked from the directory I happened to build the proof in.
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 BENCH = os.path.join(REPO, "tools", "p2w-bench")
 VERBOSE = "--verbose" in sys.argv
 
 
 def scratch():
-    d = tempfile.mkdtemp(prefix="prove-")
-    shutil.copytree(REPO, os.path.join(d, "R"),
-                    ignore=shutil.ignore_patterns(".git", "t", "all", "out", "gd", "res"))
+    """A throwaway copy of just the two trees the audit reads.
+
+    Two things went wrong here and both are in DEFECTS.md section 39. It used to copytree the
+    whole repo into tempfile.mkdtemp(), which is /tmp - a 64 MB tmpfs - and six cases filled it,
+    after which cp wrote 0-byte files without failing and working checks were reported as misses.
+    Copying only tools/ and app/ is 8 MB instead of 50, and it lands under /scratch.
+    """
+    base = "/scratch/work/prove-tmp"
+    os.makedirs(base, exist_ok=True)
+    d = tempfile.mkdtemp(prefix="prove-", dir=base)
+    for name in ("tools", "app"):
+        src = os.path.join(REPO, name)
+        if os.path.isdir(src):
+            shutil.copytree(src, os.path.join(d, "R", name))
     return os.path.join(d, "R")
 
 
