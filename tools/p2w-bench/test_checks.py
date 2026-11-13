@@ -30,7 +30,6 @@ USAGE
 import os
 import sys
 import tempfile
-import zipfile
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -75,39 +74,230 @@ def simple(path, body):
     doc.close()
 
 
-def docx_faces_doc(path, face):
-    """A minimal .docx that declares one face on one run - all 53 reads."""
-    NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-    z = zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED)
-    z.writestr("word/document.xml",
-               '<w:document xmlns:w="%s"><w:body><w:p><w:r><w:rPr>'
-               '<w:rFonts w:ascii="%s" w:hAnsi="%s" w:cs="%s"/></w:rPr>'
-               '<w:t>Invoice number 12345</w:t></w:r></w:p></w:body></w:document>'
-               % (NS, face, face, face))
-    z.writestr("word/styles.xml",
-               '<w:styles xmlns:w="%s"><w:docDefaults><w:rPrDefault><w:rPr>'
-               '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/></w:rPr></w:rPrDefault>'
-               '</w:docDefaults></w:styles>' % NS)
-    z.close()
+def compare_files(a, b):
+    return V.compare(a, b)
 
+
+# ---------------------------------------------------------------------------
+# cases
+# ---------------------------------------------------------------------------
+def cases():
+    """Yield (name, src_builder, gd_builder, expect, allow)."""
+    out = []
+
+    # ---- a pair that differs in nothing: nothing may fail ------------------
+    def base(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+
+    out.append(("identical", base, base, [], "all"))
+
+    # ---- 01 page count -----------------------------------------------------
+    def two_pages(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+        text(p, 72, 400, "continued")
+        p.parent.new_page()          # a genuinely extra page
+    out.append(("extra page", base, two_pages, ["01_page_count"], None))
+
+    # ---- 03/04 missing word ------------------------------------------------
+    def missing_word(p):
+        text(p, 72, 100, "Invoice number")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+    out.append(("word missing", base, missing_word, ["04_words_missing"], None))
+
+    # ---- 18/19/20 vertical shift ------------------------------------------
+    def shifted(p):
+        text(p, 72, 112, "Invoice number 12345")
+        text(p, 72, 142, "Total amount 4,500")
+        table(p, 72, 212, 3, 3)
+    # A uniform 12 pt shift is far outside clamp(0.35*size, 1.5, 4.5) at this document's
+    # type size, so every run on the page is out and the page's budget of
+    # max(2, ceil(0.05*n)) cannot absorb it. 18_displacement owns a uniform offset.
+    # (19_worst_dy is silent here on purpose: 12 pt is under its 15 pt tail threshold.)
+    out.append(("text shifted 12pt", base, shifted, ["18_displacement"], None))
+
+    # ---- 21/43 horizontal shift -------------------------------------------
+    def shifted_x(p):
+        text(p, 132, 100, "Invoice number 12345")
+        text(p, 132, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+    out.append(("text shifted right", base, shifted_x, ["43_within_10pt_x"], None))
+
+    # ---- 32 stroke lines ---------------------------------------------------
+    def no_lines(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+    out.append(("borders removed", base, no_lines, ["32_stroke_lines"], None))
+
+    # ---- 46 a rule drawn over text (33 retired - it was this check with a
+    # 2 pt inset on each end, and the two agreed on all 208 corpus documents) ---
+    def border_through(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+        p.draw_line((60, 96), (400, 96), color=(0, 0, 0), width=1)
+    out.append(("rule through text", base, border_through, ["46_text_crossing_rule"], None))
+
+    # ---- 34a span size -----------------------------------------------------
+    def bigger(p):
+        text(p, 72, 100, "Invoice number 12345", size=16)
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+    out.append(("one span resized", base, bigger, ["34a_span_size_match"], None))
+
+    # ---- 34b span colour ---------------------------------------------------
+    def recoloured(p):
+        text(p, 72, 100, "Invoice number 12345", colour=(1, 0, 0))
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+    out.append(("one span recoloured", base, recoloured, ["34b_span_colour_match"], None))
+
+    # ---- 45 character accuracy --------------------------------------------
+    def one_char(p):
+        text(p, 72, 100, "Invoice number 12346")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+    out.append(("one digit changed", base, one_char, ["04_words_missing"], None))
+
+    # ---- 47 margins --------------------------------------------------------
+    def narrow(p):
+        text(p, 160, 100, "Invoice number 12345")
+        text(p, 160, 130, "Total amount 4,500")
+        table(p, 160, 200, 2, 3)
+    out.append(("margins moved", base, narrow, ["47_margins"], None))
+
+    # ---- 25 invisible text -------------------------------------------------
+    def on_fill(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+        p.draw_rect(fitz.Rect(60, 300, 300, 340), color=None, fill=(0, 0, 0))
+        text(p, 70, 325, "hidden words here", colour=(0, 0, 0))
+    out.append(("text on same-colour fill", base, on_fill, ["25_invisible_text"], None))
+
+    # ---- 15/40 links -------------------------------------------------------
+    def no_link(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+    def with_link(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+        p.insert_link({"kind": fitz.LINK_URI, "from": fitz.Rect(60, 90, 300, 108),
+                       "uri": "https://example.com/inv"})
+    out.append(("link dropped", with_link, no_link, ["15_links"], None))
+
+    # ---- 48 image area -----------------------------------------------------
+    def with_image(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+        pix = fitz.Pixmap(fitz.csRGB, fitz.IRect(0, 0, 40, 40), 0)
+        pix.set_rect(pix.irect, (200, 30, 30))
+        p.insert_image(fitz.Rect(72, 400, 172, 500), pixmap=pix)
+    out.append(("image dropped", with_image, base, ["08_image_count"], None))
+
+    # ---- 35 rotation -------------------------------------------------------
+    def rotated_text(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+        p.insert_text((500, 600), "PAID", fontsize=20, rotate=90)
+    out.append(("rotated text dropped", rotated_text, base, ["35_rotation"], None))
+
+    # ---- 25 and 27: a defect is text that BECAME invisible or left the page --
+    # The source already having it is the document's own shape, not a conversion
+    # fault. Seven corpus documents failed against themselves before this.
+    def white_on_white(p):
+        text(p, 72, 100, "Invoice number 12345")
+        p.draw_rect(fitz.Rect(60, 120, 400, 150), color=None, fill=(1, 1, 1))
+        p.insert_text((72, 142), "hidden watermark", fontsize=11, color=(1, 1, 1))
+
+    out.append(("invisible text the source already had", white_on_white, white_on_white,
+                [], None))
+
+    def became_invisible(p):
+        text(p, 72, 100, "Invoice number 12345")
+        p.draw_rect(fitz.Rect(60, 120, 400, 150), color=None, fill=(1, 1, 1))
+        p.insert_text((72, 142), "hidden watermark", fontsize=11, color=(0, 0, 0))
+
+    out.append(("text turned invisible by the conversion", became_invisible, white_on_white,
+                ["25_invisible_text"], None))
+
+    def on_page(p):
+        text(p, 72, 100, "Invoice number 12345")
+        p.insert_text((72, 300), "edge marker", fontsize=11)
+
+    def off_page(p):
+        text(p, 72, 100, "Invoice number 12345")
+        p.insert_text((-40, 300), "edge marker", fontsize=11)
+
+    out.append(("text already off the page in the source", off_page, off_page, [], None))
+    out.append(("text pushed off the page by the conversion", on_page, off_page,
+                ["27_text_off_page"], None))
+
+    # ---- 53: a substituted face is not automatically a kept face -----------
+    # Liberation Serif arriving as Times New Roman is the same metrics and must
+    # pass; arriving as a sans is a different face and must still fail. Built from
+    # real font files, because base-14 names cannot express this.
+    SERIF = "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"
+    SANS = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+
+    if os.path.exists(SERIF) and os.path.exists(SANS):
+        def serif_only(p):
+            p.insert_font(fontname="FS", fontfile=SERIF)
+            p.insert_text((72, 100), "Invoice number 12345", fontsize=12, fontname="FS")
+
+        def sans_only(p):
+            p.insert_font(fontname="FN", fontfile=SANS)
+            p.insert_text((72, 130), "Total amount 4,500", fontsize=12, fontname="FN")
+
+        out.append(("the same faces keep 53 clean", serif_only, serif_only, [], None))
+        out.append(("a different face still fails 53", serif_only, sans_only,
+                    # 53 now reads the .docx the engine wrote, not Google's export, so a
+                    # PDF-only pair cannot fire it - without --docx it cannot fail and says so
+                    # on stderr. The docx case lives in prove_checks.py, which builds one.
+                    [], None))
+
+    # ---- 59 shape anchor ---------------------------------------------------
+    # A stamp is an outline with text inside it. These two cases are the failure
+    # modes the user described: the outline moves and leaves its text, and the
+    # text moves and leaves its outline. The second one is the important test -
+    # on that pair 59 is the ONLY check that fails, which is the whole reason it
+    # was added.
+    def stamp(p, shape_dx=0, text_dy=0):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+        p.draw_rect(fitz.Rect(360 + shape_dx, 560, 520 + shape_dx, 640),
+                    color=(0.75, 0.05, 0.05), width=2)
+        p.insert_text((400, 610 + text_dy), "PAID", fontsize=26, color=(0.75, 0.05, 0.05))
+
+    out.append(("stamp outline moved off its text",
+                stamp, lambda p: stamp(p, shape_dx=55),
+                ["59_shape_anchor"], None))
+    out.append(("stamp text moved out of its outline",
+                stamp, lambda p: stamp(p, text_dy=34),
+                ["59_shape_anchor"], None))
+
+    return out
 
 
 def run(verbose=False):
     tmp = tempfile.mkdtemp(prefix="chk-")
     results = []
-    for case in cases():
-        name, src_b, gd_b, expect, allow = case[:5]
-        docx_face = case[5] if len(case) > 5 else None
+    for name, src_b, gd_b, expect, allow in cases():
         a = os.path.join(tmp, "a.pdf")
         b = os.path.join(tmp, "b.pdf")
         simple(a, src_b)
         simple(b, gd_b)
-        docx = None
-        if docx_face:
-            docx = os.path.join(tmp, "a.docx")
-            docx_faces_doc(docx, docx_face)
         try:
-            res = V.compare(a, b, docx)
+            res = compare_files(a, b)
         except Exception as exc:
             results.append((name, "ERROR", "compare raised: %s" % exc, []))
             continue
