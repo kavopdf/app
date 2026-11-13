@@ -230,6 +230,9 @@ as measured; only the verdict is closed.
 | text-held-twice-shadow-text | 43/59 | FAIL | 01_page_count, 02_text_run_count, 09_font_names, 10_font_sizes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 24_page_breaks, 25_invisible_text, 27_text_off_page, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins, 55_orientation_mix | 2a68de6 | 12 Nov |
 | two-tables-stacked-with-no-gap | 54/59 | FAIL | 09_font_names, 10_font_sizes, 18_median_dy, 22_reading_order, 47_margins | 2a68de6 | 12 Nov |
 | very-long-single-column-table | 46/59 | FAIL | 06_table_columns, 07_table_rows, 09_font_names, 10_font_sizes, 12_italic_runs, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 23_line_pitch, 29_blank_where_ink_was, 30_ink_where_blank_was, 47_margins | 2a68de6 | 12 Nov |
+| 600_reviewed_invoice_with_annotations | 43/59 | FAIL | 05_words_extra, 06_table_columns, 14_filled_shapes, 18_median_dy, 19_worst_dy, 20_within_10pt, 22_reading_order, 28_clipped_at_edge, 29_blank_where_ink_was, 30_ink_where_blank_was, 32_stroke_lines, 36_underline_rules, 44_header_footer, 47_margins, 50_annotations, 59_shape_anchor | eca9020 | 13 Nov |
+| 601_fillable_admission_form |  |  |  |
+| 602_bookmarked_annual_report |  |  |  |
 ## Reopened 2026-11-10
 
 90 rows were marked CLOSED-UNFIXABLE, most of them on the single claim that Google Docs has
