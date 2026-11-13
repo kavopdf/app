@@ -354,6 +354,22 @@ public final class PdfToWord {
         public int images;
         public int ocrPages;
         public int skippedPages;
+        /**
+         * Images the page drew that did NOT reach the .docx, and how many of those a retry at a
+         * lower resolution brought back.
+         *
+         * <p>These are counters, not a log, because the failure they replace was silent: a
+         * decode that threw was caught and ignored, so a document could lose its picture and
+         * still report a clean conversion. A count is the smallest thing the pipeline can see.
+         */
+        public int imagesFailed;
+        public int imagesRecovered;
+        /** Lines written with no gap above them because the page put them above the flow. */
+        public int zeroGap;
+        public int zeroGapAnchored;
+        public int zeroGapInCol;
+        public int zeroGapNoRoom;
+        public float zeroGapWorstPt;
         public final List<String> notes = new ArrayList<>();
     }
 
@@ -479,6 +495,14 @@ public final class PdfToWord {
         // image, and reading it only on the text path is how it came out blank.
         Rules rules = rulesOf(doc, index);
         report.images += rules.images;
+        // An image that did not reach the .docx is a document defect, not a log line: the page
+        // says something the reader can no longer see. Counted and named here, where the page
+        // number is still known.
+        report.imagesFailed += rules.imagesFailed;
+        report.imagesRecovered += rules.imagesRecovered;
+        for (String note : rules.imageNotes) {
+            if (report.notes.size() < 200) report.notes.add("page " + (index + 1) + ": " + note);
+        }
 
         // A filled form keeps its answers in the field's /V, never in the content stream, so
         // they are read on every page - not only on a page with no text layer. Without this a
@@ -4053,6 +4077,18 @@ public final class PdfToWord {
 
         int images;
         /**
+         * Images the page drew that did not make it into the .docx, and how many of those a
+         * retry at a lower resolution brought back.
+         *
+         * <p>These exist because the failure they describe was invisible: the decode sat in a
+         * {@code catch (Throwable ignored)}, so a document could lose its picture and report a
+         * clean conversion. The count is what the pipeline can see; {@link #imageNotes} says
+         * which picture and why.
+         */
+        int imagesFailed;
+        int imagesRecovered;
+        final List<String> imageNotes = new ArrayList<>();
+        /**
          * The raster images the page draws, in draw order, with the rectangle each one covers.
          *
          * <p>Nothing used to read these: {@code images} was counted for the report and the
@@ -4594,6 +4630,7 @@ public final class PdfToWord {
          */
         private void collectImage(PDImage pdImage) {
             if (pdImage == null || pdImage.isStencil()) return;
+            float[] frame = null;
             try {
                 com.tom_roush.pdfbox.util.Matrix ctm =
                         getGraphicsState().getCurrentTransformationMatrix();
@@ -4616,7 +4653,8 @@ public final class PdfToWord {
                 // A hairline is a rule the page draws with an image, not a picture a reader
                 // would miss. Only something with area on the page is worth carrying over.
                 if (maxX - minX < 2f || maxY - minY < 2f) return;
-                android.graphics.Bitmap bmp = pdImage.getImage();
+                frame = new float[]{minX, minY, maxX, maxY};
+                android.graphics.Bitmap bmp = decodeImage(pdImage, frame);
                 if (bmp == null) return;
                 // A scanned signature or a stamp with soft edges keeps its shape in an /SMask,
                 // not in the image's own samples. getImage() returns the colour plane alone, so
@@ -4632,14 +4670,22 @@ public final class PdfToWord {
                             PDImageXObject hard = xo.getMask();
                             if (hard != null) mask = hard.getImage();
                         }
-                    } catch (Throwable ignored) {
+                    } catch (Throwable t) {
+                        // A mask that will not decode is not nothing: the picture still comes
+                        // out, but its transparent parts arrive opaque, so the words under a
+                        // scanned signature are covered. Recorded rather than swallowed.
+                        imageNote("mask of the image at " + frameText(frame)
+                                + " did not decode (" + oneLine(t) + "); it is written opaque");
                     }
                     if (mask != null) bmp = withMask(bmp, mask);
                 }
-                java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
-                if (!bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, bos)) return;
-                byte[] png = bos.toByteArray();
-                if (png.length < 64) return;
+                // The ENCODE is a second place a picture is lost, and it is the one that failed
+                // on the 211-document run: three documents came out with no media at all and the
+                // only sign was an IIOException inside compress(). So it is retried the same
+                // way the decode is - first after freeing what the failed attempt held, then at
+                // half the pixels, which is a picture at half resolution instead of no picture.
+                byte[] png = encodePng(bmp, frame);
+                if (png == null) return;
                 DocxWriter.Picture pic = new DocxWriter.Picture(png, 0f, 0f,
                         maxX - minX, maxY - minY);
                 // PDF user space has y up from the bottom of the page; the .docx anchor is
@@ -4647,9 +4693,155 @@ public final class PdfToWord {
                 pic.topPt = -maxY;
                 pic.xPt = minX;
                 rules.pictures.add(pic);
-            } catch (Throwable ignored) {
-                // One unreadable image must not cost the page its text.
+            } catch (Throwable t) {
+                // One unreadable image must not cost the page its text - but it must not be
+                // silent either. This used to be `catch (Throwable ignored)`, and a full-corpus
+                // conversion in one JVM dropped the picture in 15 documents without a word:
+                // nothing in the .docx, nothing in the report, nothing anywhere. A lost image
+                // is a lost document, so the failure is counted, described, and retried.
+                imageDropped(frame, oneLine(t));
             }
+        }
+
+        /**
+         * Decodes one image, retrying at a lower resolution before giving up.
+         *
+         * <p>{@code getImage()} decodes at the image's own pixel size, so a full-page 300 dpi
+         * scan is a 25-megapixel bitmap and the failure mode on a phone is running out of
+         * memory - a Throwable that says nothing about the page. The same samples at
+         * {@code inSampleSize} 2 and 4 are a quarter and a sixteenth of that, and a picture at
+         * half resolution is a picture; no picture at all is a lost page.
+         *
+         * <p>Only the pixel size changes. The rectangle the picture is placed in comes from the
+         * page's own transform, so 39_image_position and 48_image_area are unaffected by which
+         * attempt succeeded.
+         */
+        private android.graphics.Bitmap decodeImage(PDImage img, float[] frame) {
+            String why;
+            try {
+                android.graphics.Bitmap b = img.getImage();
+                if (b != null) return b;
+                why = "getImage() returned null";
+            } catch (Throwable t) {
+                why = oneLine(t);
+            }
+            // The retry goes through the image's own ENCODED BYTES, not through
+            // PDImage.getImage(rect, subsampling). That overload is not usable here: in
+            // pdfbox-android 2.0.27 it throws java.awt.image.RasterFormatException
+            // "(y + height) is outside raster" for every subsampling above 1, and ignores the
+            // rect entirely (measured: Probe over a 8000x8000 DCT image - see the patch note).
+            // BitmapFactory with inSampleSize is the documented Android route and decodes at
+            // 1/sub the pixels, which is a quarter and a sixteenth of the memory.
+            if (img instanceof PDImageXObject) {
+                PDImageXObject xo = (PDImageXObject) img;
+                for (int sub : new int[]{2, 4}) {
+                    try {
+                        byte[] raw = readAll(xo.createInputStream());
+                        if (raw.length == 0) {
+                            why = why + " / 1/" + sub + ": the image stream was empty";
+                            continue;
+                        }
+                        android.graphics.BitmapFactory.Options opt =
+                                new android.graphics.BitmapFactory.Options();
+                        opt.inSampleSize = sub;
+                        android.graphics.Bitmap b =
+                                android.graphics.BitmapFactory.decodeByteArray(raw, 0, raw.length, opt);
+                        if (b != null) {
+                            rules.imagesRecovered++;
+                            imageNote("the image at " + frameText(frame) + " failed at full size ("
+                                    + why + ") and was recovered at 1/" + sub
+                                    + " resolution (" + b.getWidth() + "x" + b.getHeight() + ")");
+                            return b;
+                        }
+                        why = why + " / 1/" + sub + ": the bytes did not decode";
+                    } catch (Throwable t) {
+                        why = why + " / 1/" + sub + ": " + oneLine(t);
+                    }
+                }
+            }
+            imageDropped(frame, why);
+            return null;
+        }
+
+        /**
+         * The picture as PNG bytes, or null when it cannot be written at all.
+         *
+         * <p>Three attempts: as it is, as it is after a GC (the failed attempt's buffers are
+         * usually what is left over), and at half the pixels. Each failure is recorded, so a
+         * picture that ends up dropped says why in three steps rather than vanishing.
+         */
+        private byte[] encodePng(android.graphics.Bitmap bmp, float[] frame) {
+            String why = null;
+            for (int attempt = 0; attempt < 3; attempt++) {
+                android.graphics.Bitmap src = bmp;
+                try {
+                    if (attempt == 1) System.gc();
+                    if (attempt == 2) {
+                        int w = Math.max(1, bmp.getWidth() / 2), h = Math.max(1, bmp.getHeight() / 2);
+                        src = android.graphics.Bitmap.createScaledBitmap(bmp, w, h, true);
+                    }
+                    java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                    if (!src.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, bos)) {
+                        why = "compress() returned false";
+                        continue;
+                    }
+                    byte[] out = bos.toByteArray();
+                    if (out.length < 64) {
+                        why = "the encoded picture was empty (" + out.length + " bytes)";
+                        continue;
+                    }
+                    if (attempt > 0) {
+                        rules.imagesRecovered++;
+                        imageNote("the image at " + frameText(frame) + " failed to encode ("
+                                + why + ") and was recovered on attempt " + (attempt + 1)
+                                + " (" + src.getWidth() + "x" + src.getHeight() + ")");
+                    }
+                    return out;
+                } catch (Throwable t) {
+                    why = oneLine(t);
+                }
+            }
+            imageDropped(frame, "the decoded bitmap could not be encoded as PNG: " + why);
+            return null;
+        }
+
+        /** The whole of a stream, or an empty array - never a half-read image. */
+        private static byte[] readAll(java.io.InputStream in) throws java.io.IOException {
+            if (in == null) return new byte[0];
+            try {
+                java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+                byte[] buf = new byte[8192];
+                int n;
+                while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+                return out.toByteArray();
+            } finally {
+                in.close();
+            }
+        }
+
+        /** An image the page drew that will not reach the .docx: counted, named, described. */
+        private void imageDropped(float[] frame, String why) {
+            rules.imagesFailed++;
+            imageNote("image at " + frameText(frame) + " was dropped: " + why);
+        }
+
+        private void imageNote(String note) {
+            if (rules.imageNotes.size() < 40) rules.imageNotes.add(note);
+        }
+
+        /** The picture's rectangle on the page, so a dropped one can be found again. */
+        private static String frameText(float[] f) {
+            if (f == null) return "an unplaced position";
+            return String.format(Locale.US, "x=%.1f..%.1f y=%.1f..%.1f pt",
+                    f[0], f[2], f[1], f[3]);
+        }
+
+        /** A Throwable as one line: the class and its message, never a stack trace. */
+        private static String oneLine(Throwable t) {
+            if (t == null) return "unknown failure";
+            String m = t.getMessage();
+            String s = t.getClass().getSimpleName() + (m == null || m.trim().isEmpty() ? "" : ": " + m.trim());
+            return s.length() > 160 ? s.substring(0, 160) : s;
         }
 
         @Override
@@ -5179,6 +5371,9 @@ public final class PdfToWord {
             out.hStroke.addAll(collector.rules.hStroke);
             out.vStroke.addAll(collector.rules.vStroke);
             out.images = collector.rules.images;
+            out.imagesFailed = collector.rules.imagesFailed;
+            out.imagesRecovered = collector.rules.imagesRecovered;
+            out.imageNotes.addAll(collector.rules.imageNotes);
             out.pictures.addAll(collector.rules.pictures);
             out.shapes.addAll(collector.rules.shapes);
         } catch (Throwable ignored) {

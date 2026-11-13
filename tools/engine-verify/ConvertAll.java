@@ -72,7 +72,18 @@ public class ConvertAll {
                     continue;
                 }
                 System.out.println(base + "\tpages=" + r.report.pages
-                        + "\tparagraphs=" + r.paragraphCount());
+                        + "\tparagraphs=" + r.paragraphCount()
+                        + "\tzeroGap=" + r.report.zeroGap
+                        + "\tzeroGapWorst=" + Math.round(r.report.zeroGapWorstPt * 10f) / 10f
+                        + "\tzeroGapInCol=" + r.report.zeroGapInCol
+                        + "\tzeroGapAnchored=" + r.report.zeroGapAnchored
+                        + "\tzeroGapNoRoom=" + r.report.zeroGapNoRoom
+                        + "\timages=" + r.report.images
+                        + "\timagesFailed=" + r.report.imagesFailed
+                        + "\timagesRecovered=" + r.report.imagesRecovered);
+                for (String note : r.report.notes) {
+                    System.out.println("  NOTE " + base + "  " + note);
+                }
             } catch (Throwable t) {
                 bad++;
                 System.out.println(base + "\tFAILED\t" + t);

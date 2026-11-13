@@ -241,6 +241,42 @@ public final class DocxWriter {
     private static final int GAP_CAP_SPEND_TW = 20000;
 
     /**
+     * Whether a line the page put ABOVE the flow is anchored at its own y instead of being
+     * written with no gap at all.
+     *
+     * <p>This is the same rule the file already applies to a gap WIDER than the cap: a gap the
+     * flow cannot hold is not a gap, it is a position, and the line is anchored where the page
+     * drew it. A NEGATIVE gap is the same statement with the sign reversed, and it used to be
+     * written as {@code w:before="0"} - the line then landed wherever the flow happened to be,
+     * low by the overshoot, and took the next line with it. On
+     * 69_two_col_legal_numbered_clauses one line landed 16.9 pt low and dragged four more with
+     * it, and again at 41.1 pt.
+     *
+     * <p>An anchored line is a text box, so it is not free: it does not reflow and Google Docs
+     * will not let it be edited in place. That is why it is the fallback rather than the rule,
+     * why a line inside a column cell is left alone (a page-anchored box written from inside a
+     * cell lands outside it), and why the miss has to reach {@link #ZERO_GAP_FLOOR_PT} before a
+     * box is worth writing: below that the two placements are the same place.
+     */
+    static final boolean ZERO_GAP_ANCHOR = !"false".equals(System.getProperty("p2w.zganchor"));
+
+    /**
+     * The miss, in points, that makes a text box worth writing.
+     *
+     * <p>Measured, not guessed. A line anchored in a text box is placed from the box's top edge,
+     * so it lands a little over a point from where the flow would have put it (measured on
+     * 69_two_col_legal_numbered_clauses: 155.0 -> 153.7 pt and 306.8 -> 305.4 pt), and the box
+     * does not advance the flow. Below this miss the two placements are the same place and the
+     * box buys nothing: at 1.0 pt, five lines of 78_mixed_english_devanagari_line - whose worst
+     * miss is 3.6 pt - became text boxes and four of them landed on the line above, which is a
+     * NEW 26_text_overlap failure paid for 3 pt of position. At 6 pt that document is untouched.
+     * 6 pt is about half a line box for the 10-12 pt text this corpus is written in, which is
+     * where a miss stops being rounding and starts being a line in the wrong place.
+     */
+    static final float ZERO_GAP_FLOOR_PT =
+            Float.parseFloat(System.getProperty("p2w.zgfloor", "6.0"));
+
+    /**
      * The most a page's flow may be compressed to make it fit the paper: 85 % of its measured
      * height.
      *
@@ -481,6 +517,14 @@ public final class DocxWriter {
     public static void write(PdfToWord.Result result, File out) throws IOException {
         Ctx ctx = new Ctx();
         String documentXml = documentXml(result, ctx);
+        // What the flow could not express, carried out where the pipeline can see it. A gap
+        // that could not be written is not a rendering detail: the line lands somewhere the
+        // page never put it, and nothing in the .docx says so.
+        result.report.zeroGap = ctx.zeroGap;
+        result.report.zeroGapAnchored = ctx.zeroGapAnchored;
+        result.report.zeroGapInCol = ctx.zeroGapInCol;
+        result.report.zeroGapWorstPt = ctx.zeroGapWorstPt;
+        result.report.zeroGapNoRoom = ctx.zeroGapNoRoom;
         if (System.getProperty("p2w.debugFlow") != null) {
             System.err.println("FLOWDOC " + out.getName() + " fitted=" + ctx.fitted
                     + " broke=" + ctx.brokePage);
@@ -567,6 +611,27 @@ public final class DocxWriter {
          * above the box it belongs to, and every label after it drifted with it.
          */
         boolean positioned;
+        /**
+         * Lines this document wrote with NO gap above them because the page put them above
+         * where the flow already was - the gap would have been negative and a flow cannot go
+         * backwards. Counted so the pipeline can see the class instead of inferring it from a
+         * render: a zero gap is invisible in the .docx, it is a missing number.
+         */
+        int zeroGap;
+        /** How far above the flow those lines were, summed and worst-case, in points. */
+        float zeroGapPt;
+        float zeroGapWorstPt;
+        /** How many of them were inside a column cell, where a text box cannot reach. */
+        int zeroGapInCol;
+        /** How many were anchored at their own y by the rule this replaces the zero with. */
+        int zeroGapAnchored;
+        /**
+         * Lines that miss their own y by more than the floor but could not be anchored, because
+         * the page left no room between them and the line above - that line is itself low, so a
+         * box here would land on top of it. Counted, so what the rule still cannot reach is a
+         * number rather than an impression.
+         */
+        int zeroGapNoRoom;
         /** The shapes on the page being written, so a stamp can find its own outline. */
         java.util.List<Shape> curShapes;
         /**
@@ -2672,6 +2737,21 @@ public final class DocxWriter {
             float extra = pitch - (1f - LINE_BASE) * ctx.lastLinePt - LINE_BASE * linePt;
             if (extra > 0f) beforeTw = (int) Math.min(gapCapTw(ctx), Math.round(extra * TWIPS_PER_PT));
         }
+        // The same rule flowFromBox applies, for a row of fields: a gap that would be NEGATIVE
+        // is a position, not a gap, and the row is anchored where the page drew it instead of
+        // being written with no gap and landing wherever the flow happens to be. A row has no
+        // absolute fallback of its own - it was the one writer with no way out of the zero.
+        {
+            float rowTop = first.y - LINE_BASE * linePt;
+            if (beforeTw == 0 && ctx.flowY >= 0f && !ctx.newPage && ctx.afterTablePt < 0f
+                    && rowTop < ctx.flowY) {
+                ctx.zeroGap++;
+                float miss = ctx.flowY - rowTop;
+                ctx.zeroGapPt += miss;
+                if (miss > ctx.zeroGapWorstPt) ctx.zeroGapWorstPt = miss;
+                if (ctx.inColumn) ctx.zeroGapInCol++;
+            }
+        }
         int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
         // The squeeze factor is 1 on every page whose own flow already fits the paper; on the
         // pages it is not, the guard is handed the heights the page will really be written with,
@@ -2695,6 +2775,34 @@ public final class DocxWriter {
         }
         beforeTw = fit[0];
         lineTw = fit[1];
+        // Same anchor rule as flowFromBox, for a row of fields: a row the flow cannot put on
+        // its own baseline is anchored there, field by field at the x the page drew each one.
+        // A row is where the miss is worst, because a row has no absolute fallback of its own -
+        // on 69_two_col_legal_numbered_clauses "binding." was written 18 pt low here and the
+        // row that followed it, correctly anchored, landed on top of it.
+        if (ZERO_GAP_ANCHOR && !ctx.inColumn && !ctx.newPage) {
+            float topNow = flowTopPt(ctx) + beforeTw / (float) TWIPS_PER_PT;
+            float landY = topNow + LINE_BASE * (lineTw / (float) TWIPS_PER_PT);
+            // The anchored box must FIT above the line before it, or it trades a position for a
+            // collision. Measured on 69_two_col_legal_numbered_clauses: anchoring
+            // "This agreement..." at its own y (306.8) put it 2.6 pt into the line above, which
+            // is itself 18 pt low, and that is a NEW 26_text_overlap failure bought with a
+            // position the page never left room for. Where the room is not there the line stays
+            // in the flow and is counted in zeroGapNoRoom instead.
+            float prevBoxTop = flowTopPt(ctx) - ctx.flowBoxPt;
+            float thisBoxBottom = first.y + (1f - LINE_BASE) * linePt;
+            if (landY - first.y >= ZERO_GAP_FLOOR_PT && thisBoxBottom <= prevBoxTop) {
+                ctx.zeroGapAnchored++;
+                for (PdfToWord.Box ab : cols) anchorBox(sb, p, ab, ctx);
+                ctx.lastLinePt = linePt;
+                ctx.lastBaseline = first.y;
+                ctx.lastSize = size;
+                ctx.flowY = first.y;
+                ctx.flowBoxPt = Math.max(4f, size * LINE_FACTOR);
+                return;
+            }
+            if (landY - first.y >= ZERO_GAP_FLOOR_PT) ctx.zeroGapNoRoom++;
+        }
         // The box the pitch solver compares next time is the page's own, not the squeezed one:
         // the page's baselines are what they are, and a squeezed box that fed back into the
         // solver would chase its own scaling down the page.
@@ -3192,10 +3300,30 @@ public final class DocxWriter {
         // them had anything to say, the distance from where the reader really put the line above
         // is what places this one, with no rounding carried down the page.
         int absBeforeTw = 0;
+        float absTop = b.y - LINE_BASE * linePt;
         if (ctx.flowY >= 0f) {
-            float absTop = b.y - LINE_BASE * linePt;
             absBeforeTw = (int) Math.max(0L,
                     Math.round(Math.min(absTop - ctx.flowY, gapCapTw(ctx) / TWIPS_PER_PT) * TWIPS_PER_PT));
+        }
+        // ZERO-GAP MEASUREMENT. A gap is white space the flow spends going down, so it cannot
+        // be negative: when the page puts this line ABOVE where the flow already is, the gap
+        // is written as 0 and the line lands wherever the flow happens to be - low by the
+        // overshoot - and the next line is measured from there. Counted here, before the fit
+        // clamp below, because that clamp can zero a gap that was real.
+        if (beforeTw == 0 && ctx.flowY >= 0f && !ctx.newPage && ctx.afterTablePt < 0f
+                && absTop < ctx.flowY) {
+            ctx.zeroGap++;
+            float miss = ctx.flowY - absTop;
+            ctx.zeroGapPt += miss;
+            if (miss > ctx.zeroGapWorstPt) ctx.zeroGapWorstPt = miss;
+            if (ctx.inColumn) ctx.zeroGapInCol++;
+            // THE ANCHOR RULE, applied to the case the cap rule above could not reach. A gap
+            // wider than the cap is already treated as a position rather than a gap; a gap that
+            // came out NEGATIVE is the same statement in the other direction - the page put the
+            // line somewhere the flow cannot walk to - and it was written as zero, which puts
+            // the line wherever the flow happens to be. So the line is anchored at its own y
+            // and the running position is re-synced to it, which is what stops the next line
+            // being dragged down with it.
         }
         if (beforeTw == 0 && absBeforeTw > 0 && !ctx.newPage && ctx.afterTablePt < 0f) {
             beforeTw = absBeforeTw;
@@ -3224,6 +3352,42 @@ public final class DocxWriter {
         }
         beforeTw = fit[0];
         lineTw = fit[1];
+        // THE ANCHOR RULE, in the general form: a line the flow cannot put on its own y is
+        // placed on its own y instead. The file already does this for a gap WIDER than the cap
+        // (a footer 340 pt below the columns, a diagram's labels); a gap that came out
+        // NEGATIVE is the same statement with the sign reversed and used to be written as
+        // w:before="0", which put the line wherever the flow happened to be. It is checked
+        // here, AFTER the fit clamp, because that clamp is the other thing that can stop a
+        // line reaching its own y - on 69_two_col_legal_numbered_clauses one line landed
+        // 16.9 pt low and dragged four more with it, and again at 41.1 pt.
+        if (ZERO_GAP_ANCHOR && !ctx.inColumn && !ctx.newPage) {
+            float topNow = flowTopPt(ctx) + beforeTw / (float) TWIPS_PER_PT;
+            float landY = topNow + LINE_BASE * (lineTw / (float) TWIPS_PER_PT);
+            float err = landY - b.y;
+            // The anchored box must FIT above the line before it. A line the flow put low has
+            // its own y somewhere above the flow, and where the line above it is ALSO low there
+            // may be no room left: anchoring there puts the text on top of the line above and
+            // trades a few points of position for a real collision. Measured on
+            // 69_two_col_legal_numbered_clauses - anchoring "This agreement..." at its own y
+            // (306.8) put it 2.6 pt into the line above, which is itself 18 pt low, and that is
+            // a NEW 26_text_overlap failure. So the box is placed only where the page left room
+            // for it; where it did not, the line stays in the flow and is counted in
+            // {@code zeroGapNoRoom} instead of being moved somewhere it cannot go.
+            float prevBoxTop = flowTopPt(ctx) - ctx.flowBoxPt;
+            float thisBoxBottom = b.y + (1f - LINE_BASE) * linePt;
+            if (err >= ZERO_GAP_FLOOR_PT && thisBoxBottom <= prevBoxTop) {
+                ctx.zeroGapAnchored++;
+                anchorBox(sb, p, b, ctx);
+                // The anchored box's baseline IS b.y, so that is where the flow now is.
+                ctx.lastLinePt = linePt;
+                ctx.lastBaseline = b.y;
+                ctx.lastSize = b.size;
+                ctx.flowY = b.y;
+                ctx.flowBoxPt = Math.max(4f, b.size * LINE_FACTOR);
+                return;
+            }
+            if (err >= ZERO_GAP_FLOOR_PT) ctx.zeroGapNoRoom++;
+        }
         // The box the pitch solver compares next time is the page's own, not the squeezed one.
         ctx.lastLinePt = linePt;
         ctx.lastBaseline = b.y;
