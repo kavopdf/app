@@ -122,6 +122,17 @@ Do not re-test one without new evidence, and if you do, say what changed.
   recorded: 2026-11-13 08:45
 
 
+## 32_stroke_lines
+
+- UNTESTED - The strokes are lost in Google's import of our DrawingML shapes, not omitted by the engine: 05_round_company_seal's docx carries 140 w:drawing elements, but Google's export of it has zero stroked paths while the source PDF has 7 (header rule, footer hairline, 5 seal strokes).
+  evidence: docx grep: 140 w:drawing in document.xml. Source drawings: 7 stroked paths (w=1.0 header rule, w=0.5 footer hairline, 5 seal strokes w=0.5-1.6). Store: 05 source=7 render=0; 16_right_aligned source=17 render=0; 01_stamp source=16 render=9. Next test: one DrawingML line in a minimal docx through Drive, then read the exported PDF's drawings.
+  recorded: 2026-11-13 09:56
+
+- UNTESTED - Google Docs drops the stroke from our DrawingML shapes: the docx carries 3 shapes with a real a:ln (w=20320/10160/6350, solidFill 0D268C) and 67 a:ln/a:noFill rects, and Google's export of that same docx has zero stroked paths. Horizontal rules should be emitted as w:pBdr, which Google renders.
+  evidence: 05_round_company_seal docx: a:ln w=20320/10160/6350 each carrying solidFill 0D268C; 67 prstGeom rect with a:ln/a:noFill. Google export: 0 stroked paths. Source: 7 (header rule 1.0pt, footer hairline 0.5pt, 5 seal strokes). Untested: whether Google keeps a stroke on a minimal w:drawing line, and whether w:pBdr survives - calibrate both before changing the emitter.
+  recorded: 2026-11-13 09:56
+
+
 ## 47_margins
 
 - CONFIRMED - The 47_margins failure is one element pinned to the page's left edge, not a page shift: the rightmost extent and the top extent are already correct, so a uniform offset is ruled out by the data itself

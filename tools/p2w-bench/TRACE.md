@@ -184,3 +184,8 @@ claim and after each step; it is not code and cannot break anything.
 | 13 Nov 09:55 | fixer | classify --txt | 4 classes from 208 documents |
 | 13 Nov 09:55 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 09:55 | fixer | commit-gate | started |
+| 13 Nov 09:56 | fixer | hypothesis | 32_stroke_lines -> untested |
+| 13 Nov 09:56 | fixer | attempt | 32_stroke_lines -> error (OPEN) |
+| 13 Nov 09:56 | fixer | classify | 43 classes from 208 documents |
+| 13 Nov 09:56 | fixer | hypothesis | 32_stroke_lines -> untested |
+| 13 Nov 09:56 | ? | commit-gate | started |

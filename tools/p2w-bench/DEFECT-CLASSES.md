@@ -18,7 +18,7 @@ parked as not converging. A parked class is skipped by the fixer and kept here w
 | 1 | 20_within_10pt (+4) | 203 | 98% | 20_within_10pt, 18_median_dy, 19_worst_dy, 22_reading_order, 30_ink_where_blank_was | 14 | 0 | OPEN |
 | 2 | 47_margins | 203 | 98% | 47_margins | 3 | 0 | OPEN |
 | 3 | 53_embedded_faces | 141 | 68% | 53_embedded_faces | 1 | 0 | OPEN |
-| 4 | 32_stroke_lines | 135 | 65% | 32_stroke_lines | 0 | 0 | OPEN |
+| 4 | 32_stroke_lines | 135 | 65% | 32_stroke_lines | 1 | 0 | OPEN |
 | 5 | 29_blank_where_ink_was | 134 | 64% | 29_blank_where_ink_was | 0 | 0 | OPEN |
 | 6 | 59_shape_anchor | 121 | 58% | 59_shape_anchor | 0 | 0 | OPEN |
 | 7 | 02_text_run_count | 111 | 53% | 02_text_run_count | 0 | 0 | OPEN |
