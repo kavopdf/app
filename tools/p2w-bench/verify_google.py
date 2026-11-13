@@ -1572,21 +1572,104 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
                                   none or ok_weight >= tot * 0.85)
 
     # ---- 35 rotation -------------------------------------------------------
-    def rotated(doc):
-        n = 0
-        for p in doc:
+    # 35_rotation: the rotated RUN, not a count of rotated lines.
+    #
+    # WHAT A COUNT MISSED. Counting rotated lines answers "how many", so six runs turned to
+    # the wrong angle reads 6 -> 6 and passes, and six runs each rotated 90 degrees off reads
+    # the same as six correct ones. Constructed 13 Nov: a 15-degree run redrawn at 90 degrees
+    # passed the count. The defect is an ANGLE AND A PLACE, so the check has to name both.
+    #
+    # WHAT IT MEASURES NOW. Each source run whose baseline is not level must have a render run
+    # on the same page with the SAME NORMALISED TEXT that is
+    #     |d angle| <= ROT_ANGLE_TOL, and
+    #     displaced no more than 18's own clamp(0.35 * size, 1.5, 4.5) pt.
+    # The displacement bound is 18's, deliberately: a rotated run that moved is the same fault
+    # 18 measures on a level one, and a second tolerance invented here would be a second
+    # standard for the same quantity.
+    #
+    # THE ANGLE TOLERANCE IS 2.0 DEGREES. The rotations this corpus actually carries are 7, 8,
+    # 9, 11, 12, 13, 14, 15, 90, 110 and 180 degrees, plus curved seal text down to 1.4. Two
+    # degrees is under a third of the smallest stamp rotation, so a run drawn at the wrong
+    # angle cannot pass it, while a producer that quantises the angle slightly still does.
+    # ONE THING TWO DEGREES CANNOT DO. The curved seal text (05, 305, 312, 318, 352, 371, 60)
+    # is one run per glyph along an arc, and those runs carry angles down to 1.4 degrees. For
+    # those, a 2-degree tolerance is "was it rotated at all", not "was it rotated correctly".
+    # They are not silently forgiven: the 0.8 keep floor still has to be met over the whole
+    # document, and measured at 2.0 every one of those documents fails. A tolerance tight
+    # enough to judge them (under 1.4 degrees) would fail a producer that rounds the angle,
+    # which is a different defect from losing the rotation.
+    # MEASURED 13 Nov on 211 renders: the tolerance is UNEXERCISED on this corpus - see the
+    # note on the sweep in the patch that ships with this change. LibreOffice draws every
+    # rotated run level, so the render side reads 0 rotated lines in 211 documents and the
+    # class is 30 at every tolerance from 0.5 to 4.0. The tolerance is therefore set from the
+    # geometry of the corpus, not from a measured knee, and is proved only by construction.
+    ROT_ANGLE_TOL = 2.0
+    # The keep floor is a SHARE, not "all": a render may split one rotated run into two, and
+    # 13's rule for a set (equality) is not available for a population that can be regrouped.
+    # 0.8 of 6 is 4.8, so 3 of 6 kept FAILS - which is the constructed case this floor exists
+    # to fail.
+    ROT_KEEP_FLOOR = 0.8
+
+    def rot_runs(doc):
+        out = []
+        for i, p in enumerate(doc):
             for blk in p.get_text("dict")["blocks"]:
                 if blk.get("type") != 0:
                     continue
                 for ln in blk.get("lines", []):
-                    d = ln.get("dir", (1, 0))
-                    if abs(d[1]) > 0.02 or d[0] < 0.98:
-                        n += 1
-        return n
+                    t = "".join(s["text"] for s in ln.get("spans", []))
+                    if not t.strip():
+                        continue
+                    dx, dy = (ln.get("dir") or (1.0, 0.0))[:2]
+                    if not (abs(dy) > 0.02 or dx < 0.98):
+                        continue
+                    sp0 = (ln.get("spans") or [{}])[0]
+                    # THE ANCHOR IS THE BASELINE ORIGIN, not the box centre. A rotated
+                    # line's bbox is axis-aligned, so its centre MOVES when the angle
+                    # changes: constructed, the same run at 15 and 13 degrees has an
+                    # identical origin and a bbox centre 1.6 pt apart, at 5 degrees off
+                    # 4.0 pt apart. Measuring the box centre would leak the angle into
+                    # the position clause and fail a run twice for one fault. 18 measures
+                    # a run's baseline, and so does this.
+                    org = sp0.get("origin")
+                    if org is None:
+                        org = ((ln["bbox"][0] + ln["bbox"][2]) / 2.0,
+                               (ln["bbox"][1] + ln["bbox"][3]) / 2.0)
+                    out.append({"page": i, "text": norm_text(t),
+                                "angle": math.degrees(math.atan2(dy, dx)),
+                                "org": (org[0], org[1]),
+                                "bbox": ln["bbox"],
+                                "size": (sp0.get("size") or 10.0)})
+        return out
 
-    s_r = rotated(src)
-    g_r = rotated(gd)
-    c["35_rotation"] = (s_r, g_r, s_r == 0 or g_r >= max(1, int(s_r * 0.6)))
+    s_rot = rot_runs(src)
+    g_rot = rot_runs(gd)
+    kept = 0
+    used = set()
+    for r in s_rot:
+        tol = min(max(0.35 * r["size"], 1.5), 4.5)
+        cx, cy = r["org"]
+        best = None
+        for j, q in enumerate(g_rot):
+            if j in used or q["page"] != r["page"] or q["text"] != r["text"]:
+                continue
+            d_ang = abs((q["angle"] - r["angle"] + 180.0) % 360.0 - 180.0)
+            qx, qy = q["org"]
+            ok = (d_ang <= ROT_ANGLE_TOL and abs(qx - cx) <= tol
+                  and abs(qy - cy) <= tol)
+            rank = (0 if ok else 1, d_ang, j)
+            if best is None or rank < best[0]:
+                best = (rank, j, d_ang, ok)
+        if best is None:
+            continue
+        used.add(best[1])
+        if best[3]:
+            kept += 1
+    need = max(1, math.ceil(ROT_KEEP_FLOOR * len(s_rot)))
+    if s_rot and kept < need:
+        print("35_rotation: %d of %d rotated run(s) kept their angle and place "
+              "(need %d, |d angle| <= %.1f deg)" % (kept, len(s_rot), need, ROT_ANGLE_TOL))
+    c["35_rotation"] = (len(s_rot), kept, not s_rot or kept >= need)
 
     # ---- 36 underline / strike --------------------------------------------
     # No underline flag in the text model, so count thin strokes sitting just
@@ -2496,6 +2579,21 @@ def compare(src_path, gd_path, docx_path=None):
     for i, p in enumerate(gd):
         g_runs += runs(p, i)
 
+    # Per-character boxes for the render, so a run that sits inside a longer one can be
+    # placed by its own glyphs instead of by a linear guess. Keyed the way runs() rounds
+    # a span's bbox, so a render run and its characters meet on the same key.
+    g_chars = {}
+    for i, p in enumerate(gd):
+        for blk in p.get_text("rawdict")["blocks"]:
+            if blk.get("type") != 0:
+                continue
+            for ln in blk.get("lines", []):
+                for sp in ln.get("spans", []):
+                    if not sp.get("text", "").strip():
+                        continue
+                    g_chars[(i, round(sp["bbox"][0], 2), round(sp["bbox"][1], 2))] = \
+                        sp.get("chars", [])
+
     s_text = " ".join(r["text"] for r in s_runs)
     g_text = " ".join(r["text"] for r in g_runs)
     s_words = collections.Counter(norm_word(w) for w in s_text.split() if w.strip())
@@ -2702,12 +2800,86 @@ def compare(src_path, gd_path, docx_path=None):
     checks["13_text_colours"] = (len(s_col_set), kept_cols,
                                  len(s_col_set) == 0 or kept_cols == len(s_col_set))
 
-    s_fill = sum(1 for p in src for _ in fill_rects(p))
-    g_fill = sum(1 for p in gd for _ in fill_rects(p))
-    # Many documents legitimately contain no filled shapes. Requiring >= 1 when the
-    # source has none failed every such document - a false positive, not a defect.
-    checks["14_filled_shapes"] = (s_fill, g_fill,
-                                  s_fill == 0 or g_fill >= max(1, int(s_fill * 0.8)))
+    # 14_filled_shapes: INK AREA and PLACEMENT, not a count.
+    #
+    # WHAT A COUNT MISSED. The old line compared the NUMBER of filled rects, so it could not
+    # tell a moved fill from a lost one, or a lost fill from an invented one: constructed 13 Nov,
+    # eight cells lost AND eight invented elsewhere reads 40 -> 40 and passed while the shading
+    # had moved off the rows it belonged to. It was also blind to size: one page-sized fill
+    # traded for twenty thin bands (3 x 500 pt, 1500 pt2 each) read 1 -> 20 and PASSED, while
+    # the area fell to 9.3 % of the source's. Constructed 13 Nov, /scratch/work/cases/14D_*.
+    #
+    # WHAT IT MEASURES NOW, per page:
+    #   AREA      the page's filled area may not fall below FILL_AREA_FLOOR of the source's.
+    #             A ratio, not a count, so trading one big fill for several small ones is not
+    #             a loss - and a page that lost a fifth of its ink is, however it was drawn.
+    #   PLACEMENT every source fill of FILL_PLACE_PT2 or more must have a RENDER fill whose
+    #             rect contains its CENTRE. Containment, not overlap and not a coordinate
+    #             match, because the render legitimately redraws one cell as one cell of a
+    #             different rect: what must not happen is the ink being somewhere else.
+    #
+    # THE FLOOR IS THE ONE THIS CHECK ALREADY CARRIED (0.8). It is kept rather than re-derived
+    # because it was never the count's problem - the count was.
+    #
+    # THE 400 pt2 PLACEMENT FLOOR IS BAND ARITHMETIC, and it keeps thin bands with 32/46.
+    # A 20 x 20 pt patch is 400 pt2; a 0.8 pt band across a 450 pt column is 360 pt2. Below
+    # the floor a fill is a rule, and whether a rule survived is 32_stroke_lines' and
+    # 46's question, not this one's.
+    #
+    # MEASURED ON 211 RENDERS, 13 Nov, and the measurement does NOT confirm the floor - it
+    # only fails to contradict it. The largest thin fill any source page in corpus-v1 draws is
+    # 80 pt2 (a 0.4 pt x 200 pt band); no thin fill in the corpus reaches 100 pt2. So no floor
+    # from 100 upward can be exercised by a band here, and the class size is the same 85
+    # documents at 10, 25, 50, 100, 200, 400, 800, 1600 and 3200 pt2. What the sweep does show
+    # is that at 400 every orphan is block-shaped - 354 of 354, min side > 2 pt - so the floor
+    # is not throwing away a real loss, and the corpus never puts a band above it. 400 stays
+    # because the arithmetic says a band cannot reach it; the corpus cannot say more than that.
+    FILL_AREA_FLOOR = 0.80
+    FILL_PLACE_PT2 = 400.0
+
+    def fill_boxes(page):
+        """Every drawing that PAINTS a fill, with its rect. Any size - the floor does the
+        cutting, and it does it in the placement clause only."""
+        out = []
+        for d in page.get_drawings():
+            if d.get("fill") is None:
+                continue
+            if (d.get("fill_alpha") or 1.0) == 0.0:
+                continue
+            r = d["rect"]
+            if r.width <= 0 or r.height <= 0:
+                continue
+            out.append(r)
+        return out
+
+    s_area = g_area = 0.0
+    thin_pages = []
+    orphans = 0
+    for i in range(max(src.page_count, gd.page_count)):
+        sb = fill_boxes(src[i]) if i < src.page_count else []
+        gb = fill_boxes(gd[i]) if i < gd.page_count else []
+        sa = sum(r.width * r.height for r in sb)
+        ga = sum(r.width * r.height for r in gb)
+        s_area += sa
+        g_area += ga
+        if sa > 0 and ga < FILL_AREA_FLOOR * sa:
+            thin_pages.append(i + 1)
+        for r in sb:
+            if r.width * r.height < FILL_PLACE_PT2:
+                continue
+            cx, cy = (r.x0 + r.x1) / 2.0, (r.y0 + r.y1) / 2.0
+            if not any(q.x0 <= cx <= q.x1 and q.y0 <= cy <= q.y1 for q in gb):
+                orphans += 1
+    if thin_pages:
+        print("14_filled_shapes: ink area under %.0f %% of the source on page(s) %s"
+              % (100 * FILL_AREA_FLOOR, ",".join(str(p) for p in thin_pages[:6])))
+    if orphans:
+        print("14_filled_shapes: %d source fill(s) of %.0f pt2 or more have no render fill "
+              "over their centre" % (orphans, FILL_PLACE_PT2))
+    # Source has no filled ink: there is no area to fall below, and the placement clause has
+    # no candidates. A render that GAINS fills is not a loss and still passes.
+    checks["14_filled_shapes"] = (int(round(s_area)), int(round(g_area)),
+                                  not thin_pages and orphans == 0)
 
     s_links = sum(len(p.get_links()) for p in src)
     g_links = sum(len(p.get_links()) for p in gd)
@@ -2804,14 +2976,115 @@ def compare(src_path, gd_path, docx_path=None):
             used.add(j)
         taken[i] = min(span, key=lambda j: abs(g_runs[j]["y"] - r["y"]) +
                                          abs(g_runs[j]["x"] - r["x"]))
+
+    # ---- A SOURCE RUN THAT SITS INSIDE ONE LONGER RENDER RUN ----------------
+    #
+    # The two passes above can join render runs into a source run. Neither can do the
+    # reverse, so when the render draws as ONE span what the source drew as several, every
+    # source run in it is unpaired and 17 charges the document for a run that is on the
+    # page, at the right place, in the right order.
+    #
+    # MEASURED 13 Nov on 211 documents (source vs the engine's .docx rendered by
+    # LibreOffice): of 582 source runs left unpaired in the 22 documents 17 fails, 352 -
+    # 60.5 % - are inside a longer render run that covers their box, and 247 of those 352
+    # are SINGLE CHARACTERS. The shape is text the source positions glyph by glyph -
+    # 05_round_company_seal_curved_text draws 'R','I','V',... as 59 spans and the render
+    # writes "SRI VINAYAKA INSTITUTE OF TECHNOLOGY" as one; 21_form_labels_x60_values_x300
+    # draws "Member Name" and ":" and the render writes "Member Name :". Closing this one
+    # case takes 15 of the 22 to a pass with no other change (cases C2, C10 in
+    # /scratch/work/cases; matrix and attribution in /scratch/work/matrix.py, corpus.py).
+    #
+    # A render run is not consumed here, because it legitimately answers for several source
+    # runs at once - that is what being merged means. What IS enforced is that no two source
+    # runs claim the same characters of it, so a source run still cannot be paired with text
+    # that another source run already accounts for.
+    piece_of = {}
+    claimed = collections.defaultdict(list)
+
+    def _inside(r):
+        """(render index, character range) of r's text inside one longer render run."""
+        want = norm_word(r["text"])
+        if not want:
+            return None
+        for j, c in enumerate(g_runs):
+            if c["page"] != r["page"]:
+                continue
+            ct = norm_word(c["text"])
+            if len(ct) <= len(want) or want not in ct:
+                continue
+            # the glyphs have to be where the source put them: the run must COVER r's box,
+            # and it must be on the SAME LINE. Without the baseline test this pass pairs a
+            # footnote marker "1" at the foot of the page with the "1" inside a header 620 pt
+            # above it - measured on journal-2col-with-footnotes, three such pairs, and
+            # 18_displacement read a 619.5 pt displacement on a page where nothing moved.
+            # Same test _split_span() already uses for the same reason.
+            if c["x"] > r["x"] + 1.0 or c["x1"] < r["x1"] - 1.0:
+                continue
+            if min(c["y1"], r["y1"]) - max(c["y"], r["y"]) < 0.5:
+                continue
+            span = c["x1"] - c["x"]
+            if span <= 0:
+                continue
+            # where the source run starts, as a character offset in the render run
+            guess = int(round((r["x"] - c["x"]) / span * len(ct)))
+            guess = max(0, min(guess, len(ct) - len(want)))
+            off = ct.find(want, guess)
+            if off < 0:
+                off = ct.find(want)
+            if off < 0:
+                continue
+            lo, hi = off, off + len(want)
+            if any(not (hi <= a or lo >= b) for a, b in claimed[j]):
+                continue          # those characters are already spoken for
+            # THE PIECE'S OWN BOX, from the render's characters. A linear map of the run's
+            # width is off by up to one character and made 43_within_10pt_x report
+            # displacements that were the estimate's, not the document's - measured on
+            # 60_page_border, where a curved caption is rendered straight and six glyphs
+            # read 12-17 pt out under the linear map. The characters are exact.
+            raw = g_chars.get((c["page"], c["x"], c["y"]))
+            px = px1 = None
+            if raw:
+                idx = []
+                acc = ""
+                for k, ch in enumerate(raw):
+                    piece = re.sub(r"[\s\u00a0\x00-\x1f]+", "", ch.get("c", "")).lower()
+                    for _ in piece:
+                        idx.append(k)
+                        acc += piece
+                if acc == ct and hi <= len(idx):
+                    px = raw[idx[lo]]["bbox"][0]
+                    px1 = raw[idx[hi - 1]]["bbox"][2]
+            if px is None:
+                px = c["x"] + span * lo / len(ct)
+                px1 = c["x"] + span * hi / len(ct)
+            return j, lo, hi, px, px1
+        return None
+
+    for i, r in enumerate(s_runs):
+        if i in taken:
+            continue
+        hit = _inside(r)
+        if hit is None:
+            continue
+        j, lo, hi, px, px1 = hit
+        claimed[j].append((lo, hi))
+        taken[i] = j
+        # the pair is the PIECE, not the whole run: 21_median_dx reads x, and the run's own
+        # x is the start of somebody else's text.
+        piece = dict(g_runs[j])
+        piece["x"] = round(px, 2)
+        piece["x1"] = round(px1, 2)
+        piece_of[i] = piece
+
     for i, r in enumerate(s_runs):
         if i not in taken:
             continue
         j = taken[i]
-        dys.append(g_runs[j]["y"] - r["y"])
-        dxs.append(g_runs[j]["x"] - r["x"])
+        g = piece_of.get(i, g_runs[j])
+        dys.append(g["y"] - r["y"])
+        dxs.append(g["x"] - r["x"])
         matched += 1
-        pairs.append((r, g_runs[j]))
+        pairs.append((r, g))
 
     def median(v):
         if not v:
