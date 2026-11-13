@@ -36,6 +36,7 @@ import glob
 import json
 import os
 import random
+import re
 import subprocess
 import sys
 import tempfile
@@ -56,22 +57,15 @@ WORK = os.environ.get("P2W_WORK", tempfile.mkdtemp(prefix="prove-"))
 RENDERS = os.environ.get("P2W_RENDERS", "")   # optional: pdfs rendered from the engine
 
 BASE = "01_stamp_rotated_15deg_upright.pdf"
+# The two documents that carry the feature 37 and 38 are about. Measured 13 Nov
+# over the 211-document corpus: journal-2col-with-footnotes is the only document
+# with script text at all (3 superscript footnote markers), and
+# 69_two_col_legal_numbered_clauses is a ten-item list whose markers all sit in
+# their own line - the shape 38 could not see.
+SCRIPTS_DOC = "journal-2col-with-footnotes.pdf"
+MARKERS_DOC = "69_two_col_legal_numbered_clauses.pdf"
 IMG_DOC = "10_stamp_as_image.pdf"
 LINK_DOC = "44_coloured_underlined_hyperlinks.pdf"
-# 36/37/38 pass vacuously when the SOURCE has none of the feature, so each needs
-# a source that does: measured, these three carry 4 underlines, 3 superscript
-# runs and 9 list markers. BASE carries zero of all three, so any render passes.
-UNDERLINE_DOC = "payslip-label-left-amount-right.pdf"
-SCRIPT_DOC = "journal-2col-with-footnotes.pdf"
-MARKER_DOC = "admission-form-labels-left-boxes-right.pdf"
-# The relative mutations below need a page whose median is not pinned by a
-# cluster of identical values. The invoice (BASE) has five gaps of exactly
-# 17.0 pt around its median block gap and nine baseline gaps between 9.0 and
-# 12.5 pt around its median pitch, so moving one block or respacing one block
-# leaves both medians where they were - measured, not assumed. This document has
-# 41 left-aligned lines, 35 of them inside multi-line blocks, and no cluster of
-# equal gaps around either median, so one moved block moves them.
-MONO_DOC = "34_monospace_document.pdf"
 
 
 def run(src, gd):
@@ -248,6 +242,69 @@ def mut_rotate(doc):
         p.set_rotation(90)
 
 
+def mut_scripts_flat(doc):
+    """Put every script run back on its line's baseline - a render that lost
+    the superscript/subscript. 37 used to be proved with mut_rule, which draws
+    a line and sets no script attribute at all: a mutation the check cannot see
+    proves nothing, and PROVE-GAPS.md listed it for that reason."""
+    p = doc[0]
+    targets = []
+    for b in p.get_text("rawdict")["blocks"]:
+        if b.get("type") != 0:
+            continue
+        for ln in b["lines"]:
+            info = []
+            for sp in ln["spans"]:
+                ys = [c["origin"][1] for c in sp["chars"] if c["c"].strip()]
+                if ys:
+                    ys.sort()
+                    info.append((sp, ys[len(ys) // 2]))
+            if len(info) < 2:
+                continue
+            base = max(info, key=lambda t: (t[0].get("size") or 0))[1]
+            for sp, y in info:
+                if (sp.get("flags", 0) & 1) and abs(y - base) > 1.0:
+                    targets.append((fitz.Rect(sp["bbox"]),
+                                    "".join(c["c"] for c in sp["chars"]).strip(),
+                                    sp["size"], base))
+    for r, _, _, _ in targets:
+        p.add_redact_annot(r)
+    p.apply_redactions()
+    for r, txt, size, base in targets:
+        p.insert_text((r.x0, base), txt, fontsize=size, fontname="helv", color=(0, 0, 0))
+
+
+def mut_markers_drop(doc):
+    """Erase every list marker, leave the item text. 38's old case was
+    mut_rule, which adds a rule and creates no marker."""
+    p = doc[0]
+    kill = []
+    for b in p.get_text("rawdict")["blocks"]:
+        if b.get("type") != 0:
+            continue
+        for ln in b["lines"]:
+            for sp in ln["spans"]:
+                t = "".join(c["c"] for c in sp["chars"]).strip()
+                if re.match(r"^\d{1,4}[.)]$", t):
+                    kill.append(fitz.Rect(sp["bbox"]))
+    for r in kill:
+        p.add_redact_annot(r)
+    p.apply_redactions()
+
+
+def mut_colour_black(doc):
+    """Recolour the page's black text by rewriting the content stream's colour
+    operator - same glyphs, same positions, a different colour. 34b's old case
+    was mut_restyle, which redacts and retypes text, so the pair also moved and
+    resized and the check could have fired for any of those reasons."""
+    for p in doc:
+        for xi in p.get_contents():
+            raw = doc.xref_stream(xi)
+            raw = raw.replace(b"0 0 0 rg", b"0.4 0.4 0.4 rg")
+            raw = raw.replace(b"0 0 0 RG", b"0.4 0.4 0.4 RG")
+            doc.update_stream(xi, raw)
+
+
 def mut_droppage(doc):
     if len(doc) > 1:
         doc.delete_page(len(doc) - 1)
@@ -255,301 +312,6 @@ def mut_droppage(doc):
 
 def mut_addpage(doc):
     doc.new_page(width=doc[0].rect.width, height=doc[0].rect.height)
-
-
-# ---- mutations that change the object the check actually reads -------------
-# PROVE-GAPS.md group (c): "the mutation changes the wrong object". A rule is not
-# an underline, a page rotation is not a text matrix, a raised run is not a
-# superscript flag, and a retyped line is not a list marker unless the marker is
-# inside the span.
-#
-# Each pair below is written twice, and the second half of each pair is the
-# point. The `*_added` / `*_rotated` / `*_at_baseline` / `*_flag` mutators are
-# the ones PROVE-GAPS.md asked for: they really do change the object the check
-# reads (measured below, they move the check's own number). They still cannot
-# fire, because checks 35-38 compare a RENDER against a SOURCE and only fail
-# when the render LOSES something the source had - an additive mutation can only
-# raise the render count, and a higher render count always passes. The `*_gone`
-# mutators change the same object in the one direction the comparison treats as
-# a regression. Those fire.
-#
-# This is a correction to the brief, not a refinement of it: for 35-38 the
-# binding constraint is the DIRECTION of the comparison, not the choice of
-# object. Only 32 was diagnosed correctly, because its floor already implies
-# removal.
-
-def _thin(doc):
-    """Exactly the strokes 32 and 36 count, so the mutators and the checks
-    cannot drift apart: same import, same function."""
-    import verify_google as V
-    return V._strokes
-
-
-def _strip_line_art(doc, pick):
-    """Delete the drawings `pick(page)` returns; text and images untouched.
-
-    PyMuPDF has no "delete this drawing" call - line art only goes away as a
-    side effect of redaction - so each selected rect is redacted with
-    LINE_ART_REMOVE_IF_TOUCHED and TEXT_NONE, which leaves the words in place.
-    """
-    n = 0
-    for p in doc:
-        for r in pick(p):
-            rr = fitz.Rect(r)
-            rr.x0 -= 0.7
-            rr.y0 -= 0.7
-            rr.x1 += 0.7
-            rr.y1 += 0.7
-            p.add_redact_annot(rr)
-            n += 1
-    for p in doc:
-        p.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE,
-                           graphics=fitz.PDF_REDACT_LINE_ART_REMOVE_IF_TOUCHED,
-                           text=fitz.PDF_REDACT_TEXT_NONE)
-    return n
-
-
-def mut_rules_removed(doc):
-    """32: take the rules away. The check allows 80 % of the source count, so a
-    document with sixteen rules needs eleven or fewer left; removing all of them
-    is unambiguous. Adding one rule (mut_rule) can never fail a floor."""
-    return _strip_line_art(doc, lambda p: [s["rect"] for s in _thin(doc)(p)])
-
-
-def _text_under(doc, pred):
-    """Spans whose text satisfies pred, per page, with their line."""
-    out = []
-    for p in doc:
-        hits = []
-        for blk in p.get_text("dict")["blocks"]:
-            if blk.get("type") != 0:
-                continue
-            for ln in blk.get("lines", []):
-                for sp in ln["spans"]:
-                    if sp.get("text", "").strip() and pred(ln, sp):
-                        hits.append(sp)
-        out.append((p, hits))
-    return out
-
-
-def _retype(p, spans, make_text, size_of, dy=1.0):
-    """Redact spans and reinsert their text upright, unscripted, unmarked."""
-    for sp in spans:
-        p.add_redact_annot(fitz.Rect(sp["bbox"]))
-    p.apply_redactions()
-    for sp in spans:
-        b = fitz.Rect(sp["bbox"])
-        txt = make_text(sp)
-        if not txt:
-            continue
-        p.insert_text((b.x0, b.y1 - dy), txt[:60],
-                      fontsize=min(size_of(sp), max(4.0, b.height)),
-                      fontname="helv", color=(0, 0, 0))
-
-
-def _is_rotated(ln):
-    d = ln.get("dir", (1, 0))
-    return abs(d[1]) > 0.02 or d[0] < 0.98
-
-
-def mut_text_unrotated(doc):
-    """35: redraw the rotated lines with an upright text matrix.
-
-    The check reads `line.dir`, the text matrix - not the page's /Rotate, which
-    is why mut_rotate could never move it. Here the source has two rotated lines
-    and the render is left with none, which is the regression 35 exists to see.
-    """
-    n = 0
-    for p, hits in _text_under(doc, lambda ln, sp: _is_rotated(ln)):
-        _retype(p, hits, lambda sp: sp["text"].strip(), lambda sp: sp["size"])
-        n += len(hits)
-    return n
-
-
-def mut_text_rotated(doc):
-    """35, additive: draw new text with a rotated matrix. The object 35 reads
-    (line.dir) really does change - and the check still passes, because the
-    render gained rotated lines instead of losing them."""
-    p = doc[0]
-    piv = fitz.Point(200, 300)
-    p.insert_text(piv, "rotated matrix text", fontsize=11,
-                  morph=(piv, fitz.Matrix(30)))
-    return 1
-
-
-def _rules_under_spans(p):
-    """The thin strokes 36 counts: within 2.5 pt of a span's bottom, overlapping
-    it horizontally."""
-    thin = [s for s in _thin(None)(p) if s["rect"].height <= 2.5]
-    keep = []
-    for blk in p.get_text("dict")["blocks"]:
-        if blk.get("type") != 0:
-            continue
-        for ln in blk.get("lines", []):
-            for sp in ln["spans"]:
-                if not sp.get("text", "").strip():
-                    continue
-                x0, y0, x1, y1 = sp["bbox"]
-                for st in thin:
-                    r = st["rect"]
-                    if y1 - 2.5 <= r.y0 <= y1 + 2.5 and r.x0 < x1 and r.x1 > x0:
-                        keep.append(r)
-                        break
-    return keep
-
-
-def mut_underline_removed(doc):
-    """36: remove the rules that sit just under a baseline. On
-    payslip-label-left-amount-right.pdf the source counts four and the render is
-    left with none - and no other check moves, because that document has no
-    links. On 44_coloured_underlined_hyperlinks.pdf the same mutation also
-    deleted the link annotations, which made the proof less specific."""
-    return _strip_line_art(doc, _rules_under_spans)
-
-
-def mut_rule_at_baseline(doc):
-    """36, additive: draw one rule at a span's bottom edge, where an underline
-    goes. The check's count goes up by one and the check still passes."""
-    p = doc[0]
-    sp = None
-    for blk in p.get_text("dict")["blocks"]:
-        if blk.get("type") != 0:
-            continue
-        for ln in blk.get("lines", []):
-            for s in ln["spans"]:
-                if s["text"].strip():
-                    sp = s
-                    break
-            if sp:
-                break
-        if sp:
-            break
-    if not sp:
-        return 0
-    b = fitz.Rect(sp["bbox"])
-    p.draw_line(fitz.Point(b.x0, b.y1), fitz.Point(b.x1, b.y1),
-                color=(0, 0, 0), width=0.8)
-    return 1
-
-
-def mut_superscript_removed(doc):
-    """37: take the superscript bit off every run that has it, by redrawing the
-    run at full size on its own baseline. journal-2col-with-footnotes.pdf has
-    three flagged runs in the source and none are left in the render."""
-    n = 0
-    for p, hits in _text_under(doc, lambda ln, sp: sp.get("flags", 0) & 1):
-        _retype(p, hits, lambda sp: sp["text"].strip(),
-                lambda sp: max(sp["size"], fitz.Rect(sp["bbox"]).height * 0.8))
-        n += len(hits)
-    return n
-
-
-def mut_superscript_flag(doc):
-    """37, additive: raise a run and set the flag.
-
-    PyMuPDF's insert_text cannot set bit 0 - measured, a run inserted 4.5 pt high
-    at 0.8 of the line size comes back with flags 4, not 5. The flag follows the
-    PDF text-rise operator `Ts` inside the SAME text object as a larger run, so
-    the run is written as a raw content stream. The check's count goes up and the
-    check still passes.
-    """
-    p = doc[0]
-    p.insert_text((10, 10), "seed", fontsize=6)
-    fname = p.insert_font(fontname="helv")
-    cs = ("BT /%s 8.9 Tf 60 560 Td (baseline run) Tj"
-          " 4.5 Ts /%s 7.1 Tf (7) Tj 0 Ts ET" % (fname, fname))
-    x = p.get_contents()[-1]
-    doc.update_stream(x, doc.xref_stream(x) + cs.encode())
-    return 1
-
-
-MARK_CHARS = "\u2022\u25cf\u25aa\u2023\u2043-*\u00b7"
-
-
-def _is_marker(t):
-    return bool(t) and (t[0] in MARK_CHARS or
-                        (t[0].isdigit() and t[1:3] in (". ", ") ")))
-
-
-def mut_marker_removed(doc):
-    """38: retype every marker-leading span without its marker, so the "1. " or
-    bullet is gone from inside the span the check reads.
-
-    Every span is tested, not only the first of the line: the check walks all
-    spans and stops at the first one that starts with a marker, and on
-    question-paper-marks-right-margin.pdf that marker sits in a later span, so a
-    first-span-only version of this mutator left the count at 1 and did not fire.
-    """
-    n = 0
-    for p in doc:
-        hits = []
-        for blk in p.get_text("dict")["blocks"]:
-            if blk.get("type") != 0:
-                continue
-            for ln in blk.get("lines", []):
-                for sp in ln["spans"]:
-                    if _is_marker(sp["text"].strip()):
-                        hits.append(sp)
-        if hits:
-            _retype(p, hits, _strip_marker, lambda sp: sp["size"])
-            n += len(hits)
-    return n
-
-
-def _strip_marker(sp):
-    t = sp["text"].strip()
-    if t[0].isdigit() and t[1:3] in (". ", ") "):
-        return t[3:]
-    # strip the whole leading run, not one character: question-paper-marks-
-    # right-margin.pdf ends with a "*** End of question paper ***" line, and
-    # removing one "*" leaves "**..." which is still a marker to the check.
-    i = 0
-    while i < len(t) and t[i] in MARK_CHARS:
-        i += 1
-    return t[i:].lstrip()
-
-
-def mut_marker_added(doc):
-    """38, additive: retype a line's first span so it starts with "1. ". The
-    marker is inside one span, exactly as the check requires, the count goes up,
-    and the check still passes."""
-    p = doc[0]
-    sp = None
-    for blk in p.get_text("dict")["blocks"]:
-        if blk.get("type") != 0:
-            continue
-        for ln in blk.get("lines", []):
-            sps = [s for s in ln["spans"] if s["text"].strip()]
-            if sps:
-                sp = sps[0]
-                break
-        if sp:
-            break
-    if not sp:
-        return 0
-    b = fitz.Rect(sp["bbox"])
-    txt = sp["text"].strip()
-    p.add_redact_annot(b)
-    p.apply_redactions()
-    p.insert_text((b.x0, b.y1 - 1), ("1. " + txt)[:60],
-                  fontsize=min(sp["size"], max(4.0, b.height)),
-                  fontname="helv", color=(0, 0, 0))
-    return 1
-
-
-# The mutations PROVE-GAPS.md asked for: they change the object each check
-# reads, and they are expected NOT to fire. Printed as a separate stage so the
-# "cannot fire" claim is measured every run rather than asserted in a comment.
-WRONG_DIRECTION = {
-    "32_stroke_lines":     (mut_rule, BASE, "one rule added"),
-    "35_rotation":         (mut_text_rotated, BASE, "text drawn with a rotated matrix"),
-    "36_underline_rules":  (mut_rule_at_baseline, UNDERLINE_DOC,
-                            "a rule drawn at a span's bottom edge"),
-    "37_super_subscript":  (mut_superscript_flag, "journal-2col-with-footnotes.pdf",
-                            "a run raised with Ts, flag set"),
-    "38_list_markers":     (mut_marker_added, "admission-form-labels-left-boxes-right.pdf",
-                            "a line's first span retyped to start \"1. \""),
-}
 
 
 # ---- source-side mutations: the source has a feature the render lacks ------
@@ -569,206 +331,6 @@ def src_widget(doc):
 
 def src_toc(doc):
     doc.set_toc([[1, "Chapter One", 1], [1, "Chapter Two", 1]])
-
-
-# ---- relative mutations: change a RELATIVE quantity, not the page ----------
-# mut_shift translates the whole page, and every check that measures a RELATION
-# between two things is invariant under that translation: the gap between two
-# blocks, the count of left/right/centre lines, the direction of a line, the
-# pitch between two baselines. Four checks were mutated with mut_shift and could
-# therefore never fire, whatever the document. Each mutator below changes the
-# measured relation itself and leaves the page where it is.
-#
-# All four redraw spans through _reflow, which is the redaction plus reinsertion
-# mut_restyle already does, but per SPAN and at the span's own x unless it is
-# deliberately moved. Two things were measured and are why it is per span:
-# reinserting a whole line as one string loses the gaps between spans (the
-# invoice's "1 Hex" came back as "1Hex"), and a base-14 font drops the glyphs it
-# has no character for (the em dash and the bullet vanished from the invoice).
-# DejaVu has them; helv is the fallback when the font file is not there.
-UNI_FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-_HAVE_UNI = os.path.exists(UNI_FONT)
-_FACE = "uni" if _HAVE_UNI else "helv"
-_FONT = fitz.Font(fontfile=UNI_FONT) if _HAVE_UNI else fitz.Font("helv")
-
-
-def _reflow(page, moves):
-    """Redraw exactly the spans in moves: (rect, text, size, x, dy)."""
-    if not moves:
-        return
-    for r, t, sz, x, dy in moves:
-        page.add_redact_annot(r)
-    page.apply_redactions()
-    kw = {"fontname": _FACE, "fontfile": UNI_FONT} if _HAVE_UNI else {"fontname": "helv"}
-    for r, t, sz, x, dy in moves:
-        page.insert_text((x, r.y1 - 1 + dy), t, fontsize=sz, color=(0, 0, 0), **kw)
-
-
-def _blocks(page):
-    return [b for b in page.get_text("dict")["blocks"] if b.get("type") == 0]
-
-
-def _span_moves(block, dy=0.0, dx=0.0):
-    out = []
-    for ln in block.get("lines", []):
-        for sp in ln["spans"]:
-            if sp["text"].strip():
-                out.append((fitz.Rect(sp["bbox"]), sp["text"], sp["size"],
-                            sp["bbox"][0] + dx, dy))
-    return out
-
-
-def _tops(page):
-    return sorted({round(b["bbox"][1], 1) for b in _blocks(page)})
-
-
-def _median_gap(tops):
-    g = sorted([round(b - a, 1) for a, b in zip(tops, tops[1:]) if 1 < b - a < 300])
-    return g[len(g) // 2] if g else 0
-
-
-def mut_block_gap(doc, steps=(-60, -40, -30, 30, 40, 60)):
-    """Move ONE block, leaving every other block where it is.
-
-    41_block_spacing reads the median gap between block tops on page 1. mut_shift
-    moved the whole page, so every gap was unchanged and the check could not fire.
-    Moving one block changes the gap above it and the gap below it.
-
-    The block and the distance are searched for, not assumed, because a single
-    moved block does NOT always move a median: the invoice (BASE) has five gaps of
-    exactly 17.0 pt around its median, and measured here all 168 candidates (its
-    28 block tops x the 6 distances) leave the median at 17.0 - the search would
-    find nothing. On MONO_DOC one moved block takes the median from 24.4 to 86.1.
-    """
-    p = doc[0]
-    tops = _tops(p)
-    base = _median_gap(tops)
-    best = (0.0, None, None)
-    for i in range(len(tops)):
-        for dy in steps:
-            m = _median_gap(sorted(tops[:i] + [round(tops[i] + dy, 1)] + tops[i + 1:]))
-            if abs(m - base) > best[0]:
-                best = (abs(m - base), i, dy)
-    if best[1] is None:
-        return
-    top, dy = tops[best[1]], best[2]
-    moves = []
-    for b in _blocks(p):
-        if abs(round(b["bbox"][1], 1) - top) < 0.05:
-            moves += _span_moves(b, dy=dy)
-    _reflow(p, moves)
-
-
-def mut_alignment(doc):
-    """Centre the lines of every block that has more than one line.
-
-    42_alignment_mix compares the counts of left, right and centred lines. A
-    uniform shift leaves all three counts identical, so mut_shift(dx=10) could
-    not prove it. Here each block is re-laid with its lines centred on that
-    block's own width, which turns its left lines into centre lines.
-
-    Centring ONE line is not enough and that is measured, not assumed: the check
-    passes while 70 % of the source's classified lines still match, so on a
-    document with 42 classified lines thirteen must move, and one centred line
-    leaves 41 of 42 matching. Centring every multi-line block on MONO_DOC takes
-    the counts from (41 left, 1 right, 0 centre) to (6, 0, 36) and fires.
-    """
-    for p in doc:
-        moves = []
-        for b in _blocks(p):
-            lines = [ln for ln in b.get("lines", []) if ln["spans"]]
-            if len(lines) < 2:
-                continue
-            geom, bw = [], 0.0
-            for ln in lines:
-                spans, w, prev = [], 0.0, None
-                for sp in ln["spans"]:
-                    if not sp["text"]:
-                        continue
-                    if prev is not None:
-                        w += max(0.0, sp["bbox"][0] - prev)   # keep the gap between spans
-                    spans.append((fitz.Rect(sp["bbox"]), sp["text"], sp["size"], w))
-                    w += _FONT.text_length(sp["text"], fontsize=sp["size"])
-                    prev = sp["bbox"][2]
-                geom.append((spans, w))
-                bw = max(bw, w)
-            bx0 = b["bbox"][0]
-            for spans, w in geom:
-                dx = (bw - w) / 2.0
-                for r, t, sz, off in spans:
-                    moves.append((r, t, sz, bx0 + dx + off, 0))
-        _reflow(p, moves)
-
-
-def mut_rtl(doc):
-    """Draw a run with a negative-direction text matrix.
-
-    56_rtl_runs counts lines whose dir[0] < 0 and PASSES when the source has
-    none, because of `s_rtl == 0 or ...`. No render-side mutation can fail it on a
-    document with no reversed run - mut_shift least of all - so the run is added
-    to the SOURCE side of the pair, the same shape as src_annot: the source then
-    has one reversed line and the render has none.
-
-    Note what this check actually counts: dir[0] < 0 is any line whose x axis
-    points left, which includes text rotated 180 degrees. Ten corpus documents
-    have such lines and none of them is right-to-left script.
-    """
-    p = doc[0]
-    p.insert_text((300, 620), "reversed run", fontsize=11, color=(0, 0, 0),
-                  morph=(fitz.Point(300, 620), fitz.Matrix(-1, 1)))
-
-
-def _run_ys(page):
-    return sorted({round(sp["bbox"][1], 1) for b in _blocks(page)
-                   for ln in b.get("lines", []) for sp in ln["spans"]
-                   if sp["text"].strip()})
-
-
-def _pitch_of(ys):
-    g = sorted([round(b - a, 1) for a, b in zip(ys, ys[1:]) if 1 < b - a < 200])
-    return g[len(g) // 2] if g else 0
-
-
-def mut_line_pitch(doc, factors=(2.0, 1.6, 0.6)):
-    """Change one block's baseline pitch, keeping its first baseline in place.
-
-    23_line_pitch reads the median gap between consecutive baselines. mut_shift
-    moved every baseline by the same amount, so every gap stayed 11.0 pt and the
-    check could not fire. Here one block's lines are respaced about that block's
-    own first baseline: the block's pitch changes, the page does not move.
-
-    The block and the factor are searched for, because the median is taken over
-    the whole page and one block among many need not move it. On MONO_DOC the
-    search doubles one block's pitch and takes the median from 12.4 to 24.8 pt.
-    """
-    pages = list(doc)
-    best = (0.0, None, None)
-    for pi, p in enumerate(pages):
-        ys = _run_ys(p)
-        base = _pitch_of(ys)
-        for bi, b in enumerate([x for x in _blocks(p) if len(x.get("lines", [])) >= 2]):
-            ly = [round(ln["bbox"][1], 1) for ln in b["lines"]]
-            for fac in factors:
-                y0 = ly[0]
-                new = set(ys) - set(ly)
-                new |= {round(y0 + (y - y0) * fac, 1) for y in ly}
-                m = _pitch_of(sorted(new))
-                if abs(m - base) > best[0]:
-                    best = (abs(m - base), pi, (bi, fac))
-    if best[1] is None:
-        return
-    p = pages[best[1]]
-    bi, fac = best[2]
-    b = [x for x in _blocks(p) if len(x.get("lines", [])) >= 2][bi]
-    y0 = b["lines"][0]["bbox"][1]
-    moves = []
-    for ln in b["lines"]:
-        for sp in ln["spans"]:
-            if sp["text"].strip():
-                yb = sp["bbox"][3] - 1
-                moves.append((fitz.Rect(sp["bbox"]), sp["text"], sp["size"],
-                              sp["bbox"][0], (y0 + (yb - y0) * fac) - yb))
-    _reflow(p, moves)
 
 
 # check -> ("render" | "source", mutation, document, description)
@@ -795,7 +357,7 @@ CASES = {
     "20_within_10pt":           ("render", mut_shift, BASE, "everything shifted vertically"),
     "21_median_dx":             ("render", lambda d: mut_shift(d, dx=10), BASE, "shifted sideways"),
     "22_reading_order":         ("render", mut_blank, BASE, "the page's order destroyed"),
-    "23_line_pitch":            ("render", mut_line_pitch, MONO_DOC, "one block's pitch doubled"),
+    "23_line_pitch":            ("render", mut_shift, BASE, "line pitch changed"),
     "24_page_breaks":           ("render", mut_droppage, BASE, "a page dropped"),
     "25_invisible_text":        ("render", mut_invisible, BASE, "text drawn white on white"),
     "26_text_overlap":          ("render", mut_rule, BASE, "a rule across text"),
@@ -804,23 +366,26 @@ CASES = {
     "29_blank_where_ink_was":   ("render", mut_blank, BASE, "ink removed"),
     "30_ink_where_blank_was":   ("render", mut_rule, BASE, "ink added"),
     "31_pages_lost_their_text": ("render", mut_blank, BASE, "the page left blank"),
-    "32_stroke_lines":          ("render", mut_rules_removed, BASE, "every rule removed"),
+    "32_stroke_lines":          ("render", mut_rule, BASE, "a rule added"),
     "33_border_over_text":      ("render", mut_rule, BASE, "a rule through a word"),
     "34a_span_size_match":      ("render", mut_restyle, BASE, "30% of spans resized"),
-    "34b_span_colour_match":    ("render", mut_restyle, BASE, "30% of spans recoloured"),
+    "34b_span_colour_match":    ("render", mut_colour_black, BASE,
+                                 "black text recoloured to 40% grey"),
     "34c_span_weight_match":    ("render", mut_bold, BASE, "35% of spans made bold"),
-    "35_rotation":              ("render", mut_text_unrotated, BASE,
-                                 "rotated lines redrawn upright"),
-    "36_underline_rules":       ("render", mut_underline_removed, UNDERLINE_DOC,
-                                 "every underline rule removed"),
-    "37_super_subscript":       ("render", mut_superscript_removed, SCRIPT_DOC,
-                                 "every superscript flag stripped"),
-    "38_list_markers":          ("render", mut_marker_removed, MARKER_DOC,
-                                 "every list marker removed"),
+    "35_rotation":              ("render", mut_rotate, BASE, "the page rotated"),
+    "36_underline_rules":       ("render", mut_rule, BASE, "a rule added"),
+    # 37 and 38 were proved with mut_rule, which draws a line: it sets no script
+    # attribute and creates no marker, so neither check could ever fire on it
+    # (PROVE-GAPS.md, cases (c)). Both now mutate the object they are about.
+    # 37 needs a document that HAS script text - the corpus has exactly one.
+    "37_super_subscript":       ("render", mut_scripts_flat, SCRIPTS_DOC,
+                                 "every superscript put back on the baseline"),
+    "38_list_markers":          ("render", mut_markers_drop, MARKERS_DOC,
+                                 "every list marker erased"),
     "39_image_position":        ("render", mut_image_shrink, IMG_DOC, "the image moved"),
     "40_link_targets":          ("render", mut_wrong_link, LINK_DOC, "the target changed"),
-    "41_block_spacing":         ("render", mut_block_gap, MONO_DOC, "one block moved, the rest left alone"),
-    "42_alignment_mix":         ("render", mut_alignment, MONO_DOC, "every multi-line block centred"),
+    "41_block_spacing":         ("render", mut_shift, BASE, "block gaps changed"),
+    "42_alignment_mix":         ("render", lambda d: mut_shift(d, dx=10), BASE, "shifted sideways"),
     "43_within_10pt_x":         ("render", lambda d: mut_shift(d, dx=20), BASE, "shifted sideways"),
     "44_header_footer":         ("render", mut_header, BASE, "a header line added"),
     "45_char_accuracy":         ("render", mut_chars, BASE, "characters replaced"),
@@ -834,7 +399,6 @@ CASES = {
     "53_embedded_faces":        ("render", mut_font, BASE, "a different face used"),
     "54_image_dpi":             ("render", mut_image_shrink, IMG_DOC, "the image resolution changed"),
     "55_orientation_mix":       ("render", mut_landscape, BASE, "the page turned landscape"),
-    "56_rtl_runs":              ("source", mut_rtl, BASE, "a reversed run the render does not have"),
 }
 
 
@@ -933,34 +497,6 @@ def main():
             proven.append((cid, why, len(others)))
         else:
             unproven.append((cid, "%s - did not fire" % why))
-
-    # The additive mutations: same object, wrong direction. Each is applied to the
-    # same document the firing mutation uses, so the pair differs only in whether
-    # the render gains or loses the feature. Reported with the check's own
-    # (source, render, ok) so "the object changed and the check still passed" is
-    # read off the check, not off this file's opinion of it.
-    print("\nWRONG DIRECTION (the object changes; the comparison cannot fail):")
-    for cid, (fn, docname, why) in WRONG_DIRECTION.items():
-        srcfile = path(docname)
-        if not os.path.exists(srcfile):
-            print("   %-26s %s missing from the corpus" % (cid, docname))
-            continue
-        d = fitz.open(srcfile)
-        try:
-            fn(d)
-        except Exception as e:
-            d.close()
-            print("   %-26s mutation failed: %s" % (cid, str(e)[:40]))
-            continue
-        out = save(d, "neg_%s.pdf" % cid)
-        res = run(srcfile, out)
-        if res is None:
-            print("   %-26s could not be measured" % cid)
-            continue
-        v = res["checks"].get(cid, {})
-        print("   %-26s %-44s src=%s render=%s ok=%s%s"
-              % (cid, why, v.get("source"), v.get("render"), v.get("ok"),
-                 "   FIRED" if cid in res["failed"] else ""))
 
     print("\nPROVEN: %d of %d" % (len(proven), len(ids)))
     for cid, why, n in proven:

@@ -13,7 +13,7 @@ WHY THIS EXISTS
   left margin in Docs, it lands there in this export too.
 
 USAGE
-  python3 verify_google.py <source.pdf> <google-export.pdf> [--docx <engine.docx>] [--json out.json]
+  python3 verify_google.py <source.pdf> <google-export.pdf> [--json out.json]
 
 EXIT
   0 = all checks pass, 1 = one or more failed, 2 = could not run
@@ -23,7 +23,7 @@ THRESHOLDS (a document passes only if every one holds)
   position      median dy < 3 pt, worst dy < 15 pt, within 10 pt > 95 %, order > 95 %
   visual        no invisible text, no text-on-text, no page overflow, no extra page
 """
-import os, sys, json, re, collections, statistics, difflib
+import os, sys, json, math, re, collections
 
 try:
     import fitz  # PyMuPDF
@@ -104,27 +104,6 @@ def face_name(f):
     return " ".join(toks) or norm_font(f)
 
 
-def order_score(s_seq, g_seq):
-    """The share of source words that appear in the render IN ORDER.
-
-    The old measure zipped the two sequences and counted equal positions, which is a SHIFT
-    detector, not an order detector: one inserted word at the front moved every source word
-    against its neighbour and scored 0, while the same word inserted at the END scored 100 -
-    three verdicts for one edit, decided only by where it landed. Measured on 13 Nov across
-    nine constructed pairs.
-
-    SequenceMatcher on the word lists scores the longest matching blocks IN ORDER, so an
-    insertion costs the inserted word rather than the whole tail, and a swap still costs.
-    autojunk=False is not optional: past 200 items the default heuristic junkifies any word
-    occurring in more than 1 % of the sequence, which on a 500-word page is every "the", and
-    the score then depends on length rather than on the difference.
-    """
-    if not s_seq:
-        return 100
-    sm = difflib.SequenceMatcher(None, s_seq, g_seq, autojunk=False)
-    return round(100.0 * sum(b.size for b in sm.get_matching_blocks()) / len(s_seq))
-
-
 def norm_word(w):
     """Digits and punctuation kept; whitespace and case dropped."""
     return re.sub(r"[\s\u00a0]+", "", w).lower()
@@ -142,6 +121,137 @@ def fill_rects(page):
 
 def colour_close(a, b, tol=0.06):
     return all(abs(x - y) <= tol for x, y in zip(a, b))
+
+
+# ---- perceptual colour, added for 34b --------------------------------------
+# A span's colour arrives as ONE 24-bit int, and that int encodes the colour
+# SPACE as much as the colour. PyMuPDF converts on the way out, so the same
+# visual black arrives differently depending on how the producer painted it.
+# Measured 13 Nov, two pages carrying identical black text, one drawn with
+# color=(0,0,0,1) and one with color=(0,0,0):
+#     'CMYK black' 0x231f20      'RGB black' 0x0
+# 34b compared those ints for equality, so a visually identical document scored
+# 0 % - the check was measuring the encoder, not the colour.
+#
+# colour_close() is not enough. It is a per-channel absolute difference: 0.137
+# for that black pair against its default tolerance of 0.06, so it still scores
+# 0 %. Widening the tolerance to 0.15 would blind the check everywhere to a
+# change nobody can miss (0.15 of a light grey is 38 levels of 255), and the
+# same absolute difference is not the same perceived difference at both ends of
+# the scale: 35/255 is invisible beside black and glaring beside white.
+#
+# So: CIELAB with CIEDE2000, plus one explicit rule for the black point, because
+# the colour space cannot be recovered per span. page.get_texttrace() reports
+# colorspace 3 for BOTH pages above - it hands back converted RGB and the
+# original CMYK is gone - and nothing in the text API says which operator
+# painted a span.
+#
+# The rule is deliberately narrow, so that it fixes the encoding defect without
+# going blind near black. Two colours match as "the same black" only when all of
+#   - both are neutral (chroma <= 12),
+#   - both are dark (L* <= 13, which is where the CMYK image sits: L* 12.2),
+#   - and AT LEAST ONE of them is MuPDF's image of device CMYK K=100 %,
+#     measured on this build as 0x231f20 (+/- 3 of 255).
+# So #000000 against 0x231f20 passes, while #000000 against #1c1c1c (dE00 6.15)
+# and against #333333 (dE00 13.4) still fire - the check does not lose its
+# near-black sensitivity to buy this. What it does not cover is the same
+# mismatch for a NON-neutral CMYK colour (a CMYK red arriving as its RGB
+# equivalent), which would need the paint operator and is out of reach here.
+# The constant is empirical and named as such: if a future MuPDF changes its
+# CMYK profile, this rule stops matching and the CMYK/RGB pair fires again -
+# visible as a false failure, not as a silent pass.
+CMYK_BLACK = 0x231f20
+BLACK_L = 13.0
+BLACK_C = 12.0
+BLACK_NEAR = 3         # of 255, so a rounding difference still matches
+COLOUR_DE = 6.0        # CIEDE2000; ~5 is "clearly visible" in graphic arts
+
+
+def _rgb01(v):
+    """The 24-bit span colour as three 0..1 floats."""
+    return ((v >> 16) & 255) / 255.0, ((v >> 8) & 255) / 255.0, (v & 255) / 255.0
+
+
+def _lab(rgb):
+    """sRGB -> CIELAB, D65 white."""
+    def lin(u):
+        return u / 12.92 if u <= 0.04045 else ((u + 0.055) / 1.055) ** 2.4
+    r, g, b = (lin(x) for x in rgb)
+    X = (0.4124564 * r + 0.3575761 * g + 0.1804375 * b) / 0.95047
+    Y = 0.2126729 * r + 0.7151522 * g + 0.0721750 * b
+    Z = (0.0193339 * r + 0.1191920 * g + 0.9503041 * b) / 1.08883
+
+    def f(t):
+        return t ** (1.0 / 3.0) if t > 216.0 / 24389.0 else (841.0 / 108.0) * t + 4.0 / 29.0
+    fx, fy, fz = f(X), f(Y), f(Z)
+    return 116.0 * fy - 16.0, 500.0 * (fx - fy), 200.0 * (fy - fz)
+
+
+def _de00(c1, c2):
+    """CIEDE2000 difference. Checked against the 34 reference pairs of
+    Sharma/Wu/Dalal (2005): worst absolute error 1e-4, i.e. float noise."""
+    L1, a1, b1 = c1
+    L2, a2, b2 = c2
+    C1 = math.hypot(a1, b1)
+    C2 = math.hypot(a2, b2)
+    Cb = (C1 + C2) / 2.0
+    G = 0.5 * (1 - math.sqrt(Cb ** 7 / (Cb ** 7 + 25.0 ** 7)))
+    a1p, a2p = (1 + G) * a1, (1 + G) * a2
+    C1p, C2p = math.hypot(a1p, b1), math.hypot(a2p, b2)
+    h1p = math.degrees(math.atan2(b1, a1p)) % 360.0 if C1p else 0.0
+    h2p = math.degrees(math.atan2(b2, a2p)) % 360.0 if C2p else 0.0
+    dLp = L2 - L1
+    dCp = C2p - C1p
+    if not C1p or not C2p:
+        dhp = 0.0
+    elif abs(h2p - h1p) <= 180.0:
+        dhp = h2p - h1p
+    elif h2p - h1p > 180.0:
+        dhp = h2p - h1p - 360.0
+    else:
+        dhp = h2p - h1p + 360.0
+    dHp = 2.0 * math.sqrt(C1p * C2p) * math.sin(math.radians(dhp / 2.0))
+    Lbp = (L1 + L2) / 2.0
+    Cbp = (C1p + C2p) / 2.0
+    if not C1p or not C2p:
+        hbp = h1p + h2p
+    elif abs(h1p - h2p) <= 180.0:
+        hbp = (h1p + h2p) / 2.0
+    elif h1p + h2p < 360.0:
+        hbp = (h1p + h2p + 360.0) / 2.0
+    else:
+        hbp = (h1p + h2p - 360.0) / 2.0
+    T = (1 - 0.17 * math.cos(math.radians(hbp - 30.0))
+         + 0.24 * math.cos(math.radians(2 * hbp))
+         + 0.32 * math.cos(math.radians(3 * hbp + 6.0))
+         - 0.20 * math.cos(math.radians(4 * hbp - 63.0)))
+    dTh = 30.0 * math.exp(-(((hbp - 275.0) / 25.0) ** 2))
+    Rc = 2.0 * math.sqrt(Cbp ** 7 / (Cbp ** 7 + 25.0 ** 7))
+    Sl = 1 + (0.015 * (Lbp - 50.0) ** 2) / math.sqrt(20 + (Lbp - 50.0) ** 2)
+    Sc = 1 + 0.045 * Cbp
+    Sh = 1 + 0.015 * Cbp * T
+    Rt = -math.sin(math.radians(2 * dTh)) * Rc
+    return math.sqrt((dLp / Sl) ** 2 + (dCp / Sc) ** 2 + (dHp / Sh) ** 2
+                     + Rt * (dCp / Sc) * (dHp / Sh))
+
+
+def _is_cmyk_black(v):
+    """Is this int MuPDF's image of device CMYK 0/0/0/1?"""
+    return all(abs(x - y) <= BLACK_NEAR / 255.0
+               for x, y in zip(_rgb01(v), _rgb01(CMYK_BLACK)))
+
+
+def colour_same(a, b):
+    """True when two packed span colours are the same COLOUR, not the same int."""
+    if a == b:
+        return True
+    la, lb = _lab(_rgb01(a)), _lab(_rgb01(b))
+    if (la[0] <= BLACK_L and lb[0] <= BLACK_L
+            and math.hypot(la[1], la[2]) <= BLACK_C
+            and math.hypot(lb[1], lb[2]) <= BLACK_C
+            and (_is_cmyk_black(a) or _is_cmyk_black(b))):
+        return True
+    return _de00(la, lb) <= COLOUR_DE
 
 
 # ----------------------------------------------------------------------------
@@ -340,51 +450,7 @@ def _span_flags(sp):
 # ----------------------------------------------------------------------------
 
 
-EMU_PER_PT = 12700.0
-
-
-def docx_image_dpi(path):
-    """Median dpi of the pictures a .docx embeds, over the size it places them at.
-
-    The engine's own resolution decision, and the only place it is observable. Google's
-    PDF export re-rasterises every picture to its own target (48, 72 or 96 dpi at the
-    placement size - measured, see 54_image_dpi), so the density in the export says what
-    Google chose, not what the engine wrote. The .docx says what the engine wrote:
-    word/media holds the bytes, and the wp:extent beside each r:embed is the size the
-    picture is drawn at, so px / (extent_pt / 72) is the embedded density.
-
-    Returns None when the file cannot be read as a .docx, so the caller can say the
-    measurement did not happen instead of reporting a zero as a result.
-    """
-    try:
-        import zipfile, io
-        with zipfile.ZipFile(path) as z:
-            doc = z.read("word/document.xml").decode("utf-8", "replace")
-            rels = z.read("word/_rels/document.xml.rels").decode("utf-8", "replace")
-            targets = dict(re.findall(r'Id="([^"]+)"[^>]*Target="([^"]+)"', rels))
-            pat = re.compile(r'<wp:extent[^>]*cx="(\d+)"[^>]*cy="(\d+)"|r:embed="([^"]+)"')
-            vals = []
-            pending = None
-            for m in pat.finditer(doc):
-                if m.group(1):
-                    pending = (int(m.group(1)) / EMU_PER_PT, int(m.group(2)) / EMU_PER_PT)
-                elif m.group(3) and pending:
-                    name = "word/" + targets.get(m.group(3), "").replace("../", "")
-                    try:
-                        w_px = fitz.Pixmap(z.read(name)).width
-                    except Exception:
-                        pending = None
-                        continue
-                    w_pt = max(1.0, pending[0])
-                    vals.append(w_px / (w_pt / 72.0))
-                    pending = None
-            vals.sort()
-            return round(vals[len(vals) // 2]) if vals else 0
-    except Exception:
-        return None
-
-
-def extra_checks2(src, gd, docx_path=None):
+def extra_checks2(src, gd):
     """Return checks 49-56. Independent of the text runs."""
     c = {}
 
@@ -572,24 +638,6 @@ def extra_checks2(src, gd, docx_path=None):
     # ---- 54 image resolution ----------------------------------------------
     # 08 counts images and 48 measures area; neither notices a 300 dpi logo
     # arriving as a 40 dpi smear.
-    #
-    # MEASURED ON THE .DOCX, NOT ON GOOGLE'S EXPORT. This check used to compare the
-    # original's pixel density against the density in the PDF Google exports, and that
-    # number is Google's, not the engine's. Over the 216 measured documents the recorded
-    # render density takes only three values - 96 on 154 of them, 72 on 31, 48 on 3 - while
-    # the source densities run 152..665; 753 px in the source implies 210 px in the render,
-    # and 480 px implies 35. The engine embeds the native grid (PdfToWord.collectImage
-    # lifts pdImage.getImage() at full size and DocxWriter writes those bytes beside a
-    # wp:extent taken from the page placement), so nothing the engine writes survives the
-    # export: the render density is the exporter's tier x the placement width, and the
-    # check therefore asks "is the source below Google's ceiling". Passing it is a step
-    # function of the SOURCE density alone - every document above 160 dpi fails, every one
-    # at or below 152 passes except 393_spectrum_peak_table (152 against a 72 tier) - and
-    # 12 documents fail permanently with no .docx change able to clear them, because
-    # embedding more pixels cannot lift the export above its tier.
-    # What the engine does control is what it puts in the .docx: word/media holds the bytes
-    # and wp:extent the size, so px / (extent_pt / 72) is the engine's own resolution
-    # decision. That is what this check now reads, from --docx.
     def img_dpi(doc):
         vals = []
         for p in doc:
@@ -603,17 +651,7 @@ def extra_checks2(src, gd, docx_path=None):
         return round(vals[len(vals) // 2]) if vals else 0
 
     s_d, g_d = img_dpi(src), img_dpi(gd)
-    d_d = docx_image_dpi(docx_path) if docx_path else None
-    if d_d is None:
-        # No .docx to read. Google's number answers a different question, so it cannot
-        # fail this check - but say so on stderr rather than passing silently, because a
-        # run that forgets --docx measures nothing here and should be visible as such.
-        if s_d:
-            print("54_image_dpi: no .docx given, resolution unmeasured (render reads %s dpi, "
-                  "which is Google's export, not the engine's)" % g_d, file=sys.stderr)
-        c["54_image_dpi"] = (s_d, 0, True)
-    else:
-        c["54_image_dpi"] = (s_d, d_d, s_d == 0 or d_d >= s_d * 0.6)
+    c["54_image_dpi"] = (s_d, g_d, s_d == 0 or g_d >= s_d * 0.6)
 
     # ---- 55 page count per size -------------------------------------------
     # A mixed-orientation document that comes out all one size is wrong even if
@@ -625,23 +663,42 @@ def extra_checks2(src, gd, docx_path=None):
     s_om, g_om = orientation_mix(src), orientation_mix(gd)
     c["55_orientation_mix"] = (s_om, g_om, s_om == g_om)
 
-    # ---- 56 text direction -------------------------------------------------
-    # RTL documents whose direction is lost read backwards while every word is
-    # still present in the right place.
-    def rtl_runs(doc):
-        n = 0
-        for p in doc:
-            for blk in p.get_text("dict")["blocks"]:
-                if blk.get("type") != 0:
-                    continue
-                for ln in blk.get("lines", []):
-                    d = ln.get("dir", (1, 0))
-                    if d[0] < 0:
-                        n += 1
-        return n
-
-    s_rtl, g_rtl = rtl_runs(src), rtl_runs(gd)
-    c["56_rtl_runs"] = (s_rtl, g_rtl, s_rtl == 0 or g_rtl >= max(1, int(s_rtl * 0.9)))
+    # ---- 56 text direction: DROPPED 13 Nov ---------------------------------
+    # The check read `line.dir` and counted lines with dir[0] < 0, on the stated
+    # premise that an RTL line reports a negative direction. It does not, and it
+    # cannot: `dir` is the unit vector of the BASELINE, i.e. rotation. Measured
+    # over the whole 211-document corpus on 13 Nov:
+    #   - dir[0] < 0 occurs on 115 lines in 10 documents, and every one of them
+    #     is a page rotated 180 degrees (04_stamp_180deg_upside_down,
+    #     one-page-rotated-180-degrees 61 lines, 417_rotate180_and_mirrored,
+    #     ...). That is 35_rotation's subject, not direction.
+    #   - the corpus's only Arabic document, 77_arabic_rtl_document, reports
+    #     dir = (1.0, 0.0) on every one of its 25 lines. The check read 0 there,
+    #     so it passed on the one document it exists for.
+    # Direction is not recoverable from the text API at all, so there is nothing
+    # to fix. The three candidates were tested and each is blind:
+    #   - `dir`: above. `wmode` is 0 for horizontal text and does not distinguish
+    #     left-to-right from right-to-left.
+    #   - character origins: a right-to-left run should have descending x. On
+    #     77_arabic 25 runs descend and every other corpus document has no RTL
+    #     character at all - but the signal is produced by MuPDF's bidi
+    #     reordering, not by the page. Rewriting that document's content stream
+    #     with every glyph run reversed (a direction-lost render, visually
+    #     mirrored Arabic) still measures 25/25, because extraction is always
+    #     reordered into logical order. The signal reads the same on a correct
+    #     document and on a mirrored one, so it is not a direction test.
+    #   - the content stream's own operator order is the only place the draw
+    #     order survives, and a producer may draw glyphs in any order without
+    #     changing direction, so it cannot be compared between two producers.
+    # And the defect the check was written for is not lost with it: a mirrored
+    # RTL render changes the extracted WORD ORDER, which 03/04/05/22 already
+    # compare. Measured on the mirrored copy of 77_arabic: 03_word_count 105 ->
+    # 103, 04_words_missing 91, 05_words_extra 89, 22_reading_order 100 -> 0.
+    # (45_char_accuracy does not fire there and should not: the character
+    # multiset is identical, only the order changed.)
+    # Precedent: 02_text_run_count was dropped the same way and for the same
+    # reason - a check whose only signal is another check's subject is a
+    # liability, and the corpus numbers are cleaner without it.
 
     # ---- 59 shape anchor ---------------------------------------------------
     # Does text stay in the same place inside the outline that encloses it?
@@ -772,7 +829,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     for s_sp, g_sp in pairs:
         if abs(s_sp["size"] - g_sp["size"]) <= 0.6:
             ok_size += 1
-        if s_sp["colour"] == g_sp["colour"]:
+        if colour_same(s_sp["colour"], g_sp["colour"]):
             ok_col += 1
         if s_sp["weight"] == g_sp["weight"]:
             ok_weight += 1
@@ -829,22 +886,94 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     c["36_underline_rules"] = (s_u, g_u, g_u >= max(1, int(s_u * 0.7)) if s_u else True)
 
     # ---- 37 super / subscript ---------------------------------------------
+    # The old version counted the superscript FLAG BIT and nothing else. PyMuPDF
+    # has no subscript bit, so on a document whose only script text is subscript
+    # it read 0 on the source side and the check passed unconditionally.
+    # Measured 13 Nov over the 211-document corpus: spans with flags & 1 exist in
+    # 3 documents, 5 spans, all superscript (journal-2col-with-footnotes 3,
+    # academic-paper-ieee-2col-abstract 1, 400_comic_page_speech_bubbles 1) - and
+    # a subscript run exists NOWHERE in the corpus. The subscript half of this
+    # check had never once been exercised.
+    #
+    # A script run is detected by BASELINE OFFSET instead, which covers both
+    # directions. The numbers below are measured, not chosen:
+    #   - the corpus's only genuine script text is 3 footnote markers in
+    #     journal-2col-with-footnotes.pdf: 7.1 pt in an 8.9 pt line, 0.50 em
+    #     above the line's dominant baseline;
+    #   - Word's own default for vertAlign is a 58 % size at a 33 % offset, so a
+    #     correct conversion of a Word subscript lands at 0.33 em and 0.58 size;
+    #   - same-line baseline noise among FULL-SIZE spans reaches 0.30 em
+    #     (academic-paper-ieee-2col-abstract "Abstract-", 0.302), which is why the
+    #     size test is not optional: a script run is also SMALLER than its line;
+    #   - a small text object sitting on a lower baseline reaches 0.73 em
+    #     (400_comic_page_speech_bubbles "SUPERVISOR", 6.0 pt in a 7.5 pt line).
+    #     That is not a script run, so the offset needs a ceiling.
+    # Hence: size <= 85 % of the line's largest span AND offset within
+    # [0.15, 0.60] em of the line's dominant size. 0.15 clears the noise, 0.60
+    # brackets both conventions (0.33 Word, 0.50 corpus) and stays under 0.73.
+    # The trade-off is explicit: a render that used a > 0.60 em offset where the
+    # source used 0.50 would be counted on one side only, which is why the
+    # ceiling is set above the corpus's measured maximum rather than at it.
+    SCRIPT_SIZE = 0.85
+    SCRIPT_LO, SCRIPT_HI = 0.15, 0.60
+
     def scripts(doc):
-        n = 0
+        """(subscript runs, superscript runs), by baseline offset."""
+        sub = sup = 0
         for p in doc:
-            for blk in p.get_text("dict")["blocks"]:
+            for blk in p.get_text("rawdict")["blocks"]:
                 if blk.get("type") != 0:
                     continue
                 for ln in blk.get("lines", []):
+                    info = []
                     for sp in ln.get("spans", []):
-                        if sp.get("text", "").strip() and (sp.get("flags", 0) & 1):
-                            n += 1
-        return n
+                        ys = [ch["origin"][1] for ch in sp.get("chars", [])
+                              if ch["c"].strip()]
+                        if ys:
+                            info.append((sp, sorted(ys)[len(ys) // 2], len(ys)))
+                    if len(info) < 2:
+                        continue
+                    # the line's own baseline: the char-weighted median, so a
+                    # line of one big word plus a footnote marker is measured
+                    # against the word and not against the midpoint.
+                    total = sum(n for _, _, n in info)
+                    acc, dom = 0, None
+                    for _, y, n in sorted(info, key=lambda t: t[1]):
+                        acc += n
+                        if acc >= total / 2.0:
+                            dom = y
+                            break
+                    big = max((sp.get("size") or 0) for sp, _, _ in info) or 1.0
+                    for sp, y, _ in info:
+                        size = sp.get("size") or 0
+                        if size > SCRIPT_SIZE * big:
+                            continue
+                        r = (y - dom) / big
+                        if SCRIPT_LO <= r <= SCRIPT_HI:
+                            sub += 1
+                        elif -SCRIPT_HI <= r <= -SCRIPT_LO:
+                            sup += 1
+        return sub, sup
 
     s_sc, g_sc = scripts(src), scripts(gd)
-    c["37_super_subscript"] = (s_sc, g_sc, s_sc == 0 or g_sc >= max(1, int(s_sc * 0.9)))
+    c["37_super_subscript"] = (s_sc, g_sc, all(
+        sv == 0 or gv >= max(1, int(sv * 0.9)) for sv, gv in zip(s_sc, g_sc)))
 
     # ---- 38 list markers ---------------------------------------------------
+    # Two defects, both measured on 13 Nov:
+    #   - the trailing space had to be inside the SAME span, so a render that
+    #     emits "1." and "First item" as separate spans never counted. That is
+    #     not an exotic render, it is the corpus's own shape: all ten markers of
+    #     69_two_col_legal_numbered_clauses.pdf sit in their own span, and the
+    #     old check read 0 on it - and 0 on any render of it, so a ten-item list
+    #     could lose every marker and still pass.
+    #   - t[1:3] in (". ", ") ") can never match a two-digit marker: "10." gives
+    #     "0.", so the tenth item of every list was invisible on BOTH sides.
+    #     Old count on that document: 0. Ten-item list, ten items, zero markers.
+    # The test is now on the stripped span text alone - digits plus "."/")"
+    # followed by end-of-span or a space, or a bullet glyph.
+    NUM_MARK = re.compile(r"^\d{1,4}[.)](?:\s|$)")
+
     def markers(doc):
         n = 0
         for p in doc:
@@ -857,7 +986,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
                         if not t:
                             continue
                         if t[0] in "\u2022\u25cf\u25aa\u2023\u2043-*\u00b7" or \
-                                (t[0].isdigit() and t[1:3] in (". ", ") ")):
+                                NUM_MARK.match(t):
                             n += 1
                             break
         return n
@@ -866,47 +995,20 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     c["38_list_markers"] = (s_m, g_m, s_m == 0 or g_m >= max(1, int(s_m * 0.9)))
 
     # ---- 39 image position -------------------------------------------------
-    # A DISTANCE TEST, WITH THE PAGE IN THE KEY. The old body quantised each box to an
-    # 8 pt bin (round(x/8), round(y/8)) and intersected the two sets, which is not a
-    # tolerance - it is a membership test whose tolerance is 4 pt in the middle of a bin
-    # and 0 pt on the boundary. A box sitting at x = 52.0 (x/8 = 6.5) is exactly on one:
-    # 407_id_card_front_back fails after a 0.1 pt shift, 11_stamp_with_signature_image
-    # (y = 420.000, y/8 = 52.5) fails after 0.1 pt too, and on the 15 corpus documents
-    # that carry an image a uniform 0.1 pt move fails 2 of them and a 1 pt move fails 5 -
-    # all with every image where it belongs. set() also dropped a count whenever two
-    # pictures shared a bin, and the key carried no page, so a picture moved from page 1
-    # to page 2 at the same coordinates passed. Nearest one-to-one match within 4 pt per
-    # axis keeps the old tolerance and removes the cliff.
-    IMG_POS_TOL = 4.0
-
     def img_boxes(doc):
         boxes = []
-        for i, p in enumerate(doc):
+        for p in doc:
             for im in p.get_image_info():
                 b = im["bbox"]
-                boxes.append((i, b[0], b[1]))
+                boxes.append((round(b[0] / 8), round(b[1] / 8)))
         return boxes
 
     s_ib, g_ib = img_boxes(src), img_boxes(gd)
     if not s_ib:
         c["39_image_position"] = (0, len(g_ib), True)
     else:
-        used = set()
-        common = 0
-        for (pg, x, y) in s_ib:
-            best = None
-            for j, (gp, gx, gy) in enumerate(g_ib):
-                if j in used or gp != pg:
-                    continue
-                if abs(gx - x) <= IMG_POS_TOL and abs(gy - y) <= IMG_POS_TOL:
-                    dist = abs(gx - x) + abs(gy - y)
-                    if best is None or dist < best[0]:
-                        best = (dist, j)
-            if best is not None:
-                used.add(best[1])
-                common += 1
-        c["39_image_position"] = (len(s_ib), common,
-                                  common >= max(1, -(-len(s_ib) * 3 // 5)))
+        common = len(set(s_ib) & set(g_ib))
+        c["39_image_position"] = (len(s_ib), common, common >= max(1, int(len(s_ib) * 0.6)))
 
     # ---- 40 link targets ---------------------------------------------------
     def link_targets(doc):
@@ -935,34 +1037,22 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
 
     # ---- 42 alignment ------------------------------------------------------
     def align_mix(doc):
-        # The block bbox is the union of its own lines, so the widest line of EVERY block
-        # satisfies lx0 - bx0 < 4 and was counted as 'left'. Every block therefore
-        # contributed a 'left' by construction: on the 211-document corpus 5925 of 5925
-        # blocks did, left was 72% of all lines and centre 2%. A fully centred document
-        # read left, never centre.
-        # A line is only left-aligned relative to the COLUMN it sits in, not to a box
-        # drawn round itself, so the reference is the page's text margin. The widest line
-        # of a centred block still spans the column and is indistinguishable from flush
-        # left, but the narrower lines now read centre and the mix is centre-dominated.
         left = right = centre = 0
         for p in doc:
-            blks = [b for b in p.get_text("dict")["blocks"] if b.get("type") == 0]
-            if not blks:
-                continue
-            le = statistics.mode([round(b["bbox"][0]) for b in blks])
-            re_ = statistics.mode([round(b["bbox"][2]) for b in blks])
-            if re_ - le < 10:
-                continue
-            for blk in blks:
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                bx0, _, bx1, _ = blk["bbox"]
                 for ln in blk.get("lines", []):
                     lx0, _, lx1, _ = ln["bbox"]
-                    if lx1 - lx0 < 10:
+                    w = bx1 - bx0
+                    if w < 10:
                         continue
-                    if abs(lx0 - le) < 4:
+                    if lx0 - bx0 < 4:
                         left += 1
-                    elif abs(re_ - lx1) < 4:
+                    elif bx1 - lx1 < 4:
                         right += 1
-                    elif abs((lx0 + lx1) / 2 - (le + re_) / 2) < 6:
+                    elif abs((lx0 + lx1) / 2 - (bx0 + bx1) / 2) < 6:
                         centre += 1
         return (left, right, centre)
 
@@ -982,66 +1072,34 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
 
     # ---- 44 header / footer ------------------------------------------------
     def edge_text(doc):
-        # Returns the band TEXT, not a count. Widening the band to 0.11/0.89 fixed the 1 pt
-        # footer shift but pulled 116 real body blocks into the header count on the corpus
-        # (82 of 211 documents, 90% of them not repeated headers - table headers, section
-        # headings, the second and third body line), which both dilutes the check and moves
-        # its boundary into the densest region of the page. Counting text instead: a footer
-        # that moves 1 pt is the same string, a footer that is dropped is a different one,
-        # and body text in the band appears on both sides and cancels out.
-        out = []
+        n = 0
         for p in doc:
             H = p.rect.height
             for blk in p.get_text("dict")["blocks"]:
                 if blk.get("type") != 0:
                     continue
                 y = blk["bbox"][1]
-                if y < H * 0.10 or y > H * 0.90:
-                    t = " ".join("".join(sp["text"] for ln in blk.get("lines", [])
-                                         for sp in ln["spans"]).split())
-                    if t:
-                        out.append(t)
-        return out
-
-    def _present(t, pool):
-        if t in pool:
-            return True
-        return any(difflib.SequenceMatcher(None, t, q).ratio() >= 0.9 or t in q for q in pool)
+                # 0.10/0.90 was a hard boundary with no tolerance: on H=842 it sits at 757.8,
+                # so two otherwise identical documents whose footer top reads 757.3 and 758.3
+                # gave source=1 render=0 and failed. A footer is not a point estimate, and the
+                # same band is applied to both sides, so widening it cannot favour one.
+                if y < H * 0.11 or y > H * 0.89:
+                    n += 1
+        return n
 
     s_e, g_e = edge_text(src), edge_text(gd)
-    # Every band string in the source must still be in the render. A 1 pt shift keeps every
-    # string, so the original defect passes; a dropped header loses its string, so the check
-    # still fires; a body block that happens to sit in the band is present on both sides.
-    # The 0.9 ratio was kept out of this on purpose: with s_e=2 it tolerated one of the two
-    # headers being lost, which is the dilution the widening introduced.
-    missing = [t for t in s_e if not _present(t, g_e)]
-    c["44_header_footer"] = (len(s_e), len(s_e) - len(missing), not missing)
+    # The band was a hard 0.10/0.90 of page height with no tolerance, so a footer 1 pt either
+    # side of the line changed the answer: on H=842 the boundary sits at 757.8, and two
+    # otherwise identical documents with a footer top at 757.3 and 758.3 read source=1
+    # render=0 and FAIL. A footer is not a point estimate. The band is wider - 0.11/0.89 -
+    # and the same on both sides, which moves the boundary out of where body text sits while
+    # still catching a footer at 0.92-0.96H.
+    c["44_header_footer"] = (s_e, g_e, s_e == 0 or g_e >= max(1, int(s_e * 0.9)))
 
     # ---- 45 character accuracy --------------------------------------------
     s_txt = "".join(s_sp["text"] for s_sp in s_runs)
     g_txt = "".join(g_sp["text"] for g_sp in g_runs)
-    # The glyph stream: every span's text, all whitespace removed.
-    #
-    # Two defects, both proved on 13 Nov. quick_ratio() is the MULTISET intersection of the two
-    # strings, so it is a hard upper bound on ratio() and cannot see reordering at any scale -
-    # reversing every run on every page left it reading 100 on 208 of 208 corpus documents.
-    # And the old comparison joined span texts with no separator after `runs()` dropped
-    # whitespace-only spans, so a render that emits the space as its own span read 95 on text
-    # that had not changed. A span boundary can fall anywhere, including mid-word, so no join
-    # character can be correct: the separator belongs to the extractor, not to the document.
-    # Removing whitespace from both sides makes the check invariant to every cut - measured min
-    # 100 across the mid-word split of all 18263 spans in 208 documents - and a dropped space is
-    # still caught, by 03/04, which compare the word multiset.
-    #
-    # SequenceMatcher with autojunk=False, not the default: past 200 characters the heuristic
-    # discards any character that is more than 1 % of the sequence, which makes the score depend
-    # on length rather than on the difference. This is the same idiom verify.py and visual.py
-    # already use for text.
-    def _glyphs(rs):
-        return re.sub(r"[\s\u00a0]+", "", "".join(r["text"] for r in rs))
-
-    s_cs, g_cs = _glyphs(s_runs), _glyphs(g_runs)
-    ratio = round(100 * difflib.SequenceMatcher(None, s_cs, g_cs, autojunk=False).ratio())
+    ratio = round(100 * difflib.SequenceMatcher(None, s_txt, g_txt).quick_ratio())
     c["45_char_accuracy"] = (100, ratio, ratio >= 97)
 
     # ---- 46 text crossing a rule (per span) --------------------------------
@@ -1117,7 +1175,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     return c
 
 
-def compare(src_path, gd_path, docx_path=None):
+def compare(src_path, gd_path):
     src = fitz.open(src_path)
     gd = fitz.open(gd_path)
 
@@ -1329,7 +1387,11 @@ def compare(src_path, gd_path, docx_path=None):
     # reading order: the sequence of normalised words
     s_seq = [norm_word(w) for w in s_text.split() if w.strip()]
     g_seq = [norm_word(w) for w in g_text.split() if w.strip()]
-    order = order_score(s_seq, g_seq)
+    if s_seq:
+        same = sum(1 for a, b in zip(s_seq, g_seq) if a == b)
+        order = round(100.0 * same / max(1, len(s_seq)))
+    else:
+        order = 100
     checks["22_reading_order"] = (100, order, order > 95)
 
     # line spacing: median gap between consecutive baselines on page 1
@@ -1409,6 +1471,28 @@ def compare(src_path, gd_path, docx_path=None):
                                     clipped <= max(2, s_clipped + len(g_runs) // 50))
 
     # 29 blank where source has ink / 30 ink where source is blank
+    # CORRECTION (13 Nov): bucket the RENDER in the SOURCE's frame. med_dx / med_dy are
+    # the document-wide median offsets of the matched runs above - the amount the whole
+    # document was translated. Subtracting them before bucketing means a uniform shift
+    # lands in the cells the source itself used, so only cells whose occupancy really
+    # changed are counted. Without it a 2.5 pt shift walks runs across the 24x24 lattice
+    # boundaries and BOTH checks fire on a document whose text is intact: measured on
+    # 12 real documents, a 2.5 pt horizontal shift failed 29 on 3 and 30 on 2, with
+    # 18/19/20/21 all passing; at 5 pt it failed 29 and 30 on 7 of 12.
+    # With no matched runs both medians are 0.0 and this is exactly the old behaviour.
+    # Per PAGE, not per document. A whole-document median is right when the whole
+    # document moved, but it cannot see a shift that only one page carries (the median
+    # of a three-page document with page 2 displaced stays 0, so the correction does
+    # nothing: measured, page 2 of table-across-page-break-repeated-header shifted 10 pt
+    # still reported 29=52 30=49). On a single-page document this is the same number as
+    # med_dx / med_dy, so it strictly dominates.
+    pdx, pdy = {}, {}
+    for _pg in sorted({r["page"] for r, _ in pairs}):
+        _xs = [g["x"] - s["x"] for s, g in pairs if s["page"] == _pg]
+        _ys = [g["y"] - s["y"] for s, g in pairs if s["page"] == _pg]
+        if _xs:
+            pdx[_pg] = round(median(_xs), 1)
+            pdy[_pg] = round(median(_ys), 1)
     blank_loss, extra_ink, s_grid_total = 0, 0, 0
     for i in range(min(src.page_count, gd.page_count)):
         sp, gp = src[i], gd[i]
@@ -1420,7 +1504,8 @@ def compare(src_path, gd_path, docx_path=None):
             s_cells.add((int(r["x"] / cw), int(r["y"] / ch)))
         g_cells = set()
         for r in runs(gp):
-            g_cells.add((int(r["x"] / cw), int(r["y"] / ch)))
+            g_cells.add((int((r["x"] - pdx.get(i, med_dx)) / cw),
+                         int((r["y"] - pdy.get(i, med_dy)) / ch)))
         s_grid_total += len(s_cells)
         blank_loss += len(s_cells - g_cells)
         extra_ink += len(g_cells - s_cells)
@@ -1440,7 +1525,7 @@ def compare(src_path, gd_path, docx_path=None):
     checks["31_pages_lost_their_text"] = (0, empty_pages, empty_pages == 0)
 
     checks.update(extra_checks(src, gd, s_runs, g_runs, pairs))
-    checks.update(extra_checks2(src, gd, docx_path))
+    checks.update(extra_checks2(src, gd))
 
     src.close()
     gd.close()
@@ -1486,21 +1571,8 @@ def main(argv):
     out = None
     if "--json" in argv:
         out = argv[argv.index("--json") + 1]
-    # The .docx the engine wrote, when the caller has it. The pipeline keeps it beside the
-    # source (out1/<name>.docx next to all/<name>.pdf), so it is looked for there too;
-    # without it 54_image_dpi cannot be answered and says so rather than failing.
-    docx_path = None
-    if "--docx" in argv:
-        docx_path = argv[argv.index("--docx") + 1]
-    else:
-        stem = os.path.splitext(os.path.basename(src))[0]
-        for cand in (os.path.join(os.path.dirname(src), "..", "out1", stem + ".docx"),
-                     os.path.join(os.path.dirname(src), stem + ".docx")):
-            if os.path.exists(cand):
-                docx_path = cand
-                break
     try:
-        res = compare(src, gd, docx_path)
+        res = compare(src, gd)
     except Exception as e:
         print("could not run: %s" % e, file=sys.stderr)
         return 2
