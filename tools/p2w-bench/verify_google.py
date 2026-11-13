@@ -899,6 +899,75 @@ def extra_checks2(src, gd, docx_path=None):
     # "source=1 render=1" for one good run and one bad run alike.
     c["59_shape_anchor"] = (anchored, anchored - (lost + moved), (lost + moved) == 0)
 
+    # ---- 60 text column right edge -----------------------------------------
+    # NOTHING MEASURED THIS BEFORE. 43_within_10pt_x compares a span's x - its LEFT edge -
+    # so a line that starts in the right place and runs 30 pt past the column is invisible
+    # to it. 27_text_off_page fires only beyond the PAPER. And the engine's own residual
+    # lives exactly in the gap between the two: the .docx carries w:pgMar right="0"
+    # (DocxWriter.java:1610) and w:ind ... right="0" (DocxWriter.java:2607), so a
+    # left-aligned paragraph has no right constraint at all and its text area is the whole
+    # 595 pt paper while the source's column ended at 539. 57 documents in the corpus
+    # overrun the right edge and 52 of them still pass 45_char_accuracy - the text is not
+    # garbled, it is unwrapped.
+    #
+    # The old 47 did see maxx, but on page 1 only, and on 136 of 211 documents a masthead or
+    # a full-width rule pins it, which is why a right column 30 pt too narrow passed.
+    #
+    # Measured per page over the BODY lines: the ink lines that start at the page's modal
+    # left edge, outside the header/footer bands. For left-aligned, centred and right-aligned
+    # body text alike the longest of those lines ends at the column's right edge, so the max
+    # of their right edges is the column edge. Two ways to fail:
+    #   overrun   the render's column edge is more than RIGHT_OVERRUN past the source's -
+    #             text is running into the margin the source kept;
+    #   underrun  the render's column edge is more than RIGHT_UNDERRUN short of it - the
+    #             column is narrower than the source's. Only judged on a page with at least
+    #             FULL_PAGE_LINES body lines, because on a short page max(right) is
+    #             raggedness, not a column edge, and a two-line page cannot tell them apart.
+    BAND = 0.06             # header / footer band, as a fraction of page height
+    RIGHT_OVERRUN = 6.0
+    RIGHT_UNDERRUN = 8.0
+    FULL_PAGE_LINES = 10
+
+    def column_right(page):
+        ls = []
+        for blk in page.get_text("dict")["blocks"]:
+            if blk.get("type") != 0:
+                continue
+            for ln in blk.get("lines", []):
+                if not "".join(sp.get("text", "") for sp in ln.get("spans", [])).strip():
+                    continue
+                ls.append(ln["bbox"])
+        if not ls:
+            return None
+        H = page.rect.height
+        # The bands are dropped ALWAYS, not only when enough mid-page lines survive. A
+        # fallback to "every line" re-admitted the masthead this check exists to ignore:
+        # measured on 15_stamp_on_scanned_page, a page whose text layer is two lines and a
+        # masthead, the fallback took the masthead's right edge as the column's and fired.
+        pool = [b for b in ls if b[1] >= BAND * H and b[3] <= H - BAND * H]
+        if not pool:
+            return None
+        ml = statistics.mode([round(b[0]) for b in pool])
+        col = [b for b in pool if abs(b[0] - ml) <= 10]
+        if not col:
+            return None
+        return max(b[2] for b in col), len(col)
+
+    over = under = 0
+    for i in range(min(src.page_count, gd.page_count)):
+        a, b = column_right(src[i]), column_right(gd[i])
+        if not a or not b:
+            continue
+        rs, ns = a
+        rg, ng = b
+        if rg > rs + RIGHT_OVERRUN:
+            over += 1
+        elif ns >= FULL_PAGE_LINES and ng >= FULL_PAGE_LINES and rg < rs - RIGHT_UNDERRUN:
+            under += 1
+    # source = pages whose column overruns the source's, render = pages whose column is
+    # narrower than the source's. A raw total would read the same for one of each.
+    c["60_text_column_right_edge"] = (over, under, over == 0 and under == 0)
+
     return c
 
 
@@ -1326,39 +1395,82 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     s_c, g_c = spans_crossing(src), spans_crossing(gd)
     c["46_text_crossing_rule"] = (s_c, g_c, g_c <= s_c + s_c // 5)
 
-    # ---- 47 margins --------------------------------------------------------
-    def extents(doc):
-        """Page-1 text extents, measured over spans that actually carry ink.
+    # ---- 47 margins: the body column's left margin, page by page ------------
+    # WHAT THIS USED TO MEASURE. Four numbers: the ink bounding box of PAGE 1, compared on
+    # all four edges with a 12 pt tolerance. That is not a margin. Measured on the 211
+    # sources (prove-47.py census): on 202 of them the page-1 ink box sits further out than
+    # the body column by more than this check's own tolerance on at least one edge - a
+    # header pins miny on 178 (median 31 pt), a footer maxy on 156 (median 232 pt), a
+    # masthead or a full-width rule maxx on 136 (median 91 pt), marginal ink minx on 47.
+    # On the median document the number called "the right margin" is 91 pt outside the body
+    # column before anything has gone wrong, and 12 pt is 25 % of the median 48 pt margin.
+    # So an unrelated stamp or header decides the verdict: adding a masthead, a rule and a
+    # page number without touching the body failed this check on 40 of 40 documents.
+    #
+    # WHAT IT MEASURES NOW. The horizontal position of the body column, on EVERY page, in
+    # the two ways a margin can be wrong:
+    #   (a) the MODAL left edge of the page's ink lines - the margin itself. A mode cannot
+    #       be moved by one stray span, a masthead or a stamp the way min() can, and it
+    #       survives a re-wrap because it compares where lines START, not which words.
+    #   (b) the distance from each source line's left edge to the nearest render line's left
+    #       edge on the same page - the indent structure. A block indented 18 pt too far
+    #       leaves the mode untouched and is caught here.
+    # Both are distributions over lines, so the tolerance is stated on the distribution:
+    # median <= 2 pt, p90 <= 6 pt. Vertical placement is NOT this check's job: 18/19/20
+    # measure dy on every page and a deleted top margin moves them by the whole margin
+    # (measured: a 56 pt lift takes 18_median_dy to -56 on 210 of 210 documents). It also
+    # read page 1 only, which left a 30 pt shift confined to pages 2+ silent on 18 of 18
+    # multi-page documents. This check owns x, on every page.
+    LM_TOL = 3.0        # the modal left edge may differ by this much, per page
+    DX_MED_TOL = 2.0    # ... and the line-left registration by this, at the median
+    DX_P90_TOL = 6.0    # ... and this, at the 90th percentile
 
-        This used to take every text block's bbox with no filter, and a block holding a
-        single space still carries a bbox. A render that emits one lone space at x = 0 -
-        which is a perfectly normal thing for a PDF writer to do - drove min(x) to 0 and
-        failed the document. Measured on 13 Nov: 167 of 187 recorded rows show
-        render.minx == 0 while 03_word_count passes 27 of 27 and 04_words_missing finds
-        nothing missing. That is not a margin defect, it is a space.
-
-        runs() in this file has always filtered whitespace-only spans; this did not.
-        """
+    def line_lefts(doc):
+        """[(page, modal left edge, [left edges of that page's ink lines]), ...]"""
         out = []
-        for p in doc[:1]:
-            xs0, ys0, xs1, ys1 = [], [], [], []
+        for pi, p in enumerate(doc):
+            xs = []
             for blk in p.get_text("dict")["blocks"]:
                 if blk.get("type") != 0:
                     continue
                 for ln in blk.get("lines", []):
-                    for sp in ln.get("spans", []):
-                        if not sp.get("text", "").strip():
-                            continue
-                        b = sp["bbox"]
-                        xs0.append(b[0]); ys0.append(b[1])
-                        xs1.append(b[2]); ys1.append(b[3])
-            if xs0:
-                out.append((round(min(xs0)), round(min(ys0)), round(max(xs1)), round(max(ys1))))
-        return out[0] if out else (0, 0, 0, 0)
+                    if not "".join(sp.get("text", "") for sp in ln.get("spans", [])).strip():
+                        continue
+                    xs.append(round(ln["bbox"][0], 1))
+            out.append((pi, (statistics.mode([round(x) for x in xs]) if xs else None), xs))
+        return out
 
-    s_ex, g_ex = extents(src), extents(gd)
-    ok_margin = all(abs(a - b) <= 12 for a, b in zip(s_ex, g_ex))
-    c["47_margins"] = (s_ex, g_ex, ok_margin)
+    def _p90(v):
+        v = sorted(v)
+        return v[min(len(v) - 1, int(round(0.9 * (len(v) - 1))))] if v else 0.0
+
+    s_ll, g_ll = line_lefts(src), line_lefts(gd)
+    margin_bad, indent_bad = [], []
+    worst_med = worst_p90 = 0.0
+    for (pi, s_ml, s_xs), (_, g_ml, g_xs) in zip(s_ll, g_ll):
+        if s_ml is not None and g_ml is not None and abs(s_ml - g_ml) > LM_TOL:
+            margin_bad.append((pi + 1, s_ml, g_ml))
+        if not s_xs or not g_xs:
+            continue
+        # set distance, not pairing: a render may split, merge or drop a line, and an index
+        # pairing turns that into a false positional failure - the defect 59 had and 22 had.
+        d = [min(abs(x - y) for y in g_xs) for x in s_xs]
+        med, p90 = statistics.median(d), _p90(d)
+        worst_med, worst_p90 = max(worst_med, med), max(worst_p90, p90)
+        if med > DX_MED_TOL or p90 > DX_P90_TOL:
+            indent_bad.append((pi + 1, round(med, 1), round(p90, 1)))
+
+    # Reported as (worst page median, worst page p90, ok). The page numbers and the actual
+    # margins are in the check's own record so a failure can be read without re-running:
+    # "47_margins: pages 3,7 left edge 56->48" is what a fixer needs and four bbox numbers
+    # never said it.
+    c["47_margins"] = (round(worst_med, 1), round(worst_p90, 1),
+                       not margin_bad and not indent_bad)
+    # A detail check would be counted as a check: all_check_ids() discovers ids by running
+    # the verifier, so a second key here would add a free pass to every document's score.
+    # The worst page's numbers are what the tuple already carries; the page numbers are in
+    # margin_bad / indent_bad and are reproduced by any re-run with --json.
+    del margin_bad, indent_bad
 
     # ---- 48 image area -----------------------------------------------------
     def img_area(doc):
