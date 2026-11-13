@@ -160,6 +160,28 @@ def _anchor(page, rs):
     return out
 
 
+def _clipped_count(doc):
+    """Text clipped at the page edge, measured the same way for either document.
+
+    28 compared the RENDER's clipped count to a hard-coded 0 and never looked at the
+    source, so a document that legitimately sets text at the page edge - a border, a
+    footer rule, a full-bleed header, a stamp that runs to the trim - failed against
+    ITSELF. That is the identical bug 25, 26 and 27 had (see the docstring below about
+    seven of 208 documents failing their own copy), and 62a1792 converted those three and
+    left this one.
+
+    Measured on 13 Nov: three spans at x < 1 fail this check against a byte-identical
+    copy, because the threshold is max(2, len(g_runs)//50) and 3 > 2 on a nine-span page.
+    """
+    n = 0
+    for p in doc:
+        W, H = p.rect.width, p.rect.height
+        for r in runs(p):
+            if r["x"] < 1 or r["x1"] > W - 1:
+                n += 1
+    return n
+
+
 def _visual_counts(doc):
     """Invisible text and off-page text, measured the same way for either document.
 
@@ -954,6 +976,7 @@ def compare(src_path, gd_path):
 
     # ---- VISUAL (25-31) -----------------------------------------------------
     s_invisible, s_off_page = _visual_counts(src)
+    s_clipped = _clipped_count(src)
     invisible, off_page = _visual_counts(gd)
 
     on_text, clipped = 0, 0
@@ -996,7 +1019,11 @@ def compare(src_path, gd_path):
     checks["26_text_overlap"] = (s_on_text, on_text,
                                  on_text <= max(s_on_text, 2, len(g_runs) // 50))
     checks["27_text_off_page"] = (s_off_page, off_page, off_page <= s_off_page)
-    checks["28_clipped_at_edge"] = (0, clipped, clipped <= max(2, len(g_runs) // 50))
+    # The render may not clip MORE than the source already did. A document whose own text
+    # sits at the page edge is not a defect; text that only the conversion pushed there is.
+    # Same rule as 25 and 27.
+    checks["28_clipped_at_edge"] = (s_clipped, clipped,
+                                    clipped <= max(2, s_clipped + len(g_runs) // 50))
 
     # 29 blank where source has ink / 30 ink where source is blank
     blank_loss, extra_ink, s_grid_total = 0, 0, 0
