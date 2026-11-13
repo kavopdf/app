@@ -1,0 +1,111 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 503772c..f147e6f 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -92,6 +92,30 @@ public final class DocxWriter {
+      */
+     private static final float LINE_BASE = 0.8f;
+ 
++    /**
++     * The exact line box every flowed line is written with, in twips - a CONSTANT, not a
++     * multiple of the type size.
++     *
++     * <p>Google's advance from one baseline to the next is
++     * {@code w:before + max((w:line / 240) * lineHeight(face, size), 0.069 * size)}. The second
++     * term is a floor, and the test for which of the two it takes is size-free: the box wins
++     * only while {@code (w:line / 240) * r * size > 0.069 * size}, which cancels to
++     * {@code w:line > 16.56 / r}. Every ratio r measured on this corpus - 1.049 (Courier),
++     * 1.2 (the Times metric family), 1.277 (Liberation Serif) - gives {@code 16.56 / r} of 12.97
++     * or more, so at 12 twips the FLOOR is what Google charges at every size and every face,
++     * and the advance it renders is exactly {@code w:before + 0.069 * size}.
++     *
++     * <p>A box that scaled with the type could not be exact: {@code w:line = 1.38 * size} sits
++     * inside the floor only below {@code 12 / r} = 9.4-11.4 pt, so 12 pt body text - the size
++     * most of this corpus is set in - falls outside it.
++     */
++    private static final int LINE_BOX_TW = 12;
++    /**
++     * Google's line-box floor as a fraction of the em: the least its line box ever advances,
++     * whatever the face. Measured on Drive, and it is what {@link #lineBox} has to satisfy.
++     */
++    private static final float GOOGLE_FLOOR = 0.069f;
++
+     /**
+      * Ceiling on the vertical gap one paragraph may ask for, in twips (120 pt).
+      *
+@@ -2885,9 +2909,42 @@ public final class DocxWriter {
+         return new float[]{before * (float) TWIPS_PER_PT, linePt};
+     }
+ 
++    /**
++     * The {@code {w:before, w:line}} pair to write for one line whose advance is
++     * {@code advanceTw} twips.
++     *
++     * <p>The box is constant ({@link #LINE_BOX_TW}); the gap carries the whole advance less the
++     * floor Google charges for that size. That makes the Google advance exactly
++     * {@code advanceTw} at every size and every face.
++     *
++     * <p>THE TRADE, stated rather than hidden: Word and LibreOffice advance by
++     * {@code w:before + w:line / 20} instead, so this pair leaves them SHORT by
++     * {@code 0.069 * size - 0.6} pt per line - 0.09 pt at 10 pt, 0.23 pt at 12 pt, 1.06 pt at
++     * 24 pt. Google is the gated renderer; Word is unmeasured anywhere in this repo.
++     *
++     * <p>Note what this pair is NOT: {@code before + line} is deliberately not
++     * {@code advanceTw}, because the two renderers disagree about what a 12-twip box is worth
++     * and no single pair can satisfy both. The advance the page is CHARGED stays
++     * {@code advanceTw} - the caller keeps the fitter's own pair for {@link #fitPage} and
++     * {@link #resync}, and only the emission is Google's. What the XML then sums to is
++     * {@code advanceTw - (floorTw - LINE_BOX_TW)}, i.e. the Word height, which is the truth for
++     * a Word-model reader and the shortfall above.
++     *
++     * @param advanceTw the advance the page was charged for this line, in twips
++     * @param size      the line's font size, which decides Google's floor
++     */
++    private static int[] lineBox(int advanceTw, float size) {
++        int floorTw = (int) Math.max(1L, Math.round(GOOGLE_FLOOR * size * TWIPS_PER_PT));
++        return new int[]{Math.max(0, advanceTw - floorTw), LINE_BOX_TW};
++    }
++
+     /**
+      * Records where the reader will put the baseline just written, from the twips that were
+      * actually emitted. The next paragraph is measured from here.
++     *
++     * <p>Fed the pair the page was CHARGED, not the pair {@link #lineBox} writes: the two
++     * differ by {@code floorTw - LINE_BOX_TW} and this arithmetic is what carries the flow's
++     * position down the sheet, so it has to land on the advance the fitter agreed to.
+      */
+     private static void resync(Ctx ctx, float topPt, int beforeTw, int lineTw) {
+         ctx.flowY = topPt + beforeTw / (float) TWIPS_PER_PT + LINE_BASE * (lineTw / (float) TWIPS_PER_PT);
+@@ -3048,14 +3105,31 @@ public final class DocxWriter {
+         }
+         beforeTw = fit[0];
+         lineTw = fit[1];
++        // The advance this line is charged: the same number fitPage has always been given and
++        // spacingTw and flowTwOf have always summed. It is what the reader travels per line and
++        // it must not move - the box below is a change of SHAPE, not of height.
++        int advanceTw = beforeTw + lineTw;
+         // The box the pitch solver compares next time is the page's own, not the squeezed one.
+         ctx.lastLinePt = linePt;
+         ctx.lastBaseline = b.y;
+         ctx.lastSize = b.size;
+         ctx.newPage = false;
+         // Re-sync to what was written, so the next paragraph is measured from the reader's
+-        // position rather than from the PDF's (D-26).
++        // position rather than from the PDF's (D-26). Fed the charged pair, so the flow lands
++        // on advanceTw and every later absolute gap is measured against the page's own advance
++        // rather than against the emission's shorter Word height.
+         resync(ctx, flowTopPt(ctx), beforeTw, lineTw);
++        // And now the pair that is actually written: a constant 12-twip box and the gap that
++        // makes Google's floor carry the rest of the advance (LINE_BOX_TW, lineBox).
++        //
++        // Neither term is squeezed a second time. advanceTw is already what fitPage returned
++        // for this page, and the floor is Google's own constant - Google does not know this
++        // writer squeezed the sheet, so scaling the floor here would take the advance off the
++        // number the page was charged twice over. Scaling box[0] as well (the obvious
++        // mistake) moved 350_question_paper by 4016 twips, 200 pt of a one-page document.
++        int[] box = lineBox(advanceTw, b.size);
++        beforeTw = box[0];
++        lineTw = box[1];
+         sb.append("<w:p><w:pPr>");
+         if (p.heading > 0) {
+             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");

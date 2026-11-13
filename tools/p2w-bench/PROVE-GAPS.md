@@ -70,3 +70,48 @@ is weaker than a constructed proof, because a check that never fires and a check
 occurs look identical from the outside. `47_margins` is the case in point: it fired on 205 of 211
 documents, was treated as a real defect class through three fixer attempts, and nineteen separate
 investigations then found it is measuring page-1 ink extents rather than margins.
+
+## CORRECTION, 13 Nov - this table was stale when it was written
+
+Three of the rows below are wrong, and one check no longer exists:
+
+- **50_annotations, 51_form_fields, 52_outline and 40_link_targets were never unproven.** The
+  harness does not need a corpus document that HAS the feature, because it does not drop the feature
+  from the render - it ADDS it to the source (`prove_checks.py:318-320` marks them `("source", ...)`
+  and then passes the mutated document as the source). They have been proven all along, and the 30
+  actually unproven are: 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 23, 24, 26, 27, 28, 30, 32, 35,
+  36, 37, 38, 39, 41, 42, 44, 48, 53, 54, 56, 59. (32/35/36/37/38 were fixed later in this same
+  day's work and now fire; 28 became 33 proven.)
+- **02_text_run_count has no row to be unproven on** - the check was dropped from the verifier on
+  13 Nov and `--list-checks` no longer emits it. Its entry at `prove_checks.py:268` can never fire.
+- **The 40 row's reason is wrong.** It says the corpus document has no external URI; it has five
+  (`44_coloured_underlined_hyperlinks.pdf`, all `LINK_URI`).
+
+## AND THE BIGGER FINDING: fan-out. 52 of 58 cases mutate ONE document.
+
+Measured over all 58 cases, each against a 58/58 control:
+
+    fan-out 0 : 24_page_breaks, 27_text_off_page, 39_image_position, 48_image_area,
+                51_form_fields, 52_outline, 54_image_dpi
+    fan-out 1 : 08_image_count, 15_links, 33_border_over_text, 40_link_targets,
+                44_header_footer, 46_text_crossing_rule, 50_annotations
+    fan-out 24: 03_word_count, 04_words_missing, 16_numeric_runs, 17_matched_runs,
+                22_reading_order, 29_blank_where_ink_was, 31_pages_lost_their_text
+
+**One mutation, `mut_blank`, is the sole evidence for SEVEN checks and moves 24 of them.** A blank
+page is not a targeted probe; it is the whole suite reacting to one page disappearing. The tool
+warns only above fan-out 8 (`prove_checks.py:426`), so seven proven checks with fan-out 5-8 print as
+if they were isolated.
+
+**`59_shape_anchor` has no case written and is collateral in 31 of the 58 mutations** - it pollutes
+every fan-out measurement until it is characterised, and it is the single biggest unknown in the
+table above.
+
+Targeted replacements were built and measured, cutting the three worst from 24/17/12 to 3/1/1:
+`mut_blank` becomes three mutations (redact one span; exchange two spans' text IN PLACE so order
+changes without geometry moving; blank the LAST page of a 7-page document), `mut_landscape` becomes
+a flip of a page that carries no text, and `mut_restyle` becomes one attribute at a time. All eight
+verified firing with the lower fan-out.
+
+**And a duplicate pair worth recording:** `33_border_over_text` and `46_text_crossing_rule` co-fire
+in 16 of 58 cases. They are not two checks; they are one question asked twice.

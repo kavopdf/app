@@ -999,7 +999,28 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     # ---- 45 character accuracy --------------------------------------------
     s_txt = "".join(s_sp["text"] for s_sp in s_runs)
     g_txt = "".join(g_sp["text"] for g_sp in g_runs)
-    ratio = round(100 * difflib.SequenceMatcher(None, s_txt, g_txt).quick_ratio())
+    # The glyph stream: every span's text, all whitespace removed.
+    #
+    # Two defects, both proved on 13 Nov. quick_ratio() is the MULTISET intersection of the two
+    # strings, so it is a hard upper bound on ratio() and cannot see reordering at any scale -
+    # reversing every run on every page left it reading 100 on 208 of 208 corpus documents.
+    # And the old comparison joined span texts with no separator after `runs()` dropped
+    # whitespace-only spans, so a render that emits the space as its own span read 95 on text
+    # that had not changed. A span boundary can fall anywhere, including mid-word, so no join
+    # character can be correct: the separator belongs to the extractor, not to the document.
+    # Removing whitespace from both sides makes the check invariant to every cut - measured min
+    # 100 across the mid-word split of all 18263 spans in 208 documents - and a dropped space is
+    # still caught, by 03/04, which compare the word multiset.
+    #
+    # SequenceMatcher with autojunk=False, not the default: past 200 characters the heuristic
+    # discards any character that is more than 1 % of the sequence, which makes the score depend
+    # on length rather than on the difference. This is the same idiom verify.py and visual.py
+    # already use for text.
+    def _glyphs(rs):
+        return re.sub(r"[\s\u00a0]+", "", "".join(r["text"] for r in rs))
+
+    s_cs, g_cs = _glyphs(s_runs), _glyphs(g_runs)
+    ratio = round(100 * difflib.SequenceMatcher(None, s_cs, g_cs, autojunk=False).ratio())
     c["45_char_accuracy"] = (100, ratio, ratio >= 97)
 
     # ---- 46 text crossing a rule (per span) --------------------------------
