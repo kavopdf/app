@@ -38,7 +38,7 @@ THRESHOLDS (a document passes only if every one holds)
                 run may be more than twice its own tolerance out. Order > 95 %
   visual        no invisible text, no text-on-text, no page overflow, no extra page
 """
-import os, sys, json, re, collections, statistics, difflib, math, zipfile
+import os, sys, json, re, collections, statistics, difflib, math, zipfile, unicodedata
 import xml.etree.ElementTree as ET
 
 try:
@@ -1880,8 +1880,40 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     def _glyphs(rs):
         return re.sub(r"[\s\u00a0]+", "", "".join(r["text"] for r in rs))
 
-    s_cs, g_cs = _glyphs(s_runs), _glyphs(g_runs)
-    ratio = round(100 * difflib.SequenceMatcher(None, s_cs, g_cs, autojunk=False).ratio())
+    # AND IT WAS STILL MEASURING ORDER, WHICH IS NOT ITS QUESTION. Measured 13 Nov on a probe
+    # carrying one ligature, one combining mark, one Arabic word with a fathatan, one
+    # Devanagari cluster, a bullet, a checkbox and five maths signs: all 360 glyphs are in the
+    # render, each exactly once (multiset difference empty in both directions), and the
+    # sequence ratio reads 95.83 - a FAIL. Two causes, both in the extractor, neither in the
+    # document:
+    #
+    #   run splitting   a glyph the named face does not carry is drawn from a fallback face,
+    #                   so the renderer emits it as its own run. It lands at the right x on the
+    #                   right baseline, but the extractor returns it AFTER the rest of the
+    #                   line. Measured: the 10 fallback glyphs alone take the pair from 95.83
+    #                   to 98.29.
+    #   bidi            a source PDF's text layer holds Arabic in VISUAL order, a render holds
+    #                   it in LOGICAL order: the same 10 characters, reversed. Measured: the
+    #                   10 Arabic characters alone take the pair from 95.83 to 97.43.
+    # Remove both and the same pair reads 100.00. Neither is a lost character, and neither is
+    # this check's question - 22_reading_order owns order and read PASS on the same pair.
+    #
+    # So the verdict is the multiset, which is what "character accuracy" says it is, and the
+    # sequence ratio is kept as a number that can be printed but never decides. NFKC first,
+    # because a producer's ligature U+FB01 and an extractor's expansion "fi" are one glyph to
+    # a reader and two characters to a Counter; the same fold turns Arabic presentation forms
+    # back into the letters they stand for.
+    def _canon(s):
+        return unicodedata.normalize("NFKC", s)
+
+    s_cs, g_cs = _canon(_glyphs(s_runs)), _canon(_glyphs(g_runs))
+    common = sum((collections.Counter(s_cs) & collections.Counter(g_cs)).values())
+    ratio = round(100 * common / max(1, max(len(s_cs), len(g_cs))))
+    if os.environ.get("P2W_45_SEQUENCE"):
+        print("45_char_accuracy: multiset %d %%, sequence %d %%"
+              % (ratio, round(100 * difflib.SequenceMatcher(None, s_cs, g_cs,
+                                                            autojunk=False).ratio())),
+              file=sys.stderr)
     c["45_char_accuracy"] = (100, ratio, ratio >= 97)
 
     # ---- 46 text crossing a rule (per span) --------------------------------
@@ -2840,7 +2872,7 @@ def compare(src_path, gd_path, docx_path=None):
         if _xs:
             pdx[_pg] = round(median(_xs), 1)
             pdy[_pg] = round(median(_ys), 1)
-    blank_loss, extra_ink, s_grid_total = 0, 0, 0
+    blank_loss, s_grid_total = 0, 0
     for i in range(min(src.page_count, gd.page_count)):
         sp, gp = src[i], gd[i]
         W, H = sp.rect.width, sp.rect.height
@@ -2855,11 +2887,62 @@ def compare(src_path, gd_path, docx_path=None):
                          int((r["y"] - pdy.get(i, med_dy)) / ch)))
         s_grid_total += len(s_cells)
         blank_loss += len(s_cells - g_cells)
-        extra_ink += len(g_cells - s_cells)
     # tolerance is a fraction of the source's own occupied grid cells, not of its columns
     s_cells_total = max(1, s_grid_total)
     checks["29_blank_where_ink_was"] = (0, blank_loss, blank_loss <= max(4, int(s_cells_total * 0.10)))
-    checks["30_ink_where_blank_was"] = (0, extra_ink, extra_ink <= max(4, int(s_cells_total * 0.10)))
+
+    # ---- 30_ink_where_blank_was RETIRED 13 Nov -----------------------------
+    # It was 29's expression with the difference taken the other way round, on the same
+    # 24x24 lattice, the same per-page medians and the SAME denominator (the source's
+    # occupied cells) and the SAME floor (max(4, 10 % of them)). The ruler was the
+    # question, and the direction was not.
+    #
+    # WHAT IT MEASURED. One anchor point per SPAN - not ink area. A line of text 511 pt
+    # wide is one cell if the extractor returns it as one span; eight short words are
+    # eight cells (constructed: 16 added words at a 32 pt pitch came back as ONE span and
+    # scored 30 = 1, while 8 added words at a 65 pt pitch scored 30 = 8). Cells occupied
+    # by the render and not by the source, against max(4, int(0.10 * source cells)).
+    #
+    # THE RULER IS THE DEFECT, and it is measurable in both directions.
+    #   * A residual of 0.3 pt - a fifth of 18_displacement's 1.5 pt floor, 1/83 of a
+    #     cell - flips the verdict. Constructed, same 30-run page twice: five runs sitting
+    #     0.15 pt before a column edge, nudged 0.3 pt, read 30 = 5 and FAIL; the same five
+    #     runs sitting 0.15 pt past the edge, the same 0.3 pt nudge, read 30 = 0 and PASS,
+    #     and on both pairs every other live check passes.
+    #   * A displacement carried by the MAJORITY of runs is subtracted away by the median:
+    #     a 25 pt shift of 25 of 30 runs reads 30 = 5, because the median dx is 25 and the
+    #     correction undoes the shift it is supposed to expose. 43_within_10pt_x and
+    #     21_median_dx catch that document; 30 does not.
+    #   * The floor is not a fraction in practice: 153 of the 211 corpus documents hold
+    #     <= 45 occupied cells, so the floor is the constant 4 on 73 % of the corpus and
+    #     never exceeds 60. "10 % of cells" reads as "more than four cells" almost always.
+    #
+    # NO UNIQUE CLASS. Measured on the two recorded snapshots (RATCHET.json, 211 rows;
+    # RATCHET-20261112-095452.json, 208 rows), with the retired ids mapped to their live
+    # successors and the absorbed ones dropped: 30 fails 145 and 143 documents, and 0 of
+    # them is failed by nothing else. 27 documents fail 30 without failing 29, and all 27
+    # fail another live check. On the 208-row values, 13 of the 143 failures sit at
+    # exactly 5 cells against a floor of 4 - one cell over, the same 13 knife-edge
+    # documents 29 has.
+    #
+    # AND THE DIRECTION IS ALREADY COVERED, by checks that ask it of the thing itself:
+    # text added -> 05_words_extra and 45_char_accuracy (constructed: a word added in a
+    # blank row fails 45 and 30 reads 1 cell and passes; a band of eight added words fails
+    # 45 and 30); a run moved into
+    # blank space -> 43_within_10pt_x, 21_median_dx, 18_displacement, 47_margins,
+    # 60_text_column_right_edge; a rule or shape drawn where the source had none ->
+    # 32_stroke_lines, 14_filled_shapes, 59_shape_anchor; ink over ink -> 26_text_overlap;
+    # an image where there was none -> 08_image_count, 39_image_position, 48_image_area.
+    # 30's own proof mutation was mut_rule, which PROVE-GAPS.md already records as unable
+    # to fire this check ("one rule rarely occupies a cell").
+    #
+    # If the class "ink in a region the source left blank" is ever wanted as its own
+    # question, it is an INK-AREA question and needs a rasterised coverage test with a
+    # % -of-page tolerance, not an occupancy lattice: the lattice's answer is decided by
+    # where the anchor happened to fall, and the corpus contains no document whose only
+    # defect is of that class.
+    # 29 is on the same ruler and is still live in this tree; see the report that
+    # accompanies this patch.
 
     # 31 every page must carry some ink
     # A blank page in the source is legitimate; a blank page the source did not have is not.
