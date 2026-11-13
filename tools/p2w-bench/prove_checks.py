@@ -233,6 +233,69 @@ def mut_font(doc):
     doc[0].insert_text((72, 330), "different typeface", fontsize=11, fontname="tiro")
 
 
+def _face_class(name):
+    """serif / sans / mono, read off a PostScript face name.
+
+    Only used to choose a mutator's target, never to score anything: 53's own
+    SAME_FACE table is the authority on which names are the same family, and it
+    is not consulted here. Anything unrecognised is sans, which is what the
+    corpus is overwhelmingly made of.
+    """
+    n = (name or "").lower()
+    if any(k in n for k in ("courier", "mono")):
+        return "mono"
+    if any(k in n for k in ("times", "serif", "roman", "georgia", "garamond",
+                            "book", "century", "palatino", "cambria")):
+        return "serif"
+    return "sans"
+
+
+def mut_font_drop(doc):
+    """Re-draw every span in a face from a DIFFERENT style class.
+
+    53_embedded_faces counts the families the SOURCE draws with that the render
+    no longer draws with, so it can only fail when the render LOSES a family.
+    `mut_font` above ADDS one - "tiro" is Times-Roman, a serif - to a document
+    that already draws its own face. The intersection can only grow, so 53 could
+    not fail and had never been proved (PROVE-GAPS.md). This mutator goes the
+    one direction the comparison treats as a regression.
+
+    Each span is redacted and re-drawn at its exact baseline origin, at its own
+    size. Words, coordinates, sizes and page count are unchanged; only the drawn
+    family differs, and images and line art are explicitly kept so the fire is
+    attributable to the face rather than to something the redaction ate.
+
+    The target class is chosen from what the page actually draws. Drawing a sans
+    face over a sans document leaves SAME_FACE with the same family on both
+    sides - a correct conversion would then read as kept, and the mutation would
+    prove nothing. So a serif document is re-drawn sans, and a sans or mono
+    document is re-drawn serif; both land in a different bucket.
+
+    A document that draws no text at all cannot fire, by construction: `faces()`
+    returns an empty set, the check passes vacuously on `len(s_fa) == 0`, and no
+    mutation can change that. That is a property of the check, not of the
+    mutation, and is recorded in PROVE-GAPS.md.
+    """
+    target = {"serif": "helv", "sans": "tiro", "mono": "tiro"}
+    for p in doc:
+        sp = spans_of(p)
+        if not sp:
+            continue
+        seen = {}
+        for _, s in sp:
+            k = _face_class(s.get("font"))
+            seen[k] = seen.get(k, 0) + 1
+        want = target[max(seen, key=seen.get)]
+        for r, _ in sp:
+            p.add_redact_annot(r)
+        p.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE,
+                           graphics=fitz.PDF_REDACT_LINE_ART_NONE,
+                           text=fitz.PDF_REDACT_TEXT_REMOVE)
+        for r, s in sp:
+            p.insert_text(s["origin"], s["text"], fontsize=s["size"],
+                          fontname=want, color=(0, 0, 0))
+
+
 def mut_offpage(doc):
     p = doc[0]
     p.insert_text((p.rect.width + 60, p.rect.height + 60), "outside", fontsize=11)
@@ -831,7 +894,7 @@ CASES = {
     "50_annotations":           ("source", src_annot, BASE, "an annotation dropped"),
     "51_form_fields":           ("source", src_widget, BASE, "a form field dropped"),
     "52_outline":               ("source", src_toc, BASE, "the outline dropped"),
-    "53_embedded_faces":        ("render", mut_font, BASE, "a different face used"),
+    "53_embedded_faces":        ("render", mut_font_drop, BASE, "the drawn family lost"),
     "54_image_dpi":             ("render", mut_image_shrink, IMG_DOC, "the image resolution changed"),
     "55_orientation_mix":       ("render", mut_landscape, BASE, "the page turned landscape"),
     "56_rtl_runs":              ("source", mut_rtl, BASE, "a reversed run the render does not have"),

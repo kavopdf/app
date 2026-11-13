@@ -43,7 +43,7 @@ an image; it does not move one and does not necessarily change its dpi.
 | `42_alignment_mix` | **PROVEN** - `mut_alignment` centres every multi-line block | a uniform shift left the alignment counts identical | done: see below |
 | `44_header_footer` | `mut_header` | ran but did not fire; the band is 0.11/0.89 of page height | add a block inside the band |
 | `48_image_area` | `mut_image_shrink` | ran but did not fire; the floor is 50 % of the source area | shrink below half |
-| `53_embedded_faces` | `mut_font` | ADDS a face; the check counts families that were LOST | drop a drawn family |
+| `53_embedded_faces` | **PROVEN** - `mut_font_drop` re-draws every span in a face of another style class | `mut_font` ADDS a face; the check counts families that were LOST | done: see "53: it fires, and here is what it cannot see" below |
 | `54_image_dpi` | `mut_image_shrink` | resizing does not change pixels per inch | re-encode the image at a lower density |
 | `56_rtl_runs` | **PROVEN** - `mut_rtl` draws a reversed run on the source side | a shift does not change text direction | done: see below |
 | `59_shape_anchor` | none written | no case exists | move a run out of its enclosing shape |
@@ -155,3 +155,43 @@ verified firing with the lower fan-out.
 
 **And a duplicate pair worth recording:** `33_border_over_text` and `46_text_crossing_rule` co-fire
 in 16 of 58 cases. They are not two checks; they are one question asked twice.
+
+## 53: it fires, and here is what it cannot see (13 Nov)
+
+`53_embedded_faces` reads `kept = len(faces(source) & faces(render))` and passes while
+`kept >= max(1, len(s_fa) * 0.5)` (`verify_google.py:698-701`). The old case, `mut_font`, drew
+`"tiro"` - Times-Roman, a serif - into a render that already had its own face. The intersection can
+only grow, so the check could not fail and had never been proved.
+
+`mut_font_drop` goes the other way: every span is redacted and re-drawn at its exact baseline
+origin, at its own size, in a base-14 face from a DIFFERENT style class. Words, coordinates, sizes
+and page count are unchanged, and images and line art are kept through the redaction
+(`PDF_REDACT_IMAGE_NONE` / `PDF_REDACT_LINE_ART_NONE`), so the fire is attributable to the face.
+Measured with the shipped code on two real LibreOffice exports - a serif document re-drawn sans and
+a sans document re-drawn serif - 53 fires on both, `src=1 kept=0`, and only 18/47 move with it.
+
+The target class is read off the page (`_face_class`). A sans face drawn over a sans document lands
+in the same `SAME_FACE` bucket on both sides and the check rightly stays silent, so a serif document
+must be re-drawn sans and a sans or mono document re-drawn serif.
+
+**Two limits are properties of the check, not of the mutation, and neither is fixable in
+`prove_checks.py`:**
+
+1. **`SAME_FACE` is a bucket table, so no substitution inside a bucket is visible.** The buckets are
+   `arial <- {arial, arialps, helvetica, helveticaps, liberationsans}`,
+   `timesnewroman <- {dejavuserif, liberationserif, times, timesnew, timesnewroman, timesnewromanps,
+   timesroman}`, `couriernew <- {...}`, `verdana <- {dejavusans, verdana}`. So a serif rendered as
+   another serif reads `kept`. Of the seven substitutions the file's own comment records Google
+   making, four are invisible: Liberation Sans->ArialMT, DejaVu Sans->Verdana, Arial->ArialMT,
+   Times New Roman->TimesNewRomanPSMT. Only a CROSS-class substitution (DejaVu Serif->ArialMT,
+   Liberation Mono->ArialMT) or a name outside the table can fire.
+2. **The floor is 50 %, so a document can lose half its drawn families and still pass.** Measured:
+   a two-page document drawing two families, rendered with one of them lost entirely, reads
+   `src=2 kept=1` and passes.
+
+The mirror defect also exists: a name outside the table fires even when the substitution is
+sans -> sans, which the check's own comment calls "a rename, not a loss". Measured:
+Liberation Sans Narrow -> ArialMT reads `src=1 kept=0` and fires.
+
+A document that draws no text at all (`faces()` returns an empty set) passes vacuously and no
+mutation can change that.
