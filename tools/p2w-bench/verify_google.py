@@ -15,6 +15,17 @@ WHY THIS EXISTS
 USAGE
   python3 verify_google.py <source.pdf> <google-export.pdf> [--docx <engine.docx>] [--json out.json]
 
+  --docx is REQUIRED for a document whose source draws a raster picture. 54_image_dpi reads
+  the engine's resolution decision out of the .docx, and there is no other place it is
+  observable. Without a readable .docx it FAILS rather than passes: a check that returns
+  ok=True having measured nothing is a vote that can never be cast, and it used to hide a
+  real resolution loss on every document in the corpus. When the source draws no picture
+  there is nothing to measure, and that pass is genuine.
+
+  53_embedded_faces has the same defect and still passes unmeasured. It is not fixed here
+  because two cases in test_checks.py rely on that pass; the one-line change is recorded in
+  the round's patch notes.
+
 EXIT
   0 = all checks pass, 1 = one or more failed, 2 = could not run
 
@@ -1015,16 +1026,35 @@ def extra_checks2(src, gd, docx_path=None):
 
     s_d, g_d = img_dpi(src), img_dpi(gd)
     d_d = docx_image_dpi(docx_path) if docx_path else None
-    if d_d is None:
-        # No .docx to read. Google's number answers a different question, so it cannot
-        # fail this check - but say so on stderr rather than passing silently, because a
-        # run that forgets --docx measures nothing here and should be visible as such.
-        if s_d:
-            print("54_image_dpi: no .docx given, resolution unmeasured (render reads %s dpi, "
-                  "which is Google's export, not the engine's)" % g_d, file=sys.stderr)
-        c["54_image_dpi"] = (s_d, 0, True)
+    if s_d == 0:
+        # The source draws no raster picture, so there is no engine resolution decision
+        # this check could be wrong about. Nothing to measure and nothing to lose - a real
+        # pass, and the only pass this check may take without a .docx.
+        c["54_image_dpi"] = (s_d, d_d if d_d is not None else 0, True)
+    elif d_d is None:
+        # UNMEASURED IS NOT A PASS. Google's number answers a different question - it is
+        # the exporter's tier, not the engine's decision - so when no .docx can be read
+        # this check has measured NOTHING and has no verdict to cast. It used to return
+        # ok=True with a line on stderr, and that made it a vote that can never be cast:
+        # every run that did not pass --docx scored this check as a PASS on all 211
+        # documents, including documents whose .docx had genuinely lost resolution.
+        #
+        # Measured, 13 Nov, on 10_stamp_as_image: with a .docx whose picture had been
+        # shrunk 8x, `--docx` gives (source=344, render=43, ok=False) - a real fail. The
+        # same document with the same degraded .docx out of reach gives
+        # (source=344, render=0, ok=True). Same defect, opposite verdict, and the only
+        # difference is whether the verifier could see the file it was asked about.
+        #
+        # So it now fails, loudly: the score says it, not just a stderr line. render=-1
+        # marks "not measured" and is not a density - nothing downstream does arithmetic
+        # on it - so an unmeasured row can never be mistaken for a measured zero.
+        print("54_image_dpi: FAIL - cannot measure. No readable .docx, so the engine's image "
+              "resolution is unknown (the render reads %s dpi, which is Google's export tier, "
+              "not the engine's decision). Pass --docx <engine.docx>, or put it beside the "
+              "source (out1/<name>.docx next to all/<name>.pdf)." % g_d, file=sys.stderr)
+        c["54_image_dpi"] = (s_d, -1, False)
     else:
-        c["54_image_dpi"] = (s_d, d_d, s_d == 0 or d_d >= s_d * 0.6)
+        c["54_image_dpi"] = (s_d, d_d, d_d >= s_d * 0.6)
 
     # ---- 55 page count per size -------------------------------------------
     # A mixed-orientation document that comes out all one size is wrong even if
@@ -2898,7 +2928,10 @@ def main(argv):
         out = argv[argv.index("--json") + 1]
     # The .docx the engine wrote, when the caller has it. The pipeline keeps it beside the
     # source (out1/<name>.docx next to all/<name>.pdf), so it is looked for there too;
-    # without it 54_image_dpi cannot be answered and says so rather than failing.
+    # without it 54_image_dpi cannot be answered, and it now FAILS rather than passing
+    # silently. The fallback is a convenience, not the contract: it only finds the .docx in
+    # the two layouts the briefs use, so a run that reorganises its working directory loses
+    # the measurement without losing the argument - pass --docx explicitly.
     docx_path = None
     if "--docx" in argv:
         docx_path = argv[argv.index("--docx") + 1]
