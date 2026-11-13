@@ -103,6 +103,72 @@ public final class DocxWriter {
      */
     private static final float HAIRLINE_EM = 0.069f;
     /**
+     * WHICH LINE BOX A PARAGRAPH IS WRITTEN WITH - the one knob this experiment turns.
+     *
+     * <p>Two constructs place a flow line, and they are not the same question:
+     * <ul>
+     *   <li>{@code w:line = 1.38*size} + {@code lineRule="exact"} - the hairline above. Word and
+     *       LibreOffice honour it exactly; Google Docs does not implement "exact" and reads
+     *       {@code w:line} as 240ths of the face's line height, so it charges
+     *       {@code (1.38*size/240) * r * size} - quadratic in the type size.</li>
+     *   <li>{@code w:line="240"} + {@code lineRule="auto"} - the reader's own single line
+     *       height, {@code r * size}, with the remainder of the pitch in {@code w:before}.
+     *       Linear in the size, so it cannot compound by size; but {@code r} is the SUBSTITUTE
+     *       face's ratio, so it is only right for the face the reader actually picks.</li>
+     * </ul>
+     *
+     * <p>The transform is exact and intent-preserving: the engine solves a gap so that
+     * {@code before + line/20} is the pitch the page drew. Auto keeps that advance and only
+     * moves the remainder into {@code w:before}:
+     * {@code before' = before + line/20 - AUTO_LINE_EM*size}. The engine's own accounting
+     * (resync, fitPage) is left on the exact model, so the only variable between the two
+     * builds is the construct - not the placement.
+     *
+     * <p>Modes: {@code -Dp2w.lineRule=exact} (default, HEAD), {@code auto} (flow AND cells),
+     * {@code autoflow} (flow only; cells and anchored text boxes keep exact).
+     */
+    private static final int LINE_MODE = lineMode();
+    private static int lineMode() {
+        String v = System.getProperty("p2w.lineRule", "exact");
+        if ("auto".equals(v)) return 2;
+        if ("autoflow".equals(v)) return 1;
+        return 0;
+    }
+    /** The reader's own single line height, in em, for the face it substitutes. */
+    private static final float AUTO_LINE_EM =
+            Float.parseFloat(System.getProperty("p2w.autoEm", "1.15"));
+    /** Paragraphs whose auto remainder had to be floored at zero: leading tighter than 1.15 em. */
+    private static int autoFloorHits = 0;
+    private static boolean autoFlowLines() { return LINE_MODE != 0; }
+    private static boolean autoCellBoxes() { return LINE_MODE == 2; }
+
+    /** One paragraph's {@code w:spacing}, in the construct the mode selects. */
+    private static String spacing(int beforeTw, int lineTw, float size, boolean auto, boolean pageFirst) {
+        if (!auto) {
+            return "<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\""
+                    + beforeTw + "\" w:after=\"0\" w:line=\"" + lineTw
+                    + "\" w:lineRule=\"exact\"/>";
+        }
+        int boxTw = (int) Math.round(AUTO_LINE_EM * Math.max(1f, size) * TWIPS_PER_PT);
+        long b = (long) beforeTw + lineTw - boxTw;
+        // The PAGE'S FIRST LINE is the one line whose baseline is not carried by the pitch
+        // above it: it is placed absolutely, at `before` + LINE_BASE * box. Auto's box is
+        // 1.15 em against the hairline's 0.069 em, so at the same `before` its baseline
+        // lands LINE_BASE * (box - line) lower - measured on the 211-document corpus as a
+        // -3.1 pt median shift of the first line of every page and a -1.9 pt median on the
+        // lines below it, which is what 18_displacement was reading. Give it back here so
+        // the first line stays on its own y; the pitch below it is set by the NEXT
+        // paragraph's own before, so nothing else moves.
+        if (pageFirst) b += Math.round((1f - LINE_BASE) * (boxTw - lineTw));
+        if (b < 0) { b = 0; autoFloorHits++; }
+        return "<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\""
+                + b + "\" w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/>";
+    }
+
+    /** How many paragraphs the auto construct could not place without a floor. */
+    public static int autoFloorHits() { return autoFloorHits; }
+
+    /**
      * Where a shape's fill stops being a colour of its own and becomes a shade of the page.
      *
      * <p>HSL L of 0.72 is the point above which a filled band reads as a white patch on a dark
@@ -2661,9 +2727,7 @@ public final class DocxWriter {
                 // paragraphs was out of schema order. The tab stops themselves are unchanged.
                 .append("<w:tabs>").append(tabs).append("</w:tabs>")
                 .append("<w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"").append(beforeTw)
-                .append("\" w:after=\"0\" w:line=\"").append(lineTw)
-                .append("\" w:lineRule=\"exact\"/>")
+                .append(spacing(beforeTw, lineTw, size, autoFlowLines(), ctx.newPage))
                 // A row is laid out by its tab stops, so it must not also be centred or pushed
                 // right: justification would move the first field off the indent the stops are
                 // measured from.
@@ -3158,9 +3222,7 @@ public final class DocxWriter {
             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
         }
         sb.append("<w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"").append(beforeTw)
-                .append("\" w:after=\"0\" w:line=\"").append(lineTw)
-                .append("\" w:lineRule=\"exact\"/>")
+                .append(spacing(beforeTw, lineTw, b.size, autoFlowLines(), ctx.newPage))
                 .append("<w:ind w:left=\"").append(Math.max(0, leftTw - bandLeftTw(ctx, p.column)))
                 .append("\" w:right=\"").append(rightTw).append("\" w:firstLine=\"0\"/>");
         if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");
@@ -4574,10 +4636,7 @@ public final class DocxWriter {
                 inner.append("</w:tcPr>")
                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
                         .append("<w:snapToGrid w:val=\"0\"/>")
-                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
-                        .append(cellBeforeTw)
-                        .append("\" w:after=\"0\" w:line=\"")
-                        .append(cellBoxTw).append("\" w:lineRule=\"exact\"/>");
+                        .append(spacing(cellBeforeTw, cellBoxTw, cellSz, autoCellBoxes(), false));
                 if (insetTw > 0) inner.append("<w:ind w:left=\"").append(insetTw).append("\"/>");
                 inner.append("</w:pPr>");
                 if (!cell.isEmpty()) {
