@@ -30,6 +30,13 @@ been through all of them and its findings have been verified.
     python3 tools/p2w-bench/reflow.py --dir OUT
     python3 tools/p2w-bench/txt-guard.py snapshot --dir OUT --save S.json
     soffice --headless --convert-to pdf --outdir REND OUT/*.docx
+    # THE RENDERER IS A MEASUREMENT CHOICE, NOT A DETAIL (13 Nov). Everything this pipeline scores
+    # is LibreOffice's output. Every number stored before 13 Nov came from a Google Docs export.
+    # They are NOT comparable: one 211-document round split the same total into engine +230,
+    # instrument -1833 and renderer +1634. Google's export cannot be produced from this sandbox
+    # (the Drive upload path rejects a local file), so the renderer question is OPEN and any score
+    # must name the renderer that produced it.
+    # TRACE.md is written by build-engine.sh on every run. Do not commit it.
     python3 tools/p2w-bench/position.py --corpus DIR --out OUT --rendered REND \
             --baseline tools/p2w-bench/base208-position.json
 

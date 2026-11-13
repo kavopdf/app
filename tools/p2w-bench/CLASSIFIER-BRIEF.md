@@ -126,3 +126,58 @@ RULES
   Do not change app/src/**. Never touch BASELINE.md or RATCHET.json.
   Do not add or rename problem classes.
   Never estimate a number.
+
+
+---
+
+## 13 Nov 2026 - WHAT CHANGED UNDER YOU (read this before acting)
+
+**C1. THE UNIVERSE IS 45 CHECKS.** It was 59, then 54, then 49, then 48, then 47, and it is 45 now.
+Retired on 13 Nov: `03_word_count`, `09_font_names`, `11_bold_runs`, `12_italic_runs`, `15_links`,
+`16_numeric_runs`, `19_worst_dy`, `20_within_10pt`, `21_median_dx`, `29_blank_where_ink_was`,
+`30_ink_where_blank_was`, `33_border_over_text`, `41_block_spacing`, `50_annotations`.
+Redefined: `04`, `05`, `08`, `13`, `14`, `17`, `22`, `23`, `31`, `32`, `35`, `36`, `37`, `42`, `43`,
+`45`, `47`, `48`, `52`, `53`, `54`, `60`. NEVER quote a stored `x/59` score as current.
+
+**C2. THE HOP THAT DECIDES IS THE `.docx`, NOT THE RENDER.** Ten checks were found on 13 Nov reading
+an artifact the engine does not control - Google's fontconfig (`09`), Google's export tiers (`54`),
+the renderer's annotation objects (`50`), the renderer's widgets (`51`), the renderer's heading-derived
+outline (`52`), the renderer's link annotations (`15`/`40`), the renderer's span geometry (`37`).
+When you diagnose a class, ask first: **does `PdfToWord`/`DocxWriter` decide this, or does whoever
+rendered it?** If the latter, no engine change can move it and the check needs re-pointing, not fixing.
+
+**C3. LIBREOFFICE AND GOOGLE DOCS ARE NOT COMPARABLE.** The pipeline (PIPELINE.md step 6) renders with
+`soffice --headless`. A 211-document round measured the three effects of one change exactly:
+**engine +230, instrument -1833, renderer +1634** of the same total. Say which renderer produced any
+number you quote. A score taken on one is not evidence about the other.
+
+**C4. SIX CHECKS BEHAVE DIFFERENTLY AND YOU MUST NOT "FIX" THEM BACK.**
+- `54_image_dpi` FAILS LOUDLY when it has no `--docx`. That is not a bug; it used to score
+  "asked and could not answer" as a PASS on twelve documents.
+- `53_embedded_faces` and `37_super_subscript` read the `.docx`; without `--docx` they cannot measure.
+- `52_outline` compares the (level, title) TREE, not a count.
+- `50_annotations` is retired and replaced by `50_annotation_text`, which asks the `.docx`.
+- `15_links` is retired; `40_link_targets` compares URLs in a normalised form.
+Always pass `--docx out1/<name>.docx`.
+
+**C5. FIVE ENGINE DEFECTS ARE NAMED AND UNFIXED - these are yours, not a check's.**
+1. `w:sz` is written in HALF-POINTS, so a 6.2 pt line becomes 6.0 pt. 7 documents, measured:
+   `304_package_insert_small_print` right edge 291.7 -> 274.8.
+2. Justification is DROPPED. `310_court_judgment` carries 82.3 pt of space in the source line and
+   50.9 in the render; the source's 538.6 column edge becomes 506.7. 5 documents.
+3. Source lines are WELDED into one paragraph. `64_newspaper_uneven_columns_ad_boxes` has 77 source
+   lines and 21 docx paragraphs. 9 documents.
+4. `Table` carries font, size and colour but NO bold and NO italic (`PdfToWord.java:201-267`), so a
+   table cell loses them. `64_newspaper` loses 2 italic spans this way and `12_italic_runs` could not
+   see it. 1 document confirmed.
+5. An anchor inside a table cell is displaced by the RENDERER, which adds the cell's page origin to a
+   page-relative `wp:posOffset`. Measured +251.3/+71.7 pt on a controlled pair. 2 documents.
+Plus: `32_stroke_lines` loses 9 documents to ONE line - `PdfToWord.attachShapes` drops a thin stroke
+near a table and `DocxWriter.borders` then writes all six sides `nil` because `ruledTable` is false.
+The rule is measured, attributed, and thrown away. A fix was measured at 13 -> 4 with +6 passes.
+
+**C6. `ratchet.py` HAD AN ORDERING BUG AND IT IS FIXED.** It keyed the latest `.txt` row on
+`(round, engine)` and compared with `>=`, and `"22728b1" >= "2a68de6"` is FALSE - so a whole round of
+211 rows was discarded and the ratchet re-compared the PRE-round rows, printing PASS while 139
+documents had improved unseen. It now orders by write. If you see a `.txt` PASS you do not believe,
+check that the store's last line is the row being compared.

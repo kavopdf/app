@@ -1,3 +1,16 @@
+# 13 Nov 2026 - WHAT IS STILL MISSING, WITH THE NUMBER
+#
+# Three checks each have exactly ONE document in 211 that can exercise them, so no document can
+# ever fail two of them and their disjointness is a property of the corpus, not of the checks:
+#   50_annotation_text  -> 600_reviewed_invoice_with_annotations (6 annotations)
+#   51_form_fields      -> 601_fillable_admission_form (11 widgets, 3 carrying a value)
+#   52_outline          -> 602_bookmarked_annual_report (6 bookmarks, 3 survive)
+# 37_super_subscript has 1 document and 0 subscripts anywhere in the corpus.
+# 36_underline_rules, after its fix, asks its question on 2 of 211 - the corpus has ONE genuinely
+# underlined document.
+# WHAT WOULD FIX IT: at least two documents carrying a bookmark tree AND an annotation; two more
+# with a real underline; two with a subscript; two whose fields are half-filled.
+#
 # Documents that would actually help
 
 The corpus has 215 files. Only 52 contain a table, and only four are genuinely

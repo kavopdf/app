@@ -213,7 +213,7 @@ def read_scores_txt():
     if not os.path.exists(RESULTS_TXT):
         return out
     latest = {}
-    for line in open(RESULTS_TXT, encoding="utf-8"):
+    for _seq, line in enumerate(open(RESULTS_TXT, encoding="utf-8")):
         line = line.strip()
         if not line:
             continue
@@ -221,7 +221,12 @@ def read_scores_txt():
             e = json.loads(line)
         except Exception:
             continue
-        key = (e.get("round", 0), e.get("engine", ""))
+        # ORDER BY WRITE, NOT BY ENGINE NAME (13 Nov). This was (round, engine) compared with
+        # `>=`, and "22728b1" >= "2a68de6" is FALSE - so a whole round of 211 rows was
+        # silently discarded and the ratchet re-compared the PRE-round rows, never seeing
+        # the 139 documents that had improved. The line index is the only ordering a JSONL
+        # store has.
+        key = (e.get("round", 0), _seq)
         doc = e.get("doc")
         if not doc:
             continue

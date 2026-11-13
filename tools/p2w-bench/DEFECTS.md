@@ -336,7 +336,7 @@ not lost: the measurement is not to be touched until round 2 begins.
 | denominator | `total = 59` on all 200 rows — one corpus, one set of checks |
 | score arithmetic | `score == total - len(failed)` on all 200 — no drift |
 | values completeness | every row carries exactly 59 values — nothing sampled out |
-| control: a PDF against itself | **59/59** on five different documents — no check is over-strict |
+| control: a PDF against itself | **59/59** on five different documents — no check is over-strict. STALE (13 Nov): the universe is 45 checks now, not 59, and the round-2 trio's "both directions" test compared 601 with ITSELF, so both sides carried the same 11 widgets and 51 passed trivially — the path the pipeline actually runs was never tested and it FAILS (601: 51_form_fields source=11 render=0) |
 | reverse: two different PDFs | **35/59** and **42/59** — the checks do fire |
 | `test_checks.py` | 23/23 — every check tested on a pair that differs and a pair that does not |
 | `test_txt_checks.py` | 7/7 |
@@ -450,7 +450,7 @@ between rounds rather than at the very start.
 
 ### Verified
 
-A PDF against itself still scores **59/59** on five documents, so no threshold became
+A PDF against itself still scores **59/59** on five documents, so no threshold became (STALE 13 Nov: 59 is now 45, and the trio of 600/601/602 is one absence with three names — DocxWriter writes 0 w:hyperlink, 0 bookmarkStart, 0 fldChar, 0 sdt and no comments.xml across all 211 docx)
 over-strict. Two different PDFs still score 35/59. `test_checks.py` 23/23 and
 `test_txt_checks.py` 7/7 still pass, which means every check still fires on a pair that
 differs and still passes on a pair that does not.

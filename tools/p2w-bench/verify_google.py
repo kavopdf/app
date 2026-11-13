@@ -6,7 +6,10 @@ WHY THIS EXISTS
   Every earlier instrument lied. gate.py scores words, blocks, overflow, lines and
   pages, and none of those move when w:framePr is ignored or a header band lands at
   the wrong y. verify_visual.py renders through LibreOffice, which honours constructs
-  Google Docs does not, so it hides exactly the faults the phone shows. Three separate
+  Google Docs does not, so it hides exactly the faults the phone shows. NOTE (13 Nov): the
+  pipeline in PIPELINE.md step 6 renders with `soffice --headless`, so EVERY number this file
+  produces today is LibreOffice's, not Google's. The two are NOT comparable - a 211-document
+  round measured engine +230, instrument -1833 and renderer +1634 of the same total. Three separate
   fixes shipped "clean" and broke on the device.
 
   This one compares the PDF that Google Docs itself exports. If a word lands at the

@@ -46,7 +46,7 @@ an image; it does not move one and does not necessarily change its dpi.
 | `53_embedded_faces` | **PROVEN** - `mut_font_drop` re-draws every span in a face of another style class | `mut_font` ADDS a face; the check counts families that were LOST | done: see "53: it fires, and here is what it cannot see" below |
 | `54_image_dpi` | `mut_image_shrink` | resizing does not change pixels per inch | re-encode the image at a lower density |
 | `56_rtl_runs` | **PROVEN** - `mut_rtl` draws a reversed run on the source side | a shift does not change text direction | done: see below |
-| `59_shape_anchor` | none written | no case exists | move a run out of its enclosing shape |
+| `59_shape_anchor` | 8 cases, 18 PDFs (13 Nov) | `cases59/C0..C7` + `run_cases.py`; C2 (stamp moved, text left behind) FIRES, C1 (stamp moved WITH its text) correctly PASSES, C7 (frame in place + a band per line inside) falsely FAILS on the shipped predicate | repair the identity test: a box present within 2 pt must not be called `moved` |
 | `46_text_crossing_rule` | `mut_rule` | same as 33 - a duplicate of it | see 33 |
 | `33_border_over_text` | `mut_rule` | ran but did not fire; needs a THIN stroke crossing a span | see `_strokes`: a filled band, not a stroked line |
 | `50/51/52` | source-side drops | unproven on this corpus - it has no annotations, widgets or outline to drop | a document that has them |

@@ -46,7 +46,10 @@ touching Drive at all.
 
     d. curl the s3url to <work>/gd-<name>.pdf
 
-    e. python3 tools/p2w-bench/verify_google.py <source.pdf> gd-<name>.pdf --json out/<name>.json
+    e. python3 tools/p2w-bench/verify_google.py <source.pdf> gd-<name>.pdf --docx out1/<name>.docx --json out/<name>.json
+       (--docx is REQUIRED. 54_image_dpi, 53_embedded_faces and 37_super_subscript measure nothing
+       without it, and 54 scored 'asked and could not answer' as a PASS on twelve documents until
+       6bb9111 made it fail loudly.)
 
     f. delete the Google Doc (see Cleanup)
 
