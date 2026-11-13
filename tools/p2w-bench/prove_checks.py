@@ -614,24 +614,6 @@ def mut_superscript_removed(doc):
     return n
 
 
-def mut_superscript_flag(doc):
-    """37, additive: raise a run and set the flag.
-
-    PyMuPDF's insert_text cannot set bit 0 - measured, a run inserted 4.5 pt high
-    at 0.8 of the line size comes back with flags 4, not 5. The flag follows the
-    PDF text-rise operator `Ts` inside the SAME text object as a larger run, so
-    the run is written as a raw content stream. The check's count goes up and the
-    check still passes.
-    """
-    p = doc[0]
-    p.insert_text((10, 10), "seed", fontsize=6)
-    fname = p.insert_font(fontname="helv")
-    cs = ("BT /%s 8.9 Tf 60 560 Td (baseline run) Tj"
-          " 4.5 Ts /%s 7.1 Tf (7) Tj 0 Ts ET" % (fname, fname))
-    x = p.get_contents()[-1]
-    doc.update_stream(x, doc.xref_stream(x) + cs.encode())
-    return 1
-
 
 MARK_CHARS = "\u2022\u25cf\u25aa\u2023\u2043-*\u00b7"
 
@@ -715,8 +697,12 @@ WRONG_DIRECTION = {
     "35_rotation":         (mut_text_rotated, BASE, "text drawn with a rotated matrix"),
     "36_underline_rules":  (mut_rule_at_baseline, UNDERLINE_DOC,
                             "a rule drawn at a span's bottom edge"),
-    "37_super_subscript":  (mut_superscript_flag, "journal-2col-with-footnotes.pdf",
-                            "a run raised with Ts, flag set"),
+    # 37 has left this table. Under the old render-side clause a raised run added to the
+    # SOURCE could not fire it (the render kept its own geometry, so both sides counted
+    # one). 37 now asks the .docx for the vertical placement, so the same mutation fires
+    # it - correctly, because the .docx genuinely carries no placement for the new run.
+    # A mutation that SHOULD fire does not belong in the table of mutations that should
+    # not, and keeping it there would assert a false thing every run.
     "38_list_markers":     (mut_marker_added, "admission-form-labels-left-boxes-right.pdf",
                             "a line's first span retyped to start \"1. \""),
 }
@@ -939,6 +925,37 @@ def mut_line_pitch(doc, factors=(2.0, 1.6, 0.6)):
                 moves.append((fitz.Rect(sp["bbox"]), sp["text"], sp["size"],
                               sp["bbox"][0], (y0 + (yb - y0) * fac) - yb))
     _reflow(p, moves)
+
+
+def mut_docx_script(path):
+    """Rewrite the engine's .docx so every vertical placement is gone.
+
+    This is the mutation 37 needs and the one it never had. 37 used to strip the
+    superscript bit from the RENDER (mut_superscript_removed), which proved nothing
+    about the engine: a PDF has no such attribute, so removing it removed a baseline
+    offset that a render can be handed back just as easily. The attribute can only
+    exist in the .docx, in w:vertAlign or w:position, and that is what this removes -
+    every run left on its paragraph's baseline, which is exactly what a superscript
+    that lost its attribute is. Returns the path of the mutated copy.
+    """
+    import zipfile, re as _re
+    zin = zipfile.ZipFile(path)
+    xml = zin.read("word/document.xml").decode("utf-8")
+    before = len(_re.findall(r"w:vertAlign|<w:position ", xml))
+    if not before:
+        raise RuntimeError("no w:vertAlign or w:position in the .docx")
+    xml = _re.sub(r'<w:vertAlign [^/]*/>', '', xml)
+    xml = _re.sub(r'<w:position [^/]*/>', '', xml)
+    dst = os.path.join(WORK, "mut_37_%s.docx"
+                       % os.path.splitext(os.path.basename(path))[0])
+    zout = zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED)
+    for item in zin.infolist():
+        data = zin.read(item.filename)
+        if item.filename == "word/document.xml":
+            data = xml.encode("utf-8")
+        zout.writestr(item, data)
+    zout.close()
+    return dst
 
 
 def mut_docx_face(path):
@@ -1187,7 +1204,10 @@ CASES = {
     # 11_bold_runs RETIRED 13 Nov - a count of runs whose FACE NAME says bold, contradicted by
     # 34c (which reads the flag) on 22 of the 26 documents it failed. Its mutation below is
     # 34c's, and 34c's line still carries it. See verify_google.py, "11_bold_runs RETIRED".
-    "12_italic_runs":           ("render", mut_bold, BASE, "span styling changed"),
+    # 12_italic_runs RETIRED 13 Nov - the italic half of 11's defect: a count of runs whose
+    # FACE NAME says italic, on Google's export, contradicted by 34c, which reads the italic
+    # flag as part of `weight`. Its case here was 34c's mutation and could not fire it (on BASE
+    # it read source=1 render=0 ok=True). See verify_google.py, "12_italic_runs RETIRED".
     "13_text_colours":          ("render", mut_restyle, BASE, "30% of spans recoloured"),
     "14_filled_shapes":         ("render", mut_invisible, BASE, "a filled rectangle added"),
     "15_links":                 ("render", mut_drop_links, LINK_DOC, "every link removed"),
@@ -1224,8 +1244,13 @@ CASES = {
                                  "rotated lines redrawn upright"),
     "36_underline_rules":       ("render", mut_underline_removed, UNDERLINE_DOC,
                                  "every underline rule removed"),
-    "37_super_subscript":       ("render", mut_superscript_removed, SCRIPT_DOC,
-                                 "every superscript flag stripped"),
+    # 37 reads the .docx now, so its mutation has to be a .docx, like 53's. Its old
+    # mutation stripped the superscript bit off the render, which measured the renderer
+    # and not the engine: a PDF has no superscript attribute to strip, only a baseline
+    # offset, and any render can be given one back. mut_docx_script removes the only two
+    # elements that can carry the attribute, w:vertAlign and w:position.
+    "37_super_subscript":       ("docx", mut_docx_script, SCRIPT_DOC,
+                                 "every vertical placement stripped from the .docx"),
     "38_list_markers":          ("render", mut_marker_removed, MARKER_DOC,
                                  "every list marker removed"),
     "39_image_position":        ("render", mut_image_shrink, IMG_DOC, "the image moved"),

@@ -316,7 +316,7 @@ def cases():
         table(p, 72, 200, 3, 3)
         p.insert_link({"kind": fitz.LINK_URI, "from": fitz.Rect(60, 90, 300, 108),
                        "uri": "https://example.com/inv"})
-    out.append(("link dropped", with_link, no_link, ["15_links"], None))
+    out.append(("link dropped", with_link, no_link, ["40_link_targets"], None))
 
     # ---- 48 image area -----------------------------------------------------
     def with_image(p):

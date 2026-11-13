@@ -286,6 +286,105 @@ def colour_same(a, b):
 
 
 # ----------------------------------------------------------------------------
+# URL identity - the normalised form a link target must be compared in
+# ----------------------------------------------------------------------------
+# 40_link_targets compared two sets of URI STRINGS with `==`. A URI is not a byte
+# string: it reaches this comparison through a docx relationship and a LibreOffice
+# PDF export, so one target can arrive spelled differently. Constructed 13 Nov,
+# 44_coloured_underlined_hyperlinks as the source, ONE link changed and four
+# untouched - before this helper, four of the seven rows below were failures:
+#
+#   render's change to link 1                40 before   40 after
+#   (none)                                   pass        pass
+#   trailing "/" added to the path           FAIL        pass
+#   percent-encoded "-" in the path          FAIL        pass
+#   fragment "#section2" added               FAIL        pass
+#   host lowercased to mixed case            FAIL        pass
+#   default port :443 added                  FAIL        pass
+#   scheme rewritten https -> http           FAIL        FAIL   (deliberate)
+#   target changed to wrong.invalid          FAIL        FAIL
+#
+# This is the same defect shape as 13_text_colours' exact int equality, which
+# colour_same() replaced, and 36_underline_rules' too-wide rule match: a
+# comparison that is too literal.
+#
+# WHAT IS FOLDED is what RFC 3986 6.2.2-6.2.3 calls an equivalent REPRESENTATION
+# of one URI: case of scheme and host, a default port, the percent-encoding of an
+# UNRESERVED character, and an empty path against "/". Two further folds are
+# DELIBERATE EXCEPTIONS, named because they are what a docx round trip produces:
+# one trailing "/", and the fragment. RFC 3986 does not declare /a and /a/
+# equivalent, so that fold is a product decision, not a reading of the spec - it
+# is a constant here so it can be turned off.
+#
+# WHAT IS NOT FOLDED: the scheme. http://x and https://x can serve different
+# resources, and a converter that rewrites a scheme has changed the link - that is
+# a real defect and 40 must keep catching it. One constant, if that is ever wrong.
+from urllib.parse import urlsplit, urlunsplit
+
+URL_FOLD_TRAILING_SLASH = True
+URL_FOLD_FRAGMENT = True
+URL_FOLD_SCHEME = False           # True would merge http:// and https://
+
+_UNRESERVED = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~")
+_DEFAULT_PORTS = {"http": "80", "https": "443", "ftp": "21"}
+
+
+def _pct_decode_unreserved(s):
+    """Decode %XX only where the octet is an UNRESERVED character (RFC 3986 6.2.2.2).
+    %2F is left alone: decoding it would turn one path segment into two."""
+    out = []
+    i = 0
+    while i < len(s):
+        if (s[i] == "%" and i + 2 < len(s)
+                and all(c in "0123456789abcdefABCDEF" for c in s[i + 1:i + 3])):
+            ch = chr(int(s[i + 1:i + 3], 16))
+            out.append(ch if ch in _UNRESERVED else s[i:i + 3].upper())
+            i += 3
+        else:
+            out.append(s[i])
+            i += 1
+    return "".join(out)
+
+
+def url_key(u):
+    """The normalised identity of a link target. Not a resolver, and not a fetcher:
+    it never touches the network and never claims a URL is reachable."""
+    if u is None:
+        return None
+    s = u.strip()
+    if not s:
+        return None
+    try:
+        parts = urlsplit(s)
+        scheme = parts.scheme.lower()
+        if URL_FOLD_SCHEME and scheme in ("http", "https"):
+            scheme = "https"
+        host = parts.hostname or ""
+        port = parts.port
+        if port is not None and _DEFAULT_PORTS.get(scheme) == str(port):
+            port = None
+        netloc = host + (":%d" % port if port is not None else "")
+        if parts.username:
+            cred = parts.username
+            if parts.password:
+                cred += ":" + parts.password
+            netloc = cred + "@" + netloc
+        path = _pct_decode_unreserved(parts.path)
+        if not path:
+            path = "/"
+        elif URL_FOLD_TRAILING_SLASH and len(path) > 1 and path.endswith("/"):
+            path = path.rstrip("/") or "/"
+        query = _pct_decode_unreserved(parts.query)
+        frag = "" if URL_FOLD_FRAGMENT else _pct_decode_unreserved(parts.fragment)
+        return urlunsplit((scheme, netloc, path, query, frag))
+    except Exception:
+        # An unparseable URI is compared as written. Better a literal comparison on
+        # one odd target than a crash that reports nothing for the whole document.
+        return s
+
+
+
+# ----------------------------------------------------------------------------
 # the 31 checks
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -832,16 +931,122 @@ def extra_checks2(src, gd, docx_path=None):
     same = sum(1 for a, b in zip(s_sz, g_sz) if abs(a[0] - b[0]) <= 1.5 and abs(a[1] - b[1]) <= 1.5)
     c["49_page_size"] = (len(s_sz), same, s_sz and same == min(len(s_sz), len(g_sz)))
 
-    # ---- 50 annotations ----------------------------------------------------
-    # Links are counted elsewhere; sticky notes, highlights and free text are not.
-    def annots(doc):
-        n = 0
+    # ---- 50_annotations RETIRED 13 Nov -------------------------------------
+    # It asked the RENDER for PDF annotation OBJECTS. A .docx has none: its only
+    # annotation is a w:comment, which lives in word/comments.xml and is exported to PDF
+    # only when the exporter is told to, and then only as one /Text per comment. Three of
+    # the six kinds on the one document that failed it (600_reviewed_invoice_with_
+    # annotations) have no DOCX counterpart at all - a Highlight, an Underline and a
+    # StrikeOut are character FORMATTING in Word, never objects. So the ceiling was
+    # arithmetic, not engineering, and it is measured below.
+    #
+    # WHAT IT MEASURED. verify_google.py:835-844 counted every annotation whose type is
+    # not Link and not Widget, in the source and in the render, and demanded
+    # g_a >= max(1, int(s_a * 0.9)). On this document s_a = 6, g_a = 0, floor 5: FAIL by
+    # five, and no reachable number of annotations in a .docx gets within four of it.
+    #
+    # THE SIX, from the source (PyMuPDF, page 1):
+    #   Highlight  (294.7,221.1,461.3,236.9)  no /Contents
+    #   Underline  ( 47.3, 70.3,198.7, 82.7)  no /Contents
+    #   StrikeOut  (347.2,123.2,547.8,136.8)  no /Contents
+    #   Text       (523.0,132.0,539.0,148.0)  "Rate for HSN 8536 confirmed with PO."
+    #   FreeText   ( 48.0,384.0,378.0,414.0)  "Checked against PO 4471. Quantity on line 3
+    #                                          raised from 20 to 25."
+    #   Stamp      (377.0,383.6,517.0,420.4)  "Approved"
+    #
+    # THE ENGINE'S PATH, and it is the same for all six. PdfToWord.java:1565-1577
+    # (annotationContentsOf) returns ann.getContents() for every non-Widget annotation and
+    # nothing else; PdfToWord.java:518 appends those strings to the page's blocks as plain
+    # paragraphs at top=0. It never imports PDAnnotationMarkup and never reads
+    # getQuadPoints (grep over app/src/main/java/com/kavopdf/app/engine: no match), so the
+    # three markup annotations' geometry is not seen at all, and DocxWriter writes no
+    # w:highlight, no w:u and no w:strike (grep -c: 0), so it could not write their look
+    # either. DocxWriter.java:537-546 writes nine parts - [Content_Types].xml, _rels/.rels,
+    # word/document.xml, styles.xml, theme/theme1.xml, settings.xml, _rels/document.xml.rels,
+    # docProps/core.xml, docProps/app.xml - and word/comments.xml is not one of them.
+    #
+    # WHAT THAT COSTS, measured on the pair (ConvertAll, then soffice --headless
+    # --convert-to pdf, then this verifier):
+    #   * the three /Contents strings survive as TEXT, at x = 0.1 pt, y = 15.0 / 42.0 /
+    #     69.0 - the left margin of the first line - where the source had them at x >= 48
+    #     and y 132-420. Carried, and hoisted. 05_chars_extra reads 30 on this document
+    #     for exactly this reason: the words are in the render and not in the source's
+    #     text layer, because an annotation is not a text layer.
+    #   * the three markup annotations' INK is gone. The yellow is in the source only as
+    #     the Highlight's appearance stream (xref 79: "1 1 0 rg"), not in the page content
+    #     (the content stream contains no "1 1 0 rg"), so no text extractor can carry it;
+    #     the render's only fill colour is black. That is a real loss and it is NOT what
+    #     this check was counting.
+    #
+    # CAN THE TARGET FORMAT CARRY IT? Constructed and measured, so this is not an opinion.
+    # A .docx holding a real w:comment (word/comments.xml + commentRangeStart/End +
+    # commentReference) over a highlighted run, an underlined run and a struck-out run was
+    # rendered twice by the same soffice:
+    #   soffice --convert-to pdf                     -> 0 annotation objects
+    #   soffice --convert-to pdf, ExportNotes=true   -> 1 annotation object, /Text, carrying
+    #                                                   the comment's text
+    # The highlight, the underline and the strike came through both times as INK (the
+    # render's fills include (1,1,0) yellow) and never as objects. So the maximum a
+    # perfectly annotation-aware engine could score here is 1 of 6, against a floor of 5.
+    # And on the renderer this verifier is named for, the ceiling is 0: Google Docs' PDF
+    # download drops comments entirely (there is no include-comments option on Download or
+    # Print; the workaround everyone uses is to download .docx and print from Word with
+    # Print Markup). A check whose answer is set by the exporter's flags cannot be moved by
+    # a fix to the engine, which is the same argument that retired 53's render-side form and
+    # 54's.
+    #
+    # NO UNIQUE CLASS, by construction rather than by corpus count. No engine output can
+    # reach the floor, so removing the check cannot hide an engine regression - it can only
+    # stop reporting the renderer's export policy as an engine defect. What the class really
+    # is - markup ink lost, note text hoisted - is asked of the things themselves below and
+    # in 05_chars_extra, 14_filled_shapes and 13_text_colours.
+    #
+    # WHAT REPLACES IT, keeping the count at 47 and asking the .docx, which is the file the
+    # engine actually decides. Every annotation /Contents the source carries must appear as
+    # text in the engine's .docx. That is answerable, it is passable, and it is the only part
+    # of an annotation the target format can carry as text at all.
+    #
+    # NOT COVERED HERE, and deliberately not smuggled in: the markup ink. Grading it needs a
+    # rect-scoped ink test - is there fill or a rule inside this annotation's /Rect - and a
+    # new id, not this one. Written as an occupancy lattice it would be retired 29 and 30
+    # again, and the corpus has no document whose only defect is of that class.
+    def annot_texts(doc):
+        out = []
         for p in doc:
-            n += sum(1 for a in p.annots() if a.type[1] not in ("Link", "Widget"))
-        return n
+            for a in p.annots():
+                if a.type[1] in ("Link", "Widget"):
+                    continue
+                s = (a.info.get("content") or "").strip()
+                if s:
+                    out.append(s)
+        return out
 
-    s_a, g_a = annots(src), annots(gd)
-    c["50_annotations"] = (s_a, g_a, s_a == 0 or g_a >= max(1, int(s_a * 0.9)))
+    def docx_flat(path):
+        try:
+            z = zipfile.ZipFile(path)
+            x = z.read("word/document.xml").decode("utf-8", "replace")
+        except Exception:
+            return None
+        x = re.sub(r"<w:tab[^>]*/>", " ", x)
+        x = re.sub(r"</w:p>", "\n", x)
+        x = re.sub(r"<[^>]+>", "", x)
+        return re.sub(r"\s+", " ", x).strip()
+
+    s_at = annot_texts(src)
+    d_at = docx_flat(docx_path) if docx_path else None
+    if d_at is None:
+        # Same rule as 53 and 54: a run that forgot --docx measured nothing here, and must
+        # be visible as such rather than passing silently.
+        print("50_annotation_text: no .docx given, annotation text unmeasured", file=sys.stderr)
+        c["50_annotation_text"] = (len(s_at), 0, True)
+    else:
+        want = [re.sub(r"\s+", " ", s) for s in s_at]
+        carried = sum(1 for w in want if w in d_at)
+        if carried < len(want):
+            print("50_annotation_text: %d of %d annotation strings are not in the .docx: %s"
+                  % (len(want) - carried, len(want),
+                     "; ".join(repr(w[:40]) for w in want if w not in d_at)), file=sys.stderr)
+        c["50_annotation_text"] = (len(want), carried, carried == len(want))
 
     # ---- 51 form fields ----------------------------------------------------
     def fields(doc):
@@ -854,14 +1059,103 @@ def extra_checks2(src, gd, docx_path=None):
     c["51_form_fields"] = (s_f, g_f, s_f == 0 or g_f >= max(1, int(s_f * 0.9)))
 
     # ---- 52 outline / bookmarks -------------------------------------------
-    def outline(doc):
-        try:
-            return len(doc.get_toc())
-        except Exception:
-            return 0
+    # A bookmark tree is a STRUCTURE, and until 13 Nov this check counted ENTRIES.
+    # `len(doc.get_toc())` is one integer and the tree it came from is thrown away -
+    # levels, titles and page targets never reach the comparison. That is 32_stroke_lines
+    # again: counting objects where the object is the structure.
+    #
+    # MEASURED 13 Nov on the only corpus document that carries a tree,
+    # 602_bookmarked_annual_report (3 roots + 3 children, 6 entries, 3 pages), by
+    # building constructed renders and running them through this verifier: a renamed
+    # title, one entry promoted from level 2 to level 1, the whole tree flattened to six
+    # level-1 entries, all six titles replaced with different ones, and all six
+    # retargeted to page 1 each kept six entries and each PASSED. The only thing that
+    # could fire was a count below the 90 % floor, so on a six-entry tree exactly one
+    # lost entry is invisible (max(1, int(6 * 0.9)) = 5).
+    #
+    # What replaces it: the tree is read as an ordered sequence of (level, title) and
+    # compared to the source's entry for entry. Three states, not one -
+    #   no /Outlines             -> "none": the pair is not asked about a tree it never had
+    #   /Outlines it cannot walk -> "unreadable", and that FAILS. Measured: a First/Next
+    #                               cycle makes get_toc() return 0 entries with no
+    #                               exception, so "corrupt" and "absent" were the same
+    #                               value, and a corrupt source read as "nothing to lose"
+    #                               and short-circuited the whole check to pass.
+    #                               "asked and could not answer" is a FAIL, not a PASS -
+    #                               the rule 54_image_dpi was retired for.
+    # Page targets are reported in `detail` and NOT scored: a reflow that pushes a
+    # heading onto the next page moves its bookmark legitimately, and 01_page_count and
+    # 24_page_breaks already own pagination. Additions are not scored when the source had
+    # no tree, because Google's export builds heading bookmarks the source never carried
+    # (DEFECTS.md:375) and that is the exporter's decision, not a conversion loss.
+    def _t52(s):
+        return " ".join(unicodedata.normalize("NFC", s or "").split())
 
-    s_o, g_o = outline(src), outline(gd)
-    c["52_outline"] = (s_o, g_o, s_o == 0 or g_o >= max(1, int(s_o * 0.9)))
+    def _outline52(doc):
+        """(state, [(level, title, page)]) with state in {"tree", "none", "unreadable"}."""
+        try:
+            cat = doc.pdf_catalog()
+            has_outlines = "/Outlines" in doc.xref_object(cat, compressed=False)
+        except Exception:
+            has_outlines = False
+        try:
+            raw = doc.get_toc(simple=False)
+        except Exception:
+            return "unreadable", []
+        if not raw:
+            if not has_outlines:
+                return "none", []
+            # /Outlines is in the catalog and get_toc() still returned nothing: either a
+            # legal empty /Outlines dict (no /First) or a tree it refuses to walk.
+            try:
+                ref = doc.xref_get_key(cat, "Outlines")[1]
+                first = doc.xref_get_key(int(ref.split()[0]), "First")[1]
+            except Exception:
+                first = "null"
+            return ("unreadable", []) if first not in ("null", "") else ("none", [])
+        out = []
+        for e in raw:
+            try:
+                out.append((int(e[0]), _t52(e[1]), int(e[2])))
+            except Exception:
+                return "unreadable", []
+        return "tree", out
+
+    s_state, s_tree = _outline52(src)
+    g_state, g_tree = _outline52(gd)
+    s_shape = [(l, t) for l, t, _ in s_tree]
+    g_shape = [(l, t) for l, t, _ in g_tree]
+    if "unreadable" in (s_state, g_state):
+        ok52 = False
+        which = "source" if s_state == "unreadable" else "render"
+        d52 = "%s /Outlines is present and could not be walked - 0 entries is not the same as no outline" % which
+    elif s_state == "none":
+        # Nothing to preserve. Reported, never failed: see the note above.
+        ok52 = True
+        d52 = ("source has no outline; render adds %d entries (not scored)" % len(g_tree)
+               if g_tree else "neither side carries an outline")
+    elif s_shape == g_shape:
+        ok52 = True
+        moved = [(t, sp, gp) for (_, t, sp), (_, _, gp) in zip(s_tree, g_tree) if sp != gp]
+        d52 = ("tree preserved: %d entries, depth %d" % (len(g_tree), max(l for l, _ in g_shape)))
+        if moved:
+            d52 += "; %d bookmark(s) on a different page: %s" % (len(moved), moved[:4])
+    else:
+        ok52 = False
+        missing = [x for x in s_shape if x not in g_shape]
+        added = [x for x in g_shape if x not in s_shape]
+        flat = (len(s_shape) == len(g_shape) and len({l for l, _ in s_shape}) > 1
+                and len({l for l, _ in g_shape}) == 1)
+        d52 = "structure differs: %d -> %d entries" % (len(s_shape), len(g_shape))
+        if missing:
+            d52 += "; missing %s" % (missing[:4],)
+        if added:
+            d52 += "; added %s" % (added[:4],)
+        if flat:
+            d52 += "; whole tree flattened to one level"
+        elif not missing and not added:
+            d52 += "; same titles and count but the levels or the order changed"
+    c["52_outline"] = (len(s_tree), len(g_tree), ok52, d52)
 
     # ---- 53 embedded font names -------------------------------------------
     # 09_font_names counts distinct faces and allows the count to fall by 20 %; it never
@@ -1478,7 +1772,7 @@ def extra_checks2(src, gd, docx_path=None):
     return c
 
 
-def extra_checks(src, gd, s_runs, g_runs, pairs):
+def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     """Return checks 32-48. pairs is [(source_run, render_run), ...] already matched."""
     c = {}
 
@@ -1797,9 +2091,72 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
                             sup += 1
         return sub, sup
 
-    s_sc, g_sc = scripts(src), scripts(gd)
-    c["37_super_subscript"] = (s_sc, g_sc, all(
-        sv == 0 or gv >= max(1, int(sv * 0.9)) for sv, gv in zip(s_sc, g_sc)))
+    # WHERE THE ATTRIBUTE LIVES, AND WHY THIS CHECK NO LONGER LOOKS AT THE RENDER.
+    # A PDF has no superscript attribute. It has a font size and a baseline, and
+    # `scripts()` above reads exactly those two numbers. Measured 13 Nov on a probe
+    # document (probe.pdf, one page, seven rows): a run raised with the text-rise
+    # operator `Ts` and a run at the SAME 7.10 pt size and the SAME 4.50 pt rise placed
+    # by `Td` in its own text object are counted identically by `scripts()` - both read
+    # r = -0.506 em and both are scored as one superscript. PyMuPDF's own superscript
+    # flag agrees with neither distinction: it is set on both (flags & 1), and it is
+    # also set on a FULL-SIZE span 0.30 em above its line
+    # (academic-paper-ieee-2col-abstract) and on a full-size one 0.73 em above
+    # (400_comic_page_speech_bubbles). The flag is a geometric heuristic, not an
+    # attribute, so nothing on the source side can tell a script run from a merely
+    # raised one.
+    #
+    # The only two places the attribute can exist are w:vertAlign and w:position in the
+    # engine's .docx, and the engine writes neither (grep vertAlign over
+    # app/src/main/java/com/kavopdf/app/engine: 0 hits). So the render-side count this
+    # check used to make was asking the renderer a question the .docx never answered:
+    # on journal-2col-with-footnotes the engine turns each of the 3 markers into its OWN
+    # paragraph, positioned by w:spacing w:before, and the raise survives as paragraph
+    # position to within 0.04 pt (source y 180.14 -> render 180.10) while no line in the
+    # render holds two baselines at all (0 of 75). The old clause read that as 3 -> 0 and
+    # failed a conversion whose vertical placement is right.
+    #
+    # So 37 reads the .docx. What it asks: for a source that drew script runs, does the
+    # engine's file carry a vertical placement for them, and is that placement still
+    # inside the run's own paragraph? A run with neither element is a small run on the
+    # paragraph baseline - which is what a "superscript" that lost its attribute is.
+    def docx_script_marks(path):
+        """(runs carrying w:vertAlign or w:position, how many of those are alone)."""
+        try:
+            xml = zipfile.ZipFile(path).read("word/document.xml").decode("utf-8")
+        except Exception:
+            return None
+        flagged = alone = 0
+        for p in re.findall(r"<w:p[ >].*?</w:p>", xml, re.S):
+            runs = re.findall(r"<w:r[ >].*?</w:r>", p, re.S)
+            marks = [r for r in runs if "w:vertAlign" in r or "<w:position " in r]
+            if not marks:
+                continue
+            flagged += len(marks)
+            if len(runs) < 2:
+                alone += len(marks)
+        return flagged, alone
+
+    s_sc = scripts(src)
+    s_script = s_sc[0] + s_sc[1]
+    marks = docx_script_marks(docx_path) if docx_path else None
+    if s_script == 0:
+        # Nothing to preserve. This pass is genuine and is the same one 53 and 54 take.
+        c["37_super_subscript"] = (s_sc, 0, True)
+    elif marks is None:
+        print("37_super_subscript: FAIL - cannot measure. The source draws %d script run(s) "
+              "and the .docx was not given, so whether the engine carried their vertical "
+              "placement is unknown. The render cannot answer it: the engine expresses the "
+              "raise as paragraph position, not as a run attribute. Pass --docx <engine.docx>."
+              % s_script, file=sys.stderr)
+        c["37_super_subscript"] = (s_sc, 0, False)
+    else:
+        d_flag, d_alone = marks
+        ok = d_flag >= max(1, int(s_script * 0.9)) and d_alone == 0
+        if not ok:
+            print("37_super_subscript: %d script run(s) in the source, %d vertical placement(s) "
+                  "in the .docx, %d of those alone in their paragraph"
+                  % (s_script, d_flag, d_alone), file=sys.stderr)
+        c["37_super_subscript"] = (s_sc, d_flag, ok)
 
     # ---- 38 list markers ---------------------------------------------------
     # Two defects, both measured on 13 Nov:
@@ -1888,8 +2245,23 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
                     out.add(l["uri"])
         return out
 
+    # Compared in the NORMALISED form (url_key), not as strings - see the URL
+    # identity block above colour_same() for the seven constructed cases.
+    # The strictness is unchanged: the source set and the render set must still be
+    # the same set, so an invented target is still a failure. Only the SPELLING is
+    # normalised.
     s_l, g_l = link_targets(src), link_targets(gd)
-    c["40_link_targets"] = (len(s_l), len(s_l & g_l), s_l == g_l or (not s_l))
+    s_k = {url_key(u) for u in s_l}
+    g_k = {url_key(u) for u in g_l}
+    kept = len(s_k & g_k)
+    lost = sorted(s_k - g_k)
+    extra = sorted(g_k - s_k)
+    if lost:
+        print("40_link_targets: %d target(s) lost, e.g. %s" % (len(lost), lost[0]))
+    if extra:
+        print("40_link_targets: %d target(s) the source does not carry, e.g. %s"
+              % (len(extra), extra[0]))
+    c["40_link_targets"] = (len(s_l), kept, not s_k or (not lost and not extra))
 
     # 41_block_spacing RETIRED 13 Nov - it measured the extractor's block segmentation,
     # not the page. Kept here as the record of what it was and why it is gone.
@@ -2794,10 +3166,49 @@ def compare(src_path, gd_path, docx_path=None):
     #     05 pairs 20 of 83 runs and fails 17. Run LOSS is 17's question, run SEGMENTATION is
     #     what 02_text_run_count was retired for, and per-span weight is 34c's.
 
-    def italic_count(rs):
-        return sum(1 for r in rs if "italic" in norm_font(r["font"]) or "oblique" in norm_font(r["font"]))
-    checks["12_italic_runs"] = (italic_count(s_runs), italic_count(g_runs),
-                                abs(italic_count(s_runs) - italic_count(g_runs)) <= max(2, italic_count(s_runs) // 5))
+    # 12_italic_runs RETIRED 13 Nov. It is the other half of 11_bold_runs' defect, and it has
+    # that defect three times over plus one of its own:
+    #
+    #   - IT READS THE FACE NAME, 34c READS THE FLAG. italic_count() tested
+    #     `"italic" in norm_font(font)`; 34c compares `weight`, which runs() builds from
+    #     `flags & 16` and `flags & 2` (lines 75-76), so the ITALIC BIT was already matched
+    #     span for span by 34c. Two votes on one question is what retired 11 the same day.
+    #   - THE NAME READ IS LOSSY IN A WAY THE FLAG IS NOT. PyMuPDF cuts the face name in
+    #     get_text("dict") at 24 characters, so "LiberationSerif-BoldItalic" arrives as
+    #     "LiberationSerif-BoldItal" and contains neither "italic" nor "oblique". Measured on
+    #     62_two_col_newsletter_pull_quote: the render carries FIVE italic spans by flag and
+    #     the name test sees TWO - which is exactly the source=5 render=2 this check recorded
+    #     for that document. The three it could not see are the three bold-italic ones.
+    #     Nothing was lost; the face name was cut.
+    #   - IT IS A COUNT ON THE WRONG SIDE. It compared the source against the PDF Google Docs
+    #     exports, not against the .docx the engine writes - 09's and 53's correction. Measured
+    #     on the four documents that read render=0 (bank-statement-5-pages 5->0,
+    #     gst-invoice-multipage-item-table 3->0, mutual-fund-statement 3->0,
+    #     very-long-single-column-table 3->0): the engine's .docx carries <w:i/> on exactly the
+    #     source's italic runs (DocxWriter:3452), and rendering that .docx with a renderer that
+    #     honours w:i gives back 5, 3, 3 and 3 - the source counts, unchanged. The zero is
+    #     Google's naming of a substituted face, and no engine change could clear it.
+    #   - ITS SLACK IS BLIND AND IT FIRES ON A GAIN. The tolerance was `max(2, s // 5)`, so at
+    #     two italic runs a document could lose BOTH and pass. Constructed: two italic spans
+    #     against a render with none reads source=2 render=0 and PASSES, where three reads
+    #     3->0 and fails. And the two sides were global counts, not pairs, so a render that
+    #     keeps all three and adds three elsewhere reads 3->6 and FAILS with nothing lost.
+    #
+    # ITS PROOF WAS NEVER ITS OWN. prove_checks.py gave it 34c's mutation - mut_bold, 35 % of
+    # spans made bold - and mut_restyle inserts with fontname "hebo"/"helv", neither italic.
+    # Measured: on BASE that mutation reads 12 as source=1 render=0 ok=True, so the case could
+    # not fire it, while 34c read 72 % and fired. The harness never said so because 12 fired on
+    # real converted documents and real_evidence() counts that as proof - the only proof 12
+    # ever had was the false alarm.
+    #
+    # RETIRING IT MOVES NO VERDICT. 0 of the 211 rows of RATCHET.json fail 12 alone, and each
+    # of the six it failed carries 12 to 19 other failures.
+    #
+    # THE ONE THING IT WOULD HAVE CAUGHT AND DID NOT. A per-span italic loss small enough to
+    # stay inside 34c's 85 % floor - five italic spans out of 585 is 0.85 % - is caught by
+    # neither check. That is 34c's floor, not a second check's job: it is recorded here as
+    # 34c's known looseness, the way 46 records its 1 pt inset. Tightening it is a one-line
+    # change to 34c's predicate and belongs in a round that measures it, not in a retirement.
 
     # A SET, NOT A COUNT. This compared the NUMBER of distinct colours, so it could not see
     # a colour CHANGE: a span recoloured to a colour the document already uses leaves both
@@ -2904,9 +3315,44 @@ def compare(src_path, gd_path, docx_path=None):
     checks["14_filled_shapes"] = (int(round(s_area)), int(round(g_area)),
                                   not thin_pages and orphans == 0)
 
-    s_links = sum(len(p.get_links()) for p in src)
-    g_links = sum(len(p.get_links()) for p in gd)
-    checks["15_links"] = (s_links, g_links, s_links == 0 or g_links >= s_links)
+    # 15_links RETIRED 13 Nov. It counted LINK ANNOTATIONS, and the object is a SET
+    # OF TARGETS. Three separate measurements say so.
+    #
+    # 1. IT IS A DUPLICATE OF 40_link_targets, by this file's own test. 13_text_colours
+    #    records that criterion: "13 is NOT a duplicate of 34b... 13 fails 4 documents,
+    #    34b fails 2, and the two sets are disjoint." Measured over all 211 documents
+    #    of corpus-v1, 15 and 40 fail the SAME ONE document, 44_coloured_underlined_
+    #    hyperlinks, and pass the other 210. Not disjoint - identical.
+    #    And 40 pass implies 15 pass: corpus-v1 carries exactly 5 links in total, all
+    #    on that one page, all LINK_URI, all distinct (measured, pymupdf get_links over
+    #    211 files). With no duplicate URIs, 40's set equality forces g_links >= s_links.
+    #    There is no document on which 15 fires and 40 does not.
+    #
+    # 2. IT IS BLIND where 40 is not. Constructed 13 Nov: a render carrying the source's
+    #    five link rectangles with all five targets rewritten to https://wrong.invalid/N
+    #    reads 5 -> 5 and PASSES 15, while 40 reads 5 -> 0 and fails. A count cannot see
+    #    a retarget, which is the defect 40 exists to catch.
+    #
+    # 3. IT IS WRONG where 40 is right - it can FALSE-FAIL. Constructed 13 Nov: a source
+    #    with five annotations but only FOUR distinct targets (two links over the same
+    #    rect, the duplicate a Word-produced PDF commonly carries) against a faithful
+    #    render emitting one hyperlink per target reads 5 -> 4 and FAILS 15, while 40
+    #    reads 4 -> 4 and passes. The render lost nothing; the count lost an annotation.
+    #
+    # WHY NOT REDEFINE IT AS A SPAN CHECK INSTEAD. The gap both checks leave is that
+    # neither reads the link's RECTANGLE: a render with the right targets on the wrong
+    # spans passes both (constructed, 13 Nov). Measuring spans was considered and
+    # rejected for the reason 41_block_spacing and 47_margins were retired: a link
+    # rectangle is where the PRODUCER put the text, and a render that legitimately
+    # reflows moves it. That is the same mistake, one rectangle further on. If internal
+    # (GoTo) link fidelity is wanted, it is a different question and should be named as
+    # one - 15_links was never that question.
+    #
+    # The universe goes 47 -> 46 live checks and 44's defect class stops counting one
+    # real defect twice. Two follow-ups this patch does NOT make, because they are
+    # outside verify_google.py: prove_checks.py:1193's "15_links" case can now never
+    # fire (the same dead-entry state 02_text_run_count was left in), and
+    # test_checks.py:319 still expects ["15_links"] from the "link dropped" case.
 
     # 16_numeric_runs RETIRED 13 Nov. It counted RUNS CONTAINING A DIGIT, which is neither
     # the number of numbers nor their content:
@@ -3639,7 +4085,7 @@ def compare(src_path, gd_path, docx_path=None):
             empty_pages += 1
     checks["31_pages_lost_their_text"] = (text_pages, empty_pages, empty_pages == 0)
 
-    checks.update(extra_checks(src, gd, s_runs, g_runs, pairs))
+    checks.update(extra_checks(src, gd, s_runs, g_runs, pairs, docx_path))
     checks.update(extra_checks2(src, gd, docx_path))
 
     src.close()
