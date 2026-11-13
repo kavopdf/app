@@ -357,12 +357,44 @@ def extra_checks2(src, gd):
         return SAME_FACE.get(n, n)
 
     def faces(doc):
+        """The families this PDF actually DRAWS with - not the ones it merely declares.
+
+        p.get_fonts() returns the page's /Resources /Font dictionary: every face the page
+        COULD use, including one no glyph ever touches, including faces inherited from a
+        shared Resources on the Pages node (so every page reports every font in the
+        document), and including fonts reached only through a Form XObject. Measured on two
+        real corpus PDFs on 13 Nov, both carry a bare "Helvetica" in their resources and draw
+        it in zero spans.
+
+        That made the two sides of this check different measurements: the source side was
+        "families declared somewhere on a page", the Google side was "families Google drew".
+        A document could fail on a face nothing was drawn in, and no engine change could ever
+        fix it because there was nothing to fix.
+
+        Drawn spans on both sides is the honest comparison - the same question asked of both
+        files: which families does this document put ink on the page with.
+        """
         out = set()
         for p in doc:
-            for f in p.get_fonts():
-                fam = family(f[3])
-                if fam:
-                    out.add(fam)
+            drawn = False
+            try:
+                blocks = p.get_text("dict").get("blocks", [])
+            except Exception:
+                blocks = []
+            for b in blocks:
+                for line in b.get("lines", []):
+                    for span in line.get("spans", []):
+                        fam = family(span.get("font"))
+                        if fam:
+                            out.add(fam)
+                            drawn = True
+            if not drawn:
+                # An image-only page has resources and no spans. Fall back to the dictionary
+                # so such a page is not silently read as "no fonts, therefore fine".
+                for f in p.get_fonts():
+                    fam = family(f[3])
+                    if fam:
+                        out.add(fam)
         return out
 
     s_fa, g_fa = faces(src), faces(gd)
