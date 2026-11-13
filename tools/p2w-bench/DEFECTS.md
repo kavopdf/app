@@ -1737,3 +1737,60 @@ The next run that records an attempt cleanly and still has time left should show
 one claim**, and the trace should show no second `claim` line. That is the whole test. If it shows
 one attempt again, the loop is being skipped for a reason this change did not address, and the
 trace will say where it stopped.
+
+---
+
+## 37. A class with entangled causes cannot be fixed by a patch, and the rules did not say so
+
+The question was: if one patch cannot fix the whole class, how will the fixer ever fix it?
+
+The answer, as the rules stood, was **it cannot** — and not for a reason anyone had written down.
+
+### The arithmetic that blocks it
+
+    kept      the target checks pass on at least half the failing documents
+    improved  at least a third
+    reverted  less than a third, OR anything fell below its ratchet mark
+
+For `20_within_10pt`, 18 documents are failing. The table-spacer patch moved 3 — 17%, under a third
+— **and** regressed 4 checks. Either condition alone rejects it. A fix that moved half the documents
+but regressed one would also be rejected.
+
+So the ratchet's rule — never keep a change that made any document worse — combined with the
+outcome thresholds means **a partial fix can never be kept for a class whose causes are entangled.**
+
+### Why these causes are entangled
+
+The class lives in the vertical flow. Correcting a table's height moves every row under it, which
+moves where the page breaks, which changes `01_page_count`, `44_header_footer` and `59_shape_anchor`.
+Fixing one part of the flow moves the others. There is no separable slice.
+
+The night's three attempts are the proof: the spacer patch moved 3 of 18 and broke 4 checks; a
+refinement for zero-gap spacers moved the regressions from 4 to 3; a clamp did the same. Three
+attempts, each correct in its own terms, each rejected — because the cause was never separable from
+the layout around it.
+
+### What the brief now says
+
+STEP 2c asked "is this one cause?" and answered with subclusters. It now asks the question that
+actually decides the strategy:
+
+**INDEPENDENT** — fixing one leaves the others where they are. Work them one at a time.
+
+**ENTANGLED** — fixing one moves the others, so a partial fix regresses. Fix them **together in one
+change**, and say in HYPOTHESES.md that they are entangled so the next attempt does not start again
+from a patch.
+
+STEP 4's "Name ONE root cause" became "Name the root cause", with the exception spelled out: for an
+entangled class the correct unit of work is the whole model, not one cause inside it.
+
+### What this means for the round
+
+`20_within_10pt` may not close this round. Fixing it properly means correcting the vertical layout
+model — every element's height charged the way Google actually renders it, not one spacer at a time.
+That is a large change, and it may be the right one; it may also be more than a fixer attempt can
+hold. Either way the pipeline now has a way to say which situation it is in, instead of spending
+twenty-four attempts discovering it one rejection at a time.
+
+A class that ends the round parked with that finding is a better outcome than a class that ends it
+with twenty-four rejected patches and no statement of why.

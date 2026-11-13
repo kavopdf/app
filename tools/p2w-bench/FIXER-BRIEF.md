@@ -230,7 +230,23 @@ STEP 2c - CHECK WHETHER THE CLASS IS REALLY ONE CAUSE
   A class of 126 documents is rarely one defect. This splits it by the checks its documents ALSO
   fail and prints the groups largest first. If there are three groups, there are three causes,
   and a fix for the largest one will not move the others - say so rather than reporting the
-  whole class as hard. Work the largest group first.
+  whole class as hard.
+
+  THEN ASK THE QUESTION THAT DECIDES THE STRATEGY: ARE THE CAUSES INDEPENDENT OR ENTANGLED?
+
+  INDEPENDENT - fixing one leaves the others where they are. Work them one at a time; each fix moves
+  its own documents and regresses nothing, so each one can be kept or improved on its own.
+
+  ENTANGLED - fixing one moves the others, so a partial fix regresses. This is the case for anything
+  in the vertical flow: correcting a table's height moves every row under it, which moves the page
+  boundary, which breaks 01_page_count and 44_header_footer. A partial fix here can NEVER pass the
+  ratchet, however correct it is for the documents it was aimed at.
+
+  If they are entangled, say so in HYPOTHESES.md and fix them TOGETHER in one change. Do not spend
+  the day submitting partial patches that each regress - on 13 Nov three attempts went to exactly
+  that: the table-spacer patch moved 3 of 18 documents and broke 4 checks, twice, then a clamp moved
+  the regressions from 4 to 3 and was rejected too. Three attempts, one cause, no path, because the
+  cause was not separable from the layout around it.
 
 STEP 3 - CALIBRATE BEFORE YOU TOUCH CODE  ** NOT OPTIONAL **
   Build the smallest docx that isolates the one variable the class depends on, in three variants.
@@ -270,7 +286,12 @@ STEP 4 - UNDERSTAND IT - AND DO NOT RE-MEASURE WHAT IS ALREADY MEASURED
   and where.
 
   Instrument it: dump the boxes, the line boxes, the OOXML you emit, and compare against what
-  the PDF actually contains. Name ONE root cause.
+  the PDF actually contains. Name the root cause.
+
+  "One root cause" is right for a class that has one. It is wrong for a class whose causes are
+  entangled - there the correct unit of work is the whole model, not one cause inside it, and a
+  change that fixes one part while leaving the rest will be rejected for the regressions it causes.
+  If STEP 2c said entangled, the change you write must move the whole thing at once.
 
 STEP 4b - RESEARCH, BUT NEVER AS PROOF
   When: 20 minutes stuck, or when the fix rests on an assumption about Google Docs that nobody has
