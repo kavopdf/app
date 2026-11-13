@@ -1106,9 +1106,14 @@ def compare(src_path, gd_path):
     # mutating a real document upward and watching this check stay green.
     checks["18_median_dy"] = (0, med_dy, abs(med_dy) < 3.0)
     checks["19_worst_dy"] = (0, worst_dy, worst_dy < 15.0)
-    # With no matched runs there is nothing to be within 10 pt of; reporting 0 %
-    # made a blank or text-free page fail for having no text to measure.
-    checks["20_within_10pt"] = (100, within10, (not dys) or within10 > 95)
+    # With no matched runs there is nothing to be within 10 pt of - but ONLY if the source had
+    # nothing either. The old rule passed on an empty dys whatever the source held, so a render
+    # that lost every run scored 100 %. Measured 13 Nov: 15_stamp_on_scanned_page has an empty
+    # render text layer, 0 words against 5, fails 31_pages_lost_their_text and 04_words_missing,
+    # and PASSED here at 100 with render=0 - the worst false clean in the corpus. A document
+    # whose text is all gone is not a document whose text is well placed.
+    checks["20_within_10pt"] = (100, within10,
+                                within10 > 95 and (bool(dys) or not s_runs))
     checks["21_median_dx"] = (0, med_dx, abs(med_dx) < 3.0)
 
     # reading order: the sequence of normalised words
