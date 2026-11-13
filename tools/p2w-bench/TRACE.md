@@ -173,3 +173,4 @@ claim and after each step; it is not code and cannot break anything.
 | 13 Nov 08:45 | fixer | attempt | 20_within_10pt (+4) -> error (OPEN) |
 | 13 Nov 08:45 | fixer | ratchet | held or rose |
 | 13 Nov 08:45 | ? | commit-gate | started |
+| 13 Nov 09:45 | fixer | claim | fixer claimed the slot |
