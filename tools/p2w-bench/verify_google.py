@@ -20,10 +20,11 @@ EXIT
 
 THRESHOLDS (a document passes only if every one holds)
   completeness  every count and every style attribute matches the source
-  position      one displacement standard: on every page, the number of runs further
-                than clamp(0.35*size, 1.5, 4.5) pt from their source baseline must not
-                exceed max(2, ceil(0.05*n)) (18_displacement); the single worst run must
-                also be under 15 pt (19_worst_dy); order > 95 %
+  position      ONE displacement standard, one check, three clauses (18_displacement):
+                on every page the number of upright runs further than
+                clamp(0.35*size, 1.5, 4.5) pt from their source baseline must not exceed
+                max(2, ceil(0.05*n)); no page may have every run out; and no single upright
+                run may be more than twice its own tolerance out. Order > 95 %
   visual        no invisible text, no text-on-text, no page overflow, no extra page
 """
 import os, sys, json, re, collections, statistics, difflib, math, zipfile
@@ -2309,12 +2310,24 @@ def compare(src_path, gd_path, docx_path=None):
     # question. An empty page stays a failure - the old rule passed a render with no text layer
     # at all (15_stamp_on_scanned_page) by scoring 0 of 0.
     #
-    # It does NOT replace 19_worst_dy, and 19 is why the universe goes 57 -> 56 and not 55. A
-    # count with a 5 % budget is blind to ONE catastrophic run by construction: a single run
-    # 289.3 pt out of 200 is n_out = 1 and passes here. 361_product_catalogue_grid is exactly
-    # that document, and 19 is the check that catches it. Bulk and tail are two questions;
-    # asking both in one gives one fault two votes and loses the tail (the same reasoning 20
-    # used when it chose p90 over max).
+        # IT ABSORBS 19_worst_dy. 19 was not a second question: it was max() of the same list this
+    # check counts, taken over a WIDER population (every matched pair, including the rotated runs
+    # excluded two paragraphs up), against a fixed 15 pt. Measured on 208 recorded documents
+    # (RESULTS.jsonl, engine 2a68de6): 160 failed both and 13 failed 19 alone, and of those 13 a
+    # lower bound on n_out already exceeds the per-page budget on 11 - so 19's own unique class
+    # was at most 2 documents, both the one-catastrophic-run shape 361_product_catalogue_grid has.
+    # Keeping it as a second check bought those two and charged every one of the 160 a second
+    # point for one fault. Its clause is kept, inside this check, and its threshold is tied to
+    # this check's own tolerance instead of to a number from a different standard.
+    #
+    # The pair also left a HOLE, which is the part that was never a question of taste. 18's count
+    # budget absorbs one stray run and 19 did not look below 15 pt, so a single run 4.6 pt out and
+    # a single run 14.9 pt out were caught by NEITHER (constructed, both, /scratch/work/matrix.py).
+    # One standard cannot leave a band of the thing it measures unjudged: a run more than
+    # TAIL_FACTOR of its own tolerance out is a displaced page whatever the budget says.
+    #
+    # 19's rounding went with it: it compared round(max|dy|, 1) against 15.0, so 14.96 pt failed
+    # and 14.90 pt passed - a threshold at 14.95 that no comment in the file ever claimed.
     flat = set()
     for i, p in enumerate(src):
         for blk in p.get_text("dict")["blocks"]:
@@ -2330,10 +2343,25 @@ def compare(src_path, gd_path, docx_path=None):
     def _tol(size):
         return min(max(0.35 * size, 1.5), 4.5)
 
+    # The tail clause. It replaces 19_worst_dy, which asked the same question of the same
+    # list at a fixed 15 pt and so left the band between this check's cap (4.5 pt) and its
+    # own threshold unjudged for every run the budget forgives.
+    TAIL_FACTOR = 2.0
     bad_pages = []
     for pg in sorted(set(r["page"] for r in s_runs)):
+        flat_src = [r for r in s_runs
+                    if r["page"] == pg and (r["page"], r["y"], r["text"]) in flat]
         ds = [(g["y"] - r["y"], r["size"]) for r, g in pairs
               if r["page"] == pg and (r["page"], r["y"], r["text"]) in flat]
+        # No upright run on the page is not the same as no text on the page. A page whose
+        # every line is rotated or curved lands here with ds empty, and it used to be scored
+        # as a displaced page: constructed, a fully rotated page against ITSELF failed this
+        # check while 19 read 0.0. Those runs are 35_rotation's question.
+        if not flat_src:
+            continue
+        # Upright text on the page and none of it matched: the render lost the page. That is
+        # still a failure here - 15_stamp_on_scanned_page was passed by a render with no text
+        # layer at all when this scored 0 of 0.
         if not ds:
             bad_pages.append(pg)
             continue
@@ -2341,10 +2369,11 @@ def compare(src_path, gd_path, docx_path=None):
         # The 2-run grace is for STRAY runs, so it may not swallow a page that has been moved
         # as a block: a two-run page shifted 12 pt is n_out == n == 2, and a bare
         # max(2, ...) passed it. Everything out is a displaced page whatever its run count.
-        if n_out > max(2, -(-len(ds) * 5 // 100)) or n_out == len(ds):
+        worst_here = max(abs(d) / _tol(sz) for d, sz in ds)
+        if (n_out > max(2, -(-len(ds) * 5 // 100)) or n_out == len(ds)
+                or worst_here > TAIL_FACTOR):
             bad_pages.append(pg)
     checks["18_displacement"] = (0, len(bad_pages), not bad_pages)
-    checks["19_worst_dy"] = (0, worst_dy, worst_dy < 15.0)
     checks["21_median_dx"] = (0, med_dx, abs(med_dx) < 3.0)
 
     # reading order: the sequence of normalised words

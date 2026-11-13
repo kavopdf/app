@@ -142,8 +142,30 @@ def cases():
     # A uniform 12 pt shift is far outside clamp(0.35*size, 1.5, 4.5) at this document's
     # type size, so every run on the page is out and the page's budget of
     # max(2, ceil(0.05*n)) cannot absorb it. 18_displacement owns a uniform offset.
-    # (19_worst_dy is silent here on purpose: 12 pt is under its 15 pt tail threshold.)
     out.append(("text shifted 12pt", base, shifted, ["18_displacement"], None))
+
+    # ---- 18's tail clause: one run, however few ----------------------------
+    # The count budget forgives a single stray run by construction, so a page whose only
+    # fault is one run far out is the tail clause's case. It used to be 19_worst_dy's case
+    # and 19 was max() of the same list, so nothing here distinguished them; 19 is gone and
+    # this case now proves the clause that replaced it.
+    def rows(p, wild=0):
+        for i in range(24):
+            dy = wild if i == 12 else 0
+            text(p, 72, 100 + 24 * i + dy, "row %02d amount 4,500" % i)
+    out.append(("one run of 24 out 20pt", lambda p: rows(p), lambda p: rows(p, 20),
+                ["18_displacement"], None))
+
+    # ---- 18 must not fail a page it cannot see -----------------------------
+    # A page whose every line is rotated has no upright run, so it contributes nothing to
+    # the population 18 measures. It used to be scored as a displaced page: constructed, a
+    # fully rotated page against ITSELF failed 18 while 19 read 0.0. 35_rotation owns those
+    # runs. This asserts the false positive stays gone.
+    def all_rotated(p):
+        for i in range(6):
+            p.insert_text((72, 100 + 24 * i), "vertical marker %02d" % i, fontsize=11,
+                          fontname="helv", rotate=90)
+    out.append(("every line rotated, identical", all_rotated, all_rotated, [], "all"))
 
     # ---- 21/43 horizontal shift -------------------------------------------
     def shifted_x(p):
@@ -348,6 +370,14 @@ def run(verbose=False):
             if failed:
                 ok = False
                 why.append("nothing should fail, but %s did" % ", ".join(sorted(failed)))
+        elif allow:
+            # The docstring above has always promised this: a check named in `allow` must NOT
+            # be in `failed`. The code only ever implemented the "all" form, so every case
+            # that passed a list was silently asserting nothing about it.
+            for e in allow:
+                if e in failed:
+                    ok = False
+                    why.append("%s should not fire but did" % e)
         results.append((name, "PASS" if ok else "FAIL", "; ".join(why), sorted(failed)))
 
     width = max(len(r[0]) for r in results) + 2
