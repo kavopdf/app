@@ -130,3 +130,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 13 Nov 11:05 | baseline | started | phase measure |
 | 13 Nov 11:06 | baseline | slot claimed - baseline running |
 | 13 Nov 11:08 | baseline | measured 600_reviewed_invoice_with_annotations 43/59 docx, 4/5 txt |
+| 13 Nov 11:09 | baseline | measured 601_fillable_admission_form 44/59 docx, 4/5 txt |
