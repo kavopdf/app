@@ -12,9 +12,26 @@
       "at": "2026-11-12 09:56",
       "phase": "classify",
       "round": 1
+    },
+    {
+      "at": "13 Nov 10:26",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-13 10:27",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "13 Nov 10:28",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
     }
   ],
-  "phase": "fix",
+  "phase": "measure",
   "round": 1,
   "rounds_total": 3,
   "started": 1794327166

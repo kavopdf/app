@@ -331,6 +331,41 @@ def main(argv):
         print("round forced to %d, phase measure" % n)
         return 0
 
+    if "--remeasure" in argv:
+        """Put the round back into measure WITHOUT closing it.
+
+        WHY THIS EXISTS. The only way out of phase 'fix' was --close-round, which archives the
+        round and blanks every score. That is right when a round is finished and wrong when the
+        engine itself changed underneath it: on 13 Nov three commits fixed ten defects - seven in
+        the checker and three in DocxWriter.faceName - and the engine id changed with them, so
+        every row in BASELINE.md and every class in DEFECT-CLASSES.md now describes an engine
+        that no longer exists. Fixing against that list would be fixing against a ghost.
+
+        Re-measuring is not a new round. The round number, the attempts ledger and the hypothesis
+        ledger all stay; only the phase moves, so the baseline cron can re-measure the corpus on
+        the engine that is actually in the tree. It is logged in RUN-LOG.md with the engine id,
+        because "why did the phase go backwards" is a question someone will ask.
+        """
+        try:
+            eng = subprocess.check_output(
+                ["git", "log", "-1", "--format=%h", "--",
+                 "app/src/main/java/com/kavopdf/app/engine/"],
+                cwd=os.path.dirname(HERE), stderr=subprocess.DEVNULL).decode().strip()
+        except Exception:
+            eng = "unknown"
+        s = load()
+        was = s.get("phase")
+        s["phase"] = "measure"
+        s["baseline_started"] = 0
+        s.setdefault("history", []).append(
+            {"at": ist("%d %b %H:%M"), "phase": "measure", "round": s.get("round"),
+             "why": "engine changed - re-measure before fixing"})
+        save(s)
+        print("phase %s -> measure (round %s kept)" % (was, s.get("round")))
+        print("engine at HEAD for app/src/.../engine/: %s" % eng)
+        print("the baseline cron will now re-measure the corpus on this engine")
+        return 0
+
     if "--advance" in argv:
         phase = s["phase"]
 
