@@ -305,6 +305,26 @@ def extra_checks2(src, gd):
             if n.endswith(suf):
                 n = n[:-len(suf)]
                 break
+        # A PDF names a face two ways, exactly as DocxWriter.faceName() says: "Liberation
+        # Sans Bold" (a space, the PostScript full name) and "LiberationSans-Bold" (a hyphen,
+        # the family-with-style form). Only the hyphen form was stripped here, so on this
+        # corpus - whose PDFs are almost all the space form - the family stayed the string
+        # "liberation sans bold", never matched SAME_FACE, and could not equal anything Google
+        # renders. 53_embedded_faces therefore read kept=0 on 157 of 208 documents no matter
+        # what the engine wrote, and the 12 Nov mapping attempt was ruled out by this blind
+        # instrument rather than by its own result. Bold is a style of the same family, not a
+        # different family.
+        for suf in (" bold italic", " bold oblique", " italic", " oblique", " bold",
+                    " regular", " roman", " normal"):
+            if n.endswith(suf):
+                n = n[:-len(suf)]
+                break
+        # The keys above are written space-free ("liberationsans"), because the hyphen form
+        # "LiberationSans-Bold" collapses to that once the style suffix is gone. The space
+        # form collapses to "liberation sans" instead and misses the table entirely, so the
+        # internal space has to go too. Families carry no meaningful space for this
+        # comparison and both sides are normalised identically, so this stays symmetric.
+        n = n.replace(" ", "")
         return SAME_FACE.get(n, n)
 
     def faces(doc):

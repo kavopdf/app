@@ -101,3 +101,12 @@ everything else: what went wrong in the work itself.
   came out `2a68de6-d5215cb`, which already held 20 rows. `git diff ... | sha1sum` is computable
   BEFORE a build - do it, and `grep` the id in `RESULTS.jsonl`, before spending a slot re-measuring
   a state that is already on the record. Cost: one slot's measurement time for zero new rows.
+
+- **A normaliser that cannot parse the corpus's own naming convention makes a whole class
+  unfixable and rules out correct theories.** `verify_google.py`'s `family()` stripped
+  hyphenated style suffixes (`LiberationSans-Bold`) but not the space form
+  (`Liberation Sans Bold`) that this corpus's PDFs actually carry, and its `SAME_FACE` keys
+  are space-free — so the family stayed the string "liberation sans bold", matched nothing
+  Google renders, and 53_embedded_faces read `kept=0` on 157 of 208 documents whatever the
+  engine wrote. The 12 Nov mapping theory was recorded RULED OUT by that blind instrument.
+  Before trusting a class of >50 % of the corpus, print the two value sets the check compares.

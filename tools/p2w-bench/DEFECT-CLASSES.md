@@ -15,9 +15,9 @@ parked as not converging. A parked class is skipped by the fixer and kept here w
 
 | # | class | documents | share | checks in class | attempts | requeues | status |
 |---|---|---|---|---|---|---|---|
-| 1 | 20_within_10pt (+4) | 203 | 98% | 20_within_10pt, 18_median_dy, 19_worst_dy, 22_reading_order, 30_ink_where_blank_was | 13 | 0 | OPEN |
+| 1 | 20_within_10pt (+4) | 203 | 98% | 20_within_10pt, 18_median_dy, 19_worst_dy, 22_reading_order, 30_ink_where_blank_was | 14 | 0 | OPEN |
 | 2 | 47_margins | 203 | 98% | 47_margins | 3 | 0 | OPEN |
-| 3 | 53_embedded_faces | 157 | 75% | 53_embedded_faces | 0 | 0 | OPEN |
+| 3 | 53_embedded_faces | 141 | 68% | 53_embedded_faces | 1 | 0 | OPEN |
 | 4 | 32_stroke_lines | 135 | 65% | 32_stroke_lines | 0 | 0 | OPEN |
 | 5 | 29_blank_where_ink_was | 134 | 64% | 29_blank_where_ink_was | 0 | 0 | OPEN |
 | 6 | 59_shape_anchor | 121 | 58% | 59_shape_anchor | 0 | 0 | OPEN |
@@ -33,7 +33,7 @@ parked as not converging. A parked class is skipped by the fixer and kept here w
 | 16 | 17_matched_runs | 53 | 25% | 17_matched_runs | 0 | 0 | OPEN |
 | 17 | 05_words_extra | 45 | 22% | 05_words_extra | 0 | 0 | OPEN |
 | 18 | 06_table_columns | 42 | 20% | 06_table_columns | 0 | 0 | OPEN |
-| 19 | 14_filled_shapes | 35 | 17% | 14_filled_shapes | 0 | 0 | OPEN |
+| 19 | 14_filled_shapes | 36 | 17% | 14_filled_shapes | 0 | 0 | OPEN |
 | 20 | 27_text_off_page | 31 | 15% | 27_text_off_page | 0 | 0 | OPEN |
 | 21 | 35_rotation | 30 | 14% | 35_rotation | 0 | 0 | OPEN |
 | 22 | 26_text_overlap | 30 | 14% | 26_text_overlap | 0 | 0 | OPEN |
@@ -45,7 +45,7 @@ parked as not converging. A parked class is skipped by the fixer and kept here w
 | 28 | 43_within_10pt_x | 15 | 7% | 43_within_10pt_x | 0 | 0 | OPEN |
 | 29 | 54_image_dpi | 12 | 6% | 54_image_dpi | 0 | 0 | OPEN |
 | 30 | 56_rtl_runs | 10 | 5% | 56_rtl_runs | 0 | 0 | OPEN |
-| 31 | 44_header_footer | 7 | 3% | 44_header_footer | 0 | 0 | OPEN |
+| 31 | 44_header_footer | 8 | 4% | 44_header_footer | 0 | 0 | OPEN |
 | 32 | 12_italic_runs | 6 | 3% | 12_italic_runs | 0 | 0 | OPEN |
 | 33 | 13_text_colours | 4 | 2% | 13_text_colours | 0 | 0 | OPEN |
 | 34 | 34c_span_weight_match | 4 | 2% | 34c_span_weight_match | 0 | 0 | OPEN |
@@ -63,7 +63,7 @@ parked as not converging. A parked class is skipped by the fixer and kept here w
 
 - **20_within_10pt (+4)** — 203 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+199 more)
 - **47_margins** — 203 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+199 more)
-- **53_embedded_faces** — 157 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+153 more)
+- **53_embedded_faces** — 141 docs: 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text (+137 more)
 - **32_stroke_lines** — 135 docs: 01_stamp_rotated_15deg_upright, 05_round_company_seal_curved_text, 08_two_overlapping_stamps, 09_stamp_font_not_embedded (+131 more)
 - **29_blank_where_ink_was** — 134 docs: 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text (+130 more)
 - **59_shape_anchor** — 121 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+117 more)
@@ -79,7 +79,7 @@ parked as not converging. A parked class is skipped by the fixer and kept here w
 - **17_matched_runs** — 53 docs: 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 07_stamp_over_table (+49 more)
 - **05_words_extra** — 45 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+41 more)
 - **06_table_columns** — 42 docs: 04_stamp_180deg_upside_down, 05_round_company_seal_curved_text, 28_value_overflows_cell_txtpos, 29_dot_leaders_txtpos (+38 more)
-- **14_filled_shapes** — 35 docs: 23_timetable_grid_txtpos, 300_prescription_rx, 301_lab_report_panel, 305_vaccination_certificate (+31 more)
+- **14_filled_shapes** — 36 docs: 23_timetable_grid_txtpos, 300_prescription_rx, 301_lab_report_panel, 305_vaccination_certificate (+32 more)
 - **27_text_off_page** — 31 docs: 01_stamp_rotated_15deg_upright, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down, 08_two_overlapping_stamps (+27 more)
 - **35_rotation** — 30 docs: 01_stamp_rotated_15deg_upright, 02_stamp_rotated_15deg_upleft, 03_stamp_vertical_90deg, 04_stamp_180deg_upside_down (+26 more)
 - **26_text_overlap** — 30 docs: 06_rect_paid_stamp_red_transparent, 17_three_column_widths_txtpos, 20_numbered_list_separate_column_txtpos, 300_prescription_rx (+26 more)
@@ -91,7 +91,7 @@ parked as not converging. A parked class is skipped by the fixer and kept here w
 - **43_within_10pt_x** — 15 docs: 06_rect_paid_stamp_red_transparent, 28_value_overflows_cell_txtpos, 310_court_judgment, 39_small_caps_letter_spacing (+11 more)
 - **54_image_dpi** — 12 docs: 10_stamp_as_image, 11_stamp_with_signature_image, 300_prescription_rx, 303_discharge_summary (+8 more)
 - **56_rtl_runs** — 10 docs: 04_stamp_180deg_upside_down, 305_vaccination_certificate, 312_affidavit_stamp_paper, 318_court_summons_form (+6 more)
-- **44_header_footer** — 7 docs: 322_mutual_fund_factsheet, 330_cad_drawing_sheet, 360_restaurant_menu, 62_two_col_newsletter_pull_quote (+3 more)
+- **44_header_footer** — 8 docs: 322_mutual_fund_factsheet, 330_cad_drawing_sheet, 340_bill_of_lading, 360_restaurant_menu (+4 more)
 - **12_italic_runs** — 6 docs: 62_two_col_newsletter_pull_quote, balance-sheet-and-profit-loss, bank-statement-5-pages, gst-invoice-multipage-item-table (+2 more)
 - **13_text_colours** — 4 docs: 15_stamp_on_scanned_page, 402_calendar_month_grid, 65_two_col_full_width_figure_caption, magazine-2col-pullquote-spanning
 - **34c_span_weight_match** — 4 docs: 39_small_caps_letter_spacing, balance-sheet-and-profit-loss, magazine-2col-pullquote-spanning, product-catalogue-code-left-price-right

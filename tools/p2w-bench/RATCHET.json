@@ -1,6 +1,6 @@
 {
   "01_stamp_rotated_15deg_upright": {
-    "best": 37,
+    "best": 38,
     "failed": [
       "01_page_count",
       "02_text_run_count",
@@ -20,7 +20,6 @@
       "32_stroke_lines",
       "35_rotation",
       "47_margins",
-      "53_embedded_faces",
       "55_orientation_mix",
       "59_shape_anchor"
     ],
@@ -620,7 +619,7 @@
     ]
   },
   "08_two_overlapping_stamps": {
-    "best": 36,
+    "best": 37,
     "failed": [
       "01_page_count",
       "02_text_run_count",
@@ -641,7 +640,6 @@
       "32_stroke_lines",
       "35_rotation",
       "47_margins",
-      "53_embedded_faces",
       "55_orientation_mix",
       "59_shape_anchor"
     ],
@@ -1289,7 +1287,7 @@
     ]
   },
   "16_right_aligned_amounts_txtpos": {
-    "best": 38,
+    "best": 39,
     "failed": [
       "01_page_count",
       "02_text_run_count",
@@ -1309,7 +1307,6 @@
       "32_stroke_lines",
       "36_underline_rules",
       "47_margins",
-      "53_embedded_faces",
       "55_orientation_mix"
     ],
     "out_of": 59,
@@ -1927,7 +1924,7 @@
     ]
   },
   "24_address_block_indents_txtpos": {
-    "best": 50,
+    "best": 51,
     "failed": [
       "09_font_names",
       "18_median_dy",
@@ -1935,8 +1932,7 @@
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
       "32_stroke_lines",
-      "47_margins",
-      "53_embedded_faces"
+      "47_margins"
     ],
     "out_of": 59,
     "universe": [
@@ -2564,7 +2560,7 @@
     ]
   },
   "302_radiology_report": {
-    "best": 48,
+    "best": 49,
     "failed": [
       "03_word_count",
       "04_words_missing",
@@ -2574,8 +2570,7 @@
       "22_reading_order",
       "32_stroke_lines",
       "41_block_spacing",
-      "47_margins",
-      "53_embedded_faces"
+      "47_margins"
     ],
     "out_of": 59,
     "universe": [
@@ -3203,7 +3198,7 @@
     ]
   },
   "312_affidavit_stamp_paper": {
-    "best": 40,
+    "best": 41,
     "failed": [
       "02_text_run_count",
       "03_word_count",
@@ -3220,7 +3215,6 @@
       "35_rotation",
       "41_block_spacing",
       "47_margins",
-      "53_embedded_faces",
       "56_rtl_runs",
       "59_shape_anchor"
     ],
@@ -3809,7 +3803,7 @@
     ]
   },
   "320_balance_sheet_statutory": {
-    "best": 50,
+    "best": 51,
     "failed": [
       "18_median_dy",
       "22_reading_order",
@@ -3817,7 +3811,6 @@
       "30_ink_where_blank_was",
       "32_stroke_lines",
       "47_margins",
-      "53_embedded_faces",
       "59_shape_anchor"
     ],
     "out_of": 59,
@@ -4355,7 +4348,7 @@
     ]
   },
   "32_serif_nondefault_body": {
-    "best": 50,
+    "best": 51,
     "failed": [
       "18_median_dy",
       "19_worst_dy",
@@ -4363,8 +4356,7 @@
       "30_ink_where_blank_was",
       "32_stroke_lines",
       "41_block_spacing",
-      "47_margins",
-      "53_embedded_faces"
+      "47_margins"
     ],
     "out_of": 59,
     "universe": [
@@ -5631,7 +5623,7 @@
     ]
   },
   "352_certificate_ornate_border": {
-    "best": 31,
+    "best": 32,
     "failed": [
       "01_page_count",
       "02_text_run_count",
@@ -5655,7 +5647,6 @@
       "41_block_spacing",
       "45_char_accuracy",
       "47_margins",
-      "53_embedded_faces",
       "54_image_dpi",
       "55_orientation_mix",
       "56_rtl_runs",
@@ -6266,14 +6257,13 @@
     ]
   },
   "365_recipe_card": {
-    "best": 52,
+    "best": 53,
     "failed": [
       "18_median_dy",
       "19_worst_dy",
       "30_ink_where_blank_was",
       "32_stroke_lines",
-      "47_margins",
-      "53_embedded_faces"
+      "47_margins"
     ],
     "out_of": 59,
     "universe": [
@@ -7521,7 +7511,7 @@
     ]
   },
   "392_statistical_console_output": {
-    "best": 50,
+    "best": 51,
     "failed": [
       "03_word_count",
       "04_words_missing",
@@ -7529,8 +7519,7 @@
       "19_worst_dy",
       "23_line_pitch",
       "41_block_spacing",
-      "47_margins",
-      "53_embedded_faces"
+      "47_margins"
     ],
     "out_of": 59,
     "universe": [
@@ -8171,7 +8160,7 @@
     ]
   },
   "404_sudoku_grid": {
-    "best": 44,
+    "best": 45,
     "failed": [
       "01_page_count",
       "18_median_dy",
@@ -8183,7 +8172,6 @@
       "32_stroke_lines",
       "41_block_spacing",
       "47_margins",
-      "53_embedded_faces",
       "55_orientation_mix",
       "59_shape_anchor"
     ],
@@ -9424,7 +9412,7 @@
     ]
   },
   "44_coloured_underlined_hyperlinks": {
-    "best": 46,
+    "best": 47,
     "failed": [
       "02_text_run_count",
       "07_table_rows",
@@ -9436,8 +9424,7 @@
       "32_stroke_lines",
       "36_underline_rules",
       "40_link_targets",
-      "47_margins",
-      "53_embedded_faces"
+      "47_margins"
     ],
     "out_of": 59,
     "universe": [
@@ -10039,7 +10026,7 @@
     ]
   },
   "52_one_cm_margin_wide_body": {
-    "best": 40,
+    "best": 41,
     "failed": [
       "02_text_run_count",
       "03_word_count",
@@ -10057,7 +10044,6 @@
       "30_ink_where_blank_was",
       "41_block_spacing",
       "47_margins",
-      "53_embedded_faces",
       "59_shape_anchor"
     ],
     "out_of": 59,
@@ -12262,7 +12248,7 @@
     ]
   },
   "79_inr_indian_digit_grouping_table": {
-    "best": 46,
+    "best": 47,
     "failed": [
       "03_word_count",
       "04_words_missing",
@@ -12274,7 +12260,6 @@
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
       "47_margins",
-      "53_embedded_faces",
       "59_shape_anchor"
     ],
     "out_of": 59,
