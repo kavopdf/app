@@ -306,15 +306,48 @@ STEP 6 - PROVE IT ON GOOGLE, THEN DECIDE THE OUTCOME
   verify_google.py, recording the new numbers with record.py.
 
   DO THE DRIVE ROUND IN BATCHES OF FIVE, NOT ONE DOCUMENT AFTER ANOTHER. Each document is four
-  sequential calls - upload, CREATE_FILE, EXPORT, download - so twenty one at a time is eighty
+  sequential calls - upload, CREATE_FILE, EXPORT, download - so twenty one after another is eighty
   round trips: about four minutes of pure Google latency, the largest single cost in an attempt.
-  Five at a time is one minute for the same work and the same API:
 
-      upload all five, then CREATE_FILE all five, then EXPORT all five, then verify all five
+  THE UNIT THAT RUNS IN PARALLEL IS THE DOCUMENT, NOT THE CALL. For each of five documents run its
+  four calls in order, and run the five documents alongside each other:
+
+      doc A: upload -> CREATE_FILE -> EXPORT -> download     }
+      doc B: upload -> CREATE_FILE -> EXPORT -> download     }  at the same time
+      doc C: ...                                             }
+      doc D: ...
+      doc E: ...
+
+  NOT "upload all five, then CREATE_FILE all five". That was tried on the night of 12 Nov and it
+  broke: upload returns a staging key that expires, and by the time the second phase reached the
+  fourth and fifth documents the key was gone. Two runs measured 2 and 4 of 20 before the rest
+  failed. A staging key is meant to be consumed immediately, so upload, create and export for one
+  document belong together.
 
   Five, not twenty. Twenty at once is a burst that looks like abuse, and the failure arrives as a
   blocked round rather than an error you can retry - which is what happened at 21:54 after five
   calibration uploads.
+
+  THE FOUR CALLS, EXACTLY - this is the flow the baseline uses and it is the only correct one:
+
+      upload(path=<copy in /scratch/output>, tool_slug="GOOGLEDRIVE_CREATE_FILE",
+             toolkit="googledrive")                                    -> s3key
+      GOOGLEDRIVE_CREATE_FILE(name=<short>, mimeType="application/vnd.google-apps.document",
+          parents=["11-mkegjnnIOmVdO7c44nDSgxrw2qkWn6"],
+          file_to_upload={name, mimetype:"application/vnd.openxmlformats-officedocument"
+                                        ".wordprocessingml.document", s3key})  -> id
+      GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE(fileId=<id>, mimeType="application/pdf") -> s3url
+      curl the s3url, then verify_google.py, then
+      GOOGLEDRIVE_GOOGLE_DRIVE_DELETE_FOLDER_OR_FILE_ACTION(fileId=<id>)
+
+  ALWAYS pass parents. NEVER create at the Drive root. This brief said "never leave a Google Doc in
+  Drive" and nothing else, so the runs invented their own flow - and on the night of 12 Nov about
+  forty documents landed in the user's My Drive root, one per measured document, none deleted. The
+  folder is "KavoPDF-Verify" and its id is in the line above; a document anywhere else is a mistake
+  even if it is deleted afterwards.
+
+  Delete each one as soon as its PDF is downloaded. A round that leaves them is not finished, and
+  the next run has no way to tell the pipeline's junk from the user's own files.
 
   This is the only place in the pipeline where parallel calls are right. The baseline measures one
   document at a time on purpose: it commits after each, so a run that dies keeps what it finished.
@@ -392,6 +425,13 @@ STEP 8c - KEEP GOING UNTIL THE SLOT IS NEARLY SPENT  ** THIS IS WHAT MAKES THE D
       commit DEFECT-CLASSES.md, ATTEMPTS.json, HYPOTHESES.md, RESULTS.jsonl, RATCHET.json, ROUND.json
   A run that does three attempts and dies before the fourth has still kept three. A run that keeps
   all three in its sandbox and dies has kept nothing.
+
+  THE SLOT IS STILL YOURS BETWEEN ATTEMPTS. Do not release it and do not claim it again - it is held
+  from STEP 0 until STEP 9, across every attempt in the run. Releasing between attempts and
+  re-claiming is not a harmless habit: it is what produced two claims ten minutes apart on the
+  morning of 13 Nov, because the commit gate used to refuse a commit while the slot was claimed and
+  the run worked around it the only way it could. That check is gone; the release belongs at STEP 9
+  and nowhere else.
 
   Do STEP 8b for the last attempt, then STEP 9 - release the slot and commit through the gate. The
   slot goes stale at 45 minutes and that is the hard ceiling: a run that works past it would have

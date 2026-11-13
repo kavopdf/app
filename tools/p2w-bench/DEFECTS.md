@@ -1624,3 +1624,73 @@ Spend nothing. The three real levers, in order:
 3. **`code.py` instead of reading the engine** — keeps a run's reading small, free, done in §22.
 
 An API key would sit unused while Google's export queue did the same work at the same speed.
+
+---
+
+## 35. The night of 12 Nov: three bugs, two of them mine
+
+Ten runs, twelve attempts, no class closed. Two classes now carry real diagnoses — and three
+things were broken, two of which I put there.
+
+### The night's actual work
+
+**`47_margins` was diagnosed properly.** A control test over all 208 converted documents: the 12
+with no `w:tbl` and no `w:drawing` reproduce the source's left edge exactly (310 57/57, 412 56/56,
+413 56/56, 416 56/56, 417 56/56, 410 56/56, 392 28/28, 304 14/14, 78 62/62) and **0 of the 192 with
+a table or a drawing pass**. Body-flow placement is exact; the defect is in the table and drawing
+emitters. Two theories were then ruled out with a purpose-built five-variant probe: `tblStyle`
+element order changes nothing, and Google *does* honour `w:tblInd` (V1 `tblInd=600` → text at
+x=30.0, exactly). So the cause is still open, but the search space is now two emitters wide instead
+of 208 documents.
+
+**The table-spacer patch was measured over 20 documents** and reverted — correctly. It fixed what
+it was meant to (`362_price_list_dense` 51→53 with `20_within_10pt` FAIL→pass, `balance-sheet` 40→44,
+10 controls held) and broke four other things (`44_header_footer`, `59_shape_anchor`,
+`40_devanagari` 37→36, `newsletter-3col` 40→39). 3 of 18 moved, 17%. The ratchet rejected it, which
+is the ratchet working.
+
+### Bug 1 — my batching advice broke the staging keys
+
+I told the brief to do "upload all five, then CREATE_FILE all five, then EXPORT all five". Two runs
+measured 2 and 4 of 20 documents before the rest failed: **"Drive staging keys expired on the rest."**
+The upload's key is meant to be consumed immediately, so splitting the phases by call leaves the
+later documents holding a dead key.
+
+Fixed: the unit that runs in parallel is the **document**, not the call. Five documents, each running
+its four calls in order, side by side. The brief now says so and says why.
+
+### Bug 2 — my slot check contradicted the loop I had just added
+
+The commit gate refused a commit while the fixer's slot was claimed. That was right when a run did
+one attempt. Then §31 made a run do three, committing between them while holding the slot — so the
+gate refused those commits, and the run worked around it the only way it could: **release, commit,
+re-claim**, three times a run. Two claims ten minutes apart at 06:47 and 06:57 were that workaround.
+
+The check was also never needed. A leaked slot blocks the next run for 45 minutes and the next run
+is 60 minutes later, so a leak always clears itself. What the claim is for — stopping two runs
+editing the engine at once — it still does.
+
+Removed from the gate. STEP 8c now says plainly: the slot is yours from STEP 0 to STEP 9, do not
+release between attempts and do not re-claim.
+
+### Bug 3 — the fixer had no Drive flow at all
+
+The baseline brief carries the exact six-step round: upload, `CREATE_FILE` with
+`parents=["11-mkegjnnIOmVdO7c44nDSgxrw2qkWn6"]`, export, curl, verify, **delete**. The fixer brief
+had one sentence — "Never leave a Google Doc in Drive" — and nothing else. So the fixer invented its
+own flow, and by morning **about forty documents sat in the user's My Drive root**, one per measured
+document, none of them deleted.
+
+Both rules were broken by the same omission: no `parents` (root instead of the verify folder) and no
+delete. The brief now carries the exact four calls, the folder id, and why a document anywhere else
+is a mistake even if it is deleted afterwards.
+
+The forty are left in place. They are not mine to remove and the user said not to delete anything in
+their Drive — but they are recorded here, and the rule that produced them is fixed.
+
+### What this says about the audit
+
+All three were found by reading what the night produced, not by any check I had written. The two I
+caused were both introduced *after* the audit that was supposed to catch that class of problem:
+§34's batching advice and §29's slot check. A change made quickly, at the end of a long session, is
+exactly the change that needs the audit re-run — and neither was.
