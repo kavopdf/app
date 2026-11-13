@@ -431,3 +431,67 @@ round-2 additions. Any count you take must say which of the two it is.
 211 rows was discarded and the ratchet re-compared the PRE-round rows, printing PASS while 139
 documents had improved unseen. It now orders by write. If you see a `.txt` PASS you do not believe,
 check that the store's last line is the row being compared.
+
+
+---
+
+## 13 Nov 2026, evening - EVERYTHING THE 24 INVESTIGATIONS CHANGED
+
+**THE UNIVERSE IS 43 CHECKS** (id-sha `f58b6e1f708a`, body-sha `f55df8c46fd0`). It was 59, then 54, 49,
+48, 47, 45, and it is 43 now. Retired today: `03, 06, 07, 09, 11, 12, 15, 16, 19, 20, 21, 29, 30, 33, 41,
+50`. Redefined: `04, 05, 08, 13, 14, 17, 22, 23, 31, 32, 35, 36, 37, 42, 43, 45, 47, 48, 52, 53, 54, 60`.
+NEVER quote a stored `x/59` or `x/45` score as current. Every stored mark is stale and needs one recut.
+
+**THE FRESH ROUND, 211 documents, soffice render** (`p2w-baseline-211-d8fb69e.md` is delivered):
+```
+8855 / 9495 = 93.26 %  at 45 checks · 29 documents pass everything · 35 failing classes
+18_displacement 98 · 14_filled_shapes 85 · 59_shape_anchor 68 · 10_font_sizes 52
+44_header_footer 50 · 47_margins 49 · 35_rotation 30 · 60_text_column_right_edge 25
+42_alignment_mix 24 · 26_text_overlap 14
+```
+Every earlier class size you have read is wrong. `59` was reported as 100 and is 68. `44` was reported as 54
+and is 50. `45` was reported as 23 and is 9. Re-measure before you trust any number.
+
+**THE HOP RULE, NOW PROVEN TEN TIMES.** Ten checks were found reading an artifact the engine does not
+control: Google's fontconfig (`09`), Google's export tiers (`54`), the renderer's annotation objects (`50`),
+its widgets (`51`), its heading-derived outline (`52`), its link annotations (`15`/`40`), its span geometry
+(`37`). Before you diagnose anything, ask: **does `PdfToWord`/`DocxWriter` decide this, or does whoever
+rendered it?** If the latter, no engine change can move it and the check needs re-pointing, not fixing.
+
+**THE RENDERER QUESTION IS OPEN AND MUST BE NAMED.** The pipeline renders with `soffice --headless`. Every
+number in every store before 13 Nov came from a Google Docs export. They are NOT comparable - one round
+split the same total into engine +230, instrument -1833, renderer +1634. Say which renderer produced any
+number you quote. A Google export cannot be produced from this sandbox.
+
+**FIVE NAMED ENGINE DEFECTS, with documents and numbers. These are yours, not a check's.**
+1. `w:sz` is written in HALF-POINTS via `Math.floor(sizePt * 2f)` (`DocxWriter.java:5051`), so a 6.2 pt line
+   becomes 6.0 pt. 51 of `10_font_sizes`' 52 are this; over 5,944 downward pairs the mean loss is -0.285 pt.
+   The floor is DELIBERATE - `:5044` records that on `362_price_list_dense` rounding up wraps every row and
+   doubles the table. 6.2 pt is unrepresentable in DOCX at all, so the only question is which side to lose.
+2. Justification is DROPPED. `310_court_judgment` carries 82.3 pt of space in the source line and 50.9 in
+   the render; the source's 538.6 column edge becomes 506.7. 5 documents.
+3. Source lines are WELDED into one paragraph. `64_newspaper_uneven_columns_ad_boxes` has 77 source lines
+   and 21 docx paragraphs. 9 documents.
+4. `PdfToWord.Table` carried `fonts, sizes, colors` and NO bold and NO italic, so a cell lost them -
+   `DocxWriter` never emitted `<w:i/>` for a cell at all. 1 document confirmed (`64_newspaper`, 2 spans).
+5. An anchor inside a table cell is displaced by the RENDERER, which adds the cell's page origin to a
+   page-relative `wp:posOffset`: measured +251.3/+71.7 pt on a controlled pair. 2 documents.
+
+**AND THE BIGGEST SINGLE ENGINE FIX, MEASURED BUT NOT LANDED.** `32_stroke_lines` loses NINE documents to
+ONE line: `PdfToWord.attachShapes` (`:5296-5298`) drops a thin stroke near a table, `markSideStrokes` reads
+that same rule's weight into `Table.sideStroke[0]`, and `DocxWriter.borders` (`:4563-4566`) then writes all
+six sides `nil` because `ruledTable` is false. The rule is measured, attributed, and thrown away. A
+three-part fix was measured at **13 -> 4 with +6 passes and 10 documents improved**, at the cost of four
+documents losing one check each. It was LOST with a recycled sandbox - re-derive it.
+
+**SIXTEEN CHECKS HAVE A POPULATION PROBLEM AND IT IS THE CORPUS'S.** `50`, `51`, `52` each have exactly ONE
+document in 211 that can exercise them; `37` has one and ZERO subscripts anywhere; `36` asks its question on
+2 of 211; `15`'s whole corpus carries FIVE links in ONE document. `TEST-CORPUS-REQUEST.md` says what to add.
+
+**AND THE FILE ITSELF WAS LYING IN FOUR PLACES, NOW CORRECTED.** `44`'s band membership is invariant on
+151 of 151 constructed 20 pt defects - it is not a placement test at all. `59`'s `_box_moved()` asks only
+whether a shape of the source box's SIZE exists anywhere on the page, never whether it is where the source
+put it, so 992 runs on 42 documents are charged `moved` with the box within 2 pt on all four edges.
+`45` at exact tolerance IS `04|05` (22 = 22, symmetric difference 0), so its 97 % floor can only remove
+fires. And `10` is blind in the other direction: swap two sizes in the .docx and 65 of 68 spans carry the
+wrong size while `10` reads 4 to 4 and passes.

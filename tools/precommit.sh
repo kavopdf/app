@@ -73,8 +73,17 @@ pass "every shell script parses"
 COULD_NOT_RUN=""
 for g in check-file-names check-tool-titles check-permissions check-pdf2word check-regressions; do
   if [ -f "tools/$g.py" ]; then
-    if python3 "tools/$g.py" >/tmp/guard.$$ 2>&1; then
+    python3 "tools/$g.py" >/tmp/guard.$$ 2>&1
+    rc=$?
+    if [ "$rc" -eq 0 ]; then
       pass "$g"
+    elif [ "$rc" -eq 3 ]; then
+      # Exit 3 is the guard's own word for "there was nothing here to check": no APK,
+      # no corpus, no fixture. That is not a failure - the code cannot be at fault -
+      # and it is not a pass. It is named, and the summary stops saying "all passed".
+      reason=$(grep -m1 '^SKIP-REASON:' /tmp/guard.$$ | sed 's/^SKIP-REASON:[[:space:]]*//')
+      echo "gap   $g - could not run (${reason:-no reason given})"
+      COULD_NOT_RUN="$COULD_NOT_RUN $g"
     elif grep -q "ModuleNotFoundError\|ImportError" /tmp/guard.$$; then
       # A guard that needs a package this machine does not have did not fail; it could
       # not run. Calling that a failure blocks every commit for a reason nobody can
@@ -266,9 +275,18 @@ fi
 echo ""
 if [ -n "$COULD_NOT_RUN" ]; then
   echo "not run: $COULD_NOT_RUN"
-  echo "  those guards need a package this machine does not have. They are not a"
-  echo "  failure and not a pass - the gap is named so it is not mistaken for either."
+  echo "  those guards could not run here - a missing package, or nothing to check yet"
+  echo "  (no release APK). They are not a failure and not a pass, and CI runs them"
+  echo "  where the thing they need exists. The gap is named so it is not mistaken"
+  echo "  for either."
   echo ""
+fi
+if [ "$FAILED" -eq 0 ] && [ -n "$COULD_NOT_RUN" ]; then
+  # The old line here said "ALL CHECKS PASSED" while a guard had not run. That is the
+  # one sentence someone reads before typing git commit, so it must not overstate.
+  echo "PASSED, EXCEPT THE GUARD(S) THAT COULD NOT RUN:$COULD_NOT_RUN"
+  echo "  the code is not at fault and nothing is blocking, but those checks were NOT made."
+  exit 0
 fi
 if [ "$FAILED" -eq 0 ]; then
   echo "ALL CHECKS PASSED - safe to commit"

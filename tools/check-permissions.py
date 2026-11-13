@@ -20,8 +20,13 @@ ALLOWED = {
 
 apks = glob.glob("app/build/outputs/apk/release/*.apk")
 if not apks:
-    print("FAIL: no release APK found")
-    sys.exit(1)
+    # Not a failure and not a pass. There is no APK on this machine, so nothing about
+    # its permissions has been observed either way. Exit 3 so precommit.sh can say
+    # "did not run" and stop claiming that every check passed. A real bad permission
+    # is still exit 1 below, and a missing pyaxmlparser is still the ImportError above.
+    print("SKIP: no release APK at app/build/outputs/apk/release/*.apk")
+    print("SKIP-REASON: no APK was built here, so its permissions were NOT checked")
+    sys.exit(3)
 
 perms = set(APK(apks[0]).get_permissions())
 bad = sorted(perms - ALLOWED)
