@@ -1972,3 +1972,75 @@ what its comments say.
 
 Both were caught by the same discipline: when a case fails, find out *why* before changing the
 tool. Twice the answer was that the case never ran.
+
+---
+
+## 40. Sixteen attempts, sixteen reports, and the one sentence that ended half of them
+
+Every fixer run to date, read as a set.
+
+### The ledger
+
+| | |
+|---|---|
+| runs | 15 |
+| attempts | 16 |
+| attempts per run | 1.1 against a target of 3 |
+| run duration | 3 to 12 min, average 6 |
+| slot used | **6 of 45 minutes — 13%** |
+| runs over 40 min | 0 |
+| cron failures | 0 consecutive |
+
+| outcome | count |
+|---|---|
+| reverted — a fix was built, measured, rejected | 6 |
+| error — staging key (my batching bug, fixed) | 2 |
+| error — Drive block (transient) | 2 |
+| **error — analysis only, no code changed** | **6** |
+
+### The six that changed no code are the finding
+
+Of sixteen attempts, six ended without touching the engine. Each one understood the class
+better than the attempt before it and wrote that into `HYPOTHESES.md` — that is real work, and
+the ledger is why attempt fourteen starts ahead of attempt one. But **every one of those six
+ended its run.** A run would analyse for three minutes, record `error`, release the slot and
+stop, with forty-two minutes of a forty-five minute slot unspent.
+
+The cause is one sentence in STEP 9:
+
+    OTHERWISE - 25 minutes or more, or the last attempt could not be recorded, ...
+
+"Could not be recorded" was written to mean *the ledger write failed*. A run recording an `error`
+outcome read it as *my attempt was an error*, which is a reasonable reading of that sentence and
+the wrong one. The 07:40 run did exactly that: claimed at 07:40, analysed, recorded `error` at
+07:43, committed at 07:44, and stopped three minutes into a forty-five minute slot.
+
+The brief now says it in as many words: **an attempt recorded as 'error' is recorded.** It means
+no fix was measured, not that the run failed — the theory is in `HYPOTHESES.md`, the try is in
+`ATTEMPTS.json`, and neither is lost by continuing. Stop only on 25 minutes, the round finishing,
+a broken build, or a ledger write that genuinely did not happen.
+
+### What is *not* wrong, checked before changing it
+
+**41 of 43 classes are untouched, and that is the design.** `20_within_10pt` took 13 of the 16
+attempts and `47_margins` took 3. STEP 2 says to take the top OPEN class and §30 made the
+follow-up binding: "switch classes only when the top class is PARKED, FIXED, or its day is spent
+— the queue is the ledger, not the run's preference." That rule was added deliberately and the
+data does not contradict it. Breadth comes from STEP 9's loop, which is why fixing the loop is
+the right lever and changing the class-selection rule is not.
+
+**No run overran its slot.** Longest was 12 minutes against a 45-minute claim, so the 25/40-minute
+guard has never had to fire and there is no evidence the ceiling is wrong.
+
+**The 6 reverts are the ratchet working.** Each one built a fix, measured it on 20 documents
+through Google, and rejected it because something fell. The table-spacer patch fixed its target
+and broke four other checks; the clamp took the regressions from 4 to 3 and was still rejected.
+That is the pipeline refusing to ship a regression, which is the whole point of it.
+
+### Health, honestly
+
+The machine is reliable — 15 runs, 0 failures, 0 overruns, every run leaving evidence — and it is
+using a seventh of the time it is given. The two reasons were both instruction defects, both now
+fixed: the loop that was skipped (§36) and the sentence that stopped runs early (§40). Neither was
+a code bug, and neither would have been found by reading the code. They were found by reading what
+sixteen runs actually did and counting.

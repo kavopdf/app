@@ -436,9 +436,20 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
       do NOT claim it again, do NOT commit here - each attempt already committed its own files in
       STEP 8, which is why going back is safe.
 
-  OTHERWISE - 25 minutes or more, or the last attempt could not be recorded, or the round is
-  finished, or the build is broken:
+  OTHERWISE - 25 minutes or more, or the round is finished, or the build is broken, or you
+  genuinely could not record the attempt at all:
       release the slot, run the gate, commit, stop. That is the rest of this step.
+
+  AN ATTEMPT RECORDED AS 'error' IS RECORDED. It is not a reason to stop.
+  This used to read "or the last attempt could not be recorded", and the 07:40 run on 13 Nov read
+  its own 'error' outcome as exactly that and released after one attempt, three minutes into a
+  forty-five minute slot. Of sixteen attempts so far, six were 'error' because the run understood
+  the class and changed no code - real work that grew the ledger, and every one of those six ended
+  its run. The slot is used six minutes of forty-five on average.
+
+  'error' means no fix was measured: no root cause found, or the change was reverted. The
+  knowledge is in HYPOTHESES.md and the attempt is in ATTEMPTS.json. Neither is lost by
+  continuing. Go back to STEP 2, take the next OPEN class, and try to fix something real.
 
   Twenty-five and not thirty-five, because the check is made BEFORE an attempt starts and an
   attempt can take twenty-five minutes when it needs calibration and twenty documents. Starting one
