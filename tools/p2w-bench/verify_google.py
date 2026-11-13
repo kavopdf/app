@@ -13,7 +13,7 @@ WHY THIS EXISTS
   left margin in Docs, it lands there in this export too.
 
 USAGE
-  python3 verify_google.py <source.pdf> <google-export.pdf> [--json out.json]
+  python3 verify_google.py <source.pdf> <google-export.pdf> [--docx <engine.docx>] [--json out.json]
 
 EXIT
   0 = all checks pass, 1 = one or more failed, 2 = could not run
@@ -23,7 +23,7 @@ THRESHOLDS (a document passes only if every one holds)
   position      median dy < 3 pt, worst dy < 15 pt, within 10 pt > 95 %, order > 95 %
   visual        no invisible text, no text-on-text, no page overflow, no extra page
 """
-import os, sys, json, re, collections
+import os, sys, json, re, collections, statistics
 
 try:
     import fitz  # PyMuPDF
@@ -319,7 +319,51 @@ def _span_flags(sp):
 # ----------------------------------------------------------------------------
 
 
-def extra_checks2(src, gd):
+EMU_PER_PT = 12700.0
+
+
+def docx_image_dpi(path):
+    """Median dpi of the pictures a .docx embeds, over the size it places them at.
+
+    The engine's own resolution decision, and the only place it is observable. Google's
+    PDF export re-rasterises every picture to its own target (48, 72 or 96 dpi at the
+    placement size - measured, see 54_image_dpi), so the density in the export says what
+    Google chose, not what the engine wrote. The .docx says what the engine wrote:
+    word/media holds the bytes, and the wp:extent beside each r:embed is the size the
+    picture is drawn at, so px / (extent_pt / 72) is the embedded density.
+
+    Returns None when the file cannot be read as a .docx, so the caller can say the
+    measurement did not happen instead of reporting a zero as a result.
+    """
+    try:
+        import zipfile, io
+        with zipfile.ZipFile(path) as z:
+            doc = z.read("word/document.xml").decode("utf-8", "replace")
+            rels = z.read("word/_rels/document.xml.rels").decode("utf-8", "replace")
+            targets = dict(re.findall(r'Id="([^"]+)"[^>]*Target="([^"]+)"', rels))
+            pat = re.compile(r'<wp:extent[^>]*cx="(\d+)"[^>]*cy="(\d+)"|r:embed="([^"]+)"')
+            vals = []
+            pending = None
+            for m in pat.finditer(doc):
+                if m.group(1):
+                    pending = (int(m.group(1)) / EMU_PER_PT, int(m.group(2)) / EMU_PER_PT)
+                elif m.group(3) and pending:
+                    name = "word/" + targets.get(m.group(3), "").replace("../", "")
+                    try:
+                        w_px = fitz.Pixmap(z.read(name)).width
+                    except Exception:
+                        pending = None
+                        continue
+                    w_pt = max(1.0, pending[0])
+                    vals.append(w_px / (w_pt / 72.0))
+                    pending = None
+            vals.sort()
+            return round(vals[len(vals) // 2]) if vals else 0
+    except Exception:
+        return None
+
+
+def extra_checks2(src, gd, docx_path=None):
     """Return checks 49-56. Independent of the text runs."""
     c = {}
 
@@ -507,6 +551,24 @@ def extra_checks2(src, gd):
     # ---- 54 image resolution ----------------------------------------------
     # 08 counts images and 48 measures area; neither notices a 300 dpi logo
     # arriving as a 40 dpi smear.
+    #
+    # MEASURED ON THE .DOCX, NOT ON GOOGLE'S EXPORT. This check used to compare the
+    # original's pixel density against the density in the PDF Google exports, and that
+    # number is Google's, not the engine's. Over the 216 measured documents the recorded
+    # render density takes only three values - 96 on 154 of them, 72 on 31, 48 on 3 - while
+    # the source densities run 152..665; 753 px in the source implies 210 px in the render,
+    # and 480 px implies 35. The engine embeds the native grid (PdfToWord.collectImage
+    # lifts pdImage.getImage() at full size and DocxWriter writes those bytes beside a
+    # wp:extent taken from the page placement), so nothing the engine writes survives the
+    # export: the render density is the exporter's tier x the placement width, and the
+    # check therefore asks "is the source below Google's ceiling". Passing it is a step
+    # function of the SOURCE density alone - every document above 160 dpi fails, every one
+    # at or below 152 passes except 393_spectrum_peak_table (152 against a 72 tier) - and
+    # 12 documents fail permanently with no .docx change able to clear them, because
+    # embedding more pixels cannot lift the export above its tier.
+    # What the engine does control is what it puts in the .docx: word/media holds the bytes
+    # and wp:extent the size, so px / (extent_pt / 72) is the engine's own resolution
+    # decision. That is what this check now reads, from --docx.
     def img_dpi(doc):
         vals = []
         for p in doc:
@@ -520,7 +582,17 @@ def extra_checks2(src, gd):
         return round(vals[len(vals) // 2]) if vals else 0
 
     s_d, g_d = img_dpi(src), img_dpi(gd)
-    c["54_image_dpi"] = (s_d, g_d, s_d == 0 or g_d >= s_d * 0.6)
+    d_d = docx_image_dpi(docx_path) if docx_path else None
+    if d_d is None:
+        # No .docx to read. Google's number answers a different question, so it cannot
+        # fail this check - but say so on stderr rather than passing silently, because a
+        # run that forgets --docx measures nothing here and should be visible as such.
+        if s_d:
+            print("54_image_dpi: no .docx given, resolution unmeasured (render reads %s dpi, "
+                  "which is Google's export, not the engine's)" % g_d, file=sys.stderr)
+        c["54_image_dpi"] = (s_d, 0, True)
+    else:
+        c["54_image_dpi"] = (s_d, d_d, s_d == 0 or d_d >= s_d * 0.6)
 
     # ---- 55 page count per size -------------------------------------------
     # A mixed-orientation document that comes out all one size is wrong even if
@@ -773,20 +845,47 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     c["38_list_markers"] = (s_m, g_m, s_m == 0 or g_m >= max(1, int(s_m * 0.9)))
 
     # ---- 39 image position -------------------------------------------------
+    # A DISTANCE TEST, WITH THE PAGE IN THE KEY. The old body quantised each box to an
+    # 8 pt bin (round(x/8), round(y/8)) and intersected the two sets, which is not a
+    # tolerance - it is a membership test whose tolerance is 4 pt in the middle of a bin
+    # and 0 pt on the boundary. A box sitting at x = 52.0 (x/8 = 6.5) is exactly on one:
+    # 407_id_card_front_back fails after a 0.1 pt shift, 11_stamp_with_signature_image
+    # (y = 420.000, y/8 = 52.5) fails after 0.1 pt too, and on the 15 corpus documents
+    # that carry an image a uniform 0.1 pt move fails 2 of them and a 1 pt move fails 5 -
+    # all with every image where it belongs. set() also dropped a count whenever two
+    # pictures shared a bin, and the key carried no page, so a picture moved from page 1
+    # to page 2 at the same coordinates passed. Nearest one-to-one match within 4 pt per
+    # axis keeps the old tolerance and removes the cliff.
+    IMG_POS_TOL = 4.0
+
     def img_boxes(doc):
         boxes = []
-        for p in doc:
+        for i, p in enumerate(doc):
             for im in p.get_image_info():
                 b = im["bbox"]
-                boxes.append((round(b[0] / 8), round(b[1] / 8)))
+                boxes.append((i, b[0], b[1]))
         return boxes
 
     s_ib, g_ib = img_boxes(src), img_boxes(gd)
     if not s_ib:
         c["39_image_position"] = (0, len(g_ib), True)
     else:
-        common = len(set(s_ib) & set(g_ib))
-        c["39_image_position"] = (len(s_ib), common, common >= max(1, int(len(s_ib) * 0.6)))
+        used = set()
+        common = 0
+        for (pg, x, y) in s_ib:
+            best = None
+            for j, (gp, gx, gy) in enumerate(g_ib):
+                if j in used or gp != pg:
+                    continue
+                if abs(gx - x) <= IMG_POS_TOL and abs(gy - y) <= IMG_POS_TOL:
+                    dist = abs(gx - x) + abs(gy - y)
+                    if best is None or dist < best[0]:
+                        best = (dist, j)
+            if best is not None:
+                used.add(best[1])
+                common += 1
+        c["39_image_position"] = (len(s_ib), common,
+                                  common >= max(1, -(-len(s_ib) * 3 // 5)))
 
     # ---- 40 link targets ---------------------------------------------------
     def link_targets(doc):
@@ -815,22 +914,34 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
 
     # ---- 42 alignment ------------------------------------------------------
     def align_mix(doc):
+        # The block bbox is the union of its own lines, so the widest line of EVERY block
+        # satisfies lx0 - bx0 < 4 and was counted as 'left'. Every block therefore
+        # contributed a 'left' by construction: on the 211-document corpus 5925 of 5925
+        # blocks did, left was 72% of all lines and centre 2%. A fully centred document
+        # read left, never centre.
+        # A line is only left-aligned relative to the COLUMN it sits in, not to a box
+        # drawn round itself, so the reference is the page's text margin. The widest line
+        # of a centred block still spans the column and is indistinguishable from flush
+        # left, but the narrower lines now read centre and the mix is centre-dominated.
         left = right = centre = 0
         for p in doc:
-            for blk in p.get_text("dict")["blocks"]:
-                if blk.get("type") != 0:
-                    continue
-                bx0, _, bx1, _ = blk["bbox"]
+            blks = [b for b in p.get_text("dict")["blocks"] if b.get("type") == 0]
+            if not blks:
+                continue
+            le = statistics.mode([round(b["bbox"][0]) for b in blks])
+            re_ = statistics.mode([round(b["bbox"][2]) for b in blks])
+            if re_ - le < 10:
+                continue
+            for blk in blks:
                 for ln in blk.get("lines", []):
                     lx0, _, lx1, _ = ln["bbox"]
-                    w = bx1 - bx0
-                    if w < 10:
+                    if lx1 - lx0 < 10:
                         continue
-                    if lx0 - bx0 < 4:
+                    if abs(lx0 - le) < 4:
                         left += 1
-                    elif bx1 - lx1 < 4:
+                    elif abs(re_ - lx1) < 4:
                         right += 1
-                    elif abs((lx0 + lx1) / 2 - (bx0 + bx1) / 2) < 6:
+                    elif abs((lx0 + lx1) / 2 - (le + re_) / 2) < 6:
                         centre += 1
         return (left, right, centre)
 
@@ -850,29 +961,40 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
 
     # ---- 44 header / footer ------------------------------------------------
     def edge_text(doc):
-        n = 0
+        # Returns the band TEXT, not a count. Widening the band to 0.11/0.89 fixed the 1 pt
+        # footer shift but pulled 116 real body blocks into the header count on the corpus
+        # (82 of 211 documents, 90% of them not repeated headers - table headers, section
+        # headings, the second and third body line), which both dilutes the check and moves
+        # its boundary into the densest region of the page. Counting text instead: a footer
+        # that moves 1 pt is the same string, a footer that is dropped is a different one,
+        # and body text in the band appears on both sides and cancels out.
+        out = []
         for p in doc:
             H = p.rect.height
             for blk in p.get_text("dict")["blocks"]:
                 if blk.get("type") != 0:
                     continue
                 y = blk["bbox"][1]
-                # 0.10/0.90 was a hard boundary with no tolerance: on H=842 it sits at 757.8,
-                # so two otherwise identical documents whose footer top reads 757.3 and 758.3
-                # gave source=1 render=0 and failed. A footer is not a point estimate, and the
-                # same band is applied to both sides, so widening it cannot favour one.
-                if y < H * 0.11 or y > H * 0.89:
-                    n += 1
-        return n
+                if y < H * 0.10 or y > H * 0.90:
+                    t = " ".join("".join(sp["text"] for ln in blk.get("lines", [])
+                                         for sp in ln["spans"]).split())
+                    if t:
+                        out.append(t)
+        return out
+
+    def _present(t, pool):
+        if t in pool:
+            return True
+        return any(difflib.SequenceMatcher(None, t, q).ratio() >= 0.9 or t in q for q in pool)
 
     s_e, g_e = edge_text(src), edge_text(gd)
-    # The band was a hard 0.10/0.90 of page height with no tolerance, so a footer 1 pt either
-    # side of the line changed the answer: on H=842 the boundary sits at 757.8, and two
-    # otherwise identical documents with a footer top at 757.3 and 758.3 read source=1
-    # render=0 and FAIL. A footer is not a point estimate. The band is wider - 0.11/0.89 -
-    # and the same on both sides, which moves the boundary out of where body text sits while
-    # still catching a footer at 0.92-0.96H.
-    c["44_header_footer"] = (s_e, g_e, s_e == 0 or g_e >= max(1, int(s_e * 0.9)))
+    # Every band string in the source must still be in the render. A 1 pt shift keeps every
+    # string, so the original defect passes; a dropped header loses its string, so the check
+    # still fires; a body block that happens to sit in the band is present on both sides.
+    # The 0.9 ratio was kept out of this on purpose: with s_e=2 it tolerated one of the two
+    # headers being lost, which is the dilution the widening introduced.
+    missing = [t for t in s_e if not _present(t, g_e)]
+    c["44_header_footer"] = (len(s_e), len(s_e) - len(missing), not missing)
 
     # ---- 45 character accuracy --------------------------------------------
     s_txt = "".join(s_sp["text"] for s_sp in s_runs)
@@ -953,7 +1075,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     return c
 
 
-def compare(src_path, gd_path):
+def compare(src_path, gd_path, docx_path=None):
     src = fitz.open(src_path)
     gd = fitz.open(gd_path)
 
@@ -1280,7 +1402,7 @@ def compare(src_path, gd_path):
     checks["31_pages_lost_their_text"] = (0, empty_pages, empty_pages == 0)
 
     checks.update(extra_checks(src, gd, s_runs, g_runs, pairs))
-    checks.update(extra_checks2(src, gd))
+    checks.update(extra_checks2(src, gd, docx_path))
 
     src.close()
     gd.close()
@@ -1326,8 +1448,21 @@ def main(argv):
     out = None
     if "--json" in argv:
         out = argv[argv.index("--json") + 1]
+    # The .docx the engine wrote, when the caller has it. The pipeline keeps it beside the
+    # source (out1/<name>.docx next to all/<name>.pdf), so it is looked for there too;
+    # without it 54_image_dpi cannot be answered and says so rather than failing.
+    docx_path = None
+    if "--docx" in argv:
+        docx_path = argv[argv.index("--docx") + 1]
+    else:
+        stem = os.path.splitext(os.path.basename(src))[0]
+        for cand in (os.path.join(os.path.dirname(src), "..", "out1", stem + ".docx"),
+                     os.path.join(os.path.dirname(src), stem + ".docx")):
+            if os.path.exists(cand):
+                docx_path = cand
+                break
     try:
-        res = compare(src, gd)
+        res = compare(src, gd, docx_path)
     except Exception as e:
         print("could not run: %s" % e, file=sys.stderr)
         return 2

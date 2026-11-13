@@ -61,6 +61,18 @@ def _render(rows, gap=False):
     return "\n".join(out) + "\n"
 
 
+def _glued_rows(rows):
+    """A writer that puts a whole row on one line - the collapse t04 has to catch.
+    Every word is still there, so only the line count has moved."""
+    out = []
+    for row in rows:
+        line = ""
+        for x, t in row:
+            line = line.ljust(round(x / CHARW)) + t
+        out.append(line)
+    return "\n".join(out) + "\n"
+
+
 def _cells_on_own_lines(rows):
     """Every cell on its own line, still at its own column. The indentation is right
     and the words are right; only the row has been broken up."""
@@ -98,10 +110,18 @@ def cases():
         ("a flat txt fires only t02", BASE,
          "Alpha\nBeta\nGamma\n", ["t02_position"]),
 
-        # t04 - two cells per row, and the txt gives each cell its own line. The
-        # words and their indentation are both right; only the row is gone.
-        ("a row split across lines fires only t04", TWO_CELL,
-         _cells_on_own_lines(TWO_CELL), ["t04_structure"]),
+        # t04 - two cells per row, and the txt gives each cell its own line. That is not
+        # a fault: TxtWriter.appendTable writes one cell per line by design, and the
+        # source drew each cell as a line of its own, so six drawn lines became six
+        # lines. Counting baselines instead of drawn lines is what used to fail this.
+        ("a cell on its own line is the format, not a fault", TWO_CELL,
+         _cells_on_own_lines(TWO_CELL), []),
+
+        # t04 - the other direction: every word kept, the indentation kept, but each row
+        # glued onto one line. Six drawn lines became three, and no other check can see
+        # it, because no word was lost and nothing moved.
+        ("rows glued onto one line fires only t04", TWO_CELL,
+         _glued_rows(TWO_CELL), ["t04_structure"]),
 
         # t05 - nothing at all
         ("an empty txt fires t05 and t01", BASE, "", ["t01_word_accuracy",

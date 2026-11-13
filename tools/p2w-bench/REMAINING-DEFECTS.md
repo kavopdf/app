@@ -221,3 +221,63 @@ looks impossible to move, the first question is not "what does the engine do wro
 number a property of the document or a property of the tool that made it".
 
 `47_margins` cost four attempts and a day. It was a space.
+
+## Class `47_margins` - the three counts reconciled (13 Nov)
+
+Three stores were being quoted for one class, and one of the three numbers was never this class's.
+All of the figures below were measured on 13 Nov with the commands in EVIDENCE-style form:
+`python3 -` over `BASELINE.md` and `RESULTS.jsonl`, counting documents whose `failed` column
+contains `47_margins`.
+
+| store | what it holds | documents | failing `47_margins` |
+|---|---|---|---|
+| `RESULTS.jsonl`, committed engine `2a68de6` only | 297 rows, 7 engine ids, one row per doc per engine | 208 | **203** |
+| `RESULTS.jsonl`, last row per document, any engine | same file, dirty engines included | 211 | 204 |
+| `BASELINE.md` | 211 rows, one per document, latest measurement | 211 | **205** |
+| `DEFECT-CLASSES.md` | generated from `BASELINE.md` by `classify.py` | 211 | **205** |
+
+**203 and 205 are both right and are not the same measurement.** The gap is three documents, and it
+resolves exactly, document by document:
+
+- `BASELINE.md` carries three documents that `RESULTS.jsonl` does not hold on engine `2a68de6`:
+  `600_reviewed_invoice_with_annotations`, `601_fillable_admission_form`,
+  `602_bookmarked_annual_report` - all three measured 13 Nov on the newer engine `eca9020`.
+- Two of them (`600`, `601`) fail `47_margins`. The third (`602`) passes it.
+- No document fails `47_margins` in `RESULTS.jsonl` and passes it in `BASELINE.md` - the difference
+  is one-directional.
+
+203 + 2 = 205. The 204 is not a count of anything: it is what you get by taking each document's
+last row regardless of which attempt wrote it, which mixes four dirty (reverted) engine ids into a
+count of what ships.
+
+**Authoritative: `BASELINE.md`.** For three reasons, in order of weight:
+
+1. It is the only store that is one row per document by construction - 211 rows, 211 distinct
+   documents, 0 duplicates - so counting it needs no rule about which row wins. Counting
+   `RESULTS.jsonl` needs an engine rule, and getting that rule wrong moves the answer (203 vs 204).
+2. It is the store the verifier writes and the only one the classifier reads (`classify.py:118`,
+   `read_baseline`), so every class number in `DEFECT-CLASSES.md` is derived from it. A count quoted
+   from anywhere else will disagree with the file the fixer actually picks from.
+3. `RESULTS.jsonl` is an append-only per-attempt log: four of its seven engine ids are `-d`/dirty
+   builds from attempts that were reverted (`2a68de6-dc3d644`, `-dirty`, `-d80a524`, `-d5215cb`,
+   `-df33807`). A row written by a reverted attempt describes an engine that does not ship.
+
+**The caveat that matters more than the count.** 208 of the 211 `BASELINE.md` rows carry engine
+`2a68de6` and only 3 carry `eca9020`; the 17 rows re-measured on 13 Nov under `2a68de6` still fail
+`47_margins` 17 of 17. So **205 is the class size BEFORE the lone-space fix (`57f521d`) has been
+measured on the corpus** - nothing in either store re-measures `47_margins` after it. Treat 205 as
+the pre-fix size. It is not today's, and no run should quote it as if the space fix were in it.
+
+**Two numbers that must stop being read as this class's size.**
+
+- `182 of 187` (`REMAINING-DEFECTS.md:180` and `:189`) is a CAUSE share, not a class size: 182
+  documents whose `47_margins` failure was the lone space at x=0, out of the 187 documents in the
+  store when that was measured. Neither 187 nor 182 appears in any current store; both predate the
+  corpus growing to 211.
+- `203` is `20_within_10pt`'s size when `patches/README-2026-11-13.md` was written
+  (the split-box heading in `patches/README-2026-11-13.md`), and `47_margins` was "never 203" as
+  that heading says. It is 205 of
+  211 now, and `20_within_10pt` is 190.
+
+Reconciled figure for anything downstream: **`47_margins` = 205 of 211 documents, measured on
+engine `2a68de6`, pre-`57f521d`** (`BASELINE.md`; `DEFECT-CLASSES.md:19`).

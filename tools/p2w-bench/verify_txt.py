@@ -14,7 +14,13 @@ WHY THIS EXISTS
       text accuracy   the same words, with nothing lost
       position        a line's x survives as its leading spaces
       symbols         the characters a PDF can carry, not just ASCII
-      structure       cells that share a row share a line
+      structure       every text line the page drew is still a line of the .txt
+
+  The last one is a line count on both sides, not a row count against a line count.
+  A .txt has no rows: TxtWriter writes one line per drawn text line, so eight cells
+  drawn across one baseline arrive as eight lines. Counting baselines on the source
+  side and lines on the .txt side measured two different objects and called the
+  engine's own format an eightfold inflation.
 
   It writes nothing and changes nothing. The .docx path is measured by verify_google.py
   and is not touched by this file - a regression in one must not be able to hide behind
@@ -35,17 +41,22 @@ import os
 import re
 import sys
 
-# A row of the page is one baseline. The bucket absorbs a baseline that wobbles by a
-# point or two, which real PDFs do and strict equality would read as a second row.
-Y_BUCKET = 3.0
-
 # How far a line's leading spaces may sit from where its x says it should be. One
 # character of slack absorbs the rounding in x/charW without hiding a shifted column.
 POS_TOLERANCE = 2
 
-# A page that drew N rows should arrive as about N lines. More than this and the
-# structure is gone: a 17-row attendance register became 459 lines.
-MAX_INFLATION = 1.5
+# A page that drew N text lines should arrive as N lines of the .txt, because that is
+# what TxtWriter writes: one line per paragraph line, and one line per table cell
+# (appendTable - "every line the PDF drew stays a line of its own"). The ratio is
+# therefore expected to be exactly 1, and this is only the room the engine's own model
+# needs to split or join a drawn line: appendTable splits a cell on "\n", so a cell the
+# model re-wrapped arrives as two lines from one drawn line, and a paragraph the model
+# joins from several columns arrives as one line from two or more. Measured on the
+# densest real document to hand (350_question_paper, 104 drawn lines -> 112 txt lines)
+# that drift is 8 %. 1.5 is half again either way - six times the drift actually
+# observed - and still catches the fault this check exists for: twenty rows glued onto
+# one line is a ratio of 0.02.
+MAX_LINE_DRIFT = 1.5
 
 # Words that survive, as a share of the source's words.
 MIN_ACCURACY = 98.0
@@ -84,9 +95,25 @@ def _src_runs(path):
     return runs
 
 
-def _rows(runs):
-    """How many distinct baselines the page drew text on."""
-    return len({round(y / Y_BUCKET) for _, y, _ in runs})
+def _src_line_count(path):
+    """How many text lines the page drew - the object the .txt writes one line each.
+
+    A drawn line, not a baseline. Eight cells drawn across one baseline are eight lines
+    here and eight lines in the .txt, so counting baselines instead would read a
+    faithful transcription as eight times too many lines.
+    """
+    import fitz
+    d = fitz.open(path)
+    n = 0
+    for pg in d:
+        for blk in pg.get_text("dict")["blocks"]:
+            if blk.get("type") != 0:
+                continue
+            for ln in blk.get("lines", []):
+                if "".join(sp.get("text", "") for sp in ln.get("spans", [])).strip():
+                    n += 1
+    d.close()
+    return n
 
 
 def _txt_lines(path):
@@ -153,12 +180,18 @@ def compare(src_pdf, txt_path):
     c["t03_symbols"] = (len(s_sym), len(s_sym) - len(missing), not missing)
 
     # ---- t04 structure -----------------------------------------------------
-    rows = _rows(runs)
-    if rows:
-        infl = round(len(lines) / rows, 2)
-        c["t04_structure"] = (rows, len(lines), infl <= MAX_INFLATION)
+    # The same object on both sides: a drawn text line of the page against a line of the
+    # .txt. A row of the page is not that object - a row is a y, and the .txt carries no
+    # y for a table row, so a row cannot be counted in it at all.
+    # An empty .txt is t05's finding, not this one: a file with no lines has no structure
+    # to compare, and restating the emptiness here would put two ids on one fault.
+    src_lines = _src_line_count(src_pdf)
+    if src_lines and lines:
+        drift = round(len(lines) / src_lines, 2)
+        c["t04_structure"] = (src_lines, len(lines),
+                              1.0 / MAX_LINE_DRIFT <= drift <= MAX_LINE_DRIFT)
     else:
-        c["t04_structure"] = (0, len(lines), True)
+        c["t04_structure"] = (src_lines, len(lines), True)
 
     # ---- t05 completeness --------------------------------------------------
     # A PDF with text must produce a .txt with text. A scanned page whose OCR ran and
