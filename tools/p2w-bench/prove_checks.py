@@ -867,7 +867,6 @@ CASES = {
     "30_ink_where_blank_was":   ("render", mut_rule, BASE, "ink added"),
     "31_pages_lost_their_text": ("render", mut_blank, BASE, "the page left blank"),
     "32_stroke_lines":          ("render", mut_rules_removed, BASE, "every rule removed"),
-    "33_border_over_text":      ("render", mut_rule, BASE, "a rule through a word"),
     "34a_span_size_match":      ("render", mut_restyle, BASE, "30% of spans resized"),
     "34b_span_colour_match":    ("render", mut_restyle, BASE, "30% of spans recoloured"),
     "34c_span_weight_match":    ("render", mut_bold, BASE, "35% of spans made bold"),

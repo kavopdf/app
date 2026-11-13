@@ -133,13 +133,14 @@ def cases():
         text(p, 72, 130, "Total amount 4,500")
     out.append(("borders removed", base, no_lines, ["32_stroke_lines"], None))
 
-    # ---- 33 border drawn over text ----------------------------------------
+    # ---- 46 a rule drawn over text (33 retired - it was this check with a
+    # 2 pt inset on each end, and the two agreed on all 208 corpus documents) ---
     def border_through(p):
         text(p, 72, 100, "Invoice number 12345")
         text(p, 72, 130, "Total amount 4,500")
         table(p, 72, 200, 3, 3)
         p.draw_line((60, 96), (400, 96), color=(0, 0, 0), width=1)
-    out.append(("rule through text", base, border_through, ["33_border_over_text"], None))
+    out.append(("rule through text", base, border_through, ["46_text_crossing_rule"], None))
 
     # ---- 34a span size -----------------------------------------------------
     def bigger(p):

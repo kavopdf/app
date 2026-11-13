@@ -991,35 +991,45 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     g_n, g_w = stroke_stats(gd)
     c["32_stroke_lines"] = (s_n, g_n, s_n == 0 or g_n >= max(1, int(s_n * 0.8)))
 
-    # ---- 33 border over text ----------------------------------------------
-    # A line that crosses a text span's box means the rule is drawn through the
-    # words - the defect the user reported by eye and nothing measured.
-    def borders_over_text(doc):
-        hits = 0
-        for p in doc:
-            lines = _strokes(p)
-            for blk in p.get_text("dict")["blocks"]:
-                if blk.get("type") != 0:
-                    continue
-                for ln in blk.get("lines", []):
-                    for sp in ln.get("spans", []):
-                        if not sp.get("text", "").strip():
-                            continue
-                        x0, y0, x1, y1 = sp["bbox"]
-                        for st in lines:
-                            r = st["rect"]
-                            thin = r.height <= 2.5
-                            if not thin:
-                                continue
-                            if r.y0 > y0 + 1.5 and r.y0 < y1 - 1.5 \
-                                    and r.x0 < x1 - 2 and r.x1 > x0 + 2:
-                                hits += 1
-                                break
-        return hits
+    # ---- 33 RETIRED 13 Nov: it was 46 with a 2 pt inset ---------------------
+    # 33 and 46 were the same question twice. Both walked every span, both kept the same
+    # strokes (`_strokes(p)` filtered to rect.height <= 2.5), both required the rule to sit
+    # inside the span's box vertically (r.y0 > y0 + 1.5 and r.y0 < y1 - 1.5), both counted
+    # one hit per span with `break`, and both judged the render against the source with the
+    # identical allowance `g <= s + s // 5`. The only difference was 2 pt on each end of the
+    # horizontal test - 33 wanted r.x0 < x1 - 2 and r.x1 > x0 + 2, 46 accepts any overlap.
+    # 33's hits are therefore a strict SUBSET of 46's, span for span.
+    #
+    # Measured on the 208-document run of engine 2a68de6 (RESULTS.jsonl): 33 and 46 report
+    # the SAME source and render count on all 208 documents and the same verdict on all 208.
+    # The 2 pt inset never bites, because no corpus document carries a rule that overlaps a
+    # span by less than 2 pt. Retiring 33 changes no verdict anywhere (union of 32/33/46 is
+    # 136 of 208 documents with or without it), which is the whole point: it was costing a
+    # vote in a 57-check universe and buying nothing.
+    #
+    # Constructed 13 Nov (work/discrim.py, run against this file's own extra_checks): a 0.5 pt
+    # stroked rule through a word reads 33 fail / 46 fail, and the same rule drawn as a 0.8 pt
+    # filled band - the way DocxWriter.shape() draws a standalone rule - also reads fail/fail,
+    # so the two shared the `_strokes` amendment as well. A rule overlapping a span's right
+    # edge by 1 pt reads 33 pass / 46 fail, which is the only behaviour 33 lacks. A source
+    # carrying six such 1 pt touches and a render that adds one true crossing reads
+    # 33 fail / 46 pass, which is the only verdict 33 reached alone - and it reaches it
+    # because its own allowance divides by the smaller count (s_bot // 5 = 0 against
+    # s_c // 5 = 1), not because it saw anything 46 did not.
+    #
+    # 46 is the survivor, and it must keep all five of these or the question stops being
+    # asked: the per-span walk with `break` (one hit per span, not per rule), the
+    # rect.height <= 2.5 filter on `_strokes` output (so a box, a 4 pt band and a vertical
+    # rule stay out), the vertical-interior test (so an underline at the baseline stays out -
+    # that is 36_underline_rules' question), the source-relative verdict `g <= s + s // 5`
+    # (a document that legitimately prints a rule across text must not fail against itself),
+    # and the `_strokes` dependency itself (a filled 0.8 pt band IS a rule).
+    #
+    # Cost accepted: with no inset, 46 counts a rule that overlaps a span box by 1 pt, which
+    # may be side bearing rather than glyph. The corpus does not contain that case (0 of 208
+    # documents differ between the two geometries), so the inset was never calibrated; it is
+    # recorded here as a known looseness rather than carried as a second check.
 
-    s_bot = borders_over_text(src)
-    g_bot = borders_over_text(gd)
-    c["33_border_over_text"] = (s_bot, g_bot, g_bot <= s_bot + s_bot // 5)
 
     # ---- 34 per-span style -------------------------------------------------
     # Size, colour and weight of each matched span, not just how many distinct
