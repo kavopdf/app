@@ -1112,12 +1112,45 @@ def extra_checks2(src, gd, docx_path=None):
     #             column is narrower than the source's. Only judged on a page with at least
     #             FULL_PAGE_LINES body lines, because on a short page max(right) is
     #             raggedness, not a column edge, and a two-line page cannot tell them apart.
+    # FOUR FIXES TO THE FIRST VERSION OF THIS CHECK, each measured on the corpus.
+    #
+    # (a) IT JUDGED ONE COLUMN AND CALLED IT THE PAGE. The modal left edge is a minority
+    #     on most pages: 157 of 545 pages hold less than half their ink in it, and 111
+    #     have two left-edge clusters of >=15 %. Everything outside it was unmeasured.
+    #     Constructed: 39 of 51 lines on 56_table_indented_from_margin and 23 of 26 on
+    #     331_pid_diagram widened 25-30 % with every left edge untouched - both checks
+    #     said pass. Every column is now measured, not just the modal one.
+    # (b) THE 10-BODY-LINE FLOOR COUNTED THE WRONG THING. The comment says "body lines";
+    #     the code compared len(col), the lines in the MODAL CLUSTER, which is one column
+    #     of a two-column page. 344 of 545 pages (63 %) are below it and 27 of those have
+    #     >=10 body lines on the page. The floor also produced a discontinuity: the same
+    #     38 %-narrow column fires on 401_trifold_brochure (cluster 10) and passes on
+    #     343_air_waybill (cluster 9). The floor is replaced by a RESOLUTION test on the
+    #     source's own edge, which is what the floor was trying to express: if the two
+    #     longest source lines agree on the edge within RIGHT_UNDERRUN, the edge is known
+    #     to within the tolerance and the comparison means something.
+    # (c) max(right) IS A ONE-LINE STATISTIC AND ITS NOISE IS THE TOLERANCE. The gap
+    #     between the longest and second-longest body line is >6 pt on 150 of 542 judged
+    #     pages (28 %) and >8 pt on 144 (27 %): one line breaking differently - which is
+    #     all a different engine's line breaking is - moves the judged edge past the
+    #     tolerance. Measured: redrawing 11 lines where they already were, in a
+    #     substituted face, fired over=1. The edge is now the 90th percentile of the
+    #     column's right edges and a single line can no longer decide the verdict.
+    # (d) THE BANDS WERE A FRACTION OF THE PAGE AND NOTHING ELSE. 159 of 545 pages have
+    #     body-column lines inside them; on 18 pages the widest body line is one of them,
+    #     by up to 206 pt, and on 320_balance_sheet_statutory moving the page 8 pt
+    #     vertically - a dy defect, not an x one - flips this check. A line in a band is
+    #     now kept when its left edge belongs to a column that continues outside the band.
     BAND = 0.06             # header / footer band, as a fraction of page height
     RIGHT_OVERRUN = 6.0
     RIGHT_UNDERRUN = 8.0
-    FULL_PAGE_LINES = 10
+    COL_MIN_LINES = 3       # a left-edge cluster is a column if it holds this many lines
+    COL_MIN_SHARE = 0.05    # ... or this share of the page's body lines, if larger
+    EDGE_PCT = 0.9          # the column edge is this percentile of its right edges
+    EDGE_MIN_LINES = 5      # below this many lines the percentile is the max anyway
+    SLACK_CAP = 24.0        # the tolerance never grows past this, however ragged the page
 
-    def column_right(page):
+    def page_lines(page):
         ls = []
         for blk in page.get_text("dict")["blocks"]:
             if blk.get("type") != 0:
@@ -1126,33 +1159,93 @@ def extra_checks2(src, gd, docx_path=None):
                 if not "".join(sp.get("text", "") for sp in ln.get("spans", [])).strip():
                     continue
                 ls.append(ln["bbox"])
+        return ls
+
+    def columns(page):
+        """[(left edge, [line bboxes]), ...] - every column on the page.
+
+        The bands are dropped ALWAYS, not only when enough mid-page lines survive. A
+        fallback to "every line" re-admitted the masthead this check exists to ignore:
+        measured on 15_stamp_on_scanned_page, a page whose text layer is two lines and a
+        masthead, the fallback took the masthead's right edge as the column's and fired.
+        A band line is kept when it starts at the left edge of a column that continues
+        outside the band - that is a body line the fraction cut off, not a masthead.
+        """
+        ls = page_lines(page)
         if not ls:
-            return None
+            return []
         H = page.rect.height
-        # The bands are dropped ALWAYS, not only when enough mid-page lines survive. A
-        # fallback to "every line" re-admitted the masthead this check exists to ignore:
-        # measured on 15_stamp_on_scanned_page, a page whose text layer is two lines and a
-        # masthead, the fallback took the masthead's right edge as the column's and fired.
-        pool = [b for b in ls if b[1] >= BAND * H and b[3] <= H - BAND * H]
-        if not pool:
-            return None
-        ml = statistics.mode([round(b[0]) for b in pool])
-        col = [b for b in pool if abs(b[0] - ml) <= 10]
-        if not col:
-            return None
-        return max(b[2] for b in col), len(col)
+        inside = [b for b in ls if b[1] >= BAND * H and b[3] <= H - BAND * H]
+        band = [b for b in ls if not (b[1] >= BAND * H and b[3] <= H - BAND * H)]
+        if not inside:
+            return []
+        need = max(COL_MIN_LINES, int(COL_MIN_SHARE * len(inside)))
+        groups = []
+        for b in sorted(inside, key=lambda b: b[0]):
+            if groups and b[0] - groups[-1][0][0] <= 10:
+                groups[-1].append(b)
+            else:
+                groups.append([b])
+        out = []
+        for g in groups:
+            if len(g) < need:
+                continue
+            a = g[0][0]
+            out.append((a, g + [b for b in band if abs(b[0] - a) <= 10]))
+        return out
+
+    def edge(col):
+        """(the column's right edge, how precisely that page can state it).
+
+        max() was a one-line statistic: its sensitivity to a single line breaking
+        differently is the gap between the longest and second-longest line, which is
+        larger than the 6 pt tolerance on 28 % of the corpus's pages. A percentile over
+        the same lines is the same number on both sides of the comparison, so the
+        systematic shortfall of a ragged column cancels.
+
+        The second number is that percentile's OWN resolution - the distance between the
+        order statistics on either side of it, capped. A re-break can move the k-th value
+        by at most that much, so it is the largest movement that is not evidence of a
+        defect, and the tolerance has to include it. This replaces the 10-line floor: the
+        floor was an attempt to ask "is this page's edge measurable", and this answers it
+        per column instead of per page, on every column, including the short ones.
+        """
+        v = sorted(b[2] for b in col)
+        if len(v) < EDGE_MIN_LINES:
+            return v[-1], min(SLACK_CAP, v[-1] - v[0]) if len(v) > 1 else 0.0
+        k = min(len(v) - 1, int(round(EDGE_PCT * (len(v) - 1))))
+        lo, hi = max(0, k - 1), min(len(v) - 1, k + 1)
+        return v[k], min(SLACK_CAP, v[hi] - v[lo])
 
     over = under = 0
     for i in range(min(src.page_count, gd.page_count)):
-        a, b = column_right(src[i]), column_right(gd[i])
-        if not a or not b:
+        sc, gc = columns(src[i]), columns(gd[i])
+        if not sc or not gc:
             continue
-        rs, ns = a
-        rg, ng = b
-        if rg > rs + RIGHT_OVERRUN:
+        for a, s_col in sc:
+            hit = [(abs(a - b2), c2) for b2, c2 in gc if abs(a - b2) <= 10]
+            if not hit:
+                continue                      # the column is gone: 04/05 own that
+            g_col = min(hit, key=lambda t: t[0])[1]
+            (rs, slack), rg = edge(s_col), edge(g_col)[0]
+            # The percentile is the single-line defence and it is implicit, so it is worth
+            # stating: on a 19-line column the p90 is the 3rd-longest line, so one line
+            # breaking differently does not move it. A max would be moved by exactly the
+            # longest/second-longest gap, which is 6 pt or more on 28 % of pages.
+            if rg > rs + RIGHT_OVERRUN + slack:
+                over += 1
+                break
+            if rg < rs - RIGHT_UNDERRUN - slack:
+                under += 1
+                break
+        # Safety net for ink that is not in any column: a diagram's labels, a table's
+        # cells, a caption set at its own left edge. 23 of 26 lines on 331_pid_diagram
+        # widened 30 % were invisible because no cluster of 3 lines held them. Two lines
+        # running far past the source's own widest line is not line breaking.
+        s_max = max((b[2] for b in page_lines(src[i])), default=0)
+        far = sum(1 for b in page_lines(gd[i]) if b[2] > s_max + 3 * RIGHT_OVERRUN)
+        if far >= 2 and not over:
             over += 1
-        elif ns >= FULL_PAGE_LINES and ng >= FULL_PAGE_LINES and rg < rs - RIGHT_UNDERRUN:
-            under += 1
     # source = pages whose column overruns the source's, render = pages whose column is
     # narrower than the source's. A raw total would read the same for one of each.
     c["60_text_column_right_edge"] = (over, under, over == 0 and under == 0)
@@ -1620,12 +1713,61 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     # (measured: a 56 pt lift takes 18_median_dy to -56 on 210 of 210 documents). It also
     # read page 1 only, which left a 30 pt shift confined to pages 2+ silent on 18 of 18
     # multi-page documents. This check owns x, on every page.
-    LM_TOL = 3.0        # the modal left edge may differ by this much, per page
-    DX_MED_TOL = 2.0    # ... and the line-left registration by this, at the median
-    DX_P90_TOL = 6.0    # ... and this, at the 90th percentile
+    # THREE FIXES TO THE FIRST VERSION OF THIS CHECK, each measured on the corpus.
+    #
+    # (a) THE ANCHOR WAS A TIE-BREAK. statistics.mode returns the FIRST value with the
+    #     highest count, so on a page whose two commonest left edges hold the same number
+    #     of lines the "margin" was whichever one the block order put first. 49 of the
+    #     corpus's 545 pages are an exact tie and 22 more differ by one line (see the
+    #     tie census in the patch notes). Constructed: on 02_stamp_rotated_15deg_upleft
+    #     (left edges 56, 86, 332 each holding 11 lines) wrapping ONE line into two at
+    #     x=86 - nothing moved - flipped the anchor to 86 and the check reported a 30 pt
+    #     margin error. The anchor is now the LEFTMOST left edge that many lines share,
+    #     which no single added or moved line can change.
+    # (b) THE p90 LEFT THE TOP 10 % OF d UNCONSTRAINED. For a page with n lines the
+    #     percentile index is round(0.9*(n-1)), so n-1-round(0.9*(n-1)) lines could be
+    #     anywhere at all: 1607 of the corpus's 17214 body lines (9.3 %) and 134
+    #     documents with >=4 such lines on some page. Constructed: 11 of 106 lines on
+    #     product-catalogue-code-left-price-right moved +70 pt and the check still said
+    #     (0.0, 0.0, ok). A COUNT BUDGET replaces it - at most max(2, 5 %) of the page's
+    #     lines may be unregistered, and no single line may be further out than
+    #     DX_WORST_TOL. Same shape as 18_displacement, which is the house standard.
+    # (c) 3 pt ON THE ANCHOR IS KEPT. It is the one number here that is a real decision
+    #     rather than a defect: a 2 pt whole-page shift still passes (measured), a 3 pt
+    #     one fails on the registration rule. It is stated, not derived.
+    LM_TOL = 3.0        # the body's left edge may differ by this much, per page
+    DX_MED_TOL = 2.0    # a line is registered if a render line starts within this
+    DX_TAIL_SHARE = 0.05  # at most this share of a page's lines may be unregistered
+    DX_TAIL_MIN = 2       # ... but never fewer than this many
+    DX_WORST_TOL = 24.0   # ... and no single line may be further out than this
+
+    def anchor(xs):
+        """The body's left margin: the leftmost left edge that many lines share.
+
+        Not the mode. The mode is decided by a tie on 49 of 545 corpus pages, and one
+        re-wrapped line is enough to move it (22 more pages differ from their runner-up
+        by a single line). A margin is a place many lines start, and the leftmost such
+        place is the one no single line can change.
+        """
+        if not xs:
+            return None
+        need = max(3, int(0.05 * len(xs)))
+        cnt = collections.Counter(round(x) for x in xs)
+        shared = [x for x, k in cnt.items() if k >= need]
+        return min(shared) if shared else min(round(x) for x in xs)
 
     def line_lefts(doc):
-        """[(page, modal left edge, [left edges of that page's ink lines]), ...]"""
+        """[(page, body left edge, [(left edge, centre y), ...]), ...]
+
+        The centre y is carried because the registration below is ROW-LOCAL. Matching
+        each source line against every render line's left edge on the page made a
+        displaced line invisible whenever it happened to land on another indent level:
+        constructed, 11 of 106 lines on product-catalogue-code-left-price-right moved
+        +70 pt straight onto the page's second column and d stayed 0.0 on every one of
+        them. Restricting the match to render lines on the same row keeps the property
+        the set-distance was there for - a re-wrapped line still starts at the column
+        edge, so wrapping cannot move it - and removes the collision.
+        """
         out = []
         for pi, p in enumerate(doc):
             xs = []
@@ -1635,17 +1777,14 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
                 for ln in blk.get("lines", []):
                     if not "".join(sp.get("text", "") for sp in ln.get("spans", [])).strip():
                         continue
-                    xs.append(round(ln["bbox"][0], 1))
-            out.append((pi, (statistics.mode([round(x) for x in xs]) if xs else None), xs))
+                    b = ln["bbox"]
+                    xs.append((round(b[0], 1), (b[1] + b[3]) / 2.0, b[3] - b[1]))
+            out.append((pi, anchor([x[0] for x in xs]), xs))
         return out
-
-    def _p90(v):
-        v = sorted(v)
-        return v[min(len(v) - 1, int(round(0.9 * (len(v) - 1))))] if v else 0.0
 
     s_ll, g_ll = line_lefts(src), line_lefts(gd)
     margin_bad, indent_bad = [], []
-    worst_med = worst_p90 = 0.0
+    worst_med = worst_tail = worst_worst = 0.0
     for (pi, s_ml, s_xs), (_, g_ml, g_xs) in zip(s_ll, g_ll):
         if s_ml is not None and g_ml is not None and abs(s_ml - g_ml) > LM_TOL:
             margin_bad.append((pi + 1, s_ml, g_ml))
@@ -1653,17 +1792,29 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
             continue
         # set distance, not pairing: a render may split, merge or drop a line, and an index
         # pairing turns that into a false positional failure - the defect 59 had and 22 had.
-        d = [min(abs(x - y) for y in g_xs) for x in s_xs]
-        med, p90 = statistics.median(d), _p90(d)
-        worst_med, worst_p90 = max(worst_med, med), max(worst_p90, p90)
-        if med > DX_MED_TOL or p90 > DX_P90_TOL:
-            indent_bad.append((pi + 1, round(med, 1), round(p90, 1)))
+        d = []
+        for x, yc, h in s_xs:
+            near = [y for y, gy, _ in g_xs if abs(gy - yc) <= max(2.0, 0.35 * h)]
+            if not near:
+                near = [y for y, _, _ in g_xs]     # the line moved vertically: 18/19's job
+            d.append(min(abs(x - y) for y in near))
+        tail = [v for v in d if v > DX_MED_TOL]
+        budget = max(DX_TAIL_MIN, int(round(DX_TAIL_SHARE * len(d))))
+        worst_med = max(worst_med, statistics.median(d))
+        worst_tail = max(worst_tail, float(len(tail)))
+        worst_worst = max(worst_worst, max(d))
+        # A count budget, not a percentile. The percentile left the largest 10 % of d
+        # unconstrained by construction; the budget leaves at most 5 %, and the worst-line
+        # cap means even a line inside the budget cannot be arbitrarily far out.
+        if len(tail) > budget or max(d) > DX_WORST_TOL:
+            indent_bad.append((pi + 1, len(tail), round(max(d), 1)))
 
-    # Reported as (worst page median, worst page p90, ok). The page numbers and the actual
-    # margins are in the check's own record so a failure can be read without re-running:
-    # "47_margins: pages 3,7 left edge 56->48" is what a fixer needs and four bbox numbers
-    # never said it.
-    c["47_margins"] = (round(worst_med, 1), round(worst_p90, 1),
+    # Reported as (worst page median, worst page unregistered-line count, ok), with the
+    # worst single displacement in the failure record. The page numbers and the actual
+    # margins are in margin_bad / indent_bad so a failure can be read without re-running:
+    # "47_margins: pages 3,7 left edge 56->48" is what a fixer needs.
+    del worst_worst
+    c["47_margins"] = (round(worst_med, 1), int(worst_tail),
                        not margin_bad and not indent_bad)
     # A detail check would be counted as a check: all_check_ids() discovers ids by running
     # the verifier, so a second key here would add a free pass to every document's score.

@@ -165,6 +165,37 @@ def mut_restyle(doc, frac=0.30, size=2.2, colour=(0.8, 0, 0.8), bold=False):
                       fontname="hebo" if bold else "helv", color=colour)
 
 
+def mut_column_narrow(doc, page=0, sx=0.72):
+    """Shrink the body column's right edge on one page, leaving every left edge alone.
+
+    60_text_column_right_edge had NO case in this table at all - it was reported
+    UNPROVEN, "no case written", so the 210-mutant run this check was signed off on never
+    touched it. This is the defect it exists for: the render's column is narrower than the
+    source's, which is the mirror of w:pgMar right="0" running the other way. The left
+    edges are kept, so 47 stays silent and only 60 can see it.
+    """
+    p = doc[page]
+    moves = []
+    for b in _blocks(p):
+        for ln in b.get("lines", []):
+            sp = [s for s in ln["spans"] if s["text"].strip()]
+            if not sp:
+                continue
+            moves.append((fitz.Rect(ln["bbox"]),
+                          "".join(s["text"] for s in sp),
+                          max(s["size"] for s in sp)))
+    if not moves:
+        return
+    for r, t, sz in moves:
+        p.add_redact_annot(r)
+    p.apply_redactions()
+    kw = {"fontname": _FACE, "fontfile": UNI_FONT} if _HAVE_UNI else {"fontname": "helv"}
+    for r, t, sz in moves:
+        p.insert_text((r.x0, r.y1 - 1), t, fontsize=sz, color=(0, 0, 0),
+                      morph=(fitz.Point(r.x0, r.y1 - 1),
+                             fitz.Matrix(sx, 0, 0, 1, 0, 0)), **kw)
+
+
 def mut_bold(doc):
     mut_restyle(doc, frac=0.35, size=1.0, colour=(0, 0, 0), bold=True)
 
@@ -954,6 +985,8 @@ CASES = {
     "54_image_dpi":             ("render", mut_image_shrink, IMG_DOC, "the image resolution changed"),
     "55_orientation_mix":       ("render", mut_landscape, BASE, "the page turned landscape"),
     "56_rtl_runs":              ("source", mut_rtl, BASE, "a reversed run the render does not have"),
+    "60_text_column_right_edge": ("render", mut_column_narrow, MONO_DOC,
+                                 "the body column 28 % narrower, every left edge kept"),
 }
 
 
