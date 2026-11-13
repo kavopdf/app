@@ -1815,6 +1815,20 @@
       "t05_completeness"
     ]
   },
+  "602_bookmarked_annual_report": {
+    "best": 4,
+    "failed": [
+      "t04_structure"
+    ],
+    "out_of": 5,
+    "universe": [
+      "t01_word_accuracy",
+      "t02_position",
+      "t03_symbols",
+      "t04_structure",
+      "t05_completeness"
+    ]
+  },
   "60_page_border": {
     "best": 3,
     "failed": [
