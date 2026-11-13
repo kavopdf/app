@@ -2198,17 +2198,11 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
         shared = [x for x, k in cnt.items() if k >= need]
         return min(shared) if shared else min(round(x) for x in xs)
 
-    def line_lefts(doc):
-        """[(page, body left edge, [(left edge, centre y), ...]), ...]
+    def page_lefts(doc):
+        """[(page index, the body's left edge, how many lines the page has), ...]
 
-        The centre y is carried because the registration below is ROW-LOCAL. Matching
-        each source line against every render line's left edge on the page made a
-        displaced line invisible whenever it happened to land on another indent level:
-        constructed, 11 of 106 lines on product-catalogue-code-left-price-right moved
-        +70 pt straight onto the page's second column and d stayed 0.0 on every one of
-        them. Restricting the match to render lines on the same row keeps the property
-        the set-distance was there for - a re-wrapped line still starts at the column
-        edge, so wrapping cannot move it - and removes the collision.
+        Only the anchor is taken from the page now. The per-line registration below is
+        measured on the caller's matched runs, not on this page's raw left edges.
         """
         out = []
         for pi, p in enumerate(doc):
@@ -2219,50 +2213,79 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
                 for ln in blk.get("lines", []):
                     if not "".join(sp.get("text", "") for sp in ln.get("spans", [])).strip():
                         continue
-                    b = ln["bbox"]
-                    xs.append((round(b[0], 1), (b[1] + b[3]) / 2.0, b[3] - b[1]))
-            out.append((pi, anchor([x[0] for x in xs]), xs))
+                    xs.append(ln["bbox"][0])
+            out.append((pi, anchor(xs), len(xs)))
         return out
 
-    s_ll, g_ll = line_lefts(src), line_lefts(gd)
     margin_bad, indent_bad = [], []
-    worst_med = worst_tail = worst_worst = 0.0
-    for (pi, s_ml, s_xs), (_, g_ml, g_xs) in zip(s_ll, g_ll):
+    worst_med = worst_tail = 0.0
+
+    # ---- (a) the margin itself: the page's anchor left edge ------------------
+    for (pi, s_ml, _sn), (_, g_ml, _gn) in zip(page_lefts(src), page_lefts(gd)):
         if s_ml is not None and g_ml is not None and abs(s_ml - g_ml) > LM_TOL:
             margin_bad.append((pi + 1, s_ml, g_ml))
-        if not s_xs or not g_xs:
-            continue
-        # set distance, not pairing: a render may split, merge or drop a line, and an index
-        # pairing turns that into a false positional failure - the defect 59 had and 22 had.
-        d = []
-        for x, yc, h in s_xs:
-            near = [y for y, gy, _ in g_xs if abs(gy - yc) <= max(2.0, 0.35 * h)]
-            if not near:
-                near = [y for y, _, _ in g_xs]     # the line moved vertically: 18/19's job
-            d.append(min(abs(x - y) for y in near))
-        tail = [v for v in d if v > DX_MED_TOL]
-        budget = max(DX_TAIL_MIN, int(round(DX_TAIL_SHARE * len(d))))
-        worst_med = max(worst_med, statistics.median(d))
-        worst_tail = max(worst_tail, float(len(tail)))
-        worst_worst = max(worst_worst, max(d))
-        # A count budget, not a percentile. The percentile left the largest 10 % of d
-        # unconstrained by construction; the budget leaves at most 5 %, and the worst-line
-        # cap means even a line inside the budget cannot be arbitrarily far out.
-        if len(tail) > budget or max(d) > DX_WORST_TOL:
-            indent_bad.append((pi + 1, len(tail), round(max(d), 1)))
 
-    # Reported as (worst page median, worst page unregistered-line count, ok), with the
-    # worst single displacement in the failure record. The page numbers and the actual
-    # margins are in margin_bad / indent_bad so a failure can be read without re-running:
-    # "47_margins: pages 3,7 left edge 56->48" is what a fixer needs.
-    del worst_worst
+    # ---- (b) the indent structure: every matched run's left edge -------------
+    # MEASURED ON THE MATCHED RUNS, NOT ON A ROW-LOCAL SET DISTANCE.
+    #
+    # The set distance was a VERTICAL check wearing a horizontal ruler. It paired each
+    # source line with the render line whose left edge was nearest ON THE SAME ROW, where
+    # "same row" was +-max(2, 0.35 * h) pt of that line's centre y; when no render line was
+    # on the row it fell back to EVERY render line on the page. A vertical displacement of
+    # a few points therefore became a horizontal distance to an unrelated line. Measured on
+    # the 211 (the corpus, the engine at 22728b1, LibreOffice's render):
+    #
+    #   purchase-order   the footer "Page 1 of 1" is at x=520.0 in the source and x=520.1
+    #                    in the render - 0.1 pt out horizontally - but 2.5 pt low. The row
+    #                    window on that line is max(2, 0.35 * 6.4) = 2.24 pt, so it missed,
+    #                    the fallback returned the nearest left edge on the page (42.6),
+    #                    and the check reported a 477.4 pt margin error. All 106 of that
+    #                    document's matched runs are within 0.67 pt horizontally.
+    #   the same footer  electricity-bill, eway-bill, salary-slip-factory-wages,
+    #                    property-tax-receipt and purchase-order all report exactly 477.4:
+    #                    five documents, one shape. Across the 82 failures, 201 of the 202
+    #                    unregistered lines that the render holds AT THE SAME x are beyond
+    #                    the row window vertically, and 43 of the 82 are decided by such a
+    #                    line.
+    #   dropping the fallback does not fix it. When the footer's own counterpart is 2.5 pt
+    #                    low, a BODY line standing on the footer's row is in the row set and
+    #                    sits at x=42.6. Constructed (construct2.py): one body line on the
+    #                    footer's row, the footer 3.9 pt low, nothing moved horizontally at
+    #                    all - and the check reports (0.0, 1) and FAILS.
+    #
+    # The pairing is the caller's `pairs`: one-to-one, page-constrained, text-matched and
+    # claimed nearest-first (see the assignment in compare()). It is the same evidence 43
+    # and 18 are built on, so this clause now asks its question of the same material they
+    # do instead of inventing a second, weaker pairing of its own.
+    #
+    # The worst-run cap needs CORROBORATION. One run out is a pairing artefact - a
+    # duplicated word can still claim a distant occurrence - so a single outlier is not a
+    # displacement; two are. Measured: with the cap unconditional, 370_offer_letter fails
+    # on 1 of its 37 runs at 43.0 pt and 69_two_col_legal_numbered_clauses on 1 of 51 at
+    # 239.2 pt; both are clean at every other run.
+    DX_MIN_PAIRS = 5        # below this many matched runs a page is not judged on a count
+    by_page = collections.defaultdict(list)
+    for s_sp, g_sp in pairs:
+        by_page[s_sp["page"]].append(g_sp["x"] - s_sp["x"])
+    for pg, dd in sorted(by_page.items()):
+        if len(dd) < DX_MIN_PAIRS:
+            continue
+        out = [v for v in dd if abs(v) > DX_MED_TOL]
+        budget = max(DX_TAIL_MIN, int(round(DX_TAIL_SHARE * len(dd))))
+        worst_med = max(worst_med, statistics.median([abs(v) for v in dd]))
+        worst_tail = max(worst_tail, float(len(out)))
+        if len(out) > budget or (len(out) >= 2 and max(abs(v) for v in dd) > DX_WORST_TOL):
+            indent_bad.append((pg + 1, len(out), round(max(abs(v) for v in dd), 1)))
+
+    # Reported as (worst page median, worst page unregistered-run count, ok). The page
+    # numbers and the actual edges are in margin_bad / indent_bad so a failure can be read
+    # without re-running: "47_margins: pages 3,7 left edge 56->48" is what a fixer needs.
     c["47_margins"] = (round(worst_med, 1), int(worst_tail),
                        not margin_bad and not indent_bad)
     # A detail check would be counted as a check: all_check_ids() discovers ids by running
     # the verifier, so a second key here would add a free pass to every document's score.
-    # The worst page's numbers are what the tuple already carries; the page numbers are in
-    # margin_bad / indent_bad and are reproduced by any re-run with --json.
     del margin_bad, indent_bad
+
 
     # ---- 48 image area -----------------------------------------------------
     def img_area(doc):
