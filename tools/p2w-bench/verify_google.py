@@ -1631,6 +1631,28 @@ def compare(src_path, gd_path, docx_path=None):
                                     clipped <= max(2, s_clipped + len(g_runs) // 50))
 
     # 29 blank where source has ink / 30 ink where source is blank
+    # CORRECTION (13 Nov): bucket the RENDER in the SOURCE's frame. med_dx / med_dy are
+    # the document-wide median offsets of the matched runs above - the amount the whole
+    # document was translated. Subtracting them before bucketing means a uniform shift
+    # lands in the cells the source itself used, so only cells whose occupancy really
+    # changed are counted. Without it a 2.5 pt shift walks runs across the 24x24 lattice
+    # boundaries and BOTH checks fire on a document whose text is intact: measured on
+    # 12 real documents, a 2.5 pt horizontal shift failed 29 on 3 and 30 on 2, with
+    # 18/19/20/21 all passing; at 5 pt it failed 29 and 30 on 7 of 12.
+    # With no matched runs both medians are 0.0 and this is exactly the old behaviour.
+    # Per PAGE, not per document. A whole-document median is right when the whole
+    # document moved, but it cannot see a shift that only one page carries (the median
+    # of a three-page document with page 2 displaced stays 0, so the correction does
+    # nothing: measured, page 2 of table-across-page-break-repeated-header shifted 10 pt
+    # still reported 29=52 30=49). On a single-page document this is the same number as
+    # med_dx / med_dy, so it strictly dominates.
+    pdx, pdy = {}, {}
+    for _pg in sorted({r["page"] for r, _ in pairs}):
+        _xs = [g["x"] - s["x"] for s, g in pairs if s["page"] == _pg]
+        _ys = [g["y"] - s["y"] for s, g in pairs if s["page"] == _pg]
+        if _xs:
+            pdx[_pg] = round(median(_xs), 1)
+            pdy[_pg] = round(median(_ys), 1)
     blank_loss, extra_ink, s_grid_total = 0, 0, 0
     for i in range(min(src.page_count, gd.page_count)):
         sp, gp = src[i], gd[i]
@@ -1642,7 +1664,8 @@ def compare(src_path, gd_path, docx_path=None):
             s_cells.add((int(r["x"] / cw), int(r["y"] / ch)))
         g_cells = set()
         for r in runs(gp):
-            g_cells.add((int(r["x"] / cw), int(r["y"] / ch)))
+            g_cells.add((int((r["x"] - pdx.get(i, med_dx)) / cw),
+                         int((r["y"] - pdy.get(i, med_dy)) / ch)))
         s_grid_total += len(s_cells)
         blank_loss += len(s_cells - g_cells)
         extra_ink += len(g_cells - s_cells)

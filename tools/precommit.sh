@@ -71,7 +71,7 @@ pass "every shell script parses"
 
 # the cheap guards, the ones that read text and need no build
 COULD_NOT_RUN=""
-for g in check-file-names check-tool-titles check-permissions check-pdf2word; do
+for g in check-file-names check-tool-titles check-permissions check-pdf2word check-regressions; do
   if [ -f "tools/$g.py" ]; then
     if python3 "tools/$g.py" >/tmp/guard.$$ 2>&1; then
       pass "$g"

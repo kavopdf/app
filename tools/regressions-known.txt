@@ -1,0 +1,21 @@
+# Regressions that are explained. One line per <sha>:<path>, reason after '#'.
+#
+# A waiver does not hide a flag. The guard still prints it, prefixed "known" instead
+# of "FAIL", so the count of explained vanishings is on screen every run and cannot
+# grow without someone reading it.
+#
+# Everything here was read by hand. Nothing goes in because it was inconvenient.
+
+# 995290a tools/p2w-bench/prove_checks.py
+#   b242cfa rebuilt prove_checks.py from 54928a0 instead of re-applying 995290a's
+#   version, so 66 of the 81 lines 995290a added are absent from HEAD on purpose.
+#   The lines the repair restored belong to 2310c3b / 7fe434e / 54928a0 and all of
+#   them survive at HEAD. This is the repair, not a second loss.
+995290a:tools/p2w-bench/prove_checks.py
+
+# 229faa9 tools/p2w-bench/verify_google.py
+#   229faa9 widened the footer band to 0.11/0.89. 2310c3b - "44's widening swallowed
+#   body text" - deliberately took it back to 0.10/0.90, and removed 11 of the 17
+#   gone lines itself. A later commit replacing a line on purpose, which is the one
+#   shape this check cannot tell from a loss on its own.
+229faa9:tools/p2w-bench/verify_google.py
