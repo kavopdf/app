@@ -167,3 +167,9 @@ claim and after each step; it is not code and cannot break anything.
 | 13 Nov 07:43 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 07:43 | ? | commit-gate | started |
 | 13 Nov 08:40 | fixer | claim | fixer claimed the slot |
+| 13 Nov 08:41 | fixer | build-engine | started |
+| 13 Nov 08:43 | fixer | build-engine | started |
+| 13 Nov 08:45 | fixer | hypothesis | 20_within_10pt (+4) -> ruled-out |
+| 13 Nov 08:45 | fixer | attempt | 20_within_10pt (+4) -> error (OPEN) |
+| 13 Nov 08:45 | fixer | ratchet | held or rose |
+| 13 Nov 08:45 | ? | commit-gate | started |

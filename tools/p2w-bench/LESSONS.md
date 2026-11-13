@@ -95,3 +95,9 @@ everything else: what went wrong in the work itself.
   ignored, so a baseline cannot be placed independently of the pitch. Only `w:before` moves a
   line, and it moves the next one with it. Cost: one calibration round, and it rules out the
   obvious repair of the hairline patch before it reached twenty documents.
+
+- **A saved patch may already have its twenty rows.** `hairline-flow-before-refined.patch` was
+  applied, built and measured through Drive before anyone asked the store: the content-hash engine id
+  came out `2a68de6-d5215cb`, which already held 20 rows. `git diff ... | sha1sum` is computable
+  BEFORE a build - do it, and `grep` the id in `RESULTS.jsonl`, before spending a slot re-measuring
+  a state that is already on the record. Cost: one slot's measurement time for zero new rows.

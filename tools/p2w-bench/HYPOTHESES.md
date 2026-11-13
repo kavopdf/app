@@ -117,6 +117,10 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: Calibration A/B/C above: the offset is uniform per run and identical for every line, so one shift at the run's first line moves all of them; C proves the same result cannot be reached by putting the difference in w:after. Untested: no build has applied the shift at a run start.
   recorded: 2026-11-13 07:43
 
+- RULED OUT - The refined hairline (advance = linePt + beforeTw, the fitter's own charge, not the 0.2/0.8 model split) is a NEW engine state that had never been measured on twenty documents
+  evidence: 13 Nov 08:40 fixer: applied patches/hairline-flow-before-refined.patch, built, converted and measured 7 docs through Drive. The content-hash engine id came out 2a68de6-d5215cb, which ALREADY holds 20 rows in RESULTS.jsonl: this exact patch was measured by an earlier run and reverted. Store, 20 docs: 16 target-failing at baseline, 6 moved (304 51->58, 334 47->53, 321 54->57, 34 53->56, 373 43->47, 406 46->48) = 37.5%, and 5 documents fell below baseline (311 47->45, 35 54->52, 49 55->54, academic-paper 46->42, table-with-no-header 54->53). Check the store for the diff-hash engine id BEFORE building: a saved patch may already have its twenty rows.
+  recorded: 2026-11-13 08:45
+
 
 ## 47_margins
 
