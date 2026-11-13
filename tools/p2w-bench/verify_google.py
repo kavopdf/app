@@ -690,11 +690,50 @@ def _span_flags(sp):
 # OVERLAP of its own length. Per rule, per page - so a gain can never pay for a loss.
 #
 # Isolation is asked of the SOURCE only. The grid's geometry is re-derived by the
-# renderer from the table model and is 06/07's question; on the render side we only ask
-# "is there ink of this shape here", because a rule that came back as a closed box or a
-# table border is still painted. Requiring isolation on the render side is a false
-# positive factory: on 64_newspaper_uneven_columns_ad_boxes all four rules are on the
-# render within 0.8 pt and all four read "lost".
+# renderer from the table model; on the render side we only ask "is there ink of this
+# shape here", because a rule that came back as a closed box or a table border is still
+# painted. Requiring isolation on the render side is a false positive factory: on
+# 64_newspaper_uneven_columns_ad_boxes all four rules are on the render within 0.8 pt and
+# all four read "lost".
+#
+# NOT 06/07's QUESTION, whatever the earlier wording said. 06_table_columns counts
+# distinct round(x / 6) values with at least three runs down the page and 07_table_rows
+# counts the same in y (verify_google.py:2719-2734): both are histograms of TEXT
+# coordinates, and neither reads a drawn line. Nothing in the 47 counts a grid side. The
+# measurement lives in tools/p2w-bench/grid_sides.py, which is a tool and not a check.
+#
+# WHAT THE EXCLUSION COSTS, MEASURED (13 Nov, engine 3d715dd, tools/p2w-bench/grid_sides.py
+# over the 211-document corpus). The filter removes 9,694 of the 10,841 thin-long segments,
+# and 9,694 of the 9,695 non-isolated segments are grid sides - a segment that T-junctions
+# into a perpendicular at one of its ends. Exactly ONE is a rule drawn in pieces that meets
+# only collinearly. So the filter is a grid filter and nothing else, which is what makes
+# "how much does it hide" a question with an answer.
+#
+# Counted per side instead of dropped: 238 table lattices on 127 documents carry 9,189 of
+# those sides. At a 4 pt tolerance, after each lattice is given its own best rigid
+# translation, 230 are not covered by the render (2.5 %) - 225 of them relocated (the row
+# or column was re-laid-out, which is displacement's question) and 5 vanished (0.05 %). All
+# five are accounted for and not one is a lost border: three are on
+# itr-computation-with-slab-table, whose table the render pushed onto a second page
+# (01_page_count 1 -> 2), and two are the off-page ends of a rule starting at y -16.4 on
+# 12_stamp_across_page_break (27_text_off_page already fails it). At this check's own 24 pt
+# the count is 28 sides on 8 documents. On the loss axis the exclusion is right for the
+# reason it was introduced: of the 22 documents that lose a grid side at all, 21 already
+# fail 18_displacement, and the widened population reproduces it - 52 documents fail with
+# every thin-long segment as the source, 48 of them already failing 18_displacement.
+#
+# The direction the exclusion cannot see even in principle is the other one, and it is
+# real ink: 791 render grid sides (8.6 %) are rules the page did not draw, on 55
+# documents. That is the .docx's six-sides-per-table model (DocxWriter.TABLE_SIDES,
+# DocxWriter.java:4351) doing what it must. 80_gstin_pan_cin_ifsc_table draws five framed
+# cards; the writer emits five tables with all four sides "single" AND five frame shapes
+# (9 wps:wsp in the .docx), so the render draws each card twice - 20 source sides all
+# present, 20 invented, the "Status: VERIFIED" line left outside the inner box. 32 reads
+# source=2 lost=0 PASS on that document, and on 353_admit_card (62 invented, 0 lost) only
+# 14_filled_shapes fires. A per-side check would fail 55 documents to say so, 45 of which
+# already fail 18_displacement and 30 of which fail 14_filled_shapes or 59_shape_anchor:
+# the same 92 % redundancy that justifies the exclusion, arriving from the other side. It
+# is recorded here, not added as a check.
 #
 # TOL is 24 pt, and it is chosen from measurement, not taste. Across 1,042 matched pairs
 # the perpendicular residual is p50 0.02 / p99 8.57 pt; the engine places a standalone
@@ -706,6 +745,14 @@ def _span_flags(sp):
 # failures are documents 18_displacement already fails, i.e. a tight tolerance turns 32
 # into a second vote for displacement. Matching is 1:1, so no tolerance can hide a lost
 # rule behind its neighbour.
+#
+# RE-MEASURED 13 Nov on engine 3d715dd against a LibreOffice export of the same .docx, 211
+# documents: 2 pt 27, 4 pt 27, 6 pt 26, 8 pt 22, 12 pt 16, 16 pt 14, 20 pt 13, 24 pt 13,
+# 30 pt 13, 45 pt 13. The same curve one document lower at every step, and the plateau
+# starts at 20 rather than 24 - so 24 is inside the flat region rather than at its edge,
+# and the smallest value at which the verdict stops changing is 20 pt. The two populations
+# are unchanged on 1,048 matched pairs: 1,018 at or below 1.74 pt (p50 0.02, p95 0.03),
+# 30 between 6 and 23.8 pt, and 4 in the 1.74-6 pt gap between them. p99 8.73 pt.
 #
 # PAINTED is not decoration: a pale rule written as a shape with neither fill nor line
 # painted nothing in any renderer (972 of 7,380 anchors), and it took this check from 26
