@@ -97,6 +97,14 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: Engine 2a68de6-d80a524, 20 documents: every document that LOST a check lost one that depends on where the flow lands on the page (page count, page breaks, header/footer band, block spacing), while every document that GAINED passed the checks that depend only on pitch (18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch). 304 gained 7 and lost 0. Untested: no build has fed the hairline advance to fitPage.
   recorded: 2026-11-13 06:56
 
+- RULED OUT - The page-boundary regressions are the fitter being charged the model's 0.2*prevBox + 0.8*box split instead of the paragraph's own advance, so the hairline spends more paper per line than the fitter budgeted; charging advance = linePt + before and b.y on a page's first line removes them
+  evidence: Refined build 2a68de6-d5215cb, same 20 documents through Drive: ratchet.py still FAIL - 7 regressions. 311_fir_police_form 47->45 (01_page_count, 24_page_breaks, 55_orientation_mix), academic-paper 46->42 (01_page_count, 07_table_rows, 24_page_breaks, 41_block_spacing), table-with-no-header-row 54->53, 35_four 54->52 (19_worst_dy), 49_coloured 55->54, 317_rti 56/59 with 41_block_spacing newly failing, 57_centred 48->49 but 27_text_off_page newly failing. The pitch win is unchanged (304 58/59, 34_monospace 56/59, 334_patent 53/59, 321 57/59), so the page-boundary damage is not the budget arithmetic.
+  recorded: 2026-11-13 07:00
+
+- UNTESTED - The hairline box moves the glyph band inside the line: with w:line=1 the baseline sits 0.069*size below the box top instead of 0.8*box, so a line whose text the page drew in a header or footer band now renders on the wrong side of that band - which is why 44_header_footer, 27_text_off_page and 41_block_spacing are the checks that move while every pitch check passes. Compare a per-line dy dump of a regressing document against the source before touching the fitter again
+  evidence: Two builds, 40 document-renders, identical shape: every check that only depends on pitch (18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch) improves or holds, and every check that depends on which band the flow lands in (44_header_footer, 27_text_off_page, 41_block_spacing, 01_page_count, 24_page_breaks) is what regresses. Untested: no per-line dy dump has been taken on a regressing document.
+  recorded: 2026-11-13 07:00
+
 
 ## 47_margins
 

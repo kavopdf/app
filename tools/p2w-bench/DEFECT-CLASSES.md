@@ -15,7 +15,7 @@ parked as not converging. A parked class is skipped by the fixer and kept here w
 
 | # | class | documents | share | checks in class | attempts | requeues | status |
 |---|---|---|---|---|---|---|---|
-| 1 | 20_within_10pt (+4) | 203 | 98% | 20_within_10pt, 18_median_dy, 19_worst_dy, 22_reading_order, 30_ink_where_blank_was | 11 | 0 | OPEN |
+| 1 | 20_within_10pt (+4) | 203 | 98% | 20_within_10pt, 18_median_dy, 19_worst_dy, 22_reading_order, 30_ink_where_blank_was | 12 | 0 | OPEN |
 | 2 | 47_margins | 203 | 98% | 47_margins | 3 | 0 | OPEN |
 | 3 | 53_embedded_faces | 157 | 75% | 53_embedded_faces | 0 | 0 | OPEN |
 | 4 | 32_stroke_lines | 135 | 65% | 32_stroke_lines | 0 | 0 | OPEN |

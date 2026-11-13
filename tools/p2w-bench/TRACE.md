@@ -147,3 +147,12 @@ claim and after each step; it is not code and cannot break anything.
 | 13 Nov 06:56 | fixer | ratchet | held or rose |
 | 13 Nov 06:56 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 06:56 | ? | commit-gate | started |
+| 13 Nov 06:57 | fixer | claim | fixer claimed the slot |
+| 13 Nov 06:57 | fixer | build-engine | started |
+| 13 Nov 07:00 | fixer | ratchet | REGRESSED 7 |
+| 13 Nov 07:00 | fixer | hypothesis | 20_within_10pt (+4) -> ruled-out |
+| 13 Nov 07:00 | fixer | hypothesis | 20_within_10pt (+4) -> untested |
+| 13 Nov 07:00 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
+| 13 Nov 07:00 | fixer | classify | 43 classes from 208 documents |
+| 13 Nov 07:00 | fixer | commit-gate | started |
+| 13 Nov 07:00 | ? | commit-gate | started |
