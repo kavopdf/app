@@ -63,7 +63,10 @@ PHASES = ["measure", "classify", "fix", "done"]
 # the same cron in the same phase at once. The stale window is per cron, sized to
 # how long one run actually takes: a dead run must not block the next one forever,
 # and a live run must never be mistaken for a dead one.
-FIXER_STALE_MIN = 100
+# FIXER_STALE_MIN was here, set to 100 and used by nothing. The real value is
+# CLAIM_STALE_MIN["fixer"] = 45 below, and a constant that says 100 next to one that says 45 is
+# worse than no constant: it is a reader - or a fixer reading its own pipeline - believing the
+# slot lasts an hour and forty minutes when it lasts forty-five.
 # The fixer's stale limit sits above its longest run and below its two-slot gap. A run that
 # finishes releases the slot itself, so this governs only a run that died: 45 minutes means a
 # crash costs one slot, and a live run of up to forty-five minutes is never doubled - two runs
@@ -194,14 +197,6 @@ def release(name):
     save(s)
     print("%s released" % name)
     return 0
-
-
-def _unused_claim_fixer():
-    return claim("fixer")
-
-
-def _unused_release_fixer():
-    return release("fixer")
 
 
 def main(argv):

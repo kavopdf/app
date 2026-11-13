@@ -71,7 +71,7 @@ STEP 0b - READ THE INTERFACE OF THE TOOLS YOU WILL USE  ** BEFORE ANYTHING ELSE 
       sed -n '/## commit-gate.sh/,/## precommit.sh/p' tools/p2w-bench/TOOLBOX.md
   TOOLBOX.md is the exact interface of every tool you will call: the command, a sample of the real
   output, the exit codes, what it writes, and what it must not be used for. You will use more tools
-  than any other cron, so read these five sections before you start. Guessing a flag wastes a slot
+  than any other cron, so read these seven sections before you start. Guessing a flag wastes a slot
   that costs a slot.
 
 STEP 0c - READ WHAT ALREADY COST US TIME
@@ -211,8 +211,11 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   Output 'round <n> closed'. Then STOP - do not start a fix.
 
   THE LIMITS - this is what stops a loop:
-    one problem type gets ONE FULL DAY (24 hours) and at most 24 attempts inside it - one per
-    hourly slot. The day is the limit; the number of tries follows the schedule.
+    one problem type gets ONE FULL DAY (24 hours) and at most 24 attempts inside it.
+    The attempt cap can arrive before the day does: a run now makes up to three attempts, so
+    twenty-four attempts is about eight hours of slots, not twenty-four. When the two disagree
+    the attempt cap wins, and the class parks with "24 attempts without progress" - which is the
+    honest reason, because it ran out of tries rather than out of time.
     A class that IMPROVES but does not pass gets its day restarted, up to 3 times.
     Absolute maximum for one class: 4 days and 96 attempts - 24 on the first day and 24
     after each of the 3 requeues - then parked permanently.
@@ -448,6 +451,13 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
       record the attempt as 'error', commit, stop.
   An abandoned attempt costs one try. An overrun costs two runs' work and corrupts the store.
 
+  IF YOU ARE STOPPING WITHOUT HAVING RECORDED A SINGLE ATTEMPT, write one line in INCIDENTS.md
+  saying why - the build broke, Drive stayed blocked, the class list was empty. The commit gate
+  lets that commit through, because a run that honestly did nothing is not a lie. But a slot with
+  no attempt in it is invisible from outside: the next run takes the same class and repeats
+  whatever went wrong, and by morning twenty-four slots have gone to it. One line is the
+  difference between a wasted hour and a known problem.
+
   THE REST OF THIS STEP, once the loop above says stop:
       python3 tools/p2w-bench/round.py --release-fixer
       bash tools/commit-gate.sh
@@ -455,8 +465,15 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
   passed, and BASELINE.md, RESULTS.jsonl and RATCHET.json all changed in the same working tree as
   the engine. Exit 1 means NO COMMIT - it prints which of the three is missing. Do not commit
   "just this once": a commit without the gate is visible forever and CI will turn it red.
-  Edit BASELINE.md IN THE LOCAL CLONE - never rebuild it from a fetched string, that deleted 119
-  rows on 10 Nov. Rows are exactly six columns, score is N/<total as printed>.
+  BASELINE.md is written by the tool, not by hand:
+      python3 tools/p2w-bench/record.py --baseline --round <n>
+  It replaces the row of every document the store has a measurement for, and writes every other
+  line back exactly as it was. It refuses a -d engine id, because a reverted attempt's scores must
+  never reach the table the gate and the ratchet treat as the truth - 362_price_list_dense reads
+  51/59 on the committed engine and 53/59 on a reverted one, and the second number describes code
+  that no longer exists. If it says "every row already matches", you measured nothing new and the
+  gate will refuse the commit for exactly that reason.
+  Do not rebuild this file from a fetched string - that deleted 119 rows on 10 Nov.
   Commit app/src (unless reverted), BASELINE.md, DEFECT-CLASSES.md, ATTEMPTS.json, HYPOTHESES.md,
   LESSONS.md, RATCHET.json, RESULTS.jsonl and ROUND.json together. Message names the round, class,
   root cause, calibration numbers, before/after and outcome. git push FAILS. Delete every Doc.

@@ -78,6 +78,17 @@ reads that store. The .txt half keeps its own record because a .txt regression a
 .docx regression are fixed by different code in different classes; one file covering both
 would make them indistinguishable.
 
+    python3 tools/p2w-bench/record.py --baseline --round <n>
+      Rewrite the BASELINE.md row for every document the store has a measurement for this round.
+      Every other line is written back exactly as it was - this is a row replacement, not a
+      rebuild. A -d engine id is refused: a reverted attempt's scores must never reach the table
+      the gate and the ratchet treat as the truth.
+      exit 0 with "N row(s) rewritten", or 0 with "every row already matches" (you measured
+      nothing new, and the gate will refuse the commit for that reason), or 1 with "the store has
+      no row for this round/engine".
+      Why it exists: commit-gate.sh demands that BASELINE.md changed when the engine changed, and
+      nothing wrote it. The brief used to tell the fixer to hand-edit twenty rows of six columns.
+
 ## ratchet.py — the regression rule
 
 **Used by:** all four. Baseline runs it after measuring, classifier runs `--check`,

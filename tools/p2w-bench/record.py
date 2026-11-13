@@ -31,9 +31,14 @@ import glob
 import json
 import os
 import sys
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STORE = os.path.join(HERE, "RESULTS.jsonl")
+
+# The human-readable table the gate checks. record.py used to only read this file; the
+# fixer was told to hand-edit it, which is twenty rows of six columns per attempt.
+BASE = os.path.join(HERE, "BASELINE.md")
 
 # The .txt half of the tool keeps its own store. One file would make a .txt regression
 # and a .docx regression indistinguishable in the record, and the two are fixed by
@@ -115,7 +120,112 @@ def append(entries, store=None):
     return len(index)
 
 
+def update_baseline(round_no=0, engine=""):
+    """Rewrite the BASELINE.md row for every document the store has for this round.
+
+    WHY THIS EXISTS
+      commit-gate.sh demands that BASELINE.md changed whenever the engine changed, and until
+      now nothing in the pipeline wrote it. The brief said "Edit BASELINE.md IN THE LOCAL
+      CLONE ... rows are exactly six columns" and left the fixer to hand-edit twenty rows of
+      six columns each - copying the failed-check list out of verify_google.py's JSON by eye.
+      That is twenty chances to mistype a check name, and the gate refuses a commit whose
+      evidence does not line up. It had never been exercised either: no fix has ever been
+      kept, so the first run that keeps one would have been the first to try it.
+
+    WHAT IT DOES NOT DO
+      It does not rebuild the file. The 10 Nov disaster was a rebuild from a fetched string,
+      which deleted 119 rows. This reads BASELINE.md, replaces the row for a document it has
+      a measurement for, and writes every other line back exactly as it was. A document with
+      no new measurement keeps its old row untouched.
+
+    Returns the number of rows replaced.
+    """
+    if not os.path.exists(BASE):
+        return 0
+
+    # Only a COMMITTED engine may write into BASELINE.md.
+    #
+    # An engine id is <hash>, or <hash>-d<sha1 of the diff> for a build that was measured and
+    # then reverted. Writing a -d engine's numbers here would put a reverted attempt's scores
+    # into the table the gate and the ratchet treat as the truth - 362_price_list_dense reads
+    # 51/59 on the committed engine and 53/59 on a reverted one, and the second number is a
+    # measurement of code that no longer exists.
+    if not engine:
+        committed = []
+        for e in load():
+            eng = e.get("engine") or ""
+            if "-d" in eng:
+                continue
+            if round_no and e.get("round") != round_no:
+                continue
+            if eng and eng not in committed:
+                committed.append(eng)
+        if not committed:
+            return 0
+        engine = committed[-1]
+
+    latest = {}
+    for e in load():
+        if round_no and e.get("round") != round_no:
+            continue
+        if e.get("engine") != engine:
+            continue
+        doc = e.get("doc")
+        if not doc:
+            continue
+        # Later entries win: the store is written in measurement order and append() replaces
+        # a row for the same (round, engine, doc), so the last one seen is the current one.
+        latest[doc] = e
+    if not latest:
+        return -1
+
+    lines = open(BASE, encoding="utf-8").read().split("\n")
+    out, replaced = [], 0
+    today = time.strftime("%d %b")
+    for line in lines:
+        if line.startswith("| "):
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) == 6 and cells[0] in latest:
+                e = latest[cells[0]]
+                failed = ", ".join(e.get("failed", []))
+                score = "%s/%s" % (e.get("score"), e.get("total"))
+                verdict = "PASS" if not e.get("failed") else "FAIL"
+                eng = e.get("engine", "")
+                # Only write a row that actually changed. The gate reads "BASELINE.md changed"
+                # as evidence that a measurement happened, so a rewrite that only refreshes
+                # the date on all 208 rows would satisfy the gate while proving nothing.
+                if (cells[1], cells[2], cells[3], cells[4]) == (score, verdict, failed, eng):
+                    out.append(line)
+                    continue
+                out.append("| %s | %s | %s | %s | %s | %s |"
+                           % (cells[0], score, verdict, failed, eng, today))
+                replaced += 1
+                continue
+        out.append(line)
+    if replaced:
+        with open(BASE, "w", encoding="utf-8") as f:
+            f.write("\n".join(out))
+    return replaced
+
+
 def main(argv):
+    if "--baseline" in argv:
+        rnd = int(argv[argv.index("--round") + 1]) if "--round" in argv else 0
+        eng = argv[argv.index("--engine") + 1] if "--engine" in argv else ""
+        n = update_baseline(rnd, eng)
+        if n < 0:
+            print("baseline: the store has no row for this round/engine - nothing written")
+            return 1
+        if n == 0:
+            print("baseline: every row already matches the store - nothing written")
+            return 0
+        print("baseline: %d row(s) rewritten from the store" % n)
+        try:
+            note("record", "BASELINE.md: %d row(s) rewritten" % n)
+        except Exception:
+            pass
+        return 0
+
     if "--show" in argv:
         doc = argv[argv.index("--show") + 1]
         only = argv[argv.index("--check") + 1] if "--check" in argv else None

@@ -1794,3 +1794,86 @@ twenty-four attempts discovering it one rejection at a time.
 
 A class that ends the round parked with that finding is a better outcome than a class that ends it
 with twenty-four rejected patches and no statement of why.
+
+---
+
+## 38. The fixer, audited by hand, one file at a time
+
+`audit.py` was not used for this. Its own accuracy is still unproven, and an audit that trusts an
+unproven tool is not an audit. Everything below was read out of the source and tested by running it.
+
+### What was checked
+
+| # | what | how |
+|---|---|---|
+| 1 | the cron's prompt, schedule, phase gate, claim logic | read `round.py` `claim()`/`release()` end to end |
+| 2 | every claim the brief makes | read the brief in full, then checked each against the code |
+| 3 | every tool the brief names | 17 named, 17 exist, every flag present |
+| 4 | every number the brief states | 24 attempts, 24 h, 3 requeues, 96 ceiling, 45 min, 25 min — all match the constants |
+| 5 | every TOOLBOX sed range | ran all 7, each returns its own section plus the next heading |
+| 6 | the state files | cross-checked `DEFECT-CLASSES.md` against `ATTEMPTS.json`; 294 result rows, 0 duplicate keys |
+| 7 | the gates | read `commit-gate.sh` in full, tested with the slot claimed and released |
+| 8 | the tools actually run | `--phase`, `--next`, `--show`, `--baseline`, `--attempt` with four kinds of bad input |
+
+### Six things were wrong
+
+**1. `FIXER_STALE_MIN = 100`, used by nothing.** The real value is `CLAIM_STALE_MIN["fixer"] = 45`
+a few lines below. A constant that says 100 sitting next to one that says 45 is worse than no
+constant: it is a reader — or a fixer reading its own pipeline — believing the slot lasts an hour
+and forty minutes. Removed.
+
+**2. `_unused_claim_fixer()` and `_unused_release_fixer()`.** Dead wrappers around `claim("fixer")`
+and `release("fixer")`, which `main()` already calls directly. Renamed rather than removed when
+first noticed; removed now.
+
+**3. The brief said "one per hourly slot", which stopped being true when a run started doing three
+attempts.** Twenty-four attempts now arrive in about eight hours, not twenty-four. The promise
+"one problem type gets ONE FULL DAY" was quietly wrong: the attempt cap binds first. The brief now
+says so, and says which limit wins.
+
+**4. "read these five sections" — there are seven sed commands.** The agent was told a number that
+did not match the list beneath it.
+
+**5. `commit-gate.sh` demands that `BASELINE.md` changed, and nothing in the pipeline wrote it.**
+The brief said "Edit BASELINE.md IN THE LOCAL CLONE ... rows are exactly six columns" and left the
+fixer to hand-edit twenty rows of six columns, copying each failed-check list out of
+`verify_google.py`'s JSON by eye. Twenty chances to mistype a check name, on the one commit the
+gate is most likely to refuse.
+
+**It had never been exercised.** No fix has ever been kept, so the first run that keeps one would
+have been the first to try it.
+
+`record.py --baseline` now does it: it replaces the row of every document the store has a
+measurement for, and writes every other line back exactly as it was. A row replacement, not a
+rebuild — the 10 Nov disaster was a rebuild from a fetched string, which deleted 119 rows.
+
+**6. A run could commit with no evidence at all** — no hypothesis, no attempt, no engine change —
+and the gate let it through. That is honest: a run that did nothing is not a lie. But the slot is
+invisible from outside, so the next run takes the same class and repeats whatever went wrong.
+Twenty-four of those is a lost day. The brief now requires one line in `INCIDENTS.md` explaining
+why a run is stopping without an attempt.
+
+### Two things checked and left alone
+
+**`trace.py` prints `?` for `commit-gate`.** `who()` picks the cron whose slot was claimed most
+recently, and the gate runs after `--release-fixer`, so no slot is live. The `?` is the trace
+telling the truth: this happened after the release. Not a bug.
+
+**`ROUND.json`'s history records the phase it left, not the one it entered** — so `fix` is missing
+from a history that reads like a list of visited phases. Confusing, not wrong. Left alone rather
+than changed, because the field is read by a person and not by any tool.
+
+### And one bug in my own new code, caught before it shipped
+
+The first version of `--baseline` took the last store entry per document — which included
+`2a68de6-dc3d644`, a reverted build — and wrote its scores into `BASELINE.md`. `362_price_list_dense`
+reads 51/59 on the committed engine and 53/59 on a reverted one, and the second number describes
+code that no longer exists. It would have poisoned the table the gate and the ratchet treat as the
+truth.
+
+Now a `-d` engine id is refused, and a row that has not changed is not written — because the gate
+reads "BASELINE.md changed" as evidence that a measurement happened, and a rewrite that only
+refreshes the date on all 208 rows would satisfy the gate while proving nothing.
+
+Tested both ways: nothing changed → "every row already matches", 0 lines written; new engine →
+21 rows rewritten, the 20 measured documents plus one.
