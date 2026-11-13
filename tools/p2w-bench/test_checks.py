@@ -103,6 +103,51 @@ def docx_faces_doc(path, face):
     z.close()
 
 
+def docx_image_doc(path, px=40, extent_pt=360):
+    """A minimal .docx embedding one px-wide PNG drawn extent_pt wide.
+
+    54_image_dpi reads exactly two things out of a .docx: the bytes in word/media, and the
+    wp:extent beside the r:embed, so px / (extent_pt / 72) is the density the engine chose.
+    Nothing else in the package is read, but the parts a reader would expect are written so
+    the file is a real .docx and not a fixture that only this test can open.
+    """
+    pix = fitz.Pixmap(fitz.csRGB, fitz.IRect(0, 0, px, px), 0)
+    pix.set_rect(pix.irect, (200, 30, 30))
+    png = pix.tobytes("png")
+    W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+    WP = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+    A = "http://schemas.openxmlformats.org/drawingml/2006/main"
+    R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+    cx = int(extent_pt * 12700)
+    z = zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED)
+    z.writestr("[Content_Types].xml",
+               '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/'
+               'package/2006/content-types"><Default Extension="png" ContentType="image/png"/>'
+               '<Default Extension="xml" ContentType="application/xml"/></Types>')
+    z.writestr("_rels/.rels",
+               '<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/'
+               'package/2006/relationships"><Relationship Id="rId0" Type="%s/officeDocument"'
+               ' Target="word/document.xml"/></Relationships>' % R)
+    z.writestr("word/document.xml",
+               '<?xml version="1.0"?><w:document xmlns:w="%s" xmlns:wp="%s" xmlns:a="%s" '
+               'xmlns:r="%s"><w:body><w:p><w:r><w:drawing><wp:inline><wp:extent cx="%d" '
+               'cy="%d"/><a:graphic><a:graphicData><a:blip r:embed="rId1"/></a:graphicData>'
+               '</a:graphic></wp:inline></w:drawing></w:r></w:p></w:body></w:document>'
+               % (W, WP, A, R, cx, cx))
+    z.writestr("word/_rels/document.xml.rels",
+               '<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/'
+               'package/2006/relationships"><Relationship Id="rId1" Type="%s/image" '
+               'Target="media/image1.png"/></Relationships>' % R)
+    z.writestr("word/media/image1.png", png)
+    # 53_embedded_faces reads the family the .docx declares and needs styles.xml to exist,
+    # so the package carries one. It is not what 54 measures.
+    z.writestr("word/styles.xml",
+               '<w:styles xmlns:w="%s"><w:docDefaults><w:rPrDefault><w:rPr>'
+               '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/></w:rPr></w:rPrDefault>'
+               '</w:docDefaults></w:styles>' % W)
+    z.close()
+
+
 # ---------------------------------------------------------------------------
 # cases
 # ---------------------------------------------------------------------------
@@ -249,6 +294,64 @@ def cases():
         p.insert_image(fitz.Rect(72, 400, 172, 500), pixmap=pix)
     out.append(("image dropped", with_image, base, ["08_image_count"], None))
 
+    # ---- 39 image position: the same picture, in the same size, moved 40 pt ----
+    # The old proof in prove_checks.py was mut_image_shrink, which resizes: a resize leaves
+    # the box origin where it was, so 39 could not fire on it. Nothing here resizes.
+    def image_moved(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+        pix = fitz.Pixmap(fitz.csRGB, fitz.IRect(0, 0, 40, 40), 0)
+        pix.set_rect(pix.irect, (200, 30, 30))
+        p.insert_image(fitz.Rect(112, 400, 212, 500), pixmap=pix)
+    out.append(("image moved, not resized", with_image, image_moved,
+                ["39_image_position"], None))
+
+    # ---- 48 image area: shrunk to 9 % of its area ---------------------------
+    # Below the 50 % floor the check already had, so this case passed before the floor was
+    # tightened; it is here so the check has a self-contained proof at all, which it did not.
+    def image_small(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+        pix = fitz.Pixmap(fitz.csRGB, fitz.IRect(0, 0, 40, 40), 0)
+        pix.set_rect(pix.irect, (200, 30, 30))
+        p.insert_image(fitz.Rect(72, 400, 102, 430), pixmap=pix)
+    out.append(("image shrunk to 9 % of its area", with_image, image_small,
+                ["48_image_area"], None))
+
+    # ---- 49 page size: A4 in, Letter out ------------------------------------
+    # The failure this check exists for. Every one of the 211 corpus documents keeps its
+    # size through the export, which is why it has never fired there - not because it cannot.
+    def letter(p):
+        text(p, 72, 100, "Invoice number 12345")
+        text(p, 72, 130, "Total amount 4,500")
+        table(p, 72, 200, 3, 3)
+        p.set_mediabox(fitz.Rect(0, 0, 612, 792))
+    out.append(("A4 exported as Letter", base, letter, ["49_page_size"], None))
+
+    # ---- 09 font names: four faces in, one out ------------------------------
+    def four_faces(p):
+        for i, f in enumerate(("helv", "tiro", "cour", "symb")):
+            p.insert_text((72, 100 + i * 20), "Invoice number 12345", fontsize=11, fontname=f)
+    def one_face(p):
+        p.insert_text((72, 100), "Invoice number 12345", fontsize=11, fontname="helv")
+    out.append(("four faces, one face kept", four_faces, one_face, ["09_font_names"], None))
+
+    # ---- 31 pages lost their text: a page that had text is empty ------------
+    def empty_page(p):
+        pass
+    out.append(("a page that had text is blank", base, empty_page,
+                ["31_pages_lost_their_text"], None))
+
+    # ---- 54 image dpi: the engine places the picture at 40 dpi --------------
+    # 54 reads the .docx, so the case has to carry one. A 40 px picture drawn 360 pt (5 in)
+    # wide is 8 dpi against a source of 28.8 dpi, well under the 60 % floor.
+    def low_dpi(path):
+        docx_image_doc(path, px=40, extent_pt=360)
+    out.append(("the engine places the picture at 8 dpi", with_image, with_image,
+                ["54_image_dpi"], None, low_dpi))
+
     # ---- 35 rotation -------------------------------------------------------
     def rotated_text(p):
         text(p, 72, 100, "Invoice number 12345")
@@ -350,10 +453,15 @@ def run(verbose=False):
         simple(b, gd_b)
         docx = None
         if docx_face:
-            # A sixth element names the family the engine's .docx declares. It is needed
-            # only by 53, which reads the .docx and cannot fail without one.
+            # A sixth element is what the engine's .docx has to say. 53 reads the family it
+            # declares, so it passes a face name; 54 reads the density it places a picture
+            # at, which a face name cannot express, so it passes a builder that writes the
+            # package. Both need a .docx to fail at all.
             docx = os.path.join(tmp, "a.docx")
-            docx_faces_doc(docx, docx_face)
+            if callable(docx_face):
+                docx_face(docx)
+            else:
+                docx_faces_doc(docx, docx_face)
         try:
             res = compare_files(a, b, docx)
         except Exception as exc:

@@ -2019,9 +2019,15 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
                 tot += max(0, (b[2] - b[0])) * max(0, (b[3] - b[1]))
         return round(tot)
 
+    # The floor was 50 %, so a document could lose 36 % of its picture area and pass -
+    # measured on a synthetic pair: a 200x200 picture drawn at 160x160 reads src=40000
+    # render=25600 ok=True. Every one of the 15 corpus documents that carries a picture
+    # comes out of Google's export with MORE area than it went in with (5720 -> 104802,
+    # 14184 -> 95939, 9692 -> 29111), so a 90 % floor moves no corpus number today and
+    # closes the hole. Below half still fails, as it always did.
     s_ia, g_ia = img_area(src), img_area(gd)
     c["48_image_area"] = (s_ia, g_ia,
-                          s_ia == 0 or g_ia >= s_ia * 0.5)
+                          s_ia == 0 or g_ia >= s_ia * 0.9)
 
     return c
 
@@ -2047,8 +2053,18 @@ def compare(src_path, gd_path, docx_path=None):
     s_words = collections.Counter(norm_word(w) for w in s_text.split() if w.strip())
     g_words = collections.Counter(norm_word(w) for w in g_text.split() if w.strip())
 
-    s_imgs = sum(len(p.get_images()) for p in src)
-    g_imgs = sum(len(p.get_images()) for p in gd)
+    # 08 counts images the page DRAWS, not images its /Resources /XObject dictionary
+    # DECLARES. get_images() is the dictionary: it includes an image nothing places and one
+    # inherited from a shared Resources on the Pages node, and Google's export declares more
+    # than the source draws (10_stamp_as_image reads 1 -> 7, 300_prescription_rx 1 -> 42),
+    # which inflates the numerator until the predicate cannot fail. Proven both ways with a
+    # synthetic pair: a render that declares two XObjects and draws none reads 08 src=1
+    # render=2 ok=True - a total image loss passes - and a document that declares an XObject
+    # it never draws reads src=2 render=1 and fails against a faithful render, with 39 and 48
+    # (which already use get_image_info) reading 1 and passing. 57f521d described this fix in
+    # its message and applied only the 47_margins half; the code kept get_images().
+    s_imgs = sum(len(p.get_image_info()) for p in src)
+    g_imgs = sum(len(p.get_image_info()) for p in gd)
 
     # ---- COMPLETENESS (1-16) ------------------------------------------------
     checks["01_page_count"] = (src.page_count, gd.page_count,
@@ -2504,13 +2520,21 @@ def compare(src_path, gd_path, docx_path=None):
 
     # 31 every page must carry some ink
     # A blank page in the source is legitimate; a blank page the source did not have is not.
+    # The source column was the literal 0 on all 211 documents, so every report of this
+    # check read "source=0" and DEFECT-CLASSES.md scored the class at 0 % pass for a check
+    # that fires on one document. It now carries the number of source pages that have text -
+    # the denominator the count is out of. The verdict is untouched: it still reads only
+    # empty_pages, so no document moves.
     empty_pages = 0
+    text_pages = 0
     for i in range(gd.page_count):
         g_has = bool(gd[i].get_text().strip())
         s_has = bool(src[i].get_text().strip()) if i < src.page_count else False
+        if s_has:
+            text_pages += 1
         if s_has and not g_has:
             empty_pages += 1
-    checks["31_pages_lost_their_text"] = (0, empty_pages, empty_pages == 0)
+    checks["31_pages_lost_their_text"] = (text_pages, empty_pages, empty_pages == 0)
 
     checks.update(extra_checks(src, gd, s_runs, g_runs, pairs))
     checks.update(extra_checks2(src, gd, docx_path))
