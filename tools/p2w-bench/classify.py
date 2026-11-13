@@ -589,6 +589,34 @@ def main(argv):
                 e["reason"] = ""
 
         save_ledger(led)
+        # The trajectory, one line per attempt.
+        #
+        # DEFECT-CLASSES.md is rewritten every run, so it cannot answer "what was this class six
+        # hours ago" or "has it been getting better". That history is the most useful thing the
+        # next run could have and the one thing nothing kept. Seven fields, one line, appended -
+        # small enough that nobody has to be told not to read it whole.
+        try:
+            import time as _t
+            stamp = _t.strftime("%Y-%m-%d %H:%M", _t.gmtime(_t.time() + 5 * 3600 + 30 * 60))
+            rnd = None
+            try:
+                rnd = json.load(open(os.path.join(HERE, "ROUND.json"),
+                                     encoding="utf-8")).get("round")
+            except Exception:
+                pass
+            with open(os.path.join(HERE, "CLASS-HISTORY.jsonl"), "a", encoding="utf-8") as f:
+                f.write(json.dumps({
+                    "at": stamp, "round": rnd, "class": cls,
+                    "attempt": e["attempts"], "outcome": outcome,
+                    "status": e.get("status"), "requeues": e.get("requeues", 0),
+                }, sort_keys=True) + "\n")
+        except Exception as exc:
+            # Not swallowed. A history file that silently stops being written is the exact
+            # defect this whole session is about - the first version of this block called
+            # load(), which does not exist here, and except-pass hid it so well that the file
+            # was created empty and nothing said why.
+            print("warning: CLASS-HISTORY.jsonl not written - %s: %s"
+                  % (type(exc).__name__, exc))
         note("attempt", "%s -> %s (%s)" % (cls, outcome, e.get("status")))
         print("%s: attempts=%d requeues=%d status=%s  %s" % (
             cls, e["attempts"], e["requeues"], e.get("status"), e.get("reason", "")))

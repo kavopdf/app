@@ -2376,3 +2376,82 @@ override would be the same promise in a new costume.
 Six times today the same shape has appeared: a rule written in prose, ignored, then made mechanical.
 The brief does not lack instructions. It lacked enforcement, and a run at three in the morning
 follows what the tools do, not what a paragraph says.
+
+---
+
+## 46. What a run leaves behind, and what the next one actually needs
+
+The question was what the fixer updates before it disappears, and how long each record lasts. The
+answer was uncomfortable: **nothing had a retention policy except TRACE.md**. Four files grew
+without bound, one of them to 328 KB, and the brief's answer to that was to tell runs not to read
+it — which means the record existed and was unusable.
+
+### What was there
+
+| file | record | retention |
+|---|---|---|
+| `ATTEMPTS.json` | per class, attempts and outcomes | current round; archived at close |
+| `HYPOTHESES.md` | per class, every theory and its evidence | **all rounds, no cap** |
+| `REMAINING-DEFECTS.md` | per class parking record | **all rounds, all corpora, no cap — 328 KB** |
+| `RESULTS.jsonl` | per (round, engine, doc) | rows forever; values trimmed to 2 engines |
+| `RATCHET.json` | per document high-water mark | rewritten |
+| `BASELINE.md` | per document current score | rewritten |
+| `TRACE.md` | every tool step | **400 lines** — the only real cap |
+| `RUN-LOG.md` | every claim and release | **no cap** |
+| `INCIDENTS.md` | what went wrong | **no cap** |
+| `LESSONS.md` | what to do differently | 20 entries, checked by audit |
+| `DEFECT-CLASSES.md` | every class, current state | **rewritten — no history at all** |
+
+### The three that mattered
+
+**`REMAINING-DEFECTS.md` was 62 sections and 5,113 lines, and two of them were this round's.**
+The other sixty were v3, b80 and g53 corpora from 7–10 November — three days of a different
+project, sitting in the file the fixer is told to write its parking record into. The brief's
+instruction was "never read it whole", which is a sentence that admits the record has stopped
+being a record.
+
+Split, nothing deleted:
+
+    REMAINING-DEFECTS.md          9,871 B   2 sections — this round, safe to read
+    REMAINING-DEFECTS-ARCHIVE.md  318,980 B  60 sections — kept, marked as history
+
+Verified 62 of 62 sections preserved, 0 overlap. A closed defect that is not written down is a
+defect that comes back, so the archive stays in the repo — it just stops being in the way.
+
+**`RUN-LOG.md` and `INCIDENTS.md` had no cap.** One day of runs left RUN-LOG at 117 lines; three
+months at 24 runs a day is about ten thousand. Both are now trimmed by `trace.py` on every tool
+call — RUN-LOG to 200 lines, INCIDENTS to 120. The lines that fall off are in git; the live file
+stays at a size a run can open.
+
+**`DEFECT-CLASSES.md` is rewritten every run, so it has no history at all.** It cannot answer the
+one question the next run most needs: *is this class converging or stuck?* `20_within_10pt` has
+fifteen attempts and the file shows a count, not a trajectory.
+
+`CLASS-HISTORY.jsonl` now records one line per attempt:
+
+    {"at": "2026-11-13 09:24", "attempt": 15, "class": "20_within_10pt (+4)",
+     "outcome": "error", "requeues": 0, "round": 1, "status": "OPEN"}
+
+Twelve lines tell a run whether it is working the class or burning it, and it is small enough that
+nobody has to be told not to read it whole.
+
+### What the next run reads now
+
+The handoff is attempts and findings, and nothing else is required reading:
+
+    HYPOTHESES.md          what was tried, what the evidence showed   — the ledger
+    ATTEMPTS.json          how many tries, what outcomes              — the counts
+    CLASS-HISTORY.jsonl    the trajectory                             — the trend
+    DEFECT-CLASSES.md      which class is open                        — the queue
+    LESSONS.md             what cost time last time                   — the warnings
+
+Everything else is support: TRACE and RUN-LOG for a person watching, RESULTS and RATCHET for the
+numbers, REMAINING-DEFECTS for what parked, the archive for history. A run that reads the first
+five and nothing else can do its job.
+
+### And one bug in my own new code, caught the same way
+
+The first `CLASS-HISTORY` block called `load()`, which does not exist in `classify.py` — it is
+`load_ledger()`. The `except Exception: pass` around it swallowed the NameError so completely that
+the file was created empty and nothing said why. It now prints the exception instead of hiding it.
+An empty record and no explanation is the exact shape of every defect in this file.

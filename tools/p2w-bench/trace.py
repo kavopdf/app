@@ -79,6 +79,40 @@ def who():
     return best
 
 
+def trim(path, keep, header_lines=0):
+    """Keep the last `keep` lines of a growing log, with its header intact.
+
+    RUN-LOG.md and INCIDENTS.md had no cap. One day of runs left RUN-LOG at 117 lines; three
+    months at 24 runs a day is about ten thousand. A log nobody can read whole is not a record,
+    it is a liability - and the fixer is told not to read the big files, so a log that grows
+    forever is a log that stops being read at all.
+
+    Nothing is lost: the lines that fall off are in git. This keeps the live file at a size a run
+    can actually open.
+    """
+    try:
+        if not os.path.exists(path):
+            return 0
+        lines = open(path, encoding="utf-8").readlines()
+        if len(lines) <= keep:
+            return 0
+        head = lines[:header_lines]
+        tail = lines[-(keep - header_lines):]
+        with open(path, "w", encoding="utf-8") as f:
+            f.writelines(head)
+            f.writelines(tail)
+        return len(lines) - keep
+    except Exception:
+        return 0
+
+
+def trim_all():
+    """Every log this directory grows, capped in one place."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    trim(os.path.join(here, "RUN-LOG.md"), 200)
+    trim(os.path.join(here, "INCIDENTS.md"), 120)
+
+
 def note(tool, what):
     """Append one line. Never raises - a trace that breaks a run is worse than no trace."""
     try:
@@ -89,6 +123,7 @@ def note(tool, what):
                 f.write(HEADER)
         with open(TRACE, "a", encoding="utf-8") as f:
             f.write(line)
+        trim_all()
         # Trim: keep the header and the last MAX_LINES of entries.
         with open(TRACE, encoding="utf-8") as f:
             lines = f.readlines()

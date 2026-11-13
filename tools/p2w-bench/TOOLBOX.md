@@ -301,6 +301,20 @@ the run uses `verify_google.py` with `ratchet.py` or `verify_txt.py` with `ratch
   Commit it with the claim and after each step. It is not code, it touches nothing, and it
   cannot break a build - so it is safe to commit at any moment, unlike the engine.
 
+## CLASS-HISTORY.jsonl - a class's own trajectory
+
+    tail -12 tools/p2w-bench/CLASS-HISTORY.jsonl
+    grep '"class": "20_within_10pt' tools/p2w-bench/CLASS-HISTORY.jsonl | tail -20
+
+  One line per attempt, appended by classify.py --attempt:
+
+      {"at": "2026-11-13 09:24", "attempt": 15, "class": "20_within_10pt (+4)",
+       "outcome": "error", "requeues": 0, "round": 1, "status": "OPEN"}
+
+  DEFECT-CLASSES.md is rewritten every run, so it cannot answer "what was this class six hours
+  ago" or "has it been getting better". This can. Twelve lines tell you whether a class is
+  converging or stuck, which is the difference between working it and burning it.
+
 ## hypothesis.py — what earlier attempts already ruled out
 
 **Used by:** fixer only.

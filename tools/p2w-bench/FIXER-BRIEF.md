@@ -47,7 +47,8 @@ STEP 0 - IS IT YOUR TURN, AND IS ANYONE ELSE STILL WORKING?
 
 NEVER READ THESE FILES WHOLE  ** THIS IS HOW A RUN DIES **
     RESULTS.jsonl          913 KB   - four kilobytes a row, every check's numbers
-    REMAINING-DEFECTS.md   328 KB   - five thousand lines of history
+    REMAINING-DEFECTS.md   current round only - the live parking record, safe to read
+    REMAINING-DEFECTS-ARCHIVE.md  319 KB  - v3, b80 and g53 corpora, 7-10 Nov, never yours
     BASELINE.md             66 KB   - 208 rows you do not need to see
     DEFECTS.md             100 KB   - the ledger for a person, not for you
 
@@ -172,6 +173,7 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
 
   IF THE TOP CLASS HAS AN UNTESTED HYPOTHESIS, THAT IS THIS RUN'S WORK:
       python3 tools/p2w-bench/hypothesis.py --next "<top class>"
+      tail -12 tools/p2w-bench/CLASS-HISTORY.jsonl    # the trajectory, one line per attempt
   An untested theory is the previous run's last instruction to you - the one thing it could not
   finish, written down so you would not have to rediscover it. Switching to a smaller class
   leaves it sitting, and it cost a slot to write.
@@ -181,6 +183,12 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   decides kept, improved or reverted. Do not re-derive it and do not form a rival theory - apply it
   and measure it. A confirmed-but-unmeasured entry names its patch in the evidence line
   (patches/<name>.patch), and applying a saved patch is one git apply.
+
+  CLASS-HISTORY.jsonl is what DEFECT-CLASSES.md cannot be: a class's own history. That file is
+  rewritten every run, so it can never answer "what was this class six hours ago" or "has it been
+  getting better". One line per attempt - when, which round, how many attempts, what outcome, what
+  status. Twelve lines tell you whether the class is converging or stuck, which is the difference
+  between working it and burning it.
 
   On 12 Nov this happened. A run left "the table-cell path (rowLineTw) is where the class's
   dominant documents live" marked UNTESTED. The next run took 53_embedded_faces instead - a
