@@ -55,7 +55,11 @@ RESULTS_TXT = os.path.join(HERE, "RESULTS-TXT.jsonl")
 
 # The .txt checks are t01..t05 rather than 01..59, so one pattern would silently drop
 # every one of them and the ratchet would guard nothing at all.
-CHECK_RE = re.compile(r"^(?:\d{2}[a-c]?|t\d{2})_[a-z_]+$")
+# A check id is <number>_<words>, and the words can contain digits: 20_within_10pt,
+# 43_within_10pt_x. The old pattern allowed [a-z_]+ only, so BOTH were silently dropped and
+# the ratchet guarded neither - including the single largest class in the corpus. Measured
+# 13 Nov: re.match on 20_within_10pt returned None while 18_median_dy matched.
+CHECK_RE = re.compile(r"^(?:\d{2}[a-c]?|t\d{2})_[a-z0-9_]+$")
 
 
 # Set by main(). A module flag rather than a parameter threaded through four functions,
@@ -200,6 +204,7 @@ def main(argv):
 
     regressions = []
     new_marks = []
+    recut = 0
     for doc, (score, out_of, failed) in scores.items():
         prev = ratchet.get(doc)
         if prev is None:
@@ -226,12 +231,19 @@ def main(argv):
         # since reads as newly failing and the document is condemned for having
         # been measured with a weaker instrument. A different universe means the
         # mark is stale, not that the document got worse - so it is replaced.
+        # A different universe means the mark was taken by a different set of checks. That does
+        # NOT mean the document got worse - but it does not mean it got better either, and the
+        # old code treated it as the second: it replaced the mark and skipped the comparison.
+        # So dropping ONE check disabled the gate for the whole corpus, silently, on exactly the
+        # run where a regression mattered most. Measured 13 Nov: dropping 02_text_run_count took
+        # the universe from 59 to 58, every one of the 211 marks was replaced without a
+        # comparison, and the gate printed PASS while 187 documents were newly failing checks
+        # against their own recorded marks.
+        #
+        # Compare on the checks BOTH marks measured, and count the re-cuts so it cannot happen
+        # quietly again.
         if prev_universe and prev_universe != universe:
-            if not check_only:
-                ratchet[doc] = {"best": score, "out_of": out_of,
-                                "failed": sorted(failed),
-                                "universe": sorted(universe)}
-            continue
+            recut += 1
 
         common = prev_universe & universe
         if not common:
@@ -271,6 +283,10 @@ def main(argv):
     print("  documents scored this run : %d of %d rows" % (total, measured_all))
     print("  high-water marks held     : %d" % len(ratchet))
     print("  new documents, first mark : %d" % len(new_marks))
+    if recut:
+        # Loud, because a re-cut is the one moment the gate is weakest: the mark moves
+        # forward without a comparison, so a regression on this run cannot be caught.
+        print("  marks re-cut (check set changed) : %d" % recut)
 
     fail = False
     note("ratchet%s" % (" --txt" if TXT_MODE else ""),

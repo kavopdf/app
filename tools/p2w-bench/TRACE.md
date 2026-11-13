@@ -194,3 +194,12 @@ claim and after each step; it is not code and cannot break anything.
 | 13 Nov 11:24 | classifier | classify --txt | 4 classes from 211 documents |
 | 13 Nov 11:24 | classifier | ratchet --txt | held or rose |
 | 13 Nov 11:24 | classifier | ratchet | held or rose |
+| 13 Nov 11:59 | ? | ratchet | REGRESSED 191 |
+| 13 Nov 11:59 | ? | ratchet | REGRESSED 191 |
+| 13 Nov 11:59 | ? | ratchet | REGRESSED 191 |
+| 13 Nov 11:59 | ? | ratchet | held or rose |
+| 13 Nov 11:59 | ? | ratchet | held or rose |
+| 13 Nov 11:59 | ? | ratchet | REGRESSED 1 |
+| 13 Nov 11:59 | ? | ratchet | REGRESSED 1 |
+| 13 Nov 11:59 | ? | ratchet | held or rose |
+| 13 Nov 11:59 | ? | ratchet | held or rose |

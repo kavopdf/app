@@ -11,6 +11,7 @@
       "09_font_names",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "25_invisible_text",
@@ -26,7 +27,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -96,6 +96,7 @@
       "09_font_names",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "30_ink_where_blank_was",
@@ -107,7 +108,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -181,6 +181,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -197,7 +198,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -272,6 +272,7 @@
       "16_numeric_runs",
       "17_matched_runs",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -289,7 +290,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -364,6 +364,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -382,7 +383,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -454,6 +454,7 @@
       "16_numeric_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -462,6 +463,7 @@
       "30_ink_where_blank_was",
       "35_rotation",
       "41_block_spacing",
+      "43_within_10pt_x",
       "47_margins",
       "53_embedded_faces",
       "55_orientation_mix",
@@ -470,7 +472,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -543,6 +544,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -558,7 +560,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -630,6 +631,7 @@
       "11_bold_runs",
       "17_matched_runs",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -646,7 +648,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -714,6 +715,7 @@
       "09_font_names",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -726,7 +728,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -798,6 +799,7 @@
       "16_numeric_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -814,7 +816,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -883,6 +884,7 @@
       "11_bold_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -898,7 +900,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -970,6 +971,7 @@
       "11_bold_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "29_blank_where_ink_was",
@@ -984,7 +986,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1053,6 +1054,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -1064,7 +1066,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1132,6 +1133,7 @@
       "05_words_extra",
       "09_font_names",
       "18_median_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "35_rotation",
@@ -1142,7 +1144,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1226,7 +1227,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1299,6 +1299,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "27_text_off_page",
@@ -1312,7 +1313,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1380,6 +1380,7 @@
       "09_font_names",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "26_text_overlap",
@@ -1394,7 +1395,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1466,7 +1466,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1539,7 +1538,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1604,6 +1602,7 @@
     "failed": [
       "09_font_names",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "26_text_overlap",
       "29_blank_where_ink_was",
@@ -1616,7 +1615,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1685,6 +1683,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -1697,7 +1696,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1770,6 +1768,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "27_text_off_page",
@@ -1784,7 +1783,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1851,6 +1849,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -1863,7 +1862,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -1928,6 +1926,7 @@
     "failed": [
       "09_font_names",
       "18_median_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -1937,7 +1936,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2010,6 +2008,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "27_text_off_page",
@@ -2022,7 +2021,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2087,6 +2085,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "32_stroke_lines",
@@ -2096,7 +2095,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2160,6 +2158,7 @@
     "best": 54,
     "failed": [
       "19_worst_dy",
+      "20_within_10pt",
       "32_stroke_lines",
       "47_margins",
       "53_embedded_faces"
@@ -2167,7 +2166,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2236,12 +2234,14 @@
       "09_font_names",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
       "32_stroke_lines",
       "41_block_spacing",
+      "43_within_10pt_x",
       "47_margins",
       "53_embedded_faces",
       "59_shape_anchor"
@@ -2249,7 +2249,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2322,6 +2321,7 @@
       "16_numeric_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "27_text_off_page",
@@ -2334,7 +2334,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2404,6 +2403,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "25_invisible_text",
@@ -2419,7 +2419,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2486,6 +2485,7 @@
       "02_text_run_count",
       "14_filled_shapes",
       "18_median_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "25_invisible_text",
@@ -2499,7 +2499,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2567,6 +2566,7 @@
       "05_words_extra",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "32_stroke_lines",
       "41_block_spacing",
@@ -2575,7 +2575,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2642,6 +2641,7 @@
       "05_words_extra",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -2659,7 +2659,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2725,6 +2724,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "23_line_pitch",
       "26_text_overlap",
       "47_margins",
@@ -2733,7 +2733,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2823,7 +2822,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2888,6 +2886,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "25_invisible_text",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -2899,7 +2898,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -2974,6 +2972,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "29_blank_where_ink_was",
@@ -2987,7 +2986,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3054,12 +3052,12 @@
       "04_words_missing",
       "18_median_dy",
       "22_reading_order",
+      "43_within_10pt_x",
       "53_embedded_faces"
     ],
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3126,6 +3124,7 @@
       "04_words_missing",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -3137,7 +3136,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3209,6 +3207,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "32_stroke_lines",
@@ -3221,7 +3220,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3292,7 +3290,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3357,6 +3354,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "25_invisible_text",
       "30_ink_where_blank_was",
       "32_stroke_lines",
@@ -3367,7 +3365,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3432,6 +3429,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "26_text_overlap",
@@ -3442,7 +3440,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3507,13 +3504,13 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "47_margins",
       "53_embedded_faces"
     ],
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3583,7 +3580,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3655,6 +3651,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -3669,7 +3666,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3733,6 +3729,7 @@
     "best": 52,
     "failed": [
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "32_stroke_lines",
       "41_block_spacing",
@@ -3742,7 +3739,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3806,6 +3802,7 @@
     "best": 51,
     "failed": [
       "18_median_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -3816,7 +3813,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3881,13 +3877,13 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "47_margins",
       "53_embedded_faces"
     ],
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -3957,6 +3953,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "29_blank_where_ink_was",
@@ -3971,7 +3968,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4040,6 +4036,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "25_invisible_text",
@@ -4054,7 +4051,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4121,6 +4117,7 @@
       "07_table_rows",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "23_line_pitch",
       "25_invisible_text",
       "32_stroke_lines",
@@ -4131,7 +4128,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4206,7 +4202,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4274,6 +4269,7 @@
       "07_table_rows",
       "14_filled_shapes",
       "18_median_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "25_invisible_text",
@@ -4287,7 +4283,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4352,6 +4347,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
       "32_stroke_lines",
@@ -4361,7 +4357,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4429,6 +4424,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -4442,7 +4438,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4529,7 +4524,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4594,6 +4588,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "26_text_overlap",
       "29_blank_where_ink_was",
@@ -4606,7 +4601,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4672,6 +4666,7 @@
       "01_page_count",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "24_page_breaks",
       "25_invisible_text",
       "29_blank_where_ink_was",
@@ -4685,7 +4680,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4751,6 +4745,7 @@
       "02_text_run_count",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -4763,7 +4758,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4829,6 +4823,7 @@
       "02_text_run_count",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "29_blank_where_ink_was",
@@ -4842,7 +4837,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4906,6 +4900,7 @@
     "best": 52,
     "failed": [
       "18_median_dy",
+      "20_within_10pt",
       "22_reading_order",
       "41_block_spacing",
       "47_margins",
@@ -4915,7 +4910,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -4976,13 +4970,14 @@
     ]
   },
   "340_bill_of_lading": {
-    "best": 43,
+    "best": 42,
     "failed": [
       "02_text_run_count",
       "07_table_rows",
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "26_text_overlap",
@@ -4990,6 +4985,7 @@
       "30_ink_where_blank_was",
       "32_stroke_lines",
       "42_alignment_mix",
+      "44_header_footer",
       "47_margins",
       "53_embedded_faces",
       "59_shape_anchor"
@@ -4997,7 +4993,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5063,6 +5058,7 @@
       "01_page_count",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "24_page_breaks",
       "25_invisible_text",
       "29_blank_where_ink_was",
@@ -5075,7 +5071,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5143,6 +5138,7 @@
       "05_words_extra",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -5157,7 +5153,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5227,6 +5222,7 @@
       "05_words_extra",
       "07_table_rows",
       "14_filled_shapes",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -5242,7 +5238,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5309,6 +5304,7 @@
       "04_words_missing",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "25_invisible_text",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -5321,7 +5317,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5386,6 +5381,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "32_stroke_lines",
       "47_margins",
       "53_embedded_faces"
@@ -5393,7 +5389,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5467,6 +5462,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -5484,7 +5480,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5551,6 +5546,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "32_stroke_lines",
@@ -5562,7 +5558,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5635,6 +5630,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -5655,7 +5651,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5722,6 +5717,7 @@
       "11_bold_runs",
       "14_filled_shapes",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -5736,7 +5732,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5808,7 +5803,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5876,6 +5870,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -5887,7 +5882,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -5963,7 +5957,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6029,6 +6022,7 @@
       "03_word_count",
       "04_words_missing",
       "18_median_dy",
+      "20_within_10pt",
       "22_reading_order",
       "42_alignment_mix",
       "47_margins",
@@ -6037,7 +6031,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6103,6 +6096,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "32_stroke_lines",
@@ -6113,7 +6107,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6181,6 +6174,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -6196,7 +6190,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6261,6 +6254,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "30_ink_where_blank_was",
       "32_stroke_lines",
       "47_margins"
@@ -6268,7 +6262,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6337,6 +6330,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "27_text_off_page",
@@ -6349,7 +6343,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6415,6 +6408,7 @@
       "02_text_run_count",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "30_ink_where_blank_was",
       "47_margins",
@@ -6424,7 +6418,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6510,7 +6503,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6575,6 +6567,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "25_invisible_text",
       "30_ink_where_blank_was",
       "32_stroke_lines",
@@ -6585,7 +6578,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6652,6 +6644,7 @@
       "07_table_rows",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "26_text_overlap",
@@ -6667,7 +6660,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6737,6 +6729,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -6750,7 +6743,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6815,6 +6807,7 @@
     "failed": [
       "01_page_count",
       "19_worst_dy",
+      "20_within_10pt",
       "21_median_dx",
       "24_page_breaks",
       "25_invisible_text",
@@ -6828,7 +6821,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6899,7 +6891,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -6965,6 +6956,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "25_invisible_text",
       "32_stroke_lines",
       "47_margins",
@@ -6974,7 +6966,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7040,6 +7031,7 @@
       "02_text_run_count",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "29_blank_where_ink_was",
@@ -7052,7 +7044,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7119,6 +7110,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -7133,7 +7125,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7199,6 +7190,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "25_invisible_text",
       "26_text_overlap",
       "32_stroke_lines",
@@ -7209,7 +7201,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7281,6 +7272,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "27_text_off_page",
@@ -7294,7 +7286,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7360,6 +7351,7 @@
       "01_page_count",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "24_page_breaks",
       "25_invisible_text",
       "32_stroke_lines",
@@ -7371,7 +7363,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7441,6 +7432,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "32_stroke_lines",
       "47_margins",
@@ -7450,7 +7442,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7517,6 +7508,7 @@
       "04_words_missing",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "23_line_pitch",
       "41_block_spacing",
       "47_margins"
@@ -7524,7 +7516,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7589,6 +7580,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
       "32_stroke_lines",
@@ -7600,7 +7592,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7666,6 +7657,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -7678,7 +7670,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7749,19 +7740,20 @@
       "11_bold_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
       "32_stroke_lines",
       "34c_span_weight_match",
       "41_block_spacing",
+      "43_within_10pt_x",
       "47_margins",
       "53_embedded_faces"
     ],
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7829,6 +7821,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "26_text_overlap",
@@ -7845,7 +7838,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -7917,6 +7909,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "21_median_dx",
       "22_reading_order",
       "23_line_pitch",
@@ -7926,6 +7919,7 @@
       "32_stroke_lines",
       "35_rotation",
       "41_block_spacing",
+      "43_within_10pt_x",
       "45_char_accuracy",
       "47_margins",
       "53_embedded_faces",
@@ -7936,7 +7930,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8004,6 +7997,7 @@
       "13_text_colours",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -8019,7 +8013,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8085,6 +8078,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -8092,6 +8086,7 @@
       "32_stroke_lines",
       "41_block_spacing",
       "42_alignment_mix",
+      "43_within_10pt_x",
       "47_margins",
       "53_embedded_faces",
       "59_shape_anchor"
@@ -8099,7 +8094,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8165,12 +8159,14 @@
       "01_page_count",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "23_line_pitch",
       "24_page_breaks",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
       "32_stroke_lines",
       "41_block_spacing",
+      "43_within_10pt_x",
       "47_margins",
       "55_orientation_mix",
       "59_shape_anchor"
@@ -8178,7 +8174,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8248,6 +8243,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -8264,7 +8260,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8331,6 +8326,7 @@
       "04_words_missing",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "32_stroke_lines",
@@ -8343,7 +8339,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8409,6 +8404,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "23_line_pitch",
       "32_stroke_lines",
       "41_block_spacing",
@@ -8420,7 +8416,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8494,6 +8489,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -8501,13 +8497,13 @@
       "29_blank_where_ink_was",
       "38_list_markers",
       "41_block_spacing",
+      "43_within_10pt_x",
       "47_margins",
       "55_orientation_mix"
     ],
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8572,6 +8568,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
       "41_block_spacing",
@@ -8581,7 +8578,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8649,6 +8645,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "34a_span_size_match",
@@ -8661,7 +8658,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8726,6 +8722,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "23_line_pitch",
       "30_ink_where_blank_was",
       "41_block_spacing",
@@ -8734,7 +8731,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8802,7 +8798,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8867,6 +8862,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "34b_span_colour_match",
       "47_margins",
       "53_embedded_faces"
@@ -8874,7 +8870,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -8939,13 +8934,13 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "47_margins",
       "53_embedded_faces"
     ],
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9010,6 +9005,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "23_line_pitch",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -9019,7 +9015,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9088,6 +9083,7 @@
       "05_words_extra",
       "17_matched_runs",
       "18_median_dy",
+      "20_within_10pt",
       "22_reading_order",
       "30_ink_where_blank_was",
       "35_rotation",
@@ -9098,7 +9094,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9171,6 +9166,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "27_text_off_page",
@@ -9184,7 +9180,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9256,6 +9251,7 @@
       "16_numeric_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "25_invisible_text",
@@ -9270,7 +9266,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9340,6 +9335,7 @@
       "11_bold_runs",
       "17_matched_runs",
       "18_median_dy",
+      "20_within_10pt",
       "22_reading_order",
       "30_ink_where_blank_was",
       "32_stroke_lines",
@@ -9351,7 +9347,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9419,6 +9414,7 @@
       "09_font_names",
       "15_links",
       "18_median_dy",
+      "20_within_10pt",
       "22_reading_order",
       "30_ink_where_blank_was",
       "32_stroke_lines",
@@ -9429,7 +9425,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9500,7 +9495,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9568,6 +9562,7 @@
       "09_font_names",
       "14_filled_shapes",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "30_ink_where_blank_was",
@@ -9581,7 +9576,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9646,6 +9640,7 @@
     "failed": [
       "09_font_names",
       "18_median_dy",
+      "20_within_10pt",
       "23_line_pitch",
       "30_ink_where_blank_was",
       "32_stroke_lines",
@@ -9655,7 +9650,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9723,6 +9717,7 @@
       "09_font_names",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "30_ink_where_blank_was",
@@ -9734,7 +9729,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9805,7 +9799,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9878,6 +9871,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -9893,7 +9887,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -9958,6 +9951,7 @@
     "failed": [
       "09_font_names",
       "18_median_dy",
+      "20_within_10pt",
       "32_stroke_lines",
       "47_margins",
       "53_embedded_faces"
@@ -9965,7 +9959,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10038,6 +10031,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -10049,7 +10043,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10114,6 +10107,7 @@
     "failed": [
       "09_font_names",
       "18_median_dy",
+      "20_within_10pt",
       "32_stroke_lines",
       "41_block_spacing",
       "47_margins",
@@ -10122,7 +10116,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10198,7 +10191,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10267,6 +10259,7 @@
       "09_font_names",
       "17_matched_runs",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "26_text_overlap",
@@ -10279,7 +10272,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10346,6 +10338,7 @@
       "09_font_names",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -10356,7 +10349,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10421,6 +10413,7 @@
     "failed": [
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -10433,7 +10426,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10499,6 +10491,7 @@
       "02_text_run_count",
       "07_table_rows",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "27_text_off_page",
       "29_blank_where_ink_was",
@@ -10510,7 +10503,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10581,6 +10573,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -10595,7 +10588,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10663,6 +10655,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "28_clipped_at_edge",
       "29_blank_where_ink_was",
@@ -10677,7 +10670,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10745,6 +10737,7 @@
       "05_words_extra",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "28_clipped_at_edge",
@@ -10758,7 +10751,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10824,13 +10816,13 @@
       "07_table_rows",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "23_line_pitch",
       "52_outline"
     ],
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10901,9 +10893,11 @@
       "07_table_rows",
       "09_font_names",
       "11_bold_runs",
+      "14_filled_shapes",
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -10915,7 +10909,6 @@
       "41_block_spacing",
       "45_char_accuracy",
       "47_margins",
-      "53_embedded_faces",
       "55_orientation_mix",
       "56_rtl_runs",
       "59_shape_anchor"
@@ -10923,7 +10916,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -10991,6 +10983,7 @@
       "04_words_missing",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "30_ink_where_blank_was",
       "32_stroke_lines",
       "47_margins",
@@ -11000,7 +10993,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11071,6 +11063,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "29_blank_where_ink_was",
@@ -11084,7 +11077,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11151,6 +11143,7 @@
       "09_font_names",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -11166,7 +11159,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11235,6 +11227,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -11248,7 +11241,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11323,6 +11315,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "32_stroke_lines",
@@ -11336,7 +11329,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11408,6 +11400,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "32_stroke_lines",
@@ -11420,7 +11413,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11488,6 +11480,7 @@
       "07_table_rows",
       "09_font_names",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "26_text_overlap",
       "29_blank_where_ink_was",
@@ -11500,7 +11493,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11571,6 +11563,7 @@
       "07_table_rows",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -11583,7 +11576,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11654,6 +11646,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "26_text_overlap",
       "29_blank_where_ink_was",
@@ -11667,7 +11660,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11733,6 +11725,7 @@
       "01_page_count",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -11749,7 +11742,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11824,6 +11816,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "27_text_off_page",
@@ -11837,7 +11830,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11910,6 +11902,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -11924,7 +11917,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -11992,6 +11984,7 @@
       "04_words_missing",
       "05_words_extra",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -12002,7 +11995,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12077,6 +12069,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -12084,6 +12077,7 @@
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
       "32_stroke_lines",
+      "43_within_10pt_x",
       "45_char_accuracy",
       "47_margins",
       "53_embedded_faces",
@@ -12092,7 +12086,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12161,6 +12154,7 @@
       "09_font_names",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "36_underline_rules",
@@ -12171,7 +12165,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12243,6 +12236,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -12251,7 +12245,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12324,6 +12317,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -12331,6 +12325,7 @@
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
       "33_border_over_text",
+      "43_within_10pt_x",
       "45_char_accuracy",
       "46_text_crossing_rule",
       "47_margins",
@@ -12339,7 +12334,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12411,18 +12405,19 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
+      "43_within_10pt_x",
       "47_margins",
       "55_orientation_mix"
     ],
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12491,6 +12486,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -12500,7 +12496,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12571,6 +12566,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -12583,7 +12579,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12651,6 +12646,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "26_text_overlap",
       "27_text_off_page",
@@ -12662,7 +12658,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12730,6 +12725,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "30_ink_where_blank_was",
@@ -12741,7 +12737,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12809,6 +12804,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -12820,7 +12816,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12888,6 +12883,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "25_invisible_text",
@@ -12900,7 +12896,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -12974,6 +12969,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -12986,7 +12982,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13058,6 +13053,7 @@
       "11_bold_runs",
       "17_matched_runs",
       "18_median_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -13071,7 +13067,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13141,6 +13136,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -13156,7 +13152,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13225,6 +13220,7 @@
       "07_table_rows",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -13239,7 +13235,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13309,6 +13304,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -13321,7 +13317,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13388,6 +13383,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "47_margins"
@@ -13395,7 +13391,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13464,6 +13459,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -13474,6 +13470,7 @@
       "32_stroke_lines",
       "36_underline_rules",
       "41_block_spacing",
+      "43_within_10pt_x",
       "47_margins",
       "55_orientation_mix",
       "59_shape_anchor"
@@ -13481,7 +13478,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13556,7 +13552,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13626,6 +13621,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -13639,7 +13635,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13708,6 +13703,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "29_blank_where_ink_was",
@@ -13719,7 +13715,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13787,6 +13782,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "29_blank_where_ink_was",
@@ -13797,7 +13793,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13864,6 +13859,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -13872,7 +13868,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -13939,6 +13934,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "29_blank_where_ink_was",
@@ -13951,7 +13947,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14022,6 +14017,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -14034,7 +14030,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14103,6 +14098,7 @@
       "12_italic_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "26_text_overlap",
@@ -14114,7 +14110,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14182,6 +14177,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -14196,7 +14192,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14264,6 +14259,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -14273,7 +14269,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14339,6 +14334,7 @@
       "02_text_run_count",
       "10_font_sizes",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -14349,7 +14345,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14420,6 +14415,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "29_blank_where_ink_was",
@@ -14431,7 +14427,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14500,6 +14495,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "26_text_overlap",
       "29_blank_where_ink_was",
@@ -14513,7 +14509,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14581,6 +14576,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -14591,7 +14587,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14664,6 +14659,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -14680,7 +14676,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14750,6 +14745,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -14764,7 +14760,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14832,6 +14827,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
       "47_margins",
@@ -14840,7 +14836,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14908,6 +14903,7 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -14917,7 +14913,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -14987,6 +14982,7 @@
       "12_italic_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -14999,7 +14995,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15069,6 +15064,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -15084,7 +15080,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15157,6 +15152,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -15172,7 +15168,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15243,6 +15238,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "26_text_overlap",
@@ -15250,13 +15246,13 @@
       "30_ink_where_blank_was",
       "32_stroke_lines",
       "35_rotation",
+      "43_within_10pt_x",
       "47_margins",
       "56_rtl_runs"
     ],
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15329,6 +15325,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "25_invisible_text",
       "29_blank_where_ink_was",
@@ -15336,6 +15333,7 @@
       "32_stroke_lines",
       "34a_span_size_match",
       "36_underline_rules",
+      "43_within_10pt_x",
       "47_margins",
       "53_embedded_faces",
       "59_shape_anchor"
@@ -15343,7 +15341,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15412,6 +15409,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -15424,7 +15422,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15498,6 +15495,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -15514,7 +15512,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15588,6 +15585,7 @@
       "17_matched_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "24_page_breaks",
       "25_invisible_text",
@@ -15601,7 +15599,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15670,6 +15667,7 @@
       "11_bold_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "32_stroke_lines",
@@ -15682,7 +15680,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15750,6 +15747,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -15760,7 +15758,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15829,6 +15826,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
@@ -15841,7 +15839,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15909,6 +15906,7 @@
       "09_font_names",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -15919,7 +15917,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -15988,6 +15985,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -15996,7 +15994,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -16069,11 +16066,13 @@
       "14_filled_shapes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "25_invisible_text",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
+      "43_within_10pt_x",
       "44_header_footer",
       "47_margins",
       "59_shape_anchor"
@@ -16081,7 +16080,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -16148,6 +16146,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -16157,7 +16156,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -16224,6 +16222,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -16233,7 +16232,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -16302,6 +16300,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "29_blank_where_ink_was",
       "30_ink_where_blank_was",
@@ -16310,7 +16309,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -16378,6 +16376,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "23_line_pitch",
       "26_text_overlap",
       "29_blank_where_ink_was",
@@ -16389,7 +16388,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -16455,6 +16453,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "47_margins",
@@ -16463,7 +16462,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -16535,7 +16533,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -16615,7 +16612,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -16684,6 +16680,7 @@
       "10_font_sizes",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "24_page_breaks",
@@ -16697,7 +16694,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -16769,7 +16765,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
@@ -16839,6 +16834,7 @@
       "12_italic_runs",
       "18_median_dy",
       "19_worst_dy",
+      "20_within_10pt",
       "22_reading_order",
       "23_line_pitch",
       "29_blank_where_ink_was",
@@ -16848,7 +16844,6 @@
     "out_of": 59,
     "universe": [
       "01_page_count",
-      "02_text_run_count",
       "03_word_count",
       "04_words_missing",
       "05_words_extra",
