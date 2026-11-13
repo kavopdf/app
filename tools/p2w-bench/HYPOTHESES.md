@@ -77,9 +77,13 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: RESULTS.jsonl, engine 2a68de6: of 131 failing rows whose page count matches the source, 86 score <50 on 20_within_10pt; among those 86 the co-failing checks are 20_within_10pt 86, 18_median_dy 84, 47_margins 83, 19_worst_dy 80, 29_blank_where_ink_was 66, 22_reading_order 65. Median dy on the examples is a constant shift, not a drift: 304_package_insert_small_print -44.8, 23_timetable_grid_txtpos -30.6, 303_discharge_summary -19.4; 47_margins render x0 is 0 against source x0 28/56 on 23 and 303.
   recorded: 2026-11-13 04:43
 
-- UNTESTED - Suppressing whitespace-only anchored text boxes in the emitter removes the x=0 element, so 47_margins stops reporting it and the class's 86 worst documents recover their left extent
-  evidence: Follows the CONFIRMED 13 Nov 03:48 entry for 47_margins: on 362_price_list_dense the only spans at x=0 are two single spaces, and on 316_contract_with_schedules three single spaces, while every real table span and the table frame match the source within 2 pt. The engine emits every paragraph as a wp:anchor at its page x (DocxWriter.java:26, anchor() at 3138), so a whitespace-only paragraph whose PDF x is 0 becomes a text block at x=0 that Google's export reports and the source PDF does not. Untested: no guard was built and no Google measurement was run.
-  recorded: 2026-11-13 04:43
+- RULED OUT - Suppressing whitespace-only anchored text boxes in the emitter removes the x=0 element, so 47_margins stops reporting it and the class's 86 worst documents recover their left extent
+  evidence: Local conversion of the two documents the entry cites, engine 2a68de6: 362_price_list_dense.docx has 0 wp:anchor, 0 wps:txbx and 0 whitespace-only runs (its 7 empty spacer paragraphs carry no runs at all); 316_contract_with_schedules.docx has 1 anchor, which is a shape with no text box, and 0 whitespace-only runs. Code: DocxWriter.flowParagraph:3081 returns on whitespace-only text and runXml emits a run only for non-empty text, so the emitter has no whitespace text box to suppress and the patch would be a no-op. The x=0 block Google reports is not a whitespace text box we emit.
+  recorded: 2026-11-13 05:44
+
+- UNTESTED - The class's mass is a per-line drift, not a step: Google renders w:line as a multiple of the substitute face's line height, so the flowed pitch asked in twips comes back short and the error accumulates down the page; the fix is to scale w:line by the face size in the flow emitter
+  evidence: 304_package_insert_small_print, engine 2a68de6: 17 flowed paragraphs, no table and no anchor; sectPr margins all 0 and first paragraph w:before=296 twips=14.8 pt against the PDF's first line top 16.4 pt, so the top of the page is placed correctly. Recorded: 18_median_dy -44.8, 19_worst_dy +90.8, 20_within_10pt 12/100, 23_line_pitch 5.0 against source 7.8. Dominant run size 6.2 pt with w:line=143 twips (7.15 pt asked); calibrate.py's model (line/240)*1.15*size predicts 4.25 pt for that pair, measured 5.0 - direction right, constant not. Untested: no per-line dy dump through Drive and no scaled-w:line build has been measured.
+  recorded: 2026-11-13 05:44
 
 
 ## 47_margins
