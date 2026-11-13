@@ -89,3 +89,9 @@ everything else: what went wrong in the work itself.
   documents (362 51->53, balance-sheet 40->44, and 40_devanagari restored to 37), because the row-by-row
   comparison is new engine vs last engine. Read the baseline deltas from `res/*.json` against `RESULTS.jsonl`
   and say in the report which comparison the number is; do not re-record a number the store refuses.
+
+- **Google adds no `w:after` between adjacent exact-line paragraphs.** A hairline box with the
+  leftover advance put in `w:after` measured pitch 9.59 pt where 12 was asked: the `after` is
+  ignored, so a baseline cannot be placed independently of the pitch. Only `w:before` moves a
+  line, and it moves the next one with it. Cost: one calibration round, and it rules out the
+  obvious repair of the hairline patch before it reached twenty documents.

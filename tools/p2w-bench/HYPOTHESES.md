@@ -105,6 +105,18 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: Two builds, 40 document-renders, identical shape: every check that only depends on pitch (18_median_dy, 19_worst_dy, 20_within_10pt, 23_line_pitch) improves or holds, and every check that depends on which band the flow lands in (44_header_footer, 27_text_off_page, 41_block_spacing, 01_page_count, 24_page_breaks) is what regresses. Untested: no per-line dy dump has been taken on a regressing document.
   recorded: 2026-11-13 07:00
 
+- RULED OUT - Restoring the model's baseline with a split hairline box (w:before = 0.8*box - 0.069*size, w:after = 0.2*prev) keeps both the pitch and the baseline position
+  evidence: Three-variant calibration through Drive (Google PDF export), 10 pt Arial, box 12 pt, advance 12 pt, 8 single-line paragraphs, zero margins: A hairline (before=226tw, line=1) first baseline 11.86 pt, pitch 11.99; B control model box (before=0, line=240) first baseline 9.38, pitch 11.50; C split (before=178tw, after=48tw, line=1) first baseline 9.46, pitch 9.59. C's pitch equals before+0.069*size exactly, so Google adds NO w:after between adjacent exact-line paragraphs: the after is ignored and the advance collapses. The split cannot place a baseline independently of the pitch.
+  recorded: 2026-11-13 07:43
+
+- CONFIRMED - The hairline construct places every flowed baseline at the full advance below its paragraph top, which is 0.2*prevLinePt lower than the model's 0.8*box placement - a uniform downward offset of the whole flow, which is why the pitch checks gained and only the band checks (44_header_footer, 27_text_off_page, 41_block_spacing, 01_page_count, 24_page_breaks) regressed
+  evidence: Same calibration, engine-independent: A first baseline 11.86 pt against B 9.38 at box 12 pt / face 10 pt - a measured +2.48 pt at the top of the flow, close to the predicted 0.2*12 + 0.8*(12-11.5) = 2.8 pt (0.3 pt residual). Pitch is unchanged (A 11.99 vs B 11.50), so the offset is uniform and does not accumulate; it moves the flow across the bands those checks measure, which is the shape of every regression the 06:56 and 07:00 runs recorded.
+  recorded: 2026-11-13 07:43
+
+- UNTESTED - The repair is a per-flow-run up-shift, not a spacing change: since w:after is ignored and every PDF line is its own paragraph, subtract 0.2*prevLinePt from the FIRST hairline paragraph of each contiguous flow run and leave every following line at advance - the pitch is untouched because each line's top is the previous line's baseline, so the whole run moves up by the same 2.48 pt
+  evidence: Calibration A/B/C above: the offset is uniform per run and identical for every line, so one shift at the run's first line moves all of them; C proves the same result cannot be reached by putting the difference in w:after. Untested: no build has applied the shift at a run start.
+  recorded: 2026-11-13 07:43
+
 
 ## 47_margins
 
