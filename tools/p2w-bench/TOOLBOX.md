@@ -245,6 +245,16 @@ are the .txt checks `t01` to `t05` rather than the .docx checks `01` to `59`. Ru
 take the largest OPEN class from either; which half you are in decides whether the rest of
 the run uses `verify_google.py` with `ratchet.py` or `verify_txt.py` with `ratchet.py --txt`.
 
+    python3 tools/p2w-bench/classify.py --pick [--txt]
+      The class this run should take, and the reason. A class gets six attempts in a pass, then the
+      queue moves on; the biggest class is still first among those with equal attempts, and every
+      class comes back. It prints the pick, how many attempts that class has had, how many classes
+      still have room, the next three in the queue, and - when the class has had three or more
+      tries - a reminder that an ENTANGLED class needs the structural path in STEP 5 rather than
+      another patch.
+      Exit 0 with "no class is OPEN" when the round is finished; close it with round.py
+      --close-round.
+
 ## seed.py - every corpus document gets a row, or nothing measures it
 
     python3 tools/p2w-bench/seed.py --corpus all

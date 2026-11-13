@@ -2455,3 +2455,77 @@ The first `CLASS-HISTORY` block called `load()`, which does not exist in `classi
 `load_ledger()`. The `except Exception: pass` around it swallowed the NameError so completely that
 the file was created empty and nothing said why. It now prints the exception instead of hiding it.
 An empty record and no explanation is the exact shape of every defect in this file.
+
+---
+
+## 47. The scheduling was the problem, not the unit — six attempts and step back
+
+The question was whether to go per-document, or stay per-class a different way. The answer is
+neither, exactly: **the class is the right unit and the scheduling was wrong.**
+
+### Why not per-document
+
+208 documents, 208 special cases, and the app ships to arbitrary PDFs that are not in the corpus.
+A fix keyed on a filename helps one file and hides the defect — the measurement goes green and
+nothing general was learned. §42 already settled this: keying on identity is forbidden, keying on
+structure is required. Per-document survives in exactly one place, and it is already there:
+**diagnosis**. The five-variant calibration probe on one document is how the table-spacer cause was
+found. That is per-document work done right.
+
+### Why the class is the right unit
+
+A class is how progress is measured. Without it there is no way to say whether a change helped.
+
+### Why the scheduling was wrong
+
+    20_within_10pt   15 attempts, 0 fixed
+    47_margins        3 attempts, 0 fixed
+    the other 41      0 attempts, never looked at
+    total             16 attempts, 0 kept, 0 improved
+
+The two biggest classes are entangled in the vertical flow: a fix to one moves the layout under the
+other, so every single-place patch regresses and the ratchet rejects it. They absorbed every slot
+and returned nothing. Forty-one classes never got a turn.
+
+"Take the top class whose status is OPEN" was right when written. §30 then made leaving it binding
+— "switch classes only when the top class is PARKED, FIXED, or its day is spent" — which was also
+right at the time, because a run had wandered to an easier class. Together they produced a round
+where two entangled causes ate the whole budget.
+
+### What changed: a cap, not a preference
+
+    python3 tools/p2w-bench/classify.py --pick
+
+A class gets **six attempts in a pass**, then the queue moves on and it comes back after the
+classes with room have had their turn. The biggest class is still first among those with equal
+attempts, so it is the same list in the same order — with a cap that stops one cause eating the
+round.
+
+Right now `--pick` returns `53_embedded_faces` (157 documents, 0 attempts) instead of
+`20_within_10pt` (15 attempts). That single change is what turns 41 untouched classes into 41
+chances to fix something.
+
+The brief's STEP 2 now runs `--pick` rather than reading a rule, and the paragraph that used to say
+"take the top class" says what the cap is and why it is a queue rather than a preference — with the
+13 Nov numbers, because the next run should know what the rule is protecting against.
+
+### And the structural nudge is now part of the pick
+
+When `--pick` returns a class with three or more attempts it prints:
+
+    this class has had 5 tries - if STEP 2c said ENTANGLED, the next attempt on it
+    must be the STRUCTURAL path in STEP 5, not another patch
+
+STEP 2c carries the same sentence. The structural path has existed since 08:31 and has never been
+used; a rule that says "use it" in the place the run reads the class name is worth more than one in
+a step it may not reach.
+
+### What this does not fix
+
+The two entangled classes still need a layout rewrite, and six attempts will not produce one. What
+the cap buys is that they stop consuming the round while it is attempted — and that the forty-one
+classes with a single cause and no entanglement get the slots they have never had.
+
+If round 1 ends with those two parked and ten to fifteen small classes fixed, that is a working
+pipeline. If it ends with two parked and nothing fixed, the scheduling was not the only problem and
+the next place to look is why every small class fails the same way.

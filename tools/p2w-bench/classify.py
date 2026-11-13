@@ -622,6 +622,59 @@ def main(argv):
             cls, e["attempts"], e["requeues"], e.get("status"), e.get("reason", "")))
         return 0
 
+    if "--pick" in argv:
+        # WHICH CLASS A RUN SHOULD TAKE NEXT, and why this is a tool rather than a sentence.
+        #
+        # The brief said "take the top class whose status is OPEN", and section 30 made switching
+        # away from it binding. Both were right when written and both are expensive now: on 13 Nov
+        # 20_within_10pt had 15 of the 16 attempts, 47_margins had 3, the other 41 classes had
+        # none, and nothing had been fixed. The two biggest classes are entangled in the vertical
+        # flow - a fix to one moves the layout under the other - so they absorb every slot and
+        # return nothing.
+        #
+        # The rule below is a cap, not a preference. A class gets MAX_PER_PASS attempts, then the
+        # queue moves on and it comes back after the others have had their turn. That is the
+        # difference between "work the biggest class" and "work only the biggest class".
+        MAX_PER_PASS = 6
+        led = load_ledger()
+        rows = []
+        classes_file = os.path.join(HERE, "DEFECT-CLASSES-TXT.md" if "--txt" in argv
+                                    else "DEFECT-CLASSES.md")
+        for line in open(classes_file, encoding="utf-8"):
+            if not line.startswith("| ") or not line[2:3].isdigit():
+                continue
+            c = [x.strip() for x in line.strip().strip("|").split("|")]
+            if len(c) < 8 or c[7] != "OPEN":
+                continue
+            try:
+                docs = int(c[2])
+            except ValueError:
+                continue
+            att = led.get(c[1], {}).get("attempts", 0)
+            rows.append((docs, att, c[1]))
+        if not rows:
+            print("no class is OPEN - the round is finished: round.py --close-round")
+            return 0
+        # Fewest attempts first, then biggest class. A class that has had its cap comes back
+        # only after every class with room has been offered.
+        rows.sort(key=lambda r: (r[1] >= MAX_PER_PASS, r[1], -r[0]))
+        docs, att, name = rows[0]
+        rest = [r for r in rows[1:4]]
+        print("take: %s" % name)
+        print("  %d documents, %d attempt(s) of %d this pass" % (docs, att, MAX_PER_PASS))
+        if att >= MAX_PER_PASS:
+            print("  every OPEN class has had its %d attempts - this one has the fewest"
+                  % MAX_PER_PASS)
+        else:
+            print("  %d class(es) still have room this pass" % len([r for r in rows if r[1] < MAX_PER_PASS]))
+        if rest:
+            print("after it: %s" % ", ".join("%s (%d att)" % (r[2], r[1]) for r in rest))
+        if att >= 3:
+            print("  this class has had %d tries - if STEP 2c said ENTANGLED, the next attempt on it"
+                  % att)
+            print("  must be the STRUCTURAL path in STEP 5, not another patch")
+        return 0
+
     top = 20
     if "--top" in argv:
         top = int(argv[argv.index("--top") + 1])

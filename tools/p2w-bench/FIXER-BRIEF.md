@@ -169,10 +169,21 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   ATTEMPTS.json is shared: a class id is unique whichever half it came from.
   Classes are data-driven groups of checks that fail on largely the same documents, named after the
   leading check id, e.g. '19_worst_dy (+3)'. Do not invent a friendlier name.
-  Take the top class whose status is OPEN. SKIP every class marked PARKED or FIXED.
+  python3 tools/p2w-bench/classify.py --pick
+  THAT IS THE CLASS YOU TAKE. Not "the top one" - the tool applies a cap you do not get to
+  override: a class gets six attempts in a pass, then the queue moves on and it comes back after
+  the classes with room have had their turn.
 
-  IF THE TOP CLASS HAS AN UNTESTED HYPOTHESIS, THAT IS THIS RUN'S WORK:
-      python3 tools/p2w-bench/hypothesis.py --next "<top class>"
+  WHY THIS IS NOT "PICK AN EASY ONE". On 13 Nov 20_within_10pt had 15 of the 16 attempts,
+  47_margins had 3, the other 41 classes had none, and nothing was fixed. The two biggest classes
+  are entangled in the vertical flow - a fix to one moves the layout under the other - so they
+  absorb every slot and return nothing. Six attempts is enough to prove that; the other forty-one
+  have never been looked at. The cap is a queue, not a preference: the biggest class is still
+  first among the ones with equal attempts, and every class comes back.
+  SKIP every class marked PARKED or FIXED - --pick already does.
+
+  IF THE CLASS --pick NAMED HAS AN UNTESTED HYPOTHESIS, THAT IS THIS RUN'S WORK:
+      python3 tools/p2w-bench/hypothesis.py --next "<that class>"
       tail -12 tools/p2w-bench/CLASS-HISTORY.jsonl    # the trajectory, one line per attempt
   An untested theory is the previous run's last instruction to you - the one thing it could not
   finish, written down so you would not have to rediscover it. Switching to a smaller class
@@ -195,8 +206,9 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   smaller class, while the top class was OPEN - and the theory waited a whole slot. The run after
   that picked it up, tested it in seven minutes and ruled it out with numbers.
 
-  Switch classes only when the top class is PARKED, FIXED, or its day is spent. Not because
-  another class looks easier: the queue is the ledger, not the run's preference.
+  The queue is the ledger, not the run's preference - and the ledger says a class that has had
+  six attempts steps back. That is not "this class looks easier": it is the same class list, in
+  the same order, with a cap that stops one entangled cause from eating the round.
 
   THE TOOL HAS TWO OUTPUTS AND EACH IS MEASURED SEPARATELY:
       python3 tools/p2w-bench/classify.py          the .docx half, checks 01 to 59
@@ -254,7 +266,10 @@ STEP 2c - CHECK WHETHER THE CLASS IS REALLY ONE CAUSE
   boundary, which breaks 01_page_count and 44_header_footer. A partial fix here can NEVER pass the
   ratchet, however correct it is for the documents it was aimed at.
 
-  If they are entangled, say so in HYPOTHESES.md and fix them TOGETHER in one change. Do not spend
+  If they are entangled, say so in HYPOTHESES.md and fix them TOGETHER in one change. If the class
+  has already had three or more attempts and STEP 2c said ENTANGLED, the next attempt on it MUST be
+  the structural path in STEP 5 - another single-place patch on an entangled class has a known
+  outcome, and 13 Nov spent four attempts proving it. Do not spend
   the day submitting partial patches that each regress - on 13 Nov three attempts went to exactly
   that: the table-spacer patch moved 3 of 18 documents and broke 4 checks, twice, then a clamp moved
   the regressions from 4 to 3 and was rejected too. Three attempts, one cause, no path, because the
