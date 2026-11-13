@@ -129,7 +129,9 @@ def main(argv):
         if line.startswith("| ") and not line.startswith("|---"):
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
             if cells and cells[0] and cells[0].lower() != "document":
-                out.append("| %s |  |  |  |  |  |" % cells[0])
+                # Seven cells since the universe stamp: a cleared row still has to
+                # hold the column, or the next row written into it lands one cell short.
+                out.append("| %s |  |  |  |  |  |  |" % cells[0])
                 cleared += 1
                 continue
         out.append(line.rstrip("\n"))

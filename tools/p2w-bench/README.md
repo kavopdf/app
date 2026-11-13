@@ -26,6 +26,20 @@ a change is good.
 | `TXT-SCORE.md` | the txt position score and its history |
 | `VISUAL-SCORE.md` | the visual score and its history |
 | `BATCH-LOG.md`, `V3-BATCH-LOG.md` | what each batch covered |
+| `RESULTS.jsonl` | every measurement, one line per document per round per engine |
+| `BASELINE.md` | the latest measurement per document, and the universe it was taken under |
+| `RATCHET.json` | the best score each document has ever reached |
+
+## Denominators
+
+A score is a count of passes, so it is a count *out of* a set of checks, and the set
+changes as checks are added, dropped or replaced. `instrument.py` is the one place that
+answers "how many checks are there" — it asks `verify_google.py --list-checks` (or
+`verify_txt.py`) rather than trusting a store. Every row in `RESULTS.jsonl` and every
+row in `BASELINE.md` carries the universe it was measured under; `ratchet.py` fails when
+a row disagrees with the live instrument, and `record.py --audit` says which counts a
+store holds before anyone totals it. `record.py --backfill` stamps rows written before
+the stamp existed.
 
 ## Removed
 

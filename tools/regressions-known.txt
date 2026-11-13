@@ -19,3 +19,10 @@
 #   gone lines itself. A later commit replacing a line on purpose, which is the one
 #   shape this check cannot tell from a loss on its own.
 229faa9:tools/p2w-bench/verify_google.py
+
+# 13 Nov: the denominator guard rewrote the three stores wholesale. RATCHET.json,
+# BASELINE.md and RESULTS.jsonl gained a universe stamp on every row, so earlier
+# commits' additions to those files were replaced by an equivalent-but-stamped row
+# rather than lost. The measurement each row records is unchanged - only the
+# bookkeeping around it. Named here so the next reader does not re-investigate.
+f47729c:tools/p2w-bench/verify_google.py  # superseded by d74a1fb: f47729c stripped ONE style pass, d74a1fb strips to a fixed point and handles truncated /BaseFont names - measured, 153 of 199 documents lost a face under the one-pass version
