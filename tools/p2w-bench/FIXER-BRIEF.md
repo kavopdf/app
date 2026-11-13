@@ -321,8 +321,33 @@ STEP 4b - RESEARCH, BUT NEVER AS PROOF
     engine. Record each ruled-out theory in the ledger so the next attempt inherits it.
 
 STEP 5 - FIX IT, IN ONE COHERENT CHANGE
-  app/src/main/java/com/kavopdf/app/engine/ only. No per-document special cases, no filename or
-  text matching. Forbidden because Google Docs ignores them: w:framePr.
+  app/src/main/java/com/kavopdf/app/engine/ only. Forbidden because Google Docs ignores them:
+  w:framePr.
+
+  WHAT IS FORBIDDEN, AND WHAT IS NOT  ** this rule has been misread in both directions **
+    FORBIDDEN - keying on IDENTITY: a filename, a document's text, its title, its page count.
+        if (doc.name.equals("362_price_list_dense")) shiftBy(10);
+    That helps exactly one file out of a corpus of 208 and out of the arbitrary PDFs the app ships
+    to. It also hides the real defect, which is the worse half: the measurement goes green and
+    nothing general was learned.
+
+    ALLOWED, AND OFTEN REQUIRED - keying on STRUCTURE: what the PDF actually contains.
+        if (row.firstBaseline - row.tableTop < 12f) chargeInBefore(gap);
+        if (glyph.isRotated() && !glyph.hasUprightForm()) ...
+    A structural condition generalises. It is how an engine distinguishes a table from a paragraph
+    without knowing which document it is reading. A fix that keys on structure is a fix; a fix that
+    keys on identity is a mask.
+
+  IF THE CLASS GENUINELY NEEDS PER-DOCUMENT HANDLING, SAY SO RATHER THAN DOING IT.
+    Eleven of the 43 classes have five documents or fewer - 15_links, 31_pages_lost_their_text and
+    33_border_over_text have one each. For those, the honest answer may be "this document carries a
+    feature nothing else in the corpus has, and the general engine cannot express it yet".
+    That is a finding, not a failure, and it belongs in the park record (STEP 10) as:
+        needs per-document handling: yes
+        documents: <name> - <what it needs, in one line>; <name> - <what it needs>
+        why it cannot be generalised: <the measurement showing no structural condition separates it>
+    Do not write the special case. Do not skip the class silently either - a class that parks with
+    a specification can be acted on later; one that parks with "hard" cannot.
 
   ONE CAUSE, NOT ONE PLACE. This step used to say "one cause, one place", and that sentence
   contradicted STEP 2c a few pages above it: 2c tells an entangled class to be fixed "together in
@@ -534,6 +559,9 @@ STEP 10 - PARKING A CLASS IS NOT A SURRENDER
       what was ruled out    - with the numbers that ruled it out
       what is still untested
       what information would settle it
+      needs per-document handling: yes|no
+      documents (if yes)    - <name> - <what it needs, in one line>; ...
+      why it cannot be generalised - the measurement showing no structural condition separates it
   A park with no numbers is not a park, it is giving up with paperwork. Mark the class
   CLOSED-UNFIXABLE with a reason, record the attempt as 'error', commit, move on.
 

@@ -2116,3 +2116,56 @@ structural fix ever has.
 It also still cannot plan across a whole class in one go. It writes one plan per attempt. If the
 plan turns out to be wrong halfway, the next run reads a wrong plan and has to notice. The ledger
 records why, so it can.
+
+---
+
+## 42. What happens to a class that needs fixing document by document
+
+The rule said "no per-document special cases, no filename or text matching" and nothing else. Read
+one way that forbids a hack; read another it forbids any conditional logic at all, including the
+kind an engine cannot work without. It also said nothing about what happens to a class that
+genuinely cannot be fixed generally — so the honest answer to "will it skip it or fix it" was
+"neither, and nobody wrote down which".
+
+### The corpus says this is not hypothetical
+
+Eleven of the 43 classes have five documents or fewer. Three have exactly one, all failing every
+document they contain:
+
+    15_links (+1)                 1 doc    0% pass
+    31_pages_lost_their_text      1 doc    0% pass
+    33_border_over_text (+1)      1 doc    0% pass
+
+For those, "fix it generally" may mean "teach the engine a feature nothing else in the corpus
+carries". That is a legitimate fix. Or it may mean "this one file is odd", and then the only fix
+that would turn the check green is the one that must not be written.
+
+### The rule now says which is which
+
+**FORBIDDEN — keying on IDENTITY**: a filename, a document's text, its title, its page count.
+
+    if (doc.name.equals("362_price_list_dense")) shiftBy(10);
+
+It helps one file out of 208, and out of the arbitrary PDFs the app ships to. It also hides the
+real defect, which is the worse half: the measurement goes green and nothing general was learned.
+
+**ALLOWED, AND OFTEN REQUIRED — keying on STRUCTURE**: what the PDF actually contains.
+
+    if (row.firstBaseline - row.tableTop < 12f) chargeInBefore(gap);
+    if (glyph.isRotated() && !glyph.hasUprightForm()) ...
+
+A structural condition generalises. It is how an engine tells a table from a paragraph without
+knowing which document it is reading. A fix that keys on structure is a fix; one that keys on
+identity is a mask.
+
+### And if it genuinely needs per-document handling, the park says so
+
+Not a silent skip, and not a hack. The park record in STEP 10 now carries three more lines:
+
+    needs per-document handling: yes
+    documents: <name> - <what it needs, in one line>; <name> - <what it needs>
+    why it cannot be generalised: <the measurement showing no structural condition separates it>
+
+A class that parks with a specification can be acted on later — by a person, or by a future
+capability that reads the specification. A class that parks with "hard" cannot. That is the
+difference the three lines buy, and it costs a fixer nothing but honesty.
