@@ -699,11 +699,12 @@ def _span_flags(sp):
 # 64_newspaper_uneven_columns_ad_boxes all four rules are on the render within 0.8 pt and
 # all four read "lost".
 #
-# NOT 06/07's QUESTION, whatever the earlier wording said. 06_table_columns counts
+# NOT 06/07's QUESTION - and since 13 Nov neither check exists. 06_table_columns counted
 # distinct round(x / 6) values with at least three runs down the page and 07_table_rows
-# counts the same in y (verify_google.py:2719-2734): both are histograms of TEXT
-# coordinates, and neither reads a drawn line. Nothing in the 47 counts a grid side. The
-# measurement lives in tools/p2w-bench/grid_sides.py, which is a tool and not a check.
+# counted the same in y: both were histograms of TEXT coordinates and neither read a drawn
+# line, which is exactly why they were retired (see "06_table_columns and 07_table_rows
+# RETIRED" in compare()). Nothing in the 43 counts a grid side. The measurement lives in
+# tools/p2w-bench/grid_sides.py, which is a tool and not a check.
 #
 # WHAT THE EXCLUSION COSTS, MEASURED (13 Nov, engine 3d715dd, tools/p2w-bench/grid_sides.py
 # over the 211-document corpus). The filter removes 9,694 of the 10,841 thin-long segments,
@@ -3171,22 +3172,81 @@ def compare(src_path, gd_path, docx_path=None):
     chars_extra = g_chars - s_chars
     checks["05_chars_extra"] = (0, sum(chars_extra.values()), not chars_extra)
 
-    # tables: count of distinct column x-positions that repeat down the page
-    def table_signature(runs_list):
-        xs = collections.Counter()
-        for r in runs_list:
-            xs[round(r["x"] / 6)] += 1
-        return sum(1 for k, v in xs.items() if v >= 3)
-    s_tbl, g_tbl = table_signature(s_runs), table_signature(g_runs)
-    checks["06_table_columns"] = (s_tbl, g_tbl, abs(s_tbl - g_tbl) <= max(1, s_tbl // 10))
-    # rows, not columns again - 06 already covers columns
-    def table_rows(runs_list):
-        ys = collections.Counter()
-        for r in runs_list:
-            ys[round(r["y"] / 6)] += 1
-        return sum(1 for k, v in ys.items() if v >= 3)
-    s_rows, g_rows = table_rows(s_runs), table_rows(g_runs)
-    checks["07_table_rows"] = (s_rows, g_rows, abs(s_rows - g_rows) <= max(2, s_rows // 5))
+    # ---- 06_table_columns and 07_table_rows RETIRED 13 Nov -----------------
+    # They were the universe's only two "table" checks and neither of them could see a
+    # table. Both were HISTOGRAMS OF TEXT COORDINATES, read off the extractor's runs:
+    #
+    #   06  how many distinct round(x / 6) values carry >= 3 runs, down the page
+    #   07  the same in y
+    #
+    # Neither reads a drawn line. A page that keeps every border and loses the text between
+    # them can pass both; a page that draws no table at all can fail both. What they count
+    # is how the extractor happened to cut glyphs into runs, once per axis.
+    #
+    # THIS IS 02_text_run_count's RETIRED DEFECT, MEASURED A SECOND TIME (see its note under
+    # 01_page_count): a run boundary is a property of the extractor's grouping, not of the
+    # page. Constructed on
+    # the corpus's own pages - the same bytes, re-read at one run per GLYPH instead of one
+    # run per span, nothing moved, nothing added, nothing removed - 06 moves on 210 of 211
+    # documents (mean 6.24 -> 70.65) and 07 on 208 of 211 (mean 8.71 -> 25.53), and each
+    # check's OWN verdict flips on 210 and 195 of them. A number that answers to the
+    # grouping cannot be a fact about the document.
+    #
+    # THE VALUE IS THE RENDER'S SPAN COUNT. On the 211 (engine d8fb69e, LibreOffice
+    # 7.4.7.2), 07's GAP tracks how far the render inflated its own span count at r = 0.850
+    # (Pearson, n = 211; the same correlation for 06 is 0.523). 350_question_paper is the
+    # whole argument in one row: 07 reads 16 -> 48 while the render emitted 454 spans
+    # against the source's 104 - 4.37x - so the "rows gained" are spans gained. 22 of 211
+    # documents emit more spans than their source; the ratio runs to 4.37, mean 1.00.
+    #
+    # WHAT THE SOURCE'S NUMBER IS. On 05_round_company_seal_curved_text 06 reads 15
+    # "columns". Twelve of the fifteen are the GLYPHS OF A CURVED SEAL: the ring reads "SRI
+    # VINAYAKA INSTITUTE OF TECHNOLOGY" / "KENGERI CAMPUS 560060", every glyph is its own
+    # rotated span at its own x (dir runs 0.6,-0.8 -> 1.0,0.1 -> 0.6,0.8 across the arc), so
+    # each x-bucket collects three or more "runs" and becomes a column. The other three are
+    # real edges - the body margin at x 54, the department line at 198, the signature block
+    # at 354. A curved stamp is not a table, and 06 could not tell.
+    #
+    # ZERO EXCLUSIVE FIRES ON 211. 06 fails 14 and 07 fails 14; they share 4, Jaccard
+    # 0.167. Not one document fails 06 alone, not one fails 07 alone, not one fails only the
+    # pair - so retiring both flips 0 of 211 verdicts. The lightest of the 28 fires carries
+    # 2 other failing checks, and 47_margins is among them on 11 of the 14 in each column.
+    # These were second votes, which is what retired 03_word_count.
+    #
+    # THE FIRES RAN THE WRONG WAY, which is the fact that settles it. On the 50 documents
+    # that DRAW a table lattice (>= 2 horizontal and >= 2 vertical thin-long segments
+    # meeting - the segment rule 32 calibrates) 07 fired on 1 = 2.0 %; on the 161 that draw
+    # none it fired on 13 = 8.1 %, 4.04x harder where there is no table to lose. That
+    # population is stable at 50/161 across thin <= 4 or 6 pt and 2x2 or 3x3, and a second,
+    # independent population says the same from the .docx side: 145 documents carry a w:tbl
+    # and 66 do not, and 07 fired on 3.4 % against 13.6 % (3.95x). 06 did not run that way -
+    # 8.0 % against 6.2 % - so the two were not even the same fault in this respect. Both
+    # carried a weak table signal in their VALUES (mean source 06 10.32 with a lattice
+    # against 4.98 without; 07 14.38 against 6.94). It was their FIRES that ignored it.
+    #
+    # NOT ONE CHECK WRITTEN TWICE, and the case does not rest on their agreement. 14 each
+    # and only 4 shared is a Jaccard of 0.17: on this evidence they separate. "The same
+    # function on two axes" is true of the CODE - the two helpers below were one body with
+    # x swapped for y - and false of the EVIDENCE, so what retires them is the unit and the
+    # direction of the fires, not redundancy between them.
+    #
+    # THE SLACK WAS PROPORTIONAL TO ITS OWN NUMBER. 06 allowed abs(d) <= max(1, s // 10)
+    # and 07 abs(d) <= max(2, s // 5), so the tolerance grew with the very quantity being
+    # questioned: 144 of 211 documents have a source 07 of 10 or less, i.e. 68 % of the
+    # corpus could lose two whole "rows" for free, and 178 of 211 have a source 06 of 10 or
+    # less and could lose one.
+    #
+    # WHAT CARRIES THE TABLE QUESTION NOW. 32_stroke_lines measures rules per side, per
+    # page, and excludes grid sides on purpose (see its block); the grid's own measurement
+    # lives in tools/p2w-bench/grid_sides.py, which is a tool and not a check. Nothing in
+    # the universe counted a grid side before today either, so this retirement removes two
+    # votes and no measurement - and every document that failed 06 or 07 already fails at
+    # least two other checks, so nothing goes unwatched.
+    #
+    # table_signature() and table_rows() stood here and were the whole of these checks: one
+    # body counting x-buckets and the same body counting y-buckets. They are kept as text
+    # above rather than as code, because the formulas are the evidence and a helper with no
+    # caller is a check waiting to be re-adopted.
 
     checks["08_image_count"] = (s_imgs, g_imgs, g_imgs >= s_imgs)
 

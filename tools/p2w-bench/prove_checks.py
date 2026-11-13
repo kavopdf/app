@@ -1193,8 +1193,14 @@ CASES = {
     "02_text_run_count":        ("render", mut_restyle, BASE, "30% of spans restyled"),
     "04_chars_missing":         ("render", mut_blank, BASE, "the page's text removed"),
     "05_chars_extra":           ("render", mut_addtext, BASE, "one line drawn a second time"),
-    "06_table_columns":         ("render", mut_shift, BASE, "the page shifted"),
-    "07_table_rows":            ("render", mut_shift, BASE, "the page shifted"),
+    # 06_table_columns and 07_table_rows RETIRED 13 Nov - histograms of the extractor's run
+    # coordinates (round(x / 6) and round(y / 6), buckets carrying >= 3 runs), so no mutation
+    # of a DOCUMENT could ever have proved them: the number answers to the grouping. Their
+    # case here was mut_shift, and it did not fire either of them - measured on BASE, the
+    # page translated 12 pt down reads 06 10 -> 10 and 07 8 -> 8, because a uniform shift
+    # moves every bucket together and changes no count. Two rows that could not fire the
+    # checks they named. mut_shift stays: 18_displacement's line below is the same mutation
+    # and does fire. See verify_google.py, "06_table_columns and 07_table_rows RETIRED".
     "08_image_count":           ("render", mut_drop_images, IMG_DOC, "the image removed"),
     # 09_font_names RETIRED 13 Nov. Its mutation - a different typeface used - is Google's
     # substitution measured on the export, so the proof could never have been the engine's.

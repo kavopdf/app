@@ -246,9 +246,11 @@ def cases():
     # The fixture is a STANDALONE rule, not a table grid. 32 counts rules, not drawing
     # objects, and a rule is a segment whose ends sit in white space: a cell edge ends at
     # a T-junction and is excluded on purpose, because the grid's geometry is re-derived
-    # by the renderer and 06_table_columns / 07_table_rows own it. A grid fixture here
-    # would be testing the population the check deliberately does not measure - it would
-    # pass a document that lost its table (06/07 fail that) and say nothing about a rule.
+    # by the renderer. No check owns the grid: 06_table_columns and 07_table_rows were
+    # retired on 13 Nov (they were histograms of text coordinates and read no drawn line),
+    # so the grid's own measurement is grid_sides.py, a tool. A grid fixture here would be
+    # testing the population 32 deliberately does not measure, and would say nothing about
+    # a rule.
     def with_rule(p):
         text(p, 72, 100, "Invoice number 12345")
         text(p, 72, 130, "Total amount 4,500")
