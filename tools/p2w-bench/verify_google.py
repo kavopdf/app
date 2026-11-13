@@ -876,230 +876,6 @@ def extra_checks2(src, gd, docx_path=None):
     # not family - bold is w:b - and the fourteen standard faces are mapped to the names a
     # reader has, exactly as DocxWriter.BASE14 does. What is NOT forgiven is one family
     # arriving as another: a serif as a sans is a loss and stays a loss.
-    SAME_FACE = {
-        # ONLY THE RENAMES THE ENGINE ITSELF PERFORMS. DocxWriter.BASE14 maps
-        # times->Times New Roman, helvetica->Arial, courier->Courier New, deliberately and
-        # correctly - no reader has a face called "Helvetica", and the three are
-        # metric-compatible with their PostScript originals by design. Those three are the
-        # whole table, because they are the whole of what the engine substitutes.
-        #
-        # The four buckets this table used to carry (liberationsans->arial,
-        # dejavusans->verdana, dejavuserif->timesnewroman, dejavusansmono->couriernew) were
-        # added because GOOGLE substitutes, and they are what made a real loss invisible:
-        # measured 13 Nov on 350_question_paper, a .docx that names DejaVu Serif where the
-        # source drew Times New Roman reads 2 of 2 kept under the buckets and 1 of 2 here.
-        # On the .docx side the engine does not substitute, so the buckets can only hide a
-        # loss. Dropping them changes NO document's verdict on this corpus: 6 either way.
-        "helvetica": "arial", "helveticaps": "arial", "arialps": "arial",
-        "times": "timesnewroman", "timesroman": "timesnewroman",
-        "timesnew": "timesnewroman", "timesnewromanps": "timesnewroman",
-        "courier": "couriernew", "courierps": "couriernew",
-        "couriernewps": "couriernew",
-        # THE FOUR THE ENGINE ITSELF PERFORMS, and they were missing. DocxWriter.BASE14 maps
-        # Liberation Sans / Serif / Mono onto Arial / Times New Roman / Courier New
-        # (DocxWriter.java:4796-4801, 5a09931 on 13 Nov 15:47) because Google Docs has no
-        # Liberation and substitutes a serif with a sans. This table refused that rename, so
-        # 53 read every Liberation document as a lost family: MEASURED on the 211-document
-        # corpus against the .docx HEAD's engine writes, 129 documents fail 53 without these
-        # four lines and 6 with them - and the 6 are exactly the six this check's own comment
-        # names (364_event_ticket, 600_reviewed_invoice_with_annotations,
-        # 601_fillable_admission_form, payslip-label-left-amount-right,
-        # price-list-right-aligned-amounts, salary-slip-corporate).
-        #
-        # This is the narrow version of the bucket this table used to carry. The old
-        # liberation->arial bucket was removed on 13 Nov because it hid a real loss on
-        # 350_question_paper: a .docx naming DejaVu Serif where the source drew Times New
-        # Roman. That case is not this one - DejaVu is not what the engine substitutes, and
-        # nothing here maps DejaVu.
-        "liberationsans": "arial", "liberationserif": "timesnewroman",
-        "liberationmono": "couriernew",
-    }
-
-    def family(name):
-        # The comma form ("Arial,Bold") is a real PDF naming style and DocxWriter's own suffix
-        # list already carries ",Bold"/",Italic"/",BoldItalic". Turned into a space here so the
-        # space-form strip below catches it - doing it at the end left "arialbold", a name no
-        # family has.
-        n = (name or "").split("+")[-1].strip().lower().replace(",", " ")
-        # THE TWO STRIPS HAVE TO ITERATE. "MT"/"PSMT"/"PS" and the style word can
-        # arrive in EITHER order, and all three of these are legal and appear in real
-        # exports:
-        #     Arial-BoldMT              family, style, PS      (what Word writes)
-        #     TimesNewRomanPS-BoldMT    family, PS, style, PS   (Google's bold export)
-        #     ArialMT-Bold              family, PS, style      (the other legal order)
-        # One PS pass then one style pass resolves the first two and leaves the third
-        # as "arialmt": the PS suffix is still attached when the style strip runs, and
-        # the style is still attached when the PS strip runs. Measured on the published
-        # corpus on 13 Nov against a copy of each source PDF whose faces were renamed
-        # to Google's export spelling and nothing else changed (word boxes identical to
-        # 0.000 pt): under the "ArialMT-Bold" order 153 of 199 documents lost at least
-        # one face that was still on the page, and 1 read kept=0. Under the
-        # "Arial-BoldMT" order 13 of 205 lost one, all of them the DejaVu Sans Mono
-        # entry now added above. Iterating to a fixed point resolves every order and
-        # cannot over-strip: each pass removes at most one suffix and stops when none
-        # applies.
-        #
-        # "-roman" and "-normal" are in DocxWriter's own suffix list
-        # (DocxWriter.java:4656-4659) and were missing here, so "Times-Roman" - the
-        # PostScript name of a base-14 face - came out as "times-roman" and matched
-        # nothing.
-        _PS = ("psmt", "mt", "ps")
-        _STYLE = ("-bolditalic", "-boldoblique", "-bold", "-italic", "-oblique",
-                  "-regular", "-roman", "-normal",
-                  " bold italic", " bold oblique", " italic", " oblique", " bold",
-                  " regular", " normal", " book")
-        # A TRUNCATED STYLE TOKEN. Some producers cap a /BaseFont name at 23 characters
-        # and cut the style word in half; "NotoSansDevanagari-Regul",
-        # "Liberation Serif Bold It" and "LiberationSerif-BoldItal" are all in the
-        # published corpus. A trailing token that is a PROPER PREFIX of a style word and
-        # at least two characters long is that truncation, not a family name, so it comes
-        # off too. Two characters is the floor because "It" and "Bo" are already
-        # unambiguous while a single letter could belong to a real family name.
-        _STYLE_WORD = ("bolditalic", "boldoblique", "italic", "oblique", "regular",
-                       "roman", "normal", "bold", "book")
-
-        def _strip_once(n):
-            for suf in _PS:
-                if n.endswith(suf) and len(n) > len(suf):
-                    return n[:-len(suf)]
-            for suf in _STYLE:
-                if n.endswith(suf):
-                    return n[:-len(suf)]
-            for sep in ("-", " "):
-                head, _, tail = n.rpartition(sep)
-                if head and len(tail) >= 2:
-                    for w in _STYLE_WORD:
-                        if len(w) > len(tail) and w.startswith(tail):
-                            return head
-            return n
-
-        # Both sides go through this, so a name that cannot be reduced is still
-        # compared as itself - the check never invents an equivalence.
-        while True:
-            shorter = _strip_once(n)
-            if shorter == n:
-                break
-            n = shorter
-        # The keys above are written space-free ("liberationsans"), because the hyphen form
-        # "LiberationSans-Bold" collapses to that once the style suffix is gone. The space
-        # form collapses to "liberation sans" instead and misses the table entirely, so the
-        # internal space has to go too. Families carry no meaningful space for this
-        # comparison and both sides are normalised identically, so this stays symmetric.
-        # The comma form ("Arial,Bold") is a real PDF naming style and DocxWriter's own
-        # suffix list already carries ",Bold"/",Italic"/",BoldItalic". This side did not.
-        n = n.replace(",", "").replace(" ", "")
-        return SAME_FACE.get(n, n)
-
-    def faces(doc):
-        """The families this PDF actually DRAWS with, and how many characters each carries.
-
-        p.get_fonts() returns the page's /Resources /Font dictionary: every face the page
-        COULD use, including one no glyph ever touches, including faces inherited from a
-        shared Resources on the Pages node (so every page reports every font in the
-        document), and including fonts reached only through a Form XObject. Measured on two
-        real corpus PDFs on 13 Nov, both carry a bare "Helvetica" in their resources and draw
-        it in zero spans.
-
-        That made the two sides of this check different measurements: the source side was
-        "families declared somewhere on a page", the other was "families actually used". A
-        document could fail on a face nothing was drawn in, and no engine change could ever
-        fix it because there was nothing to fix.
-
-        Characters, not a set, because "present" is not the question. A family carried by one
-        stray run out of three hundred is a family that did not survive; the weight is what
-        tells those apart. See SHARE_FLOOR below for the measured cut.
-        """
-        out = collections.Counter()
-        for p in doc:
-            drawn = False
-            try:
-                blocks = p.get_text("dict").get("blocks", [])
-            except Exception:
-                blocks = []
-            for b in blocks:
-                for line in b.get("lines", []):
-                    for span in line.get("spans", []):
-                        t = span.get("text", "")
-                        if not t.strip():
-                            continue
-                        fam = family(span.get("font"))
-                        if fam:
-                            out[fam] += len(t)
-                            drawn = True
-            if not drawn:
-                # An image-only page has resources and no spans. Fall back to the dictionary
-                # so such a page is not silently read as "no fonts, therefore fine". Weight 0:
-                # a family that is only declared has to be carried, but it must not inflate a
-                # share it never had.
-                for f in p.get_fonts():
-                    fam = family(f[3])
-                    if fam:
-                        out[fam] += 0
-        return out
-
-    def docx_faces(path):
-        """family -> characters carried by the runs of the engine's .docx that DECLARE it.
-
-        The .docx is a zip: word/document.xml holds the runs, word/styles.xml the styles and
-        the document defaults. A run's face resolves in the order a reader resolves it - its
-        own w:rPr/w:rFonts, then its paragraph style (following w:basedOn), then
-        w:docDefaults. DocxWriter writes w:rFonts on every run that has a face
-        (DocxWriter.java:3108) and Calibri in docDefaults (DocxWriter.java:4853), so a run
-        that resolves to the default is a run the engine could not name - counted, and
-        counted as a loss, because Calibri is not the face the source drew.
-
-        Text in tables and in text boxes is included: they are runs like any other, and
-        "table cells carry their typeface" is a defect this corpus already had.
-        """
-        NS = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
-
-        def qn(tag):
-            return NS + tag
-
-        z = zipfile.ZipFile(path)
-        styles = ET.fromstring(z.read("word/styles.xml"))
-        default = None
-        for rf in styles.iter(qn("rFonts")):
-            if rf.get(qn("ascii")):
-                default = rf.get(qn("ascii"))
-                break
-        style_face, based = {}, {}
-        for st in styles.findall(qn("style")):
-            sid = st.get(qn("styleId"))
-            rf = st.find(".//" + qn("rPr") + "/" + qn("rFonts"))
-            if rf is not None and rf.get(qn("ascii")):
-                style_face[sid] = rf.get(qn("ascii"))
-            bo = st.find(qn("basedOn"))
-            if bo is not None:
-                based[sid] = bo.get(qn("val"))
-
-        def from_style(sid, depth=0):
-            if sid in style_face:
-                return style_face[sid]
-            if sid in based and depth < 5:
-                return from_style(based[sid], depth + 1)
-            return None
-
-        body = ET.fromstring(z.read("word/document.xml"))
-        out = collections.Counter()
-        for p in body.iter(qn("p")):
-            psid = None
-            ppr = p.find(qn("pPr"))
-            if ppr is not None and ppr.find(qn("pStyle")) is not None:
-                psid = ppr.find(qn("pStyle")).get(qn("val"))
-            for r in p.findall(qn("r")):
-                text = "".join(t.text or "" for t in r.findall(qn("t")))
-                if not text.strip():
-                    continue
-                face = None
-                rpr = r.find(qn("rPr"))
-                if rpr is not None and rpr.find(qn("rFonts")) is not None:
-                    face = rpr.find(qn("rFonts")).get(qn("ascii"))
-                if not face:
-                    face = from_style(psid) if psid else None
-                out[family(face or default or "Calibri")] += len(text)
-        return out
-
     # HOW MUCH OF A FAMILY HAS TO SURVIVE. Measured over the 211 documents on 13 Nov, per
     # (document, family) pair, as the ratio of the family's share of characters in the .docx
     # to its share of characters in the PDF - share, not count, so that text the engine drops
@@ -1133,22 +909,55 @@ def extra_checks2(src, gd, docx_path=None):
         # nothing here and should be visible as such. Same rule as 54.
         print("53_embedded_faces: no .docx given, faces unmeasured (the render carries %d of "
               "%d source families, which is the renderer's choice, not the engine's)"
-              % (len(set(s_fa) & set(faces(gd))), len(s_fa)), file=sys.stderr)
+              % (len({face_bucket(f) for f in s_fa}
+                     & {face_bucket(f) for f in faces(gd)}), len(s_fa)), file=sys.stderr)
         c["53_embedded_faces"] = (len(s_fa), 0, True)
     else:
         s_tot = sum(s_fa.values()) or 1
         d_tot = sum(d_fa.values()) or 1
+
+        # ONE BUCKET PER READER-FAMILY, AND A BUCKET CAN HOLD TWO SOURCE FAMILIES.
+        # The source side is grouped by the family a READER will have (face_bucket), not by
+        # the name the PDF spelled: that is the whole of what SAME_FACE means. The .docx
+        # side is NOT grouped - a name is taken for what it says.
+        #
+        # Grouping is not free. A document that draws Liberation Sans AND Arial puts both
+        # into `arial`, and the .docx carries one bucket of characters with no way to say
+        # which source family each run came from. Two things follow, and both are done
+        # here rather than left to chance:
+        #   - the characters of BOTH spellings are credited to the bucket, so a .docx that
+        #     kept "Liberation Sans" because the engine did not rename it is not read as a
+        #     loss;
+        #   - the bucket is judged against the SUM of the group's shares, not against one
+        #     member's, and the merge is printed. Per-family ratios inside a merged bucket
+        #     would be a number the .docx cannot support: crediting the whole bucket to
+        #     each member would pass anything, and crediting it to neither would fail a
+        #     document that lost nothing.
+        groups = collections.defaultdict(list)
+        for fam in s_fa:
+            groups[face_bucket(fam)].append(fam)
+        merged = {b: fs for b, fs in groups.items() if len(fs) > 1}
         lost = []
-        for fam, chars in s_fa.items():
-            want = chars / s_tot
-            got = d_fa.get(fam, 0) / d_tot
+        for bucket, members in groups.items():
+            # Characters the .docx carries under the reader-family, counting the spellings
+            # the engine may have left alone.
+            got_chars = d_fa.get(bucket, 0) + sum(d_fa.get(m, 0) for m in members if m != bucket)
+            want_chars = sum(s_fa[m] for m in members)
+            want = want_chars / s_tot
+            got = got_chars / d_tot
             # A family the source only DECLARES (weight 0) has no share to lose; it only has
             # to be present - and `faces` keeps such a family only when the page drew nothing
             # at all, where the dictionary is the only evidence there is.
             ratio = (got / want) if want else (1.0 if got else 0.0)
             if ratio < SHARE_FLOOR:
-                lost.append((fam, round(ratio, 3), chars))
+                for m in members:
+                    lost.append((m, round(ratio, 3), s_fa[m]))
         kept = len(s_fa) - len(lost)
+        if merged:
+            print("53_embedded_faces: %s - the .docx has one face for these, so the split "
+                  "between them is unmeasured and only the group's share was judged"
+                  % ", ".join("+".join(sorted(fs)) for fs in merged.values()),
+                  file=sys.stderr)
         if lost:
             print("53_embedded_faces: %s" % ", ".join(
                 "%s kept %.0f%% of %d chars" % (f, r * 100, ch) for f, r, ch in lost),
@@ -2223,6 +2032,283 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
                           s_ia == 0 or g_ia >= s_ia * 0.9)
 
     return c
+
+
+# ---- 53's face vocabulary ---------------------------------------------------
+# Hoisted out of compare() on 13 Nov so the table and the two counters can be
+# imported and tested: a forgiveness table is the one thing in this file that can
+# hide a defect, and a table that can only be read by running the whole comparison
+# is a table nobody checks. Bodies unchanged.
+SAME_FACE = {
+    # A FORGIVENESS, AND THE TWO RULES THAT LIMIT IT.
+    #
+    # The table says: text this PDF drew in family K may be carried in the .docx under
+    # family V, and that counts as the face surviving. Every entry is a rename the ENGINE
+    # performs - DocxWriter.BASE14 (DocxWriter.java:4798-4816) - and every entry joins two
+    # faces that are the same face at the same width. That is the whole rule:
+    #
+    #   1. IT MUST BE A RENAME THE ENGINE PERFORMS. A name the engine never writes is a
+    #      name this table could only be forgiving in the abstract, and an abstract
+    #      forgiveness can only hide. `dejavuserif -> timesnewroman` was exactly that: the
+    #      engine never wrote DejaVu Serif for anything, so the entry existed only to
+    #      excuse a substitution somebody else made, and it read a .docx that names DejaVu
+    #      Serif where the source drew Times New Roman as 2 of 2 kept when 1 of 2 was true
+    #      (350_question_paper, 13 Nov). prove_checks.py now asserts this rule against
+    #      DocxWriter.java itself, so the next entry of that kind cannot be added quietly.
+    #
+    #   2. THE TWO FACES MUST BE METRIC-IDENTICAL, not merely "a reasonable substitute".
+    #      A forgiveness that spans two widths turns the check blind by construction: the
+    #      text reflows, the look changes, and the name on the run still matches. Measured
+    #      on this box (fontTools, advance widths over printable ASCII at 1 em): DejaVu
+    #      Serif is 21.4 % wider than Liberation Serif and DejaVu Sans 13.3 % wider than
+    #      Liberation Sans - which is why those two entries hid a reflow, and why the
+    #      engine's own build of them moved 77 lines in 8 documents with a worst |dx| of
+    #      432.50 pt. Liberation against the three faces below measures 0: it was drawn as
+    #      their metric drop-in, and the engine's rename of it is a verified no-op on a
+    #      reader that has Liberation - 17,817 line boxes, 0 moved, max|dx| 0.00 pt.
+    #
+    # Both halves matter here because a document may draw BOTH sides of an entry: 3 of
+    # the 211 documents draw Liberation Sans and Arial, or Liberation Serif and Times New
+    # Roman (09_stamp_font_not_embedded, 14_stamp_chars_positioned_td,
+    # 38_faux_bold_italic_synthesised). The .docx then has ONE bucket for two source
+    # families and cannot say which text went where. That is not a blind spot for the
+    # LOOK - the two are the same face at the same width, so text in either renders
+    # identically - but it does mean the split is unverified, so the comparison judges
+    # the bucket against the group's combined share and says so on stderr rather than
+    # reporting a per-family pass it did not measure.
+    #
+    # What is NOT forgiven, and must not be: one face arriving as a face of a different
+    # width. A serif as a sans, a sans as a serif, anything as DejaVu. Those stay losses,
+    # and the granularity of this table is what keeps them losses - `liberationserif`
+    # reaches `timesnewroman` and nothing else, so a Liberation Serif document whose text
+    # arrives in Arial has still lost its face and still fails.
+    # FIVE DEAD KEYS REMOVED 13 Nov: helveticaps, arialps, timesnewromanps, courierps,
+    # couriernewps. They could never fire. family() strips the PS/MT suffix BEFORE this
+    # table is consulted, so "ArialPS" has already become "arial" by the time the lookup
+    # runs and "arialps" is a key nothing can spell. Checked directly - family(k) == k
+    # holds for every key that can fire and fails for all five of these - and removing
+    # them changes no document's verdict (measured: 211 documents, 6 and 5 either way on
+    # the two engine states). A forgiveness entry that cannot fire is not a hidden loss,
+    # but it is a line in the table that reads as a claim, and this table is only worth
+    # something if every line in it is one.
+    "helvetica": "arial",
+    "times": "timesnewroman", "timesroman": "timesnewroman",
+    "timesnew": "timesnewroman",
+    "courier": "couriernew",
+    # ADDED 13 Nov, when the engine began renaming Liberation (5a09931,
+    # DocxWriter.java:4810-4815). Without these three the check reads every Liberation
+    # document as a total face loss: 6 documents failed before that commit and 129 after
+    # it, all 123 new ones on "liberationsans kept 0 %" or "liberationserif kept 0 %".
+    # The engine is right and the check was measuring a name. On this box fontconfig
+    # resolves "Arial" to LiberationSans-Regular.ttf and "Times New Roman" to
+    # LiberationSerif-Regular.ttf, so the rename is the identity on a reader without the
+    # Microsoft faces and a metric-identical swap on one with them: it cannot lose a face,
+    # and the check must not call it one.
+    "liberationsans": "arial", "liberationserif": "timesnewroman",
+    "liberationmono": "couriernew",
+}
+
+
+def face_bucket(fam):
+    """The family a reader will actually have, for a family this PDF drew with.
+
+    The table is applied here and ONLY here - to the source side. The .docx side is
+    never folded: what the engine wrote is the evidence, and folding it as well would
+    make the two sides agree by construction.
+    """
+    return SAME_FACE.get(fam, fam)
+
+def family(name):
+    # The comma form ("Arial,Bold") is a real PDF naming style and DocxWriter's own suffix
+    # list already carries ",Bold"/",Italic"/",BoldItalic". Turned into a space here so the
+    # space-form strip below catches it - doing it at the end left "arialbold", a name no
+    # family has.
+    n = (name or "").split("+")[-1].strip().lower().replace(",", " ")
+    # THE TWO STRIPS HAVE TO ITERATE. "MT"/"PSMT"/"PS" and the style word can
+    # arrive in EITHER order, and all three of these are legal and appear in real
+    # exports:
+    #     Arial-BoldMT              family, style, PS      (what Word writes)
+    #     TimesNewRomanPS-BoldMT    family, PS, style, PS   (Google's bold export)
+    #     ArialMT-Bold              family, PS, style      (the other legal order)
+    # One PS pass then one style pass resolves the first two and leaves the third
+    # as "arialmt": the PS suffix is still attached when the style strip runs, and
+    # the style is still attached when the PS strip runs. Measured on the published
+    # corpus on 13 Nov against a copy of each source PDF whose faces were renamed
+    # to Google's export spelling and nothing else changed (word boxes identical to
+    # 0.000 pt): under the "ArialMT-Bold" order 153 of 199 documents lost at least
+    # one face that was still on the page, and 1 read kept=0. Under the
+    # "Arial-BoldMT" order 13 of 205 lost one, all of them the DejaVu Sans Mono
+    # entry now added above. Iterating to a fixed point resolves every order and
+    # cannot over-strip: each pass removes at most one suffix and stops when none
+    # applies.
+    #
+    # "-roman" and "-normal" are in DocxWriter's own suffix list
+    # (DocxWriter.java:4656-4659) and were missing here, so "Times-Roman" - the
+    # PostScript name of a base-14 face - came out as "times-roman" and matched
+    # nothing.
+    _PS = ("psmt", "mt", "ps")
+    _STYLE = ("-bolditalic", "-boldoblique", "-bold", "-italic", "-oblique",
+              "-regular", "-roman", "-normal",
+              " bold italic", " bold oblique", " italic", " oblique", " bold",
+              " regular", " normal", " book")
+    # A TRUNCATED STYLE TOKEN. Some producers cap a /BaseFont name at 23 characters
+    # and cut the style word in half; "NotoSansDevanagari-Regul",
+    # "Liberation Serif Bold It" and "LiberationSerif-BoldItal" are all in the
+    # published corpus. A trailing token that is a PROPER PREFIX of a style word and
+    # at least two characters long is that truncation, not a family name, so it comes
+    # off too. Two characters is the floor because "It" and "Bo" are already
+    # unambiguous while a single letter could belong to a real family name.
+    _STYLE_WORD = ("bolditalic", "boldoblique", "italic", "oblique", "regular",
+                   "roman", "normal", "bold", "book")
+
+    def _strip_once(n):
+        for suf in _PS:
+            if n.endswith(suf) and len(n) > len(suf):
+                return n[:-len(suf)]
+        for suf in _STYLE:
+            if n.endswith(suf):
+                return n[:-len(suf)]
+        for sep in ("-", " "):
+            head, _, tail = n.rpartition(sep)
+            if head and len(tail) >= 2:
+                for w in _STYLE_WORD:
+                    if len(w) > len(tail) and w.startswith(tail):
+                        return head
+        return n
+
+    # Both sides go through this, so a name that cannot be reduced is still
+    # compared as itself - the check never invents an equivalence.
+    while True:
+        shorter = _strip_once(n)
+        if shorter == n:
+            break
+        n = shorter
+    # The keys above are written space-free ("liberationsans"), because the hyphen form
+    # "LiberationSans-Bold" collapses to that once the style suffix is gone. The space
+    # form collapses to "liberation sans" instead and misses the table entirely, so the
+    # internal space has to go too. Families carry no meaningful space for this
+    # comparison and both sides are normalised identically, so this stays symmetric.
+    # The comma form ("Arial,Bold") is a real PDF naming style and DocxWriter's own
+    # suffix list already carries ",Bold"/",Italic"/",BoldItalic". This side did not.
+    n = n.replace(",", "").replace(" ", "")
+    # NOTHING IS FORGIVEN HERE. This returns the family the name spells, and only that;
+    # SAME_FACE is applied by face_bucket() on the source side alone. Until 13 Nov this
+    # line was `return SAME_FACE.get(n, n)`, so the table folded BOTH sides and the two
+    # sides of the check could not disagree about a name the table covered - which is how
+    # a document that drew both Liberation Sans and Arial became one bucket with no way
+    # left to tell which text went where.
+    return n
+
+def faces(doc):
+    """The families this PDF actually DRAWS with, and how many characters each carries.
+
+    p.get_fonts() returns the page's /Resources /Font dictionary: every face the page
+    COULD use, including one no glyph ever touches, including faces inherited from a
+    shared Resources on the Pages node (so every page reports every font in the
+    document), and including fonts reached only through a Form XObject. Measured on two
+    real corpus PDFs on 13 Nov, both carry a bare "Helvetica" in their resources and draw
+    it in zero spans.
+
+    That made the two sides of this check different measurements: the source side was
+    "families declared somewhere on a page", the other was "families actually used". A
+    document could fail on a face nothing was drawn in, and no engine change could ever
+    fix it because there was nothing to fix.
+
+    Characters, not a set, because "present" is not the question. A family carried by one
+    stray run out of three hundred is a family that did not survive; the weight is what
+    tells those apart. See SHARE_FLOOR below for the measured cut.
+    """
+    out = collections.Counter()
+    for p in doc:
+        drawn = False
+        try:
+            blocks = p.get_text("dict").get("blocks", [])
+        except Exception:
+            blocks = []
+        for b in blocks:
+            for line in b.get("lines", []):
+                for span in line.get("spans", []):
+                    t = span.get("text", "")
+                    if not t.strip():
+                        continue
+                    fam = family(span.get("font"))
+                    if fam:
+                        out[fam] += len(t)
+                        drawn = True
+        if not drawn:
+            # An image-only page has resources and no spans. Fall back to the dictionary
+            # so such a page is not silently read as "no fonts, therefore fine". Weight 0:
+            # a family that is only declared has to be carried, but it must not inflate a
+            # share it never had.
+            for f in p.get_fonts():
+                fam = family(f[3])
+                if fam:
+                    out[fam] += 0
+    return out
+
+def docx_faces(path):
+    """family -> characters carried by the runs of the engine's .docx that DECLARE it.
+
+    The .docx is a zip: word/document.xml holds the runs, word/styles.xml the styles and
+    the document defaults. A run's face resolves in the order a reader resolves it - its
+    own w:rPr/w:rFonts, then its paragraph style (following w:basedOn), then
+    w:docDefaults. DocxWriter writes w:rFonts on every run that has a face
+    (DocxWriter.java:3108) and Calibri in docDefaults (DocxWriter.java:4853), so a run
+    that resolves to the default is a run the engine could not name - counted, and
+    counted as a loss, because Calibri is not the face the source drew.
+
+    Text in tables and in text boxes is included: they are runs like any other, and
+    "table cells carry their typeface" is a defect this corpus already had.
+    """
+    NS = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+
+    def qn(tag):
+        return NS + tag
+
+    z = zipfile.ZipFile(path)
+    styles = ET.fromstring(z.read("word/styles.xml"))
+    default = None
+    for rf in styles.iter(qn("rFonts")):
+        if rf.get(qn("ascii")):
+            default = rf.get(qn("ascii"))
+            break
+    style_face, based = {}, {}
+    for st in styles.findall(qn("style")):
+        sid = st.get(qn("styleId"))
+        rf = st.find(".//" + qn("rPr") + "/" + qn("rFonts"))
+        if rf is not None and rf.get(qn("ascii")):
+            style_face[sid] = rf.get(qn("ascii"))
+        bo = st.find(qn("basedOn"))
+        if bo is not None:
+            based[sid] = bo.get(qn("val"))
+
+    def from_style(sid, depth=0):
+        if sid in style_face:
+            return style_face[sid]
+        if sid in based and depth < 5:
+            return from_style(based[sid], depth + 1)
+        return None
+
+    body = ET.fromstring(z.read("word/document.xml"))
+    out = collections.Counter()
+    for p in body.iter(qn("p")):
+        psid = None
+        ppr = p.find(qn("pPr"))
+        if ppr is not None and ppr.find(qn("pStyle")) is not None:
+            psid = ppr.find(qn("pStyle")).get(qn("val"))
+        for r in p.findall(qn("r")):
+            text = "".join(t.text or "" for t in r.findall(qn("t")))
+            if not text.strip():
+                continue
+            face = None
+            rpr = r.find(qn("rPr"))
+            if rpr is not None and rpr.find(qn("rFonts")) is not None:
+                face = rpr.find(qn("rFonts")).get(qn("ascii"))
+            if not face:
+                face = from_style(psid) if psid else None
+            out[family(face or default or "Calibri")] += len(text)
+    return out
+
 
 
 def compare(src_path, gd_path, docx_path=None):

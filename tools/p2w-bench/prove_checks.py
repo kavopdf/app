@@ -951,6 +951,204 @@ def mut_docx_face(path):
     return dst
 
 
+# ---------------------------------------------------------------------------
+# 53's forgiveness table, proved as a table - and proved on real documents
+# ---------------------------------------------------------------------------
+# 53 forgives a face that arrives under a different name. That is the only mechanism in
+# this file that can turn a loss into a pass, and on 13 Nov it did: `dejavuserif ->
+# timesnewroman` let a .docx naming a face 25 % wider than the source's read as kept. The
+# fix was to shrink the table, and a shrunken table is not a proof - the next entry can be
+# added in one line. These two functions are what makes the next entry hard.
+#
+# The rule the table claims, in two halves, each checkable:
+#   1. every entry is a rename the ENGINE performs (DocxWriter.BASE14), and
+#   2. every entry joins two faces of the same width - here, the same font file.
+# A key that fails (1) is a forgiveness for something nobody did; a key that fails (2) is a
+# forgiveness across a reflow, which is a blind spot by construction.
+DOCXWRITER = os.path.join(HERE, "..", "..", "app", "src", "main", "java", "com",
+                          "kavopdf", "app", "engine", "DocxWriter.java")
+
+# How a reader spells the families in 53's table. Only used to ask fontconfig what a name
+# resolves to; the check itself never needs a font installed.
+SPELLING = {
+    "helvetica": "Helvetica", "times": "Times", "courier": "Courier",
+    "arial": "Arial", "timesnewroman": "Times New Roman", "couriernew": "Courier New",
+    "liberationsans": "Liberation Sans", "liberationserif": "Liberation Serif",
+    "liberationmono": "Liberation Mono",
+}
+
+
+def _verifier():
+    """verify_google.py as a module, so its table and its normaliser can be read."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("verify_google", VERIFY)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _engine_base14():
+    """DocxWriter's own rename table, read out of the engine rather than restated."""
+    import re
+    if not os.path.exists(DOCXWRITER):
+        return None
+    txt = open(DOCXWRITER).read()
+    return dict(re.findall(r'BASE14\.put\("([^"]+)",\s*"([^"]+)"\)', txt))
+
+
+def _font_file(name):
+    """What fontconfig resolves a family name to, or None when it cannot say."""
+    try:
+        out = subprocess.run(["fc-match", "--format", "%{file}", name],
+                             capture_output=True, text=True, timeout=20)
+        f = out.stdout.strip()
+        return f if out.returncode == 0 and f else None
+    except Exception:
+        return None
+
+
+def prove_53_table():
+    """Check 53's forgiveness table against the engine and against the fonts."""
+    print("\n53'S FORGIVENESS TABLE (the mechanism that can hide a face loss):")
+    V = _verifier()
+    table, fam = V.SAME_FACE, V.family
+    b14 = _engine_base14()
+    bad = 0
+
+    # (a) every entry can fire at all.
+    dead = [k for k in table if fam(k) != k]
+    print("   %-34s %s" % ("every key is reachable",
+                           "ok, %d keys" % len(table) if not dead
+                           else "DEAD: %s" % ", ".join(dead)))
+    bad += bool(dead)
+
+    if b14 is None:
+        print("   %-34s %s" % ("engine table readable", "no - %s missing" % DOCXWRITER))
+        return False
+
+    engine_targets = {fam(v) for v in b14.values()}
+    stray = sorted({v for v in table.values() if v not in engine_targets})
+    print("   %-34s %s" % ("every target is a name the engine writes",
+                           "ok, %s" % ", ".join(sorted(engine_targets)) if not stray
+                           else "NOT WRITTEN BY THE ENGINE: %s" % ", ".join(stray)))
+    bad += bool(stray)
+
+    # (b) no rename the engine performs is left unforgiven - otherwise the check fails a
+    #     document the engine converted correctly, which is the pressure that grows tables.
+    missing = []
+    for k, v in b14.items():
+        if fam(k) == fam(v):
+            continue                      # identity entry, nothing to forgive
+        if table.get(fam(k)) != fam(v):
+            missing.append("%s->%s" % (fam(k), fam(v)))
+    print("   %-34s %s" % ("every engine rename is forgiven",
+                           "ok, %d renames" % len({fam(k) for k, v in b14.items() if fam(k) != fam(v)})
+                           if not missing else "MISSING: %s" % ", ".join(missing)))
+    bad += bool(missing)
+
+    # (c) every entry joins two faces of the same width. Asked of fontconfig, so it is a
+    #     fact about the faces rather than about this file's opinion of them.
+    pairs, differ, unknown = [], [], []
+    for k, v in sorted(table.items()):
+        a, b = SPELLING.get(k), SPELLING.get(v)
+        if not a or not b:
+            unknown.append(k)
+            continue
+        fa, fb = _font_file(a), _font_file(b)
+        if not fa or not fb:
+            unknown.append(k)
+            continue
+        (pairs if fa == fb else differ).append("%s=%s" % (k, os.path.basename(fa)))
+    print("   %-34s %s" % ("every pair is one font file",
+                           "ok, %d pairs: %s" % (len(pairs), ", ".join(pairs)) if not differ
+                           else "DIFFERENT WIDTHS: %s" % ", ".join(differ)))
+    bad += bool(differ)
+    if unknown:
+        print("   %-34s %s" % ("(not resolved by fontconfig)", ", ".join(unknown)))
+
+    # (d) the control: the blind spot this table used to carry must fail (c).
+    dj = (_font_file("DejaVu Serif"), _font_file("Times New Roman"))
+    ok = dj[0] and dj[1] and dj[0] != dj[1]
+    print("   %-34s %s" % ("the old blind spot is still caught",
+                           "ok, DejaVu Serif is not Times New Roman" if ok
+                           else "cannot tell - fontconfig did not resolve both"))
+    bad += bool(not ok)
+
+    print("   -> %s" % ("TABLE HOLDS" if not bad else "TABLE FAILS %d RULE(S)" % bad))
+    return not bad
+
+
+# (document, {face in the .docx: what it is renamed to}, must 53 fail?, why)
+# Real documents, real engine output, one face renamed per case. The .docx is the only
+# side 53 reads, so this is the whole evidence it has.
+MUT53 = [
+    ("14_stamp_chars_positioned_td", {}, False,
+     "control - the engine's own .docx, Liberation Sans->Arial and Serif->Times New Roman"),
+    ("14_stamp_chars_positioned_td", {"Arial": "Times New Roman"}, True,
+     "the sans lost to a serif the table forgives (for the other family)"),
+    ("14_stamp_chars_positioned_td", {"Arial": "Courier New"}, True,
+     "the sans lost to a mono the table forgives (for Liberation Mono)"),
+    ("14_stamp_chars_positioned_td", {"Arial": "DejaVu Sans"}, True,
+     "the sans lost to a face 13.3 % wider"),
+    ("14_stamp_chars_positioned_td", {"Arial": "Calibri"}, True,
+     "the sans lost to the .docx default"),
+    ("09_stamp_font_not_embedded", {"Times New Roman": "Arial"}, True,
+     "the serif lost to a sans - the substitution the rename exists to stop"),
+    ("38_faux_bold_italic_synthesised", {"Times New Roman": "DejaVu Serif"}, True,
+     "350_question_paper again: DejaVu Serif read as Times New Roman"),
+]
+
+
+def mut53_docx(path, mapping):
+    """Rename faces in the engine's .docx. One attribute per run, nothing else touched."""
+    import zipfile
+    zin = zipfile.ZipFile(path)
+    dst = os.path.join(WORK, "mut53_%s.docx" % os.path.splitext(os.path.basename(path))[0])
+    zout = zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED)
+    for item in zin.infolist():
+        data = zin.read(item.filename)
+        if item.filename == "word/document.xml":
+            x = data.decode("utf-8")
+            for a, b in mapping.items():
+                x = x.replace('w:ascii="%s"' % a, 'w:ascii="%s"' % b)
+            data = x.encode("utf-8")
+        zout.writestr(item, data)
+    zout.close()
+    return dst
+
+
+def prove_53_mutations():
+    """The forgiveness, on real documents: it must not cover a real loss."""
+    print("53 ON REAL DOCUMENTS - a forgiven name must not cover a lost face:")
+    bad = ran = 0
+    for docname, mapping, must_fail, why in MUT53:
+        src = path(docname + ".pdf")
+        docx = find_docx(src) if os.path.exists(src) else None
+        if not docx:
+            print("   %-40s skipped - no source or no .docx beside it" % docname)
+            continue
+        ran += 1
+        try:
+            mut = mut53_docx(docx, mapping) if mapping else docx
+        except Exception as e:
+            print("   %-40s skipped - mutation failed: %s" % (docname, str(e)[:40]))
+            continue
+        res = run(src, render_for(src) or src, docx=mut)
+        if res is None:
+            print("   %-40s could not be measured" % docname)
+            continue
+        fired = "53_embedded_faces" in res["failed"]
+        ok = fired == must_fail
+        bad += (not ok)
+        print("   %-40s %-22s %s  %s" % (
+            docname, "%s -> %s" % next(iter(mapping.items())) if mapping else "(engine output)",
+            "FAIL" if fired else "pass", "ok" if ok else "WRONG - expected %s"
+            % ("FAIL" if must_fail else "pass")))
+        print("      %s" % why)
+    print("   -> %d/%d behave as claimed" % (ran - bad, ran))
+    return not bad
+
+
 # check -> ("render" | "source" | "docx", mutation, document, description)
 CASES = {
     "01_page_count":            ("render", mut_addpage, BASE, "a page added"),
@@ -1170,6 +1368,10 @@ def main():
               % (cid, why, v.get("source"), v.get("render"), v.get("ok"),
                  "   FIRED" if cid in res["failed"] else ""))
 
+    table_ok = prove_53_table()
+    print("")
+    prove_53_mutations()
+
     print("\nPROVEN: %d of %d" % (len(proven), len(ids)))
     for cid, why, n in proven:
         note = "" if n <= 8 else "   (%d other checks moved too)" % n
@@ -1180,7 +1382,7 @@ def main():
             print("   %-26s %s" % (cid, why))
     print("\n%d proven, %d unproven of %d"
           % (len(proven), len(unproven), len(ids)))
-    return 0 if not unproven else 1
+    return 0 if (not unproven and table_ok) else 1
 
 
 if __name__ == "__main__":

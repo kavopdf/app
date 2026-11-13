@@ -476,6 +476,74 @@ def cases():
         out.append(("a different face still fails 53", serif_only, sans_only,
                     ["53_embedded_faces"], None, "DejaVu Sans"))
 
+        # ---- the Liberation forgiveness, and what it must NOT forgive -------
+        # The engine renames Liberation to the face it was drawn to replace
+        # (DocxWriter.BASE14, 5a09931), and 53 forgives exactly that. These cases are the
+        # whole argument in one place: the rename the engine performs reads kept, and every
+        # way the SAME text can lose its face - including losing it to a name the table
+        # forgives for a different family - still reads lost. Without them the table has a
+        # licence nobody has tested, and this corpus has already shipped one of those
+        # (`dejavuserif == timesnewroman`, 25 % wider, 37 of 37 passing).
+        LANS = "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
+        LMONO = "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf"
+
+        def lib_sans(p):
+            p.insert_font(fontname="FL", fontfile=LANS)
+            p.insert_text((72, 100), "Invoice number 12345", fontsize=12, fontname="FL")
+
+        def lib_mono(p):
+            p.insert_font(fontname="FM", fontfile=LMONO)
+            p.insert_text((72, 100), "Invoice number 12345", fontsize=12, fontname="FM")
+
+        def times14(p):
+            p.insert_text((72, 100), "Invoice number 12345", fontsize=12, fontname="tiro")
+
+        def two_widths(p):
+            """Liberation Serif on one line, Liberation Sans on the next."""
+            p.insert_font(fontname="FS", fontfile=SERIF)
+            p.insert_font(fontname="FL", fontfile=LANS)
+            p.insert_text((72, 100), "Invoice number 12345", fontsize=12, fontname="FS")
+            p.insert_text((72, 130), "Total amount 4,500", fontsize=12, fontname="FL")
+
+        def helv_and_sans(p):
+            """Two source families that share ONE reader-family: Helvetica and
+            Liberation Sans both resolve to Arial, so the .docx has one bucket for both."""
+            p.insert_font(fontname="FL", fontfile=LANS)
+            p.insert_text((72, 100), "Invoice number 12345", fontsize=12, fontname="FL")
+            p.insert_text((72, 130), "Total amount 4,500", fontsize=12, fontname="helv")
+
+        F = ["53_embedded_faces"]
+        out.append(("Liberation Serif renamed to Times New Roman keeps 53 clean",
+                    serif_only, serif_only, [], None, "Times New Roman"))
+        out.append(("Liberation Serif arriving as a SANS still fails 53",
+                    serif_only, serif_only, F, None, "Arial"))
+        out.append(("Liberation Serif arriving as the docx default still fails 53",
+                    serif_only, serif_only, F, None, "Calibri"))
+        out.append(("Liberation Sans renamed to Arial keeps 53 clean",
+                    lib_sans, lib_sans, [], None, "Arial"))
+        out.append(("Liberation Sans arriving as Times New Roman still fails 53",
+                    lib_sans, lib_sans, F, None, "Times New Roman"))
+        out.append(("Liberation Mono renamed to Courier New keeps 53 clean",
+                    lib_mono, lib_mono, [], None, "Courier New"))
+        out.append(("Liberation Mono arriving as Arial still fails 53",
+                    lib_mono, lib_mono, F, None, "Arial"))
+        # The blind spot this corpus already shipped: Times New Roman is a SERIF and so is
+        # DejaVu Serif, but DejaVu Serif sets the same text 21.4 % wider. The table must not
+        # forgive it, and 53 must fire.
+        out.append(("Times New Roman arriving as DejaVu Serif fails 53",
+                    times14, times14, F, None, "DejaVu Serif"))
+        out.append(("Times New Roman arriving as Times New Roman keeps 53 clean",
+                    times14, times14, [], None, "Times New Roman"))
+        # One bucket, two widths: forgiving the sans must not carry the serif.
+        out.append(("a serif lost behind a forgiven sans still fails 53",
+                    two_widths, two_widths, F, None, "Arial"))
+        out.append(("a sans lost behind a forgiven serif still fails 53",
+                    two_widths, two_widths, F, None, "Times New Roman"))
+        # One bucket, ONE width: Helvetica and Liberation Sans are the same face, so a .docx
+        # that names Arial for both has lost nothing and must not be failed for it.
+        out.append(("two families the reader folds together are not a loss",
+                    helv_and_sans, helv_and_sans, [], None, "Arial"))
+
     # ---- 59 shape anchor ---------------------------------------------------
     # A stamp is an outline with text inside it. These two cases are the failure
     # modes the user described: the outline moves and leaves its text, and the
