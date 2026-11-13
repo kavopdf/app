@@ -2901,27 +2901,95 @@ def compare(src_path, gd_path, docx_path=None):
     torn = _torn_lines(s_text, g_text)
     checks["22_reading_order"] = (0, len(torn), not torn)
 
-    # line spacing: median gap between consecutive baselines on page 1
-    def pitch(doc):
-        """Line pitch, measured page by page and then taken as a median.
+    # ---- 23 line pitch: PAIRED, PER COLUMN, ON THE BASELINE -----------------
+    # What this used to be: per page, the sorted set of distinct SPAN TOPS, the median of
+    # the gaps between neighbours, then the median across pages, compared to within 2 pt.
+    # On a single-column page of one type size that number is the line pitch. On anything
+    # else it is not:
+    #   - a table or a grid: the gaps are ROW pitches (23_timetable_grid_txtpos read 39.2 pt,
+    #     402_calendar_month_grid 30.0, 411_nested_xobject_transforms 36.6);
+    #   - two columns starting at different offsets: the gaps alternate between the column
+    #     offset and the pitch (27_two_column_left_short_txtpos 11.0/13.5, and its lines are
+    #     11.0 apart on both sides);
+    #   - curved or rotated text: spans on one visual line sit at different tops, so the set
+    #     fills with sub-line gaps (05_round_company_seal_curved_text read 3.2 pt against a
+    #     true 15.7 pt pitch that the render reproduces to 0.0).
+    # And the docstring above said "baselines" while the code read sp["bbox"][1], which is the
+    # TOP of the span: on 7 of the 18 documents that failed it, reading the baseline it claims
+    # to read flips the verdict.
+    # Measured on 13 Nov over 211 documents on the current engine: it failed 18, and on every
+    # one of them the render's own pitch, paired line for line, was correct to within 0.6 pt.
+    # 14 of the 18 also fail 18_displacement, which measures per-line dy directly.
+    # So: measure the pitch where pitch is defined - two consecutive lines of the SAME column,
+    # on the BASELINE, present on both sides - and ask only that the median paired difference
+    # be small. A single line out of place inside a table row is 18_displacement's question
+    # and must not fail this one, which is why the statistic is a median and not a tail.
+    def _pitch_lines(page):
+        """(text, baseline_y, x0) for upright text lines. Slanted text is 35_rotation's."""
+        out = []
+        for blk in page.get_text("dict")["blocks"]:
+            if blk.get("type") != 0:
+                continue
+            for ln in blk.get("lines", []):
+                t = " ".join(s["text"] for s in ln.get("spans", [])).strip()
+                if not t:
+                    continue
+                if abs(ln.get("dir", (1, 0))[0] - 1) > 0.01:
+                    continue
+                base = max(s["origin"][1] for s in ln["spans"] if s["text"].strip())
+                out.append((t, round(base, 2), round(ln["bbox"][0], 1)))
+        return out
 
-        This pooled every run's y into ONE sorted set across all pages. Two pages each at a
-        true 12 pt pitch, where page 2 simply starts 6 pt lower than page 1, then measured 6.0
-        - the gap between page 1's last baseline and page 2's first was one of the gaps in the
-        set. Measured on 13 Nov: pitch(page 1) = 12, pitch(page 2) = 12, pitch(all runs) = 6,
-        so a document whose every page was correct FAILED whenever the two sides' pages started
-        at different offsets - which is what 18_median_dy reports on this corpus.
-        Per page, then the median across pages: a page break is not a line gap.
-        """
-        per_page = []
-        for p in doc:
-            ys = sorted(set(round(r["y"], 1) for r in runs(p)))
-            gaps = [b - a for a, b in zip(ys, ys[1:]) if 1 < b - a < 200]
-            if gaps:
-                per_page.append(median(gaps))
-        return round(median(per_page), 1) if per_page else 0
-    s_p, g_p = pitch(src), pitch(gd)
-    checks["23_line_pitch"] = (s_p, g_p, s_p == 0 or abs(g_p - s_p) <= 2.0)
+    def _columns(lines, tol=2.0):
+        cols = {}
+        for t, y, x in lines:
+            cols.setdefault(round(x / tol) * tol, []).append((y, t))
+        for k in cols:
+            cols[k].sort()
+        return cols
+
+    def pitch_pairs(a, b):
+        """Consecutive baseline gaps down one column of `a`, paired by text to `b`."""
+        pairs = []
+        for i in range(min(a.page_count, b.page_count)):
+            bl = _pitch_lines(b[i])
+            bcols, bidx = _columns(bl), {}
+            for t, y, x in bl:
+                bidx.setdefault(t, []).append(y)
+            for col in _columns(_pitch_lines(a[i])).values():
+                texts = {t for _, t in col}
+                best, bestn = None, 0
+                for c in bcols.values():
+                    n = len(texts & {t for _, t in c})
+                    if n > bestn:
+                        best, bestn = c, n
+                if best is None or bestn < 2:
+                    continue
+                for (ya, ta), (yb, tb) in zip(col, col[1:]):
+                    if ta not in bidx or tb not in bidx:
+                        continue
+                    ra = min(bidx[ta], key=lambda v: abs(v - ya))
+                    rb = min(bidx[tb], key=lambda v: abs(v - yb))
+                    if 1 < yb - ya < 200:
+                        pairs.append((yb - ya, rb - ra))
+        return pairs
+
+    _pp = pitch_pairs(src, gd)
+    if len(_pp) < 5:
+        # Fewer than five lines can be paired: the render lost the lines, reflowed them, or
+        # drew them as pictures. That is 04/31's, 22's and 35's question. This check reports
+        # it measured nothing rather than inventing a pitch from a pooled y-set.
+        s_p, g_p = 0, 0
+        _p23_ok = True
+        _p23_note = "unmeasured: %d paired line(s)" % len(_pp)
+    else:
+        _d = [r - a for a, r in _pp]
+        s_p = round(median([a for a, r in _pp]), 1)
+        g_p = round(median([r for a, r in _pp]), 1)
+        _p23_ok = abs(median(_d)) <= 1.0
+        _p23_note = ("%d paired gaps, median difference %+.2f pt"
+                     % (len(_pp), median(_d)))
+    checks["23_line_pitch"] = (s_p, g_p, _p23_ok)
 
     checks["24_page_breaks"] = (src.page_count, gd.page_count,
                                 src.page_count == gd.page_count)
