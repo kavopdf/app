@@ -68,6 +68,41 @@ def norm_font(f):
     return " ".join(f.split()).lower()
 
 
+_STYLE_WORDS = {"bold", "bolditalic", "boldoblique", "italic", "oblique", "regular",
+                "roman", "normal", "book", "semibold", "demibold"}
+_PS_SUFFIX = ("psmt", "mt", "ps")
+
+
+def face_name(f):
+    """The FAMILY a face name belongs to, with its style stripped off.
+
+    09_font_names counts distinct names, so "liberation sans" and "liberation sans bold" were
+    two names to it while the render writes bold once, as a run property. A correct conversion
+    therefore produced FEWER names and failed: constructed on 13 Nov with five style variants of
+    two families against two families with bold as a flag, the document scored 58/59 and 09 was
+    the ONLY failing check - 03/04/05 clean, 53 2/2, 34c 100/100, 47 extents identical.
+
+    This strips a token from a name. It never maps a name onto a different name, so 09 still
+    makes no substitution claim - that is 53's job and SAME_FACE is not consulted here. It also
+    picks up the MT/PSMT/PS suffixes and the comma form that norm_font does not.
+    """
+    toks = norm_font(f).split()
+    while toks:
+        last = toks[-1]
+        for suf in _PS_SUFFIX:
+            if last.endswith(suf) and len(last) > len(suf):
+                last = last[:-len(suf)]
+                break
+        if last != toks[-1]:
+            toks[-1] = last
+            continue
+        if last in _STYLE_WORDS:
+            toks.pop()
+            continue
+        break
+    return " ".join(toks) or norm_font(f)
+
+
 def norm_word(w):
     """Digits and punctuation kept; whitespace and case dropped."""
     return re.sub(r"[\s\u00a0]+", "", w).lower()
@@ -213,13 +248,37 @@ def _visual_counts(doc):
 
 
 def _strokes(page):
-    """Stroked paths: table rules, borders, underlines. Never looked at before."""
+    """Rules: stroked paths AND thin filled bands, measured the same way.
+
+    This used to skip every drawing whose `color` is None, which is every FILLED path. A rule
+    drawn as a 0.8 pt filled rect counted as nothing - and that is exactly how our own engine
+    draws a standalone rule: DocxWriter.shape() writes a filled rect with <a:ln><a:noFill/>.
+    The check could not see the engine's own legitimate output and reported the rule as lost.
+
+    Proven by construction on 13 Nov with 14 hand-written PDFs differing only in how the same
+    seven rules were drawn: seven stroked paths read 7, the same seven as one path with seven
+    subpaths read 1, and the same seven as filled 0.8 pt rects read 0 - the SAME answer as a
+    render with no rules at all. Loss and drawing style were indistinguishable, and 102 of the
+    145 failing rows read render == 0.
+
+    The 1.5 pt / 2 pt test is not new: PdfToWord.bandFillStroke() uses exactly it ("a fill-only
+    path that is a thin band IS a hairline, which is how most generators draw a rule"), and so
+    does compare_strokes.py. Only this file lacked it.
+    """
     out = []
     for d in page.get_drawings():
+        r = d["rect"]
         col = d.get("color")
         if col is None:
+            fill = d.get("fill")
+            if fill is None:
+                continue
+            h, w = r.height, r.width
+            if h <= 1.5 and w > 2:
+                out.append({"rect": r, "width": round(h, 2), "colour": fill})
+            elif w <= 1.5 and h > 2:
+                out.append({"rect": r, "width": round(w, 2), "colour": fill})
             continue
-        r = d["rect"]
         out.append({"rect": r, "width": round(d.get("width") or 0, 2), "colour": col})
     return out
 
@@ -855,14 +914,17 @@ def compare(src_path, gd_path):
     # ---- COMPLETENESS (1-16) ------------------------------------------------
     checks["01_page_count"] = (src.page_count, gd.page_count,
                                src.page_count == gd.page_count)
-
-    # A render that splits one source run into three has not lost anything - the words are all
-    # still there, in the same places. This compared the two counts with a TWO-SIDED tolerance,
-    # so finer segmentation FAILED the document: measured on 13 Nov, 99 of 233 recorded rows
-    # fail with render > source, and on 51 of those every source word is present (03 and 04 both
-    # pass). Losing runs is the defect; gaining them is not.
-    checks["02_text_run_count"] = (len(s_runs), len(g_runs),
-                                   len(g_runs) >= len(s_runs) - max(2, len(s_runs) // 50))
+    # 02_text_run_count was DROPPED on 13 Nov. A "run" is not a document object: runs() splits
+    # the text layer by (line, font, size, colour, flags), so a run boundary is a property of
+    # the extractor's grouping, not of the page. Measured four ways:
+    #   - under a one-sided rule 17 of 208 documents failed, and all 17 also failed 03/04;
+    #   - 02 never disagreed with 03/04 in the loss direction: 77 documents where 03/04 fired
+    #     and 02 was silent, 0 the other way;
+    #   - dropping it changed NO document's overall verdict on 208 rows;
+    #   - its one exclusive fire, constructed, is a document where every glyph, word, font,
+    #     size and colour is identical and only the extractor's line gap moved across ~7 pt.
+    # A check whose only unique signal is a false positive is a liability, and 03/04 are an
+    # exact multiset comparison with zero tolerance - strictly stronger.
 
     missing = s_words - g_words
     extra = g_words - s_words
@@ -890,8 +952,8 @@ def compare(src_path, gd_path):
 
     checks["08_image_count"] = (s_imgs, g_imgs, g_imgs >= s_imgs)
 
-    s_fonts = collections.Counter(norm_font(r["font"]) for r in s_runs)
-    g_fonts = collections.Counter(norm_font(r["font"]) for r in g_runs)
+    s_fonts = collections.Counter(face_name(r["font"]) for r in s_runs)
+    g_fonts = collections.Counter(face_name(r["font"]) for r in g_runs)
     # every source font family must appear in the render (a substitute is allowed
     # to have a different name, but a family that vanishes entirely is a loss)
     # Substitution renames a family (Arial -> Liberation Sans) so the names cannot be
@@ -998,11 +1060,25 @@ def compare(src_path, gd_path):
     checks["22_reading_order"] = (100, order, order > 95)
 
     # line spacing: median gap between consecutive baselines on page 1
-    def pitch(rs):
-        ys = sorted(set(round(r["y"], 1) for r in rs))
-        gaps = [b - a for a, b in zip(ys, ys[1:]) if 1 < b - a < 200]
-        return round(median(gaps), 1) if gaps else 0
-    s_p, g_p = pitch([r for r in s_runs]), pitch([r for r in g_runs])
+    def pitch(doc):
+        """Line pitch, measured page by page and then taken as a median.
+
+        This pooled every run's y into ONE sorted set across all pages. Two pages each at a
+        true 12 pt pitch, where page 2 simply starts 6 pt lower than page 1, then measured 6.0
+        - the gap between page 1's last baseline and page 2's first was one of the gaps in the
+        set. Measured on 13 Nov: pitch(page 1) = 12, pitch(page 2) = 12, pitch(all runs) = 6,
+        so a document whose every page was correct FAILED whenever the two sides' pages started
+        at different offsets - which is what 18_median_dy reports on this corpus.
+        Per page, then the median across pages: a page break is not a line gap.
+        """
+        per_page = []
+        for p in doc:
+            ys = sorted(set(round(r["y"], 1) for r in runs(p)))
+            gaps = [b - a for a, b in zip(ys, ys[1:]) if 1 < b - a < 200]
+            if gaps:
+                per_page.append(median(gaps))
+        return round(median(per_page), 1) if per_page else 0
+    s_p, g_p = pitch(src), pitch(gd)
     checks["23_line_pitch"] = (s_p, g_p, s_p == 0 or abs(g_p - s_p) <= 2.0)
 
     checks["24_page_breaks"] = (src.page_count, gd.page_count,
