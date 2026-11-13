@@ -331,7 +331,7 @@ def current_class_names():
     return names
 
 
-def compute_moved(cls_name):
+def compute_moved(cls_name, new_engine=None):
     """How many documents the class actually moved, read from the store.
 
     Returns (moved, failing_before, verified). verified is False when the store holds
@@ -343,27 +343,6 @@ def compute_moved(cls_name):
     passing every one of them is not counted either way - it proves nothing about this
     fix.
     """
-    base = _rows_for_mode()
-    docs = {}
-    for r in base:
-        failed = {c.strip() for c in (r.get("failed") or "").split(",")
-                  if CHECK_RE.match(c.strip())}
-        if failed:
-            docs[r["doc"]] = failed
-    if not docs:
-        return 0, 0, False
-    doc_sets = {c: {d for d, f in docs.items() if c in f}
-                for c in {x for f in docs.values() for x in f}}
-    target = None
-    for g in build_groups(doc_sets, len(docs)):
-        g = sorted(g, key=lambda c: -len(doc_sets[c]))
-        name = g[0] if len(g) == 1 else "%s (+%d)" % (g[0], len(g) - 1)
-        if name == cls_name:
-            target = set(g)
-            break
-    if target is None:
-        return 0, 0, False
-
     # BASELINE.md carries no engine column - read_baseline returns doc, score and the
     # failed set only - so the before/after comparison has to come from the store.
     store = os.path.join(HERE, "RESULTS-TXT.jsonl" if "--txt" in sys.argv else "RESULTS.jsonl")
@@ -406,9 +385,57 @@ def compute_moved(cls_name):
     # A dirty id is "<hash>-d<six hex of the diff>"; a committed one is the bare hash. So
     # the last id without a "-d" suffix is the baseline, and the last id overall is this
     # attempt.
-    new_eng = engines[-1]
-    clean = [e for e in engines[:-1] if "-d" not in e]
+    # WHICH ENGINE IS "THIS ATTEMPT"?
+    #
+    # Not engines[-1]. record.py writes the store sorted by (round, doc), so the engine on the
+    # last line is whatever engine that document was last measured under - not the most recent
+    # attempt. On 13 Nov the store's tail read
+    #     ['2a68de6-dirty', '2a68de6-d80a524', '2a68de6-d5215cb', '2a68de6-df33807']
+    # so engines[-1] was df33807 from the 07:00 run while the 08:40 run had measured under
+    # d5215cb. The tool compared the baseline against the wrong attempt and answered "0 of 5"
+    # for a round that had really moved 3 of 10 - and refused the run's honest numbers.
+    if new_engine:
+        if new_engine not in engines:
+            return 0, 0, False
+        new_eng = new_engine
+    else:
+        new_eng = engines[-1]
+    clean = [e for e in engines if e != new_eng and "-d" not in e]
     old_eng = clean[-1] if clean else engines[-2]
+
+    # THE CLASS IS RESOLVED FROM THE "BEFORE" ENGINE, NOT FROM BASELINE.md.
+    #
+    # This used to call _rows_for_mode(), which reads BASELINE.md - the state AFTER the
+    # attempt's own rows are in it. A document that moved now passes the class's checks, so
+    # it is no longer in the class, so the group rebuilt from the post-attempt state is a
+    # different group with a different check set. The comparison then asked "did the
+    # documents that are STILL failing move", which is a different question from "did the
+    # documents that were failing move", and the answer it gives is always too small.
+    #
+    # On 13 Nov that cost a real number: a run measured 3 of 10 documents moved onto a pass
+    # of 20_within_10pt (304 12->100, 34_monospace 14->100, 334_patent 16->100). The tool
+    # answered 0 of 5 and refused the claim. The run recorded the tool's numbers because the
+    # ratchet's FAIL decided the outcome anyway - so the store now says "0 of 5" where the
+    # truth is "3 of 10", and INCIDENTS.md carries the correction instead of the data.
+    docs = {}
+    for doc, by_eng in per_doc.items():
+        failed = by_eng.get(old_eng)
+        if failed:
+            docs[doc] = failed
+    if not docs:
+        return 0, 0, False
+    doc_sets = {c: {d for d, f in docs.items() if c in f}
+                for c in {x for f in docs.values() for x in f}}
+    target = None
+    for g in build_groups(doc_sets, len(docs)):
+        g = sorted(g, key=lambda c: -len(doc_sets[c]))
+        name = g[0] if len(g) == 1 else "%s (+%d)" % (g[0], len(g) - 1)
+        if name == cls_name:
+            target = set(g)
+            break
+    if target is None:
+        return 0, 0, False
+
     moved = failing = 0
     for doc, by_eng in per_doc.items():
         if old_eng not in by_eng or new_eng not in by_eng:
@@ -494,7 +521,8 @@ def main(argv):
             # true if the numbers are not supplied by the run that wants them. Tested
             # before this: --moved 10 --total 20 marked a class FIXED without a single
             # document having moved, and FIXED is permanent.
-            actual, failing, verified = compute_moved(cls)
+            eng = argv[argv.index("--engine") + 1] if "--engine" in argv else None
+            actual, failing, verified = compute_moved(cls, eng)
             if not verified:
                 print("refused: the store holds only one engine, so nothing was measured")
                 print("against a changed engine and no document can have moved. Check that")

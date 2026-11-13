@@ -474,8 +474,15 @@ STEP 8 - RECORD WHAT YOU LEARNED, THEN THE ATTEMPT
       python3 tools/p2w-bench/hypothesis.py --add "<exact class name>" "<the theory you tested>" \
               --result ruled-out|confirmed|untested --evidence "<the numbers that settled it>"
   Then record the attempt WITH ITS NUMBERS, so the outcome is computed rather than asserted:
-      python3 tools/p2w-bench/classify.py --attempt "<exact class name>" --moved <n> --total <n>
+      python3 tools/p2w-bench/classify.py --attempt "<exact class name>" --moved <n> --total <n> \
+              --engine "$ENGINE"
       (for a failed attempt with nothing to count: --outcome error)
+    ALWAYS PASS --engine. Without it the tool guesses which engine was "this attempt" by taking the
+    last one in the store - and record.py writes that store sorted by (round, doc), so the last
+    engine is whichever one that document was last measured under, not the one you just used. On
+    13 Nov a run measured 3 of 10 documents moved and was told "0 of 5", because the store's tail
+    held a different attempt's engine. Pass the id and the comparison is against the baseline you
+    actually measured against.
   Then run classify.py again so DEFECT-CLASSES.md reflects the new numbers and statuses.
   A run that fixes nothing but leaves a RULED OUT entry has still saved the next attempt two
   hours. A run that leaves nothing at all has wasted the slot.

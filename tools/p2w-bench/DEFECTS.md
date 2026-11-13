@@ -2239,3 +2239,80 @@ are checks and the third is a check on the count.
 
 A brief is not documentation of the pipeline. For the fixer it **is** the pipeline, and a stale
 sentence in it is a wrong instruction executed at three in the morning with nobody to ask.
+
+---
+
+## 44. The 08:40 run, and the measurement bug it found in the tool it was using
+
+### What the run did
+
+    claimed 08:40
+    applied patches/hairline-flow-before-refined.patch, built it
+    measured 7 documents through Drive, deleted every Doc
+    found the content-hash engine id 2a68de6-d5215cb ALREADY held 20 rows
+      - the same patch had been measured and reverted by an earlier run
+    store: 16 target-failing at baseline, 6 moved (37.5%), 5 fell below baseline
+    engine reverted, ratchet PASS 208/208, slot released, committed at 08:46
+
+Six minutes of a forty-five minute slot, one attempt. That is the §40 problem again, and it is
+worth being precise about why the fix did not bite here: this run had a specific reason to stop.
+It discovered that the patch it picked had already been measured and rejected, which means the
+class's saved work is exhausted. Moving to `47_margins` would have been the better use of the
+remaining 39 minutes, and it did not.
+
+### Two lessons it wrote, both worth keeping
+
+**A saved patch may already have its twenty rows.** `git diff | sha1sum` is computable *before* a
+build. Grep the id in `RESULTS.jsonl` first, and do not spend a slot re-measuring a state that is
+already on the record.
+
+**The refined hairline was ruled out with numbers** — the fitter's own charge rather than the
+0.2/0.8 model split, measured, 5 of 16 fell.
+
+### The bug it found in `classify.py --attempt`
+
+The run reported it in INCIDENTS.md, in its own words:
+
+> `classify.py --attempt` refused a measured 3 of 10 and reported 0 of 5, because it rebuilds the
+> class group from the store after the attempt's own rows are in it, so the group it resolves is
+> not the one the run measured.
+
+It was right, and there were **two** defects behind that, not one.
+
+**First: the class was resolved from the post-attempt state.** `compute_moved` built the document
+set from `_rows_for_mode()` — BASELINE.md, which by then carried the attempt's own rows. A document
+that moved now passes the class's checks, so it has left the class, so the group rebuilt from that
+state is a different group with a different check set. The comparison then asked "did the documents
+that are *still* failing move" instead of "did the documents that *were* failing move". Fixed: the
+class is resolved from the `old_eng` rows, the baseline the attempt was actually measured against.
+
+**Second, and worse: the tool did not know which engine was "this attempt".** It took
+`engines[-1]` — the last engine id in the store. But `record.py` writes that store **sorted by
+(round, doc)**, so the engine on the last line is whichever engine that document was last measured
+under. On 13 Nov the tail read:
+
+    ['2a68de6-dirty', '2a68de6-d80a524', '2a68de6-d5215cb', '2a68de6-df33807']
+
+`engines[-1]` is `df33807` — the 07:00 run. The 08:40 run measured under `d5215cb`. So the tool
+compared the baseline against a **different attempt** and reported 0 of 5 for a round that had
+moved 5 of 16. It then refused the run's honest numbers, and the run recorded the tool's numbers
+because the ratchet's FAIL decided the outcome anyway. The store now says "0 of 5" where the truth
+is "5 of 16", and INCIDENTS.md carries the correction instead of the data.
+
+Measured both ways on the real store:
+
+    engine=2a68de6-d5215cb  ->  (5, 16, True)   the attempt that actually ran
+    engine=2a68de6-df33807  ->  (0, 5, True)    what the tool was comparing
+    engine=None             ->  (0, 5, True)    the old behaviour
+
+`--attempt` now takes `--engine`, and the brief requires it. Without an explicit id the tool falls
+back to the old guess, which is why the brief says ALWAYS PASS --engine and says what happens when
+you do not.
+
+### Why this one matters more than the others
+
+Every other defect this session was a wrong instruction or a dead reference. This one was a
+measurement tool quietly answering a different question from the one it was asked, and the number
+it produced went into the ledger as fact. Five attempts' worth of "0 of N" may be understated.
+A pipeline whose numbers are wrong cannot be audited at all — which is why this was worth chasing
+through the store's sort order rather than writing it off as one run's complaint.
