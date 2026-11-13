@@ -1951,3 +1951,24 @@ wolf is the one that gets ignored.
 It cannot see a bug in a kind it does not implement, and this proof says nothing about kinds it was
 never asked to check. What it does say: for the eleven it claims, a planted bug comes back and
 clean code stays quiet.
+
+### The harness lied twice before the tool did
+
+Two rounds of the proof reported checks as MISSED that were working perfectly. Neither was the
+tool's fault, and both are worth writing down because a proof that lies is worse than no proof.
+
+**The harness ran out of disk.** `tempfile.mkdtemp()` defaults to `/tmp`, which is a 64 MB tmpfs
+here, and one repo copy is about 13 MB. Six cases in a row filled it. `cp` then wrote 0-byte files
+without failing, the audit found no functions in an empty file, and `dead` was reported as a miss
+twice. The same full disk is what produced the sandbox's HTTP 500s in the middle of the run. The
+scratch directory is now under `/scratch`, which has 280 GB free.
+
+**The checker counted its own prose as a reference.** After excluding the briefs from the
+dead-function scan — the fix for a real blind spot — `audit.py` itself became the problem: its
+comment three lines above names `orphan_function`, so `everything` contained a match and no planted
+dead function could ever be found. The checker is now excluded from both the definition scan and
+the reference scan. A tool that reads its own comments as evidence about the code will always find
+what its comments say.
+
+Both were caught by the same discipline: when a case fails, find out *why* before changing the
+tool. Twice the answer was that the case never ran.

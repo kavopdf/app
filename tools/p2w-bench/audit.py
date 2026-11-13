@@ -267,7 +267,10 @@ def check_clock():
     say("\nJ  CLOCK - timestamps written without the IST offset")
     suspicious = []
     for f in py_tools():
-        if f.endswith("_test.py") or f == "audit.py":
+        # prove_audit.py is a harness: its strings are deliberately bug-shaped mutations, and
+        # one of them writes a timestamp without the IST offset on purpose. Scanning it for the
+        # pattern it plants is the detector reading its own test fixtures as production code.
+        if f.endswith("_test.py") or f in ("audit.py", "prove_audit.py"):
             continue
         src = read(os.path.join(HERE, f))
         lines = src.splitlines()
@@ -306,7 +309,11 @@ def check_dead():
     say("\nK  DEAD CODE - defined, never called")
     names = []
     for f in py_tools():
-        if f.endswith("_test.py"):
+        # prove_audit.py names the functions it plants, so counting it as a reference would hide
+        # the very bug it exists to plant. audit.py is the checker: its own functions are called
+        # from a table at the bottom of the same file, which is excluded from the reference scan
+        # because its comments name the patterns it looks for - so they would all read as dead.
+        if f.endswith("_test.py") or f in ("prove_audit.py", "audit.py"):
             continue
         src = read(os.path.join(HERE, f))
         for m in re.finditer(r"^def ([a-z_][a-z0-9_]*)\(", src, re.M):
@@ -314,7 +321,11 @@ def check_dead():
     everything = "\n".join(read(os.path.join(REPO, p)) for p in
                            ["tools/" + x for x in os.listdir(os.path.join(REPO, "tools"))
                             if x.endswith(".py") or x.endswith(".sh")])
-    everything += "\n".join(read(os.path.join(HERE, f)) for f in py_tools())
+    # audit.py is the checker, not production code, and its own comments name the functions it
+    # looks for - "orphan_function" appears three lines up. Counting the checker's prose as a
+    # reference made every dead-function case unfindable, which is exactly what the proof caught.
+    everything += "\n".join(read(os.path.join(HERE, f)) for f in py_tools()
+                             if f not in ("prove_audit.py", "audit.py"))
     # References are counted in CODE only.
     #
     # This used to add every brief as well, and on 13 Nov the proof caught what that costs: a dead
