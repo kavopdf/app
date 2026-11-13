@@ -1210,7 +1210,9 @@ CASES = {
     "26_text_overlap":          ("render", mut_rule, BASE, "a rule across text"),
     "27_text_off_page":         ("render", mut_offpage, BASE, "text placed outside the page"),
     "28_clipped_at_edge":       ("render", mut_clip, BASE, "text pushed off the edge"),
-    "29_blank_where_ink_was":   ("render", mut_blank, BASE, "ink removed"),
+    # 29_blank_where_ink_was RETIRED 13 Nov - the same 24x24 occupancy lattice that retired
+    # its twin 30, and it decided no document's verdict on the live 211. Its mutation was
+    # mut_blank, which is 04_chars_missing's case as well and is proved there.
     # 30_ink_where_blank_was RETIRED 13 Nov - the 24x24 occupancy lattice it shared
     # with 29 was the defect. Its mutation was mut_rule, which could not fire it.
     "31_pages_lost_their_text": ("render", mut_blank, BASE, "the page left blank"),

@@ -3479,7 +3479,71 @@ def compare(src_path, gd_path, docx_path=None):
         blank_loss += len(s_cells - g_cells)
     # tolerance is a fraction of the source's own occupied grid cells, not of its columns
     s_cells_total = max(1, s_grid_total)
-    checks["29_blank_where_ink_was"] = (0, blank_loss, blank_loss <= max(4, int(s_cells_total * 0.10)))
+    # The measurement is kept; the verdict is not. P2W_29_LATTICE prints the number this
+    # lattice produced, so every figure in the retirement block below can be re-taken
+    # without re-inventing the check. It never votes.
+    if os.environ.get("P2W_29_LATTICE"):
+        print("29 lattice: blank_loss %d, source cells %d, floor %d"
+              % (blank_loss, s_cells_total, max(4, int(s_cells_total * 0.10))),
+              file=sys.stderr)
+
+    # ---- 29_blank_where_ink_was RETIRED 13 Nov -----------------------------
+    # 30's twin, one line apart, on the same ruler. It was retired second only because 30
+    # was the noisier of the two: the same residual flips 29 on 16 documents and 30 on 33
+    # at 3.0 pt over half the runs. Same defect, same verdict, so the same retirement.
+    #
+    # WHAT IT MEASURED. One anchor point per SPAN - not ink area. Each run's TOP-LEFT is
+    # bucketed into a 24x24 lattice (24.80 x 35.08 pt on A4), the render is bucketed in the
+    # source's frame using the per-page median offset, and the score is the number of cells
+    # the source occupied and the render did not, against max(4, 10 % of the source's own
+    # occupied cells).
+    #
+    # THE RULER IS THE DEFECT, AND IT STILL IS. Re-measured at 22728b1 on three constructed
+    # A4 pages, 30 runs one per lattice cell, ten of them moved 0.6 pt - a shift
+    # 18_displacement cannot see, its tolerance being clamp(0.35*size, 1.5, 4.5) = 3.5 pt
+    # at 10 pt:
+    #   A  the ten sit 0.3 pt under a row edge and the move crosses it
+    #      -> 29 = 6, FAIL, and 29 is the ONLY failing check of the 49
+    #   B  the same ten, the same 0.6 pt, sitting 0.9 pt under the edge so nothing crosses
+    #      -> 29 = 0, PASS, 49/49
+    #   17_matched_runs, 18_displacement, 22_reading_order and 43_within_10pt_x are
+    #   identical on A and B: 30/30, 0, 0, 100 %. A document's verdict turned on 0.6 pt.
+    # The count is not even the number of runs that moved: ten moved and 29 read 6, because
+    # four of them entered cells a neighbour already held. That is 30's anchor-not-ink
+    # defect, in the direction that fails.
+    #
+    # AND THE 0.6 pt CASE NOW NEEDS A MINORITY. A fourth page moved ALL 30 runs the same
+    # 0.6 pt and read 29 = 0: 6565508's per-page median subtracts a uniform shift before
+    # bucketing, so the exact constructed case the condemnation was written from no longer
+    # reproduces when every run moves. That does not rescue the check - it narrows which
+    # documents it can fire on, and the ruler decides the rest.
+    #
+    # NO UNIQUE DOCUMENT, RE-CONFIRMED ON 211. Re-run at 22728b1 over the full corpus
+    # (build-engine.sh, all 211 converted, LibreOffice renders, verify_google.py on each
+    # pair): 34 documents fail 29, and ZERO of them fails 29 alone - removing the check
+    # changes no document's verdict. 21 of the 34 sit at the constant floor of 4 cells, and
+    # 4 are one cell over it (5 against 4). The direction is covered by checks that ask it
+    # of the thing itself: 04_chars_missing and 17_matched_runs (constructed: ten runs
+    # deleted reads 29 = 10, 04 = 30, 17 = 20 - 29 never fires alone), 47_margins (26 of
+    # the 34), 18_displacement (27), 59_shape_anchor (22), 10_font_sizes (13).
+    #
+    # CORRECTION TO THE BRIEF THAT CONDEMNED IT, which claimed "of the 134 that failed it
+    # in the 208-doc record, ZERO passed 17, 18 and 22". On RATCHET-20261112-095452.json
+    # 134 fail 29 and TWELVE of them pass 17_matched_runs, 18_displacement and
+    # 22_reading_order (306_clinical_protocol_synopsis, 32_serif_nondefault_body,
+    # 333_datasheet_spec_tables, 341_shipping_manifest, 344_customs_declaration,
+    # 375_attendance_register, 393_spectrum_peak_table, 404_sudoku_grid,
+    # 410_form_xobject_reused, 416_many_tiny_pages, marksheet-university-consolidated,
+    # table-of-contents-dot-leaders). Every one of the twelve fails 18_median_dy and
+    # 19_worst_dy and 47_margins as well - the criterion named the wrong three checks, not
+    # the wrong conclusion. On the live 211, 2 of the 34 pass 17/18/22 -
+    # boq-horizontal-rules-only (29 = 11) and product-catalogue-code-left-price-right
+    # (29 = 8) - and both fail 10_font_sizes and 47_margins.
+    #
+    # The class "ink in a region the source left blank" is an INK-AREA question and needs a
+    # rasterised coverage test with a % -of-page tolerance; the spec is recorded in the 30
+    # block below and is not shipped, for the reason given there. A check that asks it with
+    # an occupancy lattice would be this check again under a new name.
 
     # ---- 30_ink_where_blank_was RETIRED 13 Nov -----------------------------
     # It was 29's expression with the difference taken the other way round, on the same
@@ -3531,8 +3595,8 @@ def compare(src_path, gd_path, docx_path=None):
     # % -of-page tolerance, not an occupancy lattice: the lattice's answer is decided by
     # where the anchor happened to fall, and the corpus contains no document whose only
     # defect is of that class.
-    # 29 is on the same ruler and is still live in this tree; see the report that
-    # accompanies this patch.
+    # 29_blank_where_ink_was, its twin, was on the same ruler and is retired in the block
+    # above - same defect, same evidence, one day later.
 
     # 31 every page must carry some ink
     # A blank page in the source is legitimate; a blank page the source did not have is not.
