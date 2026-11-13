@@ -925,7 +925,6 @@ def mut_docx_face(path):
 CASES = {
     "01_page_count":            ("render", mut_addpage, BASE, "a page added"),
     "02_text_run_count":        ("render", mut_restyle, BASE, "30% of spans restyled"),
-    "03_word_count":            ("render", mut_blank, BASE, "the page's text removed"),
     "04_words_missing":         ("render", mut_blank, BASE, "the page's text removed"),
     "05_words_extra":           ("render", mut_rule, BASE, "extra ink drawn"),
     "06_table_columns":         ("render", mut_shift, BASE, "the page shifted"),

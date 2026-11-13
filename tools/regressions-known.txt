@@ -6,6 +6,54 @@
 #
 # Everything here was read by hand. Nothing goes in because it was inconvenient.
 
+# 0afff7a tools/p2w-bench/test_checks.py
+#   SUPERSEDED BY 64c2816, and the flag was NOT a false alarm. 0afff7a's regex deleted
+#   two thirds of test_checks.py, including cases(), so the 23 lines it added here were
+#   a scaffold in a file that raised NameError before it ran: `for case in cases()` with
+#   no cases() defined (verified: `git show 0afff7a:tools/p2w-bench/test_checks.py`, run,
+#   NameError at line 98). No case ever supplied the sixth element, so docx_faces_doc()
+#   was never called. 64c2816 restored the file from de2196e and, correctly, 53 reads
+#   the .docx now and a PDF-only pair cannot fire it - so it had to weaken that case.
+#   WHAT 64c2816 DID NOT CARRY OVER IS REAL AND WAS LOST: the fixture, and with it the
+#   only self-contained proof that 53 fires at all. At HEAD the case read [] and 53
+#   printed "faces unmeasured", so test_checks could not fail 53 for any reason.
+#   RESTORED in this tree (test_checks.py, docx_faces_doc + the 6-tuple): 23/23 pass and
+#   the case is load-bearing - pointing the fixture at the wrong family reads 22/23.
+#   The waiver is for the historical commit only, not for the gap it left.
+0afff7a:tools/p2w-bench/test_checks.py
+
+# 6985d79 tools/p2w-bench/verify_google.py
+#   SUPERSEDED BY f618313, verified at HEAD rather than assumed. 6985d79 replaced
+#   20_within_10pt (a share of a document, so a ruler for its length) with a per-page
+#   check. f618313 replaced that check with 18_displacement: same per-page scope, same
+#   "a page with no matched run on it fails", same exclusion of rotated/curved runs, and
+#   a band calibrated in em (clamp(0.35*size, 1.5, 4.5) pt) instead of a median of the
+#   page's own pitch. Re-run on constructed pairs at HEAD, every case 6985d79 was written
+#   for: a page moved as a block by 12 pt -> 18_displacement fires; 10 of 21 lines 20 pt
+#   out -> fires (the case a pooled median passed); a 2-run page 12 pt out -> fires; an
+#   empty render text layer -> fires; an identical pair -> silent. Nothing 6985d79 set out
+#   to catch is uncaught. The 44 comment lines and the page_pitch/p90 machinery are what
+#   is gone, and f618313 removed them with evidence: int(0.9*(n-1)) is n-2 at n=2 so p90
+#   can never see the maximum, and the median is signed so a top-half-up / bottom-half-down
+#   page read 0.000.
+6985d79:tools/p2w-bench/verify_google.py
+
+# 57f521d tools/p2w-bench/verify_google.py
+#   SUPERSEDED BY 2932e15, verified at HEAD. 57f521d's change here was 47_margins'
+#   extents(): drop whitespace-only spans before taking the page-1 ink box, because one
+#   lone space at x=0 drove min(x) to 0 and failed 182 of 187 documents. 2932e15 replaced
+#   extents() with line_lefts() - per page, the MODAL left edge of ink lines - and it
+#   filters whitespace-only lines before that (verify_google.py:1851, `if not "".join(...)
+#   .strip(): continue`), so the filter is still there one granularity down and a mode
+#   could not be moved by a stray span anyway. Re-run at HEAD: a render carrying a lone
+#   space at x=0 leaves 47 silent; the body column moved 6 pt or 18 pt fails it. The 11
+#   gone lines are that docstring and the span-level bbox appends, and 2932e15's comment
+#   block records the same measurement.
+#   NOTE, and it is not what this flag is about: 57f521d's message also claims an
+#   08_image_count fix (get_images() -> get_image_info()) that its diff DOES NOT CONTAIN.
+#   HEAD still reads p.get_images() at verify_google.py:1954-1955. See the report.
+57f521d:tools/p2w-bench/verify_google.py
+
 # 995290a tools/p2w-bench/prove_checks.py
 #   b242cfa rebuilt prove_checks.py from 54928a0 instead of re-applying 995290a's
 #   version, so 66 of the 81 lines 995290a added are absent from HEAD on purpose.

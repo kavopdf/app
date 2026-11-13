@@ -1971,8 +1971,27 @@ def compare(src_path, gd_path, docx_path=None):
 
     missing = s_words - g_words
     extra = g_words - s_words
-    checks["03_word_count"] = (sum(s_words.values()), sum(g_words.values()),
-                               len(missing) == 0)
+
+    # 03_word_count RETIRED 13 Nov: it was 04 with a second display, and a second vote.
+    # The two carried the SAME predicate - `len(missing) == 0`, the identical expression,
+    # not a similar one - so no document could ever fail one and pass the other. Measured
+    # on the 211 rows of RATCHET-20261113-084751.json: 03 fails 95, 04 fails 95, and the
+    # symmetric difference of the two failure sets is 0. On the 208 rows of RESULTS.jsonl
+    # (engine 2a68de6) they agree on 208 of 208.
+    #
+    # What 03 displayed was the token totals, and those do not describe its own verdict.
+    # On 5 rows the totals are EQUAL and it votes FAIL (311_fir_police_form 232 -> 232: a
+    # word swapped for another); on 82 rows the totals differ and it votes PASS
+    # (bank-statement-horizontal-rules-only 319 -> 459, boq-horizontal-rules-only
+    # 364 -> 482). A number and a verdict that disagree on 87 of 208 rows teach a fixer
+    # the wrong thing, and the vote was the second vote for the class classify.py already
+    # records as "03_word_count (+1)" over {03, 04}: one fault, two of the universe.
+    #
+    # Retiring it moves no verdict. 0 of 211 rows fail only 03, and 0 fail only {03, 04}.
+    # What must NOT go with it is the magnitude, which is the one thing its totals had
+    # that 04's count of TYPES does not: a word type short by ten copies reads 1 here.
+    # That is 04's own limit and it is kept below, because 04's verdict is the multiset
+    # test and does not depend on the number. See 05 for the side where it does.
     checks["04_words_missing"] = (0, len(missing), len(missing) == 0)
     checks["05_words_extra"] = (0, len(extra), len(extra) <= max(1, sum(s_words.values()) // 100))
 

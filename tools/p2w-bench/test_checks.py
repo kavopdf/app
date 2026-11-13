@@ -30,6 +30,7 @@ USAGE
 import os
 import sys
 import tempfile
+import zipfile
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -74,8 +75,32 @@ def simple(path, body):
     doc.close()
 
 
-def compare_files(a, b):
-    return V.compare(a, b)
+def compare_files(a, b, docx=None):
+    return V.compare(a, b, docx)
+
+
+def docx_faces_doc(path, face):
+    """A minimal .docx that declares one face on one run - all 53 reads.
+
+    RESTORED 13 Nov. 0afff7a wrote this fixture and 64c2816, repairing that commit's
+    regex accident by restoring test_checks.py from de2196e, did not carry it over -
+    so the 53 case below went from asserting the check fires to asserting nothing, and
+    53 has had no self-contained proof since. The fixture is verbatim from 0afff7a
+    because it works: with it, a .docx naming "Liberation Serif" leaves 53 clean and
+    one naming "DejaVu Sans" fails it, which is the whole of what 53 measures.
+    """
+    NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+    z = zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED)
+    z.writestr("word/document.xml",
+               '<w:document xmlns:w="%s"><w:body><w:p><w:r><w:rPr>'
+               '<w:rFonts w:ascii="%s" w:hAnsi="%s" w:cs="%s"/></w:rPr>'
+               '<w:t>Invoice number 12345</w:t></w:r></w:p></w:body></w:document>'
+               % (NS, face, face, face))
+    z.writestr("word/styles.xml",
+               '<w:styles xmlns:w="%s"><w:docDefaults><w:rPrDefault><w:rPr>'
+               '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/></w:rPr></w:rPrDefault>'
+               '</w:docDefaults></w:styles>' % NS)
+    z.close()
 
 
 # ---------------------------------------------------------------------------
@@ -257,12 +282,15 @@ def cases():
             p.insert_font(fontname="FN", fontfile=SANS)
             p.insert_text((72, 130), "Total amount 4,500", fontsize=12, fontname="FN")
 
-        out.append(("the same faces keep 53 clean", serif_only, serif_only, [], None))
+        # 53 reads the .docx the engine wrote, not Google's export, so a PDF-only pair
+        # cannot fire it - without --docx it cannot fail and says so on stderr. The sixth
+        # element therefore carries the family the .docx declares, and the assertion below
+        # is real again: 64c2816 had to weaken it to [] because it dropped 0afff7a's
+        # fixture, which left 53 with no test that could fail it anywhere but on the corpus.
+        out.append(("the same faces keep 53 clean", serif_only, serif_only, [], None,
+                    "Liberation Serif"))
         out.append(("a different face still fails 53", serif_only, sans_only,
-                    # 53 now reads the .docx the engine wrote, not Google's export, so a
-                    # PDF-only pair cannot fire it - without --docx it cannot fail and says so
-                    # on stderr. The docx case lives in prove_checks.py, which builds one.
-                    [], None))
+                    ["53_embedded_faces"], None, "DejaVu Sans"))
 
     # ---- 59 shape anchor ---------------------------------------------------
     # A stamp is an outline with text inside it. These two cases are the failure
@@ -291,13 +319,21 @@ def cases():
 def run(verbose=False):
     tmp = tempfile.mkdtemp(prefix="chk-")
     results = []
-    for name, src_b, gd_b, expect, allow in cases():
+    for case in cases():
+        name, src_b, gd_b, expect, allow = case[:5]
+        docx_face = case[5] if len(case) > 5 else None
         a = os.path.join(tmp, "a.pdf")
         b = os.path.join(tmp, "b.pdf")
         simple(a, src_b)
         simple(b, gd_b)
+        docx = None
+        if docx_face:
+            # A sixth element names the family the engine's .docx declares. It is needed
+            # only by 53, which reads the .docx and cannot fail without one.
+            docx = os.path.join(tmp, "a.docx")
+            docx_faces_doc(docx, docx_face)
         try:
-            res = compare_files(a, b)
+            res = compare_files(a, b, docx)
         except Exception as exc:
             results.append((name, "ERROR", "compare raised: %s" % exc, []))
             continue
