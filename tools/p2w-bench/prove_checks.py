@@ -305,9 +305,13 @@ def _face_class(name):
 def mut_font_drop(doc):
     """Re-draw every span in a face from a DIFFERENT style class.
 
-    NO LONGER 53's CASE - kept because it proves 09_font_names, which still reads the
-    render. 53 now reads the .docx (13 Nov), so a mutation of the RENDER cannot move it;
-    its case is `mut_docx_face` below.
+    ORPHANED, and this was already true at 7b6ed92: no entry in CASES names it. It was kept
+    on the grounds that it proves 09_font_names, and 09 was RETIRED on 13 Nov, so the reason
+    it was kept is gone. Left in place rather than deleted because deleting a mutator is a
+    separate change from retiring a check, and because it is the only code in this file that
+    redraws a page span-for-span at its exact origin - useful the day a check needs a
+    render-side face mutation again. 53 reads the .docx (13 Nov), so a mutation of the RENDER
+    cannot move it; its case is `mut_docx_face` below.
 
     History: 53_embedded_faces counted the families the SOURCE draws with that the render
     no longer draws with, so it could only fail when the render LOST a family.
@@ -956,7 +960,10 @@ CASES = {
     "06_table_columns":         ("render", mut_shift, BASE, "the page shifted"),
     "07_table_rows":            ("render", mut_shift, BASE, "the page shifted"),
     "08_image_count":           ("render", mut_drop_images, IMG_DOC, "the image removed"),
-    "09_font_names":            ("render", mut_font, BASE, "a different typeface used"),
+    # 09_font_names RETIRED 13 Nov. Its mutation - a different typeface used - is Google's
+    # substitution measured on the export, so the proof could never have been the engine's.
+    # 53_embedded_faces carries the family question now, with a .docx mutation that the
+    # engine actually writes. See verify_google.py, "09_font_names RETIRED".
     "10_font_sizes":            ("render", mut_big, BASE, "a much larger size used"),
     "11_bold_runs":             ("render", mut_bold, BASE, "35% of spans made bold"),
     "12_italic_runs":           ("render", mut_bold, BASE, "span styling changed"),

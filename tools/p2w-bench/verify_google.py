@@ -79,34 +79,11 @@ _STYLE_WORDS = {"bold", "bolditalic", "boldoblique", "italic", "oblique", "regul
 _PS_SUFFIX = ("psmt", "mt", "ps")
 
 
-def face_name(f):
-    """The FAMILY a face name belongs to, with its style stripped off.
-
-    09_font_names counts distinct names, so "liberation sans" and "liberation sans bold" were
-    two names to it while the render writes bold once, as a run property. A correct conversion
-    therefore produced FEWER names and failed: constructed on 13 Nov with five style variants of
-    two families against two families with bold as a flag, the document scored 58/59 and 09 was
-    the ONLY failing check - 03/04/05 clean, 53 2/2, 34c 100/100, 47 extents identical.
-
-    This strips a token from a name. It never maps a name onto a different name, so 09 still
-    makes no substitution claim - that is 53's job and SAME_FACE is not consulted here. It also
-    picks up the MT/PSMT/PS suffixes and the comma form that norm_font does not.
-    """
-    toks = norm_font(f).split()
-    while toks:
-        last = toks[-1]
-        for suf in _PS_SUFFIX:
-            if last.endswith(suf) and len(last) > len(suf):
-                last = last[:-len(suf)]
-                break
-        if last != toks[-1]:
-            toks[-1] = last
-            continue
-        if last in _STYLE_WORDS:
-            toks.pop()
-            continue
-        break
-    return " ".join(toks) or norm_font(f)
+# face_name() stood here and was the whole of 09_font_names' normaliser: it stripped the
+# style word, the MT/PSMT/PS suffix and the comma form off a face name so that five style
+# variants of one family read as one family. It had exactly one caller, and that caller is
+# gone. Its history is kept where the check used to be (see "09_font_names RETIRED"), and
+# 53 does the same reduction inside family(), which is also the only place that needs it.
 
 
 def _torn_lines(s_text, g_text):
@@ -1177,6 +1154,22 @@ def extra_checks2(src, gd, docx_path=None):
                 "%s kept %.0f%% of %d chars" % (f, r * 100, ch) for f, r, ch in lost),
                 file=sys.stderr)
         c["53_embedded_faces"] = (len(s_fa), kept, len(s_fa) == 0 or not lost)
+
+        # 09_font_names' surviving fact, demoted from a vote to a note. 09 counted the
+        # families in Google's export against the source and failed when the count fell by
+        # more than 20 %; that fired on Google's substitution, which no .docx change can
+        # move, so it is not a check. It is still worth saying out loud when it happens,
+        # because a reader opening the converted file will see it - and because the day the
+        # engine starts writing a family the exporter cannot carry, this line is the evidence.
+        # Only when the .docx is CLEAN. If the engine dropped the family, 53 has already
+        # said so above and the exporter is not the story - reporting it twice would blame
+        # Google for the engine's loss, which is the mistake that retired 09.
+        g_fams = faces(gd)
+        if not lost and len(g_fams) < max(1, int(len(s_fa) * 0.8)):
+            print("53_embedded_faces: the .docx carries %d of %d source families, but Google's "
+                  "export shows %d - the exporter collapsed them, not the engine "
+                  "(retired 09's signal, reported, not scored)"
+                  % (len(s_fa) - len(lost), len(s_fa), len(g_fams)), file=sys.stderr)
 
     # ---- 54 image resolution ----------------------------------------------
     # 08 counts images and 48 measures area; neither notices a 300 dpi logo
@@ -2338,17 +2331,38 @@ def compare(src_path, gd_path, docx_path=None):
 
     checks["08_image_count"] = (s_imgs, g_imgs, g_imgs >= s_imgs)
 
-    s_fonts = collections.Counter(face_name(r["font"]) for r in s_runs)
-    g_fonts = collections.Counter(face_name(r["font"]) for r in g_runs)
-    # every source font family must appear in the render (a substitute is allowed
-    # to have a different name, but a family that vanishes entirely is a loss)
-    # Substitution renames a family (Arial -> Liberation Sans) so the names cannot be
-    # compared, but a family that vanishes entirely is a loss. Require the render to carry
-    # at least 80 % as many distinct faces as the source.
-    # A source with no fonts has nothing to lose; failing it is a false positive.
-    checks["09_font_names"] = (len(s_fonts), len(g_fonts),
-                               len(s_fonts) == 0 or
-                               len(g_fonts) >= max(1, int(len(s_fonts) * 0.8)))
+    # ---- 09_font_names RETIRED 13 Nov --------------------------------------
+    # It asked "did every family the source drew survive?" on the WRONG SIDE OF THE
+    # PIPELINE, and it asked it with a metric that could not see a loss.
+    #
+    # THE SIDE. This verifier compares a source PDF against the PDF Google Docs exports
+    # (line 12). 53 asks the same question against the .docx the engine writes. Google's
+    # export is Google's fontconfig, not the engine's decision - the same correction 53
+    # and 54 were both redefined for, and the one 53's own comment states in as many
+    # words: "Everything else - Google's substitution, LibreOffice's fontconfig, whether
+    # the machine has Liberation installed - is somebody else's decision".
+    # MEASURED 13 Nov, case (a) of the discrimination matrix: source draws four families,
+    # the engine's .docx names all four correctly, Google's export shows one. 09 fired and
+    # 53 did not, so the fire was Google's substitution and no engine change could clear
+    # it. That is the defect the test file's own docstring names - "a check that always
+    # fails ... condemns every document and hides the real defect behind its noise".
+    #
+    # THE METRIC. It compared distinct family COUNTS at an 80 % floor, so it could not fail
+    # on a loss it was built to catch: at a source of two families the floor is 1, and a
+    # render carrying one family passes. Measured on the matrix, case (c): source draws
+    # Times and Arial, the .docx keeps only Arial - one of two families gone entirely -
+    # and 09 read 2 vs 1 and passed. 53 reads the family at ratio 0.000 and fails.
+    # The floor's blind spot, computed: s=2..5 may each drop one family silently, s=6..8 two.
+    #
+    # NOT AN EXACT DUPLICATE, which is why it is retired as SUPERSEDED and not as a repeat.
+    # The matrix discriminates in both directions: case (a) fails 09 only, case (b) - a
+    # .docx that renames one family, the 350_question_paper shape - fails 53 only. Two
+    # checks that separate are not one check written twice; what makes 09 redundant is that
+    # its exclusive fire is never the engine's to fix.
+    #
+    # Its one uncovered fact - Google's export carrying fewer families than the source drew -
+    # is still reported, as information, from 53's block in extra_checks2(). A fact worth
+    # knowing is not the same as a vote, and this one is not the engine's to win.
 
     s_sizes = collections.Counter(r["size"] for r in s_runs)
     g_sizes = collections.Counter(r["size"] for r in g_runs)

@@ -103,6 +103,29 @@ def docx_faces_doc(path, face):
     z.close()
 
 
+def docx_runs_doc(path, runs):
+    """A minimal .docx with one run per (face, text) pair, each declaring its own w:rFonts.
+
+    docx_faces_doc writes one run, which is enough for "is the family there at all" and not
+    enough for "which family went": 53 weighs a family by the characters its runs carry, so
+    a multi-family document needs a fixture that can carry several. Written for the case that
+    replaced 09_font_names, where four families arrive and the .docx keeps one.
+    """
+    NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+    body = "".join(
+        '<w:p><w:r><w:rPr><w:rFonts w:ascii="%s" w:hAnsi="%s" w:cs="%s"/></w:rPr>'
+        '<w:t>%s</w:t></w:r></w:p>' % (f, f, f, t) for f, t in runs)
+    z = zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED)
+    z.writestr("word/document.xml",
+               '<?xml version="1.0"?><w:document xmlns:w="%s"><w:body>%s</w:body>'
+               '</w:document>' % (NS, body))
+    z.writestr("word/styles.xml",
+               '<?xml version="1.0"?><w:styles xmlns:w="%s"><w:docDefaults><w:rPrDefault><w:rPr>'
+               '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/></w:rPr></w:rPrDefault>'
+               '</w:docDefaults></w:styles>' % NS)
+    z.close()
+
+
 def docx_image_doc(path, px=40, extent_pt=360):
     """A minimal .docx embedding one px-wide PNG drawn extent_pt wide.
 
@@ -341,13 +364,38 @@ def cases():
         p.set_mediabox(fitz.Rect(0, 0, 612, 792))
     out.append(("A4 exported as Letter", base, letter, ["49_page_size"], None))
 
-    # ---- 09 font names: four faces in, one out ------------------------------
+    # ---- 09_font_names: RETIRED 13 Nov, replaced by 53 ----------------------
+    # 09 counted the distinct faces in GOOGLE'S EXPORT against the source and allowed the
+    # count to fall by 20 %. 53 asks the same question against the .docx the engine writes,
+    # with the family's identity and its character share, so a family that vanishes anywhere
+    # fails 53 whatever its size. 09 was not an exact duplicate of 53 - these two cases are
+    # the proof, because they separate in opposite directions - it was superseded: its own
+    # exclusive fire is Google's substitution, which no .docx change can clear.
+    #
+    # (a) the engine's .docx names all four families and GOOGLE collapses them to one.
+    #     09 fired here and 53 must not. If this case ever fails 53, the retirement was wrong.
+    # (b) the .docx itself keeps one family out of four. 53 must fire.
     def four_faces(p):
         for i, f in enumerate(("helv", "tiro", "cour", "symb")):
             p.insert_text((72, 100 + i * 20), "Invoice number 12345", fontsize=11, fontname=f)
     def one_face(p):
-        p.insert_text((72, 100), "Invoice number 12345", fontsize=11, fontname="helv")
-    out.append(("four faces, one face kept", four_faces, one_face, ["09_font_names"], None))
+        # the same four lines in one face - what Google's font substitution does
+        for i in range(4):
+            p.insert_text((72, 100 + i * 20), "Invoice number 12345", fontsize=11, fontname="helv")
+
+    def four_face_docx(path):
+        docx_runs_doc(path, [("Arial", "Invoice number 12345"),
+                             ("Times New Roman", "Invoice number 12345"),
+                             ("Courier New", "Invoice number 12345"),
+                             ("Symbol", "Invoice number 12345")])
+
+    def one_face_docx(path):
+        docx_runs_doc(path, [("Arial", "Invoice number 12345")])
+
+    out.append(("four faces, Google collapses them, .docx clean", four_faces, one_face,
+                [], ["53_embedded_faces"], four_face_docx))
+    out.append(("four faces, the .docx drops three", four_faces, one_face,
+                ["53_embedded_faces"], None, one_face_docx))
 
     # ---- 31 pages lost their text: a page that had text is empty ------------
     def empty_page(p):
