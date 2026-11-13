@@ -4745,7 +4745,9 @@ public final class DocxWriter {
                 "-Regular", "-Roman", "-Normal", ",Bold", ",Italic", ",BoldItalic"};
         for (String suf : suffixes) {
             if (f.length() > suf.length() && f.endsWith(suf)) {
-                return f.substring(0, f.length() - suf.length());
+                String stripped = f.substring(0, f.length() - suf.length());
+                String mapped = BASE14.get(stripped.toLowerCase(Locale.ROOT));
+                return mapped != null ? mapped : stripped;
             }
         }
         return f;
@@ -4764,6 +4766,12 @@ public final class DocxWriter {
         BASE14.put("arial", "Arial");
         BASE14.put("timesnewroman", "Times New Roman");
         BASE14.put("couriernew", "Courier New");
+        BASE14.put("liberationsans", "Arial");
+        BASE14.put("liberation sans", "Arial");
+        BASE14.put("liberationserif", "Times New Roman");
+        BASE14.put("liberation serif", "Times New Roman");
+        BASE14.put("liberationmono", "Courier New");
+        BASE14.put("liberation mono", "Courier New");
     }
 
     /** Points to whole twips, the unit every w:* length uses. */
