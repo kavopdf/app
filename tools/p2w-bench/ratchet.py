@@ -192,7 +192,8 @@ def _append_history(path, payload):
 # and the ratchet guards nothing. Everything below derives its denominator from it.
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
-from instrument import CHECK_RE, live_universe, parse_stamp, stamp_of  # noqa: E402
+from instrument import (CHECK_RE, body_map, digest, live_universe,  # noqa: E402
+                        parse_stamp, stamp_of)
 
 
 # Set by main(). A module flag rather than a parameter threaded through four functions,
@@ -271,6 +272,20 @@ def load_ratchet():
         except Exception:
             return {}
     return {}
+
+
+def redefined_checks(mark, live_bodies):
+    """Which of this mark's checks now ask something different, by name.
+
+    Needs the per-check digests the mark carries (check_bodies). A mark written
+    before 13 Nov has none, and this returns [] rather than guessing - the sha
+    mismatch still makes it stale, it just cannot say which check moved. That is
+    the difference between "re-measure, something changed" and "22_reading_order
+    was redefined, its old verdicts are not comparable", and the second is what a
+    fixer needs.
+    """
+    was = mark.get("check_bodies") or {}
+    return sorted(k for k in was if k in live_bodies and was[k] != live_bodies[k])
 
 
 def main(argv):
@@ -372,6 +387,7 @@ def main(argv):
         return 2
     universe = set(ids)
     N = len(ids)
+    live_bodies, bodies_err = body_map(TXT_MODE)
 
     # An empty store is the extreme case of "not asked", not a pass.
     #
@@ -450,6 +466,7 @@ def main(argv):
     regressions = []
     new_marks = []
     stale = []
+    redefined_seen = set()
     # Which documents this run actually ASKED, and for the rest, what stopped it.
     #
     # These two sets are the difference between a pass and a green light. A document
@@ -472,7 +489,10 @@ def main(argv):
                 ratchet[doc] = {"best": score, "out_of": out_of,
                                 "failed": sorted(failed),
                                 "universe": sorted(universe),
-                                "universe_n": N, "universe_sha": live_sha}
+                                "universe_n": N, "universe_sha": live_sha,
+                                "id_sha": digest(universe),
+                                "check_bodies": {k: live_bodies[k] for k in universe
+                                                 if k in live_bodies}}
             continue
 
         best = prev.get("best", 0)
@@ -506,13 +526,34 @@ def main(argv):
         # and it is not replaced (that is how one dropped check disarmed the gate
         # for 211 documents on 13 Nov, printing PASS). It is reported, and it
         # stays exactly as measured until --recut says otherwise.
-        if prev_universe and prev_universe != universe:
-            stale.append((doc, best, prev.get("out_of"), len(prev_universe), score, out_of))
+        # THE SET IS NOT THE QUESTION (13 Nov). A mark also goes stale when the ids
+        # are the same and the bodies are not: 32_stroke_lines, 22_reading_order,
+        # 08_image_count, 18_displacement and 53_embedded_faces each changed what
+        # they ASK while keeping their id, and this test - which only compared id
+        # sets - compared the marks taken under the old question against the new
+        # one. On 22 that is 88 documents failing under the old rule against 4
+        # under the new: read as 84 documents getting better, which is not a thing
+        # that happened. A mark whose stamp does not match is stale for the same
+        # reason a mark with a different set is: it was not taken by this instrument.
+        set_moved = bool(prev_universe) and prev_universe != universe
+        prev_sha = prev.get("universe_sha") or ""
+        sha_moved = bool(prev_sha) and prev_sha != live_sha
+        if set_moved or sha_moved:
+            redef = redefined_checks(prev, live_bodies)
+            stale.append((doc, best, prev.get("out_of"), len(prev_universe), score,
+                          out_of, "set" if set_moved else "bodies"))
             not_compared[doc] = {"why": "stale-mark",
                                  "marked": "%s/%s" % (best, prev.get("out_of")),
                                  "now": "%d/%d" % (score, out_of),
-                                 "mark_universe_sha": prev.get("universe_sha") or "",
-                                 "mark_out_of": prev.get("out_of")}
+                                 "mark_universe_sha": prev_sha,
+                                 "mark_out_of": prev.get("out_of"),
+                                 "stale_because": ("the set of checks changed"
+                                                   if set_moved else
+                                                   "same ids, redefined: "
+                                                   + (", ".join(redef) or
+                                                      "(bodies not recorded on the mark)"))}
+            if redef:
+                redefined_seen.update(redef)
             if recut_ok and not check_only:
                 old = {k: prev.get(k) for k in ("best", "out_of", "universe_n")}
                 old["universe_sha"] = prev.get("universe_sha") or ""
@@ -525,6 +566,9 @@ def main(argv):
                                 "failed": sorted(failed),
                                 "universe": sorted(universe),
                                 "universe_n": N, "universe_sha": live_sha,
+                                "id_sha": digest(universe),
+                                "check_bodies": {k: live_bodies[k] for k in universe
+                                                 if k in live_bodies},
                                 "superseded": hist[-4:]}
             continue
 
@@ -570,7 +614,10 @@ def main(argv):
             ratchet[doc] = {"best": max(score, best), "out_of": out_of,
                             "failed": sorted(failed),
                             "universe": sorted(universe),
-                            "universe_n": N, "universe_sha": live_sha}
+                            "universe_n": N, "universe_sha": live_sha,
+                            "id_sha": digest(universe),
+                            "check_bodies": {k: live_bodies[k] for k in universe
+                                             if k in live_bodies}}
 
     # A store whose numbers are counted out of two different universes must not be
     # written at all: every write would fold one instrument's number into the
@@ -655,10 +702,22 @@ def main(argv):
         print("  STALE marks (measured by a retired instrument): %d" % len(stale))
         print("      %d of them counted out of %s, the live instrument has %d."
               % (len(stale),
-                 ", ".join(sorted({str(o) for _d, _b, o, _n, _s, _no in stale})), N))
-        for doc, best, po, pun, score, out_of in stale[:8]:
-            print("      %-40s marked %2s/%s, now %2d/%d"
-                  % (doc[:40], best, po, score, out_of))
+                 ", ".join(sorted({str(o) for _d, _b, o, _n, _s, _no, _w in stale})), N))
+        why_sets = {}
+        for row in stale:
+            why_sets.setdefault(row[6], 0)
+            why_sets[row[6]] += 1
+        if why_sets.get("bodies"):
+            print("      %d of them by a REDEFINED CHECK - same ids, different question."
+                  % why_sets["bodies"])
+            if redefined_seen:
+                print("      redefined since those marks: %s"
+                      % ", ".join(sorted(redefined_seen)[:12]))
+        for row in stale[:8]:
+            doc, best, po, pun, score, out_of, why = row
+            print("      %-40s marked %2s/%s, now %2d/%d%s"
+                  % (doc[:40], best, po, score, out_of,
+                     "" if why == "set" else "  [redefined check]"))
         if len(stale) > 8:
             print("      ... and %d more" % (len(stale) - 8))
         print("      These are NOT compared, NOT carried and NOT replaced. They need")

@@ -43,7 +43,8 @@ STORE = os.path.join(HERE, "RESULTS.jsonl")
 # way to make that impossible is for each row to say which instrument made it.
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
-from instrument import CHECK_RE, digest, live_universe, stamp_of  # noqa: E402
+from instrument import (CHECK_RE, body_map, digest, live_universe,  # noqa: E402
+                        universe_sha, stamp_of)
 
 # The human-readable table the gate checks. record.py used to only read this file; the
 # fixer was told to hand-edit it, which is twenty rows of six columns per attempt.
@@ -55,8 +56,13 @@ BASE = os.path.join(HERE, "BASELINE.md")
 STORE_TXT = os.path.join(HERE, "RESULTS-TXT.jsonl")
 
 
-def stamp_universe(e, live_ids, live_sha):
+def stamp_universe(e, live_ids, live_sha, txt=False):
     """Write the instrument that produced this row onto the row itself.
+
+    The stamp is the BODY sha (instrument.universe_sha), not the id-list sha. A row
+    measured before 13 Nov carries the id-list one, and the two are never equal, so
+    every such row reads as what it is: taken by an instrument that cannot be shown
+    to have asked the same questions.
 
     The row's own `values` names every check the verifier computed, so it is the
     best evidence of which instrument measured it and it is preferred. When those
@@ -69,12 +75,12 @@ def stamp_universe(e, live_ids, live_sha):
     total = e.get("total")
     if keys and total and len(keys) == total:
         e["universe"] = keys
-        e["universe_sha"] = digest(keys)
+        e["universe_sha"] = universe_sha(keys, txt)
         e["universe_n"] = len(keys)
         e["universe_source"] = "values"
     elif keys:
         e["universe"] = keys
-        e["universe_sha"] = digest(keys)
+        e["universe_sha"] = universe_sha(keys, txt)
         e["universe_n"] = len(keys)
         e["universe_source"] = "values (total disagrees: %s)" % total
     elif total:
@@ -87,6 +93,13 @@ def stamp_universe(e, live_ids, live_sha):
         e["universe_sha"] = live_sha
         e["universe_n"] = len(live_ids)
         e["universe_source"] = "live (row carried no total)"
+    # Per-check body digests, so the next reader can say WHICH checks were redefined
+    # rather than only that the stamp moved. 54 ids x 12 hex is 800 bytes on a row
+    # that already carries every value it was scored on.
+    if e.get("universe"):
+        m, _err = body_map(txt)
+        e["check_bodies"] = {k: m[k] for k in e["universe"] if k in m}
+        e["id_sha"] = digest(e["universe"])
     return e
 
 
@@ -181,8 +194,9 @@ def append(entries, store=None):
     existing = load(store)
     key = lambda e: (e.get("round"), e.get("engine"), e.get("doc"))
     index = {key(e): e for e in existing}
+    txt_mode = store == STORE_TXT
     for e in entries:
-        stamp_universe(e, ids, sha)
+        stamp_universe(e, ids, sha, txt_mode)
         # Replacing a row measured by a DIFFERENT instrument is not an update, it is
         # a change of yardstick under the same key. It is allowed - a re-measurement
         # is the only cure for a stale row - but it is never silent.
@@ -400,7 +414,7 @@ def main(argv):
         for e in rows:
             if e.get("universe_sha") is not None and e.get("universe_n") is not None:
                 continue
-            stamp_universe(e, ids, sha)
+            stamp_universe(e, ids, sha, store == STORE_TXT)
             added += 1
         with open(store, "w", encoding="utf-8") as f:
             for e in sorted(rows, key=lambda e: (e.get("round", 0), e.get("doc", ""))):

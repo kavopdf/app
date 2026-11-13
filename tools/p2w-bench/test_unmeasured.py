@@ -39,8 +39,8 @@ import sys
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-COPIES = ("ratchet.py", "instrument.py", "verify_google.py", "unmeasured.py",
-          "record.py", "trace.py")
+COPIES = ("ratchet.py", "instrument.py", "checkbody.py", "verify_google.py",
+          "unmeasured.py", "record.py", "trace.py")
 
 results = []
 
@@ -58,7 +58,16 @@ def live():
 
 
 def sha(ids):
-    return hashlib.sha1("\n".join(sorted(ids)).encode()).hexdigest()[:12]
+    """The stamp a row or a mark carries: the instrument's name for this set.
+
+    It is the BODY sha (instrument.universe_sha), not the id-list sha. These fixtures
+    exist to model "measured by the instrument that is live now" against "measured by
+    one that is not", and since 13 Nov the second case includes a verifier that asks
+    a different question under the same ids - so the id-list digest would make a
+    redefined check's marks look live, which is the bug test_bodysha.py pins."""
+    sys.path.insert(0, HERE)
+    import instrument
+    return instrument.universe_sha(ids)
 
 
 def sandbox(n=3):
