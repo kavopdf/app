@@ -2656,11 +2656,76 @@ public final class PdfToWord {
         // its own and the Arabic document gained three lines that are a bare "ً" - and, worse,
         // pushed every line after them one place out of step with the reference.
         List<Line> kept = new ArrayList<>(split.size());
-        for (Line ln : split) if (!markOnly(ln.text)) kept.add(ln);
+        List<Line> orphanMarks = new ArrayList<>();
+        for (Line ln : split) {
+            if (markOnly(ln.text)) orphanMarks.add(ln);
+            else kept.add(ln);
+        }
+        for (Line orphan : orphanMarks) attachMarks(orphan, kept);
         split = kept;
         split.addAll(ring);
         split.addAll(stamp);
         return split;
+    }
+
+    /**
+     * Puts a baseline that holds nothing but combining marks onto the line it decorates.
+     *
+     * <p>Deleting it was the old behaviour, and it deleted a character a reader sees. An Arabic
+     * tanween is drawn two to three points above the baseline of the letter it belongs to, so
+     * the clustering puts it on a line of its own; the line then carried nothing but "\u064B",
+     * markOnly() called it "nothing a reader would see", and the mark left the document. On
+     * 77_arabic_rtl_document that removed all three fathatan: "يوماً" became "يوما", "كيساً"
+     * became "كيسا", "كيلوغراماً" became "كيلوغراما" - three words a reader reads and a word
+     * count cannot find.
+     *
+     * <p>The mark is inserted into the host's glyph list at its own x, because the list is in
+     * visual (x-ascending) order and logicalOrder() reverses the finished string: a mark
+     * sitting just left of its base in visual order lands just right of it in logical order,
+     * which is where a combining mark belongs. The host's text is then rebuilt from its
+     * glyphs, so the mark is part of the word rather than a line of its own.
+     *
+     * <p>A mark with no line to attach to is KEPT, not dropped. There is no case in which
+     * deleting it is right: the worst a stray mark can do is add a line, and a line can be
+     * seen, while a deleted character cannot.
+     */
+    private static void attachMarks(Line orphan, List<Line> kept) {
+        Line host = null;
+        float bestD = Float.MAX_VALUE;
+        for (Line k : kept) {
+            if (k.rotated || k.glyphs.isEmpty()) continue;
+            float dy = Math.abs(orphan.y - k.y);
+            // A mark sits within about a quarter of an em of its base's baseline.
+            if (dy > Math.max(4f, orphan.size * 1.2f)) continue;
+            float dx = 0f;
+            if (orphan.x < k.left) dx = k.left - orphan.x;
+            else if (orphan.x > k.right) dx = orphan.x - k.right;
+            float d = dy * 3f + dx;
+            if (d < bestD) { bestD = d; host = k; }
+        }
+        if (host == null) { kept.add(orphan); return; }
+        for (Glyph mark : orphan.glyphs) {
+            // The glyph list is in the order the page DREW the line, and textOf() reverses an
+            // RTL line to get logical order. So a mark placed immediately BEFORE its base in
+            // the list comes out immediately AFTER it in the string - which is where a
+            // combining mark belongs. Placing it by x instead put the mark on the wrong side
+            // of the alef ("يومًا" for "يوماً") because a zero-width mark's x is its own pen
+            // position, a fraction of a point off the letter it decorates.
+            int base = -1;
+            float best = Float.MAX_VALUE;
+            for (int i = 0; i < host.glyphs.size(); i++) {
+                Glyph g = host.glyphs.get(i);
+                if (g.text.isEmpty() || markOnly(g.text)) continue;
+                float d = Math.abs(g.x - mark.x);
+                if (d < best) { best = d; base = i; }
+            }
+            host.glyphs.add(base < 0 ? host.glyphs.size() : base, mark);
+        }
+        host.text = textOf(host.glyphs);
+        for (Glyph g : orphan.glyphs) {
+            host.left = Math.min(host.left, g.x);
+            host.right = Math.max(host.right, g.x + g.width);
+        }
     }
 
     /** True when a string carries nothing a reader would see: spaces and combining marks only. */
@@ -6775,6 +6840,13 @@ public final class PdfToWord {
                 || d == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC;
     }
 
+    /** True for a combining mark - a character with no advance and no direction of its own. */
+    private static boolean isCombiningMark(char c) {
+        int t = Character.getType(c);
+        return t == Character.NON_SPACING_MARK || t == Character.COMBINING_SPACING_MARK
+                || t == Character.ENCLOSING_MARK;
+    }
+
     /**
      * A right-to-left line comes out of the PDF in visual order - the last letter first - which
      * reads as mirror writing. Reversing the whole line gives logical order, and each run of
@@ -6807,8 +6879,14 @@ public final class PdfToWord {
         int i = 0;
         while (i < sb.length()) {
             if (isRtl(sb.charAt(i))) { i++; continue; }
+            // A combining mark has no direction of its own - it takes the direction of the
+            // letter it decorates - so it is neither reversed with a Latin run nor carried
+            // into one. Left in the run, the whole-line reversal has already put it on the
+            // correct side of its base, and the per-run reversal then walked it across the
+            // space that follows: "يوماً من" came out "يوما ًمن".
+            if (isCombiningMark(sb.charAt(i))) { i++; continue; }
             int j = i;
-            while (j < sb.length() && !isRtl(sb.charAt(j))) j++;
+            while (j < sb.length() && !isRtl(sb.charAt(j)) && !isCombiningMark(sb.charAt(j))) j++;
             String run = sb.substring(i, j);
             if (run.trim().length() > 0) {
                 // A run of letters or digits is turned back so "2024" stays "2024".

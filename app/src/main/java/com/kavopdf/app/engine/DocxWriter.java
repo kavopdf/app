@@ -4564,7 +4564,21 @@ public final class DocxWriter {
                     inner.append("</w:rPr>");
                     String[] parts = cell.split("\n");
                     for (int q = 0; q < parts.length; q++) {
-                        if (q > 0) inner.append("<w:br/>");
+                        if (q > 0) {
+                            // The break must carry a SPACE with it. A cell holds two lines of
+                            // the page, and a line break is a word boundary to a reader but
+                            // nothing at all to a text extractor: the words either side of a
+                            // bare <w:br/> come out welded. Measured on 77_arabic_rtl_document,
+                            // whose item cells hold "،قهوة عربية مغسولة" over "غربال17",
+                            // "قهوة روبوستا، غربال" over "15" and "شحن إلى ميناء" over
+                            // "نيوبورت": the docx read "مغسولةغربال17", "غربال15" and
+                            // "ميناءنيوبورت", so four words a reader sees on two lines counted
+                            // as none of them.
+                            if (!parts[q - 1].isEmpty() && !parts[q - 1].endsWith(" ")) {
+                                inner.append("<w:t xml:space=\"preserve\"> </w:t>");
+                            }
+                            inner.append("<w:br/>");
+                        }
                         inner.append("<w:t xml:space=\"preserve\">").append(esc(parts[q]))
                                 .append("</w:t>");
                     }
