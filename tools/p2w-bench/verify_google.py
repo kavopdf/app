@@ -20,9 +20,10 @@ EXIT
 
 THRESHOLDS (a document passes only if every one holds)
   completeness  every count and every style attribute matches the source
-  position      median dy < 3 pt, worst dy < 15 pt, every page within half a line of
-                its own pitch and its p90 within one line (20_line_placement),
-                order > 95 %
+  position      one displacement standard: on every page, the number of runs further
+                than clamp(0.35*size, 1.5, 4.5) pt from their source baseline must not
+                exceed max(2, ceil(0.05*n)) (18_displacement); the single worst run must
+                also be under 15 pt (19_worst_dy); order > 95 %
   visual        no invisible text, no text-on-text, no page overflow, no extra page
 """
 import os, sys, json, re, collections, statistics, difflib, math
@@ -1593,89 +1594,77 @@ def compare(src_path, gd_path, docx_path=None):
     # rule is 90 % and a floor of the product is not 90 %.
     checks["17_matched_runs"] = (len(s_runs), matched,
                                  matched >= -(-len(s_runs) * 9 // 10))
-    # abs(), because med_dy is signed. Without it a document shifted UP by any
-    # amount passed: med_dy = -12 is less than 3, so the comparison said fine
-    # while every line sat twelve points above where it belonged. Found by
-    # mutating a real document upward and watching this check stay green.
-    checks["18_median_dy"] = (0, med_dy, abs(med_dy) < 3.0)
-    checks["19_worst_dy"] = (0, worst_dy, worst_dy < 15.0)
-    # ---- 20: is the text on each page in the place that page put it? --------
+    # ---- 18: the displacement standard --------------------------------------
     #
-    # The check this replaces asked "what share of the document's runs sit within 10 pt of the
-    # source run in y". Four things are wrong with that question, each measured on corpus-v1
-    # (211 documents) on 13 Nov:
+    # Three checks used to ask this question and gave three answers: 18 failed at 4 pt, 20
+    # tolerated 10, 19 tolerated 15. This is one standard, and it is the only one of the three
+    # calibrated against what a user SEES rather than against a round number. Measured on
+    # rendered pages: 2 pt 3.4 % ink contact, 3 pt 5.3 % (the knee), 4 pt 15.8 %, 10 pt 59.7 %
+    # (text printed on text), 15 pt 71.7 % with 46 % of lines inverting reading order.
     #
-    #  1. A SHARE OF A DOCUMENT IS A RULER FOR ITS LENGTH. Under any per-line advance residual
-    #     r the k-th line of a page is k*r out, so the share is min(1, floor(10/r)/n) - a
-    #     function of n and of nothing else. Measured on the 211 recorded Google renders, the
-    #     product share x lines-per-page has a median of 9.9 lines for every document, and the
-    #     median share falls 49 -> 34 -> 24 -> 19 as lines per page rises through 16-25, 26-35,
-    #     36-50, 51+. The statistic reports "about ten lines fit inside the band".
-    #  2. A SHARE HIDES MAGNITUDE. 361_product_catalogue_grid scores 97 and PASSES with a run
-    #     289.3 pt from its source baseline; on the LibreOffice render the same document scores
-    #     97 with a 288.8 pt run.
-    #  3. A BAND IN POINTS MEANS A DIFFERENT THING AT EVERY SIZE AND PITCH. 10 pt is 1.35 em at
-    #     the corpus median run size (7.4 pt) and 1.0 em at the 90th percentile; it is 1.8 lines
-    #     on a page with a 5.5 pt pitch (343_air_waybill) and 0.35 line on a 28.2 pt page.
-    #  4. IT MEASURES THE DOCUMENT, NOT THE PAGE, so a page that has moved as a block is
-    #     outvoted by the pages that have not - and it scores non-horizontal text as if dy were
-    #     a displacement (24 of 208 documents carry such runs; 59 of 83 on
-    #     05_round_company_seal_curved_text).
+    # 18 as it stood was a POOLED MEDIAN against a fixed 3 pt, and a median is a majority rule:
+    # 10 of 21 lines 20 pt out reads 0.0 and PASSED, and so did 9 of 10 pages 20 pt low. Judging
+    # each page's median instead of the document's changes nothing on either case - the worst
+    # page's median is that same 0.0 - so a per-page-then-median rewrite is not a fix, it is the
+    # same majority rule wearing a page loop. Constructed and measured 13 Nov; it passes both.
     #
-    # It now asks, page by page, in lines, against that page's own pitch:
-    #     (a) |median dy| <= 0.5 line   the page sits in its slot
-    #     (b) p90 |dy|  <= 1.0 line     nine runs in ten are on their own line
-    #     (c) the page has a matched run at all
-    # 0.5 line is the midpoint between a run's own baseline and its neighbour's - below it the
-    # run cannot be said to be on a different line, above it it is nearer the neighbour. 1.0
-    # line is a different line of text. Both are in lines, so neither changes meaning with the
-    # type size, and neither grows with the document. p90 and not max: the single worst run is
-    # 19_worst_dy's question, and asking it here too gives one fault two votes.
-    page_pitch, page_horiz = {}, {}
+    # What is here instead:
+    #     tolerance = clamp(0.35 * size, 1.5, 4.5) pt   -- 0.35 em, floored and capped, because
+    #                                                   3 pt is 0.4 em at 7.4 pt type and 0.2 em
+    #                                                   at 15 pt, so a fixed band means a
+    #                                                   different thing at every size
+    #     a page fails when n_out > max(2, ceil(0.05 * n)) on THAT PAGE, or when every run on
+    #     the page is out (a page moved as a block, however few runs it carries)
+    # Counting runs rather than averaging them is what makes it honest about a whole page
+    # instead of a majority: ten lines out of twenty-one is 48 % and fails.
+    #
+    # The budget is per page, NOT per document. A document-wide 5 % budget is a ruler for
+    # document length - it was measured here: one page of 20 runs moved 20 pt passes at 20 pages
+    # (400 runs) and fails at 10 pages (200 runs), so the same fault is a defect in a short
+    # document and not in a long one. That is the exact failure mode 20 was rewritten to remove
+    # ("a share of a document is a ruler for its length"), and it is not reintroduced here.
+    #
+    # Rotated and curved text is excluded: on those runs dy is not a displacement, and
+    # 05_round_company_seal_curved_text has 59 of 83 runs that way. That is 35_rotation's
+    # question. An empty page stays a failure - the old rule passed a render with no text layer
+    # at all (15_stamp_on_scanned_page) by scoring 0 of 0.
+    #
+    # It does NOT replace 19_worst_dy, and 19 is why the universe goes 57 -> 56 and not 55. A
+    # count with a 5 % budget is blind to ONE catastrophic run by construction: a single run
+    # 289.3 pt out of 200 is n_out = 1 and passes here. 361_product_catalogue_grid is exactly
+    # that document, and 19 is the check that catches it. Bulk and tail are two questions;
+    # asking both in one gives one fault two votes and loses the tail (the same reasoning 20
+    # used when it chose p90 over max).
+    flat = set()
     for i, p in enumerate(src):
-        ys, sizes, horiz = set(), [], set()
         for blk in p.get_text("dict")["blocks"]:
             if blk.get("type") != 0:
                 continue
             for ln in blk.get("lines", []):
-                flat = abs(ln.get("dir", (1, 0))[1]) <= 0.02
+                if abs(ln.get("dir", (1, 0))[1]) > 0.02:
+                    continue
                 for sp in ln.get("spans", []):
-                    if not sp.get("text", "").strip():
-                        continue
-                    top = round(sp["bbox"][1], 2)
-                    ys.add(round(top, 1))
-                    sizes.append(round(sp["size"], 1))
-                    if flat:
-                        horiz.add((top, norm_word(sp["text"])))
-        ordered = sorted(ys)
-        gaps = [b - a for a, b in zip(ordered, ordered[1:]) if 1 < b - a < 200]
-        # The ruler is never allowed below the type on the page: a curved stamp's baselines are
-        # 3 pt apart and "lines" is not a unit there.
-        floor_ = 0.9 * median(sizes) if sizes else 0.0
-        page_pitch[i] = max(median(gaps) if gaps else 0.0, floor_)
-        page_horiz[i] = horiz
-    doc_pitch = median([v for v in page_pitch.values() if v > 0]) or 12.0
+                    if sp.get("text", "").strip():
+                        flat.add((i, round(sp["bbox"][1], 2), sp["text"]))
 
-    per_page = collections.defaultdict(list)
-    for r, g in pairs:
-        if (r["y"], norm_word(r["text"])) not in page_horiz.get(r["page"], ()):
-            continue                    # rotated or curved: 35_rotation's question, not this one
-        per_page[r["page"]].append(g["y"] - r["y"])
+    def _tol(size):
+        return min(max(0.35 * size, 1.5), 4.5)
 
     bad_pages = []
     for pg in sorted(set(r["page"] for r in s_runs)):
-        pitch = page_pitch.get(pg) or doc_pitch
-        ds = per_page.get(pg, [])
+        ds = [(g["y"] - r["y"], r["size"]) for r, g in pairs
+              if r["page"] == pg and (r["page"], r["y"], r["text"]) in flat]
         if not ds:
-            # Text was on this page and none of it landed anywhere this check can see. The old
-            # rule passed an empty dys at 100 % (15_stamp_on_scanned_page, a render with no text
-            # layer at all). An empty page is a failure, not a pass.
             bad_pages.append(pg)
             continue
-        e = sorted(abs(d) / pitch for d in ds)
-        if abs(median(ds) / pitch) > 0.5 or e[int(0.9 * (len(e) - 1))] > 1.0:
+        n_out = sum(1 for d, sz in ds if abs(d) > _tol(sz))
+        # The 2-run grace is for STRAY runs, so it may not swallow a page that has been moved
+        # as a block: a two-run page shifted 12 pt is n_out == n == 2, and a bare
+        # max(2, ...) passed it. Everything out is a displaced page whatever its run count.
+        if n_out > max(2, -(-len(ds) * 5 // 100)) or n_out == len(ds):
             bad_pages.append(pg)
-    checks["20_line_placement"] = (0, len(bad_pages), not bad_pages)
+    checks["18_displacement"] = (0, len(bad_pages), not bad_pages)
+    checks["19_worst_dy"] = (0, worst_dy, worst_dy < 15.0)
     checks["21_median_dx"] = (0, med_dx, abs(med_dx) < 3.0)
 
     # reading order: the sequence of normalised words
