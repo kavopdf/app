@@ -3093,8 +3093,72 @@ def compare(src_path, gd_path, docx_path=None):
                         r["y"] < o["y1"] - 1 and r["y1"] > o["y"] + 1):
                     s_on_text += 1
                     break
+    # THE CLASS IS TWO POPULATIONS AND THE COUNT CANNOT TELL THEM APART.
+    #
+    # Measured on 22728b1 over the 211-document corpus: 26_text_overlap fails 15 documents
+    # with 588 counted overlaps between them, and those 588 are not one defect. Asking the
+    # .docx which paragraph each overlapping run belongs to splits them cleanly:
+    #
+    #   539  both runs are in the SAME w:p - a line the paragraph wrapped onto a second
+    #        line, whose advance collapsed. A paragraph is written with a line box of
+    #        1.38 * size twips, lineRule="exact" (DocxWriter.java:110) - 0.069 em, 0.6 pt
+    #        at 8.5 pt - while w:before is charged once per PARAGRAPH. So line 2 of a
+    #        wrapped paragraph sits 0.6 pt under line 1 and every line after it adds
+    #        another 0.6. On 360_restaurant_menu the cell is 1437 twips = 71.85 pt and the
+    #        page drew "Chicken Malai Kebab" 92.12 pt wide in it, so "Kebab" lands 0.60 pt
+    #        under "Chicken Malai"; on 350_question_paper a 43.4 pt cell holds a 15-line
+    #        question and the cascade reaches 4.8 pt - 373 of the 588 on its own.
+    #
+    #   47   the two runs are in DIFFERENT paragraphs - no wrap and no collapsed advance.
+    #        One line was placed on top of another: the flow after a table resuming from a
+    #        table bottom the renderer did not draw (17_three_column_widths_txtpos 7,
+    #        itr-computation-with-slab-table 5), two columns written into one flow
+    #        (policy-2col-spanning-section-heading 4, 69_two_col_legal_numbered_clauses 2),
+    #        a rotated stamp box off its y (02_stamp_rotated_15deg_upleft 5), a line pushed
+    #        past the right margin (marksheet-subject-left-marks-right 5,
+    #        table-of-contents-dot-leaders 5).
+    #
+    #   2    neither run is in the flow at all - it is inside an anchored text box, i.e. a
+    #        stamp drawn over the page. 59_shape_anchor's question.
+    #
+    # Reported, not scored: the pass/fail rule is unchanged, the universe stays at 49, and
+    # the split is attached only to a document that already fails - so every passing
+    # document's JSON is byte-identical to what it was. Without it the two halves keep
+    # being read as one number, which is how a fix for one is read as a regression of the
+    # other.
+    _p26 = None
+    if on_text > max(s_on_text, 2, len(g_runs) // 50):
+        _p26 = {"wrap": 0, "line_on_line": 0, "anchored": 0}
+        _paras = []
+        if docx_path and os.path.exists(docx_path):
+            try:
+                _xml = zipfile.ZipFile(docx_path).read("word/document.xml")
+                _paras = [re.sub(r"\s+", "",
+                                 "".join(re.findall(r"<w:t[^>]*>(.*?)</w:t>", _s, re.S)))
+                          for _s in _xml.decode("utf-8", "replace").split("</w:p>")]
+                _paras = [q for q in _paras if q]
+            except Exception:
+                _paras = []
+        for p in gd:
+            rs = runs(p)
+            for r in rs:
+                for o in rs:
+                    if o is r:
+                        continue
+                    if (r["x"] < o["x1"] - 1 and r["x1"] > o["x"] + 1 and
+                            r["y"] < o["y1"] - 1 and r["y1"] > o["y"] + 1):
+                        a = re.sub(r"\s+", "", r["text"])
+                        b = re.sub(r"\s+", "", o["text"])
+                        if any(a in q and b in q for q in _paras):
+                            _p26["wrap"] += 1
+                        elif any(a in q for q in _paras) and any(b in q for q in _paras):
+                            _p26["line_on_line"] += 1
+                        else:
+                            _p26["anchored"] += 1
+                        break
     checks["26_text_overlap"] = (s_on_text, on_text,
-                                 on_text <= max(s_on_text, 2, len(g_runs) // 50))
+                                 on_text <= max(s_on_text, 2, len(g_runs) // 50),
+                                 _p26)
     checks["27_text_off_page"] = (s_off_page, off_page, off_page <= s_off_page)
     # The render may not clip MORE than the source already did. A document whose own text
     # sits at the page edge is not a defect; text that only the conversion pushed there is.
@@ -3229,7 +3293,11 @@ def compare(src_path, gd_path, docx_path=None):
         "total": len(checks),
         "failed": sorted(failed),
         "ok": not failed,
-        "checks": {k: {"source": v[0], "render": v[1], "ok": bool(v[2])}
+        # A check may carry a fourth element: what its count is MADE OF. Reported only,
+        # never scored - a document that passes writes no detail and its JSON is
+        # unchanged. 26_text_overlap is the one that needs it (see the split there).
+        "checks": {k: dict({"source": v[0], "render": v[1], "ok": bool(v[2])},
+                           **({"detail": v[3]} if len(v) > 3 and v[3] is not None else {}))
                    for k, v in sorted(checks.items())},
     }
 
