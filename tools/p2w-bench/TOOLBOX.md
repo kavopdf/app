@@ -111,9 +111,47 @@ ratchet
   FAIL - the bar fell
 ```
 
-Exit **0** the bar held or rose, **1** something fell. It has no third code: with no
-BASELINE.md to read there is nothing to compare and it exits 0, which is why a cron must
-never treat 0 as proof that measurement happened - check the row count for that.
+Exit **0** the bar held or rose, **1** something fell, **2** refused (no instrument, or a
+waiver with no reason), **3** UNMEASURED - nothing fell, but something could not be
+compared.
+
+**Three answers, because there are three states.** On 13 Nov the instrument retired five
+checks and added two, and all 211 marks had been taken by the instrument that no longer
+exists. Every document was then in a third state, and the ratchet had only two answers for
+it: "FAIL - the bar fell" (a false accusation, on a corpus where nothing had moved) or
+`--allow-stale`, which printed PASS and exited 0 (a green light over 211 documents nobody
+had asked about, with the `--reason` it was given silently discarded). Both were wrong.
+
+```
+python3 tools/p2w-bench/ratchet.py            # check and raise a mark
+python3 tools/p2w-bench/ratchet.py --check    # check only, never raise
+python3 tools/p2w-bench/ratchet.py --strict   # also fail on any document never scored
+python3 tools/p2w-bench/ratchet.py --allow-stale --reason "<what you are accepting>"
+python3 tools/p2w-bench/ratchet.py --recut --reason "<why this mark is superseded>"
+python3 tools/p2w-bench/ratchet.py --reset --reason "<why the yardstick changed>"
+```
+
+A document whose mark was taken by another instrument has not held its bar and has not
+fallen below it: **it has not been asked.** Exit 3 says exactly that, and it is not exit 0,
+so every caller that already treats non-zero as "do not commit" stays safe.
+
+`--allow-stale` is **not** a pass. It writes the gap down, with a reason, and still exits 3:
+
+| file | written by | meaning |
+|---|---|---|
+| `UNMEASURED.json` | every UNMEASURED run | which documents were compared, which were not, and for each one why |
+| `WAIVER.json` | `--allow-stale --reason` only | the act of accepting the gap, and the only place the reason can come from |
+| `UNMEASURED-HISTORY.jsonl` | `--allow-stale` | one line per waiver, so a gap being paid down can be told from one that is growing |
+
+`--allow-stale` without `--reason` is refused (exit 2). Commit these three with the engine
+change: they are the evidence that a commit through a gap was decided, not stumbled into.
+Whether a recorded gap may be committed through is `unmeasured.py`'s decision, never the
+flag's - see the commit-gate.sh section.
+
+**Never re-label a mark.** A count out of 59 is not a count out of 56, and a store that
+says otherwise is the drift the denominator guard exists to catch. If a mark's instrument
+has retired, the document must be re-measured; `--recut` re-marks one from a fresh row and
+archives the old mark inside it.
 
 It holds, per document, the best score ever reached AND the set of failing checks at
 that point. Two things count as a regression: the score falling, and a check that
@@ -125,19 +163,10 @@ bind a larger one. Do not try to out-think it and do not edit `RATCHET.json` by 
 
 
 **`--txt`** uses `RATCHET-TXT.json` and takes its scores from `RESULTS-TXT.jsonl` and its
-check universe from `verify_txt.py --list-checks`. There is no BASELINE-TXT.md: the .docx
+check universe from the .txt verifier's own check list. There is no BASELINE-TXT.md: the .docx
 path keeps a table a human also reads, and the .txt path has no reader but this one, so
 the store is the truth. Both ratchets must be run - one conversion writes both outputs,
 and each can only see its own half.
-
-    python3 tools/p2w-bench/round.py --release-fixer [--force]
-      Release the fixer slot. Exit 1 with a refusal when the run is under 25 minutes old and has
-      recorded fewer than two attempts - the slot is good for 45 minutes and one attempt takes
-      ten, so releasing there hands the rest of the hour to nobody. `--force` releases anyway and
-      writes a FORCED line into RUN-LOG.md; use it for a broken build, a blocked Drive or an empty
-      class list, and say why in INCIDENTS.md.
-      It does not refuse when no class is still OPEN: a finished round must be able to release and
-      close, or this check would block the only exit from the fix phase.
 
 ## round.py — whose turn it is
 
@@ -156,6 +185,15 @@ python3 tools/p2w-bench/round.py --apk-status    # 0 = may ship, 1 = no (prints 
 python3 tools/p2w-bench/round.py --mark-apk-shipped <version>
 python3 tools/p2w-bench/round.py --force-round <n>   # set the round by hand; recovery only
 ```
+
+    python3 tools/p2w-bench/round.py --release-fixer [--force]
+      Release the fixer slot. Exit 1 with a refusal when the run is under 25 minutes old and has
+      recorded fewer than two attempts - the slot is good for 45 minutes and one attempt takes
+      ten, so releasing there hands the rest of the hour to nobody. `--force` releases anyway and
+      writes a FORCED line into RUN-LOG.md; use it for a broken build, a blocked Drive or an empty
+      class list, and say why in INCIDENTS.md.
+      It does not refuse when no class is still OPEN: a finished round must be able to release and
+      close, or this check would block the only exit from the fix phase.
 
 `--phase` prints one bare word. Compare it, do not parse the status output.
 
@@ -518,14 +556,67 @@ Exits 0 immediately when the engine did not change - there is nothing to prove.
 When it did, three things are required and the gate refuses on any of them:
 
 ```
-ratchet.py exits 0                     no document fell
-precommit.sh --no-corpus exits 0       it builds, the guards pass
-BASELINE.md, RESULTS.jsonl, RATCHET.json changed in the same working tree
+ratchet.py exits 0, or its gap is waived and bounded   nothing fell, and nothing is hidden
+precommit.sh --no-corpus exits 0                      it builds, the guards pass
+BASELINE.md, RESULTS.jsonl, RATCHET.json changed       the numbers this fix produced are here
 ```
 
 The third is the one that matters. "I ran the ratchet" is a claim;
 "RATCHET.json changed with the engine" is evidence, and evidence cannot be
 misremembered. On pass it writes `.p2w-gate-ok` with the engine hash and the time.
+
+**What a red ratchet means here.** The gate does not ask "did it exit 0" any more, because
+a guard that is always red gets stepped over. It reads the ratchet's three verdicts:
+
+```
+exit 0  PASS        the bar held or rose                                  -> ok
+exit 1  FAIL        a document fell below its best                        -> NO COMMIT
+exit 2  REFUSED     no instrument, or a waiver with no reason             -> NO COMMIT
+exit 3  UNMEASURED  nothing fell, some marks could not be compared        -> see below
+```
+
+`UNMEASURED` is not a failure and it is not a pass. The gate then runs
+`unmeasured.py`, which decides whether *this particular gap* may be committed through. It
+may, only when all of these hold:
+
+1. `WAIVER.json` exists and names the instrument in force right now - a waiver signed under
+   a retired instrument authorises nothing.
+2. The waiver has a non-empty reason.
+3. Nothing became unmeasurable after the waiver was signed.
+4. **At least one document was actually compared under the live instrument.** A waiver over
+   a corpus where nothing was asked proves nothing about any document.
+5. **Every row that differs from HEAD in `RESULTS.jsonl` is stamped with the live universe
+   sha.** This is the rule the old gate was missing: it asked only that the evidence files
+   had *changed*, so a row measured by a retired verifier, or a cosmetic restamp, satisfied
+   it. A number produced by an instrument that no longer exists is not evidence about this
+   engine.
+6. The gap is not growing: no document compared at the last waiver has become uncomparable.
+7. The gap has not been carried for more than three waivers under one instrument. Three is
+   one run's worth of commits - a run does up to three attempts and commits between them -
+   so after that a measurement round has to land before another engine commit.
+
+Under a waiver `RATCHET.json` is allowed to stand still, and only under a waiver: while any
+row is counted out of a universe the instrument does not have, ratchet.py refuses to write
+the store at all, and demanding a new mark would demand the one thing the ratchet is right
+to refuse. `RESULTS.jsonl` and `BASELINE.md` are still required, and rule 5 has already
+proved that what moved in them came from the live instrument.
+
+There is no force flag and no option that waives on the gate's behalf. The gate never
+passes the ratchet's waiver flag itself - if it did, every commit would waive its own gap
+and that flag would be the silent pass it used to be. The waiver has to be written by whoever is asking to
+commit, with a reason, and `unmeasured.py` decides whether it is good enough.
+
+The token records which of the two passes happened:
+
+```
+engine=e24a060 time=... ratchet=pass
+engine=e24a060 time=... ratchet=unmeasured-waived waived="docx"
+```
+
+`--status` prints the current gap, its instrument and the waiver's reason, so "where does
+this tree stand" is answerable without running the gate. `--txt` selects the .txt half of
+the same check; both halves are run when the .txt store exists, and each keeps its own
+ledger, waiver and history.
 
 A CI job re-checks the same thing on every push: an engine change whose commit
 does not also touch those files turns the build red, so it can never ship.
@@ -572,6 +663,9 @@ and exits **1** if anything survived. A reset is a new attempt, not a deletion.
 |---|---|---|---|
 | `BASELINE.md` | baseline, fixer | all | one row per document: score, verdict, failing checks, engine, date |
 | `RATCHET.json` | ratchet.py | ratchet.py | best ever score + the failing set at that point |
+| `UNMEASURED.json` | ratchet.py | unmeasured.py | which documents this run could not compare, and why |
+| `WAIVER.json` | ratchet.py `--allow-stale` | unmeasured.py | the written acceptance of that gap, with its reason |
+| `UNMEASURED-HISTORY.jsonl` | ratchet.py `--allow-stale` | unmeasured.py | one line per waiver: is the gap being paid down or growing |
 | `RESULTS.jsonl` | record.py | record.py | per-check source vs render, per round, per engine |
 | `ROUND.json` | round.py | all | round, phase, fixer claim, shipped mark |
 | `DEFECT-CLASSES.md` | classify.py | fixer | ranked classes with status |

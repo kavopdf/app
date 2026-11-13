@@ -166,15 +166,26 @@ def main():
     rc, out = run(w, "ratchet.py")
     check("exit 1 when a check that passed now fails", rc == 1, "got %d" % rc)
     check("says which check newly failed", "32_stroke_lines" in out)
-    # a mark taken by a smaller verifier must not bind
+    # A mark taken by a smaller verifier must not bind - and it must not be called a
+    # pass either. This asserted rc == 0, which was the defect: a document whose mark
+    # was taken by another instrument was reported as having held its bar. It is
+    # UNMEASURED now, and 3 is the answer that says so without accusing the document.
     json.dump({"a": {"best": 31, "out_of": 50, "failed": ["09_font_names"],
                      "universe": uni[:31]}}, open(os.path.join(w, "RATCHET.json"), "w"))
     baseline_row(w, ["| a | 31/%d | FAIL | 09_font_names, 49_page_size | e | d |" % N])
-    rc, _ = run(w, "ratchet.py")
-    check("a weaker verifier's mark does not bind", rc == 0, "got %d" % rc)
-    # documented: only 0 and 1 exist
+    rc, out = run(w, "ratchet.py")
+    check("a weaker verifier's mark does not bind", rc == 3, "got %d" % rc)
+    check("and is called UNMEASURED, not a pass", "UNMEASURED" in out and "PASS" not in out)
+    check("and is recorded in the ledger",
+          os.path.exists(os.path.join(w, "UNMEASURED.json")))
+    # documented: 0 pass, 1 fell, 2 refused, 3 not asked
     src = open(os.path.join(w, "ratchet.py")).read()
-    check("ratchet has no third exit code", "return 2" not in src)
+    check("ratchet has all four exit codes", "return 3" in src and "return 2" in src)
+    check("and never exits 0 for an unmeasured run",
+          "UNMEASURED - the bar was not asked" in src)
+    # A waiver is a written act: no reason, no waiver.
+    rc, _ = run(w, "ratchet.py", "--allow-stale")
+    check("--allow-stale without --reason is refused", rc == 2, "got %d" % rc)
     shutil.rmtree(w, ignore_errors=True)
 
     # ---------------- round.py ----------------

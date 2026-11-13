@@ -45,16 +45,68 @@ WHAT IT DOES
   corpus. A stale mark stays exactly as measured until someone re-measures and
   passes --recut, which archives the old mark inside the new one.
 
+THREE ANSWERS, NOT TWO (13 Nov)
+  On 13 Nov the instrument retired five checks and added two - 59 became 56 - and
+  every one of the 211 marks became stale at once. The guard was right about that
+  and useless about it, because it had only two answers:
+
+    exit 1   printed "FAIL - the bar fell" on a run where no document had moved.
+             That is a false accusation, and the fixer's only way to answer a
+             false accusation is to ignore it.
+    --allow-stale
+             printed "PASS (--allow-stale)" and exited 0. That is worse: it
+             laundered 211 unasked documents into a green light, and the reason
+             it was told to give (--reason) was parsed and then thrown away -
+             it was only ever used by --recut.
+
+  Neither is the truth, and the truth is the third answer. A document whose mark
+  was taken by a retired instrument has not held its bar and has not dropped below
+  it: it has not been ASKED. So there are three verdicts, and they exit
+  differently so a caller cannot mistake one for another:
+
+    0  PASS        every scored document was compared against its mark under the
+                   instrument in force, and none fell
+    1  FAIL        a document fell, or a row contradicts itself
+    2  REFUSED     no instrument, or a waiver with no reason - cannot gate
+    3  UNMEASURED  nothing fell, but at least one document could not be compared
+
+  UNMEASURED is not a pass and it is not a failure, and it is deliberately not
+  exit 0: every existing caller treats non-zero as "do not commit", so the
+  default stays safe without anyone having to be told about the new code. What
+  turns it into permission is a separate, written act - see UNMEASURED.json below
+  and tools/p2w-bench/unmeasured.py, which decides whether the gap is small
+  enough, old enough and paid-down enough to commit through.
+
+  --allow-stale no longer means "pretend this is a pass". It means "record the
+  gap, with a reason, as a waiver" - it still exits 3. The gate reads the record;
+  the flag does not decide.
+
+WHAT IT RECORDS (the ledger)
+  UNMEASURED.json       the gap as it stands after this run: which documents were
+                        compared, which were not, and for each one why. Written
+                        on every UNMEASURED run, waived or not, so the gap is on
+                        disk even on a run nobody was watching.
+  WAIVER.json           written only by --allow-stale --reason. It is the act of
+                        accepting the gap, and it is the only file that can
+                        carry a reason into the gate.
+  UNMEASURED-HISTORY.jsonl
+                        one line per waiver, deduplicated, so the gate can tell a
+                        gap that is being paid down from one that is growing.
+  The .txt half keeps its own three, suffixed -TXT, for the same reason the marks
+  are separate: one conversion writes both outputs and neither may hide behind
+  the other.
+
 USAGE
   python3 tools/p2w-bench/ratchet.py            # check and raise
-  python3 tools/p2w-bench/ratchet.py --check    # check only, do not raise
-  python3 tools/p2w-bench/ratchet.py --strict   # also fail on any unmeasured document
-  python3 tools/p2w-bench/ratchet.py --allow-stale   # report drift, do not fail on it
+  python3 tools/p2w-bench/ratchet.py --check    # check only, do not raise a mark
+  python3 tools/p2w-bench/ratchet.py --strict   # also fail on any unscored document
+  python3 tools/p2w-bench/ratchet.py --allow-stale --reason "<why>"  # record a waiver
   python3 tools/p2w-bench/ratchet.py --recut --reason "<why>"   # re-mark a stale doc
 
 exits   0 held or rose
-        1 a document fell, or the stores disagree with the live instrument
-        2 the check list could not be read - refused to gate at all
+        1 a document fell, or a row contradicts itself
+        2 the check list could not be read, or --allow-stale came without --reason
+        3 UNMEASURED - nothing fell, but something could not be compared
 """
 import json
 import os
@@ -78,6 +130,59 @@ RATCHET = os.path.join(HERE, "RATCHET.json")
 # regression in one must never be able to hide behind a good score in the other.
 RATCHET_TXT = os.path.join(HERE, "RATCHET-TXT.json")
 RESULTS_TXT = os.path.join(HERE, "RESULTS-TXT.jsonl")
+RESULTS = os.path.join(HERE, "RESULTS.jsonl")
+
+
+# The ledger. Three files because they answer three different questions, and folding
+# them into one is how the 13 Nov run lost the distinction between "not asked" and
+# "passed": the record of the gap, the act of accepting it, and its trend over time.
+#
+#   UNMEASURED.json  written by EVERY unmeasured run, waived or not. A run nobody was
+#                    watching still leaves the gap on disk.
+#   WAIVER.json      written only by --allow-stale --reason. The deliberate act, and
+#                    the only place a reason can come from.
+#   UNMEASURED-HISTORY.jsonl
+#                    appended on a waiver, deduplicated, so "is this gap being paid
+#                    down or is it growing" is a question with an answer in a file
+#                    rather than in someone's memory of last week.
+def _ledger_paths(txt):
+    suffix = "-TXT" if txt else ""
+    return (os.path.join(HERE, "UNMEASURED%s.json" % suffix),
+            os.path.join(HERE, "WAIVER%s.json" % suffix),
+            os.path.join(HERE, "UNMEASURED-HISTORY%s.jsonl" % suffix))
+
+
+def _write_json(path, payload):
+    """Atomic: a half-written ledger would read as a smaller gap than there is."""
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, sort_keys=True)
+        f.write("\n")
+    os.replace(tmp, path)
+
+
+def _now():
+    """IST, because every timestamp a human reads in this repo is IST."""
+    return time.strftime("%Y-%m-%dT%H:%M:%S+05:30", time.gmtime(time.time() + 19800))
+
+
+def _append_history(path, payload):
+    """Append unless it repeats the last line.
+
+    ratchet.py is called more than once per commit - the fixer runs it, then the gate
+    runs it again. Counting those as two waivers would spend the carry allowance on
+    one decision, so an identical line is not written twice.
+    """
+    line = json.dumps(payload, sort_keys=True)
+    last = ""
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            for l in f:
+                if l.strip():
+                    last = l.strip()
+    if line != last:
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(line + "\n")
 
 
 # The instrument lives in instrument.py so that ratchet.py and record.py cannot
@@ -194,8 +299,11 @@ def main(argv):
             print("A reset without a reason erases the record of what the old marks meant.")
             return 1
         path = RATCHET_TXT if TXT_MODE else RATCHET
+        # Outside the branch: the history archive below needs it even when there was
+        # no mark file to archive, which is exactly the run where a NameError would
+        # turn a reset into a crash.
+        stamp = time.strftime("%Y%m%d-%H%M%S")
         if os.path.exists(path):
-            stamp = time.strftime("%Y%m%d-%H%M%S")
             archive = path.replace(".json", "-%s.json" % stamp)
             shutil.copy(path, archive)
             old = json.load(open(path, encoding="utf-8"))
@@ -204,6 +312,20 @@ def main(argv):
         else:
             print("nothing to archive - %s does not exist yet" % os.path.basename(path))
         json.dump({}, open(path, "w", encoding="utf-8"), indent=2)
+        # The ledger describes a gap against marks that no longer exist. A waiver left
+        # behind after a reset would authorise a commit through a comparison nobody
+        # made, so it goes with the marks it was about - and the history is archived
+        # rather than deleted, because it is the record that the gap was ever carried.
+        led, wvr, hist = _ledger_paths(TXT_MODE)
+        for f in (led, wvr):
+            if os.path.exists(f):
+                os.remove(f)
+                print("removed %s" % os.path.basename(f))
+        if os.path.exists(hist):
+            arch = hist.replace(".jsonl", "-%s.jsonl" % stamp)
+            shutil.move(hist, arch)
+            print("archived %s -> %s" % (os.path.basename(hist),
+                                         os.path.basename(arch)))
         print("cleared %s - every document sets a fresh mark on its next measurement"
               % os.path.basename(path))
         print("reason: %s" % reason)
@@ -216,8 +338,23 @@ def main(argv):
     reason = ""
     if "--reason" in argv:
         i = argv.index("--reason")
-        if i + 1 < len(argv):
+        if i + 1 < len(argv) and not argv[i + 1].startswith("--"):
             reason = argv[i + 1].strip()
+
+    # A waiver without a reason is not a waiver, it is a shrug.
+    #
+    # --allow-stale used to accept --reason and then discard it: the variable was
+    # parsed at the top of main() and read only by the --recut branch. So on 13 Nov a
+    # run could pass --allow-stale, print PASS, exit 0, and leave no statement on disk
+    # of what it had chosen not to compare. The reason is now the thing the gate reads,
+    # so refusing to proceed without one is the whole point rather than a formality -
+    # the same rule --reset already had, for the same reason.
+    if allow_stale and not reason:
+        print("refused: --allow-stale needs --reason \"<what you are accepting, and why>\"")
+        print("  A waiver is a statement about which documents were not compared. Without")
+        print("  the statement there is nothing to read at commit time, and the gap becomes")
+        print("  a green light with no author.")
+        return 2
 
     # The universe is EVERY check the verifier knows, not just the ones that
     # failed, and it is asked of the verifier rather than read from the store.
@@ -236,10 +373,28 @@ def main(argv):
     universe = set(ids)
     N = len(ids)
 
+    # An empty store is the extreme case of "not asked", not a pass.
+    #
+    # This returned 0 and printed "nothing to check", which TOOLBOX.md then had to
+    # warn about: "with no BASELINE.md there is nothing to compare and it exits 0,
+    # which is why a cron must never treat 0 as proof that measurement happened".
+    # A guard that needs a paragraph telling you not to believe its exit code is not
+    # a guard. Zero scored documents is UNMEASURED: nothing was compared.
     if not scores:
-        print("ratchet: no scored documents in %s - nothing to check"
-          % ("RESULTS-TXT.jsonl" if TXT_MODE else "BASELINE.md"))
-        return 0
+        store = "RESULTS-TXT.jsonl" if TXT_MODE else "BASELINE.md"
+        print("ratchet: no scored documents in %s - nothing was compared" % store)
+        led, wvr, hist = _ledger_paths(TXT_MODE)
+        _write_json(led, {
+            "verdict": "UNMEASURED", "waived": False, "reason": "",
+            "written_at": _now(), "store": store,
+            "instrument": {"tool": "verify_txt.py" if TXT_MODE else "verify_google.py",
+                           "checks": N, "sha": live_sha},
+            "counts": {"scored": 0, "compared": 0, "not_compared": 0,
+                       "unscored": 0, "regressed": 0},
+            "compared_docs": [], "not_compared": {},
+        })
+        print("  UNMEASURED - an empty store proves nothing about any document")
+        return 3
 
     # ---- the denominator guard --------------------------------------------
     # Three separate failures, because they need three different fixes:
@@ -295,10 +450,24 @@ def main(argv):
     regressions = []
     new_marks = []
     stale = []
+    # Which documents this run actually ASKED, and for the rest, what stopped it.
+    #
+    # These two sets are the difference between a pass and a green light. A document
+    # is compared when its row and its mark were counted out of the live instrument;
+    # everything else is a named gap with a reason attached, which is what makes the
+    # ledger something a reader can act on instead of a number that says 211.
+    compared = []
+    not_compared = {}
     for doc, (score, out_of, failed, _declared) in scores.items():
         prev = ratchet.get(doc)
         if prev is None:
             new_marks.append((doc, score, out_of))
+            if out_of == N:
+                compared.append(doc)
+            else:
+                not_compared[doc] = {"why": "row-drifted", "marked": None,
+                                     "now": "%d/%d" % (score, out_of),
+                                     "mark_universe_sha": None, "mark_out_of": None}
             if not check_only:
                 ratchet[doc] = {"best": score, "out_of": out_of,
                                 "failed": sorted(failed),
@@ -339,6 +508,11 @@ def main(argv):
         # stays exactly as measured until --recut says otherwise.
         if prev_universe and prev_universe != universe:
             stale.append((doc, best, prev.get("out_of"), len(prev_universe), score, out_of))
+            not_compared[doc] = {"why": "stale-mark",
+                                 "marked": "%s/%s" % (best, prev.get("out_of")),
+                                 "now": "%d/%d" % (score, out_of),
+                                 "mark_universe_sha": prev.get("universe_sha") or "",
+                                 "mark_out_of": prev.get("out_of")}
             if recut_ok and not check_only:
                 old = {k: prev.get(k) for k in ("best", "out_of", "universe_n")}
                 old["universe_sha"] = prev.get("universe_sha") or ""
@@ -353,6 +527,19 @@ def main(argv):
                                 "universe_n": N, "universe_sha": live_sha,
                                 "superseded": hist[-4:]}
             continue
+
+        # Reached only when the mark and the row were taken by the same instrument.
+        # Even here the denominators are checked rather than assumed: a mark can
+        # carry the right universe list and the wrong out_of, which is a row that
+        # contradicts itself and must not be counted as an answer.
+        if out_of != N or prev.get("out_of") != N:
+            not_compared[doc] = {"why": "mark-drifted",
+                                 "marked": "%s/%s" % (best, prev.get("out_of")),
+                                 "now": "%d/%d" % (score, out_of),
+                                 "mark_universe_sha": prev.get("universe_sha") or "",
+                                 "mark_out_of": prev.get("out_of")}
+        else:
+            compared.append(doc)
 
         common = prev_universe & universe
         if not common:
@@ -396,6 +583,63 @@ def main(argv):
     total = len(scores)
     measured_all = len([1 for l in open(BASE, encoding="utf-8")
                         if l.startswith("| ") and not l.startswith("|---")]) - 1
+    unscored = sorted(set(ratchet) - set(scores))
+
+    # ---- the verdict, decided before it is printed --------------------------
+    # Three answers, and the order of these tests is the policy.
+    #
+    # A REGRESSION OUTRANKS EVERYTHING. If any document fell, the run is a failure
+    # and no gap anywhere can soften it: "the instrument changed" is not an excuse
+    # for a number that moved under the same instrument. A row that contradicts
+    # itself is the same kind of answer - it is not a gap, it is a store that cannot
+    # be trusted, and a waiver over a store that lies is worse than no waiver.
+    #
+    # Only then does UNMEASURED apply. It is the answer for a run that accused no
+    # document of anything and still cannot say the bar held, because some marks
+    # were taken by an instrument this run does not use.
+    if regressions or inconsistent or (strict and total < measured_all):
+        verdict = "FAIL"
+    elif drift or mark_drift or stale:
+        verdict = "UNMEASURED"
+    else:
+        verdict = "PASS"
+
+    # ---- the ledger ---------------------------------------------------------
+    # Written on every UNMEASURED run, whether or not anyone waived it. The gap is a
+    # fact about the stores, not about who was watching, and a record that only
+    # appears when somebody asks for forgiveness is a record of the asking.
+    if verdict == "UNMEASURED":
+        led, wvr, hist = _ledger_paths(TXT_MODE)
+        payload = {
+            "verdict": "UNMEASURED",
+            "waived": bool(allow_stale),
+            "reason": reason if allow_stale else "",
+            "written_at": _now(),
+            "store": "RESULTS-TXT.jsonl" if TXT_MODE else "BASELINE.md",
+            "instrument": {
+                "tool": "verify_txt.py" if TXT_MODE else "verify_google.py",
+                "checks": N, "sha": live_sha,
+            },
+            "counts": {
+                "scored": total, "compared": len(compared),
+                "not_compared": len(not_compared), "unscored": len(unscored),
+                "regressed": len(regressions),
+            },
+            "compared_docs": sorted(compared),
+            "not_compared": not_compared,
+        }
+        _write_json(led, payload)
+        if allow_stale:
+            # The waiver is a separate file on purpose. The gate runs ratchet.py
+            # again with no flags, and that run must be able to refresh
+            # UNMEASURED.json without erasing the statement somebody signed.
+            _write_json(wvr, dict(payload, waived=True, reason=reason))
+            _append_history(hist, {
+                "at": payload["written_at"], "reason": reason,
+                "instrument": live_sha, "checks": N,
+                "compared": len(compared), "not_compared": len(not_compared),
+                "not_compared_docs": sorted(not_compared),
+            })
 
     print("ratchet")
     print("  instrument                : %d checks (sha %s)"
@@ -403,6 +647,7 @@ def main(argv):
     print("  documents scored this run : %d of %d rows" % (total, measured_all))
     print("  high-water marks held     : %d" % len(ratchet))
     print("  new documents, first mark : %d" % len(new_marks))
+    print("  compared against a mark   : %d" % len(compared))
     if stale:
         # Loud, because a stale mark is the one moment the gate is weakest: it can
         # neither pass nor fail the document, so a regression on this run is
@@ -423,9 +668,7 @@ def main(argv):
               % len(drift))
         print("  %d inconsistent, %d marks)." % (len(inconsistent), len(mark_drift)))
 
-    fail = False
     if regressions:
-        fail = True
         print("  REGRESSED: %d document(s) below their best ever score" % len(regressions))
         for doc, score, best, out_of, checks, why in sorted(regressions)[:15]:
             print("      %-40s %2d/%d was %2d/%d  %s%s"
@@ -434,36 +677,26 @@ def main(argv):
         if len(regressions) > 15:
             print("      ... and %d more" % (len(regressions) - 15))
     if strict and total < measured_all:
-        fail = True
         print("  FAIL (--strict): %d document(s) never measured" % (measured_all - total))
 
     if inconsistent:
-        fail = True
         print("  FAIL: %d row(s) stamp a universe that is not their denominator"
               % len(inconsistent))
-    if (drift or mark_drift) and not allow_stale:
-        fail = True
-        print("  FAIL: DENOMINATOR DRIFT - %d row(s) and %d mark(s) are counted out of a"
+    if drift or mark_drift:
+        print("  NOT COMPARED: %d row(s) and %d mark(s) are counted out of a universe"
               % (len(drift), len(mark_drift)))
-        print("  universe the instrument does not have (%d). Every score above is a count"
-              % N)
-        print("  out of a set that no longer exists; a comparison across the two is not a")
-        print("  ratchet. Pass --allow-stale to report this and carry on, and say why.")
-    elif (drift or mark_drift):
-        print("  ALLOWED: %d drifted row(s) / %d drifted mark(s) reported, not compared."
-              % (len(drift), len(mark_drift)))
-    if stale and not allow_stale:
-        fail = True
-        print("  FAIL: %d mark(s) STALE - measured by an instrument this run does not use."
-              % len(stale))
-        print("  A document that cannot be compared has not held its bar; it has not been")
-        print("  asked. Pass --allow-stale to accept that gap explicitly.")
+        print("  the instrument does not have (%d). A count out of %s is not a count"
+              % (N, "/".join(sorted({str(o) for _d, _s, o, _u in drift})) or "?"))
+        print("  out of %d, so these are reported and skipped - never compared, never" % N)
+        print("  carried, never replaced. That is the drift this file exists to catch.")
 
     # The trace line has to say what this run actually concluded. It used to say
     # "held or rose" whenever no document regressed - so on 13 Nov, when every mark
     # was re-cut without a comparison and the gate printed PASS, and again on any run
     # that fails on drift alone, TRACE.md recorded a hold. A log that reports a hold
-    # on a failing run is the drift hiding in a second place.
+    # on a failing run is the drift hiding in a second place. It now says UNMEASURED
+    # when the run compared less than it scored, which is the one thing a reader of
+    # the trace most needs to know.
     why = []
     if regressions:
         why.append("REGRESSED %d" % len(regressions))
@@ -473,25 +706,43 @@ def main(argv):
         why.append("STALE %d" % len(stale))
     if inconsistent:
         why.append("INCONSISTENT %d" % len(inconsistent))
-    if fail:
-        note("ratchet%s" % (" --txt" if TXT_MODE else ""), "FAIL " + "; ".join(why))
-    elif why:
-        note("ratchet%s" % (" --txt" if TXT_MODE else ""),
-             "NOT COMPARED (--allow-stale) " + "; ".join(why))
-    else:
-        note("ratchet%s" % (" --txt" if TXT_MODE else ""), "held or rose")
+    tool = "ratchet%s" % (" --txt" if TXT_MODE else "")
 
-    if fail:
-        print("  FAIL - the bar fell")
-    elif drift or mark_drift or stale:
-        # A PASS that compared nothing is not a pass. Saying 'the bar held' here would
-        # be the same lie in the last line that the old code told in the first.
-        print("  PASS (--allow-stale) - but %d row(s) and %d mark(s) were NOT compared."
-              % (max(len(drift), len(stale)), len(mark_drift)))
-        print("  This run proves nothing about them; the gap is explicit, not closed.")
-    else:
+    if verdict == "PASS":
+        note(tool, "held or rose - %d of %d compared" % (len(compared), total))
         print("  PASS - the bar held or rose")
-    return 0 if not fail else 1
+        return 0
+
+    if verdict == "FAIL":
+        note(tool, "FAIL " + "; ".join(why))
+        if regressions or inconsistent:
+            print("  FAIL - the bar fell")
+        else:
+            print("  FAIL (--strict) - %d document(s) were never measured"
+                  % (measured_all - total))
+        return 1
+
+    # ---- UNMEASURED --------------------------------------------------------
+    gap = max(len(not_compared), len(stale), len(drift))
+    note(tool, "UNMEASURED %d of %d not compared%s%s"
+         % (len(not_compared), total,
+            "; waived: " + reason if allow_stale else "",
+            "; " + "; ".join(why) if why else ""))
+    print("  UNMEASURED - the bar was not asked: %d of %d document(s) could not be"
+          % (gap, total))
+    print("  compared, and %d were. Nothing fell. This is not a pass: a document that"
+          % len(compared))
+    print("  could not be compared has not held its bar, it has not been asked.")
+    print("  ledger: %s" % os.path.basename(_ledger_paths(TXT_MODE)[0]))
+    if allow_stale:
+        print("  WAIVED: \"%s\"" % reason)
+        print("  The gap is recorded, not closed. tools/commit-gate.sh reads WAIVER.json")
+        print("  and decides whether this is small enough and paid-down enough to commit")
+        print("  through. It is not this file's decision to make.")
+    else:
+        print("  To record a waiver: --allow-stale --reason \"<what you are accepting>\".")
+        print("  To close it: re-measure the documents named above under this instrument.")
+    return 3
 
 
 if __name__ == "__main__":

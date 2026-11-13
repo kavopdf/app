@@ -915,12 +915,21 @@ public final class PdfToWord {
         // and the running footer went with it, so "Indian Institute of Plantation Management
         // * Bengaluru 560 056" and "Quarterly bulletin * Page 1" are absent from the .docx.
         // File 63 lost its estate line and its kicker the same way.
+        // The text alone does not identify a cell's line. On 364_event_ticket the tear-off
+        // stub's ticket number is drawn in DejaVuSansMono 11, and the ticket number in the
+        // grid above it in DejaVuSans 8.5. The strings are identical, so the stub's line was
+        // skipped as "already written by a table" and the stub lost its number. The same
+        // characters in another face are a different line on the page, so the set carries the
+        // face as well as the text and a line counts as cell text only when both agree.
         java.util.HashSet<String> cellText = new java.util.HashSet<>();
         for (Table t : tables) {
-            for (List<String> row : t.rows) {
-                for (String cell : row) {
+            for (int r = 0; r < t.rows.size(); r++) {
+                List<String> row = t.rows.get(r);
+                for (int c = 0; c < row.size(); c++) {
+                    String cell = row.get(c);
+                    if (cell == null) continue;
                     String norm = cell.trim().replaceAll("\\s+", " ");
-                    if (norm.length() > 3) cellText.add(norm);
+                    if (norm.length() > 3) cellText.add(norm + "\u0000" + fontOf(t, r, c));
                 }
             }
         }
@@ -943,7 +952,9 @@ public final class PdfToWord {
             }
             if (!inTable) {
                 String norm = line.text.trim().replaceAll("\\s+", " ");
-                if (!norm.isEmpty() && cellText.contains(norm)) inTable = true;
+                if (!norm.isEmpty() && cellText.contains(norm + "\u0000" + fontOf(line.glyphs))) {
+                    inTable = true;
+                }
             }
             if (!inTable) body.add(line);
         }

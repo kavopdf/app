@@ -82,6 +82,32 @@ if [ "${1:-}" = "--status" ]; then
   else
     say "  .txt half        : not measured yet - not gated"
   fi
+  # The gap is part of the status, not something you find out by running the gate.
+  # A reader asking "where does this tree stand" must see that the ratchet has not
+  # been asked about some documents, and on whose authority that was accepted.
+  if [ -f "$BENCH/UNMEASURED.json" ]; then
+    python3 - "$BENCH" <<'PYGAP' || true
+import json, os, sys
+b = sys.argv[1]
+try:
+    d = json.load(open(os.path.join(b, "UNMEASURED.json")))
+except Exception:
+    raise SystemExit(0)
+c = d.get("counts") or {}
+i = d.get("instrument") or {}
+print("  ratchet gap      : %s of %s document(s) not compared (instrument %s checks, sha %s)"
+      % (c.get("not_compared"), c.get("scored"), i.get("checks"), i.get("sha")))
+w = os.path.join(b, "WAIVER.json")
+if os.path.exists(w):
+    try:
+        wd = json.load(open(w))
+        print("  waiver           : \"%s\"" % wd.get("reason"))
+    except Exception:
+        pass
+else:
+    print("  waiver           : none - a gap like this cannot be committed through")
+PYGAP
+  fi
   [ -f "$OK_FILE" ] && say "  gate token       : present ($(cat "$OK_FILE"))" \
                     || say "  gate token       : none"
   exit 0
@@ -139,25 +165,84 @@ FAILED=0
 LOG=$(mktemp)
 
 # ---- 1. the ratchet -------------------------------------------------------
-if python3 "$BENCH/ratchet.py" >"$LOG" 2>&1; then
-  say "  ok    ratchet    - the bar held or rose"
-else
-  bad "ratchet - a document fell below its best"
-  grep -E "REGRESSED|->|below" "$LOG" | head -6 | sed 's/^/        /'
-  FAILED=1
-fi
+# One question used to be asked here: "did ratchet.py exit 0". On 13 Nov the answer
+# became no, permanently, for every commit - the instrument retired five checks and
+# added two, all 211 marks were taken by the instrument that no longer exists, and
+# nothing had been re-measured. A guard that is always red is not a guard. The two
+# ways out are to delete it or to ignore it, and both were wrong, so the ratchet
+# now has three answers and this gate has three actions:
+#
+#   exit 0  PASS        the bar held or rose
+#   exit 1  FAIL        a document fell. No waiver exists for this and none will be
+#                       added: a number that moved under the same instrument is not
+#                       a gap, it is a regression.
+#   exit 2  REFUSED     no instrument, or a waiver with no reason
+#   exit 3  UNMEASURED  nothing fell, but some marks could not be compared. Not a
+#                       pass. Whether it may be committed through is decided by
+#                       unmeasured.py against WAIVER.json, never by this script.
+RATCHET_GAP=""
+WAIVED=""
+DOCX_WAIVED=0
+TXT_WAIVED=0
 
-# ---- 1b. the .txt ratchet -------------------------------------------------
-# Separate store, separate marks. One conversion writes both outputs from the same
-# model, so a change made for the .docx can move the .txt, and only this half can see it.
-if txt_live; then
-  if python3 "$BENCH/ratchet.py" --txt >"$LOG" 2>&1; then
-    say "  ok    ratchet --txt - the .txt bar held or rose"
-  else
-    bad "ratchet --txt - a .txt fell below its best"
-    grep -E "REGRESSED|->|below" "$LOG" | head -6 | sed 's/^/        /'
-    FAILED=1
-  fi
+ratchet_half() {
+  local mode="$1" label="$2" log rc
+  log=$(mktemp)
+  # shellcheck disable=SC2086
+  python3 "$BENCH/ratchet.py" $mode >"$log" 2>&1
+  rc=$?
+  case "$rc" in
+    0) say "  ok    ratchet$label - the bar held or rose" ;;
+    1) bad "ratchet$label - a document fell below its best"
+       grep -E "REGRESSED|was +[0-9]+/" "$log" | head -6 | sed 's/^/        /'
+       FAILED=1 ;;
+    2) bad "ratchet$label - refused to gate"
+       grep -E "refused|CANNOT GATE|No check list" "$log" | head -4 | sed 's/^/        /'
+       FAILED=1 ;;
+    3) # NOT a failure and NOT a pass. Named, and sent to the policy below.
+       say "  gap   ratchet$label - UNMEASURED: nothing fell, something was not asked"
+       grep -E "^  (UNMEASURED|STALE|compared|NOT COMPARED)" "$log" | head -3 \
+         | sed 's/^/        /'
+       # "docx" rather than "" - a bare empty word disappears in $RATCHET_GAP and
+       # the gap on the .docx half would then be silently skipped by the policy
+       # below, which is the same class of bug as the one this gate is about.
+       if [ "$mode" = "--txt" ]; then RATCHET_GAP="$RATCHET_GAP txt"
+       else RATCHET_GAP="$RATCHET_GAP docx"; fi ;;
+    *) bad "ratchet$label - unexpected exit $rc"
+       tail -3 "$log" | sed 's/^/        /'
+       FAILED=1 ;;
+  esac
+  rm -f "$log"
+}
+
+ratchet_half "" ""
+if txt_live; then ratchet_half "--txt" " --txt"; fi
+
+# ---- 1a. the gap: a waiver is a written decision, not a flag --------------
+# The gate never passes --allow-stale itself. If it did, every commit would waive
+# its own gap and the flag would become the silent pass it used to be. The waiver
+# has to have been written by whoever is asking to commit, with a reason, and
+# unmeasured.py decides whether it is good enough - it checks the instrument the
+# waiver names, that something was actually compared, that the rows which moved
+# were measured by the live instrument, that the gap is not growing, and that it
+# has not been carried for more than three commits.
+if [ -n "$RATCHET_GAP" ]; then
+  for half in $RATCHET_GAP; do
+    if [ "$half" = "txt" ]; then mode="--txt"; label=" --txt"; else mode=""; label=""; fi
+    LOG2=$(mktemp)
+    # shellcheck disable=SC2086
+    if python3 "$BENCH/unmeasured.py" $mode >"$LOG2" 2>&1; then
+      say "  ok    unmeasured$label - the gap is recorded, bounded and paid for"
+      sed -n 's/^  \(gap recorded\|compared \|waivers carried\|reason given\)/        \1/p' "$LOG2"
+      WAIVED="$WAIVED $half"
+      if [ "$half" = "txt" ]; then TXT_WAIVED=1; else DOCX_WAIVED=1; fi
+    else
+      bad "unmeasured$label - the gap may not be committed through"
+      sed -n '/REFUSED/,$p' "$LOG2" | head -10 | sed 's/^/        /'
+      FAILED=1
+    fi
+    rm -f "$LOG2"
+  done
 fi
 
 # ---- 2. it builds ---------------------------------------------------------
@@ -172,7 +257,21 @@ fi
 # ---- 3. the evidence is in this commit ------------------------------------
 # The engine changed, so a measurement must have happened. A commit that carries
 # a new engine and an old RATCHET.json is a fix nobody checked.
-for f in $EVIDENCE; do
+#
+# Under a waiver RATCHET.json is allowed to stand still, and only under a waiver.
+# While any row is counted out of a universe the instrument does not have, ratchet.py
+# refuses to write the store at all ("NOTHING WRITTEN") - raising a mark from a
+# comparison it could not make is the substitution this whole file was repaired for.
+# So demanding a new RATCHET.json on a waived commit would demand the one thing the
+# ratchet is right to refuse, and the gate would be red for a reason that is not a
+# defect. The evidence that matters in that case is RESULTS.jsonl, and unmeasured.py
+# has already proved every row that moved in it was measured by the live instrument.
+if [ "$DOCX_WAIVED" -eq 1 ]; then
+  EVIDENCE_HERE="BASELINE.md RESULTS.jsonl"
+else
+  EVIDENCE_HERE="$EVIDENCE"
+fi
+for f in $EVIDENCE_HERE; do
   if file_changed "$BENCH/$f"; then
     say "  ok    $f changed with it"
   else
@@ -182,7 +281,10 @@ for f in $EVIDENCE; do
 done
 
 if txt_live; then
-  for f in $EVIDENCE_TXT; do
+  # Same exemption, same reason, on the .txt half.
+  if [ "$TXT_WAIVED" -eq 1 ]; then EVIDENCE_TXT_HERE="RESULTS-TXT.jsonl"
+  else EVIDENCE_TXT_HERE="$EVIDENCE_TXT"; fi
+  for f in $EVIDENCE_TXT_HERE; do
     if file_changed "$BENCH/$f"; then
       say "  ok    $f changed with it"
     else
@@ -213,8 +315,20 @@ if [ "$FAILED" -ne 0 ]; then
   exit 1
 fi
 
-printf 'engine=%s time=%s\n' "$ENGINE" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$OK_FILE"
+if [ -n "$WAIVED" ]; then
+  printf 'engine=%s time=%s ratchet=unmeasured-waived waived="%s"\n' \
+    "$ENGINE" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(echo $WAIVED)" > "$OK_FILE"
+else
+  printf 'engine=%s time=%s ratchet=pass\n' \
+    "$ENGINE" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$OK_FILE"
+fi
 say ""
-say "  PASS - engine $ENGINE is proven and may be committed"
+if [ -n "$WAIVED" ]; then
+  say "  PASS WITH A RECORDED GAP - engine $ENGINE may be committed"
+  say "  The ratchet was NOT asked about some documents; WAIVER.json names which,"
+  say "  why, and how many commits the gap has been carried for. It is not closed."
+else
+  say "  PASS - engine $ENGINE is proven and may be committed"
+fi
 say "  token: $OK_FILE"
 exit 0

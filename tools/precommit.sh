@@ -126,6 +126,24 @@ for pair in "verify_google.py:test_checks.py" "verify_txt.py:test_txt_checks.py"
   fi
 done
 
+# The gate's own contract, tested the way the verifiers are: only when something that
+# decides it changed. On 13 Nov the ratchet had two answers for three states of the world
+# and nothing failed, because the two harnesses that might have noticed were both red for
+# reasons of their own. This one is standalone - no corpus, no Drive, no engine.
+if [ "$FORCE_ALL" -eq 1 ] || changed "tools/p2w-bench/ratchet.py" \
+   || changed "tools/p2w-bench/unmeasured.py" \
+   || changed "tools/p2w-bench/instrument.py" \
+   || changed "tools/commit-gate.sh" \
+   || changed "tools/p2w-bench/test_unmeasured.py"; then
+  if python3 tools/p2w-bench/test_unmeasured.py >/tmp/um.$$ 2>&1; then
+    pass "test_unmeasured.py: $(grep -o '[0-9]* checks, [0-9]* passed' /tmp/um.$$ | tail -1)"
+  else
+    fail "test_unmeasured.py - the gate does not behave as documented"
+    grep -E "^FAIL|checks," /tmp/um.$$ | head -6 | sed 's/^/        /'
+  fi
+  rm -f /tmp/um.$$
+fi
+
 # a file added to the repo must not be a patch, a backup or a build leftover
 for bad in $(git status --porcelain 2>/dev/null | awk '{print $2}' | grep -E '\.(patch|orig|rej|bak|tmp)$|~$' || true); do
   fail "leftover file staged or untracked: $bad"

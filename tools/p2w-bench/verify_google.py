@@ -372,13 +372,21 @@ def _anchors(page, rs):
     out = []
     for r in rs:
         cx, cy = (r["x"] + r["x1"]) / 2.0, (r["y"] + r["y1"]) / 2.0
-        best = None
+        best, best_key = None, None
         for sh in shapes:
             # fitz.Rect is x0/y0/x1/y1, not x/y - the run dicts use x/y, which is
             # what made this crash on its first run.
             if sh.x0 <= cx <= sh.x1 and sh.y0 <= cy <= sh.y1:
-                if best is None or sh.width * sh.height < best.width * best.height:
-                    best = sh
+                # A tie on AREA is broken by geometry, not by draw order. min() with a
+                # strict < kept whichever shape get_drawings() happened to yield first,
+                # and two producers need not agree on that order - the same defect
+                # 47_margins had when statistics.mode returned the first of a tie.
+                # Constructed (break59.py M3b): two boxes of equal area both holding the
+                # text centre, drawn in the opposite order on the render side. Nothing
+                # moved and 59 failed the page.
+                key = (sh.width * sh.height, sh.width, sh.height, sh.y0, sh.x0)
+                if best_key is None or key < best_key:
+                    best, best_key = sh, key
         if best is None:
             out.append(None)
         else:
@@ -1109,7 +1117,13 @@ def extra_checks2(src, gd, docx_path=None):
         return (abs(a.x0 - b.x0) <= ANCHOR_RECT_TOL and abs(a.y0 - b.y0) <= ANCHOR_RECT_TOL
                 and abs(a.x1 - b.x1) <= ANCHOR_RECT_TOL and abs(a.y1 - b.y1) <= ANCHOR_RECT_TOL)
 
-    def _box_moved(a, gshapes):
+    def _class_count(a, shapes):
+        """How many shapes in `shapes` have a's size within ANCHOR_RECT_TOL."""
+        return sum(1 for s in shapes
+                   if abs(s.width - a.width) <= ANCHOR_RECT_TOL
+                   and abs(s.height - a.height) <= ANCHOR_RECT_TOL)
+
+    def _box_moved(a, gshapes, sshapes):
         """The source box, reproduced at its own SIZE somewhere else on the page.
 
         This is the difference the check turns on, and it cannot be read off the run's
@@ -1119,26 +1133,40 @@ def extra_checks2(src, gd, docx_path=None):
         a shape of the same size. If it does, the outline moved and the text did not -
         the defect. If it does not, the page was drawn with different primitives and
         this run is not evidence either way.
+
+        SIZE ALONE IS NOT ENOUGH, and that was the residual risk the author of this
+        check named. One shape of a given size anywhere on the page satisfied the test,
+        and a uniform table is nothing but shapes of one size: a 3x3 table drawn as nine
+        80x24 cell rects has NINE boxes of the size every cell is measured against, so a
+        render that draws that table as a rule grid finds one 80x24 box elsewhere on the
+        page and calls every cell moved. Constructed (break59.py M1): nine cells, text at
+        identical coordinates on both sides, one unrelated 80x24 signature box on the
+        page - 59 failed the document. Remove that one box and the same page reads 0/0
+        (M1b). What distinguishes the two is not whether the size occurs but whether the
+        page still has AS MANY of them: a moved box leaves its size class the size it
+        was, a re-primitivised table destroys it.
         """
-        for sh in gshapes:
-            if (abs(sh.width - a.width) <= ANCHOR_RECT_TOL
-                    and abs(sh.height - a.height) <= ANCHOR_RECT_TOL):
-                return True
-        return False
+        if _class_count(a, gshapes) == 0:
+            return False
+        return _class_count(a, gshapes) >= _class_count(a, sshapes)
 
     for si in range(min(src.page_count, gd.page_count)):
         sp, gp = src[si], gd[si]
         sruns, gruns = runs(sp), runs(gp)
         sa, ga = _anchors(sp, sruns), _anchors(gp, gruns)
         gshapes = _shapes(gp)
+        sshapes = _shapes(sp)                   # for the size-class population test
         by = collections.defaultdict(list)      # text -> render run indices
         for j, g in enumerate(gruns):
             by[norm_word(g["text"])].append(j)
         used = set()
-        n_judged = n_out = 0
+        n_judged = n_out = hard_out = 0
         for i, a in enumerate(sa):
             if a is None:
                 continue          # nothing enclosed it in the source either
+            sb = a[2]
+            sx = (sruns[i]["x"] + sruns[i]["x1"]) / 2.0
+            sy = (sruns[i]["y"] + sruns[i]["y1"]) / 2.0
             js = _match(sruns[i], gruns, by, used)
             if not js:
                 lost += 1         # its text is not in the render at all
@@ -1147,42 +1175,81 @@ def extra_checks2(src, gd, docx_path=None):
                 continue
             used.update(js)
             bs = [ga[j] for j in js if ga[j] is not None]
-            if not bs:
-                lost += 1         # text is there, but no longer inside any outline
-                n_judged += 1
-                n_out += 1
-                continue
-            sb, gb = a[2], bs[0][2]
-            if not _same_box(sb, gb):
-                if _box_moved(sb, gshapes):
-                    moved += 1    # the outline is on the page, somewhere else
-                    n_judged += 1
-                    n_out += 1
-                else:
-                    # A different rectangle encloses it and the source's is nowhere on
-                    # the page - a cell rect that came back as a band, a band that came
-                    # back as the page. The fraction is not comparable, and this run is
-                    # not evidence either way.
-                    unjudged += 1
-                continue
-            n_judged += 1
-            sx = (sruns[i]["x"] + sruns[i]["x1"]) / 2.0
-            sy = (sruns[i]["y"] + sruns[i]["y1"]) / 2.0
             gx = sum(gruns[j]["x"] + gruns[j]["x1"] for j in js) / (2.0 * len(js))
             gy = sum(gruns[j]["y"] + gruns[j]["y1"] for j in js) / (2.0 * len(js))
-            if (abs((gx - gb.x0) - (sx - sb.x0)) > ANCHOR_TOL_PT
-                    or abs((gy - gb.y0) - (sy - sb.y0)) > ANCHOR_TOL_PT):
-                moved += 1        # same box, text no longer in the same place in it
+            if not bs:
+                # NO BOX ENCLOSES THE TEXT. That is two different events and this check
+                # scored both as `lost`: the outline went, or the outline is still on the
+                # page at its own size and the text is outside it. The second is exactly
+                # the defect the check was written for, and scoring it `lost` was the
+                # only reason it ever reached the page - under the page budget, and two
+                # of them at a time are free (break59.py M6a: 2 of 40 boxes slid 30 pt
+                # clear of their text and the page passed with `lost`=2, budget 2).
+                # A run that has left its own surviving box outright cannot be a
+                # re-primitivisation artifact, so it is also beyond the budget.
+                if _box_moved(sb, gshapes, sshapes):
+                    moved += 1
+                    n_judged += 1
+                    n_out += 1
+                    hard_out += 1
+                else:
+                    lost += 1
+                    n_judged += 1
+                    n_out += 1
+                continue
+            gb = bs[0][2]
+            dx = (gx - gb.x0) - (sx - sb.x0)
+            dy = (gy - gb.y0) - (sy - sb.y0)
+            if _same_box(sb, gb) or (abs(dx) <= ANCHOR_TOL_PT and abs(dy) <= ANCHOR_TOL_PT):
+                # SAME BOX, or a different box with the text in the same place inside
+                # it. The second case is not a hole: the box's identity was only ever a
+                # proxy for "is this the same object", and the relation this check
+                # exists to measure is the text's place INSIDE its outline. A proxy that
+                # is asked directly gives the right answer three ways where the old code
+                # gave a wrong one or none:
+                #  - a box that moved WITH its text (a reflowed table) was called moved
+                #    although the relation is untouched (break59.py M7, 9 of 9 runs).
+                #    18_displacement owns that displacement; 60 already had this exact
+                #    fix applied today for the same reason (A6).
+                #  - a box that grew 2-3 pt fell outside ANCHOR_RECT_TOL and the run was
+                #    silently unjudged - a hole exactly as wide as the gap between the
+                #    box tolerance (2.0) and the displacement tolerance (3.0), so the
+                #    anchor was held to a stricter standard than the thing it anchors
+                #    (M2a: 3 pt growth, text unmoved, 59 reads 0/0 and nothing else
+                #    fires; M2a2: the same at 1.5 pt is judged).
+                #  - a table drawn one rect per cell on the source and as a rule grid on
+                #    the render kept the relation and lost the box, and fired only because
+                #    some unrelated box on the page happened to have the cell's size (M1:
+                #    9 cells, text at identical coordinates, page failed; M1b: the same
+                #    page without that one box reads 0/0 and passes).
+                n_judged += 1
+                if abs(dx) > ANCHOR_TOL_PT or abs(dy) > ANCHOR_TOL_PT:
+                    moved += 1    # same place in the box? no - and the box is the same
+                    n_out += 1
+                else:
+                    anchored += 1
+                continue
+            if _box_moved(sb, gshapes, sshapes):
+                moved += 1        # the outline is on the page, somewhere else
+                n_judged += 1
                 n_out += 1
             else:
-                anchored += 1     # same box, same place in it
+                # A different rectangle encloses it, the text sits somewhere else inside
+                # it, and the source's rectangle is nowhere on the page - a cell rect
+                # that came back as a band, a band that came back as the page. The
+                # fraction is not comparable, and this run is not evidence either way.
+                unjudged += 1
+            continue
         if n_judged and (n_out > max(2, -(-n_judged * ANCHOR_BUDGET // 100))
-                         or n_out == n_judged):
+                         or n_out == n_judged or hard_out):
             anchor_bad_pages.append(si)
     # source = the runs this could decide, render = how many of those still sit in the
     # same place inside the SAME box. A raw drift count would read as "source=1
     # render=1" for one good run and one bad run alike.
-    c["59_shape_anchor"] = (anchored + lost + moved, anchored, not anchor_bad_pages)
+    # unjudged is IN the source count. A page whose boxes were all re-primitivised
+    # judged nothing, and (0, 0, True) is indistinguishable from a page with no boxes
+    # at all - the silence of M1b read as a pass and as a clean 0/0. Now it reads 0 of 9.
+    c["59_shape_anchor"] = (anchored + lost + moved + unjudged, anchored, not anchor_bad_pages)
     if unjudged:
         # Never silent: on a document whose boxes are drawn with different primitives on
         # the two sides this check decides very little, and that must be visible as the
