@@ -1,0 +1,70 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 503772c..d98b18b 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -528,6 +528,17 @@ public final class DocxWriter {
+         float cellLeftPt;
+         /** The page's own width in points, so a tab stop can tell when it is at the paper edge. */
+         float pageWidthPt = 595f;
++        /**
++         * The page's own right TEXT edge, in points from the paper's left edge.
++         *
++         * <p>The section carries zero margins (see {@link #sectPrXml}), so a paragraph with
++         * no {@code w:ind w:right} has the whole paper to run into: a line the renderer sets
++         * wider than the source's column does not wrap, it runs to the paper edge and the
++         * page's right margin is gone. This is the edge a left-aligned paragraph has to wrap
++         * against. Measured from the page, not assumed. 0 = unknown, and the paragraph then
++         * gets no right indent, exactly as before.
++         */
++        float pageRightPt = 0f;
+         /**
+          * The page's own height in points.
+          *
+@@ -668,6 +679,20 @@ public final class DocxWriter {
+             }
+             ctx.pageWidthPt = pw;
+             ctx.pageHeightPt = ph;
++            // The page's own right text edge: the furthest a body line reaches, ignoring the
++            // lines that touch the paper edge - a banner or a full-width rule is exactly what
++            // this edge is NOT. One number per page, and a MAX, so it can only ever permit a
++            // paragraph to run to where the page's own text already reaches; it can never
++            // pull a line in past where the page drew it.
++            float rightEdge = 0f;
++            for (Object b6 : page.blocks) {
++                if (!(b6 instanceof PdfToWord.Para)) continue;
++                for (PdfToWord.Box bx : ((PdfToWord.Para) b6).boxes) {
++                    if (bx.right <= 0f || bx.right > pw - 2f) continue;
++                    if (bx.right > rightEdge) rightEdge = bx.right;
++                }
++            }
++            ctx.pageRightPt = rightEdge;
+             // The page's own outlines, so a label drawn inside one can be anchored to it and a
+             // stamp can find the frame the page drew around it. It was declared and never set,
+             // which is why the stamp's border search never matched anything.
+@@ -2914,7 +2939,15 @@ public final class DocxWriter {
+         if (text.trim().isEmpty()) return;
+         ctx.flowCount++;
+         int leftTw = (int) Math.max(0L, Math.round(b.x * TWIPS_PER_PT));
+-        int rightTw = 0;
++        // The page's right text edge, not the paper's. The section has no margins, so with
++        // w:ind w:right = 0 a left-aligned line has no right constraint at all: whatever the
++        // renderer's own type setting makes of it runs to the paper edge, and the source's
++        // right margin - 56 pt on most of the corpus - is simply not in the document.
++        int pageRightTw = ctx.pageRightPt > 0f
++                ? (int) Math.max(0L, Math.round((ctx.pageWidthPt - ctx.pageRightPt) * TWIPS_PER_PT))
++                : 0;
++        // Inside a cell the cell is the column: its own width is the constraint, as before.
++        int rightTw = ctx.inColumn ? 0 : pageRightTw;
+         // A line the page centred is placed by w:jc, and LibreOffice centres it inside the
+         // paragraph's own indents. Leaving w:ind w:left at the measured x therefore pushed every
+         // centred heading to the RIGHT by half of it: 310's heading 92.8 pt, 317's 99.2 pt,
+@@ -2939,6 +2972,9 @@ public final class DocxWriter {
+                 rightTw = (int) Math.max(0L, Math.round((ctx.pageWidthPt - b.right) * TWIPS_PER_PT));
+             } else {
+                 leftTw = 0;
++                // Centred on the paper, so it keeps the whole paper: the page's right text
++                // edge would move its centre to (0 + pageRight) / 2 and shift it left.
++                rightTw = 0;
+             }
+         } else if (p.align == 2) {
+             leftTw = 0;

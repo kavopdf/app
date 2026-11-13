@@ -1,0 +1,63 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 503772c..7e7fad1 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -92,6 +92,20 @@ public final class DocxWriter {
+      */
+     private static final float LINE_BASE = 0.8f;
+ 
++    /**
++     * Twips of {@code w:line} per point of font size for a flow line.
++     *
++     * <p>No {@code (w:before, w:line)} pair makes Word and Google agree, because the two read
++     * {@code w:line} differently: Word advances {@code w:before + w:line}, Google advances
++     * {@code w:before + max((w:line/240) * lineHeight(face, size), 0.069 * size)} - a multiple of
++     * the substitute face's line height with a floor at 0.069 em (REMAINING-DEFECTS.md probes
++     * A/B/C, four sizes, three faces). The disagreement is the difference between the box's
++     * own cost in each engine, and it is smallest when the box costs the SAME in both:
++     * {@code w:line/20 == 0.069 * size}, i.e. {@code w:line = 1.38 * size} twips. At 10 pt that
++     * is 14 twips: Word advances before + 0.70, Google before + 0.69.
++     */
++    private static final float HAIRLINE_TW_PER_PT = 1.38f;
++
+     /**
+      * Ceiling on the vertical gap one paragraph may ask for, in twips (120 pt).
+      *
+@@ -3048,21 +3062,34 @@ public final class DocxWriter {
+         }
+         beforeTw = fit[0];
+         lineTw = fit[1];
++        // The advance this model solved for, in points: Word's and LibreOffice's reading of
++        // w:before + w:line. Google's reading of a box this small is the same advance only if
++        // the box costs the same in both engines, which is what HAIRLINE_TW_PER_PT buys - so
++        // the advance goes out as before + a box of 1.38 twips per point of the run's size.
++        // A paragraph that starts a flow run (a page's first line, or the first line under a
++        // table) charged its gap from the box top and carries no lead from the line above.
++        boolean runStart = ctx.newPage || ctx.afterTablePt >= 0f;
++        float leadPt = runStart ? 0f : (1f - LINE_BASE) * ctx.lastLinePt;
++        float advancePt = leadPt + LINE_BASE * linePt + beforeTw / (float) TWIPS_PER_PT;
++        int outLineTw = (int) Math.max(1L, Math.round(HAIRLINE_TW_PER_PT * b.size));
++        int outBeforeTw = (int) Math.max(0L,
++                Math.round((advancePt - outLineTw / TWIPS_PER_PT) * TWIPS_PER_PT));
+         // The box the pitch solver compares next time is the page's own, not the squeezed one.
+         ctx.lastLinePt = linePt;
+         ctx.lastBaseline = b.y;
+         ctx.lastSize = b.size;
+         ctx.newPage = false;
+         // Re-sync to what was written, so the next paragraph is measured from the reader's
+-        // position rather than from the PDF's (D-26).
++        // position rather than from the PDF's (D-26). The bookkeeping keeps the model's own
++        // box and gap; only the XML that leaves the engine carries the split.
+         resync(ctx, flowTopPt(ctx), beforeTw, lineTw);
+         sb.append("<w:p><w:pPr>");
+         if (p.heading > 0) {
+             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
+         }
+         sb.append("<w:snapToGrid w:val=\"0\"/>")
+-                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"").append(beforeTw)
+-                .append("\" w:after=\"0\" w:line=\"").append(lineTw)
++                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"").append(outBeforeTw)
++                .append("\" w:after=\"0\" w:line=\"").append(outLineTw)
+                 .append("\" w:lineRule=\"exact\"/>")
+                 .append("<w:ind w:left=\"").append(Math.max(0, leftTw - bandLeftTw(ctx, p.column)))
+                 .append("\" w:right=\"").append(rightTw).append("\" w:firstLine=\"0\"/>");
