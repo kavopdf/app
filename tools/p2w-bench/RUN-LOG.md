@@ -128,3 +128,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 13 Nov 08:40 | fixer | slot claimed - fixer running |
 | 13 Nov 09:45 | fixer | slot claimed - fixer running |
 | 13 Nov 11:05 | baseline | started | phase measure |
+| 13 Nov 11:06 | baseline | slot claimed - baseline running |
