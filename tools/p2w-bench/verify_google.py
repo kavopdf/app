@@ -1591,7 +1591,25 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     # ---- 36 underline / strike --------------------------------------------
     # No underline flag in the text model, so count thin strokes sitting just
     # under a baseline - an approximation, and named as one.
-    def rules_under_text(doc):
+    # A RULE UNDER A BASELINE IS NOT AN UNDERLINE UNLESS IT IS THE TEXT'S OWN LENGTH.
+    #
+    # The old predicate asked only "is there a thin rule within 2.5 pt below this span and
+    # does it overlap it horizontally". Measured on 211 documents on 22728b1: of the 21
+    # documents that read a source count, NINETEEN carry no underline at all - the rule is a
+    # table row separator, a masthead rule, a certificate's decorative rule, three music
+    # staff lines, or the bottom edge of a P&ID tag box, 1.3 to 37 times the width of the
+    # span that happens to sit above it. Only 44_coloured_underlined_hyperlinks (5 of 5
+    # hits text-width) and 600_reviewed_invoice_with_annotations (1 of 4) carry one, and
+    # both PASS. So the class read "cannot pass a document with underlines" on a population
+    # that was 90 % documents without underlines.
+    #
+    # The test added below is the one 32_stroke_lines and 46_text_crossing_rule already
+    # carry in another form: a rule that belongs to a span is about as long as the span and
+    # starts where the span starts. 1.5x + 4 pt is loose on purpose - a hyperlink underline
+    # can overhang its text - and it is measured, not chosen: on 44's five real underlines
+    # the rule is 1.00x the span width and starts exactly at its left edge, and no document
+    # in the corpus has a genuine underline that this rejects.
+    def rules_under_text(doc, own_length=True):
         n = 0
         for p in doc:
             lines = [s for s in _strokes(p) if s["rect"].height <= 2.5]
@@ -1603,15 +1621,27 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
                         if not sp.get("text", "").strip():
                             continue
                         x0, y0, x1, y1 = sp["bbox"]
+                        span_w = x1 - x0
                         for st in lines:
                             r = st["rect"]
-                            if y1 - 2.5 <= r.y0 <= y1 + 2.5 and r.x0 < x1 and r.x1 > x0:
-                                n += 1
-                                break
+                            if not (y1 - 2.5 <= r.y0 <= y1 + 2.5 and r.x0 < x1 and r.x1 > x0):
+                                continue
+                            # ITS OWN LENGTH, ASKED OF THE SOURCE ONLY - the same rule
+                            # 32_stroke_lines applies to isolation. The source decides what
+                            # is an underline; the render only has to carry a rule under the
+                            # same span, because the renderer re-derives the geometry and a
+                            # rule it draws 1.6x wide is still that underline.
+                            if own_length:
+                                if r.x1 - r.x0 > span_w * 1.5 + 4:
+                                    continue
+                                if not (x0 - 4 <= r.x0 <= x0 + 4):
+                                    continue
+                            n += 1
+                            break
         return n
 
-    s_u = rules_under_text(src)
-    g_u = rules_under_text(gd)
+    s_u = rules_under_text(src, own_length=True)
+    g_u = rules_under_text(gd, own_length=False)
     c["36_underline_rules"] = (s_u, g_u, g_u >= max(1, int(s_u * 0.7)) if s_u else True)
 
     # ---- 37 super / subscript ---------------------------------------------
