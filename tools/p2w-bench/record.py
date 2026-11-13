@@ -181,7 +181,10 @@ def update_baseline(round_no=0, engine=""):
 
     lines = open(BASE, encoding="utf-8").read().split("\n")
     out, replaced = [], 0
-    today = time.strftime("%d %b")
+    # The sandbox is UTC and every other file in this directory is IST. A bare strftime here
+    # would date a row 5h30m behind the rows around it - and audit.py caught exactly that on
+    # the first run of the proof, on this line, forty minutes after it was written.
+    today = time.strftime("%d %b", time.gmtime(time.time() + 5 * 3600 + 30 * 60))
     for line in lines:
         if line.startswith("| "):
             cells = [c.strip() for c in line.strip().strip("|").split("|")]

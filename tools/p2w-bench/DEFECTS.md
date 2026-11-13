@@ -1877,3 +1877,77 @@ refreshes the date on all 208 rows would satisfy the gate while proving nothing.
 
 Tested both ways: nothing changed → "every row already matches", 0 lines written; new engine →
 21 rows rewritten, the 20 measured documents plus one.
+
+---
+
+## 39. Proving audit.py — thirteen planted bugs, five clean cases, four things it could not see
+
+An audit tool that has never been tested is a claim, not a check. `prove_audit.py` plants bugs in a
+scratch copy and asks one question: did the thing I planted come back, and did anything else? The
+ground truth is the script — every mutation is a bug written on purpose and the expected verdict
+was recorded before the run. Nothing here asks audit.py whether it is right.
+
+    SENSITIVITY  13 of 13 planted bugs caught, with the right kind
+    SPECIFICITY   5 of 5 clean cases stayed quiet
+    BLIND SPOTS   0 — both predicted misses were fixed rather than documented
+
+### What the first run found, which is the point of doing it
+
+The first run caught 7 of 11. Four were misses, and two of those were my own broken mutations:
+
+- **ranges**: I inserted the new section *before* the range's first anchor, so of course it was not
+  seen. Between the anchors, it is caught.
+- **gates**: I replaced `sys.exit(1)` in `measure_gate.py`, which does not contain that string — it
+  ends `sys.exit(main(sys.argv))`. A no-op mutation proves nothing. Made it `return 0`; caught.
+
+Two were real defects, both the same shape — a check that something other than the real thing
+could satisfy:
+
+- **states** tested `if "--close-round" not in src`. Renaming the handler to `--archive-round` still
+  passed, because round.py mentions `--close-round` in its docstring, two comments and an error
+  message. **A check a comment can satisfy is a check that cannot fail for the reason it exists.**
+  It now requires the handler, `if "--close-round" in argv`, as a regex.
+- **mutation** read the suite's exit code. A stub printing "all cases behave as claimed" and
+  returning 0 passed. It now also requires the suite to name its target three times and run three
+  cases. The four real suites run 17 to 30; the stub ran zero.
+
+### It caught a bug I had written forty minutes earlier
+
+The proof's `clock` case expected silence and got a finding:
+
+    [J] record.py:184 writes a timestamp without the IST offset - today = time.strftime("%d %b")
+
+That line was in `update_baseline`, added that morning. The sandbox is UTC and every other file
+here is IST, so the date on a rewritten row would have been 5h30m behind the rows around it.
+Fixed. A detector that finds a real bug in its own author's code on its first honest run is worth
+more than one that reports clean.
+
+### The two blind spots, both fixed
+
+- **A dead function whose name appears in a brief was never reported** — `check_dead` counted the
+  briefs as references. Prose is not a call site; references are counted in code only now.
+- **The engine-id formula removed altogether passed silently** — the absence of the thing being
+  checked is not "nothing to check". It is a finding now.
+
+### H stays a listing, and that is the honest answer
+
+The check failed on every `[:N]` in the directory: forty-nine, every one a display width. Narrowed
+to slices that reach a file, it caught `trace.py`'s `lines[:8] + lines[-MAX_LINES:]` — the trim
+working as designed. Telling a cap that loses data from a cap that *is* the feature needs to know
+what the code meant, and a regex does not. So H reports and a person decides, and the footer says
+so. Failing on it would have put two false alarms beside real findings, and a detector that cries
+wolf is the one that gets ignored.
+
+### The honest ledger
+
+| | |
+|---|---|
+| kinds a machine decides | 11 — A B C D E F I J K L N |
+| kinds a person decides | 4 — G the right question, H which cap is a bug, M realistic fixtures, O safe defaults |
+| sensitivity, this proof | 13 of 13 |
+| specificity, this proof | 5 of 5 |
+| known blind spots at the kinds it claims | 0 |
+
+It cannot see a bug in a kind it does not implement, and this proof says nothing about kinds it was
+never asked to check. What it does say: for the eleven it claims, a planted bug comes back and
+clean code stays quiet.

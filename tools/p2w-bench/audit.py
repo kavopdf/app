@@ -315,8 +315,12 @@ def check_dead():
                            ["tools/" + x for x in os.listdir(os.path.join(REPO, "tools"))
                             if x.endswith(".py") or x.endswith(".sh")])
     everything += "\n".join(read(os.path.join(HERE, f)) for f in py_tools())
-    for b in BRIEFS:
-        everything += read(os.path.join(HERE, b))
+    # References are counted in CODE only.
+    #
+    # This used to add every brief as well, and on 13 Nov the proof caught what that costs: a dead
+    # function whose name also appears in a FIXER-BRIEF sentence was never reported, because the
+    # sentence counted as an occurrence. Prose that mentions a function is not a call site, and a
+    # check a sentence can satisfy is a check that cannot fail.
     dead = []
     for f, name in names:
         if name.startswith("_") or name in ("main",):
@@ -339,6 +343,11 @@ def check_ids():
     src = read(os.path.join(HERE, "FIXER-BRIEF.md"))
     m = re.search(r'ENGINE="\$ENGINE-([^"]*)"', src)
     if not m:
+        # The brief must state how the id is built. Its absence is not "nothing to check" - it is
+        # the check's own subject having gone missing, and passing silently there is how the one
+        # guarantee that keeps two attempts apart stops being guaranteed.
+        bad("E", "FIXER-BRIEF.md has no ENGINE=\"$ENGINE-...\" formula - the engine id is "
+                 "unstated, so nothing keeps two attempts apart in the store")
         say("   no engine-id formula in the brief")
         return
     formula = m.group(1)
@@ -354,8 +363,16 @@ def check_ids():
 def check_caps():
     """A cap is fine; a cap that does not say it truncated is not."""
     say("\nH  SILENT TRUNCATION - caps and the slices they hide")
+    # A slice that reaches a file is the only kind that can lose data silently.
+    #
+    # Every other [:N] in this directory is a display width - a text preview, a column width -
+    # and there are about fifty of them. Failing on those would be fifty false alarms, and a
+    # detector that cries wolf is the one that gets ignored. What matters is a slice whose result
+    # is WRITTEN: that is a row the store will never have again, and nothing downstream can tell
+    # it from a row that never existed. classify.py wrote 20 of 43 classes for weeks this way.
+    sliced_to_file = 0
     for f in py_tools():
-        if f.endswith("_test.py"):
+        if f.endswith("_test.py") or f == "audit.py":
             continue
         src = read(os.path.join(HERE, f))
         for m in re.finditer(r"\[:(\d+)\]", src):
@@ -363,8 +380,22 @@ def check_caps():
             ctx = src.splitlines()[line - 1].strip()
             if any(w in ctx for w in ("more", "truncat", "%", "...", "said", "of ")):
                 continue
+            # does this slice land in a write?
+            window = "\n".join(src.splitlines()[line - 1:line + 1])
+            if not re.search(r"\.write\(|json\.dump|open\([^)]*['\"]w", window):
+                continue
+            sliced_to_file += 1
             say("   %-20s:%-4d %s" % (f, line, ctx[:70]))
-    say("   (listed, not failed - a cap is a judgement; a cap that lies about it is a bug)")
+    # LISTED, NOT DECIDED, and this is the honest answer.
+    #
+    # The first version of this check failed on every [:N] in the directory - forty-nine of them,
+    # all display widths. Narrowing it to slices that reach a file caught trace.py's
+    # `lines[:8] + lines[-MAX_LINES:]`, which is the trim working exactly as designed. Telling a
+    # cap that loses data from a cap that IS the feature needs to know what the code meant, and
+    # that is not a thing a regex knows. So H is reported and a person decides - putting it in
+    # the failing list would mean two false alarms standing next to real findings, and a detector
+    # that cries wolf is the one that gets ignored.
+    say("   %d slice(s) reach a file - look at these; the rest are display widths" % sliced_to_file)
 
 
 # ---------------------------------------------------------------- N: growth
@@ -416,12 +447,17 @@ def check_states():
         return
     names = [p.strip().strip('"\'') for p in phases.group(1).split(",")]
     say("   phases: %s" % " -> ".join(names))
-    if "--close-round" not in src:
-        bad("F", "nothing closes a round - fix has no exit")
-    if "--advance" not in src:
-        bad("F", "nothing advances a phase - measure and classify have no exit")
-    if "--apk-status" not in src:
-        bad("F", "nothing gates the APK on the rounds being finished")
+    # The flag must be HANDLED, not merely mentioned.
+    #
+    # This was a substring test, and on 13 Nov the proof caught it: renaming the handler to
+    # --archive-round still passed, because round.py mentions --close-round in its module
+    # docstring, in two comments and in an error message. A check a comment can satisfy is a
+    # check that cannot fail for the reason it exists.
+    for flag, why in (("--close-round", "nothing closes a round - fix has no exit"),
+                      ("--advance", "nothing advances a phase - measure and classify have no exit"),
+                      ("--apk-status", "nothing gates the APK on the rounds being finished")):
+        if not re.search(r'if\s+"%s"\s+in\s+argv' % re.escape(flag), src):
+            bad("F", why)
     say("   every phase has an exit")
 
 
@@ -434,10 +470,32 @@ def check_mutation():
         r = subprocess.run([sys.executable, os.path.join(HERE, s)],
                            capture_output=True, text=True)
         last = (r.stdout or "").strip().splitlines()[-1] if r.stdout else "(no output)"
-        ok = r.returncode == 0
-        say("   %-22s %s" % (s, "passes" if ok else "FAILS"))
-        if not ok:
+        passed = r.returncode == 0
+        say("   %-22s %s" % (s, "passes" if passed else "FAILS"))
+        if not passed:
             bad("L", "%s does not pass - %s" % (s, last))
+            continue
+        # An exit code is not evidence that anything was tested.
+        #
+        # On 13 Nov the proof replaced code_test.py with a stub that printed the right sentence
+        # and returned 0, and this check called it a passing suite. A suite must import the
+        # module it tests and contain comparisons that can be false - a stub has neither.
+        body = read(os.path.join(HERE, s))
+        target = s[:-8] if s.endswith("_test.py") else s[:-3]
+        # How often the suite names the thing it tests. An import is not the only way - gate_test
+        # drives commit-gate.sh, a shell script, and never imports a module at all - so the test
+        # is "does it talk about its target", not "does it import it". The four real suites name
+        # theirs 6 to 7 times; the stub the proof planted named it zero.
+        names = len(re.findall(r"\b%s\b" % re.escape(target), body))
+        # The suites in this directory do not use assert - they call a local check(name, got,
+        # want) and collect failures. So the count that matters is the number of CASES, which is
+        # check(...) calls plus any bare asserts. A stub that prints a sentence and returns 0 has
+        # neither, whatever it says.
+        cases = len(re.findall(r"\bcheck\(", body)) + len(re.findall(r"\bassert\b", body))
+        if names < 3 or cases < 3:
+            bad("L", "%s passes but does not test %s - it names it %d time(s) and runs %d "
+                     "case(s)" % (s, target, names, cases))
+            say("   %-22s passes, but tests nothing" % s)
 
 
 def main():
@@ -459,12 +517,19 @@ def main():
 
     print("\n" + "=" * 78)
     if FAILS:
-        print("%d finding(s)" % len(FAILS))
+        # The same range appears in more than one brief, so the same finding arrives twice.
+        # One problem should read as one problem.
+        uniq = []
         for kind, msg in FAILS:
+            if (kind, msg) not in uniq:
+                uniq.append((kind, msg))
+        print("%d finding(s)" % len(uniq))
+        for kind, msg in uniq:
             print("  [%s] %s" % (kind, msg))
         return 1
     print("clean - no finding in the eleven decidable kinds")
-    print("G, M and O need a person: the right question, realistic fixtures, safe defaults.")
+    print("G, H, M and O need a person: the right question, which cap is a bug, realistic")
+    print("fixtures, and safe defaults. H is listed above rather than decided - see its comment.")
     return 0
 
 
