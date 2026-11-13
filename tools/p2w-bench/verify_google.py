@@ -773,14 +773,30 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
 
     # ---- 47 margins --------------------------------------------------------
     def extents(doc):
+        """Page-1 text extents, measured over spans that actually carry ink.
+
+        This used to take every text block's bbox with no filter, and a block holding a
+        single space still carries a bbox. A render that emits one lone space at x = 0 -
+        which is a perfectly normal thing for a PDF writer to do - drove min(x) to 0 and
+        failed the document. Measured on 13 Nov: 167 of 187 recorded rows show
+        render.minx == 0 while 03_word_count passes 27 of 27 and 04_words_missing finds
+        nothing missing. That is not a margin defect, it is a space.
+
+        runs() in this file has always filtered whitespace-only spans; this did not.
+        """
         out = []
         for p in doc[:1]:
             xs0, ys0, xs1, ys1 = [], [], [], []
             for blk in p.get_text("dict")["blocks"]:
                 if blk.get("type") != 0:
                     continue
-                b = blk["bbox"]
-                xs0.append(b[0]); ys0.append(b[1]); xs1.append(b[2]); ys1.append(b[3])
+                for ln in blk.get("lines", []):
+                    for sp in ln.get("spans", []):
+                        if not sp.get("text", "").strip():
+                            continue
+                        b = sp["bbox"]
+                        xs0.append(b[0]); ys0.append(b[1])
+                        xs1.append(b[2]); ys1.append(b[3])
             if xs0:
                 out.append((round(min(xs0)), round(min(ys0)), round(max(xs1)), round(max(ys1))))
         return out[0] if out else (0, 0, 0, 0)
