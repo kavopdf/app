@@ -4,7 +4,7 @@
 reports whether the check fired. Run on the 208-document corpus on 13 Nov:
 
     P2W_CORPUS=<208 pdfs> python3 tools/p2w-bench/prove_checks.py
-    -> 28 proven, 30 unproven of 58      (was 26 and 32 before this commit)
+    -> 37 proven, 21 unproven of 58      (was 33 and 25 before the relative mutations)
 
 **An unproven check is not a proven check.** It may work perfectly and simply lack a test; it may
 also never fire at all, and the difference decides whether the corpus numbers mean anything. This
@@ -39,13 +39,13 @@ an image; it does not move one and does not necessarily change its dpi.
 | `37_super_subscript` | `mut_rule` | only the superscript flag exists; a rule sets no flag | raise a run and set the flag |
 | `38_list_markers` | `mut_rule` | needs a leading "1. " or bullet INSIDE one span | retype a line's first span |
 | `39_image_position` | `mut_image_shrink` | shrinks; the check compares position | move the image without resizing |
-| `41_block_spacing` | `mut_shift` | a uniform shift leaves every gap unchanged | change the gap between two blocks |
-| `42_alignment_mix` | `mut_shift` (dx=10) | a uniform shift leaves the alignment counts identical | centre one line that was left-aligned |
+| `41_block_spacing` | **PROVEN** - `mut_block_gap` moves one block | a uniform shift left every gap unchanged | done: see "The four relative measures" below |
+| `42_alignment_mix` | **PROVEN** - `mut_alignment` centres every multi-line block | a uniform shift left the alignment counts identical | done: see below |
 | `44_header_footer` | `mut_header` | ran but did not fire; the band is 0.11/0.89 of page height | add a block inside the band |
 | `48_image_area` | `mut_image_shrink` | ran but did not fire; the floor is 50 % of the source area | shrink below half |
 | `53_embedded_faces` | `mut_font` | ADDS a face; the check counts families that were LOST | drop a drawn family |
 | `54_image_dpi` | `mut_image_shrink` | resizing does not change pixels per inch | re-encode the image at a lower density |
-| `56_rtl_runs` | `mut_shift` (dx=10) | a shift does not change text direction | draw text right-to-left |
+| `56_rtl_runs` | **PROVEN** - `mut_rtl` draws a reversed run on the source side | a shift does not change text direction | done: see below |
 | `59_shape_anchor` | none written | no case exists | move a run out of its enclosing shape |
 | `46_text_crossing_rule` | `mut_rule` | same as 33 - a duplicate of it | see 33 |
 | `33_border_over_text` | `mut_rule` | ran but did not fire; needs a THIN stroke crossing a span | see `_strokes`: a filled band, not a stroked line |
@@ -61,6 +61,46 @@ Every mutation reports "(N other checks moved too)". `mut_shift` moves the whole
 18/19/20/21/23/41/43/47 at once. That proves each of them *can* fire, but not that any of them is
 specific - a check that fires on everything is as useless as one that never fires. A mutation that
 isolates its target would prove both.
+
+## The four relative measures (proven 13 Nov)
+
+`41_block_spacing`, `42_alignment_mix`, `56_rtl_runs` and `23_line_pitch` all measure a
+RELATIVE quantity, and `mut_shift` - a uniform page translation - is invariant on every one of
+them. All four now have a mutation that changes the measured quantity itself, and all four fire.
+`23_line_pitch` had no row in this table before, although the harness reported it unproven - and
+it was not alone: fourteen of the 30 unproven checks had no row here at all, including
+`05_words_extra`, `24_page_breaks`, `26_text_overlap`, `27_text_off_page` and `28_clipped_at_edge`.
+The table was never a complete account of the 30 it claims to account for.
+
+| check | mutation | measured | fires |
+|---|---|---|---|
+| `41_block_spacing` | `mut_block_gap` - one block moved, everything else left in place | median gap 24.4 -> 86.1 pt | yes |
+| `42_alignment_mix` | `mut_alignment` - every multi-line block re-laid centred | 42 matching lines -> 6 | yes |
+| `56_rtl_runs` | `mut_rtl` - a reversed run added to the SOURCE side | source 1, render 0 | yes |
+| `23_line_pitch` | `mut_line_pitch` - one block respaced about its own first baseline | median pitch 12.4 -> 24.8 pt | yes |
+
+Three things were measured rather than assumed, and each one changed the design:
+
+1. **A median can be pinned.** On the invoice (BASE) five block gaps are exactly 17.0 pt around
+the median, and all 168 candidates (28 block tops x the 6 distances the mutator tries) leave the
+median at 17.0 - simulated, not assumed. `mut_block_gap` therefore searches for the block and the
+distance instead of assuming any move works, and the case runs on `34_monospace_document.pdf`
+where one moved block takes the median from 24.4 to 86.1. On BASE the same mutator leaves the
+median at 17.0 and the check does not fire - correctly.
+2. **One centred line is not enough for a 70 % floor.** The check passes while 70 % of the
+source's classified lines still match, so on a 42-line page thirteen must move. Measured: one
+centred line leaves 42 of 42 matching, and the check does not fire.
+3. **Redaction plus reinsertion must be per span.** Reinserting a whole line as one string loses
+the gaps between spans (the invoice's `1 Hex` returned as `1Hex`) and a base-14 font drops the
+glyphs it has no character for (the em dash and the bullet disappeared). `_reflow` therefore
+redraws span by span at each span's own x, with DejaVu when the font file is present.
+
+What `56_rtl_runs` actually counts: `dir[0] < 0` is any line whose x axis points left, which
+includes text rotated 180 degrees. Ten of the 208 corpus documents have such lines and none of
+them is right-to-left script - `04_stamp_180deg_upside_down.pdf` counts 2, from a `CANCELLED`
+stamp. So the check is not RTL-specific; it is direction-reversal-specific, and its name says
+otherwise. Its mutation proves the failure path, not that a real RTL document is measured well:
+the corpus contains no RTL document to check that with.
 
 ## What this means for the corpus numbers
 

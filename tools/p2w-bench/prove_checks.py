@@ -64,6 +64,14 @@ LINK_DOC = "44_coloured_underlined_hyperlinks.pdf"
 UNDERLINE_DOC = "payslip-label-left-amount-right.pdf"
 SCRIPT_DOC = "journal-2col-with-footnotes.pdf"
 MARKER_DOC = "admission-form-labels-left-boxes-right.pdf"
+# The relative mutations below need a page whose median is not pinned by a
+# cluster of identical values. The invoice (BASE) has five gaps of exactly
+# 17.0 pt around its median block gap and nine baseline gaps between 9.0 and
+# 12.5 pt around its median pitch, so moving one block or respacing one block
+# leaves both medians where they were - measured, not assumed. This document has
+# 41 left-aligned lines, 35 of them inside multi-line blocks, and no cluster of
+# equal gaps around either median, so one moved block moves them.
+MONO_DOC = "34_monospace_document.pdf"
 
 
 def run(src, gd):
@@ -563,6 +571,206 @@ def src_toc(doc):
     doc.set_toc([[1, "Chapter One", 1], [1, "Chapter Two", 1]])
 
 
+# ---- relative mutations: change a RELATIVE quantity, not the page ----------
+# mut_shift translates the whole page, and every check that measures a RELATION
+# between two things is invariant under that translation: the gap between two
+# blocks, the count of left/right/centre lines, the direction of a line, the
+# pitch between two baselines. Four checks were mutated with mut_shift and could
+# therefore never fire, whatever the document. Each mutator below changes the
+# measured relation itself and leaves the page where it is.
+#
+# All four redraw spans through _reflow, which is the redaction plus reinsertion
+# mut_restyle already does, but per SPAN and at the span's own x unless it is
+# deliberately moved. Two things were measured and are why it is per span:
+# reinserting a whole line as one string loses the gaps between spans (the
+# invoice's "1 Hex" came back as "1Hex"), and a base-14 font drops the glyphs it
+# has no character for (the em dash and the bullet vanished from the invoice).
+# DejaVu has them; helv is the fallback when the font file is not there.
+UNI_FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+_HAVE_UNI = os.path.exists(UNI_FONT)
+_FACE = "uni" if _HAVE_UNI else "helv"
+_FONT = fitz.Font(fontfile=UNI_FONT) if _HAVE_UNI else fitz.Font("helv")
+
+
+def _reflow(page, moves):
+    """Redraw exactly the spans in moves: (rect, text, size, x, dy)."""
+    if not moves:
+        return
+    for r, t, sz, x, dy in moves:
+        page.add_redact_annot(r)
+    page.apply_redactions()
+    kw = {"fontname": _FACE, "fontfile": UNI_FONT} if _HAVE_UNI else {"fontname": "helv"}
+    for r, t, sz, x, dy in moves:
+        page.insert_text((x, r.y1 - 1 + dy), t, fontsize=sz, color=(0, 0, 0), **kw)
+
+
+def _blocks(page):
+    return [b for b in page.get_text("dict")["blocks"] if b.get("type") == 0]
+
+
+def _span_moves(block, dy=0.0, dx=0.0):
+    out = []
+    for ln in block.get("lines", []):
+        for sp in ln["spans"]:
+            if sp["text"].strip():
+                out.append((fitz.Rect(sp["bbox"]), sp["text"], sp["size"],
+                            sp["bbox"][0] + dx, dy))
+    return out
+
+
+def _tops(page):
+    return sorted({round(b["bbox"][1], 1) for b in _blocks(page)})
+
+
+def _median_gap(tops):
+    g = sorted([round(b - a, 1) for a, b in zip(tops, tops[1:]) if 1 < b - a < 300])
+    return g[len(g) // 2] if g else 0
+
+
+def mut_block_gap(doc, steps=(-60, -40, -30, 30, 40, 60)):
+    """Move ONE block, leaving every other block where it is.
+
+    41_block_spacing reads the median gap between block tops on page 1. mut_shift
+    moved the whole page, so every gap was unchanged and the check could not fire.
+    Moving one block changes the gap above it and the gap below it.
+
+    The block and the distance are searched for, not assumed, because a single
+    moved block does NOT always move a median: the invoice (BASE) has five gaps of
+    exactly 17.0 pt around its median, and measured here all 168 candidates (its
+    28 block tops x the 6 distances) leave the median at 17.0 - the search would
+    find nothing. On MONO_DOC one moved block takes the median from 24.4 to 86.1.
+    """
+    p = doc[0]
+    tops = _tops(p)
+    base = _median_gap(tops)
+    best = (0.0, None, None)
+    for i in range(len(tops)):
+        for dy in steps:
+            m = _median_gap(sorted(tops[:i] + [round(tops[i] + dy, 1)] + tops[i + 1:]))
+            if abs(m - base) > best[0]:
+                best = (abs(m - base), i, dy)
+    if best[1] is None:
+        return
+    top, dy = tops[best[1]], best[2]
+    moves = []
+    for b in _blocks(p):
+        if abs(round(b["bbox"][1], 1) - top) < 0.05:
+            moves += _span_moves(b, dy=dy)
+    _reflow(p, moves)
+
+
+def mut_alignment(doc):
+    """Centre the lines of every block that has more than one line.
+
+    42_alignment_mix compares the counts of left, right and centred lines. A
+    uniform shift leaves all three counts identical, so mut_shift(dx=10) could
+    not prove it. Here each block is re-laid with its lines centred on that
+    block's own width, which turns its left lines into centre lines.
+
+    Centring ONE line is not enough and that is measured, not assumed: the check
+    passes while 70 % of the source's classified lines still match, so on a
+    document with 42 classified lines thirteen must move, and one centred line
+    leaves 41 of 42 matching. Centring every multi-line block on MONO_DOC takes
+    the counts from (41 left, 1 right, 0 centre) to (6, 0, 36) and fires.
+    """
+    for p in doc:
+        moves = []
+        for b in _blocks(p):
+            lines = [ln for ln in b.get("lines", []) if ln["spans"]]
+            if len(lines) < 2:
+                continue
+            geom, bw = [], 0.0
+            for ln in lines:
+                spans, w, prev = [], 0.0, None
+                for sp in ln["spans"]:
+                    if not sp["text"]:
+                        continue
+                    if prev is not None:
+                        w += max(0.0, sp["bbox"][0] - prev)   # keep the gap between spans
+                    spans.append((fitz.Rect(sp["bbox"]), sp["text"], sp["size"], w))
+                    w += _FONT.text_length(sp["text"], fontsize=sp["size"])
+                    prev = sp["bbox"][2]
+                geom.append((spans, w))
+                bw = max(bw, w)
+            bx0 = b["bbox"][0]
+            for spans, w in geom:
+                dx = (bw - w) / 2.0
+                for r, t, sz, off in spans:
+                    moves.append((r, t, sz, bx0 + dx + off, 0))
+        _reflow(p, moves)
+
+
+def mut_rtl(doc):
+    """Draw a run with a negative-direction text matrix.
+
+    56_rtl_runs counts lines whose dir[0] < 0 and PASSES when the source has
+    none, because of `s_rtl == 0 or ...`. No render-side mutation can fail it on a
+    document with no reversed run - mut_shift least of all - so the run is added
+    to the SOURCE side of the pair, the same shape as src_annot: the source then
+    has one reversed line and the render has none.
+
+    Note what this check actually counts: dir[0] < 0 is any line whose x axis
+    points left, which includes text rotated 180 degrees. Ten corpus documents
+    have such lines and none of them is right-to-left script.
+    """
+    p = doc[0]
+    p.insert_text((300, 620), "reversed run", fontsize=11, color=(0, 0, 0),
+                  morph=(fitz.Point(300, 620), fitz.Matrix(-1, 1)))
+
+
+def _run_ys(page):
+    return sorted({round(sp["bbox"][1], 1) for b in _blocks(page)
+                   for ln in b.get("lines", []) for sp in ln["spans"]
+                   if sp["text"].strip()})
+
+
+def _pitch_of(ys):
+    g = sorted([round(b - a, 1) for a, b in zip(ys, ys[1:]) if 1 < b - a < 200])
+    return g[len(g) // 2] if g else 0
+
+
+def mut_line_pitch(doc, factors=(2.0, 1.6, 0.6)):
+    """Change one block's baseline pitch, keeping its first baseline in place.
+
+    23_line_pitch reads the median gap between consecutive baselines. mut_shift
+    moved every baseline by the same amount, so every gap stayed 11.0 pt and the
+    check could not fire. Here one block's lines are respaced about that block's
+    own first baseline: the block's pitch changes, the page does not move.
+
+    The block and the factor are searched for, because the median is taken over
+    the whole page and one block among many need not move it. On MONO_DOC the
+    search doubles one block's pitch and takes the median from 12.4 to 24.8 pt.
+    """
+    pages = list(doc)
+    best = (0.0, None, None)
+    for pi, p in enumerate(pages):
+        ys = _run_ys(p)
+        base = _pitch_of(ys)
+        for bi, b in enumerate([x for x in _blocks(p) if len(x.get("lines", [])) >= 2]):
+            ly = [round(ln["bbox"][1], 1) for ln in b["lines"]]
+            for fac in factors:
+                y0 = ly[0]
+                new = set(ys) - set(ly)
+                new |= {round(y0 + (y - y0) * fac, 1) for y in ly}
+                m = _pitch_of(sorted(new))
+                if abs(m - base) > best[0]:
+                    best = (abs(m - base), pi, (bi, fac))
+    if best[1] is None:
+        return
+    p = pages[best[1]]
+    bi, fac = best[2]
+    b = [x for x in _blocks(p) if len(x.get("lines", [])) >= 2][bi]
+    y0 = b["lines"][0]["bbox"][1]
+    moves = []
+    for ln in b["lines"]:
+        for sp in ln["spans"]:
+            if sp["text"].strip():
+                yb = sp["bbox"][3] - 1
+                moves.append((fitz.Rect(sp["bbox"]), sp["text"], sp["size"],
+                              sp["bbox"][0], (y0 + (yb - y0) * fac) - yb))
+    _reflow(p, moves)
+
+
 # check -> ("render" | "source", mutation, document, description)
 CASES = {
     "01_page_count":            ("render", mut_addpage, BASE, "a page added"),
@@ -587,7 +795,7 @@ CASES = {
     "20_within_10pt":           ("render", mut_shift, BASE, "everything shifted vertically"),
     "21_median_dx":             ("render", lambda d: mut_shift(d, dx=10), BASE, "shifted sideways"),
     "22_reading_order":         ("render", mut_blank, BASE, "the page's order destroyed"),
-    "23_line_pitch":            ("render", mut_shift, BASE, "line pitch changed"),
+    "23_line_pitch":            ("render", mut_line_pitch, MONO_DOC, "one block's pitch doubled"),
     "24_page_breaks":           ("render", mut_droppage, BASE, "a page dropped"),
     "25_invisible_text":        ("render", mut_invisible, BASE, "text drawn white on white"),
     "26_text_overlap":          ("render", mut_rule, BASE, "a rule across text"),
@@ -611,8 +819,8 @@ CASES = {
                                  "every list marker removed"),
     "39_image_position":        ("render", mut_image_shrink, IMG_DOC, "the image moved"),
     "40_link_targets":          ("render", mut_wrong_link, LINK_DOC, "the target changed"),
-    "41_block_spacing":         ("render", mut_shift, BASE, "block gaps changed"),
-    "42_alignment_mix":         ("render", lambda d: mut_shift(d, dx=10), BASE, "shifted sideways"),
+    "41_block_spacing":         ("render", mut_block_gap, MONO_DOC, "one block moved, the rest left alone"),
+    "42_alignment_mix":         ("render", mut_alignment, MONO_DOC, "every multi-line block centred"),
     "43_within_10pt_x":         ("render", lambda d: mut_shift(d, dx=20), BASE, "shifted sideways"),
     "44_header_footer":         ("render", mut_header, BASE, "a header line added"),
     "45_char_accuracy":         ("render", mut_chars, BASE, "characters replaced"),
@@ -626,7 +834,7 @@ CASES = {
     "53_embedded_faces":        ("render", mut_font, BASE, "a different face used"),
     "54_image_dpi":             ("render", mut_image_shrink, IMG_DOC, "the image resolution changed"),
     "55_orientation_mix":       ("render", mut_landscape, BASE, "the page turned landscape"),
-    "56_rtl_runs":              ("render", lambda d: mut_shift(d, dx=10), BASE, "direction disturbed"),
+    "56_rtl_runs":              ("source", mut_rtl, BASE, "a reversed run the render does not have"),
 }
 
 

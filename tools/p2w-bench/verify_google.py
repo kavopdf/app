@@ -23,7 +23,7 @@ THRESHOLDS (a document passes only if every one holds)
   position      median dy < 3 pt, worst dy < 15 pt, within 10 pt > 95 %, order > 95 %
   visual        no invisible text, no text-on-text, no page overflow, no extra page
 """
-import os, sys, json, re, collections, statistics
+import os, sys, json, re, collections, statistics, difflib
 
 try:
     import fitz  # PyMuPDF
@@ -102,6 +102,27 @@ def face_name(f):
             continue
         break
     return " ".join(toks) or norm_font(f)
+
+
+def order_score(s_seq, g_seq):
+    """The share of source words that appear in the render IN ORDER.
+
+    The old measure zipped the two sequences and counted equal positions, which is a SHIFT
+    detector, not an order detector: one inserted word at the front moved every source word
+    against its neighbour and scored 0, while the same word inserted at the END scored 100 -
+    three verdicts for one edit, decided only by where it landed. Measured on 13 Nov across
+    nine constructed pairs.
+
+    SequenceMatcher on the word lists scores the longest matching blocks IN ORDER, so an
+    insertion costs the inserted word rather than the whole tail, and a swap still costs.
+    autojunk=False is not optional: past 200 items the default heuristic junkifies any word
+    occurring in more than 1 % of the sequence, which on a 500-word page is every "the", and
+    the score then depends on length rather than on the difference.
+    """
+    if not s_seq:
+        return 100
+    sm = difflib.SequenceMatcher(None, s_seq, g_seq, autojunk=False)
+    return round(100.0 * sum(b.size for b in sm.get_matching_blocks()) / len(s_seq))
 
 
 def norm_word(w):
@@ -1308,11 +1329,7 @@ def compare(src_path, gd_path, docx_path=None):
     # reading order: the sequence of normalised words
     s_seq = [norm_word(w) for w in s_text.split() if w.strip()]
     g_seq = [norm_word(w) for w in g_text.split() if w.strip()]
-    if s_seq:
-        same = sum(1 for a, b in zip(s_seq, g_seq) if a == b)
-        order = round(100.0 * same / max(1, len(s_seq)))
-    else:
-        order = 100
+    order = order_score(s_seq, g_seq)
     checks["22_reading_order"] = (100, order, order > 95)
 
     # line spacing: median gap between consecutive baselines on page 1
