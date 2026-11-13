@@ -279,6 +279,21 @@ def extra_checks2(src, gd):
     # that is actually true keeps the check honest: serif-to-Times passes,
     # serif-to-Arial still fails, because it is a different face.
     SAME_FACE = {
+        # THE BASE-14 NAMES THE ENGINE ITSELF REWRITES. DocxWriter.BASE14 maps
+        # times->Times New Roman, helvetica->Arial, courier->Courier New, deliberately and
+        # correctly - no reader has a face called "Helvetica". This table knew none of the
+        # three, so a source PDF carrying "Helvetica" produced family "helvetica", Google's
+        # export of the engine's "Arial" produced "arial", and the intersection was empty: a
+        # correct conversion scored as a lost face. Measured over the published corpus on
+        # 13 Nov, Helvetica appears in 53 of 53 documents.
+        # These are equivalences, not forgiveness - Helvetica/Arial, Times/Times New Roman and
+        # Courier/Courier New are metric-compatible by design. Declaring a serif face equal to
+        # a sans face would be the other thing, and is not done here.
+        "helvetica": "arial", "helveticaps": "arial", "arialps": "arial",
+        "times": "timesnewroman", "timesroman": "timesnewroman",
+        "timesnew": "timesnewroman", "timesnewromanps": "timesnewroman",
+        "courier": "couriernew", "courierps": "couriernew",
+        "couriernewps": "couriernew",
         "liberationsans": "arial", "arial": "arial",
         "liberationserif": "timesnewroman", "timesnewroman": "timesnewroman",
         "liberationmono": "couriernew", "couriernew": "couriernew",
@@ -293,15 +308,27 @@ def extra_checks2(src, gd):
     }
 
     def family(name):
-        n = (name or "").split("+")[-1].strip().lower()
+        # The comma form ("Arial,Bold") is a real PDF naming style and DocxWriter's own suffix
+        # list already carries ",Bold"/",Italic"/",BoldItalic". Turned into a space here so the
+        # space-form strip below catches it - doing it at the end left "arialbold", a name no
+        # family has.
+        n = (name or "").split("+")[-1].strip().lower().replace(",", " ")
         # "MT" and "PSMT" are PostScript suffixes that sit AFTER the style, so
         # they have to come off first: Arial-BoldMT is arial+bold+mt, not a bold
         # family called "arial-bold".
-        for suf in ("psmt", "mt"):
+        # "ps" as well as "psmt"/"mt": Google's bold exports come back as
+        # "TimesNewRomanPS-BoldMT" and "CourierNewPS-BoldMT", and with only psmt/mt here the
+        # "ps" survived while the "-Bold" blocked the style loop that follows, leaving
+        # "timesnewromanps" - a name no family has.
+        for suf in ("psmt", "mt", "ps"):
             if n.endswith(suf):
                 n = n[:-len(suf)]
                 break
-        for suf in ("-bolditalic", "-boldoblique", "-bold", "-italic", "-oblique", "-regular"):
+        # "-roman" and "-normal" are in DocxWriter's own suffix list (DocxWriter.java:4656-4659)
+        # and were missing here, so "Times-Roman" - the PostScript name of a base-14 face -
+        # came out as "times-roman" and matched nothing.
+        for suf in ("-bolditalic", "-boldoblique", "-bold", "-italic", "-oblique", "-regular",
+                    "-roman", "-normal"):
             if n.endswith(suf):
                 n = n[:-len(suf)]
                 break
@@ -315,7 +342,7 @@ def extra_checks2(src, gd):
         # instrument rather than by its own result. Bold is a style of the same family, not a
         # different family.
         for suf in (" bold italic", " bold oblique", " italic", " oblique", " bold",
-                    " regular", " roman", " normal"):
+                    " regular", " normal", " book"):
             if n.endswith(suf):
                 n = n[:-len(suf)]
                 break
@@ -324,7 +351,9 @@ def extra_checks2(src, gd):
         # form collapses to "liberation sans" instead and misses the table entirely, so the
         # internal space has to go too. Families carry no meaningful space for this
         # comparison and both sides are normalised identically, so this stays symmetric.
-        n = n.replace(" ", "")
+        # The comma form ("Arial,Bold") is a real PDF naming style and DocxWriter's own
+        # suffix list already carries ",Bold"/",Italic"/",BoldItalic". This side did not.
+        n = n.replace(",", "").replace(" ", "")
         return SAME_FACE.get(n, n)
 
     def faces(doc):
