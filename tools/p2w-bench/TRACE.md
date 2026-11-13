@@ -189,3 +189,8 @@ claim and after each step; it is not code and cannot break anything.
 | 13 Nov 09:56 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 09:56 | fixer | hypothesis | 32_stroke_lines -> untested |
 | 13 Nov 09:56 | ? | commit-gate | started |
+| 13 Nov 11:24 | classifier | claim | classifier claimed the slot |
+| 13 Nov 11:24 | classifier | classify | 45 classes from 211 documents |
+| 13 Nov 11:24 | classifier | classify --txt | 4 classes from 211 documents |
+| 13 Nov 11:24 | classifier | ratchet --txt | held or rose |
+| 13 Nov 11:24 | classifier | ratchet | held or rose |
