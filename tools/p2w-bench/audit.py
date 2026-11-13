@@ -103,6 +103,31 @@ def check_tools():
     if not missing:
         say("   all present")
 
+    # STEP references. A brief that names a step it no longer has sends its reader looking for
+    # instructions that are not there - and on 13 Nov one did: STEP 8c was folded into STEP 9 and
+    # a line three pages later still called it by name.
+    body = briefs().get("FIXER-BRIEF.md", "")
+    defined = set(re.findall(r"^STEP ([0-9]+[a-c]?) - ", body, re.M))
+    referenced = set(re.findall(r"STEP ([0-9]+[a-c]?)\b", body))
+    orphan = sorted(referenced - defined)
+    say("   %d STEP(s) defined, %d referenced" % (len(defined), len(referenced)))
+    for o in orphan:
+        bad("B", "FIXER-BRIEF.md refers to STEP %s, which it does not define" % o)
+
+    # The sizes the brief quotes, because it uses them to tell a run what not to read. A number
+    # that has drifted is a number a run will trust and be wrong about: DEFECTS.md was quoted at
+    # 39 KB when it had reached 108.
+    for m in re.finditer(r"^\s+([A-Z][A-Z0-9-]+\.(?:jsonl|md))\s+(\d+) KB", body, re.M):
+        name, claimed = m.group(1), int(m.group(2))
+        path = os.path.join(HERE, name)
+        if not os.path.exists(path):
+            continue
+        actual = os.path.getsize(path) // 1024
+        if abs(actual - claimed) > max(10, claimed * 0.5):
+            bad("B", "the brief quotes %s at %d KB; it is %d KB" % (name, claimed, actual))
+        else:
+            say("   %-22s quoted %d KB, actual %d KB" % (name, claimed, actual))
+
 
 # ---------------------------------------------------------------- D: prose vs constants
 def check_numbers():
@@ -426,6 +451,15 @@ def check_growth():
                 % (size / 1e6))
         if f == "TRACE.md" and size > 200_000:
             bad("N", "TRACE.md is %d bytes - the 400-line trim is not running" % size)
+    # LESSONS.md is capped in prose - "keep it under twenty entries" - and prose is a promise.
+    # It said fifteen and held sixteen, because nothing counted.
+    lp = os.path.join(HERE, "LESSONS.md")
+    if os.path.exists(lp):
+        entries = len([l for l in open(lp, encoding="utf-8") if l.startswith("- ")])
+        say("   %-24s %d lesson entries (cap 20)" % ("LESSONS.md", entries))
+        if entries > 20:
+            bad("N", "LESSONS.md holds %d entries against a cap of 20 - prune one that no longer "
+                     "changes what the next attempt does" % entries)
 
 
 # ---------------------------------------------------------------- A: evidence

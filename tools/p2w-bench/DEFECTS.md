@@ -2169,3 +2169,73 @@ Not a silent skip, and not a hack. The park record in STEP 10 now carries three 
 A class that parks with a specification can be acted on later — by a person, or by a future
 capability that reads the specification. A class that parks with "hard" cannot. That is the
 difference the three lines buy, and it costs a fixer nothing but honesty.
+
+---
+
+## 43. Every rule the fixer reads, read line by line
+
+Sixteen of the brief's 616 lines carry a rule that binds the run — must, never, always, only, do
+not. Each was read against the code and against the other rules. Five were wrong, and none of the
+five would have been found by reading the code.
+
+### The five
+
+**1. Line 13 said "You fix ONE defect CLASS per run."** STEP 9 tells a run to go back and take the
+next OPEN class, and the RULES section at the bottom says "A run may work several classes". So the
+first line of the brief and the last section of the brief agreed with each other and both disagreed
+with line 13, which is the line a run reads first. Now: one class *at a time*, up to three per run,
+STEP 9 decides.
+
+**2. The brief quoted `DEFECTS.md` at 39 KB. It is 108 KB.** That number exists to stop a run
+reading the file whole — "reading one of them whole ends the run before it starts". A run that
+trusts 39 KB is being told a file is a quarter of its real size.
+
+**3. "LESSONS.md is capped at fifteen lines" — it held sixteen entries, and nothing counted.**
+Prose is a promise, and this one had already been broken. The cap is now twenty, and `audit.py`
+fails above it, so the next drift is a finding instead of a paragraph nobody checks.
+
+**4. The example report table said "Attempt 2 of 12"** while `MAX_ATTEMPTS` is 24. An example is
+the most-read part of a brief — it is what a run copies — so a wrong number there propagates.
+
+**5. A line three pages below STEP 9 still said "it was a separate step before this - STEP 8c".**
+STEP 8c was folded into STEP 9 in §36 and two references were fixed then; this one was missed. A
+brief that names a step it no longer has sends its reader looking for instructions that are not
+there.
+
+### Two checks so these cannot drift again
+
+Both are in `audit.py`, both proven by `prove_audit.py`:
+
+- **every STEP a brief names must be defined in it** — 17 defined, 17 referenced, no orphans
+- **every "N KB" a brief quotes must match the file** within half again — the four numbers it
+  quotes now read 928 / 320 / 65 / 108 against quotes of 913 / 328 / 66 / 100
+
+and one more under resource growth: **LESSONS.md is counted**, 16 against a cap of 20.
+
+The proof grew from 13 cases to 16. All 16 caught, all 5 clean cases quiet.
+
+### What was checked and found correct
+
+Not everything read was wrong, and saying so is part of the result:
+
+| checked | verdict |
+|---|---|
+| every tool path a brief names exists | 17 named, 17 present |
+| every flag a brief uses exists in its tool | all present |
+| every limit matches the code | 24 attempts, 24 h, 3 requeues, 96 ceiling, 45 min, 25 min |
+| every TOOLBOX sed range returns its own section | 7 of 7 |
+| "no BASELINE.md → ratchet exits 0" | tested, true |
+| "never measure a .txt class with .docx tools" vs "run BOTH ratchets" | not a contradiction — one is about measuring a class, the other about gating a commit |
+| TOOLBOX names no tool that does not exist | 21 sections, all resolve |
+| every size claim other than DEFECTS.md | within tolerance |
+
+### The pattern, one more time
+
+All five were prose that had drifted from the thing it described, and every one of them was in the
+brief rather than in the code. Four of the five had been *correct when written* — the class count,
+the file size, the attempt number and the step name all changed underneath a sentence that stayed
+put. Nothing in the pipeline compared a sentence to its subject until now, which is why two of them
+are checks and the third is a check on the count.
+
+A brief is not documentation of the pipeline. For the fixer it **is** the pipeline, and a stale
+sentence in it is a wrong instruction executed at three in the morning with nobody to ask.

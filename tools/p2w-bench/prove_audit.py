@@ -137,6 +137,24 @@ def m_dead_in_prose(r):
           "visible_helper is a thing that exists.\n\nSTEP 0c - READ WHAT ALREADY COST US TIME")
 
 
+def m_dead_step(r):
+    """A brief that names a step it does not define."""
+    patch(r, "tools/p2w-bench/FIXER-BRIEF.md", "STEP 0c - READ WHAT ALREADY COST US TIME",
+          "See STEP 11 for details.\n\nSTEP 0c - READ WHAT ALREADY COST US TIME")
+
+
+def m_stale_size(r):
+    """A size the brief quotes to tell a run what not to read, drifted from reality."""
+    patch(r, "tools/p2w-bench/FIXER-BRIEF.md", "DEFECTS.md             100 KB",
+          "DEFECTS.md              12 KB")
+
+
+def m_lessons_cap(r):
+    """The lesson file past the cap its own brief states."""
+    with open(os.path.join(r, "tools/p2w-bench/LESSONS.md"), "a", encoding="utf-8") as f:
+        f.write("".join("- **padding %d.** does not change anything\n" % i for i in range(10)))
+
+
 def m_ids_gone(r):
     """The engine-id formula removed entirely. E says 'no formula' and passes. Believed MISSED."""
     s = read(r, "tools/p2w-bench/FIXER-BRIEF.md")
@@ -170,6 +188,9 @@ CASES = [
     # These two were the blind spots the first proof run found. They are cases now, not
     # footnotes: a check that knows it cannot see something should be fixed or say so, and
     # after 13 Nov these two were fixed.
+    ("a brief refers to a STEP it does not define", "tools", m_dead_step, "FIRE", "B"),
+    ("a size the brief quotes has drifted", "tools", m_stale_size, "FIRE", "B"),
+    ("LESSONS.md past the cap its brief states", "growth", m_lessons_cap, "FIRE", "N"),
     ("a dead function whose name appears in a brief", "dead", m_dead_in_prose, "FIRE", "K"),
     ("the engine-id formula removed altogether", "ids", m_ids_gone, "FIRE", "E"),
 ]
