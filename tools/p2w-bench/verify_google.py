@@ -1700,8 +1700,15 @@ def extra_checks2(src, gd, docx_path=None):
     #     pages (28 %) and >8 pt on 144 (27 %): one line breaking differently - which is
     #     all a different engine's line breaking is - moves the judged edge past the
     #     tolerance. Measured: redrawing 11 lines where they already were, in a
-    #     substituted face, fired over=1. The edge is now the 90th percentile of the
-    #     column's right edges and a single line can no longer decide the verdict.
+    #     substituted face, fired over=1. The answer taken here was the 90th percentile.
+    #     THAT ANSWER WAS WRONG TOO, and it was wrong because the noise it was defending
+    #     against was never bounded - see edge() for the measurement: the percentile's own
+    #     slack reached 65.5 pt at p90 and the short-column fallback reached 416.7 pt, so
+    #     the check was defending a one-line move with a tolerance five times the figure it
+    #     states, and still firing on 25 documents whose columns had not moved at all. The
+    #     widest line plus ONE MEASURED WORD of slack absorbs the same one-line move, at a
+    #     bound that is a property of the type, and it is the widest line that sees a
+    #     single line running into the margin - which is the defect, not the noise.
     # (d) THE BANDS WERE A FRACTION OF THE PAGE AND NOTHING ELSE. 159 of 545 pages have
     #     body-column lines inside them; on 18 pages the widest body line is one of them,
     #     by up to 206 pt, and on 320_balance_sheet_statutory moving the page 8 pt
@@ -1712,9 +1719,7 @@ def extra_checks2(src, gd, docx_path=None):
     RIGHT_UNDERRUN = 8.0
     COL_MIN_LINES = 3       # a left-edge cluster is a column if it holds this many lines
     COL_MIN_SHARE = 0.05    # ... or this share of the page's body lines, if larger
-    EDGE_PCT = 0.9          # the column edge is this percentile of its right edges
-    EDGE_MIN_LINES = 5      # below this many lines the percentile is the max anyway
-    SLACK_CAP = 24.0        # the tolerance never grows past this, however ragged the page
+    SLACK_CAP = 40.0        # one word wider than this is a token, not a word - see edge()
 
     def page_lines(page):
         ls = []
@@ -1760,44 +1765,72 @@ def extra_checks2(src, gd, docx_path=None):
             out.append((a, g + [b for b in band if abs(b[0] - a) <= 10]))
         return out
 
-    def edge(col):
-        """(the column's right edge, how precisely that page can state it).
+    def edge(col, left, words):
+        """(the column's right edge, how precisely the page can state it).
 
-        max() was a one-line statistic: its sensitivity to a single line breaking
-        differently is the gap between the longest and second-longest line, which is
-        larger than the 6 pt tolerance on 28 % of the corpus's pages. A percentile over
-        the same lines is the same number on both sides of the comparison, so the
-        systematic shortfall of a ragged column cancels.
+        THE EDGE IS THE COLUMN'S WIDEST LINE. It was the 90th percentile of the right
+        edges, and the percentile was wrong for two measured reasons.
 
-        The second number is that percentile's OWN resolution - the distance between the
-        order statistics on either side of it, capped. A re-break can move the k-th value
-        by at most that much, so it is the largest movement that is not evidence of a
-        defect, and the tolerance has to include it. This replaces the 10-line floor: the
-        floor was an attempt to ask "is this page's edge measurable", and this answers it
-        per column instead of per page, on every column, including the short ones.
+        1. IT MEASURED RAGGEDNESS, NOT WIDTH. A percentile sits below the text area's
+           right edge by however ragged the column is, and the source and the render are
+           ragged for different reasons: a justified source block ends every full line at
+           exactly one x (370_offer_letter: four lines at 538.6) while a renderer that has
+           lost the justification ends them anywhere (same page: 497.9, 506.2, 510.5,
+           523.9). p90 against p90 read that as a column 32 pt narrower and fired on 25
+           documents. Over the 1421 judged columns of the 211-document corpus the p90
+           difference has |d| p99 = 67.3 pt; the widest-line difference has 47.2.
+        2. ITS SLACK COULD NOT BE BOUNDED. See below - the whole-range fallback.
+
+        The widest line is the right estimator for a BOUNDARY, and this is one: no line
+        may cross the text area's right edge, and on a column with any full line at all
+        the widest line IS that edge. Its noise under a legitimate re-break is one word -
+        the last word of the widest line moving to the next line - which is a measured
+        quantity, not an order-statistic gap.
+
+        THE SECOND NUMBER IS ONE WORD OF THIS COLUMN. A line's right edge can only move
+        when its last word moves, and then by that word's width, so the width of a word in
+        the column's own font is exactly the largest movement that is not evidence of a
+        defect. It is measured from the column's words (the median, so one long token
+        cannot set the tolerance for the whole column): over 1421 columns p50 = 24.0 pt,
+        p75 = 28.3, p90 = 34.0. This replaces the order-statistic gap, which reached
+        p90 = 65.5 pt uncapped and was capped at 24 - a cap 42.9 % of all columns rode.
+
+        AND IT REPLACES THE SHORT-COLUMN FALLBACK. The old branch returned the whole
+        column range as the slack whenever the column held under five lines. The p90 of
+        five lines is already the widest line, so the branch never changed the edge; it
+        only replaced the slack with the column's entire spread - measured at up to 416.7
+        pt, and ridden by 72.3 % of the 502 short columns. Nothing needs a fallback now:
+        one word is defined for a column of one line and for a column of two hundred.
+
+        SLACK_CAP now bounds a token, not a page. p99 of the median word width is 45.4 pt
+        and the largest is 146.0, so a cap of 40 caps 3.0 % of columns - against 42.9 %
+        at 24 - and the class size does not move between a cap of 30 and no cap at all.
         """
         v = sorted(b[2] for b in col)
-        if len(v) < EDGE_MIN_LINES:
-            return v[-1], min(SLACK_CAP, v[-1] - v[0]) if len(v) > 1 else 0.0
-        k = min(len(v) - 1, int(round(EDGE_PCT * (len(v) - 1))))
-        lo, hi = max(0, k - 1), min(len(v) - 1, k + 1)
-        return v[k], min(SLACK_CAP, v[hi] - v[lo])
+        w = sorted(b[2] - b[0] for b in words if abs(b[0] - left) <= 10)
+        one_word = w[len(w) // 2] if w else 0.0
+        return v[-1], min(SLACK_CAP, one_word)
 
     over = under = 0
     for i in range(min(src.page_count, gd.page_count)):
         sc, gc = columns(src[i]), columns(gd[i])
         if not sc or not gc:
             continue
+        # The words are what a re-break moves, so they are read once per page rather
+        # than per column.
+        s_words = [w for w in src[i].get_text("words") if w[4].strip()]
+        g_words = [w for w in gd[i].get_text("words") if w[4].strip()]
         for a, s_col in sc:
             hit = [(abs(a - b2), c2) for b2, c2 in gc if abs(a - b2) <= 10]
             if not hit:
                 continue                      # the column is gone: 04/05 own that
             g_col = min(hit, key=lambda t: t[0])[1]
-            (rs, slack), rg = edge(s_col), edge(g_col)[0]
-            # The percentile is the single-line defence and it is implicit, so it is worth
-            # stating: on a 19-line column the p90 is the 3rd-longest line, so one line
-            # breaking differently does not move it. A max would be moved by exactly the
-            # longest/second-longest gap, which is 6 pt or more on 28 % of pages.
+            (rs, slack), rg = (edge(s_col, a, s_words),
+                               edge(g_col, a, g_words)[0])
+            # The single-line defence is now the slack, not the estimator: one word of
+            # the column's own text is exactly as far as the widest line can move when a
+            # line breaks differently, so a re-break cannot decide the verdict while a
+            # line that runs a word past the column still can.
             if rg > rs + RIGHT_OVERRUN + slack:
                 over += 1
                 break
