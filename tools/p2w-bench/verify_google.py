@@ -605,6 +605,14 @@ def extra_checks2(src, gd, docx_path=None):
         # unmapped on purpose - that is the defect the engine has to fix.
         "dejavusans": "verdana", "verdana": "verdana",
         "dejavuserif": "timesnewroman",
+        # DejaVu Sans Mono is in the corpus (13 of 199 documents carry it) and had no
+        # entry, so it read as a vanished family while every glyph survived: Google
+        # substitutes Courier New, a monospace for a monospace. Same reasoning as
+        # dejavusans above - a rename inside a class is not a loss. A mono arriving as
+        # a PROPORTIONAL face still fails, and must, because that changes the metrics.
+        "dejavusansmono": "couriernew", "liberationsansmono": "couriernew",
+        "liberationserifmono": "couriernew", "notosansmono": "couriernew",
+        "dejavusansmonooblique": "couriernew",
     }
 
     def family(name):
@@ -613,39 +621,65 @@ def extra_checks2(src, gd, docx_path=None):
         # space-form strip below catches it - doing it at the end left "arialbold", a name no
         # family has.
         n = (name or "").split("+")[-1].strip().lower().replace(",", " ")
-        # "MT" and "PSMT" are PostScript suffixes that sit AFTER the style, so
-        # they have to come off first: Arial-BoldMT is arial+bold+mt, not a bold
-        # family called "arial-bold".
-        # "ps" as well as "psmt"/"mt": Google's bold exports come back as
-        # "TimesNewRomanPS-BoldMT" and "CourierNewPS-BoldMT", and with only psmt/mt here the
-        # "ps" survived while the "-Bold" blocked the style loop that follows, leaving
-        # "timesnewromanps" - a name no family has.
-        for suf in ("psmt", "mt", "ps"):
-            if n.endswith(suf):
-                n = n[:-len(suf)]
+        # THE TWO STRIPS HAVE TO ITERATE. "MT"/"PSMT"/"PS" and the style word can
+        # arrive in EITHER order, and all three of these are legal and appear in real
+        # exports:
+        #     Arial-BoldMT              family, style, PS      (what Word writes)
+        #     TimesNewRomanPS-BoldMT    family, PS, style, PS   (Google's bold export)
+        #     ArialMT-Bold              family, PS, style      (the other legal order)
+        # One PS pass then one style pass resolves the first two and leaves the third
+        # as "arialmt": the PS suffix is still attached when the style strip runs, and
+        # the style is still attached when the PS strip runs. Measured on the published
+        # corpus on 13 Nov against a copy of each source PDF whose faces were renamed
+        # to Google's export spelling and nothing else changed (word boxes identical to
+        # 0.000 pt): under the "ArialMT-Bold" order 153 of 199 documents lost at least
+        # one face that was still on the page, and 1 read kept=0. Under the
+        # "Arial-BoldMT" order 13 of 205 lost one, all of them the DejaVu Sans Mono
+        # entry now added above. Iterating to a fixed point resolves every order and
+        # cannot over-strip: each pass removes at most one suffix and stops when none
+        # applies.
+        #
+        # "-roman" and "-normal" are in DocxWriter's own suffix list
+        # (DocxWriter.java:4656-4659) and were missing here, so "Times-Roman" - the
+        # PostScript name of a base-14 face - came out as "times-roman" and matched
+        # nothing.
+        _PS = ("psmt", "mt", "ps")
+        _STYLE = ("-bolditalic", "-boldoblique", "-bold", "-italic", "-oblique",
+                  "-regular", "-roman", "-normal",
+                  " bold italic", " bold oblique", " italic", " oblique", " bold",
+                  " regular", " normal", " book")
+        # A TRUNCATED STYLE TOKEN. Some producers cap a /BaseFont name at 23 characters
+        # and cut the style word in half; "NotoSansDevanagari-Regul",
+        # "Liberation Serif Bold It" and "LiberationSerif-BoldItal" are all in the
+        # published corpus. A trailing token that is a PROPER PREFIX of a style word and
+        # at least two characters long is that truncation, not a family name, so it comes
+        # off too. Two characters is the floor because "It" and "Bo" are already
+        # unambiguous while a single letter could belong to a real family name.
+        _STYLE_WORD = ("bolditalic", "boldoblique", "italic", "oblique", "regular",
+                       "roman", "normal", "bold", "book")
+
+        def _strip_once(n):
+            for suf in _PS:
+                if n.endswith(suf) and len(n) > len(suf):
+                    return n[:-len(suf)]
+            for suf in _STYLE:
+                if n.endswith(suf):
+                    return n[:-len(suf)]
+            for sep in ("-", " "):
+                head, _, tail = n.rpartition(sep)
+                if head and len(tail) >= 2:
+                    for w in _STYLE_WORD:
+                        if len(w) > len(tail) and w.startswith(tail):
+                            return head
+            return n
+
+        # Both sides go through this, so a name that cannot be reduced is still
+        # compared as itself - the check never invents an equivalence.
+        while True:
+            shorter = _strip_once(n)
+            if shorter == n:
                 break
-        # "-roman" and "-normal" are in DocxWriter's own suffix list (DocxWriter.java:4656-4659)
-        # and were missing here, so "Times-Roman" - the PostScript name of a base-14 face -
-        # came out as "times-roman" and matched nothing.
-        for suf in ("-bolditalic", "-boldoblique", "-bold", "-italic", "-oblique", "-regular",
-                    "-roman", "-normal"):
-            if n.endswith(suf):
-                n = n[:-len(suf)]
-                break
-        # A PDF names a face two ways, exactly as DocxWriter.faceName() says: "Liberation
-        # Sans Bold" (a space, the PostScript full name) and "LiberationSans-Bold" (a hyphen,
-        # the family-with-style form). Only the hyphen form was stripped here, so on this
-        # corpus - whose PDFs are almost all the space form - the family stayed the string
-        # "liberation sans bold", never matched SAME_FACE, and could not equal anything Google
-        # renders. 53_embedded_faces therefore read kept=0 on 157 of 208 documents no matter
-        # what the engine wrote, and the 12 Nov mapping attempt was ruled out by this blind
-        # instrument rather than by its own result. Bold is a style of the same family, not a
-        # different family.
-        for suf in (" bold italic", " bold oblique", " italic", " oblique", " bold",
-                    " regular", " normal", " book"):
-            if n.endswith(suf):
-                n = n[:-len(suf)]
-                break
+            n = shorter
         # The keys above are written space-free ("liberationsans"), because the hyphen form
         # "LiberationSans-Bold" collapses to that once the style suffix is gone. The space
         # form collapses to "liberation sans" instead and misses the table entirely, so the
@@ -1500,23 +1534,49 @@ def compare(src_path, gd_path, docx_path=None):
                 return span
         return []
 
-    for r in s_runs:
-        cands = [j for j in by_page.get(r["page"], {}).get(norm_word(r["text"]), [])
-                 if j not in used]
-        joined = False
-        if not cands:
-            cands = _split_span(r)
-            joined = bool(cands)
-        if not cands:
+    # ASSIGNMENT, not a per-source walk. Walking s_runs in document order and taking
+    # each run's nearest unused candidate lets an EARLIER source run claim a render run
+    # that belongs to a LATER one: the moment a source run's own counterpart is missing
+    # (a merged span, a piece already consumed), it silently pairs with the next
+    # occurrence of the same word on the page. Constructed 13 Nov: twelve rows reading
+    # "0.00", the first row's label merged into its value so that one span no longer
+    # matches - every one of the eleven pairs then reported dy = +30.0, the line pitch,
+    # on a render whose every glyph was where the source put it, with 03, 04, 05 and 22
+    # all clean. median dy 30.0 fails 18_median_dy outright.
+    # Sorting all candidate pairs by distance and claiming in that order removes it: the
+    # run whose counterpart did not move is always at distance 0 and is therefore
+    # claimed before anything can steal it.
+    cand = []
+    for i, r in enumerate(s_runs):
+        for j in by_page.get(r["page"], {}).get(norm_word(r["text"]), []):
+            cand.append((abs(g_runs[j]["y"] - r["y"]) + abs(g_runs[j]["x"] - r["x"]), i, j))
+    cand.sort()
+    taken = {}
+    for d, i, j in cand:
+        if i in taken or j in used:
             continue
-        best = min(cands, key=lambda j: abs(g_runs[j]["y"] - r["y"]) +
-                                     abs(g_runs[j]["x"] - r["x"]))
-        for j in (cands if joined else [best]):
+        taken[i] = j
+        used.add(j)
+    # Split spans are joined only for what the exact pass left over, so a piece of a
+    # split span can no longer be eaten by an earlier source run before the join runs.
+    for i, r in enumerate(s_runs):
+        if i in taken:
+            continue
+        span = _split_span(r)
+        if not span:
+            continue
+        for j in span:
             used.add(j)
-        dys.append(g_runs[best]["y"] - r["y"])
-        dxs.append(g_runs[best]["x"] - r["x"])
+        taken[i] = min(span, key=lambda j: abs(g_runs[j]["y"] - r["y"]) +
+                                         abs(g_runs[j]["x"] - r["x"]))
+    for i, r in enumerate(s_runs):
+        if i not in taken:
+            continue
+        j = taken[i]
+        dys.append(g_runs[j]["y"] - r["y"])
+        dxs.append(g_runs[j]["x"] - r["x"])
         matched += 1
-        pairs.append((r, g_runs[best]))
+        pairs.append((r, g_runs[j]))
 
     def median(v):
         if not v:
