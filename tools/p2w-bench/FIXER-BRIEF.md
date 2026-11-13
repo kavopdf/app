@@ -320,10 +320,47 @@ STEP 4b - RESEARCH, BUT NEVER AS PROOF
     Verify every claim yourself before acting on it. Subagents may not commit and may not touch the
     engine. Record each ruled-out theory in the ledger so the next attempt inherits it.
 
-STEP 5 - FIX IT, IN ONE PLACE
-  app/src/main/java/com/kavopdf/app/engine/ only. One cause, one place, no per-document special
-  cases, no filename or text matching.
-  Forbidden because Google Docs ignores them: w:framePr.
+STEP 5 - FIX IT, IN ONE COHERENT CHANGE
+  app/src/main/java/com/kavopdf/app/engine/ only. No per-document special cases, no filename or
+  text matching. Forbidden because Google Docs ignores them: w:framePr.
+
+  ONE CAUSE, NOT ONE PLACE. This step used to say "one cause, one place", and that sentence
+  contradicted STEP 2c a few pages above it: 2c tells an entangled class to be fixed "together in
+  one change", while 5 forbade changing more than one place. A brief that says both is a brief
+  whose reader picks whichever half it read last, and on 13 Nov the fixer picked this one - every
+  attempt on the entangled class was a single append() or a single w:line, and none of them could
+  ever have worked, because the cause was never in one place.
+
+  The rule is: ONE CAUSE, as many places as that cause actually lives in. A vertical-flow cause
+  lives in the fitter, the flow emitters and the table path together; fixing one of the three
+  moves the layout under the other two, which is why four attempts were rejected for regressions
+  they caused rather than for anything wrong in themselves.
+
+  HOW A CHANGE THAT SPANS SEVERAL PLACES GETS MADE  ** this is the structural path **
+    Write the plan into HYPOTHESES.md BEFORE touching anything:
+        hypothesis.py --add "<class>" "STRUCTURAL: <the end state, in one sentence>" --result untested \
+            --evidence "methods: <a, b, c>; order: <1,2,3>; why one place cannot work: <the measurement>"
+    A plan on the record is what lets the next run continue instead of starting over, and it is
+    what tells a reviewer that the change is one idea rather than five.
+
+    Then read each place with code.py, not the whole file:
+        code.py --method <name>   for each one the plan names
+        code.py --callers <name>  for what feeds it
+    Deploy the three subagents from STEP 4b if the places are more than you can hold - each takes
+    a method, returns the exact lines to change and why. They may not commit and may not touch the
+    engine; you make every edit.
+
+    Make the whole change, then measure ONCE, at the end. Do not measure between places: an
+    intermediate state is a layout that is half-changed, it will regress, and the ratchet will
+    reject it - which is correct, and which is also not information about the end state.
+
+    The ratchet still decides. A structural change that regresses is still rejected. What changes
+    is that it is now possible to write one.
+
+    IF YOU CANNOT FINISH IT IN THIS ATTEMPT: save the plan and the partial patch to patches/,
+    record the attempt as 'error' with the evidence "structural change started, N of M places
+    done", and leave it. The next run picks up the plan and the patch. A structural change that
+    takes three attempts to land is normal; three attempts that each start over are not.
 
 STEP 6 - PROVE IT ON GOOGLE, THEN DECIDE THE OUTCOME
   Convert the same 10 plus 10 that already scored well. Run all 20 through Drive and

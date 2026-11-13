@@ -2044,3 +2044,75 @@ using a seventh of the time it is given. The two reasons were both instruction d
 fixed: the loop that was skipped (§36) and the sentence that stopped runs early (§40). Neither was
 a code bug, and neither would have been found by reading the code. They were found by reading what
 sixteen runs actually did and counting.
+
+---
+
+## 41. Can the fixer fix a structural problem? It could not, and the reason was a contradiction in its own brief
+
+The question was whether the fixer has what it takes for deep-rooted, structural or otherwise
+complex problems. The honest answer, before this section, was **no** — and not because a tool was
+missing.
+
+### What it can already do, from the record
+
+| capability | evidence |
+|---|---|
+| find a root cause under a wrong assumption | `20_within_10pt` read as a line-pitch bug on 203 documents; per-line dy showed one 10 pt step at a table's top instead |
+| separate a renderer limit from an engine bug | five-variant probe: `w:line` is a multiple of the paragraph mark's height, not the document's |
+| control an experiment over the whole corpus | `47_margins`: 12 of 12 documents without a table or drawing pass, 0 of 192 with one |
+| navigate 11,799 lines without reading them | `code.py --outline/--method/--find/--callers` |
+| carry knowledge across runs | 13 confirmed, 11 ruled out, 7 untested in `HYPOTHESES.md` |
+| save a proved-but-unmeasured fix | `patches/` |
+| refuse to ship a regression | 6 reverts, each measured on 20 documents through Google |
+
+That is a genuinely capable investigator. It is not a capable **structural** fixer, and the reason
+is one sentence.
+
+### The contradiction
+
+    STEP 2c   if they are entangled, say so and fix them TOGETHER in one change
+    STEP 5    app/src/.../engine/ only. One cause, one place.
+
+Both sentences are in the same brief. A reader picks whichever half it read last, and on 13 Nov it
+picked STEP 5: every attempt on the entangled class was a single `append()`, a single `w:line`, a
+single clamp. None of them could ever have worked, because the cause was never in one place. Four
+of them were rejected for regressions they caused elsewhere in the flow — which is not a verdict on
+the idea, it is a verdict on the size of the change.
+
+§37 had already found that the class is entangled and told the fixer to fix it "together". It
+never removed the sentence that forbade it. A rule added in one section does not repeal a rule in
+another, and nothing in the pipeline compares the two.
+
+### What changed
+
+**STEP 5 is now "one cause, not one place"** — as many places as the cause actually lives in, with
+the 13 Nov evidence for why that distinction matters.
+
+**And there is a protocol for a change that spans several places**, built from machinery that
+already exists:
+
+1. Write the plan into `HYPOTHESES.md` **before** touching anything — the end state in one
+   sentence, the methods it names, the order, and the measurement that shows one place cannot work.
+2. Read each place with `code.py --method`, not the whole file; `--callers` for what feeds it.
+3. Deploy the three subagents from STEP 4b when the places exceed what one run can hold. They may
+   not commit and may not touch the engine.
+4. Make the whole change, then **measure once at the end**. Not between places: a half-changed
+   layout regresses, the ratchet rejects it, and that rejection says nothing about the end state.
+5. The ratchet still decides. A structural change that regresses is still rejected. What changes is
+   that it is now possible to write one.
+6. **If it cannot be finished in one attempt**, save the plan and the partial patch to `patches/`,
+   record the attempt as `error` with "structural change started, N of M places done", and leave
+   it. The next run continues. A structural change that takes three attempts is normal; three
+   attempts that each start over are not.
+
+### What this does not fix
+
+The fixer still cannot ship a change that temporarily regresses and then recovers — the ratchet
+compares each attempt's end state against the best ever reached, and a mid-refactor state will
+fail it. That is deliberate: a temporary regression window is how a regression ships. What is now
+possible is a coherent multi-place change whose **end state** is clean, which is the only kind a
+structural fix ever has.
+
+It also still cannot plan across a whole class in one go. It writes one plan per attempt. If the
+plan turns out to be wrong halfway, the next run reads a wrong plan and has to notice. The ledger
+records why, so it can.
