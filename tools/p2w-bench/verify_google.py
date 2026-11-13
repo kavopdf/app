@@ -1778,18 +1778,44 @@ def extra_checks(src, gd, s_runs, g_runs, pairs):
     s_l, g_l = link_targets(src), link_targets(gd)
     c["40_link_targets"] = (len(s_l), len(s_l & g_l), s_l == g_l or (not s_l))
 
-    # ---- 41 block spacing --------------------------------------------------
-    def block_gaps(doc):
-        gaps = []
-        for p in doc[:1]:
-            ys = sorted({round(b["bbox"][1], 1) for b in p.get_text("dict")["blocks"]
-                         if b.get("type") == 0})
-            gaps += [round(b - a, 1) for a, b in zip(ys, ys[1:]) if 1 < b - a < 300]
-        gaps.sort()
-        return gaps[len(gaps) // 2] if gaps else 0
-
-    s_bg, g_bg = block_gaps(src), block_gaps(gd)
-    c["41_block_spacing"] = (s_bg, g_bg, s_bg == 0 or abs(g_bg - s_bg) <= 3.0)
+    # 41_block_spacing RETIRED 13 Nov - it measured the extractor's block segmentation,
+    # not the page. Kept here as the record of what it was and why it is gone.
+    #
+    # What it read: the median gap between distinct text-BLOCK tops, page 1 only, against a
+    # fixed 3.0 pt. Both halves of that are wrong.
+    #
+    # 1. A BLOCK IS NOT A PROPERTY OF THE PAGE. It is how the producer happened to group its
+    #    text objects, and the source PDF and the LibreOffice render group them differently on
+    #    97 of the 211 documents in corpus-v1 (measured on 22728b1). On 60 of those 97 the
+    #    median landed within 3 pt anyway, so the check was blind to its own instability; on
+    #    the rest it called the regrouping a defect. Both of its sole failures are exactly
+    #    that:
+    #      63_three_column_brochure  29 -> 27 blocks, 45 lines either side, body gaps equal to
+    #                                0.1 pt; dropping one element moved the median's RANK
+    #                                from 16.1 (6th of 11) to 25.2 (6th of 10)
+    #      20_numbered_list_separate_column_txtpos  15 -> 23 blocks, 33 lines either side; the
+    #                                render split each row into a 1.1 pt sliver plus its gap,
+    #                                so the median fell 52.0 -> 24.7
+    #    Neither document moved a line. 18_displacement, the displacement standard, passes both.
+    #
+    # 2. A MEDIAN IS A MAJORITY RULE, AND IT IS THE WRONG ONE HERE. One 10 pt gap defect,
+    #    constructed and measured through this file: it fails a page of 2 blocks and a page of
+    #    3, and PASSES at 4, 5, 6, 9, 12 and 20 blocks - because one bad gap out of n stops
+    #    being the middle value as soon as n >= 4. That is the same ruler-for-document-length
+    #    defect 18 was rewritten to remove (see its budget note above), and 23 was rewritten to
+    #    remove. Reading page 1 only (doc[:1]) made it blind on top of that: the same 10 pt
+    #    defect on page 2 of a two-page document reads 0.0 and passes.
+    #
+    # 3. IT DECIDED NO DOCUMENT'S VERDICT. Over 211 documents it failed 39; 37 of those were
+    #    already failed by another check, and the 2 it failed alone are the segmentation
+    #    artefacts above. Same test that retired 21_median_dx (see above): a check that decides
+    #    nothing on its own is a second vote on someone else's question.
+    #
+    # It is not redefined, because it cannot be: "block" is not identifiable across two
+    # producers, so no pairing rule can make a block-gap statistic mean the same thing on both
+    # sides. Vertical rhythm is asked where it IS identifiable - 23_line_pitch pairs LINES by
+    # text on the baseline within one column, and 18_displacement owns every per-line dy,
+    # including the tails a median is blind to.
 
     # ---- 42 alignment ------------------------------------------------------
     def align_mix(doc):
@@ -2897,7 +2923,8 @@ def compare(src_path, gd_path, docx_path=None):
     # A reader notices ONE thing here: a line of text broken in the middle and its second half
     # reappearing somewhere else. That is what this now asks, and it fails 4 documents where
     # the old rule failed 88. The 10 visually destroyed pages are overflow, and they belong to
-    # 26_text_overlap and 41_block_spacing, which already fail them.
+    # 26_text_overlap, which already fails them. (41_block_spacing was named here too and is
+    # now retired - see its note above 42.)
     torn = _torn_lines(s_text, g_text)
     checks["22_reading_order"] = (0, len(torn), not torn)
 
