@@ -2583,7 +2583,7 @@ public final class DocxWriter {
         } else if (ctx.newPage) {
             float topGap = first.y - LINE_BASE * linePt;
             if (topGap > 0f) {
-                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
+                beforeTw = (int) Math.min((long) firstGapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
             } else if (first.y > 0f) {
                 linePt = Math.min(linePt, Math.max(size, first.y / LINE_BASE));
             }
@@ -2603,7 +2603,7 @@ public final class DocxWriter {
             breakPage(sb, ctx);
             float topGap = first.y - LINE_BASE * linePt;
             if (topGap > 0f) {
-                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
+                beforeTw = (int) Math.min((long) firstGapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
             } else {
                 beforeTw = 0;
                 if (first.y > 0f) linePt = Math.min(linePt, Math.max(size, first.y / LINE_BASE));
@@ -2861,9 +2861,35 @@ public final class DocxWriter {
      * @param size       the line's font size
      * @param prevLinePt the height of the line box just emitted, 0 after a table
      */
+    /**
+     * The largest gap the first line of a sheet may be given, in twips.
+     *
+     * <p>This used to be a constant 2000 twips (100 pt). A page whose first baseline sits
+     * further down than that - a title page, a letterhead, a page whose first text follows a
+     * logo block - was written with a 100 pt gap and every line on the sheet landed high by
+     * the difference: 57_centred_title_page_left_body_pages asks for 4516 twips and is
+     * written with 2000, which is 125.8 pt, and all fifteen of its runs are out by it.
+     *
+     * <p>The page's own height is the only bound this needs. The gap is a position, and a
+     * position beyond the paper is caught by 27_text_off_page wherever it lands.
+     */
+    private static int firstGapCapTw(Ctx ctx) {
+        return Math.max(2000, Math.round(ctx.pageHeightPt * (float) TWIPS_PER_PT));
+    }
+
     /** The hairline line box a flow line is written with: {@code w:line = 1.38 * size} twips. */
     private static float hairlinePt(float size) {
-        return HAIRLINE_EM * Math.max(1f, size);
+        // Google's floor is 0.069 em of the RUN, so the box only lands inside it while
+        // 0.069 * size twips-of-points is below 16.56 / r twips - 12.97 twips for the widest
+        // measured face (Liberation Serif, r = 1.277). Above that the floor stops binding and
+        // Google charges (w:line/240) * r * size, which is quadratic in the size: at 24 pt the
+        // box is charged 3.86 pt where Word charges 1.66, and the difference accumulates down
+        // the page. Clamping the box at the floor keeps the two readers exact for every size
+        // the floor still covers (12 / r = 10.3 pt for DejaVu, 9.4 pt for Liberation Serif)
+        // and bounds the residue above it at 0.069 * size - 0.6485 pt a line instead of
+        // 0.0067 * size^2 - 0.069 * size: 1.01 pt against 2.20 at 24 pt, 1.70 against 5.41
+        // at 34 pt.
+        return Math.min(HAIRLINE_EM * Math.max(1f, size), 0.6485f);
     }
 
     private static float flowLinePt(float pitch, float size, float prevLinePt) {
@@ -2927,7 +2953,7 @@ public final class DocxWriter {
             // there is nothing above it to be incremental about.
             float topGap = targetY - LINE_BASE * linePt;
             if (topGap > 0f) {
-                return new float[]{Math.min(2000f, topGap * (float) TWIPS_PER_PT), linePt};
+                return new float[]{Math.min((float) firstGapCapTw(ctx), topGap * (float) TWIPS_PER_PT), linePt};
             }
             if (targetY > 0f) linePt = Math.min(linePt, Math.max(size, targetY / LINE_BASE));
             return new float[]{0f, linePt};
@@ -3052,7 +3078,7 @@ public final class DocxWriter {
             // fit rather than the line being placed below its own y.
             float topGap = b.y - LINE_BASE * linePt;
             if (topGap > 0f) {
-                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
+                beforeTw = (int) Math.min((long) firstGapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
             } else if (b.y > 0f) {
                 linePt = Math.min(linePt, Math.max(b.size, b.y / LINE_BASE));
             }
@@ -3108,7 +3134,7 @@ public final class DocxWriter {
             breakPage(sb, ctx);
             float topGap = b.y - LINE_BASE * linePt;
             if (topGap > 0f) {
-                beforeTw = (int) Math.min(2000L, Math.round(topGap * TWIPS_PER_PT));
+                beforeTw = (int) Math.min((long) firstGapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
             } else {
                 beforeTw = 0;
                 if (b.y > 0f) linePt = Math.min(linePt, Math.max(b.size, b.y / LINE_BASE));
@@ -4491,6 +4517,45 @@ public final class DocxWriter {
                 // here too: the gap carries the rest of the pitch and both renderers charge
                 // 0.069 em. A cell the page drew on SEVERAL lines keeps the old box - there the
                 // box IS the line advance, and a hairline would collapse the cell.
+                //
+                // WHY THE TWO ENGINES CANNOT BE MADE TO AGREE HERE - THE PROOF, kept because
+                // it is the reason this path is "the closest emission there is" rather than an
+                // exact one, and because a later attempt will otherwise be made.
+                //
+                // w:before is the one vertical length both engines honour exactly and
+                // identically - Google returned 20/40/80/120/160 pt as 20/40/80/120/160
+                // (REMAINING-DEFECTS.md, "The model, measured", point 2). So w:before moves
+                // BOTH baselines by the same amount and can never close the gap between them.
+                // The gap is the box, and the box is read two ways (see HAIRLINE_EM):
+                //   LibreOffice  charges LINE_BASE of the box
+                //   Google       charges max((w:line/240) * lineHeight(face, size), 0.069 * size)
+                // Cut the box to a twip and put the whole pitch in w:before and the two read
+                //     LibreOffice  before + 0.05
+                //     Google       before + 0.069 * size
+                // so the residual is 0.069 * size - 0.05 pt, zero only at size = 0.72 pt.
+                // Asking instead for Google's baseline to sit at the FOOT of the row - the
+                // place this corpus draws its cell text - needs 0.069 * size = LINE_BASE *
+                // pitch, i.e. 0.8 * 18 / 0.069 = 208.7 pt for an 18 pt row. Both are absurd,
+                // so no (w:line, w:before) pair is exact for a cell. Measured over the corpus,
+                // that pair's residual is a median 0.44 pt against 3.70 pt for the old box -
+                // better, and still not zero.
+                //
+                // WHAT THIS CODE DOES WITH IT. Keeping part of the pitch in the BOX buys
+                // accuracy, because LibreOffice charges 0.8 of the box while Google floors at
+                // 0.069 em: the residual becomes 0.069 * size - 0.8 * box, i.e.
+                // 0.2 * 0.069 * size = 0.12 pt at 8.5 pt for the box written below, against
+                // 0.54 pt for a one-twip box with the whole pitch in w:before. On a 12-cell
+                // 18 pt table this file emits before=266 line=12 where that form emits
+                // before=276 line=1. The 0.069 em charge only holds while the box stays inside
+                // Google's floor - w:line <= 16.56/r twips, 12.97 at Liberation Serif's
+                // r = 1.277 - which is why hairlinePt is 0.069 em and why the agreement
+                // degrades above 12/r = 9.4 pt.
+                //
+                // AND IT IS A WASH WHERE IT WAS MEASURED, so do not re-open it as a fix: the
+                // one-twip form was built and measured in LibreOffice over the corpus and
+                // moved 10,770 -> 10,760 of 12,027 checks, 24 documents better and 16 worse.
+                // LibreOffice was never the engine at fault. What is left is the bound above,
+                // not a bug.
                 float cellSz = r < t.sizes.size() && c < t.sizes.get(r).size()
                         && t.sizes.get(r).get(c) != null ? t.sizes.get(r).get(c) : 0f;
                 int cellBoxTw = rowLineTw, cellBeforeTw = 0;
