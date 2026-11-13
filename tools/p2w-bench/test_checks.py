@@ -114,7 +114,11 @@ def cases():
         text(p, 72, 112, "Invoice number 12345")
         text(p, 72, 142, "Total amount 4,500")
         table(p, 72, 212, 3, 3)
-    out.append(("text shifted 12pt", base, shifted, ["20_within_10pt"], None))
+    # A uniform 12 pt shift on a 30 pt pitch is 0.4 of a line, and 20_line_placement is
+    # deliberately silent on it: half a pitch is the midpoint between a run's own baseline
+    # and its neighbour's, so below it the run cannot be said to be on a different line.
+    # 18_median_dy is the check that owns a uniform offset.
+    out.append(("text shifted 12pt", base, shifted, ["18_median_dy"], None))
 
     # ---- 21/43 horizontal shift -------------------------------------------
     def shifted_x(p):

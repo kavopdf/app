@@ -792,7 +792,7 @@ CASES = {
     "17_matched_runs":          ("render", mut_blank, BASE, "nothing left to match"),
     "18_median_dy":             ("render", mut_shift, BASE, "everything shifted vertically"),
     "19_worst_dy":              ("render", mut_shift, BASE, "everything shifted vertically"),
-    "20_within_10pt":           ("render", mut_shift, BASE, "everything shifted vertically"),
+    "20_line_placement":           ("render", mut_shift, BASE, "everything shifted vertically"),
     "21_median_dx":             ("render", lambda d: mut_shift(d, dx=10), BASE, "shifted sideways"),
     "22_reading_order":         ("render", mut_blank, BASE, "the page's order destroyed"),
     "23_line_pitch":            ("render", mut_line_pitch, MONO_DOC, "one block's pitch doubled"),

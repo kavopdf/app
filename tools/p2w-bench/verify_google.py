@@ -20,7 +20,9 @@ EXIT
 
 THRESHOLDS (a document passes only if every one holds)
   completeness  every count and every style attribute matches the source
-  position      median dy < 3 pt, worst dy < 15 pt, within 10 pt > 95 %, order > 95 %
+  position      median dy < 3 pt, worst dy < 15 pt, every page within half a line of
+                its own pitch and its p90 within one line (20_line_placement),
+                order > 95 %
   visual        no invisible text, no text-on-text, no page overflow, no extra page
 """
 import os, sys, json, re, collections, statistics, difflib, math
@@ -1525,7 +1527,6 @@ def compare(src_path, gd_path, docx_path=None):
 
     med_dy = round(median(dys), 1)
     worst_dy = round(max((abs(d) for d in dys), default=0), 1)
-    within10 = round(100.0 * sum(1 for d in dys if abs(d) <= 10) / max(1, len(dys)))
     med_dx = round(median(dxs), 1)
 
     # ceil, not int: int(2 * 0.9) is 1, so a two-run document passed on one match. The stated
@@ -1538,14 +1539,83 @@ def compare(src_path, gd_path, docx_path=None):
     # mutating a real document upward and watching this check stay green.
     checks["18_median_dy"] = (0, med_dy, abs(med_dy) < 3.0)
     checks["19_worst_dy"] = (0, worst_dy, worst_dy < 15.0)
-    # With no matched runs there is nothing to be within 10 pt of - but ONLY if the source had
-    # nothing either. The old rule passed on an empty dys whatever the source held, so a render
-    # that lost every run scored 100 %. Measured 13 Nov: 15_stamp_on_scanned_page has an empty
-    # render text layer, 0 words against 5, fails 31_pages_lost_their_text and 04_words_missing,
-    # and PASSED here at 100 with render=0 - the worst false clean in the corpus. A document
-    # whose text is all gone is not a document whose text is well placed.
-    checks["20_within_10pt"] = (100, within10,
-                                within10 > 95 and (bool(dys) or not s_runs))
+    # ---- 20: is the text on each page in the place that page put it? --------
+    #
+    # The check this replaces asked "what share of the document's runs sit within 10 pt of the
+    # source run in y". Four things are wrong with that question, each measured on corpus-v1
+    # (211 documents) on 13 Nov:
+    #
+    #  1. A SHARE OF A DOCUMENT IS A RULER FOR ITS LENGTH. Under any per-line advance residual
+    #     r the k-th line of a page is k*r out, so the share is min(1, floor(10/r)/n) - a
+    #     function of n and of nothing else. Measured on the 211 recorded Google renders, the
+    #     product share x lines-per-page has a median of 9.9 lines for every document, and the
+    #     median share falls 49 -> 34 -> 24 -> 19 as lines per page rises through 16-25, 26-35,
+    #     36-50, 51+. The statistic reports "about ten lines fit inside the band".
+    #  2. A SHARE HIDES MAGNITUDE. 361_product_catalogue_grid scores 97 and PASSES with a run
+    #     289.3 pt from its source baseline; on the LibreOffice render the same document scores
+    #     97 with a 288.8 pt run.
+    #  3. A BAND IN POINTS MEANS A DIFFERENT THING AT EVERY SIZE AND PITCH. 10 pt is 1.35 em at
+    #     the corpus median run size (7.4 pt) and 1.0 em at the 90th percentile; it is 1.8 lines
+    #     on a page with a 5.5 pt pitch (343_air_waybill) and 0.35 line on a 28.2 pt page.
+    #  4. IT MEASURES THE DOCUMENT, NOT THE PAGE, so a page that has moved as a block is
+    #     outvoted by the pages that have not - and it scores non-horizontal text as if dy were
+    #     a displacement (24 of 208 documents carry such runs; 59 of 83 on
+    #     05_round_company_seal_curved_text).
+    #
+    # It now asks, page by page, in lines, against that page's own pitch:
+    #     (a) |median dy| <= 0.5 line   the page sits in its slot
+    #     (b) p90 |dy|  <= 1.0 line     nine runs in ten are on their own line
+    #     (c) the page has a matched run at all
+    # 0.5 line is the midpoint between a run's own baseline and its neighbour's - below it the
+    # run cannot be said to be on a different line, above it it is nearer the neighbour. 1.0
+    # line is a different line of text. Both are in lines, so neither changes meaning with the
+    # type size, and neither grows with the document. p90 and not max: the single worst run is
+    # 19_worst_dy's question, and asking it here too gives one fault two votes.
+    page_pitch, page_horiz = {}, {}
+    for i, p in enumerate(src):
+        ys, sizes, horiz = set(), [], set()
+        for blk in p.get_text("dict")["blocks"]:
+            if blk.get("type") != 0:
+                continue
+            for ln in blk.get("lines", []):
+                flat = abs(ln.get("dir", (1, 0))[1]) <= 0.02
+                for sp in ln.get("spans", []):
+                    if not sp.get("text", "").strip():
+                        continue
+                    top = round(sp["bbox"][1], 2)
+                    ys.add(round(top, 1))
+                    sizes.append(round(sp["size"], 1))
+                    if flat:
+                        horiz.add((top, norm_word(sp["text"])))
+        ordered = sorted(ys)
+        gaps = [b - a for a, b in zip(ordered, ordered[1:]) if 1 < b - a < 200]
+        # The ruler is never allowed below the type on the page: a curved stamp's baselines are
+        # 3 pt apart and "lines" is not a unit there.
+        floor_ = 0.9 * median(sizes) if sizes else 0.0
+        page_pitch[i] = max(median(gaps) if gaps else 0.0, floor_)
+        page_horiz[i] = horiz
+    doc_pitch = median([v for v in page_pitch.values() if v > 0]) or 12.0
+
+    per_page = collections.defaultdict(list)
+    for r, g in pairs:
+        if (r["y"], norm_word(r["text"])) not in page_horiz.get(r["page"], ()):
+            continue                    # rotated or curved: 35_rotation's question, not this one
+        per_page[r["page"]].append(g["y"] - r["y"])
+
+    bad_pages = []
+    for pg in sorted(set(r["page"] for r in s_runs)):
+        pitch = page_pitch.get(pg) or doc_pitch
+        ds = per_page.get(pg, [])
+        if not ds:
+            # Text was on this page and none of it landed anywhere this check can see. The old
+            # rule passed an empty dys at 100 % (15_stamp_on_scanned_page, a render with no text
+            # layer at all). An empty page is a failure, not a pass.
+            bad_pages.append(pg)
+            continue
+        e = sorted(abs(d) / pitch for d in ds)
+        if abs(median(ds) / pitch) > 0.5 or e[int(0.9 * (len(e) - 1))] > 1.0:
+            bad_pages.append(pg)
+    checks["20_line_placement"] = (0, len(bad_pages), not bad_pages)
     checks["21_median_dx"] = (0, med_dx, abs(med_dx) < 3.0)
 
     # reading order: the sequence of normalised words
