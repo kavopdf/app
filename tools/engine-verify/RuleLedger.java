@@ -31,7 +31,8 @@ public class RuleLedger {
         PDFBoxResourceLoader.init(new android.content.Context(
                 new android.content.res.AssetManager(new File(a[1]))));
         Method attachShapes = PdfToWord.class.getDeclaredMethod("attachShapes",
-                PdfToWord.Page.class, PdfToWord.Rules.class, float.class, List.class);
+                PdfToWord.Page.class, PdfToWord.Rules.class, float.class, List.class,
+                int.class);
         attachShapes.setAccessible(true);
         Method rulesOf = PdfToWord.class.getDeclaredMethod("rulesOf",
                 com.tom_roush.pdfbox.pdmodel.PDDocument.class, int.class);
@@ -60,7 +61,7 @@ public class RuleLedger {
                 }
                 PdfToWord.Page probe = new PdfToWord.Page();
                 probe.width = p.width; probe.height = p.height;
-                attachShapes.invoke(null, probe, rules, p.height, tables);
+                attachShapes.invoke(null, probe, rules, p.height, tables, 0);
                 List<DocxWriter.Shape> kept = new ArrayList<>();
                 for (Object b : probe.blocks) if (b instanceof DocxWriter.Shape) kept.add((DocxWriter.Shape) b);
 

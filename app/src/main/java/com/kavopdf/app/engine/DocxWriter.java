@@ -63,7 +63,10 @@ public final class DocxWriter {
      * model puts the baseline a shade higher, so expect the Word baseline within about 1 pt of
      * the PDF's.
      */
-    private static final float ASCENT = 1.17f;
+    private static final float ASCENT =
+            Float.parseFloat(System.getProperty("p2w.ascent", "0.92"));
+    private static final boolean ANCHOR_KEEPS_FLOW =
+            !"0".equals(System.getProperty("p2w.anchorkeep"));
     /** docPr ids for shapes start above the picture ids so the two never collide. */
     private static final int SHAPE_ID_BASE = 100000;
     /** Line box height as a multiple of the font size. Generous: a tight exact height clips. */
@@ -2781,7 +2784,50 @@ public final class DocxWriter {
                     // the {@link #ASCENT} it has always had, because every other such line in
                     // the corpus is measured against that.
                     float topEm = frame != null ? LINE_BASE * LINE_FACTOR : ASCENT;
-                    if (quarterTurn(lineAngle)) {
+                    if (b.ring) {
+                        // ONE CHARACTER OF A RING: ONE BOX, ONE ANGLE.
+                        //
+                        // A ring is the one place where a line's angle is not a property of
+                        // the document's flow at all: each character sits on its own tangent
+                        // (05's arc runs -55.2, -51.8, -48.1 ... and 305's runs -110.0,
+                        // -102.4, -94.8), so there is no single frame a ring could be
+                        // written into and no way to make one turned line of it.
+                        //
+                        // OOXML has no per-RUN angle: {@code a:xfrm rot} is an attribute of a
+                        // SHAPE. The smallest thing that can carry an angle is therefore one
+                        // shape, and that is exactly the grain a ring character already
+                        // arrives at - ringLines() makes one Box per character. So the ring
+                        // is written as N anchored boxes, each with its own rot, which is
+                        // per-glyph rotation expressed in the only way the format has.
+                        //
+                        // WHY px AND NOT startX. Everywhere else on this path x/y come from
+                        // getXDirAdj()/getYDirAdj(), measured in a frame turned with the text,
+                        // which is why the level case needs startX = px - length/2 (the box is
+                        // centred on a rotated origin) and why a 180-degree line is mirrored
+                        // back. A ring character carries the page point it was drawn at, so
+                        // the box's baseline origin IS (px, py) and any of those adjustments
+                        // would move it by the amount it is correcting for elsewhere.
+                        //
+                        // AND NOT THE QUARTER-TURN CONSTRUCT. vert + a swapped extent is the
+                        // construct LibreOffice turns, but it has four states, not 360: a
+                        // character at -55.2 degrees cannot be written with it, and using it
+                        // for the ones that happen to land on 90 would put one character of a
+                        // seal in a different construct from its neighbours.
+                        //
+                        // AND THE BOX IS ONE CHARACTER WIDE, NOT 1.5 em WIDER. wPt above is
+                        // sized for a line that may wrap; a ring character cannot wrap. More to
+                        // the point, anchorAt turns the box about its CENTRE, so the box's
+                        // half-width is the lever a reader that ignores a:xfrm rot swings the
+                        // character by: ((cos - 1) . -w/2, ...). Measured on 05 with the angle
+                        // in place: at length + 1.5 em the render loses 12 of its 83 matched
+                        // runs (71/83, 17_matched_runs fails); at length + 0.6 em it loses
+                        // none and 05 scores 41/43. Nothing about the file's own correctness
+                        // depends on the width, so the width is chosen by what the render can
+                        // still place.
+                        float ringW = Math.max(b.length, 2f) + b.size * 0.6f;
+                        anchorAt(sb, ctx, px, py, 0f, topEm * b.size,
+                                ringW, hPt, inner.toString(), lineAngle, -1, 0.6f, 0f, 0f);
+                    } else if (quarterTurn(lineAngle)) {
                         // A quarter-turn line with no frame to sit in still gets the one
                         // construct that turns: swapped extent, vert, no a:xfrm rot. The
                         // box's local (0,0) is the frame's far corner along the baseline
@@ -3012,11 +3058,13 @@ public final class DocxWriter {
         // same flow, and two boxes for one flow is two rulers on one page.
         float linePt = hairlinePt(size);
         int beforeTw = 0;
+        float placeTopPt = flowTopPt(ctx);        // see flowFromBox: the edge is the placement
         if (ctx.afterTablePt >= 0f) {
             // Same rule as flowFromBox: the row is placed against the table's measured edge
             // rather than spaced from a baseline that the table replaced.
             float topPt = first.y - LINE_BASE * linePt;
             float edgeGap = topPt - ctx.afterTablePt;
+            placeTopPt = ctx.afterTablePt;
             ctx.afterTablePt = -1f;
             if (edgeGap * TWIPS_PER_PT > gapCapTw(ctx)) {
                 // Too far below the table to be a gap - a running footer on the last line of
@@ -3036,7 +3084,21 @@ public final class DocxWriter {
             }
         } else if (pitch > 0f) {
             float extra = pitch - (1f - LINE_BASE) * ctx.lastLinePt - LINE_BASE * linePt;
-            if (extra > 0f) beforeTw = (int) Math.min(gapCapTw(ctx), Math.round(extra * TWIPS_PER_PT));
+            if (extra > 0f) {
+                // A gap wider than the flow may spend is not a gap, it is a position - the same
+                // rule flowFromBox applies to a single line, and this branch used to CLAMP
+                // instead. A running footer is a row (its label and its folio are one baseline),
+                // so it took this path: on 27_two_column_left_short_txtpos the footer's 272.8 pt
+                // gap was written as 120 pt - 152 pt short of the gap the page drew, and the
+                // footer landed 130.6 pt above its own baseline. flowFromBox anchors the same
+                // gap rather than truncating it.
+                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)) {
+                    ctx.positioned = true;
+                    for (PdfToWord.Box ab : cols) anchorBox(sb, p, ab, ctx);
+                    return;
+                }
+                beforeTw = (int) Math.round(extra * TWIPS_PER_PT);
+            }
         }
         // The same rule flowFromBox applies, for a row of fields: a gap that would be NEGATIVE
         // is a position, not a gap, and the row is anchored where the page drew it instead of
@@ -3063,6 +3125,7 @@ public final class DocxWriter {
             // of the new sheet - which means it takes its own y as its top gap, exactly as the
             // page's first line does.
             breakPage(sb, ctx);
+            placeTopPt = flowTopPt(ctx);
             float topGap = first.y - LINE_BASE * linePt;
             if (topGap > 0f) {
                 beforeTw = (int) Math.min((long) firstGapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
@@ -3115,7 +3178,7 @@ public final class DocxWriter {
         ctx.newPage = false;
         // Re-sync the running position to what was written, not to what was intended. A page
         // break inside the block above starts a new sheet, so the top is the paper's top again.
-        resync(ctx, flowTopPt(ctx), beforeTw, lineTw);
+        resync(ctx, placeTopPt, beforeTw, lineTw);
 
         // A tab stop's position is measured from the page margin, NOT from the paragraph's own
         // indent - the section has zero margins, so the page margin is x=0 and a stop is the
@@ -3150,9 +3213,24 @@ public final class DocxWriter {
             // the w:tblInd fix below: 60 25 -> 23, 43 13 -> 12, 47 49 -> 41, total 8461 -> 8475,
             // no document worse. 47 is where the term itself shows: it is a left-edge statistic
             // and the push was the largest single move on it (8 documents).
-            float clear = before.right + before.size * 0.4f;
+            // ...and the clearance is in the SAME FRAME as the stop it is compared with.
+            //
+            // `before.right` is a PAGE x and `pos` is a CELL x (frameX came off above), so
+            // `clear > pos` was a page coordinate tested against a cell coordinate. Inside a
+            // cell the page x always wins, and the stop was written at the page's own x - a
+            // value that is outside the cell by construction. Measured on
+            // brochure-3col-with-sidebar-box: "Founded" ends at page x 427.76, size 7, so
+            // clear = 430.56 pt = 8611 twips, and 8611 is exactly what was written; the field
+            // it precedes was drawn at page x 508.18 in a cell whose left edge is 395.33, so
+            // the stop the page needs is 112.85 pt = 2257 twips. The renderer clamped the
+            // 430 pt stop to the cell's right edge, "1994, Pune" no longer fitted after it,
+            // and it wrapped to a second line 1.0 pt under the first - 20 overlaps on that
+            // document, and 53 across the five it appears on.
+            //
+            // Only inside a cell: outside one frameX is 0 and this is the identical number.
+            float clear = (before.right - frameX) + before.size * 0.4f;
             boolean last = i == cols.size() - 1;
-            if (last && b.right > ctx.pageWidthPt - 2f && b.right > clear) {
+            if (last && b.right > ctx.pageWidthPt - 2f && (b.right - frameX) > clear) {
                 // A field that ends at the paper's edge is right-aligned there. A right tab keeps
                 // its RIGHT edge where the page drew it, so a wider substitute grows inwards
                 // instead of wrapping the last word onto the next line.
@@ -3554,6 +3632,16 @@ public final class DocxWriter {
         // accumulates down the page.
         float linePt = hairlinePt(b.size);
         int beforeTw = 0;
+        // WHERE THIS PARAGRAPH IS ACTUALLY PUT, as an absolute y from the top of the sheet.
+        //
+        // The flow's own advance places a paragraph at flowTopPt(); the afterTablePt branch
+        // below places it at the table's or the row's measured edge instead. resync() used to be
+        // handed flowTopPt() in both cases, so after a line placed at an edge it recorded a
+        // position that the page never took: on 27_two_column_left_short_txtpos the second cell
+        // of the row left flowY 67.6 pt below the line it had just written, and every flowed
+        // line in that cell was then written 67.6 pt low. The edge is the placement, so it is
+        // what resync() is given.
+        float placeTopPt = flowTopPt(ctx);
         if (ctx.afterTablePt >= 0f) {
             // The box above this one is a layout table - or the top of a column cell - and a
             // table's height is decided by the renderer from its own line boxes, not by the
@@ -3561,6 +3649,7 @@ public final class DocxWriter {
             // exactly what the page left between that edge and this line's box top.
             float topPt = b.y - LINE_BASE * linePt;
             float edgeGap = topPt - ctx.afterTablePt;
+            placeTopPt = ctx.afterTablePt;
             ctx.afterTablePt = -1f;
             // Inside a cell a wide gap is SPACE, not a position: the cell is a fixed rectangle
             // whose height is measured from exactly what it writes, so spending the gap keeps the
@@ -3660,6 +3749,7 @@ public final class DocxWriter {
             // line of the new sheet: its own y decides its top gap, which is the same rule the
             // page's first line follows.
             breakPage(sb, ctx);
+            placeTopPt = flowTopPt(ctx);          // the new sheet starts at its own top
             float topGap = b.y - LINE_BASE * linePt;
             if (topGap > 0f) {
                 beforeTw = (int) Math.min((long) firstGapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
@@ -3703,8 +3793,14 @@ public final class DocxWriter {
                 ctx.lastLinePt = linePt;
                 ctx.lastBaseline = b.y;
                 ctx.lastSize = b.size;
-                ctx.flowY = b.y;
-                ctx.flowBoxPt = Math.max(4f, b.size * LINE_FACTOR);
+                if (ANCHOR_KEEPS_FLOW) {
+                    ctx.flowY = flowTopPt(ctx) + beforeTw / (float) TWIPS_PER_PT
+                            + LINE_BASE * (lineTw / (float) TWIPS_PER_PT);
+                    ctx.flowBoxPt = lineTw / (float) TWIPS_PER_PT;
+                } else {
+                    ctx.flowY = b.y;
+                    ctx.flowBoxPt = Math.max(4f, b.size * LINE_FACTOR);
+                }
                 return;
             }
             if (err >= ZERO_GAP_FLOOR_PT) ctx.zeroGapNoRoom++;
@@ -3715,8 +3811,9 @@ public final class DocxWriter {
         ctx.lastSize = b.size;
         ctx.newPage = false;
         // Re-sync to what was written, so the next paragraph is measured from the reader's
-        // position rather than from the PDF's (D-26).
-        resync(ctx, flowTopPt(ctx), beforeTw, lineTw);
+        // position rather than from the PDF's (D-26) - and to the position this paragraph was
+        // really placed at, which is the table/row edge when the branch above used one.
+        resync(ctx, placeTopPt, beforeTw, lineTw);
         sb.append("<w:p><w:pPr>");
         if (p.heading > 0) {
             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
@@ -3902,7 +3999,19 @@ public final class DocxWriter {
      * worst mover in the corpus.
      */
     private static boolean mirrored(PdfToWord.Box b) {
-        return b.rotated && Math.abs(b.angle) < 1f && !b.ring;
+        // A 180-DEGREE LINE IS ASKED FOR, NOT ASSUMED FROM A MISSING ANGLE.
+        //
+        // This test used to read "rotated, and its angle is about 0", which is what a 180-degree
+        // line's x/y look like (PDFBox reports a turned line's origin in a frame turned with it,
+        // so both coordinates come back mirrored about the page). But 0 is also the DEFAULT of
+        // Line.angle, so every rotated line whose builder never set an angle - the ordinary
+        // line path, see PdfToWord.toLines - was read as a 180-degree line and had its origin
+        // mirrored about the page. Measured on 15_stamp_on_scanned_page: two +9-degree stamp
+        // lines went out at rot="10800000" and in the opposite corner of the sheet. Now that
+        // every rotated line records its angle, 180 is asked for by name, and a line drawn at
+        // 9 degrees cannot answer yes. 04_stamp_180deg_upside_down's CANCELLED lines are
+        // unaffected: their angle is 180.0, so this still fires for them.
+        return b.rotated && Math.abs(Math.abs(b.angle) - 180f) < 1f && !b.ring;
     }
 
     /**
@@ -4104,6 +4213,16 @@ public final class DocxWriter {
             for (PdfToWord.Box bx : p.boxes) if (bx.rotated) turned = true;
             if (!turned) continue;
             for (PdfToWord.Box bx : p.boxes) {
+                // A RING CHARACTER IS NOT A STAMP LINE - the same exclusion groupStamps()
+                // makes, for the same reason. Once ringLines() started carrying each
+                // character's own angle, frameOfLine() began finding the seal's own border
+                // round those characters, so a ring paragraph answered "yes" here and was
+                // moved to the place in the page's order where its y falls. That reorders
+                // page.blocks itself, which both outputs read: on 318 and 60 the seal's
+                // block moved from the end of the sheet to the middle of it and the .txt
+                // changed with it (318: 81 -> 90 lines). A ring is placed by its own page
+                // coordinates in every character and has nothing to gain from being moved.
+                if (bx.ring) break;
                 if (bx.runs.isEmpty() || frameOfLine(outlines, bx, ctx) == null) continue;
                 stamps.add(p);
                 break;

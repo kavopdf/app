@@ -1572,6 +1572,21 @@ public final class PdfToWord {
          * first column is the direction the glyph was really drawn in.
          */
         float tx = 1f, ty = 0f;
+        /**
+         * True when the page draws this glyph under a REFLECTION - a negative-determinant text
+         * rendering matrix - which is how 417_rotate180_and_mirrored's page 2 is drawn
+         * ({@code -1 0 0 1 595 0 cm}).
+         *
+         * <p>A mirror is not a rotation and PDFBox says so: {@code getDir()} comes back 0.0 and
+         * the shear is 0, so the glyph is NOT flagged {@link #rotated}, while its own direction
+         * {@link #tx} is -1. Both halves of that are the test: a 180-degree line's text matrix
+         * can be a reflection too (401_trifold_brochure's back panel), but that line is flagged
+         * rotated and is already read as a turned line - so a mirror is a reflection on a glyph
+         * PDFBox calls LEVEL. Everything that measures a gap assumes the line advances in +x; on
+         * a mirrored line every step then reads as an overlap, and "mirrored text" was cut into
+         * one segment per character and came out as "t xet der orri m".
+         */
+        boolean mirror;
     }
 
     private static final class GlyphCollector extends PDFTextStripper {
@@ -1808,6 +1823,14 @@ public final class PdfToWord {
                     // direction the stamp's line advances in the coordinates everything else
                     // here uses.
                     float a = tm2.getValue(0, 0), b = tm2.getValue(0, 1);
+                    // A REFLECTION THAT IS NOT ALSO A TURN. A 180-degree line's own text
+                    // matrix can be a reflection as well (401_trifold_brochure's back panel is
+                    // drawn that way), and that line is already handled: getDir() reports 180,
+                    // it is flagged rotated, and everything downstream reads it as a turned
+                    // line. The case this flag exists for is the one PDFBox calls LEVEL -
+                    // getDir() 0, no shear - while the glyphs run leftwards: a mirror.
+                    g.mirror = !g.rotated
+                            && a * tm2.getValue(1, 1) - b * tm2.getValue(1, 0) < 0f;
                     float len = (float) Math.sqrt(a * a + b * b);
                     if (len > 1e-4f) {
                         g.tx = a / len;
@@ -2906,6 +2929,21 @@ public final class PdfToWord {
      */
     private static void orderRuns(List<Glyph> glyphs) {
         if (glyphs.size() < 2) return;
+        // A LINE THE PAGE DRAWS RIGHT TO LEFT IS NOT A LINE OF OVERLAPPING RUNS.
+        //
+        // This pass exists to put a baseline's runs back in x order when the cluster holds
+        // glyphs that are not in x order (a value that ran past its cell and a label that began
+        // inside it: "56M0o0b6i7le"). It cuts the list wherever a glyph starts before the one
+        // before it ends, then sorts the pieces by x. A mirrored line - page 2 of
+        // 417_rotate180_and_mirrored is drawn under "-1 0 0 1 595 0 cm" - advances in -x for
+        // EVERY glyph, so every step is such a cut: the line became one run per character and
+        // the sort by x then reversed it, and "mirrored text" reached the .docx as
+        // "t xet der orri m". A leftward line is already in the order the page drew its
+        // characters, which is the order a reader reads them, so there is nothing to reorder.
+        // The glyphs say which line this is: a reflected text matrix (Glyph#mirror) is a
+        // mirrored line, and its list is already in reading order. A 180-degree line is not
+        // one - its matrix's determinant is positive - and it keeps the treatment it had.
+        if (glyphs.get(0).mirror) return;
         List<List<Glyph>> runs = new ArrayList<>();
         List<Glyph> run = new ArrayList<>();
         Glyph prev = null;
@@ -3356,6 +3394,11 @@ public final class PdfToWord {
             // A justified line is full of wide word gaps, so a plain "gap is big" test cut
             // sentences in half. The gap that separates two real fields is an outlier on its
             // own line - far wider than the gaps between the words around it.
+            // IS THIS LINE MIRRORED? Asked once, of the whole line, from the glyph's own text
+            // rendering matrix: a cluster that holds two runs out of x order has ONE backward
+            // step and is a different case (the signed gap below already cuts it), while a
+            // mirrored line's every step is backward.
+            boolean backwardLine = !raw.glyphs.isEmpty() && raw.glyphs.get(0).mirror;
             java.util.List<Float> gaps = new java.util.ArrayList<>();
             for (int k = 1; k < raw.glyphs.size(); k++) {
                 Glyph a = raw.glyphs.get(k - 1), b = raw.glyphs.get(k);
@@ -3380,7 +3423,13 @@ public final class PdfToWord {
                 // 66 pt to the LEFT. The gap then read as -78 and only the positive test saw
                 // it, so the line was never cut: the box kept the first label's width, the
                 // second was clipped away, and the reader lost a number off the chart.
-                float gapPts = prev == null ? 0f : g.x - (prev.x + prev.width);
+                // MEASURED ALONG THE LINE, NOT ALONG THE PAGE. A mirrored line advances in -x,
+                // so the page-space step is negative for every pair and every test below reads
+                // it as an overlap or as an outlier gap. That cut 417's page-2 lines into one
+                // segment per character. On such a line the step is taken in its own direction.
+                float gapPts = prev == null ? 0f
+                        : backwardLine ? (prev.x - g.x) - prev.width
+                                       : g.x - (prev.x + prev.width);
                 // Signed, not positive. The comment above has described this for a while and
                 // the code did not do it: a baseline cluster does not hold its glyphs in x
                 // order, so on 350_question_paper the marks column "[08]" (x=551.9) came
@@ -3389,9 +3438,10 @@ public final class PdfToWord {
                 boolean wideGap = prev != null && gapPts > outlier;
                 boolean overlap = OS && prev != null && !g.rotated && !prev.rotated
                         && Math.abs(g.y - prev.y) <= 0.5f
-                        && (g.x - (prev.x + prev.width)) < -Math.max(2f, g.size * OVF);
+                        && gapPts < -Math.max(2f, g.size * OVF);
                 if (prev != null && (wideGap || overlap
-                        || crossesGutter(gutters, prev.x + prev.width, g.x))) {
+                        || (backwardLine ? crossesGutter(gutters, g.x + g.width, prev.x)
+                                         : crossesGutter(gutters, prev.x + prev.width, g.x)))) {
                     segments.add(run);
                     run = new ArrayList<>();
                     splitBefore = wideGap;
@@ -3424,12 +3474,50 @@ public final class PdfToWord {
                 for (Glyph g : segment) totalSize += g.size;
                 line.size = segment.isEmpty() ? 10f : totalSize / segment.size();
                 line.x = segment.get(0).x;
+                // A MIRRORED SEGMENT'S FIRST GLYPH IS ITS RIGHT END. x is the left edge of a
+                // line everywhere else in this model, and it is what the .txt turns into leading
+                // spaces and what the writer anchors a box by, so on a mirrored line it is the
+                // smallest x the segment holds. Measured on 417's page 2: the origins are all
+                // x=539 and the four lines' left edges are 336, 240, 341 and 296, which is where
+                // a reader sees them start.
+                if (segment.get(0).mirror) {
+                    float minX = Float.MAX_VALUE;
+                    for (Glyph g : segment) minX = Math.min(minX, g.x);
+                    line.x = minX;
+                }
                 line.y = segment.get(0).y;
                 float right = line.x;
                 for (Glyph g : segment) right = Math.max(right, g.x + g.width);
                 line.right = right;
                 line.left = line.x;
                 line.rotated = allRotated(segment);
+                // A ROTATED LINE MUST CARRY ITS OWN ANGLE, AND THIS PATH NEVER SET ONE.
+                //
+                // stampLineOf() records the angle for every line it builds, because it is the
+                // path a stamp's lines take. A rotated line that reaches the writer down THIS
+                // path kept the field's default, 0.0f - and 0.0 is not "no rotation" here, it
+                // is the same number an upright line has, so the writer could not tell the two
+                // apart and DocxWriter.mirrored() read "rotated, angle 0" as "a 180-degree
+                // line". Measured on 15_stamp_on_scanned_page, whose stamp is the page's ONLY
+                // text (a scan with a stamp on it): the 20 rotated glyphs are 100% of the
+                // page's glyphs, so stampLines() stood down ("a rotated page, not a stamp",
+                // its 0.85 share guard) and its two 9-degree lines came through here. The
+                // .docx carried rot="10800000" - 180 degrees - for both, and mirrored the
+                // origin about the page, so a +9-degree stamp was written upside down and in
+                // the opposite corner. The angle is in the glyphs' own direction (tx/ty, from
+                // the text rendering matrix) and is read exactly as stampLineOf reads it.
+                //
+                // The ANGLE only, not the along-baseline length. length decides the box's
+                // width, and widening the box of a 180-degree run moves where its text starts:
+                // measured on 401_trifold_brochure, its "CONTACT US" block shifted 75.6 pt left
+                // and 43_within_10pt_x failed, for a line whose angle this change does not
+                // correct. An angle is what this defect is; the width is another one.
+                if (line.rotated) {
+                    Glyph seed = segment.get(0);
+                    float dx = seed.tx == 0f && seed.ty == 0f ? 1f : seed.tx;
+                    float dy = seed.tx == 0f && seed.ty == 0f ? 0f : seed.ty;
+                    line.angle = (float) Math.toDegrees(Math.atan2(dy, dx));
+                }
                 split.add(line);
             }
         }
@@ -3569,6 +3657,21 @@ public final class PdfToWord {
             line.length = Math.max(g.width, 1f);
             line.rotated = true;
             line.ring = true;
+            // THE ANGLE EACH CHARACTER IS SET AT. A ring is not one turned line: every
+            // character sits on its own tangent, and that tangent is the whole of what makes
+            // the seal a ring rather than a row of letters. This line used to leave the angle
+            // at 0, and 0 is not "unknown" downstream - DocxWriter reads it as "this line is
+            // level", writes the box with no rotation at all, and 35_rotation then finds no
+            // construct carrying the angle for any of the 247 characters in the 7 ring
+            // documents. The angle is not lost in the writer; it is dropped here.
+            //
+            // The value comes from the text matrix's first column, the same source
+            // {@code line.angle} above uses, NOT from getDir(): that one is reported in a
+            // frame turned with the text, and atan2 of it does not give the page's angle.
+            // Measured against the page (PyMuPDF's line dir) on the stamps, atan2(ty, tx) is
+            // exact to 0.0 degrees at -15, -14, -90, 9 and 15; getDir() is not.
+            line.angle = (float) Math.toDegrees(Math.atan2(g.ty, g.tx));
+            if (g.tx == 0f && g.ty == 0f) line.angle = 0f;
             line.hardEnd = true;
             out.add(line);
         }
@@ -3639,10 +3742,19 @@ public final class PdfToWord {
 
     private static String textOf(List<Glyph> glyphs) {
         StringBuilder sb = new StringBuilder();
+        // See toLines: a line whose own x runs backwards is a mirrored line, and its steps are
+        // measured along that direction rather than against the page's.
+        boolean backward = !glyphs.isEmpty() && glyphs.get(0).mirror;
         Glyph prev = null;
         for (Glyph g : glyphs) {
             if (prev != null) {
-                float gap = g.x - (prev.x + prev.width);
+                // ALONG THE LINE'S OWN DIRECTION. A mirrored line (417's page 2) advances in
+                // -x, so the page-space gap is large and negative for every pair and this test
+                // read it as "a negative gap means the next run starts inside the last one" -
+                // it inserted a space between EVERY two characters, which is the other half of
+                // why "mirrored text" arrived as "t xet der orri m".
+                float gap = backward ? (prev.x - g.x) - prev.width
+                                     : g.x - (prev.x + prev.width);
                 // A gap is a space. A negative gap means the next run starts inside the last
                 // one - text that ran past its cell - and the two must not be welded together.
                 //
@@ -3987,7 +4099,38 @@ public final class PdfToWord {
             if (count[i] < minLines || fill[i] < minFill) allFilled = false;
         }
         boolean leftFilled = count[0] >= minLines && fill[0] >= minLeftFill;
-        boolean ok = allFilled || leftFilled || band >= pageH * minBand;
+        // A COLUMN NO LINE STANDS IN IS NOT A COLUMN. The last clause here used to be
+        // `band >= pageH * minBand` on its own, so a page was accepted as a column page
+        // whenever the band its rows span reached 30 % of the sheet - which is true of almost
+        // any full-page document, and of a page with no columns at all. A guard that passes
+        // more easily the taller the region is was not guarding anything.
+        //
+        // Measured on the three pages that reach this line with allFilled and leftFilled both
+        // false, so that the band clause is the only thing deciding them:
+        //
+        //   page                     n  band/pageH  lines per column   is a column page
+        //   401_trifold_brochure     2  0.32        9, 5                yes
+        //   350_question_paper       2  0.86       46, 25               yes
+        //   marksheet-subject...     2  0.85       21,  0               NO
+        //
+        // The two that are column pages have text in both columns. marksheet has none at all in
+        // its second: the page is a stack of three rule-less tables over a tab-aligned grading
+        // row, and the "gutter" the row pass finds is the empty right margin. Written as a
+        // column page, the whole body went into one 2x2 layout table, the grading row became a
+        // cell paragraph whose tab stops are measured from the cell's text margin instead of
+        // the page's, and its visible fields landed 25 to 40 pt right of where the page drew
+        // them - 43_within_10pt_x fell 96 % -> 87 %, with 04, 26, 27, 45, 47, 59 and 60 going
+        // with it.
+        //
+        // Requiring every column to hold at least one line separates the three without a new
+        // constant. band/pageH cannot: marksheet's 0.85 and 350's 0.86 are the same number.
+        //
+        // Measured over the 211: docx 8804 -> 8812, 43 10 -> 9, no document worse, one better
+        // (marksheet 33/43 -> 41/43), and the round's own gains kept - 401 and 403 still pass
+        // 43, 47 31 -> 30, 60 24 -> 23.
+        boolean anyEmptyColumn = false;
+        for (int i = 0; i < n; i++) if (count[i] == 0) anyEmptyColumn = true;
+        boolean ok = allFilled || leftFilled || (!anyEmptyColumn && band >= pageH * minBand);
         return ok;
     }
 
@@ -4603,8 +4746,14 @@ public final class PdfToWord {
             // {@code ring} is excluded because a ring character is the one turned line whose
             // x/y ARE page coordinates (see {@link Box#ring}); mirroring it would move a seal
             // to the far side of the sheet, which is the fault DocxWriter records at 352.
+            // THE THIRD PLACE THAT READ A MISSING ANGLE AS 180. DocxWriter.mirrored() and the
+            // writer's lineAngle both took "rotated, angle 0" to mean a 180-degree line, and so
+            // did this: a rotated line whose angle is 0 is one whose angle was never set, and a
+            // 180-degree line's angle IS 180 (PdfToWord.toLines now records it). Asking for it
+            // by name is what keeps 401_trifold_brochure's back panel - a real 180-degree block
+            // - mirrored here, while a 9-degree line stops being mirrored.
             boolean turnedFrame = flippedPage
-                    || (line.rotated && Math.abs(line.angle) < 1f && !line.ring);
+                    || (line.rotated && Math.abs(Math.abs(line.angle) - 180f) < 1f && !line.ring);
             p.lineX.add(turnedFrame ? pageWidth - line.right : line.x);
             p.lineY.add(turnedFrame ? pageHeight - line.y : line.y);
             p.lineSize.add(line.size);
@@ -4648,6 +4797,16 @@ public final class PdfToWord {
             if (line.text.trim().isEmpty()) continue;
             Box box = new Box();
             box.x = line.x;
+            // A MIRRORED LINE'S ORIGIN IS ITS RIGHT END. line.x stays the page's own origin -
+            // that is what the .txt's leading spaces are measured from, and what the source
+            // reports for the run - but a BOX needs the left edge of the ink, and on a
+            // mirrored line the first glyph sits at the right. Without this the box starts
+            // where the line stops and the run is anchored a line-width to the right.
+            if (!line.glyphs.isEmpty() && line.glyphs.get(0).mirror) {
+                float minX = Float.MAX_VALUE;
+                for (Glyph g : line.glyphs) minX = Math.min(minX, g.x);
+                box.x = minX;
+            }
             box.y = line.y;
             box.right = line.right;
             box.size = line.size;
@@ -6170,7 +6329,14 @@ public final class PdfToWord {
             // they vanished. A box is not a rule: Word draws the table's grid itself, but the
             // frame around it belongs to the page.
             boolean rule = Math.min(s.wPt, s.hPt) < 3f;
-            if (rule && inTable(s.xPt, s.wPt, topDown, topDown + s.hPt, tables)) continue;
+            // The shape pass asks the SAME question the writer asks (ownedByTable, which reads
+            // Table#sideDrawn), not the loose 16 pt claim. With inTable() here and sideDrawn in
+            // the writer, the two emitters disagreed by 13.5 pt of tolerance: a rule inside the
+            // pad but off every side the writer draws was discarded by this pass and drawn by
+            // nothing. That is the NEITHER population - 101 rules on the eleven documents
+            // 32_stroke_lines still fails - and it is why this patch's helper was written but
+            // never wired in.
+            if (rule && ownedByTable(s.xPt, s.wPt, topDown, topDown + s.hPt, tables)) continue;
             // A shape is read from the content stream in page space, so on a page turned
             // 180 degrees it is on the wrong side of the page from the text it belongs to.
             // Mirrored here, before it is stored, so a box and the words inside it stay

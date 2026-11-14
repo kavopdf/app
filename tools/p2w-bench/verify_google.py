@@ -103,6 +103,14 @@ def runs(page, page_no=0):
                     "y": round(sp["bbox"][1], 2),
                     "x1": round(sp["bbox"][2], 2),
                     "y1": round(sp["bbox"][3], 2),
+                    # THE BASELINE'S OWN DIRECTION. 47 is a left-edge statistic, and a
+                    # left edge is only an edge on a baseline that runs left to right:
+                    # on a curved seal every glyph has its own angle and its own origin,
+                    # so its x is not comparable with another run's. 18_displacement has
+                    # always restricted itself to UPRIGHT runs for exactly this reason;
+                    # 47 never recorded the angle and could not. Recorded here, once.
+                    "angle": round(math.degrees(math.atan2(ln.get("dir", (1, 0))[1],
+                                                          ln.get("dir", (1, 0))[0])), 1),
                     "size": round(sp["size"], 1),
                     "font": sp.get("font", ""),
                     "colour": sp.get("color", 0),
@@ -1122,6 +1130,34 @@ def docx_rot_anchors(path):
         for sp in root.iter(WPS + "wsp"):
             xfrm = sp.find(".//" + A + "xfrm")
             rot = xfrm.get("rot") if xfrm is not None else None
+            # A QUARTER TURN IS NOT WRITTEN AS <a:xfrm rot>, AND THE FILE SAYS SO PLAINLY.
+            #
+            # The engine emits a 90-degree line as a text frame turned inside an upright box:
+            # <wps:bodyPr vert="vert270"> with the box's extent swapped (DocxWriter.java:2789-
+            # 2811). That is deliberate and it is the only construct a quarter turn survives
+            # in: <a:xfrm rot> is IGNORED by LibreOffice and by the Docs export (D-13/D-16), so
+            # a box that carries its angle only in a:xfrm renders level. Measured on
+            # table-with-rotated-header at HEAD: its 11 header cells render at -90.00 deg
+            # through vert270, and the same file's <a:xfrm> elements carry no rot at all.
+            #
+            # This function used to read <a:xfrm rot> alone, so a quarter turn written the one
+            # way the target renderer honours it read as "no rotation" - and a run the engine
+            # had rotated correctly was charged as lost. Measured on 411_nested_xobject_
+            # transforms: its 90-degree title is in the file as vert270 and the check reported
+            # both of the page's rotated runs lost.
+            #
+            # vert="vert" is 90 degrees clockwise (text reads down), vert="vert270" is 270
+            # (text reads up), which is the sense the engine uses: it writes vert270 exactly
+            # when the line's angle is 270 (readsUp, DocxWriter.java:2401).
+            vert = None
+            if not rot:
+                bodyPr = sp.find(".//" + WPS + "bodyPr")
+                v = bodyPr.get("vert") if bodyPr is not None else None
+                if v == "vert270":
+                    rot = "16200000"       # 270 * 60000
+                elif v == "vert":
+                    rot = "5400000"        # 90 * 60000
+                vert = v
             if not rot:
                 continue
             txt = "".join(t.text or "" for t in sp.iter(W + "t"))
@@ -1129,6 +1165,90 @@ def docx_rot_anchors(path):
         return out
     except Exception:
         return None
+
+
+def page_mirrors_text(doc, page):
+    """True when this page shows text under a negative-determinant CTM - a MIRROR.
+
+    A mirrored line is not a rotated line, and the difference is not academic: the source's
+    text layer reports a mirrored run exactly as it reports a 180-degree one, dir=(-1,0), so
+    35_rotation asked the .docx for a 180-degree anchor for text the page never rotated.
+    Measured on 417_rotate180_and_mirrored page 2, drawn under "-1 0 0 1 595 0 cm": 4 runs at
+    -180.0 degrees, and no anchor in any .docx can satisfy them - a rotation would turn the
+    words upside down, and a mirror is not expressible as an angle at all.
+
+    The determinant is the test because it is the one thing the two do not share: a rotation
+    by 180 degrees is [-1 0 0 -1], det = +1; a reflection is [-1 0 0 1], det = -1. PyMuPDF's
+    span record does not carry the matrix (no "matrix" key in get_texttrace on this build), so
+    the page's own content stream is walked instead - q/Q for the CTM stack, cm for the
+    change. Text inside a nested form that is itself mirrored is not seen by this walk; no
+    document in the corpus does that, and the cost of missing it is that the run is charged
+    as it is today.
+    """
+    try:
+        data = b"".join(doc.xref_stream(x) for x in page.get_contents())
+    except Exception:
+        return False
+    stack = [1.0]
+    nums = []
+    for m in re.finditer(rb"[-+]?\d*\.?\d+|[A-Za-z'\"*]+", data):
+        tok = m.group(0)
+        c = tok[:1]
+        if c.isdigit() or c in (b"-", b"+", b"."):
+            try:
+                nums.append(float(tok))
+            except ValueError:
+                pass
+            if len(nums) > 6:
+                nums.pop(0)
+            continue
+        if tok == b"q":
+            stack.append(stack[-1])
+        elif tok == b"Q":
+            if len(stack) > 1:
+                stack.pop()
+        elif tok == b"cm" and len(nums) >= 6:
+            a, b, cc, d = nums[-6], nums[-5], nums[-4], nums[-3]
+            stack[-1] = stack[-1] * (a * d - b * cc)
+        elif tok == b"BT" and stack[-1] < 0:
+            return True
+        nums = []
+    return False
+
+
+def page_is_turned_round(page):
+    """True when EVERY line on this page is drawn 180 degrees round and nothing is upright.
+
+    This is the engine's own test (PdfToWord.uprightIfPageIsUpsideDown), asked here so the
+    check can judge the same page the same way. A sheet printed the wrong way up is not a
+    page of stamps: a reader turns the paper, and the baseline is horizontal either way. The
+    engine therefore offers that page's text UPRIGHT, and the .docx is right to hold it so.
+
+    35_rotation used to charge every one of those runs as a lost rotation - 61 of them on
+    one-page-rotated-180-degrees, which is the largest single charge in the corpus for a page
+    that is not wrong. Asking the file for 61 anchors at 180 degrees would ask for 61 floating
+    text boxes: buildTables drops every rotated line ("a stamp is not a table row"), so the
+    checklist's five columns would stop being a table, and the target renderers ignore
+    <a:xfrm rot> anyway, so the boxes would show upright text in the wrong place.
+
+    The page's text is not unchecked by this: 04_chars_missing, 17_matched_runs and
+    45_char_accuracy still read it, on the render, where the text really is.
+    """
+    turned = 0
+    for blk in page.get_text("dict")["blocks"]:
+        if blk.get("type") != 0:
+            continue
+        for ln in blk.get("lines", []):
+            t = "".join(s.get("text", "") for s in ln.get("spans", []))
+            if not t.strip():
+                continue
+            dx, dy = (ln.get("dir") or (1.0, 0.0))[:2]
+            if abs(dy) > 0.25:
+                return False            # the baseline is not horizontal
+            if dx > -0.5:
+                return False            # an upright line: an ordinary page
+            turned += 1
+    return turned > 0
 
 
 def _ang_diff(a, b):
@@ -1717,6 +1837,7 @@ def extra_checks2(src, gd, docx_path=None):
     ANCHOR_TOL_PT = 3.0        # points, not a fraction of whatever box encloses the run
     ANCHOR_RECT_TOL = 2.0      # pt; the two boxes are the same object within this
     ANCHOR_BUDGET = 5          # per cent of the page's judged runs, as 18 uses
+    ANCHOR_WIDTH_TOL = 1.5     # pt; the render reproduced the run's own ink width
     lost, moved, unjudged, anchored = 0, 0, 0, 0
     anchor_bad_pages = []
 
@@ -1793,6 +1914,7 @@ def extra_checks2(src, gd, docx_path=None):
         sruns, gruns = runs(sp), runs(gp)
         gshapes = _shapes(gp)
         sshapes = _shapes(sp)                   # for the size-class population test
+        gtext = norm_word(gp.get_text())
         # Each side's anchors are chosen against the OTHER side's shapes: a box the
         # other document cannot express is not an object the two can be compared on.
         sa = _anchors(sp, sruns, gshapes)
@@ -1810,77 +1932,106 @@ def extra_checks2(src, gd, docx_path=None):
             sy = (sruns[i]["y"] + sruns[i]["y1"]) / 2.0
             js = _match(sruns[i], gruns, by, used)
             if not js:
+                # ITS TEXT IS NOT IN THE RENDER AT ALL - unless the matcher simply did
+                # not pair it. _match pairs on the exact word and, failing that, on a
+                # join of runs on one baseline; a page that draws one glyph per span on
+                # a curve defeats both. The page itself can answer the question the
+                # matcher could not: if the word is in the page's text, the text was not
+                # lost and this instrument has no verdict to cast.
+                if norm_word(sruns[i]["text"]) in gtext:
+                    unjudged += 1
+                    continue
                 lost += 1         # its text is not in the render at all
                 n_judged += 1
                 n_out += 1
                 continue
             used.update(js)
             bs = [ga[j] for j in js if ga[j] is not None]
-            gx = sum(gruns[j]["x"] + gruns[j]["x1"] for j in js) / (2.0 * len(js))
-            gy = sum(gruns[j]["y"] + gruns[j]["y1"] for j in js) / (2.0 * len(js))
+            # THE UNION'S CENTRE, not the mean of the pieces' centres. _match may pair one
+            # source run with SEVERAL render runs (a split), and the mean of their centres
+            # is not the centre of the text they make: a run split into a narrow piece and
+            # a wide one reads as a point weighted towards the narrow one. Measured on
+            # 320_balance_sheet_statutory, whose source run is one span and whose render
+            # splits it in two: dx read +3.50 with the ink's left edge 0.01 pt from where
+            # it started, i.e. a 3.5 pt "drift" produced entirely by the averaging.
+            gx = (min(gruns[j]["x"] for j in js) + max(gruns[j]["x1"] for j in js)) / 2.0
+            gy = (min(gruns[j]["y"] for j in js) + max(gruns[j]["y1"] for j in js)) / 2.0
             if not bs:
-                # NO BOX ENCLOSES THE TEXT. That is two different events and this check
-                # scored both as `lost`: the outline went, or the outline is still on the
-                # page at its own size and the text is outside it. The second is exactly
-                # the defect the check was written for, and scoring it `lost` was the
-                # only reason it ever reached the page - under the page budget, and two
-                # of them at a time are free (break59.py M6a: 2 of 40 boxes slid 30 pt
-                # clear of their text and the page passed with `lost`=2, budget 2).
-                # A run that has left its own surviving box outright cannot be a
-                # re-primitivisation artifact, so it is also beyond the budget.
                 if _box_moved(sb, gshapes, sshapes):
-                    moved += 1
+                    moved += 1    # the outline is on the page, somewhere else
                     n_judged += 1
                     n_out += 1
                     hard_out += 1
                 else:
-                    lost += 1
-                    n_judged += 1
-                    n_out += 1
+                    unjudged += 1
                 continue
             gb = bs[0][2]
-            dx = (gx - gb.x0) - (sx - sb.x0)
+            # DX IS TAKEN AT THE INK, which is what every other position check in this
+            # file does and this one did not. A span's bbox starts at the PEN, and a run
+            # that begins with spaces advances the pen without drawing anything: the
+            # source's '   Cost of materials consumed' has bbox x0 31.00 and its first
+            # glyph at 38.16, and the render drops the three spaces. Comparing bbox to
+            # bbox charges that 7.16 pt to the run's place - measured on
+            # 320_balance_sheet_statutory, dx read +3.50 on five rows whose ink had moved
+            # 0.01 pt. dy stays on the bbox, as 18_displacement takes it, so the ascent
+            # sensitivity is the house standard's and not this check's own.
+            gxl = min(gruns[j]["xink"] for j in js)
+            dx = (gxl - gb.x0) - (sruns[i]["xink"] - sb.x0)
             dy = (gy - gb.y0) - (sy - sb.y0)
-            if _same_box(sb, gb) or (abs(dx) <= ANCHOR_TOL_PT and abs(dy) <= ANCHOR_TOL_PT):
-                # SAME BOX, or a different box with the text in the same place inside
-                # it. The second case is not a hole: the box's identity was only ever a
-                # proxy for "is this the same object", and the relation this check
-                # exists to measure is the text's place INSIDE its outline. A proxy that
-                # is asked directly gives the right answer three ways where the old code
-                # gave a wrong one or none:
-                #  - a box that moved WITH its text (a reflowed table) was called moved
-                #    although the relation is untouched (break59.py M7, 9 of 9 runs).
-                #    18_displacement owns that displacement; 60 already had this exact
-                #    fix applied today for the same reason (A6).
-                #  - a box that grew 2-3 pt fell outside ANCHOR_RECT_TOL and the run was
-                #    silently unjudged - a hole exactly as wide as the gap between the
-                #    box tolerance (2.0) and the displacement tolerance (3.0), so the
-                #    anchor was held to a stricter standard than the thing it anchors
-                #    (M2a: 3 pt growth, text unmoved, 59 reads 0/0 and nothing else
-                #    fires; M2a2: the same at 1.5 pt is judged).
-                #  - a table drawn one rect per cell on the source and as a rule grid on
-                #    the render kept the relation and lost the box, and fired only because
-                #    some unrelated box on the page happened to have the cell's size (M1:
-                #    9 cells, text at identical coordinates, page failed; M1b: the same
-                #    page without that one box reads 0/0 and passes).
+            # AGREEMENT IS NEVER A DEFECT, whatever box it was measured against. Two
+            # rectangles that differ still put the text in the same place inside
+            # themselves, and a number that reads 0 is not evidence of drift. So the
+            # acquittal needs no identity test and keeps it - it is the CONVICTION that
+            # does, and that is the whole of what changed here.
+            if abs(dx) <= ANCHOR_TOL_PT and abs(dy) <= ANCHOR_TOL_PT:
+                anchored += 1
                 n_judged += 1
-                if abs(dx) > ANCHOR_TOL_PT or abs(dy) > ANCHOR_TOL_PT:
-                    moved += 1    # same place in the box? no - and the box is the same
-                    n_out += 1
-                else:
-                    anchored += 1
                 continue
-            if _box_moved(sb, gshapes, sshapes):
-                moved += 1        # the outline is on the page, somewhere else
-                n_judged += 1
-                n_out += 1
-            else:
-                # A different rectangle encloses it, the text sits somewhere else inside
-                # it, and the source's rectangle is nowhere on the page - a cell rect
-                # that came back as a band, a band that came back as the page. The
-                # fraction is not comparable, and this run is not evidence either way.
+            # A DISAGREEMENT IS A CONVICTION ONLY WHERE BOTH SIDES ARE THE SAME OBJECT.
+            #
+            # The box: on two different rectangles dx is the text's movement PLUS the
+            # distance between two unrelated origins, and the two cannot be separated
+            # from the number alone. 119 of the 826 runs this check fails on the corpus
+            # are exactly that (57 with a box of the same size elsewhere on the page, 62
+            # with none), and every one of them has moved 110-450 pt on the page - the
+            # page reflowed, which is 18_displacement's and 24_page_breaks' question, not
+            # a question about a relation to an outline. The check has no verdict here.
+            #
+            # The run: dx is taken at the run's CENTRE, and a centre is a function of the
+            # run's WIDTH as well as its place. A run whose ink is 6.7 pt wider - the
+            # 90th percentile of this corpus's same-box runs - has its centre 3.35 pt
+            # further right with its left edge exactly where it was: over the tolerance,
+            # with nothing moved. Measured on the 418 same-box runs the shipped check
+            # fails: 113 are within 3 pt once the offset is taken at the ink's LEFT edge
+            # instead of the centre. So a run whose width the render did not reproduce is
+            # not comparable either.
+            if not _same_box(sb, gb):
+                # ...UNLESS THE OUTLINE IS THE THING THAT MOVED. "The outline slid and
+                # the text stayed" is this check's own defect and it needs no offset
+                # comparison at all: the text's place on the page and the box's place on
+                # the page are each measurable on their own, and the defect is the one
+                # combination - text where it was, box somewhere else - that a
+                # displacement check cannot see, because nothing the reader reads moved.
+                # Decidable only when the source's rectangle still exists on the page at
+                # its own size, which is what _box_moved asks.
+                dtx, dty = gx - sx, gy - sy
+                if (abs(dtx) <= ANCHOR_TOL_PT and abs(dty) <= ANCHOR_TOL_PT
+                        and _box_moved(sb, gshapes, sshapes)):
+                    moved += 1
+                    n_judged += 1
+                    n_out += 1
+                    hard_out += 1
+                    continue
                 unjudged += 1
-            continue
+                continue
+            s_w = sruns[i]["x1ink"] - sruns[i]["xink"]
+            g_w = sum(gruns[j]["x1ink"] - gruns[j]["xink"] for j in js)
+            if abs(s_w - g_w) > ANCHOR_WIDTH_TOL:
+                unjudged += 1
+                continue
+            moved += 1
+            n_judged += 1
+            n_out += 1
         if n_judged and (n_out > max(2, -(-n_judged * ANCHOR_BUDGET // 100))
                          or n_out == n_judged or hard_out):
             anchor_bad_pages.append(si)
@@ -2292,6 +2443,25 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
         return out
 
     s_rot = rot_runs(src)
+    # A MIRRORED RUN IS NOT A ROTATED RUN. 417_rotate180_and_mirrored's page 2 is drawn under
+    # "-1 0 0 1 595 0 cm", and the text layer reports its four runs at -180.0 degrees - the
+    # same reading a 180-degree rotation gives - so this check demanded four 180-degree
+    # anchors for text the page never turned. There is no anchor that could satisfy it: the
+    # angle would have to turn the words upside down, which is a worse document than the one
+    # the page draws, and the engine's own reading of the page (the characters in reading
+    # order, upright, where the page puts them) is what a reader gets from a mirror anyway.
+    # The page's CTM says which of the two it is; see page_mirrors_text.
+    if s_rot:
+        mirrored_pages = [i for i, p in enumerate(src) if page_mirrors_text(src, p)]
+        if mirrored_pages:
+            s_rot = [r for r in s_rot if r["page"] not in mirrored_pages]
+    # A PAGE THE ENGINE RIGHTS ON PURPOSE IS NOT A PAGE OF LOST ANGLES - see
+    # page_is_turned_round. The test is the engine's own, so the check and the converter agree
+    # about which pages are sheets printed the wrong way up.
+    if s_rot:
+        turned_pages = [i for i, p in enumerate(src) if page_is_turned_round(p)]
+        if turned_pages:
+            s_rot = [r for r in s_rot if r["page"] not in turned_pages]
     d_rot = docx_rot_anchors(docx_path)
     if d_rot is None and s_rot:
         # UNMEASURED IS NOT A PASS - 54_image_dpi's rule, applied to the same kind of hop.
@@ -3224,6 +3394,16 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
                     if not "".join(c.get("c", "") for sp in ln.get("spans", [])
                                    for c in sp.get("chars", [])).strip():
                         continue
+                    # A turned line is not part of the body's left edge. On
+                    # 15_stamp_on_scanned_page the page's ONLY text is a 9-degree stamp,
+                    # and the anchor became that stamp's x (337 against the render's 138);
+                    # on one-page-rotated-180-degrees page 2 every line is turned 180 and
+                    # the "margin" was the mirrored column of a rotated sheet. A page with
+                    # no upright line has no body margin, and the clause says nothing
+                    # about it rather than comparing two stamps.
+                    _dx, _dy = ln.get("dir", (1, 0))
+                    if abs(math.degrees(math.atan2(_dy, _dx))) > 1.0:
+                        continue
                     xs.append(min(ink_box(sp, ln)[0] for sp in ln.get("spans", [])))
             out.append((pi, anchor(xs), len(xs)))
         return out
@@ -3280,8 +3460,30 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # displacement. It is the same edge the engine places text by, so the two sides of
     # this subtraction now mean the same thing. Falls back to x for any run whose producer
     # recorded no glyph boxes.
+    # WHICH PAIRS THIS CLAUSE MAY JUDGE. Two filters, each for a measured reason.
+    #
+    # (i) UPRIGHT ON BOTH SIDES. A curved seal draws 59 glyphs at 59 angles; the render
+    #     flattens the arc into one horizontal run. Subtracting the two x values is
+    #     subtracting a point on a curve from a point on a straight line - it is not a
+    #     displacement and no engine change can make it zero. Measured on the 31 failures
+    #     of corpus-v1: dropping the turned pairs closes 8 of them (03_stamp_vertical_90deg,
+    #     05_round_company_seal, 305, 312, 318, 352, 371, 401_trifold) and moves no
+    #     document the other way. This is the same test 18_displacement already applies -
+    #     "no single UPRIGHT run may be more than twice its own tolerance out".
+    #
+    # (ii) NOTHING ELSE. A merged-run pair - the render writing as one span what the source
+    #     drew as several, so g_sp is a PIECE with its x taken from the render's own glyph
+    #     boxes (see _inside) - IS JUDGED, because that x is exact: it is where the render
+    #     really drew the characters, so the difference is a real horizontal displacement
+    #     and not an estimate. Excluding those pairs was tried and rejected on 14 Nov: it
+    #     takes 21_form_labels, 40_devanagari, 64_newspaper, 76_devanagari_table and
+    #     magazine-2col to a pass, and 43_within_10pt_x - the only other check that reads
+    #     the same pairs - already fails 2 of those 5 and passes the other 3. So the
+    #     exclusion would blind the instrument on three documents to save five.
     by_page = collections.defaultdict(list)
     for s_sp, g_sp in pairs:
+        if abs(s_sp.get("angle", 0.0)) > 1.0 or abs(g_sp.get("angle", 0.0)) > 1.0:
+            continue
         by_page[s_sp["page"]].append(g_sp.get("xink", g_sp["x"]) -
                                      s_sp.get("xink", s_sp["x"]))
     for pg, dd in sorted(by_page.items()):
