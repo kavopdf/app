@@ -315,6 +315,22 @@ public final class DocxWriter {
      * 6 pt is about half a line box for the 10-12 pt text this corpus is written in, which is
      * where a miss stops being rounding and starts being a line in the wrong place.
      */
+    /**
+     * Whether the anchor rule makes the REST of the page absolute.
+     *
+     * <p>The rule itself says a line the flow cannot walk to is a position, not a gap. That is
+     * the same statement the wide-gap rule already makes, and that one already switches the page
+     * to {@code positioned}: once a page has a line the flow cannot reach, the page is no longer
+     * a flow. Leaving the flow live after an anchored line is what puts TWO positioners on one
+     * page - the flow, still advancing over lines it cannot reach, and the boxes placed at their
+     * own y - and their y models then disagree by exactly the miss, on every line after it.
+     *
+     * <p>Measured on policy-2col-spanning-section-heading: 51 flowed lines and 27 anchored boxes
+     * on one page, 21 overlaps, median |dy| 105.7 pt.
+     */
+    static final boolean PAGE_POSITION_ON_ANCHOR =
+            !"0".equals(System.getProperty("p2w.pagepos"));
+
     static final float ZERO_GAP_FLOOR_PT =
             Float.parseFloat(System.getProperty("p2w.zgfloor", "6.0"));
 
@@ -667,6 +683,8 @@ public final class DocxWriter {
 
     public static void write(PdfToWord.Result result, File out) throws IOException {
         Ctx ctx = new Ctx();
+        ctx.docName = out.getName().replaceFirst("\\.docx$", "");
+        censusOut();   // open the diagnostic streams before the first page, not at its end
         String documentXml = documentXml(result, ctx);
         // What the flow could not express, carried out where the pipeline can see it. A gap
         // that could not be written is not a rendering detail: the line lands somewhere the
@@ -888,6 +906,31 @@ public final class DocxWriter {
         int brokePage;
         /** Pages written so far, so the debug trace can name the page it is talking about. */
         int pageSeq;
+
+        // ---- POSITIONER CENSUS (diagnostic only; see censusEmit) ----
+        //
+        // Which writer put each line on the page, and which of them moved the flow's y. It is
+        // the measurement the one-positioner-per-page invariant is stated against, so it is
+        // counted where the lines are written rather than inferred from the .docx afterwards.
+        // Enabled with -Dp2w.census=<file>; it writes nothing to the document.
+        String docName = "";
+        int pageNo;
+        int cenPass;
+        int cenFlow;      // lines written by flowFromBox
+        int cenRow;       // rows written by flowRow
+        int cenCol;       // column cells written by columnPage
+        int cenTbl;       // tables written by table()
+        int cenAnchor;    // boxes written by anchorBox / pinnedBoxes
+        int cenAnchorRule; // anchors the ZERO_GAP rule wrote for a line that belongs to the flow
+        int cenAnchorPos;  // anchors written because the page is in positioned mode
+        int cenStamp;     // stamps written by stampBox
+        int cenFlowY;     // flowY assignments made by a flow owner
+        int cenAbsY;      // flowY assignments made by an absolute writer (a violation)
+        int cenRewind;    // assignments that moved flowY UP the page (a rewound positioner)
+        float cenRewindWorst;
+        final StringBuilder cenRewindWho = new StringBuilder();
+        /** True while writing the inside of a layout-table cell (columnPage's own flow). */
+        int cenCellFlowY;
         /**
          * How much of its measured height this page's flow may keep, 1 = all of it.
          *
@@ -1000,6 +1043,7 @@ public final class DocxWriter {
                         .append("<w:r><w:br w:type=\"page\"/></w:r></w:p>");
                 ctx.newPage = true;
             }
+            ctx.pageNo++;
             ctx.lastBaseline = -1f;
             ctx.flowY = -1f;
             ctx.flowBoxPt = 0f;
@@ -1171,7 +1215,7 @@ public final class DocxWriter {
             // the reserve applied to every page: 2, 12, 24, 48, 96 and 144 twips all still
             // render 10 pages, 300 renders 5. So the renderer needs more than 7.2 pt of slack on
             // a sheet the model calls full, and 15 pt is the first value that holds.
-            int fitReserveTw = Integer.parseInt(System.getProperty("p2w.fitreserve", "0"));
+            int fitReserveTw = Integer.parseInt(System.getProperty("p2w.fitreserve", "96"));
             if (writtenTw > pageBudgetTw - fitReserveTw
                     && !"1".equals(System.getProperty("p2w.noshave"))) {
                 // Still over the paper after squeezing: the residue is the part of the flow the
@@ -1234,7 +1278,8 @@ public final class DocxWriter {
         // frame. Rebuilt here rather than once per page because the page is written several
         // times by the budget guard, and each pass must write every stamp again.
         groupStamps(page, ctx.curShapes, ctx);
-        if (columnPage(sb, page, ctx, pw)) return;
+        cenReset(ctx);
+        if (columnPage(sb, page, ctx, pw)) { cenEmit(ctx, page); return; }
         // Which of this page's short lines are drawn beside a table rather than in its text, and
         // so must not charge the flow. Decided from the page's own geometry before anything is
         // written, so both of the budget guard's passes see the same answer (see pinShortParas).
@@ -1247,6 +1292,7 @@ public final class DocxWriter {
                     && page.blocks.get(bi + 1) instanceof PdfToWord.Table;
             emitBlock(sb, block, ctx);
         }
+        cenEmit(ctx, page);
     }
 
     /**
@@ -1526,6 +1572,12 @@ public final class DocxWriter {
         return g;
     }
 
+    private static void colRefuse(Ctx ctx, String why, Object extra) {
+        if (System.getProperty("p2w.debugCols") == null) return;
+        System.err.println("COLS " + ctx.docName + " page=" + ctx.pageNo + " refuse=" + why
+                + (extra == null ? "" : " " + extra));
+    }
+
     private static boolean columnPage(StringBuilder sb, PdfToWord.Page page, Ctx ctx, float pw) {
         int n = page.columns;
         // The edges come from the page's rows when they show columns (see rowColumnEdges), and
@@ -1536,7 +1588,7 @@ public final class DocxWriter {
             edge = geom.edge;
             n = edge.length - 1;
         } else {
-            if (n < 2 || ctx.colLeft == null || ctx.colLeft.size() < n) return false;
+            if (n < 2 || ctx.colLeft == null || ctx.colLeft.size() < n) { colRefuse(ctx, "no-colleft", n + "/" + (ctx.colLeft == null ? -1 : ctx.colLeft.size())); return false; }
             // The left edge of a column is the MEDIAN of its blocks' left edges, not the
             // smallest. Ctx.colLeft is the smallest, and on a page whose masthead is tagged with
             // the last band that smallest is the masthead's - newspaper-2col-fullwidth-headline's
@@ -1553,12 +1605,12 @@ public final class DocxWriter {
                     if (q.column != c || q.left <= 0f) continue;
                     lefts.add(q.left);
                 }
-                if (lefts.isEmpty()) return false;
+                if (lefts.isEmpty()) { colRefuse(ctx, "empty-lefts", c); return false; }
                 java.util.Collections.sort(lefts);
                 edge[c] = lefts.get(lefts.size() / 2);
-                if (c > 0 && edge[c] <= edge[c - 1] + 1f) return false;
+                if (c > 0 && edge[c] <= edge[c - 1] + 1f) { colRefuse(ctx, "edges-collide", c); return false; }
             }
-            if (edge[n - 1] >= pw - 1f) return false;
+            if (edge[n - 1] >= pw - 1f) { colRefuse(ctx, "edge-off-paper", edge[n-1]); return false; }
             edge[n] = pw;
         }
         if (n < 2) return false;
@@ -1607,6 +1659,35 @@ public final class DocxWriter {
                 int c = 0;
                 while (c + 1 < n && l >= edge[c + 1] - 1f) c++;
                 home[i] = c;
+                // A BLOCK THAT STARTS LEFT OF ITS OWN COLUMN IS NOT IN THAT COLUMN.
+                //
+                // The loop above asks one question - which column's left edge has this block
+                // passed - and a block that has passed none of them answers "column 0" by
+                // default, however far to the left of column 0 it actually starts. It is then
+                // written INSIDE that column's cell, and a cell is a rectangle: the text is
+                // drawn from the cell's own left edge, so a line the page drew at x=56 lands at
+                // x=387 and everything after it in that cell is pushed down with it.
+                //
+                // Measured on 06_rect_paid_stamp_red_transparent: the page's two "columns" are
+                // the invoice's totals label at x=386 and its value at x=518 (see
+                // rowColumnEdges - a label and its value recur at their own x on five rows), so
+                // edge[0] is 387. The "Amount in words: ..." line is drawn at x=56-373.84, 331 pt
+                // to the LEFT of that edge, and the whole left margin of the page - eleven lines
+                // - was written into the totals cell: the emitted layout table is
+                // tblInd=7744 twips with the eleven paragraphs stacked in its first cell.
+                //
+                // The block is not that cell's content and the model is not what is wrong here:
+                // PdfToWord's own Box for that line reads x=56, right=373.84. It is a
+                // full-width line drawn INSIDE the band the columns occupy, which is the one
+                // shape this table cannot describe - the refusal below already says so for a
+                // block that CROSSES the gutter. This one crosses nothing; it simply lies
+                // outside the grid, and the grid's first edge is not the paper's edge.
+                //
+                // COLUMN_START_TOL is the same tolerance columnAt() already uses for "how far a
+                // fragment may start from its column's left edge and still be that column's
+                // line": the edges are clustered averages and a line may start a few points left
+                // of its own column without being another column's content.
+                if (l < edge[c] - COLUMN_START_TOL) home[i] = -1;
             }
         }
 
@@ -1652,7 +1733,7 @@ public final class DocxWriter {
                 shared.add(bTop[i]);
             }
         }
-        if (shared.isEmpty()) return false;
+        if (shared.isEmpty()) { colRefuse(ctx, "no-shared", null); return false; }
         java.util.Collections.sort(shared);
         // The band is the longest RUN of shared baselines. A single shared line is not columns:
         // a brochure's header puts its title at the first column's x and its edition line at the
@@ -1681,7 +1762,7 @@ public final class DocxWriter {
         // A page whose bands the column pass detected but whose prose never sits in them - a
         // page of full-width lines that a vertical gutter on a form mis-tagged - is not a column
         // page at all.
-        if (colBottom <= colTop) return false;
+        if (colBottom <= colTop) { colRefuse(ctx, "no-band", colTop + "/" + colBottom); return false; }
 
         // A CONTENT TABLE INSIDE A COLUMN IS COLUMN CONTENT, NOT A BAND ABOVE THE COLUMNS.
         //
@@ -1765,6 +1846,7 @@ public final class DocxWriter {
             // commissioner to take up". Such a block belongs to two cells, not to a band, so it
             // is split by box.
             int[] parts = splitColumns(b, edge, n);
+            if (parts == null) colRefuse(ctx, "straddles-gutter", "gutter=" + gutter);
             if (parts != null) {
                 PdfToWord.Para q = (PdfToWord.Para) b;
                 for (int k = 0; k < q.boxes.size(); k++) {
@@ -1778,7 +1860,7 @@ public final class DocxWriter {
         // One cell holding everything is not a column page either: it is a single flow whose
         // lines happened to be tagged with bands. Checked before anything is written, so a
         // refusal leaves the caller's flow untouched.
-        if (used.size() < 2) return false;
+        if (used.size() < 2) { colRefuse(ctx, "one-cell", used.size()); return false; }
 
         // The bands must hold columns of text, not a column of labels beside a column of
         // values. Every test up to here asks only "is there an x that recurs and that nothing
@@ -1799,6 +1881,7 @@ public final class DocxWriter {
                 }
             }
             if (!PdfToWord.bandsAreColumns(seg, edge, colBottom - colTop, page.height)) {
+                colRefuse(ctx, "not-columns", null);
                 return false;
             }
         }
@@ -1932,6 +2015,14 @@ public final class DocxWriter {
                 ctx.cellLeftPt = edge[c];
                 ctx.cellRightPt = edge[c + 1];
                 ctx.afterTablePt = rowEndPt;
+                // A cell is a rectangle of its own, so it is a positioner of its own: the flow's
+                // y is "not known yet" at its first line, exactly as Ctx.flowY documents for a
+                // new column of a continuous section. It was left holding the BODY flow's y, and
+                // the absolute-gap fallback in flowFromBox reads flowY whenever the pitch branch
+                // had nothing to say - so a cell's first line could be placed from a position
+                // that belongs to the page's flow and not to this cell.
+                ctx.flowY = -1f;
+                ctx.flowBoxPt = 0f;
                 ctx.lastBaseline = -1f;
                 ctx.lastLinePt = 0f;
                 ctx.newPage = false;
@@ -1948,6 +2039,7 @@ public final class DocxWriter {
                     emitBlock(cellXml[c], b, ctx);
                     any = true;
                 }
+                if (any) cenLine(ctx, "columnPage");
                 // A cell must hold a block-level element, and a table must be followed by a
                 // paragraph inside its cell. A 1-twip line is the cheapest one there is.
                 if (!any) {
@@ -2436,9 +2528,26 @@ public final class DocxWriter {
      * every line on a page whose own white space is wider than the flow may spend.
      */
     private static void anchorBox(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b, Ctx ctx) {
+        cenLine(ctx, "anchorBox");
+        traceLine(ctx, "anchorBox", b.y, 0, 0, ctx.flowY, b.text());
         StringBuilder inner = new StringBuilder(256);
         lineParagraph(inner, p, b);
-        float wPt = Math.max(4f, b.right - b.x) * 1.12f + b.size * 1.5f;
+        // A text box has a fixed width and a fixed height, so a box narrower than its own line
+        // does not overflow - it WRAPS, and with w:lineRule="exact" the second line is clipped
+        // away. The page's advance is the measurement, except where the measurement is the
+        // broken thing: a line whose glyphs all report zero width measures a few points wide and
+        // the box then holds two characters. The rotated path in para() already falls back to
+        // the character count for exactly this case; this writer, which is the one the anchor
+        // rule uses for a line the flow cannot reach, did not. On
+        // 69_two_col_legal_numbered_clauses the clause "8. The job worker shall carry out the
+        // processes of desizing," measured 19 pt for 60 characters and reached the render as
+        // "8. " and nothing else - 48 characters lost, 04_chars_missing.
+        int chars = 0;
+        for (PdfToWord.Run r : b.runs) chars += r.text.length();
+        float advance = b.right - b.x;
+        float needed = chars * b.size * 0.5f;
+        if (advance < needed * 0.6f) advance = needed;
+        float wPt = Math.max(4f, advance) * 1.12f + b.size * 1.5f;
         float hPt = Math.max(4f, b.size * LINE_FACTOR);
         anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), 0f, -1, 0.6f);
     }
@@ -2701,6 +2810,7 @@ public final class DocxWriter {
         if (ctx.positioned && !anyRotated) {
             for (PdfToWord.Box b : p.boxes) {
                 if (b.runs.isEmpty()) continue;
+                ctx.cenAnchorPos++;
                 anchorBox(sb, p, b, ctx);
             }
             return;
@@ -3117,6 +3227,7 @@ public final class DocxWriter {
             flowFromBox(sb, p, cols.get(0), ctx);
             return;
         }
+        cenLine(ctx, "flowRow");
         PdfToWord.Box first = cols.get(0);
         float indent = first.x;
         float size = first.size;
@@ -3228,12 +3339,24 @@ public final class DocxWriter {
             float thisBoxBottom = first.y + (1f - LINE_BASE) * linePt;
             if (landY - first.y >= ZERO_GAP_FLOOR_PT && thisBoxBottom <= prevBoxTop) {
                 ctx.zeroGapAnchored++;
+                ctx.cenAnchorRule += cols.size();
                 for (PdfToWord.Box ab : cols) anchorBox(sb, p, ab, ctx);
                 ctx.lastLinePt = linePt;
                 ctx.lastBaseline = first.y;
                 ctx.lastSize = size;
-                ctx.flowY = first.y;
-                ctx.flowBoxPt = Math.max(4f, size * LINE_FACTOR);
+                if (PAGE_POSITION_ON_ANCHOR) ctx.positioned = true;
+                // The row is a box on the page, not a step in the flow (see anchorKeepsFlow).
+                // It used to set the flow to its own baseline here, which rewound the
+                // positioner whenever the row sat above the flow - the 18 pt miss on
+                // 69_two_col_legal_numbered_clauses, and the 101.24 pt one on
+                // policy-2col-spanning-section-heading.
+                if (ANCHOR_KEEPS_FLOW) {
+                    anchorKeepsFlow(ctx, placeTopPt, beforeTw, lineTw, "flowRow-anchor");
+                } else {
+                    cenSetY(ctx, first.y, false, "flowRow-anchor");
+                    ctx.flowY = first.y;
+                    ctx.flowBoxPt = Math.max(4f, size * LINE_FACTOR);
+                }
                 return;
             }
             if (landY - first.y >= ZERO_GAP_FLOOR_PT) ctx.zeroGapNoRoom++;
@@ -3249,7 +3372,9 @@ public final class DocxWriter {
         ctx.newPage = false;
         // Re-sync the running position to what was written, not to what was intended. A page
         // break inside the block above starts a new sheet, so the top is the paper's top again.
+        float beforeY = ctx.flowY;
         resync(ctx, placeTopPt, beforeTw, lineTw);
+        traceLine(ctx, "flowRow", first.y, beforeTw, lineTw, beforeY, first.text());
 
         // A tab stop's position is measured from the page margin, NOT from the paragraph's own
         // indent - the section has zero margins, so the page margin is x=0 and a stop is the
@@ -3719,9 +3844,167 @@ public final class DocxWriter {
      * actually emitted. The next paragraph is measured from here.
      */
     private static void resync(Ctx ctx, float topPt, int beforeTw, int lineTw) {
-        ctx.flowY = topPt + beforeTw / (float) TWIPS_PER_PT + LINE_BASE * (lineTw / (float) TWIPS_PER_PT);
+        float y = topPt + beforeTw / (float) TWIPS_PER_PT + LINE_BASE * (lineTw / (float) TWIPS_PER_PT);
+        if (ctx.inColumn) ctx.cenCellFlowY++; else cenSetY(ctx, y, false, "resync");
+        ctx.flowY = y;
         ctx.flowBoxPt = lineTw / (float) TWIPS_PER_PT;
     }
+
+    /**
+     * THE ONE-POSITIONER RULE, in the one place a writer can break it.
+     *
+     * <p>A line the writer places ABSOLUTELY - an anchored text box - is not part of the flow:
+     * it occupies its own y and the flow does not walk past it. So it must not move the flow's
+     * position either. The flow keeps the y it would have had if the line had been written as a
+     * flow line: the edge the paragraph was placed from, plus the gap, plus the box it would
+     * have carried.
+     *
+     * <p>WHAT THIS REPLACES. An anchored line used to set {@code flowY} to its OWN baseline
+     * ({@code flowY = b.y}). That is only the same number when the line is anchored at or below
+     * the flow. Where the page drew it ABOVE the flow - which is the case the anchor rule
+     * exists for - it REWINDS the positioner: the next flow line is then placed from a y above
+     * where the flow had already got to, lands high by the miss, and collides with the line
+     * above it. Measured over corpus-v1: six rewinds on five pages, the worst 101.24 pt, and
+     * every one of them from a writer that had just placed a box absolutely.
+     *
+     * <p>@param placeTopPt the absolute y the paragraph was placed from - the table/row edge
+     *                    where one was used, the flow's own top otherwise.
+     */
+    private static void anchorKeepsFlow(Ctx ctx, float placeTopPt, int beforeTw, int lineTw,
+                                        String who) {
+        if (!ANCHOR_KEEPS_FLOW) return;
+        float y = placeTopPt + beforeTw / (float) TWIPS_PER_PT
+                + LINE_BASE * (lineTw / (float) TWIPS_PER_PT);
+        cenSetY(ctx, y, false, who);
+        ctx.flowY = y;
+        ctx.flowBoxPt = lineTw / (float) TWIPS_PER_PT;
+    }
+
+    // ------------------------------------------------------------ positioner census
+    //
+    // The census is a MEASUREMENT, not a behaviour: it counts, per page, which writer wrote the
+    // page's lines and which of them moved the flow's y. It is what the one-positioner-per-page
+    // invariant is stated against, and it is off unless -Dp2w.census=<file> names an output.
+
+    /** Count one line written by {@code who}. */
+    private static void cenLine(Ctx ctx, String who) {
+        switch (who) {
+            case "flowFromBox": ctx.cenFlow++; break;
+            case "flowRow": ctx.cenRow++; break;
+            case "columnPage": ctx.cenCol++; break;
+            case "table": ctx.cenTbl++; break;
+            case "anchorBox": ctx.cenAnchor++; break;
+            case "stampBox": ctx.cenStamp++; break;
+            default: break;
+        }
+    }
+
+    /**
+     * Record a writer setting the flow's y.
+     *
+     * @param absolute true when the writer does not own the flow's y and should not have set it
+     *                 at all - an absolute placement leaking into the flow's positioner.
+     */
+    private static void cenSetY(Ctx ctx, float y, boolean absolute) {
+        cenSetY(ctx, y, absolute, "?");
+    }
+
+    private static void cenSetY(Ctx ctx, float y, boolean absolute, String who) {
+        if (ctx.flowY >= 0f && y < ctx.flowY - 0.01f) {
+            ctx.cenRewind++;
+            float back = ctx.flowY - y;
+            if (back > ctx.cenRewindWorst) ctx.cenRewindWorst = back;
+            ctx.cenRewindWho.append(ctx.cenRewindWho.length() > 0 ? "," : "")
+                    .append(who).append(":").append(String.format(java.util.Locale.ROOT, "%.2f", back));
+        }
+        if (absolute) ctx.cenAbsY++; else ctx.cenFlowY++;
+    }
+
+    private static java.io.PrintStream CENSUS_OUT;
+    private static java.io.PrintStream TRACE_OUT;
+    private static boolean CENSUS_OPEN;
+
+    /**
+     * One line per line written, when -Dp2w.traceLines=<file> names an output: which writer put
+     * it where, and what the flow's positioner did around it. The census counts; this is the
+     * sequence a fault has to be read in.
+     */
+    private static void traceLine(Ctx ctx, String who, float y, int beforeTw, int lineTw,
+                                  float beforeY, String text) {
+        if (TRACE_OUT == null) return;
+        String t = text == null ? "" : text.replace('\t', ' ').replace('\n', ' ');
+        if (t.length() > 44) t = t.substring(0, 44);
+        TRACE_OUT.println("LINE\t" + ctx.docName
+                + "\tp=" + ctx.pageNo
+                + "\t" + who
+                + "\ty=" + String.format(java.util.Locale.ROOT, "%.2f", y)
+                + "\tbefore=" + beforeTw
+                + "\tline=" + lineTw
+                + "\tflowBefore=" + String.format(java.util.Locale.ROOT, "%.2f", beforeY)
+                + "\tflowAfter=" + String.format(java.util.Locale.ROOT, "%.2f", ctx.flowY)
+                + "\tcol=" + (ctx.inColumn ? 1 : 0)
+                + "\t" + t);
+    }
+
+    private static java.io.PrintStream censusOut() {
+        if (!CENSUS_OPEN) {
+            CENSUS_OPEN = true;
+            String p = System.getProperty("p2w.census");
+            if (p != null) {
+                try {
+                    CENSUS_OUT = new java.io.PrintStream(
+                            new java.io.FileOutputStream(p, true), true, "UTF-8");
+                } catch (Exception e) {
+                    CENSUS_OUT = null;
+                }
+            }
+            String q = System.getProperty("p2w.traceLines");
+            if (q != null) {
+                try {
+                    TRACE_OUT = new java.io.PrintStream(
+                            new java.io.FileOutputStream(q, true), true, "UTF-8");
+                } catch (Exception e) {
+                    TRACE_OUT = null;
+                }
+            }
+        }
+        return CENSUS_OUT;
+    }
+
+    private static void cenReset(Ctx ctx) {
+        ctx.cenFlow = ctx.cenRow = ctx.cenCol = ctx.cenTbl = 0;
+        ctx.cenAnchor = ctx.cenStamp = 0;
+        ctx.cenAnchorRule = ctx.cenAnchorPos = 0;
+        ctx.cenFlowY = ctx.cenAbsY = ctx.cenRewind = 0;
+        ctx.cenRewindWorst = 0f;
+        ctx.cenRewindWho.setLength(0);
+        ctx.cenCellFlowY = 0;
+        ctx.cenPass++;
+    }
+
+    /** One line per page written, for the census file. */
+    private static void cenEmit(Ctx ctx, PdfToWord.Page page) {
+        java.io.PrintStream o = censusOut();
+        if (o == null) return;
+        o.println("CENSUS\t" + ctx.docName
+                + "\tpage=" + ctx.pageNo
+                + "\tpass=" + ctx.cenPass
+                + "\tflow=" + ctx.cenFlow
+                + "\trow=" + ctx.cenRow
+                + "\tcol=" + ctx.cenCol
+                + "\ttbl=" + ctx.cenTbl
+                + "\tanchor=" + ctx.cenAnchor
+                + "\tstamp=" + ctx.cenStamp
+                + "\tanchorRule=" + ctx.cenAnchorRule
+                + "\tanchorPos=" + ctx.cenAnchorPos
+                + "\tflowYset=" + ctx.cenFlowY
+                + "\tabsYset=" + ctx.cenAbsY
+                + "\trewind=" + ctx.cenRewind
+                + "\trewindWorst=" + String.format(java.util.Locale.ROOT, "%.2f", ctx.cenRewindWorst)
+                + "\tcellYset=" + ctx.cenCellFlowY
+                + "\trewindWho=" + ctx.cenRewindWho);
+    }
+
 
     /** The top of the paragraph about to be written, in points from the top of the sheet. */
     private static float flowTopPt(Ctx ctx) {
@@ -3742,6 +4025,7 @@ public final class DocxWriter {
         String text = b.text();
         if (text.trim().isEmpty()) return;
         ctx.flowCount++;
+        cenLine(ctx, "flowFromBox");
         int leftTw = (int) Math.max(0L, Math.round(b.x * TWIPS_PER_PT));
         int rightTw = 0;
         // A line the page centred is placed by w:jc, and LibreOffice centres it inside the
@@ -3937,16 +4221,17 @@ public final class DocxWriter {
             float thisBoxBottom = b.y + (1f - LINE_BASE) * linePt;
             if (err >= ZERO_GAP_FLOOR_PT && thisBoxBottom <= prevBoxTop) {
                 ctx.zeroGapAnchored++;
+                ctx.cenAnchorRule++;
                 anchorBox(sb, p, b, ctx);
                 // The anchored box's baseline IS b.y, so that is where the flow now is.
                 ctx.lastLinePt = linePt;
                 ctx.lastBaseline = b.y;
                 ctx.lastSize = b.size;
+                if (PAGE_POSITION_ON_ANCHOR) ctx.positioned = true;
                 if (ANCHOR_KEEPS_FLOW) {
-                    ctx.flowY = flowTopPt(ctx) + beforeTw / (float) TWIPS_PER_PT
-                            + LINE_BASE * (lineTw / (float) TWIPS_PER_PT);
-                    ctx.flowBoxPt = lineTw / (float) TWIPS_PER_PT;
+                    anchorKeepsFlow(ctx, placeTopPt, beforeTw, lineTw, "flowFromBox-anchor");
                 } else {
+                    cenSetY(ctx, b.y, false, "flowFromBox-anchor-rewind");
                     ctx.flowY = b.y;
                     ctx.flowBoxPt = Math.max(4f, b.size * LINE_FACTOR);
                 }
@@ -3962,7 +4247,9 @@ public final class DocxWriter {
         // Re-sync to what was written, so the next paragraph is measured from the reader's
         // position rather than from the PDF's (D-26) - and to the position this paragraph was
         // really placed at, which is the table/row edge when the branch above used one.
+        float beforeY = ctx.flowY;
         resync(ctx, placeTopPt, beforeTw, lineTw);
+        traceLine(ctx, "flowFromBox", b.y, beforeTw, lineTw, beforeY, text);
         sb.append("<w:p><w:pPr>");
         if (p.heading > 0) {
             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
@@ -4530,6 +4817,7 @@ public final class DocxWriter {
      */
     private static void stampBox(StringBuilder sb, java.util.List<PdfToWord.Box> lines,
                                  Frame frame, float lineAngle, Ctx ctx) {
+        cenLine(ctx, "stampBox");
         double th = Math.toRadians(lineAngle);
         double ux = Math.cos(th), uy = Math.sin(th);
         double vx = -Math.sin(th), vy = Math.cos(th);
@@ -5207,6 +5495,8 @@ public final class DocxWriter {
     }
 
     private static void table(StringBuilder sb, PdfToWord.Table t, Ctx ctx) {
+        cenLine(ctx, "table");
+        traceLine(ctx, "table", Float.NaN, 0, 0, ctx.flowY, "top=" + t.top);
         int cols = 0;
         for (List<String> row : t.rows) cols = Math.max(cols, row.size());
         if (cols == 0) return;
@@ -5315,6 +5605,8 @@ public final class DocxWriter {
             ctx.flowTw += spacerTw;
             // The spacer is a line of its own: the table now starts at the flow's position
             // after it, which is the y the page drew the table's top at.
+            if (ctx.inColumn) ctx.cenCellFlowY++;
+            else cenSetY(ctx, flowTopPt(ctx) + spacerTw / (float) TWIPS_PER_PT, false, "table-spacer");
             ctx.flowY = flowTopPt(ctx) + spacerTw / (float) TWIPS_PER_PT;
             ctx.flowBoxPt = 0f;
         }
@@ -6157,6 +6449,8 @@ public final class DocxWriter {
         // The flow's real position after a table is the row's box bottom plus the 4 pt carrier
         // Word requires after it, because that carrier is a line the next paragraph starts under
         // (D-26: the position is where the reader is, not where the PDF drew).
+        if (ctx.inColumn) ctx.cenCellFlowY++;
+        else cenSetY(ctx, rowBottomPt + (carrier ? carrierTw / (float) TWIPS_PER_PT : 0f), false, "table-bottom");
         ctx.flowY = rowBottomPt
                 + (carrier ? carrierTw / (float) TWIPS_PER_PT : 0f);
         ctx.flowBoxPt = 0f;

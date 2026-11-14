@@ -81,9 +81,123 @@ def ink_box(sp, ln):
     return min(c["bbox"][0] for c in ink), max(c["bbox"][2] for c in ink)
 
 
-def runs(page, page_no=0):
+def reading_frame(angle_deg, w, h, mirrored=False):
+    """The basis of a run's READING frame, for a page w x h and a baseline angle.
+
+    WHY THIS EXISTS. Every geometric check in this file compared a source run's device
+    bbox against a render run's device bbox. That is only meaningful when both pages are
+    drawn the same way up. They are not: the engine writes an UPRIGHT .docx from a page
+    whose text layer is rotated, so the render of `one-page-rotated-180-degrees` page 2
+    comes back with dir=(1,0) while the source page 2 has dir=(-1,0) on every one of its
+    61 lines. The comparison then subtracts two coordinate systems that differ by a 180
+    degree rotation about the page centre, and the residue is a full page height: worst
+    |dy| 791 pt on that page, 0 of 61 runs within 10 pt in x, on a page the engine
+    reproduced faithfully. 18_displacement and 43_within_10pt_x both charged it.
+
+    The fix is to compare in READING space, derived from each LINE's own dir - the space
+    in which a reader sees the text, whatever way up the producer drew it. The frame is
+    the baseline direction d=(cos a, sin a) and its perpendicular p=(-dy, dx), taken about
+    the page centre so that a rotation about the centre is undone rather than translated:
+
+        rx = (x-cx)*dx + (y-cy)*dy        along the baseline, increasing rightwards
+        ry = (x-cx)*px + (y-cy)*py        across it, increasing downwards
+
+    For an upright line (a=0) this is rx=x-cx, ry=y-cy: a constant shift that cancels in
+    every difference, so NOTHING changes for an upright document. For a 180-degree line
+    (a=180) it is rx=cx-x, ry=cy-y: the rotation undone. The perpendicular points "down" in
+    reading terms, so ry grows the way a reader's eye travels down the page, and dy is a
+    displacement rather than a page height.
+
+    ONLY A HORIZONTAL BASELINE IS PROJECTED. A reading frame is the space in which a reader
+    reads a LINE, and that is only well defined when the line is level: upright or upside
+    down (|sin a| <= 0.02). A curved seal - 05_round_company_seal_curved_text, and the
+    ~24 rotated glyphs on each of 312/318/352/371/305/60 - draws every glyph at its own
+    angle, so there is no single frame its x is comparable in; runs() already says as much
+    about 47. Projecting those made 43 charge the curvature as horizontal displacement
+    (05 read 99 -> 76, 352 read 100 -> 46) and collapsed their pairing (05 matched 79 -> 37).
+    A slanted line therefore keeps its DEVICE frame (the identity), which is exactly what
+    every check read before this change - so those documents do not move at all.
+
+    A 90/270 degree line is deliberately NOT projected either: undoing it needs the page's
+    width and height swapped, and no corpus page in this run turns a whole page by a
+    quarter turn. That residual is recorded in the round's write-up, not papered over.
+    """
+    # A MIRRORED LINE IS NOT A ROTATED ONE. dir=(-1,0) is what a reflection and a 180-degree
+    # rotation BOTH report, and a rotation cannot undo a reflection - undoing it needs a
+    # flip, which is not an angle. 417_rotate180_and_mirrored page 2 is drawn under
+    # "-1 0 0 1 595 0 cm" (det = -1); projecting it as a rotation took its 43 from 100 to 50.
+    # page_mirrors_text() reads the page's CTM and says which it is, so a mirrored page keeps
+    # the zero-rotation frame and reads exactly as it did before this change.
+    a = math.radians(angle_deg)
+    if mirrored or abs(math.sin(a)) > 0.02:
+        # Slanted: zero ROTATION, but still about the page centre - NOT a bare identity.
+        # The origin must be the same one every other line on the page uses, or a document
+        # that mixes a curved seal with upright body text compares a device x against a
+        # centred x and reads the page centre (297 pt) as a displacement. Zero rotation about
+        # the centre is rx=x-cx, ry=y-cy, which cancels in every difference exactly as the
+        # old device comparison did.
+        return (w / 2.0, h / 2.0, 1.0, 0.0, 0.0, 1.0)
+    # SNAP a level line to an exact 0 or exact 180. A line the extractor reports at 0.05
+    # degrees would otherwise get a frame tilted by that much, and because the tilt term is
+    # (y-cy)*sin, two lines at different heights shift by different sub-pt amounts - enough
+    # to walk a line across 42_justification_edges' 1 pt bucket (newsletter-3col-header-footer
+    # read 0 -> 6 contradicted pairs on that alone). A level baseline is level; the snap is
+    # what the old device comparison did implicitly.
+    sgn = -1.0 if math.cos(a) < 0 else 1.0
+    return (w / 2.0, h / 2.0, sgn, 0.0, 0.0, sgn)
+
+
+def rproj(x, y, fr):
+    """(rx, ry) of a device point in the reading frame `fr` from reading_frame()."""
+    cx, cy, dx, dy, px, py = fr
+    vx, vy = x - cx, y - cy
+    return (vx * dx + vy * dy, vx * px + vy * py)
+
+
+def page_reading_frame(page):
+    """The baseline orientation a reader reads this PAGE in: 0.0 or 180.0 degrees.
+
+    A page is read in ONE orientation, and that is the frame every line on it belongs to.
+    Projecting each LINE by its own dir is right when the page is uniformly rotated - the
+    case that matters - because then every line agrees and the page frame IS each line's
+    own dir. On a page that is upright except for a rotated stamp or a rotated contact
+    block, per-line projection compares that block against a render that CANNOT DRAW
+    ROTATION AT ALL: `soffice --headless` emits zero non-level lines on all 211 documents
+    (measured; see the 35_rotation note above), so the render always puts a rotated block
+    upright at its DEVICE position. Charging it in reading space therefore measures
+    LibreOffice, not the engine. Measured on the corpus, strict per-line projection flipped
+    04_stamp_180deg_upside_down (18 - and 35_rotation already fails that document on the
+    same lost stamp, so it was a DOUBLE charge) and 401_trifold_brochure (18 and 43 - where
+    35_rotation PASSES, because the .docx does carry the rotation and only the renderer
+    drops it).
+
+    So the frame is the page's DOMINANT level orientation. A page whose text is mostly
+    slanted - a curved seal - gets 0, the device frame, for the same reason runs() already
+    refuses to project slanted lines.
+    """
+    c0 = c180 = cs = 0
+    for blk in page.get_text("dict")["blocks"]:
+        if blk.get("type") != 0:
+            continue
+        for ln in blk.get("lines", []):
+            if not ln.get("spans"):
+                continue
+            dx, dy = ln.get("dir", (1, 0))[:2]
+            if abs(dy) > 0.02:
+                cs += 1
+            elif dx < 0:
+                c180 += 1
+            else:
+                c0 += 1
+    if cs >= max(c0, c180):
+        return 0.0
+    return 180.0 if c180 > c0 else 0.0
+
+
+def runs(page, page_no=0, mirrored=False, page_angle=None):
     """Every text span on a page, with the attributes we compare."""
     out = []
+    pw, ph = page.rect.width, page.rect.height
     for blk in page.get_text("rawdict")["blocks"]:
         if blk.get("type") != 0:
             continue
@@ -94,6 +208,36 @@ def runs(page, page_no=0):
                 if not t.strip():
                     continue
                 ix0, ix1 = ink_box(sp, ln)
+                ang = round(math.degrees(math.atan2(ln.get("dir", (1, 0))[1],
+                                                    ln.get("dir", (1, 0))[0])), 1)
+                fr = reading_frame(page_angle if page_angle is not None else ang,
+                                   pw, ph, mirrored)
+                b = sp["bbox"]
+                # THE BASELINE ORIGIN, not the bbox, is the point that transforms exactly.
+                # PyMuPDF's span bbox anchors the font's ascent/descent in the UNROTATED
+                # frame, so on a 180-degree line the box it reports is not the geometric
+                # image of the upright box: measured on a page against its own exact 180
+                # (content wrapped in `-1 0 0 -1 W H cm`), the bbox came back 6.07 pt off
+                # while the origin came back to 0.001 pt. A displacement is a property of
+                # the baseline, so the baseline is what is projected: ry is where the line
+                # sits across the reading direction, and the ink extents give its span
+                # along it (device x is exact under any multiple of 90 degrees).
+                #
+                # The reading-space TOP is the origin projected, minus the ascent, where the
+                # ascent is measured in device space as (origin - bbox_top) - a quantity
+                # PyMuPDF reports the same way for a level line whichever way up it is
+                # drawn (measured: 8.535 pt upright, 8.534 pt on the exact 180). That makes
+                # ry EXACT for a 180-degree line and IDENTICAL to the old bbox top for an
+                # upright one (ry = y - cy), so upright documents do not move.
+                ox, oy = sp.get("origin", (b[0], b[3]))
+                ascent = oy - b[1]
+                ryb = rproj(ox, oy, fr)[1] - ascent
+                xa = rproj(b[0], oy, fr)[0]
+                xb = rproj(b[2], oy, fr)[0]
+                rxbox, rx1box = min(xa, xb), max(xa, xb)
+                i0 = rproj(ix0, oy, fr)[0]
+                i1 = rproj(ix1, oy, fr)[0]
+                rxink, rx1ink = min(i0, i1), max(i0, i1)
                 out.append({
                     "page": page_no,
                     "text": t,
@@ -103,14 +247,29 @@ def runs(page, page_no=0):
                     "y": round(sp["bbox"][1], 2),
                     "x1": round(sp["bbox"][2], 2),
                     "y1": round(sp["bbox"][3], 2),
+                    # READING SPACE. The same box and ink box projected through this line's
+                    # own dir (reading_frame above). The position family - the pair matcher,
+                    # 18, 34, 43 and 42 - reads THESE, so a rotated page compares against an
+                    # upright render the way a reader reads it. The device fields above are
+                    # kept for the checks that are genuinely about the sheet of paper (44
+                    # bands, 46 strokes, 59 anchors, 60 column edge, 47 margins), which
+                    # exclude rotated runs rather than project them.
+                    "rx": round(rxbox, 2),
+                    "rx1": round(rx1box, 2),
+                    "ry": round(ryb, 2),
+                    "ry1": round(ryb + (b[3] - b[1]), 2),
+                    "rxink": round(rxink, 2),
+                    "rx1ink": round(rx1ink, 2),
+                    "ox": ox,
+                    "oy": oy,
+                    "fr": fr,
                     # THE BASELINE'S OWN DIRECTION. 47 is a left-edge statistic, and a
                     # left edge is only an edge on a baseline that runs left to right:
                     # on a curved seal every glyph has its own angle and its own origin,
                     # so its x is not comparable with another run's. 18_displacement has
                     # always restricted itself to UPRIGHT runs for exactly this reason;
                     # 47 never recorded the angle and could not. Recorded here, once.
-                    "angle": round(math.degrees(math.atan2(ln.get("dir", (1, 0))[1],
-                                                          ln.get("dir", (1, 0))[0])), 1),
+                    "angle": ang,
                     "size": round(sp["size"], 1),
                     "font": sp.get("font", ""),
                     "colour": sp.get("color", 0),
@@ -2334,6 +2493,154 @@ def extra_checks2(src, gd, docx_path=None):
     # narrower than the source's. A raw total would read the same for one of each.
     c["60_text_column_right_edge"] = (over, under, over == 0 and under == 0)
 
+    # ---- 61 blank_not_filled ------------------------------------------------
+    #
+    # A region the SOURCE SHOWS AS BLANK must not be filled in the RENDER.
+    #
+    # THIS IS NOT 14's QUESTION, and that is why 14 passes 414_transparency_softmask.
+    # 14 compares INK AREA - the render may not hold less than 80 % of the source's - and
+    # places the source's own fills. Both halves walk the SOURCE and ask what became of it.
+    # Ink the render INVENTED is invisible to both: 40,000 pt2 of solid #1A4D99 added to a
+    # page that shows white RAISES the render's area and leaves every source fill where it
+    # was, so 14 reads 1.0 and PASSES. It is the same shape 13_text_colours had before its
+    # GAIN clause: a check that walks one set cannot see the other.
+    #
+    # MEASURED ON 414. The page is (255,255,255) at five points across the bar and at every
+    # pixel of its 400 x 100 pt; the .docx painted a solid 400 x 100 pt block of #1A4D99 and
+    # the render read (26,77,153) at the same five points. The bar is a fill under a
+    # luminosity /SMask whose group paints at the page origin, so it covers none of the bar
+    # and the page paints nothing there. Every check in this file passed that document.
+    #
+    # WHY THE SOURCE SIDE IS A RASTER AND NOT A LIST OF DRAWINGS. pymupdf's get_drawings()
+    # cannot answer this question. It reports the masked bar with fill_opacity 1.0 - the
+    # mask's effect is not in any drawing attribute - and it walks INTO the mask's form
+    # XObject and reports the mask's own two rectangles as page ink. A check built on that
+    # list either sees the bar as ink (and never fires) or has to re-implement the mask. So
+    # the question is asked of the pixels, which is how the evidence for this class was
+    # gathered in the first place: what does the page show.
+    #
+    # WHY THE RENDER SIDE IS STILL A DRAWING LIST. The render's fills are what the .docx
+    # asked for, and their rects are exact. A raster on both sides would blur the rect of
+    # the fill it is charging.
+    #
+    # WHAT COUNTS AS BLANK. The page's own PAPER colour - the most common pixel - sampled on
+    # a 5 x 5 grid inset 1 pt inside the render fill, each point a 3 x 3 median so an
+    # antialiased edge cannot decide it. Paper, not white: a document with a tinted page
+    # background is judged against its own background.
+    #
+    # WHY A FILL THE COLOUR OF THE PAPER IS NOT CHARGED. LibreOffice writes a white fill
+    # under a table cell and under a text frame. A fill the colour of the paper shows
+    # nothing, and the question here is what a READER sees - the same reason 25_invisible_text
+    # exists. The tolerance is the same 8/255 the blank test uses, so a fill that is paper to
+    # the eye is paper to both halves.
+    #
+    # WHY 400 pt2. It is 14's own placement floor, kept rather than re-derived: below it a
+    # fill is a rule or a speck, and whether a mark that size moved is 32_stroke_lines' and
+    # 59_shape_anchor's question. A 20 x 20 pt block is 400 pt2; the 414 bar is 40,000.
+    #
+    # NO SAME-COLOUR EXCUSE, and that is deliberate. The obvious tolerance - "a source fill
+    # of this colour overlaps the box, so this is that cell moved" - would EXCUSE 414, whose
+    # invented block is the same #1A4D99 as the source's own masked bar. A renderer's
+    # slightly oversized cell still puts most of the grid over the source's ink, so the 95 %
+    # bar is what carries the shifted-cell case, not a colour match.
+    BLANK_FILL_PT2 = 400.0
+    BLANK_CLEAR = 0.95
+    BLANK_GRID = 5
+    BLANK_INSET = 1.0
+    BLANK_DPI = 100
+    BLANK_TOL = 8
+
+    def _rgb_of(col):
+        if col is None:
+            return None
+        try:
+            return tuple(int(round(c * 255)) for c in col[:3])
+        except Exception:
+            return None
+
+    def _near(a, b):
+        return a is not None and b is not None and \
+            max(abs(x - y) for x, y in zip(a[:3], b[:3])) <= BLANK_TOL
+
+    def _median3(pix, x, y):
+        """The colour at a point, as the median of its 3 x 3 neighbourhood."""
+        vals = [[], [], []]
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                px = min(max(x + dx, 0), pix.width - 1)
+                py = min(max(y + dy, 0), pix.height - 1)
+                c = pix.pixel(px, py)
+                for k in range(3):
+                    vals[k].append(c[k])
+        return tuple(sorted(v)[len(v) // 2] for v in vals)
+
+    def _paper(pix):
+        """The page's own background: the most common colour of a coarse sample."""
+        counts = {}
+        for y in range(0, pix.height, 7):
+            for x in range(0, pix.width, 7):
+                c = pix.pixel(x, y)
+                counts[c] = counts.get(c, 0) + 1
+        if not counts:
+            return (255, 255, 255)
+        return max(counts.items(), key=lambda kv: kv[1])[0]
+
+    invented = 0
+    invented_where = []
+    page_pix = {}
+    for i in range(min(src.page_count, gd.page_count)):
+        try:
+            g_drawings = gd[i].get_drawings()
+        except Exception:
+            continue
+        candidates = []
+        for d in g_drawings:
+            r = d.get("rect")
+            if r is None or r.is_empty:
+                continue
+            if d.get("fill") is None or (d.get("fill_alpha") or 1.0) <= 0.02:
+                continue
+            box = fitz.Rect(r)
+            if box.width * box.height < BLANK_FILL_PT2:
+                continue
+            candidates.append((box, _rgb_of(d.get("fill"))))
+        if not candidates:
+            continue
+        if i not in page_pix:
+            page_pix[i] = src[i].get_pixmap(dpi=BLANK_DPI)
+        pix = page_pix[i]
+        paper = _paper(pix)
+        scale = BLANK_DPI / 72.0
+        for box, rgb in candidates:
+            if _near(rgb, paper):
+                continue                      # a fill the colour of the paper shows nothing
+            inner = fitz.Rect(box.x0 + BLANK_INSET, box.y0 + BLANK_INSET,
+                              box.x1 - BLANK_INSET, box.y1 - BLANK_INSET)
+            if inner.is_empty:
+                inner = box
+            blank = total = 0
+            for gx in range(BLANK_GRID):
+                for gy in range(BLANK_GRID):
+                    px = int((inner.x0 + inner.width * (gx + 0.5) / BLANK_GRID) * scale)
+                    py = int((inner.y0 + inner.height * (gy + 0.5) / BLANK_GRID) * scale)
+                    total += 1
+                    if _near(_median3(pix, px, py), paper):
+                        blank += 1
+            if total == 0 or blank / float(total) < BLANK_CLEAR:
+                continue
+            invented += 1
+            if len(invented_where) < 3:
+                invented_where.append("%.0fx%.0f pt at %.0f,%.0f" % (
+                    box.width, box.height, box.x0, box.y0))
+        if invented and len(invented_where) >= 3:
+            break
+    if invented:
+        print("61_blank_not_filled: %d fill(s) over paper the page leaves blank: %s"
+              % (invented, "; ".join(invented_where)))
+    # source is 0 by construction: this check exists for the places the page shows nothing,
+    # and the page shows nothing in exactly the places it shows nothing.
+    c["61_blank_not_filled"] = (0, invented, invented == 0)
+
     return c
 
 
@@ -3008,12 +3315,29 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     JE_RATE = 0.02
 
     def _je_lines(pg):
+        # LEFT and RIGHT are reading-space edges, not device edges. On a 180-degree page the
+        # device left edge is the reading RIGHT edge, so a mirrored page read as a pure L-to-R
+        # flip of every line and 42 charged the rotation as a justification change.
         out = []
+        pw, ph = pg.rect.width, pg.rect.height
         for b in pg.get_text("dict")["blocks"]:
             if b.get("type") != 0:
                 continue
             for ln in b.get("lines", []):
-                lx0, _, lx1, _ = ln["bbox"]
+                _a = math.degrees(math.atan2(ln.get("dir", (1, 0))[1],
+                                             ln.get("dir", (1, 0))[0]))
+                _fr = reading_frame(_a, pw, ph)
+                # + cx puts the level case back on the device axis (rx + cx = x) and turns
+                # the 180 case into the mirror W - x. The centre must NOT stay subtracted:
+                # this check buckets a line by round(midpoint) and takes the MODE, and a
+                # constant shift moves every midpoint across a rounding boundary, so the
+                # mode - and therefore the bucket of 7 lines - changed on a document that had
+                # not moved (newsletter-3col-header-footer read 0 -> 6 contradicted pairs).
+                _cx = _fr[0]
+                _p0 = rproj(ln["bbox"][0], ln["bbox"][1], _fr)
+                _p1 = rproj(ln["bbox"][2], ln["bbox"][3], _fr)
+                lx0 = min(_p0[0], _p1[0]) + _cx
+                lx1 = max(_p0[0], _p1[0]) + _cx
                 if lx1 - lx0 < 10:
                     continue
                 t = " ".join(" ".join(sp["text"] for sp in ln["spans"]).split())
@@ -3074,9 +3398,9 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # clause a per-span window structurally cannot see, and it is the one thing 21 answered
     # that 43 did not - so 43 carries it now and 21 has no question of its own left.
     near_x = sum(1 for s_sp, g_sp in pairs
-                 if abs(g_sp.get("xink", g_sp["x"]) - s_sp.get("xink", s_sp["x"])) <= 10)
+                 if abs(g_sp.get("rxink", g_sp["rx"]) - s_sp.get("rxink", s_sp["rx"])) <= 10)
     tot_p = max(1, len(pairs))
-    ddx = [g_sp["x"] - s_sp["x"] for s_sp, g_sp in pairs]
+    ddx = [g_sp["rx"] - s_sp["rx"] for s_sp, g_sp in pairs]
     med_dx_p = round(statistics.median(ddx), 1) if ddx else 0.0
     c["43_within_10pt_x"] = (100, round(100 * near_x / tot_p),
                              ((not pairs) or near_x >= tot_p * 0.9)
@@ -3905,11 +4229,16 @@ def compare(src_path, gd_path, docx_path=None):
     # Each run carries its page. The matcher below needs it: without a page, a source run on
     # page 1 can be paired with a render run on page 7 that holds the same word, and the
     # resulting dy is a page offset reported as a placement error.
+    # A page that shows its text under a negative-determinant CTM is a MIRROR, and a mirror
+    # is not undone by a rotation (reading_frame). Told to runs() per page, once, so every
+    # run on that page keeps the zero-rotation frame and reads exactly as it did before.
+    s_mir = {i for i, p in enumerate(src) if page_mirrors_text(src, p)}
+    g_mir = {i for i, p in enumerate(gd) if page_mirrors_text(gd, p)}
     s_runs, g_runs = [], []
     for i, p in enumerate(src):
-        s_runs += runs(p, i)
+        s_runs += runs(p, i, mirrored=(i in s_mir), page_angle=page_reading_frame(p))
     for i, p in enumerate(gd):
-        g_runs += runs(p, i)
+        g_runs += runs(p, i, mirrored=(i in g_mir), page_angle=page_reading_frame(p))
 
     # Per-character boxes for the render, so a run that sits inside a longer one can be
     # placed by its own glyphs instead of by a linear guess. Keyed the way runs() rounds
@@ -4391,11 +4720,116 @@ def compare(src_path, gd_path, docx_path=None):
                 out.append(r)
         return out
 
+    def _overlap(a, b):
+        w = min(a.x1, b.x1) - max(a.x0, b.x0)
+        h = min(a.y1, b.y1) - max(a.y0, b.y0)
+        return w * h if w > 0 and h > 0 else 0.0
+
+    def _replay(stream, height):
+        """A soft mask's own paints, as (rect, luminance) in pymupdf's top-down page space.
+
+        The stream is replayed as far as coverage needs it: the CTM, `re` and the fill
+        colours. Anything else - a curve, a shading, a form - is left out, which can only
+        make a rect smaller than it is, and a rect that is too small hides too little.
+        """
+        out = []
+        ctm = (1, 0, 0, 1, 0, 0)
+        stack = []
+        value = 1.0
+        path = None
+        toks = re.findall(r"\((?:[^()\\]|\\.)*\)|\[|<|>\]|[^\s\[\]<>()]+", stream)
+        nums = []
+        for t in toks:
+            try:
+                nums.append(float(t))
+                continue
+            except ValueError:
+                pass
+            a, nums = nums, []
+            if t == "q":
+                stack.append((ctm, value))
+            elif t == "Q" and stack:
+                ctm, value = stack.pop()
+            elif t == "cm" and len(a) >= 6:
+                m = (a[0], a[1], a[2], a[3], a[4], a[5])
+                ctm = (ctm[0] * m[0] + ctm[2] * m[1],
+                       ctm[1] * m[0] + ctm[3] * m[1],
+                       ctm[0] * m[2] + ctm[2] * m[3],
+                       ctm[1] * m[2] + ctm[3] * m[3],
+                       ctm[0] * m[4] + ctm[2] * m[5] + ctm[4],
+                       ctm[1] * m[4] + ctm[3] * m[5] + ctm[5])
+            elif t == "re" and len(a) >= 4:
+                r = (a[0], a[1], a[0] + a[2], a[1] + a[3])
+                if path is None:
+                    path = r
+                else:
+                    path = (min(path[0], r[0]), min(path[1], r[1]),
+                            max(path[2], r[2]), max(path[3], r[3]))
+            elif t == "rg" and len(a) >= 3:
+                value = max(0.0, min(1.0, 0.3 * a[0] + 0.59 * a[1] + 0.11 * a[2]))
+            elif t == "g" and len(a) >= 1:
+                value = max(0.0, min(1.0, a[0]))
+            elif t in ("f", "F", "f*", "b", "b*", "B", "B*"):
+                if path is None:
+                    continue
+                xs = [path[0], path[2], path[0], path[2]]
+                ys = [path[1], path[1], path[3], path[3]]
+                px = [ctm[0] * x + ctm[2] * y + ctm[4] for x, y in zip(xs, ys)]
+                py = [ctm[1] * x + ctm[3] * y + ctm[5] for x, y in zip(xs, ys)]
+                # PDF y counts up from the bottom; pymupdf's rects count down from the top.
+                out.append((fitz.Rect(min(px), height - max(py), max(px), height - min(py)),
+                            value))
+                path = None
+            elif t in ("n", "S", "s", "W", "W*"):
+                path = None
+        return out
+
+    def mask_paints(page):
+        """The paints of every /SMask group a page's ExtGStates name, or None if it has none.
+
+        A fill under a soft mask is only ink where the mask lets something through. pymupdf
+        cannot say so: it reports 414's masked bar with fill_opacity 1.0, and it reports the
+        mask's own rectangles as page ink. So the mask is read here, the same way the engine
+        reads it, and 14 judges the fills the page actually PAINTS.
+        """
+        doc = page.parent
+        try:
+            if doc.xref_get_key(page.xref, "Resources/ExtGState")[0] == "null":
+                return None
+        except Exception:
+            return None
+        found = None
+        for x in range(1, doc.xref_length()):
+            try:
+                o = doc.xref_object(x, compressed=True)
+            except Exception:
+                continue
+            if "/SMask" not in o or "/ExtGState" not in o:
+                continue
+            m = re.search(r"/SMask\s*<<[^>]*?/G\s+(\d+)\s+0\s+R", o)
+            if not m:
+                continue
+            try:
+                stream = doc.xref_stream(int(m.group(1))).decode("latin-1", "replace")
+            except Exception:
+                continue
+            if found is None:
+                found = []
+            found.extend(_replay(stream, page.rect.height))
+        return found
+
     def fill_boxes(page):
         """Every drawing that PAINTS a fill, with its rect. Any size - the floor does the
-        cutting, and it does it in the placement clause only."""
+        cutting, and it does it in the placement clause only.
+
+        A fill a soft mask lets nothing through is not ink the page shows, so it is not
+        counted on the source side either. Measured on 414_transparency_softmask: without
+        this, 14 read the masked bar as 40,000 pt2 of source ink and FAILED the corrected
+        engine for not drawing a block the page never showed.
+        """
         out = []
         skip = softmask_ink(page)
+        paints = mask_paints(page)
         for d in page.get_drawings():
             if d.get("fill") is None:
                 continue
@@ -4405,6 +4839,9 @@ def compare(src_path, gd_path, docx_path=None):
             if r.width <= 0 or r.height <= 0:
                 continue
             if any(r == q for q in skip):
+                continue
+            if paints is not None and not any(
+                    v > 0.02 and _overlap(r, mr) > 0 for mr, v in paints):
                 continue
             out.append(r)
         return out
@@ -4519,8 +4956,8 @@ def compare(src_path, gd_path, docx_path=None):
         want = norm_word(r["text"])
         near = [j for j, c in enumerate(g_runs)
                 if j not in used and c["page"] == r["page"]
-                and abs(c["y"] - r["y"]) <= 1.0 and c["x"] >= r["x"] - 1.0]
-        near.sort(key=lambda j: g_runs[j]["x"])
+                and abs(c["ry"] - r["ry"]) <= 1.0 and c["rx"] >= r["rx"] - 1.0]
+        near.sort(key=lambda j: g_runs[j]["rx"])
         for k0 in range(min(3, len(near))):
             span = [near[k0]]
             joined = norm_word(g_runs[near[k0]]["text"])
@@ -4548,7 +4985,7 @@ def compare(src_path, gd_path, docx_path=None):
     cand = []
     for i, r in enumerate(s_runs):
         for j in by_page.get(r["page"], {}).get(norm_word(r["text"]), []):
-            cand.append((abs(g_runs[j]["y"] - r["y"]) + abs(g_runs[j]["x"] - r["x"]), i, j))
+            cand.append((abs(g_runs[j]["ry"] - r["ry"]) + abs(g_runs[j]["rx"] - r["rx"]), i, j))
     cand.sort()
     taken = {}
     for d, i, j in cand:
@@ -4610,15 +5047,20 @@ def compare(src_path, gd_path, docx_path=None):
             # above it - measured on journal-2col-with-footnotes, three such pairs, and
             # 18_displacement read a 619.5 pt displacement on a page where nothing moved.
             # Same test _split_span() already uses for the same reason.
-            if c["x"] > r["x"] + 1.0 or c["x1"] < r["x1"] - 1.0:
+            if c["rx"] > r["rx"] + 1.0 or c["rx1"] < r["rx1"] - 1.0:
                 continue
-            if min(c["y1"], r["y1"]) - max(c["y"], r["y"]) < 0.5:
+            # SAME LINE, by box overlap in READING space. ry/ry1 are the reading-space top
+            # and bottom, so for an upright pair this is the same test as before (it was
+            # device y/y1) and for a 180-degree pair it is the box the reader sees. Keeping
+            # the overlap form matters: a baseline-proximity test broke the curved seals,
+            # whose glyphs sit at their own angles.
+            if min(c["ry1"], r["ry1"]) - max(c["ry"], r["ry"]) < 0.5:
                 continue
-            span = c["x1"] - c["x"]
+            span = c["rx1"] - c["rx"]
             if span <= 0:
                 continue
             # where the source run starts, as a character offset in the render run
-            guess = int(round((r["x"] - c["x"]) / span * len(ct)))
+            guess = int(round((r["rx"] - c["rx"]) / span * len(ct)))
             guess = max(0, min(guess, len(ct) - len(want)))
             off = ct.find(want, guess)
             if off < 0:
@@ -4646,10 +5088,18 @@ def compare(src_path, gd_path, docx_path=None):
                 if acc == ct and hi <= len(idx):
                     px = raw[idx[lo]]["bbox"][0]
                     px1 = raw[idx[hi - 1]]["bbox"][2]
+            # px/px1 are DEVICE x - that is the frame g_chars is keyed in and the one the
+            # paper checks read. The piece is also given its READING-space x, projected
+            # through the render run's own dir, because 43 and 18 judge it there.
             if px is None:
-                px = c["x"] + span * lo / len(ct)
-                px1 = c["x"] + span * hi / len(ct)
-            return j, lo, hi, px, px1
+                rpx = c["rx"] + span * lo / len(ct)
+                rpx1 = c["rx"] + span * hi / len(ct)
+                px, px1 = rpx + c["fr"][0], rpx1 + c["fr"][0]
+            else:
+                pa = rproj(px, c["oy"], c["fr"])[0]
+                pb = rproj(px1, c["oy"], c["fr"])[0]
+                rpx, rpx1 = min(pa, pb), max(pa, pb)
+            return j, lo, hi, px, px1, rpx, rpx1
         return None
 
     for i, r in enumerate(s_runs):
@@ -4658,7 +5108,7 @@ def compare(src_path, gd_path, docx_path=None):
         hit = _inside(r)
         if hit is None:
             continue
-        j, lo, hi, px, px1 = hit
+        j, lo, hi, px, px1, rpx, rpx1 = hit
         claimed[j].append((lo, hi))
         taken[i] = j
         # the pair is the PIECE, not the whole run: 21_median_dx reads x, and the run's own
@@ -4668,6 +5118,10 @@ def compare(src_path, gd_path, docx_path=None):
         piece["x1"] = round(px1, 2)
         piece["xink"] = round(px, 2)
         piece["x1ink"] = round(px1, 2)
+        piece["rx"] = round(rpx, 2)
+        piece["rx1"] = round(rpx1, 2)
+        piece["rxink"] = round(rpx, 2)
+        piece["rx1ink"] = round(rpx1, 2)
         piece_of[i] = piece
 
     for i, r in enumerate(s_runs):
@@ -4675,8 +5129,8 @@ def compare(src_path, gd_path, docx_path=None):
             continue
         j = taken[i]
         g = piece_of.get(i, g_runs[j])
-        dys.append(g["y"] - r["y"])
-        dxs.append(g["x"] - r["x"])
+        dys.append(g["ry"] - r["ry"])
+        dxs.append(g["rx"] - r["rx"])
         matched += 1
         pairs.append((r, g))
 
@@ -4748,17 +5202,14 @@ def compare(src_path, gd_path, docx_path=None):
     #
     # 19's rounding went with it: it compared round(max|dy|, 1) against 15.0, so 14.96 pt failed
     # and 14.90 pt passed - a threshold at 14.95 that no comment in the file ever claimed.
-    flat = set()
-    for i, p in enumerate(src):
-        for blk in p.get_text("dict")["blocks"]:
-            if blk.get("type") != 0:
-                continue
-            for ln in blk.get("lines", []):
-                if abs(ln.get("dir", (1, 0))[1]) > 0.02:
-                    continue
-                for sp in ln.get("spans", []):
-                    if sp.get("text", "").strip():
-                        flat.add((i, round(sp["bbox"][1], 2), sp["text"]))
+    # The population is the UPRIGHT source runs, keyed in READING space. A 180-degree line
+    # has a horizontal baseline (dir_y == 0) and belongs here - it is text a reader reads
+    # left to right once the page is turned, and its dy is a displacement, not a page
+    # height, once it is projected (reading_frame). Only SLANTED text (|dir_y| > 0.02) is
+    # excluded, which is what this test always meant: on slanted and curved runs dy is not
+    # a displacement. Built from s_runs so the key is the same ry the ds lookup uses.
+    flat = {(r["page"], r["ry"], r["text"]) for r in s_runs
+            if abs(math.sin(math.radians(r["angle"]))) <= 0.02}
 
     def _tol(size):
         return min(max(0.35 * size, 1.5), 4.5)
@@ -4770,9 +5221,9 @@ def compare(src_path, gd_path, docx_path=None):
     bad_pages = []
     for pg in sorted(set(r["page"] for r in s_runs)):
         flat_src = [r for r in s_runs
-                    if r["page"] == pg and (r["page"], r["y"], r["text"]) in flat]
-        ds = [(g["y"] - r["y"], r["size"]) for r, g in pairs
-              if r["page"] == pg and (r["page"], r["y"], r["text"]) in flat]
+                    if r["page"] == pg and (r["page"], r["ry"], r["text"]) in flat]
+        ds = [(g["ry"] - r["ry"], r["size"]) for r, g in pairs
+              if r["page"] == pg and (r["page"], r["ry"], r["text"]) in flat]
         # No upright run on the page is not the same as no text on the page. A page whose
         # every line is rotated or curved lands here with ds empty, and it used to be scored
         # as a displaced page: constructed, a fully rotated page against ITSELF failed this

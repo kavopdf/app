@@ -19,6 +19,7 @@ import com.tom_roush.pdfbox.pdmodel.graphics.color.PDColor;
 import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImage;
 import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import com.tom_roush.pdfbox.pdmodel.graphics.shading.PDShading;
+import com.tom_roush.pdfbox.pdmodel.graphics.state.PDSoftMask;
 import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotationWidget;
 import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAppearanceDictionary;
@@ -3551,8 +3552,32 @@ public final class PdfToWord {
                 // first and the question (x=50) second, the gap read -520, the positive test
                 // saw nothing, and the two became one line reading "[08] Write SQL queries".
                 boolean wideGap = prev != null && gapPts > outlier;
+                // THE SAME ROW, BY THE TEST THAT PUT THESE TWO ON ONE LINE.
+                //
+                // This cut used to ask "are the two within half a point of one another?" - a
+                // question the clustering above never asked. That clustering joins two glyphs
+                // when their baselines are within max(0.9, size * 0.18), so a pair 1 pt apart
+                // is ON ONE LINE by construction, and the cut then refused to separate it
+                // because 1 > 0.5. The two numbers are the same question answered twice with
+                // different tolerances, and the stricter one always won.
+                //
+                // Measured on 350_question_paper: the page draws "[08]" at x=551.88 with its
+                // baseline 1 pt BELOW the 105-character question that starts at x=50. The
+                // cluster joined them (1 <= 1.44 at 8 pt), orderRuns put the marks first, the
+                // gap read -517.28, and neither the positive test nor the overlap test fired.
+                // The two fragments became ONE line and therefore ONE Box, whose x/right are
+                // the marks column's while its runs carry the question: a box that does not
+                // describe its own ink. columnAt() then read that x and every consumer of the
+                // box - the column split, the row's tab stops, the cell it is written into -
+                // inherited the marks column's geometry for text the page drew 500 pt away.
+                //
+                // Measured over the 211-document corpus with the cut instrumented: 27 upright
+                // boxes whose extent is not their own ink, 25 of them this document; the class
+                // is 4 documents and 62 glyph pairs, every one of them a pair the cluster had
+                // already declared one row. Nothing else in the corpus reaches this test.
+                float rowTol = Math.max(0.9f, g.size * 0.18f);   // see the clustering above
                 boolean overlap = OS && prev != null && !g.rotated && !prev.rotated
-                        && Math.abs(g.y - prev.y) <= 0.5f
+                        && Math.abs(g.y - prev.y) <= rowTol
                         && gapPts < -Math.max(2f, g.size * OVF);
                 if (prev != null && (wideGap || overlap
                         || (backwardLine ? crossesGutter(gutters, g.x + g.width, prev.x)
@@ -4547,17 +4572,57 @@ public final class PdfToWord {
         }
 
         if (!row) assignSegments(lines);
+        // A ROW IS ONE PLACE IN THE ORDER, NOT TWO.
+        //
+        // The order inside a column is by baseline, and that is the reading order of prose. It
+        // is not the reading order of a ROW: the page draws a question and the marks column
+        // beside it on one visual line, and the two can be a point apart in y - 350's question
+        // at y=127 and its "[08]" at y=128. Sorted by y alone the marks come after the question
+        // and the paragraph grouper, which reads a change of y as a change of line, closes the
+        // paragraph before the label that belongs to it. Measured on 350_question_paper: the
+        // label row "1a." was written AFTER the question it labels, on twelve of its twelve
+        // questions.
+        //
+        // The band is the same tolerance the clustering and the row test already use, so a line
+        // joins a row exactly when the model already calls it one row; inside the band the
+        // order is by x, which is how the row is read. Nothing else moves: two lines of prose
+        // are a leading apart, far outside the band, so a paragraph still sorts by baseline.
+        final java.util.IdentityHashMap<Line, Integer> rowOf = new java.util.IdentityHashMap<>();
+        {
+            java.util.List<Line> byY = new java.util.ArrayList<>(lines);
+            java.util.Collections.sort(byY, new Comparator<Line>() {
+                @Override
+                public int compare(Line a, Line b) { return Float.compare(a.y, b.y); }
+            });
+            int key = 0;
+            float bandY = 0f;
+            boolean first = true;
+            for (Line ln : byY) {
+                float tol = Math.max(1.2f, ln.size * 0.25f);
+                if (first || Math.abs(ln.y - bandY) > tol) {
+                    if (!first) key++;
+                    bandY = ln.y;
+                    first = false;
+                }
+                rowOf.put(ln, key);
+            }
+        }
         Collections.sort(lines, new Comparator<Line>() {
             @Override
             public int compare(Line a, Line b) {
                 if (row) {
-                    int c0 = Float.compare(a.y, b.y);
-                    return c0 != 0 ? c0 : Float.compare(a.x, b.x);
+                    // Same rule as the column order below: a row is one place in the order, and
+                    // inside it the fields read left to right. Sorting by y alone split the row
+                    // whose fields are a point apart - 350's question and its marks column.
+                    int r0 = Integer.compare(rowOf.get(a), rowOf.get(b));
+                    return r0 != 0 ? r0 : Float.compare(a.x, b.x);
                 }
                 int seg = Integer.compare(a.segment, b.segment);
                 if (seg != 0) return seg;
                 int c = Integer.compare(a.column, b.column);
-                return c != 0 ? c : Float.compare(a.y, b.y);
+                if (c != 0) return c;
+                int r = Integer.compare(rowOf.get(a), rowOf.get(b));
+                return r != 0 ? r : Float.compare(a.x, b.x);
             }
         });
 
@@ -5495,6 +5560,84 @@ public final class PdfToWord {
         }
 
         /**
+         * True when the masked region is carried as a bitmap with an alpha channel instead of
+         * being dropped. Off by default; {@code -Dp2w.softmask=raster} turns it on.
+         *
+         * <p>This is the second of the two candidates measured for 414_transparency_softmask,
+         * and it is here so the measurement is of the engine and not of a hand-made .docx.
+         */
+        private static final boolean MASK_RASTER =
+                "raster".equals(System.getProperty("p2w.softmask"));
+
+        /**
+         * Writes a masked fill as a PNG whose alpha is the mask, pinned where the fill was.
+         *
+         * <p>The faithful half of the choice: a partially transparent region keeps its tint, and
+         * nothing is decided by an approximation. What it costs is a raster where the page had a
+         * vector fill, and it cannot carry text - so a mask over a run of words would turn those
+         * words into a picture, which is the one thing the corpus's own rule forbids.
+         *
+         * @return true when the picture was written and the fill should not also be drawn
+         */
+        private boolean rasterFill(PDSoftMask sm, float[] r, int fill, float alpha) {
+            try {
+                float wpt = r[2] - r[0], hpt = r[3] - r[1];
+                if (wpt < 1f || hpt < 1f) return false;
+                int w = (int) Math.max(1, Math.min(1600, Math.round(wpt * 2f)));
+                int h = (int) Math.max(1, Math.min(1600, Math.round(hpt * 2f)));
+                float[] a = SoftMaskAlpha.grid(sm, r,
+                        getGraphicsState().getCurrentTransformationMatrix(), w, h);
+                if (a == null) return false;
+                int[] px = new int[w * h];
+                for (int i = 0; i < px.length; i++) {
+                    float v = a[i] < 0f ? 0f : (a[i] > 1f ? 1f : a[i]);
+                    int al = Math.round(v * alpha * 255f);
+                    px[i] = (al << 24) | (fill & 0xFFFFFF);
+                }
+                android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(px, w, h,
+                        android.graphics.Bitmap.Config.ARGB_8888);
+                byte[] png = encodePng(bmp, r);
+                if (png == null) return false;
+                DocxWriter.Picture pic = new DocxWriter.Picture(png, 0f, 0f, wpt, hpt);
+                pic.topPt = -r[3];
+                pic.xPt = r[0];
+                rules.pictures.add(pic);
+                return true;
+            } catch (Throwable t) {
+                return false;
+            }
+        }
+
+        /**
+         * The alpha a soft mask leaves a region, 1 where the page draws it unmasked, 0 where the
+         * mask lets nothing through.
+         *
+         * <p>An {@code /SMask} in force multiplies the alpha of everything painted under it, and
+         * where the mask is zero the page paints nothing. The engine ignored the mask entirely,
+         * so 414_transparency_softmask - mask group at the page origin, bar at y 640..740, no
+         * overlap - came out as a solid 400 x 100 pt block of #1A4D99 over a blank region. The
+         * page is (255,255,255) at five points across that bar; the render was (26,77,153).
+         *
+         * <p>Only a mask {@link SoftMaskAlpha} can read is acted on. Anything else returns 1, so
+         * a document whose mask this cannot evaluate keeps exactly the shapes it drew before.
+         */
+        private float maskAlpha(float[] r) {
+            try {
+                PDSoftMask sm = getGraphicsState().getSoftMask();
+                if (sm == null) return 1f;
+                SoftMaskAlpha.Coverage c = SoftMaskAlpha.of(sm, r,
+                        getGraphicsState().getCurrentTransformationMatrix());
+                if (!c.known) return 1f;
+                // Fully masked out is not "almost invisible": nothing is painted, and a shape
+                // there is ink the page does not have. A partial mask keeps the fill at the mean
+                // alpha, which is the same approximation a flat colour always was.
+                return c.max <= 0.02f ? 0f : c.mean;
+            } catch (Throwable t) {
+                return 1f;
+            }
+        }
+
+        /**
          * A filled path becomes its bounding rectangle.
          *
          * <p>Every filled path in the 80-file batch is drawn with {@code re}, so the box is
@@ -5514,6 +5657,18 @@ public final class PdfToWord {
             }
             float[] box = pathBox();
             float[] cl = clipped(box);
+            float maskA = maskAlpha(cl);
+            // Candidate A first: a bitmap with the mask as its alpha channel, which is the
+            // faithful answer and the expensive one. It is written even when the mask is zero
+            // everywhere, because that is the point of measuring it - a fully transparent
+            // bitmap is what "faithful" costs on this document.
+            if (MASK_RASTER && maskA < 0.999f) {
+                PDSoftMask sm = getGraphicsState().getSoftMask();
+                if (sm != null && rasterFill(sm, cl, fill, alpha)) return;
+            }
+            // Candidate B: nothing where the mask lets nothing through.
+            if (maskA <= 0f) return;
+            alpha *= maskA;
             boolean plainRect = pathIsAxisRect();
             // A triangle, an arrowhead, a diamond, a glyph outline: the box is not the shape.
             // Draw the path the page drew. A clipped path keeps the old box behaviour, because
@@ -5637,6 +5792,11 @@ public final class PdfToWord {
             int line = rgbOf(getGraphicsState().getStrokingColor());
             if (line < 0) return;
             float w = Math.max(0.1f, getGraphicsState().getLineWidth());
+            // A stroke under a soft mask is not the colour the stream names either: where the
+            // mask is zero the page draws no line. Same rule as a fill - see maskAlpha.
+            float maskA = maskAlpha(clipped(new float[]{pxMin - w / 2f, pyMin - w / 2f,
+                    pxMax + w / 2f, pyMax + w / 2f}));
+            if (maskA <= 0f) return;
             boolean rectangle = pathIsAxisRect();
             // A stroke-only circle used to be dropped: it is neither a rectangle nor a single
             // line, and its box would have put a square where a ring belongs. It is an ellipse,
@@ -5652,25 +5812,25 @@ public final class PdfToWord {
                 // freeform and the ring survives. Nothing that drew before changes: this branch
                 // is only reached where the ellipse was being dropped.
                 if (ellipse && ctmRotated()) {
-                    DocxWriter.Shape ring = freeform(grownRing, -1, 1f, line, w);
+                    DocxWriter.Shape ring = freeform(grownRing, -1, maskA, line, w);
                     if (ring != null) {
                         addShape(ring);
                         return;
                     }
                 }
-                addShape(grownRing, -1, 1f, line, w, ellipse ? 1 : 0);
+                addShape(grownRing, -1, maskA, line, w, ellipse ? 1 : 0);
                 return;
             }
             if (pCurves == 0 && pLines == 1 && pRects == 0) {
                 if (Math.abs(segY1 - segY0) <= 0.8f) {
                     float x0 = Math.min(segX0, segX1), x1 = Math.max(segX0, segX1);
                     addShape(clipped(new float[]{x0, segY0 - w / 2f, x1, segY0 + w / 2f}),
-                            line, 1f, -1, 0f);
+                            line, maskA, -1, 0f);
                     return;
                 } else if (Math.abs(segX1 - segX0) <= 0.8f) {
                     float y0 = Math.min(segY0, segY1), y1 = Math.max(segY0, segY1);
                     addShape(clipped(new float[]{segX0 - w / 2f, y0, segX0 + w / 2f, y1}),
-                            line, 1f, -1, 0f);
+                            line, maskA, -1, 0f);
                     return;
                 }
             }
@@ -5682,7 +5842,7 @@ public final class PdfToWord {
                     pxMax + w / 2f, pyMax + w / 2f};
             float[] cl = clipped(grown);
             if (same(cl, grown)) {
-                DocxWriter.Shape ff = freeform(grown, -1, 1f, line, w);
+                DocxWriter.Shape ff = freeform(grown, -1, maskA, line, w);
                 if (ff != null) {
                     addShape(ff);
                     return;
@@ -5691,7 +5851,7 @@ public final class PdfToWord {
             // A path the clip cuts, or one too long to carry, keeps the behaviour it had: four
             // straight sides still read as a box, and a rotated stamp box that runs off the page
             // edge is still drawn as the box it was before.
-            if (pCurves == 0 && (pRects > 0 || pLines == 4)) addShape(cl, -1, 1f, line, w, 0);
+            if (pCurves == 0 && (pRects > 0 || pLines == 4)) addShape(cl, -1, maskA, line, w, 0);
         }
 
         @Override
