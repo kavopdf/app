@@ -233,7 +233,12 @@ def cases():
         for i in range(6):
             p.insert_text((72, 100 + 24 * i), "vertical marker %02d" % i, fontsize=11,
                           fontname="helv", rotate=90)
-    out.append(("every line rotated, identical", all_rotated, all_rotated, [], "all"))
+    # 14 Nov: 35 now reads the .docx, and these synthetic pairs carry none, so 35 reports
+    # "cannot measure" and fails - which is the point of that branch, not a false positive on
+    # 18. The assertion this case exists for is kept explicitly: 18 must NOT fire, named in
+    # the allow list so the harness enforces it rather than inferring it from an empty set.
+    out.append(("every line rotated, identical", all_rotated, all_rotated,
+                ["35_rotation"], ["18_displacement"]))
 
     # ---- 21/43 horizontal shift -------------------------------------------
     def shifted_x(p):

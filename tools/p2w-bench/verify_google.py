@@ -41,7 +41,7 @@ THRESHOLDS (a document passes only if every one holds)
                 run may be more than twice its own tolerance out. Order > 95 %
   visual        no invisible text, no text-on-text, no page overflow, no extra page
 """
-import os, sys, json, re, collections, statistics, difflib, math, zipfile, unicodedata
+import os, sys, json, re, bisect, collections, statistics, difflib, math, zipfile, unicodedata
 import xml.etree.ElementTree as ET
 
 try:
@@ -54,21 +54,52 @@ except ImportError:
 # ----------------------------------------------------------------------------
 # helpers
 # ----------------------------------------------------------------------------
+_CTRL = set(chr(_i) for _i in range(0, 32))
+
+
+def ink_box(sp, ln):
+    """(x0, x1) of the glyphs in this span that put ink on the page.
+
+    A span's bbox starts at its first glyph's ORIGIN - the pen - and a space advances the
+    pen without drawing anything. A source that writes "    (a) Salary" reports a left
+    edge 8 pt left of the first thing a reader can see, and a renderer that drops the
+    leading spaces (all of them do) is charged for the difference. The reader sees ink,
+    so the measurement is taken at the ink: min/max over the glyph boxes that are not
+    whitespace and not the C0 controls producers use as padding. min/max, not
+    first/last, because on a 180-degree run the character order runs right to left.
+
+    Falls back to the span's own box when the producer recorded no glyph boxes.
+    """
+    chars = sp.get("chars")
+    if chars is None:
+        chars = [c for s in ln.get("spans", []) for c in s.get("chars", [])]
+    ink = [c for c in chars
+           if c.get("c", "") not in _CTRL and not c.get("c", "").isspace()
+           and c["bbox"][2] - c["bbox"][0] > 0.01]
+    if not ink:
+        return sp["bbox"][0], sp["bbox"][2]
+    return min(c["bbox"][0] for c in ink), max(c["bbox"][2] for c in ink)
+
+
 def runs(page, page_no=0):
     """Every text span on a page, with the attributes we compare."""
     out = []
-    for blk in page.get_text("dict")["blocks"]:
+    for blk in page.get_text("rawdict")["blocks"]:
         if blk.get("type") != 0:
             continue
         for ln in blk.get("lines", []):
             for sp in ln.get("spans", []):
-                t = sp.get("text", "")
+                t = (sp.get("text", "")
+                     or "".join(c.get("c", "") for c in sp.get("chars", [])))
                 if not t.strip():
                     continue
+                ix0, ix1 = ink_box(sp, ln)
                 out.append({
                     "page": page_no,
                     "text": t,
                     "x": round(sp["bbox"][0], 2),
+                    "xink": round(ix0, 2),
+                    "x1ink": round(ix1, 2),
                     "y": round(sp["bbox"][1], 2),
                     "x1": round(sp["bbox"][2], 2),
                     "y1": round(sp["bbox"][3], 2),
@@ -275,6 +306,19 @@ def _is_cmyk_black(v):
                for x, y in zip(_rgb01(v), _rgb01(CMYK_BLACK)))
 
 
+def is_blackish(v):
+    """Is this int a BLACK, in the sense the black-point rule above uses?
+
+    Neutral (chroma <= 12) and dark (L* <= 13). Used by 13's GAIN clause only: an
+    Automatic run resolves to whatever black the reader paints, and that black need not be
+    the source's black int. D-23 keeps `w:color` off the run and leaves it on Automatic for
+    exactly that reason, so a render carrying #000000 where the source drew #1C1C1C is the
+    same text colour written down twice, not an invented colour.
+    """
+    L, a, b = _lab(_rgb01(v))
+    return L <= BLACK_L and math.hypot(a, b) <= BLACK_C
+
+
 def colour_same(a, b):
     """True when two packed span colours are the same COLOUR, not the same int."""
     if a == b:
@@ -453,7 +497,53 @@ def _shapes(page):
     return out
 
 
-def _anchors(page, rs):
+def _size_buckets(shapes):
+    """The size classes a page can express, bucketed at half the identity tolerance.
+
+    Answering "does the other document have a box this size" for every shape on this
+    one is the pairing test in _anchors, and a scan of the whole shape list per shape
+    is quadratic on a page with 300 of them. Bucketing at ANCHOR_RECT_TOL / 2 makes it
+    a nine-bucket lookup: two sizes within 2.0 pt cannot land more than one bucket
+    apart, so the 3x3 neighbourhood around a shape's bucket holds every candidate.
+    """
+    b = collections.defaultdict(list)
+    for sh in shapes:
+        b[(int(round(sh.width / 2.0)), int(round(sh.height / 2.0)))].append(sh)
+    return b
+
+
+def _has_size(sh, buckets, tol=2.0):
+    """Is there a shape in `buckets` of sh's size, within `tol` on both sides?"""
+    w0, h0 = int(round(sh.width / 2.0)), int(round(sh.height / 2.0))
+    for dw in (-1, 0, 1):
+        for dh in (-1, 0, 1):
+            for o in buckets.get((w0 + dw, h0 + dh), ()):
+                if abs(o.width - sh.width) <= tol and abs(o.height - sh.height) <= tol:
+                    return True
+    return False
+
+
+def _smallest_holding(shapes, cx, cy):
+    """The smallest shape in `shapes` containing (cx, cy), ties broken by geometry.
+
+    fitz.Rect is x0/y0/x1/y1, not x/y - the run dicts use x/y, which is what made
+    this crash on its first run. A tie on AREA is broken by geometry, not by draw
+    order: min() with a strict < kept whichever shape get_drawings() happened to
+    yield first, and two producers need not agree on that order - the same defect
+    47_margins had when statistics.mode returned the first of a tie. Constructed
+    (break59.py M3b): two boxes of equal area both holding the text centre, drawn in
+    the opposite order on the render side. Nothing moved and 59 failed the page.
+    """
+    best, best_key = None, None
+    for sh in shapes:
+        if sh.x0 <= cx <= sh.x1 and sh.y0 <= cy <= sh.y1:
+            key = (sh.width * sh.height, sh.width, sh.height, sh.y0, sh.x0)
+            if best_key is None or key < best_key:
+                best, best_key = sh, key
+    return best, best_key
+
+
+def _anchors(page, rs, other_shapes=None):
     """For each run: where its centre sits inside the smallest shape containing it,
     AND which shape that was.
 
@@ -465,26 +555,42 @@ def _anchors(page, rs):
     rect per cell on one side, one assembled face per band on the other), so the
     fraction is then measured against a different object and reads as movement when
     nothing moved. 59 compares the rect before it trusts the fraction.
+
+    AND "SMALLEST" IS NOT THE SAME ANSWER FROM TWO PRODUCERS, which comparing the rect
+    afterwards only half repairs. Which boxes a page has at all is the producer's
+    choice, so the smallest box round a run can be a cell on one side and the row band
+    or the table's whole frame on the other; 59 then measures dx from a different
+    origin on each side and reads movement where none happened. When the other
+    document's shapes are known, the pool is therefore restricted to boxes THAT
+    DOCUMENT CAN ALSO EXPRESS - a box with no counterpart is not an object the two can
+    be compared on. The restriction is a preference, not a filter: where no paired box
+    holds the run, the unrestricted smallest is used and the run is judged exactly as
+    before.
+
+    This is a change of OBJECT, not of tolerance, and it is what makes dx mean what the
+    check says it means. dx = (gx - gb.x0) - (sx - sb.x0) is the text's displacement
+    only when gb and sb are the same box; on different boxes it is the displacement
+    plus the distance between the two origins, which is the defect this check was
+    written to report. Measured on the 56 documents that fail 59 at 23ffa25: of 1165
+    judged runs, 249 were enclosed by a box the other side does not have (46 unjudged,
+    203 scored `moved` only because a box of that size happened to exist elsewhere on
+    the page). Pairing moves 127 of those 249 to `anchored`, moves 55 more to `moved`
+    where they can now be judged in points, and leaves all 530 genuine `moved` runs
+    `moved`.
     """
     shapes = _shapes(page)
+    pool = shapes
+    if other_shapes is not None:
+        buckets = _size_buckets(other_shapes)
+        paired = [sh for sh in shapes if _has_size(sh, buckets)]
+        if paired:
+            pool = paired
     out = []
     for r in rs:
         cx, cy = (r["x"] + r["x1"]) / 2.0, (r["y"] + r["y1"]) / 2.0
-        best, best_key = None, None
-        for sh in shapes:
-            # fitz.Rect is x0/y0/x1/y1, not x/y - the run dicts use x/y, which is
-            # what made this crash on its first run.
-            if sh.x0 <= cx <= sh.x1 and sh.y0 <= cy <= sh.y1:
-                # A tie on AREA is broken by geometry, not by draw order. min() with a
-                # strict < kept whichever shape get_drawings() happened to yield first,
-                # and two producers need not agree on that order - the same defect
-                # 47_margins had when statistics.mode returned the first of a tie.
-                # Constructed (break59.py M3b): two boxes of equal area both holding the
-                # text centre, drawn in the opposite order on the render side. Nothing
-                # moved and 59 failed the page.
-                key = (sh.width * sh.height, sh.width, sh.height, sh.y0, sh.x0)
-                if best_key is None or key < best_key:
-                    best, best_key = sh, key
+        best, best_key = _smallest_holding(pool, cx, cy)
+        if best is None and pool is not shapes:
+            best, best_key = _smallest_holding(shapes, cx, cy)
         if best is None:
             out.append(None)
         else:
@@ -967,6 +1073,69 @@ def docx_image_dpi(path):
         return None
 
 
+# ---------------------------------------------------------------------------
+# The .docx side of rotation: every angle the ENGINE wrote.
+#
+# WHY THIS EXISTS AT ALL. 35_rotation compared the source's rotated runs against the
+# RENDER's, and the render cannot draw them: measured 14 Nov on 211 documents, `soffice
+# --headless` emits ZERO lines with a non-level `dir` - not one, in any of the 211 - while
+# the source corpus carries 372 rotated lines across 30 documents. The check therefore read
+# kept=0 on all 30 and failed all 30, at every tolerance from 0.0 to 360.0 degrees, because
+# the render side of the pairing was empty rather than wrong. That is a measurement of
+# LibreOffice, not of the engine.
+#
+# WHAT THE ENGINE ACTUALLY WRITES. OOXML turns a text box with `<a:xfrm rot="N">` in
+# 60000ths of a degree, clockwise, and the engine emits it from DocxWriter.anchorShape.
+# A rotated line that the page draws inside its own stroked rectangle (a stamp) is bound to
+# that rectangle and goes out with the angle; a rotated line with no rectangle round it (the
+# per-glyph text of a round seal, a rotated label on a drawing, a rotated table header) is
+# placed on its own origin with rotDeg 0f at DocxWriter.java:2508 - the angle is DROPPED, not
+# invented. So the .docx is a faithful record of a decision the engine makes, which is
+# exactly what a check should read.
+#
+# SIGN CONVENTION. `line.dir` is the baseline's unit vector in a frame whose y counts down
+# the page, so atan2(dy, dx) is already clockwise-positive - the same sense as a:xfrm rot.
+# Measured on the 12 anchors the corpus carries, the agreement is exact to 0.0 degrees:
+# -15 -> 345, -90 -> 270, -8 -> 352, -14 -> 346, -12 -> 348, -11 -> 349, 15 -> 15, 180 -> 180,
+# 9 -> 9, 11 -> 11, 13 -> 13. No conversion is applied, because none is needed; applying
+# 360-angle would turn 11 correct anchors into 11 wrong ones.
+# ---------------------------------------------------------------------------
+
+def docx_rot_anchors(path):
+    """[(rot_deg, norm_text, raw_text)] for every anchored text box the engine rotated.
+
+    Returns None when no .docx can be read, so a caller can tell "the engine wrote no
+    rotation" (an empty list) from "this check measured nothing" (None). Those two must
+    never collapse: 54_image_dpi passed twelve documents by treating them as one.
+    """
+    if not path:
+        return None
+    try:
+        import zipfile
+        from xml.etree import ElementTree as ET
+        A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
+        W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+        WPS = "{http://schemas.microsoft.com/office/word/2010/wordprocessingShape}"
+        with zipfile.ZipFile(path) as z:
+            root = ET.fromstring(z.read("word/document.xml"))
+        out = []
+        for sp in root.iter(WPS + "wsp"):
+            xfrm = sp.find(".//" + A + "xfrm")
+            rot = xfrm.get("rot") if xfrm is not None else None
+            if not rot:
+                continue
+            txt = "".join(t.text or "" for t in sp.iter(W + "t"))
+            out.append((int(rot) / 60000.0, norm_text(txt), txt))
+        return out
+    except Exception:
+        return None
+
+
+def _ang_diff(a, b):
+    """Shortest angular distance in degrees, on the circle."""
+    return abs((a - b + 180.0) % 360.0 - 180.0)
+
+
 def extra_checks2(src, gd, docx_path=None):
     """Return checks 49-56. Independent of the text runs."""
     c = {}
@@ -1099,15 +1268,83 @@ def extra_checks2(src, gd, docx_path=None):
                      "; ".join(repr(w[:40]) for w in want if w not in d_at)), file=sys.stderr)
         c["50_annotation_text"] = (len(want), carried, carried == len(want))
 
-    # ---- 51 form fields ----------------------------------------------------
-    def fields(doc):
-        n = 0
-        for p in doc:
-            n += sum(1 for w in p.widgets())
-        return n
+    # ---- 51 form field values ---------------------------------------------
+    # UNTIL 14 Nov this counted page.widgets() in the RENDER and asked the render for 90 %
+    # of the source's count. A .docx cannot carry one, and the check's answer was therefore
+    # the exporter's, not the engine's - which is the defect 50_annotations was retired for
+    # in 65fd7a6 ("the check's answer was set by the exporter's flags, not the engine's
+    # decision"), one document over. Measured on 601 with three minimal probe .docx files
+    # and LibreOffice 7.4.7.2, ExportFormFields defaulting to true
+    # (/usr/lib/libreoffice/share/registry/main.xcd:2281):
+    #   w:fldChar/w:ffData  -> imported as a fieldmark          -> 0 widgets in the render
+    #   w:sdt + w:sdtPr     -> imported as loext:content-control -> 0 widgets in the render
+    #   w:object/w:control  -> imported as a real control        -> 1 widget per field, and
+    #                          the only encoding that passes the old check. Built for 601 it
+    #                          read 11/11 and PASSED while every answer still sat in three
+    #                          paragraphs at the top of page 1.
+    #
+    # What IS the engine's decision is where each answer goes. A filled form keeps its
+    # answers in each widget's /V and a reader draws them inside the widget's own rectangle,
+    # so that is what is asked, per source widget:
+    #   ink  - if the source draws inside the rect (2 pt in from its edge, so the box's own
+    #          border is not content), the render must draw inside it too. A tick is a mark,
+    #          not a string: the source's tick extracts as the glyph '3' out of ZapfDingbats,
+    #          and asking for that character would be asking the render to reproduce one
+    #          font's encoding.
+    #   text - if the source's words inside the rect contain a letter, the render's words
+    #          inside the same rect must contain them. This is the typed answer.
+    # A rect that shows nothing asks nothing: an empty box has no answer to lose. Measured on
+    # 601: the source reads 3/3, the engine's own .docx reads 0/3, the ActiveX build 2/3, and
+    # the same engine with its three answers moved onto their rects reads 3/3 (601 33/43 ->
+    # 37/43, 18/28/45/47 flipping to pass because the page is no longer pushed down).
+    FIELD_INK_FLOOR = 0.02
+    FIELD_INSET = 2.0
 
-    s_f, g_f = fields(src), fields(gd)
-    c["51_form_fields"] = (s_f, g_f, s_f == 0 or g_f >= max(1, int(s_f * 0.9)))
+    def field_ink(page, r):
+        rr = fitz.Rect(r.x0 + FIELD_INSET, r.y0 + FIELD_INSET,
+                       r.x1 - FIELD_INSET, r.y1 - FIELD_INSET)
+        if rr.width <= 0 or rr.height <= 0:
+            return 0.0
+        s = page.get_pixmap(clip=rr, colorspace=fitz.csGRAY, dpi=72).samples
+        return (sum(1 for b in s if b < 200) / len(s)) if s else 0.0
+
+    def field_words(page, r):
+        out = []
+        for wd in page.get_text("words"):
+            if fitz.Rect(wd[:4]).intersects(r):
+                t = " ".join(unicodedata.normalize("NFC", wd[4] or "").split())
+                if t:
+                    out.append(t)
+        return out
+
+    f_asked = f_ok = 0
+    f_bad = []
+    for sp in src:
+        ws = list(sp.widgets())
+        if not ws:
+            continue
+        rp = gd[sp.number] if sp.number < len(gd) else None
+        for w in ws:
+            r = fitz.Rect(w.rect)
+            s_ink, s_words = field_ink(sp, r), field_words(sp, r)
+            if s_ink < FIELD_INK_FLOOR and not s_words:
+                continue                      # an empty box asks nothing
+            f_asked += 1
+            if rp is None:
+                f_bad.append("%s: page %d is not in the render" % (w.field_name, sp.number + 1))
+                continue
+            ink_ok = s_ink < FIELD_INK_FLOOR or field_ink(rp, r) >= FIELD_INK_FLOOR
+            r_words = field_words(rp, r)
+            text_ok = all(any(t in rw for rw in r_words)
+                          for t in s_words if any(c.isalpha() for c in t))
+            if ink_ok and text_ok:
+                f_ok += 1
+            else:
+                f_bad.append("%s (ink=%s text=%s)" % (w.field_name, ink_ok, text_ok))
+    if f_bad:
+        print("51_field_values: %d of %d answers are not inside their field's rectangle: %s"
+              % (len(f_bad), f_asked, "; ".join(f_bad[:8])), file=sys.stderr)
+    c["51_field_values"] = (f_asked, f_ok, f_ok == f_asked)
 
     # ---- 52 outline / bookmarks -------------------------------------------
     # A bookmark tree is a STRUCTURE, and until 13 Nov this check counted ENTRIES.
@@ -1554,9 +1791,12 @@ def extra_checks2(src, gd, docx_path=None):
     for si in range(min(src.page_count, gd.page_count)):
         sp, gp = src[si], gd[si]
         sruns, gruns = runs(sp), runs(gp)
-        sa, ga = _anchors(sp, sruns), _anchors(gp, gruns)
         gshapes = _shapes(gp)
         sshapes = _shapes(sp)                   # for the size-class population test
+        # Each side's anchors are chosen against the OTHER side's shapes: a box the
+        # other document cannot express is not an object the two can be compared on.
+        sa = _anchors(sp, sruns, gshapes)
+        ga = _anchors(gp, gruns, sshapes)
         by = collections.defaultdict(list)      # text -> render run indices
         for j, g in enumerate(gruns):
             by[norm_word(g["text"])].append(j)
@@ -1957,13 +2197,30 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # the same as six correct ones. Constructed 13 Nov: a 15-degree run redrawn at 90 degrees
     # passed the count. The defect is an ANGLE AND A PLACE, so the check has to name both.
     #
-    # WHAT IT MEASURES NOW. Each source run whose baseline is not level must have a render run
-    # on the same page with the SAME NORMALISED TEXT that is
-    #     |d angle| <= ROT_ANGLE_TOL, and
-    #     displaced no more than 18's own clamp(0.35 * size, 1.5, 4.5) pt.
-    # The displacement bound is 18's, deliberately: a rotated run that moved is the same fault
-    # 18 measures on a level one, and a second tolerance invented here would be a second
-    # standard for the same quantity.
+    # WHAT IT MEASURED UNTIL 14 NOV, AND WHY THAT WAS THE WRONG HOP. Each source run whose
+    # baseline is not level had to find a RENDER run on the same page with the same normalised
+    # text, within ROT_ANGLE_TOL and within 18's displacement clamp. The render cannot answer
+    # that question. Measured 14 Nov on the 211-document corpus: `soffice --headless` writes
+    # 0 lines with a non-level `dir` in ALL 211 renders, against 372 rotated lines in 30 source
+    # documents, so the pairing set on the render side was empty and the check read kept=0 on
+    # all 30 and failed all 30. The sweep proves it is a constant, not a threshold: at
+    # ROT_ANGLE_TOL 0.0, 0.5, 1.0, 2.0, 4.0, 8.0, 15.0, 45.0, 180.0 and 360.0 degrees the class
+    # reads 30 every time. A check whose verdict does not move over the whole circle is
+    # measuring the renderer's absence of a feature, not the engine's angle. This is the same
+    # defect 53_embedded_faces and 54_image_dpi had, and the same fix: read the .docx.
+    #
+    # WHAT IT MEASURES NOW. Every source run whose baseline is not level must have an ANCHOR in
+    # the engine's .docx, carrying that run's text, whose <a:xfrm rot> is within ROT_ANGLE_TOL
+    # of the page's angle; and NO anchor in the .docx may carry an angle the page does not
+    # draw (ROT_INVENTED_MAX = 0). Both clauses read the engine's own decision, which is the
+    # only place the angle is observable.
+    #
+    # WHAT IT NO LONGER MEASURES, AND SAYS SO. The displacement clause is gone, not because it
+    # was wrong but because the .docx cannot express it at this grain: one anchor holds a whole
+    # stamp's several lines, so there is no per-run origin in the file to compare against the
+    # page's. Position for rotated runs is 18's and 20_line_placement's question on the render;
+    # this check now answers only the angle, which is what its name says. Dropping a clause it
+    # cannot measure is honest; keeping one that reads 0.0 on every document is not.
     #
     # THE ANGLE TOLERANCE IS 2.0 DEGREES. The rotations this corpus actually carries are 7, 8,
     # 9, 11, 12, 13, 14, 15, 90, 110 and 180 degrees, plus curved seal text down to 1.4. Two
@@ -1976,17 +2233,31 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # document, and measured at 2.0 every one of those documents fails. A tolerance tight
     # enough to judge them (under 1.4 degrees) would fail a producer that rounds the angle,
     # which is a different defect from losing the rotation.
-    # MEASURED 13 Nov on 211 renders: the tolerance is UNEXERCISED on this corpus - see the
-    # note on the sweep in the patch that ships with this change. LibreOffice draws every
-    # rotated run level, so the render side reads 0 rotated lines in 211 documents and the
-    # class is 30 at every tolerance from 0.5 to 4.0. The tolerance is therefore set from the
-    # geometry of the corpus, not from a measured knee, and is proved only by construction.
+    # MEASURED 14 Nov on 211 .docx: the corpus itself does not exercise the tolerance either
+    # - the engine's anchors agree with the page's angle to 0.0 degrees exactly (12 anchors:
+    # -15->345, -90->270, -8->352, -14->346, -12->348, -11->349, 15->15, 180->180, 9->9,
+    # 11->11, 13->13), so the class reads 20 at every tolerance from 0.5 to 360.0 and 28 only
+    # at 0.0, where float noise in atan2 (-14.999990224 against 345.0) fails two correct
+    # anchors. That is the argument for a NON-ZERO tolerance, measured rather than assumed.
+    # The tolerance earns its keep on the mutation matrix instead: an anchor shifted 10 degrees
+    # is caught up to ROT_ANGLE_TOL 8.0 and escapes at 15.0, and one shifted 1 degree passes at
+    # 2.0 by design. It is a floor on producer rounding, not a licence to be wrong.
     ROT_ANGLE_TOL = 2.0
     # The keep floor is a SHARE, not "all": a render may split one rotated run into two, and
     # 13's rule for a set (equality) is not available for a population that can be regrouped.
     # 0.8 of 6 is 4.8, so 3 of 6 kept FAILS - which is the constructed case this floor exists
-    # to fail.
+    # to fail. It survives the move to the .docx unchanged: the engine writes ONE anchor per
+    # stamp holding several lines, so a document with 2 rotated runs and 1 anchor is 2 of 2
+    # kept, and a document that loses one run of four (08) is 3 of 4 against a floor of 4.
     ROT_KEEP_FLOOR = 0.8
+    # A ROTATION THE PAGE DOES NOT DRAW IS A FAIL AT ZERO, not a tolerance. The user's rule is
+    # "kisi bhi PDF ke stamps ko jabardasti rotate nhi karna": inventing an angle is the same
+    # fault as dropping one, and it is the fault the render cannot see at all - LibreOffice
+    # ignores <a:xfrm rot> on a text box (see D-13/D-16), so a fabricated 15 degrees renders
+    # exactly like no rotation. Measured 14 Nov: adding rot="900000" to an unrotated anchor in
+    # 34_monospace_document leaves the render with 0 rotated lines and the OLD check passes it;
+    # the clause below fails it. On the corpus as built, this clause finds 0.
+    ROT_INVENTED_MAX = 0
 
     def rot_runs(doc):
         out = []
@@ -2013,7 +2284,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
                     if org is None:
                         org = ((ln["bbox"][0] + ln["bbox"][2]) / 2.0,
                                (ln["bbox"][1] + ln["bbox"][3]) / 2.0)
-                    out.append({"page": i, "text": norm_text(t),
+                    out.append({"page": i, "text": t, "nt": norm_text(t),
                                 "angle": math.degrees(math.atan2(dy, dx)),
                                 "org": (org[0], org[1]),
                                 "bbox": ln["bbox"],
@@ -2021,33 +2292,54 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
         return out
 
     s_rot = rot_runs(src)
-    g_rot = rot_runs(gd)
-    kept = 0
-    used = set()
-    for r in s_rot:
-        tol = min(max(0.35 * r["size"], 1.5), 4.5)
-        cx, cy = r["org"]
-        best = None
-        for j, q in enumerate(g_rot):
-            if j in used or q["page"] != r["page"] or q["text"] != r["text"]:
-                continue
-            d_ang = abs((q["angle"] - r["angle"] + 180.0) % 360.0 - 180.0)
-            qx, qy = q["org"]
-            ok = (d_ang <= ROT_ANGLE_TOL and abs(qx - cx) <= tol
-                  and abs(qy - cy) <= tol)
-            rank = (0 if ok else 1, d_ang, j)
-            if best is None or rank < best[0]:
-                best = (rank, j, d_ang, ok)
-        if best is None:
-            continue
-        used.add(best[1])
-        if best[3]:
-            kept += 1
-    need = max(1, math.ceil(ROT_KEEP_FLOOR * len(s_rot)))
-    if s_rot and kept < need:
-        print("35_rotation: %d of %d rotated run(s) kept their angle and place "
-              "(need %d, |d angle| <= %.1f deg)" % (kept, len(s_rot), need, ROT_ANGLE_TOL))
-    c["35_rotation"] = (len(s_rot), kept, not s_rot or kept >= need)
+    d_rot = docx_rot_anchors(docx_path)
+    if d_rot is None and s_rot:
+        # UNMEASURED IS NOT A PASS - 54_image_dpi's rule, applied to the same kind of hop.
+        # The render cannot answer this question (0 rotated lines in 211 of 211 renders), so
+        # without a .docx there is nothing here that has a verdict to cast. It used to be
+        # cast anyway: the render side read 0 kept and the check failed every document with
+        # rotated text, which looked like a strict check and was in fact a blind one.
+        print("35_rotation: FAIL - cannot measure. The source draws %d rotated run(s) and the "
+              "render carries none, so the angle is only observable in the engine's .docx. "
+              "Pass --docx <engine.docx>." % len(s_rot), file=sys.stderr)
+        c["35_rotation"] = (len(s_rot), -1, False)
+    elif d_rot is not None:
+        kept = 0
+        lost = []
+        for r in s_rot:
+            ang = r["angle"] % 360.0
+            # THE TEXT IS THE PAIRING KEY AND THE ANGLE IS THE QUESTION. An engine anchor may
+            # hold several of the page's lines (one stamp box = one anchor), so the test is
+            # containment, not equality: a 2-line stamp whose anchor reads
+            # "AUTHORISED SIGNATORYSUNRISE FASTENERS" carries both of its runs. What that
+            # anchor may NOT do is carry a different angle - which is what the tolerance is
+            # for, and what the mutation matrix in patches/35-rotation-docx.md measures.
+            if any(_ang_diff(q[0], ang) <= ROT_ANGLE_TOL and r["nt"] and r["nt"] in q[1]
+                   for q in d_rot):
+                kept += 1
+            else:
+                lost.append(r)
+        need = max(1, math.ceil(ROT_KEEP_FLOOR * len(s_rot)))
+        src_ang = [r["angle"] % 360.0 for r in s_rot]
+        invented = [q for q in d_rot
+                    if not any(_ang_diff(q[0], a) <= ROT_ANGLE_TOL for a in src_ang)]
+        if s_rot and kept < need:
+            print("35_rotation: %d of %d rotated run(s) kept their angle in the .docx "
+                  "(need %d, |d angle| <= %.1f deg). Lost: %s"
+                  % (kept, len(s_rot), need, ROT_ANGLE_TOL,
+                     "; ".join("%.1f deg %r" % (r["angle"], r["text"][:24])
+                               for r in lost[:6])), file=sys.stderr)
+        if len(invented) > ROT_INVENTED_MAX:
+            print("35_rotation: %d rotation(s) in the .docx that the page does not draw "
+                  "(allowed %d): %s"
+                  % (len(invented), ROT_INVENTED_MAX,
+                     "; ".join("%.1f deg %r" % (q[0], q[2][:24]) for q in invented[:6])),
+                  file=sys.stderr)
+        c["35_rotation"] = (len(s_rot), kept,
+                            (not s_rot or kept >= need)
+                            and len(invented) <= ROT_INVENTED_MAX)
+    else:
+        c["35_rotation"] = (0, 0, True)
 
     # ---- 36 underline / strike --------------------------------------------
     # No underline flag in the text model, so count thin strokes sitting just
@@ -2386,67 +2678,130 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # text on the baseline within one column, and 18_displacement owns every per-line dy,
     # including the tails a median is blind to.
 
-    # ---- 42 alignment ------------------------------------------------------
-    def align_mix(doc):
-        # The block bbox is the union of its own lines, so the widest line of EVERY block
-        # satisfies lx0 - bx0 < 4 and was counted as 'left'. Every block therefore
-        # contributed a 'left' by construction: on the 211-document corpus 5925 of 5925
-        # blocks did, left was 72% of all lines and centre 2%. A fully centred document
-        # read left, never centre.
-        # A line is only left-aligned relative to the COLUMN it sits in, not to a box
-        # drawn round itself, so the reference is the page's text margin. The widest line
-        # of a centred block still spans the column and is indistinguishable from flush
-        # left, but the narrower lines now read centre and the mix is centre-dominated.
-        left = right = centre = 0
-        for p in doc:
-            blks = [b for b in p.get_text("dict")["blocks"] if b.get("type") == 0]
-            if not blks:
-                continue
-            le = statistics.mode([round(b["bbox"][0]) for b in blks])
-            re_ = statistics.mode([round(b["bbox"][2]) for b in blks])
-            if re_ - le < 10:
-                continue
-            for blk in blks:
-                for ln in blk.get("lines", []):
-                    lx0, _, lx1, _ = ln["bbox"]
-                    if lx1 - lx0 < 10:
-                        continue
-                    if abs(lx0 - le) < 4:
-                        left += 1
-                    elif abs(re_ - lx1) < 4:
-                        right += 1
-                    elif abs((lx0 + lx1) / 2 - (le + re_) / 2) < 6:
-                        centre += 1
-        return (left, right, centre)
-
-    s_al, g_al = align_mix(src), align_mix(gd)
-    # THE COUNTS ARE NOT COMPARABLE, SO THE MIX IS. `same = sum(min(a, b))` is at most the
-    # RENDER's qualifying line count, so `same >= 0.7 * sum(s_al)` was a test of how many
-    # lines the render put on a document edge, not of where they went: any render with
-    # fewer than 70 % of the source's qualifying lines failed whatever its alignment was.
-    # Constructed 13 Nov: 24 left-aligned lines against 16 left-aligned lines - the same
-    # alignment on both sides - read (24, 16) and FAILED. And every one of the 28 failures
-    # in the 211-document store has a render/source ratio under 0.70 (362_price_list_dense
-    # 174 -> 63, 331_pid_diagram 23 -> 2, newsletter-3col-header-footer 120 -> 80, i.e. 67 %
-    # and failing by four lines).
+    # ---- 42 justification edges -------------------------------------------
+    # 42_alignment_mix IS RETIRED. It could not answer its own question, and the
+    # measurement is in /scratch/output/42-reference-report.md. The short form:
     #
-    # The question is the SHARE of qualifying lines at each of the three edges, which a
-    # line count cannot move. A floor of 8 source lines keeps a two-line document from
-    # being judged on a share, and 0.15 is the drift one line in seven can cause.
-    # Redefinition, not a loosening: mut_alignment (41 left, 1 right, 0 centre -> 6, 0, 36)
-    # still fires at 0.86 drift, and a right-aligned column turned flush left still fires.
-    tot_al = sum(s_al)
-    if tot_al == 0:
-        c["42_alignment_mix"] = (0, 0, True)
-    else:
-        g_tot = sum(g_al)
-        s_share = [a / float(tot_al) for a in s_al]
-        g_share = [a / float(g_tot) for a in g_al] if g_tot else [0.0, 0.0, 0.0]
-        drift = max(abs(a - b) for a, b in zip(s_share, g_share))
-        # the LEFT share is what the report shows: it is the quantity the verdict uses, and
-        # a raw count pair cannot be compared between two documents of different length
-        c["42_alignment_mix"] = (round(100 * s_share[0]), round(100 * g_share[0]),
-                                 tot_al < 8 or drift <= 0.15)
+    #   The check classified every qualifying line as left, right or centred
+    #   against a reference derived PER PAGE AND PER SIDE from the mode of the
+    #   page's BLOCK bboxes (`statistics.mode([round(b["bbox"][0]) ...])`). A
+    #   block bbox is a segmentation artefact: PdfToWord and the renderer group
+    #   the same glyphs into different blocks, so the reference is not a property
+    #   of the page and not even the same quantity on the two sides.
+    #
+    #   Measured on all 211 documents with six defensible references - mode of
+    #   block bbox (shipped), union bbox of the blocks, mode of line bbox, mode of
+    #   span bbox, union bbox of the lines, and the page rect - the failure sets
+    #   are 24, 29, 34, 34, 29, 0 and they are NOT NESTED. Their intersection is
+    #   EMPTY: no document in corpus-v1 fails this check under all six, so there
+    #   is no document the check convicts whatever reference you pick. Their union
+    #   is 56 of 211. A check whose answer depends on which of six defensible
+    #   references you pick is measuring the reference, not the document.
+    #
+    #   There is no reference that is a property of the PAGE. A PDF records no
+    #   text frame; the only page-intrinsic horizontal landmarks are x0, x1 and
+    #   the centre of the MediaBox. Using them (`page_rect`) buckets 789 of the
+    #   corpus's 15,261 qualifying source lines - 5 % - and fails 0 of 211, i.e.
+    #   it returns the same answer for every document and measures nothing. The
+    #   text margin is a layout decision recorded nowhere in the file. For
+    #   comparison the retired reference buckets 7,087 of the same 15,261, 46 %,
+    #   so 53.6 % of the corpus's lines were in no bucket at all.
+    #
+    #   On the shipped reference 21 of the 24 failures have ZERO paired lines
+    #   whose justification changed, and 9 of the 24 have a reference narrower
+    #   than half the page's own text width (17 reads 18 pt against a 490 pt text
+    #   extent; 31 reads 8 pt; 65 reads 11 pt). Two documents - 31 and
+    #   20_numbered_list_separate_column_txtpos - have a render reference under
+    #   10 pt, so the page is skipped, the render mix is empty, and
+    #   `g_share = [0.0, 0.0, 0.0]` judges the document at "0 % left" against a
+    #   source that is 86 % left. That is not a misalignment; it is a division by
+    #   a reference that does not exist.
+    #
+    # WHAT REPLACES IT. Not a better column. The question "which of three buckets
+    # is this line in, relative to a column I inferred from this document" has no
+    # invariant answer, so it is not asked. The question the two PDFs CAN settle
+    # between them is asked instead: a line that is flush left in the source must
+    # still be flush left in the render, and likewise right and centred.
+    #
+    #   - lines are PAIRED BY THEIR OWN TEXT (unique on both sides, within a
+    #     page), so a line is compared with itself and not with a page-level share;
+    #   - "flush" is read off each page's own line set as an EXTREME - minimum x0,
+    #     maximum x1 - at 1 pt, plus two centred tests (the page's modal line
+    #     centre, and symmetry within the page's own extent). Extremes are
+    #     attained by construction and are identical under five of the six
+    #     references; a MODE of a block grouping is not;
+    #   - a line that neither side can classify ("-") makes no claim, so a
+    #     document is never failed for a line the instrument cannot read.
+    #
+    # The report's number is the count of CONTRADICTED pairs; the document fails
+    # when that reaches max(3, 2 % of the pairs). The floor stops a two-line
+    # document being judged on one line; the rate stops a 900-line document being
+    # judged on three.
+    #
+    # Measured on the same 211 documents: 2 failures, against 24 - and it fires on
+    # a single block realigned by hand (34_monospace_document, one block flushed
+    # right: drift 0.000, PASS under the retired check; 4 contradictions, FAIL
+    # here) which the retired check cannot see at all, because a line that leaves
+    # all three buckets simply stops being counted and the SHARE does not move.
+    JE_TOL = 1.0
+    JE_FLOOR = 3
+    JE_RATE = 0.02
+
+    def _je_lines(pg):
+        out = []
+        for b in pg.get_text("dict")["blocks"]:
+            if b.get("type") != 0:
+                continue
+            for ln in b.get("lines", []):
+                lx0, _, lx1, _ = ln["bbox"]
+                if lx1 - lx0 < 10:
+                    continue
+                t = " ".join(" ".join(sp["text"] for sp in ln["spans"]).split())
+                if t:
+                    out.append((t, lx0, lx1))
+        return out
+
+    def _je_class(lines):
+        if not lines:
+            return []
+        xmin = min(l[1] for l in lines)
+        xmax = max(l[2] for l in lines)
+        cmode = statistics.mode([round((l[1] + l[2]) / 2.0) for l in lines])
+        out = []
+        for _t, lx0, lx1 in lines:
+            if lx0 - xmin <= JE_TOL:
+                out.append("L")
+            elif xmax - lx1 <= JE_TOL:
+                out.append("R")
+            elif (abs((lx0 + lx1) / 2.0 - cmode) <= JE_TOL
+                  or abs((lx0 - xmin) - (xmax - lx1)) <= JE_TOL):
+                out.append("C")
+            else:
+                out.append("-")
+        return out
+
+    je_pairs = je_con = 0
+    for pi in range(min(len(src), len(gd))):
+        s_l = _je_lines(src[pi])
+        g_l = _je_lines(gd[pi])
+        s_c = _je_class(s_l)
+        g_c = _je_class(g_l)
+        s_ix, g_ix = {}, {}
+        for i, t in enumerate(x[0] for x in s_l):
+            s_ix.setdefault(t, []).append(i)
+        for i, t in enumerate(x[0] for x in g_l):
+            g_ix.setdefault(t, []).append(i)
+        for t, si in s_ix.items():
+            gi = g_ix.get(t)
+            if len(si) != 1 or not gi or len(gi) != 1:
+                continue
+            je_pairs += 1
+            a, b = s_c[si[0]], g_c[gi[0]]
+            if a != "-" and b != "-" and a != b:
+                je_con += 1
+    je_need = max(JE_FLOOR, int(JE_RATE * je_pairs + 0.999))
+    # reported: contradicted pairs, the count it had to reach, and the verdict
+    c["42_justification_edges"] = (je_con, je_need, je_con < je_need)
 
     # ---- 43 horizontal placement ------------------------------------------
     # The old 21_median_dx only looked at the median, which hides a whole column
@@ -2458,7 +2813,8 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # 375_attendance_register is the same shape at 4.3 pt). The median is the document-level
     # clause a per-span window structurally cannot see, and it is the one thing 21 answered
     # that 43 did not - so 43 carries it now and 21 has no question of its own left.
-    near_x = sum(1 for s_sp, g_sp in pairs if abs(g_sp["x"] - s_sp["x"]) <= 10)
+    near_x = sum(1 for s_sp, g_sp in pairs
+                 if abs(g_sp.get("xink", g_sp["x"]) - s_sp.get("xink", s_sp["x"])) <= 10)
     tot_p = max(1, len(pairs))
     ddx = [g_sp["x"] - s_sp["x"] for s_sp, g_sp in pairs]
     med_dx_p = round(statistics.median(ddx), 1) if ddx else 0.0
@@ -2467,41 +2823,120 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
                              and abs(med_dx_p) < 3.0)
 
     # ---- 44 header / footer ------------------------------------------------
-    def edge_text(doc):
-        # Returns the band TEXT, not a count. Widening the band to 0.11/0.89 fixed the 1 pt
-        # footer shift but pulled 116 real body blocks into the header count on the corpus
-        # (82 of 211 documents, 90% of them not repeated headers - table headers, section
-        # headings, the second and third body line), which both dilutes the check and moves
-        # its boundary into the densest region of the page. Counting text instead: a footer
-        # that moves 1 pt is the same string, a footer that is dropped is a different one,
-        # and body text in the band appears on both sides and cancels out.
+    #
+    # THE OLD PREDICATE, STATED EXACTLY (it is replaced below, not tuned):
+    #   population  every block of get_text("dict")["blocks"] with type 0 whose bbox TOP y
+    #               satisfies  y < H*0.10  or  y > H*0.90  (H = that page's rect height),
+    #               on every page, with the block's spans concatenated and whitespace
+    #               collapsed; no page index is carried.
+    #   predicate   every such source string must equal some render band string, or be a
+    #               substring of one, or reach difflib ratio >= 0.9 against one - where the
+    #               render pool is again the band blocks of the whole document.
+    #   verdict     c["44"] = (len(source band strings), matched, not missing).
+    #
+    # TWO THINGS ARE WRONG WITH IT, AND BOTH ARE MEASURED ON THE 211.
+    #
+    # 1. A BLOCK IS NOT A DOCUMENT OBJECT. It is the extractor's grouping, and the source and
+    #    the render group differently. On the 50 documents this check failed, the 272 source
+    #    band blocks are: 151 present as one render block, and 121 not - of which 68 have
+    #    every character present at the SAME y inside a differently-cut block and 53 have
+    #    them elsewhere on the page (window +-6 pt; measured, scripts in the patch notes).
+    #    Not one of the 272 has a character missing from its page. The check was reading the
+    #    segmentation, not the conversion.
+    #
+    # 2. IT CANNOT SEE THE THING IT IS NAMED AFTER. A header is a header because it REPEATS,
+    #    and this predicate has no page index, so repetition is not in it at all. 192 of the
+    #    211 documents have a single page, where repetition is structurally impossible - and
+    #    44 of the 50 failures are on exactly those documents. Meanwhile it PASSES
+    #    mutual-fund-statement, which loses its footer on page 2 (811.4 pt -> 123.2 pt), and
+    #    FAILS gst-invoice-multipage-item-table, whose headers and footers are all carried at
+    #    the source y on all four pages. Its verdict disagrees with the truth in both
+    #    directions, which is what a check looks like when it is asking the wrong question.
+    #
+    # SO: THE POPULATION IS NOW THE ONE THE NAME PROMISES. Band LINES that repeat on two or
+    # more pages of the source, digit-normalised so that a page number is the same element on
+    # every page. The band constants are unchanged (0.10 / 0.90, and still on the line's bbox
+    # top, which is what keeps 416_many_tiny_pages - header top 0.30 pt inside the cut - from
+    # moving: a centre-of-block rule was measured at 50 -> 51 and all-pass 29 -> 28, because
+    # it puts that header outside). Measured: 16 documents, 79 repeating lines, 615
+    # element-pages. The other 195 documents have no repeating element and this check has
+    # nothing to say about them - 44 of its 50 old failures live there.
+    #
+    # AND THE PREDICATE IS THE ONE A FLOW CONVERTER CAN ANSWER. It cannot promise a w:hdr
+    # part: it writes none (0 header/footer parts across all 211 docx) and in this design it
+    # cannot, because sectPrXml (DocxWriter.java:1790) emits pgMar top/right/bottom/left = 0
+    # so the text area IS the page and a part is subtracted from the body. Measured by
+    # injecting a real header part into bank-statement-5-pages: every body line moves
+    # +10.9 pt, and paying for it with real section margins moves the body by the whole top
+    # margin instead (+92.5 pt, and 354 of 525 body lines can no longer be found at all).
+    # What it CAN promise is what the flow actually delivers: the text is still on that page,
+    # and it is still in the margin band - or, if it drifted just past the band edge, that it
+    # barely moved. Both clauses are needed and neither is a tolerance invented here: the
+    # band is this check's own 0.10/0.90, and the 2x displacement budget is 18_displacement's
+    # TAIL_FACTOR (see _tol() below) so a header that 18 already forgives is not failed here.
+    def text_lines(doc):
         out = []
-        for p in doc:
+        for pi, p in enumerate(doc):
             H = p.rect.height
             for blk in p.get_text("dict")["blocks"]:
                 if blk.get("type") != 0:
                     continue
-                y = blk["bbox"][1]
-                if y < H * 0.10 or y > H * 0.90:
-                    t = " ".join("".join(sp["text"] for ln in blk.get("lines", [])
-                                         for sp in ln["spans"]).split())
-                    if t:
-                        out.append(t)
+                for ln in blk.get("lines", []):
+                    t = " ".join("".join(sp["text"] for sp in ln["spans"]).split())
+                    if not t:
+                        continue
+                    y = ln["bbox"][1]
+                    out.append({"page": pi, "y": y, "frac": y / H, "text": t,
+                                "size": max((sp["size"] for sp in ln["spans"]), default=0.0)})
         return out
 
-    def _present(t, pool):
-        if t in pool:
-            return True
-        return any(difflib.SequenceMatcher(None, t, q).ratio() >= 0.9 or t in q for q in pool)
+    def _band(l):
+        return l["frac"] < 0.10 or l["frac"] > 0.90
 
-    s_e, g_e = edge_text(src), edge_text(gd)
-    # Every band string in the source must still be in the render. A 1 pt shift keeps every
-    # string, so the original defect passes; a dropped header loses its string, so the check
-    # still fires; a body block that happens to sit in the band is present on both sides.
-    # The 0.9 ratio was kept out of this on purpose: with s_e=2 it tolerated one of the two
-    # headers being lost, which is the dilution the widening introduced.
-    missing = [t for t in s_e if not _present(t, g_e)]
-    c["44_header_footer"] = (len(s_e), len(s_e) - len(missing), not missing)
+    def _same(a, b):
+        # Unchanged from the old _present: a line either is the string, contains it, or is
+        # within 0.9 of it. Kept because a re-wrapped header is the same header.
+        return (a == b or a in b or b in a
+                or difflib.SequenceMatcher(None, a, b).ratio() >= 0.9)
+
+    def _44tol(size):
+        # 18_displacement's own per-run budget, times its TAIL_FACTOR.
+        return 2.0 * min(max(0.35 * size, 1.5), 4.5)
+
+    s_ln, g_ln = text_lines(src), text_lines(gd)
+    s_band = [l for l in s_ln if _band(l)]
+    g_by = {}
+    for l in g_ln:
+        g_by.setdefault(l["page"], []).append(l)
+
+    def _find(l, placed):
+        for c in g_by.get(l["page"], []):
+            if not _same(l["text"], c["text"]):
+                continue
+            if not placed:
+                return c
+            if _band(c) or abs(c["y"] - l["y"]) <= _44tol(l["size"]):
+                return c
+        return None
+
+    grp = {}
+    for l in s_band:
+        grp.setdefault(("top" if l["frac"] < 0.10 else "bot",
+                        re.sub(r"\d+", "#", l["text"])), []).append(l)
+    rep = [l for v in grp.values() if len({x["page"] for x in v}) >= 2 for l in v]
+    lost = [l for l in rep if _find(l, True) is None]
+    # The completeness clause. Without it the check would be silent on 195 documents, and a
+    # band line dropped from the page entirely is a real loss whether or not it repeats:
+    # 350_question_paper loses 9 (an exam paper whose footer column never reached the render)
+    # and itr-computation-with-slab-table loses 2 to a 1 -> 2 page overflow. Text that moved
+    # but is still on its page is 18_displacement's question, not this one's.
+    dropped = [l for l in s_band if _find(l, False) is None]
+    # The reported pair is "N band elements made a claim, M were honoured". A document with a
+    # repeating element is judged on the repeating lines (the header question); one without
+    # is judged on its band lines (the completeness question). A single pair that always
+    # means the same thing, rather than 0/0 on a document that failed.
+    claim, unmet = (rep, lost) if rep else (s_band, dropped)
+    c["44_header_footer"] = (len(claim), len(claim) - len(unmet), not lost and not dropped)
 
     # ---- 45 character accuracy --------------------------------------------
     s_txt = "".join(s_sp["text"] for s_sp in s_runs)
@@ -2524,7 +2959,13 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # on length rather than on the difference. This is the same idiom verify.py and visual.py
     # already use for text.
     def _glyphs(rs):
-        return re.sub(r"[\s\u00a0]+", "", "".join(r["text"] for r in rs))
+        # C0 CONTROLS ARE NOT CHARACTERS A RENDER CAN CARRY. norm_word() strips them with
+        # its own comment - six documents in corpus-v1 hold U+0000 in their text layer - and
+        # this line did not, so 406_passport_mrz_page was charged for 8 NULs that no
+        # renderer can draw: 431 of 448 reads 96, 431 of 440 reads 98. Invisible control
+        # characters are not "character accuracy", they are the extractor's opinion of the
+        # file, and counting them here measures the source, not the conversion.
+        return re.sub(r"[\s\u00a0\x00-\x1f\x7f]+", "", "".join(r["text"] for r in rs))
 
     # AND IT WAS STILL MEASURING ORDER, WHICH IS NOT ITS QUESTION. Measured 13 Nov on a probe
     # carrying one ligature, one combining mark, one Arabic word with a fathatan, one
@@ -2563,27 +3004,121 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     c["45_char_accuracy"] = (100, ratio, ratio >= 97)
 
     # ---- 46 text crossing a rule (per span) --------------------------------
-    def spans_crossing(doc):
-        n = 0
-        for p in doc:
+    # WHAT THIS USED TO ASK. "Does the render count more rules inside text boxes than the
+    # source?" with a 20 % allowance: `g_c <= s_c + s_c // 5`. Two COUNTS, so it cannot say
+    # which of the two moved, and on the 211 it never says the thing it exists to say.
+    # Measured (engine 23ffa25, LibreOffice's render of the engine's own .docx): it fails 7
+    # documents, and 0 of the 7 is a rule drawn through text that should not have one.
+    #   34 of the 42 render crossings are a rule the source drew at the SAME y (0.2-0.6 pt)
+    #     with the TEXT moved onto it by 6.2-10.0 pt - 18_displacement's question.
+    #     payslip-label-left-amount-right: 12 crossings, rule unmoved to 0.3 pt, text down
+    #     6.2-10.0 pt. bank-statement-horizontal-rules-only: 13 crossings, same shape.
+    #   4 are on a render page the source does not have - itr-computation-with-slab-table,
+    #     whose table the render pushed onto a second page (01_page_count 1 -> 2).
+    #   3 are the same ink re-segmented: 60_page_border counts ONE 48 pt tall span in the
+    #     source and TWO spans in the render, so one rule reads as two crossings.
+    #   1 is a 2.1 pt text shift: 311_fir_police_form.
+    # Constructed (mutation matrix, /scratch/work/mutation.py, one change per document):
+    # a rule moved 10 pt into text and a rule drawn through the middle of a word both read
+    # fail, which is the question; TEXT moved 12 pt onto a rule the source already drew
+    # reads fail too, which is not the question and is the same confusion the corpus shows.
+    #
+    # WHAT IT ASKS NOW. Rule by rule: is any rule inside a text box that had none? A render
+    # crossing is NEW only when the text did not move AND the rule crossing it is not a
+    # source rule that already crossed text. So:
+    #   a rule moved into text          NEW  - no source rule at that y          -> fails
+    #   a rule drawn through a word     NEW  - no source rule at all             -> fails
+    #   text moved onto a source rule   not  - the text is not registered        -> 18 owns it
+    #   a source crossing preserved     not  - the source counted this rule     -> passes
+    #   a rule deleted                  not  - nothing crosses                  -> 32 owns it
+    # On the 211 this reads 0 documents failing, and it still fails both constructed
+    # crossings above. XTEXT_DY is 18_displacement's own FLOOR, so the line between "the
+    # text moved" and "the rule moved" is the house standard's, not a new number. XRULE_DY
+    # is 4.0 pt and not 32_stroke_lines' 24 pt on purpose: 24 is right for "did this rule
+    # survive", and wrong here - a rule that moved 10 pt has survived and is now through a
+    # line of text.
+    XRULE_DY = 4.0     # a render rule is the source's own rule within this of its own y
+    XTEXT_DY = 1.5     # ... and the text is registered within this of where it was set
+    XRULE_OV = 0.80    # ... covering this share of the shorter of the two rules
+
+    def x_spans(doc):
+        out = {}
+        for i, p in enumerate(doc):
+            for blk in p.get_text("dict")["blocks"]:
+                if blk.get("type") != 0:
+                    continue
+                for ln in blk.get("lines", []):
+                    for sp in ln.get("spans", []):
+                        t = sp.get("text", "").strip()
+                        if t:
+                            out.setdefault(i, []).append((sp["bbox"], t))
+        return out
+
+    def x_rules(doc):
+        return {i: [s for s in _strokes(p) if s["rect"].height <= 2.5]
+                for i, p in enumerate(doc)}
+
+    def x_crossings(doc):
+        """One hit per span, `break`, height <= 2.5, 1.5 pt inset - the old predicate."""
+        out = []
+        for i, p in enumerate(doc):
             lines = [s for s in _strokes(p) if s["rect"].height <= 2.5]
             for blk in p.get_text("dict")["blocks"]:
                 if blk.get("type") != 0:
                     continue
                 for ln in blk.get("lines", []):
                     for sp in ln.get("spans", []):
-                        if not sp.get("text", "").strip():
+                        t = sp.get("text", "").strip()
+                        if not t:
                             continue
                         x0, y0, x1, y1 = sp["bbox"]
                         for st in lines:
                             r = st["rect"]
                             if r.y0 > y0 + 1.5 and r.y0 < y1 - 1.5 and r.x0 < x1 and r.x1 > x0:
-                                n += 1
+                                out.append((i, (x0, y0, x1, y1), t, r))
                                 break
-        return n
+        return out
 
-    s_c, g_c = spans_crossing(src), spans_crossing(gd)
-    c["46_text_crossing_rule"] = (s_c, g_c, g_c <= s_c + s_c // 5)
+    def x_text_at(spans, page, text, bbox):
+        """The source span carrying this text nearest this place, or None."""
+        best, bd = None, None
+        for bb, t in spans.get(page, ()):
+            if t != text:
+                continue
+            d = abs(bb[1] - bbox[1]) + 0.25 * abs(bb[0] - bbox[0])
+            if bd is None or d < bd:
+                best, bd = bb, d
+        return best
+
+    def x_rule_here(r, cands):
+        """The source rule this render rule is, or None."""
+        L = r.x1 - r.x0
+        for s in cands:
+            sr = s["rect"]
+            ov = min(sr.x1, r.x1) - max(sr.x0, r.x0)
+            if ov <= 0 or ov < XRULE_OV * max(1e-6, min(L, sr.x1 - sr.x0)):
+                continue
+            if abs(sr.y0 - r.y0) <= XRULE_DY:
+                return s
+        return None
+
+    s_sp, s_rl = x_spans(src), x_rules(src)
+    s_x, g_x = x_crossings(src), x_crossings(gd)
+    had = set((i, round(r.x0, 1), round(r.y0, 1), round(r.x1, 1)) for i, _, _, r in s_x)
+    g_new = 0
+    for i, bb, text, r in g_x:
+        sb = x_text_at(s_sp, i, text, bb)
+        if sb is None or abs(sb[1] - bb[1]) > XTEXT_DY:
+            continue                      # the text moved: 18_displacement's question
+        m = x_rule_here(r, s_rl.get(i, ()))
+        if m is None:
+            g_new += 1                    # a rule the source does not draw there
+            continue
+        if (i, round(m["rect"].x0, 1), round(m["rect"].y0, 1),
+                round(m["rect"].x1, 1)) not in had:
+            g_new += 1                    # the source's own rule, but it crossed no text
+    s_c, g_c = len(s_x), g_new
+    c["46_text_crossing_rule"] = (s_c, g_c, g_c == 0)
 
     # ---- 47 margins: the body column's left margin, page by page ------------
     # WHAT THIS USED TO MEASURE. Four numbers: the ink bounding box of PAGE 1, compared on
@@ -2633,6 +3168,21 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # (c) 3 pt ON THE ANCHOR IS KEPT. It is the one number here that is a real decision
     #     rather than a defect: a 2 pt whole-page shift still passes (measured), a 3 pt
     #     one fails on the registration rule. It is stated, not derived.
+    #
+    # (d) THE LEFT EDGE WAS THE PEN, NOT THE INK. Every x in this file came from a span's
+    #     bbox, and a span's bbox starts at its first glyph's ORIGIN. A space advances the
+    #     pen and draws nothing, so a source that writes "    (a) Salary" reports its left
+    #     edge 8.6 pt left of the first letter - and the engine, which reads a cell's text
+    #     at its first VISIBLE glyph (PdfToWord.glyphFirstX, and visibleX for a line),
+    #     writes w:ind for the whitespace and emits the text without it. The render
+    #     therefore draws the ink exactly where the page drew it, and this check charged it
+    #     8.6 pt for the spaces. Measured on 211: 49 documents failed, 8 of them for this
+    #     and nothing else (form16-part-b and itr-computation-with-slab-table are the two
+    #     the brief named as a cell-inset defect - they are 4 spaces of 2.002 pt each, and
+    #     the residual is 0.6 pt). The measurement is now ink to ink on both sides.
+    #     Constructed (case-build2.py, shipped with this patch): a source with "    (a) ..." against the same page
+    #     with the spaces dropped reads 6 unregistered runs here and none after the change,
+    #     and against the same page with the indent genuinely moved 9 pt it still reads 6.
     LM_TOL = 3.0        # the body's left edge may differ by this much, per page
     DX_MED_TOL = 2.0    # a line is registered if a render line starts within this
     DX_TAIL_SHARE = 0.05  # at most this share of a page's lines may be unregistered
@@ -2659,17 +3209,22 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
 
         Only the anchor is taken from the page now. The per-line registration below is
         measured on the caller's matched runs, not on this page's raw left edges.
+
+        The edge is the line's INK, for the reason 47(d) states: a line that begins with
+        an indent written as spaces has a pen left of anything it draws, and the anchor
+        would then be a place no reader sees.
         """
         out = []
         for pi, p in enumerate(doc):
             xs = []
-            for blk in p.get_text("dict")["blocks"]:
+            for blk in p.get_text("rawdict")["blocks"]:
                 if blk.get("type") != 0:
                     continue
                 for ln in blk.get("lines", []):
-                    if not "".join(sp.get("text", "") for sp in ln.get("spans", [])).strip():
+                    if not "".join(c.get("c", "") for sp in ln.get("spans", [])
+                                   for c in sp.get("chars", [])).strip():
                         continue
-                    xs.append(ln["bbox"][0])
+                    xs.append(min(ink_box(sp, ln)[0] for sp in ln.get("spans", [])))
             out.append((pi, anchor(xs), len(xs)))
         return out
 
@@ -2720,9 +3275,15 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # on 1 of its 37 runs at 43.0 pt and 69_two_col_legal_numbered_clauses on 1 of 51 at
     # 239.2 pt; both are clean at every other run.
     DX_MIN_PAIRS = 5        # below this many matched runs a page is not judged on a count
+    # INK TO INK. xink is the first glyph that puts ink on the page (see ink_box()), so
+    # the leading whitespace a source draws and a renderer drops is no longer a
+    # displacement. It is the same edge the engine places text by, so the two sides of
+    # this subtraction now mean the same thing. Falls back to x for any run whose producer
+    # recorded no glyph boxes.
     by_page = collections.defaultdict(list)
     for s_sp, g_sp in pairs:
-        by_page[s_sp["page"]].append(g_sp["x"] - s_sp["x"])
+        by_page[s_sp["page"]].append(g_sp.get("xink", g_sp["x"]) -
+                                     s_sp.get("xink", s_sp["x"]))
     for pg, dd in sorted(by_page.items()):
         if len(dd) < DX_MIN_PAIRS:
             continue
@@ -3139,8 +3700,8 @@ def compare(src_path, gd_path, docx_path=None):
     # document's - 45_char_accuracy already says so in its own comment. So the unit here is
     # the character: "not one thing may be missing" is a statement about characters.
     s_chars = collections.Counter(norm_text(s_text))
-    g_chars = collections.Counter(norm_text(g_text))
-    chars_missing = s_chars - g_chars
+    g_char_count = collections.Counter(norm_text(g_text))
+    chars_missing = s_chars - g_char_count
     checks["04_chars_missing"] = (0, sum(chars_missing.values()), not chars_missing)
     # 05 was `len(extra) <= max(1, sum(s_words.values()) // 100)` - a count of TYPES on the
     # left against a budget derived from TOKENS on the right. The two sides were not the
@@ -3169,7 +3730,7 @@ def compare(src_path, gd_path, docx_path=None):
     # the 4 documents it was tried on. Zero tolerance caught all 4. Measured over 211: zero
     # tolerance fires on 9, a 1 % character budget on 8 - one document apart, and the budget
     # is the side that misses.
-    chars_extra = g_chars - s_chars
+    chars_extra = g_char_count - s_chars
     checks["05_chars_extra"] = (0, sum(chars_extra.values()), not chars_extra)
 
     # ---- 06_table_columns and 07_table_rows RETIRED 13 Nov -----------------
@@ -3283,7 +3844,41 @@ def compare(src_path, gd_path, docx_path=None):
     # is still reported, as information, from 53's block in extra_checks2(). A fact worth
     # knowing is not the same as a vote, and this one is not the engine's to win.
 
-    s_sizes = collections.Counter(r["size"] for r in s_runs)
+    # ---- what a "size set" is, and in whose units, after 13 Nov -----------
+    # THE TWO SIDES WERE NOT IN THE SAME UNITS, and a set of sizes is a set of numbers.
+    # The source side carries what PyMuPDF reads out of the page, which is continuous: the
+    # corpus draws 64 distinct sizes and 31 of them are off the half-point grid (6.2, 6.4,
+    # 6.8, 7.2, 7.4, 7.8, 8.6, 8.9, 9.3, 11.7 ...). The render side cannot carry any of
+    # those, because the number travelled through w:sz and w:sz is an ST_HpsMeasure - an
+    # INTEGER count of half-points. DocxWriter.java:3461 writes it from halfPointsDown()
+    # (DocxWriter.java:5051), which floors; the same rule is at :2888 and :4942. Measured
+    # on the 211-document store, 0 of 211 renders carry a size that is not an exact
+    # multiple of 0.5. So an off-grid source size was a GUARANTEED miss, not a loss.
+    #
+    # WHAT THAT COST. Across the 52 documents that failed 10, 253 of their 254 missing
+    # sizes were off the grid. Of those 253, 248 had every glyph of that size present in
+    # the render at exactly floor(2*size)/2 with the span COUNT preserved - on
+    # 304_package_insert_small_print the page draws 6.2 pt in 25 spans, the .docx says
+    # w:sz 12 and the render says 6.0 pt in 25 spans - and quantising the source set
+    # through the writer's own rule cleared 52 of 52. table-inside-two-column-page read
+    # "source=7 render=3" for this reason and no other: its 6.4, 6.8, 7.2 and 8.9 pt floor
+    # onto 6.0, 6.5, 7.0 and 8.5, and 7.0 was already in the set, so the render gained
+    # three sizes and lost four.
+    #
+    # SO THE SOURCE SIDE IS NOW MEASURED IN THE UNITS THE .DOCX CAN EXPRESS. This is not a
+    # loosened tolerance - the comparison is still exact, at 0.0 pt, on 0.1-pt values - it
+    # is the same question asked of two quantities that are commensurable. A size the
+    # engine DROPS still fails: its bucket is absent from the render and nothing fills it.
+    # Proof, not assertion. table-inside-two-column-page rewritten so that its w:sz 12, 17
+    # and 30 become 13, 18 and 28 - three sizes removed and no other change - then
+    # re-rendered, reads source 6, render 3, ok=False. 34a on the same pair reads 100 -> 98
+    # and PASSES, because its 0.6 pt per-span tolerance swallows a half-point shift; so
+    # this check is not the redundant half of that pair.
+    def expressible(pt):
+        """The size a page can be written at: DocxWriter.halfPointsDown, line 5051."""
+        return max(2, min(3276, int(math.floor(pt * 2)))) / 2.0
+
+    s_sizes = collections.Counter(expressible(r["size"]) for r in s_runs)
     g_sizes = collections.Counter(r["size"] for r in g_runs)
     common = sum(1 for k in s_sizes if k in g_sizes)
     checks["10_font_sizes"] = (len(s_sizes), common,
@@ -3370,12 +3965,38 @@ def compare(src_path, gd_path, docx_path=None):
     # rule twice - 15_links (`s_links == 0 or g_links >= s_links`) and 40_link_targets
     # (`s_l == g_l or not s_l`). A colour that is GONE is gone; 80 % of four colours rounds
     # down to three, so the percentage floor let one colour of four disappear silently.
-    # A render carrying MORE colours is not a loss and still passes.
+    # A render carrying MORE colours used to pass. It does not any more: see the GAIN clause
+    # below, which is the second half of this check.
+    #
+    # THE GAIN CLAUSE, added 14 Nov. `kept_cols` walks the SOURCE set and never the render
+    # set, so a colour the render INVENTED was invisible to this check: it asked whether every
+    # source colour survived and never whether the render added one. Measured on 414_
+    # transparency_softmask - the page draws its two text lines in black and the engine wrote
+    # #1A4D99 on both, which is the blue of the bar above them - the render's only colour had
+    # no source counterpart. 13 did fail that document, but for the LOSS (black gone), not for
+    # the gain: had the render kept black anywhere else on the page it would have read 1 of 1
+    # kept and PASSED with #1A4D99 invented. Both directions are one clause each; a check that
+    # reads one of them is half a check.
+    #
+    # TOLERANCE, and only one: #000000 in the render is not a gain when the source drew a
+    # black in another encoding. That is D-23's Automatic case - the engine deliberately
+    # leaves `w:color` off a run and the reader resolves it to its own black - plus the CMYK
+    # black already handled by colour_same(). It is keyed on the EXACT int 0, so a render that
+    # paints #000000 where the source painted a COLOUR still fires, which is the case the
+    # tolerance must not buy.
     s_col_set = {r["colour"] for r in s_runs}
     g_col_set = {r["colour"] for r in g_runs}
     kept_cols = sum(1 for a in s_col_set if any(colour_same(a, b) for b in g_col_set))
+    gained_cols = sorted(
+        b for b in g_col_set
+        if not any(colour_same(a, b) for a in s_col_set)
+        and not (b == 0x000000 and any(is_blackish(a) for a in s_col_set)))
+    if gained_cols:
+        print("13_text_colours: the render carries %d colour(s) the source does not: %s"
+              % (len(gained_cols), ", ".join("#%06X" % c for c in gained_cols)))
     checks["13_text_colours"] = (len(s_col_set), kept_cols,
-                                 len(s_col_set) == 0 or kept_cols == len(s_col_set))
+                                 (len(s_col_set) == 0 or kept_cols == len(s_col_set))
+                                 and not gained_cols)
 
     # 14_filled_shapes: INK AREA and PLACEMENT, not a count.
     #
@@ -3414,10 +4035,75 @@ def compare(src_path, gd_path, docx_path=None):
     FILL_AREA_FLOOR = 0.80
     FILL_PLACE_PT2 = 400.0
 
+    def softmask_ink(page):
+        """The fills a page's /SMask group draws, which the page never paints.
+
+        pymupdf's get_drawings() walks INTO a luminosity soft mask's form XObject and reports
+        the mask's own rectangles as page ink. Measured on 414_transparency_softmask: the page
+        draws one `re f` (1A4D99) under /GS1, and get_drawings() returns three fills - the blue
+        bar plus 262626 and FFFFFF, which are the two `re f` of xref 7, the /SMask /G of
+        /ExtGState 6. The mask defines the bar's alpha; nothing of it reaches the page, so the
+        engine is right to write neither and 14 charged it for two lost fills plus 80,000 pt2 of
+        ink area that was never on the page.
+
+        A drawing is mask ink when its colour and its size both match a fill the mask stream
+        draws. Only pages that carry an /SMask ExtGState are scanned - one document of 211.
+        """
+        masks = []
+        doc = page.parent
+        try:
+            # One cheap lookup first: a page with no ExtGState resource cannot carry a mask.
+            if doc.xref_get_key(page.xref, "Resources/ExtGState")[0] == "null":
+                return []
+            for x in range(1, doc.xref_length()):
+                try:
+                    o = doc.xref_object(x, compressed=True)
+                except Exception:
+                    continue
+                if "/SMask" not in o or "/ExtGState" not in o:
+                    continue
+                m = re.search(r"/SMask\s*<<[^>]*?/G\s+(\d+)\s+0\s+R", o)
+                if not m:
+                    continue
+                form = int(m.group(1))
+                try:
+                    stream = doc.xref_stream(form).decode("latin-1", "replace")
+                except Exception:
+                    continue
+                colours, sizes = set(), set()
+                for cm in re.finditer(r"([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+rg", stream):
+                    colours.add(tuple(round(float(cm.group(i)) * 255) for i in (1, 2, 3)))
+                for rm in re.finditer(r"([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+re", stream):
+                    sizes.add((round(float(rm.group(3)), 1), round(float(rm.group(4)), 1)))
+                masks.append((colours, sizes))
+        except Exception:
+            return []
+        if not masks:
+            return []
+        out = []
+        for d in page.get_drawings():
+            f = d.get("fill")
+            if f is None:
+                continue
+            rgb = tuple(round(c * 255) for c in f[:3])
+            r = d["rect"]
+            size = (round(r.width, 1), round(r.height, 1))
+            hit = False
+            for colset, szset in masks:
+                if size not in szset:
+                    continue
+                if any(all(abs(a - b) <= 2 for a, b in zip(rgb, col)) for col in colset):
+                    hit = True
+                    break
+            if hit:
+                out.append(r)
+        return out
+
     def fill_boxes(page):
         """Every drawing that PAINTS a fill, with its rect. Any size - the floor does the
         cutting, and it does it in the placement clause only."""
         out = []
+        skip = softmask_ink(page)
         for d in page.get_drawings():
             if d.get("fill") is None:
                 continue
@@ -3425,6 +4111,8 @@ def compare(src_path, gd_path, docx_path=None):
                 continue
             r = d["rect"]
             if r.width <= 0 or r.height <= 0:
+                continue
+            if any(r == q for q in skip):
                 continue
             out.append(r)
         return out
@@ -3686,6 +4374,8 @@ def compare(src_path, gd_path, docx_path=None):
         piece = dict(g_runs[j])
         piece["x"] = round(px, 2)
         piece["x1"] = round(px1, 2)
+        piece["xink"] = round(px, 2)
+        piece["x1ink"] = round(px1, 2)
         piece_of[i] = piece
 
     for i, r in enumerate(s_runs):

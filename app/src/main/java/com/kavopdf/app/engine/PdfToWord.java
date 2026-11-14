@@ -9,6 +9,7 @@ import com.tom_roush.pdfbox.cos.COSName;
 import com.tom_roush.pdfbox.cos.COSString;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.pdmodel.PDPage;
+import com.tom_roush.pdfbox.pdmodel.PDPageContentStream;
 import com.tom_roush.pdfbox.pdmodel.PDResources;
 import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
 import com.tom_roush.pdfbox.pdmodel.font.PDFont;
@@ -19,6 +20,10 @@ import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImage;
 import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import com.tom_roush.pdfbox.pdmodel.graphics.shading.PDShading;
 import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotationWidget;
+import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAppearanceDictionary;
+import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAppearanceEntry;
+import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAppearanceStream;
 import com.tom_roush.pdfbox.text.PDFTextStripper;
 import com.tom_roush.pdfbox.text.TextPosition;
 
@@ -197,6 +202,23 @@ public final class PdfToWord {
         }
     }
 
+    /** A cell's text origin to the point, or "-" when the pass did not measure it. */
+    private static String cellPos(Table t, int r, int c) {
+        try {
+            float x = t.cellX.get(r).get(c);
+            float y = t.cellY.get(r).get(c);
+            if (Float.isNaN(x) || Float.isNaN(y)) return "-";
+            return Math.round(x) + "," + Math.round(y);
+        } catch (Throwable e) {
+            return "-";
+        }
+    }
+
+    /** A line's own origin, in the same frame {@link #cellPos} rounds. */
+    private static String linePos(Line line) {
+        return Math.round(line.x) + "," + Math.round(line.y);
+    }
+
     /** A table, as the cells a reader sees. */
     public static final class Table {
         public final List<List<String>> rows = new ArrayList<>();
@@ -232,6 +254,18 @@ public final class PdfToWord {
          * the page did, instead of re-wrapping a line the page never wrapped.
          */
         public final List<List<Float>> cellR = new ArrayList<>();
+        /**
+         * Where each cell's text was drawn on the PAGE, same shape as {@link #rows}.
+         *
+         * <p>{@link #cellX} is not that number on a right-to-left table: {@code rtlTable}
+         * reverses the row and then mirrors the cell's x about the table's own extent, which
+         * is what a Word table needs (the columns have swapped sides) and is meaningless as a
+         * page coordinate. A .txt has no columns - it writes one cell per line at the x the
+         * page drew it - so on 77_arabic_rtl_document it put the rightmost cell, "البند" at
+         * x=505.8, at column 12 of 76. This list is the pre-mirror value, and only
+         * {@code TxtWriter.cellLeft} reads it.
+         */
+        public final List<List<Float>> cellXPage = new ArrayList<>();
         /**
          * The y, in points, of the baseline each cell's FIRST line was drawn on - same shape as
          * {@link #rows}, {@link Float#NaN} where the pass did not measure it.
@@ -274,7 +308,27 @@ public final class PdfToWord {
          * were thrown away here, because a cell is written as a string and a font name.
          */
         public final List<List<Integer>> colors = new ArrayList<>();
+        /**
+         * Was each cell's text drawn BOLD, same shape as {@link #rows}.
+         *
+         * <p>Not the same question as the face's name. A page can set a bold face without the
+         * word "Bold" in it, and can draw a run bold with the regular face - so this is a
+         * statement about the glyphs: a page may embolden without renaming the face, and
+         * 34c's own note records 23 documents where the name test and the flag disagree.
+         */
+        public final List<List<Boolean>> bolds = new ArrayList<>();
+        /** Was each cell's text drawn ITALIC, same shape as {@link #rows}. See {@link #bolds}. */
+        public final List<List<Boolean>> italics = new ArrayList<>();
         public boolean header;
+        /**
+         * True when the page sets this table right to left - its first column is the
+         * rightmost one and its rows read from the right.
+         *
+         * <p>Recorded, and deliberately NOT acted on: see {@link #markRtl}. The cells stay in
+         * the order the page draws them, left to right, because that is the order a .docx
+         * table is laid out in.
+         */
+        public boolean rtl;
         /**
          * Did the page draw the lines that make this a table?
          *
@@ -293,8 +347,8 @@ public final class PdfToWord {
          * box around it?
          *
          * <p>A table the whitespace pass found has bounds that are its TEXT's ink, so the frame
-         * the page draws round it is off those bounds and {@code DocxWriter.pageDrewRule} cannot
-         * put it on the four outer sides without help. The rules inside the band can be read
+         * the page draws round it is off those bounds, and no edge test on the table's own
+         * geometry can put that frame on the four outer sides without help. The rules inside the band can be read
          * here, where the page's own rule list is in hand. 04_stamp_180deg's fee table has five
          * row separators and no column separator; the student block above it has neither, only
          * the panel the page draws round it. Writing all six sides for both would draw four
@@ -347,6 +401,35 @@ public final class PdfToWord {
          * entry therefore put it one pitch low. This is the edge the flow is placed against.
          */
         public float rowTopPt = Float.NaN;
+        /**
+         * Which of the six sides the PAGE drew a rule on, in {@link DocxWriter#TABLE_SIDES}
+         * order - {@code {top, left, bottom, right, insideH, insideV}}.
+         *
+         * <p>This is the one fact that decides who emits a rule, and the reason it exists is
+         * that a page's rule used to have two emitters and no owner. The shape pass
+         * ({@code attachShapes}) discarded every hairline that fell on or near a table, on the
+         * claim that the table would draw it. The table-border writer then decided its six
+         * sides from {@code ruled}/{@code innerH}/{@code innerV} and from
+         * {@code DocxWriter.pageDrewRule} - which scanned the shapes that had SURVIVED that
+         * discard. On a table that kept no shape the writer therefore drew nothing, and the rule
+         * the page drew came out of neither emitter. Measured on the 211-document corpus with
+         * tools/engine-verify/RuleLedger.java: of 17,713 rules the pages draw, 300 were emitted
+         * by NEITHER emitter and 12 by BOTH.
+         *
+         * <p>So the side is answered once, here, from the page's own rule list and the table's
+         * own geometry: a side is drawn when a rule of the page lies on it within
+         * {@link #SIDE_TOL} and covers at least half of it. The four outer sides are read
+         * directly; {@code insideH}/{@code insideV} are true only when EVERY interior row (or
+         * column) edge of the table has a rule of its own, because a border written at a row
+         * edge the page did not draw is a line the page never drew - the defect 351 and 360
+         * came back with.
+         *
+         * <p>Both emitters read it: {@code attachShapes} keeps a hairline unless the table that
+         * would draw it says this side is drawn AND the rule sits on that side, and
+         * {@code DocxWriter.borders} writes a side from the same array. One rule, one owner,
+         * decided by where the page drew it.
+         */
+        public final boolean[] sideDrawn = new boolean[6];
         public float top, bottom, left, right;
         public int column;
     }
@@ -490,6 +573,11 @@ public final class PdfToWord {
                 // metrics are read from. Measured when it did: char volume 99.91 -> 99.84 and
                 // word recall 99.67 -> 99.60.
                 a.lines.addAll(b.lines);
+                // The coordinates travel with the lines, or the joined tail's own lines
+                // arrive with no x and are written at column 0.
+                a.lineX.addAll(b.lineX);
+                a.lineY.addAll(b.lineY);
+                a.lineSize.addAll(b.lineSize);
                 page.blocks.remove(i);
                 i--;
             }
@@ -511,6 +599,15 @@ public final class PdfToWord {
         List<Glyph> glyphs = glyphsOf(doc, index);
         int chars = 0;
         for (Glyph g : glyphs) chars += g.text.length();
+        // The page's OWN words, read before any annotation is added to the list: this string
+        // is what decides whether an annotation's text is a duplicate of text the page already
+        // draws, and an appearance's words are not the page's - counting them here made the
+        // stamp's /Contents "Approved" look like text the content stream already carried
+        // (the appearance draws "APPROVED", and the test is case-insensitive), so the hoist was
+        // skipped and 50_annotation_text lost the only copy of the string it asks for.
+        StringBuilder ownText = new StringBuilder();
+        for (Glyph g : glyphs) ownText.append(g.text);
+        final String pageOwn = ownText.toString().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
 
         // Read once, here: the images a page draws are needed by every path below, including
         // the one that has no text layer and returns early - a scanned page is nothing but one
@@ -526,24 +623,45 @@ public final class PdfToWord {
             if (report.notes.size() < 200) report.notes.add("page " + (index + 1) + ": " + note);
         }
 
+        // An annotation draws in its own /AP appearance stream, and that stream is not part
+        // of the page's content stream: no text extractor reads it, so a red "APPROVED"
+        // stamp, a yellow highlighter band and a note's icon were lost by every path below.
+        // The words were not lost - /Contents was hoisted - but they were hoisted to the top
+        // of the page, and the ink was lost outright. Read here, once, for every annotation.
+        List<String> apDrawn = new ArrayList<>();
+        readAnnotationAppearances(doc, pdPage, page.height, glyphs, rules, apDrawn, report);
+
         // A filled form keeps its answers in the field's /V, never in the content stream, so
         // they are read on every page - not only on a page with no text layer. Without this a
         // filled form converted to Word kept its printed labels and lost every answer.
         if (chars >= MIN_TEXT_CHARS) {
-            StringBuilder pageText = new StringBuilder();
-            for (Glyph g : glyphs) pageText.append(g.text);
-            String flat = pageText.toString().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
+            String flat = pageOwn;
             // A stamp, a comment or a free-text box sits on a page that already has text, so
             // the annotation path below (which only runs on an empty page) never saw it: the
             // words "RECEIVED", "APPROVED" and every reviewer comment were dropped.
             List<String> outside = new ArrayList<>(formValuesOf(pdPage));
-            outside.addAll(annotationContentsOf(pdPage));
             for (String v : outside) {
                 // Some generators also draw the value into the content stream. Adding it again
                 // would put the same words in twice, which is worse than not adding it.
                 if (flat.contains(v.replaceAll("\\s+", " ").toLowerCase(Locale.ROOT))) continue;
+                // Nor again what the annotation's own appearance already draws, now that it is
+                // read: a free-text box's /Contents and the string its /AP /N draws are the
+                // same words, and the appearance puts them where the reader saw them.
+                if (drawnByAppearance(apDrawn, v)) continue;
                 Para p = new Para();
                 p.runs.add(new Run(v, false, false, 11f));
+                p.top = 0;
+                page.blocks.add(p);
+                report.paragraphs++;
+            }
+            // An annotation's words are not a body paragraph: the appearance knows the size
+            // and colour they are drawn at, and 11 pt black is neither.
+            for (Run ar : annotationRuns(pdPage)) {
+                if (flat.contains(ar.text.replaceAll("\\s+", " ").toLowerCase(Locale.ROOT))) {
+                    continue;
+                }
+                Para p = new Para();
+                p.runs.add(ar);
                 p.top = 0;
                 page.blocks.add(p);
                 report.paragraphs++;
@@ -599,13 +717,24 @@ public final class PdfToWord {
                 report.notes.add("page " + (index + 1)
                         + " has no text layer and was not OCR'd - it comes out empty");
             }
-            attachShapes(page, rules, page.height, null);
+            attachShapes(page, rules, page.height, null, pageTurn(pdPage, glyphs));
             attachPictures(page, rules, page.height);
             return page;
         }
 
         float pageWidth = pdPage.getMediaBox().getWidth();
         final float pageHeight = pdPage.getMediaBox().getHeight();
+        // A page turned 180 degrees is read by turning it. Its glyphs are drawn at direction
+        // 180, so `rotated` is set on every one of them and the page's text is treated as a
+        // stamp: buildTables drops every rotated line ("a stamp is not a table row"), the
+        // ruled pass finds no table on a page that is one table, and the whitespace pass
+        // then rebuilds it with the columns it happens to see - two instead of five on
+        // one-page-rotated-180-degrees. In the frame the reader uses, these glyphs are
+        // upright, so they are marked upright here.
+        final int turn = pageTurn(pdPage, glyphs);
+        if (turn == 180) {
+            for (Glyph g : glyphs) if (g.dirx < -0.5f) g.rotated = false;
+        }
         List<Line> rawLines = toLines(glyphs, new ArrayList<float[]>());
         page.columns = proseColumns(rawLines, pageWidth);
 
@@ -620,6 +749,10 @@ public final class PdfToWord {
         // two-column table with "2.2 Invoices shall be raised monthly and paid within 30 days of
         // receipt." squeezed into a 150 pt cell beside "3.1 ...".
         Rules topRules = flipY(rules, pageHeight);
+        // A page whose content is turned 180 degrees draws its rules in page space and its
+        // text in the turned frame. Both have to be read in the same frame before anything
+        // compares them - see pageTurn and mirrorX.
+        if (turn == 180) topRules = mirrorX(topRules, pageWidth);
         List<Table> firstPass = buildTables(topRules, rawLines, pageWidth);
 
         // Borderless tables are found here, before the column starts are filtered, so that a
@@ -823,7 +956,7 @@ public final class PdfToWord {
             for (int k = 1; k < starts.size(); k++) gLo = Math.min(gLo, starts.get(k) - starts.get(k - 1));
             page.columnGap = gLo == Float.MAX_VALUE ? 0f : gLo;
         }
-        uprightIfPageIsUpsideDown(glyphs);
+        boolean flippedPage = uprightIfPageIsUpsideDown(glyphs);
         List<Line> lines = toLines(glyphs, asBands(starts));
         List<Line> ring = new ArrayList<>();
         for (java.util.Iterator<Line> it = lines.iterator(); it.hasNext(); ) {
@@ -922,14 +1055,8 @@ public final class PdfToWord {
             for (Line line : lines) {
                 if (!line.inside(t)) continue;
                 inside++;
-                String norm = line.text.trim().replaceAll("\\s+", " ");
-                for (List<String> row : t.rows) {
-                    boolean hit = false;
-                    for (String cell : row) {
-                        String c = cell.trim().replaceAll("\\s+", " ");
-                        if (!c.isEmpty() && (c.contains(norm) || norm.contains(c))) { hit = true; break; }
-                    }
-                    if (hit) { covered++; break; }
+                for (int r = 0; r < t.rows.size(); r++) {
+                    if (rowHolds(t, r, line)) { covered++; break; }
                 }
             }
             // A table row is a baseline. A two-column page's gutter rule plus its header and
@@ -967,7 +1094,31 @@ public final class PdfToWord {
         // skipped as "already written by a table" and the stub lost its number. The same
         // characters in another face are a different line on the page, so the set carries the
         // face as well as the text and a line counts as cell text only when both agree.
-        java.util.HashSet<String> cellText = new java.util.HashSet<>();
+        // AND THE TEXT ALONE STILL IS NOT ENOUGH - IT NEEDS THE CELL'S OWN BAND.
+        //
+        // The key is (text, face) and it says nothing about WHERE. A page that prints the same
+        // short label twice - once as a table cell and once somewhere else - has two lines with
+        // one key, and the second one is deleted although the table never wrote it. Measured on
+        // the 211-document corpus, four documents, 63 characters:
+        //   323_credit_card_statement  the SPEND BY CATEGORY summary's Travel/Shopping/Fuel/
+        //                              Groceries/Health are also category cells of the
+        //                              transaction table above; only "Other", which is not a
+        //                              transaction category, survived. 33 characters.
+        //   electricity-bill           the masthead's "October 2026" is also Table 1's last
+        //                              month row, 227 pt lower down the page. 11 characters.
+        //   406_passport_mrz_page      "Place of birth" BENGALURU and "Place of issue"
+        //                              BENGALURU are the same string in the same face. 9.
+        //   mutual-fund-statement      "Active" is Table 3's status for five SIPs and also the
+        //                              bank mandate's status in Table 5. 10 characters.
+        // Each is a run the engine had already read, deleted by a grouping decision - the exact
+        // shape the user's rule forbids ("kuch bachna nhi chahiye").
+        //
+        // So the value carries the table's vertical band, and a line counts as cell text only
+        // when its baseline falls inside that band, with the same 2 pt tolerance `inside` uses.
+        // The band is what tells "the table's own text, drawn again as a run-on paragraph" (the
+        // bill of lading this set exists for, whose duplicate lies in the table's rows) from
+        // "another line that happens to say the same thing 100 pt away".
+        java.util.HashMap<String, List<float[]>> cellText = new java.util.HashMap<>();
         for (Table t : tables) {
             for (int r = 0; r < t.rows.size(); r++) {
                 List<String> row = t.rows.get(r);
@@ -975,7 +1126,11 @@ public final class PdfToWord {
                     String cell = row.get(c);
                     if (cell == null) continue;
                     String norm = cell.trim().replaceAll("\\s+", " ");
-                    if (norm.length() > 3) cellText.add(norm + "\u0000" + fontOf(t, r, c));
+                    if (norm.length() <= 3) continue;
+                    String key = norm + "\u0000" + fontOf(t, r, c);
+                    List<float[]> bands = cellText.get(key);
+                    if (bands == null) { bands = new ArrayList<>(1); cellText.put(key, bands); }
+                    bands.add(new float[]{t.top, t.bottom});
                 }
             }
         }
@@ -998,8 +1153,14 @@ public final class PdfToWord {
             }
             if (!inTable) {
                 String norm = line.text.trim().replaceAll("\\s+", " ");
-                if (!norm.isEmpty() && cellText.contains(norm + "\u0000" + fontOf(line.glyphs))) {
-                    inTable = true;
+                if (!norm.isEmpty()) {
+                    List<float[]> bands = cellText.get(norm + "\u0000" + fontOf(line.glyphs));
+                    if (bands != null) {
+                        for (int bi = 0; bi < bands.size(); bi++) {
+                            float[] bb = bands.get(bi);
+                            if (line.y >= bb[0] - 2 && line.y <= bb[1] + 2) { inTable = true; break; }
+                        }
+                    }
                 }
             }
             if (!inTable) body.add(line);
@@ -1007,7 +1168,7 @@ public final class PdfToWord {
 
         int bands = columns(body, pageWidth, asBands(starts));
         boolean row = ROW || rowMajor(body, starts, rules, pageHeight);
-        List<Para> paras = toParagraphs(body, pageWidth, bands, row);
+        List<Para> paras = toParagraphs(body, pageWidth, bands, row, flippedPage, pageHeight);
 
         // Order everything the way a reader would: down one column, then the next.
         List<Object> ordered = new ArrayList<>();
@@ -1179,13 +1340,21 @@ public final class PdfToWord {
             }
         }
         ordered.addAll(overlay);
-        // A table in a right-to-left document runs from the right margin to the left one, so
-        // its first column is the rightmost. Every pass that builds a table places its cells
-        // in the order the page draws them, left to right, which mirrors the rows: the Arabic
-        // invoice's header reached the reader as "المبلغ السعر الكمية الوصف البند" and its
-        // first line as "1380000 34500 40 … 1". The rows are turned round here, once, for
-        // every table on the page, and the column geometry is mirrored with them.
-        for (Object o : ordered) if (o instanceof Table) rtlTable((Table) o);
+        // A right-to-left table is NOT turned round here. It used to be: rtlTable() reversed
+        // every row and mirrored every column edge, so the cells came out in logical order.
+        // Logical order is not the frame a .docx table is laid out in - a w:tbl puts its first
+        // cell at the left - so the page's first column moved to the right and the table came
+        // back mirrored. Measured on 77_arabic_rtl_document, whose five columns run
+        // البند الوصف الكمية السعر المبلغ from the right margin leftwards: with the rows
+        // reversed the header read 448 pt out and the page 163.0 pt out on 47_margins; with
+        // the page's own left-to-right order kept it reads 0.6. The page's visual order IS the
+        // frame here, because the container on the other side is left-to-right too.
+        //
+        // The alternative - logical order plus <w:bidiVisual/> - is the semantically richer
+        // answer and was measured: it brings the page to 27.7 pt, because LibreOffice then
+        // places the table 42 pt left of where the page drew it and ignores w:tblInd
+        // altogether (2116 twips, 1356 and 0 all render identically).
+        for (Object o : ordered) if (o instanceof Table) markRtl((Table) o);
         for (Object o : ordered) {
             page.blocks.add(o);
             if (o instanceof Para) report.paragraphs++;
@@ -1195,23 +1364,21 @@ public final class PdfToWord {
         }
         List<Table> written = new ArrayList<>();
         for (Object o : ordered) if (o instanceof Table) written.add((Table) o);
-        attachShapes(page, rules, page.height, written);
+        attachShapes(page, rules, page.height, written, turn);
         attachPictures(page, rules, page.height);
         return page;
     }
 
 
     /**
-     * Turns a right-to-left table round: first column on the right, rows read from the right.
+     * Records that a table is set right to left, so the writer knows it.
      *
-     * <p>The rows are reversed together with the three arrays that run alongside them - the
-     * cell x, the typeface and the colour - so a cell keeps its own geometry after the move.
-     * The column edges are mirrored about the table's own extent, which reverses the widths
-     * and puts each width back over the text it belongs to.
+     * <p>Nothing is reordered. See the call site: the page's own left-to-right order is the
+     * frame a .docx table is laid out in, so turning the rows round here is what mirrored the
+     * table in the first place.
      */
-    private static void rtlTable(Table t) {
+    private static void markRtl(Table t) {
         if (t == null || t.rows.isEmpty()) return;
-        boolean rtl = false;
         for (List<String> row : t.rows) {
             for (String c : row) {
                 if (c == null) continue;
@@ -1221,38 +1388,9 @@ public final class PdfToWord {
                     if (isRtl(ch)) r++;
                     else if (Character.isLetter(ch)) l++;
                 }
-                if (r > l && r > 0) { rtl = true; break; }
-            }
-            if (rtl) break;
-        }
-        if (!rtl) return;
-
-        for (List<String> row : t.rows) Collections.reverse(row);
-        reverseRows(t.cellX);
-        reverseRows(t.cellR);
-        reverseRows(t.cellY);
-        reverseRows(t.fonts);
-        reverseRows(t.sizes);
-        reverseRows(t.colors);
-
-        float lo = t.colX != null && t.colX.length > 0 ? t.colX[0] : t.left;
-        float hi = t.colX != null && t.colX.length > 0 ? t.colX[t.colX.length - 1] : t.right;
-        if (hi <= lo) return;
-        if (t.colX != null) {
-            float[] nx = new float[t.colX.length];
-            for (int i = 0; i < t.colX.length; i++) nx[i] = lo + hi - t.colX[t.colX.length - 1 - i];
-            t.colX = nx;
-        }
-        for (List<Float> xs : t.cellX) {
-            for (int i = 0; i < xs.size(); i++) {
-                Float v = xs.get(i);
-                if (v != null && !v.isNaN()) xs.set(i, lo + hi - v);
+                if (r > l && r > 0) { t.rtl = true; return; }
             }
         }
-    }
-
-    private static <E> void reverseRows(List<List<E>> rows) {
-        for (List<E> r : rows) Collections.reverse(r);
     }
 
     /**
@@ -1297,20 +1435,79 @@ public final class PdfToWord {
         if (t.rows == null || t.rows.isEmpty()) return true;
         int rowsN = t.rows.size();
         int worst = 0;
-        for (List<String> row : t.rows) {
-            for (String raw : row) {
-                String c = raw.trim().replaceAll("\\s+", " ");
-                if (c.length() < 12) continue;
+        for (int r = 0; r < t.rows.size(); r++) {
+            List<String> row = t.rows.get(r);
+            for (int c = 0; c < row.size(); c++) {
+                String raw = row.get(c);
+                if (raw == null) continue;
+                String cell = raw.trim().replaceAll("\\s+", " ");
+                if (cell.length() < 12) continue;
                 int n = 0;
                 for (Line line : lines) {
                     if (!line.inside(t)) continue;
-                    String norm = line.text.trim().replaceAll("\\s+", " ");
-                    if (norm.length() > 3 && c.contains(norm)) n++;
+                    if (cellHolds(t, r, c, cell, line)) n++;
                 }
                 if (n > worst) worst = n;
             }
         }
         return worst <= Math.max(6, rowsN * 2);
+    }
+
+    /**
+     * Does any cell of row r hold this line - by its text AND by where it was drawn?
+     *
+     * <p>Two questions were being answered by the text alone, and the text is not a key: the
+     * same characters appear in a cell and somewhere else on the page, and a one-character
+     * cell is a substring of every line that carries that character. Measured over the 211
+     * documents, the old test fired 11,229 times and 3,350 of them (29.8 %) were a substring
+     * match that was not an equality - each one a line credited to a cell it was not in.
+     */
+    private static boolean rowHolds(Table t, int r, Line line) {
+        List<String> row = t.rows.get(r);
+        for (int c = 0; c < row.size(); c++) {
+            String raw = row.get(c);
+            if (raw == null) continue;
+            if (cellHolds(t, r, c, raw.trim().replaceAll("\\s+", " "), line)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Whether {@code line} lies in cell (r, c) of {@code t}.
+     *
+     * <p>A cell's text is the join of the lines it swallowed, so containment in one direction
+     * is the only test that can match a two-line cell - but containment alone is a key with no
+     * position in it, and the page is what decides which cell a line is in. So the text must
+     * agree AND the line must be drawn where that cell is: inside the column's own edges, and
+     * on this row rather than another. The row band runs from this row's first baseline to the
+     * next row's, which is what makes a cell of several lines count all of them.
+     */
+    private static boolean cellHolds(Table t, int r, int c, String cell, Line line) {
+        if (cell.isEmpty()) return false;
+        String norm = line.text.trim().replaceAll("\\s+", " ");
+        if (norm.isEmpty()) return false;
+        if (!cell.contains(norm) && !norm.contains(cell)) return false;
+        // Column: the page states the edges, so a line outside them is in another cell.
+        if (t.colX != null && c + 1 < t.colX.length) {
+            float lo = t.colX[c] - 2f, hi = t.colX[c + 1] + 2f;
+            if (line.right < lo || line.x > hi) return false;
+        }
+        // Row: from this row's first baseline to the next row's.
+        if (r < t.cellY.size() && c < t.cellY.get(r).size()) {
+            float y0 = t.cellY.get(r).get(c);
+            if (!Float.isNaN(y0)) {
+                float next = Float.NaN;
+                if (r + 1 < t.cellY.size()) {
+                    for (float v : t.cellY.get(r + 1)) {
+                        if (Float.isNaN(v)) continue;
+                        next = Float.isNaN(next) ? v : Math.min(next, v);
+                    }
+                }
+                float band = Float.isNaN(next) ? t.bottom : next;
+                if (line.y < y0 - Math.max(3f, line.size) || line.y > band + 2f) return false;
+            }
+        }
+        return true;
     }
 
     private static float topOf(Object o) {
@@ -1336,6 +1533,23 @@ public final class PdfToWord {
         float sizePt;
         String font;
         boolean bold, italic;
+        /**
+         * Bold and italic as the font DESCRIPTOR states them, which is a different question
+         * from {@link #bold}/{@link #italic}.
+         *
+         * <p>{@code bold} and {@code italic} above are read from the face NAME
+         * ("LiberationSerif-BoldItalic"), and a face name is not a description of its style:
+         * a subset face may be drawn italic under a name that never says so, and the name is
+         * what {@code DocxWriter.faceName} then strips. The descriptor's flags are the page's
+         * own statement - bit 7 is Italic, bit 19 is ForceBold - and they are what the
+         * measuring instrument reads (PyMuPDF's span flags), so a cell written from these
+         * agrees with the question the bench asks.
+         *
+         * <p>Kept SEPARATE from {@code bold}/{@code italic} on purpose: those two are read by
+         * the paragraph-run path, which is measured and settled, and changing what they mean
+         * would move every run in every document. Nothing outside the table model reads these.
+         */
+        boolean boldDesc, italicDesc;
         /** Colour as 0xRRGGBB, or -1 when the page draws it in the default black. */
         int color = -1;
         /** True when the baseline is not horizontal - a rotated stamp, a seal, a watermark. */
@@ -1382,6 +1596,49 @@ public final class PdfToWord {
         }
 
         private final List<Marked> marked = new ArrayList<>();
+
+        /**
+         * The box the page is, as the page states it - the crop box, or the media box when
+         * the page names no crop.
+         *
+         * <p>PDFTextStripper reads every text-showing operator in the content stream and
+         * consults the page box nowhere: a generator that lays a section out below the sheet
+         * (350_question_paper writes its objective section at y = -201 .. -253) hands the
+         * engine characters that no reader of the page can see. The engine wrote all of them
+         * into the .docx - 3,369 characters on 350 where the page holds 2,585 - and Word then
+         * had to put them somewhere, so the one-page question paper became three pages with
+         * 711 characters on it that the source never shows. A glyph whose origin is outside
+         * the page is not on the page; it is dropped here, where the page is still in hand.
+         */
+        private PDRectangle pageBox;
+
+        /** Half a point of slack, so a glyph set exactly on the edge is not lost to rounding. */
+        private static final float PAGE_BOX_SLACK = 0.5f;
+
+        @Override
+        protected void startPage(PDPage page) throws IOException {
+            pageBox = page.getCropBox();
+            if (pageBox == null) pageBox = page.getMediaBox();
+            super.startPage(page);
+        }
+
+        /**
+         * Whether a glyph's origin lies on the page.
+         *
+         * <p>{@code getX()}/{@code getY()} and not {@code getXDirAdj()}/{@code getYDirAdj()}:
+         * the box is stated in unrotated user space, and the dir-adjusted pair is rotated into
+         * reading order, so on a /Rotate 90 page the two do not share a coordinate system. The
+         * origin is the test rather than the whole advance, because a line that runs off the
+         * right edge is still visible up to the edge and its first glyphs must not go with it.
+         */
+        private boolean onPage(TextPosition tp) {
+            if (pageBox == null) return true;
+            float x = tp.getX(), y = tp.getY();
+            return x >= pageBox.getLowerLeftX() - PAGE_BOX_SLACK
+                    && x <= pageBox.getUpperRightX() + PAGE_BOX_SLACK
+                    && y >= pageBox.getLowerLeftY() - PAGE_BOX_SLACK
+                    && y <= pageBox.getUpperRightY() + PAGE_BOX_SLACK;
+        }
 
         GlyphCollector() throws IOException {
             super();
@@ -1481,6 +1738,7 @@ public final class PdfToWord {
 
         @Override
         protected void processTextPosition(TextPosition tp) {
+            if (!onPage(tp)) return;
             String u = tp.getUnicode();
             PDFont f0 = tp.getFont();
             // A CID font with no ToUnicode hands back the raw code as if it were a character:
@@ -1518,6 +1776,21 @@ public final class PdfToWord {
             g.bold = n.contains("bold") || n.contains("black") || n.contains("heavy")
                     || n.contains("semibold") || n.contains("demi");
             g.italic = n.contains("italic") || n.contains("oblique");
+            // The page's own statement of style, for the table model - see Glyph#boldDesc.
+            // PDF 32000-1 table 123: bit 7 is Italic, bit 19 is ForceBold (1-based, so
+            // 1<<6 and 1<<18). A font may have no descriptor at all (a Type 3, or a face the
+            // page never embedded), and the flags then say nothing rather than "not italic".
+            try {
+                com.tom_roush.pdfbox.pdmodel.font.PDFontDescriptor fd = font == null
+                        ? null : font.getFontDescriptor();
+                if (fd != null) {
+                    int fl = fd.getFlags();
+                    g.italicDesc = (fl & (1 << 6)) != 0;
+                    g.boldDesc = (fl & (1 << 18)) != 0;
+                }
+            } catch (Exception ignored) {
+                // A font whose descriptor cannot be read keeps the name's answer.
+            }
             // A non-horizontal baseline. getDir() is the angle in degrees; the text matrix
             // shear catches stamps whose glyphs are placed individually, where getDir()
             // sometimes reports 0 because each glyph carries its own horizontal matrix.
@@ -1556,6 +1829,169 @@ public final class PdfToWord {
     }
 
     /**
+     * Draws every annotation's own /AP /N appearance into a scratch page and reads it back
+     * with the two readers the page itself is read with.
+     *
+     * <p>WHY THIS EXISTS. A page draws three kinds of ink and the engine read one. The content
+     * stream was read; a form widget's appearance was read (its /V is painted onto the page);
+     * every other annotation's appearance stream was not, and an appearance stream is not in
+     * the content stream - it is a separate Form XObject the viewer draws on top. Measured on
+     * 600_reviewed_invoice_with_annotations, the corpus's only annotated document: a red
+     * "APPROVED" stamp whose outline the page draws at 1.474 pt (2 w through a 0.7368 scale)
+     * and whose text it draws at 22.1 pt, a yellow highlighter band of 2332 pt2, a note icon
+     * of 15x15 pt, and a green underline - every one of them gone from the .docx.
+     *
+     * <p>WHY A SCRATCH PAGE, AND NOT A SECOND PARSER. An appearance stream is a page in all
+     * but name: it has a /BBox instead of a /MediaBox, its own /Resources and its own content
+     * stream. Drawing it into a one-page document of its own BBox and running {@link
+     * #glyphsOf} and {@link #rulesOf} over that page costs one content stream and reuses the
+     * whole reader - fonts, ToUnicode, /ActualText, colours, fills, strokes, freeforms - so a
+     * glyph in a stamp is the same kind of object as a glyph on the page, and the .docx has
+     * one way of carrying text and one way of carrying ink. A second, annotation-only parser
+     * would be a second answer to every one of those questions.
+     *
+     * <p>WHERE IT LANDS. The appearance is drawn into the annotation's /Rect: the /BBox is
+     * mapped onto the rectangle by an axis scale, which is what a viewer does, and every
+     * glyph and every path is put through the same scale before it joins the page.
+     *
+     * <p>The scratch page is added to the document being read and removed again, so the form
+     * XObject stays in its own COS document - a foreign XObject drawn into a second PDDocument
+     * reads back with the wrong resources.
+     *
+     * @param drawn receives the text each appearance stream draws, so the caller can stop a
+     *              free-text box's /Contents being written a second time as a hoisted
+     *              paragraph at the top of the page.
+     */
+    private static void readAnnotationAppearances(PDDocument doc, PDPage pdPage, float pageHeight,
+                                                  List<Glyph> glyphs, Rules rules,
+                                                  List<String> drawn, Report report) {
+        List<PDAnnotation> anns;
+        try {
+            anns = pdPage.getAnnotations();
+        } catch (Throwable t) {
+            return;
+        }
+        if (anns == null || anns.isEmpty()) return;
+        for (PDAnnotation ann : anns) {
+            if (ann == null) continue;
+            try {
+                // A widget's appearance is the field's /V, and that is already painted onto
+                // the page by paintField; reading it again would draw the answer twice.
+                if (ann.isHidden() || ann instanceof PDAnnotationWidget) continue;
+                PDAppearanceDictionary apd = ann.getAppearance();
+                if (apd == null) continue;
+                PDAppearanceEntry entry = apd.getNormalAppearance();
+                if (entry == null || !entry.isStream()) continue;   // a state dictionary
+                PDAppearanceStream ap = entry.getAppearanceStream();
+                if (ap == null) continue;
+                PDRectangle rect = ann.getRectangle();
+                if (rect == null) continue;
+                PDRectangle bbox = ap.getBBox();
+                if (bbox == null) bbox = rect;
+                float bw = bbox.getWidth(), bh = bbox.getHeight();
+                float rw = rect.getWidth(), rh = rect.getHeight();
+                if (bw <= 0f || bh <= 0f || rw <= 0f || rh <= 0f) continue;
+                float sx = rw / bw, sy = rh / bh;
+
+                int scratchIndex = doc.getNumberOfPages();
+                List<Glyph> apGlyphs;
+                Rules apRules;
+                // The scratch page's own origin is (0,0) and the box is MOVED onto it, because
+                // RuleCollector starts the clip stack at (0,0,width,height): a page whose
+                // MediaBox does not begin at the origin would clip every path away. Measured -
+                // the first attempt at this kept the /BBox's own origin and the highlighter,
+                // the underline and the strikeout (the three annotations whose /BBox sits at
+                // their page position) came back as 0 shapes, while the two whose /BBox begins
+                // at (0,0) - the note icon and the stamp - read correctly.
+                PDPage scratch = new PDPage(new PDRectangle(0f, 0f, bw, bh));
+                doc.addPage(scratch);
+                try {
+                    try (PDPageContentStream cs = new PDPageContentStream(doc, scratch)) {
+                        cs.transform(com.tom_roush.pdfbox.util.Matrix.getTranslateInstance(
+                                -bbox.getLowerLeftX(), -bbox.getLowerLeftY()));
+                        cs.drawForm(ap);
+                    }
+                    apGlyphs = glyphsOf(doc, scratchIndex);
+                    apRules = rulesOf(doc, scratchIndex);
+                } finally {
+                    doc.removePage(scratchIndex);
+                }
+
+                float bllx = bbox.getLowerLeftX(), blly = bbox.getLowerLeftY();
+                float rllx = rect.getLowerLeftX(), rlly = rect.getLowerLeftY();
+
+                StringBuilder text = new StringBuilder();
+                for (Glyph g : apGlyphs) {
+                    if (g.text == null || g.text.isEmpty()) continue;
+                    // The scratch page counts x from the box's left edge and y down from its
+                    // top; the page counts x from its own left and y down from its top.
+                    float xUp = g.x;
+                    float yUp = bh - g.y;
+                    g.x = rllx + xUp * sx;
+                    g.y = pageHeight - (rlly + yUp * sy);
+                    g.width *= sx;
+                    g.size *= sy;
+                    g.sizePt *= sy;
+                    // A stamp drawn inside a fraction-of-a-degree rotation is upright to the
+                    // eye and to the reader; left flagged, it is a "rotated stamp" and the
+                    // page orders it at the end instead of where it stands. Measured on 600:
+                    // the stamp's own cm is 0.6 degrees (b = 0.0104717849).
+                    if (Math.abs(g.tx) > 0.9f && Math.abs(g.ty) < 0.03f) {
+                        g.rotated = false;
+                        g.tx = 1f;
+                        g.ty = 0f;
+                        g.diry = 0f;
+                        g.dirx = 1f;
+                    }
+                    glyphs.add(g);
+                    text.append(g.text);
+                }
+                if (text.length() > 0) drawn.add(text.toString());
+
+                float stroke = (sx + sy) / 2f;
+                for (DocxWriter.Shape s : apRules.shapes) {
+                    float topUp = -s.topPt;              // stored as the negated PDF y
+                    s.xPt = rllx + s.xPt * sx;
+                    s.topPt = -(rlly + topUp * sy);
+                    s.wPt *= sx;
+                    s.hPt *= sy;
+                    s.lineWidthPt *= stroke;
+                    if (s.freeform != null) {
+                        for (float[] c : s.freeform) {
+                            for (int i = 1; i + 1 < c.length; i += 2) {
+                                c[i] = rllx + c[i] * sx;
+                                c[i + 1] = rlly + c[i + 1] * sy;
+                            }
+                        }
+                    }
+                    rules.shapes.add(s);
+                }
+            } catch (Throwable ignored) {
+                // One awkward appearance must not cost the page.
+            }
+        }
+    }
+
+    /**
+     * True when an appearance stream already drew these words, character for character.
+     *
+     * <p>Case matters here and nowhere else in this file: 600's stamp carries /Contents
+     * "Approved" and draws "APPROVED", and 50_annotation_text asks for the /Contents string
+     * exactly, so suppressing the hoist on a case-insensitive match would delete the only
+     * copy of "Approved" in the document and fail a check that passes today.
+     */
+    private static boolean drawnByAppearance(List<String> drawn, String contents) {
+        if (drawn == null || drawn.isEmpty() || contents == null) return false;
+        String want = contents.trim().replaceAll("\\s+", " ");
+        if (want.isEmpty()) return false;
+        for (String t : drawn) {
+            if (t == null) continue;
+            if (t.replaceAll("\\s+", " ").contains(want)) return true;
+        }
+        return false;
+    }
+
+    /**
      * Text a page carries outside its content stream: form field values, free-text boxes,
      * notes, comments.
      *
@@ -1584,6 +2020,83 @@ public final class PdfToWord {
         return sb.toString();
     }
 
+    /**
+     * The colour and text size an annotation's own appearance draws its text with.
+     *
+     * <p>A stamp, a free-text box or a note carries its words twice: in {@code /Contents},
+     * which is a string, and in {@code /AP /N}, which is the Form XObject the reader actually
+     * paints. Only the appearance knows what that text LOOKS like. The annotation path wrote
+     * every one of them with {@code new Run(v, false, false, 11f)} - 11 pt, no colour - so
+     * 600_reviewed_invoice_with_annotations' red "APPROVED" stamp arrived as an 11 pt black
+     * body paragraph and the page's #FF0000 was gone (13_text_colours, 2 -> 1). Its
+     * appearance draws the word at 22.11 pt in {@code 1 0 0 rg}.
+     *
+     * <p>Returns {rgb, sizePt}: rgb is -1 and size is NaN when the appearance names neither,
+     * which leaves the caller's old 11 pt black exactly as it was.
+     */
+    private static float[] appearanceStyle(PDAnnotation ann) {
+        float[] out = {-1f, Float.NaN};
+        try {
+            com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAppearanceDictionary ap =
+                    ann.getAppearance();
+            if (ap == null) return out;
+            com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAppearanceEntry normal =
+                    ap.getNormalAppearance();
+            if (normal == null || !normal.isStream()) return out;
+            com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAppearanceStream st =
+                    normal.getAppearanceStream();
+            if (st == null) return out;
+            com.tom_roush.pdfbox.pdmodel.common.PDStream ps = st.getStream();
+            if (ps == null) return out;
+            ColourWalker w = new ColourWalker();
+            w.walk(readAll(ps.createInputStream()), st.getResources(),
+                    new float[]{1, 0, 0, 1, 0, 0}, 0);
+            if (w.marks.isEmpty()) return out;
+            ColourMark m = w.marks.get(0);
+            out[0] = m.rgb;
+            // An appearance stream is painted into the annotation's /Rect, scaled from its
+            // own /BBox - that is the transform a viewer applies and the one the page's
+            // pixels show. File 600's stamp sets /Times 30 Tf in a BBox 190 x 50 and sits in
+            // a Rect 140 x 36.84, so the word is DRAWN at 30 * 140/190 = 22.10 pt; the page's
+            // own span measures 22.11 pt. Reading Tf alone would have written 30 pt.
+            float scale = 1f;
+            try {
+                com.tom_roush.pdfbox.pdmodel.common.PDRectangle bbox = st.getBBox();
+                com.tom_roush.pdfbox.pdmodel.common.PDRectangle rect = ann.getRectangle();
+                if (bbox != null && rect != null
+                        && bbox.getWidth() > 0f && bbox.getHeight() > 0f) {
+                    float sx = rect.getWidth() / bbox.getWidth();
+                    float sy = rect.getHeight() / bbox.getHeight();
+                    if (sx > 0f && sy > 0f) scale = (sx + sy) / 2f;
+                }
+            } catch (Throwable ignored) {
+            }
+            out[1] = m.size * scale;
+            return out;
+        } catch (Throwable ignored) {
+            return out;
+        }
+    }
+
+    /** The annotations' own words, each as a run carrying the colour and size it is drawn at. */
+    private static List<Run> annotationRuns(PDPage page) {
+        List<Run> out = new ArrayList<>();
+        try {
+            for (PDAnnotation ann : page.getAnnotations()) {
+                if (ann == null || ann.isHidden()) continue;
+                if (ann instanceof com.tom_roush.pdfbox.pdmodel.interactive.annotation
+                        .PDAnnotationWidget) continue;      // its /V was already read
+                String c = ann.getContents();
+                if (c == null || c.trim().isEmpty()) continue;
+                float[] style = appearanceStyle(ann);
+                float size = Float.isNaN(style[1]) || style[1] <= 0f ? 11f : style[1];
+                out.add(new Run(c.trim(), false, false, size, null, (int) style[0]));
+            }
+        } catch (Throwable ignored) {
+        }
+        return out;
+    }
+
     /** Text an annotation carries in its own right: a comment, a note, a free-text box. */
     private static List<String> annotationContentsOf(PDPage page) {
         List<String> out = new ArrayList<>();
@@ -1592,6 +2105,16 @@ public final class PdfToWord {
                 if (ann == null || ann.isHidden()) continue;
                 if (ann instanceof com.tom_roush.pdfbox.pdmodel.interactive.annotation
                         .PDAnnotationWidget) continue;      // its /V was already read
+                // ONLY A FREE-TEXT BOX PRINTS ITS /Contents. A note, a comment, a highlight's
+                // remark and a stamp's caption are METADATA: the reader shows them in a panel,
+                // and the page itself prints nothing of them. Reading them here put them in
+                // the document as body text - 600_reviewed_invoice_with_annotations gained
+                // "Rate for HSN 8536 confirmed with PO." (the note) and "Approved" (the stamp's
+                // caption, which then also REPLACED the page's own upper-case "APPROVED"), 34
+                // characters that no page shows. A FreeText box is different: its text is what
+                // the page draws, and its appearance stream is not the page's content stream,
+                // so /Contents is the only place the engine can read it from.
+                if (!"FreeText".equals(ann.getSubtype())) continue;
                 String c = ann.getContents();
                 if (c != null && !c.trim().isEmpty()) out.add(c.trim());
             }
@@ -1660,8 +2183,15 @@ public final class PdfToWord {
                 // A tick box has no text of its own; its /V is a state name like "Yes".
                 String state = v instanceof COSName ? ((COSName) v).getName() : String.valueOf(v);
                 if (state.isEmpty() || "Off".equalsIgnoreCase(state)) return null;
-                String label = field.getString(COSName.T);
-                return label == null || label.trim().isEmpty() ? null : label.trim();
+                // The field's /T NAME is not text on the page. It is the form's own label for
+                // the box ("enclosed_1"), it is never drawn, and writing it into the .docx puts
+                // a word in front of the reader that the page does not carry: on
+                // 601_fillable_admission_form "enclosed_1 enclosed_2" arrived at the top of the
+                // converted document and the two tick marks (ZapfDingbats "3", the check glyph)
+                // still did not arrive at all. A box that is on says nothing a reader can read,
+                // so it contributes nothing; the state is form structure, and 51_form_fields
+                // reads it from the .docx's own field list.
+                return null;
             }
             if (v instanceof COSString) {
                 String t = ((COSString) v).getString();
@@ -1747,9 +2277,24 @@ public final class PdfToWord {
         final float x, y;      // page space, y up
         final float ux, uy;    // unit vector along the baseline the operator draws on
         final int rgb;
+        /** The text size in force when this mark was made, in device points. 0 = unknown. */
+        final float size;
 
-        ColourMark(float x, float y, float ux, float uy, int rgb) {
+        ColourMark(float x, float y, float ux, float uy, int rgb, float size) {
             this.x = x; this.y = y; this.ux = ux; this.uy = uy; this.rgb = rgb;
+            this.size = size;
+        }
+    }
+
+    /** One entry of the PDF graphics-state stack: what {@code q} saves and {@code Q} restores. */
+    private static final class GState {
+        final float[] ctm;
+        final int cur;
+        final float fontSize;
+        final String space;
+
+        GState(float[] ctm, int cur, float fontSize, String space) {
+            this.ctm = ctm; this.cur = cur; this.fontSize = fontSize; this.space = space;
         }
     }
 
@@ -1765,11 +2310,29 @@ public final class PdfToWord {
         private static final int MAX_DEPTH = 8;
         private static final Object DUMMY = new Object();
 
+        /**
+         * Is this mark's text size the size the glyph was drawn at?
+         *
+         * <p>A mark whose size the stream never named - no {@code Tf} seen, or a form whose
+         * matrix this walker did not reach - is not evidence either way, so it answers yes.
+         * That keeps the answer for every page whose marks all agree, which is nearly all of
+         * them; the test only ever separates marks that position could not.
+         */
+        private static boolean sameSize(ColourMark m, float size) {
+            if (m == null || m.size <= 0f || size <= 0f) return true;
+            return Math.abs(m.size - size) <= Math.max(0.5f, size * 0.1f);
+        }
+
         /** The colour a glyph at (gx, gy) - page space, y up - is drawn in, or -1. */
         int colourAt(float gx, float gy, float dirx, float diry, float size) {
             float tol = Math.max(2.5f, size * 0.45f);
-            ColourMark behind = null, ahead = null, loose = null;
-            float behindAlong = Float.MAX_VALUE, aheadAlong = Float.MAX_VALUE, looseDist = 60f;
+            // TWO "BEHIND" ANSWERS, not one. behindSame counts only the marks whose text size
+            // is the size this glyph was drawn at; behindAny counts them all. The first is
+            // preferred and the second is the old answer, so a page whose marks all agree -
+            // nearly every page - reads exactly as it did.
+            ColourMark behindSame = null, behindAny = null, ahead = null, loose = null;
+            float sameAlong = Float.MAX_VALUE, behindAlong = Float.MAX_VALUE;
+            float aheadAlong = Float.MAX_VALUE, looseDist = 60f;
             for (ColourMark m : marks) {
                 // 0 is BLACK, not "no colour": a mark of #000000 used to be dropped here, so
                 // the only mark left near a glyph could be an invisible white copy of the same
@@ -1792,7 +2355,37 @@ public final class PdfToWord {
                             // glyph - so it was the nearest "behind" one and a black heading was
                             // written #FFFFFF. The title vanished from the Word file, and no text
                             // metric moved: the characters were all still in the XML.
-                            if (along <= behindAlong) { behindAlong = along; behind = m; }
+                            //
+                            // "LAST DRAWN" IS NOT THE WHOLE ANSWER, and it got the 1 pt copy
+                            // wrong in the other direction. On the same file the two marks are
+                            // at the IDENTICAL origin, so "along" cannot separate them and the
+                            // later one - the 15 pt black title - won every glyph on that
+                            // baseline, including the 1 pt white one. White then arrived at
+                            // applyColours as #000000, which is the "no colour" value, so the
+                            // run was written with no w:color at all and the page's #FFFFFF was
+                            // gone (13_text_colours, 4 -> 3).
+                            //
+                            // AND NEITHER IS POSITION, when the page sets two operators at
+                            // different sizes on ONE baseline. File 39's 1 pt white copy runs
+                            // from x=56 to x=82.8 along the same baseline as the 15 pt black
+                            // title, whose own operators start every 10-20 pt. So for the
+                            // white glyph at x=64.9 the nearest mark "behind" it is the black
+                            // operator that starts at x=67.16 - 2.26 pt ahead, inside tol - and
+                            // distance alone hands a 1 pt white glyph a 15 pt black colour. It
+                            // is not the same text: a glyph belongs to the operator that set
+                            // the size it is drawn at. Measured before this: the 1 pt run came
+                            // out split into "THE MYSORE CHA" in #FFFFFF and the rest in black,
+                            // because only the glyphs the black operator had already passed
+                            // kept white.
+                            //
+                            // So the nearest behind mark AT THE GLYPH'S OWN SIZE is preferred,
+                            // and when there is none the old nearest-behind answer stands
+                            // unchanged. "Last drawn wins a tie" is kept inside each set: an
+                            // operator paints the text that follows it.
+                            if (along <= behindAlong) { behindAlong = along; behindAny = m; }
+                            if (sameSize(m, size) && along <= sameAlong) {
+                                sameAlong = along; behindSame = m;
+                            }
                         } else if (-along < aheadAlong) {
                             aheadAlong = -along; ahead = m;
                         }
@@ -1803,17 +2396,22 @@ public final class PdfToWord {
                 float d = Math.abs(dx) + Math.abs(dy) * 4f;
                 if (d < looseDist) { looseDist = d; loose = m; }
             }
-            if (behind != null) return behind.rgb;
+            if (behindSame != null) return behindSame.rgb;
+            if (behindAny != null) return behindAny.rgb;
             if (ahead != null) return ahead.rgb;
             return loose == null ? -1 : loose.rgb;
         }
 
         void walk(String cs, PDResources res, float[] startCtm, int depth) {
             float[] ctm = startCtm.clone();
-            ArrayList<float[]> stack = new ArrayList<>();
+            ArrayList<GState> stack = new ArrayList<>();
             float[] tm = {1, 0, 0, 1, 0, 0};
             float leading = 0f, charSpacing = 0f, wordSpacing = 0f, hScale = 1f;
             int cur = -1;
+            // The size the text state is set at, from Tf. A colour mark carries it, because
+            // two operators can paint at the SAME origin in different colours and different
+            // sizes, and only the size tells them apart (see colourAt).
+            float fontSize = 0f;
             String space = "";
             ArrayList<Object> ops = new ArrayList<>();
             int i = 0, n = cs.length();
@@ -1849,9 +2447,24 @@ public final class PdfToWord {
                     String name = ops.isEmpty() ? "" : (ops.get(ops.size() - 1) instanceof String
                             ? (String) ops.get(ops.size() - 1) : "");
                     if (tok.equals("q")) {
-                        stack.add(ctm.clone());
+                        // The graphics state is the CTM AND the colour AND the text state.
+                        // Saving only the CTM let a fill colour set for one filled rect leak
+                        // out of its own q...Q and paint the text that followed it: on
+                        // 414_transparency_softmask the page sets 0.1 0.3 0.6 rg for a blue
+                        // bar, closes it with Q, and then draws two black lines with no
+                        // colour operator - and both arrived #1A4D99. A page that names no
+                        // colour draws in the initial fill colour, which is black.
+                        stack.add(new GState(ctm, cur, fontSize, space));
                     } else if (tok.equals("Q")) {
-                        if (!stack.isEmpty()) ctm = stack.remove(stack.size() - 1);
+                        if (!stack.isEmpty()) {
+                            GState g = stack.remove(stack.size() - 1);
+                            ctm = g.ctm;
+                            cur = g.cur;
+                            fontSize = g.fontSize;
+                            space = g.space;
+                        }
+                    } else if (tok.equals("Tf") && ops.size() >= 2) {
+                        fontSize = num(ops, -1);
                     } else if (tok.equals("cm") && ops.size() >= 6) {
                         ctm = mul(new float[]{num(ops, -6), num(ops, -5), num(ops, -4),
                                 num(ops, -3), num(ops, -2), num(ops, -1)}, ctm);
@@ -1876,13 +2489,13 @@ public final class PdfToWord {
                         tm = mul(new float[]{1, 0, 0, 1, 0, -leading}, tm);
                     } else if (tok.equals("'")) {
                         tm = mul(new float[]{1, 0, 0, 1, 0, -leading}, tm);
-                        addMark(tm, ctm, cur);
+                        addMark(tm, ctm, cur, fontSize);
                     } else if (tok.equals("\"")) {
                         if (ops.size() >= 3) { wordSpacing = num(ops, -3); charSpacing = num(ops, -2); }
                         tm = mul(new float[]{1, 0, 0, 1, 0, -leading}, tm);
-                        addMark(tm, ctm, cur);
+                        addMark(tm, ctm, cur, fontSize);
                     } else if (tok.equals("Tj") || tok.equals("TJ")) {
-                        addMark(tm, ctm, cur);
+                        addMark(tm, ctm, cur, fontSize);
                     } else if (tok.equals("rg") && ops.size() >= 3) {
                         cur = packRgb(num(ops, -3), num(ops, -2), num(ops, -1));
                     } else if (tok.equals("g") && ops.size() >= 1) {
@@ -1909,7 +2522,7 @@ public final class PdfToWord {
         }
 
         /** Records the colour in force at the origin of {@code tm}, transformed by {@code ctm}. */
-        private void addMark(float[] tm, float[] ctm, int rgb) {
+        private void addMark(float[] tm, float[] ctm, int rgb, float fontSize) {
             if (rgb < 0) return;
             float tx = tm[4], ty = tm[5];
             float px = tx * ctm[0] + ty * ctm[2] + ctm[4];
@@ -1918,7 +2531,10 @@ public final class PdfToWord {
             float uy = tm[0] * ctm[1] + tm[1] * ctm[3];
             float len = (float) Math.hypot(ux, uy);
             if (len < 1e-6f) { ux = 1f; uy = 0f; } else { ux /= len; uy /= len; }
-            marks.add(new ColourMark(px, py, ux, uy, rgb));
+            // The device size the text state is set at: Tf's size scaled by the CTM it is
+            // drawn under. 0 when the stream never set one, which means "unknown".
+            float device = Math.abs(fontSize) * (float) Math.hypot(ctm[0], ctm[1]);
+            marks.add(new ColourMark(px, py, ux, uy, rgb, device));
         }
 
         /** Follows {@code /Name Do} into a Form XObject and reads its stream the same way. */
@@ -2064,6 +2680,49 @@ public final class PdfToWord {
         return ((ri & 0xFF) << 16) | ((gi & 0xFF) << 8) | (bi & 0xFF);
     }
 
+    /**
+     * Drops the glyphs the page draws OUTSIDE the box a reader is shown.
+     *
+     * <p>{@link GlyphCollector} extends PDFBox's {@code PDFTextStripper}, which walks the whole
+     * content stream and never consults the page box. A producer that writes its overflow past
+     * the bottom of the page - the usual way a generator that only paginates at the end leaves
+     * the tail of a document - therefore hands every one of those glyphs over as if the reader
+     * could see them. Measured over the 211 documents of corpus-v1 with a probe built on the
+     * same library (OffPage.java): 11 documents carry text outside their page box, 1,274
+     * characters in all, and the converted .docx gains every one of them. On
+     * 350_question_paper the source page is one page and the generator wrote the objective
+     * section at y = -201 to -253, below the bottom edge: PDFBox reports 2,585 characters
+     * inside the page and 784 outside it, and the .docx holds 3,369 - the page's 2,585 plus
+     * exactly the 784 no reader can see. PyMuPDF, which clips, reports 2,585.
+     *
+     * <p>The test is the baseline against the box, with one em of slack: a glyph whose baseline
+     * is a fraction of a point outside the edge can still have ink inside it (a descender, a
+     * rotated stamp), while one more than an em out cannot. The box is the crop box when the
+     * page has one, because that is the box the reader is shown.
+     */
+    private static List<Glyph> onPage(PDDocument doc, int index, List<Glyph> glyphs) {
+        if (glyphs.isEmpty()) return glyphs;
+        float w, h;
+        try {
+            PDRectangle box = doc.getPage(index).getCropBox();
+            if (box == null || box.getWidth() <= 0 || box.getHeight() <= 0) {
+                box = doc.getPage(index).getMediaBox();
+            }
+            w = box.getWidth();
+            h = box.getHeight();
+        } catch (Throwable t) {
+            return glyphs;
+        }
+        if (w <= 0 || h <= 0) return glyphs;
+        List<Glyph> kept = new ArrayList<>(glyphs.size());
+        for (Glyph g : glyphs) {
+            float s = Math.max(1f, g.size);
+            if (g.px < -s || g.py < -s || g.px > w + s || g.py > h + s) continue;
+            kept.add(g);
+        }
+        return kept;
+    }
+
     private static List<Glyph> glyphsOf(PDDocument doc, int index) {
         try {
             GlyphCollector gc = new GlyphCollector();
@@ -2071,11 +2730,65 @@ public final class PdfToWord {
             gc.setEndPage(index + 1);
             gc.getText(doc);
             List<Glyph> out = dedupe(gc.out);
+            out = onPage(doc, index, out);
             applyColours(doc, index, out);
             return out;
         } catch (Throwable t) {
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * Drops text the page draws outside its own paper.
+     *
+     * <p>A content stream may draw past the MediaBox, and every reader clips it away: a viewer,
+     * a printer and PyMuPDF all show the page and nothing beyond its edge. The engine did not
+     * clip, so that text was read as if it were on the page, given its own absolute y - which
+     * is beyond the paper - and flowed. Two things followed, and both are check 44's failure:
+     * the flow's height for the page became larger than the sheet, so the last real lines were
+     * pushed onto a second sheet and out of the bottom band; and the lines that did land were
+     * placed against a page the model thought was further down than it was.
+     *
+     * <p>Measured on the two documents in the corpus that do it:
+     * {@code itr-computation-with-slab-table} draws a note and a signature block at y 894-988 on
+     * an 841.9 pt sheet (PyMuPDF reports no such text on the page at all; asking it for the band
+     * BELOW the page returns both blocks), the flow needs 17782 twips for 16836 of paper, and
+     * "Computation prepared on 12 August 2026" and "Page 1 of 1" end up on a second page
+     * mid-sheet. {@code 350_question_paper} draws fourteen blocks below its 841.9 pt sheet -
+     * MODULE 5, questions 8c and 9a, "schemas." and the end-of-paper rule - and the flow needs
+     * 38942 twips for the same 16836, which is why that one page becomes three and the nine band
+     * strings on it are lost.
+     *
+     * <p>Clipped to the MEDIA box, not the CropBox, on purpose: the crop box can be offset and
+     * this must never remove a glyph a reader can see. Text outside the media box is invisible
+     * in every viewer, so dropping it costs nothing and is what the reference does.
+     */
+    private static List<Glyph> clipToPaper(PDDocument doc, int index, List<Glyph> in) {
+        float w, h;
+        try {
+            PDRectangle box = doc.getPage(index).getMediaBox();
+            w = box.getWidth();
+            h = box.getHeight();
+        } catch (Throwable t) {
+            return in;
+        }
+        if (w <= 0f || h <= 0f) return in;
+        List<Glyph> out = new ArrayList<>(in.size());
+        int dropped = 0;
+        for (Glyph g : in) {
+            // px/py are page coordinates from the text matrix, y downwards, in the page's own
+            // unrotated user space - the same space the media box is stated in.
+            if (g.py < -0.5f || g.py > h + 0.5f || g.px < -0.5f || g.px > w + 0.5f) {
+                dropped++;
+                continue;
+            }
+            out.add(g);
+        }
+        if (dropped > 0 && System.getProperty("p2w.debugClip") != null) {
+            System.err.println("CLIP page=" + (index + 1) + " dropped=" + dropped
+                    + " of " + in.size() + " box=" + w + "x" + h);
+        }
+        return out;
     }
 
     /**
@@ -2536,17 +3249,28 @@ public final class PdfToWord {
      * (04_stamp_180deg_upside_down, 08_two_overlapping_stamps) is still an overlay and keeps its
      * flag, and so does any page whose text does not run along a horizontal baseline.
      */
-    private static void uprightIfPageIsUpsideDown(List<Glyph> glyphs) {
+    private static boolean uprightIfPageIsUpsideDown(List<Glyph> glyphs) {
         int turned = 0;
         for (Glyph g : glyphs) {
             if (g.text == null || g.text.trim().isEmpty()) continue;
-            if (!g.rotated) return;                     // an upright glyph: an ordinary page
-            if (Math.abs(g.diry) > 0.25f) return;       // the baseline is not horizontal
-            if (g.dirx >= 0f) return;                   // not turned round
+            if (!g.rotated) return false;               // an upright glyph: an ordinary page
+            if (Math.abs(g.diry) > 0.25f) return false; // the baseline is not horizontal
+            if (g.dirx >= 0f) return false;             // not turned round
             turned++;
         }
-        if (turned == 0) return;
+        if (turned == 0) return false;
         for (Glyph g : glyphs) g.rotated = false;
+        // CLEARING THE FLAG DOES NOT MOVE THE COORDINATES, and this is where the .txt lost
+        // them. Every glyph on this page is still measured in the frame turned with the text,
+        // so its x is the distance from the RIGHT edge of the page: on
+        // one-page-rotated-180-degrees page 2 the model holds x=45.35 for "ORBIT POLYMERS
+        // PVT. LTD." where the page draws it at 395.90, and every one of the page's 41 lines
+        // is on the wrong side of the sheet. Nothing downstream could tell: the flag that
+        // says so is the one just cleared. The page therefore reports itself, and the answer
+        // travels to the one place that rebuilds a position from these numbers
+        // ({@code buildPara}, for the .txt). The .docx keeps the coordinates it has always
+        // had - see {@code DocxWriter.mirrored}, which must not start firing here.
+        return true;
     }
 
     private static List<Line> toLines(List<Glyph> glyphs, List<float[]> gutters) {
@@ -2869,6 +3593,20 @@ public final class PdfToWord {
             String t = ln.text.trim();
             if (t.isEmpty()) continue;
             p.lines.add(t);
+            // The x this character was drawn at, which is what writeTxt() turns into
+            // leading spaces. Without it a Para of N lines and an EMPTY lineX wrote every
+            // one of the N at column 0: a curved seal's letters, and the vertical text down
+            // a page border, all arrived hard against the left margin with their x thrown
+            // away. buildPara (below) has always recorded x per line; this path - the one
+            // every rotated or ring glyph takes - never did, so the .docx (which reads runs
+            // and boxes) was unaffected and only the .txt lost the position.
+            //
+            // x only, deliberately. lineY is left empty so the ring keeps the vertical
+            // layout it has today: its characters are 2-6 pt apart round a circle, and
+            // feeding those gaps to the blank-line model put 97 blank lines into
+            // 05_round_company_seal_curved_text's 83-line file. y is not what t02 measures
+            // and not what this fix is for.
+            p.lineX.add(ln.x);
             sb.append(t);
         }
         p.left = l == Float.MAX_VALUE ? 0f : l;
@@ -3185,6 +3923,74 @@ public final class PdfToWord {
         return o instanceof Para ? ((Para) o).size() : 0f;
     }
 
+    /**
+     * True when the bands these gutters cut the page into may be written as a layout table.
+     *
+     * <p>WHY "IS THERE A GUTTER" IS NOT THE QUESTION. {@link #columnStarts} answers "is there an
+     * x that no text crosses, that many lines start after, and that leaves a column's width on
+     * both sides". A claim form answers yes to all three: every label starts at x=39.7 and every
+     * value at x=129.7, so the value column's left edge recurs once per row, nothing crosses it,
+     * and both sides are wide. bank-statement-5-pages was written that way on all five of its
+     * pages - a two-column layout table, 90.0 / 465.6 pt - over the three label rows at the top
+     * of a page whose body is a ruled five-column transaction table.
+     *
+     * <p>WHAT A COLUMN HAS AND A FORM DOES NOT. A column is FILLED by its text: prose is set to
+     * its measure, so a column's mean line width is a large part of the column's width. A form's
+     * left band holds short labels of varying width - "Account holder", "Address", "Statement
+     * period" in a 90 pt band, mean 39.5 pt, 44 % - and its values stop far short of the paper's
+     * edge (27 %).
+     *
+     * <p>THE LEFT BAND IS THE ONE THAT DECIDES. The right band may be ragged and still be a
+     * column - a sidebar, a question paper's mark strip, a timetable's last column - and
+     * requiring both bands to be filled was measured to cost more documents than it gained.
+     *
+     * <p>AND THE COLUMNS HAVE TO RUN. A form's label/value block is a header: three rows in a
+     * 36 pt band, 4 % of bank-statement's first page. A newspaper's columns, a brochure's
+     * panels, a catalogue's grid run down the sheet. This is the second way a page can be a
+     * column page, and it is the clause that keeps the layout table where the table is the
+     * better answer even though the bands are ragged.
+     *
+     * <p>A line that crosses a gutter is not a column line - it is a headline, or a rule of text
+     * across the measure - and is counted for neither side.
+     *
+     * @param seg    every text segment in the bands as {x, right}, in points
+     * @param edge   the band edges, left to right, one more entry than there are bands
+     * @param band   the height of the band the columns occupy, in points
+     * @param pageH  the page's own height, in points
+     */
+    static boolean bandsAreColumns(List<float[]> seg, float[] edge, float band, float pageH) {
+        int n = edge.length - 1;
+        if (n < 2 || seg == null || pageH <= 0f) return false;
+        int minLines = Integer.getInteger("p2w.colMinLines", 4).intValue();
+        float minFill = Float.parseFloat(System.getProperty("p2w.colMinFill", "0.45"));
+        float minLeftFill = Float.parseFloat(System.getProperty("p2w.colMinLeft", "0.50"));
+        float minBand = Float.parseFloat(System.getProperty("p2w.colMinBand", "0.30"));
+        int[] count = new int[n];
+        double[] sum = new double[n];
+        for (float[] s : seg) {
+            float x = s[0], right = s[1];
+            if (right <= x) continue;
+            int c = -1;
+            for (int i = 0; i < n; i++) {
+                if (x >= edge[i] - 1f && x < edge[i + 1]) { c = i; break; }
+            }
+            if (c < 0) continue;
+            if (right > edge[c + 1] + 1f) continue;      // crosses the gutter: not a column line
+            count[c]++;
+            sum[c] += right - x;
+        }
+        float[] fill = new float[n];
+        boolean allFilled = true;
+        for (int i = 0; i < n; i++) {
+            float w = edge[i + 1] - edge[i];
+            fill[i] = (w > 0f && count[i] > 0) ? (float) (sum[i] / count[i] / w) : 0f;
+            if (count[i] < minLines || fill[i] < minFill) allFilled = false;
+        }
+        boolean leftFilled = count[0] >= minLines && fill[0] >= minLeftFill;
+        boolean ok = allFilled || leftFilled || band >= pageH * minBand;
+        return ok;
+    }
+
     private static List<Float> columnStarts(List<Line> lines) {
         List<Float> candidates = new ArrayList<>();
         for (Line line : lines) {
@@ -3450,11 +4256,13 @@ public final class PdfToWord {
     }
 
     private static List<Para> toParagraphs(List<Line> lines, float pageWidth, int bands) {
-        return toParagraphs(lines, pageWidth, bands, false);
+        return toParagraphs(lines, pageWidth, bands, false, false, 0f);
     }
 
     private static List<Para> toParagraphs(List<Line> lines, float pageWidth, int bands,
-                                           final boolean row) {
+                                           final boolean row,
+                                           final boolean flippedPage,
+                                           final float pageHeight) {
         List<Para> out = new ArrayList<>();
         if (lines.isEmpty()) return out;
 
@@ -3520,13 +4328,14 @@ public final class PdfToWord {
             } else if (sameParagraph(last, line, pageWidth, blockRight)) {
                 group.add(line);
             } else {
-                out.add(buildPara(group, pageWidth, bands));
+                out.add(buildPara(group, pageWidth, pageHeight, bands, flippedPage));
                 group = new ArrayList<>();
                 group.add(line);
                 addRowMates(group, line);
             }
         }
-        if (!group.isEmpty()) out.add(buildPara(group, pageWidth, bands));
+        if (!group.isEmpty()) out.add(buildPara(group, pageWidth, pageHeight, bands,
+                flippedPage));
         return out;
     }
 
@@ -3734,7 +4543,8 @@ public final class PdfToWord {
         return continues && !indented;
     }
 
-    private static Para buildPara(List<Line> group, float pageWidth, int bands) {
+    private static Para buildPara(List<Line> group, float pageWidth, float pageHeight,
+                                  int bands, boolean flippedPage) {
         // Fields on one baseline read left to right, whatever order the page drew them in. The
         // row's tab stops are measured from its first box, so the box order IS the line.
         if (group.size() > 1 && isRow(group)) {
@@ -3767,8 +4577,36 @@ public final class PdfToWord {
             // was one line long always got zero indent and its position was lost. The padding
             // is now worked out in writeTxt() against the page, which is the only consumer.
             p.lines.add(t);
-            p.lineX.add(line.x);
-            p.lineY.add(line.y);
+            // THE PAGE FRAME, NOT THE FRAME THE TEXT WAS DRAWN IN.
+            //
+            // These three lists are the .txt's whole geometry: TxtWriter turns lineX into
+            // leading spaces and lineY into blank lines, and reads nothing else. They are
+            // written here, where the line's own direction is still in hand, because that is
+            // the only place that has it - p.boxes is NOT one entry per line (a combining mark
+            // and a row fragment are merged into the box before them, see below), so a writer
+            // holding only {@code Para} cannot ask "which box is line i".
+            //
+            // A line drawn on a 180-degree baseline comes out of PDFBox in a frame turned with
+            // it, so BOTH of its coordinates are mirrored about the page: on
+            // 04_stamp_180deg_upside_down the page draws CANCELLED at x=337.6 and the model
+            // holds x=151.01, which is 595.276-444.266 - the baseline origin the page used.
+            // The .docx has always put that back (DocxWriter.mirrored / frameOfLine) and the
+            // .txt never did, so the two halves of one conversion described two different
+            // documents: the stamp sat 293 pt left of the paper position it was drawn at.
+            //
+            // The left edge of a mirrored run is its RIGHT edge reflected: x runs from
+            // W-right to W-x, so W-right is where a reader starts the line. Measured against
+            // the page on the four documents that carry one: 04 337.61 vs 337.60 drawn, 401
+            // 742.98/692.41/675.16/712.69/746.48 vs 743.0/692.4/675.2/712.7/746.5, and
+            // one-page-rotated-180-degrees 395.92 vs 395.90.
+            //
+            // {@code ring} is excluded because a ring character is the one turned line whose
+            // x/y ARE page coordinates (see {@link Box#ring}); mirroring it would move a seal
+            // to the far side of the sheet, which is the fault DocxWriter records at 352.
+            boolean turnedFrame = flippedPage
+                    || (line.rotated && Math.abs(line.angle) < 1f && !line.ring);
+            p.lineX.add(turnedFrame ? pageWidth - line.right : line.x);
+            p.lineY.add(turnedFrame ? pageHeight - line.y : line.y);
             p.lineSize.add(line.size);
             if (prevText != null) {
                 if (prevText.endsWith("-") && t.length() > 0
@@ -4291,7 +5129,15 @@ public final class PdfToWord {
             // PDFBox's Matrix is row-major with getValue(row, col). The translation lives at
             // (2,0)/(2,1) - NOT (0,2)/(1,2), which returns the wrong row - so the rotation and
             // shear terms are (0,1) and (1,0).
-            return Math.abs(m.getValue(0, 1)) > 0.01f || Math.abs(m.getValue(1, 0)) > 0.01f;
+            // 0.035 rad is 2 degrees. The case this guard exists for is a 15-degree stamp
+            // (0.26) whose bounding box is 207 x 106 pt for a 60 x 40 pt rectangle, and a box
+            // that wrong is worse than no box. Below 2 degrees the error is not of that kind:
+            // 600's stamp draws its own outline inside `cm` with b = 0.0104717849 - 0.6
+            // degrees, 0.14 pt of corner error on a 137.1 x 32.4 pt box - and the guard was
+            // dropping the only red rule the document has (32_stroke_lines: source 3, all 3
+            // lost). At 0.01 the guard was answering "rotated" for a rectangle a reader sees
+            // as upright.
+            return Math.abs(m.getValue(0, 1)) > 0.035f || Math.abs(m.getValue(1, 0)) > 0.035f;
         }
 
         /**
@@ -5302,12 +6148,18 @@ public final class PdfToWord {
      * kept - that is the header's shading, and Word does not invent one.
      */
     private static void attachShapes(Page page, Rules rules, float pageHeight,
-                                     List<Table> tables) {
+                                     List<Table> tables, int turn) {
         if (rules == null || rules.shapes.isEmpty()) return;
         // A figure drawn as a swarm of tiny squares becomes ONE object before anything is
         // placed: see mergeSpecks. It is done here because this is the last point at which
         // every shape is still in the page's own frame and still in drawing order.
         mergeSpecks(rules.shapes);
+        // A rule has exactly ONE owner (see Table#sideDrawn). Before a single hairline is thrown
+        // away on the claim that a table draws it, the four sides a surviving FRAME already
+        // draws are taken off the table: the page drew one rectangle round this table, so either
+        // the frame shape draws it or the table's four sides do - never both. That double claim
+        // is what made 80_gstin_pan_cin_ifsc_table draw each of its five framed cards twice.
+        if (tables != null) for (Table t : tables) releaseFramedSides(t, rules.shapes, pageHeight);
         for (DocxWriter.Shape s : rules.shapes) {
             // A table's own box is measured down from the top of the page, so the test is
             // made in that space - the shape is converted to it here and stored afterwards.
@@ -5319,6 +6171,18 @@ public final class PdfToWord {
             // frame around it belongs to the page.
             boolean rule = Math.min(s.wPt, s.hPt) < 3f;
             if (rule && inTable(s.xPt, s.wPt, topDown, topDown + s.hPt, tables)) continue;
+            // A shape is read from the content stream in page space, so on a page turned
+            // 180 degrees it is on the wrong side of the page from the text it belongs to.
+            // Mirrored here, before it is stored, so a box and the words inside it stay
+            // together - which is what 59_shape_anchor measures.
+            if (turn == 180) {
+                s.xPt = page.width - s.xPt - s.wPt;
+                if (s.freeform != null) {
+                    for (float[] c : s.freeform) {
+                        for (int i = 1; i < c.length; i += 2) c[i] = page.width - c[i];
+                    }
+                }
+            }
             s.topPt = topDown;
             // A freeform's points are in the page's own frame, where y counts up from the
             // bottom; the shape now lives in the frame that counts down, so its points are
@@ -5350,31 +6214,118 @@ public final class PdfToWord {
      * on where it lies and how much of the table it spans, not on strict containment; a box
      * is matched either inside the cell box or around it.
      */
-    private static boolean inTable(float x, float w, float top, float bottom, List<Table> tables) {
+    /**
+     * True when a table will paint a border exactly where this stroke lies - the shape pass's
+     * half of the ownership test, and the same test the writer writes from.
+     *
+     * <p>A table the ruled pass found has its bounds ON the drawn grid, so its six sides stand
+     * in for any rule on them and {@link #inTable} answers. For every other table the answer is
+     * {@link Table#sideDrawn}: a side is drawn only where the page drew a rule, and only that
+     * rule is given up. A rule that is merely NEAR the table - within the old 16 pt pad, outside
+     * its edge - is not drawn by any side and stays a shape at the page's own y.
+     */
+    private static boolean ownedByTable(float x, float w, float top, float bottom,
+                                        List<Table> tables) {
         if (tables == null || tables.isEmpty()) return false;
-        boolean thin = Math.min(w, bottom - top) < 3f;
+        boolean horizontal = w >= (bottom - top);
+        float perp = horizontal ? (top + bottom) / 2f : x + w / 2f;
+        float lo = horizontal ? x : top;
+        float hi = horizontal ? x + w : bottom;
         for (Table t : tables) {
             float tw = t.right - t.left, th = t.bottom - t.top;
             if (tw <= 0 || th <= 0) continue;
-            if (thin) {
-                float pad = 16f;
-                if (w >= bottom - top) {                       // a horizontal rule
-                    if (top < t.top - pad || top > t.bottom + pad) continue;
-                    if (overlap(x, x + w, t.left, t.right) >= 0.5f * tw) return true;
-                } else {                                       // a vertical rule
-                    if (x < t.left - pad || x > t.right + pad) continue;
-                    if (overlap(top, bottom, t.top, t.bottom) >= 0.5f * th) return true;
-                }
+            if (t.ruled) {
+                if (inTableOne(t, x, w, top, bottom)) return true;
                 continue;
             }
-            float pad = 2f;
-            boolean inside = x >= t.left - pad && x + w <= t.right + pad
-                    && top >= t.top - pad && bottom <= t.bottom + pad;
-            boolean frame = t.left >= x - pad && t.right <= x + w + pad
-                    && t.top >= top - pad && t.bottom <= bottom + pad;
-            if (inside || frame) return true;
+            if (horizontal) {
+                if (t.sideDrawn[0] && Math.abs(perp - t.top) <= SIDE_TOL
+                        && overlap(lo, hi, t.left, t.right) >= 0.5f * tw) return true;
+                if (t.sideDrawn[2] && Math.abs(perp - t.bottom) <= SIDE_TOL
+                        && overlap(lo, hi, t.left, t.right) >= 0.5f * tw) return true;
+            } else {
+                if (t.sideDrawn[1] && Math.abs(perp - t.left) <= SIDE_TOL
+                        && overlap(lo, hi, t.top, t.bottom) >= 0.5f * th) return true;
+                if (t.sideDrawn[3] && Math.abs(perp - t.right) <= SIDE_TOL
+                        && overlap(lo, hi, t.top, t.bottom) >= 0.5f * th) return true;
+            }
+            // An interior rule is the table's own insideH/insideV, which is drawn at every row
+            // (or column) boundary - and only when every one of those boundaries has a rule, so
+            // the border the table draws is a rule the page drew. That is what sideDrawn[4]/[5]
+            // already mean; here the rule only has to run across the band rather than along an
+            // edge.
+            if (horizontal ? (t.sideDrawn[4] && interiorOf(perp, t.top, t.bottom))
+                    : (t.sideDrawn[5] && interiorOf(perp, t.left, t.right)))
+                return true;
         }
         return false;
+    }
+
+    /** True when {@code perp} runs across the band rather than along one of its two edges. */
+    private static boolean interiorOf(float perp, float lo, float hi) {
+        return perp > lo + SIDE_TOL && perp < hi - SIDE_TOL;
+    }
+
+    /**
+     * Takes the four outer sides off a table when a shape that survives already draws its frame.
+     *
+     * <p>A stroke-only box that encloses the table, covering at least half of it in both
+     * directions, is the page's own rectangle round that table. A box is not a hairline, so
+     * attachShapes keeps it - and the table must then not draw the same four sides again. This
+     * is the duplication half of the ownership defect: {@code pageDrewRule} read a box that
+     * encloses the table as "the page drew a rule on this table" and turned all six borders on,
+     * while the box was written as a shape as well. On 80_gstin_pan_cin_ifsc_table that is five
+     * framed cards, five tables with all four sides "single" and five frame shapes: the 20 sides
+     * the page drew all present, and 20 more invented beside them.
+     */
+    private static void releaseFramedSides(Table t, List<DocxWriter.Shape> shapes,
+                                           float pageHeight) {
+        float tw = t.right - t.left, th = t.bottom - t.top;
+        if (tw <= 0f || th <= 0f) return;
+        for (DocxWriter.Shape s : shapes) {
+            if (s.consumed || s.lineRgb < 0 || s.fillRgb >= 0) continue;
+            if (s.wPt < 8f || s.hPt < 8f) continue;
+            // The shapes are still in the page's own frame here (y up from the bottom) and the
+            // table is in the lines' frame (y down), so the box is moved before it is compared.
+            float sTop = pageHeight + s.topPt;
+            boolean encloses = t.top >= sTop - SIDE_FRAME_TOL
+                    && t.bottom <= sTop + s.hPt + SIDE_FRAME_TOL
+                    && t.left >= s.xPt - SIDE_FRAME_TOL
+                    && t.right <= s.xPt + s.wPt + SIDE_FRAME_TOL;
+            if (!encloses) continue;
+            if (tw < s.wPt * 0.5f || th < s.hPt * 0.5f) continue;
+            t.sideDrawn[0] = t.sideDrawn[1] = t.sideDrawn[2] = t.sideDrawn[3] = false;
+            return;
+        }
+    }
+
+    private static boolean inTable(float x, float w, float top, float bottom, List<Table> tables) {
+        if (tables == null || tables.isEmpty()) return false;
+        for (Table t : tables) if (inTableOne(t, x, w, top, bottom)) return true;
+        return false;
+    }
+
+    /** {@link #inTable} for one table: the loose 16 pt claim the ruled pass has always made. */
+    private static boolean inTableOne(Table t, float x, float w, float top, float bottom) {
+        float tw = t.right - t.left, th = t.bottom - t.top;
+        if (tw <= 0 || th <= 0) return false;
+        boolean thin = Math.min(w, bottom - top) < 3f;
+        if (thin) {
+            float pad = 16f;
+            if (w >= bottom - top) {                       // a horizontal rule
+                if (top < t.top - pad || top > t.bottom + pad) return false;
+                return overlap(x, x + w, t.left, t.right) >= 0.5f * tw;
+            } else {                                       // a vertical rule
+                if (x < t.left - pad || x > t.right + pad) return false;
+                return overlap(top, bottom, t.top, t.bottom) >= 0.5f * th;
+            }
+        }
+        float pad = 2f;
+        boolean inside = x >= t.left - pad && x + w <= t.right + pad
+                && top >= t.top - pad && bottom <= t.bottom + pad;
+        boolean frame = t.left >= x - pad && t.right <= x + w + pad
+                && t.top >= top - pad && t.bottom <= bottom + pad;
+        return inside || frame;
     }
 
     private static float overlap(float a0, float a1, float b0, float b1) {
@@ -5460,6 +6411,71 @@ public final class PdfToWord {
      * on that side; neither is a median over the page, which is what the earlier attempt
      * computed and why its numbers matched no drawn line anywhere.
      */
+    /**
+     * The page's rule that lies on the side at {@code at}, within {@link #SIDE_TOL}, covering at
+     * least half of it - or null when the page drew no rule there.
+     *
+     * <p>The geometry half of the ownership test, and the same span test {@code edgeStroke}
+     * uses: half the side, so a 3 pt tick beside a corner is not the table's edge.
+     */
+    private static float[] ruleOnSide(Rules rules, boolean horizontal, float at,
+                                      float a0, float a1, float span) {
+        if (rules == null) return null;
+        List<float[]> geom = horizontal ? rules.horizontal : rules.vertical;
+        float[] best = null;
+        float bestD = Float.MAX_VALUE;
+        for (int i = 0; i < geom.size(); i++) {
+            float[] g = geom.get(i);
+            float d = Math.abs(g[0] - at);
+            if (d > SIDE_TOL) continue;
+            if (Math.min(g[2], a1) - Math.max(g[1], a0) < span * 0.5f) continue;
+            if (d < bestD) { best = g; bestD = d; }
+        }
+        return best;
+    }
+
+    /**
+     * True when every interior row edge (or column edge) of the table has a rule of its own.
+     *
+     * <p>{@code w:tblBorders/insideH} is ONE weight drawn at EVERY row boundary - it cannot
+     * draw a separator on some rows and not others. So it may be written only when the page
+     * drew a separator at every boundary: otherwise the table invents lines where the page left
+     * the row blank, and the rules it was supposed to stand in for are dropped by the shape
+     * pass at the same time. On 16_right_aligned_amounts the page draws 13 rules at a 19 pt
+     * pitch while the table's rows run at 17.5 pt, so no boundary has a rule of its own,
+     * {@code insideH} is not written, and the 13 rules stay shapes at the page's own y.
+     */
+    private static boolean interiorRulesOnEdges(Rules rules, boolean horizontal, Table t) {
+        if (rules == null) return false;
+        float lo = horizontal ? t.top : t.left;
+        float hi = horizontal ? t.bottom : t.right;
+        float a0 = horizontal ? t.left : t.top;
+        float a1 = horizontal ? t.right : t.bottom;
+        float span = horizontal ? t.right - t.left : t.bottom - t.top;
+        if (span <= 0f || hi - lo <= 2f * SIDE_TOL) return false;
+        float[] edges = horizontal ? rowEdges(t) : t.colX;
+        if (edges == null || edges.length < 3) return false;
+        int interior = 0, matched = 0;
+        for (int k = 1; k < edges.length - 1; k++) {
+            float e = edges[k];
+            if (e <= lo + SIDE_TOL || e >= hi - SIDE_TOL) continue;
+            interior++;
+            if (ruleOnSide(rules, horizontal, e, a0, a1, span) != null) matched++;
+        }
+        return interior > 0 && matched == interior;
+    }
+
+    /** The table's row edges top-down: the page's own when the pass that built it knew them. */
+    private static float[] rowEdges(Table t) {
+        int rows = t.rows.size();
+        if (rows <= 0) return null;
+        if (t.rowEdge != null && t.rowEdge.length == rows + 1) return t.rowEdge;
+        float[] e = new float[rows + 1];
+        float pitch = (t.bottom - t.top) / rows;
+        for (int r = 0; r <= rows; r++) e[r] = t.top + r * pitch;
+        return e;
+    }
+
     private static void markSideStrokes(Table t, Rules rules) {
         if (rules == null) return;
         float w = t.right - t.left, h = t.bottom - t.top;
@@ -5470,6 +6486,17 @@ public final class PdfToWord {
         t.sideStroke[3] = edgeStroke(rules, false, t.right, t.top, t.bottom, h);   // right
         t.sideStroke[4] = insideStroke(rules, true, t.top, t.bottom, t.left, t.right, w);   // insideH
         t.sideStroke[5] = insideStroke(rules, false, t.left, t.right, t.top, t.bottom, h);  // insideV
+        // WHO DRAWS EACH SIDE, decided here from the page's own rule list, before a single shape
+        // is written or discarded. SIDE_TOL and not SIDE_FRAME_TOL: edgeStroke above is generous
+        // on purpose (a whitespace table's bounds are its text's ink, so the page's frame can
+        // stand 24 pt outside them), but a side may only be DRAWN where a rule actually lies.
+        // The gap between those two tolerances is where rules used to disappear.
+        t.sideDrawn[0] = ruleOnSide(rules, true, t.top, t.left, t.right, w) != null;
+        t.sideDrawn[2] = ruleOnSide(rules, true, t.bottom, t.left, t.right, w) != null;
+        t.sideDrawn[1] = ruleOnSide(rules, false, t.left, t.top, t.bottom, h) != null;
+        t.sideDrawn[3] = ruleOnSide(rules, false, t.right, t.top, t.bottom, h) != null;
+        t.sideDrawn[4] = interiorRulesOnEdges(rules, true, t);
+        t.sideDrawn[5] = interiorRulesOnEdges(rules, false, t);
         // A side the page drew no rule along still gets a weight, because the side is written
         // either way. It takes the table's own stroke rather than the writer's old constant.
         float[] tableStroke = bandStroke(rules, t);
@@ -5937,6 +6964,8 @@ public final class PdfToWord {
             List<Float> rowRs = new ArrayList<>();
             List<Float> rowBaseYs = new ArrayList<>();
             List<Integer> rowCols = new ArrayList<>();
+            List<Boolean> rowBolds = new ArrayList<>();
+            List<Boolean> rowItalics = new ArrayList<>();
             for (int c = 0; c < ncol; c++) {
                 String str = glyphText(buckets.get(r).get(c));
                 if (!str.isEmpty()) filled++;
@@ -5947,6 +6976,8 @@ public final class PdfToWord {
                 rowRs.add(glyphLastRight(buckets.get(r).get(c)));
                 rowBaseYs.add(glyphFirstBaseline(buckets.get(r).get(c)));
                 rowCols.add(colorOf(buckets.get(r).get(c)));
+                rowBolds.add(boldOf(buckets.get(r).get(c)));
+                rowItalics.add(italicOf(buckets.get(r).get(c)));
             }
             t.rows.add(row);
             t.fonts.add(rowFonts);
@@ -5955,6 +6986,8 @@ public final class PdfToWord {
             t.cellR.add(rowRs);
             t.cellY.add(rowBaseYs);
             t.colors.add(rowCols);
+            t.bolds.add(rowBolds);
+            t.italics.add(rowItalics);
         }
         // A QR code, a logo or a chart is drawn from the same rectangles a table is, so the
         // cells are real but the words are not there. A real table has text in a good share of
@@ -6053,6 +7086,37 @@ public final class PdfToWord {
         return best == Float.MAX_VALUE ? fallback : best;
     }
 
+    /** One cell's measured start, or NaN when the pass that built the table did not measure it. */
+    private static float cellAt(List<List<Float>> grid, int r, int c) {
+        try {
+            Float v = grid.get(r).get(c);
+            return v == null ? Float.NaN : v;
+        } catch (Throwable t) {
+            return Float.NaN;
+        }
+    }
+
+    /** How far apart two drawings of one thing may be and still be one thing. */
+    private static final float CELL_TEXT_TOL = 1.5f;
+
+    /**
+     * True when a line agrees with a cell on text and face AND on where it was drawn.
+     *
+     * <p>A key with no position in it says two different lines are one line; that is how 60
+     * characters went missing over four documents. The position is the part that distinguishes
+     * a genuine second copy from a coincidence, so it is part of the test.
+     */
+    private static boolean cellTextAt(java.util.Map<String, List<float[]>> cellText, String key,
+                                      float x, float y) {
+        List<float[]> at = cellText.get(key);
+        if (at == null) return false;
+        for (float[] p : at) {
+            if (Float.isNaN(p[0]) || Float.isNaN(p[1])) return true;   // unmeasured: old behaviour
+            if (Math.abs(p[0] - x) <= CELL_TEXT_TOL && Math.abs(p[1] - y) <= CELL_TEXT_TOL) return true;
+        }
+        return false;
+    }
+
     /** The typeface the first drawn glyph of a cell carries; empty when the page did not say. */
     /** The colour of the first glyph that draws something, or -1 for the default black. */
     private static int colorOf(List<Glyph> gs) {
@@ -6108,6 +7172,39 @@ public final class PdfToWord {
             if (Float.isNaN(best) || g.size > best) best = g.size;
         }
         return best;
+    }
+
+    /**
+     * Was a cell's text drawn bold - the style of the glyphs that carry the words.
+     *
+     * <p>Counted by CHARACTERS, the way {@link #fontOf} picks the face, so a cell that is
+     * mostly upright with one italic word in it is not reported italic: the writer sets a cell
+     * as ONE run and can carry one style, so the style has to be the one the cell is mostly
+     * set in. The descriptor's flag is preferred where the page stated one, and the face name
+     * is the fallback for a font with no descriptor - the same evidence order
+     * {@code DocxWriter.isBoldFace} already uses, with the page's statement first.
+     */
+    private static boolean boldOf(List<Glyph> gs) {
+        int yes = 0, total = 0;
+        for (Glyph g : gs) {
+            if (g.text == null || g.text.trim().isEmpty()) continue;
+            int n = Math.max(1, g.text.length());
+            total += n;
+            if (g.boldDesc || g.bold) yes += n;
+        }
+        return total > 0 && yes * 2 > total;
+    }
+
+    /** Was a cell's text drawn italic. See {@link #boldOf} for the counting rule. */
+    private static boolean italicOf(List<Glyph> gs) {
+        int yes = 0, total = 0;
+        for (Glyph g : gs) {
+            if (g.text == null || g.text.trim().isEmpty()) continue;
+            int n = Math.max(1, g.text.length());
+            total += n;
+            if (g.italicDesc || g.italic) yes += n;
+        }
+        return total > 0 && yes * 2 > total;
     }
 
     /** Join a cell's glyphs into one string, in reading order. */
@@ -6207,6 +7304,69 @@ public final class PdfToWord {
         return out;
     }
 
+    /**
+     * The turn, in degrees, at which the page's own text is drawn: its /Rotate plus the
+     * direction the text runs.
+     *
+     * <p>Every x in this file comes from one of two channels, and only one of them is
+     * turned. Text x is {@code TextPosition.getXDirAdj()}, which PDFBox measures in the
+     * frame that turn produces - it flips x about the page width for a page at /Rotate 180
+     * and for a run drawn at 180 degrees alike (measured: on 417_rotate180_and_mirrored's
+     * rotated page a glyph at user-space x=539.28 reports xDirAdj=56.00, and on
+     * one-page-rotated-180-degrees' page 2 a glyph at x=549.92 reports 45.35). Rules,
+     * shapes and pictures are read out of the content stream by {@link RuleCollector} in
+     * PDF user space and are turned by nothing at all.
+     *
+     * <p>So on a turned page the two channels are in different frames, a page width apart,
+     * and every place that compares them - buildTables, markInnerRules, markSideStrokes,
+     * attachShapes - is comparing an x with its own mirror image. Measured on
+     * one-page-rotated-180-degrees page 2: the page draws its five column separators at
+     * x = 45.4, 107.0, 230.4, 303.2, 516.3 and its cell text starts at the turned-frame
+     * x = 48.4, 82.2, 310.6, 368.1, 507.8. The separators that bound those cells are the
+     * mirrored ones (45.4, 79.0, 292.1, 364.9, 488.3); matched against the raw ones no cell
+     * is bounded on both sides, the five columns collapse to two, and the page reads
+     * 267.8 pt out on 47_margins.
+     */
+    private static int pageTurn(PDPage page, List<Glyph> glyphs) {
+        int rot = ((page.getRotation() % 360) + 360) % 360;
+        int turned = 0, total = 0;
+        for (Glyph g : glyphs) {
+            if (g.text == null || g.text.trim().isEmpty()) continue;
+            total++;
+            if (g.dirx < -0.5f) turned++;
+        }
+        // A supermajority, not a majority. An upright page carrying a stamp drawn upside
+        // down (04_stamp_180deg_upside_down) is still an upright page - 90 % of its glyphs
+        // are upright and its stamp is a local, later problem. Only a page whose text is
+        // turned throughout has a frame of its own to normalise.
+        if (total > 0 && turned * 10 >= total * 9) return (rot + 180) % 360;
+        return rot;
+    }
+
+    /**
+     * The same rules with x mirrored about the page's own width - the turn a page at 180
+     * degrees applies to its content, and the one the text channel has already had applied.
+     *
+     * <p>A rule is stored {y, x1, x2} horizontally and {x, y1, y2} vertically, so a
+     * horizontal rule keeps its y and swaps its ends and a vertical rule moves to the other
+     * side of the page. The strokes are a weight and a colour, not a coordinate, and travel
+     * unchanged - the same rule {@link #flipY} follows, and for the same reason: the two
+     * lists are parallel and every index after this point reads another rule's weight.
+     */
+    private static Rules mirrorX(Rules in, float pageWidth) {
+        Rules out = new Rules();
+        for (float[] h : in.horizontal) {
+            out.horizontal.add(new float[]{h[0], pageWidth - h[2], pageWidth - h[1]});
+        }
+        for (float[] v : in.vertical) {
+            out.vertical.add(new float[]{pageWidth - v[0], v[1], v[2]});
+        }
+        out.hStroke.addAll(in.hStroke);
+        out.vStroke.addAll(in.vStroke);
+        out.images = in.images;
+        return out;
+    }
+
     /** The same rules with y measured down from the top, the way a line carries it. */
     private static Rules flipY(Rules in, float pageHeight) {
         Rules out = new Rules();
@@ -6230,6 +7390,11 @@ public final class PdfToWord {
      * share a horizontal extent are rows of one table, and only the vertical rules standing
      * inside that extent, tall enough to cross its rows, are its columns.
      */
+    /** A cell no line has written into yet. Not a colour: -1 is a real one (black). */
+    private static final int COLOUR_UNSET = -2;
+    /** A cell whose glyphs do not all share one colour, so the cell has none to carry. */
+    private static final int COLOUR_MIXED = -3;
+
     private static List<Table> buildTables(Rules rules, List<Line> lines, float pageWidth) {
         List<Table> out = new ArrayList<>();
         // A stamp is not a table row. Its characters are drawn over the grid, not in it.
@@ -6302,6 +7467,22 @@ public final class PdfToWord {
             String[][] cells = new String[rows][cols];
             String[][] faces = new String[rows][cols];
             float[][] sizes = new float[rows][cols];
+            // The colour each cell was drawn in. This pass built rows, fonts, sizes and x/y
+            // and never filled the colour matrix, so DocxWriter's guard
+            // `if (r < t.colors.size() && ...)` was false for EVERY cell of every table this
+            // pass found and no w:color was written at all. On
+            // 64_newspaper_uneven_columns_ad_boxes the ad grid is exactly this kind of table
+            // - seven rows, ruled - and its four #73081A headings came back black, 13's
+            // source set 3 -> render 2 with nothing else lost.
+            //
+            // A CELL IS ONE RUN, so it may only carry a colour the WHOLE cell agrees on. A
+            // cell holding an #73081A heading over black body text has no single colour, and
+            // writing the first glyph's would paint the body text with the heading's - which
+            // is the same per-cell-not-per-line defect 402 carries, arrived at from the other
+            // side. So a cell whose glyphs disagree is left on Automatic, which is what the
+            // writer already does for a run the page named no colour for.
+            int[][] colours = new int[rows][cols];
+            for (int[] rowColour : colours) java.util.Arrays.fill(rowColour, COLOUR_UNSET);
             for (float[] rowSize : sizes) java.util.Arrays.fill(rowSize, Float.NaN);
             // Where the first line written into each cell actually starts. A cell's text is not
             // at its rule: it is wherever the page drew it, centred, right-aligned or padded.
@@ -6320,6 +7501,11 @@ public final class PdfToWord {
                         ? line.text.trim() : cells[r][c] + " " + line.text.trim();
                 if (faces[r][c] == null) faces[r][c] = fontOf(line.glyphs);
                 if (Float.isNaN(sizes[r][c])) sizes[r][c] = sizeOf(line.glyphs);
+                for (Glyph g : line.glyphs) {
+                    if (g.text == null || g.text.trim().isEmpty()) continue;
+                    if (colours[r][c] == COLOUR_UNSET) colours[r][c] = g.color;
+                    else if (colours[r][c] != g.color) colours[r][c] = COLOUR_MIXED;
+                }
                 if (Float.isNaN(firstX[r][c])) firstX[r][c] = visibleX(line.glyphs, line.x);
                 if (Float.isNaN(firstY[r][c])) firstY[r][c] = line.y;
             }
@@ -6346,18 +7532,21 @@ public final class PdfToWord {
                 String[][] trimmedFaces = new String[rows][keep.size()];
                 float[][] trimmedX = new float[rows][keep.size()];
                 float[][] trimmedY = new float[rows][keep.size()];
+                int[][] trimmedColours = new int[rows][keep.size()];
                 for (int r = 0; r < rows; r++) {
                     for (int k = 0; k < keep.size(); k++) {
                         trimmedY[r][k] = firstY[r][keep.get(k)];
                         trimmed[r][k] = cells[r][keep.get(k)];
                         trimmedFaces[r][k] = faces[r][keep.get(k)];
                         trimmedX[r][k] = firstX[r][keep.get(k)];
+                        trimmedColours[r][k] = colours[r][keep.get(k)];
                     }
                 }
                 cells = trimmed;
                 faces = trimmedFaces;
                 firstX = trimmedX;
                 firstY = trimmedY;
+                colours = trimmedColours;
                 cols = keep.size();
             }
 
@@ -6388,18 +7577,23 @@ public final class PdfToWord {
                 List<Float> rowSizes = new ArrayList<>();
                 List<Float> rowXs = new ArrayList<>();
                 List<Float> rowYs = new ArrayList<>();
+                List<Integer> rowColours = new ArrayList<>();
                 for (int c = 0; c < cols; c++) {
                     row.add(cells[r][c] == null ? "" : cells[r][c]);
                     rowFonts.add(faces[r][c] == null ? "" : faces[r][c]);
                     rowSizes.add(sizes[r][c]);
                     rowXs.add(firstX[r][c]);
                     rowYs.add(firstY[r][c]);
+                    // COLOUR_UNSET (a cell with no ink) and COLOUR_MIXED both mean "no one
+                    // colour": -1 is the writer's "leave it on Automatic".
+                    rowColours.add(colours[r][c] >= -1 ? colours[r][c] : -1);
                 }
                 t.rows.add(row);
                 t.fonts.add(rowFonts);
                 t.sizes.add(rowSizes);
                 t.cellX.add(rowXs);
                 t.cellY.add(rowYs);
+                t.colors.add(rowColours);
             }
             out.add(t);
         }
@@ -6669,6 +7863,9 @@ public final class PdfToWord {
             java.util.Arrays.fill(lineSizes, Float.NaN);
             int[] lineCols = new int[columns.size()];
             java.util.Arrays.fill(lineCols, -1);
+            // The style of the line that set this cell's face and size - see Table#bolds.
+            boolean[] lineBold = new boolean[columns.size()];
+            boolean[] lineItalic = new boolean[columns.size()];
             float[] lineX = new float[columns.size()];
             java.util.Arrays.fill(lineX, Float.NaN);
             float[] lineR = new float[columns.size()];
@@ -6702,6 +7899,8 @@ public final class PdfToWord {
                     lineFonts[best] = fontOf(cell.glyphs);
                     lineSizes[best] = sizeOf(cell.glyphs);
                     lineCols[best] = colorOf(cell.glyphs);
+                    lineBold[best] = boldOf(cell.glyphs);
+                    lineItalic[best] = italicOf(cell.glyphs);
                 }
                 bottom = Math.max(bottom, cell.y);
                 left = Math.min(left, cell.x);
@@ -6714,6 +7913,12 @@ public final class PdfToWord {
             List<Float> textXs = new ArrayList<>();
             List<Float> textRs = new ArrayList<>();
             List<Integer> textCols = new ArrayList<>();
+            List<Boolean> textBolds = new ArrayList<>();
+            List<Boolean> textItalics = new ArrayList<>();
+            for (int c = 0; c < lineCols.length; c++) {
+                textBolds.add(lineBold[c]);
+                textItalics.add(lineItalic[c]);
+            }
             for (String cell : line) texts.add(cell == null ? "" : cell);
             for (String f : lineFonts) textFonts.add(f == null ? "" : f);
             for (float sz : lineSizes) textSizes.add(sz);
@@ -6731,6 +7936,8 @@ public final class PdfToWord {
             for (float y : lineY) textYs.add(y);
             t.cellY.add(textYs);
             t.colors.add(textCols);
+            t.bolds.add(textBolds);
+            t.italics.add(textItalics);
             float rowY = Float.MAX_VALUE;
             for (Line cell : rows.get(r)) rowY = Math.min(rowY, cell.y);
             rowTops.add(rowY == Float.MAX_VALUE ? (rowTops.isEmpty() ? t.top : rowTops.get(rowTops.size() - 1)) : rowY);
@@ -6892,6 +8099,8 @@ public final class PdfToWord {
             out.cellR.add(new ArrayList<>(java.util.Arrays.asList(rOf(t, r, c), Float.NaN)));
             out.cellY.add(new ArrayList<>(java.util.Arrays.asList(yOf(t, r, c), Float.NaN)));
             out.colors.add(new ArrayList<>(java.util.Arrays.asList(colorOf(t, r, c), -1)));
+            out.bolds.add(new ArrayList<>(java.util.Arrays.asList(boldOf(t, r, c), false)));
+            out.italics.add(new ArrayList<>(java.util.Arrays.asList(italicOf(t, r, c), false)));
         }
         for (int side = 0; side < 2; side++) {
             int from = side == 0 ? 0 : split;
@@ -6915,6 +8124,10 @@ public final class PdfToWord {
                         yOf(t, r, a), b < 0 ? Float.NaN : yOf(t, r, b))));
                 out.colors.add(new ArrayList<>(java.util.Arrays.asList(
                         colorOf(t, r, a), b < 0 ? -1 : colorOf(t, r, b))));
+                out.bolds.add(new ArrayList<>(java.util.Arrays.asList(
+                        boldOf(t, r, a), b >= 0 && boldOf(t, r, b))));
+                out.italics.add(new ArrayList<>(java.util.Arrays.asList(
+                        italicOf(t, r, a), b >= 0 && italicOf(t, r, b))));
             }
         }
         // The label column is as wide as the left panel's label column was; the value column
@@ -6970,6 +8183,18 @@ public final class PdfToWord {
         if (r >= t.colors.size()) return -1;
         List<Integer> row = t.colors.get(r);
         return c < row.size() && row.get(c) != null ? row.get(c) : -1;
+    }
+
+    private static boolean boldOf(Table t, int r, int c) {
+        if (r >= t.bolds.size()) return false;
+        List<Boolean> row = t.bolds.get(r);
+        return c < row.size() && Boolean.TRUE.equals(row.get(c));
+    }
+
+    private static boolean italicOf(Table t, int r, int c) {
+        if (r >= t.italics.size()) return false;
+        List<Boolean> row = t.italics.get(r);
+        return c < row.size() && Boolean.TRUE.equals(row.get(c));
     }
 
     private static float rOf(Table t, int r, int c) {

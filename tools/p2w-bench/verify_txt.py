@@ -15,6 +15,22 @@ WHY THIS EXISTS
       position        a line's x survives as its leading spaces
       symbols         the characters a PDF can carry, not just ASCII
       structure       every text line the page drew is still a line of the .txt
+      encoding        the file is UTF-8 and carries no replacement character
+      symbol counts   each symbol arrives as many times as the page drew it
+
+  THE LAST TWO EXIST BECAUSE THE FIRST FIVE COULD NOT SEE A BROKEN FILE.
+  TxtWriter.java:91 writes the bytes with
+  clean.getBytes(StandardCharsets.UTF_8), so the .txt is declared UTF-8. This reader
+  opens it with errors="replace", which means an invalid byte never raises: it becomes
+  U+FFFD and every check then runs on the repaired string. Measured on the 211-document
+  corpus, a .txt with one byte flipped out of its UTF-8 sequence still scores 5/5 on 159
+  documents, and a .txt whose last multi-byte character is cut in half - a write that
+  died one byte short - still scores 5/5 on 28 of the 137 documents that carry any
+  non-ASCII at all. t06 is the assertion that closes that hole.
+
+  And t03 compares SETS. A set cannot see a symbol the page drew five times and the
+  .txt carries once: 38_faux_bold_italic_synthesised draws two em dashes and the .txt
+  carries one, and t03 passes because the em dash is still in the set. t07 counts.
 
   The last one is a line count on both sides, not a row count against a line count.
   A .txt has no rows: TxtWriter writes one line per drawn text line, so eight cells
@@ -62,7 +78,8 @@ MAX_LINE_DRIFT = 1.5
 MIN_ACCURACY = 98.0
 
 CHECKS = ["t01_word_accuracy", "t02_position", "t03_symbols",
-          "t04_structure", "t05_completeness"]
+          "t04_structure", "t05_completeness",
+          "t06_encoding", "t07_symbol_counts"]
 
 
 def _words(s):
@@ -119,6 +136,23 @@ def _src_line_count(path):
 def _txt_lines(path):
     with open(path, encoding="utf-8", errors="replace") as f:
         return [l.rstrip("\n") for l in f if l.strip()]
+
+
+def _txt_bytes(path):
+    """(bytes, strict decode error or "") - what the reader above threw away.
+
+    _txt_lines decodes with errors="replace" and is left exactly as it was, because
+    every number t01-t05 has ever reported came through it and changing the reader
+    would move those numbers without the engine changing. This is the same file read
+    again, strictly, for the one check that asks whether the bytes were readable.
+    """
+    with open(path, "rb") as f:
+        raw = f.read()
+    try:
+        raw.decode("utf-8")
+        return raw, ""
+    except UnicodeDecodeError as e:
+        return raw, "%s at byte %d" % (e.reason, e.start)
 
 
 def _column(line):
@@ -198,6 +232,54 @@ def compare(src_pdf, txt_path):
     # produced nothing is a defect, not an empty document.
     c["t05_completeness"] = (len(src_text.strip()), len(txt_text.strip()),
                              len(src_text.strip()) == 0 or len(txt_text.strip()) > 0)
+
+    # ---- t06 encoding ------------------------------------------------------
+    # The writer declares UTF-8 and this reader reads UTF-8, so the two agree and the
+    # file must decode. Three ways a .txt arrives unreadable while t01-t05 stay green:
+    #   * a byte of a multi-byte sequence is lost or flipped. The real production case
+    #     is the tail of a truncated write - FileOutputStream is not atomic, and a
+    #     process killed mid-write leaves a file that ends inside a character;
+    #   * the engine is switched to the platform default charset, which on a non-UTF-8
+    #     host writes cp1252 and still looks like text to every editor;
+    #   * a BOM, legal UTF-8, which puts an invisible character at the head of the
+    #     first line of every .txt.
+    # U+FFFD is counted as well as the strict decode: a file that already carries one
+    # has the same defect one layer up, where something put "cannot represent this"
+    # into the string and the writer then wrote it faithfully.
+    raw, enc_err = _txt_bytes(txt_path)
+    fffd = txt_text.count("\ufffd")
+    bom = raw.startswith(b"\xef\xbb\xbf")
+    c["t06_encoding"] = (0, fffd + (1 if bom else 0) + (1 if enc_err else 0),
+                         not enc_err and fffd == 0 and not bom)
+
+    # ---- t07 symbol counts -------------------------------------------------
+    # t03 asks whether a symbol survived AT ALL. This asks whether it survived as many
+    # times as the page drew it, which is the question a reader of the .txt has: a price
+    # list whose rupee sign appears once where the page printed it five times has lost
+    # four of them, and a set cannot say so.
+    #
+    # Two directions, and they are different faults:
+    #   lost      a source symbol carried fewer times than the page drew it;
+    #   invented  a character in the .txt the page never drew - U+FFFD from a bad
+    #             decode, mojibake from a charset mistake, a glyph from a fallback font.
+    # The invented direction runs on every document, including the 74 of 211 whose
+    # source carries no non-ASCII at all and on which t03 is vacuous: a .txt cannot
+    # invent a character and be right. The reported pair is the total on each side, so
+    # the row carries the size of the question - source=6 txt=5 is a loss of one,
+    # source=0 txt=0 is a document with nothing to lose.
+    s_cnt = {}
+    for ch in src_text:
+        if ord(ch) > 127:
+            s_cnt[ch] = s_cnt.get(ch, 0) + 1
+    t_cnt = {}
+    for ch in txt_text:
+        if ord(ch) > 127:
+            t_cnt[ch] = t_cnt.get(ch, 0) + 1
+    short = {ch: (n, t_cnt.get(ch, 0)) for ch, n in s_cnt.items()
+             if t_cnt.get(ch, 0) < n}
+    invented = sorted(ch for ch in t_cnt if ch not in s_cnt)
+    c["t07_symbol_counts"] = (sum(s_cnt.values()), sum(t_cnt.values()),
+                              not short and not invented)
     return c
 
 
@@ -260,6 +342,14 @@ def main(argv):
                 "failed": sorted(failed),
                 "checks": {cid: {"source": checks[cid][0], "render": checks[cid][1],
                                  "ok": bool(checks[cid][2])} for cid in CHECKS},
+                # Which checks asked their question on THIS document. A source count of
+                # 0 is a document that could not exercise the check, and a score that
+                # does not say how many of those it contains is a score with a silent
+                # denominator - the fault t03 has carried on 74 of 211.
+                "applicability": {
+                    "t03_symbols": checks["t03_symbols"][0] > 0,
+                    "t07_symbol_counts_counted": checks["t07_symbol_counts"][0] > 0,
+                },
             }, f, indent=2)
 
     return 0 if not failed else 1

@@ -168,15 +168,33 @@ public final class DocxWriter {
     /** How many paragraphs the auto construct could not place without a floor. */
     public static int autoFloorHits() { return autoFloorHits; }
 
+    /** Anchored boxes whose offset was pulled back onto the page this write. See anchorShape. */
+    private static int anchorClamped;
+
+    public static int anchorClampedHits() { return anchorClamped; }
+
     /**
-     * Where a shape's fill stops being a colour of its own and becomes a shade of the page.
+     * How far a shape's fill may sit from the page it is painted on and still BE the page.
      *
-     * <p>HSL L of 0.72 is the point above which a filled band reads as a white patch on a dark
-     * canvas. It catches the tints the user's own files carry - E6EBF5, F0F0E6, F5E6E6, BFBFBF,
-     * C9C9C9, FFFFFF - and leaves a mid-tone or a dark band alone, because those carry dark or
-     * white text that must not move.
+     * <p>Measured as the largest per-channel distance from white paper, 0..255. A fill inside
+     * this tolerance is a white patch on a dark canvas and paints nothing a reader can see on a
+     * light one, so omitting it costs nothing in either mode - that is the whole of the D-23
+     * device fix and it is kept.
+     *
+     * <p>It replaces an HSL-lightness test at 0.72, which asked the wrong question. Lightness
+     * says how light a colour is, not how close to the page: C9C9C9 is L=0.788, i.e. deep inside
+     * the old rule, and sits 54 levels off the page - a mid-grey table band, not a white patch.
+     * Measured over corpus-v1's 3,192 shape fills, the old rule dropped 402 fills in 87
+     * documents, and 202 of those 402 are pale tints that carry a word inside them - a cell's
+     * shading or a highlight, never a decorative band. Every one of the 402 at 9 levels or more
+     * from the page carries text; 178 of the 200 pure-white ones carry nothing. The two classes
+     * are disjoint on "does this fill do a job", and distance from the page is the axis that
+     * separates them.
+     *
+     * <p>8 is the just-noticeable distance for a flat area of this size: #F7F7F7 against #FFFFFF
+     * is dE00 1.1, below the threshold at which a reader sees an edge.
      */
-    private static final double LIGHT_FILL = 0.72;
+    private static final int PAGE_TOL = 8;
     /**
      * Where the baseline sits inside a {@code w:lineRule="exact"} line box: this fraction of the
      * box height below its top.
@@ -318,6 +336,25 @@ public final class DocxWriter {
      */
     private static final int PAGE_ROUNDING_TW = 2;
 
+    /**
+     * The line height written into a table cell that holds no text - one point, which is
+     * enough for the paragraph OOXML requires a cell to contain and nothing more.
+     *
+     * <p>Such a cell used to be given the WHOLE row height as its line
+     * ({@code cellBoxTw = rowLineTw}). That writes the row's {@code w:trHeight} a second
+     * time, inside the cell, and the renderer then takes the row as
+     * {@code max(trHeight, cell content)} - so the duplicate is charged as content on top
+     * of the height the row already declares. Measured on
+     * {@code itr-computation-with-slab-table}, whose 20-row slab table is the only table in
+     * the 211 with empty cells carrying a real line: every one of its 20 rows came back
+     * 0.475 pt taller than its own {@code w:trHeight} - 9.50 pt on a page that is 9.7 pt
+     * over - and the page's measured line pitch read 18.7 pt against the source's 18.4.
+     * With this constant the same document renders 922.30 -> 912.80 pt and its rows land
+     * on their declared heights. The row is still held by its own {@code w:trHeight}, so
+     * no row collapses: 43 rows still occupy 735.05 pt of the page.
+     */
+    private static final int EMPTY_CELL_LINE_TW = 20;
+
     /** The ceiling this page's gaps get - see {@link #GAP_CAP_SPEND_TW}. */
     private static int gapCapTw(Ctx ctx) {
         return ctx.spendGaps ? GAP_CAP_SPEND_TW : GAP_CAP_TW;
@@ -365,6 +402,9 @@ public final class DocxWriter {
      */
     private static final String BEFORE = "w:before=\"";
     private static final String LINE = "w:line=\"";
+    /** The tokens {@link #flowTwOf} needs to tell a nested table's own height from its cells'. */
+    private static final String TBL_OPEN = "<w:tbl>";
+    private static final String TBL_CLOSE = "</w:tbl>";
     private static final String TRHEIGHT = "w:trHeight w:val=\"";
     private static int spacingTw(CharSequence xml) {
         int sum = 0;
@@ -403,6 +443,74 @@ public final class DocxWriter {
         return sum;
     }
 
+    /**
+     * Takes {@code excessTw} out of the page's own gaps, largest first, so the page ends where
+     * the paper does.
+     *
+     * <p>The budget guard in {@link #fitPage} already gives up the gap of a line it cannot place,
+     * then shortens that line's box, and only then lets the page overrun. That leaves a residue
+     * the guard cannot reach: once {@code flowTw} has arrived at the budget, every further line
+     * on the page has {@code before = 0} already, so there is nothing left for it to give up -
+     * and the page is written one or two twips too tall, which a renderer answers with a page
+     * break. On {@code bank-statement-5-pages} that residue was 24 twips (1.2 pt) on a 841.9 pt
+     * sheet, and LibreOffice turned each of its five pages into two: 5 pages in, 10 out, and
+     * nine checks lost (01_page_count, 24_page_breaks, 27_text_off_page, 55_orientation_mix,
+     * 04_chars_missing, 17_matched_runs, 32_stroke_lines, 59_shape_anchor,
+     * 60_text_column_right_edge).
+     *
+     * <p>Shaving the residue off the page's LARGEST gap is the cheapest way to end at the paper's
+     * edge: the gap it comes out of is white space the page left (on bank-statement, 278 pt
+     * between the transaction table and the closing-balance line), so 1.2 pt of it is invisible,
+     * where a page break is a whole sheet. Cell paragraphs and text boxes are skipped for the
+     * same reason {@link #spacingTw} skips them: a row carries its own height and a text box is
+     * placed at a y, so neither is the page's flow.
+     *
+     * @return the twips still over the paper, 0 when the page now fits
+     */
+    private static int shaveToFit(StringBuilder xml, int excessTw) {
+        while (excessTw > 0) {
+            int best = -1, bestVal = 0, depth = 0, i = 0, n = xml.length();
+            while (i < n) {
+                if (startsWith(xml, "<w:tbl>", i)) {
+                    depth++;
+                    i += 7;
+                } else if (startsWith(xml, "</w:tbl>", i)) {
+                    if (depth > 0) depth--;
+                    i += 8;
+                } else if (startsWith(xml, "<w:txbxContent>", i)) {
+                    depth++;
+                    i += 15;
+                } else if (startsWith(xml, "</w:txbxContent>", i)) {
+                    if (depth > 0) depth--;
+                    i += 16;
+                } else if (startsWith(xml, BEFORE, i)) {
+                    int j = i + BEFORE.length();
+                    if (depth == 0) {
+                        int v = digits(xml, j);
+                        if (v > bestVal) {
+                            bestVal = v;
+                            best = j;
+                        }
+                    }
+                    i = j;
+                } else {
+                    i++;
+                }
+            }
+            if (best < 0 || bestVal <= 0) break;
+            int take = Math.min(excessTw, bestVal);
+            int left = bestVal - take;
+            String was = Integer.toString(bestVal), now = Integer.toString(left);
+            if (was.length() != now.length()) {
+                xml.replace(best, best + was.length(), now);
+            } else {
+                for (int k = 0; k < was.length(); k++) xml.setCharAt(best + k, now.charAt(k));
+            }
+            excessTw -= take;
+        }
+        return Math.max(0, excessTw);
+    }
+
     /** The integer starting at {@code from}, or 0 when there is none. */
     private static int digits(CharSequence xml, int from) {
         int v = 0, i = from;
@@ -437,9 +545,28 @@ public final class DocxWriter {
             // column that the row is holding, and a page break inside a cell is not a thing.
             // The page's squeeze factor still applies - the row is measured from what the cell
             // really writes, so a squeezed page has to squeeze inside the cells too.
+            //
+            // AND THE CELL IS NOT CHARGED TO THE PAGE AT ALL. It used to be: every cell line
+            // added its own height to ctx.flowTw, and then table() closed with
+            // flowTw = max(flowTw, rowEndPt) - so the page was charged the SUM of a row's
+            // cells and then had the row's real height taken out of the same ledger. The
+            // columns of a row stand SIDE BY SIDE; only the tallest of them advances the page,
+            // and that is exactly what rowTw already is (flowTwOf over each cell's XML, maxed).
+            // Charging them as well put the page's flow below the table by the sum of the
+            // other columns, and every line after the table was then placed against a page
+            // that was further down than it really was.
+            //
+            // Measured on the two documents where a footer follows a layout table:
+            // 12_stamp_across_page_break page 2 charged 12594 twips against a table whose last
+            // row ends at 490.1 pt (9802 twips) - 139.6 pt of other-column height - and the
+            // footer's gap to its own y (798.8) was clamped by fitPage from 6341 twips to 4231,
+            // landing it at 693.3. mutual-fund-statement page 2 charged 13510 against a row
+            // ending at 411.8 (8236) - 263.7 pt - and its footer landed at 548.8 instead of
+            // 811.4. Neither is a placement defect: the gap was correct and the budget was
+            // wrong.
             int b2 = twScale(beforeTw, ctx.squeeze);
             int l2 = twScale(lineTw, ctx.squeeze);
-            ctx.flowTw += b2 + l2;
+            if ("1".equals(System.getProperty("p2w.colcharge"))) ctx.flowTw += b2 + l2;
             return new int[]{b2, l2};
         }
         if (ctx.measuring) {
@@ -903,7 +1030,16 @@ public final class DocxWriter {
                 // guaranteed to be monotone (a table whose rows are held at their type size stops
                 // shrinking while the prose around it keeps going), so the page that is used is
                 // the shortest one measured, never simply the last one tried.
-                String bestXml = null;
+                // THE MEASURING PASS IS THE FIRST CANDIDATE, not the fallback. It used to be
+                // bestXml = null, and null meant "no attempt beat the measuring pass", so pg
+                // kept whatever the LAST attempt wrote - while writtenTw still held the
+                // measuring pass's height. The two are not the same page: an attempt is written
+                // to pageBudgetTw - overheadTw, the measuring pass to pageBudgetTw, and they
+                // give up different gaps. Measured on bank-statement-5-pages: writtenTw 16860,
+                // the page actually in pg 16902 - the writer believed a page 42 twips shorter
+                // than the one it emitted, so the guard could never see the overrun it was
+                // supposed to remove and the renderer answered with a page break.
+                String bestXml = pg.toString();
                 int bestWritten = writtenTw;
                 float f = Math.min(1f, Math.max(SQUEEZE_FLOOR, (float) pageBudgetTw / (float) needTw));
                 for (int attempt = 0; attempt < 3; attempt++) {
@@ -953,6 +1089,37 @@ public final class DocxWriter {
                 }
                 ctx.squeeze = 1f;
                 ctx.budgetTw = pageBudgetTw;
+            }
+            // THE FIT RESERVE IS ONLY SPENT BY A PAGE THAT CANNOT FIT.
+            //
+            // A reserve taken off every page's budget was the first attempt, and it is wrong:
+            // it clamps the gap of any page that comes within the reserve of the paper, whether
+            // or not that page would have overrun, and that cost two documents a check each
+            // (341_shipping_manifest 18_displacement, academic-paper-ieee-2col-abstract
+            // 26_text_overlap) for pages that were never in danger. A page whose flow ends below
+            // pageBudgetTw - FIT_RESERVE_TW is written exactly as it was before; only a page that
+            // has to be made to fit pays for the reserve.
+            //
+            // 300 twips (15 pt) is measured, not guessed. With the column charge corrected,
+            // bank-statement-5-pages ends 24 twips over the paper and LibreOffice answers with a
+            // page break on all five sheets (5 pages in, 10 out). Swept on that document with
+            // the reserve applied to every page: 2, 12, 24, 48, 96 and 144 twips all still
+            // render 10 pages, 300 renders 5. So the renderer needs more than 7.2 pt of slack on
+            // a sheet the model calls full, and 15 pt is the first value that holds.
+            int fitReserveTw = Integer.parseInt(System.getProperty("p2w.fitreserve", "0"));
+            if (writtenTw > pageBudgetTw - fitReserveTw
+                    && !"1".equals(System.getProperty("p2w.noshave"))) {
+                // Still over the paper after squeezing: the residue is the part of the flow the
+                // guard could not give up, because it had already spent every gap it was allowed
+                // to. Take it out of the page's own largest gaps instead of letting a renderer
+                // answer with a page break.
+                int over = writtenTw - (pageBudgetTw - fitReserveTw);
+                int left = shaveToFit(pg, over);
+                writtenTw = spacingTw(pg);
+                if (System.getProperty("p2w.debugFlow") != null) {
+                    System.err.println("SHAVE over=" + over + " left=" + left
+                            + " writtenTw=" + writtenTw);
+                }
             }
             sb.append(pg);
             if (System.getProperty("p2w.debugFlow") != null) {
@@ -1449,6 +1616,41 @@ public final class DocxWriter {
         // page at all.
         if (colBottom <= colTop) return false;
 
+        // A CONTENT TABLE INSIDE A COLUMN IS COLUMN CONTENT, NOT A BAND ABOVE THE COLUMNS.
+        //
+        // The band's top is the first baseline on which TWO columns are both set, and a table
+        // contributes no baseline to that test: it is one block, not a paragraph, so its rows
+        // never appear in `shared`. On table-inside-two-column-page the right column's content
+        // table starts 110 pt ABOVE the first line where the two columns agree, so the band read
+        // as beginning below the table, the table fell into `before` as though it were a
+        // full-width band, and it was written at page level ahead of the layout table. Its 111 pt
+        // of rows were then charged to the single body flow and pushed every line after it down
+        // by 103.4 pt: measured, the first line after the table has its baseline at 243.50 in the
+        // render against 139.85 in the source, and 31 lines carry the shift.
+        //
+        // The column pass has ALREADY placed such a table in a column - home[] is computed from
+        // the table's own left and right - so the only thing wrong is that the band's extent was
+        // measured without it. Extend the band up to cover it. A table drawn across the gutter
+        // has home == -1 and is left alone: that one really is a full-width band, and the
+        // refusal below still fires for a full-width block that lands inside the band.
+        //
+        // GUARDED BY A FIT TEST, because home[] is a coarse tag: it asks which edge the block's
+        // LEFT starts at, not whether the block is inside the column. Without the test the rule
+        // also fires on 06_rect_paid_stamp_red_transparent, whose invoice table (x 64-515 on a
+        // 595 pt page) is tagged column 0 of a two-cell split at x=387 that it does not fit in -
+        // measured 34/43 -> 28/43, six checks lost. A table that really does fit its column is
+        // the case this is for; one that does not is the page's own mis-tagging and is left
+        // exactly where it was.
+        for (int i = 0; i < nb; i++) {
+            if (!(page.blocks.get(i) instanceof PdfToWord.Table) || home[i] < 0) continue;
+            float t = bTop[i], bt = blockBottom(page.blocks.get(i));
+            if (t < 0f || bt <= 0f) continue;
+            PdfToWord.Table q = (PdfToWord.Table) page.blocks.get(i);
+            int c = home[i];
+            if (q.left < edge[c] - 2f || q.right > edge[c + 1] + 2f) continue;
+            if (t < colTop) colTop = t;
+        }
+
         // Everything above the band is a band of its own, everything below is another, and what
         // is left between them has to be column content. That is the shape a table can describe:
         // a full-width band, then the columns, then a full-width band.
@@ -1511,6 +1713,29 @@ public final class DocxWriter {
         // refusal leaves the caller's flow untouched.
         if (used.size() < 2) return false;
 
+        // The bands must hold columns of text, not a column of labels beside a column of
+        // values. Every test up to here asks only "is there an x that recurs and that nothing
+        // crosses" - rowColumnEdges() reads the page's rows and clusters the fragments' left
+        // edges, and a form's labels recur at one x and its values at another, so every row of
+        // a form passes it. bank-statement-5-pages was written as a two-column layout table on
+        // all five of its pages that way, over a page with no columns at all: three label rows
+        // in a 36 pt band at the top of a sheet whose body is a ruled five-column table.
+        {
+            java.util.List<float[]> seg = new ArrayList<>();
+            for (int c = 0; c < n; c++) {
+                for (Object b : cells[c]) {
+                    if (!(b instanceof PdfToWord.Para)) continue;
+                    for (PdfToWord.Box z : ((PdfToWord.Para) b).boxes) {
+                        if (z.runs.isEmpty() || z.right <= z.x) continue;
+                        seg.add(new float[]{z.x, z.right});
+                    }
+                }
+            }
+            if (!PdfToWord.bandsAreColumns(seg, edge, colBottom - colTop, page.height)) {
+                return false;
+            }
+        }
+
         // The bands are written in the order the page drew them, top to bottom.
         //
         // Not in block order: the block pass orders a page by column and then by y, so a
@@ -1531,7 +1756,12 @@ public final class DocxWriter {
             gridTw[c] = (int) Math.max(1L, Math.round((edge[c + 1] - edge[c]) * TWIPS_PER_PT));
             totalTw += gridTw[c];
         }
-        int indTw = (int) Math.max(0L, Math.round(edge[0] * TWIPS_PER_PT));
+        // w:tblInd is measured from the text margin - the page margin at body level, and the
+        // CELL's left edge when this table is written inside one. The page's x is only the same
+        // number at body level; subtracting the cell keeps the field in the frame the renderer
+        // reads it in (see the Table path, which had this wrong at 4561).
+        int indTw = (int) Math.max(0L,
+                Math.round((edge[0] - (ctx.inColumn ? ctx.cellLeftPt : 0f)) * TWIPS_PER_PT));
 
         // The band's vertical extent, from the boxes the page drew.
         float bandTop = Float.MAX_VALUE, bandBottom = -Float.MAX_VALUE;
@@ -1711,8 +1941,36 @@ public final class DocxWriter {
     private static int flowTwOf(CharSequence xml) {
         int sum = 0;
         int i = 0;
+        // HOW DEEP INSIDE A NESTED TABLE THIS POSITION IS.
+        //
+        // A cell can hold a nested w:tbl - a real content table inside one column of a layout
+        // table - and every paragraph of that nested table carries its own w:before and w:line.
+        // Summing those charges the nested table once per CELL rather than once per ROW: a row
+        // of five option cells contributed five lines' worth of height to a row that renders as
+        // one. Measured on the two documents that nest, cell height as written against what the
+        // rows really occupy: 401_trifold_brochure 5583 tw against 4783 (1.6x), and
+        // 350_question_paper 21644 tw against 17596 (2.9x) - a 1082 pt row on a 842 pt page,
+        // which is why that document comes out as three pages.
+        //
+        // Inside a nested table the height is carried by its own w:trHeight, exactly as the
+        // paragraph rule is for a plain cell (see the note above). So skip w:before/w:line in
+        // there and take the row heights instead.
+        int depth = 0;
         while (i < xml.length()) {
-            if (startsWith(xml, BEFORE, i)) {
+            if (startsWith(xml, TBL_OPEN, i)) {
+                depth++;
+                i += TBL_OPEN.length();
+            } else if (startsWith(xml, TBL_CLOSE, i)) {
+                if (depth > 0) depth--;
+                i += TBL_CLOSE.length();
+            } else if (depth > 0) {
+                if (startsWith(xml, TRHEIGHT, i)) {
+                    sum += digits(xml, i + TRHEIGHT.length());
+                    i += TRHEIGHT.length();
+                } else {
+                    i++;
+                }
+            } else if (startsWith(xml, BEFORE, i)) {
                 sum += digits(xml, i + BEFORE.length());
                 i += BEFORE.length();
             } else if (startsWith(xml, LINE, i)) {
@@ -2126,6 +2384,25 @@ public final class DocxWriter {
      * to the extent: a path that runs a hair outside its own bounding box would otherwise be
      * drawn outside the shape and lost.
      */
+    /**
+     * Is this line drawn on a quarter turn - within a degree of 90 or 270?
+     *
+     * <p>The band is a degree wide because that is the width of the claim: a line at 90.4
+     * degrees is a vertical column of text as far as a reader is concerned, and the construct
+     * below turns it by exactly 90. A line at 89 is still 89 and gets the picture-free path
+     * every other angle gets.
+     */
+    private static boolean quarterTurn(float deg) {
+        float a = ((deg % 360f) + 360f) % 360f;
+        return Math.abs(a - 90f) <= 1f || Math.abs(a - 270f) <= 1f;
+    }
+
+    /** The quarter turn that reads bottom-to-top, i.e. the PDF's -90. */
+    private static boolean readsUp(float deg) {
+        float a = ((deg % 360f) + 360f) % 360f;
+        return Math.abs(a - 270f) <= 1f;
+    }
+
     private static String geom(Shape s, long cx, long cy) {
         if (s.kind != 2 || s.freeform == null || s.freeform.isEmpty()) {
             return "<a:prstGeom prst=\"" + (s.kind == 1 ? "ellipse" : "rect")
@@ -2229,15 +2506,15 @@ public final class DocxWriter {
     }
 
     /**
-     * The lightness (HSL L, 0..1) of a 0xRRGGBB colour.
+     * True when a 0xRRGGBB fill is the page's own colour to within {@link #PAGE_TOL}.
      *
-     * <p>Lightness, not luminance: what makes a filled band read as a white patch on a dark
-     * canvas is how light it is, and HSL L is the same number Word's own colour picker shows
-     * for the tint.
+     * <p>The largest per-channel distance from white, which is what a reader sees as the edge
+     * of a band: 0 for FFFFFF, 26 for E5EBF5, 54 for C9C9C9. Only the first of those is a fill
+     * a reader cannot tell from the paper, and only that one is dropped.
      */
-    private static double lightness(int rgb) {
+    private static boolean isPageColour(int rgb) {
         int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
-        return (Math.max(r, Math.max(g, b)) + Math.min(r, Math.min(g, b))) / 510.0;
+        return 255 - Math.min(r, Math.min(g, b)) <= PAGE_TOL;
     }
 
     /**
@@ -2275,11 +2552,11 @@ public final class DocxWriter {
      * filled; without it, the same fill comes out 000000. The hue of the tint is lost - a tint of
      * white has no hue to keep, only a lightness - which is the price of making it relative.
      *
-     * <p>Only light fills are written this way. A dark band carries white text - the FFFFFF
-     * headings in 01, 02, 04 and 62 sit on one - and must stay dark in light mode, so a fill
-     * below the threshold keeps its absolute hex. Dark fills are not the reported defect: a
-     * dark band on a dark canvas is not a patch, and inverting it would make its white text
-     * disappear.
+     * <p>Only a fill that IS the page is dropped. A dark band carries white text - the FFFFFF
+     * headings in 01, 02, 04 and 62 sit on one - and must stay dark in light mode, and a pale
+     * tint is a cell's shading, so both keep their absolute hex. See {@link #PAGE_TOL} for the
+     * measurement that separates them: 202 of the 402 fills the old lightness rule dropped were
+     * cell fills with a word inside them, and every one of them sat 9 levels or more off the page.
      */
     private static void fillXml(StringBuilder sb, int rgb, float alpha) {
         fillXml(sb, rgb, alpha, false);
@@ -2290,8 +2567,7 @@ public final class DocxWriter {
      *                  when it is light. See {@link #isHairline} and {@link #shape}.
      */
     private static void fillXml(StringBuilder sb, int rgb, float alpha, boolean mustPaint) {
-        double l = lightness(rgb);
-        if (l >= LIGHT_FILL && !mustPaint) {
+        if (isPageColour(rgb) && !mustPaint) {
             // No fill at all. A decorative tint barely distinguishable from the page IS no fill
             // on a dark page, and a fill is the only thing that can be a white patch - so the
             // good converters emit none: measured, Adobe writes ZERO w:shd fills and iLovePDF
@@ -2505,8 +2781,33 @@ public final class DocxWriter {
                     // the {@link #ASCENT} it has always had, because every other such line in
                     // the corpus is measured against that.
                     float topEm = frame != null ? LINE_BASE * LINE_FACTOR : ASCENT;
+                    if (quarterTurn(lineAngle)) {
+                        // A quarter-turn line with no frame to sit in still gets the one
+                        // construct that turns: swapped extent, vert, no a:xfrm rot. The
+                        // box's local (0,0) is the frame's far corner along the baseline
+                        // (vert270 reads up, so it starts at the bottom) and the baseline
+                        // falls at LINE_BASE * lineHeight on its own.
+                        double c2 = Math.cos(Math.toRadians(lineAngle));
+                        double s2 = Math.sin(Math.toRadians(lineAngle));
+                        boolean up2 = readsUp(lineAngle);
+                        float ax = 0f, ay = topEm * b.size;
+                        float lu = up2 ? wPt : 0f, lv = up2 ? 0f : hPt;
+                        float du = lu - ax, dv = lv - ay;
+                        // THE BASELINE ORIGIN, NOT THE CENTRED BOX. startX is px - length/2
+                        // because the horizontal construct centres a rotated box on the
+                        // origin; a vertical frame starts its text AT the origin, so the
+                        // half-length offset would move the text by exactly length/2 -
+                        // measured on table-with-rotated-header: -12.5 pt on "Month" and
+                        // -32.9 pt on "Cost per piece (Rs)", which are their half-lengths.
+                        anchorAt(sb, ctx,
+                                (float) (px + c2 * du - s2 * dv),
+                                (float) (py + s2 * du + c2 * dv),
+                                0f, 0f, hPt, wPt, inner.toString(), 0f, -1, 0.6f, 0f, 0f,
+                                up2 ? "vert270" : "vert");
+                    } else {
                     anchorAt(sb, ctx, startX, py, 0f, topEm * b.size, wPt, hPt,
-                            inner.toString(), 0f, -1, 0.6f, 0f, 0f);
+                            inner.toString(), lineAngle, -1, 0.6f, 0f, 0f);
+                    }
                 }
             }
             return;
@@ -2825,17 +3126,37 @@ public final class DocxWriter {
         StringBuilder tabs = new StringBuilder();
         for (int i = 1; i < cols.size(); i++) {
             PdfToWord.Box b = cols.get(i), before = cols.get(i - 1);
-            float pos = b.x;
+            // A tab stop is measured from the paragraph's TEXT MARGIN. Outside a cell that is
+            // the page margin, and the section's margins are zero, so a stop is the page's own
+            // x. Inside a layout-table cell the text margin is the CELL's left edge, so a page
+            // x written there is one column-edge too far right: on 403_crossword_puzzle the
+            // stop (157.5 pt) fell outside a 7 pt cell, LibreOffice dropped it and the number
+            // landed on the cell's edge at 157.6 pt where the page drew it at 113.5, and on
+            // 401_trifold_brochure every field of the third panel came back at page x plus the
+            // panel's own left edge. The indent on the same paragraph already comes off
+            // (bandLeftTw), so the stop is the only field still in the page's frame.
+            float frameX = ctx.inColumn ? ctx.cellLeftPt : 0f;
+            float pos = b.x - frameX;
             // The embedded face's advance is not the substituted face's: at the same point size
             // Word's face can be a few per cent wider, and a tab stop that lands inside the text
             // before it is skipped for the next one. Only ever push the stop clear, never left.
-            float clear = before.right * 1.06f + before.size * 0.4f;
+            //
+            // The clearance is ONE EM OF THE TYPE BEFORE IT, not a percentage of an absolute x.
+            // It was `before.right * 1.06f`, and 6 % of an absolute x grows with how far right
+            // the field sits: 3.2 pt at x=56 and 21 pt at x=350, so a row in the right-hand
+            // column of a form had its stop pushed 21 pt past the x the page drew it at and the
+            // field then ran past the column's right edge (60) and out of its 10 pt window (43).
+            // Measured on the 211-document corpus, this term with the cell-frame fix above and
+            // the w:tblInd fix below: 60 25 -> 23, 43 13 -> 12, 47 49 -> 41, total 8461 -> 8475,
+            // no document worse. 47 is where the term itself shows: it is a left-edge statistic
+            // and the push was the largest single move on it (8 documents).
+            float clear = before.right + before.size * 0.4f;
             boolean last = i == cols.size() - 1;
             if (last && b.right > ctx.pageWidthPt - 2f && b.right > clear) {
                 // A field that ends at the paper's edge is right-aligned there. A right tab keeps
                 // its RIGHT edge where the page drew it, so a wider substitute grows inwards
                 // instead of wrapping the last word onto the next line.
-                int posTw = (int) Math.round(b.right * TWIPS_PER_PT);
+                int posTw = (int) Math.round((b.right - frameX) * TWIPS_PER_PT);
                 tabs.append("<w:tab w:val=\"right\" w:pos=\"").append(posTw).append("\"/>");
                 continue;
             }
@@ -2893,7 +3214,7 @@ public final class DocxWriter {
         sb.append("</w:pPr>");
         for (PdfToWord.Run run : b.runs) {
             if (run.text.isEmpty()) continue;
-            runXml(sb, run);
+            runXml(sb, run, p.heading > 0);
         }
         sb.append("</w:p>");
     }
@@ -3409,7 +3730,7 @@ public final class DocxWriter {
         sb.append("</w:pPr>");
         for (PdfToWord.Run run : b.runs) {
             if (run.text.isEmpty()) continue;
-            runXml(sb, run);
+            runXml(sb, run, p.heading > 0);
         }
         sb.append("</w:p>");
     }
@@ -3431,13 +3752,36 @@ public final class DocxWriter {
         sb.append("</w:pPr>");
         for (PdfToWord.Run run : p.runs) {
             if (run.text.isEmpty()) continue;
-            runXml(sb, run);
+            runXml(sb, run, p.heading > 0);
         }
         sb.append("</w:p>");
     }
 
     /** One run with the properties the PDF drew it with. */
     private static void runXml(StringBuilder sb, PdfToWord.Run run) {
+        runXml(sb, run, false);
+    }
+
+    /**
+     * One run, with {@code styleBold} telling it that the paragraph style it is written into
+     * already says bold.
+     *
+     * <p>THE HEADING STYLES SAY BOLD, so every run inside a heading inherited it. The style
+     * definition is {@code <w:rPr><w:b/>...} (see {@link #heading}) and a run that carries no
+     * {@code w:b} of its own takes the style's - which is correct DOCX, and wrong for a page
+     * whose heading is drawn in a regular face. Measured on the 211-document corpus, this is
+     * the whole of 34c's two failures: 39_small_caps_letter_spacing draws "THE MYSORE CHAMBER
+     * OF COMMERCE AND INDUSTRY" in Liberation Serif Regular at 15/11.7 pt, the engine marked
+     * the line a Heading3 because it is 1.43x the body size, and 12 of 74 matched spans came
+     * back bold (LiberationSerif-Bold, flags 20); product-catalogue-code-left-price-right does
+     * the same to the rupee sign of every price line, which the engine marked Heading2 - 20 of
+     * 126 spans, and 34c read 84 % on both documents.
+     *
+     * <p>The style's bold is not removed - it is what makes the heading a heading in Word's
+     * outline - it is switched OFF per run, which is how DOCX expresses "this run is not the
+     * style's weight".
+     */
+    private static void runXml(StringBuilder sb, PdfToWord.Run run, boolean styleBold) {
         sb.append("<w:r><w:rPr>");
         // The typeface and colour the PDF used. Without these every document came out in
         // the default font in black, and "the Word file should look like the PDF" had no
@@ -3449,6 +3793,7 @@ public final class DocxWriter {
                     .append("\" w:cs=\"").append(face).append("\"/>");
         }
         if (run.bold) sb.append("<w:b/>");
+        else if (styleBold) sb.append("<w:b w:val=\"0\"/>");
         if (run.italic) sb.append("<w:i/>");
         // Only when the page named one. A run with no w:color is left on Automatic, which is
         // what a reader adapts to its own canvas - pinning 000000 here would make every such
@@ -3885,14 +4230,30 @@ public final class DocxWriter {
      * There is no second object to move against the first, and no {@code w:framePr} anywhere in
      * a stamp.
      *
-     * <p>THE GEOMETRY, AND WHY IT IS EXPRESSED IN THE BOX'S OWN FRAME. {@code <a:xfrm rot>} turns
-     * a shape about its CENTRE, so the path inside it must be the shape BEFORE the turn: the
-     * rectangle as the page's own text frame saw it, {@code frame.w} by {@code frame.h}, with
-     * {@code u} along the reading direction. Each rule's corners are the page's corners projected
-     * onto those two axes, and each line's baseline is projected the same way - so the text sits
-     * inside the frame by construction, and the rotation puts the whole thing back on the page.
-     * The anchor is then placed by {@link #anchorShape}, which solves for the offset such that the
-     * box's local (0,0) lands on the frame's own corner after the turn.
+     * <p>THE GEOMETRY, AND WHY THE BOX IS THE FRAME'S BOUNDING BOX. A renderer that will not
+     * turn glyphs lays a text box's paragraphs out in the box's AXIS-ALIGNED BOUNDING BOX: it
+     * applies {@code w:ind/@w:left} horizontally and {@code w:spacing/@w:before} vertically.
+     * The previous construction wrote those two numbers as the line's offset ALONG and ACROSS
+     * the reading direction inside a box turned by {@code <a:xfrm rot>}, so the renderer applied
+     * both to the wrong axis and measured the across-offset from the bounding box's corner
+     * rather than from the frame's - a 26.5 pt error on 08's blue stamp at 14 degrees, and on a
+     * 90-degree stamp a complete transposition: 03's three lines came out at the top of the
+     * strip running right, two of them off the page.
+     *
+     * <p>Expressing the box in page axes removes both errors, because the box and the bounding
+     * box are then the same frame and the writer, not the renderer, decides where each run
+     * starts. The frame is unaffected: its rules are still the page's own corners, projected
+     * into the box's frame, so the outline is drawn exactly where the page drew it and the two
+     * rules still cannot drift against each other.
+     *
+     * <p>WHERE EACH RUN STARTS. A run shorter than the strip goes where the page put it,
+     * clamped into the strip, with the ink edge - not the baseline origin - aligned to the
+     * page's, because a tilted line's glyphs overhang their origin by {@code size*sin(angle)}.
+     * A run longer than the strip cannot be contained by any start point, so it is centred:
+     * that is the placement that keeps the most of it on the paper (56.2 % of 03's ink lands
+     * inside the outline against 30.1 % from the page's own line origin) and splits the
+     * overflow instead of piling it on one side. That case is the 90-degree stamp, and it is
+     * the one residual this patch does not remove - see the patch notes.
      *
      * <p>NOTHING IS CHARGED TO THE PAGE. The drawing is anchored in a zero-height carrier
      * paragraph and its text lives in {@code w:txbxContent}, which {@link #spacingTw} does not
@@ -3904,84 +4265,116 @@ public final class DocxWriter {
         double th = Math.toRadians(lineAngle);
         double ux = Math.cos(th), uy = Math.sin(th);
         double vx = -Math.sin(th), vy = Math.cos(th);
-        // The frame's own corner in page space: local (0, 0) of the box.
         float p0x = (float) (frame.cx - (frame.w / 2.0) * ux - (frame.h / 2.0) * vx);
         float p0y = (float) (frame.cy - (frame.w / 2.0) * uy - (frame.h / 2.0) * vy);
-
-        // Each line's baseline in the box's own frame, and the top of its line box, which is
-        // where a paragraph has to start for its glyphs to land on the page's baseline.
+        // the frame's axis-aligned bounding box, which is the frame this renderer uses
+        float bx0 = Float.MAX_VALUE, by0 = Float.MAX_VALUE;
+        float bx1 = -Float.MAX_VALUE, by1 = -Float.MAX_VALUE;
+        double[][] corners = {
+                {p0x, p0y},
+                {p0x + frame.w * ux, p0y + frame.w * uy},
+                {p0x + frame.w * ux + frame.h * vx, p0y + frame.w * uy + frame.h * vy},
+                {p0x + frame.h * vx, p0y + frame.h * vy}};
+        for (double[] c : corners) {
+            bx0 = (float) Math.min(bx0, c[0]); bx1 = (float) Math.max(bx1, c[0]);
+            by0 = (float) Math.min(by0, c[1]); by1 = (float) Math.max(by1, c[1]);
+        }
         int n = lines.size();
-        float[] lx = new float[n], top = new float[n], lpt = new float[n];
+        float[] lx = new float[n], ly = new float[n], lpt = new float[n], Lr = new float[n];
         for (int i = 0; i < n; i++) {
             PdfToWord.Box b = lines.get(i);
             float px = b.x, py = b.y;
             if (mirrored(b)) {
-                // A 180-degree line's origin comes back mirrored about the page (see
-                // {@link #mirrored}); the box's own frame is turned with it, so it has to be put
-                // back before it means anything here.
                 px = ctx.pageWidthPt - b.x;
                 py = ctx.pageHeightPt - b.y;
             }
-            lx[i] = (float) ((px - p0x) * ux + (py - p0y) * uy);
-            float ly = (float) ((px - p0x) * vx + (py - p0y) * vy);
+            // The run is upright, so its advance is horizontal: L is the length it will
+            // occupy along x, which is what the placement below needs.
+            float L = b.length > 0f ? b.length : Math.abs(b.right - b.x);
+            if (L <= 0f) L = 1f;
+            Lr[i] = L;
+            float fw = bx1 - bx0;
+            double dirX = Math.cos(th);
+            if (L > fw) {
+                // The run is longer than the strip can hold, so no start point inside it
+                // contains any more of the run than another: centring it is the placement
+                // that puts the overflow on both sides instead of all on one.
+                lx[i] = (bx0 + bx1) / 2f - L / 2f;
+            } else {
+                // A tilted line's INK starts before its baseline origin: a run drawn at
+                // 15 degrees has its glyph boxes reaching size*sin(15) to the left of the
+                // point the page calls the line's start. An upright run has no such
+                // overhang, so placing it on the origin puts its ink that far RIGHT of the
+                // page's - 3.4 pt on 01, which is over the 2 pt a line is allowed before
+                // it reads as unregistered. Taking the overhang off aligns ink with ink,
+                // and the origin is then 3.4 pt out, which is inside the displacement
+                // tolerance (clamp(0.35*size, 1.5, 4.5)).
+                float over = Math.abs(dirX) >= 0.5
+                        ? b.size * Math.abs((float) Math.sin(th)) : 0f;
+                if (dirX <= -0.5) lx[i] = px - L + over;   // drawn right to left
+                else if (Math.abs(dirX) < 0.5) lx[i] = (bx0 + bx1) / 2f - L / 2f;
+                else lx[i] = px - over;                    // drawn left to right
+                lx[i] = Math.max(bx0, Math.min(bx1 - L, lx[i]));
+            }
+            ly[i] = py;
             lpt[i] = flowLinePt(-1f, b.size, 0f);
-            top[i] = ly - LINE_BASE * lpt[i];
         }
-        // The page's own order, not the order the lines were detected in.
+        // The box has to hold every run, and a centred run starts LEFT of the frame - so the
+        // box is the union of the frame and the runs, not the frame alone. An indent cannot be
+        // negative, so a box that only covered the frame would clamp the run back to its edge
+        // and put the centred variant exactly where the left-aligned one is.
+        float ux0 = bx0, uy0 = by0, ux1 = bx1, uy1 = by1;
+        for (int i = 0; i < n; i++) {
+            ux0 = Math.min(ux0, lx[i]);
+            ux1 = Math.max(ux1, lx[i] + Lr[i]);
+            uy0 = Math.min(uy0, ly[i] - LINE_BASE * lpt[i]);
+            uy1 = Math.max(uy1, ly[i] + lpt[i]);
+        }
+        for (int i = 0; i < n; i++) { lx[i] -= ux0; ly[i] -= uy0; }
+        bx0 = ux0; by0 = uy0;
+        float bw = ux1 - ux0, bh = uy1 - uy0;
         Integer[] order = new Integer[n];
         for (int i = 0; i < n; i++) order[i] = i;
-        final float[] sortKey = top;
+        final float[] sortKey = ly;
         java.util.Arrays.sort(order, new java.util.Comparator<Integer>() {
             public int compare(Integer a, Integer b) {
                 return Float.compare(sortKey[a], sortKey[b]);
             }
         });
 
-        // The frame: every rule of this stamp, projected into the box's own frame. Both rules in
-        // one path, which is what keeps them from drifting against each other.
-        Shape local = new Shape(0f, 0f, Math.max(0.1f, frame.w), Math.max(0.1f, frame.h));
+        Shape local = new Shape(0f, 0f, Math.max(0.1f, bw), Math.max(0.1f, bh));
         local.kind = 2;
         java.util.List<float[]> cmds = new ArrayList<>();
         Shape merged = frame.shape.mergedShape;
         if (merged != null && merged.freeform != null && !merged.freeform.isEmpty()) {
             for (float[] c : merged.freeform) {
                 int type = (int) c[0];
-                if (type == 3) {
-                    cmds.add(new float[]{3f});
-                    continue;
-                }
-                cmds.add(new float[]{type,
-                        (float) ((c[1] - p0x) * ux + (c[2] - p0y) * uy),
-                        (float) ((c[1] - p0x) * vx + (c[2] - p0y) * vy)});
+                if (type == 3) { cmds.add(new float[]{3f}); continue; }
+                cmds.add(new float[]{type, c[1] - bx0, c[2] - by0});
             }
         } else {
-            // One rule only - the frame is the box itself.
             cmds.add(new float[]{0f, 0f, 0f});
-            cmds.add(new float[]{1f, frame.w, 0f});
-            cmds.add(new float[]{1f, frame.w, frame.h});
-            cmds.add(new float[]{1f, 0f, frame.h});
+            cmds.add(new float[]{1f, bw, 0f});
+            cmds.add(new float[]{1f, bw, bh});
+            cmds.add(new float[]{1f, 0f, bh});
             cmds.add(new float[]{3f});
         }
         local.freeform = cmds;
         local.freeformClosed = false;
-        long cx = Math.max(1, Math.round(frame.w * EMU_PER_PT));
-        long cy = Math.max(1, Math.round(frame.h * EMU_PER_PT));
+        long cx = Math.max(1, Math.round(bw * EMU_PER_PT));
+        long cy = Math.max(1, Math.round(bh * EMU_PER_PT));
         String geomXml = geom(local, cx, cy);
-
-        // The stroke the page drew, with its own weight and opacity.
         long lw = Math.max(0, Math.round(frame.shape.lineWidthPt * EMU_PER_PT));
         String lnXml = "<a:ln w=\"" + lw + "\"><a:solidFill><a:srgbClr val=\""
                 + hex(frame.shape.lineRgb) + "\">" + alphaXml(frame.shape.lineAlpha)
                 + "</a:srgbClr></a:solidFill></a:ln>";
 
-        // The words, each paragraph at its own measured place inside the box. A text box lays its
-        // paragraphs out downwards from its top inset, so the first one gets the gap it needs and
-        // every later one gets the distance from the bottom of the line above it.
         StringBuilder inner = new StringBuilder(256);
         float cursor = 0f;
         for (int k = 0; k < n; k++) {
             int i = order[k];
-            float before = Math.max(0f, top[i] - cursor);
+            float top = ly[i] - LINE_BASE * lpt[i];
+            float before = Math.max(0f, top - cursor);
             cursor = cursor + before + lpt[i];
             int beforeTw = (int) Math.round(before * TWIPS_PER_PT);
             int lineTw = (int) Math.max(1L, Math.round(lpt[i] * TWIPS_PER_PT));
@@ -3998,17 +4391,7 @@ public final class DocxWriter {
             }
             inner.append("</w:p>");
         }
-        if (System.getProperty("p2w.debugStamp") != null) {
-            System.err.println("STAMP angle=" + lineAngle + " frame=" + frame.w + "x" + frame.h
-                    + " centre=" + frame.cx + "," + frame.cy + " p0=" + p0x + "," + p0y
-                    + " lines=" + n);
-            for (int k = 0; k < n; k++) {
-                int i = order[k];
-                System.err.println("   line " + k + " lx=" + lx[i] + " top=" + top[i]
-                        + " pt=" + lpt[i] + " text=" + lines.get(i).text());
-            }
-        }
-        anchorShape(sb, ctx, p0x, p0y, 0f, 0f, frame.w, frame.h, lineAngle,
+        anchorShape(sb, ctx, bx0, by0, 0f, 0f, bw, bh, 0f,
                 geomXml, lnXml, inner.toString(), 0f, 0f);
     }
 
@@ -4148,6 +4531,15 @@ public final class DocxWriter {
                                  float lx, float ly, float wPt, float hPt, String inner,
                                  float rotDeg, int borderRgb, float borderWpt,
                                  float lInsPt, float tInsPt) {
+        anchorAt(sb, ctx, pageX, pageY, lx, ly, wPt, hPt, inner, rotDeg, borderRgb, borderWpt,
+                lInsPt, tInsPt, null);
+    }
+
+    /** The same, with the text frame turned inside an upright box - see {@link #anchorShape}. */
+    private static void anchorAt(StringBuilder sb, Ctx ctx, float pageX, float pageY,
+                                 float lx, float ly, float wPt, float hPt, String inner,
+                                 float rotDeg, int borderRgb, float borderWpt,
+                                 float lInsPt, float tInsPt, String vert) {
         String ln;
         if (borderRgb >= 0) {
             ln = "<a:ln w=\"" + Math.max(6350, Math.round(borderWpt * EMU_PER_PT))
@@ -4159,7 +4551,7 @@ public final class DocxWriter {
         }
         anchorShape(sb, ctx, pageX, pageY, lx, ly, wPt, hPt, rotDeg,
                 "<a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom>", ln, inner,
-                lInsPt, tInsPt);
+                lInsPt, tInsPt, vert);
     }
 
     /**
@@ -4174,11 +4566,55 @@ public final class DocxWriter {
                                     float lx, float ly, float wPt, float hPt, float rotDeg,
                                     String geomXml, String lnXml, String inner,
                                     float lInsPt, float tInsPt) {
+        anchorShape(sb, ctx, pageX, pageY, lx, ly, wPt, hPt, rotDeg, geomXml, lnXml, inner,
+                lInsPt, tInsPt, null);
+    }
+
+    /**
+     * The same, with the text frame turned inside an upright box.
+     *
+     * <p>{@code vert} is "vert270" or "vert", or null for a box whose text lies flat. It is
+     * the one construct LibreOffice turns, and it needs the box's extent swapped by the
+     * caller - a vertical frame wraps along its height. See {@link #stampBox}.
+     */
+    private static void anchorShape(StringBuilder sb, Ctx ctx, float pageX, float pageY,
+                                    float lx, float ly, float wPt, float hPt, float rotDeg,
+                                    String geomXml, String lnXml, String inner,
+                                    float lInsPt, float tInsPt, String vert) {
         double th = Math.toRadians(rotDeg);
         double cos = Math.cos(th), sin = Math.sin(th);
         double dx = lx - wPt / 2.0, dy = ly - hPt / 2.0;
         float offXpt = (float) (pageX - wPt / 2.0 - (cos * dx - sin * dy));
         float offYpt = (float) (pageY - hPt / 2.0 - (sin * dx + cos * dy));
+        // THE BOX HAS TO LAND ON THE PAPER, AND NOTHING ELSE IN THIS WRITER ASKS.
+        //
+        // The offset above is the page's own coordinate, written straight through. A line the
+        // page drew near its right edge gets a box 12 % wider than the line plus 1.5 em (see
+        // para()), and a line whose baseline origin is the END of the text - every 180-degree
+        // line, whose origin comes back mirrored - gets a box that starts where the text STOPS.
+        // Either way the box runs off the sheet, and a renderer that clips at the page edge does
+        // not clip the box's text to a few points: it drops it. Measured at 23ffa25 by moving
+        // only this offset back onto the page and changing nothing else - 401_trifold_brochure
+        // 104 characters back (262 -> 366), 364_event_ticket 15,
+        // 411_nested_xobject_transforms 3, 03_stamp_vertical_90deg 1: 123 characters the .docx
+        // carried and the page never drew. Clamping moves nothing that already fits.
+        //
+        // HORIZONTALLY ONLY. The vertical analogue is the same fault - 12_stamp_across_page_break
+        // writes its "12 AUG 2025" box at y = -14.8 pt, 5 characters above the top edge - but
+        // pulling it down lands it ON the table it was drawn clear of, and 26_text_overlap fails
+        // the document for it. A box that leaves the sheet vertically is a stamp the page put
+        // outside itself; that is a placement decision, not a width the writer got wrong.
+        if (rotDeg == 0f && wPt < ctx.pageWidthPt) {
+            float fitX = Math.max(0f, Math.min(offXpt, ctx.pageWidthPt - wPt));
+            if (fitX != offXpt) {
+                anchorClamped++;
+                if (System.getProperty("p2w.debugAnchors") != null) {
+                    System.err.println("ANCHOR clamp x " + Math.round(offXpt) + " -> " + Math.round(fitX)
+                            + " box " + Math.round(wPt) + " page " + Math.round(ctx.pageWidthPt));
+                }
+                offXpt = fitX;
+            }
+        }
         int id = ctx.shapeSeq++;
         long cx = Math.max(1, Math.round(wPt * EMU_PER_PT));
         long cy = Math.max(1, Math.round(hPt * EMU_PER_PT));
@@ -4232,6 +4668,7 @@ public final class DocxWriter {
                 .append(Math.round(lInsPt * EMU_PER_PT)).append("\" tIns=\"")
                 .append(Math.round(tInsPt * EMU_PER_PT))
                 .append("\" rIns=\"0\" bIns=\"0\"")
+                .append(vert == null ? "" : " vert=\"" + vert + "\"")
                 .append(" anchor=\"t\" anchorCtr=\"0\"><a:noAutofit/></wps:bodyPr>")
                 .append("</wps:wsp></a:graphicData></a:graphic>")
                 .append("</wp:anchor></w:drawing></w:r></w:p>");
@@ -4269,14 +4706,16 @@ public final class DocxWriter {
      * <p>A side with no stroke ({@code sideStroke} null) keeps the old constant, sz 8 in
      * 000000, so nothing that used to be right changes.
      */
-    private static String borders(int[] sideSz, String[] sideColour,
-                                  boolean outer, boolean innerH, boolean innerV) {
+    private static String borders(int[] sideSz, String[] sideColour, boolean[] sideDrawn) {
         StringBuilder b = new StringBuilder("<w:tblBorders>");
         for (int i = 0; i < TABLE_SIDES.length; i++) {
             String side = TABLE_SIDES[i];
-            boolean drawn = "insideH".equals(side) ? innerH
-                    : "insideV".equals(side) ? innerV
-                    : outer;
+            // One flag per side, and it is the page's own answer (PdfToWord.Table#sideDrawn):
+            // the page drew a rule on this side, so this side is drawn - at that rule's weight
+            // and colour - and the rule itself is dropped from the shape pass at the same time.
+            // Where the page drew nothing this is "nil", and the hairline the page did draw
+            // stays a shape at its own position. No side is left without an owner.
+            boolean drawn = sideDrawn[i];
             // w:val="nil", not "none" with sz="0" w:color="auto". "auto" is an inherited colour
             // by definition - a reader resolves it to whatever it thinks a line is, usually the
             // flipped text colour - and it was written on 486 sides across 59 documents. A side
@@ -4387,13 +4826,74 @@ public final class DocxWriter {
             boolean onRight = Math.abs(s.xPt + s.wPt - t.right) <= tol
                     && s.topPt <= t.bottom + tol && s.topPt + s.hPt >= t.top - tol;
             if (onTop || onBottom || onLeft || onRight) return true;
-            // A rule, not a frame: a hairline band cannot be the box a table sits in.
-            if (s.wPt < 8f || s.hPt < 8f) continue;
-            boolean encloses = t.top >= s.topPt - tol && t.bottom <= s.topPt + s.hPt + tol
-                    && t.left >= s.xPt - tol && t.right <= s.xPt + s.wPt + tol;
-            if (encloses && tw >= s.wPt * 0.5f && th >= s.hPt * 0.5f) return true;
+            // THE ENCLOSING-FRAME BRANCH THAT USED TO BE HERE IS GONE, AND IT WAS DRAWING THE
+            // FRAME TWICE.
+            //
+            // It read: a stroke-only box that encloses the table, and is at least half covered
+            // by it, means the page drew this table a grid, so give the table borders. The
+            // reading is wrong on its own terms. Every shape in `shapes` is a Shape block on
+            // the page (DocxWriter.java:850-853, `ctx.curShapes = outlines`), and the shape
+            // pass draws all of them. So the frame is already on the page as its own outline
+            // before this table is written. Saying "this table is ruled" does not add the
+            // frame the page drew - it adds a SECOND rectangle, and a smaller one: w:tblBorders
+            // is stroked on the cell grid, and the whitespace pass measures that grid from the
+            // table's TEXT, while the frame the page drew sits outside the text (pageDrewRule's
+            // own docstring measures that gap on 04_stamp_180deg as 8.3 pt left, 14.3 pt above,
+            // 96.1 pt right). Two nested rectangles where the page had one.
+            //
+            // Measured, and it is the largest single cause of 59_shape_anchor's failures: on
+            // 80_gstin_pan_cin_ifsc_table the page draws five 483.3x84.0 row-group frames and
+            // no interior rules at all. The engine reproduced all five exactly - and then
+            // wrote six tables whose outer borders trace the text extents at 64.1..484.5 x
+            // 58.5 tall. The render therefore holds both, and 59's smallest-enclosing-box
+            // anchors onto the invented 58.5 pt box instead of the page's 84 pt one; the text
+            // sits 5 pt nearer its top inside it and every cell in the table fails. 65 runs on
+            // that one document, 671 "moved" runs across the 51 non-stamp documents.
+            //
+            // Nothing is lost by removing it: the frame the page drew is still drawn, by the
+            // shape pass, at the page's own coordinates. What goes away is the duplicate.
         }
         return false;
+    }
+
+    /**
+     * How many lines the renderer will draw this cell's text on, at the cell's own width.
+     *
+     * <p>The width is the estimate this file already uses for a line's own advance -
+     * {@code 0.5 em a character} (see {@code para()}'s {@code chars * b.size * 0.5f}) -
+     * measured against the column the cell was given. It answers ONE question: does this
+     * cell hold one line or several. It sets no row height, no column width and no
+     * {@code w:before}, so a table it decides "wraps" is laid out at exactly the height the
+     * page gave it; only the box the cell's lines advance by changes.
+     *
+     * <p>That is why a wrong answer here is cheap. A cell called "wraps" that does not is
+     * written with the row's own line advance instead of the hairline, and since both forms
+     * put the first baseline at {@code 0.8 * rowLineTw}, a one-line cell renders identically
+     * either way. A cell called "one line" that wraps is the defect this exists to stop.
+     */
+    private static int wrapsAt(String cv, int q, int r, PdfToWord.Table t,
+                               int[] colTw, int cols) {
+        if (cv == null || cv.isEmpty() || q >= cols || colTw == null || q >= colTw.length) {
+            return 1;
+        }
+        float sz = r < t.sizes.size() && q < t.sizes.get(r).size()
+                && t.sizes.get(r).get(q) != null ? t.sizes.get(r).get(q) : 0f;
+        if (sz <= 0f) return 1;
+        int availTw = colTw[q];
+        if (availTw <= 0) return 1;
+        int maxChars = (int) Math.floor(availTw / (0.5f * sz * TWIPS_PER_PT));
+        if (maxChars < 1) maxChars = 1;
+        int best = 1;
+        int from = 0;
+        for (int i = 0; i <= cv.length(); i++) {
+            if (i == cv.length() || cv.charAt(i) == '\n') {
+                int len = i - from;
+                int n = len <= 0 ? 1 : (len + maxChars - 1) / maxChars;
+                if (n > best) best = n;
+                from = i + 1;
+            }
+        }
+        return best;
     }
 
     private static void table(StringBuilder sb, PdfToWord.Table t, Ctx ctx) {
@@ -4527,7 +5027,24 @@ public final class DocxWriter {
         // is the missing line on 04_stamp_180deg, whose grid the page draws round every table.
         // The same answer decides the row height, because a rule that is drawn is a rule the
         // renderer adds to the row, and {@link #TABLE_BORDER_TW} is that rule's height.
-        boolean ruledTable = t.ruled || pageDrewRule(t, ctx.curShapes);
+        // WHO DRAWS EACH SIDE, and it is no longer one flag for all six.
+        //
+        // It used to be `t.ruled || pageDrewRule(t, ctx.curShapes)`: one answer for the four
+        // outer sides and, through innerH/innerV, for the two inner ones. pageDrewRule scanned
+        // the shapes that had SURVIVED the shape pass - and the shape pass drops every hairline
+        // that lies on or inside a table, on the claim that this writer draws it. The writer's
+        // only evidence was the shapes its own input had already removed: on
+        // 16_right_aligned_amounts, 13 row rules the page draws, 13 shapes dropped by
+        // attachShapes, and all six sides written nil. The rule was measured, attributed and
+        // thrown away - on 11 of 32_stroke_lines' 13 failing documents.
+        //
+        // The sides now come from PdfToWord.Table#sideDrawn, filled from the page's own rule
+        // list (PdfToWord.markSideStrokes) before any shape is discarded and already reconciled
+        // with the frame shapes attachShapes kept. One rule, one owner, decided by where the
+        // page drew it.
+        boolean ruledTable = t.ruled;
+        boolean[] sideDrawn = new boolean[6];
+        for (int i = 0; i < 6; i++) sideDrawn[i] = ruledTable || t.sideDrawn[i];
         // Six weights and six colours, one per side, read off the rule that lies on that side
         // (D-22). A side with no stroke keeps the old constant, so nothing that was right moves.
         int[] sideSz = new int[6];
@@ -4539,7 +5056,17 @@ public final class DocxWriter {
         }
         inner.append("<w:tbl><w:tblPr>")
                 .append("<w:tblW w:w=\"").append(totalTw).append("\" w:type=\"dxa\"/>")
-                .append("<w:tblInd w:w=\"").append(tw(x0)).append("\" w:type=\"dxa\"/>")
+                // w:tblInd IS CELL-RELATIVE. The page's x belongs here only at body level: inside
+                // a layout-table cell the renderer adds the cell's own left edge to this number,
+                // so writing the page's x put the table one column-edge to the right of where
+                // the page drew it. Measured on 401_trifold_brochure, whose SPECIFICATIONS table
+                // sits in the third panel at page x 300.65: tblInd was 6013 twips (300.65 pt),
+                // every cell of it landed at page x + 300.8 (dx +300.8 on all 10 pairs of 43,
+                // which read 47 %), and 350_question_paper's nested table was 28 pt out the
+                // same way. A table outside a cell subtracts nothing and is unchanged.
+                .append("<w:tblInd w:w=\"")
+                .append(tw(x0 - (ctx.inColumn ? ctx.cellLeftPt : 0f)))
+                .append("\" w:type=\"dxa\"/>")
                 // A named table style, so the table carries a style of its own rather than
                 // falling back on a reader's default. It draws no borders and sets no colour.
                 .append("<w:tblStyle w:val=\"KavoTable\"/>")
@@ -4549,9 +5076,7 @@ public final class DocxWriter {
                 // with no frame at all keeps all six undrawn even when a rule crosses its band:
                 // that rule is as likely the edge of a filled band as a drawn separator, and a
                 // line the page did not draw is the defect 403 and 406 came back with.
-                .append(borders(sideSz, sideColour, ruledTable,
-                        ruledTable && (t.ruled || t.innerH),
-                        ruledTable && (t.ruled || t.innerV)))
+                .append(borders(sideSz, sideColour, sideDrawn))
                 .append("<w:tblLayout w:type=\"fixed\"/>")
                 // Word's default cell margin is 0.19 cm (108 twips) on each side. Left at the
                 // default, every cell's text sat 6 pt right of where the page had it - a
@@ -4627,9 +5152,63 @@ public final class DocxWriter {
         // (D-26, cause 2). Where the edges are not known, the average is used exactly as before.
         float[] rowEdge = t.rowEdge;
         boolean exactRows = rowEdge != null && rowEdge.length == t.rows.size() + 1;
+        // THE RULE IS ADDED TO THE ROW, NOT INCLUDED IN IT - and that is the whole of the
+        // +2 pt-a-row ramp inside a table.
+        //
+        // The comment above ("NOT SUBTRACTED") is right about the case it measured and wrong
+        // about this one. What the renderer does, measured on 404_sudoku_grid by rewriting only
+        // the table's own numbers and rendering each form (LibreOffice 7.4.7.2):
+        //
+        //   row border-box = max(w:trHeight, cell content height + horizontal rule width)
+        //
+        // so a row is NOT "at that height with or without its borders" - it is at that height
+        // only while its CONTENT is smaller than trHeight. The earlier probe compared a row
+        // whose content was far below trHeight, where the rule cannot show; and its second
+        // measurement (content 21.0 -> 21.7 bordered) is the same rule seen from the other
+        // side. Here the cell's own w:line IS the row's pitch (see cellLineHere below), so the
+        // content is exactly the pitch, the rule is charged on top of it, and every row comes
+        // out one rule too tall.
+        //
+        // Measured, same document, one number changed at a time:
+        //   trHeight 880 + cell line 880 + sz 16 (2 pt)   -> 46.0 pt rows  (the engine's form)
+        //   trHeight 840 + cell line 840 + sz 16          -> 44.0 pt rows
+        //   trHeight 880 + cell line 840 + sz 16          -> 44.0 pt rows  (trHeight is a FLOOR)
+        //   trHeight 880 + cell line 880 + sz 6 (0.75)    -> 44.8 pt rows
+        //   trHeight 840 + cell line 840 + sz 0           -> 42.8 pt rows
+        // and the page's own pitch for that table is 44.0 pt, its rules 0.5 pt. So the page's
+        // 44 pt rows are laid out 46 pt apart, each row's text sits at a constant 15.6 pt below
+        // its own row's top rule - the placement is right - and every row down the table is
+        // 2.00 pt lower than the page drew it. That is the ramp: tdy = 1.28, 3.28, 5.28 ... 17.28
+        // over 404_sudoku_grid's nine rows, with the box identical on both sides, because the
+        // box the check reads is the cell frame, which the renderer still draws at trHeight.
+        //
+        // It is NOT the font's line height. A font-driven row would be 28.5 + 20.95 = 49.45 pt
+        // of content and 51.5 pt with its rule, and it would move when w:before moves: measured
+        // 51.5 for w:line="13" hRule="atLeast" (the renderer expands "atLeast" to the face's
+        // 1.164 em) and 51.5 for w:line="419" exact, while w:before 570 / 310 / 0 all lay out
+        // 46.0. The 46 is 44 + 2, and 2 is the rule.
+        //
+        // So the row is written a rule short, in BOTH places the pitch appears: the w:trHeight
+        // floor and the cell's own w:line. Reducing only trHeight does nothing here (the cell's
+        // line is the binding content), and reducing only the line leaves the floor high.
+        // A side the page did not draw adds nothing, so the widths come from the same
+        // drawn-ness the w:tblBorders element is written from, and are halved per row because
+        // half of each rule lies inside the row above and half inside the row below.
+        boolean hRuleTop = ruledTable;
+        boolean hRuleBottom = ruledTable;
+        boolean hRuleInside = ruledTable && (t.ruled || t.innerH);
+        int szRuleTop = hRuleTop ? sideSz[0] : 0;        // TABLE_SIDES: top
+        int szRuleBottom = hRuleBottom ? sideSz[2] : 0;  // bottom
+        int szRuleInside = hRuleInside ? sideSz[4] : 0;  // insideH
         // The height this table is really written at: the sum of the row heights below. It is
         // what the page budget must read (see the flow charge after the loop).
         int writtenRowsTw = 0;
+        // WHAT THE LAST ROW LEAVES UNDER ITS OWN TEXT - see the flow anchor after the table.
+        // Only the last row can be seen by the flow, because it is the only one the next
+        // paragraph is spaced from.
+        int lastRowHeightTw = 0;
+        int lastRowContentTw = 0;
+        float lastRowTopPagePt = Float.NaN;
         for (int r = 0; r < t.rows.size(); r++) {
             List<String> row = t.rows.get(r);
             // This row's own pitch. A ruled table's rule lies inside the row's box, so it comes
@@ -4639,24 +5218,56 @@ public final class DocxWriter {
                 float pitchPt = rowEdge[r + 1] - rowEdge[r];
                 if (pitchPt > 0.5f && pitchPt < 2000f) {
                     rowTwHere = (int) Math.round(pitchPt * TWIPS_PER_PT);
-                    // The page's own pitch, not the pitch less the rule - see above. This is the
-                    // path that carries a ruled table whose rows the page bounds with rules, and
-                    // it is where the cumulative drift lived.
                 }
             }
+            // The rule this row pays: half of the rule above it plus half of the rule below it.
+            int szAbove = r == 0 ? szRuleTop : szRuleInside;
+            int szBelow = r == t.rows.size() - 1 ? szRuleBottom : szRuleInside;
+            int ruleTwHere = (int) Math.round((szAbove + szBelow) * TWIPS_PER_PT / 16.0);
+            // THE PITCH STAYS THE PAGE'S PITCH; THE CELL'S CONTENT IS WHAT COMES OFF.
+            // The renderer lays a row out at max(w:trHeight, cell content + rule). Two different
+            // rows need two different answers from that, and only one form satisfies both:
+            //   a row whose content is the pitch      content + rule = pitch + rule  -> too tall
+            //   a row whose content is below it       the trHeight floor binds    -> already right
+            // So w:trHeight keeps the page's pitch (the floor is what a short row needs) and the
+            // cell's own w:line is capped a rule below it. Then content + rule <= pitch for every
+            // row, the floor is never exceeded, and the row is laid out at the page's pitch
+            // whichever of the two was binding. Subtracting from w:trHeight instead was measured
+            // and is wrong: it shortens every row whose content was already below the pitch, and
+            // on electricity-bill's 18.4 pt rows (0.5 pt rules) that turned an 18.0/19.0
+            // alternation into 17.5/18.5 - 18_displacement gained more documents than it fixed.
+            int pitchTwHere = rowTwHere;
+            int contentTwHere = rowTwHere > 0 && ruleTwHere > 0
+                    ? Math.max(1, rowTwHere - ruleTwHere) : rowTwHere;
             // The line inside the cell follows the row it is in: a cell's text is drawn at the
             // foot of its own row on most of this corpus, so the line height is the row's pitch.
-            int cellLineHere = rowTwHere > 0 ? rowTwHere : 200;
-            int naturalLineHere = rowTwHere > 0 ? Math.min(rowTwHere, 200) : 200;
+            int cellLineHere = contentTwHere > 0 ? contentTwHere : 200;
+            int naturalLineHere = contentTwHere > 0 ? Math.min(contentTwHere, 200) : 200;
             // Does any cell of this row hold more than one line of the page? A numbered item's
             // marker, a calendar's holiday name under its date, a two-line address in a box.
             int rowParts = 1;
+            int nlParts = 1;
+            int wrapParts = 1;
             for (int q = 0; q < row.size() && q < cols; q++) {
                 String cv = row.get(q);
                 if (cv == null) continue;
                 int n = 1;
                 for (int i = 0; i < cv.length(); i++) if (cv.charAt(i) == '\n') n++;
-                if (n > rowParts) rowParts = n;
+                // A CELL THE RENDERER WILL WRAP IS A CELL THAT HOLDS SEVERAL LINES.
+                //
+                // rowParts used to count only the '\n' the model carries, so a cell the
+                // page drew on one line - and that the engine then put text into that is
+                // wider than the cell - kept rowParts == 1 and was written with the
+                // HAIRLINE box (0.069 em, 0.4 pt at 8 pt). Every line the renderer wrapped
+                // out of that one paragraph was then charged 0.4 pt, so line 2 landed on
+                // line 1 and so on: 26_text_overlap's BOX class, one w:p holding N lines.
+                // Counting the wrap here is what routes such a cell to the rowParts > 1
+                // branch, whose box IS the line advance.
+                int w = wrapsAt(cv, q, r, t, colTw, cols);
+                if (n > nlParts) nlParts = n;
+                if (w > wrapParts) wrapParts = w;
+                int m = Math.max(n, w);
+                if (m > rowParts) rowParts = m;
             }
             int baseLineTw = rowParts > 1 ? naturalLineHere : cellLineHere;
             // The row's own line height, never smaller than its own text. cellLineTw is the
@@ -4695,7 +5306,12 @@ public final class DocxWriter {
                 rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
                 rowLineTw = Math.max(typeFloorTw, twScale(rowLineTw, ctx.squeeze));
             }
-            writtenRowsTw += Math.max(0, Math.max(rowTwHere, rowLineTw));
+            // The budget is charged what the renderer will LAY OUT, which is the content plus
+            // the rule - not the content alone. Charging the content alone under-measures every
+            // ruled table by one rule a row, and this is the number the flow after the table is
+            // placed from.
+            writtenRowsTw += Math.max(0, Math.max(pitchTwHere,
+                    Math.max(rowTwHere, rowLineTw) + ruleTwHere));
             // THE ROW'S OWN TOP EDGE IN THE PAGE'S COORDINATES, when the pass that built the
             // table measured the row edges. The cells below are placed from it.
             //
@@ -4731,6 +5347,11 @@ public final class DocxWriter {
                 String cell = c < row.size() ? row.get(c) : "";
                 String face = r < t.fonts.size() && c < t.fonts.get(r).size()
                         ? t.fonts.get(r).get(c) : "";
+                // The style the page drew this cell in. `faceName` below strips the style word
+                // out of the name, so the name is not a description of the cell's style any
+                // more; these two flags are the model's own record of it.
+                boolean cellBold = boldOf(t, r, c);
+                boolean cellItalic = italicOf(t, r, c);
                 // How far into its own box this cell's text was drawn. A cell's text does not
                 // start at its border: the page padded it, centred it or right-aligned it, and
                 // in a right-aligned column the distance changes row by row. Word's cell margin
@@ -4866,24 +5487,43 @@ public final class DocxWriter {
                 // placement; the page's fraction is used only where it is a placement at all.
                 float cellBaseY = yOf(t, r, c);
                 boolean cellPlaced = false;
-                int cellBoxTw = rowLineTw, cellBeforeTw = 0;
-                if (rowParts == 1 && cellSz > 0f && !Float.isNaN(cellBaseY)
+                int cellBoxTw = cell.isEmpty() ? EMPTY_CELL_LINE_TW : rowLineTw;
+                int cellBeforeTw = 0;
+                // The box this cell's lines advance by. One line: the hairline, and the
+                // baseline is placed at the page's own fraction of the row. Several lines:
+                // the line advance, and the FIRST line keeps that same placement.
+                int boxHere = rowParts > 1
+                        ? (int) Math.max(1L, Math.round(rowLineTw))
+                        : (int) Math.max(1L, Math.round(hairlinePt(cellSz) * TWIPS_PER_PT));
+                // WHEN THE WRAP IS WHAT MADE THE ROW MULTI-LINE, the N lines SPLIT the space
+                // below the row's own first baseline instead of each taking min(pitch, 10 pt).
+                if (wrapParts > nlParts && wrapParts > 1 && rowTwHere > 0) {
+                    int split = (int) Math.round((double) rowTwHere / wrapParts);
+                    if (split > 0) boxHere = Math.min(boxHere, split);
+                }
+                if (cellSz > 0f && !Float.isNaN(cellBaseY)
                         && !Float.isNaN(rowTopPagePt)) {
                     float wantPt = cellBaseY - rowTopPagePt;
+                    // A cell is PLACED from its own measured baseline as long as that baseline is
+                    // anywhere in the row - the acceptance test reads the row, not the content, so
+                    // a cell drawn at the foot of its row keeps its measurement and is clamped by
+                    // the cap below rather than thrown back to the fallback. Reading the cap here
+                    // instead pushed 9 cells of mutual-fund-statement 3.8 pt up: their measured
+                    // baseline was 18.5 pt into a 19 pt row, which is inside the row and outside
+                    // the row less its rule.
                     float roomPt = rowHeightTw / (float) TWIPS_PER_PT;
                     if (wantPt >= LINE_BASE * cellSz && wantPt <= roomPt) {
-                        int boxTw = (int) Math.max(1L,
-                                Math.round(hairlinePt(cellSz) * TWIPS_PER_PT));
+                        int boxTw = boxHere;
                         int beforeTw = (int) Math.round(
                                 (wantPt - LINE_BASE * boxTw / (float) TWIPS_PER_PT) * TWIPS_PER_PT);
-                        int capTw = Math.max(0, rowHeightTw - boxTw);
+                        int capTw = Math.max(0, Math.min(rowHeightTw, contentTwHere) - boxTw);
                         cellBoxTw = boxTw;
                         cellBeforeTw = Math.max(0, Math.min(beforeTw, capTw));
                         cellPlaced = true;
                     }
                 }
-                if (!cellPlaced && rowParts == 1 && cellSz > 0f) {
-                    cellBoxTw = (int) Math.max(1L, Math.round(hairlinePt(cellSz) * TWIPS_PER_PT));
+                if (!cellPlaced && cellSz > 0f) {
+                    cellBoxTw = boxHere;
                     // The baseline inside a box sits LINE_BASE of the box below its top, and the
                     // old pair (before=0, box=rowLineTw) put it at LINE_BASE * rowLineTw - the
                     // foot of the row, which is where this corpus draws its cell text. Keep that
@@ -4894,6 +5534,41 @@ public final class DocxWriter {
                     cellBeforeTw = Math.max(0,
                             Math.round(LINE_BASE * (rowLineTw - cellBoxTw)));
                 }
+                // AN EMPTY CELL CARRIES NO LINE, so its box must not be the row's pitch.
+                //
+                // Both branches above are keyed on cellSz > 0f, which is the size of the text
+                // the page drew in the cell. An empty cell has no text, so cellSz is 0, so
+                // neither branch runs and the box stays at rowLineTw - the row's whole pitch -
+                // with before = 0. That is a paragraph one full pitch tall inside a row whose
+                // w:trHeight is the same pitch, and LibreOffice renders such a row 0.35 pt
+                // TALLER than the pitch the page drew (measured below).
+                //
+                // The row's height is already carried by w:trHeight w:hRule="atLeast", which
+                // is written from rowHeightTw >= rowLineTw, so the empty cell's own box adds
+                // nothing but this overhang. A hairline box adds nothing at all: the row is
+                // the page's own pitch and every row below it starts where the page put it.
+                //
+                // MEASURED, 320_balance_sheet_statutory, one 16-row table on a 14 pt pitch,
+                // the empty-cell box set to each value in turn and the document re-rendered:
+                //     box =   1 tw   14.0 14.0 14.0 14.0 14.0   (pitches between baselines)
+                //     box = 140 tw   14.0 14.0 14.0 14.0 14.0
+                //     box = 200 tw   14.0 14.0 14.0 14.0 14.0
+                //     box = 280 tw   14.0 14.0 14.0 14.4 14.3   <- the pitch itself
+                // The overhang appears only when the empty paragraph's box reaches the row's
+                // own trHeight, and it is charged to EVERY row that has an empty cell: that
+                // document's seven such rows drifted +0.35 pt each, the table's last row
+                // finished 4.25 pt low and the signature block under it 4.61 pt, and
+                // 18_displacement read 14 runs out on a page where no text had been moved.
+                // With the hairline the same page reads 0 runs out, max |dy| 0.45 pt.
+                //
+                // Guarded on rowTwHere > 0: that is exactly when w:trHeight is written and
+                // the row's height is therefore not the cells' business. Where the table has
+                // no row pitch at all (rowTwHere == 0, no trPr) a row of empty cells IS sized
+                // by its content, and a hairline there would collapse the row to nothing.
+                if (cell.isEmpty() && rowTwHere > 0) {
+                    cellBoxTw = 1;
+                    cellBeforeTw = 0;
+                }
                 inner.append("</w:tcPr>")
                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
                         .append("<w:snapToGrid w:val=\"0\"/>")
@@ -4902,7 +5577,7 @@ public final class DocxWriter {
                 inner.append("</w:pPr>");
                 if (!cell.isEmpty()) {
                     inner.append("<w:r><w:rPr>");
-                    // Written in schema order - rFonts, b, color, sz, szCs. It was sz, szCs,
+                    // Written in schema order - rFonts, b, i, color, sz, szCs. It was sz, szCs,
                     // rFonts, color, b, which is not the order the schema defines; a reader
                     // that validates rPr drops what it cannot place.
                     if (!face.isEmpty()) {
@@ -4916,8 +5591,21 @@ public final class DocxWriter {
                     // bold first row out of tables whose header is not bold, and missed a
                     // bold cell anywhere else. The face is the evidence; the header guess is
                     // only the fallback for a cell whose face the page did not name.
-                    if (isBoldFace(face) || (r == 0 && t.header && face.isEmpty())) {
+                    // The flag the table model now carries is the FIRST evidence: it is what the
+                    // page drew, where `isBoldFace` is a guess about a face NAME that
+                    // `faceName` has already stripped. 34c's own note records 23 documents on
+                    // which the name test and the flag disagree, and the flag is the right one
+                    // there. The name stays as the fallback for a pass that recorded no flag.
+                    if (cellBold || isBoldFace(face) || (r == 0 && t.header && face.isEmpty())) {
                         inner.append("<w:b/>");
+                    }
+                    // Italic. Nothing wrote it before: a paragraph run has carried `w:i` from
+                    // Run#italic all along (runXml, line 3452), but a cell is not a run, so the
+                    // face name's "Italic" was stripped by faceName and no `w:i` replaced it -
+                    // 64_newspaper_uneven_columns_ad_boxes draws two italic spans and the .docx
+                    // carried none. Written after w:b because that is the schema's order.
+                    if (cellItalic) {
+                        inner.append("<w:i/>");
                     }
                     // The colour the page drew this cell in. A cell is written as a string and
                     // a font name, so without this every coloured table - a grey label column,
@@ -4970,7 +5658,20 @@ public final class DocxWriter {
                     inner.append("</w:r>");
                 }
                 inner.append("</w:p></w:tc>");
+                // The depth this cell's own text occupies: its w:before plus one exact line box
+                // per line the cell holds. It is the number the renderer lays the cell out
+                // with, and the row is w:trHeight tall whatever this says - the difference is
+                // the slack the flow anchor after the table is about.
+                if (r == t.rows.size() - 1) {
+                    int lines = Math.max(1, cell.split("\n", -1).length);
+                    lastRowContentTw = Math.max(lastRowContentTw,
+                            cellBeforeTw + lines * cellBoxTw);
+                }
                 c += span;
+            }
+            if (r == t.rows.size() - 1) {
+                lastRowHeightTw = rowHeightTw;
+                lastRowTopPagePt = rowTopPagePt;
             }
             inner.append("</w:tr>");
         }
@@ -5001,15 +5702,58 @@ public final class DocxWriter {
                 ? twScale(writtenRowsTw, ctx.squeeze)
                 : twScale((int) Math.round(Math.max(0f, extentPt) * TWIPS_PER_PT), ctx.squeeze))
                 + (carrier ? POST_TABLE_TW : 0);
-        ctx.lastBaseline = t.bottom;
+        // THE FLOW CONTINUES FROM THE LAST ROW'S BOX BOTTOM, NOT FROM ITS TEXT.
+        //
+        // This is the ~4 pt step at a table-to-flow boundary. A row is written
+        // w:trHeight="atLeast" at the page's own pitch, and its cell's text is placed at
+        // LINE_BASE (0.8) of that pitch - the foot of the row, which is where this corpus
+        // draws its cell text. The cell's text therefore stops short of the row's box bottom,
+        // and the renderer measures the NEXT paragraph's w:before from the BOX. Anchoring the
+        // flow to the text loses that difference, and every paragraph after the table lands
+        // that much too low - a flat constant for the rest of the flow, which is the shape
+        // 18_displacement reads.
+        //
+        // WHERE THE ANCHOR WAS WRONG, AND WHERE IT WAS ONLY WRONG BY LUCK. t.bottom does not
+        // mean one thing: the ruled pass sets it to the grid's last rule, which IS the last
+        // row's bottom edge, and the whitespace pass sets it to the last row's BASELINE
+        // (PdfToWord: `bottom = Math.max(bottom, cell.y)`). Measured on the corpus with the
+        // engine's own numbers printed at the boundary: 42_table_coloured_header_alternating
+        // _rows has t.bottom 293.30 against rowEdge[8] 313.30 - a baseline, one pitch above
+        // the box - while electricity-bill's ruled table has t.bottom 169.00 and rowEdge[5]
+        // 169.00 - the edge itself. So the ruled pass closed and the whitespace pass did not,
+        // which is why the step is in the whitespace-found tables.
+        //
+        // MEASURED, not reasoned. Synthetic single-row tables rendered through LibreOffice,
+        // cell content 16.1 pt, after-paragraph before+line 24.8 pt: row 20.0 pt -> the render
+        // advances 28.70 = 24.8 + 3.9, and 3.9 is exactly trHeight - content; row 40.0 ->
+        // 48.70 (+23.9); content 10.6 in a 20 pt row -> +9.40; content 25.6 in a 20 pt row
+        // (the row grows to its content) -> +0.00. The excess is max(0, trHeight - content) to
+        // 0.02 pt over five configurations, and it is the same whether the row is ruled or
+        // not, because the renderer sees only the row's box. The borders the writer emits add
+        // a further 0.20 pt (the bottom rule less the top rule), which is left unmodelled and
+        // is the residual quoted in the patch note.
+        //
+        // So the anchor is the last row's box bottom, built from the same row edge the cells
+        // were placed from - which is the edge for a ruled table and the converted edge for a
+        // whitespace one - and falling back to the written row height less the written cell
+        // content where the page's row edges were not measured.
+        float rowBottomPt = t.bottom;
+        if (!Float.isNaN(lastRowTopPagePt) && lastRowHeightTw > 0) {
+            rowBottomPt = lastRowTopPagePt + lastRowHeightTw / (float) TWIPS_PER_PT;
+        } else {
+            rowBottomPt = t.bottom
+                    + Math.max(0, lastRowHeightTw - lastRowContentTw) / (float) TWIPS_PER_PT;
+        }
+        ctx.lastBaseline = rowBottomPt;
         ctx.lastSize = 0f;
-        // The table's bottom edge is where its content ended, not a baseline inside a line box,
-        // so there is no slack of its own to carry into the next line's advance.
+        // The box under the cell's text is the row's, and it is charged here rather than
+        // carried as a line box: lastLinePt stays 0 and the whole of it is in the anchor above.
         ctx.lastLinePt = 0f;
-        // The flow's real position after a table is the table's bottom edge plus the 4 pt carrier
+        // The flow's real position after a table is the row's box bottom plus the 4 pt carrier
         // Word requires after it, because that carrier is a line the next paragraph starts under
         // (D-26: the position is where the reader is, not where the PDF drew).
-        ctx.flowY = t.bottom + (carrier ? POST_TABLE_TW / (float) TWIPS_PER_PT : 0f);
+        ctx.flowY = rowBottomPt
+                + (carrier ? POST_TABLE_TW / (float) TWIPS_PER_PT : 0f);
         ctx.flowBoxPt = 0f;
         ctx.newPage = false;
         ctx.lastWasTable = true;
@@ -5060,6 +5804,20 @@ public final class DocxWriter {
         return f.contains("bold") || f.contains("black") || f.contains("heavy")
                 || f.endsWith("-bd") || f.contains(",bd")
                 || f.contains("semibold") || f.contains("demi");
+    }
+
+    /** Was cell (r, c) drawn bold, or false when the pass that built the table did not say. */
+    private static boolean boldOf(PdfToWord.Table t, int r, int c) {
+        if (r >= t.bolds.size()) return false;
+        List<Boolean> row = t.bolds.get(r);
+        return c < row.size() && Boolean.TRUE.equals(row.get(c));
+    }
+
+    /** Was cell (r, c) drawn italic, or false when the pass did not say. */
+    private static boolean italicOf(PdfToWord.Table t, int r, int c) {
+        if (r >= t.italics.size()) return false;
+        List<Boolean> row = t.italics.get(r);
+        return c < row.size() && Boolean.TRUE.equals(row.get(c));
     }
 
     /** The text of cell (r, c), or "" when the row does not reach that far. */

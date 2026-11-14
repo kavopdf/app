@@ -536,6 +536,41 @@ def mut_text_unrotated(doc):
     return n
 
 
+def mut_docx_rot(path):
+    """Rewrite the engine's .docx so every rotated text box comes out level.
+
+    This is the mutation 35 needs now that it reads the .docx, and it is the real defect
+    rather than a constructed one: measured 14 Nov on the 211-document corpus, 21 of the 30
+    documents whose source draws rotated text have NO a:xfrm rot anywhere in the engine's
+    file, because DocxWriter.java:2508 places a rotated line that has no stamp frame round it
+    with rotDeg 0f. So this removes the attribute that the engine does write where it writes
+    it, and the check must notice that the page's angle is gone.
+
+    The old mutation, mut_text_unrotated, redrew the ROTATED LINES UPRIGHT IN THE RENDER -
+    which the renderer already does to all of them unprompted (0 rotated lines in 211 of 211
+    renders), so it could not distinguish a working engine from a broken one. It is kept
+    below for the record but 35 no longer reads the side it mutates.
+    """
+    import zipfile, re as _re
+    zin = zipfile.ZipFile(path)
+    xml = zin.read("word/document.xml").decode("utf-8")
+    n = len(_re.findall(r'<a:xfrm rot="[0-9]+"', xml))
+    if not n:
+        raise RuntimeError("no a:xfrm rot in the .docx - nothing for 35 to lose")
+    xml = _re.sub(r'<a:xfrm rot="[0-9]+"', '<a:xfrm', xml)
+    dst = os.path.join(WORK, "mut_35_%s.docx"
+                       % os.path.splitext(os.path.basename(path))[0])
+    zout = zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED)
+    for item in zin.infolist():
+        data = zin.read(item.filename)
+        if item.filename == "word/document.xml":
+            data = xml.encode("utf-8")
+        zout.writestr(item, data)
+    zout.close()
+    zin.close()
+    return dst
+
+
 def mut_text_rotated(doc):
     """35, additive: draw new text with a rotated matrix. The object 35 reads
     (line.dir) really does change - and the check still passes, because the
@@ -694,7 +729,13 @@ def mut_marker_added(doc):
 # "cannot fire" claim is measured every run rather than asserted in a comment.
 WRONG_DIRECTION = {
     "32_stroke_lines":     (mut_rule, BASE, "one rule added"),
-    "35_rotation":         (mut_text_rotated, BASE, "text drawn with a rotated matrix"),
+    # 35 has left this table too, and for 37's reason. mut_text_rotated draws NEW text with a
+    # rotated matrix into the SOURCE; while 35 compared source to render that could not fire it,
+    # because the render gained rotated lines instead of losing them. 35 now asks the .docx for
+    # the angle, and a rotated run the source draws that the .docx does not carry is precisely
+    # what it is for - so the mutation fires it, correctly. Measured 14 Nov: with the .docx
+    # side in place, 01_stamp_rotated_15deg_upright with one 30-degree run added reports
+    # source=3, kept=2, need=3, ok=False.
     "36_underline_rules":  (mut_rule_at_baseline, UNDERLINE_DOC,
                             "a rule drawn at a span's bottom edge"),
     # 37 has left this table. Under the old render-side clause a raised run added to the
@@ -715,12 +756,20 @@ def src_annot(doc):
     a.update()
 
 
-def src_widget(doc):
+def src_field_value(doc):
+    """A form field whose box holds an answer.
+
+    The replacement for 51 reads the SOURCE for what each widget's rectangle shows and asks
+    the render to show it in the same place, so the mutation has to put an answer inside a
+    box the render leaves empty. An empty widget - the old mutation - asks nothing and would
+    prove nothing: an empty box has no answer to lose.
+    """
     w = fitz.Widget()
     w.field_name = "f1"
     w.field_type = fitz.PDF_WIDGET_TYPE_TEXT
     w.rect = fitz.Rect(60, 60, 220, 84)
     doc[0].add_widget(w)
+    doc[0].insert_text((66, 78), "ANSWER", fontsize=11)
 
 
 def src_toc(doc):
@@ -1246,8 +1295,12 @@ CASES = {
     "34a_span_size_match":      ("render", mut_restyle, BASE, "30% of spans resized"),
     "34b_span_colour_match":    ("render", mut_restyle, BASE, "30% of spans recoloured"),
     "34c_span_weight_match":    ("render", mut_bold, BASE, "35% of spans made bold"),
-    "35_rotation":              ("render", mut_text_unrotated, BASE,
-                                 "rotated lines redrawn upright"),
+    # 35 reads the .docx now, so its mutation has to be a .docx, like 37's and 53's. The
+    # render cannot be the object: soffice writes 0 rotated lines in all 211 renders, so
+    # "redraw the rotated lines upright" describes what the renderer does anyway and proves
+    # nothing about the engine.
+    "35_rotation":              ("docx", mut_docx_rot, BASE,
+                                 "every a:xfrm rot stripped from the .docx"),
     "36_underline_rules":       ("render", mut_underline_removed, UNDERLINE_DOC,
                                  "every underline rule removed"),
     # 37 reads the .docx now, so its mutation has to be a .docx, like 53's. Its old
@@ -1271,7 +1324,14 @@ CASES = {
     "48_image_area":            ("render", mut_image_shrink, IMG_DOC, "the image resized"),
     "49_page_size":             ("render", mut_pagesize, BASE, "the page size changed"),
     "50_annotations":           ("source", src_annot, BASE, "an annotation dropped"),
-    "51_form_fields":           ("source", src_widget, BASE, "a form field dropped"),
+    # 51_form_fields RETIRED 14 Nov - it counted page.widgets() in the RENDER, and a .docx
+    # cannot carry one: all three OOXML encodings were built as probes and measured, and only
+    # an MSForms ActiveX control survives the import - and 601 built that way PASSED the old
+    # check with every answer still at the top of page 1. See verify_google.py, "51 form field
+    # values", and patches/FORM-FIELDS.md. The replacement asks where the answer went, so its
+    # mutation puts an answer inside a box the render leaves empty.
+    "51_field_values":          ("source", src_field_value, BASE,
+                                 "an answer inside a field the render leaves empty"),
     "52_outline":               ("source", src_toc, BASE, "the outline dropped"),
     # 53 reads the .docx, so its mutation has to be a .docx. "docx" hands the mutation the
     # engine's own file and measures the same pair with the mutated copy.

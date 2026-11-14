@@ -158,6 +158,17 @@ public final class TxtWriter {
     }
 
     private static float cellLeft(PdfToWord.Table t, int ri, int ci) {
+        // Where the page drew it, when the table pass had to move it. A right-to-left table's
+        // cellX is mirrored about the table's own extent, which is a Word column order and not
+        // a page x; cellXPage is the number this file needs and is empty for every table that
+        // was never reversed. See PdfToWord.Table#cellXPage.
+        if (t.cellXPage != null && ri < t.cellXPage.size()) {
+            List<Float> row = t.cellXPage.get(ri);
+            if (row != null && ci < row.size()) {
+                Float v = row.get(ci);
+                if (v != null && !Float.isNaN(v) && v > 0f) return v;
+            }
+        }
         if (t.cellX != null && ri < t.cellX.size()) {
             List<Float> row = t.cellX.get(ri);
             if (row != null && ci < row.size()) {
