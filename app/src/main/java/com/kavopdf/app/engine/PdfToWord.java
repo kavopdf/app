@@ -841,7 +841,7 @@ public final class PdfToWord {
         if (turn == 180) {
             for (Glyph g : glyphs) if (g.dirx < -0.5f) g.rotated = false;
         }
-        List<Line> rawLines = toLines(glyphs, new ArrayList<float[]>());
+        List<Line> rawLines = toLines(glyphs, new ArrayList<float[]>(), false);
         page.columns = proseColumns(rawLines, pageWidth);
 
         // Tables are found from the drawn rules, so they can be located before any line is
@@ -1063,7 +1063,7 @@ public final class PdfToWord {
             page.columnGap = gLo == Float.MAX_VALUE ? 0f : gLo;
         }
         boolean flippedPage = uprightIfPageIsUpsideDown(glyphs);
-        List<Line> lines = toLines(glyphs, asBands(starts));
+        List<Line> lines = toLines(glyphs, asBands(starts), flippedPage);
         List<Line> ring = new ArrayList<>();
         for (java.util.Iterator<Line> it = lines.iterator(); it.hasNext(); ) {
             Line ln = it.next();
@@ -3422,6 +3422,11 @@ public final class PdfToWord {
     }
 
     private static List<Line> toLines(List<Glyph> glyphs, List<float[]> gutters) {
+        return toLines(glyphs, gutters, false);
+    }
+
+    private static List<Line> toLines(List<Glyph> glyphs, List<float[]> gutters,
+                                      boolean turnedPage) {
         // A seal drawn as a ring of characters is not a block of text and has no baseline to
         // cluster on: every character sits on its own tangent. It is taken out of the page's
         // text here and handed back as one character per line, in the order the page drew

@@ -910,6 +910,27 @@ public final class DocxWriter {
          * nothing (see {@link #POST_TABLE_TW}).
          */
         boolean nextIsPara;
+        /**
+         * True when the block about to be written is followed by ANOTHER TABLE.
+         *
+         * <p>The carrier paragraph below is the only thing separating two tables, and Word
+         * needs it or it merges them. But where a table follows a table, the carrier is not
+         * standing in for a gap the page drew: the next table's top edge is placed from the
+         * page's own y, and any height this paragraph carries is added to the flow BEFORE
+         * that placement is measured, so it can never be taken back out. 4 pt of carrier is
+         * then 4 pt of displacement on the second table and on everything under it.
+         *
+         * <p>Measured on 314_tender_rfp_boq, whose BOQ sub-total table is stacked directly
+         * under the BOQ table with no gap on the page: every run of the first table sat at
+         * dy +0.10, every run of the second at dy +4.10, and the three prose blocks after it
+         * carried the same +4.10 to the foot of the sheet. Rewriting that one carrier's
+         * w:line from 80 twips to 1 put all 79 runs of the document inside 0.53 pt.
+         *
+         * <p>A 1-twip carrier does not merge the tables (measured: two 13-row tables stacked
+         * with a 1-twip carrier render 16 rules at the same y as with an 80-twip carrier, and
+         * the second table's text lands 4.0 pt higher - no absorbed row).
+         */
+        boolean nextIsTable;
     }
 
     // ------------------------------------------------------------------ document
@@ -1222,6 +1243,8 @@ public final class DocxWriter {
             Object block = page.blocks.get(bi);
             ctx.nextIsPara = bi + 1 < page.blocks.size()
                     && page.blocks.get(bi + 1) instanceof PdfToWord.Para;
+            ctx.nextIsTable = bi + 1 < page.blocks.size()
+                    && page.blocks.get(bi + 1) instanceof PdfToWord.Table;
             emitBlock(sb, block, ctx);
         }
     }
@@ -5232,7 +5255,13 @@ public final class DocxWriter {
         // paragraph rather than w:spacing on the table because OOXML gives a table no
         // before-spacing of its own.
         int spacerTw = 0;
-        if (!ctx.newPage && !ctx.lastWasTable && ctx.flowY >= 0f && !Float.isNaN(t.rowTopPt)) {
+        // A table stacked under another table is placed the same way, and it has to be: the
+        // carrier paragraph between them is already inside flowTopPt, so the gap the page drew
+        // is measured from it and the spacer comes out at gap - carrier. With the carrier at
+        // one twip that is the gap itself. Excluding the stacked case (the old !lastWasTable)
+        // meant the second table's top edge was never placed from the page at all - it fell
+        // wherever the first table's bottom plus the carrier happened to be.
+        if (!ctx.newPage && ctx.flowY >= 0f && !Float.isNaN(t.rowTopPt)) {
             // The table's top is placed ABSOLUTELY, from the flow's real position (D-26): the
             // spacer is the distance from where the reader will be to where the page drew the
             // table's top edge. The arithmetic this replaces measured that distance from the
@@ -6059,10 +6088,13 @@ public final class DocxWriter {
         // the table started from the wrong y. 4 pt is below every font's line box, so it can
         // never hold text, but it is a real line and stays a paragraph.
         boolean carrier = !ctx.nextIsPara;
+        // Stacked tables: the carrier is a separator, not a gap, so it is written at the
+        // smallest line box that still renders as a paragraph of its own.
+        int carrierTw = ctx.nextIsTable ? POST_TABLE_TW_STACKED : POST_TABLE_TW;
         if (carrier) {
             sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
                     .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
-                    .append(POST_TABLE_TW).append("\" w:lineRule=\"exact\"/>")
+                    .append(carrierTw).append("\" w:lineRule=\"exact\"/>")
                     .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
         }
         // The table is part of the flow too. Left out of the accounting, the paragraph after it
@@ -6074,7 +6106,7 @@ public final class DocxWriter {
         ctx.flowTw += (writtenRowsTw > 0
                 ? twScale(writtenRowsTw, ctx.squeeze)
                 : twScale((int) Math.round(Math.max(0f, extentPt) * TWIPS_PER_PT), ctx.squeeze))
-                + (carrier ? POST_TABLE_TW : 0);
+                + (carrier ? carrierTw : 0);
         // THE FLOW CONTINUES FROM THE LAST ROW'S BOX BOTTOM, NOT FROM ITS TEXT.
         //
         // This is the ~4 pt step at a table-to-flow boundary. A row is written
@@ -6126,7 +6158,7 @@ public final class DocxWriter {
         // Word requires after it, because that carrier is a line the next paragraph starts under
         // (D-26: the position is where the reader is, not where the PDF drew).
         ctx.flowY = rowBottomPt
-                + (carrier ? POST_TABLE_TW / (float) TWIPS_PER_PT : 0f);
+                + (carrier ? carrierTw / (float) TWIPS_PER_PT : 0f);
         ctx.flowBoxPt = 0f;
         ctx.newPage = false;
         ctx.lastWasTable = true;
@@ -6253,6 +6285,15 @@ public final class DocxWriter {
 
     /** The paragraph a table must be followed by: 4 pt, in twips. */
     private static final int POST_TABLE_TW = 80;
+
+    /**
+     * The same paragraph where the next block is another table: 1 twip, in twips.
+     *
+     * <p>It is there to keep Word from merging the two tables, and a table's own top edge is
+     * placed absolutely from the page's y, so its height is pure added displacement. See
+     * {@code Ctx.nextIsTable} for the measurement.
+     */
+    private static final int POST_TABLE_TW_STACKED = 1;
 
     /**
      * What the table's own hairline adds to the height of every row, in twips.
