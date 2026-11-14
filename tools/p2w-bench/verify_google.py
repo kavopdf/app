@@ -2644,6 +2644,36 @@ def extra_checks2(src, gd, docx_path=None):
     return c
 
 
+# ---- 43's whole-block tolerances ---------------------------------------
+# A block that MOVED carries its spans together, so their ink dx agrees to within
+# BLOCK_WIN. Line-breaking does not: a re-broken line moves by the difference in its
+# own width, and the lines of a paragraph therefore disagree.
+#
+# BLOCK_WIN IS 6.0 AND THAT IS MEASURED, NOT GUESSED. A moved block does not read one
+# dx exactly: the render's glyphs are not the source's width, so a right-aligned or
+# centred span inside the block moves by the block's shift PLUS its own width delta.
+# Constructed 14 Nov on 401_trifold_brochure - the two contact text boxes moved -279 pt
+# together read -284.99 and -280.00, 4.99 pt apart, and a 2.5 pt window split them into
+# two single-span "clusters" and fired on neither. 6.0 pt holds that block together and
+# still does not merge it with the untouched spans 275 pt away.
+#
+# BLOCK_TOL is measured on the same 211 (14 Nov, this instrument, the engine's .docx
+# rendered by LibreOffice). With BLOCK_WIN 6.0 and BLOCK_MIN 2 the widest same-page
+# coherent block among the 134 documents that pass all 43 checks is 8.53 pt -
+# 401_trifold_brochure, whose contact block loses its right alignment by 1.0-9.6 pt.
+# Above it the corpus reads 10.79, 11.29, 11.52, 18.20, 19.64, 32.19, 54.55, 144.36,
+# 490.19 pt, and every one of those documents already fails a check. 12.0 pt sits in
+# that gap: 1.4x the widest block on a clean document, 60x the engine's usual 0.1-0.2 pt
+# placement error, and a sixth of an inch.
+#
+# BLOCK_MIN is 2 because the block that matters can be two spans: a contact block, a
+# signature line, one row of a table. The tolerance, not the floor, is what keeps it
+# quiet - and it is checked against the whole corpus above rather than assumed.
+BLOCK_WIN = 6.0
+BLOCK_MIN = 2
+BLOCK_TOL = 12.0
+
+
 def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     """Return checks 32-48. pairs is [(source_run, render_run), ...] already matched."""
     c = {}
@@ -3402,9 +3432,84 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     tot_p = max(1, len(pairs))
     ddx = [g_sp["rx"] - s_sp["rx"] for s_sp, g_sp in pairs]
     med_dx_p = round(statistics.median(ddx), 1) if ddx else 0.0
+
+    # ---- A WHOLE BLOCK THAT MOVED IS NOT A RATE ---------------------------
+    # Both clauses above are SHARES of the document, and a share cannot see a block.
+    # near_x is a rate: 90 % of the matched spans must be within 10 pt, so up to a
+    # tenth of a page's spans may sit anywhere at all - 279 pt, a quarter of the page
+    # width, half the paper - and the rate still passes. med_dx_p is the median of the
+    # same list, so a minority block cannot move it either: 401_trifold_brochure reads
+    # med_dx 0.1 with a block 9.6 pt out, and a document with 300 spans could move 29
+    # of them a panel to the right and read the identical 0.1. The two clauses cover a
+    # uniform shift (every span, by a little) and a scattered one (most spans, by a
+    # little). Neither asks whether SOME spans moved together, by a lot.
+    #
+    # That is the whole-block displacement, and it has a signature the two clauses do
+    # not use: the spans of a block share an ORIGIN, so they share their error. Cluster
+    # the page's ink dx and a moved block appears as a tight group at one non-zero
+    # offset, while line-breaking - which moves each line by the difference in its own
+    # width - leaves the same spans disagreeing. So the test is agreement, not size.
+    #
+    # INK, not x, and the difference is not cosmetic. A source run that starts with
+    # leading spaces has its origin at the paragraph's edge and its glyphs where the
+    # spaces end, and the render draws the run without them: 74_balance_sheet_indented_
+    # subitems reads dx +37.1 on five spans that are indented eight spaces, and +0.1 on
+    # the ink of the same five. The block did not move; the run's origin did. near_x
+    # already reads xink for exactly this reason, and this clause reads the same field.
+    #
+    # NOT A CAP ON max|dx|. One span can be legitimately far: a centred heading whose
+    # text re-broke moves by half the width it gained, and on the 211 a single-span cap
+    # at any tolerance under 30 pt fires on documents whose columns never moved.
+    #
+    # WHICH PAIRS THIS CLAUSE MAY JUDGE: x has to MEAN the same thing on both sides.
+    # A run set at 0 deg or at 180 deg has a horizontal axis, so its ink x is comparable
+    # with the render's. A glyph on an ARC does not: 305_vaccination_certificate draws
+    # 'I','I','F','E' at -3.8, 26.6, -24.4 and 36.7 deg and the render sets them
+    # straight, so subtracting the two x values subtracts a point on a curve from a
+    # point on a line. 47_margins measured exactly this and excludes it (its line 3575,
+    # |angle| > 1.0); the test here is the same rule written to keep 180 deg, because
+    # 401_trifold_brochure's third panel IS 180 deg - five source runs at angle 180.0
+    # against a render at 0.0 - and 47's filter drops all five, which is why 47 has
+    # never judged that panel. Written as a fold to 0-90 so both flips are upright.
+    def _upright(a):
+        a = abs(a) % 180.0
+        return min(a, 180.0 - a) <= 1.0
+
+    blk = collections.defaultdict(list)
+    for s_sp, g_sp in pairs:
+        if not (_upright(s_sp.get("angle", 0.0)) and _upright(g_sp.get("angle", 0.0))):
+            continue
+        blk[s_sp.get("page")].append(
+            g_sp.get("xink", g_sp["x"]) - s_sp.get("xink", s_sp["x"]))
+    worst_blk, worst_blk_n = 0.0, 0
+    for dv in blk.values():
+        if len(dv) < BLOCK_MIN:
+            continue
+        dv.sort()
+        j = 0
+        for i in range(len(dv)):
+            while dv[i] - dv[j] > BLOCK_WIN:
+                j += 1
+            n = i - j + 1
+            if n >= BLOCK_MIN:
+                m = statistics.median(dv[j:i + 1])
+                if abs(m) > abs(worst_blk):
+                    worst_blk, worst_blk_n = m, n
+    block_bad = abs(worst_blk) > BLOCK_TOL
+    if block_bad:
+        # Never silent: this clause is the only thing that reports a block which moved
+        # while the rate and the median both read clean, so it says which block and by
+        # how much rather than leaving a fixer to bisect the document.
+        print("43_within_10pt_x: %d span(s) on one page moved together by %.1f pt - "
+              "the rate reads %d%% near and the median %.1f, and neither can see a "
+              "block that is small against the page"
+              % (worst_blk_n, worst_blk, round(100 * near_x / tot_p), med_dx_p),
+              file=sys.stderr)
+
     c["43_within_10pt_x"] = (100, round(100 * near_x / tot_p),
                              ((not pairs) or near_x >= tot_p * 0.9)
-                             and abs(med_dx_p) < 3.0)
+                             and abs(med_dx_p) < 3.0
+                             and not block_bad)
 
     # ---- 44 header / footer ------------------------------------------------
     #
