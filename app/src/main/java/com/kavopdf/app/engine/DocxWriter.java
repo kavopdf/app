@@ -214,6 +214,27 @@ public final class DocxWriter {
     private static final float LINE_BASE = 0.8f;
 
     /**
+     * How far the centre of a glyph's INK sits from its own baseline, in em.
+     *
+     * <p>The counterpart of {@link #LINE_BASE} for the perpendicular axis, and the one number
+     * a turned line needs that a horizontal one does not: an upright run's ink is a fixed
+     * distance ABOVE its baseline, so a run copied from a line the page drew at another angle
+     * has to be lifted by the difference between the two frames' perpendiculars (see
+     * {@code stampBox}). It is a property of the face, not of the size: a face's ascent less
+     * its descent, halved.
+     *
+     * <p>Calibrated on the two turned cases where the answer is not mixed up with the tilt.
+     * 04's upside-down stamp needs exactly twice this - its ink hangs below the baseline where
+     * the copy's sits above - and measures 10.90 pt at 17 pt, so k = 0.320. 03's 90-degree
+     * stamp needs it once and measures 45.60 against a half-length of 45.2, so k = 0.32. The
+     * glyph-box figure is the same number from the other side: 04's own upright heading at
+     * 13 pt has its ink centre 4.45 pt above its baseline, 0.342 em, and the substituted face
+     * LibreOffice renders the copy in measures 0.30 em. A stamp that the page draws
+     * horizontally is unaffected at any k - the term is multiplied by (1 - cos 0) = 0.
+     */
+    private static final float INK_MID_EM = 0.32f;
+
+    /**
      * Ceiling on the vertical gap one paragraph may ask for, in twips (120 pt).
      *
      * <p>A gap is a measurement - the distance between two baselines the page drew - and must
@@ -4435,7 +4456,49 @@ public final class DocxWriter {
                 else lx[i] = px - over;                    // drawn left to right
                 lx[i] = Math.max(bx0, Math.min(bx1 - L, lx[i]));
             }
-            ly[i] = py;
+            // WHERE THE INK GOES ON THE VERTICAL AXIS, NOT WHERE THE BASELINE GOES.
+            //
+            // The horizontal placement above is already ink-to-ink: it takes the page's
+            // baseline origin, subtracts the overhang the tilted glyph boxes put before it
+            // and lands the run's ink edge on the page's. The vertical placement was not,
+            // and that asymmetry is the whole of the stamp displacement: the run's
+            // baseline origin was copied straight off the page (`ly[i] = py`), while the
+            // glyphs are written on a HORIZONTAL baseline. A page glyph's ink does not sit
+            // on its baseline - it sits a fixed distance to one SIDE of it, in the text's
+            // own frame - so an upright copy of a turned line lands one perpendicular
+            // offset away from the ink it is copying:
+            //
+            //   the page's ink centre  = P + (L/2).u + k.n,  u = (cos, sin), n = (sin, -cos)
+            //   the copy's ink centre  = R + (L/2).(1,0) + k.(0,-1)
+            //
+            // Setting the two equal and keeping the x axis as it is gives
+            //
+            //   R.y = P.y + (L/2).sin(theta) + k.(1 - cos(theta))
+            //
+            // which is exactly zero for an upright line (sin 0 = 0, cos 0 = 1) - so a
+            // stamp whose text the page draws horizontally does not move by a thousandth
+            // of a point - and is the full lift for the two turned cases that can be
+            // measured without a tilted font:
+            //
+            //   theta = 180:  R.y = P.y + 2k. An upside-down glyph's ink hangs BELOW the
+            //     baseline, an upright one's sits above it, so an upright copy placed on
+            //     the page's baseline is one full em-rise too high. Measured on 04: the
+            //     baseline is already exact there (0.06 pt, see the pen origins), and the
+            //     word still read 10.90 pt off, which is 2k at 17 pt with k = 0.32 em.
+            //   theta = 90:   R.y = P.y + L/2 + k. The line runs UP the page, so its ink
+            //     is centred half its own length above its start. Measured on 03: 45.60 pt
+            //     off on "VERIFIED FOR AUDIT", whose L/2 is 45.2.
+            //
+            // For a shallow tilt this is the same half-length term: a 15-degree line of
+            // 166 pt has its ink centre 21.5 pt above its start, which is 01's 24.0. The
+            // copy cannot be turned - Writer has no arbitrary text rotation - so what is
+            // placed here is the horizontal run whose ink is centred on the page's ink,
+            // which is the placement that splits the unavoidable residual over both ends
+            // instead of piling all of it on the far one.
+            //
+            // NOTHING IS ROTATED AND NOTHING MOVES BUT THE TEXT. The outline is the same
+            // freeform at the same page coordinates; this is the run's baseline inside it.
+            ly[i] = py + (float) (L / 2.0 * uy) + INK_MID_EM * b.size * (1f - (float) ux);
             lpt[i] = flowLinePt(-1f, b.size, 0f);
         }
         // The box has to hold every run, and a centred run starts LEFT of the frame - so the
