@@ -783,6 +783,8 @@ public final class DocxWriter {
          * number rather than an impression.
          */
         int zeroGapNoRoom;
+        /** Cell paragraphs the renderer will wrap, i.e. that were charged more than one box. */
+        int cellWrapHits;
         /** The shapes on the page being written, so a stamp can find its own outline. */
         java.util.List<Shape> curShapes;
         /**
@@ -821,6 +823,24 @@ public final class DocxWriter {
          * from the line above it, which is the only way the page's own y survives a table.
          */
         float afterTablePt = -1f;
+        /**
+         * How far AHEAD of the model the renderer already is inside the cell being written, in
+         * twips, because it wrapped paragraphs the model budgeted one line box for.
+         *
+         * <p>A cell is a fixed-width rectangle and the page's line may be wider than it, so the
+         * renderer breaks that one paragraph into N lines and charges N line boxes. The model
+         * charges one ({@code w:line} is the hairline - see {@link #hairlinePt}). The excess is
+         * permanent and it is CUMULATIVE down the cell, because each paragraph's gap is solved
+         * from the page's own pitch ({@code b.y - lastBaseline}) and so cannot see it. Paying it
+         * out of the next paragraph's gap is what puts that paragraph back on its own y.
+         *
+         * <p>This is the same fault {@link #table} already counts with {@code wrapsAt} (:5266);
+         * the layout table {@link #columnPage} builds never did, and it is where every
+         * para-in-column displacement in corpus-v1 comes from.
+         */
+        int wrapDebtTw;
+        /** The same debt, summed over the cell, so the row can be as tall as what it writes. */
+        int wrapDebtTotalTw;
         /**
          * True while writing the inside of a layout-table cell.
          *
@@ -1894,6 +1914,10 @@ public final class DocxWriter {
                 ctx.newPage = false;
                 ctx.positioned = false;
                 ctx.lastWasTable = false;
+                // A new cell is a new rectangle: its first line is measured from the row's own
+                // top edge, so no debt from the previous cell may follow it in.
+                ctx.wrapDebtTw = 0;
+                ctx.wrapDebtTotalTw = 0;
                 boolean any = false;
                 for (Object b : cells[c]) {
                     float t = blockTop(b);
@@ -1910,7 +1934,10 @@ public final class DocxWriter {
                             .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
                 }
                 ctx.inColumn = false;
-                cellTw[c] = flowTwOf(cellXml[c]);
+                // The row is as tall as what the cell WRITES, and the renderer charges one line
+                // box per wrapped line while flowTwOf can only see the one w:line the paragraph
+                // carries. The debt is the difference, already summed over the cell.
+                cellTw[c] = flowTwOf(cellXml[c]) + ctx.wrapDebtTotalTw;
             }
             int rowTw = 1;
             for (int c = 0; c < n; c++) rowTw = Math.max(rowTw, cellTw[c]);
@@ -3482,6 +3509,84 @@ public final class DocxWriter {
      */
     private static int firstGapCapTw(Ctx ctx) {
         return Math.max(2000, Math.round(ctx.pageHeightPt * (float) TWIPS_PER_PT));
+    }
+
+    /**
+     * How many lines the renderer will draw for one paragraph inside a cell.
+     *
+     * <p>A cell is a fixed rectangle. The page's line was drawn at the page's width, so when the
+     * column pass puts it in a narrower cell the renderer breaks it up and charges one line box
+     * per piece - and the model charges one for the whole paragraph. This is the count that
+     * closes the gap, and it is the same question {@link #wrapsAt} answers for a real table
+     * (:5266), asked of a paragraph instead of a cell string.
+     *
+     * <p>TWO THINGS KEEP IT HONEST, and both are measurements rather than guesses.
+     *
+     * <p>The first is the gate. Whether the paragraph wraps at all is not a matter of opinion:
+     * the page drew the line {@code b.right - b.x} wide and the cell is {@code avail} wide, so a
+     * line that fits cannot wrap and is left exactly alone. That gate is what keeps this off
+     * the documents whose columns are wide enough - an ungated version of this counted wraps in
+     * every two-column layout and moved five of them.
+     *
+     * <p>The second is the advance. A character average (0.5 em, what {@link #wrapsAt} uses)
+     * misreads a 43 pt cell badly, because what decides the count there is the WORDS, not the
+     * characters: 350's marks cell breaks "SQL queries" across two lines that both fit in 11
+     * characters. The line's own width over its own character count is the advance of THIS line
+     * in THIS face, measured from the page, and it makes the total text width exact; only the
+     * word boundaries are then left to estimate.
+     *
+     * <p>The count is the larger of that greedy fill and the plain {@code srcW / avail}, so a
+     * line of few long words - where greedy is at its worst - is still charged what its own
+     * width demands.
+     */
+    private static int cellWrapLines(PdfToWord.Box b, Ctx ctx, int indTw, int rightTw) {
+        if (b == null || b.rotated) return 1;
+        String text = b.text();
+        if (text == null) return 1;
+        float avail = (ctx.cellRightPt - ctx.cellLeftPt)
+                - indTw / (float) TWIPS_PER_PT - rightTw / (float) TWIPS_PER_PT;
+        if (avail <= 1f) return 1;
+        int n = 0;
+        for (int i = 0; i < text.length(); i++) if (text.charAt(i) > ' ') n++;
+        if (n <= 0) return 1;
+        // HOW WIDE IS THE TEXT, when the box cannot say? A Box's own extent is the extent of the
+        // FIRST span on the line: on 350 the marks paragraph reports x=551.88 right=567.28 - the
+        // width of "[08]" - while its runs carry all 105 characters of the question. So the box
+        // is a lower bound and the character count is the other one; take the larger.
+        float textW = Math.max(b.right - b.x, n * 0.5f * Math.max(1f, b.size));
+        // THE GATE: a line the cell can hold is not wrapped, whatever its words look like.
+        //
+        // 3.0 rather than 1.0, and it is a budget argument rather than a tolerance. Below three
+        // times the cell width the paragraph wraps into one or two lines, the whole of the debt
+        // is under a point, and the estimate's own error is the same size - so the correction
+        // buys nothing and can cost a line. At 3.0 and above the cell is not a column the page
+        // ever drew the text in, the debt is several points a paragraph and it accumulates.
+        // Measured: at 1.02 the gate lets 06_rect_paid_stamp_red_transparent through and costs
+        // it 47_margins; at 3.0 that document is untouched and 350 keeps its gain.
+        if (textW <= avail * Float.parseFloat(System.getProperty("p2w.wrapgate", "3.0"))) return 1;
+        float em = textW / n;
+        int lines = 1;
+        float w = 0f;
+        int i = 0, len = text.length();
+        while (i < len) {
+            while (i < len && text.charAt(i) <= ' ') i++;
+            int j = i;
+            while (j < len && text.charAt(j) > ' ') j++;
+            if (j > i) {
+                float ww = (j - i) * em;
+                if (w > 0f && w + em + ww > avail) { lines++; w = 0f; }
+                if (ww > avail) {
+                    int pieces = (int) Math.ceil(ww / avail);
+                    lines += pieces - 1;
+                    w = ww - (pieces - 1) * avail;
+                } else {
+                    w += (w > 0f ? em : 0f) + ww;
+                }
+            }
+            i = j;
+        }
+        int floor = (int) Math.ceil(textW / avail);
+        return Math.max(1, Math.max(lines, floor));
     }
 
     /** The hairline line box a flow line is written with: {@code w:line = 1.38 * size} twips. */
@@ -5391,6 +5496,10 @@ public final class DocxWriter {
         int lastRowHeightTw = 0;
         int lastRowContentTw = 0;
         float lastRowTopPagePt = Float.NaN;
+        // The running top edge of a re-cut table's rows, in points from the page top: its rows
+        // are stacked from the table's own top, so row 2 starts one WRITTEN row below row 1.
+        float recutTopPt = Float.NaN;
+        float rowTopPagePtHere = Float.NaN;
         for (int r = 0; r < t.rows.size(); r++) {
             List<String> row = t.rows.get(r);
             // This row's own pitch. A ruled table's rule lies inside the row's box, so it comes
@@ -5510,6 +5619,39 @@ public final class DocxWriter {
             // (see PdfToWord, where rowTopPt is rowEdge[0] less LINE_BASE of a pitch). Reading
             // a baseline as an edge would put every cell of a whitespace table on its row's top
             // rule, so the baseline is converted back to an edge here.
+            // A CELL THAT CARRIES THE PAGE'S OWN PARAGRAPHS OCCUPIES WHAT THEY ADD UP TO.
+            //
+            // A re-cut band grid's rows are not the page's rules any more: row 0 is a spanning
+            // band and row 1 is the whole of the columns. The page's own extent cannot describe
+            // either of them, so the CONTENT does - every line's box plus every gap between the
+            // baselines the page drew. Declaring the row at the grid's extent instead put
+            // 64_newspaper_uneven_columns_ad_boxes' row at 726.1 pt against the 723.89 the sheet
+            // had left, and the renderer took the larger of the two and broke the page.
+            int paraContentTw = 0;
+            if (t.recut) {
+                for (int q = 0; q < cols; q++) {
+                    paraContentTw = Math.max(paraContentTw,
+                            cellParasTw(t, r, q, recutTopPt, rowLineTw));
+                }
+            }
+            if (paraContentTw > 0) {
+                // A FLOOR, never a cap: the page's own row extent stays the geometry, so the
+                // table's frame closes where the page drew it, and the content only matters
+                // when it is TALLER than that - which is the case that used to overflow.
+                // The rule is added because the renderer lays a row out at content + rule
+                // (see the note above on 404_sudoku_grid).
+                rowHeightTw = Math.max(rowHeightTw, paraContentTw + ruleTwHere);
+            }
+            // WHERE THIS ROW REALLY STARTS. A re-cut table's rows are stacked from its own top
+            // edge, so the second row starts one WRITTEN row below the first - not at the rule
+            // the page drew, which is 44 pt down on 64_newspaper_uneven_columns_ad_boxes while
+            // its spanning band is written 32 pt tall. Placing the cells from the rule put every
+            // column of that page 13.5 pt low.
+            if (t.recut) {
+                if (Float.isNaN(recutTopPt)) recutTopPt = t.rowTopPt;
+                rowTopPagePtHere = recutTopPt;
+                recutTopPt += rowHeightTw / (float) TWIPS_PER_PT;
+            }
             float rowTopPagePt = Float.NaN;
             if (exactRows) {
                 float edgePt = rowEdge[r];
@@ -5519,6 +5661,7 @@ public final class DocxWriter {
                 }
                 rowTopPagePt = edgePt;
             }
+            if (!Float.isNaN(rowTopPagePtHere)) rowTopPagePt = rowTopPagePtHere;
             inner.append("<w:tr>");
             if (rowTwHere > 0) {
                 inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
@@ -5751,6 +5894,54 @@ public final class DocxWriter {
                     cellBoxTw = 1;
                     cellBeforeTw = 0;
                 }
+                // ONE CELL, SEVERAL PARAGRAPHS.
+                //
+                // Everything above places ONE paragraph in the cell: one w:before, one w:line,
+                // one face, one size, one colour. That is the model's limit - `rows` is a
+                // string - and it is why a cell the page drew five lines in was written as one
+                // welded run at a single box. Where the model carries the page's own lines
+                // (Table#paras) each one is written as its own paragraph, at its own leading,
+                // with the page's own gap above it and its own face, size, colour and weight.
+                java.util.List<PdfToWord.Table.CellPara> cps = t.parasAt(r, c);
+                if (cps.size() >= 2) {
+                    int box0 = paraBoxTw(cps, 0, rowLineTw);
+                    int before0 = cellBeforeTw;
+                    if (!Float.isNaN(cellBaseY) && !Float.isNaN(rowTopPagePt)
+                            && cps.get(0).size > 0f) {
+                        float wantPt = cellBaseY - rowTopPagePt;
+                        if (wantPt >= LINE_BASE * cps.get(0).size) {
+                            before0 = (int) Math.max(0L, Math.round(
+                                    (wantPt - LINE_BASE * box0 / (float) TWIPS_PER_PT)
+                                            * TWIPS_PER_PT));
+                        }
+                    }
+                    int stackTw = before0;
+                    // TOP-ALIGNED, because every line in this cell is placed at an ABSOLUTE y:
+                    // w:before carries the page's own distance from the row's top edge. A cell
+                    // that is centred instead is a cell whose content is shifted by half the
+                    // slack between the row's trHeight and what it holds - measured on
+                    // 64_newspaper_uneven_columns_ad_boxes as a flat +2.2 pt on all 77 lines,
+                    // which is half of the 3.8 pt its spanning row had spare.
+                    inner.append("<w:vAlign w:val=\"top\"/></w:tcPr>");
+                    for (int q = 0; q < cps.size(); q++) {
+                        PdfToWord.Table.CellPara cp = cps.get(q);
+                        // THE LINE ADVANCE IS THE BOX, and it is the page's own leading: a
+                        // cell's paragraphs are the lines the page drew, so the distance to the
+                        // next one IS the advance. w:before then carries only a paragraph gap.
+                        int boxTw = paraBoxTw(cps, q, rowLineTw);
+                        int beforeTw = q == 0 ? before0 : paraBeforeTw(cps, q, rowLineTw);
+                        stackTw += (q == 0 ? 0 : beforeTw) + boxTw;
+                        int pInset = Float.isNaN(cp.indentPt) ? insetTw
+                                : (int) Math.max(0L, Math.round(cp.indentPt * TWIPS_PER_PT));
+                        cellParaXml(inner, cp, beforeTw, boxTw, pInset, cellSz);
+                    }
+                    if (r == t.rows.size() - 1) {
+                        lastRowContentTw = Math.max(lastRowContentTw, stackTw);
+                    }
+                    inner.append("</w:tc>");
+                    c += span;
+                    continue;
+                }
                 inner.append("</w:tcPr>")
                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
                         .append("<w:snapToGrid w:val=\"0\"/>")
@@ -5939,6 +6130,125 @@ public final class DocxWriter {
         ctx.flowBoxPt = 0f;
         ctx.newPage = false;
         ctx.lastWasTable = true;
+    }
+
+    /**
+     * The advance of one line of paragraph {@code q} of a cell, in twips.
+     *
+     * <p>A cell's paragraphs are the lines the page drew, so the distance to the NEXT paragraph
+     * is the leading the page used - the one number a welded cell could never carry. Where the
+     * next paragraph is not a line below (a gap, a different block) the leading is 1.2 em of
+     * this paragraph's own size, which is the face's own box and not the row's tallest type.
+     */
+    private static int paraBoxTw(java.util.List<PdfToWord.Table.CellPara> cps, int q,
+                                 int fallbackTw) {
+        PdfToWord.Table.CellPara cp = cps.get(q);
+        float sz = cp.size > 0f ? cp.size : 0f;
+        if (q + 1 < cps.size()) {
+            float dy = cps.get(q + 1).baseY - cp.baseY;
+            // A LINE is at most 1.4 em away; anything further is a PARAGRAPH GAP, and a gap
+            // belongs in the next paragraph's w:before, not in this one's box. Reading the gap
+            // as the box put the first baseline of every paragraph that follows a gap half a
+            // gap too low - measured on 64_newspaper_uneven_columns_ad_boxes as a flat +63.6 pt
+            // on the middle column, where the 15 pt headline above it sits 30 pt above its
+            // body.
+            if (dy > 0f && (sz <= 0f || dy <= 1.4f * sz)) {
+                return (int) Math.max(1L, Math.round(dy * TWIPS_PER_PT));
+            }
+        }
+        if (sz > 0f) return (int) Math.max(1L, Math.round(1.2f * sz * TWIPS_PER_PT));
+        return Math.max(1, fallbackTw);
+    }
+
+    /**
+     * The gap above paragraph {@code q}, in twips, from the two baselines.
+     *
+     * <p>A baseline sits LINE_BASE of its own box below the box's top, so the distance between
+     * two baselines is 0.2 of the first box, plus the gap, plus 0.8 of the second. Asking for
+     * the page's own baselines therefore means solving for the gap, not subtracting the box -
+     * which is right only when the two boxes are the same, and a 15 pt headline over 9 pt body
+     * text is exactly the case where they are not.
+     */
+    private static int paraBeforeTw(java.util.List<PdfToWord.Table.CellPara> cps, int q,
+                                    int rowLineTw) {
+        int boxPrev = paraBoxTw(cps, q - 1, rowLineTw);
+        int boxHere = paraBoxTw(cps, q, rowLineTw);
+        float dy = cps.get(q).baseY - cps.get(q - 1).baseY;
+        long want = Math.round(dy * TWIPS_PER_PT)
+                - Math.round(0.2f * boxPrev) - Math.round(LINE_BASE * boxHere);
+        return (int) Math.max(0L, want);
+    }
+
+    /** What a paragraph-carrying cell occupies, in twips: its first line's placement plus every line. */
+    private static int cellParasTw(PdfToWord.Table t, int r, int c, float rowTopPagePt,
+                                   int rowLineTw) {
+        java.util.List<PdfToWord.Table.CellPara> cps = t.parasAt(r, c);
+        if (cps.size() < 2) return 0;
+        int box0 = paraBoxTw(cps, 0, rowLineTw);
+        int total = box0;
+        float first = cps.get(0).baseY;
+        if (!Float.isNaN(first) && !Float.isNaN(rowTopPagePt) && cps.get(0).size > 0f) {
+            float wantPt = first - rowTopPagePt;
+            if (wantPt >= LINE_BASE * cps.get(0).size) {
+                total += Math.max(0, Math.round(
+                        (wantPt - LINE_BASE * box0 / (float) TWIPS_PER_PT) * TWIPS_PER_PT));
+            }
+        }
+        for (int q = 1; q < cps.size(); q++) {
+            total += paraBeforeTw(cps, q, rowLineTw);
+            total += paraBoxTw(cps, q, rowLineTw);
+        }
+        return total;
+    }
+
+    /**
+     * One paragraph of a cell, with its own spacing, indent and run properties.
+     *
+     * <p>This is the emission the string-based cell could not make: a cell was one {@code w:p}
+     * with one {@code w:rPr}, so a column holding a 15 pt bold headline over 8.4 pt italic body
+     * text could carry exactly one of them.
+     */
+    private static void cellParaXml(StringBuilder inner, PdfToWord.Table.CellPara cp,
+                                    int beforeTw, int boxTw, int insetTw, float cellSz) {
+        float sz = cp.size > 0f ? cp.size : cellSz;
+        inner.append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
+                .append("<w:snapToGrid w:val=\"0\"/>")
+                .append(spacing(beforeTw, boxTw, sz, autoCellBoxes(), false));
+        if (insetTw > 0) inner.append("<w:ind w:left=\"").append(insetTw).append("\"/>");
+        inner.append("</w:pPr>");
+        if (!cp.text.isEmpty()) {
+            inner.append("<w:r><w:rPr>");
+            if (cp.face != null && !cp.face.isEmpty()) {
+                String f = esc(faceName(cp.face));
+                inner.append("<w:rFonts w:ascii=\"").append(f)
+                        .append("\" w:hAnsi=\"").append(f)
+                        .append("\" w:cs=\"").append(f).append("\"/>");
+            }
+            if (cp.bold) inner.append("<w:b/>");
+            if (cp.italic) inner.append("<w:i/>");
+            if (cp.colour >= 0) {
+                inner.append(String.format("<w:color w:val=\"%06X\"/>", cp.colour & 0xFFFFFF));
+            }
+            if (!Float.isNaN(sz) && sz > 0f) {
+                int half = Math.max(2, halfPointsDown(sz));
+                inner.append("<w:sz w:val=\"").append(half)
+                        .append("\"/><w:szCs w:val=\"").append(half).append("\"/>");
+            }
+            inner.append("</w:rPr>");
+            String[] parts = cp.text.split("\n");
+            for (int q = 0; q < parts.length; q++) {
+                if (q > 0) {
+                    if (!parts[q - 1].isEmpty() && !parts[q - 1].endsWith(" ")) {
+                        inner.append("<w:t xml:space=\"preserve\"> </w:t>");
+                    }
+                    inner.append("<w:br/>");
+                }
+                inner.append("<w:t xml:space=\"preserve\">").append(esc(parts[q]))
+                        .append("</w:t>");
+            }
+            inner.append("</w:r>");
+        }
+        inner.append("</w:p>");
     }
 
     /** The paragraph a table must be followed by: 4 pt, in twips. */

@@ -223,6 +223,102 @@ public final class PdfToWord {
     public static final class Table {
         public final List<List<String>> rows = new ArrayList<>();
         /**
+         * THE CELL'S PARAGRAPHS - what a cell really holds, and why {@link #rows} is not enough.
+         *
+         * <p>{@code rows} is one STRING per cell, so a cell can express one paragraph. That is
+         * the whole of the model's limit, and it is the root of four separate failures: a cell
+         * the page drew five lines in arrives as five lines welded with spaces, the renderer
+         * then re-wraps them where its own face says, and the page's own line breaks, leading,
+         * gaps, faces, sizes and colours are all gone. Every cell carries the FIRST line's
+         * style only, because a string has one of each.
+         *
+         * <p>This is the same cell expressed as what it is: an ORDERED LIST of paragraphs, one
+         * per line the page drew, each with its own text, face, size, colour, weight and
+         * baseline. The gaps between them are the page's own, measured as the difference of
+         * two baselines, so a column of a newspaper - which is what a cell of a re-cut
+         * newspaper grid becomes - writes at the leading and with the paragraph gaps the page
+         * had, instead of at one box for the whole cell.
+         *
+         * <p>EMPTY MEANS "ONE PARAGRAPH, USE {@link #rows}". Only a cell that holds two or more
+         * lines of the page is described here, so a table whose cells are single lines - which
+         * is nearly all of them - is written by exactly the code that wrote it before. That is
+         * deliberate: it makes this a model change that can be measured per document instead of
+         * a rewrite of every table in the corpus.
+         */
+        public final List<List<List<CellPara>>> paras = new ArrayList<>();
+
+        /** One paragraph inside a cell: one line the page drew, with the style it drew it in. */
+        public static final class CellPara {
+            public String text = "";
+            public String face = "";
+            public float size = Float.NaN;
+            /** 0xRRGGBB, or -1 when the page named no single colour for this line. */
+            public int colour = -1;
+            public boolean bold, italic;
+            /** Where the page drew this line's first ink and its last, in points. */
+            public float x = Float.NaN, right = Float.NaN;
+            /** The baseline the page drew this line on, in points from the page top. */
+            public float baseY = Float.NaN;
+            /**
+             * Where this paragraph starts inside its cell, in points - {@link Float#NaN} when
+             * the cell's own measured inset is the answer.
+             *
+             * <p>A cell had ONE inset, because it had one paragraph. A cell that holds a
+             * column's lines needs one per paragraph only where the lines do not all start at
+             * the same x - and they do not once a full-width band's headline shares a cell
+             * with the body under it.
+             */
+            public float indentPt = Float.NaN;
+
+            public CellPara() { }
+
+            public CellPara(String text, String face, float size, int colour,
+                            boolean bold, boolean italic,
+                            float x, float right, float baseY) {
+                this.text = text == null ? "" : text;
+                this.face = face == null ? "" : face;
+                this.size = size;
+                this.colour = colour;
+                this.bold = bold;
+                this.italic = italic;
+                this.x = x;
+                this.right = right;
+                this.baseY = baseY;
+            }
+        }
+
+        /**
+         * The paragraphs the page drew in cell (r, c), top to bottom - empty when the cell is a
+         * single paragraph and {@link #rows} describes it.
+         */
+        public List<CellPara> parasAt(int r, int c) {
+            if (r < 0 || r >= paras.size()) return java.util.Collections.emptyList();
+            List<List<CellPara>> row = paras.get(r);
+            if (row == null || c < 0 || c >= row.size() || row.get(c) == null) {
+                return java.util.Collections.emptyList();
+            }
+            return row.get(c);
+        }
+
+        /** Does any cell of this table carry a paragraph list? */
+        public boolean hasParas() {
+            for (List<List<CellPara>> row : paras) {
+                if (row == null) continue;
+                for (List<CellPara> cell : row) if (cell != null && cell.size() >= 2) return true;
+            }
+            return false;
+        }
+
+        /** Gives a table the paragraph shape of another one: one entry per cell, empty lists. */
+        public void shapeParas(int nRows, int nCols) {
+            paras.clear();
+            for (int r = 0; r < nRows; r++) {
+                List<List<CellPara>> row = new ArrayList<>(nCols);
+                for (int c = 0; c < nCols; c++) row.add(new ArrayList<CellPara>());
+                paras.add(row);
+            }
+        }
+        /**
          * The x of every column edge, left to right, in points - one more entry than there are
          * columns. Null when the pass that built the table did not know them, in which case the
          * writer splits the width evenly.
@@ -320,6 +416,16 @@ public final class PdfToWord {
         /** Was each cell's text drawn ITALIC, same shape as {@link #rows}. See {@link #bolds}. */
         public final List<List<Boolean>> italics = new ArrayList<>();
         public boolean header;
+        /**
+         * True when this table is a RE-CUT of a band-major grid - one row, one cell per column
+         * (see {@code recutColumnBands}).
+         *
+         * <p>It matters to the writer for one reason: a re-cut table's row is not the page's
+         * row pitch any more, it is the whole column, so its height is the sum of the
+         * paragraphs it holds and not the grid's extent. For every other table the extent
+         * stays the floor, exactly as before.
+         */
+        public boolean recut;
         /**
          * True when the page sets this table right to left - its first column is the
          * rightmost one and its rows read from the right.
@@ -1075,6 +1181,10 @@ public final class PdfToWord {
         // table's bounds are final. D-22: the writer used to draw all six at one constant
         // weight and one constant colour whatever the page did.
         for (Table t : tables) markSideStrokes(t, topRules);
+        // A band-major grid - a newspaper page drawn as a table - is re-cut into one cell per
+        // column, so the reader gets a column at a time instead of a band at a time. It needs
+        // the cell-paragraph model to be possible at all: see recutColumnBands.
+        recutPages(tables, pageWidth, pageHeight);
 
         // Text already sitting in a table cell must not also come out as body text: the bill of
         // lading appeared twice, once as a run-on paragraph and once as its proper table.
@@ -6373,19 +6483,13 @@ public final class PdfToWord {
      * the PDF meant, and cuts through the row. Measured on file 50, seven row rules across a
      * seven-row table; on file 42, eight.
      *
-     * <p>Three cases, because the drawn rule and the detected cell box do not have the same
-     * extent. The cell box is the text area: it is inset from the drawn frame by the cell
-     * padding, and its last column can stop short of a rule that runs past the final cell
-     * (file 56's rules are 36 pt wider than the cells they close). So a hairline is matched
-     * on where it lies and how much of the table it spans, not on strict containment; a box
-     * is matched either inside the cell box or around it.
-     */
     /**
      * True when a table will paint a border exactly where this stroke lies - the shape pass's
      * half of the ownership test, and the same test the writer writes from.
      *
-     * <p>A table the ruled pass found has its bounds ON the drawn grid, so its six sides stand
-     * in for any rule on them and {@link #inTable} answers. For every other table the answer is
+     * <p>A table the ruled pass found has its bounds and its row and column edges ON the drawn
+     * grid, so the rule it can stand in for is one lying on one of those edges and {@link
+     * #onRuledLine} answers. For every other table the answer is
      * {@link Table#sideDrawn}: a side is drawn only where the page drew a rule, and only that
      * rule is given up. A rule that is merely NEAR the table - within the old 16 pt pad, outside
      * its edge - is not drawn by any side and stays a shape at the page's own y.
@@ -6401,7 +6505,7 @@ public final class PdfToWord {
             float tw = t.right - t.left, th = t.bottom - t.top;
             if (tw <= 0 || th <= 0) continue;
             if (t.ruled) {
-                if (inTableOne(t, x, w, top, bottom)) return true;
+                if (onRuledLine(t, x, w, top, bottom)) return true;
                 continue;
             }
             if (horizontal) {
@@ -6423,6 +6527,40 @@ public final class PdfToWord {
             if (horizontal ? (t.sideDrawn[4] && interiorOf(perp, t.top, t.bottom))
                     : (t.sideDrawn[5] && interiorOf(perp, t.left, t.right)))
                 return true;
+        }
+        return false;
+    }
+
+    /**
+     * True when the stroke lies ON one of this table's own ruled lines - a row edge or a column
+     * edge, side or interior - within {@link #SIDE_TOL} and covering at least half the table.
+     *
+     * <p>This is the ruled table's half of the ownership test, and it replaces the loose 16 pt
+     * pad this pass used to apply to every table alike. A table the ruled pass found has its bounds and its row
+     * edges ON the grid the page draws, so the only rule it can honestly stand in for is one
+     * that lies on one of those edges: the writer gives a ruled table all six borders
+     * ({@code DocxWriter.tbl}, {@code ruledTable || sideDrawn}), and {@code insideH}/{@code
+     * insideV} are drawn at every row and column edge. A rule 14 pt outside the table's bottom
+     * edge is not drawn by the bottom border - the border is where the table ends - so the
+     * 16 pt pad dropped a rule that no side then drew. That was the last NEITHER rule on
+     * marksheet-subject-left-marks-right: the page's 0.6 pt closing rule under the marks table
+     * sits 14.35 pt below it, the pad claimed it, and the border was painted 14 pt higher.
+     */
+    private static boolean onRuledLine(Table t, float x, float w, float top, float bottom) {
+        float tw = t.right - t.left, th = t.bottom - t.top;
+        if (tw <= 0f || th <= 0f) return false;
+        boolean horizontal = w >= (bottom - top);
+        float perp = horizontal ? (top + bottom) / 2f : x + w / 2f;
+        float lo = horizontal ? x : top;
+        float hi = horizontal ? x + w : bottom;
+        float a0 = horizontal ? t.left : t.top;
+        float a1 = horizontal ? t.right : t.bottom;
+        float span = horizontal ? tw : th;
+        float[] edges = horizontal ? rowEdges(t) : t.colX;
+        if (edges == null) return false;
+        for (float e : edges) {
+            if (Math.abs(perp - e) > SIDE_TOL) continue;
+            if (overlap(lo, hi, a0, a1) >= 0.5f * span) return true;
         }
         return false;
     }
@@ -6463,35 +6601,6 @@ public final class PdfToWord {
             t.sideDrawn[0] = t.sideDrawn[1] = t.sideDrawn[2] = t.sideDrawn[3] = false;
             return;
         }
-    }
-
-    private static boolean inTable(float x, float w, float top, float bottom, List<Table> tables) {
-        if (tables == null || tables.isEmpty()) return false;
-        for (Table t : tables) if (inTableOne(t, x, w, top, bottom)) return true;
-        return false;
-    }
-
-    /** {@link #inTable} for one table: the loose 16 pt claim the ruled pass has always made. */
-    private static boolean inTableOne(Table t, float x, float w, float top, float bottom) {
-        float tw = t.right - t.left, th = t.bottom - t.top;
-        if (tw <= 0 || th <= 0) return false;
-        boolean thin = Math.min(w, bottom - top) < 3f;
-        if (thin) {
-            float pad = 16f;
-            if (w >= bottom - top) {                       // a horizontal rule
-                if (top < t.top - pad || top > t.bottom + pad) return false;
-                return overlap(x, x + w, t.left, t.right) >= 0.5f * tw;
-            } else {                                       // a vertical rule
-                if (x < t.left - pad || x > t.right + pad) return false;
-                return overlap(top, bottom, t.top, t.bottom) >= 0.5f * th;
-            }
-        }
-        float pad = 2f;
-        boolean inside = x >= t.left - pad && x + w <= t.right + pad
-                && top >= t.top - pad && bottom <= t.bottom + pad;
-        boolean frame = t.left >= x - pad && t.right <= x + w + pad
-                && t.top >= top - pad && t.bottom <= bottom + pad;
-        return inside || frame;
     }
 
     private static float overlap(float a0, float a1, float b0, float b1) {
@@ -7076,6 +7185,8 @@ public final class PdfToWord {
             for (int c = 0; c < ncol; c++) row.add(new ArrayList<>());
             buckets.add(row);
         }
+        float[] prevCell = null;
+        float prevY = 0, prevRight = 0, prevSize = 0;
         for (Glyph g : glyphs) {
             float cx = g.x + g.width / 2f;
             float cy = g.y + g.size * 0.35f;
@@ -7084,7 +7195,16 @@ public final class PdfToWord {
                 if (cx >= cell[0] - 2f && cx <= cell[2] + 2f
                         && cy >= cell[1] - 2f && cy <= cell[3] + 2f) { hit = cell; break; }
             }
-            if (hit == null) continue;
+            if (hit == null && prevCell != null && Math.abs(g.y - prevY) <= 0.5f
+                    && g.x >= prevRight - 1f
+                    && g.x - prevRight <= Math.max(9f, Math.max(g.size, prevSize) * 1.1f)) {
+                hit = prevCell;
+            }
+            if (hit == null) { prevCell = null; continue; }
+            prevCell = hit;
+            prevY = g.y;
+            prevRight = g.x + g.width;
+            prevSize = g.size;
             int ri = R.indexOf(hit[1]);
             int ci = C.indexOf(hit[0]);
             if (ri >= 0 && ci >= 0) buckets.get(ri).get(ci).add(g);
@@ -7132,7 +7252,10 @@ public final class PdfToWord {
             List<Integer> rowCols = new ArrayList<>();
             List<Boolean> rowBolds = new ArrayList<>();
             List<Boolean> rowItalics = new ArrayList<>();
+            List<List<Table.CellPara>> paraRow = new ArrayList<>();
             for (int c = 0; c < ncol; c++) {
+                List<Table.CellPara> cp = parasOfGlyphs(buckets.get(r).get(c));
+                paraRow.add(cp.size() >= 2 ? cp : new ArrayList<Table.CellPara>());
                 String str = glyphText(buckets.get(r).get(c));
                 if (!str.isEmpty()) filled++;
                 row.add(str);
@@ -7154,6 +7277,7 @@ public final class PdfToWord {
             t.colors.add(rowCols);
             t.bolds.add(rowBolds);
             t.italics.add(rowItalics);
+            t.paras.add(paraRow);
         }
         // A QR code, a logo or a chart is drawn from the same rectangles a table is, so the
         // cells are real but the words are not there. A real table has text in a good share of
@@ -7448,6 +7572,444 @@ public final class PdfToWord {
         return outSb.toString().trim();
     }
 
+    /**
+     * A cell's paragraphs, from the LINES the page drew in it.
+     *
+     * <p>Two lines on one baseline are one paragraph (a label and its value drawn side by side,
+     * a numbered item's marker beside its name); two lines on different baselines are two
+     * paragraphs, which is what the page drew and what {@code rows} welds into one.
+     *
+     * <p>Returns an EMPTY list for a cell that holds one paragraph: that cell is written by the
+     * string path exactly as it always was, and the model stays out of the way of the 200-odd
+     * documents that have no multi-line cell at all.
+     */
+    private static List<Table.CellPara> parasOfLines(List<Line> ls) {
+        List<Table.CellPara> none = new ArrayList<>();
+        if (ls == null || ls.size() < 2) return none;
+        List<Line> sorted = new ArrayList<>(ls);
+        Collections.sort(sorted, new Comparator<Line>() {
+            @Override
+            public int compare(Line a, Line b) {
+                if (Math.abs(a.y - b.y) > 2f) return Float.compare(a.y, b.y);
+                return Float.compare(a.x, b.x);
+            }
+        });
+        List<Table.CellPara> out = new ArrayList<>();
+        Table.CellPara cur = null;
+        float curY = Float.NaN;
+        for (Line ln : sorted) {
+            String piece = ln.text == null ? "" : ln.text.trim();
+            if (piece.isEmpty()) continue;
+            if (cur != null && Math.abs(ln.y - curY) <= 2f) {
+                cur.text = cur.text.isEmpty() ? piece : cur.text + " " + piece;
+                if (!Float.isNaN(ln.right) && ln.right > cur.right) cur.right = ln.right;
+                continue;
+            }
+            cur = new Table.CellPara(piece, fontOf(ln.glyphs), sizeOf(ln.glyphs),
+                    colourOfLine(ln.glyphs), boldOf(ln.glyphs), italicOf(ln.glyphs),
+                    visibleX(ln.glyphs, ln.x), ln.right, ln.y);
+            curY = ln.y;
+            out.add(cur);
+        }
+        if (out.size() < 2) return none;
+        return out;
+    }
+
+    /** The same, from a cell's raw glyphs: one paragraph per baseline the page drew. */
+    private static List<Table.CellPara> parasOfGlyphs(List<Glyph> gs) {
+        List<Table.CellPara> none = new ArrayList<>();
+        if (gs == null || gs.size() < 2) return none;
+        List<Glyph> sorted = new ArrayList<>(gs);
+        Collections.sort(sorted, new Comparator<Glyph>() {
+            @Override
+            public int compare(Glyph a, Glyph b) {
+                if (Math.abs(a.y - b.y) > 2f) return Float.compare(a.y, b.y);
+                return Float.compare(a.x, b.x);
+            }
+        });
+        List<List<Glyph>> bands = new ArrayList<>();
+        float curY = Float.NaN;
+        for (Glyph g : sorted) {
+            if (bands.isEmpty() || Math.abs(g.y - curY) > 2f) {
+                bands.add(new ArrayList<Glyph>());
+                curY = g.y;
+            }
+            bands.get(bands.size() - 1).add(g);
+        }
+        if (bands.size() < 2) return none;
+        List<Table.CellPara> out = new ArrayList<>();
+        for (List<Glyph> band : bands) {
+            String txt = glyphText(band);
+            if (txt.trim().isEmpty()) continue;
+            out.add(new Table.CellPara(txt, fontOf(band), sizeOf(band), colourOfLine(band),
+                    boldOf(band), italicOf(band), glyphFirstX(band), glyphLastRight(band),
+                    glyphFirstBaseline(band)));
+        }
+        if (out.size() < 2) return none;
+        return out;
+    }
+
+    /**
+     * The one colour a line was drawn in, or -1 when it was drawn in more than one.
+     *
+     * <p>A line is not a cell: a heading in #73081A over black body text is two lines, so each
+     * of them has its own colour and the "a cell is one run" rule that forced the whole cell
+     * onto Automatic no longer has to be applied to a cell at all.
+     */
+    private static int colourOfLine(List<Glyph> gs) {
+        int c = COLOUR_UNSET;
+        for (Glyph g : gs) {
+            if (g.text == null || g.text.trim().isEmpty()) continue;
+            if (c == COLOUR_UNSET) c = g.color;
+            else if (c != g.color) return -1;
+        }
+        return c == COLOUR_UNSET ? -1 : (c >= -1 ? c : -1);
+    }
+
+    /**
+     * A BAND-MAJOR GRID RE-CUT INTO ONE CELL PER COLUMN - the reading-order fix for a page that
+     * is set in newspaper columns and drawn as a table.
+     *
+     * <p>A page like that reaches the model as a grid whose ROWS are horizontal bands: row 0
+     * holds the first band of every column, row 1 the second band, and so on. A .docx table
+     * reads row by row, so the reader gets "left column's band 1, middle column's band 1, right
+     * column's band 1, left column's band 2 ..." - interleaved. The page reads down one column
+     * and then the next. Measured on 64_newspaper_uneven_columns_ad_boxes: 25 of 77 runs
+     * matched in reading order, and it is 75 of 77 once the grid is re-cut.
+     *
+     * <p>The re-cut keeps the geometry and changes the container: one row, one cell per column,
+     * each cell holding that column's bands in order. Nothing moves - a cell is a fixed
+     * rectangle, and the bands inside it are paragraphs at the page's own baselines.
+     *
+     * <p>IT IS ONLY POSSIBLE WITH THE CELL-PARAGRAPH MODEL. Re-cut with one string per cell,
+     * the column's five bands become one welded paragraph written at ONE line box - the row's
+     * tallest type, 1.25 em, so a 15 pt headline writes 18.75 pt for every line of every cell -
+     * and the page grows from one sheet to three. With {@link Table#paras} each band is a
+     * paragraph with its own leading and its own gap, and the column is written at the leading
+     * the page used.
+     *
+     * <p>THE GUARD IS THE WHOLE OF THE SAFETY. A ledger is also a ruled grid whose cells hold
+     * several lines, and re-cutting one interleaves nothing - it only destroys the row
+     * structure the reader needs. Six ledgers were re-cut by the first form of this test. What
+     * separates a newspaper from a ledger is that a newspaper's columns are FULL-HEIGHT runs of
+     * prose: text in every band of every column, cells deep enough that they are prose rather
+     * than figures, and a grid that is most of the sheet. A ledger's cells hold one figure each
+     * and its bands do not all carry text in all columns.
+     */
+    private static Table recutColumnBands(Table t, float pageW, float pageH) {
+        if (t == null || !t.ruled) return null;
+        int rows = t.rows.size();
+        if (rows < 3 || rows > 12) return null;
+        int cols = 0;
+        for (List<String> r : t.rows) cols = Math.max(cols, r.size());
+        if (cols < 2 || cols > 4) return null;
+        if (t.colX == null || t.colX.length != cols + 1) return null;
+        if (t.rowEdge == null || t.rowEdge.length != rows + 1) return null;
+        float w = t.right - t.left, h = t.bottom - t.top;
+        if (w <= 0f || h <= 0f) return null;
+        // Most of the sheet: a newspaper's columns run the height of the page.
+        if (w * h < 0.5f * pageW * pageH) return null;
+
+        // Text in at least two bands of EVERY column. A ledger's column is a figure per row
+        // and its bands are rows, not paragraphs - but the test that separates the two is the
+        // one below, and this one keeps a page with an empty column out.
+        for (int c = 0; c < cols; c++) {
+            int bands = 0;
+            for (int r = 0; r < rows; r++) if (!cellTextOf(t, r, c).isEmpty()) bands++;
+            if (bands < 2) return null;
+        }
+        // Cells deep enough to be prose. Counted over the cells that hold anything at all: a
+        // newspaper band is two to six lines, a ledger's cell is one figure or one label.
+        int nonEmpty = 0, deep = 0;
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                if (cellTextOf(t, r, c).isEmpty()) continue;
+                nonEmpty++;
+                int lines = t.parasAt(r, c).size();
+                if (lines < 2) lines = 1;
+                if (lines >= 3) deep++;
+            }
+        }
+        if (nonEmpty < 4 || deep * 100 / nonEmpty < 60) return null;
+
+        // ---- what a cell cannot hold --------------------------------------------------
+        //
+        // A line drawn ACROSS a gutter - a headline, a standfirst - is wider than the column it
+        // starts in, and a cell is a fixed rectangle: written into that cell it re-wraps, which
+        // both loses the line and pushes the whole column down by one pitch. Those lines are
+        // not column content; they are a full-width band, and a band is a ROW that spans the
+        // table. They are only hoisted when they are the table's TOP bands, because a spanning
+        // row can only be before or after the column row, not inside it.
+        int[][] overrun = new int[rows][cols];       // 1 = this cell holds a spanning line
+        int lastSpanBand = -1;
+        for (int r = 0; r < rows; r++) {
+            boolean any = false;
+            for (int c = 0; c < cols; c++) {
+                float cw = t.colX[c + 1] - t.colX[c];
+                for (Table.CellPara p : t.parasAt(r, c)) {
+                    if (p.right - p.x > cw + 2f) { overrun[r][c] = 1; any = true; break; }
+                }
+                if (overrun[r][c] == 0 && t.parasAt(r, c).isEmpty()) {
+                    String txt = cellTextOf(t, r, c);
+                    if (!txt.isEmpty()) {
+                        float x = xOf(t, r, c), rr = rOf(t, r, c);
+                        if (!Float.isNaN(x) && !Float.isNaN(rr) && rr - x > cw + 2f) {
+                            overrun[r][c] = 1;
+                            any = true;
+                        }
+                    }
+                }
+            }
+            if (!any) break;                          // the spanning bands must be a prefix
+            lastSpanBand = r;
+        }
+
+        // ---- the re-cut itself --------------------------------------------------------
+        Table u = new Table();
+        u.recut = true;
+        u.ruled = t.ruled;
+        u.innerH = false;                 // one column row: no inside-horizontal rules
+        u.innerV = t.innerV && lastSpanBand < 0;
+        u.header = false;
+        u.rtl = t.rtl;
+        u.top = t.top;
+        u.bottom = t.bottom;
+        u.left = t.left;
+        u.right = t.right;
+        u.rowTopPt = t.rowTopPt;
+        u.colX = t.colX.clone();
+        for (int i = 0; i < 6; i++) {
+            u.sideDrawn[i] = t.sideDrawn[i];
+            u.sideStroke[i] = t.sideStroke[i];
+        }
+        int bandRows = lastSpanBand + 1;              // rows of the grid that become bands
+        int nRows = (bandRows > 0 ? 1 : 0) + 1;
+        u.shapeParas(nRows, cols);
+        float[] rowEdgeOut = new float[nRows + 1];
+        rowEdgeOut[0] = t.rowEdge[0];
+
+        // The spanning bands first: one row, one cell, spanning every column.
+        int outRow = 0;
+        if (bandRows > 0) {
+            List<Table.CellPara> band = new ArrayList<>();
+            // IN COLUMN ORDER, each column's lines top to bottom: the band is read the way the
+            // page is read. Sorting the whole band by y instead interleaves it - 64's
+            // CLASSIFIEDS heading sits 7 pt above the first line of the middle column, and a
+            // y-sort puts the third column's heading before the second column's prose.
+            for (int r = 0; r < bandRows; r++) {
+                for (int c = 0; c < cols; c++) {
+                    List<Table.CellPara> ps = t.parasAt(r, c);
+                    if (!ps.isEmpty()) {
+                        for (Table.CellPara p : ps) {
+                            if (p.right - p.x > (t.colX[c + 1] - t.colX[c]) + 2f) band.add(p);
+                        }
+                    } else {
+                        String txt = cellTextOf(t, r, c);
+                        if (txt.isEmpty()) continue;
+                        float x = xOf(t, r, c), rr = rOf(t, r, c);
+                        if (Float.isNaN(x) || Float.isNaN(rr)
+                                || rr - x <= (t.colX[c + 1] - t.colX[c]) + 2f) continue;
+                        band.add(new Table.CellPara(txt, fontOf(t, r, c),
+                                sizeOf(t, r, c), colorOf(t, r, c), boldOf(t, r, c),
+                                italicOf(t, r, c), x, rr, yOf(t, r, c)));
+                    }
+                }
+            }
+            Collections.sort(band, new Comparator<Table.CellPara>() {
+                @Override
+                public int compare(Table.CellPara a, Table.CellPara b) {
+                    return Float.compare(a.baseY, b.baseY);
+                }
+            });
+            addRecutRow(u, outRow, cols, band, t.left, band.size() >= 2, true);
+            outRow++;
+        }
+
+        // Then the columns: one cell each, every band of that column in order.
+        List<String> rowText = new ArrayList<>();
+        List<String> rowFaces = new ArrayList<>();
+        List<Float> rowSizes = new ArrayList<>();
+        List<Float> rowXs = new ArrayList<>();
+        List<Float> rowRs = new ArrayList<>();
+        List<Float> rowYs = new ArrayList<>();
+        List<Integer> rowColours = new ArrayList<>();
+        List<Boolean> rowBolds = new ArrayList<>();
+        List<Boolean> rowItalics = new ArrayList<>();
+        for (int c = 0; c < cols; c++) {
+            List<Table.CellPara> all = new ArrayList<>();
+            for (int r = 0; r < rows; r++) {
+                List<Table.CellPara> ps = t.parasAt(r, c);
+                if (!ps.isEmpty()) {
+                    for (Table.CellPara p : ps) {
+                        if (overrun[r][c] == 1 && p.right - p.x
+                                > (t.colX[c + 1] - t.colX[c]) + 2f) continue;
+                        all.add(p);
+                    }
+                } else {
+                    String txt = cellTextOf(t, r, c);
+                    if (txt.isEmpty()) continue;
+                    if (overrun[r][c] == 1) continue;
+                    all.add(new Table.CellPara(txt, fontOf(t, r, c), sizeOf(t, r, c),
+                            colorOf(t, r, c), boldOf(t, r, c), italicOf(t, r, c),
+                            xOf(t, r, c), rOf(t, r, c), yOf(t, r, c)));
+                }
+            }
+            Collections.sort(all, new Comparator<Table.CellPara>() {
+                @Override
+                public int compare(Table.CellPara a, Table.CellPara b) {
+                    return Float.compare(a.baseY, b.baseY);
+                }
+            });
+            for (Table.CellPara p : all) p.indentPt = p.x - t.colX[c];
+            if (all.isEmpty()) {
+                rowText.add("");
+                rowFaces.add("");
+                rowSizes.add(Float.NaN);
+                rowXs.add(Float.NaN);
+                rowRs.add(Float.NaN);
+                rowYs.add(Float.NaN);
+                rowColours.add(-1);
+                rowBolds.add(false);
+                rowItalics.add(false);
+                continue;
+            }
+            StringBuilder joined = new StringBuilder();
+            for (Table.CellPara p : all) {
+                if (joined.length() > 0) joined.append('\n');
+                joined.append(p.text);
+            }
+            Table.CellPara first = all.get(0);
+            float xLo = Float.MAX_VALUE, xHi = -Float.MAX_VALUE;
+            for (Table.CellPara p : all) {
+                if (!Float.isNaN(p.x)) xLo = Math.min(xLo, p.x);
+                if (!Float.isNaN(p.right)) xHi = Math.max(xHi, p.right);
+            }
+            rowText.add(joined.toString());
+            rowFaces.add(first.face);
+            rowSizes.add(first.size);
+            rowXs.add(xLo == Float.MAX_VALUE ? first.x : xLo);
+            rowRs.add(xHi == -Float.MAX_VALUE ? first.right : xHi);
+            rowYs.add(first.baseY);
+            rowColours.add(first.colour);
+            rowBolds.add(first.bold);
+            rowItalics.add(first.italic);
+            if (all.size() >= 2) u.paras.get(outRow).get(c).addAll(all);
+        }
+        // THE ROW EDGES ARE THE GEOMETRY THE WRITER WILL LAY OUT, not the page's rules: the
+        // rows are stacked, so the column row's top is one written row below the table's own
+        // top. Reading it from the page's rule list instead put every column 13.5 pt low on
+        // 64_newspaper_uneven_columns_ad_boxes - the spanning row was written 32 pt tall where
+        // the page's rule sat 44 pt down, and the cells below were placed from the rule.
+        float colTop = t.rowEdge[0];
+        for (int c = 0; c < cols; c++) {
+            List<Table.CellPara> ps = u.parasAt(outRow, c);
+            if (ps.isEmpty()) continue;
+            colTop = Math.max(colTop, ps.get(0).baseY
+                    - (ps.get(0).size > 0f ? 0.8f * ps.get(0).size : 8f));
+            break;
+        }
+        if (bandRows > 0) {
+            rowEdgeOut[1] = Math.max(rowEdgeOut[0] + 1f, colTop);
+        } else {
+            rowEdgeOut[0] = t.rowEdge[0];
+        }
+        rowEdgeOut[nRows] = t.bottom;
+        u.rows.add(rowText);
+        u.fonts.add(rowFaces);
+        u.sizes.add(rowSizes);
+        u.cellX.add(rowXs);
+        u.cellR.add(rowRs);
+        u.cellY.add(rowYs);
+        u.colors.add(rowColours);
+        u.bolds.add(rowBolds);
+        u.italics.add(rowItalics);
+        u.rowEdge = rowEdgeOut;
+        return u;
+    }
+
+    /**
+     * One row of the re-cut table: the paragraphs it holds, and the cell shape the writer reads
+     * when the row is a single paragraph.
+     */
+    private static void addRecutRow(Table u, int row, int cols, List<Table.CellPara> ps,
+                                    float cellLeft, boolean asParas, boolean spans) {
+        List<String> rowText = new ArrayList<>();
+        List<String> rowFaces = new ArrayList<>();
+        List<Float> rowSizes = new ArrayList<>();
+        List<Float> rowXs = new ArrayList<>();
+        List<Float> rowRs = new ArrayList<>();
+        List<Float> rowYs = new ArrayList<>();
+        List<Integer> rowColours = new ArrayList<>();
+        List<Boolean> rowBolds = new ArrayList<>();
+        List<Boolean> rowItalics = new ArrayList<>();
+        for (Table.CellPara p : ps) p.indentPt = p.x - cellLeft;
+        StringBuilder joined = new StringBuilder();
+        for (Table.CellPara p : ps) {
+            if (joined.length() > 0) joined.append('\n');
+            joined.append(p.text);
+        }
+        Table.CellPara first = ps.isEmpty() ? null : ps.get(0);
+        rowText.add(joined.toString());
+        for (int c = 1; c < cols; c++) rowText.add("");
+        float xLo = Float.MAX_VALUE, xHi = -Float.MAX_VALUE;
+        for (Table.CellPara p : ps) {
+            if (!Float.isNaN(p.x)) xLo = Math.min(xLo, p.x);
+            if (!Float.isNaN(p.right)) xHi = Math.max(xHi, p.right);
+        }
+        rowFaces.add(first == null ? "" : first.face);
+        rowSizes.add(first == null ? Float.NaN : first.size);
+        rowXs.add(xLo == Float.MAX_VALUE ? Float.NaN : xLo);
+        rowRs.add(xHi == -Float.MAX_VALUE ? Float.NaN : xHi);
+        rowYs.add(first == null ? Float.NaN : first.baseY);
+        rowColours.add(first == null ? -1 : first.colour);
+        rowBolds.add(first != null && first.bold);
+        rowItalics.add(first != null && first.italic);
+        for (int c = 1; c < cols; c++) {
+            rowFaces.add("");
+            rowSizes.add(Float.NaN);
+            rowXs.add(Float.NaN);
+            rowRs.add(Float.NaN);
+            rowYs.add(Float.NaN);
+            rowColours.add(-1);
+            rowBolds.add(false);
+            rowItalics.add(false);
+        }
+        u.rows.add(rowText);
+        u.fonts.add(rowFaces);
+        u.sizes.add(rowSizes);
+        u.cellX.add(rowXs);
+        u.cellR.add(rowRs);
+        u.cellY.add(rowYs);
+        u.colors.add(rowColours);
+        u.bolds.add(rowBolds);
+        u.italics.add(rowItalics);
+        if (asParas) u.paras.get(row).get(0).addAll(ps);
+    }
+
+    /** A cell's text, "" when the cell does not exist. */
+    private static String cellTextOf(Table t, int r, int c) {
+        if (r >= t.rows.size()) return "";
+        List<String> row = t.rows.get(r);
+        if (row == null || c >= row.size()) return "";
+        String s = row.get(c);
+        return s == null ? "" : s.trim();
+    }
+
+    /**
+     * Re-cuts every band-major grid on a page. Applied after the page's tables are final and
+     * before anything reads them, so the .docx and the .txt describe the same document.
+     */
+    private static void recutPages(List<Table> tables, float pageW, float pageH) {
+        if (!RECUT) return;
+        for (int i = 0; i < tables.size(); i++) {
+            Table u = recutColumnBands(tables.get(i), pageW, pageH);
+            if (u != null) tables.set(i, u);
+        }
+    }
+
+    /** The band re-cut, on by default; {@code -Dp2w.recut=false} turns it off. */
+    static final boolean RECUT = !"false".equals(System.getProperty("p2w.recut"));
+
     /** All tables on a page, found the way pdfplumber finds them. */
     private static List<Table> findTables(List<Edge> rawEdges, List<Glyph> glyphs, float pageWidth) {
         List<Table> out = new ArrayList<>();
@@ -7658,11 +8220,23 @@ public final class PdfToWord {
             // placed inside its row from the page's own y, not from a fixed fraction of the pitch.
             float[][] firstY = new float[rows][cols];
             for (float[] rowY : firstY) java.util.Arrays.fill(rowY, Float.NaN);
+            // THE LINES EACH CELL REALLY HOLDS, so the cell can carry them as paragraphs.
+            // `cells` below welds them into one string, which is the model's one-paragraph
+            // limit: a newspaper column cut into bands arrives as five lines run together with
+            // spaces, and the writer then has no way to give them their own leading, their own
+            // gaps, or their own size, face and colour.
+            List<List<List<Line>>> pieces = new ArrayList<>();
+            for (int rr = 0; rr < rows; rr++) {
+                List<List<Line>> prow = new ArrayList<>();
+                for (int cc = 0; cc < cols; cc++) prow.add(new ArrayList<Line>());
+                pieces.add(prow);
+            }
             for (Line line : lines) {
                 float cx = (line.x + line.right) / 2f;
                 int r = band(ys, line.y);
                 int c = band(xs, cx);
                 if (r < 0 || c < 0) continue;
+                pieces.get(r).get(c).add(line);
                 cells[r][c] = cells[r][c] == null
                         ? line.text.trim() : cells[r][c] + " " + line.text.trim();
                 if (faces[r][c] == null) faces[r][c] = fontOf(line.glyphs);
@@ -7760,6 +8334,13 @@ public final class PdfToWord {
                 t.cellX.add(rowXs);
                 t.cellY.add(rowYs);
                 t.colors.add(rowColours);
+            }
+            t.shapeParas(rows, cols);
+            for (int rr = 0; rr < rows; rr++) {
+                for (int cc = 0; cc < cols; cc++) {
+                    List<Table.CellPara> cp = parasOfLines(pieces.get(rr).get(cc));
+                    if (cp.size() >= 2) t.paras.get(rr).get(cc).addAll(cp);
+                }
             }
             out.add(t);
         }
@@ -8040,8 +8621,11 @@ public final class PdfToWord {
             // be told apart: beside it on the same line, or under it on the next one.
             float[] lineY = new float[columns.size()];
             java.util.Arrays.fill(lineY, Float.NaN);
+            List<List<Line>> pieces = new ArrayList<>();
+            for (int cc = 0; cc < columns.size(); cc++) pieces.add(new ArrayList<Line>());
             for (Line cell : rows.get(r)) {
                 int best = columnOf(columns, colRight, cell);
+                if (best >= 0 && best < pieces.size()) pieces.get(best).add(cell);
                 if (Float.isNaN(lineX[best])) lineX[best] = visibleX(cell.glyphs, cell.x);
                 if (Float.isNaN(lineY[best])) lineY[best] = cell.y;
                 if (Float.isNaN(lineR[best]) || cell.right > lineR[best]) lineR[best] = cell.right;
@@ -8096,6 +8680,12 @@ public final class PdfToWord {
             t.sizes.add(textSizes);
             t.cellX.add(textXs);
             t.cellR.add(textRs);
+            List<List<Table.CellPara>> paraRow = new ArrayList<>();
+            for (List<Line> cell : pieces) {
+                List<Table.CellPara> cp = parasOfLines(cell);
+                paraRow.add(cp.size() >= 2 ? cp : new ArrayList<Table.CellPara>());
+            }
+            t.paras.add(paraRow);
             // Where each cell's own first line sits, so the writer can place it inside the row
             // from the page's y instead of at a fixed fraction of the row's pitch.
             List<Float> textYs = new ArrayList<>();

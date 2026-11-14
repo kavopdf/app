@@ -486,15 +486,33 @@ def _shapes(page):
     # drawn as lines is not a shape at all (a horizontal line is 0 pt tall), so the
     # text inside it looks unanchored and the check cannot see the frame it is about.
     hs.sort(key=lambda r: r.y0)
-    for a, b in zip(hs, hs[1:]):
-        if b.y0 - a.y0 < 8:
-            continue
-        x0, x1 = min(a.x0, b.x0), max(a.x1, b.x1)
-        if x1 - x0 < 8:
-            continue
-        if (any(abs(v.x0 - x0) <= 2 and v.y0 <= a.y0 + 2 and v.y1 >= b.y0 - 2 for v in vs)
-                and any(abs(v.x1 - x1) <= 2 and v.y0 <= a.y0 + 2 and v.y1 >= b.y0 - 2 for v in vs)):
-            out.append(fitz.Rect(x0, a.y0, x1, b.y0))
+    # THE FACE IS THE NEXT RULE THAT ACTUALLY CLOSES A BOX, not the next rule in y.
+    # `zip(hs, hs[1:])` tested only y-ADJACENT pairs, so ONE extra hairline landing
+    # between a band's two rules destroyed the face those two rules still draw: the
+    # pair (a, b) was never tested, and (a, extra) / (extra, b) have no vertical rule
+    # standing at their ends. Measured on 330_cad_drawing_sheet: the engine gained the
+    # page's own 380x0.4 pt rule at y 430.05 (a rule the source draws and the old
+    # shape pass dropped), it fell between the revision table's band edges at 417.6
+    # and 430.6, and the face (21.0, 417.6, 255.4, 430.6) - the box four runs were
+    # anchored to - was no longer assembled. Their enclosing box became the sheet
+    # border, dx/dy jumped to 11.1/407.7, and 5 of 40 judged runs on that page were
+    # scored `moved` against a budget of 2. Nothing on the page moved: the text is
+    # unmoved (18_displacement passes), and both band rules are in the render at the
+    # same coordinates. That is the tool talking, and the fix is to test the pair
+    # that closes rather than the pair that is adjacent.
+    for i, a in enumerate(hs):
+        for b in hs[i + 1:]:
+            if b.y0 - a.y0 < 8:
+                continue
+            if b.y0 - a.y0 > FACE_MAX_H:
+                break
+            x0, x1 = min(a.x0, b.x0), max(a.x1, b.x1)
+            if x1 - x0 < 8:
+                continue
+            if (any(abs(v.x0 - x0) <= 2 and v.y0 <= a.y0 + 2 and v.y1 >= b.y0 - 2 for v in vs)
+                    and any(abs(v.x1 - x1) <= 2 and v.y0 <= a.y0 + 2 and v.y1 >= b.y0 - 2 for v in vs)):
+                out.append(fitz.Rect(x0, a.y0, x1, b.y0))
+                break
     try:
         for img in page.get_images(full=True):
             for r in page.get_image_rects(img[0]):
@@ -879,6 +897,27 @@ def _span_flags(sp):
 # drawing it white reads g_n=26.
 # ----------------------------------------------------------------------------
 RULE_THIN = 4.0
+# How much wider than RULE_THIN the RENDER's copy of a rule may be and still be that rule.
+#
+# RULE_THIN is a width, and a width is the one thing a renderer does not reproduce
+# exactly. 49_coloured_background_block_paragraph draws a 4.00 pt filled strip (the
+# accent bar down the side of a shaded block) - exactly RULE_THIN - and the .docx
+# carries it at 4.00 pt with the page's own colour (29529E) and the page's own
+# position (wp:positionV 146 pt, which is the source's top-down 146.00 pt to the
+# hundredth). LibreOffice exports that path 0.05 pt wider on each side, so the render's
+# copy is 4.10 pt and `t > RULE_THIN` threw it away: the source's rule then had no
+# candidate on its own page and was counted LOST, on a document whose ink is right.
+# The allowance is on the render side only - the source's own rules are read from the
+# PDF the check is the reference for, and widening that set can only invent losses.
+RULE_THIN_REN = 4.25
+# RULE_BAND is the same width question one step earlier - "is this filled rect a band
+# rather than a box" - and it is what actually rejected the render's 4.10 pt copy
+# (4.10 > RULE_BAND, so the rect was classified as neither a band nor a rule and never
+# reached the RULE_THIN test at all). Both widths move together on the render side.
+RULE_BAND_REN = 4.25
+# A face taller than this is not a band between two rules; it is the page frame or a
+# panel, and testing every pair of rules across it is quadratic for no answer.
+FACE_MAX_H = 900.0
 RULE_LONG = 10.0
 RULE_GAP = 3.0
 RULE_BAND = 4.0
@@ -909,7 +948,7 @@ def _paints(col, alpha):
     return lum < PAGE_WHITE
 
 
-def _rule_segments(page):
+def _rule_segments(page, band=None):
     """Every straight axis-aligned segment the page draws.
 
     perp is the coordinate across the segment (y for horizontal, x for vertical);
@@ -917,6 +956,7 @@ def _rule_segments(page):
     `l`/`qu` path with a fill - the latter is how LibreOffice draws every cell border,
     and missing it reads a correct render as 1,009 rules against 11,983 segments.
     """
+    band = RULE_BAND if band is None else band
     out = []
     for d in page.get_drawings():
         w = d.get("width")
@@ -930,10 +970,10 @@ def _rule_segments(page):
         t_s = max(0.05, float(w)) if w is not None else 0.05
         if filled and not stroked:
             h, wd = r.height, r.width
-            if h <= RULE_BAND and wd > h:
+            if h <= band and wd > h:
                 out.append({"o": "h", "perp": (r.y0 + r.y1) / 2.0, "a": r.x0, "b": r.x1,
                             "t": max(0.05, h), "col": fill})
-            elif wd <= RULE_BAND and h > wd:
+            elif wd <= band and h > wd:
                 out.append({"o": "v", "perp": (r.x0 + r.x1) / 2.0, "a": r.y0, "b": r.y1,
                             "t": max(0.05, wd), "col": fill})
             continue
@@ -981,11 +1021,12 @@ def _rule_touches(seg, others, gap):
     return False
 
 
-def _rules(page, isolated=True):
-    segs = _rule_segments(page)
+def _rules(page, isolated=True, thin=None, band=None):
+    segs = _rule_segments(page, band)
+    thin = RULE_THIN if thin is None else thin
     out = []
     for s in segs:
-        if s["t"] > RULE_THIN or (s["b"] - s["a"]) < RULE_LONG:
+        if s["t"] > thin or (s["b"] - s["a"]) < RULE_LONG:
             continue
         if isolated and _rule_touches(s, segs, RULE_GAP):
             continue
@@ -993,10 +1034,10 @@ def _rules(page, isolated=True):
     return out
 
 
-def _doc_rules(doc, isolated=True):
+def _doc_rules(doc, isolated=True, thin=None, band=None):
     out = []
     for i, p in enumerate(doc):
-        for s in _rules(p, isolated):
+        for s in _rules(p, isolated, thin, band):
             s = dict(s)
             s["page"] = i
             out.append(s)
@@ -1876,6 +1917,55 @@ def extra_checks2(src, gd, docx_path=None):
         return (abs(a.x0 - b.x0) <= ANCHOR_RECT_TOL and abs(a.y0 - b.y0) <= ANCHOR_RECT_TOL
                 and abs(a.x1 - b.x1) <= ANCHOR_RECT_TOL and abs(a.y1 - b.y1) <= ANCHOR_RECT_TOL)
 
+
+    # ---- 59: what OBJECT a box is, decided from the file, not from a tolerance
+    def _face(rect, page):
+        """The primitive the file actually drew there: a filled face or an outline.
+
+        A filled band and a stroked frame of the same rectangle are different objects -
+        a background panel versus an outline drawn round something. The corpus draws one
+        table face four ways (one rect, four line paths, four filled hairlines, and
+        _shapes' assembled rule pair) and all four are ONE object: an outline. So the
+        answer is two-valued and it is read off the drawings rather than guessed.
+        """
+        for d in page.get_drawings():
+            r = d["rect"]
+            if (abs(r.x0 - rect.x0) < 0.6 and abs(r.y0 - rect.y0) < 0.6
+                    and abs(r.x1 - rect.x1) < 0.6 and abs(r.y1 - rect.y1) < 0.6):
+                return "filled" if d.get("fill") is not None else "outline"
+        return "outline"        # an assembled rule pair, or a placed image
+
+    def _held(rect, rs):
+        """The set of texts this box encloses - the box's identity, as a set.
+
+        A stamp's outline holds the stamp's text. A table row band holds the row. A page
+        frame holds the page. Two rectangles holding different texts are different
+        objects even when their corners agree to the point, and the text's offset inside
+        them is then measured between two unrelated origins.
+        """
+        out = set()
+        for r in rs:
+            cx, cy = (r["x"] + r["x1"]) / 2.0, (r["y"] + r["y1"]) / 2.0
+            if rect.x0 <= cx <= rect.x1 and rect.y0 <= cy <= rect.y1:
+                out.add(norm_word(r["text"]))
+        return frozenset(out)
+
+    def _same_object(sb, gb, sp, gp, srs, grs):
+        """Are these two coincident rectangles the same object?
+
+        Two questions, neither of them a tolerance on the answer:
+          1. the same primitive        - filled face vs outline, from the drawings
+          2. the same text population  - the set of texts each box encloses must be equal
+        (2) is what catches "same size, different object": a cell rect and the band that
+        replaced it agree to the point but do not hold the same text. Measured on the
+        corpus this decides 406_passport_mrz_page (its page frame holds 32 texts on one
+        side and 31 on the other) and, with clause A, brochure-3col-with-sidebar-box
+        (its sidebar holds 22 against 21) - and it fires on 1 document of 211 on its own.
+        """
+        if _face(sb, sp) != _face(gb, gp):
+            return False
+        return _held(sb, srs) == _held(gb, grs)
+
     def _class_count(a, shapes):
         """How many shapes in `shapes` have a's size within ANCHOR_RECT_TOL."""
         return sum(1 for s in shapes
@@ -2258,7 +2348,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # not a ratio of counts: a document with no isolated rule passes and says so with a
     # source of 0, rather than inventing a denominator out of table grid it does not own.
     s_rules = _doc_rules(src, isolated=True)
-    g_segs = _doc_rules(gd, isolated=False)
+    g_segs = _doc_rules(gd, isolated=False, thin=RULE_THIN_REN, band=RULE_BAND_REN)
     _, s_lost = _rules_lost(s_rules, g_segs)
     c["32_stroke_lines"] = (len(s_rules), len(s_lost), not s_lost)
 
