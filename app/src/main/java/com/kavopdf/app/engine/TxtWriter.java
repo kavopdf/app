@@ -62,16 +62,42 @@ public final class TxtWriter {
         float docPitch = documentPitch(result);
         StringBuilder sb = new StringBuilder(1 << 14);
         if (result.pages != null) {
+            // U+000C at every page boundary. A .txt carries no y for a page, so without a
+            // separator a five-page document is one undifferentiated stream: a reader
+            // cannot tell where page one ended, and no check can tell which page a line
+            // belongs to. U+000C is the byte every text tool already reads as "new page"
+            // (pdftotext writes exactly this, and every pager and editor breaks on it), so
+            // it adds a boundary without adding a character the page did not draw - which
+            // is why a literal "--- page N ---" marker was rejected here before. It is
+            // emitted for every page after the first, whether or not that page drew any
+            // text: a blank page is still a page boundary, and skipping it would make the
+            // separators stop counting pages.
+            int pageNo = 0;
             for (PdfToWord.Page page : result.pages) {
+                if (pageNo > 0) {
+                    if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '\n') sb.append('\n');
+                    // The separator owns its own line: "\f\n", never "\f" glued to the next
+                    // page's first line. Glued, the byte becomes the first character of that
+                    // line, and every reader that measures a column with lstrip(' ') stops at
+                    // it - so the first line of every page after the first reported a column
+                    // of 0 and t02_position fell from 198/211 to 196/211. Alone on its line it
+                    // is still one U+000C to a byte count, and an empty line to every reader
+                    // that splits on newlines, which is what the boundary should be.
+                    sb.append("\f\n");
+                }
+                pageNo++;
                 if (page == null || page.blocks == null) continue;
                 float pitch = pagePitch(page, docPitch);
                 float lastY = -1f;
-                for (Object block : page.blocks) {
+                for (Object block : pageOrder(page)) {
                     if (block instanceof PdfToWord.Table) {
                         if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '\n') sb.append('\n');
                         appendTable(sb, (PdfToWord.Table) block, charW);
+                    } else if (block instanceof Piece) {
+                        Piece pc = (Piece) block;
+                        lastY = appendPara(sb, pc.para, charW, pitch, lastY, pc.lines);
                     } else if (block instanceof PdfToWord.Para) {
-                        lastY = appendPara(sb, (PdfToWord.Para) block, charW, pitch, lastY);
+                        lastY = appendPara(sb, (PdfToWord.Para) block, charW, pitch, lastY, null);
                     }
                 }
             }
@@ -82,8 +108,12 @@ public final class TxtWriter {
         // NUL between two words is a word separator, and deleting it ran "Strongly agree"
         // together. Tabs become spaces so a tab stop cannot shift a column the padding
         // has just set.
+        // U+000C is deliberately NOT in the ranges below. It used to be, which is why the
+        // page separators written above survived for exactly zero lines: the writer
+        // emitted none, and this line turned any it had emitted into a space. It is the
+        // one control byte the file is supposed to carry, so it is stripped from neither.
         String clean = sb.toString()
-                .replaceAll("[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F]", " ")
+                .replaceAll("[\\u0000-\\u0008\\u000B\\u000E-\\u001F]", " ")
                 .replace("\t", "    ");
         // java.nio.file.Files.write is API 26 and minSdk is 24, so the bytes go through a
         // FileOutputStream: on Android 7.0/7.1 the nio call threw NoClassDefFoundError and
@@ -94,15 +124,210 @@ public final class TxtWriter {
         }
     }
 
+    /** A paragraph, or the part of one that belongs to one column, written as a unit.
+     *
+     * <p>The model groups lines by baseline, so a body line and a sidebar line drawn on the
+     * same baseline arrive as ONE paragraph: 67_two_col_with_sidebar's "Module 3" and
+     * "SEE marks" are a single Para whose lines sit at x=56 and x=424. Reordering blocks
+     * cannot separate them, because they are not separate blocks - the paragraph itself has
+     * to be cut at the gutter, which is what {@link #lines} carries.
+     */
+    private static final class Piece {
+        final PdfToWord.Para para;
+        /** The line indices of {@code para} this piece writes, or null for all of them. */
+        final int[] lines;
+
+        Piece(PdfToWord.Para p, int[] l) {
+            para = p;
+            lines = l;
+        }
+    }
+
+    /** The page's blocks, in the order the .txt should read them.
+     *
+     * <p>A page that sets a sidebar beside its body draws two columns, and the model keeps
+     * its blocks in y order, so the sidebar's lines sit between the body's lines. Written
+     * straight out, the .txt alternates body, sidebar, body, sidebar. Every column is in its
+     * own correct order, which is why a within-column order check cannot see the fault at
+     * all - but no reader can follow the page, and 67_two_col_with_sidebar is exactly this.
+     *
+     * <p>The gutter is found from the model's own numbers and nothing else. Every paragraph
+     * line carries an x, so the page's distinct left edges either form one cluster (one
+     * column) or two with a wide empty band between them (two columns). A wide band is not
+     * enough on its own: a centred title also leaves a wide gap to the left margin, and a
+     * table's cells leave one between every pair of columns. So the right side must also
+     * hold several paragraphs, run down a real share of the page, and share ONE left edge -
+     * a column has a left margin, a table's cells do not.
+     *
+     * <p>A page carrying a table is returned untouched. A table is already emitted
+     * contiguously and has no y of its own here, so there is nothing to sort it against, and
+     * guessing would risk the pages that are right today.
+     */
+    private static List<Object> pageOrder(PdfToWord.Page page) {
+        List<Object> natural = page.blocks;
+        List<PdfToWord.Para> paras = new ArrayList<>();
+        for (Object b : natural) {
+            if (b instanceof PdfToWord.Table) return natural;
+            if (b instanceof PdfToWord.Para) paras.add((PdfToWord.Para) b);
+        }
+        if (paras.size() < 6) return natural;
+
+        List<Float> xs = new ArrayList<>();
+        float minX = Float.MAX_VALUE, maxX = -1f, minY = Float.MAX_VALUE, maxY = -1f;
+        for (PdfToWord.Para p : paras) {
+            if (p.lineX != null && p.lines != null) {
+                for (int i = 0; i < p.lineX.size() && i < p.lines.size(); i++) {
+                    Float x = p.lineX.get(i);
+                    String ln = p.lines.get(i);
+                    if (x == null || Float.isNaN(x) || ln == null || ln.trim().isEmpty()) continue;
+                    xs.add(x);
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                }
+            }
+            float top = paraTop(p);
+            if (!Float.isNaN(top)) {
+                if (top < minY) minY = top;
+                if (top > maxY) maxY = top;
+            }
+        }
+        if (xs.size() < 6 || maxX - minX < 1f || maxY - minY < 1f) return natural;
+
+        List<Float> uniq = new ArrayList<>(new java.util.TreeSet<>(xs));
+        float gap = 0f, gutter = 0f;
+        for (int i = 1; i < uniq.size(); i++) {
+            float g = uniq.get(i) - uniq.get(i - 1);
+            if (g > gap) {
+                gap = g;
+                gutter = (uniq.get(i - 1) + uniq.get(i)) / 2f;
+            }
+        }
+        if (gap < 0.25f * (maxX - minX)) return natural;
+
+        int rightParas = 0, sameEdge = 0;
+        float edge = Float.NaN, rMinY = Float.MAX_VALUE, rMaxY = -1f;
+        for (PdfToWord.Para p : paras) {
+            int[] r = sideLines(p, gutter, true);
+            if (r == null) continue;
+            rightParas++;
+            float lo = p.lineX.get(r[0]);
+            if (Float.isNaN(edge)) edge = lo;
+            if (Math.abs(lo - edge) <= 2f) sameEdge++;
+            for (int i : r) {
+                Float y = i < p.lineY.size() ? p.lineY.get(i) : null;
+                if (y == null || Float.isNaN(y)) continue;
+                if (y < rMinY) rMinY = y;
+                if (y > rMaxY) rMaxY = y;
+            }
+        }
+        if (rightParas < 3) return natural;
+        // A column has one left margin. A table's cells do not.
+        if (sameEdge < 0.8f * rightParas) return natural;
+        // A column runs down the page. A title does not.
+        if (rMaxY - rMinY < 0.15f * (maxY - minY)) return natural;
+        // A grid is not two columns. In a table the right-hand cells sit on the SAME
+        // baselines as the left-hand ones - that is what makes them rows - while two
+        // columns are two independent flows and share almost none. Without this test a
+        // product grid is reordered as though its second column were a sidebar, which is
+        // what happened to 361_product_catalogue_grid.
+        int rightLines = 0, aligned = 0;
+        for (PdfToWord.Para p : paras) {
+            int[] r = sideLines(p, gutter, true);
+            if (r == null) continue;
+            for (int i : r) {
+                rightLines++;
+                Float y = i < p.lineY.size() ? p.lineY.get(i) : null;
+                if (y == null || Float.isNaN(y)) continue;
+                if (hasLeftBaseline(paras, gutter, y)) aligned++;
+            }
+        }
+        if (rightLines == 0 || aligned > 0.5f * rightLines) return natural;
+
+        // The whole left column in model order, then the whole right column. Splitting the
+        // left column around the sidebar's top edge instead would write intro, sidebar,
+        // body - which alternates just as badly as the input did, one run further along.
+        List<Object> out = new ArrayList<>(natural.size());
+        for (PdfToWord.Para p : paras) {
+            int[] l = sideLines(p, gutter, false);
+            if (l != null) out.add(new Piece(p, l));
+        }
+        for (PdfToWord.Para p : paras) {
+            int[] r = sideLines(p, gutter, true);
+            if (r != null) out.add(new Piece(p, r));
+        }
+        return out;
+    }
+
+    /** True when some line left of the gutter was drawn on this same baseline, within the
+     *  tolerance a row of a table allows. A row shares a baseline; a column does not. */
+    private static boolean hasLeftBaseline(List<PdfToWord.Para> paras, float gutter, float y) {
+        for (PdfToWord.Para p : paras) {
+            if (p.lineX == null || p.lineY == null || p.lines == null) continue;
+            int n = Math.min(Math.min(p.lineX.size(), p.lineY.size()), p.lines.size());
+            for (int i = 0; i < n; i++) {
+                Float x = p.lineX.get(i);
+                Float ly = p.lineY.get(i);
+                String ln = p.lines.get(i);
+                if (x == null || ly == null || ln == null || ln.trim().isEmpty()) continue;
+                if (Float.isNaN(x) || Float.isNaN(ly)) continue;
+                if (x < gutter && Math.abs(ly - y) <= 3f) return true;
+            }
+        }
+        return false;
+    }
+
+    /** The indices of the lines of {@code p} that sit on one side of {@code gutter}.
+     *  Null when that side holds none of them, so a caller can skip the piece entirely. */
+    private static int[] sideLines(PdfToWord.Para p, float gutter, boolean right) {
+        if (p.lineX == null || p.lines == null) return null;
+        List<Integer> keep = new ArrayList<>();
+        int n = Math.min(p.lineX.size(), p.lines.size());
+        for (int i = 0; i < n; i++) {
+            Float x = p.lineX.get(i);
+            String ln = p.lines.get(i);
+            if (ln == null || ln.trim().isEmpty()) continue;
+            boolean isRight = x != null && !Float.isNaN(x) && x >= gutter;
+            if (isRight == right) keep.add(i);
+        }
+        if (keep.isEmpty()) return null;
+        int[] out = new int[keep.size()];
+        for (int i = 0; i < out.length; i++) out[i] = keep.get(i);
+        return out;
+    }
+
+    /** The top of a paragraph, over the lines that carry text. */
+    private static float paraTop(PdfToWord.Para p) {
+        if (p.lineY == null || p.lines == null) return Float.NaN;
+        float top = Float.MAX_VALUE;
+        for (int i = 0; i < p.lineY.size() && i < p.lines.size(); i++) {
+            Float y = p.lineY.get(i);
+            String ln = p.lines.get(i);
+            if (y == null || Float.isNaN(y) || ln == null || ln.trim().isEmpty()) continue;
+            if (y < top) top = y;
+        }
+        return top == Float.MAX_VALUE ? Float.NaN : top;
+    }
+
+    /** True when {@code i} is one of the line indices in {@code only}. The list is short -
+     *  a paragraph cut at a gutter holds a handful of lines - so a scan beats a set. */
+    private static boolean inOnly(int[] only, int i) {
+        for (int v : only) {
+            if (v == i) return true;
+        }
+        return false;
+    }
+
     /** Writes one paragraph, opening blank lines for the gap the page left above it. */
     private static float appendPara(StringBuilder sb, PdfToWord.Para para, float charW,
-                                    float pitch, float lastY) {
-        if (para.text().trim().isEmpty()) return lastY;
+                                    float pitch, float lastY, int[] only) {
+        if (only == null && para.text().trim().isEmpty()) return lastY;
         if (para.lines == null || para.lines.isEmpty()) {
+            if (only != null) return lastY;
             sb.append(rtrim(para.text())).append('\n');
             return lastY;
         }
         for (int li = 0; li < para.lines.size(); li++) {
+            if (only != null && !inOnly(only, li)) continue;
             String ln = para.lines.get(li);
             if (ln == null) continue;
             String trimmed = rtrim(ln);
