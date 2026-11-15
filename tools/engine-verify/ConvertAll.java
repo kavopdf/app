@@ -1,5 +1,6 @@
 import com.kavopdf.app.engine.DocxWriter;
 import com.kavopdf.app.engine.PdfToWord;
+import com.kavopdf.app.engine.ReadingOrder;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 
 import java.io.File;
@@ -60,7 +61,22 @@ public class ConvertAll {
             try {
                 PdfToWord.Result r = PdfToWord.convert(in, "", null);
                 PdfToWord.classifyHeadings(r);
-                DocxWriter.write(r, new File(outDir, base + ".docx"));
+                // The reading order is part of the document, so it is decided here - before
+                // either writer, once - and both writers then read the same page. It used to be
+                // decided inside DocxWriter.write, on the page itself, which made the .txt a
+                // function of whether the .docx had been written first. -Dp2w.readingOrder=false
+                // is the before-side of the measurement: the page as the PDF drew it.
+                if (!"false".equals(System.getProperty("p2w.readingOrder"))) {
+                    ReadingOrder.apply(r);
+                }
+                // -Dp2w.noDocx=true writes the .txt WITHOUT the .docx write. It exists for
+                // tools/p2w-bench/check-writer-independence.py, which runs the corpus both ways
+                // and fails if a single .txt differs: the .txt must be a function of the PDF and
+                // not of whether the .docx writer ran first (SECTOR 19).
+                boolean wantDocx = !"true".equals(System.getProperty("p2w.noDocx"));
+                DocxWriter.Stats ws = wantDocx
+                        ? DocxWriter.write(r, new File(outDir, base + ".docx"))
+                        : new DocxWriter.Stats();
                 PdfToWord.writeTxt(r, new File(outDir, base + ".txt"));
                 // An empty Result is not a conversion. It means the fonts did not load,
                 // or the page really holds nothing - and either way a .docx with no
@@ -73,11 +89,11 @@ public class ConvertAll {
                 }
                 System.out.println(base + "\tpages=" + r.report.pages
                         + "\tparagraphs=" + r.paragraphCount()
-                        + "\tzeroGap=" + r.report.zeroGap
-                        + "\tzeroGapWorst=" + Math.round(r.report.zeroGapWorstPt * 10f) / 10f
-                        + "\tzeroGapInCol=" + r.report.zeroGapInCol
-                        + "\tzeroGapAnchored=" + r.report.zeroGapAnchored
-                        + "\tzeroGapNoRoom=" + r.report.zeroGapNoRoom
+                        + "\tzeroGap=" + ws.zeroGap
+                        + "\tzeroGapWorst=" + Math.round(ws.zeroGapWorstPt * 10f) / 10f
+                        + "\tzeroGapInCol=" + ws.zeroGapInCol
+                        + "\tzeroGapAnchored=" + ws.zeroGapAnchored
+                        + "\tzeroGapNoRoom=" + ws.zeroGapNoRoom
                         + "\timages=" + r.report.images
                         + "\timagesFailed=" + r.report.imagesFailed
                         + "\timagesRecovered=" + r.report.imagesRecovered);

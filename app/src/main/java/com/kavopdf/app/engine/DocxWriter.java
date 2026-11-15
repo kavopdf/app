@@ -681,7 +681,24 @@ public final class DocxWriter {
     private DocxWriter() {
     }
 
-    public static void write(PdfToWord.Result result, File out) throws IOException {
+    /**
+     * What this writer's flow could not express. Returned, not stored on the document.
+     *
+     * <p>These are measurements of the .docx writer's own layout, and they used to be written
+     * into {@link PdfToWord.Report} - a field of the conversion that every consumer of the same
+     * {@code Result} shares. A .txt written after a .docx therefore described a document whose
+     * report carried numbers only the .docx writer can produce, and the harness printed them as
+     * if they were the conversion's. They belong to the call that measured them.
+     */
+    public static final class Stats {
+        public int zeroGap;
+        public int zeroGapAnchored;
+        public int zeroGapInCol;
+        public int zeroGapNoRoom;
+        public float zeroGapWorstPt;
+    }
+
+    public static Stats write(PdfToWord.Result result, File out) throws IOException {
         Ctx ctx = new Ctx();
         ctx.docName = out.getName().replaceFirst("\\.docx$", "");
         censusOut();   // open the diagnostic streams before the first page, not at its end
@@ -689,11 +706,12 @@ public final class DocxWriter {
         // What the flow could not express, carried out where the pipeline can see it. A gap
         // that could not be written is not a rendering detail: the line lands somewhere the
         // page never put it, and nothing in the .docx says so.
-        result.report.zeroGap = ctx.zeroGap;
-        result.report.zeroGapAnchored = ctx.zeroGapAnchored;
-        result.report.zeroGapInCol = ctx.zeroGapInCol;
-        result.report.zeroGapWorstPt = ctx.zeroGapWorstPt;
-        result.report.zeroGapNoRoom = ctx.zeroGapNoRoom;
+        Stats stats = new Stats();
+        stats.zeroGap = ctx.zeroGap;
+        stats.zeroGapAnchored = ctx.zeroGapAnchored;
+        stats.zeroGapInCol = ctx.zeroGapInCol;
+        stats.zeroGapWorstPt = ctx.zeroGapWorstPt;
+        stats.zeroGapNoRoom = ctx.zeroGapNoRoom;
         if (System.getProperty("p2w.debugFlow") != null) {
             System.err.println("FLOWDOC " + out.getName() + " fitted=" + ctx.fitted
                     + " broke=" + ctx.brokePage);
@@ -718,6 +736,7 @@ public final class DocxWriter {
                 zip.closeEntry();
             }
         }
+        return stats;
     }
 
     private static void put(ZipOutputStream zip, String name, String body) throws IOException {
@@ -1000,7 +1019,14 @@ public final class DocxWriter {
         int secCols = 1;
         float secGap = 0f;
         boolean first = true;
-        for (PdfToWord.Page page : result.pages) {
+        for (PdfToWord.Page model : result.pages) {
+            // EVERY EDIT THIS WRITER MAKES IS MADE HERE, ON A COPY. The page order it builds
+            // (ReadingOrder's stamp placement), the column band it tags a paragraph with and the
+            // {@code pinned} flag it sets are findings about the layout, and they are written on
+            // this copy. The document keeps the order and the flags the PDF gave it, so a second
+            // consumer - the .txt writer, a second .docx write, a verifier - reads the page and
+            // not the tail of this writer's pass.
+            PdfToWord.Page page = model.copyForWrite();
             float pw = page.width > 0 ? page.width : 595f;
             float ph = page.height > 0 ? page.height : 842f;
             int[] pc = pageColumns(page);
@@ -1090,9 +1116,14 @@ public final class DocxWriter {
             // D-25: fold each stamp's concentric frame rules into one shape before anything is
             // written, so the page is laid out against the same geometry it is drawn with.
             stampFrames(outlines);
-            // And put the stamp's text paragraphs where their own y falls, so the indent and
-            // space-before they are placed with are the page's own.
-            orderStamps(page, outlines, ctx);
+            // AND THE STAMP ORDER IS NOT DECIDED HERE ANY MORE. It is decided once, on the
+            // document, by {@link ReadingOrder} - so that the .txt and the .docx read the same
+            // page in the same order and neither of them is reading the other's pass. This
+            // writer used to call orderStamps(page, ...) on the page itself, and that single
+            // call is SECTOR 19: it moved a stamp's paragraphs inside page.blocks, the .txt
+            // walked page.blocks, and the .txt therefore changed according to whether the .docx
+            // had been written first (11 of 211 documents). Where ReadingOrder has not run, the
+            // page keeps the order the PDF gave it, which is what the model is supposed to be.
             if (page.blocks.isEmpty()) continue;
             // ---- the page's flow, measured before it is written ----
             //
@@ -2486,6 +2517,41 @@ public final class DocxWriter {
             this.topPt = topPt;
             this.wPt = wPt;
             this.hPt = hPt;
+        }
+
+        /**
+         * A copy for a WRITER to edit, registered in {@code map} so frame references can be
+         * pointed at the copies ({@link #remap}).
+         *
+         * <p>{@code stampFrames} marks a stamp's rules here - {@link #stampFrame},
+         * {@link #mergedHost}, {@link #mergedShape} - and {@code containerOf} reads
+         * {@link #consumed}, so a writer that wrote these on the page's own shapes left the
+         * document describing a frame as already folded into a box that the document does not
+         * have. The geometry is copied; the path itself is shared, because no writer writes it.
+         */
+        public Shape copyForWrite(java.util.Map<Shape, Shape> map) {
+            Shape q = new Shape(xPt, topPt, wPt, hPt);
+            q.fillRgb = fillRgb;
+            q.fillAlpha = fillAlpha;
+            q.lineRgb = lineRgb;
+            q.lineWidthPt = lineWidthPt;
+            q.lineAlpha = lineAlpha;
+            q.kind = kind;
+            q.freeform = freeform;
+            q.freeformClosed = freeformClosed;
+            q.consumed = consumed;
+            q.stampFrame = stampFrame;
+            q.stampDrawn = stampDrawn;
+            q.mergedHost = mergedHost;
+            q.mergedShape = mergedShape;
+            if (map != null) map.put(this, q);
+            return q;
+        }
+
+        /** Points this copy's frame references at the copies made with it. */
+        public void remap(java.util.Map<Shape, Shape> map) {
+            if (mergedHost != null && map.containsKey(mergedHost)) mergedHost = map.get(mergedHost);
+            if (mergedShape != null && map.containsKey(mergedShape)) mergedShape = map.get(mergedShape);
         }
     }
 
@@ -4460,11 +4526,19 @@ public final class DocxWriter {
      * the page.
      */
     private static Frame frameOfLine(java.util.List<Shape> shapes, PdfToWord.Box b, Ctx ctx) {
+        return frameOfLine(shapes, b, ctx.pageWidthPt, ctx.pageHeightPt);
+    }
+
+    /**
+     * The same, against a page box given directly - the form {@link ReadingOrder} uses, because
+     * the model pass has a page and not a writer's context.
+     */
+    static Frame frameOfLine(java.util.List<Shape> shapes, PdfToWord.Box b, float pageW, float pageH) {
         float angle = mirrored(b) ? 180f : b.angle;
         float px = b.x, py = b.y;
         if (mirrored(b)) {
-            px = ctx.pageWidthPt - b.x;
-            py = ctx.pageHeightPt - b.y;
+            px = pageW - b.x;
+            py = pageH - b.y;
         }
         return frameOf(shapes, px, py, angle);
     }
@@ -4638,8 +4712,10 @@ public final class DocxWriter {
      * then the gap the page really drew, and the line lands inside its frame. Nothing else on
      * the page moves - the gap from the last body line to the footer is the same gap it was.
      */
-    private static void orderStamps(PdfToWord.Page page, java.util.List<Shape> outlines, Ctx ctx) {
+    static void orderStamps(PdfToWord.Page page, java.util.List<Shape> outlines) {
         if (outlines == null || outlines.isEmpty()) return;
+        float pw = page.width > 0 ? page.width : 595f;
+        float ph = page.height > 0 ? page.height : 842f;
         java.util.List<Object> blocks = page.blocks;
         java.util.List<PdfToWord.Para> stamps = new ArrayList<>();
         for (Object b : blocks) {
@@ -4659,7 +4735,7 @@ public final class DocxWriter {
                 // changed with it (318: 81 -> 90 lines). A ring is placed by its own page
                 // coordinates in every character and has nothing to gain from being moved.
                 if (bx.ring) break;
-                if (bx.runs.isEmpty() || frameOfLine(outlines, bx, ctx) == null) continue;
+                if (bx.runs.isEmpty() || frameOfLine(outlines, bx, pw, ph) == null) continue;
                 stamps.add(p);
                 break;
             }
@@ -5008,7 +5084,7 @@ public final class DocxWriter {
      * {@code stampFrame} - which is NOT {@code consumed} - so the writer draws the group once,
      * where the outermost rule sits, and never draws or consumes a rule on its own.
      */
-    private static void stampFrames(java.util.List<Shape> shapes) {
+    static void stampFrames(java.util.List<Shape> shapes) {
         if (shapes == null || shapes.size() < 2) return;
         int n = shapes.size();
         float[][][] cs = new float[n][][];

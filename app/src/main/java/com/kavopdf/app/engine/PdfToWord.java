@@ -164,6 +164,43 @@ public final class PdfToWord {
         public float size() {
             return runs.isEmpty() ? 0f : runs.get(0).sizePt;
         }
+
+        /**
+         * A copy for a WRITER to edit, so that the writer does not edit the document.
+         *
+         * <p>A writer reads this class and then has work of its own to do on what it read: the
+         * .docx writer tags a paragraph with the column band the geometry put it in
+         * ({@code column}) and with the fact that the line is anchored rather than flowed
+         * ({@code pinned}). Those are the writer's findings about the page, not properties of
+         * the document, and writing them here made them visible to whoever read the model next -
+         * which is the second writer, and the reason SECTOR 19 exists. A writer therefore takes
+         * a copy and writes its findings on the copy.
+         *
+         * <p>The runs and boxes are SHARED, not copied: a writer reads them and never writes
+         * them, and copying them would put two Run objects behind one line of text. The lists
+         * that hold them are copies, because a writer that adds to a list must not add to the
+         * document's.
+         */
+        public Para copyForWrite() {
+            Para q = new Para();
+            q.runs.addAll(runs);
+            q.heading = heading;
+            q.align = align;
+            q.indent = indent;
+            q.bullet = bullet;
+            q.top = top;
+            q.left = left;
+            q.right = right;
+            q.stamp = stamp;
+            q.pinned = pinned;
+            q.column = column;
+            q.lines.addAll(lines);
+            q.lineX.addAll(lineX);
+            q.lineY.addAll(lineY);
+            q.lineSize.addAll(lineSize);
+            q.boxes.addAll(boxes);
+            return q;
+        }
     }
 
     /**
@@ -602,6 +639,49 @@ public final class PdfToWord {
         public int columns = 1;
         /** The gutter between those columns, in points. */
         public float columnGap;
+
+        /**
+         * A copy of this page that a WRITER may edit - its own block order, its own flags.
+         *
+         * <p>This is what makes a writer's output a function of the document instead of a
+         * function of what ran before it. The .docx writer puts a stamp's paragraphs where
+         * their own y falls (see {@code ReadingOrder}), tags paragraphs with the column band
+         * and with {@code pinned}, and marks shapes as folded into a frame; every one of those
+         * edits landed in {@link #blocks} - the same list {@code TxtWriter} then walked - so the
+         * .txt read the .docx writer's relocations and not the page's. Measured on the 211-file
+         * corpus: 11 documents wrote a different .txt with the .docx write in front of them
+         * than without it, and every one of them was a stamp or a turned line.
+         *
+         * <p>The blocks are copied, and the paragraphs and shapes in them are copied, because a
+         * writer writes on both. A {@link Table} is SHARED: no writer writes one, and the
+         * independence test asserts it rather than trusting the note.
+         */
+        public Page copyForWrite() {
+            Page q = new Page();
+            q.number = number;
+            q.ocr = ocr;
+            q.width = width;
+            q.height = height;
+            q.columns = columns;
+            q.columnGap = columnGap;
+            java.util.Map<DocxWriter.Shape, DocxWriter.Shape> map =
+                    new java.util.IdentityHashMap<>();
+            for (Object b : blocks) {
+                if (b instanceof Para) {
+                    q.blocks.add(((Para) b).copyForWrite());
+                } else if (b instanceof DocxWriter.Shape) {
+                    q.blocks.add(((DocxWriter.Shape) b).copyForWrite(map));
+                } else {
+                    q.blocks.add(b);
+                }
+            }
+            // A shape can name another shape as the one that draws it (a stamp frame is drawn
+            // once, by its outermost rule), and those references have to point at the copies -
+            // a copy that still named the document's shape would be written against the wrong
+            // geometry the moment the writer marked the copy.
+            for (DocxWriter.Shape s : map.keySet()) map.get(s).remap(map);
+            return q;
+        }
     }
 
     /** What the conversion could and could not do. */
@@ -622,7 +702,16 @@ public final class PdfToWord {
          */
         public int imagesFailed;
         public int imagesRecovered;
-        /** Lines written with no gap above them because the page put them above the flow. */
+        /**
+         * Lines written with no gap above them because the page put them above the flow.
+         *
+         * <p>NO LONGER WRITTEN HERE. These five were filled by {@code DocxWriter.write} into this
+         * object - a field of the conversion, shared by every consumer of the same
+         * {@code Result} - so a .txt written after a .docx described a document whose report
+         * carried numbers only the .docx writer could produce. They are measurements of the .docx
+         * layout and are returned by that call as {@code DocxWriter.Stats}. The fields are kept
+         * because a caller may still read them; they are zero unless something sets them.
+         */
         public int zeroGap;
         public int zeroGapAnchored;
         public int zeroGapInCol;
