@@ -151,7 +151,8 @@ if ! engine_changed; then
   if [ -f "$BENCH/HYPOTHESES.md" ] && file_changed "$BENCH/HYPOTHESES.md"; then
     if [ ! -f "$BENCH/ATTEMPTS.json" ] || ! file_changed "$BENCH/ATTEMPTS.json"; then
       bad "HYPOTHESES.md records a theory but ATTEMPTS.json records no attempt"
-      bad "A reverted attempt still counts - run classify.py --attempt <class> --moved N --total M"
+      bad "A reverted attempt still counts - record it in ATTEMPTS.json for the class"
+      bad "you were working on, with moved/total and the outcome. See benchmarks/PIPELINE.md"
       exit 1
     fi
     say "  engine unchanged, but an attempt was recorded - that is allowed"

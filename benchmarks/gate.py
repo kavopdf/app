@@ -26,7 +26,10 @@ LAYER POLICY, stated so no consumer has to guess
 * verify_google.py (47 docx checks) and verify_txt.py (12 txt checks) are
   ADVISORY. They name a defect; they do not size it. A check that cannot fail
   is a bug in the check, not a pass -- the falsifiability gate already showed
-  66 % of verify_google's passes were unfalsifiable.
+  (The claim that 66 % of verify_google's passes were unfalsifiable has been
+  WITHDRAWN - see benchmarks/LAYER-POLICY.md. It was measured on an earlier verifier,
+  the harness had since broken, and when it was repaired all 47 checks proved able to
+  fail. Falsifiable is the floor, not proof that a check is right.)
 * No consumer may rank by a single number. Use signature + share@5px + max_pt.
 
 THE RATCHET

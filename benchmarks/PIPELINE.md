@@ -1,4 +1,19 @@
-# P2W measurement pipeline — the authoritative truth
+# Pipeline
+
+> **RETIRED AS A MEASUREMENT — do not run these as the score**
+>
+> `record.py`, `classify.py`, `calibrate.py`, `seed.py`, `verify_google.py`
+>
+> **DEAD FILES — nothing reads or writes them any more**
+>
+> `BASELINE.md`, `RESULTS.jsonl`, `RATCHET.json`
+>
+> **THE CORPUS IS 213, NOT 208** — 211 synthetic + every PDF in `benchmarks/realworld/`.
+>
+> The four briefs in `tools/p2w-bench/` were written for the previous pipeline. Their
+> method is current; their tool names are not. The authoritative command list is
+> `tools/p2w-bench/INSTRUMENT.md`. Where a brief and that file disagree about which
+> command to run, that file wins.
 
 Everything below is measured, not assumed. Where a number came from a guess or
 an untested instrument, it says so.

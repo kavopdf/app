@@ -28,7 +28,7 @@ THE PHASES
 WHAT ENDS A PHASE
   measure -> classify   when every row in BASELINE.md has a score
   classify -> fix       when DEFECT-CLASSES.md is newer than BASELINE.md
-  fix -> measure        when classify.py reports no OPEN class
+  fix -> measure        when every class file reports no OPEN class (round.py --close-round)
   fix -> done           when that happens in round 3
 
 USAGE

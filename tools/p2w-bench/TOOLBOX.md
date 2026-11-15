@@ -1,3 +1,28 @@
+<!-- ============================================================================
+     READ THIS BEFORE ANY COMMAND IN THIS FILE.
+
+     The METHOD below is current and applies in full: how to form a hypothesis, how to
+     be honest about a failure, how to commit, how not to break a neighbour.
+
+     THE TOOL NAMES ARE NOT. This brief was written for the previous pipeline. Every
+     command it gives that touches measurement, recording, classification or closing is
+     obsolete, and running one produces a number that looks real and describes nothing.
+
+         RETIRED, do not run as a measurement:
+             record.py  classify.py  calibrate.py  seed.py  verify_google.py
+
+         DEAD FILES, nothing reads or writes them any more:
+             BASELINE.md   RESULTS.jsonl   RATCHET.json
+
+         THE CORPUS IS 213, NOT 208.  211 synthetic + benchmarks/realworld/.
+
+     THE CURRENT COMMANDS ARE IN  tools/p2w-bench/INSTRUMENT.md  AND IN
+     benchmarks/PIPELINE.md § "What the phase gates require".
+
+     Where this brief and INSTRUMENT.md disagree about WHICH COMMAND TO RUN,
+     INSTRUMENT.md wins.
+     ============================================================================ -->
+
 # TOOLBOX — how to use every tool in this pipeline
 
 One section per tool: the exact command, what it prints, what it returns, what it
