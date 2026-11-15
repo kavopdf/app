@@ -136,3 +136,53 @@ it. Do not treat it as a defect on this number alone.
 * A document whose score gets worse is a regression, whatever else improved.
 * Never silence a finding without first proving it is a false positive. Two of
   the three worst "failures" in the first ranking were false positives.
+
+---
+
+## What the phase gates require, and why it matters
+
+The phase machine advances only through `round.py --advance`, and it asks a gate first.
+Both gates read the artefacts the measurement layer actually writes. They used to read
+`BASELINE.md` and `RESULTS.jsonl`, which nothing writes any more, and that is why
+`classify_gate` could never return 0 - the phase would have stopped at classify and the
+fixer would never have run. `benchmarks/PIPELINE-AUDIT.md` has the whole finding.
+
+### measure -> classify  (`measure_gate.py`)
+
+- `benchmarks/RANKING.csv` must exist and hold **211 synthetic + every PDF in
+  `benchmarks/realworld/`** documents. Today that is 213. A corpus that failed to build
+  cannot read as "all measured".
+- Every row must have a numeric `share5`. A `MEASURE-ERROR` row is unscored and **blocks**,
+  unless the document is listed in `tools/p2w-bench/EXEMPT.json` with a reason. It is
+  recorded, never dropped, and never silently counted as done.
+- No document may appear twice. Two rows for one document is a pipeline defect, not a
+  document to score.
+- **The committed `benchmarks/STATE.json` must carry the current round.** `gate.py` stamps
+  it. Without this a closed round keeps its RANKING.csv, "every row scored" stays true
+  across the boundary, and round 2 advances on round 1's numbers before the baseline has
+  measured anything.
+
+### classify -> fix  (`classify_gate.py`)
+
+- `benchmarks/DEFECT-CLASSES.md` must exist. **That path and no other** - writing the class
+  file anywhere else means the phase cannot advance.
+- It must contain the header line `Documents measured: **N of M**`, and N must equal the
+  number of documents `RANKING.csv` actually scored. Count them; do not estimate.
+- The status vocabulary is exactly `OPEN`, `FIXED`, `PARKED`. `round.py` matches the status
+  as a **cell**, so any other word is invisible to the gate - worse than a row that says
+  OPEN, because it looks finished.
+
+### fix -> next round  (`round.py --close-round`)
+
+- Only from phase `fix`. Closing from anywhere else is refused, because three such calls
+  would reach `done` and `done` is what lets the app ship.
+- Refused while **any** class file still holds an `OPEN` row.
+- Archives the round, blanks the scores, clears all three slot claims, increments the round.
+
+### Round 2 and 3
+
+Each round is a fresh measurement on the engine as it now stands, then a fresh
+classification, then fixing. The round stamp in `STATE.json` is what makes the second and
+third rounds real rather than a re-reading of the first round's table. Verified by a dry
+run through all three rounds, including the negative test that a new round refuses to
+advance before it has re-measured.
