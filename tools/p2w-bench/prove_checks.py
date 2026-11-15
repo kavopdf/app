@@ -756,20 +756,61 @@ def src_annot(doc):
     a.update()
 
 
-def src_field_value(doc):
-    """A form field whose box holds an answer.
+def _blank_field_rect(page, w=160.0, h=24.0):
+    """A rectangle of this page that draws nothing and says nothing.
 
-    The replacement for 51 reads the SOURCE for what each widget's rectangle shows and asks
-    the render to show it in the same place, so the mutation has to put an answer inside a
-    box the render leaves empty. An empty widget - the old mutation - asks nothing and would
-    prove nothing: an empty box has no answer to lose.
+    The mutation below needs a box with no ink of its own, or the page's existing text
+    would answer for it. Found rather than assumed, so the case survives the document
+    being re-rendered or replaced."""
+    r = page.rect
+    y = r.y0 + 24
+    while y + h < r.y1 - 24:
+        x = r.x0 + 24
+        while x + w < r.x1 - 24:
+            cand = fitz.Rect(x, y, x + w, y + h)
+            s = page.get_pixmap(clip=cand, colorspace=fitz.csGRAY, dpi=72).samples
+            dark = sum(1 for b in s if b < 200) if s else 0
+            if dark == 0 and not [t for t in page.get_text("words")
+                                  if fitz.Rect(t[:4]).intersects(cand)]:
+                return cand
+            x += 40
+        y += 24
+    return fitz.Rect(r.x0 + 24, r.y0 + 24, r.x0 + 24 + w, r.y0 + 24 + h)
+
+
+def src_field_value(doc):
+    """A form field that DECLARES an answer the page does not draw.
+
+    This is the case 51 could not see until 15 Nov. The box exists (/Rect), the document
+    declares the answer (/V "RAVI KUMAR"), and the appearance stream exists and draws
+    nothing - which is also what suppresses the reader's own synthesis of an appearance
+    from /V. Ink 0.0, no words: the check that decided from page pixels alone skipped it,
+    asked nothing, and reported the same value as a document where every answer was in
+    place. Measured on this mutation: the old predicate reads asked=0 and passes, the
+    replacement reads asked=1 and fails, because the answer is in the source and nowhere
+    in the render.
+
+    A widget whose /V is set and whose /AP is ABSENT would not do: MuPDF synthesises an
+    appearance from /V and draws it, so that box is asked either way. The blank /AP is
+    what makes the state reachable.
     """
+    page = doc[0]
+    rect = _blank_field_rect(page)
     w = fitz.Widget()
     w.field_name = "f1"
     w.field_type = fitz.PDF_WIDGET_TYPE_TEXT
-    w.rect = fitz.Rect(60, 60, 220, 84)
-    doc[0].add_widget(w)
-    doc[0].insert_text((66, 78), "ANSWER", fontsize=11)
+    w.rect = rect
+    page.add_widget(w)
+    w.update()
+    xref = list(page.widgets())[-1].xref
+    doc.xref_set_key(xref, "V", "(RAVI KUMAR)")
+    ap = doc.get_new_xref()
+    doc.update_object(ap, "<<>>")
+    doc.update_stream(ap, b"q Q")
+    doc.xref_set_key(ap, "Type", "/XObject")
+    doc.xref_set_key(ap, "Subtype", "/Form")
+    doc.xref_set_key(ap, "BBox", "[0 0 %g %g]" % (rect.width, rect.height))
+    doc.xref_set_key(xref, "AP", "<</N %d 0 R>>" % ap)
 
 
 def src_toc(doc):
@@ -1331,7 +1372,7 @@ CASES = {
     # values", and patches/FORM-FIELDS.md. The replacement asks where the answer went, so its
     # mutation puts an answer inside a box the render leaves empty.
     "51_field_values":          ("source", src_field_value, BASE,
-                                 "an answer inside a field the render leaves empty"),
+                                 "a field that declares an answer the page does not draw"),
     "52_outline":               ("source", src_toc, BASE, "the outline dropped"),
     # 53 reads the .docx, so its mutation has to be a .docx. "docx" hands the mutation the
     # engine's own file and measures the same pair with the mutated copy.

@@ -1576,29 +1576,145 @@ def extra_checks2(src, gd, docx_path=None):
     #                          paragraphs at the top of page 1.
     #
     # What IS the engine's decision is where each answer goes. A filled form keeps its
-    # answers in each widget's /V and a reader draws them inside the widget's own rectangle,
-    # so that is what is asked, per source widget:
-    #   ink  - if the source draws inside the rect (2 pt in from its edge, so the box's own
-    #          border is not content), the render must draw inside it too. A tick is a mark,
-    #          not a string: the source's tick extracts as the glyph '3' out of ZapfDingbats,
-    #          and asking for that character would be asking the render to reproduce one
-    #          font's encoding.
-    #   text - if the source's words inside the rect contain a letter, the render's words
-    #          inside the same rect must contain them. This is the typed answer.
-    # A rect that shows nothing asks nothing: an empty box has no answer to lose. Measured on
-    # 601: the source reads 3/3, the engine's own .docx reads 0/3, the ActiveX build 2/3, and
-    # the same engine with its three answers moved onto their rects reads 3/3 (601 33/43 ->
-    # 37/43, 18/28/45/47 flipping to pass because the page is no longer pushed down).
-    FIELD_INK_FLOOR = 0.02
-    FIELD_INSET = 2.0
+    # answers in each widget's /V or in the widget's own appearance stream, and a reader
+    # draws them inside the widget's rectangle, so that is what is asked, per source widget.
+    #
+    # THE VERDICT GAP THIS CHECK HAD, AND WHAT CLOSES IT. Until now the decision "is this
+    # box asked about" was made from PAGE PIXELS alone: a rectangle whose average ink was
+    # under 2 % and which held no extractable word was skipped. "The box shows nothing" and
+    # "the box has no answer" then read as the same value, so a run that measured nothing
+    # reported exactly what a run that found everything correct reports. Measured on
+    # fixtures built for it (see the 13-row mutation matrix):
+    #   * a widget whose /V says "RAVI KUMAR" and whose /AP exists but draws nothing reads
+    #     ink 0.0 and no words -> old: asked 0, PASS. The answer is in the document and
+    #     nothing in the output has to carry it for the old check to be satisfied.
+    #   * a tick drawn as a PATH in the left fifth of a 150 pt box reads 0.4 % ink over the
+    #     rectangle -> old: asked 0, PASS, and when the render loses the tick it still
+    #     passes. The 2 % average was measuring the box's area, not the mark.
+    #   * a widget with no readable /Rect is not "a box with no answer" either; it is a box
+    #     the check could not read, and it used to be skipped by the same branch.
+    # So the state is now read from the DOCUMENT's own account of the widget (/V) as well as
+    # from what the page draws, and the states are kept apart:
+    #
+    #   state             /V     drawn  words   scored
+    #   ---------------   ----   -----  -----   ------------------------------------------
+    #   empty             no     no     no      NOT ASKED - counted, never silently dropped
+    #   ink-only          no     yes    maybe   ASKED - the render must draw where the
+    #                                           source draws
+    #   drawn             yes    yes    yes/no  ASKED - ink in the same place AND the same
+    #                                           words inside the rectangle
+    #   declared-undrawn  yes    no     no      ASKED - the source cannot show its own
+    #                                           answer, so there is no ink to compare and
+    #                                           the answer's STRING is asked of the render's
+    #                                           words in the rectangle and then of the .docx
+    #
+    # and at document level three claims, which used to be one:
+    #   no widgets at all  -> "none": the pair is not asked about a form it never had
+    #   every box provably empty (/V empty and nothing drawn) -> "empty-form": nothing to
+    #                         lose, and the detail says so instead of leaving it implicit
+    #   a box the check could not read -> FAIL. "asked and could not answer" is not a pass;
+    #                         that is the rule 54_image_dpi was retired for.
+    #
+    # MEASURED, 15 Nov, PyMuPDF 2.1 / MuPDF 1.28.6, on the 211-document corpus: 208 carry no
+    # widgets at all ("none"); 601 carries 11 and 3 of them are asked (the combo box's
+    # "General" and two ticked check boxes) - the other 8 have no /V and their appearances
+    # draw nothing, so they are genuinely empty and are counted as such. The engine's own
+    # .docx carries none of the 3, so 601 reads 3 asked / 0 kept and FAILS - which is the
+    # true positive, not a check that cannot pass: with the answers moved onto their
+    # rectangles the same pair reads 3/3.
+    #
+    # A NOTE ON /V WITHOUT /AP, measured rather than assumed: MuPDF SYNTHESISES a widget
+    # appearance from /V when there is no /AP at all, so such a box is drawn, extracted as
+    # words, and asked by the old rule as well. The blind spot needs an /AP that exists and
+    # draws nothing - which suppresses the synthesis - and that is the fixture the matrix
+    # uses. An /AP is also never reached by a redaction: measured on 601's shape, a redaction
+    # of the answer's rectangle leaves the appearance stream, its 266 dark pixels and the
+    # words "RAVI KUMAR" exactly where they were.
+    FIELD_INSET = 2.0          # pt in from the rectangle's edge: the box's own rule is
+                               # furniture, not content
+    FIELD_MIN_DARK = 3         # absolute dark pixels that mean "something is drawn"
+    FIELD_PX_TARGET = 160      # render the inset rect to ~this many px on its long side
+    FIELD_DPI_MIN, FIELD_DPI_MAX = 72, 600
+    FIELD_RENDER_KEEP = 0.30   # share of the source's dark pixels the render must keep
+
+    def field_value(doc, xref):
+        """The widget's declared value, or '' when it declares none. /V /Off is an
+        unchecked box - a state, not an answer - and /V () is an empty field."""
+        try:
+            kind, val = doc.xref_get_key(xref, "V")
+        except Exception:
+            return ""
+        if kind == "null" or not val:
+            return ""
+        if kind == "name":
+            return "" if val.strip("/") in ("Off", "") else val.strip("/")
+        if kind == "string":
+            return " ".join(val.split())          # already decoded by PyMuPDF
+        m = re.match(r"^\((.*)\)$", val.strip(), re.S)
+        if m:
+            s = m.group(1)
+            for a, b in (("\\(", "("), ("\\)", ")"), ("\\\\", "\\")):
+                s = s.replace(a, b)
+            return " ".join(s.split())
+        return ""
+
+    def field_dpi(span):
+        return int(round(min(FIELD_DPI_MAX, max(FIELD_DPI_MIN,
+                                              72.0 * FIELD_PX_TARGET / span))))
 
     def field_ink(page, r):
+        """(dark pixel count, the bbox those pixels occupy) inside r, inset.
+
+        The bbox, not the rectangle's area, is what says whether there is an answer:
+        the average over a wide rectangle calls a 6 pt mark in a 150 pt box empty
+        (0.4 %) while the mark is plainly there. It is also the region the render has
+        to reproduce, so an answer drawn in a different part of the box fails.
+        """
         rr = fitz.Rect(r.x0 + FIELD_INSET, r.y0 + FIELD_INSET,
                        r.x1 - FIELD_INSET, r.y1 - FIELD_INSET)
-        if rr.width <= 0 or rr.height <= 0:
-            return 0.0
-        s = page.get_pixmap(clip=rr, colorspace=fitz.csGRAY, dpi=72).samples
-        return (sum(1 for b in s if b < 200) / len(s)) if s else 0.0
+        if rr.width <= 0.5 or rr.height <= 0.5:
+            return 0, None
+        try:
+            pm = page.get_pixmap(clip=rr, colorspace=fitz.csGRAY,
+                                 dpi=field_dpi(max(rr.width, rr.height)))
+        except Exception:
+            return 0, None
+        s, w, h = pm.samples, pm.width, pm.height
+        if not s or not w or not h:
+            return 0, None
+        dark = 0
+        x0 = y0 = None
+        x1 = y1 = -1
+        for y in range(h):
+            row = s[y * w:(y + 1) * w]
+            for x in range(w):
+                if row[x] < 200:
+                    dark += 1
+                    if x0 is None or x < x0:
+                        x0 = x
+                    if x > x1:
+                        x1 = x
+                    if y0 is None:
+                        y0 = y
+                    y1 = y
+        if dark == 0 or x0 is None:
+            return 0, None
+        sx, sy = rr.width / w, rr.height / h
+        return dark, fitz.Rect(rr.x0 + x0 * sx, rr.y0 + y0 * sy,
+                               rr.x0 + (x1 + 1) * sx, rr.y0 + (y1 + 1) * sy)
+
+    def field_dark(page, box):
+        """Dark pixels of `page` inside `box`, with no inset: box is the source's own
+        ink bbox and is already tight, so insetting it again would cut the mark it
+        describes."""
+        if box is None or box.width <= 0 or box.height <= 0:
+            return 0
+        try:
+            pm = page.get_pixmap(clip=box, colorspace=fitz.csGRAY,
+                                 dpi=field_dpi(max(box.width, box.height)))
+        except Exception:
+            return 0
+        return sum(1 for b in pm.samples if b < 200) if pm.samples else 0
 
     def field_words(page, r):
         out = []
@@ -1610,33 +1726,87 @@ def extra_checks2(src, gd, docx_path=None):
         return out
 
     f_asked = f_ok = 0
+    f_empty = f_unread = f_widgets = 0
     f_bad = []
+    f_docx = docx_flat(docx_path) if docx_path else None
     for sp in src:
-        ws = list(sp.widgets())
+        try:
+            ws = list(sp.widgets())
+        except Exception:
+            continue
         if not ws:
             continue
+        f_widgets += len(ws)
         rp = gd[sp.number] if sp.number < len(gd) else None
         for w in ws:
             r = fitz.Rect(w.rect)
-            s_ink, s_words = field_ink(sp, r), field_words(sp, r)
-            if s_ink < FIELD_INK_FLOOR and not s_words:
-                continue                      # an empty box asks nothing
+            if r.is_empty or r.width <= 0 or r.height <= 0:
+                # No rectangle: there is no box to ask about, and that is a measurement
+                # this check could not make. Counted apart and it fails the document.
+                f_unread += 1
+                f_bad.append("%s: no readable /Rect" % w.field_name)
+                continue
+            declared = field_value(src, w.xref)
+            s_dark, s_box = field_ink(sp, r)
+            s_words = field_words(sp, r)
+            drawn = s_dark >= FIELD_MIN_DARK
+            if not drawn and not declared and not s_words:
+                f_empty += 1
+                continue                          # an empty box asks nothing
             f_asked += 1
             if rp is None:
                 f_bad.append("%s: page %d is not in the render" % (w.field_name, sp.number + 1))
                 continue
-            ink_ok = s_ink < FIELD_INK_FLOOR or field_ink(rp, r) >= FIELD_INK_FLOOR
-            r_words = field_words(rp, r)
-            text_ok = all(any(t in rw for rw in r_words)
-                          for t in s_words if any(c.isalpha() for c in t))
+            if drawn:
+                r_dark = field_dark(rp, s_box)
+                ink_ok = r_dark >= max(FIELD_MIN_DARK, int(FIELD_RENDER_KEEP * s_dark))
+                r_words = field_words(rp, r)
+                text_ok = all(any(t in rw for rw in r_words)
+                              for t in s_words if any(c.isalpha() for c in t))
+            else:
+                # declared, not drawn: the source cannot show its own answer, so there is
+                # no ink to compare. The answer's string is asked of the render inside the
+                # same rectangle, and then of the .docx the engine wrote.
+                r_words = field_words(rp, r)
+                want = " ".join(declared.split())
+                toks = [t for t in want.split() if any(c.isalpha() for c in t)] or [want]
+                ink_ok = True
+                text_ok = any(t in rw for t in toks for rw in r_words)
+                if not text_ok and f_docx:
+                    text_ok = bool(want) and want in f_docx
+                if not text_ok and not f_docx:
+                    f_bad.append("%s: /V %r is not drawn in the source and no --docx was "
+                                 "given to ask where it went" % (w.field_name, want[:30]))
+                    continue
             if ink_ok and text_ok:
                 f_ok += 1
             else:
                 f_bad.append("%s (ink=%s text=%s)" % (w.field_name, ink_ok, text_ok))
+
+    if not f_widgets:
+        f_state = "none"                          # no form: not asked about one
+    elif f_unread:
+        f_state = "unreadable"                    # asked and could not answer
+    elif f_asked == 0:
+        f_state = "empty-form"                    # every box provably empty
+    else:
+        f_state = "asked"
+    # Three states, three different claims - and the unreadable one must not fall
+    # through to "0 of 0 failed, so it passed": that is the very confusion this
+    # check exists to stop, and it came back once while this rule was being written.
+    if f_state == "unreadable":
+        f_pass = False
+    elif f_state in ("none", "empty-form"):
+        f_pass = True
+    else:
+        f_pass = f_ok == f_asked
     if f_bad:
-        print("51_field_values: %d of %d answers are not inside their field's rectangle: %s"
-              % (len(f_bad), f_asked, "; ".join(f_bad[:8])), file=sys.stderr)
-    c["51_field_values"] = (f_asked, f_ok, f_ok == f_asked)
+        print("51_field_values: %d of %d answers are not inside their field's rectangle "
+              "(state=%s): %s"
+              % (len(f_bad), f_asked, f_state, "; ".join(f_bad[:8])), file=sys.stderr)
+    c["51_field_values"] = (f_asked, f_ok, f_pass,
+                            {"state": f_state, "widgets": f_widgets,
+                             "empty": f_empty, "unreadable": f_unread})
 
     # ---- 52 outline / bookmarks -------------------------------------------
     # A bookmark tree is a STRUCTURE, and until 13 Nov this check counted ENTRIES.
