@@ -571,6 +571,37 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
   genuinely could not record the attempt at all:
       release the slot, run the gate, commit, stop. That is the rest of this step.
 
+  *** IF THE ROUND IS FINISHED, CLOSE IT. NOTHING ELSE WILL. ***
+
+  "The round is finished" means every class file reports no OPEN row. When that is true, run
+  this BEFORE you release the slot:
+
+      python3 tools/p2w-bench/round.py --close-round
+
+  This is not a formality and it is not optional. On 16 Nov an audit found that **no cron in
+  the whole pipeline called --close-round or --advance at all**. The phase machine, the
+  gates, the three-round logic and the ratchet were all correct and completely unreachable:
+  the pipeline would have sat in phase 'fix' for ever, every cron reporting success, and
+  rounds 2 and 3 would never have happened. The app would have shipped - or rather, never
+  shipped - on one round of work.
+
+  --close-round does all of this, in this order:
+    * refuses unless the phase is 'fix' (closing from anywhere else could reach 'done' with
+      nothing fixed, and 'done' is what lets the app ship)
+    * refuses while ANY class file still holds an OPEN row - so park them with a reason, or
+      fix them, but do not leave them silently OPEN
+    * archives the round's numbers as ROUND-<n>.md and ATTEMPTS-round-<n>.json
+    * blanks the class files, so the next round cannot inherit this round's verdicts. This
+      matters: a class file that survived the boundary already said everything was FIXED, so
+      round 2 closed instantly having done nothing, and three such rounds reached 'done'
+    * clears all three slot claims
+    * increments the round, or sets the phase to 'done' if this was round 3
+
+  If it refuses, it prints why. Fix that reason - do not work around it, and do not release
+  and pretend the round closed.
+
+  If the round is NOT finished, do not call it. Release and let the next run continue.
+
   AN ATTEMPT RECORDED AS 'error' IS RECORDED. It is not a reason to stop.
   This used to read "or the last attempt could not be recorded", and the 07:40 run on 13 Nov read
   its own 'error' outcome as exactly that and released after one attempt, three minutes into a
