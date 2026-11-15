@@ -219,6 +219,36 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   The .txt half keeps its own list in DEFECT-CLASSES-TXT.md, still under
   tools/p2w-bench/. Take the largest OPEN class from whichever half you are working.
 
+  *** BEFORE YOU FORM A THEORY, READ benchmarks/CENSUS.csv. ***
+
+  A score tells you HOW FAR OFF a document is. It cannot tell you WHAT is missing. The
+  census does: for every defective document, what the source holds beside what the output
+  holds - characters, raster images, drawn rules, table cells, annotations - and which
+  page carries the worst displacement.
+
+      document, problem, share5, max_pt, worst_page, pages,
+      src_chars, docx_chars, src_images, docx_images,
+      src_drawings, docx_tables, docx_cells, src_annots, signal
+
+  `signal` is a candidate mechanism, deliberately conservative - it fires only when the
+  counts are unambiguous:
+      images-none-extracted   source has images, the docx has none
+      images-mostly-missing   the docx kept fewer than half of them
+      rules-not-tables        many drawn lines in the source, zero table cells out
+      text-missing            the output holds under 85 % of the source's characters
+      annotations-present     the source carries annotations
+      none-identified         the counts do not point at one cause
+
+  `none-identified` is a real answer, not a failure of the census: it means the evidence
+  does not name a mechanism, so do not invent one - open the page named in `worst_page`
+  and look.
+
+  benchmarks/CENSUS.md is the same data grouped by signal, with a document count per
+  mechanism. **Start with the signal that covers the most documents**: one mechanism fixed
+  once clears every document under it, and that is worth more than clearing one document
+  twenty times. Nineteen attempts produced nothing while the fixer worked from a score
+  alone; the census exists so the next attempt starts from a mechanism.
+
   ATTEMPTS.json is shared: a class id is unique whichever half it came from.
   python3 tools/p2w-bench/classify.py --pick
   THAT IS THE CLASS YOU TAKE. Not "the top one" - the tool applies a cap you do not get to
