@@ -64,6 +64,9 @@ except ImportError:
     os.system("pip install -q pymupdf"); import fitz
 
 ROOT="/scratch/work/p2w"; CORPUS=ROOT+"/corpus"; DOCX=ROOT+"/out"
+# Where this script lives. Needed because the real-world documents travel with the
+# repository beside it, not in the release zips, so the script must find its own tree.
+HERE=os.path.dirname(os.path.abspath(__file__))
 DIST=ROOT+"/dist2"; CACHE="/scratch/output/_cache"; REPO=ROOT+"/repo"
 IMG=ROOT+"/diag"; ZIPS=["p2w-all-groups","p2w-batch-1","pdf-to-word-test-corpus-v3","p2w-round2-additions"]
 JH="/scratch/work/.p2w-jdk/jdk"; INK=68; DPI=150; PT=72.0/DPI
@@ -267,15 +270,31 @@ def validate():
     return ok
 
 # ---------------- build ----------------
+# The corpus is 211 SYNTHETIC documents plus the real ones in benchmarks/realworld/.
+# They are kept in one directory because the measurement does not care where a PDF came
+# from, but they are NOT the same population and must never be averaged together:
+# synthetic median share@5px is 0.3%, the real documents read 10.3%. REALWORLD-RANKING.csv
+# holds the real subset's own ranking.
+#
+# The real set exists because the synthetic corpus cannot see its own blind spots. It had
+# no nine-page form, so it could not see that nine-page forms score 98.7% and 97.6%. Adding
+# them to the corpus is how the fixer gets to work on the largest defect in the project on
+# its first run instead of never.
+CORPUS_SYNTHETIC = 211
 def corpus():
+    real=len(glob.glob(HERE+"/realworld/*.pdf"))
+    want=CORPUS_SYNTHETIC+real
     n=len(glob.glob(CORPUS+"/*.pdf"))
-    if n>=211: return n
-    log(f"corpus {n}/211 -- rebuilding"); os.makedirs(CORPUS,exist_ok=True); os.makedirs(CACHE,exist_ok=True)
+    if n>=want: return n
+    log(f"corpus {n}/{want} -- rebuilding"); os.makedirs(CORPUS,exist_ok=True); os.makedirs(CACHE,exist_ok=True)
     for z in ZIPS:
         c=f"{CACHE}/{z}.zip"
         if not os.path.exists(c): sh(f"gh release download corpus-v1 --repo kavopdf/app -p '{z}.zip' -O '{c}' --clobber",130)
         if os.path.exists(c): sh(f"unzip -oq '{c}' -d {ROOT}/x",130)
     sh("find "+ROOT+"/x -name '*.pdf' -exec cp {} "+CORPUS+"/ \\;",130)
+    # The real-world documents travel with the repository, not the release, so a cron that
+    # clones the repo gets them without any extra download.
+    sh(f"cp {HERE}/realworld/*.pdf {CORPUS}/",60)
     return len(glob.glob(CORPUS+"/*.pdf"))
 def engine():
     if os.path.exists(REPO+"/tools/engine-verify/out"): return True
