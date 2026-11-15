@@ -109,8 +109,15 @@ def _find_round_json():
     reporting success.
     """
     here = os.path.dirname(os.path.abspath(__file__))
+    # /scratch/work/base is where the BASELINE cron clones the repo, and it was missing
+    # from this list. On 16 Nov the 00:46 baseline run measured all 213 documents and then
+    # could not stamp the round, so measure_gate refused and the phase never advanced -
+    # a complete measurement thrown away because a path was not searched.
     for c in (os.path.join(here, "..", "tools", "p2w-bench", "ROUND.json"),
+              "/scratch/work/base/tools/p2w-bench/ROUND.json",
               "/scratch/work/p2w/repo/tools/p2w-bench/ROUND.json",
+              "/scratch/work/cls/tools/p2w-bench/ROUND.json",
+              "/scratch/work/fix/tools/p2w-bench/ROUND.json",
               os.path.join(here, "tools", "p2w-bench", "ROUND.json")):
         c = os.path.normpath(c)
         if os.path.exists(c):
@@ -122,7 +129,10 @@ def _expected_docs():
     """211 synthetic + the real documents, counted not assumed."""
     n = 211
     for d in ("/scratch/work/realworld",
-              "/scratch/work/p2w/repo/benchmarks/realworld"):
+              "/scratch/work/base/benchmarks/realworld",
+              "/scratch/work/p2w/repo/benchmarks/realworld",
+              "/scratch/work/cls/benchmarks/realworld",
+              "/scratch/work/fix/benchmarks/realworld"):
         if os.path.isdir(d):
             real = len([f for f in os.listdir(d) if f.lower().endswith(".pdf")])
             if real:
@@ -198,8 +208,10 @@ def main():
         # can actually be.
         cen = None
         for c in (os.path.join(HERE, "census.py"),
+                  "/scratch/work/base/benchmarks/census.py",
                   "/scratch/work/p2w/repo/benchmarks/census.py",
-                  "/scratch/work/base/benchmarks/census.py"):
+                  "/scratch/work/cls/benchmarks/census.py",
+                  "/scratch/work/fix/benchmarks/census.py"):
             if os.path.exists(c):
                 cen = c
                 break
