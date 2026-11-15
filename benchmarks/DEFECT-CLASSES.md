@@ -1,10 +1,15 @@
 # Defect classes - what is wrong with each document, ranked by damage to the user
 
-Documents measured: **211 of 211**
+Documents measured: **212 of 213**
 
-Built from `benchmarks/RANKING.csv` of this run: **211 rows, 211 distinct documents, every one of them scored**. Every number below is read from that file, or from `REALWORLD-RANKING.csv` where it is named as such. Nothing here is estimated and nothing here is a judgement: the class is the `problem` field the instrument wrote and the shape behind it is the `signature` field, both derived mechanically from the tolerance sweep. This document sorts those verdicts by damage. It does not re-derive, re-measure or overrule them.
+Built from `benchmarks/RANKING.csv` of this run: **213 rows, 213 distinct documents, 212 of them scored**.
+Every number below is read from that file. Nothing here is estimated and nothing here is a
+judgement: the class is the `problem` field the instrument wrote and the shape behind it is the
+`signature` field, both derived mechanically from the tolerance sweep. This document sorts those
+verdicts by damage. It does not re-derive, re-measure or overrule them.
 
-`RANKING.csv` is the baseline cron's output and the only record of what was measured. This file never edits it, and neither should anything else.
+`RANKING.csv` is the baseline cron's output and the only record of what was measured. This file
+never edits it, and neither should anything else.
 
 ## The class is not an opinion
 
@@ -12,55 +17,84 @@ Built from `benchmarks/RANKING.csv` of this run: **211 rows, 211 distinct docume
     curve shape   share@1px -> share@10px                                 -> ABSENT or MOVED
     max_pt        furthest displaced ink, in points                       -> an outlier indicator ONLY
 
-A flat curve means tolerance cannot help: the ink is not there. A falling curve means the ink is there and sitting somewhere else. The two fields agree on every row of this run - every `content-loss` document is a missing or replaced class, every `displacement` document is a present class, and `mixed` splits into the two partly-lost classes:
+A flat curve means tolerance cannot help: the ink is not there. A falling curve means the ink is
+there and sitting somewhere else. The two fields agree on every row of this run:
 
 | signature | problem | documents |
 |---|---|---|
-| clean | none | 121 |
 | content-loss | content-missing-nothing-in-its-place | 30 |
-| content-loss | content-missing-partly-replaced | 14 |
+| content-loss | content-missing-partly-replaced | 16 |
 | displacement | content-present-wholly-displaced | 15 |
 | displacement | content-present-partly-displaced | 12 |
 | displacement | single-element-far-out | 1 |
 | mixed | content-partly-lost | 11 |
 | mixed | content-partly-lost-and-displaced | 7 |
-| **total** | | **211** |
+| clean | none | 120 |
+| MEASURE-ERROR | unmeasured | 1 |
 
 ## Damage ordering (highest damage per user first)
 
-This order comes from what the user can recover, not from the size of the number and not from the number of documents in the class.
+This order comes from what the user can recover, not from the size of the number and not from
+the number of documents in the class.
 
 | # | class | documents | worst in class | why it sits here |
 |---|---|---|---|---|
 | 1 | content-missing-nothing-in-its-place | 30 | 415_inline_images 89.04 %@5 | highest - content gone, unrecoverable |
-| 2 | content-missing-partly-replaced | 14 | one-page-rotated-180-degrees 81.64 %@5 | very high - content gone, replaced by something else |
+| 2 | content-missing-partly-replaced | 16 | 041122-Account_Opening_Form 98.65 %@5 | very high - content gone, replaced by something else |
 | 3 | content-partly-lost | 11 | 411_nested_xobject_transforms 31.05 %@5 | high - part gone, rest moved |
 | 3 | content-partly-lost-and-displaced | 7 | itr-computation-with-slab-table 68.82 %@5 | high - two defects on one page |
 | 4 | content-present-wholly-displaced | 15 | 75_merged_header_cell_three_columns 27.62 %@5 | high - everything there, all of it moved |
 | 5 | content-present-partly-displaced | 12 | table-of-contents-dot-leaders 10.72 %@5 | moderate - most right, part moved |
 | 6 | single-element-far-out | 1 | newsletter-3col-header-footer 3.45 %@5 | low - one small element far from home |
-| - | none | 121 | - | share@5px below 1 % |
-| 7 | unmeasured | 0 | - | the document failed to measure |
+| - | none | 120 | - | share@5px below 1 % |
+| 7 | unmeasured | 1 | - | the document failed to measure |
 
-**Do not rank by `max_pt`.** It is dominated by a single outlier pixel. In this run `electricity-bill` carries max_pt 100.8 at 16.24 %@5 with a median of 1.44 pt, and `mobile-bill` carries 75.36 at 18.48 %@5 with a median of 1.44 pt - the worst pixel says nothing about the page. A document with share@5px near zero and a large max_pt is nearly perfect: `344_customs_declaration` reads 0.61 %@5 with max_pt 49.92, and `416_many_tiny_pages` reads 0.00 %@5 with 300 pages.
+**Do not rank by `max_pt`.** It is dominated by a single outlier pixel and says nothing about
+how much of the page is wrong. Three facts from this run make the point:
+
+- `344_customs_declaration` reads **0.61 %@5** - nearly perfect - yet carries max_pt **49.92 pt**, because one mark
+  is that far from home while the median displacement is only 0.96 pt.
+- `eway-bill` reads **0.91 %@5** - nearly perfect - yet carries max_pt **31.2 pt**, because one mark
+  is that far from home while the median displacement is only 0.96 pt.
+- `electricity-bill` carries max_pt **100.8 pt** against a median of only **1.44 pt**. Ranking by the worst
+  pixel would put it above classes whose whole page is wrong.
+
+The largest max_pt in the run, 937.92 pt on `041122-Account_Opening_Form`, happens to sit on a
+genuinely bad 98.65 %@5 - one document where the outlier and the class agree. One agreement does
+not make it a ranking key, and it is not one here: the order above comes from recoverability.
 
 ## The status column, and what the gate does with it
 
-`round.py` counts every table row that carries `OPEN` in a cell, and the round cannot close while any row says it. The vocabulary is exactly three words:
+`round.py` counts every table row that carries `OPEN` in a cell, and the round cannot close while
+any row says it. The vocabulary is exactly three words:
 
     OPEN      still to fix - the round cannot close while any row says this
     FIXED     the fixer measured it and the number improved
     PARKED    tried, could not be fixed, reason written beside it
 
-This classification is step 2 of 3: it sorts, it never fixes. So no row here is `FIXED` - that status can only be written by a run that measured an improvement, and claiming it here would be a lie the next ratchet would expose. Rows that are not defects the engine can close are `PARKED`, with the reason in the row.
+This classification is step 2 of 3: it sorts, it never fixes. So no row here is `FIXED` - that
+status can only be written by a run that measured an improvement, and claiming it here would be a
+lie the next ratchet would expose. Rows that are not defects the engine can close are `PARKED`,
+with the reason in the row.
 
-The `none` section carries no status cells at all, deliberately. A clean document has nothing for the fixer to act on; marking 121 clean rows `OPEN` would block every round for ever, and marking them `FIXED` would claim a fix nobody made. Absent beats a wrong word.
+The `none` section carries no status cells at all, deliberately. A clean document has nothing for
+the fixer to act on; marking 120 clean rows `OPEN` would block every round for ever, and marking
+them `FIXED` would claim a fix nobody made. Absent beats a wrong word.
 
-## Coverage: what this run measured, and the one gap in it
+## Coverage: what this run measured
 
-`measure_gate.py` expects **213** documents: 211 synthetic plus the PDFs sitting in `benchmarks/realworld/`. `RANKING.csv` holds **211** rows. The two nine-page bank forms are therefore **not rows in this run's ranking**, even though the PDFs ship in the repository and `REALWORLD-IN-CORPUS.md` states they are copied in by `corpus()`. Their numbers exist only in `REALWORLD-RANKING.csv`, and they are quoted from there in the real-world section below.
+`RANKING.csv` holds **213 rows**. **212** carry a numeric `share@5px`; **1** does not.
 
-This is a measurement-coverage gap, not a classification decision. It is recorded here because the class file is the only place a reader would otherwise conclude the two forms had been measured and found unremarkable. The four one-page real documents (`property-tax-receipt`, `admit-card`, `delivery-challan`, `gst-invoice-3line-items`) **are** ordinary rows in `RANKING.csv` and are classified below like any other document.
+    416_many_tiny_pages   signature MEASURE-ERROR   problem unmeasured
+
+That row is a `MEASURE-ERROR`, not a clean document. It is ranked last, in its own section,
+because the measurement has to be fixed before the document can be judged.
+
+**The coverage gap of the last classification is closed.** `041122-Account_Opening_Form` and
+`Account_Opening_Form_Fillable_filled` - the two nine-page bank forms that used to exist only in
+`REALWORLD-RANKING.csv` - are ordinary rows in this run's `RANKING.csv`, at rank 1 and rank 2.
+They are classified below like any other document, and they are also called out separately in
+the real-world section, because a corpus median cannot describe them.
 
 ## The classes, in damage order
 
@@ -103,32 +137,34 @@ Worst: `415_inline_images` at 89.04 %@5, 89.04 %@10, max 153.12 pt, text recall 
 | 29 | `07_stamp_over_table` | 1.82 % | 1.67 % | 66.24 | 100.0 % | 1 | content-loss | OPEN | - |
 | 30 | `312_affidavit_stamp_paper` | 1.07 % | 1.02 % | 53.76 | 100.0 % | 1 | content-loss | OPEN | - |
 
-### content-missing-partly-replaced - 14 documents
+### content-missing-partly-replaced - 16 documents
 
 **Damage rank 2.** Content is gone and something else sits where it was. Falling curve, high invention.
 
-Worst: `one-page-rotated-180-degrees` at 81.64 %@5, 81.64 %@10, max 177.6 pt, text recall 100.0 %. 13 row(s) `OPEN`, 1 `PARKED`.
+Worst: `041122-Account_Opening_Form` at 98.65 %@5, 98.65 %@10, max 937.92 pt, text recall 99.68 %. 15 row(s) `OPEN`, 1 `PARKED`.
 
 | # | document | share@5px | share@10px | max_pt | text recall | pages | signature | status | note |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | `one-page-rotated-180-degrees` | 81.64 % | 81.64 % | 177.6 | 100.0 % | 2 | content-loss | PARKED | medium mismatch: source is an upside-down scan, output is typeset text; text recall 100 %, nothing lost |
-| 2 | `600_reviewed_invoice_with_annotations` | 63.08 % | 52.91 % | 62.88 | 100.0 % | 1 | content-loss | OPEN | annotation ink gone, something else where it sat |
-| 3 | `601_fillable_admission_form` | 52.39 % | 44.76 % | 27.84 | 99.58 % | 1 | content-loss | OPEN | field boxes replaced; text recall 99.58 %, 2 chars missing |
-| 4 | `table-inside-two-column-page` | 42.0 % | 33.62 % | 84.48 | 100.0 % | 1 | content-loss | OPEN | table ink replaced by reflowed text |
-| 5 | `360_restaurant_menu` | 34.43 % | 28.56 % | 45.6 | 100.0 % | 1 | content-loss | OPEN | - |
-| 6 | `text-held-twice-shadow-text` | 34.33 % | 32.22 % | 92.64 | 100.0 % | 1 | content-loss | OPEN | shadow copy dropped, real text placed once |
-| 7 | `77_arabic_rtl_document` | 11.89 % | 10.75 % | 19.68 | 100.0 % | 1 | content-loss | OPEN | - |
-| 8 | `academic-paper-ieee-2col-abstract` | 10.39 % | 8.36 % | 27.36 | 100.0 % | 2 | content-loss | OPEN | - |
-| 9 | `journal-2col-with-footnotes` | 7.75 % | 6.62 % | 35.04 | 100.0 % | 1 | content-loss | OPEN | - |
-| 10 | `370_offer_letter` | 3.47 % | 2.8 % | 31.68 | 100.0 % | 1 | content-loss | OPEN | - |
-| 11 | `352_certificate_ornate_border` | 3.0 % | 2.92 % | 5.28 | 100.0 % | 1 | content-loss | OPEN | - |
-| 12 | `11_stamp_with_signature_image` | 2.77 % | 2.67 % | 25.92 | 100.0 % | 1 | content-loss | OPEN | - |
-| 13 | `317_rti_response` | 2.18 % | 1.78 % | 36.96 | 100.0 % | 1 | content-loss | OPEN | - |
-| 14 | `gst-invoice-with-qr-code` | 1.24 % | 1.2 % | 16.32 | 100.0 % | 1 | content-loss | OPEN | - |
+| 1 | `041122-Account_Opening_Form` | 98.65 % | 98.65 % | 937.92 | 99.68 % | 9 | content-loss | OPEN | - |
+| 2 | `Account_Opening_Form_Fillable_filled` | 97.62 % | 97.55 % | 358.08 | 99.67 % | 9 | content-loss | OPEN | - |
+| 3 | `one-page-rotated-180-degrees` | 81.64 % | 81.64 % | 177.6 | 100.0 % | 2 | content-loss | PARKED | medium mismatch: source is an upside-down scan, output is typeset text; text recall 100 %, nothing lost. Not an ink defect - see the caveat below |
+| 4 | `600_reviewed_invoice_with_annotations` | 63.08 % | 52.91 % | 62.88 | 100.0 % | 1 | content-loss | OPEN | annotation ink gone, something else where it sat |
+| 5 | `601_fillable_admission_form` | 52.39 % | 44.76 % | 27.84 | 99.58 % | 1 | content-loss | OPEN | field boxes replaced; text recall 99.58 %, 2 chars missing |
+| 6 | `table-inside-two-column-page` | 42.0 % | 33.62 % | 84.48 | 100.0 % | 1 | content-loss | OPEN | table ink replaced by reflowed text |
+| 7 | `360_restaurant_menu` | 34.43 % | 28.56 % | 45.6 | 100.0 % | 1 | content-loss | OPEN | - |
+| 8 | `text-held-twice-shadow-text` | 34.33 % | 32.22 % | 92.64 | 100.0 % | 1 | content-loss | OPEN | shadow copy dropped, real text placed once |
+| 9 | `77_arabic_rtl_document` | 11.89 % | 10.75 % | 19.68 | 100.0 % | 1 | content-loss | OPEN | - |
+| 10 | `academic-paper-ieee-2col-abstract` | 10.39 % | 8.36 % | 27.36 | 100.0 % | 2 | content-loss | OPEN | - |
+| 11 | `journal-2col-with-footnotes` | 7.75 % | 6.62 % | 35.04 | 100.0 % | 1 | content-loss | OPEN | - |
+| 12 | `370_offer_letter` | 3.47 % | 2.8 % | 31.68 | 100.0 % | 1 | content-loss | OPEN | - |
+| 13 | `352_certificate_ornate_border` | 3.0 % | 2.92 % | 5.28 | 100.0 % | 1 | content-loss | OPEN | - |
+| 14 | `11_stamp_with_signature_image` | 2.77 % | 2.67 % | 25.92 | 100.0 % | 1 | content-loss | OPEN | - |
+| 15 | `317_rti_response` | 2.18 % | 1.78 % | 36.96 | 100.0 % | 1 | content-loss | OPEN | - |
+| 16 | `gst-invoice-with-qr-code` | 1.24 % | 1.2 % | 16.32 | 100.0 % | 1 | content-loss | OPEN | - |
 
 ### content-partly-lost - 11 documents
 
-**Damage rank 3.** Some content gone, the rest displaced. Two axes high, neither dominant.
+**Damage rank 3.** Part of the content is gone and the rest is displaced. Two failures on one page.
 
 Worst: `411_nested_xobject_transforms` at 31.05 %@5, 22.39 %@10, max 97.92 pt, text recall 100.0 %. 11 row(s) `OPEN`, 0 `PARKED`.
 
@@ -148,7 +184,7 @@ Worst: `411_nested_xobject_transforms` at 31.05 %@5, 22.39 %@10, max 97.92 pt, t
 
 ### content-partly-lost-and-displaced - 7 documents
 
-**Damage rank 3.** Two defects on one page: loss and displacement together.
+**Damage rank 3.** Both loss and displacement, neither dominant. Two defects on one page.
 
 Worst: `itr-computation-with-slab-table` at 68.82 %@5, 55.04 %@10, max 133.92 pt, text recall 100.0 %. 7 row(s) `OPEN`, 0 `PARKED`.
 
@@ -164,7 +200,7 @@ Worst: `itr-computation-with-slab-table` at 68.82 %@5, 55.04 %@10, max 133.92 pt
 
 ### content-present-wholly-displaced - 15 documents
 
-**Damage rank 4.** Every mark is present and every mark is in the wrong place. Loss equals invention.
+**Damage rank 4.** Loss and invention are equal: every mark is there, all of it moved.
 
 Worst: `75_merged_header_cell_three_columns` at 27.62 %@5, 11.53 %@10, max 21.6 pt, text recall 100.0 %. 15 row(s) `OPEN`, 0 `PARKED`.
 
@@ -188,7 +224,7 @@ Worst: `75_merged_header_cell_three_columns` at 27.62 %@5, 11.53 %@10, max 21.6 
 
 ### content-present-partly-displaced - 12 documents
 
-**Damage rank 5.** Most of the page is right; a part of it moved.
+**Damage rank 5.** Most of the page is right and part of it moved.
 
 Worst: `table-of-contents-dot-leaders` at 10.72 %@5, 3.69 %@10, max 26.4 pt, text recall 100.0 %. 12 row(s) `OPEN`, 0 `PARKED`.
 
@@ -217,9 +253,10 @@ Worst: `newsletter-3col-header-footer` at 3.45 %@5, 1.51 %@10, max 77.28 pt, tex
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | `newsletter-3col-header-footer` | 3.45 % | 1.51 % | 77.28 | 100.0 % | 1 | displacement | OPEN | 97 % of the page correct; one header/footer element 77 pt from home |
 
-### none - 121 documents (clean)
+### none - 120 documents (clean)
 
-`share@5px` below 1 %: the output ink sits where the source put it. Nothing to fix, so these rows carry no status cell - see above. Listed so the corpus total adds up.
+`share@5px` below 1 %: the output ink sits where the source put it. Nothing to fix, so these rows
+carry no status cell - see above. Listed so the corpus total adds up.
 
 | # | document | share@5px | share@10px | max_pt | text recall | pages | signature |
 |---|---|---|---|---|---|---|---|
@@ -336,51 +373,74 @@ Worst: `newsletter-3col-header-footer` at 3.45 %@5, 1.51 %@10, max 77.28 pt, tex
 | 111 | `380_runbook_terminal_output` | 0.0 % | 0.0 % | 0.96 | 100.0 % | 1 | clean |
 | 112 | `405_sheet_music_lyrics` | 0.0 % | 0.0 % | 0.96 | 100.0 % | 1 | clean |
 | 113 | `410_form_xobject_reused` | 0.0 % | 0.0 % | 0.96 | 100.0 % | 1 | clean |
-| 114 | `416_many_tiny_pages` | 0.0 % | 0.0 % | 0.96 | 100.0 % | 300 | clean |
-| 115 | `47_grey_body_black_headings` | 0.0 % | 0.0 % | 0.96 | 100.0 % | 1 | clean |
-| 116 | `54_two_column_body_full_width_header_footer` | 0.0 % | 0.0 % | 0.96 | 100.0 % | 1 | clean |
-| 117 | `602_bookmarked_annual_report` | 0.0 % | 0.0 % | 0.96 | 100.0 % | 3 | clean |
-| 118 | `361_product_catalogue_grid` | 0.0 % | 0.0 % | 0.0 | 100.0 % | 1 | clean |
-| 119 | `382_architecture_diagram` | 0.0 % | 0.0 % | 0.0 | 100.0 % | 1 | clean |
-| 120 | `412_page_labels_roman` | 0.0 % | 0.0 % | 0.0 | 100.0 % | 5 | clean |
-| 121 | `414_transparency_softmask` | 0.0 % | 0.0 % | 0.0 | 100.0 % | 1 | clean |
+| 114 | `47_grey_body_black_headings` | 0.0 % | 0.0 % | 0.96 | 100.0 % | 1 | clean |
+| 115 | `54_two_column_body_full_width_header_footer` | 0.0 % | 0.0 % | 0.96 | 100.0 % | 1 | clean |
+| 116 | `602_bookmarked_annual_report` | 0.0 % | 0.0 % | 0.96 | 100.0 % | 3 | clean |
+| 117 | `361_product_catalogue_grid` | 0.0 % | 0.0 % | 0.0 | 100.0 % | 1 | clean |
+| 118 | `382_architecture_diagram` | 0.0 % | 0.0 % | 0.0 | 100.0 % | 1 | clean |
+| 119 | `412_page_labels_roman` | 0.0 % | 0.0 % | 0.0 | 100.0 % | 5 | clean |
+| 120 | `414_transparency_softmask` | 0.0 % | 0.0 % | 0.0 | 100.0 % | 1 | clean |
 
-### unmeasured - 0 documents
+### unmeasured - 1 documents
 
-Zero this run. The previous classification carried one `MEASURE-ERROR` row, `416_many_tiny_pages`; it scored this run at 0.00 %@5 across 300 pages and now sits in `none`. A document that failed to measure would rank last here regardless of how bad it looks: fix the measurement before judging the document.
+The measurement failed, so the document has no class. It ranks last here regardless of how bad
+it looks: fix the measurement before judging the document.
 
-| # | document | share@5px | note | status |
-|---|---|---|---|---|
-| - | none | - | every row of RANKING.csv carries a numeric share@5px | - |
+| # | document | share@5px | signature | status | note |
+|---|---|---|---|---|---|
+| 1 | `416_many_tiny_pages` | - | MEASURE-ERROR | OPEN | measurement failed; no share@5px written - re-measure before classifying |
 
 ## The real world outranks this corpus - and it is the highest-value defect in the project
 
-This run's 211 rows read a median `share@5px` of **0.27 %**, with 121 of them clean - the synthetic set alone reads 0.3 %, as recorded in `REALWORLD-FINDINGS.md`. The nine real documents measured in that report read **median 10.3 %** on the same instrument and the same engine: 34x worse. Text recall is 99.7-100 % on every one of them. The words come through; the layout does not.
+`REALWORLD-FINDINGS.md` measured nine real documents at **median `share@5px` 10.3 %** against
+**0.3 %** synthetic: 34x worse, on the same instrument and the same engine. Text recall is
+99.7-100 % on every one of them. The words come through; the layout does not.
+
+**The two nine-page bank forms are now IN the corpus**, at `benchmarks/realworld/`, so they appear
+in `RANKING.csv` as ordinary rows - rank 1 and rank 2 of 213 - and they are classified in the
+`content-missing-partly-replaced` table above like any other document. Do not treat their presence
+in that table as the end of the story: they are the highest-value defect in the project and they
+outrank `415_inline_images`, which is one synthetic document while they are a class users open
+constantly.
 
 | # | document | problem | share@5px | max_pt | text recall | pages | status |
 |---|---|---|---|---|---|---|---|
-| 1 | `041122-Account_Opening_Form` | content-missing-partly-replaced | 98.65 % | 937.92 | 99.68 % | 9 | OPEN |
-| 2 | `Account_Opening_Form_Fillable_filled` | content-missing-partly-replaced | 97.62 % | 358.08 | 99.67 % | 9 | OPEN |
-| 3 | `property-tax-receipt` | content-missing-nothing-in-its-place | 10.78 % | 55.68 | 100.0 % | 1 | see class above |
-| 4 | `admit-card` | content-missing-nothing-in-its-place | 10.68 % | 57.12 | 100.0 % | 1 | see class above |
-| 5 | `delivery-challan` | content-missing-nothing-in-its-place | 10.26 % | 39.84 | 100.0 % | 1 | see class above |
-| 6 | `gst-invoice-3line-items` | content-missing-nothing-in-its-place | 7.15 % | 20.16 | 100.0 % | 1 | see class above |
-| 7 | `350_question_paper` | none | 0.11 % | 16.8 | 100.0 % | 1 | see class above |
-| 8 | `300_prescription_rx` | none | 0.06 % | 21.6 | 100.0 % | 1 | see class above |
-| 9 | `311_fir_police_form` | none | 0.0 % | 2.4 | 100.0 % | 1 | see class above |
+| 1 | `041122-Account_Opening_Form` | content-missing-partly-replaced | 98.65 % | 937.92 | 99.68 % | 9 | see class above |
+| 2 | `Account_Opening_Form_Fillable_filled` | content-missing-partly-replaced | 97.62 % | 358.08 | 99.67 % | 9 | see class above |
+
+The other seven documents of that nine-document study are ordinary rows of this corpus too -
+`property-tax-receipt`, `admit-card`, `delivery-challan`, `gst-invoice-3line-items`, `350_question_paper`,
+`300_prescription_rx` and `311_fir_police_form` - and each is classified in its own class section
+above. Only the two bank forms live in `benchmarks/realworld/`; the rest were already in the corpus.
 
 Read that table with three things in mind:
 
-1. **The two nine-page bank forms are the highest-value defect in the project, and they outrank `415_inline_images`.** `415_inline_images` is one synthetic document. `041122-Account_Opening_Form` (98.65 %@5, max 937.92 pt - 33 cm, larger than the page) and `Account_Opening_Form_Fillable_filled` (97.62 %@5) are a document type users open constantly, and on them 98 % of the source ink has no counterpart in our output at 5 px.
-2. **They are in the corpus but not in this run's `RANKING.csv`.** The PDFs ship in `benchmarks/realworld/`, so a future measurement will list them as ordinary rows. This run's ranking does not contain them - the numbers above come from `REALWORLD-RANKING.csv`. Do not average the two populations: synthetic median 0.3 %, real median 10.3 %.
-3. **Never quote the synthetic median as if it described the product.** Quote both. A corpus of single-page synthetic tables cannot see a nine-page form with repeated field grids, which is exactly the shape that fails.
+1. **`041122-Account_Opening_Form` (98.65 %@5, max 937.92 pt - 33 cm, larger than the page) and
+   `Account_Opening_Form_Fillable_filled` (97.62 %@5) are the largest measured error anywhere in
+   the project.** 98 % of the source ink has no counterpart in our output at 5 px, on a document
+   type users open constantly.
+2. **The corpus still cannot see this shape on its own.** The synthetic set is single-page or a
+   small multi-page table; the corpus had no nine-page form until these two were copied in. This
+   run's synthetic-only median is 0.27 %, the real-world rows read up to 98.65 %. Do not average
+   the two populations, and do not read the all-rows median of 0.29 % as a statement about the
+   product - it is diluted by 120 clean rows.
+3. **Never quote the synthetic median as if it described the product.** Quote both.
 
 ## One caveat this classification carries forward
 
-`one-page-rotated-180-degrees` is classed `content-missing-partly-replaced` at 81.64 %@5 with **text recall 100 %**. Both facts are true and neither is wrong: the source page is an upside-down **scan** and our output is typeset text, so the ink cannot match because it is a different medium. Nothing was lost - the ink changed form. It is `PARKED` here for that reason. **Do not hand this to the fixer as an ink defect**: a fixer that chases 81 % of ink on this page will damage a document whose text is already complete.
+`one-page-rotated-180-degrees` is classed `content-missing-partly-replaced` at 81.64 %@5 with **text recall 100.0 %**. Both facts
+are true and neither is wrong: the source page is an upside-down **scan** and our output is
+typeset text, so the ink cannot match because it is a different medium. Nothing was lost - the
+ink changed form. It is `PARKED` here for that reason. **Do not hand this to the fixer as an ink
+defect**: a fixer that chases 81.64 % of ink on this page will damage a document whose text is
+already complete.
 
 ## What this file does not say
 
-It names the KIND of defect and sizes it. It does not say WHY the engine did it. "Inline images are not extracted" came from looking at a rendered pair (`p2w.py --diagnose`), not from these numbers. The name narrows the search; the fixer still has to find the cause. Nothing here is a fix, and nothing here may be read as one.
+It names the KIND of defect and sizes it. It does not say WHY the engine did it. "Inline images
+are not extracted" came from looking at a rendered pair (`p2w.py --diagnose`), not from these
+numbers. The name narrows the search; the fixer still has to find the cause. Nothing here is a
+fix, and nothing here may be read as one.
 
-_Generated by the classify step of the PDF-to-Word pipeline. Measurement: `benchmarks/RANKING.csv` (this run). Engine untouched. Ranking untouched._
+_Generated by the classify step of the PDF-to-Word pipeline. Measurement: `benchmarks/RANKING.csv`
+(this run). Engine untouched. Ranking untouched._
