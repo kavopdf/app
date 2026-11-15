@@ -5494,6 +5494,25 @@ public final class DocxWriter {
         return best;
     }
 
+    /**
+     * How many grid columns the PAGE's own cell rectangle covers at (r, c).
+     *
+     * <p>0 means this slot is covered by the cell to its left. Returns 1 - the neutral
+     * answer - for a table whose pass recorded no rectangles, so a table built by a pass
+     * that did not measure the grid keeps the old behaviour exactly.
+     */
+    private static int spanCAt(PdfToWord.Table t, int r, int c) {
+        if (t == null || t.spanC == null || r < 0 || r >= t.spanC.size()) return 1;
+        List<Integer> row = t.spanC.get(r);
+        if (row == null || c < 0 || c >= row.size()) return 1;
+        return row.get(c);
+    }
+
+    /** Does this table know its cells' spans at all? */
+    private static boolean hasSpans(PdfToWord.Table t) {
+        return t != null && t.spanC != null && t.spanC.size() == t.rows.size();
+    }
+
     private static void table(StringBuilder sb, PdfToWord.Table t, Ctx ctx) {
         cenLine(ctx, "table");
         traceLine(ctx, "table", Float.NaN, 0, 0, ctx.flowY, "top=" + t.top);
@@ -5990,6 +6009,10 @@ public final class DocxWriter {
             }
             int c = 0;
             while (c < cols) {
+                // A slot the page's own rectangle handed to the cell on its left is not a
+                // cell: writing a w:tc for it would split the merge the page drew.
+                int mspan = hasSpans(t) ? spanCAt(t, r, c) : 1;
+                if (mspan == 0) { c++; continue; }
                 String cell = c < row.size() ? row.get(c) : "";
                 String face = r < t.fonts.size() && c < t.fonts.get(r).size()
                         ? t.fonts.get(r).get(c) : "";
@@ -6020,12 +6043,23 @@ public final class DocxWriter {
                 // it, and the line is left whole.
                 float textR = cellRTw(t, r, c);
                 int span = 1, spanTw = colTw[c];
-                while (c + span < cols && cellAt(t, r, c + span).isEmpty()) {
-                    boolean startsOutside = insetTw >= spanTw;
-                    boolean tooWide = !Float.isNaN(textR) && insetTw + textR > spanTw;
-                    if (!startsOutside && !tooWide) break;
-                    spanTw += colTw[c + span];
-                    span++;
+                if (hasSpans(t)) {
+                    // THE PAGE DREW THE GRID. Its rectangle says how many columns this cell
+                    // covers, so take that number and stop guessing from the text. The guess
+                    // below was wrong in both directions on the documents that hold a merge -
+                    // too narrow where the text happened to fit its own column, welded over a
+                    // neighbour where it did not.
+                    span = Math.max(1, Math.min(mspan, cols - c));
+                    spanTw = 0;
+                    for (int k = 0; k < span; k++) spanTw += colTw[c + k];
+                } else {
+                    while (c + span < cols && cellAt(t, r, c + span).isEmpty()) {
+                        boolean startsOutside = insetTw >= spanTw;
+                        boolean tooWide = !Float.isNaN(textR) && insetTw + textR > spanTw;
+                        if (!startsOutside && !tooWide) break;
+                        spanTw += colTw[c + span];
+                        span++;
+                    }
                 }
                 if (insetTw > spanTw - 1) insetTw = Math.max(0, spanTw - 1);
                 // A cell that could not be widened - because the cells beside it hold text of

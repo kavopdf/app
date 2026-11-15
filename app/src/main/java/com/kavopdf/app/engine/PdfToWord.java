@@ -204,6 +204,20 @@ public final class PdfToWord {
     }
 
     /** A cell's text origin to the point, or "-" when the pass did not measure it. */
+    /**
+     * The boundary index of x in the table's own edge list, clamped to [0, size].
+     *
+     * <p>The list is the distinct left edges plus the table's own right edge, so the last
+     * index is the number of columns. A cell whose right edge is the table's right edge
+     * therefore ends on the last boundary and not one short of it.
+     */
+    private static int edgeIdx(List<Float> E, float x) {
+        for (int i = 0; i < E.size(); i++) if (Math.abs(E.get(i) - x) < 1.5f) return i;
+        int best = 0;
+        for (int i = 0; i < E.size(); i++) if (E.get(i) <= x + 1.5f) best = i;
+        return best;
+    }
+
     private static String cellPos(Table t, int r, int c) {
         try {
             float x = t.cellX.get(r).get(c);
@@ -328,6 +342,38 @@ public final class PdfToWord {
          * started in the right place and every figure inside it was at the wrong x.
          */
         public float[] colX;
+        /**
+         * HOW MANY GRID COLUMNS each cell covers, read off the page's own cell rectangles.
+         *
+         * <p>Same shape as {@link #rows}. A cell that covers several columns carries that
+         * number here and the slots it covers carry 0. 1 is the ordinary cell.
+         *
+         * <p>WHY THE MODEL NEEDED THIS. {@code rows} is a rectangular lattice: every row has
+         * one entry per column, so a cell the page drew across three columns could only be
+         * expressed by putting its text in one slot and leaving the other two empty. The
+         * writer then had to GUESS whether those empty neighbours belonged to it, from the
+         * width of the text - "the text starts further right than the column is wide" or
+         * "the text is wider than the column is". Both are guesses about text, and the page
+         * had already answered the question by drawing (or not drawing) the rule.
+         *
+         * <p>Measured on the 211-document corpus, that guess was wrong in both directions on
+         * the documents that hold a merge: it left a merged cell too narrow (the text fitted
+         * its own column, so no widening was asked for) and it welded a cell over a
+         * neighbour the page had kept separate (the text overflowed a column that was
+         * correctly narrow). The rule is the evidence, so the rule is what the model now
+         * carries.
+         */
+        public final List<List<Integer>> spanC = new ArrayList<>();
+        /**
+         * HOW MANY GRID ROWS each cell covers, same shape as {@link #spanC}.
+         *
+         * <p>Filled from the page's own rectangles exactly as {@link #spanC} is: a cell
+         * whose rectangle is bounded by rules two rows apart covers two rows. Recorded so
+         * the question can be ASKED; {@code DocxWriter} does not yet emit {@code w:vMerge},
+         * because a vertical merge changes which row owns a line of text and therefore
+         * moves the text layer - see the note where the rows are written.
+         */
+        public final List<List<Integer>> spanR = new ArrayList<>();
         /**
          * The x, in points, at which each cell's own text starts - same shape as {@link #rows},
          * {@link Float#NaN} where the pass did not measure it.
@@ -7405,6 +7451,42 @@ public final class PdfToWord {
         for (int i = 0; i < ncol; i++) cx[i] = C.get(i);
         cx[ncol] = right;
         t.colX = cx;
+        // ---- THE PAGE'S OWN CELL RECTANGLES, AS GRID COORDINATES ----------------
+        // `group` holds the cells exactly as intersectionsToCells emitted them:
+        // {left, top, right, bottom}, each bounded by the four rules that close it. C is
+        // the distinct LEFT edges and R the distinct TOP edges, so a rectangle runs from
+        // the index of its left edge to the index of its right edge - and that difference
+        // is the number of columns the page merged it across. No heuristic, no text.
+        List<Float> CE = new ArrayList<>(C);
+        CE.add(right);
+        List<Float> RE = new ArrayList<>(R);
+        RE.add(bottom);
+        int[][] sc = new int[nrow][ncol];
+        int[][] sr = new int[nrow][ncol];
+        for (float[] cell : group) {
+            int c0 = edgeIdx(CE, cell[0]), c1 = edgeIdx(CE, cell[2]);
+            int r0 = edgeIdx(RE, cell[1]), r1 = edgeIdx(RE, cell[3]);
+            if (c1 < c0) { int tmp = c0; c0 = c1; c1 = tmp; }
+            if (r1 < r0) { int tmp = r0; r0 = r1; r1 = tmp; }
+            c0 = Math.max(0, Math.min(ncol - 1, c0));
+            r0 = Math.max(0, Math.min(nrow - 1, r0));
+            c1 = Math.max(c0, Math.min(ncol, c1));
+            r1 = Math.max(r0, Math.min(nrow, r1));
+            // A rectangle's HORIZONTAL extent belongs to EVERY row it covers, not just the
+            // row it starts on. Zeroing the slots below the first row would say "the cell
+            // above owns this slot", and only w:vMerge can say that - without it the row is
+            // left short of the grid's width, which is not a table at all. Measured on
+            // 75_merged_header_cell_three_columns: a header cell spanning rows 0-2 and
+            // columns 4-5 zeroed row 1 and row 2 at column 4, so those rows wrote 3 cells
+            // across a 6-column grid and the whole row lost its right-hand pair.
+            // So spanR is RECORDED (it is the page's answer to the row question) while
+            // spanC is written on every row, which keeps each row a full tiling.
+            for (int r = r0; r < r1; r++) {
+                if (sc[r][c0] != 0) continue;   // a second rectangle claiming the same slot
+                sc[r][c0] = Math.max(1, c1 - c0);
+                sr[r][c0] = Math.max(1, r1 - r0);
+            }
+        }
         t.header = nrow > 1;
         int filled = 0;
         for (int r = 0; r < nrow; r++) {
@@ -7418,6 +7500,8 @@ public final class PdfToWord {
             List<Boolean> rowBolds = new ArrayList<>();
             List<Boolean> rowItalics = new ArrayList<>();
             List<List<Table.CellPara>> paraRow = new ArrayList<>();
+            List<Integer> rowSpanC = new ArrayList<>();
+            List<Integer> rowSpanR = new ArrayList<>();
             for (int c = 0; c < ncol; c++) {
                 List<Table.CellPara> cp = parasOfGlyphs(buckets.get(r).get(c));
                 paraRow.add(cp.size() >= 2 ? cp : new ArrayList<Table.CellPara>());
@@ -7432,7 +7516,11 @@ public final class PdfToWord {
                 rowCols.add(colorOf(buckets.get(r).get(c)));
                 rowBolds.add(boldOf(buckets.get(r).get(c)));
                 rowItalics.add(italicOf(buckets.get(r).get(c)));
+                rowSpanC.add(sc[r][c]);
+                rowSpanR.add(sr[r][c]);
             }
+            t.spanC.add(rowSpanC);
+            t.spanR.add(rowSpanR);
             t.rows.add(row);
             t.fonts.add(rowFonts);
             t.sizes.add(rowSizes);

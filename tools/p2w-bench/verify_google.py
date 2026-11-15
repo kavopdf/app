@@ -4296,6 +4296,28 @@ def docx_faces(path):
 
 
 
+# ---- THE TABLE GEOMETRY CHECKS -------------------------------------------
+# 62-66 ask what grid the page drew and what grid the .docx declares. They are in
+# tablechecks.py because they need two readers the rest of this file does not: a rule
+# network turned into cell rectangles, and the OOXML table model. Before them the suite
+# read no table geometry at all - `grep -c gridSpan verify_google.py` was 0, and a
+# correct table-merge fix scored exactly zero on 43 checks.
+try:
+    import tablechecks as _tables
+except ImportError:
+    _tables = None
+    print("tablechecks.py not found - 62-66 will abstain on every document",
+          file=sys.stderr)
+
+# A check that ABSTAINS is invisible on an empty document, so the universe cannot be
+# discovered by running the verifier on two blank pages the way every other id is.
+# Declared here instead, and only for the five that can abstain.
+# IDS: the design note numbers these 61-65; main gave 61 to `61_blank_not_filled`, so
+# they land as 62-66. See the mapping at the top of tablechecks.py.
+TABLE_CHECK_IDS = ("62_table_columns", "63_table_rows", "64_table_span_across",
+                   "65_table_span_down", "66_table_cell_width")
+
+
 def compare(src_path, gd_path, docx_path=None):
     src = fitz.open(src_path)
     gd = fitz.open(gd_path)
@@ -5964,6 +5986,17 @@ def compare(src_path, gd_path, docx_path=None):
     checks.update(extra_checks(src, gd, s_runs, g_runs, pairs, docx_path))
     checks.update(extra_checks2(src, gd, docx_path))
 
+    # 61-65 read the SOURCE page's rule grid and the .docx's table model. They are the
+    # only checks here that never look at the render, because table geometry is a
+    # question about what was WRITTEN, not about what the renderer drew with it.
+    # A check that had nothing to judge is simply absent from `checks`, so it does not
+    # enter `total` - that is what abstention means and why the denominator moves.
+    if _tables is not None:
+        try:
+            checks.update(_tables.checks_for(src_path, docx_path))
+        except Exception as e:
+            print("table geometry could not run: %s" % e, file=sys.stderr)
+
     src.close()
     gd.close()
 
@@ -5997,7 +6030,9 @@ def all_check_ids():
         doc.new_page()
         doc.save(path)
         doc.close()
-    return sorted(compare(a, b)["checks"])
+    ids = set(compare(a, b)["checks"])
+    ids.update(TABLE_CHECK_IDS)      # these abstain on a blank page; see above
+    return sorted(ids)
 
 
 def main(argv):
