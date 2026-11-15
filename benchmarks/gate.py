@@ -182,6 +182,37 @@ def main():
         S["layers"]["txt_checks"] = dict(status="not-run",
             reason="verify_txt.py not present in this checkout")
 
+    # ---- census: what was lost, and where ----
+    #
+    # Runs here rather than as an instruction in a prompt because it needs the source PDFs
+    # and the produced .docx files, and those only exist during this run - the sandbox is
+    # wiped between runs, so the fixer cannot build this later. Its output is committed, so
+    # the fixer reads CENSUS.csv from the repository in a run that has no corpus at all.
+    #
+    # Only on a complete measurement: a census of a half-measured corpus would name
+    # mechanisms for documents whose numbers are not settled.
+    if S["layers"]["measurement"].get("complete"):
+        # Same trap as realworld/ and ROUND.json: the baseline cron copies only
+        # p2w.py and gate.py into /scratch/work, so a plain HERE/census.py lookup
+        # finds nothing and the census silently never runs. Search the places it
+        # can actually be.
+        cen = None
+        for c in (os.path.join(HERE, "census.py"),
+                  "/scratch/work/p2w/repo/benchmarks/census.py",
+                  "/scratch/work/base/benchmarks/census.py"):
+            if os.path.exists(c):
+                cen = c
+                break
+        if cen:
+            rc, out = sh("cd %s && python3 %s --corpus /scratch/work/p2w/corpus "
+                         "--out /scratch/work/p2w/out --ranking /scratch/output/RANKING.csv"
+                         % (os.path.dirname(HERE), cen), 240)
+            tail = [l for l in out.strip().splitlines() if l.startswith("  ")]
+            S["layers"]["census"] = dict(status="ok" if rc == 0 else f"exit{rc}",
+                                         summary=tail[-8:])
+        else:
+            S["layers"]["census"] = dict(status="not-run", reason="census.py not present")
+
     # ---- ratchet ----
     # WHICH ROUND THESE NUMBERS BELONG TO.
     #
