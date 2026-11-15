@@ -1,53 +1,62 @@
-# Can each .txt check actually fail?
+# .txt falsifiability — final result
 
 A check that cannot fail is not a pass; it is a bug in the check. The 47 docx
-checks were measured and 66 % of their passes could not have failed. The 12
-.txt checks had never been tested the same way. This is that test.
+checks were measured at 66 % unfalsifiable passes. The 12 .txt checks had never
+been tested. This is the finished test.
 
-Method: take a source PDF and the .txt the engine wrote for it, confirm the
-baseline, then apply one mutation per check -- each designed to break exactly
-that check -- and see whether its verdict flips.
+## Result: 11 of 12 proven able to fail
 
-Document: `12_stamp_across_page_break` (2 pages).
-Baseline: `10/12 applicable, 9 passed, 2 abstained  FAIL`
-`t12_word_invention` was already failing at baseline (5 invented words).
-
-## Result, stated exactly
-
-| check | verdict | evidence |
+| check | verdict | how it was proven |
 |---|---|---|
-| t01_word_accuracy | **PROVEN** | deleting words flips it |
-| t02_position | **PROVEN** | stripping leading spaces flips it |
-| t03_symbols | **PROVEN** | replacing non-ASCII with '?' flips it |
-| t04_structure | **PROVEN** | deleting half the lines flips it |
-| t07_symbol_counts | **PROVEN** | adding 40 rupee signs flips it |
-| t08_line_order | **PROVEN** | reversing the lines flips it |
-| t11_page_breaks | **PROVEN** | removing U+000C flips it |
-| t12_word_invention | **PROVEN** | failing at baseline: 5 invented words in the .txt |
-| t06_encoding | **INCONCLUSIVE** | applicable (source 2842, txt 0), but the mutation did not produce invalid bytes -- my harness wrote the file as UTF-8, which re-encoded them. The check was never actually given bad input. |
-| t10_page_completeness | **INCONCLUSIVE** | applicable (source 2, txt 2); removing a page did not change the counted value, so the mutation did not reach the condition the check tests |
-| t09_page_furniture | **NOT TESTED** | abstained -- source 0, no running heads on this document |
-| t13_amount_columns | **NOT TESTED** | abstained -- source 0, no money column on this document |
+| t01_word_accuracy | **PROVEN** | deleting five common words |
+| t02_position | **PROVEN** | stripping leading spaces |
+| t03_symbols | **PROVEN** | replacing every non-ASCII character with `?` |
+| t04_structure | **PROVEN** | deleting every second line |
+| t06_encoding | **PROVEN** | prepending raw `\xff\xfe\x00\x00` bytes |
+| t07_symbol_counts | **PROVEN** | appending 40 rupee signs |
+| t08_line_order | **PROVEN** | reversing line order |
+| t10_page_completeness | **PROVEN** | blanking a whole middle page |
+| t11_page_breaks | **PROVEN** | removing every U+000C |
+| t12_word_invention | **PROVEN** | already failing at baseline: 5 invented words |
+| t13_amount_columns | **PROVEN** | already failing at baseline |
+| t09_page_furniture | **BLIND** | three mutations, none flipped it |
 
-**8 of 12 proven able to fail. 2 inconclusive because the harness, not the
-check, was at fault. 2 untested because this document does not exercise them.**
+## The one that would not fail
 
-## Why this is reported as a partial result
+`t09_page_furniture` claims: "one copy of each running head per page it belongs
+to." On `324_loan_amortisation_schedule` -- a document where the check reports
+itself APPLICABLE -- these three mutations all left it passing:
 
-The first run of this harness printed `12/12 checks can fail`. That was wrong:
-it counted harness write-failures as successes. A test that reports its own
-broken cases as passes is exactly the disease this whole exercise is about, so
-the summary was corrected to count only `PASS` as proof, and the two
-inconclusive rows are stated as inconclusive rather than folded into either
-column.
+1. duplicating the first line of every page twice
+2. duplicating it three times on every page
+3. injecting the first non-blank line of each page three times
 
-## What must happen before these checks are quoted
+Two possible explanations, and they are not the same thing:
 
-1. `t06_encoding` needs a mutation that writes genuinely invalid UTF-8 bytes
-   (`open(path,'wb').write(b'\xff\xfe')`), not a str round-trip.
-2. `t10_page_completeness` needs a document with three or more pages so that
-   removing one changes the count.
-3. `t09_page_furniture` and `t13_amount_columns` need documents that exercise
-   them: one with running heads, one with a money column.
-4. Until all twelve are proven, the .txt checks stay advisory and no score may
-   be quoted from them.
+* the check tests "at least one copy is present" rather than "exactly one", in
+  which case its stated meaning and its implemented meaning differ; or
+* it cannot see duplicate furniture at all, in which case it is not a check.
+
+Deciding which requires reading its predicate, not another mutation. Until that
+is done it must not be quoted as evidence that page furniture is correct.
+
+## What changed between round 1 and this round
+
+Round 1 reported `12/12` in its first run, which was wrong -- it counted
+harness write-failures as successes. Corrected to count only PASS. Round 1 then
+reported 8/12 with four unresolved, and every one of the four was a harness
+defect, not a check defect:
+
+* `t06_encoding` was written back as UTF-8, so the check never received invalid
+  bytes. Fixed by writing raw bytes with `open(path,'wb')`.
+* `t10_page_completeness` was truncated, which does not remove a page marker.
+  Fixed by blanking an entire middle page.
+* `t09` and `t13` were run on a document that did not exercise them. Fixed by
+  finding documents where each reports itself applicable.
+
+Three of the four are now proven. The fourth is the one above.
+
+## Standing rule
+
+Until `t09` is resolved, the .txt checks remain advisory and no score may be
+quoted from them. 11 of 12 is not 12 of 12.
