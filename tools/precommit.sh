@@ -10,14 +10,20 @@
 #
 #   A commit message is not evidence. This checks the thing itself.
 #
-# THREE TIERS, BECAUSE MOST COMMITS ARE NOT ENGINE COMMITS
-#   tier 1  always          python syntax, the cheap guards, file names        ~20 s
-#   tier 2  engine changed  javac + TestPdfToWord                              ~90 s
-#   tier 3  engine changed  G2 across the corpus against base208.json         ~180 s
+# FOUR TIERS, BECAUSE MOST COMMITS ARE NOT ENGINE COMMITS
+#   tier 1   always          python syntax, the cheap guards, file names       ~20 s
+#   tier 2   engine changed  javac + TestPdfToWord                             ~90 s
+#   tier 2b  engine changed  the whole behavioural suite (verify-engine.sh)   ~170 s
+#   tier 3   engine changed  G2 across the corpus against base208.json        ~180 s
 #
-#   Tier 1 alone catches a broken script. Tier 2 catches a broken compile. Tier 3
+#   Tier 1 alone catches a broken script. Tier 2 catches a broken compile. Tier 2b
+#   runs the engine's own 39-check suite - the one that was never run in full because
+#   TestPdfToWord died at Standard14Fonts.getAFM and was not invoked anyway. Tier 3
 #   catches a document that got worse. Skipping tier 3 on an engine change is how a
 #   regression ships.
+#
+#   Tier 2b is the expensive one. It is opt-out (-\-no-suite) for a machine that cannot
+#   afford it, but the opt-out is named in the summary, not silent.
 #
 # USAGE
 #   bash tools/precommit.sh              # decide the tier from what changed
@@ -39,10 +45,12 @@ FORCE_ALL=0
 # environment with the old path as the default.
 CORPUS_DIR="${P2W_CORPUS:-/scratch/work/corpus}"
 NO_CORPUS=0
+NO_SUITE=0
 for arg in "$@"; do
   case "$arg" in
     --all) FORCE_ALL=1 ;;
     --no-corpus) NO_CORPUS=1 ;;
+    --no-suite) NO_SUITE=1 ;;
   esac
 done
 
@@ -71,7 +79,7 @@ pass "every shell script parses"
 
 # the cheap guards, the ones that read text and need no build
 COULD_NOT_RUN=""
-for g in check-file-names check-tool-titles check-permissions check-pdf2word check-regressions; do
+for g in check-file-names check-tool-titles check-permissions check-pdf2word check-regressions check-suite-headers; do
   if [ -f "tools/$g.py" ]; then
     python3 "tools/$g.py" >/tmp/guard.$$ 2>&1
     rc=$?
@@ -221,6 +229,33 @@ else
       grep error /tmp/tj.$$ | head -5 | sed 's/^/        /'
     fi
     rm -f /tmp/tj.$$ /tmp/tp.$$
+  fi
+
+  echo ""
+  echo "=== tier 2b: the engine's own behavioural suite ==="
+  # This is tools/verify-engine.sh itself, not a copy of its logic. Until now precommit
+  # ran one class out of that suite (TestPdfToWord) and the suite's other 38 checks were
+  # never run before a commit - which is how 20+ engine changes landed with none of the
+  # new paths exercised. Keyed to engine changes, like tier 2, because that is what it
+  # measures. Measured at 170 s on a 2-vCPU pod; it re-downloads the libraries, so it
+  # also needs network.
+  if [ "$NO_SUITE" -eq 1 ]; then
+    echo "skipped by --no-suite"
+    COULD_NOT_RUN="$COULD_NOT_RUN tier2b-suite"
+  elif [ ! -f "$HERE/verify-engine.sh" ]; then
+    echo "gap   tools/verify-engine.sh not present - the suite could not run"
+    COULD_NOT_RUN="$COULD_NOT_RUN tier2b-suite"
+  else
+    SUITE_T0=$(date +%s)
+    if bash "$HERE/verify-engine.sh" >/tmp/suite.$$ 2>&1; then
+      SUITE_SECS=$(( $(date +%s) - SUITE_T0 ))
+      pass "verify-engine.sh: $(tr -d '\0' </tmp/suite.$$ | grep -c 'PASS') PASS lines, ${SUITE_SECS}s"
+    else
+      SUITE_SECS=$(( $(date +%s) - SUITE_T0 ))
+      fail "verify-engine.sh - the engine suite failed (${SUITE_SECS}s)"
+      tr -d '\0' </tmp/suite.$$ | grep -E "^  FAIL|FAILED|^== " | tail -8 | sed 's/^/        /'
+    fi
+    rm -f /tmp/suite.$$
   fi
 
   echo ""

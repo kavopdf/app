@@ -62,7 +62,14 @@ fi
 echo "== compiling stubs, engine and ConvertAll ==" >&2
 rm -rf out && mkdir -p out
 javac -nowarn -d out $(find stubs -name '*.java')
-CP="out:libs/aar/classes.jar:libs/bcprov.jar:libs/bcpkix.jar:libs/bcutil.jar"
+# libs/aar/assets is NOT optional. pdfbox-android ships the 14 Standard-14 AFM metric
+# files in the AAR's assets/ directory, not in classes.jar (classes.jar contains zero
+# .afm entries - they are Android assets by design). Standard14Fonts.loadMetrics()
+# falls back to PDType1Font.class.getResourceAsStream("/com/tom_roush/pdfbox/resources/
+# afm/<name>.afm") on a plain JVM, so with assets off the classpath every PDType1Font
+# dies with "resource 'com/tom_roush/pdfbox/resources/afm/Times-Roman.afm' not found".
+# That is what made TestPdfToWord unrunnable: an asset-bootstrap bug, not engine code.
+CP="out:libs/aar/classes.jar:libs/aar/assets:libs/bcprov.jar:libs/bcpkix.jar:libs/bcutil.jar"
 javac -nowarn -cp "$CP" -d out $(find ../../app/src/main/java/com/kavopdf/app/engine -name '*.java')
 javac -nowarn -cp "$CP" -d out ConvertAll.java
 

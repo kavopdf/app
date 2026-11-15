@@ -57,5 +57,9 @@ public class TestRealDocs {
             if (ok) pass++; else fail++;
         }
         System.out.println("REALDOCS TOTAL: " + pass + " passed, " + fail + " failed");
+        // main() used to return here whatever it found, so a printed FAIL could not fail
+        // the caller: verify-engine.sh runs this and the whole suite stayed green while
+        // these documents converted wrongly. The exit status now carries the verdict.
+        if (fail > 0) System.exit(1);
     }
 }
