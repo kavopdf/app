@@ -1,0 +1,370 @@
+{
+ "doc": "Screenshot_20261029_143058_KavoPDF_searchable",
+ "pages": 18,
+ "median_share5": 0.03,
+ "worst_share5": 0.03,
+ "clean": 18,
+ "median_text": 100.0,
+ "per_page": [
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 67.2,
+   "p90_pt": 84.96,
+   "max_pt": 84.96,
+   "n": 4046830,
+   "n_ours": 4068098,
+   "page": 1,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.01,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 67.68,
+   "p90_pt": 84.48,
+   "max_pt": 84.48,
+   "n": 3997154,
+   "n_ours": 4020980,
+   "page": 2,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.02,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 67.92,
+   "p90_pt": 84.48,
+   "max_pt": 84.48,
+   "n": 3986929,
+   "n_ours": 4015582,
+   "page": 3,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.01,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 64.32,
+   "p90_pt": 85.44,
+   "max_pt": 85.44,
+   "n": 3976891,
+   "n_ours": 4018517,
+   "page": 4,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.03,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 67.92,
+   "p90_pt": 84.48,
+   "max_pt": 84.48,
+   "n": 3995436,
+   "n_ours": 4017651,
+   "page": 5,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.01,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 67.68,
+   "p90_pt": 84.96,
+   "max_pt": 84.96,
+   "n": 3926502,
+   "n_ours": 3956680,
+   "page": 6,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.02,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 68.16,
+   "p90_pt": 84.96,
+   "max_pt": 84.96,
+   "n": 3972118,
+   "n_ours": 4001510,
+   "page": 7,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.01,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 68.16,
+   "p90_pt": 84.96,
+   "max_pt": 84.96,
+   "n": 4000943,
+   "n_ours": 4024823,
+   "page": 8,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.02,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 67.68,
+   "p90_pt": 84.48,
+   "max_pt": 84.48,
+   "n": 4014365,
+   "n_ours": 4038849,
+   "page": 9,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.02,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 67.2,
+   "p90_pt": 84.48,
+   "max_pt": 84.48,
+   "n": 3989218,
+   "n_ours": 4015906,
+   "page": 10,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.02,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 67.2,
+   "p90_pt": 84.48,
+   "max_pt": 84.48,
+   "n": 4001502,
+   "n_ours": 4026414,
+   "page": 11,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.02,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 67.2,
+   "p90_pt": 84.48,
+   "max_pt": 84.48,
+   "n": 3963062,
+   "n_ours": 3998151,
+   "page": 12,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.02,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 65.04,
+   "p90_pt": 84.48,
+   "max_pt": 84.48,
+   "n": 3979532,
+   "n_ours": 4011611,
+   "page": 13,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.01,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 65.28,
+   "p90_pt": 84.96,
+   "max_pt": 84.96,
+   "n": 3984830,
+   "n_ours": 4007124,
+   "page": 14,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.02,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 66.24,
+   "p90_pt": 84.96,
+   "max_pt": 84.96,
+   "n": 3943505,
+   "n_ours": 3982105,
+   "page": 15,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.01,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 63.6,
+   "p90_pt": 84.96,
+   "max_pt": 84.96,
+   "n": 3944136,
+   "n_ours": 3976263,
+   "page": 16,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.03,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 64.8,
+   "p90_pt": 84.96,
+   "max_pt": 84.96,
+   "n": 3972078,
+   "n_ours": 4011614,
+   "page": 17,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.02,
+   "problem": "none"
+  },
+  {
+   "state": "compared",
+   "shares": {
+    "1": 0.03,
+    "2": 0.03,
+    "3": 0.03,
+    "5": 0.03,
+    "10": 0.03
+   },
+   "median_pt": 77.04,
+   "p90_pt": 95.52,
+   "max_pt": 95.52,
+   "n": 4478839,
+   "n_ours": 4505743,
+   "page": 18,
+   "signature": "clean",
+   "text_recall": 100.0,
+   "invent5": 0.02,
+   "problem": "none"
+  }
+ ]
+}
