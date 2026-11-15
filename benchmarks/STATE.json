@@ -1,34 +1,40 @@
 {
- "ran_at": "2026-11-15T19:01:18",
- "round": 1,
+ "ran_at": "2026-11-15T19:15:57",
  "layers": {
   "ground_truth": {
    "status": "pass",
    "exit": 0,
-   "note": "14/14 synthetic displacements recovered by construction"
+   "tail": [
+    "  warnings.warn("
+   ]
   },
   "measurement": {
    "status": "ok",
-   "docs_with_result": 212,
-   "of": 213,
-   "complete": true,
-   "note": "one document exempted with a reason - see EXEMPT.json"
+   "docs_with_result": 213,
+   "of": 211
   },
   "txt_checks": {
    "status": "available",
-   "exit": 0,
+   "exit": 2,
    "note": "named semantic checks; advisory, not a size"
   }
  },
+ "signatures": [
+  "[19:16:11]   content-loss    46 docs  median share@1px  30.6%",
+  "[19:16:11]   displacement    28 docs  median share@1px  29.1%",
+  "[19:16:11]   clean          121 docs  median share@1px   0.6%"
+ ],
+ "round": null,
  "ratchet": {
   "status": "compared",
   "baseline_docs": 212,
-  "current_docs": 212,
+  "current_docs": 213,
   "regressions": [],
   "improvements": [],
-  "new_documents": [],
+  "new_documents": [
+   "416_many_tiny_pages"
+  ],
   "disappeared": []
  },
- "verdict": "OK: no regressions against baseline",
- "provenance": "Produced by the full manual measurement of all 213 documents on 16 Nov, not by a gate.py run. The baseline cron re-runs gate.py and re-stamps this file with its own round on its next pass."
+ "verdict": "OK: no regressions against baseline"
 }
