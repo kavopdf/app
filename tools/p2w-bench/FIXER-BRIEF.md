@@ -186,14 +186,40 @@ STEP 1 - BUILD
   Corpus: gh release download corpus-v1 --repo kavopdf/app for the three zips; unzip into t; copy all PDFs into all/ (expect 208).
 
 STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
-  Read tools/p2w-bench/DEFECT-CLASSES.md and tools/p2w-bench/ATTEMPTS.json.
-  The .txt half has its own list in DEFECT-CLASSES-TXT.md. If either file is
-  missing or older than the store it describes, rebuild it first:
-      python3 tools/p2w-bench/classify.py
-      python3 tools/p2w-bench/classify.py --txt
+
+  Read benchmarks/DEFECT-CLASSES.md and tools/p2w-bench/ATTEMPTS.json.
+
+  *** THE PATH MATTERS. IT USED TO BE THE WRONG ONE. ***
+
+  Until 16 Nov this line said tools/p2w-bench/DEFECT-CLASSES.md, which is the OLD
+  pipeline's list: 45 rows named after verify_google check ids ('47_margins',
+  '20_within_10pt', '32_stroke_lines'). Nothing writes that file any more. The
+  classifier writes benchmarks/DEFECT-CLASSES.md, and it carries 92 OPEN rows across
+  the eight user-visible problem classes. The fixer was reading the ghost.
+
+  That is why ATTEMPTS.json shows 19 attempts across four check-id classes with ZERO
+  kept, and 14 attempts burned on '20_within_10pt' alone. The fixer was not failing at
+  fixing; it was fixing a queue that no longer described anything. A check id is a
+  property of a verifier. A problem name is a property of a document a user opened.
+
+  The eight classes, in damage order - this IS the queue:
+      content-missing-nothing-in-its-place   content GONE, nothing put in its place
+      content-missing-partly-replaced        gone, something else in its place
+      content-partly-lost-and-displaced      two defects on one page
+      content-partly-lost                    some gone, rest displaced
+      content-present-wholly-displaced       everything there, all of it moved
+      content-present-partly-displaced       most right, part moved
+      single-element-far-out                 one small thing (a stamp, a seal) far away
+
+  DO NOT rebuild the class file. It is the classifier's output and the classifier runs
+  before you, every round. If it is missing, stale, or has no OPEN row, the phase is
+  wrong - say so and stop, do not classify it yourself. `classify.py` is retired and
+  running it produces the ghost list this step just stopped reading.
+
+  The .txt half keeps its own list in DEFECT-CLASSES-TXT.md, still under
+  tools/p2w-bench/. Take the largest OPEN class from whichever half you are working.
+
   ATTEMPTS.json is shared: a class id is unique whichever half it came from.
-  Classes are data-driven groups of checks that fail on largely the same documents, named after the
-  leading check id, e.g. '19_worst_dy (+3)'. Do not invent a friendlier name.
   python3 tools/p2w-bench/classify.py --pick
   THAT IS THE CLASS YOU TAKE. Not "the top one" - the tool applies a cap you do not get to
   override: a class gets six attempts in a pass, then the queue moves on and it comes back after
@@ -533,16 +559,37 @@ STEP 8 - RECORD WHAT YOU LEARNED, THEN THE ATTEMPT
       python3 tools/p2w-bench/hypothesis.py --add "<exact class name>" "<the theory you tested>" \
               --result ruled-out|confirmed|untested --evidence "<the numbers that settled it>"
   Then record the attempt WITH ITS NUMBERS, so the outcome is computed rather than asserted:
-      python3 tools/p2w-bench/classify.py --attempt "<exact class name>" --moved <n> --total <n> \
-              --engine "$ENGINE"
-      (for a failed attempt with nothing to count: --outcome error)
+      python3 tools/p2w-bench/attempt.py --class "<exact problem name>" \
+              --moved <n> --total <n> --engine "$ENGINE"
+      (for a failed attempt with nothing to count: --outcome error --reason "<why>")
+
+  *** attempt.py, NOT classify.py. ***
+
+  Until 16 Nov this step recorded through `classify.py --attempt`, which refuses any name
+  that is not in the OLD check-id table. Verified:
+
+      $ classify.py --attempt "content-missing-nothing-in-its-place" --moved 0 --total 20
+      refused: '...' is not a class. The ledger is keyed by the exact name ...
+      Run classify.py and copy a name from the table exactly.
+
+  So the fixer could read the real queue and then be unable to record a single attempt
+  against it: the ledger and the work were in different vocabularies, and the ledger
+  refused the one that mattered. Every attempt it did record was against a check id, which
+  is why ATTEMPTS.json reads 19 attempts over four check-id classes and zero kept.
+
+  `attempt.py` keys the ledger by the problem name, refuses a name that is not in
+  benchmarks/DEFECT-CLASSES.md (so a typo cannot write against nothing), and computes
+  kept / reverted from --moved/--total rather than trusting a claim. See the ledger with:
+      python3 tools/p2w-bench/attempt.py --show
     ALWAYS PASS --engine. Without it the tool guesses which engine was "this attempt" by taking the
     last one in the store - and record.py writes that store sorted by (round, doc), so the last
     engine is whichever one that document was last measured under, not the one you just used. On
     13 Nov a run measured 3 of 10 documents moved and was told "0 of 5", because the store's tail
     held a different attempt's engine. Pass the id and the comparison is against the baseline you
     actually measured against.
-  Then run classify.py again so DEFECT-CLASSES.md reflects the new numbers and statuses.
+  Then update the class file's own row for this class - FIXED if the number improved,
+  PARKED with a reason if it did not. Do NOT run classify.py; the classifier owns that
+  file and rewrites it each round.
   A run that fixes nothing but leaves a RULED OUT entry has still saved the next attempt two
   hours. A run that leaves nothing at all has wasted the slot.
 
