@@ -98,6 +98,38 @@ def ratchet():
                 new_documents=sorted(set(cur) - set(base)),
                 disappeared=sorted(set(base) - set(cur)))
 
+def _find_round_json():
+    """ROUND.json, wherever this copy of gate.py happens to be running from.
+
+    The baseline cron copies gate.py into /scratch/work and runs it there, so
+    dirname(__file__)/../tools/p2w-bench/ROUND.json resolves to /tools/p2w-bench/ROUND.json,
+    which does not exist. S["round"] was then None on every real run, and measure_gate -
+    which refuses a measurement whose round stamp does not match the machine's - would
+    have refused for ever. The pipeline would have stopped at measure with the gate
+    reporting success.
+    """
+    here = os.path.dirname(os.path.abspath(__file__))
+    for c in (os.path.join(here, "..", "tools", "p2w-bench", "ROUND.json"),
+              "/scratch/work/p2w/repo/tools/p2w-bench/ROUND.json",
+              os.path.join(here, "tools", "p2w-bench", "ROUND.json")):
+        c = os.path.normpath(c)
+        if os.path.exists(c):
+            return c
+    return None
+
+
+def _expected_docs():
+    """211 synthetic + the real documents, counted not assumed."""
+    n = 211
+    for d in ("/scratch/work/realworld",
+              "/scratch/work/p2w/repo/benchmarks/realworld"):
+        if os.path.isdir(d):
+            real = len([f for f in os.listdir(d) if f.lower().endswith(".pdf")])
+            if real:
+                return n + real
+    return n
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--budget", type=int, default=250)
@@ -123,8 +155,14 @@ def main():
     # ---- layer 2: global measurement ----
     rc, out = sh(f"python3 {HERE}/p2w.py --budget {a.budget}", a.budget + 30)
     measured = len(glob.glob("/scratch/work/p2w/dist2/*.json"))
-    S["layers"]["measurement"] = dict(status="ok" if rc == 0 else f"exit{rc}",
-                                      docs_with_result=measured, of=211)
+    expected = _expected_docs()
+    # A run that stopped early is not a success. --budget is a time limit, so exit 0 can
+    # mean "measured 13 of 213 and ran out of time", and calling that "ok" is how a
+    # partial table got published with a clean verdict over it.
+    complete = (measured >= expected)
+    S["layers"]["measurement"] = dict(
+        status="ok" if (rc == 0 and complete) else ("incomplete" if rc == 0 else f"exit{rc}"),
+        docs_with_result=measured, of=expected, complete=complete)
     for line in out.splitlines():
         if "content-loss" in line or "displacement" in line or "clean" in line:
             S.setdefault("signatures", []).append(line.strip())
@@ -132,8 +170,13 @@ def main():
     # ---- layer 3: txt named checks ----
     vt = os.path.join(BENCH, "verify_txt.py")
     if os.path.exists(vt):
-        rc, out = sh(f"cd {BENCH} && python3 verify_txt.py --help", 60)
-        S["layers"]["txt_checks"] = dict(status="available", exit=rc,
+        # --list-checks is the supported way to prove the tool loads. --help exits 2, and
+        # this used to record that as "available" anyway - a smoke test whose failure was
+        # written down as a pass.
+        rc, out = sh(f"cd {BENCH} && python3 verify_txt.py --list-checks", 60)
+        S["layers"]["txt_checks"] = dict(
+            status="available" if rc == 0 else "BROKEN",
+            exit=rc,
             note="named semantic checks; advisory, not a size")
     else:
         S["layers"]["txt_checks"] = dict(status="not-run",
@@ -148,18 +191,29 @@ def main():
     # had measured anything - rounds 2 and 3 would run on round 1's numbers and prove
     # nothing. Stamping the round here, and requiring it in the gate, is what makes a new
     # round actually start with a new measurement.
+    rp = _find_round_json()
     try:
-        import json as _j
-        _r = _j.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                       "..", "tools", "p2w-bench", "ROUND.json")))
-        S["round"] = _r.get("round", 1)
+        S["round"] = json.load(open(rp)).get("round", 1) if rp else None
     except Exception:
         S["round"] = None
     S["ratchet"] = ratchet()
 
     # ---- verdict ----
+    #
+    # INCOMPLETE OUTRANKS EVERYTHING EXCEPT A FAILED GATE.
+    #
+    # A run that measured 13 of 213 documents has no regressions, because the 200 it
+    # never looked at cannot regress. Read on its own, that is a clean bill of health for
+    # a corpus that was barely touched - and this verdict is what measure_gate and the APK
+    # cron both read. So an incomplete measurement is named as one, before any comparison
+    # is allowed to speak.
     reg = S["ratchet"].get("regressions", [])
-    if reg:
+    meas = S["layers"]["measurement"]
+    if not meas.get("complete"):
+        S["verdict"] = ("INCOMPLETE: measured %d of %d documents - run again with more "
+                        "budget before trusting any comparison"
+                        % (meas["docs_with_result"], meas["of"]))
+    elif reg:
         S["verdict"] = f"REGRESSION: {len(reg)} document(s) worse than baseline"
     elif S["ratchet"].get("status") != "compared":
         S["verdict"] = "OK, but no baseline to ratchet against"

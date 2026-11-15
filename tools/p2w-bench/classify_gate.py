@@ -51,21 +51,31 @@ MEASURED = re.compile(r"Documents measured:\s*\*\*(\d+)\s*of\s*(\d+)\*\*")
 
 
 def scored_docs():
-    """Distinct documents RANKING.csv actually scored."""
+    """(scored, total) - distinct documents with a real score, and every row.
+
+    They are NOT the same number and the gate used to assume they were. A document that
+    cannot be measured is exempted, so the class file's header reads "212 of 213": 212
+    scored, 213 in the corpus. Comparing the header's M against the SCORED count made
+    every corpus with one exemption fail for ever - the gate would refuse, the phase would
+    never advance, and the reason it printed ("classify again") would be wrong, because
+    classifying again cannot change how many documents were measured.
+    """
     docs = set()
+    total = 0
     if not os.path.exists(RANKING):
-        return docs
+        return docs, 0
     with open(RANKING, encoding="utf-8") as f:
         for r in csv.DictReader(f):
             doc = (r.get("document") or "").strip()
             if not doc:
                 continue
+            total += 1
             try:
                 float((r.get("share5") or "").strip())
             except (TypeError, ValueError):
                 continue
             docs.add(doc)
-    return docs
+    return docs, total
 
 
 def header_count(path):
@@ -81,7 +91,7 @@ def header_count(path):
 
 
 def main(argv):
-    docs = scored_docs()
+    docs, total_rows = scored_docs()
     head = header_count(DOCX_CLASSES)
     problems = []
 
@@ -98,16 +108,17 @@ def main(argv):
             problems.append(
                 "DEFECT-CLASSES.md covers %d documents, RANKING.csv scored %d - "
                 "classify again" % (measured, len(docs)))
-        if total != len(docs):
+        # M is the corpus size, not the scored count - see scored_docs().
+        if total != total_rows:
             problems.append(
-                "DEFECT-CLASSES.md says the corpus is %d documents, RANKING.csv scored %d - "
-                "classify again" % (total, len(docs)))
+                "DEFECT-CLASSES.md says the corpus is %d documents, RANKING.csv holds %d "
+                "rows - classify again" % (total, total_rows))
 
     ok = not problems
 
     if "--quiet" not in argv:
-        print("docx   %d scored in RANKING.csv, class file covers %s"
-              % (len(docs), "%d of %d" % head if head else "nothing"))
+        print("docx   %d scored of %d rows, class file covers %s"
+              % (len(docs), total_rows, "%d of %d" % head if head else "nothing"))
         for p in problems:
             print("  - %s" % p)
         print("READY - the class file covers the whole measurement" if ok

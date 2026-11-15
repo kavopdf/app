@@ -1,4 +1,6 @@
 {
-  "docx": {},
-  "txt": {}
+ "docx": {
+  "416_many_tiny_pages": "300 pages. One whole-document measurement exceeds the per-command budget, so the run is killed mid-document and no result is written. Exempted so it does not block the phase for ever; the real fix is resumable page-by-page measurement, the same fix the nine-page forms need. Recorded here rather than dropped."
+ },
+ "txt": {}
 }

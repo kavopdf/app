@@ -211,6 +211,35 @@ def ist(fmt="%d %b %H:%M"):
     return time.strftime(fmt, t)
 
 
+# How far into the future a claim may sit before it is treated as corrupt rather than
+# live. Some jitter is real - two machines, NTP correcting, a run that writes a second
+# early - so a small window is allowed. Beyond it, a future timestamp is a broken record,
+# not a running job.
+FUTURE_TOLERANCE_MIN = 5
+
+
+def claim_age_min(started):
+    """Minutes since a claim, or None when there is no claim.
+
+    A NEGATIVE age is the dangerous case and this is why the helper exists. With
+    `age = (now - started)/60` a timestamp written in the future - clock skew, a
+    hand-edited ROUND.json, a timezone mistake - produces a negative age, and
+    `age < limit` is then true for ever. The slot reads as busy for ever, the cron
+    stands aside on every run, and the phase never moves. That is indistinguishable
+    from the pipeline working until someone reads ROUND.json by hand.
+
+    So a timestamp far in the future is treated as stale, which lets the next run take
+    the slot. The cost of being wrong is one doubled run; the cost of the bug was a
+    pipeline that never ran again.
+    """
+    if not started:
+        return None
+    age = (time.time() - started) / 60.0
+    if age < -FUTURE_TOLERANCE_MIN:
+        return 1e9
+    return age
+
+
 def claim(name):
     """Return 0 if this run may proceed, 1 if a previous one is still working.
 
@@ -221,8 +250,9 @@ def claim(name):
     s = load()
     key = "%s_started" % name
     limit = CLAIM_STALE_MIN.get(name, 60)
-    last = s.get(key) or 0
-    age_min = (time.time() - last) / 60.0 if last else 1e9
+    age_min = claim_age_min(s.get(key))
+    if age_min is None:
+        age_min = 1e9
     if age_min < limit:
         print("%s busy - previous run started %d min ago (stale after %d min)"
               % (name, age_min, limit))
@@ -298,7 +328,7 @@ def release(name, force=False):
             break
 
     if name == "fixer" and started and not force and s.get("phase") == "fix" and any_open:
-        age = (time.time() - started) / 60.0
+        age = claim_age_min(started) or 0.0
         done = _attempts_this_run()
         if age < 25 and done < 2:
             print("refused: this run is %d minutes old with %d attempt(s) recorded." % (age, done))
@@ -543,8 +573,26 @@ def main(argv):
             out.append(line.rstrip("\n"))
         open(BASE, "w", encoding="utf-8").write("\n".join(out) + "\n")
 
-        # A new round means new defects to find; classes start fresh, but the
-        # attempt ledger is archived first so the history survives.
+        # A new round means new defects to find, so the class files are BLANKED.
+        #
+        # They used to survive the boundary, and that made rounds 2 and 3 fake. The
+        # fixer marks a class FIXED when its number improves; the next round then
+        # inherits a file that already says everything is FIXED, --close-round finds no
+        # OPEN row, and the round closes instantly having done nothing. Three such rounds
+        # reach done and the app ships on one round of work dressed as three.
+        #
+        # Blanking forces the classifier to write a fresh classification from the new
+        # measurement, and classify_gate refuses to advance until it has - so a round
+        # cannot reach fix, let alone close, without a class list built for that round.
+        # The file is emptied rather than deleted, so its absence is never mistaken for
+        # "no defects found".
+        for cf in (CLASSES_B, CLASSES):
+            if os.path.exists(cf):
+                open(cf, "w", encoding="utf-8").write(
+                    "# Defect classes - this round has not been classified yet\n\n"
+                    "The classifier writes this file. round.py blanks it when a round "
+                    "closes, so a new round cannot inherit the previous round's verdicts.\n")
+
         if os.path.exists(ATTEMPTS):
             os.remove(ATTEMPTS)
 

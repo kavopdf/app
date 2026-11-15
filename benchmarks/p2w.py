@@ -281,8 +281,33 @@ def validate():
 # them to the corpus is how the fixer gets to work on the largest defect in the project on
 # its first run instead of never.
 CORPUS_SYNTHETIC = 211
+def _realworld_dirs():
+    """Every place the real-world documents might sit, most specific first.
+
+    The baseline cron copies only the two .py files into /scratch/work and runs them
+    from there. benchmarks/realworld/ does NOT come along, so looking only beside the
+    script found nothing and the corpus stayed at 211 - while measure_gate, which runs
+    from the clone where the directory does exist, expected 213. 211 < 213 is a gate that
+    refuses for ever, and the pipeline stops at step one with every cron reporting success.
+
+    So: beside the script, then in the repo this script clones for the engine, then in a
+    benchmarks/ directory beside the script. Whichever exists is used.
+    """
+    return [HERE + "/realworld",
+            REPO + "/benchmarks/realworld",
+            HERE + "/benchmarks/realworld"]
+
+
+def _realworld_count():
+    for d in _realworld_dirs():
+        n = len(glob.glob(d + "/*.pdf"))
+        if n:
+            return n, d
+    return 0, None
+
+
 def corpus():
-    real=len(glob.glob(HERE+"/realworld/*.pdf"))
+    real, real_dir = _realworld_count()
     want=CORPUS_SYNTHETIC+real
     n=len(glob.glob(CORPUS+"/*.pdf"))
     if n>=want: return n
@@ -293,8 +318,10 @@ def corpus():
         if os.path.exists(c): sh(f"unzip -oq '{c}' -d {ROOT}/x",130)
     sh("find "+ROOT+"/x -name '*.pdf' -exec cp {} "+CORPUS+"/ \\;",130)
     # The real-world documents travel with the repository, not the release, so a cron that
-    # clones the repo gets them without any extra download.
-    sh(f"cp {HERE}/realworld/*.pdf {CORPUS}/",60)
+    # clones the repo gets them without any extra download. real_dir is wherever they were
+    # actually found - see _realworld_dirs() for why it is not simply HERE/realworld.
+    if real_dir:
+        sh(f"cp {real_dir}/*.pdf {CORPUS}/",60)
     return len(glob.glob(CORPUS+"/*.pdf"))
 def engine():
     if os.path.exists(REPO+"/tools/engine-verify/out"): return True
@@ -336,7 +363,22 @@ def rank():
     r=sorted(seen.values(),key=lambda x:(-x['share5'],-x['max_pt']))
     cols=['rank','document','signature','problem','share1','share2','share3','share5','share10',
           'median_pt','p90_pt','max_pt','text_recall','chars_missing','worst_page','pages']
-    with open('/scratch/output/RANKING.csv','w',newline='') as fh:
+    # A PARTIAL RUN MUST NOT DESTROY THE PUBLISHED TABLE.
+    #
+    # --budget is a time limit, so a run can stop after 13 documents of 213. This used to
+    # write whatever it had to RANKING.csv, replacing the committed table with 13 rows -
+    # and gate.py then reported "OK: no regressions" because the 200 missing documents
+    # were not regressions, they were absent. One timed-out run silently deleted the
+    # baseline. A partial measurement now goes to RANKING.partial.csv and the published
+    # table is left alone.
+    want = len(glob.glob(CORPUS + "/*.pdf"))
+    have = len(seen) + len(errs)
+    complete = (want > 0 and have >= want)
+    out_path = '/scratch/output/RANKING.csv' if complete else '/scratch/output/RANKING.partial.csv'
+    if not complete:
+        log(f"  PARTIAL: {have} of {want} measured - writing {os.path.basename(out_path)}, "
+            f"the published RANKING.csv is untouched")
+    with open(out_path,'w',newline='') as fh:
         w=csv.writer(fh); w.writerow(cols)
         for i,x in enumerate(r,1):
             w.writerow([i,x['doc'][:-5],x['signature'],x['problem'],x['share1'],x['share2'],x['share3'],
@@ -349,7 +391,10 @@ def rank():
     return r
 def status():
     p=len(glob.glob(CORPUS+"/*.pdf")); d=len(glob.glob(DOCX+"/*.docx")); m=len(glob.glob(DIST+"/*.json"))
-    log(f"corpus {p}/211  docx {d}/211  measured {m}/211  remaining {max(0,211-m)}")
+    # The corpus is 211 synthetic + the real documents, so the denominator is counted,
+    # never assumed. A hard-coded 211 made a 213-document corpus look permanently short.
+    want = p or (CORPUS_SYNTHETIC + _realworld_count()[0])
+    log(f"corpus {p}/{want}  docx {d}/{want}  measured {m}/{want}  remaining {max(0,want-m)}")
 
 def diagnose(n):
     os.makedirs(IMG,exist_ok=True)
