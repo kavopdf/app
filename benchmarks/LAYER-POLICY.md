@@ -49,9 +49,34 @@ carry — UTF-8 validity, page separators, symbol counts, line order, page
 furniture — which is why they are kept.
 
 **They are advisory, and a check that cannot fail is a bug in the check, not a
-pass.** The falsifiability gate already showed that 66 % of verify_google's
-passes could not have failed. Before a check's result is quoted, it must be
-shown capable of failing; otherwise it is retired or repaired.
+pass.** Before a check's result is quoted, it must be shown capable of failing;
+otherwise it is retired or repaired.
+
+**Measured status of the falsifiability, and a retraction.**
+
+The .txt checks: 12 of 12 proven able to fail (`TXT-FALSIFIABILITY.md`,
+`T09-FURNITURE-FIX.md`). Getting there required fixing two checks -- t09 could
+only see MISSING furniture, and t06/t10 had never been given the input they test.
+
+The docx checks: 47 of 47 proven able to fail (`FALSIFY-47-RESULT.md`). 41
+mutations, each aimed at specific checks of a real corpus document; 41 fired
+their target, 0 missed, 0 errored, and every one of the 47 fired at least once.
+
+**This page used to say "the falsifiability gate already showed that 66 % of
+verify_google's passes could not have failed." That was wrong and it is
+withdrawn.** The figure came from a run against an earlier verifier; the harness
+had since broken (`set_universe()` was removed from verify_google.py), so nobody
+could reproduce it, and when it was repaired the measurement said the opposite.
+It is recorded rather than quietly deleted because a number that is repeated
+after it stops being reproducible is the exact failure this whole layer exists
+to prevent.
+
+So the 47 checks are advisory for one reason only, and it never needed a
+percentage: **a named check tells you a defect exists, it does not tell you how
+large it is.** `01_page_count` cannot say a document is 3 % wrong; `share@5px`
+can. Falsifiable is the floor -- it says the check responds when its input
+breaks. It does not say the check responds to the right things, which needs
+documents known to be correct, not mutations known to be wrong.
 
 ## The ratchet
 
