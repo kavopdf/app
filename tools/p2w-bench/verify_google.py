@@ -298,34 +298,6 @@ _PS_SUFFIX = ("psmt", "mt", "ps")
 # 53 does the same reduction inside family(), which is also the only place that needs it.
 
 
-def _torn_lines(s_text, g_text):
-    """Lines whose second half reappears elsewhere in the render.
-
-    A line is torn when its first words and its last words both occur in the render but no
-    single render line contains them together. That is what a reader sees as broken order;
-    everything else the LCS rule counted was two extractors disagreeing about a table's
-    cell order, which is a property of the producer's drawing sequence, not of the document.
-    """
-    s_lines = [ln for ln in s_text.split("\n") if ln.strip()]
-    g_lines = [ln.strip() for ln in g_text.split("\n") if ln.strip()]
-    if not s_lines or not g_lines:
-        return []
-    g_joined = "\n".join(g_lines)
-    torn = []
-    for ln in s_lines:
-        words = [norm_word(w) for w in ln.split() if w.strip()]
-        if len(words) < 4:
-            continue
-        head, tail = " ".join(words[:2]), " ".join(words[-2:])
-        if head not in g_joined or tail not in g_joined:
-            continue
-        if any(head in g_ln and tail in g_ln for g_ln in g_lines):
-            continue
-        torn.append(ln.strip())
-    return torn
-
-
-
 def norm_word(w):
     """Digits and punctuation kept; whitespace, C0 controls and case dropped.
 
@@ -4720,9 +4692,87 @@ def compare(src_path, gd_path, docx_path=None):
     if gained_cols:
         print("13_text_colours: the render carries %d colour(s) the source does not: %s"
               % (len(gained_cols), ", ".join("#%06X" % c for c in gained_cols)))
+
+    # THE MASS CLAUSE, added 15 Nov: the GAIN clause above asks whether the render INVENTED a
+    # colour, and a colour that MOVED onto text it never owned is not an invention - both
+    # colours already exist, so the set is unchanged and the clause reads 0.
+    #
+    # THE HOLE, PROVEN. Constructed on 42_table_coloured_header_alternating_rows by swapping
+    # the two w:color values the engine wrote, on every run, and re-rendering (case M13_swap):
+    # 13 reads 4 -> 4, kept 4 of 4, no gain, and PASSES, while 34b falls to 84 % - a render
+    # that paints the body text in the header's colour and the header in the body's passes the
+    # check whose subject is which text carries which colour. The swap is invisible to every
+    # aggregate over the colour SET, which is why the set clause could not be repaired by
+    # tightening it: 2 -> 2 is the same number before and after.
+    #
+    # THE UNIT IS THE CHARACTER MASS PER COLOUR, AS A SHARE. Not a count of runs - a run
+    # boundary is the extractor's grouping, which retired 02/06/07 - and not a raw count of
+    # characters, because a document that lost characters everywhere (411_nested_xobject_
+    # transforms, 24 % of its text) moves every raw count at once. A SHARE of the document's
+    # own characters cancels that: on 411 the one colour is 100 % of the text on both sides.
+    #
+    # COLOURS ARE GROUPED BEFORE THEY ARE COMPARED. colour_same() is a tolerance, not an
+    # identity, so two source colours can both be "the same colour as" one render colour - on
+    # boq-horizontal-rules-only #111111 and #1C1C1C are one black - and a per-colour map would
+    # then charge the whole of one to the other (that document read a 89 % deviation under a
+    # greedy first-match, against 0.0 % under the classes below).
+    #
+    # THE FLOOR IS MEASURED, NOT INVENTED. Over the 211 pairs, the worst share a colour moves
+    # between a source and a faithful render is 6.8 % (305_vaccination_certificate); 186 of
+    # the 211 move under 0.1 %. One document moves 24.5 % - text-held-twice-shadow-text, where
+    # the render paints two body paragraphs white and doubles the heading, and where 04 passes
+    # (the characters are all there), 25 passes (no fill behind them) and 34b forgives 12 % of
+    # spans at its floor. That is a true fire, and it is the one document this clause adds to
+    # the 211. The floor sits in the gap at 10 %; the swap it must catch moves 12.9 points.
+    COLOUR_MASS_TOL = 0.10
+
+    s_mass, g_mass = collections.Counter(), collections.Counter()
+    for r in s_runs:
+        s_mass[r["colour"]] += len(r["text"])
+    for r in g_runs:
+        g_mass[r["colour"]] += len(r["text"])
+
+    _cols = list(s_col_set | g_col_set)
+    _parent = {c: c for c in _cols}
+
+    def _class_of(x):
+        while _parent[x] != x:
+            _parent[x] = _parent[_parent[x]]
+            x = _parent[x]
+        return x
+
+    for _i in range(len(_cols)):
+        for _j in range(_i + 1, len(_cols)):
+            if colour_same(_cols[_i], _cols[_j]):
+                _parent[_class_of(_cols[_i])] = _class_of(_cols[_j])
+    cl_s, cl_g = collections.Counter(), collections.Counter()
+    for c, v in s_mass.items():
+        cl_s[_class_of(c)] += v
+    for c, v in g_mass.items():
+        cl_g[_class_of(c)] += v
+    _ts, _tg = sum(cl_s.values()), sum(cl_g.values())
+    moved_cols = []
+    if _ts and _tg:
+        for k in set(cl_s) | set(cl_g):
+            d = cl_g.get(k, 0) / _tg - cl_s.get(k, 0) / _ts
+            if abs(d) > COLOUR_MASS_TOL:
+                moved_cols.append((k, d))
+    # THE VERDICT AND THE NUMBER MUST NOT DISAGREE, which is what retired 03_word_count: a
+    # pair that reads the same on both sides while the verdict is FAIL teaches a fixer the
+    # wrong thing. The pair stays the COLOUR COUNT - that is this check's subject and its
+    # name - and the clause that decided a failure writes the reason in the fourth element,
+    # where 52_outline already records what is reported but not scored.
+    mass_detail = None
+    if moved_cols:
+        mass_detail = ", ".join("#%06X %+.1f %%" % (k, 100 * d)
+                                for k, d in sorted(moved_cols, key=lambda t: -abs(t[1])))
+        print("13_text_colours: the share of the text a colour carries moved by more than "
+              + str(int(round(100 * COLOUR_MASS_TOL))) + " % of the document: " + mass_detail)
     checks["13_text_colours"] = (len(s_col_set), kept_cols,
                                  (len(s_col_set) == 0 or kept_cols == len(s_col_set))
-                                 and not gained_cols)
+                                 and not gained_cols and not moved_cols,
+                                 ("the share of the text a colour carries moved: " + mass_detail)
+                                 if mass_detail else None)
 
     # 14_filled_shapes: INK AREA and PLACEMENT, not a count.
     #
@@ -4924,8 +4974,17 @@ def compare(src_path, gd_path, docx_path=None):
         return found
 
     def fill_boxes(page):
-        """Every drawing that PAINTS a fill, with its rect. Any size - the floor does the
-        cutting, and it does it in the placement clause only.
+        """Every drawing that PAINTS a fill, with its rect AND its colour. Any size - the
+        floor does the cutting, and it does it in the placement clause only.
+
+        THE COLOUR IS KEPT, and it was not before: this returned the rect alone, so
+        `d["fill"]` was discarded one line after being tested for None and NOTHING in the
+        universe compared the colour of a filled band. That is the hole both colour defects
+        went through. Constructed on 42_table_coloured_header_alternating_rows by recolouring
+        its alternating row band #EDF2FF -> #FFFFFF in the engine's .docx and re-rendering
+        (case M14_recolour): the band is drawn at the same place, the same size, over the same
+        cells, so area and centre both hold, and the check read 43/43 - a whole table's
+        shading turned white on a white page and no check in the universe moved.
 
         A fill a soft mask lets nothing through is not ink the page shows, so it is not
         counted on the source side either. Measured on 414_transparency_softmask: without
@@ -4936,7 +4995,8 @@ def compare(src_path, gd_path, docx_path=None):
         skip = softmask_ink(page)
         paints = mask_paints(page)
         for d in page.get_drawings():
-            if d.get("fill") is None:
+            f = d.get("fill")
+            if f is None:
                 continue
             if (d.get("fill_alpha") or 1.0) == 0.0:
                 continue
@@ -4948,37 +5008,104 @@ def compare(src_path, gd_path, docx_path=None):
             if paints is not None and not any(
                     v > 0.02 and _overlap(r, mr) > 0 for mr, v in paints):
                 continue
-            out.append(r)
+            out.append((r, tuple(round(c * 255) for c in f[:3]), solid_rect(d)))
         return out
+
+    # THE COLOUR CLAUSE, added 15 Nov, is a third question and the same unit as the other two:
+    # the fill that covers a source fill's centre must BE that colour. Not a new population -
+    # the same FILL_PLACE_PT2 candidates the placement clause walks - because a recoloured band
+    # is a fill whose centre is covered by a fill of the wrong colour, and splitting it out
+    # would have meant two passes over one list.
+    #
+    # THE FLOOR IS MEASURED. Over the 211 pairs there are 306 source fills of 400 pt2 or more
+    # whose centre a same-sized solid render fill covers, on 91 documents, and the worst dE00
+    # among all 306 is 0.48 - every one of them the same colour drawn twice. The mutant this
+    # clause exists for reads 6.5 (#EDF2FF -> #FFFFFF on 42_table_coloured_header_alternating_
+    # rows) and 63.9 for the same band taken to the header's #1A338C. The floor sits between
+    # them at 2.0: four times the corpus's own noise and a third of the palest real recolour.
+    # It is also below colour_same()'s 6.0, so this clause can never fire on a colour this
+    # file already treats as the same colour as a span.
+    FILL_COLOUR_DE = 2.0
+    # A FILL'S RECT IS NOT ITS INK unless the path IS a rectangle, and the colour clause reads
+    # the ink. pymupdf reports one `fill` per PAINTED PATH, with the path's bounding box as
+    # `rect`: the QR code on gst-invoice-with-qr-code is 724 line items in one fill, and its
+    # bbox is the whole 40 x 40 module field. Charging that path the colour of the white quiet
+    # zone it sits on reported eight corpus documents as recoloured bands when what had
+    # happened was that a glyph-like path had been drawn over a source fill's centre. So a
+    # render fill is a COLOUR CANDIDATE only when its own outline encloses its bounding box -
+    # a rectangle drawn as one `re` or as four `l` - and only when it is the same SIZE as the
+    # source fill (ratio within a factor of two), because a band redrawn is the same band.
+    def solid_rect(d):
+        items = d.get("items") or []
+        if len(items) == 1 and items[0][0] == "re":
+            return True
+        if len(items) != 4 or any(it[0] != "l" for it in items):
+            return False
+        pts = [items[0][1]] + [it[2] for it in items]
+        area = 0.0
+        for k in range(len(pts)):
+            x0, y0 = pts[k].x, pts[k].y
+            x1, y1 = pts[(k + 1) % len(pts)].x, pts[(k + 1) % len(pts)].y
+            area += x0 * y1 - x1 * y0
+        r = d["rect"]
+        box = r.width * r.height
+        return box > 0 and abs(abs(area) / 2.0 - box) <= 0.02 * box
 
     s_area = g_area = 0.0
     thin_pages = []
     orphans = 0
+    recoloured = []
     for i in range(max(src.page_count, gd.page_count)):
         sb = fill_boxes(src[i]) if i < src.page_count else []
         gb = fill_boxes(gd[i]) if i < gd.page_count else []
-        sa = sum(r.width * r.height for r in sb)
-        ga = sum(r.width * r.height for r in gb)
+        sa = sum(r.width * r.height for r, _c, _s in sb)
+        ga = sum(r.width * r.height for r, _c, _s in gb)
         s_area += sa
         g_area += ga
         if sa > 0 and ga < FILL_AREA_FLOOR * sa:
             thin_pages.append(i + 1)
-        for r in sb:
+        for r, col, _s in sb:
             if r.width * r.height < FILL_PLACE_PT2:
                 continue
             cx, cy = (r.x0 + r.x1) / 2.0, (r.y0 + r.y1) / 2.0
-            if not any(q.x0 <= cx <= q.x1 and q.y0 <= cy <= q.y1 for q in gb):
+            cover = [(q, c, s) for q, c, s in gb if q.x0 <= cx <= q.x1 and q.y0 <= cy <= q.y1]
+            if not cover:
                 orphans += 1
+                continue
+            area_s = r.width * r.height
+            over = [c for q, c, s in cover
+                    if s and 0.5 <= (q.width * q.height) / area_s <= 2.0]
+            if not over:
+                continue
+            # The NEAREST colour among the fills that cover the centre, not the first: a render
+            # legitimately stacks a white page-sized fill under every band it draws, and a
+            # first-match test would read that white and charge the band for it.
+            de = min(_de00(_lab(tuple(v / 255.0 for v in col)),
+                           _lab(tuple(v / 255.0 for v in c))) for c in over)
+            if de > FILL_COLOUR_DE:
+                recoloured.append((i + 1, "#%02X%02X%02X" % col,
+                                   "#%02X%02X%02X" % min(over, key=lambda c: _de00(
+                                       _lab(tuple(v / 255.0 for v in col)),
+                                       _lab(tuple(v / 255.0 for v in c)))), round(de, 1)))
     if thin_pages:
         print("14_filled_shapes: ink area under %.0f %% of the source on page(s) %s"
               % (100 * FILL_AREA_FLOOR, ",".join(str(p) for p in thin_pages[:6])))
     if orphans:
         print("14_filled_shapes: %d source fill(s) of %.0f pt2 or more have no render fill "
               "over their centre" % (orphans, FILL_PLACE_PT2))
-    # Source has no filled ink: there is no area to fall below, and the placement clause has
-    # no candidates. A render that GAINS fills is not a loss and still passes.
+    if recoloured:
+        print("14_filled_shapes: %d source fill(s) are covered by a fill of another colour: %s"
+              % (len(recoloured), "; ".join("page %d %s -> %s (dE00 %.1f)" % t
+                                            for t in recoloured[:6])))
+    # Source has no filled ink: there is no area to fall below, and neither the placement nor
+    # the colour clause has a candidate. A render that GAINS fills is not a loss and passes.
+    # Same rule as 13: the pair is the AREA, which is this check's subject, and the clause
+    # that decided a failure writes why - a recoloured band has the same area on both sides.
     checks["14_filled_shapes"] = (int(round(s_area)), int(round(g_area)),
-                                  not thin_pages and orphans == 0)
+                                  not thin_pages and orphans == 0 and not recoloured,
+                                  ("covered by a fill of another colour: " + "; ".join(
+                                      "page %d %s -> %s (dE00 %.1f)" % t for t in recoloured[:6]))
+                                  if recoloured else None)
 
     # 15_links RETIRED 13 Nov. It counted LINK ANNOTATIONS, and the object is a SET
     # OF TARGETS. Three separate measurements say so.
@@ -5378,8 +5505,51 @@ def compare(src_path, gd_path, docx_path=None):
     # the old rule failed 88. The 10 visually destroyed pages are overflow, and they belong to
     # 26_text_overlap, which already fails them. (41_block_spacing was named here too and is
     # now retired - see its note above 42.)
-    torn = _torn_lines(s_text, g_text)
-    checks["22_reading_order"] = (0, len(torn), not torn)
+    # 22_reading_order RETIRED 15 Nov - it could not fail on ANY input, and the property it
+    # named is not independently measurable from a PDF.
+    #
+    # DEAD AS WRITTEN. `torn = _torn_lines(s_text, g_text)` split its arguments on "\n", and
+    # both arguments are built as `" ".join(...)` at the top of this function - no newline can
+    # survive that join. So s_lines and g_lines each held ONE element on all 211 documents,
+    # the `head in g_ln and tail in g_ln` guard was satisfied whenever any text survived at
+    # all, and the check reported 0 -> 0 and passed on every document, every run. Measured:
+    # it fails 0 of 211, and a constructed render whose five lines are DRAWN bottom-to-top
+    # instead of top-to-bottom (case C22_draw_order, every position identical) reads 0 and
+    # passes - extraction re-sorts by position, so the draw order never reaches the check.
+    # A check that can never be cast is not a vote, it is a free pass in the denominator.
+    #
+    # REBUILT, AND STILL NOT A PROPERTY. The obvious repair is an inversion count - order
+    # two paired lines the other way round and the check fires. Built and measured on the 211
+    # pairs (vertical order inversions between lines unique on their page, upright lines only
+    # as 18 judges them, GAP 2 pt): 205 documents read 0, and the 6 that read > 0 are 21, 13,
+    # 10, 9, 8, 2. Every ONE of those 6 also fails 18_displacement - 6 of 6, no exclusive fire,
+    # and 18's population (it fails 28 of 211 at 0c2beaa) contains this one. So the rebuilt
+    # check is a second vote on the displacement 18 already charges. (The audit's earlier
+    # measurement read 10 of 211 against 18's 35, on the 2ee3596 engine; the containment is
+    # the same result, the counts moved with the engine.)
+    #
+    # WHY NO REPAIR CAN DO BETTER. Order in a PDF is a function of GEOMETRY: two lines are
+    # read in the order they are placed. So a wrong order is always some line in the wrong
+    # place, and the smallest such error is a displacement. Within a column an inversion
+    # needs the two lines to cross, i.e. a move of half a pitch, which 18's per-run cap
+    # (twice the tolerance, ~8.4 pt at 12 pt) charges. Across columns an inversion is not an
+    # error at all - the two lines are read in different columns - and a check that counts
+    # them fires on noise: constructed on BASE, one line of a two-column page moved 6 pt, the
+    # order flips, 18 passes (inside tolerance) and nothing a reader can see has changed.
+    # The only remaining signal is the order the PRODUCER DREW the glyphs in, which is what
+    # the LCS rule measured and why it was abandoned: that is the drawing sequence, not a
+    # reading order, and a table's cells are row-major by construction while the producer may
+    # draw down a column.
+    #
+    # WHAT CARRIES IT NOW. A line torn in half and its second half landing elsewhere is a
+    # displacement of that run: 18_displacement charges it (the run is out by the whole
+    # distance to its new home, which is far outside twice its tolerance), and 26_text_overlap
+    # charges it where it lands on other text. Nothing in the universe counted reading order
+    # before today either, so this retirement removes one vote and no measurement.
+    #
+    # _torn_lines() stood here and was the whole of this check; it is kept as the formula in
+    # the paragraph above rather than as code, because a helper with no caller is a check
+    # waiting to be re-adopted.
 
     # ---- 23 line pitch: PAIRED, PER COLUMN, ON THE BASELINE -----------------
     # What this used to be: per page, the sorted set of distinct SPAN TOPS, the median of
@@ -5471,8 +5641,33 @@ def compare(src_path, gd_path, docx_path=None):
                      % (len(_pp), median(_d)))
     checks["23_line_pitch"] = (s_p, g_p, _p23_ok)
 
-    checks["24_page_breaks"] = (src.page_count, gd.page_count,
-                                src.page_count == gd.page_count)
+    # 24_page_breaks RETIRED 15 Nov - it was 01_page_count, character for character.
+    #
+    # THE SAME EXPRESSION, NOT A SIMILAR ONE. 01 is
+    #     (src.page_count, gd.page_count, src.page_count == gd.page_count)
+    # and 24 was that tuple with a different name on it: same two operands, same predicate.
+    # Two checks that read the same operands through the same operator cannot disagree, so
+    # the subset test is an identity in both directions - 24's fire set IS 01's, and 01's
+    # population IS 24's - which is the case for retiring the second one rather than keeping
+    # a corroborating vote. Measured on the 211 at 0c2beaa: both read identical values on 211
+    # of 211 and both fire on the same set - which is now EMPTY, because the engine fixed the
+    # one document that used to move them (itr-computation-with-slab-table, 1 page -> 2 at
+    # 2ee3596, 1 -> 1 here). An identity that agrees on a document nobody fails is still an
+    # identity, and the constructed case carries it: C01_extra_page (one page added to the
+    # render) reads 1 -> 2 on both and both fail. 55_orientation_mix fires on that same case
+    # for the same reason and is the
+    # only other check that does: its operands are the same page count, split by orientation,
+    # so any count change moves it too. That is a second predicate over one population - the
+    # shape 08/39/48/54 have - not a second name for this tuple.
+    #
+    # It also carried the wrong NAME. A "page break" is where a page ENDS, which the count
+    # cannot see: a document whose content moved onto an extra page has one more page and one
+    # fewer break, and a document that gained a blank page has one more of each. The name
+    # promised a property the body never measured, which is how it survived two audits.
+    #
+    # 01 keeps the measurement and its own name says exactly what it reads. Nothing goes
+    # unwatched: 01 fails on any page-count change, and 55_orientation_mix's operands are
+    # derived from the same count.
 
     # ---- VISUAL (25-31) -----------------------------------------------------
     s_invisible, s_off_page = _visual_counts(src)
