@@ -50,6 +50,36 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 STATE = os.path.join(HERE, "ROUND.json")
 BASE = os.path.join(HERE, "BASELINE.md")
 CLASSES = os.path.join(HERE, "DEFECT-CLASSES.md")
+# The classifier now writes benchmarks/DEFECT-CLASSES.md, beside the measurement it
+# describes. This file kept reading tools/p2w-bench/DEFECT-CLASSES.md, which nothing
+# wrote any more, so open_classes() always said 0 and --close-round always said
+# "nothing is OPEN" - a round could be closed with every class still unfixed.
+CLASSES_B = os.path.normpath(os.path.join(os.path.dirname(HERE), "..",
+                                          "benchmarks", "DEFECT-CLASSES.md"))
+
+
+def class_files():
+    """The class files this round is judged against. ONE authority, not two.
+
+    benchmarks/DEFECT-CLASSES.md is what the classifier writes now. tools/p2w-bench/
+    DEFECT-CLASSES.md is the old pipeline's list and describes defects in an engine that
+    no longer exists.
+
+    Reading BOTH is worse than reading either. The stale file still carries OPEN rows, so
+    --close-round would refuse for ever on classes nobody can fix, while a fixer working
+    from it would be fixing against a ghost. benchmarks/ wins outright when it is present;
+    tools/ is read only when benchmarks/ is absent, which is the one case where it is
+    still the best information available.
+    """
+    out = []
+    if os.path.exists(CLASSES_B):
+        out.append(CLASSES_B)
+    elif os.path.exists(CLASSES):
+        out.append(CLASSES)
+    txt = os.path.join(HERE, "DEFECT-CLASSES-TXT.md")
+    if os.path.exists(txt):
+        out.append(txt)
+    return out
 ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 
 ROUNDS_TOTAL = 3
@@ -88,31 +118,58 @@ def save(s):
     json.dump(s, open(STATE, "w", encoding="utf-8"), indent=2, sort_keys=True)
 
 
+# THE INSTRUMENT CHANGED AND THIS FILE DID NOT.
+#
+# rows() used to read BASELINE.md, because BASELINE.md was what the old verifier wrote.
+# The measurement layer is now benchmarks/p2w.py, and it writes benchmarks/RANKING.csv.
+# Nothing wrote BASELINE.md any more, so rows() returned (0, 0): status() said "0 of 0
+# documents scored" and every phase decision downstream was made against an empty table.
+# A phase machine reading a file nobody writes is not a phase machine, it is a decoration.
+#
+# RANKING.csv is now the source of truth: one row per document, and a row counts as
+# scored when share5 is a number. A MEASURE-ERROR row carries an empty share5 and is
+# therefore unscored - which is right, because it was not measured.
+RANKING = os.path.join(os.path.dirname(HERE), "..", "benchmarks", "RANKING.csv")
+
+
 def rows():
-    """(total, scored) from BASELINE.md. Header found by its first cell."""
+    """(total, scored) from benchmarks/RANKING.csv."""
     total = scored = 0
-    if not os.path.exists(BASE):
+    path = os.path.normpath(RANKING)
+    if not os.path.exists(path):
         return 0, 0
-    for line in open(BASE, encoding="utf-8"):
-        if not line.startswith("| ") or line.startswith("|---"):
-            continue
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if not cells or not cells[0] or cells[0].lower() == "document":
-            continue
-        total += 1
-        if re.match(r"\d+\s*/\s*\d+", cells[1] if len(cells) > 1 else ""):
-            scored += 1
+    try:
+        import csv as _csv
+        with open(path, encoding="utf-8") as f:
+            for r in _csv.DictReader(f):
+                total += 1
+                try:
+                    float((r.get("share5") or "").strip())
+                    scored += 1
+                except (TypeError, ValueError):
+                    pass
+    except Exception:
+        return 0, 0
     return total, scored
 
 
 def open_classes():
-    """Count classes still marked OPEN in DEFECT-CLASSES.md."""
-    if not os.path.exists(CLASSES):
+    """Count classes still marked OPEN, across every class file that exists.
+
+    "OPEN" is matched as a CELL, not as the last thing on the line. The old
+    endswith("| OPEN |") test silently stopped working the moment a column was added to
+    the right of it, which is a gate that turns itself off when the table is edited.
+    """
+    files = class_files()
+    if not files:
         return None
     n = 0
-    for line in open(CLASSES, encoding="utf-8"):
-        if line.startswith("| ") and not line.startswith("|---"):
-            if line.rstrip().endswith("| OPEN |"):
+    for fp in files:
+        for line in open(fp, encoding="utf-8"):
+            if not line.startswith("| ") or line.startswith("|---"):
+                continue
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) >= 3 and "OPEN" in cells:
                 n += 1
     return n
 
@@ -125,7 +182,7 @@ def status(s=None):
     print("  documents scored : %d of %d" % (scored, total))
     print("  open classes     : %s" % ("-" if oc is None else oc))
     if s["phase"] == "measure":
-        print("  next             : baseline runs until %d of %d are scored" % (total or 208, total or 208))
+        print("  next             : baseline runs until every row of RANKING.csv is scored")
     elif s["phase"] == "classify":
         print("  next             : classifier runs once")
     elif s["phase"] == "fix":
@@ -229,12 +286,12 @@ def release(name, force=False):
     # and it must be able to release and close - otherwise this check would block the only exit
     # from the fix phase, which is a worse bug than the one it fixes.
     any_open = False
-    for fname in ("DEFECT-CLASSES.md", "DEFECT-CLASSES-TXT.md"):
-        fp = os.path.join(HERE, fname)
-        if not os.path.exists(fp):
-            continue
+    for fp in class_files():
         for line in open(fp, encoding="utf-8"):
-            if line.startswith("| ") and line.rstrip().endswith("| OPEN |"):
+            if not line.startswith("| ") or line.startswith("|---"):
+                continue
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) >= 3 and "OPEN" in cells:
                 any_open = True
                 break
         if any_open:
@@ -327,8 +384,13 @@ def main(argv):
         n = int(argv[argv.index("--force-round") + 1])
         s["round"] = n
         s["phase"] = "measure"
+        # Every claim is cleared. A slot left claimed by the round that just ended reads
+        # as "a run is working" to the first run of the new round, which then sits out for
+        # up to 45 minutes doing nothing - a phase that looks busy and is idle.
+        for k in ("fixer_started", "baseline_started", "classifier_started"):
+            s[k] = 0
         save(s)
-        print("round forced to %d, phase measure" % n)
+        print("round forced to %d, phase measure, all slots released" % n)
         return 0
 
     if "--remeasure" in argv:
@@ -356,7 +418,12 @@ def main(argv):
         s = load()
         was = s.get("phase")
         s["phase"] = "measure"
-        s["baseline_started"] = 0
+        # All three, not just the baseline. Re-measuring means the classify and fix work
+        # built on the old numbers is void too, so their slots must not stay held: a
+        # classifier claim left over would make the classifier skip the very run it is
+        # needed for.
+        for k in ("fixer_started", "baseline_started", "classifier_started"):
+            s[k] = 0
         s.setdefault("history", []).append(
             {"at": ist("%d %b %H:%M"), "phase": "measure", "round": s.get("round"),
              "why": "engine changed - re-measure before fixing"})
@@ -420,10 +487,7 @@ def main(argv):
             return 1
 
         still_open = []
-        for name in ("DEFECT-CLASSES.md", "DEFECT-CLASSES-TXT.md"):
-            path = os.path.join(HERE, name)
-            if not os.path.exists(path):
-                continue
+        for path in class_files():
             for line in open(path, encoding="utf-8"):
                 if not line.startswith("| "):
                     continue

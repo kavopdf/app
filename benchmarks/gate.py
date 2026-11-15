@@ -137,6 +137,21 @@ def main():
             reason="verify_txt.py not present in this checkout")
 
     # ---- ratchet ----
+    # WHICH ROUND THESE NUMBERS BELONG TO.
+    #
+    # A round closes and RANKING.csv keeps every row it had, so "all rows scored" stays
+    # true across the boundary. Without a round stamp, measure_gate would read round 1's
+    # finished table as round 2's finished work and advance the phase before the baseline
+    # had measured anything - rounds 2 and 3 would run on round 1's numbers and prove
+    # nothing. Stamping the round here, and requiring it in the gate, is what makes a new
+    # round actually start with a new measurement.
+    try:
+        import json as _j
+        _r = _j.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                       "..", "tools", "p2w-bench", "ROUND.json")))
+        S["round"] = _r.get("round", 1)
+    except Exception:
+        S["round"] = None
     S["ratchet"] = ratchet()
 
     # ---- verdict ----

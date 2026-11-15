@@ -1,59 +1,75 @@
 #!/usr/bin/env python3
 """Is the classify phase finished? One question, one answer.
 
-The fixer must not start on a partial class list. If classify ran when 160 documents
-were scored and 48 more arrived afterwards, the classes describe the corpus as it was,
-not as it is - and the fixer would spend its day on a ranking that is already out of
-date, then hand a round to a baseline that measures something different.
+WHY THIS FILE WAS REWRITTEN
 
-That is the same shape as the measure gate: a phase that advances on a partial result
-looks like progress and produces work that has to be thrown away.
+It used to read DEFECT-CLASSES.md and RESULTS.jsonl from tools/p2w-bench/, and it required
+a header line "Documents measured: **N of M**". Three things were wrong with that once the
+measurement layer changed:
+
+  1. The classifier now writes benchmarks/DEFECT-CLASSES.md. This file read the old path,
+     which still held the previous pipeline's list, so the count it compared was the count
+     of a different corpus.
+  2. RESULTS.jsonl is not written by benchmarks/p2w.py at all. store_docs() therefore
+     returned an empty set, and "the .docx store is empty - there is nothing to classify"
+     fired on every single run.
+  3. Because of (2) the gate could never return 0.
+
+A classify gate that can never return 0 means the phase never advances from classify to
+fix, which means the fixer never runs, which means no round ever closes - and rounds 2 and
+3 never happen at all. That is the whole pipeline stopping at step two while every cron
+reports success.
+
+WHAT IT READS NOW
+
+  benchmarks/RANKING.csv          the document set that was measured
+  benchmarks/DEFECT-CLASSES.md    the classifier's output, beside the measurement
+
+The contract with the classifier is unchanged and is still worth keeping: the class file
+must state how many documents it covers, in the header line
+
+    Documents measured: **N of M**
+
+and N must equal the number of documents RANKING.csv scored. That comparison is content,
+not a timestamp - a fresh clone gives every file the same mtime, so a timestamp comparison
+proves nothing there, while a count survives being copied, committed and checked out.
 
     python3 tools/p2w-bench/classify_gate.py            # human answer, exit 0 or 1
     python3 tools/p2w-bench/classify_gate.py --quiet    # exit code only
-
-Exit 0 means both class files exist and each one's own document count matches the store
-it was built from. Exit 1 means not yet, and the lines above say which half is short.
-
-Why the document count and not the file's timestamp: a fresh clone gives every file the
-same mtime, so a timestamp comparison proves nothing there. The count is content, and it
-survives being copied, committed and checked out again.
 """
-import json
+import csv
 import os
 import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DOCX_CLASSES = os.path.join(HERE, "DEFECT-CLASSES.md")
-TXT_CLASSES = os.path.join(HERE, "DEFECT-CLASSES-TXT.md")
-DOCX_STORE = os.path.join(HERE, "RESULTS.jsonl")
-TXT_STORE = os.path.join(HERE, "RESULTS-TXT.jsonl")
+ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
+RANKING = os.path.join(ROOT, "benchmarks", "RANKING.csv")
+DOCX_CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
 
 MEASURED = re.compile(r"Documents measured:\s*\*\*(\d+)\s*of\s*(\d+)\*\*")
 
 
-def store_docs(path):
-    """Distinct documents in a results store."""
+def scored_docs():
+    """Distinct documents RANKING.csv actually scored."""
     docs = set()
-    if not os.path.exists(path):
+    if not os.path.exists(RANKING):
         return docs
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
+    with open(RANKING, encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            doc = (r.get("document") or "").strip()
+            if not doc:
                 continue
             try:
-                row = json.loads(line)
-            except ValueError:
+                float((r.get("share5") or "").strip())
+            except (TypeError, ValueError):
                 continue
-            if row.get("doc"):
-                docs.add(row["doc"])
+            docs.add(doc)
     return docs
 
 
 def header_count(path):
-    """(measured, total) from a class file's header, or None if it cannot be read."""
+    """(measured, total) from the class file's header, or None if it cannot be read."""
     if not os.path.exists(path):
         return None
     with open(path, encoding="utf-8") as f:
@@ -65,47 +81,37 @@ def header_count(path):
 
 
 def main(argv):
-    docx_docs = store_docs(DOCX_STORE)
-    txt_docs = store_docs(TXT_STORE)
-
-    docx_head = header_count(DOCX_CLASSES)
-    txt_head = header_count(TXT_CLASSES)
-
+    docs = scored_docs()
+    head = header_count(DOCX_CLASSES)
     problems = []
 
-    if docx_head is None:
-        problems.append("DEFECT-CLASSES.md is missing or has no 'Documents measured' line")
-    else:
-        measured, _total = docx_head
-        if measured != len(docx_docs):
-            problems.append(
-                "DEFECT-CLASSES.md covers %d documents, the .docx store holds %d - "
-                "classify again" % (measured, len(docx_docs)))
+    if not docs:
+        problems.append("RANKING.csv scored no documents - there is nothing to classify")
 
-    if txt_head is None:
-        problems.append("DEFECT-CLASSES-TXT.md is missing or has no 'Documents measured' line")
+    if head is None:
+        problems.append("benchmarks/DEFECT-CLASSES.md is missing or has no "
+                        "'Documents measured: **N of M**' line - the classifier must write "
+                        "that header, it is how coverage is proved")
     else:
-        measured, _total = txt_head
-        if measured != len(txt_docs):
+        measured, total = head
+        if measured != len(docs):
             problems.append(
-                "DEFECT-CLASSES-TXT.md covers %d documents, the .txt store holds %d - "
-                "run classify.py --txt again" % (measured, len(txt_docs)))
-
-    if not docx_docs:
-        problems.append("the .docx store is empty - there is nothing to classify")
+                "DEFECT-CLASSES.md covers %d documents, RANKING.csv scored %d - "
+                "classify again" % (measured, len(docs)))
+        if total != len(docs):
+            problems.append(
+                "DEFECT-CLASSES.md says the corpus is %d documents, RANKING.csv scored %d - "
+                "classify again" % (total, len(docs)))
 
     ok = not problems
 
     if "--quiet" not in argv:
-        print("docx   %d in store, class file covers %s"
-              % (len(docx_docs), "%d" % docx_head[0] if docx_head else "nothing"))
-        print("txt    %d in store, class file covers %s"
-              % (len(txt_docs), "%d" % txt_head[0] if txt_head else "nothing"))
+        print("docx   %d scored in RANKING.csv, class file covers %s"
+              % (len(docs), "%d of %d" % head if head else "nothing"))
         for p in problems:
             print("  - %s" % p)
-        print("READY - both class files match their stores" if ok
+        print("READY - the class file covers the whole measurement" if ok
               else "NOT READY")
-
     return 0 if ok else 1
 
 
