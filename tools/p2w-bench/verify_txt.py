@@ -979,7 +979,12 @@ def compare(src_pdf, txt_path):
     present = 0
     for key, pgs in elements.items():
         owed += len(pgs)
-        present += min(txt_furniture.get(key, 0), len(pgs))
+        # NOT min(txt_furniture, len(pgs)). The cap made present <= owed always, so
+        # present == owed held whenever there were AT LEAST enough copies and the check
+        # could only ever see missing furniture, never duplicated furniture - while its
+        # stated meaning is "one copy of each running head per page it belongs to".
+        # A falsifiability test duplicated every head three times and it still passed.
+        present += txt_furniture.get(key, 0)
     c["t09_page_furniture"] = (owed, present, present == owed, owed > 0)
 
     # ---- t10 page completeness ---------------------------------------------
