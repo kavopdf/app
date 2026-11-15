@@ -135,13 +135,49 @@ def position(src,our):
                 p90_pt=round(float(np.percentile(dv,90))*PT,2),
                 max_pt=round(float(dv.max())*PT,2), n=n, n_ours=no)
 
+def invention(src, our):
+    """Ink we produced that the source lacks. The mirror of position().
+    Needed to tell deletion from displacement: if loss and invention are both
+    high the content moved; if loss is high and invention is near zero, nothing
+    was put in its place and the content is simply gone."""
+    H=max(src.shape[0],our.shape[0]); W=max(src.shape[1],our.shape[1])
+    sm=pad(src,H,W)<INK; om=pad(our,H,W)<INK
+    n=int(om.sum())
+    if n==0: return dict(shares={t:0.0 for t in SWEEP}, max_pt=0.0, n=0)
+    d,_=edt(sm,om.shape)
+    shares={t:round(float((om&(d>t)).sum())/n*100,2) for t in SWEEP}
+    un=om&(d>1)
+    return dict(shares=shares,max_pt=round(float(d[un].max())*PT,2) if un.sum() else 0.0,n=n)
+
+def problem_name(sig, share5, invent5, max_pt):
+    """The NAME of the defect, derived from the numbers alone.
+
+    Measurement, not opinion: every branch is a statement about the two axes,
+    nothing is a guess about the engine's internals. It answers 'what kind of
+    problem is this document' without anyone opening a rendered image."""
+    if share5 < 1.0:           return "none"
+    if sig == "clean":         return "none"
+    if sig == "MEASURE-ERROR": return "unmeasured"
+    if sig == "content-loss":
+        return ("content-missing-nothing-in-its-place" if invent5 < 2
+                else "content-missing-partly-replaced")
+    if sig == "mixed":
+        return ("content-partly-lost-and-displaced" if invent5 > 0.7*share5
+                else "content-partly-lost")
+    if share5 < 8 and max_pt > 30: return "single-element-far-out"
+    if abs(share5-invent5) < 0.3*max(share5,1): return "content-present-wholly-displaced"
+    return "content-present-partly-displaced"
+
 def signature(p):
     """Classify from the SHAPE of the tolerance sweep -- no new threshold."""
     if p["state"] in ("blank-both",): return "clean"
     s=p["shares"]
-    if s[1] < 1.0: return "clean"
-    if s[1] > 50 and (s[10] > 0.8*s[1]): return "content-loss"
-    if s[10] < 0.6*s[1]: return "displacement"
+    # Anchored on share@5px, not share@1px. A page whose only difference is
+    # sub-pixel antialiasing reads high at 1 px and zero at 5 px; calling that
+    # "displacement" is the same mistake the ranking already had to fix.
+    if s[5] < 1.0: return "clean"
+    if s[10] > 0.8*s[5]: return "content-loss"
+    if s[10] < 0.6*s[5]: return "displacement"
     return "mixed"
 
 def content(src_txt,our_txt):
@@ -165,7 +201,9 @@ def measure_doc(pdf,dx):
     for i in range(n):
         p=position(sp[i],op[i])
         c=content([st[i]] if i<len(st) else [""],[ot[i]] if i<len(ot) else [""])
+        inv=invention(sp[i],op[i])
         p["page"]=i+1; p["signature"]=signature(p); p["text_recall"]=c["recall"]
+        p["invent5"]=inv["shares"][5]; p["invent_max_pt"]=inv["max_pt"]
         pages.append(p)
     worst=max(pages,key=lambda x:x["shares"][5]) if pages else None
     ct=content(st,ot)
@@ -183,12 +221,25 @@ def measure_doc(pdf,dx):
         max_pt=worst["max_pt"] if worst else 0.0,
         worst_page=worst["page"] if worst else 1,
         signature=worst["signature"] if worst else "clean",
+        invent5=worst.get("invent5",0.0) if worst else 0.0,
+        invent_max_pt=worst.get("invent_max_pt",0.0) if worst else 0.0,
+        problem=problem_name(worst["signature"],worst["shares"][5],
+                             worst.get("invent5",0.0),worst["max_pt"]) if worst else "none",
         # content axis
         text_recall=ct["recall"], chars_src=ct["chars_src"], chars_missing=ct["missing"],
         pages=pages)
 
 # ---------------- ground-truth gate ----------------
 def validate():
+    # The gate must be self-sufficient: a missing scipy must not be able to
+    # turn a valid instrument into a failing one. The ladder fallback gives the
+    # same integer distances but is far slower, and a slow gate is a gate that
+    # gets skipped. Install first, then measure.
+    try:
+        import scipy  # noqa: F401
+    except ImportError:
+        print("  (installing scipy for the gate)")
+        os.system("pip install -q scipy >/dev/null 2>&1")
     def cv(w,h): return np.full((int(round(h*DPI/72)),int(round(w*DPI/72))),255,np.uint8)
     def sq(im,x,y,s):
         X=int(round(x*DPI/72));Y=int(round(y*DPI/72));S=int(round(s*DPI/72)); im[Y:Y+S,X:X+S]=0; return im
@@ -264,17 +315,17 @@ def rank():
     # rank by share@5px: share@1px is inflated by text antialiasing (glyph edges
     # never align to the pixel grid), so it cannot order documents fairly.
     r=sorted(seen.values(),key=lambda x:(-x['share5'],-x['max_pt']))
-    cols=['rank','document','signature','share1','share2','share3','share5','share10',
+    cols=['rank','document','signature','problem','share1','share2','share3','share5','share10',
           'median_pt','p90_pt','max_pt','text_recall','chars_missing','worst_page','pages']
     with open('/scratch/output/RANKING.csv','w',newline='') as fh:
         w=csv.writer(fh); w.writerow(cols)
         for i,x in enumerate(r,1):
-            w.writerow([i,x['doc'][:-5],x['signature'],x['share1'],x['share2'],x['share3'],
+            w.writerow([i,x['doc'][:-5],x['signature'],x['problem'],x['share1'],x['share2'],x['share3'],
                         x['share5'],x['share10'],x['median_pt'],x['p90_pt'],x['max_pt'],
                         x['text_recall'],x['chars_missing'],x['worst_page'],x['pages_src']])
         # a document that failed to measure is an UNMEASURED row, never a silent gap
         for j,d in enumerate(errs.values(), len(r)+1):
-            w.writerow([j,d['doc'][:-5],'MEASURE-ERROR','','','','','','','','','','','',''])
+            w.writerow([j,d['doc'][:-5],'MEASURE-ERROR','unmeasured','','','','','','','','','','','',''])
     if errs: log(f"  {len(errs)} MEASURE-ERROR rows written (never dropped)")
     return r
 def status():
