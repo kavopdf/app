@@ -6417,14 +6417,35 @@ public final class DocxWriter {
                     c += span;
                     continue;
                 }
-                inner.append("</w:tcPr>")
-                        .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
-                        .append("<w:snapToGrid w:val=\"0\"/>")
-                        .append(spacing(cellBeforeTw, cellBoxTw, cellSz, autoCellBoxes(), false));
-                if (insetTw > 0) inner.append("<w:ind w:left=\"").append(insetTw).append("\"/>");
-                inner.append("</w:pPr>");
-                if (!cell.isEmpty()) {
-                    inner.append("<w:r><w:rPr>");
+                inner.append("</w:tcPr>");
+                // ONE PARAGRAPH PER LINE OF A WELDED CELL, AND THE INSET BELONGS TO THE LINE.
+                //
+                // A cell whose lines the model welded into one string carries the FIRST line's
+                // x as its inset. Written as one paragraph, the renderer then lays every line
+                // of that cell into the width left after that inset - and on a heading that is
+                // right-aligned in a narrow slot, that width is 59 pt. Measured on
+                // 041122-Account_Opening_Form.pdf page 7, row 2, cell 2: tcW 10636 twips, inset
+                // 9452, so 1184 twips (59.2 pt) of usable width, and the six lines of the
+                // heading came out as TWENTY-SEVEN lines at 10 pt = 270 pt in a row declared
+                // 84.1 pt. The table then laid out ~186 pt taller than the page, the fit guard
+                // could not see it (it charges w:trHeight, not the wrap), and the renderer
+                // broke the page: 9 pages in, 10 out.
+                //
+                // A line's x is a fact about that line. The first line keeps it; the lines the
+                // model could not place keep the cell's own edge, because a welded paragraph is
+                // not a line and cannot inherit one line's x for all of them.
+                String[] cellLines = cell.split("\n", -1);
+                for (int li = 0; li < cellLines.length; li++) {
+                    String lineCell = cellLines[li];
+                    int lineInset = li == 0 ? insetTw : 0;
+                    int lineBefore = li == 0 ? cellBeforeTw : 0;
+                    inner.append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
+                            .append("<w:snapToGrid w:val=\"0\"/>")
+                            .append(spacing(lineBefore, cellBoxTw, cellSz, autoCellBoxes(), false));
+                    if (lineInset > 0) inner.append("<w:ind w:left=\"").append(lineInset).append("\"/>");
+                    inner.append("</w:pPr>");
+                    if (!lineCell.isEmpty()) {
+                        inner.append("<w:r><w:rPr>");
                     // Written in schema order - rFonts, b, i, color, sz, szCs. It was sz, szCs,
                     // rFonts, color, b, which is not the order the schema defines; a reader
                     // that validates rPr drops what it cannot place.
@@ -6483,29 +6504,13 @@ public final class DocxWriter {
                     // its own line above the name, and the page drew them eight points apart.
                     // One w:t would flatten them into "1. SUNRISE" again.
                     inner.append("</w:rPr>");
-                    String[] parts = cell.split("\n");
-                    for (int q = 0; q < parts.length; q++) {
-                        if (q > 0) {
-                            // The break must carry a SPACE with it. A cell holds two lines of
-                            // the page, and a line break is a word boundary to a reader but
-                            // nothing at all to a text extractor: the words either side of a
-                            // bare <w:br/> come out welded. Measured on 77_arabic_rtl_document,
-                            // whose item cells hold "،قهوة عربية مغسولة" over "غربال17",
-                            // "قهوة روبوستا، غربال" over "15" and "شحن إلى ميناء" over
-                            // "نيوبورت": the docx read "مغسولةغربال17", "غربال15" and
-                            // "ميناءنيوبورت", so four words a reader sees on two lines counted
-                            // as none of them.
-                            if (!parts[q - 1].isEmpty() && !parts[q - 1].endsWith(" ")) {
-                                inner.append("<w:t xml:space=\"preserve\"> </w:t>");
-                            }
-                            inner.append("<w:br/>");
-                        }
-                        inner.append("<w:t xml:space=\"preserve\">").append(esc(parts[q]))
+                        inner.append("<w:t xml:space=\"preserve\">").append(esc(lineCell))
                                 .append("</w:t>");
+                        inner.append("</w:r>");
                     }
-                    inner.append("</w:r>");
+                    inner.append("</w:p>");
                 }
-                inner.append("</w:p></w:tc>");
+                inner.append("</w:tc>");
                 // The depth this cell's own text occupies: its w:before plus one exact line box
                 // per line the cell holds. It is the number the renderer lays the cell out
                 // with, and the row is w:trHeight tall whatever this says - the difference is

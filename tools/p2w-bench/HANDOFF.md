@@ -9,10 +9,10 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 14:55 |
+| started | 14:58 |
 | ended | still running |
 | how it ended | - |
-| plan | - |
+| plan | Close the carry-over: fix the 041122 page-7 spill on content-missing-partly-replaced (one 24-row w:tbl, rows atLeast+cantSplit, shaveToFit no-op at depth 0), then ratchet at corpus scale with RANKING.csv committed. |
 
 ## The picture, in the words of the run that left it
 
@@ -42,6 +42,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `13:52` agent deployed: content-missing-partly-replaced / B - is the wrap inside a text box a renderer limit or our emitted width
 - `13:52` agent landed: content-missing-partly-replaced / B -> FINDINGS/content-missing-partly-replaced-B-1300.md
 - `13:52` C (differential) returned without committing: pdf2docx and LibreOffice PDF-import both keep page 7 of 041122 on ONE page (pdf2docx 2.03 s for that page alone; pdftotext -layout 56 lines; LibreOffice writer_pdf_import round-trip 1 page), and PyMuPDF puts the source page 7 text at y 22.6-843.4 on an 842.1 pt sheet = 97.5 % fill, 0 pt slack. Nothing reproduced a 10-page output, so the spill is ours, not an intrinsically hard PDF. Unverified by me and no file committed - do not re-deploy blind, read this note.
+- `15:48` attempt 6 on content-missing-partly-replaced -> kept (1/30 moved)
 
 ## Where the rest of the state lives
 

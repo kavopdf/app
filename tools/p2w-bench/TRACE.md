@@ -253,3 +253,8 @@ claim and after each step; it is not code and cannot break anything.
 | 16 Nov 13:51 | fixer | attempt | content-missing-partly-replaced -> error |
 | 16 Nov 13:52 | fixer | attempt | content-missing-nothing-in-its-place -> kept (31/212 moved) |
 | 16 Nov 14:55 | fixer | claim | fixer claimed the slot |
+| 16 Nov 14:58 | fixer | build-engine | started |
+| 16 Nov 15:00 | fixer | build-engine | engine built in 72s |
+| 16 Nov 15:28 | fixer | build-engine | started |
+| 16 Nov 15:29 | fixer | build-engine | engine built in 47s |
+| 16 Nov 15:48 | fixer | attempt | content-missing-partly-replaced -> kept (1/30 moved) |

@@ -110,12 +110,86 @@ def render(p,rotate_zero=True):
     d.close(); return o
 def text_of(p):
     d=fitz.open(p); t=[pg.get_text() for pg in d]; d.close(); return t
+# SOFFICE FINISHES THE CONVERSION AND THEN NEVER EXITS - SO WE WAIT FOR THE FILE, NOT THE PID.
+#
+# Measured 16 Nov on 041122-Account_Opening_Form.docx (9 pages, 4.5 MB document.xml): the PDF
+# is complete on disk 97 s after launch, and the process is still alive 240 s later. Both
+# `soffice` (the oosplash wrapper) and `/usr/lib/libreoffice/program/soffice.bin` called
+# directly do this; after the kill, soffice.bin sits in state Z and oosplash keeps the pipe
+# open, so anything that waits for the process - subprocess.run with a timeout included -
+# blocks until the caller's own ceiling, with the finished PDF already written.
+#
+# That is what "the two nine-page bank forms cannot be converted inside the 290 s call limit"
+# actually was: not a slow render and not a hard PDF. A pass that converts 12 documents per
+# launch (see prerender) lost the whole batch to a process that had already finished its work,
+# which is why the class measurement stalled and the ratchet never ran.
+#
+# So: launch in its own session, poll for the output files to appear and stop growing, then
+# kill the session. The PDF is the deliverable; the exit code never was.
+SOFFICE_BIN = "/usr/lib/libreoffice/program/soffice.bin"
+
+def _soffice_exe():
+    return SOFFICE_BIN if os.path.exists(SOFFICE_BIN) else "soffice"
+
+def _settled(path, settle=0.7):
+    """True when `path` exists, is non-empty, and its size has stopped changing."""
+    try:
+        a = os.path.getsize(path)
+    except OSError:
+        return False
+    if a <= 0:
+        return False
+    time.sleep(settle)
+    try:
+        return os.path.getsize(path) == a
+    except OSError:
+        return False
+
+def soffice_pdf(files, outdir, deadline=None, extra=None):
+    """Convert `files` to PDF in `outdir`; return the paths that appeared.
+
+    Waits for the OUTPUT, never for the process - see the note above. `deadline` is a wall
+    clock time (time.time()), not a duration, so a caller with its own budget passes its own.
+    """
+    os.makedirs(outdir, exist_ok=True)
+    want = [os.path.join(outdir, os.path.splitext(os.path.basename(f))[0] + ".pdf") for f in files]
+    cmd = [_soffice_exe(), "--headless", "--norestore"] + list(extra or []) + \
+          ["--convert-to", "pdf", "--outdir", outdir] + list(files)
+    end = deadline if deadline else time.time() + 280
+    p = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                         stderr=subprocess.DEVNULL, start_new_session=True)
+    got = []
+    try:
+        while time.time() < end:
+            missing = [w for w in want if not os.path.exists(w)]
+            if not missing:
+                if all(_settled(w) for w in want):
+                    got = want
+                    break
+            if p.poll() is not None and not missing:
+                got = want
+                break
+            if p.poll() is not None and missing:
+                break
+            time.sleep(0.4)
+    finally:
+        try:
+            os.killpg(os.getpgid(p.pid), 9)
+        except Exception:
+            pass
+        try:
+            p.wait(timeout=5)
+        except Exception:
+            pass
+    if not got:
+        got = [w for w in want if os.path.exists(w) and os.path.getsize(w) > 0]
+    return got
+
 def conv(dx,od):
     b=os.path.splitext(os.path.basename(dx))[0]; t=os.path.join(od,b+".pdf")
     c=PRE+"/"+b+".pdf"
     if os.path.exists(c): return c          # see prerender(): one soffice start per CHUNK files
-    subprocess.run(["soffice","--headless","--convert-to","pdf","--outdir",od,dx],check=False,
-                   stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=300)
+    soffice_pdf([dx], od, deadline=time.time()+280)
     return t if os.path.exists(t) else None
 
 # SOFFICE'S START-UP, NOT ITS WORK, IS WHAT THE CORPUS RUN SPENDS ITS BUDGET ON.
@@ -136,9 +210,7 @@ def prerender(names,end):
         grp=[b for b in names[i:i+CHUNK] if not os.path.exists(PRE+"/"+b+".pdf")]
         fs=[DOCX+"/"+b+".docx" for b in grp if os.path.exists(DOCX+"/"+b+".docx")]
         if not fs: continue
-        subprocess.run(["soffice","--headless","--convert-to","pdf","--outdir",PRE]+fs,
-                       check=False,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
-                       timeout=min(280,max(30,int(end-time.time()))))
+        soffice_pdf(fs, PRE, deadline=min(end, time.time()+280))
         n+=len(fs)
     return n
 

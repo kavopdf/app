@@ -1,5 +1,5 @@
 {
- "plan": "",
+ "plan": "Close the carry-over: fix the 041122 page-7 spill on content-missing-partly-replaced (one 24-row w:tbl, rows atLeast+cantSplit, shaveToFit no-op at depth 0), then ratchet at corpus scale with RANKING.csv committed.",
  "notes": [
   {
    "at": "13:08",
@@ -32,6 +32,10 @@
   {
    "at": "13:52",
    "text": "C (differential) returned without committing: pdf2docx and LibreOffice PDF-import both keep page 7 of 041122 on ONE page (pdf2docx 2.03 s for that page alone; pdftotext -layout 56 lines; LibreOffice writer_pdf_import round-trip 1 page), and PyMuPDF puts the source page 7 text at y 22.6-843.4 on an 842.1 pt sheet = 97.5 % fill, 0 pt slack. Nothing reproduced a 10-page output, so the spill is ours, not an intrinsically hard PDF. Unverified by me and no file committed - do not re-deploy blind, read this note."
+  },
+  {
+   "at": "15:48",
+   "text": "attempt 6 on content-missing-partly-replaced -> kept (1/30 moved)"
   }
  ],
  "next": "Fix the 041122 page spill on content-missing-partly-replaced, now localised: page 7 is ONE 24-row w:tbl (zero w:txbxContent), its rows are written w:trHeight hRule=atLeast + w:cantSplit (DocxWriter.java:6086/:6123), and the page's whole flow is that table so shaveToFit (:495-560, depth==0 w:before only) is a no-op and the page goes out 12 twips over target. Shaving w:trHeight alone does NOT work (16746, still 10 pages) because the row is laid out at content+rule; the repair must reduce the row's CONTENT height together with its trHeight. The fit guard's trigger is writtenTw > pageBudgetTw - p2w.fitreserve (default 96). Ratchet it with benchmarks/p2w.py --budget 250 then gate.py --ratchet-only.",
@@ -58,7 +62,7 @@
   }
  ],
  "run": {
-  "started": "14:55",
+  "started": "14:58",
   "ended": null,
   "ended_how": null
  },
