@@ -60,7 +60,24 @@ if [ ! -f libs/aar/classes.jar ]; then
 fi
 
 echo "== compiling stubs, engine and ConvertAll ==" >&2
-rm -rf out && mkdir -p out
+mkdir -p out
+# MEASURED, 16 Nov: a full compile of this engine is 42-46 s. It is NOT the reason an
+# attempt costs seventeen minutes - the 09:12 fixer report put that on the scipy ladder
+# (soffice on a 4088-run form exceeded the 290 s call limit twice) and that is fixed in
+# p2w.py. javac recompiles every file it is handed regardless of -d, so removing the
+# `rm -rf out` below bought nothing measurable; what it does buy is not deleting a
+# directory we are about to rewrite. Keep the wipe out, but do not pretend it is the win.
+#
+# The real saving available here is skipping the compile when no source is newer than the
+# newest class file - a run that rebuilds to prove the tree is unchanged should not spend
+# 45 s doing it.
+_newest_src=$(find stubs ../../app/src/main/java/com/kavopdf/app/engine ConvertAll.java -name '*.java' -newer out/ConvertAll.class 2>/dev/null | head -1)
+if [ -f out/ConvertAll.class ] && [ -z "$_newest_src" ]; then
+  echo "engine unchanged - skipping compile" >&2
+  tr "engine unchanged, compile skipped"
+  exit 0
+fi
+_t0=$(date +%s)
 javac -nowarn -d out $(find stubs -name '*.java')
 # libs/aar/assets is NOT optional. pdfbox-android ships the 14 Standard-14 AFM metric
 # files in the AAR's assets/ directory, not in classes.jar (classes.jar contains zero
@@ -74,4 +91,5 @@ javac -nowarn -cp "$CP" -d out $(find ../../app/src/main/java/com/kavopdf/app/en
 javac -nowarn -cp "$CP" -d out ConvertAll.java
 
 test -f out/ConvertAll.class || { echo "ConvertAll did not compile" >&2; exit 1; }
-echo "engine built - ConvertAll ready" >&2
+echo "engine built - ConvertAll ready ($(( $(date +%s) - _t0 ))s)" >&2
+tr "engine built in $(( $(date +%s) - _t0 ))s"
