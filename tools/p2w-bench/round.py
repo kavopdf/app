@@ -315,9 +315,16 @@ def release(name, force=False):
       and the slot is used six minutes of forty-five. Instructions are promises; this is the check
       that makes it one.
 
-      A fixer run that has been going less than 25 minutes and has recorded fewer than two
+      A fixer run that has been going less than 30 minutes and has recorded fewer than two
       attempts is not finished, whatever it thinks. It still holds the slot, the brief still tells
       it to go back to STEP 2, and releasing now hands 39 idle minutes to nobody.
+
+      30 and not 25 (16 Nov): the ask was for one run to work continuously for as long as it can
+      rather than have its time cut into small pieces. A cap is only worth having if the run can
+      reach it - at 25 minutes a run that spent ten of them on a soffice timeout had barely begun
+      its second attempt. 30 leaves room for two real attempts, and the heartbeat in attempt.py
+      means a run that stops after this refusal frees the slot 45 minutes after its last attempt
+      rather than 45 after its start.
 
       --force is the way out, and it exists for the honest cases: the build is broken, Drive is
       blocked, the class list is empty. It prints a line into RUN-LOG.md so a forced release is
@@ -343,7 +350,7 @@ def release(name, force=False):
     if name == "fixer" and started and not force and s.get("phase") == "fix" and any_open:
         age = claim_age_min(started) or 0.0
         done = _attempts_this_run()
-        if age < 25 and done < 2:
+        if age < 30 and done < 2:
             print("refused: this run is %d minutes old with %d attempt(s) recorded." % (age, done))
             print("The slot is good for 45 minutes and one attempt takes about ten. Go back to")
             print("STEP 2, take the next OPEN class and do another one - an attempt recorded as")
@@ -352,7 +359,7 @@ def release(name, force=False):
             print("class list is empty - release with: round.py --release-fixer --force")
             return 1
         if done < 2:
-            print("fixer: releasing after %d minute(s) with %d attempt(s) - past the 25-minute mark,"
+            print("fixer: releasing after %d minute(s) with %d attempt(s) - past the 30-minute mark,"
                   % (age, done))
     s["%s_started" % name] = 0
     save(s)

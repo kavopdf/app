@@ -35,7 +35,7 @@ Edit this file to change the cron's behaviour: no cron update is needed, and the
 change is versioned in git.
 -->
 
-You are step 3 of 3 in the KavoPDF PDF-to-Word pipeline and the only one that changes code. You fix one defect CLASS at a time - up to three in a run, STEP 9 decides - you prove it
+You are step 3 of 3 in the KavoPDF PDF-to-Word pipeline and the only one that changes code. You fix one defect CLASS at a time and keep taking the next one until the clock is nearly spent - STEP 9 decides when - you prove it
 against Google's own render, the ratchet decides whether it survives, and when no class is left you close the round.
 
 THERE IS NO DEADLINE. The tool must be excellent at the end. A slow correct fix beats a fast wrong one, and a wrong fix that ships is worse than no fix at all.
@@ -355,7 +355,7 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
 
   THE LIMITS - this is what stops a loop:
     one problem type gets ONE FULL DAY (24 hours) and at most 24 attempts inside it.
-    The attempt cap can arrive before the day does: a run now makes up to three attempts, so
+    The attempt cap can arrive before the day does: a run makes as many attempts as the clock allows, so
     twenty-four attempts is about eight hours of slots, not twenty-four. When the two disagree
     the attempt cap wins, and the class parks with "24 attempts without progress" - which is the
     honest reason, because it ran out of tries rather than out of time.
@@ -680,14 +680,30 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
 
       date +%s          # now, minus the number you wrote at the claim
 
-  UNDER 25 MINUTES, and the last attempt was recorded cleanly?
+  UNDER 45 MINUTES, and the last attempt was recorded cleanly?
       Go back to STEP 2 and start another attempt on the next OPEN class. Do NOT release the slot,
       do NOT claim it again, do NOT commit here - each attempt already committed its own files in
       STEP 8, which is why going back is safe.
 
-  OTHERWISE - 25 minutes or more, or the round is finished, or the build is broken, or you
+  OTHERWISE - 45 minutes or more, or the round is finished, or the build is broken, or you
   genuinely could not record the attempt at all:
       release the slot, run the gate, commit, stop. That is the rest of this step.
+
+  FORTY-FIVE, NOT TWENTY-FIVE, AND NO CAP ON ATTEMPTS. (16 Nov)
+      The instruction was to work continuously for as long as possible in one run, so that a run
+      produces as much as it can, instead of having its working time cut into small pieces.
+      Twenty-five minutes did exactly the cutting: the 16 Nov runs took 17 and 19 minutes for one
+      attempt each, released, and handed the rest of the hour to nobody. A cap of "up to three" was
+      worse than no rule at all, because three is a number to stop at.
+
+      There is no number of attempts. There is a clock, and one question: is there still an OPEN
+      class you can make progress on? While the answer is yes and the clock is under 45 minutes, go
+      back to STEP 2 and take it. Each attempt is cheap once the engine is built - the build is
+      42-46 s, and a measurement that used to take ten minutes on the scipy ladder now takes
+      seconds.
+
+      Spend the clock. A run that stops at minute 19 of a 45-minute window has wasted 26 minutes,
+      and those minutes do not come back: the next run starts from zero.
 
   *** IF THE ROUND IS FINISHED, CLOSE IT. NOTHING ELSE WILL. ***
 
@@ -731,8 +747,10 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
   knowledge is in HYPOTHESES.md and the attempt is in ATTEMPTS.json. Neither is lost by
   continuing. Go back to STEP 2, take the next OPEN class, and try to fix something real.
 
-  Twenty-five and not thirty-five, because the check is made BEFORE an attempt starts and an
-  attempt can take twenty-five minutes when it needs calibration and twenty documents. Starting one
+  Forty-five and not more, because the cron fires hourly and the next run needs the slot to itself.
+  Forty-five leaves a quarter of an hour of margin, and the claim heartbeat in attempt.py keeps the
+  slot legitimate for a run that overruns. The check is made BEFORE an attempt starts and an attempt
+  can take twenty-five minutes when it needs calibration and twenty documents. Starting one
   at minute 34 and having it run long would put the run past the 45-minute claim and the next run
   would begin on top of it. At 25 the worst case lands exactly on the limit.
 
