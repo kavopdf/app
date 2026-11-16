@@ -248,3 +248,7 @@ claim and after each step; it is not code and cannot break anything.
 | 16 Nov 12:24 | fixer | hypothesis | content-missing-nothing-in-its-place -> confirmed |
 | 16 Nov 12:24 | fixer | attempt | content-missing-nothing-in-its-place -> kept (22/30 moved) |
 | 16 Nov 12:46 | fixer | claim | fixer claimed the slot |
+| 16 Nov 13:51 | fixer | hypothesis | content-missing-partly-replaced -> untested |
+| 16 Nov 13:51 | fixer | hypothesis | content-missing-partly-replaced -> confirmed |
+| 16 Nov 13:51 | fixer | attempt | content-missing-partly-replaced -> error |
+| 16 Nov 13:52 | fixer | attempt | content-missing-nothing-in-its-place -> kept (31/212 moved) |

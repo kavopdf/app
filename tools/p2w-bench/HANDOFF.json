@@ -4,10 +4,59 @@
   {
    "at": "13:08",
    "text": "seeded by the agent: the 232f622 ratchet is the open item carried into this run"
+  },
+  {
+   "at": "13:51",
+   "text": "attempt 5 on content-missing-partly-replaced -> error"
+  },
+  {
+   "at": "13:52",
+   "text": "attempt 3 on content-missing-nothing-in-its-place -> kept (31/212 moved)"
+  },
+  {
+   "at": "13:52",
+   "text": "agent deployed: content-missing-partly-replaced / A - which code path decides the height of a block emitted from a PDF text box, and w"
+  },
+  {
+   "at": "13:52",
+   "text": "agent landed: content-missing-partly-replaced / A -> FINDINGS/content-missing-partly-replaced-A-1305.md"
+  },
+  {
+   "at": "13:52",
+   "text": "agent deployed: content-missing-partly-replaced / B - is the wrap inside a text box a renderer limit or our emitted width"
+  },
+  {
+   "at": "13:52",
+   "text": "agent landed: content-missing-partly-replaced / B -> FINDINGS/content-missing-partly-replaced-B-1300.md"
+  },
+  {
+   "at": "13:52",
+   "text": "C (differential) returned without committing: pdf2docx and LibreOffice PDF-import both keep page 7 of 041122 on ONE page (pdf2docx 2.03 s for that page alone; pdftotext -layout 56 lines; LibreOffice writer_pdf_import round-trip 1 page), and PyMuPDF puts the source page 7 text at y 22.6-843.4 on an 842.1 pt sheet = 97.5 % fill, 0 pt slack. Nothing reproduced a 10-page output, so the spill is ours, not an intrinsically hard PDF. Unverified by me and no file committed - do not re-deploy blind, read this note."
   }
  ],
- "next": "Run the full 213-document ratchet on commit 232f622 (per-row tcBorders). Measured on 30 class documents + 12 controls: 22/30 moved, 0/12 controls worse, mobile-bill 18.48 -> 1.55. Never measured at corpus scale, so 180 documents are unproven. Until that ratchet passes, the pipeline has a fix it cannot vouch for. This is ahead of any new class.",
- "agents": [],
+ "next": "Fix the 041122 page spill on content-missing-partly-replaced, now localised: page 7 is ONE 24-row w:tbl (zero w:txbxContent), its rows are written w:trHeight hRule=atLeast + w:cantSplit (DocxWriter.java:6086/:6123), and the page's whole flow is that table so shaveToFit (:495-560, depth==0 w:before only) is a no-op and the page goes out 12 twips over target. Shaving w:trHeight alone does NOT work (16746, still 10 pages) because the row is laid out at content+rule; the repair must reduce the row's CONTENT height together with its trHeight. The fit guard's trigger is writtenTw > pageBudgetTw - p2w.fitreserve (default 96). Ratchet it with benchmarks/p2w.py --budget 250 then gate.py --ratchet-only.",
+ "agents": [
+  {
+   "id": "contA-01",
+   "class": "content-missing-partly-replaced",
+   "angle": "A",
+   "question": "which code path decides the height of a block emitted from a PDF text box, and what makes source page 7 of 041122 overflow",
+   "expected": "landed",
+   "deployed": "13:52",
+   "status": "landed",
+   "finding": "FINDINGS/content-missing-partly-replaced-A-1305.md"
+  },
+  {
+   "id": "contB-01",
+   "class": "content-missing-partly-replaced",
+   "angle": "B",
+   "question": "is the wrap inside a text box a renderer limit or our emitted width",
+   "expected": "landed",
+   "deployed": "13:52",
+   "status": "landed",
+   "finding": "FINDINGS/content-missing-partly-replaced-B-1300.md"
+  }
+ ],
  "run": {},
  "history": [],
  "context": "The 232f622 fix is in the engine and measured on 30 class documents. It has never been ratcheted. Two nine-page bank forms cannot be converted by soffice inside the 290 s call limit, which is why the class measurement stalls - that is a tooling problem, not an engine one."

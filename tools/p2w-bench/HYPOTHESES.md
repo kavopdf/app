@@ -235,6 +235,17 @@ Do not re-test one without new evidence, and if you do, say what changed.
   is a one-page, 381-byte reproducer, so a fix can be measured in seconds.
 
 
+## content-missing-partly-replaced
+
+- UNTESTED - The 9->10 page spill on 041122 is not a text-box height: page 7's .docx carries ZERO w:txbxContent and is one w:tbl of 24 rows, and the page's whole flow is that table, so the fit guard's residue shave (shaveToFit) finds no depth-0 w:before to give up and writes the page 12 twips over its target.
+  evidence: 16 Nov 12:46 fixer, subagent A committed FINDINGS/content-missing-partly-replaced-A-1305.md: row height DocxWriter.java:6086 = max(rowHeightTw, paraContentTw+ruleTwHere), written :6123 as w:trHeight hRule=atLeast + w:cantSplit; shaveToFit :495-560 only shaves w:before at depth==0; page 7 writtenTw 16756 vs target 16744 (over=12, left=12). Four repairs measured to fail: shave trHeight (16746, still 10 pages), -Dp2w.fitreserve=700 (10 pages), remove w:cantSplit (page 7 fills to y 838.7, still 10 pages), drop the page-number row (10 pages). NOT verified by me. I measured at HEAD: 041122 share5 98.65, pages 10/9, worst_page 9, text_recall 99.68.
+  recorded: 2026-11-16 13:51
+
+- CONFIRMED - The 20-line wrap is renderer-correct for the width we give it, so the defect is our emitted width/indent and not a renderer limit.
+  evidence: subagent B, FINDINGS/content-missing-partly-replaced-B-1300.md, three hand-built docx variants rendered with soffice 7.4.7.2: V1 box 58 pt at x 513.9 -> 4 lines (ink 514.0-569.0); V2 box 11 pt at x 573.1 -> 25 lines (ink 573.2-584.2), and the engine's own wrap=none wrapped identically, so wrap=none is no guard in LibreOffice; V3 box 58 pt at x 573.1 (our emitted anchor) -> 4 lines, identical to V1 to the tenth of a point. Anchor x has zero effect on wrapping; width alone decides. Measured side-note: the '11 pt box' is an ink width - a 1 pt-font second copy of the heading inside a 22.8 pt margin cell, not a text box.
+  recorded: 2026-11-16 13:51
+
+
 ## content-missing-partly-replaced - 16 Nov 09:54 run: the CONFIRMED patch re-measured, and the spill is now a number
 
 - MEASURED - The confirmed `run-size-from-sizePt-not-Tf` patch reproduces to the digit on a

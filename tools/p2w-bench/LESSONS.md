@@ -80,10 +80,6 @@ everything else: what went wrong in the work itself.
   Staged upload keys also expire: nineteen uploaded together and used five minutes later all failed
   with a bare "Failed"; a fresh upload converted immediately. Stage, convert, export, repeat.
 
-- **The ratchet reads `BASELINE.md`, not `RESULTS.jsonl`.** A fixer that records its twenty rows and
-  runs `ratchet.py` gets PASS on the unchanged baseline — it compares the baseline with itself. Write
-  the attempt's rows into `BASELINE.md` first, then run it: on 13 Nov that turned a PASS into
-  "REGRESSED: 4" on the same measurement. Cost: a green ratchet that had seen nothing.
 - **`classify.py --attempt` counts 'moved' against the PREVIOUS ENGINE, not the baseline.** An attempt that
   only refines a patch the last run reverted scores 0 moved even when it beats the baseline on the same
   documents (362 51->53, balance-sheet 40->44, and 40_devanagari restored to 37), because the row-by-row
@@ -123,3 +119,11 @@ everything else: what went wrong in the work itself.
   exist and `set -e` took it as a failed build. Five minutes and three attempts went to it, and
   the only visible symptom was a script that stopped after its own progress line. Cost: the
   first twenty minutes of the slot looked like a broken engine.
+
+- **One soffice launch is 11 s and the corpus run was paying it per document.** Measured 16 Nov
+  on a ONE-page document: conv() 11.29 s, render 0.39 s, position+invention 4.24 s. That is why a
+  250 s budget measured 26 documents and why the nine-page bank forms exceeded the per-command
+  limit on their own - the class looked unmeasurable and was merely being launched 213 times.
+  Converting 12 docx per soffice invocation (`benchmarks/p2w.py` `prerender()`) took the same
+  budget from 26 to 48-72 documents and reproduced three documents' stored share5 and page counts
+  exactly. When a measurement "cannot fit", time the parts before you blame the renderer.

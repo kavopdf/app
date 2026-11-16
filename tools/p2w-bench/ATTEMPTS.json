@@ -59,34 +59,44 @@
   "status": "OPEN"
  },
  "content-missing-nothing-in-its-place": {
-  "attempts": 2,
+  "attempts": 3,
   "first_seen": null,
   "last": null,
-  "last_engine": "rowrule-per-row-tcborders",
-  "last_moved": 22,
-  "last_total": 30,
+  "last_engine": "232f622",
+  "last_moved": 31,
+  "last_total": 212,
   "outcomes": [
    "error",
+   "kept",
    "kept"
   ],
-  "reason": "diagnosis only, no fix attempted: inline images are skipped by name at PdfToWord.java:2715 (skipInlineImage, 2906); 415_inline_images page 1 carries 2 BI/ID/EI sequences in a 381-byte stream and get_images() reports 0. Fixing it is a decoder plus placement, not a guard, and there was not enough clock left to build and ratchet it",
+  "ratchet_at": "16 Nov 08:22",
+  "ratchet_docs": 212,
+  "reason": "CORPUS RATCHET of the 232f622 per-row tcBorders fix, the item HANDOFF.md carried into this run. Full 213-document measurement (213/213 docx, 213/213 measured, 1 MEASURE-ERROR = 416_many_tiny_pages, exempted) then gate.py --ratchet-only: 212 documents compared, 0 regressions, 31 improvements. mobile-bill 18.48->1.55, salary-slip-factory-wages 18.09->0.73, two-tables-stacked-with-no-gap 17.20->0.77, marksheet-university-consolidated 16.78->0.64, electricity-bill 16.24->1.33, insurance-policy-schedule 13.29->0.53, table-inside-two-column-page 42.0->40.05. The fix is now vouched for at corpus scale.",
+  "reasons": [
+   "CORPUS RATCHET of the 232f622 per-row tcBorders fix, the item HANDOFF.md carried into this run. Full 213-document measurement (213/213 docx, 213/213 measured, 1 MEASURE-ERROR = 416_many_tiny_pages, exempted) then gate.py --ratchet-only: 212 documents compared, 0 regressions, 31 improvements. mobile-bill 18.48->1.55, salary-slip-factory-wages 18.09->0.73, two-tables-stacked-with-no-gap 17.20->0.77, marksheet-university-consolidated 16.78->0.64, electricity-bill 16.24->1.33, insurance-policy-schedule 13.29->0.53, table-inside-two-column-page 42.0->40.05. The fix is now vouched for at corpus scale."
+  ],
   "requeues": 0,
   "status": "OPEN"
  },
  "content-missing-partly-replaced": {
-  "attempts": 4,
+  "attempts": 5,
   "first_seen": null,
   "last": null,
-  "last_engine": "sizePt patch (run-size-from-sizePt-not-Tf)",
+  "last_engine": "232f622",
   "last_moved": 2,
   "last_total": 2,
   "outcomes": [
    "reverted",
    "error",
    "error",
+   "error",
    "error"
   ],
-  "reason": "trace fix verification: attempt.py now writes a TRACE line so round.py's release guard can count attempts",
+  "reason": "no fix measured. Localised the 9->10 page spill on 041122 with two subagent findings and my own measurement (share5 98.65, pages 10/9, worst_page 9, text_recall 99.68 at HEAD): page 7 is one 24-row table, shaveToFit cannot reach it, and four candidate repairs were each measured to leave the page count at 10. B proved the wrap follows width, not anchor, so the width is ours. Three paths closed, no engine change made - a spill repair needs a content-height reduction and a full ratchet that this slot did not have time for.",
+  "reasons": [
+   "no fix measured. Localised the 9->10 page spill on 041122 with two subagent findings and my own measurement (share5 98.65, pages 10/9, worst_page 9, text_recall 99.68 at HEAD): page 7 is one 24-row table, shaveToFit cannot reach it, and four candidate repairs were each measured to leave the page count at 10. B proved the wrap follows width, not anchor, so the width is ours. Three paths closed, no engine change made - a spill repair needs a content-height reduction and a full ratchet that this slot did not have time for."
+  ],
   "requeues": 0,
   "status": "OPEN"
  }
