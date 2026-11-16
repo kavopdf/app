@@ -305,6 +305,26 @@ def claim(name):
     print("%s claimed at %s" % (name, ist("%H:%M")))
     note("claim", "%s claimed the slot" % name)
     if name == "fixer":
+        # A run that was killed never closed its record. Without this, _run_record("start")
+        # overwrote it and the dead run's attempts, kept count and duration vanished - so the
+        # report under-counted the day and chain.py judged the next run's productivity against a
+        # record that had just been wiped. Archive it first.
+        try:
+            import json as _j
+            _rp = os.path.join(HERE, "RUN.json")
+            _prev = _j.load(open(_rp, encoding="utf-8"))
+            if _prev.get("started") and _prev.get("ended") is None:
+                _prev["ended_how"] = "killed - never released the slot"
+                _prev["ended"] = _prev.get("ended") or "(never)"
+                _hp = os.path.join(HERE, "RUN-HISTORY.json")
+                try:
+                    _hist = _j.load(open(_hp, encoding="utf-8"))
+                except Exception:
+                    _hist = []
+                _hist.append(_prev)
+                _j.dump(_hist[-60:], open(_hp, "w", encoding="utf-8"), indent=1)
+        except Exception:
+            pass
         _handoff("--run-start")
         _run_record("start")
     # A stale claim means the previous run ended WITHOUT releasing. That is a real failure -

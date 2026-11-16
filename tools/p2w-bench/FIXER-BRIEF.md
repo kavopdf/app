@@ -1001,7 +1001,7 @@ STEP 8 - RECORD WHAT YOU LEARNED, THEN THE ATTEMPT
   THEN COMMIT, BEFORE YOU GO BACK TO STEP 2. Every attempt commits its own files - that is what
   makes going back to STEP 2 safe, and it is what survives the platform killing you mid-attempt:
 
-      ROUND.json, RUN.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md,
+      ROUND.json, RUN.json, RUN-HISTORY.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md,
       HANDOFF.md, HANDOFF.json, benchmarks/DEFECT-CLASSES.md,
       benchmarks/RANKING.csv, benchmarks/STATE.json, benchmarks/CENSUS.csv,
       and every engine file you changed
@@ -1218,7 +1218,7 @@ STEP 9b - CHAIN THE NEXT RUN. THE PIPELINE RUNS 24/7.
           handoff.py --next "..."           what the next run should do first
       2.  round.py --release-fixer          the slot is free
       3.  COMMIT AND PUSH EVERYTHING:
-              ROUND.json, RUN.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md,
+              ROUND.json, RUN.json, RUN-HISTORY.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md,
               HANDOFF.md, HANDOFF.json, benchmarks/DEFECT-CLASSES.md,
               benchmarks/RANKING.csv, benchmarks/STATE.json, benchmarks/CENSUS.csv,
               and every engine file you changed
