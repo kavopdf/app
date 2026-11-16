@@ -68,7 +68,7 @@ ROOT="/scratch/work/p2w"; CORPUS=ROOT+"/corpus"; DOCX=ROOT+"/out"
 # repository beside it, not in the release zips, so the script must find its own tree.
 HERE=os.path.dirname(os.path.abspath(__file__))
 DIST=ROOT+"/dist2"; CACHE="/scratch/output/_cache"; REPO=ROOT+"/repo"
-IMG=ROOT+"/diag"; ZIPS=["p2w-all-groups","p2w-batch-1","pdf-to-word-test-corpus-v3","p2w-round2-additions"]
+IMG=ROOT+"/diag"; PRE=ROOT+"/pre"; CHUNK=12; ZIPS=["p2w-all-groups","p2w-batch-1","pdf-to-word-test-corpus-v3","p2w-round2-additions"]
 JH="/scratch/work/.p2w-jdk/jdk"; INK=68; DPI=150; PT=72.0/DPI
 SWEEP=[1,2,3,5,10]
 
@@ -112,9 +112,35 @@ def text_of(p):
     d=fitz.open(p); t=[pg.get_text() for pg in d]; d.close(); return t
 def conv(dx,od):
     b=os.path.splitext(os.path.basename(dx))[0]; t=os.path.join(od,b+".pdf")
+    c=PRE+"/"+b+".pdf"
+    if os.path.exists(c): return c          # see prerender(): one soffice start per CHUNK files
     subprocess.run(["soffice","--headless","--convert-to","pdf","--outdir",od,dx],check=False,
                    stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=300)
     return t if os.path.exists(t) else None
+
+# SOFFICE'S START-UP, NOT ITS WORK, IS WHAT THE CORPUS RUN SPENDS ITS BUDGET ON.
+# Measured 16 Nov on 300_prescription_rx (1 page): conv() 11.29 s, render 0.39 s, the whole
+# position+invention pass 4.24 s - so 11 of the 16 s a document costs are one soffice launch.
+# The nine-page forms and 416_many_tiny_pages were being lost to this, not to the renderer:
+# a 213-document pass managed 26 documents per 250 s budget and the two bank forms exceeded
+# the per-command limit on their own.
+#
+# Converting CHUNK files per soffice invocation took the corpus from 26 to 48-72 documents per
+# 250 s budget (2.1x) and the same numbers: the cached PDF is the byte-for-byte output of the
+# same soffice on the same docx, and a re-measure of an already-measured document through the
+# cache reproduced its stored share5 and page counts exactly.
+def prerender(names,end):
+    os.makedirs(PRE,exist_ok=True); n=0
+    for i in range(0,len(names),CHUNK):
+        if time.time()>=end: break
+        grp=[b for b in names[i:i+CHUNK] if not os.path.exists(PRE+"/"+b+".pdf")]
+        fs=[DOCX+"/"+b+".docx" for b in grp if os.path.exists(DOCX+"/"+b+".docx")]
+        if not fs: continue
+        subprocess.run(["soffice","--headless","--convert-to","pdf","--outdir",PRE]+fs,
+                       check=False,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                       timeout=min(280,max(30,int(end-time.time()))))
+        n+=len(fs)
+    return n
 
 def norm(s):
     return re.sub(r"\s+","",s or "")
@@ -342,6 +368,11 @@ def docx(end):
     return len(glob.glob(DOCX+"/*.docx"))
 def run(end):
     os.makedirs(DIST,exist_ok=True)
+    todo=[os.path.basename(p)[:-4] for p in sorted(glob.glob(CORPUS+"/*.pdf"))
+          if not os.path.exists(DIST+"/"+os.path.basename(p)[:-4]+".json")]
+    if todo:
+        got=prerender(todo,end)
+        if got: log(f"prerender {got} docx in soffice batches of {CHUNK}")
     for p in sorted(glob.glob(CORPUS+"/*.pdf")):
         if time.time()>=end: break
         b=os.path.basename(p)[:-4]; jf=f"{DIST}/{b}.json"
