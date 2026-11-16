@@ -256,6 +256,8 @@ def add(args):
         _r = _j.load(open(_rp, encoding="utf-8"))
         _r["class"] = name
         _r["attempts"] = _r.get("attempts", 0) + 1
+        if outcome == "partial":
+            _r["partial"] = _r.get("partial", 0) + 1
         if outcome == "kept":
             _r["kept"] = _r.get("kept", 0) + 1
             # A RATCHET IS NOT NEW WORK. `--ratchet` re-measures the WHOLE corpus to prove a fix

@@ -1202,6 +1202,36 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
   Releasing the slot matters even when the run failed - otherwise the next run waits 45 minutes
   for a claim that nobody holds.
 
+STEP 9b - CHAIN THE NEXT RUN, INSTEAD OF WAITING FOR THE HOUR
+
+  The cron fires at :45. A run that ends at 15:40 leaves forty-seven minutes on the floor before
+  15:45, and across a day that is most of the day. So after a clean release, start the next run
+  yourself:
+
+      python3 tools/p2w-bench/chain.py --after-release
+
+  It prints FIRE or STOP with the reason. On FIRE, trigger the cron it names:
+
+      cron action=trigger cron_id=<the id chain.py printed>
+
+  WHY THE BRAKE MATTERS MORE THAN THE SPEED. A job that re-fires itself with no stop condition
+  is a way to spend a night producing nothing. chain.py stops on:
+
+    * a FORCED release         something went wrong; a human should look before another run
+    * the round is finished    there is nothing to chain into
+    * three runs in a row with no kept and no partial attempt
+                               the circuit breaker. Three consecutive runs that fixed nothing
+                               are not unlucky, they are stuck, and a fourth is stuck the same
+                               way. Fix the obstacle, or let the hourly cron take over
+    * depth 24                 a chain longer than that is not a chain, it is a loop
+
+  The slot guard still makes it safe: if you trigger while your own claim is still held, the new
+  run finds it busy and stands aside with 'previous fixer run still active'. Nothing stacks.
+
+  If you are killed before you trigger, the hourly cron picks the work up. The chain is an
+  accelerator, never a dependency.
+
+
 STEP 10 - PARKING A CLASS IS NOT A SURRENDER
   Only after calibration proves it. A park must carry, in REMAINING-DEFECTS.md:
       what was tried        - from the hypothesis ledger
