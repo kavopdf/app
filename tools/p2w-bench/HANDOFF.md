@@ -9,10 +9,10 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 14:58 |
+| started | 17:23 |
 | ended | still running |
 | how it ended | - |
-| plan | Close the carry-over: fix the 041122 page-7 spill on content-missing-partly-replaced (one 24-row w:tbl, rows atLeast+cantSplit, shaveToFit no-op at depth 0), then ratchet at corpus scale with RANKING.csv committed. |
+| plan | - |
 
 ## The picture, in the words of the run that left it
 

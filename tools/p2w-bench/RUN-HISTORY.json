@@ -1,0 +1,16 @@
+[
+ {
+  "started_ts": 1794821109.2794962,
+  "started": "14:55",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "content-missing-nothing-in-its-place",
+  "attempts": 2,
+  "kept": 2,
+  "docs_improved": 32,
+  "agents": [],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - never released the slot"
+ }
+]
