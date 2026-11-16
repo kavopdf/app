@@ -829,6 +829,21 @@ STEP 8 - RECORD WHAT YOU LEARNED, THEN THE ATTEMPT
   Then update the class file's own row for this class - FIXED if the number improved,
   PARKED with a reason if it did not. Do NOT run classify.py; the classifier owns that
   file and rewrites it each round.
+  THEN COMMIT, BEFORE YOU GO BACK TO STEP 2. Every attempt commits its own files - that is what
+  makes going back to STEP 2 safe, and it is what survives the platform killing you mid-attempt:
+
+      ROUND.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md,
+      HANDOFF.md, HANDOFF.json, benchmarks/DEFECT-CLASSES.md,
+      and every engine file you changed
+
+  HANDOFF.md and HANDOFF.json are in that list on purpose. attempt.py rewrites them on every
+  attempt, and until this commit they existed only in the sandbox - so a run killed between an
+  attempt and its commit took the handoff with it, which defeats the only reason the file exists.
+  A handoff that is not committed is a handoff the next run cannot read.
+
+  This step used to say nothing about committing at all, while the prompt said "each attempt
+  commits its own files in STEP 8". One of the two was wrong, and it was this one.
+
   A run that fixes nothing but leaves a RULED OUT entry has still saved the next attempt two
   hours. A run that leaves nothing at all has wasted the slot.
 
