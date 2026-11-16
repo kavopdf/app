@@ -37,7 +37,14 @@ ROUND = os.path.join(HERE, "ROUND.json")
 CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
 
 DRY_LIMIT = 3          # consecutive unproductive runs before the chain stops
-MAX_DEPTH = 24         # a day's worth; a chain longer than this is not a chain, it is a loop
+# A DAY, NOT A RUN. The first version capped the chain at 24 firings and never reset the
+# counter, so after twenty-four short runs the chain stopped FOR EVER - the hourly cron would
+# fire, chain.py would still say "depth 24 reached", and nothing would chain again until a human
+# ran --reset. If a run averages seven minutes that is three hours of work and then a dead day.
+#
+# The cap is now per calendar day and set high enough that it cannot bind inside one: 200 firings
+# is twenty-four hours at seven minutes each, which is the shortest an attempt can be.
+MAX_DEPTH = 200
 
 # The cron this chain re-fires. Kept in CHAIN.json so it is one place, not scattered through
 # the brief and the prompt.
@@ -60,6 +67,13 @@ def load():
     c.setdefault("cron_id", DEFAULT_CRON)
     c.setdefault("depth", 0)
     c.setdefault("dry", 0)
+    c.setdefault("day", "")
+    # New day, new budget. Without this the counter is a lifetime total wearing a daily name.
+    today = time.strftime("%Y-%m-%d", time.gmtime(time.time() + 19800))
+    if c["day"] != today:
+        c["day"] = today
+        c["depth"] = 0
+        c["dry"] = 0
     c.setdefault("fired_at", [])
     return c
 
@@ -89,6 +103,7 @@ def main(argv):
     if "--status" in argv:
         r = _j(RUN, {})
         print("cron_id      : %s" % c["cron_id"])
+        print("day          : %s" % (c.get("day") or "-"))
         print("chain depth  : %d of %d" % (c["depth"], MAX_DEPTH))
         print("dry runs     : %d of %d" % (c["dry"], DRY_LIMIT))
         print("last run     : %s -> %s  (%d attempts, %d kept)"
