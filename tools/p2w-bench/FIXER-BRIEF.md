@@ -415,6 +415,12 @@ STEP 2b - READ WHAT IS ALREADY KNOWN, BEFORE FORMING ANY THEORY  ** DO THIS FIRS
   you do, say what changed. --next prints what is still untested; if it says nothing is left, every
   theory has been tried and you must form a new one from the evidence, not repeat an old one.
 
+        ls tools/p2w-bench/FINDINGS/ | grep "<exact class name>"
+    And read the files it lists. These are subagents from earlier runs that may have finished
+    hours after the run that asked them. A finding is a hypothesis, never proof - verify it
+    yourself before acting - but it is the cheapest start you will get, and it may name the exact
+    line. A class with three findings and no fix has three paths closed; that is progress.
+
 STEP 2c - CHECK WHETHER THE CLASS IS REALLY ONE CAUSE
       python3 tools/p2w-bench/classify.py --subclusters "<exact class name>"
   A class of 126 documents is rarely one defect. This splits it by the checks its documents ALSO
@@ -499,7 +505,7 @@ STEP 4b - THE TOOLS YOU HAVE, AND WHEN TO SPEND THEM
   A subagent runs in its own sandbox with its own copy of the repo. Give it a self-contained brief,
   tell it what to return, and it works while you keep working. Ask for a FALSIFIABLE CLAIM and how
   to test it - never a report of what it did. Verify every claim yourself before acting on it.
-  Subagents may not commit and may not touch the engine; you make every edit.
+  A subagent may commit ONE thing - its own file under FINDINGS/ - and nothing else. You make every edit and every other commit.
 
   THE THRESHOLDS WERE WRONG, AND IT COST 24 ATTEMPTS. (16 Nov)
     This step used to say "when: 20 minutes stuck" for research and "escalation at 30 minutes, not
@@ -531,23 +537,35 @@ STEP 4b - THE TOOLS YOU HAVE, AND WHEN TO SPEND THEM
         C  differential - what does another converter or library do with the same PDF
     AND keep working yourself on a fourth angle.
 
-    TIMING - THE RUN IS 45 MINUTES, AND A SUBAGENT'S ANSWER MUST LAND INSIDE IT.
-      A subagent has its own budget and can outlive your run. If it does, its answer arrives
-      after your context has ended and the work is lost - exactly as if you had never
-      deployed it. So:
-        * call delegate_task with background=false when you need the answer in this run. The
-          call returns when the agent finishes and you act on it. Waiting is the cost of an
-          answer; sending and idling is the cost of none.
-        * if you do deploy in the background, collect every result yourself before minute 40.
-          A background agent you never read is a wasted agent.
-        * bound every brief to ONE question and say "return within 10 minutes with X". An
-          open-ended agent will still be working when you are gone.
-      Deploy at minute 12 and a 15-minute agent lands at 27, leaving 18 minutes to act on what
-      it found. Deploy at minute 35 and you have bought nothing.
+    TIMING - LET THEM OUTLIVE YOU, BUT MAKE THEM LEAVE A FILE.
+      A subagent has its own budget and can easily outlive your 45-minute run. Its final message
+      goes to you - and if you are gone, that message arrives nowhere. So the deliverable is not
+      a message. The deliverable is a committed file.
+
+      EVERY subagent you deploy must write its finding to
+      tools/p2w-bench/FINDINGS/<class>-<angle>-<HHMM>.md and commit it with
+      GITHUB_COMMIT_MULTIPLE_FILES before it finishes. The format is in
+      tools/p2w-bench/FINDINGS/README.md. That file is what makes an agent worth deploying even
+      when it answers at 14:40 to a run that ended at 12:00.
+
+      So:
+        * background=true is right for investigation that may run long. You fire it and keep
+          working; whatever it proves is committed, and the next run reads it.
+        * background=false is right when you need the answer in THIS run and can afford to wait
+          for it. Deploy at minute 12 and a 15-minute agent lands at 27, leaving 18 minutes to
+          act on what it found. Deploy at minute 35 and you have bought nothing today - but the
+          file still lands, and tomorrow's run inherits it.
+        * bound every brief to ONE question and say "return within 10 minutes with X, and commit
+          the file even if X is 'I could not tell'".
+        * if you deploy in the background, collect what has arrived before minute 40. Anything
+          still running is not lost - it is a file the next run will find.
 
     Each subagent must return a falsifiable claim AND how to test it - not a report of what it did.
-    Verify every claim yourself before acting on it. Subagents may not commit and may not touch the
-    engine. Record each ruled-out theory in the ledger so the next attempt inherits it.
+    Verify every claim yourself before acting on it. A subagent may commit ONE thing - its own
+    file under FINDINGS/ - and nothing else: not the engine, not DEFECT-CLASSES.md, not
+    ATTEMPTS.json, not HYPOTHESES.md. You make every edit and every other commit.
+
+    THREE FINDINGS AND NO FIX IS STILL PROGRESS. Three paths are closed. Record them and move on.
 
 STEP 4c - LOOK AT IT. A NUMBER IS NOT AN EYE.
 
@@ -640,8 +658,8 @@ STEP 5 - FIX IT, IN ONE COHERENT CHANGE
         code.py --method <name>   for each one the plan names
         code.py --callers <name>  for what feeds it
     Deploy the three subagents from STEP 4b if the places are more than you can hold - each takes
-    a method, returns the exact lines to change and why. They may not commit and may not touch the
-    engine; you make every edit.
+    a method, returns the exact lines to change and why. They may commit their own FINDINGS file
+    and nothing else; you make every edit.
 
     Make the whole change, then measure ONCE, at the end. Do not measure between places: an
     intermediate state is a layout that is half-changed, it will regress, and the ratchet will
