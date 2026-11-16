@@ -146,6 +146,13 @@ def main(argv):
         # removes it.
         raw = argv[argv.index("--needs-human") + 1]
         parts = [x.strip() for x in (raw.split("|") + ["", "", ""])[:3]]
+        try:
+            _rp = os.path.join(HERE, "RUN.json")
+            _r = json.load(open(_rp, encoding="utf-8"))
+            _r["needs_human"] = _r.get("needs_human", 0) + 1
+            json.dump(_r, open(_rp, "w", encoding="utf-8"), indent=1)
+        except Exception:
+            pass
         d.setdefault("needs_human", []).append(
             {"at": ist(), "what": parts[0], "tried": parts[1], "change": parts[2]})
     if "--needs-human-clear" in argv:
@@ -167,6 +174,13 @@ def main(argv):
         _n = 1
         while "%s-%02d" % (_base, _n) in _used:
             _n += 1
+        try:
+            _rp = os.path.join(HERE, "RUN.json")
+            _r = json.load(open(_rp, encoding="utf-8"))
+            _r.setdefault("agents", []).append("%s-%02d" % (_base, _n))
+            json.dump(_r, open(_rp, "w", encoding="utf-8"), indent=1)
+        except Exception:
+            pass
         d["agents"].append({"id": "%s-%02d" % (_base, _n),
                             "class": parts[0].strip(), "angle": parts[1].strip(),
                             "question": parts[2].strip(), "expected": parts[3].strip(),

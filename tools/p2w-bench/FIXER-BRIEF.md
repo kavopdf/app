@@ -989,9 +989,23 @@ STEP 8 - RECORD WHAT YOU LEARNED, THEN THE ATTEMPT
   THEN COMMIT, BEFORE YOU GO BACK TO STEP 2. Every attempt commits its own files - that is what
   makes going back to STEP 2 safe, and it is what survives the platform killing you mid-attempt:
 
-      ROUND.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md,
+      ROUND.json, RUN.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md,
       HANDOFF.md, HANDOFF.json, benchmarks/DEFECT-CLASSES.md,
+      benchmarks/RANKING.csv, benchmarks/STATE.json, benchmarks/CENSUS.csv,
       and every engine file you changed
+
+      THE MEASUREMENT FILES ARE IN THAT LIST BECAUSE THEY WERE MISSING, AND IT COST US THE ONLY
+      PROOF WE HAD. (16 Nov)
+
+      On 16 Nov the fixer recorded "212 documents compared, 0 regressions, 31 improvements" in
+      ATTEMPTS.json. benchmarks/RANKING.csv was byte-identical to the round-one baseline and
+      STATE.json still read "improvements": []. The measurement ran in the sandbox and the claim was
+      written down, but the file it produced was never in any commit - so nothing on disk could tell
+      31 improvements from 31 hopes, and report.py correctly prints 0.00%.
+
+      A ratchet is not finished when the number appears on your screen. It is finished when
+      benchmarks/RANKING.csv is committed with it. If you cannot commit that file, the ratchet did
+      not happen and you must not record --ratchet.
 
   HANDOFF.md and HANDOFF.json are in that list on purpose. attempt.py rewrites them on every
   attempt, and until this commit they existed only in the sandbox - so a run killed between an
@@ -1047,6 +1061,26 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
         is.
 
 
+
+    THEN RUN THE REPORT AND PASTE IT. It is computed from committed files only - it does not
+    read your summary and it cannot be talked up:
+
+          python3 tools/p2w-bench/report.py
+
+    Eight numbers, and each one has a file behind it:
+
+        1  classes total          benchmarks/DEFECT-CLASSES.md row count
+        2  classes solved         FIXED rows, split into fixed-by-us and never-broken
+        3  docs improved this run  RUN.json, fed by attempt.py as attempts are recorded
+        4  this run total time    RUN.json start and end - not the heartbeat age
+        5  subagents this run     RUN.json, fed by handoff.py --agent-add
+        6  working class          RUN.json, set by attempt.py
+        7  corpus improvement %   RANKING.csv against RANKING-BASELINE.csv
+        8  docs improved total    the same two files, counted
+
+    If a number says 0, it is because nothing on disk proves it - not because the tool is
+    pessimistic. On 16 Nov a run recorded 31 improvements while RANKING.csv sat unchanged, and
+    this report printed 0.00%. That is the report doing its job.
     BEFORE YOU RELEASE, TWO LINES THAT ONLY YOU CAN WRITE.
 
           python3 tools/p2w-bench/handoff.py --context "<the picture in prose>"

@@ -101,6 +101,34 @@ PHASES = ["measure", "classify", "fix", "done"]
 # finishes releases the slot itself, so this governs only a run that died: 45 minutes means a
 # crash costs one slot, and a live run of up to forty-five minutes is never doubled - two runs
 # editing the engine at once would each revert the other's fix.
+def _run_record(action, **kw):
+    """RUN.json - one record per fixer run, written by the tools, never by hand.
+
+    round.py stamps the start ONCE and the end once. It deliberately does not refresh the start
+    on the heartbeat, which is what made the claim age useless for reporting: attempt.py resets
+    that on every attempt, so "how long did this run take" was always about seven minutes.
+    """
+    import json as _j
+    fp = os.path.join(HERE, "RUN.json")
+    try:
+        d = _j.load(open(fp, encoding="utf-8"))
+    except Exception:
+        d = {}
+    if action == "start":
+        d = {"started_ts": time.time(), "started": ist("%H:%M"), "ended_ts": None, "ended": None,
+             "class": "", "attempts": 0, "kept": 0, "docs_improved": 0, "agents": [],
+             "obstacles_cleared": 0, "needs_human": 0}
+    elif action == "end":
+        d["ended_ts"] = time.time()
+        d["ended"] = ist("%H:%M")
+    else:
+        d.update(kw)
+    try:
+        _j.dump(d, open(fp, "w", encoding="utf-8"), indent=1)
+    except Exception:
+        pass
+
+
 def _handoff(*args):
     """Best-effort: never let the handoff file break the round machine."""
     try:
@@ -274,6 +302,7 @@ def claim(name):
     note("claim", "%s claimed the slot" % name)
     if name == "fixer":
         _handoff("--run-start")
+        _run_record("start")
     # A stale claim means the previous run ended WITHOUT releasing. That is a real failure -
     # on 16 Nov the fixer finished at 08:05 and left its slot held - and it used to be
     # silent: the next run simply took over and nobody could see a run had ended untidily.
@@ -387,6 +416,7 @@ def release(name, force=False):
     save(s)
     if name == "fixer":
         _handoff("--run-end", "forced" if force else "released")
+        _run_record("end")
     if force:
         try:
             log = os.path.join(HERE, "RUN-LOG.md")

@@ -230,6 +230,20 @@ def add(args):
     log_runline(name, outcome, args.moved, args.total)
     heartbeat()
     try:
+        import json as _j
+        _rp = os.path.join(HERE, "RUN.json")
+        _r = _j.load(open(_rp, encoding="utf-8"))
+        _r["class"] = name
+        _r["attempts"] = _r.get("attempts", 0) + 1
+        if outcome == "kept":
+            _r["kept"] = _r.get("kept", 0) + 1
+            # Only a kept attempt that was committed counts here. attempt.py runs at STEP 8,
+            # before the commit, so this is the number the report will show once it lands.
+            _r["docs_improved"] = _r.get("docs_improved", 0) + (args.moved or 0)
+        _j.dump(_r, open(_rp, "w", encoding="utf-8"), indent=1)
+    except Exception:
+        pass
+    try:
         import subprocess
         subprocess.run([sys.executable, os.path.join(HERE, "handoff.py"), "--note",
                         "attempt %d on %s -> %s%s" % (row.get("attempts", 0), name, outcome,
