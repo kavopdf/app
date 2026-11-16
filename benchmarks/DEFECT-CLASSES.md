@@ -405,8 +405,8 @@ constantly.
 
 | # | document | problem | share@5px | max_pt | text recall | pages | status |
 |---|---|---|---|---|---|---|---|
-| 1 | `041122-Account_Opening_Form` | content-missing-partly-replaced | 98.65 % | 937.92 | 99.68 % | 9 | see class above |
-| 2 | `Account_Opening_Form_Fillable_filled` | content-missing-partly-replaced | 97.62 % | 358.08 | 99.67 % | 9 | see class above |
+| 1 | `041122-Account_Opening_Form` | content-missing-partly-replaced | 98.65 % | 937.92 | 99.68 % | 9 | OPEN |
+| 2 | `Account_Opening_Form_Fillable_filled` | content-missing-partly-replaced | 97.62 % | 358.08 | 99.67 % | 9 | OPEN |
 
 The other seven documents of that nine-document study are ordinary rows of this corpus too -
 `property-tax-receipt`, `admit-card`, `delivery-challan`, `gst-invoice-3line-items`, `350_question_paper`,
