@@ -82,7 +82,7 @@ NEVER READ THESE FILES WHOLE  ** THIS IS HOW A RUN DIES **
 
       python3 tools/p2w-bench/record.py --show <document>          one document, last three engines
       python3 tools/p2w-bench/record.py --show <doc> --check <id>  one check on one document
-      python3 tools/p2w-bench/classify.py                          the classes, largest first
+      python3 tools/p2w-bench/classify.py --pick   which class to take next (NOT bare classify.py - that rewrites the class file)
       python3 tools/p2w-bench/hypothesis.py --show "<class>"       what was tried on this class
       python3 tools/p2w-bench/trace.py --show 40                   what the tools did
 

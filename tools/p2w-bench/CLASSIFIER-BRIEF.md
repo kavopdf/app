@@ -107,8 +107,13 @@ WHEN SOMETHING FAILS
   reason is a result; a run that died retrying is not.
 
 STEP 1 - CLASSIFY
-  python3 tools/p2w-bench/classify.py
-  python3 tools/p2w-bench/classify.py --txt
+  python3 tools/p2w-bench/classify.py --write
+  python3 tools/p2w-bench/classify.py --txt --write
+
+  --write is not optional for you. Since 16 Nov this script only rewrites the class file
+  when it is asked to: a bare run prints the summary and changes nothing, because the fixer
+  ran one to look up a key and it silently replaced DEFECT-CLASSES.md with 45 retired
+  check-id classes. You are the classifier - you are the one caller that passes --write.
 
   The tool has two outputs and each is classified on its own. The first command
   writes DEFECT-CLASSES.md for the .docx half (checks 01 to 59); the second writes

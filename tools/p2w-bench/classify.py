@@ -795,7 +795,29 @@ def main(argv):
     # The two halves get their own file. Writing both into DEFECT-CLASSES.md meant a
     # classify --txt run replaced the .docx class list with the .txt one, and the fixer
     # reads that file to decide what to attack next.
+    # WRITING IS OPT-IN. It used to happen on every run of this script.
+    #
+    # On 16 Nov the fixer ran a bare `classify.py` to look up a valid ledger key, and that
+    # rewrote DEFECT-CLASSES.md with 45 retired check-id classes. It had to revert to HEAD
+    # and the run was worth nothing: "Nobody should run classify.py to read a class name."
+    # A tool that destroys the file the whole pipeline plans from, as a side effect of being
+    # asked a question, is a trap. The classifier is the only thing that should ever write
+    # this file, and it now has to say so.
+    #
+    # `classify.py` on its own prints the summary and changes nothing. `classify.py --write`
+    # rewrites the class file - that is the classifier's command and nobody else's.
     name = "DEFECT-CLASSES-TXT.md" if "--txt" in sys.argv else "DEFECT-CLASSES.md"
+    if "--write" not in argv:
+        print("read-only: %s NOT rewritten (pass --write to rewrite it, and only the "
+              "classifier should)" % name)
+        note("classify%s (read-only)" % (" --txt" if "--txt" in argv else ""),
+             "%d classes from %d documents, class file untouched" % (len(classes), len(measured)))
+        print("documents measured : %d" % len(measured))
+        print("checks firing      : %d" % len(doc_sets))
+        print("classes (data-driven): %d" % len(classes))
+        for _c in classes[:10]:
+            print("  %-42s %3d docs" % (_c["name"], len(_c["docs"])))
+        return 0
     open(os.path.join(HERE, name), "w", encoding="utf-8").write("\n".join(out) + "\n")
 
     note("classify%s" % (" --txt" if "--txt" in argv else ""),
