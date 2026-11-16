@@ -137,6 +137,23 @@ def log_runline(cls, outcome, moved, total):
             f.write("| %s | fixer | attempt %s -> %s%s |\n" % (stamp, cls, outcome, tail))
     except Exception:
         pass                      # a log that cannot be written must not lose the attempt
+    # AND TO THE TRACE, because that is what round.py counts.
+    #
+    # round.py's release guard asks `_attempts_this_run()`, which counts lines in TRACE.md
+    # reading "| attempt |" since the last claim. This tool wrote ATTEMPTS.json and
+    # RUN-LOG.md and never TRACE.md, so the guard counted ZERO however many attempts a run
+    # recorded: on 16 Nov the 10:50 run recorded two and was still told "0 attempt(s)
+    # recorded" and refused its release. Every run since has ended in `--force`, which is
+    # why RUN-LOG.md reads "slot FORCED released" over and over - a guard that cannot see
+    # the work it is guarding pushes runs to bypass it, which is worse than no guard.
+    try:
+        import sys as _sys
+        if HERE not in _sys.path:
+            _sys.path.insert(0, HERE)      # ahead of the stdlib `trace` module
+        import trace as _trace
+        _trace.note("attempt", "%s -> %s%s" % (cls, outcome, tail))
+    except Exception:
+        pass
 
 
 def compute(moved, total):

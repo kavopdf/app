@@ -272,3 +272,24 @@ Do not re-test one without new evidence, and if you do, say what changed.
   have cost a corpus ratchet to prove it.
   NEXT: the spill's height is the text box, so look at the box's width in DocxWriter's anchor
   path (where a box's extent comes from its block's own line boxes) before the table's rows.
+
+## content-missing-nothing-in-its-place - 16 Nov 10:50 run: the inline image is SKIPPED by name, and the line is now known
+
+- MEASURED (untested as a fix) - The 89.04 %@5 on `415_inline_images` is not an extraction
+  failure to be chased in the image path: the content-stream walker throws the operator away
+  before anything else sees it.
+  evidence: 16 Nov 2026 fixer, corpus-v1 downloaded (211 PDFs).
+  `415_inline_images.pdf` page 1: `get_images()` = 0, and its content stream is 381 bytes
+  carrying 2 `BI ... ID ... EI` sequences -
+  `BI /W 8 /H 8 /CS /G /BPC 8 /F /AHx ID 00FF00FF... EI`. `PdfToWord.java:2715`:
+  `if (tok.equals("BI")) { i = skipInlineImage(cs, i); ops.clear(); continue; }`, and
+  `skipInlineImage` is at `PdfToWord.java:2906`. So the four bars are dropped by design and
+  the text below them moves up into the freed space - which is why the page reads as
+  content-LOSS with text_recall still high.
+  WHY IT WAS NEVER FIXED: the fix is a decoder, not a correction - parse W/H/CS/BPC/F, build
+  the raster, place it at the current CTM, and emit it as the Picture block the XObject path
+  already writes. That is a feature with a measured surface, not a one-line guard, and it
+  should be taken by a run that has the whole slot for it.
+  NEXT: start at `skipInlineImage` (2715/2906). The page's own text says what the bars are
+  ("It has no object number and lives inside the content stream."), and the corpus document
+  is a one-page, 381-byte reproducer, so a fix can be measured in seconds.

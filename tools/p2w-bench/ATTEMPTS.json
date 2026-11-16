@@ -58,8 +58,19 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "content-missing-nothing-in-its-place": {
+  "attempts": 1,
+  "first_seen": null,
+  "last": null,
+  "outcomes": [
+   "error"
+  ],
+  "reason": "diagnosis only, no fix attempted: inline images are skipped by name at PdfToWord.java:2715 (skipInlineImage, 2906); 415_inline_images page 1 carries 2 BI/ID/EI sequences in a 381-byte stream and get_images() reports 0. Fixing it is a decoder plus placement, not a guard, and there was not enough clock left to build and ratchet it",
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "content-missing-partly-replaced": {
-  "attempts": 3,
+  "attempts": 4,
   "first_seen": null,
   "last": null,
   "last_engine": "sizePt patch (run-size-from-sizePt-not-Tf)",
@@ -68,9 +79,10 @@
   "outcomes": [
    "reverted",
    "error",
+   "error",
    "error"
   ],
-  "reason": "ruled-band-by-overlap: the heading block's narrow placement is inside a wps:txbx text box (378 in the docx, the heading exists twice at x 513.9-571.5 and 573.1-584.0), not a ruled table cell, so the overlap rule fires on no page-7 line; measurement identical to the digit (94.92, pages 9 vs 10); patch saved and reverted",
+  "reason": "trace fix verification: attempt.py now writes a TRACE line so round.py's release guard can count attempts",
   "requeues": 0,
   "status": "OPEN"
  }
