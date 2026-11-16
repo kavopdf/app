@@ -1207,14 +1207,32 @@ STEP 9b - CHAIN THE NEXT RUN. THE PIPELINE RUNS 24/7.
   The cron fires at :45. A run that ends at 15:40 leaves forty-seven minutes on the floor. So the
   chain closes the gap: after a clean release, start the next run yourself.
 
-  THE ORDER MATTERS. Do these three things in this order, and do the trigger BEFORE you write
-  anything else:
+  THE ORDER MATTERS, AND THE COMMIT SITS IN THE MIDDLE OF IT.
+
+  The next run starts seconds later and it starts with a FRESH CLONE. A clone reads origin, not
+  your sandbox. So anything you wrote and did not commit is invisible to it - it reads the
+  previous run's handoff, redoes work that was already done, or re-opens a question you had just
+  answered. That is why the commit comes before the trigger, not after:
 
       1.  handoff.py --context "..."        what is true now
           handoff.py --next "..."           what the next run should do first
       2.  round.py --release-fixer          the slot is free
-      3.  chain.py --after-release          prints FIRE or STOP
-          on FIRE:  cron action=trigger cron_id=<the id chain.py printed>
+      3.  COMMIT AND PUSH EVERYTHING:
+              ROUND.json, RUN.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md,
+              HANDOFF.md, HANDOFF.json, benchmarks/DEFECT-CLASSES.md,
+              benchmarks/RANKING.csv, benchmarks/STATE.json, benchmarks/CENSUS.csv,
+              and every engine file you changed
+      4.  chain.py --after-release          prints FIRE or STOP
+              on FIRE:  cron action=trigger cron_id=<the id chain.py printed>
+
+  chain.py will not fire unless your sandbox matches origin AND the working tree is clean. It
+  prints the dirty files by name if they are not. That check exists because HEAD matching origin
+  is not enough on its own - an uncommitted edit does not move HEAD, so a run that rewrote
+  HANDOFF.md and forgot to commit it passes a HEAD check while the next clone reads the old file.
+
+  Trigger before the report, before any summary, before anything that could be interrupted. A run
+  that releases and then dies writing its summary has stopped the chain for up to an hour, and the
+  summary was worth less than the hour.
 
   Trigger before the report, before any summary, before anything that could be interrupted. A run
   that releases and then dies writing its summary has stopped the chain for up to an hour, and the

@@ -78,6 +78,50 @@ def load():
     return c
 
 
+def remote_in_sync():
+    """Is everything this run wrote actually on origin?
+
+    THE RACE THIS EXISTS TO CLOSE. The chain triggers the next run seconds after the release, and
+    that run starts with a fresh clone. A clone reads origin, not this sandbox. So if the handoff,
+    the attempt ledger or the class file were written here and never committed, the next run starts
+    blind: it reads the previous run's context, does work that was already done, or re-opens a
+    question the last run had answered.
+
+    The order in the brief is now: write, release, COMMIT, verify, trigger. This is the verify.
+    """
+    import subprocess
+    try:
+        subprocess.run(["git", "fetch", "-q", "origin", "main"], cwd=ROOT,
+                       capture_output=True, timeout=90)
+        local = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
+                               capture_output=True, text=True, timeout=30).stdout.strip()
+        remote = subprocess.run(["git", "rev-parse", "origin/main"], cwd=ROOT,
+                                capture_output=True, text=True, timeout=30).stdout.strip()
+        if not local or not remote:
+            return None, "", ""
+        if local != remote:
+            return False, local[:8], remote[:8]
+        # HEAD matching origin is NOT enough. An uncommitted edit does not move HEAD, so a run
+        # that rewrote HANDOFF.md and forgot to commit it passes a HEAD check while the next
+        # clone reads the old file. The working tree has to be clean too.
+        st = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT,
+                            capture_output=True, text=True, timeout=60).stdout
+        dirty = []
+        for line in st.splitlines():
+            code, _, path = line[:2], line[2:3], line[3:].strip()
+            if code.strip() == "??":
+                # untracked matters only where the pipeline keeps state
+                if path.startswith(("tools/p2w-bench/", "benchmarks/")):
+                    dirty.append(path)
+            else:
+                dirty.append(path)
+        if dirty:
+            return "dirty", local[:8], ", ".join(dirty[:6])
+        return True, local[:8], remote[:8]
+    except Exception:
+        return None, "", ""
+
+
 def open_classes():
     n = 0
     try:
@@ -132,6 +176,24 @@ def main(argv):
     if open_classes() == 0:
         print("STOP: no OPEN document left - close the round, do not chain")
         return 1
+    ok, local, remote = remote_in_sync()
+    if ok is None:
+        print("STOP: could not compare this sandbox to origin, so I cannot promise the next run")
+        print("      will see what this one wrote. Commit and push, then chain.")
+        return 1
+    if ok == "dirty":
+        print("STOP: uncommitted changes in this sandbox: %s" % remote)
+        print("      HEAD matches origin, but the next run clones origin - it would read the")
+        print("      files as they are on the server, not as you have just written them.")
+        print("      Commit and push, then run chain.py again.")
+        return 1
+    if not ok:
+        print("STOP: this sandbox is at %s but origin/main is at %s." % (local, remote))
+        print("      The next run clones from origin. Anything you wrote and did not commit - the")
+        print("      handoff, the attempt ledger, the class file, RANKING.csv - it will not see.")
+        print("      Commit and push, then run chain.py again.")
+        return 1
+
     if c["depth"] >= MAX_DEPTH:
         print("STOP: chain depth %d reached - wait for the hourly cron" % c["depth"])
         return 1
