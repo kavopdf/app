@@ -1015,6 +1015,18 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
         because you are the one doing the work. A skipped run is not a wasted hour. A stopped run
         is.
 
+
+    BEFORE YOU RELEASE, TWO LINES THAT ONLY YOU CAN WRITE.
+
+          python3 tools/p2w-bench/handoff.py --context "<the picture in prose>"
+          python3 tools/p2w-bench/handoff.py --next "<the one thing the next run should do>"
+
+    --next is what the gate reads first, and it is working: the 13:58 run set it and the run
+    after it started from that exact sentence instead of from the class list. --context is the
+    part that is not being written - on 16 Nov it still held the text a previous agent had seeded,
+    so the next run read a stale picture next to a fresh instruction. Say what is true NOW: what
+    you established, what you ruled out and why, and what the next run would waste an hour
+    rediscovering. Two paragraphs is enough. It is the only place your understanding survives.
     WHEN YOU SENSE THE END, LEAVE THE ROOM CLEAN.
         The platform may end you at any moment. If you think you are close - the context is
         filling, calls are slowing - then before it happens: record the attempt you are on, write

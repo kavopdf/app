@@ -99,6 +99,18 @@ def save(d):
         json.dump(d, f, indent=1, sort_keys=True)
 
 
+def ist(fmt="%d %b %H:%M"):
+    """The wall clock this pipeline writes in.
+
+    round.py has had this since the beginning; attempt.py did not, and wrote bare strftime -
+    which on this sandbox is UTC, five and a half hours behind. So RUN-LOG.md carried both at
+    once: "12:46 slot claimed" from round.py next to "08:21 attempt -> error" from here, and
+    the ratchet stamp read 08:22 for something that happened at 13:52. A timeline with two
+    clocks in it is not a timeline.
+    """
+    return time.strftime(fmt, time.gmtime(time.time() + 19800))
+
+
 def heartbeat():
     """Refresh the fixer claim while the run is demonstrably alive.
 
@@ -132,7 +144,7 @@ def log_runline(cls, outcome, moved, total):
     """
     import time
     try:
-        stamp = time.strftime("%d %b %H:%M")
+        stamp = ist()
         tail = "" if moved is None else " (%s/%s moved)" % (moved, total or "?")
         with open(RUNLOG, "a", encoding="utf-8") as f:
             f.write("| %s | fixer | attempt %s -> %s%s |\n" % (stamp, cls, outcome, tail))
@@ -210,7 +222,7 @@ def add(args):
     # kept fix stays 'pending' for ever, and pending.py is a gate: a run may not take a new class
     # while it lists something. That is the point - an unratcheted fix is unfinished work.
     if args.ratchet is not None:
-        row["ratchet_at"] = time.strftime("%d %b %H:%M")
+        row["ratchet_at"] = ist()
         row["ratchet_docs"] = args.ratchet
     row.setdefault("reasons", []).append(args.reason or "")
     row["reason"] = args.reason or "(no reason recorded for this attempt)"
