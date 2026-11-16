@@ -485,8 +485,22 @@ STEP 4b - THE TOOLS YOU HAVE, AND WHEN TO SPEND THEM
         A  read the engine code path - what do we emit, and where
         B  calibration variants - is this a renderer limit or our bug
         C  differential - what does another converter or library do with the same PDF
-    AND keep working yourself on a fourth angle. Sending three agents and then waiting is not an
-    escalation, it is a pause.
+    AND keep working yourself on a fourth angle.
+
+    TIMING - THE RUN IS 45 MINUTES, AND A SUBAGENT'S ANSWER MUST LAND INSIDE IT.
+      A subagent has its own budget and can outlive your run. If it does, its answer arrives
+      after your context has ended and the work is lost - exactly as if you had never
+      deployed it. So:
+        * call delegate_task with background=false when you need the answer in this run. The
+          call returns when the agent finishes and you act on it. Waiting is the cost of an
+          answer; sending and idling is the cost of none.
+        * if you do deploy in the background, collect every result yourself before minute 40.
+          A background agent you never read is a wasted agent.
+        * bound every brief to ONE question and say "return within 10 minutes with X". An
+          open-ended agent will still be working when you are gone.
+      Deploy at minute 12 and a 15-minute agent lands at 27, leaving 18 minutes to act on what
+      it found. Deploy at minute 35 and you have bought nothing.
+
     Each subagent must return a falsifiable claim AND how to test it - not a report of what it did.
     Verify every claim yourself before acting on it. Subagents may not commit and may not touch the
     engine. Record each ruled-out theory in the ledger so the next attempt inherits it.
