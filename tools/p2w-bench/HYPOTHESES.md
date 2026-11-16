@@ -197,3 +197,21 @@ Do not re-test one without new evidence, and if you do, say what changed.
   form 11: source page 7 overflows, everything after it shifts one page, and pages 7-9 read
   74-95 %@5 purely because page i is compared against page i. Fix the spill and the same
   documents should fall from ~90 %@5 to the pages 1-6 range. Do not re-derive the size bug.
+
+## PIPELINE - the measurement is slow because scipy is missing, and that is why slots vanish
+
+- MEASURED - A fresh pod has no scipy, so `p2w.edt()` takes its ladder fallback
+  (radius-by-radius dilation, up to 400 iterations per page) instead of
+  `scipy.ndimage.distance_transform_edt`.
+  evidence: 16 Nov 2026 fixer. Same engine, same three single-page documents
+  (415_inline_images, 07_stamp_over_table, 601_fillable_admission_form):
+  without scipy the run exceeded the 290 s sandbox call limit twice and returned
+  nothing; after `pip install scipy` the identical three measured in 28 s.
+  Two nine-page realworld forms still exceeded 290 s after the install, so soffice
+  on a 4088-run form is a second, separate cost - but the ladder is the one that
+  silently converts "measure a sample" into "measure nothing".
+  ACTION FOR THE NEXT RUN, before any attempt: `pip install scipy` (one line, ~20 s),
+  then measure. `p2w.validate()` installs scipy itself; any measurement path that
+  does not go through validate() must do the same or it measures at ladder speed.
+  This is a cost defect, not a fidelity defect: it changes no score, only whether a
+  run gets to produce one.

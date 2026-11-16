@@ -59,15 +59,17 @@
   "status": "OPEN"
  },
  "content-missing-partly-replaced": {
-  "attempts": 1,
+  "attempts": 2,
   "first_seen": null,
   "last": null,
+  "last_engine": "sizePt patch (run-size-from-sizePt-not-Tf)",
   "last_moved": 2,
   "last_total": 2,
   "outcomes": [
-   "reverted"
+   "reverted",
+   "error"
   ],
-  "reason": "1pt text from raw Tf (getFontSize not getFontSizeInPt); 041122 pages 1-6 mean share@5 82.1->18.3; class not passed - page spill 10 vs 9 pages remains; patch saved at patches/run-size-from-sizePt-not-Tf.patch; full 213-doc ratchet not run in slot",
+  "reason": "re-applied the CONFIRMED patch and built the engine; measured 3 docs on the patched engine: 415_inline_images 89.04 (baseline 89.04), 07_stamp_over_table 1.93 (baseline 2.60), 601_fillable_admission_form 52.39 (baseline 52.39) - no regression, but the class's own two nine-page forms could not be measured: soffice on the 4088-run form exceeded the 290s call limit twice. FOUND: scipy is absent on a fresh pod, so p2w.edt falls back to the ladder; installing scipy took 3 single-page docs from >290s to 28s. Measurement cost, not engine cost, is what has been eating these slots.",
   "requeues": 0,
   "status": "OPEN"
  }
