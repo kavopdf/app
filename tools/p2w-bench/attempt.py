@@ -169,11 +169,32 @@ def log_runline(cls, outcome, moved, total):
         pass
 
 
-def compute(moved, total):
-    """kept / reverted from the numbers. None when there are no numbers to read."""
+def compute(moved, total, ratchet=False):
+    """kept / partial / reverted from the numbers. None when there are no numbers to read.
+
+    THIS USED TO BE `"kept" if moved > 0`. One document moving out of thirty counted as a kept
+    fix, and on 16 Nov that is exactly what happened: a 1/30 attempt sat in the ledger beside a
+    31/212 ratchet and the run report read "2 kept" as though both had landed. A fix that moves
+    one document of thirty is a partial, and calling it kept is how a pipeline convinces itself
+    it is winning.
+
+    The bar is a quarter of the class, and never fewer than two documents - one document moving
+    can be noise in the measurement, and two is the smallest number that cannot be.
+    """
     if moved is None or not total:
         return None
-    return "kept" if moved > 0 else "reverted"
+    if moved <= 0:
+        return "reverted"
+    # A RATCHET IS JUDGED DIFFERENTLY, because it answers a different question. It is not "did
+    # this patch move a quarter of the class" - it is "does this fix hold across the whole corpus
+    # without breaking anything". 31 of 212 is a perfectly good ratchet: only 31 documents ever
+    # had that defect. Applying the class bar here marked the strongest proof in the pipeline as
+    # "partial".
+    if ratchet:
+        return "kept"
+    if moved >= max(2, 0.25 * total):
+        return "kept"
+    return "partial"
 
 
 def add(args):
@@ -188,7 +209,7 @@ def add(args):
             print("    %s" % n)
         return 2
 
-    outcome = args.outcome or compute(args.moved, args.total)
+    outcome = args.outcome or compute(args.moved, args.total, ratchet=args.ratchet is not None)
     if outcome not in OUTCOMES:
         print("refused: outcome must be one of %s, or give --moved/--total so it is "
               "computed." % ", ".join(OUTCOMES))
