@@ -1,0 +1,197 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 452a4bf..eab272d 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -1043,6 +1043,58 @@ public final class PdfToWord {
+                 starts.clear(); starts.addAll(ruleGutters);
+             }
+         }
++        // A page set in three or four columns can hide one of its gutters from the whole-page
++        // projection above, and then it is cut into two columns that are each two columns wide
++        // and the halves interleave line by line. newsletter-3col-header-footer is the case:
++        // its three columns are 160 pt wide and separated by clean gutters at x=210.2 and
++        // x=385.0, but the KPI panel at the foot of the sheet sets four cells from x=42 to
++        // x=475 and one of them ("EBITDA margin", x=172.9-220.1) reaches across the first
++        // gutter. The projection reports ONE gap, the page comes out two columns, and 32 of
++        // its 100 judged lines are read out of order.
++        //
++        // The panel occupies 24 pt of an 842 pt sheet. A band of the page that does not hold
++        // it sees both gutters, so the page is projected again band by band - the same six
++        // bands the spanning-block fallback above uses - and a gutter at least half the bands
++        // report is a gutter the page has. Measured on that page: bands 1-3 report 210.2 and
++        // 385.0, band 0 reports neither, band 4 reports nothing, band 5 reports only the two
++        // cells of the panel.
++        //
++        // WHY THE LINE-START CLUSTER DETECTOR IS NOT THE ONE CONSULTED HERE, since it looks
++        // like the natural choice and was the last thing tried. Widening it to run whenever
++        // `starts.size() < 2` and letting its candidates through cut the rows of three ruled
++        // tables (mobile-bill 109 paragraphs to 77, two-tables-stacked 108 to 6, boq 34 to
++        // 146), and filtering those candidates against the tables found so far does not
++        // rescue them, because on those pages there is no Table object yet to filter against
++        // (`firstPass` and `rowPass` are both empty on mobile-bill, two-tables-stacked and
++        // boq-horizontal-rules-only). Measured again for this patch: with the table filter in
++        // place and the cluster candidates admitted, 332_bom_on_drawing, one-page-rotated-
++        // 180-degrees and 68_journal_wide_table_spanning each had a ruled table split and
++        // reshaped. On the document this is for, the detector also cannot answer: its
++        // candidates are empty, because two three-line groups (the panel's own cells at
++        // x=172.9 and x=303.3) sit between the real clusters, and its midpoint rule puts the
++        // boundary at 143.9 - inside column 1.
++        //
++        // So the position always comes from the band projection, and a candidate still has to
++        // clear three tests before it is allowed anywhere near `toLines`:
++        //
++        //   a table already found owns it   a candidate inside a ruled or row-detected table
++        //                                   that runs down the sheet is that table's cell
++        //                                   separator, not a page column - the same test
++        //                                   `columnStarts` is already filtered by above.
++        //   the columns stay equal           the engine's own test for a column page
++        //                                   (proseColumns: the thinnest band is at least 0.7
++        //                                   of the widest). A newsletter, a newspaper and a
++        //                                   brochure are set in equal columns; the cell of a
++        //                                   table is not.
++        //   it is not already there          within 20 pt of a gutter the page already has.
++        if (starts.size() < 2 && glyphs.size() >= 40) {
++            List<Float> extra = extraGutters(rawLines, starts, firstPass, rowPass,
++                    pageHeight);
++            if (!extra.isEmpty()) {
++                starts.addAll(extra);
++                Collections.sort(starts);
++            }
++        }
+         // The page's column count is the number of bands the cut actually made, not the earlier
+         // proseColumns() estimate.
+         //
+@@ -3153,6 +3205,133 @@ public final class PdfToWord {
+         return bands.size();
+     }
+ 
++    /**
++     * The page's gutters, projected band by band instead of all at once.
++     *
++     * <p>{@link #keep0} projects every glyph of the page together, so one element that reaches
++     * across a gutter removes it from the whole page - a pull quote, a spanning heading, or a
++     * KPI panel whose cell is 17 pt wider than the column above it. Each of the six bands is
++     * projected on its own and a gutter that at least half of them report is returned with its
++     * vote count. A gutter the whole page already has is reported by every band and comes back
++     * here too; the caller drops it as already present.
++     */
++    private static List<float[]> bandGutters(List<Line> rawLines, float fullWidth) {
++        List<float[]> out = new ArrayList<>();
++        float top = Float.MAX_VALUE, bot = -Float.MAX_VALUE;
++        for (Line l : rawLines) {
++            if (l.text.trim().isEmpty()) continue;
++            top = Math.min(top, l.y);
++            bot = Math.max(bot, l.y);
++        }
++        final int bandsN = 6;
++        float bh = (bot - top) / bandsN;
++        if (bh <= 8f) return out;
++        List<float[]> votes = new ArrayList<>();
++        for (int b = 0; b < bandsN; b++) {
++            float y0 = top + b * bh, y1 = y0 + bh;
++            List<Line> sub = new ArrayList<>();
++            for (Line l : rawLines) if (l.y >= y0 && l.y < y1) sub.add(l);
++            if (sub.size() < 4) continue;
++            for (Float g : keep0(sub, fullWidth)) votes.add(new float[]{g, b});
++        }
++        Collections.sort(votes, new Comparator<float[]>() {
++            @Override
++            public int compare(float[] a, float[] b) { return Float.compare(a[0], b[0]); }
++        });
++        int need = Math.max(2, (bandsN + 1) / 2);
++        int i = 0;
++        while (i < votes.size()) {
++            int j = i;
++            float sum = 0f;
++            java.util.LinkedHashSet<Integer> seen = new java.util.LinkedHashSet<>();
++            while (j < votes.size() && votes.get(j)[0] - votes.get(i)[0] <= 6f) {
++                sum += votes.get(j)[0];
++                seen.add((int) votes.get(j)[1]);
++                j++;
++            }
++            if (seen.size() >= need) out.add(new float[]{sum / (j - i), seen.size()});
++            i = j;
++        }
++        return out;
++    }
++
++    /**
++     * The gutters to ADD to a page the detectors above could only partly resolve.
++     *
++     * <p>Every candidate is filtered here, against the tables found so far and against the
++     * page's own shape, BEFORE it is returned - so nothing that fails a test reaches
++     * {@link #toLines}. The three tests are set out at the call site; this method applies
++     * them in the order that rejects the most first.
++     */
++    private static List<Float> extraGutters(List<Line> rawLines, List<Float> starts,
++                                            List<Table> firstPass, List<Table> rowPass,
++                                            float pageHeight) {
++        List<Float> out = new ArrayList<>();
++        float lo = Float.MAX_VALUE, hi = -Float.MAX_VALUE;
++        for (Line l : rawLines) {
++            if (l.text.trim().isEmpty() || l.right <= l.x) continue;
++            lo = Math.min(lo, l.x);
++            hi = Math.max(hi, l.right);
++        }
++        if (hi <= lo) return out;
++        // A full-width headline covers the gutter under it; the projection leaves those lines
++        // out, exactly as the whole-page one does.
++        float fullWidth = (hi - lo) * 0.62f;
++        List<Float> taken = new ArrayList<>(starts);
++        for (float[] g : bandGutters(rawLines, fullWidth)) {
++            float x = g[0];
++            boolean near = false;
++            for (Float s : taken) if (Math.abs(s - x) < 20f) { near = true; break; }
++            if (near) continue;
++            if (x <= lo + 20f || x >= hi - 20f) continue;
++            boolean inTable = false;
++            for (Table t : firstPass) if (ownsGutter(t, x, rawLines, pageHeight)) { inTable = true; break; }
++            if (!inTable) {
++                for (Table t : rowPass) if (ownsGutter(t, x, rawLines, pageHeight)) { inTable = true; break; }
++            }
++            if (inTable) continue;
++            if (taken.size() >= 3) break;                       // four columns is the cap
++            if (!bandsStayEven(taken, x, lo, hi)) continue;
++            taken.add(x);
++            Collections.sort(taken);
++            out.add(x);
++        }
++        return out;
++    }
++
++    /**
++     * Is this x the cell separator of a table that runs down the sheet?
++     *
++     * <p>The {@code rowSane} test is the one {@code columnStarts} is already filtered by. The
++     * height test is added because a short table cannot make a page-wide gutter: the KPI panel
++     * on newsletter-3col-header-footer spans x=42-475 and is 24 pt of an 842 pt page, and
++     * without the test it would veto the very gutter this patch is here to find.
++     */
++    private static boolean ownsGutter(Table t, float x, List<Line> rawLines, float pageHeight) {
++        if (!rowSane(t, rawLines)) return false;
++        if (x < t.left - 4 || x > t.right + 4) return false;
++        float h = Math.abs(t.bottom - t.top);
++        return pageHeight <= 0 || h >= pageHeight * 0.20f;
++    }
++
++    /** Does adding x leave every band at least 0.7 of the widest - the column-page test? */
++    private static boolean bandsStayEven(List<Float> starts, float x, float lo, float hi) {
++        List<Float> all = new ArrayList<>(starts);
++        all.add(x);
++        Collections.sort(all);
++        float widest = 0f, thinnest = Float.MAX_VALUE, prev = lo;
++        for (Float s : all) {
++            float w = s - prev;
++            widest = Math.max(widest, w);
++            thinnest = Math.min(thinnest, w);
++            prev = s;
++        }
++        float w = hi - prev;
++        widest = Math.max(widest, w);
++        thinnest = Math.min(thinnest, w);
++        return thinnest >= widest * 0.7f;
++    }
++
+     private static List<Float> keep0(List<Line> rawLines, float fullWidth) {
+         List<float[]> iv = new ArrayList<>();
+         float lo = Float.MAX_VALUE, hi = -Float.MAX_VALUE;

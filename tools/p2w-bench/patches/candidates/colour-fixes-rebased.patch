@@ -1,0 +1,318 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 327a3f9..7cc2459 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -805,6 +805,17 @@ public final class DocxWriter {
+         int cellWrapHits;
+         /** The shapes on the page being written, so a stamp can find its own outline. */
+         java.util.List<Shape> curShapes;
++        /**
++         * The shapes already written on the page being written, in the order they were written.
++         *
++         * <p>Paint order is the only thing that says whether a fill is a background or a hole.
++         * A page that draws a black square and then a smaller white square inside it has drawn a
++         * RING; dropping the white fill leaves a solid black square. That is what
++         * 49_coloured_background_block_paragraph's cousin - gst-invoice-with-qr-code's QR finder
++         * pattern - came out as. Cleared per page (see pageBody), so the second pass of the
++         * budget guard sees the same list the first one did.
++         */
++        final java.util.List<Shape> painted = new java.util.ArrayList<>();
+         /**
+          * The lines of each stamp, keyed by the shape that carries that stamp's frame.
+          *
+@@ -1277,6 +1288,7 @@ public final class DocxWriter {
+         // Which of the page's turned lines belong to one stamp, and which shape carries its
+         // frame. Rebuilt here rather than once per page because the page is written several
+         // times by the budget guard, and each pass must write every stamp again.
++        ctx.painted.clear();
+         groupStamps(page, ctx.curShapes, ctx);
+         cenReset(ctx);
+         if (columnPage(sb, page, ctx, pw)) { cenEmit(ctx, page); return; }
+@@ -2671,7 +2683,19 @@ public final class DocxWriter {
+             // the dark-mode white patch fillXml exists to avoid is a BAND, which has an area,
+             // and a 0.3 pt rule has none. Same 1.5 pt / 2 pt test as PdfToWord.bandFillStroke
+             // and verify_google._strokes.
+-            fillXml(sb, s.fillRgb, s.fillAlpha, s.lineRgb < 0 && isHairline(s));
++            //
++            // AND A WHITE FILL THAT IS A HOLE MUST PAINT. "White is the page, so write no fill"
++            // is only true of a fill at the BOTTOM of the stack. A page that draws a black
++            // square and then a smaller white one inside it has drawn a RING - a QR finder
++            // pattern, a speech bubble's interior, a white label inside a coloured band - and
++            // dropping the white fill lets the black underneath show through the hole. Measured
++            // on gst-invoice-with-qr-code: the finder pattern is three nested rects (111111
++            // 125.4 pt2, FFFFFF 64.0 pt2, 111111 23.0 pt2) and the render came out as a solid
++            // black square, which is the "coloured block lost its shape" half of the user's
++            // report. 38 such fills sit over non-page ink across 13 of the 211 documents.
++            fillXml(sb, s.fillRgb, s.fillAlpha,
++                    (s.lineRgb < 0 && isHairline(s)) || paintsOverInk(s, ctx));
++            ctx.painted.add(s);
+         }
+         // A shape with no fill gets no fill element at all, matching the commercial files.
+         if (s.lineRgb >= 0) {
+@@ -2707,6 +2731,31 @@ public final class DocxWriter {
+      * {@code PdfToWord.bandFillStroke} uses to call a fill-only path a hairline, and the one
+      * {@code verify_google._strokes} uses to count it.
+      */
++    /**
++     * True when this shape's fill is a HOLE - it sits on top of ink the page already painted.
++     *
++     * <p>Only a fill that IS the page may be dropped (see {@link #fillXml}). A fill is the page
++     * when nothing but paper is under it; when another shape with a colour under it is, the fill
++     * is a knockout and writing nothing turns the hole into more of the ink around it.
++     *
++     * <p>The test is the shape's CENTRE, not its area: a knockout is nested inside the shape it
++     * cuts, so its centre is inside that shape, while the page's own background rect is drawn
++     * first and has nothing under it. Containment, not overlap, because a white cell of a table
++     * beside a dark band overlaps it by a hairline and is still not a hole.
++     */
++    private static boolean paintsOverInk(Shape s, Ctx ctx) {
++        if (!isPageColour(s.fillRgb)) return false;
++        float cx = s.xPt + s.wPt / 2f, cy = s.topPt + s.hPt / 2f;
++        for (Shape p : ctx.painted) {
++            if (p.fillRgb < 0 || isPageColour(p.fillRgb)) continue;
++            if (p.xPt <= cx && cx <= p.xPt + p.wPt
++                    && p.topPt <= cy && cy <= p.topPt + p.hPt) {
++                return true;
++            }
++        }
++        return false;
++    }
++
+     private static boolean isHairline(Shape s) {
+         float lo = Math.min(s.wPt, s.hPt), hi = Math.max(s.wPt, s.hPt);
+         return lo <= 1.5f && hi > 2f;
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 452a4bf..a2c8687 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -2426,9 +2426,11 @@ public final class PdfToWord {
+         final int cur;
+         final float fontSize;
+         final String space;
++        final float rise;
+ 
+-        GState(float[] ctm, int cur, float fontSize, String space) {
++        GState(float[] ctm, int cur, float fontSize, String space, float rise) {
+             this.ctm = ctm; this.cur = cur; this.fontSize = fontSize; this.space = space;
++            this.rise = rise;
+         }
+     }
+ 
+@@ -2460,13 +2462,43 @@ public final class PdfToWord {
+         /** The colour a glyph at (gx, gy) - page space, y up - is drawn in, or -1. */
+         int colourAt(float gx, float gy, float dirx, float diry, float size) {
+             float tol = Math.max(2.5f, size * 0.45f);
+-            // TWO "BEHIND" ANSWERS, not one. behindSame counts only the marks whose text size
+-            // is the size this glyph was drawn at; behindAny counts them all. The first is
+-            // preferred and the second is the old answer, so a page whose marks all agree -
+-            // nearly every page - reads exactly as it did.
+-            ColourMark behindSame = null, behindAny = null, ahead = null, loose = null;
+-            float sameAlong = Float.MAX_VALUE, behindAlong = Float.MAX_VALUE;
+-            float aheadAlong = Float.MAX_VALUE, looseDist = 60f;
++            // A MARK PAINTS THE BASELINE IT SITS ON, AND ONLY THAT ONE.
++            //
++            // The old selection minimised `along` (the distance measured along the baseline
++            // from the mark to the glyph) inside a window of +/-tol, and `tol` is
++            // max(2.5, size * 0.45) - 4.05 pt at 9 pt. Two things followed, and both are
++            // measured defects on corpus-v1:
++            //
++            //  - A MARK AHEAD IS NOT "BEHIND". `along` is negative for a mark that starts
++            //    after the glyph, and a negative is always smaller than the 0 of the operator
++            //    that starts exactly at it, so the ahead mark won every time.
++            //  - A MARK 2 pt OFF THE BASELINE IS ON A DIFFERENT LINE. Inside 4.05 pt it counted
++            //    as the same baseline, so a shadow copy 2 pt up-and-right beat the operator at
++            //    the glyph's own origin - it is nearer along.
++            //
++            // text-held-twice-shadow-text draws every body line twice: once in #FFFFFF 2 pt
++            // up-and-right, once in #1C1C1C at the visible origin. Both defects then applied
++            // and all five body paragraphs were written #FFFFFF - white text on white paper,
++            // which is the "white patch" the user reports (dE00 84.8; 13_text_colours read
++            // 4 -> 4 kept, because a set cannot see a colour move from one span to another).
++            //
++            // So a mark is ranked by FOUR things, most significant first:
++            //   perpTier  is the mark on THIS baseline at all? |perp| <= tight (a tenth of an
++            //             em, floor 0.6 pt) is the glyph's own baseline; up to `tol` is the old
++            //             window; beyond `tol` the mark is not on this baseline.
++            //   sizeTier  the mark was set at the glyph's own size (the old behindSame rule -
++            //             two operators at one origin are told apart by size alone).
++            //   alongTier at or behind the glyph before ahead of it.
++            //   distance  nearest first, and "last drawn wins a tie", because an operator
++            //             paints the text that follows it.
++            //
++            // A page whose marks all agree - nearly every page in the corpus - has one mark
++            // per line at |perp| = 0, so it reads exactly as it did: every tier is 0 and the
++            // nearest one wins. Nothing here changes which colour a single-mark line gets.
++            float tight = Math.max(0.6f, size * 0.08f);
++            ColourMark best = null, loose = null;
++            long bestKey = Long.MAX_VALUE;
++            float looseDist = 60f;
+             for (ColourMark m : marks) {
+                 // 0 is BLACK, not "no colour": a mark of #000000 used to be dropped here, so
+                 // the only mark left near a glyph could be an invisible white copy of the same
+@@ -2476,63 +2508,32 @@ public final class PdfToWord {
+                 float dot = m.ux * dirx + m.uy * diry;
+                 float dx = gx - m.x, dy = gy - m.y;
+                 if (dot > 0.9f) {
+-                    // the mark draws on the same baseline: measure along it and across it
+                     float along = dx * dirx + dy * diry;
+-                    float perp = -dx * diry + dy * dirx;
+-                    if (Math.abs(perp) <= tol) {
+-                        if (along >= -tol) {
+-                            // "Nearest behind" must break a near-tie in favour of the mark drawn
+-                            // LAST, because that is the colour in force: an operator paints the
+-                            // text that follows it. File 39 draws an invisible 1 pt white copy of
+-                            // its title on the very baseline and origin the visible black title
+-                            // then uses, and the white mark sits a tenth of a point AHEAD of the
+-                            // glyph - so it was the nearest "behind" one and a black heading was
+-                            // written #FFFFFF. The title vanished from the Word file, and no text
+-                            // metric moved: the characters were all still in the XML.
+-                            //
+-                            // "LAST DRAWN" IS NOT THE WHOLE ANSWER, and it got the 1 pt copy
+-                            // wrong in the other direction. On the same file the two marks are
+-                            // at the IDENTICAL origin, so "along" cannot separate them and the
+-                            // later one - the 15 pt black title - won every glyph on that
+-                            // baseline, including the 1 pt white one. White then arrived at
+-                            // applyColours as #000000, which is the "no colour" value, so the
+-                            // run was written with no w:color at all and the page's #FFFFFF was
+-                            // gone (13_text_colours, 4 -> 3).
+-                            //
+-                            // AND NEITHER IS POSITION, when the page sets two operators at
+-                            // different sizes on ONE baseline. File 39's 1 pt white copy runs
+-                            // from x=56 to x=82.8 along the same baseline as the 15 pt black
+-                            // title, whose own operators start every 10-20 pt. So for the
+-                            // white glyph at x=64.9 the nearest mark "behind" it is the black
+-                            // operator that starts at x=67.16 - 2.26 pt ahead, inside tol - and
+-                            // distance alone hands a 1 pt white glyph a 15 pt black colour. It
+-                            // is not the same text: a glyph belongs to the operator that set
+-                            // the size it is drawn at. Measured before this: the 1 pt run came
+-                            // out split into "THE MYSORE CHA" in #FFFFFF and the rest in black,
+-                            // because only the glyphs the black operator had already passed
+-                            // kept white.
+-                            //
+-                            // So the nearest behind mark AT THE GLYPH'S OWN SIZE is preferred,
+-                            // and when there is none the old nearest-behind answer stands
+-                            // unchanged. "Last drawn wins a tie" is kept inside each set: an
+-                            // operator paints the text that follows it.
+-                            if (along <= behindAlong) { behindAlong = along; behindAny = m; }
+-                            if (sameSize(m, size) && along <= sameAlong) {
+-                                sameAlong = along; behindSame = m;
+-                            }
+-                        } else if (-along < aheadAlong) {
+-                            aheadAlong = -along; ahead = m;
+-                        }
++                    float ap = Math.abs(-dx * diry + dy * dirx);
++                    if (ap <= tol) {
++                        // The distance from the glyph to the mark's own baseline, in units
++                        // of `tight` (a tenth of an em). Ranked as a TIER, not a boolean,
++                        // because two operators can be a hair apart: text-held-twice's second
++                        // block draws its white copy 0.5 pt above its dark copy, and 0.5 is
++                        // inside any tolerance a reader would call "the same baseline" - but
++                        // it is still the nearer baseline for the dark copy's glyphs and the
++                        // further one for the white copy's, which is exactly the discrimination
++                        // that was missing.
++                        int perpTier = Math.min(2, Math.round(ap / tight));
++                        int sizeTier = sameSize(m, size) ? 0 : 1;
++                        int alongTier = along >= 0f ? 0 : 1;
++                        float ad = along >= 0f ? along : -along;
++                        long key = (((long) perpTier * 10 + sizeTier) * 10 + alongTier) * 100000L
++                                + Math.min(99999L, Math.round(ad * 100f));
++                        if (key <= bestKey) { bestKey = key; best = m; }
+                         continue;
+                     }
+                 }
+-                // nothing on this baseline: fall back to the nearest mark anywhere, as before
++                // not on this baseline at all: the nearest mark anywhere, as before
+                 float d = Math.abs(dx) + Math.abs(dy) * 4f;
+                 if (d < looseDist) { looseDist = d; loose = m; }
+             }
+-            if (behindSame != null) return behindSame.rgb;
+-            if (behindAny != null) return behindAny.rgb;
+-            if (ahead != null) return ahead.rgb;
++            if (best != null) return best.rgb;
+             return loose == null ? -1 : loose.rgb;
+         }
+ 
+@@ -2541,6 +2542,16 @@ public final class PdfToWord {
+             ArrayList<GState> stack = new ArrayList<>();
+             float[] tm = {1, 0, 0, 1, 0, 0};
+             float leading = 0f, charSpacing = 0f, wordSpacing = 0f, hScale = 1f;
++            // THE TEXT RISE. `Ts` lifts the glyphs off the baseline the operator set them on -
++            // a footnote marker, a superscript, a chemical formula. The walker ignored it, so
++            // the mark sat on the unrisen baseline while the glyph sat 4.45 pt above it, and
++            // colourAt's perpendicular window (max(2.5, size*0.45) = 3.2 pt at 7.12 pt) does
++            // not reach that far. The marker therefore matched NO mark on its baseline, the
++            // loose fallback could not reach it either (the mark is 173 pt away along the line,
++            // and that fallback is 60), and it came out -1 = "no colour": journal-2col's three
++            // footnote markers were written with no w:color and rendered #000000 against the
++            // page's #1C1C1C. Measured: 3 runs, dE00 6.15, 34b 96 %.
++            float rise = 0f;
+             int cur = -1;
+             // The size the text state is set at, from Tf. A colour mark carries it, because
+             // two operators can paint at the SAME origin in different colours and different
+@@ -2588,7 +2599,7 @@ public final class PdfToWord {
+                         // bar, closes it with Q, and then draws two black lines with no
+                         // colour operator - and both arrived #1A4D99. A page that names no
+                         // colour draws in the initial fill colour, which is black.
+-                        stack.add(new GState(ctm, cur, fontSize, space));
++                        stack.add(new GState(ctm, cur, fontSize, space, rise));
+                     } else if (tok.equals("Q")) {
+                         if (!stack.isEmpty()) {
+                             GState g = stack.remove(stack.size() - 1);
+@@ -2596,6 +2607,7 @@ public final class PdfToWord {
+                             cur = g.cur;
+                             fontSize = g.fontSize;
+                             space = g.space;
++                            rise = g.rise;
+                         }
+                     } else if (tok.equals("Tf") && ops.size() >= 2) {
+                         fontSize = num(ops, -1);
+@@ -2611,6 +2623,8 @@ public final class PdfToWord {
+                     } else if (tok.equals("Tm") && ops.size() >= 6) {
+                         tm = new float[]{num(ops, -6), num(ops, -5), num(ops, -4),
+                                 num(ops, -3), num(ops, -2), num(ops, -1)};
++                    } else if (tok.equals("Ts")) {
++                        rise = num(ops, -1);
+                     } else if (tok.equals("TL")) {
+                         leading = num(ops, -1);
+                     } else if (tok.equals("Tc")) {
+@@ -2623,13 +2637,13 @@ public final class PdfToWord {
+                         tm = mul(new float[]{1, 0, 0, 1, 0, -leading}, tm);
+                     } else if (tok.equals("'")) {
+                         tm = mul(new float[]{1, 0, 0, 1, 0, -leading}, tm);
+-                        addMark(tm, ctm, cur, fontSize);
++                        addMark(tm, ctm, cur, fontSize, rise);
+                     } else if (tok.equals("\"")) {
+                         if (ops.size() >= 3) { wordSpacing = num(ops, -3); charSpacing = num(ops, -2); }
+                         tm = mul(new float[]{1, 0, 0, 1, 0, -leading}, tm);
+-                        addMark(tm, ctm, cur, fontSize);
++                        addMark(tm, ctm, cur, fontSize, rise);
+                     } else if (tok.equals("Tj") || tok.equals("TJ")) {
+-                        addMark(tm, ctm, cur, fontSize);
++                        addMark(tm, ctm, cur, fontSize, rise);
+                     } else if (tok.equals("rg") && ops.size() >= 3) {
+                         cur = packRgb(num(ops, -3), num(ops, -2), num(ops, -1));
+                     } else if (tok.equals("g") && ops.size() >= 1) {
+@@ -2657,8 +2671,23 @@ public final class PdfToWord {
+ 
+         /** Records the colour in force at the origin of {@code tm}, transformed by {@code ctm}. */
+         private void addMark(float[] tm, float[] ctm, int rgb, float fontSize) {
++            addMark(tm, ctm, rgb, fontSize, 0f);
++        }
++
++        /**
++         * @param rise the `Ts` in force, in text space. It lifts the glyphs, so it must lift
++         *             the mark with them - otherwise the mark and the glyph it paints are on
++         *             two different baselines and colourAt cannot match them (see the note on
++         *             `rise` in walk()).
++         */
++        private void addMark(float[] tm, float[] ctm, int rgb, float fontSize, float rise) {
+             if (rgb < 0) return;
+             float tx = tm[4], ty = tm[5];
++            if (rise != 0f) {
++                // rise is along the text-space y axis; tm's second column is that axis
++                tx += rise * tm[2];
++                ty += rise * tm[3];
++            }
+             float px = tx * ctm[0] + ty * ctm[2] + ctm[4];
+             float py = tx * ctm[1] + ty * ctm[3] + ctm[5];
+             float ux = tm[0] * ctm[0] + tm[1] * ctm[2];

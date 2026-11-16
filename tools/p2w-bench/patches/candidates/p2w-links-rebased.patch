@@ -1,0 +1,734 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 327a3f9..88e13b9 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -698,7 +698,7 @@ public final class DocxWriter {
+             System.err.println("FLOWDOC " + out.getName() + " fitted=" + ctx.fitted
+                     + " broke=" + ctx.brokePage);
+         }
+-        String rels = documentRels(ctx.media);
++        String rels = documentRels(ctx);
+         String contentTypes = contentTypes(ctx.media.size());
+ 
+         try (OutputStream fos = new FileOutputStream(out);
+@@ -729,6 +729,8 @@ public final class DocxWriter {
+     /** Mutable state for one write: the shape id counter and the images collected. */
+     private static final class Ctx {
+         final List<byte[]> media = new ArrayList<>();
++        /** Link target -> relationship id, filled before document.xml is written. */
++        final Map<String, String> linkRels = new java.util.LinkedHashMap<>();
+         int shapeSeq = 1;
+         int anchorCount;
+         int flowCount;
+@@ -979,6 +981,11 @@ public final class DocxWriter {
+     // ------------------------------------------------------------------ document
+ 
+     private static String documentXml(PdfToWord.Result result, Ctx ctx) {
++        // Before a single run is written: which targets exist, and which pages they point
++        // at. See collectLinks.
++        collectLinks(result, ctx);
++        LINK_RELS = ctx.linkRels;
++        PENDING_ANCHOR = null;
+         StringBuilder sb = new StringBuilder(1 << 18);
+         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+         sb.append("<w:document xmlns:w=\"").append(NS_W).append("\" xmlns:r=\"").append(NS_R)
+@@ -1079,6 +1086,10 @@ public final class DocxWriter {
+             }
+             ctx.pageWidthPt = pw;
+             ctx.pageHeightPt = ph;
++            // An internal link in this document points at this page: its bookmark is written
++            // against the first run the page emits. See runXml.
++            PENDING_ANCHOR = LINK_TARGET_PAGES.contains(page.number)
++                    ? "p2wpage" + page.number : null;
+             // The page's own outlines, so a label drawn inside one can be anchored to it and a
+             // stamp can find the frame the page drew around it. It was declared and never set,
+             // which is why the stamp's border search never matched anything.
+@@ -4290,6 +4301,80 @@ public final class DocxWriter {
+         sb.append("</w:p>");
+     }
+ 
++    /**
++     * Link target -> relationship id for the document being written, and the bookmark the
++     * page being written still owes.
++     *
++     * <p>Held here rather than threaded through every writer because a relationship is a
++     * property of the PACKAGE and a bookmark of the page, not of the run that happens to
++     * carry it. {@code DocxWriter.write} handles one document at a time and ConvertAll runs
++     * the corpus sequentially, so there is one document in flight.
++     */
++    private static Map<String, String> LINK_RELS = java.util.Collections.emptyMap();
++    private static java.util.Set<Integer> LINK_TARGET_PAGES = java.util.Collections.emptySet();
++    private static String PENDING_ANCHOR;
++
++    /**
++     * Gives every link target in the model a relationship id, and records which pages are
++     * the target of an internal link so a bookmark can be placed on them.
++     *
++     * <p>Runs are the only thing that knows a link exists, and they are spread across
++     * paragraphs and their boxes, so the model is walked once here - before the body is
++     * written, because a relationship has to exist in the package by the time a run points
++     * at it.
++     */
++    private static void collectLinks(PdfToWord.Result result, Ctx ctx) {
++        java.util.Set<String> seen = new java.util.LinkedHashSet<>();
++        java.util.Set<Integer> targetPages = new java.util.LinkedHashSet<>();
++        for (PdfToWord.Page page : result.pages) {
++            for (Object o : page.blocks) {
++                if (!(o instanceof PdfToWord.Para)) continue;
++                PdfToWord.Para p = (PdfToWord.Para) o;
++                for (PdfToWord.Run r : p.runs) noteLink(r, seen, targetPages);
++                for (PdfToWord.Box b : p.boxes) {
++                    for (PdfToWord.Run r : b.runs) noteLink(r, seen, targetPages);
++                }
++            }
++        }
++        int n = 1;
++        for (String t : seen) {
++            if (t.startsWith("#")) continue;      // an internal link needs a bookmark, not a rel
++            ctx.linkRels.put(t, "rIdLk" + (n++));
++        }
++        LINK_TARGET_PAGES = targetPages;
++    }
++
++    private static void noteLink(PdfToWord.Run r, java.util.Set<String> seen,
++                                 java.util.Set<Integer> targetPages) {
++        if (r == null || r.link == null || r.link.isEmpty()) return;
++        seen.add(r.link);
++        if (r.link.startsWith("#p2wpage")) {
++            try {
++                targetPages.add(Integer.parseInt(r.link.substring("#p2wpage".length())));
++            } catch (NumberFormatException ignored) {
++            }
++        }
++    }
++
++    /**
++     * The opening tag that makes a run a link, or null when it is not one.
++     *
++     * <p>An external link is a relationship of type {@code hyperlink} with
++     * {@code TargetMode="External"} and is referenced as {@code r:id}; an internal one is
++     * {@code w:anchor} naming a bookmark. A run whose target has no relationship is written
++     * as ordinary text rather than with a dangling {@code r:id}, which is a corrupt package.
++     */
++    private static String hyperlinkOpen(PdfToWord.Run run) {
++        String l = run.link;
++        if (l == null || l.isEmpty()) return null;
++        if (l.startsWith("#")) {
++            return "<w:hyperlink w:anchor=\"" + esc(l.substring(1)) + "\">";
++        }
++        String rid = LINK_RELS.get(l);
++        if (rid == null) return null;
++        return "<w:hyperlink r:id=\"" + rid + "\">";
++    }
++
+     /** One run with the properties the PDF drew it with. */
+     private static void runXml(StringBuilder sb, PdfToWord.Run run) {
+         runXml(sb, run, false);
+@@ -4315,6 +4400,18 @@ public final class DocxWriter {
+      * style's weight".
+      */
+     private static void runXml(StringBuilder sb, PdfToWord.Run run, boolean styleBold) {
++        // A bookmark is zero-width and lives inside the paragraph, so it is written against
++        // the first run of the page it names - that places it without adding a paragraph,
++        // which would have moved every line below it.
++        String bookmark = null;
++        if (PENDING_ANCHOR != null) {
++            bookmark = PENDING_ANCHOR;
++            PENDING_ANCHOR = null;
++            sb.append("<w:bookmarkStart w:id=\"").append(bookmarkId(bookmark))
++                    .append("\" w:name=\"").append(bookmark).append("\"/>");
++        }
++        String open = hyperlinkOpen(run);
++        if (open != null) sb.append(open);
+         sb.append("<w:r><w:rPr>");
+         // The typeface and colour the PDF used. Without these every document came out in
+         // the default font in black, and "the Word file should look like the PDF" had no
+@@ -4344,6 +4441,17 @@ public final class DocxWriter {
+         }
+         sb.append("</w:rPr><w:t xml:space=\"preserve\">").append(esc(run.text))
+                 .append("</w:t></w:r>");
++        if (open != null) sb.append("</w:hyperlink>");
++        if (bookmark != null) {
++            sb.append("<w:bookmarkEnd w:id=\"").append(bookmarkId(bookmark)).append("\"/>");
++        }
++    }
++
++    /** The numeric id a bookmark name carries - {@code p2wpage7} is id 7. */
++    private static String bookmarkId(String name) {
++        int i = name.length();
++        while (i > 0 && Character.isDigit(name.charAt(i - 1))) i--;
++        return i < name.length() ? name.substring(i) : "0";
+     }
+ 
+     // ------------------------------------------------------------------ the anchor
+@@ -6851,13 +6959,23 @@ public final class DocxWriter {
+                 + "</Relationships>";
+     }
+ 
+-    private static String documentRels(List<byte[]> media) {
++    private static String documentRels(Ctx ctx) {
++        List<byte[]> media = ctx.media;
+         StringBuilder sb = new StringBuilder();
+         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>")
+                 .append("<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">")
+                 .append("<Relationship Id=\"rIdStyles\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/>")
+                 .append("<Relationship Id=\"rIdTheme\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/>")
+                 .append("<Relationship Id=\"rIdSettings\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings\" Target=\"settings.xml\"/>");
++        // One relationship per distinct target. TargetMode="External" is what tells the
++        // reader the target is a URI rather than a part of the package; without it Word
++        // looks for the URL as a file inside the .docx and reports the file as damaged.
++        for (Map.Entry<String, String> e : ctx.linkRels.entrySet()) {
++            sb.append("<Relationship Id=\"").append(e.getValue())
++                    .append("\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink\" Target=\"")
++                    .append(esc(e.getKey()))
++                    .append("\" TargetMode=\"External\"/>");
++        }
+         for (int i = 0; i < media.size(); i++) {
+             sb.append("<Relationship Id=\"rIdImg").append(i + 1)
+                     .append("\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/image\" Target=\"media/image")
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 452a4bf..996d8a5 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -22,6 +22,11 @@ import com.tom_roush.pdfbox.pdmodel.graphics.shading.PDShading;
+ import com.tom_roush.pdfbox.pdmodel.graphics.state.PDSoftMask;
+ import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+ import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotationWidget;
++import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
++import com.tom_roush.pdfbox.pdmodel.interactive.action.PDAction;
++import com.tom_roush.pdfbox.pdmodel.interactive.action.PDActionGoTo;
++import com.tom_roush.pdfbox.pdmodel.interactive.action.PDActionURI;
++import com.tom_roush.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
+ import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAppearanceDictionary;
+ import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAppearanceEntry;
+ import com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAppearanceStream;
+@@ -77,6 +82,16 @@ public final class PdfToWord {
+         public final String font;
+         /** 0xRRGGBB, or -1 when the page draws this run in the default black. */
+         public final int color;
++        /**
++         * The link this run sits inside, or null when it sits inside none.
++         *
++         * <p>Encoded as the writer needs it: the target URI for an external link, and
++         * {@code "#p2wpage<N>"} for an internal one - a link whose /Dest or /GoTo names
++         * another page of the same document. Mutable rather than final because it is
++         * decided from the page's geometry after the run's text and styling are already
++         * settled; the text itself is never changed by it.
++         */
++        public String link;
+ 
+         Run(String text, boolean bold, boolean italic, float sizePt) {
+             this(text, bold, italic, sizePt, "", -1);
+@@ -541,8 +556,65 @@ public final class PdfToWord {
+         public int column;
+     }
+ 
++    /**
++     * One link annotation, as a rectangle the page drew it in.
++     *
++     * <p>The frame is the one every other geometry in this file uses: x from the left edge
++     * of the page, y from the TOP edge, in points. A PDF gives a link its rect in PDF user
++     * space, where y runs up from the bottom, so {@link #linksOf} flips it once, here, and
++     * nothing downstream has to think about it again.
++     */
++    public static final class Link {
++        public final float x0, yTop, x1, yBottom;
++        /** The target URI of an external link, or null for an internal one. */
++        public final String uri;
++        /** The 1-based page an internal link points at, or -1 for an external one. */
++        public final int targetPage;
++
++        Link(float x0, float yTop, float x1, float yBottom, String uri, int targetPage) {
++            this.x0 = x0;
++            this.yTop = yTop;
++            this.x1 = x1;
++            this.yBottom = yBottom;
++            this.uri = uri;
++            this.targetPage = targetPage;
++        }
++
++        /** The token a run carries for this link. */
++        String token() {
++            return uri != null ? uri : "#p2wpage" + targetPage;
++        }
++
++        /** True when the glyph's centre lies inside the rect horizontally. */
++        boolean coversX(float cx) {
++            return cx >= x0 - 1f && cx <= x1 + 1f;
++        }
++
++        /**
++         * True when a line's BASELINE falls inside the rect.
++         *
++         * <p>The baseline, not the line's box. {@code Line.y} is the baseline - a 12 pt line
++         * of type reports y=250 and bottom=260 for text that occupies 241.1..252.2 - so a
++         * box-overlap test lets a heading 9 pt above a link fall inside it: measured on
++         * 44_coloured_underlined_hyperlinks, "Important links" (baseline 250) took the link
++         * that belongs to "Examination timetable" (baseline 268). A link rect encloses the
++         * text it covers, so its own top and bottom bracket that text's baseline.
++         */
++        boolean spansBaseline(float baseline) {
++            return baseline >= yTop - 1f && baseline <= yBottom + 1f;
++        }
++    }
++
+     public static final class Page {
+         public int number;
++        /**
++         * The link annotations the page carries, already in display points.
++         *
++         * <p>Read here rather than in the writer because a link is geometry: which words it
++         * covers is a question about this page's own coordinates, and the writer only ever
++         * sees runs.
++         */
++        public final List<Link> links = new ArrayList<>();
+         public final List<Object> blocks = new ArrayList<>();   // Para or Table
+         public boolean ocr;
+         /** The page box in points. A .docx section has to be told, or a landscape page comes
+@@ -738,6 +810,13 @@ public final class PdfToWord {
+         List<String> apDrawn = new ArrayList<>();
+         readAnnotationAppearances(doc, pdPage, page.height, glyphs, rules, apDrawn, report);
+ 
++        // A link is not text. The page draws the words and puts the target in an /Annots
++        // entry, so no content-stream reader can see it - and every other annotation on a
++        // page WAS read here (stamps, notes, form fields) while this one never was. A page
++        // whose whole point is its five links reached Word as five dead lines.
++        List<Link> pageLinks = linksOf(doc, pdPage, page.height);
++        page.links.addAll(pageLinks);
++
+         // A filled form keeps its answers in the field's /V, never in the content stream, so
+         // they are read on every page - not only on a page with no text layer. Without this a
+         // filled form converted to Word kept its printed labels and lost every answer.
+@@ -1279,7 +1358,8 @@ public final class PdfToWord {
+ 
+         int bands = columns(body, pageWidth, asBands(starts));
+         boolean row = ROW || rowMajor(body, starts, rules, pageHeight);
+-        List<Para> paras = toParagraphs(body, pageWidth, bands, row, flippedPage, pageHeight);
++        List<Para> paras = toParagraphs(body, pageWidth, bands, row, flippedPage, pageHeight,
++                pageLinks);
+ 
+         // Order everything the way a reader would: down one column, then the next.
+         List<Object> ordered = new ArrayList<>();
+@@ -4539,13 +4619,23 @@ public final class PdfToWord {
+     }
+ 
+     private static List<Para> toParagraphs(List<Line> lines, float pageWidth, int bands) {
+-        return toParagraphs(lines, pageWidth, bands, false, false, 0f);
++        return toParagraphs(lines, pageWidth, bands, false, false, 0f,
++                Collections.<Link>emptyList());
+     }
+ 
+     private static List<Para> toParagraphs(List<Line> lines, float pageWidth, int bands,
+                                            final boolean row,
+                                            final boolean flippedPage,
+                                            final float pageHeight) {
++        return toParagraphs(lines, pageWidth, bands, row, flippedPage, pageHeight,
++                Collections.<Link>emptyList());
++    }
++
++    private static List<Para> toParagraphs(List<Line> lines, float pageWidth, int bands,
++                                           final boolean row,
++                                           final boolean flippedPage,
++                                           final float pageHeight,
++                                           final List<Link> links) {
+         List<Para> out = new ArrayList<>();
+         if (lines.isEmpty()) return out;
+ 
+@@ -4651,14 +4741,14 @@ public final class PdfToWord {
+             } else if (sameParagraph(last, line, pageWidth, blockRight)) {
+                 group.add(line);
+             } else {
+-                out.add(buildPara(group, pageWidth, pageHeight, bands, flippedPage));
++                out.add(buildPara(group, pageWidth, pageHeight, bands, flippedPage, links));
+                 group = new ArrayList<>();
+                 group.add(line);
+                 addRowMates(group, line);
+             }
+         }
+         if (!group.isEmpty()) out.add(buildPara(group, pageWidth, pageHeight, bands,
+-                flippedPage));
++                flippedPage, links));
+         return out;
+     }
+ 
+@@ -4867,7 +4957,7 @@ public final class PdfToWord {
+     }
+ 
+     private static Para buildPara(List<Line> group, float pageWidth, float pageHeight,
+-                                  int bands, boolean flippedPage) {
++                                  int bands, boolean flippedPage, List<Link> links) {
+         // Fields on one baseline read left to right, whatever order the page drew them in. The
+         // row's tab stops are measured from its first box, so the box order IS the line.
+         if (group.size() > 1 && isRow(group)) {
+@@ -4995,7 +5085,7 @@ public final class PdfToWord {
+             box.rotated = line.rotated;
+             box.angle = line.angle;
+             box.ring = line.ring;
+-            List<Run> lineRuns = coalesceRuns(runsOf(line));
++            List<Run> lineRuns = coalesceRuns(runsOf(line, links));
+             // A fragment that opens with a combining mark is not a line of its own - it is the
+             // tail of the word the previous fragment began. The page draws "केवल" as one line,
+             // but the converter cuts a line wherever the typeface changes, and the cut can land
+@@ -5077,9 +5167,12 @@ public final class PdfToWord {
+             if (!out.isEmpty()) {
+                 Run p = out.get(out.size() - 1);
+                 if (p.bold == r.bold && p.italic == r.italic && p.color == r.color
+-                        && Math.abs(p.sizePt - r.sizePt) < 0.01f && p.font.equals(r.font)) {
+-                    out.set(out.size() - 1, new Run(p.text + r.text, p.bold, p.italic,
+-                            p.sizePt, p.font, p.color));
++                        && Math.abs(p.sizePt - r.sizePt) < 0.01f && p.font.equals(r.font)
++                        && java.util.Objects.equals(p.link, r.link)) {
++                    Run merged = new Run(p.text + r.text, p.bold, p.italic,
++                            p.sizePt, p.font, p.color);
++                    merged.link = p.link;
++                    out.set(out.size() - 1, merged);
+                     continue;
+                 }
+             }
+@@ -5098,22 +5191,34 @@ public final class PdfToWord {
+      * losing or reordering a character is not.
+      */
+     private static List<Run> runsOf(Line line) {
++        return runsOf(line, Collections.<Link>emptyList());
++    }
++
++    private static List<Run> runsOf(Line line, List<Link> links) {
+         List<Run> out = new ArrayList<>();
+         StringBuilder cur = new StringBuilder();
+-        String curKey = null;
++        String curKey = null, curLink = null;
+         Glyph first = null, prev = null;
+         char lastOut = 0;
+         for (Glyph g : line.glyphs) {
++            // The link is part of the run key, so a run never straddles a link's edge: the
++            // words inside the rect and the words outside it are written as two runs even
++            // when they share a typeface, which is the only way one of them can be a link.
++            String lk = linkTokenAt(links, g, line);
+             String key = g.bold + "|" + g.italic + "|" + Math.round(g.size * 4f) + "|"
+-                    + g.font + "|" + g.color;
++                    + g.font + "|" + g.color + "|" + lk;
+             if (curKey == null) {
+                 curKey = key;
++                curLink = lk;
+                 first = g;
+             } else if (!key.equals(curKey)) {
+-                out.add(new Run(cur.toString(), first.bold, first.italic, first.size,
+-                        first.font, first.color));
++                Run made = new Run(cur.toString(), first.bold, first.italic, first.size,
++                        first.font, first.color);
++                made.link = curLink;
++                out.add(made);
+                 cur.setLength(0);
+                 curKey = key;
++                curLink = lk;
+                 first = g;
+             }
+             if (prev != null) {
+@@ -5129,25 +5234,113 @@ public final class PdfToWord {
+             prev = g;
+         }
+         if (first != null) {
+-            out.add(new Run(cur.toString(), first.bold, first.italic, first.size,
+-                    first.font, first.color));
++            Run made = new Run(cur.toString(), first.bold, first.italic, first.size,
++                    first.font, first.color);
++            made.link = curLink;
++            out.add(made);
+         }
+         StringBuilder all = new StringBuilder();
+         for (Run r : out) all.append(r.text);
+         if (!all.toString().equals(line.text)) {
+             Glyph lead = line.glyphs.isEmpty() ? null : line.glyphs.get(0);
+             List<Run> one = new ArrayList<>();
+-            one.add(new Run(line.text,
++            Run whole = new Run(line.text,
+                     lead != null && lead.bold,
+                     lead != null && lead.italic,
+                     line.size,
+                     lead == null ? "" : lead.font,
+-                    lead == null ? -1 : lead.color));
++                    lead == null ? -1 : lead.color);
++            whole.link = lead == null ? null : linkTokenAt(links, lead, line);
++            one.add(whole);
+             return one;
+         }
+         return out;
+     }
+ 
++    /** The link a glyph sits inside, or null. See {@link Link}. */
++    private static String linkTokenAt(List<Link> links, Glyph g, Line line) {
++        if (links == null || links.isEmpty()) return null;
++        float cx = g.x + g.width / 2f;
++        float baseline = line.y;
++        for (Link l : links) {
++            if (l.spansBaseline(baseline) && l.coversX(cx)) {
++                if (System.getProperty("p2w.debugLinks") != null) {
++                    System.err.println("LINKGLYPH \"" + g.text + "\" cx=" + cx
++                            + " baseline=" + baseline
++                            + " rect=(" + l.x0 + "," + l.yTop + "," + l.x1 + "," + l.yBottom + ")"
++                            + " -> " + l.token());
++                }
++                return l.token();
++            }
++        }
++        return null;
++    }
++
++    /**
++     * Every link annotation on a page, with its target resolved.
++     *
++     * <p>External targets come from a /URI action. An internal one is a /GoTo action or the
++     * annotation's own /Dest naming another page; it is resolved to that page's 1-based
++     * number here, because the writer needs a bookmark name and only this layer knows which
++     * page a destination lands on.
++     */
++    private static List<Link> linksOf(PDDocument doc, PDPage pdPage, float pageHeight) {
++        List<Link> out = new ArrayList<>();
++        List<PDAnnotation> anns;
++        try {
++            anns = pdPage.getAnnotations();
++        } catch (Throwable t) {
++            return out;
++        }
++        if (anns == null) return out;
++        for (PDAnnotation ann : anns) {
++            if (!(ann instanceof PDAnnotationLink)) continue;
++            try {
++                PDAnnotationLink la = (PDAnnotationLink) ann;
++                if (la.isHidden()) continue;
++                PDRectangle r = la.getRectangle();
++                if (r == null) continue;
++                float x0 = Math.min(r.getLowerLeftX(), r.getUpperRightX());
++                float x1 = Math.max(r.getLowerLeftX(), r.getUpperRightX());
++                // PDF user space runs y UP from the page's bottom edge; this file runs it
++                // DOWN from the top. One flip, here.
++                float yTop = pageHeight - Math.max(r.getLowerLeftY(), r.getUpperRightY());
++                float yBottom = pageHeight - Math.min(r.getLowerLeftY(), r.getUpperRightY());
++                if (x1 - x0 <= 0f || yBottom - yTop <= 0f) continue;
++                PDAction act = la.getAction();
++                if (act instanceof PDActionURI) {
++                    String u = ((PDActionURI) act).getURI();
++                    if (u != null && !u.trim().isEmpty()) {
++                        out.add(new Link(x0, yTop, x1, yBottom, u.trim(), -1));
++                    }
++                    continue;
++                }
++                int dest = destPageOf(doc, la, act);
++                if (dest > 0) out.add(new Link(x0, yTop, x1, yBottom, null, dest));
++            } catch (Throwable ignored) {
++                // One awkward annotation must not cost the page its other links.
++            }
++        }
++        return out;
++    }
++
++    /** The 1-based page an internal link points at, or -1 when it cannot be resolved. */
++    private static int destPageOf(PDDocument doc, PDAnnotationLink la, PDAction act) {
++        try {
++            // getDestination() hands back the base PDDestination; only a page destination
++            // names a page, and a named destination that cannot be resolved is not a target.
++            com.tom_roush.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDestination d0 = null;
++            if (act instanceof PDActionGoTo) d0 = ((PDActionGoTo) act).getDestination();
++            else d0 = la.getDestination();
++            if (!(d0 instanceof PDPageDestination)) return -1;
++            PDPage p = ((PDPageDestination) d0).getPage();
++            if (p == null) return -1;
++            return doc.getPages().indexOf(p) + 1;
++        } catch (Throwable t) {
++            return -1;
++        }
++    }
++
+     private static float leftMargin(List<Line> group) {
+         float min = Float.MAX_VALUE;
+         for (Line line : group) min = Math.min(min, line.x);
+diff --git a/tools/p2w-bench/verify_google.py b/tools/p2w-bench/verify_google.py
+index 7dac3e4..1f9270f 100644
+--- a/tools/p2w-bench/verify_google.py
++++ b/tools/p2w-bench/verify_google.py
+@@ -3210,31 +3210,163 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+                                   common >= max(1, -(-len(s_ib) * 3 // 5)))
+ 
+     # ---- 40 link targets ---------------------------------------------------
+-    def link_targets(doc):
+-        out = set()
++    # REBUILT 14 Nov 2026, REBASED 15 Nov onto the url_key instrument.
++    #
++    # WHAT IT USED TO BE, and why it could not fail. It read `p.get_links()` from the
++    # SOURCE and from the RENDER, compared the two SETS of URIs, and passed when they
++    # were equal. Three independent blind spots:
++    #
++    #   1. THE RENDER CARRIES NO LINK ANNOTATIONS in this environment. Not "few" - none.
++    #      Measured: a canonical python-docx hyperlink (w:hyperlink + r:id + a
++    #      relationships/hyperlink relationship with TargetMode="External") and a one-line
++    #      HTML <a href> BOTH export from this LibreOffice 7.4.7.2 with zero /Annots
++    #      objects, while the same export DOES write the document outline. So the render
++    #      population is empty by construction - g_l == 0 on all 211 - and `kept` is
++    #      identically 0. The check was not passing falsely; it was measuring an EMPTY
++    #      POPULATION, which is the same class of defect as the 37.8 % vacuous-pass
++    #      finding: a check that cannot fail. (It did fail exactly one document, 44, and
++    #      only because the render side was empty - a total loss and a 1-of-5 loss read
++    #      identically.)
++    #   2. A SET cannot see a REPEATED target. Two links to one URL collapse to one
++    #      member, so losing one of them still reads as "kept".
++    #   3. It counted TARGETS, never INSTANCES, so how many links a page actually draws
++    #      was never compared against how many arrived.
++    #
++    # WHAT IT DOES NOW. It asks the .docx - the file the engine writes, and the only place
++    # its decision is recorded - and counts INSTANCES per target. A link rect spanning two
++    # drawn lines is written as one run per line (PdfToWord.runsOf splits a run at the
++    # link's edge), so the expected instance count is (annotation x the text lines its rect
++    # covers). An internal link is written as w:anchor against a bookmark the writer places
++    # on the target page, so the anchor must resolve or the link goes nowhere.
++    #
++    # Comparison is in the NORMALISED form (url_key) on BOTH sides - the seven constructed
++    # cases documented above colour_same() still hold: trailing "/", percent-encoded
++    # unreserved characters, a fragment, host case and a default port all fold; a scheme
++    # rewrite and a changed host do not.
++    #
++    # Precedent: 50_annotations was retired for exactly this reason - a .docx has no PDF
++    # annotation objects - and 50_annotation_text now reads the .docx. Same move here.
++
++    def src_link_instances(doc):
++        """target -> the number of hyperlink runs the .docx must carry for it."""
++        want = {}
+         for p in doc:
++            lines = []
++            try:
++                for blk in p.get_text("dict")["blocks"]:
++                    for ln in blk.get("lines", []):
++                        lines.append(ln["bbox"])
++            except Exception:
++                lines = []
+             for l in p.get_links():
+-                if l.get("uri"):
+-                    out.add(l["uri"])
+-        return out
++                u = l.get("uri")
++                if u:
++                    tgt = url_key(u)
++                    if not tgt:
++                        continue
++                elif l.get("page") is not None:
++                    tgt = "#p2wpage%d" % (int(l["page"]) + 1)   # PyMuPDF page is 0-based
++                else:
++                    continue
++                try:
++                    x0, y0, x1, y1 = l["from"]
++                except Exception:
++                    continue
++                n = 0
++                for (bx0, by0, bx1, by1) in lines:
++                    if by1 < y0 - 1 or by0 > y1 + 1:
++                        continue
++                    if bx1 < x0 - 1 or bx0 > x1 + 1:
++                        continue
++                    n += 1
++                want[tgt] = want.get(tgt, 0) + max(1, n)
++        return want
+ 
+-    # Compared in the NORMALISED form (url_key), not as strings - see the URL
+-    # identity block above colour_same() for the seven constructed cases.
+-    # The strictness is unchanged: the source set and the render set must still be
+-    # the same set, so an invented target is still a failure. Only the SPELLING is
+-    # normalised.
+-    s_l, g_l = link_targets(src), link_targets(gd)
+-    s_k = {url_key(u) for u in s_l}
+-    g_k = {url_key(u) for u in g_l}
+-    kept = len(s_k & g_k)
+-    lost = sorted(s_k - g_k)
+-    extra = sorted(g_k - s_k)
+-    if lost:
+-        print("40_link_targets: %d target(s) lost, e.g. %s" % (len(lost), lost[0]))
+-    if extra:
+-        print("40_link_targets: %d target(s) the source does not carry, e.g. %s"
+-              % (len(extra), extra[0]))
+-    c["40_link_targets"] = (len(s_l), kept, not s_k or (not lost and not extra))
++    def docx_links(path):
++        """(target -> runs, bookmark names) read straight out of the .docx package."""
++        if not path:
++            return None
++        try:
++            with zipfile.ZipFile(path) as z:
++                doc = z.read("word/document.xml").decode("utf-8", "replace")
++                try:
++                    rels = z.read("word/_rels/document.xml.rels").decode("utf-8", "replace")
++                except KeyError:
++                    rels = ""
++        except Exception:
++            return None
++        relmap = {}
++        for m in re.finditer(r"<Relationship\b[^>]*>", rels):
++            tag = m.group(0)
++            if "relationships/hyperlink" not in tag:
++                continue
++            rid = re.search(r'Id="([^"]+)"', tag)
++            tgt = re.search(r'Target="([^"]+)"', tag)
++            if rid and tgt:
++                relmap[rid.group(1)] = tgt.group(1).replace("&amp;", "&")
++        counts = {}
++        for m in re.finditer(r"<w:hyperlink\b([^>]*)>", doc):
++            attrs = m.group(1)
++            rid = re.search(r'r:id="([^"]+)"', attrs)
++            anc = re.search(r'w:anchor="([^"]+)"', attrs)
++            if rid:
++                raw = relmap.get(rid.group(1))
++                if raw is None:
++                    continue            # a dangling r:id is not a link
++                key = url_key(raw)
++                if not key:
++                    continue
++            elif anc:
++                key = "#" + anc.group(1)
++            else:
++                continue
++            counts[key] = counts.get(key, 0) + 1
++        bms = set(re.findall(r'<w:bookmarkStart\b[^>]*w:name="([^"]+)"', doc))
++        return counts, bms
++
++    s_want = src_link_instances(src)
++    d_links = docx_links(docx_path)
++
++    if d_links is None:
++        # Same rule as 50 and 53: a run that forgot --docx measured nothing, and a check
++        # that cannot see the thing it asks about must FAIL, not pass. Before this, a
++        # document with links and no --docx was scored against an empty render and read
++        # "0 of 0".
++        if s_want:
++            print("40_link_targets: no readable .docx, %d link target(s) unmeasured"
++                  % len(s_want), file=sys.stderr)
++        c["40_link_targets"] = (sum(s_want.values()), 0, not s_want)
++    else:
++        d_have, d_bms = d_links
++        total = sum(s_want.values())
++        lost = sorted(t for t in s_want if t not in d_have)
++        short = sorted(t for t in s_want if t in d_have and d_have[t] < s_want[t])
++        extra = sorted(t for t in d_have if t not in s_want)
++        dangling = sorted(t for t in s_want if t.startswith("#") and t[1:] not in d_bms)
++        # kept counts INSTANCES, so a document that loses one of five reads 4, not 0.
++        kept = sum(min(d_have.get(t, 0), s_want[t]) for t in s_want)
++        if lost:
++            print("40_link_targets: %d of %d link instance(s) lost - no run at all for %s"
++                  % (sum(s_want[t] for t in lost), total, lost[0]))
++        if short:
++            print("40_link_targets: %s needs %d run(s), the .docx carries %d"
++                  % (short[0], s_want[short[0]], d_have.get(short[0], 0)))
++        if extra:
++            print("40_link_targets: %s is linked in the .docx and not in the source"
++                  % extra[0])
++        if dangling:
++            print("40_link_targets: internal link %s has no bookmark to land on"
++                  % dangling[0])
++        # NO `not s_want or` SHORT-CIRCUIT. The rebuilt check first shipped with one, and
++        # it re-created the defect it was written to remove: on the 210 corpus documents
++        # that carry no link, `not s_want` is True, so the verdict was PASS whatever the
++        # .docx held. Measured: inject one invented <w:hyperlink> into gst-invoice-3line-items
++        # and the check still read PASS, source=0 kept=0 - a check that cannot fail on 99.5 %
++        # of the corpus. An empty source population means there is nothing to LOSE, not that
++        # there is nothing to INVENT: `extra` is the population that can still speak, and it
++        # is exactly what an engine that linked text the page did not is caught by.
++        c["40_link_targets"] = (total, kept,
++                                not lost and not short and not extra and not dangling)
+ 
+     # 41_block_spacing RETIRED 13 Nov - it measured the extractor's block segmentation,
+     # not the page. Kept here as the record of what it was and why it is gone.

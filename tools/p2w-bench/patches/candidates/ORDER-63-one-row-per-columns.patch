@@ -1,0 +1,79 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 327a3f9..e38a779 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -1936,47 +1936,35 @@ public final class DocxWriter {
+         float flowTopPt = ctx.flowTw / (float) TWIPS_PER_PT;
+         float rowTopPt = flowTopPt <= bandTop + 0.5f ? flowTopPt : bandTop;
+ 
+-        // ONE ROW PER BAND, not one row for the whole page.
++        // ONE ROW, ONE CELL PER COLUMN - AND NOT ONE ROW PER HORIZONTAL BAND.
+         //
+-        // A page can be set in columns more than once - a brochure whose three columns carry one
+-        // block of prose and then a second block of specifications below it. The page reads
+-        // band by band: all three columns of the first band, then all three of the second. A
+-        // single row cannot say that; it says "all of column one, then all of column two", which
+-        // is why 63_three_column_brochure still scored 33 % on reading order with its lines all
+-        // in the right place. A row per band says it exactly, and the bands are where the page
+-        // left a gap across EVERY column at once.
++        // This used to cut the columns into a row wherever no column had a block (a gap wider
++        // than 30 pt), on the theory that such a page "reads band by band: all three columns of
++        // the first band, then all three of the second". That theory is wrong for the document
++        // it was written for, and it is wrong for every other page here.
++        //
++        // 63_three_column_brochure is three columns of prose on a landscape sheet. Each column
++        // runs from its own heading down to its own closing block - "THE ESTATE" then "Estate at
++        // a glance", "THE CROP" then "Cupping profile", "THE OFFER" then "How to order". Every
++        // column happens to break at the same y (the prose ends and the reference block starts at
++        // 394.3 pt in all three), so the "gap that no column fills" test fires and the page was
++        // written as a 2x3 grid: row 0 the three prose blocks, row 1 the three reference blocks.
++        // A .docx table is read row by row, so the reader got left-prose, middle-prose,
++        // right-prose, then left-reference, middle-reference, right-reference - the reading order
++        // of no reader of that page. Measured with verify_order.py, line identity against the
++        // page's own column-major order: 11 inversions.
++        //
++        // A page-wide horizontal gap is not evidence that the columns stop. Two columns standing
++        // side by side is the whole definition of a column, and a column is read to its foot
++        // before the next one is begun - which is exactly what ONE row says. A full-width
++        // element really drawn across the gutter is a different case and is already handled: it
++        // goes to `before`/`after` when it is outside the band, and the page is refused
++        // ("straddles-gutter") when it is inside it. Nothing is lost by not splitting the row.
++        //
++        // Measured: 63_three_column_brochure 11 -> 1 inversions; every other judged document
++        // unchanged; all 44 checks on all 211 documents unchanged (9154/9284, 138 all-pass).
+         java.util.List<float[]> subs = new java.util.ArrayList<>();
+-        {
+-            java.util.List<float[]> iv = new ArrayList<>();
+-            for (int c = 0; c < n; c++) {
+-                for (Object b : cells[c]) {
+-                    float t = blockTop(b), bt = blockBottom(b);
+-                    if (t < 0f || bt <= 0f) continue;
+-                    iv.add(new float[]{t, bt});
+-                }
+-            }
+-            if (iv.isEmpty()) return false;
+-            java.util.Collections.sort(iv, new java.util.Comparator<float[]>() {
+-                public int compare(float[] a, float[] b) { return Float.compare(a[0], b[0]); }
+-            });
+-            float curT = iv.get(0)[0], curB = iv.get(0)[1];
+-            for (int i = 1; i < iv.size(); i++) {
+-                // A gap that no column fills is the end of a band. 30 pt is two or three lines of
+-                // body type: less than that is the leading between two lines, or the slack under a
+-                // short line, and not a band break. Measured on the six column documents: at 12 pt
+-                // 62_two_col_newsletter_pull_quote splits at its pull quote and its reading order
+-                // falls from 89 % to 75 %, while 63_three_column_brochure is unaffected; at 30 pt
+-                // both hold (62 at 89 %, 63 at 96 %).
+-                if (iv.get(i)[0] - curB > 30f) {
+-                    subs.add(new float[]{curT, curB});
+-                    curT = iv.get(i)[0];
+-                    curB = iv.get(i)[1];
+-                } else {
+-                    curB = Math.max(curB, iv.get(i)[1]);
+-                }
+-            }
+-            subs.add(new float[]{curT, curB});
+-        }
++        subs.add(new float[]{bandTop, bandBottom});
+ 
+         String noBorder = "<w:top w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"
+                 + "<w:left w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"

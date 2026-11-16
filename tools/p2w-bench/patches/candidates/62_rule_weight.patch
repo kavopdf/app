@@ -1,0 +1,252 @@
+diff --git a/tools/p2w-bench/verify_google.py b/tools/p2w-bench/verify_google.py
+index 7dac3e4..0345b50 100644
+--- a/tools/p2w-bench/verify_google.py
++++ b/tools/p2w-bench/verify_google.py
+@@ -1131,10 +1131,10 @@ def _rule_segments(page, band=None):
+             h, wd = r.height, r.width
+             if h <= band and wd > h:
+                 out.append({"o": "h", "perp": (r.y0 + r.y1) / 2.0, "a": r.x0, "b": r.x1,
+-                            "t": max(0.05, h), "col": fill})
++                            "t": max(0.05, h), "col": fill, "alpha": f_alpha})
+             elif wd <= band and h > wd:
+                 out.append({"o": "v", "perp": (r.x0 + r.x1) / 2.0, "a": r.y0, "b": r.y1,
+-                            "t": max(0.05, wd), "col": fill})
++                            "t": max(0.05, wd), "col": fill, "alpha": f_alpha})
+             continue
+         for item in d.get("items", []):
+             kind = item[0]
+@@ -1144,11 +1144,11 @@ def _rule_segments(page, band=None):
+                 if dy <= 0.8 and dx >= 1 and stroked:
+                     out.append({"o": "h", "perp": (p1.y + p2.y) / 2.0,
+                                 "a": min(p1.x, p2.x), "b": max(p1.x, p2.x),
+-                                "t": t_s, "col": col})
++                                "t": t_s, "col": col, "alpha": s_alpha})
+                 elif dx <= 0.8 and dy >= 1 and stroked:
+                     out.append({"o": "v", "perp": (p1.x + p2.x) / 2.0,
+                                 "a": min(p1.y, p2.y), "b": max(p1.y, p2.y),
+-                                "t": t_s, "col": col})
++                                "t": t_s, "col": col, "alpha": s_alpha})
+             elif kind in ("re", "qu"):
+                 rr = item[1] if kind == "re" else item[1].rect
+                 if stroked:
+@@ -1157,7 +1157,7 @@ def _rule_segments(page, band=None):
+                                           (rr.x0, rr.y0, rr.y1, "v"),
+                                           (rr.x1, rr.y0, rr.y1, "v")):
+                         out.append({"o": o, "perp": perp, "a": a, "b": b,
+-                                    "t": t_s, "col": col})
++                                    "t": t_s, "col": col, "alpha": s_alpha})
+     return out
+ 
+ 
+@@ -2641,9 +2641,211 @@ def extra_checks2(src, gd, docx_path=None):
+     # and the page shows nothing in exactly the places it shows nothing.
+     c["61_blank_not_filled"] = (0, invented, invented == 0)
+ 
++    # ---- 62 rule weight and opacity ----------------------------------------
++    c["62_rule_weight"] = rule_weight(src, gd)
++
+     return c
+ 
+ 
++# ----------------------------------------------------------------------------
++# 62_rule_weight - a rule's WIDTH and its OPACITY, the two things nothing read
++#
++# THE DEFECT THIS EXISTS FOR. The user's requirement, in their words: "table ke sabhi
++# lines ki motai ek jaisa nhi chahiye pdf ke according lines ki thickness and opacity
++# chahiye aur yeh sirf table me hee nhi poore pdf to word me aisa hee implementation
++# hona chahiye" - every line in the document, not just the table, must carry the page's
++# own thickness and opacity. A fix for it was built, measured with a bespoke census, and
++# shipped to a round that scored it ZERO, because no check in this file read a rule's
++# weight at all: 32_stroke_lines asks whether a rule is still THERE (same page, same
++# orientation, within 24 pt, 80 % of its length) and never how heavy it is, so a change
++# that made every border in the corpus 3x too thick, and a change that made them all
++# correct, both scored 8,923 of 9,073. A measurement that no check reads is a measurement
++# the score cannot see. This is that check.
++#
++# WHAT IS COMPARED. For every rule the page draws with a stroke of its own - thin
++# (<= RULE_THIN pt across), long (>= RULE_LONG along), on the same page and orientation -
++# the drawn copy's thickness and its INK.
++#
++#   width   the render's own thickness: a stroked segment's line width, or a filled
++#           band's perpendicular extent. This is the number `w:sz` decides for a table
++#           border and the band's EMU extent decides for a standalone rule, so it is the
++#           one place both halves of the user's requirement are observable at once - and
++#           it is observable in the RENDER, which is what the user sees, not in the .docx.
++#
++#   ink     how much of the white page the rule covers: 1 - the luminance the paint
++#           leaves behind, i.e. lum*a + (1-a) for colour lum and alpha a. OPACITY IS
++#           RECOVERED BY BLENDING TOWARD WHITE, because a renderer is free to flatten a
++#           faint stroke into an opaque grey - and LibreOffice does exactly that for a
++#           table border, which has no alpha channel at all (w:tblBorders carries
++#           w:val/w:sz/w:space/w:color and nothing else, so the writer blends the colour
++#           itself: c' = c*a + 255*(1-a)). A 30 % black rule and an opaque 0.702 grey
++#           rule are the same ink on white paper, and this check says so; a 30 % rule
++#           drawn solid black is 0.70 of ink too much and it says that too. Recovering
++#           alpha the other way - reading stroke_opacity/fill_opacity alone - would call
++#           the blended border a total loss of opacity on every table in the corpus.
++#
++# THE PAIRING, AND WHY IT PREFERS A WIDTH THAT AGREES. Rules are matched 1:1 per page
++# and orientation: within RULE_W_MATCH pt across, covering at least RULE_W_OVERLAP of the
++# source rule's own length, longest source rule first so the heaviest rule on a shared
++# gridline claims the drawn line before the grid does. Among the candidates that pass
++# that geometry test, one whose width already agrees is preferred. That is not a way of
++# passing: a page can draw a 0.45 pt grid and a 0.9 pt separator on the SAME line (a
++# bank statement does, at y 132.00 and 132.09), and without the preference the matcher
++# crossed them and reported the pair twice - 0.90 drawn at 0.40 AND 0.40 drawn at 0.90 -
++# on 29 documents. With it, 0.9 takes the 0.9 line and 0.45 takes the grid. It cannot
++# hide a real error: when a mutation changes every width, no candidate agrees and the
++# fallback is the best geometric match, which is then judged (see the mutation matrix).
++#
++# A RULE THAT DID NOT MATCH IS NOT JUDGED HERE. It may have moved, which is 18's and
++# 32's question, or the render may have re-laid-out the table around it. Only a pair is
++# judged, so a document whose table moved wholesale is not charged twice for one fault.
++#
++# THE TOLERANCES ARE MEASURED, NOT CHOSEN. Over 10,647 matched pairs on the 165 documents
++# this check judges (engine 0c2beaa + rule-fix, LibreOffice export; 10,700 pairs over the
++# 193 documents that draw any rule at all):
++#
++#   |drawn - source| pt   p50 0.00   p90 0.05   p95 0.05   p98 0.05   p99 0.05
++#   ... and then, all of it, 0.10, 0.20, 0.35, 0.40, 0.60, 1.30, 1.50
++#
++# So the whole population inside 0.05 pt is the FORMAT's quantisation and nothing else:
++# w:sz counts eighths of a point (0.45 pt has no representation: round(0.45*8) = 4 = 0.5),
++# and the renderer lays a border out on a 1/20 pt grid (0.375 pt = 7.5 twips -> 7 -> 0.35).
++# RULE_W_TOL is 0.06 pt: above every quantisation the format can produce and below the
++# next population, which starts at 0.10 pt. The 3 % relative term is there for a thick
++# rule only - a 4.00 pt accent strip comes back 4.10 pt because the renderer widens a
++# path 0.05 pt on each side, and 0.03*4.10 = 0.12 covers it while still failing a 3x
++# mutation of the same rule.
++#
++#   |ink difference|      p50 0.000  p90 0.000  p98 0.001  p99 0.001
++#   ... and then 0.18 and 0.54, on two pairs in two documents
++#
++# RULE_INK_TOL is 0.06 of a white page - an empty band between 0.001 and 0.18. It fails a
++# rule drawn solid that the page draws at 30 % (0.70 too much ink) and a black rule drawn
++# as the page's grey (0.54 too little). On the 211 that reads: 30 documents fail on ink
++# before the fix and 1 after.
++#
++# NO BUDGET, AND THAT IS MEASURED TOO. The deltas are exact: two renders of the same
++# .docx read the same widths to the hundredth, so there is no noise for a budget to
++# absorb, and a rule drawn at the wrong weight is one fault per rule. Of the 211:
++#
++#                         judged  abstain  pass  fail   failing documents
++#   rule-fix applied         165       46   161     4   03_stamp_vertical_90deg,
++#                                                       04_stamp_180deg_upside_down,
++#                                                       23_timetable_grid_txtpos,
++#                                                       itr-computation-with-slab-table
++#   HEAD (no fix)            165       46   132    33   ... 33, of which 30 also on ink
++#
++# A budget of even 5 % would have forgiven 23_timetable_grid_txtpos (1 bad of 20, a
++# 0.40 pt column rule drawn 0.75) and both pairs on itr-computation-with-slab-table, and
++# all three are genuine. The four that still fail after the fix are the remaining defect,
++# not noise: a rotated stamp's 0.60 pt border drawn 1.20 and 1.90 pt, a 0.40 pt column
++# rule drawn 0.75, and the known 0.90 -> 0.50 on itr-computation-with-slab-table, whose
++# table the render pushes onto a second page (01_page_count 1 -> 2, 32_stroke_lines).
++RULE_W_TOL = 0.06      # pt, absolute floor - above w:sz and twip quantisation, below 0.10
++RULE_W_REL = 0.03      # pt per pt of the heavier of the two - for a thick band only
++RULE_INK_TOL = 0.06    # fraction of a white page
++RULE_W_MATCH = 2.0     # pt across - matching only, never the judgement
++RULE_W_OVERLAP = 0.30  # share of the source rule's length a render piece must cover
++RULE_W_PAIRS_MIN = 3   # fewer than this and the document abstains rather than passes
++
++
++def rule_ink(col, alpha):
++    """The share of a white page a rule of this colour and alpha covers.
++
++    1 - the luminance left behind, with the alpha blended toward white: a 30 % black rule
++    and an opaque 0.702 grey one both read 0.298. This is the whole reason the check can
++    judge opacity at all - see the note on w:tblBorders above.
++    """
++    if col is None:
++        return 0.0
++    lum = 0.299 * col[0] + 0.587 * col[1] + 0.114 * col[2]
++    a = 1.0 if alpha is None else max(0.0, min(1.0, alpha))
++    return max(0.0, min(1.0, 1.0 - (lum * a + (1.0 - a))))
++
++
++def _weight_segments(doc, thin, band):
++    """Every thin-long rule segment in a document, with its page and its ink."""
++    out = []
++    for i, p in enumerate(doc):
++        for s in _rule_segments(p, band):
++            if s["t"] > thin or (s["b"] - s["a"]) < RULE_LONG:
++                continue
++            s = dict(s)
++            s["page"] = i
++            s["ink"] = rule_ink(s.get("col"), s.get("alpha"))
++            out.append(s)
++    return out
++
++
++def _weight_tol(a, b):
++    return max(RULE_W_TOL, RULE_W_REL * max(abs(a), abs(b)))
++
++
++def _weight_pairs(s_segs, g_segs):
++    """Match each source rule to the drawn segment that is its copy. 1:1, per page."""
++    by = {}
++    for s in g_segs:
++        by.setdefault((s["page"], s["o"]), []).append(s)
++    used, out = set(), []
++    # Longest first, then heaviest: on a gridline shared by a 0.45 grid and a 0.9 separator
++    # the separator is the rule that owns the drawn line, and it must claim it first.
++    for s in sorted(s_segs, key=lambda s: (-(s["b"] - s["a"]), -s["t"])):
++        L = s["b"] - s["a"]
++        cands = []
++        for o in by.get((s["page"], s["o"]), []):
++            if id(o) in used:
++                continue
++            dp = abs(o["perp"] - s["perp"])
++            if dp > RULE_W_MATCH:
++                continue
++            ov = min(s["b"], o["b"]) - max(s["a"], o["a"])
++            if ov < RULE_W_OVERLAP * L:
++                continue
++            cands.append((o, ov, dp))
++        if not cands:
++            continue
++        tol = max(_weight_tol(s["t"], c[0]["t"]) for c in cands)
++        agree = [c for c in cands if abs(c[0]["t"] - s["t"]) <= tol]
++        best = max(agree or cands, key=lambda c: (c[1], -c[2]))[0]
++        used.add(id(best))
++        out.append((s, best))
++    return out
++
++
++def rule_weight(src, gd):
++    """62_rule_weight: (pairs judged, rules drawn at the wrong weight or ink, ok).
++
++    Abstains - and says so - on a document that draws fewer than RULE_W_PAIRS_MIN
++    thin-long rules: there is nothing to judge, and a pass with no denominator would be a
++    vote that can never be cast. That is the same reason 54_image_dpi fails rather than
++    passes without a .docx, and the opposite of what 53_embedded_faces still does.
++    """
++    s_segs = _weight_segments(src, RULE_THIN, RULE_BAND)
++    g_segs = _weight_segments(gd, RULE_THIN_REN, RULE_BAND_REN)
++    ps = _weight_pairs(s_segs, g_segs)
++    if len(ps) < RULE_W_PAIRS_MIN:
++        print("62_rule_weight: unmeasured - %d rule pair(s) to judge, %d needed"
++              % (len(ps), RULE_W_PAIRS_MIN), file=sys.stderr)
++        return (0, 0, True)
++    bad, where = [], []
++    for s, g in ps:
++        dt = g["t"] - s["t"]
++        di = g["ink"] - s["ink"]
++        why = None
++        if abs(dt) > _weight_tol(s["t"], g["t"]):
++            why = "%.2f pt drawn %.2f" % (s["t"], g["t"])
++        elif abs(di) > RULE_INK_TOL:
++            why = "ink %.2f drawn %.2f" % (s["ink"], g["ink"])
++        if why:
++            bad.append((s, g))
++            if len(where) < 3:
++                where.append("p%d %s %s" % (s["page"] + 1, s["o"], why))
++    if bad:
++        print("62_rule_weight: %d of %d rules drawn at a weight or ink the page does not "
++              "use: %s" % (len(bad), len(ps), "; ".join(where)))
++    return (len(ps), len(bad), not bad)
++
++
+ # ---- 43's whole-block tolerances ---------------------------------------
+ # A block that MOVED carries its spans together, so their ink dx agrees to within
+ # BLOCK_WIN. Line-breaking does not: a re-broken line moves by the difference in its

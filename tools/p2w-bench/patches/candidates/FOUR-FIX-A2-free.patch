@@ -1,0 +1,277 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 452a4bf..b933cf3 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -1005,7 +1005,12 @@ public final class PdfToWord {
+                     }
+                     if (left + right < iv.size() * 0.8f) continue;      // glyphs cross it
+                     float ratio = Math.min(left, right) / (float) Math.max(left, right);
+-                    if (ratio < 0.30f) continue;                        // a margin, not a column
++                    // The ratio measures how MUCH was set on each side, not what it is, and a
++                    // short right-hand column is not a margin: journal-2col-with-footnotes has
++                    // 48 in-band lines on the left and 14 on the right - ratio 0.29 - and is
++                    // two columns of prose. So the ratio is one sufficient condition and
++                    // running text on both sides is the other; either one keeps the gutter.
++                    if (ratio < 0.30f && !runningText(rawLines, mid)) continue;
+                     keep.add(mid);
+                 }
+                 // The glyph projection is the most reliable of the three detectors, so when it
+@@ -1299,7 +1304,8 @@ public final class PdfToWord {
+         // Only a page that actually has columns needs the cut. On a single-column page the old
+         // top-to-bottom order is already right, and cutting there separated a heading from the
+         // line under it.
+-        if (bands > 1 && !row) xyCut(prose, cut, 8f); else cut.addAll(prose);
++        if (bands > 1 && !row) xyCut(prose, cut, 8f, columnMajorWide(prose));
++        else cut.addAll(prose);
+         List<Object> reordered = new ArrayList<>();
+         List<Table> pending = new ArrayList<>();
+         for (Object o : ordered) if (o instanceof Table) pending.add((Table) o);
+@@ -3153,6 +3159,66 @@ public final class PdfToWord {
+         return bands.size();
+     }
+ 
++    /**
++     * True when the lines on both sides of {@code mid} are running text, not the two halves of
++     * a label/value block.
++     *
++     * <p>The glyph-projection ratio test in the caller measures how many glyphs sit on each side
++     * of a candidate gutter and rejects a gutter whose sides are uneven. A two-column page whose
++     * right-hand article is simply shorter than its left one fails it, and the page then comes
++     * out single-column and interleaves the two of them line by line.
++     *
++     * <p>What separates a column of prose from a column of values is how the lines fill their own
++     * measure: running text is set to a measure, so it fills 0.55-1.00 of its band and carries
++     * 3.5 words or more per line; a value column fills 0.40 or less and holds one or two words.
++     * Measured on this corpus the two populations do not overlap, so the thresholds sit in an
++     * empty band. Both sides must hold four lines and overlap vertically by half the shorter
++     * one, which is what keeps a footnote block, a sidebar or a footer from being called a
++     * column. A line that crosses the gutter is a headline and counts for neither side.
++     */
++    private static boolean runningText(List<Line> rawLines, float mid) {
++        List<Line> left = new ArrayList<>(), right = new ArrayList<>();
++        for (Line l : rawLines) {
++            if (l.text == null || l.text.trim().isEmpty() || l.right <= l.x) continue;
++            if (l.right <= mid + 2f) left.add(l);
++            else if (l.x >= mid - 2f) right.add(l);
++        }
++        if (left.size() < 4 || right.size() < 4) return false;
++        if (fillOf(left) < 0.55f || fillOf(right) < 0.55f) return false;
++        if (wordsPerLine(left) < 3.5f || wordsPerLine(right) < 3.5f) return false;
++        float lt = Float.MAX_VALUE, lb = -Float.MAX_VALUE;
++        float rt = Float.MAX_VALUE, rb = -Float.MAX_VALUE;
++        for (Line l : left) { lt = Math.min(lt, l.y); lb = Math.max(lb, l.y); }
++        for (Line l : right) { rt = Math.min(rt, l.y); rb = Math.max(rb, l.y); }
++        float overlap = Math.min(lb, rb) - Math.max(lt, rt);
++        float shorter = Math.min(lb - lt, rb - rt);
++        if (shorter <= 0f) return overlap >= 0f;
++        return overlap >= shorter * 0.5f;
++    }
++
++    /** How much of its own band a group of lines fills: mean line width / band width. */
++    private static float fillOf(List<Line> ls) {
++        float lo = Float.MAX_VALUE, hi = -Float.MAX_VALUE, sum = 0f;
++        for (Line l : ls) {
++            lo = Math.min(lo, l.x);
++            hi = Math.max(hi, l.right);
++            sum += l.right - l.x;
++        }
++        if (hi <= lo) return 0f;
++        return sum / ls.size() / (hi - lo);
++    }
++
++    /** Mean words per line of a group of lines. */
++    private static float wordsPerLine(List<Line> ls) {
++        int words = 0;
++        for (Line l : ls) {
++            String t = l.text == null ? "" : l.text.trim();
++            if (t.isEmpty()) continue;
++            words += t.split("\\s+").length;
++        }
++        return words / (float) ls.size();
++    }
++
+     private static List<Float> keep0(List<Line> rawLines, float fullWidth) {
+         List<float[]> iv = new ArrayList<>();
+         float lo = Float.MAX_VALUE, hi = -Float.MAX_VALUE;
+@@ -3998,7 +4064,16 @@ public final class PdfToWord {
+      * and the pieces come out in the order a reader takes them - down a column, then the next.
+      */
+     private static void xyCut(List<Object> items, List<Object> out, float minGap) {
+-        xyCut(items, out, minGap, 0);
++        xyCut(items, out, minGap, 0, false);
++    }
++
++    /**
++     * @param sorted the order handed in is already column-major and has been verified as such
++     *               (see {@link #columnMajorWide}). The horizontal cut is then refused and the
++     *               uncut branch hands the items back in the order it was given them.
++     */
++    private static void xyCut(List<Object> items, List<Object> out, float minGap, boolean sorted) {
++        xyCut(items, out, minGap, 0, sorted);
+     }
+ 
+     /**
+@@ -4007,7 +4082,8 @@ public final class PdfToWord {
+      *              take the stack with it. Past the limit the rest is read top to bottom, which
+      *              is what the uncut branch does anyway.
+      */
+-    private static void xyCut(List<Object> items, List<Object> out, float minGap, int depth) {
++    private static void xyCut(List<Object> items, List<Object> out, float minGap, int depth,
++                              boolean sorted) {
+         if (items.size() <= 1 || depth > 40) {
+             out.addAll(items);
+             return;
+@@ -4098,15 +4174,66 @@ public final class PdfToWord {
+         boolean cutVertically = vValid && bestV >= minGap && bestVi > 0
+                 && (bestH < horizontalFloor || bestV >= bestH || !hValid);
+         if (cutVertically) {
+-            xyCut(new ArrayList<>(byX.subList(0, bestVi)), out, minGap, depth + 1);
+-            xyCut(new ArrayList<>(byX.subList(bestVi, byX.size())), out, minGap, depth + 1);
+-        } else if (hValid && bestH >= horizontalFloor && bestHi > 0) {
+-            xyCut(new ArrayList<>(byY.subList(0, bestHi)), out, minGap, depth + 1);
+-            xyCut(new ArrayList<>(byY.subList(bestHi, byY.size())), out, minGap, depth + 1);
++            xyCut(new ArrayList<>(byX.subList(0, bestVi)), out, minGap, depth + 1, sorted);
++            xyCut(new ArrayList<>(byX.subList(bestVi, byX.size())), out, minGap, depth + 1, sorted);
++        } else if (!sorted && hValid && bestH >= horizontalFloor && bestHi > 0) {
++            // A horizontal cut on a page whose columns are already in order is not a cut, it is
++            // a cut ACROSS the columns. It fires here for a structural reason: the sweep above
++            // tracks a RUNNING maximum right edge, so one full-width line - a figure caption, a
++            // spanning section heading - sets that maximum to the page's right margin and no
++            // vertical gap can be positive anywhere after it. bestV is then 0, no column cut is
++            // possible, and the 8 pt of ordinary paragraph space between two lines is taken for
++            // the page's widest horizontal gap. Refusing it leaves the verified order alone.
++            xyCut(new ArrayList<>(byY.subList(0, bestHi)), out, minGap, depth + 1, sorted);
++            xyCut(new ArrayList<>(byY.subList(bestHi, byY.size())), out, minGap, depth + 1, sorted);
+         } else {
+-            // nothing to cut: read down, then across
+-            out.addAll(byY);
++            // nothing to cut: read down, then across - unless the order handed in is already
++            // the page's reading order, in which case handing it back is the answer.
++            out.addAll(sorted ? items : byY);
++        }
++    }
++
++    /**
++     * True when a paragraph list handed to the XY-cut is ALREADY in column-major reading order,
++     * and holds enough of it for that to be worth protecting.
++     *
++     * <p>toParagraphs sorts by (segment, column, baseline), so on a column page its output is
++     * column-major by construction: all of the left column, then all of the next one. The XY-cut
++     * then throws that away - it never looks at the column a paragraph came from - and reorders
++     * from geometry alone, which on a two-column page with one spanning element is exactly
++     * band-major.
++     *
++     * <p>The incoming order is checked rather than assumed: it must decompose into contiguous
++     * runs of paragraphs that share a left edge (the bands), the bands must not step backwards
++     * to the left, and inside a band the paragraphs must read down the page. At least four
++     * paragraphs and at least two bands holding two paragraphs each, so that a page with one
++     * stray indented line is not mistaken for a column page. A list that fails any of this is
++     * left to the old behaviour.
++     */
++    private static boolean columnMajorWide(List<Object> items) {
++        if (items.size() < 4) return false;
++        List<int[]> runs = new ArrayList<>();
++        int start = 0;
++        for (int i = 1; i <= items.size(); i++) {
++            boolean same = i < items.size()
++                    && Math.abs(leftOf(items.get(i)) - leftOf(items.get(start))) <= 3f;
++            if (!same) {
++                runs.add(new int[]{start, i});
++                start = i;
++            }
+         }
++        int wide = 0;
++        float prevLeft = -Float.MAX_VALUE;
++        for (int[] r : runs) {
++            float left = leftOf(items.get(r[0]));
++            if (left < prevLeft - 3f) return false;
++            prevLeft = left;
++            for (int i = r[0] + 1; i < r[1]; i++) {
++                if (topOf(items.get(i)) < topOf(items.get(i - 1)) - 0.5f) return false;
++            }
++            if (r[1] - r[0] >= 2) wide++;
++        }
++        return wide >= 2;
+     }
+ 
+     private static float leftOf(Object o) {
+@@ -4447,7 +4574,29 @@ public final class PdfToWord {
+             i = j;
+         }
+         if (right == 0) return false;
+-        return paired / (float) right >= 0.90f;
++        if (paired / (float) right < 0.90f) return false;
++        // A shared baseline grid is necessary but not sufficient, because it does not separate
++        // the two populations it is asked to separate. A column page whose columns are set on
++        // one grid pairs as tightly as a form does - newsletter-3col 0.92, magazine 1.00,
++        // 74_balance_sheet 0.90 - so the pairing ratio decides nothing there.
++        //
++        // What does separate them is how much of the right-hand band each segment fills. A
++        // form's value is a short field standing far short of the paper (balance sheet 0.18,
++        // payslip 0.32, price list 0.43 of the band available to it); a column's line is prose
++        // set to the column measure (magazine 0.97, newsletter 0.96, newspaper 0.98). Nothing on
++        // the corpus lands between 0.54 and 0.69, so 0.65 is measured, not tuned. A page with
++        // fewer than four right-hand segments has too little evidence to be called a column row.
++        List<Float> segW = new ArrayList<>();
++        float avail = 0f;
++        for (Line l : base) {
++            if (l.right > avail) avail = l.right;
++            if (l.x >= splitX - 2f) segW.add(l.right - l.x);
++        }
++        float availW = avail - splitX;
++        if (availW <= 0f || segW.isEmpty()) return true;
++        Collections.sort(segW);
++        float medSeg = segW.get(segW.size() / 2);
++        return right < 4 || medSeg < availW * 0.65f;
+     }
+ 
+     /**
+@@ -4794,6 +4943,16 @@ public final class PdfToWord {
+             // the left runs right up to it. Only the wide gap may cross a column boundary.
+             float across = next.x - prev.right;
+             if (across < Math.max(40f, size * 3f)) return false;
++            // The gap is measured between the two lines' INK, not across the gutter, and a prose
++            // column is ragged on the right, so its last word can stop far enough short of the
++            // column edge to clear the floor: 69_two_col_legal_numbered_clauses ends col 0 at
++            // 278.5 and starts col 1 at 319.0 - across 40.5 against a floor of 40 - and the two
++            // columns' first lines were welded into one paragraph, and every baseline after them.
++            // Two lines of prose are not two fields of a row whatever the white space between
++            // them, so a weld across a gutter needs the right-hand segment to be a field. A page
++            // number is furniture, not prose: a running footer is a row like any other.
++            if (wordsOf(prev.text) >= 5 && wordsOf(next.text) >= 4
++                    && !pageNumber(next.text)) return false;
+         }
+         // A fragment that starts to the LEFT of where the previous one began is not a field of
+         // this row; leave it where it is.
+@@ -4823,6 +4982,31 @@ public final class PdfToWord {
+         return true;
+     }
+ 
++    /**
++     * True when the fragment is a page number - "Page 1 of 1", "3", "2/7".
++     *
++     * <p>A running footer is a row of fields like any other: the document's title on the left and
++     * the page number on the right, drawn on one baseline. It is also four words, so the prose
++     * test above would call it a column and refuse the weld - and refusing it puts the page
++     * number on a line of its own, one line more than the sheet has room for. Measured: the last
++     * line was then clipped and mobile-bill lost 7 checks (04_chars_missing, 18_displacement,
++     * 26_text_overlap, 27_text_off_page, 43_within_10pt_x, 45_char_accuracy, 47_margins) over
++     * that one line, and two-tables-stacked and boq lost 5 and 3 the same way.
++     */
++    private static boolean pageNumber(String s) {
++        if (s == null) return false;
++        String t = s.trim().replaceAll("\\s+", " ").toLowerCase(java.util.Locale.ROOT);
++        return t.matches("(page\\s*)?\\d{1,3}(\\s*(/|of)\\s*\\d{1,3})?");
++    }
++
++    /** Whitespace-separated word count, 0 for a null or blank string. */
++    private static int wordsOf(String s) {
++        if (s == null) return 0;
++        String t = s.trim();
++        if (t.isEmpty()) return 0;
++        return t.split("\\s+").length;
++    }
++
+     /** How many lines of {@code group} already stand on {@code next}'s baseline. */
+     private static int rowWidth(List<Line> group, Line next) {
+         int n = 0;

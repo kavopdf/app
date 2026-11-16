@@ -270,6 +270,20 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   so the census spends its time where the fixer will look first. A blank cell means that
   document was not in the displacement pass, not that it is fine.
 
+  **CANDIDATE PATCHES EXIST - read tools/p2w-bench/patches/candidates/README.md.**
+
+  Ten patches from the 13-14 Nov sub-agent work are preserved there. None is applied and
+  none is verified: they were measured on the old 211-document corpus with the old
+  instrument, and the pipeline was rebuilt underneath them. Six change what the app
+  produces (1233 added lines across DocxWriter and PdfToWord), four change only the
+  advisory check tooling.
+
+  They are a source of ready-made hypotheses for the class you are on - ORDER-63 targets
+  `63_three_column_brochure`, rule-fix-2 targets stroke lines, p2w-links-rebased targets
+  hyperlinks - **not a stack to apply.** Apply at most ONE per attempt, measure it, and let
+  the ratchet decide. Two at once and the ledger cannot say which one did what, which is
+  the failure the 19-attempt record is made of.
+
   benchmarks/CENSUS.md is the same data grouped by signal, with a document count per
   mechanism. **Start with the signal that covers the most documents**: one mechanism fixed
   once clears every document under it, and that is worth more than clearing one document

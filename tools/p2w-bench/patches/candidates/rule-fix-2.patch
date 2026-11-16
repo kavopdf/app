@@ -1,0 +1,286 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 327a3f9..b793252 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -5384,6 +5384,94 @@ public final class DocxWriter {
+         int b = Math.round((rgb & 0xFF) * a + 255f * (1f - a));
+         return hex((r << 16) | (g << 8) | b);
+     }
++    /**
++     * One side of a cell's {@code w:tcBorders}: the weight of the rule that lies on it, or nil.
++     *
++     * <p>Nil rather than "none" for the same reason {@link #borders} writes nil: "none" with a
++     * colour is a line somebody else gets to decide, and a side the page did not draw is no
++     * line at all.
++     */
++    private static void cellBorder(StringBuilder sb, String side, int sz, String colour) {
++        if (sz <= 0) {
++            sb.append("<w:").append(side)
++              .append(" w:val=\"nil\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>");
++        } else {
++            sb.append("<w:").append(side).append(" w:val=\"single\" w:sz=\"").append(sz)
++              .append("\" w:space=\"0\" w:color=\"").append(colour).append("\"/>");
++        }
++    }
++
++    /** The per-edge border weights a table is written with, or null when six sides suffice. */
++    public static final class EdgeBorders {
++        public final int[] rowSz, colSz;
++        public final String[] rowColour, colColour;
++        EdgeBorders(int[] rs, String[] rc, int[] cs, String[] cc) {
++            rowSz = rs; rowColour = rc; colSz = cs; colColour = cc;
++        }
++    }
++
++    /**
++     * The weight and colour of the rule on every row edge and every column edge of a table,
++     * or null when the table's six {@code w:tblBorders} sides already say the same thing.
++     *
++     * <p>{@code w:tblBorders} carries exactly one {@code insideH} and one {@code insideV}, so a
++     * table whose grid is not uniform cannot be written from six weights: {@code insideStroke}
++     * reduces the rules inside the band to the one carrying the most length and every other
++     * weight is discarded. Measured on the 211-document corpus, 67 tables draw interior rules at
++     * more than one width and 62 of those rules reached the render thinner than the page drew
++     * them - 0.9 pt drawn as 0.5 pt. {@code w:tcBorders} is the only place OOXML lets one row's
++     * edge carry its own weight, so each edge's own rule goes on the cells of that edge.
++     *
++     * <p>Only where the edges really differ, so a table whose grid is uniform - almost all of
++     * them - is written exactly as before. And only where the row edges are MEASURED: an
++     * estimated even pitch would invent edges and put nil borders on a grid the page drew.
++     *
++     * <p>Public because {@code tools/engine-verify/RuleCensus.java} reads it: the census that
++     * measures what the writer emits must not carry a second copy of this arithmetic.
++     */
++    public static EdgeBorders edgeBorders(PdfToWord.Table t, int[] sideSz, String[] sideColour,
++                                          boolean[] sideDrawn, boolean exactRows, int cols) {
++        if (t == null) return null;
++        if (!(t.rowStroke != null && exactRows) && !(t.colStroke != null && cols > 0)) return null;
++        int rows = Math.max(1, t.rows.size());
++        int[] rs = new int[rows + 1];
++        String[] rc = new String[rows + 1];
++        for (int i = 0; i <= rows; i++) {
++            int fb = i == 0 ? 0 : i == rows ? 2 : 4;      // top / bottom / insideH
++            float[] st = t.rowStroke != null && i < t.rowStroke.length ? t.rowStroke[i] : null;
++            if (st != null) {
++                rs[i] = szOf(st[0]);
++                rc[i] = borderColour(st);
++            } else {
++                rs[i] = sideDrawn[fb] ? sideSz[fb] : 0;
++                rc[i] = sideDrawn[fb] ? sideColour[fb] : TABLE_RULE_COLOUR;
++            }
++        }
++        int[] cs = new int[cols + 1];
++        String[] cc = new String[cols + 1];
++        for (int i = 0; i <= cols; i++) {
++            int fb = i == 0 ? 1 : i == cols ? 3 : 5;      // left / right / insideV
++            float[] st = t.colStroke != null && i < t.colStroke.length ? t.colStroke[i] : null;
++            if (st != null) {
++                cs[i] = szOf(st[0]);
++                cc[i] = borderColour(st);
++            } else {
++                cs[i] = sideDrawn[fb] ? sideSz[fb] : 0;
++                cc[i] = sideDrawn[fb] ? sideColour[fb] : TABLE_RULE_COLOUR;
++            }
++        }
++        boolean differs = false;
++        for (int i = 0; i <= rows && !differs; i++) {
++            int fb = i == 0 ? 0 : i == rows ? 2 : 4;
++            if (rs[i] != (sideDrawn[fb] ? sideSz[fb] : 0)) differs = true;
++        }
++        for (int i = 0; i <= cols && !differs; i++) {
++            int fb = i == 0 ? 1 : i == cols ? 3 : 5;
++            if (cs[i] != (sideDrawn[fb] ? sideSz[fb] : 0)) differs = true;
++        }
++        return differs ? new EdgeBorders(rs, rc, cs, cc) : null;
++    }
++
+     /** The six sides a {@code w:tblBorders} element carries. */
+     private static final String[] TABLE_SIDES =
+             {"top", "left", "bottom", "right", "insideH", "insideV"};
+@@ -5802,6 +5890,13 @@ public final class DocxWriter {
+         // A side the page did not draw adds nothing, so the widths come from the same
+         // drawn-ness the w:tblBorders element is written from, and are halved per row because
+         // half of each rule lies inside the row above and half inside the row below.
++        // PER-EDGE BORDER WEIGHTS - see edgeBorders(), which the census reads as well so
++        // that the measurement and the writer cannot answer differently.
++        EdgeBorders eb = edgeBorders(t, sideSz, sideColour, sideDrawn, exactRows, cols);
++        boolean perEdge = eb != null;
++        int[] rowEdgeSz = perEdge ? eb.rowSz : null, colEdgeSz = perEdge ? eb.colSz : null;
++        String[] rowEdgeCol = perEdge ? eb.rowColour : null;
++        String[] colEdgeCol = perEdge ? eb.colColour : null;
+         boolean hRuleTop = ruledTable;
+         boolean hRuleBottom = ruledTable;
+         boolean hRuleInside = ruledTable && (t.ruled || t.innerH);
+@@ -6054,6 +6149,18 @@ public final class DocxWriter {
+                 inner.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(spanTw)
+                         .append("\" w:type=\"dxa\"/>");
+                 if (span > 1) inner.append("<w:gridSpan w:val=\"").append(span).append("\"/>");
++                if (perEdge) {
++                    // This cell's own four edges, each at the weight of the rule that lies on
++                    // it. tcBorders sits after gridSpan and before shd / noWrap / tcMar /
++                    // vAlign in the schema, which is where it is written here.
++                    int rightEdge = Math.min(cols, c + span);
++                    inner.append("<w:tcBorders>");
++                    cellBorder(inner, "top", rowEdgeSz[r], rowEdgeCol[r]);
++                    cellBorder(inner, "left", colEdgeSz[c], colEdgeCol[c]);
++                    cellBorder(inner, "bottom", rowEdgeSz[r + 1], rowEdgeCol[r + 1]);
++                    cellBorder(inner, "right", colEdgeSz[rightEdge], colEdgeCol[rightEdge]);
++                    inner.append("</w:tcBorders>");
++                }
+                 // The page drew this cell's text a point or two past its own column edge and
+                 // never broke the value: on 343_air_waybill "12" starts at 67.46 pt in a column
+                 // that ends at 76 and runs to 77. A word processor's default is to wrap it, and
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 452a4bf..0254815 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -483,6 +483,26 @@ public final class PdfToWord {
+          * constant - so a side that used to be right stays right.
+          */
+         public final float[][] sideStroke = new float[6][];
++        /**
++         * The stroke of the rule on each ROW edge and each COLUMN edge, top-down and
++         * left-right, with one more entry than there are rows (columns).
++         *
++         * <p>{@code w:tblBorders} has exactly one {@code insideH} and one {@code insideV} for
++         * the whole table, so a table whose grid is not uniform - a 0.4 pt grid with a 0.9 pt
++         * rule under its header, a 0.5 pt grid inside a 1.5 pt frame - cannot be written from
++         * the six side weights at all: {@code insideStroke} reduces the rules inside the band
++         * to the one carrying the most length, and every other weight is discarded. Measured
++         * on the 211-document corpus: 67 tables draw interior rules at more than one width and
++         * 62 of those rules came out thinner than the page drew them (0.9 pt drawn as 0.5 pt);
++         * constructed, a 0.9 pt separator under row 1 of a 0.4 pt grid is not expressible.
++         *
++         * <p>So the writer can put each edge's own weight on the cells of that edge
++         * ({@code w:tcBorders}), which is the only place OOXML allows a per-row border. These
++         * arrays are that evidence, filled where the page's own rule list is in hand.
++         */
++        public float[][] rowStroke;
++        /** The stroke of the rule on each column edge, left to right - see {@link #rowStroke}. */
++        public float[][] colStroke;
+         /**
+          * The y of every row's top edge, in points, with one more entry than there are rows -
+          * the last entry is the bottom edge of the last row. Null when the pass that built the
+@@ -5822,15 +5842,32 @@ public final class PdfToWord {
+                 return;
+             }
+             if (pCurves == 0 && pLines == 1 && pRects == 0) {
++                // THE BAND'S OPACITY IS THE STROKE'S OWN, NOT 1.
++                //
++                // A single axis-aligned line is written as a filled band rather than as an
++                // outline, and the band was created with its fill alpha hard-coded to 1f. A
++                // page that strokes a rule at 30 % (/CA 0.3) therefore came out solid: the
++                // stroke's alpha constant was read into the shape's lineAlpha, on a line the
++                // writer then does not draw (a band carries <a:ln><a:noFill/>). Measured on a
++                // constructed page drawing 0.5 pt rules at 100 %, 50 % and 30 %: all three
++                // .docx shapes were byte-identical, and the render drew all three at
++                // fill-opacity 1.0. The user's requirement is a line's weight AND its opacity
++                // from the page, everywhere - so the band carries the stroke's CA.
++                //
++                // REBASED onto 0c2beaa: the band's fill alpha used to be the literal 1f and is
++                // now maskA, the soft-mask coverage (bf2355c). Neither is the stroke's own
++                // alpha, so the two are multiplied: a rule under a half-covering soft mask at
++                // 30 % CA paints 15 % of its ink, which is what the page shows.
++                float strokeAlpha = (float) getGraphicsState().getAlphaConstant() * maskA;
+                 if (Math.abs(segY1 - segY0) <= 0.8f) {
+                     float x0 = Math.min(segX0, segX1), x1 = Math.max(segX0, segX1);
+                     addShape(clipped(new float[]{x0, segY0 - w / 2f, x1, segY0 + w / 2f}),
+-                            line, maskA, -1, 0f);
++                            line, strokeAlpha, -1, 0f);
+                     return;
+                 } else if (Math.abs(segX1 - segX0) <= 0.8f) {
+                     float y0 = Math.min(segY0, segY1), y1 = Math.max(segY0, segY1);
+                     addShape(clipped(new float[]{segX0 - w / 2f, y0, segX0 + w / 2f, y1}),
+-                            line, maskA, -1, 0f);
++                            line, strokeAlpha, -1, 0f);
+                     return;
+                 }
+             }
+@@ -6858,6 +6895,41 @@ public final class PdfToWord {
+      * <p>The geometry half of the ownership test, and the same span test {@code edgeStroke}
+      * uses: half the side, so a 3 pt tick beside a corner is not the table's edge.
+      */
++    /**
++     * The STROKE of the rule lying on one edge, or null when the page drew none there.
++     *
++     * <p>{@link #ruleOnSide} answers "is there a rule" with the rule's geometry, which is all a
++     * drawn/not-drawn test needs. A per-edge border needs the weight and colour as well, and
++     * the stroke is kept in a parallel list at the same index - so the index is what has to be
++     * carried out of the search, not the geometry.
++     */
++    private static float[] strokeOnSide(Rules rules, boolean horizontal, float at,
++                                        float a0, float a1, float span) {
++        if (rules == null) return null;
++        List<float[]> geom = horizontal ? rules.horizontal : rules.vertical;
++        int best = -1;
++        float bestD = Float.MAX_VALUE, bestW = -1f;
++        for (int i = 0; i < geom.size(); i++) {
++            float[] g = geom.get(i);
++            float d = Math.abs(g[0] - at);
++            if (d > SIDE_TOL) continue;
++            if (Math.min(g[2], a1) - Math.max(g[1], a0) < span * 0.5f) continue;
++            float[] st = horizontal ? rules.hStrokeAt(i) : rules.vStrokeAt(i);
++            float wd = st == null ? -1f : st[0];
++            // THE HEAVIER RULE WINS ON A SHARED EDGE, and that is not a tie-break, it is what
++            // the page shows: a bank statement draws its 0.45 pt grid at 132.00 and a 0.9 pt
++            // section rule at 132.09, so both lie on the same row edge within SIDE_TOL and the
++            // reader sees one line - the 0.9 pt one, which covers the other. Nearest-wins took
++            // the 0.45 grid and wrote the row edge at 0.5 pt: measured, 61 rules on the corpus
++            // came out 3 eighths light for exactly this reason.
++            if (wd > bestW + 0.01f || (Math.abs(wd - bestW) <= 0.01f && d < bestD)) {
++                best = i; bestD = d; bestW = wd;
++            }
++        }
++        if (best < 0) return null;
++        return horizontal ? rules.hStrokeAt(best) : rules.vStrokeAt(best);
++    }
++
+     private static float[] ruleOnSide(Rules rules, boolean horizontal, float at,
+                                       float a0, float a1, float span) {
+         if (rules == null) return null;
+@@ -6937,6 +7009,21 @@ public final class PdfToWord {
+         t.sideDrawn[3] = ruleOnSide(rules, false, t.right, t.top, t.bottom, h) != null;
+         t.sideDrawn[4] = interiorRulesOnEdges(rules, true, t);
+         t.sideDrawn[5] = interiorRulesOnEdges(rules, false, t);
++        // Every row edge and every column edge, with the rule that lies on it - the evidence
++        // w:tcBorders needs, because w:tblBorders can only carry one insideH and one insideV.
++        float[] re = rowEdges(t);
++        if (re != null) {
++            t.rowStroke = new float[re.length][];
++            for (int i = 0; i < re.length; i++) {
++                t.rowStroke[i] = strokeOnSide(rules, true, re[i], t.left, t.right, w);
++            }
++        }
++        if (t.colX != null && t.colX.length > 1) {
++            t.colStroke = new float[t.colX.length][];
++            for (int i = 0; i < t.colX.length; i++) {
++                t.colStroke[i] = strokeOnSide(rules, false, t.colX[i], t.top, t.bottom, h);
++            }
++        }
+         // A side the page drew no rule along still gets a weight, because the side is written
+         // either way. It takes the table's own stroke rather than the writer's old constant.
+         float[] tableStroke = bandStroke(rules, t);
+@@ -7947,6 +8034,14 @@ public final class PdfToWord {
+             u.sideDrawn[i] = t.sideDrawn[i];
+             u.sideStroke[i] = t.sideStroke[i];
+         }
++        // The per-edge strokes travel with the record, like the six sides: a re-cut table is
++        // still the page's table, and w:tcBorders is written from these.
++        u.rowStroke = t.rowStroke;
++        u.colStroke = t.colStroke;
++        for (int i = 0; i < 6; i++) {
++            u.sideDrawn[i] = t.sideDrawn[i];
++            u.sideStroke[i] = t.sideStroke[i];
++        }
+         int bandRows = lastSpanBand + 1;              // rows of the grid that become bands
+         int nRows = (bandRows > 0 ? 1 : 0) + 1;
+         u.shapeParas(nRows, cols);
+@@ -9006,6 +9101,8 @@ public final class PdfToWord {
+         out.ruled = t.ruled;
+         // The rebuilt record stands where the old one stood, so it keeps the page's strokes.
+         for (int i = 0; i < 6; i++) out.sideStroke[i] = t.sideStroke[i];
++        out.rowStroke = t.rowStroke;
++        out.colStroke = t.colStroke;
+         // The record's own heading - the numbered line that is not a label/value pair - keeps
+         // its place at the top, because it introduces both panels.
+         for (int r = 0; r < t.rows.size(); r++) {

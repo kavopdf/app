@@ -1,0 +1,103 @@
+diff --git a/tools/p2w-bench/verify_google.py b/tools/p2w-bench/verify_google.py
+index 7dac3e4..3e7625b 100644
+--- a/tools/p2w-bench/verify_google.py
++++ b/tools/p2w-bench/verify_google.py
+@@ -2760,12 +2760,23 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+         # and be read as a check id.
+         print("34a/34b/34c: no span paired, so size, colour and weight are unmeasured "
+               "rather than zero")
++    # THE THREE FLOORS ARE CALIBRATED, NOT INHERITED. All three sat at 0.85 because that
++    # was the first number that seemed safe; measured on 211 documents (calibration round,
++    # see FLOORS-211.md) each statistic has a hole in its distribution and the floor now
++    # sits in it. 34a's hole is (0.8308, 0.9524) and 0.85 is already inside it - unmoved.
++    # 34b's hole is (0.9583, 1.0000): 209 documents at exactly 1.000, one at 0.9583
++    # (journal-2col, 3 of 72 spans #1C1C1C -> #000000) and one at 0.9149 (text-held-twice,
++    # the shadow copy and the real copy swap colours). 0.98 is the midpoint and fails 2.
++    # 34c's hole is (0.9871, 1.0000) - 204 at exactly 1.000 and seven in a crowded tail
++    # from 0.9600 to 0.9871 - so 0.99 fails all seven. Both are TOP-OF-RANGE floors and
++    # brittle off this corpus: 5 documents pair only 2 spans, and on a 2-span document one
++    # wrong span reads 0.50.
+     c["34a_span_size_match"] = (100, 0 if none else round(100 * ok_size / tot),
+                                 none or ok_size >= tot * 0.85)
+     c["34b_span_colour_match"] = (100, 0 if none else round(100 * ok_col / tot),
+-                                  none or ok_col >= tot * 0.85)
++                                  none or ok_col >= tot * 0.98)
+     c["34c_span_weight_match"] = (100, 0 if none else round(100 * ok_weight / tot),
+-                                  none or ok_weight >= tot * 0.85)
++                                  none or ok_weight >= tot * 0.99)
+ 
+     # ---- 35 rotation -------------------------------------------------------
+     # 35_rotation: the rotated RUN, not a count of rotated lines.
+@@ -2992,7 +3003,18 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+ 
+     s_u = rules_under_text(src, own_length=True)
+     g_u = rules_under_text(gd, own_length=False)
+-    c["36_underline_rules"] = (s_u, g_u, g_u >= max(1, int(s_u * 0.7)) if s_u else True)
++    # TWO-SIDED. The predicate had no upper clause, so a render drawing thirty rules under
++    # text where the source draws one PASSED - and that is 600_reviewed_invoice_with_
++    # annotations (1 -> 30), the document's real defect. 1.5x + 4 is the slack
++    # rules_under_text() already allows a source rule; reusing it here rather than
++    # inventing a second constant. The clause is guarded by `s_u` because 34 documents
++    # draw text-width rules with no source underline (table separators, mastheads) - those
++    # are 32_stroke_lines' question, not this one's. Measured: s_u > 0 on 2 of 211
++    # documents only, with g_u of 5 (44_coloured_underlined_hyperlinks, 5 -> 5, passes)
++    # and 30 (600, fails). The check is a 2-document vote, not a 211-document one.
++    c["36_underline_rules"] = (s_u, g_u,
++                               (g_u >= max(1, int(s_u * 0.7))
++                                and g_u <= int(s_u * 1.5) + 4) if s_u else True)
+ 
+     # ---- 37 super / subscript ---------------------------------------------
+     # The old version counted the superscript FLAG BIT and nothing else. PyMuPDF
+@@ -3690,7 +3712,22 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+               % (ratio, round(100 * difflib.SequenceMatcher(None, s_cs, g_cs,
+                                                             autojunk=False).ratio())),
+               file=sys.stderr)
+-    c["45_char_accuracy"] = (100, ratio, ratio >= 97)
++    # RETIRED AS A VOTE, KEPT AS A NUMBER. It reads the RENDER, so it charges the engine
++    # for what the renderer drops, and its 3 % slack cannot see a one-character defect
++    # while 04_chars_missing and 05_chars_extra are exact multiset tests in both
++    # directions. Measured on the 211 (FLOORS-211.md): it fails 2 documents, 411 and 600,
++    # and BOTH already fail five other checks - so it contributes no exclusive fire, and
++    # retiring it moves no document's verdict. A mutation matrix on
++    # 53_single_space_body_15_headings - delete a character, substitute one, duplicate a
++    # short paragraph, transpose two, delete a word - shows 45 silent on all five where 04
++    # or 05 fires on four; the one mutant 45 does see is a duplicated paragraph large
++    # enough to cross its 3 % slack, and 05 reports that same document exactly (75 chars)
++    # rather than as a ratio. Reading the .docx instead would not rescue it: that reading
++    # answers "did the engine lose anything", which is a true statement no verdict can
++    # use while 04 still owns character loss on the render. Reported, not voted - the
++    # universe goes from 44 checks to 43.
++    print("45_char_accuracy (reported, not a check): character multiset %d %%" % ratio,
++          file=sys.stderr)
+ 
+     # ---- 46 text crossing a rule (per span) --------------------------------
+     # WHAT THIS USED TO ASK. "Does the render count more rules inside text boxes than the
+@@ -5454,6 +5491,19 @@ def compare(src_path, gd_path, docx_path=None):
+                         pairs.append((yb - ya, rb - ra))
+         return pairs
+ 
++    # THE TOLERANCE WAS WIDER THAN THE DATA. It sat at 1.0 pt while the whole corpus
++    # spans -0.50 to +0.60 pt, so on 198 measured documents it could not fire at all, and
++    # a half-point pitch error - half a line on a 12 pt pitch - passed. The useful hole is
++    # not at the top of the range: 177 documents read exactly 0.00, sixteen read at or
++    # below 0.08 in absolute value, the next value is 0.10 (bank-statement, one of the two
++    # that a stale 0.40 reading had put on the far side of the gap), and above that the
++    # corpus does not come back until 0.295. 0.19 pt sits inside the measured hole
++    # (0.10, 0.295) and fails 4. A ladder proves the floor does what a floor is for
++    # (FLOORS-211.md): w:line +2 units, a 0.12 pt error, still passes; +5, a 0.25 pt
++    # error, fails; +10, a 0.52 pt error - half a line - passed the old 1.0 and fails
++    # this. The 13 documents with fewer than five paired lines are unmeasured and pass -
++    # 6 % of the corpus voting blind on this question, unchanged by the floor.
++    _PITCH_TOL_PT = 0.19
+     _pp = pitch_pairs(src, gd)
+     if len(_pp) < 5:
+         # Fewer than five lines can be paired: the render lost the lines, reflowed them, or
+@@ -5466,7 +5516,7 @@ def compare(src_path, gd_path, docx_path=None):
+         _d = [r - a for a, r in _pp]
+         s_p = round(median([a for a, r in _pp]), 1)
+         g_p = round(median([r for a, r in _pp]), 1)
+-        _p23_ok = abs(median(_d)) <= 1.0
++        _p23_ok = abs(median(_d)) <= _PITCH_TOL_PT
+         _p23_note = ("%d paired gaps, median difference %+.2f pt"
+                      % (len(_pp), median(_d)))
+     checks["23_line_pitch"] = (s_p, g_p, _p23_ok)

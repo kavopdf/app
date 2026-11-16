@@ -1,0 +1,362 @@
+diff --git a/tools/p2w-bench/prove_checks.py b/tools/p2w-bench/prove_checks.py
+index d8ef13e..bb91284 100644
+--- a/tools/p2w-bench/prove_checks.py
++++ b/tools/p2w-bench/prove_checks.py
+@@ -59,9 +59,18 @@ BASE = "01_stamp_rotated_15deg_upright.pdf"
+ IMG_DOC = "10_stamp_as_image.pdf"
+ LINK_DOC = "44_coloured_underlined_hyperlinks.pdf"
+ # 36/37/38 pass vacuously when the SOURCE has none of the feature, so each needs
+-# a source that does: measured, these three carry 4 underlines, 3 superscript
++# a source that does: measured, these three carry 5 underlines, 3 superscript
+ # runs and 9 list markers. BASE carries zero of all three, so any render passes.
+-UNDERLINE_DOC = "payslip-label-left-amount-right.pdf"
++#
++# UNDERLINE_DOC was payslip-label-left-amount-right.pdf, which the comment here called
++# "4 underlines". It carries NONE: measured on 0c2beaa its four rules under text are table
++# row separators 5.2 to 6.6 times the width of the span above them, so the source side read
++# 0 and "every underline rule removed" went 0 -> 0 and proved nothing. 44_coloured_underlined_
++# hyperlinks.pdf carries 5 genuine ones (ratio 1.00x, origin dx0 -0.10..-0.15) and the same
++# mutation takes it 5 -> 0. The 15 Nov patch made the check say when it is not applicable,
++# so a vacuous document can no longer be mistaken for a proof either: on payslip the check
++# now reports applicable=False instead of a pass.
++UNDERLINE_DOC = "44_coloured_underlined_hyperlinks.pdf"
+ SCRIPT_DOC = "journal-2col-with-footnotes.pdf"
+ MARKER_DOC = "admission-form-labels-left-boxes-right.pdf"
+ # The relative mutations below need a page whose median is not pinned by a
+@@ -604,14 +613,80 @@ def _rules_under_spans(p):
+ 
+ 
+ def mut_underline_removed(doc):
+-    """36: remove the rules that sit just under a baseline. On
+-    payslip-label-left-amount-right.pdf the source counts four and the render is
+-    left with none - and no other check moves, because that document has no
+-    links. On 44_coloured_underlined_hyperlinks.pdf the same mutation also
+-    deleted the link annotations, which made the proof less specific."""
++    """36, LOSS: remove the rules that sit just under a baseline.
++
++    44_coloured_underlined_hyperlinks.pdf reads source 5, render 0. This is the direction
++    the old check already caught, and it still catches it.
++
++    It was run on payslip-label-left-amount-right.pdf until 15 Nov, where the source side
++    read 0 because those four rules are table row separators 5.2 to 6.6 times the width of
++    the span above them - so the mutation went 0 -> 0 and the proof was vacuous."""
+     return _strip_line_art(doc, _rules_under_spans)
+ 
+ 
++def mut_underline_many(doc, target=30):
++    """36, INVENTION: draw a rule at span bottom edges until the render carries 30.
++
++    This is the defect the check could not see at all. Its verdict was
++    `g_u >= max(1, int(s_u * 0.7))` - a lower bound with nothing above it - so a render
++    that draws thirty underlines where the source draws one passed, and on
++    600_reviewed_invoice_with_annotations that is not a hypothetical: source 1, render 30,
++    ok=True, on the one document in the corpus whose only underline is gone.
++
++    Drawn one at a time and re-measured, so the count in the report is the count the
++    verifier read rather than the number of lines this function drew.
++    """
++    drawn = 0
++    for sp in _spans_in_order(doc):
++        if _underline_count(doc) >= target:
++            break
++        if _has_rule_under(doc, sp):
++            continue
++        b = fitz.Rect(sp)
++        doc[0].draw_line(fitz.Point(b.x0, b.y1), fitz.Point(b.x1, b.y1),
++                         color=(0, 0, 0), width=0.8)
++        drawn += 1
++    return drawn
++
++
++def _spans_in_order(doc):
++    for p in doc:
++        for blk in p.get_text("dict")["blocks"]:
++            if blk.get("type") != 0:
++                continue
++            for ln in blk.get("lines", []):
++                for sp in ln.get("spans", []):
++                    if sp.get("text", "").strip():
++                        yield sp["bbox"]
++
++
++def _has_rule_under(doc, bbox):
++    b = fitz.Rect(bbox)
++    for p in doc:
++        for r in _rules_under_spans(p):
++            if b.y1 - 2.5 <= r.y0 <= b.y1 + 2.5 and r.x0 < b.x1 and r.x1 > b.x0:
++                return True
++    return False
++
++
++def _underline_count(doc):
++    """The RENDER side of 36: one hit per span, no own-length test. Measured through the
++    verifier itself so this harness cannot drift from the predicate it is proving."""
++    fd, tmp = tempfile.mkstemp(suffix=".pdf")
++    os.close(fd)
++    doc.save(tmp, deflate=True)
++    fd, js = tempfile.mkstemp(suffix=".json")
++    os.close(fd)
++    subprocess.run([sys.executable, VERIFY, tmp, tmp, "--json", js],
++                   capture_output=True, text=True)
++    try:
++        return json.load(open(js))["checks"]["36_underline_rules"]["render"]
++    finally:
++        for p in (tmp, js):
++            if os.path.exists(p):
++                os.unlink(p)
++
++
+ def mut_rule_at_baseline(doc):
+     """36, additive: draw one rule at a span's bottom edge, where an underline
+     goes. The check's count goes up by one and the check still passes."""
+@@ -736,6 +811,13 @@ WRONG_DIRECTION = {
+     # what it is for - so the mutation fires it, correctly. Measured 14 Nov: with the .docx
+     # side in place, 01_stamp_rotated_15deg_upright with one 30-degree run added reports
+     # source=3, kept=2, need=3, ok=False.
++    # 36 stays here, and the 15 Nov upper clause is why it can. Its firing mutation is
++    # mut_underline_removed (44: 5 -> 0), the LOSS direction. This additive one draws ONE
++    # rule at ONE span's bottom edge on the same document: 44 reads source 5, render 6, and
++    # the verdict is now `max(1, int(5*0.7)) <= 6 <= 5*3`, i.e. 3 <= 6 <= 15 - it passes,
++    # deliberately. A render that draws one extra rule is inside the allowance the corpus's
++    # own two measurements support; the clause is there for 600's 1 -> 30, not for 5 -> 6.
++    # mut_underline_many below is the mutation that fires the upper clause.
+     "36_underline_rules":  (mut_rule_at_baseline, UNDERLINE_DOC,
+                             "a rule drawn at a span's bottom edge"),
+     # 37 has left this table. Under the old render-side clause a raised run added to the
+@@ -1204,6 +1286,56 @@ def mut53_docx(path, mapping):
+     return dst
+ 
+ 
++def prove_36_upper():
++    """36's UPPER clause: the direction the check was blind in.
++
++    The check's firing mutation is mut_underline_removed (44: 5 -> 0), the LOSS
++    direction, which it already caught. Its verdict used to be
++    `g_u >= max(1, int(s_u * 0.7))` - a lower bound with nothing above it - so a render
++    that INVENTED underlines passed. This draws rules at span bottom edges, one at a time
++    and re-measured, until the render carries 30, with the source held at its own one
++    underline: 600_reviewed_invoice_with_annotations is the corpus's real instance of
++    exactly that pair (source 1, render 30, and it read ok=True before this patch).
++    """
++    print("36 TWO-SIDED - the upper clause, on the document that needed it:")
++    srcfile = path("600_reviewed_invoice_with_annotations.pdf")
++    if not os.path.exists(srcfile):
++        print("   600_reviewed_invoice_with_annotations.pdf missing from the corpus")
++        return True
++    d = fitz.open(srcfile)
++    try:
++        drawn = mut_underline_many(d)
++    except Exception as e:
++        d.close()
++        print("   mutation failed: %s" % str(e)[:60])
++        return False
++    out = save(d, "mut_36_upper.pdf")
++    res = run(srcfile, out)
++    if res is None:
++        print("   could not be measured")
++        return False
++    v = res["checks"]["36_underline_rules"]
++    det = v.get("detail") or {}
++    fired = "36_underline_rules" in res["failed"]
++    print("   %-40s %d rule(s) drawn   src=%s render=%s lower=%s upper=%s ok=%s%s"
++          % ("600 + invented underlines", drawn, v.get("source"), v.get("render"),
++             det.get("lower"), det.get("upper"), v.get("ok"),
++             "   FIRED" if fired else "   DID NOT FIRE"))
++    # The control is 44, not 600: 600 as the engine rendered it is the real defect this
++    # clause exists to catch (source 1, render 30), so it is not a control at all. 44 is
++    # a document with five genuine underlines whose render carries all five, and it must
++    # pass or the fire above proves nothing about the upper clause.
++    ctrl_src = path("44_coloured_underlined_hyperlinks.pdf")
++    ctrl = run(ctrl_src, render_for(ctrl_src) or ctrl_src) if os.path.exists(ctrl_src) else None
++    if ctrl is not None:
++        cv = ctrl["checks"]["36_underline_rules"]
++        cdet = cv.get("detail") or {}
++        print("   %-40s %s   src=%s render=%s lower=%s upper=%s ok=%s"
++              % ("44 as the engine rendered it", "control", cv.get("source"),
++                 cv.get("render"), cdet.get("lower"), cdet.get("upper"), cv.get("ok")))
++    return fired
++
++
+ def prove_53_mutations():
+     """The forgiveness, on real documents: it must not cover a real loss."""
+     print("53 ON REAL DOCUMENTS - a forgiven name must not cover a lost face:")
+@@ -1493,6 +1625,8 @@ def main():
+     table_ok = prove_53_table()
+     print("")
+     prove_53_mutations()
++    print("")
++    table_ok = prove_36_upper() and table_ok
+ 
+     print("\nPROVEN: %d of %d" % (len(proven), len(ids)))
+     for cid, why, n in proven:
+diff --git a/tools/p2w-bench/verify_google.py b/tools/p2w-bench/verify_google.py
+index 7dac3e4..be37699 100644
+--- a/tools/p2w-bench/verify_google.py
++++ b/tools/p2w-bench/verify_google.py
+@@ -2959,10 +2959,44 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+     # can overhang its text - and it is measured, not chosen: on 44's five real underlines
+     # the rule is 1.00x the span width and starts exactly at its left edge, and no document
+     # in the corpus has a genuine underline that this rejects.
++    #
++    # TWO-SIDED SINCE 15 Nov. The verdict above was `g_u >= max(1, int(s_u * 0.7))` - a
++    # LOWER clause and nothing else - so the check was NECESSARY AND BLIND. It caught a
++    # render that LOST underlines and could not see a render that INVENTED them, and it
++    # passed the one document in the corpus whose only underline is gone:
++    #
++    #   loss       44_coloured_underlined_hyperlinks, every rule shape under the five
++    #              underlined spans deleted from the render: source 5, render 0, and
++    #              0 >= max(1, 3) is false. FAILS. The lower clause works and stays.
++    #   invention  600_reviewed_invoice_with_annotations: source 1, render 30, and
++    #              30 >= max(1, 0) is true. PASSED - on a document whose one underline (a
++    #              green rule under "Shree Ganesh Traders", 150.0 pt, at its left edge) is
++    #              absent from the render, with the nearest rule 36 pt below the span. The
++    #              30 are the document's table borders, carried faithfully. A render that
++    #              draws thirty underlines where the source draws one was read as fine
++    #              because no clause could reject it.
++    #
++    # The upper clause added below closes that, and its bound is measured rather than
++    # chosen. The population where this check can say anything at all is the documents
++    # whose SOURCE draws an underline: measured over the 211-document corpus at 0c2beaa,
++    # that is 2 documents - 44 (source 5, render 5) and 600 (source 1, render 30). Every
++    # other document reads source 0 and cannot judge anything, which is what the
++    # applicability flag at the end of this block is for. The useful gap is (5, 30): a
++    # genuine render sits at or just under its source count, and the defect sits at 30x.
++    # U_CEIL = 3 puts the bound at 3x the source count - 15 for 44, 3 for 600 - i.e.
++    # strictly inside that measured gap on the one document where a bound is decidable,
++    # and far below the 30 on the other. It is not a guess about the renderer: it is the
++    # largest allowance the corpus's two measurements both support.
++    U_Y = 2.5          # a thin rule, the stroke model's own threshold - both sides
++    U_ORIGIN = 4.0     # the rule starts where the span starts - source side
++    U_MAX_W = 1.5      # the rule is not much longer than the span - source side
++    U_LOSS = 0.7       # lower clause: 30 % of a document's underlines may be lost
++    U_CEIL = 3         # upper clause: the render may not carry 3x the source's count
++
+     def rules_under_text(doc, own_length=True):
+         n = 0
+         for p in doc:
+-            lines = [s for s in _strokes(p) if s["rect"].height <= 2.5]
++            lines = [s for s in _strokes(p) if s["rect"].height <= U_Y]
+             for blk in p.get_text("dict")["blocks"]:
+                 if blk.get("type") != 0:
+                     continue
+@@ -2974,7 +3008,7 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+                         span_w = x1 - x0
+                         for st in lines:
+                             r = st["rect"]
+-                            if not (y1 - 2.5 <= r.y0 <= y1 + 2.5 and r.x0 < x1 and r.x1 > x0):
++                            if not (y1 - U_Y <= r.y0 <= y1 + U_Y and r.x0 < x1 and r.x1 > x0):
+                                 continue
+                             # ITS OWN LENGTH, ASKED OF THE SOURCE ONLY - the same rule
+                             # 32_stroke_lines applies to isolation. The source decides what
+@@ -2982,9 +3016,9 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+                             # same span, because the renderer re-derives the geometry and a
+                             # rule it draws 1.6x wide is still that underline.
+                             if own_length:
+-                                if r.x1 - r.x0 > span_w * 1.5 + 4:
++                                if r.x1 - r.x0 > span_w * U_MAX_W + 4:
+                                     continue
+-                                if not (x0 - 4 <= r.x0 <= x0 + 4):
++                                if not (x0 - U_ORIGIN <= r.x0 <= x0 + U_ORIGIN):
+                                     continue
+                             n += 1
+                             break
+@@ -2992,7 +3026,28 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+ 
+     s_u = rules_under_text(src, own_length=True)
+     g_u = rules_under_text(gd, own_length=False)
+-    c["36_underline_rules"] = (s_u, g_u, g_u >= max(1, int(s_u * 0.7)) if s_u else True)
++    u_lo = max(1, int(s_u * U_LOSS))
++    u_hi = s_u * U_CEIL
++    # A CHECK THAT JUDGES 2 DOCUMENTS MUST NOT READ LIKE ONE THAT JUDGES 211.
++    # This check asks its question only where the SOURCE draws an underline, and on this
++    # corpus that is 2 documents of 211. On the other 209 the render side reads a rule on
++    # 32 of them - 388 hits in total, up to 77 on 03_stamp_vertical_90deg - and every one
++    # of those numbers is the document's own table borders, masthead rules and stamp-box
++    # edges, carried faithfully, not a defect. Reporting those 209 documents as "36 passed"
++    # is what let the check be counted as a 211-document vote it never cast. It now says
++    # applicable=False there: the same
++    # denominator rule verify_txt.py applies to t09 (judges 8) and t11 (judges 19). An
++    # abstention is not a pass, and the JSON and the CLI line both say so.
++    u_app = s_u > 0
++    c["36_underline_rules"] = (
++        s_u, g_u,
++        (u_lo <= g_u <= u_hi) if u_app else True,
++        {"applicable": u_app,
++         "lower": u_lo if u_app else None,
++         "upper": u_hi if u_app else None,
++         "note": None if u_app else
++                 "the source draws no underline, so there is nothing to judge"},
++    )
+ 
+     # ---- 37 super / subscript ---------------------------------------------
+     # The old version counted the superscript FLAG BIT and nothing else. PyMuPDF
+@@ -5773,19 +5828,51 @@ def compare(src_path, gd_path, docx_path=None):
+     gd.close()
+ 
+     failed = [k for k, v in checks.items() if not v[2]]
++
++    # A CHECK THAT JUDGED NOTHING IS NOT A CHECK THAT PASSED.
++    # verify_txt.py already carries this: a check there returns (source, render, ok,
++    # applicable) and every JSON says "applicable" beside "total", so "a check that judges
++    # 19 documents cannot read like one that judges 211". This file had no such channel, so
++    # a check whose source side reads 0 was written down as a PASS on all 211 documents and
++    # counted as a vote in all 211. 36_underline_rules is the first check to say otherwise:
++    # it asks its question only where the SOURCE draws an underline - 2 documents of 211 -
++    # and on the other 209 the render side reads the document's own table borders and calls
++    # them nothing it can judge. It now abstains there instead of passing.
++    #
++    # The flag travels in the fourth element a check already has (26 uses it for what its
++    # count is made of), so no check has to be rewritten to use it: a fourth element that
++    # is a dict carrying "applicable": False is an abstention, and nothing else changes.
++    #
++    # "passed" and "total" KEEP THEIR OLD MEANING on purpose. record.py writes "passed"
++    # into RESULTS.jsonl and ratchet.py reads it as the score, so moving the denominator
++    # there would arrive as 209 documents scoring one point lower - a regression report,
++    # not a correction, and the ratchet would freeze the wrong number as a ceiling. The
++    # honest pair is reported beside them: "passed_applicable" / "applicable".
++    applicable = {k: not (len(v) > 3 and isinstance(v[3], dict)
++                          and v[3].get("applicable") is False)
++                  for k, v in checks.items()}
++    abstained = sorted(k for k, a in applicable.items() if not a)
+     return {
+         "source": src_path,
+         "render": gd_path,
+         "passed": len(checks) - len(failed),
+         "total": len(checks),
++        # The same three numbers verify_txt.py prints: how many checks judged this
++        # document, how many of those passed, and which ones abstained and why.
++        "applicable": len(checks) - len(abstained),
++        "passed_applicable": sum(1 for k, v in checks.items() if v[2] and applicable[k]),
++        "abstained": abstained,
+         "failed": sorted(failed),
+         "ok": not failed,
+         # A check may carry a fourth element: what its count is MADE OF. Reported only,
+         # never scored - a document that passes writes no detail and its JSON is
+-        # unchanged. 26_text_overlap is the one that needs it (see the split there).
+-        "checks": {k: dict({"source": v[0], "render": v[1], "ok": bool(v[2])},
++        # unchanged. 26_text_overlap is the one that needs it (see the split there), and
++        # 36_underline_rules uses it to carry its abstention and its two bounds.
++        "checks": {k: dict({"source": v[0], "render": v[1], "ok": bool(v[2]),
++                            "applicable": applicable[k]},
+                            **({"detail": v[3]} if len(v) > 3 and v[3] is not None else {}))
+                    for k, v in sorted(checks.items())},
++        "applicability": applicable,
+     }
+ 
+ 
+@@ -5846,6 +5933,15 @@ def main(argv):
+         for k in res["failed"]:
+             c = res["checks"][k]
+             print("    %-28s source=%-8s render=%-8s" % (k, c["source"], c["render"]))
++    # An abstention is printed, not counted as a pass. The line names the check and the
++    # reason the check gave, so "36_underline_rules" on a document with no underline reads
++    # as a document it did not judge rather than one it cleared.
++    if res.get("abstained"):
++        for k in res["abstained"]:
++            c = res["checks"][k]
++            why = (c.get("detail") or {}).get("note") if isinstance(c.get("detail"), dict) else None
++            print("    %-28s abstained%s  [%d of %d checks judged this document]"
++                  % (k, " - " + why if why else "", res["applicable"], res["total"]))
+     if out:
+         # The run may be told to write into a directory it has not made yet - that is
+         # exactly how the .txt half measured nothing for a whole day: restxt/ never existed,

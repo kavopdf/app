@@ -1,0 +1,266 @@
+diff --git a/tools/p2w-bench/verify_google.py b/tools/p2w-bench/verify_google.py
+index 7dac3e4..784f07b 100644
+--- a/tools/p2w-bench/verify_google.py
++++ b/tools/p2w-bench/verify_google.py
+@@ -2674,6 +2674,56 @@ BLOCK_MIN = 2
+ BLOCK_TOL = 12.0
+ 
+ 
++def _cell_probe(doc):
++    """(page, x0, x1, y0, y1) -> is this box inside a closed table cell?
++
++    Geometric, so it does not depend on the .docx surviving the round trip. A box is in a
++    cell when a vertical rule stands to its left and another to its right, both spanning
++    its band, no wider than a cell apart, with a horizontal rule above and below joining
++    them. Validated against an independent whole-line/docx-cell-text match: 95.6 %
++    agreement on 18078 judged runs (AUDIT-47-POPULATION.md).
++    """
++    per = []
++    for page in doc:
++        V, H = [], []
++        for d in page.get_drawings():
++            for it in d["items"]:
++                if it[0] == "l":
++                    a, b = it[1], it[2]
++                    if abs(a.x - b.x) < 0.6 and abs(a.y - b.y) > 3:
++                        V.append((a.x, min(a.y, b.y), max(a.y, b.y)))
++                    if abs(a.y - b.y) < 0.6 and abs(a.x - b.x) > 3:
++                        H.append((a.y, min(a.x, b.x), max(a.x, b.x)))
++                elif it[0] == "re":
++                    r = it[1]
++                    if r.height > 3:
++                        V.append((r.x0, r.y0, r.y1)); V.append((r.x1, r.y0, r.y1))
++                    if r.width > 3:
++                        H.append((r.y0, r.x0, r.x1)); H.append((r.y1, r.x0, r.x1))
++        V = sorted(set((round(x, 1), round(a, 1), round(b, 1)) for x, a, b in V))
++        H = sorted(set((round(y, 1), round(a, 1), round(b, 1)) for y, a, b in H))
++
++        def _inside(x0, x1, y0, y1, _V=V, _H=H):
++            if len(_V) < 2 or len(_H) < 2:
++                return False
++            ym = (y0 + y1) / 2.0
++            L = [x for x, a, b in _V if x <= x0 + 0.6 and a - 0.6 <= ym <= b + 0.6]
++            R = [x for x, a, b in _V if x >= x1 - 0.6 and a - 0.6 <= ym <= b + 0.6]
++            if not L or not R:
++                return False
++            xl, xr = max(L), min(R)
++            if xr - xl > 420 or xr <= xl:
++                return False
++            up = [y for y, a, b in _H if y <= y0 + 2 and a - 1 <= xl <= b + 1
++                  and a - 1 <= xr <= b + 1]
++            dn = [y for y, a, b in _H if y >= y1 - 2 and a - 1 <= xl <= b + 1
++                  and a - 1 <= xr <= b + 1]
++            return bool(up) and bool(dn)
++
++        per.append(_inside)
++    return lambda pi, x0, x1, y0, y1: per[pi](x0, x1, y0, y1) if pi < len(per) else False
++
++
+ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+     """Return checks 32-48. pairs is [(source_run, render_run), ...] already matched."""
+     c = {}
+@@ -3891,13 +3941,26 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+         need = max(3, int(0.05 * len(xs)))
+         cnt = collections.Counter(round(x) for x in xs)
+         shared = [x for x, k in cnt.items() if k >= need]
+-        return min(shared) if shared else min(round(x) for x in xs)
+-
+-    def page_lefts(doc):
++        # NO FALLBACK. min(xs) over a filtered population is not a margin, it is whichever
++        # single line happened to sit furthest left: on price-list-right-aligned-amounts the
++        # body population is 8 lines of a table-heavy page, nothing is shared, and min()
++        # read 51 against the render's 508 - a 457 pt "margin error" on a page whose body
++        # column is a table. A margin is a place many lines start; if no place has enough
++        # lines, the page has no body margin and this clause says nothing about it.
++        return min(shared) if shared else None
++
++    def page_lefts(doc, skip_texts):
+         """[(page index, the body's left edge, how many lines the page has), ...]
+ 
+-        Only the anchor is taken from the page now. The per-line registration below is
+-        measured on the caller's matched runs, not on this page's raw left edges.
++        POPULATION: body lines only. A left edge is a page-margin quantity only when the
++        page frame puts it there. Three kinds of line have a left edge that something else
++        set, and they are removed rather than tolerated:
++          - a line inside a table cell: its left edge is the CELL'S INSET, which is a
++            function of the column widths, not of the page margin;
++          - a line positioned by a tab stop: its left edge is the TAB STOP;
++          - (turned lines are already removed below.)
++        A page with no body line left has no body margin and this clause says nothing
++        about it - not with a tolerance, but by not having a population.
+ 
+         The edge is the line's INK, for the reason 47(d) states: a line that begins with
+         an indent written as spaces has a pen left of anything it draws, and the anchor
+@@ -3913,6 +3976,10 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+                     if not "".join(c.get("c", "") for sp in ln.get("spans", [])
+                                    for c in sp.get("chars", [])).strip():
+                         continue
++                    _lt = norm_text("".join(c.get("c", "") for sp in ln.get("spans", [])
++                                            for c in sp.get("chars", [])))
++                    if _lt in skip_texts:
++                        continue
+                     # A turned line is not part of the body's left edge. On
+                     # 15_stamp_on_scanned_page the page's ONLY text is a 9-degree stamp,
+                     # and the anchor became that stamp's x (337 against the render's 138);
+@@ -3930,99 +3997,73 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
+     margin_bad, indent_bad = [], []
+     worst_med = worst_tail = 0.0
+ 
++    # ---- the body-line population, built once ---------------------------------
++    # A line is NOT a body line when a table cell or a tab stop put its left edge there.
++    # Both sides are filtered by the SAME text set, so the two anchors are taken over the
++    # same kind of line even when the render's own cell grid is missing.
++    _skip = set()
++    for _doc in (src, gd):
++        _cf = _cell_probe(_doc)
++        for _pi, _p in enumerate(_doc):
++            for _blk in _p.get_text("rawdict")["blocks"]:
++                if _blk.get("type") != 0:
++                    continue
++                for _ln in _blk.get("lines", []):
++                    _t = norm_text("".join(c.get("c", "") for sp in _ln.get("spans", [])
++                                           for c in sp.get("chars", [])))
++                    if not _t:
++                        continue
++                    _ink = [c for sp in _ln.get("spans", []) for c in sp.get("chars", [])
++                            if c.get("c", "") not in _CTRL and not c.get("c", "").isspace()]
++                    if not _ink:
++                        continue
++                    _x0 = min(c["bbox"][0] for c in _ink)
++                    _y0 = min(c["bbox"][1] for c in _ink)
++                    _y1 = max(c["bbox"][3] for c in _ink)
++                    if _cf(_pi, _x0, _x0 + 2.0, _y0, _y1):
++                        _skip.add(_t)
++    if docx_path:
++        try:
++            import zipfile as _zf
++            from lxml import etree as _et
++            _W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
++            _root = _et.fromstring(_zf.ZipFile(docx_path).read("word/document.xml"))
++            for _tbl in _root.iter(_W + "tbl"):
++                for _tc in _tbl.iter(_W + "tc"):
++                    _t = norm_text("".join(x.text or "" for x in _tc.iter(_W + "t")))
++                    if _t:
++                        _skip.add(_t)
++            for _p in _root.iter(_W + "p"):
++                _seen = False
++                for _el in _p.iter():
++                    if _el.tag == _W + "tab" and _el.get(_W + "val") is None:
++                        _seen = True
++                    elif _el.tag == _W + "t" and _seen and _el.text:
++                        _t = norm_text(_el.text)
++                        if _t:
++                            _skip.add(_t)
++        except Exception:
++            pass
++
+     # ---- (a) the margin itself: the page's anchor left edge ------------------
+-    for (pi, s_ml, _sn), (_, g_ml, _gn) in zip(page_lefts(src), page_lefts(gd)):
++    for (pi, s_ml, _sn), (_, g_ml, _gn) in zip(page_lefts(src, _skip),
++                                               page_lefts(gd, _skip)):
+         if s_ml is not None and g_ml is not None and abs(s_ml - g_ml) > LM_TOL:
+             margin_bad.append((pi + 1, s_ml, g_ml))
+ 
+-    # ---- (b) the indent structure: every matched run's left edge -------------
+-    # MEASURED ON THE MATCHED RUNS, NOT ON A ROW-LOCAL SET DISTANCE.
+-    #
+-    # The set distance was a VERTICAL check wearing a horizontal ruler. It paired each
+-    # source line with the render line whose left edge was nearest ON THE SAME ROW, where
+-    # "same row" was +-max(2, 0.35 * h) pt of that line's centre y; when no render line was
+-    # on the row it fell back to EVERY render line on the page. A vertical displacement of
+-    # a few points therefore became a horizontal distance to an unrelated line. Measured on
+-    # the 211 (the corpus, the engine at 22728b1, LibreOffice's render):
+-    #
+-    #   purchase-order   the footer "Page 1 of 1" is at x=520.0 in the source and x=520.1
+-    #                    in the render - 0.1 pt out horizontally - but 2.5 pt low. The row
+-    #                    window on that line is max(2, 0.35 * 6.4) = 2.24 pt, so it missed,
+-    #                    the fallback returned the nearest left edge on the page (42.6),
+-    #                    and the check reported a 477.4 pt margin error. All 106 of that
+-    #                    document's matched runs are within 0.67 pt horizontally.
+-    #   the same footer  electricity-bill, eway-bill, salary-slip-factory-wages,
+-    #                    property-tax-receipt and purchase-order all report exactly 477.4:
+-    #                    five documents, one shape. Across the 82 failures, 201 of the 202
+-    #                    unregistered lines that the render holds AT THE SAME x are beyond
+-    #                    the row window vertically, and 43 of the 82 are decided by such a
+-    #                    line.
+-    #   dropping the fallback does not fix it. When the footer's own counterpart is 2.5 pt
+-    #                    low, a BODY line standing on the footer's row is in the row set and
+-    #                    sits at x=42.6. Constructed (construct2.py): one body line on the
+-    #                    footer's row, the footer 3.9 pt low, nothing moved horizontally at
+-    #                    all - and the check reports (0.0, 1) and FAILS.
+-    #
+-    # The pairing is the caller's `pairs`: one-to-one, page-constrained, text-matched and
+-    # claimed nearest-first (see the assignment in compare()). It is the same evidence 43
+-    # and 18 are built on, so this clause now asks its question of the same material they
+-    # do instead of inventing a second, weaker pairing of its own.
+-    #
+-    # The worst-run cap needs CORROBORATION. One run out is a pairing artefact - a
+-    # duplicated word can still claim a distant occurrence - so a single outlier is not a
+-    # displacement; two are. Measured: with the cap unconditional, 370_offer_letter fails
+-    # on 1 of its 37 runs at 43.0 pt and 69_two_col_legal_numbered_clauses on 1 of 51 at
+-    # 239.2 pt; both are clean at every other run.
+-    DX_MIN_PAIRS = 5        # below this many matched runs a page is not judged on a count
+-    # INK TO INK. xink is the first glyph that puts ink on the page (see ink_box()), so
+-    # the leading whitespace a source draws and a renderer drops is no longer a
+-    # displacement. It is the same edge the engine places text by, so the two sides of
+-    # this subtraction now mean the same thing. Falls back to x for any run whose producer
+-    # recorded no glyph boxes.
+-    # WHICH PAIRS THIS CLAUSE MAY JUDGE. Two filters, each for a measured reason.
+-    #
+-    # (i) UPRIGHT ON BOTH SIDES. A curved seal draws 59 glyphs at 59 angles; the render
+-    #     flattens the arc into one horizontal run. Subtracting the two x values is
+-    #     subtracting a point on a curve from a point on a straight line - it is not a
+-    #     displacement and no engine change can make it zero. Measured on the 31 failures
+-    #     of corpus-v1: dropping the turned pairs closes 8 of them (03_stamp_vertical_90deg,
+-    #     05_round_company_seal, 305, 312, 318, 352, 371, 401_trifold) and moves no
+-    #     document the other way. This is the same test 18_displacement already applies -
+-    #     "no single UPRIGHT run may be more than twice its own tolerance out".
+-    #
+-    # (ii) NOTHING ELSE. A merged-run pair - the render writing as one span what the source
+-    #     drew as several, so g_sp is a PIECE with its x taken from the render's own glyph
+-    #     boxes (see _inside) - IS JUDGED, because that x is exact: it is where the render
+-    #     really drew the characters, so the difference is a real horizontal displacement
+-    #     and not an estimate. Excluding those pairs was tried and rejected on 14 Nov: it
+-    #     takes 21_form_labels, 40_devanagari, 64_newspaper, 76_devanagari_table and
+-    #     magazine-2col to a pass, and 43_within_10pt_x - the only other check that reads
+-    #     the same pairs - already fails 2 of those 5 and passes the other 3. So the
+-    #     exclusion would blind the instrument on three documents to save five.
+-    by_page = collections.defaultdict(list)
+-    for s_sp, g_sp in pairs:
+-        if abs(s_sp.get("angle", 0.0)) > 1.0 or abs(g_sp.get("angle", 0.0)) > 1.0:
+-            continue
+-        by_page[s_sp["page"]].append(g_sp.get("xink", g_sp["x"]) -
+-                                     s_sp.get("xink", s_sp["x"]))
+-    for pg, dd in sorted(by_page.items()):
+-        if len(dd) < DX_MIN_PAIRS:
+-            continue
+-        out = [v for v in dd if abs(v) > DX_MED_TOL]
+-        budget = max(DX_TAIL_MIN, int(round(DX_TAIL_SHARE * len(dd))))
+-        worst_med = max(worst_med, statistics.median([abs(v) for v in dd]))
+-        worst_tail = max(worst_tail, float(len(out)))
+-        if len(out) > budget or (len(out) >= 2 and max(abs(v) for v in dd) > DX_WORST_TOL):
+-            indent_bad.append((pg + 1, len(out), round(max(abs(v) for v in dd), 1)))
+-
+-    # Reported as (worst page median, worst page unregistered-run count, ok). The page
+-    # numbers and the actual edges are in margin_bad / indent_bad so a failure can be read
+-    # without re-running: "47_margins: pages 3,7 left edge 56->48" is what a fixer needs.
+-    c["47_margins"] = (round(worst_med, 1), int(worst_tail),
++    # ---- (b) RETIRED ---------------------------------------------------------
++    # The per-run registration clause is gone. It was a PLACEMENT assertion wearing a
++    # margin's name: 71.7 % of the runs it judged have no page-frame margin left edge at
++    # all (table-cell insets, tab stops, intra-line advances, derived pieces), and on the
++    # documents it failed, 85.2 % of the offending runs were in those classes. Its whole
++    # population is a subset of 43_within_10pt_x's, which asks the same question of the
++    # same pairs. See AUDIT-47-POPULATION.md and POPULATION-AUDIT-REPRODUCED.md.
++    #
++    # The band this leaves unowned is run-level x displacement between ~2 pt and 10 pt,
++    # inside 43's own window; it is named in the audit rather than silently dropped.
++    _err = max([abs(s_ml - g_ml) for _pi, s_ml, g_ml in margin_bad] or [0.0])
++    c["47_margins"] = (round(_err, 1), int(len(margin_bad)),
+                        not margin_bad and not indent_bad)
+-    # A detail check would be counted as a check: all_check_ids() discovers ids by running
+-    # the verifier, so a second key here would add a free pass to every document's score.
+-    del margin_bad, indent_bad
+ 
+ 
+     # ---- 48 image area -----------------------------------------------------
