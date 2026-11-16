@@ -175,6 +175,50 @@ WHEN SOMETHING FAILS
   tools/p2w-bench/INCIDENTS.md, and continue. One skipped document with a recorded
   reason is a result; a run that died retrying is not.
 
+STEP 0d - WHEN SOMETHING BLOCKS YOU, CLEAR IT OR NAME IT  ** READ BEFORE YOU START **
+
+  You will hit obstacles that are not the defect you were hired to fix: a tool that refuses a
+  class name, a library that is missing, a file another step rewrote, a command that times out,
+  a download that 403s. None of these is a reason to end the run. Clearing an obstacle is part
+  of the work, not an interruption to it.
+
+  FIRST - SOLVE IT YOURSELF, IF YOU CAN.
+    Read the error, not the symptom. If one of our own tools refuses or corrupts something, you
+    have its source - read it, find why, fix it, commit the fix separately so the next run
+    inherits it, then go back to the work you were doing and finish it. If something is missing,
+    install it. If a command timed out, find what made it slow before you retry it.
+
+    This is not a hypothetical. On 16 Nov the fixer found that scipy was absent, that its absence
+    forced measurement onto a 400-step dilation ladder, that the ladder made a page take 25 s
+    instead of 0.46 s, and that this - not the engine - was why soffice kept hitting the 290 s
+    limit and why a whole class could not be measured. That one diagnosis was worth more than
+    every patch it wrote that day. It found it by reading the code, not by giving up.
+
+  SECOND - IF YOU ARE RESTRICTED, NAME IT PRECISELY.
+    Some walls you cannot clear: no network to a host, no permission, a platform limit, a missing
+    credential. Do not fake a result and do not quietly work around it. Append one row to
+    tools/p2w-bench/BLOCKERS.md - the format is at the top of that file:
+
+      | time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
+
+    "What I was doing" means the step and the class, not "working": the next run needs to know
+    where the wall is so it can approach from another side. "The obstacle" means the error text,
+    not a paraphrase. "What I tried" is the field that stops the next run repeating you.
+
+    Write the row when you hit the wall, not at the end. A run that dies takes its notes with it.
+
+  THEN KEEP WORKING.
+    If the wall is on one class, take another and spend the rest of the clock. A run that ends
+    early with a good BLOCKERS row has done more than a run that hides the wall and reports
+    success - but a run that writes the row and then keeps going has done more than both.
+
+  NEVER:
+    - end the run over an obstacle you did not try to clear
+    - report a number you did not measure because a tool refused
+    - work around a tool by editing its output file by hand - that is the bug wearing a hat
+    - leave an obstacle only in your final message
+
+
 STEP 1 - BUILD
 ===================================================================
   bash tools/p2w-bench/build-engine.sh
