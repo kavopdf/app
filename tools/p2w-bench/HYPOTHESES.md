@@ -171,6 +171,114 @@ Do not re-test one without new evidence, and if you do, say what changed.
   recorded: 2026-11-13 09:54
 
 
+## PIPELINE - the attempt ledger cannot record any of the eight problem classes
+
+- MEASURED - `classify.py --attempt` refuses every name in benchmarks/DEFECT-CLASSES.md,
+  because `current_class_names()` builds its keys from verify_google check ids
+  (`04_words_missing (+1)`, `20_within_10pt`) and not from the eight derived problem names.
+  evidence: 16 Nov 2026 fixer. `classify.py --attempt "content-missing-partly-replaced"
+  --outcome reverted` -> "refused: ... is not a class". ATTEMPTS.json's own
+  `content-missing-partly-replaced` key was written before this guard existed and can no
+  longer be appended to. Consequence: a fixer that follows the brief's instruction to record
+  its attempt against a problem class cannot record it at all, and the 19 attempts the brief
+  cites are all against retired check ids. The ledger is the fixer's only memory of what it
+  already ruled out; until the key is the problem name, that memory cannot grow.
+  ACTION: key the ledger off DEFECT-CLASSES.md's `problem` column. Until then an attempt is
+  recorded in this file and in TRACE.md, which is what this run did.
+
+
+## PIPELINE - the measurement is slow because scipy is missing, and that is why slots vanish
+
+- MEASURED - A fresh pod has no scipy, so `p2w.edt()` takes its ladder fallback
+  (radius-by-radius dilation, up to 400 iterations per page) instead of
+  `scipy.ndimage.distance_transform_edt`.
+  evidence: 16 Nov 2026 fixer. Same engine, same three single-page documents
+  (415_inline_images, 07_stamp_over_table, 601_fillable_admission_form):
+  without scipy the run exceeded the 290 s sandbox call limit twice and returned
+  nothing; after `pip install scipy` the identical three measured in 28 s.
+  Two nine-page realworld forms still exceeded 290 s after the install, so soffice
+  on a 4088-run form is a second, separate cost - but the ladder is the one that
+  silently converts "measure a sample" into "measure nothing".
+  ACTION FOR THE NEXT RUN, before any attempt: `pip install scipy` (one line, ~20 s),
+  then measure. `p2w.validate()` installs scipy itself; any measurement path that
+  does not go through validate() must do the same or it measures at ladder speed.
+  This is a cost defect, not a fidelity defect: it changes no score, only whether a
+  run gets to produce one.
+
+
+## content-missing-nothing-in-its-place
+
+- CONFIRMED - CONFIRMED: a row separator the page draws heavier than the table's other separators - two coincident rules on one y, 0.45pt grey 0x9B9B9B and 0.9pt black 0x111111 - is dropped, because w:tblBorders holds ONE weight for every insideH and insideStroke's dominant-length tie goes to whichever was inserted first (the grey); the black rule is then drawn nowhere and its ink is absent. FIX: per-row w:tcBorders top.
+  evidence: 16 Nov fixer, soffice render, p2w.measure_doc, 30 class docs + 12 controls. mobile-bill 18.48->1.55, salary-slip-factory-wages 18.09->0.73, two-tables-stacked 17.20->0.77, marksheet-university 16.78->0.64, electricity-bill 16.24->1.33, insurance-policy-schedule 13.29->0.53, landscape-page-inside-portrait 13.08->1.45, form16-part-b 12.32->0.77, mutual-fund-statement 12.05->0.21, property-tax-receipt 10.78->0.96, admit-card 10.68->1.89, gst-invoice-multipage 10.44->0.40, delivery-challan 10.26->0.84, table-across-page-break 9.41->0.53. 22 of 30 moved; 0 of 12 controls worse (eway-bill 0.91->0.05). Patch: PdfToWord.Table.rowRule, markSideStrokes.heaviestRuleOn, DocxWriter emits w:tcBorders top for a row whose inkWeight exceeds 1.5x the insideH stroke's.
+  recorded: 2026-11-16 12:24
+
+
+## content-missing-nothing-in-its-place - 16 Nov 10:50 run: the inline image is SKIPPED by name, and the line is now known
+
+- MEASURED (untested as a fix) - The 89.04 %@5 on `415_inline_images` is not an extraction
+  failure to be chased in the image path: the content-stream walker throws the operator away
+  before anything else sees it.
+  evidence: 16 Nov 2026 fixer, corpus-v1 downloaded (211 PDFs).
+  `415_inline_images.pdf` page 1: `get_images()` = 0, and its content stream is 381 bytes
+  carrying 2 `BI ... ID ... EI` sequences -
+  `BI /W 8 /H 8 /CS /G /BPC 8 /F /AHx ID 00FF00FF... EI`. `PdfToWord.java:2715`:
+  `if (tok.equals("BI")) { i = skipInlineImage(cs, i); ops.clear(); continue; }`, and
+  `skipInlineImage` is at `PdfToWord.java:2906`. So the four bars are dropped by design and
+  the text below them moves up into the freed space - which is why the page reads as
+  content-LOSS with text_recall still high.
+  WHY IT WAS NEVER FIXED: the fix is a decoder, not a correction - parse W/H/CS/BPC/F, build
+  the raster, place it at the current CTM, and emit it as the Picture block the XObject path
+  already writes. That is a feature with a measured surface, not a one-line guard, and it
+  should be taken by a run that has the whole slot for it.
+  NEXT: start at `skipInlineImage` (2715/2906). The page's own text says what the bars are
+  ("It has no object number and lives inside the content stream."), and the corpus document
+  is a one-page, 381-byte reproducer, so a fix can be measured in seconds.
+
+
+## content-missing-partly-replaced - 16 Nov 09:54 run: the CONFIRMED patch re-measured, and the spill is now a number
+
+- MEASURED - The confirmed `run-size-from-sizePt-not-Tf` patch reproduces to the digit on a
+  fresh pod, and the page spill it was blocked on is real, counted, not inferred.
+  evidence: 16 Nov 2026 fixer, engine `ead0d0e-d027ee6` (clean + patches/run-size-from-sizePt-not-Tf.patch),
+  scipy 1.18.1 present, instrument p2w.render/measure_doc at DPI 150:
+  `041122-Account_Opening_Form` share@5 94.92, worst_page 9, text_recall 99.5 %,
+  **pages_src 9, pages_ours 10**, problem content-missing-partly-replaced.
+  The previous run's worst page was 94.92 after the patch - identical. So the patch is
+  deterministic and the measurement is now cheap enough to run: the form converted in 20.1 s
+  and the whole document measured in 116 s, inside one 290 s call, once scipy was installed.
+  The 290 s limit was the scipy ladder, not soffice. That corrects the 09:12 note, which put
+  the second cost on soffice.
+  NOT KEPT again, for the same honest reason and one more: the class does not pass, the full
+  213-document ratchet still has not run, and pages_ours 10 against pages_src 9 means page 9
+  of the source is still compared against page 10 of ours. The spill is the next fix, and it
+  is now measurable in one call: make the source's page 7 stop overflowing and pages 7-9 stop
+  shifting, and this document should fall to the 18 %@5 its pages 1-6 already read.
+  Do not re-derive the size bug and do not re-derive the spill - both are numbers now.
+
+
+## content-missing-partly-replaced - 16 Nov 10:50 run: the band-by-centre theory is RULED OUT, and the narrow placement is a text box
+
+- RULED OUT - A line the page drew ACROSS a ruled grid is placed in the band containing its
+  CENTRE, so a centred heading block lands in whichever narrow band the grid's middle happens
+  to be and is wrapped into it; assigning the band by greatest overlap should stop the wrap,
+  shrink the row and stop the spill.
+  evidence: 16 Nov 2026 fixer, engine (clean + patches/run-size-from-sizePt-not-Tf.patch) plus
+  patches/ruled-band-by-overlap-not-centre.patch, scipy 1.18.1 present, p2w.render/measure_doc
+  at DPI 150: `041122-Account_Opening_Form` share@5 94.92, worst_page 9, pages_src 9,
+  pages_ours 10, text_recall 99.5 - IDENTICAL TO THE DIGIT to the unpatched run, per page too
+  (p1 48.22, p2 52.49, p3 10.57, p4 20.39, p5 15.5, p6 1.61, p7 73.99, p8 89.59, p9 94.92).
+  The rule fires on no line of page 7: the heading lines are not wider than the band they land
+  in ('Annexure-1' is 23 pt of text inside a 58 pt band), so the overlap branch is never taken.
+  MEASURED, and it relocates the cause: the .docx carries 378 `wps:txbx` text boxes, and the
+  heading exists TWICE - once at x 513.9-571.5 (58 pt wide) and once at x 573.1-584.0 (11 pt
+  wide). The 20-line wrap is inside a text box whose width was taken from a table column, not
+  inside a ruled table cell, so the ruled pass is the wrong place to look. Patch kept at
+  patches/ruled-band-by-overlap-not-centre.patch and REVERTED - it moves nothing and would
+  have cost a corpus ratchet to prove it.
+  NEXT: the spill's height is the text box, so look at the box's width in DocxWriter's anchor
+  path (where a box's extent comes from its block's own line boxes) before the table's rows.
+
+
 ## content-missing-partly-replaced — the nine-page account-opening form class
 
 - CONFIRMED - Every Run in a text box carried the raw `Tf` operand as its point size, not the
@@ -198,98 +306,3 @@ Do not re-test one without new evidence, and if you do, say what changed.
   74-95 %@5 purely because page i is compared against page i. Fix the spill and the same
   documents should fall from ~90 %@5 to the pages 1-6 range. Do not re-derive the size bug.
 
-## PIPELINE - the measurement is slow because scipy is missing, and that is why slots vanish
-
-- MEASURED - A fresh pod has no scipy, so `p2w.edt()` takes its ladder fallback
-  (radius-by-radius dilation, up to 400 iterations per page) instead of
-  `scipy.ndimage.distance_transform_edt`.
-  evidence: 16 Nov 2026 fixer. Same engine, same three single-page documents
-  (415_inline_images, 07_stamp_over_table, 601_fillable_admission_form):
-  without scipy the run exceeded the 290 s sandbox call limit twice and returned
-  nothing; after `pip install scipy` the identical three measured in 28 s.
-  Two nine-page realworld forms still exceeded 290 s after the install, so soffice
-  on a 4088-run form is a second, separate cost - but the ladder is the one that
-  silently converts "measure a sample" into "measure nothing".
-  ACTION FOR THE NEXT RUN, before any attempt: `pip install scipy` (one line, ~20 s),
-  then measure. `p2w.validate()` installs scipy itself; any measurement path that
-  does not go through validate() must do the same or it measures at ladder speed.
-  This is a cost defect, not a fidelity defect: it changes no score, only whether a
-  run gets to produce one.
-
-## content-missing-partly-replaced - 16 Nov 09:54 run: the CONFIRMED patch re-measured, and the spill is now a number
-
-- MEASURED - The confirmed `run-size-from-sizePt-not-Tf` patch reproduces to the digit on a
-  fresh pod, and the page spill it was blocked on is real, counted, not inferred.
-  evidence: 16 Nov 2026 fixer, engine `ead0d0e-d027ee6` (clean + patches/run-size-from-sizePt-not-Tf.patch),
-  scipy 1.18.1 present, instrument p2w.render/measure_doc at DPI 150:
-  `041122-Account_Opening_Form` share@5 94.92, worst_page 9, text_recall 99.5 %,
-  **pages_src 9, pages_ours 10**, problem content-missing-partly-replaced.
-  The previous run's worst page was 94.92 after the patch - identical. So the patch is
-  deterministic and the measurement is now cheap enough to run: the form converted in 20.1 s
-  and the whole document measured in 116 s, inside one 290 s call, once scipy was installed.
-  The 290 s limit was the scipy ladder, not soffice. That corrects the 09:12 note, which put
-  the second cost on soffice.
-  NOT KEPT again, for the same honest reason and one more: the class does not pass, the full
-  213-document ratchet still has not run, and pages_ours 10 against pages_src 9 means page 9
-  of the source is still compared against page 10 of ours. The spill is the next fix, and it
-  is now measurable in one call: make the source's page 7 stop overflowing and pages 7-9 stop
-  shifting, and this document should fall to the 18 %@5 its pages 1-6 already read.
-  Do not re-derive the size bug and do not re-derive the spill - both are numbers now.
-
-## PIPELINE - the attempt ledger cannot record any of the eight problem classes
-
-- MEASURED - `classify.py --attempt` refuses every name in benchmarks/DEFECT-CLASSES.md,
-  because `current_class_names()` builds its keys from verify_google check ids
-  (`04_words_missing (+1)`, `20_within_10pt`) and not from the eight derived problem names.
-  evidence: 16 Nov 2026 fixer. `classify.py --attempt "content-missing-partly-replaced"
-  --outcome reverted` -> "refused: ... is not a class". ATTEMPTS.json's own
-  `content-missing-partly-replaced` key was written before this guard existed and can no
-  longer be appended to. Consequence: a fixer that follows the brief's instruction to record
-  its attempt against a problem class cannot record it at all, and the 19 attempts the brief
-  cites are all against retired check ids. The ledger is the fixer's only memory of what it
-  already ruled out; until the key is the problem name, that memory cannot grow.
-  ACTION: key the ledger off DEFECT-CLASSES.md's `problem` column. Until then an attempt is
-  recorded in this file and in TRACE.md, which is what this run did.
-
-## content-missing-partly-replaced - 16 Nov 10:50 run: the band-by-centre theory is RULED OUT, and the narrow placement is a text box
-
-- RULED OUT - A line the page drew ACROSS a ruled grid is placed in the band containing its
-  CENTRE, so a centred heading block lands in whichever narrow band the grid's middle happens
-  to be and is wrapped into it; assigning the band by greatest overlap should stop the wrap,
-  shrink the row and stop the spill.
-  evidence: 16 Nov 2026 fixer, engine (clean + patches/run-size-from-sizePt-not-Tf.patch) plus
-  patches/ruled-band-by-overlap-not-centre.patch, scipy 1.18.1 present, p2w.render/measure_doc
-  at DPI 150: `041122-Account_Opening_Form` share@5 94.92, worst_page 9, pages_src 9,
-  pages_ours 10, text_recall 99.5 - IDENTICAL TO THE DIGIT to the unpatched run, per page too
-  (p1 48.22, p2 52.49, p3 10.57, p4 20.39, p5 15.5, p6 1.61, p7 73.99, p8 89.59, p9 94.92).
-  The rule fires on no line of page 7: the heading lines are not wider than the band they land
-  in ('Annexure-1' is 23 pt of text inside a 58 pt band), so the overlap branch is never taken.
-  MEASURED, and it relocates the cause: the .docx carries 378 `wps:txbx` text boxes, and the
-  heading exists TWICE - once at x 513.9-571.5 (58 pt wide) and once at x 573.1-584.0 (11 pt
-  wide). The 20-line wrap is inside a text box whose width was taken from a table column, not
-  inside a ruled table cell, so the ruled pass is the wrong place to look. Patch kept at
-  patches/ruled-band-by-overlap-not-centre.patch and REVERTED - it moves nothing and would
-  have cost a corpus ratchet to prove it.
-  NEXT: the spill's height is the text box, so look at the box's width in DocxWriter's anchor
-  path (where a box's extent comes from its block's own line boxes) before the table's rows.
-
-## content-missing-nothing-in-its-place - 16 Nov 10:50 run: the inline image is SKIPPED by name, and the line is now known
-
-- MEASURED (untested as a fix) - The 89.04 %@5 on `415_inline_images` is not an extraction
-  failure to be chased in the image path: the content-stream walker throws the operator away
-  before anything else sees it.
-  evidence: 16 Nov 2026 fixer, corpus-v1 downloaded (211 PDFs).
-  `415_inline_images.pdf` page 1: `get_images()` = 0, and its content stream is 381 bytes
-  carrying 2 `BI ... ID ... EI` sequences -
-  `BI /W 8 /H 8 /CS /G /BPC 8 /F /AHx ID 00FF00FF... EI`. `PdfToWord.java:2715`:
-  `if (tok.equals("BI")) { i = skipInlineImage(cs, i); ops.clear(); continue; }`, and
-  `skipInlineImage` is at `PdfToWord.java:2906`. So the four bars are dropped by design and
-  the text below them moves up into the freed space - which is why the page reads as
-  content-LOSS with text_recall still high.
-  WHY IT WAS NEVER FIXED: the fix is a decoder, not a correction - parse W/H/CS/BPC/F, build
-  the raster, place it at the current CTM, and emit it as the Picture block the XObject path
-  already writes. That is a feature with a measured surface, not a one-line guard, and it
-  should be taken by a run that has the whole slot for it.
-  NEXT: start at `skipInlineImage` (2715/2906). The page's own text says what the bars are
-  ("It has no object number and lives inside the content stream."), and the corpus document
-  is a one-page, 381-byte reproducer, so a fix can be measured in seconds.

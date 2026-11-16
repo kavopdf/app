@@ -5434,6 +5434,33 @@ public final class DocxWriter {
      * clamp is a real loss of fidelity at both ends - a 0.1 pt hairline is drawn a quarter point
      * thick - and it is the narrower loss: a border outside the range is not a border at all.
      */
+    /**
+     * Is this row's rule visibly heavier than the stroke the table's inside separators are
+     * written at?
+     *
+     * <p>Ink weight, not width: a 0.9 pt rule at 6.7 % grey carries about five times the ink of
+     * a 0.45 pt rule at 61 % grey, and it is the ink the reader sees. The threshold is 1.5x
+     * because a row border that merely re-states insideH is a second element for the same line,
+     * and a renderer that rounds the two differently draws a doubled rule - the failure this
+     * pipeline's ratchet exists to catch. Nothing below the threshold is written.
+     */
+    private static boolean heavierThanInside(float[] rowStroke, float[] insideStroke) {
+        if (rowStroke == null) return false;
+        float row = inkWeight(rowStroke);
+        float inside = insideStroke == null ? 0f : inkWeight(insideStroke);
+        return row > inside * 1.5f;
+    }
+
+    /** How much ink a stroke puts on the page: width in points times its darkness and opacity. */
+    private static float inkWeight(float[] stroke) {
+        if (stroke == null) return 0f;
+        int rgb = (int) stroke[1];
+        float a = stroke.length > 2 ? Math.max(0f, Math.min(1f, stroke[2])) : 1f;
+        float luma = rgb < 0 ? 0f : (((rgb >> 16) & 0xFF) * 0.299f
+                + ((rgb >> 8) & 0xFF) * 0.587f + (rgb & 0xFF) * 0.114f) / 255f;
+        return Math.max(0.1f, stroke[0]) * (1f - luma) * a;
+    }
+
     private static int szOf(float widthPt) {
         int sz = Math.round(Math.max(0.1f, widthPt) * 8f);
         return Math.max(TABLE_RULE_SZ_MIN, Math.min(TABLE_RULE_SZ_MAX, sz));
@@ -6079,6 +6106,19 @@ public final class DocxWriter {
             }
             if (!Float.isNaN(rowTopPagePtHere)) rowTopPagePt = rowTopPagePtHere;
             inner.append("<w:tr>");
+            // A row separator the page drew heavier than the table's other separators cannot be
+            // written in w:tblBorders - that element holds one weight for every inside
+            // horizontal border, and the dominant-length answer is the common grey rule. The
+            // row carries its own top border instead, which overrides insideH for this row
+            // alone. Measured on mobile-bill and salary-slip-factory-wages: three coincident
+            // rule pairs a page, 18.5 % of the ink missing at 5 px (see Table#rowRule).
+            int rowTopSz = 0;
+            String rowTopColour = null;
+            if (t.rowRule != null && r < t.rowRule.length && sideDrawn[4]
+                    && heavierThanInside(t.rowRule[r], t.sideStroke[4])) {
+                rowTopSz = szOf(t.rowRule[r][0]);
+                rowTopColour = borderColour(t.rowRule[r]);
+            }
             if (rowTwHere > 0) {
                 inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
                      .append("\" w:hRule=\"atLeast\"/><w:cantSplit/></w:trPr>");
@@ -6164,6 +6204,10 @@ public final class DocxWriter {
                 inner.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(spanTw)
                         .append("\" w:type=\"dxa\"/>");
                 if (span > 1) inner.append("<w:gridSpan w:val=\"").append(span).append("\"/>");
+                if (rowTopSz > 0) {
+                    inner.append("<w:tcBorders><w:top w:val=\"single\" w:sz=\"").append(rowTopSz)
+                         .append("\" w:color=\"").append(rowTopColour).append("\"/></w:tcBorders>");
+                }
                 // The page drew this cell's text a point or two past its own column edge and
                 // never broke the value: on 343_air_waybill "12" starts at 67.46 pt in a column
                 // that ends at 76 and runs to 77. A word processor's default is to wrap it, and

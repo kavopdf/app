@@ -87,6 +87,29 @@ except Exception:
     def note(*a, **k):
         pass
 
+def _is_problem_name(cls):
+    """Is this one of the eight problem names in benchmarks/DEFECT-CLASSES.md?
+
+    current_class_names() reads the RETIRED check-id rows, so the fixer's own vocabulary -
+    the problem names the classifier writes into benchmarks/DEFECT-CLASSES.md - was refused
+    as "not a class" on 16 Nov. That is the same split that made attempt.py unusable until it
+    was keyed by problem name: the ledger and the work in two vocabularies, and the ledger
+    refusing the one that mattered. Both are valid keys; a name from either table is a class.
+    """
+    base = cls.split(" (")[0].strip()
+    path = os.path.join(HERE, "..", "..", "benchmarks", "DEFECT-CLASSES.md")
+    try:
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                if line.startswith("| ") and "`" in line:
+                    cells = [c.strip() for c in line.strip().strip("|").split("|")]
+                    if len(cells) > 2 and base in (cells[1], cells[2]):
+                        return True
+    except OSError:
+        return False
+    return False
+
+
 def add(cls, text, result, evidence):
     # The class name is the section key, exactly as it is the ledger key in
     # classify.py --attempt. An unvalidated one files the reasoning under a class that
@@ -97,7 +120,7 @@ def add(cls, text, result, evidence):
         known = _C.current_class_names()
     except Exception:
         known = []
-    if known and cls not in known:
+    if known and cls not in known and not _is_problem_name(cls):
         print("refused: %r is not a class - the section would be filed under nothing." % cls)
         near = [k for k in known if cls.split(" (")[0] in k or k.split(" (")[0] in cls]
         if near:

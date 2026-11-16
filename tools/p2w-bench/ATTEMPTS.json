@@ -59,11 +59,15 @@
   "status": "OPEN"
  },
  "content-missing-nothing-in-its-place": {
-  "attempts": 1,
+  "attempts": 2,
   "first_seen": null,
   "last": null,
+  "last_engine": "rowrule-per-row-tcborders",
+  "last_moved": 22,
+  "last_total": 30,
   "outcomes": [
-   "error"
+   "error",
+   "kept"
   ],
   "reason": "diagnosis only, no fix attempted: inline images are skipped by name at PdfToWord.java:2715 (skipInlineImage, 2906); 415_inline_images page 1 carries 2 BI/ID/EI sequences in a 381-byte stream and get_images() reports 0. Fixing it is a decoder plus placement, not a guard, and there was not enough clock left to build and ratchet it",
   "requeues": 0,

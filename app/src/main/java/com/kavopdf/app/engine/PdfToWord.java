@@ -581,6 +581,24 @@ public final class PdfToWord {
          */
         public float[] rowEdge;
         /**
+         * The stroke the page drew on each ROW's top edge, index for index with the rows, or
+         * null where that edge carries no rule of its own.
+         *
+         * <p>{@code w:tblBorders} carries ONE weight for every inside horizontal border, so a
+         * table whose row rules are 0.45 pt grey and whose header separator is 0.9 pt black has
+         * to be reduced to a single answer, and {@code insideStroke} reduces it to the stroke
+         * carrying the most length - the grey. The black rule is then drawn nowhere and its ink
+         * is simply absent from the page. Measured on {@code mobile-bill} and
+         * {@code salary-slip-factory-wages}: three coincident rule pairs per page (a 0.45 pt
+         * grey at 0.607 and a 0.9 pt black at 0.0667 on the SAME y), 18.5 % of the page's ink
+         * missing at 5 px, and the .docx carrying nothing but {@code sz 4 color 9B9B9B}.
+         *
+         * <p>A row that carries a stroke here is one the writer gives its own
+         * {@code w:tcBorders} top, which overrides the table's insideH for that row alone. That
+         * is the only place OOXML can express two weights of row separator in one table.
+         */
+        public float[][] rowRule;
+        /**
          * The y of the table's first row's TOP edge, in points, when the pass that built the
          * table could tell where that edge is ({@link Float#NaN} otherwise).
          *
@@ -1317,6 +1335,21 @@ public final class PdfToWord {
         // table's bounds are final. D-22: the writer used to draw all six at one constant
         // weight and one constant colour whatever the page did.
         for (Table t : tables) markSideStrokes(t, topRules);
+        if (System.getenv("P2W_DUMP_RULES") != null) {
+            StringBuilder sb = new StringBuilder("DUMPRULES page\n");
+            for (int i = 0; i < topRules.horizontal.size(); i++) {
+                float[] g = topRules.horizontal.get(i); float[] st = topRules.hStrokeAt(i);
+                sb.append(String.format("H y=%.2f x=%.2f..%.2f w=%.2f rgb=%s%n", g[0], g[1], g[2],
+                        st == null ? -1 : st[0], st == null ? "null" : String.format("%.3f", st[1])));
+            }
+            for (Table t : tables) {
+                sb.append(String.format("TABLE top=%.2f bottom=%.2f left=%.2f right=%.2f sideTop=%s sideBottom=%s%n",
+                        t.top, t.bottom, t.left, t.right,
+                        t.sideStroke[0] == null ? "null" : String.format("w=%.2f rgb=%.3f", t.sideStroke[0][0], t.sideStroke[0][1]),
+                        t.sideStroke[2] == null ? "null" : String.format("w=%.2f rgb=%.3f", t.sideStroke[2][0], t.sideStroke[2][1])));
+            }
+            System.out.print(sb);
+        }
         // A band-major grid - a newspaper page drawn as a table - is re-cut into one cell per
         // column, so the reader gets a column at a time instead of a band at a time. It needs
         // the cell-paragraph model to be possible at all: see recutColumnBands.
@@ -7078,6 +7111,43 @@ public final class PdfToWord {
         if (tableStroke != null) {
             for (int i = 0; i < 6; i++) if (t.sideStroke[i] == null) t.sideStroke[i] = tableStroke;
         }
+        // Every row edge that carries a rule of its own, so the writer can give that row the
+        // weight the page drew there (see Table#rowRule). Row 0 is the table's top side and
+        // already has one; the last entry of rowEdge is the bottom side.
+        if (t.rowEdge != null && t.rowEdge.length == t.rows.size() + 1) {
+            t.rowRule = new float[t.rows.size()][];
+            for (int r = 1; r < t.rows.size(); r++) {
+                t.rowRule[r] = heaviestRuleOn(rules, true, t.rowEdge[r], t.left, t.right, w);
+            }
+        }
+    }
+
+    /**
+     * The heaviest rule lying on one row edge of a table, or null.
+     *
+     * <p>{@link #edgeStroke} answers "which stroke is this edge" for a side, where a tie goes to
+     * the heavier rule because that is what a reader sees. A row separator drawn TWICE on the
+     * same y - a grey grid rule and a black emphasis rule over it - is the same question and it
+     * has the same answer, but the answer has nowhere to go in {@code w:tblBorders}: one element
+     * holds every inside horizontal border. This returns the stroke so the row can carry it in
+     * its own {@code w:tcBorders}, and the writer decides whether it is heavy enough to be worth
+     * writing (see {@code DocxWriter.heavierThanInside}).
+     */
+    private static float[] heaviestRuleOn(Rules rules, boolean horizontal, float at,
+                                          float a0, float a1, float span) {
+        List<float[]> geom = horizontal ? rules.horizontal : rules.vertical;
+        float[] best = null;
+        float bestWeight = -1f;
+        for (int i = 0; i < geom.size(); i++) {
+            float[] g = geom.get(i);
+            if (Math.abs(g[0] - at) > SIDE_TOL) continue;
+            if (Math.min(g[2], a1) - Math.max(g[1], a0) < span * 0.5f) continue;
+            float[] stroke = horizontal ? rules.hStrokeAt(i) : rules.vStrokeAt(i);
+            if (stroke == null) continue;
+            float weight = stroke[0] * (stroke.length > 2 ? Math.max(0f, Math.min(1f, stroke[2])) : 1f);
+            if (weight > bestWeight) { best = stroke; bestWeight = weight; }
+        }
+        return best;
     }
 
     /**

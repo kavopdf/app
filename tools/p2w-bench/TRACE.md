@@ -240,3 +240,10 @@ claim and after each step; it is not code and cannot break anything.
 | 16 Nov 10:52 | fixer | build-engine | started |
 | 16 Nov 11:11 | fixer | attempt | content-missing-partly-replaced -> error |
 | 16 Nov 11:53 | fixer | claim | fixer claimed the slot |
+| 16 Nov 11:54 | fixer | build-engine | started |
+| 16 Nov 11:54 | fixer | build-engine | started |
+| 16 Nov 11:55 | fixer | build-engine | started |
+| 16 Nov 11:55 | fixer | build-engine | started |
+| 16 Nov 11:55 | fixer | build-engine | engine unchanged, compile skipped |
+| 16 Nov 12:24 | fixer | hypothesis | content-missing-nothing-in-its-place -> confirmed |
+| 16 Nov 12:24 | fixer | attempt | content-missing-nothing-in-its-place -> kept (22/30 moved) |

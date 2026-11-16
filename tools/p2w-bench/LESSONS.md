@@ -117,3 +117,9 @@ everything else: what went wrong in the work itself.
   the rows were measured by a normaliser that could not pass a correct conversion. Before spending
   a day on a class, ask whether the number is a property of the document or of the tool that made
   it. The open ones are in REMAINING-DEFECTS.md.
+
+- 16 Nov 11:53 - `build-engine.sh` died at "compiling stubs" with exit 1 and no message on a
+  fresh clone, because `find ... -newer out/ConvertAll.class` exits 1 when that file does not
+  exist and `set -e` took it as a failed build. Five minutes and three attempts went to it, and
+  the only visible symptom was a script that stopped after its own progress line. Cost: the
+  first twenty minutes of the slot looked like a broken engine.
