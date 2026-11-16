@@ -63,6 +63,16 @@ finding because the commit raced.
   HYPOTHESES.md, not RANKING.csv. Your file under FINDINGS/ is the only thing you write.
 - **Falsifiable or it is not a finding.** "The layout looks wrong" is not a finding. "Line 1840
   omits the CTM multiply, so a scaled image lands at 1/scale" is.
+- **A root cause, not a patch.** Your claim must name the mechanism, not suggest a repair. The
+  test: a root cause predicts which OTHER documents change; a patch only fixes the one in front
+  of you. "Skip this document's table", "raise the threshold", "add a fallback", "special-case
+  this page", "wrap it in a try" are not findings - they make a number move and teach nobody
+  anything. If you cannot name the mechanism, say so plainly: "I could not find the root cause,
+  and here is what I ruled out" is a better file than a plausible-sounding patch.
+- **Suspect the instrument too.** If the number you were handed could itself be wrong - the
+  measurement, the check, the benchmark - say so with evidence. Several of this pipeline's real
+  bugs were in the instrument and the checks, not the engine, and the agent that noticed was
+  worth more than the one that patched around it.
 - **Say what you ruled out.** That is worth as much as the claim, because it stops the next agent
   walking the same path.
 - **Never state a result you did not run.** Reading the code is evidence and should be labelled as

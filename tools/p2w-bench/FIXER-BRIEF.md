@@ -251,6 +251,37 @@ STEP 0e - READ THE HANDOFF BEFORE YOU PICK ANYTHING  ** THE ANSWER TO "WHAT WAS 
   nothing has not.
 
 
+STEP 0f - NOTHING IS ABOVE SUSPICION, INCLUDING US  ** READ BEFORE YOU TRUST A NUMBER **
+
+  When something is wrong, the engine is not the only suspect. In this pipeline the fault has been
+  found in every one of these:
+
+    the instrument   p2w.py's own docstring admits a score cannot say what is wrong with a page.
+                     census.py once reported a whitespace span at x=0 as ink.
+    a check          53_embedded_faces' family() normaliser never collapsed the corpus's space-form
+                     names ('Liberation Sans Bold'), so kept=0 was structurally guaranteed whatever
+                     the engine wrote. The engine was fine; the check could not have passed.
+    the tooling      classify.py refused the real class names, so the ledger and the work lived in
+                     different vocabularies. build-engine.sh killed the build on a fresh clone
+                     because `find -newer` exits 1 on a file that does not exist yet. round.py's
+                     release guard could never be satisfied because the heartbeat reset the very
+                     age it measured.
+    a dependency     scipy was absent, so measurement fell back to a 400-step ladder, a page took
+                     25 s instead of 0.46 s, soffice hit the 290 s limit, and a whole class became
+                     unmeasurable. Nothing was wrong with the engine.
+    the brief        rules that contradicted each other, and a step that told the run to stop.
+
+  So: do not trust the number, the check, the tool, the benchmark, or this brief. Trust the test.
+
+  Before you change engine code because a measurement says X, ask whether the measurement could be
+  wrong - and answer it the cheapest way there is: run the instrument on a case whose answer you
+  already know. If it gets that one right, the number is probably good. If it does not, you have
+  just found the real bug, and it was not in the engine.
+
+  This is not licence to doubt everything and do nothing. It is the opposite: verify, and the
+  answer arrives by itself. A claim you tested is worth ten you reasoned about.
+
+
 STEP 1 - BUILD
 ===================================================================
   bash tools/p2w-bench/build-engine.sh
@@ -650,6 +681,36 @@ STEP 4b - THE TOOLS YOU HAVE, AND WHEN TO SPEND THEM
           the file even if X is 'I could not tell'".
         * if you deploy in the background, collect what has arrived before minute 40. Anything
           still running is not lost - it is a file the next run will find.
+
+    WHAT A BRIEF MUST CONTAIN, AND WHAT IT MUST ASK FOR
+
+    A badly written brief gets a badly written answer, and the answer will look fine. So:
+
+      * name the exact document, page and measurement. "content-missing-partly-replaced,
+        041122-Account_Opening_Form.pdf page 7, our .docx emits 10 pages against 9" is a brief.
+        "look into the table problem" is not.
+      * ONE question. Two questions is two agents.
+      * say what evidence you want back: file:line, the command they ran, and its output.
+      * ask what they RULED OUT. A path closed is worth as much as a path found.
+      * ask what would prove them WRONG. A claim with no falsifier is an opinion.
+
+    AND DEMAND THE ROOT CAUSE - NOT A PATCH THAT MAKES THE NUMBER MOVE.
+
+    A cheap patch changes behaviour for the document in front of you. A root cause names the
+    mechanism. One test tells them apart:
+
+        A ROOT CAUSE PREDICTS OTHER DOCUMENTS. A cheap patch does not.
+
+    "Line 1840 places inline images from the text matrix without multiplying by the CTM, so every
+    scaled image in the corpus lands at 1/scale" is a root cause - it says which documents change
+    and how. "Skip this document's table", "raise the threshold", "add a fallback", "special-case
+    this page", "wrap it in a try", "retry until it fits" are not. They make the number move and
+    teach you nothing, and the next document with the same cause fails again.
+
+    Refuse those answers. Send the agent back with the question that forces the mechanism: what is
+    computed here, from which inputs, and where does the wrong value come from? Root cause is the
+    only thing that clears a class instead of one document - and the only thing that tells you the
+    truth about what the engine is actually doing.
 
     Each subagent must return a falsifiable claim AND how to test it - not a report of what it did.
     Verify every claim yourself before acting on it. A subagent may commit ONE thing - its own
