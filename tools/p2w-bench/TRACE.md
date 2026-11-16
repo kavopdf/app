@@ -230,3 +230,6 @@ claim and after each step; it is not code and cannot break anything.
 | 16 Nov 08:53 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 16 Nov 08:54 | fixer | build-engine | started |
 | 16 Nov 09:54 | fixer | claim | fixer claimed the slot |
+| 16 Nov 09:55 | fixer | build-engine | started |
+| 16 Nov 09:56 | fixer | build-engine | started |
+| 16 Nov 09:59 | fixer | classify | 45 classes from 211 documents |

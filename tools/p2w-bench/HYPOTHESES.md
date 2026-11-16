@@ -215,3 +215,38 @@ Do not re-test one without new evidence, and if you do, say what changed.
   does not go through validate() must do the same or it measures at ladder speed.
   This is a cost defect, not a fidelity defect: it changes no score, only whether a
   run gets to produce one.
+
+## content-missing-partly-replaced - 16 Nov 09:54 run: the CONFIRMED patch re-measured, and the spill is now a number
+
+- MEASURED - The confirmed `run-size-from-sizePt-not-Tf` patch reproduces to the digit on a
+  fresh pod, and the page spill it was blocked on is real, counted, not inferred.
+  evidence: 16 Nov 2026 fixer, engine `ead0d0e-d027ee6` (clean + patches/run-size-from-sizePt-not-Tf.patch),
+  scipy 1.18.1 present, instrument p2w.render/measure_doc at DPI 150:
+  `041122-Account_Opening_Form` share@5 94.92, worst_page 9, text_recall 99.5 %,
+  **pages_src 9, pages_ours 10**, problem content-missing-partly-replaced.
+  The previous run's worst page was 94.92 after the patch - identical. So the patch is
+  deterministic and the measurement is now cheap enough to run: the form converted in 20.1 s
+  and the whole document measured in 116 s, inside one 290 s call, once scipy was installed.
+  The 290 s limit was the scipy ladder, not soffice. That corrects the 09:12 note, which put
+  the second cost on soffice.
+  NOT KEPT again, for the same honest reason and one more: the class does not pass, the full
+  213-document ratchet still has not run, and pages_ours 10 against pages_src 9 means page 9
+  of the source is still compared against page 10 of ours. The spill is the next fix, and it
+  is now measurable in one call: make the source's page 7 stop overflowing and pages 7-9 stop
+  shifting, and this document should fall to the 18 %@5 its pages 1-6 already read.
+  Do not re-derive the size bug and do not re-derive the spill - both are numbers now.
+
+## PIPELINE - the attempt ledger cannot record any of the eight problem classes
+
+- MEASURED - `classify.py --attempt` refuses every name in benchmarks/DEFECT-CLASSES.md,
+  because `current_class_names()` builds its keys from verify_google check ids
+  (`04_words_missing (+1)`, `20_within_10pt`) and not from the eight derived problem names.
+  evidence: 16 Nov 2026 fixer. `classify.py --attempt "content-missing-partly-replaced"
+  --outcome reverted` -> "refused: ... is not a class". ATTEMPTS.json's own
+  `content-missing-partly-replaced` key was written before this guard existed and can no
+  longer be appended to. Consequence: a fixer that follows the brief's instruction to record
+  its attempt against a problem class cannot record it at all, and the 19 attempts the brief
+  cites are all against retired check ids. The ledger is the fixer's only memory of what it
+  already ruled out; until the key is the problem name, that memory cannot grow.
+  ACTION: key the ledger off DEFECT-CLASSES.md's `problem` column. Until then an attempt is
+  recorded in this file and in TRACE.md, which is what this run did.
