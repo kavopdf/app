@@ -36,9 +36,17 @@
   {
    "at": "15:48",
    "text": "attempt 6 on content-missing-partly-replaced -> kept (1/30 moved)"
+  },
+  {
+   "at": "16:18",
+   "text": "attempt 4 on content-missing-nothing-in-its-place -> kept (31/212 moved)"
+  },
+  {
+   "at": "16:19",
+   "text": "tooling: p2w.py waits for soffice's output (measured: bank form 89 s to a complete PDF, process still alive at 240 s); render cache keyed by docx size+mtime; soffice_pdf clears its output paths and requires mtime >= launch. scipy installed (EDT per page 25 s -> 1.6 s)."
   }
  ],
- "next": "Fix the 041122 page spill on content-missing-partly-replaced, now localised: page 7 is ONE 24-row w:tbl (zero w:txbxContent), its rows are written w:trHeight hRule=atLeast + w:cantSplit (DocxWriter.java:6086/:6123), and the page's whole flow is that table so shaveToFit (:495-560, depth==0 w:before only) is a no-op and the page goes out 12 twips over target. Shaving w:trHeight alone does NOT work (16746, still 10 pages) because the row is laid out at content+rule; the repair must reduce the row's CONTENT height together with its trHeight. The fit guard's trigger is writtenTw > pageBudgetTw - p2w.fitreserve (default 96). Ratchet it with benchmarks/p2w.py --budget 250 then gate.py --ratchet-only.",
+ "next": "Fix the 041122 page-7 spill. The '12 twips of residue' theory is dead: the real cause is measured and it is 186 pt, not 1.2. Page 7 row 2 cell 2 is ONE paragraph (no w:br, no paras record) whose text is the six heading lines welded with SPACES by PdfToWord:8653, carrying the FIRST line's x as its inset (tcW 10636, ind 9452, so 1184 twips = 59.2 pt usable). The renderer lays that one paragraph out as TWENTY-SEVEN lines at 10 pt, y 23.4-293.4 = 270 pt, in a row whose w:trHeight declares 84.1 pt (1682 twips). The table therefore lays out ~186 pt taller than the 842 pt sheet, the last row (the Verification block) does not fit, w:cantSplit moves it to a new page, and 9 pages come out as 10. The fit guard is blind to this because spacingTw charges w:trHeight and never the wrap. Tried and ruled out this run: (a) one w:p per line of a welded cell in DocxWriter (shipped, no-op here - the cell text carries no newline), (b) joining cell lines with a newline at PdfToWord:8653 so that path fires (reverted: still 10 pages, page 7 went 99 -> 108 lines), (c) shaving w:trHeight (last run, 16746, still 10 pages). The next thing to try is the one the mechanism points at: a welded paragraph's inset must be the block's LEFTMOST line x, not the first line's - the heading's lines start at x 232-377 (centred) and 513 (right-aligned), so an inset of ~191 pt instead of 472.6 pt gives the paragraph ~340 pt of width and ~3 lines instead of 27. Measure page count with a render into an EMPTY directory - a render that can return a pre-existing file has already cost this pipeline one false fix.",
  "agents": [
   {
    "id": "contA-01",
@@ -73,6 +81,6 @@
    "plan": ""
   }
  ],
- "context": "The 232f622 fix is in the engine and measured on 30 class documents. It has never been ratcheted. Two nine-page bank forms cannot be converted by soffice inside the 290 s call limit, which is why the class measurement stalls - that is a tooling problem, not an engine one.",
+ "context": "The class measurement now completes: soffice finishes its conversion and then never exits (both the oosplash wrapper and soffice.bin called directly; the PDF is complete on disk ~90 s in and the process is still alive 240 s later), so p2w.py now launches it in its own session, waits for the output files to settle and kills the session. That - not a hard PDF - is what kept the nine-page forms unmeasurable and the 232f622 ratchet off disk. 213/213 measured, 31 improvements, 0 regressions, RANKING.csv and STATE.json committed. Two instrument bugs found and fixed on the way: the render cache was keyed by document NAME, so a render made before an engine change scored the new engine (041122 was measured against its 10:07 render), and soffice_pdf could return a pre-existing file at the output path - that one produced a false 'fixed' result I have retracted in ATTEMPTS.json. scipy was absent again and was installed.",
  "needs_human": []
 }

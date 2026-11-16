@@ -262,3 +262,4 @@ claim and after each step; it is not code and cannot break anything.
 | 16 Nov 16:15 | fixer | build-engine | engine built in 40s |
 | 16 Nov 16:17 | fixer | build-engine | started |
 | 16 Nov 16:18 | fixer | build-engine | engine built in 59s |
+| 16 Nov 16:18 | fixer | attempt | content-missing-nothing-in-its-place -> kept (31/212 moved) |

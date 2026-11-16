@@ -59,7 +59,7 @@
   "status": "OPEN"
  },
  "content-missing-nothing-in-its-place": {
-  "attempts": 3,
+  "attempts": 4,
   "first_seen": null,
   "last": null,
   "last_engine": "232f622",
@@ -68,13 +68,15 @@
   "outcomes": [
    "error",
    "kept",
+   "kept",
    "kept"
   ],
-  "ratchet_at": "16 Nov 08:22",
+  "ratchet_at": "16 Nov 16:18",
   "ratchet_docs": 212,
-  "reason": "CORPUS RATCHET of the 232f622 per-row tcBorders fix, the item HANDOFF.md carried into this run. Full 213-document measurement (213/213 docx, 213/213 measured, 1 MEASURE-ERROR = 416_many_tiny_pages, exempted) then gate.py --ratchet-only: 212 documents compared, 0 regressions, 31 improvements. mobile-bill 18.48->1.55, salary-slip-factory-wages 18.09->0.73, two-tables-stacked-with-no-gap 17.20->0.77, marksheet-university-consolidated 16.78->0.64, electricity-bill 16.24->1.33, insurance-policy-schedule 13.29->0.53, table-inside-two-column-page 42.0->40.05. The fix is now vouched for at corpus scale.",
+  "reason": "corpus ratchet committed: benchmarks/RANKING.csv + STATE.json at 10:37, 212 documents compared, 31 improvements, 0 regressions (salary-slip-factory-wages 18.09 -> 0.73, mobile-bill 18.48 -> 1.55). The 232f622 fix had been measured and never put on disk; the measurement itself could not complete until soffice stopped being waited on by pid.",
   "reasons": [
-   "CORPUS RATCHET of the 232f622 per-row tcBorders fix, the item HANDOFF.md carried into this run. Full 213-document measurement (213/213 docx, 213/213 measured, 1 MEASURE-ERROR = 416_many_tiny_pages, exempted) then gate.py --ratchet-only: 212 documents compared, 0 regressions, 31 improvements. mobile-bill 18.48->1.55, salary-slip-factory-wages 18.09->0.73, two-tables-stacked-with-no-gap 17.20->0.77, marksheet-university-consolidated 16.78->0.64, electricity-bill 16.24->1.33, insurance-policy-schedule 13.29->0.53, table-inside-two-column-page 42.0->40.05. The fix is now vouched for at corpus scale."
+   "CORPUS RATCHET of the 232f622 per-row tcBorders fix, the item HANDOFF.md carried into this run. Full 213-document measurement (213/213 docx, 213/213 measured, 1 MEASURE-ERROR = 416_many_tiny_pages, exempted) then gate.py --ratchet-only: 212 documents compared, 0 regressions, 31 improvements. mobile-bill 18.48->1.55, salary-slip-factory-wages 18.09->0.73, two-tables-stacked-with-no-gap 17.20->0.77, marksheet-university-consolidated 16.78->0.64, electricity-bill 16.24->1.33, insurance-policy-schedule 13.29->0.53, table-inside-two-column-page 42.0->40.05. The fix is now vouched for at corpus scale.",
+   "corpus ratchet committed: benchmarks/RANKING.csv + STATE.json at 10:37, 212 documents compared, 31 improvements, 0 regressions (salary-slip-factory-wages 18.09 -> 0.73, mobile-bill 18.48 -> 1.55). The 232f622 fix had been measured and never put on disk; the measurement itself could not complete until soffice stopped being waited on by pid."
   ],
   "requeues": 0,
   "status": "OPEN"
