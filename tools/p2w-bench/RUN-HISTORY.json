@@ -12,5 +12,19 @@
   "obstacles_cleared": 0,
   "needs_human": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1794830012.890204,
+  "started": "17:23",
+  "ended_ts": 1794832828.5943756,
+  "ended": "18:10",
+  "class": "",
+  "attempts": 0,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - hung 47 min with 0 attempts and 0 beacons; claim cleared"
  }
 ]

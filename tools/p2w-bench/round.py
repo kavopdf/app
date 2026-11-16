@@ -459,6 +459,31 @@ def release(name, force=False):
     _timeline("release", "%s released%s" % (name, " (forced)" if force else ""))
     if name == "fixer":
         _handoff("--run-end", "forced" if force else "released")
+        # A FORCED RELEASE OF A DEAD CLAIM IS AN AUTOPSY, NOT A NORMAL END.
+        #
+        # The run that held this slot is not the one releasing it - a stale claim means the run
+        # died and something else is clearing up. Its record has to be archived with that fact
+        # attached, or the next run's _run_record("start") overwrites it and the dead run's
+        # attempts vanish. Closing it with a normal "ended" would say it finished, which is the
+        # one thing it did not do.
+        if force:
+            try:
+                import json as _j
+                _rp = os.path.join(HERE, "RUN.json")
+                _prev = _j.load(open(_rp, encoding="utf-8"))
+                if _prev.get("started"):
+                    _prev["ended_how"] = "killed - slot cleared by a force release"
+                    _prev["ended"] = _prev.get("ended") or "(never)"
+                    _hp = os.path.join(HERE, "RUN-HISTORY.json")
+                    try:
+                        _hist = _j.load(open(_hp, encoding="utf-8"))
+                    except Exception:
+                        _hist = []
+                    _hist.append(_prev)
+                    _j.dump(_hist[-60:], open(_hp, "w", encoding="utf-8"), indent=1)
+                    _timeline("killed", "dead claim cleared by force release")
+            except Exception:
+                pass
         _run_record("end")
     if force:
         try:
