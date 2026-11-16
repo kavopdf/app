@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-11-16T01:07:41",
+ "ran_at": "2026-11-16T10:37:28",
  "layers": {
   "ground_truth": {
    "status": "pass",
@@ -20,33 +20,216 @@
    "note": "named semantic checks; advisory, not a size"
   },
   "census": {
-   "status": "exit1",
+   "status": "ok",
    "summary": [
-    "  File \"/scratch/work/base/benchmarks/census.py\", line 239, in <module>",
-    "    sys.exit(main(sys.argv))",
-    "             ^^^^^^^^^^^^^^",
-    "  File \"/scratch/work/base/benchmarks/census.py\", line 181, in main",
-    "    os.makedirs(os.path.dirname(a.csv) or \".\", exist_ok=True)",
-    "  File \"<frozen os>\", line 225, in makedirs"
+    "  text-missing             11",
+    "  annotations-present      1",
+    "  none-identified          61",
+    "  warnings.warn("
    ]
   }
  },
  "signatures": [
-  "[01:11:12]   content-loss    46 docs  median share@1px  30.6%",
-  "[01:11:12]   displacement    28 docs  median share@1px  29.1%",
-  "[01:11:12]   clean          120 docs  median share@1px   0.6%"
+  "[10:37:43]   content-loss    21 docs  median share@1px  22.0%",
+  "[10:37:43]   displacement    33 docs  median share@1px  29.1%",
+  "[10:37:43]   clean          139 docs  median share@1px   1.1%"
  ],
  "round": 1,
  "ratchet": {
   "status": "compared",
-  "baseline_docs": 213,
+  "baseline_docs": 212,
   "current_docs": 212,
   "regressions": [],
-  "improvements": [],
+  "improvements": [
+   {
+    "document": "salary-slip-factory-wages",
+    "was": 18.09,
+    "now": 0.73,
+    "delta": -17.36
+   },
+   {
+    "document": "mobile-bill",
+    "was": 18.48,
+    "now": 1.55,
+    "delta": -16.93
+   },
+   {
+    "document": "two-tables-stacked-with-no-gap",
+    "was": 17.2,
+    "now": 0.77,
+    "delta": -16.43
+   },
+   {
+    "document": "marksheet-university-consolidated",
+    "was": 16.78,
+    "now": 0.64,
+    "delta": -16.14
+   },
+   {
+    "document": "electricity-bill",
+    "was": 16.24,
+    "now": 1.33,
+    "delta": -14.91
+   },
+   {
+    "document": "insurance-policy-schedule",
+    "was": 13.29,
+    "now": 0.53,
+    "delta": -12.76
+   },
+   {
+    "document": "mutual-fund-statement",
+    "was": 12.05,
+    "now": 0.21,
+    "delta": -11.84
+   },
+   {
+    "document": "landscape-page-inside-portrait-document",
+    "was": 13.08,
+    "now": 1.45,
+    "delta": -11.63
+   },
+   {
+    "document": "form16-part-b",
+    "was": 12.32,
+    "now": 0.77,
+    "delta": -11.55
+   },
+   {
+    "document": "gst-invoice-multipage-item-table",
+    "was": 10.44,
+    "now": 0.4,
+    "delta": -10.04
+   },
+   {
+    "document": "property-tax-receipt",
+    "was": 10.78,
+    "now": 0.96,
+    "delta": -9.82
+   },
+   {
+    "document": "delivery-challan",
+    "was": 10.26,
+    "now": 0.84,
+    "delta": -9.42
+   },
+   {
+    "document": "table-across-page-break-repeated-header",
+    "was": 9.41,
+    "now": 0.53,
+    "delta": -8.88
+   },
+   {
+    "document": "admit-card",
+    "was": 10.68,
+    "now": 1.89,
+    "delta": -8.79
+   },
+   {
+    "document": "gst-invoice-3line-items",
+    "was": 7.15,
+    "now": 0.54,
+    "delta": -6.61
+   },
+   {
+    "document": "boq-tender-bill-of-quantities",
+    "was": 7.1,
+    "now": 0.62,
+    "delta": -6.48
+   },
+   {
+    "document": "table-with-rotated-header",
+    "was": 6.42,
+    "now": 0.12,
+    "delta": -6.3
+   },
+   {
+    "document": "balance-sheet-and-profit-loss",
+    "was": 6.2,
+    "now": 0.21,
+    "delta": -5.99
+   },
+   {
+    "document": "report-2col-table-spanning-both-columns",
+    "was": 22.58,
+    "now": 17.17,
+    "delta": -5.41
+   },
+   {
+    "document": "very-long-single-column-table",
+    "was": 6.87,
+    "now": 2.38,
+    "delta": -4.49
+   },
+   {
+    "document": "purchase-order",
+    "was": 5.3,
+    "now": 0.9,
+    "delta": -4.4
+   },
+   {
+    "document": "invoice-line-items-qty-rate-amount",
+    "was": 4.9,
+    "now": 0.66,
+    "delta": -4.24
+   },
+   {
+    "document": "marksheet-subject-left-marks-right",
+    "was": 4.55,
+    "now": 0.32,
+    "delta": -4.23
+   },
+   {
+    "document": "text-held-twice-shadow-text",
+    "was": 34.33,
+    "now": 30.29,
+    "delta": -4.04
+   },
+   {
+    "document": "salary-slip-corporate",
+    "was": 5.09,
+    "now": 1.28,
+    "delta": -3.81
+   },
+   {
+    "document": "bank-statement-5-pages",
+    "was": 3.09,
+    "now": 0.56,
+    "delta": -2.53
+   },
+   {
+    "document": "academic-paper-ieee-2col-abstract",
+    "was": 10.39,
+    "now": 8.09,
+    "delta": -2.3
+   },
+   {
+    "document": "table-inside-two-column-page",
+    "was": 42.0,
+    "now": 40.05,
+    "delta": -1.95
+   },
+   {
+    "document": "gst-invoice-with-qr-code",
+    "was": 1.24,
+    "now": 0.07,
+    "delta": -1.17
+   },
+   {
+    "document": "eway-bill",
+    "was": 0.91,
+    "now": 0.05,
+    "delta": -0.86
+   },
+   {
+    "document": "600_reviewed_invoice_with_annotations",
+    "was": 63.08,
+    "now": 62.46,
+    "delta": -0.62
+   }
+  ],
   "new_documents": [],
-  "disappeared": [
-   "416_many_tiny_pages"
-  ]
+  "disappeared": []
  },
  "verdict": "OK: no regressions against baseline"
 }

@@ -156,6 +156,20 @@ def soffice_pdf(files, outdir, deadline=None, extra=None):
     cmd = [_soffice_exe(), "--headless", "--norestore"] + list(extra or []) + \
           ["--convert-to", "pdf", "--outdir", outdir] + list(files)
     end = deadline if deadline else time.time() + 280
+    # A PRE-EXISTING FILE AT THE OUTPUT PATH IS NOT THIS CONVERSION'S OUTPUT.
+    #
+    # Measured 16 Nov: a repro directory already held a copy of the SOURCE pdf under the same
+    # basename. soffice_pdf polled, saw the file, saw its size settle, killed the process and
+    # returned it - so the "render" that was measured, and that read 9 pages with a perfect
+    # page 7, was the source document itself. A conversion that can answer with someone else's
+    # file is not a measurement. Clear the paths, and require the file to be written after the
+    # launch.
+    t_launch = time.time()
+    for w in want:
+        try:
+            os.remove(w)
+        except OSError:
+            pass
     p = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                          stderr=subprocess.DEVNULL, start_new_session=True)
     got = []
@@ -163,7 +177,8 @@ def soffice_pdf(files, outdir, deadline=None, extra=None):
         while time.time() < end:
             missing = [w for w in want if not os.path.exists(w)]
             if not missing:
-                if all(_settled(w) for w in want):
+                if all(_settled(w) for w in want) and \
+                        all(os.path.getmtime(w) >= t_launch for w in want):
                     got = want
                     break
             if p.poll() is not None and not missing:
@@ -185,12 +200,59 @@ def soffice_pdf(files, outdir, deadline=None, extra=None):
         got = [w for w in want if os.path.exists(w) and os.path.getsize(w) > 0]
     return got
 
+# THE RENDER CACHE IS KEYED BY THE DOCX, NOT BY ITS NAME.
+#
+# prerender() keeps one soffice start per CHUNK documents by caching the rendered PDF under
+# the document's basename. The key was the NAME alone, so a cached render survived an engine
+# change: measured 16 Nov, 041122-Account_Opening_Form was rendered at 10:07 from the
+# pre-fix .docx (10 pages), the .docx was rebuilt at 10:14 (9 pages), and the corpus pass at
+# 10:22 saw the file already there, skipped the render, and scored the document against a
+# render of an engine that no longer existed - 98.65 with 10 pages, the old number exactly.
+# A cache that outlives the thing it caches is a measurement of the past.
+#
+# The stamp is the docx's size and mtime: cheap, and it changes whenever the writer does.
+def _stamp(dx):
+    try:
+        st = os.stat(dx)
+        return f"{st.st_size}:{int(st.st_mtime)}"
+    except OSError:
+        return "0:0"
+
+def _cached_render(dx):
+    b = os.path.splitext(os.path.basename(dx))[0]
+    c = PRE + "/" + b + ".pdf"
+    if not os.path.exists(c):
+        return None
+    side = c + ".src"
+    try:
+        with open(side) as fh:
+            if fh.read().strip() == _stamp(dx):
+                return c
+    except OSError:
+        pass
+    # Stale or unstamped: the render describes a .docx this engine no longer writes.
+    try:
+        os.remove(c)
+    except OSError:
+        pass
+    return None
+
+def _stamp_render(dx, pdf):
+    try:
+        with open(pdf + ".src", "w") as fh:
+            fh.write(_stamp(dx))
+    except OSError:
+        pass
+
 def conv(dx,od):
     b=os.path.splitext(os.path.basename(dx))[0]; t=os.path.join(od,b+".pdf")
-    c=PRE+"/"+b+".pdf"
-    if os.path.exists(c): return c          # see prerender(): one soffice start per CHUNK files
+    c=_cached_render(dx)
+    if c: return c                          # see prerender(): one soffice start per CHUNK files
     soffice_pdf([dx], od, deadline=time.time()+280)
-    return t if os.path.exists(t) else None
+    if os.path.exists(t):
+        _stamp_render(dx, t)
+        return t
+    return None
 
 # SOFFICE'S START-UP, NOT ITS WORK, IS WHAT THE CORPUS RUN SPENDS ITS BUDGET ON.
 # Measured 16 Nov on 300_prescription_rx (1 page): conv() 11.29 s, render 0.39 s, the whole
@@ -207,10 +269,14 @@ def prerender(names,end):
     os.makedirs(PRE,exist_ok=True); n=0
     for i in range(0,len(names),CHUNK):
         if time.time()>=end: break
-        grp=[b for b in names[i:i+CHUNK] if not os.path.exists(PRE+"/"+b+".pdf")]
+        grp=[b for b in names[i:i+CHUNK]
+             if not _cached_render(DOCX+"/"+b+".docx")]
         fs=[DOCX+"/"+b+".docx" for b in grp if os.path.exists(DOCX+"/"+b+".docx")]
         if not fs: continue
         soffice_pdf(fs, PRE, deadline=min(end, time.time()+280))
+        for f in fs:
+            p = PRE + "/" + os.path.splitext(os.path.basename(f))[0] + ".pdf"
+            if os.path.exists(p): _stamp_render(f, p)
         n+=len(fs)
     return n
 
