@@ -237,9 +237,14 @@ def add(args):
         _r["attempts"] = _r.get("attempts", 0) + 1
         if outcome == "kept":
             _r["kept"] = _r.get("kept", 0) + 1
-            # Only a kept attempt that was committed counts here. attempt.py runs at STEP 8,
-            # before the commit, so this is the number the report will show once it lands.
-            _r["docs_improved"] = _r.get("docs_improved", 0) + (args.moved or 0)
+            # A RATCHET IS NOT NEW WORK. `--ratchet` re-measures the WHOLE corpus to prove a fix
+            # that was already counted when it was kept, so adding its moved count here counted
+            # the same 31 documents twice: once at 08:22 and again at 16:18, and the run report
+            # read "32 documents improved this run" when one of them had been improved at 08:22.
+            if args.ratchet is not None:
+                _r["ratchets"] = _r.get("ratchets", 0) + 1
+            else:
+                _r["docs_improved"] = _r.get("docs_improved", 0) + (args.moved or 0)
         _j.dump(_r, open(_rp, "w", encoding="utf-8"), indent=1)
     except Exception:
         pass

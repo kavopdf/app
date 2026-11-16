@@ -983,7 +983,19 @@ STEP 8 - RECORD WHAT YOU LEARNED, THEN THE ATTEMPT
     13 Nov a run measured 3 of 10 documents moved and was told "0 of 5", because the store's tail
     held a different attempt's engine. Pass the id and the comparison is against the baseline you
     actually measured against.
-  Then update the class file's own row for this class - FIXED if the number improved,
+  Then refresh the class file FROM THE MEASUREMENT - do not hand-edit it:
+
+      python3 tools/p2w-bench/classrow.py --write
+
+  It reads benchmarks/RANKING.csv and rewrites every document row's numbers and status from it.
+  FIXED means the document was above the defect line at baseline and is at or below it now -
+  so a document that was always below the line is never counted as a fix we made.
+
+  This replaces 'update the class file's own row for this class - FIXED if the number improved'.
+  That instruction had no tool behind it, so it was a hand-edit of a 212-row markdown table, and
+  on 16 Nov it simply did not happen: mobile-bill had gone 18.48 -> 1.55 and its row still read
+  18.48 OPEN. Every report built on that file then under-counted the work by everything that had
+  actually been fixed.
   PARKED with a reason if it did not. Do NOT run classify.py; the classifier owns that
   file and rewrites it each round.
   THEN COMMIT, BEFORE YOU GO BACK TO STEP 2. Every attempt commits its own files - that is what

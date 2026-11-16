@@ -32,8 +32,17 @@ def _json(p, default):
 
 
 def classes():
-    """(total, solved_by_us, never_broken, open) from the single class authority."""
-    total = solved = never = opened = 0
+    """Count CLASSES, not document rows.
+
+    The file is one row per document - 212 of them - grouped by problem name. The first version
+    of this function counted rows and called them classes, so the report said "212 classes total"
+    when there are eight. A number that is wrong by a factor of twenty-six is worse than a number
+    that is missing.
+
+    A class is solved when no document under it is still OPEN.
+    """
+    per_class = {}          # problem -> [open_count, fixed_count, never_broken]
+    docs = 0
     try:
         for line in open(CLASSES, encoding="utf-8"):
             s = line.strip()
@@ -42,20 +51,21 @@ def classes():
             cells = [c.strip() for c in s.strip("|").split("|")]
             if len(cells) < 8 or cells[0] in ("rank", "") or not cells[0].isdigit():
                 continue
-            total += 1
-            status, note = cells[6].upper(), cells[7].lower()
+            docs += 1
+            problem, status, note = cells[2], cells[6].upper(), cells[7].lower()
+            rec = per_class.setdefault(problem, [0, 0, 0])
             if "OPEN" in status:
-                opened += 1
-            elif "FIXED" in status:
-                # 'no defect' means this class was never broken. Counting it as a fix we made
-                # would inflate every report by the size of the corpus.
-                if "no defect" in note or cells[2].lower() == "none":
-                    never += 1
-                else:
-                    solved += 1
+                rec[0] += 1
+            elif "no defect" in note or problem.lower() == "none":
+                rec[2] += 1
+            else:
+                rec[1] += 1
     except Exception:
         pass
-    return total, solved, never, opened
+    total = len(per_class)
+    solved = sum(1 for v in per_class.values() if v[0] == 0 and v[1] > 0)
+    openc = sum(1 for v in per_class.values() if v[0] > 0)
+    return total, solved, openc, docs, per_class
 
 
 def _share5(path):
@@ -88,9 +98,12 @@ def corpus():
     regressed = [k for k in common if c[k] > b[k] + 0.05]
     unchanged = len(common) - len(improved) - len(regressed)
     identical = all(abs(b[k] - c[k]) < 1e-9 for k in common)
+    # share@5px is the fraction of ink that landed more than 5px from where it belongs, so a
+    # FALL is an improvement. The first version printed (current - baseline), which reported
+    # 6.15 -> 5.01 as "-18.55%" - arithmetically right, and read by every human as a regression.
     return {"available": True, "docs": len(common),
             "baseline_mean": round(bm, 2), "current_mean": round(cm, 2),
-            "pct": round((cm - bm) / bm * 100, 2) if bm else 0.0,
+            "pct": round((bm - cm) / bm * 100, 2) if bm else 0.0,
             "improved": len(improved), "regressed": len(regressed), "unchanged": unchanged,
             "measurement_committed": not identical,
             "best": [{"doc": k, "before": round(b[k], 2), "after": round(c[k], 2)}
@@ -112,15 +125,15 @@ def this_run():
 
 
 def main(argv):
-    total, solved, never, opened = classes()
+    total, solved, openc, docs, per_class = classes()
     co = corpus()
     tr = this_run()
     h = _json(HANDOFF, {})
     working = tr.get("class") if tr.get("present") else "-"
 
     if "--json" in argv:
-        print(json.dumps({"classes": {"total": total, "solved_by_us": solved,
-                                      "never_broken": never, "open": opened},
+        print(json.dumps({"classes": {"total": total, "clear": solved, "open": openc,
+                                      "documents": docs},
                           "corpus": co, "run": tr, "working_class": working,
                           "needs_human": len(h.get("needs_human") or [])}, indent=1))
         return 0
@@ -128,9 +141,9 @@ def main(argv):
     L = []
     L.append("=== FIXER REPORT - every number computed from committed files ===")
     L.append("")
-    L.append("1. classes total            : %d" % total)
-    L.append("2. classes solved           : %d fixed by us, %d never broken, %d still OPEN"
-             % (solved, never, opened))
+    L.append("1. classes total            : %d  (%d documents across them)" % (total, docs))
+    L.append("2. classes solved           : %d clear, %d still have an OPEN document"
+             % (solved, openc))
     if tr.get("present"):
         L.append("3. docs improved THIS run   : %d  (%d attempts, %d kept)"
                  % (tr["docs_improved"], tr["attempts"], tr["kept"]))
