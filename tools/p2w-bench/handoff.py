@@ -120,7 +120,15 @@ def main(argv):
     if "--agent-add" in argv:
         raw = argv[argv.index("--agent-add") + 1]
         parts = (raw.split("|") + ["", "", "", ""])[:4]
-        d["agents"].append({"id": "%s%s" % (parts[0].strip()[:4], parts[1].strip()),
+        # The id has to be unique on its own. A prefix of class+angle is not: two agents on the
+        # same class and angle - which is exactly the case that needed disambiguating - produced
+        # the same id and the bug survived its own fix until it was tested.
+        _base = "%s%s" % (parts[0].strip()[:4], parts[1].strip())
+        _used = {a.get("id") for a in d["agents"]}
+        _n = 1
+        while "%s-%02d" % (_base, _n) in _used:
+            _n += 1
+        d["agents"].append({"id": "%s-%02d" % (_base, _n),
                             "class": parts[0].strip(), "angle": parts[1].strip(),
                             "question": parts[2].strip(), "expected": parts[3].strip(),
                             "deployed": ist(), "status": "running", "finding": ""})

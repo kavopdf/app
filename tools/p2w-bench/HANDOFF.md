@@ -16,7 +16,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> Run the full 213-document ratchet on commit 232f622 (per-row tcBorders). It was measured on 30 class documents + 12 controls: 22/30 moved, 0/12 controls worse, mobile-bill 18.48 -> 1.55. It has never been measured at corpus scale, so 180 documents are unproven. Until that ratchet passes, the pipeline has a fix it cannot vouch for. This is ahead of any new class.
+> Run the full 213-document ratchet on commit 232f622 (per-row tcBorders). Measured on 30 class documents + 12 controls: 22/30 moved, 0/12 controls worse, mobile-bill 18.48 -> 1.55. Never measured at corpus scale, so 180 documents are unproven. Until that ratchet passes, the pipeline has a fix it cannot vouch for. This is ahead of any new class.
 
 ## What happened, most recent last
 
