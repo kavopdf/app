@@ -19,6 +19,7 @@ The next run reads it before it reads anything else and before it picks a class.
     python3 tools/p2w-bench/handoff.py --plan "take 20_within_10pt, diagnose the 3pt band"
     python3 tools/p2w-bench/handoff.py --note "attempt 2 kept, 22/30 moved"
     python3 tools/p2w-bench/handoff.py --next "run the full 213-document ratchet on 232f622"
+    python3 tools/p2w-bench/handoff.py --context "what the next run needs to know, in prose"
     python3 tools/p2w-bench/handoff.py --agent-add "class|A|which code path places inline images|11:35"
     python3 tools/p2w-bench/handoff.py --agent-land "class|A" --finding "FINDINGS/x.md"
     python3 tools/p2w-bench/handoff.py --run-end released
@@ -63,6 +64,12 @@ def render(d):
     L.append("| how it ended | %s |" % (r.get("ended_how") or "-"))
     L.append("| plan | %s |" % ((d.get("plan") or "-").replace("|", "/")))
     L.append("")
+    if d.get("context"):
+        L.append("## The picture, in the words of the run that left it")
+        L.append("")
+        for para in (d["context"] or "").split("\n"):
+            L.append("> " + para if para.strip() else ">")
+        L.append("")
     if d.get("next"):
         L.append("## What the next run should do first")
         L.append("")
@@ -117,6 +124,10 @@ def main(argv):
         d["notes"].append({"at": ist(), "text": argv[argv.index("--note") + 1]})
     if "--next" in argv:
         d["next"] = argv[argv.index("--next") + 1]
+    if "--context" in argv:
+        # The narrative. `notes` is a log of what happened; this is the picture - what is true now,
+        # what was ruled out and why, and what the next run would waste time rediscovering.
+        d["context"] = argv[argv.index("--context") + 1]
     if "--agent-add" in argv:
         raw = argv[argv.index("--agent-add") + 1]
         parts = (raw.split("|") + ["", "", "", ""])[:4]

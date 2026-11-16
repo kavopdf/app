@@ -28,7 +28,7 @@ not in the live class file - which is the check worth having, because a typo wou
 attempt against nothing and leave the real class at zero.
 
     attempt.py --class "<problem name>" --outcome kept|reverted|error \
-               [--moved N --total M] [--engine HASH] [--reason "..."]
+               [--moved N --total M] [--engine HASH] [--reason "..."] [--ratchet N]
 
     attempt.py --show            the ledger, worst first
     attempt.py --show <class>    one class's history
@@ -205,6 +205,12 @@ def add(args):
     # Now every attempt records its own reason, even when that reason is empty, and the
     # history is kept in `reasons` so an earlier note is never lost - it just stops being
     # presented as the current one.
+    # --ratchet N stamps the corpus-wide check that closes this class in pending.py. Without it a
+    # kept fix stays 'pending' for ever, and pending.py is a gate: a run may not take a new class
+    # while it lists something. That is the point - an unratcheted fix is unfinished work.
+    if args.ratchet is not None:
+        row["ratchet_at"] = time.strftime("%d %b %H:%M")
+        row["ratchet_docs"] = args.ratchet
     row.setdefault("reasons", []).append(args.reason or "")
     row["reason"] = args.reason or "(no reason recorded for this attempt)"
     save(d)
@@ -253,6 +259,8 @@ def main(argv):
     ap.add_argument("--total", type=int, default=None)
     ap.add_argument("--engine", default="")
     ap.add_argument("--reason", default="")
+    ap.add_argument("--ratchet", type=int, default=None,
+                    help="documents in the corpus-wide ratchet that just passed")
     ap.add_argument("--show", action="store_true")
     a = ap.parse_args(argv[1:])
     return show(a) if a.show else add(a)

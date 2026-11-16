@@ -14,6 +14,10 @@ unfinished work, not as a result.
 | how it ended | - |
 | plan | - |
 
+## The picture, in the words of the run that left it
+
+> The 232f622 fix is in the engine and measured on 30 class documents. It has never been ratcheted. Two nine-page bank forms cannot be converted by soffice inside the 290 s call limit, which is why the class measurement stalls - that is a tooling problem, not an engine one.
+
 ## What the next run should do first
 
 > Run the full 213-document ratchet on commit 232f622 (per-row tcBorders). Measured on 30 class documents + 12 controls: 22/30 moved, 0/12 controls worse, mobile-bill 18.48 -> 1.55. Never measured at corpus scale, so 180 documents are unproven. Until that ratchet passes, the pipeline has a fix it cannot vouch for. This is ahead of any new class.

@@ -265,6 +265,32 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
 
   Read benchmarks/DEFECT-CLASSES.md and tools/p2w-bench/ATTEMPTS.json.
 
+  *** THE GATE. NOTHING NEW STARTS WHILE ANYTHING IS UNFINISHED. ***
+
+      python3 tools/p2w-bench/pending.py
+
+  Exit 0 prints NOTHING PENDING and only then may you take a new class. Exit 1 lists what is
+  outstanding, and that list IS the work - in the order it prints:
+
+      1. carry-over   what the last run said to do first (HANDOFF.md)
+      2. agent        a subagent deployed and not yet landed - read FINDINGS/ for its file
+                      before you re-deploy, never blind
+      3. ratchet      a fix that was kept on its own class and never measured at corpus scale
+      4. blocker      a wall in BLOCKERS.md that is still standing
+
+  This exists because a run that picks the biggest OPEN class looks productive while the debt
+  underneath it grows. The class list cannot see any of these four things. On 16 Nov the first
+  kept fix - 232f622, 22/30 moved - was measured on thirty documents and the other 180 were
+  never checked; the next run would have taken a fresh class and left it unproven.
+
+  Close each item where it lives, not in your report:
+      handoff.py --next ""                  clears the carry-over
+      handoff.py --agent-land "<id>" --finding FINDINGS/<file>.md   closes an agent
+      attempt.py --class "<cls>" --ratchet <docs>                   closes a ratchet
+      a BLOCKERS row you cleared gets a closing row saying what fixed it
+  The tool reads those files, so it goes quiet when you are actually done - not when you say so.
+
+
   *** THE PATH MATTERS. IT USED TO BE THE WRONG ONE. ***
 
   Until 16 Nov this line said tools/p2w-bench/DEFECT-CLASSES.md, which is the OLD
