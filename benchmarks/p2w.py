@@ -417,7 +417,11 @@ def diagnose(n):
     json.dump(out,open(IMG+"/diagnosis.json","w"),indent=1)
     return out
 
+INSTRUMENT_MODE = "scipy"
+
+
 def main():
+    global INSTRUMENT_MODE
     ap=argparse.ArgumentParser(); ap.add_argument("--budget",type=int,default=250)
     ap.add_argument("--status",action="store_true"); ap.add_argument("--validate",action="store_true")
     ap.add_argument("--diagnose",type=int,default=0); a=ap.parse_args()
@@ -429,8 +433,40 @@ def main():
                   f"txt {x['text_recall']:6.2f}% {x['signature']:14} {x['doc'][:-5][:38]}")
         return 0
     end=time.time()+a.budget; os.makedirs(ROOT,exist_ok=True)
-    if sh("python3 -c 'import scipy'",60) is None or sh("python3 -c 'import scipy'",60).returncode!=0:
-        log("installing scipy"); sh("pip install -q scipy",220)
+    # scipy is not a nicety. edt() falls back to a 400-step dilation ladder without it,
+    # and that ladder is exact but about ten times slower - the 16 Nov fixer measured three
+    # single-page documents going from >290 s each to 28 s total once scipy was present. On
+    # the nine-page forms the ladder is why soffice hit the 290 s call limit twice and the
+    # class could not be measured at all: "measurement cost, not engine cost, is what has
+    # been eating these slots".
+    #
+    # This block used to check, install, and then NOT check again. A pip that failed quietly
+    # (proxy, no network, a different interpreter) left the run on the ladder for its whole
+    # slot with nothing anywhere saying so. Check once, install, verify, and say which mode
+    # the numbers were produced in.
+    _have = sh("python3 -c 'import scipy'", 60)
+    if _have is None or _have.returncode != 0:
+        log("scipy missing - installing (the ladder fallback is ~10x slower)")
+        sh("pip install -q scipy", 220)
+        _have = sh("python3 -c 'import scipy'", 60)
+        if _have is None or _have.returncode != 0:
+            log("WARNING: scipy STILL missing after install - this run measures on the")
+            log("WARNING: dilation ladder. The numbers are exact but roughly ten times")
+            log("WARNING: slower, and a large document will exceed the per-call limit.")
+            INSTRUMENT_MODE = "ladder"
+        else:
+            log("scipy installed - exact EDT, fast path")
+            INSTRUMENT_MODE = "scipy"
+    else:
+        INSTRUMENT_MODE = "scipy"
+    try:
+        os.makedirs("/scratch/output", exist_ok=True)
+        with open("/scratch/output/INSTRUMENT.txt", "w") as fh:
+            fh.write(INSTRUMENT_MODE + "\n")
+    except Exception:
+        pass
+    log("instrument: " + INSTRUMENT_MODE + (" (exact EDT)" if INSTRUMENT_MODE == "scipy"
+        else " (dilation ladder - exact but ~10x slower)"))
     if not validate(): log("ABORT: gate"); return 3
     if corpus()<100: log("ABORT: corpus"); return 2
     if not engine(): log("ABORT: engine"); return 2
