@@ -243,6 +243,33 @@ STEP 2 - PICK THE CLASS, OR CLOSE THE ROUND
   does not name a mechanism, so do not invent one - open the page named in `worst_page`
   and look.
 
+  **AND FOR THE DOCUMENTS WHERE NOTHING IS MISSING, READ THE DISPLACEMENT COLUMNS.**
+
+  Most defects are not missing content, they are moved content. The two nine-page bank
+  forms keep 99.6 % of their characters and their image and still read 98.7 %@5 with a
+  937 pt outlier. A count cannot describe that. These four columns can:
+
+      dx_pt        the rigid shift that best explains the page, in points. Positive = the
+                   output ink sits to the RIGHT of the source.
+      dy_pt        the same, vertically. Positive = BELOW the source, i.e. down the page.
+      explains     how much of the overlap that one translation accounts for, in percent.
+      moved_gt20   the share of ink still more than 20 pt from any output ink AFTER the
+                   shift is applied - the part the shift does not explain.
+
+  Read them together, because they say different things:
+      big dx/dy AND high explains     an offset or margin bug. One origin is wrong and
+                                      every element inherits it. This is usually one small
+                                      fix that clears a whole page.
+      small dx/dy AND low explains    a layout bug. Elements disagree with each other and
+                                      no single translation fixes the page.
+      high moved_gt20 with high explains  the page moved, and part of it moved further.
+                                      Fix the origin first, then re-measure before
+                                      theorising about the remainder.
+
+  These are computed for the worst documents only - each one is a LibreOffice round-trip,
+  so the census spends its time where the fixer will look first. A blank cell means that
+  document was not in the displacement pass, not that it is fine.
+
   benchmarks/CENSUS.md is the same data grouped by signal, with a document count per
   mechanism. **Start with the signal that covers the most documents**: one mechanism fixed
   once clears every document under it, and that is worth more than clearing one document

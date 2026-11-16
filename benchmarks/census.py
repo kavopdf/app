@@ -113,6 +113,102 @@ def docx_facts(docx_path):
     return out
 
 
+def _instrument():
+    """p2w's own renderer, so the census compares with the same instrument.
+
+    Imported lazily and tolerated failing: the census is useful without it (the element
+    counts still stand) and must never take the run down because a sibling module moved.
+    """
+    import importlib.util
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "p2w.py")
+    if not os.path.exists(path):
+        return None
+    try:
+        spec = importlib.util.spec_from_file_location("p2w_for_census", path)
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m
+    except Exception:
+        return None
+
+
+def displacement_vector(pdf_path, docx_path, tmpdir, inst):
+    """Where the ink WENT, in points - the rigid shift that explains the page.
+
+    The census counts what is MISSING. Most defects are not missing, they are MOVED: the
+    two nine-page bank forms keep 99.6 % of their characters and their image and still
+    read 98.7 %@5 with a 937 pt outlier. Nothing was lost; everything is in the wrong
+    place. A count cannot say that. A shift can.
+
+    WHY NOT NEAREST-NEIGHBOUR. The first version matched every source ink pixel to its
+    closest output ink pixel and took the median offset. Tested on a block moved +10 right
+    and +6 down, it answered +6, +2: a solid block's pixels all map to the nearest EDGE of
+    the output block, not to their own counterpart, so the answer collapses toward the
+    middle. It was wrong by 40 % and looked plausible, which is the worst kind.
+
+    Cross-correlation answers the question actually being asked - what single translation
+    makes these two ink masks line up - and on the same test it returns exactly +10, +6.
+    Verified on +10/+6, on -12/+3, and on an unshifted pair which returns 0, 0.
+
+    dx > 0 means the output ink sits to the RIGHT of the source, dy > 0 means BELOW it
+    (image coordinates, so down the page). A large shift with a high `explains` is an
+    offset or margin bug: one origin is wrong and every element inherits it. A small shift
+    with low `explains` is a layout bug: elements disagree with each other and no single
+    translation fixes the page. `moved_gt20` is the share of ink still more than 20 pt from
+    any output ink AFTER the shift is applied - the part the shift does not explain.
+    """
+    if inst is None:
+        return None
+    try:
+        import numpy as np
+        from scipy.ndimage import distance_transform_edt as edt
+        from scipy.signal import fftconvolve
+    except Exception:
+        return None
+    try:
+        sp = inst.render(pdf_path)
+        pdf = inst.conv(docx_path, tmpdir)
+        if not pdf:
+            return None
+        op = inst.render(pdf)
+    except Exception:
+        return None
+    PT, INK = inst.PT, inst.INK
+    shifts, explains, residuals = [], [], []
+    for i in range(min(len(sp), len(op))):
+        src, our = sp[i], op[i]
+        H = max(src.shape[0], our.shape[0]); W = max(src.shape[1], our.shape[1])
+        s_pad = np.full((H, W), 255, np.uint8); s_pad[:src.shape[0], :src.shape[1]] = src
+        o_pad = np.full((H, W), 255, np.uint8); o_pad[:our.shape[0], :our.shape[1]] = our
+        sm = s_pad < INK
+        om = o_pad < INK
+        if not sm.any() or not om.any():
+            continue
+        f = sm.astype(np.float32); g = om.astype(np.float32)
+        corr = fftconvolve(g, f[::-1, ::-1], mode="same")
+        py, px = np.unravel_index(np.argmax(corr), corr.shape)
+        dy, dx = int(py) - H // 2, int(px) - W // 2
+        base = float(corr[H // 2, W // 2]); peak = float(corr[py, px])
+        ink = float(sm.sum())
+        shifts.append((dx, dy, ink))
+        # how much of the overlap this one translation accounts for
+        explains.append(max(0.0, (peak - base)) / max(1.0, ink) * 100)
+        # residual: source ink shifted by (dx,dy), still far from any output ink
+        sh = np.roll(np.roll(sm, dy, axis=0), dx, axis=1)
+        d = edt(~om)
+        far = d[sh] > (20 / PT)
+        residuals.append(float(far.mean()) * 100 if sh.any() else 0.0)
+    if not shifts:
+        return None
+    tw = sum(w for _, _, w in shifts) or 1.0
+    return dict(
+        dx_pt=round(sum(d * w for d, _, w in shifts) / tw * PT, 1),
+        dy_pt=round(sum(y * w for _, y, w in shifts) / tw * PT, 1),
+        explains=round(float(np.mean(explains)), 0),
+        moved_gt20=round(float(np.mean(residuals)), 0),
+    )
+
+
 def signal_for(s, d):
     """The candidate mechanism. Conservative on purpose - see the module docstring."""
     if s.get("error") or d.get("error"):
@@ -137,9 +233,21 @@ def main(argv):
     ap.add_argument("--out", default="/scratch/work/p2w/out")
     ap.add_argument("--ranking", default="benchmarks/RANKING.csv")
     ap.add_argument("--limit", type=int, default=0, help="only the N worst documents")
-    ap.add_argument("--csv", default="benchmarks/CENSUS.csv")
-    ap.add_argument("--md", default="benchmarks/CENSUS.md")
+    ap.add_argument("--csv", default="")
+    ap.add_argument("--md", default="")
+    ap.add_argument("--disp-limit", type=int, default=30,
+                    help="how many of the worst documents get the expensive "
+                         "displacement-vector pass; 0 disables it")
     a = ap.parse_args(argv[1:])
+
+    # The output belongs beside the ranking it describes, NOT beside whatever directory
+    # the caller happened to be in. gate.py runs the census from the repo root while the
+    # ranking is written to /scratch/output, and a cwd-relative path made os.makedirs
+    # fail with the census already half-done - the 16 Nov run recorded "exit1" while
+    # still writing valid files, which is the worst of both.
+    _rd = os.path.dirname(os.path.abspath(a.ranking)) or "."
+    a.csv = a.csv or os.path.join(_rd, "CENSUS.csv")
+    a.md = a.md or os.path.join(_rd, "CENSUS.md")
 
     rows = []
     with open(a.ranking, encoding="utf-8") as f:
@@ -158,9 +266,18 @@ def main(argv):
 
     cols = ["document", "problem", "share5", "max_pt", "worst_page", "pages",
             "src_chars", "docx_chars", "src_images", "docx_images",
-            "src_drawings", "docx_tables", "docx_cells", "src_annots", "signal"]
+            "src_drawings", "docx_tables", "docx_cells", "src_annots", "signal",
+            "dx_pt", "dy_pt", "explains", "moved_gt20"]
+    inst = _instrument() if a.disp_limit else None
+    tmpdir = None
+    if inst is not None:
+        import tempfile
+        tmpdir = tempfile.mkdtemp(prefix="census-")
+        if inst is None:
+            print("  displacement vector unavailable - p2w.py could not be loaded")
+
     out_rows = []
-    for r in rows:
+    for _rank, r in enumerate(rows):
         doc = r["document"]
         sp = os.path.join(a.corpus, doc + ".pdf")
         dp = os.path.join(a.out, doc + ".docx")
@@ -176,7 +293,14 @@ def main(argv):
             "src_drawings": s.get("drawings", ""), "docx_tables": d.get("tables", ""),
             "docx_cells": d.get("cells", ""), "src_annots": s.get("annots", ""),
             "signal": signal_for(s, d),
+            "dx_pt": "", "dy_pt": "", "explains": "", "moved_gt20": "",
         })
+        # The vector is expensive (a LibreOffice round-trip per document), so only the
+        # worst ones get it. They are the ones the fixer will look at first anyway.
+        if inst is not None and _rank < a.disp_limit:
+            v = displacement_vector(sp, dp, tmpdir, inst)
+            if v:
+                out_rows[-1].update(v)
 
     os.makedirs(os.path.dirname(a.csv) or ".", exist_ok=True)
     with open(a.csv, "w", newline="", encoding="utf-8") as f:
@@ -208,6 +332,20 @@ def main(argv):
         md.append("| %s | %d | %.1f%% | %s %.1f%%@5 p%s |"
                   % (sig, len(g), sum(float(r["share5"]) for r in g),
                      worst["document"][:34], float(worst["share5"]), worst["worst_page"]))
+    vec = [r for r in out_rows if r.get("dx_pt") != ""]
+    if vec:
+        md += ["", "## Where the ink went, in points", "",
+               "`dx` positive = the output ink sits right of the source; `dy` positive = below it.",
+               "A whole page shifted one way is an offset or margin bug. Signs scattered is a",
+               "layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.", "",
+               "| document | share@5 | dx | dy | explains | still >20pt |",
+               "|---|---|---|---|---|---|"]
+        for r in vec:
+            md.append("| %s | %s | %s | %s | %s | %s%% |"
+                      % (r["document"][:34], r["share5"], r["dx_pt"], r["dy_pt"],
+                         r["explains"], r["moved_gt20"]))
+        md.append("")
+
     md.append("")
     for sig in order:
         g = by.get(sig)
