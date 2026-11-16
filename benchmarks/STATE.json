@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-11-15T19:15:57",
+ "ran_at": "2026-11-16T01:07:41",
  "layers": {
   "ground_truth": {
    "status": "pass",
@@ -11,30 +11,42 @@
   "measurement": {
    "status": "ok",
    "docs_with_result": 213,
-   "of": 211
+   "of": 213,
+   "complete": true
   },
   "txt_checks": {
    "status": "available",
-   "exit": 2,
+   "exit": 0,
    "note": "named semantic checks; advisory, not a size"
+  },
+  "census": {
+   "status": "exit1",
+   "summary": [
+    "  File \"/scratch/work/base/benchmarks/census.py\", line 239, in <module>",
+    "    sys.exit(main(sys.argv))",
+    "             ^^^^^^^^^^^^^^",
+    "  File \"/scratch/work/base/benchmarks/census.py\", line 181, in main",
+    "    os.makedirs(os.path.dirname(a.csv) or \".\", exist_ok=True)",
+    "  File \"<frozen os>\", line 225, in makedirs"
+   ]
   }
  },
  "signatures": [
-  "[19:16:11]   content-loss    46 docs  median share@1px  30.6%",
-  "[19:16:11]   displacement    28 docs  median share@1px  29.1%",
-  "[19:16:11]   clean          121 docs  median share@1px   0.6%"
+  "[01:11:12]   content-loss    46 docs  median share@1px  30.6%",
+  "[01:11:12]   displacement    28 docs  median share@1px  29.1%",
+  "[01:11:12]   clean          120 docs  median share@1px   0.6%"
  ],
- "round": null,
+ "round": 1,
  "ratchet": {
   "status": "compared",
-  "baseline_docs": 212,
-  "current_docs": 213,
+  "baseline_docs": 213,
+  "current_docs": 212,
   "regressions": [],
   "improvements": [],
-  "new_documents": [
+  "new_documents": [],
+  "disappeared": [
    "416_many_tiny_pages"
-  ],
-  "disappeared": []
+  ]
  },
  "verdict": "OK: no regressions against baseline"
 }
