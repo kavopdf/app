@@ -57,7 +57,16 @@
    "finding": "FINDINGS/content-missing-partly-replaced-B-1300.md"
   }
  ],
- "run": {},
- "history": [],
+ "run": {
+  "ended": "13:58",
+  "ended_how": "released"
+ },
+ "history": [
+  {
+   "at": "13:58",
+   "how": "released",
+   "plan": ""
+  }
+ ],
  "context": "The 232f622 fix is in the engine and measured on 30 class documents. It has never been ratcheted. Two nine-page bank forms cannot be converted by soffice inside the 290 s call limit, which is why the class measurement stalls - that is a tooling problem, not an engine one."
 }
