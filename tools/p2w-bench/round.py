@@ -101,6 +101,16 @@ PHASES = ["measure", "classify", "fix", "done"]
 # finishes releases the slot itself, so this governs only a run that died: 45 minutes means a
 # crash costs one slot, and a live run of up to forty-five minutes is never doubled - two runs
 # editing the engine at once would each revert the other's fix.
+def _handoff(*args):
+    """Best-effort: never let the handoff file break the round machine."""
+    try:
+        import subprocess
+        subprocess.run([sys.executable, os.path.join(HERE, "handoff.py")] + list(args),
+                       capture_output=True, timeout=25)
+    except Exception:
+        pass
+
+
 CLAIM_STALE_MIN = {"fixer": 45, "baseline": 45, "classifier": 20}
 
 
@@ -262,6 +272,8 @@ def claim(name):
     save(s)
     print("%s claimed at %s" % (name, ist("%H:%M")))
     note("claim", "%s claimed the slot" % name)
+    if name == "fixer":
+        _handoff("--run-start")
     # A stale claim means the previous run ended WITHOUT releasing. That is a real failure -
     # on 16 Nov the fixer finished at 08:05 and left its slot held - and it used to be
     # silent: the next run simply took over and nobody could see a run had ended untidily.
@@ -373,6 +385,8 @@ def release(name, force=False):
         print("fixer: releasing after %d minute(s) with %d attempt(s)" % (age, done))
     s["%s_started" % name] = 0
     save(s)
+    if name == "fixer":
+        _handoff("--run-end", "forced" if force else "released")
     if force:
         try:
             log = os.path.join(HERE, "RUN-LOG.md")

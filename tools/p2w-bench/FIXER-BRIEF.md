@@ -219,6 +219,38 @@ STEP 0d - WHEN SOMETHING BLOCKS YOU, CLEAR IT OR NAME IT  ** READ BEFORE YOU STA
     - leave an obstacle only in your final message
 
 
+STEP 0e - READ THE HANDOFF BEFORE YOU PICK ANYTHING  ** THE ANSWER TO "WHAT WAS HAPPENING" **
+
+      python3 tools/p2w-bench/handoff.py --show
+
+  HANDOFF.md is written by the claim, by every attempt, by every agent deployed and by every
+  release - so it is never more than one attempt old, about seven minutes. It answers the three
+  questions no other file can:
+
+    * what was the previous run in the middle of when it stopped
+    * which subagents were deployed, for which class and angle, and which of them have landed a
+      finding
+    * what that run said the next one should do first
+
+  A fixer run can end three ways: it releases cleanly, it is forced out, or the platform kills it
+  mid-attempt. In the third case nothing else is written at all, and without this file the next
+  run has to guess. If ROUND.json shows a claim older than the stale limit, the run that wrote
+  this died without releasing - treat its plan as unfinished work, not as a result, and read its
+  attempts in ATTEMPTS.json before you repeat any of them.
+
+  Keep it current as you work. Every line you write here is a line the next run does not have to
+  reconstruct:
+
+      handoff.py --plan "..."        what this run intends, at the start
+      handoff.py --note "..."        what just happened (attempt.py writes this for you)
+      handoff.py --agent-add "class|A|the question|expected by HH:MM"
+      handoff.py --agent-land "class|A" --finding FINDINGS/<file>.md
+      handoff.py --next "..."        before you release: the one thing the next run should do
+
+  A run that dies leaving a good HANDOFF has handed over its work. A run that dies leaving
+  nothing has not.
+
+
 STEP 1 - BUILD
 ===================================================================
   bash tools/p2w-bench/build-engine.sh
@@ -564,6 +596,13 @@ STEP 4b - THE TOOLS YOU HAVE, AND WHEN TO SPEND THEM
     Verify every claim yourself before acting on it. A subagent may commit ONE thing - its own
     file under FINDINGS/ - and nothing else: not the engine, not DEFECT-CLASSES.md, not
     ATTEMPTS.json, not HYPOTHESES.md. You make every edit and every other commit.
+
+    REGISTER EVERY AGENT. An agent nobody registered is an agent the next run does not know to
+    look for:
+        handoff.py --agent-add "<class>|A|the question|expected by HH:MM"
+        handoff.py --agent-land "<class>|A" --finding FINDINGS/<file>.md
+    If the file never appears, leave it as 'running' - the next run will see an agent that was
+    deployed and never reported, which is itself information.
 
     THREE FINDINGS AND NO FIX IS STILL PROGRESS. Three paths are closed. Record them and move on.
 

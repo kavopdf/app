@@ -210,6 +210,14 @@ def add(args):
     save(d)
     log_runline(name, outcome, args.moved, args.total)
     heartbeat()
+    try:
+        import subprocess
+        subprocess.run([sys.executable, os.path.join(HERE, "handoff.py"), "--note",
+                        "attempt %d on %s -> %s%s" % (row.get("attempts", 0), name, outcome,
+                        (" (%s/%s moved)" % (args.moved, args.total)) if args.total else "")],
+                       capture_output=True, timeout=25)
+    except Exception:
+        pass
     print("%s: attempt %d recorded as %s%s"
           % (name, row["attempts"], outcome,
              "  (%d/%d moved)" % (args.moved, args.total) if args.moved is not None else ""))
