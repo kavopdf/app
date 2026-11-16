@@ -226,3 +226,5 @@ claim and after each step; it is not code and cannot break anything.
 | 16 Nov 07:49 | fixer | build-engine | started |
 | 16 Nov 07:59 | fixer | build-engine | started |
 | 16 Nov 08:04 | fixer | commit-gate | started |
+| 16 Nov 08:53 | fixer | claim | fixer claimed the slot |
+| 16 Nov 08:53 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
