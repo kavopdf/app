@@ -350,17 +350,25 @@ def release(name, force=False):
     if name == "fixer" and started and not force and s.get("phase") == "fix" and any_open:
         age = claim_age_min(started) or 0.0
         done = _attempts_this_run()
-        if age < 30 and done < 2:
+        # TIME, NOT ATTEMPT COUNT.
+        #
+        # This read `age < 30 and done < 2`, so three attempts bought an early exit at 22
+        # minutes - which is what happened: the 10:50 run did three real attempts and
+        # released with half its window unused. Counting attempts was the wrong test once
+        # attempts became cheap. The question is not "did I do two?" but "have I spent the
+        # clock?". The round-finished bypass above still applies, so a run that has emptied
+        # the class list is never blocked, and --force remains for the honest cases.
+        if age < 40:
             print("refused: this run is %d minutes old with %d attempt(s) recorded." % (age, done))
-            print("The slot is good for 45 minutes and one attempt takes about ten. Go back to")
-            print("STEP 2, take the next OPEN class and do another one - an attempt recorded as")
-            print("'error' is recorded, and is not a reason to stop.")
+            print("The slot is good for 45 minutes and attempts are cheap now - the build is about")
+            print("45 seconds, and a measurement that used to take ten minutes takes seconds.")
+            print("Go back to STEP 2, take the next OPEN class and do another one. An attempt")
+            print("recorded as 'error' is recorded, and is not a reason to stop.")
             print("If you genuinely cannot continue - the build is broken, Drive is blocked, the")
             print("class list is empty - release with: round.py --release-fixer --force")
             return 1
-        if done < 2:
-            print("fixer: releasing after %d minute(s) with %d attempt(s) - past the 30-minute mark,"
-                  % (age, done))
+        print("fixer: releasing after %d minute(s) with %d attempt(s) - past the 40-minute mark,"
+              % (age, done))
     s["%s_started" % name] = 0
     save(s)
     if force:
