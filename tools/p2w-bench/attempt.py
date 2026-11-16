@@ -53,7 +53,7 @@ RUNLOG = os.path.join(HERE, "RUN-LOG.md")
 CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
 CLASSES_TXT = os.path.join(HERE, "DEFECT-CLASSES-TXT.md")
 
-OUTCOMES = ("kept", "reverted", "error")
+OUTCOMES = ("kept", "partial", "reverted", "error")
 
 
 # The class vocabulary, and the only thing that identifies a class cell. A class file also
@@ -247,6 +247,23 @@ def add(args):
         row["ratchet_docs"] = args.ratchet
     row.setdefault("reasons", []).append(args.reason or "")
     row["reason"] = args.reason or "(no reason recorded for this attempt)"
+    # A VISIBLE DEVIATION. The default is to deploy two or three agents on a class before working
+    # it alone. On 16 Nov every run worked alone, and nothing anywhere said so - the rule was a
+    # checklist whose default was no, and a default of no is invisible when it is taken.
+    try:
+        import glob as _g
+        import json as _jh
+        _rp = os.path.join(HERE, "RUN.json")
+        _r = _jh.load(open(_rp, encoding="utf-8"))
+        _mine = _r.get("agents") or []
+        _prior = [f for f in _g.glob(os.path.join(HERE, "FINDINGS", "*.md"))
+                  if name.replace(" ", "-") in os.path.basename(f)]
+        if not _mine and not _prior:
+            print("note: this attempt was recorded with no agent deployed and no FINDINGS file for")
+            print("      %r. The default is two or three agents before working a class alone." % name)
+    except Exception:
+        pass
+
     save(d)
     log_runline(name, outcome, args.moved, args.total)
     heartbeat()
