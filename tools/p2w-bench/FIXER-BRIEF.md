@@ -809,30 +809,38 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
 
       date +%s          # now, minus the number you wrote at the claim
 
-  UNDER 45 MINUTES, and the last attempt was recorded cleanly?
-      Go back to STEP 2 and start another attempt on the next OPEN class. Do NOT release the slot,
-      do NOT claim it again, do NOT commit here - each attempt already committed its own files in
-      STEP 8, which is why going back is safe.
+    IS THERE STILL WORK YOU CAN DO?
+        Go back to STEP 2 and start another attempt on the next OPEN class. Do NOT release the
+        slot, do NOT claim it again, do NOT commit here - each attempt already committed its own
+        files in STEP 8, which is why going back is safe.
 
-  OTHERWISE - 45 minutes or more, or the round is finished, or the build is broken, or you
-  genuinely could not record the attempt at all:
-      release the slot, run the gate, commit, stop. That is the rest of this step.
+    STOP ONLY WHEN ONE OF THESE IS TRUE:
+        * the round is finished - close it, see below
+        * every remaining OPEN class is one you have already proved you cannot move
+        * the build is broken and you cannot fix it
+        * the platform is ending you - release cleanly first, see below
 
-  FORTY-FIVE, NOT TWENTY-FIVE, AND NO CAP ON ATTEMPTS. (16 Nov)
-      The instruction was to work continuously for as long as possible in one run, so that a run
-      produces as much as it can, instead of having its working time cut into small pieces.
-      Twenty-five minutes did exactly the cutting: the 16 Nov runs took 17 and 19 minutes for one
-      attempt each, released, and handed the rest of the hour to nobody. A cap of "up to three" was
-      worse than no rule at all, because three is a number to stop at.
+    THERE IS NO CLOCK. (16 Nov)
+        There used to be a 25-minute rule, then a 45-minute one. Both were caps, and a cap is a
+        number to stop at: the 16 Nov runs stopped at 17, 19 and 22 minutes with half the window
+        unused. The instruction is to work continuously for as long as the system allows, and the
+        system's own limit is the only thing that should end a run.
 
-      There is no number of attempts. There is a clock, and one question: is there still an OPEN
-      class you can make progress on? While the answer is yes and the clock is under 45 minutes, go
-      back to STEP 2 and take it. Each attempt is cheap once the engine is built - the build is
-      42-46 s, and a measurement that used to take ten minutes on the scipy ladder now takes
-      seconds.
+        So: no minute count and no attempt count. One question, asked after every attempt - is
+        there an OPEN class I can still make progress on? While the answer is yes, go back to
+        STEP 2 and take it.
 
-      Spend the clock. A run that stops at minute 19 of a 45-minute window has wasted 26 minutes,
-      and those minutes do not come back: the next run starts from zero.
+        The hourly cron is not a reason to stop either. If your run is still working when the next
+        one fires, that next run finds the slot busy and stands aside - and that costs nothing,
+        because you are the one doing the work. A skipped run is not a wasted hour. A stopped run
+        is.
+
+    WHEN YOU SENSE THE END, LEAVE THE ROOM CLEAN.
+        The platform may end you at any moment. If you think you are close - the context is
+        filling, calls are slowing - then before it happens: record the attempt you are on, write
+        what you learned to HYPOTHESES.md or a FINDINGS file, and release the slot. A run killed
+        while still holding the claim blocks the next run for 45 minutes. A run that leaves
+        cleanly blocks it for none. Same work, different cost to the agent behind you.
 
   *** IF THE ROUND IS FINISHED, CLOSE IT. NOTHING ELSE WILL. ***
 
