@@ -59,7 +59,7 @@
   "status": "OPEN"
  },
  "content-missing-partly-replaced": {
-  "attempts": 2,
+  "attempts": 3,
   "first_seen": null,
   "last": null,
   "last_engine": "sizePt patch (run-size-from-sizePt-not-Tf)",
@@ -67,9 +67,10 @@
   "last_total": 2,
   "outcomes": [
    "reverted",
+   "error",
    "error"
   ],
-  "reason": "re-applied the CONFIRMED patch and built the engine; measured 3 docs on the patched engine: 415_inline_images 89.04 (baseline 89.04), 07_stamp_over_table 1.93 (baseline 2.60), 601_fillable_admission_form 52.39 (baseline 52.39) - no regression, but the class's own two nine-page forms could not be measured: soffice on the 4088-run form exceeded the 290s call limit twice. FOUND: scipy is absent on a fresh pod, so p2w.edt falls back to the ladder; installing scipy took 3 single-page docs from >290s to 28s. Measurement cost, not engine cost, is what has been eating these slots.",
+  "reason": "ruled-band-by-overlap: the heading block's narrow placement is inside a wps:txbx text box (378 in the docx, the heading exists twice at x 513.9-571.5 and 573.1-584.0), not a ruled table cell, so the overlap rule fires on no page-7 line; measurement identical to the digit (94.92, pages 9 vs 10); patch saved and reverted",
   "requeues": 0,
   "status": "OPEN"
  }

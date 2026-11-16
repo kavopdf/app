@@ -250,3 +250,25 @@ Do not re-test one without new evidence, and if you do, say what changed.
   already ruled out; until the key is the problem name, that memory cannot grow.
   ACTION: key the ledger off DEFECT-CLASSES.md's `problem` column. Until then an attempt is
   recorded in this file and in TRACE.md, which is what this run did.
+
+## content-missing-partly-replaced - 16 Nov 10:50 run: the band-by-centre theory is RULED OUT, and the narrow placement is a text box
+
+- RULED OUT - A line the page drew ACROSS a ruled grid is placed in the band containing its
+  CENTRE, so a centred heading block lands in whichever narrow band the grid's middle happens
+  to be and is wrapped into it; assigning the band by greatest overlap should stop the wrap,
+  shrink the row and stop the spill.
+  evidence: 16 Nov 2026 fixer, engine (clean + patches/run-size-from-sizePt-not-Tf.patch) plus
+  patches/ruled-band-by-overlap-not-centre.patch, scipy 1.18.1 present, p2w.render/measure_doc
+  at DPI 150: `041122-Account_Opening_Form` share@5 94.92, worst_page 9, pages_src 9,
+  pages_ours 10, text_recall 99.5 - IDENTICAL TO THE DIGIT to the unpatched run, per page too
+  (p1 48.22, p2 52.49, p3 10.57, p4 20.39, p5 15.5, p6 1.61, p7 73.99, p8 89.59, p9 94.92).
+  The rule fires on no line of page 7: the heading lines are not wider than the band they land
+  in ('Annexure-1' is 23 pt of text inside a 58 pt band), so the overlap branch is never taken.
+  MEASURED, and it relocates the cause: the .docx carries 378 `wps:txbx` text boxes, and the
+  heading exists TWICE - once at x 513.9-571.5 (58 pt wide) and once at x 573.1-584.0 (11 pt
+  wide). The 20-line wrap is inside a text box whose width was taken from a table column, not
+  inside a ruled table cell, so the ruled pass is the wrong place to look. Patch kept at
+  patches/ruled-band-by-overlap-not-centre.patch and REVERTED - it moves nothing and would
+  have cost a corpus ratchet to prove it.
+  NEXT: the spill's height is the text box, so look at the box's width in DocxWriter's anchor
+  path (where a box's extent comes from its block's own line boxes) before the table's rows.
