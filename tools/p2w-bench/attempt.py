@@ -47,6 +47,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
 LEDGER = os.path.join(HERE, "ATTEMPTS.json")
+ROUND = os.path.join(HERE, "ROUND.json")
 RUNLOG = os.path.join(HERE, "RUN-LOG.md")
 CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
 CLASSES_TXT = os.path.join(HERE, "DEFECT-CLASSES-TXT.md")
@@ -95,6 +96,29 @@ def load():
 def save(d):
     with open(LEDGER, "w", encoding="utf-8") as f:
         json.dump(d, f, indent=1, sort_keys=True)
+
+
+def heartbeat():
+    """Refresh the fixer claim while the run is demonstrably alive.
+
+    The claim is what tells the next hourly run whether to stand aside. It used to be
+    stamped once, at claim time, so its age was "how long ago this run STARTED" - and a
+    run that died at minute 17 held the slot until minute 45 anyway. On 16 Nov that cost
+    roughly fifty minutes: the 07:48 run ended at 08:05 without releasing, the slot read
+    busy until 08:33, and the next run had to wait for 08:53 to take over.
+
+    Recording an attempt is proof of life. Touching the stamp here makes the age mean
+    "how long since this run last did anything", which is the question the next run is
+    actually asking. A dead run frees the slot 45 minutes after its last attempt instead
+    of 45 minutes after its start; a live run keeps the slot it is using.
+    """
+    try:
+        import time
+        s = json.load(open(ROUND, encoding="utf-8"))
+        s["fixer_started"] = time.time()
+        json.dump(s, open(ROUND, "w", encoding="utf-8"), indent=2)
+    except Exception:
+        pass                    # a heartbeat that fails must never lose the attempt
 
 
 def log_runline(cls, outcome, moved, total):
@@ -156,6 +180,7 @@ def add(args):
         row["reason"] = args.reason
     save(d)
     log_runline(name, outcome, args.moved, args.total)
+    heartbeat()
     print("%s: attempt %d recorded as %s%s"
           % (name, row["attempts"], outcome,
              "  (%d/%d moved)" % (args.moved, args.total) if args.moved is not None else ""))
