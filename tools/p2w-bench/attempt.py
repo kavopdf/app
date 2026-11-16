@@ -266,6 +266,13 @@ def add(args):
 
     save(d)
     log_runline(name, outcome, args.moved, args.total)
+    try:
+        import json as _jt
+        with open(os.path.join(HERE, "TIMELINE.jsonl"), "a", encoding="utf-8") as _f:
+            _f.write(_jt.dumps({"t": time.time(), "ist": ist("%H:%M:%S"), "ev": "attempt",
+                                "d": "%s -> %s" % (name, outcome)}) + "\n")
+    except Exception:
+        pass
     heartbeat()
     try:
         import json as _j

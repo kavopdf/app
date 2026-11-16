@@ -253,6 +253,12 @@ STEP 0d - THE TWO QUESTIONS, THEN NO EXCUSE  ** READ BEFORE YOU START **
 STEP 0e - READ THE HANDOFF BEFORE YOU PICK ANYTHING  ** THE ANSWER TO "WHAT WAS HAPPENING" **
 
       python3 tools/p2w-bench/handoff.py --show
+      python3 tools/p2w-bench/gaps.py --last
+
+  gaps.py reads TIMELINE.jsonl - every claim, beacon, attempt and release with an epoch float -
+  and prints every stretch of the previous run longer than five minutes, with what was being done
+  on either side of it. A gap is silence, not proof of a stop: an announced long measurement
+  explains it, and nothing does not. Report what it says.
 
   HANDOFF.md is written by the claim, by every attempt, by every agent deployed and by every
   release - so it is never more than one attempt old, about seven minutes. It answers the three
@@ -1003,7 +1009,7 @@ STEP 8 - RECORD WHAT YOU LEARNED, THEN THE ATTEMPT
   THEN COMMIT, BEFORE YOU GO BACK TO STEP 2. Every attempt commits its own files - that is what
   makes going back to STEP 2 safe, and it is what survives the platform killing you mid-attempt:
 
-      ROUND.json, RUN.json, RUN-HISTORY.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md,
+      ROUND.json, RUN.json, RUN-HISTORY.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md, TIMELINE.jsonl,
       HANDOFF.md, HANDOFF.json, benchmarks/DEFECT-CLASSES.md,
       benchmarks/RANKING.csv, benchmarks/STATE.json, benchmarks/CENSUS.csv,
       and every engine file you changed
@@ -1220,7 +1226,7 @@ STEP 9b - CHAIN THE NEXT RUN. THE PIPELINE RUNS 24/7.
           handoff.py --next "..."           what the next run should do first
       2.  round.py --release-fixer          the slot is free
       3.  COMMIT AND PUSH EVERYTHING:
-              ROUND.json, RUN.json, RUN-HISTORY.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md,
+              ROUND.json, RUN.json, RUN-HISTORY.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md, TRACE.md, TIMELINE.jsonl,
               HANDOFF.md, HANDOFF.json, benchmarks/DEFECT-CLASSES.md,
               benchmarks/RANKING.csv, benchmarks/STATE.json, benchmarks/CENSUS.csv,
               and every engine file you changed
@@ -1255,7 +1261,7 @@ STEP 9b - CHAIN THE NEXT RUN. THE PIPELINE RUNS 24/7.
       python3 tools/p2w-bench/round.py --heartbeat --doing "measuring 213 documents (ratchet)"
 
   Call it before and after a full corpus ratchet, a long soffice conversion, or any single step you
-  expect to run past ten minutes. Without it, a run that is working hard looks identical to a run
+  expect to run past FIVE minutes. Without it, a run that is working hard looks identical to a run
   that died - and the next cron takes the slot away from a run that was still using it.
 
   The --doing text is not decoration. A bare heartbeat answers "is the process up", which is not

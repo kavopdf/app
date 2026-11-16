@@ -101,6 +101,23 @@ PHASES = ["measure", "classify", "fix", "done"]
 # finishes releases the slot itself, so this governs only a run that died: 45 minutes means a
 # crash costs one slot, and a live run of up to forty-five minutes is never doubled - two runs
 # editing the engine at once would each revert the other's fix.
+def _timeline(ev, detail=""):
+    """Append one line to TIMELINE.jsonl - the record gaps.py reads.
+
+    Every event carries an epoch float, because the whole point is to measure the distance
+    between two of them. A run that stopped for five minutes in the middle and a run that
+    stopped for five at the end look the same in a claim timestamp; they do not look the same
+    here, because there is a line either side of the gap.
+    """
+    import json as _j
+    try:
+        rec = {"t": time.time(), "ist": ist("%H:%M:%S"), "ev": ev, "d": detail}
+        with open(os.path.join(HERE, "TIMELINE.jsonl"), "a", encoding="utf-8") as f:
+            f.write(_j.dumps(rec) + "\n")
+    except Exception:
+        pass
+
+
 def _run_record(action, **kw):
     """RUN.json - one record per fixer run, written by the tools, never by hand.
 
@@ -304,6 +321,7 @@ def claim(name):
     save(s)
     print("%s claimed at %s" % (name, ist("%H:%M")))
     note("claim", "%s claimed the slot" % name)
+    _timeline("claim", "%s claimed the slot" % name)
     if name == "fixer":
         # A run that was killed never closed its record. Without this, _run_record("start")
         # overwrote it and the dead run's attempts, kept count and duration vanished - so the
@@ -438,6 +456,7 @@ def release(name, force=False):
         print("fixer: releasing after %d minute(s) with %d attempt(s)" % (age, done))
     s["%s_started" % name] = 0
     save(s)
+    _timeline("release", "%s released%s" % (name, " (forced)" if force else ""))
     if name == "fixer":
         _handoff("--run-end", "forced" if force else "released")
         _run_record("end")
@@ -508,6 +527,7 @@ def main(argv):
         doing = ""
         if "--doing" in argv:
             doing = argv[argv.index("--doing") + 1]
+        _timeline("beat", doing or "(no activity given)")
         if doing:
             s2["fixer_doing"] = doing
             s2["fixer_doing_since"] = time.time()
