@@ -49,6 +49,21 @@ def save(d):
 
 def render(d):
     L = ["# HANDOFF - read this before you pick a class", ""]
+    nh = d.get("needs_human") or []
+    if nh:
+        L.append("## NEEDS A HUMAN - no future run can clear these")
+        L.append("")
+        L.append("A run tried, could not, and it was not a system limit. Every run after this one")
+        L.append("will hit the same wall until one of these is changed by a person.")
+        L.append("")
+        L.append("| # | what it is | what was tried | what must change | when |")
+        L.append("|---|---|---|---|---|")
+        for n, x in enumerate(nh):
+            L.append("| %d | %s | %s | %s | %s |" % (
+                n, (x.get("what") or "").replace("|", "/")[:90],
+                (x.get("tried") or "").replace("|", "/")[:70],
+                (x.get("change") or "").replace("|", "/")[:70], x.get("at", "")))
+        L.append("")
     L.append("Written by handoff.py on every claim, every attempt, every agent and every release.")
     L.append("It is never more than one attempt old. If the claim in ROUND.json is older than the")
     L.append("stale limit, the run that wrote this died without releasing - treat its plan as")
@@ -124,6 +139,19 @@ def main(argv):
         d["notes"].append({"at": ist(), "text": argv[argv.index("--note") + 1]})
     if "--next" in argv:
         d["next"] = argv[argv.index("--next") + 1]
+    if "--needs-human" in argv:
+        # Something the run could not clear and a human must change. It goes to the top of
+        # HANDOFF.md, above everything else, because it is the only item here that no future run
+        # can fix by itself - every run after this one will hit the same wall until a person
+        # removes it.
+        raw = argv[argv.index("--needs-human") + 1]
+        parts = [x.strip() for x in (raw.split("|") + ["", "", ""])[:3]]
+        d.setdefault("needs_human", []).append(
+            {"at": ist(), "what": parts[0], "tried": parts[1], "change": parts[2]})
+    if "--needs-human-clear" in argv:
+        n = int(argv[argv.index("--needs-human-clear") + 1])
+        if 0 <= n < len(d.get("needs_human") or []):
+            d["needs_human"].pop(n)
     if "--context" in argv:
         # The narrative. `notes` is a log of what happened; this is the picture - what is true now,
         # what was ruled out and why, and what the next run would waste time rediscovering.

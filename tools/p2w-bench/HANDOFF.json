@@ -68,5 +68,6 @@
    "plan": ""
   }
  ],
- "context": "The 232f622 fix is in the engine and measured on 30 class documents. It has never been ratcheted. Two nine-page bank forms cannot be converted by soffice inside the 290 s call limit, which is why the class measurement stalls - that is a tooling problem, not an engine one."
+ "context": "The 232f622 fix is in the engine and measured on 30 class documents. It has never been ratcheted. Two nine-page bank forms cannot be converted by soffice inside the 290 s call limit, which is why the class measurement stalls - that is a tooling problem, not an engine one.",
+ "needs_human": []
 }

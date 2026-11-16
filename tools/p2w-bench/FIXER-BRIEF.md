@@ -175,48 +175,71 @@ WHEN SOMETHING FAILS
   tools/p2w-bench/INCIDENTS.md, and continue. One skipped document with a recorded
   reason is a result; a run that died retrying is not.
 
-STEP 0d - WHEN SOMETHING BLOCKS YOU, CLEAR IT OR NAME IT  ** READ BEFORE YOU START **
+STEP 0d - THE TWO QUESTIONS, THEN NO EXCUSE  ** READ BEFORE YOU START **
 
   You will hit obstacles that are not the defect you were hired to fix: a tool that refuses a
-  class name, a library that is missing, a file another step rewrote, a command that times out,
-  a download that 403s. None of these is a reason to end the run. Clearing an obstacle is part
-  of the work, not an interruption to it.
+  class name, a library that is missing, a file another step rewrote, a command that times out, a
+  download that 403s, two rules that contradict each other.
 
-  FIRST - SOLVE IT YOURSELF, IF YOU CAN.
-    Read the error, not the symptom. If one of our own tools refuses or corrupts something, you
-    have its source - read it, find why, fix it, commit the fix separately so the next run
-    inherits it, then go back to the work you were doing and finish it. If something is missing,
-    install it. If a command timed out, find what made it slow before you retry it.
+  Before you accept any of them, answer two questions honestly - not to me, to yourself, and put
+  the answers in the report:
 
-    This is not a hypothetical. On 16 Nov the fixer found that scipy was absent, that its absence
-    forced measurement onto a 400-step dilation ladder, that the ladder made a page take 25 s
-    instead of 0.46 s, and that this - not the engine - was why soffice kept hitting the 290 s
-    limit and why a whole class could not be measured. That one diagnosis was worth more than
-    every patch it wrote that day. It found it by reading the code, not by giving up.
+    QUESTION 1   IS THIS A LIMIT OF THE SYSTEM?
+                 The 290 s per-command ceiling. No network to a host that is not on the egress
+                 list. A permission that was never granted. A platform cap on run length. These
+                 are real limits. You cannot code around them, and pretending otherwise wastes
+                 the run.
 
-  SECOND - IF YOU ARE RESTRICTED, NAME IT PRECISELY.
-    Some walls you cannot clear: no network to a host, no permission, a platform limit, a missing
-    credential. Do not fake a result and do not quietly work around it. Append one row to
-    tools/p2w-bench/BLOCKERS.md - the format is at the top of that file:
+    QUESTION 2   AM I ELIGIBLE TO CHANGE IT?
+                 Do you have the source, the access, the authority? For anything in this
+                 repository - our engine, our tools, our benchmarks, our briefs - the answer is
+                 always yes. That is what this slot is for.
+
+  IF THE ANSWER TO BOTH IS NO - it is not a system limit, and you are eligible - THEN YOU CLEAR
+  IT AND FINISH YOUR WORK. THERE IS NO THIRD OPTION AND THERE IS NO EXCUSE.
+
+    our tool refuses or corrupts something   -> read its source, find why, fix it, commit it
+    a library is missing                     -> install it, then verify it actually imported
+    a file another step rewrote              -> regenerate it, or repair it from its inputs
+    a command is too slow                    -> find what makes it slow, fix the cause
+    two rules contradict each other          -> decide which is right and fix the other
+    a measurement disagrees with the page    -> fix the instrument, then re-measure
+
+  The excuses that do not work here, and why:
+
+    "I did not have time."       There is no clock. The run ends when the system ends it.
+    "It was hard."               Hard is the job. Every class still OPEN is hard.
+    "It was not the defect."     It is between you and the defect. That makes it the defect.
+    "Someone else should."       There is no someone else. The next run starts from zero.
+    "I worked around it."        A workaround that hides a bug is the bug wearing a hat.
+
+  This is not hypothetical. On 16 Nov the fixer found scipy absent, that its absence forced
+  measurement onto a 400-step ladder, that the ladder made a page take 25 s instead of 0.46 s, and
+  that this - not the engine - was why soffice kept hitting the 290 s limit and a whole class
+  could not be measured. It also found two bugs I had written that day, in build-engine.sh and in
+  the release guard, and fixed both. None of those was a system limit. All of them were ours.
+
+  ONLY IF YOU GENUINELY CANNOT - you tried, and it still will not move - it goes in the report so
+  a human fixes it and no later run meets it. Two places, both required:
+
+      python3 tools/p2w-bench/handoff.py --needs-human "<what it is> | <what you tried> | <what must change>"
+
+  and one row in BLOCKERS.md, under '## Rows':
 
       | time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
 
-    "What I was doing" means the step and the class, not "working": the next run needs to know
-    where the wall is so it can approach from another side. "The obstacle" means the error text,
-    not a paraphrase. "What I tried" is the field that stops the next run repeating you.
+  "What I was doing" means the step and the class, not "working". "The obstacle" means the error
+  text, not a paraphrase. "What I tried" is the field that stops the next run repeating you.
+  Write both when you hit the wall, not at the end: a run that dies takes its notes with it.
 
-    Write the row when you hit the wall, not at the end. A run that dies takes its notes with it.
+  A wall you named precisely is a wall someone can remove. A wall you mentioned in passing is
+  still there tomorrow, and the run after that hits it too.
 
   THEN KEEP WORKING.
-    If the wall is on one class, take another and spend the rest of the clock. A run that ends
-    early with a good BLOCKERS row has done more than a run that hides the wall and reports
-    success - but a run that writes the row and then keeps going has done more than both.
-
-  NEVER:
-    - end the run over an obstacle you did not try to clear
-    - report a number you did not measure because a tool refused
-    - work around a tool by editing its output file by hand - that is the bug wearing a hat
-    - leave an obstacle only in your final message
+    If the wall is on one class, take another from the pending list and spend the rest of the run
+    on it. A run that writes a good row and then keeps going has done more than one that writes
+    the row and stops - but a run that clears the wall and finishes its own work has done more
+    than both.
 
 
 STEP 0e - READ THE HANDOFF BEFORE YOU PICK ANYTHING  ** THE ANSWER TO "WHAT WAS HAPPENING" **
