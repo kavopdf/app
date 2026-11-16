@@ -34,3 +34,13 @@ The revert itself is unaffected: ratchet.py FAIL on 6 documents is the decision.
 | 16 Nov 09:54 | fixer | `classify.py --attempt` refuses every problem class name (keys are retired verify_google check ids), so this run's attempt is recorded in HYPOTHESES.md and TRACE.md instead of ATTEMPTS.json. Engine reverted to clean. |
 | 16 Nov 10:26 | fixer | Running `classify.py` (to list valid ledger keys) rewrote the GHOST class file tools/p2w-bench/DEFECT-CLASSES.md with 45 retired check-id classes. Reverted to HEAD before committing. Nobody should run classify.py to read a class name. |
 | 16 Nov 10:50 | fixer | `hypothesis.py --add "content-missing-partly-replaced"` refuses the same way `classify.py --attempt` does ("is not a class"), so this run's ruled-out theory is written straight into HYPOTHESES.md and the attempt is recorded through `attempt.py`, which does accept the problem name. |
+
+## 16 Nov 11:53 fixer - release guard reports "0 minutes old" and cannot be satisfied
+
+`round.py --release-fixer` refused at 32 minutes into the run with "this run is 0 minutes old
+with 1 attempt(s) recorded". The age is measured from the last attempt heartbeat, and
+`attempt.py` writes one when it records - so any run that records an attempt and then releases
+is told it is 0 minutes old and must go back to STEP 2. The guard cannot be satisfied by
+finishing the work it asks for. Forced here, with the reason: the kept fix on
+`content-missing-nothing-in-its-place` is committed (232f622) and the remaining work - a
+full-corpus ratchet, 213 documents, about 25 minutes of soffice - does not fit the window.
