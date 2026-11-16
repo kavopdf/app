@@ -49,8 +49,8 @@ from collections import Counter, defaultdict
 def src_facts(pdf_path):
     """Per-page element counts from the source PDF."""
     import pymupdf
-    out = {"pages": 0, "chars": 0, "images": 0, "drawings": 0, "annots": 0,
-           "page_chars": {}, "page_images": {}, "page_drawings": {}}
+    out = {"pages": 0, "chars": 0, "images": 0, "images_any": 0, "drawings": 0,
+           "annots": 0, "page_chars": {}, "page_images": {}, "page_drawings": {}}
     try:
         doc = pymupdf.open(pdf_path)
     except Exception as e:
@@ -60,7 +60,18 @@ def src_facts(pdf_path):
     for i, page in enumerate(doc):
         try:
             text = page.get_text("text") or ""
+            # get_images() returns XObject images only. INLINE images - the BI ... ID ...
+            # EI operators - are not XObjects and are not returned, so a document made
+            # entirely of inline images reported src_images 0. 415_inline_images is exactly
+            # that document: the census said "source has no images, output has one", which
+            # is backwards and points the fixer at the wrong mechanism for the class named
+            # after it. get_image_info() reports what is actually DRAWN on the page,
+            # inline images included.
             n_img = len(page.get_images(full=True))
+            try:
+                n_any = len(page.get_image_info())
+            except Exception:
+                n_any = n_img
             n_draw = len(page.get_drawings())
             n_ann = 0
             try:
@@ -69,6 +80,7 @@ def src_facts(pdf_path):
                 pass
             out["chars"] += len(text)
             out["images"] += n_img
+            out["images_any"] += max(n_img, n_any)
             out["drawings"] += n_draw
             out["annots"] += n_ann
             out["page_chars"][i + 1] = len(text)
@@ -213,7 +225,7 @@ def signal_for(s, d):
     """The candidate mechanism. Conservative on purpose - see the module docstring."""
     if s.get("error") or d.get("error"):
         return "unreadable"
-    si, di = s["images"], d["images"]
+    si, di = s.get("images_any", s["images"]), d["images"]
     if si > 0 and di == 0:
         return "images-none-extracted"
     if si >= 2 and 0 < di < si * 0.5:
@@ -266,7 +278,8 @@ def main(argv):
 
     cols = ["document", "problem", "share5", "max_pt", "worst_page", "pages",
             "src_chars", "docx_chars", "src_images", "docx_images",
-            "src_drawings", "docx_tables", "docx_cells", "src_annots", "signal",
+            "src_drawings", "docx_tables", "docx_cells", "src_annots", "src_images_any",
+            "signal",
             "dx_pt", "dy_pt", "explains", "moved_gt20"]
     inst = _instrument() if a.disp_limit else None
     tmpdir = None
@@ -290,6 +303,7 @@ def main(argv):
             "pages": s.get("pages", ""),
             "src_chars": s.get("chars", ""), "docx_chars": d.get("chars", ""),
             "src_images": s.get("images", ""), "docx_images": d.get("images", ""),
+            "src_images_any": s.get("images_any", ""),
             "src_drawings": s.get("drawings", ""), "docx_tables": d.get("tables", ""),
             "docx_cells": d.get("cells", ""), "src_annots": s.get("annots", ""),
             "signal": signal_for(s, d),
