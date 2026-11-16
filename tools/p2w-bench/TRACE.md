@@ -223,3 +223,6 @@ claim and after each step; it is not code and cannot break anything.
 | 16 Nov 06:07 | baseline | claim | baseline claimed the slot |
 | 16 Nov 07:46 | classifier | claim | classifier claimed the slot |
 | 16 Nov 07:48 | fixer | claim | fixer claimed the slot |
+| 16 Nov 07:49 | fixer | build-engine | started |
+| 16 Nov 07:59 | fixer | build-engine | started |
+| 16 Nov 08:04 | fixer | commit-gate | started |

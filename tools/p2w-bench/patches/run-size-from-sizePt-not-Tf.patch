@@ -1,0 +1,81 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 17a7242..9cbd467 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -3993,7 +3993,8 @@ public final class PdfToWord {
+         p.column = 0;
+         Glyph lead = ring.get(0).glyphs.isEmpty() ? null : ring.get(0).glyphs.get(0);
+         if (!p.lines.isEmpty()) {
+-            p.runs.add(new Run(sb.toString(), false, false, ring.get(0).size,
++            p.runs.add(new Run(sb.toString(), false, false,
++                    lead == null || lead.sizePt <= 0f ? ring.get(0).size : lead.sizePt,
+                     lead == null || lead.font == null ? "" : lead.font,
+                     lead == null ? -1 : lead.color));
+         }
+@@ -5101,7 +5102,8 @@ public final class PdfToWord {
+             Glyph lead = first.glyphs.isEmpty() ? null : first.glyphs.get(0);
+             String face = (lead == null || lead.font == null) ? "" : lead.font;
+             int col = lead == null ? -1 : lead.color;
+-            p.runs.add(new Run(text, bold, italic, size, face, col));
++            p.runs.add(new Run(text, bold, italic,
++                    lead != null && lead.sizePt > 0f ? lead.sizePt : size, face, col));
+         }
+ 
+         // The same words again, line by line, carrying the page's own coordinates and each
+@@ -5232,6 +5234,22 @@ public final class PdfToWord {
+      * emitted as a single run holding {@code line.text}. Losing the styling is recoverable;
+      * losing or reordering a character is not.
+      */
++    /**
++     * The size the glyph was DRAWN at, in points.
++     *
++     * <p>{@code Glyph.size} is the raw {@code Tf} operand. A page that carries its scale in
++     * the TEXT MATRIX - a bank form drawn with {@code 1 Tf} and {@code 6 0 0 6 x y Tm} -
++     * reports 1.0 there while {@code sizePt} reports the 6.0 the reader sees. Every run
++     * built from {@code size} alone therefore rendered at 1 pt: the nine-page account
++     * opening form came out as boxes with the words missing, 4088 runs all at {@code w:sz
++     * w:val="2"}. PDFBox fills {@code sizePt} from the matrix, so prefer it, and fall back
++     * to the operand only for a font whose size the page never named.
++     */
++    private static float effPt(Glyph g) {
++        if (g == null) return 0f;
++        return g.sizePt > 0f ? g.sizePt : g.size;
++    }
++
+     private static List<Run> runsOf(Line line) {
+         List<Run> out = new ArrayList<>();
+         StringBuilder cur = new StringBuilder();
+@@ -5239,13 +5257,13 @@ public final class PdfToWord {
+         Glyph first = null, prev = null;
+         char lastOut = 0;
+         for (Glyph g : line.glyphs) {
+-            String key = g.bold + "|" + g.italic + "|" + Math.round(g.size * 4f) + "|"
++            String key = g.bold + "|" + g.italic + "|" + Math.round(effPt(g) * 4f) + "|"
+                     + g.font + "|" + g.color;
+             if (curKey == null) {
+                 curKey = key;
+                 first = g;
+             } else if (!key.equals(curKey)) {
+-                out.add(new Run(cur.toString(), first.bold, first.italic, first.size,
++                out.add(new Run(cur.toString(), first.bold, first.italic, effPt(first),
+                         first.font, first.color));
+                 cur.setLength(0);
+                 curKey = key;
+@@ -5264,7 +5282,7 @@ public final class PdfToWord {
+             prev = g;
+         }
+         if (first != null) {
+-            out.add(new Run(cur.toString(), first.bold, first.italic, first.size,
++            out.add(new Run(cur.toString(), first.bold, first.italic, effPt(first),
+                     first.font, first.color));
+         }
+         StringBuilder all = new StringBuilder();
+@@ -5275,7 +5293,7 @@ public final class PdfToWord {
+             one.add(new Run(line.text,
+                     lead != null && lead.bold,
+                     lead != null && lead.italic,
+-                    line.size,
++                    lead == null ? line.size : effPt(lead),
+                     lead == null ? "" : lead.font,
+                     lead == null ? -1 : lead.color));
+             return one;

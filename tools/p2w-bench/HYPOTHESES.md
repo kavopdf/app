@@ -170,3 +170,30 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: 20 docs, 13 Nov: 53 passes on 16 of 20 (was 0 of 20). 01_stamp: src=5 kept=0 before, src=2 kept=1 after, same Google export, only the normaliser changed. Google export of 01_stamp carries ArialMT/Calibri; source carries 'Liberation Sans Bold/Regular' and 'Liberation Serif Regular/Italic/Bold'. The 12 Nov mapping theory was ruled out by this blind instrument, not by its own result.
   recorded: 2026-11-13 09:54
 
+
+## content-missing-partly-replaced — the nine-page account-opening form class
+
+- CONFIRMED - Every Run in a text box carried the raw `Tf` operand as its point size, not the
+  size the glyph was drawn at, so a PDF that puts its scale in the TEXT MATRIX renders at 1 pt
+  evidence: 16 Nov 2026 fixer, engine (clean) + patches/run-size-from-sizePt-not-Tf.patch.
+  `041122-Account_Opening_Form` p1 content stream: `/TT0 1 Tf` with `6 0 0 6 71.3 493.7 Tm`,
+  so PDFBox reports getFontSize()=1.000 and getFontSizeInPt()=6.000 (probe, 25 glyphs, page 1).
+  The .docx carried 4088 runs ALL at `w:sz w:val="2"` (1 pt) - `halfPointsDown` floors
+  sizePt*2 with a minimum of 2 - and the LibreOffice render was boxes with no words.
+  Cause: `runsOf()` and the paragraph/ring paths built `new Run(..., first.size, ...)` from
+  `Glyph.size` = getFontSize() (raw Tf), never `Glyph.sizePt` = getFontSizeInPt(). On every
+  document where Tf carries the size the two are equal, which is why 211 synthetic documents
+  never showed it; a form PDF is exactly the shape that separates them.
+  Measured on the class's two real documents (soffice render, benchmarks/p2w.py position()):
+  `041122` pages 1-6 mean share@5 82.1 -> 18.3 (p1 40.0->9.4, p3 92.9->10.6, p4 87.1->20.4,
+  p5 97.0->15.5, p6 96.8->1.6); worst-page 98.65 -> 94.92. `Account_Opening_Form_Fillable_filled`
+  worst-page 97.62 -> 90.31, mean over 9 pages 72.5. No page of `041122` got worse.
+  NOT KEPT: the class does not pass and the full 213-document ratchet was not run in this slot,
+  so the engine is reverted and the patch is saved at
+  patches/run-size-from-sizePt-not-Tf.patch. NEXT WORK, in order:
+  (1) run the ratchet on the patch across the corpus - it touches every run in every text box;
+  (2) THE REMAINING BLOCKER IS A PAGE SPILL, and it is now the class's real cause. With the
+  text at its true 6 pt, `041122` still emits 10 pages against the source's 9 and the fillable
+  form 11: source page 7 overflows, everything after it shifts one page, and pages 7-9 read
+  74-95 %@5 purely because page i is compared against page i. Fix the spill and the same
+  documents should fall from ~90 %@5 to the pages 1-6 range. Do not re-derive the size bug.
