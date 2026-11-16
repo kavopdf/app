@@ -190,6 +190,14 @@ STEP 0d - THE TWO QUESTIONS, THEN NO EXCUSE  ** READ BEFORE YOU START **
                  are real limits. You cannot code around them, and pretending otherwise wastes
                  the run.
 
+                 ONE DISTINCTION, BECAUSE IT IS THE HOLE THIS RULE WOULD OTHERWISE HAVE.
+                 A system limit is not the same as the work behind it. The 290 s per-command
+                 ceiling is a system limit; "the nine-page bank form cannot be measured" is not -
+                 it is OUR tooling meeting that ceiling, and it is ours to fix, with a page-by-page
+                 converter or a smaller unit of work. "The sandbox is UTC" is a fact; "RUN-LOG has
+                 two clocks in it" was our bug. Naming the limit is the start of the answer, never
+                 the end of it. If the wall is a limit, the thing to fix is our side of it.
+
     QUESTION 2   AM I ELIGIBLE TO CHANGE IT?
                  Do you have the source, the access, the authority? For anything in this
                  repository - our engine, our tools, our benchmarks, our briefs - the answer is
