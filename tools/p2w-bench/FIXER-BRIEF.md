@@ -505,6 +505,34 @@ STEP 4b - THE TOOLS YOU HAVE, AND WHEN TO SPEND THEM
     Verify every claim yourself before acting on it. Subagents may not commit and may not touch the
     engine. Record each ruled-out theory in the ledger so the next attempt inherits it.
 
+STEP 4c - LOOK AT IT. A NUMBER IS NOT AN EYE.
+
+  The instrument says 89.04% of ink lands within 5px. It cannot tell you that a table's right
+  border is missing, that a stamp's text sits four millimetres from its outline, or that a
+  heading came out grey. Only looking can. The instrument's own docstring says it:
+
+      a score cannot say "the table border is what is wrong with this document" without
+      anyone opening a rendered image.
+
+  So open one. This writes, for each of the worst three documents, its worst page twice - the
+  PDF and what we produced - at 150 DPI:
+
+      python3 benchmarks/p2w.py --diagnose 3
+
+      /scratch/work/p2w/diag/<doc>__p<page>__src.png     the PDF
+      /scratch/work/p2w/diag/<doc>__p<page>__ours.png    our output
+
+  Read both with view_image and compare them yourself: borders, rules, alignment, colour,
+  anything absent, anything doubled, anything in the wrong place.
+
+  WHEN: before you form a theory, and again after you measure a patch. A patch that moves the
+  number up and looks worse is not a fix. If the images disagree with the score, say so - that
+  is a finding about the instrument, and it is worth more than the patch you were writing.
+
+  For a class whose documents are all clean at 5px but still look wrong, this is the only way
+  you will ever see the problem.
+
+
 STEP 5 - FIX IT, IN ONE COHERENT CHANGE
   app/src/main/java/com/kavopdf/app/engine/ only. Forbidden because Google Docs ignores them:
   w:framePr.
