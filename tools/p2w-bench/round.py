@@ -139,7 +139,11 @@ def _handoff(*args):
         pass
 
 
-CLAIM_STALE_MIN = {"fixer": 45, "baseline": 45, "classifier": 20}
+# The fixer window came down from 45 to 20 once round.py --heartbeat existed. Before that the
+# only heartbeat was on an attempt, so a run doing a long ratchet was indistinguishable from a
+# dead one, and the window had to cover the longest silent stretch - which also meant a dead run
+# held the slot for 45 minutes. A run that is alive now says so; a run that is not costs 20.
+CLAIM_STALE_MIN = {"fixer": 20, "baseline": 45, "classifier": 20}
 
 
 def load():
@@ -456,6 +460,27 @@ def main(argv):
         s["apk_shipped"] = v
         save(s)
         print("apk marked shipped: %s" % v)
+        return 0
+
+    if "--heartbeat" in argv:
+        # A run that is alive must be able to say so between attempts.
+        #
+        # The only heartbeat was inside attempt.py, so a run doing a twenty-five minute corpus
+        # ratchet looked exactly like a run that had died: the claim aged, and the stale check
+        # could hand the slot to someone else while the first run was still working. That is why
+        # the window had to stay at 45 minutes - long enough to cover the longest silent stretch,
+        # which meant a genuinely dead run also blocked the slot for 45.
+        #
+        # With this, a live run can refresh between attempts, the window can come down, and a
+        # dead run stops costing most of an hour.
+        s2 = load()
+        key = "fixer_started"
+        if not s2.get(key):
+            print("no fixer claim to refresh")
+            return 1
+        s2[key] = time.time()
+        save(s2)
+        print("fixer claim refreshed")
         return 0
 
     if "--claim-fixer" in argv:

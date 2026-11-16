@@ -1202,31 +1202,37 @@ STEP 9 - IS THE SLOT SPENT? CHECK BEFORE YOU RELEASE.
   Releasing the slot matters even when the run failed - otherwise the next run waits 45 minutes
   for a claim that nobody holds.
 
-STEP 9b - CHAIN THE NEXT RUN, INSTEAD OF WAITING FOR THE HOUR
+STEP 9b - CHAIN THE NEXT RUN. THE PIPELINE RUNS 24/7.
 
-  The cron fires at :45. A run that ends at 15:40 leaves forty-seven minutes on the floor before
-  15:45, and across a day that is most of the day. So after a clean release, start the next run
-  yourself:
+  The cron fires at :45. A run that ends at 15:40 leaves forty-seven minutes on the floor. So the
+  chain closes the gap: after a clean release, start the next run yourself.
 
-      python3 tools/p2w-bench/chain.py --after-release
+  THE ORDER MATTERS. Do these three things in this order, and do the trigger BEFORE you write
+  anything else:
 
-  It prints FIRE or STOP with the reason. On FIRE, trigger the cron it names:
+      1.  handoff.py --context "..."        what is true now
+          handoff.py --next "..."           what the next run should do first
+      2.  round.py --release-fixer          the slot is free
+      3.  chain.py --after-release          prints FIRE or STOP
+          on FIRE:  cron action=trigger cron_id=<the id chain.py printed>
 
-      cron action=trigger cron_id=<the id chain.py printed>
+  Trigger before the report, before any summary, before anything that could be interrupted. A run
+  that releases and then dies writing its summary has stopped the chain for up to an hour, and the
+  summary was worth less than the hour.
 
-  WHY THE BRAKE MATTERS MORE THAN THE SPEED. A job that re-fires itself with no stop condition
-  is a way to spend a night producing nothing. chain.py stops on:
+  WHY THE BRAKE STAYS. A job that re-fires itself with no stop condition is a way to spend a night
+  producing nothing. chain.py stops on a forced release, a finished round, and three runs in a row
+  with no kept and no partial attempt - three runs that fixed nothing are stuck, not unlucky. When
+  it stops, the hourly cron still fires and takes over, so nothing is lost but the hour.
 
-    * a FORCED release         something went wrong; a human should look before another run
-    * the round is finished    there is nothing to chain into
-    * three runs in a row with no kept and no partial attempt
-                               the circuit breaker. Three consecutive runs that fixed nothing
-                               are not unlucky, they are stuck, and a fourth is stuck the same
-                               way. Fix the obstacle, or let the hourly cron take over
-    * depth 24                 a chain longer than that is not a chain, it is a loop
+  KEEP THE CLAIM FRESH WHILE YOU WORK. The stale window is twenty minutes, so anything you do that
+  takes longer than that must say you are alive:
 
-  The slot guard still makes it safe: if you trigger while your own claim is still held, the new
-  run finds it busy and stands aside with 'previous fixer run still active'. Nothing stacks.
+      python3 tools/p2w-bench/round.py --heartbeat
+
+  Call it before and after a full corpus ratchet, a long soffice conversion, or any single step you
+  expect to run past ten minutes. Without it, a run that is working hard looks identical to a run
+  that died - and the next cron takes the slot away from a run that was still using it.
 
   If you are killed before you trigger, the hourly cron picks the work up. The chain is an
   accelerator, never a dependency.
