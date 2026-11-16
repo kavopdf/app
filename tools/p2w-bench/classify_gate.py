@@ -90,6 +90,30 @@ def header_count(path):
     return None
 
 
+def document_rows(md):
+    """Every per-document row in the class file: (doc, pipe_count, status_cells).
+
+    The class file is supposed to be ONE table of documents. The 16 Nov run produced
+    THREE shapes - 92 rows with 11 pipes, 122 with 9, one with 7 - and listed the two
+    bank forms twice, once in each layout. round.py counts every row that says OPEN, so
+    it reported 94 classes when there were 92 defective documents: the round-close gate
+    was counting two phantoms, and a fixer reading the file would see the same document
+    in two tables with different column meanings.
+    """
+    import re as _re
+    out = []
+    for line in md.splitlines():
+        if not _re.match(r"^\|\s*\d+\s*\|\s*`", line):
+            continue
+        m = _re.search(r"`([^`]+)`", line)
+        if not m:
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        status = [c for c in cells if c in ("OPEN", "FIXED", "PARKED")]
+        out.append((m.group(1), line.count("|"), status))
+    return out
+
+
 def main(argv):
     docs, total_rows = scored_docs()
     head = header_count(DOCX_CLASSES)
@@ -113,6 +137,34 @@ def main(argv):
             problems.append(
                 "DEFECT-CLASSES.md says the corpus is %d documents, RANKING.csv holds %d "
                 "rows - classify again" % (total, total_rows))
+
+    # ---- the file must be ONE table, one row per document ----
+    rows = document_rows(open(DOCX_CLASSES, encoding="utf-8").read()) if os.path.exists(DOCX_CLASSES) else []
+    if rows:
+        from collections import Counter
+        dup = {d: n for d, n in Counter(r[0] for r in rows).items() if n > 1}
+        if dup:
+            problems.append("%d document(s) appear more than once in the class file: %s - "
+                            "round.py counts every OPEN row, so a duplicate is a phantom "
+                            "class and the round can never close cleanly"
+                            % (len(dup), ", ".join(sorted(dup)[:5])))
+        shapes = Counter(r[1] for r in rows)
+        if len(shapes) > 1:
+            problems.append("the class file has %d different table shapes (%s pipes) - it "
+                            "must be one table with one set of columns, or a reader has to "
+                            "guess what each column means in each block"
+                            % (len(shapes), ", ".join(str(k) for k in sorted(shapes))))
+        listed = {r[0] for r in rows}
+        missing = sorted(docs - listed)
+        if missing:
+            problems.append("%d scored document(s) are not in the class file: %s"
+                            % (len(missing), ", ".join(missing[:5])))
+        extra = sorted(listed - docs)
+        if extra:
+            problems.append("%d document(s) are in the class file but were not scored: %s "
+                            "- an unmeasured document must be PARKED with a reason, not "
+                            "OPEN, or the round waits for a measurement that does not exist"
+                            % (len(extra), ", ".join(extra[:5])))
 
     ok = not problems
 
