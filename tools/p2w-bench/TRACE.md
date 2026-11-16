@@ -252,3 +252,4 @@ claim and after each step; it is not code and cannot break anything.
 | 16 Nov 13:51 | fixer | hypothesis | content-missing-partly-replaced -> confirmed |
 | 16 Nov 13:51 | fixer | attempt | content-missing-partly-replaced -> error |
 | 16 Nov 13:52 | fixer | attempt | content-missing-nothing-in-its-place -> kept (31/212 moved) |
+| 16 Nov 14:55 | fixer | claim | fixer claimed the slot |
