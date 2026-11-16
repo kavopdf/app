@@ -193,8 +193,20 @@ def add(args):
         row["last_total"] = args.total
     if args.engine:
         row["last_engine"] = args.engine
-    if args.reason:
-        row["reason"] = args.reason
+    # A STALE REASON IS A LIE IN THE LEDGER. (16 Nov)
+    #
+    # This read `if args.reason:` - so an attempt recorded without --reason inherited the
+    # previous attempt's reason and kept it. The 12:24 kept fix on
+    # content-missing-nothing-in-its-place went into ATTEMPTS.json with the reason from the
+    # 10:50 diagnosis attempt, which read "diagnosis only, no fix attempted". Anyone reading
+    # the ledger would have concluded no fix had landed, while the commit next to it held a
+    # measured 22/30 improvement. The file contradicted the code.
+    #
+    # Now every attempt records its own reason, even when that reason is empty, and the
+    # history is kept in `reasons` so an earlier note is never lost - it just stops being
+    # presented as the current one.
+    row.setdefault("reasons", []).append(args.reason or "")
+    row["reason"] = args.reason or ""
     save(d)
     log_runline(name, outcome, args.moved, args.total)
     heartbeat()
