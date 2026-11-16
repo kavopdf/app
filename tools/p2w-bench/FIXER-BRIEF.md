@@ -1250,9 +1250,27 @@ STEP 9b - CHAIN THE NEXT RUN. THE PIPELINE RUNS 24/7.
 
       python3 tools/p2w-bench/round.py --heartbeat
 
+  SAY WHAT YOU ARE DOING, NOT JUST THAT YOU ARE ALIVE:
+
+      python3 tools/p2w-bench/round.py --heartbeat --doing "measuring 213 documents (ratchet)"
+
   Call it before and after a full corpus ratchet, a long soffice conversion, or any single step you
   expect to run past ten minutes. Without it, a run that is working hard looks identical to a run
   that died - and the next cron takes the slot away from a run that was still using it.
+
+  The --doing text is not decoration. A bare heartbeat answers "is the process up", which is not
+  the question anyone asks; the question is "is work happening". A run measuring 213 documents and
+  a run wedged in a loop are both silent from outside, and only the announced activity tells them
+  apart. Write it BEFORE the long step starts, so that silence afterwards means something.
+
+  Anyone can then ask, at any moment:
+
+      python3 tools/p2w-bench/status.py
+
+  which prints WORKING, SILENT or LIKELY DEAD with the beacon age, the announced activity and its
+  duration, the attempts this run has made and the rate per hour. That last pair is the honest one:
+  an attempt costs about seven minutes, so a run ninety minutes in with two attempts is not slow,
+  it is not making attempts - and the status says so instead of leaving you to guess.
 
   If you are killed before you trigger, the hourly cron picks the work up. The chain is an
   accelerator, never a dependency.

@@ -499,8 +499,24 @@ def main(argv):
             print("no fixer claim to refresh")
             return 1
         s2[key] = time.time()
+        # WHAT IT IS DOING, NOT JUST THAT IT IS ALIVE.
+        #
+        # A heartbeat with no description answers "is the process up", which is not the question
+        # anyone asks. The question is "is work happening". A run measuring 213 documents and a run
+        # wedged in a loop look identical from a claim timestamp - both are silent, both refresh
+        # if they refresh at all. So the beacon carries the activity and when it started.
+        doing = ""
+        if "--doing" in argv:
+            doing = argv[argv.index("--doing") + 1]
+        if doing:
+            s2["fixer_doing"] = doing
+            s2["fixer_doing_since"] = time.time()
+        s2["fixer_last_beat"] = time.time()
         save(s2)
-        print("fixer claim refreshed")
+        if doing:
+            print("fixer claim refreshed - doing: %s" % doing)
+        else:
+            print("fixer claim refreshed")
         return 0
 
     if "--claim-fixer" in argv:
