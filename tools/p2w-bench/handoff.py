@@ -72,11 +72,11 @@ def render(d):
     if ag:
         L.append("## Agents deployed and not yet accounted for")
         L.append("")
-        L.append("| class | angle | question | deployed | expected | status | finding |")
-        L.append("|---|---|---|---|---|---|---|")
+        L.append("| id | class | angle | question | deployed | expected | status | finding |")
+        L.append("|---|---|---|---|---|---|---|---|")
         for a in ag:
-            L.append("| %s | %s | %s | %s | %s | %s | %s |" % (
-                a.get("class", ""), a.get("angle", ""), (a.get("question") or "").replace("|", "/")[:70],
+            L.append("| %s | %s | %s | %s | %s | %s | %s | %s |" % (
+                a.get("id", ""), a.get("class", ""), a.get("angle", ""), (a.get("question") or "").replace("|", "/")[:70],
                 a.get("deployed", ""), a.get("expected", ""), a.get("status", ""), a.get("finding", "")))
         L.append("")
         L.append("A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent")
@@ -120,7 +120,8 @@ def main(argv):
     if "--agent-add" in argv:
         raw = argv[argv.index("--agent-add") + 1]
         parts = (raw.split("|") + ["", "", "", ""])[:4]
-        d["agents"].append({"class": parts[0].strip(), "angle": parts[1].strip(),
+        d["agents"].append({"id": "%s%s" % (parts[0].strip()[:4], parts[1].strip()),
+                            "class": parts[0].strip(), "angle": parts[1].strip(),
                             "question": parts[2].strip(), "expected": parts[3].strip(),
                             "deployed": ist(), "status": "running", "finding": ""})
         d["notes"].append({"at": ist(), "text": "agent deployed: %s / %s - %s"
@@ -129,9 +130,14 @@ def main(argv):
         raw = argv[argv.index("--agent-land") + 1]
         parts = (raw.split("|") + ["", ""])[:2]
         fnd = argv[argv.index("--finding") + 1] if "--finding" in argv else ""
+        # Match by id first, then class+angle. Two agents on the same class and angle used to be
+        # ambiguous: the first running one was marked landed whichever had actually returned.
+        target = raw.strip()
         for a in d["agents"]:
-            if a.get("class") == parts[0].strip() and a.get("angle") == parts[1].strip() \
-               and a.get("status") == "running":
+            if a.get("status") != "running":
+                continue
+            if a.get("id") == target or (a.get("class") == parts[0].strip()
+                                         and a.get("angle") == parts[1].strip()):
                 a["status"] = "landed"
                 a["finding"] = fnd
                 d["notes"].append({"at": ist(), "text": "agent landed: %s / %s -> %s"

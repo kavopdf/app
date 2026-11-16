@@ -604,6 +604,12 @@ STEP 4b - THE TOOLS YOU HAVE, AND WHEN TO SPEND THEM
     If the file never appears, leave it as 'running' - the next run will see an agent that was
     deployed and never reported, which is itself information.
 
+    DO NOT LOOP ON ONE CLASS IN ONE RUN. There is no clock, so the only thing that could hold
+    this slot for ever is the same class failing the same way again and again. Three consecutive
+    'error' outcomes on one class inside a single run is the signal: switch class. The theory is
+    in HYPOTHESES.md and the tries are in ATTEMPTS.json, so nothing is lost by leaving it - and the
+    next run inherits both. This is not a cap on the run; it is a cap on repeating yourself.
+
     THREE FINDINGS AND NO FIX IS STILL PROGRESS. Three paths are closed. Record them and move on.
 
 STEP 4c - LOOK AT IT. A NUMBER IS NOT AN EYE.

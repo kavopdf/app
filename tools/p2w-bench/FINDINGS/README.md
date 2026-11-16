@@ -13,7 +13,7 @@ from the question.
 
 ## The file
 
-`tools/p2w-bench/FINDINGS/<class>-<angle>-<HHMM>.md`
+`tools/p2w-bench/FINDINGS/<class>-<angle>-<HHMMSS>-<4 hex>.md`
 
 ```
 # content-missing-nothing-in-its-place / A - the engine code path
@@ -39,6 +39,19 @@ Confidence: medium. The asymmetry with line 1902 is real; whether it is the caus
 Ruled out: the font-substitution path (checked, 415 uses an embedded face).
 Status: complete
 ```
+
+## Filename
+
+`<class>-<angle>-<HHMMSS>-<4 hex>` - the seconds and the random suffix are there because two
+agents on the same class and angle can finish in the same minute, and one would have overwritten
+the other. Never reuse a name; never append to a file that is not yours.
+
+## If your commit is rejected
+
+Three agents and the fixer all commit to the same branch. If your commit comes back rejected or
+non-fast-forward, retry once. If it fails again, re-read the file at that path - someone else may
+have just written it - and commit yours under a new name with a different suffix. Never drop a
+finding because the commit raced.
 
 ## Rules
 

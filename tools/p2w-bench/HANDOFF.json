@@ -1,0 +1,13 @@
+{
+ "plan": "",
+ "notes": [
+  {
+   "at": "13:08",
+   "text": "seeded by the agent: the 232f622 ratchet is the open item carried into this run"
+  }
+ ],
+ "next": "Run the full 213-document ratchet on commit 232f622 (per-row tcBorders). It was measured on 30 class documents + 12 controls: 22/30 moved, 0/12 controls worse, mobile-bill 18.48 -> 1.55. It has never been measured at corpus scale, so 180 documents are unproven. Until that ratchet passes, the pipeline has a fix it cannot vouch for. This is ahead of any new class.",
+ "agents": [],
+ "run": {},
+ "history": []
+}

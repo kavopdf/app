@@ -206,7 +206,7 @@ def add(args):
     # history is kept in `reasons` so an earlier note is never lost - it just stops being
     # presented as the current one.
     row.setdefault("reasons", []).append(args.reason or "")
-    row["reason"] = args.reason or ""
+    row["reason"] = args.reason or "(no reason recorded for this attempt)"
     save(d)
     log_runline(name, outcome, args.moved, args.total)
     heartbeat()
