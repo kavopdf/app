@@ -47,6 +47,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
 LEDGER = os.path.join(HERE, "ATTEMPTS.json")
+RUNLOG = os.path.join(HERE, "RUN-LOG.md")
 CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
 CLASSES_TXT = os.path.join(HERE, "DEFECT-CLASSES-TXT.md")
 
@@ -96,6 +97,24 @@ def save(d):
         json.dump(d, f, indent=1, sort_keys=True)
 
 
+def log_runline(cls, outcome, moved, total):
+    """Append the attempt to RUN-LOG.md as well as the ledger.
+
+    The ledger is the durable record and it is what the next run reads, but it is a JSON
+    blob keyed by class. Someone reading RUN-LOG.md - the chronological log - would have
+    seen only "slot claimed" for the 16 Nov fixer run and concluded it did nothing, while
+    ATTEMPTS.json held a full attempt with its reason. Two records, one of them blind.
+    """
+    import time
+    try:
+        stamp = time.strftime("%d %b %H:%M")
+        tail = "" if moved is None else " (%s/%s moved)" % (moved, total or "?")
+        with open(RUNLOG, "a", encoding="utf-8") as f:
+            f.write("| %s | fixer | attempt %s -> %s%s |\n" % (stamp, cls, outcome, tail))
+    except Exception:
+        pass                      # a log that cannot be written must not lose the attempt
+
+
 def compute(moved, total):
     """kept / reverted from the numbers. None when there are no numbers to read."""
     if moved is None or not total:
@@ -136,6 +155,7 @@ def add(args):
     if args.reason:
         row["reason"] = args.reason
     save(d)
+    log_runline(name, outcome, args.moved, args.total)
     print("%s: attempt %d recorded as %s%s"
           % (name, row["attempts"], outcome,
              "  (%d/%d moved)" % (args.moved, args.total) if args.moved is not None else ""))

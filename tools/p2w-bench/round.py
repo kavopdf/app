@@ -257,10 +257,23 @@ def claim(name):
         print("%s busy - previous run started %d min ago (stale after %d min)"
               % (name, age_min, limit))
         return 1
+    had_stale = bool(s.get(key))
     s[key] = time.time()
     save(s)
     print("%s claimed at %s" % (name, ist("%H:%M")))
     note("claim", "%s claimed the slot" % name)
+    # A stale claim means the previous run ended WITHOUT releasing. That is a real failure -
+    # on 16 Nov the fixer finished at 08:05 and left its slot held - and it used to be
+    # silent: the next run simply took over and nobody could see a run had ended untidily.
+    #
+    # This note MUST come after the timestamp above. trace.who() attributes a line to the
+    # cron whose slot is newest, and a stale slot is by definition the oldest - written
+    # before the refresh, the note was credited to whichever OTHER cron had run most
+    # recently. Tested: it said "classifier" for a fixer slot.
+    if had_stale:
+        note("stale-claim",
+             "%s slot was stale (%.0f min) - the previous run ended without releasing it"
+             % (name, age_min))
 
     # The claim leaves its own line in RUN-LOG.md, written by the tool rather than by the
     # run. "Commit ROUND.json immediately" is an instruction, and an instruction is a
