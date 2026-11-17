@@ -560,6 +560,51 @@ def docx(end):
     env='JAVA_HOME='+JH+' PATH='+JH+'/bin:$PATH JAVA_TOOL_OPTIONS="-XX:CompressedClassSpaceSize=64m -XX:MaxMetaspaceSize=200m"'
     sh('cd '+E+' && '+env+' java -Xmx700m -cp "'+cp+'" ConvertAll '+CORPUS+' '+DOCX,min(max(60,int(end-time.time())),280))
     return len(glob.glob(DOCX+"/*.docx"))
+def _engine_stamp():
+    """The engine commit this measurement belongs to, or 'unknown'."""
+    try:
+        return subprocess.run(["git", "-C", REPO, "log", "-1", "--format=%h", "--",
+                               "app/src/main/java/com/kavopdf/app/engine/"],
+                              capture_output=True, text=True, timeout=30).stdout.strip() or "unknown"
+    except Exception:
+        return "unknown"
+
+
+def _invalidate_if_engine_changed():
+    """Throw the .docx and the measurements away when the engine is not the one they came from.
+
+    THE CACHE NEVER KNEW WHICH ENGINE IT BELONGED TO, AND THAT IS WHY THE RANKING NEVER MOVED.
+
+    docx() skips a document whose .docx already exists, and run() skips one whose DIST json
+    already exists. Both caches survive a change to the engine, so a run that measured an old
+    engine keeps reporting that engine's numbers for ever. Measured 17 Nov: the engine was restored
+    to ead0d0e at f6ab687 and the baseline cron ran at 21:01, reported 'succeeded', and left
+    RANKING.csv exactly as it was - 360_restaurant_menu still 41.13 where the restored engine
+    produces 34.43. The run was honest; the cache was stale. Every measurement since 11:20 was
+    a measurement of the engine from 11:20.
+
+    The stamp is the engine commit. If it differs from the one the cache was built with, the .docx
+    and the per-document measurements are not evidence about this engine and are removed.
+    """
+    stamp_path = os.path.join(ROOT, "ENGINE-STAMP")
+    now = _engine_stamp()
+    try:
+        was = open(stamp_path, encoding="utf-8").read().strip()
+    except Exception:
+        was = ""
+    if was and was != now:
+        log(f"engine changed {was} -> {now} - discarding docx and measurements built on {was}")
+        for d in (DOCX, DIST, PRE):
+            sh(f"rm -rf {d}", 120)
+        os.makedirs(DOCX, exist_ok=True)
+    try:
+        os.makedirs(ROOT, exist_ok=True)
+        open(stamp_path, "w", encoding="utf-8").write(now)
+    except Exception:
+        pass
+    return now
+
+
 def run(end):
     """Measure, one chunk at a time, so a run always makes progress.
 
@@ -712,6 +757,7 @@ def main():
     log("instrument: " + INSTRUMENT_MODE + (" (exact EDT)" if INSTRUMENT_MODE == "scipy"
         else " (dilation ladder - exact but ~10x slower)"))
     if not validate(): log("ABORT: gate"); return 3
+    _invalidate_if_engine_changed()
     if corpus()<100: log("ABORT: corpus"); return 2
     if not engine(): log("ABORT: engine"); return 2
     docx(end); run(end); r=rank(); status()
