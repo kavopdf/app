@@ -1,1 +1,4 @@
 {"t": 1794887491.4851723, "ist": "09:21:31", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1794889936.2481709, "ist": "10:02:16", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1794889936.4500349, "ist": "10:02:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794889938.4110863, "ist": "10:02:18", "ev": "beat", "d": "claimed, reading the handoff"}
