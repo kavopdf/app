@@ -276,6 +276,38 @@ def add(args):
             "%d attempts without converging (ceiling %d)" % (row["attempts"], MAX_ATTEMPTS))
         print("PARKED: %s after %d attempts - it will not be attempted again this round"
               % (name, row["attempts"]))
+
+        # A PARKED CLASS MUST ALSO LEAVE THE CLASS FILE, OR THE ROUND CAN NEVER CLOSE.
+        #
+        # round.py --close-round refuses while any row says OPEN, and it reads
+        # benchmarks/DEFECT-CLASSES.md - not this ledger. Parking used to write only here, so a class
+        # the fixer had given up on stayed OPEN in the file for ever and the round waited on work
+        # nobody would ever do. Measured 17 Nov: 70 rows OPEN, 0 rows PARKED, and nothing anywhere
+        # able to write the word. Round 1 could not have closed however long the fixer ran, and
+        # rounds 2 and 3 begin only when round 1 closes.
+        #
+        # So the park is written where the gate reads it. Only rows of THIS class, and only rows
+        # still OPEN - a document already FIXED is not un-fixed by its class being abandoned.
+        try:
+            cf = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
+            if os.path.exists(cf):
+                out, moved = [], 0
+                for line in open(cf, encoding="utf-8").read().split("\n"):
+                    if line.startswith("| "):
+                        cells = [c for c in line.strip().strip("|").split("|")]
+                        if (len(cells) >= 8
+                                and cells[2].strip().strip("`") == name
+                                and cells[6].strip() == "OPEN"):
+                            cells[6] = " PARKED "
+                            line = "|" + "|".join(cells) + "|"
+                            moved += 1
+                    out.append(line)
+                if moved:
+                    open(cf, "w", encoding="utf-8").write("\n".join(out))
+                    print("class file: %d document(s) of %s marked PARKED" % (moved, name))
+        except Exception as exc:
+            print("warning: could not mark the class file PARKED - %s: %s"
+                  % (type(exc).__name__, exc))
         try:
             hp = os.path.join(HERE, "HANDOFF.json")
             h = json.load(open(hp, encoding="utf-8"))
