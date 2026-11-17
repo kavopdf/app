@@ -455,6 +455,21 @@ def release(name, force=False):
             return 1
         print("fixer: releasing after %d minute(s) with %d attempt(s)" % (age, done))
     s["%s_started" % name] = 0
+    # CLEAR THE BEACON WITH THE CLAIM, or the next reader is told a lie.
+    #
+    # --heartbeat stores what the run said it was doing in fixer_doing / fixer_doing_since, and
+    # status.py reads those two fields to answer "what is happening". Release cleared the claim and
+    # left the beacon, so after a release status.py printed:
+    #
+    #     verdict : IDLE        (correct - the slot is free)
+    #     doing   : "claimed, gathering work" for 124 min
+    #
+    # Both lines were read off the same screen and they contradicted each other. That stale line is
+    # what made the pipeline look busy while it was idle, and it is why a run was repeatedly judged
+    # working when the slot was free and nothing was happening. A released slot has no activity to
+    # describe, so it says nothing.
+    s.pop("%s_doing" % name, None)
+    s.pop("%s_doing_since" % name, None)
     save(s)
     _timeline("release", "%s released%s" % (name, " (forced)" if force else ""))
     if name == "fixer":
