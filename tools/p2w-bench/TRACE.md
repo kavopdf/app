@@ -351,3 +351,4 @@ claim and after each step; it is not code and cannot break anything.
 | 17 Nov 19:31 | fixer | attempt | content-missing-partly-replaced -> partial (1/3 moved) |
 | 17 Nov 19:35 | fixer | attempt | content-missing-partly-replaced -> kept (3/3 moved) |
 | 17 Nov 23:02 | baseline | claim | baseline claimed the slot |
+| 17 Nov 23:43 | classifier | claim | classifier claimed the slot |
