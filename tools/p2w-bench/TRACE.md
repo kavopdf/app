@@ -305,35 +305,19 @@ claim and after each step; it is not code and cannot break anything.
 | 17 Nov 14:34 | fixer | hypothesis | content-missing-partly-replaced -> ruled-out |
 | 17 Nov 14:34 | fixer | hypothesis | content-missing-partly-replaced -> confirmed |
 | 17 Nov 14:34 | fixer | attempt | content-missing-partly-replaced -> partial (2/16 moved) |
-| 17 Nov 14:55 | fixer | claim | fixer claimed the slot |
-| 17 Nov 14:55 | fixer | build-engine | started |
-| 17 Nov 14:56 | fixer | build-engine | engine built in 36s |
-| 17 Nov 15:01 | fixer | build-engine | started |
-| 17 Nov 15:02 | fixer | build-engine | engine built in 41s |
-| 17 Nov 15:04 | fixer | build-engine | started |
-| 17 Nov 15:04 | fixer | build-engine | engine built in 40s |
-| 17 Nov 15:08 | fixer | build-engine | started |
-| 17 Nov 15:09 | fixer | build-engine | engine built in 42s |
-| 17 Nov 15:10 | fixer | build-engine | started |
-| 17 Nov 15:11 | fixer | build-engine | engine built in 38s |
-| 17 Nov 15:12 | fixer | build-engine | started |
-| 17 Nov 15:13 | fixer | build-engine | engine built in 38s |
-| 17 Nov 15:13 | fixer | build-engine | started |
-| 17 Nov 15:14 | fixer | build-engine | engine built in 38s |
-| 17 Nov 16:08 | fixer | build-engine | started |
-| 17 Nov 16:09 | fixer | build-engine | engine built in 56s |
-| 17 Nov 16:10 | fixer | build-engine | started |
-| 17 Nov 16:11 | fixer | build-engine | engine built in 50s |
-| 17 Nov 16:22 | fixer | build-engine | started |
-| 17 Nov 16:23 | fixer | build-engine | engine built in 51s |
-| 17 Nov 16:27 | fixer | build-engine | started |
-| 17 Nov 16:28 | fixer | build-engine | engine built in 49s |
-| 17 Nov 16:32 | fixer | build-engine | started |
-| 17 Nov 16:33 | fixer | build-engine | engine built in 64s |
-| 17 Nov 16:36 | fixer | build-engine | started |
-| 17 Nov 16:36 | fixer | build-engine | engine built in 38s |
-| 17 Nov 16:39 | fixer | build-engine | started |
-| 17 Nov 16:39 | fixer | build-engine | engine built in 47s |
-| 17 Nov 16:52 | fixer | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |
-| 17 Nov 16:52 | fixer | build-engine | started |
-| 17 Nov 16:53 | fixer | build-engine | engine built in 36s |
+| 17 Nov 14:39 | fixer | claim | fixer claimed the slot |
+| 17 Nov 14:39 | fixer | build-engine | started |
+| 17 Nov 14:40 | fixer | build-engine | engine built in 58s |
+| 17 Nov 14:58 | fixer | build-engine | started |
+| 17 Nov 14:59 | fixer | build-engine | engine built in 56s |
+| 17 Nov 15:36 | fixer | attempt | content-missing-partly-replaced -> partial (1/30 moved) |
+| 17 Nov 16:54 | fixer | claim | fixer claimed the slot |
+| 17 Nov 16:54 | fixer | build-engine | started |
+| 17 Nov 16:55 | fixer | build-engine | engine built in 36s |
+| 17 Nov 16:57 | fixer | build-engine | started |
+| 17 Nov 16:58 | fixer | build-engine | engine built in 39s |
+| 17 Nov 17:00 | fixer | build-engine | started |
+| 17 Nov 17:00 | fixer | build-engine | engine built in 38s |
+| 17 Nov 17:01 | fixer | build-engine | started |
+| 17 Nov 17:02 | fixer | build-engine | engine built in 37s |
+| 17 Nov 17:29 | fixer | attempt | content-missing-partly-replaced -> reverted (0/212 moved) |

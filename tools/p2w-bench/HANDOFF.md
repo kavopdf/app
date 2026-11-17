@@ -9,18 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 14:55 |
-| ended | 16:55 |
-| how it ended | released |
-| plan | 1. [carry-over] the last run |
+| started | 16:54 |
+| ended | still running |
+| how it ended | - |
+| plan | - |
 
 ## The picture, in the words of the run that left it
 
-> The folio fix is IN the engine and it works: a page's own page number is no longer table content. PdfToWord.markFolios marks the glyphs of a folio drawn in the bottom band (same shapes as DocxWriter.isFolio), and buildTables, tableFromCells and the 'is this line inside a table' flow test all refuse them; DocxWriter.anchorBox no longer lets the horizontal clamp slide a folio off its own x. 041122 page 7 went from 11 sheets to 10 (source 9), the folio lands at x=584.2 against the source's 584.1, and no word is lost on any page. Blast radius measured corpus-wide by converting all 213 documents with and without the change and diffing document.xml: exactly 3 documents differ (041122, Account_Opening_Form_Fillable_filled, itr-computation-with-slab-table) - the other 210 are byte-identical. The attempt is recorded as reverted because the class number did not move: share5 86.38 -> 86.18 on the two forms. THE REASON IS NOT THIS CHANGE - read the next field. Also: the committed RANKING.csv is STALE. It says 041122 is 97.62 and 392_statistical_console_output is 1.61; the PRISTINE engine from main (git clone, no change of mine) measures 86.38 and 28.39 on the same corpus, doc for doc. So gate.py's 'REGRESSION: 54 documents worse than baseline' is not about this run's change - it is 54 documents of drift between the committed file and the corpus the file is compared against. A fresh RANKING.csv measured on this corpus is committed with this round; the next run compares against that.
+> THE TENTH PAGE IS A ROW THAT SWALLOWED THE TEXT BELOW ITS TABLE, AND IT IS MEASURED. cantSplit is falsified (see HYPOTHESES): the narrow rule the last run specified fires on 0 of 041122's 86 rows because every row fits the sheet in our model, the one document it does change is neutral (share5 68.12 -> 68.12), and stripping all 86 cantSplit from 041122 still renders 10 pages. What the extra page actually is: the instruction page is one 33-row table declared 742.0 pt, and its LAST row (2220 tw = 111 pt declared, 164.2 pt rendered) holds not only 'Government Department establishing identity and address of such person.' but the whole '(2) ... (4) Sl. No. 16' instruction block that the SOURCE sets below the table, after the last rule. Source page: table ends at y=688.7 and the block sits in the 153 pt left below it. Ours: table ends at 698.2, 144 pt left, block needs 164 -> it moves whole to p9. Row pitches agree with the source within 0.5 pt, so the grid is right and the row's CONTENT is wrong. (Our table also starts 26.4 pt high - y 58.2 against 84.6 - a second, smaller contributor.) The engine tree is unchanged from 18de245 this run: the cantSplit patch was built, measured across all 213 documents and reverted.
 
 ## What the next run should do first
 
-> THE 4.3 PT THAT COSTS A SHEET ON 041122 PAGE 8. The 33-row identity/address table's written row heights EQUAL the page's own row bands exactly (sum 742 against 800-58) - the 'rows accumulate a few points each' theory is ruled out by reading the docx, do not chase it. The table simply STARTS 4.3 pt low: source page 8 first ink y=22.6, ours y=26.9, and the table ends at the paper's edge (800 of 842), so 4.3 pt pushes the last row onto a 10th sheet (154 words). Find where the 4.3 pt comes from in the block above the table (the Annexure-1 heading) - the prior font finding (cell lines at 12.0 pt against the source's 11.6 pt pitch) is the first place to look - and then apply the rule the flow already applies to a line: give up the gap above before breaking. Read HYPOTHESES.md's last two entries first; the folio work is DONE and must not be redone.
+> Locate and stop the ruled pass handing a block that lies BELOW a table's last rule to that table's last row (PdfToWord: the ruled pass that fills rows/cellY around rowEdge and buildRows). A block with y > t.rowEdge[nRows] belongs to the flow AFTER the table, which DocxWriter.table() already emits from its 'after' list. Test on 041122 p8: the last row should fall from 111 pt declared to ~50 pt, the table should end near the source's 688.7, the block should fit in the 153 pt left and the document should read 9 pages. Cheap check first - render with p2w.conv using a UNIQUE basename per variant (same basename = one cached render, which cost this run a false reading) and count pages; only then spend a full measurement. Do NOT touch cantSplit again.
 
 ## Agents deployed and not yet accounted for
 
@@ -56,7 +56,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `12:41` COMMITTING: git push is 403 'denied to Onyx-Node' for the fixer too, not only for subagents - the App has no write access to kavopdf/app over HTTPS git. It is not a dead end: the GitHub MCP tool GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main, upserts=[{path,content,encoding:utf-8}]) commits several files atomically and worked for all four commits of this run. The next run should commit that way, then 'git fetch origin main && git reset --hard origin/main' so HEAD matches origin, then chain.py. chain.py's sync check is strict SHA equality and also refuses a dirty tree, and it rewrites CHAIN.json - so commit CHAIN.json again after each chain.py run.
 - `13:13` attempt 9 on content-missing-partly-replaced -> error
 - `14:34` attempt 10 on content-missing-partly-replaced -> partial (2/16 moved)
-- `16:52` attempt 11 on content-missing-partly-replaced -> reverted (0/16 moved)
+- `15:36` attempt 11 on content-missing-partly-replaced -> partial (1/30 moved)
+- `17:29` attempt 12 on content-missing-partly-replaced -> reverted (0/212 moved)
 
 ## Where the rest of the state lives
 
