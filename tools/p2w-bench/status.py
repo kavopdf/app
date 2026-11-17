@@ -58,9 +58,14 @@ def collect():
     # that had been going twenty-five minutes while reporting every two was called dead.
     if not started:
         verdict, why = "IDLE", "no fixer claim - the slot is free"
-    elif silent is not None and silent >= SLOW_MIN:
-        verdict, why = "LIKELY DEAD", ("no beacon for %.0f min, past the %d-min stale window - the "
-                                       "next run will take it over" % (silent, SLOW_MIN))
+    elif claim_age is not None and claim_age >= SLOW_MIN:
+        # THE CLAIM IS THE AUTHORITY. It is refreshed only by the run itself - round.py --heartbeat
+        # and attempt.py - so its age is "how long since the run last spoke for itself". Beacons
+        # from a reading tool are not the run speaking, and judging liveness by them let an
+        # observer's own calls make a blocked run look alive.
+        verdict, why = "LIKELY DEAD", ("the run has not refreshed its claim for %.0f min, past the "
+                                       "%d-min stale window - the next run will take it over"
+                                       % (claim_age, SLOW_MIN))
     elif silent is not None and silent >= WORKING_MIN:
         verdict, why = "SILENT", ("no beacon for %.0f min. Either it is inside one long step it "
                                   "did not announce, or it has wedged" % silent)

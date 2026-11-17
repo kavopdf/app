@@ -38,15 +38,12 @@ def beat(tool, what=""):
             f.write(json.dumps(rec) + "\n")
     except Exception:
         pass
-    # and refresh the claim, so the stale check sees a live run rather than a dead one
-    try:
-        s = json.load(open(ROUND, encoding="utf-8"))
-        if s.get("fixer_started"):
-            s["fixer_started"] = time.time()
-            s["fixer_last_beat"] = time.time()
-            if what:
-                s["fixer_doing"] = what
-                s["fixer_doing_since"] = time.time()
-            json.dump(s, open(ROUND, "w", encoding="utf-8"), indent=1)
-    except Exception:
-        pass
+    # A BEACON MUST NOT REFRESH THE CLAIM. Found by doing it to myself: during a verification pass
+    # on 17 Nov I ran pending, report, classrow, gaps, handoff and chain in a row, and each one
+    # refreshed the claim of a run that had been blocked for thirty-three minutes. status.py then
+    # reported WORKING with the claim zero minutes old - a dead run made to look alive by an
+    # observer. Anyone running these tools would do the same, and so would the watchdog.
+    #
+    # Only the run itself may hold the slot, so only the run may refresh it: round.py --heartbeat
+    # and attempt.py do that, because they are called by the run about its own work. A tool that
+    # merely reads state must not write the one field the stale check depends on.
