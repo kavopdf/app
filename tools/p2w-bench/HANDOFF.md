@@ -9,18 +9,14 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 18:17 |
+| started | 18:56 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> THREE BUILDS, THE MECHANISM IS NOW BOUNDED AND ITS FAILURE MODE IS LOCATED: THE WIDTH. Build 1 (Helvetica advances everywhere, inset-overflow correction, row = max(declared, lines x rowLineTw) in w:trHeight atLeast, charged before writtenRowsTw): 42 of 213 documents change, 0 docx page-break moves, and price-list-right-aligned-amounts goes 1.79 -> 81.15 with 1 -> 2 pages. Build 2 (4 % tolerance for the Helvetica/DejaVu gap): 41 of 213; the price list drops 38 -> 16 changed rows but every one still reads 312 -> 440 tw, exactly 2 x its 220 tw row line, so the excess is structural and not metric drift. Build 3 came from READING ROW 0 of that table instead of rebuilding blind: its cells are Times New Roman (digits 0.500 em) and Courier New, and the charge was measuring Helvetica (0.556 em, 11 % wide) - so advanceEm now picks TIMES/COURIER/HELVETICA from the cell's own face. That build is the right shape: 12 of 213 documents change and on 041122 exactly ONE row moves, row 77, 2220 -> 3000 tw, which IS the instruction cell the handoff describes. It still must not be kept: measured, price-list-right-aligned-amounts 1.79 -> 32.54 and 77_arabic_rtl_document 17.14 -> 58.55. THE DIAGNOSIS: w:ind is written from insetTw AFTER the textOverflows correction, so the renderer is handed a width the text fits; a charge computed against anything narrower invents a wrap the renderer never draws, and each invented line is 3.5 pt of drift down the table (16 rows x 3.5 = the 56 pt that lands the figures 56 pt out). THE NEXT MOVE IS ONE LINE OF ARITHMETIC, not a fourth build: charge against (emitted w:tcW - emitted w:ind) from the same <w:tc>, and only beyond the row's own slack. On the price list that width is the drawn text + 20 tw, so the charge is 1 line and the document is untouched; on 041122 it still fires on the 9-paragraph cell. All three patches are committed: patches/wrap-charge-helvetica.patch (apply with git apply --include='*DocxWriter.java', it carries state-file hunks too), patches/wrap-charge-gated-1.04.patch, patches/wrap-charge-face-aware.patch. Engine at HEAD, nothing carried. OPERATIONAL, paid for this run: the whole corpus converts in 81-90 s in one JVM (ConvertAll, 213 files, 0 failed) so a corpus diff is two calls; p2w.measure_doc is 25-60 s a document, so measure the top movers only - never the whole changed set; scipy must be pip-installed every run; 041122's charged builds will not render inside a 280 s soffice call.
-
-## What the next run should do first
-
-> Charge the wrap against the width the renderer is GIVEN: in wrappedRowLines, compute avail as the emitted cell width minus the emitted indent (the same spanTw and the same post-textOverflows insetTw the cell writer writes into w:tcW and w:ind), and only charge ceil(wTw/avail) when wTw beats avail by more than the row's own slack. Apply patches/wrap-charge-face-aware.patch as the base (12 of 213, one row on 041122). Then re-convert all 213 and diff against outA before measuring: the count must fall below 12 and price-list-right-aligned-amounts must leave the list entirely. Only then measure price-list-right-aligned-amounts and 77_arabic_rtl_document both ways - they are the two documents that decided against builds 1-3.
+> THE SPILL WAS THE CARRY'S CEILING, NOT A ROW HEIGHT. The carry-over asked for a fourth wrap-charge build (page-layout this time); this run measured that on 041122 the row does not need to be taller - it needs the renderer to wrap it the way the page did, and the mechanism for that (ARIAL_W, w:w) was already in the engine and silently not clamping on merged cells. carryScalePct was given colTw[c], the FIRST grid column under the cell, so on a cell merged over six columns the width was negative, the clamp was skipped, and the scale went out at the page's drawn ratio 97 % where the cell allows 92. Four of the page's nine instruction lines wrapped into two, the row rendered 154 pt where the page drew 118, and it no longer fitted the 158 pt the page had left. Fix is one token (spanTw - pInset). Corpus diff: 3 of 213 .docx change, 210 byte-identical, all 3 measured: 373_leave_application_form 5.46 -> 4.64, 041122 11 -> 10 pages, Account_Opening_Form_Fillable_filled 11 -> 10 pages, 0 worse. THE CLASS DOES NOT MOVE YET because the last spurious page of both form documents is a FOLIO WRITTEN AS A TABLE ROW (the declaration table's last row is the bare text '7'), which costs its own sheet and shifts every page after it - our page 8 reads share@5 99.02 with text_recall 0.04. The flow-line folio rule exists and names this document but cannot fire on a table row. THE ONE THING THE NEXT RUN SHOULD DO: make that row a position - detect it before the row loop, skip it, take the last-row bookkeeping from row-1, emit the text after </w:tbl> via anchor(sb, ctx, x, yTop, w, h, inner), which needs only a hand-built paragraph string. w:framePr does NOT work as the cheap route (anchored to the page at y 16104 tw it rendered at y 218 pt). That one change should take both form documents from 10 pages to the source's 9 and is what moves the class.
 
 ## Agents deployed and not yet accounted for
 
@@ -36,8 +32,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `13:08` seeded by the agent: the 232f622 ratchet is the open item carried into this run
-- `13:51` attempt 5 on content-missing-partly-replaced -> error
 - `13:52` attempt 3 on content-missing-nothing-in-its-place -> kept (31/212 moved)
 - `13:52` agent deployed: content-missing-partly-replaced / A - which code path decides the height of a block emitted from a PDF text box, and w
 - `13:52` agent landed: content-missing-partly-replaced / A -> FINDINGS/content-missing-partly-replaced-A-1305.md
@@ -58,8 +52,11 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:34` attempt 10 on content-missing-partly-replaced -> partial (2/16 moved)
 - `15:36` attempt 11 on content-missing-partly-replaced -> partial (1/30 moved)
 - `17:32` attempt 12 on content-missing-partly-replaced -> reverted (0/4 moved)
-- `18:50` attempt 13 on content-missing-partly-replaced -> reverted (0/16 moved)
-- `19:05` attempt 14 on content-missing-partly-replaced -> reverted (0/16 moved)
+- `18:22` attempt 13 on content-missing-partly-replaced -> reverted (0/16 moved)
+- `18:34` attempt 14 on content-missing-partly-replaced -> reverted (0/16 moved)
+- `18:45` attempt 15 on content-missing-partly-replaced -> reverted (0/16 moved)
+- `19:31` attempt 16 on content-missing-partly-replaced -> partial (1/3 moved)
+- `19:35` attempt 17 on content-missing-partly-replaced -> kept (3/3 moved)
 
 ## Where the rest of the state lives
 

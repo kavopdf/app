@@ -111,27 +111,54 @@
 {"t": 1794917075.2205272, "ist": "17:34:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1794917081.3682652, "ist": "17:34:41", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1794917117.5161273, "ist": "17:35:17", "ev": "beat", "d": "chain.py: deciding whether to chain"}
-{"t": 1794919622.6458197, "ist": "18:17:02", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1794919622.8348837, "ist": "18:17:02", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794919623.2288015, "ist": "18:17:03", "ev": "beat", "d": "claimed, gathering work"}
-{"t": 1794919623.4391725, "ist": "18:17:03", "ev": "beat", "d": "archive.py: housekeeping"}
-{"t": 1794919623.6080592, "ist": "18:17:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794919623.733621, "ist": "18:17:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1794919623.8641605, "ist": "18:17:03", "ev": "beat", "d": "gaps.py: reading the timeline"}
-{"t": 1794919707.5484486, "ist": "18:18:27", "ev": "beat", "d": "claimed, reading the handoff"}
-{"t": 1794919707.7538207, "ist": "18:18:27", "ev": "beat", "d": "archive.py: housekeeping"}
-{"t": 1794919707.9113345, "ist": "18:18:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1794921601.451213, "ist": "18:50:01", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1794921601.7079725, "ist": "18:50:01", "ev": "attempt", "d": "content-missing-partly-replaced -> reverted"}
-{"t": 1794921601.9844368, "ist": "18:50:01", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794921912.582898, "ist": "18:55:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794921915.5504901, "ist": "18:55:15", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1794921916.1944022, "ist": "18:55:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1794922249.5969644, "ist": "19:00:49", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794922252.0912755, "ist": "19:00:52", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1794922286.3219597, "ist": "19:01:26", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1794922510.5494068, "ist": "19:05:10", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1794922510.647167, "ist": "19:05:10", "ev": "attempt", "d": "content-missing-partly-replaced -> reverted"}
-{"t": 1794922510.7462926, "ist": "19:05:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794922520.3863726, "ist": "19:05:20", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794922520.630343, "ist": "19:05:20", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1794917819.5021384, "ist": "17:46:59", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1794917819.6004193, "ist": "17:46:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794917819.8399217, "ist": "17:46:59", "ev": "beat", "d": "claimed, gathering work"}
+{"t": 1794917819.9928372, "ist": "17:46:59", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1794917820.093853, "ist": "17:47:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794917820.214654, "ist": "17:47:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794917820.324518, "ist": "17:47:00", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1794917883.7068856, "ist": "17:48:03", "ev": "beat", "d": "claimed, reading handoff + brief"}
+{"t": 1794917883.8573234, "ist": "17:48:03", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1794917883.9892237, "ist": "17:48:03", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1794917890.525502, "ist": "17:48:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794917938.6152139, "ist": "17:48:58", "ev": "beat", "d": "carry-over: fetching corpus for the wrap-charge corpus diff"}
+{"t": 1794918123.5151112, "ist": "17:52:03", "ev": "beat", "d": "wrap charge implemented, building"}
+{"t": 1794919951.921737, "ist": "18:22:31", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1794919956.1824937, "ist": "18:22:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1794919956.281339, "ist": "18:22:36", "ev": "attempt", "d": "content-missing-partly-replaced -> reverted"}
+{"t": 1794919956.3750188, "ist": "18:22:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794919962.0185416, "ist": "18:22:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794919967.0074396, "ist": "18:22:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794919967.1316502, "ist": "18:22:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1794920008.9834902, "ist": "18:23:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794920660.514811, "ist": "18:34:20", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1794920660.6014626, "ist": "18:34:20", "ev": "attempt", "d": "content-missing-partly-replaced -> reverted"}
+{"t": 1794920660.7008934, "ist": "18:34:20", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794920666.5089607, "ist": "18:34:26", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794920666.6574543, "ist": "18:34:26", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1794921307.622841, "ist": "18:45:07", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1794921307.7611547, "ist": "18:45:07", "ev": "attempt", "d": "content-missing-partly-replaced -> reverted"}
+{"t": 1794921307.8447099, "ist": "18:45:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794921312.205628, "ist": "18:45:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794921312.319576, "ist": "18:45:12", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1794921337.5963247, "ist": "18:45:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794921341.4215028, "ist": "18:45:41", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1794921341.5153224, "ist": "18:45:41", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794921341.5272064, "ist": "18:45:41", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1794921990.7626922, "ist": "18:56:30", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1794921990.8615649, "ist": "18:56:30", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794921991.0712683, "ist": "18:56:31", "ev": "beat", "d": "claimed, gathering work"}
+{"t": 1794921991.1930614, "ist": "18:56:31", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1794921991.3171988, "ist": "18:56:31", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794921991.4226828, "ist": "18:56:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794921991.523597, "ist": "18:56:31", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1794924105.4410448, "ist": "19:31:45", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1794924105.5263846, "ist": "19:31:45", "ev": "attempt", "d": "content-missing-partly-replaced -> partial"}
+{"t": 1794924105.6144726, "ist": "19:31:45", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794924322.6080084, "ist": "19:35:22", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1794924322.718898, "ist": "19:35:22", "ev": "attempt", "d": "content-missing-partly-replaced -> kept"}
+{"t": 1794924322.8299448, "ist": "19:35:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794924335.3985288, "ist": "19:35:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794924335.68005, "ist": "19:35:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794924347.2890341, "ist": "19:35:47", "ev": "beat", "d": "report.py: building the report"}

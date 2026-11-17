@@ -1,0 +1,26 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 876b8f3..8541e5e 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6645,8 +6645,20 @@ public final class DocxWriter {
+                         stackTw += (q == 0 ? 0 : beforeTw) + boxTw;
+                         int pInset = Float.isNaN(cp.indentPt) ? insetTw
+                                 : (int) Math.max(0L, Math.round(cp.indentPt * TWIPS_PER_PT));
++                        // THE CELL'S OWN WIDTH, SPAN AND ALL. This asked for colTw[c] - the
++                        // FIRST grid column under the cell - so a cell merged over six columns
++                        // was told it had the width of the narrowest one. That number is what
++                        // carryScalePct clamps its character scale to, and a clamp of zero or
++                        // less is skipped, so on every spanning cell the scale went out
++                        // unclamped at the ratio of the page's drawn width to Arial's: 95-97 %
++                        // on 041122's instruction cell, where the cell really allows 92 and the
++                        // renderer, told 95, wrapped four of the page's nine lines into two.
++                        // Measured on 041122-Account_Opening_Form: with the span the ceiling is
++                        // 92 %, the nine paragraphs set as nine lines, the row is 118 pt against
++                        // the 158 the page had left for it and the instruction page closes
++                        // (10 pages against 11, the source's 9 plus the folio row below).
+                         cellParaXml(inner, cp, beforeTw, boxTw, pInset, cellSz,
+-                                Math.max(0, colTw[c] - pInset));
++                                Math.max(0, spanTw - pInset));
+                     }
+                     if (r == t.rows.size() - 1) {
+                         lastRowContentTw = Math.max(lastRowContentTw, stackTw);

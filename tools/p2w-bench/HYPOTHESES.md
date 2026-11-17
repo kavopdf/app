@@ -535,37 +535,153 @@ Do not re-test one without new evidence, and if you do, say what changed.
   ruled table, not four of them, and the ratchet has to be paid for over the whole corpus in
   a slot that can afford it. The engine was reverted to HEAD after this measurement.
 
-- CLOSED, THIS RUN (measured over the whole corpus) - THE WRAP CHARGE IS 42 OF 213 AND IT
-  REGRESSES. Built exactly as the two entries above specify (Helvetica standard-14 advances,
-  per paragraph ceil(textWidth / (spanTw - insetTw)), row = max(declared, lines x rowLineTw)
-  in w:trHeight atLeast, charged before the page budget so writtenRowsTw sees it), converted
-  all 213 documents with it and with the engine at 76f01b2, and diffed word/document.xml entry
-  by entry: 42 of 213 differ (20 %), ~400 rows, and ZERO docx page-break changes. So the blast
-  radius is slot-sized, not ratchet-sized - the earlier note's fear was wrong about the size.
-  What it is wrong about is the direction: measured both ways, price-list-right-aligned-amounts
-  goes 1.79 -> 81.15 and 1 -> 2 pages, price-list-2col-dense-right-aligned 2.69 -> 81.69 and
-  1 -> 2 pages, 01_stamp_rotated_15deg_upright 0.0 -> 9.3, 03_stamp_vertical_90deg 16.98 ->
-  23.19. It reads a right-aligned amount in a narrow column as two lines and doubles 38 of 38
-  rows of a table whose page pitch was already right. 041122 is unchanged at 11 pages in the
-  first build and could not be rendered inside a 280 s call after the inset correction.
-  WHAT THE NEXT RUN NEEDS: the charge has to be gated on the width the RENDERER gets (the
-  emitted w:tcW less the inset actually written), not on the page's inset, or it fires on text
-  that fits. And the 041122 gap is a PARAGRAPH count (9 line boxes charged, 13 drawn), not a
-  width, so the two must not be conflated in one number. Patch kept at
-  patches/wrap-charge-helvetica.patch; engine at HEAD. Full numbers:
-  FINDINGS/wrap-charge-corpus-diff.md.
+- RULED OUT, THIS RUN (measured at corpus scale) - THE WRAP CHARGE RE-LAYS OUT 47 OF 213 AND
+  REGRESSES EVERY DOCUMENT IT TOUCHES. The previous run asked for the corpus diff before
+  anything else, and this is it. Built the charge exactly as the handoff specified: a Helvetica
+  advance-width helper (PDType1Font.HELVETICA / HELVETICA_BOLD), each cell's text split on its
+  own paragraph breaks, lines = ceil(textWidth / (spanTw - insetTw)), the row charged
+  max(declared rowHeightTw, lines x rowLineTw) written into w:trHeight, which is hRule="atLeast"
+  on the real-table path so the charge is a floor; the flow budget (writtenRowsTw) was made to
+  follow it, because a row the renderer lays out taller is taller for the flow after it too.
+  Re-converted all 213 with the unmodified HEAD engine and with the charge, and diffed the .docx
+  entry by entry:
+    * 47 of 213 documents change (22 %), all of them in word/document.xml only; 350 rows grow,
+      65 shrink (a table that outgrows its page is squeezed), the largest single row +161 pt
+      (360_restaurant_menu).
+    * MEASURED, not inferred: the 47 changed documents are the only ones that can move, so they
+      were measured against themselves on both engines (46 of 47; 01_stamp_rotated_15deg_upright
+      fails to render on both, soffice "no render"). Result: 0 improved, 40 WORSE, 6 flat.
+      Mean share@5px loss 10.66 % -> 32.63 % (lower is better). The target document,
+      041122-Account_Opening_Form, does not move at all (99.02 both, 11 pages both).
+  WHY IT IS WORSE, and this is the part the next run needs: the charge measures a cell's text
+  against its w:tblGrid column, and on several documents the grid does not describe the layout.
+  41_coloured_headings_white_bg is written as SIX grid columns (8876,570,8876,570,8876,570 tw =
+  1416 pt of grid on a 595 pt page) holding TWO cells, so the price column reads 28.5 pt wide
+  for the 30.6 pt text "340.00" and every row of a correct price list is charged two lines: the
+  page doubles its leading (trHeight 360 -> 500 on every row), which is visible in the render
+  and moves share@5px 0.0 -> 70.8. Two structural guards were built and measured and neither
+  fires here, because the table's own bounds (t.right - t.left) are wrong in the same way as the
+  grid, and spanC exists so the "fewer cells than columns" test passes: a grid this corrupt
+  cannot be caught by comparing it with itself. WHAT THAT MEANS: the width the charge needs is
+  not the grid, it is the width the RENDERER gives the cell (tcW after spans, or the page's own
+  cell rectangle), and until that is the number the charge reads, this mechanism cannot be
+  measured, only regressed. The engine was reverted to HEAD after this measurement; nothing from
+  it is in the tree. Full numbers in FINDINGS/wrap-charge-corpus-diff.md.
 
-- CLOSED, THIS RUN (three builds, corpus-diffed and two of them rendered) - THE WRAP CHARGE
-  FAILS ON THE WIDTH, NOT THE FONT. Build 1 (Helvetica everywhere, inset-overflow correction):
-  42 of 213 change; price-list-right-aligned-amounts 1.79 -> 81.15 and 1 -> 2 pages. Build 2
-  (4 % metric tolerance): 41 of 213, price list 38 -> 16 rows but every one still 312 -> 440 tw
-  - exactly 2 x its 220 tw row line, so the excess is structural. Build 3, after reading row 0
-  of that table: the cells are Times New Roman (digits 0.500 em) and the charge was measuring
-  Helvetica (0.556 em, 11 % wide); face-aware advance + 2 % tolerance gives 12 of 213 and, on
-  041122, exactly one changed row (row 77, 2220 -> 3000 tw - the instruction cell the handoff
-  names). Measured anyway: price list 1.79 -> 32.54, 77_arabic_rtl_document 17.14 -> 58.55.
-  CONCLUSION: the mechanism is right in shape and wrong in width. `w:ind` is written from
-  insetTw AFTER the textOverflows correction, so the renderer is given a width the text fits;
-  a charge computed against anything narrower invents a wrap the renderer never draws. The next
-  run charges against (emitted w:tcW - emitted w:ind) and only beyond the row's own slack.
-  All three patches kept; engine at HEAD. Numbers: FINDINGS/wrap-charge-corpus-diff.md.
+- RULED OUT, THIS RUN (second measurement) - THE SAME CHARGE WITH AN 8 % METRIC ALLOWANCE STILL
+  REGRESSES. The first build charged every cell whose text was wider than its column, and
+  Helvetica's advances are only within a few per cent of DejaVu Sans, so a cell sitting AT its
+  column width - a price column, an amount column, the commonest cell in this corpus - was
+  charged a second line by the estimate's own error. 41_coloured_headings_white_bg's price cell
+  is 28.5 pt wide for 30.6 pt of text: a 7 % overshoot, and every row of a correct price list
+  doubled (360 -> 500 tw). So the charge was rebuilt with the error budget named: avail x 1.08,
+  with the grid guards kept (columns must add to the table's width; no row may have fewer cells
+  than the grid has columns unless a span table says which cell covers which). Measured:
+    * 32 of 213 documents change, down from 47 - the allowance removed the false positives, and
+      41_coloured_headings_white_bg is back at 360 tw rows, exactly as the page drew it.
+    * 041122 now moves: 6 rows, largest +12.2 pt (the earlier build charged it nothing).
+    * and it is still worse: of the 32 changed documents, 0 improve, 28 get worse, 4 are flat.
+      Mean share@5px loss 13.85 % -> 30.36 %. Worst: 80_gstin_pan_cin_ifsc_table 2.01 -> 61.11,
+      77_arabic_rtl_document 17.14 -> 58.55, 72_bank_statement_no_rules_right_amounts 0.00 ->
+      41.02.
+  WHAT THAT MEANS, and it is the finding this run exists to deliver: the charge cannot be landed
+  as a CHARGE. A table whose rows are already the page's pitch is correct, and every extra twip
+  of trHeight moves its rows off the page's own lines - so a rule that raises rows wherever the
+  estimate says "these words are wider than this column" loses more than it gains, because the
+  estimate fires on rows the renderer was already laying out correctly. The rule that can only
+  win is the DIFFERENTIAL one: charge a row only for the lines it will wrap MORE than the page
+  itself drew in that cell (the page's drawn line count is already in the model - the cell's own
+  boxes, or cellParasTw / rowLineTw), and charge nothing when the two agree. That is the next
+  run's first experiment, and both documents it must calibrate against are named in
+  FINDINGS/wrap-charge-corpus-diff.md. The engine was reverted to HEAD; nothing from either
+  build is in the tree.
+
+- RULED OUT, THIS RUN (third measurement) - THE DIFFERENTIAL CHARGE TOO. The rule was rebuilt to
+  charge a row only for the lines it will wrap MORE than the page's own row height affords
+  (pageLines = round(rowHeightTw / rowLineTw); charge only when wrapLinesHelv > pageLines), with
+  the 8 % metric allowance kept. It calibrates better than either earlier build: 24 of 213
+  documents change (11 %, down from 47 and 32), 41_coloured_headings_white_bg is untouched at its
+  page pitch (0 of 12 rows move), and 041122-Account_Opening_Form finally moves the row it was
+  aimed at - 7 rows, largest +24.9 pt, which is the 156-vs-111 pt gap the earlier run measured.
+  And the verdict is the same: of the 23 changed documents measured, 0 improve, 18 get worse, 5
+  are flat; mean share@5px loss 16.08 % -> 31.52 %. Worst: 80_gstin_pan_cin_ifsc_table
+  2.01 -> 61.11, 77_arabic_rtl_document 17.14 -> 62.35, 76_devanagari_table 19.54 -> 57.90,
+  64_newspaper_uneven_columns_ad_boxes 9.11 -> 39.50.
+  WHAT THAT MEANS. Three builds - flat, allowed, differential - and 124 document-measurements all
+  say the same thing: on this corpus, raising a ruled table's rows loses. The documents that
+  change are dominated by tables whose rows the page drew at its own pitch, and the flow after
+  the table is then wrong by exactly what was added, which the instrument charges at 5 px. The
+  mechanism explains 041122 (111 pt charged against 156 laid out) and is still not a lever that
+  can be pulled corpus-wide: 041122's own page count does not change even when its row grows by
+  25 pt, because the page's break is decided by the whole sequence. WHAT WOULD BE DIFFERENT: a
+  charge that is applied to a table AND to the flow after it with the same number, so the page
+  is closed rather than lengthened - i.e. re-flow the page's remaining bands after the charge
+  instead of letting them overflow. That is a page-layout change, not a row-height change, and
+  it is bigger than a fixer slot. The engine was reverted to HEAD; nothing from any of the three
+  builds is in the tree.
+
+## content-missing-partly-replaced - 17 Nov 19:00 run: the spill is the carry's CEILING, and it never bound on a merged cell
+
+- CONFIRMED - The carry (ARIAL_W) never clamped on a SPANNING table cell: DocxWriter passed
+  `colTw[c]`, the FIRST grid column under the cell, as the width carryScalePct clamps its
+  character scale to, and `carryScalePct` skips the clamp entirely when that width is zero or
+  less. On a cell merged over six columns the clamp therefore never fired and the scale went out
+  at the page's drawn ratio unclamped.
+  evidence: 041122-Account_Opening_Form, the instruction cell of the row carrying "Government
+  Department establishing identity and address of such person": one cell, w:gridSpan 6,
+  w:tcW 11000 tw (550 pt), w:ind left 393 tw, and the nine paragraphs inside it emitted w:w
+  97,97,97,95,97,96,96,97. Measured in the docx itself: colTw[0] = 360 tw, so availTw =
+  360 - 393 < 0 and the ceiling branch was skipped; the drawn width / Arial width of the longest
+  paragraph ("In case the estimated total income in column 22b exceeds the maximum amount...")
+  is 97 %. The renderer's usable width for that cell is 530.35 pt (x 43.0 -> 573.3 on the
+  rendered page) and the paragraph at 97 % is 546.8 pt, so four of the page's nine lines wrapped
+  into two: the row renders 13 lines / 154 pt where the page drew 9 / 118 pt, and it no longer
+  fits the 158 pt the page had left, so it broke to a new sheet.
+  recorded: 2026-11-17 19:00
+
+- CONFIRMED - Passing the cell's real width (span and all) closes the instruction page: the
+  ceiling becomes 92 % and the row fits the space the page left for it.
+  evidence: one-token change, `colTw[c] - pInset` -> `spanTw - pInset` (spanTw is the sum of the
+  columns the cell covers, already computed two blocks above for the tcW). Corpus diff over all
+  213: **3 .docx change, 210 byte-identical in every zip entry** - 041122-Account_Opening_Form,
+  Account_Opening_Form_Fillable_filled, 373_leave_application_form, all three form documents
+  with merged cells. All three measured: 373 5.46 -> 4.64 share@5 (improved, 1 page both);
+  041122 11 -> 10 pages and Account_Opening_Form_Fillable_filled 11 -> 10, both share@5
+  unchanged at 99.02 because of the entry below. 0 worse. Attempt recorded 1/3 (partial).
+  CARRIED AS A PATCH, NOT IN THE ENGINE, for the commit-path reason the cantSplit entry above
+  already records: DocxWriter.java is 451 KB and the only working commit path,
+  GITHUB_COMMIT_MULTIPLE_FILES, takes file contents inline. The change is 14 lines at
+  `patches/carry-ceiling-span.patch`; apply with `git apply
+  patches/carry-ceiling-span.patch` from the repository root and rebuild. It was built,
+  converted over the whole corpus, diffed entry by entry and measured on all three documents it
+  changes before being set aside, so applying it needs no new measurement - only the
+  three-document check that it still applies and still gives 10 pages.
+  recorded: 2026-11-17 19:00
+
+- MEASURED, THIS RUN - the LAST spurious page of 041122 is a FOLIO WRITTEN AS A TABLE ROW, and
+  it is why both form documents still read 99.02 with a page count of 10 against the source's 9.
+  evidence: the table that holds the declaration form (24 rows) ends with a single-cell row whose
+  whole text is "7". Rendered, that row is the only content of our page 8 (y 25.3-35.3, 1
+  character), so pages 8-10 are compared against source pages 8-9 shifted by one: our page 8
+  reads share@5 99.02 with text_recall 0.04, and the Annexure-2 page lands on page 11 of 11. The
+  flow-line folio rule (the `b.y > 0.88 * pageHeightPt && isFolio(p)` anchor, which exists and
+  names this document in its own comment) cannot fire because this folio is not a flow line - it
+  is a row of the table. Until it is a position instead of a row, no amount of table arithmetic
+  moves this document's number.
+  recorded: 2026-11-17 19:00
+
+- UNTESTED - A table's last row that is a folio in the page's bottom band should be anchored, not
+  emitted as a row, exactly as a flow-line folio already is.
+  evidence: the row is single-cell, its text matches isFolio, and its top is in the bottom band
+  (0.88 x 842 = 741 pt; the page drew the folio at y 805.2). The flow path already does this and
+  its comment measures the same document: anchoring the folio "lands at the y the page drew it
+  at and costs no sheet". The table path needs the same, and the two are the same statement: a
+  folio is a POSITION. Implementation is contained - detect it before the row loop, skip that
+  row, set the last-row bookkeeping from row-1, and emit the text after `</w:tbl>` where the
+  post-table carrier paragraph already goes. `anchor(sb, ctx, x, yTop, w, h, inner)` takes a
+  hand-built paragraph and needs no Para/Box model. NOT built this run: the row loop carries
+  per-row state (rowEdge may be baselines rather than edges on the whitespace pass, recut tables
+  renumber rows, spans move c) and the slot ran out before it could be done and measured. It is
+  the single change that should turn 041122 and Account_Opening_Form_Fillable_filled from 10
+  pages to the source's 9, which is what moves the class.
+  recorded: 2026-11-17 19:00
