@@ -1,0 +1,13 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 2a41841..c1fd2d1 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -2063,7 +2063,7 @@ public final class PdfToWord {
+             // number without the rounding; inPt is only the fallback for a font whose size
+             // the page did not name.
+             g.sizePt = tp.getFontSizeInPt() > 0 ? tp.getFontSizeInPt() : tp.getFontSize();
+-            g.size = tp.getFontSize() > 0 ? tp.getFontSize() : tp.getFontSizeInPt();
++            g.size = tp.getFontSizeInPt() > 0 ? tp.getFontSizeInPt() : tp.getFontSize();
+             PDFont font = tp.getFont();
+             g.font = font == null ? "" : font.getName();
+             String n = g.font.toLowerCase(Locale.ROOT);
