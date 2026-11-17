@@ -160,7 +160,13 @@ def _handoff(*args):
 # only heartbeat was on an attempt, so a run doing a long ratchet was indistinguishable from a
 # dead one, and the window had to cover the longest silent stretch - which also meant a dead run
 # held the slot for 45 minutes. A run that is alive now says so; a run that is not costs 20.
-CLAIM_STALE_MIN = {"fixer": 20, "baseline": 45, "classifier": 20}
+# FIXER 20 -> 10. The window must exceed the longest silent stretch a live run can produce, or a
+# working run loses its claim mid-render. The longest single tool call is 290 s (4.8 min) and the
+# model may think for a few minutes before the next one, so 10 covers a 290 s call plus five minutes
+# of thought. Twenty was chosen when the age meant "time since start", where a dead run blocked the
+# slot for twenty minutes; now that the age means "time since last activity", the window is purely a
+# safety margin and can be as small as that margin allows.
+CLAIM_STALE_MIN = {"fixer": 10, "baseline": 45, "classifier": 20}
 
 
 def load():
@@ -277,6 +283,25 @@ def ist(fmt="%d %b %H:%M"):
 FUTURE_TOLERANCE_MIN = 5
 
 
+def _pending_count():
+    """How many items pending.py lists, or 0 when the gate is clear.
+
+    Run as a subprocess rather than imported: pending.py is the single authority on what is
+    outstanding and duplicating its logic here is how two answers to one question start.
+    """
+    try:
+        r = subprocess.run([sys.executable, os.path.join(HERE, "pending.py")],
+                           capture_output=True, text=True, timeout=60)
+        for line in (r.stdout or "").split("\n"):
+            m = re.match(r"PENDING \((\d+)\)", line.strip())
+            if m:
+                return int(m.group(1))
+        return 0
+    except Exception:
+        # A gate that cannot be read must not become a lock that never opens.
+        return 0
+
+
 def claim_age_min(started):
     """Minutes since a claim, or None when there is no claim.
 
@@ -312,8 +337,42 @@ def claim(name):
     age_min = claim_age_min(s.get(key))
     if age_min is None:
         age_min = 1e9
+
+    # THE AGE THAT MATTERS IS TIME SINCE THE RUN LAST DID ANYTHING, NOT TIME SINCE IT STARTED.
+    #
+    # This read <slot>_started, which is stamped once at claim and never refreshed. So a run that
+    # had been working productively for twenty minutes read as STALE to the next slot, which took
+    # the claim and started editing the same files. That is not a theory: on 17 Nov a slot read
+    # DocxWriter at 9f7a094, another slot committed a 218-line engine fix at cf2f9c6, and the first
+    # slot's whole-file commit silently reverted it. Two runs on one tree, and nothing reported an
+    # error.
+    #
+    # attempt.py's heartbeat already wrote <slot>_last_beat for exactly this reason, and its own
+    # docstring says the stamp makes the age mean "how long since this run last did anything" - but
+    # nothing ever read it. The fix was written and the reader was not updated.
+    #
+    # The timeline file is the third and cheapest witness: EVERY run-facing tool appends a line to
+    # it on entry, so its mtime is the last moment the run touched anything at all. No extra write,
+    # no lock, no cost. Taking the newest of the three is the honest answer to "is anyone home".
+    if not s.get(key):
+        # NO CLAIM AT ALL. Activity must not be consulted here: the timeline is written by every
+        # tool, so after a release its mtime is always recent, and taking it as the claim's age made
+        # a free slot read as busy for ever - the slot could be released and never claimed again.
+        # Caught by test D: release, then claim, then "busy - last activity 0 min ago".
+        age_min = 1e9
+    else:
+        newest = s.get(key) or 0
+        for other in ("%s_last_beat" % name, "%s_doing_since" % name):
+            newest = max(newest, s.get(other) or 0)
+        try:
+            newest = max(newest, os.path.getmtime(os.path.join(HERE, "TIMELINE.jsonl")))
+        except Exception:
+            pass
+        age_min = claim_age_min(newest)
+        if age_min is None:
+            age_min = 1e9
     if age_min < limit:
-        print("%s busy - previous run started %d min ago (stale after %d min)"
+        print("%s busy - last activity %d min ago (stale after %d min)"
               % (name, age_min, limit))
         return 1
     had_stale = bool(s.get(key))
@@ -453,7 +512,30 @@ def release(name, force=False):
             print("If you genuinely cannot - the build is broken, Drive is blocked, the class list")
             print("is empty - release with: round.py --release-fixer --force")
             return 1
-        print("fixer: releasing after %d minute(s) with %d attempt(s)" % (age, done))
+
+        # WORK LEFT IS NOT A REASON TO STOP.
+        #
+        # A run that released after one attempt handed back a slot the scheduler would not fill for
+        # up to an hour, and the next run spent its first thirteen minutes reading and building
+        # before it touched the work. Measured on 17 Nov: six runs, gaps of 8, 8, 51, 56 and 23
+        # minutes, roughly half of every day idle, and the same setup paid twenty-four times.
+        #
+        # pending.py is the gate and it already knows whether anything is outstanding. If it is, the
+        # run is not finished, whatever it thinks - and the platform's own limit is what ends it, not
+        # the run's guess about how long it has worked. A killed run frees the slot ten minutes after
+        # its last activity, so this cannot wedge: the slot always comes back.
+        #
+        # --force still bypasses everything, and the round-finished bypass above still applies.
+        left = _pending_count()
+        if left > 0:
+            print("refused: %d item(s) still pending. The slot is not spent while work is left." % left)
+            print("A run that stops here hands back a slot the scheduler will not fill for up to an")
+            print("hour, and the next run pays its setup again before touching the work. Keep going:")
+            print("pending.py lists what is outstanding, in the order it should be taken.")
+            print("If you genuinely cannot continue - the build is broken, the drive is blocked, the")
+            print("class list is empty - release with: round.py --release-fixer --force")
+            return 1
+        print("fixer: releasing after %d minute(s) with %d attempt(s), nothing pending" % (age, done))
     s["%s_started" % name] = 0
     # CLEAR THE BEACON WITH THE CLAIM, or the next reader is told a lie.
     #
