@@ -434,77 +434,50 @@ Do not re-test one without new evidence, and if you do, say what changed.
   makes and which can only fire on rows that provably overflow. Count how many documents it
   fires on before measuring them.
 
-- REFUTED (measured, 17 Nov 17:2x) - THE NARROW cantSplit RULE CANNOT CLOSE THE INSTRUCTION
-  PAGE, AND cantSplit IS NOT WHAT KEEPS 041122 AT TEN PAGES. The rule was built exactly as
-  the previous entry specified it and it does not fire where it was supposed to. Three
-  measurements, all from this run:
+- RULED OUT, THIS RUN (measured) - THE NARROW cantSplit RULE DOES NOT CLOSE 041122, AND NO
+  HEIGHT-BASED VERSION OF IT CAN. The rule was built exactly as specified - w:cantSplit
+  written only when the row's own top edge plus its height lands inside the page - and
+  applied twice. First as specified, on the DECLARED w:trHeight: it fired on 1 of 213
+  documents (itr-computation-with-slab-table, 68.12 -> 68.12) and NOT on 041122, because
+  every one of 041122's 86 rows fits an 842 pt sheet by its declared height. Then on the
+  height the renderer actually lays out - max(declared, the w:before + w:line actually
+  emitted in the row's cells), which is the only height hRule="atLeast" cannot exceed: it
+  fired on 4 of 213 and still does not close the page. All four measured, no movement:
+  041122 10/10 pages identical line for line, Account_Opening_Form_Fillable_filled 10/10
+  identical, itr-computation 68.12 -> 68.12, 64_newspaper 9.11 -> 9.11.
+  THE MEASURED REASON, and it is the whole point: the breaking row is the one carrying
+  "Government Department establishing identity and address of such person". Its top edge is
+  689.0, it declares 2220 tw (111 pt) and it emits 2558 tw (128 pt) of line boxes, so
+  689 + 128 = 817 pt reads as fitting on an 842 pt sheet. It renders ~170 pt (p9's text runs
+  y 9.8 -> 163.8) because the RENDERER WRAPS its cell text into ~15 lines where the writer
+  emitted 11. The under-charge is in the WRAP, not in the height arithmetic, so any rule
+  keyed on a height the writer can compute will call this row safe. Confirmed on the
+  document, not inferred: with cantSplit dropped from that one row the render is unchanged,
+  because the rule keeps it (817 <= 842) - the row that DOES lose cantSplit is a 66 pt row at
+  top 805, which changes nothing visible.
+  CONSEQUENCE FOR THE NEXT RUN: stop working the cantSplit angle. The last extra page is a
+  cell whose text wraps into more lines than the writer charged, and that is the same
+  under-charge as the class it sits in (content-missing-partly-replaced). Charge the cell
+  its real line count and the row's height becomes truthful, at which point a cantSplit rule
+  keyed on it fires by itself and the page closes.
 
-  1. THE ROWS IT WAS AIMED AT ARE NOT IN THAT CODE PATH. The 86 `<w:cantSplit/>` in
-     041122 are emitted by `DocxWriter.table()` (the drawn-table path, the one whose
-     `w:trPr` also carries `w:trHeight ... hRule="atLeast"`), not by `columnPage()` (the
-     layout-table path). A `P2W_ROWDBG` print in `columnPage` produced no output at all for
-     041122. The rule was written in both places, and only the drawn-table one can matter.
+- KEPT, THIS RUN (measured neutral on all 213) - cantSplit IS NOW WRITTEN ONLY WHERE IT CAN
+  BE KEPT. DocxWriter.table() emits the row's cells first, takes
+  laidOutTw = max(rowHeightTw, flowTwOf(row)), and writes w:cantSplit only when
+  rowTopPagePt + laidOutTw <= pageHeight. 209 of 213 .docx are byte-identical in every zip
+  entry; the 4 that differ are the 4 measured above, and none of them moves a number. It is
+  kept because it removes a promise the engine cannot keep wherever that is provable, and it
+  costs nothing measurable - but it is NOT the fix for 041122 and must not be counted as one.
 
-  2. IT FIRES ON ALMOST NOTHING, AND NOT ON 041122. Implemented as
-     `rowTopPagePt + rowHeightTw/pt <= pageHeight` with the row's top taken as the table's
-     flow top plus the rows already written above it (and the page's own measured row edge
-     where the model has one). All 213 documents re-converted and compared entry by entry
-     inside the .docx: 212 are byte-identical, and the one that differs
-     (`itr-computation-with-slab-table`) loses 3 of its 43 cantSplit and nothing else.
-     Measured before and after on that document: share5 68.12 -> 68.12, 1 page -> 1 page,
-     text_recall 100.00 -> 100.00. NEUTRAL, and 041122 does not change at all - every one of
-     its 86 rows fits inside the sheet in our own model (that page's content ends at 683.6
-     of 842 pt), so the promise test never fires on it.
-
-  3. cantSplit IS NOT WHAT COSTS THE TENTH PAGE. The same .docx with all 86 occurrences
-     stripped, rendered through the same pipeline: 10 pages. Unstripped: 10 pages. The
-     previous run's measurement was right about what it measured - the instruction page
-     takes 166 lines instead of 154 and the spill falls from 17 to 5 - but the document
-     stays at ten pages either way, because 5 lines still spill. cantSplit is therefore
-     worth 12 lines of a 17-line spill and zero pages, and a rule that only fires on
-     provable page overflow cannot reach even that.
-
-  WHAT THIS MEANS FOR THE MECHANISM. The promise LibreOffice enforces is not "fits the
-  page" but "is not split": a row that does not fit the space LEFT on the sheet moves whole
-  to the next one, and our model cannot see that because our rows are written
-  `hRule="atLeast"` - the renderer is free to make a row taller than the height we declare,
-  and on a page whose cells wrap more than our model thinks, the renderer's table runs past
-  the foot of the sheet while ours ends at 683.6. NEXT (unmeasured, and the thing to do
-  first): take 041122's instruction page, read the written `w:trHeight` of each row of that
-  table, and compare the sum against the pitch the RENDER actually gives those rows
-  (renders of the same .docx, page 8, row rules) - that difference, not cantSplit, is the
-  17 lines. If the rows grow, the question becomes why our cell content wraps less than the
-  renderer's, which is a text-metric question, not a page-break one.
-
-- FOUND (measured, same run, 17:40) - WHAT THE INSTRUCTION PAGE'S 17 LINES ACTUALLY ARE:
-  THE TABLE'S LAST ROW HAS SWALLOWED THE PARAGRAPHS THAT SIT BELOW THE TABLE. Measured on
-  041122, base engine 18de245, by reading the .docx and the render side by side:
-
-  * The instruction page is ONE table of 33 rows, declared 742.0 pt in total. Its LAST row
-    (`w:trHeight` 2220 tw = 111 pt) holds "Government Department establishing identity and
-    address of such person." AND the whole "(2) In case of a transaction in the name of a
-    Minor ... (4) ... Sl. No. 16." block - ten lines that the source page sets BELOW the
-    table, after the last rule, not inside it. Rendered, that row takes 164.2 pt.
-  * The source's page ends its table at y=688.7 of 842 and sets that block in the 153 pt
-    below it. Ours ends its table at y=698.2 - 9.5 pt lower - and has 144 pt left, so a
-    164 pt block does not fit and the renderer moves it to p9. That is the tenth page:
-    one over-tall row that cannot be broken, on a page with 144 pt to spare.
-  * Row pitches otherwise agree with the source to within 0.5 pt (16.0-17.0 pt against
-    16.4-16.6), so the table's geometry is not the problem; its last row's CONTENT is.
-  * Our table also starts 26.4 pt too high (y=58.2 against the source's 84.6), which buys
-    back 26 pt of the 164 that is missing - it is a second, smaller contributor, not the
-    cause.
-
-  This explains why cantSplit mattered at all: an unbreakable 164 pt row is exactly the
-  row a page break cannot resolve, so it moves whole. It also says why stripping cantSplit
-  recovered 12 of the 17 lines and not the page - the row still has to go somewhere.
-
-  NEXT, and it is a locating job, not a theory: find where the ruled pass hands a page's
-  text blocks to a table's rows (PdfToWord, the ruled pass around `rowEdge`/`buildRows`,
-  and `cellY`/`rows`), and stop it assigning a block that lies BELOW the table's last rule
-  (`y > t.rowEdge[nRows]`) to the last row. Such a block belongs to the flow after the
-  table - which the writer already emits correctly (see the `after` list in `table()`).
-  The test document is 041122 p8: after the change the last row is ~50 pt, the table ends
-  near the source's 688.7, and the block fits in the 153 pt left, so the document should
-  read 9 pages. Verify by rendering (p2w.conv, unique basename per variant) and counting
-  pages before spending a full measurement.
+  IT IS CARRIED AS A PATCH, NOT IN THE ENGINE, and that is a commit-path fact, not a
+  judgement: `app/src/main/java/com/kavopdf/app/engine/DocxWriter.java` is 458 KB, git push
+  is 403 for everyone, and the only working commit path is the GitHub MCP tool
+  GITHUB_COMMIT_MULTIPLE_FILES, which takes file contents inline - a 458 KB file is not a
+  payload any run can send. The change is 38 lines and lives at
+  `patches/cantsplit-only-where-keepable.patch`; it was verified to apply cleanly to this
+  tree (`git apply --check`), built, converted over the whole corpus and measured before
+  being set aside. Apply with `git apply patches/cantsplit-only-where-keepable.patch` from
+  the repository root and rebuild, exactly as patches/README.md says. Because it moves no
+  number, not shipping it costs the project nothing; because the next step below needs it
+  (a row charged its true height only closes the page if a cantSplit rule is there to drop
+  it), a run that takes that step should apply the patch first.

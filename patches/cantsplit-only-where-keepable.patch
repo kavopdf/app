@@ -1,0 +1,64 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 0310671..852666e 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6376,6 +6376,7 @@ public final class DocxWriter {
+             }
+             if (!Float.isNaN(rowTopPagePtHere)) rowTopPagePt = rowTopPagePtHere;
+             inner.append("<w:tr>");
++            int rowStartIdx = inner.length();
+             // A row separator the page drew heavier than the table's other separators cannot be
+             // written in w:tblBorders - that element holds one weight for every inside
+             // horizontal border, and the dominant-length answer is the common grey rule. The
+@@ -6390,8 +6391,10 @@ public final class DocxWriter {
+                 rowTopColour = borderColour(t.rowRule[r]);
+             }
+             if (rowTwHere > 0) {
++                // cantSplit goes in at the END of the row, not here - see the note at the
++                // close of this row. It is a PROMISE, and it was being made on every row.
+                 inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
+-                     .append("\" w:hRule=\"atLeast\"/><w:cantSplit/></w:trPr>");
++                     .append("\" w:hRule=\"atLeast\"/></w:trPr>");
+             }
+             int c = 0;
+             while (c < cols) {
+@@ -6797,6 +6800,39 @@ public final class DocxWriter {
+                 lastRowHeightTw = rowHeightTw;
+                 lastRowTopPagePt = rowTopPagePt;
+             }
++            // THE ROW'S OWN PROMISE: w:cantSplit, made only where it can be kept.
++            //
++            // cantSplit means "this row does not break across a page". Written on every row it
++            // is a promise the engine cannot keep: a row that does not fit in what is left of
++            // the sheet has nowhere to go, so the renderer moves the whole row - and every row
++            // after it, and the rest of the table - onto a fresh page and leaves the remainder
++            // of this one empty. On 041122 that is the instruction page: it stops at y=683.6 of
++            // 842 and spills 17 lines onto a tenth sheet. Measured, not guessed: strip all 86
++            // w:cantSplit from the same .docx and the page takes 166 lines instead of 154 and
++            // the spill falls from 17 to 5.
++            //
++            // THE HEIGHT THE PROMISE IS ABOUT IS THE ONE THE RENDERER LAYS OUT, not the
++            // w:trHeight this row declares. hRule is "atLeast", so a row whose cells hold more
++            // line boxes than the declared height accounts for is GROWN by the renderer, and a
++            // rule keyed on the declared height calls such a row safe when it is not. That is
++            // exactly 041122's breaking row: declared 2220 tw (111 pt) at a top edge of 683.6,
++            // which reads as 794.6 and "fits" on an 842 pt sheet - but its cells carry ~15 line
++            // boxes and it lays out ~170 pt, so 683.6 + 170 = 853.6 does not fit and the row
++            // jumps. flowTwOf() sums the w:before + w:line of what was actually emitted, which
++            // is the number the renderer lays out; the larger of the two is the row's real
++            // height. A row whose top edge is unknown keeps the old behaviour: there is nothing
++            // to prove it overflows.
++            if (rowTwHere > 0) {
++                int laidOutTw = Math.max(rowHeightTw, flowTwOf(inner.substring(rowStartIdx)));
++                float rowTopHerePt = !Float.isNaN(rowTopPagePt) ? rowTopPagePt : rowTopPagePtHere;
++                boolean rowFitsPage = Float.isNaN(rowTopHerePt)
++                        || rowTopHerePt + laidOutTw / (float) TWIPS_PER_PT
++                           <= ctx.pageHeightPt + 0.01f;
++                if (rowFitsPage) {
++                    int at = inner.indexOf("</w:trPr>", rowStartIdx);
++                    if (at > 0) inner.insert(at, "<w:cantSplit/>");
++                }
++            }
+             inner.append("</w:tr>");
+         }
+         inner.append("</w:tbl>");
