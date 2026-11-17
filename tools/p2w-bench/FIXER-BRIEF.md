@@ -281,6 +281,18 @@ evidence. **A park with no numbers is not a park, it is giving up with paperwork
 
 **Never attempt a PARKED class.** Always record the attempt, with numbers, honestly.
 
+**You do not decide when a class parks - `attempt.py` does, on evidence.** The ledger already knows
+whether a class is still moving: `partial` means the attempt moved something and did not finish,
+`kept` means it moved enough to hold, and those two are progress; `error` and `reverted` are not. So
+after every attempt it looks at the last five outcomes, and if none of them is progress the class is
+parked and the carry-over is cleared in the same call - the gate opens and you take the next class.
+The ceiling is 24 attempts, because a class alternating partial and reverted for ever is not
+converging either, it is oscillating.
+
+That is why a park needs no separate command from you. It is also why a class that looks stuck after
+two attempts is worth one more: the count that parks it is five consecutive outcomes without
+movement, not five attempts.
+
 **A park must also clear the carry-over, or the gate holds the class for ever.** `pending.py` reads
 `HANDOFF.json["next"]` and reports it as carry-over, and the gate says nothing new starts while
 anything is unfinished - so a class that has been parked, and can no longer be attempted, would sit
