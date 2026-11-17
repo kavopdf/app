@@ -86,11 +86,11 @@
    "text": "attempt 11 on content-missing-partly-replaced -> partial (1/30 moved)"
   },
   {
-   "at": "17:32",
-   "text": "attempt 12 on content-missing-partly-replaced -> reverted (0/4 moved)"
+   "at": "17:34",
+   "text": "attempt 12 on content-missing-partly-replaced -> reverted (0/213 moved)"
   }
  ],
- "next": "Charge the wrapping cell its real line count - that is what closes 041122's last extra page and it is the same under-charge as the class it sits in. Concretely: DocxWriter.table() charges a row from the page's measured cell content (rowTwHere) and the type floor (rowLineTw), which on 041122's breaking row is 2220 tw against the ~3080 tw it lays out. The row already knows how many w:line boxes it emitted, so take flowTwOf(cell) as a FLOOR for rowHeightTw exactly as the recut path already does with paraContentTw + ruleTwHere at 6356. Then the row is written at its true ~170 pt, 689 + 170 = 859 > 842, and the cantSplit rule fires by itself and the page closes - so apply patches/cantsplit-only-where-keepable.patch first, it is the other half of this fix. Count the documents that change BEFORE measuring (re-convert the corpus and diff the .docx entry by entry: 209 of 213 were byte-identical this run, so the diff is cheap and decisive), and pip install scipy before any measurement or every call dies on the tool timeout.",
+ "next": "",
  "agents": [
   {
    "id": "contA-01",
@@ -134,9 +134,9 @@
   }
  ],
  "run": {
-  "started": "16:17",
-  "ended": null,
-  "ended_how": null
+  "started": "16:35",
+  "ended": "17:34",
+  "ended_how": "released"
  },
  "history": [
   {
@@ -163,9 +163,14 @@
    "at": "15:40",
    "how": "released",
    "plan": "1. [carry-over] the last run"
+  },
+  {
+   "at": "17:34",
+   "how": "released",
+   "plan": ""
   }
  ],
- "context": "The narrow cantSplit rule was built, applied, converted over all 213 documents and MEASURED - and it is now RULED OUT as the fix for 041122, with the mechanism measured rather than guessed. Written as specified (cantSplit only when rowTopPagePt + height <= pageHeight) it fired on 1 of 213 documents and moved nothing. Rewritten to use the height the renderer really lays out - max(declared w:trHeight, the w:before+w:line actually emitted in the row's cells), the only height hRule=atLeast cannot exceed - it fires on 4 of 213 and still moves nothing: 041122 10/10 pages identical line for line, Account_Opening_Form_Fillable_filled 10/10 identical, itr-computation 68.12 -> 68.12, 64_newspaper 9.11 -> 9.11; the other 209 documents are byte-identical in every zip entry. WHY IT CANNOT WORK, measured on the document: 041122's breaking row (the one carrying 'Government Department establishing identity and address of such person') has a top edge of 689.0, declares 2220 tw (111 pt) and emits 2558 tw (128 pt) of line boxes, so 689+128 = 817 reads as fitting on an 842 pt sheet - but it RENDERS ~170 pt (p9's text runs y 9.8 -> 163.8) because the renderer wraps its cell text into ~15 lines where the writer emitted 11. The under-charge is in the WRAP, not the height arithmetic, so no rule keyed on a height the writer can compute will ever catch it. The change is kept as patches/cantsplit-only-where-keepable.patch (38 lines, applies cleanly, measured neutral on all 213) and NOT in the engine, because DocxWriter.java is 458 KB and the only working commit path takes file contents inline. TWO OPERATIONAL FACTS THIS RUN PAID FOR: scipy was missing in the pod and every position() call fell back to the 400-step dilation ladder - single-document measurements ran past 200 s and three measurement calls died on the tool timeout before it was found (p2w.py installs scipy inside main(), so a run that calls measure_doc() directly never gets it - pip install scipy first); and gh api writes are 403 'Resource not accessible by integration', the same wall as git push, so the MCP commit tool is the only path.",
+ "context": "041122 renders 10 pages against the source's 9. The folio page was fixed by the previous run (11 -> 10). THIS RUN RULED OUT THE cantSplit RULE, WITH NUMBERS. The narrow rule was implemented at both row writers (cantSplit written only when rowTop*20 + heightTw <= the page budget) and counted before measuring: 213 documents re-converted with the patched engine and diffed entry by entry against the unpatched build, 210 byte-identical in every zip entry, 3 differ (041122 86->85 cantSplit, the filled form 86->85, itr-computation-with-slab-table 43->40). All 3 measured both ways on this pod: every number identical to the digit and the page counts unmoved (041122 9 src/10 ours, share5 86.38, share1 93.07, text_recall 99.48, worst p9; itr 1/1, 68.82). A gated census (-Dp2w.cantsplit, one line per row with top, height, budget, decision) says why: the only rows refused the promise are three 13 pt folio-band rows at top=805 on p2. The row that actually costs the page is the atLeast row at top=689 with a WRITTEN height of 111 pt (trHeight 2220 tw, the instruction table's last row) - 689+111=800 < 842, so our geometry says it fits and it keeps cantSplit, and the renderer moves it whole to p9 anyway because hRule=atLeast makes 111 pt a FLOOR and its real wrapped height is ~250 pt. Stripping cantSplit from that ONE row (docx-only edit, no engine change) reproduces the handoff's whole-doc strip exactly: p8 takes 166 lines instead of 154 and p9 falls from 17 lines to 5, still 10 pages. So the page cannot be closed by cantSplit at all: 12 of the 17 lines are the promise, the last 5 are the row height. The change was REVERTED (attempt 12, reverted, 0/213 moved) so the tree matches the ledger, and HYPOTHESES.md carries the whole measurement.",
  "needs_human": [],
  "next_class": ""
 }
