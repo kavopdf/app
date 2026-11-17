@@ -15,6 +15,46 @@ that cannot work.
 | annotations-present | 1 | 63.1% | 600_reviewed_invoice_with_annotati 63.1%@5 p1 |
 | none-identified | 79 | 1144.2% | 041122-Account_Opening_Form 98.7%@5 p9 |
 
+## Where the ink went, in points
+
+`dx` positive = the output ink sits right of the source; `dy` positive = below it.
+A whole page shifted one way is an offset or margin bug. Signs scattered is a
+layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
+
+| document | share@5 | dx | dy | explains | still >20pt |
+|---|---|---|---|---|---|
+| 041122-Account_Opening_Form | 98.65 | 38.6 | -39.5 | 1.0 | 70.0% |
+| Account_Opening_Form_Fillable_fill | 97.62 | 3.4 | -17.4 | 2.0 | 66.0% |
+| 415_inline_images | 89.04 | 0.0 | 0.0 | 0.0 | 89.0% |
+| one-page-rotated-180-degrees | 81.64 | 0.0 | 0.0 | 0.0 | 23.0% |
+| itr-computation-with-slab-table | 68.82 | 0.0 | -33.1 | 9.0 | 7.0% |
+| 600_reviewed_invoice_with_annotati | 63.08 | 0.0 | 102.7 | 22.0 | 1.0% |
+| 601_fillable_admission_form | 52.39 | 0.0 | 26.9 | 15.0 | 8.0% |
+| table-inside-two-column-page | 42.0 | 0.0 | 0.0 | 0.0 | 20.0% |
+| 360_restaurant_menu | 34.43 | 0.0 | 0.0 | 0.0 | 3.0% |
+| text-held-twice-shadow-text | 34.33 | 0.0 | 0.0 | 0.0 | 29.0% |
+| 411_nested_xobject_transforms | 31.05 | -0.5 | 0.0 | 16.0 | 18.0% |
+| 75_merged_header_cell_three_column | 27.62 | 0.0 | 0.0 | 0.0 | 1.0% |
+| 71_invoice_space_aligned_no_rules | 26.88 | 0.0 | 1.4 | 4.0 | 0.0% |
+| report-2col-table-spanning-both-co | 22.58 | 0.0 | 0.0 | 0.0 | 1.0% |
+| mobile-bill | 18.48 | 0.0 | 0.0 | 0.0 | 6.0% |
+| salary-slip-factory-wages | 18.09 | 0.0 | 0.0 | 0.0 | 7.0% |
+| two-tables-stacked-with-no-gap | 17.2 | 0.0 | 0.0 | 0.0 | 3.0% |
+| 03_stamp_vertical_90deg | 16.98 | 0.0 | 0.0 | 0.0 | 0.0% |
+| marksheet-university-consolidated | 16.78 | 0.0 | 0.0 | 0.0 | 4.0% |
+| electricity-bill | 16.24 | 0.0 | 1.4 | 9.0 | 5.0% |
+| 78_mixed_english_devanagari_line | 13.51 | 0.0 | 0.0 | 0.0 | 0.0% |
+| insurance-policy-schedule | 13.29 | 0.0 | 0.0 | 0.0 | 5.0% |
+| landscape-page-inside-portrait-doc | 13.08 | 0.0 | 0.0 | 0.0 | 0.0% |
+| 66_two_col_footnotes_bottom | 13.03 | -0.5 | 2.9 | 3.0 | 0.0% |
+| 68_journal_wide_table_spanning | 12.83 | 0.0 | 0.0 | 0.0 | 0.0% |
+| form16-part-b | 12.32 | 0.0 | 0.2 | 1.0 | 4.0% |
+| mutual-fund-statement | 12.05 | 0.3 | 0.3 | 1.0 | 0.0% |
+| 77_arabic_rtl_document | 11.89 | 0.5 | 0.5 | 26.0 | 0.0% |
+| property-tax-receipt | 10.78 | 0.0 | 0.0 | 0.0 | 5.0% |
+| table-of-contents-dot-leaders | 10.72 | -0.5 | 0.0 | 1.0 | 0.0% |
+
+
 ## text-missing (12 documents)
 
 | document | share@5 | worst page | src img | docx img | src chars | docx chars | src draws | docx cells |
