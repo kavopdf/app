@@ -182,6 +182,19 @@ THE ONE FAILURE NO RUN CAN FIX: THE USAGE BUDGET
     * do NOT try to work around it, retry into it, or split the work to use less - the budget is
       not a rate limit and waiting inside a run does not restore it
 
+  A WATCHDOG NOW RESUMES THE PIPELINE, so you do not have to be rescued by a human. 'P2W 0/3
+  watchdog' runs every six hours, resumes any of the three pipeline crons that is paused or has
+  three consecutive failures, and triggers this one immediately if it resumed anything.
+
+  Six hours is not arbitrary. The platform pauses a cron after five consecutive failures, so an
+  hourly watchdog would survive five hours - shorter than the outage it exists to survive. At six
+  hours it survives thirty, which covers the fifteen to twenty hours a weekly budget takes to
+  reset. It clones nothing and fixes nothing on purpose: a watchdog that spends budget helps
+  cause the next outage.
+
+  So if you start a run and find the previous release hours old, the watchdog may have just woken
+  you up. That is expected. Read gaps.py, note the outage, and get on with the work.
+
   gaps.py now measures the space BETWEEN runs, not only inside one, because a 24/7 pipeline is
   defined by the gap between its runs as much as by the runs themselves. A between-run gap over
   five minutes is reported under "BETWEEN RUNS", and 849 minutes of it means the crons are paused.
@@ -703,8 +716,14 @@ STEP 4b - THE TOOLS YOU HAVE, AND WHEN TO SPEND THEM
     almost none, because the rule read as a five-condition checklist whose default was no. A run
     with an hour and one pair of eyes works one thread at a time; three agents work three.
 
-    THE DEFAULT IS YES. When you start a class, deploy two or three agents on different angles,
-    register them, and then work on your own fourth. They run in the background - you do not wait.
+    THE DEFAULT IS YES, AND THE CEILING IS TWO. When you start a class, deploy AT MOST TWO agents
+    on different angles, register them, and then work your own third. They run in the background -
+    you do not wait for them.
+
+    Two is the ceiling, not a target to beat. A run that deploys three has spent a third agent's
+    budget on an angle it will not have time to read, and the next run inherits findings nobody
+    acted on. If the two angles you have are enough, two is the answer; one is allowed; three is
+    not.
 
     Only two things stop the default:
 
