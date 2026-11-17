@@ -130,6 +130,8 @@ public final class DocxWriter {
      * <p>Modes: {@code -Dp2w.lineRule=exact} (default, HEAD), {@code auto} (flow AND cells),
      * {@code autoflow} (flow only; cells and anchored text boxes keep exact).
      */
+    /** Probe: print every cell paragraph's own line box. Off unless -Dp2w.dbgCells=1. */
+    private static final boolean DBG_CELLS = "1".equals(System.getProperty("p2w.dbgCells"));
     private static final int LINE_MODE = lineMode();
     private static int lineMode() {
         String v = System.getProperty("p2w.lineRule", "exact");
@@ -2614,50 +2616,7 @@ public final class DocxWriter {
         float needed = chars * b.size * 0.5f;
         if (advance < needed * 0.6f) advance = needed;
         float wPt = Math.max(4f, advance) * 1.12f + b.size * 1.5f;
-        // THE BOX'S PADDING MUST NOT PUSH THE TEXT OFF ITS OWN X.
-        //
-        // The box is 12 % wider than its line plus 1.5 em, and a line near the right edge
-        // therefore makes a box that ends past the paper. anchorShape() answers that by moving
-        // the box back onto the sheet - which is right for a box that would be DROPPED, and
-        // wrong when the line itself fits: the box's own padding is what overflowed, and
-        // sliding it left takes the text with it. Measured on 041122-Account_Opening_Form page
-        // 7, whose folio "7" is drawn at x=584.1 on a 595.5 pt sheet: the box is 21.1 pt wide,
-        // 574.4 pt is all that is left once it is added to the text's x, and the folio landed
-        // 9.6 pt left of the page's own - a 9.6 pt displacement on a document that had none.
-        // So the box is NARROWED to what is left of the sheet whenever the line's own advance
-        // fits there; a line that does not fit is still moved, exactly as before.
-        // The line needs a hair more than its own advance: a box as wide as the ink is a box
-        // the renderer may wrap, and with w:lineRule="exact" the wrapped remainder is clipped
-        // away. Measured while narrowing this box on 041122: a box cut to the advance exactly
-        // lost the last word of a line on pages 1, 3 and 4.
-        // THE CLAMP MOVES THE BOX, AND THE TEXT MUST NOT GO WITH IT.
-        //
-        // A line near the right edge makes a box that ends past the paper - the box is 12 %
-        // wider than its line plus 1.5 em - and anchorShape() answers that by moving the box
-        // back onto the sheet. That is right for a box that would be DROPPED, and wrong when
-        // the line itself fits: sliding the box left takes the text with it. Measured on
-        // 041122-Account_Opening_Form page 7, whose folio "7" is drawn at x=584.1 on a 595.5 pt
-        // sheet: the box is 21.1 pt wide, so it is clamped to x=574.4 and the folio landed
-        // 9.6 pt left of where the page drew it - a displacement on a document that had none.
-        //
-        // So the box stays where the clamp puts it and the TEXT is inset back to its own x,
-        // which is what lIns is for. The box's width is not touched: narrowing it is what
-        // dropped the last words of three lines on the same document (measured: pages 1, 3 and
-        // 4, whose lines already run past the page edge).
-        // ... and the box is NARROWED to what is left of the sheet, which is safe only for a
-        // line that ENDS on the paper. A text box here is written with wrap="none", so it never
-        // re-wraps its line - but a box narrower than the line clips the tail of it. Measured
-        // on the same document: narrowing the box of a line whose ink already runs past the
-        // page edge (pages 1, 3 and 4 end their lines at x=596.6 on a 595.5 pt sheet) dropped
-        // the last word of each. The folio's ink ends at 589.5, inside the paper, so its box
-        // can be the width the sheet has left and the digit lands on its own x.
         float hPt = Math.max(4f, b.size * LINE_FACTOR);
-        float room = ctx.pageWidthPt - b.x;
-        // The slack is a fifth again on top of the measured advance: the model's advance is
-        // the page's own, and the renderer's face is not - a line that measures 33 pt draws
-        // 34 pt wide, and a box cut to the measurement clips its last letter.
-        if (room > 0f && room < wPt && room >= advance * 1.15f + 2f
-                && b.right <= ctx.pageWidthPt + 0.5f) wPt = room;
         anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), 0f, -1, 0.6f);
     }
 
@@ -6675,6 +6634,14 @@ public final class DocxWriter {
                         // next one IS the advance. w:before then carries only a paragraph gap.
                         int boxTw = paraBoxTw(cps, q, rowLineTw);
                         int beforeTw = q == 0 ? before0 : paraBeforeTw(cps, q, rowLineTw);
+                        if (DBG_CELLS) {
+                            System.err.println("CELLDBG r" + r + " c" + c + " q" + q
+                                    + " sz=" + cp.size + " baseY=" + cp.baseY
+                                    + " box=" + boxTw + " before=" + beforeTw
+                                    + " rowLine=" + rowLineTw + " trH=" + rowHeightTw
+                                    + " n=" + cps.size()
+                                    + " txt=" + cp.text.substring(0, Math.min(24, cp.text.length())));
+                        }
                         stackTw += (q == 0 ? 0 : beforeTw) + boxTw;
                         int pInset = Float.isNaN(cp.indentPt) ? insetTw
                                 : (int) Math.max(0L, Math.round(cp.indentPt * TWIPS_PER_PT));
