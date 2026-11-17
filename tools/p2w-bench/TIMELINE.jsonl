@@ -169,3 +169,4 @@
 {"t": 1794924414.2003214, "ist": "19:36:54", "ev": "beat", "d": "chain.py: deciding whether to chain"}
 {"t": 1794924418.2379868, "ist": "19:36:58", "ev": "beat", "d": "chain.py: deciding whether to chain"}
 {"t": 1794924421.9666798, "ist": "19:37:01", "ev": "beat", "d": "chain.py: deciding whether to chain"}
+{"t": 1794936722.774272, "ist": "23:02:02", "ev": "claim", "d": "baseline claimed the slot"}
