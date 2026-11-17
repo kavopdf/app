@@ -146,7 +146,8 @@ so you can copy them. Never estimate a number.
 
     python3 tools/p2w-bench/round.py                    round, phase, scored
     python3 benchmarks/p2w.py --status                  measured / remaining, this run
-    python3 tools/p2w-bench/txt_gap.py --count          txt backfill left
+    python3 -c "import json;print(json.load(open('benchmarks/STATE.json'))['layers'].get('txt_checks'))"
+                                                        the .txt named checks, advisory
     python3 -c "import json;print(json.load(open('benchmarks/STATE.json'))['verdict'])"
                                                         ratchet verdict and the regressions list
     git log -1 --format=%h -- app/src/main/java/com/kavopdf/app/engine/     engine

@@ -42,6 +42,16 @@ DEAD = [
     "tools/p2w-bench/base208-position.json",
     "tools/p2w-bench/VISUAL-SCORE.md",
     "tools/p2w-bench/BATCH-LOG.md",
+    # the separate .txt store. The current measurement puts text_recall and chars_missing in the
+    # SAME row of RANKING.csv, and gate.py runs verify_txt.py for the named checks - so there is no
+    # separate .txt score store any more, and nothing writes or reads these.
+    "tools/p2w-bench/RESULTS-TXT.jsonl",
+    "tools/p2w-bench/RATCHET-TXT.json",
+    "tools/p2w-bench/TXT-DEFECTS.md",
+    "tools/p2w-bench/TXT-SCORE.md",
+    # its own first line calls it a RETIRED LIST, PARKED; all four rows are PARKED so it adds zero
+    # OPEN classes, and round.py guards its read with os.path.exists
+    "tools/p2w-bench/DEFECT-CLASSES-TXT.md",
 ]
 DEAD_GLOBS = [
     "tools/p2w-bench/RATCHET-2*.json",       # timestamped backups of a file nothing reads

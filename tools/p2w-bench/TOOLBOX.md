@@ -497,7 +497,14 @@ corpus is not contiguous - 37_font_... sits inside that range, and 376 to 379 ar
 the corpus at all. The commit log is the only record of what was measured, so the list is
 read from the file rather than remembered.
 
-## txt_gap.py — documents that have a .docx score but no .txt score
+## txt_gap.py — RETIRED, do not call
+
+It counts documents in RESULTS.jsonl that never reached RESULTS-TXT.jsonl. Both stores are dead:
+text_recall and chars_missing now live in the same RANKING.csv row, and the .txt named checks come
+from verify_txt.py through gate.py. It prints 0 because two dead files agree, not because the work
+is done.
+
+## txt_gap.py (historical) — documents that have a .docx score but no .txt score
 
 **Used by:** baseline, before STEP 3b and before it advances the phase.
 
