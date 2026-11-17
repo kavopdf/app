@@ -127,5 +127,12 @@
   }
  ],
  "context": "Three root causes in the table-cell paragraph path are fixed and measured across 213 documents: (1) the per-cell lines matrix 'pieces' was left in the untrimmed column space while its consumer indexed the trimmed grid, so a multi-line cell read the WRONG column's lines - the six heading paragraphs of 041122 page 7 were written into the empty cell beside them, which is why that heading appeared twice; (2) the point size was taken from the Tf operand, so 041122 - which draws everything as '/TT0 1 Tf' inside a 10x Tm - was emitted as 1214 one-point runs, microprint for the whole bank form; the size is scalingFactorY of the text rendering matrix and it is a size, not a multiplier (multiplying squared it and regressed 192 documents, measured and discarded); (3) each line's own x was computed but never set as the paragraph inset, so all six heading lines carried the first line's 472.6 pt inset in a 531.8 pt cell and wrapped in a 59 pt column. Corpus after all three: 208 unchanged, 411_nested_xobject_transforms 31.05 -> 0.00, 041122 98.65 -> 97.62 with median displacement 477.6 -> 138.24 pt, one regression 39_small_caps_letter_spacing 0.72 -> 3.78. The heading now renders in the right cell, at 10 pt, right-aligned and centred as the source draws it. STILL OPEN: 041122 renders 12 pages against 9 and page 7 is nearly blank - the page-7 table itself renders correctly on page 8, so one row is rendering far taller than its declared trHeight and cantSplit moves it. 416_many_tiny_pages is a MEASURE-ERROR in both the baseline and this run, not new.",
- "needs_human": []
+ "needs_human": [
+  {
+   "at": "11:23",
+   "what": "subagents cannot commit their findings to kavopdf/app (git push 403 'denied to Onyx-Node'; contents API 'Resource not accessible by integration')",
+   "tried": "retried once each, verified 403 not 422, verified repo exists and my own push is denied too - every commit this run went through the GitHub MCP contents API",
+   "change": "grant the GitHub App write access to kavopdf/app, or give subagent sandboxes the parent's credentials"
+  }
+ ]
 }

@@ -10,6 +10,7 @@ file is read by every run after it.
 
 | time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
 |---|---|---|---|---|---|
+| 2026-11-17 11:20 | `git push` and the contents API both refuse writes from a SUBAGENT's sandbox: `remote: Permission to kavopdf/app.git denied to Onyx-Node` (403) and `Resource not accessible by integration`. Both agents this run found real root causes, committed locally, and could not land their FINDINGS file; I had to commit them from my own sandbox, and my own `git push` is denied too - every commit this run went through the GitHub MCP contents API instead. | Retried once per the subagent commit rule; both attempts refused identically. Verified it is not a non-fast-forward race (403, not 422) and not a missing repo. | Give the GitHub App write access to `kavopdf/app`, or give the subagent sandboxes the same credentials the parent uses. Until then the rule 'every subagent commits its own finding' cannot be satisfied and a finding depends on the parent run surviving long enough to commit it. |
 
 ## How to add a row
 

@@ -26,3 +26,8 @@
 {"t": 1794894413.4036152, "ist": "11:16:53", "ev": "attempt", "d": "content-missing-partly-replaced -> partial"}
 {"t": 1794894714.7363167, "ist": "11:21:54", "ev": "release", "d": "fixer released"}
 {"t": 1794894731.3405192, "ist": "11:22:11", "ev": "beat", "d": "chain.py: deciding whether to chain"}
+{"t": 1794894784.6892354, "ist": "11:23:04", "ev": "beat", "d": "chain.py: deciding whether to chain"}
+{"t": 1794894794.9315488, "ist": "11:23:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1794894795.0527046, "ist": "11:23:15", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1794894799.982929, "ist": "11:23:19", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1794894814.044501, "ist": "11:23:34", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

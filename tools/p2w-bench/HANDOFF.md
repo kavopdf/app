@@ -1,5 +1,14 @@
 # HANDOFF - read this before you pick a class
 
+## NEEDS A HUMAN - no future run can clear these
+
+A run tried, could not, and it was not a system limit. Every run after this one
+will hit the same wall until one of these is changed by a person.
+
+| # | what it is | what was tried | what must change | when |
+|---|---|---|---|---|
+| 0 | subagents cannot commit their findings to kavopdf/app (git push 403 'denied to Onyx-Node'; | retried once each, verified 403 not 422, verified repo exists and my o | grant the GitHub App write access to kavopdf/app, or give subagent san | 11:23 |
+
 Written by handoff.py on every claim, every attempt, every agent and every release.
 It is never more than one attempt old. If the claim in ROUND.json is older than the
 stale limit, the run that wrote this died without releasing - treat its plan as
