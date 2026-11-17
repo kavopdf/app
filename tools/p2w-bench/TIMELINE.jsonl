@@ -31,3 +31,5 @@
 {"t": 1794894587.8886924, "ist": "11:19:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1794894618.052195, "ist": "11:20:18", "ev": "beat", "d": "chain.py: deciding whether to chain"}
 {"t": 1794894631.6674035, "ist": "11:20:31", "ev": "beat", "d": "chain.py: deciding whether to chain"}
+{"t": 1794894649.0568707, "ist": "11:20:49", "ev": "beat", "d": "chain.py: deciding whether to chain"}
+{"t": 1794894671.455599, "ist": "11:21:11", "ev": "beat", "d": "chain.py: deciding whether to chain"}

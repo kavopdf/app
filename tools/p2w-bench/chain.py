@@ -36,6 +36,7 @@ except Exception:
         pass
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+BEACON_FILES = ("tools/p2w-bench/TIMELINE.jsonl", "tools/p2w-bench/TRACE.md")
 ROOT = os.path.dirname(os.path.dirname(HERE))
 CHAIN = os.path.join(HERE, "CHAIN.json")
 RUN = os.path.join(HERE, "RUN.json")
@@ -115,10 +116,25 @@ def remote_in_sync():
         dirty = []
         for line in st.splitlines():
             code, _, path = line[:2], line[2:3], line[3:].strip()
+            # __pycache__ IS CREATED BY RUNNING THIS CHECK. Python writes it the moment the
+            # tooling imports beacon/trace, so a clean tree became dirty between the run that
+            # committed it and the chain that read it - every run ended "STOP: uncommitted
+            # changes ... tools/p2w-bench/__pycache__/", and the only way to pass was to run
+            # chain.py from a tree that had not yet imported anything, which is impossible.
+            if "__pycache__" in path or path.endswith(".pyc"):
+                continue
             if code.strip() == "??":
                 # untracked matters only where the pipeline keeps state
                 if path.startswith(("tools/p2w-bench/", "benchmarks/")):
                     dirty.append(path)
+            elif path in BEACON_FILES:
+                # THE BEACON FILES ARE APPENDED TO BY THE TOOL THAT IS CHECKING THEM.
+                # beat() runs on chain.py's own entry, so TIMELINE.jsonl and TRACE.md are
+                # modified by the time this runs, by this run, on purpose. Their content is
+                # one line of telemetry that the next run's evidence commit carries; a chain
+                # that refuses to fire over its own heartbeat has the brake wired to the
+                # engine. Every other state file is still checked.
+                continue
             else:
                 dirty.append(path)
         if dirty:
