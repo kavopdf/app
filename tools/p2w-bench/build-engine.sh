@@ -74,7 +74,7 @@ mkdir -p out
 # `find -newer` on a file that does not exist exits 1, and under `set -e` that killed the
 # whole build on a fresh clone - the 16 Nov 11:53 run lost five minutes to "compiling stubs"
 # printing nothing and exiting 1. The guard must answer "nothing is newer", not "cannot tell".
-_newest_src=$(find stubs ../../app/src/main/java/com/kavopdf/app/engine ConvertAll.java -name '*.java' -newer out/ConvertAll.class 2>/dev/null | head -1) || true
+_newest_src=$(find stubs ../../app/src/main/java/com/kavopdf/app/engine ConvertAll.java ConvertOne.java -name '*.java' -newer out/ConvertAll.class 2>/dev/null | head -1) || true
 if [ -f out/ConvertAll.class ] && [ -z "$_newest_src" ]; then
   echo "engine unchanged - skipping compile" >&2
   tr "engine unchanged, compile skipped"
@@ -91,8 +91,9 @@ javac -nowarn -d out $(find stubs -name '*.java')
 # That is what made TestPdfToWord unrunnable: an asset-bootstrap bug, not engine code.
 CP="out:libs/aar/classes.jar:libs/aar/assets:libs/bcprov.jar:libs/bcpkix.jar:libs/bcutil.jar"
 javac -nowarn -cp "$CP" -d out $(find ../../app/src/main/java/com/kavopdf/app/engine -name '*.java')
-javac -nowarn -cp "$CP" -d out ConvertAll.java
+javac -nowarn -cp "$CP" -d out ConvertAll.java ConvertOne.java
 
 test -f out/ConvertAll.class || { echo "ConvertAll did not compile" >&2; exit 1; }
+test -f out/ConvertOne.class || { echo "ConvertOne did not compile" >&2; exit 1; }
 echo "engine built - ConvertAll ready ($(( $(date +%s) - _t0 ))s)" >&2
 tr "engine built in $(( $(date +%s) - _t0 ))s"

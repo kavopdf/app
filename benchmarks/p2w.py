@@ -558,7 +558,27 @@ def docx(end):
     E=REPO+"/tools/engine-verify"
     cp=":".join([E+"/out",E+"/libs/aar/classes.jar",E+"/libs/bcprov.jar",E+"/libs/bcpkix.jar",E+"/libs/bcutil.jar"])
     env='JAVA_HOME='+JH+' PATH='+JH+'/bin:$PATH JAVA_TOOL_OPTIONS="-XX:CompressedClassSpaceSize=64m -XX:MaxMetaspaceSize=200m"'
-    sh('cd '+E+' && '+env+' java -Xmx700m -cp "'+cp+'" ConvertAll '+CORPUS+' '+DOCX,min(max(60,int(end-time.time())),280))
+    # ONE DOCUMENT PER JVM. NOT AN OPTIMISATION - A CORRECTNESS REQUIREMENT.
+    #
+    # ConvertAll carries state between the documents it is given. Measured 17 Nov on
+    # 392_statistical_console_output, same engine, same PDF:
+    #
+    #     converted alone                          share5 1.61   (its 15 Nov ranking value)
+    #     converted with 1 other document          share5 1.61
+    #     converted with 11 others                 share5 1.61
+    #     converted inside the full corpus of 213  share5 28.39
+    #
+    # The .docx differ in layout, not only in bytes. So a document's score depends on which other
+    # documents happened to share the batch - and a ranking built that way cannot be reproduced,
+    # because reproducing it means reproducing the batch. That is why every regression count this
+    # session was a number nobody could re-derive from the corpus.
+    #
+    # ConvertOne takes one PDF and one output directory. It is the only way to get a measurement
+    # that is a property of the document rather than of its neighbours.
+    for p in miss:
+        if time.time() > end - 6: break
+        sh('cd ' + E + ' && ' + env + ' java -Xmx700m -cp "' + cp + '" ConvertOne '
+           + p + ' ' + DOCX, min(max(25, int(end - time.time())), 90))
     return len(glob.glob(DOCX+"/*.docx"))
 def _engine_stamp():
     """The engine commit this measurement belongs to, or 'unknown'."""
