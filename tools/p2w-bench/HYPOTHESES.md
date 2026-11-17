@@ -407,3 +407,24 @@ Do not re-test one without new evidence, and if you do, say what changed.
   source line ends at 569.0 - 3.9 pt of slack. NEXT on this class: measure whether that last
   3.9 pt is our cell width (`w:tcW`/gridCol) or our run metrics, before touching the writer
   again.
+
+- CORRECTION to the two entries above, and the reason they read as they do. evidence: 17 Nov
+  14:5x fixer. This slot cloned at 9f7a094; by the time it measured, origin/main had moved to
+  cf2f9c6 - "the page's advance widths are carried in a face the reader has" (ARIAL_W: runs
+  are written in Arial, whose metrics the engine holds, at the character scale that reproduces
+  the width the page drew, plus the folio anchored where the page put it). Every number in
+  this run's first attempt was measured on the OLD engine. On the fixed engine 041122 renders
+  11 pages, not 12, and the verification block - the row whose line box this run was told to
+  change - lands on page 7, the page the source drew it on: `item 22b` is on our page 7, and
+  the cell's paragraphs no longer take 24 pt. The wrap was already cured. The 232 tw change
+  would have been made against a defect that no longer exists.
+- CONFIRMED - what is left of 041122's 11 pages against 9 is TWO FOLIO-ONLY SHEETS. evidence:
+  page heads of our render against the source's, page by page - our 8 holds the text "7" and
+  nothing else, our 10 holds "8" and nothing else; every other page carries its source page's
+  content and in the right order (7 = Annexure-1, 9 = Instruction, 11 = Annexure-2). The
+  folio anchor in DocxWriter (~:4255) fires only for `b.y > 0.88 * pageHeightPt`, i.e. a folio
+  in the BOTTOM band; these two pages draw their number where the flow had no room left, so
+  the folio still goes through the flow path, `fitPage` refuses it, and `breakPage` gives it a
+  sheet of its own. NEXT: probe the two folios' own `b.y` and `ctx.pageHeightPt` in the model
+  (`-Dp2w.dbgCells` is the pattern) and decide whether the anchor's band test or the page's
+  own height is what excludes them, before widening the test.
