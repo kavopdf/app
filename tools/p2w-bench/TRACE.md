@@ -305,14 +305,9 @@ claim and after each step; it is not code and cannot break anything.
 | 17 Nov 14:34 | fixer | hypothesis | content-missing-partly-replaced -> ruled-out |
 | 17 Nov 14:34 | fixer | hypothesis | content-missing-partly-replaced -> confirmed |
 | 17 Nov 14:34 | fixer | attempt | content-missing-partly-replaced -> partial (2/16 moved) |
-| 17 Nov 14:21 | fixer | claim | fixer claimed the slot |
-| 17 Nov 14:21 | fixer | build-engine | started |
-| 17 Nov 14:23 | fixer | build-engine | engine built in 69s |
-| 17 Nov 14:24 | fixer | build-engine | started |
-| 17 Nov 14:24 | fixer | build-engine | engine unchanged, compile skipped |
-| 17 Nov 14:26 | fixer | build-engine | started |
-| 17 Nov 14:27 | fixer | build-engine | engine built in 69s |
-| 17 Nov 14:48 | fixer | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |
-| 17 Nov 14:58 | classifier | build-engine | started |
-| 17 Nov 14:59 | classifier | build-engine | engine built in 46s |
-| 17 Nov 15:05 | classifier | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |
+| 17 Nov 14:39 | fixer | claim | fixer claimed the slot |
+| 17 Nov 14:39 | fixer | build-engine | started |
+| 17 Nov 14:40 | fixer | build-engine | engine built in 58s |
+| 17 Nov 14:58 | fixer | build-engine | started |
+| 17 Nov 14:59 | fixer | build-engine | engine built in 56s |
+| 17 Nov 15:36 | fixer | attempt | content-missing-partly-replaced -> partial (1/30 moved) |

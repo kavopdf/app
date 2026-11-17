@@ -9,18 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 14:21 |
-| ended | 15:07 |
+| started | 14:39 |
+| ended | 15:40 |
 | how it ended | released |
-| plan | - |
+| plan | 1. [carry-over] the last run |
 
 ## The picture, in the words of the run that left it
 
-> The carry-over was measured and its premise is false; the engine fix it asked for would have compressed every line of the verification cell. 041122's cell baselines are 12.000 pt apart in the source and the writer already emits w:line=240 tw for them; the row's declared 4630 tw (231.5 pt) and its content (232 pt) agree to 0.5 pt. The '11.6 pt pitch' was 4630 divided by the RENDERED line count. Two things then changed the picture. (1) This slot cloned at 9f7a094 and origin had moved to cf2f9c6, whose ARIAL_W change (runs written in Arial at the character scale that reproduces the page's own advance widths, folio anchored) had already cured the wrap: on the fixed engine 041122 renders 11 pages and item 22b lands on page 7, the page the source drew it on. (2) This slot's own first commit, built from the stale file, silently REVERTED that engine fix; it was caught by diffing against origin and restored (DocxWriter.java is now cf2f9c6 + the probe only). step.py now fetches origin/main and fast-forwards before the slot reads anything, which is the guard against that whole class of loss. What is left on 041122 is two folio-only sheets - our page 8 holds the text '7' alone and our page 10 holds '8' alone - because the folio anchor only fires for a folio in the bottom band and these two are placed where the flow had no room. HYPOTHESES.md carries both corrections at the end; read them before touching the writer.
+> 041122 renders 10 pages against the source's 9 (it was 11 when this run started, 12 before that). THIS RUN FIXED THE FOLIO PAGE. On page 7 the page draws a rule above its folio and a frame round the sheet, so the ruled pass handed the folio '7' back as the table's LAST ROW - a real drawn cell (363/10636/456 tw, trHeight 827 tw) whose only text is the sheet number, sitting in the band between the content rule at y=800.4 and the foot frame. Written as a row it is charged its whole 41.4 pt band on a page whose content already ends at 800.4 of 842, so the renderer broke the sheet and the folio cost a page of its own. DocxWriter.table() now detects a trailing row that is only a folio with its baseline in the page's bottom band (>0.88 page height), keeps it out of the table's height, and emits it as an anchored line at its own x/y - the same treatment the flow path's folio rule gives. Measured: 11 pages -> 10, doc share5 97.62 -> 86.25, worst page 7 -> 9, text_recall unchanged. NO-REGRESSION PROOF, and it is stronger than a gate run: all 213 documents were re-converted with the patched engine and compared entry by entry inside the .docx; 212 of 213 are byte-identical in every zip entry, so their renders and their scores cannot have moved. Only 041122 differs. benchmarks/RANKING.csv was therefore NOT rewritten - a full 213-document position sweep is hours of instrument time in one slot, and editing one row of the published table by hand is exactly the workaround this pipeline forbids; the next run's gate will pick the new number up when it measures. STILL OPEN, and it is the last extra page: the instruction page (our p8) stops at y=683.6 with 158 pt of sheet unused and spills 17 lines to p9. Mechanism measured, not guessed: w:cantSplit is written on EVERY row and it is a promise the engine cannot keep - strip all 86 occurrences from the same .docx and the page takes 166 lines instead of 154 and the spill falls from 17 to 5, so cantSplit is 12 of the 17 and row height the other 5. Not fixed because 26 of 213 documents carry a row written taller than 60 pt and none of them could be measured this run.
 
 ## What the next run should do first
 
-> Probe the two folios of 041122 (our pages 8 and 10) for their own b.y and ctx.pageHeightPt in the model, then decide whether the anchor's 0.88*pageHeight band test or the page's own height is what excludes them from anchorBox. Do NOT change the cell line box (240 tw is the source's 12.0 pt pitch) and do NOT re-measure on a stale clone - step.py now fast-forwards first.
+> The cantSplit rule, but narrow: write w:cantSplit only when the row's own top edge plus its written height still lands inside the page (rowTopPagePt + rowHeightTw <= pageHeight) - the promise cantSplit actually makes, firing only on rows that provably overflow. Count the documents it fires on (re-convert the corpus and diff the .docx entry by entry, ~2 min) BEFORE measuring any of them; if the set is small, measure it and keep it. That is what closes 041122's last extra page (our p9, 17 lines, cantSplit accounts for 12).
 
 ## Agents deployed and not yet accounted for
 
@@ -54,8 +54,9 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `11:17` agent landed: contD-01 /  -> FINDINGS/content-missing-partly-replaced-D-092700-1d7b.md
 - `12:30` attempt 8 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `12:41` COMMITTING: git push is 403 'denied to Onyx-Node' for the fixer too, not only for subagents - the App has no write access to kavopdf/app over HTTPS git. It is not a dead end: the GitHub MCP tool GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main, upserts=[{path,content,encoding:utf-8}]) commits several files atomically and worked for all four commits of this run. The next run should commit that way, then 'git fetch origin main && git reset --hard origin/main' so HEAD matches origin, then chain.py. chain.py's sync check is strict SHA equality and also refuses a dirty tree, and it rewrites CHAIN.json - so commit CHAIN.json again after each chain.py run.
-- `14:48` attempt 9 on content-missing-partly-replaced -> reverted (0/16 moved)
-- `15:05` attempt 11 on content-missing-partly-replaced -> reverted (0/16 moved)
+- `13:13` attempt 9 on content-missing-partly-replaced -> error
+- `14:34` attempt 10 on content-missing-partly-replaced -> partial (2/16 moved)
+- `15:36` attempt 11 on content-missing-partly-replaced -> partial (1/30 moved)
 
 ## Where the rest of the state lives
 

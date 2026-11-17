@@ -130,8 +130,6 @@ public final class DocxWriter {
      * <p>Modes: {@code -Dp2w.lineRule=exact} (default, HEAD), {@code auto} (flow AND cells),
      * {@code autoflow} (flow only; cells and anchored text boxes keep exact).
      */
-    /** Probe: print every cell paragraph's own line box. Off unless -Dp2w.dbgCells=1. */
-    private static final boolean DBG_CELLS = "1".equals(System.getProperty("p2w.dbgCells"));
     private static final int LINE_MODE = lineMode();
     private static int lineMode() {
         String v = System.getProperty("p2w.lineRule", "exact");
@@ -4530,7 +4528,13 @@ public final class DocxWriter {
      * whole line in the bottom band of the page. Nothing else is short enough to match.
      */
     private static boolean isFolio(PdfToWord.Para p) {
-        String t = p == null ? "" : p.text().trim();
+        return isFolioText(p == null ? "" : p.text().trim());
+    }
+
+    /** The same test on a string, so a table cell can be asked the question too. */
+    private static boolean isFolioText(String t) {
+        if (t == null) return false;
+        t = t.trim();
         if (t.isEmpty() || t.length() > 12) return false;
         return t.matches("(Page\\s+)?\\d{1,4}(\\s*(of|/)\\s*\\d{1,4})?")
                 || t.matches("-\\s*\\d{1,4}\\s*-")
@@ -6062,8 +6066,45 @@ public final class DocxWriter {
         // high against its PDF, file 55's sidebar 141 pt low, and three documents spilled onto a
         // second sheet. Measured on the corpus, the drift is worst in exactly the documents that
         // contain a table and near zero in those that do not.
-        int rowCount = Math.max(1, t.rows.size());
-        float extentPt = t.bottom - t.top;
+        // THE PAGE'S OWN FOLIO IS NOT A ROW OF THE TABLE THE PAGE'S RULES BOUND.
+        //
+        // A page that draws a frame round itself draws a rule above its folio, and the ruled
+        // pass then hands the folio back as the table's LAST ROW: on 041122-Account_Opening_Form
+        // page 7 the model's table ends at y=800.4 and the folio "7" is drawn at y=824.3, in the
+        // band between that rule and the page's foot frame - so the row exists, it is the last
+        // one, and its only text is the sheet's number. Written as a row it is charged the whole
+        // band (827 twips, 41.4 pt) and the page, whose content already ends at 800.4 of 842, has
+        // no room for it: the renderer breaks the sheet and the folio costs a page of its own
+        // (ours p8 of 11 against the source's 9). The same table with that row taken out ends at
+        // the rule the page's content ends on and fits.
+        //
+        // It is not deleted. It is written where the page drew it - an anchored line at its own
+        // y, which is the treatment the FLOW path already gives a folio (see the folio rule in
+        // para()), and which costs the flow no height because the box is positioned, not flowed.
+        int folioRow = -1;
+        if (t.rows.size() >= 2 && !ctx.inColumn) {
+            int last = t.rows.size() - 1;
+            StringBuilder only = new StringBuilder(16);
+            for (String cellText : t.rows.get(last)) if (cellText != null) only.append(cellText);
+            String folioText = only.toString().trim();
+            float folioBase = Float.NaN;
+            if (last < t.cellY.size()) {
+                for (Float y : t.cellY.get(last)) {
+                    if (y != null && !Float.isNaN(y)) { folioBase = y; break; }
+                }
+            }
+            if (!folioText.isEmpty() && isFolioText(folioText)
+                    && !Float.isNaN(folioBase) && folioBase > 0.88f * ctx.pageHeightPt) {
+                folioRow = last;
+            }
+        }
+        int nRows = folioRow >= 0 ? folioRow : t.rows.size();
+        int rowCount = Math.max(1, nRows);
+        float tableBottom = t.bottom;
+        if (folioRow >= 0 && t.rowEdge != null && t.rowEdge.length == t.rows.size() + 1) {
+            tableBottom = t.rowEdge[nRows];
+        }
+        float extentPt = tableBottom - t.top;
         int rowTw = extentPt > 0f ? (int) Math.round(extentPt / rowCount * TWIPS_PER_PT) : 0;
         // The rule the writer draws is added to every row by the renderer, so a row asked for
         // the page's own pitch arrives that much taller. With collapsed borders half of the top
@@ -6172,7 +6213,7 @@ public final class DocxWriter {
         // are stacked from the table's own top, so row 2 starts one WRITTEN row below row 1.
         float recutTopPt = Float.NaN;
         float rowTopPagePtHere = Float.NaN;
-        for (int r = 0; r < t.rows.size(); r++) {
+        for (int r = 0; r < nRows; r++) {
             List<String> row = t.rows.get(r);
             // This row's own pitch. A ruled table's rule lies inside the row's box, so it comes
             // off here exactly as it comes off the average above.
@@ -6185,7 +6226,7 @@ public final class DocxWriter {
             }
             // The rule this row pays: half of the rule above it plus half of the rule below it.
             int szAbove = r == 0 ? szRuleTop : szRuleInside;
-            int szBelow = r == t.rows.size() - 1 ? szRuleBottom : szRuleInside;
+            int szBelow = r == nRows - 1 ? szRuleBottom : szRuleInside;
             int ruleTwHere = (int) Math.round((szAbove + szBelow) * TWIPS_PER_PT / 16.0);
             // THE PITCH STAYS THE PAGE'S PITCH; THE CELL'S CONTENT IS WHAT COMES OFF.
             // The renderer lays a row out at max(w:trHeight, cell content + rule). Two different
@@ -6634,14 +6675,6 @@ public final class DocxWriter {
                         // next one IS the advance. w:before then carries only a paragraph gap.
                         int boxTw = paraBoxTw(cps, q, rowLineTw);
                         int beforeTw = q == 0 ? before0 : paraBeforeTw(cps, q, rowLineTw);
-                        if (DBG_CELLS) {
-                            System.err.println("CELLDBG r" + r + " c" + c + " q" + q
-                                    + " sz=" + cp.size + " baseY=" + cp.baseY
-                                    + " box=" + boxTw + " before=" + beforeTw
-                                    + " rowLine=" + rowLineTw + " trH=" + rowHeightTw
-                                    + " n=" + cps.size()
-                                    + " txt=" + cp.text.substring(0, Math.min(24, cp.text.length())));
-                        }
                         stackTw += (q == 0 ? 0 : beforeTw) + boxTw;
                         int pInset = Float.isNaN(cp.indentPt) ? insetTw
                                 : (int) Math.max(0L, Math.round(cp.indentPt * TWIPS_PER_PT));
@@ -6753,14 +6786,14 @@ public final class DocxWriter {
                 // per line the cell holds. It is the number the renderer lays the cell out
                 // with, and the row is w:trHeight tall whatever this says - the difference is
                 // the slack the flow anchor after the table is about.
-                if (r == t.rows.size() - 1) {
+                if (r == nRows - 1) {
                     int lines = Math.max(1, cell.split("\n", -1).length);
                     lastRowContentTw = Math.max(lastRowContentTw,
                             cellBeforeTw + lines * cellBoxTw);
                 }
                 c += span;
             }
-            if (r == t.rows.size() - 1) {
+            if (r == nRows - 1) {
                 lastRowHeightTw = rowHeightTw;
                 lastRowTopPagePt = rowTopPagePt;
             }
@@ -6768,6 +6801,7 @@ public final class DocxWriter {
         }
         inner.append("</w:tbl>");
         sb.append(inner);
+        if (folioRow >= 0) tableFolio(sb, t, folioRow, ctx);
         // A table must be followed by a paragraph of its own: Word inserts one if it is not
         // there, and a paragraph the writer did not place is a paragraph it cannot measure.
         //
@@ -6853,6 +6887,57 @@ public final class DocxWriter {
         ctx.flowBoxPt = 0f;
         ctx.newPage = false;
         ctx.lastWasTable = true;
+    }
+
+    /**
+     * The page's own folio, written where the page drew it instead of as a row of the table.
+     *
+     * <p>Called only for a trailing row that is nothing but the sheet's number and whose baseline
+     * is in the page's bottom band - see the folio rule at the head of {@link #table}. The row is
+     * not part of the table's height (that is the whole point: it lives in the band the page's
+     * foot frame leaves, which the text area does not have), so it goes out as an anchored line
+     * at its own x and y, the same treatment {@link #para} gives a folio that reaches the flow.
+     */
+    private static void tableFolio(StringBuilder sb, PdfToWord.Table t, int r, Ctx ctx) {
+        if (r >= t.rows.size()) return;
+        List<String> row = t.rows.get(r);
+        int c = -1;
+        for (int q = 0; q < row.size(); q++) {
+            String v = row.get(q);
+            if (v != null && !v.trim().isEmpty()) { c = q; break; }
+        }
+        if (c < 0) return;
+        String text = row.get(c).trim();
+        float x = c < t.cellX.get(r).size() && t.cellX.get(r).get(c) != null
+                ? t.cellX.get(r).get(c) : Float.NaN;
+        float base = c < t.cellY.get(r).size() && t.cellY.get(r).get(c) != null
+                ? t.cellY.get(r).get(c) : Float.NaN;
+        float sz = c < t.sizes.get(r).size() && t.sizes.get(r).get(c) != null
+                ? t.sizes.get(r).get(c) : 0f;
+        if (Float.isNaN(x) || Float.isNaN(base) || sz <= 0f) return;
+        String face = c < t.fonts.get(r).size() ? t.fonts.get(r).get(c) : null;
+        int rgb = c < t.colors.get(r).size() && t.colors.get(r).get(c) != null
+                ? t.colors.get(r).get(c) : 0;
+        int half = halfPointsDown(sz);
+        StringBuilder inner = new StringBuilder(256);
+        inner.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/><w:spacing w:beforeAutospacing=\"0\"")
+                .append(" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
+                .append(Math.max(1, Math.round(sz * LINE_FACTOR * TWIPS_PER_PT)))
+                .append("\" w:lineRule=\"exact\"/><w:ind w:left=\"0\" w:right=\"0\"")
+                .append(" w:firstLine=\"0\"/><w:rPr><w:sz w:val=\"").append(half)
+                .append("\"/></w:rPr></w:pPr><w:r><w:rPr>");
+        if (face != null && !face.isEmpty()) {
+            String f = esc(faceName(face));
+            inner.append("<w:rFonts w:ascii=\"").append(f).append("\" w:hAnsi=\"").append(f)
+                    .append("\" w:cs=\"").append(f).append("\"/>");
+        }
+        inner.append("<w:color w:val=\"").append(hex(rgb)).append("\"/>")
+                .append("<w:sz w:val=\"").append(half).append("\"/><w:szCs w:val=\"")
+                .append(half).append("\"/></w:rPr><w:t xml:space=\"preserve\">")
+                .append(esc(text)).append("</w:t></w:r></w:p>");
+        float wPt = Math.max(4f, text.length() * sz * 0.6f) + sz * 1.5f;
+        float hPt = Math.max(4f, sz * LINE_FACTOR);
+        anchor(sb, ctx, x, base - ASCENT * sz, wPt, hPt, inner.toString(), 0f, -1, 0.6f);
     }
 
     /**
