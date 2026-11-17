@@ -318,41 +318,67 @@ Do not re-test one without new evidence, and if you do, say what changed.
   documents should fall from ~90 %@5 to the pages 1-6 range. Do not re-derive the size bug.
 
 
-## content-missing-partly-replaced - 17 Nov 10:50 run: the patch was lost, and the metric is saturated
-
-- RULED OUT - (re-derived, do not repeat) Reading `g.size` off `getFontSize()` is what makes
-  `041122` render at 1 pt, and setting it to the effective size fixes the class.
-  evidence: 17 Nov 2026 fixer, HEAD `5e0af50`, probe through the engine's own PDFBox
-  (`ProbeSz`, page 7): `getFontSize()=1.0`, `getFontSizeInPt()=10.0`, textMatrix scaling 10.0 -
-  the page sets `1 Tf` at all 23 of its Tf sites and carries the size in `Tm` (6.0/6.5/10.0).
-  The whole document is emitted at `w:sz` 2 = 1 pt, 47201 characters, and page 7 renders as a
-  sheet of table rules with 80.67 % of the source ink unmatched. THE MECHANISM IS REAL AND WAS
-  ALREADY PROVED on 16 Nov - this entry exists only because `patches/` was never committed and
-  the fix was re-derived from a cold start. Both fields now restored to the effective size in
-  `patches/run-size-from-sizePt-not-Tf.patch`. NOT the fix on its own: with real 6 pt text the
-  document lays out at 13 pages, and `11_stamp_with_signature_image` reads 2.77 -> 6.38.
-  recorded: 2026-11-17 11:30
-
-- RULED OUT - The per-line paragraphs a trimmed table cell holds land on the wrong cell, and
-  fixing that alignment moves the class.
-  evidence: 17 Nov 2026 fixer. `PdfToWord` 8680-8702 trims `cells, faces, firstX, firstY,
-  colours` through `keep` but not `pieces` or `sizes`, while `shapeParas(rows, cols)` and the
-  `pieces.get(rr).get(cc)` loop that follows both use the TRIMMED width - so a cell's lines are
-  read out of a `pieces` still indexed by the ORIGINAL column. On `041122` page 7 `keep=[1,2,3]`
-  and the six heading CellParas are attached to the cell to the right of the one that owns them.
-  The misalignment is real and still unfixed. Remapping `pieces` and `sizes` was built and the
-  16-document class measured: 13 identical to HEAD to the digit, 2 WORSE
-  (`041122` 98.65 -> 99.02, `Account_Opening_Form_Fillable_filled` 97.62 -> 99.02), 0 improved.
-  Reverted. Do not re-apply the remap alone - it is correct code that moves nothing.
-  recorded: 2026-11-17 11:32
-
-- CONFIRMED - The class metric cannot see a layout fix on its two worst documents, because they
-  are 1 pt and the metric is saturated.
-  evidence: 17 Nov 2026 fixer. `041122` reads 98.65 %@5 at 1 pt (text invisible) and 98.77 %@5
-  with the text at its true 6 pt (text legible, 13 pages). A 20-point mean improvement across
-  the 9 pages (86.29 -> 65.62 by direct EDT on the rendered pages) does not move the worst-page
-  number, because the worst page is the spilled one either way. THE ORDER IS THEREFORE FIXED:
-  the spill must go first, and the spill is a text box, not a table cell (see the 16 Nov entry
-  and the 378 `wps:txbx`). Measure this class on the spill's page count, not on %@5, until the
-  page counts agree.
-  recorded: 2026-11-17 11:34
+- CONFIRMED - The per-cell paragraph matrix (`pieces`) was indexed in the UNTRIMMED column
+  space after the empty-column trim, so the multi-line cell path read another column's lines.
+  evidence: 17 Nov 2026 fixer. `PdfToWord.buildTables` (~:8686) remaps cells/faces/firstX/
+  firstY/colours through `keep` and left `pieces` alone, while the consumer at :8800 reads
+  `pieces.get(rr).get(cc)` with `cc` in the trimmed space. 041122 p7 grid is 24x4 with
+  keep=[1,2,3]: the heading is original column 2 = trimmed cell 1, but pieces.get(1).get(1) is
+  original column 1 (empty), so parasOfLines returned 0, the cell fell back to the welded
+  string, and the SIX paragraphs were written into the empty cell to their right - which is
+  why the heading appeared twice on that page. Fixed by trimming `pieces` with everything
+  else. Predicts every table that drops a column.
+- CONFIRMED - The point size is `scalingFactorY` of PDFBox's TextPosition text matrix, and it
+  is a SIZE, not a multiplier on the Tf operand. evidence: 17 Nov 2026, probe over three
+  documents: 041122 fontSize=1.000 scaleY=10.000 inPt=10.000; 48_form 12/12/12;
+  01_stamp fontSize=8.500 scaleY=8.500 inPt=8.000. Multiplying the two squared every ordinary
+  page and regressed 192 of 213 documents (12 x 12 = 144 pt) - that wrong version was measured
+  and thrown away, not reasoned about. Taking scaleY itself keeps the 8.5 that inPt rounds to
+  8, and is 13.0 on text rotated 90 degrees. Full 213-document ratchet WITH the fix:
+  208 unchanged, 2 improved (411_nested_xobject_transforms 31.05 -> 0.00;
+  041122 98.65 -> 97.62, median displacement 477.6 -> 138.24 pt), 1 regression
+  (39_small_caps_letter_spacing 0.72 -> 3.78) and one nil change (05_round_company_seal
+  0.19 -> 0.20). This supersedes the reverted patches/run-size-from-sizePt-not-Tf.patch,
+  which used the ROUNDED inPt.
+- CONFIRMED - `parasOfLines` records each line's own x, `addRecutRow` (:8380) turns it into
+  `indentPt`, and the pieces path added the paragraphs WITHOUT it, so indentPt stayed NaN and
+  the writer applied one inset - the cell's first-line x - to every paragraph in the cell.
+  evidence: 17 Nov 2026. 041122 p7 row 1 wrote all six heading lines at `w:ind 9452`
+  (472.6 pt) inside a 10636-dxa cell: 59 pt of usable width, so "Income-tax Rules, 1962"
+  (drawn at x 253.7) wrapped inside a 59 pt column. After the fix the six carry
+  9452/4255/4705/3830/107/2079 and the row renders at its declared height.
+- CONFIRMED (measured, engine change still owed) - the 041122 page spill is a WRAP, not a
+  paragraph property, and the wrap is caused by the reference renderer substituting a
+  different font. evidence: 17 Nov fixer. Rendered bottom rules of table 17's 24 rows
+  against their declared `w:trHeight`, in twips/20: r1 23.2/23.15, r2 93.1/84.1 (+9.0),
+  r3-r15 17.3-17.6 each = declared, r16 40.9/40.95, r17 17.3/17.3, r18 17.3/17.25,
+  r19 37.6/29.15 (+8.5), r20 61.7/41.0 (+20.7), r21 41.0/41.0, r22 40.8/40.8,
+  r23 340.4/231.5 (+108.9) -> spills to our page 9, r24 41.6/41.35. THE ROWS THAT GROW GROW
+  BY WHOLE LINES: r23 carries 20 source lines and rendered 26, and its own `w:before` values
+  are 0-4 pt each (sum 24.1 pt) with `w:line` exact 240 tw = 12 pt - the source's own pitch.
+  So neither `w:before`, nor `w:line exact`, nor `w:cantSplit` is what grows it; the extra
+  lines are the growth. The cause of the extra lines: the .docx names Effra (the source's
+  font, correctly), the renderer has no Effra, and substitutes Noto Sans - 'Verification'
+  at 10 pt measures 52.40 pt in the source's Effra-Bold and 61.24 pt in the substitute
+  (+16.9 %). The cell leaves the source's longest line 2.9 pt of slack (line ends x 568.8,
+  cell edge 571.9 = 0.5 %), so every full-width line wraps its tail. Ruled out by
+  measurement: the sizePt bug and the `pieces` index (both fixed; r1's six heading lines
+  carry 9452/4255/4705/3830/107/2079 and render at declared height), `w:before` (24 pt, not
+  109), `w:line` (12 pt = source pitch), `w:cantSplit` (only moves an already-taller row).
+  Also measured: our page 7 is NOT table 17 - it holds page 6's page furniture (the C7EAFB
+  heading bar, the footer rule at y 738.2 and the page number at y -7.5) whose anchor
+  paragraphs were pushed off page 6; table 17 starts on our page 8.
+- CONFIRMED (environment, and it changes what this class's numbers mean) - installing a
+  metric clone of the source's own embedded font takes 041122's table from spill to nearly
+  exact. evidence: 17 Nov fixer. Built Effra-Regular/Bold from Liberation Sans with the
+  advances read out of the PDF's own `/Widths` arrays (FirstChar 32, w/1000 em; space 0.181
+  em against Liberation's 0.278), installed to ~/.fonts, re-rendered into an empty dir:
+  r2 93.1 -> 84.1 (= declared), r23 340.4 -> 256.4, page 2 of the table no longer starts a
+  new page. Ruled out: kerning (stripping GPOS/kern changed nothing), font *shape* (only the
+  advances matter for line breaking). NOT yet enough on its own - still 12 pages, because
+  the residual is the engine's own line box: r23's 19-20 paragraphs are emitted at
+  `w:line` 240 tw (12.0 pt) while the row the engine itself declares is 4630 tw (231.5 pt)
+  for 20 lines at the source's 11.6 pt pitch - the engine's row height and the engine's
+  line height disagree by 0.4 pt a line, so a 20-line row overflows by ~8 pt + `w:before`
+  before any font is involved. NEXT: make the cell-line box carry the source's measured
+  pitch in twips (232, not 240) and re-measure r23 against 231.5.

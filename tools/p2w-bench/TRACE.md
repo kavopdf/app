@@ -266,15 +266,20 @@ claim and after each step; it is not code and cannot break anything.
 | 16 Nov 17:23 | fixer | claim | fixer claimed the slot |
 | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
-| 17 Nov 10:02 | fixer | claim | fixer claimed the slot |
-| 17 Nov 10:02 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 17 Nov 10:50 | fixer | claim | fixer claimed the slot |
-| 17 Nov 10:50 | fixer | stale-claim | fixer slot was stale (48 min) - the previous run ended without releasing it |
-| 17 Nov 11:07 | fixer | build-engine | started |
-| 17 Nov 11:09 | fixer | build-engine | engine built in 52s |
-| 17 Nov 11:34 | fixer | build-engine | started |
-| 17 Nov 11:36 | fixer | build-engine | engine built in 113s |
-| 17 Nov 11:59 | fixer | build-engine | started |
-| 17 Nov 12:01 | fixer | build-engine | engine built in 102s |
-| 17 Nov 12:20 | fixer | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |
-| 17 Nov 12:20 | fixer | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |
+| 17 Nov 09:30 | fixer | build-engine | started |
+| 17 Nov 09:31 | fixer | build-engine | engine built in 41s |
+| 17 Nov 09:35 | fixer | build-engine | started |
+| 17 Nov 09:36 | fixer | build-engine | engine built in 40s |
+| 17 Nov 09:39 | fixer | build-engine | started |
+| 17 Nov 09:40 | fixer | build-engine | engine built in 42s |
+| 17 Nov 09:43 | fixer | build-engine | started |
+| 17 Nov 09:44 | fixer | build-engine | engine built in 46s |
+| 17 Nov 10:27 | fixer | build-engine | started |
+| 17 Nov 10:28 | fixer | build-engine | engine built in 40s |
+| 17 Nov 10:49 | fixer | build-engine | started |
+| 17 Nov 10:50 | fixer | build-engine | engine built in 51s |
+| 17 Nov 11:16 | fixer | attempt | content-missing-partly-replaced -> partial (1/13 moved) |
+| 17 Nov 12:04 | fixer | claim | fixer claimed the slot |
+| 17 Nov 12:04 | fixer | build-engine | started |
+| 17 Nov 12:06 | fixer | build-engine | engine built in 90s |
+| 17 Nov 12:30 | fixer | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |
