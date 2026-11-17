@@ -153,7 +153,14 @@ def main():
     S = dict(ran_at=time.strftime("%Y-%m-%dT%H:%M:%S"), layers={})
 
     # ---- layer 1: ground truth ----
-    rc, out = sh("python3 " + HERE + "/p2w.py --validate", 180)
+    # The instrument needs scipy, and on a fresh pod it is not installed yet: p2w.py
+    # installs it itself, from inside the command this timeout covers. Measured: the pip
+    # install alone took over 180 s on a cold pod, the validate call was killed at 180,
+    # exit 124, and the gate reported "BLOCKED: instrument failed ground-truth validation"
+    # - a verdict about the instrument for what was a slow package download. So the
+    # dependency is satisfied here, with its own budget, before the timed validation.
+    sh("python3 -c 'import scipy' || pip install -q scipy", 200)
+    rc, out = sh("python3 " + HERE + "/p2w.py --validate", 240)
     gate_pass = (rc == 0)
     S["layers"]["ground_truth"] = dict(status="pass" if gate_pass else "FAIL",
                                        exit=rc, tail=out.strip().splitlines()[-1:])

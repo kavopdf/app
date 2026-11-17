@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-11-17T05:49:16",
+ "ran_at": "2026-11-17T11:20:27",
  "layers": {
   "ground_truth": {
    "status": "pass",
@@ -22,17 +22,18 @@
   "census": {
    "status": "ok",
    "summary": [
-    "  text-missing             11",
+    "  rules-not-tables         4",
+    "  text-missing             14",
     "  annotations-present      1",
-    "  none-identified          61",
+    "  none-identified          85",
     "  warnings.warn("
    ]
   }
  },
  "signatures": [
-  "[05:49:32]   content-loss    22 docs  median share@1px  22.0%",
-  "[05:49:32]   displacement    33 docs  median share@1px  29.1%",
-  "[05:49:32]   clean          139 docs  median share@1px   1.1%"
+  "[11:20:41]   content-loss    48 docs  median share@1px  31.6%",
+  "[11:20:41]   displacement    37 docs  median share@1px  29.6%",
+  "[11:20:41]   clean          108 docs  median share@1px   1.8%"
  ],
  "round": 1,
  "ratchet": {
@@ -41,28 +42,412 @@
   "current_docs": 212,
   "regressions": [
    {
-    "document": "39_small_caps_letter_spacing",
-    "was": 0.72,
-    "now": 3.78,
-    "delta": 3.06
+    "document": "392_statistical_console_output",
+    "was": 1.61,
+    "now": 28.39,
+    "delta": 26.78
+   },
+   {
+    "document": "310_court_judgment",
+    "was": 1.73,
+    "now": 15.33,
+    "delta": 13.6
+   },
+   {
+    "document": "321_auditors_report",
+    "was": 2.62,
+    "now": 16.06,
+    "delta": 13.44
+   },
+   {
+    "document": "317_rti_response",
+    "was": 2.18,
+    "now": 15.57,
+    "delta": 13.39
+   },
+   {
+    "document": "313_power_of_attorney",
+    "was": 2.29,
+    "now": 15.35,
+    "delta": 13.06
+   },
+   {
+    "document": "304_package_insert_small_print",
+    "was": 3.41,
+    "now": 16.41,
+    "delta": 13.0
+   },
+   {
+    "document": "316_contract_with_schedules",
+    "was": 1.26,
+    "now": 13.97,
+    "delta": 12.71
+   },
+   {
+    "document": "371_experience_certificate",
+    "was": 0.0,
+    "now": 12.43,
+    "delta": 12.43
+   },
+   {
+    "document": "312_affidavit_stamp_paper",
+    "was": 1.07,
+    "now": 12.98,
+    "delta": 11.91
+   },
+   {
+    "document": "302_radiology_report",
+    "was": 0.0,
+    "now": 11.75,
+    "delta": 11.75
+   },
+   {
+    "document": "76_devanagari_table",
+    "was": 7.91,
+    "now": 19.54,
+    "delta": 11.63
+   },
+   {
+    "document": "334_patent_document",
+    "was": 0.0,
+    "now": 11.63,
+    "delta": 11.63
+   },
+   {
+    "document": "370_offer_letter",
+    "was": 3.47,
+    "now": 13.66,
+    "delta": 10.19
+   },
+   {
+    "document": "315_gazette_notification",
+    "was": 1.96,
+    "now": 11.45,
+    "delta": 9.49
+   },
+   {
+    "document": "350_question_paper",
+    "was": 0.11,
+    "now": 9.19,
+    "delta": 9.08
+   },
+   {
+    "document": "352_certificate_ornate_border",
+    "was": 3.0,
+    "now": 11.38,
+    "delta": 8.38
+   },
+   {
+    "document": "40_devanagari_shaping_font",
+    "was": 10.48,
+    "now": 18.65,
+    "delta": 8.17
+   },
+   {
+    "document": "318_court_summons_form",
+    "was": 0.0,
+    "now": 8.17,
+    "delta": 8.17
+   },
+   {
+    "document": "78_mixed_english_devanagari_line",
+    "was": 13.51,
+    "now": 21.04,
+    "delta": 7.53
+   },
+   {
+    "document": "360_restaurant_menu",
+    "was": 34.43,
+    "now": 41.13,
+    "delta": 6.7
+   },
+   {
+    "document": "365_recipe_card",
+    "was": 0.02,
+    "now": 5.96,
+    "delta": 5.94
+   },
+   {
+    "document": "363_warranty_card",
+    "was": 10.58,
+    "now": 16.11,
+    "delta": 5.53
+   },
+   {
+    "document": "373_leave_application_form",
+    "was": 0.0,
+    "now": 5.46,
+    "delta": 5.46
+   },
+   {
+    "document": "77_arabic_rtl_document",
+    "was": 11.89,
+    "now": 17.14,
+    "delta": 5.25
+   },
+   {
+    "document": "391_survey_questionnaire_grid",
+    "was": 0.11,
+    "now": 5.07,
+    "delta": 4.96
+   },
+   {
+    "document": "402_calendar_month_grid",
+    "was": 0.0,
+    "now": 4.48,
+    "delta": 4.48
+   },
+   {
+    "document": "305_vaccination_certificate",
+    "was": 0.0,
+    "now": 3.85,
+    "delta": 3.85
+   },
+   {
+    "document": "374_org_chart",
+    "was": 5.92,
+    "now": 9.76,
+    "delta": 3.84
+   },
+   {
+    "document": "311_fir_police_form",
+    "was": 0.0,
+    "now": 3.83,
+    "delta": 3.83
+   },
+   {
+    "document": "394_map_with_legend",
+    "was": 0.0,
+    "now": 3.5,
+    "delta": 3.5
+   },
+   {
+    "document": "343_air_waybill",
+    "was": 0.23,
+    "now": 2.97,
+    "delta": 2.74
+   },
+   {
+    "document": "335_msds_safety_data_sheet",
+    "was": 0.0,
+    "now": 2.74,
+    "delta": 2.74
+   },
+   {
+    "document": "405_sheet_music_lyrics",
+    "was": 0.0,
+    "now": 2.61,
+    "delta": 2.61
+   },
+   {
+    "document": "340_bill_of_lading",
+    "was": 0.07,
+    "now": 2.44,
+    "delta": 2.37
+   },
+   {
+    "document": "303_discharge_summary",
+    "was": 0.0,
+    "now": 2.19,
+    "delta": 2.19
+   },
+   {
+    "document": "332_bom_on_drawing",
+    "was": 0.0,
+    "now": 2.02,
+    "delta": 2.02
+   },
+   {
+    "document": "364_event_ticket",
+    "was": 0.25,
+    "now": 2.16,
+    "delta": 1.91
+   },
+   {
+    "document": "393_spectrum_peak_table",
+    "was": 0.01,
+    "now": 1.92,
+    "delta": 1.91
+   },
+   {
+    "document": "314_tender_rfp_boq",
+    "was": 0.0,
+    "now": 1.58,
+    "delta": 1.58
+   },
+   {
+    "document": "406_passport_mrz_page",
+    "was": 3.45,
+    "now": 5.01,
+    "delta": 1.56
+   },
+   {
+    "document": "320_balance_sheet_statutory",
+    "was": 0.0,
+    "now": 1.39,
+    "delta": 1.39
+   },
+   {
+    "document": "383_api_docs_page",
+    "was": 0.3,
+    "now": 1.65,
+    "delta": 1.35
+   },
+   {
+    "document": "382_architecture_diagram",
+    "was": 0.0,
+    "now": 1.27,
+    "delta": 1.27
+   },
+   {
+    "document": "331_pid_diagram",
+    "was": 0.0,
+    "now": 1.25,
+    "delta": 1.25
+   },
+   {
+    "document": "342_packing_list",
+    "was": 0.0,
+    "now": 1.15,
+    "delta": 1.15
+   },
+   {
+    "document": "362_price_list_dense",
+    "was": 0.03,
+    "now": 1.16,
+    "delta": 1.13
+   },
+   {
+    "document": "381_incident_report_timeline",
+    "was": 0.0,
+    "now": 1.0,
+    "delta": 1.0
+   },
+   {
+    "document": "404_sudoku_grid",
+    "was": 0.27,
+    "now": 1.13,
+    "delta": 0.86
+   },
+   {
+    "document": "344_customs_declaration",
+    "was": 0.61,
+    "now": 1.46,
+    "delta": 0.85
+   },
+   {
+    "document": "361_product_catalogue_grid",
+    "was": 0.0,
+    "now": 0.8,
+    "delta": 0.8
+   },
+   {
+    "document": "300_prescription_rx",
+    "was": 0.06,
+    "now": 0.78,
+    "delta": 0.72
+   },
+   {
+    "document": "353_admit_card",
+    "was": 0.0,
+    "now": 0.67,
+    "delta": 0.67
+   },
+   {
+    "document": "301_lab_report_panel",
+    "was": 0.02,
+    "now": 0.64,
+    "delta": 0.62
+   },
+   {
+    "document": "330_cad_drawing_sheet",
+    "was": 4.91,
+    "now": 5.5,
+    "delta": 0.59
    }
   ],
   "improvements": [
    {
-    "document": "411_nested_xobject_transforms",
-    "was": 31.05,
-    "now": 0.0,
-    "delta": -31.05
+    "document": "041122-Account_Opening_Form",
+    "was": 97.62,
+    "now": 86.18,
+    "delta": -11.44
    },
    {
-    "document": "041122-Account_Opening_Form",
-    "was": 98.65,
-    "now": 97.62,
-    "delta": -1.03
+    "document": "Account_Opening_Form_Fillable_filled",
+    "was": 97.62,
+    "now": 86.18,
+    "delta": -11.44
+   },
+   {
+    "document": "report-2col-table-spanning-both-columns",
+    "was": 17.17,
+    "now": 11.1,
+    "delta": -6.07
+   },
+   {
+    "document": "table-inside-two-column-page",
+    "was": 40.05,
+    "now": 36.03,
+    "delta": -4.02
+   },
+   {
+    "document": "brochure-3col-with-sidebar-box",
+    "was": 6.84,
+    "now": 3.61,
+    "delta": -3.23
+   },
+   {
+    "document": "annual-review-2col-uneven-columns",
+    "was": 5.77,
+    "now": 2.85,
+    "delta": -2.92
+   },
+   {
+    "document": "journal-2col-with-footnotes",
+    "was": 7.75,
+    "now": 5.63,
+    "delta": -2.12
+   },
+   {
+    "document": "text-held-twice-shadow-text",
+    "was": 30.29,
+    "now": 28.92,
+    "delta": -1.37
+   },
+   {
+    "document": "31_times_body_arial_headings",
+    "was": 2.11,
+    "now": 0.74,
+    "delta": -1.37
+   },
+   {
+    "document": "academic-paper-ieee-2col-abstract",
+    "was": 8.09,
+    "now": 6.85,
+    "delta": -1.24
+   },
+   {
+    "document": "landscape-page-inside-portrait-document",
+    "was": 1.45,
+    "now": 0.62,
+    "delta": -0.83
+   },
+   {
+    "document": "newsletter-3col-header-footer",
+    "was": 3.45,
+    "now": 2.75,
+    "delta": -0.7
+   },
+   {
+    "document": "37_font_not_embedded_substitution",
+    "was": 0.58,
+    "now": 0.06,
+    "delta": -0.52
    }
   ],
   "new_documents": [],
   "disappeared": []
  },
- "verdict": "REGRESSION: 1 document(s) worse than baseline"
+ "verdict": "REGRESSION: 54 document(s) worse than baseline"
 }

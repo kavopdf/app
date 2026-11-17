@@ -997,6 +997,7 @@ public final class PdfToWord {
         }
         List<Line> rawLines = toLines(glyphs, new ArrayList<float[]>(), false);
         page.columns = proseColumns(rawLines, pageWidth);
+        markFolios(rawLines, pageHeight);
 
         // Tables are found from the drawn rules, so they can be located before any line is
         // split. A column start that falls inside one is that table's cell separator, not a
@@ -1313,6 +1314,7 @@ public final class PdfToWord {
         for (Table t : tables) {
             int inside = 0, covered = 0;
             for (Line line : lines) {
+                if (line.folio()) continue;
                 if (!line.inside(t)) continue;
                 inside++;
                 for (int r = 0; r < t.rows.size(); r++) {
@@ -1422,7 +1424,10 @@ public final class PdfToWord {
             // the "PAID" stamp on file 07 - laid across the lower rows of the item table - was
             // dropped as if it were cell text that the table had already written.
             boolean inTable = false;
-            if (!line.rotated) {
+            // A folio is drawn in the page's bottom band and is nobody's cell, so the geometric
+            // test does not apply to it: a bordered form's grid reaches the paper's own edge and
+            // would otherwise hide the page number from the flow. See markFolios.
+            if (!line.rotated && !line.folio()) {
                 for (Table t : tables) {
                     if (line.inside(t)) {
                         inTable = true;
@@ -1833,6 +1838,14 @@ public final class PdfToWord {
         int color = -1;
         /** True when the baseline is not horizontal - a rotated stamp, a seal, a watermark. */
         boolean rotated;
+        /**
+         * True when this glyph is part of the sheet's own folio - the page number drawn in the
+         * bottom band of the page.
+         *
+         * <p>A folio is a POSITION, not content, and it belongs to no table. See
+         * {@link #markFolios} for what it costs when a table claims it.
+         */
+        boolean folio;
         /** Page position from the text matrix, y downwards - the same space for every
          *  direction. {@link #x}/{@link #y} are measured ALONG the baseline, so on a 90-degree
          *  stamp they are not page coordinates and a colour cannot be matched to them. */
@@ -3219,6 +3232,11 @@ public final class PdfToWord {
         boolean inside(Table t) {
             float cx = (x + right) / 2f;
             return cx >= t.left - 2 && cx <= t.right + 2 && y >= t.top - 2 && y <= t.bottom + 2;
+        }
+
+        /** Is this line the sheet's own folio? Set once per page by {@link #markFolios}. */
+        boolean folio() {
+            return !glyphs.isEmpty() && glyphs.get(0).folio;
         }
     }
 
@@ -7551,6 +7569,48 @@ public final class PdfToWord {
         return kept;
     }
 
+    /**
+     * Marks the glyphs of the sheet's own folio - the page number drawn in the bottom band of
+     * the page - so that no table can claim them as content.
+     *
+     * <p>A FOLIO IS A POSITION, NOT A CELL. This is the model's half of the rule the writer
+     * already applies to a flowed line ({@code DocxWriter} anchors a folio at its own y instead
+     * of letting the flow decide whether there is room for it). The model had no such rule, so
+     * a folio drawn in the margin of a bordered form was bucketed into the nearest cell of the
+     * page's grid and written as a {@code TableText} paragraph.
+     *
+     * <p>Measured on 041122-Account_Opening_Form, source page 7. The page is one ruled form
+     * whose outer border IS the paper (rules at y=0.1 and y=842.0), so the grid that the
+     * intersection pass reads has a last row from y=800.4 to y=842.0 and a last column from
+     * x=572.7 to x=595.5 - the right margin. The folio "7" is drawn at x=584.1, y=824.3: inside
+     * that margin cell, 24 pt BELOW the form's own bottom rule. The table therefore ends at the
+     * foot of the sheet with a 42 pt row holding one character, the renderer cannot fit the
+     * table's last row on the sheet it belongs to, and the row alone is pushed onto a sheet of
+     * its own - 11 pages against the source's 9, and every page after it shifted by one.
+     *
+     * <p>Two things follow from the mark, and both are needed. The glyphs are not placed in a
+     * cell ({@link #tableFromCells}), so the row they were the only content of collapses to
+     * nothing instead of costing 42 pt; and the line is not hidden from the flow by the
+     * geometric "it is inside a table" test, so the writer still writes the folio - anchored,
+     * at the y the page drew it at.
+     *
+     * <p>The shapes are the writer's own ({@code DocxWriter.isFolio}): nothing longer than a
+     * page number is short enough to match, and the bottom-band test is what keeps a table's
+     * last numeric cell out of it.
+     */
+    private static void markFolios(List<Line> lines, float pageHeight) {
+        for (Line ln : lines) {
+            if (ln.rotated || ln.y <= 0.88f * pageHeight) continue;
+            String t = ln.text.trim();
+            if (t.isEmpty() || t.length() > 12) continue;
+            boolean folio = t.matches("(Page\\s+)?\\d{1,4}(\\s*(of|/)\\s*\\d{1,4})?")
+                    || t.matches("-\\s*\\d{1,4}\\s*-")
+                    || t.matches("\\d{1,4}\\s*-\\s*\\d{1,4}");
+            if (!folio) continue;
+            for (Glyph g : ln.glyphs) g.folio = true;
+        }
+    }
+
     /** Build a Table from a group of cells, placing every glyph in the cell it falls in. */
     private static Table tableFromCells(List<float[]> group, List<Glyph> glyphs) {
         TreeSet<Float> colXs = new TreeSet<>(), rowYs = new TreeSet<>();
@@ -7581,6 +7641,10 @@ public final class PdfToWord {
         float[] prevCell = null;
         float prevY = 0, prevRight = 0, prevSize = 0;
         for (Glyph g : glyphs) {
+            // The sheet's folio is not cell content - see markFolios. It stays in the flow, and
+            // the row it would have been the only content of collapses instead of costing a
+            // sheet at the foot of the page.
+            if (g.folio) { prevCell = null; continue; }
             float cx = g.x + g.width / 2f;
             float cy = g.y + g.size * 0.35f;
             float[] hit = null;
@@ -8667,6 +8731,11 @@ public final class PdfToWord {
                 pieces.add(prow);
             }
             for (Line line : lines) {
+                // The sheet's folio is drawn in the page's bottom band and belongs to no cell,
+                // even when the form's own rules enclose the whole sheet - see markFolios. It
+                // stays in the flow, and the row it would have been the only content of is
+                // written at its cells' height instead of the page's.
+                if (line.folio()) continue;
                 float cx = (line.x + line.right) / 2f;
                 int r = band(ys, line.y);
                 int c = band(xs, cx);
@@ -8958,7 +9027,7 @@ public final class PdfToWord {
         // cut every raw line at its own gaps
         List<Line> cells = new ArrayList<>();
         for (Line raw : rawLines) {
-            if (raw.text.trim().isEmpty()) continue;
+            if (raw.text.trim().isEmpty() || raw.folio()) continue;
             boolean inRuled = false;
             for (Table t : ruled) {
                 if (raw.inside(t)) { inRuled = true; break; }

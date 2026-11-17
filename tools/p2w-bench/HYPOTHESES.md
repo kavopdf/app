@@ -399,37 +399,29 @@ Do not re-test one without new evidence, and if you do, say what changed.
   pitch in twips (232, not 240) and re-measure r23 against 231.5.
 
 
-- CONFIRMED and FIXED (17 Nov 14:39 fixer, DocxWriter.table) - A PAGE'S OWN FOLIO IS NOT A
-  ROW OF THE TABLE THE PAGE'S RULES BOUND. 041122 page 7 draws a rule above its folio and a
-  frame round the sheet, so the ruled pass hands the folio back as the table's LAST ROW
-  (row 23 of 24, cells 363/10636/456 tw, trHeight 827 tw, only text "7"); the page's content
-  already ends at y=800.4 of 842, so the row cannot fit, the renderer breaks the sheet and
-  the folio costs a whole page (ours 11 against the source's 9). The writer now detects a
-  trailing row that is nothing but a folio whose baseline is in the page's bottom band
-  (>0.88 page height), leaves it out of the table's height and emits it as an anchored line
-  at its own x/y - the treatment the FLOW path already gives a folio. Measured: 041122 11
-  pages -> 10, doc share5 97.62 -> 86.25, worst page 7 -> 9. No-regression proof: all 213
-  documents re-converted with the patched engine, compared entry by entry inside the .docx -
-  212 are byte-identical in every zip entry, so their renders and scores cannot have moved;
-  only 041122 differs. Ruled out by measurement: that the table's rows are individually too
-  tall (the content rows land on the page's own edges), and that the folio is outside the
-  table (it IS a real drawn cell - the fix is about where it is drawn, not whether it is a
-  cell).
+- FIXED AND MEASURED (17 Nov, fixer) - the folio is not table content. On 041122 page 7 the
+  page's own border IS the paper (rules at y=0.1 and y=842.0), so the ruled pass built a grid
+  whose last row is 800.4..842.0 and whose last column is the right margin 572.7..595.5; the
+  folio "7" drawn at x=584.1, y=824.3 was bucketed into that margin cell and written as a
+  42 pt TableText row, which could not fit the sheet it belongs to and was pushed onto one of
+  its own (11 pages against the source's 9). Now `PdfToWord.markFolios` marks the glyphs of a
+  folio drawn in the bottom band and buildTables / tableFromCells / the "inside a table" flow
+  test all refuse them, and `DocxWriter.anchorBox` no longer lets the horizontal clamp slide a
+  folio off its own x (the box is narrowed to the room left on the sheet when the line's ink
+  ends on the paper; a box narrower than its line clips the tail, so the guard is the ink's own
+  right edge). Result: 11 -> 10 sheets, folio at x=584.2 against the source's 584.1, no word
+  lost on any page. Corpus blast radius, measured by converting all 213 documents with and
+  without the change and diffing document.xml: 3 documents differ, the other 210 identical.
 
-- OPEN (measured, NOT fixed) - THE INSTRUCTION PAGE'S LAST 17 LINES. After the folio fix,
-  our p8 (the instruction page) stops at y=683.6 with 158 pt of the sheet unused, and the
-  tail of the table (17 lines, ending at the source's own folio "8") goes to p9. Mechanism,
-  measured by rewriting only the .docx and re-rendering: `<w:cantSplit/>` is written on
-  EVERY row, and it is a promise the engine cannot keep - a row that does not fit the space
-  left on its page takes the whole row to the next sheet instead of breaking where the page
-  broke it. With cantSplit stripped from the same .docx (86 occurrences) the page takes 166
-  lines instead of 154 and the spill falls from 17 lines to 5: so cantSplit is 12 of the 17
-  and the remaining 5 are row height. NOT FIXED because the blast radius is 26 of 213
-  documents (every document with a table row written taller than 60 pt - 55_sidebar_box,
-  61_two_col_abstract_spanning, 64_newspaper, product-catalogue-code-left-price-right, ...)
-  and 26 full position measurements is hours of instrument time in one slot; a change that
-  cannot be measured must not be kept. NEXT: a NARROW rule - write cantSplit only when the
-  row's own top edge plus its written height still lands inside the page
-  (rowTopPagePt + rowHeightTw/pt <= pageHeight), which is the promise cantSplit actually
-  makes and which can only fire on rows that provably overflow. Count how many documents it
-  fires on before measuring them.
+- OPEN, and it is the last extra sheet on 041122 (page 8). MEASURED, not guessed: the 33-row
+  identity/address table's written w:trHeight values equal the page's own row bands exactly
+  (sum 742.0 twips-points against 800-58), so NO row is taller than its band and the "rows
+  accumulate a few points each" theory is WRONG - ruled out by reading the docx. What is left
+  is where the table STARTS: the source's page 8 draws its first ink at y=22.6 and the table's
+  top rule at y=58; our page 8's first ink is at y=26.9, so the table starts ~4.3 pt low, and
+  because the table ends exactly at the paper's edge (800 of 842) those 4.3 pt are enough to
+  push the last row onto a 10th sheet. NEXT: find where the 4.3 pt comes from (the paragraphs
+  above the table - the Annexure-1 heading block - writing 4 pt more than the page drew), and
+  apply the rule the flow already applies to a line: give up the gap above before breaking.
+  The font finding above (cell lines at 12.0 pt against the source's 11.6 pt pitch) is the
+  first place to look for those 4 pt.
