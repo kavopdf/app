@@ -258,7 +258,7 @@ anything you wrote and did not commit is invisible to it.
     1.  handoff.py --context "..." / --next "..."     what is true now, what to do first
     2.  round.py --release-fixer                      the slot is free
     3.  COMMIT AND PUSH EVERYTHING (STEP 8's list, plus ROUND.json after the release)
-    4.  chain.py --after-release                      FIRE or STOP
+    4.  chain.py --after-release                      HANDOVER or STOP
     5.  report.py                                    eight numbers, and writes REPORT.md
     6.  END THIS RUN
 
@@ -266,9 +266,10 @@ anything you wrote and did not commit is invisible to it.
 names the dirty files. HEAD matching origin is not enough - an uncommitted edit does not move HEAD.
 
 **YOU CANNOT START THE NEXT RUN, AND THAT IS NOT A FAILURE.** The `cron` tool is not in a run's tool
-list - a run on 17 Nov verified it and wrote so into CHAIN.json. The next run starts at the next
-scheduled slot (:45) by itself. What you control is your own END: a run that holds the slot past :45
-costs a whole scheduled slot, and that is the difference between two runs an hour and one.
+list - a run on 17 Nov verified it and wrote so into CHAIN.json. Two fixer crons exist, at :15 and
+:45, thirty minutes apart; whichever finds the slot free takes it. What you control is your own END:
+a run that stops early hands back a slot the scheduler will not refill for thirty minutes, and that
+is the difference between two runs an hour and one.
 
 Why the brake stays: it stops on a forced release, a finished round, and three runs in a row with
 no kept and no partial attempt. Three runs that fixed nothing are stuck, not unlucky.

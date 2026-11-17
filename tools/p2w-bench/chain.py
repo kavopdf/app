@@ -23,7 +23,7 @@ stops on any of these, and prints the reason:
                                         will be stuck the same way
   * no run record at all              - cannot tell what happened, so do not continue
 
-    python3 tools/p2w-bench/chain.py --after-release    # FIRE or STOP, with the reason
+    python3 tools/p2w-bench/chain.py --after-release    # HANDOVER or STOP, with the reason
     python3 tools/p2w-bench/chain.py --status
     python3 tools/p2w-bench/chain.py --reset            # clear the counter after a fix
 """
@@ -250,7 +250,18 @@ def main(argv):
     c["fired_at"] = (c.get("fired_at") or [])[-9:] + [time.strftime("%H:%M", time.gmtime(time.time() + 19800))]
     _w(CHAIN, c)
 
-    print("FIRE: chain depth %d of %d, dry %d of %d, %d open document(s) left"
+    # THIS USED TO SAY "FIRE" AND RECORD A FIRE THAT NEVER HAPPENED.
+    #
+    # A run cannot start another run: the `cron` tool is not in a run's tool list, and a run on
+    # 17 Nov proved it and then deleted the fire entry it had just written. Recording a fire that
+    # did not happen is worse than silence, because the next reader counts it as a chain and stops
+    # looking for why the slot went empty.
+    #
+    # It is named for what it is now, and it no longer tells the run to end. Under the release
+    # guard a run may not release while pending.py lists work, so "end now" either did nothing or
+    # cost the rest of the slot. The two crons at :15 and :45 pick the work up; a run's job is to
+    # keep working until the platform ends it.
+    print("HANDOVER: depth %d of %d, dry %d of %d, %d open document(s) left"
           % (c["depth"], MAX_DEPTH, c["dry"], DRY_LIMIT, open_classes()))
     print("")
     # THE CRON TOOL IS NOT AVAILABLE TO A RUN. Verified by a run on 17 Nov, which wrote into
@@ -262,7 +273,9 @@ def main(argv):
     # an instruction that says otherwise is a lie that costs a whole scheduled slot. What a run CAN
     # do is end cleanly and quickly, so the next scheduled slot finds the slot free and the state
     # honest - and that is the only lever it has.
-    print("FIRE: the work is handed over and this run should end now.")
+    print("No chain was triggered and none can be - a run cannot start a run. The next cron")
+    print("(:15 and :45, thirty minutes apart) picks this up when the platform ends you. Keep")
+    print("working until then; do not stop here.")
     print("")
     print("This run cannot start the next one: the `cron` tool is not in a run's tool list, so no")
     print("trigger can be issued. The next run starts at the next scheduled slot - the cron is")
