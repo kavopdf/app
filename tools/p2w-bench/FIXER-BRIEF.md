@@ -270,6 +270,26 @@ Only two things stop the default: `FINDINGS/` already holds a file answering the
 attempt on this class in THIS run already moved the number. **"I think I understand this one" is
 not an exception** - it is the exact state in which one more pair of eyes is worth the most.
 
+**ALWAYS `background=true`. NEVER WAIT.**
+
+This is not a preference, it is the rule that stops runs dying. A subagent deployed with
+`background=false` blocks your run until it returns. While it is blocked you make no tool call, write
+no beacon and record no attempt - and from outside that is indistinguishable from a hung run. It is
+not hypothetical: on 17 Nov a run claimed at 10:02, committed its evidence at 10:03, deployed a
+synchronous subagent, and then wrote nothing for eighteen minutes while the subagent worked. status.py
+called it SILENT, the watchdog would have called it dead, and the work was real the whole time.
+
+Every subagent started from 16 Nov onward that blocked its parent looked exactly like that, and that
+is why runs stopped ending.
+
+So: `background=true`, always. Fire it, register it, and go back to your own work. Its finding lands
+in `FINDINGS/` and the NEXT run reads it - that is what the directory is for. A finding you collect
+tomorrow is worth more than a run you block today.
+
+Before you deploy, one line so the wait is announced if anything goes wrong:
+
+    python3 tools/p2w-bench/round.py --heartbeat --doing "deployed 2 agents, working my own angle"
+
 A subagent has its own sandbox, its own clone, its own budget, and can outlive your run. That is
 fine as long as it leaves something behind: **every subagent must write its finding to
 `tools/p2w-bench/FINDINGS/<class>-<angle>-<HHMMSS>-<4 hex>.md` and commit it itself.** If its
