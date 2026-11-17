@@ -139,6 +139,35 @@ def main(argv):
     if "--run-start" in argv:
         d["run"] = {"started": ist(), "ended": None, "ended_how": None}
         d["plan"] = ""
+    if "--next" in argv:
+        nxt = argv[argv.index("--next") + 1]
+        d["next"] = nxt
+        # WHICH CLASS THIS CARRY-OVER BELONGS TO, derived rather than asked for.
+        #
+        # pending.py reports this text as work that blocks every new class. When the class it
+        # describes is PARKED it can never be attempted again, so the gate would hold it for ever -
+        # STEP 10 says park and move on, the gate says move on only when nothing is pending, and a
+        # parked class is always pending. Nothing cleared it, so the two rules contradicted.
+        #
+        # The fix needs to know which class the prose is about, and a run will not remember to say.
+        # So it is read off the text: every class name in DEFECT-CLASSES.md is looked for, and a
+        # single unambiguous match is recorded as next_class. classify.py clears the carry-over when
+        # that class is parked.
+        d["next_class"] = ""
+        try:
+            known = []
+            cf = os.path.join(HERE, "..", "..", "benchmarks", "DEFECT-CLASSES.md")
+            for line in open(cf, encoding="utf-8"):
+                cells = [c.strip().strip("`") for c in line.strip().strip("|").split("|")]
+                for c in cells:
+                    if c.count("-") >= 1 and " " not in c and len(c) > 12 and c.islower():
+                        known.append(c)
+            known = sorted(set(known))
+            hits = [k for k in known if k in nxt]
+            if len(hits) == 1:
+                d["next_class"] = hits[0]
+        except Exception:
+            pass
     if "--plan" in argv:
         d["plan"] = argv[argv.index("--plan") + 1]
         d["run"] = {"started": ist(), "ended": None, "ended_how": None}

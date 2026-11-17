@@ -281,6 +281,19 @@ evidence. **A park with no numbers is not a park, it is giving up with paperwork
 
 **Never attempt a PARKED class.** Always record the attempt, with numbers, honestly.
 
+**A park must also clear the carry-over, or the gate holds the class for ever.** `pending.py` reads
+`HANDOFF.json["next"]` and reports it as carry-over, and the gate says nothing new starts while
+anything is unfinished - so a class that has been parked, and can no longer be attempted, would sit
+at the head of the queue blocking every other class for the rest of the round. Parking is the one
+honest exit from a class that will not move, and it is only an exit if the queue lets go:
+
+    handoff.py --next ""        after the park row is written to REMAINING-DEFECTS.md
+
+Then take the next class. Without this line the two rules contradict each other: STEP 10 says park
+and move on, the gate says move on only when nothing is pending, and a parked class is always
+pending. Measured on 17 Nov - three attempts on one class, all reverted, the gate still reporting
+the same single item.
+
 ---
 
 ## Subagents - default yes, ceiling two

@@ -226,6 +226,44 @@ def add(args):
                               "outcomes": [], "reason": "", "requeues": 0,
                               "status": "OPEN"})
     row["attempts"] = row.get("attempts", 0) + 1
+
+    # A CLASS THAT NEVER CONVERGES MUST BE PARKED, AND NOTHING IN THIS PIPELINE DID IT.
+    #
+    # Verified 17 Nov: classify.py does set PARKED, but it reads tools/p2w-bench/DEFECT-CLASSES.md
+    # - the old pipeline's ghost list of verify_google check ids - so it parks ghost classes that
+    # no run ever works on. The live queue is benchmarks/DEFECT-CLASSES.md and the live recorder is
+    # this file, and this file only ever incremented a counter. So a class that failed every time
+    # stayed OPEN and was attempted again, and again, with no limit: 24 attempts, 50, 100.
+    #
+    # The brief has said since the round began that a class is parked after a fixed number of
+    # attempts, and that a PARKED class is never attempted. Neither was true. This is the line that
+    # makes it true.
+    #
+    # MAX_ATTEMPTS matches classify.py's 24 - one per hourly slot in a day. The carry-over is
+    # cleared with the park, because pending.py reports it as work and a parked class can never be
+    # attempted again: leaving it in place would close the gate for the rest of the round.
+    MAX_ATTEMPTS = 24
+    if row["attempts"] >= MAX_ATTEMPTS and row.get("status") != "PARKED":
+        row["status"] = "PARKED"
+        row["parked_at"] = ist()
+        row["park_reason"] = ("%d attempts without converging (limit %d)"
+                              % (row["attempts"], MAX_ATTEMPTS))
+        print("PARKED: %s after %d attempts - it will not be attempted again this round"
+              % (name, row["attempts"]))
+        try:
+            hp = os.path.join(HERE, "HANDOFF.json")
+            h = json.load(open(hp, encoding="utf-8"))
+            if (h.get("next_class") or "") == name:
+                h["next"] = ""
+                h["next_class"] = ""
+                h.setdefault("history", []).append(
+                    {"at": ist(), "cleared": "carry-over",
+                     "why": "%s parked after %d attempts" % (name, row["attempts"])})
+                json.dump(h, open(hp, "w", encoding="utf-8"), indent=1)
+                print("carry-over cleared: %s is parked" % name)
+        except Exception as exc:
+            print("warning: could not clear the carry-over - %s: %s"
+                  % (type(exc).__name__, exc))
     row.setdefault("outcomes", []).append(outcome)
     row["last"] = row.get("last")
     if args.moved is not None and args.total:
