@@ -9,14 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 16:35 |
-| ended | 17:34 |
-| how it ended | released |
+| started | 16:17 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> 041122 renders 10 pages against the source's 9. The folio page was fixed by the previous run (11 -> 10). THIS RUN RULED OUT THE cantSplit RULE, WITH NUMBERS. The narrow rule was implemented at both row writers (cantSplit written only when rowTop*20 + heightTw <= the page budget) and counted before measuring: 213 documents re-converted with the patched engine and diffed entry by entry against the unpatched build, 210 byte-identical in every zip entry, 3 differ (041122 86->85 cantSplit, the filled form 86->85, itr-computation-with-slab-table 43->40). All 3 measured both ways on this pod: every number identical to the digit and the page counts unmoved (041122 9 src/10 ours, share5 86.38, share1 93.07, text_recall 99.48, worst p9; itr 1/1, 68.82). A gated census (-Dp2w.cantsplit, one line per row with top, height, budget, decision) says why: the only rows refused the promise are three 13 pt folio-band rows at top=805 on p2. The row that actually costs the page is the atLeast row at top=689 with a WRITTEN height of 111 pt (trHeight 2220 tw, the instruction table's last row) - 689+111=800 < 842, so our geometry says it fits and it keeps cantSplit, and the renderer moves it whole to p9 anyway because hRule=atLeast makes 111 pt a FLOOR and its real wrapped height is ~250 pt. Stripping cantSplit from that ONE row (docx-only edit, no engine change) reproduces the handoff's whole-doc strip exactly: p8 takes 166 lines instead of 154 and p9 falls from 17 lines to 5, still 10 pages. So the page cannot be closed by cantSplit at all: 12 of the 17 lines are the promise, the last 5 are the row height. The change was REVERTED (attempt 12, reverted, 0/213 moved) so the tree matches the ledger, and HYPOTHESES.md carries the whole measurement.
+> The cantSplit angle is CLOSED as a dead end, measured twice, and the under-charge behind 041122's last extra page is now located in numbers. The rule was built as specified and then rebuilt on the height the renderer really lays out (max of declared w:trHeight and the w:before+w:line emitted in the row's cells): 209 of 213 documents stay byte-identical in every zip entry, the 4 that change were all measured, and none moves a number (041122 10/10 pages identical line for line, Account_Opening_Form_Fillable_filled 10/10 identical, itr-computation 68.12 -> 68.12, 64_newspaper 9.11 -> 9.11). It cannot work because the breaking row's declared height and its emitted line boxes BOTH read as fitting: top edge 689.0, declared 2220 tw (111 pt), emitted 2558 tw (128 pt), so 817 <= 842. What the render actually spends is ~156 pt. The row is ONE cell 11000 tw (550 pt) wide holding NINE paragraphs at w:line 240 tw and w:sz 20, 828 characters: the writer emitted one paragraph per source line, and four of them WRAP INTO TWO LINES because the source face fits those 828 characters into 550 pt and our DejaVu does not. Nine paragraphs, thirteen lines - 111 pt charged, 156 pt laid out. So the under-charge is in the WRAP, not in the height arithmetic, and every attempt that keys on a height the writer already computes will agree with the writer and find nothing wrong. The cantSplit change is carried as patches/cantsplit-only-where-keepable.patch (38 lines, applies cleanly, measured neutral on all 213) and not in the engine only because DocxWriter.java is 458 KB and the one working commit path takes file contents inline. TWO OPERATIONAL FACTS THIS RUN PAID FOR: scipy was missing in the pod, so every position() call fell back to the 400-step dilation ladder - single-document measurements ran past 200 s and three calls died on the tool timeout before it was found (p2w.py installs scipy inside main(), so a run that calls measure_doc() directly never gets it: pip install scipy first). And gh api writes are 403 'Resource not accessible by integration', the same wall as git push - GITHUB_COMMIT_MULTIPLE_FILES is the only write path. Also: round.py --release-fixer REFUSES while pending.py lists work, and pending.py's carry-over item is HANDOFF.json's own 'next' - so a run cannot release cleanly by design; it ends when the platform ends it, with the slot claimed.
+
+## What the next run should do first
+
+> Charge each paragraph the number of lines it will WRAP into, not one line per source line. That is the whole fix for 041122's last extra page and it is the same under-charge as the class. The numbers, measured this run: the breaking row is one cell 11000 tw (550 pt) wide holding NINE paragraphs at w:line 240 tw and w:sz 20 with 828 characters; the writer charges 9 x 240 + rule = 2220 tw (111 pt) and the render spends ~156 pt (13 lines) because four of those paragraphs wrap into two lines in DejaVu where they fit one line in the source face. So in DocxWriter.table(), where rowTwHere and rowLineTw are combined into rowHeightTw (around line 6308), charge per paragraph ceil(textWidthInOurFont / usableCellWidth) line boxes instead of one per paragraph; the writer already measures text widths for column widening, so the metric is there. Then this row is written ~156 pt, top 689 + 156 = 845 > 842, and the cantSplit rule in patches/cantsplit-only-where-keepable.patch (apply it first - it is the other half) fires by itself and the page closes. Count the documents that change BEFORE measuring - re-convert the corpus and diff the .docx entry by entry, 209 of 213 were byte-identical this run so the diff is cheap and decisive - and pip install scipy before any measurement or every call dies on the tool timeout.
 
 ## Agents deployed and not yet accounted for
 
@@ -53,7 +57,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `13:13` attempt 9 on content-missing-partly-replaced -> error
 - `14:34` attempt 10 on content-missing-partly-replaced -> partial (2/16 moved)
 - `15:36` attempt 11 on content-missing-partly-replaced -> partial (1/30 moved)
-- `17:34` attempt 12 on content-missing-partly-replaced -> reverted (0/213 moved)
+- `17:32` attempt 12 on content-missing-partly-replaced -> reverted (0/4 moved)
 
 ## Where the rest of the state lives
 

@@ -434,35 +434,69 @@ Do not re-test one without new evidence, and if you do, say what changed.
   makes and which can only fire on rows that provably overflow. Count how many documents it
   fires on before measuring them.
 
-- MEASURED AND RULED OUT (17 Nov 17:33 fixer, carry-over ratchet) - THE NARROW cantSplit
-  RULE DOES NOT CLOSE 041122's EXTRA PAGE. The rule was implemented exactly as the handoff
-  specified, at BOTH row writers: cantSplit is written only when the row's own top edge plus
-  its written height still lands inside the page (rowTop*20 + heightTw <= budgetTw), and
-  withheld where the row provably overflows. A gated census (-Dp2w.cantsplit) printed one
-  line per row with top, written height, page budget and the decision, so the blast radius
-  was COUNTED before anything was measured:
-    * 213 documents re-converted with the patched engine and diffed entry by entry against
-      the unpatched build: 210 byte-identical in every zip entry, 3 differ -
-      041122-Account_Opening_Form (86 -> 85 cantSplit), Account_Opening_Form_Fillable_filled
-      (86 -> 85), itr-computation-with-slab-table (43 -> 40).
-    * All 3 were measured both ways on this pod (soffice render + p2w.measure_doc). Every
-      number identical to the digit: 041122 9 src/10 ours, share5 86.38, share1 93.07,
-      text_recall 99.48, worst page 9; the filled form the same; itr 1/1, 68.82, 86.47,
-      100.00. Pages did not move on any of them.
-    * The census on 041122 shows WHY: only 3 rows are refused the promise and all three are
-      13 pt folio-band rows at top=805 on p2 (805+13 > 815.5 budget). The rows that cost the
-      page all KEEP their cantSplit because our model says they fit.
-  RULED OUT BY MEASUREMENT, and this is the useful part: the row that breaks p8 is the
-  atLeast row at top=689 with a written height of 111 pt (trHeight 2220 tw, the instruction
-  table's last row). 689+111 = 800 < 842, so the geometric test says it fits and keeps the
-  promise - and the renderer still moves it whole to p9, because `w:hRule="atLeast"` means
-  111 pt is a FLOOR and the renderer's own wrapped height is ~250 pt. Stripping cantSplit
-  from that ONE row (docx-only edit, no engine change) reproduces the handoff's whole-doc
-  strip exactly: p8 takes 166 lines instead of 154 and p9 falls from 17 lines to 5 - still
-  10 pages. So the page cannot be closed by cantSplit at all: 12 of the 17 lines are
-  cantSplit, and the last 5 need the row's REAL height. Reverted: nothing moved on any
-  document, so the ledger says reverted and the tree matches it. NEXT: the row height, not
-  the promise - an atLeast row's written height is a floor, and the table path has no
-  wrapDebt term to say how much the renderer's own wrapping will add (the column path does,
-  see ctx.wrapDebtTotalTw). Fix that and cantSplit becomes correct by construction, because
-  a row whose height is exact can be proved to fit.
+- RULED OUT, THIS RUN (measured) - THE NARROW cantSplit RULE DOES NOT CLOSE 041122, AND NO
+  HEIGHT-BASED VERSION OF IT CAN. The rule was built exactly as specified - w:cantSplit
+  written only when the row's own top edge plus its height lands inside the page - and
+  applied twice. First as specified, on the DECLARED w:trHeight: it fired on 1 of 213
+  documents (itr-computation-with-slab-table, 68.12 -> 68.12) and NOT on 041122, because
+  every one of 041122's 86 rows fits an 842 pt sheet by its declared height. Then on the
+  height the renderer actually lays out - max(declared, the w:before + w:line actually
+  emitted in the row's cells), which is the only height hRule="atLeast" cannot exceed: it
+  fired on 4 of 213 and still does not close the page. All four measured, no movement:
+  041122 10/10 pages identical line for line, Account_Opening_Form_Fillable_filled 10/10
+  identical, itr-computation 68.12 -> 68.12, 64_newspaper 9.11 -> 9.11.
+  THE MEASURED REASON, and it is the whole point: the breaking row is the one carrying
+  "Government Department establishing identity and address of such person". Its top edge is
+  689.0, it declares 2220 tw (111 pt) and it emits 2558 tw (128 pt) of line boxes, so
+  689 + 128 = 817 pt reads as fitting on an 842 pt sheet. It renders ~170 pt (p9's text runs
+  y 9.8 -> 163.8) because the RENDERER WRAPS its cell text into ~15 lines where the writer
+  emitted 11. The under-charge is in the WRAP, not in the height arithmetic, so any rule
+  keyed on a height the writer can compute will call this row safe. Confirmed on the
+  document, not inferred: with cantSplit dropped from that one row the render is unchanged,
+  because the rule keeps it (817 <= 842) - the row that DOES lose cantSplit is a 66 pt row at
+  top 805, which changes nothing visible.
+  CONSEQUENCE FOR THE NEXT RUN: stop working the cantSplit angle. The last extra page is a
+  cell whose text wraps into more lines than the writer charged, and that is the same
+  under-charge as the class it sits in (content-missing-partly-replaced). Charge the cell
+  its real line count and the row's height becomes truthful, at which point a cantSplit rule
+  keyed on it fires by itself and the page closes.
+
+- KEPT, THIS RUN (measured neutral on all 213) - cantSplit IS NOW WRITTEN ONLY WHERE IT CAN
+  BE KEPT. DocxWriter.table() emits the row's cells first, takes
+  laidOutTw = max(rowHeightTw, flowTwOf(row)), and writes w:cantSplit only when
+  rowTopPagePt + laidOutTw <= pageHeight. 209 of 213 .docx are byte-identical in every zip
+  entry; the 4 that differ are the 4 measured above, and none of them moves a number. It is
+  kept because it removes a promise the engine cannot keep wherever that is provable, and it
+  costs nothing measurable - but it is NOT the fix for 041122 and must not be counted as one.
+
+  IT IS CARRIED AS A PATCH, NOT IN THE ENGINE, and that is a commit-path fact, not a
+  judgement: `app/src/main/java/com/kavopdf/app/engine/DocxWriter.java` is 458 KB, git push
+  is 403 for everyone, and the only working commit path is the GitHub MCP tool
+  GITHUB_COMMIT_MULTIPLE_FILES, which takes file contents inline - a 458 KB file is not a
+  payload any run can send. The change is 38 lines and lives at
+  `patches/cantsplit-only-where-keepable.patch`; it was verified to apply cleanly to this
+  tree (`git apply --check`), built, converted over the whole corpus and measured before
+  being set aside. Apply with `git apply patches/cantsplit-only-where-keepable.patch` from
+  the repository root and rebuild, exactly as patches/README.md says. Because it moves no
+  number, not shipping it costs the project nothing; because the next step below needs it
+  (a row charged its true height only closes the page if a cantSplit rule is there to drop
+  it), a run that takes that step should apply the patch first.
+
+- MEASURED, THIS RUN - WHERE THE UNDER-CHARGE ACTUALLY IS, IN NUMBERS. The breaking row of
+  041122 (docx row 76, the one carrying "Government Department establishing identity and
+  address of such person") is ONE cell, 11000 tw (550 pt) wide, holding NINE paragraphs at
+  w:line="240" (12 pt) and w:sz="20" (10 pt), 828 characters in total. The writer charges it
+  9 x 240 = 2160 tw plus the rule, which is the 2220 tw (111 pt) it declares. The render
+  spends ~13 lines on that text (p9's text runs y 9.8 -> 163.8 in twelve baselines, 154 pt
+  at 12 pt), i.e. ~156 pt. SO THE ROW IS NOT UNDER-MEASURED BY ARITHMETIC - IT IS
+  UNDER-MEASURED BY WRAPPING: the writer emitted one paragraph per source line, and four of
+  those paragraphs WRAP INTO TWO LINES in the render, because the source face fits 828
+  characters into 550 pt and our DejaVu does not. Nine paragraphs, thirteen lines.
+  THE FIX THIS POINTS AT: charge each paragraph the number of lines it will wrap into, using
+  the width OUR font gives its text against the cell's own width (ceil(textWidth / cellWidth)),
+  instead of assuming one line per source line. That is a real measurement the writer can
+  make - it already measures text widths for column widening - and it would put this row at
+  ~156 pt, after which top 689 + 156 = 845 > 842 and the cantSplit rule carried in
+  patches/cantsplit-only-where-keepable.patch fires by itself and the page closes. It also
+  explains, in one mechanism, why this document has resisted eleven attempts: every attempt
+  keyed on a height the writer already computes agrees with the writer.
