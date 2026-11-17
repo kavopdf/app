@@ -283,6 +283,28 @@ claim and after each step; it is not code and cannot break anything.
 | 17 Nov 12:04 | fixer | build-engine | started |
 | 17 Nov 12:06 | fixer | build-engine | engine built in 90s |
 | 17 Nov 12:30 | fixer | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |
+| 17 Nov 12:51 | fixer | claim | fixer claimed the slot |
+| 17 Nov 12:51 | fixer | build-engine | started |
+| 17 Nov 12:53 | fixer | build-engine | engine built in 85s |
+| 17 Nov 13:13 | fixer | attempt | content-missing-partly-replaced -> error |
+| 17 Nov 13:46 | fixer | build-engine | started |
+| 17 Nov 13:47 | fixer | build-engine | engine built in 51s |
+| 17 Nov 13:50 | fixer | build-engine | started |
+| 17 Nov 13:50 | fixer | build-engine | started |
+| 17 Nov 13:51 | fixer | build-engine | started |
+| 17 Nov 13:52 | fixer | build-engine | engine built in 73s |
+| 17 Nov 13:57 | fixer | build-engine | started |
+| 17 Nov 13:58 | fixer | build-engine | engine built in 94s |
+| 17 Nov 14:02 | fixer | build-engine | started |
+| 17 Nov 14:03 | fixer | build-engine | started |
+| 17 Nov 14:04 | fixer | build-engine | started |
+| 17 Nov 14:05 | fixer | build-engine | engine built in 66s |
+| 17 Nov 14:09 | fixer | build-engine | started |
+| 17 Nov 14:11 | fixer | build-engine | engine built in 101s |
+| 17 Nov 14:34 | fixer | hypothesis | content-missing-partly-replaced -> ruled-out |
+| 17 Nov 14:34 | fixer | hypothesis | content-missing-partly-replaced -> ruled-out |
+| 17 Nov 14:34 | fixer | hypothesis | content-missing-partly-replaced -> confirmed |
+| 17 Nov 14:34 | fixer | attempt | content-missing-partly-replaced -> partial (2/16 moved) |
 | 17 Nov 14:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 14:21 | fixer | build-engine | started |
 | 17 Nov 14:23 | fixer | build-engine | engine built in 69s |
@@ -293,3 +315,4 @@ claim and after each step; it is not code and cannot break anything.
 | 17 Nov 14:48 | fixer | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |
 | 17 Nov 14:58 | classifier | build-engine | started |
 | 17 Nov 14:59 | classifier | build-engine | engine built in 46s |
+| 17 Nov 15:05 | classifier | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |

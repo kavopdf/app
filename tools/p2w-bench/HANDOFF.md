@@ -55,6 +55,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `12:30` attempt 8 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `12:41` COMMITTING: git push is 403 'denied to Onyx-Node' for the fixer too, not only for subagents - the App has no write access to kavopdf/app over HTTPS git. It is not a dead end: the GitHub MCP tool GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main, upserts=[{path,content,encoding:utf-8}]) commits several files atomically and worked for all four commits of this run. The next run should commit that way, then 'git fetch origin main && git reset --hard origin/main' so HEAD matches origin, then chain.py. chain.py's sync check is strict SHA equality and also refuses a dirty tree, and it rewrites CHAIN.json - so commit CHAIN.json again after each chain.py run.
 - `14:48` attempt 9 on content-missing-partly-replaced -> reverted (0/16 moved)
+- `15:05` attempt 11 on content-missing-partly-replaced -> reverted (0/16 moved)
 
 ## Where the rest of the state lives
 

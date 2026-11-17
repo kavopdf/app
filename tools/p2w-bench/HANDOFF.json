@@ -76,6 +76,10 @@
   {
    "at": "14:48",
    "text": "attempt 9 on content-missing-partly-replaced -> reverted (0/16 moved)"
+  },
+  {
+   "at": "15:05",
+   "text": "attempt 11 on content-missing-partly-replaced -> reverted (0/16 moved)"
   }
  ],
  "next": "Probe the two folios of 041122 (our pages 8 and 10) for their own b.y and ctx.pageHeightPt in the model, then decide whether the anchor's 0.88*pageHeight band test or the page's own height is what excludes them from anchorBox. Do NOT change the cell line box (240 tw is the source's 12.0 pt pitch) and do NOT re-measure on a stale clone - step.py now fast-forwards first.",
