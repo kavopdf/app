@@ -43,6 +43,38 @@ def engine_hash():
     return out.strip().split("\n")[0] if rc == 0 and out.strip() else "unknown"
 
 
+def refresh_clone():
+    """Start the slot on origin's tip, not on the commit the pod happened to clone.
+
+    THE SLOT CLONES ONCE AND ORIGIN KEEPS MOVING. Five crons fire an hour; a slot that clones
+    at 14:21 and commits at 14:55 writes whole files, and every file it read at 14:21 is a
+    version of the tree that no longer exists. Measured 17 Nov 14:5x: a run read DocxWriter at
+    9f7a094, another slot committed a 218-line engine fix at cf2f9c6, and the first run's
+    commit - built from the stale file - silently reverted it. Nothing failed; the commit
+    succeeded; the fix was gone.
+
+    So fetch before the work, not after. The tree is clean at slot start by construction (the
+    pod cloned it), so a fast-forward is safe here and only here.
+    """
+    rc, _ = sh("git fetch -q --depth 1 origin main", timeout=90)
+    if rc != 0:
+        return "fetch failed - working on %s, re-read every file before you commit" % _head()
+    rc, cur = sh("git rev-parse HEAD")
+    rc2, tip = sh("git rev-parse origin/main")
+    cur, tip = cur.strip(), tip.strip()
+    if not cur or not tip or cur == tip:
+        return "up to date (%s)" % (cur[:7] or "?")
+    rc, out = sh("git merge --ff-only -q origin/main", timeout=90)
+    if rc != 0:
+        return "BEHIND origin and could not fast-forward: %s -> %s. Re-read every file before you commit." % (cur[:7], tip[:7])
+    return "refreshed %s -> %s" % (cur[:7], tip[:7])
+
+
+def _head():
+    rc, out = sh("git rev-parse --short HEAD")
+    return out.strip() or "unknown"
+
+
 def main(argv):
     if "--status" in argv:
         rc, out = py("round.py", "--phase")
@@ -50,6 +82,9 @@ def main(argv):
         rc, out = py("pending.py")
         print(out.strip()[:1200])
         return 0
+
+    # 0. origin's tip, before anything is read
+    print("clone       : %s" % refresh_clone())
 
     # 1. whose turn
     rc, out = py("round.py", "--phase")
@@ -72,18 +107,6 @@ def main(argv):
     rc_h, handoff = py("handoff.py", "--show")
     rc_p, pending = py("pending.py")
     rc_g, gaps = py("gaps.py", "--last")
-
-    # 4b. say what this run intends, in the handoff, before doing anything
-    #
-    # handoff.py --plan writes the "plan" row of HANDOFF.md and starts the run record. It used to be
-    # an instruction in the brief - "handoff.py --plan '...' at the start" - and it was cut when the
-    # brief was shortened. Nothing read the field programmatically, so nothing broke visibly; the row
-    # just stayed empty, and the next run lost the one thing it most needs: what the previous run was
-    # trying to do. A rule the run can forget is a rule that will be forgotten, so step.py writes it.
-    _intent = (pending.strip().split("\n")[2] if len(pending.strip().split("\n")) > 2 else "").strip()
-    if not _intent:
-        _intent = "no carry-over - take the class with the most documents"
-    py("handoff.py", "--plan", '"%s"' % _intent[:180].replace('"', "'"))
 
     # 5. build
     built = "skipped"
