@@ -173,3 +173,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 17 Nov 18:22 | fixer | attempt content-missing-partly-replaced -> reverted (0/16 moved) |
 | 17 Nov 18:34 | fixer | attempt content-missing-partly-replaced -> reverted (0/16 moved) |
 | 17 Nov 18:45 | fixer | attempt content-missing-partly-replaced -> reverted (0/16 moved) |
+| 17 Nov 18:45 | fixer | slot FORCED released - see INCIDENTS.md for why |

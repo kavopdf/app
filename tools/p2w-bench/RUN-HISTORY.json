@@ -68,5 +68,19 @@
   "obstacles_cleared": 0,
   "needs_human": 0,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1794917819.6105702,
+  "started": "17:46",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "content-missing-partly-replaced",
+  "attempts": 3,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

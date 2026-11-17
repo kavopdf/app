@@ -147,8 +147,8 @@
  ],
  "run": {
   "started": "17:46",
-  "ended": null,
-  "ended_how": null
+  "ended": "18:45",
+  "ended_how": "forced"
  },
  "history": [
   {
@@ -175,6 +175,11 @@
    "at": "15:40",
    "how": "released",
    "plan": "1. [carry-over] the last run"
+  },
+  {
+   "at": "18:45",
+   "how": "forced",
+   "plan": ""
   }
  ],
  "context": "THREE WRAP-CHARGE BUILDS, ALL MEASURED AT CORPUS SCALE, ALL REVERTED. The last run asked for the corpus diff; this run did it three times over, each build cheaper than the last. v1 flat charge: 47/213 .docx change, 0 of 46 measured improve, 40 worse - the false positives were the metric's own 7% Helvetica/DejaVu mismatch firing on cells that sit exactly at their column width. v2 named that budget (avail x1.08) and added structural grid guards: 32/213 change, 41_coloured_headings right again, 041122 moves 6 rows, still 0 improved / 28 worse. v3 charged only the EXCESS over the page's own row height (pageLines = round(rowHeightTw/rowLineTw)): 24/213 change (11%), 41_coloured untouched (0 of 12 rows), 041122 moves the row it was aimed at by +24.9 pt - the best calibration of the three - and still 0 of 23 improved, 18 worse, mean share@5px loss 16.08% -> 31.52%. THE FINDING: the mechanism is real (041122 charges 111 pt for 156 pt of laid-out content) but a row height is not the lever. Growing a row lengthens the page instead of closing it; the page break is decided by the whole sequence of rows, and everything after the table is then wrong by exactly what was added. Nothing from any build is in the tree; the engine is at HEAD and rebuilt.",
