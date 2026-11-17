@@ -581,24 +581,6 @@ public final class PdfToWord {
          */
         public float[] rowEdge;
         /**
-         * The stroke the page drew on each ROW's top edge, index for index with the rows, or
-         * null where that edge carries no rule of its own.
-         *
-         * <p>{@code w:tblBorders} carries ONE weight for every inside horizontal border, so a
-         * table whose row rules are 0.45 pt grey and whose header separator is 0.9 pt black has
-         * to be reduced to a single answer, and {@code insideStroke} reduces it to the stroke
-         * carrying the most length - the grey. The black rule is then drawn nowhere and its ink
-         * is simply absent from the page. Measured on {@code mobile-bill} and
-         * {@code salary-slip-factory-wages}: three coincident rule pairs per page (a 0.45 pt
-         * grey at 0.607 and a 0.9 pt black at 0.0667 on the SAME y), 18.5 % of the page's ink
-         * missing at 5 px, and the .docx carrying nothing but {@code sz 4 color 9B9B9B}.
-         *
-         * <p>A row that carries a stroke here is one the writer gives its own
-         * {@code w:tcBorders} top, which overrides the table's insideH for that row alone. That
-         * is the only place OOXML can express two weights of row separator in one table.
-         */
-        public float[][] rowRule;
-        /**
          * The y of the table's first row's TOP edge, in points, when the pass that built the
          * table could tell where that edge is ({@link Float#NaN} otherwise).
          *
@@ -1335,21 +1317,6 @@ public final class PdfToWord {
         // table's bounds are final. D-22: the writer used to draw all six at one constant
         // weight and one constant colour whatever the page did.
         for (Table t : tables) markSideStrokes(t, topRules);
-        if (System.getenv("P2W_DUMP_RULES") != null) {
-            StringBuilder sb = new StringBuilder("DUMPRULES page\n");
-            for (int i = 0; i < topRules.horizontal.size(); i++) {
-                float[] g = topRules.horizontal.get(i); float[] st = topRules.hStrokeAt(i);
-                sb.append(String.format("H y=%.2f x=%.2f..%.2f w=%.2f rgb=%s%n", g[0], g[1], g[2],
-                        st == null ? -1 : st[0], st == null ? "null" : String.format("%.3f", st[1])));
-            }
-            for (Table t : tables) {
-                sb.append(String.format("TABLE top=%.2f bottom=%.2f left=%.2f right=%.2f sideTop=%s sideBottom=%s%n",
-                        t.top, t.bottom, t.left, t.right,
-                        t.sideStroke[0] == null ? "null" : String.format("w=%.2f rgb=%.3f", t.sideStroke[0][0], t.sideStroke[0][1]),
-                        t.sideStroke[2] == null ? "null" : String.format("w=%.2f rgb=%.3f", t.sideStroke[2][0], t.sideStroke[2][1])));
-            }
-            System.out.print(sb);
-        }
         // A band-major grid - a newspaper page drawn as a table - is re-cut into one cell per
         // column, so the reader gets a column at a time instead of a band at a time. It needs
         // the cell-paragraph model to be possible at all: see recutColumnBands.
@@ -2062,31 +2029,8 @@ public final class PdfToWord {
             // outside the tolerance the position check allows. getFontSize() is the same
             // number without the rounding; inPt is only the fallback for a font whose size
             // the page did not name.
-            //
-            // BUT getFontSize() IS THE OPERAND, NOT THE SIZE. It is the number after Tf,
-            // and a page is free to draw 10 pt text as `/TT0 1 Tf` inside a `10 0 0 10 Tm`.
-            // 041122-Account_Opening_Form does exactly that on every page: the probe reports
-            // fontSize=1.000 inPt=10.000 scaleY=10.000 for every glyph, the engine took the
-            // 1.0, and 1214 of that document's 3885 runs were written `w:sz 2` - one point
-            // - so the whole bank form rendered as microprint.
-            //
-            // THE SIZE IS scalingFactorY OF THE TEXT MATRIX, and it is a size, not a factor:
-            // PDFBox's TextPosition carries the TEXT RENDERING matrix, which already has the
-            // Tf operand baked into it, so scalingFactorY (sqrt(c^2 + d^2)) is the length the
-            // text space's y axis has in device space. Probed on three documents:
-            //   041122      fontSize=1.000   scaleY=10.000  inPt=10.000   (10 pt text)
-            //   48_form     fontSize=12.000  scaleY=12.000  inPt=12.000   (ordinary page)
-            //   01_stamp    fontSize=8.500   scaleY=8.500   inPt=8.000    (fractional size)
-            // It is right in all three, it keeps the 8.5 that inPt rounds away, and it is
-            // still 13.0 on text rotated 90 degrees, where scalingFactorX is the only
-            // non-zero factor. Multiplying it by fontSize again squares every ordinary page
-            // - that mistake measured as 192 of 213 documents regressed, text emitted at
-            // 12 x 12 = 144 pt - so this is the value itself, never a multiplier.
-            float scaleY = tp.getTextMatrix() == null ? 0f : tp.getTextMatrix().getScalingFactorY();
-            float sizeOnPage = (scaleY > 0f && !Float.isNaN(scaleY) && !Float.isInfinite(scaleY))
-                    ? scaleY : (tp.getFontSize() > 0f ? tp.getFontSize() : tp.getFontSizeInPt());
-            g.sizePt = sizeOnPage;
-            g.size = sizeOnPage;
+            g.sizePt = tp.getFontSizeInPt() > 0 ? tp.getFontSizeInPt() : tp.getFontSize();
+            g.size = tp.getFontSize() > 0 ? tp.getFontSize() : tp.getFontSizeInPt();
             PDFont font = tp.getFont();
             g.font = font == null ? "" : font.getName();
             String n = g.font.toLowerCase(Locale.ROOT);
@@ -7134,43 +7078,6 @@ public final class PdfToWord {
         if (tableStroke != null) {
             for (int i = 0; i < 6; i++) if (t.sideStroke[i] == null) t.sideStroke[i] = tableStroke;
         }
-        // Every row edge that carries a rule of its own, so the writer can give that row the
-        // weight the page drew there (see Table#rowRule). Row 0 is the table's top side and
-        // already has one; the last entry of rowEdge is the bottom side.
-        if (t.rowEdge != null && t.rowEdge.length == t.rows.size() + 1) {
-            t.rowRule = new float[t.rows.size()][];
-            for (int r = 1; r < t.rows.size(); r++) {
-                t.rowRule[r] = heaviestRuleOn(rules, true, t.rowEdge[r], t.left, t.right, w);
-            }
-        }
-    }
-
-    /**
-     * The heaviest rule lying on one row edge of a table, or null.
-     *
-     * <p>{@link #edgeStroke} answers "which stroke is this edge" for a side, where a tie goes to
-     * the heavier rule because that is what a reader sees. A row separator drawn TWICE on the
-     * same y - a grey grid rule and a black emphasis rule over it - is the same question and it
-     * has the same answer, but the answer has nowhere to go in {@code w:tblBorders}: one element
-     * holds every inside horizontal border. This returns the stroke so the row can carry it in
-     * its own {@code w:tcBorders}, and the writer decides whether it is heavy enough to be worth
-     * writing (see {@code DocxWriter.heavierThanInside}).
-     */
-    private static float[] heaviestRuleOn(Rules rules, boolean horizontal, float at,
-                                          float a0, float a1, float span) {
-        List<float[]> geom = horizontal ? rules.horizontal : rules.vertical;
-        float[] best = null;
-        float bestWeight = -1f;
-        for (int i = 0; i < geom.size(); i++) {
-            float[] g = geom.get(i);
-            if (Math.abs(g[0] - at) > SIDE_TOL) continue;
-            if (Math.min(g[2], a1) - Math.max(g[1], a0) < span * 0.5f) continue;
-            float[] stroke = horizontal ? rules.hStrokeAt(i) : rules.vStrokeAt(i);
-            if (stroke == null) continue;
-            float weight = stroke[0] * (stroke.length > 2 ? Math.max(0f, Math.min(1f, stroke[2])) : 1f);
-            if (weight > bestWeight) { best = stroke; bestWeight = weight; }
-        }
-        return best;
     }
 
     /**
@@ -8708,28 +8615,6 @@ public final class PdfToWord {
                 float[][] trimmedX = new float[rows][keep.size()];
                 float[][] trimmedY = new float[rows][keep.size()];
                 int[][] trimmedColours = new int[rows][keep.size()];
-                // THE LINES HAVE TO BE TRIMMED WITH EVERYTHING ELSE. This block remapped
-                // cells, faces, firstX, firstY and colours through keep and left `pieces` -
-                // the one matrix the consumer below reads by COLUMN INDEX - in the untrimmed
-                // space, so after any dropped column the paragraph path was handed a
-                // different column's lines. On 041122-Account_Opening_Form page 7 the grid
-                // is 24 rows x 4 columns with keep=[1,2,3]: the heading lives in original
-                // column 2, which is trimmed cell 1, but pieces.get(1).get(1) is original
-                // column 1 - empty - so parasOfLines returned 0, the cell fell back to the
-                // welded string with the first line's x as its inset (w:ind 9452 dxa in a
-                // 10636 dxa cell = 59.2 pt of usable width), the six heading lines wrapped
-                // into 28 rendered lines (y 23.4-293.4, 270 pt) inside a row declaring
-                // w:trHeight 1682 twips (84.1 pt), and a 9-page document came out as 10.
-                // The same shift wrote those six paragraphs into the EMPTY cell to their
-                // right, which is why the heading appeared twice.
-                List<List<List<Line>>> trimmedPieces = new ArrayList<>();
-                for (int r = 0; r < rows; r++) {
-                    List<List<Line>> trow = new ArrayList<>();
-                    for (int k = 0; k < keep.size(); k++) {
-                        trow.add(pieces.get(r).get(keep.get(k)));
-                    }
-                    trimmedPieces.add(trow);
-                }
                 for (int r = 0; r < rows; r++) {
                     for (int k = 0; k < keep.size(); k++) {
                         trimmedY[r][k] = firstY[r][keep.get(k)];
@@ -8744,7 +8629,6 @@ public final class PdfToWord {
                 firstX = trimmedX;
                 firstY = trimmedY;
                 colours = trimmedColours;
-                pieces = trimmedPieces;
                 cols = keep.size();
             }
 
@@ -8797,22 +8681,7 @@ public final class PdfToWord {
             for (int rr = 0; rr < rows; rr++) {
                 for (int cc = 0; cc < cols; cc++) {
                     List<Table.CellPara> cp = parasOfLines(pieces.get(rr).get(cc));
-                    if (cp.size() >= 2) {
-                        // EACH PARAGRAPH KEEPS ITS OWN x. parasOfLines records the x the page
-                        // drew each line at, and addRecutRow (:8380) turns that into
-                        // indentPt - but this path added the paragraphs without it, so
-                        // indentPt stayed NaN and the writer fell back to ONE inset for the
-                        // whole cell: the first line's. On 041122-Account_Opening_Form page 7
-                        // that wrote all six heading lines at w:ind 9452 (472.6 pt) in a
-                        // 531.8 pt cell - 59 pt of usable width - so "Income-tax Rules, 1962"
-                        // (drawn at x 253.7) and the proviso (x 232.4) each wrapped inside a
-                        // 59 pt column, the row grew from its declared 84.1 pt to a third of
-                        // the sheet, and the table spilled a 9-page form over 12 pages with
-                        // page 7 nearly blank. The same held for the 17-paragraph Verification
-                        // block, every one of them inset 4610 twips.
-                        for (Table.CellPara p : cp) p.indentPt = p.x - colX[cc];
-                        t.paras.get(rr).get(cc).addAll(cp);
-                    }
+                    if (cp.size() >= 2) t.paras.get(rr).get(cc).addAll(cp);
                 }
             }
             out.add(t);
