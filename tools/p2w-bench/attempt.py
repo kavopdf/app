@@ -242,12 +242,38 @@ def add(args):
     # MAX_ATTEMPTS matches classify.py's 24 - one per hourly slot in a day. The carry-over is
     # cleared with the park, because pending.py reports it as work and a parked class can never be
     # attempted again: leaving it in place would close the gate for the rest of the round.
+    # PARK ON EVIDENCE, NOT ON A COUNT.
+    #
+    # A fixed limit is wrong in both directions. At 24 a class that stopped converging after six
+    # failed attempts keeps the slot for eighteen more hours while seventy documents sit untouched
+    # in the other seven classes. At 4 a class that is genuinely moving gets abandoned with its
+    # progress unrecorded.
+    #
+    # The signal is already in the ledger: an outcome of 'partial' means the attempt MOVED something
+    # and did not finish, and 'kept' means it moved enough to hold. Those two are progress. 'error'
+    # and 'reverted' are not. So the question is not how many attempts, it is whether the recent
+    # ones are still producing movement.
+    #
+    # Measured on 17 Nov: content-missing-partly-replaced reached eleven attempts with
+    #     reverted, error, error, error, error, error, partial, reverted, error, partial, reverted
+    # Six errors in a row, then two partials. Under the old rule it would have run twenty-four hours
+    # on sixteen documents. Under this one the six-error run would have parked it, and the two
+    # partials since then keep it alive - which is the right answer both times.
+    #
+    # MAX_ATTEMPTS stays as a hard ceiling: a class alternating partial and reverted for ever is not
+    # converging either, it is oscillating, and the ceiling is what stops that.
     MAX_ATTEMPTS = 24
-    if row["attempts"] >= MAX_ATTEMPTS and row.get("status") != "PARKED":
+    LOOK_BACK = 5
+    recent = (row.get("outcomes") or [])[-LOOK_BACK:]
+    moving = any(o in ("partial", "kept", "improved") for o in recent)
+    stuck = len(recent) >= LOOK_BACK and not moving
+    if (stuck or row["attempts"] >= MAX_ATTEMPTS) and row.get("status") != "PARKED":
         row["status"] = "PARKED"
         row["parked_at"] = ist()
-        row["park_reason"] = ("%d attempts without converging (limit %d)"
-                              % (row["attempts"], MAX_ATTEMPTS))
+        row["park_reason"] = (
+            "no progress in the last %d attempts (%s)" % (LOOK_BACK, ", ".join(recent))
+            if stuck else
+            "%d attempts without converging (ceiling %d)" % (row["attempts"], MAX_ATTEMPTS))
         print("PARKED: %s after %d attempts - it will not be attempted again this round"
               % (name, row["attempts"]))
         try:
