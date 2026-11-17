@@ -37,6 +37,17 @@ except Exception:
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BEACON_FILES = ("tools/p2w-bench/TIMELINE.jsonl", "tools/p2w-bench/TRACE.md")
+# WRITTEN BY THE TOOL THAT IS CHECKING FOR IT, and the second one is the whole brake.
+#
+# chain.py appends its own entry to CHAIN.json (the depth counter and the fire record) a few
+# lines BEFORE it asks whether the tree is clean, so CHAIN.json is always modified by the time
+# the question is asked. Every run therefore ended "STOP: uncommitted changes ... CHAIN.json",
+# and the one remedy the message names - commit it and run chain again - writes it again, so
+# the guard could never be satisfied by the run it was guarding. Measured 17 Nov 14:5x: two
+# rounds of commit-then-STOP with the file changing only by chain.py's own entry.
+# The depth counter is telemetry the next run re-reads and re-writes; it is not state a run's
+# decisions depend on, so it does not belong in this check.
+SELF_WRITTEN = ("tools/p2w-bench/CHAIN.json",)
 ROOT = os.path.dirname(os.path.dirname(HERE))
 CHAIN = os.path.join(HERE, "CHAIN.json")
 RUN = os.path.join(HERE, "RUN.json")
@@ -122,6 +133,8 @@ def remote_in_sync():
             # changes ... tools/p2w-bench/__pycache__/", and the only way to pass was to run
             # chain.py from a tree that had not yet imported anything, which is impossible.
             if "__pycache__" in path or path.endswith(".pyc"):
+                continue
+            if path in SELF_WRITTEN:
                 continue
             if code.strip() == "??":
                 # untracked matters only where the pipeline keeps state
