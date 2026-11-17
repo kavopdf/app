@@ -169,8 +169,7 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 17 Nov 15:36 | fixer | attempt content-missing-partly-replaced -> partial (1/30 moved) |
 | 17 Nov 16:35 | fixer | slot claimed - fixer running |
 | 17 Nov 17:34 | fixer | attempt content-missing-partly-replaced -> reverted (0/213 moved) |
-| 17 Nov 17:46 | fixer | slot claimed - fixer running |
-| 17 Nov 18:22 | fixer | attempt content-missing-partly-replaced -> reverted (0/16 moved) |
-| 17 Nov 18:34 | fixer | attempt content-missing-partly-replaced -> reverted (0/16 moved) |
-| 17 Nov 18:45 | fixer | attempt content-missing-partly-replaced -> reverted (0/16 moved) |
-| 17 Nov 18:45 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 17 Nov 18:17 | fixer | slot claimed - fixer running |
+| 17 Nov 18:50 | fixer | attempt content-missing-partly-replaced -> reverted (0/16 moved) |
+| 17 Nov 18:52 | fixer | wrap charge corpus diff: 42/213 change, 0 page-break moves, 2 spills (price lists 1.79->81.15, 2.69->81.69); reverted, patch kept |
+| 17 Nov 19:12 | fixer | gated wrap charge (4% metric tolerance) rebuilt and re-diffed: 41/213 change, price list 38->16 rows but still 312->440 tw; not measured, reverted, patch kept |

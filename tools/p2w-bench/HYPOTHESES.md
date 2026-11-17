@@ -535,87 +535,22 @@ Do not re-test one without new evidence, and if you do, say what changed.
   ruled table, not four of them, and the ratchet has to be paid for over the whole corpus in
   a slot that can afford it. The engine was reverted to HEAD after this measurement.
 
-- RULED OUT, THIS RUN (measured at corpus scale) - THE WRAP CHARGE RE-LAYS OUT 47 OF 213 AND
-  REGRESSES EVERY DOCUMENT IT TOUCHES. The previous run asked for the corpus diff before
-  anything else, and this is it. Built the charge exactly as the handoff specified: a Helvetica
-  advance-width helper (PDType1Font.HELVETICA / HELVETICA_BOLD), each cell's text split on its
-  own paragraph breaks, lines = ceil(textWidth / (spanTw - insetTw)), the row charged
-  max(declared rowHeightTw, lines x rowLineTw) written into w:trHeight, which is hRule="atLeast"
-  on the real-table path so the charge is a floor; the flow budget (writtenRowsTw) was made to
-  follow it, because a row the renderer lays out taller is taller for the flow after it too.
-  Re-converted all 213 with the unmodified HEAD engine and with the charge, and diffed the .docx
-  entry by entry:
-    * 47 of 213 documents change (22 %), all of them in word/document.xml only; 350 rows grow,
-      65 shrink (a table that outgrows its page is squeezed), the largest single row +161 pt
-      (360_restaurant_menu).
-    * MEASURED, not inferred: the 47 changed documents are the only ones that can move, so they
-      were measured against themselves on both engines (46 of 47; 01_stamp_rotated_15deg_upright
-      fails to render on both, soffice "no render"). Result: 0 improved, 40 WORSE, 6 flat.
-      Mean share@5px loss 10.66 % -> 32.63 % (lower is better). The target document,
-      041122-Account_Opening_Form, does not move at all (99.02 both, 11 pages both).
-  WHY IT IS WORSE, and this is the part the next run needs: the charge measures a cell's text
-  against its w:tblGrid column, and on several documents the grid does not describe the layout.
-  41_coloured_headings_white_bg is written as SIX grid columns (8876,570,8876,570,8876,570 tw =
-  1416 pt of grid on a 595 pt page) holding TWO cells, so the price column reads 28.5 pt wide
-  for the 30.6 pt text "340.00" and every row of a correct price list is charged two lines: the
-  page doubles its leading (trHeight 360 -> 500 on every row), which is visible in the render
-  and moves share@5px 0.0 -> 70.8. Two structural guards were built and measured and neither
-  fires here, because the table's own bounds (t.right - t.left) are wrong in the same way as the
-  grid, and spanC exists so the "fewer cells than columns" test passes: a grid this corrupt
-  cannot be caught by comparing it with itself. WHAT THAT MEANS: the width the charge needs is
-  not the grid, it is the width the RENDERER gives the cell (tcW after spans, or the page's own
-  cell rectangle), and until that is the number the charge reads, this mechanism cannot be
-  measured, only regressed. The engine was reverted to HEAD after this measurement; nothing from
-  it is in the tree. Full numbers in FINDINGS/wrap-charge-corpus-diff.md.
-
-- RULED OUT, THIS RUN (second measurement) - THE SAME CHARGE WITH AN 8 % METRIC ALLOWANCE STILL
-  REGRESSES. The first build charged every cell whose text was wider than its column, and
-  Helvetica's advances are only within a few per cent of DejaVu Sans, so a cell sitting AT its
-  column width - a price column, an amount column, the commonest cell in this corpus - was
-  charged a second line by the estimate's own error. 41_coloured_headings_white_bg's price cell
-  is 28.5 pt wide for 30.6 pt of text: a 7 % overshoot, and every row of a correct price list
-  doubled (360 -> 500 tw). So the charge was rebuilt with the error budget named: avail x 1.08,
-  with the grid guards kept (columns must add to the table's width; no row may have fewer cells
-  than the grid has columns unless a span table says which cell covers which). Measured:
-    * 32 of 213 documents change, down from 47 - the allowance removed the false positives, and
-      41_coloured_headings_white_bg is back at 360 tw rows, exactly as the page drew it.
-    * 041122 now moves: 6 rows, largest +12.2 pt (the earlier build charged it nothing).
-    * and it is still worse: of the 32 changed documents, 0 improve, 28 get worse, 4 are flat.
-      Mean share@5px loss 13.85 % -> 30.36 %. Worst: 80_gstin_pan_cin_ifsc_table 2.01 -> 61.11,
-      77_arabic_rtl_document 17.14 -> 58.55, 72_bank_statement_no_rules_right_amounts 0.00 ->
-      41.02.
-  WHAT THAT MEANS, and it is the finding this run exists to deliver: the charge cannot be landed
-  as a CHARGE. A table whose rows are already the page's pitch is correct, and every extra twip
-  of trHeight moves its rows off the page's own lines - so a rule that raises rows wherever the
-  estimate says "these words are wider than this column" loses more than it gains, because the
-  estimate fires on rows the renderer was already laying out correctly. The rule that can only
-  win is the DIFFERENTIAL one: charge a row only for the lines it will wrap MORE than the page
-  itself drew in that cell (the page's drawn line count is already in the model - the cell's own
-  boxes, or cellParasTw / rowLineTw), and charge nothing when the two agree. That is the next
-  run's first experiment, and both documents it must calibrate against are named in
-  FINDINGS/wrap-charge-corpus-diff.md. The engine was reverted to HEAD; nothing from either
-  build is in the tree.
-
-- RULED OUT, THIS RUN (third measurement) - THE DIFFERENTIAL CHARGE TOO. The rule was rebuilt to
-  charge a row only for the lines it will wrap MORE than the page's own row height affords
-  (pageLines = round(rowHeightTw / rowLineTw); charge only when wrapLinesHelv > pageLines), with
-  the 8 % metric allowance kept. It calibrates better than either earlier build: 24 of 213
-  documents change (11 %, down from 47 and 32), 41_coloured_headings_white_bg is untouched at its
-  page pitch (0 of 12 rows move), and 041122-Account_Opening_Form finally moves the row it was
-  aimed at - 7 rows, largest +24.9 pt, which is the 156-vs-111 pt gap the earlier run measured.
-  And the verdict is the same: of the 23 changed documents measured, 0 improve, 18 get worse, 5
-  are flat; mean share@5px loss 16.08 % -> 31.52 %. Worst: 80_gstin_pan_cin_ifsc_table
-  2.01 -> 61.11, 77_arabic_rtl_document 17.14 -> 62.35, 76_devanagari_table 19.54 -> 57.90,
-  64_newspaper_uneven_columns_ad_boxes 9.11 -> 39.50.
-  WHAT THAT MEANS. Three builds - flat, allowed, differential - and 124 document-measurements all
-  say the same thing: on this corpus, raising a ruled table's rows loses. The documents that
-  change are dominated by tables whose rows the page drew at its own pitch, and the flow after
-  the table is then wrong by exactly what was added, which the instrument charges at 5 px. The
-  mechanism explains 041122 (111 pt charged against 156 laid out) and is still not a lever that
-  can be pulled corpus-wide: 041122's own page count does not change even when its row grows by
-  25 pt, because the page's break is decided by the whole sequence. WHAT WOULD BE DIFFERENT: a
-  charge that is applied to a table AND to the flow after it with the same number, so the page
-  is closed rather than lengthened - i.e. re-flow the page's remaining bands after the charge
-  instead of letting them overflow. That is a page-layout change, not a row-height change, and
-  it is bigger than a fixer slot. The engine was reverted to HEAD; nothing from any of the three
-  builds is in the tree.
+- CLOSED, THIS RUN (measured over the whole corpus) - THE WRAP CHARGE IS 42 OF 213 AND IT
+  REGRESSES. Built exactly as the two entries above specify (Helvetica standard-14 advances,
+  per paragraph ceil(textWidth / (spanTw - insetTw)), row = max(declared, lines x rowLineTw)
+  in w:trHeight atLeast, charged before the page budget so writtenRowsTw sees it), converted
+  all 213 documents with it and with the engine at 76f01b2, and diffed word/document.xml entry
+  by entry: 42 of 213 differ (20 %), ~400 rows, and ZERO docx page-break changes. So the blast
+  radius is slot-sized, not ratchet-sized - the earlier note's fear was wrong about the size.
+  What it is wrong about is the direction: measured both ways, price-list-right-aligned-amounts
+  goes 1.79 -> 81.15 and 1 -> 2 pages, price-list-2col-dense-right-aligned 2.69 -> 81.69 and
+  1 -> 2 pages, 01_stamp_rotated_15deg_upright 0.0 -> 9.3, 03_stamp_vertical_90deg 16.98 ->
+  23.19. It reads a right-aligned amount in a narrow column as two lines and doubles 38 of 38
+  rows of a table whose page pitch was already right. 041122 is unchanged at 11 pages in the
+  first build and could not be rendered inside a 280 s call after the inset correction.
+  WHAT THE NEXT RUN NEEDS: the charge has to be gated on the width the RENDERER gets (the
+  emitted w:tcW less the inset actually written), not on the page's inset, or it fires on text
+  that fits. And the 041122 gap is a PARAGRAPH count (9 line boxes charged, 13 drawn), not a
+  width, so the two must not be conflated in one number. Patch kept at
+  patches/wrap-charge-helvetica.patch; engine at HEAD. Full numbers:
+  FINDINGS/wrap-charge-corpus-diff.md.

@@ -1,0 +1,148 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 876b8f3..c1a7edb 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6269,6 +6269,32 @@ public final class DocxWriter {
+                 rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
+                 rowLineTw = Math.max(typeFloorTw, twScale(rowLineTw, ctx.squeeze));
+             }
++            // THE WRAP CHARGE - A ROW IS AS TALL AS THE LINES ITS CELLS REALLY TAKE.
++            //
++            // w:trHeight is written from the page's own row pitch (rowTwHere) and the row's
++            // line (rowLineTw), i.e. from ONE line of text. A cell the page drew on one line
++            // and that the engine put text into which does not fit its own width is laid out
++            // by the renderer on as many lines as its text needs, and each of those lines is
++            // charged against the page - while the writer's own page budget charges the row
++            // its trHeight and skips the paragraphs inside the cell (spacingTw). That is the
++            // gap this closes: 041122-Account_Opening_Form's instruction cell holds nine
++            // paragraphs and the writer charges 9 x 240 tw (111 pt) where the render spends
++            // ~156 pt, so page 7 - one 24-row table with nothing to shave - spills.
++            //
++            // The metric is Helvetica's advance widths (standard-14, the AFM metrics
++            // PDFBox ships), not a 0.5 em character average: at a 59 pt column the average
++            // misreads the count by a third. Each cell's text is split on its OWN paragraph
++            // breaks, each paragraph charged ceil(textWidth / (spanTw - insetTw)) lines, and
++            // the row takes max(declared height, wrapped lines x rowLineTw). hRule="atLeast"
++            // makes that a floor the renderer will not go below, so a row that already fits
++            // keeps the page's pitch exactly.
++            if (rowTwHere > 0) {
++                int wrapLines = wrappedRowLines(t, r, cols, colTw, x0, edgeTw);
++                if (wrapLines > 1) {
++                    int wrapTw = wrapLines * Math.max(1, rowLineTw);
++                    if (wrapTw > rowHeightTw) rowHeightTw = wrapTw;
++                }
++            }
+             // The budget is charged what the renderer will LAY OUT, which is the content plus
+             // the rule - not the content alone. Charging the content alone under-measures every
+             // ruled table by one rule a row, and this is the number the flow after the table is
+@@ -7108,6 +7134,110 @@ public final class DocxWriter {
+         return Math.max(0, tw);
+     }
+ 
++    /**
++     * The advance width of a string in Helvetica, in em units.
++     *
++     * <p>Standard-14 metrics: PDFBox ships the AFM files, so this is the face a renderer
++     * substitutes for an unknown font, measured rather than estimated. Bold takes the bold
++     * AFM. Any failure falls back to the 0.5 em average this replaced, which is what the rest
++     * of the writer still uses - a missing metric must not change a document that already fits.
++     */
++    private static float helvAdvanceEm(String s, boolean bold) {
++        if (s == null || s.isEmpty()) return 0f;
++        try {
++            com.tom_roush.pdfbox.pdmodel.font.PDFont f = bold
++                    ? com.tom_roush.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD
++                    : com.tom_roush.pdfbox.pdmodel.font.PDType1Font.HELVETICA;
++            return f.getStringWidth(s) / 1000f;
++        } catch (Throwable e) {
++            return s.length() * 0.5f;
++        }
++    }
++
++    /**
++     * How many lines the renderer will draw for one cell's text at one type size.
++     *
++     * <p>Split on the cell's OWN paragraph breaks: a cell holding nine paragraphs is nine
++     * line boxes at least, whatever its width. Each paragraph is charged
++     * {@code ceil(textWidth / availTw)} and never less than one.
++     */
++    private static int wrapLinesForCell(String text, float sz, int availTw, boolean bold) {
++        if (text == null || text.isEmpty() || availTw <= 0 || sz <= 0f) return 1;
++        int total = 0;
++        int from = 0;
++        for (int i = 0; i <= text.length(); i++) {
++            if (i == text.length() || text.charAt(i) == '\n') {
++                String para = text.substring(from, i);
++                from = i + 1;
++                float wTw = (float) (helvAdvanceEm(para, bold) * sz * TWIPS_PER_PT);
++                // THE METRIC IS NOT THE FACE THE RENDERER USES. Helvetica's advances are within
++                // a few per cent of DejaVu Sans, and a cell the writer has already widened to
++                // hold its text sits within that few per cent of its own width. Charging a
++                // second line for a 1 twip excess doubled 38 of 38 rows of
++                // price-list-right-aligned-amounts (312 -> 624 tw) and spilled its page,
++                // 1.79 -> 81.15. Below 4 % over, the cell is one line whatever the sum says.
++                int n = wTw <= availTw * 1.04f ? 1 : (int) Math.ceil(wTw / (float) availTw);
++                total += Math.max(1, n);
++            }
++        }
++        return Math.max(1, total);
++    }
++
++    /**
++     * The tallest cell of row r, in lines - the number the wrap charge is made from.
++     *
++     * <p>The width a cell's text may use is its SPAN (the columns the page's own rectangle
++     * handed it, or the empty neighbours it widens over) less the inset the page drew its
++     * text at. Both are the same numbers the cell writer below uses; they are recomputed here
++     * because w:trHeight is written before the cells are.
++     */
++    private static int wrappedRowLines(PdfToWord.Table t, int r, int cols, int[] colTw,
++                                       float x0, long[] edgeTw) {
++        if (t == null || colTw == null || r >= t.rows.size()) return 0;
++        List<String> row = t.rows.get(r);
++        if (row == null) return 0;
++        int best = 0;
++        for (int c = 0; c < cols && c < row.size(); c++) {
++            String cell = row.get(c);
++            if (cell == null || cell.isEmpty()) continue;
++            float sz = r < t.sizes.size() && c < t.sizes.get(r).size()
++                    && t.sizes.get(r).get(c) != null ? t.sizes.get(r).get(c) : 0f;
++            if (sz <= 0f) continue;
++            int inset = insetTw(t, r, c, x0, edgeTw[c]);
++            float textR = cellRTw(t, r, c);
++            int spanTw = colTw[c];
++            if (hasSpans(t)) {
++                int span = Math.max(1, Math.min(spanCAt(t, r, c), cols - c));
++                spanTw = 0;
++                for (int k = 0; k < span; k++) spanTw += colTw[c + k];
++            } else {
++                int span = 1;
++                while (c + span < cols && cellAt(t, r, c + span).isEmpty()) {
++                    boolean startsOutside = inset >= spanTw;
++                    boolean tooWide = !Float.isNaN(textR) && inset + textR > spanTw;
++                    if (!startsOutside && !tooWide) break;
++                    spanTw += colTw[c + span];
++                    span++;
++                }
++            }
++            if (inset > spanTw - 1) inset = Math.max(0, spanTw - 1);
++            // THE SAME OVERFLOW CORRECTION THE CELL WRITER MAKES, or this charges a wrap the
++            // renderer never draws. A right-aligned amount sits at an inset that leaves it
++            // almost no room, and the writer gives that inset way by the few twips that let
++            // the value fit on one line (see 343_air_waybill in table()): the renderer then
++            // draws ONE line. Charging the uncorrected inset read 43 rows of
++            // price-list-right-aligned-amounts as two lines and doubled them, 312 -> 624 tw.
++            int needTw = Float.isNaN(textR) ? 0 : (int) Math.ceil(textR) + 20;
++            if (!Float.isNaN(textR) && textR > 0f && inset + needTw > spanTw) {
++                inset = Math.max(0, spanTw - needTw);
++            }
++            int avail = spanTw - inset;
++            int lines = wrapLinesForCell(cell, sz, avail, boldOf(t, r, c));
++            if (lines > best) best = lines;
++        }
++        return best;
++    }
++
+     /**
+      * The typeface name without the PDF's subset tag.
+      *

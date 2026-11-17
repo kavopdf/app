@@ -9,18 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 17:46 |
-| ended | 18:45 |
-| how it ended | forced |
+| started | 18:17 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> THREE WRAP-CHARGE BUILDS, ALL MEASURED AT CORPUS SCALE, ALL REVERTED. The last run asked for the corpus diff; this run did it three times over, each build cheaper than the last. v1 flat charge: 47/213 .docx change, 0 of 46 measured improve, 40 worse - the false positives were the metric's own 7% Helvetica/DejaVu mismatch firing on cells that sit exactly at their column width. v2 named that budget (avail x1.08) and added structural grid guards: 32/213 change, 41_coloured_headings right again, 041122 moves 6 rows, still 0 improved / 28 worse. v3 charged only the EXCESS over the page's own row height (pageLines = round(rowHeightTw/rowLineTw)): 24/213 change (11%), 41_coloured untouched (0 of 12 rows), 041122 moves the row it was aimed at by +24.9 pt - the best calibration of the three - and still 0 of 23 improved, 18 worse, mean share@5px loss 16.08% -> 31.52%. THE FINDING: the mechanism is real (041122 charges 111 pt for 156 pt of laid-out content) but a row height is not the lever. Growing a row lengthens the page instead of closing it; the page break is decided by the whole sequence of rows, and everything after the table is then wrong by exactly what was added. Nothing from any build is in the tree; the engine is at HEAD and rebuilt.
+> SECOND BUILD ALSO FAILS THE CORPUS DIFF, AND THE ANSWER IS IN ONE ROW. Gated the wrap charge on a 4 % metric tolerance (a paragraph is one line unless Helvetica's advance beats the available width by more than 4 %) to absorb the Helvetica-vs-DejaVu mismatch: 41 of 213 documents still change (was 42), 0 page-break moves, and price-list-right-aligned-amounts drops from 38 changed rows to 16 - but every one of those 16 still goes 312 -> 440 tw, exactly two lines at its 220 tw row line. So the excess is not a few per cent of a metric mismatch; some cell in that table is being measured against a width the renderer never uses. That build was NOT measured (41 documents both ways does not fit a slot at 25-60 s each) and was reverted with the first. Both patches are kept: patches/wrap-charge-helvetica.patch (ungated, 251 lines, but it also carries the run's state-file diffs - apply with git apply --include='*DocxWriter.java') and patches/wrap-charge-gated-1.04.patch. Engine at HEAD, nothing carried. THE NEXT RUN'S FIRST MOVE IS A ONE-ROW INSPECTION, not a rebuild: take row 0 of price-list-right-aligned-amounts, read its emitted w:tcW, w:ind and cell text, and compare them against what wrappedRowLines computes - the number that makes avail smaller than the text is in that row and it has not been looked at yet. Only after that is known does a third build make sense. Time this run: corpus diff is two calls (convert 213 in 81-90 s, diff 20 s); measure_doc is 25-60 s a document so measure top movers only, never the whole changed set.
 
 ## What the next run should do first
 
-> Plan the wrap charge as a PAGE-layout change, not a row height: after a table's rows are charged, re-flow the bands that follow onto the page's remaining height instead of letting them overflow. Calibration pair already chosen - 41_coloured_headings_white_bg must keep its 360 tw rows, 041122-Account_Opening_Form's instruction row must grow - and the corpus diff costs 2 x 71 s to convert plus ~7 s a document to measure. Do not spend another slot on a row-height variant; three are measured in HYPOTHESES.md and FINDINGS/wrap-charge-corpus-diff.md.
+> Read row 0 of price-list-right-aligned-amounts: its emitted w:tcW, w:ind and cell text, against what wrappedRowLines computes for that cell (spanTw from colTw, inset from insetTw, textR from cellRTw). Find the number that makes avail smaller than the text the renderer actually lays on one line. The 312 -> 440 tw doubling (exactly 2 x 220 tw row line) survives both the inset-overflow correction and a 4 % tolerance, so it is structural, not metric drift. Fix that, re-convert all 213 and re-diff (two calls) before measuring anything; only then measure the top movers, not all 41.
 
 ## Agents deployed and not yet accounted for
 
@@ -58,9 +58,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:34` attempt 10 on content-missing-partly-replaced -> partial (2/16 moved)
 - `15:36` attempt 11 on content-missing-partly-replaced -> partial (1/30 moved)
 - `17:32` attempt 12 on content-missing-partly-replaced -> reverted (0/4 moved)
-- `18:22` attempt 13 on content-missing-partly-replaced -> reverted (0/16 moved)
-- `18:34` attempt 14 on content-missing-partly-replaced -> reverted (0/16 moved)
-- `18:45` attempt 15 on content-missing-partly-replaced -> reverted (0/16 moved)
+- `18:50` attempt 13 on content-missing-partly-replaced -> reverted (0/16 moved)
 
 ## Where the rest of the state lives
 
