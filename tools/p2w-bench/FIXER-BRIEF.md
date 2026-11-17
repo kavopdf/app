@@ -259,13 +259,16 @@ anything you wrote and did not commit is invisible to it.
     2.  round.py --release-fixer                      the slot is free
     3.  COMMIT AND PUSH EVERYTHING (STEP 8's list, plus ROUND.json after the release)
     4.  chain.py --after-release                      FIRE or STOP
-            on FIRE:  cron action=trigger cron_id=<the id chain.py printed>
+    5.  report.py                                    eight numbers, and writes REPORT.md
+    6.  END THIS RUN
 
 `chain.py` will not fire unless your sandbox matches origin AND the working tree is clean, and it
 names the dirty files. HEAD matching origin is not enough - an uncommitted edit does not move HEAD.
 
-**Trigger before the report, before any summary.** A run that releases and then dies writing its
-summary has stopped the chain for an hour, and the summary was worth less than the hour.
+**YOU CANNOT START THE NEXT RUN, AND THAT IS NOT A FAILURE.** The `cron` tool is not in a run's tool
+list - a run on 17 Nov verified it and wrote so into CHAIN.json. The next run starts at the next
+scheduled slot (:45) by itself. What you control is your own END: a run that holds the slot past :45
+costs a whole scheduled slot, and that is the difference between two runs an hour and one.
 
 Why the brake stays: it stops on a forced release, a finished round, and three runs in a row with
 no kept and no partial attempt. Three runs that fixed nothing are stuck, not unlucky.
@@ -310,6 +313,14 @@ tomorrow is worth more than a run you block today.
 Before you deploy, one line so the wait is announced if anything goes wrong:
 
     python3 tools/p2w-bench/round.py --heartbeat --doing "deployed 2 agents, working my own angle"
+
+**A SUBAGENT COMMITS WITH THE MCP TOOL, NEVER WITH `git push`.** `git push` from a sandbox is 403
+("Permission to kavopdf/app.git denied to Onyx-Node") - for the fixer and for every subagent alike.
+A run on 17 Nov recorded that as a blocker and stopped deploying agents altogether, which cost a day
+of parallel work. The blocker was never a missing permission; it was the wrong tool.
+`GITHUB_COMMIT_MULTIPLE_FILES` (owner kavopdf, repo app, branch main) works from inside a run. Use
+it, and tell every subagent to use it too.
+
 
 A subagent has its own sandbox, its own clone, its own budget, and can outlive your run. That is
 fine as long as it leaves something behind: **every subagent must write its finding to
