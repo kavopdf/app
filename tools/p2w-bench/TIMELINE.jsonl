@@ -24,3 +24,4 @@
 {"t": 1794894077.5519717, "ist": "11:11:17", "ev": "beat", "d": "final corpus: prerender+measure pass 3"}
 {"t": 1794894332.9764793, "ist": "11:15:32", "ev": "beat", "d": "final corpus: last 37 docs"}
 {"t": 1794894413.4036152, "ist": "11:16:53", "ev": "attempt", "d": "content-missing-partly-replaced -> partial"}
+{"t": 1794894714.7363167, "ist": "11:21:54", "ev": "release", "d": "fixer released"}

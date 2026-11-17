@@ -10,8 +10,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 09:22 |
-| ended | still running |
-| how it ended | - |
+| ended | 11:21 |
+| how it ended | released |
 | plan | clear carry-over: fix the 041122 page-7 welded cell inset (first line's x -> block's leftmost line x), measure with an empty render dir |
 
 ## The picture, in the words of the run that left it
