@@ -95,5 +95,12 @@
   }
  ],
  "context": "The 041122 spill is a TEXT BOX, not a table cell - the 16 Nov finding, not this run's. This run re-derived the font-size bug because patches/ was never committed (it did not exist in the repository at all) and HYPOTHESES.md pointed at patches/run-size-from-sizePt-not-Tf.patch. That patch is now real and committed, with a patches/README.md saying how to apply it. Read HYPOTHESES.md before forming a theory - three of this run's hours went on work the file already records as done.",
- "needs_human": []
+ "needs_human": [
+  {
+   "at": "12:23",
+   "what": "the chain cannot fire: the cron tool is not in the fixer agent's tool list",
+   "tried": "called cron action=list (TOOL_NOT_FOUND) and tool_search for a cron service (only GitHub/HuggingFace job tools exist); chain.py --after-release prints FIRE and appends a fired_at entry regardless",
+   "change": "give the fixer the cron tool, or make chain.py verify the trigger actually happened before recording it"
+  }
+ ]
 }
