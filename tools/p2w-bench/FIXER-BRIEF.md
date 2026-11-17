@@ -217,7 +217,11 @@ code in different classes, and one number covering both lets either hide behind 
     handoff.py --note "..."        what just happened (attempt.py writes this too)
     attempt.py --class "<cls>" --moved N --total M --engine <hash> --reason "..."
 
-**Always pass `--engine`.** A stale reason is a lie in the ledger: every attempt records its own,
+**`--engine` is the commit that last touched the engine** - `git log -1 --format=%h --
+app/src/main/java/com/kavopdf/app/engine/`. `attempt.py` now derives it when you omit it, so you
+cannot forget; passing it explicitly is still better, because you know which build you measured.
+
+A stale reason is a lie in the ledger: every attempt records its own,
 and the history is kept in `reasons` so an earlier note is never lost - it just stops being
 presented as the current one.
 

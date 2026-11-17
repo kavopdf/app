@@ -266,7 +266,7 @@ def add(args):
                   if name.replace(" ", "-") in os.path.basename(f)]
         if not _mine and not _prior:
             print("note: this attempt was recorded with no agent deployed and no FINDINGS file for")
-            print("      %r. The default is two or three agents before working a class alone." % name)
+            print("      %r. The default is at most two agents before working a class alone." % name)
     except Exception:
         pass
 
@@ -336,6 +336,23 @@ def show(args):
     return 0
 
 
+def _engine_hash():
+    """The commit that last touched the engine - the same command the brief tells the run to use.
+
+    Returns 'unknown' rather than raising: an attempt with no engine named is worse than one named
+    'unknown', because the second is honest about what it does not know.
+    """
+    try:
+        import subprocess
+        r = subprocess.run(["git", "log", "-1", "--format=%h", "--",
+                            "app/src/main/java/com/kavopdf/app/engine/"],
+                           capture_output=True, text=True, timeout=30, cwd=os.path.dirname(os.path.dirname(HERE)))
+        h = (r.stdout or "").strip()
+        return h or "unknown"
+    except Exception:
+        return "unknown"
+
+
 def main(argv):
     beat("attempt.py", "recording an attempt")
     ap = argparse.ArgumentParser()
@@ -343,12 +360,19 @@ def main(argv):
     ap.add_argument("--outcome", default="")
     ap.add_argument("--moved", type=int, default=None)
     ap.add_argument("--total", type=int, default=None)
-    ap.add_argument("--engine", default="")
+    ap.add_argument("--engine", default="",
+                    help="engine commit hash; derived from git when omitted")
     ap.add_argument("--reason", default="")
     ap.add_argument("--ratchet", type=int, default=None,
                     help="documents in the corpus-wide ratchet that just passed")
     ap.add_argument("--show", action="store_true")
     a = ap.parse_args(argv[1:])
+    if not a.engine:
+        # THE RULE HAS NO TEETH OTHERWISE. The brief says "always pass --engine" twice, and the
+        # tool accepted an empty string - so every attempt recorded without it lost its provenance
+        # and nobody noticed, because nothing refused. Asking the run to remember a value git
+        # already knows is the wrong side of the contract.
+        a.engine = _engine_hash()
     return show(a) if a.show else add(a)
 
 
