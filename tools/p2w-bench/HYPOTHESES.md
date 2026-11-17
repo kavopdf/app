@@ -567,3 +567,55 @@ Do not re-test one without new evidence, and if you do, say what changed.
   cell rectangle), and until that is the number the charge reads, this mechanism cannot be
   measured, only regressed. The engine was reverted to HEAD after this measurement; nothing from
   it is in the tree. Full numbers in FINDINGS/wrap-charge-corpus-diff.md.
+
+- RULED OUT, THIS RUN (second measurement) - THE SAME CHARGE WITH AN 8 % METRIC ALLOWANCE STILL
+  REGRESSES. The first build charged every cell whose text was wider than its column, and
+  Helvetica's advances are only within a few per cent of DejaVu Sans, so a cell sitting AT its
+  column width - a price column, an amount column, the commonest cell in this corpus - was
+  charged a second line by the estimate's own error. 41_coloured_headings_white_bg's price cell
+  is 28.5 pt wide for 30.6 pt of text: a 7 % overshoot, and every row of a correct price list
+  doubled (360 -> 500 tw). So the charge was rebuilt with the error budget named: avail x 1.08,
+  with the grid guards kept (columns must add to the table's width; no row may have fewer cells
+  than the grid has columns unless a span table says which cell covers which). Measured:
+    * 32 of 213 documents change, down from 47 - the allowance removed the false positives, and
+      41_coloured_headings_white_bg is back at 360 tw rows, exactly as the page drew it.
+    * 041122 now moves: 6 rows, largest +12.2 pt (the earlier build charged it nothing).
+    * and it is still worse: of the 32 changed documents, 0 improve, 28 get worse, 4 are flat.
+      Mean share@5px loss 13.85 % -> 30.36 %. Worst: 80_gstin_pan_cin_ifsc_table 2.01 -> 61.11,
+      77_arabic_rtl_document 17.14 -> 58.55, 72_bank_statement_no_rules_right_amounts 0.00 ->
+      41.02.
+  WHAT THAT MEANS, and it is the finding this run exists to deliver: the charge cannot be landed
+  as a CHARGE. A table whose rows are already the page's pitch is correct, and every extra twip
+  of trHeight moves its rows off the page's own lines - so a rule that raises rows wherever the
+  estimate says "these words are wider than this column" loses more than it gains, because the
+  estimate fires on rows the renderer was already laying out correctly. The rule that can only
+  win is the DIFFERENTIAL one: charge a row only for the lines it will wrap MORE than the page
+  itself drew in that cell (the page's drawn line count is already in the model - the cell's own
+  boxes, or cellParasTw / rowLineTw), and charge nothing when the two agree. That is the next
+  run's first experiment, and both documents it must calibrate against are named in
+  FINDINGS/wrap-charge-corpus-diff.md. The engine was reverted to HEAD; nothing from either
+  build is in the tree.
+
+- RULED OUT, THIS RUN (third measurement) - THE DIFFERENTIAL CHARGE TOO. The rule was rebuilt to
+  charge a row only for the lines it will wrap MORE than the page's own row height affords
+  (pageLines = round(rowHeightTw / rowLineTw); charge only when wrapLinesHelv > pageLines), with
+  the 8 % metric allowance kept. It calibrates better than either earlier build: 24 of 213
+  documents change (11 %, down from 47 and 32), 41_coloured_headings_white_bg is untouched at its
+  page pitch (0 of 12 rows move), and 041122-Account_Opening_Form finally moves the row it was
+  aimed at - 7 rows, largest +24.9 pt, which is the 156-vs-111 pt gap the earlier run measured.
+  And the verdict is the same: of the 23 changed documents measured, 0 improve, 18 get worse, 5
+  are flat; mean share@5px loss 16.08 % -> 31.52 %. Worst: 80_gstin_pan_cin_ifsc_table
+  2.01 -> 61.11, 77_arabic_rtl_document 17.14 -> 62.35, 76_devanagari_table 19.54 -> 57.90,
+  64_newspaper_uneven_columns_ad_boxes 9.11 -> 39.50.
+  WHAT THAT MEANS. Three builds - flat, allowed, differential - and 124 document-measurements all
+  say the same thing: on this corpus, raising a ruled table's rows loses. The documents that
+  change are dominated by tables whose rows the page drew at its own pitch, and the flow after
+  the table is then wrong by exactly what was added, which the instrument charges at 5 px. The
+  mechanism explains 041122 (111 pt charged against 156 laid out) and is still not a lever that
+  can be pulled corpus-wide: 041122's own page count does not change even when its row grows by
+  25 pt, because the page's break is decided by the whole sequence. WHAT WOULD BE DIFFERENT: a
+  charge that is applied to a table AND to the flow after it with the same number, so the page
+  is closed rather than lengthened - i.e. re-flow the page's remaining bands after the charge
+  instead of letting them overflow. That is a page-layout change, not a row-height change, and
+  it is bigger than a fixer slot. The engine was reverted to HEAD; nothing from any of the three
+  builds is in the tree.

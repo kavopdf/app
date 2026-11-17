@@ -131,3 +131,14 @@
 {"t": 1794919962.0185416, "ist": "18:22:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1794919967.0074396, "ist": "18:22:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1794919967.1316502, "ist": "18:22:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1794920008.9834902, "ist": "18:23:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794920660.514811, "ist": "18:34:20", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1794920660.6014626, "ist": "18:34:20", "ev": "attempt", "d": "content-missing-partly-replaced -> reverted"}
+{"t": 1794920660.7008934, "ist": "18:34:20", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794920666.5089607, "ist": "18:34:26", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794920666.6574543, "ist": "18:34:26", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1794921307.622841, "ist": "18:45:07", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1794921307.7611547, "ist": "18:45:07", "ev": "attempt", "d": "content-missing-partly-replaced -> reverted"}
+{"t": 1794921307.8447099, "ist": "18:45:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794921312.205628, "ist": "18:45:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794921312.319576, "ist": "18:45:12", "ev": "beat", "d": "report.py: building the report"}

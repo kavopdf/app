@@ -63,10 +63,62 @@ table says which cells cover which. Neither fires on this document, because the 
 bounds are wrong in the same way the grid is and `spanC` exists (so the cell-count test passes).
 A corrupt grid cannot be caught by comparing it with itself.
 
+## Second build: the metric's own error was manufacturing lines
+The first build charged a cell whenever its text was wider than its column. Helvetica's advances
+are only within a few per cent of DejaVu Sans, and the commonest cell in this corpus sits AT its
+column width, so the estimate's error alone turned one-line cells into two: 41_coloured_headings'
+price cell is 28.5 pt wide for 30.6 pt of text (7 % over), and every row doubled.
+
+Rebuilt with the error budget named - avail x 1.08 - and the grid guards kept:
+
+| | first build | with 8 % allowance |
+|---|---|---|
+| documents changed | 47 (22 %) | **32 (15 %)** |
+| 41_coloured_headings rows | 360 -> 500 tw (wrong) | 360 tw (right) |
+| 041122 rows moved | 0 | 6, largest +12.2 pt |
+| improved / worse / flat (measured) | 0 / 40 / 6 | **0 / 28 / 4** |
+| mean share@5px loss | 10.66 -> 32.63 | 13.85 -> 30.36 |
+
+The allowance did what it was meant to do and the verdict did not change: **charging rows their
+wrapped height, as a charge, loses on this corpus.** Worst movers in the second build:
+80_gstin_pan_cin_ifsc_table 2.01 -> 61.11, 77_arabic_rtl_document 17.14 -> 58.55,
+72_bank_statement_no_rules_right_amounts 0.00 -> 41.02.
+
+## Third build: the differential charge, and the verdict
+Charging only the EXCESS over the page's own row height (`pageLines = round(rowHeightTw /
+rowLineTw)`; charge only when the Helvetica estimate needs more), with the 8 % allowance kept:
+
+| | v1 flat | v2 + allowance | v3 differential |
+|---|---|---|---|
+| documents changed | 47 (22 %) | 32 (15 %) | **24 (11 %)** |
+| 41_coloured_headings | rows doubled | right | **untouched (0/12 rows)** |
+| 041122 rows moved | 0 | 6 (+12.2 pt) | **7 (+24.9 pt)** |
+| improved / worse / flat | 0 / 40 / 6 | 0 / 28 / 4 | **0 / 18 / 5** |
+| mean share@5px loss | 10.66 -> 32.63 | 13.85 -> 30.36 | 16.08 -> 31.52 |
+
+v3 is the best calibration of the three - it leaves the correct tables alone and it grows the row
+it was aimed at by almost exactly the 45 pt the earlier run measured - and it still loses. Worst:
+80_gstin_pan_cin_ifsc_table 2.01 -> 61.11, 77_arabic_rtl_document 17.14 -> 62.35,
+76_devanagari_table 19.54 -> 57.90, 64_newspaper_uneven_columns_ad_boxes 9.11 -> 39.50.
+
+**The verdict, after three builds and 124 document-measurements: raising a ruled table's rows is
+not a corpus-wide lever on this engine.** The mechanism is real (041122 charges 111 pt for 156 pt
+of content) but the fix is not a row height. Growing a row lengthens the page instead of closing
+it, and the flow after the table is then wrong by exactly what was added.
+
 ## What the next run should do
-Do not re-land this charge against `w:tblGrid`. The width it needs is the width the RENDERER gives
-the cell - the `w:tcW` after spans, or better, the page's own cell rectangle
-(`t.cellX` / `t.spanC`), which is where the PDF says the text was drawn. Calibrate that width on
-`41_coloured_headings_white_bg` (must stay at 360 tw rows) and on `041122`'s instruction row (must
-grow) BEFORE converting the corpus again; the two documents disagree in exactly the way that
-separates a real column width from a grid artefact.
+Do not re-land any of the three row-height builds. The numbers are in the tables above and the
+code is gone from the tree.
+
+What is left is not a row height. `041122`'s page is 111 pt of charged table against 156 pt of
+laid-out content, and charging the difference does not close the page - it lengthens it, and the
+page break is decided by the whole sequence of rows, not by the row that overflows. The next
+experiment is a PAGE-layout one: after a table's rows are charged, the bands that follow it must
+be re-flowed onto the page's remaining height (the same number the charge added, subtracted from
+what the page has left) rather than allowed to overflow. That is a bigger change than a fixer
+slot and should be planned as one.
+
+If it is attempted, the calibration pair is already chosen and costs two conversions:
+`41_coloured_headings_white_bg` must keep its 360 tw rows and `041122-Account_Opening_Form`'s
+instruction row must grow. The corpus diff is cheap - 2 x 71 s to convert, ~7 s a document to
+measure - and the 213-document answer is the only thing that decides it.

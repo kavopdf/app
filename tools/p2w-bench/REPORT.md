@@ -1,12 +1,12 @@
-# Fixer report - 2026-11-17 18:22
+# Fixer report - 2026-11-17 18:45
 
 ```
 === FIXER REPORT - every number computed from committed files ===
 
 1. classes total            : 8  (212 documents across them)
 2. classes solved           : 0 clear, 7 still have an OPEN document
-3. docs improved THIS run   : 0  (1 attempts, 0 kept)
-4. this run total time      : 35 min  (17:46 -> running)
+3. docs improved THIS run   : 0  (3 attempts, 0 kept)
+4. this run total time      : 58 min  (17:46 -> running)
 5. subagents this run       : 0
 6. working on class         : content-missing-partly-replaced
 7. corpus improvement       : -0.01%  (mean share5 6.15 -> 6.15 over 212 docs)

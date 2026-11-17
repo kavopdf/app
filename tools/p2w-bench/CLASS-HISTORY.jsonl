@@ -1,3 +1,5 @@
 {"at": "2026-11-13 09:55", "attempt": 1, "class": "53_embedded_faces", "outcome": "error", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-13 09:56", "attempt": 1, "class": "32_stroke_lines", "outcome": "error", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-17 18:22", "attempt": 13, "class": "content-missing-partly-replaced", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-17 18:34", "attempt": 14, "class": "content-missing-partly-replaced", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-17 18:45", "attempt": 15, "class": "content-missing-partly-replaced", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
