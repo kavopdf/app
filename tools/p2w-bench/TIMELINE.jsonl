@@ -111,3 +111,4 @@
 {"t": 1794916904.8166347, "ist": "17:31:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1794916904.8271816, "ist": "17:31:44", "ev": "killed", "d": "dead claim cleared by force release"}
 {"t": 1794916904.9646862, "ist": "17:31:44", "ev": "beat", "d": "chain.py: deciding whether to chain"}
+{"t": 1794916921.841975, "ist": "17:32:01", "ev": "beat", "d": "chain.py: deciding whether to chain"}
