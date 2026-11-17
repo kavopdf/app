@@ -130,8 +130,6 @@ public final class DocxWriter {
      * <p>Modes: {@code -Dp2w.lineRule=exact} (default, HEAD), {@code auto} (flow AND cells),
      * {@code autoflow} (flow only; cells and anchored text boxes keep exact).
      */
-    /** Probe: print every cell paragraph's own line box. Off unless -Dp2w.dbgCells=1. */
-    private static final boolean DBG_CELLS = "1".equals(System.getProperty("p2w.dbgCells"));
     private static final int LINE_MODE = lineMode();
     private static int lineMode() {
         String v = System.getProperty("p2w.lineRule", "exact");
@@ -4239,24 +4237,6 @@ public final class DocxWriter {
         if (beforeTw == 0 && absBeforeTw > 0 && !ctx.newPage && ctx.afterTablePt < 0f) {
             beforeTw = absBeforeTw;
         }
-        // A FOLIO IS A POSITION, NOT THE PAGE'S LAST LINE OF TEXT.
-        //
-        // The page number is drawn in the bottom band of the sheet, below everything the page
-        // says. Written as a flowed line it is the one block whose whole existence depends on
-        // the flow having room for the gap above it - and when the page's own content is a few
-        // points taller than the model counted (a substitute face that re-wraps, which is what
-        // ARIAL_W is for, and which this cannot assume is always cured), the folio alone is
-        // pushed onto a new sheet and EVERY page after it shifts by one.
-        //
-        // Measured on 041122-Account_Opening_Form: source page 6 renders its folio "6" at
-        // y=-7.5 on a page of its own (12 pages against 9), and source page 7 does the same
-        // with "7" (11 pages, the table itself already fitting at 795.2 pt against the page's
-        // own 800.4). Anchored, it lands at the y the page drew it at and costs no sheet.
-        if (!ctx.inColumn && b.y > 0.88f * ctx.pageHeightPt && isFolio(p)) {
-            ctx.positioned = true;
-            anchorBox(sb, p, b, ctx);
-            return;
-        }
         int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
         // A page's flow must end where the paper does. The gap above is clamped per line, but
         // 43 of them add up, and a page whose flow overruns by a few points sends its last line
@@ -4347,11 +4327,9 @@ public final class DocxWriter {
         if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");
         else if (p.align == 2) sb.append("<w:jc w:val=\"right\"/>");
         sb.append("</w:pPr>");
-        // The scale this line is written at, from the width the page drew it - see ARIAL_W.
-        int carryPct = carryScalePct(b);
         for (PdfToWord.Run run : b.runs) {
             if (run.text.isEmpty()) continue;
-            runXml(sb, run, p.heading > 0, carryPct);
+            runXml(sb, run, p.heading > 0);
         }
         sb.append("</w:p>");
     }
@@ -4378,216 +4356,9 @@ public final class DocxWriter {
         sb.append("</w:p>");
     }
 
-    // ------------------------------------------------------------------ advance widths
-    //
-    // THE PAGE'S OWN ADVANCE WIDTHS, CARRIED IN A FACE THE READER HAS.
-    //
-    // A .docx names a typeface; it cannot ship one (an embedded font part is ignored by the
-    // reader this project measures against - measured, not assumed: an embedded Effra .odttf
-    // with fontTable/embedRegular/settings/embedTrueTypeFonts rendered identically to no
-    // embedding at all, same page count, same NotoSans faces). So a page set in a face the
-    // reader does not have is re-set in whatever the reader substitutes, and that substitute
-    // is a different width.
-    //
-    // Measured on 041122-Account_Opening_Form: the PDF is set in Effra; LibreOffice
-    // substitutes NotoSans-Regular, which is 10.5 % wider (a 526.5 pt source line needs
-    // ~582 pt). Every full-measure line then re-wraps into two. The engine's model gives each
-    // source line ONE line box, so the page it writes is taller than the page it counted:
-    // source page 6 renders 115 lines against 76, the page's folio is pushed onto a new
-    // sheet, and every page after it shifts by one - 12 pages against 9.
-    //
-    // The width is a fact about the page, not about the reader: the PDF says how wide the line
-    // was. So the run is written in a face whose metrics this engine KNOWS (Arial, which
-    // LibreOffice supplies as Liberation Sans - metric-identical by design), and its advance
-    // widths are scaled to the width the page drew. `w:w` is Word's character scale and the
-    // reader honours it (measured: at the computed scale the verification block of 041122 p7
-    // comes back as 17 lines and 230 pt, the source's own geometry, against 26 lines and
-    // 338 pt unscaled).
-    //
-    // Only for a face the reader is not guaranteed to have. A page already set in Arial,
-    // Liberation, DejaVu or Noto is written exactly as before, so the 211-document synthetic
-    // corpus - all DejaVu - is untouched by construction.
-    private static final int[] ARIAL_W = {
-            278, 278, 355, 556, 556, 889, 667, 191, 333, 333, 389, 584, 278, 333, 278, 278,
-            556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 278, 278, 584, 584, 584, 556,
-            1015, 667, 667, 722, 722, 667, 611, 778, 722, 278, 500, 667, 556, 833, 722, 778,
-            667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 278, 278, 278, 469, 556,
-            333, 556, 556, 500, 556, 556, 278, 556, 556, 222, 222, 500, 222, 833, 556, 556,
-            556, 556, 333, 500, 278, 556, 500, 722, 500, 500, 500, 334, 260, 334, 584 };
-
-    private static final int[] ARIAL_W_BOLD = {
-            278, 333, 474, 556, 556, 889, 722, 238, 333, 333, 389, 584, 278, 333, 278, 278,
-            556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 333, 333, 584, 584, 584, 611,
-            975, 722, 722, 722, 722, 667, 611, 778, 722, 278, 556, 722, 611, 833, 722, 778,
-            667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 333, 278, 333, 584, 556,
-            333, 556, 611, 556, 611, 556, 333, 611, 611, 278, 278, 556, 278, 889, 611, 611,
-            611, 611, 389, 556, 333, 611, 556, 778, 556, 556, 500, 389, 280, 389, 584 };
-
-    private static int arialGlyphW(char c, boolean bold) {
-        if (c >= 0x20 && c <= 0x7E) return (bold ? ARIAL_W_BOLD : ARIAL_W)[c - 0x20];
-        switch (c) {
-            case '\t': return 556;
-            case '\u00a0': return 278;
-            case '\u2013': return 556;
-            case '\u2014': return 1000;
-            case '\u2018': return bold ? 278 : 222;
-            case '\u2019': return bold ? 278 : 222;
-            case '\u201c': return bold ? 500 : 333;
-            case '\u201d': return bold ? 500 : 333;
-            case '\u2022': return 350;
-            case '\u2026': return 1000;
-            case '\u20ac': return 556;
-            case '\u00a3': return 556;
-            case '\u00b0': return 400;
-            default: return 500;
-        }
-    }
-
-    private static float arialAdvPt(String s, float size, boolean bold) {
-        if (s == null || s.isEmpty() || size <= 0f) return 0f;
-        long u = 0;
-        for (int i = 0; i < s.length(); i++) u += arialGlyphW(s.charAt(i), bold);
-        return u / 1000f * size;
-    }
-
-    /** Faces the reader is expected to have, so their metrics need no carrying. */
-    private static final String[] READER_FACES = {
-            "arial", "helvetica", "liberation sans", "liberation serif", "times new roman",
-            "times", "courier new", "courier", "dejavu sans", "dejavu serif", "noto sans",
-            "noto serif", "calibri", "cambria", "georgia", "verdana", "tahoma",
-            "symbol", "webdings", "wingdings", "roboto", "sans-serif", "serif" };
-
-    private static boolean readerFace(String face) {
-        if (face == null) return true;
-        String f = face.toLowerCase(java.util.Locale.ROOT).trim();
-        if (f.isEmpty()) return true;
-        // A PDF names an embedded font with a six-letter subset tag - "EIMQAG+Effra-Regular".
-        // The tag is not part of the family, and reading it as one made every subset-named
-        // DejaVu or Arial in the corpus look like a face the reader has never heard of.
-        if (f.length() > 7 && f.charAt(6) == '+') f = f.substring(7);
-        for (String r : READER_FACES) if (f.equals(r) || f.startsWith(r + " ")) return true;
-        return false;
-    }
-
-    private static int clampPct(int pct) {
-        // ONLY EVER NARROWER. The problem this solves is a substitute that is WIDER than the
-        // page's face, so a scale above 100 is never the answer - and a width that reads as
-        // needing one is a width that is not the text's: "Place : ... (Signature of declarant)"
-        // is two segments of one baseline welded into one cell paragraph, so its drawn width is
-        // the distance between them and not the length of the words. Measured on 041122 p7:
-        // that paragraph came out at 200 % and re-wrapped into three lines.
-        if (pct >= 100) return 100;
-        if (pct < 50) return 50;
-        return Math.abs(pct - 100) <= 2 ? 100 : pct;
-    }
-
-    /** The scale a flow line is written at: 100 when the page's face is one the reader has. */
-    private static int carryScalePct(PdfToWord.Box b) {
-        if (b == null || b.runs.isEmpty()) return 100;
-        boolean sub = false;
-        for (PdfToWord.Run r : b.runs) if (!readerFace(r.font)) { sub = true; break; }
-        if (!sub) return 100;
-        float src = b.right - b.x;
-        if (!(src > 1f)) return 100;
-        float natural = 0f;
-        for (PdfToWord.Run r : b.runs) {
-            natural += arialAdvPt(r.text, r.sizePt > 0f ? r.sizePt : b.size, r.bold);
-        }
-        if (!(natural > 0f)) return 100;
-        return clampPct(Math.round(100f * src / natural));
-    }
-
-    /** The same, for one line the page drew inside a table cell. */
-    private static int carryScalePct(PdfToWord.Table.CellPara cp, float sz, int availTw) {
-        if (cp == null || readerFace(cp.face)) return 100;
-        float src = cp.right - cp.x;
-        if (!(src > 1f) || !(sz > 0f)) return 100;
-        float natural = arialAdvPt(cp.text, sz, cp.bold);
-        if (!(natural > 0f)) return 100;
-        int pct = Math.round(100f * src / natural);
-        // NEVER WIDER THAN THE CELL CAN HOLD. The width the page drew is the target, but a
-        // line that exactly fills its cell in the source fills it here too - and a cell whose
-        // usable width this engine measures a few points narrower than the page did would
-        // still break the line, which is the one thing this is for. The cell's own width is
-        // the hard ceiling; the drawn width is only the aim.
-        if (availTw > 0 && natural > 0f) {
-            // Two per cent of the cell is held back: the width the reader gives a cell is its
-            // own measurement of w:tcW (minus whatever it decides the borders and the table's
-            // indent are), and a line written to the declared width to the twip is a line the
-            // reader breaks by one word. The page's own slack is smaller than that - 3.9 pt on
-            // a 531.8 pt cell, 0.7 % - so the ceiling is the cell less a hair, not the cell.
-            float ceilingPt = availTw * 0.98f / (float) TWIPS_PER_PT;
-            int fitPct = (int) Math.floor(100f * ceilingPt / natural);
-            if (pct > fitPct) pct = fitPct;
-        }
-        return clampPct(pct);
-    }
-
-    /**
-     * Is this paragraph the sheet's own folio - "7", "Page 7", "- 7 -", "7 of 9"?
-     *
-     * <p>The same shapes {@code PdfToWord.pageNumberSplit} cuts a running head at, asked of a
-     * whole line in the bottom band of the page. Nothing else is short enough to match.
-     */
-    private static boolean isFolio(PdfToWord.Para p) {
-        String t = p == null ? "" : p.text().trim();
-        if (t.isEmpty() || t.length() > 12) return false;
-        return t.matches("(Page\\s+)?\\d{1,4}(\\s*(of|/)\\s*\\d{1,4})?")
-                || t.matches("-\\s*\\d{1,4}\\s*-")
-                || t.matches("\\d{1,4}\\s*-\\s*\\d{1,4}");
-    }
-
-    /** The face a scaled run is written in: one whose advance widths the table above holds. */
-    private static final String CARRY_FACE = "Arial";
-
     /** One run with the properties the PDF drew it with. */
     private static void runXml(StringBuilder sb, PdfToWord.Run run) {
         runXml(sb, run, false);
-    }
-
-    /**
-     * One run, carrying the page's advance width when its face is not one the reader has.
-     *
-     * @param carryPct the character scale, 100 for none - see {@link #carryScalePct(PdfToWord.Box)}
-     */
-    private static void runXml(StringBuilder sb, PdfToWord.Run run, boolean styleBold,
-                               int carryPct) {
-        // THE FACE IS CARRIED WHATEVER THE SCALE IS. A line whose drawn width happens to match
-        // Arial's needs no w:w, but it still must not be written in a face the reader will
-        // substitute: at 100 % the substitute is the whole defect, and skipping the rename
-        // there left five of the verification cell's seventeen paragraphs in Effra and wrapping.
-        boolean sub = !readerFace(run.font);
-        boolean carry = sub && carryPct != 100;
-        String face = "";
-        if (sub) {
-            face = CARRY_FACE;
-        } else if (run.font != null && !run.font.isEmpty()) {
-            face = faceName(run.font);
-        }
-        sb.append("<w:r><w:rPr>");
-        if (!face.isEmpty()) {
-            String f = esc(face);
-            sb.append("<w:rFonts w:ascii=\"").append(f)
-                    .append("\" w:hAnsi=\"").append(f)
-                    .append("\" w:cs=\"").append(f).append("\"/>");
-        }
-        if (run.bold) sb.append("<w:b/>");
-        else if (styleBold) sb.append("<w:b w:val=\"0\"/>");
-        if (run.italic) sb.append("<w:i/>");
-        if (run.color >= 0) {
-            sb.append(String.format("<w:color w:val=\"%06X\"/>", run.color & 0xFFFFFF));
-        }
-        // After w:color and before w:sz: that is where CT_RPr puts w:w, and a reader that
-        // validates the run properties drops what it cannot place.
-        if (carry) sb.append("<w:w w:val=\"").append(carryPct).append("\"/>");
-        int half = halfPointsDown(run.sizePt);
-        if (half > 0) {
-            sb.append("<w:sz w:val=\"").append(Math.min(3276, Math.max(2, half))).append("\"/>");
-            sb.append("<w:szCs w:val=\"").append(Math.min(3276, Math.max(2, half)))
-                    .append("\"/>");
-        }
-        sb.append("</w:rPr><w:t xml:space=\"preserve\">").append(esc(run.text))
-                .append("</w:t></w:r>");
     }
 
     /**
@@ -6634,19 +6405,10 @@ public final class DocxWriter {
                         // next one IS the advance. w:before then carries only a paragraph gap.
                         int boxTw = paraBoxTw(cps, q, rowLineTw);
                         int beforeTw = q == 0 ? before0 : paraBeforeTw(cps, q, rowLineTw);
-                        if (DBG_CELLS) {
-                            System.err.println("CELLDBG r" + r + " c" + c + " q" + q
-                                    + " sz=" + cp.size + " baseY=" + cp.baseY
-                                    + " box=" + boxTw + " before=" + beforeTw
-                                    + " rowLine=" + rowLineTw + " trH=" + rowHeightTw
-                                    + " n=" + cps.size()
-                                    + " txt=" + cp.text.substring(0, Math.min(24, cp.text.length())));
-                        }
                         stackTw += (q == 0 ? 0 : beforeTw) + boxTw;
                         int pInset = Float.isNaN(cp.indentPt) ? insetTw
                                 : (int) Math.max(0L, Math.round(cp.indentPt * TWIPS_PER_PT));
-                        cellParaXml(inner, cp, beforeTw, boxTw, pInset, cellSz,
-                                Math.max(0, colTw[c] - pInset));
+                        cellParaXml(inner, cp, beforeTw, boxTw, pInset, cellSz);
                     }
                     if (r == t.rows.size() - 1) {
                         lastRowContentTw = Math.max(lastRowContentTw, stackTw);
@@ -6932,8 +6694,7 @@ public final class DocxWriter {
      * text could carry exactly one of them.
      */
     private static void cellParaXml(StringBuilder inner, PdfToWord.Table.CellPara cp,
-                                    int beforeTw, int boxTw, int insetTw, float cellSz,
-                                    int availTw) {
+                                    int beforeTw, int boxTw, int insetTw, float cellSz) {
         float sz = cp.size > 0f ? cp.size : cellSz;
         inner.append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
                 .append("<w:snapToGrid w:val=\"0\"/>")
@@ -6941,18 +6702,9 @@ public final class DocxWriter {
         if (insetTw > 0) inner.append("<w:ind w:left=\"").append(insetTw).append("\"/>");
         inner.append("</w:pPr>");
         if (!cp.text.isEmpty()) {
-            // A cell's line is a line the page drew, so it carries the page's advance width by
-            // the same rule a flow line does - see ARIAL_W. This is where it matters most: a
-            // form cell gives its text 3.9 pt of slack, so a face 10 % wider turns every line
-            // into two and the row grows by a whole line for each one.
-            int carryPct = carryScalePct(cp, sz, availTw);
-            boolean sub = !readerFace(cp.face);
-            boolean carry = sub && carryPct != 100;
             inner.append("<w:r><w:rPr>");
-            String cellFace = sub ? CARRY_FACE
-                    : (cp.face != null && !cp.face.isEmpty() ? faceName(cp.face) : "");
-            if (!cellFace.isEmpty()) {
-                String f = esc(cellFace);
+            if (cp.face != null && !cp.face.isEmpty()) {
+                String f = esc(faceName(cp.face));
                 inner.append("<w:rFonts w:ascii=\"").append(f)
                         .append("\" w:hAnsi=\"").append(f)
                         .append("\" w:cs=\"").append(f).append("\"/>");
@@ -6962,7 +6714,6 @@ public final class DocxWriter {
             if (cp.colour >= 0) {
                 inner.append(String.format("<w:color w:val=\"%06X\"/>", cp.colour & 0xFFFFFF));
             }
-            if (carry) inner.append("<w:w w:val=\"").append(carryPct).append("\"/>");
             if (!Float.isNaN(sz) && sz > 0f) {
                 int half = Math.max(2, halfPointsDown(sz));
                 inner.append("<w:sz w:val=\"").append(half)
