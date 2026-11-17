@@ -131,7 +131,7 @@
  ],
  "run": {
   "started": "14:55",
-  "ended": "16:53",
+  "ended": "16:55",
   "ended_how": "released"
  },
  "history": [
@@ -157,6 +157,11 @@
   },
   {
    "at": "16:53",
+   "how": "released",
+   "plan": "1. [carry-over] the last run"
+  },
+  {
+   "at": "16:55",
    "how": "released",
    "plan": "1. [carry-over] the last run"
   }

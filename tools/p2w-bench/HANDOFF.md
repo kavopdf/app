@@ -10,7 +10,7 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 14:55 |
-| ended | 16:53 |
+| ended | 16:55 |
 | how it ended | released |
 | plan | 1. [carry-over] the last run |
 
