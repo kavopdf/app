@@ -39,13 +39,7 @@ it was files no tool opens.
     python3 tools/p2w-bench/gaps.py --last
 
 **Commit the run-start evidence before you read anything else** - ROUND.json, RUN.json,
-RUN-HISTORY.json, TIMELINE.jsonl, HANDOFF.md, HANDOFF.json.
-
-**Not RUN-LOG.md and TRACE.md.** You have to send every byte you commit, and those two are 38 KB
-between them - 73% of this commit - of append-only history that no decision is made from. They were
-in the list because they are useful to read, and reading is not the same as committing. They stay in
-the working tree for this run and are not carried across; TIMELINE.jsonl is the durable record and
-it is 0.4 KB. A run that dies
+RUN-HISTORY.json, RUN-LOG.md, TRACE.md, TIMELINE.jsonl, HANDOFF.md, HANDOFF.json. A run that dies
 leaving a good HANDOFF has handed over its work; one that dies without it has cost the next run
 the whole investigation.
 
@@ -234,12 +228,10 @@ presented as the current one.
 **A handoff that is not committed is a handoff the next run cannot read.** A run that fixes nothing
 but leaves a ruled-out entry has still saved the next attempt two hours.
 
-STEP 8 COMMITS: ROUND.json, RUN.json, RUN-HISTORY.json, ATTEMPTS.json, HYPOTHESES.md,
-TIMELINE.jsonl, HANDOFF.md, HANDOFF.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv,
-benchmarks/STATE.json, benchmarks/CENSUS.csv, and every engine file you changed.
-
-RUN-LOG.md and TRACE.md are NOT committed: 38 KB of append-only history you would have to send byte
-for byte, for no decision anyone makes. TIMELINE.jsonl carries the same events in 0.4 KB.
+STEP 8 COMMITS: ROUND.json, RUN.json, RUN-HISTORY.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md,
+TRACE.md, TIMELINE.jsonl, HANDOFF.md, HANDOFF.json, benchmarks/DEFECT-CLASSES.md,
+benchmarks/RANKING.csv, benchmarks/STATE.json, benchmarks/CENSUS.csv, and every engine file you
+changed.
 
 **Never commit the dead files:** `BASELINE.md`, `RESULTS.jsonl`, `RESULTS-TXT.jsonl`,
 `RATCHET.json`, `RATCHET-TXT.json`. They belong to the previous pipeline and nothing reads them.
