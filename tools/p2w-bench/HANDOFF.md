@@ -1,5 +1,14 @@
 # HANDOFF - read this before you pick a class
 
+## NEEDS A HUMAN - no future run can clear these
+
+A run tried, could not, and it was not a system limit. Every run after this one
+will hit the same wall until one of these is changed by a person.
+
+| # | what it is | what was tried | what must change | when |
+|---|---|---|---|---|
+| 0 | subagents cannot commit their findings to kavopdf/app (git push 403 'denied to Onyx-Node'; | retried once each, verified 403 not 422, verified repo exists and my o | grant the GitHub App write access to kavopdf/app, or give subagent san | 11:23 |
+
 Written by handoff.py on every claim, every attempt, every agent and every release.
 It is never more than one attempt old. If the claim in ROUND.json is older than the
 stale limit, the run that wrote this died without releasing - treat its plan as
@@ -9,18 +18,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 14:05 |
-| ended | 14:26 |
+| started | 12:51 |
+| ended | 14:34 |
 | how it ended | released |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> The carry-over is closed as FALSIFIED, with numbers. 041122's Verification cell already writes w:line=240 tw = 12.0 pt, which IS the page's own pitch (source baselines 563.61/579.61/591.61/... are 12.0 apart, 16.0 where a paragraph gap of 4 pt is carried in w:before=80). The brief's 11.6 pt came from dividing the row's declared 4630 tw by 20; the cell holds 17 paragraphs. No engine change was kept - the attempted edge-column drop was reverted (see HYPOTHESES.md). What IS now measured: 041122 renders 12 pages against the source's 9, and the declaration table's grid is 18.15 + 531.8 + 22.8 pt with boundaries at x 22.8/40.94/572.7; a line the page draws x 28.3-568.8 is assigned to the 531.8 pt column by its centre and its start is clamped to x 40.94, losing 12.6 pt, so its tail wraps, rows 17 and 18 each grow a line and the Verification block spills to its own page. Our page 7 is that spill's companion: one footer page number at y -7.5. Also cleared: BLOCKERS row 0 (subagent commits) - git push is 403 for everyone and GITHUB_COMMIT_MULTIPLE_FILES is the tool.
+> 041122 and its fillable twin render 11 pages against the source's 9 (they were 12). The engine now CARRIES THE PAGE'S ADVANCE WIDTHS: DocxWriter writes a run in Arial with w:w = the scale that reproduces the width the page drew, whenever the PDF's face is not in READER_FACES (Arial/Helvetica/Liberation/DejaVu/Noto/Times/Courier/Calibri/Cambria/Georgia/Verdana/Tahoma/Symbol/Webdings, PDF subset tags stripped). Measured this run, all of it: the reader honours w:w (a correct scale gives the verification block 17 lines and 230 pt against 26 lines and 338 pt), and it IGNORES an embedded font part completely (built one, rendered it: 12 pages, NotoSans, geometry identical to baseline) and ignores w:fitText and w:noWrap. The carry-over's premise was wrong and is now measured wrong: the source's pitch in that cell is 12.00 pt exactly (baselines 579.61/591.61/603.61/615.61), the 240 tw w:line is that pitch, and the 4630 tw row is 16 lines at 240 tw plus 562 tw of paragraph gaps = 4642 tw written, 0.6 pt. What is left on 041122 is TWO spurious pages: our p8 (the page-7 folio, one line '7' at y=25.3) and our p10 (17 lines of the instruction page's spill). The folio rule added this run anchors a folio that reaches flowFromBox and it fixed source page 6, but page 7's folio is emitted as a TABLE CELL - a TableText paragraph inside the page's table - so the rule never sees it.
 
 ## What the next run should do first
 
-> In PdfToWord.buildTables, stop assigning a line to a column by its centre: give it to the column its LEFT edge starts in, and where the line then runs past that column's right boundary, extend that cell across the columns it covers (gridSpan, as addRecutRow already writes for the recut path) instead of clamping its start. Calibrate on 041122 p7 rows 17-18 first: the wrap must disappear and the table must end on page 8, i.e. 9 pages, before anything else is measured.
+> Make the page's own folio not be content: on 041122 it is a TableText paragraph inside the table of page 7 (not a flow line), so it costs a whole sheet when the table ends near the page's foot. Either keep a folio line out of the table the page's rules bound (the source's table bottom on p7 is y=800.4 and the folio is at y=824.3, outside it), or give a folio row the same position-not-gap treatment the flow path now has. Then run python3 benchmarks/gate.py --budget 250 to see the corpus: the advance-width carry is guarded to fire only for faces outside READER_FACES, so the 211 synthetic DejaVu documents should be unchanged - prove that before calling it a ratchet. Then the instruction-page spill (our p10, 17 lines) is the last extra page.
 
 ## Agents deployed and not yet accounted for
 
@@ -54,7 +63,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `11:17` agent landed: contD-01 /  -> FINDINGS/content-missing-partly-replaced-D-092700-1d7b.md
 - `12:30` attempt 8 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `12:41` COMMITTING: git push is 403 'denied to Onyx-Node' for the fixer too, not only for subagents - the App has no write access to kavopdf/app over HTTPS git. It is not a dead end: the GitHub MCP tool GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main, upserts=[{path,content,encoding:utf-8}]) commits several files atomically and worked for all four commits of this run. The next run should commit that way, then 'git fetch origin main && git reset --hard origin/main' so HEAD matches origin, then chain.py. chain.py's sync check is strict SHA equality and also refuses a dirty tree, and it rewrites CHAIN.json - so commit CHAIN.json again after each chain.py run.
-- `14:25` attempt 9 on content-missing-partly-replaced -> reverted (0/2 moved)
+- `13:13` attempt 9 on content-missing-partly-replaced -> error
+- `14:34` attempt 10 on content-missing-partly-replaced -> partial (2/16 moved)
 
 ## Where the rest of the state lives
 

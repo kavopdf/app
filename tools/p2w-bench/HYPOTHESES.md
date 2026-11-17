@@ -245,6 +245,18 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: subagent B, FINDINGS/content-missing-partly-replaced-B-1300.md, three hand-built docx variants rendered with soffice 7.4.7.2: V1 box 58 pt at x 513.9 -> 4 lines (ink 514.0-569.0); V2 box 11 pt at x 573.1 -> 25 lines (ink 573.2-584.2), and the engine's own wrap=none wrapped identically, so wrap=none is no guard in LibreOffice; V3 box 58 pt at x 573.1 (our emitted anchor) -> 4 lines, identical to V1 to the tenth of a point. Anchor x has zero effect on wrapping; width alone decides. Measured side-note: the '11 pt box' is an ink width - a 1 pt-font second copy of the heading inside a 22.8 pt margin cell, not a text box.
   recorded: 2026-11-16 13:51
 
+- RULED OUT - the cell line box carries the wrong pitch (11.6 pt vs the 240 tw it writes)
+  evidence: source p7 baselines 579.61/591.61/603.61/615.61 = 12.00 pt exactly; the 4630 tw row is 16 lines at 240 + 562 tw of gaps = 4642 written, 0.6 pt
+  recorded: 2026-11-17 14:34
+
+- RULED OUT - an embedded font part makes the reader use the page's own face
+  evidence: embedded Effra .odttf + fontTable/embedRegular + settings/embedTrueTypeFonts rendered identically to no embedding: 12 pages, NotoSans, same geometry
+  recorded: 2026-11-17 14:34
+
+- CONFIRMED - carrying the page's advance widths in a face the reader has (Arial + w:w) stops the re-wrap
+  evidence: 041122 12 -> 11 pages: p6 folio stays on p6, p7 table fits at 795.2 pt against the source's 800.4; block line counts fall; the remaining spurious page is the p7 folio, which is a table cell not a flow line
+  recorded: 2026-11-17 14:34
+
 
 ## content-missing-partly-replaced - 16 Nov 09:54 run: the CONFIRMED patch re-measured, and the spill is now a number
 
@@ -317,7 +329,6 @@ Do not re-test one without new evidence, and if you do, say what changed.
   74-95 %@5 purely because page i is compared against page i. Fix the spill and the same
   documents should fall from ~90 %@5 to the pages 1-6 range. Do not re-derive the size bug.
 
-
 - CONFIRMED - The per-cell paragraph matrix (`pieces`) was indexed in the UNTRIMMED column
   space after the empty-column trim, so the multi-line cell path read another column's lines.
   evidence: 17 Nov 2026 fixer. `PdfToWord.buildTables` (~:8686) remaps cells/faces/firstX/
@@ -328,6 +339,7 @@ Do not re-test one without new evidence, and if you do, say what changed.
   string, and the SIX paragraphs were written into the empty cell to their right - which is
   why the heading appeared twice on that page. Fixed by trimming `pieces` with everything
   else. Predicts every table that drops a column.
+
 - CONFIRMED - The point size is `scalingFactorY` of PDFBox's TextPosition text matrix, and it
   is a SIZE, not a multiplier on the Tf operand. evidence: 17 Nov 2026, probe over three
   documents: 041122 fontSize=1.000 scaleY=10.000 inPt=10.000; 48_form 12/12/12;
@@ -340,6 +352,7 @@ Do not re-test one without new evidence, and if you do, say what changed.
   (39_small_caps_letter_spacing 0.72 -> 3.78) and one nil change (05_round_company_seal
   0.19 -> 0.20). This supersedes the reverted patches/run-size-from-sizePt-not-Tf.patch,
   which used the ROUNDED inPt.
+
 - CONFIRMED - `parasOfLines` records each line's own x, `addRecutRow` (:8380) turns it into
   `indentPt`, and the pieces path added the paragraphs WITHOUT it, so indentPt stayed NaN and
   the writer applied one inset - the cell's first-line x - to every paragraph in the cell.
@@ -347,6 +360,7 @@ Do not re-test one without new evidence, and if you do, say what changed.
   (472.6 pt) inside a 10636-dxa cell: 59 pt of usable width, so "Income-tax Rules, 1962"
   (drawn at x 253.7) wrapped inside a 59 pt column. After the fix the six carry
   9452/4255/4705/3830/107/2079 and the row renders at its declared height.
+
 - CONFIRMED (measured, engine change still owed) - the 041122 page spill is a WRAP, not a
   paragraph property, and the wrap is caused by the reference renderer substituting a
   different font. evidence: 17 Nov fixer. Rendered bottom rules of table 17's 24 rows
@@ -368,6 +382,7 @@ Do not re-test one without new evidence, and if you do, say what changed.
   Also measured: our page 7 is NOT table 17 - it holds page 6's page furniture (the C7EAFB
   heading bar, the footer rule at y 738.2 and the page number at y -7.5) whose anchor
   paragraphs were pushed off page 6; table 17 starts on our page 8.
+
 - CONFIRMED (environment, and it changes what this class's numbers mean) - installing a
   metric clone of the source's own embedded font takes 041122's table from spill to nearly
   exact. evidence: 17 Nov fixer. Built Effra-Regular/Bold from Liberation Sans with the
@@ -383,35 +398,3 @@ Do not re-test one without new evidence, and if you do, say what changed.
   before any font is involved. NEXT: make the cell-line box carry the source's measured
   pitch in twips (232, not 240) and re-measure r23 against 231.5.
 
-- FALSIFIED - The carry-over's premise: "the cell line box carries a rounded em multiple (240 tw
-  for a 10 pt line) while the row's own pitch is 231.5 pt for 20 lines, i.e. 11.6 pt a line".
-  evidence: 17 Nov fixer, measured, not derived. 041122 p7's Verification cell emits 17
-  paragraphs, every one `w:line="240" w:lineRule="exact"`, `w:before` 0/2/80/80... and `w:sz=20`;
-  the SOURCE's own baselines in that block (page 7, y0 = 563.61, 579.61, 591.61, 603.61, 615.61,
-  627.61, 643.61, 659.61, 675.61) are 16.0, 12.0, 12.0, 12.0, 12.0, 16.0, 16.0, 16.0 apart. The
-  page's pitch IS 12.0 pt = 240 tw, and the 4 pt paragraph gaps are carried in `w:before` as 80
-  tw. So the writer already writes the measured pitch; there is no 0.4 pt a line error and no
-  232 tw value to write. The "20 lines at 11.6 pt" came from dividing the row's declared 4630 tw
-  by 20, and the row holds 17 paragraphs, not 20 even lines. Ruled out as the cause of the
-  spill; the engine was NOT changed for it.
-- CONFIRMED (mechanism named, engine change still owed) - The 041122 page spill is the
-  line-to-column ASSIGNMENT, not the line box and not (only) the font. evidence: 17 Nov fixer,
-  current engine, soffice render of the .docx vs the source, text lines matched by content.
-  041122 comes out at 12 pages against the source's 9. On the declaration table's page our line
-  "18 If PAN not applied, fill estimated total income (including" runs x 41.3-571.0 (529.7 pt)
-  where the source draws it x 28.3-568.8 (540.5 pt): the table's grid is [363, 10636, 456] tw =
-  18.15 + 531.8 + 22.8 pt with boundaries at x 22.8 / 40.94 / 572.7, and the line is assigned to
-  the 531.8 pt column by its CENTRE (298.5) even though it STARTS at 28.3, inside the 18 pt
-  first column. Its own start is then clamped to the column's 40.94 pt edge, 12.6 pt of the
-  page's width is lost, and the tail wraps: rows 17 and 18 each gain a line (24 pt), the
-  Verification block below them no longer fits, and it is pushed onto a page of its own. Our
-  page 7 is that spill's partner - it holds nothing but the footer page number "6" at y -7.5.
-  Ruled out by measurement this run: the `w:line` pitch (240 = the source's 12.0, see above),
-  the `pieces` index and the per-paragraph `w:ind` (both fixed; the six heading lines carry
-  their own x), `w:before` (sums to 24 pt, not 109), `w:cantSplit`, and the empty-column trim
-  (it already drops the empty column left of the 18 pt sliver). TRIED AND REVERTED: dropping a
-  narrow unwritten edge column whose boundary the text runs across. It does not fire on this
-  table - the 18 pt sliver is WRITTEN IN by the model (a short line is centred in it), so
-  `written` is true and the boundary is kept; and the long line still starts inside it. The
-  real fix has to move the LINE to the column its start is in, or widen that column to the
-  line's right edge (a merged cell / gridSpan in this pass), not drop a boundary.
