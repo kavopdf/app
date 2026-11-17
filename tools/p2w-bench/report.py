@@ -190,5 +190,42 @@ def main(argv):
     return 0
 
 
+def _persist(text):
+    """Write the report to a file, not just to stdout.
+
+    THE REPORT THAT NEVER ARRIVED. On 17 Nov the 09:21 run finished at 11:22, ran report.py at
+    11:23, and printed eight correct numbers. The platform never closed the run, so the run's
+    output was never delivered and the report was lost - the work was real, the numbers were real,
+    and nobody saw them. A report that exists only as stdout is a report that depends on the
+    platform delivering it.
+
+    So it goes to a file in the repository as well, and the commit list carries it. Whatever
+    happens to the run, the report is on disk and in git.
+    """
+    try:
+        import io, contextlib
+        path = os.path.join(HERE, "REPORT.md")
+        open(path, "w", encoding="utf-8").write(
+            "# Fixer report - %s\n\n```\n%s\n```\n\n"
+            "Written by report.py from committed files only. Every number above is read from\n"
+            "ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv\n"
+            "and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.\n"
+            % (time.strftime("%Y-%m-%d %H:%M", time.localtime(time.time() + 19800)), text))
+        return path
+    except Exception:
+        return None
+
+
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    # capture what we print, so the same text can also go to REPORT.md
+    import io, contextlib
+    _buf = io.StringIO()
+    with contextlib.redirect_stdout(_buf):
+        rc = main(sys.argv)
+    _text = _buf.getvalue()
+    sys.stdout.write(_text)
+    _p = _persist(_text)
+    if _p:
+        sys.stdout.write("\n  written to %s - commit it, so the report survives the run\n"
+                         % os.path.relpath(_p, os.path.dirname(os.path.dirname(HERE))))
+    sys.exit(rc)

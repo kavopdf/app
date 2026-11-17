@@ -229,9 +229,15 @@ presented as the current one.
 but leaves a ruled-out entry has still saved the next attempt two hours.
 
 STEP 8 COMMITS: ROUND.json, RUN.json, RUN-HISTORY.json, ATTEMPTS.json, HYPOTHESES.md, RUN-LOG.md,
-TRACE.md, TIMELINE.jsonl, HANDOFF.md, HANDOFF.json, benchmarks/DEFECT-CLASSES.md,
+TRACE.md, TIMELINE.jsonl, HANDOFF.md, HANDOFF.json, REPORT.md, benchmarks/DEFECT-CLASSES.md,
 benchmarks/RANKING.csv, benchmarks/STATE.json, benchmarks/CENSUS.csv, and every engine file you
 changed.
+
+**REPORT.md is not decoration.** On 17 Nov a run finished at 11:22 and printed eight correct
+numbers at 11:23; the platform never closed the run, so its output was never delivered and the
+report was lost - the work was real, the numbers were real, and nobody saw them. A report that
+exists only as stdout depends on the platform delivering it. report.py now writes the same text to
+REPORT.md, and you commit it, so the report survives whatever happens to the run.
 
 **Never commit the dead files:** `BASELINE.md`, `RESULTS.jsonl`, `RESULTS-TXT.jsonl`,
 `RATCHET.json`, `RATCHET-TXT.json`. They belong to the previous pipeline and nothing reads them.
