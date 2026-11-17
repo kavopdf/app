@@ -382,3 +382,36 @@ Do not re-test one without new evidence, and if you do, say what changed.
   line height disagree by 0.4 pt a line, so a 20-line row overflows by ~8 pt + `w:before`
   before any font is involved. NEXT: make the cell-line box carry the source's measured
   pitch in twips (232, not 240) and re-measure r23 against 231.5.
+
+- FALSIFIED - The carry-over's premise: "the cell line box carries a rounded em multiple (240 tw
+  for a 10 pt line) while the row's own pitch is 231.5 pt for 20 lines, i.e. 11.6 pt a line".
+  evidence: 17 Nov fixer, measured, not derived. 041122 p7's Verification cell emits 17
+  paragraphs, every one `w:line="240" w:lineRule="exact"`, `w:before` 0/2/80/80... and `w:sz=20`;
+  the SOURCE's own baselines in that block (page 7, y0 = 563.61, 579.61, 591.61, 603.61, 615.61,
+  627.61, 643.61, 659.61, 675.61) are 16.0, 12.0, 12.0, 12.0, 12.0, 16.0, 16.0, 16.0 apart. The
+  page's pitch IS 12.0 pt = 240 tw, and the 4 pt paragraph gaps are carried in `w:before` as 80
+  tw. So the writer already writes the measured pitch; there is no 0.4 pt a line error and no
+  232 tw value to write. The "20 lines at 11.6 pt" came from dividing the row's declared 4630 tw
+  by 20, and the row holds 17 paragraphs, not 20 even lines. Ruled out as the cause of the
+  spill; the engine was NOT changed for it.
+- CONFIRMED (mechanism named, engine change still owed) - The 041122 page spill is the
+  line-to-column ASSIGNMENT, not the line box and not (only) the font. evidence: 17 Nov fixer,
+  current engine, soffice render of the .docx vs the source, text lines matched by content.
+  041122 comes out at 12 pages against the source's 9. On the declaration table's page our line
+  "18 If PAN not applied, fill estimated total income (including" runs x 41.3-571.0 (529.7 pt)
+  where the source draws it x 28.3-568.8 (540.5 pt): the table's grid is [363, 10636, 456] tw =
+  18.15 + 531.8 + 22.8 pt with boundaries at x 22.8 / 40.94 / 572.7, and the line is assigned to
+  the 531.8 pt column by its CENTRE (298.5) even though it STARTS at 28.3, inside the 18 pt
+  first column. Its own start is then clamped to the column's 40.94 pt edge, 12.6 pt of the
+  page's width is lost, and the tail wraps: rows 17 and 18 each gain a line (24 pt), the
+  Verification block below them no longer fits, and it is pushed onto a page of its own. Our
+  page 7 is that spill's partner - it holds nothing but the footer page number "6" at y -7.5.
+  Ruled out by measurement this run: the `w:line` pitch (240 = the source's 12.0, see above),
+  the `pieces` index and the per-paragraph `w:ind` (both fixed; the six heading lines carry
+  their own x), `w:before` (sums to 24 pt, not 109), `w:cantSplit`, and the empty-column trim
+  (it already drops the empty column left of the 18 pt sliver). TRIED AND REVERTED: dropping a
+  narrow unwritten edge column whose boundary the text runs across. It does not fire on this
+  table - the 18 pt sliver is WRITTEN IN by the model (a short line is centred in it), so
+  `written` is true and the boundary is kept; and the long line still starts inside it. The
+  real fix has to move the LINE to the column its start is in, or widen that column to the
+  line's right edge (a merged cell / gridSpan in this pass), not drop a boundary.

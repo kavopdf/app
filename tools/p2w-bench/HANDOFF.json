@@ -72,9 +72,13 @@
   {
    "at": "12:41",
    "text": "COMMITTING: git push is 403 'denied to Onyx-Node' for the fixer too, not only for subagents - the App has no write access to kavopdf/app over HTTPS git. It is not a dead end: the GitHub MCP tool GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main, upserts=[{path,content,encoding:utf-8}]) commits several files atomically and worked for all four commits of this run. The next run should commit that way, then 'git fetch origin main && git reset --hard origin/main' so HEAD matches origin, then chain.py. chain.py's sync check is strict SHA equality and also refuses a dirty tree, and it rewrites CHAIN.json - so commit CHAIN.json again after each chain.py run."
+  },
+  {
+   "at": "14:25",
+   "text": "attempt 9 on content-missing-partly-replaced -> reverted (0/2 moved)"
   }
  ],
- "next": "Make the CELL line box carry the source's measured pitch in twips instead of a rounded em multiple: DocxWriter writes w:line=240 for a 10 pt cell line while the row the engine itself declares is 4630 tw (231.5 pt) for 20 lines, i.e. 11.6 pt a line. Find the pitch used by the pieces/cell path (DocxWriter.java:8121 documents a 1.25 em cell factor; the emitted value is 1.2 em), make it the measured pitch rounded to the nearest twip, rebuild, and check r23's rendered bottom rule against 231.5 on 041122 before anything else. Then re-check the three separate overflows one at a time: our p7 (page 6's anchored furniture - anchor the page's shapes to content that STARTS on that page, not to a trailing empty paragraph), our p9 (r23), our p11. Do not re-derive the wrap: HYPOTHESES.md has the numbers, and the font clone recipe if the renderer is to be made font-faithful.",
+ "next": "In PdfToWord.buildTables, stop assigning a line to a column by its centre: give it to the column its LEFT edge starts in, and where the line then runs past that column's right boundary, extend that cell across the columns it covers (gridSpan, as addRecutRow already writes for the recut path) instead of clamping its start. Calibrate on 041122 p7 rows 17-18 first: the wrap must disappear and the table must end on page 8, i.e. 9 pages, before anything else is measured.",
  "agents": [
   {
    "id": "contA-01",
@@ -118,8 +122,8 @@
   }
  ],
  "run": {
-  "started": "12:04",
-  "ended": "12:39",
+  "started": "14:05",
+  "ended": "14:26",
   "ended_how": "released"
  },
  "history": [
@@ -137,15 +141,13 @@
    "at": "12:39",
    "how": "released",
    "plan": ""
+  },
+  {
+   "at": "14:26",
+   "how": "released",
+   "plan": ""
   }
  ],
- "context": "041122's spill is now measured and its cause is named. The pending item asked for rendered row heights against declared trHeight: r2 +9.0, r19 +8.5, r20 +20.7, r23 +108.9, every other row exact. They grow by WHOLE LINES, not by a paragraph property - r23 has 20 source lines and rendered 26, its w:before sums to 24 pt and its w:line is exact 240 tw = the source's own 12 pt pitch. The extra lines are wraps: the docx names Effra, the renderer substitutes Noto Sans (16.9 % wider on the same string), and the cell gives the source's longest line 0.5 % of slack. Ruled out by measurement: w:before, w:line, w:cantSplit, the sizePt bug, the pieces index. Also disproved: our page 7 is NOT table 17 - it is page 6's page furniture (heading bar, footer rule, page number at y -7.5) whose anchor paragraphs were pushed off page 6; table 17 begins on our page 8. Second finding: building a metric clone of the source's own font from the PDF's /Widths arrays (installed to ~/.fonts) takes r2 to its declared 84.1 and r23 from 340.4 to 256.4 - the wrap theory confirmed - but the document still renders 12 pages, because the engine's own line box (240 tw = 12.0 pt) is taller than the pitch its own row height assumes (231.5 pt for 20 lines = 11.6 pt each). That 0.4 pt a line is the engine-side residual and it is the next thing to change. Nothing was committed to the engine this run: the font work is a harness measurement, not a fix, and a half-working font install would have moved the corpus without a mechanism.",
- "needs_human": [
-  {
-   "at": "11:23",
-   "what": "subagents cannot commit their findings to kavopdf/app (git push 403 'denied to Onyx-Node'; contents API 'Resource not accessible by integration')",
-   "tried": "retried once each, verified 403 not 422, verified repo exists and my own push is denied too - every commit this run went through the GitHub MCP contents API",
-   "change": "grant the GitHub App write access to kavopdf/app, or give subagent sandboxes the parent's credentials"
-  }
- ]
+ "context": "The carry-over is closed as FALSIFIED, with numbers. 041122's Verification cell already writes w:line=240 tw = 12.0 pt, which IS the page's own pitch (source baselines 563.61/579.61/591.61/... are 12.0 apart, 16.0 where a paragraph gap of 4 pt is carried in w:before=80). The brief's 11.6 pt came from dividing the row's declared 4630 tw by 20; the cell holds 17 paragraphs. No engine change was kept - the attempted edge-column drop was reverted (see HYPOTHESES.md). What IS now measured: 041122 renders 12 pages against the source's 9, and the declaration table's grid is 18.15 + 531.8 + 22.8 pt with boundaries at x 22.8/40.94/572.7; a line the page draws x 28.3-568.8 is assigned to the 531.8 pt column by its centre and its start is clamped to x 40.94, losing 12.6 pt, so its tail wraps, rows 17 and 18 each grow a line and the Verification block spills to its own page. Our page 7 is that spill's companion: one footer page number at y -7.5. Also cleared: BLOCKERS row 0 (subagent commits) - git push is 403 for everyone and GITHUB_COMMIT_MULTIPLE_FILES is the tool.",
+ "needs_human": []
 }
