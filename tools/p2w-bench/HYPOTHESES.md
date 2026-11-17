@@ -317,3 +317,42 @@ Do not re-test one without new evidence, and if you do, say what changed.
   74-95 %@5 purely because page i is compared against page i. Fix the spill and the same
   documents should fall from ~90 %@5 to the pages 1-6 range. Do not re-derive the size bug.
 
+
+## 17 Nov 10:0x-11:4x - the fixer run that landed the size fix
+
+CONFIRMED - `pieces` is not remapped through the empty-column `keep` trim (PdfToWord:8682-8701
+rebuilds `cells`, `faces`, `firstX`, `firstY`, `colours` and `cols`; `pieces` keeps the page's
+original columns) while the paragraph loop at :8753 indexes it with the TRIMMED `cc`. A table with
+one dropped column therefore writes every multi-line cell's paragraphs one column to the right, and
+the cell that really holds them keeps one welded string. Found by agent contC-01, proved by
+reverting the index in a copy: `parasOfLines(pieces.get(rr).get(keep.get(cc)))` moves 6 paragraphs
+from cell 3 into cell 2 on 041122 table 18. Blast radius over all 213 documents: 2 (the two bank
+forms), 211 bit-identical. MEASURED AND REVERTED anyway: 041122 pages 9/10 -> 9/9 and invent5
+66.62 -> 0.00, but share@5 98.65 -> 99.02 and the fillable twin 97.62 -> 98.65. The score cannot
+see a page that should not exist (it compares page k with page k for k <= min(pages)) and invent5 is
+not in the rank. NOT a reason to think the remap is wrong - it is a reason to fix the instrument or
+to land it together with the size fix.
+
+CONFIRMED AND KEPT - `g.size` read `tp.getFontSize()`, which is Tf, the size in TEXT SPACE. It does
+not carry the text matrix's scale. `tp.getTextMatrix()` is Tm with the font size folded in (01_stamp:
+Tf 16, no Tm scale, reads 16; 041122: Tf 1, Tm scale 10, reads 10), so its scaling factor is the size
+the page draws at, unrounded - `tp.getFontSizeInPt()` is that same number rounded to a whole point,
+which is why it was dropped. Measured over all 213 corpus PDFs: exactly 4 documents differ - the two
+bank forms (all 47477 glyphs each), 38_faux_bold (93 glyphs, 9.5 -> 9.7), 411_nested_xobject_transforms
+(32 of 138 glyphs, 10 -> 16). After the fix: 411_nested_xobject_transforms 48.64 -> 0.00 share5,
+38_faux_bold 3.25 -> 0.01, 041122 98.65 -> 97.81, the fillable twin 97.62 -> 97.81. RANKING.csv
+carries those four rows; the other 209 are carried forward because the engine's output for them is
+byte-identical (that is the same probe, not an assumption).
+
+RULED OUT - multiplying the text matrix scale by getFontSize(). It squares the size: 01_stamp went
+16 -> 256 pt and 041122 only looked right because its Tf happens to be 1.0.
+
+RULED OUT - the "welded paragraph must take the block's leftmost line x as its inset" theory from the
+previous handoff. With the remap the welded paragraph is gone (the six lines get their own w:p), and
+with the size fix the bank forms' problem is not one paragraph's inset but the whole table model
+holding 10 pt text in row heights and column widths that were fitted against 1 pt: both forms emit
+22 pages against the source's 9.
+
+OPEN - the bank forms' spill at true size. 041122 and the fillable twin now have correct 10 pt text
+and 22 pages. Page 7 comes out nearly blank. This is the next attempt and it is a geometry problem,
+not a size one.

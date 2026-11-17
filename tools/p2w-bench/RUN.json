@@ -1,13 +1,17 @@
 {
  "started_ts": 1794892836.8630638,
  "started": "10:50",
- "ended_ts": null,
- "ended": null,
- "class": "",
- "attempts": 0,
+ "ended_ts": 1794894587.9044752,
+ "ended": "11:19",
+ "class": "content-missing-partly-replaced",
+ "attempts": 3,
  "kept": 0,
  "docs_improved": 0,
- "agents": [],
+ "agents": [
+  "contC-01",
+  "contD-01"
+ ],
  "obstacles_cleared": 0,
- "needs_human": 0
+ "needs_human": 0,
+ "partial": 2
 }

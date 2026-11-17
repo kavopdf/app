@@ -53,8 +53,8 @@ max_pt is reported but never ranks, because a single outlier pixel dominates it.
 | 28 | `31_times_body_arial_headings` | content-missing-nothing-in-its-place | 20.96 | 2.11 | 1 | OPEN | - |
 | 29 | `07_stamp_over_table` | content-missing-nothing-in-its-place | 2.61 | 1.82 | 1 | OPEN | - |
 | 30 | `312_affidavit_stamp_paper` | content-missing-nothing-in-its-place | 1.42 | 1.07 | 1 | OPEN | - |
-| 31 | `041122-Account_Opening_Form` | content-missing-partly-replaced | 98.72 | 98.65 | 9 | OPEN | - |
-| 32 | `Account_Opening_Form_Fillable_filled` | content-missing-partly-replaced | 97.90 | 97.62 | 7 | OPEN | - |
+| 31 | `041122-Account_Opening_Form` | content-missing-partly-replaced | 99.07 | 97.81 | 9 | OPEN | - |
+| 32 | `Account_Opening_Form_Fillable_filled` | content-missing-partly-replaced | 99.07 | 97.81 | 7 | OPEN | - |
 | 33 | `one-page-rotated-180-degrees` | content-missing-partly-replaced | 81.64 | 81.64 | 2 | OPEN | - |
 | 34 | `600_reviewed_invoice_with_annotations` | content-missing-partly-replaced | 73.32 | 62.46 | 1 | OPEN | - |
 | 35 | `601_fillable_admission_form` | content-missing-partly-replaced | 61.58 | 52.39 | 1 | OPEN | - |
@@ -76,7 +76,7 @@ max_pt is reported but never ranks, because a single outlier pixel dominates it.
 | 51 | `321_auditors_report` | content-partly-lost-and-displaced | 22.72 | 2.62 | 1 | OPEN | - |
 | 52 | `313_power_of_attorney` | content-partly-lost-and-displaced | 18.70 | 2.29 | 1 | OPEN | - |
 | 53 | `310_court_judgment` | content-partly-lost-and-displaced | 20.35 | 1.73 | 1 | OPEN | - |
-| 54 | `411_nested_xobject_transforms` | content-partly-lost | 48.64 | 31.05 | 1 | OPEN | - |
+| 54 | `411_nested_xobject_transforms` | content-partly-lost | 5.01 | 0.00 | 1 | FIXED | share@5 0.00 |
 | 55 | `40_devanagari_shaping_font` | content-partly-lost | 26.79 | 10.48 | 1 | OPEN | - |
 | 56 | `76_devanagari_table` | content-partly-lost | 14.50 | 7.91 | 1 | OPEN | - |
 | 57 | `very-long-single-column-table` | content-partly-lost | 26.08 | 2.38 | 3 | FIXED | share@5 2.38 |

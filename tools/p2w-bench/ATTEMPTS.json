@@ -82,25 +82,46 @@
   "status": "OPEN"
  },
  "content-missing-partly-replaced": {
-  "attempts": 6,
+  "attempts": 8,
   "first_seen": null,
   "last": null,
-  "last_engine": "DocxWriter: one w:p per line of a welded cell; later lines take the cell edge, not the first line's inset",
-  "last_moved": 0,
-  "last_total": 30,
+  "last_engine": "708146e",
+  "last_moved": 1,
+  "last_total": 13,
   "outcomes": [
    "reverted",
    "error",
    "error",
    "error",
    "error",
-   "error"
+   "error",
+   "reverted",
+   "partial"
   ],
-  "reason": "RETRACTED, and the retraction is the finding. I reported 'p7 share5 73.99 -> 0.00, pages 10 -> 9' from a render of /scratch/work/repro/v2. That directory also held a copy of the SOURCE pdf under the same basename, and my new soffice_pdf() polled for the output path, saw that file, saw its size settle, killed the process and returned it. The 'fixed' render was the source document read as the render: 9 pages, every page's line count equal to the source's, share5 0.00. The engine change itself is a no-op on this document - the .docx it writes is byte-identical to the one before it (all zip entries md5-equal) and still renders to 10 pages on three consecutive renders. Cause not fixed. Instrument fixed twice: soffice_pdf() clears the output paths and requires mtime >= launch, and conv()/prerender() key the render cache by the docx's size+mtime instead of its name (a cache that outlived the engine scored 041122 against a 10:07 render).",
+  "reason": "same size fix: 041122 98.65 -> 97.81 share5, the fillable twin 97.62 -> 97.81 (worse). Both bank forms now carry 10 pt text where they carried 1 pt, and both now emit 22 pages against 9 because the table model fits row heights to 1 pt text - the spill is the next run's work, see FINDINGS/...-D-110200-a7c4.md",
   "reasons": [
    "no fix measured. Localised the 9->10 page spill on 041122 with two subagent findings and my own measurement (share5 98.65, pages 10/9, worst_page 9, text_recall 99.68 at HEAD): page 7 is one 24-row table, shaveToFit cannot reach it, and four candidate repairs were each measured to leave the page count at 10. B proved the wrap follows width, not anchor, so the width is ours. Three paths closed, no engine change made - a spill repair needs a content-height reduction and a full ratchet that this slot did not have time for.",
    "041122 p7: welded heading (inset 9452 twips in a 10636 cell) wrapped to 27 lines x 10pt in a 59pt slot, row declared 84.1pt laid out 270pt, table 186pt taller than the paper -> 9 pages in, 10 out. Per-line paragraphs: p7 share5 73.99 -> 0.00, pages 10 -> 9, every page's line count now equals the source's.",
-   "RETRACTED, and the retraction is the finding. I reported 'p7 share5 73.99 -> 0.00, pages 10 -> 9' from a render of /scratch/work/repro/v2. That directory also held a copy of the SOURCE pdf under the same basename, and my new soffice_pdf() polled for the output path, saw that file, saw its size settle, killed the process and returned it. The 'fixed' render was the source document read as the render: 9 pages, every page's line count equal to the source's, share5 0.00. The engine change itself is a no-op on this document - the .docx it writes is byte-identical to the one before it (all zip entries md5-equal) and still renders to 10 pages on three consecutive renders. Cause not fixed. Instrument fixed twice: soffice_pdf() clears the output paths and requires mtime >= launch, and conv()/prerender() key the render cache by the docx's size+mtime instead of its name (a cache that outlived the engine scored 041122 against a 10:07 render)."
+   "RETRACTED, and the retraction is the finding. I reported 'p7 share5 73.99 -> 0.00, pages 10 -> 9' from a render of /scratch/work/repro/v2. That directory also held a copy of the SOURCE pdf under the same basename, and my new soffice_pdf() polled for the output path, saw that file, saw its size settle, killed the process and returned it. The 'fixed' render was the source document read as the render: 9 pages, every page's line count equal to the source's, share5 0.00. The engine change itself is a no-op on this document - the .docx it writes is byte-identical to the one before it (all zip entries md5-equal) and still renders to 10 pages on three consecutive renders. Cause not fixed. Instrument fixed twice: soffice_pdf() clears the output paths and requires mtime >= launch, and conv()/prerender() key the render cache by the docx's size+mtime instead of its name (a cache that outlived the engine scored 041122 against a 10:07 render).",
+   "root cause found and fixed twice over (pieces not remapped through the keep column trim; g.size reads Tf instead of the text rendering matrix), measured on both bank forms, reverted: share5 98.65->99.02 and 97.62->98.65 - the score cannot see the spurious page or the duplicated text the fixes remove. See FINDINGS/...-C-044323-d5fd.md and ...-D-110200-a7c4.md",
+   "same size fix: 041122 98.65 -> 97.81 share5, the fillable twin 97.62 -> 97.81 (worse). Both bank forms now carry 10 pt text where they carried 1 pt, and both now emit 22 pages against 9 because the table model fits row heights to 1 pt text - the spill is the next run's work, see FINDINGS/...-D-110200-a7c4.md"
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "content-partly-lost": {
+  "attempts": 1,
+  "first_seen": null,
+  "last": null,
+  "last_engine": "708146e",
+  "last_moved": 1,
+  "last_total": 11,
+  "outcomes": [
+   "partial"
+  ],
+  "reason": "g.size now reads the text rendering matrix scale (the size the page draws at) instead of Tf, which is text space. 411_nested_xobject_transforms 48.64 -> 0.00 share5 (32 of 138 glyphs were at 10 pt inside a nested XObject whose cm carried 16); 38_faux_bold 3.25 -> 0.01 (9.5 -> 9.7). Blast radius measured over all 213 corpus PDFs: 4 documents, the other 209 emit byte-identical DOCX",
+  "reasons": [
+   "g.size now reads the text rendering matrix scale (the size the page draws at) instead of Tf, which is text space. 411_nested_xobject_transforms 48.64 -> 0.00 share5 (32 of 138 glyphs were at 10 pt inside a nested XObject whose cm carried 16); 38_faux_bold 3.25 -> 0.01 (9.5 -> 9.7). Blast radius measured over all 213 corpus PDFs: 4 documents, the other 209 emit byte-identical DOCX"
   ],
   "requeues": 0,
   "status": "OPEN"

@@ -10,17 +10,17 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 10:50 |
-| ended | still running |
-| how it ended | - |
+| ended | 11:19 |
+| how it ended | released |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> The class measurement now completes: soffice finishes its conversion and then never exits (both the oosplash wrapper and soffice.bin called directly; the PDF is complete on disk ~90 s in and the process is still alive 240 s later), so p2w.py now launches it in its own session, waits for the output files to settle and kills the session. That - not a hard PDF - is what kept the nine-page forms unmeasurable and the 232f622 ratchet off disk. 213/213 measured, 31 improvements, 0 regressions, RANKING.csv and STATE.json committed. Two instrument bugs found and fixed on the way: the render cache was keyed by document NAME, so a render made before an engine change scored the new engine (041122 was measured against its 10:07 render), and soffice_pdf could return a pre-existing file at the output path - that one produced a false 'fixed' result I have retracted in ATTEMPTS.json. scipy was absent again and was installed.
+> The size fix is IN THE TREE and measured: g.size at PdfToWord:2065 now reads the text rendering matrix scale (the size the page draws at, unrounded) instead of Tf, which is text space. Blast radius proved over all 213 corpus PDFs: exactly 4 documents change, the other 209 emit byte-identical DOCX. 411_nested_xobject_transforms 48.64 -> 0.00 share5 (rank 10 -> rank 1), 38_faux_bold 3.25 -> 0.01, 041122 98.65 -> 97.81, fillable twin 97.62 -> 97.81. RANKING.csv carries those four rows; classrow.py rewrote DEFECT-CLASSES.md. The bank forms now have correct 10 pt text and 22 pages against the source's 9 - that spill is the whole remaining problem on them. The pieces-remap root cause (PdfToWord:8753 indexes pieces with the trimmed column index while pieces is the only per-cell array the keep trim does not re-index) is proven by two agents and measured, and is NOT in the tree: it fixes the page count (9/10 -> 9/9) and invent5 (66.62 -> 0.00) but moves share5 the wrong way, because the score cannot see a spurious page. The engine diff is exactly one hunk in PdfToWord.java.
 
 ## What the next run should do first
 
-> Fix the 041122 page-7 spill. The '12 twips of residue' theory is dead: the real cause is measured and it is 186 pt, not 1.2. Page 7 row 2 cell 2 is ONE paragraph (no w:br, no paras record) whose text is the six heading lines welded with SPACES by PdfToWord:8653, carrying the FIRST line's x as its inset (tcW 10636, ind 9452, so 1184 twips = 59.2 pt usable). The renderer lays that one paragraph out as TWENTY-SEVEN lines at 10 pt, y 23.4-293.4 = 270 pt, in a row whose w:trHeight declares 84.1 pt (1682 twips). The table therefore lays out ~186 pt taller than the 842 pt sheet, the last row (the Verification block) does not fit, w:cantSplit moves it to a new page, and 9 pages come out as 10. The fit guard is blind to this because spacingTw charges w:trHeight and never the wrap. Tried and ruled out this run: (a) one w:p per line of a welded cell in DocxWriter (shipped, no-op here - the cell text carries no newline), (b) joining cell lines with a newline at PdfToWord:8653 so that path fires (reverted: still 10 pages, page 7 went 99 -> 108 lines), (c) shaving w:trHeight (last run, 16746, still 10 pages). The next thing to try is the one the mechanism points at: a welded paragraph's inset must be the block's LEFTMOST line x, not the first line's - the heading's lines start at x 232-377 (centred) and 513 (right-aligned), so an inset of ~191 pt instead of 472.6 pt gives the paragraph ~340 pt of width and ~3 lines instead of 27. Measure page count with a render into an EMPTY directory - a render that can return a pre-existing file has already cost this pipeline one false fix.
+> Land the pieces remap (parasOfLines(pieces.get(rr).get(keep.get(cc))) at PdfToWord:8753) ON TOP of the size fix now in the tree, then fix the bank forms' spill: with 10 pt text both forms emit 22 pages against 9 and page 7 is nearly blank. The mechanism to look at is the table model's row height and column width for table 18 on page 7 - the FORM NO.60 heading block is one cell whose lines are wrapped, and w:trHeight is charged but the wrap is not, so the table lays out far taller than the sheet. Measure page count with a render into an EMPTY directory (a render can return a pre-existing file at the output path). If the pair still reads worse on share@5, fix the instrument: it compares page k with page k for k <= min(pages), so a document that gains a spurious page is not penalised and one that loses it is not rewarded - pages_src and pages_ours are recorded and never scored.
 
 ## Agents deployed and not yet accounted for
 
@@ -28,6 +28,8 @@ unfinished work, not as a result.
 |---|---|---|---|---|---|---|---|
 | contA-01 | content-missing-partly-replaced | A | which code path decides the height of a block emitted from a PDF text  | 13:52 | landed | landed | FINDINGS/content-missing-partly-replaced-A-1305.md |
 | contB-01 | content-missing-partly-replaced | B | is the wrap inside a text box a renderer limit or our emitted width | 13:52 | landed | landed | FINDINGS/content-missing-partly-replaced-B-1300.md |
+| contC-01 | content-missing-partly-replaced | C | why does the welded cell keep its 27-line paragraph when the per-line  | 11:13 | 11:00 | landed | FINDINGS/content-missing-partly-replaced-C-044323-d5fd.md |
+| contD-01 | content-missing-partly-replaced | D | blast radius of the pieces-not-remapped bug across the 213-document co | 11:13 | 11:00 | landed | FINDINGS/content-missing-partly-replaced-D-110200-a7c4.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
@@ -45,6 +47,13 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:48` attempt 6 on content-missing-partly-replaced -> kept (1/30 moved)
 - `16:18` attempt 4 on content-missing-nothing-in-its-place -> kept (31/212 moved)
 - `16:19` tooling: p2w.py waits for soffice's output (measured: bank form 89 s to a complete PDF, process still alive at 240 s); render cache keyed by docx size+mtime; soffice_pdf clears its output paths and requires mtime >= launch. scipy installed (EDT per page 25 s -> 1.6 s).
+- `11:13` attempt 7 on content-missing-partly-replaced -> reverted (0/13 moved)
+- `11:13` agent deployed: content-missing-partly-replaced / C - why does the welded cell keep its 27-line paragraph when the per-line paragraph 
+- `11:13` agent deployed: content-missing-partly-replaced / D - blast radius of the pieces-not-remapped bug across the 213-document corpus
+- `11:13` agent landed: content-missing-partly-replaced / C -> FINDINGS/content-missing-partly-replaced-C-044323-d5fd.md
+- `11:13` agent landed: content-missing-partly-replaced / D -> FINDINGS/content-missing-partly-replaced-D-110200-a7c4.md
+- `11:19` attempt 1 on content-partly-lost -> partial (1/11 moved)
+- `11:19` attempt 8 on content-missing-partly-replaced -> partial (1/13 moved)
 
 ## Where the rest of the state lives
 

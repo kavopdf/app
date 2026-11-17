@@ -270,3 +270,8 @@ claim and after each step; it is not code and cannot break anything.
 | 17 Nov 10:02 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
 | 17 Nov 10:50 | fixer | claim | fixer claimed the slot |
 | 17 Nov 10:50 | fixer | stale-claim | fixer slot was stale (48 min) - the previous run ended without releasing it |
+| 17 Nov 11:13 | fixer | attempt | content-missing-partly-replaced -> reverted (0/13 moved) |
+| 17 Nov 11:13 | fixer | build-engine | started |
+| 17 Nov 11:14 | fixer | build-engine | engine built in 38s |
+| 17 Nov 11:19 | fixer | attempt | content-partly-lost -> partial (1/11 moved) |
+| 17 Nov 11:19 | fixer | attempt | content-missing-partly-replaced -> partial (1/13 moved) |

@@ -2062,8 +2062,36 @@ public final class PdfToWord {
             // outside the tolerance the position check allows. getFontSize() is the same
             // number without the rounding; inPt is only the fallback for a font whose size
             // the page did not name.
-            g.sizePt = tp.getFontSizeInPt() > 0 ? tp.getFontSizeInPt() : tp.getFontSize();
-            g.size = tp.getFontSize() > 0 ? tp.getFontSize() : tp.getFontSizeInPt();
+            // THE SIZE THE PAGE DRAWS AT IS THE TEXT RENDERING MATRIX'S SCALE, AND g.size
+            // WAS READING Tf, WHICH IS THE SIZE IN TEXT SPACE.
+            //
+            // getFontSizeInPt() is the device size ROUNDED TO A WHOLE POINT (5.8 -> 5.0,
+            // 8.5 -> 8.0), which is why the position model stopped using it. getFontSize() is
+            // the same number without the rounding - but it is the operand of Tf and it does
+            // NOT carry the text matrix's scale. Most writers put the size in Tf, so the two
+            // agree and 211 of 213 documents never showed the difference. A writer that emits
+            // `/C2_0 1 Tf  10 0 0 10 x y Tm` - which is what both bank forms' generator does -
+            // sets Tf 1 and puts the 10 in the matrix, so getFontSize() answers 1.0 and every
+            // run of 041122-Account_Opening_Form was written at 1 pt: 4088 runs, w:sz val="2",
+            // on all nine pages, while the page's own spans measure 10 pt. Positions were
+            // already device space (getXDirAdj/getWidthDirAdj), so the engine was placing
+            // true ink with a text-space size.
+            //
+            // TextPosition.getTextMatrix() is Tm with the font size folded in - 01_stamp has
+            // Tf 16 and no Tm scale and reads 16, this form has Tf 1 and Tm scale 10 and reads
+            // 10 - so its scaling factor IS the size in points, unrounded, and multiplying it
+            // by getFontSize() again squares the size (measured: 01_stamp 16 -> 256 pt).
+            float deviceSize = 0f;
+            try {
+                com.tom_roush.pdfbox.util.Matrix trm = tp.getTextMatrix();
+                if (trm != null) {
+                    float sy = Math.abs(trm.getScalingFactorY());
+                    if (sy > 1e-4f && sy < 1e4f) deviceSize = sy;
+                }
+            } catch (Throwable ignored) {
+            }
+            g.sizePt = tp.getFontSizeInPt() > 0 ? tp.getFontSizeInPt() : deviceSize;
+            g.size = deviceSize > 0f ? deviceSize : tp.getFontSizeInPt();
             PDFont font = tp.getFont();
             g.font = font == null ? "" : font.getName();
             String n = g.font.toLowerCase(Locale.ROOT);
