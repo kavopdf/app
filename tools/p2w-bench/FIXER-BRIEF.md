@@ -24,6 +24,17 @@ That is not a wasted hour; the other run is doing the work.
 Then, immediately:
 
     python3 tools/p2w-bench/round.py --heartbeat --doing "claimed, reading the handoff"
+    python3 tools/p2w-bench/archive.py
+
+`archive.py` is housekeeping and it is cheap: it checks its own date and does nothing on any run
+after the first of the day. When it does run it moves files nothing reads into `archive/<date>/` and
+rotates the append-only logs the pipeline DOES read - newest lines stay where the tools expect them,
+older lines go to `archive/<date>/<name>.head`. Rotated, never truncated. Nothing is deleted from
+git history; `archive/ARCHIVED.md` says which commit each file is still readable at.
+
+A file nothing reads is not evidence, it is weight: it costs a clone, it costs a diff, and the one
+time it matters it is the file someone reads by mistake. This repository was 13 MB and a quarter of
+it was files no tool opens.
     python3 tools/p2w-bench/handoff.py --show
     python3 tools/p2w-bench/gaps.py --last
 
