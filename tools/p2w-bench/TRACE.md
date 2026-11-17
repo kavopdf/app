@@ -333,3 +333,6 @@ claim and after each step; it is not code and cannot break anything.
 | 17 Nov 18:57 | fixer | build-engine | engine built in 92s |
 | 17 Nov 18:57 | fixer | build-engine | started |
 | 17 Nov 18:58 | fixer | build-engine | engine built in 75s |
+| 17 Nov 19:01 | fixer | build-engine | started |
+| 17 Nov 19:02 | fixer | build-engine | engine built in 49s |
+| 17 Nov 19:05 | fixer | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |

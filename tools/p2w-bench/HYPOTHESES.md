@@ -554,3 +554,18 @@ Do not re-test one without new evidence, and if you do, say what changed.
   width, so the two must not be conflated in one number. Patch kept at
   patches/wrap-charge-helvetica.patch; engine at HEAD. Full numbers:
   FINDINGS/wrap-charge-corpus-diff.md.
+
+- CLOSED, THIS RUN (three builds, corpus-diffed and two of them rendered) - THE WRAP CHARGE
+  FAILS ON THE WIDTH, NOT THE FONT. Build 1 (Helvetica everywhere, inset-overflow correction):
+  42 of 213 change; price-list-right-aligned-amounts 1.79 -> 81.15 and 1 -> 2 pages. Build 2
+  (4 % metric tolerance): 41 of 213, price list 38 -> 16 rows but every one still 312 -> 440 tw
+  - exactly 2 x its 220 tw row line, so the excess is structural. Build 3, after reading row 0
+  of that table: the cells are Times New Roman (digits 0.500 em) and the charge was measuring
+  Helvetica (0.556 em, 11 % wide); face-aware advance + 2 % tolerance gives 12 of 213 and, on
+  041122, exactly one changed row (row 77, 2220 -> 3000 tw - the instruction cell the handoff
+  names). Measured anyway: price list 1.79 -> 32.54, 77_arabic_rtl_document 17.14 -> 58.55.
+  CONCLUSION: the mechanism is right in shape and wrong in width. `w:ind` is written from
+  insetTw AFTER the textOverflows correction, so the renderer is given a width the text fits;
+  a charge computed against anything narrower invents a wrap the renderer never draws. The next
+  run charges against (emitted w:tcW - emitted w:ind) and only beyond the row's own slack.
+  All three patches kept; engine at HEAD. Numbers: FINDINGS/wrap-charge-corpus-diff.md.

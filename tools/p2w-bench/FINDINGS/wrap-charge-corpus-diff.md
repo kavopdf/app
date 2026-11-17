@@ -113,3 +113,46 @@ What the next run should read first: the 312 -> 440 rows. Pull the emitted `<w:t
 of `price-list-right-aligned-amounts` out of `outA` (the .docx this run converted, 213 files,
 in `/scratch/work/p2w/outA` on the run's pod) and compare its `w:tcW`, `w:ind` and cell text
 against what `wrappedRowLines` computes for it. The answer is in that one row.
+
+## Third build: the charge measured in the face the engine EMITS (patches/wrap-charge-face-aware.patch)
+
+The 4 % tolerance did not reach the price list, so the row was inspected instead of rebuilt:
+row 0 of `price-list-right-aligned-amounts` in the .docx this run converted is a four-cell table
+— `w:tcW` 5905 / 1791 / 1449 / 740 tw — and every run carries `w:rFonts ascii="Times New Roman"`
+(and `Courier New` for the code column). The charge was measuring Helvetica. Helvetica's digits
+are 0.556 em against Times' 0.500 — **11 % wide** — so `₹1,845.00` in a 740 tw cell read as two
+lines whatever tolerance was applied.
+
+Third build: `advanceEm(text, bold, face)` picks TIMES_ROMAN / TIMES_BOLD, COURIER / COURIER_BOLD
+or Helvetica from the cell's own face name, tolerance 2 %.
+
+    documents differing      12 of 213   (was 42, then 41)
+    rows changed on 041122   1  — row 77, 2220 -> 3000 tw, i.e. the instruction cell itself
+    rows changed on price-list-right-aligned-amounts  16 of 38, still 312 -> 440 tw
+
+That is the shape the fix was supposed to have: 12 documents, and on the target document exactly
+the one row the handoff described. It still must not be kept, because the two documents it fires
+on hardest are still worse when rendered:
+
+| document | before (A) | after (C) |
+|---|---|---|
+| `price-list-right-aligned-amounts` | 1.79 (1 page) | **32.54** (1 page) |
+| `77_arabic_rtl_document` | 17.14 | **58.55** |
+| `041122-Account_Opening_Form` | 99.02 | not rendered (soffice does not finish it inside a 280 s call) |
+
+So the doubling of 16 rows on the price list is 3.5 pt a row, ~56 pt down the table, and the
+column of figures lands 56 pt from where the page drew it. The row it doubles is one the page
+drew on ONE line and the writer had already made fit: `w:ind` is written from `insetTw` after
+the `textOverflows` correction, so the renderer gets a width the text fits, and the charge is
+computing a wrap that the renderer does not perform. The residual 6 % between the AFM advance
+and the page's own drawn width is not metric drift to be tolerated — it means the charge is
+measuring the wrong width, not the wrong font.
+
+**What the next run should do instead of a fourth build:** take the width the renderer actually
+gets (`w:tcW` less the `w:ind` written in the same `<w:tc>`), and charge a second line only when
+the AFM advance beats THAT by more than the row's own slack. On this table that width is the
+drawn text plus 20 tw, so the charge is 1 line and the price list is untouched. The 041122 row
+is the one case where it fires: 9 paragraphs, 2220 tw charged, 3000 tw wanted.
+
+All three patches are kept (`wrap-charge-helvetica`, `wrap-charge-gated-1.04`,
+`wrap-charge-face-aware`); the engine is at HEAD.

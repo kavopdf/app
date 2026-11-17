@@ -129,3 +129,9 @@
 {"t": 1794921916.1944022, "ist": "18:55:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1794922249.5969644, "ist": "19:00:49", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1794922252.0912755, "ist": "19:00:52", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1794922286.3219597, "ist": "19:01:26", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794922510.5494068, "ist": "19:05:10", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1794922510.647167, "ist": "19:05:10", "ev": "attempt", "d": "content-missing-partly-replaced -> reverted"}
+{"t": 1794922510.7462926, "ist": "19:05:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794922520.3863726, "ist": "19:05:20", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794922520.630343, "ist": "19:05:20", "ev": "beat", "d": "report.py: building the report"}
