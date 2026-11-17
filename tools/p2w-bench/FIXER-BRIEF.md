@@ -159,6 +159,33 @@ NO EXCUSES
   'error' outcome, not a failure. Guessing is the failure.
 
 ===================================================================
+
+===================================================================
+THE ONE FAILURE NO RUN CAN FIX: THE USAGE BUDGET
+
+  On 16 Nov at 18:53 every run of all three crons began failing with a single line:
+
+      your usage budget for this period is exhausted - contact your workspace admin to raise the limit
+
+  It failed at 18:53, 19:46, 20:53, 21:47 and 22:47. After the fifth consecutive failure the
+  platform PAUSED all three crons by itself, and the pipeline was dead for fourteen hours and
+  eleven minutes - 849 minutes, measured by gaps.py, between one release and the next claim. No
+  run existed to report it, because a run that cannot start reports nothing.
+
+  This is a limit of the system, not of the work, so the two-questions rule does not apply: there
+  is nothing in this repository to fix. What you do instead:
+
+    * if a run starts and finds that the previous run's release is hours old rather than minutes,
+      say so at the top of your report and check the cron runs list before doing anything else
+    * write it once in BLOCKERS.md with handoff.py --needs-human, so it sits at the top of
+      HANDOFF.md and no later run has to rediscover it
+    * do NOT try to work around it, retry into it, or split the work to use less - the budget is
+      not a rate limit and waiting inside a run does not restore it
+
+  gaps.py now measures the space BETWEEN runs, not only inside one, because a 24/7 pipeline is
+  defined by the gap between its runs as much as by the runs themselves. A between-run gap over
+  five minutes is reported under "BETWEEN RUNS", and 849 minutes of it means the crons are paused.
+
 WHEN SOMETHING FAILS
   Read tools/p2w-bench/RETRY.md before you retry anything. Classify the error first:
   transient (rate limit, 429, 5xx, timeout) clears and is worth waiting for;

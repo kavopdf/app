@@ -33,3 +33,9 @@ file is read by every run after it.
 - Never record an obstacle you did not actually attempt to clear.
 
 ## Rows
+
+## Rows
+
+| when | what | what was tried | what must change |
+|---|---|---|---|
+| 2026-11-16 18:53 | Workspace usage budget exhausted. All 3 crons failed 5 times and the platform paused them. Pipeline dead 849 minutes (14h 11m) - the longest outage it has had. | Nothing could be tried: a run that cannot start cannot report. Resumed all three crons at 09:22 on 17 Nov once budget returned; the fixer claimed and ran normally. | A human must watch the cron runs list for `failed` with `usage budget`. The platform pauses a cron after 5 consecutive failures and nothing inside the repo can see or prevent it. |

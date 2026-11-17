@@ -59,6 +59,31 @@ def runs(events):
     return out
 
 
+def between_runs(rs, threshold_min):
+    """The gap nobody was measuring: one run released, the next did not start.
+
+    This is the 15 hours of 16-17 Nov. Every run inside the timeline looked healthy - the last
+    one released normally at 18:10 - and then nothing at all until 09:21 the next morning, because
+    the workspace usage budget ran out and the platform paused all three crons after five
+    failures. gaps.py measured gaps INSIDE a run, so the largest outage the pipeline has had was
+    invisible to it: there was no run to contain the gap.
+
+    A pipeline that is supposed to run 24/7 is defined as much by the space between its runs as by
+    the runs themselves.
+    """
+    out = []
+    for a, b in zip(rs, rs[1:]):
+        end = a["end"].get("t") if a["end"] else None
+        if not end:
+            continue
+        start = b["start"].get("t") or 0
+        d = (start - end) / 60.0
+        if d > threshold_min:
+            out.append({"from_ist": a["end"].get("ist"), "to_ist": b["start"].get("ist"),
+                        "minutes": round(d, 1)})
+    return out
+
+
 def analyse(run, threshold_min):
     evs = run["events"]
     gaps = []
@@ -120,6 +145,19 @@ def main(argv):
                 if x.get("tail"):
                     print("        this is the tail: the run stopped writing and never came back")
         print("")
+    # and the space between runs, which is where a 24/7 pipeline actually dies
+    br = between_runs(rs, thr)
+    if br:
+        print("=== BETWEEN RUNS ===")
+        print("")
+        for x in br:
+            print("   GAP %6.1f min  %s (released) -> %s (next claim)" % (x["minutes"], x["from_ist"], x["to_ist"]))
+        print("")
+        print("   A pipeline meant to run 24/7 is defined by the space between its runs as much as")
+        print("   by the runs. Nothing was working here - check whether the crons were paused.")
+        print("")
+        bad += len(br)
+
     if bad:
         print("%d gap(s) over %.0f min. A gap is silence, not proof of a stop - check the"
               % (bad, thr))
