@@ -250,29 +250,29 @@ A run can end three ways: it releases cleanly, it is forced out, or the platform
 first is a handover. If the guard refuses, read why - it is usually telling you the run has done
 nothing yet.
 
-## STEP 9b - Hand off and chain. The commit sits in the middle.
+## STEP 9b - Hand off continuously, and do not wait for a clean exit
 
-The next run starts seconds later with a FRESH CLONE. A clone reads origin, not your sandbox, so
-anything you wrote and did not commit is invisible to it.
+The next run starts at the next scheduled slot - the two fixer crons are at :15 and :45, thirty
+minutes apart. Not seconds later. It starts with a FRESH CLONE, and a clone reads origin, not your
+sandbox, so anything you wrote and did not commit is invisible to it. That is the whole reason the
+commit goes with every attempt rather than at the end.
 
     1.  handoff.py --context "..." / --next "..."     what is true now, what to do first
-    2.  round.py --release-fixer                      the slot is free
-    3.  COMMIT AND PUSH EVERYTHING (STEP 8's list, plus ROUND.json after the release)
-    4.  chain.py --after-release                      HANDOVER or STOP
-    5.  report.py                                    eight numbers, and writes REPORT.md
-    6.  END THIS RUN
+    2.  COMMIT EVERYTHING (STEP 8's list, plus ROUND.json)
+    3.  report.py                                    eight numbers, and writes REPORT.md
+    4.  keep working - the platform ends this run, not you
 
-`chain.py` will not fire unless your sandbox matches origin AND the working tree is clean, and it
+**THE RELEASE WILL BE REFUSED WHILE WORK IS PENDING, AND THAT IS NOT AN ERROR.** `round.py
+--release-fixer` refuses when `pending.py` still lists anything, because a run that stops early
+hands back a slot the scheduler will not refill for thirty minutes while the next run pays its
+setup again. Call it, read the refusal, and go back to work. `--force` exists only for the honest
+cases: a broken build, a blocked drive, an empty class list.
+
+`chain.py --after-release` prints HANDOVER and says plainly that no chain can be triggered. Run it
+if you have released; it changes nothing about when the next run starts.
+
+`chain.py` will not run unless your sandbox matches origin AND the working tree is clean, and it
 names the dirty files. HEAD matching origin is not enough - an uncommitted edit does not move HEAD.
-
-**YOU CANNOT START THE NEXT RUN, AND THAT IS NOT A FAILURE.** The `cron` tool is not in a run's tool
-list - a run on 17 Nov verified it and wrote so into CHAIN.json. Two fixer crons exist, at :15 and
-:45, thirty minutes apart; whichever finds the slot free takes it. What you control is your own END:
-a run that stops early hands back a slot the scheduler will not refill for thirty minutes, and that
-is the difference between two runs an hour and one.
-
-Why the brake stays: it stops on a forced release, a finished round, and three runs in a row with
-no kept and no partial attempt. Three runs that fixed nothing are stuck, not unlucky.
 
 ## STEP 10 - Parking a class is not a surrender
 
