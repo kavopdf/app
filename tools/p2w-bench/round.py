@@ -526,6 +526,46 @@ def release(name, force=False):
         # its last activity, so this cannot wedge: the slot always comes back.
         #
         # --force still bypasses everything, and the round-finished bypass above still applies.
+        # AN ENGINE CHANGE OUTSIDE A KEPT ATTEMPT IS NEVER MEASURED, SO IT MUST NOT SHIP.
+        #
+        # The ratchet measures what an attempt says it kept. A run that edits the engine, records
+        # 'reverted' and commits anyway puts the change into the tree with nothing comparing it to
+        # the corpus. Measured 17 Nov: a run recorded '1 attempt, 0 kept' and committed a folio rule
+        # that regressed seventy documents - 392_statistical_console_output went 1.61 -> 28.39 - and
+        # nothing in the pipeline said a word. The corpus number moved, the baseline did not, and
+        # the next run inherited an engine nobody had measured.
+        #
+        # step.py records the engine hash when the slot is claimed. If the engine differs now and
+        # the attempts this run recorded no 'kept', the run is holding an unmeasured change: revert
+        # it or prove it. --force still bypasses.
+        try:
+            import json as _j
+            import subprocess as _sp
+            _start = (load().get("fixer_engine_at_claim") or "").strip()
+            _root = os.path.normpath(os.path.join(HERE, "..", ".."))
+            _now = _sp.run(["git", "log", "-1", "--format=%h", "--",
+                            "app/src/main/java/com/kavopdf/app/engine/"],
+                           cwd=_root, capture_output=True, text=True).stdout.strip()
+            _kept = False
+            try:
+                _att = _j.load(open(ATTEMPTS, encoding="utf-8"))
+                for _row in _att.values():
+                    if (_row.get("last_engine") or "").strip() == _now and "kept" in (_row.get("outcomes") or []):
+                        _kept = True
+                        break
+            except Exception:
+                pass
+            if _start and _now and _start != _now and not _kept:
+                print("refused: the engine changed this run (%s -> %s) and no attempt was kept." % (_start, _now))
+                print("The ratchet only measures what an attempt says it kept, so this change has never")
+                print("been compared against the corpus - and on 17 Nov exactly this shipped a rule that")
+                print("regressed seventy documents. Either revert the engine, or record the attempt that")
+                print("measured it. If you genuinely must ship it unmeasured: --force.")
+                return 1
+        except Exception as exc:
+            print("warning: could not check the engine against the attempt ledger - %s: %s"
+                  % (type(exc).__name__, exc))
+
         left = _pending_count()
         if left > 0:
             print("refused: %d item(s) still pending. The slot is not spent while work is left." % left)

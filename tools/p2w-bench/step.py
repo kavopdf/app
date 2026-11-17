@@ -99,6 +99,22 @@ def main(argv):
         print(out.strip()[:300])
         return 1
 
+    # 2b. remember which engine this run started on
+    #
+    # The release guard compares this against the engine at the end. A run that commits an engine
+    # change outside a kept attempt is never checked by the ratchet - the ratchet measures what an
+    # attempt says it kept - so the change ships unmeasured and the corpus drifts away from the
+    # baseline without anything reporting it. That is exactly what happened on 17 Nov: a run
+    # recorded '1 attempt, 0 kept' and committed a folio rule that regressed seventy documents.
+    try:
+        import json as _j
+        _rp = os.path.join(ROOT, "tools", "p2w-bench", "ROUND.json")
+        _d = _j.load(open(_rp, encoding="utf-8"))
+        _d["fixer_engine_at_claim"] = engine_hash()
+        _j.dump(_d, open(_rp, "w", encoding="utf-8"), indent=1)
+    except Exception:
+        pass
+
     # 3. say we are alive, in the same breath
     py("round.py", "--heartbeat", "--doing", '"claimed, gathering work"')
 
