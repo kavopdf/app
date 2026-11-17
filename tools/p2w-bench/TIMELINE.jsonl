@@ -1,35 +1,26 @@
 {"t": 1794887491.4851723, "ist": "09:21:31", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1794889936.2481709, "ist": "10:02:16", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1794889936.4500349, "ist": "10:02:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794889938.4110863, "ist": "10:02:18", "ev": "beat", "d": "claimed, reading the handoff"}
-{"t": 1794892836.624952, "ist": "10:50:36", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1794892836.839968, "ist": "10:50:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794892839.0312488, "ist": "10:50:39", "ev": "beat", "d": "claimed, reading the handoff"}
-{"t": 1794894166.497275, "ist": "11:12:46", "ev": "beat", "d": "attempt recorded, closing out"}
-{"t": 1794894180.0062745, "ist": "11:13:00", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1794894180.1408124, "ist": "11:13:00", "ev": "attempt", "d": "content-missing-partly-replaced -> reverted"}
-{"t": 1794894180.2559998, "ist": "11:13:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894186.5874348, "ist": "11:13:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894186.7238464, "ist": "11:13:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894186.8760664, "ist": "11:13:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894187.008225, "ist": "11:13:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894195.6132402, "ist": "11:13:15", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894195.7860298, "ist": "11:13:15", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894195.9659486, "ist": "11:13:15", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894196.1053805, "ist": "11:13:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1794894198.7827322, "ist": "11:13:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1794894563.1751611, "ist": "11:19:23", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1794894572.044856, "ist": "11:19:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1794894572.2781172, "ist": "11:19:32", "ev": "attempt", "d": "content-partly-lost -> partial"}
-{"t": 1794894572.4983532, "ist": "11:19:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894572.8675709, "ist": "11:19:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1794894573.2062087, "ist": "11:19:33", "ev": "attempt", "d": "content-missing-partly-replaced -> partial"}
-{"t": 1794894573.4558802, "ist": "11:19:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894587.3495383, "ist": "11:19:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894587.5012414, "ist": "11:19:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894587.7676742, "ist": "11:19:47", "ev": "release", "d": "fixer released"}
-{"t": 1794894587.8886924, "ist": "11:19:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1794894618.052195, "ist": "11:20:18", "ev": "beat", "d": "chain.py: deciding whether to chain"}
-{"t": 1794894631.6674035, "ist": "11:20:31", "ev": "beat", "d": "chain.py: deciding whether to chain"}
-{"t": 1794894649.0568707, "ist": "11:20:49", "ev": "beat", "d": "chain.py: deciding whether to chain"}
-{"t": 1794894671.455599, "ist": "11:21:11", "ev": "beat", "d": "chain.py: deciding whether to chain"}
+{"t": 1794887526.168909, "ist": "09:22:06", "ev": "beat", "d": "carry-over: 041122 page-7 welded-paragraph inset, reading landed findings A and B"}
+{"t": 1794887534.3110316, "ist": "09:22:14", "ev": "beat", "d": "carry-over: reading PdfToWord:8653 welded-cell weld + inset, then patch leftmost-x"}
+{"t": 1794888038.613504, "ist": "09:30:38", "ev": "beat", "d": "building engine with pieces-trim fix, then measuring 041122 page count into an empty render dir"}
+{"t": 1794888558.5277784, "ist": "09:39:18", "ev": "beat", "d": "fix verified by control: 041122 render 10 pages unfixed -> 9 fixed; rebuilding with fix, then corpus measurement"}
+{"t": 1794888799.200873, "ist": "09:43:19", "ev": "beat", "d": "size fix: g.size = Tf operand x text-matrix scaleY; rebuilding and re-measuring 041122"}
+{"t": 1794889351.1524637, "ist": "09:52:31", "ev": "beat", "d": "measuring share5 of 041122 across three engine variants (unfixed / pieces-trim / pieces+size)"}
+{"t": 1794889943.5984507, "ist": "10:02:23", "ev": "beat", "d": "corpus gate with pieces-trim + text-matrix size fix (213 docs)"}
+{"t": 1794890209.6068842, "ist": "10:06:49", "ev": "beat", "d": "corpus gate pass 2: engine = patched clone (symlinked REPO), 213 docs converting"}
+{"t": 1794890465.9978106, "ist": "10:11:05", "ev": "beat", "d": "measuring corpus with patched engine (213 docs, batch 1)"}
+{"t": 1794890720.7198014, "ist": "10:15:20", "ev": "beat", "d": "measuring corpus with patched engine (213 docs, prerender continues)"}
+{"t": 1794890978.4833043, "ist": "10:19:38", "ev": "beat", "d": "corpus: finishing prerender then measuring; will A/B 40 docs against committed RANKING.csv"}
+{"t": 1794891233.8451755, "ist": "10:23:53", "ev": "beat", "d": "corpus: 116/213 measured with patched engine, finishing the rest"}
+{"t": 1794891470.551753, "ist": "10:27:50", "ev": "beat", "d": "rebuilding with corrected size (size = scalingFactorY, not squared) then re-measuring corpus"}
+{"t": 1794891705.1780007, "ist": "10:31:45", "ev": "beat", "d": "corpus re-measure with corrected size fix (213 docs, prerender+measure)"}
+{"t": 1794891959.5361865, "ist": "10:35:59", "ev": "beat", "d": "corpus re-measure pass 2 (prerender continues)"}
+{"t": 1794892213.8080678, "ist": "10:40:13", "ev": "beat", "d": "corpus re-measure pass 3"}
+{"t": 1794892471.5134974, "ist": "10:44:31", "ev": "beat", "d": "corpus re-measure pass 4, finishing 213"}
+{"t": 1794892748.4478977, "ist": "10:49:08", "ev": "beat", "d": "rebuild with per-paragraph inset fix, checking 041122 page 7"}
+{"t": 1794893040.710291, "ist": "10:54:00", "ev": "beat", "d": "final corpus pass with all three fixes: converting 213 docs"}
+{"t": 1794893151.9187875, "ist": "10:55:51", "ev": "beat", "d": "final corpus: prerender+measure pass 1"}
+{"t": 1794893520.039455, "ist": "11:02:00", "ev": "beat", "d": "final corpus: prerender+measure pass 1"}
+{"t": 1794893816.4821413, "ist": "11:06:56", "ev": "beat", "d": "final corpus: prerender+measure pass 2"}
+{"t": 1794894077.5519717, "ist": "11:11:17", "ev": "beat", "d": "final corpus: prerender+measure pass 3"}
+{"t": 1794894332.9764793, "ist": "11:15:32", "ev": "beat", "d": "final corpus: last 37 docs"}
+{"t": 1794894413.4036152, "ist": "11:16:53", "ev": "attempt", "d": "content-missing-partly-replaced -> partial"}

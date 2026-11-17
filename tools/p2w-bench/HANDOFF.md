@@ -9,18 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 10:50 |
-| ended | 11:19 |
-| how it ended | released |
-| plan | - |
+| started | 09:22 |
+| ended | still running |
+| how it ended | - |
+| plan | clear carry-over: fix the 041122 page-7 welded cell inset (first line's x -> block's leftmost line x), measure with an empty render dir |
 
 ## The picture, in the words of the run that left it
 
-> The size fix is IN THE TREE and measured: g.size at PdfToWord:2065 now reads the text rendering matrix scale (the size the page draws at, unrounded) instead of Tf, which is text space. Blast radius proved over all 213 corpus PDFs: exactly 4 documents change, the other 209 emit byte-identical DOCX. 411_nested_xobject_transforms 48.64 -> 0.00 share5 (rank 10 -> rank 1), 38_faux_bold 3.25 -> 0.01, 041122 98.65 -> 97.81, fillable twin 97.62 -> 97.81. RANKING.csv carries those four rows; classrow.py rewrote DEFECT-CLASSES.md. The bank forms now have correct 10 pt text and 22 pages against the source's 9 - that spill is the whole remaining problem on them. The pieces-remap root cause (PdfToWord:8753 indexes pieces with the trimmed column index while pieces is the only per-cell array the keep trim does not re-index) is proven by two agents and measured, and is NOT in the tree: it fixes the page count (9/10 -> 9/9) and invent5 (66.62 -> 0.00) but moves share5 the wrong way, because the score cannot see a spurious page. The engine diff is exactly one hunk in PdfToWord.java.
+> Three root causes in the table-cell paragraph path are fixed and measured across 213 documents: (1) the per-cell lines matrix 'pieces' was left in the untrimmed column space while its consumer indexed the trimmed grid, so a multi-line cell read the WRONG column's lines - the six heading paragraphs of 041122 page 7 were written into the empty cell beside them, which is why that heading appeared twice; (2) the point size was taken from the Tf operand, so 041122 - which draws everything as '/TT0 1 Tf' inside a 10x Tm - was emitted as 1214 one-point runs, microprint for the whole bank form; the size is scalingFactorY of the text rendering matrix and it is a size, not a multiplier (multiplying squared it and regressed 192 documents, measured and discarded); (3) each line's own x was computed but never set as the paragraph inset, so all six heading lines carried the first line's 472.6 pt inset in a 531.8 pt cell and wrapped in a 59 pt column. Corpus after all three: 208 unchanged, 411_nested_xobject_transforms 31.05 -> 0.00, 041122 98.65 -> 97.62 with median displacement 477.6 -> 138.24 pt, one regression 39_small_caps_letter_spacing 0.72 -> 3.78. The heading now renders in the right cell, at 10 pt, right-aligned and centred as the source draws it. STILL OPEN: 041122 renders 12 pages against 9 and page 7 is nearly blank - the page-7 table itself renders correctly on page 8, so one row is rendering far taller than its declared trHeight and cantSplit moves it. 416_many_tiny_pages is a MEASURE-ERROR in both the baseline and this run, not new.
 
 ## What the next run should do first
 
-> Land the pieces remap (parasOfLines(pieces.get(rr).get(keep.get(cc))) at PdfToWord:8753) ON TOP of the size fix now in the tree, then fix the bank forms' spill: with 10 pt text both forms emit 22 pages against 9 and page 7 is nearly blank. The mechanism to look at is the table model's row height and column width for table 18 on page 7 - the FORM NO.60 heading block is one cell whose lines are wrapped, and w:trHeight is charged but the wrap is not, so the table lays out far taller than the sheet. Measure page count with a render into an EMPTY directory (a render can return a pre-existing file at the output path). If the pair still reads worse on share@5, fix the instrument: it compares page k with page k for k <= min(pages), so a document that gains a spurious page is not penalised and one that loses it is not rewarded - pages_src and pages_ours are recorded and never scored.
+> 041122 page-7 spill, third attempt: the text is fixed, the row height is not. With all three paragraph-path fixes in, 041122 renders 12 pages against 9 and page 7 is nearly blank - a shaded row at the top and one rule at the bottom, with the page-7 table itself rendering correctly and close to the source on page 8. The table's declared row heights sum to 16649 twips (832 pt) against an 842 pt sheet, so one row is rendering far taller than its w:trHeight and w:cantSplit is moving it to the next page. Measure the RENDERED height of each of the 24 rows (the y of each row's bottom rule in our own render) against its declared trHeight, name the row that grows and the paragraph property that grows it - w:before, w:line exact, or a wrap. Do NOT re-derive the size bug or the pieces index: both are fixed and measured (HYPOTHESES.md, 17 Nov). Measure page count with a render into an EMPTY directory.
 
 ## Agents deployed and not yet accounted for
 
@@ -28,8 +28,8 @@ unfinished work, not as a result.
 |---|---|---|---|---|---|---|---|
 | contA-01 | content-missing-partly-replaced | A | which code path decides the height of a block emitted from a PDF text  | 13:52 | landed | landed | FINDINGS/content-missing-partly-replaced-A-1305.md |
 | contB-01 | content-missing-partly-replaced | B | is the wrap inside a text box a renderer limit or our emitted width | 13:52 | landed | landed | FINDINGS/content-missing-partly-replaced-B-1300.md |
-| contC-01 | content-missing-partly-replaced | C | why does the welded cell keep its 27-line paragraph when the per-line  | 11:13 | 11:00 | landed | FINDINGS/content-missing-partly-replaced-C-044323-d5fd.md |
-| contD-01 | content-missing-partly-replaced | D | blast radius of the pieces-not-remapped bug across the 213-document co | 11:13 | 11:00 | landed | FINDINGS/content-missing-partly-replaced-D-110200-a7c4.md |
+| contA2-01 | content-missing-partly-replaced | A2 | why does parasOfLines reject the six heading lines of 041122 page 7 | 11:16 | landed | landed | FINDINGS/content-missing-partly-replaced-A2-092912-7c4e.md |
+| contD-01 | content-missing-partly-replaced | D | how many corpus documents have a cell whose lines start left of the fi | 11:16 | landed | landed | FINDINGS/content-missing-partly-replaced-D-092700-1d7b.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
@@ -47,13 +47,11 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:48` attempt 6 on content-missing-partly-replaced -> kept (1/30 moved)
 - `16:18` attempt 4 on content-missing-nothing-in-its-place -> kept (31/212 moved)
 - `16:19` tooling: p2w.py waits for soffice's output (measured: bank form 89 s to a complete PDF, process still alive at 240 s); render cache keyed by docx size+mtime; soffice_pdf clears its output paths and requires mtime >= launch. scipy installed (EDT per page 25 s -> 1.6 s).
-- `11:13` attempt 7 on content-missing-partly-replaced -> reverted (0/13 moved)
-- `11:13` agent deployed: content-missing-partly-replaced / C - why does the welded cell keep its 27-line paragraph when the per-line paragraph 
-- `11:13` agent deployed: content-missing-partly-replaced / D - blast radius of the pieces-not-remapped bug across the 213-document corpus
-- `11:13` agent landed: content-missing-partly-replaced / C -> FINDINGS/content-missing-partly-replaced-C-044323-d5fd.md
-- `11:13` agent landed: content-missing-partly-replaced / D -> FINDINGS/content-missing-partly-replaced-D-110200-a7c4.md
-- `11:19` attempt 1 on content-partly-lost -> partial (1/11 moved)
-- `11:19` attempt 8 on content-missing-partly-replaced -> partial (1/13 moved)
+- `11:16` attempt 7 on content-missing-partly-replaced -> partial (1/13 moved)
+- `11:16` agent deployed: content-missing-partly-replaced / A2 - why does parasOfLines reject the six heading lines of 041122 page 7
+- `11:16` agent deployed: content-missing-partly-replaced / D - how many corpus documents have a cell whose lines start left of the first line
+- `11:17` agent landed: contA2-01 /  -> FINDINGS/content-missing-partly-replaced-A2-092912-7c4e.md
+- `11:17` agent landed: contD-01 /  -> FINDINGS/content-missing-partly-replaced-D-092700-1d7b.md
 
 ## Where the rest of the state lives
 

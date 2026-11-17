@@ -159,8 +159,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 16 Nov 17:23 | fixer | slot claimed - fixer running |
 | 16 Nov 18:10 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 17 Nov 09:21 | fixer | slot claimed - fixer running |
-| 17 Nov 10:02 | fixer | slot claimed - fixer running |
-| 17 Nov 10:50 | fixer | slot claimed - fixer running |
-| 17 Nov 11:13 | fixer | attempt content-missing-partly-replaced -> reverted (0/13 moved) |
-| 17 Nov 11:19 | fixer | attempt content-partly-lost -> partial (1/11 moved) |
-| 17 Nov 11:19 | fixer | attempt content-missing-partly-replaced -> partial (1/13 moved) |
+| 17 Nov 11:16 | fixer | attempt content-missing-partly-replaced -> partial (1/13 moved) |

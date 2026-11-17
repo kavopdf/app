@@ -2062,36 +2062,31 @@ public final class PdfToWord {
             // outside the tolerance the position check allows. getFontSize() is the same
             // number without the rounding; inPt is only the fallback for a font whose size
             // the page did not name.
-            // THE SIZE THE PAGE DRAWS AT IS THE TEXT RENDERING MATRIX'S SCALE, AND g.size
-            // WAS READING Tf, WHICH IS THE SIZE IN TEXT SPACE.
             //
-            // getFontSizeInPt() is the device size ROUNDED TO A WHOLE POINT (5.8 -> 5.0,
-            // 8.5 -> 8.0), which is why the position model stopped using it. getFontSize() is
-            // the same number without the rounding - but it is the operand of Tf and it does
-            // NOT carry the text matrix's scale. Most writers put the size in Tf, so the two
-            // agree and 211 of 213 documents never showed the difference. A writer that emits
-            // `/C2_0 1 Tf  10 0 0 10 x y Tm` - which is what both bank forms' generator does -
-            // sets Tf 1 and puts the 10 in the matrix, so getFontSize() answers 1.0 and every
-            // run of 041122-Account_Opening_Form was written at 1 pt: 4088 runs, w:sz val="2",
-            // on all nine pages, while the page's own spans measure 10 pt. Positions were
-            // already device space (getXDirAdj/getWidthDirAdj), so the engine was placing
-            // true ink with a text-space size.
+            // BUT getFontSize() IS THE OPERAND, NOT THE SIZE. It is the number after Tf,
+            // and a page is free to draw 10 pt text as `/TT0 1 Tf` inside a `10 0 0 10 Tm`.
+            // 041122-Account_Opening_Form does exactly that on every page: the probe reports
+            // fontSize=1.000 inPt=10.000 scaleY=10.000 for every glyph, the engine took the
+            // 1.0, and 1214 of that document's 3885 runs were written `w:sz 2` - one point
+            // - so the whole bank form rendered as microprint.
             //
-            // TextPosition.getTextMatrix() is Tm with the font size folded in - 01_stamp has
-            // Tf 16 and no Tm scale and reads 16, this form has Tf 1 and Tm scale 10 and reads
-            // 10 - so its scaling factor IS the size in points, unrounded, and multiplying it
-            // by getFontSize() again squares the size (measured: 01_stamp 16 -> 256 pt).
-            float deviceSize = 0f;
-            try {
-                com.tom_roush.pdfbox.util.Matrix trm = tp.getTextMatrix();
-                if (trm != null) {
-                    float sy = Math.abs(trm.getScalingFactorY());
-                    if (sy > 1e-4f && sy < 1e4f) deviceSize = sy;
-                }
-            } catch (Throwable ignored) {
-            }
-            g.sizePt = tp.getFontSizeInPt() > 0 ? tp.getFontSizeInPt() : deviceSize;
-            g.size = deviceSize > 0f ? deviceSize : tp.getFontSizeInPt();
+            // THE SIZE IS scalingFactorY OF THE TEXT MATRIX, and it is a size, not a factor:
+            // PDFBox's TextPosition carries the TEXT RENDERING matrix, which already has the
+            // Tf operand baked into it, so scalingFactorY (sqrt(c^2 + d^2)) is the length the
+            // text space's y axis has in device space. Probed on three documents:
+            //   041122      fontSize=1.000   scaleY=10.000  inPt=10.000   (10 pt text)
+            //   48_form     fontSize=12.000  scaleY=12.000  inPt=12.000   (ordinary page)
+            //   01_stamp    fontSize=8.500   scaleY=8.500   inPt=8.000    (fractional size)
+            // It is right in all three, it keeps the 8.5 that inPt rounds away, and it is
+            // still 13.0 on text rotated 90 degrees, where scalingFactorX is the only
+            // non-zero factor. Multiplying it by fontSize again squares every ordinary page
+            // - that mistake measured as 192 of 213 documents regressed, text emitted at
+            // 12 x 12 = 144 pt - so this is the value itself, never a multiplier.
+            float scaleY = tp.getTextMatrix() == null ? 0f : tp.getTextMatrix().getScalingFactorY();
+            float sizeOnPage = (scaleY > 0f && !Float.isNaN(scaleY) && !Float.isInfinite(scaleY))
+                    ? scaleY : (tp.getFontSize() > 0f ? tp.getFontSize() : tp.getFontSizeInPt());
+            g.sizePt = sizeOnPage;
+            g.size = sizeOnPage;
             PDFont font = tp.getFont();
             g.font = font == null ? "" : font.getName();
             String n = g.font.toLowerCase(Locale.ROOT);
@@ -8713,6 +8708,28 @@ public final class PdfToWord {
                 float[][] trimmedX = new float[rows][keep.size()];
                 float[][] trimmedY = new float[rows][keep.size()];
                 int[][] trimmedColours = new int[rows][keep.size()];
+                // THE LINES HAVE TO BE TRIMMED WITH EVERYTHING ELSE. This block remapped
+                // cells, faces, firstX, firstY and colours through keep and left `pieces` -
+                // the one matrix the consumer below reads by COLUMN INDEX - in the untrimmed
+                // space, so after any dropped column the paragraph path was handed a
+                // different column's lines. On 041122-Account_Opening_Form page 7 the grid
+                // is 24 rows x 4 columns with keep=[1,2,3]: the heading lives in original
+                // column 2, which is trimmed cell 1, but pieces.get(1).get(1) is original
+                // column 1 - empty - so parasOfLines returned 0, the cell fell back to the
+                // welded string with the first line's x as its inset (w:ind 9452 dxa in a
+                // 10636 dxa cell = 59.2 pt of usable width), the six heading lines wrapped
+                // into 28 rendered lines (y 23.4-293.4, 270 pt) inside a row declaring
+                // w:trHeight 1682 twips (84.1 pt), and a 9-page document came out as 10.
+                // The same shift wrote those six paragraphs into the EMPTY cell to their
+                // right, which is why the heading appeared twice.
+                List<List<List<Line>>> trimmedPieces = new ArrayList<>();
+                for (int r = 0; r < rows; r++) {
+                    List<List<Line>> trow = new ArrayList<>();
+                    for (int k = 0; k < keep.size(); k++) {
+                        trow.add(pieces.get(r).get(keep.get(k)));
+                    }
+                    trimmedPieces.add(trow);
+                }
                 for (int r = 0; r < rows; r++) {
                     for (int k = 0; k < keep.size(); k++) {
                         trimmedY[r][k] = firstY[r][keep.get(k)];
@@ -8727,6 +8744,7 @@ public final class PdfToWord {
                 firstX = trimmedX;
                 firstY = trimmedY;
                 colours = trimmedColours;
+                pieces = trimmedPieces;
                 cols = keep.size();
             }
 
@@ -8779,7 +8797,22 @@ public final class PdfToWord {
             for (int rr = 0; rr < rows; rr++) {
                 for (int cc = 0; cc < cols; cc++) {
                     List<Table.CellPara> cp = parasOfLines(pieces.get(rr).get(cc));
-                    if (cp.size() >= 2) t.paras.get(rr).get(cc).addAll(cp);
+                    if (cp.size() >= 2) {
+                        // EACH PARAGRAPH KEEPS ITS OWN x. parasOfLines records the x the page
+                        // drew each line at, and addRecutRow (:8380) turns that into
+                        // indentPt - but this path added the paragraphs without it, so
+                        // indentPt stayed NaN and the writer fell back to ONE inset for the
+                        // whole cell: the first line's. On 041122-Account_Opening_Form page 7
+                        // that wrote all six heading lines at w:ind 9452 (472.6 pt) in a
+                        // 531.8 pt cell - 59 pt of usable width - so "Income-tax Rules, 1962"
+                        // (drawn at x 253.7) and the proviso (x 232.4) each wrapped inside a
+                        // 59 pt column, the row grew from its declared 84.1 pt to a third of
+                        // the sheet, and the table spilled a 9-page form over 12 pages with
+                        // page 7 nearly blank. The same held for the 17-paragraph Verification
+                        // block, every one of them inset 4610 twips.
+                        for (Table.CellPara p : cp) p.indentPt = p.x - colX[cc];
+                        t.paras.get(rr).get(cc).addAll(cp);
+                    }
                 }
             }
             out.add(t);

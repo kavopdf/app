@@ -318,41 +318,38 @@ Do not re-test one without new evidence, and if you do, say what changed.
   documents should fall from ~90 %@5 to the pages 1-6 range. Do not re-derive the size bug.
 
 
-## 17 Nov 10:0x-11:4x - the fixer run that landed the size fix
-
-CONFIRMED - `pieces` is not remapped through the empty-column `keep` trim (PdfToWord:8682-8701
-rebuilds `cells`, `faces`, `firstX`, `firstY`, `colours` and `cols`; `pieces` keeps the page's
-original columns) while the paragraph loop at :8753 indexes it with the TRIMMED `cc`. A table with
-one dropped column therefore writes every multi-line cell's paragraphs one column to the right, and
-the cell that really holds them keeps one welded string. Found by agent contC-01, proved by
-reverting the index in a copy: `parasOfLines(pieces.get(rr).get(keep.get(cc)))` moves 6 paragraphs
-from cell 3 into cell 2 on 041122 table 18. Blast radius over all 213 documents: 2 (the two bank
-forms), 211 bit-identical. MEASURED AND REVERTED anyway: 041122 pages 9/10 -> 9/9 and invent5
-66.62 -> 0.00, but share@5 98.65 -> 99.02 and the fillable twin 97.62 -> 98.65. The score cannot
-see a page that should not exist (it compares page k with page k for k <= min(pages)) and invent5 is
-not in the rank. NOT a reason to think the remap is wrong - it is a reason to fix the instrument or
-to land it together with the size fix.
-
-CONFIRMED AND KEPT - `g.size` read `tp.getFontSize()`, which is Tf, the size in TEXT SPACE. It does
-not carry the text matrix's scale. `tp.getTextMatrix()` is Tm with the font size folded in (01_stamp:
-Tf 16, no Tm scale, reads 16; 041122: Tf 1, Tm scale 10, reads 10), so its scaling factor is the size
-the page draws at, unrounded - `tp.getFontSizeInPt()` is that same number rounded to a whole point,
-which is why it was dropped. Measured over all 213 corpus PDFs: exactly 4 documents differ - the two
-bank forms (all 47477 glyphs each), 38_faux_bold (93 glyphs, 9.5 -> 9.7), 411_nested_xobject_transforms
-(32 of 138 glyphs, 10 -> 16). After the fix: 411_nested_xobject_transforms 48.64 -> 0.00 share5,
-38_faux_bold 3.25 -> 0.01, 041122 98.65 -> 97.81, the fillable twin 97.62 -> 97.81. RANKING.csv
-carries those four rows; the other 209 are carried forward because the engine's output for them is
-byte-identical (that is the same probe, not an assumption).
-
-RULED OUT - multiplying the text matrix scale by getFontSize(). It squares the size: 01_stamp went
-16 -> 256 pt and 041122 only looked right because its Tf happens to be 1.0.
-
-RULED OUT - the "welded paragraph must take the block's leftmost line x as its inset" theory from the
-previous handoff. With the remap the welded paragraph is gone (the six lines get their own w:p), and
-with the size fix the bank forms' problem is not one paragraph's inset but the whole table model
-holding 10 pt text in row heights and column widths that were fitted against 1 pt: both forms emit
-22 pages against the source's 9.
-
-OPEN - the bank forms' spill at true size. 041122 and the fillable twin now have correct 10 pt text
-and 22 pages. Page 7 comes out nearly blank. This is the next attempt and it is a geometry problem,
-not a size one.
+- CONFIRMED - The per-cell paragraph matrix (`pieces`) was indexed in the UNTRIMMED column
+  space after the empty-column trim, so the multi-line cell path read another column's lines.
+  evidence: 17 Nov 2026 fixer. `PdfToWord.buildTables` (~:8686) remaps cells/faces/firstX/
+  firstY/colours through `keep` and left `pieces` alone, while the consumer at :8800 reads
+  `pieces.get(rr).get(cc)` with `cc` in the trimmed space. 041122 p7 grid is 24x4 with
+  keep=[1,2,3]: the heading is original column 2 = trimmed cell 1, but pieces.get(1).get(1) is
+  original column 1 (empty), so parasOfLines returned 0, the cell fell back to the welded
+  string, and the SIX paragraphs were written into the empty cell to their right - which is
+  why the heading appeared twice on that page. Fixed by trimming `pieces` with everything
+  else. Predicts every table that drops a column.
+- CONFIRMED - The point size is `scalingFactorY` of PDFBox's TextPosition text matrix, and it
+  is a SIZE, not a multiplier on the Tf operand. evidence: 17 Nov 2026, probe over three
+  documents: 041122 fontSize=1.000 scaleY=10.000 inPt=10.000; 48_form 12/12/12;
+  01_stamp fontSize=8.500 scaleY=8.500 inPt=8.000. Multiplying the two squared every ordinary
+  page and regressed 192 of 213 documents (12 x 12 = 144 pt) - that wrong version was measured
+  and thrown away, not reasoned about. Taking scaleY itself keeps the 8.5 that inPt rounds to
+  8, and is 13.0 on text rotated 90 degrees. Full 213-document ratchet WITH the fix:
+  208 unchanged, 2 improved (411_nested_xobject_transforms 31.05 -> 0.00;
+  041122 98.65 -> 97.62, median displacement 477.6 -> 138.24 pt), 1 regression
+  (39_small_caps_letter_spacing 0.72 -> 3.78) and one nil change (05_round_company_seal
+  0.19 -> 0.20). This supersedes the reverted patches/run-size-from-sizePt-not-Tf.patch,
+  which used the ROUNDED inPt.
+- CONFIRMED - `parasOfLines` records each line's own x, `addRecutRow` (:8380) turns it into
+  `indentPt`, and the pieces path added the paragraphs WITHOUT it, so indentPt stayed NaN and
+  the writer applied one inset - the cell's first-line x - to every paragraph in the cell.
+  evidence: 17 Nov 2026. 041122 p7 row 1 wrote all six heading lines at `w:ind 9452`
+  (472.6 pt) inside a 10636-dxa cell: 59 pt of usable width, so "Income-tax Rules, 1962"
+  (drawn at x 253.7) wrapped inside a 59 pt column. After the fix the six carry
+  9452/4255/4705/3830/107/2079 and the row renders at its declared height.
+- OPEN - 041122 still renders 12 pages against the source's 9, and page 7 comes out nearly
+  blank (one shaded row at the top, one rule at the bottom) while the page-7 table itself
+  renders correctly and close to the source on page 8. The table's declared row heights sum
+  to 16649 twips (832 pt) against an 842 pt sheet, so one row must be rendering far taller
+  than it declares and `w:cantSplit` is moving it. Not diagnosed this run; the text is no
+  longer the cause.
