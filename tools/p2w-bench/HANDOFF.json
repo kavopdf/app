@@ -135,8 +135,8 @@
  ],
  "run": {
   "started": "16:54",
-  "ended": null,
-  "ended_how": null
+  "ended": "17:31",
+  "ended_how": "forced"
  },
  "history": [
   {
@@ -163,6 +163,11 @@
    "at": "15:40",
    "how": "released",
    "plan": "1. [carry-over] the last run"
+  },
+  {
+   "at": "17:31",
+   "how": "forced",
+   "plan": ""
   }
  ],
  "context": "THE TENTH PAGE IS A ROW THAT SWALLOWED THE TEXT BELOW ITS TABLE, AND IT IS MEASURED. cantSplit is falsified (see HYPOTHESES): the narrow rule the last run specified fires on 0 of 041122's 86 rows because every row fits the sheet in our model, the one document it does change is neutral (share5 68.12 -> 68.12), and stripping all 86 cantSplit from 041122 still renders 10 pages. What the extra page actually is: the instruction page is one 33-row table declared 742.0 pt, and its LAST row (2220 tw = 111 pt declared, 164.2 pt rendered) holds not only 'Government Department establishing identity and address of such person.' but the whole '(2) ... (4) Sl. No. 16' instruction block that the SOURCE sets below the table, after the last rule. Source page: table ends at y=688.7 and the block sits in the 153 pt left below it. Ours: table ends at 698.2, 144 pt left, block needs 164 -> it moves whole to p9. Row pitches agree with the source within 0.5 pt, so the grid is right and the row's CONTENT is wrong. (Our table also starts 26.4 pt high - y 58.2 against 84.6 - a second, smaller contributor.) The engine tree is unchanged from 18de245 this run: the cantSplit patch was built, measured across all 213 documents and reverted.",
