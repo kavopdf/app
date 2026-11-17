@@ -2,3 +2,6 @@
 {"t": 1794889936.2481709, "ist": "10:02:16", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1794889936.4500349, "ist": "10:02:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1794889938.4110863, "ist": "10:02:18", "ev": "beat", "d": "claimed, reading the handoff"}
+{"t": 1794892836.624952, "ist": "10:50:36", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1794892836.839968, "ist": "10:50:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794892839.0312488, "ist": "10:50:39", "ev": "beat", "d": "claimed, reading the handoff"}

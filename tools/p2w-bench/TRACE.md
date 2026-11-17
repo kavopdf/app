@@ -268,3 +268,5 @@ claim and after each step; it is not code and cannot break anything.
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 10:02 | fixer | claim | fixer claimed the slot |
 | 17 Nov 10:02 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
+| 17 Nov 10:50 | fixer | claim | fixer claimed the slot |
+| 17 Nov 10:50 | fixer | stale-claim | fixer slot was stale (48 min) - the previous run ended without releasing it |

@@ -9,7 +9,7 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 10:02 |
+| started | 10:50 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
