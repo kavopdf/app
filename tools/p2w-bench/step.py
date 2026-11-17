@@ -73,6 +73,18 @@ def main(argv):
     rc_p, pending = py("pending.py")
     rc_g, gaps = py("gaps.py", "--last")
 
+    # 4b. say what this run intends, in the handoff, before doing anything
+    #
+    # handoff.py --plan writes the "plan" row of HANDOFF.md and starts the run record. It used to be
+    # an instruction in the brief - "handoff.py --plan '...' at the start" - and it was cut when the
+    # brief was shortened. Nothing read the field programmatically, so nothing broke visibly; the row
+    # just stayed empty, and the next run lost the one thing it most needs: what the previous run was
+    # trying to do. A rule the run can forget is a rule that will be forgotten, so step.py writes it.
+    _intent = (pending.strip().split("\n")[2] if len(pending.strip().split("\n")) > 2 else "").strip()
+    if not _intent:
+        _intent = "no carry-over - take the class with the most documents"
+    py("handoff.py", "--plan", '"%s"' % _intent[:180].replace('"', "'"))
+
     # 5. build
     built = "skipped"
     if "--no-build" not in argv:
