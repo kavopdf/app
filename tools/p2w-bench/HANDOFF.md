@@ -10,7 +10,7 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 14:21 |
-| ended | 14:57 |
+| ended | 15:07 |
 | how it ended | released |
 | plan | - |
 

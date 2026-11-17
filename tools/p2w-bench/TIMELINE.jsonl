@@ -97,3 +97,6 @@
 {"t": 1794908117.9396179, "ist": "15:05:17", "ev": "attempt", "d": "content-missing-partly-replaced -> reverted"}
 {"t": 1794908118.0671928, "ist": "15:05:18", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1794908120.8765178, "ist": "15:05:20", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1794908214.1393912, "ist": "15:06:54", "ev": "beat", "d": "chain.py: deciding whether to chain"}
+{"t": 1794908223.5252588, "ist": "15:07:03", "ev": "release", "d": "fixer released"}
+{"t": 1794908223.6157143, "ist": "15:07:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
