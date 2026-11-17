@@ -534,3 +534,36 @@ Do not re-test one without new evidence, and if you do, say what changed.
   re-convert all 213 and count how many .docx change - because this change touches every
   ruled table, not four of them, and the ratchet has to be paid for over the whole corpus in
   a slot that can afford it. The engine was reverted to HEAD after this measurement.
+
+- RULED OUT, THIS RUN (measured at corpus scale) - THE WRAP CHARGE RE-LAYS OUT 47 OF 213 AND
+  REGRESSES EVERY DOCUMENT IT TOUCHES. The previous run asked for the corpus diff before
+  anything else, and this is it. Built the charge exactly as the handoff specified: a Helvetica
+  advance-width helper (PDType1Font.HELVETICA / HELVETICA_BOLD), each cell's text split on its
+  own paragraph breaks, lines = ceil(textWidth / (spanTw - insetTw)), the row charged
+  max(declared rowHeightTw, lines x rowLineTw) written into w:trHeight, which is hRule="atLeast"
+  on the real-table path so the charge is a floor; the flow budget (writtenRowsTw) was made to
+  follow it, because a row the renderer lays out taller is taller for the flow after it too.
+  Re-converted all 213 with the unmodified HEAD engine and with the charge, and diffed the .docx
+  entry by entry:
+    * 47 of 213 documents change (22 %), all of them in word/document.xml only; 350 rows grow,
+      65 shrink (a table that outgrows its page is squeezed), the largest single row +161 pt
+      (360_restaurant_menu).
+    * MEASURED, not inferred: the 47 changed documents are the only ones that can move, so they
+      were measured against themselves on both engines (46 of 47; 01_stamp_rotated_15deg_upright
+      fails to render on both, soffice "no render"). Result: 0 improved, 40 WORSE, 6 flat.
+      Mean share@5px loss 10.66 % -> 32.63 % (lower is better). The target document,
+      041122-Account_Opening_Form, does not move at all (99.02 both, 11 pages both).
+  WHY IT IS WORSE, and this is the part the next run needs: the charge measures a cell's text
+  against its w:tblGrid column, and on several documents the grid does not describe the layout.
+  41_coloured_headings_white_bg is written as SIX grid columns (8876,570,8876,570,8876,570 tw =
+  1416 pt of grid on a 595 pt page) holding TWO cells, so the price column reads 28.5 pt wide
+  for the 30.6 pt text "340.00" and every row of a correct price list is charged two lines: the
+  page doubles its leading (trHeight 360 -> 500 on every row), which is visible in the render
+  and moves share@5px 0.0 -> 70.8. Two structural guards were built and measured and neither
+  fires here, because the table's own bounds (t.right - t.left) are wrong in the same way as the
+  grid, and spanC exists so the "fewer cells than columns" test passes: a grid this corrupt
+  cannot be caught by comparing it with itself. WHAT THAT MEANS: the width the charge needs is
+  not the grid, it is the width the RENDERER gives the cell (tcW after spans, or the page's own
+  cell rectangle), and until that is the number the charge reads, this mechanism cannot be
+  measured, only regressed. The engine was reverted to HEAD after this measurement; nothing from
+  it is in the tree. Full numbers in FINDINGS/wrap-charge-corpus-diff.md.
