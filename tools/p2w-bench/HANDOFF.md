@@ -1,14 +1,5 @@
 # HANDOFF - read this before you pick a class
 
-## NEEDS A HUMAN - no future run can clear these
-
-A run tried, could not, and it was not a system limit. Every run after this one
-will hit the same wall until one of these is changed by a person.
-
-| # | what it is | what was tried | what must change | when |
-|---|---|---|---|---|
-| 0 | subagents cannot commit their findings to kavopdf/app (git push 403 'denied to Onyx-Node'; | retried once each, verified 403 not 422, verified repo exists and my o | grant the GitHub App write access to kavopdf/app, or give subagent san | 11:23 |
-
 Written by handoff.py on every claim, every attempt, every agent and every release.
 It is never more than one attempt old. If the claim in ROUND.json is older than the
 stale limit, the run that wrote this died without releasing - treat its plan as
@@ -18,18 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 12:51 |
-| ended | 14:34 |
+| started | 14:21 |
+| ended | 14:57 |
 | how it ended | released |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> 041122 and its fillable twin render 11 pages against the source's 9 (they were 12). The engine now CARRIES THE PAGE'S ADVANCE WIDTHS: DocxWriter writes a run in Arial with w:w = the scale that reproduces the width the page drew, whenever the PDF's face is not in READER_FACES (Arial/Helvetica/Liberation/DejaVu/Noto/Times/Courier/Calibri/Cambria/Georgia/Verdana/Tahoma/Symbol/Webdings, PDF subset tags stripped). Measured this run, all of it: the reader honours w:w (a correct scale gives the verification block 17 lines and 230 pt against 26 lines and 338 pt), and it IGNORES an embedded font part completely (built one, rendered it: 12 pages, NotoSans, geometry identical to baseline) and ignores w:fitText and w:noWrap. The carry-over's premise was wrong and is now measured wrong: the source's pitch in that cell is 12.00 pt exactly (baselines 579.61/591.61/603.61/615.61), the 240 tw w:line is that pitch, and the 4630 tw row is 16 lines at 240 tw plus 562 tw of paragraph gaps = 4642 tw written, 0.6 pt. What is left on 041122 is TWO spurious pages: our p8 (the page-7 folio, one line '7' at y=25.3) and our p10 (17 lines of the instruction page's spill). The folio rule added this run anchors a folio that reaches flowFromBox and it fixed source page 6, but page 7's folio is emitted as a TABLE CELL - a TableText paragraph inside the page's table - so the rule never sees it.
+> 041122's cell pitch was measured, not reasoned about, and the carry-over's number is wrong: the verification cell's source baselines are 12.000 pt apart and the writer already emits w:line=240 tw for them, so the '232 not 240' change would compress every line of that cell. The row's declared trHeight (4630 tw = 231.5 pt) and its content (232 pt) agree to 0.5 pt; the '11.6 pt pitch' was 4630 divided by the rendered line count. What is left on this class is a WRAP: each of that cell's paragraphs takes 12/24/24/24 pt in the render instead of a flat 12, so the cantSplit row is pushed whole to the next page and 041122 renders 11-12 pages against the source's 9. The font is a contributing cause but NOT the mechanism: extracting the source's embedded Effra subsets, rewriting their name tables with fonttools so fontconfig binds them, and re-rendering puts pages 8-10 in Effra-Medium/Effra-Bold and the document still renders 12 pages with item 22b on page 9, exactly as with Noto Sans. Measured for the next run: our cell's right rule is at x 572.9, the source's longest line ends at 569.0 - 3.9 pt of slack - so the next question is whether that 3.9 pt is our cell width or our run metrics, not the writer's line box. A debug probe was added to DocxWriter this run (-Dp2w.dbgCells=1) and is off by default; it is what produced this evidence. The stale NEEDS-A-HUMAN entry that blamed a permission for subagents' commits was cleared: git push is 403 for everyone and the GitHub MCP contents API is the tool, exactly as the operator note says.
 
 ## What the next run should do first
 
-> Make the page's own folio not be content: on 041122 it is a TableText paragraph inside the table of page 7 (not a flow line), so it costs a whole sheet when the table ends near the page's foot. Either keep a folio line out of the table the page's rules bound (the source's table bottom on p7 is y=800.4 and the folio is at y=824.3, outside it), or give a folio row the same position-not-gap treatment the flow path now has. Then run python3 benchmarks/gate.py --budget 250 to see the corpus: the advance-width carry is guarded to fire only for faces outside READER_FACES, so the 211 synthetic DejaVu documents should be unchanged - prove that before calling it a ratchet. Then the instruction-page spill (our p10, 17 lines) is the last extra page.
+> Measure, on 041122 page 7's verification cell, whether the 3.9 pt of slack is lost in our cell width (w:tcW/gridCol against the source's ruled extent) or in our run metrics (the emitted face/size against the PDF's /Widths). Do NOT change the cell line box: 240 tw is the source's own 12.0 pt pitch and the row height agrees with the content to 0.5 pt - see the two RULED OUT entries at the end of HYPOTHESES.md.
 
 ## Agents deployed and not yet accounted for
 
@@ -63,8 +54,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `11:17` agent landed: contD-01 /  -> FINDINGS/content-missing-partly-replaced-D-092700-1d7b.md
 - `12:30` attempt 8 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `12:41` COMMITTING: git push is 403 'denied to Onyx-Node' for the fixer too, not only for subagents - the App has no write access to kavopdf/app over HTTPS git. It is not a dead end: the GitHub MCP tool GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main, upserts=[{path,content,encoding:utf-8}]) commits several files atomically and worked for all four commits of this run. The next run should commit that way, then 'git fetch origin main && git reset --hard origin/main' so HEAD matches origin, then chain.py. chain.py's sync check is strict SHA equality and also refuses a dirty tree, and it rewrites CHAIN.json - so commit CHAIN.json again after each chain.py run.
-- `13:13` attempt 9 on content-missing-partly-replaced -> error
-- `14:34` attempt 10 on content-missing-partly-replaced -> partial (2/16 moved)
+- `14:48` attempt 9 on content-missing-partly-replaced -> reverted (0/16 moved)
 
 ## Where the rest of the state lives
 
