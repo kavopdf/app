@@ -240,36 +240,24 @@ def main(argv):
     print("FIRE: chain depth %d of %d, dry %d of %d, %d open document(s) left"
           % (c["depth"], MAX_DEPTH, c["dry"], DRY_LIMIT, open_classes()))
     print("")
-    # A PLAIN TRIGGER DOES NOT WORK, and that cost a day to find.
+    # THE CRON TOOL IS NOT AVAILABLE TO A RUN. Verified by a run on 17 Nov, which wrote into
+    # CHAIN.json: "chain.py printed FIRE but the `cron` tool is not in this agent's tool list
+    # (tool_search finds only GitHub/HuggingFace job tools), so no trigger could be issued." It
+    # also removed the fire entry it had written, because it recorded a fire that did not happen.
     #
-    # The platform holds this run as 'running' until it ends - and on 17 Nov it never ended it at
-    # all: the 10:50 run finished its work, released the slot at 11:22 and was still 'running' at
-    # 12:00. While it believes a run is running it will not start another one, and a trigger is
-    # accepted and silently does nothing. That is why the 09:45, 10:45 and 11:45 scheduled runs
-    # never appeared.
-    #
-    # Replacing the cron is the only way to clear a run state the platform holds. It is what a
-    # human had to do by hand four times today; there is no reason a run cannot do it itself.
-    print("The next run cannot simply be triggered: the platform holds THIS run as 'running' until")
-    print("it ends, and on 17 Nov it never ended it at all. A trigger would be accepted and do")
-    print("nothing. Replace the cron and trigger the replacement - four calls, no judgement:")
+    # So a run cannot start another run. There is no way around that from inside the sandbox, and
+    # an instruction that says otherwise is a lie that costs a whole scheduled slot. What a run CAN
+    # do is end cleanly and quickly, so the next scheduled slot finds the slot free and the state
+    # honest - and that is the only lever it has.
+    print("FIRE: the work is handed over and this run should end now.")
     print("")
-    # BY NAME, NOT BY A STORED ID. The id in CHAIN.json goes stale the moment the cron is
-    # replaced - which is exactly what this instruction does every time it fires. On 17 Nov the
-    # stored id pointed at a cron deleted hours earlier, so a run following it literally would
-    # have failed on the first call. Look it up.
-    print("    cron action=list")
-    print("         find the cron whose name starts 'P2W 3/3 fixer' and use ITS id below")
-    print("    cron action=get    cron_id=<the fixer id from the list>")
-    print("         capture name, schedule, timezone and prompt from the reply")
-    print("    cron action=delete cron_id=<the same id>")
-    print("    cron action=create name=<same> schedule=<same> timezone=<same> prompt=<same>")
-    print("    cron action=trigger cron_id=<the id the create returned>")
+    print("This run cannot start the next one: the `cron` tool is not in a run's tool list, so no")
+    print("trigger can be issued. The next run starts at the next scheduled slot - the cron is")
+    print("'45 * * * *', so at the next :45.")
     print("")
-    print("Copy the prompt VERBATIM from the get. It is this run's entire instruction set and you")
-    print("are moving it, not editing it. If the get fails, do NOT create with a guessed prompt -")
-    print("say so in your report and stop; a cron recreated from memory is worse than a chain that")
-    print("did not fire.")
+    print("What you can do, and it matters: release, commit, and END. A run that keeps the slot")
+    print("held past :45 costs a whole scheduled slot, and today that is the difference between")
+    print("two runs an hour and one.")
     return 0
 
 
