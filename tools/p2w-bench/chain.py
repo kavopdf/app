@@ -254,9 +254,15 @@ def main(argv):
     print("it ends, and on 17 Nov it never ended it at all. A trigger would be accepted and do")
     print("nothing. Replace the cron and trigger the replacement - four calls, no judgement:")
     print("")
-    print("    cron action=get    cron_id=%s" % c["cron_id"])
+    # BY NAME, NOT BY A STORED ID. The id in CHAIN.json goes stale the moment the cron is
+    # replaced - which is exactly what this instruction does every time it fires. On 17 Nov the
+    # stored id pointed at a cron deleted hours earlier, so a run following it literally would
+    # have failed on the first call. Look it up.
+    print("    cron action=list")
+    print("         find the cron whose name starts 'P2W 3/3 fixer' and use ITS id below")
+    print("    cron action=get    cron_id=<the fixer id from the list>")
     print("         capture name, schedule, timezone and prompt from the reply")
-    print("    cron action=delete cron_id=%s" % c["cron_id"])
+    print("    cron action=delete cron_id=<the same id>")
     print("    cron action=create name=<same> schedule=<same> timezone=<same> prompt=<same>")
     print("    cron action=trigger cron_id=<the id the create returned>")
     print("")
