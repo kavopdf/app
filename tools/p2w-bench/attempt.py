@@ -315,6 +315,34 @@ def add(args):
     if args.ratchet is not None:
         row["ratchet_at"] = ist()
         row["ratchet_docs"] = args.ratchet
+    # CLASS-HISTORY.jsonl IS THE ONLY TRAJECTORY THE BRIEF TELLS A RUN TO READ.
+    #
+    # STEP 2b says `tail -12 tools/p2w-bench/CLASS-HISTORY.jsonl` and calls it "what is already
+    # known". The only writer was classify.py, which is retired - so the file froze on 13 Nov and a
+    # run reading it was reading a week-old trajectory and believing it was current. An instruction
+    # that points at a file nothing maintains is worse than no instruction: it answers a question
+    # with the wrong day.
+    #
+    # This is the live recorder, so this is where the trajectory belongs. Same shape as before, so
+    # every existing reader still parses it.
+    try:
+        _rnd = None
+        try:
+            _rnd = json.load(open(os.path.join(HERE, "ROUND.json"), encoding="utf-8")).get("round")
+        except Exception:
+            pass
+        with open(os.path.join(HERE, "CLASS-HISTORY.jsonl"), "a", encoding="utf-8") as _f:
+            _f.write(json.dumps({
+                "at": ist("%Y-%m-%d %H:%M"), "round": _rnd, "class": name,
+                "attempt": row["attempts"], "outcome": outcome,
+                "status": row.get("status"), "requeues": row.get("requeues", 0),
+            }, sort_keys=True) + "\n")
+    except Exception as _exc:
+        # Never swallowed: a history file that silently stops being written is the exact defect
+        # this is fixing.
+        print("warning: CLASS-HISTORY.jsonl not written - %s: %s"
+              % (type(_exc).__name__, _exc))
+
     row.setdefault("reasons", []).append(args.reason or "")
     row["reason"] = args.reason or "(no reason recorded for this attempt)"
     # A VISIBLE DEVIATION. The default is to deploy two or three agents on a class before working
