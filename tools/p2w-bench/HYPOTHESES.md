@@ -500,3 +500,20 @@ Do not re-test one without new evidence, and if you do, say what changed.
   patches/cantsplit-only-where-keepable.patch fires by itself and the page closes. It also
   explains, in one mechanism, why this document has resisted eleven attempts: every attempt
   keyed on a height the writer already computes agrees with the writer.
+
+- RULED OUT, THIS RUN (measured, and it made things WORSE) - DROPPING cantSplit ON A
+  WRAP-AWARE HEIGHT. The wrap estimate above was built for real: a Helvetica advance-width
+  helper (PDType1Font.HELVETICA / HELVETICA_BOLD, the standard-14 metrics PDFBox already
+  ships, within a few per cent of the DejaVu Sans these documents are set in), each cell's
+  text split on its own paragraph breaks, lines = ceil(textWidth / (spanTw - insetTw)), the
+  row charged lines x rowLineTw, and the cantSplit rule keyed on the larger of that, the
+  declared height and the emitted line boxes. It compiles and it runs. On 041122 it takes
+  the document from 10 pages to ELEVEN: p7 falls from 91 lines to 90, a one-line p8 appears
+  (maxy 35.3), and the instruction page is untouched at 683.6 with the same 17 lines spilling
+  to p10. So a row that the earlier rule kept whole now breaks, and the break itself costs a
+  page. THAT IS THE FINDING, and it redirects the fix: cantSplit is NOT the lever. With
+  hRule="atLeast" a split row leaves a fragment the renderer charges again, so removing the
+  promise can cost more than it saves. The page has to be closed by charging the row its real
+  height in w:trHeight - so the renderer lays the row out at 156 pt and breaks it ITSELF at
+  the foot of the sheet - not by removing cantSplit and hoping it breaks well. The engine was
+  reverted to HEAD after this measurement; nothing from this experiment is in the tree.
