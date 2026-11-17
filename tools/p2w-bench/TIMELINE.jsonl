@@ -162,3 +162,7 @@
 {"t": 1794924335.3985288, "ist": "19:35:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1794924335.68005, "ist": "19:35:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1794924347.2890341, "ist": "19:35:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1794924391.4912944, "ist": "19:36:31", "ev": "beat", "d": "chain.py: deciding whether to chain"}
+{"t": 1794924398.5513406, "ist": "19:36:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794924398.5632482, "ist": "19:36:38", "ev": "release", "d": "fixer released"}
+{"t": 1794924398.670614, "ist": "19:36:38", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
