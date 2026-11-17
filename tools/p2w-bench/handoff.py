@@ -26,6 +26,12 @@ The next run reads it before it reads anything else and before it picks a class.
 """
 import json, os, sys, time
 
+try:
+    from beacon import beat
+except Exception:
+    def beat(*a, **k):
+        pass
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 MD   = os.path.join(HERE, "HANDOFF.md")
 JS   = os.path.join(HERE, "HANDOFF.json")
@@ -124,6 +130,7 @@ def render(d):
 
 
 def main(argv):
+    beat("handoff.py", "reading or writing the handoff")
     d = load()
     if "--show" in argv or len(argv) == 1:
         render(d)

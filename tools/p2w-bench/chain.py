@@ -29,6 +29,12 @@ stops on any of these, and prints the reason:
 """
 import json, os, sys, time
 
+try:
+    from beacon import beat
+except Exception:
+    def beat(*a, **k):
+        pass
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 CHAIN = os.path.join(HERE, "CHAIN.json")
@@ -135,6 +141,7 @@ def open_classes():
 
 
 def main(argv):
+    beat("chain.py", "deciding whether to chain")
     c = load()
 
     if "--reset" in argv:

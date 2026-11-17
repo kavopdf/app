@@ -16,6 +16,12 @@ it. It cannot forget, and it cannot disagree with the measurement.
 """
 import csv, os, re, sys
 
+try:
+    from beacon import beat
+except Exception:
+    def beat(*a, **k):
+        pass
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
@@ -42,6 +48,7 @@ def load_rank(path=RANK):
 
 
 def main(argv):
+    beat("classrow.py", "refreshing the class file")
     write = "--write" in argv
     thr = DEFAULT_FIXED_BELOW
     if "--fixed-below" in argv:

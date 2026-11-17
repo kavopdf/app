@@ -15,6 +15,12 @@ told apart from a hope.
 """
 import csv, json, os, sys, time
 
+try:
+    from beacon import beat
+except Exception:
+    def beat(*a, **k):
+        pass
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 CLASSES  = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
@@ -125,6 +131,7 @@ def this_run():
 
 
 def main(argv):
+    beat("report.py", "building the report")
     total, solved, openc, docs, per_class = classes()
     co = corpus()
     tr = this_run()

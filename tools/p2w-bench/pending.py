@@ -23,6 +23,12 @@ Exit 1  pending - the items printed are the work, in the order they should be do
 """
 import json, os, sys, time
 
+try:
+    from beacon import beat
+except Exception:
+    def beat(*a, **k):
+        pass
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 HANDOFF  = os.path.join(HERE, "HANDOFF.json")
 ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
@@ -133,6 +139,7 @@ def collect():
 
 
 def main(argv):
+    beat("pending.py", "reading the pending gate")
     items = collect()
     if "--json" in argv:
         print(json.dumps({"pending": items, "count": len(items)}, indent=1))

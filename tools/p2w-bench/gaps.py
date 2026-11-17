@@ -24,6 +24,12 @@ reader is never guessing about whether the gap was there.
 """
 import json, os, sys, time
 
+try:
+    from beacon import beat
+except Exception:
+    def beat(*a, **k):
+        pass
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 TL = os.path.join(HERE, "TIMELINE.jsonl")
 DEFAULT_THRESHOLD_MIN = 5.0
@@ -107,6 +113,7 @@ def analyse(run, threshold_min):
 
 
 def main(argv):
+    beat("gaps.py", "reading the timeline")
     thr = DEFAULT_THRESHOLD_MIN
     if "--threshold" in argv:
         thr = float(argv[argv.index("--threshold") + 1])

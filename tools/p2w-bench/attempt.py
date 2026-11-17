@@ -45,6 +45,12 @@ import re
 import sys
 import time
 
+try:
+    from beacon import beat
+except Exception:
+    def beat(*a, **k):
+        pass
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
 LEDGER = os.path.join(HERE, "ATTEMPTS.json")
@@ -331,6 +337,7 @@ def show(args):
 
 
 def main(argv):
+    beat("attempt.py", "recording an attempt")
     ap = argparse.ArgumentParser()
     ap.add_argument("--class", dest="cls", default="")
     ap.add_argument("--outcome", default="")
