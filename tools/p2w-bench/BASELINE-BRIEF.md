@@ -30,14 +30,14 @@ pages, removed ink, 1 px jitter - and refuses to continue if it cannot read it b
 
 ## 2. Measure all 213 in this one run. Do not stop at the first chunk.
 
-`gate.py --budget 250` measures about 45 documents and stops, because a single sandbox command is
+`p2w.py --budget 250` measures about 45 documents and stops, because a single sandbox command is
 killed at 295 seconds. Running it once per run is why a round used to take five hours to measure a
 corpus that needs twenty-five minutes.
 
 **A cron run can issue many commands. Loop until the corpus is finished:**
 
     for i in 1 2 3 4 5 6 7 8; do
-      python3 /scratch/work/gate.py --budget 250
+      python3 /scratch/work/p2w.py --budget 250
       DONE=$(python3 -c "import json;print(json.load(open('/scratch/output/STATE.json'))['layers']['measurement'].get('complete'))" 2>/dev/null)
       echo "pass $i complete=$DONE"
       [ "$DONE" = "True" ] && break
