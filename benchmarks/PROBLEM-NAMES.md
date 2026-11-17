@@ -1,75 +1,57 @@
-# What each document's problem is called, and why
+# The problem names - what each one means, and where it comes from
 
-The ranking used to report a size. It now reports a name as well, and the name
-is derived from the numbers -- not from anyone's judgement, and not from
-opening a rendered image.
+Every scored document in `RANKING.csv` carries a `problem` beside its `signature`. Both are
+computed by `benchmarks/p2w.py` from the numbers alone - never from opening a rendered image and
+never from anyone's opinion about what the engine did.
 
-## The two axes that produce it
+`signature()` reads the SHAPE of the tolerance sweep. `problem_name()` reads the two axes together:
+how much ink is missing, how much is in the wrong place, and how far the worst of it is.
 
-    share@5px    what fraction of source ink has no counterpart within 5 px
-    invent5      what fraction of our ink has no counterpart in the source
-    max_pt       the furthest displaced ink, in points
+    signature(p):
+      clean          share@5px < 1.0            nothing to see
+      content-loss   share@10 > 0.8 * share@5   the ink is ABSENT, not moved - a wider
+                                                tolerance does not recover it
+      displacement   share@10 < 0.6 * share@5   the ink MOVED - a wider tolerance recovers it
+      mixed          otherwise                  both on one page
 
-Loss and invention together say whether content MOVED or is MISSING:
+    problem_name(sig, share5, invent5, max_pt):
+      none                                   share@5 < 1.0, or signature is clean
+      unmeasured                             signature is MEASURE-ERROR
+      content-missing-nothing-in-its-place   content-loss, invent5 < 2
+      content-missing-partly-replaced        content-loss, invent5 >= 2
+      content-partly-lost-and-displaced      mixed, invent5 > 0.7 * share5
+      content-partly-lost                    mixed, otherwise
+      single-element-far-out                 share5 < 8 and max_pt > 30
+      content-present-wholly-displaced       |share5 - invent5| < 0.3 * max(share5, 1)
+      content-present-partly-displaced       everything else
 
-    loss high, invention near zero   -> nothing was put in its place -> MISSING
-    loss high, invention high        -> the content moved             -> MOVED
-    loss high, invention partly high -> both
+`share@N` is the percentage of source ink that lands within N pixels of where it belongs.
+`invent5` is the percentage of our ink that has no source ink near it - text we put somewhere the
+PDF never had it.
 
-## The eight names
+## The names, in order of how much they hurt a user
 
-| name | condition | what it means for the user |
-|---|---|---|
-| `none` | share@5px < 1% | nothing wrong |
-| `content-missing-nothing-in-its-place` | loss high, invention < 2% | content is GONE. The worst kind: nothing can be recovered by reformatting. |
-| `content-missing-partly-replaced` | loss high, invention 2-70% | content gone, something else in its place |
-| `content-partly-lost` | loss high, invention > 70% of loss | some content gone, the rest displaced |
-| `content-partly-lost-and-displaced` | both, neither dominant | two defects on one page |
-| `content-present-wholly-displaced` | loss ~= invention | everything is there, all of it moved |
-| `content-present-partly-displaced` | loss ~= invention, partial | most is right, part moved |
-| `single-element-far-out` | share@5px < 8% and max_pt > 30 | one small thing (a stamp, a seal) is far from where it belongs |
-| `unmeasured` | the document failed to measure | fix the measurement before judging the document |
+1. **content-missing-nothing-in-its-place** - content is GONE and nothing was put in its place.
+   The worst outcome: the page is simply short of what it should say, and nothing looks wrong.
+2. **content-missing-partly-replaced** - content is gone, and something else sits where it was.
+   Worse to look at than the first, because it reads as a wrong document rather than a short one.
+3. **content-partly-lost-and-displaced** - two defects on one page: some text lost, the rest moved.
+4. **content-partly-lost** - some text lost, the remainder displaced.
+5. **content-present-wholly-displaced** - everything is there and all of it has moved. Recoverable
+   by moving it back; not by finding it.
+6. **content-present-partly-displaced** - most of it is right, a part has moved.
+7. **single-element-far-out** - one small thing (a stamp, a seal, a signature) far from home,
+   with the rest of the page correct. Visually the most obvious, textually the least damaging.
+8. **none** - nothing to do. A `none` document is `FIXED` in `DEFECT-CLASSES.md`, not `OPEN`.
+9. **unmeasured** - the instrument could not read this document. It is never dropped: it becomes
+   a MEASURE-ERROR row, and if it genuinely cannot be measured it is listed in
+   `tools/p2w-bench/EXEMPT.json` with a reason.
 
-## What the current corpus says
+## Two things this file is not
 
-    120  none
-     30  content-missing-nothing-in-its-place
-     15  content-present-wholly-displaced
-     14  content-missing-partly-replaced
-     12  content-present-partly-displaced
-     11  content-partly-lost
-      7  content-partly-lost-and-displaced
-      1  single-element-far-out
+It is not a diagnosis. A name says what the output looks like, never why - two documents can share
+a name and have entirely different causes in the engine.
 
-## Worked examples, read straight off RANKING.csv
-
-    415_inline_images        89.0%@5  inv  0.0%  max 153.1  text 100%
-      -> content-missing-nothing-in-its-place
-      Nothing was put where the four bars were. The image is absent, not moved.
-      This is the only true deletion in the corpus.
-
-    one-page-rotated-180     81.6%@5  inv 78.8%  max 177.6  text 100%
-      -> content-missing-partly-replaced
-      The source is an upside-down SCAN; our output is typeset text. The scan's
-      ink was replaced by glyphs. Text recall is 100%, so nothing was lost --
-      the ink changed medium. Do not read this as an ink defect.
-
-    itr-computation          68.8%@5  inv 65.2%  max 133.9  text 100%
-      -> content-partly-lost-and-displaced
-      Content present, geometry systematically off. Table rules and column
-      edges sit a few px out across the page.
-
-    75_merged_header_cell    27.6%@5  inv 31.1%  max  21.6  text 100%
-      -> content-present-wholly-displaced
-      Loss and invention are equal: every mark is there, all of it moved.
-
-    07_stamp_over_table       2.6%@5  inv  2.2%  max  66.2  text 100%
-      -> single-element-far-out
-      97% of the page is right. One stamp is 2.3 cm from where it belongs.
-
-## What this does NOT tell you
-
-It names the KIND of defect and sizes it. It does not say WHY the engine did
-it -- "inline images are not extracted" came from looking at a rendered pair
-(`p2w.py --diagnose`), not from these numbers. The name narrows the search;
-the fixer still has to find the cause.
+It is not a ranking of work. The fixer takes the class with the MOST DOCUMENTS, because one
+mechanism fixed once clears every document under it, and the most damaging class is not always the
+largest one.

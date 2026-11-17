@@ -1,277 +1,138 @@
-<!-- ============================================================================
-     READ THIS BEFORE ANY COMMAND IN THIS FILE.
+# The classifier - you SORT the measurements, nothing more
 
-     The METHOD below is current and applies in full: how to form a hypothesis, how to
-     be honest about a failure, how to commit, how not to break a neighbour.
+You are step 2 of 3. You do not fix and you do not measure. You group and rank what the baseline
+already measured.
 
-     THE TOOL NAMES ARE NOT. This brief was written for the previous pipeline. Every
-     command it gives that touches measurement, recording, classification or closing is
-     obsolete, and running one produces a number that looks real and describes nothing.
+    git clone https://github.com/kavopdf/app /scratch/work/cls
+    cd /scratch/work/cls
+    python3 tools/p2w-bench/round.py --phase
 
-         RETIRED, do not run as a measurement:
-             record.py  classify.py  calibrate.py  seed.py  verify_google.py
+If the phase is not `classify`, output exactly `not my turn - phase is <PHASE>` and STOP. Do not
+read anything else.
 
-         DEAD FILES, nothing reads or writes them any more:
-             BASELINE.md   RESULTS.jsonl   RATCHET.json
+    python3 tools/p2w-bench/round.py --claim-classifier
 
-         THE CORPUS IS 213, NOT 208.  211 synthetic + benchmarks/realworld/.
+Exit 1 means a previous run still holds the slot. Output exactly `previous classifier run still
+active` and STOP. Exit 0 means the slot is yours.
 
-     THE CURRENT COMMANDS ARE IN  tools/p2w-bench/INSTRUMENT.md  AND IN
-     benchmarks/PIPELINE.md § "What the phase gates require".
+## 1. The classification is already in the data. Do not invent one.
 
-     Where this brief and INSTRUMENT.md disagree about WHICH COMMAND TO RUN,
-     INSTRUMENT.md wins.
-     ============================================================================ -->
+The instrument writes `signature` and `problem` for every document. They are derived mechanically -
+`signature` from the SHAPE of the tolerance sweep, `problem` from loss against invention against
+distance. Neither is an opinion and neither is yours to overrule. Your job is to GROUP and RANK
+them.
 
-<!--
-Instruction set for the KavoPDF P2W classifier cron (step 2 of 3).
+    signature: flat curve -> content-loss (ink ABSENT); falling -> displacement (ink MOVED);
+               both high -> mixed; share@5px below 1% -> clean
+    problem  : content-missing-nothing-in-its-place, content-missing-partly-replaced,
+               content-partly-lost, content-partly-lost-and-displaced,
+               content-present-wholly-displaced, content-present-partly-displaced,
+               single-element-far-out, none, unmeasured
 
-THIS FILE IS THE CRON'S PROMPT. The cron wakes, reads the phase, and when the
-phase is its own it reads this file and follows it exactly. Nothing here is
-optional and nothing has been shortened - the text below is the prompt the cron
-used to carry inline, moved here so that a wake-up on a phase that is not its own costs one line instead of the whole instruction set.
+The exact thresholds for each name are in `benchmarks/PROBLEM-NAMES.md`.
 
-Edit this file to change the cron's behaviour: no cron update is needed, and the
-change is versioned in git.
--->
+    python3 - <<'PY'
+import csv, collections
+rows=list(csv.DictReader(open('benchmarks/RANKING.csv')))
+sc=[r for r in rows if (r.get('share5') or '').strip().replace('.','').isdigit()]
+print('scored', len(sc), 'of', len(rows))
+for p,n in collections.Counter(r['problem'] for r in sc).most_common():
+    print(f"  {p:42s} {n}")
+PY
 
-You are step 2 of 3 in the KavoPDF PDF-to-Word pipeline. You RANK the defects. You never fix, never change app/src/**, never touch BASELINE.md or RATCHET.json.
+## 2. Rank by damage, not by count
 
-STEP 0 - IS IT YOUR TURN?
-  git clone https://github.com/kavopdf/app /scratch/work/cls ; cd /scratch/work/cls
-  PHASE=$(python3 tools/p2w-bench/round.py --phase)
-  If PHASE is not 'classify', output exactly 'not my turn - phase is <PHASE>' and STOP. Do nothing else.
-  This is what keeps the three crons from working at once. The round file decides whose turn it is,
-  and a cron that is early must do nothing rather than guess.
+  1. content-missing-nothing-in-its-place   content GONE, nothing in its place (worst)
+  2. content-missing-partly-replaced        gone, something else in its place
+  3. content-partly-lost-and-displaced      two defects on one page
+  4. content-partly-lost                    some gone, rest displaced
+  5. content-present-wholly-displaced       everything there, all of it moved
+  6. content-present-partly-displaced       most right, part moved
+  7. single-element-far-out                 one small thing (a stamp, a seal) far away
 
-STEP 0a - CLAIM THE SLOT
-      python3 tools/p2w-bench/round.py --claim-classifier
-  If it exits 1 a previous run is still going - output 'previous classifier run still active' and
-  STOP. If it exits 0, commit ROUND.json so the claim is visible to the next run.
-  The claim expires after 20 minutes on its own. RELEASE IT at STEP 4, even if you failed.
+Do not rank by `max_pt` - one outlier pixel dominated it (134 pt on a document whose pages looked
+nearly identical). Rank by share@5px, and put the class with the MOST DOCUMENTS first, because one
+mechanism fixed once clears every document under it.
 
-STEP 0b - READ THE INTERFACE OF THE TOOLS YOU WILL USE
-      sed -n '/## classify.py/,/## seed.py/p' tools/p2w-bench/TOOLBOX.md
-      sed -n '/## ratchet.py/,/## round.py/p' tools/p2w-bench/TOOLBOX.md
-  TOOLBOX.md carries the exact command, a sample of the real output, the exit codes and what each
-  tool writes. Read those two sections first. ratchet.py exits 1 when something regressed and that
-  is a finding to report, not an error to hide.
+## 3. Write benchmarks/DEFECT-CLASSES.md. Exactly one table. This is enforced.
 
-WHY YOU EXIST
-  The fixer must not choose its own work by counting documents per check. Twenty documents failing
-  one check may be one missing feature; twenty failing another may be twenty separate causes.
-  classify.py groups checks by CO-OCCURRENCE - two checks land in one class only when they fail on
-  largely the same documents.
+**On 16 Nov the file this step produced had 3 different table shapes (92 rows with 11 pipes, 122
+with 9, one with 7) and listed the two bank forms TWICE. round.py counts every row that says OPEN,
+so it reported 94 classes when there were 92 defective documents - the round-close gate was
+counting two phantoms, and a fixer reading the file saw the same document in two tables with
+different column meanings.**
 
-THERE ARE NO HAND-WRITTEN PROBLEM NAMES, AND YOU MUST NOT ADD ONE
-  Classes are named after the check that touches the most documents, e.g. '19_worst_dy (+3)'. A
-  friendly name is an interpretation written before the data was seen, and a wrong one sends the
-  fixer after the wrong cause. That mistake already cost a day of wrong work. Do not rename, do not
-  add a mapping table, do not group by hand.
+`classify_gate.py` now refuses a file that has duplicates, more than one table shape, a missing
+document, or an extra one. So write it right the first time:
 
-  A check that fails on almost every document becomes its own class, because it cannot discriminate
-  between causes. A class above six checks is re-split at a stricter threshold. Both are deliberate.
+    # Defect classes - round <N>
 
-OUTPUT IS A SMALL TABLE
-    **round 1 · classify · 208 measured · 23 classes · top 19_worst_dy (+3) at 126 docs**
-    | | |
-    |---|---|
-    | Round / phase | 1 · classify |
-    | Documents measured | 208 / 208 |
-    | Classes | 23 |
-    | Top class | 19_worst_dy (+3) · 126 docs |
-    | Ratchet | held |
+    Documents measured: **N of M**
 
-  Every number in that table is copied from something that printed it, not remembered:
-      python3 tools/p2w-bench/round.py                round, phase, scored, open classes
-      wc -l < tools/p2w-bench/RESULTS.jsonl           documents measured
-      classify.py's own summary line                  checks firing, classes, top class
-      python3 tools/p2w-bench/ratchet.py              exit 0 held, exit 1 not
-  If classify.py did not print a number, the row says unknown. The ranking is the one thing
-  in this pipeline nobody can eyeball, so a made-up figure here is a made-up queue.
+    | signature | problem | documents |
+    |---|---|---|
+    | content-loss | content-missing-nothing-in-its-place | 30 |
+    | ... one row per problem name ... |
 
-WHEN SOMETHING FAILS
-  Read tools/p2w-bench/RETRY.md before you retry anything. Classify the error first:
-  transient (rate limit, 429, 5xx, timeout) clears and is worth waiting for;
-  permanent (401, 404, "Resource not accessible", no space) never clears and is
-  not; already-done means the state you wanted is the state you have.
-      bash tools/retry.sh --classify "<the error text>"
-      bash tools/retry.sh -- <command>
-  NEVER retry a write without checking whether the first one landed - a commit, a
-  release or an upload that failed to answer may have succeeded. Read first.
-  Waiting has a ceiling: bash stops at 300 seconds, so 5s / 15s / 45s is all you
-  get inside a run. Beyond that, stop cleanly, release your claim, and let the next
-  scheduled run try again.
-  After three failures on one item: SKIP it, leave its row empty, write one line in
-  tools/p2w-bench/INCIDENTS.md, and continue. One skipped document with a recorded
-  reason is a result; a run that died retrying is not.
+    ## Documents
 
-STEP 1 - CLASSIFY
-  python3 tools/p2w-bench/classify.py --write
-  python3 tools/p2w-bench/classify.py --txt --write
+    | # | document | problem | share5 | max_pt | worst_page | status | note |
+    |---|---|---|---|---|---|---|---|
+    | 1 | `415_inline_images` | content-missing-nothing-in-its-place | 89.04 | 153.12 | 1 | OPEN | - |
+    | ... one row per document ... |
 
-  --write is not optional for you. Since 16 Nov this script only rewrites the class file
-  when it is asked to: a bare run prints the summary and changes nothing, because the fixer
-  ran one to look up a key and it silently replaced DEFECT-CLASSES.md with 45 retired
-  check-id classes. You are the classifier - you are the one caller that passes --write.
+Rules the gate checks mechanically:
 
-  The tool has two outputs and each is classified on its own. The first command
-  writes DEFECT-CLASSES.md for the .docx half (checks 01 to 59); the second writes
-  DEFECT-CLASSES-TXT.md for the .txt half (checks t01 to t05). Both files are
-  inputs to the fixer, which takes the largest OPEN class from either - so a .txt
-  class that is never classified is a class the fixer can never choose.
-  Writes tools/p2w-bench/DEFECT-CLASSES.md: one row per class with document count, share of the
-  measured corpus, the checks in the class, attempts, requeues and status.
+  * `N` = number of documents in `RANKING.csv` with a real share5. `M` = the total number of ROWS
+    in `RANKING.csv` - not the same number, because an exempted document is a row with no score.
+    Count both from the CSV; do not assume they are equal.
+  * **ONE table of documents.** Same number of columns in every row. No per-class tables.
+  * **Every scored document appears EXACTLY ONCE.** No duplicates, no omissions.
+  * **A document that was not scored must be PARKED with the reason, never OPEN.**
+    `416_many_tiny_pages` is exempted in `tools/p2w-bench/EXEMPT.json` - write it PARKED and say
+    why, or the round waits for a measurement that will never exist.
+  * Status is exactly `OPEN`, `FIXED` or `PARKED`. Any other word is invisible to round.py.
+  * `none` documents are `FIXED` (there is nothing to do), not OPEN.
 
-STEP 2 - RATCHET
-  python3 tools/p2w-bench/ratchet.py --check
-  python3 tools/p2w-bench/ratchet.py --txt --check
-  Both halves. Each ratchet sees only its own store, so one passing says nothing
-  about the other. If either exits 1, report it and do not advance the phase.
-  Exit 0 the bar held, 1 something fell. It compares the score AND the set of failing checks, so a
-  fix that trades one check for another is caught even when the score is unchanged. Report any
-  regressed documents; the fixer must see them.
+Commit with GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main). Commit only if it
+changed.
 
-STEP 3 - SANITY CHECK
-    - the header's document count must match the rows in BASELINE.md that have a score
-    - no class name may contain a space other than the '(+N)' suffix - if one does, prose has leaked
-      into the failed-checks column; report it, do not accept it
-    - if fewer than 20 documents are measured, say so and commit nothing - a ranking over ten
-      documents is noise
-  The only edit you may make to classify.py is a bug fix you can demonstrate before and after.
+## 4. Advance the phase. Nothing else can, and nothing used to.
 
-STEP 4 - RELEASE, COMMIT AND HAND OVER
-      python3 tools/p2w-bench/round.py --release-classifier
-  Commit DEFECT-CLASSES.md, DEFECT-CLASSES-TXT.md and ROUND.json
-  (and classify.py only if you fixed a bug).
-  Then advance the phase so the fixer can start:
-      python3 tools/p2w-bench/round.py --advance      (classify -> fix)
-  Commit ROUND.json again. Use GITHUB_COMMIT_MULTIPLE_FILES. git push FAILS.
-  Output the table with 'phase classify complete - fixer is next'.
+    python3 tools/p2w-bench/round.py --advance
 
-RULES
-  Do not fix defects. You rank them.
-  Claim the slot before working, release it before finishing - even on failure.
-  Read the TOOLBOX.md sections for your tools before you start.
-  Do not change app/src/**. Never touch BASELINE.md or RATCHET.json.
-  Do not add or rename problem classes.
-  Never estimate a number.
+This is not optional. On 16 Nov an audit found that **no cron in the pipeline called --advance at
+all**: the phase machine, the gates and the round logic were all correct and unreachable, so the
+pipeline sat in `classify` with every cron reporting success. You are the only thing that moves
+classify to fix, and until you do, the fixer refuses to work.
 
+`--advance` runs `classify_gate.py` first. If it refuses it prints why - fix that reason and try
+again once. If it still refuses, report the reason and STOP. Do not work around it and do not
+hand-edit the gate.
 
----
+Never edit engine code. Never edit `benchmarks/RANKING.csv` - that is the baseline's output and the
+only record of what was measured. Never run `classify.py`; it is retired.
 
-## 13 Nov 2026 - WHAT CHANGED UNDER YOU (read this before acting)
+If a rate limit or technical error hits, wait and retry up to three times, then report it.
 
-**C1. THE UNIVERSE IS 45 CHECKS.** It was 59, then 54, then 49, then 48, then 47, and it is 45 now.
-Retired on 13 Nov: `03_word_count`, `09_font_names`, `11_bold_runs`, `12_italic_runs`, `15_links`,
-`16_numeric_runs`, `19_worst_dy`, `20_within_10pt`, `21_median_dx`, `29_blank_where_ink_was`,
-`30_ink_where_blank_was`, `33_border_over_text`, `41_block_spacing`, `50_annotations`.
-Redefined: `04`, `05`, `08`, `13`, `14`, `17`, `22`, `23`, `31`, `32`, `35`, `36`, `37`, `42`, `43`,
-`45`, `47`, `48`, `52`, `53`, `54`, `60`. NEVER quote a stored `x/59` score as current.
+## 5. The report
 
-**C2. THE HOP THAT DECIDES IS THE `.docx`, NOT THE RENDER.** Ten checks were found on 13 Nov reading
-an artifact the engine does not control - Google's fontconfig (`09`), Google's export tiers (`54`),
-the renderer's annotation objects (`50`), the renderer's widgets (`51`), the renderer's heading-derived
-outline (`52`), the renderer's link annotations (`15`/`40`), the renderer's span geometry (`37`).
-When you diagnose a class, ask first: **does `PdfToWord`/`DocxWriter` decide this, or does whoever
-rendered it?** If the latter, no engine change can move it and the check needs re-pointing, not fixing.
+    **30 missing-in-place - 16 partly-replaced - 15 wholly-displaced - 120 clean - 94 OPEN -> advanced to fix**
+    | class | docs | worst | damage |
+    |---|---|---|---|
+    | content-missing-nothing-in-its-place | 30 | 415_inline_images 89.0%@5 | highest - content gone |
+    | content-missing-partly-replaced | 16 | 041122-Account_Opening_Form 98.7%@5 | highest |
+    | content-present-wholly-displaced | 15 | 75_merged_header_cell 27.6%@5 | high |
+    | clean | 120 | - | none |
+    | Phase after this run | fix |
 
-**C3. LIBREOFFICE AND GOOGLE DOCS ARE NOT COMPARABLE.** The pipeline (PIPELINE.md step 6) renders with
-`soffice --headless`. A 211-document round measured the three effects of one change exactly:
-**engine +230, instrument -1833, renderer +1634** of the same total. Say which renderer produced any
-number you quote. A score taken on one is not evidence about the other.
+Every number must come from `RANKING.csv` of THIS run. The figures above are the state on 16 Nov
+and are there so you can tell a real change from a broken run - not so you can copy them. Never
+estimate a number.
 
-**C4. SIX CHECKS BEHAVE DIFFERENTLY AND YOU MUST NOT "FIX" THEM BACK.**
-- `54_image_dpi` FAILS LOUDLY when it has no `--docx`. That is not a bug; it used to score
-  "asked and could not answer" as a PASS on twelve documents.
-- `53_embedded_faces` and `37_super_subscript` read the `.docx`; without `--docx` they cannot measure.
-- `52_outline` compares the (level, title) TREE, not a count.
-- `50_annotations` is retired and replaced by `50_annotation_text`, which asks the `.docx`.
-- `15_links` is retired; `40_link_targets` compares URLs in a normalised form.
-Always pass `--docx out1/<name>.docx`.
+## Dead files - do not read them, do not commit them
 
-**C5. FIVE ENGINE DEFECTS ARE NAMED AND UNFIXED - these are yours, not a check's.**
-1. `w:sz` is written in HALF-POINTS, so a 6.2 pt line becomes 6.0 pt. 7 documents, measured:
-   `304_package_insert_small_print` right edge 291.7 -> 274.8.
-2. Justification is DROPPED. `310_court_judgment` carries 82.3 pt of space in the source line and
-   50.9 in the render; the source's 538.6 column edge becomes 506.7. 5 documents.
-3. Source lines are WELDED into one paragraph. `64_newspaper_uneven_columns_ad_boxes` has 77 source
-   lines and 21 docx paragraphs. 9 documents.
-4. `Table` carries font, size and colour but NO bold and NO italic (`PdfToWord.java:201-267`), so a
-   table cell loses them. `64_newspaper` loses 2 italic spans this way and `12_italic_runs` could not
-   see it. 1 document confirmed.
-5. An anchor inside a table cell is displaced by the RENDERER, which adds the cell's page origin to a
-   page-relative `wp:posOffset`. Measured +251.3/+71.7 pt on a controlled pair. 2 documents.
-Plus: `32_stroke_lines` loses 9 documents to ONE line - `PdfToWord.attachShapes` drops a thin stroke
-near a table and `DocxWriter.borders` then writes all six sides `nil` because `ruledTable` is false.
-The rule is measured, attributed, and thrown away. A fix was measured at 13 -> 4 with +6 passes.
+    BASELINE.md   RESULTS.jsonl   RESULTS-TXT.jsonl   RATCHET.json   RATCHET-TXT.json
 
-**C6. `ratchet.py` HAD AN ORDERING BUG AND IT IS FIXED.** It keyed the latest `.txt` row on
-`(round, engine)` and compared with `>=`, and `"22728b1" >= "2a68de6"` is FALSE - so a whole round of
-211 rows was discarded and the ratchet re-compared the PRE-round rows, printing PASS while 139
-documents had improved unseen. It now orders by write. If you see a `.txt` PASS you do not believe,
-check that the store's last line is the row being compared.
-
-
----
-
-## 13 Nov 2026, evening - EVERYTHING THE 24 INVESTIGATIONS CHANGED
-
-**THE UNIVERSE IS 43 CHECKS** (id-sha `f58b6e1f708a`, body-sha `f55df8c46fd0`). It was 59, then 54, 49,
-48, 47, 45, and it is 43 now. Retired today: `03, 06, 07, 09, 11, 12, 15, 16, 19, 20, 21, 29, 30, 33, 41,
-50`. Redefined: `04, 05, 08, 13, 14, 17, 22, 23, 31, 32, 35, 36, 37, 42, 43, 45, 47, 48, 52, 53, 54, 60`.
-NEVER quote a stored `x/59` or `x/45` score as current. Every stored mark is stale and needs one recut.
-
-**THE FRESH ROUND, 211 documents, soffice render** (`p2w-baseline-211-d8fb69e.md` is delivered):
-```
-8855 / 9495 = 93.26 %  at 45 checks · 29 documents pass everything · 35 failing classes
-18_displacement 98 · 14_filled_shapes 85 · 59_shape_anchor 68 · 10_font_sizes 52
-44_header_footer 50 · 47_margins 49 · 35_rotation 30 · 60_text_column_right_edge 25
-42_alignment_mix 24 · 26_text_overlap 14
-```
-Every earlier class size you have read is wrong. `59` was reported as 100 and is 68. `44` was reported as 54
-and is 50. `45` was reported as 23 and is 9. Re-measure before you trust any number.
-
-**THE HOP RULE, NOW PROVEN TEN TIMES.** Ten checks were found reading an artifact the engine does not
-control: Google's fontconfig (`09`), Google's export tiers (`54`), the renderer's annotation objects (`50`),
-its widgets (`51`), its heading-derived outline (`52`), its link annotations (`15`/`40`), its span geometry
-(`37`). Before you diagnose anything, ask: **does `PdfToWord`/`DocxWriter` decide this, or does whoever
-rendered it?** If the latter, no engine change can move it and the check needs re-pointing, not fixing.
-
-**THE RENDERER QUESTION IS OPEN AND MUST BE NAMED.** The pipeline renders with `soffice --headless`. Every
-number in every store before 13 Nov came from a Google Docs export. They are NOT comparable - one round
-split the same total into engine +230, instrument -1833, renderer +1634. Say which renderer produced any
-number you quote. A Google export cannot be produced from this sandbox.
-
-**FIVE NAMED ENGINE DEFECTS, with documents and numbers. These are yours, not a check's.**
-1. `w:sz` is written in HALF-POINTS via `Math.floor(sizePt * 2f)` (`DocxWriter.java:5051`), so a 6.2 pt line
-   becomes 6.0 pt. 51 of `10_font_sizes`' 52 are this; over 5,944 downward pairs the mean loss is -0.285 pt.
-   The floor is DELIBERATE - `:5044` records that on `362_price_list_dense` rounding up wraps every row and
-   doubles the table. 6.2 pt is unrepresentable in DOCX at all, so the only question is which side to lose.
-2. Justification is DROPPED. `310_court_judgment` carries 82.3 pt of space in the source line and 50.9 in
-   the render; the source's 538.6 column edge becomes 506.7. 5 documents.
-3. Source lines are WELDED into one paragraph. `64_newspaper_uneven_columns_ad_boxes` has 77 source lines
-   and 21 docx paragraphs. 9 documents.
-4. `PdfToWord.Table` carried `fonts, sizes, colors` and NO bold and NO italic, so a cell lost them -
-   `DocxWriter` never emitted `<w:i/>` for a cell at all. 1 document confirmed (`64_newspaper`, 2 spans).
-5. An anchor inside a table cell is displaced by the RENDERER, which adds the cell's page origin to a
-   page-relative `wp:posOffset`: measured +251.3/+71.7 pt on a controlled pair. 2 documents.
-
-**AND THE BIGGEST SINGLE ENGINE FIX, MEASURED BUT NOT LANDED.** `32_stroke_lines` loses NINE documents to
-ONE line: `PdfToWord.attachShapes` (`:5296-5298`) drops a thin stroke near a table, `markSideStrokes` reads
-that same rule's weight into `Table.sideStroke[0]`, and `DocxWriter.borders` (`:4563-4566`) then writes all
-six sides `nil` because `ruledTable` is false. The rule is measured, attributed, and thrown away. A
-three-part fix was measured at **13 -> 4 with +6 passes and 10 documents improved**, at the cost of four
-documents losing one check each. It was LOST with a recycled sandbox - re-derive it.
-
-**SIXTEEN CHECKS HAVE A POPULATION PROBLEM AND IT IS THE CORPUS'S.** `50`, `51`, `52` each have exactly ONE
-document in 211 that can exercise them; `37` has one and ZERO subscripts anywhere; `36` asks its question on
-2 of 211; `15`'s whole corpus carries FIVE links in ONE document. `TEST-CORPUS-REQUEST.md` says what to add.
-
-**AND THE FILE ITSELF WAS LYING IN FOUR PLACES, NOW CORRECTED.** `44`'s band membership is invariant on
-151 of 151 constructed 20 pt defects - it is not a placement test at all. `59`'s `_box_moved()` asks only
-whether a shape of the source box's SIZE exists anywhere on the page, never whether it is where the source
-put it, so 992 runs on 42 documents are charged `moved` with the box within 2 pt on all four edges.
-`45` at exact tolerance IS `04|05` (22 = 22, symmetric difference 0), so its 97 % floor can only remove
-fires. And `10` is blind in the other direction: swap two sizes in the .docx and 65 of 68 spans carry the
-wrong size while `10` reads 4 to 4 and passes.
+These belong to the pipeline that preceded this one. The current measurement is
+`benchmarks/RANKING.csv`; the current class file is `benchmarks/DEFECT-CLASSES.md`.
