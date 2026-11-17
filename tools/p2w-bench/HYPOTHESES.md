@@ -517,3 +517,20 @@ Do not re-test one without new evidence, and if you do, say what changed.
   height in w:trHeight - so the renderer lays the row out at 156 pt and breaks it ITSELF at
   the foot of the sheet - not by removing cantSplit and hoping it breaks well. The engine was
   reverted to HEAD after this measurement; nothing from this experiment is in the tree.
+
+- RULED OUT, THIS RUN (measured) - CHARGING THE ROW ITS WRAPPED HEIGHT CASCADES. Built the
+  same way as the previous entry (Helvetica standard-14 advances, per paragraph
+  ceil(textWidth / (spanTw - insetTw)), the row charged max(declared, wrapped) x rowLineTw)
+  but written into w:trHeight itself - hRule is "atLeast", so the floor is what the renderer
+  will not go below - and cantSplit left alone. It works on the row it was aimed at: the
+  instruction page's content now runs to 711.5 instead of 683.6, so the breaking row really
+  did grow. The document is still ELEVEN pages, and the reason is the cascade: p7 falls from
+  91 lines to 90 and a one-line p8 appears, because rows that used to fit the page are now
+  charged more and one of them crosses. Charging every under-charged row at once is not a
+  one-row fix - it re-lays out every table in the document and the page count is decided by
+  the whole sequence, not by the row that overflows. WHAT THAT MEANS FOR THE NEXT RUN: the
+  wrap charge is the right mechanism (it is the only one that explains 111 pt charged against
+  156 pt laid out), but it cannot be landed blind on one document. Do the corpus diff FIRST -
+  re-convert all 213 and count how many .docx change - because this change touches every
+  ruled table, not four of them, and the ratchet has to be paid for over the whole corpus in
+  a slot that can afford it. The engine was reverted to HEAD after this measurement.
