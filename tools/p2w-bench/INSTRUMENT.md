@@ -1,3 +1,5 @@
+<!-- RETIRED - see tools/p2w-bench/RETIRED.md. This file describes the check-id pipeline, which the live pipeline does not run. Do not read it as current. -->
+
 # INSTRUMENT — the only commands that measure anything
 
 This file is authoritative. The four briefs (`BASELINE-BRIEF.md`, `CLASSIFIER-BRIEF.md`,

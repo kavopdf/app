@@ -22,10 +22,12 @@ not `git apply`.
 | `run-size-from-sizePt-not-Tf` (x2, duplicate) | PdfToWord | **REJECT** - `392_statistical_console_output` 1.61 -> 13.94 |
 | `wrap-charge-gated-1.04` | DocxWriter | **REJECT** - `76_devanagari_table` 7.91 -> 54.99 |
 | `wrap-charge-face-aware` | DocxWriter | **REJECT** - `76_devanagari_table` 7.91 -> 54.99 |
-| `ruled-band-by-overlap-not-centre` | PdfToWord | not run - `patches/README.md` records that its mechanism moves nothing |
+| `ruled-band-by-overlap-not-centre` | PdfToWord | **REJECT** - `392_statistical_console_output` 1.61 -> 13.94 |
 
-**Not one of the 29 can be kept.** Twenty-three cannot be applied at all, three regress a document,
-one is neutral and one was already recorded as moving nothing.
+**Not one of the 29 can be kept.** Twenty-three cannot be applied at all, four regress a document and
+one is neutral. The last to be measured, `ruled-band-by-overlap-not-centre`, drives
+`392_statistical_console_output` to exactly 13.94 - the same number `run-size-from-sizePt-not-Tf`
+produces - which says the two share a mechanism rather than each having its own.
 
 `run-size-from-sizePt-not-Tf` is the interesting one. It takes `360_restaurant_menu` from **34.43 to
 1.31** - a 96 % improvement, the largest single-document gain anyone has measured in this corpus - and

@@ -1,3 +1,5 @@
+<!-- RETIRED - see tools/p2w-bench/RETIRED.md. This file describes the check-id pipeline, which the live pipeline does not run. Do not read it as current. -->
+
 # Google-render baseline
 
 Every document, measured by `verify_google.py` against the PDF that Google Docs
