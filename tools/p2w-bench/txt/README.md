@@ -66,8 +66,9 @@ again at the end:
                   change may be kept; the gate's job is only to make sure nobody can claim a txt
                   result while a docx number moved underneath it.
 
-**AND THE OTHER DIRECTION MATTERS TOO.** DocxWriter mutates page.blocks, which is what TxtWriter
-walks, so a docx-motivated change can move the txt. `txt_gate.py --watch-docx` records the SHA-256 of
+**AND THE OTHER DIRECTION MATTERS TOO.** `DocxWriter.orderStamps()` mutates page.blocks - line 4757
+is `blocks.removeAll(stamps)`, and there are two mutation sites in that method against zero in
+`DocxWriter.write()` - and TxtWriter walks page.blocks, so a docx-motivated change can move the txt. `txt_gate.py --watch-docx` records the SHA-256 of
 RANKING-TXT.csv before a docx change and checks it after, exactly as the docx hash is checked after a
 txt change. One direction is not enough: the shared model makes the dependency two-way even though
 only one writer writes it.

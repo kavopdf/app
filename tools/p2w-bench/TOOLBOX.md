@@ -197,9 +197,12 @@ A conversion writes ONE output, chosen by the format the user picked:
     ToolsActivity.kt:600   if (asTxt) TxtWriter.write(result, out) else DocxWriter.write(result, out)
 
 The two writers are separate files - `TxtWriter.java` (568 lines, references DocxWriter nowhere)
-and `DocxWriter.java` (7196 lines, never touches the txt). What they share is `PdfToWord.java`,
-which parses once and builds the model both read. So an engine change can move both outputs even
-though no single conversion produces both, and both ratchets must be run.
+and `DocxWriter.java` (7219 lines, whose `write()` does not touch the txt). What they share is
+`PdfToWord.java` (9677 lines), which parses once and builds the model both read, and which also
+carries the .txt entry point `writeTxt()`. One file in `DocxWriter` does move the txt:
+`orderStamps()` mutates `page.blocks` at line 4757 and `ReadingOrder` calls it before either writer
+runs. So an engine change can move both outputs even though no single conversion produces both, and
+both ratchets must be run.
 
 ## round.py — whose turn it is
 

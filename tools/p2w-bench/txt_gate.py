@@ -72,8 +72,10 @@ def main(argv):
     os.makedirs(TXT, exist_ok=True)
     docx_before = sha(DOCX_RANK)
 
-    # THE OTHER DIRECTION. A docx-motivated change can move the txt, because DocxWriter mutates
-    # page.blocks and TxtWriter walks it. --watch-docx snapshots the txt scores before such a change;
+    # THE OTHER DIRECTION. A docx-motivated change can move the txt, because DocxWriter.orderStamps()
+    # mutates page.blocks (line 4757, blocks.removeAll) and TxtWriter walks it. Note it is that
+    # method and not the file: DocxWriter.write() has zero mutation sites.
+    # --watch-docx snapshots the txt scores before such a change;
     # --check-docx compares them after. Without this the gate only ever caught txt breaking docx, and
     # the failure that actually happened (SECTOR 19, 11 of 211 documents) went the other way.
     if "--watch-docx" in argv:
@@ -96,7 +98,7 @@ def main(argv):
             print("  txt untouched: RANKING-TXT.csv is %s, unchanged by the docx work" % now)
             return 0
         print("  TXT MOVED DURING DOCX WORK: RANKING-TXT.csv was %s, now %s." % (was, now))
-        print("  DocxWriter mutates page.blocks and TxtWriter walks it, so this is expected unless")
+        print("  DocxWriter.orderStamps() mutates page.blocks and TxtWriter walks it, so this is")
         print("  the change was meant to be docx-only. Re-score the txt and say so in the report.")
         return 1
 
