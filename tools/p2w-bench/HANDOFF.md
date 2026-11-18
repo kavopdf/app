@@ -9,18 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 14:50 |
+| started | 15:58 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> STEP 3/3 fixer, class content-partly-lost-and-displaced (7 docs). Root cause on its worst document, itr-computation-with-slab-table (68.82 share@5): the PDF draws its last table past the bottom of its own sheet (rules at 848.4/866.8/885.2 on an 841.9 pt page, clipped by every viewer), the engine reproduced those rows, its model of the page needed 908 pt against an 841.8 pt budget, and the fitter answered the overrun with a GLOBAL squeeze (f=0.875) that came off every gap on the sheet including the top of the page - first paragraph w:before 1057 -> 392 twips, whole page 33.6 pt high, 65% of the ink invented and 69% of the source ink >5px from ours. Fix: DocxWriter.table() clips rows whose top edge is below the paper (keepRows) and cuts the straddling row at the edge (rowCapTw). Measured 68.82 -> 50.80 share@5, median 9.60 -> 4.80, p90 36.96 -> 16.32. Class screen 7 measured, 1 better, 6 same, 0 worse. CORPUS RATCHET: 210 of 213 compared (416_many_tiny_pages 300 pages not finished, 77_arabic and 79_inr failed to render), 1 better, 0 worse, 209 unchanged. Recorded as a kept ratchet attempt. Full diagnosis in FINDINGS/content-partly-lost-and-displaced-CLIP-1521.md.
+> STEP 3/3 fixer, class content-partly-lost-and-displaced. The handoff's carry-over was worked and its diagnosis REFUTED by measurement: the 50.80 residual on itr-computation-with-slab-table is not the f=0.974 squeeze and not an anchorable footer. The footer is a ROW of table 3, not a flow line (traceLines: zeroGap=0, the anchor branch never runs on it), and releasing the squeeze - capping the clipped table's charge at the page budget, needTw 17278 -> 16836, f 0.974 -> 0.994 - made the document WORSE, 50.80 -> 70.85. Both changes built, screened and reverted; engine is back to 1ba86d7 and re-screened at 50.80 (1 same). What the rendered page really shows, line by line: every table cell sits 5.2 pt high (cellBeforeTw's fallback treats rowLineTw, 190 twips, as if it were the row's 368-twip pitch), the first three header lines are in the wrong reading order, and the footer row is emitted between the last two rows. Also cleared: the three documents the 14:30 ratchet could not measure are not blocked - 77_arabic (11.89) and 79_inr (0.74) measure on the first try, and 416_many_tiny_pages measured all 300 pages in one 211 s call with scipy. Evidence: FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md.
 
 ## What the next run should do first
 
-> Finish itr-computation-with-slab-table (50.80). Its remaining 22 pt of overrun is the running footer, which the page draws at y=811 INSIDE table 3's band while the flow can only place it after the table's clipped bottom at 841, so the page still squeezes at f=0.974 and every row drifts -0.45 pt. The anchor rule is already described in DocxWriter's zero-gap branch (~line 4235): the comment says a line the page drew above the flow's position is anchored at its own y, but the code only counts it and writes before=0. Implement that, re-screen this document (screen.py --docs itr-computation-with-slab-table). Second: finish the three documents the ratchet could not measure - 416_many_tiny_pages (300 pages, needs ~5 calls of measure_doc_chunked), 77_arabic_rtl_document and 79_inr_indian_digit_grouping_table (soffice 'no render', re-run them). Third: this class CAN now be closed - attempt.py takes --best-drop and keeps an attempt when one document moved >= 5.0 share points (5d3965a), so the 18.02-point fix on itr-computation-with-slab-table counts even though only 1 of 7 moved. Pass --best-drop when you record it.
+> Do NOT re-open the squeeze or the anchor rule on itr-computation-with-slab-table - both are measured and refuted (FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md). The largest single term there is the cell baseline: cellBeforeTw's fallback is LINE_BASE*(rowLineTw - cellBoxTw) and rowLineTw is the cell's LINE capped at 200 twips, not the row's pitch, so in a tall row (18.4 pt) every cell lands 5.2 pt high. Screen that on the table documents that already score well (320_balance_sheet_statutory, 404_sudoku_grid, 42_table_coloured_header_alternating_rows) BEFORE touching it - it changes every table on the corpus. Second, and cheaper: the class still needs the human decision in BLOCKERS 14:50 (6 of 7 documents are already under 5.0; attempt.py's bar cannot close it). Third: measure_doc_chunked reports pages_done=160 pages_total=300 beside a complete result and pages_compared=1200 - check its accumulator before the next 300-page document.
 
 ## Agents deployed and not yet accounted for
 
@@ -38,7 +38,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `16:19` tooling: p2w.py waits for soffice's output (measured: bank form 89 s to a complete PDF, process still alive at 240 s); render cache keyed by docx size+mtime; soffice_pdf clears its output paths and requires mtime >= launch. scipy installed (EDT per page 25 s -> 1.6 s).
 - `11:16` attempt 7 on content-missing-partly-replaced -> partial (1/13 moved)
 - `11:16` agent deployed: content-missing-partly-replaced / A2 - why does parasOfLines reject the six heading lines of 041122 page 7
 - `11:16` agent deployed: content-missing-partly-replaced / D - how many corpus documents have a cell whose lines start left of the first line
@@ -63,6 +62,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `13:44` attempt 1 on single-element-far-out -> partial (1/1 moved)
 - `14:51` attempt 1 on content-partly-lost-and-displaced -> partial (1/7 moved)
 - `15:28` attempt 2 on content-partly-lost-and-displaced -> kept (1/210 moved)
+- `16:11` attempt 3 on content-partly-lost-and-displaced -> reverted (0/7 moved)
 
 ## Where the rest of the state lives
 

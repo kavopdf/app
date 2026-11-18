@@ -83,7 +83,7 @@ only a work queue.
 | 44 | `11_stamp_with_signature_image` | content-missing-partly-replaced | 2.91 | 2.77 | 1 | OPEN | - |
 | 45 | `317_rti_response` | content-missing-partly-replaced | 13.97 | 2.18 | 1 | OPEN | - |
 | 46 | `gst-invoice-with-qr-code` | content-missing-partly-replaced | 3.61 | 1.24 | 1 | OPEN | - |
-| 47 | `itr-computation-with-slab-table` | content-partly-lost-and-displaced | 86.47 | 68.82 | 1 | OPEN | - |
+| 47 | `itr-computation-with-slab-table` | content-partly-lost-and-displaced | 86.47 | 50.80 | 1 | OPEN | - |
 | 48 | `table-with-merged-cells` | content-partly-lost-and-displaced | 17.50 | 4.93 | 1 | OPEN | - |
 | 49 | `14_stamp_chars_positioned_td` | content-partly-lost-and-displaced | 5.27 | 3.89 | 1 | OPEN | - |
 | 50 | `newspaper-2col-fullwidth-headline` | content-partly-lost-and-displaced | 17.98 | 3.46 | 1 | OPEN | - |

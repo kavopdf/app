@@ -10,3 +10,4 @@
 {"at": "2026-11-18 13:44", "attempt": 1, "class": "single-element-far-out", "outcome": "partial", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-18 14:51", "attempt": 1, "class": "content-partly-lost-and-displaced", "outcome": "partial", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-18 15:28", "attempt": 2, "class": "content-partly-lost-and-displaced", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-18 16:11", "attempt": 3, "class": "content-partly-lost-and-displaced", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
