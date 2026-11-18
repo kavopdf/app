@@ -195,7 +195,114 @@ def obstacles():
     a run that hit one wall it could not clear looked identical to a run that hit nothing at all.
     """
     path = os.path.join(ROOT, "tools", "p2w-bench", "BLOCKERS.md")
-    today = (_json(RUN, {}).get("started") or "")[:10]
+    # THE DATE COMES FROM started_ts, THE ONLY FIELD THAT IS ACTUALLY A DATE. `started` is a bare
+    # HH:MM ("14:50"), so taking its first ten characters gave "14:50" and testing that as a prefix
+    # of each row's "2026-11-18 13:00" matched nothing - the report said "0 cleared, 0 need a human"
+    # about a run that had appended eleven rows. The fixer fixed exactly this at 13:48 and a later
+    # rewrite of this file put the bug back; it is written this way so it does not come back again.
+    import datetime as _dt
+    today = ""
+    _ts = _json(RUN, {}).get("started_ts")
+    if _ts:
+        try:
+            today = _dt.datetime.fromtimestamp(float(_ts) + 19800).strftime("%Y-%m-%d")
+        except Exception:
+            today = ""
+    if not today:
+        today = (_json(RUN, {}).get("started") or "")[:10]
+    rows = []
+    try:
+        for line in open(path, encoding="utf-8"):
+            if not line.startswith("| ") or line.startswith("|---"):
+                continue
+            c = [x.strip() for x in line.strip().strip("|").split("|")]
+            if len(c) < 6 or c[0].lower().startswith("time"):
+                continue
+            if today and not c[0].startswith(today):
+                continue
+            rows.append({"can": c[4], "wall": c[2]})
+    except Exception:
+        return {"mine": 0, "human": 0, "last": ""}
+    def cleared(r):
+        t = (r["can"] or "").lower()
+        return t.startswith(("yes", "fixed", "solved", "cleared", "done"))
+    mine = [r for r in rows if cleared(r)]
+    human = [r for r in rows if not cleared(r)]
+    return {"mine": len(mine), "human": len(human),
+            "last": human[-1]["wall"][:110] if human else ""}
+
+
+def silences():
+    """What the run was doing while it looked dead.
+
+    A fixer run is watched from outside, and from outside a long stretch with no commit and no beat
+    is indistinguishable from a crash. Measured 18 Nov: the 09:54 run was reported as possibly dead
+    at 11:05 because the last committed beat was 10:55 - and it was running the 213-document ratchet,
+    one command that takes forty minutes and writes nothing until it returns.
+
+    THE WINDOW IS EPOCH ARITHMETIC. RUN.json carries started_ts and ended_ts; "ist" is a bare
+    HH:MM:SS that cannot tell one day from another. Three earlier versions of this function compared
+    strings and reported silences that were really the gap between one run and the next - 1351
+    minutes once, 611 another time. When the timestamps are missing the window is skipped rather
+    than guessed.
+    """
+    try:
+        run = _json(RUN, {})
+        lo = run.get("started_ts")
+        hi = run.get("ended_ts") or (time.time() if lo else None)
+        if not lo:
+            return {"available": False}
+        lo, hi = float(lo), float(hi)
+        path = os.path.join(ROOT, "tools", "p2w-bench", "TIMELINE.jsonl")
+        rows = []
+        for line in open(path, encoding="utf-8"):
+            try:
+                d = json.loads(line)
+            except Exception:
+                continue
+            t = d.get("t", 0)
+            if lo - 5 <= t <= hi + 5:
+                rows.append(d)
+        rows.sort(key=lambda r: r.get("t", 0))
+        if len(rows) < 2:
+            return {"available": False}
+        gaps = []
+        for k in range(len(rows) - 1):
+            g = rows[k + 1].get("t", 0) - rows[k].get("t", 0)
+            if g >= 120:
+                gaps.append({"min": round(g / 60.0, 1), "at": rows[k].get("ist", ""),
+                             "doing": (rows[k].get("d") or "")[:70]})
+        gaps.sort(key=lambda x: -x["min"])
+        return {"available": True, "beats": len(rows), "n": len(gaps),
+                "longest": gaps[0] if gaps else None}
+    except Exception:
+        return {"available": False}
+
+
+def obstacles():
+    """Walls this run hit, split into the ones it cleared and the ones a human must clear.
+
+    BLOCKERS.md has recorded every wall since the pipeline began, with a column headed "can I fix
+    it" - the run's own verdict on whether it cleared the obstacle or a human has to. The report
+    never read that file: zero references. So the most useful thing a run can say was invisible, and
+    a run that hit one wall it could not clear looked identical to a run that hit nothing at all.
+    """
+    path = os.path.join(ROOT, "tools", "p2w-bench", "BLOCKERS.md")
+    # THE DATE COMES FROM started_ts, THE ONLY FIELD THAT IS ACTUALLY A DATE. `started` is a bare
+    # HH:MM ("14:50"), so taking its first ten characters gave "14:50" and testing that as a prefix
+    # of each row's "2026-11-18 13:00" matched nothing - the report said "0 cleared, 0 need a human"
+    # about a run that had appended eleven rows. The fixer fixed exactly this at 13:48 and a later
+    # rewrite of this file put the bug back; it is written this way so it does not come back again.
+    import datetime as _dt
+    today = ""
+    _ts = _json(RUN, {}).get("started_ts")
+    if _ts:
+        try:
+            today = _dt.datetime.fromtimestamp(float(_ts) + 19800).strftime("%Y-%m-%d")
+        except Exception:
+            today = ""
+    if not today:
+        today = (_json(RUN, {}).get("started") or "")[:10]
     rows = []
     try:
         for line in open(path, encoding="utf-8"):
