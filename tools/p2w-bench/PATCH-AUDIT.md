@@ -34,10 +34,17 @@ until 18 Nov the instrument could not measure reproducibly. Measured now against
 | `232f622` | table row separator, "kept 22/30" | **15 documents measured: 0 better, 0 worse.** The .docx bytes differ, the scores do not. |
 | `5e0af50` | "041122 page spill: 10 pages -> 9, p7 73.99 -> 0.00" | **does not reproduce.** `ead0d0e` already produces 9 pages for 041122 and already scores 98.65. |
 | `3232601` | "411_nested_xobject 48.64 -> 0.00" | **does not reproduce.** `ead0d0e` scores it 31.05, which is neither number. |
-| `0554e8c` | table-cell paragraph path | not tested |
+| `0554e8c` | table-cell paragraph path | **8 documents: 0 better, 0 worse against `ead0d0e`** |
 
 The claims were measured against an engine carrying other changes, not against `ead0d0e`. **Against
-the baseline that the pipeline actually accepts, none of the three tested commits adds anything.**
+the baseline that the pipeline actually accepts, none of the four commits adds anything.**
+
+A TRAP TO KNOW ABOUT, found while testing the fourth. `benchmarks/RANKING.csv` is no longer `ead0d0e`
+- it carries the fixer's DeviceGray-alpha fix from 11:56, so `415_inline_images` reads 0.00 there
+while every pre-fix commit produces 89.04. Comparing a pre-fix commit against today's RANKING.csv
+therefore shows 415 as a regression when it is only older. The baseline for judging a commit is
+`ead0d0e`'s own output, not the current ranking. Against `ead0d0e`, `0554e8c` is neutral like the
+other three.
 
 That is not a verdict that they are bad code - it is a verdict that they cannot be justified by the
 numbers they cite, and a commit nobody can justify does not go in.
