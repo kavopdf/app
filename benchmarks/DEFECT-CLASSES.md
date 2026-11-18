@@ -1,6 +1,6 @@
 # Defect classes - round 1
 
-Documents measured: **212 of 213**
+Documents measured: **213 of 213**
 
 Grouped and ranked from `benchmarks/RANKING.csv` only: `signature` and `problem` are the
 instrument's own mechanical names, not a judgement. Ranked by damage, and within a class
@@ -11,14 +11,18 @@ dominates it.
 
 | signature | problem | documents |
 |---|---|---|
-| content-loss | content-missing-nothing-in-its-place | 30 |
+| content-loss | content-missing-nothing-in-its-place | 29 |
 | content-loss | content-missing-partly-replaced | 16 |
 | mixed | content-partly-lost-and-displaced | 7 |
 | mixed | content-partly-lost | 11 |
-| displacement | content-present-wholly-displaced | 15 |
+| displacement | content-present-wholly-displaced | 16 |
 | displacement | content-present-partly-displaced | 12 |
-| displacement | single-element-far-out | 1 |
-| clean | none | 120 |
+| clean | none | 122 |
+
+`single-element-far-out` is closed: it held one document, `newsletter-3col-header-footer`, and
+no document carries the class any more. The class was defined by `share5 < 8 and max_pt > 30`;
+the 13:5x fix moved that document to `max_pt` 22.08, so the classifier now names it
+`content-present-wholly-displaced`. Counts above are recounted from RANKING.csv, 18 Nov 14:14.
 
 ## Documents
 
@@ -115,7 +119,7 @@ dominates it.
 | 89 | `27_two_column_left_short_txtpos` | content-present-partly-displaced | 19.61 | 1.62 | 1 | OPEN | - |
 | 90 | `392_statistical_console_output` | content-present-partly-displaced | 28.12 | 1.61 | 1 | OPEN | - |
 | 91 | `70_magazine_drop_cap_photo_caption` | content-present-partly-displaced | 26.06 | 1.49 | 1 | OPEN | - |
-| 92 | `newsletter-3col-header-footer` | single-element-far-out | 8.24 | 3.45 | 1 | OPEN | - |
+| 92 | `newsletter-3col-header-footer` | content-present-wholly-displaced | 8.08 | 3.13 | 1 | OPEN | reclassified from single-element-far-out: max_pt 77.28 -> 22.08 |
 | 93 | `34_monospace_document` | none | 0.93 | 4.8 | 1 | FIXED | no defect |
 | 94 | `eway-bill` | none | 0.91 | 31.2 | 1 | FIXED | no defect |
 | 95 | `67_two_col_with_sidebar` | none | 0.8 | 11.52 | 1 | FIXED | no defect |

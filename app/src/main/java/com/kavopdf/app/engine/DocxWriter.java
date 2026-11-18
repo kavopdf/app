@@ -2116,6 +2116,19 @@ public final class DocxWriter {
         // Everything after the columns - the running footer, and any picture or shape drawn on
         // the page - continues the flow from the last row's real bottom edge.
         ctx.afterTablePt = rowEndPt;
+        // ...AND THE FLOW HAS TO CONTINUE FROM IT, not merely record it. afterTablePt is read by
+        // the paragraph and the field-row paths; a TABLE placed after the columns reads
+        // flowTopPt() instead, and ctx.flowY was still wherever the last cell's own flow had got
+        // to - 70.2 pt above the row's bottom edge on newsletter-3col-header-footer. The stats
+        // band under the columns was therefore given a spacer equal to that whole gap and landed
+        // on the running footer: the page drew its first label at 688.6 and the substitute at
+        // 764.3, 75.7 pt out, with the band's last line at 797.7 against a footer at 802.3.
+        //
+        // The row is written with hRule="exact" (see the trHeight note above), so its bottom is
+        // rowEndPt to the twip and this is not an estimate: it is the same edge afterTablePt
+        // already carries, given to the one reader that was looking somewhere else.
+        ctx.flowY = rowEndPt;
+        ctx.flowBoxPt = 0f;
         ctx.lastBaseline = -1f;
         ctx.lastLinePt = 0f;
         ctx.newPage = false;

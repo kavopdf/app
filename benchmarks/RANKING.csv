@@ -64,9 +64,9 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 63,magazine-2col-pullquote-spanning,mixed,content-partly-lost,26.48,12.46,7.71,3.49,2.56,0.96,4.8,21.6,100.0,0,1,1
 64,370_offer_letter,content-loss,content-missing-partly-replaced,15.44,8.3,5.99,3.47,2.8,1.44,11.04,31.68,100.0,0,1,1
 65,newspaper-2col-fullwidth-headline,mixed,content-partly-lost-and-displaced,17.98,9.87,6.68,3.46,2.11,1.44,6.72,24.48,100.0,0,1,1
-66,newsletter-3col-header-footer,displacement,single-element-far-out,8.24,5.99,4.89,3.45,1.51,2.4,9.6,77.28,100.0,0,1,1
-67,406_passport_mrz_page,displacement,content-present-partly-displaced,6.27,5.17,4.41,3.45,1.94,2.88,12.96,15.84,98.21,8,1,1
-68,304_package_insert_small_print,mixed,content-partly-lost,25.97,12.05,6.18,3.41,2.3,0.96,4.32,21.12,100.0,0,1,1
+66,406_passport_mrz_page,displacement,content-present-partly-displaced,6.27,5.17,4.41,3.45,1.94,2.88,12.96,15.84,98.21,8,1,1
+67,304_package_insert_small_print,mixed,content-partly-lost,25.97,12.05,6.18,3.41,2.3,0.96,4.32,21.12,100.0,0,1,1
+68,newsletter-3col-header-footer,displacement,content-present-wholly-displaced,8.08,5.78,4.65,3.13,1.05,1.92,6.24,22.08,100.0,0,1,1
 69,bank-statement-5-pages,content-loss,content-missing-nothing-in-its-place,10.04,4.88,3.75,3.09,2.71,0.96,8.16,50.88,100.0,0,2,5
 70,352_certificate_ornate_border,content-loss,content-missing-partly-replaced,3.11,3.05,3.04,3.0,2.92,5.28,5.28,5.28,100.0,0,1,1
 71,11_stamp_with_signature_image,content-loss,content-missing-partly-replaced,2.91,2.84,2.8,2.77,2.67,14.88,21.6,25.92,100.0,0,1,1

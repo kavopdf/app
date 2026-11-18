@@ -128,9 +128,13 @@
   {
    "at": "11:55",
    "text": "attempt 6 on content-missing-nothing-in-its-place -> reverted (0/30 moved)"
+  },
+  {
+   "at": "13:44",
+   "text": "attempt 1 on single-element-far-out -> partial (1/1 moved)"
   }
  ],
- "next": "",
+ "next": "Take content-present-partly-displaced (12) or content-partly-lost (11) next - the small classes are gone. Two tooling walls are waiting for a decision, not a fix: attempt.py cannot keep an attempt on a 1-document class (max(2,25%)), and classrow.py cannot mark a document FIXED whose baseline was already below 5.0. Do not read FIXER-BRIEF.md end to end. A fresh pod needs /scratch/work/p2w/repo symlinked to the clone and p2w.corpus() called before screen.py will work; screen.py's cache stamp is the commit, not the working tree, so wipe screen-out after an uncommitted engine change or the screen reports a false FAIL.",
  "agents": [
   {
    "id": "contA-01",
@@ -194,9 +198,9 @@
   }
  ],
  "run": {
-  "started": "09:54",
-  "ended": "11:55",
-  "ended_how": "released"
+  "started": "12:58",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {
@@ -240,7 +244,7 @@
    "plan": ""
   }
  ],
- "context": "STEP 3/3 fixer, class content-missing-nothing-in-its-place (30 docs, now 29 - 415_inline_images is FIXED). KEPT AND RATCHETED (attempt 5, engine 5cd9e33): DeviceGray images were carried out with alpha = luminance, so every dark pixel of a grey picture was transparent - 415_inline_images drew a correct 120 pt square containing nothing at 89.04 share@5px with text_recall 100.0. Fix: PdfToWord.declaresTransparency() reads the PDF's own dictionary (/SMask, /Mask, SMaskInData, stencil) and forceOpaque() rewrites only the alpha byte when nothing is declared. Full 213-document ratchet: 212 compared, 0 regressions, 1 improvement (89.04 -> 0.00). Blast radius measured, not assumed: 415 is the only document of 213 with an inline image and there are zero DeviceGray XObject images. ATTEMPT 6 REVERTED with numbers: the table bottom-rule ladder is real (rungs of +0.50 pt per emitted w:tbl on mobile-bill/salary-slip/electricity-bill, proved by surgery on the .docx) and the one-term fix was built and screened - all five documents improved and none got worse, but only by 0.01-0.37 share@5px, so nothing crosses the 0.5 line and the ratchet could keep nothing. share@1px fell 47.66 -> 37.56 on mobile-bill, so the ladder is genuinely gone; the residual (median 1.44 -> 2.40 pt) is a DIFFERENT and larger defect, and that is where this class's next attempt should look. Tools fixed this run: gate.py wrote STATE.json only to /scratch/output so the repository's benchmarks/STATE.json could never record a ratchet (now writes both); attempt.py counted nothing for a run that made a fix and ratcheted it in the same slot (now keyed on class+moved, so a re-measurement is a no-op and a first measurement counts); the run's attempt hash had been derived while the fix was still uncommitted and was corrected to 5cd9e33.",
+ "context": "STEP 3/3 fixer, class single-element-far-out (1 doc: newsletter-3col-header-footer). FOUND AND FIXED A STATE BUG IN columnPage: after writing the newspaper-column layout table it set ctx.afterTablePt = rowEndPt but never advanced ctx.flowY, so the flow stayed 70.2 pt above the table's real bottom edge. A TABLE placed after the columns reads flowTopPt(), not afterTablePt, so the stats band under the columns got a spacer equal to that whole stale gap and landed on the running footer (labels at 764.3 where the page drew 688.6; band bottom 797.7 against a footer at 802.3). Fix: ctx.flowY = rowEndPt; ctx.flowBoxPt = 0f (DocxWriter.java, end of columnPage). Measured: share5 3.45->3.13, max_pt 77.28->22.08, p90 9.6->6.24, median 2.4->1.92. FULL CORPUS 213 of 213: exactly ONE document moved, none worse, none better by the 0.5 bar. classrow refuses FIXED because baseline share5 was already 3.45 (<5.0), so the row is OPEN with the new numbers and the class is closed by reclassification instead (max_pt 22.08 no longer meets the class rule max_pt>30).",
  "needs_human": [],
  "next_class": ""
 }

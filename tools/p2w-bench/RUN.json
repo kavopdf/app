@@ -1,23 +1,14 @@
 {
- "started_ts": 1794975899.0970533,
- "started": "09:54",
- "ended_ts": 1794983146.1114354,
- "ended": "11:55",
- "class": "content-missing-nothing-in-its-place",
- "attempts": 2,
- "kept": 1,
- "docs_improved": 1,
- "agents": [
-  "contA-02",
-  "contB-02"
- ],
+ "started_ts": 1794986881.2526083,
+ "started": "12:58",
+ "ended_ts": 1794989744.815181,
+ "ended": "13:45",
+ "class": "single-element-far-out",
+ "attempts": 1,
+ "kept": 0,
+ "docs_improved": 0,
+ "agents": [],
  "obstacles_cleared": 0,
  "needs_human": 0,
- "ratchets": 1,
- "counted": [
-  [
-   "content-missing-nothing-in-its-place",
-   1
-  ]
- ]
+ "partial": 1
 }

@@ -133,5 +133,31 @@
   ],
   "requeues": 0,
   "status": "OPEN"
+ },
+ "single-element-far-out": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-18 08:14",
+    "moved": 1,
+    "outcome": "partial",
+    "reason": "flowY was not advanced to the layout table's bottom edge after columnPage, so the block after the columns was given a spacer equal to the whole stale gap; the stats band landed on the running footer. ",
+    "total": 1
+   }
+  ],
+  "last": null,
+  "last_engine": "67e14a6",
+  "last_moved": 1,
+  "last_total": 1,
+  "outcomes": [
+   "partial"
+  ],
+  "reason": "flowY was not advanced to the layout table's bottom edge after columnPage, so the block after the columns was given a spacer equal to the whole stale gap; the stats band landed on the running footer. newsletter-3col-header-footer share5 3.45->3.13, max_pt 77.28->22.08. Corpus 213: one document moved, none worse.",
+  "reasons": [
+   "flowY was not advanced to the layout table's bottom edge after columnPage, so the block after the columns was given a spacer equal to the whole stale gap; the stats band landed on the running footer. newsletter-3col-header-footer share5 3.45->3.13, max_pt 77.28->22.08. Corpus 213: one document moved, none worse."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
  }
 }

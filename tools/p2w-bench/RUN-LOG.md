@@ -181,3 +181,5 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 17 Nov 23:43 | classifier | slot claimed - classifier running |
 | 18 Nov 09:54 | fixer | slot claimed - fixer running |
 | 18 Nov 11:55 | fixer | attempt content-missing-nothing-in-its-place -> reverted (0/30 moved) |
+| 18 Nov 12:58 | fixer | slot claimed - fixer running |
+| 18 Nov 13:44 | fixer | attempt single-element-far-out -> partial (1/1 moved) |
