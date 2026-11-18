@@ -1,9 +1,11 @@
 {
   "baseline_started": 1794936722.77173,
   "classifier_started": 1794939194.3206565,
-  "fixer_engine_at_claim": "7fbb22e",
-  "fixer_last_beat": 1794921991.071648,
-  "fixer_started": 0,
+  "fixer_doing": "claimed, reading handoff",
+  "fixer_doing_since": 1794975955.295424,
+  "fixer_engine_at_claim": "8c14e53",
+  "fixer_last_beat": 1794975955.2954247,
+  "fixer_started": 1794975955.2949867,
   "history": [
     {
       "at": "2026-11-12 09:46",

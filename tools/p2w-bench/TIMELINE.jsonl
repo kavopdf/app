@@ -171,3 +171,17 @@
 {"t": 1794924421.9666798, "ist": "19:37:01", "ev": "beat", "d": "chain.py: deciding whether to chain"}
 {"t": 1794936722.774272, "ist": "23:02:02", "ev": "claim", "d": "baseline claimed the slot"}
 {"t": 1794939194.3312814, "ist": "23:43:14", "ev": "claim", "d": "classifier claimed the slot"}
+{"t": 1794975898.997071, "ist": "09:54:58", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1794975899.087685, "ist": "09:54:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794975899.3097463, "ist": "09:54:59", "ev": "beat", "d": "claimed, gathering work"}
+{"t": 1794975899.4457288, "ist": "09:54:59", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1794975899.5702825, "ist": "09:54:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794975899.6796033, "ist": "09:54:59", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794975899.7840464, "ist": "09:54:59", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1794975955.294993, "ist": "09:55:55", "ev": "beat", "d": "claimed, reading handoff"}
+{"t": 1794975955.4073858, "ist": "09:55:55", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1794975955.5363142, "ist": "09:55:55", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1794975955.6051233, "ist": "09:55:55", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1794976026.4874616, "ist": "09:57:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794976026.599974, "ist": "09:57:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1794979500.9731073, "ist": "10:55:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

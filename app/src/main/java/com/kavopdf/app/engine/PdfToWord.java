@@ -6032,6 +6032,60 @@ public final class PdfToWord {
         }
 
         /**
+         * True when the page itself says the image has transparent parts.
+         *
+         * <p>Only a declaration counts. A bitmap that merely HAS an alpha channel is not
+         * evidence of transparency - on the DeviceGray path pdfbox-android always produces
+         * one, with the luminance written into it - so the question is asked of the PDF's
+         * own dictionary, never of the decoded bitmap. An error here answers "yes, leave it",
+         * because forcing alpha onto a real soft mask would put the box back over the words.
+         */
+        private static boolean declaresTransparency(PDImage img) {
+            if (img == null) return true;
+            try {
+                if (img.isStencil()) return true;
+                com.tom_roush.pdfbox.cos.COSBase raw = img.getCOSObject();
+                if (!(raw instanceof com.tom_roush.pdfbox.cos.COSDictionary)) return true;
+                com.tom_roush.pdfbox.cos.COSDictionary d =
+                        (com.tom_roush.pdfbox.cos.COSDictionary) raw;
+                if (d.getDictionaryObject(com.tom_roush.pdfbox.cos.COSName.SMASK) != null) return true;
+                if (d.getDictionaryObject(com.tom_roush.pdfbox.cos.COSName.MASK) != null) return true;
+                if (d.getDictionaryObject(
+                        com.tom_roush.pdfbox.cos.COSName.getPDFName("SMaskInData")) != null) return true;
+                return false;
+            } catch (Throwable t) {
+                return true;
+            }
+        }
+
+        /**
+         * The picture with every pixel opaque, colour untouched.
+         *
+         * <p>Only the alpha byte is rewritten, so a grey sample that arrived as
+         * {@code g,g,g,g} keeps its grey in R, G and B and stops being a hole. It allocates
+         * the same one-int-per-pixel array withMask() already allocates for a masked
+         * picture, and returns the original bitmap untouched when no pixel needed changing -
+         * so an RGB picture, which never takes this path, costs nothing at all.
+         */
+        private static android.graphics.Bitmap forceOpaque(android.graphics.Bitmap src) {
+            if (src == null || !src.hasAlpha()) return src;
+            int w = src.getWidth(), h = src.getHeight();
+            if (w <= 0 || h <= 0) return src;
+            int[] px = new int[w * h];
+            src.getPixels(px, 0, w, 0, 0, w, h);
+            boolean changed = false;
+            for (int i = 0; i < px.length; i++) {
+                if ((px[i] >>> 24) != 0xFF) {
+                    px[i] = px[i] | 0xFF000000;
+                    changed = true;
+                }
+            }
+            if (!changed) return src;
+            return android.graphics.Bitmap.createBitmap(px, w, h,
+                    android.graphics.Bitmap.Config.ARGB_8888);
+        }
+
+        /**
          * Folds a mask image into the picture as its alpha channel.
          *
          * <p>The mask is usually a different size from the image it protects - a soft mask is
@@ -6098,6 +6152,7 @@ public final class PdfToWord {
                 // not in the image's own samples. getImage() returns the colour plane alone, so
                 // the mask has to be folded in here or every transparent part of the picture
                 // arrives as an opaque black box over the words underneath it.
+                boolean foldedMask = false;
                 if (pdImage instanceof PDImageXObject) {
                     android.graphics.Bitmap mask = null;
                     try {
@@ -6115,8 +6170,28 @@ public final class PdfToWord {
                         imageNote("mask of the image at " + frameText(frame)
                                 + " did not decode (" + oneLine(t) + "); it is written opaque");
                     }
-                    if (mask != null) bmp = withMask(bmp, mask);
+                    if (mask != null) {
+                        bmp = withMask(bmp, mask);
+                        foldedMask = true;
+                    }
                 }
+                // A GREY PICTURE ARRIVES WITH ITS OWN LUMINANCE AS ALPHA.
+                //
+                // pdfbox-android packs a DeviceGray sample into all four lanes of the ARGB
+                // pixel - g<<24 | g<<16 | g<<8 | g - instead of 0xFF000000 | g<<16 | g<<8 | g.
+                // So a black sample 0x00 is 0x00000000, alpha 0, and a white one 0xFF is
+                // opaque white: the picture's ALPHA IS ITS LUMINANCE, and every dark pixel of
+                // a grey picture is transparent. The engine carried that bitmap into the PNG
+                // unchanged, LibreOffice round-tripped it faithfully, and the ink simply was
+                // not on the page - 415_inline_images drew its 8x8 grey block as a correct
+                // 120 pt square containing nothing, and read 89.04% share@5px with
+                // text_recall 100.0 and chars_missing 0.
+                //
+                // A page that declares no transparency means every sample is opaque, so the
+                // alpha is forced opaque. Only when nothing was declared: an /SMask, a /Mask
+                // or an SMaskInData JPEG is a real alpha channel and is left alone, and a
+                // mask that was already folded in above is that same declaration honoured.
+                if (!foldedMask && !declaresTransparency(pdImage)) bmp = forceOpaque(bmp);
                 // The ENCODE is a second place a picture is lost, and it is the one that failed
                 // on the 211-document run: three documents came out with no media at all and the
                 // only sign was an IIOException inside compress(). So it is retried the same

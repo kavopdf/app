@@ -9,14 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 18:56 |
-| ended | 19:36 |
-| how it ended | released |
+| started | 09:54 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> THE SPILL WAS THE CARRY'S CEILING, NOT A ROW HEIGHT. The carry-over asked for a fourth wrap-charge build (page-layout this time); this run measured that on 041122 the row does not need to be taller - it needs the renderer to wrap it the way the page did, and the mechanism for that (ARIAL_W, w:w) was already in the engine and silently not clamping on merged cells. carryScalePct was given colTw[c], the FIRST grid column under the cell, so on a cell merged over six columns the width was negative, the clamp was skipped, and the scale went out at the page's drawn ratio 97 % where the cell allows 92. Four of the page's nine instruction lines wrapped into two, the row rendered 154 pt where the page drew 118, and it no longer fitted the 158 pt the page had left. Fix is one token (spanTw - pInset). Corpus diff: 3 of 213 .docx change, 210 byte-identical, all 3 measured: 373_leave_application_form 5.46 -> 4.64, 041122 11 -> 10 pages, Account_Opening_Form_Fillable_filled 11 -> 10 pages, 0 worse. THE CLASS DOES NOT MOVE YET because the last spurious page of both form documents is a FOLIO WRITTEN AS A TABLE ROW (the declaration table's last row is the bare text '7'), which costs its own sheet and shifts every page after it - our page 8 reads share@5 99.02 with text_recall 0.04. The flow-line folio rule exists and names this document but cannot fire on a table row. THE ONE THING THE NEXT RUN SHOULD DO: make that row a position - detect it before the row loop, skip it, take the last-row bookkeeping from row-1, emit the text after </w:tbl> via anchor(sb, ctx, x, yTop, w, h, inner), which needs only a hand-built paragraph string. w:framePr does NOT work as the cheap route (anchored to the page at y 16104 tw it rendered at y 218 pt). That one change should take both form documents from 10 pages to the source's 9 and is what moves the class.
+> STEP 3/3 fixer. Class: content-missing-nothing-in-its-place (30 docs, biggest OPEN). Two agents landed root causes; one is PROVEN AND FIXED IN THE TREE: pdfbox-android packs a DeviceGray sample into all four ARGB lanes (g<<24|g<<16|g<<8|g) instead of 0xFF000000|..., so a grey picture's ALPHA IS ITS LUMINANCE and every dark pixel is transparent. 415_inline_images (8x8 inline DeviceGray block) therefore rendered a correct 120 pt square containing nothing: 89.04 share@5px with text_recall 100.0 and chars_missing 0. Fix in PdfToWord.java: declaresTransparency() asks the PDF's own dictionary (/SMask, /Mask, SMaskInData, stencil) and forceOpaque() sets only the alpha byte when nothing is declared. SCREENED: 415_inline_images 89.04 -> 0.00, nothing worse. Corpus scan: 415_inline_images is the ONLY document in the 213 with an inline image and there are ZERO grey XObject images, so the blast radius is one document - the attempt will read 'partial' (1 of 30), not kept, and that is the honest number. RATCHET NOT YET RUN. Second agent (content-missing-nothing-in-its-place-B-103610-346a.md) proved the ~1.44 pt median on mobile-bill/salary-slip/electricity-bill is a ladder of +0.50 pt steps, one per emitted w:tbl: the bottom rule is drawn outside the last row's box and never charged to the following flow (DocxWriter.java:6020 drops ruleTwHere when the row pitch binds; 6547-6554 sets ctx.lastBaseline to the box bottom with no rule). NOT APPLIED - geometry measured, score consequence predicted only.
+
+## What the next run should do first
+
+> Run the full 213-document ratchet for the DeviceGray-alpha fix now in PdfToWord.java (p2w.py --budget 250 repeatedly, then gate.py --ratchet-only), record the attempt, commit RANKING.csv. Then apply the DocxWriter bottom-rule term named in FINDINGS/content-missing-nothing-in-its-place-B-103610-346a.md (add sideSz[2]/8 to rowBottomPt at 6547-6554 and the twip equivalent at 6508) and screen the class.
 
 ## Agents deployed and not yet accounted for
 
@@ -26,14 +30,14 @@ unfinished work, not as a result.
 | contB-01 | content-missing-partly-replaced | B | is the wrap inside a text box a renderer limit or our emitted width | 13:52 | landed | landed | FINDINGS/content-missing-partly-replaced-B-1300.md |
 | contA2-01 | content-missing-partly-replaced | A2 | why does parasOfLines reject the six heading lines of 041122 page 7 | 11:16 | landed | landed | FINDINGS/content-missing-partly-replaced-A2-092912-7c4e.md |
 | contD-01 | content-missing-partly-replaced | D | how many corpus documents have a cell whose lines start left of the fi | 11:16 | landed | landed | FINDINGS/content-missing-partly-replaced-D-092700-1d7b.md |
+| contA-02 | content-missing-nothing-in-its-place | A | 415_inline_images p1: why is 89% of source ink >5px from ours when tex | 09:57 | expected by 11:15 | running |  |
+| contB-02 | content-missing-nothing-in-its-place | B | the ~1.4pt uniform shift on mobile-bill/salary-slip-factory-wages/elec | 09:57 | expected by 11:15 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `13:52` attempt 3 on content-missing-nothing-in-its-place -> kept (31/212 moved)
-- `13:52` agent deployed: content-missing-partly-replaced / A - which code path decides the height of a block emitted from a PDF text box, and w
 - `13:52` agent landed: content-missing-partly-replaced / A -> FINDINGS/content-missing-partly-replaced-A-1305.md
 - `13:52` agent deployed: content-missing-partly-replaced / B - is the wrap inside a text box a renderer limit or our emitted width
 - `13:52` agent landed: content-missing-partly-replaced / B -> FINDINGS/content-missing-partly-replaced-B-1300.md
@@ -57,6 +61,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `18:45` attempt 15 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `19:31` attempt 16 on content-missing-partly-replaced -> partial (1/3 moved)
 - `19:35` attempt 17 on content-missing-partly-replaced -> kept (3/3 moved)
+- `09:57` agent deployed: content-missing-nothing-in-its-place / A - 415_inline_images p1: why is 89% of source ink >5px from ours when text_recall i
+- `09:57` agent deployed: content-missing-nothing-in-its-place / B - the ~1.4pt uniform shift on mobile-bill/salary-slip-factory-wages/electricity-bi
 
 ## Where the rest of the state lives
 
