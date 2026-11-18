@@ -23,23 +23,39 @@ One or the other, never both. `TxtWriter.java` is 568 lines and standalone - it 
 `DocxWriter`, `ReadingOrder` and `NormStore` nowhere and imports only `java.io` and `java.util`.
 `DocxWriter.java` is 7196 lines and never touches the txt.
 
-**The isolation runs ONE way, not two.**
+**The isolation runs ONE way, and it depends on WHICH METHOD in the file you touch.**
 
-    a change to TxtWriter.java    CANNOT move a docx number - it reads the model and writes nothing
-                                  back to it ("nothing here writes back to the model", line 17)
-    a change to DocxWriter.java   CAN move a txt number - it MUTATES page.blocks, and TxtWriter
-                                  walks page.blocks. This is not theory: DocxWriter used to call
-                                  orderStamps(page, ...) on the page itself, which moved a stamp's
-                                  paragraphs inside page.blocks, and the .txt therefore changed
-                                  according to whether the .docx had been written first - 11 of 211
-                                  documents. The comment at DocxWriter.java:1119-1126 calls it SECTOR
-                                  19 and says the fix was to move the ordering decision out to
-                                  ReadingOrder, decided once on the document, so neither writer
-                                  mutates order.
-    a change to PdfToWord.java    CAN move BOTH - it builds the model both writers read
+`DocxWriter.java` is not only a writer. It is a writer plus two static helpers that the model uses:
 
-So the txt is the fragile side: anything that mutates the model before TxtWriter walks it changes the
-txt, and DocxWriter is such a mutator. That is why the gate is symmetric (below).
+    DocxWriter.write()         does NOT mutate the model. Verified: zero writes to page.blocks in
+                               the whole file. A change here cannot move a txt number.
+    DocxWriter.orderStamps()   DOES mutate it. Line 4757 is `blocks.removeAll(stamps)` followed by a
+                               re-insert at the position each stamp's own y falls. Its own comment
+                               (4745-4748) records the effect: "That reorders page.blocks itself,
+                               which both outputs read ... the .txt changed with it (318: 81 -> 90
+                               lines)."
+    DocxWriter.stampFrames()   folds a stamp's frame rules into one shape before anything is written.
+
+`ReadingOrder` calls both helpers, and `ReadingOrder` runs BEFORE either writer:
+
+    ReadingOrder.java:61       DocxWriter.orderStamps(page, outlines);
+
+That placement used to live inside `DocxWriter.write()` itself, and ReadingOrder.java:15-22 explains
+why it was moved: "The .txt writer then walked the same list, so the .txt described a page whose stamp
+paragraphs had been moved by the .docx writer ... the same PDF gave two different .txt files depending
+on call order, and no check could see it because every text check pairs by text, and a reordering of
+lines pairs just as well one way as the other."
+
+So:
+
+    a change to TxtWriter.java           cannot move a docx number - it reads the model and writes
+                                         nothing back to it ("nothing here writes back to the model")
+    a change to DocxWriter.write()       cannot move a txt number - it does not mutate the model
+    a change to DocxWriter.orderStamps() CAN move a txt number - it reorders page.blocks, which the
+                                         txt then walks
+    a change to PdfToWord.java           can move both - it builds the model both writers read
+
+The file name is not the unit of risk; the method is. That is why the gate is symmetric (below).
 
 That is why `txt_gate.py` records the SHA-256 of `benchmarks/RANKING.csv` when it starts and checks it
 again at the end:

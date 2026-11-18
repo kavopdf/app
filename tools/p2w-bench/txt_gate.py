@@ -9,16 +9,22 @@ WHY THE TXT IS SEPARATE. The conversion is three files, not one:
 
     ToolsActivity.kt:600   if (asTxt) TxtWriter.write(result, out) else DocxWriter.write(result, out)
 
-One or the other, never both. TxtWriter references DocxWriter nowhere and imports only java.io and
-java.util, and it writes nothing back to the model - so a change in TxtWriter cannot move a docx
-number. That is the ONE direction that is safe.
+One or the other, never both. The risk is per METHOD, not per file:
 
-THE OTHER DIRECTION IS NOT. DocxWriter MUTATES page.blocks, and TxtWriter walks page.blocks.
-DocxWriter.java:1119-1126 records the time it did exactly that: orderStamps(page, ...) moved a stamp's
-paragraphs inside page.blocks and the .txt changed according to whether the .docx had been written
-first - 11 of 211 documents. The fix was to move the ordering decision out to ReadingOrder, decided
-once on the document, so neither writer mutates order. The risk is real and it is two-way, which is
-why this gate checks both hashes and not just one.
+    DocxWriter.write()          does not mutate the model - zero writes to page.blocks in the file.
+                                A change here cannot move a txt number.
+    DocxWriter.orderStamps()    does. Line 4757 is blocks.removeAll(stamps), then a re-insert at the
+                                position each stamp's y falls. Its comment (4745-4748): "That reorders
+                                page.blocks itself, which both outputs read ... the .txt changed with
+                                it (318: 81 -> 90 lines)."
+    TxtWriter                   reads the model and writes nothing back to it.
+
+ReadingOrder calls orderStamps and runs BEFORE either writer (ReadingOrder.java:61), so both outputs
+see the same order - which is the invariant that keeps them in step. Before that move the placement
+happened inside DocxWriter.write itself, and ReadingOrder.java:15-22 records the result: the same PDF
+gave two different .txt files depending on call order.
+
+So the dependency is two-way and this gate checks both hashes, not one.
 
 Everything else is kept apart so that neither side can damage the other by accident:
 
