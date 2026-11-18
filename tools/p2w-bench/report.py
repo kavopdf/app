@@ -68,6 +68,10 @@ def classes():
                 rec[1] += 1
     except Exception:
         pass
+    # "none" is the pseudo-class for documents with no defect. It is a row in the file, not a
+    # problem to solve, and counting it made the report say "0 of 7 clear" when six classes carry
+    # the 91 OPEN documents.
+    per_class.pop("none", None)
     total = len(per_class)
     solved = sum(1 for v in per_class.values() if v[0] == 0 and v[1] > 0)
     openc = sum(1 for v in per_class.values() if v[0] > 0)
@@ -242,12 +246,17 @@ def subagents():
     # THIS RUN'S AGENTS ONLY. RUN.json lists the ids it deployed; the handoff keeps every agent ever
     # used, so without this filter the report shows agents from three days ago beside today's and
     # the "Took" column fills with cross-day rows that belong to somebody else's run.
-    mine = set((_json(RUN, {}).get("agents") or []))
+    run = _json(RUN, {})
+    mine = set(run.get("agents") or [])
     out = []
     for a in (h.get("agents") or []):
         if a.get("status") not in ("landed", "running", "dead"):
             continue
-        if mine and a.get("id") not in mine:
+        # EMPTY MEANS NONE. `if mine and ...` treated an empty list as "no filter" and the report
+        # showed six agents from three earlier runs beside a run that deployed nobody - the 12:58
+        # run did exactly that, and its report named agents it never sent. A run that has a RUN.json
+        # record and no agents in it deployed none, and the table must say so.
+        if run.get("started") and a.get("id") not in mine:
             continue
         dep = a.get("deployed_at") or ""
         land = a.get("landed_at") or ""
@@ -360,6 +369,11 @@ def main(argv):
     L.append("")
 
     subs = subagents()
+    if not subs:
+        L.append("## Subagents")
+        L.append("")
+        L.append("*None deployed this run.*")
+        L.append("")
     if subs:
         L.append("## Subagents")
         L.append("")

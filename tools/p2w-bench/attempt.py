@@ -389,7 +389,10 @@ def add(args):
     _hist = row.setdefault("history", [])
     _hist.append({"outcome": outcome,
                   "reason": (args.reason or "")[:200],
-                  "at": time.strftime("%Y-%m-%d %H:%M"),
+                  # IST, like every other timestamp in this pipeline. time.strftime follows the
+                  # sandbox clock, which is UTC, so the history said 08:14 for an attempt made at
+                  # 13:44 - a five-and-a-half-hour lie in a file whose job is to be checkable.
+                  "at": time.strftime("%Y-%m-%d %H:%M", time.gmtime(time.time() + 19800)),
                   "moved": args.moved, "total": args.total})
     del _hist[:-20]                      # twenty attempts of memory is more than any class gets
     row["reason"] = args.reason or "(no reason recorded for this attempt)"
