@@ -471,6 +471,60 @@ def phases():
         return []
 
 
+def committed():
+    """Every file this run committed, read from git - not typed.
+
+    The 13:50 run's report said "Committed: 17 files" and named HYPOTHESES, RUN-HISTORY and CHAIN.json
+    among them. Its commits have thirteen files between them and none of those three. The prompt lists
+    HYPOTHESES.md and RUN-HISTORY.json as required, so the run believed it had committed them and the
+    report repeated the belief.
+
+    A run commits more than once - the 15:58 run made three commits in two minutes - so this walks the
+    whole window and unions them. A "Committed" line that is typed is a claim; this one is a fact.
+    """
+    import subprocess as _sp
+    try:
+        run = _json(RUN, {})
+        lo, hi = run.get("started_ts"), run.get("ended_ts")
+        if not lo:
+            return None
+        lo = float(lo)
+        hi = float(hi or time.time())
+        log = _sp.run(["git", "-C", ROOT, "log", "--format=%H %ct %s",
+                       "--since=%d" % int(lo - 30), "--until=%d" % int(hi + 120)],
+                      capture_output=True, text=True, timeout=30).stdout
+        # THE RUN'S OWN COMMITS, BY ITS OWN PREFIX. The window alone is not enough: on 18 Nov another
+        # agent committed twice inside the fixer's run and the file count came out at 19 across 10
+        # commits for a run that made 3. The fixer signs every commit "p2w fixer <HH:MM>: ..." - that
+        # is the only marker that separates its work from everything else on the branch.
+        shas = []
+        for line in log.strip().split("\n"):
+            parts = line.split(None, 2)
+            if len(parts) < 3:
+                continue
+            try:
+                t = float(parts[1])
+            except Exception:
+                continue
+            if not (lo - 30 <= t <= hi + 120):
+                continue
+            if parts[2].startswith("p2w fixer"):
+                shas.append(parts[0])
+        if not shas:
+            return None
+        files = set()
+        for sha in shas:
+            stat = _sp.run(["git", "-C", ROOT, "show", "--stat", "--format=", sha],
+                           capture_output=True, text=True, timeout=20).stdout
+            for l in stat.split("\n"):
+                if "|" in l:
+                    files.add(l.split("|")[0].strip().split("/")[-1])
+        return {"sha": shas[0][:7], "commits": len(shas), "n": len(files),
+                "files": sorted(files)}
+    except Exception:
+        return None
+
+
 def tried():
     """Every attempt THIS RUN recorded, with what it measured and how it ended.
 
@@ -662,6 +716,10 @@ def main(argv):
     L.append("| Classes solved | %d of %d clear — %d class(es) still have an OPEN document |"
              % (solved, total, openc))
     L.append("| Working on | `%s` |" % working)
+    cm = committed()
+    if cm:
+        L.append("| Committed | **%d** files in %d commit(s) from `%s` — %s |"
+                 % (cm["n"], cm["commits"], cm["sha"], ", ".join(cm["files"])[:220]))
     L.append("")
 
     tr_tried = tried()
