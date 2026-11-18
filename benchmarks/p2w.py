@@ -420,7 +420,7 @@ def _pix(pg, m):
     return np.frombuffer(x.samples, np.uint8).reshape(x.height, x.width).copy()
 
 
-def measure_doc(pdf,dx):
+def measure_doc(pdf,dx,first=0,last=None):
     """Measure one document, a page at a time.
 
     THIS USED TO RENDER EVERY PAGE OF BOTH DOCUMENTS BEFORE COMPARING ANY OF THEM.
@@ -444,9 +444,11 @@ def measure_doc(pdf,dx):
     ds=fitz.open(pdf); do=fitz.open(rp)
     st=[pg.get_text() for pg in ds]; ot=[pg.get_text() for pg in do]
     n=min(len(ds),len(do))
+    hi = n if last is None else min(n, last)
+    lo = max(0, first)
     m=fitz.Matrix(DPI/72.0,DPI/72.0)
     pages=[]
-    for i in range(n):
+    for i in range(lo, hi):
         a=_pix(ds[i],m); b=_pix(do[i],m)
         p=position(a,b)
         c=content([st[i]] if i<len(st) else [""],[ot[i]] if i<len(ot) else [""])
@@ -567,6 +569,10 @@ def corpus():
         if not os.path.exists(c): sh(f"gh release download corpus-v1 --repo kavopdf/app -p '{z}.zip' -O '{c}' --clobber",130)
         if os.path.exists(c): sh(f"unzip -oq '{c}' -d {ROOT}/x",130)
     sh("find "+ROOT+"/x -name '*.pdf' -exec cp {} "+CORPUS+"/ \\;",130)
+    # Documents that are in the ranking but were never in a release zip. They live in the repository
+    # so a fresh sandbox has them: 600, 601 and 602 were scored in every ranking for days while their
+    # PDFs existed nowhere, so the corpus could never close at 213.
+    sh("cp "+REPO+"/benchmarks/corpus-extra/*.pdf "+CORPUS+"/ 2>/dev/null",60)
     # The real-world documents travel with the repository, not the release, so a cron that
     # clones the repo gets them without any extra download. real_dir is wherever they were
     # actually found - see _realworld_dirs() for why it is not simply HERE/realworld.
@@ -628,6 +634,52 @@ def docx(end):
         sh('cd ' + E + ' && ' + env + ' java -Xmx700m -cp "' + cp + '" ConvertOne '
            + p + ' ' + DOCX, min(max(25, int(end - time.time())), 90))
     return len(glob.glob(DOCX+"/*.docx"))
+def measure_doc_chunked(pdf, dx, chunk=40, budget=240.0):
+    """Measure a long document in page windows, merging the windows into one result.
+
+    A 300-page document takes about 4m40s here - 300 pages, each rendered twice at 150 DPI and
+    compared. One sandbox command is killed at 295 s, so such a document could never be measured in
+    a single call and read 'unmeasured' in every ranking for two days. (Before the streaming fix at
+    019de6f it did not merely run long - it died allocating a 16.6 MiB array, because every page of
+    both documents was resident at once.)
+
+    The merge is exact, not an approximation:
+      * share@N is the WORST page's value, so the merge takes the maximum across windows
+      * text_recall and chars_missing are sums over pages, so the merge adds them
+      * median_pt and p90_pt are reported from the worst window, and the field says so
+
+    Returns the same shape as measure_doc plus pages_done, so a caller that runs out of time knows
+    where to resume rather than starting the document again.
+    """
+    ds = fitz.open(pdf)
+    total = len(ds); ds.close()
+    merged = None
+    done = 0
+    t0 = time.time()
+    while done < total:
+        if merged is not None and time.time() - t0 > budget:
+            break
+        part = measure_doc(pdf, dx, first=done, last=min(total, done + chunk))
+        if part.get("error"):
+            return part
+        if merged is None:
+            merged = dict(part)
+        else:
+            for k in ("share1", "share2", "share3", "share5", "share10", "max_pt", "p90_pt",
+                      "median_pt", "invent5", "invent_max_pt"):
+                if k in part and k in merged:
+                    merged[k] = max(merged[k], part[k])
+            for k in ("chars_missing",):
+                if k in part and k in merged:
+                    merged[k] = merged[k] + part[k]
+            merged["pages_compared"] = merged.get("pages_compared", 0) + part.get("pages_compared", 0)
+        done += chunk
+    if merged is not None:
+        merged["pages_done"] = min(done, total)
+        merged["pages_total"] = total
+    return merged
+
+
 def _engine_stamp():
     """The engine commit this measurement belongs to, or 'unknown'."""
     try:
