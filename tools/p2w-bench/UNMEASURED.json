@@ -1,0 +1,1499 @@
+{
+  "compared_docs": [],
+  "counts": {
+    "compared": 0,
+    "not_compared": 211,
+    "regressed": 0,
+    "scored": 211,
+    "unscored": 0
+  },
+  "instrument": {
+    "checks": 47,
+    "sha": "192ed820c33d",
+    "tool": "verify_google.py"
+  },
+  "not_compared": {
+    "01_stamp_rotated_15deg_upright": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "38/59",
+      "why": "row-drifted"
+    },
+    "02_stamp_rotated_15deg_upleft": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "03_stamp_vertical_90deg": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "35/59",
+      "why": "row-drifted"
+    },
+    "04_stamp_180deg_upside_down": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "33/59",
+      "why": "row-drifted"
+    },
+    "05_round_company_seal_curved_text": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "32/59",
+      "why": "row-drifted"
+    },
+    "06_rect_paid_stamp_red_transparent": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "36/59",
+      "why": "row-drifted"
+    },
+    "07_stamp_over_table": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "37/59",
+      "why": "row-drifted"
+    },
+    "08_two_overlapping_stamps": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "37/59",
+      "why": "row-drifted"
+    },
+    "09_stamp_font_not_embedded": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "45/59",
+      "why": "row-drifted"
+    },
+    "10_stamp_as_image": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "37/59",
+      "why": "row-drifted"
+    },
+    "11_stamp_with_signature_image": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "12_stamp_across_page_break": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "39/59",
+      "why": "row-drifted"
+    },
+    "13_stamp_non_english": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "45/59",
+      "why": "row-drifted"
+    },
+    "14_stamp_chars_positioned_td": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "15_stamp_on_scanned_page": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "16_right_aligned_amounts_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "39/59",
+      "why": "row-drifted"
+    },
+    "17_three_column_widths_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "18_centred_heading_left_body_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "54/59",
+      "why": "row-drifted"
+    },
+    "19_hanging_indent_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "53/59",
+      "why": "row-drifted"
+    },
+    "20_numbered_list_separate_column_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "21_form_labels_x60_values_x300_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "22_invoice_four_columns_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "38/59",
+      "why": "row-drifted"
+    },
+    "23_timetable_grid_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "24_address_block_indents_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "25_signature_block_underscores_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "40/59",
+      "why": "row-drifted"
+    },
+    "26_footnote_marker_bottom_note_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "27_two_column_left_short_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "54/59",
+      "why": "row-drifted"
+    },
+    "28_value_overflows_cell_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "29_dot_leaders_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "40/59",
+      "why": "row-drifted"
+    },
+    "300_prescription_rx": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "40/59",
+      "why": "row-drifted"
+    },
+    "301_lab_report_panel": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "45/59",
+      "why": "row-drifted"
+    },
+    "302_radiology_report": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "49/59",
+      "why": "row-drifted"
+    },
+    "303_discharge_summary": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "304_package_insert_small_print": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "305_vaccination_certificate": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "36/59",
+      "why": "row-drifted"
+    },
+    "306_clinical_protocol_synopsis": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "49/59",
+      "why": "row-drifted"
+    },
+    "30_mixed_font_sizes_one_baseline_txtpos": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "37/59",
+      "why": "row-drifted"
+    },
+    "310_court_judgment": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "53/59",
+      "why": "row-drifted"
+    },
+    "311_fir_police_form": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "312_affidavit_stamp_paper": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "313_power_of_attorney": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "55/59",
+      "why": "row-drifted"
+    },
+    "314_tender_rfp_boq": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "50/59",
+      "why": "row-drifted"
+    },
+    "315_gazette_notification": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "50/59",
+      "why": "row-drifted"
+    },
+    "316_contract_with_schedules": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "54/59",
+      "why": "row-drifted"
+    },
+    "317_rti_response": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "56/59",
+      "why": "row-drifted"
+    },
+    "318_court_summons_form": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "39/59",
+      "why": "row-drifted"
+    },
+    "31_times_body_arial_headings": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "52/59",
+      "why": "row-drifted"
+    },
+    "320_balance_sheet_statutory": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "321_auditors_report": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "54/59",
+      "why": "row-drifted"
+    },
+    "322_mutual_fund_factsheet": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "323_credit_card_statement": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "324_loan_amortisation_schedule": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "325_demat_holdings_statement": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "326_itr_computation": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "32_serif_nondefault_body": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "330_cad_drawing_sheet": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "331_pid_diagram": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "39/59",
+      "why": "row-drifted"
+    },
+    "332_bom_on_drawing": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "333_datasheet_spec_tables": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "334_patent_document": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "335_msds_safety_data_sheet": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "33_sans_nondefault_body": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "52/59",
+      "why": "row-drifted"
+    },
+    "340_bill_of_lading": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "341_shipping_manifest": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "342_packing_list": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "343_air_waybill": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "40/59",
+      "why": "row-drifted"
+    },
+    "344_customs_declaration": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "34_monospace_document": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "53/59",
+      "why": "row-drifted"
+    },
+    "350_question_paper": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "34/59",
+      "why": "row-drifted"
+    },
+    "351_omr_answer_sheet": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "352_certificate_ornate_border": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "32/59",
+      "why": "row-drifted"
+    },
+    "353_admit_card": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "35_four_typefaces_one_page": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "54/59",
+      "why": "row-drifted"
+    },
+    "360_restaurant_menu": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "361_product_catalogue_grid": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "50/59",
+      "why": "row-drifted"
+    },
+    "362_price_list_dense": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "363_warranty_card": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "49/59",
+      "why": "row-drifted"
+    },
+    "364_event_ticket": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "365_recipe_card": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "53/59",
+      "why": "row-drifted"
+    },
+    "36_embedded_subset_font": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "370_offer_letter": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "50/59",
+      "why": "row-drifted"
+    },
+    "371_experience_certificate": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "40/59",
+      "why": "row-drifted"
+    },
+    "372_timesheet_grid": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "50/59",
+      "why": "row-drifted"
+    },
+    "373_leave_application_form": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "374_org_chart": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "375_attendance_register": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "37_font_not_embedded_substitution": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "55/59",
+      "why": "row-drifted"
+    },
+    "380_runbook_terminal_output": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "50/59",
+      "why": "row-drifted"
+    },
+    "381_incident_report_timeline": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "382_architecture_diagram": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "383_api_docs_page": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "49/59",
+      "why": "row-drifted"
+    },
+    "38_faux_bold_italic_synthesised": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "40/59",
+      "why": "row-drifted"
+    },
+    "390_wide_data_appendix": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "391_survey_questionnaire_grid": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "392_statistical_console_output": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "393_spectrum_peak_table": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "49/59",
+      "why": "row-drifted"
+    },
+    "394_map_with_legend": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "39_small_caps_letter_spacing": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "400_comic_page_speech_bubbles": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "401_trifold_brochure": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "33/59",
+      "why": "row-drifted"
+    },
+    "402_calendar_month_grid": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "403_crossword_puzzle": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "404_sudoku_grid": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "45/59",
+      "why": "row-drifted"
+    },
+    "405_sheet_music_lyrics": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "39/59",
+      "why": "row-drifted"
+    },
+    "406_passport_mrz_page": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "407_id_card_front_back": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "40_devanagari_shaping_font": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "37/59",
+      "why": "row-drifted"
+    },
+    "410_form_xobject_reused": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "411_nested_xobject_transforms": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "45/59",
+      "why": "row-drifted"
+    },
+    "412_page_labels_roman": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "52/59",
+      "why": "row-drifted"
+    },
+    "413_tagged_pdf_actualtext": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "58/59",
+      "why": "row-drifted"
+    },
+    "414_transparency_softmask": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "53/59",
+      "why": "row-drifted"
+    },
+    "415_inline_images": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "54/59",
+      "why": "row-drifted"
+    },
+    "416_many_tiny_pages": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "417_rotate180_and_mirrored": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "41_coloured_headings_white_bg": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "39/59",
+      "why": "row-drifted"
+    },
+    "42_table_coloured_header_alternating_rows": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "39/59",
+      "why": "row-drifted"
+    },
+    "43_red_stamp_over_black_text": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "44_coloured_underlined_hyperlinks": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "45_coloured_callout_box": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "55/59",
+      "why": "row-drifted"
+    },
+    "46_chart_coloured_labels_body_text": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "47_grey_body_black_headings": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "48_form_coloured_border_coloured_values": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "49_coloured_background_block_paragraph": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "55/59",
+      "why": "row-drifted"
+    },
+    "50_invoice_coloured_total_row": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "37/59",
+      "why": "row-drifted"
+    },
+    "51_two_cm_margins": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "53/59",
+      "why": "row-drifted"
+    },
+    "52_one_cm_margin_wide_body": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "53_single_space_body_15_headings": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "52/59",
+      "why": "row-drifted"
+    },
+    "54_two_column_body_full_width_header_footer": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "50/59",
+      "why": "row-drifted"
+    },
+    "55_sidebar_box_beside_body": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "56_table_indented_from_margin": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "57_centred_title_page_left_body_pages": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "58_header_rule_footer_rule": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "59_landscape_mixed_portrait": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "40/59",
+      "why": "row-drifted"
+    },
+    "600_reviewed_invoice_with_annotations": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "601_fillable_admission_form": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "602_bookmarked_annual_report": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "53/59",
+      "why": "row-drifted"
+    },
+    "60_page_border": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "32/59",
+      "why": "row-drifted"
+    },
+    "61_two_col_abstract_spanning": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "62_two_col_newsletter_pull_quote": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "63_three_column_brochure": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "64_newspaper_uneven_columns_ad_boxes": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "65_two_col_full_width_figure_caption": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "37/59",
+      "why": "row-drifted"
+    },
+    "66_two_col_footnotes_bottom": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "67_two_col_with_sidebar": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "45/59",
+      "why": "row-drifted"
+    },
+    "68_journal_wide_table_spanning": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "69_two_col_legal_numbered_clauses": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "70_magazine_drop_cap_photo_caption": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "71_invoice_space_aligned_no_rules": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "37/59",
+      "why": "row-drifted"
+    },
+    "72_bank_statement_no_rules_right_amounts": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "38/59",
+      "why": "row-drifted"
+    },
+    "73_marksheet_subject_marks_grade": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "74_balance_sheet_indented_subitems": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "34/59",
+      "why": "row-drifted"
+    },
+    "75_merged_header_cell_three_columns": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "76_devanagari_table": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "45/59",
+      "why": "row-drifted"
+    },
+    "77_arabic_rtl_document": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "36/59",
+      "why": "row-drifted"
+    },
+    "78_mixed_english_devanagari_line": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "79_inr_indian_digit_grouping_table": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "80_gstin_pan_cin_ifsc_table": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "academic-paper-ieee-2col-abstract": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "admission-form-labels-left-boxes-right": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "admit-card": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "annual-review-2col-uneven-columns": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "45/59",
+      "why": "row-drifted"
+    },
+    "balance-sheet-and-profit-loss": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "39/59",
+      "why": "row-drifted"
+    },
+    "balance-sheet-two-columns-of-figures": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "40/59",
+      "why": "row-drifted"
+    },
+    "bank-statement-5-pages": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "40/59",
+      "why": "row-drifted"
+    },
+    "bank-statement-horizontal-rules-only": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "boq-horizontal-rules-only": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "boq-tender-bill-of-quantities": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "brochure-3col-with-sidebar-box": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "38/59",
+      "why": "row-drifted"
+    },
+    "bus-timetable-station-left-times-right": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "delivery-challan": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "electricity-bill": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "45/59",
+      "why": "row-drifted"
+    },
+    "eway-bill": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "form16-part-b": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "50/59",
+      "why": "row-drifted"
+    },
+    "gst-invoice-3line-items": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "gst-invoice-horizontal-rules-only": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "42/59",
+      "why": "row-drifted"
+    },
+    "gst-invoice-multipage-item-table": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "45/59",
+      "why": "row-drifted"
+    },
+    "gst-invoice-with-qr-code": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "insurance-policy-schedule": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "invoice-line-items-qty-rate-amount": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "49/59",
+      "why": "row-drifted"
+    },
+    "itr-computation-with-slab-table": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "journal-2col-with-footnotes": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "landscape-page-inside-portrait-document": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "magazine-2col-pullquote-spanning": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "36/59",
+      "why": "row-drifted"
+    },
+    "marksheet-subject-left-marks-right": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "41/59",
+      "why": "row-drifted"
+    },
+    "marksheet-university-consolidated": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "49/59",
+      "why": "row-drifted"
+    },
+    "mobile-bill": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "mutual-fund-statement": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "newsletter-3col-header-footer": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "40/59",
+      "why": "row-drifted"
+    },
+    "newspaper-2col-fullwidth-headline": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "37/59",
+      "why": "row-drifted"
+    },
+    "one-page-rotated-180-degrees": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "40/59",
+      "why": "row-drifted"
+    },
+    "payslip-label-left-amount-right": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "37/59",
+      "why": "row-drifted"
+    },
+    "policy-2col-spanning-section-heading": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "price-list-2col-dense-right-aligned": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "35/59",
+      "why": "row-drifted"
+    },
+    "price-list-right-aligned-amounts": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "38/59",
+      "why": "row-drifted"
+    },
+    "product-catalogue-code-left-price-right": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "property-tax-receipt": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "purchase-order": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "44/59",
+      "why": "row-drifted"
+    },
+    "question-paper-marks-right-margin": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "47/59",
+      "why": "row-drifted"
+    },
+    "report-2col-table-spanning-both-columns": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "salary-slip-corporate": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "39/59",
+      "why": "row-drifted"
+    },
+    "salary-slip-factory-wages": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "49/59",
+      "why": "row-drifted"
+    },
+    "table-across-page-break-repeated-header": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "49/59",
+      "why": "row-drifted"
+    },
+    "table-inside-two-column-page": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "48/59",
+      "why": "row-drifted"
+    },
+    "table-of-contents-dot-leaders": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "table-with-merged-cells": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "51/59",
+      "why": "row-drifted"
+    },
+    "table-with-no-header-row": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "54/59",
+      "why": "row-drifted"
+    },
+    "table-with-rotated-header": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    },
+    "text-held-twice-shadow-text": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "43/59",
+      "why": "row-drifted"
+    },
+    "two-tables-stacked-with-no-gap": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "54/59",
+      "why": "row-drifted"
+    },
+    "very-long-single-column-table": {
+      "mark_out_of": null,
+      "mark_universe_sha": null,
+      "marked": null,
+      "now": "46/59",
+      "why": "row-drifted"
+    }
+  },
+  "reason": "",
+  "store": "BASELINE.md",
+  "verdict": "UNMEASURED",
+  "waived": false,
+  "written_at": "2026-11-18T16:54:35+05:30"
+}

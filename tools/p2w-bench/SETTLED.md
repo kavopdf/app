@@ -42,6 +42,15 @@ in the same breath takes `392_statistical_console_output` from 1.61 to 13.94. Th
 and aimed at the right thing; it is too broad. A version gated on the case it fixes, rather than
 applied to every run, is the best single change available. That is new work, not a patch to apply.
 
+**CORRECTED 18 Nov 17:05 - the 96 % gain does not reproduce on engine `7a95b1c`.** The patch was
+re-applied (it applies clean), built, and screened on four documents: `360_restaurant_menu`
+**34.43 -> 34.43**, no movement at all; `392_statistical_console_output` 1.61 -> 13.94, exactly as
+recorded; `itr-computation-with-slab-table` and `320_balance_sheet_statutory` unchanged. So the
+1.31 belongs to the engine state the patch was measured on, not to the patch, and there is nothing
+here to gate - a gate on a change that moves nothing is a gate on nothing. Do not spend another
+slot re-testing it; if the size mechanism is worth having, it has to be re-derived from the current
+engine's own `size` vs `sizePt` values, starting from a measurement, not from this paragraph.
+
 ## The four commits after the baseline are decided. Do not re-verify.
 
     232f622  15 documents: 0 better, 0 worse. The .docx bytes differ; the scores do not.

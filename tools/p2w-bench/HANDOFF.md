@@ -9,18 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 15:58 |
-| ended | 16:24 |
-| how it ended | released |
+| started | 16:52 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> STEP 3/3 fixer, class content-partly-lost-and-displaced. THREE mechanisms were tried on itr-computation-with-slab-table (50.80) and all three were measured and reverted; the engine is back to 1ba86d7 and the document re-screens at 50.80. (1) The handoff's anchor rule: dead code here - the running footer is a ROW of table 3, not a flow line after it (traceLines zeroGap=0), so afterTablePt never sees it. (2) Releasing the f=0.974 squeeze by capping a clipped table's charge at the page budget (needTw 17278 -> 16836): the document went 50.80 -> 70.85. LESS squeeze is worse, so the squeeze is a symptom of a page that really is too tall, not the defect. (3) The cell baseline: cellBeforeTw's fallback treats rowLineTw (the cell's LINE, 190 twips) as the row's pitch (269), so cells sit 3.2-5.2 pt high; using the row's foot where the row is >1.3x its line screened 4 table documents at 4 same and moved the target 50.80 -> 51.18 (share1 92.18 -> 69.91, invent5 62.48 -> 40.41, median 4.80 -> 5.28). Not kept. The rendered line-by-line comparison names the three real defects: the header's first three lines are in the wrong reading order (our Chartered line at 44.4 where the page draws it at 58.1), the cell baseline, and the footer row emitted between the last two rows. Also cleared this run: the 14:30 blocker's premise was wrong and its row is corrected; 77_arabic (11.89) and 79_inr (0.74) measure on the first try; 416_many_tiny_pages measured all 300 pages in one 211 s call with scipy. report.py's obstacle counter read the run's clock time as a date and printed 0 on every run - fixed.
+> STEP 3/3 fixer 16:52. The carry-over's own diagnosis was already refuted before I arrived: the anchor rule (FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md) never fires, and the cell-baseline fallback was measured worse at 16:23. So the carry-over had one item left that was still true - the three documents the ratchet has never compared - and I spent the slot on that and on the one change SETTLED still called live. RESULT, both measured: (1) run-size-from-sizePt does NOT reproduce. Applied clean to engine 7a95b1c, built, screened 4 docs: 360_restaurant_menu 34.43 -> 34.43 (the 96% gain SETTLED records does not exist on this engine), 392_statistical_console_output 1.61 -> 13.94 (reproduces exactly), itr and 320 unchanged. SCREEN FAIL, reverted, SETTLED.md corrected in place. (2) Two of the three unmeasured documents are now measured for the first time: 77_arabic_rtl_document share5 11.89 and 79_inr_indian_digit_grouping_table share5 0.74, both 1 page - the earlier 'soffice no render' was a render timeout, not a broken document, and both render once given 250 s. 416_many_tiny_pages is still unmeasured and the reason is now precise: its docx needs ~250 s in soffice and its 300 pages need ~280 s to compare, and measure_doc_chunked does not cache a partial window, so it restarts at page 1 and is killed at 292 s every run. A full corpus pass was started (86 of 213 docx converted, one JVM each) but not finished inside the slot, so RANKING.csv is unchanged and nothing was published.
 
 ## What the next run should do first
 
-> The pending gate is EMPTY, so a new class may be taken - but do not take one on itr-computation-with-slab-table's account: its three remaining defects are named in FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md and HYPOTHESES.md, and the cheapest untested one is H3, the footer ROW's position in the row order (the page draws it last at 811.4, the engine emits it between the 816.4 and 834.8 rows). The class content-partly-lost-and-displaced still cannot be closed by attempt.py's bar - 6 of 7 documents are already under 5.0 - and that is the human decision in BLOCKERS 14:50. If a new class is taken, take the smallest OPEN one and screen before building.
+> Do 416_many_tiny_pages FIRST and alone: seed its render (soffice --convert-to pdf on out/416_many_tiny_pages.docx takes ~250 s and does succeed), write pre/416_many_tiny_pages.pdf.src with the docx's size:mtime stamp so conv() uses the cache, then spend one whole call on measure_doc_chunked with chunk=100 budget=270 - or add per-window caching under dist2/<doc>.w<N>.json first, which is the real fix, because without it the document is unmeasurable at 300 pages by construction. Do NOT re-test run-size-from-sizePt (refuted on this engine 18 Nov 17:05, SETTLED.md corrected). Do NOT re-implement the anchor rule or the cell-baseline fallback. The class content-partly-lost-and-displaced is down to one document above the line, itr-computation-with-slab-table at 50.80; its remaining defects are listed in order in FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md and the first two are both refuted, so the third - the footer ROW of table 3 emitted between rows the page draws around it - is the only one left standing, and it is a row-ordering question in DocxWriter.table(), not a flow one.
 
 ## Agents deployed and not yet accounted for
 
@@ -61,8 +61,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `13:44` attempt 1 on single-element-far-out -> partial (1/1 moved)
 - `14:51` attempt 1 on content-partly-lost-and-displaced -> partial (1/7 moved)
 - `15:28` attempt 2 on content-partly-lost-and-displaced -> kept (1/210 moved)
-- `16:11` attempt 3 on content-partly-lost-and-displaced -> reverted (0/7 moved)
-- `16:23` attempt 4 on content-partly-lost-and-displaced -> reverted (0/7 moved)
+- `16:12` attempt 3 on content-partly-lost-and-displaced -> kept (1/7 moved)
+- `17:00` attempt 18 on content-missing-partly-replaced -> reverted (0/16 moved)
 
 ## Where the rest of the state lives
 

@@ -12,3 +12,4 @@
 {"at": "2026-11-18 15:28", "attempt": 2, "class": "content-partly-lost-and-displaced", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-18 16:11", "attempt": 3, "class": "content-partly-lost-and-displaced", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-18 16:23", "attempt": 4, "class": "content-partly-lost-and-displaced", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-18 17:00", "attempt": 18, "class": "content-missing-partly-replaced", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
