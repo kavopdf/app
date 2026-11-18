@@ -54,6 +54,31 @@ def _findings():
         return []
 
 
+def _finding_landed(a):
+    """Did this agent actually land a finding?
+
+    AN AGENT IS NOT SILENT JUST BECAUSE TIME PASSED. This list called every agent older than the
+    threshold "no finding committed - it may have died" without ever looking. Measured 18 Nov: two
+    agents were reported dead at 59 minutes while both of their findings sat in FINDINGS/ - A at
+    10,100 bytes and B at 12,406 bytes, committed an hour earlier. The run that read this list would
+    have re-deployed work it already had.
+    """
+    d = os.path.join(HERE, "FINDINGS")
+    if not os.path.isdir(d):
+        return ""
+    cls = (a.get("class") or "").split(" / ")[0].strip()
+    angle = (a.get("angle") or "").strip()
+    if not cls:
+        return ""
+    for f in sorted(os.listdir(d)):
+        if cls not in f:
+            continue
+        if angle and ("-%s-" % angle) not in f:
+            continue
+        return f
+    return ""
+
+
 def collect():
     items = []
     now = time.time()
@@ -78,15 +103,18 @@ def collect():
                 age += 1440
         except Exception:
             pass
-        silent = age is not None and age >= AGENT_SILENT_MIN
+        landed = _finding_landed(a)
+        silent = age is not None and age >= AGENT_SILENT_MIN and not landed
         items.append({"kind": "agent", "who": a.get("id") or (a.get("class", "") + "/" + a.get("angle", "")),
                       "what": "%s / %s - %s" % (a.get("class", ""), a.get("angle", ""),
                                                 (a.get("question") or "")[:100]),
-                      "why": ("deployed %s min ago and no finding committed - it may have died with "
-                              "its run. Check FINDINGS/ for %s, then either read it or re-deploy."
-                              % (age, a.get("class", ""))) if silent else
-                             ("deployed %s min ago, expected %s - check FINDINGS/ before you re-deploy"
-                              % (age if age is not None else "?", a.get("expected") or "?"))})
+                      "why": ("its finding LANDED - FINDINGS/%s. Read it and act on it; do not "
+                              "re-deploy this agent." % landed) if landed else
+                             (("deployed %s min ago and no finding committed - it may have died with "
+                               "its run. Check FINDINGS/ for %s, then either read it or re-deploy."
+                               % (age, a.get("class", ""))) if silent else
+                              ("deployed %s min ago, expected %s - check FINDINGS/ before you re-deploy"
+                               % (age if age is not None else "?", a.get("expected") or "?")))})
 
     # 3. A fix that was kept but never ratcheted at corpus scale.
     att = _load(ATTEMPTS, {})
