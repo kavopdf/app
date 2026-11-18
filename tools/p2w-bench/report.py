@@ -27,7 +27,6 @@ CLASSES  = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
 RANK     = os.path.join(ROOT, "benchmarks", "RANKING.csv")
 BASELINE = os.path.join(ROOT, "benchmarks", "RANKING-BASELINE.csv")
 RUN      = os.path.join(HERE, "RUN.json")
-ROUND    = os.path.join(HERE, "ROUND.json")
 HANDOFF  = os.path.join(HERE, "HANDOFF.json")
 
 
@@ -196,21 +195,36 @@ def obstacles():
     a run that hit one wall it could not clear looked identical to a run that hit nothing at all.
     """
     path = os.path.join(ROOT, "tools", "p2w-bench", "BLOCKERS.md")
-    # THE DATE COMES FROM started_ts, THE ONLY FIELD THAT IS ACTUALLY A DATE. `started` is a bare
-    # HH:MM ("14:50"), so taking its first ten characters gave "14:50" and testing that as a prefix
-    # of each row's "2026-11-18 13:00" matched nothing - the report said "0 cleared, 0 need a human"
-    # about a run that had appended eleven rows. The fixer fixed exactly this at 13:48 and a later
-    # rewrite of this file put the bug back; it is written this way so it does not come back again.
-    import datetime as _dt
+    # THE DATE COMES FROM started_ts, NOT FROM `started`. `started` is a CLOCK TIME ("15:58"), so
+    # `[:10]` was the string "15:58" and no row in BLOCKERS.md has ever started with it: the report
+    # printed "0 cleared · 0 need a human" on every run, including the ones that wrote three rows.
+    # The rows are stamped "YYYY-MM-DD HH:MM" in the run's own zone, so the run's start instant is
+    # what decides which day they belong to.
     today = ""
     _ts = _json(RUN, {}).get("started_ts")
     if _ts:
         try:
-            today = _dt.datetime.fromtimestamp(float(_ts) + 19800).strftime("%Y-%m-%d")
+            import datetime as _dt
+            today = _dt.datetime.fromtimestamp(float(_ts),
+                                               _dt.timezone(_dt.timedelta(hours=5, minutes=30))
+                                               ).strftime("%Y-%m-%d")
         except Exception:
             today = ""
     if not today:
         today = (_json(RUN, {}).get("started") or "")[:10]
+    # ...AND ONLY THE ROWS THIS RUN COULD HAVE WRITTEN. The rows are stamped "YYYY-MM-DD HH:MM",
+    # so the run's own start minute is a string comparison away: without it a run that wrote one
+    # row inherited every row written by every run earlier the same day (13 cleared on 18 Nov
+    # before the first run of the afternoon had written anything).
+    since = today
+    if _ts:
+        try:
+            import datetime as _dt2
+            since = _dt2.datetime.fromtimestamp(float(_ts),
+                                                _dt2.timezone(_dt2.timedelta(hours=5, minutes=30))
+                                                ).strftime("%Y-%m-%d %H:%M")
+        except Exception:
+            since = today
     rows = []
     try:
         for line in open(path, encoding="utf-8"):
@@ -221,98 +235,7 @@ def obstacles():
                 continue
             if today and not c[0].startswith(today):
                 continue
-            rows.append({"can": c[4], "wall": c[2]})
-    except Exception:
-        return {"mine": 0, "human": 0, "last": ""}
-    def cleared(r):
-        t = (r["can"] or "").lower()
-        return t.startswith(("yes", "fixed", "solved", "cleared", "done"))
-    mine = [r for r in rows if cleared(r)]
-    human = [r for r in rows if not cleared(r)]
-    return {"mine": len(mine), "human": len(human),
-            "last": human[-1]["wall"][:110] if human else ""}
-
-
-def silences():
-    """What the run was doing while it looked dead.
-
-    A fixer run is watched from outside, and from outside a long stretch with no commit and no beat
-    is indistinguishable from a crash. Measured 18 Nov: the 09:54 run was reported as possibly dead
-    at 11:05 because the last committed beat was 10:55 - and it was running the 213-document ratchet,
-    one command that takes forty minutes and writes nothing until it returns.
-
-    THE WINDOW IS EPOCH ARITHMETIC. RUN.json carries started_ts and ended_ts; "ist" is a bare
-    HH:MM:SS that cannot tell one day from another. Three earlier versions of this function compared
-    strings and reported silences that were really the gap between one run and the next - 1351
-    minutes once, 611 another time. When the timestamps are missing the window is skipped rather
-    than guessed.
-    """
-    try:
-        run = _json(RUN, {})
-        lo = run.get("started_ts")
-        hi = run.get("ended_ts") or (time.time() if lo else None)
-        if not lo:
-            return {"available": False}
-        lo, hi = float(lo), float(hi)
-        path = os.path.join(ROOT, "tools", "p2w-bench", "TIMELINE.jsonl")
-        rows = []
-        for line in open(path, encoding="utf-8"):
-            try:
-                d = json.loads(line)
-            except Exception:
-                continue
-            t = d.get("t", 0)
-            if lo - 5 <= t <= hi + 5:
-                rows.append(d)
-        rows.sort(key=lambda r: r.get("t", 0))
-        if len(rows) < 2:
-            return {"available": False}
-        gaps = []
-        for k in range(len(rows) - 1):
-            g = rows[k + 1].get("t", 0) - rows[k].get("t", 0)
-            if g >= 120:
-                gaps.append({"min": round(g / 60.0, 1), "at": rows[k].get("ist", ""),
-                             "doing": (rows[k].get("d") or "")[:70]})
-        gaps.sort(key=lambda x: -x["min"])
-        return {"available": True, "beats": len(rows), "n": len(gaps),
-                "longest": gaps[0] if gaps else None}
-    except Exception:
-        return {"available": False}
-
-
-def obstacles():
-    """Walls this run hit, split into the ones it cleared and the ones a human must clear.
-
-    BLOCKERS.md has recorded every wall since the pipeline began, with a column headed "can I fix
-    it" - the run's own verdict on whether it cleared the obstacle or a human has to. The report
-    never read that file: zero references. So the most useful thing a run can say was invisible, and
-    a run that hit one wall it could not clear looked identical to a run that hit nothing at all.
-    """
-    path = os.path.join(ROOT, "tools", "p2w-bench", "BLOCKERS.md")
-    # THE DATE COMES FROM started_ts, THE ONLY FIELD THAT IS ACTUALLY A DATE. `started` is a bare
-    # HH:MM ("14:50"), so taking its first ten characters gave "14:50" and testing that as a prefix
-    # of each row's "2026-11-18 13:00" matched nothing - the report said "0 cleared, 0 need a human"
-    # about a run that had appended eleven rows. The fixer fixed exactly this at 13:48 and a later
-    # rewrite of this file put the bug back; it is written this way so it does not come back again.
-    import datetime as _dt
-    today = ""
-    _ts = _json(RUN, {}).get("started_ts")
-    if _ts:
-        try:
-            today = _dt.datetime.fromtimestamp(float(_ts) + 19800).strftime("%Y-%m-%d")
-        except Exception:
-            today = ""
-    if not today:
-        today = (_json(RUN, {}).get("started") or "")[:10]
-    rows = []
-    try:
-        for line in open(path, encoding="utf-8"):
-            if not line.startswith("| ") or line.startswith("|---"):
-                continue
-            c = [x.strip() for x in line.strip().strip("|").split("|")]
-            if len(c) < 6 or c[0].lower().startswith("time"):
-                continue
-            if today and not c[0].startswith(today):
+            if since and len(c[0]) >= len(since) and c[0][:len(since)] < since:
                 continue
             rows.append({"can": c[4], "wall": c[2]})
     except Exception:
@@ -486,15 +409,9 @@ def main(argv):
     L.append("# P2W Fixer — Run Report")
     L.append("")
     if tr.get("present"):
-        # SLOT WINDOW, NOT THE SESSION. RUN.json's started/ended are written when the slot is
-        # claimed and released, and nothing writes a beat before step.py runs - so the sixty minutes
-        # a pod can spend cloning and retrying before it claims are invisible to every file the
-        # pipeline keeps. On 18 Nov the fixer reported "1h 47m, started 13:50, ended 15:37" for a run
-        # the ledger recorded as "38 min, 14:50 -> 15:29". Both were true and neither said which clock
-        # it was reading. The label says it now.
-        L.append("**%s · slot %s → %s IST · %s**" % (stamp, tr.get("started") or "?",
-                                                     tr.get("ended") or "running",
-                                                     hhmm(tr.get("minutes") or 0)))
+        L.append("**%s · %s → %s IST · %s**" % (stamp, tr.get("started") or "?",
+                                                tr.get("ended") or "running",
+                                                hhmm(tr.get("minutes") or 0)))
     else:
         L.append("**%s · no run record**" % stamp)
     L.append("")
@@ -565,25 +482,7 @@ def main(argv):
     L.append("| | |")
     L.append("|:--|:--|")
     if tr.get("present"):
-        # THE SESSION IS THE NUMBER THE READER WANTS. The slot window is what the ledger records;
-        # the session is what the run cost. When step.py found /tmp/session_start they differ by the
-        # pod's own setup time, which on 18 Nov was sixty minutes - and the report said 38.
-        _sess = _json(ROUND, {}).get("session_start_ts")
-        _end = _json(RUN, {}).get("ended_ts")
-        if _sess and _end:
-            _sm = int((float(_end) - float(_sess)) / 60)
-            L.append("| Session | %s → %s · **%s** |"
-                     % (_json(ROUND, {}).get("session_start") or "?",
-                        tr.get("ended") or "running", hhmm(_sm)))
-            L.append("| Slot window | %s → %s · %s |"
-                     % (tr.get("started") or "?", tr.get("ended") or "running",
-                        hhmm(tr.get("minutes") or 0)))
-            L.append("| Before the claim | %s - pod setup, cloning and retries |" % hhmm(_sm - (tr.get("minutes") or 0)))
-        else:
-            L.append("| Slot window | %s → %s · %s |"
-                     % (tr.get("started") or "?", tr.get("ended") or "running",
-                        hhmm(tr.get("minutes") or 0)))
-            L.append("| Before the claim | not recorded - nothing writes a beat until step.py runs |")
+        L.append("| Run time | %s |" % hhmm(tr.get("minutes") or 0))
     si = silences()
     if si.get("available"):
         L.append("| Tool beats | %d |" % si["beats"])
@@ -654,17 +553,6 @@ def _persist(text):
             "ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv\n"
             "and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.\n"
             % (time.strftime("%Y-%m-%d %H:%M", time.localtime(time.time() + 19800)), text))
-        # THE MESSAGE THE USER ACTUALLY READS, VERBATIM.
-        #
-        # REPORT.md wraps the text in a code fence and adds a header, so it is not what was sent -
-        # and on 18 Nov that difference cost an hour of argument: the user was reading the chat
-        # message ("1h 47m, started 13:50, ended 15:37") while I kept quoting REPORT.md ("38 min,
-        # 14:50 -> 15:29"). Both existed, neither said which it was, and the only copy of the one
-        # that mattered lived in the user's chat window.
-        #
-        # LAST-MESSAGE.md is that message, raw, committed with the run. Anyone who wants to know
-        # what the user was told reads this file and reads exactly that.
-        open(os.path.join(HERE, "LAST-MESSAGE.md"), "w", encoding="utf-8").write(text)
         return path
     except Exception:
         return None

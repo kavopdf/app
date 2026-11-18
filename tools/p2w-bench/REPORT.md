@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-18 16:18
+# Fixer report - 2026-11-18 16:23
 
 ```
 # P2W Fixer — Run Report
 
-**18 Nov 2026 · 15:58 → running IST · 19 min**
+**18 Nov 2026 · 15:58 → running IST · 25 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 3 of 212 |
 | Corpus improvement vs 15 Nov | **+8.24%** — mean 6.15 → 5.64 |
 | Regressions | **none** |
@@ -26,10 +26,10 @@
 
 | | |
 |:--|:--|
-| Run time | 19 min |
-| Tool beats | 15 |
+| Run time | 25 min |
+| Tool beats | 24 |
 | Longest silence | **12.8 min** — from 15:58:51, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 3 |
 | Obstacles | 3 cleared · 0 need a human |
 
 ## Best results this round
@@ -42,7 +42,7 @@
 
 ## Next run
 
-Do NOT re-open the squeeze or the anchor rule on itr-computation-with-slab-table - both are measured and refuted (FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md). The largest single term there is the cell baseline: cellBeforeTw's fallback is LINE_BASE*(rowLineTw - cellBoxTw) and rowLineTw is the cell's LINE capped at 200 twips, not the row's pitch, so in a tall row (18.4 pt) every cell lands 5.2 pt high. Screen that on the table documents that already score well (320_balance_sheet_statutory, 404_sudoku_grid, 42_table_coloured_header_alternating_rows) BEFORE touching it - it changes every table on the corpus. Second, and cheaper: the class still needs the human decision in BLOCKERS 14:50 (6 of 7 documents are already under 5.0; attempt.py's bar cannot close it). Third: measure_doc_chunked reports pages_done=160 pages_total=300 beside a complete result and pages_compared=1200 - check its accumulator before the next 300-page document.
+The pending gate is EMPTY, so a new class may be taken - but do not take one on itr-computation-with-slab-table's account: its three remaining defects are named in FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md and HYPOTHESES.md, and the cheapest untested one is H3, the footer ROW's position in the row order (the page draws it last at 811.4, the engine emits it between the 816.4 and 834.8 rows). The class content-partly-lost-and-displaced still cannot be closed by attempt.py's bar - 6 of 7 documents are already under 5.0 - and that is the human decision in BLOCKERS 14:50. If a new class is taken, take the smallest OPEN one and screen before building.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

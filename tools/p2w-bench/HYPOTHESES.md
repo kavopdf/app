@@ -697,3 +697,32 @@ Do not re-test one without new evidence, and if you do, say what changed.
   it is bigger than a fixer slot. The engine was reverted to HEAD; nothing from any of the three
   builds is in the tree.
 
+
+## 18 Nov 17:00 — three mechanisms tried on `itr-computation-with-slab-table` (50.80), all refuted
+
+The handoff carried one hypothesis and this run added two of its own. Each was built, screened, and
+reverted; the engine is at `1ba86d7` and the document re-screens at 50.80.
+
+**H1 — "the residual is the f=0.974 squeeze; anchor the footer and the squeeze goes away."**
+REFUTED, twice. (a) There is nothing to anchor: the running footer is a ROW of table 3, not a flow
+paragraph, so `afterTablePt` never sees it and `zeroGap=0` on the trace. An anchor implementation
+written into that branch is dead code on this document. (b) Releasing the squeeze directly — capping
+a clipped table's charge at the page budget, needTw 17278 -> 16836, f 0.974 -> 0.994 — made the
+document WORSE, 50.80 -> 70.85. LESS squeeze is worse, so the squeeze is compensating for a page
+that really is too tall; it is a symptom, not the defect.
+
+**H2 — "the cell baseline: `cellBeforeTw`'s fallback treats `rowLineTw` as the row's pitch."**
+MECHANISM REAL, SCORE DOES NOT MOVE. `rowLineTw` is the cell's LINE, capped at 200 twips; on this
+document it is 190 twips inside a 269 twip row, so every cell is written 3.2-5.2 pt above where the
+page draws it. Using the row's pitch as the foot where the row is >1.3x its own line, and only in
+the fallback (never for a cell placed from a measured baseline): screened on 4 table documents, 4
+measured, 0 better, 0 worse; measured directly on the target, 50.80 -> 51.18 (share1 92.18 -> 69.91
+and invent5 62.48 -> 40.41 improve sharply, median 4.80 -> 5.28 and share5 slightly worse). WHAT
+WOULD BE DIFFERENT: this is a 3-5 pt move on a page whose remaining error is 100+ pt at the foot —
+it needs the header block and the row order fixed at the same time to show up in share5, and it
+touches every table on the corpus, so it needs a corpus pass, not a screen.
+
+**H3 — "the footer row's position in the row order is the defect."** NOT YET TESTED, and it is the
+cheapest of the three: the page draws the footer last (811.4) while the engine emits it between the
+816.4 and 834.8 rows. See FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md for the rendered
+line-by-line table that shows all three defects side by side.

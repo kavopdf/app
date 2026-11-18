@@ -135,7 +135,7 @@
   "status": "OPEN"
  },
  "content-partly-lost-and-displaced": {
-  "attempts": 3,
+  "attempts": 4,
   "engine_note": "last_engine corrected 7dff436 -> 7dff436+a2261d7b2d: attempt.py records `git log -1 -- engine/`, which is the COMMIT and cannot see the working tree, while round.py's release guard computes commit+worktree. The change was measured uncommitted (screen + the 210-document ratchet), so the hash that names the measured tree is the worktree one.",
   "first_seen": null,
   "history": [
@@ -159,6 +159,13 @@
     "outcome": "reverted",
     "reason": "TWO IDEAS MEASURED AND BOTH REVERTED. (1) the handoff's anchor rule in the afterTable branch: it never fires on this document - the footer is a ROW of table 3, not a flow line after it (TBLDBG: the ta",
     "total": 7
+   },
+   {
+    "at": "2026-11-18 16:23",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "THIRD IDEA, ALSO MEASURED AND REVERTED: the cell baseline. cellBeforeTw's fallback is LINE_BASE*(rowLineTw - cellBoxTw) and treats rowLineTw (the cell's LINE, capped at 200 twips) as if it were the ro",
+    "total": 7
    }
   ],
   "last": null,
@@ -168,15 +175,17 @@
   "outcomes": [
    "partial",
    "kept",
+   "reverted",
    "reverted"
   ],
   "ratchet_at": "18 Nov 15:28",
   "ratchet_docs": 210,
-  "reason": "TWO IDEAS MEASURED AND BOTH REVERTED. (1) the handoff's anchor rule in the afterTable branch: it never fires on this document - the footer is a ROW of table 3, not a flow line after it (TBLDBG: the table is charged 145.4 pt for a 140.9 pt band and the page's own needTw is 17278 against 16836), so the branch is dead code here and was reverted rather than committed. (2) capping the clipped table's charge at the page budget (killing the f=0.974 squeeze): needTw 17278 -> 16836, squeeze 0.974 -> 0.994, and the document went 50.80 -> 70.85. LESS SQUEEZE IS WORSE, so the handoff's premise - that the residual 50.80 is the squeeze - is refuted by measurement: the squeeze is compensating for a page that really is too tall, not inventing the overrun. Reverted; engine back to 1ba86d7 and re-screened at 50.80 (1 same).",
+  "reason": "THIRD IDEA, ALSO MEASURED AND REVERTED: the cell baseline. cellBeforeTw's fallback is LINE_BASE*(rowLineTw - cellBoxTw) and treats rowLineTw (the cell's LINE, capped at 200 twips) as if it were the row's pitch. On itr-computation-with-slab-table table 1 the pitch is 13.5 pt and rowLineTw 9.5 pt, so every cell was written 7.6 pt into its row where the page draws it 12.6 pt in - a flat 5.2 pt lift on 100+ cells. Change: where the row is more than 1.3x its own line and the cell was NOT placed from a measured baseline, use the row's pitch as the foot. Built, screened on 4 table documents (itr-computation-with-slab-table, 320_balance_sheet_statutory, 404_sudoku_grid, 42_table_coloured_header_alternating_rows): SCREEN FAIL, 4 measured, 0 better, 0 worse; measured directly on the target it is 50.80 -> 51.18 (share1 92.18 -> 69.91 and invent5 62.48 -> 40.41 improve a lot, but median 4.80 -> 5.28 and share5 up). Not kept - a change that does not move the score is not a change, and it touches every table on the corpus. Reverted; engine back to 1ba86d7.",
   "reasons": [
    "Rows below the paper edge are clipped, not reproduced. itr-computation-with-slab-table draws 3 rules past its 841.9 pt sheet; the engine charged them to the flow (model need=18160 twips vs budget=16836), the fitter answered with a global squeeze f=0.875, and the squeeze came off every gap including the top of the page (w:before 1057->392, page 33.6 pt high). DocxWriter.table(): keepRows drops rows whose top edge is below the paper, rowCapTw cuts the straddling row at the edge. 68.82->50.80 share5, median 9.60->4.80, p90 36.96->16.32; other 6 unchanged, 0 worse. No corpus pass: gated -Dp2w.clipDbg census over all 213 conversions says the branch fires on exactly 1 document, and word/document.xml is byte-identical old vs new engine on an 11-document sample (10 SAME, 1 DIFF = the target).",
    "CORPUS RATCHET over 210 of 213 documents (416_many_tiny_pages, 300 pages, not finished; 77_arabic_rtl_document and 79_inr_indian_digit_grouping_table failed to render this pass): 1 better (itr-computation-with-slab-table 68.82 -> 50.80), 0 worse, 209 unchanged, compared against benchmarks/RANKING.csv. The change: DocxWriter.table() clips table rows whose top edge is below the paper (keepRows) and cuts the straddling row at the edge (rowCapTw). The PDF drew three rules past its own 841.9 pt sheet; the engine charged them to the flow (need=18160 twips vs budget=16836) and the fitter answered with a global squeeze f=0.875 that took 33.6 pt off the page's top gap (w:before 1057 -> 392 twips). Class screen: 7 measured, 1 better, 6 same, 0 worse.",
-   "TWO IDEAS MEASURED AND BOTH REVERTED. (1) the handoff's anchor rule in the afterTable branch: it never fires on this document - the footer is a ROW of table 3, not a flow line after it (TBLDBG: the table is charged 145.4 pt for a 140.9 pt band and the page's own needTw is 17278 against 16836), so the branch is dead code here and was reverted rather than committed. (2) capping the clipped table's charge at the page budget (killing the f=0.974 squeeze): needTw 17278 -> 16836, squeeze 0.974 -> 0.994, and the document went 50.80 -> 70.85. LESS SQUEEZE IS WORSE, so the handoff's premise - that the residual 50.80 is the squeeze - is refuted by measurement: the squeeze is compensating for a page that really is too tall, not inventing the overrun. Reverted; engine back to 1ba86d7 and re-screened at 50.80 (1 same)."
+   "TWO IDEAS MEASURED AND BOTH REVERTED. (1) the handoff's anchor rule in the afterTable branch: it never fires on this document - the footer is a ROW of table 3, not a flow line after it (TBLDBG: the table is charged 145.4 pt for a 140.9 pt band and the page's own needTw is 17278 against 16836), so the branch is dead code here and was reverted rather than committed. (2) capping the clipped table's charge at the page budget (killing the f=0.974 squeeze): needTw 17278 -> 16836, squeeze 0.974 -> 0.994, and the document went 50.80 -> 70.85. LESS SQUEEZE IS WORSE, so the handoff's premise - that the residual 50.80 is the squeeze - is refuted by measurement: the squeeze is compensating for a page that really is too tall, not inventing the overrun. Reverted; engine back to 1ba86d7 and re-screened at 50.80 (1 same).",
+   "THIRD IDEA, ALSO MEASURED AND REVERTED: the cell baseline. cellBeforeTw's fallback is LINE_BASE*(rowLineTw - cellBoxTw) and treats rowLineTw (the cell's LINE, capped at 200 twips) as if it were the row's pitch. On itr-computation-with-slab-table table 1 the pitch is 13.5 pt and rowLineTw 9.5 pt, so every cell was written 7.6 pt into its row where the page draws it 12.6 pt in - a flat 5.2 pt lift on 100+ cells. Change: where the row is more than 1.3x its own line and the cell was NOT placed from a measured baseline, use the row's pitch as the foot. Built, screened on 4 table documents (itr-computation-with-slab-table, 320_balance_sheet_statutory, 404_sudoku_grid, 42_table_coloured_header_alternating_rows): SCREEN FAIL, 4 measured, 0 better, 0 worse; measured directly on the target it is 50.80 -> 51.18 (share1 92.18 -> 69.91 and invent5 62.48 -> 40.41 improve a lot, but median 4.80 -> 5.28 and share5 up). Not kept - a change that does not move the score is not a change, and it touches every table on the corpus. Reverted; engine back to 1ba86d7."
   ],
   "requeues": 0,
   "status": "OPEN"

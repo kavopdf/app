@@ -16,11 +16,11 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> STEP 3/3 fixer, class content-partly-lost-and-displaced. The handoff's carry-over was worked and its diagnosis REFUTED by measurement: the 50.80 residual on itr-computation-with-slab-table is not the f=0.974 squeeze and not an anchorable footer. The footer is a ROW of table 3, not a flow line (traceLines: zeroGap=0, the anchor branch never runs on it), and releasing the squeeze - capping the clipped table's charge at the page budget, needTw 17278 -> 16836, f 0.974 -> 0.994 - made the document WORSE, 50.80 -> 70.85. Both changes built, screened and reverted; engine is back to 1ba86d7 and re-screened at 50.80 (1 same). What the rendered page really shows, line by line: every table cell sits 5.2 pt high (cellBeforeTw's fallback treats rowLineTw, 190 twips, as if it were the row's 368-twip pitch), the first three header lines are in the wrong reading order, and the footer row is emitted between the last two rows. Also cleared: the three documents the 14:30 ratchet could not measure are not blocked - 77_arabic (11.89) and 79_inr (0.74) measure on the first try, and 416_many_tiny_pages measured all 300 pages in one 211 s call with scipy. Evidence: FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md.
+> STEP 3/3 fixer, class content-partly-lost-and-displaced. THREE mechanisms were tried on itr-computation-with-slab-table (50.80) and all three were measured and reverted; the engine is back to 1ba86d7 and the document re-screens at 50.80. (1) The handoff's anchor rule: dead code here - the running footer is a ROW of table 3, not a flow line after it (traceLines zeroGap=0), so afterTablePt never sees it. (2) Releasing the f=0.974 squeeze by capping a clipped table's charge at the page budget (needTw 17278 -> 16836): the document went 50.80 -> 70.85. LESS squeeze is worse, so the squeeze is a symptom of a page that really is too tall, not the defect. (3) The cell baseline: cellBeforeTw's fallback treats rowLineTw (the cell's LINE, 190 twips) as the row's pitch (269), so cells sit 3.2-5.2 pt high; using the row's foot where the row is >1.3x its line screened 4 table documents at 4 same and moved the target 50.80 -> 51.18 (share1 92.18 -> 69.91, invent5 62.48 -> 40.41, median 4.80 -> 5.28). Not kept. The rendered line-by-line comparison names the three real defects: the header's first three lines are in the wrong reading order (our Chartered line at 44.4 where the page draws it at 58.1), the cell baseline, and the footer row emitted between the last two rows. Also cleared this run: the 14:30 blocker's premise was wrong and its row is corrected; 77_arabic (11.89) and 79_inr (0.74) measure on the first try; 416_many_tiny_pages measured all 300 pages in one 211 s call with scipy. report.py's obstacle counter read the run's clock time as a date and printed 0 on every run - fixed.
 
 ## What the next run should do first
 
-> Do NOT re-open the squeeze or the anchor rule on itr-computation-with-slab-table - both are measured and refuted (FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md). The largest single term there is the cell baseline: cellBeforeTw's fallback is LINE_BASE*(rowLineTw - cellBoxTw) and rowLineTw is the cell's LINE capped at 200 twips, not the row's pitch, so in a tall row (18.4 pt) every cell lands 5.2 pt high. Screen that on the table documents that already score well (320_balance_sheet_statutory, 404_sudoku_grid, 42_table_coloured_header_alternating_rows) BEFORE touching it - it changes every table on the corpus. Second, and cheaper: the class still needs the human decision in BLOCKERS 14:50 (6 of 7 documents are already under 5.0; attempt.py's bar cannot close it). Third: measure_doc_chunked reports pages_done=160 pages_total=300 beside a complete result and pages_compared=1200 - check its accumulator before the next 300-page document.
+> The pending gate is EMPTY, so a new class may be taken - but do not take one on itr-computation-with-slab-table's account: its three remaining defects are named in FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md and HYPOTHESES.md, and the cheapest untested one is H3, the footer ROW's position in the row order (the page draws it last at 811.4, the engine emits it between the 816.4 and 834.8 rows). The class content-partly-lost-and-displaced still cannot be closed by attempt.py's bar - 6 of 7 documents are already under 5.0 - and that is the human decision in BLOCKERS 14:50. If a new class is taken, take the smallest OPEN one and screen before building.
 
 ## Agents deployed and not yet accounted for
 
@@ -38,7 +38,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:16` attempt 7 on content-missing-partly-replaced -> partial (1/13 moved)
 - `11:16` agent deployed: content-missing-partly-replaced / A2 - why does parasOfLines reject the six heading lines of 041122 page 7
 - `11:16` agent deployed: content-missing-partly-replaced / D - how many corpus documents have a cell whose lines start left of the first line
 - `11:17` agent landed: contA2-01 /  -> FINDINGS/content-missing-partly-replaced-A2-092912-7c4e.md
@@ -63,6 +62,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:51` attempt 1 on content-partly-lost-and-displaced -> partial (1/7 moved)
 - `15:28` attempt 2 on content-partly-lost-and-displaced -> kept (1/210 moved)
 - `16:11` attempt 3 on content-partly-lost-and-displaced -> reverted (0/7 moved)
+- `16:23` attempt 4 on content-partly-lost-and-displaced -> reverted (0/7 moved)
 
 ## Where the rest of the state lives
 
