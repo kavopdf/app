@@ -136,3 +136,21 @@ estimate a number.
 
 These belong to the pipeline that preceded this one. The current measurement is
 `benchmarks/RANKING.csv`; the current class file is `benchmarks/DEFECT-CLASSES.md`.
+
+## WHEN SOMETHING FAILS
+
+Read `RETRY.md` before you retry anything, and `INCIDENTS.md` for what has already gone wrong and how
+it was cleared. Half of all failures clear by themselves and half never will, and the two look
+identical in a log until you read the reason.
+
+    TRANSIENT     rate limit, 429, 502/503/504, connection reset, timeout
+                  These clear. Wait 5s, 15s, 45s and try again. Three tries.
+    PERMANENT     bad credentials, 401, 403, "Resource not accessible by integration",
+                  404, "no space left on device", a permission denial
+                  These never clear. Stop at once, say what it was, do not retry.
+    ALREADY DONE  "destination path already exists"
+                  Not a failure. Carry on.
+
+A run that retries a permanent failure burns the slot the next run needs. A run that gives up on a
+rate limit wastes an hour that a 45-second wait would have saved. Say which one it was, in the report,
+in one line.

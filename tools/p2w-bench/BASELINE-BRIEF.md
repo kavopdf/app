@@ -184,3 +184,30 @@ is worse than a short report because it reads as evidence. If a command fails, t
 These belong to the pipeline that preceded this one. They still sit in the repository, and
 `RESULTS.jsonl` carries 297 lines from then. **Counting scored rows from it gives a number that
 looks authoritative and is wrong.** Scored comes from `benchmarks/RANKING.csv`.
+
+## WHEN SOMETHING FAILS
+
+Read `RETRY.md` before you retry anything, and `INCIDENTS.md` for what has already gone wrong and how
+it was cleared. Half of all failures clear by themselves and half never will, and the two look
+identical in a log until you read the reason.
+
+    TRANSIENT     rate limit, 429, 502/503/504, connection reset, timeout
+                  These clear. Wait 5s, 15s, 45s and try again. Three tries.
+    PERMANENT     bad credentials, 401, 403, "Resource not accessible by integration",
+                  404, "no space left on device", a permission denial
+                  These never clear. Stop at once, say what it was, do not retry.
+    ALREADY DONE  "destination path already exists"
+                  Not a failure. Carry on.
+
+A run that retries a permanent failure burns the slot the next run needs. A run that gives up on a
+rate limit wastes an hour that a 45-second wait would have saved. Say which one it was, in the report,
+in one line.
+
+## THE COMMIT MESSAGE
+
+Name the documents with `docnames.py`, never by hand and never as a range:
+
+    python3 tools/p2w-bench/docnames.py <doc> <doc> ...
+
+**Never a range.** "documents 40-58" is a claim nobody can check and it goes stale the moment the
+corpus changes; the list of names is checkable for ever.
