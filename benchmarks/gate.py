@@ -169,7 +169,25 @@ def main():
     if a.ratchet_only:
         r = ratchet(); print(json.dumps(r, indent=1)); return 0
 
-    S = dict(ran_at=time.strftime("%Y-%m-%dT%H:%M:%S"), layers={})
+    # WHICH ENGINE PRODUCED THESE NUMBERS. The file recorded everything about the run except the
+    # one thing every later reader needs: what it measured. Without it, round.py's release guard
+    # could only guess whether the tree it was about to ship had ever been ratcheted - it inferred
+    # it from the attempt ledger's outcome list, which is a proxy, and on 18 Nov that proxy said
+    # "reverted" about an engine that had been ratcheted cleanly. Record the identity, including
+    # the uncommitted diff, and the guard can ask the exact question instead.
+    def _engine_id():
+        try:
+            h = sh("git log -1 --format=%h -- app/src/main/java/com/kavopdf/app/engine/", 30)[1].strip()
+            d = sh("{ git diff -- app/src/main/java/com/kavopdf/app/engine/; "
+                   "git diff --cached -- app/src/main/java/com/kavopdf/app/engine/; } | sha1sum", 60)[1]
+            d = (d.split() or [""])[0]
+            if d and d != "da39a3ee5e6b4b0d3255bfef95601890afd80709":
+                return "%s+%s" % (h, d[:10])
+            return h or "unknown"
+        except Exception:
+            return "unknown"
+
+    S = dict(ran_at=time.strftime("%Y-%m-%dT%H:%M:%S"), engine=_engine_id(), layers={})
 
     # ---- layer 1: ground truth ----
     # The instrument needs scipy, and on a fresh pod it is not installed yet: p2w.py

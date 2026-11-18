@@ -546,18 +546,46 @@ def release(name, force=False):
             import subprocess as _sp
             _start = (load().get("fixer_engine_at_claim") or "").strip()
             _root = os.path.normpath(os.path.join(HERE, "..", ".."))
+            # THE ENGINE'S IDENTITY INCLUDES THE WORKING TREE. `git log -1 --format=%h` is the HEAD
+            # commit, so an UNCOMMITTED engine edit left _now unchanged and this guard could not see
+            # it at all - which is precisely the change it exists to catch. The same defect was
+            # found in screen.py's cache stamp on 18 Nov and fixed there; this is the other half.
             _now = _sp.run(["git", "log", "-1", "--format=%h", "--",
                             "app/src/main/java/com/kavopdf/app/engine/"],
                            cwd=_root, capture_output=True, text=True).stdout.strip()
+            _dirty = _sp.run(["bash", "-lc",
+                              "{ git diff -- app/src/main/java/com/kavopdf/app/engine/; "
+                              "git diff --cached -- app/src/main/java/com/kavopdf/app/engine/; } | sha1sum"],
+                             cwd=_root, capture_output=True, text=True).stdout.strip().split()
+            _dirty = _dirty[0] if _dirty else ""
+            if _dirty and _dirty != "da39a3ee5e6b4b0d3255bfef95601890afd80709":
+                _now = "%s+%s" % (_now, _dirty[:10])
             _kept = False
+            # ASK THE STATE RECORD FIRST. benchmarks/STATE.json now carries the engine its numbers
+            # were produced by, so "has this tree been measured" is a fact rather than an inference.
+            # The ledger is the fallback for a state file written before that field existed.
             try:
-                _att = _j.load(open(ATTEMPTS, encoding="utf-8"))
-                for _row in _att.values():
-                    if (_row.get("last_engine") or "").strip() == _now and "kept" in (_row.get("outcomes") or []):
-                        _kept = True
-                        break
+                _st = _j.load(open(os.path.join(_root, "benchmarks", "STATE.json"), encoding="utf-8"))
+                if (_st.get("engine") or "").strip() == _now:
+                    _kept = True
             except Exception:
                 pass
+            if not _kept:
+                try:
+                    _att = _j.load(open(ATTEMPTS, encoding="utf-8"))
+                    for _row in _att.values():
+                        if (_row.get("last_engine") or "").strip() != _now:
+                            continue
+                        # THE LAST OUTCOME, NOT ANY OUTCOME. "kept" in outcomes was true for ever once
+                        # a class had ever been kept, so a run that kept something last week and
+                        # reverted this week passed the guard holding an unmeasured change. What
+                        # matters is what the last attempt against THIS engine decided.
+                        _outs = _row.get("outcomes") or []
+                        if _outs and _outs[-1] == "kept":
+                            _kept = True
+                            break
+                except Exception:
+                    pass
             if _start and _now and _start != _now and not _kept:
                 print("refused: the engine changed this run (%s -> %s) and no attempt was kept." % (_start, _now))
                 print("The ratchet only measures what an attempt says it kept, so this change has never")
