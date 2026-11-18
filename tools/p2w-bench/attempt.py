@@ -376,6 +376,22 @@ def add(args):
               % (type(_exc).__name__, _exc))
 
     row.setdefault("reasons", []).append(args.reason or "")
+    # KEEP THE STORY, NOT JUST THE LAST SENTENCE.
+    #
+    # "outcomes" keeps every verdict but "reason" kept only the newest one, so a class with four
+    # 'kept' outcomes could be read as having one unexplained reason - and on 18 Nov the reason
+    # belonged to a reverted table-rule idea while the run's real fix was the DeviceGray one that
+    # took 415_inline_images from 89.04 to 0.00. Anyone reading the ledger would have concluded the
+    # opposite of what happened.
+    #
+    # Each attempt now appends {outcome, reason, at, moved, total} so the kept one keeps its
+    # explanation even after five later attempts overwrite the field.
+    _hist = row.setdefault("history", [])
+    _hist.append({"outcome": outcome,
+                  "reason": (args.reason or "")[:200],
+                  "at": time.strftime("%Y-%m-%d %H:%M"),
+                  "moved": args.moved, "total": args.total})
+    del _hist[:-20]                      # twenty attempts of memory is more than any class gets
     row["reason"] = args.reason or "(no reason recorded for this attempt)"
     # A VISIBLE DEVIATION. The default is to deploy two or three agents on a class before working
     # it alone. On 16 Nov every run worked alone, and nothing anywhere said so - the rule was a
