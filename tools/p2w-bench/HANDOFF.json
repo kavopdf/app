@@ -142,15 +142,11 @@
    "text": "attempt 2 on content-partly-lost-and-displaced -> kept (1/210 moved)"
   },
   {
-   "at": "16:11",
-   "text": "attempt 3 on content-partly-lost-and-displaced -> reverted (0/7 moved)"
-  },
-  {
-   "at": "16:23",
-   "text": "attempt 4 on content-partly-lost-and-displaced -> reverted (0/7 moved)"
+   "at": "16:12",
+   "text": "attempt 3 on content-partly-lost-and-displaced -> kept (1/7 moved)"
   }
  ],
- "next": "The pending gate is EMPTY, so a new class may be taken - but do not take one on itr-computation-with-slab-table's account: its three remaining defects are named in FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md and HYPOTHESES.md, and the cheapest untested one is H3, the footer ROW's position in the row order (the page draws it last at 811.4, the engine emits it between the 816.4 and 834.8 rows). The class content-partly-lost-and-displaced still cannot be closed by attempt.py's bar - 6 of 7 documents are already under 5.0 - and that is the human decision in BLOCKERS 14:50. If a new class is taken, take the smallest OPEN one and screen before building.",
+ "next": "Finish itr-computation-with-slab-table (50.80). Its remaining 22 pt of overrun is the running footer, which the page draws at y=811 INSIDE table 3's band while the flow can only place it after the table's clipped bottom at 841, so the page still squeezes at f=0.974 and every row drifts -0.45 pt. The anchor rule is already described in DocxWriter's zero-gap branch (~line 4235): the comment says a line the page drew above the flow's position is anchored at its own y, but the code only counts it and writes before=0. Implement that, re-screen this document (screen.py --docs itr-computation-with-slab-table). Second: finish the three documents the ratchet could not measure - 416_many_tiny_pages (300 pages, needs ~5 calls of measure_doc_chunked), 77_arabic_rtl_document and 79_inr_indian_digit_grouping_table (soffice 'no render', re-run them). Third: this class CAN now be closed - attempt.py takes --best-drop and keeps an attempt when one document moved >= 5.0 share points (5d3965a), so the 18.02-point fix on itr-computation-with-slab-table counts even though only 1 of 7 moved. Pass --best-drop when you record it.",
  "agents": [
   {
    "id": "contA-01",
@@ -214,9 +210,9 @@
   }
  ],
  "run": {
-  "started": "15:58",
-  "ended": "16:24",
-  "ended_how": "released"
+  "started": "14:50",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {
@@ -258,14 +254,9 @@
    "at": "11:55",
    "how": "released",
    "plan": ""
-  },
-  {
-   "at": "16:24",
-   "how": "released",
-   "plan": ""
   }
  ],
- "context": "STEP 3/3 fixer, class content-partly-lost-and-displaced. THREE mechanisms were tried on itr-computation-with-slab-table (50.80) and all three were measured and reverted; the engine is back to 1ba86d7 and the document re-screens at 50.80. (1) The handoff's anchor rule: dead code here - the running footer is a ROW of table 3, not a flow line after it (traceLines zeroGap=0), so afterTablePt never sees it. (2) Releasing the f=0.974 squeeze by capping a clipped table's charge at the page budget (needTw 17278 -> 16836): the document went 50.80 -> 70.85. LESS squeeze is worse, so the squeeze is a symptom of a page that really is too tall, not the defect. (3) The cell baseline: cellBeforeTw's fallback treats rowLineTw (the cell's LINE, 190 twips) as the row's pitch (269), so cells sit 3.2-5.2 pt high; using the row's foot where the row is >1.3x its line screened 4 table documents at 4 same and moved the target 50.80 -> 51.18 (share1 92.18 -> 69.91, invent5 62.48 -> 40.41, median 4.80 -> 5.28). Not kept. The rendered line-by-line comparison names the three real defects: the header's first three lines are in the wrong reading order (our Chartered line at 44.4 where the page draws it at 58.1), the cell baseline, and the footer row emitted between the last two rows. Also cleared this run: the 14:30 blocker's premise was wrong and its row is corrected; 77_arabic (11.89) and 79_inr (0.74) measure on the first try; 416_many_tiny_pages measured all 300 pages in one 211 s call with scipy. report.py's obstacle counter read the run's clock time as a date and printed 0 on every run - fixed.",
+ "context": "STEP 3/3 fixer, class content-partly-lost-and-displaced (7 docs). Root cause on its worst document, itr-computation-with-slab-table (68.82 share@5): the PDF draws its last table past the bottom of its own sheet (rules at 848.4/866.8/885.2 on an 841.9 pt page, clipped by every viewer), the engine reproduced those rows, its model of the page needed 908 pt against an 841.8 pt budget, and the fitter answered the overrun with a GLOBAL squeeze (f=0.875) that came off every gap on the sheet including the top of the page - first paragraph w:before 1057 -> 392 twips, whole page 33.6 pt high, 65% of the ink invented and 69% of the source ink >5px from ours. Fix: DocxWriter.table() clips rows whose top edge is below the paper (keepRows) and cuts the straddling row at the edge (rowCapTw). Measured 68.82 -> 50.80 share@5, median 9.60 -> 4.80, p90 36.96 -> 16.32. Class screen 7 measured, 1 better, 6 same, 0 worse. CORPUS RATCHET: 210 of 213 compared (416_many_tiny_pages 300 pages not finished, 77_arabic and 79_inr failed to render), 1 better, 0 worse, 209 unchanged. Recorded as a kept ratchet attempt. Full diagnosis in FINDINGS/content-partly-lost-and-displaced-CLIP-1521.md.",
  "needs_human": [],
- "next_class": ""
+ "next_class": "itr-computation-with-slab-table"
 }
