@@ -1,11 +1,9 @@
 {
   "baseline_started": 1794936722.77173,
   "classifier_started": 1794939194.3206565,
-  "fixer_doing": "claimed, gathering work",
-  "fixer_doing_since": 1794997730.9102926,
   "fixer_engine_at_claim": "1ba86d7",
   "fixer_last_beat": 1794997730.9102936,
-  "fixer_started": 1794999206.9795303,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
