@@ -485,9 +485,15 @@ def main(argv):
     L.append("# P2W Fixer — Run Report")
     L.append("")
     if tr.get("present"):
-        L.append("**%s · %s → %s IST · %s**" % (stamp, tr.get("started") or "?",
-                                                tr.get("ended") or "running",
-                                                hhmm(tr.get("minutes") or 0)))
+        # SLOT WINDOW, NOT THE SESSION. RUN.json's started/ended are written when the slot is
+        # claimed and released, and nothing writes a beat before step.py runs - so the sixty minutes
+        # a pod can spend cloning and retrying before it claims are invisible to every file the
+        # pipeline keeps. On 18 Nov the fixer reported "1h 47m, started 13:50, ended 15:37" for a run
+        # the ledger recorded as "38 min, 14:50 -> 15:29". Both were true and neither said which clock
+        # it was reading. The label says it now.
+        L.append("**%s · slot %s → %s IST · %s**" % (stamp, tr.get("started") or "?",
+                                                     tr.get("ended") or "running",
+                                                     hhmm(tr.get("minutes") or 0)))
     else:
         L.append("**%s · no run record**" % stamp)
     L.append("")
@@ -558,7 +564,10 @@ def main(argv):
     L.append("| | |")
     L.append("|:--|:--|")
     if tr.get("present"):
-        L.append("| Run time | %s |" % hhmm(tr.get("minutes") or 0))
+        L.append("| Slot window | %s → %s · %s |"
+                 % (tr.get("started") or "?", tr.get("ended") or "running",
+                    hhmm(tr.get("minutes") or 0)))
+        L.append("| Before the claim | not recorded - nothing writes a beat until step.py runs |")
     si = silences()
     if si.get("available"):
         L.append("| Tool beats | %d |" % si["beats"])
