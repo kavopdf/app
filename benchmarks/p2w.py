@@ -413,26 +413,56 @@ def content(src_txt,our_txt):
     return dict(chars_src=len(a),chars_ours=len(b),
                 recall=round(keep/len(a)*100,2), missing=len(a)-keep)
 
+def _pix(pg, m):
+    """One page as a grayscale array, rotation neutralised - see the /ROTATE note above."""
+    pg.set_rotation(0)
+    x = pg.get_pixmap(matrix=m, colorspace=fitz.csGRAY, alpha=False)
+    return np.frombuffer(x.samples, np.uint8).reshape(x.height, x.width).copy()
+
+
 def measure_doc(pdf,dx):
+    """Measure one document, a page at a time.
+
+    THIS USED TO RENDER EVERY PAGE OF BOTH DOCUMENTS BEFORE COMPARING ANY OF THEM.
+
+    render() returns a list, so a 300-page document held 300 source pages and 300 produced pages
+    in memory at once - about 1.3 GB at 150 DPI. Measured 18 Nov on 416_many_tiny_pages (300 pages,
+    900 paragraphs): the run died with
+
+        numpy._ArrayMemoryError: Unable to allocate 16.6 MiB
+        for an array with shape (1755, 1241) and data type float64
+
+    which is not a 16 MB problem - it is the last allocation of a process that had already spent its
+    whole address space on page images. The document was recorded as 'unmeasured' in every ranking
+    for two days, and the classifier could not say anything about it.
+
+    Two pages are now in memory at a time, and only the per-page result survives the loop.
+    """
     tmp=ROOT+"/tmp"; os.makedirs(tmp,exist_ok=True)
     rp=conv(dx,tmp)
     if not rp: return dict(doc=os.path.basename(dx),error="no render")
-    sp,op=render(pdf),render(rp)
-    st,ot=text_of(pdf),text_of(rp)
-    n=min(len(sp),len(op))
+    ds=fitz.open(pdf); do=fitz.open(rp)
+    st=[pg.get_text() for pg in ds]; ot=[pg.get_text() for pg in do]
+    n=min(len(ds),len(do))
+    m=fitz.Matrix(DPI/72.0,DPI/72.0)
     pages=[]
     for i in range(n):
-        p=position(sp[i],op[i])
+        a=_pix(ds[i],m); b=_pix(do[i],m)
+        p=position(a,b)
         c=content([st[i]] if i<len(st) else [""],[ot[i]] if i<len(ot) else [""])
-        inv=invention(sp[i],op[i])
+        inv=invention(a,b)
         p["page"]=i+1; p["signature"]=signature(p); p["text_recall"]=c["recall"]
         p["invent5"]=inv["shares"][5]; p["invent_max_pt"]=inv["max_pt"]
         pages.append(p)
+        del a, b
+    n_src, n_ours = len(ds), len(do)
+    ds.close(); do.close()
+    sp=[None]*n_src; op=[None]*n_ours
     worst=max(pages,key=lambda x:x["shares"][5]) if pages else None
     ct=content(st,ot)
     return dict(doc=os.path.basename(dx),
-        pages_src=len(sp),pages_ours=len(op),pages_compared=n,
-        extra_pages=max(0,len(op)-len(sp)),missing_pages=max(0,len(sp)-len(op)),
+        pages_src=n_src,pages_ours=n_ours,pages_compared=n,
+        extra_pages=max(0,n_ours-n_src),missing_pages=max(0,n_src-n_ours),
         # position, page-1-worst (the page that is worst at the tightest tolerance)
         share1=worst["shares"][1] if worst else 0.0,
         share2=worst["shares"][2] if worst else 0.0,
