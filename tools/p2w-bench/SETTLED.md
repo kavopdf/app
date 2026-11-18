@@ -42,15 +42,6 @@ in the same breath takes `392_statistical_console_output` from 1.61 to 13.94. Th
 and aimed at the right thing; it is too broad. A version gated on the case it fixes, rather than
 applied to every run, is the best single change available. That is new work, not a patch to apply.
 
-**CORRECTED 18 Nov 17:05 - the 96 % gain does not reproduce on engine `7a95b1c`.** The patch was
-re-applied (it applies clean), built, and screened on four documents: `360_restaurant_menu`
-**34.43 -> 34.43**, no movement at all; `392_statistical_console_output` 1.61 -> 13.94, exactly as
-recorded; `itr-computation-with-slab-table` and `320_balance_sheet_statutory` unchanged. So the
-1.31 belongs to the engine state the patch was measured on, not to the patch, and there is nothing
-here to gate - a gate on a change that moves nothing is a gate on nothing. Do not spend another
-slot re-testing it; if the size mechanism is worth having, it has to be re-derived from the current
-engine's own `size` vs `sizePt` values, starting from a measurement, not from this paragraph.
-
 ## The four commits after the baseline are decided. Do not re-verify.
 
     232f622  15 documents: 0 better, 0 worse. The .docx bytes differ; the scores do not.
@@ -112,3 +103,48 @@ this row is the difference. It also prints **"obstacles this run"**, counted fro
 So when something goes wrong, write the row in `BLOCKERS.md` and let the report carry it. Being stuck
 is not a failure to report - it is the most useful thing you can report, because the next run reads the
 file and starts where you stopped instead of walking into the same wall.
+
+## A document that was never measured is not a clean document
+
+`416_many_tiny_pages` sat in `RANKING.csv` with `share5=0.0` and `problem=none` - reading as PERFECT
+in the one table the pipeline is judged on - while `EXEMPT.json` said it had never been measured at
+all. Two lies in one row: `none` told the class file it was clean, and `0.0` dragged the corpus mean
+down so every other number looked better than it was.
+
+**Settled:** an exempt document carries a BLANK score and `problem=exempt`. Blank means unknown; zero
+means perfect. The corpus mean covers 212 documents, and the report prints the exempt one on its own
+line. `gate.py` re-applies the exemption after every publish, because `p2w.py` writes `0.0`/`none`
+for anything it cannot measure and would put the lie back.
+
+## Two clocks, and the report prints both
+
+`RUN.json` records when the slot was CLAIMED. Nothing writes a beat before `step.py` runs, so the time
+a pod spends cloning and retrying before it claims is invisible to every file - on 18 Nov a run began
+at 13:50, claimed at 14:50, and the report said "38 min" about a session that lasted 1h 47m.
+
+**Settled:** the prompt's first command writes the epoch to `/tmp/session_start`; `step.py` copies it
+into `ROUND.json`; `report.py` prints Session, Slot window and Before the claim as three separate rows.
+Never type a time - `blockers.py` stamps blocker rows from the clock, because three rows once went in
+stamped 16:35/16:38/16:44 inside a commit dated 16:24:27.
+
+## The report is a file, and it is the message
+
+The cron delivers the fixer's last text to the chat and stores nothing - `cron runs` returns
+`output_summary: null`. Twice the only way anyone could read what the user was told was for the user to
+export the cron page to a PDF, seven pages of prompt included.
+
+**Settled:** write the finished message to `/tmp/report.md`, run `lastmessage.py --file`, commit
+`LAST-MESSAGE.md`, then send that exact text. The file and the message must be identical.
+
+## Sign every commit "p2w fixer <HH:MM>: <subject>"
+
+`report.py` finds the run's commits by that prefix and unions their files for the Committed line.
+Without it the line counts somebody else's work: on 18 Nov it reported nineteen files across ten
+commits for a run that made three.
+
+## Do not commit while a fixer run is in flight
+
+A run clones once. Commits that land after its clone leave it reading stale ledgers - on 18 Nov it read
+a blocker row that had been fixed a minute before it started, and a 60-minute re-clone cost the run
+half its session. If origin has moved, `git fetch` and `git reset --hard origin/main` inside the clone
+you already have, and keep your `TIMELINE.jsonl`.
