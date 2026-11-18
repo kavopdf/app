@@ -89,92 +89,19 @@ def _share5(path):
     return d
 
 
-def silences():
-    """What the run was doing while it looked dead.
+def this_run():
+    r = _json(RUN, {})
+    if not r.get("started"):
+        return {"present": False}
+    end = r.get("ended_ts") or time.time()
+    mins = int((end - (r.get("started_ts") or end)) / 60)
+    return {"present": True, "started": r.get("started"), "ended": r.get("ended"),
+            "minutes": mins, "class": r.get("class") or "-",
+            "attempts": r.get("attempts", 0), "kept": r.get("kept", 0),
+            "docs_improved": r.get("docs_improved", 0),
+            "agents": r.get("agents") or [], "obstacles_cleared": r.get("obstacles_cleared", 0),
+            "needs_human": r.get("needs_human", 0)}
 
-    A fixer run is watched from outside, and from outside a long stretch with no commit and no beat
-    is indistinguishable from a crash. Measured 18 Nov: the 09:54 run was reported as possibly dead
-    at 11:05 because the last committed beat was 10:55 - and it was running the 213-document ratchet,
-    one command that takes forty minutes and writes nothing until it returns.
-
-    So the report says it: the longest silence, when it started, and what the run had just called.
-    "38 min, after p2w.py: measuring the corpus" tells the reader it was working. "38 min, after
-    handoff.py" tells them something hung.
-
-    THE WINDOW IS EPOCH ARITHMETIC, NOT STRING COMPARISON. "ist" is a bare HH:MM:SS, so comparing it
-    to a start time silently wraps at midnight: a beat at 13:13 yesterday passes ">= 09:54", and a
-    beat at 09:00 tomorrow passes "<= 11:55". Both versions of this function reported silences that
-    were really the gap between one run and the next. Anchor on the last beat and look back.
-    """
-    try:
-        path = os.path.join(ROOT, "tools", "p2w-bench", "TIMELINE.jsonl")
-        allrows = []
-        for line in open(path, encoding="utf-8"):
-            try:
-                allrows.append(json.loads(line))
-            except Exception:
-                continue
-        if len(allrows) < 2:
-            return {"available": False}
-        last = max(r.get("t", 0) for r in allrows)
-        # THE WINDOW STARTS AT THIS RUN'S CLAIM, not eight hours back. An 8 h look-back from the
-        # last beat reaches into the PREVIOUS run, and on 18 Nov it reported this run's longest
-        # silence as 62.1 min from 11:55:52 - a gap that happened an hour before this run claimed
-        # at 12:58, and after a report.py in a different run. The row that is meant to tell a
-        # reader "it was measuring, not hung" was instead accusing the run of a silence it never
-        # had. RUN.json's started_ts is the claim; that is the only honest anchor.
-        start = _json(RUN, {}).get("started_ts") or (last - 8 * 3600)
-        rows = [r for r in allrows if r.get("t", 0) >= start]
-        if len(rows) < 2:
-            return {"available": False}
-        gaps = []
-        for i in range(len(rows) - 1):
-            g = rows[i + 1].get("t", 0) - rows[i].get("t", 0)
-            if g >= 120:
-                gaps.append({"min": round(g / 60.0, 1), "at": rows[i].get("ist", ""),
-                             "doing": (rows[i].get("d") or "")[:70]})
-        gaps.sort(key=lambda x: -x["min"])
-        return {"available": True, "beats": len(rows), "n": len(gaps),
-                "longest": gaps[0] if gaps else None}
-    except Exception:
-        return {"available": False}
-
-
-def obstacles():
-    """Walls this run hit, split into the ones it cleared and the ones a human must clear.
-
-    BLOCKERS.md has recorded every wall since the pipeline began, with a column headed "can I fix
-    it" - the run's own verdict on whether it cleared the obstacle or a human has to. The report
-    never read that file: zero references. So the most useful thing a run can say was invisible, and
-    a run that hit one wall it could not clear looked identical to a run that hit nothing at all.
-    """
-    path = os.path.join(ROOT, "tools", "p2w-bench", "BLOCKERS.md")
-    # RUN.json's "started" is a bare HH:MM ("12:58"), so [:_10] is "12:58" and every row dated
-    # "2026-11-18 13:00" failed the prefix test: on 18 Nov this counted 0 obstacles for a run that
-    # had appended five. The date comes from the epoch stamp, which is the only field that has one.
-    _run = _json(RUN, {})
-    today = time.strftime("%Y-%m-%d", time.gmtime((_run.get("started_ts") or 0) + 19800)) \
-        if _run.get("started_ts") else (_run.get("started") or "")[:10]
-    rows = []
-    try:
-        for line in open(path, encoding="utf-8"):
-            if not line.startswith("| ") or line.startswith("|---"):
-                continue
-            c = [x.strip() for x in line.strip().strip("|").split("|")]
-            if len(c) < 6 or c[0].lower().startswith("time"):
-                continue
-            if today and not c[0].startswith(today):
-                continue
-            rows.append({"can": c[4], "wall": c[2]})
-    except Exception:
-        return {"mine": 0, "human": 0, "last": ""}
-    def cleared(r):
-        t = (r["can"] or "").lower()
-        return t.startswith(("yes", "fixed", "solved", "cleared", "done"))
-    mine = [r for r in rows if cleared(r)]
-    human = [r for r in rows if not cleared(r)]
-    return {"mine": len(mine), "human": len(human),
-            "last": human[-1]["wall"][:110] if human else ""}
 
 
 def corpus():
@@ -204,18 +131,161 @@ def corpus():
                      for k in sorted(improved, key=lambda k: c[k] - b[k])[:5]]}
 
 
-def this_run():
-    r = _json(RUN, {})
-    if not r.get("started"):
-        return {"present": False}
-    end = r.get("ended_ts") or time.time()
-    mins = int((end - (r.get("started_ts") or end)) / 60)
-    return {"present": True, "started": r.get("started"), "ended": r.get("ended"),
-            "minutes": mins, "class": r.get("class") or "-",
-            "attempts": r.get("attempts", 0), "kept": r.get("kept", 0),
-            "docs_improved": r.get("docs_improved", 0),
-            "agents": r.get("agents") or [], "obstacles_cleared": r.get("obstacles_cleared", 0),
-            "needs_human": r.get("needs_human", 0)}
+
+def obstacles():
+    """Walls this run hit, split into the ones it cleared and the ones a human must clear.
+
+    BLOCKERS.md has recorded every wall since the pipeline began, with a column headed "can I fix
+    it" - the run's own verdict on whether it cleared the obstacle or a human has to. The report
+    never read that file: zero references. So the most useful thing a run can say was invisible, and
+    a run that hit one wall it could not clear looked identical to a run that hit nothing at all.
+    """
+    path = os.path.join(ROOT, "tools", "p2w-bench", "BLOCKERS.md")
+    today = (_json(RUN, {}).get("started") or "")[:10]
+    rows = []
+    try:
+        for line in open(path, encoding="utf-8"):
+            if not line.startswith("| ") or line.startswith("|---"):
+                continue
+            c = [x.strip() for x in line.strip().strip("|").split("|")]
+            if len(c) < 6 or c[0].lower().startswith("time"):
+                continue
+            if today and not c[0].startswith(today):
+                continue
+            rows.append({"can": c[4], "wall": c[2]})
+    except Exception:
+        return {"mine": 0, "human": 0, "last": ""}
+    def cleared(r):
+        t = (r["can"] or "").lower()
+        return t.startswith(("yes", "fixed", "solved", "cleared", "done"))
+    mine = [r for r in rows if cleared(r)]
+    human = [r for r in rows if not cleared(r)]
+    return {"mine": len(mine), "human": len(human),
+            "last": human[-1]["wall"][:110] if human else ""}
+
+
+def silences():
+    """What the run was doing while it looked dead.
+
+    A fixer run is watched from outside, and from outside a long stretch with no commit and no beat
+    is indistinguishable from a crash. Measured 18 Nov: the 09:54 run was reported as possibly dead
+    at 11:05 because the last committed beat was 10:55 - and it was running the 213-document ratchet,
+    one command that takes forty minutes and writes nothing until it returns.
+
+    THE WINDOW IS THE RUN'S OWN, FOUND IN THE TIMELINE BY WALKING, NOT BY COMPARING STRINGS. "ist" is
+    a bare HH:MM:SS, so ">= 09:54" is true for a beat at 13:13 yesterday and "<= 11:55" is true for
+    one at 09:00 tomorrow. Both earlier versions of this function reported silences that were really
+    the gap between one run and the next. The timeline is chronological, so: find the first beat at
+    or after the run's start, take beats forward until one passes the run's end, stop.
+    """
+    try:
+        run = _json(RUN, {})
+        start = run.get("started") or ""
+        end = run.get("ended") or ""
+        path = os.path.join(ROOT, "tools", "p2w-bench", "TIMELINE.jsonl")
+        allrows = []
+        for line in open(path, encoding="utf-8"):
+            try:
+                allrows.append(json.loads(line))
+            except Exception:
+                continue
+        if len(allrows) < 2 or not start:
+            return {"available": False}
+        # WALK BACKWARDS FROM THE RUN'S END. Walking forwards from the start found the first beat
+        # whose HH:MM was >= 09:54 - which is a beat from the previous afternoon, not this morning -
+        # and the window then covered the wrong day. The run's own last beat is the anchor: find the
+        # last beat at or before the end, then take beats backwards while they are at or after the
+        # start. Chronology does the rest.
+        last = None
+        for n in range(len(allrows) - 1, -1, -1):
+            if not end or (allrows[n].get("ist") or "") <= end:
+                last = n
+                break
+        if last is None:
+            return {"available": False}
+        # STOP AT A REAL GAP, NOT AT A STRING. Walking back on ">= 09:54" passes yesterday's
+        # 23:43 beat, because a bare HH:MM cannot tell one day from another - and the window then
+        # covered thirty hours and reported a 611-minute silence that was simply the night. A gap of
+        # more than an hour between consecutive beats means a different run, whatever the clock says.
+        k = last
+        while k > 0:
+            if (allrows[k - 1].get("ist") or "") < start:
+                break
+            if allrows[k].get("t", 0) - allrows[k - 1].get("t", 0) > 3600:
+                break
+            k -= 1
+        rows = allrows[k:last + 1]
+        if len(rows) < 2:
+            return {"available": False}
+        gaps = []
+        for i in range(len(rows) - 1):
+            g = rows[i + 1].get("t", 0) - rows[i].get("t", 0)
+            if g >= 120:
+                gaps.append({"min": round(g / 60.0, 1), "at": rows[i].get("ist", ""),
+                             "doing": (rows[i].get("d") or "")[:70]})
+        gaps.sort(key=lambda x: -x["min"])
+        return {"available": True, "beats": len(rows), "n": len(gaps),
+                "longest": gaps[0] if gaps else None}
+    except Exception:
+        return {"available": False}
+
+
+def subagents():
+    """Every agent this run deployed, with how long each one actually worked.
+
+    "deployed 09:57" with no counterpart meant nobody could say whether an agent took four minutes
+    or forty - the report could name it and nothing else. Each record now carries deployed_at and
+    landed_at as full timestamps; for older records the finding file's commit time is the best
+    available stand-in, and where neither exists the column says so rather than guessing.
+    """
+    h = _json(HANDOFF, {})
+    # THIS RUN'S AGENTS ONLY. RUN.json lists the ids it deployed; the handoff keeps every agent ever
+    # used, so without this filter the report shows agents from three days ago beside today's and
+    # the "Took" column fills with cross-day rows that belong to somebody else's run.
+    mine = set((_json(RUN, {}).get("agents") or []))
+    out = []
+    for a in (h.get("agents") or []):
+        if a.get("status") not in ("landed", "running", "dead"):
+            continue
+        if mine and a.get("id") not in mine:
+            continue
+        dep = a.get("deployed_at") or ""
+        land = a.get("landed_at") or ""
+        dep_s = a.get("deployed") or "-"
+        land_s = "-"
+        took = "-"
+        try:
+            import datetime as _dt
+            if dep and land:
+                d0 = _dt.datetime.fromisoformat(dep)
+                d1 = _dt.datetime.fromisoformat(land)
+                took = "%d min" % round((d1 - d0).total_seconds() / 60.0)
+                land_s = d1.strftime("%H:%M")
+            elif dep_s and a.get("finding"):
+                # the finding file's own commit time, when the record has no landed_at
+                import subprocess
+                r = subprocess.run(["git", "-C", ROOT, "log", "-1", "--format=%ad",
+                                    "--date=format:%H:%M",
+                                    "--", "tools/p2w-bench/" + a["finding"]],
+                                   capture_output=True, text=True, timeout=15)
+                if r.stdout.strip():
+                    land_s = r.stdout.strip()
+                    hh, mm = (dep_s.split(":") + ["0"])[:2]
+                    lh, lm = (land_s.split(":") + ["0"])[:2]
+                    mins = (int(lh) * 60 + int(lm)) - (int(hh) * 60 + int(mm))
+                    if mins < 0:
+                        mins += 1440
+                    # MORE THAN A WORKING DAY IS A DAY BOUNDARY, NOT A DURATION. The old records
+                    # carry HH:MM with no date, so an agent deployed at 13:52 whose finding landed
+                    # the next morning computes as 1386 minutes. Say so instead of printing it.
+                    took = "%d min" % mins if mins <= 600 else "cross-day"
+        except Exception:
+            pass
+        out.append({"id": a.get("id") or "-",
+                    "q": (a.get("question") or a.get("class") or "")[:52],
+                    "dep": dep_s, "land": land_s, "took": took,
+                    "status": a.get("status")})
+    return out
 
 
 def main(argv):
@@ -233,59 +303,124 @@ def main(argv):
                           "needs_human": len(h.get("needs_human") or [])}, indent=1))
         return 0
 
+    # ---------------------------------------------------------------------------------------
+    # THE REPORT IS A DOCUMENT, NOT A DUMP. It is read in a chat window by someone deciding
+    # whether to trust the run, so it is laid out in sections with aligned tables - what changed,
+    # who did the work and for how long, what the run looked like from outside, and what is next.
+    # ---------------------------------------------------------------------------------------
+    date = (tr.get("started") or "")[:0]
+    import datetime as _dt
+    stamp = _dt.datetime.now().strftime("%d %b %Y")
+
+    def hhmm(m):
+        return "%dh %02dm" % (m // 60, m % 60) if m and m >= 60 else ("%d min" % (m or 0))
+
     L = []
-    L.append("=== FIXER REPORT - every number computed from committed files ===")
+    L.append("# P2W Fixer — Run Report")
     L.append("")
-    L.append("1. classes total            : %d  (%d documents across them)" % (total, docs))
-    L.append("2. classes solved           : %d clear, %d still have an OPEN document"
-             % (solved, openc))
     if tr.get("present"):
-        L.append("3. docs improved THIS run   : %d  (%d attempts, %d kept)"
+        L.append("**%s · %s → %s IST · %s**" % (stamp, tr.get("started") or "?",
+                                                tr.get("ended") or "running",
+                                                hhmm(tr.get("minutes") or 0)))
+    else:
+        L.append("**%s · no run record**" % stamp)
+    L.append("")
+
+    best = (co.get("best") or [])
+    if best and tr.get("kept"):
+        b = best[0]
+        L.append("> **%s** fixed — %.2f → %.2f. Corpus ratchet clean across %d documents."
+                 % (b["doc"], b["before"], b["after"], co.get("docs") or 0))
+    elif tr.get("present"):
+        L.append("> No change was kept this run. The numbers below say what was tried.")
+    L.append("")
+
+    L.append("## Progress")
+    L.append("")
+    L.append("| | |")
+    L.append("|:--|:--|")
+    if tr.get("present"):
+        L.append("| Documents improved this run | **%d** — %d attempt(s), %d kept |"
                  % (tr["docs_improved"], tr["attempts"], tr["kept"]))
-        L.append("4. this run total time      : %d min  (%s -> %s)"
-                 % (tr["minutes"], tr["started"], tr["ended"] or "running"))
-        L.append("5. subagents this run       : %d%s"
-                 % (len(tr["agents"]), (" - " + ", ".join(tr["agents"])) if tr["agents"] else ""))
     else:
-        L.append("3. docs improved THIS run   : no run record (RUN.json missing)")
-        L.append("4. this run total time      : unknown")
-        L.append("5. subagents this run       : unknown")
-    L.append("6. working on class         : %s" % working)
+        L.append("| Documents improved this run | no run record |")
     if co.get("available"):
-        L.append("7. corpus improvement       : %+.2f%%  (mean share5 %.2f -> %.2f over %d docs)"
-                 % (co["pct"], co["baseline_mean"], co["current_mean"], co["docs"]))
-        L.append("8. docs improved total      : %d of %d  (%d regressed, %d unchanged)"
-                 % (co["improved"], co["docs"], co["regressed"], co["unchanged"]))
-        if not co["measurement_committed"]:
-            L.append("")
-            L.append("   NOTE: RANKING.csv is identical to the baseline, so no improvement has")
-            L.append("   been COMMITTED since round one. If a run reported improvements, its")
-            L.append("   measurement was never committed and cannot be checked. Re-measure and")
-            L.append("   commit benchmarks/RANKING.csv with the attempt.")
-        if co.get("best"):
-            L.append("")
-            L.append("   best so far:")
-            for x in co["best"]:
-                L.append("     %-42s %6.2f -> %5.2f" % (x["doc"][:42], x["before"], x["after"]))
+        L.append("| Documents improved, round total | %d of %d |"
+                 % (co["improved"], co["docs"]))
+        L.append("| Corpus improvement vs 15 Nov | **%+.2f%%** — mean %.2f → %.2f |"
+                 % (co["pct"], co["baseline_mean"], co["current_mean"]))
+        L.append("| Regressions | %s |"
+                 % ("**none**" if not co["regressed"] else "**%d** — %s"
+                    % (co["regressed"], ", ".join(x["doc"] for x in best[:3]) or "see RANKING.csv")))
     else:
-        L.append("7. corpus improvement       : not measurable - %s" % co.get("why"))
-        L.append("8. docs improved total      : not measurable")
+        L.append("| Corpus improvement | not measurable — %s |" % co.get("why"))
+    L.append("| Classes solved | %d of %d clear — %d class(es) still have an OPEN document |"
+             % (solved, total, openc))
+    L.append("| Working on | `%s` |" % working)
+    L.append("")
+
+    subs = subagents()
+    if subs:
+        L.append("## Subagents")
+        L.append("")
+        L.append("| Agent | Sent to find | Deployed | Landed | Took |")
+        L.append("|:--|:--|--:|--:|--:|")
+        for a in subs:
+            L.append("| `%s` | %s | %s | %s | %s |"
+                     % (a["id"], a["q"], a["dep"], a["land"], a["took"]))
+        L.append("")
+
+    L.append("## Timing")
+    L.append("")
+    L.append("| | |")
+    L.append("|:--|:--|")
+    if tr.get("present"):
+        L.append("| Run time | %s |" % hhmm(tr.get("minutes") or 0))
     si = silences()
     if si.get("available"):
-        L.append(" 9. looked dead, was not    : %d beats, %d silence(s) over 2 min"
-                 % (si["beats"], si["n"]))
+        L.append("| Tool beats | %d |" % si["beats"])
         if si.get("longest"):
-            L.append("     longest silence        : %s min from %s, after %s"
+            L.append("| Longest silence | **%s min** — from %s, after `%s` |"
                      % (si["longest"]["min"], si["longest"]["at"], si["longest"]["doing"]))
+        L.append("| Silences over 2 min | %d |" % si["n"])
     ob = obstacles()
-    L.append("10. obstacles this run     : %d cleared by the run, %d need a human"
-             % (ob["mine"], ob["human"]))
-    if ob["human"]:
-        L.append("     still a wall           : %s" % ob["last"])
+    L.append("| Obstacles | %d cleared · %d need a human |" % (ob["mine"], ob["human"]))
+    if ob.get("human"):
+        L.append("| Still a wall | %s |" % ob["last"])
+    L.append("")
+
+    if best:
+        L.append("## Best results this round")
+        L.append("")
+        L.append("| Document | Before | After | Change |")
+        L.append("|:--|--:|--:|--:|")
+        for x in best[:5]:
+            L.append("| `%s` | %.2f | %.2f | %+.2f |"
+                     % (x["doc"], x["before"], x["after"], x["after"] - x["before"]))
+        L.append("")
+
+    if co.get("available") and not co["measurement_committed"]:
+        L.append("> **RANKING.csv is identical to the baseline.** No improvement has been committed")
+        L.append("> since round one. If a run reported improvements, its measurement was never")
+        L.append("> committed and cannot be checked.")
+        L.append("")
+
+    nxt = (h.get("next") or "").strip()
+    if nxt:
+        L.append("## Next run")
+        L.append("")
+        L.append(nxt)
+        L.append("")
+
     nh = len(h.get("needs_human") or [])
     if nh:
+        L.append("> **%d item(s) need a human** — see the top of `HANDOFF.md`." % nh)
         L.append("")
-        L.append("   %d item(s) NEED A HUMAN - see the top of HANDOFF.md" % nh)
+
+    L.append("---")
+    L.append("*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, "
+             "BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. "
+             "Never remembered, never estimated.*")
     print("\n".join(L))
     return 0
 

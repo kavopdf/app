@@ -220,7 +220,10 @@ def main(argv):
         d["agents"].append({"id": "%s-%02d" % (_base, _n),
                             "class": parts[0].strip(), "angle": parts[1].strip(),
                             "question": parts[2].strip(), "expected": parts[3].strip(),
-                            "deployed": ist(), "status": "running", "finding": ""})
+                            "deployed": ist(), "status": "running", "finding": "",
+                            # Full timestamp as well as the HH:MM, so a duration survives midnight
+                            # and so report.py can say how long the agent actually worked.
+                            "deployed_at": time.strftime("%Y-%m-%dT%H:%M")})
         d["notes"].append({"at": ist(), "text": "agent deployed: %s / %s - %s"
                            % (parts[0].strip(), parts[1].strip(), parts[2].strip()[:80])})
     if "--agent-land" in argv:
@@ -237,6 +240,11 @@ def main(argv):
                                          and a.get("angle") == parts[1].strip()):
                 a["status"] = "landed"
                 a["finding"] = fnd
+                # WHEN IT LANDED, not just that it did. "deployed 09:57" with no counterpart
+                # meant nobody could say whether an agent took four minutes or forty - the report
+                # could name it and nothing else. A full timestamp also survives midnight, which
+                # the bare HH:MM in "deployed" does not.
+                a["landed_at"] = time.strftime("%Y-%m-%dT%H:%M")
                 d["notes"].append({"at": ist(), "text": "agent landed: %s / %s -> %s"
                                    % (parts[0].strip(), parts[1].strip(), fnd or "(no file)")})
                 break
