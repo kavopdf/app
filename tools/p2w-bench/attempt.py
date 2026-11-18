@@ -433,6 +433,23 @@ def add(args):
                        capture_output=True, timeout=25)
     except Exception:
         pass
+    # REWRITE THE CLASS ROWS FROM THE MEASUREMENT. classrow.py decides FIXED by comparing a
+    # document's share@5 now against the baseline: above the line then, at or below it now. Nothing
+    # called it - measured 18 Nov, the only mention of the tool anywhere was a comment in beacon.py -
+    # so a document could be genuinely fixed and its row would still read OPEN for ever. round.py
+    # --close-round refuses while any row says OPEN, so the round could never close and rounds 2 and
+    # 3 could never begin. The fixer would have gone on fixing and the pipeline would have gone on
+    # saying nothing had been fixed.
+    try:
+        import subprocess
+        _cr = subprocess.run([sys.executable, os.path.join(HERE, "classrow.py"), "--write"],
+                             capture_output=True, text=True, timeout=60)
+        if _cr.returncode == 0 and _cr.stdout.strip():
+            _n = [l for l in _cr.stdout.split("\n") if "->" in l]
+            if _n:
+                print("class rows updated from the measurement: %d" % len(_n))
+    except Exception:
+        pass
     print("%s: attempt %d recorded as %s%s"
           % (name, row["attempts"], outcome,
              "  (%d/%d moved)" % (args.moved, args.total) if args.moved is not None else ""))

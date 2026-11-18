@@ -534,13 +534,29 @@ def main(argv):
                 print("The store compares the last two engines row by row. Record what")
                 print("happened: --moved %d --total %d" % (actual, failing))
                 return 1
-            ratio = float(moved) / float(total)
-            if ratio >= 0.5:
-                outcome = "kept"
-            elif ratio >= 1.0 / 3.0:
-                outcome = "improved"
-            else:
-                outcome = "reverted"
+            # ONE AUTHORITY FOR "KEPT". attempt.py is the tool the fixer actually calls, and it
+            # has its own bar: a quarter of the class, never fewer than two documents. This file
+            # carried a different one - 50% for kept, a third for improved - so the same numbers
+            # recorded through the two tools produced different verdicts, and a run that measured
+            # 8 of 30 could be "kept" by one and "reverted" by the other. Import the rule instead
+            # of restating it.
+            try:
+                import importlib.util as _iu, os as _os
+                _sp = _iu.spec_from_file_location(
+                    "_att", _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "attempt.py"))
+                _att = _iu.module_from_spec(_sp)
+                _sp.loader.exec_module(_att)
+                outcome = _att.compute(moved, total)
+                if outcome == "partial":
+                    outcome = "improved"      # this file's older name for the same thing
+            except Exception:
+                ratio = float(moved) / float(total)
+                if moved >= max(2, 0.25 * total):
+                    outcome = "kept"
+                elif ratio >= 1.0 / 3.0:
+                    outcome = "improved"
+                else:
+                    outcome = "reverted"
             if claimed and claimed != outcome:
                 print("refused: you said '%s' but %d of %d documents moved, which is '%s'."
                       % (claimed, moved, total, outcome))
