@@ -304,3 +304,6 @@
 {"t": 1795001438.6485112, "ist": "17:00:38", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795001438.8588207, "ist": "17:00:38", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795002540.558574, "ist": "17:19:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795002596.7554927, "ist": "17:19:56", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795002596.7690272, "ist": "17:19:56", "ev": "release", "d": "fixer released"}
+{"t": 1795002596.882933, "ist": "17:19:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

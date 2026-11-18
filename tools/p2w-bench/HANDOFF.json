@@ -215,8 +215,8 @@
  ],
  "run": {
   "started": "16:52",
-  "ended": null,
-  "ended_how": null
+  "ended": "17:19",
+  "ended_how": "released"
  },
  "history": [
   {
@@ -256,6 +256,11 @@
   },
   {
    "at": "11:55",
+   "how": "released",
+   "plan": ""
+  },
+  {
+   "at": "17:19",
    "how": "released",
    "plan": ""
   }
