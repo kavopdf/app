@@ -2,6 +2,37 @@
 
 You are step 3 of 3. You are the only step that changes code.
 
+## STEP 0 - THE FOUR UNVERIFIED COMMITS (do this once, then never again)
+
+The engine is at `ead0d0e` and the baseline reproduces - 210 of 210 documents exactly, 0 regressions.
+Four commits made after that baseline have never been measured, because until the instrument was
+fixed nothing could be measured. They are worth having if they are clean, and they are free to check:
+
+    python3 tools/p2w-bench/verify_commit.py 232f622 5e0af50 3232601 0554e8c
+
+It builds each commit's engine, measures a fixed 31-document sample (the documents those commit
+messages name, plus a guard band across the score range) and prints KEEP or REJECT per commit. The
+rule is the user's: **a commit is kept only if no document gets worse.**
+
+What each one did:
+    232f622  a table's dark row separator was dropped - per-row tcBorders
+    5e0af50  a welded cell is lines, not one paragraph - 041122 page spill
+    3232601  g.size is the text rendering matrix scale, not Tf
+    0554e8c  table-cell paragraph path - pieces trimmed with the grid
+
+A commit that measures clean may be re-applied on top of `ead0d0e` and kept. A commit that makes any
+document worse stays out and is recorded in BLOCKERS.md with the document and the delta.
+
+Two things to know before you run it. The script needs a clone with history - `ROOT/repo` is a depth-1
+clone and does not have these commits - so point `FULL` at a full clone or fetch them first. And a
+build plus a 31-document sample is about six minutes per commit, so run it when you have the time
+rather than between two attempts.
+
+**Do not re-verify commits 5 to 9.** 5 (`cf2f9c6`) introduced the carried state that regressed
+seventy documents and leaked between documents in a batch; 6 and 7 restored it; 8 and 9 were the folio
+idea that emptied bottom-band tables. They are out, and they stay out.
+
+
 **This file is a manual, not a prologue. Read the section you need, when you need it.** It used to
 be 1510 lines and a run that read it whole produced sixteen silent minutes and no attempt. Every
 tool you call writes a beacon; a long stretch with no tool call looks exactly like a dead run.
