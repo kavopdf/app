@@ -2,37 +2,6 @@
 
 You are step 3 of 3. You are the only step that changes code.
 
-## STEP 0 - THE FOUR UNVERIFIED COMMITS (do this once, then never again)
-
-The engine is at `ead0d0e` and the baseline reproduces - 210 of 210 documents exactly, 0 regressions.
-Four commits made after that baseline have never been measured, because until the instrument was
-fixed nothing could be measured. They are worth having if they are clean, and they are free to check:
-
-    python3 tools/p2w-bench/verify_commit.py 232f622 5e0af50 3232601 0554e8c
-
-It builds each commit's engine, measures a fixed 31-document sample (the documents those commit
-messages name, plus a guard band across the score range) and prints KEEP or REJECT per commit. The
-rule is the user's: **a commit is kept only if no document gets worse.**
-
-What each one did:
-    232f622  a table's dark row separator was dropped - per-row tcBorders
-    5e0af50  a welded cell is lines, not one paragraph - 041122 page spill
-    3232601  g.size is the text rendering matrix scale, not Tf
-    0554e8c  table-cell paragraph path - pieces trimmed with the grid
-
-A commit that measures clean may be re-applied on top of `ead0d0e` and kept. A commit that makes any
-document worse stays out and is recorded in BLOCKERS.md with the document and the delta.
-
-Two things to know before you run it. The script needs a clone with history - `ROOT/repo` is a depth-1
-clone and does not have these commits - so point `FULL` at a full clone or fetch them first. And a
-build plus a 31-document sample is about six minutes per commit, so run it when you have the time
-rather than between two attempts.
-
-**Do not re-verify commits 5 to 9.** 5 (`cf2f9c6`) introduced the carried state that regressed
-seventy documents and leaked between documents in a batch; 6 and 7 restored it; 8 and 9 were the folio
-idea that emptied bottom-band tables. They are out, and they stay out.
-
-
 **This file is a manual, not a prologue. Read the section you need, when you need it.** It used to
 be 1510 lines and a run that read it whole produced sixteen silent minutes and no attempt. Every
 tool you call writes a beacon; a long stretch with no tool call looks exactly like a dead run.
@@ -231,6 +200,35 @@ across the corpus without breaking anything", not "did it move a quarter of the 
 
 **Never call something kept when it is improved.** The tool refuses the claim and says what the
 number is. Always pass `--engine`: without it the tool guesses which engine was "this attempt".
+
+## STEP 6b - SCREEN BEFORE YOU SPEND A CORPUS PASS
+
+An attempt used to cost a full corpus measurement - about forty minutes - and five attempts park a
+class. With 92 OPEN classes that is 307 hours of measuring before one document is fixed. The order was
+wrong: the cheap question was being asked last.
+
+    python3 tools/p2w-bench/screen.py --class "<the class you are working on>"
+
+It measures only that class's documents against the baseline and prints one of three things:
+
+    SCREEN FAIL   nothing improved, or something got worse
+                  -> revert your change and move on. You have spent minutes, not forty.
+    PARTIAL       n of m measured - call it again, the cache carries over
+    SCREEN PASS   something improved and nothing got worse
+                  -> now, and only now, measure the full corpus and run the ratchet
+
+A SCREEN PASS is not a kept fix. The ratchet still has to prove the change across all 213 documents,
+and only that can keep it. The screen only decides whether a corpus pass is worth spending.
+
+WHAT IT COSTS. soffice takes about eighty seconds to start, so the fixed cost of a screen is a few
+minutes whatever the class size. On the small classes - single-element-far-out (1), partly-lost-and-
+displaced (7), partly-lost (11), partly-displaced (12) - that is five to ten minutes instead of forty.
+On the thirty-document class it is about the same as a corpus pass, so there is no loss but no gain
+either; use judgement rather than assuming the screen is always cheaper.
+
+DO THE SMALL CLASSES FIRST. Not because they are easy, but because four of them are 31 of the 92
+documents and each one can be screened in minutes. Finishing them closes four classes and shrinks the
+round instead of leaving 92 OPEN rows at the end.
 
 ## STEP 7 - The ratchet decides. This is the regression rule.
 
