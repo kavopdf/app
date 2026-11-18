@@ -839,6 +839,24 @@ def main(argv):
     return 0
 
 
+def _report_stamp():
+    """The run's own start, not the wall clock, so the same run produces the same file for ever.
+
+    The header used time.time(), so REPORT.md written at 17:19:59 and 17:20:01 carried different
+    timestamps for identical content - which makes two files impossible to compare byte for byte and
+    turns every reproducibility check into a diff of clock digits. A report describes a run; the run
+    has a start, and that is the only time it should carry.
+    """
+    try:
+        run = _json(RUN, {})
+        ts = run.get("started_ts")
+        if ts:
+            return time.strftime("%Y-%m-%d %H:%M", time.gmtime(float(ts) + 19800))
+    except Exception:
+        pass
+    return "unknown run"
+
+
 def _persist(text):
     """Write the report to a file, not just to stdout.
 
@@ -859,7 +877,7 @@ def _persist(text):
             "Written by report.py from committed files only. Every number above is read from\n"
             "ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv\n"
             "and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.\n"
-            % (time.strftime("%Y-%m-%d %H:%M", time.localtime(time.time() + 19800)), text))
+            % (_report_stamp(), text))
         # THE MESSAGE THE USER ACTUALLY READS, VERBATIM.
         #
         # REPORT.md wraps the text in a code fence and adds a header, so it is not what was sent -

@@ -1,0 +1,22 @@
+{
+ "corpus": {
+  "count": 213,
+  "sha": "ce734c995f6efe1c"
+ },
+ "engine": "78a1382",
+ "tools": {
+  "PIL": "13.0.0",
+  "fitz": "2.1",
+  "java": "bash: line 1: java: command not found",
+  "numpy": "2.5.4",
+  "os": "Linux x86_64",
+  "pymupdf": "2.1",
+  "python": "Python 3.12.13",
+  "scipy": "MISSING",
+  "soffice": "LibreOffice 7.4.7.2 40(Build:2)"
+ },
+ "warnings": [
+  "scipy is MISSING: the EDT falls back to a forty-times-slower path and long documents are killed mid-measurement. Any score taken now is suspect.",
+  "java is MISSING: the engine cannot be built, so no .docx measurement is possible."
+ ]
+}
