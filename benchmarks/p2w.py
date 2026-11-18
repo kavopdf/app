@@ -755,8 +755,23 @@ def run(end):
             if os.path.exists(jf): continue
             p=f"{CORPUS}/{b}.pdf"; d=f"{DOCX}/{b}.docx"
             if not (os.path.exists(p) and os.path.exists(d)): continue
-            try: r=measure_doc(p,d)
-            except Exception as e: r=dict(doc=os.path.basename(d),error=str(e)[:100])
+            # A 300-page document cannot be measured inside one command. measure_doc_chunked
+            # walks it in page windows and merges them exactly; if it still runs out of time the
+            # result is NOT cached, so the next run resumes rather than recording a half-measured
+            # document as if it were whole.
+            n_pg=0
+            try:
+                _dd=fitz.open(p); n_pg=len(_dd); _dd.close()
+            except Exception: pass
+            if n_pg>80:
+                try: r=measure_doc_chunked(p,d,chunk=60,budget=max(30,int(end-time.time())-20))
+                except Exception as e: r=dict(doc=os.path.basename(d),error=str(e)[:100])
+                if r and r.get("pages_done",0)<r.get("pages_total",0):
+                    log(f"{b}: {r.get('pages_done')} of {r.get('pages_total')} pages - not cached, next run resumes")
+                    continue
+            else:
+                try: r=measure_doc(p,d)
+                except Exception as e: r=dict(doc=os.path.basename(d),error=str(e)[:100])
             json.dump(r,open(jf,"w"))
         done=len(glob.glob(DIST+"/*.json"))
         log(f"chunk {i//CHUNK+1}: measured {done} of {len(todo)+done}")
