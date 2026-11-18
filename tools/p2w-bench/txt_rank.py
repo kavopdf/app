@@ -78,6 +78,15 @@ def main(argv):
     if not ds:
         print("no documents found - is the corpus built?")
         return 2
+    # SCORE WHAT IS NOT SCORED YET. Taking the first n every time re-scored the same documents and
+    # left the rest of the corpus invisible, which is the shape of the bug that produced a day of
+    # "0 of 213". --rescore forces everything; --all means the whole corpus either way.
+    if os.path.exists(OUT) and "--rescore" not in argv:
+        import csv as _c
+        done = {r["document"] for r in _c.DictReader(open(OUT, encoding="utf-8"))}
+        fresh = [d for d in ds if d not in done]
+        if fresh:
+            ds = fresh
     if "--all" not in argv:
         n = 20
         if "--limit" in argv:
@@ -89,13 +98,27 @@ def main(argv):
         rows.append(r)
         if r["failed"] > 0:
             print("  %-40s %d/%d  FAIL %s" % (d[:40], r["passed"], r["applicable"], r["failed_ids"][:50]))
-    # merge into the csv, newest wins
+    # THE TXT RATCHET: NO DOCUMENT MAY GET WORSE.
+    #
+    # The docx has had one since the beginning - a change is kept only if no document regresses - and
+    # the txt had none, because it had no scores. Now that it has scores it gets the same rule: a
+    # document whose failing-check count goes UP between passes is a regression, and it is printed and
+    # counted rather than quietly written over.
     old = {}
     if os.path.exists(OUT):
         import csv as _c
         for row in _c.DictReader(open(OUT, encoding="utf-8")):
             old[row["document"]] = row
+    regressed = []
     for r in rows:
+        prev = old.get(r["document"])
+        if prev:
+            try:
+                was, now = int(prev.get("failed") or 0), r["failed"]
+            except ValueError:
+                was = now = 0
+            if was >= 0 and now > was:
+                regressed.append((r["document"], was, now))
         old[r["document"]] = {k: str(v) for k, v in r.items()}
     import csv as _c
     fields = ["document", "applicable", "passed", "failed", "abstained", "failed_ids"]
@@ -111,6 +134,13 @@ def main(argv):
              len([r for r in rows if r["failed"] > 0]),
              len([r for r in rows if r["failed"] < 0])))
     print("  wrote %s" % OUT)
+    if regressed:
+        print()
+        print("  RATCHET: %d document(s) got WORSE in the txt:" % len(regressed))
+        for d, was, now in regressed:
+            print("    %-40s %d failing -> %d" % (d[:40], was, now))
+        return 1
+    print("  ratchet: no document got worse")
     return 0
 
 

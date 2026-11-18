@@ -507,6 +507,50 @@ def tried():
         return []
 
 
+def txt():
+    """The .txt half: how many documents are scored, how many pass every applicable check.
+
+    THE TXT HAD NO SCORE FOR A DAY. verify_txt.py has twelve named checks and its own docstring says
+    why: "the pipeline measures the .docx path and nothing else... the .txt is never opened. So the
+    fixer cannot improve it." The separate store was deleted on 17 Nov on the belief that
+    RANKING.csv's text_recall covered it - but text_recall compares the RENDERED DOCX's text with the
+    source, and no tool opens the .txt at all. So the txt could break outright without a number
+    moving, and for a day it did.
+
+    A document passes at the same 99% bar the docx uses: EVERY applicable check passes. `abstained`
+    is never counted as a pass - a check that did not run is not a check that passed.
+    """
+    path = os.path.join(HERE, "RANKING-TXT.csv")
+    if not os.path.exists(path):
+        return {"available": False}
+    rows = []
+    try:
+        for r in csv.DictReader(open(path, encoding="utf-8")):
+            try:
+                app = int(r.get("applicable") or 0)
+                bad = int(r.get("failed") or 0)
+            except ValueError:
+                continue
+            if bad < 0 or app <= 0:
+                continue
+            rows.append({"doc": r["document"], "app": app, "failed": bad,
+                         "ids": (r.get("failed_ids") or "").strip()})
+    except Exception:
+        return {"available": False}
+    if not rows:
+        return {"available": False}
+    clean = [r for r in rows if r["failed"] == 0]
+    bad = [r for r in rows if r["failed"] > 0]
+    tally = {}
+    for r in bad:
+        for cid in r["ids"].split():
+            tally[cid] = tally.get(cid, 0) + 1
+    top = sorted(tally.items(), key=lambda t: -t[1])[:3]
+    return {"available": True, "scored": len(rows), "clean": len(clean),
+            "failing": len(bad), "top": top,
+            "pct": round(100.0 * len(clean) / len(rows), 1)}
+
+
 def subagents():
     """Every agent this run deployed, with how long each one actually worked.
 
@@ -676,6 +720,19 @@ def main(argv):
             why = x["reason"].replace("|", "/").replace("\n", " ")
             L.append("| %s | **%s** | %s/%s | %s |"
                      % (x["at"], x["outcome"], x["moved"], x["total"], why[:300]))
+        L.append("")
+
+    tx = txt()
+    if tx.get("available"):
+        L.append("## The txt")
+        L.append("")
+        L.append("| | |")
+        L.append("|:--|:--|")
+        L.append("| Scored | **%d** of 213 |" % tx["scored"])
+        L.append("| Clean - every applicable check passes | **%d** (%.1f%%) |" % (tx["clean"], tx["pct"]))
+        L.append("| Failing at least one check | **%d** |" % tx["failing"])
+        if tx["top"]:
+            L.append("| Most common failure | `%s` - %d documents |" % tx["top"][0])
         L.append("")
 
     subs = subagents()
