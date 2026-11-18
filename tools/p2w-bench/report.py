@@ -193,10 +193,12 @@ def corpus():
     regressed = [k for k in common if c[k] > b[k] + 0.05]
     # FIXED IS NOT MOVED. A document that went 18.48 -> 15.00 has improved by every definition and is
     # still fifteen per cent wrong; calling that a fix is how a run reports progress while ninety-one
-    # documents stay broken. The rule is explicit: a document is fixed only when it matches the
-    # original at 98% or better. share@5px is the fraction of ink more than 5 px from where it
-    # belongs, so 98% match is share5 <= 2.0. The classifier's own clean bar is stricter: share5 < 1.
-    FIXED_BAR = 2.0
+    # documents stay broken.
+    # 99%, NOT 98%. The bar is share5 <= 1.0: at most one per cent of the ink more than 5 px from
+    # where it belongs. That is the same line problem_name() already draws for "none", so a document
+    # the classifier calls clean and a document this report calls fixed are the same document - one
+    # definition, in one place, instead of two that drift apart.
+    FIXED_BAR = 1.0
     fixed = [k for k in common if c[k] <= FIXED_BAR and b[k] > FIXED_BAR]
     moved_open = [k for k in improved if k not in fixed]
     unchanged = len(common) - len(improved) - len(regressed)
@@ -651,7 +653,7 @@ def main(argv):
                  % ("**none**" if not co["regressed"] else "**%d** — %s"
                     % (co["regressed"], ", ".join(x["doc"] for x in best[:3]) or "see RANKING.csv")))
         L.append("| Exempt, not measured | **%d** — %s |" % (len(_exempt()), ", ".join(_exempt()) or "none"))
-        L.append("| **Fixed to 98%%** | **%d** of %d — the rest are still off |" % (co.get("fixed", 0), co.get("docs", 0)))
+        L.append("| **Fixed to 99%%** | **%d** of %d — the rest are still off |" % (co.get("fixed", 0), co.get("docs", 0)))
         L.append("| Moved but still open | **%d** — improved, not fixed |" % co.get("moved_open", 0))
     else:
         L.append("| Corpus improvement | not measurable — %s |" % co.get("why"))
