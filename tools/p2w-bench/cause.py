@@ -163,7 +163,23 @@ def report():
     for doc, rec in d.items():
         by[rec.get("cause", "?")].append(doc)
     path = os.path.join(HERE, "CAUSES.md")
+    # A CENSUS MUST SAY HOW MUCH OF THE CORPUS IT SAW. Six documents classified out of ninety-four
+    # open is not a census, and a reader who takes it for one will size the work from a sample. The
+    # coverage line is the first thing under the heading for that reason.
+    try:
+        import csv as _c
+        _rank = {r["document"]: r for r in _c.DictReader(
+            open(os.path.join(ROOT, "benchmarks", "RANKING.csv"), encoding="utf-8"))}
+        _open = [d for d, r in _rank.items()
+                 if r.get("share5") and float(r["share5"]) > 1.0]
+    except Exception:
+        _open = []
+    _covered = len([d for d in d if d in set(_open)])
     L = ["# Causes, not symptoms", "",
+         "**Coverage: %d of %d open documents classified.** The rest are unclassified, and a cause"
+         % (_covered, len(_open)),
+         "table built from a sample is not a census - re-run `cause.py --open --limit N` against docx",
+         "built by the CURRENT engine before sizing any work from this file.", "",
          "Grouped from `CAUSES.json`, which `cause.py` writes by matching every line of our render",
          "against the line the PDF drew and classifying the SHAPE of the displacement.", "",
          "| cause | documents | what one fix would serve |", "|---|---:|---|"]

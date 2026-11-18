@@ -79,6 +79,10 @@ def score(doc):
 
 
 def main(argv):
+    if len(argv) < 2:
+        print("usage: txt_rank.py --limit N | --all | --rescore | --ratchet")
+        print("  scores the next N UNSCORED documents into tools/p2w-bench/txt/RANKING-TXT.csv")
+        return 2
     ds = docs()
     if not ds:
         print("no documents found - is the corpus built?")

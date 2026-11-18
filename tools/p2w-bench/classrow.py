@@ -31,7 +31,14 @@ BASELINE = os.path.join(ROOT, "benchmarks", "RANKING-BASELINE.csv")
 # A document below this share@5px is no longer the defect the class is named after. 5.0 is the
 # same line the ranking already treats as "ink in the wrong place"; it is a flag so a run can
 # justify a different number rather than silently inherit one.
-DEFAULT_FIXED_BELOW = 5.0
+# THE SAME LINE AS EVERYTHING ELSE: share5 <= 1.0, a 99% match.
+#
+# This was 5.0, so the class file marked a document FIXED at 5 per cent of its ink misplaced while
+# the report and the classifier called it clean only below 1. Six documents - very-long-single-column-
+# table at 2.38, admit-card 1.89, mobile-bill 1.55, landscape-page-inside-portrait-document 1.45,
+# electricity-bill 1.33, salary-slip-corporate 1.28 - were FIXED in one file and below the bar in
+# another. Two thresholds for one question is how a pipeline reports progress it does not have.
+DEFAULT_FIXED_BELOW = 1.0
 
 
 def load_rank(path=RANK):
@@ -41,7 +48,7 @@ def load_rank(path=RANK):
         if not d:
             continue
         try:
-            out[d] = (float(r["share1"]), float(r["share5"]))
+            out[d] = (float(r["share1"]), float(r["share5"]), (r.get("problem") or "").strip())
         except (KeyError, ValueError, TypeError):
             pass
     return out
@@ -144,16 +151,33 @@ def main(argv):
         if doc not in rank:
             out.append(line)
             continue
-        s1, s5 = rank[doc]
+        s1, s5, prob = rank[doc]
+        # THE PROBLEM COMES FROM THE RANKING, NOT FROM THIS FILE. The column was written when the row
+        # was first classified and nothing updated it, so four documents still carried
+        # "content-missing-nothing-in-its-place" while RANKING said "none" with share5 of 0.66, 0.56,
+        # 0.32 and 0.07. The none-branch below tested this stale column, never fired, and the summary
+        # reported 70 open documents where 66 were real. A file that records a measurement must read
+        # the measurement; anything else is a copy that can drift.
+        if prob and prob != c[2]:
+            c[2] = prob
         status = c[6].upper()
         note = c[7]
         if "no defect" in note.lower() or c[2].lower() == "none":
-            out.append(line)          # never broken - leave it alone
+            # A CLEAN DOCUMENT CANNOT BE OPEN. This branch used to leave the whole row alone, which
+            # was right about the numbers and wrong about the status: four documents sat in the class
+            # file marked OPEN with problem "none" and share5 of 0.66, 0.56, 0.32 and 0.07 - passing
+            # the 99% bar and counted as work to do. The summary then said 70 open when 66 were.
+            if status == "OPEN":
+                c[6] = "FIXED"
+                c[7] = "no defect"
+                out.append("| " + " | ".join(c) + " |")
+            else:
+                out.append(line)
             continue
         # FIXED means WE fixed it: it was above the line at baseline and is at or below it now.
         # Anything already below the line at baseline was never this defect, and claiming it
         # would inflate the one number the whole pipeline is judged on.
-        was = base.get(doc, (None, None))[1]
+        was = base.get(doc, (None, None, None))[1]
         new_status = "FIXED" if (was is not None and was > thr >= s5) else "OPEN"
         new_note = ("share@5 %.2f" % s5) if new_status == "FIXED" else (note if note not in ("-", "") else "-")
         newrow = "| %s | `%s` | %s | %.2f | %.2f | %s | %s | %s |" % (
