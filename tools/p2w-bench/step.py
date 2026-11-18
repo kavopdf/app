@@ -1,3 +1,4 @@
+import time as _time
 #!/usr/bin/env python3
 """step.py - everything mechanical, in one call, so the run spends its turns on the work.
 
@@ -156,6 +157,19 @@ def main(argv):
         _rp = os.path.join(ROOT, "tools", "p2w-bench", "ROUND.json")
         _d = _j.load(open(_rp, encoding="utf-8"))
         _d["fixer_engine_at_claim"] = engine_hash()
+        # WHEN THE SESSION STARTED, NOT WHEN THE SLOT WAS CLAIMED.
+        #
+        # The prompt's first command writes the epoch to /tmp/session_start before it clones, because
+        # everything after that point is measured and everything before it is not. On 18 Nov the run
+        # began at 13:50 and claimed the slot at 14:50: an hour of pod setup no file recorded, so the
+        # report said "38 min" about a session lasting 1h 47m while the fixer's own message said
+        # 1h 47m about a slot lasting 38 minutes. Both true, and no way to tell which clock was which.
+        try:
+            _sess = float(open("/tmp/session_start").read().strip())
+            _d["session_start_ts"] = _sess
+            _d["session_start"] = _time.strftime("%H:%M", _time.gmtime(_sess + 19800))
+        except Exception:
+            pass
         _j.dump(_d, open(_rp, "w", encoding="utf-8"), indent=1)
     except Exception:
         pass

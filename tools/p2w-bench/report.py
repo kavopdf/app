@@ -27,6 +27,7 @@ CLASSES  = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
 RANK     = os.path.join(ROOT, "benchmarks", "RANKING.csv")
 BASELINE = os.path.join(ROOT, "benchmarks", "RANKING-BASELINE.csv")
 RUN      = os.path.join(HERE, "RUN.json")
+ROUND    = os.path.join(HERE, "ROUND.json")
 HANDOFF  = os.path.join(HERE, "HANDOFF.json")
 
 
@@ -564,10 +565,25 @@ def main(argv):
     L.append("| | |")
     L.append("|:--|:--|")
     if tr.get("present"):
-        L.append("| Slot window | %s → %s · %s |"
-                 % (tr.get("started") or "?", tr.get("ended") or "running",
-                    hhmm(tr.get("minutes") or 0)))
-        L.append("| Before the claim | not recorded - nothing writes a beat until step.py runs |")
+        # THE SESSION IS THE NUMBER THE READER WANTS. The slot window is what the ledger records;
+        # the session is what the run cost. When step.py found /tmp/session_start they differ by the
+        # pod's own setup time, which on 18 Nov was sixty minutes - and the report said 38.
+        _sess = _json(ROUND, {}).get("session_start_ts")
+        _end = _json(RUN, {}).get("ended_ts")
+        if _sess and _end:
+            _sm = int((float(_end) - float(_sess)) / 60)
+            L.append("| Session | %s → %s · **%s** |"
+                     % (_json(ROUND, {}).get("session_start") or "?",
+                        tr.get("ended") or "running", hhmm(_sm)))
+            L.append("| Slot window | %s → %s · %s |"
+                     % (tr.get("started") or "?", tr.get("ended") or "running",
+                        hhmm(tr.get("minutes") or 0)))
+            L.append("| Before the claim | %s - pod setup, cloning and retries |" % hhmm(_sm - (tr.get("minutes") or 0)))
+        else:
+            L.append("| Slot window | %s → %s · %s |"
+                     % (tr.get("started") or "?", tr.get("ended") or "running",
+                        hhmm(tr.get("minutes") or 0)))
+            L.append("| Before the claim | not recorded - nothing writes a beat until step.py runs |")
     si = silences()
     if si.get("available"):
         L.append("| Tool beats | %d |" % si["beats"])
