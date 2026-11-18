@@ -50,6 +50,7 @@ WHAT IT REFUSES TO DO
     gate.py --ratchet-only        compare current RANKING.csv to the committed one
 """
 import sys, os, json, csv, subprocess, time, argparse, glob, urllib.request
+import shutil
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RANK = "/scratch/output/RANKING.csv"
