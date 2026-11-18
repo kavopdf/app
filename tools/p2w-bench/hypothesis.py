@@ -33,7 +33,7 @@ USAGE
   hypothesis.py --add "19_worst_dy (+3)" "the paragraph mark sets the line box" \
                 --result untested
 """
-import os
+import os, sys
 import re
 import sys
 import time
@@ -72,13 +72,39 @@ def load():
 
 
 def save(sections):
+    """Write the ledger, but refuse to destroy it.
+
+    A LEDGER THAT CAN BE TRUNCATED IS NOT A LEDGER. Measured 18 Nov at 10:55: one fixer commit took
+    HYPOTHESES.md from 687 lines and 13 sections to 400 lines and 2 sections - the header, eleven
+    class sections and every RULED OUT entry gone. RULED OUT entries are the expensive ones: each
+    cost a calibration run, and the whole point of this file is that attempt twelve does not re-test
+    what attempt eleven disproved.
+
+    The writer now compares what it is about to write against what is on disk and refuses when the
+    result would keep fewer than half the sections. --force-shrink exists for the case where the
+    loss is deliberate; it has to be typed.
+    """
     out = [HEADER]
     for cls in sorted(sections):
         out.append("## %s\n" % cls)
         for entry in sections[cls]:
             out.append(entry + "\n")
         out.append("")
-    open(LEDGER, "w", encoding="utf-8").write("\n".join(out))
+    body = "\n".join(out)
+    try:
+        on_disk = _load()
+        before, after = len(on_disk), len(sections)
+        if before >= 4 and after * 2 < before and "--force-shrink" not in sys.argv:
+            raise SystemExit(
+                "refused: this would cut HYPOTHESES.md from %d sections to %d. A ledger that can be\n"
+                "truncated is not a ledger - the RULED OUT entries cost a calibration run each.\n"
+                "Append to the existing sections instead of writing a fresh file. If the loss is\n"
+                "genuinely intended, re-run with --force-shrink." % (before, after))
+    except SystemExit:
+        raise
+    except Exception:
+        pass
+    open(LEDGER, "w", encoding="utf-8").write(body)
 
 
 try:
