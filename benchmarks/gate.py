@@ -285,6 +285,26 @@ def main():
         S["round"] = None
     S["ratchet"] = ratchet()
 
+    # THE RANKING IS THE PIPELINE'S SOURCE OF TRUTH, AND IT WAS ONLY EVER WRITTEN TO /scratch/output.
+    #
+    # This is the same defect the 13:47 run fixed for STATE.json, one file over and far more
+    # expensive: gate.py measured into /scratch/output/RANKING.csv, compared that against the
+    # committed baseline, and never touched benchmarks/RANKING.csv. So the committed ranking could
+    # only ever be as new as the last time somebody copied it by hand - and on 18 Nov the 15:30 run
+    # measured itr-computation-with-slab-table from 68.82 to 50.80, recorded the attempt as kept,
+    # released the slot, and left benchmarks/RANKING.csv reading 68.82. The ledger said the fix was
+    # kept; the file every report reads said nothing had happened.
+    #
+    # Published only when the measurement is complete, for the same reason the verdict refuses to
+    # speak on a partial one: a ranking half-written is worse than a ranking one run old.
+    if S["layers"]["measurement"].get("complete"):
+        try:
+            if os.path.exists(RANK):
+                shutil.copyfile(RANK, os.path.join(HERE, "RANKING.csv"))
+                log("published RANKING.csv into the repository")
+        except Exception as e:
+            log("could not publish RANKING.csv: %s" % str(e)[:120])
+
     # ---- verdict ----
     #
     # INCOMPLETE OUTRANKS EVERYTHING EXCEPT A FAILED GATE.

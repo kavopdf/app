@@ -564,13 +564,21 @@ def release(name, force=False):
             # ASK THE STATE RECORD FIRST. benchmarks/STATE.json now carries the engine its numbers
             # were produced by, so "has this tree been measured" is a fact rather than an inference.
             # The ledger is the fallback for a state file written before that field existed.
+            _have_state = False
             try:
                 _st = _j.load(open(os.path.join(_root, "benchmarks", "STATE.json"), encoding="utf-8"))
-                if (_st.get("engine") or "").strip() == _now:
-                    _kept = True
+                if (_st.get("engine") or "").strip():
+                    _have_state = True
+                    _kept = (_st.get("engine") or "").strip() == _now
             except Exception:
                 pass
-            if not _kept:
+            # WHEN THE STATE RECORD KNOWS THE ENGINE, IT IS THE ONLY AUTHORITY. The ledger is a
+            # claim; STATE.json is the measurement. On 18 Nov the 15:30 run recorded its attempt as
+            # kept and released, while benchmarks/RANKING.csv still read 68.82 - the measurement had
+            # gone to /scratch/output and never reached the repository. A ledger override here let
+            # exactly that ship. It no longer can: if the state file names an engine and the tree is
+            # a different one, the tree has not been measured, whatever the ledger says.
+            if not _have_state:
                 try:
                     _att = _j.load(open(ATTEMPTS, encoding="utf-8"))
                     for _row in _att.values():

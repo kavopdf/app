@@ -39,6 +39,7 @@ documents moved and the ratchet did not regress; 'reverted' means the numbers di
 vocabulary, and the ledger already uses them.
 """
 import argparse
+import subprocess
 import json
 import os
 import re
@@ -175,7 +176,34 @@ def log_runline(cls, outcome, moved, total):
         pass
 
 
-def compute(moved, total, ratchet=False):
+def engine_id():
+    """The engine's identity: HEAD commit plus the uncommitted diff on top of it.
+
+    attempt.py recorded `last_engine` from `git log -1 --format=%h -- engine/`, which is the COMMIT
+    and cannot see the working tree - while round.py's release guard compares against commit+hash.
+    A dirty tree therefore produced two strings that could never match, so the guard fell through to
+    its other branch every time. The 15:31 run reported this as a blocker: "attempt.py should call
+    the same helper round.py uses".
+
+    This is that helper. Same definition in both places, or the comparison is meaningless.
+    """
+    try:
+        h = subprocess.run(["git", "log", "-1", "--format=%h", "--",
+                            "app/src/main/java/com/kavopdf/app/engine/"],
+                           cwd=ROOT, capture_output=True, text=True, timeout=30).stdout.strip()
+        d = subprocess.run(["bash", "-lc",
+                            "{ git diff -- app/src/main/java/com/kavopdf/app/engine/; "
+                            "git diff --cached -- app/src/main/java/com/kavopdf/app/engine/; } | sha1sum"],
+                           cwd=ROOT, capture_output=True, text=True, timeout=60).stdout.strip().split()
+        d = d[0] if d else ""
+        if d and d != "da39a3ee5e6b4b0d3255bfef95601890afd80709":
+            return "%s+%s" % (h, d[:10])
+        return h or "unknown"
+    except Exception:
+        return "unknown"
+
+
+def compute(moved, total, ratchet=False, best_drop=None):
     """kept / partial / reverted from the numbers. None when there are no numbers to read.
 
     THIS USED TO BE `"kept" if moved > 0`. One document moving out of thirty counted as a kept
@@ -207,6 +235,17 @@ def compute(moved, total, ratchet=False):
         return "kept" if moved >= 1 else "reverted"
     if moved >= max(2, 0.25 * total):
         return "kept"
+    # ONE DOCUMENT THAT MOVED A LONG WAY IS PROGRESS, EVEN IN A BIG CLASS.
+    #
+    # The fixer hit this twice on 18 Nov. content-partly-lost-and-displaced holds 7 documents, six
+    # of them already under 5.0 share@5, and one of them improved by 18.02 points - the whole point
+    # of the class - and the 25 % bar called it 'partial' because 1 < 2. A count of documents cannot
+    # tell a real fix from measurement noise; the size of the movement can.
+    #
+    # 5.0 share points is the same line the ranking already treats as "ink in the wrong place", so a
+    # document that crosses it in one attempt has moved by more than the defect it was carrying.
+    if moved >= 1 and best_drop is not None and best_drop >= 5.0:
+        return "kept"
     return "partial"
 
 
@@ -222,7 +261,8 @@ def add(args):
             print("    %s" % n)
         return 2
 
-    outcome = args.outcome or compute(args.moved, args.total, ratchet=args.ratchet is not None)
+    outcome = args.outcome or compute(args.moved, args.total, ratchet=args.ratchet is not None,
+                         best_drop=getattr(args, "best_drop", None))
     if outcome not in OUTCOMES:
         print("refused: outcome must be one of %s, or give --moved/--total so it is "
               "computed." % ", ".join(OUTCOMES))
@@ -335,7 +375,7 @@ def add(args):
         row["last_moved"] = args.moved
         row["last_total"] = args.total
     if args.engine:
-        row["last_engine"] = args.engine
+        row["last_engine"] = engine_id()
     # A STALE REASON IS A LIE IN THE LEDGER. (16 Nov)
     #
     # This read `if args.reason:` - so an attempt recorded without --reason inherited the
@@ -538,6 +578,8 @@ def main(argv):
     ap.add_argument("--class", dest="cls", default="")
     ap.add_argument("--outcome", default="")
     ap.add_argument("--moved", type=int, default=None)
+    ap.add_argument("--best-drop", type=float, default=None,
+                        help="largest single-document share@5 improvement in this attempt")
     ap.add_argument("--total", type=int, default=None)
     ap.add_argument("--engine", default="",
                     help="engine commit hash; derived from git when omitted")

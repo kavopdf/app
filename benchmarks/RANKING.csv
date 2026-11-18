@@ -2,7 +2,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 1,041122-Account_Opening_Form,content-loss,content-missing-partly-replaced,98.72,98.65,98.65,98.65,98.65,477.6,687.84,937.92,99.68,127,9,9
 2,Account_Opening_Form_Fillable_filled,content-loss,content-missing-partly-replaced,97.9,97.72,97.66,97.62,97.55,138.72,312.0,358.08,99.67,131,7,9
 3,one-page-rotated-180-degrees,content-loss,content-missing-partly-replaced,81.64,81.64,81.64,81.64,81.64,27.84,156.0,177.6,100.0,0,2,2
-4,itr-computation-with-slab-table,mixed,content-partly-lost-and-displaced,86.47,80.26,76.66,68.82,55.04,9.6,36.96,133.92,100.0,0,1,1
+4,itr-computation-with-slab-table,mixed,content-partly-lost-and-displaced,86.47,80.26,76.66,50.8,55.04,4.8,16.32,133.92,100.0,0,1,1
 5,600_reviewed_invoice_with_annotations,content-loss,content-missing-partly-replaced,73.57,70.34,68.34,63.08,52.91,11.04,48.96,62.88,100.0,0,1,1
 6,601_fillable_admission_form,content-loss,content-missing-partly-replaced,61.58,57.93,55.92,52.39,44.76,12.0,24.96,27.84,99.58,2,1,1
 7,table-inside-two-column-page,content-loss,content-missing-partly-replaced,63.8,53.03,48.31,42.0,33.62,5.76,64.8,84.48,100.0,0,1,1

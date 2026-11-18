@@ -108,6 +108,56 @@ def this_run():
 
 
 
+def run_docs():
+    """The documents whose score changed inside THIS run's window.
+
+    The headline used to name best[0] - the largest improvement of the whole round - so the 14:50
+    run, which took itr-computation-with-slab-table from 68.82 to 50.80, announced
+    "415_inline_images fixed, 89.04 -> 0.00": a fix from four hours earlier. A report whose headline
+    credits the wrong work is worse than one with no headline.
+
+    The ranking is committed with the run, so the last commit touching RANKING.csv inside the run's
+    own window is the run's own measurement. Diff it against its parent.
+    """
+    import subprocess as _sp
+    try:
+        run = _json(RUN, {})
+        lo, hi = run.get("started_ts"), run.get("ended_ts")
+        if not lo:
+            return []
+        out = _sp.run(["git", "-C", ROOT, "log", "-1", "--format=%H %ct", "--",
+                       "benchmarks/RANKING.csv"], capture_output=True, text=True, timeout=20).stdout.split()
+        if len(out) < 2:
+            return []
+        sha, when = out[0], float(out[1])
+        if hi and when > hi + 300:
+            return []                       # committed after the run ended
+        if when < lo - 300:
+            return []                       # committed before the run started
+        prev = _sp.run(["git", "-C", ROOT, "show", "%s^:benchmarks/RANKING.csv" % sha],
+                       capture_output=True, text=True, timeout=20).stdout
+        now = _sp.run(["git", "-C", ROOT, "show", "%s:benchmarks/RANKING.csv" % sha],
+                      capture_output=True, text=True, timeout=20).stdout
+        if not prev or not now:
+            return []
+
+        def _m(txt):
+            d = {}
+            for row in csv.DictReader(txt.splitlines()):
+                try:
+                    d[row["document"]] = float(row["share5"])
+                except Exception:
+                    pass
+            return d
+        a, b = _m(prev), _m(now)
+        diff = [{"doc": k, "before": a[k], "after": b[k]}
+                for k in a if k in b and abs(a[k] - b[k]) > 0.05]
+        diff.sort(key=lambda x: x["after"] - x["before"])
+        return diff
+    except Exception:
+        return []
+
+
 def corpus():
     """Improvement measured against the round-one baseline, from committed files only."""
     b, c = _share5(BASELINE), _share5(RANK)
@@ -336,7 +386,19 @@ def main(argv):
     L.append("")
 
     best = (co.get("best") or [])
-    if best and tr.get("kept"):
+    mine = run_docs()
+    if mine and tr.get("docs_improved"):
+        b = mine[0]
+        L.append("> **%s** improved — %.2f → %.2f. Corpus ratchet clean across %d documents."
+                 % (b["doc"], b["before"], b["after"], co.get("docs") or 0))
+    elif tr.get("docs_improved"):
+        # THE RUN IMPROVED SOMETHING BUT DID NOT COMMIT THE RANKING, so there is no honest way to
+        # name the document - and naming the round's best instead credited a fix from four hours
+        # earlier. Say the count and say why the name is missing; that is also the signal that the
+        # run left its measurement in /scratch/output.
+        L.append("> **%d document(s)** improved this run, but the run did not commit "
+                 "benchmarks/RANKING.csv, so the report cannot name them." % tr["docs_improved"])
+    elif best and tr.get("kept"):
         b = best[0]
         L.append("> **%s** fixed — %.2f → %.2f. Corpus ratchet clean across %d documents."
                  % (b["doc"], b["before"], b["after"], co.get("docs") or 0))
