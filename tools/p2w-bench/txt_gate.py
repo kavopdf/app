@@ -66,6 +66,7 @@ def load(path, default):
 
 TXT_RANK = os.path.join(TXT, "RANKING-TXT.csv")
 TXT_BEFORE = os.path.join(TXT, "DOCX-WATCH.json")
+BOTH_BEFORE = os.path.join(TXT, "BOTH-WATCH.json")
 
 
 def main(argv):
@@ -86,6 +87,41 @@ def main(argv):
         print("  watching: RANKING-TXT.csv is %s - re-run with --check-docx after the docx change"
               % sha(TXT_RANK))
         return 0
+    # ONE SNAPSHOT, BOTH DIRECTIONS. The two one-way commands above each guard half the problem,
+    # and a run that remembers only one of them leaves the other open. These two take both hashes at
+    # once and compare both at once, so there is no way to check the format you were working on and
+    # forget the one you were not.
+    if "--snapshot" in argv:
+        import json as _j
+        _j.dump({"docx_sha": sha(DOCX_RANK), "txt_sha": sha(TXT_RANK),
+                 "at": time.strftime("%Y-%m-%d %H:%M", time.gmtime(time.time() + 19800))},
+                open(BOTH_BEFORE, "w", encoding="utf-8"), indent=1)
+        print("  snapshot: docx %s | txt %s" % (sha(DOCX_RANK), sha(TXT_RANK)))
+        print("  run --verify after the change; it compares both and names whichever moved")
+        return 0
+
+    if "--verify" in argv:
+        import json as _j
+        try:
+            was = _j.load(open(BOTH_BEFORE, encoding="utf-8"))
+        except Exception:
+            print("  no snapshot - run --snapshot before the change")
+            return 2
+        dx_now, tx_now = sha(DOCX_RANK), sha(TXT_RANK)
+        dx_moved = was.get("docx_sha") != dx_now
+        tx_moved = was.get("txt_sha") != tx_now
+        if not dx_moved and not tx_moved:
+            print("  both untouched: docx %s | txt %s" % (dx_now, tx_now))
+            return 0
+        if dx_moved:
+            print("  DOCX MOVED: RANKING.csv was %s, now %s" % (was.get("docx_sha"), dx_now))
+        if tx_moved:
+            print("  TXT MOVED:  RANKING-TXT.csv was %s, now %s" % (was.get("txt_sha"), tx_now))
+        print("  An engine change must say which format it was for. If it was meant to move only one,")
+        print("  the other moving is the defect - PdfToWord.convert() feeds both and")
+        print("  DocxWriter.orderStamps() reorders page.blocks, which TxtWriter walks.")
+        return 1
+
     if "--check-docx" in argv:
         import json as _j
         try:
