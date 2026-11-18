@@ -203,7 +203,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 202,380_runbook_terminal_output,clean,none,0.0,0.0,0.0,0.0,0.0,0.96,0.96,0.96,100.0,0,1,1
 203,405_sheet_music_lyrics,clean,none,0.09,0.0,0.0,0.0,0.0,0.96,0.96,0.96,100.0,0,1,1
 204,410_form_xobject_reused,clean,none,0.63,0.0,0.0,0.0,0.0,0.96,0.96,0.96,100.0,0,1,1
-205,416_many_tiny_pages,clean,none,0.35,0.0,0.0,0.0,0.0,0.96,0.96,0.96,100.0,0,1,300
+205,416_many_tiny_pages,clean,exempt,,,,,,,,,,0,1,300
 206,47_grey_body_black_headings,clean,none,0.01,0.0,0.0,0.0,0.0,0.96,0.96,0.96,100.0,0,1,1
 207,54_two_column_body_full_width_header_footer,clean,none,0.0,0.0,0.0,0.0,0.0,0.96,0.96,0.96,100.0,0,1,1
 208,602_bookmarked_annual_report,clean,none,0.32,0.0,0.0,0.0,0.0,0.96,0.96,0.96,100.0,0,1,3

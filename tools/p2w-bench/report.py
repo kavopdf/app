@@ -80,6 +80,24 @@ def classes():
     return total, solved, openc, docs, per_class
 
 
+def _exempt():
+    """Documents the ranking carries but does not score, named rather than silently dropped.
+
+    RANKING.csv gave 416_many_tiny_pages share5=0.0 and problem=none - a 300-page document reading as
+    PERFECT in the one table the whole pipeline is judged on, when EXEMPT.json says it was never
+    measured because one whole-document pass exceeds the per-command budget. A blank score is honest;
+    a zero is a lie, and it drags the corpus mean down so every other number looks better than it is.
+    """
+    out = []
+    try:
+        for r in csv.DictReader(open(RANK, encoding="utf-8")):
+            if (r.get("problem") or "").strip().lower() == "exempt":
+                out.append(r.get("document"))
+    except Exception:
+        pass
+    return out
+
+
 def _share5(path):
     d = {}
     try:
@@ -599,6 +617,7 @@ def main(argv):
         L.append("| Regressions | %s |"
                  % ("**none**" if not co["regressed"] else "**%d** — %s"
                     % (co["regressed"], ", ".join(x["doc"] for x in best[:3]) or "see RANKING.csv")))
+        L.append("| Exempt, not measured | **%d** — %s |" % (len(_exempt()), ", ".join(_exempt()) or "none"))
     else:
         L.append("| Corpus improvement | not measurable — %s |" % co.get("why"))
     L.append("| Classes solved | %d of %d clear — %d class(es) still have an OPEN document |"

@@ -18,6 +18,7 @@ dominates it.
 | displacement | content-present-wholly-displaced | 16 | 0 |
 | displacement | content-present-partly-displaced | 12 | 0 |
 | clean | none | 0 | 120 |
+| exempt | exempt - not measured | - | - |
 
 `single-element-far-out` is closed: it held one document, `newsletter-3col-header-footer`, and
 no document carries the class any more. The class was defined by `share5 < 8 and max_pt > 30`; the

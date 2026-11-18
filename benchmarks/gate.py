@@ -301,7 +301,43 @@ def main():
     if S["layers"]["measurement"].get("complete"):
         try:
             if os.path.exists(RANK):
-                shutil.copyfile(RANK, os.path.join(HERE, "RANKING.csv"))
+                dest = os.path.join(HERE, "RANKING.csv")
+                shutil.copyfile(RANK, dest)
+                # EXEMPT.json IS THE AUTHORITY, AND THE MEASUREMENT DOES NOT KNOW IT.
+                #
+                # p2w.py writes share5=0.0 and problem=none for a document it could not measure, so
+                # 416_many_tiny_pages read as PERFECT in the table the whole pipeline is judged on -
+                # a 300-page document that EXEMPT.json says was never measured at all. Copying that
+                # file over the committed ranking put the lie back every time. Re-apply the exemption
+                # after the copy: blank the scores, name the problem "exempt", and let the corpus mean
+                # skip it instead of being dragged down by a zero that means "unknown".
+                try:
+                    ex_path = os.path.join(HERE, "..", "tools", "p2w-bench", "EXEMPT.json")
+                    exempt = set()
+                    if os.path.exists(ex_path):
+                        exempt = set((json.load(open(ex_path, encoding="utf-8")).get("docx") or {}))
+                    if exempt:
+                        rows = list(csv.DictReader(open(dest, encoding="utf-8")))
+                        if rows:
+                            fields = list(rows[0].keys())
+                            n = 0
+                            for r in rows:
+                                if r.get("document") in exempt:
+                                    for k in ("share1", "share2", "share3", "share5", "share10",
+                                              "median_pt", "p90_pt", "max_pt", "text_recall"):
+                                        if k in r:
+                                            r[k] = ""
+                                    r["problem"] = "exempt"
+                                    n += 1
+                            import io as _io
+                            buf = _io.StringIO()
+                            w = csv.DictWriter(buf, fieldnames=fields, lineterminator="\n")
+                            w.writeheader()
+                            w.writerows(rows)
+                            open(dest, "w", encoding="utf-8", newline="").write(buf.getvalue())
+                            log("re-applied %d exemption(s) after the publish" % n)
+                except Exception as e:
+                    log("could not re-apply exemptions: %s" % e)
                 log("published RANKING.csv into the repository")
         except Exception as e:
             log("could not publish RANKING.csv: %s" % str(e)[:120])
