@@ -8,11 +8,29 @@ cannot hide behind a txt score.
     STATE-TXT.json       the txt state - scored, clean, failing, and the docx hash at the last gate
     HISTORY-TXT.jsonl    one line per gate run
 
-## The one thing they share
+## What the two formats actually share
 
-The engine. `DocxWriter` writes both the .docx and the .txt from the same layout model, so a change
-made for the txt is a change to code the docx also depends on. That is why `txt_gate.py` records the
-SHA-256 of `benchmarks/RANKING.csv` when it starts and checks it again at the end:
+**They do not share a writer.** The conversion is a three-way split:
+
+    PdfToWord.parse()  ->  result (the model)
+                              |
+                              +-- asTxt ? TxtWriter.write(result, out)
+                                         : DocxWriter.write(result, out)
+
+    ToolsActivity.kt:600    if (asTxt) TxtWriter.write(result, out) else DocxWriter.write(result, out)
+
+One or the other, never both. `TxtWriter.java` is 568 lines and standalone - it references
+`DocxWriter`, `ReadingOrder` and `NormStore` nowhere and imports only `java.io` and `java.util`.
+`DocxWriter.java` is 7196 lines and never touches the txt.
+
+**So a change to `TxtWriter.java` cannot move a docx number, and a change to `DocxWriter.java` cannot
+move a txt number. The single shared file is `PdfToWord.java`** - it parses once and hands the same
+model to whichever writer runs. Its txt-only geometry (the `lineX`/`lineY` lists at ~line 5040, which
+`TxtWriter` turns into leading spaces and blank lines) lives in that shared file, so a change made
+there for the txt IS a change the docx depends on.
+
+That is why `txt_gate.py` records the SHA-256 of `benchmarks/RANKING.csv` when it starts and checks it
+again at the end:
 
   * unchanged  -> the txt work did not touch the docx, and the gate says so
   * changed    -> the gate fails and names both hashes. The docx ratchet still decides whether the
