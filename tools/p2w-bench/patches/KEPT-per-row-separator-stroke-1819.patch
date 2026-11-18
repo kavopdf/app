@@ -1,0 +1,92 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 121b7cc..4798e7b 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6133,6 +6133,24 @@ public final class DocxWriter {
+                 rowTopPagePt = edgePt;
+             }
+             if (!Float.isNaN(rowTopPagePtHere)) rowTopPagePt = rowTopPagePtHere;
++            // THE ROW SEPARATOR'S OWN STROKE, when the page drew it heavier or darker than the
++            // table's insideH stroke. w:tblBorders holds one insideH for the whole table, so a
++            // header rule drawn at a different weight is emitted here as a per-cell bottom
++            // border instead of being lost. Measured on salary-slip-factory-wages: three such
++            // rules, 17.53 of the page's 18.09 share@5.
++            int sepSz = -1;
++            String sepColour = null;
++            if (t.rowStroke != null && t.rowStroke.length > r + 1 && r < keepRows - 1) {
++                float[] sep = t.rowStroke[r + 1];
++                if (sep != null) {
++                    int sz = szOf(sep[0]);
++                    String col = borderColour(sep);
++                    if (Math.abs(sz - sideSz[4]) >= 1 || !col.equalsIgnoreCase(sideColour[4])) {
++                        sepSz = sz;
++                        sepColour = col;
++                    }
++                }
++            }
+             inner.append("<w:tr>");
+             if (rowTwHere > 0) {
+                 inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
+@@ -6219,6 +6237,11 @@ public final class DocxWriter {
+                 inner.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(spanTw)
+                         .append("\" w:type=\"dxa\"/>");
+                 if (span > 1) inner.append("<w:gridSpan w:val=\"").append(span).append("\"/>");
++                // tcBorders comes after gridSpan and before noWrap in the OOXML tcPr order.
++                if (sepSz > 0 && sepColour != null) {
++                    inner.append("<w:tcBorders><w:bottom w:val=\"single\" w:sz=\"").append(sepSz)
++                         .append("\" w:color=\"").append(sepColour).append("\"/></w:tcBorders>");
++                }
+                 // The page drew this cell's text a point or two past its own column edge and
+                 // never broke the value: on 343_air_waybill "12" starts at 67.46 pt in a column
+                 // that ends at 76 and runs to 77. A word processor's default is to wrap it, and
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index fc79ab9..a145688 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -580,6 +580,28 @@ public final class PdfToWord {
+          * height the page gave it (D-26, cause 2).
+          */
+         public float[] rowEdge;
++        /**
++         * The stroke drawn on each ROW SEPARATOR, indexed like {@link #rowEdge}: entry k is the
++         * rule at the boundary between row k-1 and row k, and entries 0 and rows are left null
++         * because those are the table's outer top and bottom sides.
++         *
++         * <p>WHY THIS EXISTS. {@code w:tblBorders} carries ONE {@code insideH} stroke for every
++         * separator of a table, so {@link #sideStroke}[4] has to reduce all of them to one
++         * answer, and {@code insideStroke} reduces by "the stroke carrying the most rules".
++         * A table ruled 0.45 pt grey for twelve rows and drawn 0.9 pt black under its header
++         * row therefore reports 0.45 pt grey - and the header rule, which is the heaviest ink
++         * on the page after the title, is emitted nowhere at all. Measured on
++         * salary-slip-factory-wages: the page draws five full-width rules (1.0 pt black at the
++         * top, 0.9 pt black under each of the three tables' header rows, 0.45 pt grey at every
++         * body boundary); the .docx carried the first and none of the other three, and those
++         * three rules are 17.53 of the page's 18.09 share@5 - 4000 of 22818 source ink pixels,
++         * up to 71 pt from any ink we emit.
++         *
++         * <p>So each separator's own stroke is kept here, and the writer emits the ones that
++         * differ from {@code insideH} as a per-cell bottom border on the row above. Null means
++         * the page drew no rule there.
++         */
++        public float[][] rowStroke;
+         /**
+          * The y of the table's first row's TOP edge, in points, when the pass that built the
+          * table could tell where that edge is ({@link Float#NaN} otherwise).
+@@ -7136,6 +7158,17 @@ public final class PdfToWord {
+         t.sideStroke[3] = edgeStroke(rules, false, t.right, t.top, t.bottom, h);   // right
+         t.sideStroke[4] = insideStroke(rules, true, t.top, t.bottom, t.left, t.right, w);   // insideH
+         t.sideStroke[5] = insideStroke(rules, false, t.left, t.right, t.top, t.bottom, h);  // insideV
++        // The stroke on each ROW SEPARATOR, kept per row because insideH above can hold only
++        // one of them - see Table#rowStroke. edgeStroke prefers the heavier rule on a tie, so
++        // where a 0.9 pt black header rule is drawn on top of a 0.45 pt grey body rule at the
++        // same y, the black one is what is kept here.
++        float[] redges = rowEdges(t);
++        int nrows = t.rows.size();
++        if (redges != null && nrows > 0 && redges.length == nrows + 1) {
++            float[][] rs = new float[nrows + 1][];
++            for (int k = 1; k < nrows; k++) rs[k] = edgeStroke(rules, true, redges[k], t.left, t.right, w);
++            t.rowStroke = rs;
++        }
+         // WHO DRAWS EACH SIDE, decided here from the page's own rule list, before a single shape
+         // is written or discarded. SIDE_TOL and not SIDE_FRAME_TOL: edgeStroke above is generous
+         // on purpose (a whitespace table's bounds are its text's ink, so the page's frame can

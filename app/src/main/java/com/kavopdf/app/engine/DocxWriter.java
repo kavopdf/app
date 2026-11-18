@@ -6133,6 +6133,24 @@ public final class DocxWriter {
                 rowTopPagePt = edgePt;
             }
             if (!Float.isNaN(rowTopPagePtHere)) rowTopPagePt = rowTopPagePtHere;
+            // THE ROW SEPARATOR'S OWN STROKE, when the page drew it heavier or darker than the
+            // table's insideH stroke. w:tblBorders holds one insideH for the whole table, so a
+            // header rule drawn at a different weight is emitted here as a per-cell bottom
+            // border instead of being lost. Measured on salary-slip-factory-wages: three such
+            // rules, 17.53 of the page's 18.09 share@5.
+            int sepSz = -1;
+            String sepColour = null;
+            if (t.rowStroke != null && t.rowStroke.length > r + 1 && r < keepRows - 1) {
+                float[] sep = t.rowStroke[r + 1];
+                if (sep != null) {
+                    int sz = szOf(sep[0]);
+                    String col = borderColour(sep);
+                    if (Math.abs(sz - sideSz[4]) >= 1 || !col.equalsIgnoreCase(sideColour[4])) {
+                        sepSz = sz;
+                        sepColour = col;
+                    }
+                }
+            }
             inner.append("<w:tr>");
             if (rowTwHere > 0) {
                 inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
@@ -6219,6 +6237,11 @@ public final class DocxWriter {
                 inner.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(spanTw)
                         .append("\" w:type=\"dxa\"/>");
                 if (span > 1) inner.append("<w:gridSpan w:val=\"").append(span).append("\"/>");
+                // tcBorders comes after gridSpan and before noWrap in the OOXML tcPr order.
+                if (sepSz > 0 && sepColour != null) {
+                    inner.append("<w:tcBorders><w:bottom w:val=\"single\" w:sz=\"").append(sepSz)
+                         .append("\" w:color=\"").append(sepColour).append("\"/></w:tcBorders>");
+                }
                 // The page drew this cell's text a point or two past its own column edge and
                 // never broke the value: on 343_air_waybill "12" starts at 67.46 pt in a column
                 // that ends at 76 and runs to 77. A word processor's default is to wrap it, and

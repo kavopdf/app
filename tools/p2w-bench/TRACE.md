@@ -6,13 +6,6 @@ claim and after each step; it is not code and cannot break anything.
 
 | time | run | tool | what happened |
 |---|---|---|---|
-| 12 Nov 18:41 | fixer | claim | fixer claimed the slot |
-| 12 Nov 18:42 | fixer | build-engine | started |
-| 12 Nov 18:43 | fixer | classify | 43 classes from 208 documents |
-| 12 Nov 18:43 | fixer | classify --txt | 4 classes from 208 documents |
-| 12 Nov 18:46 | fixer | build-engine | started |
-| 12 Nov 18:46 | fixer | build-engine | started |
-| 12 Nov 18:47 | fixer | build-engine | started |
 | 12 Nov 18:52 | fixer | ratchet | held or rose |
 | 12 Nov 18:52 | fixer | ratchet --txt | held or rose |
 | 12 Nov 18:52 | fixer | hypothesis | 20_within_10pt (+4) -> confirmed |
@@ -406,3 +399,10 @@ claim and after each step; it is not code and cannot break anything.
 | 18 Nov 16:59 | fixer | build-engine | started |
 | 18 Nov 17:00 | fixer | build-engine | engine built in 56s |
 | 18 Nov 17:00 | fixer | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |
+| 18 Nov 18:00 | fixer | claim | fixer claimed the slot |
+| 18 Nov 18:00 | fixer | build-engine | started |
+| 18 Nov 18:01 | fixer | build-engine | engine built in 38s |
+| 18 Nov 18:24 | fixer | build-engine | started |
+| 18 Nov 18:25 | fixer | build-engine | engine built in 35s |
+| 18 Nov 18:30 | fixer | ratchet | UNMEASURED 211 of 211 not compared; DRIFT 211 rows/0 marks |
+| 18 Nov 19:07 | fixer | attempt | content-missing-nothing-in-its-place -> kept (22/29 moved) |

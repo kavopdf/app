@@ -309,3 +309,25 @@
 {"t": 1795002596.882933, "ist": "17:19:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795002611.4873328, "ist": "17:20:11", "ev": "beat", "d": "chain.py: deciding whether to chain"}
 {"t": 1795002616.6478412, "ist": "17:20:16", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795005009.493501, "ist": "18:00:09", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795005009.563845, "ist": "18:00:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795005009.7975352, "ist": "18:00:09", "ev": "beat", "d": "claimed, gathering work"}
+{"t": 1795005009.9079387, "ist": "18:00:09", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1795005010.0144095, "ist": "18:00:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795005010.1158738, "ist": "18:00:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795005010.222562, "ist": "18:00:10", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795009024.1134398, "ist": "19:07:04", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795009024.5776353, "ist": "19:07:04", "ev": "attempt", "d": "content-missing-nothing-in-its-place -> kept"}
+{"t": 1795009024.711342, "ist": "19:07:04", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795009024.8945427, "ist": "19:07:04", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795009029.0230207, "ist": "19:07:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795009071.3668795, "ist": "19:07:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795009071.395452, "ist": "19:07:51", "ev": "release", "d": "fixer released"}
+{"t": 1795009071.4695106, "ist": "19:07:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795009076.2603283, "ist": "19:07:56", "ev": "beat", "d": "chain.py: deciding whether to chain"}
+{"t": 1795009095.766249, "ist": "19:08:15", "ev": "release", "d": "fixer released"}
+{"t": 1795009095.874781, "ist": "19:08:15", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795009096.0708396, "ist": "19:08:16", "ev": "beat", "d": "chain.py: deciding whether to chain"}
+{"t": 1795009100.037143, "ist": "19:08:20", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795009110.2557535, "ist": "19:08:30", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795009115.1076975, "ist": "19:08:35", "ev": "beat", "d": "report.py: building the report"}

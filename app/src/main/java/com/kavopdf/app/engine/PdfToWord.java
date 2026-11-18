@@ -581,6 +581,28 @@ public final class PdfToWord {
          */
         public float[] rowEdge;
         /**
+         * The stroke drawn on each ROW SEPARATOR, indexed like {@link #rowEdge}: entry k is the
+         * rule at the boundary between row k-1 and row k, and entries 0 and rows are left null
+         * because those are the table's outer top and bottom sides.
+         *
+         * <p>WHY THIS EXISTS. {@code w:tblBorders} carries ONE {@code insideH} stroke for every
+         * separator of a table, so {@link #sideStroke}[4] has to reduce all of them to one
+         * answer, and {@code insideStroke} reduces by "the stroke carrying the most rules".
+         * A table ruled 0.45 pt grey for twelve rows and drawn 0.9 pt black under its header
+         * row therefore reports 0.45 pt grey - and the header rule, which is the heaviest ink
+         * on the page after the title, is emitted nowhere at all. Measured on
+         * salary-slip-factory-wages: the page draws five full-width rules (1.0 pt black at the
+         * top, 0.9 pt black under each of the three tables' header rows, 0.45 pt grey at every
+         * body boundary); the .docx carried the first and none of the other three, and those
+         * three rules are 17.53 of the page's 18.09 share@5 - 4000 of 22818 source ink pixels,
+         * up to 71 pt from any ink we emit.
+         *
+         * <p>So each separator's own stroke is kept here, and the writer emits the ones that
+         * differ from {@code insideH} as a per-cell bottom border on the row above. Null means
+         * the page drew no rule there.
+         */
+        public float[][] rowStroke;
+        /**
          * The y of the table's first row's TOP edge, in points, when the pass that built the
          * table could tell where that edge is ({@link Float#NaN} otherwise).
          *
@@ -7136,6 +7158,17 @@ public final class PdfToWord {
         t.sideStroke[3] = edgeStroke(rules, false, t.right, t.top, t.bottom, h);   // right
         t.sideStroke[4] = insideStroke(rules, true, t.top, t.bottom, t.left, t.right, w);   // insideH
         t.sideStroke[5] = insideStroke(rules, false, t.left, t.right, t.top, t.bottom, h);  // insideV
+        // The stroke on each ROW SEPARATOR, kept per row because insideH above can hold only
+        // one of them - see Table#rowStroke. edgeStroke prefers the heavier rule on a tie, so
+        // where a 0.9 pt black header rule is drawn on top of a 0.45 pt grey body rule at the
+        // same y, the black one is what is kept here.
+        float[] redges = rowEdges(t);
+        int nrows = t.rows.size();
+        if (redges != null && nrows > 0 && redges.length == nrows + 1) {
+            float[][] rs = new float[nrows + 1][];
+            for (int k = 1; k < nrows; k++) rs[k] = edgeStroke(rules, true, redges[k], t.left, t.right, w);
+            t.rowStroke = rs;
+        }
         // WHO DRAWS EACH SIDE, decided here from the page's own rule list, before a single shape
         // is written or discarded. SIDE_TOL and not SIDE_FRAME_TOL: edgeStroke above is generous
         // on purpose (a whitespace table's bounds are its text's ink, so the page's frame can

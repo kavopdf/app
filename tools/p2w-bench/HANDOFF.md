@@ -9,18 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 16:52 |
-| ended | 17:19 |
+| started | 18:00 |
+| ended | 19:08 |
 | how it ended | released |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> STEP 3/3 fixer 16:52. The carry-over's own diagnosis was already refuted before I arrived: the anchor rule (FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md) never fires, and the cell-baseline fallback was measured worse at 16:23. So the carry-over had one item left that was still true - the three documents the ratchet has never compared - and I spent the slot on that and on the one change SETTLED still called live. RESULT, both measured: (1) run-size-from-sizePt does NOT reproduce. Applied clean to engine 7a95b1c, built, screened 4 docs: 360_restaurant_menu 34.43 -> 34.43 (the 96% gain SETTLED records does not exist on this engine), 392_statistical_console_output 1.61 -> 13.94 (reproduces exactly), itr and 320 unchanged. SCREEN FAIL, reverted, SETTLED.md corrected in place. (2) Two of the three unmeasured documents are now measured for the first time: 77_arabic_rtl_document share5 11.89 and 79_inr_indian_digit_grouping_table share5 0.74, both 1 page - the earlier 'soffice no render' was a render timeout, not a broken document, and both render once given 250 s. 416_many_tiny_pages is still unmeasured and the reason is now precise: its docx needs ~250 s in soffice and its 300 pages need ~280 s to compare, and measure_doc_chunked does not cache a partial window, so it restarts at page 1 and is killed at 292 s every run. A full corpus pass was started (86 of 213 docx converted, one JVM each) but not finished inside the slot, so RANKING.csv is unchanged and nothing was published.
+> The per-row separator stroke is kept: DocxWriter.table() now emits a per-cell w:tcBorders/w:bottom where a table's interior rule is heavier or darker than the table's single insideH. Full corpus 212 measured: 33 better, 179 same, 0 worse. content-missing-nothing-in-its-place went 22 of 29 better, best drop 17.36 (salary-slip-factory-wages 18.09->0.73).
 
 ## What the next run should do first
 
-> Do 416_many_tiny_pages FIRST and alone: seed its render (soffice --convert-to pdf on out/416_many_tiny_pages.docx takes ~250 s and does succeed), write pre/416_many_tiny_pages.pdf.src with the docx's size:mtime stamp so conv() uses the cache, then spend one whole call on measure_doc_chunked with chunk=100 budget=270 - or add per-window caching under dist2/<doc>.w<N>.json first, which is the real fix, because without it the document is unmeasurable at 300 pages by construction. Do NOT re-test run-size-from-sizePt (refuted on this engine 18 Nov 17:05, SETTLED.md corrected). Do NOT re-implement the anchor rule or the cell-baseline fallback. The class content-partly-lost-and-displaced is down to one document above the line, itr-computation-with-slab-table at 50.80; its remaining defects are listed in order in FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md and the first two are both refuted, so the third - the footer ROW of table 3 emitted between rows the page draws around it - is the only one left standing, and it is a row-ordering question in DocxWriter.table(), not a flow one.
+> Take the next class, content-partly-lost (11 open). The class-wide screen now covers the whole corpus in about 30 minutes across 6 calls via screen.py --docs with the full RANKING.csv document list - p2w.py --budget does NOT resume and cannot finish a corpus pass inside the 300 s cap, so use screen.py --docs. Do not retry run-size-from-sizePt-not-Tf, the anchor rule, the cell-baseline fallback, or the row separator stroke - the last is now implemented.
 
 ## Agents deployed and not yet accounted for
 
@@ -38,7 +38,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:16` agent deployed: content-missing-partly-replaced / A2 - why does parasOfLines reject the six heading lines of 041122 page 7
 - `11:16` agent deployed: content-missing-partly-replaced / D - how many corpus documents have a cell whose lines start left of the first line
 - `11:17` agent landed: contA2-01 /  -> FINDINGS/content-missing-partly-replaced-A2-092912-7c4e.md
 - `11:17` agent landed: contD-01 /  -> FINDINGS/content-missing-partly-replaced-D-092700-1d7b.md
@@ -63,6 +62,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:28` attempt 2 on content-partly-lost-and-displaced -> kept (1/210 moved)
 - `16:12` attempt 3 on content-partly-lost-and-displaced -> kept (1/7 moved)
 - `17:00` attempt 18 on content-missing-partly-replaced -> reverted (0/16 moved)
+- `19:07` attempt 7 on content-missing-nothing-in-its-place -> kept (22/29 moved)
 
 ## Where the rest of the state lives
 

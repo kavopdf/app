@@ -59,29 +59,40 @@
   "status": "OPEN"
  },
  "content-missing-nothing-in-its-place": {
-  "attempts": 6,
+  "attempts": 7,
   "engine_note": "last_engine corrected 8c14e53 -> 5cd9e33: attempt.py derived the hash while the fix was still uncommitted in the working tree, so it recorded the commit BEFORE the change. 5cd9e33 is the commit that touched app/.../engine/ and is exactly the tree the 213-document ratchet measured (212 compared, 0 regressions, 1 improvement).",
   "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-18 19:07",
+    "moved": 22,
+    "outcome": "kept",
+    "reason": "per-row separator stroke: table interior rules whose weight/colour differs from the table's insideH are emitted as per-cell tcBorders bottom instead of collapsing into one border. salary-slip-factory-",
+    "total": 29
+   }
+  ],
   "last": null,
-  "last_engine": "5cd9e33",
-  "last_moved": 0,
-  "last_total": 30,
+  "last_engine": "2945cb0+0e592953a0",
+  "last_moved": 22,
+  "last_total": 29,
   "outcomes": [
    "error",
    "kept",
    "kept",
    "kept",
    "kept",
-   "reverted"
+   "reverted",
+   "kept"
   ],
   "ratchet_at": "18 Nov 11:49",
   "ratchet_docs": 213,
-  "reason": "Table bottom rule: the last row's rule is drawn below its box and charged to nothing, so every table hands the flow below it +0.5 pt and the page becomes a ladder of +0.5 steps per emitted w:tbl (mobile-bill, salary-slip-factory-wages, electricity-bill all measured at rungs -0.02/+0.48/+0.98/+1.48; every border nil returns them to -0.02; w:sz 16 gives steps of exactly 2.00 pt). Built the one-term fix (bottomRulePt added to rowBottomPt and to the flowTw charge), rebuilt, screened 5 documents: mobile-bill 18.48 -> 18.12, electricity-bill 16.24 -> 15.87, salary-slip 18.09 -> 17.85, marksheet 16.78 -> 16.58, two-tables 17.20 -> 17.19 - all FIVE improved and NONE worse, but by 0.01-0.37 share@5px, under the 0.5 the screen counts as moved. share@1px tells the real story (mobile-bill 47.66 -> 37.56): the rung IS gone, and the residual that remains (median 1.44 -> 2.40 pt) is a different, larger defect. REVERTED rather than shipped: a change that moves no document over the line cannot be kept by the ratchet and would spend 45 minutes proving nothing.",
+  "reason": "per-row separator stroke: table interior rules whose weight/colour differs from the table's insideH are emitted as per-cell tcBorders bottom instead of collapsing into one border. salary-slip-factory-wages 18.09->0.73, mobile-bill 18.48->1.55, two-tables-stacked 17.20->0.77, marksheet 16.78->0.64, electricity-bill 16.24->1.33. FULL CORPUS 212 measured: 33 better, 179 same, 0 worse.",
   "reasons": [
    "CORPUS RATCHET of the 232f622 per-row tcBorders fix, the item HANDOFF.md carried into this run. Full 213-document measurement (213/213 docx, 213/213 measured, 1 MEASURE-ERROR = 416_many_tiny_pages, exempted) then gate.py --ratchet-only: 212 documents compared, 0 regressions, 31 improvements. mobile-bill 18.48->1.55, salary-slip-factory-wages 18.09->0.73, two-tables-stacked-with-no-gap 17.20->0.77, marksheet-university-consolidated 16.78->0.64, electricity-bill 16.24->1.33, insurance-policy-schedule 13.29->0.53, table-inside-two-column-page 42.0->40.05. The fix is now vouched for at corpus scale.",
    "corpus ratchet committed: benchmarks/RANKING.csv + STATE.json at 10:37, 212 documents compared, 31 improvements, 0 regressions (salary-slip-factory-wages 18.09 -> 0.73, mobile-bill 18.48 -> 1.55). The 232f622 fix had been measured and never put on disk; the measurement itself could not complete until soffice stopped being waited on by pid.",
    "DeviceGray alpha: pdfbox-android packs a grey sample into all four ARGB lanes (g<<24|g<<16|g<<8|g) so alpha = luminance and every dark pixel of a grey picture is transparent. 415_inline_images drew a correct 120 pt square containing nothing (89.04 share@5px, text_recall 100.0, chars_missing 0). PdfToWord.declaresTransparency() asks the PDF's own dictionary (/SMask, /Mask, SMaskInData, stencil) and forceOpaque() rewrites only the alpha byte when nothing is declared. Full 213-document ratchet: 212 compared, 0 regressions, 1 improvement (415_inline_images 89.04 -> 0.00, now 'clean'). Corpus scan says the blast radius is one document: 415 is the only document of 213 with an inline image and there are zero DeviceGray XObject images - so this is partial (1 of 30), not kept, and the class stays OPEN.",
-   "Table bottom rule: the last row's rule is drawn below its box and charged to nothing, so every table hands the flow below it +0.5 pt and the page becomes a ladder of +0.5 steps per emitted w:tbl (mobile-bill, salary-slip-factory-wages, electricity-bill all measured at rungs -0.02/+0.48/+0.98/+1.48; every border nil returns them to -0.02; w:sz 16 gives steps of exactly 2.00 pt). Built the one-term fix (bottomRulePt added to rowBottomPt and to the flowTw charge), rebuilt, screened 5 documents: mobile-bill 18.48 -> 18.12, electricity-bill 16.24 -> 15.87, salary-slip 18.09 -> 17.85, marksheet 16.78 -> 16.58, two-tables 17.20 -> 17.19 - all FIVE improved and NONE worse, but by 0.01-0.37 share@5px, under the 0.5 the screen counts as moved. share@1px tells the real story (mobile-bill 47.66 -> 37.56): the rung IS gone, and the residual that remains (median 1.44 -> 2.40 pt) is a different, larger defect. REVERTED rather than shipped: a change that moves no document over the line cannot be kept by the ratchet and would spend 45 minutes proving nothing."
+   "Table bottom rule: the last row's rule is drawn below its box and charged to nothing, so every table hands the flow below it +0.5 pt and the page becomes a ladder of +0.5 steps per emitted w:tbl (mobile-bill, salary-slip-factory-wages, electricity-bill all measured at rungs -0.02/+0.48/+0.98/+1.48; every border nil returns them to -0.02; w:sz 16 gives steps of exactly 2.00 pt). Built the one-term fix (bottomRulePt added to rowBottomPt and to the flowTw charge), rebuilt, screened 5 documents: mobile-bill 18.48 -> 18.12, electricity-bill 16.24 -> 15.87, salary-slip 18.09 -> 17.85, marksheet 16.78 -> 16.58, two-tables 17.20 -> 17.19 - all FIVE improved and NONE worse, but by 0.01-0.37 share@5px, under the 0.5 the screen counts as moved. share@1px tells the real story (mobile-bill 47.66 -> 37.56): the rung IS gone, and the residual that remains (median 1.44 -> 2.40 pt) is a different, larger defect. REVERTED rather than shipped: a change that moves no document over the line cannot be kept by the ratchet and would spend 45 minutes proving nothing.",
+   "per-row separator stroke: table interior rules whose weight/colour differs from the table's insideH are emitted as per-cell tcBorders bottom instead of collapsing into one border. salary-slip-factory-wages 18.09->0.73, mobile-bill 18.48->1.55, two-tables-stacked 17.20->0.77, marksheet 16.78->0.64, electricity-bill 16.24->1.33. FULL CORPUS 212 measured: 33 better, 179 same, 0 worse."
   ],
   "requeues": 0,
   "status": "OPEN"
