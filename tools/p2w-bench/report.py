@@ -191,12 +191,22 @@ def corpus():
     cm = sum(c[k] for k in common) / len(common)
     improved = [k for k in common if c[k] < b[k] - 0.05]
     regressed = [k for k in common if c[k] > b[k] + 0.05]
+    # FIXED IS NOT MOVED. A document that went 18.48 -> 15.00 has improved by every definition and is
+    # still fifteen per cent wrong; calling that a fix is how a run reports progress while ninety-one
+    # documents stay broken. The rule is explicit: a document is fixed only when it matches the
+    # original at 98% or better. share@5px is the fraction of ink more than 5 px from where it
+    # belongs, so 98% match is share5 <= 2.0. The classifier's own clean bar is stricter: share5 < 1.
+    FIXED_BAR = 2.0
+    fixed = [k for k in common if c[k] <= FIXED_BAR and b[k] > FIXED_BAR]
+    moved_open = [k for k in improved if k not in fixed]
     unchanged = len(common) - len(improved) - len(regressed)
     identical = all(abs(b[k] - c[k]) < 1e-9 for k in common)
     # share@5px is the fraction of ink that landed more than 5px from where it belongs, so a
     # FALL is an improvement. The first version printed (current - baseline), which reported
     # 6.15 -> 5.01 as "-18.55%" - arithmetically right, and read by every human as a regression.
     return {"available": True, "docs": len(common),
+            "fixed": len(fixed), "moved_open": len(moved_open),
+            "still_open": len([k for k in common if c[k] > FIXED_BAR]),
             "baseline_mean": round(bm, 2), "current_mean": round(cm, 2),
             "pct": round((bm - cm) / bm * 100, 2) if bm else 0.0,
             "improved": len(improved), "regressed": len(regressed), "unchanged": unchanged,
@@ -641,6 +651,8 @@ def main(argv):
                  % ("**none**" if not co["regressed"] else "**%d** — %s"
                     % (co["regressed"], ", ".join(x["doc"] for x in best[:3]) or "see RANKING.csv")))
         L.append("| Exempt, not measured | **%d** — %s |" % (len(_exempt()), ", ".join(_exempt()) or "none"))
+        L.append("| **Fixed to 98%%** | **%d** of %d — the rest are still off |" % (co.get("fixed", 0), co.get("docs", 0)))
+        L.append("| Moved but still open | **%d** — improved, not fixed |" % co.get("moved_open", 0))
     else:
         L.append("| Corpus improvement | not measurable — %s |" % co.get("why"))
     L.append("| Classes solved | %d of %d clear — %d class(es) still have an OPEN document |"
