@@ -70,6 +70,24 @@ fixed document stayed OPEN for ever - which means the round could never close.
 corpus pass costs. SCREEN FAIL means revert and move on. SCREEN PASS means the corpus pass is now
 worth spending. It is not a substitute for the ratchet; it only decides whether to spend it.
 
+## One rule for "kept", in one place - and three ways to satisfy it
+
+`attempt.py compute()` is the only authority. An attempt is kept when ANY of these holds:
+
+    1. moved >= max(2, 25 % of the class)        the original bar
+    2. total < 2 and moved >= 1                  a class of one: one document IS the class
+    3. moved >= 1 and --best-drop >= 5.0         one document that moved a long way
+
+**PASS `--best-drop`.** It is the largest single-document share@5 improvement in the attempt, and
+without it rule 3 cannot fire:
+
+    attempt.py --class "<cls>" --moved 1 --total 7 --best-drop 18.02 --reason "..."
+
+Rule 3 exists because of `content-partly-lost-and-displaced`: 7 documents, six already under 5.0, one
+improved by 18.02 points - the whole point of the class - and the 25 % bar called it 'partial' because
+1 < 2. A count of documents cannot tell a real fix from measurement noise; the size of the movement
+can, and 5.0 is the same line the ranking already treats as ink in the wrong place.
+
 ## One rule for "kept", in one place
 
 `attempt.py compute()` is the only authority: kept when `moved >= max(2, 25% of the class)`. `classify.py`
