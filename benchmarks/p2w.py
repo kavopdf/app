@@ -544,11 +544,29 @@ def corpus():
         sh(f"cp {real_dir}/*.pdf {CORPUS}/",60)
     return len(glob.glob(CORPUS+"/*.pdf"))
 def engine():
-    if os.path.exists(REPO+"/tools/engine-verify/out"): return True
-    log("engine -- cloning/building"); os.makedirs(ROOT,exist_ok=True)
-    if not os.path.exists(REPO+"/.git"): sh("git clone -q --depth 1 https://github.com/kavopdf/app.git "+REPO,200)
-    sh("cd "+REPO+" && bash tools/p2w-bench/build-engine.sh",280)
-    ok=os.path.exists(REPO+"/tools/engine-verify/out"); log(f"engine: {'ok' if ok else 'FAILED'}"); return ok
+    """Build the engine from the repository's CURRENT head, every run.
+
+    THE CLONE WAS NEVER UPDATED, AND THAT IS WHY THE ENGINE WAS NEVER THE ONE ANYONE CHOSE.
+
+    This used to return immediately if out/ existed, and clone only if .git was missing. So the
+    first clone lived for ever: measured 17 Nov, ROOT/repo was sitting on fcded10 - a fixer commit
+    from hours earlier - while the repository's engine had been restored to ead0d0e. Every corpus
+    measurement was of an engine nobody had selected, and the restored engine was never measured at
+    all. Two days of numbers described a build that no longer existed in the branch.
+
+    It now fetches the head and rebuilds when the engine differs, so the binary and the branch agree.
+    """
+    log("engine -- syncing to head and building")
+    os.makedirs(ROOT, exist_ok=True)
+    if not os.path.exists(REPO + "/.git"):
+        sh("git clone -q https://github.com/kavopdf/app.git " + REPO, 240)
+    sh("cd " + REPO + " && git fetch -q origin main && git checkout -q -f FETCH_HEAD", 180)
+    sh("cd " + REPO + " && bash tools/p2w-bench/build-engine.sh", 280)
+    ok = os.path.exists(REPO + "/tools/engine-verify/out")
+    head = sh("cd " + REPO + " && git log -1 --format=%h", 30)
+    eng = sh("cd " + REPO + " && git log -1 --format=%h -- app/src/main/java/com/kavopdf/app/engine/", 30)
+    log(f"engine: {'ok' if ok else 'FAILED'} head={str(head).strip()[:9]} engine={str(eng).strip()[:9]}")
+    return ok
 def docx(end):
     pdfs=sorted(glob.glob(CORPUS+"/*.pdf"))
     miss=[p for p in pdfs if not os.path.exists(DOCX+"/"+os.path.basename(p)[:-4]+".docx")]
