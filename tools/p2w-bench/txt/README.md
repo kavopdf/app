@@ -12,9 +12,14 @@ cannot hide behind a txt score.
 
 **Three files, three jobs:**
 
-    PdfToWord.java    9677 lines   BOTH   - convert() builds the model, writeTxt() writes the .txt
-    DocxWriter.java   7219 lines   DOCX   - writes the .docx
-    TxtWriter.java     568 lines   TXT    - writes the .txt
+    PdfToWord.java    9677 lines   MODEL + TXT - convert() builds the model both writers read, and
+                                                writeTxt() writes the .txt itself (line 9674)
+    DocxWriter.java   7219 lines   DOCX        - write() writes the .docx (line 701)
+    TxtWriter.java     568 lines   TXT         - write() writes the .txt (line 59)
+
+  PdfToWord does NOT write a .docx: it has no w:document, no word/document.xml, no ZipOutputStream,
+  no ZipEntry, and its DocxWriter references are comments or model types (DocxWriter.Shape,
+  DocxWriter.Picture), never a call to DocxWriter.write().
 
 The pipeline, from ReadingOrder.java:24-30:
 
@@ -27,7 +32,9 @@ The pipeline, from ReadingOrder.java:24-30:
 `PdfToWord.writeTxt()` is the txt's entry point (line 9674); `TxtWriter.write()` is what it calls.
 ToolsActivity:600 calls `TxtWriter.write()` directly for the same result.
 
-**So `PdfToWord` is the file that produces both outputs**, and the two writers each own one format.
+**So `PdfToWord` feeds both outputs and writes one of them.** It builds the model the .docx is made
+from, and it writes the .txt. The .docx itself is written by `DocxWriter.write()`; the .txt by
+`TxtWriter.write()`, which `PdfToWord.writeTxt()` calls.
 
 What that means for a change:
 

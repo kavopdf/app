@@ -3,9 +3,11 @@
 
 WHY THE TXT IS SEPARATE. Three files, three jobs:
 
-    PdfToWord.java    9677 lines   BOTH   - convert() builds the model, writeTxt() writes the .txt
-    DocxWriter.java   7219 lines   DOCX   - writes the .docx
-    TxtWriter.java     568 lines   TXT    - writes the .txt
+    PdfToWord.java    9677 lines   MODEL + TXT - convert() builds the model, writeTxt() writes the txt
+    DocxWriter.java   7219 lines   DOCX        - write() writes the .docx
+    TxtWriter.java     568 lines   TXT         - write() writes the .txt
+
+  PdfToWord writes no .docx - no w:document, no word/document.xml, no ZipOutputStream, no ZipEntry.
 
     ReadingOrder.java:24-30
         Result r = PdfToWord.convert(pdf, "", null);
