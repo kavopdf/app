@@ -23,7 +23,12 @@ import json, os, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-OUT = os.path.join(HERE, "RANKING-TXT.csv")
+# THE TXT LIVES IN ITS OWN DIRECTORY. Nothing under tools/p2w-bench/txt/ is read by the .docx path,
+# and nothing in the .docx path writes there, so a txt change cannot move a docx number by accident
+# and a docx change cannot hide behind a txt score. The two formats share the ENGINE and nothing else.
+TXT_DIR = os.path.join(HERE, "txt")
+os.makedirs(TXT_DIR, exist_ok=True)
+OUT = os.path.join(TXT_DIR, "RANKING-TXT.csv")
 CORPUS = "/scratch/work/p2w/corpus"
 TXT = "/scratch/work/p2w/out"
 

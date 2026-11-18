@@ -520,7 +520,9 @@ def txt():
     A document passes at the same 99% bar the docx uses: EVERY applicable check passes. `abstained`
     is never counted as a pass - a check that did not run is not a check that passed.
     """
-    path = os.path.join(HERE, "RANKING-TXT.csv")
+    path = os.path.join(HERE, "txt", "RANKING-TXT.csv")
+    if not os.path.exists(path):
+        path = os.path.join(HERE, "RANKING-TXT.csv")
     if not os.path.exists(path):
         return {"available": False}
     rows = []
