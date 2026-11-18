@@ -89,6 +89,39 @@ def _share5(path):
     return d
 
 
+def obstacles():
+    """Walls this run hit, split into the ones it cleared and the ones a human must clear.
+
+    BLOCKERS.md already records every one of them, with a column headed "can I fix it". The report
+    never read that file, so the single most useful thing a run can say - what stopped it and whether
+    it could get past - was invisible. A run that hit three walls, solved two and reported only its
+    attempts looked idle; a run that hit one wall it could not clear looked identical to a run that
+    hit nothing at all.
+    """
+    path = os.path.join(ROOT, "tools", "p2w-bench", "BLOCKERS.md")
+    rows = []
+    try:
+        for line in open(path, encoding="utf-8"):
+            if not line.startswith("| ") or line.startswith("|---"):
+                continue
+            c = [x.strip() for x in line.strip().strip("|").split("|")]
+            if len(c) < 6 or c[0].lower().startswith("time"):
+                continue
+            rows.append({"when": c[0], "doing": c[1], "wall": c[2],
+                         "tried": c[3], "can": c[4], "need": c[5]})
+    except Exception:
+        return {"available": False, "rows": [], "mine": 0, "human": 0}
+    # "can I fix it" is the run's own verdict: anything that starts with yes / fixed / solved was
+    # cleared; anything else is a wall only a human can take down.
+    def cleared(r):
+        t = (r["can"] or "").lower()
+        return t.startswith(("yes", "fixed", "solved", "cleared", "done"))
+    mine = [r for r in rows if cleared(r)]
+    human = [r for r in rows if not cleared(r)]
+    return {"available": True, "rows": rows, "mine": len(mine), "human": len(human),
+            "last_human": human[-1]["wall"][:120] if human else ""}
+
+
 def corpus():
     """Improvement measured against the round-one baseline, from committed files only."""
     b, c = _share5(BASELINE), _share5(RANK)
@@ -166,7 +199,12 @@ def main(argv):
     if co.get("available"):
         L.append("7. corpus improvement       : %+.2f%%  (mean share5 %.2f -> %.2f over %d docs)"
                  % (co["pct"], co["baseline_mean"], co["current_mean"], co["docs"]))
-        L.append("8. docs improved total      : %d of %d  (%d regressed, %d unchanged)"
+        ob = obstacles()
+        L.append("8. obstacles this run      : %d cleared by the run, %d need a human"
+                 % (ob.get("mine", 0), ob.get("human", 0)))
+        if ob.get("human"):
+            L.append("   still a wall           : %s" % ob["last_human"])
+        L.append("9. docs improved total      : %d of %d  (%d regressed, %d unchanged)"
                  % (co["improved"], co["docs"], co["regressed"], co["unchanged"]))
         if not co["measurement_committed"]:
             L.append("")
