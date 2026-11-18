@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-11-17T18:08:48",
+ "ran_at": "2026-11-18T06:17:40",
  "layers": {
   "ground_truth": {
    "status": "pass",
@@ -24,24 +24,33 @@
    "summary": [
     "  text-missing             12",
     "  annotations-present      1",
-    "  none-identified          79",
+    "  none-identified          78",
     "  warnings.warn("
    ]
   }
  },
  "signatures": [
-  "[18:09:02]   content-loss    46 docs  median share@1px  30.6%",
-  "[18:09:02]   displacement    28 docs  median share@1px  29.1%",
-  "[18:09:02]   clean          120 docs  median share@1px   0.6%"
+  "[06:18:01]   content-loss    45 docs  median share@1px  22.0%",
+  "[06:18:01]   displacement    28 docs  median share@1px  29.1%",
+  "[06:18:01]   clean          122 docs  median share@1px   0.6%"
  ],
  "round": 1,
  "ratchet": {
   "status": "compared",
   "baseline_docs": 212,
-  "current_docs": 212,
+  "current_docs": 213,
   "regressions": [],
-  "improvements": [],
-  "new_documents": [],
+  "improvements": [
+   {
+    "document": "415_inline_images",
+    "was": 89.04,
+    "now": 0.0,
+    "delta": -89.04
+   }
+  ],
+  "new_documents": [
+   "416_many_tiny_pages"
+  ],
   "disappeared": []
  },
  "verdict": "OK: no regressions against baseline"

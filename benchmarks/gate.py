@@ -54,8 +54,27 @@ import sys, os, json, csv, subprocess, time, argparse, glob, urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 RANK = "/scratch/output/RANKING.csv"
 STATE = "/scratch/output/STATE.json"
+# THE RECORD THE REPOSITORY READS IS NOT THE FILE THIS SCRIPT WROTE.
+#
+# gate.py wrote /scratch/output/STATE.json, which is the delivered copy of a run and
+# survives nothing; measure_gate.py, the ratchet reader and every brief read
+# benchmarks/STATE.json in the repository. So the committed STATE.json could only ever
+# be as new as the last time somebody copied it by hand - and on 18 Nov it was still
+# carrying 17 Nov's ratchet ("improvements": []) while RANKING.csv beside it had a
+# measured improvement in it. Two files in one commit disagreeing about the same run.
+# Both are written now, from the same dict, in the same breath.
+STATE_REPO = os.path.join(HERE, "STATE.json")
 RAW = "https://raw.githubusercontent.com/kavopdf/app/main/benchmarks/RANKING.csv"
 BENCH = "/scratch/work/p2w/repo/tools/p2w-bench"
+
+
+def _write_state(S):
+    """The delivered copy and the repository's copy, from one dict."""
+    for p in (STATE, STATE_REPO):
+        try:
+            json.dump(S, open(p, "w"), indent=1)
+        except Exception as e:
+            log("STATE not written to " + p + ": " + str(e))
 
 def sh(c, t=280):
     try:
@@ -166,7 +185,7 @@ def main():
                                        exit=rc, tail=out.strip().splitlines()[-1:])
     if not gate_pass:
         S["verdict"] = "BLOCKED: instrument failed ground-truth validation"
-        json.dump(S, open(STATE, "w"), indent=1)
+        _write_state(S)
         log(S["verdict"]); return 3
 
     # ---- layer 2: global measurement ----
@@ -270,7 +289,7 @@ def main():
     else:
         S["verdict"] = "OK: no regressions against baseline"
 
-    json.dump(S, open(STATE, "w"), indent=1)
+    _write_state(S)
     log(S["verdict"])
     log(f"layers: " + " ".join(f"{k}={v['status']}" for k, v in S["layers"].items()))
     return 0

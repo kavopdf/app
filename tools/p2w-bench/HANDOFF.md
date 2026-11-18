@@ -10,17 +10,13 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 09:54 |
-| ended | still running |
-| how it ended | - |
+| ended | 11:55 |
+| how it ended | released |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> STEP 3/3 fixer. Class: content-missing-nothing-in-its-place (30 docs, biggest OPEN). Two agents landed root causes; one is PROVEN AND FIXED IN THE TREE: pdfbox-android packs a DeviceGray sample into all four ARGB lanes (g<<24|g<<16|g<<8|g) instead of 0xFF000000|..., so a grey picture's ALPHA IS ITS LUMINANCE and every dark pixel is transparent. 415_inline_images (8x8 inline DeviceGray block) therefore rendered a correct 120 pt square containing nothing: 89.04 share@5px with text_recall 100.0 and chars_missing 0. Fix in PdfToWord.java: declaresTransparency() asks the PDF's own dictionary (/SMask, /Mask, SMaskInData, stencil) and forceOpaque() sets only the alpha byte when nothing is declared. SCREENED: 415_inline_images 89.04 -> 0.00, nothing worse. Corpus scan: 415_inline_images is the ONLY document in the 213 with an inline image and there are ZERO grey XObject images, so the blast radius is one document - the attempt will read 'partial' (1 of 30), not kept, and that is the honest number. RATCHET NOT YET RUN. Second agent (content-missing-nothing-in-its-place-B-103610-346a.md) proved the ~1.44 pt median on mobile-bill/salary-slip/electricity-bill is a ladder of +0.50 pt steps, one per emitted w:tbl: the bottom rule is drawn outside the last row's box and never charged to the following flow (DocxWriter.java:6020 drops ruleTwHere when the row pitch binds; 6547-6554 sets ctx.lastBaseline to the box bottom with no rule). NOT APPLIED - geometry measured, score consequence predicted only.
-
-## What the next run should do first
-
-> Run the full 213-document ratchet for the DeviceGray-alpha fix now in PdfToWord.java (p2w.py --budget 250 repeatedly, then gate.py --ratchet-only), record the attempt, commit RANKING.csv. Then apply the DocxWriter bottom-rule term named in FINDINGS/content-missing-nothing-in-its-place-B-103610-346a.md (add sideSz[2]/8 to rowBottomPt at 6547-6554 and the twip equivalent at 6508) and screen the class.
+> STEP 3/3 fixer, class content-missing-nothing-in-its-place (30 docs, now 29 - 415_inline_images is FIXED). KEPT AND RATCHETED (attempt 5, engine 5cd9e33): DeviceGray images were carried out with alpha = luminance, so every dark pixel of a grey picture was transparent - 415_inline_images drew a correct 120 pt square containing nothing at 89.04 share@5px with text_recall 100.0. Fix: PdfToWord.declaresTransparency() reads the PDF's own dictionary (/SMask, /Mask, SMaskInData, stencil) and forceOpaque() rewrites only the alpha byte when nothing is declared. Full 213-document ratchet: 212 compared, 0 regressions, 1 improvement (89.04 -> 0.00). Blast radius measured, not assumed: 415 is the only document of 213 with an inline image and there are zero DeviceGray XObject images. ATTEMPT 6 REVERTED with numbers: the table bottom-rule ladder is real (rungs of +0.50 pt per emitted w:tbl on mobile-bill/salary-slip/electricity-bill, proved by surgery on the .docx) and the one-term fix was built and screened - all five documents improved and none got worse, but only by 0.01-0.37 share@5px, so nothing crosses the 0.5 line and the ratchet could keep nothing. share@1px fell 47.66 -> 37.56 on mobile-bill, so the ladder is genuinely gone; the residual (median 1.44 -> 2.40 pt) is a DIFFERENT and larger defect, and that is where this class's next attempt should look. Tools fixed this run: gate.py wrote STATE.json only to /scratch/output so the repository's benchmarks/STATE.json could never record a ratchet (now writes both); attempt.py counted nothing for a run that made a fix and ratcheted it in the same slot (now keyed on class+moved, so a re-measurement is a no-op and a first measurement counts); the run's attempt hash had been derived while the fix was still uncommitted and was corrected to 5cd9e33.
 
 ## Agents deployed and not yet accounted for
 
@@ -30,17 +26,14 @@ unfinished work, not as a result.
 | contB-01 | content-missing-partly-replaced | B | is the wrap inside a text box a renderer limit or our emitted width | 13:52 | landed | landed | FINDINGS/content-missing-partly-replaced-B-1300.md |
 | contA2-01 | content-missing-partly-replaced | A2 | why does parasOfLines reject the six heading lines of 041122 page 7 | 11:16 | landed | landed | FINDINGS/content-missing-partly-replaced-A2-092912-7c4e.md |
 | contD-01 | content-missing-partly-replaced | D | how many corpus documents have a cell whose lines start left of the fi | 11:16 | landed | landed | FINDINGS/content-missing-partly-replaced-D-092700-1d7b.md |
-| contA-02 | content-missing-nothing-in-its-place | A | 415_inline_images p1: why is 89% of source ink >5px from ours when tex | 09:57 | expected by 11:15 | running |  |
-| contB-02 | content-missing-nothing-in-its-place | B | the ~1.4pt uniform shift on mobile-bill/salary-slip-factory-wages/elec | 09:57 | expected by 11:15 | running |  |
+| contA-02 | content-missing-nothing-in-its-place | A | 415_inline_images p1: why is 89% of source ink >5px from ours when tex | 09:57 | expected by 11:15 | landed | FINDINGS/content-missing-nothing-in-its-place-A-044628-d0c0.md |
+| contB-02 | content-missing-nothing-in-its-place | B | the ~1.4pt uniform shift on mobile-bill/salary-slip-factory-wages/elec | 09:57 | expected by 11:15 | landed | FINDINGS/content-missing-nothing-in-its-place-B-103610-346a.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `13:52` agent landed: content-missing-partly-replaced / A -> FINDINGS/content-missing-partly-replaced-A-1305.md
-- `13:52` agent deployed: content-missing-partly-replaced / B - is the wrap inside a text box a renderer limit or our emitted width
-- `13:52` agent landed: content-missing-partly-replaced / B -> FINDINGS/content-missing-partly-replaced-B-1300.md
 - `13:52` C (differential) returned without committing: pdf2docx and LibreOffice PDF-import both keep page 7 of 041122 on ONE page (pdf2docx 2.03 s for that page alone; pdftotext -layout 56 lines; LibreOffice writer_pdf_import round-trip 1 page), and PyMuPDF puts the source page 7 text at y 22.6-843.4 on an 842.1 pt sheet = 97.5 % fill, 0 pt slack. Nothing reproduced a 10-page output, so the spill is ours, not an intrinsically hard PDF. Unverified by me and no file committed - do not re-deploy blind, read this note.
 - `15:48` attempt 6 on content-missing-partly-replaced -> kept (1/30 moved)
 - `16:18` attempt 4 on content-missing-nothing-in-its-place -> kept (31/212 moved)
@@ -63,6 +56,9 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `19:35` attempt 17 on content-missing-partly-replaced -> kept (3/3 moved)
 - `09:57` agent deployed: content-missing-nothing-in-its-place / A - 415_inline_images p1: why is 89% of source ink >5px from ours when text_recall i
 - `09:57` agent deployed: content-missing-nothing-in-its-place / B - the ~1.4pt uniform shift on mobile-bill/salary-slip-factory-wages/electricity-bi
+- `11:50` agent landed: contA-02 /  -> FINDINGS/content-missing-nothing-in-its-place-A-044628-d0c0.md
+- `11:50` agent landed: contB-02 /  -> FINDINGS/content-missing-nothing-in-its-place-B-103610-346a.md
+- `11:55` attempt 6 on content-missing-nothing-in-its-place -> reverted (0/30 moved)
 
 ## Where the rest of the state lives
 

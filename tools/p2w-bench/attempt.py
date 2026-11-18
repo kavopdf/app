@@ -418,9 +418,21 @@ def add(args):
             # that was already counted when it was kept, so adding its moved count here counted
             # the same 31 documents twice: once at 08:22 and again at 16:18, and the run report
             # read "32 documents improved this run" when one of them had been improved at 08:22.
+            # ...and the guard above then under-reported the opposite case: a run that MAKES a
+            # fix and ratchets it in the same slot counted nothing at all. Measured 18 Nov - the
+            # DeviceGray fix moved 415_inline_images 89.04 -> 0.00, the 213-document ratchet
+            # passed with 0 regressions, and RUN.json still read "docs_improved": 0 while
+            # RANKING.csv beside it held the improvement. The question is not "was this a
+            # ratchet" but "has this exact (class, moved) already been counted in this run":
+            # a re-measurement of the same count is a no-op, a first measurement of a new count
+            # is the number the report wants.
             if args.ratchet is not None:
                 _r["ratchets"] = _r.get("ratchets", 0) + 1
-            else:
+            _counted = _r.get("counted") or []
+            _key = [name, args.moved or 0]
+            if _key not in _counted:
+                _counted.append(_key)
+                _r["counted"] = _counted
                 _r["docs_improved"] = _r.get("docs_improved", 0) + (args.moved or 0)
         _j.dump(_r, open(_rp, "w", encoding="utf-8"), indent=1)
     except Exception:

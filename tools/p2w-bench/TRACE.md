@@ -360,3 +360,12 @@ claim and after each step; it is not code and cannot break anything.
 | 18 Nov 10:51 | fixer | build-engine | started |
 | 18 Nov 10:52 | fixer | build-engine | started |
 | 18 Nov 10:53 | fixer | build-engine | engine built in 46s |
+| 18 Nov 11:49 | fixer | attempt | content-missing-nothing-in-its-place -> kept (1/30 moved) |
+| 18 Nov 11:50 | fixer | hypothesis | content-missing-nothing-in-its-place -> confirmed |
+| 18 Nov 11:50 | fixer | hypothesis | content-missing-nothing-in-its-place -> untested |
+| 18 Nov 11:52 | fixer | build-engine | started |
+| 18 Nov 11:53 | fixer | build-engine | engine built in 39s |
+| 18 Nov 11:54 | fixer | build-engine | started |
+| 18 Nov 11:55 | fixer | build-engine | engine built in 37s |
+| 18 Nov 11:55 | fixer | attempt | content-missing-nothing-in-its-place -> reverted (0/30 moved) |
+| 18 Nov 11:55 | fixer | hypothesis | content-missing-nothing-in-its-place -> ruled-out |

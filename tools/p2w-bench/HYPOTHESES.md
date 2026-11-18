@@ -212,6 +212,18 @@ Do not re-test one without new evidence, and if you do, say what changed.
   evidence: 16 Nov fixer, soffice render, p2w.measure_doc, 30 class docs + 12 controls. mobile-bill 18.48->1.55, salary-slip-factory-wages 18.09->0.73, two-tables-stacked 17.20->0.77, marksheet-university 16.78->0.64, electricity-bill 16.24->1.33, insurance-policy-schedule 13.29->0.53, landscape-page-inside-portrait 13.08->1.45, form16-part-b 12.32->0.77, mutual-fund-statement 12.05->0.21, property-tax-receipt 10.78->0.96, admit-card 10.68->1.89, gst-invoice-multipage 10.44->0.40, delivery-challan 10.26->0.84, table-across-page-break 9.41->0.53. 22 of 30 moved; 0 of 12 controls worse (eway-bill 0.91->0.05). Patch: PdfToWord.Table.rowRule, markSideStrokes.heaviestRuleOn, DocxWriter emits w:tcBorders top for a row whose inkWeight exceeds 1.5x the insideH stroke's.
   recorded: 2026-11-16 12:24
 
+- CONFIRMED - pdfbox-android packs a DeviceGray sample into all four ARGB lanes, so the bitmap's ALPHA IS ITS LUMINANCE and every dark pixel of a grey picture is transparent; the engine carried it out unchanged and the ink was not on the page
+  evidence: 415_inline_images: 8x8 DeviceGray inline image, getImage() row0 = (00000000)(FFFFFFFF)...; the .docx's image1.png had alpha == luminance; rewriting only the alpha byte gave share5 89.04 -> 0.00 and max 153.23 -> 0.48 pt; the full 213-document ratchet then read 415_inline_images 89.04 -> 0.00, 0 regressions
+  recorded: 2026-11-18 11:50
+
+- UNTESTED - the ~1.44 pt median on mobile-bill/salary-slip/electricity-bill is a ladder of +0.50 pt steps, one per emitted w:tbl, because the table's bottom rule is drawn outside the last row's box and never charged to the flow that follows it (DocxWriter.java:6020 drops ruleTwHere when the row pitch binds; 6547-6554 sets ctx.lastBaseline to the box bottom with no rule)
+  evidence: measured geometry on all three: rungs 0.00/+0.48/+0.98/+1.48; every border nil -> all within 0.02 pt; bottom rule at w:sz 16 -> steps of exactly 2.00 pt per table; two-tables-stacked (1 merged table) shows exactly one rung, 405_sheet_music_lyrics (0 tables) shows none. NOT applied - score consequence predicted, not measured
+  recorded: 2026-11-18 11:50
+
+- RULED OUT - fixing the table bottom-rule term (adding the last row's rule to rowBottomPt and to the flow charge) will clear documents in this class
+  evidence: built and screened on the five documents the ladder was measured on: mobile-bill 18.48->18.12, electricity-bill 16.24->15.87, salary-slip-factory-wages 18.09->17.85, marksheet 16.78->16.58, two-tables-stacked 17.20->17.19. All five improved, none worse, but 0.01-0.37 share@5px - under the 0.5 that counts. share@1px shows the rung is genuinely gone (mobile-bill 47.66->37.56) and the residual median rose 1.44->2.40 pt, i.e. what is left is a different defect. REVERTED, not shipped
+  recorded: 2026-11-18 11:55
+
 
 ## content-missing-nothing-in-its-place - 16 Nov 10:50 run: the inline image is SKIPPED by name, and the line is now known
 
@@ -300,6 +312,73 @@ Do not re-test one without new evidence, and if you do, say what changed.
   have cost a corpus ratchet to prove it.
   NEXT: the spill's height is the text box, so look at the box's width in DocxWriter's anchor
   path (where a box's extent comes from its block's own line boxes) before the table's rows.
+
+
+## content-missing-partly-replaced - 17 Nov 19:00 run: the spill is the carry's CEILING, and it never bound on a merged cell
+
+- CONFIRMED - The carry (ARIAL_W) never clamped on a SPANNING table cell: DocxWriter passed
+  `colTw[c]`, the FIRST grid column under the cell, as the width carryScalePct clamps its
+  character scale to, and `carryScalePct` skips the clamp entirely when that width is zero or
+  less. On a cell merged over six columns the clamp therefore never fired and the scale went out
+  at the page's drawn ratio unclamped.
+  evidence: 041122-Account_Opening_Form, the instruction cell of the row carrying "Government
+  Department establishing identity and address of such person": one cell, w:gridSpan 6,
+  w:tcW 11000 tw (550 pt), w:ind left 393 tw, and the nine paragraphs inside it emitted w:w
+  97,97,97,95,97,96,96,97. Measured in the docx itself: colTw[0] = 360 tw, so availTw =
+  360 - 393 < 0 and the ceiling branch was skipped; the drawn width / Arial width of the longest
+  paragraph ("In case the estimated total income in column 22b exceeds the maximum amount...")
+  is 97 %. The renderer's usable width for that cell is 530.35 pt (x 43.0 -> 573.3 on the
+  rendered page) and the paragraph at 97 % is 546.8 pt, so four of the page's nine lines wrapped
+  into two: the row renders 13 lines / 154 pt where the page drew 9 / 118 pt, and it no longer
+  fits the 158 pt the page had left, so it broke to a new sheet.
+  recorded: 2026-11-17 19:00
+
+- CONFIRMED - Passing the cell's real width (span and all) closes the instruction page: the
+  ceiling becomes 92 % and the row fits the space the page left for it.
+  evidence: one-token change, `colTw[c] - pInset` -> `spanTw - pInset` (spanTw is the sum of the
+  columns the cell covers, already computed two blocks above for the tcW). Corpus diff over all
+  213: **3 .docx change, 210 byte-identical in every zip entry** - 041122-Account_Opening_Form,
+  Account_Opening_Form_Fillable_filled, 373_leave_application_form, all three form documents
+  with merged cells. All three measured: 373 5.46 -> 4.64 share@5 (improved, 1 page both);
+  041122 11 -> 10 pages and Account_Opening_Form_Fillable_filled 11 -> 10, both share@5
+  unchanged at 99.02 because of the entry below. 0 worse. Attempt recorded 1/3 (partial).
+  CARRIED AS A PATCH, NOT IN THE ENGINE, for the commit-path reason the cantSplit entry above
+  already records: DocxWriter.java is 451 KB and the only working commit path,
+  GITHUB_COMMIT_MULTIPLE_FILES, takes file contents inline. The change is 14 lines at
+  `patches/carry-ceiling-span.patch`; apply with `git apply
+  patches/carry-ceiling-span.patch` from the repository root and rebuild. It was built,
+  converted over the whole corpus, diffed entry by entry and measured on all three documents it
+  changes before being set aside, so applying it needs no new measurement - only the
+  three-document check that it still applies and still gives 10 pages.
+  recorded: 2026-11-17 19:00
+
+- MEASURED, THIS RUN - the LAST spurious page of 041122 is a FOLIO WRITTEN AS A TABLE ROW, and
+  it is why both form documents still read 99.02 with a page count of 10 against the source's 9.
+  evidence: the table that holds the declaration form (24 rows) ends with a single-cell row whose
+  whole text is "7". Rendered, that row is the only content of our page 8 (y 25.3-35.3, 1
+  character), so pages 8-10 are compared against source pages 8-9 shifted by one: our page 8
+  reads share@5 99.02 with text_recall 0.04, and the Annexure-2 page lands on page 11 of 11. The
+  flow-line folio rule (the `b.y > 0.88 * pageHeightPt && isFolio(p)` anchor, which exists and
+  names this document in its own comment) cannot fire because this folio is not a flow line - it
+  is a row of the table. Until it is a position instead of a row, no amount of table arithmetic
+  moves this document's number.
+  recorded: 2026-11-17 19:00
+
+- UNTESTED - A table's last row that is a folio in the page's bottom band should be anchored, not
+  emitted as a row, exactly as a flow-line folio already is.
+  evidence: the row is single-cell, its text matches isFolio, and its top is in the bottom band
+  (0.88 x 842 = 741 pt; the page drew the folio at y 805.2). The flow path already does this and
+  its comment measures the same document: anchoring the folio "lands at the y the page drew it
+  at and costs no sheet". The table path needs the same, and the two are the same statement: a
+  folio is a POSITION. Implementation is contained - detect it before the row loop, skip that
+  row, set the last-row bookkeeping from row-1, and emit the text after `</w:tbl>` where the
+  post-table carrier paragraph already goes. `anchor(sb, ctx, x, yTop, w, h, inner)` takes a
+  hand-built paragraph and needs no Para/Box model. NOT built this run: the row loop carries
+  per-row state (rowEdge may be baselines rather than edges on the whitespace pass, recut tables
+  renumber rows, spans move c) and the slot ran out before it could be done and measured. It is
+  the single change that should turn 041122 and Account_Opening_Form_Fillable_filled from 10
+  pages to the source's 9, which is what moves the class.
+  recorded: 2026-11-17 19:00
 
 
 ## content-missing-partly-replaced — the nine-page account-opening form class
@@ -398,7 +477,6 @@ Do not re-test one without new evidence, and if you do, say what changed.
   before any font is involved. NEXT: make the cell-line box carry the source's measured
   pitch in twips (232, not 240) and re-measure r23 against 231.5.
 
-
 - CONFIRMED and FIXED (17 Nov 14:39 fixer, DocxWriter.table) - A PAGE'S OWN FOLIO IS NOT A
   ROW OF THE TABLE THE PAGE'S RULES BOUND. 041122 page 7 draws a rule above its folio and a
   frame round the sheet, so the ruled pass hands the folio back as the table's LAST ROW
@@ -468,7 +546,6 @@ Do not re-test one without new evidence, and if you do, say what changed.
   entry; the 4 that differ are the 4 measured above, and none of them moves a number. It is
   kept because it removes a promise the engine cannot keep wherever that is provable, and it
   costs nothing measurable - but it is NOT the fix for 041122 and must not be counted as one.
-
   IT IS CARRIED AS A PATCH, NOT IN THE ENGINE, and that is a commit-path fact, not a
   judgement: `app/src/main/java/com/kavopdf/app/engine/DocxWriter.java` is 458 KB, git push
   is 403 for everyone, and the only working commit path is the GitHub MCP tool
@@ -620,68 +697,3 @@ Do not re-test one without new evidence, and if you do, say what changed.
   it is bigger than a fixer slot. The engine was reverted to HEAD; nothing from any of the three
   builds is in the tree.
 
-## content-missing-partly-replaced - 17 Nov 19:00 run: the spill is the carry's CEILING, and it never bound on a merged cell
-
-- CONFIRMED - The carry (ARIAL_W) never clamped on a SPANNING table cell: DocxWriter passed
-  `colTw[c]`, the FIRST grid column under the cell, as the width carryScalePct clamps its
-  character scale to, and `carryScalePct` skips the clamp entirely when that width is zero or
-  less. On a cell merged over six columns the clamp therefore never fired and the scale went out
-  at the page's drawn ratio unclamped.
-  evidence: 041122-Account_Opening_Form, the instruction cell of the row carrying "Government
-  Department establishing identity and address of such person": one cell, w:gridSpan 6,
-  w:tcW 11000 tw (550 pt), w:ind left 393 tw, and the nine paragraphs inside it emitted w:w
-  97,97,97,95,97,96,96,97. Measured in the docx itself: colTw[0] = 360 tw, so availTw =
-  360 - 393 < 0 and the ceiling branch was skipped; the drawn width / Arial width of the longest
-  paragraph ("In case the estimated total income in column 22b exceeds the maximum amount...")
-  is 97 %. The renderer's usable width for that cell is 530.35 pt (x 43.0 -> 573.3 on the
-  rendered page) and the paragraph at 97 % is 546.8 pt, so four of the page's nine lines wrapped
-  into two: the row renders 13 lines / 154 pt where the page drew 9 / 118 pt, and it no longer
-  fits the 158 pt the page had left, so it broke to a new sheet.
-  recorded: 2026-11-17 19:00
-
-- CONFIRMED - Passing the cell's real width (span and all) closes the instruction page: the
-  ceiling becomes 92 % and the row fits the space the page left for it.
-  evidence: one-token change, `colTw[c] - pInset` -> `spanTw - pInset` (spanTw is the sum of the
-  columns the cell covers, already computed two blocks above for the tcW). Corpus diff over all
-  213: **3 .docx change, 210 byte-identical in every zip entry** - 041122-Account_Opening_Form,
-  Account_Opening_Form_Fillable_filled, 373_leave_application_form, all three form documents
-  with merged cells. All three measured: 373 5.46 -> 4.64 share@5 (improved, 1 page both);
-  041122 11 -> 10 pages and Account_Opening_Form_Fillable_filled 11 -> 10, both share@5
-  unchanged at 99.02 because of the entry below. 0 worse. Attempt recorded 1/3 (partial).
-  CARRIED AS A PATCH, NOT IN THE ENGINE, for the commit-path reason the cantSplit entry above
-  already records: DocxWriter.java is 451 KB and the only working commit path,
-  GITHUB_COMMIT_MULTIPLE_FILES, takes file contents inline. The change is 14 lines at
-  `patches/carry-ceiling-span.patch`; apply with `git apply
-  patches/carry-ceiling-span.patch` from the repository root and rebuild. It was built,
-  converted over the whole corpus, diffed entry by entry and measured on all three documents it
-  changes before being set aside, so applying it needs no new measurement - only the
-  three-document check that it still applies and still gives 10 pages.
-  recorded: 2026-11-17 19:00
-
-- MEASURED, THIS RUN - the LAST spurious page of 041122 is a FOLIO WRITTEN AS A TABLE ROW, and
-  it is why both form documents still read 99.02 with a page count of 10 against the source's 9.
-  evidence: the table that holds the declaration form (24 rows) ends with a single-cell row whose
-  whole text is "7". Rendered, that row is the only content of our page 8 (y 25.3-35.3, 1
-  character), so pages 8-10 are compared against source pages 8-9 shifted by one: our page 8
-  reads share@5 99.02 with text_recall 0.04, and the Annexure-2 page lands on page 11 of 11. The
-  flow-line folio rule (the `b.y > 0.88 * pageHeightPt && isFolio(p)` anchor, which exists and
-  names this document in its own comment) cannot fire because this folio is not a flow line - it
-  is a row of the table. Until it is a position instead of a row, no amount of table arithmetic
-  moves this document's number.
-  recorded: 2026-11-17 19:00
-
-- UNTESTED - A table's last row that is a folio in the page's bottom band should be anchored, not
-  emitted as a row, exactly as a flow-line folio already is.
-  evidence: the row is single-cell, its text matches isFolio, and its top is in the bottom band
-  (0.88 x 842 = 741 pt; the page drew the folio at y 805.2). The flow path already does this and
-  its comment measures the same document: anchoring the folio "lands at the y the page drew it
-  at and costs no sheet". The table path needs the same, and the two are the same statement: a
-  folio is a POSITION. Implementation is contained - detect it before the row loop, skip that
-  row, set the last-row bookkeeping from row-1, and emit the text after `</w:tbl>` where the
-  post-table carrier paragraph already goes. `anchor(sb, ctx, x, yTop, w, h, inner)` takes a
-  hand-built paragraph and needs no Para/Box model. NOT built this run: the row loop carries
-  per-row state (rowEdge may be baselines rather than edges on the whitespace pass, recut tables
-  renumber rows, spans move c) and the slot ran out before it could be done and measured. It is
-  the single change that should turn 041122 and Account_Opening_Form_Fillable_filled from 10
-  pages to the source's 9, which is what moves the class.
-  recorded: 2026-11-17 19:00
