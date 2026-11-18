@@ -56,16 +56,30 @@ def by_all_open():
 
 
 def biggest_open_class():
-    """The OPEN class to take next, smallest first, and its documents.
+    """The OPEN class to take next, and its documents, worst first.
 
-    SMALLEST FIRST IS DELIBERATE. A screen costs a few minutes whatever the class size, because
-    soffice needs about eighty seconds to start either way. So the small classes are where a class
-    can actually be closed inside one run: single-element-far-out (1 document),
-    partly-lost-and-displaced (7), partly-lost (11) and partly-displaced (12) are 31 of the 92 OPEN
-    documents between them. Taking the thirty-document class first spends a run on one class that
-    cannot close; taking the four small ones closes four classes and shrinks the round.
+    RANKED BY DOCUMENTS THAT CAN ACTUALLY IMPROVE, NOT BY CLASS SIZE.
+
+    The rule used to be smallest-first, and the reasoning was sound about classes and wrong about
+    documents: a small class closes sooner, so taking it shrinks the round. What that ignored is that
+    a document already under the 5.0 line cannot move any number when you improve it. Measured 18 Nov,
+    after five attempts and one kept:
+
+        class                                  open   above 5.0   attempts
+        content-missing-nothing-in-its-place     29          21          0
+        content-present-wholly-displaced         16          13          0
+        content-missing-partly-replaced          16          11          1
+        content-partly-lost                      11           6          0
+        content-present-partly-displaced         12           3          0
+        content-partly-lost-and-displaced         7           1          4
+
+    Four of five attempts went to the class with ONE improvable document, and the class with
+    twenty-one had never been touched. The run was closing classes and improving nothing, which is
+    exactly what its reports said.
+
+    So: the class with the most documents above the line, and inside it those documents worst first.
+    A run that works the top of this list is a run that moves the corpus.
     """
-    import re as _re
     path = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
     by = {}
     try:
@@ -80,8 +94,24 @@ def biggest_open_class():
         return "", []
     if not by:
         return "", []
-    cls = min(by, key=lambda k: (len(by[k]), k))
-    return cls, by[cls]
+    # the share5 of each document, so "improvable" means above the line
+    score = {}
+    try:
+        import csv as _csv
+        for r in _csv.DictReader(open(os.path.join(ROOT, "benchmarks", "RANKING.csv"), encoding="utf-8")):
+            try:
+                score[r["document"]] = float(r["share5"])
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    def improvable(docs):
+        return [d for d in docs if score.get(d, 0.0) > 5.0]
+
+    cls = max(by, key=lambda k: (len(improvable(by[k])), len(by[k]), k))
+    docs = sorted(by[cls], key=lambda d: -score.get(d, 0.0))
+    return cls, docs
 
 
 def engine_hash():
