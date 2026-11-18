@@ -65,9 +65,10 @@ def engine_stamp():
     """
     head = run("cd %s && git log -1 --format=%%h -- app/src/main/java/com/kavopdf/app/engine/"
                % REPO, 30).stdout.strip() or "unknown"
-    d = run("cd %s && { git diff -- app/src/main/java/com/kavopdf/app/engine/; "
-            "git diff --cached -- app/src/main/java/com/kavopdf/app/engine/; } | sha1sum" % REPO,
-            60).stdout.strip().split()[0] if True else ""
+    out = run("cd %s && { git diff -- app/src/main/java/com/kavopdf/app/engine/; "
+              "git diff --cached -- app/src/main/java/com/kavopdf/app/engine/; } | sha1sum"
+              % REPO, 60).stdout.strip()
+    d = out.split()[0] if out else ""
     if d and d != EMPTY_SHA:
         return "%s+%s" % (head, d[:10])
     return head

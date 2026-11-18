@@ -68,6 +68,10 @@ def recount(lines):
     after every class closes is a table that will be wrong most of the time, and this one is the
     first thing any reader sees.
     """
+    # TWO COLUMNS, BECAUSE ONE WAS ALWAYS AMBIGUOUS. The hand-maintained table counted OPEN
+    # documents for defect classes and ALL rows for "none" - 29 beside 122, in the same column,
+    # meaning two different things. A reader could not tell whether a class of 16 had 16 documents
+    # or 16 left. open and fixed together say both, and cannot be misread.
     counts = {}
     for line in lines:
         st = line.strip()
@@ -76,10 +80,17 @@ def recount(lines):
         c = [x.strip() for x in st.strip("|").split("|")]
         if len(c) < 8 or not c[0].isdigit():
             continue
-        counts[c[2]] = counts.get(c[2], 0) + 1
-    head = "| signature | problem | documents |"
+        rec = counts.setdefault(c[2], [0, 0])
+        if "OPEN" in c[6].upper():
+            rec[0] += 1
+        else:
+            rec[1] += 1
+    head = "| signature | problem | open | fixed |"
     try:
-        a = next(i for i, l in enumerate(lines) if l.strip() == head)
+        # MATCH BY PREFIX. The old header was "| signature | problem | documents |"; pinning the
+        # exact string meant a file written by the previous version was never found, so the recount
+        # silently did nothing - which is the same class of bug as the length-delta one.
+        a = next(i for i, l in enumerate(lines) if l.strip().startswith("| signature |"))
         b = a
         while b + 1 < len(lines) and lines[b + 1].startswith("|"):
             b += 1
@@ -87,9 +98,10 @@ def recount(lines):
         return lines, 0
     order = ["content-loss", "mixed", "displacement", "clean"]
     rows = sorted(counts.items(), key=lambda kv: (order.index(signature(kv[0]))
-                                                  if signature(kv[0]) in order else 9, -kv[1]))
-    new = [head, "|---|---|---|"]
-    new += ["| %s | %s | %d |" % (signature(k), k, v) for k, v in rows]
+                                                  if signature(kv[0]) in order else 9,
+                                                  -kv[1][0], -sum(kv[1])))
+    new = [head, "|---|---|---|---|"]
+    new += ["| %s | %s | %d | %d |" % (signature(k), k, v[0], v[1]) for k, v in rows]
     # COUNT CHANGED ROWS, NOT A LENGTH DELTA. The first version returned len(new) - len(old), which
     # is zero whenever a recount changes a number without changing the row count - so the summary
     # printed "0 differ" while its counts were wrong, and --write skipped the save.
