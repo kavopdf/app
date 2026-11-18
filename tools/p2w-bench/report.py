@@ -392,6 +392,84 @@ def silences():
         return {"available": False}
 
 
+PHASES = (
+    ("setup",   ("claimed", "archive.py", "housekeeping", "gaps.py", "step.py")),
+    ("screen",  ("screen.py",)),
+    ("build",   ("build-engine", "building the engine", "compil")),
+    ("measure", ("p2w.py", "measure", "ratchet", "gate.py", "convert", "census")),
+    ("record",  ("attempt.py", "handoff.py", "classrow.py", "pending.py", "round.py")),
+    ("report",  ("report.py", "chain.py")),
+)
+
+
+def _phase_of(text):
+    t = (text or "").lower()
+    for name, keys in PHASES:
+        for k in keys:
+            if k in t:
+                return name
+    return "other"
+
+
+def phases():
+    """Where the run's minutes actually went.
+
+    A total tells nobody whether the run spent its hour fixing the engine or waiting for a clone.
+    Measured 18 Nov: a 38-minute slot of which 37 was one conversion-and-measure loop and the rest
+    four tool calls.
+
+    A beat marks the start of a tool call, and editing DocxWriter for twelve minutes is not a tool
+    call - so the gap that ends at an attempt belongs to the fix that produced it, not to whatever
+    beat happened to precede it. That mistake credited twelve minutes of engine work to "setup".
+    """
+    try:
+        run = _json(RUN, {})
+        lo = run.get("started_ts")
+        hi = run.get("ended_ts")
+        if not lo:
+            return []
+        lo = float(lo)
+        hi = float(hi) if hi else time.time()
+        rows = []
+        for line in open(os.path.join(ROOT, "tools", "p2w-bench", "TIMELINE.jsonl"), encoding="utf-8"):
+            try:
+                d = json.loads(line)
+            except Exception:
+                continue
+            if lo - 5 <= d.get("t", 0) <= hi + 5:
+                rows.append(d)
+        rows.sort(key=lambda r: r.get("t", 0))
+        if not rows:
+            return []
+        acc, order = {}, []
+        for k in range(len(rows)):
+            nxt_t = rows[k + 1].get("t", hi) if k + 1 < len(rows) else hi
+            g = max(0.0, nxt_t - rows[k].get("t", 0))
+            nxt_d = rows[k + 1].get("d") if k + 1 < len(rows) else ""
+            if g >= 120 and "attempt.py" in (nxt_d or ""):
+                ph = "fix"
+            elif g >= 120 and "report.py" in (nxt_d or ""):
+                ph = "report"
+            else:
+                ph = _phase_of(rows[k].get("d"))
+            if ph not in acc:
+                acc[ph] = 0.0
+                order.append(ph)
+            acc[ph] += g
+        named = [("setup", "setup - claim, housekeeping, reading the gate"),
+                 ("screen", "screen - the class's own documents"),
+                 ("build", "build - compiling the engine"),
+                 ("fix", "fix - diagnose and change the engine"),
+                 ("measure", "measure - convert and measure the corpus"),
+                 ("record", "record - attempt, handoff, class rows"),
+                 ("report", "report - the report and the chain"),
+                 ("other", "other - not attributed to a tool")]
+        return [{"phase": label, "min": round(acc[key] / 60.0, 1)}
+                for key, label in named if acc.get(key, 0) >= 30]
+    except Exception:
+        return []
+
+
 def subagents():
     """Every agent this run deployed, with how long each one actually worked.
 
@@ -596,6 +674,19 @@ def main(argv):
     if ob.get("human"):
         L.append("| Still a wall | %s |" % ob["last"])
     L.append("")
+
+    # the phase breakdown closes the Timing section, after the obstacle rows are already written
+    ph = phases()
+    if ph:
+        L.append("")
+        L.append("### Where the time went")
+        L.append("")
+        L.append("| Phase | Time | |")
+        L.append("|:--|--:|:--|")
+        tot = sum(x["min"] for x in ph) or 1
+        for x in ph:
+            bar = "#" * max(1, int(round(22 * x["min"] / tot)))
+            L.append("| %s | **%s** | `%s` |" % (x["phase"], hhmm(int(x["min"])), bar))
 
     if best:
         L.append("## Best results this round")
