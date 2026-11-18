@@ -1,9 +1,21 @@
 #!/usr/bin/env python3
 """txt_gate.py - the .txt half runs its own gate, and cannot move a .docx number.
 
-WHY THE TXT IS SEPARATE. The two formats share one thing: the engine. DocxWriter writes the .docx and
-the .txt from the same layout model, so a change made to improve the txt is a change to code the docx
-also depends on. Everything else is kept apart so that neither side can damage the other by accident:
+WHY THE TXT IS SEPARATE. The conversion is three files, not one:
+
+    PdfToWord.java    9644 lines   parses the PDF once, builds the model   <-- the ONLY shared file
+    DocxWriter.java   7196 lines   writes the .docx                      <-- docx only
+    TxtWriter.java     568 lines   writes the .txt                       <-- txt only
+
+    ToolsActivity.kt:600   if (asTxt) TxtWriter.write(result, out) else DocxWriter.write(result, out)
+
+One or the other, never both. TxtWriter references DocxWriter nowhere and imports only java.io and
+java.util; DocxWriter never touches the txt. So a change in TxtWriter cannot move a docx number and a
+change in DocxWriter cannot move a txt number - the risk is confined to PdfToWord, whose txt-only
+geometry (the lineX/lineY lists TxtWriter turns into spaces and blank lines) sits in the model both
+writers read.
+
+Everything else is kept apart so that neither side can damage the other by accident:
 
     tools/p2w-bench/txt/RANKING-TXT.csv   the txt scores. Nothing in the .docx path reads it.
     tools/p2w-bench/txt/STATE-TXT.json    the txt state. Not benchmarks/STATE.json.

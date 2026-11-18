@@ -93,8 +93,9 @@ WHAT IT RECORDS (the ledger)
                         one line per waiver, deduplicated, so the gate can tell a
                         gap that is being paid down from one that is growing.
   The .txt half keeps its own three, suffixed -TXT, for the same reason the marks
-  are separate: one conversion writes both outputs and neither may hide behind
-  the other.
+  are separate: a conversion writes ONE output, chosen by the format the user
+  picked (ToolsActivity: if (asTxt) TxtWriter.write(...) else DocxWriter.write(...)),
+  but an engine change can move both, and neither may hide behind the other.
 
 USAGE
   python3 tools/p2w-bench/ratchet.py            # check and raise
@@ -211,6 +212,16 @@ def read_scores_txt():
     """
     out = {}
     if not os.path.exists(RESULTS_TXT):
+        # THE TXT STORE THIS READ WAS DELETED ON 17 NOV. The txt scores live in
+        # txt/RANKING-TXT.csv now, and the txt ratchet that guards them is txt_rank.py's own
+        # (--ratchet, run by txt_gate.py). Two ratchets for one format is how they disagree, so this
+        # mode stops rather than silently gating against nothing - which is what "UNMEASURED - an
+        # empty store proves nothing" already said, only without telling anyone where to go.
+        print("ratchet: the .txt store this mode read (RESULTS-TXT.jsonl) no longer exists.")
+        print("  The .txt ratchet is txt_rank.py's: run")
+        print("      python3 tools/p2w-bench/txt_gate.py --score N     # score, then ratchet")
+        print("      python3 tools/p2w-bench/txt_gate.py --gate        # ratchet only")
+        print("  Scores: tools/p2w-bench/txt/RANKING-TXT.csv. State: txt/STATE-TXT.json.")
         return out
     latest = {}
     for _seq, line in enumerate(open(RESULTS_TXT, encoding="utf-8")):

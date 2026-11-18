@@ -134,15 +134,40 @@ def live_universe(txt=False):
         out = subprocess.check_output(
             [sys.executable, os.path.join(HERE, tool), "--list-checks"],
             stderr=subprocess.DEVNULL, timeout=120, text=True)
-        ids = sorted({l.strip() for l in out.splitlines()
-                      if l.strip() and CHECK_RE.match(l.strip())})
+        # THE TWO VERIFIERS PRINT DIFFERENT THINGS, AND ONE OF THEM PRINTED NOTHING USABLE.
+        #
+        # verify_google.py --list-checks prints a bare id per line ("01_page_count"). verify_txt.py
+        # prints the id followed by its description ("t01_word_accuracy        the source's words
+        # survive, 98 % of them"). CHECK_RE is anchored ^...$ to a bare id, so matching the whole
+        # line found 47 checks for the docx and ZERO for the txt - and a zero denominator is exactly
+        # what this gate refuses to work with. The txt ratchet has therefore never run: every call
+        # ended in "CANNOT GATE - verify_txt.py --list-checks printed no check ids".
+        #
+        # The first whitespace-delimited token is the id in both formats. Match that.
+        ids = sorted({tok for tok in (l.split()[0] for l in out.splitlines() if l.strip())
+                      if CHECK_RE.match(tok)})
         if not ids:
             err = "%s --list-checks printed no check ids" % tool
     except Exception as e:
         err = "%s --list-checks failed: %s" % (tool, e)
     if ids and not err:
         m, berr = body_map(txt)
-        missing = [i for i in ids if i not in m]
+        # SOME IDS ARE DECLARED, NOT DEFINED, AND THAT IS DELIBERATE. The five table checks
+        # (62_table_columns ... 66_table_cell_width) can ABSTAIN, so they are invisible on a blank
+        # page and cannot be discovered the way the others are - verify_google declares them in
+        # TABLE_CHECK_IDS instead. The AST walk cannot see a `def` for them because there is none, so
+        # they came back as "5 check id(s) have no body" on every run - a false alarm that made a
+        # working gate look broken. An id the verifier itself declares is a known id.
+        declared = set()
+        try:
+            src = open(tool_file(txt), encoding="utf-8").read()
+            for name in ("TABLE_CHECK_IDS", "DECLARED_CHECK_IDS"):
+                for mm in __import__("re").finditer(
+                        name + r"\s*=\s*\(([^)]*)\)", src, __import__("re").S):
+                    declared.update(__import__("re").findall(r'"([^"]+)"', mm.group(1)))
+        except Exception:
+            pass
+        missing = [i for i in ids if i not in m and i not in declared]
         if berr:
             err = berr
         elif missing:

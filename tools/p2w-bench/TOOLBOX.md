@@ -187,11 +187,19 @@ bind a larger one. Do not try to out-think it and do not edit `RATCHET.json` by 
 ---
 
 
-**`--txt`** uses `RATCHET-TXT.json` and takes its scores from `RESULTS-TXT.jsonl` and its
-check universe from the .txt verifier's own check list. There is no BASELINE-TXT.md: the .docx
-path keeps a table a human also reads, and the .txt path has no reader but this one, so
-the store is the truth. Both ratchets must be run - one conversion writes both outputs,
-and each can only see its own half.
+**`--txt`** takes its scores from `tools/p2w-bench/txt/RANKING-TXT.csv` and its check
+universe from the .txt verifier's own check list. `RATCHET-TXT.json` and `RESULTS-TXT.jsonl`
+are gone - deleted on 17 Nov on the belief that `RANKING.csv`'s `text_recall` covered the txt,
+which it did not, so for a day nothing scored the txt at all.
+
+A conversion writes ONE output, chosen by the format the user picked:
+
+    ToolsActivity.kt:600   if (asTxt) TxtWriter.write(result, out) else DocxWriter.write(result, out)
+
+The two writers are separate files - `TxtWriter.java` (568 lines, references DocxWriter nowhere)
+and `DocxWriter.java` (7196 lines, never touches the txt). What they share is `PdfToWord.java`,
+which parses once and builds the model both read. So an engine change can move both outputs even
+though no single conversion produces both, and both ratchets must be run.
 
 ## round.py — whose turn it is
 

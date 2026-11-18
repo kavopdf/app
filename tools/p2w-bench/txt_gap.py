@@ -36,7 +36,11 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DOCX = os.path.join(HERE, "RESULTS.jsonl")
-TXT = os.path.join(HERE, "RESULTS-TXT.jsonl")
+# THE TXT STORE MOVED. RESULTS-TXT.jsonl was deleted on 17 Nov and the txt scores now live in
+# txt/RANKING-TXT.csv. This tool kept reading the deleted file, so every document looked unscored and
+# --count printed 211 - a number that was true of a file nobody writes any more and false about the
+# corpus, where all 213 are scored.
+TXT = os.path.join(HERE, "txt", "RANKING-TXT.csv")
 EXEMPT = os.path.join(HERE, "EXEMPT.json")
 
 
@@ -44,6 +48,13 @@ def rows(path):
     """Every row in a store, as dicts. A missing store is an empty one."""
     out = []
     if not os.path.exists(path):
+        return out
+    if path.endswith(".csv"):
+        import csv
+        with open(path, encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                if r.get("document"):
+                    out.append({"doc": r["document"]})
         return out
     with open(path, encoding="utf-8") as f:
         for line in f:
