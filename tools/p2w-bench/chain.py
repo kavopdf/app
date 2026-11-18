@@ -54,7 +54,7 @@ RUN = os.path.join(HERE, "RUN.json")
 ROUND = os.path.join(HERE, "ROUND.json")
 CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
 
-DRY_LIMIT = 3          # consecutive unproductive runs before the chain stops
+DRY_LIMIT = 8          # consecutive runs that measured NOTHING before the chain stops
 # A DAY, NOT A RUN. The first version capped the chain at 24 firings and never reset the
 # counter, so after twenty-four short runs the chain stopped FOR EVER - the hourly cron would
 # fire, chain.py would still say "depth 24 reached", and nothing would chain again until a human
@@ -234,15 +234,20 @@ def main(argv):
         print("STOP: chain depth %d reached - wait for the hourly cron" % c["depth"])
         return 1
 
-    productive = (r.get("kept", 0) + r.get("partial", 0)) > 0
+    # A MEASURED REFUTATION IS WORK. This counted only kept and partial, so a run that tried an idea,
+    # measured it on four documents and reverted it scored zero - three of those in a row stopped the
+    # chain dead, which is what happened at 17:19. But that run had answered a question: the idea does
+    # not work here, and no later run has to spend a slot finding out. The only run that did nothing is
+    # one that recorded no attempt at all.
+    productive = r.get("attempts", 0) > 0
     if productive:
         c["dry"] = 0
     else:
         c["dry"] = c.get("dry", 0) + 1
     if c["dry"] >= DRY_LIMIT:
-        print("STOP: %d runs in a row with no kept and no partial attempt." % c["dry"])
-        print("      That is not bad luck, that is stuck - a fourth run will be stuck the same")
-        print("      way. Fix the obstacle, or wait for the hourly cron.")
+        print("STOP: %d runs in a row that recorded no attempt at all." % c["dry"])
+        print("      A run with no attempt is a run that could not start - the slot, the clone,")
+        print("      the build. Fix that before chaining; it will fail the same way again.")
         _w(CHAIN, c)
         return 1
 
