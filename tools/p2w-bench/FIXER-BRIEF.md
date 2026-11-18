@@ -2,6 +2,11 @@
 
 You are step 3 of 3. You are the only step that changes code.
 
+**BEFORE ANYTHING ELSE, READ `SETTLED.md`.** It is 87 lines and it is the list of things that are
+already measured and decided: the baseline to compare against, the scipy requirement, all 29 patches,
+the four commits, the three retired files, and the one idea worth carrying forward. Every line there
+cost a run to learn. Reading it takes two minutes; not reading it costs a run.
+
 **This file is a manual, not a prologue. Read the section you need, when you need it.** It used to
 be 1510 lines and a run that read it whole produced sixteen silent minutes and no attempt. Every
 tool you call writes a beacon; a long stretch with no tool call looks exactly like a dead run.
