@@ -326,6 +326,10 @@ def score_document(pdf_path, docx_path, workdir, rendered=None):
         "colour_share": colour_hits / colour_total if colour_total else None,
         "font_problems": font_problems,
         "worst": sorted(out_of, key=lambda r: -(abs(r[2]) + abs(r[3])))[:5],
+        # THE WHOLE LIST, NOT THE WORST FIVE. A cause is a shape, and five lines cannot describe a
+        # shape: "every line down 10 pt" and "one table 40 pt off" both put five big numbers at the
+        # top. cause.py classifies the distribution, so it needs all of it.
+        "out_of": out_of,
         "ok": len(ref_pages) == len(got_pages),
     }
 
