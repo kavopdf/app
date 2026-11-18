@@ -49,6 +49,9 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATE = os.path.join(HERE, "ROUND.json")
 BASE = os.path.join(HERE, "BASELINE.md")
+# THE LIVE MEASUREMENT. BASE is the retired markdown table; nothing writes it any more, so archiving
+# and blanking it archived and blanked nothing. The round's numbers live here now.
+RANK = os.path.join(os.path.dirname(os.path.dirname(HERE)), "benchmarks", "RANKING.csv")
 CLASSES = os.path.join(HERE, "DEFECT-CLASSES.md")
 # The classifier now writes benchmarks/DEFECT-CLASSES.md, beside the measurement it
 # describes. This file kept reading tools/p2w-bench/DEFECT-CLASSES.md, which nothing
@@ -855,6 +858,10 @@ def main(argv):
         # Archive the finished round so its numbers are never lost.
         if os.path.exists(BASE):
             shutil.copy(BASE, os.path.join(HERE, "ROUND-%d.md" % s["round"]))
+        # THE ROUND'S ACTUAL NUMBERS. Without this the archive held a file that had not been written
+        # since the pipeline moved to RANKING.csv, and the real scores were never kept at all.
+        if os.path.exists(RANK):
+            shutil.copy(RANK, os.path.join(HERE, "ROUND-%d.csv" % s["round"]))
         # Always write the archive, even when nothing was attempted. A round that
         # closed with zero attempts is a fact worth keeping - it means the fixer
         # never ran, or every class was already parked - and silence would hide it.
@@ -889,6 +896,32 @@ def main(argv):
                     continue
             out.append(line.rstrip("\n"))
         open(BASE, "w", encoding="utf-8").write("\n".join(out) + "\n")
+
+        # BLANK THE LIVE SCORES, OR THE NEXT ROUND MEASURES NOTHING.
+        #
+        # measure_gate counts a row as scored when share5 is a number, and the baseline cron only
+        # measures rows that have no score. Leaving RANKING.csv full meant round 2 opened with every
+        # document already "measured" against round 1's engine: the gate passed instantly, the
+        # baseline cron found nothing to do, and rounds 2 and 3 were the first round wearing two
+        # more hats. Measured 18 Nov: close-round touched BASELINE.md, which does not exist.
+        #
+        # share1..max_pt are blanked, not deleted, so the row keeps its identity and the next
+        # measurement fills it. text_recall and chars_missing are left alone - they are content
+        # facts about the document, not scores, and p2w.py rewrites them anyway.
+        if os.path.exists(RANK):
+            try:
+                rl = open(RANK, encoding="utf-8").read().split("\n")
+                keep = [rl[0]]
+                for line in rl[1:]:
+                    if not line.strip():
+                        continue
+                    c = line.split(",")
+                    for i in range(4, min(12, len(c))):
+                        c[i] = ""
+                    keep.append(",".join(c))
+                open(RANK, "w", encoding="utf-8").write("\n".join(keep) + "\n")
+            except Exception as _e:
+                print("warning: could not blank RANKING.csv (%s)" % type(_e).__name__)
 
         # A new round means new defects to find, so the class files are BLANKED.
         #

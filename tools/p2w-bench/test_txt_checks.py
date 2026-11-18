@@ -123,9 +123,11 @@ def cases():
         ("rows glued onto one line fires only t04", TWO_CELL,
          _glued_rows(TWO_CELL), ["t04_structure"]),
 
-        # t05 - nothing at all
-        ("an empty txt fires t05 and t01", BASE, "", ["t01_word_accuracy",
-                                                     "t05_completeness"]),
+        # The completeness check is t10 now. It was t05 when this case was written; the checks were
+        # renumbered and this expectation was never moved with them, so the case failed against a
+        # check id that no longer exists rather than against any behaviour.
+        ("an empty txt fires the completeness check and t01", BASE, "", ["t01_word_accuracy",
+                                                                        "t10_page_completeness"]),
     ]
 
     # t03 - a symbol the source carries and the txt drops. Degree and multiply are in
@@ -139,7 +141,11 @@ def cases():
     # too. Both checks are right to fire and the case says so rather than pretending a
     # lost symbol can leave the word untouched.
     out.append(("a lost symbol fires t03 and the word with it", sym,
-                sym_good.replace("\u00b0", ""), ["t01_word_accuracy", "t03_symbols"]))
+                # t07_symbol_counts fires too, and it should: the page drew the degree sign a
+                # certain number of times and the txt carries it fewer. Expecting only t03 meant the
+                # case reported a correct extra firing as a broken check.
+                sym_good.replace("\u00b0", ""),
+                ["t01_word_accuracy", "t03_symbols", "t07_symbol_counts"]))
     return out
 
 

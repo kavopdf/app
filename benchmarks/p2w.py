@@ -896,6 +896,20 @@ def main():
     if corpus()<100: log("ABORT: corpus"); return 2
     if not engine(): log("ABORT: engine"); return 2
     docx(end); run(end); r=rank(); status()
+    # THE CENSUS IS PART OF THE MEASUREMENT, NOT A SEPARATE TOOL SOMEBODY REMEMBERS TO RUN.
+    #
+    # BASELINE-BRIEF.md says CENSUS.csv and CENSUS.md "are not optional and they are not
+    # decoration", and says the census "runs itself inside gate.py once the measurement is
+    # complete". But the baseline cron runs p2w.py, not gate.py - this file had zero references
+    # to census - so the census was whatever the last manual run left behind. Measured 18 Nov:
+    # benchmarks/CENSUS.csv was hours stale while the brief described it as automatic.
+    try:
+        _c = os.path.join(os.path.dirname(os.path.abspath(__file__)), "census.py")
+        if os.path.exists(_c):
+            _r = sh("%s %s" % (sys.executable, _c), 240)
+            log("census: %s" % ("ok" if _r and _r.returncode == 0 else "failed"))
+    except Exception as _e:
+        log("census: skipped (%s)" % type(_e).__name__)
     if r:
         for sig in ("content-loss","displacement","mixed","clean"):
             k=[x for x in r if x['signature']==sig]
