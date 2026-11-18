@@ -27,6 +27,7 @@ CLASSES  = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
 RANK     = os.path.join(ROOT, "benchmarks", "RANKING.csv")
 BASELINE = os.path.join(ROOT, "benchmarks", "RANKING-BASELINE.csv")
 RUN      = os.path.join(HERE, "RUN.json")
+ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 ROUND    = os.path.join(HERE, "ROUND.json")
 HANDOFF  = os.path.join(HERE, "HANDOFF.json")
 
@@ -470,6 +471,47 @@ def phases():
         return []
 
 
+def tried():
+    """Every attempt THIS RUN recorded, with what it measured and how it ended.
+
+    The 15:58 run's chat message carried a table REPORT.md did not have:
+
+        | Idea | Measured result | Verdict |
+        | Anchor the running footer at its own y | traceLines: the footer is a row of table 3 |
+        | Release the f=0.974 squeeze            | itr-computation 50.80 -> 70.85           |
+        | Cell baseline: the row's pitch         | 4 table docs, 4 same, 0 better           |
+
+    That table is the most useful thing in the report - it says what was already proved wrong, so the
+    next run does not try it again - and it existed only because the fixer typed it by hand. The data
+    is in ATTEMPTS.json's per-attempt history; this reads it.
+    """
+    import datetime as _dt
+    try:
+        run = _json(RUN, {})
+        lo = run.get("started_ts")
+        if not lo:
+            return []
+        lo = float(lo)
+        hi = float(run.get("ended_ts") or time.time())
+        out = []
+        for cls, row in (_json(ATTEMPTS, {}) or {}).items():
+            for x in (row.get("history") or []):
+                at = (x.get("at") or "").strip()
+                try:
+                    t = _dt.datetime.strptime(at, "%Y-%m-%d %H:%M").timestamp() - 19800
+                except Exception:
+                    continue
+                if not (lo - 180 <= t <= hi + 900):
+                    continue
+                out.append({"at": at[11:], "cls": cls, "outcome": x.get("outcome") or "?",
+                            "moved": x.get("moved"), "total": x.get("total"),
+                            "reason": (x.get("reason") or "").strip()})
+        out.sort(key=lambda r: r["at"])
+        return out
+    except Exception:
+        return []
+
+
 def subagents():
     """Every agent this run deployed, with how long each one actually worked.
 
@@ -621,6 +663,18 @@ def main(argv):
              % (solved, total, openc))
     L.append("| Working on | `%s` |" % working)
     L.append("")
+
+    tr_tried = tried()
+    if tr_tried:
+        L.append("## What was tried")
+        L.append("")
+        L.append("| At | Outcome | Moved | What it measured |")
+        L.append("|--:|:--|--:|:--|")
+        for x in tr_tried:
+            why = x["reason"].replace("|", "/").replace("\n", " ")
+            L.append("| %s | **%s** | %s/%s | %s |"
+                     % (x["at"], x["outcome"], x["moved"], x["total"], why[:300]))
+        L.append("")
 
     subs = subagents()
     if not subs:
