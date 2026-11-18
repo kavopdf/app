@@ -23,11 +23,23 @@ One or the other, never both. `TxtWriter.java` is 568 lines and standalone - it 
 `DocxWriter`, `ReadingOrder` and `NormStore` nowhere and imports only `java.io` and `java.util`.
 `DocxWriter.java` is 7196 lines and never touches the txt.
 
-**So a change to `TxtWriter.java` cannot move a docx number, and a change to `DocxWriter.java` cannot
-move a txt number. The single shared file is `PdfToWord.java`** - it parses once and hands the same
-model to whichever writer runs. Its txt-only geometry (the `lineX`/`lineY` lists at ~line 5040, which
-`TxtWriter` turns into leading spaces and blank lines) lives in that shared file, so a change made
-there for the txt IS a change the docx depends on.
+**The isolation runs ONE way, not two.**
+
+    a change to TxtWriter.java    CANNOT move a docx number - it reads the model and writes nothing
+                                  back to it ("nothing here writes back to the model", line 17)
+    a change to DocxWriter.java   CAN move a txt number - it MUTATES page.blocks, and TxtWriter
+                                  walks page.blocks. This is not theory: DocxWriter used to call
+                                  orderStamps(page, ...) on the page itself, which moved a stamp's
+                                  paragraphs inside page.blocks, and the .txt therefore changed
+                                  according to whether the .docx had been written first - 11 of 211
+                                  documents. The comment at DocxWriter.java:1119-1126 calls it SECTOR
+                                  19 and says the fix was to move the ordering decision out to
+                                  ReadingOrder, decided once on the document, so neither writer
+                                  mutates order.
+    a change to PdfToWord.java    CAN move BOTH - it builds the model both writers read
+
+So the txt is the fragile side: anything that mutates the model before TxtWriter walks it changes the
+txt, and DocxWriter is such a mutator. That is why the gate is symmetric (below).
 
 That is why `txt_gate.py` records the SHA-256 of `benchmarks/RANKING.csv` when it starts and checks it
 again at the end:
@@ -36,6 +48,12 @@ again at the end:
   * changed    -> the gate fails and names both hashes. The docx ratchet still decides whether the
                   change may be kept; the gate's job is only to make sure nobody can claim a txt
                   result while a docx number moved underneath it.
+
+**AND THE OTHER DIRECTION MATTERS TOO.** DocxWriter mutates page.blocks, which is what TxtWriter
+walks, so a docx-motivated change can move the txt. `txt_gate.py --watch-docx` records the SHA-256 of
+RANKING-TXT.csv before a docx change and checks it after, exactly as the docx hash is checked after a
+txt change. One direction is not enough: the shared model makes the dependency two-way even though
+only one writer writes it.
 
 ## The 99% bar
 

@@ -10,10 +10,15 @@ WHY THE TXT IS SEPARATE. The conversion is three files, not one:
     ToolsActivity.kt:600   if (asTxt) TxtWriter.write(result, out) else DocxWriter.write(result, out)
 
 One or the other, never both. TxtWriter references DocxWriter nowhere and imports only java.io and
-java.util; DocxWriter never touches the txt. So a change in TxtWriter cannot move a docx number and a
-change in DocxWriter cannot move a txt number - the risk is confined to PdfToWord, whose txt-only
-geometry (the lineX/lineY lists TxtWriter turns into spaces and blank lines) sits in the model both
-writers read.
+java.util, and it writes nothing back to the model - so a change in TxtWriter cannot move a docx
+number. That is the ONE direction that is safe.
+
+THE OTHER DIRECTION IS NOT. DocxWriter MUTATES page.blocks, and TxtWriter walks page.blocks.
+DocxWriter.java:1119-1126 records the time it did exactly that: orderStamps(page, ...) moved a stamp's
+paragraphs inside page.blocks and the .txt changed according to whether the .docx had been written
+first - 11 of 211 documents. The fix was to move the ordering decision out to ReadingOrder, decided
+once on the document, so neither writer mutates order. The risk is real and it is two-way, which is
+why this gate checks both hashes and not just one.
 
 Everything else is kept apart so that neither side can damage the other by accident:
 
@@ -53,9 +58,41 @@ def load(path, default):
         return default
 
 
+TXT_RANK = os.path.join(TXT, "RANKING-TXT.csv")
+TXT_BEFORE = os.path.join(TXT, "DOCX-WATCH.json")
+
+
 def main(argv):
     os.makedirs(TXT, exist_ok=True)
     docx_before = sha(DOCX_RANK)
+
+    # THE OTHER DIRECTION. A docx-motivated change can move the txt, because DocxWriter mutates
+    # page.blocks and TxtWriter walks it. --watch-docx snapshots the txt scores before such a change;
+    # --check-docx compares them after. Without this the gate only ever caught txt breaking docx, and
+    # the failure that actually happened (SECTOR 19, 11 of 211 documents) went the other way.
+    if "--watch-docx" in argv:
+        import json as _j
+        _j.dump({"txt_sha": sha(TXT_RANK),
+                 "at": time.strftime("%Y-%m-%d %H:%M", time.gmtime(time.time() + 19800))},
+                open(TXT_BEFORE, "w", encoding="utf-8"), indent=1)
+        print("  watching: RANKING-TXT.csv is %s - re-run with --check-docx after the docx change"
+              % sha(TXT_RANK))
+        return 0
+    if "--check-docx" in argv:
+        import json as _j
+        try:
+            was = _j.load(open(TXT_BEFORE, encoding="utf-8")).get("txt_sha")
+        except Exception:
+            print("  no snapshot - run --watch-docx before the docx change")
+            return 2
+        now = sha(TXT_RANK)
+        if was == now:
+            print("  txt untouched: RANKING-TXT.csv is %s, unchanged by the docx work" % now)
+            return 0
+        print("  TXT MOVED DURING DOCX WORK: RANKING-TXT.csv was %s, now %s." % (was, now))
+        print("  DocxWriter mutates page.blocks and TxtWriter walks it, so this is expected unless")
+        print("  the change was meant to be docx-only. Re-score the txt and say so in the report.")
+        return 1
 
     if "--score" in argv:
         n = int(argv[argv.index("--score") + 1])
