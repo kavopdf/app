@@ -198,6 +198,13 @@ def compute(moved, total, ratchet=False):
     # "partial".
     if ratchet:
         return "kept"
+    # A CLASS OF ONE. The bar is max(2, 25 %), so a class holding a single document could never be
+    # kept - and on 18 Nov that is exactly what happened: the 12:58 run moved 1 of 1, emptied
+    # single-element-far-out, and was recorded "partial" with the class still OPEN. One document IS
+    # the whole class when the class is one document, and moving it is the strongest evidence the
+    # pipeline can get short of a corpus ratchet.
+    if total < 2:
+        return "kept" if moved >= 1 else "reverted"
     if moved >= max(2, 0.25 * total):
         return "kept"
     return "partial"

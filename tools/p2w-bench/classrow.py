@@ -47,6 +47,59 @@ def load_rank(path=RANK):
     return out
 
 
+SIG = (("content-missing", "content-loss"),
+       ("content-partly", "mixed"),
+       ("content-present", "displacement"))
+
+
+def signature(problem):
+    for pre, sig in SIG:
+        if problem.startswith(pre):
+            return sig
+    return "clean"
+
+
+def recount(lines):
+    """Rewrite the class summary from the document rows, so it cannot drift.
+
+    The summary at the top of the file is a table of classes and their document counts, and it was
+    maintained by hand - on 18 Nov a run had to recount it from RANKING.csv and write a paragraph
+    explaining that `single-element-far-out` was closed. A table that has to be recounted by hand
+    after every class closes is a table that will be wrong most of the time, and this one is the
+    first thing any reader sees.
+    """
+    counts = {}
+    for line in lines:
+        st = line.strip()
+        if not st.startswith("| ") or st.startswith("|---"):
+            continue
+        c = [x.strip() for x in st.strip("|").split("|")]
+        if len(c) < 8 or not c[0].isdigit():
+            continue
+        counts[c[2]] = counts.get(c[2], 0) + 1
+    head = "| signature | problem | documents |"
+    try:
+        a = next(i for i, l in enumerate(lines) if l.strip() == head)
+        b = a
+        while b + 1 < len(lines) and lines[b + 1].startswith("|"):
+            b += 1
+    except StopIteration:
+        return lines, 0
+    order = ["content-loss", "mixed", "displacement", "clean"]
+    rows = sorted(counts.items(), key=lambda kv: (order.index(signature(kv[0]))
+                                                  if signature(kv[0]) in order else 9, -kv[1]))
+    new = [head, "|---|---|---|"]
+    new += ["| %s | %s | %d |" % (signature(k), k, v) for k, v in rows]
+    # COUNT CHANGED ROWS, NOT A LENGTH DELTA. The first version returned len(new) - len(old), which
+    # is zero whenever a recount changes a number without changing the row count - so the summary
+    # printed "0 differ" while its counts were wrong, and --write skipped the save.
+    old_rows = lines[a:b + 1]
+    changed = sum(1 for x, y in zip(old_rows, new) if x != y) + abs(len(old_rows) - len(new))
+    if not changed:
+        return lines, 0
+    return lines[:a] + new + lines[b + 1:], changed
+
+
 def main(argv):
     beat("classrow.py", "refreshing the class file")
     write = "--write" in argv
@@ -99,8 +152,11 @@ def main(argv):
                 print("  %-44s %8s -> %-5s  %s" % (doc[:44], c[6], new_status, new_note))
         out.append(newrow)
 
+    out, sum_delta = recount(out)
     print("  %d row(s) %s" % (changed, "rewritten" if write else "would change"))
-    if write and changed:
+    if sum_delta:
+        print("  class summary recounted (%d line(s) differ)" % abs(sum_delta))
+    if write and (changed or sum_delta):
         open(CLASSES, "w", encoding="utf-8").write("\n".join(out))
         print("  wrote benchmarks/DEFECT-CLASSES.md")
     return 0

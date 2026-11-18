@@ -33,7 +33,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 ROOT = "/scratch/work/p2w"
 CORPUS = ROOT + "/corpus"
-REPO = ROOT + "/repo"
+# THE ENGINE BEING MEASURED IS THE ONE screen.py LIVES IN. This used to be ROOT + "/repo", a path
+# under /scratch/work that the first run of a pod happened to create - and on 18 Nov it held a
+# separate clone at a different commit, so the stamp and the build could disagree with the tree the
+# fixer was editing. REPO_ROOT is tools/p2w-bench/../.. : the working tree, always.
+REPO = REPO_ROOT
 SUB = ROOT + "/screen-corpus"
 OUT = ROOT + "/screen-out"
 BASELINE = os.path.join(REPO_ROOT, "benchmarks", "RANKING.csv")
@@ -44,9 +48,29 @@ def run(cmd, timeout=280):
     return subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
 
 
+EMPTY_SHA = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+
+
 def engine_stamp():
-    return run("cd %s && git log -1 --format=%%h -- app/src/main/java/com/kavopdf/app/engine/" % REPO,
-               30).stdout.strip() or "unknown"
+    """The engine's identity: the HEAD commit AND the uncommitted diff on top of it.
+
+    `git log -1 --format=%h -- engine/` is the HEAD COMMIT. An uncommitted engine change therefore
+    kept the previous engine's stamp, reused the previous engine's docx and measurements, and the
+    screen printed "SCREEN FAIL - nothing improved" about a fix that worked. Measured 18 Nov: a run
+    had to wipe screen-out by hand and re-run to see the real numbers. A run that trusts the verdict
+    reverts its own good change, which is the most expensive thing this tool can do.
+
+    The diff is hashed rather than counted, so two different uncommitted changes of the same size
+    cannot collide.
+    """
+    head = run("cd %s && git log -1 --format=%%h -- app/src/main/java/com/kavopdf/app/engine/"
+               % REPO, 30).stdout.strip() or "unknown"
+    d = run("cd %s && { git diff -- app/src/main/java/com/kavopdf/app/engine/; "
+            "git diff --cached -- app/src/main/java/com/kavopdf/app/engine/; } | sha1sum" % REPO,
+            60).stdout.strip().split()[0] if True else ""
+    if d and d != EMPTY_SHA:
+        return "%s+%s" % (head, d[:10])
+    return head
 
 
 def docs_for(name):
@@ -72,6 +96,26 @@ def main(argv):
     if not name:
         print("usage: screen.py --class <problem> | --docs <d1,d2,...>")
         return 2
+
+    # A FRESH POD HAS NEITHER. /scratch/work/p2w is created by whichever run happened to be first,
+    # and a pod that has just started has no corpus and no engine. screen.py printed "none of the
+    # class's documents are in the corpus" and exited 2 while step.py had just said "build: ok" -
+    # two minutes of every fresh-pod run, spent working out that the tool was looking in the wrong
+    # place. Both are now made here if they are missing.
+    os.makedirs(ROOT, exist_ok=True)
+    if not os.path.isdir(CORPUS) or not os.listdir(CORPUS):
+        try:
+            spec0 = importlib.util.spec_from_file_location(
+                "p2w", os.path.join(REPO_ROOT, "benchmarks", "p2w.py"))
+            p0 = importlib.util.module_from_spec(spec0)
+            try:
+                spec0.loader.exec_module(p0)
+            except SystemExit:
+                pass
+            p0.corpus()
+            print("  corpus built: %d PDFs" % len(os.listdir(CORPUS)))
+        except Exception as e:
+            print("  could not build the corpus: %s" % str(e)[:120])
 
     docs = name.split(",") if "," in name else docs_for(name)
     if not docs:
