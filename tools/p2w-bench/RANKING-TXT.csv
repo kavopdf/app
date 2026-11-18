@@ -1,0 +1,31 @@
+document,applicable,passed,failed,abstained,failed_ids
+01_stamp_rotated_15deg_upright,10,9,1,2,t13_amount_columns
+02_stamp_rotated_15deg_upleft,9,9,0,3,-
+03_stamp_vertical_90deg,10,10,0,2,-
+041122-Account_Opening_Form,11,4,7,1,t02_position t03_symbols t06_encoding t07_symbol_counts t08_line_order t09_page_furniture t12_word_invention
+04_stamp_180deg_upside_down,10,10,0,2,-
+05_round_company_seal_curved_text,9,8,1,3,t12_word_invention
+06_rect_paid_stamp_red_transparent,10,9,1,2,t13_amount_columns
+07_stamp_over_table,10,9,1,2,t13_amount_columns
+08_two_overlapping_stamps,10,10,0,2,-
+09_stamp_font_not_embedded,9,7,2,3,t02_position t08_line_order
+10_stamp_as_image,10,9,1,2,t13_amount_columns
+11_stamp_with_signature_image,9,9,0,3,-
+12_stamp_across_page_break,10,9,1,2,t12_word_invention
+13_stamp_non_english,9,9,0,3,-
+14_stamp_chars_positioned_td,9,9,0,3,-
+15_stamp_on_scanned_page,4,4,0,8,-
+16_right_aligned_amounts_txtpos,10,10,0,2,-
+17_three_column_widths_txtpos,9,9,0,3,-
+18_centred_heading_left_body_txtpos,9,9,0,3,-
+19_hanging_indent_txtpos,9,9,0,3,-
+20_numbered_list_separate_column_txtpos,9,9,0,3,-
+21_form_labels_x60_values_x300_txtpos,9,9,0,3,-
+22_invoice_four_columns_txtpos,10,9,1,2,t13_amount_columns
+23_timetable_grid_txtpos,9,9,0,3,-
+24_address_block_indents_txtpos,9,9,0,3,-
+25_signature_block_underscores_txtpos,10,10,0,2,-
+26_footnote_marker_bottom_note_txtpos,9,9,0,3,-
+27_two_column_left_short_txtpos,9,9,0,3,-
+28_value_overflows_cell_txtpos,10,10,0,2,-
+29_dot_leaders_txtpos,10,9,1,2,t13_amount_columns
