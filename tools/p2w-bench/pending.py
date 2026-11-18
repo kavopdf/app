@@ -34,6 +34,7 @@ HANDOFF  = os.path.join(HERE, "HANDOFF.json")
 ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 BLOCKERS = os.path.join(HERE, "BLOCKERS.md")
 FINDINGS = os.path.join(HERE, "FINDINGS")
+RUN      = os.path.join(HERE, "RUN.json")
 
 # An agent still 'running' after this long has almost certainly died with its run. The finding may
 # still arrive - that is what the file is for - but the next run should not wait on it silently.
@@ -85,10 +86,29 @@ def collect():
 
     # 1. What the last run said to do first.
     h = _load(HANDOFF, {})
-    if (h.get("next") or "").strip():
-        items.append({"kind": "carry-over", "who": "the last run",
-                      "what": h["next"].strip(),
-                      "why": "HANDOFF.md says this is the first work. It is ahead of any new class."})
+    _next = (h.get("next") or "").strip()
+    if _next:
+        # A CARRY-OVER THIS RUN WROTE IS NOT PENDING WORK FOR THIS RUN.
+        #
+        # The documented order is: write the handoff, commit, release. But this gate treats any
+        # non-empty `next` as outstanding work, so writing the handoff first made the release
+        # refuse with "1 item(s) still pending" - the run blocking itself with its own note to the
+        # future. The 14:15 run had to save HANDOFF.json, blank the field, release, and restore it.
+        #
+        # The handoff file's own mtime settles it: if it was written after this run started, this
+        # run wrote it, and its note belongs to the next run, not to this one.
+        _run = _load(RUN, {})
+        _started = _run.get("started_ts")
+        _wrote_it = False
+        try:
+            if _started and os.path.getmtime(HANDOFF) >= float(_started):
+                _wrote_it = True
+        except Exception:
+            pass
+        if not _wrote_it:
+            items.append({"kind": "carry-over", "who": "the last run",
+                          "what": _next,
+                          "why": "HANDOFF.md says this is the first work. It is ahead of any new class."})
 
     # 2. Agents that were deployed and have not landed a finding.
     for a in h.get("agents") or []:
@@ -135,31 +155,33 @@ def collect():
     # this scan read the whole file and matched the format example in "How to add a row" as a real
     # blocker - a false positive of exactly the kind this pipeline is supposed to be free of. A
     # detector that reports the documentation is worse than no detector.
+    # EVERY SIX-COLUMN ROW IN THE FILE, NOT ONLY THE ONES UNDER "## Rows".
+    #
+    # The scanner used to require a "## Rows" heading and a six-cell row. On 18 Nov all eleven of
+    # the day's rows had been appended under "## Cleared this round" - including three marked "no -
+    # needs a decision" - while "## Rows" held three truncated four-column rows from 16 Nov. The gate
+    # reported zero blockers while four were open, and it could not have reported otherwise.
+    #
+    # The section name is not the truth; the "can I fix it" cell is. A row that says it was cleared
+    # is cleared wherever it sits, and a row that does not is pending wherever it sits.
     try:
-        in_rows = False
         in_fence = False
         for line in open(BLOCKERS, encoding="utf-8"):
-            s = line.strip()
-            if s.startswith("```"):
+            t = line.strip()
+            if t.startswith("```"):
                 in_fence = not in_fence
                 continue
-            if in_fence:
+            if in_fence or not t.startswith("| ") or t.startswith("|---"):
                 continue
-            if s.startswith("## Rows"):
-                in_rows = True
+            cells = [c.strip() for c in t.strip("|").split("|")]
+            if len(cells) < 6 or "what I was doing" in cells[1]:
                 continue
-            if s.startswith("## ") and in_rows:
-                in_rows = False
-                continue
-            if not in_rows:
-                continue
-            if not s.startswith("| ") or s.startswith("|---") or "what I was doing" in s:
-                continue
-            cells = [c.strip() for c in s.strip("|").split("|")]
-            if len(cells) >= 6 and any(cells):
-                items.append({"kind": "blocker", "who": cells[0],
-                              "what": "%s - %s" % (cells[1][:80], cells[2][:80]),
-                              "why": "can I fix it: %s | needed: %s" % (cells[4], cells[5])})
+            can = (cells[4] or "").lower()
+            if can.startswith(("yes", "fixed", "solved", "cleared", "done")):
+                continue                      # the run cleared it; it is not a wall any more
+            items.append({"kind": "blocker", "who": cells[0],
+                          "what": "%s - %s" % (cells[1][:80], cells[2][:80]),
+                          "why": "can I fix it: %s | needed: %s" % (cells[4], cells[5])})
     except Exception:
         pass
 
