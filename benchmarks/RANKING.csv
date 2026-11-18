@@ -94,7 +94,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 93,eway-bill,clean,none,4.1,1.4,1.1,0.91,0.86,0.96,7.2,31.2,100.0,0,1,1
 94,67_two_col_with_sidebar,clean,none,9.51,3.78,2.08,0.8,0.54,0.96,2.4,11.52,100.0,0,1,1
 95,28_value_overflows_cell_txtpos,clean,none,15.49,8.29,3.51,0.74,0.5,1.44,1.92,15.36,100.0,0,1,1
-96,79_inr_indian_digit_grouping_table,clean,none,11.69,4.34,2.11,0.74,0.35,0.96,1.92,9.12,98.43,15,1,1
+96,79_inr_indian_digit_grouping_table,content-loss,content-missing-nothing-in-its-place,11.69,4.34,2.11,0.74,0.35,0.96,1.92,9.12,98.43,15,1,1
 97,39_small_caps_letter_spacing,clean,none,9.85,6.21,3.78,0.72,0.0,1.44,2.4,4.8,100.0,0,1,1
 98,326_itr_computation,clean,none,0.8,0.66,0.65,0.63,0.46,10.56,13.92,13.92,100.0,0,1,1
 99,344_customs_declaration,clean,none,1.78,0.74,0.67,0.61,0.59,0.96,49.92,49.92,100.0,0,1,1
@@ -113,7 +113,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 112,boq-horizontal-rules-only,clean,none,3.99,2.09,0.75,0.13,0.08,1.44,1.92,8.64,100.0,0,1,1
 113,350_question_paper,clean,none,16.48,0.79,0.16,0.11,0.1,0.96,0.96,16.8,100.0,0,1,1
 114,08_two_overlapping_stamps,clean,none,0.38,0.29,0.2,0.11,0.05,1.92,6.24,11.04,100.0,0,1,1
-115,391_survey_questionnaire_grid,clean,none,1.24,0.61,0.28,0.11,0.0,0.96,2.4,4.32,99.58,2,1,1
+115,391_survey_questionnaire_grid,content-loss,content-missing-nothing-in-its-place,1.24,0.61,0.28,0.11,0.0,0.96,2.4,4.32,99.58,2,1,1
 116,333_datasheet_spec_tables,clean,none,2.35,0.57,0.25,0.07,0.02,0.96,1.92,6.24,100.0,0,1,1
 117,340_bill_of_lading,clean,none,4.48,0.44,0.16,0.07,0.0,0.96,0.96,3.36,100.0,0,1,1
 118,300_prescription_rx,clean,none,0.6,0.39,0.28,0.06,0.05,1.44,2.4,21.6,100.0,0,1,1
@@ -134,7 +134,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 133,26_footnote_marker_bottom_note_txtpos,clean,none,0.07,0.04,0.02,0.01,0.0,1.44,3.02,3.84,100.0,0,1,1
 134,375_attendance_register,clean,none,0.17,0.04,0.02,0.01,0.0,0.96,1.92,3.84,100.0,0,1,1
 135,393_spectrum_peak_table,clean,none,0.09,0.04,0.04,0.01,0.0,0.96,2.35,3.36,100.0,0,1,1
-136,38_faux_bold_italic_synthesised,clean,none,3.25,0.62,0.15,0.01,0.0,0.96,1.44,2.88,98.01,19,1,1
+136,38_faux_bold_italic_synthesised,content-loss,content-missing-nothing-in-its-place,3.25,0.62,0.15,0.01,0.0,0.96,1.44,2.88,98.01,19,1,1
 137,46_chart_coloured_labels_body_text,clean,none,4.88,0.23,0.07,0.01,0.0,0.96,0.96,2.88,100.0,0,1,1
 138,342_packing_list,clean,none,0.13,0.08,0.05,0.0,0.0,1.44,2.21,3.36,100.0,0,1,1
 139,407_id_card_front_back,clean,none,0.03,0.01,0.01,0.0,0.0,0.96,1.92,3.36,100.0,0,1,1

@@ -372,12 +372,28 @@ def invention(src, our):
     un=om&(d>1)
     return dict(shares=shares,max_pt=round(float(d[un].max())*PT,2) if un.sum() else 0.0,n=n)
 
-def problem_name(sig, share5, invent5, max_pt):
+def problem_name(sig, share5, invent5, max_pt, recall=100.0):
     """The NAME of the defect, derived from the numbers alone.
 
     Measurement, not opinion: every branch is a statement about the two axes,
     nothing is a guess about the engine's internals. It answers 'what kind of
-    problem is this document' without anyone opening a rendered image."""
+    problem is this document' without anyone opening a rendered image.
+
+    MISSING TEXT IS NOT A CLEAN DOCUMENT, HOWEVER WELL IT IS PLACED. The first test used to be
+    `share5 < 1.0 -> none`, which asks only where the ink landed - so a document that lost characters
+    read as perfect because the characters it kept were in the right place. Measured 18 Nov, three
+    documents passed the 99% position bar while missing text:
+
+        38_faux_bold_italic_synthesised      recall 98.01%  missing 19 chars
+        79_inr_indian_digit_grouping_table   recall 98.43%  missing 15
+        391_survey_questionnaire_grid        recall 99.58%  missing 2
+
+    A 99% match means 99% of the document, and a character that is not there has not been placed
+    correctly. Recall is checked first now, and anything short of complete is a content defect.
+    """
+    if recall < 99.9:
+        return ("content-missing-nothing-in-its-place" if invent5 < 2
+                else "content-missing-partly-replaced")
     if share5 < 1.0:           return "none"
     if sig == "clean":         return "none"
     if sig == "MEASURE-ERROR": return "unmeasured"
@@ -479,7 +495,7 @@ def measure_doc(pdf,dx,first=0,last=None):
         invent5=worst.get("invent5",0.0) if worst else 0.0,
         invent_max_pt=worst.get("invent_max_pt",0.0) if worst else 0.0,
         problem=problem_name(worst["signature"],worst["shares"][5],
-                             worst.get("invent5",0.0),worst["max_pt"]) if worst else "none",
+                             worst.get("invent5",0.0),worst["max_pt"],ct["recall"]) if worst else "none",
         # content axis
         text_recall=ct["recall"], chars_src=ct["chars_src"], chars_missing=ct["missing"],
         pages=pages)
