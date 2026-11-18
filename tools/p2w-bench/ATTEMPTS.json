@@ -134,6 +134,44 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "content-partly-lost-and-displaced": {
+  "attempts": 2,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-18 14:51",
+    "moved": 1,
+    "outcome": "partial",
+    "reason": "Rows below the paper edge are clipped, not reproduced. itr-computation-with-slab-table draws 3 rules past its 841.9 pt sheet; the engine charged them to the flow (model need=18160 twips vs budget=1683",
+    "total": 7
+   },
+   {
+    "at": "2026-11-18 15:28",
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "CORPUS RATCHET over 210 of 213 documents (416_many_tiny_pages, 300 pages, not finished; 77_arabic_rtl_document and 79_inr_indian_digit_grouping_table failed to render this pass): 1 better (itr-computa",
+    "total": 210
+   }
+  ],
+  "last": null,
+  "last_engine": "7dff436+a2261d7b2d",
+  "last_moved": 1,
+  "last_total": 210,
+  "outcomes": [
+   "partial",
+   "kept"
+  ],
+  "ratchet_at": "18 Nov 15:28",
+  "ratchet_docs": 210,
+  "reason": "CORPUS RATCHET over 210 of 213 documents (416_many_tiny_pages, 300 pages, not finished; 77_arabic_rtl_document and 79_inr_indian_digit_grouping_table failed to render this pass): 1 better (itr-computation-with-slab-table 68.82 -> 50.80), 0 worse, 209 unchanged, compared against benchmarks/RANKING.csv. The change: DocxWriter.table() clips table rows whose top edge is below the paper (keepRows) and cuts the straddling row at the edge (rowCapTw). The PDF drew three rules past its own 841.9 pt sheet; the engine charged them to the flow (need=18160 twips vs budget=16836) and the fitter answered with a global squeeze f=0.875 that took 33.6 pt off the page's top gap (w:before 1057 -> 392 twips). Class screen: 7 measured, 1 better, 6 same, 0 worse.",
+  "reasons": [
+   "Rows below the paper edge are clipped, not reproduced. itr-computation-with-slab-table draws 3 rules past its 841.9 pt sheet; the engine charged them to the flow (model need=18160 twips vs budget=16836), the fitter answered with a global squeeze f=0.875, and the squeeze came off every gap including the top of the page (w:before 1057->392, page 33.6 pt high). DocxWriter.table(): keepRows drops rows whose top edge is below the paper, rowCapTw cuts the straddling row at the edge. 68.82->50.80 share5, median 9.60->4.80, p90 36.96->16.32; other 6 unchanged, 0 worse. No corpus pass: gated -Dp2w.clipDbg census over all 213 conversions says the branch fires on exactly 1 document, and word/document.xml is byte-identical old vs new engine on an 11-document sample (10 SAME, 1 DIFF = the target).",
+   "CORPUS RATCHET over 210 of 213 documents (416_many_tiny_pages, 300 pages, not finished; 77_arabic_rtl_document and 79_inr_indian_digit_grouping_table failed to render this pass): 1 better (itr-computation-with-slab-table 68.82 -> 50.80), 0 worse, 209 unchanged, compared against benchmarks/RANKING.csv. The change: DocxWriter.table() clips table rows whose top edge is below the paper (keepRows) and cuts the straddling row at the edge (rowCapTw). The PDF drew three rules past its own 841.9 pt sheet; the engine charged them to the flow (need=18160 twips vs budget=16836) and the fitter answered with a global squeeze f=0.875 that took 33.6 pt off the page's top gap (w:before 1057 -> 392 twips). Class screen: 7 measured, 1 better, 6 same, 0 worse."
+  ],
+  "requeues": 0,
+  "status": "OPEN",
+  "engine_note": "last_engine corrected 7dff436 -> 7dff436+a2261d7b2d: attempt.py records `git log -1 -- engine/`, which is the COMMIT and cannot see the working tree, while round.py's release guard computes commit+worktree. The change was measured uncommitted (screen + the 210-document ratchet), so the hash that names the measured tree is the worktree one."
+ },
  "single-element-far-out": {
   "attempts": 1,
   "first_seen": null,

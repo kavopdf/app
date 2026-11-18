@@ -375,3 +375,10 @@ claim and after each step; it is not code and cannot break anything.
 | 18 Nov 13:04 | fixer | build-engine | started |
 | 18 Nov 13:05 | fixer | build-engine | engine built in 39s |
 | 18 Nov 13:44 | fixer | attempt | single-element-far-out -> partial (1/1 moved) |
+| 18 Nov 14:50 | classifier | build-engine | started |
+| 18 Nov 14:50 | classifier | build-engine | engine built in 38s |
+| 18 Nov 14:50 | fixer | claim | fixer claimed the slot |
+| 18 Nov 14:50 | fixer | build-engine | started |
+| 18 Nov 14:50 | fixer | build-engine | engine unchanged, compile skipped |
+| 18 Nov 14:51 | fixer | attempt | content-partly-lost-and-displaced -> partial (1/7 moved) |
+| 18 Nov 15:28 | fixer | attempt | content-partly-lost-and-displaced -> kept (1/210 moved) |

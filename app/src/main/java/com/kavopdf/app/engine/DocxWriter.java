@@ -5868,6 +5868,39 @@ public final class DocxWriter {
         // (D-26, cause 2). Where the edges are not known, the average is used exactly as before.
         float[] rowEdge = t.rowEdge;
         boolean exactRows = rowEdge != null && rowEdge.length == t.rows.size() + 1;
+        // ROWS BELOW THE PAPER ARE NOT ON THE PAGE.
+        //
+        // A PDF may draw a table past the bottom edge of its own sheet - itr-computation-with-
+        // slab-table draws three rules at 848.4, 866.8 and 885.2 on an 841.9 pt page, and every
+        // viewer clips them. The engine reproduced them, so its model of the page needed 908 pt
+        // against a 841.8 pt budget; the fitter's answer to an overrun is a global squeeze, and
+        // the squeeze came off EVERY gap on the sheet including the top of the page - the first
+        // paragraph's w:before went 1057 twips to 392 and the whole page sat 33.6 pt high, which
+        // is the 68.82 share@5 the classifier reads on that document. Clipping is what the page
+        // itself does: a row whose top edge is below the paper's bottom is dropped, and the row
+        // that straddles the edge is cut at it. Nothing visible moves - the ink below the edge
+        // was never rendered - and the page stops being squeezed for content no reader can see.
+        int keepRows = t.rows.size();
+        float paperHPt = ctx.pageHeightPt;
+        if (paperHPt > 0f) {
+            if (exactRows) {
+                int k = 0;
+                for (int r = 0; r < t.rows.size(); r++) {
+                    if (rowEdge[r] < paperHPt - 0.5f) k = r + 1; else break;
+                }
+                keepRows = k;
+            } else if (t.top < paperHPt && t.bottom > paperHPt && t.rows.size() > 1) {
+                float pitch = (t.bottom - t.top) / t.rows.size();
+                if (pitch > 0.5f) {
+                    int k = (int) Math.floor((paperHPt - t.top) / pitch);
+                    keepRows = Math.max(1, Math.min(t.rows.size(), k));
+                }
+            }
+        }
+        if (keepRows < 1) keepRows = 1;
+        if (keepRows < t.rows.size() && System.getProperty("p2w.clipDbg") != null) {
+            System.err.println("CLIP " + ctx.docName + " p" + ctx.pageNo + " rows " + t.rows.size() + " -> " + keepRows);
+        }
         // THE RULE IS ADDED TO THE ROW, NOT INCLUDED IN IT - and that is the whole of the
         // +2 pt-a-row ramp inside a table.
         //
@@ -5929,7 +5962,7 @@ public final class DocxWriter {
         // are stacked from the table's own top, so row 2 starts one WRITTEN row below row 1.
         float recutTopPt = Float.NaN;
         float rowTopPagePtHere = Float.NaN;
-        for (int r = 0; r < t.rows.size(); r++) {
+        for (int r = 0; r < keepRows; r++) {
             List<String> row = t.rows.get(r);
             // This row's own pitch. A ruled table's rule lies inside the row's box, so it comes
             // off here exactly as it comes off the average above.
@@ -5940,9 +5973,17 @@ public final class DocxWriter {
                     rowTwHere = (int) Math.round(pitchPt * TWIPS_PER_PT);
                 }
             }
+            // The row that straddles the paper's bottom edge is cut at it, so the table ends
+            // where the sheet does. The renderer lays a row out at max(trHeight, content+rule),
+            // so the cap has to reach the cell's own w:line as well - see below.
+            int rowCapTw = -1;
+            if (keepRows < t.rows.size() && r == keepRows - 1 && exactRows && paperHPt > 0f) {
+                int remainTw = (int) Math.round((paperHPt - rowEdge[r]) * TWIPS_PER_PT);
+                if (remainTw > 0 && remainTw < rowTwHere) { rowTwHere = remainTw; rowCapTw = remainTw; }
+            }
             // The rule this row pays: half of the rule above it plus half of the rule below it.
             int szAbove = r == 0 ? szRuleTop : szRuleInside;
-            int szBelow = r == t.rows.size() - 1 ? szRuleBottom : szRuleInside;
+            int szBelow = r == keepRows - 1 ? szRuleBottom : szRuleInside;
             int ruleTwHere = (int) Math.round((szAbove + szBelow) * TWIPS_PER_PT / 16.0);
             // THE PITCH STAYS THE PAGE'S PITCH; THE CELL'S CONTENT IS WHAT COMES OFF.
             // The renderer lays a row out at max(w:trHeight, cell content + rule). Two different
@@ -6021,6 +6062,7 @@ public final class DocxWriter {
             // already carries the type-size floor, so the floor is taken before the scaling and
             // the scaled row is held at it.
             int typeFloorTw = rowLineTw;
+            if (rowCapTw > 0) rowLineTw = Math.min(rowLineTw, Math.max(1, rowCapTw - ruleTwHere));
             int rowHeightTw = Math.max(rowTwHere, rowLineTw);
             if (ctx.squeeze != 1f) {
                 rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
@@ -6379,7 +6421,7 @@ public final class DocxWriter {
                                 : (int) Math.max(0L, Math.round(cp.indentPt * TWIPS_PER_PT));
                         cellParaXml(inner, cp, beforeTw, boxTw, pInset, cellSz);
                     }
-                    if (r == t.rows.size() - 1) {
+                    if (r == keepRows - 1) {
                         lastRowContentTw = Math.max(lastRowContentTw, stackTw);
                     }
                     inner.append("</w:tc>");
@@ -6479,14 +6521,14 @@ public final class DocxWriter {
                 // per line the cell holds. It is the number the renderer lays the cell out
                 // with, and the row is w:trHeight tall whatever this says - the difference is
                 // the slack the flow anchor after the table is about.
-                if (r == t.rows.size() - 1) {
+                if (r == keepRows - 1) {
                     int lines = Math.max(1, cell.split("\n", -1).length);
                     lastRowContentTw = Math.max(lastRowContentTw,
                             cellBeforeTw + lines * cellBoxTw);
                 }
                 c += span;
             }
-            if (r == t.rows.size() - 1) {
+            if (r == keepRows - 1) {
                 lastRowHeightTw = rowHeightTw;
                 lastRowTopPagePt = rowTopPagePt;
             }

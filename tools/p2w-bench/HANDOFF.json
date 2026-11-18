@@ -132,9 +132,17 @@
   {
    "at": "13:44",
    "text": "attempt 1 on single-element-far-out -> partial (1/1 moved)"
+  },
+  {
+   "at": "14:51",
+   "text": "attempt 1 on content-partly-lost-and-displaced -> partial (1/7 moved)"
+  },
+  {
+   "at": "15:28",
+   "text": "attempt 2 on content-partly-lost-and-displaced -> kept (1/210 moved)"
   }
  ],
- "next": "Take content-present-partly-displaced (12) or content-partly-lost (11) next - the small classes are gone. Two tooling walls are waiting for a decision, not a fix: attempt.py cannot keep an attempt on a 1-document class (max(2,25%)), and classrow.py cannot mark a document FIXED whose baseline was already below 5.0. Do not read FIXER-BRIEF.md end to end. A fresh pod needs /scratch/work/p2w/repo symlinked to the clone and p2w.corpus() called before screen.py will work; screen.py's cache stamp is the commit, not the working tree, so wipe screen-out after an uncommitted engine change or the screen reports a false FAIL.",
+ "next": "Finish itr-computation-with-slab-table (50.80). Its remaining 22 pt of overrun is the running footer, which the page draws at y=811 INSIDE table 3's band while the flow can only place it after the table's clipped bottom at 841, so the page still squeezes at f=0.974 and every row drifts -0.45 pt. The anchor rule is already described in DocxWriter's zero-gap branch (~line 4235): the comment says a line the page drew above the flow's position is anchored at its own y, but the code only counts it and writes before=0. Implement that, re-screen this document (screen.py --docs itr-computation-with-slab-table). Second: finish the three documents the ratchet could not measure - 416_many_tiny_pages (300 pages, needs ~5 calls of measure_doc_chunked), 77_arabic_rtl_document and 79_inr_indian_digit_grouping_table (soffice 'no render', re-run them). Third: this class cannot be closed by attempt.py's bar (6 of 7 already under 5.0) - BLOCKERS.md 14:50, a human decision.",
  "agents": [
   {
    "id": "contA-01",
@@ -198,7 +206,7 @@
   }
  ],
  "run": {
-  "started": "12:58",
+  "started": "14:50",
   "ended": null,
   "ended_how": null
  },
@@ -244,7 +252,7 @@
    "plan": ""
   }
  ],
- "context": "STEP 3/3 fixer, class single-element-far-out (1 doc: newsletter-3col-header-footer). FOUND AND FIXED A STATE BUG IN columnPage: after writing the newspaper-column layout table it set ctx.afterTablePt = rowEndPt but never advanced ctx.flowY, so the flow stayed 70.2 pt above the table's real bottom edge. A TABLE placed after the columns reads flowTopPt(), not afterTablePt, so the stats band under the columns got a spacer equal to that whole stale gap and landed on the running footer (labels at 764.3 where the page drew 688.6; band bottom 797.7 against a footer at 802.3). Fix: ctx.flowY = rowEndPt; ctx.flowBoxPt = 0f (DocxWriter.java, end of columnPage). Measured: share5 3.45->3.13, max_pt 77.28->22.08, p90 9.6->6.24, median 2.4->1.92. FULL CORPUS 213 of 213: exactly ONE document moved, none worse, none better by the 0.5 bar. classrow refuses FIXED because baseline share5 was already 3.45 (<5.0), so the row is OPEN with the new numbers and the class is closed by reclassification instead (max_pt 22.08 no longer meets the class rule max_pt>30).",
+ "context": "STEP 3/3 fixer, class content-partly-lost-and-displaced (7 docs). Root cause on its worst document, itr-computation-with-slab-table (68.82 share@5): the PDF draws its last table past the bottom of its own sheet (rules at 848.4/866.8/885.2 on an 841.9 pt page, clipped by every viewer), the engine reproduced those rows, its model of the page needed 908 pt against an 841.8 pt budget, and the fitter answered the overrun with a GLOBAL squeeze (f=0.875) that came off every gap on the sheet including the top of the page - first paragraph w:before 1057 -> 392 twips, whole page 33.6 pt high, 65% of the ink invented and 69% of the source ink >5px from ours. Fix: DocxWriter.table() clips rows whose top edge is below the paper (keepRows) and cuts the straddling row at the edge (rowCapTw). Measured 68.82 -> 50.80 share@5, median 9.60 -> 4.80, p90 36.96 -> 16.32. Class screen 7 measured, 1 better, 6 same, 0 worse. CORPUS RATCHET: 210 of 213 compared (416_many_tiny_pages 300 pages not finished, 77_arabic and 79_inr failed to render), 1 better, 0 worse, 209 unchanged. Recorded as a kept ratchet attempt. Full diagnosis in FINDINGS/content-partly-lost-and-displaced-CLIP-1521.md.",
  "needs_human": [],
- "next_class": ""
+ "next_class": "itr-computation-with-slab-table"
 }

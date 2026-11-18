@@ -8,3 +8,5 @@
 {"at": "2026-11-18 11:49", "attempt": 5, "class": "content-missing-nothing-in-its-place", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-18 11:55", "attempt": 6, "class": "content-missing-nothing-in-its-place", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-18 13:44", "attempt": 1, "class": "single-element-far-out", "outcome": "partial", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-18 14:51", "attempt": 1, "class": "content-partly-lost-and-displaced", "outcome": "partial", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-18 15:28", "attempt": 2, "class": "content-partly-lost-and-displaced", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
