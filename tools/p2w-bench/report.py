@@ -240,6 +240,19 @@ def obstacles():
                 continue
             if today and not c[0].startswith(today):
                 continue
+            # THE RUN'S ROWS, NOT THE DAY'S. This counted every row written today and printed
+            # "16 cleared" for a run that wrote two - the number was true of the day and false of the
+            # run, and the run's own report said two. A blocker row carries "YYYY-MM-DD HH:MM", so it
+            # can be placed in the window exactly.
+            try:
+                _h, _m = int(c[0][11:13]), int(c[0][14:16])
+                _t = _dt.datetime(int(c[0][0:4]), int(c[0][5:7]), int(c[0][8:10]), _h, _m).timestamp() - 19800
+                _lo = float(_json(RUN, {}).get("started_ts") or 0)
+                _hi = float(_json(RUN, {}).get("ended_ts") or time.time())
+                if _lo and not (_lo - 60 <= _t <= _hi + 900):
+                    continue
+            except Exception:
+                pass
             rows.append({"can": c[4], "wall": c[2]})
     except Exception:
         return {"mine": 0, "human": 0, "last": ""}
@@ -357,6 +370,16 @@ def phases():
                 ph = "fix"
             elif g >= 120 and "report.py" in (nxt_d or ""):
                 ph = "report"
+            elif g >= 300:
+                # A LONG GAP WITH NO BEACON IS MEASUREMENT OR A BUILD, AND SAYING "record" IS A LIE.
+                #
+                # The 16:52 run spent 18.4 minutes converting 86 of 213 documents twice, one JVM each,
+                # after a classrow.py beat. The beat before a gap is not what the gap was spent on: a
+                # conversion loop, a soffice render and a compile write nothing at all, so the only
+                # honest label for five minutes or more of silence is the work that cannot announce
+                # itself. The run's own report called it "measure - 19 min"; this now agrees with it
+                # instead of filing it under "record".
+                ph = "measure"
             else:
                 ph = _phase_of(rows[k].get("d"))
             if ph not in acc:
@@ -367,7 +390,7 @@ def phases():
                  ("screen", "screen - the class's own documents"),
                  ("build", "build - compiling the engine"),
                  ("fix", "fix - diagnose and change the engine"),
-                 ("measure", "measure - convert and measure the corpus"),
+                 ("measure", "measure or build - a conversion, screen or compile writes no beacon"),
                  ("record", "record - attempt, handoff, class rows"),
                  ("report", "report - the report and the chain"),
                  ("other", "other - not attributed to a tool")]
