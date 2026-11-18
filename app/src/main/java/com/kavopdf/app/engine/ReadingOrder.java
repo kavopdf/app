@@ -60,10 +60,12 @@ import java.util.List;
  *
  * <p>Both writers are then functions of the document, and the order is the one the engine
  * intends rather than a side effect of which writer ran first. The measurement behind keeping
- * this pass rather than dropping the relocation: see {@code tools/p2w-bench/SECTOR19.md} - with
- * the pass, the .txt is byte-identical to what the shipped pipeline produced (docx first) on all
- * 211 documents; without it, 11 documents' .txt files change order, and the .txt checks score
- * them identically either way, so nothing would have told us.
+ * this pass rather than dropping the relocation is in {@code tools/p2w-bench/SECTOR19.md}: on the
+ * corpus as it stood when that measurement was taken, with the pass the .txt was byte-identical to
+ * what the shipped pipeline produced (docx first) on every document, and without it a handful
+ * changed order while the .txt checks scored them identically either way, so nothing would have
+ * told us. The counts are in that file rather than here - they describe a corpus that has changed
+ * since.
  *
  * <p>It is idempotent: a page whose stamps are already at their y has nothing to move, because
  * each stamp is removed and re-inserted at the index its own top falls at, which is where it
