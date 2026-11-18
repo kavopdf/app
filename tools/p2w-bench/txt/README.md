@@ -10,52 +10,46 @@ cannot hide behind a txt score.
 
 ## What the two formats actually share
 
-**They do not share a writer.** The conversion is a three-way split:
+**Three files, three jobs:**
 
-    PdfToWord.parse()  ->  result (the model)
-                              |
-                              +-- asTxt ? TxtWriter.write(result, out)
-                                         : DocxWriter.write(result, out)
+    PdfToWord.java    9677 lines   BOTH   - convert() builds the model, writeTxt() writes the .txt
+    DocxWriter.java   7219 lines   DOCX   - writes the .docx
+    TxtWriter.java     568 lines   TXT    - writes the .txt
 
-    ToolsActivity.kt:600    if (asTxt) TxtWriter.write(result, out) else DocxWriter.write(result, out)
+The pipeline, from ReadingOrder.java:24-30:
 
-One or the other, never both. `TxtWriter.java` is 568 lines and standalone - it references
-`DocxWriter`, `ReadingOrder` and `NormStore` nowhere and imports only `java.io` and `java.util`.
-`DocxWriter.java` is 7196 lines and never touches the txt.
+    Result r = PdfToWord.convert(pdf, "", null);   // the model
+    PdfToWord.classifyHeadings(r);
+    ReadingOrder.apply(r);                          // one order, for every consumer
+    DocxWriter.write(r, docx);                      // reads it        -> .docx
+    PdfToWord.writeTxt(r, txt);                     // reads the same  -> .txt
 
-**The isolation runs ONE way, and it depends on WHICH METHOD in the file you touch.**
+`PdfToWord.writeTxt()` is the txt's entry point (line 9674); `TxtWriter.write()` is what it calls.
+ToolsActivity:600 calls `TxtWriter.write()` directly for the same result.
 
-`DocxWriter.java` is not only a writer. It is a writer plus two static helpers that the model uses:
+**So `PdfToWord` is the file that produces both outputs**, and the two writers each own one format.
 
-    DocxWriter.write()         does NOT mutate the model. Verified: zero writes to page.blocks in
-                               the whole file. A change here cannot move a txt number.
-    DocxWriter.orderStamps()   DOES mutate it. Line 4757 is `blocks.removeAll(stamps)` followed by a
-                               re-insert at the position each stamp's own y falls. Its own comment
-                               (4745-4748) records the effect: "That reorders page.blocks itself,
-                               which both outputs read ... the .txt changed with it (318: 81 -> 90
-                               lines)."
-    DocxWriter.stampFrames()   folds a stamp's frame rules into one shape before anything is written.
+What that means for a change:
 
-`ReadingOrder` calls both helpers, and `ReadingOrder` runs BEFORE either writer:
+    a change in DocxWriter.java   moves the .docx only
+    a change in TxtWriter.java    moves the .txt only
+    a change in PdfToWord.java    moves BOTH - it owns convert() and writeTxt()
 
-    ReadingOrder.java:61       DocxWriter.orderStamps(page, outlines);
+Two facts from the source that hold the isolation in place:
 
-That placement used to live inside `DocxWriter.write()` itself, and ReadingOrder.java:15-22 explains
-why it was moved: "The .txt writer then walked the same list, so the .txt described a page whose stamp
-paragraphs had been moved by the .docx writer ... the same PDF gave two different .txt files depending
-on call order, and no check could see it because every text check pairs by text, and a reordering of
-lines pairs just as well one way as the other."
+  * PdfToWord.java:139-140, on the lineX/lineY fields: "Keeping the raw numbers here means that work
+    happens in writeTxt() and nowhere else - the .docx path reads runs and never touches any of these,
+    so the document output cannot change."
+  * PdfToWord.java:730-735, on the five layout stats: "NO LONGER WRITTEN HERE. These five were filled
+    by DocxWriter.write into this object - a field of the conversion, shared by every consumer of the
+    same Result - so a .txt written after a .docx described a document whose report carried numbers
+    only the .docx writer could produce. They are measurements of the .docx layout and are returned by
+    that call as DocxWriter.Stats."
 
-So:
-
-    a change to TxtWriter.java           cannot move a docx number - it reads the model and writes
-                                         nothing back to it ("nothing here writes back to the model")
-    a change to DocxWriter.write()       cannot move a txt number - it does not mutate the model
-    a change to DocxWriter.orderStamps() CAN move a txt number - it reorders page.blocks, which the
-                                         txt then walks
-    a change to PdfToWord.java           can move both - it builds the model both writers read
-
-The file name is not the unit of risk; the method is. That is why the gate is symmetric (below).
+The second one is the bug that made the two outputs disagree: the docx writer wrote into the shared
+Result and the txt then described the docx's numbers. It was fixed by returning those stats instead of
+storing them. ReadingOrder.java:15-22 records the same lesson about page.blocks: the ordering decision
+was moved out of DocxWriter.write into ReadingOrder so it happens once, before either writer.
 
 That is why `txt_gate.py` records the SHA-256 of `benchmarks/RANKING.csv` when it starts and checks it
 again at the end:

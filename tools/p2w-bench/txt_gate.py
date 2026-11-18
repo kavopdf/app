@@ -1,30 +1,28 @@
 #!/usr/bin/env python3
 """txt_gate.py - the .txt half runs its own gate, and cannot move a .docx number.
 
-WHY THE TXT IS SEPARATE. The conversion is three files, not one:
+WHY THE TXT IS SEPARATE. Three files, three jobs:
 
-    PdfToWord.java    9644 lines   parses the PDF once, builds the model   <-- the ONLY shared file
-    DocxWriter.java   7196 lines   writes the .docx                      <-- docx only
-    TxtWriter.java     568 lines   writes the .txt                       <-- txt only
+    PdfToWord.java    9677 lines   BOTH   - convert() builds the model, writeTxt() writes the .txt
+    DocxWriter.java   7219 lines   DOCX   - writes the .docx
+    TxtWriter.java     568 lines   TXT    - writes the .txt
 
-    ToolsActivity.kt:600   if (asTxt) TxtWriter.write(result, out) else DocxWriter.write(result, out)
+    ReadingOrder.java:24-30
+        Result r = PdfToWord.convert(pdf, "", null);
+        PdfToWord.classifyHeadings(r);
+        ReadingOrder.apply(r);                 // one order, for every consumer
+        DocxWriter.write(r, docx);             // reads it
+        PdfToWord.writeTxt(r, txt);            // reads the same order
 
-One or the other, never both. The risk is per METHOD, not per file:
+So a change in DocxWriter.java moves the .docx only, a change in TxtWriter.java moves the .txt only,
+and a change in PdfToWord.java moves both - it owns convert() and writeTxt().
 
-    DocxWriter.write()          does not mutate the model - zero writes to page.blocks in the file.
-                                A change here cannot move a txt number.
-    DocxWriter.orderStamps()    does. Line 4757 is blocks.removeAll(stamps), then a re-insert at the
-                                position each stamp's y falls. Its comment (4745-4748): "That reorders
-                                page.blocks itself, which both outputs read ... the .txt changed with
-                                it (318: 81 -> 90 lines)."
-    TxtWriter                   reads the model and writes nothing back to it.
-
-ReadingOrder calls orderStamps and runs BEFORE either writer (ReadingOrder.java:61), so both outputs
-see the same order - which is the invariant that keeps them in step. Before that move the placement
-happened inside DocxWriter.write itself, and ReadingOrder.java:15-22 records the result: the same PDF
-gave two different .txt files depending on call order.
-
-So the dependency is two-way and this gate checks both hashes, not one.
+Two facts hold the isolation in place, both from the source. PdfToWord.java:139-140, on lineX/lineY:
+"that work happens in writeTxt() and nowhere else - the .docx path reads runs and never touches any of
+these, so the document output cannot change." PdfToWord.java:730-735, on the five layout stats: "NO
+LONGER WRITTEN HERE. These five were filled by DocxWriter.write into this object ... so a .txt written
+after a .docx described a document whose report carried numbers only the .docx writer could produce."
+That second one was the bug, and it was fixed by returning the stats instead of storing them.
 
 Everything else is kept apart so that neither side can damage the other by accident:
 
