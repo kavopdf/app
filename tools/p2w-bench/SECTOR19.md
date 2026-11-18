@@ -2,7 +2,50 @@
 
 **The .txt must be a function of the PDF. It was a function of the call order.**
 
-Status: fixed, measured on all 211 corpus documents. Nothing committed.
+Status: the writer-side mutations are fixed and measured. See §0.1 before reading anything else:
+the model pass this document describes is **not called by the shipping path**.
+
+---
+
+## 0.1 WHERE THIS PASS ACTUALLY RUNS — read this first
+
+`ReadingOrder.apply()` is the model pass this document argues for, and it is the only caller of
+`DocxWriter.orderStamps()`. Three callers exist in the tree and they do not agree:
+
+| Caller | Calls `ReadingOrder.apply`? | What it is |
+|---|:--|---|
+| `ToolsActivity.kt` | **no** | what the app runs |
+| `ConvertOne.java` | **no** | what `p2w.py` runs to produce `benchmarks/RANKING.csv` |
+| `ConvertAll.java` | yes | the measurement tool this document and `check-writer-independence.py` use |
+
+`git log -S'ReadingOrder' -- ToolsActivity.kt` returns nothing: the call was never added, not added
+and then removed.
+
+**The app and the ranking agree with each other, which is the part that matters** - both run without
+the pass, so `RANKING.csv` measures what the app does. The disagreement is between those two and
+this document's measurement.
+
+**Why the output is unaffected anyway.** `DocxWriter.stampBox` writes the stamp as one anchored text
+box whose `wp:positionH` and `wp:positionV` are both `relativeFrom="page"`. Its place in the block
+list decides which page it is attached to, not where on that page it lands. So the pass can only
+change an output when the anchor's page and the stamp's page differ, which needs a document longer
+than one page. In `benchmarks/RANKING.csv` every stamp document's score equals its score in
+`RANKING-BASELINE.csv`, so nothing has needed it.
+
+**A multi-page stamp document is the case to re-measure** before trusting that: if one is added, or
+if a stamp document's score ever moves, run the corpus with `-Dp2w.readingOrder=true` and `=false`
+and compare, rather than assuming.
+
+**DO NOT "FIX" THE SIDE EFFECT BY MOVING `orderStamps` INTO THE DOCX BRANCH.** There is no side
+effect to fix while the pass is not called - `ReadingOrder.apply` is the only caller of
+`DocxWriter.orderStamps`, so nothing is reordered today. Moving the call into the branch gives the
+.docx the relocation and withholds it from the .txt, which is exactly the configuration of §3
+measurement H - the one that changes the .txt. The two formats would then disagree about the order
+of the same page, which is the property this document exists to hold.
+
+**If the pass is ever put into the shipping path it must go into `ToolsActivity` and `ConvertOne` in
+the same change.** Wiring one and not the other makes `RANKING.csv` a measurement of something the
+app does not do.
 
 ---
 
