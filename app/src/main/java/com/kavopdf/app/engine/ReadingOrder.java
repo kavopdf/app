@@ -6,6 +6,35 @@ import java.util.List;
 /**
  * The order a reader takes the page's blocks in - decided once, on the document.
  *
+ * <p><b>NOT IN THE SHIPPING PATH.</b> Two callers matter and neither calls this:
+ * {@code ToolsActivity} (what the app runs) and {@code ConvertOne} (what {@code p2w.py} runs to
+ * produce {@code benchmarks/RANKING.csv}) both go straight from {@code classifyHeadings} to a
+ * writer. Only {@code ConvertAll} calls {@code apply}, and that class exists for the measurement
+ * in {@code tools/p2w-bench/SECTOR19.md} and for {@code check-writer-independence.py}.
+ *
+ * <p>That is not a defect in the output, and the reason is in {@code DocxWriter.stampBox}: the
+ * stamp is written as one anchored text box whose {@code wp:positionH} and {@code wp:positionV} are
+ * both {@code relativeFrom="page"}. Its place in the block list decides which page it is attached
+ * to, not where on that page it lands.
+ *
+ * <p>So the pass can only matter when the anchor's page and the stamp's page differ, which needs a
+ * document longer than one page. In {@code benchmarks/RANKING.csv} every stamp document's score
+ * equals its score in {@code RANKING-BASELINE.csv}, so nothing has needed it so far. <b>A
+ * multi-page stamp document is the case to re-check</b> before trusting that: if one is added, or
+ * if a stamp document's score ever moves, measure it with this pass on and off rather than
+ * assuming.
+ *
+ * <p><b>DO NOT "FIX" THE SIDE EFFECT BY MOVING {@code DocxWriter.orderStamps} INTO THE DOCX
+ * BRANCH.</b> There is no side effect to fix - this class is the only caller of that method, so
+ * while it is not called, nothing is reordered. Moving the call into the branch would give the
+ * .docx the relocation and withhold it from the .txt, and SECTOR19.md's §3 measurement H is
+ * exactly that configuration: it changes the .txt. The .docx and the .txt would then disagree
+ * about the order of the same page, which is the property SECTOR19 exists to hold.
+ *
+ * <p>If this pass is ever put into the shipping path, it must go into <b>both</b>
+ * {@code ToolsActivity} and {@code ConvertOne} in the same change. Wiring one and not the other
+ * makes {@code RANKING.csv} a measurement of something the app does not do.
+ *
  * <p>SECTOR 19. The engine reads a stamp after the page's own words, because a stamp is an
  * overlay and not part of the page's grid. That is right for detecting a stamp and wrong for a
  * paragraph: a paragraph can only follow the paragraph before it, so a stamp line left at the end
