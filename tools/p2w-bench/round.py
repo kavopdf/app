@@ -595,11 +595,35 @@ def release(name, force=False):
                 except Exception:
                     pass
             if _start and _now and _start != _now and not _kept:
-                print("refused: the engine changed this run (%s -> %s) and no attempt was kept." % (_start, _now))
-                print("The ratchet only measures what an attempt says it kept, so this change has never")
-                print("been compared against the corpus - and on 17 Nov exactly this shipped a rule that")
-                print("regressed seventy documents. Either revert the engine, or record the attempt that")
-                print("measured it. If you genuinely must ship it unmeasured: --force.")
+                # REVERT IT, DO NOT REFUSE IT.
+                #
+                # Refusing kept the quality guarantee and cost the throughput: a refused release leaves
+                # the slot held, the chain never fires, and the scheduler does not fill it for up to an
+                # hour - so one unmeasured change ended a run and the next one paid its setup again
+                # before touching any work. The change still must not ship unmeasured; that is the rule
+                # the 17 Nov regression bought. So the engine goes back to the state it had when the
+                # slot was claimed, the release proceeds, and the run carries on with its remaining
+                # time instead of dying on a bookkeeping failure.
+                _claim = (_start or "").split("+")[0].strip()
+                _reverted = False
+                if _claim and len(_claim) >= 7:
+                    rc, out = sh("git checkout %s -- app/src/main/java/com/kavopdf/app/engine/ 2>&1"
+                                 % _claim, timeout=60)
+                    if rc == 0:
+                        _reverted = True
+                        print("reverted: the engine changed this run (%s -> %s) with no kept attempt."
+                              % (_start, _now))
+                        print("The engine is back at %s, the state it had when the slot was claimed."
+                              % _claim)
+                        print("COMMIT THAT REVERT before you release, or the release will not see a")
+                        print("clean tree. Then carry on - you have the rest of the run.")
+                if not _reverted:
+                    print("refused: the engine changed this run (%s -> %s) and no attempt was kept." % (_start, _now))
+                    print("The ratchet only measures what an attempt says it kept, so this change has never")
+                    print("been compared against the corpus - and on 17 Nov exactly this shipped a rule that")
+                    print("regressed seventy documents. Either revert the engine, or record the attempt that")
+                    print("measured it. If you genuinely must ship it unmeasured: --force.")
+                    return 1
                 return 1
         except Exception as exc:
             print("warning: could not check the engine against the attempt ledger - %s: %s"

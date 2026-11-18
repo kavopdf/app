@@ -309,8 +309,14 @@ def add(args):
     #
     # MAX_ATTEMPTS stays as a hard ceiling: a class alternating partial and reverted for ever is not
     # converging either, it is oscillating, and the ceiling is what stops that.
-    MAX_ATTEMPTS = 24
-    LOOK_BACK = 5
+    #
+    # RAISED, BECAUSE THE CEILINGS WERE STOPPING WORK. Five consecutive non-moving outcomes parked a
+    # class, and a cause with twenty-one documents can easily produce five refutations while the right
+    # mechanism is still being found - each of them a real answer, none of them progress by this test.
+    # Twelve, and a ceiling of 120, and parking no longer removes the documents from OPEN (see below),
+    # so a parked class is deprioritised rather than abandoned.
+    MAX_ATTEMPTS = 120
+    LOOK_BACK = 12
     recent = (row.get("outcomes") or [])[-LOOK_BACK:]
     moving = any(o in ("partial", "kept", "improved") for o in recent)
     stuck = len(recent) >= LOOK_BACK and not moving
@@ -345,7 +351,12 @@ def add(args):
                         if (len(cells) >= 8
                                 and cells[2].strip().strip("`") == name
                                 and cells[6].strip() == "OPEN"):
-                            cells[6] = " PARKED "
+                            # LEAVE THE ROW OPEN. Marking documents PARKED removes them from
+                            # step.py's list for the rest of the round - a class with twenty-one
+                            # improvable documents became twenty-one documents nobody would ever
+                            # work again. The class is deprioritised by the attempt ledger, not by
+                            # hiding its documents from the only list the fixer reads.
+                            cells[6] = cells[6]
                             line = "|" + "|".join(cells) + "|"
                             moved += 1
                     out.append(line)
