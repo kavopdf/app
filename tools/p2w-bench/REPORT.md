@@ -1,4 +1,4 @@
-# Fixer report - 2026-11-18 13:45
+# Fixer report - 2026-11-18 13:48
 
 ```
 === FIXER REPORT - every number computed from committed files ===
@@ -15,9 +15,10 @@
    best so far:
      415_inline_images                           89.04 ->  0.00
      newsletter-3col-header-footer                3.45 ->  3.13
- 9. looked dead, was not    : 58 beats, 5 silence(s) over 2 min
-     longest silence        : 62.1 min from 11:55:52, after report.py: building the report
-10. obstacles this run     : 0 cleared by the run, 0 need a human
+ 9. looked dead, was not    : 22 beats, 1 silence(s) over 2 min
+     longest silence        : 46.2 min from 12:58:01, after gaps.py: reading the timeline
+10. obstacles this run     : 4 cleared by the run, 2 need a human
+     still a wall           : `classrow.py` marks FIXED only when the document was ABOVE 5.0 share@5 at baseline and is at or below it now. 
 
 ```
 

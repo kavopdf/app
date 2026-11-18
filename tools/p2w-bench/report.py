@@ -117,7 +117,14 @@ def silences():
         if len(allrows) < 2:
             return {"available": False}
         last = max(r.get("t", 0) for r in allrows)
-        rows = [r for r in allrows if r.get("t", 0) >= last - 8 * 3600]
+        # THE WINDOW STARTS AT THIS RUN'S CLAIM, not eight hours back. An 8 h look-back from the
+        # last beat reaches into the PREVIOUS run, and on 18 Nov it reported this run's longest
+        # silence as 62.1 min from 11:55:52 - a gap that happened an hour before this run claimed
+        # at 12:58, and after a report.py in a different run. The row that is meant to tell a
+        # reader "it was measuring, not hung" was instead accusing the run of a silence it never
+        # had. RUN.json's started_ts is the claim; that is the only honest anchor.
+        start = _json(RUN, {}).get("started_ts") or (last - 8 * 3600)
+        rows = [r for r in allrows if r.get("t", 0) >= start]
         if len(rows) < 2:
             return {"available": False}
         gaps = []
@@ -142,7 +149,12 @@ def obstacles():
     a run that hit one wall it could not clear looked identical to a run that hit nothing at all.
     """
     path = os.path.join(ROOT, "tools", "p2w-bench", "BLOCKERS.md")
-    today = (_json(RUN, {}).get("started") or "")[:10]
+    # RUN.json's "started" is a bare HH:MM ("12:58"), so [:_10] is "12:58" and every row dated
+    # "2026-11-18 13:00" failed the prefix test: on 18 Nov this counted 0 obstacles for a run that
+    # had appended five. The date comes from the epoch stamp, which is the only field that has one.
+    _run = _json(RUN, {})
+    today = time.strftime("%Y-%m-%d", time.gmtime((_run.get("started_ts") or 0) + 19800)) \
+        if _run.get("started_ts") else (_run.get("started") or "")[:10]
     rows = []
     try:
         for line in open(path, encoding="utf-8"):
