@@ -38,6 +38,51 @@ def py(script, *args):
     return sh("python3 tools/p2w-bench/%s %s" % (script, " ".join(args)))
 
 
+def by_all_open():
+    path = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
+    by = {}
+    try:
+        for line in open(path, encoding="utf-8"):
+            if not line.startswith("| "):
+                continue
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) < 8 or cells[6] != "OPEN":
+                continue
+            by.setdefault(cells[2], []).append(cells[1].strip("`"))
+    except Exception:
+        return {}
+    return by
+
+
+def biggest_open_class():
+    """The OPEN class to take next, smallest first, and its documents.
+
+    SMALLEST FIRST IS DELIBERATE. A screen costs a few minutes whatever the class size, because
+    soffice needs about eighty seconds to start either way. So the small classes are where a class
+    can actually be closed inside one run: single-element-far-out (1 document),
+    partly-lost-and-displaced (7), partly-lost (11) and partly-displaced (12) are 31 of the 92 OPEN
+    documents between them. Taking the thirty-document class first spends a run on one class that
+    cannot close; taking the four small ones closes four classes and shrinks the round.
+    """
+    import re as _re
+    path = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
+    by = {}
+    try:
+        for line in open(path, encoding="utf-8"):
+            if not line.startswith("| "):
+                continue
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) < 8 or cells[6] != "OPEN":
+                continue
+            by.setdefault(cells[2], []).append(cells[1].strip("`"))
+    except Exception:
+        return "", []
+    if not by:
+        return "", []
+    cls = min(by, key=lambda k: (len(by[k]), k))
+    return cls, by[cls]
+
+
 def engine_hash():
     rc, out = sh("git log -1 --format=%h -- app/src/main/java/com/kavopdf/app/engine/")
     return out.strip().split("\n")[0] if rc == 0 and out.strip() else "unknown"
@@ -150,10 +195,32 @@ def main(argv):
     h = handoff.strip()
     L.append(h[:900] if h else "(no handoff)")
     L.append("")
+    # 6b. NAME THE CLASS. A run that has to go and find the biggest OPEN class spends a turn on a
+    # table lookup it could have been handed, and a run that reads the whole FIXER-BRIEF to find out
+    # what to do spends many - the brief itself records that "a run that read it whole produced
+    # sixteen silent minutes and no attempt". So the class, its documents and the exact command are
+    # printed here and the run starts working instead of looking things up.
+    cls, docs = biggest_open_class()
+    L.append("--- WORK ON THIS ---")
+    if cls:
+        L.append("class       : %s" % cls)
+        L.append("documents   : %d  %s" % (len(docs), ", ".join(docs[:6]) + (" ..." if len(docs) > 6 else "")))
+        L.append("")
+        L.append("  SCREEN IT FIRST - minutes, not forty:")
+        L.append("     python3 tools/p2w-bench/screen.py --class \"%s\"" % cls)
+        _ladder = sorted(by_all_open().items(), key=lambda kv: (len(kv[1]), kv[0]))
+        L.append("  open classes, smallest first: " +
+                 ", ".join("%s (%d)" % (k, len(v)) for k, v in _ladder[:5]))
+        L.append("  SCREEN FAIL -> revert, next idea. PARTIAL -> run it again. SCREEN PASS -> then:")
+        L.append("     python3 tools/p2w-bench/attempt.py --class \"%s\" --moved N --total M --reason \"...\"" % cls)
+    else:
+        L.append("(no OPEN class - check DEFECT-CLASSES.md, or close the round)")
+    L.append("")
     L.append("--- NEXT, IN ORDER ---")
-    L.append("  1. read the section of tools/p2w-bench/FIXER-BRIEF.md that matches the pending item")
+    L.append("  1. do NOT read FIXER-BRIEF.md end to end. This message is your brief.")
+    L.append("     Open only the one section you need, if you need one.")
     L.append("  2. make the change; build again if you touched the engine")
-    L.append("  3. python3 tools/p2w-bench/attempt.py --class \"<cls>\" --moved N --total M --reason \"...\"")
+    L.append("  3. screen.py --class \"<cls>\"   then   attempt.py --class \"<cls>\" --moved N --total M --reason \"...\"")
     L.append("  4. handoff.py --context \"...\" --next \"...\"; round.py --release-fixer")
     L.append("  5. commit; chain.py --after-release")
     L.append("")
