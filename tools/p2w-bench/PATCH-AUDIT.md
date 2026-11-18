@@ -18,11 +18,20 @@ not `git apply`.
 
 | patch | touches | result |
 |---|---|---|
-| `table-spacer-before-not-line` | DocxWriter | **tested: 0 better, 0 worse on 6 table documents** |
-| `ruled-band-by-overlap-not-centre` | PdfToWord | not tested - `patches/README.md` says its mechanism moves nothing |
-| `run-size-from-sizePt-not-Tf` (x2, duplicate) | PdfToWord | not tested |
-| `wrap-charge-face-aware` | DocxWriter | not tested |
-| `wrap-charge-gated-1.04` | DocxWriter | not tested |
+| `table-spacer-before-not-line` | DocxWriter | neutral - 0 better, 0 worse on 6 table documents |
+| `run-size-from-sizePt-not-Tf` (x2, duplicate) | PdfToWord | **REJECT** - `392_statistical_console_output` 1.61 -> 13.94 |
+| `wrap-charge-gated-1.04` | DocxWriter | **REJECT** - `76_devanagari_table` 7.91 -> 54.99 |
+| `wrap-charge-face-aware` | DocxWriter | **REJECT** - `76_devanagari_table` 7.91 -> 54.99 |
+| `ruled-band-by-overlap-not-centre` | PdfToWord | not run - `patches/README.md` records that its mechanism moves nothing |
+
+**Not one of the 29 can be kept.** Twenty-three cannot be applied at all, three regress a document,
+one is neutral and one was already recorded as moving nothing.
+
+`run-size-from-sizePt-not-Tf` is the interesting one. It takes `360_restaurant_menu` from **34.43 to
+1.31** - a 96 % improvement, the largest single-document gain anyone has measured in this corpus - and
+in the same breath takes `392_statistical_console_output` from 1.61 to 13.94. The mechanism is real and
+it is aimed at the right thing; it is simply too broad. A version gated on the case it fixes, rather
+than applied to every run, is worth writing. That is a new piece of work, not a patch to apply.
 
 ## The four commits nobody could measure
 
@@ -51,10 +60,11 @@ numbers they cite, and a commit nobody can justify does not go in.
 
 ## What is still open
 
-    wrap-charge-face-aware        build, measure, decide
-    wrap-charge-gated-1.04        build, measure, decide
-    run-size-from-sizePt-not-Tf   build, measure, decide
-    0554e8c                       build, measure, decide
+    nothing. All 29 patches and all 4 commits are measured and decided.
+
+    The one idea worth carrying forward: `run-size-from-sizePt-not-Tf` gains 33 points on
+    `360_restaurant_menu` and loses 12 on `392_statistical_console_output`. Gate it on the case it
+    fixes and it may be the best single change available.
 
 Each is: `git apply`, `bash tools/p2w-bench/build-engine.sh`, convert the documents it targets,
 `p2w.measure_doc` against `benchmarks/RANKING.csv`, keep only if nothing gets worse.
