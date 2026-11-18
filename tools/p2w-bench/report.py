@@ -89,16 +89,60 @@ def _share5(path):
     return d
 
 
+def silences():
+    """What the run was doing while it looked dead.
+
+    A fixer run is watched from outside, and from outside a long stretch with no commit and no beat
+    is indistinguishable from a crash. Measured 18 Nov: the 09:54 run was reported as possibly dead
+    at 11:05 because the last committed beat was 10:55 - and it was running the 213-document ratchet,
+    one command that takes forty minutes and writes nothing until it returns.
+
+    So the report says it: the longest silence, when it started, and what the run had just called.
+    "38 min, after p2w.py: measuring the corpus" tells the reader it was working. "38 min, after
+    handoff.py" tells them something hung.
+
+    THE WINDOW IS EPOCH ARITHMETIC, NOT STRING COMPARISON. "ist" is a bare HH:MM:SS, so comparing it
+    to a start time silently wraps at midnight: a beat at 13:13 yesterday passes ">= 09:54", and a
+    beat at 09:00 tomorrow passes "<= 11:55". Both versions of this function reported silences that
+    were really the gap between one run and the next. Anchor on the last beat and look back.
+    """
+    try:
+        path = os.path.join(ROOT, "tools", "p2w-bench", "TIMELINE.jsonl")
+        allrows = []
+        for line in open(path, encoding="utf-8"):
+            try:
+                allrows.append(json.loads(line))
+            except Exception:
+                continue
+        if len(allrows) < 2:
+            return {"available": False}
+        last = max(r.get("t", 0) for r in allrows)
+        rows = [r for r in allrows if r.get("t", 0) >= last - 8 * 3600]
+        if len(rows) < 2:
+            return {"available": False}
+        gaps = []
+        for i in range(len(rows) - 1):
+            g = rows[i + 1].get("t", 0) - rows[i].get("t", 0)
+            if g >= 120:
+                gaps.append({"min": round(g / 60.0, 1), "at": rows[i].get("ist", ""),
+                             "doing": (rows[i].get("d") or "")[:70]})
+        gaps.sort(key=lambda x: -x["min"])
+        return {"available": True, "beats": len(rows), "n": len(gaps),
+                "longest": gaps[0] if gaps else None}
+    except Exception:
+        return {"available": False}
+
+
 def obstacles():
     """Walls this run hit, split into the ones it cleared and the ones a human must clear.
 
-    BLOCKERS.md already records every one of them, with a column headed "can I fix it". The report
-    never read that file, so the single most useful thing a run can say - what stopped it and whether
-    it could get past - was invisible. A run that hit three walls, solved two and reported only its
-    attempts looked idle; a run that hit one wall it could not clear looked identical to a run that
-    hit nothing at all.
+    BLOCKERS.md has recorded every wall since the pipeline began, with a column headed "can I fix
+    it" - the run's own verdict on whether it cleared the obstacle or a human has to. The report
+    never read that file: zero references. So the most useful thing a run can say was invisible, and
+    a run that hit one wall it could not clear looked identical to a run that hit nothing at all.
     """
     path = os.path.join(ROOT, "tools", "p2w-bench", "BLOCKERS.md")
+    today = (_json(RUN, {}).get("started") or "")[:10]
     rows = []
     try:
         for line in open(path, encoding="utf-8"):
@@ -107,19 +151,18 @@ def obstacles():
             c = [x.strip() for x in line.strip().strip("|").split("|")]
             if len(c) < 6 or c[0].lower().startswith("time"):
                 continue
-            rows.append({"when": c[0], "doing": c[1], "wall": c[2],
-                         "tried": c[3], "can": c[4], "need": c[5]})
+            if today and not c[0].startswith(today):
+                continue
+            rows.append({"can": c[4], "wall": c[2]})
     except Exception:
-        return {"available": False, "rows": [], "mine": 0, "human": 0}
-    # "can I fix it" is the run's own verdict: anything that starts with yes / fixed / solved was
-    # cleared; anything else is a wall only a human can take down.
+        return {"mine": 0, "human": 0, "last": ""}
     def cleared(r):
         t = (r["can"] or "").lower()
         return t.startswith(("yes", "fixed", "solved", "cleared", "done"))
     mine = [r for r in rows if cleared(r)]
     human = [r for r in rows if not cleared(r)]
-    return {"available": True, "rows": rows, "mine": len(mine), "human": len(human),
-            "last_human": human[-1]["wall"][:120] if human else ""}
+    return {"mine": len(mine), "human": len(human),
+            "last": human[-1]["wall"][:110] if human else ""}
 
 
 def corpus():
@@ -199,12 +242,7 @@ def main(argv):
     if co.get("available"):
         L.append("7. corpus improvement       : %+.2f%%  (mean share5 %.2f -> %.2f over %d docs)"
                  % (co["pct"], co["baseline_mean"], co["current_mean"], co["docs"]))
-        ob = obstacles()
-        L.append("8. obstacles this run      : %d cleared by the run, %d need a human"
-                 % (ob.get("mine", 0), ob.get("human", 0)))
-        if ob.get("human"):
-            L.append("   still a wall           : %s" % ob["last_human"])
-        L.append("9. docs improved total      : %d of %d  (%d regressed, %d unchanged)"
+        L.append("8. docs improved total      : %d of %d  (%d regressed, %d unchanged)"
                  % (co["improved"], co["docs"], co["regressed"], co["unchanged"]))
         if not co["measurement_committed"]:
             L.append("")
@@ -220,6 +258,18 @@ def main(argv):
     else:
         L.append("7. corpus improvement       : not measurable - %s" % co.get("why"))
         L.append("8. docs improved total      : not measurable")
+    si = silences()
+    if si.get("available"):
+        L.append(" 9. looked dead, was not    : %d beats, %d silence(s) over 2 min"
+                 % (si["beats"], si["n"]))
+        if si.get("longest"):
+            L.append("     longest silence        : %s min from %s, after %s"
+                     % (si["longest"]["min"], si["longest"]["at"], si["longest"]["doing"]))
+    ob = obstacles()
+    L.append("10. obstacles this run     : %d cleared by the run, %d need a human"
+             % (ob["mine"], ob["human"]))
+    if ob["human"]:
+        L.append("     still a wall           : %s" % ob["last"])
     nh = len(h.get("needs_human") or [])
     if nh:
         L.append("")
