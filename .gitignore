@@ -19,3 +19,12 @@ tools/engine-verify/out/
 build/
 app/build/
 *.hprof
+
+# Python bytecode. The fixer and the tooling import modules from tools/p2w-bench on every run, so
+# __pycache__ appears within minutes of any work and is never wanted. Two .pyc files were committed
+# once and are removed below; leaving them tracked means the tree is permanently dirty, which breaks
+# `git pull --rebase` with "please commit or stash them" - which happened on nine consecutive pushes
+# today, and every one of them was this and not the fixer's work.
+__pycache__/
+*.pyc
+*.pyo
