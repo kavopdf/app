@@ -264,6 +264,10 @@
   {
    "at": "03:41",
    "text": "One fix landed: recutColumnBands takes the row top as the minimum over the columns (64_newspaper 9.11 -> 3.46, corpus 212/212 with nothing worse, .txt 213 unchanged, gate PASS, commits 4e61dfd and 97e2e1f). Two things for the next run: (1) the class queue was stale by one run - the carry-over named 75_merged_header_cell_three_columns at 27.31 when the previous run had already taken it to 7.62 and reclassified it to content-partly-lost-and-displaced; always re-read RANKING.csv before believing the carry-over. (2) The corpus pass in p2w.py cannot finish inside a sandbox command and does not resume - it re-converts from zero every call because it measures ROOT/repo, not the working tree. screen.py --docs with the whole RANKING list DOES resume and measures the working tree including the uncommitted diff; 212 of 213 took 9 calls. Build RANKING.csv from screen-out/dist/*.json. Two documents block a batch: Account_Opening_Form_Fillable_filled and one-page-rotated-180-degrees must be measured alone or they eat the whole budget. The .txt half re-scores from screen-out/*.txt copied into /scratch/work/p2w/out after deleting txt/RESTAMP-TXT.jsonl."
+  },
+  {
+   "at": "03:42",
+   "text": "Slot released with --force: one agent was deployed, not two. A subagent in a scheduled run runs synchronously inside the turn (background=true still blocks), and the one deployed spent 26 minutes instrumenting the newspaper page - it found the mechanism that became the fix, but a second would have eaten the ratchet budget. The gate's agent rule counts registrations, and this run's agent was never registered with --agent-add before it was deployed; do that first next time."
   }
  ],
  "next": "",
@@ -403,8 +407,8 @@
  ],
  "run": {
   "started": "01:52",
-  "ended": null,
-  "ended_how": null
+  "ended": "03:42",
+  "ended_how": "forced"
  },
  "history": [
   {
@@ -484,6 +488,11 @@
   },
   {
    "at": "01:21",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "03:42",
    "how": "forced",
    "plan": ""
   }

@@ -106,5 +106,26 @@
    ]
   ],
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795119741.3465843,
+  "started": "01:52",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "content-present-partly-displaced",
+  "attempts": 2,
+  "kept": 2,
+  "docs_improved": 1,
+  "agents": [],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "counted": [
+   [
+    "content-present-partly-displaced",
+    1
+   ]
+  ],
+  "ratchets": 1,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
