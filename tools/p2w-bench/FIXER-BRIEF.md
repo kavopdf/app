@@ -576,7 +576,8 @@ has taken another cron's work and skipped its own.
 
 ### The shape of a correct run
 
-    stage.py                  is it `fix`?          if not, one line and stop.
+    round.py --phase          is it `fix`?          if not, one line and stop.
+                              (NOT stage.py - see the box below)
     gverify.py --report       which check fails the most documents.
     FINDINGS/                 has this been tried?   four fixes are recorded; re-deriving one is the
                                                      most expensive thing a run can do.
@@ -599,3 +600,25 @@ has taken another cron's work and skipped its own.
 
 **If a run reaches its time limit having recorded an attempt, that is a good run** - even if the
 attempt was reverted. The attempt is the output. A run that produced no attempt produced nothing.
+
+
+---
+
+## TWO STATE MACHINES, AND ONLY ONE OF THEM IS YOURS
+
+The repository has two, and reading the wrong one is how a fixer run spends its hour doing nothing.
+
+    round.py --phase     THE FIX LOOP. `measure` -> `classify` -> `fix` -> done.
+                         THIS IS YOURS. Claim with `round.py --claim-fixer`.
+
+    stage.py             THE MEASUREMENT PIPELINE. `measure-google` -> `matrix` -> `classify` -> `fix`.
+                         NOT YOURS. It belongs to the gverify cron, which is still working through
+                         213 documents and will be for hours.
+
+**They will disagree, and that is correct.** On 19 Nov `stage.py` said `measure-google` while
+`round.py` said `fix` - because the Google measurement is 90 of 213 done and the fix loop is ready.
+**A fixer that waits for `stage.py` to say `fix` waits for the measurement to finish, which is not its
+job and not its blocker.** There are failing documents to fix right now.
+
+**Use `round.py --phase`.** Use `stage.py` only to read how far the measurement has got, never to
+decide whether to work.
