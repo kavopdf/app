@@ -79,9 +79,25 @@ def class_files():
         out.append(CLASSES_B)
     elif os.path.exists(CLASSES):
         out.append(CLASSES)
-    txt = os.path.join(HERE, "DEFECT-CLASSES-TXT.md")
+    # THE .txt CLASSES LIVE IN A SUBDIRECTORY, and this looked in the wrong one for as long as the
+    # file has existed - so --close-round has never seen a single .txt class. Found in the final audit
+    # by printing what class_files() actually returns instead of assuming it was right.
+    txt = os.path.join(HERE, "txt", "DEFECT-CLASSES-TXT.md")
+    if not os.path.exists(txt):
+        txt = os.path.join(HERE, "DEFECT-CLASSES-TXT.md")   # the old flat location, if it ever returns
     if os.path.exists(txt):
         out.append(txt)
+    # THE GOOGLE TABLE TOO, AND THIS IS THE ONE THAT MATTERS MOST.
+    #
+    # Without it, --close-round judged a round finished on the .docx and .txt classes alone - both of
+    # which come from a soffice render - while 53 documents still failed `32_stroke_lines` in Google.
+    # The round would close, the pipeline would move on, and the largest block in the corpus would
+    # never be fixed. Found in the final audit, not by a run failing.
+    google = os.path.join(os.path.dirname(HERE), "..", "benchmarks",
+                          "DEFECT-CLASSES-GOOGLE.md")
+    google = os.path.normpath(google)
+    if os.path.exists(google):
+        out.append(google)
     return out
 ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 
