@@ -1,0 +1,16 @@
+{
+ "name": "06_rect_paid_stamp_red_transparent",
+ "status": "ok",
+ "rc": 1,
+ "passed": 35,
+ "total": 42,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "13_text_colours",
+  "18_displacement",
+  "32_stroke_lines",
+  "35_rotation",
+  "59_shape_anchor"
+ ]
+}

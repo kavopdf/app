@@ -1,0 +1,19 @@
+{
+ "name": "08_two_overlapping_stamps",
+ "status": "ok",
+ "rc": 1,
+ "passed": 32,
+ "total": 42,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "13_text_colours",
+  "17_matched_runs",
+  "18_displacement",
+  "25_invisible_text",
+  "32_stroke_lines",
+  "35_rotation",
+  "45_char_accuracy",
+  "59_shape_anchor"
+ ]
+}
