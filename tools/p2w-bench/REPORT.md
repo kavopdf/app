@@ -26,7 +26,6 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 22:30 | **kept** | 13/18 | recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down th |
-| 22:32 | **kept** | 13/18 | recordBaseline(): a split row's second paragraph landed one hairline box low and the pitch solver measured every later row from there, so the drift accumulated (0.4554 pt per row). Whole corpus 213 me |
 
 ## The txt
 

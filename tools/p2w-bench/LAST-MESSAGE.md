@@ -32,6 +32,15 @@ still the right next piece of engine work, and the finding says exactly where it
 **416_many_tiny_pages is EXEMPT and its row was not re-measured this run** - it carries the value
 the committed table had, which is the same value the previous run's hand measurement produced.
 
+**Two numbers in the tables above are bookkeeping, not the run.** The slot window reads 21:59
+because the claim was refreshed when the second corpus pass began; this run claimed at 18:53 and
+ended at 00:00, and the measurement work is what filled it - three full corpus passes, 213
+documents each, at about twenty minutes a pass. The agents' "4 min" is the gap between registering
+them and landing their findings: both were dispatched at 18:56 and the platform ran them inline
+anyway, so they cost the run about sixteen minutes of its own work before returning two findings
+that were worth it - the bank-statement row pitch, which became the fix, and the measurement that
+killed w:vMerge as a way into this class.
+
 ## Progress
 
 | | |
