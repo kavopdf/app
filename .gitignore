@@ -28,3 +28,6 @@ app/build/
 __pycache__/
 *.pyc
 *.pyo
+
+# stage.py writes this every run; it is recomputed from the evidence, never a source of truth
+tools/p2w-bench/STAGE.json

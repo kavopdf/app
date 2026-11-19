@@ -135,9 +135,31 @@ def compute():
                  if g >= total and total else "waiting"}
 
     recent = _attempts_recent(3.0)
+    # A RUN THAT IS STILL "RUNNING" AND HAS STOPPED BEACONING IS THE FAILURE THIS WATCHDOG EXISTS FOR.
+    #
+    # Attempts in the last three hours said "moving" for a run that had been hung for 39 minutes with
+    # zero attempts - it had recorded two earlier, so the window was satisfied and the stall was
+    # invisible. Measured 19 Nov: a fixer run started 18:52, released its slot, and sat with no beacon
+    # while the cron platform still called it running and so did not schedule the next one.
+    #
+    # The beacon is the honest signal. status.py already computes it; this reads the same file.
+    hung = None
+    try:
+        r = subprocess.run([sys.executable, os.path.join(HERE, "status.py"), "--json"],
+                           capture_output=True, text=True, timeout=90)
+        st = json.loads(r.stdout) if r.stdout.strip().startswith("{") else {}
+        mins = st.get("beacon_age_min") or st.get("claim_age_min")
+        if isinstance(mins, (int, float)) and mins > 20:
+            hung = round(mins)
+    except Exception:
+        pass
     out["stages"]["fix"] = {
         "attempts_3h": recent, "age_h": round(_age(ATTEMPTS), 1),
-        "state": "moving" if recent else "stopped"}
+        "state": "stopped" if hung else ("moving" if recent else "stopped")}
+    if hung:
+        out["stages"]["fix"]["why"] = ("a run is still marked running but has not beaconed for %d min "
+                                       "- the slot is free, so the next scheduled run takes over; if "
+                                       "the platform keeps the old one running it never will" % hung)
 
     out["stages"]["txt"] = {
         "measured": txt["measured"], "clean": txt["clean"], "failing": txt["failing"],
@@ -176,6 +198,8 @@ def main(argv):
             elif name == "fix":
                 prog = "%d attempt(s) in 3 h" % s["attempts_3h"]
             print("  %-16s %-10s %-22s %.1f h" % (name, s["state"], prog, s["age_h"]))
+            if s.get("why"):
+                print("      %s" % s["why"])
         if d["blockers"]:
             print("\n  blockers recorded:")
             for b in d["blockers"][-5:]:
