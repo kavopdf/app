@@ -1,4 +1,3 @@
-One line per stage, written and committed by the baseline cron as it works. It exists
 because a run that dies before its first commit leaves no trace: on 11 Nov ten runs in a
 row measured ten documents each and committed nothing, and there was no way to tell
 whether they died in the conversion, in Drive, in the record step or in the commit
@@ -198,3 +197,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 19 Nov 18:53 | fixer | slot claimed - fixer running |
 | 19 Nov 21:59 | fixer | slot claimed - fixer running |
 | 19 Nov 22:30 | fixer | attempt content-present-partly-displaced -> kept (13/18 moved) |
+| 19 Nov 22:32 | fixer | attempt content-present-partly-displaced -> kept (13/18 moved) |

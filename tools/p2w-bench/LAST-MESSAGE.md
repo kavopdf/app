@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**19 Nov 2026 · slot 21:59 → running IST · 32 min**
+**19 Nov 2026 · slot 21:59 → 22:35 IST · 36 min**
 
 > **report-2col-table-spanning-both-columns** improved — 16.10 → 0.76. Corpus ratchet clean across 213 documents.
 
@@ -36,7 +36,7 @@ the committed table had, which is the same value the previous run's hand measure
 
 | | |
 |:--|:--|
-| Documents improved this run | **13** — 1 attempt(s), 1 kept |
+| Documents improved this run | **13** — 2 attempt(s), 2 kept |
 | Documents improved, round total | 58 of 213 |
 | Corpus improvement vs 15 Nov | **+37.17%** — mean 6.15 → 3.86 |
 | Regressions | **none** |
@@ -51,6 +51,7 @@ the committed table had, which is the same value the previous run's hand measure
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 22:30 | **kept** | 13/18 | recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down th |
+| 22:32 | **kept** | 13/18 | recordBaseline(): a split row's second paragraph landed one hairline box low and the pitch solver measured every later row from there, so the drift accumulated (0.4554 pt per row). Whole corpus 213 me |
 
 ## The txt
 
@@ -63,17 +64,20 @@ the committed table had, which is the same value the previous run's hand measure
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `contA-04` | bank-statement-horizontal-rules-only: which code pat | 22:31 | 17:05 | 4 min |
+| `contB-04` | blast radius of w:vMerge across the 18 documents in  | 22:31 | 17:05 | 4 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 21:59 → running · 32 min |
+| Slot window | 21:59 → 22:35 · 36 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 14 |
+| Tool beats | 31 |
 | Longest silence | **30.4 min** — from 22:00:25, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 1 |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 need a human |
 
 
@@ -82,8 +86,9 @@ the committed table had, which is the same value the previous run's hand measure
 | Phase | Time | |
 |:--|--:|:--|
 | setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| fix - diagnose and change the engine | **30 min** | `#####################` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
+| fix - diagnose and change the engine | **30 min** | `##################` |
+| record - attempt, handoff, class rows | **4 min** | `###` |
+| report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
