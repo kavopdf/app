@@ -194,3 +194,26 @@ happens. **That is the quietest failure in the whole system.**
        yes -> and it has been running >1 h with ended_at null -> zombie -> delete + recreate
     3. update the id in this file and in the watchdog prompt
     4. write what you did into BLOCKERS.md
+
+---
+
+## DOES THE WATCHDOG ACTUALLY HAVE THE `cron` TOOL?
+
+The baseline cron's own prompt says, and has said since it was written:
+
+> *"A run cannot manage crons - the `cron` tool is not in a run's tool list."*
+
+**If that is true of cron runs generally, then everything in this brief about pause/resume and
+delete/recreate cannot be executed by the watchdog**, and the two failures it exists to fix - a paused
+cron and a zombie run - are not automatable at all.
+
+**The watchdog must therefore check its own tool list first and say which world it is in.**
+
+* **No `cron` tool** → do health, progress, `round.py --reopen` and `round.py --release-fixer`, then
+  write into BLOCKERS.md: *"the watchdog has no cron tool; a paused or zombie cron needs a person."*
+  **Say it in the report.** A watchdog that reports "nothing to do" while unable to do the one thing it
+  exists for is worse than no watchdog.
+* **Has `cron`** → the zombie and stale-fire procedures above apply.
+
+This was found during the final audit, not by a run failing. That is the point of writing it down: the
+next run does not have to discover it.
