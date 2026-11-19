@@ -206,3 +206,15 @@ whole division of work and the settled decisions; read it once.
 **Nothing changes without a measurement before and after.** The engine is not rewritten. One construct,
 one measurement, one commit - kept only if nothing gets worse.
 
+
+### This does NOT replace your claim step
+
+Two state machines exist and they answer different questions:
+
+    round.py --claim-<yours>   YOUR SLOT. Whoever holds it works. This is the one that gates you.
+    stage.py                   THE MEASUREMENT PIPELINE - informational, for the gverify cron.
+
+**They will disagree while the Google measurement is incomplete, and that is correct.** If `stage.py`
+says `measure-google` but your claim succeeds, work - the measurement is another cron's job and is not
+your blocker. Never stop because `stage.py` disagrees with your claim; only your claim decides.
+

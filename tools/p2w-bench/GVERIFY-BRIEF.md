@@ -175,3 +175,15 @@ Every check Google fails that LibreOffice passes is a construct LibreOffice hono
 not. **The limitation is Google's, and it is a limitation of absolute placement in a flowing-text
 format** — which is why the model is flowing text, and why the engine is changed one construct at a
 time rather than rewritten.
+
+### This does NOT replace your claim step
+
+Two state machines exist and they answer different questions:
+
+    round.py --claim-<yours>   YOUR SLOT. Whoever holds it works. This is the one that gates you.
+    stage.py                   THE MEASUREMENT PIPELINE - informational, for the gverify cron.
+
+**They will disagree while the Google measurement is incomplete, and that is correct.** If `stage.py`
+says `measure-google` but your claim succeeds, work - the measurement is another cron's job and is not
+your blocker. Never stop because `stage.py` disagrees with your claim; only your claim decides.
+

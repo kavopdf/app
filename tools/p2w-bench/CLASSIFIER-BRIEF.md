@@ -225,3 +225,15 @@ failing for as long as the table ignores them.
 `DEFECT-CLASSES.md` carries the `.docx` classes; the `.txt` classes live beside it in
 `txt/DEFECT-CLASSES-TXT.md`. **Both are regenerated every run.** A run that updates one and not the
 other has classified half the corpus and reported it as the corpus.
+
+### This does NOT replace your claim step
+
+Two state machines exist and they answer different questions:
+
+    round.py --claim-<yours>   YOUR SLOT. Whoever holds it works. This is the one that gates you.
+    stage.py                   THE MEASUREMENT PIPELINE - informational, for the gverify cron.
+
+**They will disagree while the Google measurement is incomplete, and that is correct.** If `stage.py`
+says `measure-google` but your claim succeeds, work - the measurement is another cron's job and is not
+your blocker. Never stop because `stage.py` disagrees with your claim; only your claim decides.
+
