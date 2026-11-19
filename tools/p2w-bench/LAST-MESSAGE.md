@@ -1,21 +1,19 @@
-
-  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
-**19 Nov 2026 · slot 21:59 → 22:35 IST · 36 min**
+**19 Nov 2026 · slot 23:53 → running IST · 32 min**
 
-> **report-2col-table-spanning-both-columns** improved — 16.10 → 0.76. Corpus ratchet clean across 213 documents.
+> **75_merged_header_cell_three_columns** improved — 27.31 → 7.62. Corpus ratchet clean across 213 documents.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **13** — 2 attempt(s), 1 kept |
-| Documents improved, round total | 58 of 213 |
-| Corpus improvement vs 15 Nov | **+37.17%** — mean 6.15 → 3.86 |
+| Documents improved this run | **2** — 2 attempt(s), 1 kept |
+| Documents improved, round total | 59 of 213 |
+| Corpus improvement vs 15 Nov | **+39.01%** — mean 6.15 → 3.75 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
-| **Fixed to 99%** | **31** of 213 — the rest are still off |
+| **Fixed to 99%** | **32** of 213 — the rest are still off |
 | Moved but still open | **27** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `content-present-partly-displaced` |
@@ -24,32 +22,30 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 22:30 | **kept** | 13/18 | recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down th |
+| 00:24 | **kept** | 2/18 | w:vMerge emitted from spanR (DocxWriter) + spanR recorded only on the row a rectangle starts (PdfToWord) + a rectangle spanning rows is a merge only when its text occupies fewer bands than the rows it |
+| 23:56 | **error** | 0/18 | IN PROGRESS - 75_merged_header_cell_three_columns: emit w:vMerge from spanR + bucket glyphs by their own baseline band instead of the cell top edge (PdfToWord:7846); baseline 27.31 reproduced on this |
 
 ## The txt
 
 | | |
 |:--|:--|
 | Scored | **213** of 213 |
-| Clean - every applicable check passes | **166** (77.9%) |
-| Failing at least one check | **47** |
-| Most common failure | `t13_amount_columns` - 19 documents |
+| Clean - every applicable check passes | **167** (78.4%) |
+| Failing at least one check | **46** |
+| Most common failure | `t13_amount_columns` - 18 documents |
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `contA-04` | bank-statement-horizontal-rules-only: which code pat | 22:31 | 17:05 | 4 min |
-| `contB-04` | blast radius of w:vMerge across the 18 documents in  | 22:31 | 17:05 | 4 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 21:59 → 22:35 · 36 min |
+| Slot window | 23:53 → running · 32 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 31 |
-| Longest silence | **30.4 min** — from 22:00:25, after `handoff.py: reading or writing the handoff` |
+| Tool beats | 16 |
+| Longest silence | **28.1 min** — from 23:56:48, after `classrow.py: refreshing the class file` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 need a human |
 
@@ -58,10 +54,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| fix - diagnose and change the engine | **30 min** | `##################` |
-| record - attempt, handoff, class rows | **4 min** | `###` |
-| report - the report and the chain | **0 min** | `#` |
+| fix - diagnose and change the engine | **31 min** | `######################` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -70,7 +64,7 @@
 | `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
 | `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
 | `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
-| `salary-slip-factory-wages` | 18.09 | 0.73 | -17.36 |
+| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
 
 ## Next run
 

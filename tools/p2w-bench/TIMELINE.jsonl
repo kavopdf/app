@@ -506,3 +506,7 @@
 {"t": 1795114497.2930107, "ist": "00:24:57", "ev": "attempt", "d": "content-present-partly-displaced -> kept"}
 {"t": 1795114497.4100494, "ist": "00:24:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795114497.5303478, "ist": "00:24:57", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795114517.9291058, "ist": "00:25:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795114534.4790301, "ist": "00:25:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795114534.8853617, "ist": "00:25:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795114535.0420177, "ist": "00:25:35", "ev": "beat", "d": "report.py: building the report"}
