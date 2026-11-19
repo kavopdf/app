@@ -1,93 +1,95 @@
 # P2W Fixer — Run Report
 
-**18 Nov 2026 · session 18:00 → 19:12 IST · 1h 12m**
+**19 Nov 2026 · slot 16:11 → 17:18 IST · 1h 07m**
 
-> One missing `w:tcBorders` broke twenty-two documents at once: a table's heavier header rule was collapsed into the table's single `insideH` and drawn nowhere, and emitting it per row took `salary-slip-factory-wages` from 18.09 to 0.73 and the corpus mean from 6.15 to 4.46 with nothing worse.
+> A justified line was being written left-aligned: the page spreads a line's inter-word spaces to reach its measure and the writer used the face's natural space, so every word on the line slid left by a share of the missing width. Built, measured, and it moves five of the class's ten documents with nothing worse — then the run ended 46 documents into a 213-document corpus pass, so **nothing was kept**. The change is a patch in `patches/`, not an engine commit.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **22** — 1 attempt(s), 1 kept |
-| Documents improved, round total | 36 of 212 |
-| Corpus improvement vs 15 Nov | **+27.52%** — mean 6.15 → 4.46 |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved, round total | 37 of 212 |
+| Corpus improvement vs 15 Nov | **+29.90%** — mean 6.15 → 4.31 |
 | Regressions | **none** |
-| Exempt, not measured | **1** — `416_many_tiny_pages` |
+| Exempt, not measured | **0** — none |
+| **Fixed to 99%** | **21** of 212 — the rest are still off |
+| Moved but still open | **16** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `content-missing-nothing-in-its-place` — **10 open, down from 29**, 8 of the 10 already below 5.0 |
-| Open documents, whole corpus | **70**, down from **91** at the start of the run |
-| Committed | **34** files in 2 commit(s) from `139599f` |
+| Working on | `content-partly-lost` |
+| Committed | **24** files in 2 commit(s) from `0a9de90` |
 
 ## What was tried
 
 | At | Document | Outcome | Moved | What it measured | Verdict |
 |--:|:--|:--|--:|:--|:--|
-| 19:07 | `salary-slip-factory-wages` (+21 more) | **kept** | 22/29 | per-row separator stroke: table interior rules whose weight or colour differs from the table's `insideH` are emitted as per-cell `w:tcBorders/w:bottom` instead of collapsing into one border. `salary-slip-factory-wages` 18.09 → 0.73, `mobile-bill` 18.48 → 1.55, `two-tables-stacked-with-no-gap` 17.20 → 0.77. Full corpus 212 measured: 33 better, 179 same, 0 worse. | **the mechanism was real** — a geometric loss, not a flow one |
+| 16:58 | `content-partly-lost` (10 open) | **partial** | 5/10 | justified lines emitted left-aligned. The model now carries the measured shortfall (`Box.stretchPt`/`Line.stretchPt`, set by `stretchOf()` against a per-page 3rd-percentile gap floor) and `DocxWriter` emits `w:spacing` in `flowFromBox()` and `lineParagraph()`. Screen: `policy-2col-spanning-section-heading` 5.37 → 1.76, `academic-paper-ieee-2col-abstract` 8.09 → 5.02, `magazine-2col-pullquote-spanning` 3.49 → 1.45, `304_package_insert_small_print` 3.41 → 2.47, `landscape-page-inside-portrait-document` 1.45 → 0.62. 5 same, **0 worse**. | **the mechanism is real** — and it is not block placement: the spanning block lands within 0.16 pt horizontally and 1.2 pt vertically, and the displaced ink is the right tail of every justified body line |
+
+## Why nothing was kept
+
+`regress.py --check` is the gate and there is no override: no commit lands unless the whole corpus has been measured with the engine as it stands and no document got worse. The screen passed at 16:58; the corpus pass needs 213 documents at 22–24 per 4.5-minute call, roughly nine calls. Three calls got to **46 of 213** before the run ended. An engine change with no kept attempt is auto-reverted at release, so I reverted it myself and committed the diff as `patches/PATCH-justified-lines-spacing.patch` — `git apply --check` passes against `0a9de90` and the tree is clean.
+
+## The two mistakes that each cost a screen
+
+| Mistake | What it cost | The fix |
+|:--|:--|:--|
+| A 0.06 em cap on the spacing | 8.09 → 6.54 only. 26 pt of missing measure over 45 characters is 11 twips a character, and 0.06 em at 9 pt *is* 11 | cap is now 0.30 em |
+| Measuring a word gap as `next.x − (prev.x + prev.width)` | On `academic-paper-ieee-2col-abstract` every justified line reported `med=NaN` and 0 lines were accepted, because **a space is a glyph** on that document — the gap between two glyph boxes is ~0 | measure from the last **non-space** glyph's advance end; 56 lines accepted |
 
 ## Subagents
 
-| Agent | Document | Sent to find | Deployed | Landed | Took | Result |
-|:--|:--|:--|--:|--:|--:|:--|
-| `5S300FMPRQ93E9CSJF7KM2K2KV` | `salary-slip-factory-wages` | why a page whose every baseline is within 1.5 pt still has 18 % of its ink 26–71 pt out | 18:31 | 18:54 | 23 min | **root cause found** — 4 000 of 22 818 source ink pixels were three 0.9 pt header rules the page draws over a 0.45 pt grey one; `insideStroke()` collapsed both into the table's single `insideH`, so 96.9 % of the far ink was drawn nowhere |
+| Agent | Document | Sent to find | Deployed | Landed | Result |
+|:--|:--|:--|--:|:--|:--|
+| `6JNXNK2E2K8Y0AJKDXY3J8WQ8Z` | the four 2-column spanning documents | which ink is displaced, horizontal or vertical, and where in the engine | 16:22 | 16:32 | **root cause found, and the obvious suspect refuted** — the spanning block is placed correctly (0.16 pt / 1.2 pt); the displaced ink is the right tail of justified body lines, short by up to 36 pt at the last word, accumulated word by word. `DocxWriter.lineParagraph` emits no `w:jc` and no `w:spacing`. Landed as `1ba1f98`. |
+
+It ran inline for 10 minutes rather than in the background — a scheduled run has no one to answer later, so the platform ran it in the turn. That is the 17.3-minute silence below, and it is why only one agent was deployed.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Session | 18:00 → 19:08 · **1h 08m** |
-| Slot window | 18:00 → 19:08 · 1h 08m |
-| Before the claim | 0 min - pod setup, cloning and retries |
-| Tool beats | 20 |
-| Longest silence | **66.9 min** — from 18:00:10, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 1 |
-| Obstacles | 1 cleared · 0 need a human |
+| Session | 16:11 → 17:18 · **1h 07m** |
+| Slot window | 16:11 → 17:18 · 1h 07m |
+| Before the claim | 0 min |
+| Tool beats | 18 |
+| Longest silence | **17.3 min** — from 16:11:34, after `pending.py` |
+| Silences over 2 min | 3 |
+| Obstacles | 0 cleared · 0 need a human |
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **1h 06m** | `######################` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
+| fix - diagnose and change the engine | **14 min** | `#######` |
+| measure or build - a conversion, screen or compile writes no beacon | **31 min** | `###############` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
 
 ## What the fix is
 
-`DocxWriter.table()` had one `w:tblBorders insideH` for a whole table, so when a page drew one interior rule heavier or darker than the rest — the usual header rule under a table head — the writer collapsed it into the table's body rule and the heavier stroke was drawn nowhere. The engine now carries `Table#rowStroke`: each separator's own stroke, read through `edgeStroke()`, which prefers the heavier rule when two are drawn on top of each other. Where that stroke differs from the table's `insideH` by at least one eighth-point or in colour, `table()` emits a per-cell `w:tcBorders/w:bottom` for that row instead. Interior edges only; a table without such a rule emits byte-identical output, which is why 179 of 212 documents did not move by a single point.
-
-## Best results, round to date
-
-| Document | Before | After | Change |
-|:--|--:|--:|--:|
-| `415_inline_images` | 89.04 | 0.00 | -89.04 |
-| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
-| `salary-slip-factory-wages` | 18.09 | 0.73 | -17.36 |
-| `mobile-bill` | 18.48 | 1.55 | -16.93 |
-| `two-tables-stacked-with-no-gap` | 17.20 | 0.77 | -16.43 |
+`PdfToWord` gains `Box.stretchPt` and `Line.stretchPt`. `toParagraphs()` computes a per-page floor from the **3rd percentile** of the page's inter-word gaps — justification only ever widens a gap, so the narrow end is where the face's own space lives — and `buildPara()` sets each box's shortfall to `right − (firstGlyph.x + Σ glyph advances)`. That is a measurement, not a guess: the advances are the face's own, so a ragged line's natural width *is* its extent and its shortfall is zero. Three guards, each a document that got worse without it: a dot leader is already drawn to fill its measure; a complex-script line's substitute face is wider than the page's; and below 3 pt the stretch buys nothing, because `w:sz` is half-points. `DocxWriter.stretchTw()` spreads the shortfall over the line's characters and `runXml` emits it as `w:spacing`.
 
 ## Honest gaps
 
-The corpus number is real but it was not produced by `benchmarks/p2w.py`. `p2w.py --budget 260` does not resume: it restarts `docx 0/213` on every call and spends the whole budget converting, so it measured **0 of 213 twice in a row**. The 212-document ratchet was run with `screen.py --docs` over the full `RANKING.csv` list instead, which does cache and resume; `benchmarks/RANKING.csv` and `benchmarks/STATE.json` were then written from those 212 measurement files. That is the same instrument `p2w.py` uses, but it is not the pipeline's own publisher, and the next run should confirm the two agree.
+**The `.txt` was not re-scored.** `scope.py` says BOTH, because the model classes changed, so the gate would want the `.txt` measured too. Nothing outside `DocxWriter` reads `stretchPt`, so the `.txt` is *expected* to be byte-identical — but that is a claim about the code, not a measurement, and this run did not turn it into one.
 
-`416_many_tiny_pages` is still unmeasured — 300 pages, one command, no result written. `itr-computation-with-slab-table` (42.33) was not touched; its third defect, the footer row of table 3 emitted between rows the page draws around it, is still the only item left standing in `content-partly-lost-and-displaced`.
+**This implementation is weaker than the lost `855f443`.** `SPEC-justified-lines.md` claims 8.09 → 0.83 and 5.37 → 0.01 with `w:jc="distribute"` plus a right indent at the line's own ink edge. `w:spacing` spreads the missing width over every character, while the page spent it at spaces only, and it gets 5.02 and 1.76. The next step is the spec's own mechanism, not a bigger cap.
 
-Eight of the ten documents still OPEN in this class already score below 5.0 — they are open because the class row asks for *clean*, not for *under the line*. `annual-review-2col-uneven-columns` (5.77) and `23_timetable_grid_txtpos` (5.16) are the two that still have ink in the wrong place, and neither has a heavier interior rule to explain it.
+**The corpus pass does not resume across runs.** `screen.py` caches under `/scratch/work/p2w`, which does not survive the sandbox, so the 46 documents measured here are worth nothing to the next run. That is why the next run must start the pass from zero and why this run could not finish it.
 
-`chain.py --after-release` still reports the sandbox at `2945cb0` against origin `4c48b1a`, because the commit was published through the GitHub API and the local `HEAD` cannot advance without a push. The work is on `main` at `139599f`; only the local ref is behind.
-
-## Why the silence
-
-The 66.9-minute gap is not a hung run. It is the one inline subagent (23 min, no beacon while it converted and rendered) followed by the corpus ratchet: six `screen.py --docs` calls at roughly five minutes each, each one converting and soffice-rendering its own batch. A conversion loop and a soffice render write no beacon, exactly as `SETTLED.md` warns.
+**`benchmarks/RANKING.csv` is untouched.** It still describes the pre-change engine, which is correct: the engine in the tree is the one it describes.
 
 ## Verdict per idea
 
 | Idea | Verdict |
 |:--|:--|
-| per-row separator stroke (`Table#rowStroke` + per-cell `w:tcBorders`) | **kept** — 33 better, 0 worse on 212 |
-| `p2w.py --budget` as the corpus pass | **dead here** — it cannot finish inside the 300 s cap and does not resume |
-| re-testing `run-size-from-sizePt-not-Tf`, the anchor rule, the cell-baseline fallback | not attempted — all refuted on this engine, recorded in `SETTLED.md` |
+| justified-line character spacing (`Box.stretchPt` + `w:spacing`) | **screened, not kept** — 5 of 10 better, 0 worse; the corpus ratchet did not run |
+| 0.06 em spacing cap | **dead** — it truncates the fix to a third of what it needs |
+| word gap measured from glyph box to glyph box | **dead** — a space is a glyph, and the test sees nothing on the documents it is for |
+| block placement / `xyCut` column order as the cause | **refuted twice**, by the subagent with numbers and by this run's own page comparison |
 
 ## Next run
 
-Take `content-partly-lost` (9 open). The corpus pass is `screen.py --docs "$(python3 -c "import csv;print(','.join(r['document'] for r in csv.DictReader(open('benchmarks/RANKING.csv'))))")"` — about six calls, and it resumes. Do not spend a call on `p2w.py --budget`, and do not retry the row separator stroke: it is implemented.
+Apply `patches/PATCH-justified-lines-spacing.patch`, build, re-screen `content-partly-lost` (expect 5 better, 0 worse), then spend the rest of the run on the corpus pass — `screen.py --docs` with every document in `RANKING.csv`, 22–24 per call in about nine calls, then write `RANKING.csv` and `STATE.json` from `screen-out/dist/*.json`. Re-score the `.txt` too. Do not retry the two mistakes above.
 
 ---
 
