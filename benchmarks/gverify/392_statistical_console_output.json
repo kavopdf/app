@@ -1,0 +1,10 @@
+{
+ "name": "392_statistical_console_output",
+ "status": "ok",
+ "rc": 1,
+ "passed": 41,
+ "total": 42,
+ "failed": [
+  "47_margins"
+ ]
+}

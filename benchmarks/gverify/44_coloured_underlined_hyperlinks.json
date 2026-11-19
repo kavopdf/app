@@ -1,0 +1,13 @@
+{
+ "name": "44_coloured_underlined_hyperlinks",
+ "status": "ok",
+ "rc": 1,
+ "passed": 38,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "32_stroke_lines",
+  "40_link_targets",
+  "46_text_crossing_rule"
+ ]
+}

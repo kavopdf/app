@@ -1,0 +1,13 @@
+{
+ "name": "417_rotate180_and_mirrored",
+ "status": "ok",
+ "rc": 1,
+ "passed": 38,
+ "total": 42,
+ "failed": [
+  "04_chars_missing",
+  "17_matched_runs",
+  "18_displacement",
+  "27_text_off_page"
+ ]
+}

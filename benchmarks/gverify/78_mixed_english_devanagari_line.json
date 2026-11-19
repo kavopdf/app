@@ -1,0 +1,17 @@
+{
+ "name": "78_mixed_english_devanagari_line",
+ "status": "ok",
+ "rc": 1,
+ "passed": 34,
+ "total": 42,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "17_matched_runs",
+  "18_displacement",
+  "26_text_overlap",
+  "43_within_10pt_x",
+  "45_char_accuracy",
+  "47_margins"
+ ]
+}

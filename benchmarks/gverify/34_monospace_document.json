@@ -1,0 +1,11 @@
+{
+ "name": "34_monospace_document",
+ "status": "ok",
+ "rc": 1,
+ "passed": 40,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "32_stroke_lines"
+ ]
+}

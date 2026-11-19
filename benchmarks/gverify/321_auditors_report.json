@@ -1,0 +1,10 @@
+{
+ "name": "321_auditors_report",
+ "status": "ok",
+ "rc": 1,
+ "passed": 41,
+ "total": 42,
+ "failed": [
+  "60_text_column_right_edge"
+ ]
+}

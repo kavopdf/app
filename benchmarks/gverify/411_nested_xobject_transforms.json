@@ -1,0 +1,11 @@
+{
+ "name": "411_nested_xobject_transforms",
+ "status": "ok",
+ "rc": 1,
+ "passed": 40,
+ "total": 42,
+ "failed": [
+  "04_chars_missing",
+  "17_matched_runs"
+ ]
+}

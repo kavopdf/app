@@ -1,0 +1,16 @@
+{
+ "name": "601_fillable_admission_form",
+ "status": "ok",
+ "rc": 1,
+ "passed": 35,
+ "total": 42,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "18_displacement",
+  "32_stroke_lines",
+  "51_field_values",
+  "53_embedded_faces",
+  "59_shape_anchor"
+ ]
+}

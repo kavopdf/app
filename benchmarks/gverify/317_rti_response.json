@@ -1,0 +1,11 @@
+{
+ "name": "317_rti_response",
+ "status": "ok",
+ "rc": 1,
+ "passed": 40,
+ "total": 42,
+ "failed": [
+  "47_margins",
+  "60_text_column_right_edge"
+ ]
+}

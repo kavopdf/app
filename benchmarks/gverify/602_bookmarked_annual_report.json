@@ -1,0 +1,13 @@
+{
+ "name": "602_bookmarked_annual_report",
+ "status": "ok",
+ "rc": 1,
+ "passed": 38,
+ "total": 42,
+ "failed": [
+  "04_chars_missing",
+  "18_displacement",
+  "27_text_off_page",
+  "52_outline"
+ ]
+}

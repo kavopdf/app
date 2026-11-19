@@ -1,0 +1,13 @@
+{
+ "name": "406_passport_mrz_page",
+ "status": "ok",
+ "rc": 1,
+ "passed": 38,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "59_shape_anchor",
+  "60_text_column_right_edge"
+ ]
+}

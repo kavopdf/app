@@ -1,0 +1,13 @@
+{
+ "name": "76_devanagari_table",
+ "status": "ok",
+ "rc": 1,
+ "passed": 43,
+ "total": 47,
+ "failed": [
+  "17_matched_runs",
+  "18_displacement",
+  "34a_span_size_match",
+  "47_margins"
+ ]
+}

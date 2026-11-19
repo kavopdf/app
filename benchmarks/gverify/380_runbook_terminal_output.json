@@ -1,0 +1,11 @@
+{
+ "name": "380_runbook_terminal_output",
+ "status": "ok",
+ "rc": 1,
+ "passed": 40,
+ "total": 42,
+ "failed": [
+  "25_invisible_text",
+  "47_margins"
+ ]
+}

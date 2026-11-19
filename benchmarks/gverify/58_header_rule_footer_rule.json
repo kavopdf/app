@@ -1,0 +1,15 @@
+{
+ "name": "58_header_rule_footer_rule",
+ "status": "ok",
+ "rc": 1,
+ "passed": 36,
+ "total": 42,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "18_displacement",
+  "27_text_off_page",
+  "32_stroke_lines",
+  "44_header_footer"
+ ]
+}
