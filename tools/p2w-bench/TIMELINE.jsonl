@@ -537,3 +537,8 @@
 {"t": 1795126234.8080606, "ist": "03:40:34", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795126236.3226867, "ist": "03:40:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795126236.443634, "ist": "03:40:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795126307.7601569, "ist": "03:41:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795126313.1247025, "ist": "03:41:53", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795126313.583596, "ist": "03:41:53", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795126313.7204444, "ist": "03:41:53", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795126316.7437377, "ist": "03:41:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

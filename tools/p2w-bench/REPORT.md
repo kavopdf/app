@@ -1,33 +1,33 @@
-# Fixer report - 2026-11-19 23:53
+# Fixer report - 2026-11-20 01:52
 
 ```
 # P2W Fixer - Run Report
 
-**19 Nov 2026 · slot 23:53 → 01:21 IST · 1h 28m**
+**19 Nov 2026 · slot 01:52 → running IST · 1h 49m**
 
-> **75_merged_header_cell_three_columns** improved — 27.31 → 7.62. Corpus ratchet clean across 213 documents.
+> **64_newspaper_uneven_columns_ad_boxes** improved — 9.11 → 3.46. Corpus ratchet clean across 213 documents.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **2** — 2 attempt(s), 1 kept |
-| Documents improved, round total | 59 of 213 |
-| Corpus improvement vs 15 Nov | **+39.01%** — mean 6.15 → 3.75 |
+| Documents improved this run | **1** — 2 attempt(s), 2 kept |
+| Documents improved, round total | 60 of 213 |
+| Corpus improvement vs 15 Nov | **+39.44%** — mean 6.15 → 3.72 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
 | **Fixed to 99%** | **32** of 213 — the rest are still off |
-| Moved but still open | **27** — improved, not fixed |
+| Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `content-present-partly-displaced` |
-| Committed | **1** files in 1 commit(s) from `90193e0` — ...sent-partly-displaced-fillstroke-003744-0191.md |
+| Committed | **20** files in 2 commit(s) from `97e2e1f` — ...esent-partly-displaced-newspaper-033000-a7d1.md, ...tent-present-partly-displaced-newspaper-033000-a7d1.md, ARCHIVE.json, ATTEMPTS.json, CLASS-HISTORY.jsonl, DEFECT-CLASSES.md, ENGINE-STAMP.json, HANDOFF.json, HANDOFF |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 00:24 | **kept** | 2/18 | w:vMerge emitted from spanR (DocxWriter) + spanR recorded only on the row a rectangle starts (PdfToWord) + a rectangle spanning rows is a merge only when its text occupies fewer bands than the rows it |
-| 23:56 | **error** | 0/18 | IN PROGRESS - 75_merged_header_cell_three_columns: emit w:vMerge from spanR + bucket glyphs by their own baseline band instead of the cell top edge (PdfToWord:7846); baseline 27.31 reproduced on this |
+| 02:25 | **kept** | 1/23 | recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one. 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 10 |
+| 03:40 | **kept** | 1/23 | recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one (the 'break' at PdfToWord:8666). 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_ |
 
 ## The txt
 
@@ -40,30 +40,28 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `contA-05` | can RuleCollector carry the PDF paint operator so a  | 00:46 | - | - |
-| `contB-05` | what does check 65_table_span_down assert and why do | 00:46 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 23:53 → 01:21 · 1h 28m |
+| Slot window | 01:52 → running · 1h 49m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 21 |
-| Longest silence | **35.0 min** — from 00:46:43, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 4 |
-| Obstacles | 0 cleared · 0 need a human |
+| Tool beats | 18 |
+| Longest silence | **75.2 min** — from 02:25:21, after `classrow.py: refreshing the class file` |
+| Silences over 2 min | 3 |
+| Obstacles | 0 cleared · 1 need a human |
+| Still a wall | The count is inflated by a timezone mismatch. `_attempts_recent()` parses `at` with `time.mktime(time.strptime |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **31 min** | `########` |
-| measure or build - a conversion, screen or compile writes no beacon | **56 min** | `##############` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
+| fix - diagnose and change the engine | **4 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **1h 43m** | `#####################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -73,10 +71,6 @@
 | `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
 | `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
 | `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
-
-## Next run
-
-content-present-partly-displaced, 24 OPEN. Take 75_merged_header_cell_three_columns (27.31, the worst in the class): implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord:7950 already computes, and bucket each glyph by its own baseline band instead of the cell's top edge (7846) - the sibling finding says both are needed and that the band test alone moves Depot to the wrong row. Do not retry dropping fill-only rules from the Edge list (27.31 -> 46.58). Do not apply patches/rowgapok-run-pitch.patch on its old numbers.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
