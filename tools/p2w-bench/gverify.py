@@ -127,15 +127,127 @@ def collect(name, url):
                    if isinstance(v, dict) and v.get("ok") is False)
     _write(name, {"name": name, "status": "ok", "rc": r.returncode,
                   "passed": d.get("passed"), "total": d.get("total"), "failed": fails})
-    print("  %-44s %s/%s PASS%s" % (name[:44], d.get("passed"), d.get("total"),
-                                    "" if not fails else "   fail: " + ",".join(fails)))
+    print("  %-44s GOOGLE %s/%s%s" % (name[:44], d.get("passed"), d.get("total"),
+                                      "" if not fails else "  fail: " + ",".join(fails)))
+    lo = collect_lo(name)
+    print("  %-44s LIBRE  %s" % ("", lo))
     return 0
+
+
+SOFFICE = "/usr/lib/libreoffice/program/soffice.bin"
+LORES = "/scratch/work/p2w/lo-res"
+
+
+def collect_lo(name):
+    """The SAME 42 checks against the LibreOffice render, so every document carries both numbers.
+
+    The whole reason this pipeline exists is that the two renderers disagree, and a corpus measured by
+    only one of them cannot say where. LibreOffice is a fast local proxy that hides the faults Google
+    shows - on the first 50 documents, LibreOffice passed 23 and Google passed 7 - so the pair is what
+    a fixer needs: "Google fails this and LibreOffice does not" is the sentence that names a construct
+    Google drops. Measuring them in the same pass means the pair is never half-collected.
+    """
+    src = os.path.join(CORPUS, name + ".pdf")
+    docx = os.path.join(OUT, name + ".docx")
+    if not os.path.exists(src) or not os.path.exists(docx):
+        return "missing source or docx"
+    os.makedirs(LORES, exist_ok=True)
+    out_json = os.path.join(LORES, name + ".json")
+    if os.path.exists(out_json):
+        return "already have it"
+    tmpdir = "/tmp/lo-one"
+    os.makedirs(tmpdir, exist_ok=True)
+    exe = SOFFICE if os.path.exists(SOFFICE) else "soffice"
+    r = subprocess.run([exe, "--headless", "--norestore", "--convert-to", "pdf",
+                        "--outdir", tmpdir, docx], capture_output=True, text=True, timeout=180)
+    pdf = os.path.join(tmpdir, name + ".pdf")
+    if not os.path.exists(pdf):
+        return "soffice produced nothing"
+    subprocess.run([sys.executable, os.path.join(HERE, "verify_google.py"),
+                    src, pdf, "--docx", docx, "--json", out_json],
+                   capture_output=True, text=True, timeout=180)
+    try:
+        os.remove(pdf)
+    except OSError:
+        pass
+    if not os.path.exists(out_json):
+        return "verify_google produced nothing"
+    d = json.load(open(out_json, encoding="utf-8"))
+    fails = sorted(k for k, v in (d.get("checks") or {}).items()
+                   if isinstance(v, dict) and v.get("ok") is False)
+    return "%s/%s%s" % (d.get("passed"), d.get("total"),
+                        "" if not fails else "   LO fail: " + ",".join(fails))
 
 
 def _write(name, rec):
     os.makedirs(RES, exist_ok=True)
     with open(os.path.join(RES, name + ".json"), "w", encoding="utf-8") as f:
         json.dump(rec, f, indent=1)
+
+
+def matrix():
+    """The capability table: every check, both renderers, from the results on disk.
+
+    This is what the whole pass exists for. A check Google fails and LibreOffice passes names a
+    construct LibreOffice honours and Google does not - that is the sentence a fixer needs, and it
+    cannot be written without both numbers on the same document.
+    """
+    from collections import Counter
+    lo_dir = "/scratch/work/p2w/lo-res"
+    if not os.path.isdir(RES):
+        print("no Google results yet")
+        return 2
+    names = [f[:-5] for f in sorted(os.listdir(RES)) if f.endswith(".json")]
+    gf, lf = Counter(), Counter()
+    both = gpass = lpass = 0
+    for n in names:
+        g = json.load(open(os.path.join(RES, n + ".json"), encoding="utf-8"))
+        if g.get("status") == "page_count_refused":
+            continue
+        lo_path = os.path.join(lo_dir, n + ".json")
+        if not os.path.exists(lo_path):
+            continue
+        l = json.load(open(lo_path, encoding="utf-8"))
+        both += 1
+        gg = set(g.get("failed") or [])
+        ll = {k for k, v in (l.get("checks") or {}).items() if v.get("ok") is False}
+        for c in gg: gf[c] += 1
+        for c in ll: lf[c] += 1
+        if not gg: gpass += 1
+        if not ll: lpass += 1
+    if not both:
+        print("no document has both renders yet")
+        return 2
+    print("# Google Docs vs LibreOffice - the 42 checks, %d documents, same engine\n" % both)
+    print("Same source PDF, same .docx, same instrument. Only the renderer differs.\n")
+    print("    LibreOffice : %d of %d pass all 42" % (lpass, both))
+    print("    Google Docs : %d of %d pass all 42\n" % (gpass, both))
+    print("## Where they disagree\n")
+    print("| check | LibreOffice fails | Google fails | who is stricter |")
+    print("|---|---:|---:|---|")
+    allc = set(gf) | set(lf)
+    for c in sorted(allc, key=lambda x: -(gf[x] - lf[x])):
+        a, b = lf[c], gf[c]
+        if a == 0 and b == 0:
+            continue
+        who = "**Google**" if b > a else ("LibreOffice" if a > b else "same")
+        print("| `%s` | %d | %d | %s |" % (c, a, b, who))
+    print()
+    only_g = [c for c in allc if gf[c] > 0 and lf[c] == 0]
+    print("## Constructs LibreOffice honours and Google does not\n")
+    if only_g:
+        for c in sorted(only_g, key=lambda x: -gf[x]):
+            print("* `%s` - %d documents" % (c, gf[c]))
+    else:
+        print("_None: every check Google fails, LibreOffice fails too._")
+    print()
+    only_l = [c for c in allc if lf[c] > 0 and gf[c] == 0]
+    if only_l:
+        print("## Constructs Google honours and LibreOffice does not\n")
+        for c in sorted(only_l, key=lambda x: -lf[x]):
+            print("* `%s` - %d documents" % (c, lf[c]))
+        print()
+    return 0
 
 
 def report():
@@ -174,11 +286,17 @@ def main(argv):
     ap.add_argument("--plan", type=int)
     ap.add_argument("--stage")
     ap.add_argument("--collect", nargs=2)
+    ap.add_argument("--lo", help="measure the LibreOffice side of one document")
+    ap.add_argument("--matrix", action="store_true")
     ap.add_argument("--report", action="store_true")
     a = ap.parse_args(argv)
     if a.plan:    return plan(a.plan)
     if a.stage:   return stage(a.stage)
     if a.collect: return collect(*a.collect)
+    if a.lo:
+        print(collect_lo(a.lo))
+        return 0
+    if a.matrix:  return matrix()
     if a.report:  return report()
     ap.print_help()
     return 1

@@ -17,6 +17,10 @@ STAGES, in order. A stage is not left until its exit condition is measured, neve
 
     measure-google   Google has a result for fewer than all documents. gverify.py measures 20 a run.
                      exit: measured == total
+    matrix           Both renders must exist for every measured document, so the capability table can
+                     say which checks Google fails and LibreOffice passes - the pair that names a
+                     construct. gverify.py --lo fills the LibreOffice half.
+                     exit: lo == measured
     classify         The classifier groups the Google failures into classes.
                      exit: DEFECT-CLASSES has a row for every failing document
     fix              The fixer takes ONE class at a time, smallest first, and changes the engine only
@@ -37,7 +41,7 @@ GVERIFY = os.path.join(ROOT, "benchmarks", "gverify")
 CORPUS = "/scratch/work/p2w/corpus"
 RANKING = os.path.join(ROOT, "benchmarks", "RANKING.csv")
 
-ORDER = ["measure-google", "classify", "fix", "ship"]
+ORDER = ["measure-google", "matrix", "classify", "fix", "ship"]
 
 
 def _json(p, default=None):
@@ -112,6 +116,19 @@ def compute():
         return {"stage": "measure-google", "total": total, "measured": done,
                 "scored": ok, "refused": refused,
                 "next": "measure %d more through Google" % min(20, total - done)}
+
+    # THE SECOND HALF OF EVERY DOCUMENT. A Google number alone says a document fails; only the pair
+    # says WHICH CONSTRUCT Google drops, because LibreOffice honours nearly all of them. Measuring both
+    # in the same pass is what makes the capability table possible at all.
+    lo_dir = "/scratch/work/p2w/lo-res"
+    lo = 0
+    if os.path.isdir(lo_dir):
+        lo = len([f for f in os.listdir(lo_dir) if f.endswith(".json")])
+    if lo < ok:
+        return {"stage": "matrix", "total": total, "measured": done,
+                "scored": ok, "refused": refused, "libreoffice": lo,
+                "next": "measure the LibreOffice side of %d documents - gverify.py --lo <name>"
+                        % (ok - lo)}
     if bad:
         # Classification is done when the table names a class for every failing document.
         classes = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")

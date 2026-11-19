@@ -1,12 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/01_stamp_rotated_15deg_upright.pdf",
-  "render": "/tmp/loall/01_stamp_rotated_15deg_upright.pdf",
-  "passed": 39,
+  "render": "/tmp/lo-one/01_stamp_rotated_15deg_upright.pdf",
+  "passed": 41,
   "total": 42,
   "failed": [
-    "25_invisible_text",
-    "35_rotation",
-    "60_text_column_right_edge"
+    "35_rotation"
   ],
   "ok": false,
   "checks": {
@@ -42,7 +40,7 @@
     },
     "14_filled_shapes": {
       "source": 20384,
-      "render": 521545,
+      "render": 23019,
       "ok": true
     },
     "17_matched_runs": {
@@ -62,12 +60,12 @@
     },
     "25_invisible_text": {
       "source": 0,
-      "render": 1,
-      "ok": false
+      "render": 0,
+      "ok": true
     },
     "26_text_overlap": {
       "source": 3,
-      "render": 3,
+      "render": 0,
       "ok": true
     },
     "27_text_off_page": {
@@ -112,7 +110,7 @@
     },
     "36_underline_rules": {
       "source": 0,
-      "render": 0,
+      "render": 6,
       "ok": true
     },
     "37_super_subscript": {
@@ -164,7 +162,7 @@
       "ok": true
     },
     "47_margins": {
-      "source": 0.0,
+      "source": 0.1,
       "render": 0,
       "ok": true
     },
@@ -196,9 +194,9 @@
     },
     "52_outline": {
       "source": 0,
-      "render": 1,
+      "render": 2,
       "ok": true,
-      "detail": "source has no outline; render adds 1 entries (not scored)"
+      "detail": "source has no outline; render adds 2 entries (not scored)"
     },
     "53_embedded_faces": {
       "source": 2,
@@ -227,9 +225,9 @@
       "ok": true
     },
     "60_text_column_right_edge": {
-      "source": 1,
+      "source": 0,
       "render": 0,
-      "ok": false
+      "ok": true
     },
     "61_blank_not_filled": {
       "source": 0,
@@ -239,5 +237,5 @@
   },
   "document": "01_stamp_rotated_15deg_upright",
   "source_file": "/scratch/work/p2w/corpus/01_stamp_rotated_15deg_upright.pdf",
-  "render_file": "/tmp/loall/01_stamp_rotated_15deg_upright.pdf"
+  "render_file": "/tmp/lo-one/01_stamp_rotated_15deg_upright.pdf"
 }

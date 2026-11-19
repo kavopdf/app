@@ -127,3 +127,51 @@ whole division of work and the settled decisions; read it once.
 **Nothing changes without a measurement before and after.** The engine is not rewritten. One construct,
 one measurement, one commit - kept only if nothing gets worse.
 
+
+---
+
+## STAGE `matrix` — the other half of every document
+
+    python3 tools/p2w-bench/stage.py
+
+If it says **`matrix`**, the Google side is complete but the LibreOffice side is not. A Google number
+alone says a document fails; only the **pair** says which construct Google drops, because LibreOffice
+honours nearly all of them. That pair is the whole point of this pass.
+
+    python3 tools/p2w-bench/gverify.py --lo <name>      # one document
+
+It renders with soffice, runs the same 42 checks, and writes to `/scratch/work/p2w/lo-res/`. Batch it:
+render several with one `soffice` call, then verify each. Commit `benchmarks/gverify-lo/` with the
+Google results every run.
+
+`--collect` now runs both sides automatically for every new document, so this stage only ever fills a
+backlog — never a fresh document.
+
+## STAGE `classify` and after — write the table, then stop
+
+When `stage.py` reports `classify`, this cron's measuring work is finished. Regenerate the capability
+table and commit it, then stop and let the classifier cron take over:
+
+    python3 tools/p2w-bench/gverify.py --matrix > benchmarks/GOOGLE-VS-LIBREOFFICE.md
+    cp /scratch/work/p2w/lo-res/*.json benchmarks/gverify-lo/
+    git add benchmarks/ && git commit -m "matrix: N of 213, both renderers" && git push
+
+**Do not classify, do not fix, do not change engine code.** The table is this cron's last deliverable
+and the next cron reads it.
+
+## What the table is for
+
+On the first 67 documents with both renders:
+
+    LibreOffice : 30 of 67 pass all 42
+    Google Docs :  7 of 67 pass all 42
+
+    32_stroke_lines   LO 0    Google 45
+    05_chars_extra    LO 6    Google 45
+    18_displacement   LO 3    Google 31
+    13_text_colours   LO 0    Google 13
+
+Every check Google fails that LibreOffice passes is a construct LibreOffice honours and Google does
+not. **The limitation is Google's, and it is a limitation of absolute placement in a flowing-text
+format** — which is why the model is flowing text, and why the engine is changed one construct at a
+time rather than rewritten.
