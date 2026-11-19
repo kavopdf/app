@@ -1,0 +1,11 @@
+{
+ "name": "26_footnote_marker_bottom_note_txtpos",
+ "status": "ok",
+ "rc": 1,
+ "passed": 40,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "32_stroke_lines"
+ ]
+}

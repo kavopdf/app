@@ -1,0 +1,17 @@
+{
+ "name": "77_arabic_rtl_document",
+ "status": "ok",
+ "rc": 1,
+ "passed": 39,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "17_matched_runs",
+  "18_displacement",
+  "26_text_overlap",
+  "43_within_10pt_x",
+  "47_margins",
+  "59_shape_anchor",
+  "60_text_column_right_edge"
+ ]
+}

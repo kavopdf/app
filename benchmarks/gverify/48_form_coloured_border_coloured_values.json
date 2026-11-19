@@ -1,0 +1,12 @@
+{
+ "name": "48_form_coloured_border_coloured_values",
+ "status": "ok",
+ "rc": 1,
+ "passed": 39,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "32_stroke_lines",
+  "59_shape_anchor"
+ ]
+}

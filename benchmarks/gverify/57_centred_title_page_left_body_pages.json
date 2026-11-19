@@ -1,0 +1,14 @@
+{
+ "name": "57_centred_title_page_left_body_pages",
+ "status": "ok",
+ "rc": 1,
+ "passed": 37,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "27_text_off_page",
+  "32_stroke_lines",
+  "44_header_footer"
+ ]
+}

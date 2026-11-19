@@ -1,0 +1,11 @@
+{
+ "name": "18_centred_heading_left_body_txtpos",
+ "status": "ok",
+ "rc": 1,
+ "passed": 40,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "32_stroke_lines"
+ ]
+}

@@ -1,0 +1,11 @@
+{
+ "name": "370_offer_letter",
+ "status": "ok",
+ "rc": 1,
+ "passed": 45,
+ "total": 47,
+ "failed": [
+  "18_displacement",
+  "60_text_column_right_edge"
+ ]
+}
