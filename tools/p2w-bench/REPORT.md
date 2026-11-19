@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**19 Nov 2026 · slot 23:53 → running IST · 32 min**
+**19 Nov 2026 · slot 23:53 → 01:21 IST · 1h 28m**
 
 > **75_merged_header_cell_three_columns** improved — 27.31 → 7.62. Corpus ratchet clean across 213 documents.
 
@@ -20,6 +20,7 @@
 | Moved but still open | **27** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `content-present-partly-displaced` |
+| Committed | **1** files in 1 commit(s) from `90193e0` — ...sent-partly-displaced-fillstroke-003744-0191.md |
 
 ## What was tried
 
@@ -39,17 +40,20 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `contA-05` | can RuleCollector carry the PDF paint operator so a  | 00:46 | - | - |
+| `contB-05` | what does check 65_table_span_down assert and why do | 00:46 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 23:53 → running · 32 min |
+| Slot window | 23:53 → 01:21 · 1h 28m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 16 |
-| Longest silence | **28.1 min** — from 23:56:48, after `classrow.py: refreshing the class file` |
-| Silences over 2 min | 2 |
+| Tool beats | 21 |
+| Longest silence | **35.0 min** — from 00:46:43, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 need a human |
 
 
@@ -57,7 +61,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **31 min** | `######################` |
+| fix - diagnose and change the engine | **31 min** | `########` |
+| measure or build - a conversion, screen or compile writes no beacon | **56 min** | `##############` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
 ## Best results this round
 
