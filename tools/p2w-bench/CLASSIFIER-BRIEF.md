@@ -253,3 +253,44 @@ seventeen files once.
 The state files are HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-HISTORY.json,
 RUN-LOG.md, RUN.json, TIMELINE.jsonl and TRACE.md. The last **committed** copy is the real handoff.
 
+
+---
+
+## THE CLASSES ARE LIBREOFFICE'S. GOOGLE'S ARE BIGGER AND INVISIBLE.
+
+`benchmarks/DEFECT-CLASSES.md` says in its own header: *"Grouped and ranked from
+`benchmarks/RANKING.csv` only"*. RANKING.csv is a soffice render. So every class the fixer is offered
+describes a renderer no user opens, and the checks that actually fail in Google appear in no class at
+all. Measured 19 Nov on 84 documents with both renders:
+
+    32_stroke_lines   LibreOffice  0    Google 53      <- no class mentions it
+    05_chars_extra    LibreOffice  6    Google 54      <- no class mentions it
+    18_displacement   LibreOffice  4    Google 46      <- no class mentions it
+
+LibreOffice fails `32_stroke_lines` on **zero** documents. Google fails it on 53. A classifier reading
+RANKING.csv alone can never produce a class for it, and the fixer can never be sent to fix it.
+
+### Both halves, every run
+
+    benchmarks/DEFECT-CLASSES.md        the .docx classes, from RANKING.csv          (as now)
+    tools/p2w-bench/txt/DEFECT-CLASSES-TXT.md   the .txt classes                     (as now)
+    benchmarks/DEFECT-CLASSES-GOOGLE.md  NEW - from benchmarks/gverify/ and gverify-lo/
+
+The third file groups the **42 checks** through both renderers and ranks by the gap:
+
+    python3 tools/p2w-bench/gverify.py --matrix
+
+Its "Where they disagree" table is already the ranking - `google fails` minus `libreoffice fails`, the
+checks that are Google's alone. Turn each into a class with the documents that fail it and the
+construct it names:
+
+    | signature | problem | google | libreoffice | documents |
+    |---|---|---:|---:|---|
+    | rules-as-drawings | 32_stroke_lines + 05_chars_extra | 53 | 0 | <names> |
+
+**A class where LibreOffice fails zero and Google fails fifty is the highest-value class in the
+repository**, because it is invisible to every other measurement and it is the reason the users see a
+broken document while the gate says it passes.
+
+`FINDINGS/RULES-ARE-DRAWINGS-GOOGLE-DROPS-THEM.md` already names the construct for the first of them.
+Read it before writing the class so the fixer is not sent to rediscover it.
