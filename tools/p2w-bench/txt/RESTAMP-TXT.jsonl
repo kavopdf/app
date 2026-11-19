@@ -151,7 +151,7 @@
 {"document": "72_bank_statement_no_rules_right_amounts", "applicable": 10, "passed": 9, "failed": 1, "failed_ids": "t13_amount_columns"}
 {"document": "73_marksheet_subject_marks_grade", "applicable": 9, "passed": 9, "failed": 0, "failed_ids": ""}
 {"document": "74_balance_sheet_indented_subitems", "applicable": 10, "passed": 8, "failed": 2, "failed_ids": "t02_position t13_amount_columns"}
-{"document": "75_merged_header_cell_three_columns", "applicable": 10, "passed": 9, "failed": 1, "failed_ids": "t13_amount_columns"}
+{"document": "75_merged_header_cell_three_columns", "applicable": 10, "passed": 10, "failed": 0, "failed_ids": ""}
 {"document": "76_devanagari_table", "applicable": 10, "passed": 10, "failed": 0, "failed_ids": ""}
 {"document": "77_arabic_rtl_document", "applicable": 9, "passed": 7, "failed": 2, "failed_ids": "t01_word_accuracy t12_word_invention"}
 {"document": "78_mixed_english_devanagari_line", "applicable": 9, "passed": 9, "failed": 0, "failed_ids": ""}

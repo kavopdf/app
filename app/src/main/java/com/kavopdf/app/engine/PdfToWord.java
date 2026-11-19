@@ -8677,14 +8677,25 @@ public final class PdfToWord {
         // top. Reading it from the page's rule list instead put every column 13.5 pt low on
         // 64_newspaper_uneven_columns_ad_boxes - the spanning row was written 32 pt tall where
         // the page's rule sat 44 pt down, and the cells below were placed from the rule.
-        float colTop = t.rowEdge[0];
+        // THE TOPMOST COLUMN SETS THE ROW'S TOP, not the first column that happens to hold
+        // text. A column row has ONE top edge, and every cell is placed from it; a cell whose
+        // own first line sits ABOVE that edge cannot be pulled up to it, because w:before is
+        // clamped at zero. Taking the edge from one column therefore wrote every column that
+        // starts higher than that one low by the difference: on
+        // 64_newspaper_uneven_columns_ad_boxes the classifieds column starts 10.8 pt above the
+        // two prose columns, and the whole column - heading, three ad boxes, its last line -
+        // landed 10 pt low, 9.11% of the page's ink off by 5 px with no character missing.
+        // The minimum over the columns lets the higher column sit at the edge and gives each
+        // lower column its own offset through w:before, which is the flowing-text model.
+        float colTop = Float.NaN;
         for (int c = 0; c < cols; c++) {
-            List<Table.CellPara> ps = u.parasAt(outRow, c);
-            if (ps.isEmpty()) continue;
-            colTop = Math.max(colTop, ps.get(0).baseY
-                    - (ps.get(0).size > 0f ? 0.8f * ps.get(0).size : 8f));
-            break;
+            float by = rowYs.get(c), sz = rowSizes.get(c);
+            if (Float.isNaN(by)) continue;
+            float top = by - (sz > 0f ? 0.8f * sz : 8f);
+            if (Float.isNaN(colTop) || top < colTop) colTop = top;
         }
+        if (Float.isNaN(colTop)) colTop = t.rowEdge[0];
+        colTop = Math.max(t.rowEdge[0], colTop);
         if (bandRows > 0) {
             rowEdgeOut[1] = Math.max(rowEdgeOut[0] + 1f, colTop);
         } else {

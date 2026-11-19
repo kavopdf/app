@@ -1,7 +1,3 @@
-A stage with no line is a stage that was never reached. That is the answer.
-
-| when | run | stage |
-|---|---|---|
 | 12 Nov probe | probe | commit test |
 | 12 Nov 07:25 | size-probe | testing a 796 KB commit payload |
 | 12 Nov 08:02 | baseline | started | phase measure |
@@ -199,3 +195,6 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 19 Nov 23:56 | fixer | attempt content-present-partly-displaced -> error (0/18 moved) |
 | 20 Nov 00:24 | fixer | attempt content-present-partly-displaced -> kept (2/18 moved) |
 | 20 Nov 01:21 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 20 Nov 01:52 | fixer | slot claimed - fixer running |
+| 20 Nov 02:25 | fixer | attempt content-present-partly-displaced -> kept (1/23 moved) |
+| 20 Nov 03:40 | fixer | attempt content-present-partly-displaced -> kept (1/23 moved) |

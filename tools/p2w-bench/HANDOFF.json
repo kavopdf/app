@@ -244,9 +244,25 @@
   {
    "at": "00:46",
    "text": "agent deployed: content-present-partly-displaced / B - what does check 65_table_span_down assert and why does 75_merged_header_cell_thr"
+  },
+  {
+   "at": "02:25",
+   "text": "attempt 7 on content-present-partly-displaced -> kept (1/23 moved)"
+  },
+  {
+   "at": "03:40",
+   "text": "attempt 8 on content-present-partly-displaced -> kept (1/23 moved)"
+  },
+  {
+   "at": "03:40",
+   "text": "agent landed: contA-05 /  -> FINDINGS/content-present-partly-displaced-newspaper-033000-a7d1.md"
+  },
+  {
+   "at": "03:40",
+   "text": "agent landed: contB-05 /  -> FINDINGS/content-present-partly-displaced-mergedheader-vmerge-192600-c3f1.md"
   }
  ],
- "next": "content-present-partly-displaced, 24 OPEN. Take 75_merged_header_cell_three_columns (27.31, the worst in the class): implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord:7950 already computes, and bucket each glyph by its own baseline band instead of the cell's top edge (7846) - the sibling finding says both are needed and that the band test alone moves Depot to the wrong row. Do not retry dropping fill-only rules from the Edge list (27.31 -> 46.58). Do not apply patches/rowgapok-run-pitch.patch on its old numbers.",
+ "next": "",
  "agents": [
   {
    "id": "contA-01",
@@ -363,9 +379,10 @@
    "question": "can RuleCollector carry the PDF paint operator so a shading fill stops acting as a cell separator, and what would it break",
    "expected": "00:37",
    "deployed": "00:46",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-19T19:16"
+   "status": "landed",
+   "finding": "FINDINGS/content-present-partly-displaced-newspaper-033000-a7d1.md",
+   "deployed_at": "2026-11-19T19:16",
+   "landed_at": "2026-11-19T22:10"
   },
   {
    "id": "contB-05",
@@ -374,15 +391,16 @@
    "question": "what does check 65_table_span_down assert and why does 75_merged_header_cell_three_columns still fail it with real w:vMerge",
    "expected": "00:41",
    "deployed": "00:46",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-19T19:16"
+   "status": "landed",
+   "finding": "FINDINGS/content-present-partly-displaced-mergedheader-vmerge-192600-c3f1.md",
+   "deployed_at": "2026-11-19T19:16",
+   "landed_at": "2026-11-19T22:10"
   }
  ],
  "run": {
-  "started": "23:53",
-  "ended": "01:21",
-  "ended_how": "forced"
+  "started": "01:52",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {
@@ -466,7 +484,7 @@
    "plan": ""
   }
  ],
- "context": "The class file's own rows say 24 OPEN for content-present-partly-displaced (the summary table said 18 and classrow.py --write recounted it; its duplicate-header bug is fixed in this run - it inserted a second identical 'Documents measured' line on every run that found nothing to change). TWO things are settled with numbers. (1) bank-statement-horizontal-rules-only is CLEAN at 0.10 on main: 13518ff fixed the split-row before/flowY drift. The same document also has a second, deeper cause - rowTables never runs because rowGapOk's floor max(size*2.4,16) rejects every 18.4 pt row pair (PdfToWord:9701); a patch that widens it to the run's own pitch (patches/rowgapok-run-pitch.patch) measured 6.89 -> 0.14 on engine 3abfa85 with 6 other class docs unchanged, and is now SUPERSEDED and unproven on the current engine. Do not apply it on the old numbers. (2) 75_merged_header_cell_three_columns (27.31) is NOT that mechanism and is untouched by that patch: spanR is computed at PdfToWord:7950 and read by nothing, so no w:vMerge is ever written, and a glyph's row comes from the cell's top edge at 7846. Also: the engine moved under this run - 13518ff landed at 22:30 IST while the fixer slot was claimed at 21:59, which round.py's claim did not prevent; whoever owns round.py should look at that.",
+ "context": "64_newspaper_uneven_columns_ad_boxes is a PLACEMENT defect, not a loss: text_recall 100.0, chars_missing 0, dx 0.0, dy 1.0, share5 9.11. An Explore agent instrumented it: the page reaches the model as a band-major ruled grid and PdfToWord.recutColumnBands (PdfToWord.java:8476) re-cuts it to one row of one cell per column. That row's top edge was taken from the FIRST non-empty column only (a 'break' in the loop, colTop = max over that one column), so the column row got column 1's box top, 122.77 pt, while the classifieds column starts at 112.4 pt. DocxWriter places each cell from the shared row edge and clamps w:before at zero, so nothing can pull a cell up: the whole classifieds column (heading, three ad boxes, last line) landed 10-11 pt low. That is the 9.11% of ink. Change: colTop is now the MINIMUM over all columns (each lower column gets its own w:before), measured on a scratch copy at share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 100.0, 1 page. recutColumnBands fires on exactly one document in the corpus (the agent scanned 81-213 individually plus the 11 column-layout documents; 1-80 not reliably scanned), so this moves one document, not a class - and a 5.65-point drop is above the 5.0 line attempt.py uses for a one-document keep. Do not retry: absolute positioning, dropping fill-only rules from the Edge list (27.31 -> 46.58), patches/rowgapok-run-pitch.patch, PATCH-t13-table-row-per-line.patch (101 worse, t04_structure is a line-count check).",
  "needs_human": [],
- "next_class": "content-present-partly-displaced"
+ "next_class": ""
 }

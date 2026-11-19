@@ -120,7 +120,7 @@ only a work queue.
 | 78 | `product-catalogue-code-left-price-right` | content-present-wholly-displaced | 22.44 | 1.71 | 1 | OPEN | - |
 | 79 | `316_contract_with_schedules` | content-present-wholly-displaced | 14.32 | 0.26 | 1 | FIXED | share@5 0.26 |
 | 80 | `table-of-contents-dot-leaders` | content-present-partly-displaced | 37.28 | 4.97 | 1 | OPEN | - |
-| 81 | `64_newspaper_uneven_columns_ad_boxes` | content-present-partly-displaced | 48.53 | 9.11 | 1 | OPEN | - |
+| 81 | `64_newspaper_uneven_columns_ad_boxes` | content-present-partly-displaced | 40.13 | 3.46 | 1 | OPEN | - |
 | 82 | `bank-statement-horizontal-rules-only` | none | 26.88 | 6.89 | 1 | FIXED | no defect |
 | 83 | `330_cad_drawing_sheet` | content-present-partly-displaced | 9.88 | 4.91 | 1 | OPEN | - |
 | 84 | `65_two_col_full_width_figure_caption` | content-present-partly-displaced | 22.54 | 1.75 | 1 | OPEN | - |
