@@ -562,3 +562,40 @@ were once measured with one tool and it produced a month of numbers that meant n
 
 **`verify_txt.py` and `verify_google.py` are the measurement, not the work.** Never edit either to make
 a result look better. If a check is wrong, that is a finding to write down, not a number to move.
+
+---
+
+## A RUN THAT MEASURES THE WHOLE CORPUS AND RECORDS NO ATTEMPT HAS DONE NOTHING
+
+Measured 19 Nov: a fixer run started, spent **172 minutes** on a corpus pass, recorded **0 attempts**,
+and released its slot. The cron platform still called it running, so the next scheduled run never fired.
+Two and a half hours of the only cron allowed to change the engine, and the engine did not change.
+
+**The baseline cron measures the corpus. That is its whole job.** A fixer run that measures the corpus
+has taken another cron's work and skipped its own.
+
+### The shape of a correct run
+
+    stage.py                  is it `fix`?          if not, one line and stop.
+    gverify.py --report       which check fails the most documents.
+    FINDINGS/                 has this been tried?   four fixes are recorded; re-deriving one is the
+                                                     most expensive thing a run can do.
+    change ONE construct      not two, not a refactor.
+    measure what it can affect  verify-change.py or a screen, not the whole corpus.
+    record the attempt        attempt.py - BEFORE the measurement, so a run that dies still counts.
+    keep or revert            better or equal and nothing worse, or revert.
+    commit the result         either way. A recorded negative result stops the next run repeating it.
+
+### The two rules that make it survive
+
+1. **Record the attempt first.** `attempt.py` before the measurement, not after. A run that dies at
+   minute 90 with the attempt recorded is a run that happened. A run that dies at minute 90 with
+   nothing recorded is indistinguishable from a run that never started, and the next run will do the
+   same thing again.
+
+2. **Never start a corpus pass you cannot finish.** If a change needs the full corpus to prove it and
+   there is not time, stop and write the change up in `FINDINGS/` instead. An uncommitted finding is
+   worth more than a hung slot.
+
+**If a run reaches its time limit having recorded an attempt, that is a good run** - even if the
+attempt was reverted. The attempt is the output. A run that produced no attempt produced nothing.
