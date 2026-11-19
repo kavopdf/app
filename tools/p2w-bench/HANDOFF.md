@@ -9,9 +9,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 21:59 |
-| ended | 23:00 |
-| how it ended | released |
+| started | 23:53 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -42,8 +42,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `13:44` attempt 1 on single-element-far-out -> partial (1/1 moved)
-- `14:51` attempt 1 on content-partly-lost-and-displaced -> partial (1/7 moved)
 - `15:28` attempt 2 on content-partly-lost-and-displaced -> kept (1/210 moved)
 - `16:12` attempt 3 on content-partly-lost-and-displaced -> kept (1/7 moved)
 - `17:00` attempt 18 on content-missing-partly-replaced -> reverted (0/16 moved)
@@ -67,6 +65,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `22:59` attempt 3 on content-present-partly-displaced -> reverted (0/24 moved)
 - `23:00` attempt 4 on content-present-partly-displaced -> kept (13/18 moved)
 - `23:00` ATTEMPTS.json attempt 4 on content-present-partly-displaced is a RATCHET STAMP for attempt 2 (the 22:30 recordBaseline split-row fix, 13/18 moved, corpus ratcheted at d129d46), not a second fix - attempt.py has no way to stamp a ratchet without appending an attempt, so a later report.py will read '2 kept'. One fix was kept this round on this class.
+- `23:56` attempt 5 on content-present-partly-displaced -> error (0/18 moved)
+- `00:24` attempt 6 on content-present-partly-displaced -> kept (2/18 moved)
 
 ## Where the rest of the state lives
 

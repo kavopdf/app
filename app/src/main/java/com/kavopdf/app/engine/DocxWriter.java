@@ -5683,6 +5683,36 @@ public final class DocxWriter {
         return row.get(c);
     }
 
+    /**
+     * How many grid ROWS the PAGE's own cell rectangle at (r, c) covers.
+     *
+     * <p>The row twin of {@link #spanCAt}, read from the same rectangles
+     * {@code PdfToWord.tableFromCells} measured. 1 is the neutral answer, so a table built
+     * by a pass that recorded no rectangles keeps the old behaviour exactly.
+     */
+    private static int spanRAt(PdfToWord.Table t, int r, int c) {
+        if (t == null || t.spanR == null || r < 0 || r >= t.spanR.size()) return 1;
+        List<Integer> row = t.spanR.get(r);
+        if (row == null || c < 0 || c >= row.size()) return 1;
+        return row.get(c);
+    }
+
+    /**
+     * Is (r, c) the continuation row of a vertical merge that started above it?
+     *
+     * <p>{@code PdfToWord} writes {@code spanC} on every row a rectangle covers (so each row
+     * stays a full tiling) and records {@code spanR} on the row the rectangle STARTS on. A
+     * slot is therefore a continuation when some row above it claims a span that reaches it.
+     * Bounded at 40 rows: a rectangle taller than that is not a header merge.
+     */
+    private static boolean vMergeContinues(PdfToWord.Table t, int r, int c) {
+        if (t == null || t.spanR == null || r <= 0 || r >= t.spanR.size()) return false;
+        for (int up = r - 1; up >= 0 && r - up <= 40; up--) {
+            if (spanRAt(t, up, c) >= r - up + 1) return true;
+        }
+        return false;
+    }
+
     /** Does this table know its cells' spans at all? */
     private static boolean hasSpans(PdfToWord.Table t) {
         return t != null && t.spanC != null && t.spanC.size() == t.rows.size();
@@ -6248,7 +6278,20 @@ public final class DocxWriter {
                 // cell: writing a w:tc for it would split the merge the page drew.
                 int mspan = hasSpans(t) ? spanCAt(t, r, c) : 1;
                 if (mspan == 0) { c++; continue; }
-                String cell = c < row.size() ? row.get(c) : "";
+                // THE ROW QUESTION, ASKED AT LAST. spanR has been recorded from the page's
+                // own rectangles since the ruled pass was written and nothing read it, so a
+                // cell the page merged DOWN was written as one cell per row with the text in
+                // the top one - and because each of those rows then held only part of a line,
+                // the row it should have shared grew to fit it. On
+                // 75_merged_header_cell_three_columns that is the whole 22.07 pt the table
+                // body sits low: two extra lines in two 17 pt header rows.
+                // w:vMerge is OOXML's own answer. The cell that STARTS a merge carries the
+                // text and w:vMerge restart; every row below it carries an empty cell with
+                // w:vMerge and the same gridSpan, which is what keeps the row a full tiling.
+                int vspan = hasSpans(t) ? spanRAt(t, r, c) : 1;
+                boolean vRestart = vspan > 1;
+                boolean vCont = !vRestart && hasSpans(t) && vMergeContinues(t, r, c);
+                String cell = (vCont || c >= row.size()) ? "" : row.get(c);
                 String face = r < t.fonts.size() && c < t.fonts.get(r).size()
                         ? t.fonts.get(r).get(c) : "";
                 // The style the page drew this cell in. `faceName` below strips the style word
@@ -6323,6 +6366,9 @@ public final class DocxWriter {
                 inner.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(spanTw)
                         .append("\" w:type=\"dxa\"/>");
                 if (span > 1) inner.append("<w:gridSpan w:val=\"").append(span).append("\"/>");
+                // vMerge follows gridSpan in the OOXML tcPr order, ahead of tcBorders.
+                if (vRestart) inner.append("<w:vMerge w:val=\"restart\"/>");
+                else if (vCont) inner.append("<w:vMerge/>");
                 // tcBorders comes after gridSpan and before noWrap in the OOXML tcPr order.
                 if (sepSz > 0 && sepColour != null) {
                     inner.append("<w:tcBorders><w:bottom w:val=\"single\" w:sz=\"").append(sepSz)
@@ -6431,12 +6477,29 @@ public final class DocxWriter {
                     // instead pushed 9 cells of mutual-fund-statement 3.8 pt up: their measured
                     // baseline was 18.5 pt into a 19 pt row, which is inside the row and outside
                     // the row less its rule.
-                    float roomPt = rowHeightTw / (float) TWIPS_PER_PT;
+                    // A MERGED CELL'S BOX IS THE ROWS IT COVERS, not the row it starts on.
+                    // A label centred down a two-row header sits further below the merge's top
+                    // edge than one row's pitch, so a cap of one row rejected the page's own
+                    // baseline and dropped the label back to the foot of the first row -
+                    // measured on 75_merged_header_cell_three_columns, where "Depot" and
+                    // "Fleet held" came out 10.8 and 10.9 pt high.
+                    int roomTwHere = rowHeightTw;
+                    if (vspan > 1 && exactRows && rowEdge != null
+                            && r + vspan < rowEdge.length) {
+                        float spanPt = rowEdge[r + vspan] - rowEdge[r];
+                        if (spanPt > 0f && spanPt < 400f) {
+                            roomTwHere = Math.max(roomTwHere,
+                                    (int) Math.round(spanPt * TWIPS_PER_PT));
+                        }
+                    }
+                    float roomPt = roomTwHere / (float) TWIPS_PER_PT;
                     if (wantPt >= LINE_BASE * cellSz && wantPt <= roomPt) {
                         int boxTw = boxHere;
                         int beforeTw = (int) Math.round(
                                 (wantPt - LINE_BASE * boxTw / (float) TWIPS_PER_PT) * TWIPS_PER_PT);
-                        int capTw = Math.max(0, Math.min(rowHeightTw, contentTwHere) - boxTw);
+                        int capTw = roomTwHere == rowHeightTw
+                                ? Math.max(0, Math.min(rowHeightTw, contentTwHere) - boxTw)
+                                : Math.max(0, roomTwHere - boxTw);
                         cellBoxTw = boxTw;
                         cellBeforeTw = Math.max(0, Math.min(beforeTw, capTw));
                         cellPlaced = true;

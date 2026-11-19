@@ -490,3 +490,19 @@
 {"t": 1795109421.3706887, "ist": "23:00:21", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795109421.382978, "ist": "23:00:21", "ev": "release", "d": "fixer released"}
 {"t": 1795109421.4773638, "ist": "23:00:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795112586.7334056, "ist": "23:53:06", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795112586.864912, "ist": "23:53:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795112595.5494637, "ist": "23:53:15", "ev": "beat", "d": "claimed, reading handoff"}
+{"t": 1795112595.7113361, "ist": "23:53:15", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1795112595.8385649, "ist": "23:53:15", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795112599.3113985, "ist": "23:53:19", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795112803.0038564, "ist": "23:56:43", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795112805.8387253, "ist": "23:56:45", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795112808.1494894, "ist": "23:56:48", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795112808.3859835, "ist": "23:56:48", "ev": "attempt", "d": "content-present-partly-displaced -> error"}
+{"t": 1795112808.5173738, "ist": "23:56:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795112808.6429987, "ist": "23:56:48", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795114496.9193661, "ist": "00:24:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795114497.2930107, "ist": "00:24:57", "ev": "attempt", "d": "content-present-partly-displaced -> kept"}
+{"t": 1795114497.4100494, "ist": "00:24:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795114497.5303478, "ist": "00:24:57", "ev": "beat", "d": "classrow.py: refreshing the class file"}

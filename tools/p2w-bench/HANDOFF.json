@@ -228,6 +228,14 @@
   {
    "at": "23:00",
    "text": "ATTEMPTS.json attempt 4 on content-present-partly-displaced is a RATCHET STAMP for attempt 2 (the 22:30 recordBaseline split-row fix, 13/18 moved, corpus ratcheted at d129d46), not a second fix - attempt.py has no way to stamp a ratchet without appending an attempt, so a later report.py will read '2 kept'. One fix was kept this round on this class."
+  },
+  {
+   "at": "23:56",
+   "text": "attempt 5 on content-present-partly-displaced -> error (0/18 moved)"
+  },
+  {
+   "at": "00:24",
+   "text": "attempt 6 on content-present-partly-displaced -> kept (2/18 moved)"
   }
  ],
  "next": "content-present-partly-displaced, 24 OPEN. Take 75_merged_header_cell_three_columns (27.31, the worst in the class): implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord:7950 already computes, and bucket each glyph by its own baseline band instead of the cell's top edge (7846) - the sibling finding says both are needed and that the band test alone moves Depot to the wrong row. Do not retry dropping fill-only rules from the Edge list (27.31 -> 46.58). Do not apply patches/rowgapok-run-pitch.patch on its old numbers.",
@@ -342,9 +350,9 @@
   }
  ],
  "run": {
-  "started": "21:59",
-  "ended": "23:00",
-  "ended_how": "released"
+  "started": "23:53",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

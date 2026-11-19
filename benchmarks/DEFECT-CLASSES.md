@@ -18,9 +18,9 @@ dominates it.
 | content-loss | content-missing-nothing-in-its-place | 6 | 16 |
 | mixed | content-partly-lost-and-displaced | 6 | 4 |
 | mixed | content-partly-lost | 6 | 0 |
-| displacement | content-present-partly-displaced | 24 | 0 |
+| displacement | content-present-partly-displaced | 23 | 0 |
 | displacement | content-present-wholly-displaced | 7 | 1 |
-| clean | none | 0 | 129 |
+| clean | none | 0 | 130 |
 
 `single-element-far-out` is closed: it held one document, `newsletter-3col-header-footer`, and
 no document carries the class any more. The class was defined by `share5 < 8 and max_pt > 30`; the
@@ -87,7 +87,7 @@ only a work queue.
 | 45 | `317_rti_response` | content-missing-partly-replaced | 13.97 | 0.65 | 1 | FIXED | share@5 0.65 |
 | 46 | `gst-invoice-with-qr-code` | none | 2.73 | 0.07 | 1 | FIXED | no defect |
 | 47 | `itr-computation-with-slab-table` | content-partly-lost-and-displaced | 64.93 | 42.33 | 1 | OPEN | - |
-| 48 | `table-with-merged-cells` | content-partly-lost-and-displaced | 17.50 | 4.93 | 1 | OPEN | - |
+| 48 | `table-with-merged-cells` | none | 17.50 | 4.93 | 1 | FIXED | no defect |
 | 49 | `14_stamp_chars_positioned_td` | content-partly-lost-and-displaced | 5.50 | 3.89 | 1 | OPEN | - |
 | 50 | `newspaper-2col-fullwidth-headline` | content-partly-lost-and-displaced | 17.98 | 0.01 | 1 | FIXED | share@5 0.01 |
 | 51 | `321_auditors_report` | content-partly-lost-and-displaced | 22.72 | 0.37 | 1 | FIXED | share@5 0.37 |
@@ -104,7 +104,7 @@ only a work queue.
 | 62 | `304_package_insert_small_print` | content-present-partly-displaced | 25.84 | 2.47 | 1 | OPEN | - |
 | 63 | `61_two_col_abstract_spanning` | content-partly-lost | 24.44 | 2.01 | 1 | OPEN | - |
 | 64 | `80_gstin_pan_cin_ifsc_table` | content-partly-lost | 14.89 | 2.01 | 1 | OPEN | - |
-| 65 | `75_merged_header_cell_three_columns` | content-present-partly-displaced | 37.74 | 27.31 | 1 | OPEN | - |
+| 65 | `75_merged_header_cell_three_columns` | content-partly-lost-and-displaced | 29.22 | 7.62 | 1 | OPEN | - |
 | 66 | `71_invoice_space_aligned_no_rules` | content-present-wholly-displaced | 42.21 | 26.88 | 1 | OPEN | - |
 | 67 | `report-2col-table-spanning-both-columns` | none | 43.81 | 15.22 | 1 | FIXED | no defect |
 | 68 | `03_stamp_vertical_90deg` | content-present-wholly-displaced | 30.74 | 16.98 | 1 | OPEN | - |

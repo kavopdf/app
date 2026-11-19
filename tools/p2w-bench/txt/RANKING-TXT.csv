@@ -152,7 +152,7 @@ document,applicable,passed,failed,abstained,failed_ids
 72_bank_statement_no_rules_right_amounts,10,9,1,2,t13_amount_columns
 73_marksheet_subject_marks_grade,9,9,0,3,-
 74_balance_sheet_indented_subitems,10,8,2,2,t02_position t13_amount_columns
-75_merged_header_cell_three_columns,10,9,1,2,t13_amount_columns
+75_merged_header_cell_three_columns,10,10,0,2,-
 76_devanagari_table,10,10,0,2,-
 77_arabic_rtl_document,9,7,2,3,t01_word_accuracy t12_word_invention
 78_mixed_english_devanagari_line,9,9,0,3,-

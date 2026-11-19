@@ -267,6 +267,27 @@ public final class PdfToWord {
         return best;
     }
 
+    /**
+     * Which row band a y falls in: the index of the row edge at or above it.
+     *
+     * <p>{@code E} holds the row edges and one closing edge, so band i runs from E[i] to
+     * E[i+1]. A y above the first edge reads as row 0 and one below the last as the last row,
+     * because a cell's own rectangle is the caller's evidence that the glyph is inside the
+     * table at all.
+     */
+    private static int bandInCell(List<Float> R, List<Float> E, float y, int r0, int cover) {
+        int b = bandOf(R, E, y);
+        if (b < r0) b = r0;
+        int last = Math.min(R.size() - 1, r0 + Math.max(1, cover) - 1);
+        if (b > last) b = last;
+        return b;
+    }
+
+    private static int bandOf(List<Float> R, List<Float> E, float y) {
+        for (int i = 0; i + 1 < E.size(); i++) if (y < E.get(i + 1)) return Math.min(i, R.size() - 1);
+        return Math.max(0, R.size() - 1);
+    }
+
     private static String cellPos(Table t, int r, int c) {
         try {
             float x = t.cellX.get(r).get(c);
@@ -7817,35 +7838,98 @@ public final class PdfToWord {
             if (nextX - C.get(c) < 6f) return null;
         }
 
+        // ---- HOW MANY ROWS DOES EACH RECTANGLE REALLY COVER? --------------------
+        // A rectangle's HEIGHT is not evidence of a vertical merge. intersectionsToCells closes
+        // a cell on the nearest connected corner, so wherever the page did not draw a row
+        // separator under every column - the normal shape of a table whose second header row is
+        // narrower than its first, and of any table with a vertically merged cell - the only
+        // closed region is one cell tall enough for two rows, and both rows' texts are then
+        // emitted in the upper one. On 75_merged_header_cell_three_columns that hoisted
+        // "1,842", "6,42,180" and "1,284.42" out of the data row and into the header, and left
+        // the data row short of three values.
+        //
+        // THE TEXT IS THE EVIDENCE. A cell the page really merged down carries FEWER lines than
+        // the rows it covers - one label centred across two header rows - while a cell that is
+        // only missing a separator carries one line per row it spans. So: count the row bands
+        // this cell's own glyphs fall in. Fewer bands than rows covered = a merge, and its text
+        // stays in its first row. As many bands as rows = the page's separator is missing, not
+        // the cell, and each line belongs to the row its own baseline falls in.
+        float bottomB = -Float.MAX_VALUE, rightB = -Float.MAX_VALUE;
+        for (float[] c : group) {
+            bottomB = Math.max(bottomB, c[3]);
+            rightB = Math.max(rightB, c[2]);
+        }
+        List<Float> REb = new ArrayList<>(R);
+        REb.add(Math.max(R.get(nrow - 1) + 1f, bottomB));
+        List<Float> CEb = new ArrayList<>(C);
+        CEb.add(rightB);
+        int ncells = group.size();
+        int[] cellR0 = new int[ncells], cellCover = new int[ncells];
+        int[] cellC0 = new int[ncells], cellC1 = new int[ncells];
+        List<java.util.TreeSet<Integer>> cellBands = new ArrayList<>();
+        for (int i = 0; i < ncells; i++) {
+            float[] cell = group.get(i);
+            int r0 = edgeIdx(REb, cell[1]), r1 = edgeIdx(REb, cell[3]);
+            if (r1 < r0) { int sw = r0; r0 = r1; r1 = sw; }
+            int c0 = edgeIdx(CEb, cell[0]), c1 = edgeIdx(CEb, cell[2]);
+            if (c1 < c0) { int sw = c0; c0 = c1; c1 = sw; }
+            cellR0[i] = Math.max(0, Math.min(nrow - 1, r0));
+            cellCover[i] = Math.max(1, Math.min(nrow, r1) - cellR0[i]);
+            cellC0[i] = Math.max(0, Math.min(ncol - 1, c0));
+            cellC1[i] = Math.max(cellC0[i], Math.min(ncol, c1));
+            cellBands.add(new java.util.TreeSet<Integer>());
+        }
+
         List<List<List<Glyph>>> buckets = new ArrayList<>();
         for (int r = 0; r < nrow; r++) {
             List<List<Glyph>> row = new ArrayList<>();
             for (int c = 0; c < ncol; c++) row.add(new ArrayList<>());
             buckets.add(row);
         }
-        float[] prevCell = null;
+        List<int[]> glyphCell = new ArrayList<>();
+        List<Float> glyphCy = new ArrayList<>();
+        List<Glyph> glyphKeep = new ArrayList<>();
+        int prevCell = -1;
         float prevY = 0, prevRight = 0, prevSize = 0;
         for (Glyph g : glyphs) {
             float cx = g.x + g.width / 2f;
             float cy = g.y + g.size * 0.35f;
-            float[] hit = null;
-            for (float[] cell : group) {
+            int hit = -1;
+            for (int i = 0; i < ncells; i++) {
+                float[] cell = group.get(i);
                 if (cx >= cell[0] - 2f && cx <= cell[2] + 2f
-                        && cy >= cell[1] - 2f && cy <= cell[3] + 2f) { hit = cell; break; }
+                        && cy >= cell[1] - 2f && cy <= cell[3] + 2f) { hit = i; break; }
             }
-            if (hit == null && prevCell != null && Math.abs(g.y - prevY) <= 0.5f
+            if (hit < 0 && prevCell >= 0 && Math.abs(g.y - prevY) <= 0.5f
                     && g.x >= prevRight - 1f
                     && g.x - prevRight <= Math.max(9f, Math.max(g.size, prevSize) * 1.1f)) {
                 hit = prevCell;
             }
-            if (hit == null) { prevCell = null; continue; }
+            if (hit < 0) { prevCell = -1; continue; }
             prevCell = hit;
             prevY = g.y;
             prevRight = g.x + g.width;
             prevSize = g.size;
-            int ri = R.indexOf(hit[1]);
-            int ci = C.indexOf(hit[0]);
-            if (ri >= 0 && ci >= 0) buckets.get(ri).get(ci).add(g);
+            // THE BAND IS CLAMPED TO THE CELL'S OWN ROWS. A glyph within the 2 pt hit
+            // tolerance of its cell's top edge has a cy just above that edge, and its band
+            // would then be the row ABOVE the cell - which writes the cell's width on a row
+            // that does not own it and leaves its own row short of the grid. Measured on
+            // purchase-order: 0.90 -> 2.64, two w:tc short.
+            cellBands.get(hit).add(bandInCell(R, REb, cy, cellR0[hit], cellCover[hit]));
+            glyphCell.add(new int[]{hit});
+            glyphCy.add(cy);
+            glyphKeep.add(g);
+        }
+        boolean[] cellMerge = new boolean[ncells];
+        for (int i = 0; i < ncells; i++) {
+            cellMerge[i] = cellBands.get(i).size() < cellCover[i];
+        }
+        for (int q = 0; q < glyphKeep.size(); q++) {
+            int i = glyphCell.get(q)[0];
+            int ri = cellMerge[i] ? cellR0[i]
+                    : bandInCell(R, REb, glyphCy.get(q), cellR0[i], cellCover[i]);
+            int ci = C.indexOf(group.get(i)[0]);
+            if (ri >= 0 && ri < nrow && ci >= 0) buckets.get(ri).get(ci).add(glyphKeep.get(q));
         }
 
         Table t = new Table();
@@ -7890,15 +7974,22 @@ public final class PdfToWord {
         RE.add(bottom);
         int[][] sc = new int[nrow][ncol];
         int[][] sr = new int[nrow][ncol];
-        for (float[] cell : group) {
-            int c0 = edgeIdx(CE, cell[0]), c1 = edgeIdx(CE, cell[2]);
-            int r0 = edgeIdx(RE, cell[1]), r1 = edgeIdx(RE, cell[3]);
-            if (c1 < c0) { int tmp = c0; c0 = c1; c1 = tmp; }
-            if (r1 < r0) { int tmp = r0; r0 = r1; r1 = tmp; }
-            c0 = Math.max(0, Math.min(ncol - 1, c0));
-            r0 = Math.max(0, Math.min(nrow - 1, r0));
-            c1 = Math.max(c0, Math.min(ncol, c1));
-            r1 = Math.max(r0, Math.min(nrow, r1));
+        for (int i = 0; i < ncells; i++) {
+            int c0 = cellC0[i], c1 = cellC1[i];
+            int r0 = cellR0[i], r1 = Math.min(nrow, r0 + cellCover[i]);
+            // A cell that is NOT a merge is one cell per row band its text occupies - the page
+            // simply did not draw the separator - so each of those rows owns its own width.
+            // Writing the rectangle's width on the rows below instead is what made a missing
+            // separator look like a vertical merge and hoisted the lower row's values into the
+            // row above it.
+            if (!cellMerge[i]) {
+                for (int rb : cellBands.get(i)) {
+                    if (rb < 0 || rb >= nrow || sc[rb][c0] != 0) continue;
+                    sc[rb][c0] = Math.max(1, c1 - c0);
+                    sr[rb][c0] = 1;
+                }
+                continue;
+            }
             // A rectangle's HORIZONTAL extent belongs to EVERY row it covers, not just the
             // row it starts on. Zeroing the slots below the first row would say "the cell
             // above owns this slot", and only w:vMerge can say that - without it the row is
@@ -7911,7 +8002,13 @@ public final class PdfToWord {
             for (int r = r0; r < r1; r++) {
                 if (sc[r][c0] != 0) continue;   // a second rectangle claiming the same slot
                 sc[r][c0] = Math.max(1, c1 - c0);
-                sr[r][c0] = Math.max(1, r1 - r0);
+                // spanR belongs to the row the rectangle STARTS on and nowhere else. It is the
+                // answer to "how many rows does THIS cell cover", and a continuation row does
+                // not cover them - the cell above it does. Writing the full span on every row
+                // it covers made DocxWriter emit a second w:vMerge restart on the row below
+                // (measured: 75_merged_header_cell_three_columns 27.31 -> 30.08, text_recall
+                // 100 -> 94.23), which is two merges stacked where the page drew one.
+                sr[r][c0] = (r == r0) ? Math.max(1, r1 - r0) : 1;
             }
         }
         t.header = nrow > 1;

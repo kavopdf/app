@@ -8,7 +8,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 7,table-inside-two-column-page,mixed,content-partly-lost-and-displaced,62.45,50.76,45.62,38.11,29.13,3.84,64.32,82.08,100.0,0,1,1,,0,77.16,95.14,100.00
 8,360_restaurant_menu,content-loss,content-missing-partly-replaced,48.59,42.48,39.16,34.43,28.56,7.68,19.2,45.6,100.0,0,1,1,39.59,5713,72.20,74.77,100.00
 9,text-held-twice-shadow-text,content-loss,content-missing-partly-replaced,49.2,43.95,40.42,30.29,28.35,29.28,52.8,60.48,100.0,0,1,1,,0,79.63,87.47,100.00
-10,75_merged_header_cell_three_columns,displacement,content-present-partly-displaced,37.74,33.71,31.69,27.31,11.72,4.32,12.96,22.08,100.0,0,1,1,70.03,9082,77.19,93.48,100.00
+10,75_merged_header_cell_three_columns,mixed,content-partly-lost-and-displaced,29.22,9.06,8.09,7.62,5.08,0.96,14.88,20.16,100.0,0,1,1,70.5,9082,77.22,97.83,100.00
 11,71_invoice_space_aligned_no_rules,displacement,content-present-wholly-displaced,42.21,33.65,28.5,26.88,12.28,3.84,6.24,9.12,100.0,0,1,1,95.05,3937,77.18,100.00,100.00
 12,03_stamp_vertical_90deg,displacement,content-present-wholly-displaced,30.74,27.72,24.5,16.98,0.78,2.88,4.8,5.76,100.0,0,1,1,80.53,10885,77.81,95.28,100.00
 13,68_journal_wide_table_spanning,displacement,content-present-wholly-displaced,35.63,26.51,21.47,12.09,0.6,1.92,3.84,8.64,100.0,0,1,1,87.33,3292,80.02,78.93,100.00
@@ -24,7 +24,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 23,417_rotate180_and_mirrored,displacement,content-present-wholly-displaced,42.9,22.86,14.4,5.5,0.17,1.44,2.88,5.76,100.0,0,2,2,,0,59.94,100.00,100.00
 24,23_timetable_grid_txtpos,content-loss,content-missing-nothing-in-its-place,17.06,5.43,5.24,5.16,5.06,0.96,41.76,46.56,100.0,0,1,1,75.37,9003,70.80,100.00,100.00
 25,table-of-contents-dot-leaders,displacement,content-present-partly-displaced,37.28,15.21,9.72,4.97,2.64,0.96,3.36,26.4,100.0,0,1,1,72.60,741,62.60,89.33,100.00
-26,table-with-merged-cells,mixed,content-partly-lost-and-displaced,17.5,8.79,6.22,4.93,3.94,1.44,9.12,13.92,100.0,0,1,1,,0,92.34,100.00,100.00
+26,table-with-merged-cells,clean,none,13.45,4.17,1.71,0.67,0.37,0.96,1.92,11.04,100.0,0,1,1,,0,94.1,100.00,100.00
 27,330_cad_drawing_sheet,displacement,content-present-partly-displaced,9.88,8.61,7.74,4.91,1.62,2.4,5.76,14.88,100.0,0,1,1,,0,91.61,41.57,100.00
 28,33_sans_nondefault_body,mixed,content-partly-lost,27.65,13.53,8.77,4.49,3.32,0.96,7.2,36.0,100.0,0,1,1,93.80,11018,82.72,100.00,100.00
 29,14_stamp_chars_positioned_td,mixed,content-partly-lost-and-displaced,5.5,4.75,4.39,3.89,3.08,6.24,17.76,25.44,100.0,0,1,1,88.80,51074,95.54,97.58,100.00

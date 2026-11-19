@@ -239,7 +239,7 @@
   "status": "OPEN"
  },
  "content-present-partly-displaced": {
-  "attempts": 4,
+  "attempts": 6,
   "first_seen": null,
   "history": [
    {
@@ -269,26 +269,44 @@
     "outcome": "kept",
     "reason": "ratchet stamp for the 22:30 kept attempt (recordBaseline split-row fix, 13/18 moved): d129d46 measured the whole corpus on engine 13518ff - STATE.json ratchet compared, baseline 213, current 213, 0 re",
     "total": 18
+   },
+   {
+    "at": "2026-11-19 23:56",
+    "moved": 0,
+    "outcome": "error",
+    "reason": "IN PROGRESS - 75_merged_header_cell_three_columns: emit w:vMerge from spanR + bucket glyphs by their own baseline band instead of the cell top edge (PdfToWord:7846); baseline 27.31 reproduced on this ",
+    "total": 18
+   },
+   {
+    "at": "2026-11-20 00:24",
+    "moved": 2,
+    "outcome": "kept",
+    "reason": "w:vMerge emitted from spanR (DocxWriter) + spanR recorded only on the row a rectangle starts (PdfToWord) + a rectangle spanning rows is a merge only when its text occupies fewer bands than the rows it",
+    "total": 18
    }
   ],
   "last": null,
-  "last_engine": "13518ff",
-  "last_moved": 13,
+  "last_engine": "13518ff+3c30e9965a",
+  "last_moved": 2,
   "last_total": 18,
   "outcomes": [
    "reverted",
    "kept",
    "reverted",
+   "kept",
+   "error",
    "kept"
   ],
-  "ratchet_at": "19 Nov 23:00",
+  "ratchet_at": "20 Nov 00:24",
   "ratchet_docs": 213,
-  "reason": "ratchet stamp for the 22:30 kept attempt (recordBaseline split-row fix, 13/18 moved): d129d46 measured the whole corpus on engine 13518ff - STATE.json ratchet compared, baseline 213, current 213, 0 regressions, 13 improvements, RANKING.csv 213 rows 213 scored. It was never stamped, so pending.py held the class for a ratchet that had already run.",
+  "reason": "w:vMerge emitted from spanR (DocxWriter) + spanR recorded only on the row a rectangle starts (PdfToWord) + a rectangle spanning rows is a merge only when its text occupies fewer bands than the rows it covers, else each line goes to its own band and the cell's width is written there. 75_merged_header_cell_three_columns 27.31->7.62 (Google 39/47->41/47), table-with-merged-cells 4.93->0.67 (Google 42/47->43/47, 65_table_span_down now passes). 4 of 213 docx changed, 2 bank forms unchanged in score, 209 identical by content hash. regress.py --check PASS.",
   "reasons": [
    "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them refuted: 75_merged_header_cell_three_columns 27.31 -> 46.58 and 1 page -> 2, because the shading band's edges are the only rules that close those header cells. Reverted. The real fix is the finding's: lattice-cut cells plus w:vMerge, since spanR is computed and read by nothing.",
    "recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down the page (bank-statement 0.4554 pt x 12 rows = +5.85 pt). Whole corpus 13 improved, 0 worse. Also published the table this engine actually produces - ten rows were stale and had blocked every fixer run since 11:55.",
    "SUPERSEDED, nothing landed. rowTables is gated out on this page by rowGapOk's floor max(size*2.4,16) - every 18.4 pt row pair was rejected, so bank-statement fell back to flow. patches/rowgapok-run-pitch.patch (widened to the run's own pitch) measured 6.89 -> 0.14 on 3abfa85 and 6 other class docs unchanged. While this run measured, 13518ff landed the same defect from the other end (the split-row before/flowY drift) and that document is now clean at 0.10 on main, so the patch is unproven on the current engine and must be re-screened from zero if anyone wants the table. Numbers in FINDINGS/content-present-partly-displaced-rowgapok-225500-fixer.md.",
-   "ratchet stamp for the 22:30 kept attempt (recordBaseline split-row fix, 13/18 moved): d129d46 measured the whole corpus on engine 13518ff - STATE.json ratchet compared, baseline 213, current 213, 0 regressions, 13 improvements, RANKING.csv 213 rows 213 scored. It was never stamped, so pending.py held the class for a ratchet that had already run."
+   "ratchet stamp for the 22:30 kept attempt (recordBaseline split-row fix, 13/18 moved): d129d46 measured the whole corpus on engine 13518ff - STATE.json ratchet compared, baseline 213, current 213, 0 regressions, 13 improvements, RANKING.csv 213 rows 213 scored. It was never stamped, so pending.py held the class for a ratchet that had already run.",
+   "IN PROGRESS - 75_merged_header_cell_three_columns: emit w:vMerge from spanR + bucket glyphs by their own baseline band instead of the cell top edge (PdfToWord:7846); baseline 27.31 reproduced on this engine",
+   "w:vMerge emitted from spanR (DocxWriter) + spanR recorded only on the row a rectangle starts (PdfToWord) + a rectangle spanning rows is a merge only when its text occupies fewer bands than the rows it covers, else each line goes to its own band and the cell's width is written there. 75_merged_header_cell_three_columns 27.31->7.62 (Google 39/47->41/47), table-with-merged-cells 4.93->0.67 (Google 42/47->43/47, 65_table_span_down now passes). 4 of 213 docx changed, 2 bank forms unchanged in score, 209 identical by content hash. regress.py --check PASS."
   ],
   "requeues": 0,
   "status": "OPEN"

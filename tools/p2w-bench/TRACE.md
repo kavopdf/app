@@ -6,27 +6,6 @@
 | 12 Nov 18:52 | fixer | ratchet | held or rose |
 | 12 Nov 18:52 | fixer | ratchet --txt | held or rose |
 | 12 Nov 18:52 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
-| 12 Nov 22:46 | fixer | claim | fixer claimed the slot |
-| 12 Nov 22:46 | fixer | build-engine | started |
-| 12 Nov 22:48 | fixer | build-engine | started |
-| 12 Nov 22:52 | fixer | hypothesis | 20_within_10pt (+4) -> confirmed |
-| 12 Nov 22:52 | fixer | attempt | 20_within_10pt (+4) -> error (OPEN) |
-| 12 Nov 22:52 | fixer | classify | 43 classes from 208 documents |
-| 12 Nov 23:48 | fixer | claim | fixer claimed the slot |
-| 12 Nov 23:49 | fixer | build-engine | started |
-| 12 Nov 23:50 | fixer | classify | 43 classes from 208 documents |
-| 12 Nov 23:50 | fixer | build-engine | started |
-| 13 Nov 00:00 | fixer | ratchet | held or rose |
-| 13 Nov 00:00 | fixer | ratchet --txt | held or rose |
-| 13 Nov 00:00 | fixer | hypothesis | 20_within_10pt (+4) -> confirmed |
-| 13 Nov 00:00 | fixer | attempt | 20_within_10pt (+4) -> error (OPEN) |
-| 13 Nov 00:00 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 00:00 | ? | commit-gate | started |
-| 13 Nov 00:46 | fixer | claim | fixer claimed the slot |
-| 13 Nov 00:47 | fixer | build-engine | started |
-| 13 Nov 00:48 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 00:48 | fixer | classify --txt | 4 classes from 208 documents |
-| 13 Nov 00:48 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:53 | fixer | ratchet | held or rose |
 | 13 Nov 00:53 | fixer | ratchet --txt | held or rose |
 | 13 Nov 00:53 | fixer | ratchet | REGRESSED 4 |
@@ -406,3 +385,24 @@
 | 19 Nov 22:32 | fixer | attempt | content-present-partly-displaced -> kept (13/18 moved) |
 | 19 Nov 22:59 | ? | attempt | content-present-partly-displaced -> reverted (0/24 moved) |
 | 19 Nov 23:00 | fixer | attempt | content-present-partly-displaced -> kept (13/18 moved) |
+| 19 Nov 23:53 | fixer | claim | fixer claimed the slot |
+| 19 Nov 23:54 | fixer | build-engine | started |
+| 19 Nov 23:55 | fixer | build-engine | engine built in 39s |
+| 19 Nov 23:56 | fixer | attempt | content-present-partly-displaced -> error (0/18 moved) |
+| 19 Nov 23:57 | fixer | build-engine | started |
+| 19 Nov 23:58 | fixer | build-engine | engine built in 40s |
+| 19 Nov 23:58 | fixer | build-engine | started |
+| 19 Nov 23:59 | fixer | build-engine | engine built in 44s |
+| 20 Nov 00:00 | fixer | build-engine | started |
+| 20 Nov 00:01 | fixer | build-engine | engine built in 46s |
+| 20 Nov 00:01 | fixer | build-engine | started |
+| 20 Nov 00:02 | fixer | build-engine | engine built in 42s |
+| 20 Nov 00:03 | fixer | build-engine | started |
+| 20 Nov 00:04 | fixer | build-engine | engine built in 41s |
+| 20 Nov 00:07 | fixer | build-engine | started |
+| 20 Nov 00:07 | fixer | build-engine | engine built in 39s |
+| 20 Nov 00:09 | fixer | build-engine | started |
+| 20 Nov 00:09 | fixer | build-engine | engine built in 41s |
+| 20 Nov 00:14 | fixer | build-engine | started |
+| 20 Nov 00:14 | fixer | build-engine | engine built in 41s |
+| 20 Nov 00:24 | fixer | attempt | content-present-partly-displaced -> kept (2/18 moved) |
