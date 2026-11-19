@@ -122,6 +122,116 @@ def verify(text):
     return problems, checked
 
 
+def _report_json():
+    """report.py's own numbers, as a dict. None when it cannot be read."""
+    import json
+    try:
+        r = subprocess.run([sys.executable, os.path.join(HERE, "report.py"), "--json"],
+                           capture_output=True, text=True, timeout=120, cwd=os.path.dirname(HERE))
+        if r.returncode != 0 or not r.stdout.strip():
+            return None
+        return json.loads(r.stdout)
+    except Exception:
+        return None
+
+
+_HHMM = re.compile(r"(\d{1,2}):(\d{2})")
+
+
+def verify_facts(text, data):
+    """Compare the report's PROSE against report.py - the timing, the corpus size, the .txt, the agents.
+
+    WHY THIS EXISTS. verify() above checks the Progress table and nothing else, and every wrong
+    number the 19 Nov run printed lived outside that table:
+
+      * the header said "slot 16:11 -> 17:18 IST - 1h 07m". RUN.json says the slot ended at 17:00
+        and lasted 48 minutes. The run wrote the clock it was looking at, not the one it recorded,
+        and over-reported its own runtime by nineteen minutes.
+      * every sentence about the corpus said "of 212". The corpus is 213; 212 is the intersection of
+        the baseline table and the current one, because 416_many_tiny_pages was exempt when the
+        baseline was taken. Two different quantities, one word.
+      * "29 files in 7 commit(s) from 0b8c821" - it was 25 files in 8 commits, and only three of them
+        came after 0b8c821.
+      * the .txt was not mentioned at all, and an agent's window was given as "16:22 -> 16:32" with
+        nothing behind it.
+
+    A number a run types is a number a run can get wrong. These are the ones it types most.
+    """
+    if not data:
+        return ["report.py --json could not be read - nothing in this message is verified"]
+    problems = []
+    run = data.get("run") or {}
+    co = data.get("corpus") or {}
+    tx = data.get("txt") or {}
+
+    # ---- 1. THE HEADER'S CLOCK ------------------------------------------------------------
+    head = "\n".join(text.splitlines()[:12])
+    m = re.search(r"slot\s+(\d{1,2}:\d{2})\s*(?:→|->|—)\s*(\d{1,2}:\d{2})\s*IST", head)
+    if not m:
+        problems.append("header: no 'slot HH:MM -> HH:MM IST' window, so the timing cannot be checked")
+    elif run.get("present"):
+        if m.group(1) != (run.get("started") or ""):
+            problems.append("header: start %s, report.py says %s" % (m.group(1), run.get("started")))
+        if m.group(2) != (run.get("ended") or ""):
+            problems.append("header: end %s, report.py says %s" % (m.group(2), run.get("ended")))
+    # the duration, wherever it appears in the first twelve lines
+    mins = run.get("minutes")
+    if isinstance(mins, int) and mins > 0:
+        for hh, mm in _HHMM.findall(head):
+            pass
+        d = re.search(r"(\d+)\s*h\s*(\d+)\s*m|(\d+)\s*min", head)
+        if d:
+            claimed = (int(d.group(1)) * 60 + int(d.group(2))) if d.group(1) else int(d.group(3))
+            if abs(claimed - mins) > 1:
+                problems.append("header: duration %d min, report.py says %d min" % (claimed, mins))
+
+    # ---- 2. THE CORPUS SIZE ---------------------------------------------------------------
+    docs = co.get("docs")
+    if isinstance(docs, int) and docs > 0:
+        # ONLY A NUMBER NEAR THE CORPUS SIZE CAN BE A CLAIM ABOUT THE CORPUS. "5 of 10" is a
+        # class's documents and "of 22" is a batch; flagging those teaches a run to ignore the
+        # check, which is worse than not having it. A corpus claim is always in the hundreds.
+        for n in re.findall(r"of\s+\*{0,2}(\d{2,4})\*{0,2}\b", text):
+            v = int(n)
+            if not (100 <= v <= 400):
+                continue
+            if v != docs and v != co.get("compared"):
+                problems.append("corpus: 'of %s' appears, the corpus is %d (compared: %s)"
+                                % (n, docs, co.get("compared")))
+                break
+
+    # ---- 3. THE .TXT ----------------------------------------------------------------------
+    if tx.get("available"):
+        scored, clean, failing = tx.get("scored"), tx.get("clean"), tx.get("failing")
+        if not re.search(r"\.txt|\btxt\b", text, re.I):
+            problems.append("txt: the .txt is not mentioned at all (%d scored, %d clean, %d failing)"
+                            % (scored, clean, failing))
+        else:
+            tail = text[text.lower().find(".txt"):] if ".txt" in text.lower() else text
+            for want, name in ((clean, "clean"), (failing, "failing")):
+                if isinstance(want, int) and str(want) not in text:
+                    problems.append("txt: %d %s in report.py, that number is not in the message"
+                                    % (want, name))
+                    break
+
+    # ---- 4. THE AGENTS' TIMINGS -----------------------------------------------------------
+    agents = data.get("subagents")
+    rows = agents if isinstance(agents, list) else (agents or {}).get("agents") or []
+    for a in rows:
+        aid = (a.get("id") or "")[:12]
+        if not aid:
+            continue
+        dep, land = a.get("deployed_at"), a.get("landed_at")
+        if dep and dep not in text:
+            problems.append("agent %s: deployed_at %s is not in the message" % (aid, dep))
+        if land and land not in text:
+            problems.append("agent %s: landed_at %s is not in the message" % (aid, land))
+        mins = a.get("minutes")
+        if isinstance(mins, int) and mins > 0 and str(mins) not in text:
+            problems.append("agent %s: worked %d min, that number is not in the message" % (aid, mins))
+    return problems
+
+
 def main(argv):
     if "--check" in argv:
         if not os.path.exists(OUT):
@@ -144,18 +254,25 @@ def main(argv):
     if len(text.strip()) < MIN:
         print("refused: %d characters is not a report" % len(text.strip()))
         return 2
+    # BOTH CHECKS RUN, AND EVERY PROBLEM IS PRINTED. The row check used to return before the fact
+    # check ran, so a report with a wrong table row was rejected without ever telling the run that
+    # its header clock was wrong too - and the run fixed the row and shipped the clock.
     problems, checked = verify(text)
+    data = _report_json()
+    facts = verify_facts(text, data)
     if problems is None:
         print("WARNING: report.py could not be run, so no number in this message was checked "
               "against it. Say so in the report.")
-    elif problems:
-        print("REFUSED - %d row(s) do not match report.py. Copy its numbers; do not retype them."
-              % len(problems))
-        for p in problems:
+        problems = []
+    bad = list(problems or []) + list(facts or [])
+    if bad:
+        print("REFUSED - %d number(s) in this message do not match report.py. "
+              "Copy them from `report.py --json`; do not retype them." % len(bad))
+        for p in bad:
             print("  " + p)
         return 3
-    else:
-        print("numbers: %d Progress row(s) match report.py" % checked)
+    print("numbers: %d Progress row(s) match report.py" % checked)
+    print("facts: header clock, corpus size, .txt and agent timings all match report.py")
     open(OUT, "w", encoding="utf-8").write(text)
     print("wrote %s - %d characters" % (OUT, len(text.strip())))
     return 0

@@ -206,7 +206,14 @@ def corpus():
     # share@5px is the fraction of ink that landed more than 5px from where it belongs, so a
     # FALL is an improvement. The first version printed (current - baseline), which reported
     # 6.15 -> 5.01 as "-18.55%" - arithmetically right, and read by every human as a regression.
-    return {"available": True, "docs": len(common),
+    # THE CORPUS AND THE COMPARED SET ARE NOT THE SAME NUMBER, AND SAYING "212" FOR BOTH IS A LIE
+    # ABOUT THE CORPUS. `common` is the documents in the baseline AND in the current table: 416 was
+    # exempt when the baseline was taken, so it is in one and not the other and the intersection is
+    # 212. The corpus is 213. Every report for weeks printed "of 212" as the corpus total because
+    # this field was the only one available, and the fixer then copied it into a sentence about the
+    # corpus. Both numbers are reported now, each under the name that says what it counts.
+    corpus_total = len(c)
+    return {"available": True, "docs": corpus_total, "compared": len(common),
             "fixed": len(fixed), "moved_open": len(moved_open),
             "still_open": len([k for k in common if c[k] > FIXED_BAR]),
             "baseline_mean": round(bm, 2), "current_mean": round(cm, 2),
@@ -648,9 +655,15 @@ def main(argv):
     working = tr.get("class") if tr.get("present") else "-"
 
     if "--json" in argv:
+        # EVERY SECTION THE MARKDOWN CARRIES IS IN THE JSON, so a checker can compare the two.
+        # txt and subagents were computed and printed in the document and absent here, which meant
+        # lastmessage.py had nothing to compare a .txt sentence or an agent's timings against - and
+        # a number nobody can check is a number that drifts. The fixer's own report quoted the .txt
+        # not at all and gave an agent's window as "16:22 -> 16:32" with nothing behind it.
         print(json.dumps({"classes": {"total": total, "clear": solved, "open": openc,
                                       "documents": docs},
                           "corpus": co, "run": tr, "working_class": working,
+                          "txt": txt(), "subagents": subagents(),
                           "needs_human": len(h.get("needs_human") or [])}, indent=1))
         return 0
 
@@ -925,7 +938,11 @@ if __name__ == "__main__":
         rc = main(sys.argv)
     _text = _buf.getvalue()
     sys.stdout.write(_text)
-    _p = _persist(_text)
+    # --json IS FOR A MACHINE AND MUST BE PURE JSON. `_persist` writes REPORT.md and then announces
+    # it on stdout, so `report.py --json | python3 -c "json.load(sys.stdin)"` failed with "Extra
+    # data" - every consumer of the JSON had to know to strip a trailing sentence. A checker that
+    # parses this output is the thing that keeps the report honest, so it must not need a workaround.
+    _p = None if "--json" in sys.argv else _persist(_text)
     if _p:
         sys.stdout.write("\n  written to %s - commit it, so the report survives the run\n"
                          % os.path.relpath(_p, os.path.dirname(os.path.dirname(HERE))))
