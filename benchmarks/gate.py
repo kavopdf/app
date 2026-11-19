@@ -267,6 +267,25 @@ def main():
             tail = [l for l in out.strip().splitlines() if l.startswith("  ")]
             S["layers"]["census"] = dict(status="ok" if rc == 0 else f"exit{rc}",
                                          summary=tail[-8:])
+            # THE CENSUS IS WRITTEN BESIDE THE RANKING, AND THE RANKING IS IN /scratch/output.
+            #
+            # census.py sets its output directory from --ranking ("the output belongs beside
+            # the ranking it describes"), and gate.py passes /scratch/output/RANKING.csv, so
+            # every census this pipeline ever ran wrote /scratch/output/CENSUS.csv and left
+            # benchmarks/CENSUS.csv alone. It has been the header row and nothing else since
+            # 18 Nov 17:19 - through four complete measurements that each logged "census: ok".
+            # The fixer is told to read benchmarks/CENSUS.csv before forming a theory, and a
+            # fresh pod has no corpus, so /scratch/output is gone by the time anyone reads it.
+            # This is the RANKING.csv publish below, one file over: copy it into the repository
+            # or the census exists only for the run that made it.
+            for name in ("CENSUS.csv", "CENSUS.md"):
+                src = os.path.join("/scratch/output", name)
+                try:
+                    if os.path.exists(src):
+                        shutil.copyfile(src, os.path.join(HERE, name))
+                        log("published %s into the repository" % name)
+                except Exception as e:
+                    log("could not publish %s: %s" % (name, str(e)[:120]))
         else:
             S["layers"]["census"] = dict(status="not-run", reason="census.py not present")
 
