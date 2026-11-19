@@ -417,3 +417,11 @@
 {"t": 1795096554.7779887, "ist": "19:25:54", "ev": "beat", "d": "screen PASS 3 improved, starting the corpus pass"}
 {"t": 1795096867.2954445, "ist": "19:31:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795102172.4783092, "ist": "20:59:32", "ev": "beat", "d": "corpus pass done; publishing the table this engine actually produces"}
+{"t": 1795105761.5445528, "ist": "21:59:21", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795105761.7309108, "ist": "21:59:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795105772.0692194, "ist": "21:59:32", "ev": "beat", "d": "claimed, reading the handoff"}
+{"t": 1795105772.2483678, "ist": "21:59:32", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1795105772.3848596, "ist": "21:59:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795105775.624507, "ist": "21:59:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795105776.1508083, "ist": "21:59:36", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795105825.0404737, "ist": "22:00:25", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
