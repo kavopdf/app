@@ -122,6 +122,57 @@ def verify(text):
     return problems, checked
 
 
+def _report_md():
+    """report.py's own markdown, or None."""
+    try:
+        r = subprocess.run([sys.executable, os.path.join(HERE, "report.py")],
+                           capture_output=True, text=True, timeout=120, cwd=os.path.dirname(HERE))
+        return r.stdout if r.returncode == 0 else None
+    except Exception:
+        return None
+
+
+def _section(md, title):
+    """The body of one `## title` section, up to the next `## `."""
+    out, on = [], False
+    for line in (md or "").splitlines():
+        if line.startswith("## "):
+            on = line[3:].strip().lower() == title.lower()
+            continue
+        if on:
+            out.append(line)
+    return "\n".join(out).strip()
+
+
+# THE SECTIONS THAT MUST BE REPORT.PY'S, WORD FOR WORD. These are the ones that carry numbers a run
+# has got wrong: the .txt counts, and the clock. The rest of the message is the run's to write - the
+# headline, the verdict per idea, why a silence happened - and those are prose, not figures.
+COPIED_SECTIONS = ("The txt", "Timing")
+
+
+def verify_sections(text):
+    """Every line of report.py's txt and timing tables must appear in the message unchanged."""
+    md = _report_md()
+    if md is None:
+        return []
+    problems = []
+    for title in COPIED_SECTIONS:
+        want = _section(md, title)
+        if not want:
+            continue
+        # The rows that carry a number. A separator or an empty cell cannot be got wrong.
+        for line in want.splitlines():
+            line = line.strip()
+            if not line or set(line) <= set("|:- "):
+                continue
+            if not re.search(r"\d", line):
+                continue
+            if line not in text:
+                problems.append("%s: this row from report.py is missing or altered:\n      %s"
+                                % (title, line[:110]))
+    return problems
+
+
 def _report_json():
     """report.py's own numbers, as a dict. None when it cannot be read."""
     import json
@@ -259,7 +310,7 @@ def main(argv):
     # its header clock was wrong too - and the run fixed the row and shipped the clock.
     problems, checked = verify(text)
     data = _report_json()
-    facts = verify_facts(text, data)
+    facts = verify_facts(text, data) + verify_sections(text)
     if problems is None:
         print("WARNING: report.py could not be run, so no number in this message was checked "
               "against it. Say so in the report.")
@@ -273,6 +324,12 @@ def main(argv):
         return 3
     print("numbers: %d Progress row(s) match report.py" % checked)
     print("facts: header clock, corpus size, .txt and agent timings all match report.py")
+    # --dry-run CHECKS WITHOUT WRITING. Without it, testing the checker against a known-bad report
+    # overwrote the report being tested - which happened twice while building this, and each time
+    # the file had to be restored from git before the next attempt meant anything.
+    if "--dry-run" in argv:
+        print("dry run - nothing written")
+        return 0
     open(OUT, "w", encoding="utf-8").write(text)
     print("wrote %s - %d characters" % (OUT, len(text.strip())))
     return 0

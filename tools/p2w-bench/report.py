@@ -799,7 +799,23 @@ def main(argv):
         # pod's own setup time, which on 18 Nov was sixty minutes - and the report said 38.
         _sess = _json(ROUND, {}).get("session_start_ts")
         _end = _json(RUN, {}).get("ended_ts")
-        if _sess and _end:
+        # A SESSION CANNOT START AFTER IT ENDED, AND WHEN IT SAYS IT DID THE FIELD IS STALE.
+        # ROUND.json survives the run that wrote it; session_start_ts is written once at the top of
+        # a run and not cleared, so by the time this reads it it can belong to a LATER run than the
+        # RUN.json beside it. Measured 19 Nov: the report printed "Session 18:00 -> 17:00 · 23h 00m"
+        # and "Before the claim 22h 12m" for a run that lasted 48 minutes. Both numbers were
+        # arithmetically right and both were nonsense. Skipping the line is the honest answer: a
+        # session figure nobody can trust is worse than no session figure.
+        # A SESSION IS THE SLOT PLUS THE POD'S SETUP, AND NOTHING ELSE. The pod can spend an hour
+        # cloning and retrying before step.py writes the first beat; it cannot spend twenty-three.
+        # Measured 19 Nov: the report printed "Session 18:00 -> 17:00 · 23h 00m" - the field held
+        # the PREVIOUS day's 18:00, so it was earlier in epoch than the end, passed a naive
+        # before-the-end test, and produced a duration of 23 hours for a run that lasted 48 minutes.
+        # The bound is the slot plus three hours: generous for setup, and far short of a day.
+        _slot = (float(_end) - float(_json(RUN, {}).get("started_ts") or _end)) if _end else 0
+        _ok = (_sess and _end and float(_sess) < float(_end)
+               and (float(_end) - float(_sess)) <= max(_slot, 3600) + 3 * 3600)
+        if _ok:
             _sm = int((float(_end) - float(_sess)) / 60)
             L.append("| Session | %s → %s · **%s** |"
                      % (_json(ROUND, {}).get("session_start") or "?",
