@@ -1,0 +1,15 @@
+# Progress - one row per day
+
+Written by `tools/p2w-bench/progress.py`, which the watchdog runs. Each row is the committed state of
+the corpus on that date; nothing here is typed by hand.
+
+`docx open` is the number of documents whose share@5px is above 1.0 in RANKING.csv. `txt failing` is
+the number whose .txt fails a check. `google` is how many documents have been measured through Google's
+own renderer, and `google clean` how many of those pass all 42 checks.
+
+A row that does not move is the signal: it means a day of the pipeline produced no change, and the
+watchdog's job is to find out why.
+
+| date | docx open | txt failing | google | google clean | note |
+|---|---:|---:|---:|---:|---|
+| 2026-11-19 | 65 | 47 | 84 | 7 |  |

@@ -137,3 +137,23 @@ It reopens a round, and it refuses unless there is something left to fix:
 documents.** A reopen with nothing failing would loop forever, which is why the guard exists; a reopen
 with failures is the pipeline admitting it is not finished, which is exactly what a two-month run needs
 it to be able to say.
+
+---
+
+## THE TREND — the only thing that says whether two months worked
+
+    python3 tools/p2w-bench/progress.py
+
+Appends one dated row to `benchmarks/PROGRESS.md` - once per day, never twice - and prints the change
+since the previous row. **Run it every watchdog pass and commit the file.** It is the only place the
+corpus is compared against itself across time; every other report says what happened this hour.
+
+    date        docx open   txt failing   google   google clean
+    2026-11-19      65           47          84          7
+
+**A row that does not move is the signal.** Not a failure - a fact. If three days pass with the same
+`docx open` and the same `txt failing`, the pipeline is running and producing nothing, and the watchdog
+should say so plainly in `BLOCKERS.md` with the fixer's attempt count beside it.
+
+**Never edit a past row.** The value of a trend is that it was not adjusted afterwards. If a row is
+wrong because a table was regenerated, append a new row with a note; do not rewrite history.
