@@ -233,8 +233,30 @@ def check(allow_engine_change, only=None):
                 print("             An unmeasured change is not a pass. Re-measure, then --stamp.")
                 fail = 1
 
-    d_bad, d_err = docx_regressions() if need_docx else ([], "")
+    # THE TABLE IS CHECKED EVEN WHEN THE ENGINE DID NOT CHANGE.
+    #
+    # This read `docx_regressions() if need_docx else ([], "")`, so a run that did not touch the engine
+    # skipped the check. Falsified 19 Nov: a document's share5 was changed from 0.00 to 99.00 and
+    # committed, and the gate answered PASS with "docx: not re-measured - the tree is the engine the
+    # table was measured on".
+    #
+    # The stamp says the table was MADE by this engine. It does not say the numbers in it are right,
+    # and a baseline run re-measures every document and can write a worse table without touching a line
+    # of engine code - a soffice failure, a truncated render, a bad read. Over two months that is the
+    # difference between a ratchet and a table nobody is checking.
+    #
+    # Reading two CSVs costs milliseconds. It runs every time.
+    d_bad, d_err = docx_regressions()
     if not need_docx:
+        if d_bad:
+            print("  docx: %d REGRESSION(S) in the table even though the engine did not change"
+                  % len(d_bad))
+            for d, b, c, why in d_bad[:10]:
+                print("    %-44s %.2f -> %s   %s"
+                      % (d[:44], b, "-" if c is None else "%.2f" % c, why))
+            print("             The engine is unchanged, so the numbers should be too. Something")
+            print("             re-measured and got worse - that is not a pass.")
+            fail = 1
         print("  docx: not re-measured - the tree is the engine the table was measured on (%s)"
               % (st.get("docx") or "?"))
     elif d_err:
