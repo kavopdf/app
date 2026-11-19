@@ -189,9 +189,30 @@ per-document records that produced it. `restamp_txt.py --report` re-prints the c
 * **`round.py` called `sh()` and had no `sh`.** The auto-revert guard — the thing that puts an
   unmeasured engine change back — raised `NameError` and was swallowed by a bare `except`, so it
   **never once ran**. Found by the 00:58 run and fixed.
-* **`lastmessage.py` now refuses a report whose Progress rows do not equal `report.py`'s.** Exit 3
-  means a number was not copied from the tool. The 13:50 run published "17 files" where
-  `report.py` said 6.
+* **`lastmessage.py` now refuses a report whose numbers do not equal `report.py`'s.** Exit 3 means a
+  number was not copied from the tool. The 13:50 run published "17 files" where `report.py` said 6.
+
+* **AND IT CHECKS THE PROSE, NOT ONLY THE TABLE - because that is where every later error lived.**
+  Four reports in a row were wrong outside the Progress rows, and each cost a manual audit:
+
+      header     "slot 16:11 -> 17:18 IST - 1h 07m"   RUN.json: 16:11 -> 17:00, 48 min
+      corpus     "of 212" in every sentence            the corpus is 213; 212 is the baseline
+                                                       intersection, since 416 was exempt then
+      .txt       not mentioned at all                  166 clean, 47 failing
+      agents     "16:22 -> 16:32"                      nothing behind it
+      committed  "29 files in 7 commits from 0b8c821"   25 files in 8 commits
+
+  `report.py --json` now carries `corpus.docs` (213) AND `corpus.compared` (212) as separate fields,
+  plus `txt` and `subagents`, which were computed for the document and absent from the JSON so
+  nothing could check a .txt sentence against them. `verify_facts()` compares the header's clock and
+  duration, any number in the corpus range, the .txt's clean and failing counts, and each agent's
+  deployed_at / landed_at / minutes. It refuses; it does not warn. Both checks run before deciding -
+  the row check used to return early, so a report with a bad row was rejected without being told its
+  clock was wrong too.
+
+  **The rule this encodes: never type a number that a tool can print.** Run
+  `report.py --json` and copy. If `lastmessage.py` refuses, the number is wrong - it is not being
+  pedantic.
 
 ### Three root causes are diagnosed, in `FINDINGS/t02-t12-t08-root-causes.md`
 
