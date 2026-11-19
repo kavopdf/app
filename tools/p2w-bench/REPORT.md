@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-20 01:52
+# Fixer report - 2026-11-20 03:53
 
 ```
 # P2W Fixer - Run Report
 
-**19 Nov 2026 · slot 01:52 → running IST · 1h 49m**
+**20 Nov 2026 · slot 03:53 → running IST · 20 min**
 
-> **64_newspaper_uneven_columns_ad_boxes** improved — 9.11 → 3.46. Corpus ratchet clean across 213 documents.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **1** — 2 attempt(s), 2 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.44%** — mean 6.15 → 3.72 |
 | Regressions | **none** |
@@ -20,14 +20,13 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `content-present-partly-displaced` |
-| Committed | **20** files in 2 commit(s) from `97e2e1f` — ...esent-partly-displaced-newspaper-033000-a7d1.md, ...tent-present-partly-displaced-newspaper-033000-a7d1.md, ARCHIVE.json, ATTEMPTS.json, CLASS-HISTORY.jsonl, DEFECT-CLASSES.md, ENGINE-STAMP.json, HANDOFF.json, HANDOFF |
+| Committed | **15** files in 2 commit(s) from `319035a` — ...artly-displaced-rules-cannot-flow-044000-f1x.md, ATTEMPTS.json, BLOCKERS.md, CLASS-HISTORY.jsonl, DEFECT-CLASSES.md, HANDOFF.json, HANDOFF.md, ROUND.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md, classrow-colum |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 02:25 | **kept** | 1/23 | recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one. 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 10 |
-| 03:40 | **kept** | 1/23 | recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one (the 'break' at PdfToWord:8666). 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_ |
+| 04:03 | **error** | 0/23 | no fix was built or measured, on purpose: the pBdr rule change cannot work until a rule is written before the text below it. PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs ( |
 
 ## The txt
 
@@ -40,28 +39,29 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `contA-06` | after rules become w:pBdr, which construct still emi | 03:54 | 22:34 | 10 min |
+| `contB-06` | mobile-bill share5 43.87 and electricity-bill 46.85  | 03:54 | 22:43 | 19 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 01:52 → running · 1h 49m |
+| Slot window | 03:53 → running · 20 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 18 |
-| Longest silence | **75.2 min** — from 02:25:21, after `classrow.py: refreshing the class file` |
-| Silences over 2 min | 3 |
-| Obstacles | 0 cleared · 1 need a human |
-| Still a wall | The count is inflated by a timezone mismatch. `_attempts_recent()` parses `at` with `time.mktime(time.strptime |
+| Tool beats | 27 |
+| Longest silence | **9.5 min** — from 03:54:06, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 2 |
+| Obstacles | 2 cleared · 0 need a human |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **4 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **1h 43m** | `#####################` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **18 min** | `####################` |
+| record - attempt, handoff, class rows | **2 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |

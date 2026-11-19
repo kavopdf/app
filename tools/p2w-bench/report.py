@@ -706,7 +706,11 @@ def main(argv):
     # ---------------------------------------------------------------------------------------
     date = (tr.get("started") or "")[:0]
     import datetime as _dt
-    stamp = _dt.datetime.now().strftime("%d %b %Y")
+    # THE POD RUNS UTC AND EVERY OTHER STAMP IN THIS PIPELINE IS IST. `datetime.now()` therefore
+    # dated a run that claimed at 03:53 IST on 20 Nov as "19 Nov", one line above a table whose
+    # own date field is computed from started_ts + 19800 - two clocks in one report, which is the
+    # defect SETTLED.md records twice. Same conversion as the date below it.
+    stamp = _dt.datetime.fromtimestamp(time.time() + 19800).strftime("%d %b %Y")
 
     def hhmm(m):
         return "%dh %02dm" % (m // 60, m % 60) if m and m >= 60 else ("%d min" % (m or 0))
