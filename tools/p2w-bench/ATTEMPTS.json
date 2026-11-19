@@ -156,6 +156,32 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "content-partly-lost": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-19 16:58",
+    "moved": 5,
+    "outcome": "partial",
+    "reason": "justified lines emitted left-aligned: model carries the measured shortfall (Box.stretchPt/Line.stretchPt), writer emits w:spacing in flowFromBox and lineParagraph. SCREEN PASS 5 of 10 better, 0 worse ",
+    "total": 10
+   }
+  ],
+  "last": null,
+  "last_engine": "57a0507",
+  "last_moved": 5,
+  "last_total": 10,
+  "outcomes": [
+   "partial"
+  ],
+  "reason": "justified lines emitted left-aligned: model carries the measured shortfall (Box.stretchPt/Line.stretchPt), writer emits w:spacing in flowFromBox and lineParagraph. SCREEN PASS 5 of 10 better, 0 worse (policy 5.37->1.76, academic 8.09->5.02, magazine 3.49->1.45, 304 3.41->2.47, landscape 1.45->0.62). The corpus ratchet was NOT run - 46 of 213 measured in three calls when the run ended - so this is not a kept fix. The change is patches/PATCH-justified-lines-spacing.patch, unapplied and verified to apply cleanly.",
+  "reasons": [
+   "justified lines emitted left-aligned: model carries the measured shortfall (Box.stretchPt/Line.stretchPt), writer emits w:spacing in flowFromBox and lineParagraph. SCREEN PASS 5 of 10 better, 0 worse (policy 5.37->1.76, academic 8.09->5.02, magazine 3.49->1.45, 304 3.41->2.47, landscape 1.45->0.62). The corpus ratchet was NOT run - 46 of 213 measured in three calls when the run ended - so this is not a kept fix. The change is patches/PATCH-justified-lines-spacing.patch, unapplied and verified to apply cleanly."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "content-partly-lost-and-displaced": {
   "attempts": 4,
   "engine_note": "last_engine corrected 7dff436 -> 7dff436+a2261d7b2d: attempt.py records `git log -1 -- engine/`, which is the COMMIT and cannot see the working tree, while round.py's release guard computes commit+worktree. The change was measured uncommitted (screen + the 210-document ratchet), so the hash that names the measured tree is the worktree one.",

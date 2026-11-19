@@ -1,40 +1,41 @@
-# Fixer report - 2026-11-18 18:00
+# Fixer report - 2026-11-19 16:11
 
 ```
 # P2W Fixer — Run Report
 
-**18 Nov 2026 · slot 18:00 → 19:08 IST · 1h 08m**
+**19 Nov 2026 · slot 16:11 → running IST · 46 min**
 
-> **22 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **22** — 1 attempt(s), 1 kept |
-| Documents improved, round total | 36 of 212 |
-| Corpus improvement vs 15 Nov | **+27.52%** — mean 6.15 → 4.46 |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved, round total | 37 of 212 |
+| Corpus improvement vs 15 Nov | **+29.90%** — mean 6.15 → 4.31 |
 | Regressions | **none** |
-| Exempt, not measured | **1** — 416_many_tiny_pages |
-| **Fixed to 99%** | **20** of 212 — the rest are still off |
+| Exempt, not measured | **0** — none |
+| **Fixed to 99%** | **21** of 212 — the rest are still off |
 | Moved but still open | **16** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `content-missing-nothing-in-its-place` |
+| Working on | `content-partly-lost` |
+| Committed | **11** files in 1 commit(s) from `30aecd9` — ARCHIVE.json, HANDOFF.json, HANDOFF.md, HYPOTHESES.md, HYPOTHESES.md.head, ROUND.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md, TRACE.md.head |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 19:07 | **kept** | 22/29 | per-row separator stroke: table interior rules whose weight/colour differs from the table's insideH are emitted as per-cell tcBorders bottom instead of collapsing into one border. salary-slip-factory- |
+| 16:58 | **partial** | 5/10 | justified lines emitted left-aligned: model carries the measured shortfall (Box.stretchPt/Line.stretchPt), writer emits w:spacing in flowFromBox and lineParagraph. SCREEN PASS 5 of 10 better, 0 worse |
 
 ## The txt
 
 | | |
 |:--|:--|
 | Scored | **213** of 213 |
-| Clean - every applicable check passes | **149** (70.0%) |
-| Failing at least one check | **64** |
-| Most common failure | `t13_amount_columns` - 30 documents |
+| Clean - every applicable check passes | **166** (77.9%) |
+| Failing at least one check | **47** |
+| Most common failure | `t13_amount_columns` - 19 documents |
 
 ## Subagents
 
@@ -44,34 +45,34 @@
 
 | | |
 |:--|:--|
-| Session | 18:00 → 19:08 · **1h 08m** |
-| Slot window | 18:00 → 19:08 · 1h 08m |
-| Before the claim | 0 min - pod setup, cloning and retries |
-| Tool beats | 20 |
-| Longest silence | **66.9 min** — from 18:00:10, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 1 |
-| Obstacles | 1 cleared · 0 need a human |
+| Slot window | 16:11 → running · 46 min |
+| Before the claim | not recorded - nothing writes a beat until step.py runs |
+| Tool beats | 18 |
+| Longest silence | **17.3 min** — from 16:11:34, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 3 |
+| Obstacles | 0 cleared · 0 need a human |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **1h 06m** | `######################` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
+| fix - diagnose and change the engine | **14 min** | `#######` |
+| measure or build - a conversion, screen or compile writes no beacon | **31 min** | `###############` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
 |:--|--:|--:|--:|
 | `415_inline_images` | 89.04 | 0.00 | -89.04 |
+| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
 | `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
 | `salary-slip-factory-wages` | 18.09 | 0.73 | -17.36 |
 | `mobile-bill` | 18.48 | 1.55 | -16.93 |
-| `two-tables-stacked-with-no-gap` | 17.20 | 0.77 | -16.43 |
 
 ## Next run
 
-Take the next class, content-partly-lost (11 open). The class-wide screen now covers the whole corpus in about 30 minutes across 6 calls via screen.py --docs with the full RANKING.csv document list - p2w.py --budget does NOT resume and cannot finish a corpus pass inside the 300 s cap, so use screen.py --docs. Do not retry run-size-from-sizePt-not-Tf, the anchor rule, the cell-baseline fallback, or the row separator stroke - the last is now implemented.
+Apply patches/PATCH-justified-lines-spacing.patch, build, re-screen content-partly-lost (expect 5 better 0 worse), then spend the rest of the run on the corpus pass - screen.py --docs with every document in RANKING.csv, 22-24 per call in about nine calls, then write RANKING.csv and STATE.json from screen-out/dist/*.json. scope.py says BOTH: re-score the .txt too. Do not retry the two mistakes recorded in FINDINGS/content-partly-lost-JUSTIFY-170800-fixer.md - the 0.06 em spacing cap and the word-gap test that cannot see a space glyph.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

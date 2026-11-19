@@ -1,11 +1,11 @@
 {
   "baseline_started": 1794936722.77173,
   "classifier_started": 1794939194.3206565,
-  "fixer_doing": "claimed, reading the handoff",
-  "fixer_doing_since": 1795084891.7302299,
+  "fixer_doing": "corpus pass 1/6 on the justified-line engine",
+  "fixer_doing_since": 1795086778.4733675,
   "fixer_engine_at_claim": "2945cb0",
-  "fixer_last_beat": 1795084891.7302313,
-  "fixer_started": 1795084891.7297685,
+  "fixer_last_beat": 1795086778.4733684,
+  "fixer_started": 1795087683.3874996,
   "history": [
     {
       "at": "2026-11-12 09:46",

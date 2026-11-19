@@ -152,9 +152,17 @@
   {
    "at": "19:07",
    "text": "attempt 7 on content-missing-nothing-in-its-place -> kept (22/29 moved)"
+  },
+  {
+   "at": "16:58",
+   "text": "attempt 1 on content-partly-lost -> partial (5/10 moved)"
+  },
+  {
+   "at": "16:58",
+   "text": "measured, screened, not ratcheted: the justified-line fix is a patch in patches/, not an engine change"
   }
  ],
- "next": "Take the next class, content-partly-lost (11 open). The class-wide screen now covers the whole corpus in about 30 minutes across 6 calls via screen.py --docs with the full RANKING.csv document list - p2w.py --budget does NOT resume and cannot finish a corpus pass inside the 300 s cap, so use screen.py --docs. Do not retry run-size-from-sizePt-not-Tf, the anchor rule, the cell-baseline fallback, or the row separator stroke - the last is now implemented.",
+ "next": "Apply patches/PATCH-justified-lines-spacing.patch, build, re-screen content-partly-lost (expect 5 better 0 worse), then spend the rest of the run on the corpus pass - screen.py --docs with every document in RANKING.csv, 22-24 per call in about nine calls, then write RANKING.csv and STATE.json from screen-out/dist/*.json. scope.py says BOTH: re-score the .txt too. Do not retry the two mistakes recorded in FINDINGS/content-partly-lost-JUSTIFY-170800-fixer.md - the 0.06 em spacing cap and the word-gap test that cannot see a space glyph.",
  "agents": [
   {
    "id": "contA-01",
@@ -279,7 +287,7 @@
    "plan": ""
   }
  ],
- "context": "The per-row separator stroke is kept: DocxWriter.table() now emits a per-cell w:tcBorders/w:bottom where a table's interior rule is heavier or darker than the table's single insideH. Full corpus 212 measured: 33 better, 179 same, 0 worse. content-missing-nothing-in-its-place went 22 of 29 better, best drop 17.36 (salary-slip-factory-wages 18.09->0.73).",
+ "context": "content-partly-lost is diagnosed and the fix is written: a justified line is emitted left-aligned, because the page spreads its inter-word spaces and the writer uses the face's natural space. The model now carries the measured shortfall and the writer emits w:spacing. SCREEN PASS on 10 documents: 5 better, 0 worse (policy 5.37->1.76, academic 8.09->5.02, magazine 3.49->1.45, 304 3.41->2.47, landscape 1.45->0.62). NOT ratcheted: 46 of 213 documents measured in three calls when the run ended. The change is patches/PATCH-justified-lines-spacing.patch - unapplied, verified with git apply --check against 30aecd9, and the tree is clean. scope.py says BOTH, so the .txt must be re-scored or its byte-identity proved.",
  "needs_human": [],
  "next_class": "content-partly-lost"
 }

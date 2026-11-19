@@ -338,3 +338,14 @@
 {"t": 1795084892.081021, "ist": "16:11:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795084894.7354074, "ist": "16:11:34", "ev": "beat", "d": "gaps.py: reading the timeline"}
 {"t": 1795084894.8509448, "ist": "16:11:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795085932.3898082, "ist": "16:28:52", "ev": "beat", "d": "built justified-line spacing, screening content-partly-lost"}
+{"t": 1795086778.4729016, "ist": "16:42:58", "ev": "beat", "d": "corpus pass 1/6 on the justified-line engine"}
+{"t": 1795087617.546285, "ist": "16:56:57", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795087683.0559177, "ist": "16:58:03", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795087683.386303, "ist": "16:58:03", "ev": "attempt", "d": "content-partly-lost -> partial"}
+{"t": 1795087683.5023499, "ist": "16:58:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795087683.6261678, "ist": "16:58:03", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795087689.2246473, "ist": "16:58:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795087689.4718466, "ist": "16:58:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795087689.6678913, "ist": "16:58:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795087693.1271777, "ist": "16:58:13", "ev": "beat", "d": "report.py: building the report"}

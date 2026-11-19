@@ -16,11 +16,11 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> The per-row separator stroke is kept: DocxWriter.table() now emits a per-cell w:tcBorders/w:bottom where a table's interior rule is heavier or darker than the table's single insideH. Full corpus 212 measured: 33 better, 179 same, 0 worse. content-missing-nothing-in-its-place went 22 of 29 better, best drop 17.36 (salary-slip-factory-wages 18.09->0.73).
+> content-partly-lost is diagnosed and the fix is written: a justified line is emitted left-aligned, because the page spreads its inter-word spaces and the writer uses the face's natural space. The model now carries the measured shortfall and the writer emits w:spacing. SCREEN PASS on 10 documents: 5 better, 0 worse (policy 5.37->1.76, academic 8.09->5.02, magazine 3.49->1.45, 304 3.41->2.47, landscape 1.45->0.62). NOT ratcheted: 46 of 213 documents measured in three calls when the run ended. The change is patches/PATCH-justified-lines-spacing.patch - unapplied, verified with git apply --check against 30aecd9, and the tree is clean. scope.py says BOTH, so the .txt must be re-scored or its byte-identity proved.
 
 ## What the next run should do first
 
-> Take the next class, content-partly-lost (11 open). The class-wide screen now covers the whole corpus in about 30 minutes across 6 calls via screen.py --docs with the full RANKING.csv document list - p2w.py --budget does NOT resume and cannot finish a corpus pass inside the 300 s cap, so use screen.py --docs. Do not retry run-size-from-sizePt-not-Tf, the anchor rule, the cell-baseline fallback, or the row separator stroke - the last is now implemented.
+> Apply patches/PATCH-justified-lines-spacing.patch, build, re-screen content-partly-lost (expect 5 better 0 worse), then spend the rest of the run on the corpus pass - screen.py --docs with every document in RANKING.csv, 22-24 per call in about nine calls, then write RANKING.csv and STATE.json from screen-out/dist/*.json. scope.py says BOTH: re-score the .txt too. Do not retry the two mistakes recorded in FINDINGS/content-partly-lost-JUSTIFY-170800-fixer.md - the 0.06 em spacing cap and the word-gap test that cannot see a space glyph.
 
 ## Agents deployed and not yet accounted for
 
@@ -38,8 +38,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:16` agent deployed: content-missing-partly-replaced / D - how many corpus documents have a cell whose lines start left of the first line
-- `11:17` agent landed: contA2-01 /  -> FINDINGS/content-missing-partly-replaced-A2-092912-7c4e.md
 - `11:17` agent landed: contD-01 /  -> FINDINGS/content-missing-partly-replaced-D-092700-1d7b.md
 - `12:30` attempt 8 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `12:41` COMMITTING: git push is 403 'denied to Onyx-Node' for the fixer too, not only for subagents - the App has no write access to kavopdf/app over HTTPS git. It is not a dead end: the GitHub MCP tool GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main, upserts=[{path,content,encoding:utf-8}]) commits several files atomically and worked for all four commits of this run. The next run should commit that way, then 'git fetch origin main && git reset --hard origin/main' so HEAD matches origin, then chain.py. chain.py's sync check is strict SHA equality and also refuses a dirty tree, and it rewrites CHAIN.json - so commit CHAIN.json again after each chain.py run.
@@ -63,6 +61,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `16:12` attempt 3 on content-partly-lost-and-displaced -> kept (1/7 moved)
 - `17:00` attempt 18 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `19:07` attempt 7 on content-missing-nothing-in-its-place -> kept (22/29 moved)
+- `16:58` attempt 1 on content-partly-lost -> partial (5/10 moved)
+- `16:58` measured, screened, not ratcheted: the justified-line fix is a patch in patches/, not an engine change
 
 ## Where the rest of the state lives
 

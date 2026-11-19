@@ -6,16 +6,6 @@
 | 12 Nov 18:52 | fixer | ratchet | held or rose |
 | 12 Nov 18:52 | fixer | ratchet --txt | held or rose |
 | 12 Nov 18:52 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
-| 12 Nov 18:52 | fixer | classify | 43 classes from 208 documents |
-| 12 Nov 18:52 | ? | commit-gate | started |
-| 12 Nov 19:46 | fixer | claim | fixer claimed the slot |
-| 12 Nov 19:46 | fixer | classify | 43 classes from 208 documents |
-| 12 Nov 19:46 | fixer | classify --txt | 4 classes from 208 documents |
-| 12 Nov 19:47 | fixer | build-engine | started |
-| 12 Nov 19:48 | fixer | build-engine | started |
-| 12 Nov 19:52 | fixer | hypothesis | 53_embedded_faces -> ruled-out |
-| 12 Nov 19:52 | ? | classify | 43 classes from 208 documents |
-| 12 Nov 19:52 | ? | classify | 43 classes from 208 documents |
 | 12 Nov 20:43 | fixer | claim | fixer claimed the slot |
 | 12 Nov 20:44 | fixer | build-engine | started |
 | 12 Nov 20:45 | fixer | classify | 43 classes from 208 documents |
@@ -398,3 +388,21 @@
 | 18 Nov 18:30 | fixer | ratchet | UNMEASURED 211 of 211 not compared; DRIFT 211 rows/0 marks |
 | 18 Nov 19:07 | fixer | attempt | content-missing-nothing-in-its-place -> kept (22/29 moved) |
 | 19 Nov 16:11 | fixer | claim | fixer claimed the slot |
+| 19 Nov 16:12 | fixer | build-engine | started |
+| 19 Nov 16:13 | fixer | build-engine | engine built in 42s |
+| 19 Nov 16:26 | fixer | build-engine | started |
+| 19 Nov 16:28 | fixer | build-engine | engine built in 135s |
+| 19 Nov 16:33 | fixer | build-engine | started |
+| 19 Nov 16:34 | fixer | build-engine | engine built in 39s |
+| 19 Nov 16:37 | fixer | build-engine | started |
+| 19 Nov 16:37 | fixer | build-engine | engine built in 37s |
+| 19 Nov 16:38 | fixer | build-engine | started |
+| 19 Nov 16:38 | fixer | build-engine | engine built in 38s |
+| 19 Nov 16:39 | fixer | build-engine | started |
+| 19 Nov 16:39 | fixer | build-engine | engine built in 40s |
+| 19 Nov 16:41 | fixer | ratchet | UNMEASURED 211 of 211 not compared; DRIFT 211 rows/0 marks |
+| 19 Nov 16:41 | fixer | build-engine | started |
+| 19 Nov 16:42 | fixer | build-engine | engine built in 38s |
+| 19 Nov 16:57 | fixer | build-engine | started |
+| 19 Nov 16:57 | fixer | build-engine | engine built in 41s |
+| 19 Nov 16:58 | fixer | attempt | content-partly-lost -> partial (5/10 moved) |
