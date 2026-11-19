@@ -1,0 +1,12 @@
+{
+ "name": "annual-review-2col-uneven-columns",
+ "status": "ok",
+ "rc": 1,
+ "passed": 39,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "25_invisible_text",
+  "32_stroke_lines"
+ ]
+}

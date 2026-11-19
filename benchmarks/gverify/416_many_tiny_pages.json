@@ -1,0 +1,11 @@
+{
+ "name": "416_many_tiny_pages",
+ "status": "ok",
+ "rc": 1,
+ "passed": 40,
+ "total": 42,
+ "failed": [
+  "18_displacement",
+  "27_text_off_page"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "name": "80_gstin_pan_cin_ifsc_table",
+ "status": "ok",
+ "rc": 1,
+ "passed": 35,
+ "total": 42,
+ "failed": [
+  "04_chars_missing",
+  "17_matched_runs",
+  "18_displacement",
+  "32_stroke_lines",
+  "44_header_footer",
+  "45_char_accuracy",
+  "59_shape_anchor"
+ ]
+}

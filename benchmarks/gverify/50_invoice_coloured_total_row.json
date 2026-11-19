@@ -1,0 +1,14 @@
+{
+ "name": "50_invoice_coloured_total_row",
+ "status": "ok",
+ "rc": 1,
+ "passed": 37,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "25_invisible_text",
+  "32_stroke_lines",
+  "59_shape_anchor"
+ ]
+}

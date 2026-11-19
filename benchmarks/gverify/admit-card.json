@@ -1,0 +1,16 @@
+{
+ "name": "admit-card",
+ "status": "ok",
+ "rc": 1,
+ "passed": 40,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "13_text_colours",
+  "18_displacement",
+  "32_stroke_lines",
+  "45_char_accuracy",
+  "59_shape_anchor"
+ ]
+}

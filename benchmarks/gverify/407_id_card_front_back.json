@@ -1,0 +1,10 @@
+{
+ "name": "407_id_card_front_back",
+ "status": "ok",
+ "rc": 1,
+ "passed": 41,
+ "total": 42,
+ "failed": [
+  "32_stroke_lines"
+ ]
+}
