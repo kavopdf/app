@@ -1,51 +1,16 @@
+
+  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
 **19 Nov 2026 · slot 21:59 → 22:35 IST · 36 min**
 
 > **report-2col-table-spanning-both-columns** improved — 16.10 → 0.76. Corpus ratchet clean across 213 documents.
 
-## What the tables cannot show
-
-**The gate was the defect, and it had been failing every fixer run since 11:55.** Measuring the
-whole corpus with origin/main's engine and no change at all put 203 of 213 documents back exactly
-where the committed table had them and ten higher. Those ten are the rows the 11:55 justified-line
-commit touched; the table kept their older numbers, and `regress.py` compares every later commit
-against that table, so every run since then has been shown ten phantom regressions and no engine
-change could land. This run published the table the engine actually produces (commit `c6d8cdf`,
-no engine change in it) and the fix then landed.
-
-**Three versions of the fix were needed, and each one is a number.** The mechanism is that a row
-the page drew as one baseline is emitted as two paragraphs, and the second lands one hairline box
-low with nothing to take it back - 0.4554 pt per split row, +5.85 pt by y=421 on
-`bank-statement-horizontal-rules-only`. The first version broke a drop cap page (1.49 -> 4.28), the
-second counted one continuation of two on a three-box row, the third broke a question paper
-(0.11 -> 19.59) and a two-column page (0.80 -> 7.82) by treating a sidebar label 0.85 pt off a
-body line as that line's continuation. What finally held is exactness - 0.2 pt - not a fraction
-of the em.
-
-**w:vMerge is real but it is not this class.** `spanR` is computed at `PdfToWord:7950` and read by
-nothing, so a vertically merged source cell is written as three `w:gridSpan` and no `w:vMerge`.
-Subagent B measured all eighteen documents in the class and only `75_merged_header_cell_three_columns`
-has such a cell: the feature cannot close this class and is not what moves these numbers. It is
-still the right next piece of engine work, and the finding says exactly where it goes.
-
-**416_many_tiny_pages is EXEMPT and its row was not re-measured this run** - it carries the value
-the committed table had, which is the same value the previous run's hand measurement produced.
-
-**Two numbers in the tables above are bookkeeping, not the run.** The slot window reads 21:59
-because the claim was refreshed when the second corpus pass began; this run claimed at 18:53 and
-ended at 00:00, and the measurement work is what filled it - three full corpus passes, 213
-documents each, at about twenty minutes a pass. The agents' "4 min" is the gap between registering
-them and landing their findings: both were dispatched at 18:56 and the platform ran them inline
-anyway, so they cost the run about sixteen minutes of its own work before returning two findings
-that were worth it - the bank-statement row pitch, which became the fix, and the measurement that
-killed w:vMerge as a way into this class.
-
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **13** — 1 attempt(s), 1 kept |
+| Documents improved this run | **13** — 2 attempt(s), 1 kept |
 | Documents improved, round total | 58 of 213 |
 | Corpus improvement vs 15 Nov | **+37.17%** — mean 6.15 → 3.86 |
 | Regressions | **none** |
@@ -109,7 +74,7 @@ killed w:vMerge as a way into this class.
 
 ## Next run
 
-Re-run screen.py on content-present-partly-displaced: 13 documents moved but the class bar is a quarter of 18 = 5, so it is kept, not solved - the remaining open rows are 75_merged_header_cell_three_columns (w:vMerge, 1 of 18), 374_org_chart, payslip-label-left-amount-right and the ones the screen shows unchanged. Take the next-biggest class if this one is closer to done. Do not retry dropping fill-only rules from the Edge list.
+content-present-partly-displaced, 24 OPEN. Take 75_merged_header_cell_three_columns (27.31, the worst in the class): implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord:7950 already computes, and bucket each glyph by its own baseline band instead of the cell's top edge (7846) - the sibling finding says both are needed and that the band test alone moves Depot to the wrong row. Do not retry dropping fill-only rules from the Edge list (27.31 -> 46.58). Do not apply patches/rowgapok-run-pitch.patch on its old numbers.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
