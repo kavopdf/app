@@ -677,3 +677,25 @@ LibreOffice and fails Google is the exact defect this whole pipeline exists to s
 **If Drive is unavailable**, say so in the report and keep the change - an unmeasured Google side is a
 gap in the evidence, not a reason to throw away a real improvement. Write it into FINDINGS/ so the next
 run can measure it.
+
+---
+
+## START HERE: the largest class in the corpus is already diagnosed
+
+Before taking any class from any table, read these three, in this order:
+
+    benchmarks/DEFECT-CLASSES-GOOGLE.md          what Google fails, ranked by gap
+    FINDINGS/RULES-ARE-DRAWINGS-GOOGLE-DROPS-THEM.md   the cause
+    FINDINGS/RULES-PBDR-IMPLEMENTATION.md        the exact code, and the line the first attempt missed
+
+**Worth 53 + 48 documents.** LibreOffice fails `32_stroke_lines` on zero of them; Google fails it on 53.
+A rule is emitted as a floating `<w:drawing>`, Google drops the shape and keeps the `U+200B` anchor -
+which is why `32_stroke_lines` and `05_chars_extra` are one construct and not two.
+
+The implementation is written out. The one line that is easy to forget is `ctx.flowY = s.topPt` - omit
+it and every line below a rule moves up by the rule's gap, which is an `18_displacement` regression on
+every document with a rule. **The second-largest class made worse by the fix for the largest is not a
+fix.**
+
+**Do this one first.** It is the only class in the repository where the construct, the code and the
+failure signature are all already written down.
