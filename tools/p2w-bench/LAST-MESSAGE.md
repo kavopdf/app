@@ -110,6 +110,13 @@ change**. A fix that only touches `pageXml()` cannot reach any multi-column docu
 has many. That is a second construct, and it is written up in
 `FINDINGS/content-present-partly-displaced-rules-flush-works-displaces-055000-f1x.md`.
 
+No subagents were deployed, and the release guard refused on that, so the slot was released with
+`--force`. That is a real gap: two angles ran in parallel every recent run and both landed findings.
+The reason is budget rather than judgement — by the time the Google verdict on the reverted change
+came back this run was already past the point where a synchronous subagent could finish inside the
+turn, and a run that stays `running` blocks every later run. The two open questions above are written
+up sharply enough to be handed to an agent at the top of the next slot.
+
 Two attempts were recorded — the first as `partial` from the LibreOffice screen before the Google
 check existed, the second `reverted` once Google decided against it. The ledger carries both so the
 next run can see that the class moved and then stopped, rather than reading a clean zero.
