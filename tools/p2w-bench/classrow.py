@@ -57,7 +57,8 @@ def load_rank(path=RANK):
         if not d:
             continue
         try:
-            out[d] = (float(r["share1"]), float(r["share5"]), (r.get("problem") or "").strip())
+            out[d] = (float(r["share1"]), float(r["share5"]), (r.get("problem") or "").strip(),
+                      float(r["max_pt"]))
         except (KeyError, ValueError, TypeError):
             pass
     return out
@@ -170,7 +171,11 @@ def main(argv):
         if doc not in rank:
             out.append(line)
             continue
-        s1, s5, prob = rank[doc]
+        s1, s5, prob, mpt = rank[doc]
+        # The class this row was measured with, kept for the rows that are now clean: the file is a
+        # record of what was wrong there as well as a work queue, and the paragraph under the summary
+        # says so. Only the NUMBERS are repaired on those rows, never their history.
+        measured_problem = c[2]
         # THE PROBLEM COMES FROM THE RANKING, NOT FROM THIS FILE. The column was written when the row
         # was first classified and nothing updated it, so four documents still carried
         # "content-missing-nothing-in-its-place" while RANKING said "none" with share5 of 0.66, 0.56,
@@ -189,18 +194,36 @@ def main(argv):
             if status == "OPEN":
                 c[6] = "FIXED"
                 c[7] = "no defect"
-                out.append("| " + " | ".join(c) + " |")
-            else:
-                out.append(line)
+            # BOTH BRANCHES WRITE THE ROW. The else-branch used to `out.append(line)` - the row
+            # exactly as it was found - which discarded the `c[2] = prob` correction three lines
+            # above it and left every FIXED-and-clean row carrying whatever two numbers it was
+            # born with. Measured 20 Nov: 152 of the 212 rows still showed share1 under the share5
+            # heading and share5 under max_pt, because they are clean rows and only the OPEN ones
+            # went through the branch below. The correction is applied here for all of them.
+            out.append("| %s | `%s` | %s | %.2f | %.2f | %s | %s | %s |" % (
+                c[0], doc, measured_problem, s5, mpt, c[5], c[6], c[7]))
             continue
         # FIXED means WE fixed it: it was above the line at baseline and is at or below it now.
         # Anything already below the line at baseline was never this defect, and claiming it
         # would inflate the one number the whole pipeline is judged on.
-        was = base.get(doc, (None, None, None))[1]
+        was = base.get(doc, (None, None, None, None))[1]
         new_status = "FIXED" if (was is not None and was > thr >= s5) else "OPEN"
         new_note = ("share@5 %.2f" % s5) if new_status == "FIXED" else (note if note not in ("-", "") else "-")
+        # THE COLUMNS ARE share5 AND max_pt, AND THIS WROTE share1 AND share5 INTO THEM.
+        #
+        # Measured 20 Nov: the header of the document table is
+        #     | # | document | problem | share5 | max_pt | worst_page | status | note |
+        # and this format string put `s1` in the share5 column and `s5` in the max_pt column, so
+        # every row the tool has ever written carries two numbers under the wrong two names and
+        # the real max_pt is nowhere. It read as impossible arithmetic to the first agent that
+        # looked at it - mobile-bill "share@5 43.87, max_pt 1.55" is 44 % of ink beyond 5 px with
+        # nothing more than 1.55 pt from its place, which cannot be true of one page. Both numbers
+        # were right; only their labels were wrong: 43.87 is share@1px and 1.55 is share@5px.
+        # Nothing computed a status from these two cells, so no FIXED/OPEN claim is affected -
+        # new_status below is computed from `s5` in the dict, never from the row - and the repair
+        # is to write the two columns the header names.
         newrow = "| %s | `%s` | %s | %.2f | %.2f | %s | %s | %s |" % (
-            c[0], doc, c[2], s1, s5, c[5], new_status, new_note)
+            c[0], doc, c[2], s5, mpt, c[5], new_status, new_note)
         if newrow != line.strip():
             changed += 1
             if not write:

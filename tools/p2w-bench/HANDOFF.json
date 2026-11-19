@@ -284,6 +284,18 @@
   {
    "at": "04:03",
    "text": "health.py: _age() now takes the last COMMIT time of the path, not mtime (every cron clones fresh, so every mtime was the clone's, and the report read 0.0 h for all five stages while --stalled could never turn red). _attempts_recent() now parses the ledger's IST stamps with calendar.timegm - IST_OFFSET instead of time.mktime, which read them as pod-local UTC and put every attempt 5.5 h in the future: the watchdog's '6 attempt(s) in 3 h' was 2. Verified: ages 0.0 h -> 0.4 h on all five stages, attempts 6 -> 2. Both blockers closed in BLOCKERS.md."
+  },
+  {
+   "at": "04:04",
+   "text": "agent landed: contA-06 /  -> FINDINGS/content-present-partly-displaced-zerowidth-040040-7c1e.md"
+  },
+  {
+   "at": "04:13",
+   "text": "classrow.py fixed: load_rank() now reads max_pt and the row writer emits (share5, max_pt) into the columns the header names. Every row the tool ever wrote carried share1 under the share5 heading and share5 under max_pt - mobile-bill read 'share@5 43.87, max_pt 1.55', which is impossible arithmetic and cost an agent its whole budget proving the page was fine. Also: the clean-row branch discarded the c[2]=prob correction with out.append(line), so no FIXED-and-clean row ever got its numbers or its problem name repaired; both branches now write the row, and the measured class is preserved on those rows. Verified: 212 of 212 rows now match RANKING.csv on both columns, 0 status changes, 0 document changes, class summary counts identical (12/1 6/16 6/4 6/0 23/0 7/1 130). The queue's real shape: content-present-partly-displaced 23 open at share@5 1.0-4.0 with max_pt 13-17, not the sub-2pt figures the table used to show."
+  },
+  {
+   "at": "04:13",
+   "text": "agent landed: contB-06 /  -> FINDINGS/content-present-partly-displaced-subpx-041118-ed1d.md"
   }
  ],
  "next": "",
@@ -427,9 +439,10 @@
    "question": "after rules become w:pBdr, which construct still emits the U+200B anchor at y~797 on 18_centred_heading_left_body_txtpos, and is it a rule or a table/paragraph border",
    "expected": "expected by 05:00",
    "deployed": "03:54",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-19T22:24"
+   "status": "landed",
+   "finding": "FINDINGS/content-present-partly-displaced-zerowidth-040040-7c1e.md",
+   "deployed_at": "2026-11-19T22:24",
+   "landed_at": "2026-11-19T22:34"
   },
   {
    "id": "contB-06",
@@ -438,9 +451,10 @@
    "question": "mobile-bill share5 43.87 and electricity-bill 46.85 with max_pt only 1.55/1.33: what structural construct puts ~45 percent of ink just over 5px off while the outlier is under 2pt",
    "expected": "expected by 05:00",
    "deployed": "03:54",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-19T22:24"
+   "status": "landed",
+   "finding": "FINDINGS/content-present-partly-displaced-subpx-041118-ed1d.md",
+   "deployed_at": "2026-11-19T22:24",
+   "landed_at": "2026-11-19T22:43"
   }
  ],
  "run": {
