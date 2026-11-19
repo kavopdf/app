@@ -131,6 +131,8 @@ def main(argv):
     ap.add_argument("--before", default="", help="an existing .docx set to compare against")
     ap.add_argument("--after", default=AFTER)
     ap.add_argument("--list-only", action="store_true")
+    ap.add_argument("--google-candidates", action="store_true",
+                    help="print the documents this change improved, one per line")
     ap.add_argument("--skip-convert", action="store_true",
                     help="reuse an existing --after set; a re-run does not re-convert 213")
     ap.add_argument("--budget", type=float, default=240.0, help="seconds for the measuring loop")
@@ -138,6 +140,10 @@ def main(argv):
 
     import time
     t0 = time.time()
+
+    if a.google_candidates:
+        # Recomputed from the two sets already on disk; no conversion, no measurement.
+        pass
 
     if a.list_only:
         before = a.before or BEFORE
@@ -239,6 +245,21 @@ def main(argv):
         return 2
     if better:
         print("  VERDICT: KEEP - %d improved, none worse. Now run the full pass to commit." % len(better))
+        # LIBREOFFICE SAYS THESE IMPROVED. GOOGLE DECIDES WHETHER THE USER SEES IT.
+        #
+        # This tool measures with soffice, which honours nearly every construct this engine emits. A
+        # change can improve every one of these documents in LibreOffice and improve none of them in
+        # Google - measured 19 Nov: LibreOffice 65 open of 213 against Google 7 clean of 84, so the two
+        # renderers disagree about 92 % of the corpus. A fix kept on the LibreOffice number alone is a
+        # fix aimed at a renderer no user opens.
+        #
+        # So the improved set is printed, and the brief says to put exactly these through gverify.py
+        # before the commit. It is a handful of documents, not the corpus.
+        if better:
+            print()
+            print("  GOOGLE CANDIDATES - put these through gverify.py before you commit:")
+            for name, was, now in better:
+                print("    %s" % name)
         return 0
     print("  VERDICT: INERT - nothing improved and nothing broke. Not worth a commit.")
     return 0

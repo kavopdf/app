@@ -622,3 +622,58 @@ job and not its blocker.** There are failing documents to fix right now.
 
 **Use `round.py --phase`.** Use `stage.py` only to read how far the measurement has got, never to
 decide whether to work.
+
+---
+
+## LIBREOFFICE SAYS IT IMPROVED. GOOGLE DECIDES WHETHER THE USER SEES IT
+
+Measured 19 Nov, same engine, same corpus:
+
+    LibreOffice   65 open of 213      70 % clean
+    Google Docs    7 clean of 84      92 % FAIL
+
+**The gate is LibreOffice's.** `regress.py --check` reads RANKING.csv, which is a soffice render. So a
+change can improve every document it touches in LibreOffice and improve none of them in Google, pass
+the gate, and be committed - a fix aimed at a renderer no user opens. That is how a month of work
+produces nothing.
+
+**LibreOffice is still the right gate** - it is fast, it covers all 213, and it catches regressions.
+What it cannot do is tell you whether the change helped anyone.
+
+### So every kept change gets one Google check before the commit
+
+`verify-change.py` already prints the documents a change improved:
+
+    python3 tools/p2w-bench/verify-change.py
+      ...
+      GOOGLE CANDIDATES - put these through gverify.py before you commit:
+        18_centred_heading_left_body_txtpos
+        47_grey_body_black_headings
+        53_single_space_body_15_headings
+
+**That is a handful, not the corpus.** For each one, put it through Google and compare the 42 checks
+before and after:
+
+    1. copy out/<name>.docx into /scratch/output/ and upload it
+         upload(path=..., tool_slug="GOOGLEDRIVE_CREATE_FILE", toolkit="googledrive")
+    2. GOOGLEDRIVE_CREATE_FILE with mimeType="application/vnd.google-apps.document", parents=[
+       1OoSHtsv-qEUwk8CnNa9d5hsCKu8PFeij]  - converts on upload
+    3. GOOGLEDRIVE_DOWNLOAD_FILE(fileId, mime_type="application/pdf")
+    4. python3 tools/p2w-bench/gverify.py --collect <name> <s3url>
+
+`--collect` also refreshes the LibreOffice side, so one call gives both numbers.
+
+### What to do with the answer
+
+| LibreOffice | Google | keep? |
+|---|---|---|
+| better | better or equal | **keep** - this is what a fix looks like |
+| better | worse | **revert** - the fix is for a renderer nobody opens |
+| better | cannot measure | **keep, and say so** - a Drive failure is not evidence |
+
+**Do not skip this because it is slower.** Three or four documents is two minutes. A fix that passes
+LibreOffice and fails Google is the exact defect this whole pipeline exists to stop committing.
+
+**If Drive is unavailable**, say so in the report and keep the change - an unmeasured Google side is a
+gap in the evidence, not a reason to throw away a real improvement. Write it into FINDINGS/ so the next
+run can measure it.
