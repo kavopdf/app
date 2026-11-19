@@ -99,7 +99,7 @@ pause/resume on a run that will not die is noise, not a fix.
 
     baseline    01M7N3RTAM7SATT9TXMQPP7QRM     hourly :00
     classifier  01M733RFR3D71C2E0T2TQ9PW0R     hourly :40
-    fixer       01M7MT22NTGYACMGSETJ8R8NZY     hourly :50   <- the one that matters
+    fixer       01M7TA3F4NTRWQZD6AQQESR51A     hourly :50   <- the one that matters
     apk         01M72XD9FD9MDM35X4Z7TQ6RRW     daily 22:00
     gverify     01M7T6STKQJ2KPZAYFMCZVCG85     hourly :20
     watchdog    01M7T903P1BTMEEG8SJ9SA47MQ     every 3 h
@@ -157,3 +157,40 @@ should say so plainly in `BLOCKERS.md` with the fixer's attempt count beside it.
 
 **Never edit a past row.** The value of a trend is that it was not adjusted afterwards. If a row is
 wrong because a table was regenerated, append a new row with a note; do not rewrite history.
+
+---
+
+## A ZOMBIE RUN: pause/resume is not always enough
+
+Found 19 Nov, hours after the first fix. A fixer run started 18:52, released its slot, and stayed
+`status: running` on the platform for over three hours. `pause` then `resume` recomputed
+`next_fire_at` correctly and the pipeline looked healthy - **but the zombie was still there, and the
+cron still would not fire.** Every later run was blocked by a run that had already finished its work
+and never exited.
+
+**`pause`/`resume` clears a stale `next_fire_at`. It does not clear a zombie run.** Those are two
+different faults and only one of them is fixed by pause/resume.
+
+    cron(action="runs", cron_id="<id>")     # is the OLD run still listed `running`?
+
+If a run has been `running` for more than an hour with `ended_at: null` and the slot is free, it is a
+zombie. **The only way to clear it is to recreate the cron:**
+
+    cron(action="delete", cron_id="<id>")     # then create it again with the same prompt
+    cron(action="create", name=..., schedule=..., prompt=...)
+
+Deleting a cron does not delete the repository, the state or the work - only the schedule and its run
+history. The new cron fires on the next matching minute.
+
+**After recreating, the id changes.** Update the table above in this file and in the watchdog's own
+prompt, or the watchdog will try to pause a cron that no longer exists and report success while nothing
+happens. **That is the quietest failure in the whole system.**
+
+### The order, when a stage is stopped
+
+    1. health.py --stalled                       which stage
+    2. cron(action="runs")                       is a run still `running`?
+       no  -> pause/resume, done
+       yes -> and it has been running >1 h with ended_at null -> zombie -> delete + recreate
+    3. update the id in this file and in the watchdog prompt
+    4. write what you did into BLOCKERS.md
