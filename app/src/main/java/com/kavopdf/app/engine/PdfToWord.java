@@ -2019,6 +2019,49 @@ public final class PdfToWord {
             }
         }
 
+        /**
+         * The factor the current transformation matrix applies to a glyph's SIZE.
+         *
+         * PDFBox hands back a glyph's size in TEXT space and its advance in DEVICE space.
+         * {@code getFontSize()} / {@code getFontSizeInPt()} are the Tf operand scaled by the text
+         * matrix and never by the CTM - {@code getCurrentTransformationMatrix} is read nowhere in
+         * this text path. So a glyph drawn inside a Form XObject whose {@code cm} scales by k was
+         * recorded at 1/k of the size the page draws it at, and the writer re-laid the line k times
+         * too narrow.
+         *
+         * MEASURED, 411_nested_xobject_transforms: 10 pt set inside {@code q 1.6 0 0 1.6 cm}, the
+         * page draws 16 pt, the model held 10 pt from a correct origin - so the ink compressed
+         * toward the origin and the error grew along the line to 97.92 pt at the far end. 31.05 %
+         * of the document displaced. Multiplying the size by this factor takes it to 0.00.
+         *
+         * THE FACTOR MUST BE THE CTM AND NOTHING ELSE. {@code size} already carries the text
+         * matrix, so multiplying by |Trm| as well double-counts it and sends 041122 from 98.65 to
+         * 97.81 - that measurement is what separates the right formula from a plausible one. The
+         * advance is not scaled at all: {@code getWidthDirAdj()} already includes the CTM.
+         *
+         * The geometric mean of the matrix's two column lengths is the factor a uniform scale
+         * gives exactly, and the average a non-uniform one gives, which is the closest a single
+         * size can be to a skewed glyph. A sweep of all 213 corpus PDFs finds exactly one document
+         * that draws text under a CTM whose scale differs from 1.
+         */
+        private double ctmScale() {
+            try {
+                com.tom_roush.pdfbox.util.Matrix m =
+                        getGraphicsState().getCurrentTransformationMatrix();
+                if (m == null) return 1.0;
+                // PDFBox's Matrix is row-major: getValue(row, col). The two column vectors are
+                // (a, c) and (b, d); their lengths are the scales the matrix applies to x and y.
+                double a = m.getValue(0, 0), b = m.getValue(0, 1);
+                double c = m.getValue(1, 0), d = m.getValue(1, 1);
+                double col0 = Math.sqrt(a * a + c * c);
+                double col1 = Math.sqrt(b * b + d * d);
+                if (col0 <= 0 || col1 <= 0) return 1.0;
+                return Math.sqrt(col0 * col1);
+            } catch (Exception ignored) {
+                return 1.0;
+            }
+        }
+
         @Override
         protected void processTextPosition(TextPosition tp) {
             if (!onPage(tp)) return;
@@ -2053,6 +2096,13 @@ public final class PdfToWord {
             // the page did not name.
             g.sizePt = tp.getFontSizeInPt() > 0 ? tp.getFontSizeInPt() : tp.getFontSize();
             g.size = tp.getFontSize() > 0 ? tp.getFontSize() : tp.getFontSizeInPt();
+            // The CTM the page drew this glyph under. 1.0 for every glyph not inside a scaled
+            // Form XObject, which is 212 of the 213 corpus documents - see ctmScale().
+            double ctmScale = ctmScale();
+            if (Math.abs(ctmScale - 1.0) > 1e-4) {
+                g.sizePt *= (float) ctmScale;
+                g.size *= (float) ctmScale;
+            }
             PDFont font = tp.getFont();
             g.font = font == null ? "" : font.getName();
             String n = g.font.toLowerCase(Locale.ROOT);
@@ -3189,6 +3239,35 @@ public final class PdfToWord {
     }
 
     /**
+     * A combining mark cannot begin a run, because it has no advance of its own to compare.
+     *
+     * <p>The cut above asks whether a glyph starts before the one before it ends, and that is
+     * the right question for two runs drawn across one another. It is the wrong question for a
+     * mark, whose origin the shaper places INSIDE the base glyph's advance: on
+     * 78_mixed_english_devanagari_line the receipt draws केवल as क at x=198.50 with an 8.38 pt
+     * advance, so the े belongs at x=204.50 - 2.38 pt inside the box of the letter it hangs on.
+     * 204.50 < 198.50 + 8.38 - 0.5, so the cut fired and the receipt's own run was cut in two
+     * between क and ेवल. The halves were then sorted by their first x, which put the amount
+     * overlay drawn on the same baseline between them: the .txt read "क" / ". 4,200.00" /
+     * "ेवल चार हजार दो सौ रुपये", and the tokens क and ेवल were invented on a document whose
+     * text is केवल. Same mechanism cut पंजीकृत into पंजीक and ृत at y=652.60.
+     *
+     * <p>So the test is skipped when the glyph is a mark: a mark stays in the run it was drawn
+     * on. Nothing else about the cut changes - two real runs still separate wherever a glyph
+     * genuinely starts before its predecessor ends, which is what the pass exists for.
+     */
+    private static boolean combiningMark(Glyph g) {
+        if (g.text == null) return false;
+        for (int i = 0; i < g.text.length(); ) {
+            int cp = g.text.codePointAt(i);
+            i += Character.charCount(cp);
+            int t = Character.getType(cp);
+            if (t == Character.NON_SPACING_MARK || t == Character.COMBINING_SPACING_MARK) return true;
+        }
+        return false;
+    }
+
+    /**
      * Puts a baseline's glyphs in reading order without breaking a run apart.
      *
      * <p>Sorting every glyph by x interleaves runs that overlap - text that runs past its cell
@@ -3216,7 +3295,8 @@ public final class PdfToWord {
         List<Glyph> run = new ArrayList<>();
         Glyph prev = null;
         for (Glyph g : glyphs) {
-            if (prev != null && g.x < prev.x + prev.width - 0.5f) {
+            if (prev != null && !combiningMark(g)
+                    && g.x < prev.x + prev.width - Math.max(0.5f, prev.size * 0.10f)) {
                 runs.add(run);
                 run = new ArrayList<>();
             }
