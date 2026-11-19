@@ -298,7 +298,7 @@
    "text": "agent landed: contB-06 /  -> FINDINGS/content-present-partly-displaced-subpx-041118-ed1d.md"
   }
  ],
- "next": "",
+ "next": "Write the page's shapes in TOP ORDER among its blocks, then land ruleAsBorder with the flow guard. Concretely: in DocxWriter.pageXml()'s emit loop (DocxWriter.java:1324-1332) flush any not-yet-written Shape whose s.topPt <= the next block's top before writing that block, and flush the rest after the loop; leave paragraph and table order exactly as it is (the column pass and the budget guard depend on it). Only then is ruleAsBorder()'s test s.topPt > ctx.flowY ever true - today PdfToWord.attachShapes appends every shape AFTER the paragraphs (PdfToWord.java:7122) so the flow is always at the foot of the page and the border lands there. Then add ruleAsBorder (FINDINGS/RULES-PBDR-IMPLEMENTATION.md, the w:before gap and ctx.flowY = s.topPt) with an early return when the rule is behind the flow, and measure with verify-change.py. Worth 53 documents on 32_stroke_lines and 48 on 05_chars_extra in Google, and zero in LibreOffice - so the gate cannot see it and the Google check decides.",
  "agents": [
   {
    "id": "contA-01",
