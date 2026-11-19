@@ -1,0 +1,17 @@
+{
+ "name": "delivery-challan",
+ "status": "ok",
+ "rc": 1,
+ "passed": 39,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "13_text_colours",
+  "18_displacement",
+  "25_invisible_text",
+  "26_text_overlap",
+  "32_stroke_lines",
+  "60_text_column_right_edge"
+ ]
+}

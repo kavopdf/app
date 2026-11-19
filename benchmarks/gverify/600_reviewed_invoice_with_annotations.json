@@ -1,0 +1,16 @@
+{
+ "name": "600_reviewed_invoice_with_annotations",
+ "status": "ok",
+ "rc": 1,
+ "passed": 37,
+ "total": 44,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "28_clipped_at_edge",
+  "32_stroke_lines",
+  "45_char_accuracy",
+  "47_margins",
+  "62_table_columns"
+ ]
+}

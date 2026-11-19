@@ -1,0 +1,12 @@
+{
+ "name": "391_survey_questionnaire_grid",
+ "status": "ok",
+ "rc": 1,
+ "passed": 39,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "17_matched_runs",
+  "32_stroke_lines"
+ ]
+}

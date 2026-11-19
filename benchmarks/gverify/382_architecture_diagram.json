@@ -1,0 +1,10 @@
+{
+ "name": "382_architecture_diagram",
+ "status": "ok",
+ "rc": 1,
+ "passed": 41,
+ "total": 42,
+ "failed": [
+  "05_chars_extra"
+ ]
+}

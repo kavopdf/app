@@ -1,0 +1,11 @@
+{
+ "name": "402_calendar_month_grid",
+ "status": "ok",
+ "rc": 1,
+ "passed": 45,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement"
+ ]
+}

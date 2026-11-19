@@ -1,0 +1,18 @@
+{
+ "name": "69_two_col_legal_numbered_clauses",
+ "status": "ok",
+ "rc": 1,
+ "passed": 33,
+ "total": 42,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "10_font_sizes",
+  "13_text_colours",
+  "17_matched_runs",
+  "32_stroke_lines",
+  "38_list_markers",
+  "44_header_footer",
+  "45_char_accuracy"
+ ]
+}

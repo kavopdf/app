@@ -1,0 +1,14 @@
+{
+ "name": "property-tax-receipt",
+ "status": "ok",
+ "rc": 1,
+ "passed": 42,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "13_text_colours",
+  "18_displacement",
+  "32_stroke_lines"
+ ]
+}
