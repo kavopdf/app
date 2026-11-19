@@ -239,7 +239,7 @@
   "status": "OPEN"
  },
  "content-present-partly-displaced": {
-  "attempts": 9,
+  "attempts": 11,
   "first_seen": null,
   "history": [
    {
@@ -304,6 +304,20 @@
     "outcome": "error",
     "reason": "no fix was built or measured, on purpose: the pBdr rule change cannot work until a rule is written before the text below it. PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs (",
     "total": 23
+   },
+   {
+    "at": "2026-11-20 05:11",
+    "moved": 2,
+    "outcome": "partial",
+    "reason": "flushShapes writes a page's shapes in TOP ORDER among its blocks (DocxWriter.pageXml) and ruleAsBorder turns a horizontal hairline the flow has reached into w:pBdr with a real w:before gap, ctx.flowY=",
+    "total": 23
+   },
+   {
+    "at": "2026-11-20 05:17",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "REVERTS attempt 10. attempt 10 was recorded 'partial 2/23' from the LibreOffice screen before the Google check existed; the Google check then decided against it. flushShapes (top-ordered shape emit in",
+    "total": 23
    }
   ],
   "last": null,
@@ -319,11 +333,13 @@
    "kept",
    "kept",
    "kept",
-   "error"
+   "error",
+   "partial",
+   "reverted"
   ],
   "ratchet_at": "20 Nov 03:40",
   "ratchet_docs": 213,
-  "reason": "no fix was built or measured, on purpose: the pBdr rule change cannot work until a rule is written before the text below it. PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs (PdfToWord.java:7122) and pageXml writes page.blocks in list order (DocxWriter.java:1324), so ctx.flowY is at the foot of the page when every rule is emitted and w:before can never place a border at the rule's y. That is the cause of the 19 Nov 'both borders at the foot (807/808)' number, computed here from the emitted spacing of the same document (flow 805.9 vs rules at 110.0 and 793.89). Without a guard pBdr is a LibreOffice regression, since the drawing path pins the rule absolutely and LibreOffice fails 32_stroke_lines on zero documents. Written up in FINDINGS/content-present-partly-displaced-rules-cannot-flow-044000-f1x.md with the flush-shapes-by-top change that makes it possible.",
+  "reason": "REVERTS attempt 10. attempt 10 was recorded 'partial 2/23' from the LibreOffice screen before the Google check existed; the Google check then decided against it. flushShapes (top-ordered shape emit in pageXml) + ruleAsBorder (w:pBdr with w:before and ctx.flowY=s.topPt) turned both rules on 18_centred_heading_left_body_txtpos into borders at the page's own ys (110.0 and 793.89, 2 pBdr / 0 drawings) and flipped 32_stroke_lines FAIL->PASS in Google, but made 18_displacement fail where it had passed, in BOTH renderers: LibreOffice 42/42 -> 41/42 on a document that was clean. Reverted. The exact diff is FINDINGS/rules-flush-by-top-WORKS-DISPLACES-055000-f1x.patch and the numbers are in the matching .md. Second blocker: 315_gazette_notification takes columnPage(), which returns before the emit loop, so no multi-column document can be reached by a pageXml-only fix - it measured pBdr 0 / drawings 5 and unchanged 40/42 in Google.",
   "reasons": [
    "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them refuted: 75_merged_header_cell_three_columns 27.31 -> 46.58 and 1 page -> 2, because the shading band's edges are the only rules that close those header cells. Reverted. The real fix is the finding's: lattice-cut cells plus w:vMerge, since spanR is computed and read by nothing.",
    "recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down the page (bank-statement 0.4554 pt x 12 rows = +5.85 pt). Whole corpus 13 improved, 0 worse. Also published the table this engine actually produces - ten rows were stale and had blocked every fixer run since 11:55.",
@@ -333,7 +349,9 @@
    "w:vMerge emitted from spanR (DocxWriter) + spanR recorded only on the row a rectangle starts (PdfToWord) + a rectangle spanning rows is a merge only when its text occupies fewer bands than the rows it covers, else each line goes to its own band and the cell's width is written there. 75_merged_header_cell_three_columns 27.31->7.62 (Google 39/47->41/47), table-with-merged-cells 4.93->0.67 (Google 42/47->43/47, 65_table_span_down now passes). 4 of 213 docx changed, 2 bank forms unchanged in score, 209 identical by content hash. regress.py --check PASS.",
    "recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one. 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 100.0. Screen PASS: 23 measured, 22 same, 1 better, 0 worse. Corpus ratchet pending.",
    "recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one (the 'break' at PdfToWord:8666). 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 100.0. Corpus ratchet: 212/212 measured, 1 better, 0 worse; .txt 213 unchanged. Gate PASS.",
-   "no fix was built or measured, on purpose: the pBdr rule change cannot work until a rule is written before the text below it. PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs (PdfToWord.java:7122) and pageXml writes page.blocks in list order (DocxWriter.java:1324), so ctx.flowY is at the foot of the page when every rule is emitted and w:before can never place a border at the rule's y. That is the cause of the 19 Nov 'both borders at the foot (807/808)' number, computed here from the emitted spacing of the same document (flow 805.9 vs rules at 110.0 and 793.89). Without a guard pBdr is a LibreOffice regression, since the drawing path pins the rule absolutely and LibreOffice fails 32_stroke_lines on zero documents. Written up in FINDINGS/content-present-partly-displaced-rules-cannot-flow-044000-f1x.md with the flush-shapes-by-top change that makes it possible."
+   "no fix was built or measured, on purpose: the pBdr rule change cannot work until a rule is written before the text below it. PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs (PdfToWord.java:7122) and pageXml writes page.blocks in list order (DocxWriter.java:1324), so ctx.flowY is at the foot of the page when every rule is emitted and w:before can never place a border at the rule's y. That is the cause of the 19 Nov 'both borders at the foot (807/808)' number, computed here from the emitted spacing of the same document (flow 805.9 vs rules at 110.0 and 793.89). Without a guard pBdr is a LibreOffice regression, since the drawing path pins the rule absolutely and LibreOffice fails 32_stroke_lines on zero documents. Written up in FINDINGS/content-present-partly-displaced-rules-cannot-flow-044000-f1x.md with the flush-shapes-by-top change that makes it possible.",
+   "flushShapes writes a page's shapes in TOP ORDER among its blocks (DocxWriter.pageXml) and ruleAsBorder turns a horizontal hairline the flow has reached into w:pBdr with a real w:before gap, ctx.flowY=s.topPt, and a guard that declines when the rule is behind the flow. On 18_centred_heading_left_body_txtpos the emitted XML now carries 2 pBdr and 0 drawings, landing at 110.0 and 793.89 pt - the page's own ys - where the previous engine put both at 807/808. LibreOffice screen (3 of 23): 304 3.41->2.47, 315 1.96->1.91, 27 unchanged; nothing worse. Google check is the deciding evidence and was not complete when this was recorded.",
+   "REVERTS attempt 10. attempt 10 was recorded 'partial 2/23' from the LibreOffice screen before the Google check existed; the Google check then decided against it. flushShapes (top-ordered shape emit in pageXml) + ruleAsBorder (w:pBdr with w:before and ctx.flowY=s.topPt) turned both rules on 18_centred_heading_left_body_txtpos into borders at the page's own ys (110.0 and 793.89, 2 pBdr / 0 drawings) and flipped 32_stroke_lines FAIL->PASS in Google, but made 18_displacement fail where it had passed, in BOTH renderers: LibreOffice 42/42 -> 41/42 on a document that was clean. Reverted. The exact diff is FINDINGS/rules-flush-by-top-WORKS-DISPLACES-055000-f1x.patch and the numbers are in the matching .md. Second blocker: 315_gazette_notification takes columnPage(), which returns before the emit loop, so no multi-column document can be reached by a pageXml-only fix - it measured pBdr 0 / drawings 5 and unchanged 40/42 in Google."
   ],
   "requeues": 0,
   "status": "OPEN"

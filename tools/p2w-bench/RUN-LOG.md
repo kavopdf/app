@@ -1,6 +1,3 @@
-| 12 Nov 08:11 | baseline | 10 documents measured, each committed (56_table_indented_from_margin, 57_centred_title_page_left_body_pages, 58_header_rule_footer_rule, 59_landscape_mixed_portrait, 60_page_border, 61_two_col_abstract_spanning, 62_two_col_newsletter_pull_quote, 63_three_column_brochure, 64_newspaper_uneven_columns_ad_boxes, 65_two_col_full_width_figure_caption) |
-| 12 Nov 08:13 | baseline | txt backfill: 10 more documents recorded (01_stamp_rotated_15deg_upright .. 10_stamp_as_image), gap 129 -> 119 |
-| 12 Nov 08:13 | baseline | note: pre-existing 'probe-commit-test' text file left in KavoPDF-Verify by an earlier probe run; not created by this run, left in place |
 | 12 Nov 08:14 | baseline | ratchet held (docx 140/208 scored, txt 21/208); slot released |
 | 12 Nov 09:06 | baseline | started | phase measure |
 | 12 Nov 09:45 | baseline | 10 documents measured, each committed (66_two_col_footnotes_bottom, 67_two_col_with_sidebar, 68_journal_wide_table_spanning, 69_two_col_legal_numbered_clauses, 70_magazine_drop_cap_photo_caption, 71_invoice_space_aligned_no_rules, 72_bank_statement_no_rules_right_amounts, 73_marksheet_subject_marks_grade, 74_balance_sheet_indented_subitems, 75_merged_header_cell_three_columns) |
@@ -198,3 +195,6 @@
 | 20 Nov 03:53 | fixer | slot claimed - fixer running |
 | 20 Nov 04:03 | fixer | attempt content-present-partly-displaced -> error (0/23 moved) |
 | 20 Nov 04:14 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 20 Nov 04:59 | fixer | slot claimed - fixer running |
+| 20 Nov 05:11 | fixer | attempt content-present-partly-displaced -> partial (2/23 moved) |
+| 20 Nov 05:17 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |

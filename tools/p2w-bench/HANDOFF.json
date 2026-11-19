@@ -296,9 +296,17 @@
   {
    "at": "04:13",
    "text": "agent landed: contB-06 /  -> FINDINGS/content-present-partly-displaced-subpx-041118-ed1d.md"
+  },
+  {
+   "at": "05:11",
+   "text": "attempt 10 on content-present-partly-displaced -> partial (2/23 moved)"
+  },
+  {
+   "at": "05:17",
+   "text": "attempt 11 on content-present-partly-displaced -> reverted (0/23 moved)"
   }
  ],
- "next": "Write the page's shapes in TOP ORDER among its blocks, then land ruleAsBorder with the flow guard. Concretely: in DocxWriter.pageXml()'s emit loop (DocxWriter.java:1324-1332) flush any not-yet-written Shape whose s.topPt <= the next block's top before writing that block, and flush the rest after the loop; leave paragraph and table order exactly as it is (the column pass and the budget guard depend on it). Only then is ruleAsBorder()'s test s.topPt > ctx.flowY ever true - today PdfToWord.attachShapes appends every shape AFTER the paragraphs (PdfToWord.java:7122) so the flow is always at the foot of the page and the border lands there. Then add ruleAsBorder (FINDINGS/RULES-PBDR-IMPLEMENTATION.md, the w:before gap and ctx.flowY = s.topPt) with an early return when the rule is behind the flow, and measure with verify-change.py. Worth 53 documents on 32_stroke_lines and 48 on 05_chars_extra in Google, and zero in LibreOffice - so the gate cannot see it and the Google check decides.",
+ "next": "Re-apply FINDINGS/rules-flush-by-top-WORKS-DISPLACES-055000-f1x.patch with 'git apply' - the flush-by-top change is PROVEN (18_centred: 0->2 pBdr, 2->0 drawings, both rules at the page's own ys 110.0 and 793.89, 32_stroke_lines FAIL->PASS in Google) and it is the precondition the last three runs were missing. Then fix the ONE thing it breaks: 18_displacement. It is NOT the gap (border 1 lands within 0.5 pt of its rule), NOT the below=flowBoxPt*(1-LINE_BASE) term (flowBoxPt is 0 when the rule is flushed) and NOT the kind!=0 guard (removing it changed nothing). It is the reader's position AFTER the carrier paragraph. Measure both variants on 18_centred through gverify: (a) ctx.flowY = s.topPt as written, (b) ctx.flowY left unchanged. One build, one Google round trip, and 18_displacement decides. THEN, separately: columnPage() (DocxWriter.java:2005, :2146, :2214) emits before/cells/after with plain emitBlock loops and returns before pageXml's emit loop, so no multi-column document can be reached - 315_gazette_notification measures pBdr 0 / drawings 5 / 40-42 unchanged because its two horizontal rules land in 'after' with flowY already 751.87. That is a second construct and the bigger share of the corpus.",
  "agents": [
   {
    "id": "contA-01",
@@ -458,7 +466,7 @@
   }
  ],
  "run": {
-  "started": "03:53",
+  "started": "04:59",
   "ended": null,
   "ended_how": null
  },
@@ -549,7 +557,7 @@
    "plan": ""
   }
  ],
- "context": "THE RULE CLASS HAS A STRUCTURAL PRECONDITION, AND IT IS NOT MET. The largest Google class (32_stroke_lines 53 docs, 05_chars_extra 48) is rules emitted as floating w:drawing that Google drops. The pBdr fix is written (FINDINGS/RULES-PBDR-IMPLEMENTATION.md) and cannot work yet: PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs (PdfToWord.java:7122) and DocxWriter.pageXml writes page.blocks in list order (DocxWriter.java:1324), so when a rule is written ctx.flowY is at the foot of the page - 805.9 pt on 18_centred_heading_left_body_txtpos, against rules at 110.0 and 793.89. w:before can only move a border FORWARD, so it lands at the foot: that is the 19 Nov 'both at 807/808' measurement, and it is why 'rules drawn 2, lost 1 of 2'. Do NOT build pBdr again until shapes are written in top order among the page's blocks (flush any shape whose s.topPt <= the next block's top, before writing that block) - then the guard s.topPt > ctx.flowY starts being true and the gap is real. Also confirmed by an agent this run: there is NO third construct emitting the U+200B. The emitted XML of all 211 corpus docx contains ZERO U+200B - no Java line writes it, it is Google's own placeholder for a dropped floating drawing. The two drawings on that page are the only constructs at the foot. Do not hunt for a third.",
+ "context": "THE FLUSH-BY-TOP PRECONDITION IS SOLVED; THE RESIDUAL IS DISPLACEMENT, NOT THE RULE. The rule class (Google 32_stroke_lines 145 docs, 05_chars_extra 141) needs a rule written as w:pBdr, and the pBdr fix was inert because attachShapes appends shapes after the paragraphs so the flow was always at the foot. This run built the flush: DocxWriter.pageXml now emits a page's shapes in TOP ORDER among its blocks (flush any unwritten shape whose topPt <= the next Para/Table top, rest after the loop; paragraph/table order untouched). That works exactly as predicted - on 18_centred_heading_left_body_txtpos the emitted XML goes 0->2 w:pBdr and 2->0 w:drawing, both rules landing at the page's own ys 110.0 and 793.89 (the earlier finding's 805.9-pt flow problem is gone), and 32_stroke_lines flips FAIL->PASS in Google. It is REVERTED because it makes 18_displacement fail where it passed - LibreOffice 42/42 -> 41/42 on a document that was clean, Google 18_displacement PASS->FAIL - and the brief says a fix for the largest class that breaks the second-largest is not a fix. The exact diff is FINDINGS/rules-flush-by-top-WORKS-DISPLACES-055000-f1x.patch; re-apply it with 'git apply' and fix the flow. THREE THINGS ARE RULED OUT and must not be retried: the below=flowBoxPt*(1-LINE_BASE) term (flowBoxPt is 0 when the rule is flushed, it contributes nothing), the kind!=0 path guard (removing it changed nothing), and the gap arithmetic (border 1 lands within 0.5 pt of its rule). The residual is the READER'S POSITION AFTER the carrier paragraph, not the gap before it: try emitting the border with ctx.flowY UNCHANGED and compare 18_displacement against the ctx.flowY=s.topPt version - one build and one Google round trip. SECOND BLOCKER, larger than it looks: 315_gazette_notification is three-column and takes columnPage(), which returns BEFORE the emit loop, so its two horizontal rules (y 59.6 and 77.8) are written at the foot (flowY 751.87), both declined, and the document measures pBdr 0 / drawings 5 and 40/42 unchanged in Google. columnPage emits three lists (before, cells[c], after) with plain emitBlock loops at DocxWriter.java:2005, :2146 and :2214; the horizontal rules land in 'after'. A pageXml-only fix cannot reach ANY multi-column document, and the corpus has many. That is the next structural question and it is separate from this one.",
  "needs_human": [],
  "next_class": ""
 }

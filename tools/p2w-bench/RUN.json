@@ -1,16 +1,14 @@
 {
- "started_ts": 1795127005.1946025,
- "started": "03:53",
- "ended_ts": 1795128268.243794,
- "ended": "04:14",
+ "started_ts": 1795130940.7651992,
+ "started": "04:59",
+ "ended_ts": null,
+ "ended": null,
  "class": "content-present-partly-displaced",
- "attempts": 1,
+ "attempts": 2,
  "kept": 0,
  "docs_improved": 0,
- "agents": [
-  "contA-06",
-  "contB-06"
- ],
+ "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0
+ "needs_human": 0,
+ "partial": 1
 }

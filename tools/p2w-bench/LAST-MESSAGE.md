@@ -1,14 +1,15 @@
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 03:53 → 04:14 IST · 21 min**
+**20 Nov 2026 · slot 04:59 → running IST · 19 min**
 
-> No change was kept this run. The numbers below say what was tried.
+> No change was kept this run — but the thing three runs could not get past is now solved and measured.
+> The diff is kept in FINDINGS/ so the next run re-applies it in one command instead of rebuilding it.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.44%** — mean 6.15 → 3.72 |
 | Regressions | **none** |
@@ -17,13 +18,13 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `content-present-partly-displaced` |
-| Committed | **18** files in 3 commit(s) from `0841265` — ...artly-displaced-rules-cannot-flow-044000-f1x.md, ATTEMPTS.json, BLOCKERS.md, CLASS-HISTORY.jsonl, DEFECT-CLASSES.md, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, TIMELINE.jso |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 04:03 | **error** | 0/23 | no fix was built or measured, on purpose: the pBdr rule change cannot work until a rule is written before the text below it. PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs ( |
+| 05:11 | **partial** | 2/23 | flushShapes writes a page's shapes in TOP ORDER among its blocks (DocxWriter.pageXml) and ruleAsBorder turns a horizontal hairline the flow has reached into w:pBdr with a real w:before gap, ctx.flowY= |
+| 05:17 | **reverted** | 0/23 | REVERTS attempt 10. attempt 10 was recorded 'partial 2/23' from the LibreOffice screen before the Google check existed; the Google check then decided against it. flushShapes (top-ordered shape emit in |
 
 ## The txt
 
@@ -36,30 +37,26 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `contA-06` | after rules become w:pBdr, which construct still emi | 03:54 | 22:34 | 10 min |
-| `contB-06` | mobile-bill share5 43.87 and electricity-bill 46.85  | 03:54 | 22:43 | 19 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 03:53 → 04:14 · 21 min |
+| Slot window | 04:59 → running · 19 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 33 |
-| Longest silence | **9.5 min** — from 03:54:06, after `handoff.py: reading or writing the handoff` |
+| Tool beats | 14 |
+| Longest silence | **12.4 min** — from 04:59:16, after `attempt.py: recording an attempt` |
 | Silences over 2 min | 2 |
-| Obstacles | 2 cleared · 0 need a human |
+| Obstacles | 0 cleared · 0 need a human |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **18 min** | `###################` |
-| record - attempt, handoff, class rows | **2 min** | `###` |
-| report - the report and the chain | **0 min** | `#` |
+| fix - diagnose and change the engine | **18 min** | `#####################` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -72,37 +69,50 @@
 
 ## Next run
 
-Write the page's shapes in TOP ORDER among its blocks, then land ruleAsBorder with the flow guard. Concretely: in DocxWriter.pageXml()'s emit loop (DocxWriter.java:1324-1332) flush any not-yet-written Shape whose s.topPt <= the next block's top before writing that block, and flush the rest after the loop; leave paragraph and table order exactly as it is (the column pass and the budget guard depend on it). Only then is ruleAsBorder()'s test s.topPt > ctx.flowY ever true - today PdfToWord.attachShapes appends every shape AFTER the paragraphs (PdfToWord.java:7122) so the flow is always at the foot of the page and the border lands there. Then add ruleAsBorder (FINDINGS/RULES-PBDR-IMPLEMENTATION.md, the w:before gap and ctx.flowY = s.topPt) with an early return when the rule is behind the flow, and measure with verify-change.py. Worth 53 documents on 32_stroke_lines and 48 on 05_chars_extra in Google, and zero in LibreOffice - so the gate cannot see it and the Google check decides.
-
----
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+Re-apply FINDINGS/rules-flush-by-top-WORKS-DISPLACES-055000-f1x.patch with 'git apply' - the flush-by-top change is PROVEN (18_centred: 0->2 pBdr, 2->0 drawings, both rules at the page's own ys 110.0 and 793.89, 32_stroke_lines FAIL->PASS in Google) and it is the precondition the last three runs were missing. Then fix the ONE thing it breaks: 18_displacement. It is NOT the gap (border 1 lands within 0.5 pt of its rule), NOT the below=flowBoxPt*(1-LINE_BASE) term (flowBoxPt is 0 when the rule is flushed) and NOT the kind!=0 guard (removing it changed nothing). It is the reader's position AFTER the carrier paragraph. Measure both variants on 18_centred through gverify: (a) ctx.flowY = s.topPt as written, (b) ctx.flowY left unchanged. One build, one Google round trip, and 18_displacement decides. THEN, separately: columnPage() (DocxWriter.java:2005, :2146, :2214) emits before/cells/after with plain emitBlock loops and returns before pageXml's emit loop, so no multi-column document can be reached - 315_gazette_notification measures pBdr 0 / drawings 5 / 40-42 unchanged because its two horizontal rules land in 'after' with flowY already 751.87. That is a second construct and the bigger share of the corpus.
 
 ## What the tables cannot show
 
-No engine change was kept, and that is the finding rather than an accident. The largest class in the
-corpus is rules: a horizontal rule is emitted as a floating drawing that Google Docs drops, and Google
-fails the stroke-line check on dozens of documents that LibreOffice fails on none of. The `w:pBdr`
-repair for it is written and was measured on 19 Nov; this run established that it **cannot work as
-written**, and the reason is structural, not a wrong formula. `PdfToWord.attachShapes` appends every
-shape to the page's block list *after* the paragraphs, and `DocxWriter.pageXml` writes that list in
-order, so a rule is always written when the flow has already run to the foot of the page — and a
-paragraph border can only be placed forward. That is what put both borders at y 807 on 19 Nov instead
-of at the two ys the page drew, and it is why the change would be a LibreOffice regression: the drawing
-path pins the rule absolutely and LibreOffice draws it correctly today. The precondition is that shapes
-must be written in top order among the page's blocks; `FINDINGS/content-present-partly-displaced-rules-
-cannot-flow-044000-f1x.md` has the exact change and the numbers behind it.
+Three runs have now circled the largest class in the corpus: a horizontal rule emitted as a floating
+`<w:drawing>`, which Google Docs drops and LibreOffice draws, so `32_stroke_lines` fails 145 documents
+in Google and none in LibreOffice. The repair is to write the rule as a `w:pBdr` paragraph border.
+The pBdr code was already written; it measured as inert because a border is placed *by flow* and
+`PdfToWord.attachShapes` appends every shape to the page *after* the paragraphs, so the flow had
+always run to the foot of the page by the time a rule was written, and `w:before` can only move a
+border forward.
 
-Two subagents landed findings. The first closed the open question in the handoff — there is no third
-construct emitting the zero-width-space anchor: no Java line writes that character, and none of the
-corpus `.docx` files contains one; it is Google's own placeholder for a drawing it refused. The second
-found that the numbers describing this class were unreadable because the class file's two numeric
-columns were swapped, and went on to name the real residual on the pages it examined.
+This run built the missing precondition: `DocxWriter.pageXml` now emits a page's shapes in **top
+order among its blocks** — flush any not-yet-written shape whose top the next paragraph or table has
+reached, then the rest after the loop, with paragraph and table order untouched. It works exactly as
+the finding predicted. On `18_centred_heading_left_body_txtpos` the emitted XML goes from **0 to 2
+`w:pBdr`** and **2 to 0 `w:drawing`**, and both rules land at the ys the page drew them at — 110.0 and
+793.89 — instead of both at 807/808. Through Google, `32_stroke_lines` flips **FAIL → PASS**.
 
-Four tool defects were found and repaired, each verified by re-running the tool and comparing: the
-liveness report took its ages from file timestamps, which a fresh clone resets, so every stage read as
-zero hours old and the stall alarm could never fire; its attempt counter read the ledger's Indian
-timestamps as if they were pod-local, putting every attempt five and a half hours in the future; the
-class-file writer put the one-pixel share in the five-pixel column and the five-pixel share in the
-outlier column, on every row it had ever written; and the report dated itself in UTC while every other
-stamp in the file is IST. Two blocker rows were closed on the evidence. The one that remains needs a
-person at the platform console and cannot be cleared from inside a run.
+It is reverted anyway, and that is the finding rather than an accident. The border charges the flow,
+and the text under it moves: `18_displacement` goes **PASS → FAIL** in Google, and LibreOffice goes
+**42/42 → 41/42** on a document that was clean. A fix for the largest class that breaks the
+second-largest is not a fix. The exact 163-line diff is in
+`FINDINGS/rules-flush-by-top-WORKS-DISPLACES-055000-f1x.patch` and re-applies with `git apply`.
+
+Three explanations were tested and ruled out, so the next run does not pay for them: the
+`below = flowBoxPt * (1 - LINE_BASE)` term from the original implementation contributes nothing
+(`flowBoxPt` is 0 at the moment the rule is flushed), the `kind != 0` guard made no difference
+(removing it changed nothing on either document), and the gap arithmetic is not at fault — border 1
+lands within 0.5 pt of its rule. **The residual is the reader's position after the carrier paragraph,
+not the gap before it**, and that is one build and one Google round trip to settle: emit the border
+with `ctx.flowY` left unchanged and let `18_displacement` decide between the two.
+
+A second, larger blocker surfaced on the way. `315_gazette_notification` is three-column, so it takes
+`columnPage()`, which returns before the emit loop the flush was added to. Its two horizontal rules
+land in that function's `after` list with the flow already at 751.87, both are declined, and the
+document measures `pBdr 0 / drawings 5` and 40/42 in Google — **completely unchanged by the whole
+change**. A fix that only touches `pageXml()` cannot reach any multi-column document, and the corpus
+has many. That is a second construct, and it is written up in
+`FINDINGS/content-present-partly-displaced-rules-flush-works-displaces-055000-f1x.md`.
+
+Two attempts were recorded — the first as `partial` from the LibreOffice screen before the Google
+check existed, the second `reverted` once Google decided against it. The ledger carries both so the
+next run can see that the class moved and then stopped, rather than reading a clean zero.
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

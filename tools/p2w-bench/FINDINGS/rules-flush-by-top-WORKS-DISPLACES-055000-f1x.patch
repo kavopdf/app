@@ -1,0 +1,163 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index efa7c30..5f967fc 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -1325,17 +1325,80 @@ public final class DocxWriter {
+         // so must not charge the flow. Decided from the page's own geometry before anything is
+         // written, so both of the budget guard's passes see the same answer (see pinShortParas).
+         pinShortParas(page);
++        // A RULE HAS TO BE WRITTEN BEFORE THE TEXT THAT FOLLOWS IT.
++        //
++        // PdfToWord.attachShapes appends every surviving shape to page.blocks AFTER the page's
++        // paragraphs and tables (PdfToWord.java:7122), so this loop used to reach each shape
++        // last on its page - when the flow was already at the foot. A shape that becomes a
++        // paragraph border is placed BY FLOW (see ruleAsBorder), and w:before can only move a
++        // border forward, so at the foot every rule landed at the foot. Measured on
++        // 18_centred_heading_left_body_txtpos: flow after the last paragraph 805.9 pt, rules
++        // drawn at 110.0 and 793.89 - both behind it. That is the 19 Nov "both borders at
++        // y 807/808" and it is why the pBdr fix measured as inert (FINDINGS/
++        // content-present-partly-displaced-rules-cannot-flow-044000-f1x.md).
++        //
++        // So shapes are flushed here, in TOP ORDER, into the flow position the page drew them
++        // at: any not-yet-written shape whose top the next block has reached is written before
++        // that block, and the rest after the loop. The paragraph and table ORDER is untouched -
++        // only the shapes move - because the column pass and the budget guard depend on it.
++        boolean[] shapeWritten = new boolean[page.blocks.size()];
+         for (int bi = 0; bi < page.blocks.size(); bi++) {
+             Object block = page.blocks.get(bi);
++            if (block instanceof PdfToWord.Para || block instanceof PdfToWord.Table) {
++                float top = blockTopPt(block);
++                if (!Float.isNaN(top)) flushShapes(sb, page, ctx, top, shapeWritten);
++            }
+             ctx.nextIsPara = bi + 1 < page.blocks.size()
+                     && page.blocks.get(bi + 1) instanceof PdfToWord.Para;
+             ctx.nextIsTable = bi + 1 < page.blocks.size()
+                     && page.blocks.get(bi + 1) instanceof PdfToWord.Table;
++            // A shape is written by flushShapes, never here: it is placed by its own top, not by
++            // its position in the list. Skipping it keeps its paragraph/table neighbours' order
++            // exactly as it was, so nextIsPara/nextIsTable still read the same block.
++            if (block instanceof Shape) continue;
+             emitBlock(sb, block, ctx);
+         }
++        flushShapes(sb, page, ctx, Float.POSITIVE_INFINITY, shapeWritten);
+         cenEmit(ctx, page);
+     }
+ 
++    /** Where the page drew this block's top edge, in points from the page top. */
++    private static float blockTopPt(Object block) {
++        if (block instanceof PdfToWord.Para) return ((PdfToWord.Para) block).top;
++        if (block instanceof PdfToWord.Table) return ((PdfToWord.Table) block).top;
++        return Float.NaN;
++    }
++
++    /**
++     * Writes every shape on this page whose top the flow has reached, in top order.
++     *
++     * <p>A shape is placed by its own {@code topPt}, not by its position in {@code page.blocks}
++     * - attachShapes appends them all after the paragraphs, so list order is the opposite of
++     * the order the page drew them. Writing them in top order is what lets {@link #ruleAsBorder}
++     * see a rule while the flow is still above it: a paragraph border can only be moved FORWARD
++     * by {@code w:before}, so a rule written at the foot of the page can only land at the foot.
++     *
++     * <p>{@code upto} is the next block's top: a shape at or above it belongs before that block.
++     * The final call passes {@link Float#POSITIVE_INFINITY} for the shapes below all the text.
++     */
++    private static void flushShapes(StringBuilder sb, PdfToWord.Page page, Ctx ctx,
++                                    float upto, boolean[] written) {
++        while (true) {
++            int pick = -1;
++            float pickTop = Float.POSITIVE_INFINITY;
++            for (int i = 0; i < page.blocks.size(); i++) {
++                if (written[i]) continue;
++                Object b = page.blocks.get(i);
++                if (!(b instanceof Shape)) continue;
++                float t = ((Shape) b).topPt;
++                if (t <= upto && t < pickTop) { pick = i; pickTop = t; }
++            }
++            if (pick < 0) return;
++            written[pick] = true;
++            emitBlock(sb, page.blocks.get(pick), ctx);
++        }
++    }
++
+     /**
+      * The column each box of a cross-gutter "row" belongs to, or null when the block is a
+      * genuine full-width line.
+@@ -2716,6 +2779,64 @@ public final class DocxWriter {
+         g.append("<a:pt x=\"").append(px).append("\" y=\"").append(py).append("\"/>");
+     }
+ 
++    /**
++     * Writes a horizontal hairline as a paragraph border, when the flow can place it exactly.
++     *
++     * <p>Google Docs drops a floating {@code <w:drawing>} and keeps only its {@code U+200B}
++     * anchor; a {@code w:pBdr} bottom border is a construct it honours. That is worth 53
++     * documents on {@code 32_stroke_lines} and 48 on {@code 05_chars_extra}.
++     *
++     * <p>A border is placed BY FLOW, so it is only correct where the flow has a real position to
++     * measure the gap from and that position is at or above the rule. Returns false - leaving
++     * the drawing path untouched - whenever either is not true, because a border at the wrong y
++     * is a LibreOffice regression on every document with a rule, and LibreOffice draws the
++     * drawing correctly today.
++     *
++     * @return true when the border was written and the flow has been moved onto it
++     */
++    private static boolean ruleAsBorder(StringBuilder sb, Shape s, Ctx ctx) {
++        if (!isHairline(s)) return false;
++        if (Math.abs(s.hPt) > Math.abs(s.wPt)) return false;   // vertical rules are not pBdr bottom
++        int rgb = s.lineRgb >= 0 ? s.lineRgb : s.fillRgb;
++        if (rgb < 0) return false;
++        // The flow's position on this sheet: 0 at the top of a fresh page, otherwise where the
++        // reader will put the last baseline. A rule at or above it cannot be reached by w:before.
++        float from = (ctx.newPage || ctx.flowY < 0f) ? 0f : ctx.flowY;
++        if (!(s.topPt > from)) return false;
++        // The border is drawn at the BOTTOM of the carrier paragraph's box, so the gap is the
++        // distance to the rule less the carrier's own one-twip line. Subtracting the previous
++        // line's descent as well put both borders 2.35 pt high on
++        // 18_centred_heading_left_body_txtpos (measured: 107.65 and 791.54 against rules at
++        // 110.0 and 793.89) and that is what made 18_displacement fail there.
++        int beforeTw = (int) Math.max(0L,
++                Math.round((s.topPt - from) * TWIPS_PER_PT) - 1L);
++
++        int szEighth = (int) Math.max(2L, Math.round(s.lineWidthPt * 8f));
++        int leftTw = (int) Math.max(0L, Math.round(s.xPt * TWIPS_PER_PT));
++        int rightTw = (int) Math.max(0L,
++                Math.round((ctx.pageWidthPt - (s.xPt + s.wPt)) * TWIPS_PER_PT));
++
++        sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
++                .append("<w:pBdr><w:bottom w:val=\"single\" w:sz=\"").append(szEighth)
++                .append("\" w:space=\"0\" w:color=\"").append(hex(rgb)).append("\"/></w:pBdr>")
++                .append("<w:ind w:left=\"").append(leftTw).append("\" w:right=\"").append(rightTw)
++                .append("\" w:firstLine=\"0\"/>")
++                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\"")
++                .append(" w:before=\"").append(beforeTw)
++                .append("\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
++                .append("<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr></w:pPr>")
++                .append("<w:r><w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr>")
++                .append("<w:t xml:space=\"preserve\"> </w:t></w:r></w:p>");
++
++        // The border IS the flow's new position. Without this the next paragraph measures its
++        // gap from the line ABOVE the rule, and every line below the rule on the page moves up
++        // by the rule's gap - an 18_displacement regression on every document with a rule.
++        ctx.flowY = s.topPt;
++        ctx.flowBoxPt = 0f;
++        ctx.newPage = false;
++        return true;
++    }
++
+     /**
+      * A shape pinned to the page, behind the text.
+      *
+@@ -2724,6 +2845,12 @@ public final class DocxWriter {
+      * it exists to make visible. A rule drawn behind text is still a rule.
+      */
+     private static void shape(StringBuilder sb, Shape s, Ctx ctx) {
++        // A hairline the flow has already reached is written as a PARAGRAPH BORDER, not as a
++        // floating drawing. Google Docs drops the drawing and keeps its U+200B anchor, which is
++        // why 32_stroke_lines (53 docs) and 05_chars_extra (48) are one construct: a rule.
++        // LibreOffice draws the drawing correctly, so this only runs where it can place the
++        // border at the page's own y - see ruleAsBorder's guard.
++        if (ruleAsBorder(sb, s, ctx)) return;
+         int id = SHAPE_ID_BASE + (ctx.shapeSeq++);
+         long cx = Math.max(1, Math.round(s.wPt * EMU_PER_PT));
+         long cy = Math.max(1, Math.round(s.hPt * EMU_PER_PT));
