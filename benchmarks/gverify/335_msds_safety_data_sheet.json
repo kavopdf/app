@@ -1,0 +1,13 @@
+{
+ "name": "335_msds_safety_data_sheet",
+ "status": "ok",
+ "rc": 1,
+ "passed": 43,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "25_invisible_text",
+  "60_text_column_right_edge"
+ ]
+}

@@ -1,0 +1,12 @@
+{
+ "name": "363_warranty_card",
+ "status": "ok",
+ "rc": 1,
+ "passed": 39,
+ "total": 42,
+ "failed": [
+  "18_displacement",
+  "59_shape_anchor",
+  "60_text_column_right_edge"
+ ]
+}

@@ -1,0 +1,13 @@
+{
+ "name": "365_recipe_card",
+ "status": "ok",
+ "rc": 1,
+ "passed": 38,
+ "total": 42,
+ "failed": [
+  "18_displacement",
+  "32_stroke_lines",
+  "47_margins",
+  "60_text_column_right_edge"
+ ]
+}

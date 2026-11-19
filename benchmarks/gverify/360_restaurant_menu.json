@@ -1,0 +1,14 @@
+{
+ "name": "360_restaurant_menu",
+ "status": "ok",
+ "rc": 1,
+ "passed": 37,
+ "total": 42,
+ "failed": [
+  "18_displacement",
+  "32_stroke_lines",
+  "43_within_10pt_x",
+  "47_margins",
+  "60_text_column_right_edge"
+ ]
+}

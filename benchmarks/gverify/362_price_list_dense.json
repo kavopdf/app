@@ -1,0 +1,10 @@
+{
+ "name": "362_price_list_dense",
+ "status": "ok",
+ "rc": 1,
+ "passed": 41,
+ "total": 42,
+ "failed": [
+  "18_displacement"
+ ]
+}
