@@ -1,0 +1,83 @@
+# How the five crons divide the work, and why the model is flowing text
+
+## The decision: a .docx is flowing text
+
+Settled 19 Nov. A Word document is a flow of paragraphs that a reader lays out. It is not a canvas of
+absolutely-positioned boxes, and the engine has been writing it as one - zero page margins, every line
+placed by an absolute indent, every rule a floating drawing at an absolute y.
+
+That works in LibreOffice because LibreOffice honours every one of those constructs. Google Docs, which
+is what the users open, honours almost none of them, and four measured attempts to patch the constructs
+one at a time all made the score worse:
+
+    rules as w:pBdr                        40/42 -> 40/42   construct right, placement wrong
+    w:pgMar + indents                      40/42 -> 32/42   worse
+    w:pgMar + indents + spacing + offsets  40/42 -> 34/42   worse
+    font metrics                           40/42 -> worse
+
+So the model is flowing text, which is also what Acrobat Pro and iLovePDF produce: paragraphs with
+styles, tables with cell borders, rules as paragraph borders, positions carried by indents and spacing
+rather than by absolute offsets. The measured capability table is in
+`benchmarks/GOOGLE-VS-LIBREOFFICE.md`.
+
+**The engine is NOT rewritten.** Rewriting a converter that already produces 42/42 in one renderer, to
+chase another, loses everything that works and cannot be verified in one step. The model is changed
+one construct at a time, each with a measurement before and after, and each document that improves is
+worth keeping whether or not the next one does.
+
+## The five crons, in order, and what each may touch
+
+    :20  gverify    measure 20 documents through Google.        engine: NO   results: YES
+    :00  baseline   measure the whole corpus through soffice.   engine: NO   RANKING: YES
+    :40  classifier group the failures into classes.            engine: NO   classes: YES
+    :50  fixer      change ONE construct, measure, keep or revert.  engine: YES  nothing else
+    22:00 apk       ship once, when every stage is done.        engine: NO   releases: YES
+
+**One cron may change engine code. That is the fixer.** The other four exist so that the fixer never has
+to guess what to fix and never has to prove its own work.
+
+## The one file they all read
+
+    python3 tools/p2w-bench/stage.py
+
+It computes the stage from the results on disk - never from a label, never from a list written down:
+
+    measure-google   Google has a result for fewer than all documents
+    classify         results exist and the class table is older than them
+    fix              classes exist and some document still fails a check
+    ship             every document passes all 42
+
+`--set <stage>` refuses when the evidence disagrees. A run cannot advance the pipeline by asserting it
+has; it advances by leaving results behind.
+
+**Every cron starts with `stage.py` and does only what its stage says.** If a run finds the stage is not
+its own, it says so in one line and stops. That is not a wasted slot - it is the coordination working.
+
+## What a fixer run does, in order, every time
+
+1. `stage.py` - is it `fix`? If not, stop.
+2. `gverify.py --report` - which check fails the most documents. That is the class to take.
+3. **Read `FINDINGS/` first.** Four fixes are already measured and recorded. Re-deriving one of them is
+   the most expensive thing a run can do.
+4. Change ONE construct. Not a refactor, not a rewrite, not two constructs because they look related.
+5. Measure it on the documents it can affect, through Google: upload, export, `verify_google.py`.
+6. **Better or equal, and nothing worse, or revert.** A change that scores the same is not kept - it is
+   risk with no gain.
+7. Commit the measurement whether it helped or not. A recorded negative result is worth more than an
+   unrecorded idea, because it stops the next run spending a slot on it.
+
+## What is settled and must not be re-litigated
+
+* **The renderer is Google Docs.** LibreOffice is a fast local proxy that hides the faults the phone
+  shows: on the same 50 documents, LibreOffice passes 23 and Google passes 7.
+* **The model is flowing text.**
+* **No engine rewrite.** One construct, one measurement, one commit.
+* **Nothing changes without a measurement before and after.**
+* **`share@5px` is not a cross-renderer measure.** Use the 42 checks.
+* **A refused document is not a pass.**
+
+## When something is blocked
+
+Not every wall is a code problem. If a run cannot proceed, it writes the blocker to `BLOCKERS.md` with
+what it tried, and stops. The next run reads it. A blocker that is written down is a decision someone
+can make; a blocker that is not is a month.
