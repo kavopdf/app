@@ -94,7 +94,14 @@ Rules the gate checks mechanically:
   * Status is exactly `OPEN`, `FIXED` or `PARKED`. Any other word is invisible to round.py.
   * `none` documents are `FIXED` (there is nothing to do), not OPEN.
 
-Commit with GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main). Commit only if it
+**`git push` works as of 19 Nov.** Set the identity first
+(`git config user.email "320240581+Onyx-Node@users.noreply.github.com"`, `user.name "Onyx-Node"`),
+run `bash tools/install-gate.sh` once per clone, then commit with git. A commit authored as a
+private address is refused with "push declined due to email privacy restrictions", and a commit
+whose change has not been measured across the whole corpus is refused by the gate - neither is a
+permissions problem. The MCP tool below still works as a fallback.
+
+Commit these files with git (fallback: GITHUB_COMMIT_MULTIPLE_FILES, owner kavopdf, repo app, branch main): Commit only if it
 changed.
 
 ## 4. Advance the phase. Nothing else can, and nothing used to.

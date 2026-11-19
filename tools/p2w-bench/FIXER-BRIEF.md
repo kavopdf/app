@@ -374,12 +374,42 @@ Before you deploy, one line so the wait is announced if anything goes wrong:
 
     python3 tools/p2w-bench/round.py --heartbeat --doing "deployed 2 agents, working my own angle"
 
-**A SUBAGENT COMMITS WITH THE MCP TOOL, NEVER WITH `git push`.** `git push` from a sandbox is 403
-("Permission to kavopdf/app.git denied to Onyx-Node") - for the fixer and for every subagent alike.
-A run on 17 Nov recorded that as a blocker and stopped deploying agents altogether, which cost a day
-of parallel work. The blocker was never a missing permission; it was the wrong tool.
-`GITHUB_COMMIT_MULTIPLE_FILES` (owner kavopdf, repo app, branch main) works from inside a run. Use
-it, and tell every subagent to use it too.
+**`git push` WORKS. IT DID NOT BEFORE 19 NOV, AND THAT IS THE WHOLE STORY OF THE LAST FOUR DAYS.**
+
+From 15 to 19 Nov every push returned 403 "Permission to kavopdf/app.git denied to Onyx-Node", and
+so did the git-data API and the contents API. Runs recorded it as a blocker, some stopped deploying
+agents because of it, and a workaround grew on top: `GITHUB_COMMIT_MULTIPLE_FILES`, and a Google
+Drive folder as a place to park reports. **The cause was never a missing permission on the repo.**
+It was that the Sarvam GitHub App was not installed on the `kavopdf` organization at all, so the
+token could only reach public repositories. Sarvam support found it, the app was installed on
+19 Nov with `kavopdf/app` selected and Contents: Read and write, and the push was verified end to
+end: `git clone`, commit, `git push origin main` -> `8e8fdd2..199d611`.
+
+So:
+
+    git clone https://github.com/kavopdf/app /scratch/work/CS
+    cd /scratch/work/CS
+    bash tools/install-gate.sh            # once per clone; installs the pre-commit gate
+    ... work ...
+    git add ... && git commit -m "..."
+    git push origin main
+
+**Two things make the push fail and both look like permission problems:**
+
+  * **The commit identity.** Set it before you commit:
+    `git config user.email "320240581+Onyx-Node@users.noreply.github.com"` and
+    `git config user.name "Onyx-Node"`. A commit authored as a private address is refused with
+    "push declined due to email privacy restrictions" - which is not a permissions problem and
+    will send you looking in the wrong place.
+  * **The gate.** `install-gate.sh` puts `tools/p2w-bench/regress.py --check` in the pre-commit
+    hook. A commit whose change has not been measured across the whole corpus, or that makes any
+    document worse, is REFUSED. There is no override. That is the point of it.
+
+Tell every subagent the same: git, with that identity, after installing the gate.
+
+`GITHUB_COMMIT_MULTIPLE_FILES` still works and is still a fine fallback if git fails for a reason
+you can name. The Google Drive folder is a backup for a report that could not be committed. Neither
+is the primary path any more - and do not spend a run on a workaround for a blocker that is gone.
 
 
 A subagent has its own sandbox, its own clone, its own budget, and can outlive your run. That is
