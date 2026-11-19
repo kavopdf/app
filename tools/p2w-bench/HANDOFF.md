@@ -16,7 +16,11 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> content-partly-lost is diagnosed and the fix is written: a justified line is emitted left-aligned, because the page spreads its inter-word spaces and the writer uses the face's natural space. The model now carries the measured shortfall and the writer emits w:spacing. SCREEN PASS on 10 documents: 5 better, 0 worse (policy 5.37->1.76, academic 8.09->5.02, magazine 3.49->1.45, 304 3.41->2.47, landscape 1.45->0.62). NOT ratcheted: 46 of 213 documents measured in three calls when the run ended. The change is patches/PATCH-justified-lines-spacing.patch - unapplied, verified with git apply --check against 30aecd9, and the tree is clean. scope.py says BOTH, so the .txt must be re-scored or its byte-identity proved.
+> content-present-partly-displaced (18 OPEN) is NOT one mechanism - measured on four documents: 75_merged_header welds two header columns and shifts rows by one (22.07 pt); bank-statement accumulates 0.34 pt per positioned row (source pitch 18.4, ours 18.74) to +5.77 pt by y421; 374_org_chart is -0.18 pt at the top and +4.48 pt in the bottom box row; payslip is a constant -3.45 pt in one block. The subagent's root cause is confirmed by reading the code and is in FINDINGS/content-present-partly-displaced-mergedheader-130426-4bd9.md: cells are cut from drawn rectangles, a fill-only shading band becomes a gridSpan, and spanR is computed at PdfToWord:7950 and read by nothing so no w:vMerge is ever written. Dropping fill-only rules from the Edge list (PdfToWord:1275) is REFUTED - 27.31 -> 46.58 and 2 pages, because on this page the shading band is the only rule that closes the header cells. Do not retry it.
+
+## What the next run should do first
+
+> Implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord already computes (PdfToWord:7950 writes it, nothing reads it). Screen 75_merged_header_cell_three_columns plus the 17 other content-present-partly-displaced documents. Do not retry dropping fill-only rules from the Edge list - measured 27.31 -> 46.58.
 
 ## Agents deployed and not yet accounted for
 
@@ -28,15 +32,14 @@ unfinished work, not as a result.
 | contD-01 | content-missing-partly-replaced | D | how many corpus documents have a cell whose lines start left of the fi | 11:16 | landed | landed | FINDINGS/content-missing-partly-replaced-D-092700-1d7b.md |
 | contA-02 | content-missing-nothing-in-its-place | A | 415_inline_images p1: why is 89% of source ink >5px from ours when tex | 09:57 | expected by 11:15 | landed | FINDINGS/content-missing-nothing-in-its-place-A-044628-d0c0.md |
 | contB-02 | content-missing-nothing-in-its-place | B | the ~1.4pt uniform shift on mobile-bill/salary-slip-factory-wages/elec | 09:57 | expected by 11:15 | landed | FINDINGS/content-missing-nothing-in-its-place-B-103610-346a.md |
+| contA-03 | content-present-partly-displaced | A | 75_merged_header_cell_three_columns: the table body is 22 pt low and e | 18:16 | expected 19:05 | running |  |
+| contB-03 | content-present-partly-displaced | B | 13 of the 18 documents are within 1 pt everywhere except a few rows th | 18:16 | expected 19:05 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `12:30` attempt 8 on content-missing-partly-replaced -> reverted (0/16 moved)
-- `12:41` COMMITTING: git push is 403 'denied to Onyx-Node' for the fixer too, not only for subagents - the App has no write access to kavopdf/app over HTTPS git. It is not a dead end: the GitHub MCP tool GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main, upserts=[{path,content,encoding:utf-8}]) commits several files atomically and worked for all four commits of this run. The next run should commit that way, then 'git fetch origin main && git reset --hard origin/main' so HEAD matches origin, then chain.py. chain.py's sync check is strict SHA equality and also refuses a dirty tree, and it rewrites CHAIN.json - so commit CHAIN.json again after each chain.py run.
-- `13:13` attempt 9 on content-missing-partly-replaced -> error
 - `14:34` attempt 10 on content-missing-partly-replaced -> partial (2/16 moved)
 - `15:36` attempt 11 on content-missing-partly-replaced -> partial (1/30 moved)
 - `17:32` attempt 12 on content-missing-partly-replaced -> reverted (0/4 moved)
@@ -59,6 +62,9 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `16:58` attempt 1 on content-partly-lost -> partial (5/10 moved)
 - `16:58` measured, screened, not ratcheted: the justified-line fix is a patch in patches/, not an engine change
 - `18:01` 18:00 run: carry-over verified DONE - the justified-lines fix landed as 4147d54 with a full corpus ratchet (53 of 213 improved, mean 4.13, regress.py --check PASS, txt 213/213). Taking content-present-partly-displaced (18 open, most documents).
+- `18:16` agent deployed: content-present-partly-displaced / A - 75_merged_header_cell_three_columns: the table body is 22 pt low and each data r
+- `18:16` agent deployed: content-present-partly-displaced / B - 13 of the 18 documents are within 1 pt everywhere except a few rows that are 3-5
+- `18:40` attempt 1 on content-present-partly-displaced -> reverted (0/18 moved)
 
 ## Where the rest of the state lives
 

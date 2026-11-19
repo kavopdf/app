@@ -366,3 +366,14 @@
 {"t": 1795091512.8352404, "ist": "18:01:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795091512.9831538, "ist": "18:01:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795091513.1160116, "ist": "18:01:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795092377.2529223, "ist": "18:16:17", "ev": "beat", "d": "deployed 2 agents on content-present-partly-displaced, working my own angle"}
+{"t": 1795092377.3931968, "ist": "18:16:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795092377.532217, "ist": "18:16:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795093811.3616502, "ist": "18:40:11", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795093816.1159415, "ist": "18:40:16", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795093816.334892, "ist": "18:40:16", "ev": "attempt", "d": "content-present-partly-displaced -> reverted"}
+{"t": 1795093816.4800096, "ist": "18:40:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795093816.6011992, "ist": "18:40:16", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795093850.8398972, "ist": "18:40:50", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795093850.994439, "ist": "18:40:50", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795093851.1566405, "ist": "18:40:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

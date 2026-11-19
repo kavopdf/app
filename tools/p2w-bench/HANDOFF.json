@@ -164,9 +164,21 @@
   {
    "at": "18:01",
    "text": "18:00 run: carry-over verified DONE - the justified-lines fix landed as 4147d54 with a full corpus ratchet (53 of 213 improved, mean 4.13, regress.py --check PASS, txt 213/213). Taking content-present-partly-displaced (18 open, most documents)."
+  },
+  {
+   "at": "18:16",
+   "text": "agent deployed: content-present-partly-displaced / A - 75_merged_header_cell_three_columns: the table body is 22 pt low and each data r"
+  },
+  {
+   "at": "18:16",
+   "text": "agent deployed: content-present-partly-displaced / B - 13 of the 18 documents are within 1 pt everywhere except a few rows that are 3-5"
+  },
+  {
+   "at": "18:40",
+   "text": "attempt 1 on content-present-partly-displaced -> reverted (0/18 moved)"
   }
  ],
- "next": "",
+ "next": "Implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord already computes (PdfToWord:7950 writes it, nothing reads it). Screen 75_merged_header_cell_three_columns plus the 17 other content-present-partly-displaced documents. Do not retry dropping fill-only rules from the Edge list - measured 27.31 -> 46.58.",
  "agents": [
   {
    "id": "contA-01",
@@ -227,6 +239,28 @@
    "deployed": "09:57",
    "status": "landed",
    "finding": "FINDINGS/content-missing-nothing-in-its-place-B-103610-346a.md"
+  },
+  {
+   "id": "contA-03",
+   "class": "content-present-partly-displaced",
+   "angle": "A",
+   "question": "75_merged_header_cell_three_columns: the table body is 22 pt low and each data row's numbers are emitted one row above its depot name, while the source merges the Depot / Fleet held / Breakdowns cells vertically across the two header rows. Find the engine code that decides how many table rows the header occupies and which sub-row a cell's text is assigned to.",
+   "expected": "expected 19:05",
+   "deployed": "18:16",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-19T12:46"
+  },
+  {
+   "id": "contB-03",
+   "class": "content-present-partly-displaced",
+   "angle": "B",
+   "question": "13 of the 18 documents are within 1 pt everywhere except a few rows that are 3-5 pt off, and the error grows down the page (bank-statement-horizontal-rules-only: +0.03 pt at y108, +5.77 pt at y421, source pitch exactly 18.4 pt). Decide from measurement whether this is a LibreOffice quantisation of the hairline w:line the writer emits, or an engine bug in the before/line split, and say which.",
+   "expected": "expected 19:05",
+   "deployed": "18:16",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-19T12:46"
   }
  ],
  "run": {
@@ -296,7 +330,7 @@
    "plan": ""
   }
  ],
- "context": "content-partly-lost is diagnosed and the fix is written: a justified line is emitted left-aligned, because the page spreads its inter-word spaces and the writer uses the face's natural space. The model now carries the measured shortfall and the writer emits w:spacing. SCREEN PASS on 10 documents: 5 better, 0 worse (policy 5.37->1.76, academic 8.09->5.02, magazine 3.49->1.45, 304 3.41->2.47, landscape 1.45->0.62). NOT ratcheted: 46 of 213 documents measured in three calls when the run ended. The change is patches/PATCH-justified-lines-spacing.patch - unapplied, verified with git apply --check against 30aecd9, and the tree is clean. scope.py says BOTH, so the .txt must be re-scored or its byte-identity proved.",
+ "context": "content-present-partly-displaced (18 OPEN) is NOT one mechanism - measured on four documents: 75_merged_header welds two header columns and shifts rows by one (22.07 pt); bank-statement accumulates 0.34 pt per positioned row (source pitch 18.4, ours 18.74) to +5.77 pt by y421; 374_org_chart is -0.18 pt at the top and +4.48 pt in the bottom box row; payslip is a constant -3.45 pt in one block. The subagent's root cause is confirmed by reading the code and is in FINDINGS/content-present-partly-displaced-mergedheader-130426-4bd9.md: cells are cut from drawn rectangles, a fill-only shading band becomes a gridSpan, and spanR is computed at PdfToWord:7950 and read by nothing so no w:vMerge is ever written. Dropping fill-only rules from the Edge list (PdfToWord:1275) is REFUTED - 27.31 -> 46.58 and 2 pages, because on this page the shading band is the only rule that closes the header cells. Do not retry it.",
  "needs_human": [],
- "next_class": ""
+ "next_class": "content-present-partly-displaced"
 }

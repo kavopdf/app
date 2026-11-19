@@ -238,6 +238,32 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "content-present-partly-displaced": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-19 18:40",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them",
+    "total": 18
+   }
+  ],
+  "last": null,
+  "last_engine": "4147d54",
+  "last_moved": 0,
+  "last_total": 18,
+  "outcomes": [
+   "reverted"
+  ],
+  "reason": "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them refuted: 75_merged_header_cell_three_columns 27.31 -> 46.58 and 1 page -> 2, because the shading band's edges are the only rules that close those header cells. Reverted. The real fix is the finding's: lattice-cut cells plus w:vMerge, since spanR is computed and read by nothing.",
+  "reasons": [
+   "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them refuted: 75_merged_header_cell_three_columns 27.31 -> 46.58 and 1 page -> 2, because the shading band's edges are the only rules that close those header cells. Reverted. The real fix is the finding's: lattice-cut cells plus w:vMerge, since spanR is computed and read by nothing."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "single-element-far-out": {
   "attempts": 1,
   "first_seen": null,
