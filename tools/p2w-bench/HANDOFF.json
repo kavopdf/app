@@ -204,6 +204,18 @@
   {
    "at": "22:31",
    "text": "agent deployed: content-present-partly-displaced / B - blast radius of w:vMerge across the 18 documents in the class"
+  },
+  {
+   "at": "22:32",
+   "text": "attempt 3 on content-present-partly-displaced -> kept (13/18 moved)"
+  },
+  {
+   "at": "22:35",
+   "text": "agent landed: contA-04 /  -> FINDINGS/content-present-partly-displaced-bankpitch-133100-d68d.md"
+  },
+  {
+   "at": "22:35",
+   "text": "agent landed: contB-04 /  -> FINDINGS/content-present-partly-displaced-vmergescope-133908-a7c4.md"
   }
  ],
  "next": "Re-run screen.py on content-present-partly-displaced: 13 documents moved but the class bar is a quarter of 18 = 5, so it is kept, not solved - the remaining open rows are 75_merged_header_cell_three_columns (w:vMerge, 1 of 18), 374_org_chart, payslip-label-left-amount-right and the ones the screen shows unchanged. Take the next-biggest class if this one is closer to done. Do not retry dropping fill-only rules from the Edge list.",
@@ -299,9 +311,10 @@
    "question": "bank-statement-horizontal-rules-only: which code path decides row pitch when the engine rebuilds rows from positioned text",
    "expected": "expected by 19:30",
    "deployed": "22:31",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-19T17:01"
+   "status": "landed",
+   "finding": "FINDINGS/content-present-partly-displaced-bankpitch-133100-d68d.md",
+   "deployed_at": "2026-11-19T17:01",
+   "landed_at": "2026-11-19T17:05"
   },
   {
    "id": "contB-04",
@@ -310,9 +323,10 @@
    "question": "blast radius of w:vMerge across the 18 documents in the class",
    "expected": "expected by 19:30",
    "deployed": "22:31",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-19T17:01"
+   "status": "landed",
+   "finding": "FINDINGS/content-present-partly-displaced-vmergescope-133908-a7c4.md",
+   "deployed_at": "2026-11-19T17:01",
+   "landed_at": "2026-11-19T17:05"
   }
  ],
  "run": {
