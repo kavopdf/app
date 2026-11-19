@@ -1,0 +1,15 @@
+{
+ "name": "purchase-order",
+ "status": "ok",
+ "rc": 1,
+ "passed": 41,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "25_invisible_text",
+  "26_text_overlap",
+  "32_stroke_lines",
+  "60_text_column_right_edge"
+ ]
+}

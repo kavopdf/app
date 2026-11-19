@@ -1,0 +1,14 @@
+{
+ "name": "report-2col-table-spanning-both-columns",
+ "status": "ok",
+ "rc": 1,
+ "passed": 42,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "18_displacement",
+  "32_stroke_lines",
+  "44_header_footer"
+ ]
+}

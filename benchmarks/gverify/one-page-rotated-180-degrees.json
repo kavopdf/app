@@ -1,0 +1,19 @@
+{
+ "name": "one-page-rotated-180-degrees",
+ "status": "ok",
+ "rc": 1,
+ "passed": 37,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "18_displacement",
+  "27_text_off_page",
+  "32_stroke_lines",
+  "43_within_10pt_x",
+  "44_header_footer",
+  "60_text_column_right_edge",
+  "62_table_columns",
+  "63_table_rows"
+ ]
+}

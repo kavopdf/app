@@ -1,0 +1,14 @@
+{
+ "name": "salary-slip-factory-wages",
+ "status": "ok",
+ "rc": 1,
+ "passed": 42,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "32_stroke_lines",
+  "59_shape_anchor",
+  "60_text_column_right_edge"
+ ]
+}

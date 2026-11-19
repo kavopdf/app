@@ -1,0 +1,12 @@
+{
+ "name": "question-paper-marks-right-margin",
+ "status": "ok",
+ "rc": 1,
+ "passed": 39,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "32_stroke_lines",
+  "60_text_column_right_edge"
+ ]
+}

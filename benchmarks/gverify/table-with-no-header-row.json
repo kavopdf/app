@@ -1,0 +1,12 @@
+{
+ "name": "table-with-no-header-row",
+ "status": "ok",
+ "rc": 1,
+ "passed": 44,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "32_stroke_lines"
+ ]
+}
