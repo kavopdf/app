@@ -16,11 +16,11 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> content-present-partly-displaced: KEPT this run - recordBaseline() in DocxWriter stops a split row's continuation from dragging the page down (13 improved, 0 worse across 213). The class is NOT one mechanism: 75_merged_header (fill-only shading as a cell edge + missing w:vMerge), bank/toc/gst/66/78 (the continuation drift, now fixed), 374_org_chart and payslip (separate offsets, unmeasured). Subagent B measured all 18: only 75 has a vertically merged cell, so w:vMerge cannot close this class. Two more things were fixed on the way: RANKING.csv was stale for ten rows (blocked every fixer run since 11:55) and is now the measurement of the engine in the tree; regress.py crashed instead of printing a regression whose document is not in the 15 Nov baseline.
+> The class file's own rows say 24 OPEN for content-present-partly-displaced (the summary table said 18 and classrow.py --write recounted it; its duplicate-header bug is fixed in this run - it inserted a second identical 'Documents measured' line on every run that found nothing to change). TWO things are settled with numbers. (1) bank-statement-horizontal-rules-only is CLEAN at 0.10 on main: 13518ff fixed the split-row before/flowY drift. The same document also has a second, deeper cause - rowTables never runs because rowGapOk's floor max(size*2.4,16) rejects every 18.4 pt row pair (PdfToWord:9701); a patch that widens it to the run's own pitch (patches/rowgapok-run-pitch.patch) measured 6.89 -> 0.14 on engine 3abfa85 with 6 other class docs unchanged, and is now SUPERSEDED and unproven on the current engine. Do not apply it on the old numbers. (2) 75_merged_header_cell_three_columns (27.31) is NOT that mechanism and is untouched by that patch: spanR is computed at PdfToWord:7950 and read by nothing, so no w:vMerge is ever written, and a glyph's row comes from the cell's top edge at 7846. Also: the engine moved under this run - 13518ff landed at 22:30 IST while the fixer slot was claimed at 21:59, which round.py's claim did not prevent; whoever owns round.py should look at that.
 
 ## What the next run should do first
 
-> Re-run screen.py on content-present-partly-displaced: 13 documents moved but the class bar is a quarter of 18 = 5, so it is kept, not solved - the remaining open rows are 75_merged_header_cell_three_columns (w:vMerge, 1 of 18), 374_org_chart, payslip-label-left-amount-right and the ones the screen shows unchanged. Take the next-biggest class if this one is closer to done. Do not retry dropping fill-only rules from the Edge list.
+> content-present-partly-displaced, 24 OPEN. Take 75_merged_header_cell_three_columns (27.31, the worst in the class): implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord:7950 already computes, and bucket each glyph by its own baseline band instead of the cell's top edge (7846) - the sibling finding says both are needed and that the band test alone moves Depot to the wrong row. Do not retry dropping fill-only rules from the Edge list (27.31 -> 46.58). Do not apply patches/rowgapok-run-pitch.patch on its old numbers.
 
 ## Agents deployed and not yet accounted for
 
@@ -42,7 +42,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:50` agent landed: contA-02 /  -> FINDINGS/content-missing-nothing-in-its-place-A-044628-d0c0.md
 - `11:50` agent landed: contB-02 /  -> FINDINGS/content-missing-nothing-in-its-place-B-103610-346a.md
 - `11:55` attempt 6 on content-missing-nothing-in-its-place -> reverted (0/30 moved)
 - `13:44` attempt 1 on single-element-far-out -> partial (1/1 moved)
@@ -67,6 +66,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `22:32` attempt 3 on content-present-partly-displaced -> kept (13/18 moved)
 - `22:35` agent landed: contA-04 /  -> FINDINGS/content-present-partly-displaced-bankpitch-133100-d68d.md
 - `22:35` agent landed: contB-04 /  -> FINDINGS/content-present-partly-displaced-vmergescope-133908-a7c4.md
+- `22:59` attempt 3 on content-present-partly-displaced -> reverted (0/24 moved)
 
 ## Where the rest of the state lives
 

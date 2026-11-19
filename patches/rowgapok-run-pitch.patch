@@ -1,0 +1,40 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index e7c0eb2..a02e714 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -9227,7 +9227,7 @@ public final class PdfToWord {
+             // loose pair above the grid discarded the invoice with it.
+             while (j < rows.size() && rows.get(j).size() >= 2
+                     && alignedStart(rows.get(i), rows.get(j))
+-                    && rowGapOk(rows, j - 1, j)) j++;
++                    && rowGapOk(rows, i, j - 1, j)) j++;
+             if (j - i >= 3 && shortCells(rows, i, j)) {
+                 Table t = keyValuePanels(buildRowTable(rows, i, j));
+                 // Every word of the lines the table covers must survive in its cells. A false
+@@ -9698,10 +9698,24 @@ public final class PdfToWord {
+      * the page; a table's rows follow one another at roughly the line spacing.
+      */
+     /** True when the vertical gap between two neighbouring rows is a table's, not a page's. */
+-    private static boolean rowGapOk(List<List<Line>> rows, int a, int b) {
++    private static boolean rowGapOk(List<List<Line>> rows, int from, int a, int b) {
+         float gap = rows.get(b).get(0).y - rows.get(a).get(0).y;
+         float size = rows.get(a).get(0).size;
+-        return gap <= Math.max(size * 2.4f, 16f);
++        if (gap <= Math.max(size * 2.4f, 16f)) return true;
++        // A LEDGER'S ROW PITCH IS SET BY THE PAGE, NOT BY THE TYPE. 6.6 pt figures printed on
++        // 18.4 pt rows are a table, and a 2.4 em bound (15.8 pt) rejected every row pair, so the
++        // page fell back to flow - where the pitch then drifted +0.45 pt per split row and the
++        // body ended 5.8 pt low (bank-statement-horizontal-rules-only, 26.88 share@1px).
++        //
++        // A table's pitch is its own and it is constant, so a wider gap is accepted only when the
++        // run has already established that pitch: the pair that opens the run may set it, every
++        // later pair must match it. Spread-out boxes also line up in a grid, but they do not do so
++        // at one pitch, which is what this rejects. The absolute ceiling keeps a page's furniture
++        // (a heading, a footnote) from joining a run of rows.
++        if (gap > Math.max(size * 3.0f, 20f)) return false;
++        if (a <= from) return true;
++        float pitch = rows.get(a).get(0).y - rows.get(a - 1).get(0).y;
++        return Math.abs(gap - pitch) <= Math.max(1.5f, pitch * 0.2f);
+     }
+ 
+     /** Every line the rows from..to cover, for the word-survival check. */

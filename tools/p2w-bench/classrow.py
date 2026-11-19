@@ -230,10 +230,16 @@ def main(argv):
     _hit = False
     for i, ln in enumerate(out):
         if ln.startswith("Documents measured:"):
+            # _hit IS SET EVEN WHEN THE LINE ALREADY MATCHES. It used to be set only when the
+            # line was rewritten, so a run whose header was already correct fell through to the
+            # `if not _hit` branch below and INSERTED A SECOND, IDENTICAL HEADER LINE. Measured
+            # 19 Nov 22:5x: the file carried the same "Documents measured" line three times,
+            # one per run that found nothing to change - and the line is what the brief tells a
+            # reader to look for.
             if ln.strip() != _head:
                 out[i] = _head
-                _hit = True
                 changed += 1
+            _hit = True
             break
     if not _hit:
         for i, ln in enumerate(out):

@@ -216,9 +216,13 @@
   {
    "at": "22:35",
    "text": "agent landed: contB-04 /  -> FINDINGS/content-present-partly-displaced-vmergescope-133908-a7c4.md"
+  },
+  {
+   "at": "22:59",
+   "text": "attempt 3 on content-present-partly-displaced -> reverted (0/24 moved)"
   }
  ],
- "next": "Re-run screen.py on content-present-partly-displaced: 13 documents moved but the class bar is a quarter of 18 = 5, so it is kept, not solved - the remaining open rows are 75_merged_header_cell_three_columns (w:vMerge, 1 of 18), 374_org_chart, payslip-label-left-amount-right and the ones the screen shows unchanged. Take the next-biggest class if this one is closer to done. Do not retry dropping fill-only rules from the Edge list.",
+ "next": "content-present-partly-displaced, 24 OPEN. Take 75_merged_header_cell_three_columns (27.31, the worst in the class): implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord:7950 already computes, and bucket each glyph by its own baseline band instead of the cell's top edge (7846) - the sibling finding says both are needed and that the band test alone moves Depot to the wrong row. Do not retry dropping fill-only rules from the Edge list (27.31 -> 46.58). Do not apply patches/rowgapok-run-pitch.patch on its old numbers.",
  "agents": [
   {
    "id": "contA-01",
@@ -406,7 +410,7 @@
    "plan": ""
   }
  ],
- "context": "content-present-partly-displaced: KEPT this run - recordBaseline() in DocxWriter stops a split row's continuation from dragging the page down (13 improved, 0 worse across 213). The class is NOT one mechanism: 75_merged_header (fill-only shading as a cell edge + missing w:vMerge), bank/toc/gst/66/78 (the continuation drift, now fixed), 374_org_chart and payslip (separate offsets, unmeasured). Subagent B measured all 18: only 75 has a vertically merged cell, so w:vMerge cannot close this class. Two more things were fixed on the way: RANKING.csv was stale for ten rows (blocked every fixer run since 11:55) and is now the measurement of the engine in the tree; regress.py crashed instead of printing a regression whose document is not in the 15 Nov baseline.",
+ "context": "The class file's own rows say 24 OPEN for content-present-partly-displaced (the summary table said 18 and classrow.py --write recounted it; its duplicate-header bug is fixed in this run - it inserted a second identical 'Documents measured' line on every run that found nothing to change). TWO things are settled with numbers. (1) bank-statement-horizontal-rules-only is CLEAN at 0.10 on main: 13518ff fixed the split-row before/flowY drift. The same document also has a second, deeper cause - rowTables never runs because rowGapOk's floor max(size*2.4,16) rejects every 18.4 pt row pair (PdfToWord:9701); a patch that widens it to the run's own pitch (patches/rowgapok-run-pitch.patch) measured 6.89 -> 0.14 on engine 3abfa85 with 6 other class docs unchanged, and is now SUPERSEDED and unproven on the current engine. Do not apply it on the old numbers. (2) 75_merged_header_cell_three_columns (27.31) is NOT that mechanism and is untouched by that patch: spanR is computed at PdfToWord:7950 and read by nothing, so no w:vMerge is ever written, and a glyph's row comes from the cell's top edge at 7846. Also: the engine moved under this run - 13518ff landed at 22:30 IST while the fixer slot was claimed at 21:59, which round.py's claim did not prevent; whoever owns round.py should look at that.",
  "needs_human": [],
- "next_class": ""
+ "next_class": "content-present-partly-displaced"
 }

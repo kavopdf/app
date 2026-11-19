@@ -467,3 +467,9 @@
 {"t": 1795108135.4973636, "ist": "22:38:55", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795108136.1706905, "ist": "22:38:56", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795108136.470576, "ist": "22:38:56", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795109344.7852407, "ist": "22:59:04", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795109345.0628507, "ist": "22:59:05", "ev": "attempt", "d": "content-present-partly-displaced -> reverted"}
+{"t": 1795109345.167038, "ist": "22:59:05", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795109345.30039, "ist": "22:59:05", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795109350.2871013, "ist": "22:59:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795109350.3975096, "ist": "22:59:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
