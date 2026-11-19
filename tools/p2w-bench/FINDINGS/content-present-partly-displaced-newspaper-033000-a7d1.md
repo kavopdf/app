@@ -80,3 +80,18 @@ would be no offset to correct. Neither holds here, and the measurement moved 5.6
 
 * Do not take the maximum again to "keep the row tight" - that is the defect.
 * Do not chase the remaining 3.46 with this construct; it is the `w:before` clamp, not the row edge.
+
+## Google, 20 Nov - the renderer the user opens
+
+Measured through `gverify.py` after the fix landed (Google Doc created, exported, scored, deleted):
+
+    64_newspaper_uneven_columns_ad_boxes      GOOGLE 37/42   fail: 05_chars_extra,
+                                                            18_displacement, 23_line_pitch,
+                                                            26_text_overlap, 59_shape_anchor
+                                              LIBRE  41/42   LO fail: 18_displacement
+
+The one check LibreOffice fails is `18_displacement`, the same defect this change reduced - and it
+still fails, which is consistent with the 3.46 residual (the `w:before` clamp), not with the row edge.
+There is **no earlier Google result for this document** (`gverify/results/` had none), so this is the
+first Google measurement of it and no before/after can be claimed through Google. The LibreOffice
+before/after (9.11 -> 3.46) is measured; the Google side is a first reading, not an improvement.
