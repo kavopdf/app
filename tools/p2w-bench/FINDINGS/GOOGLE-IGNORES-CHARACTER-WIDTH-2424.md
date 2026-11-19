@@ -63,7 +63,25 @@ The engine already maps Liberation Serif/Sans (they are what `BASE14` has done a
 - `<w:fitText>`: ignored (14 Nov).
 - Scaling `w:sz` to match the width: matches the width and scores worse.
 
-## Still unexplained, and it is the bigger number
+## CORRECTION - the pixel number overstated this, and the 42 checks are the instrument
+
+The share@5px figures above (16.28 % against 1.39 %) read as if the document were 16 % wrong. It is
+not. `verify_google.py` runs 42 named checks and it says:
+
+| document | LibreOffice | Google Docs |
+|---|---|---|
+| `310_court_judgment` | **42/42 PASS** | 39/42 - `43_within_10pt_x`, `47_margins`, `60_text_column_right_edge` |
+| `01_stamp_rotated_15deg_upright` | 41/42 - one check | 34/42 - seven checks |
+
+So the renderer difference is **3 checks and 7 checks**, not 16 % of the page. share@5px is a
+per-pixel measure and a face that is 12 % narrower moves a great deal of ink a little, which scores
+badly without the layout being wrong. **Use the 42 checks. Do not quote share@5px for a cross-renderer
+comparison again** - it is the right instrument for one renderer against itself and the wrong one for
+two renderers against each other.
+
+The difference is still real and still the point: LibreOffice calls 310 perfect and Google does not.
+
+## Still unexplained
 
 `01_stamp_rotated_15deg_upright` is set in **Liberation Serif**, which the engine maps to **Times New
 Roman** - a face Google has and is metric-identical with. It scores:
