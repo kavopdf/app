@@ -828,7 +828,25 @@ def main(argv):
               "classifier should)" % name)
         note("classify%s (read-only)" % (" --txt" if "--txt" in argv else ""),
              "%d classes from %d documents, class file untouched" % (len(classes), len(measured)))
-        print("documents measured : %d" % len(measured))
+        # THE DOCX HALF OF THIS TOOL IS RETIRED AND ITS COUNT WAS BEING READ AS LIVE.
+        # It reads tools/p2w-bench/BASELINE.md and writes tools/p2w-bench/DEFECT-CLASSES.md - both
+        # listed in RETIRED.md - and it printed "documents measured: 211", from a baseline taken
+        # before the corpus reached 213. Measured 19 Nov, four numbers for one corpus:
+        #   this tool            211
+        #   benchmarks/RANKING.csv           213 rows, 212 scored
+        #   benchmarks/DEFECT-CLASSES.md     213 of 213 (also wrong - see classrow.py)
+        #   report.py            36 of 212, 1 exempt
+        # The live docx classes come from benchmarks/DEFECT-CLASSES.md via classrow.py. This says so
+        # rather than printing a number that looks like a measurement of today.
+        if "--txt" not in sys.argv:
+            print("documents measured : %d  (RETIRED SOURCE - do not quote this number)"
+                  % len(measured))
+            print("                     reads tools/p2w-bench/BASELINE.md, writes")
+            print("                     tools/p2w-bench/DEFECT-CLASSES.md - both retired. The live")
+            print("                     docx classes are benchmarks/DEFECT-CLASSES.md, kept by")
+            print("                     classrow.py; the live count is in its header.")
+        else:
+            print("documents measured : %d" % len(measured))
         print("checks firing      : %d" % len(doc_sets))
         print("classes (data-driven): %d" % len(classes))
         for _c in classes[:10]:

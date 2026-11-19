@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+"""scope.py - which formats a change can move, proved rather than claimed.
+
+THE QUESTION THIS ANSWERS. A change to TxtWriter cannot move the .docx; a change to DocxWriter
+cannot move the .txt; a change to PdfToWord.convert() moves BOTH, because it builds the model both
+writers read. Running the .docx regression pass for a .txt-only change costs hours and proves
+nothing. Running only the .txt pass for a model change lets a .docx regression land.
+
+So the scope is derived, and then PROVED:
+
+    1. read `git diff` and find which METHODS changed, not which files
+    2. map method -> format using the table below
+    3. PROVE the claim: convert the whole corpus to the format you say cannot move, and compare
+       it byte-for-byte with the same conversion from HEAD. If it moved, the scope was wrong and
+       both formats are checked. If it did not, the claim is a measurement.
+
+Step 3 is what makes this safe. A scope nobody tested is a guess, and a guess that is wrong is a
+regression that ships. Byte-identity is the strongest evidence available: if the .txt produced by
+two engines is identical for all 213 documents, no .txt score can differ.
+
+WHY METHOD AND NOT FILE. PdfToWord.java holds convert() (BOTH) and writeTxt() (txt only). A
+file-level rule would call every change to that file a BOTH change and lose the saving on the one
+method where it is safe; or, worse, call it txt-only and let a model change through.
+
+    python3 tools/p2w-bench/scope.py                 # what does the working tree change touch?
+    python3 tools/p2w-bench/scope.py --prove         # convert both ways and compare
+"""
+import argparse, os, re, subprocess, sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(HERE))
+ENGINE = "app/src/main/java/com/kavopdf/app/engine"
+
+# THE TABLE. Derived from what each method actually writes - see the tool table in the fixer brief
+# and the call graph: ToolsActivity calls TxtWriter.write() or DocxWriter.write(); both read the
+# Result that PdfToWord.convert() built.
+METHOD_FORMAT = {
+    "TxtWriter.write": "txt",
+    "PdfToWord.writeTxt": "txt",
+    "DocxWriter.write": "docx",
+    "DocxWriter.orderStamps": "both",   # reorders page.blocks, which TxtWriter walks
+    "PdfToWord.convert": "both",        # builds the model both writers read
+    "ReadingOrder.apply": "both",       # decides block order once, for both
+    "ReadingOrder.order": "both",
+}
+
+# A file whose every line can move both formats. A change to a class FIELD is a model change even
+# when it lands in a writer file, because the other writer reads the same field.
+MODEL_CLASSES = ("class Box", "class Para", "class Table", "class CellPara", "class Line",
+                 "class Result", "class Page", "class Glyph")
+
+
+def sh(cmd, timeout=300, cwd=ROOT):
+    try:
+        return subprocess.run(cmd, shell=True, capture_output=True, text=True,
+                              timeout=timeout, cwd=cwd)
+    except Exception:
+        return None
+
+
+def changed_java():
+    """{file: [(method, first_changed_line)]} for the engine sources in the working tree."""
+    r = sh("git diff -U0 -- %s" % ENGINE)
+    if r is None or not r.stdout.strip():
+        # nothing unstaged: try staged, then HEAD-vs-HEAD~1 is the author's business
+        r = sh("git diff -U0 --cached -- %s" % ENGINE)
+    if r is None or not r.stdout.strip():
+        return {}
+    out, cur = {}, None
+    for line in r.stdout.splitlines():
+        if line.startswith("+++ b/"):
+            cur = line[6:].strip()
+            out.setdefault(cur, [])
+        elif line.startswith("@@") and cur:
+            m = re.search(r"\+(\d+)", line)
+            if m:
+                out[cur].append(int(m.group(1)))
+    return out
+
+
+def method_at(path, lineno):
+    """The nearest enclosing method name at or above lineno, by scanning backwards for a signature."""
+    try:
+        lines = open(os.path.join(ROOT, path), encoding="utf-8", errors="replace").read().split("\n")
+    except Exception:
+        return None
+    pat = re.compile(r"^\s{0,12}(?:public|private|protected|static|final|\s)*[\w<>\[\],.\s]+\s+(\w+)\s*\(")
+    for i in range(min(lineno, len(lines)) - 1, max(-1, lineno - 400), -1):
+        m = pat.match(lines[i])
+        if m:
+            name = m.group(1)
+            if name in ("if", "for", "while", "switch", "catch", "return", "new"):
+                continue
+            return name
+    return None
+
+
+def decide():
+    files = changed_java()
+    if not files:
+        return {"formats": set(), "reason": "no engine change in the working tree", "detail": []}
+
+    formats, detail = set(), []
+    for path, linenos in files.items():
+        base = os.path.basename(path)
+        cls = base[:-5]
+        # a change inside a model class definition is a model change, whatever file it is in
+        try:
+            src = open(os.path.join(ROOT, path), encoding="utf-8", errors="replace").read()
+        except Exception:
+            src = ""
+        in_model = any(m in src for m in MODEL_CLASSES)
+        names = set()
+        for ln in linenos[:40]:
+            n = method_at(path, ln)
+            if n:
+                names.add(n)
+        hit = False
+        for n in names:
+            key = "%s.%s" % (cls, n)
+            if key in METHOD_FORMAT:
+                formats.add(METHOD_FORMAT[key])
+                detail.append("%s -> %s" % (key, METHOD_FORMAT[key]))
+                hit = True
+        if not hit:
+            # an unnamed or unknown method: cannot scope it, so assume the worst
+            if in_model:
+                formats.add("both")
+                detail.append("%s: change outside a known method, model file -> both" % base)
+            else:
+                formats.add("both")
+                detail.append("%s: change in an unrecognised method -> both (cannot scope)" % base)
+    return {"formats": formats, "reason": "derived from the changed methods", "detail": detail}
+
+
+def main(argv):
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--prove", action="store_true")
+    a = ap.parse_args(argv)
+
+    d = decide()
+    f = d["formats"]
+    if not f:
+        print("  scope: nothing to check - %s" % d["reason"])
+        return 0
+    both = "both" in f
+    need = {"docx", "txt"} if both else f
+    print("  scope: %s" % ("BOTH formats" if both else " and ".join(sorted(need))))
+    for line in d["detail"][:10]:
+        print("    %s" % line)
+    if a.prove:
+        print()
+        print("  To prove the untouched format did not move, convert the whole corpus with both")
+        print("  engines and compare:")
+        print("    tools/p2w-bench/build-engine.sh                       # the tree as it is")
+        print("    java -Dp2w.noDocx=true -cp <cp> ConvertAll corpus /tmp/scopeA")
+        print("    git stash && tools/p2w-bench/build-engine.sh && git stash pop")
+        print("    java -Dp2w.noDocx=true -cp <cp> ConvertAll corpus /tmp/scopeB")
+        print("    diff -rq /tmp/scopeA /tmp/scopeB     # zero differences proves the claim")
+    print()
+    print("  regress.py must therefore check: %s" % ", ".join(sorted(need)))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

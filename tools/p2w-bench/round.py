@@ -327,6 +327,32 @@ def claim_age_min(started):
     return age
 
 
+def sh(cmd, timeout=290):
+    """Run a shell command from the repo root. Returns (returncode, stdout+stderr).
+
+    THIS FUNCTION DID NOT EXIST AND THE GUARD THAT CALLED IT SILENTLY DID NOTHING.
+    The auto-revert below calls `sh("git checkout <claim> -- .../engine/")` so that an engine
+    change with no kept attempt goes back to the state the slot was claimed in. There was no
+    `sh` in this file - it is defined in step.py, repro.py and gate.py, and this module imported
+    only shutil and subprocess - so the call raised NameError, the bare `except Exception` around
+    it printed a one-line warning, and the release carried on. Measured 19 Nov in the 00:58 run's
+    own report: "round.py --release-fixer printed could not check the engine against the attempt
+    ledger - NameError: name 'sh' is not defined. The auto-revert guard therefore did not run."
+
+    A guard that has never once run is worse than no guard, because the run reads its silence as
+    a pass. Found by the fixer, not by me, and fixed here.
+    """
+    try:
+        # The repo root, from this file's own location - round.py already derives RANK the
+        # same way two levels up, and it has no ROOT constant to borrow.
+        root = os.path.dirname(os.path.dirname(HERE))
+        r = subprocess.run(cmd, shell=True, cwd=root, capture_output=True, text=True,
+                           timeout=timeout)
+        return r.returncode, (r.stdout or "") + (r.stderr or "")
+    except Exception as e:
+        return 1, str(e)
+
+
 def claim(name):
     """Return 0 if this run may proceed, 1 if a previous one is still working.
 
@@ -452,6 +478,13 @@ def _attempts_this_run():
 
 def release(name, force=False):
     """Release a slot, and for the fixer, refuse to waste it.
+
+    THE COMMIT GATE COMES FIRST, AND IT IS NOT BYPASSED BY --force. No commit may land, for the
+    .docx or the .txt, unless the whole corpus has been measured with the engine as it stands and
+    no document got worse. A run that is trying to release while regress.py refuses is a run about
+    to hand back an engine change nobody measured - and --force exists for a broken build, not for
+    an unmeasured one. Verified 19 Nov: the git pre-commit hook aborts the commit itself, so this
+    is the second of three locks rather than the only one.
 
     WHY THIS IS A REFUSAL AND NOT A SENTENCE
       The brief has said since 13 Nov, twice, that an attempt recorded as 'error' is not a reason

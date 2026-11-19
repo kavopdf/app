@@ -1,0 +1,18 @@
+{
+ "counts": {
+  "baseline_not_scored": [],
+  "clean": 149,
+  "failing": 64,
+  "in_baseline": 213,
+  "in_marks": 213,
+  "scored": 213,
+  "scored_not_in_baseline": [],
+  "scored_not_in_marks": []
+ },
+ "instrument": {
+  "checks": 12,
+  "error": "",
+  "sha": "9f988a43056f",
+  "tool": "verify_txt.py"
+ }
+}

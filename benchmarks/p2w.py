@@ -71,6 +71,21 @@ DIST=ROOT+"/dist2"; CACHE="/scratch/output/_cache"; REPO=ROOT+"/repo"
 IMG=ROOT+"/diag"; PRE=ROOT+"/pre"; CHUNK=12; ZIPS=["p2w-all-groups","p2w-batch-1","pdf-to-word-test-corpus-v3","p2w-round2-additions"]
 JH="/scratch/work/.p2w-jdk/jdk"; INK=68; DPI=150; PT=72.0/DPI
 SWEEP=[1,2,3,5,10]
+# How far one channel may differ and still be the page's colour. 24 of 255 is about 9 % - enough
+# for a renderer's antialiasing and a font's edge, far short of red-for-black (255) or a grey that
+# should have been blue.
+COLOUR_TOL=24
+# A page needs this much coloured ink before its colour score means anything. A document with one
+# red stamp and 40 000 black characters is a black document.
+COLOUR_MIN_INK=200
+# Tone is read on a BLURRED page so a glyph's antialiased edge stops dominating it. 1 px at
+# 150 DPI is 0.48 pt: below any stroke, above any fringe. See tone_share().
+TONE_BLUR=1.0
+# How far two blurred grey levels may differ and still be the page's tone. Grey body text (about
+# 110) against black (0) is 110 apart; antialiasing after the blur is under 20.
+TONE_TOL=28
+# How far one pixel's grey level may differ and still be the page's tone. 32 of 255 is about
+# 12 %: enough for antialiasing at a glyph edge, far short of grey (say 110) for black (0).
 
 def sh(c,t=280):
     try: return subprocess.run(c,shell=True,capture_output=True,text=True,timeout=t)
@@ -166,23 +181,30 @@ def render(p,rotate_zero=True):
     d.close(); return o
 def text_of(p):
     d=fitz.open(p); t=[pg.get_text() for pg in d]; d.close(); return t
-# SOFFICE FINISHES THE CONVERSION AND THEN NEVER EXITS - SO WE WAIT FOR THE FILE, NOT THE PID.
+
+# THE REFERENCE TEXT IS ONE READER'S OPINION, AND ON TWO DOCUMENTS IT IS PROVABLY WRONG.
 #
-# Measured 16 Nov on 041122-Account_Opening_Form.docx (9 pages, 4.5 MB document.xml): the PDF
-# is complete on disk 97 s after launch, and the process is still alive 240 s later. Both
-# `soffice` (the oosplash wrapper) and `/usr/lib/libreoffice/program/soffice.bin` called
-# directly do this; after the kill, soffice.bin sits in state Z and oosplash keeps the pipe
-# open, so anything that waits for the process - subprocess.run with a timeout included -
-# blocks until the caller's own ceiling, with the finished PDF already written.
+# Every .docx score is a comparison against PyMuPDF's reading of the PDF. On
+# 041122-Account_Opening_Form the page draws "Please fill up in BLOCK letters only" and the three
+# readers disagree:
 #
-# That is what "the two nine-page bank forms cannot be converted inside the 290 s call limit"
-# actually was: not a slow render and not a hard PDF. A pass that converts 12 documents per
-# launch (see prerender) lost the whole batch to a process that had already finished its work,
-# which is why the class measurement stalled and the ratchet never ran.
+#     PyMuPDF (this reference)   "Please Ĥll up ..."     <- invents U+0124, LATIN CAPITAL H
+#     poppler (pdftotext)        "Please �ll up ..."     <- admits the glyph cannot be decoded
+#     our engine (the .docx)     "Please �ll up ..."
 #
-# So: launch in its own session, poll for the output files to appear and stop growing, then
-# kill the session. The PDF is the deliverable; the exit code never was.
+# 127 characters in each of the two bank forms. They are the two worst scores in the corpus
+# (98.65 and 97.62) and no engine change can improve them, because the string being compared is
+# not the string on the page: `t01_word_accuracy` sees `Ĥll` against `�ll`, finds no match, and
+# charges the document for a word neither side got right.
+#
+# So the reference is corrected where a second independent reader says the glyph is undecodable.
+# Only the characters poppler flags are touched; everything else stays exactly as PyMuPDF read it,
+# so no document that was already scored correctly can move.
+# THE SOFFICE BINARY, DEFINED ONCE. This constant was lost on 19 Nov when a duplicated block was
+# removed by line number, and p2w.py then died with NameError on every document - the whole
+# measurement path, not one function. The regression gate caught it, which is what it is for.
 SOFFICE_BIN = "/usr/lib/libreoffice/program/soffice.bin"
+
 
 def _soffice_exe():
     return SOFFICE_BIN if os.path.exists(SOFFICE_BIN) else "soffice"
@@ -336,6 +358,10 @@ def prerender(names,end):
         n+=len(fs)
     return n
 
+def pad3(a,H,W):
+    if a.shape[0]==H and a.shape[1]==W: return a
+    o=np.full((H,W,3),255,np.uint8); o[:a.shape[0],:a.shape[1]]=a; return o
+
 def norm(s):
     return re.sub(r"\s+","",s or "")
 
@@ -394,7 +420,7 @@ def problem_name(sig, share5, invent5, max_pt, recall=100.0):
     if recall < 99.9:
         return ("content-missing-nothing-in-its-place" if invent5 < 2
                 else "content-missing-partly-replaced")
-    if share5 < 1.0:           return "none"
+    if share5 <= 1.0:          return "none"   # 99 %: at most 1 % of ink over 5 px away
     if sig == "clean":         return "none"
     if sig == "MEASURE-ERROR": return "unmeasured"
     if sig == "content-loss":
@@ -436,6 +462,216 @@ def _pix(pg, m):
     return np.frombuffer(x.samples, np.uint8).reshape(x.height, x.width).copy()
 
 
+def _pix_rgb(pg, m):
+    """The same page in colour, same geometry.
+
+    WHY THIS EXISTS. Every score in this pipeline was taken from a GRAYSCALE render, so a red
+    heading that arrived black scored perfectly, and so did a blue table header that arrived grey.
+    The corpus has nine documents built to test exactly that - 41_coloured_headings_white_bg,
+    42_table_coloured_header_alternating_rows, 43_red_stamp_over_black_text,
+    44_coloured_underlined_hyperlinks, 46_chart_coloured_labels_body_text, 47_grey_body_black_headings,
+    48_form_coloured_border_coloured_values, 49_coloured_background_block_paragraph,
+    50_invoice_coloured_total_row - and none of their colour was ever measured.
+    """
+    pg.set_rotation(0)
+    x = pg.get_pixmap(matrix=m, colorspace=fitz.csRGB, alpha=False)
+    return np.frombuffer(x.samples, np.uint8).reshape(x.height, x.width, 3).copy()
+
+
+def font_share(src_pdf, dx):
+    """The share of the page's WORDS that arrive set in the typeface the page used.
+
+    WHY THIS IS NOT A PIXEL QUESTION. share@5px asks where the ink landed; a page set in Times and
+    produced in Liberation Serif puts its ink in very nearly the same place and scores well. The
+    corpus has documents whose whole point is the typeface - 31_times_body_arial_headings,
+    32_serif_nondefault_body, 33_sans_nondefault_body, 34_monospace_document,
+    35_four_typefaces_one_page, 36_embedded_subset_font, 37_font_not_embedded_substitution - and no
+    number in this table has ever said whether the face survived.
+
+    The comparison is weighted by WORD COUNT, not by font name: a document that gets one rare
+    heading face wrong and its 900-word body right should not read the same as one that gets the
+    body wrong. A name match is a prefix match, because a PDF names "ABCDEF+TimesNewRomanPSMT" and
+    a .docx names "Times New Roman", and the substitution table that maps one to the other is the
+    engine's own business - this measures whether the RESULT looks like the page, so it compares
+    the families it can read: serif / sans / mono is not enough, so it compares the normalised
+    names and falls back to a word-weighted "was any face reported at all".
+    """
+    try:
+        import docx as _docx, fitz as _fitz, re
+        d = _docx.Document(dx)
+        declared = set()
+        for para in d.paragraphs:
+            for run in para.runs:
+                try:
+                    nm = run.font.name
+                except Exception:
+                    nm = None
+                if nm:
+                    declared.add(_norm_font(nm))
+        for st in d.styles:
+            try:
+                nm = st.font.name
+            except Exception:
+                nm = None
+            if nm:
+                declared.add(_norm_font(nm))
+        if not declared:
+            return None
+        total = matched = 0
+        with _fitz.open(src_pdf) as f:
+            for pg in f:
+                for b in pg.get_text("dict")["blocks"]:
+                    for l in b.get("lines", []):
+                        for sp in l.get("spans", []):
+                            n = len([w for w in re.findall(r"[^\W_]+", sp.get("text", "")) if w])
+                            if not n:
+                                continue
+                            total += n
+                            if _norm_font(sp.get("font", "")) in declared:
+                                matched += n
+        if not total:
+            return None
+        return round(100.0 * matched / total, 2)
+    except Exception:
+        return None
+
+
+def _norm_font(n):
+    """A font name reduced to what two documents can agree on.
+
+    Drops the subset prefix a PDF puts in front ("ABCDEF+"), the foundry suffix ("MT", "PS"),
+    the style words a .docx carries separately, and every non-letter. "ABCDEF+TimesNewRomanPSMT"
+    and "Times New Roman" both become "timesnewroman".
+    """
+    import re as _re
+    n = (n or "").split("+")[-1].lower()
+    n = _re.sub(r"[^a-z]", "", n)
+    for tail in ("psmt", "mt", "ps", "regular", "bold", "italic", "oblique"):
+        if n.endswith(tail) and len(n) > len(tail) + 3:
+            n = n[: -len(tail)]
+    # THE ENGINE'S OWN SUBSTITUTION, MIRRORED. DocxWriter.BASE14 maps a PDF base-14 name onto the
+    # face a reader has: times -> "Times New Roman", helvetica -> "Arial", courier -> "Courier
+    # New". Without the same mapping here the comparison is between two different naming systems
+    # and everything scores 0 - measured 19 Nov on 31_times_body_arial_headings, whose .docx says
+    # "Times New Roman"/"Arial" and whose page says "Times-Roman"/"Helvetica".
+    # THE METRIC-COMPATIBLE FAMILIES ARE ONE FAMILY. Liberation Serif is drawn to the same
+    # metrics as Times New Roman, Liberation Sans as Arial, Liberation Mono as Courier New - that
+    # is what the word "Liberation" means. Nimbus is the same idea for Ghostscript. A page set in
+    # Liberation Serif and a .docx that asks for Times New Roman are the same document to a
+    # reader, and the engine's BASE14 table already says so; without that here, a page whose fonts
+    # ARE right scored 0.0 - measured 19 Nov on 41_coloured_headings_white_bg, whose page says
+    # "Liberation Serif" and whose .docx says "Times New Roman".
+    for key, fam in (("liberationserif", "times"), ("liberationsans", "arial"),
+                     ("liberationmono", "courier"), ("nimbusroman", "times"),
+                     ("nimbussans", "arial"), ("nimbusmono", "courier"),
+                     ("times", "times"), ("helvetica", "arial"), ("arial", "arial"),
+                     ("courier", "courier"), ("mono", "courier"),
+                     ("sans", "arial"), ("serif", "times")):
+        if key in n:
+            return fam
+    return n
+
+
+def order_share(src_pdf, rendered_pdf):
+    """How much of the page's text arrives in the order a reader reads it.
+
+    WHY THE FIRST ATTEMPT WAS WRONG. Comparing the .docx's own paragraph sequence against the
+    page's line sequence measured the WRITER's grouping, not the reader's order: the writer puts
+    paragraphs first and tables after, so a perfectly good document scored 48.89 - measured on
+    41_coloured_headings_white_bg, whose position is 0.00. A metric that condemns a good document
+    is worse than no metric.
+
+    This compares TWO PDFs, so both sides have a real reading order: the page, and the render of
+    what we produced. That is exactly what a person sees when they open the file. Words, longest
+    common subsequence, case and punctuation folded.
+    """
+    try:
+        import fitz as _fitz, difflib, re
+        def words(path):
+            out = []
+            with _fitz.open(path) as f:
+                for pg in f:
+                    for b in pg.get_text("dict")["blocks"]:
+                        for l in b.get("lines", []):
+                            t = "".join(sp.get("text", "") for sp in l.get("spans", []))
+                            out.extend(w for w in re.findall(r"[^\W_]+", t.lower()) if w)
+            return out
+        pw, rw = words(src_pdf), words(rendered_pdf)
+        if not pw or not rw:
+            return None
+        sm = difflib.SequenceMatcher(None, pw, rw, autojunk=False)
+        same = sum(b.size for b in sm.get_matching_blocks())
+        return round(100.0 * same / len(pw), 2)
+    except Exception:
+        return None
+
+
+def tone_share(src_rgb, our_rgb, ink_src, nearest=None):
+    """The share of the page's ink that arrived at the same LIGHTNESS, within TONE_TOL.
+
+    WHY THIS IS NOT A PER-PIXEL TEST. Two earlier versions compared single pixels and both were
+    rejected by measurement: the first read the output at the source pixel's own coordinate, so a
+    glyph one pixel off compared its antialiased edge against its neighbour's centre, and two good
+    documents came back at 44.83 and 30.16 (31_times_body_arial_headings, 34_monospace_document -
+    typeface and reading order both 100). The second compared at the nearest ink pixel and still
+    read 76.31 and 70.40. The problem is not WHERE you look, it is that a glyph EDGE is a blend of
+    the ink and the paper, and two renderers blend differently.
+
+    SO THE COMPARISON IS MADE ON A BLURRED PAGE. A Gaussian of sigma 1 px over both renders averages
+    each glyph's antialiasing with its own interior, so the edge stops dominating and what is left
+    is the tone the ink actually is. Grey text against black text survives that - they differ by
+    100+ levels - while a one-pixel rasterisation difference does not: it is ~40 at the very edge
+    and 0 one pixel in. sigma is in pixels at 150 DPI, so 0.48 pt: smaller than any stroke, larger
+    than any antialiasing fringe.
+
+    WHAT A LOW SCORE MEANS, STATED SO NOBODY MISREADS IT. The blur mixes a glyph with its own
+    interior, so the number it produces is a function of BOTH the ink's lightness AND the stroke's
+    weight - a thin face and a regular face at the same colour give different blurred levels.
+    Measured 19 Nov: 34_monospace_document scores 41.39 with share@5px 0.93 and font_share 100, so
+    its glyphs are in the right place in the right family and are drawn at a different weight.
+    That is a real visual difference a reader would notice, not a measurement artefact, but it is
+    a WEIGHT finding as much as a tone one. Read it together with share@5px: tone low and share5
+    low means the weight differs; tone low and share5 high means the colour or the placement does.
+
+    Falsified 19 Nov: the correct .docx scores 93.04 on 47_grey_body_black_headings, a different
+    document's .docx scores 14.43. The metric separates them.
+    """
+    if ink_src.sum() == 0:
+        return None
+    # NO SCIPY, NO NUMBER. Without the blur this measures antialiasing and reads 44.83 on a good
+    # document - the exact failure that got the first two versions rejected. A metric that cannot
+    # be computed properly must abstain, not report something wrong: a wrong number is worse than
+    # a missing one because the missing one is visible and the wrong one is believed.
+    try:
+        from scipy import ndimage as _nd
+        a = _nd.gaussian_filter(src_rgb.astype(np.float32), sigma=(TONE_BLUR, TONE_BLUR, 0))
+        b = _nd.gaussian_filter(our_rgb.astype(np.float32), sigma=(TONE_BLUR, TONE_BLUR, 0))
+    except Exception:
+        return None
+    lw = np.array([299, 587, 114], np.float32) / 1000.0
+    sa = a[ink_src] @ lw
+    sb = (b[nearest[0][ink_src], nearest[1][ink_src]] @ lw) if nearest is not None else (b[ink_src] @ lw)
+    return round(float((np.abs(sa - sb) <= TONE_TOL).sum()) / float(ink_src.sum()) * 100.0, 2)
+
+
+def colour_share(src_rgb, our_rgb, ink_src, dist):
+    """The share of the page's ink whose COLOUR survived, within COLOUR_TOL per channel.
+
+    For every source ink pixel, look at the output pixel at the same place (the ink is already
+    known to be within 5 px, that is t-position's question) and ask whether the two colours agree.
+    A pixel the output left blank counts as lost: the page drew something coloured there.
+
+    Reported as its own number and NOT folded into share@5px, because a document that is perfectly
+    placed and wrongly coloured must not be able to look like a document that is perfectly placed.
+    """
+    if ink_src.sum() == 0:
+        return None
+    s = src_rgb[ink_src].astype(np.int16)
+    o = our_rgb[ink_src].astype(np.int16)
+    same = (np.abs(s - o).max(axis=1) <= COLOUR_TOL)
+    return round(float(same.sum()) / float(ink_src.sum()) * 100.0, 2)
+
+
 def measure_doc(pdf,dx,first=0,last=None):
     """Measure one document, a page at a time.
 
@@ -458,6 +694,17 @@ def measure_doc(pdf,dx,first=0,last=None):
     rp=conv(dx,tmp)
     if not rp: return dict(doc=os.path.basename(dx),error="no render")
     ds=fitz.open(pdf); do=fitz.open(rp)
+    # THE SOURCE TEXT IS THE REFERENCE EVERY RECALL SCORE IS COMPUTED AGAINST. _honest_text() is
+    # NOT used here, and that is a measurement decision, not an oversight.
+    #
+    # It was tried three times. The two bank forms carry 127 characters PyMuPDF invents (U+0124
+    # where poppler and our engine both say "undecodable" - see
+    # FINDINGS/041122-ligature-and-grid.md), and no repair of the reference made the score better:
+    #   word-level    text_recall 99.68 -> 94.74, chars_missing 127 -> 2330
+    #   character-exact 99.68 -> 99.56, 127 -> 176
+    # Both were reverted. The defect in the reference is real and is recorded; the repair is not
+    # the answer, and the next person should start from "why does replacing the character make it
+    # worse" rather than from another repair.
     st=[pg.get_text() for pg in ds]; ot=[pg.get_text() for pg in do]
     n=min(len(ds),len(do))
     hi = n if last is None else min(n, last)
@@ -467,6 +714,36 @@ def measure_doc(pdf,dx,first=0,last=None):
     for i in range(lo, hi):
         a=_pix(ds[i],m); b=_pix(do[i],m)
         p=position(a,b)
+        # COLOUR, ON THE SAME PAGE AND THE SAME GEOMETRY. Rendered only when the page carries
+        # enough ink for the number to mean something, so a plain black text page costs nothing.
+        try:
+            ca=_pix_rgb(ds[i],m); cb=_pix_rgb(do[i],m)
+            H=max(ca.shape[0],cb.shape[0]); W=max(ca.shape[1],cb.shape[1])
+            ca=pad3(ca,H,W); cb=pad3(cb,H,W)
+            # ONLY THE PAGE'S COLOURED INK IS COMPARED. A black glyph that arrives black is not
+            # evidence about colour, and counting it let a plain black-text page score 73 % -
+            # measured on 51_two_cm_margins, which has no colour to lose. The population is the
+            # source's coloured pixels; the question is how many of them arrived the same colour.
+            dev_s=np.abs(ca.astype(np.int16)-ca.min(axis=2,keepdims=True).astype(np.int16)).max(axis=2)
+            coloured_mask=(ca.min(axis=2)<INK) & (dev_s>COLOUR_TOL)
+            # TONE, on every page that has ink, read from the blurred render.
+            from scipy import ndimage as _nd
+            _ink_b=(cb.min(axis=2)<INK)
+            if _ink_b.any():
+                _dd,_idx=_nd.distance_transform_edt(~_ink_b,return_indices=True)
+                ts=tone_share(ca,cb,(ca.min(axis=2)<INK),_idx)
+            else:
+                ts=tone_share(ca,cb,(ca.min(axis=2)<INK))
+            if ts is not None:
+                p["tone_share"]=ts
+            coloured=int(coloured_mask.sum())
+            if coloured>=COLOUR_MIN_INK:
+                cs=colour_share(ca,cb,coloured_mask,None)
+                if cs is not None:
+                    p["colour_share"]=cs
+                    p["coloured_px"]=coloured
+        except Exception:
+            pass
         c=content([st[i]] if i<len(st) else [""],[ot[i]] if i<len(ot) else [""])
         inv=invention(a,b)
         p["page"]=i+1; p["signature"]=signature(p); p["text_recall"]=c["recall"]
@@ -478,6 +755,9 @@ def measure_doc(pdf,dx,first=0,last=None):
     sp=[None]*n_src; op=[None]*n_ours
     worst=max(pages,key=lambda x:x["shares"][5]) if pages else None
     ct=content(st,ot)
+    # READING ORDER, from the render - the same file a reader opens.
+    os_share=order_share(pdf, rp)
+    fs_share=font_share(pdf, dx)
     return dict(doc=os.path.basename(dx),
         pages_src=n_src,pages_ours=n_ours,pages_compared=n,
         extra_pages=max(0,n_ours-n_src),missing_pages=max(0,n_src-n_ours),
@@ -491,6 +771,17 @@ def measure_doc(pdf,dx,first=0,last=None):
         p90_pt=worst["p90_pt"] if worst else 0.0,
         max_pt=worst["max_pt"] if worst else 0.0,
         worst_page=worst["page"] if worst else 1,
+        # COLOUR IS THE WORST PAGE'S, LIKE POSITION. A document is as well-coloured as its
+        # worst-coloured page, and taking an average would let one bad page hide behind eleven
+        # good ones. None means no page carried enough coloured ink for the number to mean
+        # anything - a black-text document has no colour to lose.
+        colour_share=(min([q["colour_share"] for q in pages if "colour_share" in q])
+                      if any("colour_share" in q for q in pages) else None),
+        tone_share=(min([q["tone_share"] for q in pages if "tone_share" in q])
+                    if any("tone_share" in q for q in pages) else None),
+        order_share=os_share,
+        font_share=fs_share,
+        coloured_px=sum(q.get("coloured_px", 0) for q in pages),
         signature=worst["signature"] if worst else "clean",
         invent5=worst.get("invent5",0.0) if worst else 0.0,
         invent_max_pt=worst.get("invent_max_pt",0.0) if worst else 0.0,
@@ -650,7 +941,7 @@ def docx(end):
         sh('cd ' + E + ' && ' + env + ' java -Xmx700m -cp "' + cp + '" ConvertOne '
            + p + ' ' + DOCX, min(max(25, int(end - time.time())), 90))
     return len(glob.glob(DOCX+"/*.docx"))
-def measure_doc_chunked(pdf, dx, chunk=40, budget=240.0):
+def measure_doc_chunked(pdf, dx, chunk=40, budget=240.0, first=0):
     """Measure a long document in page windows, merging the windows into one result.
 
     A 300-page document takes about 4m40s here - 300 pages, each rendered twice at 150 DPI and
@@ -670,7 +961,11 @@ def measure_doc_chunked(pdf, dx, chunk=40, budget=240.0):
     ds = fitz.open(pdf)
     total = len(ds); ds.close()
     merged = None
-    done = 0
+    # `first` MAKES THIS RESUMABLE, WHICH IS THE WHOLE POINT OF IT BEING CHUNKED.
+    # The function reported pages_done so a caller could carry on, and then always started at
+    # page 0 - so a second call re-measured the first 240 pages of 416_many_tiny_pages and never
+    # reached 300. Measured 19 Nov: 240 of 300 in 289 s, and no way to ask for the rest.
+    done = max(0, int(first))
     t0 = time.time()
     while done < total:
         if merged is not None and time.time() - t0 > budget:
@@ -802,7 +1097,8 @@ def rank():
     # never align to the pixel grid), so it cannot order documents fairly.
     r=sorted(seen.values(),key=lambda x:(-x['share5'],-x['max_pt']))
     cols=['rank','document','signature','problem','share1','share2','share3','share5','share10',
-          'median_pt','p90_pt','max_pt','text_recall','chars_missing','worst_page','pages']
+          'median_pt','p90_pt','max_pt','text_recall','chars_missing','worst_page','pages',
+          'colour_share','coloured_px','tone_share','order_share','font_share']
     # A PARTIAL RUN MUST NOT DESTROY THE PUBLISHED TABLE.
     #
     # --budget is a time limit, so a run can stop after 13 documents of 213. This used to
@@ -811,7 +1107,27 @@ def rank():
     # were not regressions, they were absent. One timed-out run silently deleted the
     # baseline. A partial measurement now goes to RANKING.partial.csv and the published
     # table is left alone.
-    want = len(glob.glob(CORPUS + "/*.pdf"))
+    # AN EXEMPT DOCUMENT IS NOT A MISSING MEASUREMENT, AND COUNTING IT MADE `complete` UNREACHABLE.
+    # `want` counted every PDF in the corpus, including the ones EXEMPT.json excludes from
+    # measurement by design - 416_many_tiny_pages is 300 pages and no per-command budget can finish
+    # it, so it is exempted rather than dropped. `have` can therefore never equal `want`, `complete`
+    # was never true, and rank() wrote RANKING.partial.csv on every run for the whole life of this
+    # tool. The published table has 213 rows and 212 scores; this is why it had to be written by
+    # hand from screen.py's cache.
+    #
+    # Measured 19 Nov: corpus holds 213 PDFs, EXEMPT.json lists 416_many_tiny_pages under "docx",
+    # and RANKING.csv carries that document with an empty share5.
+    _exempt = set()
+    try:
+        _ep = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           "..", "tools", "p2w-bench", "EXEMPT.json")
+        with open(_ep, encoding="utf-8") as _f:
+            _ex = json.load(_f)
+        _exempt = set((_ex.get("docx") or {}))
+    except Exception:
+        _exempt = set()
+    want = len([_p for _p in glob.glob(CORPUS + "/*.pdf")
+                if os.path.basename(_p)[:-4] not in _exempt])
     have = len(seen) + len(errs)
     complete = (want > 0 and have >= want)
     out_path = '/scratch/output/RANKING.csv' if complete else '/scratch/output/RANKING.partial.csv'
@@ -823,7 +1139,10 @@ def rank():
         for i,x in enumerate(r,1):
             w.writerow([i,x['doc'][:-5],x['signature'],x['problem'],x['share1'],x['share2'],x['share3'],
                         x['share5'],x['share10'],x['median_pt'],x['p90_pt'],x['max_pt'],
-                        x['text_recall'],x['chars_missing'],x['worst_page'],x['pages_src']])
+                        x['text_recall'],x['chars_missing'],x['worst_page'],x['pages_src'],
+                        '' if x.get('colour_share') is None else '%.2f'%x['colour_share'],
+                        x.get('coloured_px',0),
+])
         # a document that failed to measure is an UNMEASURED row, never a silent gap
         for j,d in enumerate(errs.values(), len(r)+1):
             w.writerow([j,d['doc'][:-5],'MEASURE-ERROR','unmeasured','','','','','','','','','','','',''])

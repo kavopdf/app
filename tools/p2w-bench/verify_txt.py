@@ -147,6 +147,11 @@ SYMBOL_ENCODING = [
 # How far a line's leading spaces may sit from where its x says it should be. One
 # character of slack absorbs the rounding in x/charW without hiding a shifted column.
 POS_TOLERANCE = 2
+# How far two estimates of a character width may differ before the columns disagree. See t02.
+POS_DRIFT = 0.08
+# A character width outside this range is a collapsed fit, not a document. Body text is 2-20 pt.
+POS_MID_MIN = 2.0
+POS_MID_MAX = 20.0
 
 # A page that drew N text lines should arrive as N lines of the .txt, because that is
 # what TxtWriter writes: one line per paragraph line, and one line per table cell
@@ -162,7 +167,12 @@ POS_TOLERANCE = 2
 MAX_LINE_DRIFT = 1.5
 
 # Words that survive, as a share of the source's words.
-MIN_ACCURACY = 98.0
+# THE BAR IS 99 %, NOT 98 %. A document is fixed only when it matches the original at 99 % or
+# better, and t01 was passing anything at or above 98 - so a .txt that lost one word in fifty was
+# counted clean while sitting a full percentage point under the bar the whole pipeline is judged on.
+# Measured 19 Nov: 6 documents fail t01; with this bar the ones between 98 and 99 fail too, which is
+# the correct outcome rather than a regression.
+MIN_ACCURACY = 99.0
 
 # Where a running head or a page number lives: the top and bottom band of the page, as
 # a share of page height. Furniture outside these bands is not furniture - a heading
@@ -212,7 +222,7 @@ CHECKS = ["t01_word_accuracy", "t02_position", "t03_symbols",
 
 # What each check is, for --list-checks and for anyone reading a JSON a year from now.
 ABOUT = {
-    "t01_word_accuracy": "the source's words survive, 98 % of them",
+    "t01_word_accuracy": "the source's words survive, 99 % of them",
     "t02_position": "a line's x survives as its leading spaces",
     "t03_symbols": "every character the page DRAWS survives, read from the glyphs",
     "t04_structure": "line count against drawn-line count (demoted, not primary)",
@@ -757,10 +767,46 @@ def compare(src_pdf, txt_path):
     mid, pairs = _ruler(runs, lines)
     if len(pairs) >= 3:
         if mid:
-            good = sum(1 for x, col in pairs
-                       if abs(col - round(x / mid)) <= POS_TOLERANCE)
-            share = round(100.0 * good / len(pairs))
-            c["t02_position"] = (len(pairs), share, share >= 90, True)
+            # THE TOLERANCE IS PROPORTIONAL TO THE COLUMN, BECAUSE THE ERROR IS.
+            #
+            # The check asks whether one character width explains every line: col should be
+            # round(x / mid). A PROPORTIONAL font has no single character width, so `mid` is an
+            # estimate and the writer's own width is a different estimate. If they disagree by a
+            # relative amount e, then col_actual = col_expected * (1 + e) - the error grows with
+            # the column, which is why a flat tolerance of 2 characters passed lines near the left
+            # margin and failed the same document's right-aligned running heads by 3 and 4.
+            # Measured 19 Nov on the 15 failing documents: 58_header_rule_footer_rule has passing
+            # lines at x=56 and failing ones at x=423 and x=503, off by exactly 3.
+            #
+            # So the tolerance is max(POS_TOLERANCE, POS_DRIFT * col). 8 % is the point where a
+            # document whose lines all sit on one ruler still passes and a document whose columns
+            # genuinely disagree does not; it is a bound on how far two estimates of a quantity
+            # that does not exist may differ, not a fitted number.
+            #
+            # AND A RULER THAT DOES NOT FIT AT ALL IS NOT A FAILING DOCUMENT. 041122 and
+            # 332_bom_on_drawing come back with mid = 1.002 and 3.907 and residuals of 71 % and
+            # 82 %: the fit itself collapsed, so the check is not measuring position, it is
+            # measuring its own failure to calibrate. Those abstain. A check that cannot judge a
+            # document must say so rather than charge it - the same reason "too few lines to fit a
+            # ruler" abstains rather than fails.
+            # ABSTAIN ONLY WHEN THE RULER ITSELF IS IMPLAUSIBLE, NOT WHEN THE DATA IS BAD.
+            # The first version abstained whenever the worst residual exceeded 25 %, and that
+            # swallowed a real failure: a .txt whose indents were randomised came back as
+            # "cannot judge" instead of "wrong", which is the check excusing the exact fault it
+            # exists to find. Measured 19 Nov on 310_court_judgment with shuffled indents.
+            #
+            # A character width is a physical quantity. Body text is 2 to 20 pt per character;
+            # anything outside that is a fit that collapsed on degenerate pairs (041122 returns
+            # mid = 1.002 with residuals over 1300 %). Inside that range, a ruler that does not
+            # explain the lines means the lines are in the wrong place, and that is a failure.
+            if not (POS_MID_MIN <= mid <= POS_MID_MAX):
+                c["t02_position"] = (len(pairs), 0, True, False)
+            else:
+                good = sum(1 for x, col in pairs
+                           if abs(col - round(x / mid))
+                           <= max(POS_TOLERANCE, POS_DRIFT * round(x / mid)))
+                share = round(100.0 * good / len(pairs))
+                c["t02_position"] = (len(pairs), share, share >= 90, True)
         else:
             # Enough pairs to judge and not one of them at a positive column: every line
             # of the .txt is flat against the margin. That is not a document too short to
@@ -1085,8 +1131,13 @@ def compare(src_pdf, txt_path):
     # word, and t01 already owns the case fault.
     invented_words = 0
     if len(src_text) >= WORD_INVENTION_MIN_CHARS:
-        src_w = Counter(_strip_punct(w) for w in _words(src_text))
-        txt_w = Counter(_strip_punct(w) for w in _words(txt_text))
+        # A token that is nothing but punctuation strips to "", and an empty string is not
+        # a word the writer invented - it is a mark the page drew and this comparison has no
+        # business counting. Measured on balance-sheet-and-profit-loss, whose only two
+        # "invented words" were both "": the .txt carries an em dash standing alone where
+        # the page does, and the check condemned the document for it.
+        src_w = Counter(w for w in (_strip_punct(x) for x in _words(src_text)) if w)
+        txt_w = Counter(w for w in (_strip_punct(x) for x in _words(txt_text)) if w)
         invented_words = sum((txt_w - src_w).values())
     c["t12_word_invention"] = (len(src_text), invented_words,
                                invented_words == 0,
@@ -1112,7 +1163,9 @@ def compare(src_pdf, txt_path):
     # is not a fault in the .txt, and a check that condemns it is a check measuring the
     # page, not the writer. This is the same split every other check here makes: the
     # source names the population, the .txt is what gets judged.
-    src_cols = {}
+    # Every amount the page ends a line with, IN THE ORDER THE PAGE DRAWS THEM. The order
+    # matters and it did not used to be kept: see the occurrence match below.
+    src_occ = []          # [(token, end_col)] in source reading order
     if mid:
         for pg in _src_pages(src_pdf):
             for ln in pg["lines"]:
@@ -1122,8 +1175,10 @@ def compare(src_pdf, txt_path):
                 if not span:
                     continue
                 token = ln["text"][span[0]:span[1]]
-                end_col = round(ln["x"] / mid) + span[1]
-                src_cols.setdefault(end_col, []).append(token)
+                src_occ.append((token, round(ln["x"] / mid) + span[1]))
+    src_cols = {}
+    for token, end_col in src_occ:
+        src_cols.setdefault(end_col, []).append(token)
     right_src = {k: v for k, v in src_cols.items() if len(v) >= AMOUNT_MIN_ROWS}
     # Where each amount token ended in the .txt. Keyed by the TOKEN and not by the line,
     # because the source's line carries characters the .txt does not - the declaration
@@ -1134,17 +1189,39 @@ def compare(src_pdf, txt_path):
         span = _amount_at_end(ln)
         if span:
             txt_ends.setdefault(ln[span[0]:span[1]], []).append(span[1])
-    consumed = {}
+    # MATCH THE OCCURRENCE, NOT THE TOKEN. This used to look a token up and always take
+    # got[0], the FIRST place that token ended in the .txt. On an invoice the CGST and SGST
+    # columns routinely hold the SAME values, so one token ended in two columns and both
+    # source columns read the same first position: the second column was judged against the
+    # first one's position and passed for the wrong reason. Measured on
+    # gst-invoice-3line-items - 2,497.50 / 1,053.00 / 12,825.00 / 9,652.50 / 26,601.75 each
+    # occur twice, ending at 109 and at 120, and the SGST column was checked against 109.
+    #
+    # The k-th source occurrence of a token is matched to the k-th .txt occurrence of it,
+    # walking the source in the order the page draws its lines. That is the pairing a reader
+    # makes, and it needs no assumption about which column a .txt line belongs to.
+    used = {}
+    src_end = []          # parallel to src_occ: where that occurrence ended, or None
+    for tok, _ec in src_occ:
+        got = txt_ends.get(tok)
+        if not got:
+            src_end.append(None)      # the amount is not in the .txt at all: t01's finding
+            continue
+        k = used.get(tok, 0)
+        used[tok] = k + 1
+        src_end.append(got[k] if k < len(got) else None)
+    col_ends = {}
+    for (tok, ec), end in zip(src_occ, src_end):
+        col_ends.setdefault(ec, []).append(end)
     preserved = 0
     for end_col, tokens in right_src.items():
         ends = []
         ok = True
-        for tok in tokens:
-            got = txt_ends.get(tok)
-            if not got:
-                ok = False       # the amount is not in the .txt at all: t01's finding
+        for e in col_ends.get(end_col, []):
+            if e is None:
+                ok = False
                 break
-            ends.append(got[0])
+            ends.append(e)
         # Zero tolerance, WITHIN the column: the amounts either end at one character
         # column or they do not. The column's absolute offset is not compared to the
         # source's - the writer's ruler is t02's question and it is a constant shift, not

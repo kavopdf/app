@@ -56,7 +56,18 @@ defect, not a check defect:
 
 Three of the four are now proven. The fourth is the one above.
 
-## Standing rule
+## t09 was fixed 20 minutes after this was written
 
-Until `t09` is resolved, the .txt checks remain advisory and no score may be
-quoted from them. 11 of 12 is not 12 of 12.
+This table was the state at 21:03. At 21:23 the `min()` cap in `t09` was removed and the check was
+re-tested: duplicating every running head 2x and 3x on `412_page_labels_roman` now fails it, where it
+passed before. See `benchmarks/T09-FURNITURE-FIX.md` for the three-row proof.
+
+**The result is 12 of 12, not 11 of 12.** The row above is left as it was measured because a record
+that gets edited to match the present is not a record.
+
+## Standing rule - withdrawn
+
+The rule that stood here said "until t09 is resolved, the .txt checks remain advisory and no score
+may be quoted from them". t09 is resolved, so the rule no longer holds and the .txt scores may be
+quoted. It is withdrawn, not deleted: it was the right rule while it was true, and a reader who saw
+it quoted somewhere should be able to find out why it stopped.

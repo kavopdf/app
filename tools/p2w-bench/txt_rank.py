@@ -29,8 +29,37 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 TXT_DIR = os.path.join(HERE, "txt")
 os.makedirs(TXT_DIR, exist_ok=True)
 OUT = os.path.join(TXT_DIR, "RANKING-TXT.csv")
+# THE TXT GRADES ITSELF AGAINST ITS OWN RECORDS, NOT AGAINST ITS OWN SCORE FILE.
+#
+# The ratchet used to compare each document with the previous row in OUT - the same file it was about
+# to overwrite. That is the store grading itself, and it fails in the one case that matters: delete or
+# reset OUT and every document is a first score, nothing is compared, and the ratchet prints "no
+# document got worse" over an empty table. Measured: with OUT absent, two documents at 3 and 1
+# failing checks both reported as clean.
+#
+# Two files fix it, and neither is read or written by anything on the .docx side:
+#   RATCHET-TXT.json          the best failed-count each document has ever reached, plus the check
+#                             universe it was reached under. Written only when a document improves.
+#   RANKING-TXT-BASELINE.csv  the reference table, written once by --baseline and never by scoring.
+MARKS = os.path.join(TXT_DIR, "RATCHET-TXT.json")
+BASELINE = os.path.join(TXT_DIR, "RANKING-TXT-BASELINE.csv")
 CORPUS = "/scratch/work/p2w/corpus"
 TXT = "/scratch/work/p2w/out"
+
+
+def _universe():
+    """(ids, sha12, error) for the .txt verifier, asked of the instrument right now.
+
+    A mark is only comparable with a score taken under the same set of checks. Adding or dropping a
+    check moves this sha, and every mark stamped with the old one is stale - not compared, not
+    carried forward, and not silently replaced. Same rule the .docx ratchet learned the hard way.
+    """
+    try:
+        sys.path.insert(0, HERE)
+        from instrument import live_universe
+        return live_universe(True)
+    except Exception as e:
+        return [], "", "instrument.live_universe failed: %s" % e
 
 
 def docs():
@@ -96,6 +125,25 @@ def main(argv):
         fresh = [d for d in ds if d not in done]
         if fresh:
             ds = fresh
+    # --baseline writes the reference table ONCE, from whatever the store holds now, and refuses to
+    # overwrite it. Scoring never touches it: a file that scoring could rewrite is a file that
+    # records the last measurement rather than the reference the measurements are judged against.
+    if "--baseline" in argv:
+        if os.path.exists(BASELINE) and "--force" not in argv:
+            print("  %s already exists - refusing to overwrite it." % os.path.basename(BASELINE))
+            print("  It is the reference, not a log. Pass --force only if you mean to move the")
+            print("  reference, and say why in the commit message.")
+            return 2
+        if not os.path.exists(OUT):
+            print("  no %s to take a baseline from - score the corpus first" % os.path.basename(OUT))
+            return 2
+        import csv as _c, shutil as _sh
+        _sh.copyfile(OUT, BASELINE)
+        n = sum(1 for _ in _c.DictReader(open(BASELINE, encoding="utf-8")))
+        print("  baseline written: %s (%d rows, taken from %s)"
+              % (os.path.basename(BASELINE), n, os.path.basename(OUT)))
+        return 0
+
     if "--all" not in argv:
         n = 20
         if "--limit" in argv:
@@ -118,17 +166,55 @@ def main(argv):
         import csv as _c
         for row in _c.DictReader(open(OUT, encoding="utf-8")):
             old[row["document"]] = row
-    regressed = []
     for r in rows:
-        prev = old.get(r["document"])
-        if prev:
-            try:
-                was, now = int(prev.get("failed") or 0), r["failed"]
-            except ValueError:
-                was = now = 0
-            if was >= 0 and now > was:
-                regressed.append((r["document"], was, now))
         old[r["document"]] = {k: str(v) for k, v in r.items()}
+
+    # THE RATCHET, AGAINST RATCHET-TXT.json AND NOTHING ELSE.
+    marks = {}
+    if os.path.exists(MARKS):
+        try:
+            _m = json.load(open(MARKS, encoding="utf-8"))
+            marks = _m.get("marks") or {}
+            marks_universe = (_m.get("instrument") or {}).get("sha")
+        except (ValueError, OSError):
+            marks, marks_universe = {}, None
+    else:
+        marks_universe = None
+
+    ids, live_sha, live_err = _universe()
+    unmeasured = not marks
+    stale = bool(marks) and marks_universe != live_sha
+    regressed = []
+    if not unmeasured and not stale:
+        for r in rows:
+            m = marks.get(r["document"])
+            if not m:
+                continue                      # first score for this document - nothing to compare
+            try:
+                was, now = int(m.get("best_failed", 0)), r["failed"]
+            except (TypeError, ValueError):
+                continue
+            if now > was:
+                regressed.append((r["document"], was, now))
+
+    # A mark is raised only when a document actually improves, so the file records the best each
+    # document has ever reached rather than the last thing that happened to be measured.
+    raised = 0
+    if not stale:
+        for r in rows:
+            m = marks.setdefault(r["document"], {})
+            try:
+                best = int(m.get("best_failed", 10 ** 6))
+            except (TypeError, ValueError):
+                best = 10 ** 6
+            if r["failed"] < best:
+                m["best_failed"] = r["failed"]
+                m["best_ids"] = r["failed_ids"]
+                raised += 1
+        json.dump({"instrument": {"checks": len(ids), "sha": live_sha, "tool": "verify_txt.py",
+                                  "error": live_err or ""},
+                   "marks": marks},
+                  open(MARKS, "w", encoding="utf-8"), indent=1, sort_keys=True)
     import csv as _c
     fields = ["document", "applicable", "passed", "failed", "abstained", "failed_ids"]
     with open(OUT, "w", encoding="utf-8", newline="") as fh:
@@ -143,6 +229,23 @@ def main(argv):
              len([r for r in rows if r["failed"] > 0]),
              len([r for r in rows if r["failed"] < 0])))
     print("  wrote %s" % OUT)
+    if raised:
+        print("  marks raised for %d document(s) -> %s" % (raised, os.path.basename(MARKS)))
+    if unmeasured:
+        print()
+        print("  UNMEASURED - %s holds no marks, so nothing was compared." % os.path.basename(MARKS))
+        print("  An empty marks file proves nothing about any document. This is not a pass.")
+        print("  Every document scored above is a FIRST score; the next pass has something to")
+        print("  compare against.")
+        return 3
+    if stale:
+        print()
+        print("  STALE MARKS - %s was stamped under a different set of checks." % os.path.basename(MARKS))
+        print("      marks : %s" % (marks_universe or "none"))
+        print("      live  : %s (%d checks)" % (live_sha or "unknown", len(ids)))
+        print("  Not compared, not carried forward, and not replaced: the marks were left as they")
+        print("  were. Re-measure the corpus, or reset with a reason if the universe really moved.")
+        return 3
     if regressed:
         print()
         print("  RATCHET: %d document(s) got WORSE in the txt:" % len(regressed))

@@ -79,6 +79,11 @@ def main(argv):
     # --watch-docx snapshots the txt scores before such a change;
     # --check-docx compares them after. Without this the gate only ever caught txt breaking docx, and
     # the failure that actually happened (SECTOR 19, 11 of 211 documents) went the other way.
+    # THE ONE-DIRECTIONAL PAIR IS STILL HERE AND IS THE NARROWER OPTION. --watch-docx records only
+    # the txt hash, so --check-docx can only answer "did the txt move during docx work" - it cannot
+    # see a docx number moving, which is the other half. A run that used this pair and believed it
+    # had checked both directions would be wrong, and that is a worse failure than not checking.
+    # Kept working for anything already calling it, with the better command named on every use.
     if "--watch-docx" in argv:
         import json as _j
         _j.dump({"txt_sha": sha(TXT_RANK),
@@ -86,6 +91,8 @@ def main(argv):
                 open(TXT_BEFORE, "w", encoding="utf-8"), indent=1)
         print("  watching: RANKING-TXT.csv is %s - re-run with --check-docx after the docx change"
               % sha(TXT_RANK))
+        print("  NOTE: this watches one direction. --snapshot / --verify watches both and is what")
+        print("        a run should use; this pair cannot see a docx number move.")
         return 0
     # ONE SNAPSHOT, BOTH DIRECTIONS. The two one-way commands above each guard half the problem,
     # and a run that remembers only one of them leaves the other open. These two take both hashes at
@@ -166,6 +173,27 @@ def main(argv):
                 failing += 1
     except Exception:
         pass
+
+    # AN EMPTY STORE IS NOT A CLEAN STORE. Without this the gate printed
+    # "0 of 0 clean (0.0%)" and exited 0, which reads as a pass over a corpus nobody measured - the
+    # same shape of mistake as a ratchet with nothing to compare. Say what is missing and refuse.
+    if rows == 0:
+        print()
+        print("  UNMEASURED - %s holds no scoreable row." % os.path.basename(RANK_TXT))
+        print("  Nothing was summarised, so nothing is proved. Score the corpus first:")
+        print("      python3 tools/p2w-bench/txt_gate.py --score N")
+        return 3
+    marks_ok = os.path.exists(os.path.join(TXT, "RATCHET-TXT.json"))
+    base_ok = os.path.exists(os.path.join(TXT, "RANKING-TXT-BASELINE.csv"))
+    if not marks_ok or not base_ok:
+        print()
+        print("  INCOMPLETE - the .txt has scores but no %s."
+              % ("marks" if not marks_ok else "baseline"))
+        print("  marks    : %s" % ("present" if marks_ok else "MISSING - nothing to ratchet against"))
+        print("  baseline : %s" % ("present" if base_ok else "MISSING - nothing to compare against"))
+        print("  Fix with: python3 tools/p2w-bench/txt_rank.py --all   (writes the marks)")
+        print("            python3 tools/p2w-bench/txt_rank.py --baseline")
+        return 3
 
     docx_after = sha(DOCX_RANK)
     moved = docx_before != docx_after and docx_before != "missing"

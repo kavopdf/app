@@ -1,0 +1,12 @@
+# The measurement pipeline's Python dependencies. Python 3.12.
+#
+# scipy is NOT optional. p2w.py uses scipy.ndimage.distance_transform_edt for share@Npx and
+# gaussian_filter for tone_share. The distance transform has a hand-rolled fallback that is
+# documented as NOT giving the same answer (see the note at the top of p2w.py: scipy reads a
+# 10 px offset as 4.800 pt and passes, the fallback does not), and tone_share abstains without
+# it rather than reporting a number it cannot compute. Either way a sandbox without scipy
+# measures something different from a sandbox with it, so it is pinned here.
+numpy>=1.26
+scipy>=1.11
+pymupdf>=1.24
+python-docx>=1.1

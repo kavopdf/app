@@ -14,7 +14,7 @@ it. It cannot forget, and it cannot disagree with the measurement.
     python3 tools/p2w-bench/classrow.py --write    # rewrite benchmarks/DEFECT-CLASSES.md
     python3 tools/p2w-bench/classrow.py --write --fixed-below 5.0
 """
-import csv, os, re, sys
+import csv, json, os, re, sys
 
 try:
     from beacon import beat
@@ -25,6 +25,15 @@ except Exception:
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
+
+# The documents EXEMPT.json excludes from measurement. They are in the corpus and in the
+# ranking, and they have no score - so a count that says "213 of 213" is claiming a
+# measurement that was never taken.
+try:
+    with open(os.path.join(HERE, "EXEMPT.json"), encoding="utf-8") as _f:
+        EXEMPTED = set((json.load(_f).get("docx") or {}))
+except Exception:
+    EXEMPTED = set()
 RANK = os.path.join(ROOT, "benchmarks", "RANKING.csv")
 BASELINE = os.path.join(ROOT, "benchmarks", "RANKING-BASELINE.csv")
 
@@ -122,9 +131,19 @@ def recount(lines):
 def main(argv):
     beat("classrow.py", "refreshing the class file")
     write = "--write" in argv
+    # THE BAR IS 99 % AND IT IS NOT NEGOTIABLE FROM THE COMMAND LINE.
+    # --fixed-below could RAISE the threshold, and a run that did would mark documents FIXED at 2 %
+    # or 5 % of ink displaced - the one number the whole pipeline is judged on, set by whoever ran
+    # the tool. A lower threshold is now clamped back to 1.0 with a note; anything stricter is
+    # allowed, because being stricter is never a false claim.
     thr = DEFAULT_FIXED_BELOW
     if "--fixed-below" in argv:
-        thr = float(argv[argv.index("--fixed-below") + 1])
+        want = float(argv[argv.index("--fixed-below") + 1])
+        if want > DEFAULT_FIXED_BELOW:
+            print("  --fixed-below %.2f is looser than the 99 %% bar; clamped to %.2f"
+                  % (want, DEFAULT_FIXED_BELOW))
+            want = DEFAULT_FIXED_BELOW
+        thr = want
     rank = load_rank()
     # The baseline is what stops this tool from claiming credit it did not earn. The first
     # version marked a row FIXED whenever its share@5 was below the threshold - which marked 57
@@ -189,6 +208,39 @@ def main(argv):
         out.append(newrow)
 
     out, sum_delta = recount(out)
+
+    # THE HEADER COUNT WAS NEVER REWRITTEN, AND IT DISAGREED WITH EVERY OTHER TOOL.
+    # Measured 19 Nov: this file said "Documents measured: **213 of 213**" while RANKING.csv
+    # carried 212 scored rows (416_many_tiny_pages is exempt and has no score), the retired
+    # tools/p2w-bench/DEFECT-CLASSES.md said "211 of 211", and report.py printed "36 of 212"
+    # with "Exempt, not measured: 1". Four numbers for one corpus.
+    #
+    # The count is derived here, from the ranking, every time the file is written. A number
+    # that can only be produced by reading the data cannot drift from the data.
+    # load_rank() drops a row whose share5 is not a number, so `rank` holds the SCORED
+    # documents only (measured 19 Nov: 212 of the table's 213 rows - 416_many_tiny_pages has an
+    # empty share5 and is skipped). The total therefore has to add the exempt ones back.
+    _scored = len(rank)
+    _total = len(rank) + len(EXEMPTED)
+    _head = ("Documents measured: **%d of %d**" % (_scored, _total))
+    if EXEMPTED:
+        _head += (" - %d exempt (%s), counted in the total and never scored"
+                  % (len(EXEMPTED), ", ".join("`%s`" % e for e in sorted(EXEMPTED))))
+    _head += "."
+    _hit = False
+    for i, ln in enumerate(out):
+        if ln.startswith("Documents measured:"):
+            if ln.strip() != _head:
+                out[i] = _head
+                _hit = True
+                changed += 1
+            break
+    if not _hit:
+        for i, ln in enumerate(out):
+            if ln.startswith("# Defect classes"):
+                out.insert(i + 1, _head)
+                _hit = True
+                break
     print("  %d row(s) %s" % (changed, "rewritten" if write else "would change"))
     if sum_delta:
         print("  class summary recounted (%d line(s) differ)" % abs(sum_delta))

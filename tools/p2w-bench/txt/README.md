@@ -8,6 +8,65 @@ cannot hide behind a txt score.
     STATE-TXT.json       the txt state - scored, clean, failing, and the docx hash at the last gate
     HISTORY-TXT.jsonl    one line per gate run
 
+## The .txt grades itself against its own records, and nothing else
+
+Every file here, all inside this directory. Nothing on the .docx side reads or writes any of them, and
+`txt_gate.py` proves that per run by hashing `benchmarks/RANKING.csv` before and after.
+
+The .docx keeps a set of records that turn a score table into something a fixer can act on. The .txt
+now keeps the same set, one directory over, and no file on either side is read or written by the
+other.
+
+| .docx | .txt | what it is | who writes it |
+|---|---|---|---|
+| `benchmarks/RANKING.csv` | `RANKING-TXT.csv` | the current scores, one row per document | scoring |
+| `benchmarks/RANKING-BASELINE.csv` | `RANKING-TXT-BASELINE.csv` | the reference table | `txt_rank.py --baseline`, once. Scoring never touches it. |
+| `tools/p2w-bench/RATCHET.json` | `RATCHET-TXT.json` | the best each document has reached, and the universe it reached it under | `txt_rank.py`, only when a document improves |
+| - | `DOCX-WATCH.json`, `BOTH-WATCH.json` | the hashes `--watch-docx` and `--snapshot` recorded, for the comparison after the change | `txt_gate.py` |
+| `benchmarks/STATE.json` | `STATE-TXT.json` | the last gate state | `txt_gate.py` |
+| `tools/p2w-bench/RESULTS.jsonl` | `HISTORY-TXT.jsonl` | one line per gate run | `txt_gate.py` |
+| `benchmarks/DEFECT-CLASSES.md` | `DEFECT-CLASSES-TXT.md` | the classes, ranked by how many documents each holds | `classify_txt.py` |
+| `benchmarks/CENSUS.csv` | `CENSUS-TXT.csv` | one row per document with its cause and its baseline | `classify_txt.py` |
+| `tools/p2w-bench/CAUSES.json` | `CAUSES-TXT.json` | what causes each document's damage | `classify_txt.py` |
+| `tools/p2w-bench/UNMEASURED.json` | `UNMEASURED-TXT.json` | what was not compared, and why | `classify_txt.py` |
+
+`tools/p2w-bench/RATCHET.json` is named above as the .docx counterpart and **does not currently
+exist**: the .docx ratchet was reset on the drift described in `ratchet.py`'s own output, and no
+fresh marks have been taken since. The .txt has its marks. That asymmetry is real and is a .docx
+problem, not a .txt one - the .txt gate does not depend on it.
+
+Two tools mirror the .docx's as well:
+
+    step_txt.py       what to fix, worst class first, with the commands - the .txt's step.py
+    classify_txt.py   rebuilds the four records from RANKING-TXT.csv and nothing else
+
+**`classify_txt.py` never reads a .docx file.** A cause is derived from the check ids that failed:
+one check names its own cause, and checks that move together (position with line order, word
+accuracy with word invention) are named for the group, because they are one displacement seen
+twice. It also reports every document that is scored but absent from the baseline or the marks,
+which is the only way a gap in the records becomes visible rather than assumed away.
+
+**The ratchet compares a score against `RATCHET-TXT.json`, never against `RANKING-TXT.csv`.** That
+distinction is the whole point. Comparing against the score file means the store grades itself, and
+it fails in the one case that matters: delete or reset the store and every document becomes a first
+score, nothing is compared, and the ratchet prints "no document got worse" over an empty table.
+
+Three verdicts, and only one of them is a pass:
+
+    exit 0   every mark held
+    exit 1   a document is worse than its best - a real regression
+    exit 3   nothing was compared: the marks are empty (UNMEASURED) or were stamped under a
+             different set of checks (STALE). Not a pass, not a regression - a gate that cannot speak.
+
+`txt_gate.py --gate` refuses the same two cases rather than printing `0 of 0 clean (0.0%)`, and it
+also refuses when the scores exist but the marks or the baseline do not.
+
+**A mark is raised only when a document improves**, so `RATCHET-TXT.json` records the best each
+document has ever reached rather than the last thing that happened to be measured. Marks stamped
+under a different check universe are not compared, not carried forward and not replaced.
+
+---
+
 ## What the two formats actually share
 
 **Three files, three jobs:**

@@ -7,7 +7,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 6,itr-computation-with-slab-table,mixed,content-partly-lost-and-displaced,64.93,56.21,52.2,42.33,27.4,4.32,11.04,15.36,100.0,0,1,1
 7,table-inside-two-column-page,mixed,content-partly-lost-and-displaced,62.99,51.96,46.91,40.05,31.37,4.8,64.8,84.48,100.0,0,1,1
 8,360_restaurant_menu,content-loss,content-missing-partly-replaced,48.59,42.48,39.16,34.43,28.56,7.68,19.2,45.6,100.0,0,1,1
-9,411_nested_xobject_transforms,mixed,content-partly-lost,48.64,38.34,35.56,31.05,22.39,4.8,79.2,97.92,100.0,0,1,1
+9,411_nested_xobject_transforms,mixed,none,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,100.0,0,1,1
 10,text-held-twice-shadow-text,content-loss,content-missing-partly-replaced,49.2,43.95,40.42,30.29,28.35,29.28,52.8,60.48,100.0,0,1,1
 11,75_merged_header_cell_three_columns,displacement,content-present-partly-displaced,37.74,33.71,31.69,27.31,11.72,4.32,12.96,22.08,100.0,0,1,1
 12,71_invoice_space_aligned_no_rules,displacement,content-present-wholly-displaced,42.21,33.65,28.5,26.88,12.28,3.84,6.24,9.12,100.0,0,1,1
@@ -211,4 +211,4 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 210,63_three_column_brochure,clean,none,0.02,0.01,0.0,0.0,0.0,1.44,1.44,2.4,100.0,0,1,1
 211,72_bank_statement_no_rules_right_amounts,clean,none,9.8,1.43,0.44,0.0,0.0,0.96,1.44,2.4,100.0,0,1,1
 212,73_marksheet_subject_marks_grade,clean,none,0.99,0.03,0.0,0.0,0.0,0.96,0.96,1.44,100.0,0,1,1
-213,416_many_tiny_pages,clean,exempt,,,,,,,,,,0,1,300
+213,416_many_tiny_pages,clean,none,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,100.00,0,1,300

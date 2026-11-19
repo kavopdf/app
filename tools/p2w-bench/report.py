@@ -242,13 +242,35 @@ def obstacles():
             today = ""
     if not today:
         today = (_json(RUN, {}).get("started") or "")[:10]
+    # THE "can" COLUMN IS FOUND BY ITS HEADER, NOT BY ITS POSITION. This file carries more than
+    # one table - a 6-column one with "can I fix it", and a 4-column one headed
+    # "when | what | what was tried | what must change" - and the parser required 6 cells, so it
+    # dropped every row of the second table without saying so. Measured on the committed
+    # BLOCKERS.md: 28 rows, of which 6 have fewer than 6 cells and were silently skipped.
+    #
+    # The 06:51 run's report blamed this on "a row whose can column starts with no -", which is
+    # not the mechanism: a row saying "no - ..." is counted as needing a human, not dropped. The
+    # count came out 0 cleared / 0 human because the rows never reached the counter at all.
     rows = []
     try:
+        can_at = 4                     # the 6-column table's position, kept as the default
         for line in open(path, encoding="utf-8"):
             if not line.startswith("| ") or line.startswith("|---"):
                 continue
             c = [x.strip() for x in line.strip().strip("|").split("|")]
-            if len(c) < 6 or c[0].lower().startswith("time"):
+            if not c:
+                continue
+            head = c[0].lower()
+            if head.startswith("time") or head == "when":
+                can_at = -1                      # this table has no "can I fix it" column
+                for i, h in enumerate(c):        # learn this table's own column order
+                    if h.lower().startswith("can"):
+                        can_at = i
+                        break
+                continue
+            # A table with no "can" column still records a wall. A row that does not say it was
+            # cleared was not cleared, so it counts as needing a human rather than vanishing.
+            if can_at >= 0 and len(c) <= can_at:
                 continue
             if today and not c[0].startswith(today):
                 continue
@@ -265,7 +287,8 @@ def obstacles():
                     continue
             except Exception:
                 pass
-            rows.append({"can": c[4], "wall": c[2]})
+            rows.append({"can": (c[can_at] if 0 <= can_at < len(c) else "no"),
+                         "wall": c[2] if len(c) > 2 else ""})
     except Exception:
         return {"mine": 0, "human": 0, "last": ""}
     def cleared(r):

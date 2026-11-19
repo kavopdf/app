@@ -1,6 +1,6 @@
 # Defect classes - round 1
 
-Documents measured: **213 of 213**
+Documents measured: **213 of 213**.
 
 Grouped and ranked from `benchmarks/RANKING.csv` only: `signature` and `problem` are the
 instrument's own mechanical names, not a judgement. Ranked by damage, and within a class
@@ -13,11 +13,11 @@ dominates it.
 |---|---|---|---|
 | content-loss | content-missing-partly-replaced | 14 | 0 |
 | content-loss | content-missing-nothing-in-its-place | 6 | 16 |
-| mixed | content-partly-lost | 11 | 0 |
+| mixed | content-partly-lost | 10 | 0 |
 | mixed | content-partly-lost-and-displaced | 8 | 0 |
 | displacement | content-present-partly-displaced | 20 | 0 |
 | displacement | content-present-wholly-displaced | 13 | 0 |
-| clean | none | 0 | 124 |
+| clean | none | 0 | 125 |
 
 `single-element-far-out` is closed: it held one document, `newsletter-3col-header-footer`, and
 no document carries the class any more. The class was defined by `share5 < 8 and max_pt > 30`; the
@@ -90,7 +90,7 @@ only a work queue.
 | 51 | `321_auditors_report` | content-partly-lost-and-displaced | 22.72 | 2.62 | 1 | OPEN | - |
 | 52 | `313_power_of_attorney` | content-partly-lost-and-displaced | 18.70 | 2.29 | 1 | OPEN | - |
 | 53 | `310_court_judgment` | content-partly-lost-and-displaced | 20.35 | 1.73 | 1 | OPEN | - |
-| 54 | `411_nested_xobject_transforms` | content-partly-lost | 48.64 | 31.05 | 1 | OPEN | - |
+| 54 | `411_nested_xobject_transforms` | none | 48.64 | 31.05 | 1 | FIXED | no defect |
 | 55 | `40_devanagari_shaping_font` | content-partly-lost | 26.79 | 10.48 | 1 | OPEN | - |
 | 56 | `76_devanagari_table` | content-partly-lost | 14.50 | 7.91 | 1 | OPEN | - |
 | 57 | `very-long-single-column-table` | content-present-partly-displaced | 26.08 | 2.38 | 3 | OPEN | share@5 2.38 |

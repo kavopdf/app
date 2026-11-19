@@ -148,3 +148,162 @@ A run clones once. Commits that land after its clone leave it reading stale ledg
 a blocker row that had been fixed a minute before it started, and a 60-minute re-clone cost the run
 half its session. If origin has moved, `git fetch` and `git reset --hard origin/main` inside the clone
 you already have, and keep your `TIMELINE.jsonl`.
+
+## What the agent already did, so you do not do it twice
+
+The agent worked 19 Nov with no `java` and no write path. It could read the engine, the corpus and
+the 213 `.txt` files, and it could run `verify_txt.py`. Everything below is **already done** — do not
+redo it, and do not re-derive it.
+
+### Two bugs were found in `verify_txt.py` and are fixed
+
+**`t13` matched an amount by TOKEN and always took its first occurrence.** On an invoice the CGST
+and SGST columns routinely hold the same figures, so one token ended in two columns and both source
+columns read the same first position. The SGST column was judged against the CGST position and
+passed for the wrong reason — and the reverse, which is what the corpus shows: the check was
+*failing* documents that were genuinely aligned. Measured on `390_wide_data_appendix`, 4 of 19
+columns preserved before, 19 of 19 after.
+
+The fix matches the **k-th source occurrence of a token to the k-th `.txt` occurrence**, walking the
+source in the order the page draws its lines.
+
+**`t12` counted a punctuation-only token as an invented word.** `_strip_punct` strips
+`.,;:!?()[]{}"'…-` from both ends, so a lone em dash becomes `""` — and `""` was counted. Both
+`balance-sheet-and-profit-loss` and `balance-sheet-two-columns-of-figures` were failing t12 on
+nothing but empty strings.
+
+### The `.txt` baseline has been re-stamped for both
+
+    OLD  149 clean of 213 (70.0%)   64 failing
+    NEW  159 clean of 213 (74.6%)   54 failing
+
+13 documents improved, **0 worsened**. `tools/p2w-bench/txt/RESTAMP-TXT.jsonl` holds all 213
+per-document records that produced it. `restamp_txt.py --report` re-prints the comparison;
+`--apply` rewrites both CSVs atomically.
+
+**Do not run `txt_rank.py` bare.** It scores 20 documents and overwrites the published table. Use
+`restamp_txt.py --run` (resumable, writes to JSONL) then `--report` then `--apply`.
+
+### Two tooling bugs are fixed
+
+* **`round.py` called `sh()` and had no `sh`.** The auto-revert guard — the thing that puts an
+  unmeasured engine change back — raised `NameError` and was swallowed by a bare `except`, so it
+  **never once ran**. Found by the 00:58 run and fixed.
+* **`lastmessage.py` now refuses a report whose Progress rows do not equal `report.py`'s.** Exit 3
+  means a number was not copied from the tool. The 13:50 run published "17 files" where
+  `report.py` said 6.
+
+### Three root causes are diagnosed, in `FINDINGS/t02-t12-t08-root-causes.md`
+
+* **`t02`** — the check fits ONE global character width. In every failing document the failing lines
+  sit further right than the passing ones (`58_header_rule_footer_rule`: passing at x=56, failing at
+  x=423 and 503, off by 3 columns). **A proportional font has no single character width.** This is a
+  check redesign, not a writer bug, and `310_court_judgment` fails at 89 against a 90 bar.
+* **`t12`** — five separate causes: curved-text segmentation, source-side misses on stamps,
+  Devanagari clusters split mid-word (`केवल` → `क` + `ेवल`), two table cells joined with no space
+  (`60067mobile`), and line-wrap word splitting. **Four writer faults, one name.**
+* **`t08`** — zero tolerance, and six of ten documents fail by **exactly one line out of 16 to 88**.
+
+### Three specifications are written, in `PATCHES-READY.md`
+
+`PATCH-411-ctm-size.patch`, `PATCH-t13-table-row-per-line.patch`, and `SPEC-justified-lines.md`
+(the `855f443` rebuild). **All three are unbuilt and unmeasured** — the agent had no `java`. Build
+each, screen it, ratchet it. The specs say what to expect and what to prove; they are not proof.
+
+### What is still yours
+
+The engine work. 72 `.docx` open, 54 `.txt` failing, `416_many_tiny_pages` never measured, the
+census at 6 of 72, and every one of the three patches above to build and measure.
+
+## THE COMMIT GATE — universal, no override, no exceptions
+
+**No commit may land, for the .docx or the .txt, unless the whole corpus has been measured with the
+engine as it stands and no document got worse.** Not one document. Not by one point. A fix that
+improves 20 documents and damages 1 is not a fix, it is a trade, and nobody authorised the trade.
+
+This is not advice. It is enforced in three places:
+
+    tools/p2w-bench/regress.py --check     the check itself; exit 1 refuses
+    .git/hooks/pre-commit                  installed by tools/install-gate.sh; a real commit is
+                                           aborted, verified 19 Nov - HEAD stayed at 8e8fdd2
+    tools/p2w-bench/step.py                a fixer slot is not released while it fails
+
+### What "worse" means
+
+    .docx   share@5px went UP. It is compared against TWO floors: the 15 Nov baseline AND the
+            last committed value. The baseline alone is a ratchet with a slack rope - a document
+            that improved 10.78 -> 0.50 could drift back to 5.00 and still beat its baseline.
+
+    .txt    any document fails a check it did not fail in the baseline. Checks are pass/fail, so a
+            new member of the failing set is a regression however small the check looks.
+
+### An unmeasured change is not a pass
+
+If the engine has changed since the corpus was last measured, the tables describe an engine that no
+longer exists. `regress.py` compares the current engine fingerprint against `txt/ENGINE-STAMP.json`
+and refuses when they differ. After re-measuring, run `regress.py --stamp`.
+
+**This is why the 411 fix is committable and the t13 patch is not.** 411 was measured across all 213
+documents and proved to move exactly one: 212 `.docx` byte-identical, 213 `.txt` byte-identical,
+and the one that moved went 31.05 -> 0.00. t13 was measured and moved 101 documents the wrong way,
+with 0 better. One has a proof, the other has a story.
+
+### The order to work in
+
+    1. change the engine
+    2. measure the whole corpus in BOTH formats
+    3. regress.py --check        must PASS
+    4. regress.py --stamp        record which engine the tables describe
+    5. commit
+
+Skipping 2 and 3 is the one thing that cannot be recovered from, because a regression that lands is
+a regression every later measurement inherits.
+
+### Scoped or both: the scope is DERIVED and then PROVED
+
+Running the `.docx` pass for a `.txt`-only change costs hours and proves nothing; running only the
+`.txt` pass for a model change lets a `.docx` regression land. So the scope is not claimed by the
+author, it is worked out from the code:
+
+    tools/p2w-bench/scope.py
+
+It reads `git diff` and finds which **methods** changed, not which files — because `PdfToWord.java`
+holds `convert()` (BOTH formats) and `writeTxt()` (txt only), so a file-level rule is either too
+coarse or unsafe. The table:
+
+    TxtWriter.write            -> txt
+    PdfToWord.writeTxt         -> txt
+    DocxWriter.write           -> docx
+    DocxWriter.orderStamps     -> both   (reorders page.blocks, which TxtWriter walks)
+    PdfToWord.convert          -> both   (builds the model both writers read)
+    ReadingOrder.apply         -> both
+
+**A change it cannot name a method for is BOTH.** A change inside a model class (`Box`, `Para`,
+`Table`, `CellPara`, `Line`, `Result`, `Page`, `Glyph`) is BOTH even when it sits in a writer file,
+because the other writer reads the same field. Verified 19 Nov: the 411 change lands in
+`processTextPosition` and scopes to BOTH, which is correct — it changes `g.size`, and `TxtWriter`
+reads that.
+
+### And then it is PROVED, not trusted
+
+The scope is only worth having if it is true, and the way to know is byte-identity:
+
+    build the tree, convert the whole corpus to the format you say cannot move
+    build HEAD,  convert the whole corpus the same way
+    diff the two directories
+
+Zero differences is proof that no score in that format can differ — the writers produced the same
+bytes for all 213 documents. That is what was done for 411: **212 `.docx` byte-identical, 213 `.txt`
+byte-identical**, and the one `.docx` that moved went 31.05 -> 0.00.
+
+**If the byte check shows movement, the scope was wrong.** Run both.
+
+### Stamps are per format
+
+`txt/ENGINE-STAMP.json` holds a fingerprint for `docx` and one for `txt`. A txt-only change re-stamps
+`txt` and leaves `docx` alone, so the .docx table is not invalidated by work that could not touch it.
+`regress.py --check` compares only the fingerprints for the formats in scope.
+
+    regress.py --check              scope from scope.py
+    regress.py --check --only txt   force it (for when scope.py cannot see your change)
+    regress.py --stamp              stamp the formats in scope
