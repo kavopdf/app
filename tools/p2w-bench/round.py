@@ -554,6 +554,25 @@ def release(name, force=False):
         # The one floor left is that a run may not release having recorded nothing. That is not a
         # short run, it is a wasted slot. The round-finished bypass above still applies, and
         # --force remains for the honest cases - a broken build, a blocked Drive, an empty list.
+        # TWO AGENTS, OR THE SLOT IS NOT SPENT. The brief says deploy two every run; a rule that
+        # only lives in a brief is a rule a tired run skips. On 19 Nov the fixer deployed one agent,
+        # made one attempt, got to 46 of 213 and reported zero documents improved - and one of those
+        # three would have saved the run. The agents are the part that still produces something when
+        # the run's own idea fails.
+        try:
+            _rr = json.load(open(os.path.join(HERE, "RUN.json"), encoding="utf-8"))
+        except Exception:
+            _rr = {}
+        _agents = len((s.get("fixer") or {}).get("agents") or []) or \
+                  len((_rr.get("agents") or []))
+        if _agents < 2 and not force:
+            print("refused: this run deployed %d agent(s). The brief requires TWO every run." % _agents)
+            print("Two angles working for the whole slot is two more than a run that works alone, and")
+            print("their findings land even when this run's own idea does not. Deploy them, then work")
+            print("your own third angle - and do not wait for them.")
+            print("If a genuine blocker stopped both (no findings to answer, budget gone), say so in the")
+            print("report and release with --force.")
+            return 1
         if done < 1:
             print("refused: this run has recorded no attempt at all.")
             print("An attempt is a patch, a measurement and a line in ATTEMPTS.json - or an honest")

@@ -343,16 +343,49 @@ the same single item.
 
 ---
 
-## Subagents - default yes, ceiling two
+## Subagents - TWO EVERY RUN, MANDATORY, NO EXCEPTIONS
 
-When you start a class, deploy **at most two** agents on different angles, register them, then work
-your own third. They run in the background; do not wait.
+**Deploy exactly two agents on every run, in the first ten minutes, before you do anything else of
+your own.** Not "at most two" - two. Different angles on different questions, or the same class from
+two directions. Register them and carry on with your own third angle; they run in the background and
+you never wait for them.
 
     handoff.py --agent-add "<class>|A|the question|expected by HH:MM"
+    handoff.py --agent-add "<class>|B|the other question|expected by HH:MM"
 
-Only two things stop the default: `FINDINGS/` already holds a file answering the question, or an
-attempt on this class in THIS run already moved the number. **"I think I understand this one" is
-not an exception** - it is the exact state in which one more pair of eyes is worth the most.
+**WHY IT IS MANDATORY AND NOT A DEFAULT.** Runs have been ending with one attempt and zero documents
+improved, and the most common shape of those runs is: no agent deployed, one idea tried, the corpus
+pass not finished, nothing kept. Two agents working for the whole run is two more angles than a run
+that works alone, and their findings land even when the run's own idea fails - which is the run that
+otherwise produces nothing at all.
+
+**THE ONLY EXCEPTION IS THAT BOTH ARE ALREADY RUNNING.** If `FINDINGS/` holds a file answering the
+question, or an agent from THIS run has not landed yet, pick a different question - do not deploy
+three, and do not deploy zero. "I think I understand this one" is not an exception: it is the exact
+state in which one more pair of eyes is worth the most.
+
+## NEVER IDLE. WHEN ONE THING BLOCKS, PICK UP ANOTHER.
+
+A run that waits is a run that produces nothing. There is always a second thing to do:
+
+| blocked on | do instead |
+|:--|:--|
+| a soffice render, a conversion, a compile | read `FINDINGS/` for an unclaimed question and start it |
+| a corpus pass that will not finish in the slot | switch to `verify-change.py` on what you already changed |
+| an idea that measured inert | take the next class in `DEFECT-CLASSES.md` |
+| a subagent you are tempted to wait for | work your own angle; its finding lands by itself |
+
+**Measure what your idea did before you decide it failed.** `verify-change.py` measures ONLY the
+documents an engine change moved - 25 of 213 on 19 Nov - instead of all 213:
+
+    python3 tools/p2w-bench/verify-change.py --before <a .docx set you already have> --skip-convert
+
+It prints `KEEP`, `INERT`, `REFUSED` or `INCOMPLETE`, and `INCOMPLETE` is not `INERT` - it means the
+budget ran out, and you must re-run it, not conclude the idea was bad. The 19 Nov run concluded
+exactly that at 46 of 213 and threw away a fix that moved five documents.
+
+**Every run must leave something behind: a kept fix, a landed finding, or a written root cause. A
+run that leaves none of those is a wasted slot and must say so at the top of its report.**
 
 **ALWAYS `background=true`. NEVER WAIT.**
 
