@@ -81,3 +81,34 @@ its own, it says so in one line and stops. That is not a wasted slot - it is the
 Not every wall is a code problem. If a run cannot proceed, it writes the blocker to `BLOCKERS.md` with
 what it tried, and stops. The next run reads it. A blocker that is written down is a decision someone
 can make; a blocker that is not is a month.
+
+---
+
+## STARTING A RUN WHEN THE LAST ONE DIED
+
+A run that dies mid-way leaves the live state files modified and uncommitted. The next run's
+`git pull --rebase` then refuses with `error: please commit or stash them`, and that run stops before it
+has done anything. **This is the most common way a run does nothing, and it looks like a permissions
+problem.**
+
+The state files are:
+
+    tools/p2w-bench/{HANDOFF.json,HANDOFF.md,LAST-MESSAGE.md,REPORT.md,ROUND.json,
+                     RUN-HISTORY.json,RUN-LOG.md,RUN.json,TIMELINE.jsonl,TRACE.md}
+
+They are written by whichever run is live. A dirty one means a run died, not that there is work to
+preserve - the last **committed** copy is the real handoff.
+
+**Every run starts with this, before anything else:**
+
+    cd <your clone>
+    git checkout -- tools/p2w-bench/   # discard a dead run's half-written state
+    git pull --rebase origin main
+
+`git checkout --` on that directory discards only uncommitted state. It never touches committed work,
+never touches `app/`, and never touches the tools or briefs. **Never use `git reset --hard`** - that
+discards everything, and it wiped seventeen files once.
+
+If the checkout itself fails because a file is unreadable, `git clean -fd tools/p2w-bench/` after it.
+
+**Then** claim your slot and work. A run that starts by resetting state is a run that can always start.
