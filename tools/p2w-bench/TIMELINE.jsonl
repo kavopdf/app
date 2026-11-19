@@ -404,3 +404,13 @@
 {"t": 1795093997.6661034, "ist": "18:43:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795093997.6811683, "ist": "18:43:17", "ev": "release", "d": "fixer released"}
 {"t": 1795093997.846454, "ist": "18:43:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795094594.7799935, "ist": "18:53:14", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795094594.9114575, "ist": "18:53:14", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795094620.5317264, "ist": "18:53:40", "ev": "beat", "d": "claimed, reading the handoff"}
+{"t": 1795094620.6859927, "ist": "18:53:40", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1795094620.8155837, "ist": "18:53:40", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795094623.0628889, "ist": "18:53:43", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795094623.1596458, "ist": "18:53:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795095621.0093427, "ist": "19:10:21", "ev": "beat", "d": "2 agents landed, implementing the flowRow pitch fix"}
+{"t": 1795095621.1907756, "ist": "19:10:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795095621.3902836, "ist": "19:10:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
