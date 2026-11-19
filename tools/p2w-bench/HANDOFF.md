@@ -16,11 +16,11 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> content-present-partly-displaced (18 OPEN) is NOT one mechanism - measured on four documents: 75_merged_header welds two header columns and shifts rows by one (22.07 pt); bank-statement accumulates 0.34 pt per positioned row (source pitch 18.4, ours 18.74) to +5.77 pt by y421; 374_org_chart is -0.18 pt at the top and +4.48 pt in the bottom box row; payslip is a constant -3.45 pt in one block. The subagent's root cause is confirmed by reading the code and is in FINDINGS/content-present-partly-displaced-mergedheader-130426-4bd9.md: cells are cut from drawn rectangles, a fill-only shading band becomes a gridSpan, and spanR is computed at PdfToWord:7950 and read by nothing so no w:vMerge is ever written. Dropping fill-only rules from the Edge list (PdfToWord:1275) is REFUTED - 27.31 -> 46.58 and 2 pages, because on this page the shading band is the only rule that closes the header cells. Do not retry it.
+> content-present-partly-displaced: KEPT this run - recordBaseline() in DocxWriter stops a split row's continuation from dragging the page down (13 improved, 0 worse across 213). The class is NOT one mechanism: 75_merged_header (fill-only shading as a cell edge + missing w:vMerge), bank/toc/gst/66/78 (the continuation drift, now fixed), 374_org_chart and payslip (separate offsets, unmeasured). Subagent B measured all 18: only 75 has a vertically merged cell, so w:vMerge cannot close this class. Two more things were fixed on the way: RANKING.csv was stale for ten rows (blocked every fixer run since 11:55) and is now the measurement of the engine in the tree; regress.py crashed instead of printing a regression whose document is not in the 15 Nov baseline.
 
 ## What the next run should do first
 
-> Implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord already computes (PdfToWord:7950 writes it, nothing reads it). Screen 75_merged_header_cell_three_columns plus the 17 other content-present-partly-displaced documents. Do not retry dropping fill-only rules from the Edge list - measured 27.31 -> 46.58.
+> Re-run screen.py on content-present-partly-displaced: 13 documents moved but the class bar is a quarter of 18 = 5, so it is kept, not solved - the remaining open rows are 75_merged_header_cell_three_columns (w:vMerge, 1 of 18), 374_org_chart, payslip-label-left-amount-right and the ones the screen shows unchanged. Take the next-biggest class if this one is closer to done. Do not retry dropping fill-only rules from the Edge list.
 
 ## Agents deployed and not yet accounted for
 
@@ -40,7 +40,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `18:34` attempt 14 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `18:45` attempt 15 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `19:31` attempt 16 on content-missing-partly-replaced -> partial (1/3 moved)
 - `19:35` attempt 17 on content-missing-partly-replaced -> kept (3/3 moved)
@@ -65,6 +64,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `18:41` agent landed: content-present-partly-displaced / B -> (no file)
 - `18:41` Agent B was registered but never deployed: the first subagent ran inline for 19 minutes (a scheduled run has no one to answer later, so the platform ran it in the turn), which left no room for a second. Angle B is carried forward unanswered in the handoff context: the ~0.34 pt per positioned row accumulation on bank-statement-horizontal-rules-only.
 - `19:31` flowRow/flowFromBox baseline accounting: a row the page drew as one baseline but emitted as two+ paragraphs landed each continuation one hairline box lower and the pitch solver never took it back. recordBaseline() now records the baseline the flow actually reached. Screen: 3 improved (bank-statement 6.89->0.10, toc-dot-leaders 8.52->4.97, 65_two_col 4.91->1.75), 0 worse. Corpus pass running.
+- `22:30` attempt 2 on content-present-partly-displaced -> kept (13/18 moved)
 
 ## Where the rest of the state lives
 

@@ -425,3 +425,9 @@
 {"t": 1795105775.624507, "ist": "21:59:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795105776.1508083, "ist": "21:59:36", "ev": "beat", "d": "gaps.py: reading the timeline"}
 {"t": 1795105825.0404737, "ist": "22:00:25", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795107647.4564407, "ist": "22:30:47", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795107647.696292, "ist": "22:30:47", "ev": "attempt", "d": "content-present-partly-displaced -> kept"}
+{"t": 1795107647.7939725, "ist": "22:30:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795107647.900822, "ist": "22:30:47", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795107663.5122628, "ist": "22:31:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795107663.6769774, "ist": "22:31:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

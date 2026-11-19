@@ -2,6 +2,11 @@
 
 **Found 19 Nov 21:05 while trying to land an engine fix. No engine change needed to see it.**
 
+**RESOLVED the same run, commit `c6d8cdf`:** the table this engine actually produces was measured
+across all 213 documents and published (203 rows identical, 10 corrected upward), with no engine
+change in that commit. `regress.py --check` then passed and the engine fix landed. The rule below
+is still worth settling - the ten rows were invisible to every tool we have.
+
 ## What happened
 
 The fixer measured the whole corpus in this pod with **origin/main's engine** - unmodified,
