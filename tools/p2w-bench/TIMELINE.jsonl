@@ -487,3 +487,6 @@
 {"t": 1795109406.9072456, "ist": "23:00:06", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795109407.1081915, "ist": "23:00:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795109412.534562, "ist": "23:00:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795109421.3706887, "ist": "23:00:21", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795109421.382978, "ist": "23:00:21", "ev": "release", "d": "fixer released"}
+{"t": 1795109421.4773638, "ist": "23:00:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

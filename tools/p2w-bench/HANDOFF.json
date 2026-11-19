@@ -343,7 +343,7 @@
  ],
  "run": {
   "started": "21:59",
-  "ended": "22:35",
+  "ended": "23:00",
   "ended_how": "released"
  },
  "history": [
@@ -414,6 +414,11 @@
   },
   {
    "at": "22:35",
+   "how": "released",
+   "plan": ""
+  },
+  {
+   "at": "23:00",
    "how": "released",
    "plan": ""
   }
