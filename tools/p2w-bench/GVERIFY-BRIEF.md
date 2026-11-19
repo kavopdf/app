@@ -111,3 +111,19 @@ one instead of another guess.
 
 One short block: how many are now measured, what this run added, the top five failing checks, and
 whether STEP 4 is due. Numbers come from `gverify.py --report`; do not type them.
+
+## WHOSE STAGE IS IT — read this before anything else
+
+    python3 tools/p2w-bench/stage.py
+
+It prints which of `measure-google` / `classify` / `fix` / `ship` the evidence says we are in, and what
+the next action is. It is computed from the results on disk, never from a label, and `--set` refuses
+when the evidence disagrees.
+
+**If it is not your stage, say so in one line and stop.** That is not a wasted slot - it is the five
+crons agreeing with each other instead of five runs each deciding for itself. `COORDINATION.md` has the
+whole division of work and the settled decisions; read it once.
+
+**Nothing changes without a measurement before and after.** The engine is not rewritten. One construct,
+one measurement, one commit - kept only if nothing gets worse.
+

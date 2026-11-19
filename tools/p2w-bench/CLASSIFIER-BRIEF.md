@@ -193,3 +193,19 @@ counts; every deployed agent's `deployed_at`, `landed_at` and `minutes`; and eve
 digit in report.py's own `The txt` and `Timing` tables, which must appear in your message unchanged.
 
 If it refuses, do not reword the sentence - copy the number from `report.py --json`.
+
+## WHOSE STAGE IS IT — read this before anything else
+
+    python3 tools/p2w-bench/stage.py
+
+It prints which of `measure-google` / `classify` / `fix` / `ship` the evidence says we are in, and what
+the next action is. It is computed from the results on disk, never from a label, and `--set` refuses
+when the evidence disagrees.
+
+**If it is not your stage, say so in one line and stop.** That is not a wasted slot - it is the five
+crons agreeing with each other instead of five runs each deciding for itself. `COORDINATION.md` has the
+whole division of work and the settled decisions; read it once.
+
+**Nothing changes without a measurement before and after.** The engine is not rewritten. One construct,
+one measurement, one commit - kept only if nothing gets worse.
+
