@@ -376,7 +376,20 @@ A run that waits is a run that produces nothing. There is always a second thing 
 | a subagent you are tempted to wait for | work your own angle; its finding lands by itself |
 
 **Measure what your idea did before you decide it failed.** `verify-change.py` measures ONLY the
-documents an engine change moved - 25 of 213 on 19 Nov - instead of all 213:
+documents an engine change moved - 25 of 213 on 19 Nov - instead of all 213.
+
+**`verify-change.py` IS NOT A COMMIT PATH AND NEVER BECOMES ONE.** It answers "did my idea work",
+which is a question about an attempt. A COMMIT is a claim that the whole corpus was measured and
+nothing got worse, and only `regress.py --check` can make that claim. The pre-commit hook runs it
+and there is no override: if it refuses, the change is not ready. Measure with `verify-change.py`,
+then commit only after the full pass says PASS.
+
+**THE GATE'S SKIP IS NOT A HOLE.** When a commit cannot move the corpus, `regress.py` does not
+re-run 213 documents - but it now checks the table's ENGINE STAMP for BOTH formats unconditionally,
+so a commit passes without re-measuring only when the published table is provably the full-corpus
+measurement of the exact engine in the tree. A stale stamp refuses. Do not treat "not re-measured"
+as "not checked".
+
 
     python3 tools/p2w-bench/verify-change.py --before <a .docx set you already have> --skip-convert
 

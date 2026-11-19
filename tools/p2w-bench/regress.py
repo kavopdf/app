@@ -205,11 +205,24 @@ def check(allow_engine_change, only=None):
     need_docx = "docx" in scope
     need_txt = "txt" in scope
 
+    st = load_stamp()
     if not allow_engine_change:
-        st = load_stamp()
-        for f, needed in (("docx", need_docx), ("txt", need_txt)):
-            if not needed:
-                continue
+        # THE STAMP IS CHECKED FOR EVERY FORMAT, INCLUDING THE SKIPPED ONES.
+        #
+        # It used to run only inside `if not needed: continue`, so when scope.py said "no engine
+        # change" BOTH formats were skipped and the stamp was never read - the commit passed having
+        # verified neither the corpus nor the table's provenance. That is the one path by which a
+        # commit could land without a full-corpus regression check, and it was reachable from a
+        # tooling-only change, which is most commits.
+        #
+        # Skipping the measurement is only sound when the table IS the full-corpus measurement of
+        # the engine in the tree. The stamp is what says so. If it does not match, the skip is not a
+        # pass - it is an unmeasured table, and the run must measure before it commits.
+        # EVERY FORMAT, WHETHER OR NOT IT IS BEING RE-MEASURED. A format that is not re-measured is
+        # being passed on the strength of the table alone, so the table's stamp is the ONLY thing
+        # standing between this commit and an unmeasured corpus. Checking it only for the formats
+        # that are being measured checks it exactly where it is least needed.
+        for f in ("docx", "txt"):
             was = st.get(f)
             if was is None:
                 print("  UNSTAMPED (%s): the table does not say which engine made it, so" % f)
@@ -222,7 +235,8 @@ def check(allow_engine_change, only=None):
 
     d_bad, d_err = docx_regressions() if need_docx else ([], "")
     if not need_docx:
-        print("  docx: skipped - this change cannot move the .docx")
+        print("  docx: not re-measured - the tree is the engine the table was measured on (%s)"
+              % (st.get("docx") or "?"))
     elif d_err:
         print("  docx: %s - cannot check" % d_err)
         fail = 1
@@ -236,7 +250,8 @@ def check(allow_engine_change, only=None):
 
     t_bad, t_err = txt_regressions() if need_txt else ([], "")
     if not need_txt:
-        print("  txt : skipped - this change cannot move the .txt")
+        print("  txt : not re-measured - the tree is the engine the table was measured on (%s)"
+              % (st.get("txt") or "?"))
     elif t_err:
         print("  txt : %s - cannot check" % t_err)
         fail = 1
