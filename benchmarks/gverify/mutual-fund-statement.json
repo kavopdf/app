@@ -1,0 +1,16 @@
+{
+ "name": "mutual-fund-statement",
+ "status": "ok",
+ "rc": 1,
+ "passed": 40,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "25_invisible_text",
+  "27_text_off_page",
+  "32_stroke_lines",
+  "60_text_column_right_edge",
+  "66_table_cell_width"
+ ]
+}

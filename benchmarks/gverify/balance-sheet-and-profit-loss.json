@@ -1,0 +1,14 @@
+{
+ "name": "balance-sheet-and-profit-loss",
+ "status": "ok",
+ "rc": 1,
+ "passed": 42,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "27_text_off_page",
+  "32_stroke_lines",
+  "60_text_column_right_edge"
+ ]
+}

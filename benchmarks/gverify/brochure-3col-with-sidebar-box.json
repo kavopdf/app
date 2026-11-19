@@ -1,0 +1,14 @@
+{
+ "name": "brochure-3col-with-sidebar-box",
+ "status": "ok",
+ "rc": 1,
+ "passed": 37,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "32_stroke_lines",
+  "47_margins",
+  "59_shape_anchor"
+ ]
+}

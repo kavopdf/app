@@ -1,0 +1,14 @@
+{
+ "name": "itr-computation-with-slab-table",
+ "status": "ok",
+ "rc": 1,
+ "passed": 42,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "26_text_overlap",
+  "32_stroke_lines",
+  "63_table_rows"
+ ]
+}

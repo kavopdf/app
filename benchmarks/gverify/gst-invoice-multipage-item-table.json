@@ -1,0 +1,16 @@
+{
+ "name": "gst-invoice-multipage-item-table",
+ "status": "ok",
+ "rc": 1,
+ "passed": 40,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "25_invisible_text",
+  "26_text_overlap",
+  "27_text_off_page",
+  "32_stroke_lines",
+  "44_header_footer"
+ ]
+}

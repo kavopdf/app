@@ -1,0 +1,13 @@
+{
+ "name": "marksheet-subject-left-marks-right",
+ "status": "ok",
+ "rc": 1,
+ "passed": 43,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "25_invisible_text",
+  "32_stroke_lines"
+ ]
+}
