@@ -130,6 +130,27 @@ one measurement, one commit - kept only if nothing gets worse.
 
 ---
 
+## EVERY RUN DOES BOTH — the LibreOffice backlog does not wait
+
+`stage.py` says `measure-google` until all 213 are measured, and only then says `matrix`. That is right
+for a fresh corpus and wrong for this one: on 19 Nov Google was 90 and LibreOffice 70, so the twenty
+behind would have waited until all 213 Google results existed. **A backlog that only clears at the end
+is a backlog that does not clear.**
+
+**So every run does two things, in this order:**
+
+    1. measure up to 20 NEW documents through Google   (STEP 1 and STEP 2 below)
+       --collect now measures the LibreOffice side too, so a new document never falls behind
+    2. close the LibreOffice gap on documents that already have a Google result but no soffice one:
+
+           python3 tools/p2w-bench/gverify.py --plan 200 | head -1     # shows the two counts
+           python3 tools/p2w-bench/gverify.py --lo <name>              # one document
+
+       Render several with one soffice call, then verify each - the brief's matrix section has how.
+
+**If step 2 would eat the whole run, do it anyway.** A Google number with no LibreOffice partner says a
+document fails but not which construct; the pair is the only thing a fixer can act on.
+
 ## STAGE `matrix` — the other half of every document
 
     python3 tools/p2w-bench/stage.py
