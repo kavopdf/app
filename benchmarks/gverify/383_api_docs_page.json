@@ -1,0 +1,16 @@
+{
+ "name": "383_api_docs_page",
+ "status": "ok",
+ "rc": 1,
+ "passed": 40,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "18_displacement",
+  "25_invisible_text",
+  "47_margins",
+  "59_shape_anchor",
+  "60_text_column_right_edge",
+  "66_table_cell_width"
+ ]
+}

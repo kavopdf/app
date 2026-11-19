@@ -1,0 +1,13 @@
+{
+ "name": "373_leave_application_form",
+ "status": "ok",
+ "rc": 1,
+ "passed": 43,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "23_line_pitch",
+  "60_text_column_right_edge"
+ ]
+}

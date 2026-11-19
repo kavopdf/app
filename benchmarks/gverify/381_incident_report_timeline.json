@@ -1,0 +1,15 @@
+{
+ "name": "381_incident_report_timeline",
+ "status": "ok",
+ "rc": 1,
+ "passed": 41,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "18_displacement",
+  "25_invisible_text",
+  "59_shape_anchor",
+  "60_text_column_right_edge"
+ ]
+}

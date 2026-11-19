@@ -1,0 +1,17 @@
+{
+ "name": "75_merged_header_cell_three_columns",
+ "status": "ok",
+ "rc": 1,
+ "passed": 39,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "32_stroke_lines",
+  "43_within_10pt_x",
+  "47_margins",
+  "59_shape_anchor",
+  "64_table_span_across",
+  "65_table_span_down"
+ ]
+}

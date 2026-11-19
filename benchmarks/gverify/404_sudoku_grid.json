@@ -1,0 +1,13 @@
+{
+ "name": "404_sudoku_grid",
+ "status": "ok",
+ "rc": 1,
+ "passed": 43,
+ "total": 47,
+ "failed": [
+  "18_displacement",
+  "23_line_pitch",
+  "47_margins",
+  "59_shape_anchor"
+ ]
+}

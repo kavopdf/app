@@ -1,0 +1,12 @@
+{
+ "name": "72_bank_statement_no_rules_right_amounts",
+ "status": "ok",
+ "rc": 1,
+ "passed": 39,
+ "total": 42,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "32_stroke_lines"
+ ]
+}

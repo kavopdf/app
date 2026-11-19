@@ -1,0 +1,10 @@
+{
+ "name": "394_map_with_legend",
+ "status": "ok",
+ "rc": 1,
+ "passed": 41,
+ "total": 42,
+ "failed": [
+  "32_stroke_lines"
+ ]
+}
