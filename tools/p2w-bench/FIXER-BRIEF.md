@@ -209,7 +209,7 @@ number is. Always pass `--engine`: without it the tool guesses which engine was 
 ## STEP 6b - SCREEN BEFORE YOU SPEND A CORPUS PASS
 
 An attempt used to cost a full corpus measurement - about forty minutes - and five attempts park a
-class. With 92 OPEN classes that is 307 hours of measuring before one document is fixed. The order was
+class. With every open document in one pile that is hundreds of hours of measuring before one document is fixed. The order was
 wrong: the cheap question was being asked last.
 
     python3 tools/p2w-bench/screen.py --class "<the class you are working on>"
@@ -233,7 +233,7 @@ either; use judgement rather than assuming the screen is always cheaper.
 
 DO THE SMALL CLASSES FIRST. Not because they are easy, but because four of them are 31 of the 92
 documents and each one can be screened in minutes. Finishing them closes four classes and shrinks the
-round instead of leaving 92 OPEN rows at the end.
+round instead of leaving the open rows untouched at the end.
 
 ## STEP 7 - The ratchet decides. This is the regression rule.
 

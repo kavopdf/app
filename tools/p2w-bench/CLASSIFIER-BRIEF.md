@@ -124,13 +124,19 @@ If a rate limit or technical error hits, wait and retry up to three times, then 
 
 ## 5. The report
 
-    **30 missing-in-place - 16 partly-replaced - 15 wholly-displaced - 120 clean - 94 OPEN -> advanced to fix**
+    **18 partly-displaced - 13 partly-replaced - 12 wholly-displaced - 149 clean - 64 OPEN -> advanced to fix**
     | class | docs | worst | damage |
     |---|---|---|---|
-    | content-missing-nothing-in-its-place | 30 | 415_inline_images 89.0%@5 | highest - content gone |
-    | content-missing-partly-replaced | 16 | 041122-Account_Opening_Form 98.7%@5 | highest |
-    | content-present-wholly-displaced | 15 | 75_merged_header_cell 27.6%@5 | high |
-    | clean | 120 | - | none |
+    | content-present-partly-displaced | 18 | (from RANKING.csv) | high |
+    | content-missing-partly-replaced | 13 | (from RANKING.csv) | highest |
+    | content-present-wholly-displaced | 12 | (from RANKING.csv) | high |
+    | clean | 149 | - | none |
+
+**THE SHAPE IS THE INSTRUCTION; THE NUMBERS ARE NOT.** This table read "30 / 16 / 15 / 120 / 94" and
+every figure had moved: the justified-lines fix took the open count from 94 to 64 and the clean
+count from 120 to 149. Build the table from `benchmarks/RANKING.csv` and `DEFECT-CLASSES.md` every
+run - a brief that prints last week's census teaches the run to copy it, and a copied census is a
+report nobody can trust.
     | Phase after this run | fix |
 
 Every number must come from `RANKING.csv` of THIS run. The figures above are the state on 16 Nov

@@ -139,13 +139,20 @@ belongs to the baseline cron only - the classifier and the fixer do not run it.
 
 ## 9. The report
 
-    **measured 212/213 (1 exempt) - 92 defective - census: N mechanisms - 0 regressions - advanced to classify**
+    **measured 213/213 (0 exempt) - 64 defective - census: N mechanisms - 0 regressions - advanced to classify**
     | | |
     |---|---|
     | Ground-truth gate | pass 14/14 |
-    | Documents | 212 measured + 1 exempt |
-    | Defective | 92 |
-    | share@5px median | 0.3% |
+    | Documents | 213 measured + 0 exempt |
+    | Defective | 64 |
+    | share@5px median | 0.1% |
+
+**THESE FOUR NUMBERS ARE EXAMPLES, NOT CONSTANTS - READ THEM FROM THE TABLE.** They were "212
+measured + 1 exempt / 92 defective / 0.3%" and every one of them had gone stale: 416_many_tiny_pages
+is measured now so nothing is exempt, and the justified-lines fix took the defective count from 92 to
+64. A brief that prints last week's numbers teaches every run to copy them, which is exactly how
+"of 212" reached four reports in a row. Take the numbers from `benchmarks/RANKING.csv` and
+`report.py --json`; the shapes above are only the shapes.
     | Census mechanisms | text-missing 12, rules-not-tables 9, images-none-extracted 4 |
     | Regressions | 0 |
     | Committed | RANKING.csv, STATE.json, CENSUS.csv, CENSUS.md |
