@@ -113,9 +113,11 @@ by seven hand-run cases:
     gate with marks missing     -> exit 3
     gate with the store empty   -> exit 3
 
-**It cannot be committed:** `git push` returns 403, `gh api` writes return "Resource not
-accessible by integration", and the MCP commit tool is not in the registry. The patch is the
-delivery mechanism until the write path returns:
+**It IS committed as of 19 Nov.** It was held back for four days by a 403 that turned out to be the
+Sarvam GitHub App missing from the `kavopdf` organization rather than a repository permission; the
+app was installed and the work landed as commits 57a0507 and 199d611. The patch file is kept only as
+a record of what changed. If you are reading this because a push failed again, check
+`gh api /user/installations` first - an empty list means the app is gone, and no retry will help.
 
     git apply /scratch/saved/TXT-FULL-PARITY.patch
 

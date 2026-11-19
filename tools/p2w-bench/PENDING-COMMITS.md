@@ -1,14 +1,31 @@
 # Everything written but not committed
 
-GitHub's write path has been dead since 18 Nov 21:12. `git push` returns 403, `gh api` writes
-return 403 "Resource not accessible by integration", and `GITHUB_COMMIT_MULTIPLE_FILES` is not in
-any run's tool list. **Nothing below has reached origin.** This file is the list, and it must be
-emptied in this order the moment a write path exists.
+**EMPTY. THE WRITE PATH IS ALIVE AGAIN.**
 
-Last checked: 19 Nov. Repo tip is still `8e8fdd2` (18 Nov 21:12).
+From 18 Nov 21:12 to 19 Nov 16:00 `git push` returned 403, `gh api` writes returned 403 "Resource
+not accessible by integration", and `GITHUB_COMMIT_MULTIPLE_FILES` was not in any run's tool list.
+Everything written in that window piled up here.
+
+The cause was never a permission on the repository. **The Sarvam GitHub App was not installed on
+the `kavopdf` organization at all**, so the token could only reach public repositories. Sarvam
+support found it, the app was installed on 19 Nov with `kavopdf/app` selected and Contents: Read and
+write, and the backlog was landed the same afternoon:
+
+    199d611  measure: four axes the table never had, and a gate that refuses to land a regression
+    57a0507  engine: two fixes, each proved on the whole corpus before landing
+    d51faf8  briefs: git push works again - say so, and say what actually made it fail
+    c8c8ca2  baseline brief: the one operational fact the prompt had and the brief did not
+    c88423b  apk: the fourth brief, so all four crons read their instructions from the repo
+
+**If this file ever fills up again, the first thing to check is whether the app is still installed
+on the organization** - `gh api /user/installations` returning an empty list is the signature. It is
+not a repository permission and no amount of retrying fixes it.
+
+Two things that DO still make a push fail, and both look like permissions: a commit authored as a
+private address ("push declined due to email privacy restrictions"), and the pre-commit gate
+refusing a change that was not measured across the whole corpus. Neither is fixed by retrying.
 
 ---
-
 ## The four patches
 
 | # | file | what it carries | engine |
