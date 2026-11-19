@@ -231,6 +231,18 @@ public final class PdfToWord {
          * page. This flag is how the writer can tell the two apart.
          */
         public boolean ring;
+        /**
+         * How many points the page stretched this line's inter-word spaces to reach its
+         * measure, or 0 when it did not stretch it.
+         *
+         * <p>A justified line's glyph ADVANCES are the face's own; only the POSITIONS are
+         * spread, so the natural width is the sum of the advances and the shortfall between
+         * that and the ink's right edge is exactly the width the page added. The writer has
+         * to add it back or the line stops short of the right edge and every word on it
+         * slides left by a share of the missing width - worst on narrow two-column measures,
+         * which carry few spaces to absorb it.
+         */
+        public float stretchPt;
         public final List<Run> runs = new ArrayList<>();
 
         public String text() {
@@ -3231,6 +3243,8 @@ public final class PdfToWord {
         float angle;
         /** Bottom edge of the line's box on the page, y down. */
         float bottom;
+        /** Points the page added to this line's spaces to justify it; 0 when it did not. */
+        float stretchPt;
 
         boolean inside(Table t) {
             float cx = (x + right) / 2f;
@@ -4117,6 +4131,123 @@ public final class PdfToWord {
         return p;
     }
 
+    /**
+     * Every inter-word gap on a line, in points - the spaces the page itself drew.
+     *
+     * <p>The word test is {@link #textOf}'s, so a gap counted here is a gap that put a space in
+     * the line's text. Gaps wider than two and a half em are not spaces at all: they are the
+     * gutter between two columns or a tab to a value, and a page does not justify those.
+     */
+    private static void collectWordGaps(Line ln, List<Float> out) {
+        Glyph prev = null;
+        for (Glyph g : ln.glyphs) {
+            // A SPACE IS A GLYPH ON MOST OF THIS CORPUS. Measuring from the last non-space
+            // glyph's advance end to the next non-space glyph's start counts the space's own
+            // width as part of the gap, which is what it is. Measured without this on
+            // academic-paper-ieee-2col-abstract: every justified line reported NO gap at all,
+            // because its spaces are glyphs and the justification is a fraction of an em that
+            // the old test discarded as letter-spacing.
+            boolean space = g.text == null || g.text.trim().isEmpty();
+            if (prev != null && !space) {
+                float gs = g.sizePt > 0f ? g.sizePt : Math.max(1f, Math.round(g.size));
+                float gap = g.x - (prev.x + prev.width);
+                if (prev.width > prev.size * 0.05f && gap > gs * 0.18f && gap < gs * 2.5f) {
+                    out.add(gap);
+                }
+            }
+            if (!space) prev = g;
+        }
+    }
+
+    /** A line's median inter-word gap, or NaN when it has none. */
+    private static float medianWordGap(Line ln) {
+        List<Float> gaps = new ArrayList<>();
+        collectWordGaps(ln, gaps);
+        if (gaps.isEmpty()) return Float.NaN;
+        Collections.sort(gaps);
+        return gaps.get(gaps.size() / 2);
+    }
+
+    /** True when the line is a dot leader, which is drawn to fill its measure already. */
+    private static boolean isLeader(String text) {
+        return text != null && (text.matches(".*\\.{3,}.*") || text.indexOf('\u2026') >= 0);
+    }
+
+    /** True when the line carries a complex-script character, whose substitute face is wider. */
+    private static boolean hasComplexScript(String text) {
+        if (text == null) return false;
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if ((c >= 0x0590 && c <= 0x08FF)     // Hebrew, Arabic, Syriac, Thaana
+                    || (c >= 0x0900 && c <= 0x0DFF)  // Devanagari .. Sinhala
+                    || (c >= 0x0E00 && c <= 0x0FFF)  // Thai, Lao, Tibetan
+                    || (c >= 0x1000 && c <= 0x109F)  // Myanmar
+                    || (c >= 0x3040 && c <= 0x30FF)  // Kana
+                    || (c >= 0x4E00 && c <= 0x9FFF)  // CJK
+                    || (c >= 0xAC00 && c <= 0xD7AF)) return true;  // Hangul
+        }
+        return false;
+    }
+
+    /**
+     * How far the page stretched this line's spaces to reach its measure, in points, or 0 when
+     * it did not stretch it.
+     *
+     * <p>The glyph ADVANCES are the face's own - justification moves glyphs, it does not widen
+     * them - so the natural width of the line is the sum of the advances, and the shortfall
+     * between that and the ink's right edge is exactly the width the page added. That makes the
+     * test a measurement rather than a guess: a ragged line's natural width IS its extent and
+     * its shortfall is zero.
+     *
+     * <p>Three guards, each one a document that got worse without it:
+     * <ul>
+     *   <li>a dot leader is drawn to fill its measure, and stretching it re-lays the dots
+     *       (table-of-contents-dot-leaders, 10.72 -> 26.27 without this guard);</li>
+     *   <li>the substitute face for a complex script is wider than the page's, so such a line
+     *       is already at or past the measure (78_mixed_english_devanagari_line, 13.51 ->
+     *       16.08);</li>
+     *   <li>below 3 pt the stretch buys nothing and disturbs the fit, because w:sz is
+     *       half-points and an 8.9 pt line already goes out 4.5 % narrow.</li>
+     * </ul>
+     */
+    private static float stretchOf(Line ln, float gapFloor) {
+        if (Float.isNaN(gapFloor) || ln.rotated || ln.ring) return 0f;
+        if (ln.glyphs.size() < 3) return 0f;
+        Glyph first = ln.glyphs.get(0);
+        if (first.mirror) return 0f;
+        float med = medianWordGap(ln);
+        if (Float.isNaN(med)) return 0f;
+        if (med <= gapFloor + Math.max(0.05f * ln.size, 0.25f)) return 0f;
+        if (isLeader(ln.text) || hasComplexScript(ln.text)) return 0f;
+        float natural = 0f;
+        for (Glyph g : ln.glyphs) natural += g.width;
+        float shortfall = ln.right - (first.x + natural);
+        if (shortfall < 3f) return 0f;
+        // A line cannot have been stretched by more than a fraction of its own length; past
+        // that the measurement is describing something else - a tab run out, a clipped line.
+        if (shortfall > 0.5f * Math.max(1f, ln.right - ln.x)) return 0f;
+        // THE SHORTFALL MUST BE THE WORD GAPS, NOT THE LETTER SPACING.
+        //
+        // `natural` sums each glyph's ADVANCE, and an advance does not include letter-spacing: a
+        // page that sets 39_small_caps_letter_spacing puts its characters further apart than their
+        // advances say, so `ln.right - (first.x + natural)` counts that extra tracking as a
+        // shortfall the writer then fills by stretching the word gaps. It filled a line that was
+        // never justified, and the document went 0.72 -> 3.74 - the only regression the patch had
+        // out of 25 documents it moved.
+        //
+        // A justified line's shortfall IS its word-gap inflation times the number of gaps, so
+        // compare the two. When they disagree the line was not justified and the difference is
+        // tracking, which the writer must leave alone.
+        List<Float> gaps = new ArrayList<>();
+        collectWordGaps(ln, gaps);
+        if (gaps.size() >= 2) {
+            float explained = gaps.size() * Math.max(0f, med - gapFloor);
+            float slack = Math.max(2f, 0.35f * shortfall);
+            if (Math.abs(shortfall - explained) > slack) return 0f;
+        }
+        return shortfall;
+    }
+
     private static String textOf(List<Glyph> glyphs) {
         StringBuilder sb = new StringBuilder();
         // See toLines: a line whose own x runs backwards is a mirrored line, and its steps are
@@ -4808,6 +4939,24 @@ public final class PdfToWord {
             }
         }
 
+        // THE PAGE'S OWN WORD GAP. Justification only ever WIDENS a gap, so the narrow end of
+        // a page's inter-word gaps is where the face's own space lives. A line whose gaps sit
+        // well above that floor has been stretched to the measure. Percentile, not mean: one
+        // wide space on a page of tight text must not move the floor, and a page with no
+        // justification has a flat distribution in which nothing crosses.
+        float gapFloor = Float.NaN;
+        {
+            List<Float> gaps = new ArrayList<>();
+            for (Line ln : lines) {
+                if (ln.rotated || ln.ring) continue;
+                collectWordGaps(ln, gaps);
+            }
+            if (gaps.size() >= 8) {
+                Collections.sort(gaps);
+                gapFloor = gaps.get(Math.max(0, (int) (gaps.size() * 0.03f)));
+            }
+        }
+
         if (!row) assignSegments(lines);
         // A ROW IS ONE PLACE IN THE ORDER, NOT TWO.
         //
@@ -4888,14 +5037,14 @@ public final class PdfToWord {
             } else if (sameParagraph(last, line, pageWidth, blockRight)) {
                 group.add(line);
             } else {
-                out.add(buildPara(group, pageWidth, pageHeight, bands, flippedPage));
+                out.add(buildPara(group, pageWidth, pageHeight, bands, flippedPage, gapFloor));
                 group = new ArrayList<>();
                 group.add(line);
                 addRowMates(group, line);
             }
         }
         if (!group.isEmpty()) out.add(buildPara(group, pageWidth, pageHeight, bands,
-                flippedPage));
+                flippedPage, gapFloor));
         return out;
     }
 
@@ -5104,7 +5253,7 @@ public final class PdfToWord {
     }
 
     private static Para buildPara(List<Line> group, float pageWidth, float pageHeight,
-                                  int bands, boolean flippedPage) {
+                                  int bands, boolean flippedPage, float gapFloor) {
         // Fields on one baseline read left to right, whatever order the page drew them in. The
         // row's tab stops are measured from its first box, so the box order IS the line.
         if (group.size() > 1 && isRow(group)) {
@@ -5232,6 +5381,7 @@ public final class PdfToWord {
             box.rotated = line.rotated;
             box.angle = line.angle;
             box.ring = line.ring;
+            box.stretchPt = stretchOf(line, gapFloor);
             List<Run> lineRuns = coalesceRuns(runsOf(line));
             // A fragment that opens with a combining mark is not a line of its own - it is the
             // tail of the word the previous fragment began. The page draws "केवल" as one line,

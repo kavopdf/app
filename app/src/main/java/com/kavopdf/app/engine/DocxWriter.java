@@ -3565,9 +3565,10 @@ public final class DocxWriter {
                     .append("\"/></w:rPr>");
         }
         sb.append("</w:pPr>");
+        int spacingTw = p.align == 0 ? stretchTw(b) : 0;
         for (PdfToWord.Run run : b.runs) {
             if (run.text.isEmpty()) continue;
-            runXml(sb, run, p.heading > 0);
+            runXml(sb, run, p.heading > 0, spacingTw);
         }
         sb.append("</w:p>");
     }
@@ -4340,9 +4341,10 @@ public final class DocxWriter {
         if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");
         else if (p.align == 2) sb.append("<w:jc w:val=\"right\"/>");
         sb.append("</w:pPr>");
+        int spacingTw = p.align == 0 ? stretchTw(b) : 0;
         for (PdfToWord.Run run : b.runs) {
             if (run.text.isEmpty()) continue;
-            runXml(sb, run, p.heading > 0);
+            runXml(sb, run, p.heading > 0, spacingTw);
         }
         sb.append("</w:p>");
     }
@@ -4369,9 +4371,38 @@ public final class DocxWriter {
         sb.append("</w:p>");
     }
 
+    /**
+     * The character spacing, in twips, that puts a line the page justified back on its measure.
+     *
+     * <p>The page spreads a justified line's spaces and leaves the glyph advances alone; the
+     * writer puts the words down with the face's own space and stops, so the line ends short of
+     * the right edge by exactly the width the page added, and every word on it slides left by a
+     * share of that. {@code PdfToWord.stretchOf()} measured the shortfall; here it is spread
+     * over the line's characters, which moves each glyph by the same fraction of the line the
+     * page moved it. Below 3 pt nothing is emitted: {@code w:sz} is half-points, so a line 1-2 pt
+     * short of its edge is short of it for that reason and not for this one.
+     */
+    private static int stretchTw(PdfToWord.Box b) {
+        if (b == null || b.rotated || !(b.stretchPt >= 3f)) return 0;
+        String t = b.text();
+        if (t.length() < 2) return 0;
+        long tw = Math.round(b.stretchPt * TWIPS_PER_PT / t.length());
+        // A tenth of an em per character is already a letter-spaced line. The cap is only a
+        // sanity limit: the shortfall the model carries has already been bounded to half the
+        // line's own length, and truncating it here is what left the first attempt 2 of 10
+        // documents moved instead of the whole class - 26 pt of missing measure over 45
+        // characters is 11 twips a character, and a 0.06 em cap is exactly 11 at 9 pt.
+        long cap = Math.max(1L, Math.round(b.size * 0.30f * TWIPS_PER_PT));
+        return (int) Math.max(0L, Math.min(tw, cap));
+    }
+
     /** One run with the properties the PDF drew it with. */
     private static void runXml(StringBuilder sb, PdfToWord.Run run) {
         runXml(sb, run, false);
+    }
+
+    private static void runXml(StringBuilder sb, PdfToWord.Run run, boolean styleBold) {
+        runXml(sb, run, styleBold, 0);
     }
 
     /**
@@ -4393,7 +4424,8 @@ public final class DocxWriter {
      * outline - it is switched OFF per run, which is how DOCX expresses "this run is not the
      * style's weight".
      */
-    private static void runXml(StringBuilder sb, PdfToWord.Run run, boolean styleBold) {
+    private static void runXml(StringBuilder sb, PdfToWord.Run run, boolean styleBold,
+                               int spacingTw) {
         sb.append("<w:r><w:rPr>");
         // The typeface and colour the PDF used. Without these every document came out in
         // the default font in black, and "the Word file should look like the PDF" had no
@@ -4414,6 +4446,12 @@ public final class DocxWriter {
         // that validates rPr and drops what it cannot place loses it otherwise.
         if (run.color >= 0) {
             sb.append(String.format("<w:color w:val=\"%06X\"/>", run.color & 0xFFFFFF));
+        }
+        // The page's own justification, put back. w:spacing sits after w:color and before w:sz
+        // in the schema's rPr order, and a reader that validates rPr and drops what it cannot
+        // place would lose it otherwise.
+        if (spacingTw > 0) {
+            sb.append("<w:spacing w:val=\"").append(spacingTw).append("\"/>");
         }
         int half = halfPointsDown(run.sizePt);
         if (half > 0) {
