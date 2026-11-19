@@ -116,3 +116,24 @@ A paused cron is silent and nothing else in the system reports that it is paused
 2. **A cron that is paused** - `status` reads `paused`. Nothing else in the repo knows.
 
 Check both, every run. A paused cron is the quietest way for this pipeline to die.
+
+---
+
+## DONE IS NOT THE END — the reopen
+
+`rounds_total` rounds finish and `round.py` sets the phase to `done`. From then on every claim refuses:
+baseline, classifier and fixer all stop, permanently. **If the corpus is not actually perfect at that
+point, that is a silent stop** - the app ships, the documents still fail, and nothing anywhere says so.
+
+    python3 tools/p2w-bench/round.py --reopen
+
+It reopens a round, and it refuses unless there is something left to fix:
+
+    refused: the phase is fix, not done - there is nothing to reopen.
+    refused: nothing fails in either format - the pipeline is finished.
+    reopened as round 4 - 65 .docx and 47 .txt still fail
+
+**The watchdog should run it whenever the phase is `done` and `health.py` still shows failing
+documents.** A reopen with nothing failing would loop forever, which is why the guard exists; a reopen
+with failures is the pipeline admitting it is not finished, which is exactly what a two-month run needs
+it to be able to say.

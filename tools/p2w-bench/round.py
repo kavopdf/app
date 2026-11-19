@@ -1091,6 +1091,60 @@ def main(argv):
         print("round %d closed, round %d begins in phase measure" % (s["round"] - 1, s["round"]))
         return 0
 
+    if "--reopen" in argv:
+        # DONE IS NOT THE END. `rounds_total` rounds finish and the phase becomes `done`; from then on
+        # every claim refuses and the pipeline stops for good. If the corpus is not actually perfect at
+        # that point that is a silent stop - the app ships, the documents still fail, nothing says so.
+        #
+        # This reopens a round and refuses unless something is still failing. A reopen with nothing
+        # failing would loop forever; a reopen with failures is the pipeline admitting it is not done.
+        if s["phase"] != "done":
+            print("refused: the phase is %s, not done - there is nothing to reopen." % s["phase"])
+            return 1
+        failing = 0
+        try:
+            import csv as _csv
+            with open(RANK, encoding="utf-8") as f:
+                for r in _csv.DictReader(f):
+                    try:
+                        if float(r.get("share5") or 0) > 1.0:
+                            failing += 1
+                    except ValueError:
+                        pass
+        except Exception:
+            print("refused: %s cannot be read, so there is no evidence either way." % RANK)
+            return 1
+        txt_failing = 0
+        try:
+            import csv as _csv
+            with open(os.path.join(HERE, "txt", "RANKING-TXT.csv"), encoding="utf-8") as f:
+                for r in _csv.DictReader(f):
+                    try:
+                        if int(r.get("failed") or 0) > 0:
+                            txt_failing += 1
+                    except ValueError:
+                        pass
+        except Exception:
+            pass
+        if failing == 0 and txt_failing == 0:
+            print("refused: nothing fails in either format - the pipeline is finished.")
+            return 1
+        s.setdefault("history", []).append(
+            {"round": s["round"], "phase": "reopened", "docx_failing": failing,
+             "txt_failing": txt_failing, "at": ist("%Y-%m-%d %H:%M")})
+        s["round"] += 1
+        s["rounds_total"] = max(s["rounds_total"], s["round"])
+        s["phase"] = "measure"
+        s["started"] = time.time()
+        s["fixer_started"] = 0
+        s["baseline_started"] = 0
+        s["classifier_started"] = 0
+        s["apk_shipped"] = ""
+        save(s)
+        print("reopened as round %d - %d .docx and %d .txt still fail"
+              % (s["round"], failing, txt_failing))
+        return 0
+
     status(s)
     return 0
 
