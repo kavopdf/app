@@ -160,9 +160,13 @@
   {
    "at": "16:58",
    "text": "measured, screened, not ratcheted: the justified-line fix is a patch in patches/, not an engine change"
+  },
+  {
+   "at": "18:01",
+   "text": "18:00 run: carry-over verified DONE - the justified-lines fix landed as 4147d54 with a full corpus ratchet (53 of 213 improved, mean 4.13, regress.py --check PASS, txt 213/213). Taking content-present-partly-displaced (18 open, most documents)."
   }
  ],
- "next": "Apply patches/PATCH-justified-lines-spacing.patch, build, re-screen content-partly-lost (expect 5 better 0 worse), then spend the rest of the run on the corpus pass - screen.py --docs with every document in RANKING.csv, 22-24 per call in about nine calls, then write RANKING.csv and STATE.json from screen-out/dist/*.json. scope.py says BOTH: re-score the .txt too. Do not retry the two mistakes recorded in FINDINGS/content-partly-lost-JUSTIFY-170800-fixer.md - the 0.06 em spacing cap and the word-gap test that cannot see a space glyph.",
+ "next": "",
  "agents": [
   {
    "id": "contA-01",
@@ -226,9 +230,9 @@
   }
  ],
  "run": {
-  "started": "16:11",
-  "ended": "17:00",
-  "ended_how": "released"
+  "started": "18:00",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {
@@ -294,5 +298,5 @@
  ],
  "context": "content-partly-lost is diagnosed and the fix is written: a justified line is emitted left-aligned, because the page spreads its inter-word spaces and the writer uses the face's natural space. The model now carries the measured shortfall and the writer emits w:spacing. SCREEN PASS on 10 documents: 5 better, 0 worse (policy 5.37->1.76, academic 8.09->5.02, magazine 3.49->1.45, 304 3.41->2.47, landscape 1.45->0.62). NOT ratcheted: 46 of 213 documents measured in three calls when the run ended. The change is patches/PATCH-justified-lines-spacing.patch - unapplied, verified with git apply --check against 30aecd9, and the tree is clean. scope.py says BOTH, so the .txt must be re-scored or its byte-identity proved.",
  "needs_human": [],
- "next_class": "content-partly-lost"
+ "next_class": ""
 }

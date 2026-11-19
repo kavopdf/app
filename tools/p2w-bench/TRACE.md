@@ -6,7 +6,6 @@
 | 12 Nov 18:52 | fixer | ratchet | held or rose |
 | 12 Nov 18:52 | fixer | ratchet --txt | held or rose |
 | 12 Nov 18:52 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
-| 12 Nov 20:43 | fixer | claim | fixer claimed the slot |
 | 12 Nov 20:44 | fixer | build-engine | started |
 | 12 Nov 20:45 | fixer | classify | 43 classes from 208 documents |
 | 12 Nov 20:45 | fixer | classify --txt | 4 classes from 208 documents |
@@ -406,3 +405,4 @@
 | 19 Nov 16:57 | fixer | build-engine | started |
 | 19 Nov 16:57 | fixer | build-engine | engine built in 41s |
 | 19 Nov 16:58 | fixer | attempt | content-partly-lost -> partial (5/10 moved) |
+| 19 Nov 18:00 | fixer | claim | fixer claimed the slot |

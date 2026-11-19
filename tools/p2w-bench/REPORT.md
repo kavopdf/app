@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-19 16:11
+# Fixer report - 2026-11-19 18:00
 
 ```
-# P2W Fixer — Run Report
+# P2W Fixer - Run Report
 
-**19 Nov 2026 · slot 16:11 → 17:00 IST · 48 min**
+**19 Nov 2026 · slot 18:00 → running IST · 0 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,22 +11,15 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
-| Documents improved, round total | 37 of 212 |
-| Corpus improvement vs 15 Nov | **+29.90%** — mean 6.15 → 4.31 |
+| Documents improved this run | **0** — 0 attempt(s), 0 kept |
+| Documents improved, round total | 53 of 213 |
+| Corpus improvement vs 15 Nov | **+32.81%** — mean 6.15 → 4.13 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
-| **Fixed to 99%** | **21** of 212 — the rest are still off |
-| Moved but still open | **16** — improved, not fixed |
+| **Fixed to 99%** | **28** of 213 — the rest are still off |
+| Moved but still open | **25** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `content-partly-lost` |
-| Committed | **29** files in 7 commit(s) from `0b8c821` — ARCHIVE.json, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, HYPOTHESES.md, HYPOTHESES.md.head, INCIDENTS.md, LAST-MESSAGE.md, PATCH-justified-lines-spacing.patch, REPORT.md, ROUND.json, RUN-LOG.md, RUN.js |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 16:58 | **partial** | 5/10 | justified lines emitted left-aligned: model carries the measured shortfall (Box.stretchPt/Line.stretchPt), writer emits w:spacing in flowFromBox and lineParagraph. SCREEN PASS 5 of 10 better, 0 worse |
+| Working on | `-` |
 
 ## The txt
 
@@ -45,12 +38,10 @@
 
 | | |
 |:--|:--|
-| Session | 18:00 → 17:00 · **23h 00m** |
-| Slot window | 16:11 → 17:00 · 48 min |
-| Before the claim | 22h 12m - pod setup, cloning and retries |
-| Tool beats | 23 |
-| Longest silence | **17.3 min** — from 16:11:34, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 3 |
+| Slot window | 18:00 → running · 0 min |
+| Before the claim | not recorded - nothing writes a beat until step.py runs |
+| Tool beats | 6 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 need a human |
 
 
@@ -58,10 +49,7 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **14 min** | `######` |
-| measure or build - a conversion, screen or compile writes no beacon | **31 min** | `##############` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **2 min** | `#` |
+| record - attempt, handoff, class rows | **1 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |

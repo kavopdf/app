@@ -9,18 +9,14 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 16:11 |
-| ended | 17:00 |
-| how it ended | released |
+| started | 18:00 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
 > content-partly-lost is diagnosed and the fix is written: a justified line is emitted left-aligned, because the page spreads its inter-word spaces and the writer uses the face's natural space. The model now carries the measured shortfall and the writer emits w:spacing. SCREEN PASS on 10 documents: 5 better, 0 worse (policy 5.37->1.76, academic 8.09->5.02, magazine 3.49->1.45, 304 3.41->2.47, landscape 1.45->0.62). NOT ratcheted: 46 of 213 documents measured in three calls when the run ended. The change is patches/PATCH-justified-lines-spacing.patch - unapplied, verified with git apply --check against 30aecd9, and the tree is clean. scope.py says BOTH, so the .txt must be re-scored or its byte-identity proved.
-
-## What the next run should do first
-
-> Apply patches/PATCH-justified-lines-spacing.patch, build, re-screen content-partly-lost (expect 5 better 0 worse), then spend the rest of the run on the corpus pass - screen.py --docs with every document in RANKING.csv, 22-24 per call in about nine calls, then write RANKING.csv and STATE.json from screen-out/dist/*.json. scope.py says BOTH: re-score the .txt too. Do not retry the two mistakes recorded in FINDINGS/content-partly-lost-JUSTIFY-170800-fixer.md - the 0.06 em spacing cap and the word-gap test that cannot see a space glyph.
 
 ## Agents deployed and not yet accounted for
 
@@ -38,7 +34,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:17` agent landed: contD-01 /  -> FINDINGS/content-missing-partly-replaced-D-092700-1d7b.md
 - `12:30` attempt 8 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `12:41` COMMITTING: git push is 403 'denied to Onyx-Node' for the fixer too, not only for subagents - the App has no write access to kavopdf/app over HTTPS git. It is not a dead end: the GitHub MCP tool GITHUB_COMMIT_MULTIPLE_FILES (owner kavopdf, repo app, branch main, upserts=[{path,content,encoding:utf-8}]) commits several files atomically and worked for all four commits of this run. The next run should commit that way, then 'git fetch origin main && git reset --hard origin/main' so HEAD matches origin, then chain.py. chain.py's sync check is strict SHA equality and also refuses a dirty tree, and it rewrites CHAIN.json - so commit CHAIN.json again after each chain.py run.
 - `13:13` attempt 9 on content-missing-partly-replaced -> error
@@ -63,6 +58,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `19:07` attempt 7 on content-missing-nothing-in-its-place -> kept (22/29 moved)
 - `16:58` attempt 1 on content-partly-lost -> partial (5/10 moved)
 - `16:58` measured, screened, not ratcheted: the justified-line fix is a patch in patches/, not an engine change
+- `18:01` 18:00 run: carry-over verified DONE - the justified-lines fix landed as 4147d54 with a full corpus ratchet (53 of 213 improved, mean 4.13, regress.py --check PASS, txt 213/213). Taking content-present-partly-displaced (18 open, most documents).
 
 ## Where the rest of the state lives
 

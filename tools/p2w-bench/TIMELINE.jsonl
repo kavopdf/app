@@ -357,3 +357,12 @@
 {"t": 1795087841.3635361, "ist": "17:00:41", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795087844.2163308, "ist": "17:00:44", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795087848.370613, "ist": "17:00:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795091429.08037, "ist": "18:00:29", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795091429.2233236, "ist": "18:00:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795091443.457881, "ist": "18:00:43", "ev": "beat", "d": "claimed, reading the handoff"}
+{"t": 1795091443.6224258, "ist": "18:00:43", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1795091443.7208817, "ist": "18:00:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795091488.8032115, "ist": "18:01:28", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795091512.8352404, "ist": "18:01:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795091512.9831538, "ist": "18:01:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795091513.1160116, "ist": "18:01:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
