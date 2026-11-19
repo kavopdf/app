@@ -17,7 +17,7 @@
 | Moved but still open | **16** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `content-partly-lost` |
-| Committed | **24** files in 2 commit(s) from `0a9de90` |
+| Committed | **29** files in 7 commit(s) from `0b8c821` |
 
 ## What was tried
 
@@ -35,6 +35,10 @@
 |:--|:--|:--|
 | A 0.06 em cap on the spacing | 8.09 → 6.54 only. 26 pt of missing measure over 45 characters is 11 twips a character, and 0.06 em at 9 pt *is* 11 | cap is now 0.30 em |
 | Measuring a word gap as `next.x − (prev.x + prev.width)` | On `academic-paper-ieee-2col-abstract` every justified line reported `med=NaN` and 0 lines were accepted, because **a space is a glyph** on that document — the gap between two glyph boxes is ~0 | measure from the last **non-space** glyph's advance end; 56 lines accepted |
+
+## A tool bug that was costing every run its work
+
+`round.py --release-fixer` auto-reverts an engine change that no attempt kept. **The commit it reverts to was never written by anything** — `fixer_engine_at_claim` is only ever read, so it held a fossil, `2945cb0`, older than the previous run's kept per-row separator stroke. On this run's first release attempt it checked out that pre-fix engine and **removed a measured, committed fix for 22 documents from the working tree**, printing "reverted: the engine changed this run" and telling me to commit it. A run that obeyed would have published the regression the 18 Nov fix removed. Fixed in `d26141e`: `claim()` now records the field from the live `git log`, and the guard **does not revert a clean engine tree** — when there is no uncommitted engine diff there is nothing to revert, and it refuses instead. Written up in `INCIDENTS.md`.
 
 ## Subagents
 

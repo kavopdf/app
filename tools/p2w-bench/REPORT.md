@@ -3,7 +3,7 @@
 ```
 # P2W Fixer — Run Report
 
-**19 Nov 2026 · slot 16:11 → running IST · 47 min**
+**19 Nov 2026 · slot 16:11 → 17:00 IST · 48 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -20,7 +20,7 @@
 | Moved but still open | **16** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `content-partly-lost` |
-| Committed | **24** files in 2 commit(s) from `0a9de90` — ARCHIVE.json, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, HYPOTHESES.md, HYPOTHESES.md.head, PATCH-justified-lines-spacing.patch, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md, T |
+| Committed | **29** files in 7 commit(s) from `0b8c821` — ARCHIVE.json, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, HYPOTHESES.md, HYPOTHESES.md.head, INCIDENTS.md, LAST-MESSAGE.md, PATCH-justified-lines-spacing.patch, REPORT.md, ROUND.json, RUN-LOG.md, RUN.js |
 
 ## What was tried
 
@@ -45,9 +45,10 @@
 
 | | |
 |:--|:--|
-| Slot window | 16:11 → running · 47 min |
-| Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 20 |
+| Session | 18:00 → 17:00 · **23h 00m** |
+| Slot window | 16:11 → 17:00 · 48 min |
+| Before the claim | 22h 12m - pod setup, cloning and retries |
+| Tool beats | 23 |
 | Longest silence | **17.3 min** — from 16:11:34, after `pending.py: reading the pending gate` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 need a human |
@@ -57,10 +58,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **14 min** | `#######` |
-| measure or build - a conversion, screen or compile writes no beacon | **31 min** | `###############` |
+| fix - diagnose and change the engine | **14 min** | `######` |
+| measure or build - a conversion, screen or compile writes no beacon | **31 min** | `##############` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **2 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

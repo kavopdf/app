@@ -351,3 +351,9 @@
 {"t": 1795087693.1271777, "ist": "16:58:13", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795087709.2312624, "ist": "16:58:29", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795087725.65768, "ist": "16:58:45", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795087817.0868168, "ist": "17:00:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795087817.101453, "ist": "17:00:17", "ev": "release", "d": "fixer released"}
+{"t": 1795087817.2097306, "ist": "17:00:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795087841.3635361, "ist": "17:00:41", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795087844.2163308, "ist": "17:00:44", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795087848.370613, "ist": "17:00:48", "ev": "beat", "d": "report.py: building the report"}
