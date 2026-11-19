@@ -248,8 +248,21 @@ def check(allow_engine_change, only=None):
     else:
         print("  docx: no document worse than baseline")
 
-    t_bad, t_err = txt_regressions() if need_txt else ([], "")
+    # SAME HOLE AS THE .docx SIDE, found by the same falsification. A .txt whose failed_ids went from
+    # '-' to 't13' was committed with no engine change and the gate answered PASS, because this read
+    # `txt_regressions() if need_txt else ([], "")` and need_txt was False.
+    #
+    # read_txt reads `failed_ids`, not the `failed` count - a falsification that changed only the count
+    # proved nothing, and that is worth writing down: a test that cannot fail is not a test.
+    t_bad, t_err = txt_regressions()
     if not need_txt:
+        if t_bad:
+            print("  txt : %d REGRESSION(S) in the table even though the engine did not change"
+                  % len(t_bad))
+            for d, b, c, why in t_bad[:10]:
+                print("    %-44s %s" % (d[:44], why))
+            print("             The engine is unchanged, so the numbers should be too.")
+            fail = 1
         print("  txt : not re-measured - the tree is the engine the table was measured on (%s)"
               % (st.get("txt") or "?"))
     elif t_err:
