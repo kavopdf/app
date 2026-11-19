@@ -10,8 +10,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 18:00 |
-| ended | still running |
-| how it ended | - |
+| ended | 18:43 |
+| how it ended | released |
 | plan | - |
 
 ## The picture, in the words of the run that left it

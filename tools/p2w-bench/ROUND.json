@@ -1,11 +1,9 @@
 {
   "baseline_started": 1794936722.77173,
   "classifier_started": 1794939194.3206565,
-  "fixer_doing": "deployed 2 agents on content-present-partly-displaced, working my own angle",
-  "fixer_doing_since": 1795092377.253618,
   "fixer_engine_at_claim": "4147d54",
   "fixer_last_beat": 1795092377.2536187,
-  "fixer_started": 1795093816.367168,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
