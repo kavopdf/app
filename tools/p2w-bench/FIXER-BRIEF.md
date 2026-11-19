@@ -699,3 +699,34 @@ fix.**
 
 **Do this one first.** It is the only class in the repository where the construct, the code and the
 failure signature are all already written down.
+
+---
+
+## TEN MINUTES FROM CLAIM TO A RECORDED ATTEMPT. NO EXCEPTIONS.
+
+Measured 19 Nov, three times in one evening: a run claims the slot, heartbeats
+`"claimed, reading the handoff"`, and then sits there. Twenty-one minutes later `status.py` calls it
+LIKELY DEAD, the slot is up for takeover, and the hour is gone with **zero attempts recorded**.
+
+Reading the handoff is not the work. It is five minutes of context at most, and the class to take is
+already named in `benchmarks/DEFECT-CLASSES-GOOGLE.md` - the top row, the one with the largest gap.
+
+**So: from the moment `--claim-fixer` succeeds, you have ten minutes to have recorded an attempt.**
+
+    round.py --claim-fixer
+    round.py --heartbeat --doing "reading the handoff"
+    archive.py
+    --- ten minutes from here ---
+    attempt.py <class>            <- a class is claimed and the attempt EXISTS
+    round.py --heartbeat --doing "measuring <class>"
+
+An attempt recorded and then abandoned is a **good** run: the next one reads `ATTEMPTS.json` and knows
+what was tried. A run that claims and records nothing is indistinguishable from one that never started,
+and the next run will claim the same slot and hang in the same place.
+
+**If ten minutes is not enough to understand the class, record the attempt anyway and write what you do
+not understand into `FINDINGS/`.** That is a real result. Silence is not.
+
+`status.py` will call an unannounced silence LIKELY DEAD at 20 minutes, and it is right to: the
+conversion loops and soffice renders the brief mentions are steps you **announce** with
+`--heartbeat --doing`, not a place to hide for half an hour.
