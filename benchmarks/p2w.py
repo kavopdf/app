@@ -1142,6 +1142,9 @@ def rank():
                         x['text_recall'],x['chars_missing'],x['worst_page'],x['pages_src'],
                         '' if x.get('colour_share') is None else '%.2f'%x['colour_share'],
                         x.get('coloured_px',0),
+                        '' if x.get('tone_share') is None else '%.2f'%x['tone_share'],
+                        '' if x.get('order_share') is None else '%.2f'%x['order_share'],
+                        '' if x.get('font_share') is None else '%.2f'%x['font_share'],
 ])
         # a document that failed to measure is an UNMEASURED row, never a silent gap
         for j,d in enumerate(errs.values(), len(r)+1):

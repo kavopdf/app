@@ -1,4 +1,5 @@
 # Defect classes - round 1
+Documents measured: **213 of 213**.
 
 Documents measured: **213 of 213**.
 
@@ -12,10 +13,10 @@ dominates it.
 | signature | problem | open | fixed |
 |---|---|---|---|
 | content-loss | content-missing-partly-replaced | 14 | 0 |
-| content-loss | content-missing-nothing-in-its-place | 6 | 16 |
+| content-loss | content-missing-nothing-in-its-place | 8 | 16 |
 | mixed | content-partly-lost | 10 | 0 |
 | mixed | content-partly-lost-and-displaced | 8 | 0 |
-| displacement | content-present-partly-displaced | 20 | 0 |
+| displacement | content-present-partly-displaced | 18 | 0 |
 | displacement | content-present-wholly-displaced | 13 | 0 |
 | clean | none | 0 | 125 |
 
@@ -121,12 +122,12 @@ only a work queue.
 | 82 | `bank-statement-horizontal-rules-only` | content-present-partly-displaced | 26.88 | 6.89 | 1 | OPEN | - |
 | 83 | `330_cad_drawing_sheet` | content-present-partly-displaced | 9.88 | 4.91 | 1 | OPEN | - |
 | 84 | `65_two_col_full_width_figure_caption` | content-present-partly-displaced | 32.74 | 4.91 | 1 | OPEN | - |
-| 85 | `406_passport_mrz_page` | content-present-partly-displaced | 6.27 | 3.45 | 1 | OPEN | - |
+| 85 | `406_passport_mrz_page` | content-missing-nothing-in-its-place | 6.27 | 3.45 | 1 | OPEN | - |
 | 86 | `price-list-2col-dense-right-aligned` | content-present-partly-displaced | 39.94 | 2.69 | 1 | OPEN | - |
 | 87 | `315_gazette_notification` | content-present-partly-displaced | 20.60 | 1.96 | 1 | OPEN | - |
 | 88 | `price-list-right-aligned-amounts` | content-present-partly-displaced | 31.53 | 1.79 | 1 | OPEN | - |
 | 89 | `27_two_column_left_short_txtpos` | content-present-partly-displaced | 19.61 | 1.62 | 1 | OPEN | - |
-| 90 | `392_statistical_console_output` | content-present-partly-displaced | 28.12 | 1.61 | 1 | OPEN | - |
+| 90 | `392_statistical_console_output` | content-missing-nothing-in-its-place | 28.12 | 1.61 | 1 | OPEN | - |
 | 91 | `70_magazine_drop_cap_photo_caption` | content-present-partly-displaced | 26.06 | 1.49 | 1 | OPEN | - |
 | 92 | `newsletter-3col-header-footer` | content-present-wholly-displaced | 8.08 | 3.13 | 1 | OPEN | reclassified from single-element-far-out: max_pt 77.28 -> 22.08 |
 | 93 | `34_monospace_document` | none | 0.93 | 4.8 | 1 | FIXED | no defect |
