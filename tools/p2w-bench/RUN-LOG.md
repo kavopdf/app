@@ -198,3 +198,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 19 Nov 23:53 | fixer | slot claimed - fixer running |
 | 19 Nov 23:56 | fixer | attempt content-present-partly-displaced -> error (0/18 moved) |
 | 20 Nov 00:24 | fixer | attempt content-present-partly-displaced -> kept (2/18 moved) |
+| 20 Nov 01:21 | fixer | slot FORCED released - see INCIDENTS.md for why |

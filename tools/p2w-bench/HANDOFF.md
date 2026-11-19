@@ -10,8 +10,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 23:53 |
-| ended | still running |
-| how it ended | - |
+| ended | 01:21 |
+| how it ended | forced |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -36,14 +36,14 @@ unfinished work, not as a result.
 | contB-03 | content-present-partly-displaced | B | 13 of the 18 documents are within 1 pt everywhere except a few rows th | 18:16 | expected 19:05 | landed |  |
 | contA-04 | content-present-partly-displaced | A | bank-statement-horizontal-rules-only: which code path decides row pitc | 22:31 | expected by 19:30 | landed | FINDINGS/content-present-partly-displaced-bankpitch-133100-d68d.md |
 | contB-04 | content-present-partly-displaced | B | blast radius of w:vMerge across the 18 documents in the class | 22:31 | expected by 19:30 | landed | FINDINGS/content-present-partly-displaced-vmergescope-133908-a7c4.md |
+| contA-05 | content-present-partly-displaced | A | can RuleCollector carry the PDF paint operator so a shading fill stops | 00:46 | 00:37 | running |  |
+| contB-05 | content-present-partly-displaced | B | what does check 65_table_span_down assert and why does 75_merged_heade | 00:46 | 00:41 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `15:28` attempt 2 on content-partly-lost-and-displaced -> kept (1/210 moved)
-- `16:12` attempt 3 on content-partly-lost-and-displaced -> kept (1/7 moved)
 - `17:00` attempt 18 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `19:07` attempt 7 on content-missing-nothing-in-its-place -> kept (22/29 moved)
 - `16:58` attempt 1 on content-partly-lost -> partial (5/10 moved)
@@ -67,6 +67,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `23:00` ATTEMPTS.json attempt 4 on content-present-partly-displaced is a RATCHET STAMP for attempt 2 (the 22:30 recordBaseline split-row fix, 13/18 moved, corpus ratcheted at d129d46), not a second fix - attempt.py has no way to stamp a ratchet without appending an attempt, so a later report.py will read '2 kept'. One fix was kept this round on this class.
 - `23:56` attempt 5 on content-present-partly-displaced -> error (0/18 moved)
 - `00:24` attempt 6 on content-present-partly-displaced -> kept (2/18 moved)
+- `00:46` agent deployed: content-present-partly-displaced / A - can RuleCollector carry the PDF paint operator so a shading fill stops acting as
+- `00:46` agent deployed: content-present-partly-displaced / B - what does check 65_table_span_down assert and why does 75_merged_header_cell_thr
 
 ## Where the rest of the state lives
 

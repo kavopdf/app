@@ -236,6 +236,14 @@
   {
    "at": "00:24",
    "text": "attempt 6 on content-present-partly-displaced -> kept (2/18 moved)"
+  },
+  {
+   "at": "00:46",
+   "text": "agent deployed: content-present-partly-displaced / A - can RuleCollector carry the PDF paint operator so a shading fill stops acting as"
+  },
+  {
+   "at": "00:46",
+   "text": "agent deployed: content-present-partly-displaced / B - what does check 65_table_span_down assert and why does 75_merged_header_cell_thr"
   }
  ],
  "next": "content-present-partly-displaced, 24 OPEN. Take 75_merged_header_cell_three_columns (27.31, the worst in the class): implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord:7950 already computes, and bucket each glyph by its own baseline band instead of the cell's top edge (7846) - the sibling finding says both are needed and that the band test alone moves Depot to the wrong row. Do not retry dropping fill-only rules from the Edge list (27.31 -> 46.58). Do not apply patches/rowgapok-run-pitch.patch on its old numbers.",
@@ -347,12 +355,34 @@
    "finding": "FINDINGS/content-present-partly-displaced-vmergescope-133908-a7c4.md",
    "deployed_at": "2026-11-19T17:01",
    "landed_at": "2026-11-19T17:05"
+  },
+  {
+   "id": "contA-05",
+   "class": "content-present-partly-displaced",
+   "angle": "A",
+   "question": "can RuleCollector carry the PDF paint operator so a shading fill stops acting as a cell separator, and what would it break",
+   "expected": "00:37",
+   "deployed": "00:46",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-19T19:16"
+  },
+  {
+   "id": "contB-05",
+   "class": "content-present-partly-displaced",
+   "angle": "B",
+   "question": "what does check 65_table_span_down assert and why does 75_merged_header_cell_three_columns still fail it with real w:vMerge",
+   "expected": "00:41",
+   "deployed": "00:46",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-19T19:16"
   }
  ],
  "run": {
   "started": "23:53",
-  "ended": null,
-  "ended_how": null
+  "ended": "01:21",
+  "ended_how": "forced"
  },
  "history": [
   {
@@ -428,6 +458,11 @@
   {
    "at": "23:00",
    "how": "released",
+   "plan": ""
+  },
+  {
+   "at": "01:21",
+   "how": "forced",
    "plan": ""
   }
  ],
