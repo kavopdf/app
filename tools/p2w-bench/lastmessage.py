@@ -225,13 +225,21 @@ def verify_facts(text, data):
 
     # ---- 1. THE HEADER'S CLOCK ------------------------------------------------------------
     head = "\n".join(text.splitlines()[:12])
-    m = re.search(r"slot\s+(\d{1,2}:\d{2})\s*(?:→|->|—)\s*(\d{1,2}:\d{2})\s*IST", head)
+    # A RUN THAT IS STILL GOING HAS NO END CLOCK, AND report.py SAYS SO.
+    #
+    # report.py writes "slot 18:00 → running IST · 41 min" while the slot is open, because
+    # RUN.json has no ended clock yet - that is the honest header, and it is the only one a
+    # live run can write. This check demanded a clock at both ends, so it REFUSED the report
+    # report.py had just produced, every time, and no run could commit a report while it was
+    # still working. The end is checked only when there is one to check; the start and the
+    # duration are checked either way, which is what the 19 Nov over-reporting was about.
+    m = re.search(r"slot\s+(\d{1,2}:\d{2})\s*(?:→|->|—)\s*(\d{1,2}:\d{2}|running)\s*IST", head)
     if not m:
         problems.append("header: no 'slot HH:MM -> HH:MM IST' window, so the timing cannot be checked")
     elif run.get("present"):
         if m.group(1) != (run.get("started") or ""):
             problems.append("header: start %s, report.py says %s" % (m.group(1), run.get("started")))
-        if m.group(2) != (run.get("ended") or ""):
+        if m.group(2) != "running" and m.group(2) != (run.get("ended") or ""):
             problems.append("header: end %s, report.py says %s" % (m.group(2), run.get("ended")))
     # the duration, wherever it appears in the first twelve lines
     mins = run.get("minutes")

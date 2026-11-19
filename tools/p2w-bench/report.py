@@ -341,6 +341,19 @@ def silences():
         rows.sort(key=lambda r: r.get("t", 0))
         if len(rows) < 2:
             return {"available": False}
+        # A REPORT IS NOT WORK, AND COUNTING IT MAKES THE COUNT UNSETTLED.
+        #
+        # report.py marks the timeline on entry like every other tool, so the beat it writes
+        # lands AFTER the count it just took. Every regeneration therefore sees one more beat
+        # than the last, and lastmessage.py - which re-runs report.py to check the message
+        # against it - compares a number that moved between the two calls. Measured 19 Nov: a
+        # report that report.py itself had just written was REFUSED for "Tool beats 35" against
+        # its own 36, and no report could be committed while the run was live. The beats that
+        # count are the run's work; the reader's own footsteps are not.
+        def _work(r):
+            d = str(r.get("d") or "")
+            return not (d.startswith("report.py") or d.startswith("lastmessage.py"))
+        beats = len([r for r in rows if _work(r)])
         gaps = []
         for k in range(len(rows) - 1):
             g = rows[k + 1].get("t", 0) - rows[k].get("t", 0)
@@ -348,7 +361,7 @@ def silences():
                 gaps.append({"min": round(g / 60.0, 1), "at": rows[k].get("ist", ""),
                              "doing": (rows[k].get("d") or "")[:70]})
         gaps.sort(key=lambda x: -x["min"])
-        return {"available": True, "beats": len(rows), "n": len(gaps),
+        return {"available": True, "beats": beats, "n": len(gaps),
                 "longest": gaps[0] if gaps else None}
     except Exception:
         return {"available": False}

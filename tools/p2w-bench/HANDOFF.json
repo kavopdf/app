@@ -176,6 +176,18 @@
   {
    "at": "18:40",
    "text": "attempt 1 on content-present-partly-displaced -> reverted (0/18 moved)"
+  },
+  {
+   "at": "18:41",
+   "text": "agent landed: content-present-partly-displaced / A -> tools/p2w-bench/FINDINGS/content-present-partly-displaced-mergedheader-130426-4bd9.md"
+  },
+  {
+   "at": "18:41",
+   "text": "agent landed: content-present-partly-displaced / B -> (no file)"
+  },
+  {
+   "at": "18:41",
+   "text": "Agent B was registered but never deployed: the first subagent ran inline for 19 minutes (a scheduled run has no one to answer later, so the platform ran it in the turn), which left no room for a second. Angle B is carried forward unanswered in the handoff context: the ~0.34 pt per positioned row accumulation on bank-statement-horizontal-rules-only."
   }
  ],
  "next": "Implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord already computes (PdfToWord:7950 writes it, nothing reads it). Screen 75_merged_header_cell_three_columns plus the 17 other content-present-partly-displaced documents. Do not retry dropping fill-only rules from the Edge list - measured 27.31 -> 46.58.",
@@ -247,9 +259,10 @@
    "question": "75_merged_header_cell_three_columns: the table body is 22 pt low and each data row's numbers are emitted one row above its depot name, while the source merges the Depot / Fleet held / Breakdowns cells vertically across the two header rows. Find the engine code that decides how many table rows the header occupies and which sub-row a cell's text is assigned to.",
    "expected": "expected 19:05",
    "deployed": "18:16",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-19T12:46"
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/content-present-partly-displaced-mergedheader-130426-4bd9.md",
+   "deployed_at": "2026-11-19T12:46",
+   "landed_at": "2026-11-19T13:11"
   },
   {
    "id": "contB-03",
@@ -258,9 +271,10 @@
    "question": "13 of the 18 documents are within 1 pt everywhere except a few rows that are 3-5 pt off, and the error grows down the page (bank-statement-horizontal-rules-only: +0.03 pt at y108, +5.77 pt at y421, source pitch exactly 18.4 pt). Decide from measurement whether this is a LibreOffice quantisation of the hairline w:line the writer emits, or an engine bug in the before/line split, and say which.",
    "expected": "expected 19:05",
    "deployed": "18:16",
-   "status": "running",
+   "status": "landed",
    "finding": "",
-   "deployed_at": "2026-11-19T12:46"
+   "deployed_at": "2026-11-19T12:46",
+   "landed_at": "2026-11-19T13:11"
   }
  ],
  "run": {
