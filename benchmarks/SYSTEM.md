@@ -67,7 +67,7 @@ pipeline produced nothing.
 ## Where the evidence lives
 
     benchmarks/RANKING.csv              the .docx scores, soffice render
-    benchmarks/RANKING-TXT.csv          the .txt scores
+    tools/p2w-bench/txt/RANKING-TXT.csv  the .txt scores
     benchmarks/gverify/                 the 42 checks through Google, one JSON per document
     benchmarks/gverify-lo/              the same 42 checks through LibreOffice
     benchmarks/GOOGLE-VS-LIBREOFFICE.md which checks each renderer fails, and by how much
