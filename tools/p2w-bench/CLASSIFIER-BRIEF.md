@@ -209,3 +209,19 @@ whole division of work and the settled decisions; read it once.
 **Nothing changes without a measurement before and after.** The engine is not rewritten. One construct,
 one measurement, one commit - kept only if nothing gets worse.
 
+
+---
+
+## BOTH FORMATS GET CLASSES
+
+The corpus has two halves and they fail differently. A class table built only from the `.docx` results
+tells the fixer nothing about the 47 documents whose `.txt` fails a check, and those documents stay
+failing for as long as the table ignores them.
+
+    python3 tools/p2w-bench/health.py                    # both halves, one view
+    python3 tools/p2w-bench/txt/RANKING-TXT.csv          # per-document .txt checks
+    python3 tools/p2w-bench/txt/DEFECT-CLASSES-TXT.md    # the .txt classes
+
+`DEFECT-CLASSES.md` carries the `.docx` classes; the `.txt` classes live beside it in
+`txt/DEFECT-CLASSES-TXT.md`. **Both are regenerated every run.** A run that updates one and not the
+other has classified half the corpus and reported it as the corpus.

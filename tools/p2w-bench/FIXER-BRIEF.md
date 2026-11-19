@@ -534,3 +534,31 @@ whole division of work and the settled decisions; read it once.
 **Nothing changes without a measurement before and after.** The engine is not rewritten. One construct,
 one measurement, one commit - kept only if nothing gets worse.
 
+
+---
+
+## THE OTHER HALF: the .txt must reach the same bar
+
+The user asked for **both** formats perfect across the whole corpus. `.docx` and `.txt` are measured by
+different instruments and keep separate stores, and a run that only ever takes the largest `.docx` class
+will leave the `.txt` exactly where it is for months.
+
+**Every run, before choosing what to work on:**
+
+    python3 tools/p2w-bench/health.py
+
+Read the `txt` row. It reports `N clean, M failing` and how long since the table changed. Then:
+
+    python3 tools/p2w-bench/restamp_txt.py --report      # failures by check
+    python3 tools/p2w-bench/txt/RANKING-TXT.csv          # per document
+
+**Alternate.** One run takes the largest `.docx` class; the next takes the largest `.txt` check. Not
+because the two are equal in size - they are not - but because a pipeline that fixes only the format
+with more failures is a pipeline that never finishes the other one.
+
+**The rule that does not bend:** a `.txt` change is verified with the `.txt` instrument and the `.txt`
+ratchet, never with the `.docx` tools. Line 244 above says the same thing for a reason - the two halves
+were once measured with one tool and it produced a month of numbers that meant nothing.
+
+**`verify_txt.py` and `verify_google.py` are the measurement, not the work.** Never edit either to make
+a result look better. If a check is wrong, that is a finding to write down, not a number to move.
