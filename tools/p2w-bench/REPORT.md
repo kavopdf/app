@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **13** — 2 attempt(s), 2 kept |
+| Documents improved this run | **13** — 1 attempt(s), 1 kept |
 | Documents improved, round total | 58 of 213 |
 | Corpus improvement vs 15 Nov | **+37.17%** — mean 6.15 → 3.86 |
 | Regressions | **none** |

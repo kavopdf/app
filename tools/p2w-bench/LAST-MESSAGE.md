@@ -45,7 +45,7 @@ killed w:vMerge as a way into this class.
 
 | | |
 |:--|:--|
-| Documents improved this run | **13** — 2 attempt(s), 2 kept |
+| Documents improved this run | **13** — 1 attempt(s), 1 kept |
 | Documents improved, round total | 58 of 213 |
 | Corpus improvement vs 15 Nov | **+37.17%** — mean 6.15 → 3.86 |
 | Regressions | **none** |
@@ -60,7 +60,6 @@ killed w:vMerge as a way into this class.
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 22:30 | **kept** | 13/18 | recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down th |
-| 22:32 | **kept** | 13/18 | recordBaseline(): a split row's second paragraph landed one hairline box low and the pitch solver measured every later row from there, so the drift accumulated (0.4554 pt per row). Whole corpus 213 me |
 
 ## The txt
 

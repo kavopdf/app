@@ -4,8 +4,8 @@
  "ended_ts": 1795107935.6073332,
  "ended": "22:35",
  "class": "content-present-partly-displaced",
- "attempts": 2,
- "kept": 2,
+ "attempts": 1,
+ "kept": 1,
  "docs_improved": 13,
  "agents": [
   "contA-04",
