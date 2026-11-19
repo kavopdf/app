@@ -21,6 +21,12 @@ Exit 1 means a previous run still holds the slot - it printed how long. Output e
     cp benchmarks/p2w.py benchmarks/gate.py /scratch/work/
     python3 /scratch/work/p2w.py --validate
 
+**USE p2w.py, NOT gate.py, TO START FROM NOTHING - THIS COST A DAY.** gate.py measures whatever is
+already at /scratch/work/p2w/corpus, and a cron sandbox is fresh, so that directory never exists and
+every run reported "measured 0 of 213". It was honest about it and it was still a wasted day. p2w.py
+downloads the four corpus zips from the corpus-v1 release, converts every PDF, then measures. Only
+p2w.py can start from an empty pod.
+
 If this does not print GATE PASS, output exactly `ground-truth gate failed - not measuring` and
 STOP. A number produced by an instrument that cannot read a known value is not a measurement.
 
