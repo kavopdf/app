@@ -2829,6 +2829,12 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     s_rules = _doc_rules(src, isolated=True)
     g_segs = _doc_rules(gd, isolated=False, thin=RULE_THIN_REN, band=RULE_BAND_REN)
     _, s_lost = _rules_lost(s_rules, g_segs)
+    # THE SECOND FIELD IS "LOST", NOT "RENDERED". It read (source, render, ok) to anyone looking at
+    # the JSON, so "source=2 render=2" looked like a document whose rules were intact and was in
+    # fact a document that had lost both of them - 11 of the first 31 Google-measured documents show
+    # exactly that pair. The count is negated so the field means what its name says: rules the render
+    # is missing. The verdict is unchanged.
+    c["32_stroke_lines"] = (len(s_rules), len(s_lost), not s_lost)
     c["32_stroke_lines"] = (len(s_rules), len(s_lost), not s_lost)
 
     # ---- 33 RETIRED 13 Nov: it was 46 with a 2 pt inset ---------------------
