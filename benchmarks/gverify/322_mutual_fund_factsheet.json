@@ -1,0 +1,19 @@
+{
+ "name": "322_mutual_fund_factsheet",
+ "status": "ok",
+ "rc": 1,
+ "passed": 37,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "05_chars_extra",
+  "13_text_colours",
+  "17_matched_runs",
+  "18_displacement",
+  "25_invisible_text",
+  "26_text_overlap",
+  "44_header_footer",
+  "45_char_accuracy",
+  "60_text_column_right_edge"
+ ]
+}

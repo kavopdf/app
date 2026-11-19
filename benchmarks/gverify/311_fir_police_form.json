@@ -1,0 +1,14 @@
+{
+ "name": "311_fir_police_form",
+ "status": "ok",
+ "rc": 1,
+ "passed": 42,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "18_displacement",
+  "32_stroke_lines",
+  "45_char_accuracy",
+  "60_text_column_right_edge"
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "name": "318_court_summons_form",
+ "status": "ok",
+ "rc": 1,
+ "passed": 38,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "13_text_colours",
+  "17_matched_runs",
+  "18_displacement",
+  "43_within_10pt_x",
+  "45_char_accuracy",
+  "47_margins",
+  "59_shape_anchor",
+  "60_text_column_right_edge"
+ ]
+}

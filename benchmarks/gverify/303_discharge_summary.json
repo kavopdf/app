@@ -1,0 +1,12 @@
+{
+ "name": "303_discharge_summary",
+ "status": "ok",
+ "rc": 1,
+ "passed": 44,
+ "total": 47,
+ "failed": [
+  "05_chars_extra",
+  "18_displacement",
+  "25_invisible_text"
+ ]
+}

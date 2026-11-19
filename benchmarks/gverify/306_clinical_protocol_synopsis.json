@@ -1,0 +1,12 @@
+{
+ "name": "306_clinical_protocol_synopsis",
+ "status": "ok",
+ "rc": 1,
+ "passed": 44,
+ "total": 47,
+ "failed": [
+  "18_displacement",
+  "25_invisible_text",
+  "59_shape_anchor"
+ ]
+}

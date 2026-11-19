@@ -1,0 +1,13 @@
+{
+ "name": "324_loan_amortisation_schedule",
+ "status": "ok",
+ "rc": 1,
+ "passed": 43,
+ "total": 47,
+ "failed": [
+  "18_displacement",
+  "25_invisible_text",
+  "27_text_off_page",
+  "59_shape_anchor"
+ ]
+}
