@@ -654,6 +654,25 @@ def main(argv):
     h = _json(HANDOFF, {})
     working = tr.get("class") if tr.get("present") else "-"
 
+    # WHICH CRON IS THIS REPORT FOR, AND THEREFORE WHICH SECTIONS BELONG IN IT.
+    #
+    # Only the fixer had a generator; the baseline, the classifier and the APK each wrote their own
+    # message by hand, so every number in them was typed and nothing checked it. They all read the
+    # same files report.py already reads, so they can all be generated - and a generated report has
+    # no number in it that a run can get wrong.
+    cron = "fixer"
+    if "--for" in argv:
+        i = argv.index("--for") + 1
+        if i < len(argv):
+            cron = argv[i].strip().lower()
+    KEEP = {
+        "baseline":   ("Progress", "The txt", "Timing", "Where the time went"),
+        "classifier": ("Progress", "Timing", "Where the time went"),
+        "fixer":      None,          # every section
+        "apk":        ("Progress", "Timing"),
+    }
+    keep = KEEP.get(cron, None)
+
     if "--json" in argv:
         # EVERY SECTION THE MARKDOWN CARRIES IS IN THE JSON, so a checker can compare the two.
         # txt and subagents were computed and printed in the document and absent here, which meant
@@ -680,7 +699,10 @@ def main(argv):
         return "%dh %02dm" % (m // 60, m % 60) if m and m >= 60 else ("%d min" % (m or 0))
 
     L = []
-    L.append("# P2W Fixer — Run Report")
+    # THE TITLE NAMES THE CRON THAT WROTE IT. Four crons read these files; a baseline report headed
+    # "P2W Fixer" is wrong in its first line, and the first line is the one a reader trusts.
+    L.append("# P2W %s - Run Report" % {"baseline": "Baseline", "classifier": "Classifier",
+                                        "fixer": "Fixer", "apk": "APK"}.get(cron, cron.title()))
     L.append("")
     if tr.get("present"):
         # SLOT WINDOW, NOT THE SESSION. RUN.json's started/ended are written when the slot is
@@ -887,6 +909,17 @@ def main(argv):
     L.append("*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, "
              "BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. "
              "Never remembered, never estimated.*")
+    if keep is not None:
+        out, on = [], False
+        for line in L:
+            if line.startswith("## "):
+                on = line[3:].strip() in keep
+            if on or not line.startswith("## "):
+                if on or line.startswith("# ") or line.strip() == "" or line.startswith("**"):
+                    out.append(line)
+        # keep the title and the header, drop everything the cron does not need
+        L = [x for x in out if x.startswith("# ") or x.startswith("**") or x.startswith("## ")
+             or not x.strip() or True]
     print("\n".join(L))
     return 0
 
@@ -960,6 +993,10 @@ if __name__ == "__main__":
     # parses this output is the thing that keeps the report honest, so it must not need a workaround.
     _p = None if "--json" in sys.argv else _persist(_text)
     if _p:
-        sys.stdout.write("\n  written to %s - commit it, so the report survives the run\n"
+        # STDERR, NOT STDOUT. This line is a notice to the run, not part of the report - and on
+        # stdout it became a line of the report: lastmessage.py read it back as a Timing row and
+        # refused a message for not containing "written to tools/p2w-bench/REPORT.md". stdout is
+        # the document; anything else goes where logs go.
+        sys.stderr.write("\n  written to %s - commit it, so the report survives the run\n"
                          % os.path.relpath(_p, os.path.dirname(os.path.dirname(HERE))))
     sys.exit(rc)

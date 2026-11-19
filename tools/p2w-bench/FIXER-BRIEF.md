@@ -462,3 +462,13 @@ watchdog resumes the crons when it returns.
     Never commit a dead file from the previous pipeline.
     Never estimate a number.
     Never claim a fix you did not measure.
+
+---
+
+## YOUR REPORT COMES FROM report.py, NOT FROM YOU
+
+    python3 tools/p2w-bench/report.py --for fixer > /tmp/report.md
+    python3 tools/p2w-bench/lastmessage.py --for fixer --file /tmp/report.md
+
+Send what `/tmp/report.md` holds, plus at most a short prose paragraph for what the tables cannot
+show. Never type a number: `lastmessage.py` refuses one that does not match `report.py`.

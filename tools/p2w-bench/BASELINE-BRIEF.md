@@ -224,3 +224,29 @@ Name the documents with `docnames.py`, never by hand and never as a range:
 
 **Never a range.** "documents 40-58" is a claim nobody can check and it goes stale the moment the
 corpus changes; the list of names is checkable for ever.
+
+---
+
+## YOUR REPORT COMES FROM report.py, NOT FROM YOU
+
+**Never type a number. Generate the report and send it.**
+
+    python3 tools/p2w-bench/report.py --for baseline > /tmp/report.md
+    python3 tools/p2w-bench/lastmessage.py --for baseline --file /tmp/report.md
+
+Then send exactly what `/tmp/report.md` now holds, plus at most a short prose paragraph saying what
+this run concluded that the tables cannot show. `lastmessage.py` refuses a message whose numbers do
+not match `report.py`, and it prints every one that is wrong - exit 3.
+
+**Why this is not optional.** Four reports in a row carried numbers that were not true, and each one
+cost a manual audit to find: a header clock that said 1h 07m for a 48-minute run; "of 212" for a
+213-document corpus; a `.txt` section that was never written; an agent window with nothing behind
+it; "29 files in 7 commits" where there were 25 in 8. Every one was a number somebody typed. The
+generator cannot type a wrong number because it does not type at all.
+
+**What is checked:** every Progress row; the header's `slot HH:MM -> HH:MM IST` and its duration
+against RUN.json; any number in the corpus range against 213 / 212; the `.txt` clean and failing
+counts; every deployed agent's `deployed_at`, `landed_at` and `minutes`; and every line carrying a
+digit in report.py's own `The txt` and `Timing` tables, which must appear in your message unchanged.
+
+If it refuses, do not reword the sentence - copy the number from `report.py --json`.

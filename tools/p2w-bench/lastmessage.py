@@ -125,7 +125,7 @@ def verify(text):
 def _report_md():
     """report.py's own markdown, or None."""
     try:
-        r = subprocess.run([sys.executable, os.path.join(HERE, "report.py")],
+        r = subprocess.run([sys.executable, os.path.join(HERE, "report.py")] + _for_args(),
                            capture_output=True, text=True, timeout=120, cwd=os.path.dirname(HERE))
         return r.stdout if r.returncode == 0 else None
     except Exception:
@@ -173,11 +173,19 @@ def verify_sections(text):
     return problems
 
 
+def _for_args():
+    """The `--for <cron>` pair this invocation was given, or nothing."""
+    for i, a in enumerate(sys.argv):
+        if a == "--for" and i + 1 < len(sys.argv):
+            return ["--for", sys.argv[i + 1]]
+    return []
+
+
 def _report_json():
     """report.py's own numbers, as a dict. None when it cannot be read."""
     import json
     try:
-        r = subprocess.run([sys.executable, os.path.join(HERE, "report.py"), "--json"],
+        r = subprocess.run([sys.executable, os.path.join(HERE, "report.py"), "--json"] + _for_args(),
                            capture_output=True, text=True, timeout=120, cwd=os.path.dirname(HERE))
         if r.returncode != 0 or not r.stdout.strip():
             return None
@@ -252,7 +260,15 @@ def verify_facts(text, data):
                 break
 
     # ---- 3. THE .TXT ----------------------------------------------------------------------
-    if tx.get("available"):
+    # ONLY IF THIS CRON'S REPORT IS SUPPOSED TO CARRY IT. The classifier and the APK report do not
+    # have a .txt section - report.py's --for does not give them one - so demanding the counts there
+    # would refuse every classifier report for a section it was never meant to have.
+    cron = "fixer"
+    for i, a in enumerate(sys.argv):
+        if a == "--for" and i + 1 < len(sys.argv):
+            cron = sys.argv[i + 1].strip().lower()
+    wants_txt = cron in ("fixer", "baseline")
+    if tx.get("available") and wants_txt:
         scored, clean, failing = tx.get("scored"), tx.get("clean"), tx.get("failing")
         if not re.search(r"\.txt|\btxt\b", text, re.I):
             problems.append("txt: the .txt is not mentioned at all (%d scored, %d clean, %d failing)"
