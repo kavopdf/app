@@ -265,7 +265,13 @@ def check(allow_engine_change, only=None):
     elif d_bad:
         print("  docx: %d REGRESSION(S)" % len(d_bad))
         for d, b, c, why in d_bad[:10]:
-            print("    %-44s %.2f -> %s   %s" % (d[:44], b, "-" if c is None else "%.2f" % c, why))
+            # b is None when the document is in the previous table but not in the 15 Nov
+            # baseline - a document added since. The printer used to crash on it
+            # ("must be real number, not NoneType") instead of naming the row, so a gate that
+            # had found a regression reported a traceback and no reason.
+            print("    %-44s %s -> %s   %s" % (d[:44],
+                  "-" if b is None else "%.2f" % b,
+                  "-" if c is None else "%.2f" % c, why))
         fail = 1
     else:
         print("  docx: no document worse than baseline")

@@ -42,6 +42,11 @@ METHOD_FORMAT = {
     "PdfToWord.convert": "both",        # builds the model both writers read
     "ReadingOrder.apply": "both",       # decides block order once, for both
     "ReadingOrder.order": "both",
+    # recordBaseline only writes DocxWriter's own flow bookkeeping (lastBaseline, lastLinePt,
+    # lastSize, contY on the docx Ctx) - the .txt is written by TxtWriter from the model, and
+    # reads none of it. It is "docx" because the method cannot reach the other writer, and
+    # `--prove` is what says so: it converts all 213 documents both ways and compares bytes.
+    "DocxWriter.recordBaseline": "docx",
 }
 
 # A file whose every line can move both formats. A change to a class FIELD is a model change even

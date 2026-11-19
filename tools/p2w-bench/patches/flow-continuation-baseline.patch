@@ -1,8 +1,25 @@
 diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
-index 3dc3b21..b519551 100644
+index 3dc3b21..44268e7 100644
 --- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
 +++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
-@@ -3443,11 +3443,9 @@ public final class DocxWriter {
+@@ -755,6 +755,16 @@ public final class DocxWriter {
+         float lastBaseline = -1f;
+         /** Size of that line's text, so its line box can be measured. */
+         float lastSize = 0f;
++        /**
++         * The y of the line the flow is currently continuing, in PDF points, or -1 when the last
++         * paragraph started a line of its own. A row the page drew as one baseline can be emitted
++         * as several paragraphs; every one after the first has the SAME y as the row, and that
++         * exactness is what tells it apart from a second column whose line merely happens to be
++         * close. Measured on 67_two_col_with_sidebar: a 0.85 pt difference between a body line and
++         * a sidebar label is two columns, not one row, and treating it as a continuation moved
++         * every body line after it (0.80 -> 7.82).
++         */
++        float contY = -1f;
+         /**
+          * The height of the line box just emitted, which decides where the next baseline falls:
+          * the previous box's lower 0.2 em of slack is part of the advance. 0 after a table, whose
+@@ -3443,11 +3453,9 @@ public final class DocxWriter {
          // The box the pitch solver compares next time is the page's own, not the squeezed one:
          // the page's baselines are what they are, and a squeezed box that fed back into the
          // solver would chase its own scaling down the page.
@@ -15,7 +32,7 @@ index 3dc3b21..b519551 100644
          ctx.newPage = false;
          // Re-sync the running position to what was written, not to what was intended. A page
          // break inside the block above starts a new sheet, so the top is the paper's top again.
-@@ -4101,6 +4099,46 @@ public final class DocxWriter {
+@@ -4101,6 +4109,48 @@ public final class DocxWriter {
       * The vertical gap is kept so a form's label/value rows still sit apart, but it is clamped:
       * a PDF that leaves 300 pt of white space must not push a line onto the next page.
       */
@@ -40,13 +57,15 @@ index 3dc3b21..b519551 100644
 +     * paragraph, which is the layout's job and not the flow's.
 +     */
 +    private static void recordBaseline(Ctx ctx, float y, float linePt, float size) {
-+        // The tolerance is a quarter of the SMALLER of the two boxes. Taking it from this one
-+        // alone let a 34 pt drop cap swallow the 9.2 pt line 7.7 pt above it: on
-+        // 70_magazine_drop_cap_photo_caption that one false continuation pushed the page 3.4 pt
-+        // down (1.49 -> 4.28). A split row's halves are the same size, so the smaller is the
-+        // honest measure of how far apart two boxes on one baseline can be.
-+        float tol = Math.max(0.5f, 0.25f * Math.min(size, ctx.lastSize > 0f ? ctx.lastSize : size));
-+        boolean continuation = ctx.lastBaseline >= 0f && Math.abs(y - ctx.lastBaseline) <= tol;
++        // A continuation is a paragraph on the SAME baseline as the line already open - the
++        // page's own row, emitted in halves. The test is exactness (0.2 pt, which is rounding),
++        // not a fraction of the em: a quarter-em tolerance let a 34 pt drop cap swallow the
++        // 9.2 pt line 7.7 pt above it (70_magazine_drop_cap_photo_caption, 1.49 -> 4.28) and let
++        // a sidebar label 0.85 pt off a body line count as that line's continuation
++        // (67_two_col_with_sidebar, 0.80 -> 7.82). Both are two things on a page, not one row.
++        float ref = ctx.contY >= 0f ? ctx.contY : ctx.lastBaseline;
++        boolean continuation = ctx.lastBaseline >= 0f && Math.abs(y - ref) <= 0.2f;
++        ctx.contY = continuation ? ref : -1f;
 +        // The base is the baseline the flow is ALREADY at, not this paragraph's y: a row split
 +        // into three boxes is two continuations, and measuring the second from the page's shared
 +        // y instead of from where the first one landed counts one of the two and leaves the other
@@ -62,7 +81,7 @@ index 3dc3b21..b519551 100644
      private static void flowFromBox(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b, Ctx ctx) {
          String text = b.text();
          if (text.trim().isEmpty()) return;
-@@ -4320,9 +4358,7 @@ public final class DocxWriter {
+@@ -4320,9 +4370,7 @@ public final class DocxWriter {
              if (err >= ZERO_GAP_FLOOR_PT) ctx.zeroGapNoRoom++;
          }
          // The box the pitch solver compares next time is the page's own, not the squeezed one.

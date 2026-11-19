@@ -756,6 +756,16 @@ public final class DocxWriter {
         /** Size of that line's text, so its line box can be measured. */
         float lastSize = 0f;
         /**
+         * The y of the line the flow is currently continuing, in PDF points, or -1 when the last
+         * paragraph started a line of its own. A row the page drew as one baseline can be emitted
+         * as several paragraphs; every one after the first has the SAME y as the row, and that
+         * exactness is what tells it apart from a second column whose line merely happens to be
+         * close. Measured on 67_two_col_with_sidebar: a 0.85 pt difference between a body line and
+         * a sidebar label is two columns, not one row, and treating it as a continuation moved
+         * every body line after it (0.80 -> 7.82).
+         */
+        float contY = -1f;
+        /**
          * The height of the line box just emitted, which decides where the next baseline falls:
          * the previous box's lower 0.2 em of slack is part of the advance. 0 after a table, whose
          * bottom edge is a box edge and not a baseline.
@@ -3443,11 +3453,9 @@ public final class DocxWriter {
         // The box the pitch solver compares next time is the page's own, not the squeezed one:
         // the page's baselines are what they are, and a squeezed box that fed back into the
         // solver would chase its own scaling down the page.
-        ctx.lastLinePt = linePt;
+        recordBaseline(ctx, first.y, linePt, size);
 
         ctx.flowCount++;
-        ctx.lastBaseline = first.y;
-        ctx.lastSize = size;
         ctx.newPage = false;
         // Re-sync the running position to what was written, not to what was intended. A page
         // break inside the block above starts a new sheet, so the top is the paper's top again.
@@ -4101,6 +4109,48 @@ public final class DocxWriter {
      * The vertical gap is kept so a form's label/value rows still sit apart, but it is clamped:
      * a PDF that leaves 300 pt of white space must not push a line onto the next page.
      */
+    /**
+     * Records where the flow's last baseline REALLY is, which is not always where the page put
+     * it.
+     *
+     * <p>A row the page drew as ONE baseline can be emitted as TWO paragraphs - the left columns,
+     * then the amount columns - and the second box is placed by the flow, which has already spent
+     * the first box: its baseline lands {@code (1 - LINE_BASE) * prevLinePt + LINE_BASE * linePt}
+     * BELOW the shared baseline, and nothing took that back. On
+     * {@code bank-statement-horizontal-rules-only} it is 0.4554 pt on every split row of twelve,
+     * unbounded: dates 132.0 pt at the top of the page and 431.8 pt by the bottom, a mean pitch of
+     * 18.7375 pt against the page's own 18.4 pt, +5.847 pt of accumulated drift - and the pitch
+     * solver, reading {@code lastBaseline} as the page's y, then measured every following row from
+     * a place the reader was never at.
+     *
+     * <p>So the continuation records the baseline it ACTUALLY landed on. The next row's pitch is
+     * then relative to the page's next baseline again and the drift stops at the one row instead
+     * of accumulating down the page. The continuation's own half-line is the residue: it is one
+     * hairline box, 0.46 pt at 6.6 pt type, and removing it entirely needs the two halves in one
+     * paragraph, which is the layout's job and not the flow's.
+     */
+    private static void recordBaseline(Ctx ctx, float y, float linePt, float size) {
+        // A continuation is a paragraph on the SAME baseline as the line already open - the
+        // page's own row, emitted in halves. The test is exactness (0.2 pt, which is rounding),
+        // not a fraction of the em: a quarter-em tolerance let a 34 pt drop cap swallow the
+        // 9.2 pt line 7.7 pt above it (70_magazine_drop_cap_photo_caption, 1.49 -> 4.28) and let
+        // a sidebar label 0.85 pt off a body line count as that line's continuation
+        // (67_two_col_with_sidebar, 0.80 -> 7.82). Both are two things on a page, not one row.
+        float ref = ctx.contY >= 0f ? ctx.contY : ctx.lastBaseline;
+        boolean continuation = ctx.lastBaseline >= 0f && Math.abs(y - ref) <= 0.2f;
+        ctx.contY = continuation ? ref : -1f;
+        // The base is the baseline the flow is ALREADY at, not this paragraph's y: a row split
+        // into three boxes is two continuations, and measuring the second from the page's shared
+        // y instead of from where the first one landed counts one of the two and leaves the other
+        // in the drift. Measured on table-of-contents-dot-leaders: 0.65 pt of the 1.3 pt survived
+        // and every entry was still 0.6 pt low.
+        ctx.lastBaseline = continuation
+                ? ctx.lastBaseline + (1f - LINE_BASE) * ctx.lastLinePt + LINE_BASE * linePt
+                : y;
+        ctx.lastLinePt = linePt;
+        ctx.lastSize = size;
+    }
+
     private static void flowFromBox(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b, Ctx ctx) {
         String text = b.text();
         if (text.trim().isEmpty()) return;
@@ -4320,9 +4370,7 @@ public final class DocxWriter {
             if (err >= ZERO_GAP_FLOOR_PT) ctx.zeroGapNoRoom++;
         }
         // The box the pitch solver compares next time is the page's own, not the squeezed one.
-        ctx.lastLinePt = linePt;
-        ctx.lastBaseline = b.y;
-        ctx.lastSize = b.size;
+        recordBaseline(ctx, b.y, linePt, b.size);
         ctx.newPage = false;
         // Re-sync to what was written, so the next paragraph is measured from the reader's
         // position rather than from the PDF's (D-26) - and to the position this paragraph was
