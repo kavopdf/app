@@ -73,3 +73,46 @@ one honest blocker.
 
 One block: which stages are done, moving, stopped, with the numbers from `health.py` and nothing typed
 by hand. If nothing is stopped, one line saying so.
+
+---
+
+## THE STUCK-CRON FIX: pause then resume
+
+Verified 19 Nov. A fixer run started 18:52, hung with no beacon, and the platform still called it
+running - so `next_fire_at` stayed at 18:50, in the past, and the cron never fired again. Three hours
+of the only cron allowed to change the engine, gone, with nothing to show.
+
+**A run cannot be cancelled through the `cron` tool. It can be cleared:**
+
+    cron(action="pause",  cron_id="<id>")
+    cron(action="resume", cron_id="<id>")
+
+The resume recomputes the next fire. On the fixer that took `next_fire_at` from 18:50 in the past to
+22:50, and the pipeline moved again.
+
+**This is the watchdog's one real power and it should use it whenever `health.py --stalled` names the
+fix stage and the slot is free but the cron is not firing.** Do it once per stalled stage per run, then
+check `cron(action="runs")` - if the old run is still listed `running`, say so and stop. Repeated
+pause/resume on a run that will not die is noise, not a fix.
+
+### The cron ids, so a watchdog does not have to look them up
+
+    baseline    01M7N3RTAM7SATT9TXMQPP7QRM     hourly :00
+    classifier  01M733RFR3D71C2E0T2TQ9PW0R     hourly :40
+    fixer       01M7MT22NTGYACMGSETJ8R8NZY     hourly :50   <- the one that matters
+    apk         01M72XD9FD9MDM35X4Z7TQ6RRW     daily 22:00
+    gverify     01M7T6STKQJ2KPZAYFMCZVCG85     hourly :20
+    watchdog    01M7T903P1BTMEEG8SJ9SA47MQ     every 3 h
+
+**Never pause a cron and leave it paused.** Pause and resume in the same run, or do not pause at all.
+A paused cron is silent and nothing else in the system reports that it is paused.
+
+## What the watchdog should check that health.py cannot
+
+`health.py` reads files. It cannot see the cron platform. Two things it will never catch:
+
+1. **A cron that is enabled but not firing** - `next_fire_at` in the past while the stage is stopped.
+   Read it with `cron(action="list")`.
+2. **A cron that is paused** - `status` reads `paused`. Nothing else in the repo knows.
+
+Check both, every run. A paused cron is the quietest way for this pipeline to die.
