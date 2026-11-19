@@ -1,12 +1,3 @@
-# Trace - what the tools were actually asked to do
-
-Written by the tools themselves, not by the run. A run that dies mid-way leaves its
-path here, which is the one thing the run's own report cannot do. Commit it with the
-claim and after each step; it is not code and cannot break anything.
-
-| time | run | tool | what happened |
-|---|---|---|---|
-| 12 Nov 18:52 | fixer | ratchet | held or rose |
 | 12 Nov 18:52 | fixer | ratchet --txt | held or rose |
 | 12 Nov 18:52 | fixer | hypothesis | 20_within_10pt (+4) -> confirmed |
 | 12 Nov 18:52 | fixer | hypothesis | 20_within_10pt (+4) -> ruled-out |
@@ -406,3 +397,4 @@ claim and after each step; it is not code and cannot break anything.
 | 18 Nov 18:25 | fixer | build-engine | engine built in 35s |
 | 18 Nov 18:30 | fixer | ratchet | UNMEASURED 211 of 211 not compared; DRIFT 211 rows/0 marks |
 | 18 Nov 19:07 | fixer | attempt | content-missing-nothing-in-its-place -> kept (22/29 moved) |
+| 19 Nov 16:11 | fixer | claim | fixer claimed the slot |

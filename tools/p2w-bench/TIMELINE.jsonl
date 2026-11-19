@@ -331,3 +331,10 @@
 {"t": 1795009100.037143, "ist": "19:08:20", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795009110.2557535, "ist": "19:08:30", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795009115.1076975, "ist": "19:08:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795084884.4721684, "ist": "16:11:24", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795084884.5754282, "ist": "16:11:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795084891.7297766, "ist": "16:11:31", "ev": "beat", "d": "claimed, reading the handoff"}
+{"t": 1795084891.9035625, "ist": "16:11:31", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1795084892.081021, "ist": "16:11:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795084894.7354074, "ist": "16:11:34", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795084894.8509448, "ist": "16:11:34", "ev": "beat", "d": "pending.py: reading the pending gate"}

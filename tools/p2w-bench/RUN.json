@@ -1,19 +1,13 @@
 {
- "started_ts": 1795005009.5919158,
- "started": "18:00",
- "ended_ts": 1795009095.8944643,
- "ended": "19:08",
- "class": "content-missing-nothing-in-its-place",
- "attempts": 1,
- "kept": 1,
- "docs_improved": 22,
+ "started_ts": 1795084884.5887563,
+ "started": "16:11",
+ "ended_ts": null,
+ "ended": null,
+ "class": "",
+ "attempts": 0,
+ "kept": 0,
+ "docs_improved": 0,
  "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0,
- "counted": [
-  [
-   "content-missing-nothing-in-its-place",
-   22
-  ]
- ]
+ "needs_human": 0
 }
