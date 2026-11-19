@@ -1,4 +1,3 @@
-row measured ten documents each and committed nothing, and there was no way to tell
 whether they died in the conversion, in Drive, in the record step or in the commit
 itself. The cron keeps no output of its own, so this file is the only witness.
 
@@ -198,3 +197,4 @@ A stage with no line is a stage that was never reached. That is the answer.
 | 19 Nov 22:30 | fixer | attempt content-present-partly-displaced -> kept (13/18 moved) |
 | 19 Nov 22:32 | fixer | attempt content-present-partly-displaced -> kept (13/18 moved) |
 | 19 Nov 22:59 | fixer | attempt content-present-partly-displaced -> reverted (0/24 moved) |
+| 19 Nov 23:00 | fixer | attempt content-present-partly-displaced -> kept (13/18 moved) |

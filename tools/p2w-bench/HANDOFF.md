@@ -42,8 +42,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:50` agent landed: contB-02 /  -> FINDINGS/content-missing-nothing-in-its-place-B-103610-346a.md
-- `11:55` attempt 6 on content-missing-nothing-in-its-place -> reverted (0/30 moved)
 - `13:44` attempt 1 on single-element-far-out -> partial (1/1 moved)
 - `14:51` attempt 1 on content-partly-lost-and-displaced -> partial (1/7 moved)
 - `15:28` attempt 2 on content-partly-lost-and-displaced -> kept (1/210 moved)
@@ -67,6 +65,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `22:35` agent landed: contA-04 /  -> FINDINGS/content-present-partly-displaced-bankpitch-133100-d68d.md
 - `22:35` agent landed: contB-04 /  -> FINDINGS/content-present-partly-displaced-vmergescope-133908-a7c4.md
 - `22:59` attempt 3 on content-present-partly-displaced -> reverted (0/24 moved)
+- `23:00` attempt 4 on content-present-partly-displaced -> kept (13/18 moved)
+- `23:00` ATTEMPTS.json attempt 4 on content-present-partly-displaced is a RATCHET STAMP for attempt 2 (the 22:30 recordBaseline split-row fix, 13/18 moved, corpus ratcheted at d129d46), not a second fix - attempt.py has no way to stamp a ratchet without appending an attempt, so a later report.py will read '2 kept'. One fix was kept this round on this class.
 
 ## Where the rest of the state lives
 
