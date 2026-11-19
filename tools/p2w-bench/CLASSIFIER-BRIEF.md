@@ -237,3 +237,19 @@ Two state machines exist and they answer different questions:
 says `measure-google` but your claim succeeds, work - the measurement is another cron's job and is not
 your blocker. Never stop because `stage.py` disagrees with your claim; only your claim decides.
 
+
+### IF YOUR `git pull` FAILS WITH "please commit or stash them"
+
+A previous run died and left the live state files modified. That is not your work and not a permission
+problem. Run this, then pull again:
+
+    git checkout -- tools/p2w-bench/
+    git pull --rebase origin main
+
+It discards only uncommitted state. It never touches committed work, never touches `app/`, and never
+touches the tools or briefs. **Never use `git reset --hard`** - it wipes everything, and it destroyed
+seventeen files once.
+
+The state files are HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-HISTORY.json,
+RUN-LOG.md, RUN.json, TIMELINE.jsonl and TRACE.md. The last **committed** copy is the real handoff.
+
