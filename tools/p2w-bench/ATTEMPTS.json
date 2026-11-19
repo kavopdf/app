@@ -239,7 +239,7 @@
   "status": "OPEN"
  },
  "content-present-partly-displaced": {
-  "attempts": 8,
+  "attempts": 9,
   "first_seen": null,
   "history": [
    {
@@ -297,11 +297,18 @@
     "outcome": "kept",
     "reason": "recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one (the 'break' at PdfToWord:8666). 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_",
     "total": 23
+   },
+   {
+    "at": "2026-11-20 04:03",
+    "moved": 0,
+    "outcome": "error",
+    "reason": "no fix was built or measured, on purpose: the pBdr rule change cannot work until a rule is written before the text below it. PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs (",
+    "total": 23
    }
   ],
   "last": null,
-  "last_engine": "6bff144+21614d387a",
-  "last_moved": 1,
+  "last_engine": "4e61dfd",
+  "last_moved": 0,
   "last_total": 23,
   "outcomes": [
    "reverted",
@@ -311,11 +318,12 @@
    "error",
    "kept",
    "kept",
-   "kept"
+   "kept",
+   "error"
   ],
   "ratchet_at": "20 Nov 03:40",
   "ratchet_docs": 213,
-  "reason": "recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one (the 'break' at PdfToWord:8666). 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 100.0. Corpus ratchet: 212/212 measured, 1 better, 0 worse; .txt 213 unchanged. Gate PASS.",
+  "reason": "no fix was built or measured, on purpose: the pBdr rule change cannot work until a rule is written before the text below it. PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs (PdfToWord.java:7122) and pageXml writes page.blocks in list order (DocxWriter.java:1324), so ctx.flowY is at the foot of the page when every rule is emitted and w:before can never place a border at the rule's y. That is the cause of the 19 Nov 'both borders at the foot (807/808)' number, computed here from the emitted spacing of the same document (flow 805.9 vs rules at 110.0 and 793.89). Without a guard pBdr is a LibreOffice regression, since the drawing path pins the rule absolutely and LibreOffice fails 32_stroke_lines on zero documents. Written up in FINDINGS/content-present-partly-displaced-rules-cannot-flow-044000-f1x.md with the flush-shapes-by-top change that makes it possible.",
   "reasons": [
    "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them refuted: 75_merged_header_cell_three_columns 27.31 -> 46.58 and 1 page -> 2, because the shading band's edges are the only rules that close those header cells. Reverted. The real fix is the finding's: lattice-cut cells plus w:vMerge, since spanR is computed and read by nothing.",
    "recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down the page (bank-statement 0.4554 pt x 12 rows = +5.85 pt). Whole corpus 13 improved, 0 worse. Also published the table this engine actually produces - ten rows were stale and had blocked every fixer run since 11:55.",
@@ -324,7 +332,8 @@
    "IN PROGRESS - 75_merged_header_cell_three_columns: emit w:vMerge from spanR + bucket glyphs by their own baseline band instead of the cell top edge (PdfToWord:7846); baseline 27.31 reproduced on this engine",
    "w:vMerge emitted from spanR (DocxWriter) + spanR recorded only on the row a rectangle starts (PdfToWord) + a rectangle spanning rows is a merge only when its text occupies fewer bands than the rows it covers, else each line goes to its own band and the cell's width is written there. 75_merged_header_cell_three_columns 27.31->7.62 (Google 39/47->41/47), table-with-merged-cells 4.93->0.67 (Google 42/47->43/47, 65_table_span_down now passes). 4 of 213 docx changed, 2 bank forms unchanged in score, 209 identical by content hash. regress.py --check PASS.",
    "recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one. 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 100.0. Screen PASS: 23 measured, 22 same, 1 better, 0 worse. Corpus ratchet pending.",
-   "recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one (the 'break' at PdfToWord:8666). 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 100.0. Corpus ratchet: 212/212 measured, 1 better, 0 worse; .txt 213 unchanged. Gate PASS."
+   "recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one (the 'break' at PdfToWord:8666). 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 100.0. Corpus ratchet: 212/212 measured, 1 better, 0 worse; .txt 213 unchanged. Gate PASS.",
+   "no fix was built or measured, on purpose: the pBdr rule change cannot work until a rule is written before the text below it. PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs (PdfToWord.java:7122) and pageXml writes page.blocks in list order (DocxWriter.java:1324), so ctx.flowY is at the foot of the page when every rule is emitted and w:before can never place a border at the rule's y. That is the cause of the 19 Nov 'both borders at the foot (807/808)' number, computed here from the emitted spacing of the same document (flow 805.9 vs rules at 110.0 and 793.89). Without a guard pBdr is a LibreOffice regression, since the drawing path pins the rule absolutely and LibreOffice fails 32_stroke_lines on zero documents. Written up in FINDINGS/content-present-partly-displaced-rules-cannot-flow-044000-f1x.md with the flush-shapes-by-top change that makes it possible."
   ],
   "requeues": 0,
   "status": "OPEN"

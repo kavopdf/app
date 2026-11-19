@@ -1,6 +1,3 @@
-| 12 Nov probe | probe | commit test |
-| 12 Nov 07:25 | size-probe | testing a 796 KB commit payload |
-| 12 Nov 08:02 | baseline | started | phase measure |
 | 12 Nov 08:04 | baseline | corpus 208 pdfs unpacked, engine built |
 | 12 Nov 08:11 | baseline | 10 documents measured, each committed (56_table_indented_from_margin, 57_centred_title_page_left_body_pages, 58_header_rule_footer_rule, 59_landscape_mixed_portrait, 60_page_border, 61_two_col_abstract_spanning, 62_two_col_newsletter_pull_quote, 63_three_column_brochure, 64_newspaper_uneven_columns_ad_boxes, 65_two_col_full_width_figure_caption) |
 | 12 Nov 08:13 | baseline | txt backfill: 10 more documents recorded (01_stamp_rotated_15deg_upright .. 10_stamp_as_image), gap 129 -> 119 |
@@ -199,3 +196,5 @@
 | 20 Nov 02:25 | fixer | attempt content-present-partly-displaced -> kept (1/23 moved) |
 | 20 Nov 03:40 | fixer | attempt content-present-partly-displaced -> kept (1/23 moved) |
 | 20 Nov 03:42 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 20 Nov 03:53 | fixer | slot claimed - fixer running |
+| 20 Nov 04:03 | fixer | attempt content-present-partly-displaced -> error (0/23 moved) |

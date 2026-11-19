@@ -26,7 +26,7 @@ that stage actually takes, not from a round number:
 A threshold that is too tight turns the watchdog into noise, and a watchdog that cries wolf is ignored
 exactly when it matters. These are deliberately loose.
 """
-import argparse, csv, glob, json, os, subprocess, sys, time
+import argparse, calendar, csv, glob, json, os, subprocess, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -39,6 +39,8 @@ ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 BLOCKERS = os.path.join(HERE, "BLOCKERS.md")
 
 HOUR = 3600.0
+# Every timestamp this pipeline writes is IST; this pod runs UTC. See _attempts_recent().
+IST_OFFSET = 5 * 3600 + 30 * 60
 THRESHOLD = {
     "measure-google": 4 * HOUR,
     "matrix": 4 * HOUR,
@@ -48,8 +50,38 @@ THRESHOLD = {
 }
 
 
+def _commit_time(path):
+    """When the last commit touched a path, in epoch seconds - or None if git cannot say.
+
+    THIS IS THE PIPELINE'S OWN CLOCK AND mtime IS NOT. Every cron starts from a FRESH CLONE
+    (COORDINATION.md), so `os.path.getmtime` on any file in the tree is the time the clone was
+    made, not the time the file changed. Measured on 20 Nov: `health.py` reported `0.0 h` for
+    all five stages while the newest gverify result was hours old - every age was the age of the
+    clone. A watchdog reading those numbers can never turn red, which is the one thing it exists
+    to do. `git log -1 --format=%ct` survives a clone because the commit carries its own date.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "-C", ROOT, "log", "-1", "--format=%ct", "--", path],
+            capture_output=True, text=True, timeout=20)
+        v = (out.stdout or "").strip()
+        return float(v) if v else None
+    except Exception:
+        return None
+
+
 def _age(path):
-    """Hours since a path last changed. A missing path is infinitely old, not zero."""
+    """Hours since a path last changed. A missing path is infinitely old, not zero.
+
+    The commit date is used when git knows one; mtime is the fallback for a file that has never
+    been committed. Taking the NEWER of the two would put the clone's own timestamp back in
+    front and restore the bug, so the commit wins whenever it exists.
+    """
+    if not os.path.exists(path):
+        return 1e9
+    c = _commit_time(os.path.relpath(path, ROOT))
+    if c is not None:
+        return max(0.0, (time.time() - c) / HOUR)
     try:
         return (time.time() - os.path.getmtime(path)) / HOUR
     except OSError:
@@ -104,7 +136,15 @@ def _attempts_recent(hours=3.0):
         for h in rec.get("history") or []:
             at = h.get("at") or ""
             try:
-                t = time.mktime(time.strptime(at, "%Y-%m-%d %H:%M"))
+                # THE LEDGER WRITES IST AND THIS POD RUNS UTC. attempt.py stamps `at` with
+                # `time.gmtime(time.time() + 19800)` - IST wall time, deliberately, so every
+                # timestamp in the pipeline agrees. `time.mktime` then read that wall time as
+                # LOCAL, and local here is UTC, so every attempt was placed 5.5 hours in the
+                # FUTURE and counted as "in the last 3 hours" for ever. Measured on 20 Nov: the
+                # watchdog read `6 attempt(s) in 3 h` when the ledger held fewer. calendar.timegm
+                # reads the struct as UTC (so the pod's own TZ cannot move it) and the offset
+                # takes it back to the real epoch.
+                t = calendar.timegm(time.strptime(at, "%Y-%m-%d %H:%M")) - IST_OFFSET
             except Exception:
                 continue
             if t >= cutoff:
