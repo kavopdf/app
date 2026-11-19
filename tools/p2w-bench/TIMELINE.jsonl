@@ -414,3 +414,6 @@
 {"t": 1795095621.0093427, "ist": "19:10:21", "ev": "beat", "d": "2 agents landed, implementing the flowRow pitch fix"}
 {"t": 1795095621.1907756, "ist": "19:10:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795095621.3902836, "ist": "19:10:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795096554.7779887, "ist": "19:25:54", "ev": "beat", "d": "screen PASS 3 improved, starting the corpus pass"}
+{"t": 1795096867.2954445, "ist": "19:31:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795102172.4783092, "ist": "20:59:32", "ev": "beat", "d": "corpus pass done; publishing the table this engine actually produces"}

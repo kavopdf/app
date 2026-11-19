@@ -1,11 +1,11 @@
 {
   "baseline_started": 1794936722.77173,
   "classifier_started": 1794939194.3206565,
-  "fixer_doing": "2 agents landed, implementing the flowRow pitch fix",
-  "fixer_doing_since": 1795095621.010957,
+  "fixer_doing": "corpus pass done; publishing the table this engine actually produces",
+  "fixer_doing_since": 1795102172.478782,
   "fixer_engine_at_claim": "4147d54",
-  "fixer_last_beat": 1795095621.0109584,
-  "fixer_started": 1795095621.0093343,
+  "fixer_last_beat": 1795102172.4787827,
+  "fixer_started": 1795102172.4783032,
   "history": [
     {
       "at": "2026-11-12 09:46",

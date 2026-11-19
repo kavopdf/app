@@ -40,7 +40,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `18:22` attempt 13 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `18:34` attempt 14 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `18:45` attempt 15 on content-missing-partly-replaced -> reverted (0/16 moved)
 - `19:31` attempt 16 on content-missing-partly-replaced -> partial (1/3 moved)
@@ -65,6 +64,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `18:41` agent landed: content-present-partly-displaced / A -> tools/p2w-bench/FINDINGS/content-present-partly-displaced-mergedheader-130426-4bd9.md
 - `18:41` agent landed: content-present-partly-displaced / B -> (no file)
 - `18:41` Agent B was registered but never deployed: the first subagent ran inline for 19 minutes (a scheduled run has no one to answer later, so the platform ran it in the turn), which left no room for a second. Angle B is carried forward unanswered in the handoff context: the ~0.34 pt per positioned row accumulation on bank-statement-horizontal-rules-only.
+- `19:31` flowRow/flowFromBox baseline accounting: a row the page drew as one baseline but emitted as two+ paragraphs landed each continuation one hairline box lower and the pitch solver never took it back. recordBaseline() now records the baseline the flow actually reached. Screen: 3 improved (bank-statement 6.89->0.10, toc-dot-leaders 8.52->4.97, 65_two_col 4.91->1.75), 0 worse. Corpus pass running.
 
 ## Where the rest of the state lives
 

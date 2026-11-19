@@ -188,6 +188,10 @@
   {
    "at": "18:41",
    "text": "Agent B was registered but never deployed: the first subagent ran inline for 19 minutes (a scheduled run has no one to answer later, so the platform ran it in the turn), which left no room for a second. Angle B is carried forward unanswered in the handoff context: the ~0.34 pt per positioned row accumulation on bank-statement-horizontal-rules-only."
+  },
+  {
+   "at": "19:31",
+   "text": "flowRow/flowFromBox baseline accounting: a row the page drew as one baseline but emitted as two+ paragraphs landed each continuation one hairline box lower and the pitch solver never took it back. recordBaseline() now records the baseline the flow actually reached. Screen: 3 improved (bank-statement 6.89->0.10, toc-dot-leaders 8.52->4.97, 65_two_col 4.91->1.75), 0 worse. Corpus pass running."
   }
  ],
  "next": "Implement w:vMerge in DocxWriter's table emission from the spanR PdfToWord already computes (PdfToWord:7950 writes it, nothing reads it). Screen 75_merged_header_cell_three_columns plus the 17 other content-present-partly-displaced documents. Do not retry dropping fill-only rules from the Edge list - measured 27.31 -> 46.58.",
