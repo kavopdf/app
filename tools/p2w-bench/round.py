@@ -411,6 +411,21 @@ def claim(name):
     note("claim", "%s claimed the slot" % name)
     _timeline("claim", "%s claimed the slot" % name)
     if name == "fixer":
+        # THE ENGINE THE SLOT WAS CLAIMED ON, RECORDED LIVE.
+        #
+        # The release guard READ `fixer_engine_at_claim` and NOTHING EVER WROTE IT, so the field
+        # held a fossil. On 19 Nov it still said 2945cb0 - a commit older than the previous run's
+        # kept fix - and the guard's `git checkout 2945cb0 -- engine/` stripped that fix out of the
+        # tree on every release. It printed a cheerful "reverted: the engine changed this run" and
+        # the run's own work was gone. Recording it here is the other half of that guard.
+        try:
+            _eng = sh("git log -1 --format=%h -- "
+                      "app/src/main/java/com/kavopdf/app/engine/", timeout=60)[1].strip()
+            if _eng:
+                s["fixer_engine_at_claim"] = _eng
+                save(s)
+        except Exception:
+            pass
         # A run that was killed never closed its record. Without this, _run_record("start")
         # overwrote it and the dead run's attempts, kept count and duration vanished - so the
         # report under-counted the day and chain.py judged the next run's productivity against a
@@ -639,7 +654,14 @@ def release(name, force=False):
                 # time instead of dying on a bookkeeping failure.
                 _claim = (_start or "").split("+")[0].strip()
                 _reverted = False
-                if _claim and len(_claim) >= 7:
+                # NOTHING TO REVERT WHEN THE TREE IS CLEAN. `_dirty` is the uncommitted engine
+                # diff; when it is empty every engine change this run made is already committed
+                # or already gone, and checking out an old commit then only DAMAGES what is
+                # there. That is not hypothetical: on 19 Nov this branch checked out 2945cb0 and
+                # removed the previous run's kept per-row separator stroke - 22 documents - from a
+                # tree that held no unmeasured change at all.
+                _clean_tree = (not _dirty) or _dirty == "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+                if _claim and len(_claim) >= 7 and not _clean_tree:
                     rc, out = sh("git checkout %s -- app/src/main/java/com/kavopdf/app/engine/ 2>&1"
                                  % _claim, timeout=60)
                     if rc == 0:
