@@ -794,3 +794,61 @@ Two agents working a real blocker for the whole slot are worth more than ten ans
 
 **And deploy them in the first ten minutes, before your own attempt** - not at 08:58 when the slot is
 already half spent. Their whole value is that they work in parallel with you, not after you.
+
+---
+
+## WHICH CLASS, AND HOW LONG YOU WORK ON IT. BOTH ARE DECIDED FOR YOU.
+
+The user's instruction, 20 Nov, in his words:
+
+> "fixer kuch bhi kare kaise bhi kare lekin wo hamesha apne full time tak non stop chalta rahe jab tak
+> system khud na rok de aur ek run me maximum documents fix kare ... alag alag approach se attack karta
+> rahe aur jaruri nhi easy class hee choose kare ... class choose karne ki priority set karo jisme
+> sabse jyada documents fix karna ho aur classes ka selection rotation based ho"
+
+### The class is not your choice
+
+    python3 tools/p2w-bench/classpick.py
+
+It prints one class and the reason. **Take that one.** It ranks the capability table by how many
+documents each class costs, biggest first, and it rotates:
+
+* **Stay on a class while it is producing.** If the attempts since you took it moved at least one
+  document, it keeps the slot - that is the user's "jab tak improvement ho raha hai tab tak kaam hota
+  rahe".
+* **Rotate when a class stalls.** Two or more attempts on it, and not one document moved: the next run
+  takes the next biggest class. That is "poore ek run me multiple attempt try karne ke baad bhi ek bhi
+  document improvement nhi ho raha hai toh next turn me dusre sabse jyada documents wale class par".
+* **Wrap round.** When the ranking runs out it starts again from the top, skipping the classes recorded
+  as exhausted. A class that failed is not a class that failed for ever.
+
+**Do not pick a class because it looks easy.** The rotation reaches the easy ones soon enough - the
+three cleanest gaps are 7th, 9th and 14th by size - and picking them first is how the hard classes go
+untouched for two months.
+
+### When you give up on a class, say so
+
+    python3 tools/p2w-bench/classpick.py --exhaust <class> "<what you proved>"
+
+Record it the moment you conclude a class cannot be won by the approach you have, with the reason that
+made you sure. The rotation skips it from then on. **Never leave the next run to rediscover the same
+wall** - that is what has cost eighteen attempts on one construct.
+
+### The slot is yours until the system takes it back
+
+**Work the whole slot. There is no "I have made an attempt, I can stop."** The run ends when the platform
+ends it, and not before. While you still have time:
+
+* **A different approach.** The same idea with a looser guard is not a different approach - that was
+  tried twice on the rules class and changed nothing. A different construct, a different hook in the
+  emitter, a different place in the flow.
+* **A different document.** If a class fails on one document, the same class may be reachable on
+  another with a simpler shape. `bank-statement-horizontal-rules-only` is 39 rules and nothing else;
+  a document with one rule is a far better first proof.
+* **A measurement that narrows it.** If you cannot land a change, a measured fact that removes a
+  possibility is worth the hour: it stops the next run paying for it. Write it into `FINDINGS/`.
+* **Both agents working a real blocker.** See the section above - not a grep.
+
+**One attempt in thirty-two minutes is not a full slot.** The run that reported that spent 9 minutes on
+the fix and 12 on the screen. Two attempts is the floor, three is normal, and the only reason to stop
+early is that the platform has taken the slot back.
