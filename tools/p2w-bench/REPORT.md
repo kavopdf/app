@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-20 08:52
+# Fixer report - 2026-11-20 09:58
 
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 08:52 → 09:24 IST · 32 min**
+**20 Nov 2026 · slot 09:58 → running IST · 44 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 3 attempt(s), 0 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,14 +20,16 @@
 | Fixed - LibreOffice proxy | 32 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `content-present-partly-displaced` |
-| Committed | **15** files in 3 commit(s) from `61c8fee` — ...ed-rule-guard-was-not-the-blocker-100700-f1x.md, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, INCIDENTS.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, TIMELINE.jso |
+| Working on | `18_displacement` |
+| Committed | **12** files in 4 commit(s) from `e5f2e9a` — ...18_displacement-engine-topoffset-101951-cda8.md, ...placement-page-top-before-DROPPED-105000-f1x.md, 18_displacement-dy-shape-101323-4fa7.md, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, ROUND.json, R |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 09:22 | **reverted** | 0/23 | relaxed the rule-border guard twice and wrote the paragraph indents from the rule so a border lands exactly on it: 3 of 39 rules on bank-statement-horizontal-rules-only now become w:pBdr, but 36 never |
+| 10:36 | **reverted** | 0/107 | table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 p |
+| 10:38 | **reverted** | 0/107 | ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 |
+| 10:41 | **reverted** | 0/107 | Third probe, hand-edited docx (no engine change): replaced the four page-top w:before gaps in bank-statement-5-pages with 1x1 trHeight-exact table rows and zeroed the before. THE DISPLACEMENT ITSELF I |
 
 ## The txt
 
@@ -43,31 +45,28 @@
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `contA-08` | is the rule-as-drawing construct still in the engine | 08:58 | 09:05 | 7 min |
-| `contB-08` | how much of 18_displacement the rule construct can e | 08:58 | 09:05 | 7 min |
+| `18_dA-01` | Quantify the dy signature: across the Google renders | 09:59 | 05:12 | 43 min |
+| `18_dB-01` | Find the engine code path that decides each line's v | 09:59 | 05:12 | 43 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 08:52 → 09:24 · 32 min |
+| Slot window | 09:58 → running · 44 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 27 |
-| Longest silence | **7.6 min** — from 09:06:08, after `screen pass 2 of the displacement class` |
-| Silences over 2 min | 6 |
-| Obstacles | 0 cleared · 2 need a human |
-| Still a wall | **This watchdog run has no `cron` tool**, so a paused or zombie cron cannot be moved by automation - a person  |
+| Tool beats | 26 |
+| Longest silence | **27.0 min** — from 09:59:51, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 5 |
+| Obstacles | 0 cleared · 0 need a human |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **9 min** | `#######` |
-| measure or build - a conversion, screen or compile writes no beacon | **12 min** | `#########` |
-| record - attempt, handoff, class rows | **3 min** | `##` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **5 min** | `###` |
+| fix - diagnose and change the engine | **8 min** | `####` |
+| record - attempt, handoff, class rows | **2 min** | `#` |
+| report - the report and the chain | **34 min** | `#################` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -80,7 +79,7 @@
 
 ## Next run
 
-the rule class is a TABLE-PATH job, not a guard job: 36 of 39 rules on bank-statement-horizontal-rules-only belong to table rows and never reach flowFromBox, so give the rule to the row or cell (w:tcBorders top) instead of loosening the guard again. Verify per document by counting w:pBdr in word/document.xml before screening - a count of 0 means the change is not being exercised
+18_displacement: the page-top gap is PROVEN to be the cause (Google drops w:before there; a trHeight-exact 1x1 table row is honoured to 0.97 pt). Applying it by hand to bank-statement-5-pages fixes the displacement itself (dy median -53.8 -> +0.8) but the document goes 6 pages -> 10 with a blank after each, because (a) the break paragraph already emits a blank page 1 in Google and (b) the 55 pt gap is not charged to the page fill budget. So it is NOT a construct swap: make the gap real AND charge it to the page capacity, and fix the blank page. Engine work, needs a full corpus ratchet. See FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md, second section.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

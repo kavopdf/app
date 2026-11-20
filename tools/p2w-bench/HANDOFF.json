@@ -380,6 +380,14 @@
   {
    "at": "10:41",
    "text": "attempt 3 on 18_displacement -> reverted (0/107 moved)"
+  },
+  {
+   "at": "10:42",
+   "text": "agent landed: 18_dA-01 /  -> tools/p2w-bench/FINDINGS/18_displacement-dy-shape-101323-4fa7.md"
+  },
+  {
+   "at": "10:42",
+   "text": "agent landed: 18_dB-01 /  -> tools/p2w-bench/FINDINGS/18_displacement-engine-topoffset-101951-cda8.md"
   }
  ],
  "next": "18_displacement: the page-top gap is PROVEN to be the cause (Google drops w:before there; a trHeight-exact 1x1 table row is honoured to 0.97 pt). Applying it by hand to bank-statement-5-pages fixes the displacement itself (dy median -53.8 -> +0.8) but the document goes 6 pages -> 10 with a blank after each, because (a) the break paragraph already emits a blank page 1 in Google and (b) the 55 pt gap is not charged to the page fill budget. So it is NOT a construct swap: make the gap real AND charge it to the page capacity, and fix the blank page. Engine work, needs a full corpus ratchet. See FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md, second section.",
@@ -595,9 +603,10 @@
    "question": "Quantify the dy signature: across the Google renders that fail 18_displacement, is the displacement a whole-page uniform shift, a progressive drift down the page, or per-line scatter? Determine which construct in word/document.xml carries it (w:spacing line/lineRule, w:before/w:after, empty spacer paragraphs, w:ind firstLine/hanging) by correlating with the per-page n_out and worst_here numbers. Deliver a FINDINGS file with the distribution and the named construct.",
    "expected": "expected by 10:45",
    "deployed": "09:59",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-20T04:29"
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/18_displacement-dy-shape-101323-4fa7.md",
+   "deployed_at": "2026-11-20T04:29",
+   "landed_at": "2026-11-20T05:12"
   },
   {
    "id": "18_dB-01",
@@ -606,9 +615,10 @@
    "question": "Find the engine code path that decides each line's vertical position in the emitted docx (PdfToWord.java / DocxWriter.java): where w:spacing, w:before/w:after, exact line rules, spacer paragraphs and page margins are written. State for each whether Google Docs would honour it, and name the one construct most likely to make Google place 125 documents' lines outside a clamp(0.35em,1.5,4.5)pt tolerance when LibreOffice keeps 173 of them inside. Deliver a FINDINGS file naming file:line.",
    "expected": "expected by 10:45",
    "deployed": "09:59",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-20T04:29"
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/18_displacement-engine-topoffset-101951-cda8.md",
+   "deployed_at": "2026-11-20T04:29",
+   "landed_at": "2026-11-20T05:12"
   }
  ],
  "run": {
