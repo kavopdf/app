@@ -1,5 +1,5 @@
 {
- "plan": "",
+ "plan": "Measure the reach of every construct before building the next one: 47_margins has 26 documents and the two constructs on the table reach 3 and 5 of them, so the class was being attacked from the wrong end. Traced all 26, corrected SETTLED's run-size lead, added verify_google --detail so a FAIL names its page and its distance.",
  "notes": [
   {
    "at": "13:08",
@@ -456,6 +456,22 @@
   {
    "at": "15:08",
    "text": "attempt 8 on 47_margins -> partial (2/26 moved)"
+  },
+  {
+   "at": "15:12",
+   "text": "agent deployed: 47_margins / A - which code path emits a table-cell line, and how a cell's horizontal position is"
+  },
+  {
+   "at": "15:12",
+   "text": "agent deployed: 47_margins / B - why 40_devanagari_shaping_font and 76_devanagari_table score 10.48 and 7.91 - is"
+  },
+  {
+   "at": "15:12",
+   "text": "agent landed: 47_mA-01 /  -> tools/p2w-bench/FINDINGS/47_margins-CELLPATH-A-150000.md"
+  },
+  {
+   "at": "15:12",
+   "text": "agent landed: 47_mB-01 /  -> tools/p2w-bench/FINDINGS/47_margins-DIAGNOSE40-B-150000.md"
   }
  ],
  "next": "47_margins: re-measure the class against a fresh render, not the tables - 392_statistical_console_output already reads 0.06 and passes all 42 checks on this engine while RANKING.csv says 1.61 and both gverify tables say 47_margins FAIL, so the class is at most 25 documents. Then pull the thread FINDINGS/47_margins-REACH-140500.md leaves open: 360_restaurant_menu's body column was 12 pt left (source 52, render 40) and 9 runs are still 11.9 pt out; the leading-space indent and the centred-line constructs are both capped under the 25% bar and must not be retried.",
@@ -735,10 +751,34 @@
    "finding": "FINDINGS/47_margins-MECHANISM-133500-f2.md",
    "deployed_at": "2026-11-20T08:06",
    "landed_at": "2026-11-20T08:06"
+  },
+  {
+   "id": "47_mA-01",
+   "class": "47_margins",
+   "angle": "A",
+   "question": "which code path emits a table-cell line, and how a cell's horizontal position is expressed",
+   "expected": "landed",
+   "deployed": "14:02",
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/47_margins-CELLPATH-A-150000.md",
+   "deployed_at": "2026-11-20T08:33",
+   "landed_at": "2026-11-20T08:37"
+  },
+  {
+   "id": "47_mB-01",
+   "class": "47_margins",
+   "angle": "B",
+   "question": "why 40_devanagari_shaping_font and 76_devanagari_table score 10.48 and 7.91 - is it horizontal at all",
+   "expected": "landed",
+   "deployed": "14:02",
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/47_margins-DIAGNOSE40-B-150000.md",
+   "deployed_at": "2026-11-20T08:33",
+   "landed_at": "2026-11-20T08:46"
   }
  ],
  "run": {
-  "started": "13:54",
+  "started": "15:12",
   "ended": null,
   "ended_how": null
  },

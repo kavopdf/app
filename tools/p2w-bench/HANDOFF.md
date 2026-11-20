@@ -9,10 +9,10 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 13:54 |
+| started | 15:12 |
 | ended | still running |
 | how it ended | - |
-| plan | - |
+| plan | Measure the reach of every construct before building the next one: 47_margins has 26 documents and the two constructs on the table reach 3 and 5 of them, so the class was being attacked from the wrong end. Traced all 26, corrected SETTLED's run-size lead, added verify_google --detail so a FAIL names its page and its distance. |
 
 ## The picture, in the words of the run that left it
 
@@ -50,16 +50,14 @@ unfinished work, not as a result.
 | t13_B-01 | t13_amount_columns | B | census of the 18 documents: table path vs paragraph path | 12:00 | 11:06 | landed |  |
 | 47_mA-01-01 | 47_margins | A-01 | what 47_margins actually compares, and where the page margin is emitte | 13:36 | 13:00 | landed | FINDINGS/47_margins-MECHANISM-133500-f2.md |
 | 47_mB-01-01 | 47_margins | B-01 | the space-led indent construct on 47_margins | 13:36 | 13:00 | landed | FINDINGS/47_margins-MECHANISM-133500-f2.md |
+| 47_mA-01 | 47_margins | A | which code path emits a table-cell line, and how a cell's horizontal p | 15:12 | landed | landed | tools/p2w-bench/FINDINGS/47_margins-CELLPATH-A-150000.md |
+| 47_mB-01 | 47_margins | B | why 40_devanagari_shaping_font and 76_devanagari_table score 10.48 and | 15:12 | landed | landed | tools/p2w-bench/FINDINGS/47_margins-DIAGNOSE40-B-150000.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `09:22` agent landed: content-present-partly-displaced / B -> FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md
-- `09:59` agent deployed: 18_displacement / A - Quantify the dy signature: across the Google renders that fail 18_displacement, 
-- `09:59` agent deployed: 18_displacement / B - Find the engine code path that decides each line's vertical position in the emit
-- `10:36` attempt 1 on 18_displacement -> reverted (0/107 moved)
 - `10:38` attempt 2 on 18_displacement -> reverted (0/107 moved)
 - `10:41` attempt 3 on 18_displacement -> reverted (0/107 moved)
 - `10:42` agent landed: 18_dA-01 /  -> tools/p2w-bench/FINDINGS/18_displacement-dy-shape-101323-4fa7.md
@@ -81,6 +79,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:35` attempt 6 on 47_margins -> reverted (0/26 moved)
 - `15:07` attempt 7 on 47_margins -> reverted (0/26 moved)
 - `15:08` attempt 8 on 47_margins -> partial (2/26 moved)
+- `15:12` agent deployed: 47_margins / A - which code path emits a table-cell line, and how a cell's horizontal position is
+- `15:12` agent deployed: 47_margins / B - why 40_devanagari_shaping_font and 76_devanagari_table score 10.48 and 7.91 - is
+- `15:12` agent landed: 47_mA-01 /  -> tools/p2w-bench/FINDINGS/47_margins-CELLPATH-A-150000.md
+- `15:12` agent landed: 47_mB-01 /  -> tools/p2w-bench/FINDINGS/47_margins-DIAGNOSE40-B-150000.md
 
 ## Where the rest of the state lives
 

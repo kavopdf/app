@@ -862,7 +862,11 @@ def main(argv):
         # Google's render at 99% or better. The LibreOffice count is a proxy and is labelled as one,
         # because LibreOffice draws what Google drops and 32-vs-7 on the same corpus is not a rounding
         # difference - it is two different products.
-        L.append("| **Fixed - Google, all 42 checks** | **%d** of %d measured |"
+        # "of the N documents both renderers measured", not "of N": the Google table is the
+        # intersection of the two render sets and is smaller than the corpus, and lastmessage.py
+        # reads any bare "of NNN" in the hundreds as a claim about the corpus size and refuses the
+        # report. The two numbers are both right and the sentence has to say which is which.
+        L.append("| **Fixed - Google, all 42 checks** | **%d**, out of the %d documents both renderers measured |"
                  % (co.get("google_fixed", 0), co.get("google_scored", 0)))
         L.append("| Fixed - LibreOffice proxy | %d of %d - a renderer the user does not open |"
                  % (co.get("fixed", 0), co.get("docs", 0)))
