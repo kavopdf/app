@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-20 09:58
+# Fixer report - 2026-11-20 10:51
 
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 09:58 → 10:43 IST · 45 min**
+**20 Nov 2026 · slot 10:51 → running IST · 1h 10m**
 
-> No change was kept this run. The numbers below say what was tried.
+> **bank-statement-horizontal-rules-only** improved — 1.00 → 0.00. Corpus ratchet clean across 213 documents.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 3 attempt(s), 0 kept |
+| Documents improved this run | **12** — 3 attempt(s), 2 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,43 +20,42 @@
 | Fixed - LibreOffice proxy | 32 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `18_displacement` |
-| Committed | **15** files in 6 commit(s) from `027fe14` — ...18_displacement-engine-topoffset-101951-cda8.md, ...placement-page-top-before-DROPPED-105000-f1x.md, 18_displacement-dy-shape-101323-4fa7.md, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE. |
+| Working on | `t13_amount_columns` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 10:36 | **reverted** | 0/107 | table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 p |
-| 10:38 | **reverted** | 0/107 | ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 |
-| 10:41 | **reverted** | 0/107 | Third probe, hand-edited docx (no engine change): replaced the four page-top w:before gaps in bank-statement-5-pages with 1x1 trHeight-exact table rows and zeroed the before. THE DISPLACEMENT ITSELF I |
+| 10:52 | **error** | None/None | claimed. .txt half. PATCH-t13 (row-per-line) was rejected 19 Nov: it breaks t04_structure line-count drift, 101 worse 0 better. Working the other direction: keep one cell per line, fix only where an a |
+| 11:51 | **kept** | 10/18 | KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over |
+| 11:59 | **kept** | 2/18 | KEPT (second construct, same slot). paraEndSnap(): per page, an end column whose immediate neighbour is also an end column of the page's numeric paragraph lines merges into it transitively and keeps t |
 
 ## The txt
 
 | | |
 |:--|:--|
 | Scored | **213** of 213 |
-| Clean - every applicable check passes | **167** (78.4%) |
-| Failing at least one check | **46** |
+| Clean - every applicable check passes | **179** (84.0%) |
+| Failing at least one check | **34** |
 | Moved since the last commit | **none** - nothing changed |
-| Most common failure | `t13_amount_columns` - 18 documents |
+| Most common failure | `t12_word_invention` - 12 documents |
 
 ## Subagents
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `18_dA-01` | Quantify the dy signature: across the Google renders | 09:59 | 05:12 | 43 min |
-| `18_dB-01` | Find the engine code path that decides each line's v | 09:59 | 05:12 | 43 min |
+| `t13_A-01` | which writer path emits the misaligned amounts, prov | 12:00 | - | - |
+| `t13_B-01` | census of the 18 documents: table path vs paragraph  | 12:00 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 09:58 → 10:43 · 45 min |
+| Slot window | 10:51 → running · 1h 10m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 32 |
-| Longest silence | **27.0 min** — from 09:59:51, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 5 |
+| Tool beats | 22 |
+| Longest silence | **58.6 min** — from 10:52:49, after `classrow.py: refreshing the class file` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 need a human |
 
 
@@ -64,9 +63,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **8 min** | `####` |
+| fix - diagnose and change the engine | **1h 07m** | `#####################` |
 | record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **34 min** | `#################` |
+| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

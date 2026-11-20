@@ -388,6 +388,34 @@
   {
    "at": "10:42",
    "text": "agent landed: 18_dB-01 /  -> tools/p2w-bench/FINDINGS/18_displacement-engine-topoffset-101951-cda8.md"
+  },
+  {
+   "at": "10:52",
+   "text": "attempt 1 on t13_amount_columns -> error"
+  },
+  {
+   "at": "11:51",
+   "text": "attempt 2 on t13_amount_columns -> kept (10/18 moved)"
+  },
+  {
+   "at": "11:59",
+   "text": "attempt 3 on t13_amount_columns -> kept (2/18 moved)"
+  },
+  {
+   "at": "12:00",
+   "text": "agent deployed: t13_amount_columns / A - which writer path emits the misaligned amounts, proven by build"
+  },
+  {
+   "at": "12:00",
+   "text": "agent deployed: t13_amount_columns / B - census of the 18 documents: table path vs paragraph path"
+  },
+  {
+   "at": "12:00",
+   "text": "agent landed: t13_amount_columns / A -> FINDINGS/t13-writer-path-110501-f3de.md"
+  },
+  {
+   "at": "12:00",
+   "text": "agent landed: t13_amount_columns / B -> (no file)"
   }
  ],
  "next": "18_displacement: the page-top gap is PROVEN to be the cause (Google drops w:before there; a trHeight-exact 1x1 table row is honoured to 0.97 pt). Applying it by hand to bank-statement-5-pages fixes the displacement itself (dy median -53.8 -> +0.8) but the document goes 6 pages -> 10 with a blank after each, because (a) the break paragraph already emits a blank page 1 in Google and (b) the 55 pt gap is not charged to the page fill budget. So it is NOT a construct swap: make the gap real AND charge it to the page capacity, and fix the blank page. Engine work, needs a full corpus ratchet. See FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md, second section.",
@@ -619,12 +647,36 @@
    "finding": "tools/p2w-bench/FINDINGS/18_displacement-engine-topoffset-101951-cda8.md",
    "deployed_at": "2026-11-20T04:29",
    "landed_at": "2026-11-20T05:12"
+  },
+  {
+   "id": "t13_A-01",
+   "class": "t13_amount_columns",
+   "angle": "A",
+   "question": "which writer path emits the misaligned amounts, proven by build",
+   "expected": "11:05",
+   "deployed": "12:00",
+   "status": "landed",
+   "finding": "FINDINGS/t13-writer-path-110501-f3de.md",
+   "deployed_at": "11:05",
+   "landed_at": "11:18"
+  },
+  {
+   "id": "t13_B-01",
+   "class": "t13_amount_columns",
+   "angle": "B",
+   "question": "census of the 18 documents: table path vs paragraph path",
+   "expected": "11:06",
+   "deployed": "12:00",
+   "status": "landed",
+   "finding": "",
+   "deployed_at": "11:06",
+   "landed_at": "11:29"
   }
  ],
  "run": {
-  "started": "09:58",
-  "ended": "10:43",
-  "ended_how": "forced"
+  "started": "10:51",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {
@@ -728,7 +780,7 @@
    "plan": ""
   }
  ],
- "context": "Two attempts on 18_displacement, both reverted, both carrying measured facts. (1) the table-spacer construct named by both agents is NOT the cause and forcing its gap into w:before REGRESSES Google 40/47 -> 36/47 on bank-statement-5-pages (LO unchanged 47/47). (2) the real cause is w:before being dropped at page top by Google; proven by a 5-variant probe. The corpus reproduces exactly in LibreOffice against the committed gverify-lo records (362_price_list_dense 42/42, purchase-order 46/47, mobile-bill 47/47, bank-statement-5-pages 47/47 - all MATCH), so the sandbox can measure for real.",
+ "context": "t13_amount_columns (.txt half) is now 6 documents, not 18. Two constructs landed, both in TxtWriter only: (1) appendTable ends every numeric cell at ONE end column per table column instead of each cell's own right edge, which the 'if (startCol > col)' guard always discarded because the 0.6em ruler over-estimates a 7pt numeric token by a column; (2) paraEndSnap merges a page's numeric paragraph end columns that sit one apart. The remaining 6 need the table and paragraph paths POOLED onto one per-page ruler - measured by an agent at 15 of 18 - plus one doc whose split is two columns wide. The gate itself was the reason the .txt half could never land: engine_fingerprint hashes every .java so a TxtWriter edit always staled the docx stamp and regress.py refused; scope.py now knows TxtWriter.appendTable/appendPara are txt and regress.py does not stamp-check a format scope.py proved out of scope.",
  "needs_human": [],
  "next_class": "bank-statement-5-pages"
 }

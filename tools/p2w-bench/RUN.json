@@ -1,16 +1,27 @@
 {
- "started_ts": 1795148909.596737,
- "started": "09:58",
- "ended_ts": 1795151622.4976554,
- "ended": "10:43",
- "class": "18_displacement",
+ "started_ts": 1795152088.1033015,
+ "started": "10:51",
+ "ended_ts": null,
+ "ended": null,
+ "class": "t13_amount_columns",
  "attempts": 3,
- "kept": 0,
- "docs_improved": 0,
+ "kept": 2,
+ "docs_improved": 12,
  "agents": [
-  "18_dA-01",
-  "18_dB-01"
+  "t13_A-01",
+  "t13_B-01"
  ],
  "obstacles_cleared": 0,
- "needs_human": 0
+ "needs_human": 0,
+ "ratchets": 2,
+ "counted": [
+  [
+   "t13_amount_columns",
+   10
+  ],
+  [
+   "t13_amount_columns",
+   2
+  ]
+ ]
 }

@@ -55,13 +55,30 @@ def sh(cmd, timeout=120):
         return None
 
 
-def engine_fingerprint():
+# THE FINGERPRINT HAS TO DESCRIBE THE ARTEFACT IT STAMPS, OR A .TXT CHANGE IS UNCOMMITTABLE.
+#
+# It hashed every .java in the engine, so an edit to TxtWriter.java moved the hash the DOCX table
+# was stamped with. The docx path never calls TxtWriter - DocxWriter.write() reads the Result that
+# PdfToWord.convert() built, and TxtWriter.write() is the only caller of that class - so the docx
+# table was being refused as "measured on another engine" by a change that cannot reach a docx byte.
+# Measured 20 Nov: it refused the engine commit AND every state commit after it, which is the
+# mechanical reason the .txt half had never landed one.
+#
+# So the docx fingerprint leaves TxtWriter.java out. Nothing else is excluded: DocxWriter.java stays
+# in the txt fingerprint, because DocxWriter.orderStamps() reorders page.blocks and TxtWriter walks
+# them - the one place a docx-side method can move the .txt.
+DOCX_EXCLUDES = ("TxtWriter.java",)
+
+
+def engine_fingerprint(fmt=None):
     """A hash of the engine sources, so a table can say which engine produced it."""
     h = hashlib.sha256()
     if not os.path.isdir(ENGINE_DIR):
         return "NO-ENGINE-DIR"
     for name in sorted(os.listdir(ENGINE_DIR)):
         if not name.endswith(".java"):
+            continue
+        if fmt == "docx" and name in DOCX_EXCLUDES:
             continue
         h.update(name.encode())
         with open(os.path.join(ENGINE_DIR, name), "rb") as f:
@@ -248,7 +265,7 @@ def stamp(scope):
         rec = {}
     rec.pop("engine", None)
     for f in scope:
-        rec[f] = fp
+        rec[f] = engine_fingerprint(f)
     os.makedirs(os.path.dirname(STAMP), exist_ok=True)
     json.dump(rec, open(STAMP, "w", encoding="utf-8"), indent=1)
     print("  stamped %s to engine %s" % (", ".join(sorted(scope)), fp))
@@ -316,6 +333,7 @@ def check(allow_engine_change, only=None):
                 print("  %s: out of scope - scope.py proved this change cannot move it" % f)
                 continue
             was = st.get(f)
+            fp = engine_fingerprint(f)
             if was is None:
                 print("  UNSTAMPED (%s): the table does not say which engine made it, so" % f)
                 print("             'no regressions' is a claim about nothing.")

@@ -9,14 +9,14 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 09:58 |
-| ended | 10:43 |
-| how it ended | forced |
+| started | 10:51 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> Two attempts on 18_displacement, both reverted, both carrying measured facts. (1) the table-spacer construct named by both agents is NOT the cause and forcing its gap into w:before REGRESSES Google 40/47 -> 36/47 on bank-statement-5-pages (LO unchanged 47/47). (2) the real cause is w:before being dropped at page top by Google; proven by a 5-variant probe. The corpus reproduces exactly in LibreOffice against the committed gverify-lo records (362_price_list_dense 42/42, purchase-order 46/47, mobile-bill 47/47, bank-statement-5-pages 47/47 - all MATCH), so the sandbox can measure for real.
+> t13_amount_columns (.txt half) is now 6 documents, not 18. Two constructs landed, both in TxtWriter only: (1) appendTable ends every numeric cell at ONE end column per table column instead of each cell's own right edge, which the 'if (startCol > col)' guard always discarded because the 0.6em ruler over-estimates a 7pt numeric token by a column; (2) paraEndSnap merges a page's numeric paragraph end columns that sit one apart. The remaining 6 need the table and paragraph paths POOLED onto one per-page ruler - measured by an agent at 15 of 18 - plus one doc whose split is two columns wide. The gate itself was the reason the .txt half could never land: engine_fingerprint hashes every .java so a TxtWriter edit always staled the docx stamp and regress.py refused; scope.py now knows TxtWriter.appendTable/appendPara are txt and regress.py does not stamp-check a format scope.py proved out of scope.
 
 ## What the next run should do first
 
@@ -46,19 +46,14 @@ unfinished work, not as a result.
 | contB-08 | content-present-partly-displaced | B | how much of 18_displacement the rule construct can explain, and which  | 08:58 | 09:00 | landed | FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md |
 | 18_dA-01 | 18_displacement | A | Quantify the dy signature: across the Google renders that fail 18_disp | 09:59 | expected by 10:45 | landed | tools/p2w-bench/FINDINGS/18_displacement-dy-shape-101323-4fa7.md |
 | 18_dB-01 | 18_displacement | B | Find the engine code path that decides each line's vertical position i | 09:59 | expected by 10:45 | landed | tools/p2w-bench/FINDINGS/18_displacement-engine-topoffset-101951-cda8.md |
+| t13_A-01 | t13_amount_columns | A | which writer path emits the misaligned amounts, proven by build | 12:00 | 11:05 | landed | FINDINGS/t13-writer-path-110501-f3de.md |
+| t13_B-01 | t13_amount_columns | B | census of the 18 documents: table path vs paragraph path | 12:00 | 11:06 | landed |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:13` classrow.py fixed: load_rank() now reads max_pt and the row writer emits (share5, max_pt) into the columns the header names. Every row the tool ever wrote carried share1 under the share5 heading and share5 under max_pt - mobile-bill read 'share@5 43.87, max_pt 1.55', which is impossible arithmetic and cost an agent its whole budget proving the page was fine. Also: the clean-row branch discarded the c[2]=prob correction with out.append(line), so no FIXED-and-clean row ever got its numbers or its problem name repaired; both branches now write the row, and the measured class is preserved on those rows. Verified: 212 of 212 rows now match RANKING.csv on both columns, 0 status changes, 0 document changes, class summary counts identical (12/1 6/16 6/4 6/0 23/0 7/1 130). The queue's real shape: content-present-partly-displaced 23 open at share@5 1.0-4.0 with max_pt 13-17, not the sub-2pt figures the table used to show.
-- `04:13` agent landed: contB-06 /  -> FINDINGS/content-present-partly-displaced-subpx-041118-ed1d.md
-- `05:11` attempt 10 on content-present-partly-displaced -> partial (2/23 moved)
-- `05:17` attempt 11 on content-present-partly-displaced -> reverted (0/23 moved)
-- `05:53` attempt 12 on content-present-partly-displaced -> reverted (0/23 moved)
-- `06:20` attempt 13 on content-present-partly-displaced -> reverted (0/23 moved)
-- `07:13` attempt 5 on content-partly-lost-and-displaced -> partial (1/6 moved)
 - `07:59` attempt 6 on content-partly-lost-and-displaced -> kept (1/6 moved)
 - `07:59` agent deployed: content-partly-lost-and-displaced / B - why two corpus documents lose ~60% of their ink at 5px: absent or moved
 - `07:59` agent landed: contB-07 /  -> tools/p2w-bench/FINDINGS/content-partly-lost-and-displaced-twocol-tables-0700-f1x.md
@@ -77,6 +72,13 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `10:41` attempt 3 on 18_displacement -> reverted (0/107 moved)
 - `10:42` agent landed: 18_dA-01 /  -> tools/p2w-bench/FINDINGS/18_displacement-dy-shape-101323-4fa7.md
 - `10:42` agent landed: 18_dB-01 /  -> tools/p2w-bench/FINDINGS/18_displacement-engine-topoffset-101951-cda8.md
+- `10:52` attempt 1 on t13_amount_columns -> error
+- `11:51` attempt 2 on t13_amount_columns -> kept (10/18 moved)
+- `11:59` attempt 3 on t13_amount_columns -> kept (2/18 moved)
+- `12:00` agent deployed: t13_amount_columns / A - which writer path emits the misaligned amounts, proven by build
+- `12:00` agent deployed: t13_amount_columns / B - census of the 18 documents: table path vs paragraph path
+- `12:00` agent landed: t13_amount_columns / A -> FINDINGS/t13-writer-path-110501-f3de.md
+- `12:00` agent landed: t13_amount_columns / B -> (no file)
 
 ## Where the rest of the state lives
 
