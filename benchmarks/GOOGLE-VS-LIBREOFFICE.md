@@ -26,22 +26,22 @@ Same source PDF, same .docx, same instrument. Only the renderer differs.
 | `10_font_sizes` | 1 | 6 | **Google** |
 | `43_within_10pt_x` | 7 | 11 | **Google** |
 | `23_line_pitch` | 0 | 3 | **Google** |
-| `38_list_markers` | 0 | 2 | **Google** |
 | `34a_span_size_match` | 0 | 2 | **Google** |
+| `38_list_markers` | 0 | 2 | **Google** |
 | `51_field_values` | 0 | 1 | **Google** |
-| `42_justification_edges` | 0 | 1 | **Google** |
-| `46_text_crossing_rule` | 0 | 1 | **Google** |
 | `31_pages_lost_their_text` | 0 | 1 | **Google** |
+| `46_text_crossing_rule` | 0 | 1 | **Google** |
+| `42_justification_edges` | 0 | 1 | **Google** |
 | `37_super_subscript` | 1 | 1 | same |
-| `53_embedded_faces` | 4 | 4 | same |
-| `65_table_span_down` | 1 | 1 | same |
-| `52_outline` | 1 | 1 | same |
-| `62_table_columns` | 3 | 3 | same |
-| `40_link_targets` | 1 | 1 | same |
 | `63_table_rows` | 5 | 5 | same |
-| `64_table_span_across` | 1 | 1 | same |
+| `52_outline` | 1 | 1 | same |
+| `40_link_targets` | 1 | 1 | same |
+| `65_table_span_down` | 1 | 1 | same |
 | `66_table_cell_width` | 4 | 4 | same |
+| `53_embedded_faces` | 4 | 4 | same |
+| `64_table_span_across` | 1 | 1 | same |
 | `35_rotation` | 12 | 12 | same |
+| `62_table_columns` | 3 | 3 | same |
 | `28_clipped_at_edge` | 2 | 1 | LibreOffice |
 | `61_blank_not_filled` | 1 | 0 | LibreOffice |
 | `14_filled_shapes` | 2 | 0 | LibreOffice |
@@ -49,30 +49,15 @@ Same source PDF, same .docx, same instrument. Only the renderer differs.
 ## Constructs LibreOffice honours and Google does not
 
 * `23_line_pitch` - 3 documents
-* `38_list_markers` - 2 documents
 * `34a_span_size_match` - 2 documents
+* `38_list_markers` - 2 documents
 * `51_field_values` - 1 documents
-* `42_justification_edges` - 1 documents
-* `46_text_crossing_rule` - 1 documents
 * `31_pages_lost_their_text` - 1 documents
+* `46_text_crossing_rule` - 1 documents
+* `42_justification_edges` - 1 documents
 
 ## Constructs Google honours and LibreOffice does not
 
 * `14_filled_shapes` - 2 documents
 * `61_blank_not_filled` - 1 documents
 
-
-## What carries the largest disagreements
-
-Two are already measured and recorded; they must not be re-derived.
-
-* `32_stroke_lines` - a rule is emitted as a floating `w:drawing`; Google drops the shape and keeps
-  the anchor. See `tools/p2w-bench/FINDINGS/RULES-ARE-DRAWINGS-GOOGLE-DROPS-THEM.md`.
-* `05_chars_extra` - the same anchor, counted as a character.
-
-The rest of the column is the same story in different constructs: absolute indent, absolute `w:spacing`
-and absolute drawing offsets are the position carriers the engine uses, and Google lays out flowing text
-instead. Four fixes have been tried against this and measured - rules as `w:pBdr`, `w:pgMar` plus
-indents, the same plus spacing and offsets, and font metrics - and all four were worse or neutral. See
-`tools/p2w-bench/FINDINGS/GOOGLE-LAYOUT-THREE-FIXES-TRIED.md`. This table is what makes the next
-attempt an informed one.
