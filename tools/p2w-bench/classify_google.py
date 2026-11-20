@@ -113,15 +113,22 @@ def render():
     L_.append("")
     L_.append("## Classes, ranked by gap (Google fails − LibreOffice fails)")
     L_.append("")
-    L_.append("| signature | problem | open | fixed-in-LO-only | libreoffice | google |")
-    L_.append("|---|---|---:|---:|---:|---:|")
+    # THE STATUS CELL IS THE GATE. round.py open_classes() counts a class as open when a row carries a
+    # cell that is exactly "OPEN" - and the first version of this table had no such column, so
+    # --close-round counted ZERO Google classes and would have closed a round with 145 documents still
+    # failing in the renderer the user actually opens. A gate that reads a cell nobody writes is a gate
+    # that is silently off. benchmarks/DEFECT-CLASSES.md has carried OPEN from the start; this and the
+    # .txt table did not.
+    L_.append("| signature | problem | open | status | fixed-in-LO-only | libreoffice | google |")
+    L_.append("|---|---|---:|---|---:|---:|---:|")
     for c, gc, lc in rows:
         # `fixed` is the gap: documents that fail this check in GOOGLE but pass it in LibreOffice. That
         # is the number this table exists for - work that looks done in the proxy and is not done for
         # the user. The first version of this generator wrote the LibreOffice count into both columns,
         # which said 19 "fixed" where the truth is 19 documents LibreOffice draws and Google does not.
         gap = max(0, gc - lc)
-        L_.append("| `%s` | %s | %d | %d | %d | %d |" % (c, c, gc, gap, lc, gc))
+        status = "OPEN" if gc else "FIXED"
+        L_.append("| `%s` | %s | %d | %s | %d | %d | %d |" % (c, c, gc, status, gap, lc, gc))
     L_.append("")
     return "\n".join(L_)
 

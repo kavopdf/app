@@ -9,17 +9,17 @@ serves every document under it.
 
 ## Classes
 
-| check | what it means | documents | share |
-|---|---|---:|---:|
-| `t13_amount_columns` | amount columns stay right-aligned | 18 | 8% |
-| `t12_word_invention` | the .txt carries no word the source never drew | 12 | 6% |
-| `t01_word_accuracy` | the source's words survive, 99 % of them | 10 | 5% |
-| `t08_line_order` | lines arrive in the order the page drew them | 10 | 5% |
-| `t02_position` | a line's x survives as its leading spaces | 5 | 2% |
-| `t09_page_furniture` | one copy of each running head per page it belongs to | 4 | 2% |
-| `t07_symbol_counts` | each symbol arrives as many times as the page drew it | 3 | 1% |
-| `t03_symbols` | every character the page DRAWS survives, read from the glyphs | 2 | 1% |
-| `t06_encoding` | the bytes decode as the UTF-8 the writer declares | 2 | 1% |
+| check | what it means | documents | status | share |
+|---|---|---:|---|---:|
+| `t13_amount_columns` | amount columns stay right-aligned | 18 | OPEN | 8% |
+| `t12_word_invention` | the .txt carries no word the source never drew | 12 | OPEN | 6% |
+| `t01_word_accuracy` | the source's words survive, 99 % of them | 10 | OPEN | 5% |
+| `t08_line_order` | lines arrive in the order the page drew them | 10 | OPEN | 5% |
+| `t02_position` | a line's x survives as its leading spaces | 5 | OPEN | 2% |
+| `t09_page_furniture` | one copy of each running head per page it belongs to | 4 | OPEN | 2% |
+| `t07_symbol_counts` | each symbol arrives as many times as the page drew it | 3 | OPEN | 1% |
+| `t03_symbols` | every character the page DRAWS survives, read from the glyphs | 2 | OPEN | 1% |
+| `t06_encoding` | the bytes decode as the UTF-8 the writer declares | 2 | OPEN | 1% |
 
 ## Documents
 

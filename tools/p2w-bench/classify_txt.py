@@ -153,11 +153,16 @@ def write_classes(rs, by_check, base):
          "of them. Ranked by how many documents each check holds, because one fix that clears a check",
          "serves every document under it.", "",
          "## Classes", "",
-         "| check | what it means | documents | share |",
-         "|---|---|---:|---:|"]
+         # THE STATUS CELL IS THE GATE. round.py open_classes() counts a class as open when a row
+         # carries a cell that is exactly "OPEN". This table had no such column, so a round could
+         # close with every .txt check still failing - measured 20 Nov: 0 of the 9 .txt classes
+         # were visible to the gate while 46 documents failed one.
+         "| check | what it means | documents | status | share |",
+         "|---|---|---:|---|---:|"]
     for cid, n in sorted(by_check.items(), key=lambda kv: (-kv[1], kv[0])):
-        L.append("| `%s` | %s | %d | %.0f%% |"
-                 % (cid, MEANING.get(cid, ""), n, 100.0 * n / max(1, len(rs))))
+        L.append("| `%s` | %s | %d | %s | %.0f%% |"
+                 % (cid, MEANING.get(cid, ""), n, "OPEN" if n else "FIXED",
+                    100.0 * n / max(1, len(rs))))
     if not by_check:
         L.append("| - | no failing document | 0 | 0% |")
     if not base:

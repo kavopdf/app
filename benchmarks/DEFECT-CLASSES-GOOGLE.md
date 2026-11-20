@@ -12,44 +12,44 @@ Every other class table comes from `RANKING.csv`, a soffice render — a rendere
 
 `round.py --close-round` reads this file. A round cannot close while a row here says OPEN.
 
-Last regenerated: 2026-11-20 10:34 IST
+Last regenerated: 2026-11-20 10:35 IST
 
 ## Classes, ranked by gap (Google fails − LibreOffice fails)
 
-| signature | problem | open | fixed-in-LO-only | libreoffice | google |
-|---|---|---:|---:|---:|---:|
-| `32_stroke_lines` | 32_stroke_lines | 145 | 144 | 1 | 145 |
-| `05_chars_extra` | 05_chars_extra | 141 | 134 | 7 | 141 |
-| `18_displacement` | 18_displacement | 125 | 106 | 19 | 125 |
-| `04_chars_missing` | 04_chars_missing | 67 | 60 | 7 | 67 |
-| `59_shape_anchor` | 59_shape_anchor | 58 | 48 | 10 | 58 |
-| `25_invisible_text` | 25_invisible_text | 49 | 48 | 1 | 49 |
-| `45_char_accuracy` | 45_char_accuracy | 38 | 31 | 7 | 38 |
-| `13_text_colours` | 13_text_colours | 32 | 31 | 1 | 32 |
-| `60_text_column_right_edge` | 60_text_column_right_edge | 57 | 29 | 28 | 57 |
-| `44_header_footer` | 44_header_footer | 32 | 28 | 4 | 32 |
-| `17_matched_runs` | 17_matched_runs | 30 | 21 | 9 | 30 |
-| `00_page_count` | 00_page_count | 21 | 21 | 0 | 21 |
-| `27_text_off_page` | 27_text_off_page | 17 | 14 | 3 | 17 |
-| `47_margins` | 47_margins | 26 | 12 | 14 | 26 |
-| `26_text_overlap` | 26_text_overlap | 17 | 7 | 10 | 17 |
-| `10_font_sizes` | 10_font_sizes | 6 | 5 | 1 | 6 |
-| `43_within_10pt_x` | 43_within_10pt_x | 11 | 4 | 7 | 11 |
-| `23_line_pitch` | 23_line_pitch | 3 | 3 | 0 | 3 |
-| `34a_span_size_match` | 34a_span_size_match | 2 | 2 | 0 | 2 |
-| `38_list_markers` | 38_list_markers | 2 | 2 | 0 | 2 |
-| `31_pages_lost_their_text` | 31_pages_lost_their_text | 1 | 1 | 0 | 1 |
-| `42_justification_edges` | 42_justification_edges | 1 | 1 | 0 | 1 |
-| `46_text_crossing_rule` | 46_text_crossing_rule | 1 | 1 | 0 | 1 |
-| `51_field_values` | 51_field_values | 1 | 1 | 0 | 1 |
-| `35_rotation` | 35_rotation | 12 | 0 | 12 | 12 |
-| `63_table_rows` | 63_table_rows | 5 | 0 | 5 | 5 |
-| `66_table_cell_width` | 66_table_cell_width | 4 | 0 | 4 | 4 |
-| `53_embedded_faces` | 53_embedded_faces | 4 | 0 | 4 | 4 |
-| `62_table_columns` | 62_table_columns | 3 | 0 | 3 | 3 |
-| `40_link_targets` | 40_link_targets | 1 | 0 | 1 | 1 |
-| `52_outline` | 52_outline | 1 | 0 | 1 | 1 |
-| `64_table_span_across` | 64_table_span_across | 1 | 0 | 1 | 1 |
-| `65_table_span_down` | 65_table_span_down | 1 | 0 | 1 | 1 |
-| `37_super_subscript` | 37_super_subscript | 1 | 0 | 1 | 1 |
-| `28_clipped_at_edge` | 28_clipped_at_edge | 1 | 0 | 2 | 1 |
+| signature | problem | open | status | fixed-in-LO-only | libreoffice | google |
+|---|---|---:|---|---:|---:|---:|
+| `32_stroke_lines` | 32_stroke_lines | 145 | OPEN | 144 | 1 | 145 |
+| `05_chars_extra` | 05_chars_extra | 141 | OPEN | 134 | 7 | 141 |
+| `18_displacement` | 18_displacement | 125 | OPEN | 106 | 19 | 125 |
+| `04_chars_missing` | 04_chars_missing | 67 | OPEN | 60 | 7 | 67 |
+| `59_shape_anchor` | 59_shape_anchor | 58 | OPEN | 48 | 10 | 58 |
+| `25_invisible_text` | 25_invisible_text | 49 | OPEN | 48 | 1 | 49 |
+| `45_char_accuracy` | 45_char_accuracy | 38 | OPEN | 31 | 7 | 38 |
+| `13_text_colours` | 13_text_colours | 32 | OPEN | 31 | 1 | 32 |
+| `60_text_column_right_edge` | 60_text_column_right_edge | 57 | OPEN | 29 | 28 | 57 |
+| `44_header_footer` | 44_header_footer | 32 | OPEN | 28 | 4 | 32 |
+| `17_matched_runs` | 17_matched_runs | 30 | OPEN | 21 | 9 | 30 |
+| `00_page_count` | 00_page_count | 21 | OPEN | 21 | 0 | 21 |
+| `27_text_off_page` | 27_text_off_page | 17 | OPEN | 14 | 3 | 17 |
+| `47_margins` | 47_margins | 26 | OPEN | 12 | 14 | 26 |
+| `26_text_overlap` | 26_text_overlap | 17 | OPEN | 7 | 10 | 17 |
+| `10_font_sizes` | 10_font_sizes | 6 | OPEN | 5 | 1 | 6 |
+| `43_within_10pt_x` | 43_within_10pt_x | 11 | OPEN | 4 | 7 | 11 |
+| `23_line_pitch` | 23_line_pitch | 3 | OPEN | 3 | 0 | 3 |
+| `34a_span_size_match` | 34a_span_size_match | 2 | OPEN | 2 | 0 | 2 |
+| `38_list_markers` | 38_list_markers | 2 | OPEN | 2 | 0 | 2 |
+| `31_pages_lost_their_text` | 31_pages_lost_their_text | 1 | OPEN | 1 | 0 | 1 |
+| `42_justification_edges` | 42_justification_edges | 1 | OPEN | 1 | 0 | 1 |
+| `46_text_crossing_rule` | 46_text_crossing_rule | 1 | OPEN | 1 | 0 | 1 |
+| `51_field_values` | 51_field_values | 1 | OPEN | 1 | 0 | 1 |
+| `35_rotation` | 35_rotation | 12 | OPEN | 0 | 12 | 12 |
+| `63_table_rows` | 63_table_rows | 5 | OPEN | 0 | 5 | 5 |
+| `66_table_cell_width` | 66_table_cell_width | 4 | OPEN | 0 | 4 | 4 |
+| `53_embedded_faces` | 53_embedded_faces | 4 | OPEN | 0 | 4 | 4 |
+| `62_table_columns` | 62_table_columns | 3 | OPEN | 0 | 3 | 3 |
+| `40_link_targets` | 40_link_targets | 1 | OPEN | 0 | 1 | 1 |
+| `52_outline` | 52_outline | 1 | OPEN | 0 | 1 | 1 |
+| `64_table_span_across` | 64_table_span_across | 1 | OPEN | 0 | 1 | 1 |
+| `65_table_span_down` | 65_table_span_down | 1 | OPEN | 0 | 1 | 1 |
+| `37_super_subscript` | 37_super_subscript | 1 | OPEN | 0 | 1 | 1 |
+| `28_clipped_at_edge` | 28_clipped_at_edge | 1 | OPEN | 0 | 2 | 1 |
