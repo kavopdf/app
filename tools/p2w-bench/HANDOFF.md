@@ -20,7 +20,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> Apply FINDINGS/fffd-cmap-destination-2300-fixer.patch, then run p2w.py --budget 250 repeatedly until complete - it populates the .docx AND the .txt for all 213 in one pass and gives the docx ratchet the patch needs. Then restamp_txt.py --run and --apply, classrow.py --write, regress.py --check, commit RANKING.csv and STATE-TXT.json. Do not screen these two documents on their own: soffice cannot prerender them inside a call.
+> Do not apply the FFFD patch first. Render page 1 of 041122-Account_Opening_Form at 150 DPI and look at the 127 glyph sites - ligature or not decides whether the patch is right. Read FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md. If ligature, the fix is CIDToGIDMap plus the descendant cmap; if not, apply FINDINGS/fffd-cmap-destination-2300-fixer.patch and budget the whole slot for p2w.py --budget 250 to completion, then restamp_txt.py --run/--apply, classrow.py --write, regress.py --check.
 
 ## Agents deployed and not yet accounted for
 

@@ -1186,3 +1186,11 @@
 {"t": 1795194830.9951532, "ist": "22:43:50", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795194831.089715, "ist": "22:43:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795194831.1078665, "ist": "22:43:51", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795194853.1666257, "ist": "22:44:13", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795194853.9092374, "ist": "22:44:13", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795194854.189655, "ist": "22:44:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795194886.820819, "ist": "22:44:46", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795194887.0413668, "ist": "22:44:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795194887.7612991, "ist": "22:44:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795194888.3663204, "ist": "22:44:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795194888.6792789, "ist": "22:44:48", "ev": "beat", "d": "report.py: building the report"}

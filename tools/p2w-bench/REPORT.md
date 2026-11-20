@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 21:57 → running IST · 46 min**
+**20 Nov 2026 · slot 21:57 → 22:43 IST · 46 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,7 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
-| Committed | **17** files in 1 commit(s) from `3233ad3` — ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, HISTORY-TXT.jsonl, LAST-MESSAGE.md, REPORT.md, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, STATE-TXT.json, TIMELINE.jsonl, TRACE.md, ff |
+| Committed | **18** files in 3 commit(s) from `b87c499` — ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, HISTORY-TXT.jsonl, LAST-MESSAGE.md, REPORT.md, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, STATE-TXT.json, TIMELINE.jsonl, TRACE.md, ff |
 
 ## What was tried
 
@@ -50,9 +50,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 21:57 → running · 46 min |
+| Slot window | 21:57 → 22:43 · 46 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 16 |
+| Tool beats | 22 |
 | Longest silence | **23.3 min** — from 21:57:13, after `pending.py: reading the pending gate` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 need a human |
@@ -77,7 +77,7 @@
 
 ## Next run
 
-Apply FINDINGS/fffd-cmap-destination-2300-fixer.patch, then run p2w.py --budget 250 repeatedly until complete - it populates the .docx AND the .txt for all 213 in one pass and gives the docx ratchet the patch needs. Then restamp_txt.py --run and --apply, classrow.py --write, regress.py --check, commit RANKING.csv and STATE-TXT.json. Do not screen these two documents on their own: soffice cannot prerender them inside a call.
+Do not apply the FFFD patch first. Render page 1 of 041122-Account_Opening_Form at 150 DPI and look at the 127 glyph sites - ligature or not decides whether the patch is right. Read FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md. If ligature, the fix is CIDToGIDMap plus the descendant cmap; if not, apply FINDINGS/fffd-cmap-destination-2300-fixer.patch and budget the whole slot for p2w.py --budget 250 to completion, then restamp_txt.py --run/--apply, classrow.py --write, regress.py --check.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

@@ -86,9 +86,11 @@ regress.py --check before any commit.
 
 ## Subagents
 
+
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
 | `t01_ToUnicode CMap destination-01` | Is the U+FFFD the CMap's own answer or a parse failu | 22:39 | 17:09 | 0 min |
+| `t01_adversarial patch review-01` | How can this Identity-H recovery write wrong text in | 22:43 | 17:13 | 0 min |
 
 Two agents, and they disagree - which is the most useful thing this slot produced.
 
@@ -113,11 +115,12 @@ not decides which of the two agents is right, and it costs one page.
 
 
 
+
 | | |
 |:--|:--|
-| Slot window | 21:57 → running · 46 min |
+| Slot window | 21:57 → 22:43 · 46 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 16 |
+| Tool beats | 22 |
 | Longest silence | **23.3 min** — from 21:57:13, after `pending.py: reading the pending gate` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 need a human |
@@ -144,7 +147,10 @@ minutes. A release at the end of a run matters as much as the claim at the start
 
 ## Next run
 
-Apply FINDINGS/fffd-cmap-destination-2300-fixer.patch, then run p2w.py --budget 250 repeatedly until
-complete. Then restamp\_txt.py --run and --apply, classrow.py --write, regress.py --check, and commit
-RANKING.csv with STATE-TXT.json. Do not screen these two documents on their own - soffice cannot
-prerender them inside a call.
+Do not apply the patch first. Render page 1 of 041122\_Account\_Opening\_Form at 150 DPI and look at
+the 127 glyph sites - STEP 4c, one page, and it decides which of the two agents is right. If the page
+draws a ligature, the fix is the CIDToGIDMap plus the descendant font's own cmap, and
+FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md lists the guards the helper would need anyway.
+If it draws what the CID names, apply FINDINGS/fffd-cmap-destination-2300-fixer.patch and budget the
+whole slot for p2w.py --budget 250 repeated to completion, then restamp\_txt.py --run and --apply,
+classrow.py --write, regress.py --check, and commit RANKING.csv with STATE-TXT.json.
