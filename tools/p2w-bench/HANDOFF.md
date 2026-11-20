@@ -72,7 +72,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `20:59` attempt 1 on t01_word_accuracy -> reverted (0/10 moved)
 - `21:22` attempt 2 on t01_word_accuracy -> kept (3/10 moved)
 - `21:46` attempt 3 on t01_word_accuracy -> reverted (0/10 moved)
 - `21:47` agent deployed: t01_word_accuracy / verifier-tokenisation - Does verify_txt.py's t01 tokenisation charge a correct .txt for words the page d
@@ -97,6 +96,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `01:41` agent landed: t01_word_accuracy / A -> FINDINGS/411-nested-xobject-matrix-1940.md
 - `01:41` agent landed: t01_word_accuracy / B -> FINDINGS/39-small-caps-gap-threshold-0150-fixer.md
 - `01:41` attempt 9 on t01_word_accuracy -> reverted (0/5 moved)
+- `01:47` attempt 10 on t01_word_accuracy -> reverted (0/5 moved)
 
 ## Where the rest of the state lives
 

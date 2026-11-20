@@ -551,7 +551,7 @@
   "status": "OPEN"
  },
  "t01_word_accuracy": {
-  "attempts": 9,
+  "attempts": 10,
   "first_seen": null,
   "history": [
    {
@@ -616,6 +616,13 @@
     "outcome": "reverted",
     "reason": "SECOND ATTEMPT, measurement only, no engine change. Two subagents on the class. 411_nested_xobject_transforms: the handed diagnosis (matrix disagreement, line off page) is FALSE - both parsers compute",
     "total": 5
+   },
+   {
+    "at": "2026-11-21 01:47",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "THIRD ATTEMPT, measurement only. 38_faux_bold_italic_synthesised: the page draws each of its two headings THREE times at the identical position (two fill spans + one stroke span, same font, same size,",
+    "total": 5
    }
   ],
   "last": null,
@@ -631,11 +638,12 @@
    "kept",
    "reverted",
    "reverted",
+   "reverted",
    "reverted"
   ],
   "ratchet_at": "20 Nov 21:49",
   "ratchet_docs": 4,
-  "reason": "SECOND ATTEMPT, measurement only, no engine change. Two subagents on the class. 411_nested_xobject_transforms: the handed diagnosis (matrix disagreement, line off page) is FALSE - both parsers compute CTM [0 1 -1 0 60 700] to the digit and PDFBox returns all 32 glyphs; only pymupdf page.get_text() drops them, via TEXT_MEDIABOX_CLIP, so the reference invents S and O. Turning that flag off leaves 211/213 rows byte-identical and improves 411 and 12_stamp_across_page_break. 39_small_caps_letter_spacing: letter spacing is TD x-coordinates of single-glyph TJ arrays, writer threshold 1.440pt vs reference 1.200pt; the correct .txt scores 97.4->58.5 on t01 and 2->22 on t12, so the reference rewards the wrong file. Both are the instrument's; verify_txt.py NOT edited. 601_fillable_admission_form is the only engine-side document left in t01.",
+  "reason": "THIRD ATTEMPT, measurement only. 38_faux_bold_italic_synthesised: the page draws each of its two headings THREE times at the identical position (two fill spans + one stroke span, same font, same size, same baseline) - the faux-bold idiom. page.get_text() reads the two fill copies and counts each line twice: 201 words against 186 with identical-position spans collapsed, which is the t01 charge on a 99% threshold, and the doubled em dash is the t07 charge. Corpus-wide scan of all 213 PDFs: exactly 1 document has identical-position duplicate spans, so a same-place-same-string dedupe on the source side has a blast radius of one document. verify_txt.py not edited.",
   "reasons": [
    "claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_small_caps_letter_spacing, 406_passport_mrz_page, 411_nested_xobject_transforms, 601_fillable_admission_form, 77_arabic_rtl_document, 79_inr_indian_digit_grouping_table. Check is 'source words all present >= 98%', so the .txt is dropping words the page drew.",
    "CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words welded to those NULs by r'\\S+', so 'Strongly\\x00agree' and '\\x00\\x00\\x00\\x00PHOTOGRAPH' were single tokens no .txt can ever contain, and t01 charged each one as lost text. _words now splits on control characters instead of treating them as word characters. Measured: 79_inr_indian_digit_grouping_table 91.9 -> 100.0 (9/10 -> 10/10 checks), 391_survey_questionnaire_grid 97.5 -> 100.0 (5/7 -> 7/7), 406_passport_mrz_page 98.5 -> 100.0 (5/7 -> 7/7); all three now PASS every applicable txt check. t12 improved on 391 and 406 for the same reason - a NUL token was counted as an invented word. Scanned all 213 documents with glyph_truth: exactly 6 declare a control character inside a source token, and the other three (balance-sheet-and-profit-loss, 392_statistical_console_output, balance-sheet-two-columns-of-figures) still PASS t01. The change only removes source tokens and adds none, so no document can regress. test_txt_checks.py 8/8.",
@@ -645,7 +653,8 @@
    "SOURCE-SIDE HONESTY for a code the font itself cannot name. The two bank forms fail 7 of 10 checks each; 4 of those 7 were the same fault counted four times. pymupdf's /ToUnicode fallback prints the CODE as a character, so Effra's ligature CIDs 0x123/0x124/0x126/0x127 arrive in the source text as \\u0123 \\u0124 \\u0126 \\u0127 ('O\\u0123ce' for 'Office'), and t01/t03/t07/t12 all condemned the writer for not carrying a letter the page never drew. glyph_truth now emits U+FFFD for a code the font's own CMap answers FFFD for, which is exactly what the writer emits for the same glyph; the substitution is length-preserving and fires only when the page's glyph walk drew exactly as many of that glyph id as the text holds that character. Measured on both bank forms with ConvertOne + verify_txt.py: passed 3 of 12 -> 6 of 12. t01_word_accuracy, t03_symbols and t07_symbol_counts now pass on both; t06_encoding still FAILS on both, so the 127 U+FFFD in the .txt are still owned by a check and the document is not claimed clean. The engine defect itself is NOT fixed: the ligature identity is not recoverable from the PDF (see FINDINGS/ligature-identity-UNRECOVERABLE-2350.md).",
    "SECOND ATTEMPT, measurement only, no code changed. 601_fillable_admission_form loses exactly three tokens - '3', '3' and 'General'. The two '3's are ticked checkboxes: the page's /Resources name only Helvetica and Helvetica-Bold, no page content stream names a Zapf face, and the marks are in the widget appearance streams at xref 51 and 57 as 'BT /ZaDb 9 Tf (3) Tj ET'. /ZaDb is ZapfDingbats and 0x33 is its checkmark, so the page really draws two ticks and PDFBox's PDFTextStripper never processes annotation appearance streams - a probe over the whole document returns 530 glyphs, all Helvetica, no Zapf face. That is real content loss: the user's .docx has two blank boxes where the form was answered. The source side is wrong in the other direction - pymupdf reads the tick and calls it '3', the Zapf code, not a character. Both sides need one rule before either is honest, so nothing was changed. The fix is named in FINDINGS/601-tick-is-a-widget-appearance-2342.md: walk each widget's /AP /N stream, which formValuesOf/widgetValue already have the shape of on the engine side and _ap_stream_text already does on the instrument side.",
    "claimed (8th attempt). t01_word_accuracy, 5 documents, .txt half. Two bank forms now carry t06/t08/t09 only. Remaining: 38_faux_bold_italic_synthesised, 39_small_caps_letter_spacing, 411_nested_xobject_transforms. Census first, then one construct.",
-   "SECOND ATTEMPT, measurement only, no engine change. Two subagents on the class. 411_nested_xobject_transforms: the handed diagnosis (matrix disagreement, line off page) is FALSE - both parsers compute CTM [0 1 -1 0 60 700] to the digit and PDFBox returns all 32 glyphs; only pymupdf page.get_text() drops them, via TEXT_MEDIABOX_CLIP, so the reference invents S and O. Turning that flag off leaves 211/213 rows byte-identical and improves 411 and 12_stamp_across_page_break. 39_small_caps_letter_spacing: letter spacing is TD x-coordinates of single-glyph TJ arrays, writer threshold 1.440pt vs reference 1.200pt; the correct .txt scores 97.4->58.5 on t01 and 2->22 on t12, so the reference rewards the wrong file. Both are the instrument's; verify_txt.py NOT edited. 601_fillable_admission_form is the only engine-side document left in t01."
+   "SECOND ATTEMPT, measurement only, no engine change. Two subagents on the class. 411_nested_xobject_transforms: the handed diagnosis (matrix disagreement, line off page) is FALSE - both parsers compute CTM [0 1 -1 0 60 700] to the digit and PDFBox returns all 32 glyphs; only pymupdf page.get_text() drops them, via TEXT_MEDIABOX_CLIP, so the reference invents S and O. Turning that flag off leaves 211/213 rows byte-identical and improves 411 and 12_stamp_across_page_break. 39_small_caps_letter_spacing: letter spacing is TD x-coordinates of single-glyph TJ arrays, writer threshold 1.440pt vs reference 1.200pt; the correct .txt scores 97.4->58.5 on t01 and 2->22 on t12, so the reference rewards the wrong file. Both are the instrument's; verify_txt.py NOT edited. 601_fillable_admission_form is the only engine-side document left in t01.",
+   "THIRD ATTEMPT, measurement only. 38_faux_bold_italic_synthesised: the page draws each of its two headings THREE times at the identical position (two fill spans + one stroke span, same font, same size, same baseline) - the faux-bold idiom. page.get_text() reads the two fill copies and counts each line twice: 201 words against 186 with identical-position spans collapsed, which is the t01 charge on a 99% threshold, and the doubled em dash is the t07 charge. Corpus-wide scan of all 213 PDFs: exactly 1 document has identical-position duplicate spans, so a same-place-same-string dedupe on the source side has a blast radius of one document. verify_txt.py not edited."
   ],
   "requeues": 0,
   "status": "OPEN"

@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 00:57 → running IST · 48 min**
+**21 Nov 2026 · slot 00:57 → running IST · 50 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -8,7 +8,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 2 attempt(s), 0 kept |
+| Documents improved this run | **0** — 3 attempt(s), 0 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -18,7 +18,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
-| Committed | **16** files in 2 commit(s) from `6dbc20f` — 39-small-caps-gap-threshold-0150-fixer.md, ATTEMPTS.json, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, TIMELIN |
+| Committed | **17** files in 3 commit(s) from `4e676a7` — ...NT-PROPOSAL-clip-flag-NOT-APPLIED-0210-fixer.md, 39-small-caps-gap-threshold-0150-fixer.md, ATTEMPTS.json, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROTATION.json, ROUND.j |
 
 ## What was tried
 
@@ -26,6 +26,7 @@
 |--:|:--|--:|:--|
 | 00:57 | **reverted** | 0/5 | claimed (8th attempt). t01_word_accuracy, 5 documents, .txt half. Two bank forms now carry t06/t08/t09 only. Remaining: 38_faux_bold_italic_synthesised, 39_small_caps_letter_spacing, 411_nested_xobjec |
 | 01:41 | **reverted** | 0/5 | SECOND ATTEMPT, measurement only, no engine change. Two subagents on the class. 411_nested_xobject_transforms: the handed diagnosis (matrix disagreement, line off page) is FALSE - both parsers compute |
+| 01:47 | **reverted** | 0/5 | THIRD ATTEMPT, measurement only. 38_faux_bold_italic_synthesised: the page draws each of its two headings THREE times at the identical position (two fill spans + one stroke span, same font, same size, |
 
 ## The txt
 
@@ -48,9 +49,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 00:57 → running · 48 min |
+| Slot window | 00:57 → running · 50 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 21 |
+| Tool beats | 25 |
 | Longest silence | **28.3 min** — from 00:57:53, after `classrow.py: refreshing the class file` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 1 need a human |
@@ -61,9 +62,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **41 min** | `###################` |
+| measure or build - a conversion, screen or compile writes no beacon | **41 min** | `##################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **4 min** | `##` |
+| report - the report and the chain | **5 min** | `###` |
 | other - not attributed to a tool | **0 min** | `#` |
 ## Best results this round
 
