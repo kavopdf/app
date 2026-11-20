@@ -217,3 +217,40 @@ cron and a zombie run - are not automatable at all.
 
 This was found during the final audit, not by a run failing. That is the point of writing it down: the
 next run does not have to discover it.
+
+---
+
+## YOUR REPORT IS GENERATED AND VERIFIED. IT IS NOT WRITTEN.
+
+The user's instruction, 20 Nov: *"sabhi ke reports me yeh ensure karna koi bhi report hath se na likha
+jaaye mujhe sabhi crons ke report me hamesha 100% accuracy chahiye."*
+
+**Every number in your message must be one a tool printed.** Not remembered, not rounded, not
+reconstructed from what you think the run did.
+
+Write the report, then run this before you commit it:
+
+    python3 tools/p2w-bench/lastmessage.py --file /tmp/report.md --for CRON
+
+where `CRON` is `gverify` or `health`. It compares **every integer** in your message against what the
+tools print, character for character. Dates and clock times are stripped first - a date is not a
+measurement.
+
+    REFUSED - 1 number(s) in this gverify report are not in the tool output:
+      gverify: 999 is not in the gverify output - ...32_stroke_lines fails 999 documents in Google...
+    A number a run types is a number a run can get wrong.
+
+Exit 3 means a number you wrote is not in the tool output. **Do not "fix" it by re-running until the
+numbers match** - open the tool, read what it prints, and copy that. If the sentence needs a number no
+tool prints, delete the sentence.
+
+**A report that fails this check is not committed.** The numbers that matter, and the tool that owns
+each:
+
+    how many measured, scored, refused    gverify.py --report
+    which check fails how many docs       gverify.py --report
+    the stage and what is next            stage.py
+    the capability table                  gverify.py --matrix
+    each stage done/moving/stopped        health.py
+    the day's trend row                  progress.py
+
