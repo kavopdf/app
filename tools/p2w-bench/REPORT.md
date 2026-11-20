@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 21:57 → running IST · 43 min**
+**20 Nov 2026 · slot 21:57 → running IST · 46 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,6 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
+| Committed | **17** files in 1 commit(s) from `3233ad3` — ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, HISTORY-TXT.jsonl, LAST-MESSAGE.md, REPORT.md, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, STATE-TXT.json, TIMELINE.jsonl, TRACE.md, ff |
 
 ## What was tried
 
@@ -43,16 +44,17 @@
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
 | `t01_ToUnicode CMap destination-01` | Is the U+FFFD the CMap's own answer or a parse failu | 22:39 | 17:09 | 0 min |
+| `t01_adversarial patch review-01` | How can this Identity-H recovery write wrong text in | 22:43 | 17:13 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 21:57 → running · 43 min |
+| Slot window | 21:57 → running · 46 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 13 |
+| Tool beats | 16 |
 | Longest silence | **23.3 min** — from 21:57:13, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 need a human |
 
 
@@ -60,9 +62,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **42 min** | `#####################` |
+| fix - diagnose and change the engine | **42 min** | `####################` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **3 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |

@@ -16,7 +16,7 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> The U+FFFD in the two bank forms is the /ToUnicode CMap's own destination value - REAQAG+Effra-Regular declares <0123>/<0124>/<0126>/<0127> -> FFFD and pdfbox returns it verbatim (PDFont.java:474; PDType0Font returns at 489 before its fallback). PdfToWord.processTextPosition:2101 trusts it because isJunk():2501 accepts U+FFFD. The patch in FINDINGS/fffd-cmap-destination-2300-fixer.patch applies clean to e5268fe and was measured: both documents go 7 of 10 failing -> 3 of 10 on verify_txt, U+FFFD 127 -> 0, closing t01/t03/t06/t07 on each. It was reverted unmeasured at corpus scale. THE WALL IS THE INSTRUMENT, NOT THE FIX: screen.py --docs on these two documents could not get past prerender in three consecutive 295 s calls, and restamp_txt.py --run needs /scratch/work/p2w/out which only p2w.py --budget populates. Budget a full slot for p2w.py --budget 250 repeated to completion, then restamp_txt --run/--apply and classrow.py --write.
+> The U+FFFD root cause is known (CMap destination), but TWO agents disagree on whether the fix is right and the .txt measurement cannot settle it: pymupdf resolves Identity fonts the same way, so agreement between extractors is not evidence. FIRST ACTION NEXT RUN: render page 1 of 041122-Account_Opening_Form at 150 DPI and look at the 127 glyph sites - ligature or not. If ligature, the fix is CIDToGIDMap plus the descendant cmap; if not, apply FINDINGS/fffd-cmap-destination-2300-fixer.patch. Read FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md before touching the engine.
 
 ## What the next run should do first
 
@@ -61,14 +61,13 @@ unfinished work, not as a result.
 | t01_verifier-tokenisation-01 | t01_word_accuracy | verifier-tokenisation | Does verify_txt.py's t01 tokenisation charge a correct .txt for words  | 21:02 | a per-asymmetry verdict with measured before/after on synthetic cases, and a diff for any instrument bug | landed | Verdict ENGINE for the two bank forms (127 tokens of U+FFFD where the source declares U+0124); two real instrument bugs found (widget /AP double-count, source word boundaries) but neither makes any of the ten pass; 15 asymmetries tested and ruled harmless with numbers. Ruled the instrument out as the explanation for 79/391/406 - which the run then found was wrong: the NUL declaration WAS the instrument's fault. See FINDINGS/t01_word_accuracy-CONTROL-CHARS-2135.md |
 | t01_writer-word-drop-01 | t01_word_accuracy | writer-word-drop | Which construct in TxtWriter.java/PdfToWord.java drops words the PDF d | 21:02 | a ranked table with file:line, the exact condition, measured evidence and the minimal fix | landed | No writer drop on either measurable document: 041122's 131 lost tokens are 127 ligature U+FFFD plus 4 genuine; the filled form's 145 are the same 127 plus 18 widget values counted twice by the source. Measured negatives that remove possibilities permanently: nested XObject with a scaling CTM LOST 0, Arabic through logicalOrder LOST 0 (length-preserving), below-paper LOST 0, letterspacing 0.16-0.30em identical both sides. Also: clipToPaper() is dead code and the live filter uses the CropBox ignoring its offset - a page whose CropBox origin is not (0,0) drops visible text (measured: VISIBLE -> V). |
 | t01_ToUnicode CMap destination-01 | t01_word_accuracy | ToUnicode CMap destination | Is the U+FFFD the CMap's own answer or a parse failure, and what is th | 22:39 | the root cause with file:line and a patch proven on the two documents | landed | FINDINGS/t01_word_accuracy-FFFD-CMAP-2300-fixer.md |
+| t01_adversarial patch review-01 | t01_word_accuracy | adversarial patch review | How can this Identity-H recovery write wrong text into the document? | 22:43 | a ranked list of regression risks with a one-line test each | landed | FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `19:27` attempt 1 on t12_word_invention -> reverted (0/12 moved)
-- `19:29` attempt 2 on t12_word_invention -> reverted (0/12 moved)
 - `19:31` agent deployed: t13 / column census - which of the six t13 documents still fail at head, the exact end column of every
 - `19:31` agent deployed: t13 / itr weld fix - implement and measure the TxtWriter change that clears itr-computation-with-slab
 - `19:31` agent landed: t13 / column census -> tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md
@@ -92,6 +91,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `22:39` attempt 5 on t01_word_accuracy -> reverted (2/7 moved)
 - `22:39` agent deployed: t01_word_accuracy / ToUnicode CMap destination - Is the U+FFFD the CMap's own answer or a parse failure, and what is the smallest
 - `22:39` agent landed: t01_word_accuracy / ToUnicode CMap destination -> FINDINGS/t01_word_accuracy-FFFD-CMAP-2300-fixer.md
+- `22:43` agent deployed: t01_word_accuracy / adversarial patch review - How can this Identity-H recovery write wrong text into the document?
+- `22:43` agent landed: t01_word_accuracy / adversarial patch review -> FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md
 
 ## Where the rest of the state lives
 

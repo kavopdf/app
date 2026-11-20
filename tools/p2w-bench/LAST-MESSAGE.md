@@ -1,6 +1,6 @@
 # Fixer report - 2026-11-20 21:57
 
-**20 Nov 2026 · slot 21:57 → running IST · 42 min**
+**20 Nov 2026 · slot 21:57 → running IST · 46 min**
 
 > No engine change was kept this run. What the slot bought is a proven root cause and a patch that
 > needs a corpus pass the slot could not afford - and a named wall that has now eaten three runs.
@@ -90,20 +90,36 @@ regress.py --check before any commit.
 |:--|:--|--:|--:|--:|
 | `t01_ToUnicode CMap destination-01` | Is the U+FFFD the CMap's own answer or a parse failu | 22:39 | 17:09 | 0 min |
 
-One agent, not two. It found the mechanism, the file and line, the CMap bytes and a patch that
-compiles - then ran past its budget and had to be cut off, which is also the 23 minute silence in the
-timing table below. The second angle was not deployed before the slot ran out.
+Two agents, and they disagree - which is the most useful thing this slot produced.
+
+The first found the mechanism, the file and line, the CMap bytes, and a patch that compiles and
+moves the .txt number. The second saw only the diff and says do not land it: the helper writes the
+CID as a code point, and the CIDs here are 0x0123/0x0124/0x0126/0x0127, which are g-with-cedilla,
+H-circumflex, H-stroke and h-stroke. A bank form does not draw those. If the page really draws a
+ligature, this replaces 127 visible U+FFFD with 127 wrong letters - wrong text that looks like text,
+which nothing downstream can detect.
+
+The measurement above cannot settle that argument, and this is the part worth carrying forward:
+t01\_word\_accuracy passes because our .txt now agrees with the source extraction, and the source
+extraction is pymupdf, which resolves an Identity font the same way. Two extractors making the same
+assumption agree with each other whether or not the assumption is true. The check moved; the
+question did not.
+
+So the first thing the next run does is not measure anything. It renders page 1 of
+041122-Account\_Opening\_Form at 150 DPI and looks at the 127 glyph sites with an eye. Ligature or
+not decides which of the two agents is right, and it costs one page.
 
 ## Timing
 
 
+
 | | |
 |:--|:--|
-| Slot window | 21:57 → running · 43 min |
+| Slot window | 21:57 → running · 46 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 13 |
+| Tool beats | 16 |
 | Longest silence | **23.3 min** — from 21:57:13, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 need a human |
 
 
@@ -111,9 +127,9 @@ timing table below. The second angle was not deployed before the slot ran out.
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **42 min** | `#####################` |
+| fix - diagnose and change the engine | **42 min** | `####################` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **3 min** | `##` |
 
 The 23 minute silence is the subagent running inline, not a dead run.
 

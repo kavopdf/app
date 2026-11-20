@@ -93,3 +93,34 @@ the corpus is bounded - but the docx ratchet is what proves it, not that census.
 - The writer: `TxtWriter`/`DocxWriter` receive the U+FFFD already formed.
 - The control-character fix of 21:49 (already landed, `_words` splitting) - that is a different
   mechanism and it is why the class went 10 -> 7 open before this.
+
+## A second agent read the patch adversarially and says do not land it as written
+
+Recorded 23:25 by a review agent that saw only the diff, in
+`FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md`. Its objection is the strongest thing
+in this run and the next run must answer it before the patch goes anywhere:
+
+- `sb.append((char) code)` turns the CID into a code point. The CIDs measured here are
+  0x0123/0x0124/0x0126/0x0127, which are the characters g-with-cedilla, H-circumflex,
+  H-stroke and h-stroke. A bank form does not draw those. If the page really draws a
+  ligature or a special glyph and the CMap declines to name it, this writes 127 wrong
+  letters into the document - and wrong text that looks like text is worse than a visible
+  U+FFFD, because nothing downstream can tell.
+- One CID becomes exactly one char, so a CID that should expand to two characters cannot.
+- The PdfEngine call site has neither `decodeThroughFont` nor `isJunk` precedence, so the
+  search index and the exported .docx can hold different text for the same glyph - the
+  divergence the patch's own comment claims to remove.
+
+**And the review is right that the measurement above cannot settle it.** t01_word_accuracy
+passes because our .txt now agrees with the source extraction, and the source extraction is
+pymupdf, which resolves an Identity font the same way. Two extractors making the same
+assumption agree with each other whether or not the assumption is true. The check moved; the
+question did not.
+
+The test that settles it costs one page, and it is STEP 4c - look at it. Render page 1 of
+041122-Account_Opening_Form at 150 DPI, crop where the 127 glyphs sit, and read the letters
+with an eye. If the page draws a ligature, the patch is wrong and the answer is the
+CIDToGIDMap plus the descendant font's own cmap, not the CID as a code point. If the page
+draws exactly what the CID names, the patch is right and the review's first risk is closed.
+
+Until that is done this patch must not be landed, whatever the .txt number says.

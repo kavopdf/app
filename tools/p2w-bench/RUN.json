@@ -8,7 +8,8 @@
  "kept": 0,
  "docs_improved": 0,
  "agents": [
-  "t01_ToUnicode CMap destination-01"
+  "t01_ToUnicode CMap destination-01",
+  "t01_adversarial patch review-01"
  ],
  "obstacles_cleared": 0,
  "needs_human": 0
