@@ -564,6 +564,14 @@
   {
    "at": "20:45",
    "text": "agent landed: 47margins / class census -> FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md"
+  },
+  {
+   "at": "20:59",
+   "text": "attempt 1 on t01_word_accuracy -> reverted (0/10 moved)"
+  },
+  {
+   "at": "21:22",
+   "text": "attempt 2 on t01_word_accuracy -> kept (3/10 moved)"
   }
  ],
  "next": "47_margins: re-measure the class against a fresh render, not the tables - 392_statistical_console_output already reads 0.06 and passes all 42 checks on this engine while RANKING.csv says 1.61 and both gverify tables say 47_margins FAIL, so the class is at most 25 documents. Then pull the thread FINDINGS/47_margins-REACH-140500.md leaves open: 360_restaurant_menu's body column was 12 pt left (source 52, render 40) and 9 runs are still 11.9 pt out; the leading-space indent and the centred-line constructs are both capped under the 25% bar and must not be retried.",
@@ -942,9 +950,9 @@
   }
  ],
  "run": {
-  "started": "20:01",
-  "ended": "20:46",
-  "ended_how": "forced"
+  "started": "20:58",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

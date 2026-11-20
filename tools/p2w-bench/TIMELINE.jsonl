@@ -1074,3 +1074,24 @@
 {"t": 1795187841.8586268, "ist": "20:47:21", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795187842.8017828, "ist": "20:47:22", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795187843.426233, "ist": "20:47:23", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795188528.6804316, "ist": "20:58:48", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795188528.8217716, "ist": "20:58:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795188536.2529676, "ist": "20:58:56", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1795188551.4574175, "ist": "20:59:11", "ev": "beat", "d": "(no activity given)"}
+{"t": 1795188553.3769321, "ist": "20:59:13", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795188562.5833406, "ist": "20:59:22", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795188570.7545822, "ist": "20:59:30", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795188573.2500124, "ist": "20:59:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795188573.53457, "ist": "20:59:33", "ev": "attempt", "d": "t01_word_accuracy -> reverted"}
+{"t": 1795188573.6323736, "ist": "20:59:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795188573.7382164, "ist": "20:59:33", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795189948.184398, "ist": "21:22:28", "ev": "beat", "d": "(no activity given)"}
+{"t": 1795189975.0145717, "ist": "21:22:55", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795189975.537254, "ist": "21:22:55", "ev": "attempt", "d": "t01_word_accuracy -> kept"}
+{"t": 1795189975.670403, "ist": "21:22:55", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795189975.8146243, "ist": "21:22:55", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795190305.8728197, "ist": "21:28:25", "ev": "beat", "d": "(no activity given)"}
+{"t": 1795190569.775224, "ist": "21:32:49", "ev": "beat", "d": "(no activity given)"}
+{"t": 1795190837.109901, "ist": "21:37:17", "ev": "beat", "d": "(no activity given)"}
+{"t": 1795191062.7730057, "ist": "21:41:02", "ev": "beat", "d": "(no activity given)"}
+{"t": 1795191152.5168774, "ist": "21:42:32", "ev": "beat", "d": "(no activity given)"}

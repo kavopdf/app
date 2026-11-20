@@ -93,8 +93,8 @@ document,applicable,passed,failed,abstained,failed_ids
 383_api_docs_page,7,7,0,0,
 38_faux_bold_italic_synthesised,9,7,2,2,t01_word_accuracy t07_symbol_counts
 390_wide_data_appendix,8,8,0,0,
-391_survey_questionnaire_grid,7,5,2,2,t01_word_accuracy t12_word_invention
-392_statistical_console_output,7,6,1,1,t12_word_invention
+391_survey_questionnaire_grid,7,7,0,0,
+392_statistical_console_output,7,7,0,0,
 393_spectrum_peak_table,7,7,0,0,
 394_map_with_legend,7,7,0,0,
 39_small_caps_letter_spacing,9,7,2,2,t01_word_accuracy t12_word_invention
@@ -104,7 +104,7 @@ document,applicable,passed,failed,abstained,failed_ids
 403_crossword_puzzle,7,7,0,0,
 404_sudoku_grid,6,6,0,0,
 405_sheet_music_lyrics,7,7,0,0,
-406_passport_mrz_page,7,5,2,2,t01_word_accuracy t12_word_invention
+406_passport_mrz_page,7,7,0,0,
 407_id_card_front_back,7,7,0,0,
 40_devanagari_shaping_font,9,9,0,0,
 410_form_xobject_reused,7,7,0,0,
@@ -156,7 +156,7 @@ document,applicable,passed,failed,abstained,failed_ids
 76_devanagari_table,10,10,0,0,
 77_arabic_rtl_document,9,7,2,2,t01_word_accuracy t12_word_invention
 78_mixed_english_devanagari_line,9,9,0,0,
-79_inr_indian_digit_grouping_table,10,9,1,1,t01_word_accuracy
+79_inr_indian_digit_grouping_table,10,10,0,0,
 80_gstin_pan_cin_ifsc_table,9,9,0,0,
 Account_Opening_Form_Fillable_filled,10,3,7,7,t01_word_accuracy t03_symbols t06_encoding t07_symbol_counts t08_line_order t09_page_furniture t12_word_invention
 academic-paper-ieee-2col-abstract,10,10,0,0,

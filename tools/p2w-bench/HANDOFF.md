@@ -9,9 +9,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 20:01 |
-| ended | 20:46 |
-| how it ended | forced |
+| started | 20:58 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -56,16 +56,14 @@ unfinished work, not as a result.
 | t13_B-02 | t13_amount_columns | B | reach of a per-page end column across the whole .txt corpus, before an | 17:09 | which of 213 improve and which regress | landed | FINDINGS/t13-page-end-column-KEPT-172000.md |
 | t13column census-01 | t13 | column census | which of the six t13 documents still fail at head, the exact end colum | 18:01 | a per-document table with columns, path and a fixable/geometry verdict | landed | tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md |
 | t13itr weld fix-01 | t13 | itr weld fix | implement and measure the TxtWriter change that clears itr-computation | 18:11 | a unified diff plus before and after scores for the six and for a wider set | landed | tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md |
-| 47maanchor trace-01 | 47margins | anchor trace | which writer construct puts 360_restaurant_menu's body column 12 pt le | 20:45 | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md | landed | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md |
-| 47maclass census-01 | 47margins | class census | which clause of 47_margins each document fails, grouped by mechanism,  | 20:45 | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md | landed | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md |
+| 47maanchor trace-01 | 47margins | anchor trace | which writer construct puts 360_restaurant_menu's body column 12 pt le | 20:07 | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md | landed | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md |
+| 47maclass census-01 | 47margins | class census | which clause of 47_margins each document fails, grouped by mechanism,  | 20:33 | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md | landed | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `15:12` agent landed: 47_mA-01 /  -> tools/p2w-bench/FINDINGS/47_margins-CELLPATH-A-150000.md
-- `15:12` agent landed: 47_mB-01 /  -> tools/p2w-bench/FINDINGS/47_margins-DIAGNOSE40-B-150000.md
 - `16:14` attempt 4 on t13_amount_columns -> reverted (0/26 moved)
 - `17:06` attempt 5 on t13_amount_columns -> kept (5/6 moved)
 - `17:08` attempt 6 on t13_amount_columns -> reverted (0/1 moved)
@@ -89,6 +87,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `20:45` agent landed: 47margins / anchor trace -> FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md
 - `20:45` agent deployed: 47margins / class census - which clause of 47_margins each document fails, grouped by mechanism, and whethe
 - `20:45` agent landed: 47margins / class census -> FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md
+- `20:59` attempt 1 on t01_word_accuracy -> reverted (0/10 moved)
+- `21:22` attempt 2 on t01_word_accuracy -> kept (3/10 moved)
 
 ## Where the rest of the state lives
 

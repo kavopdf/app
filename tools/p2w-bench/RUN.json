@@ -1,16 +1,19 @@
 {
- "started_ts": 1795185064.7096055,
- "started": "20:01",
- "ended_ts": 1795187786.2155132,
- "ended": "20:46",
- "class": "47_margins",
+ "started_ts": 1795188528.837544,
+ "started": "20:58",
+ "ended_ts": null,
+ "ended": null,
+ "class": "t01_word_accuracy",
  "attempts": 2,
- "kept": 0,
- "docs_improved": 0,
- "agents": [
-  "47maanchor trace-01",
-  "47maclass census-01"
- ],
+ "kept": 1,
+ "docs_improved": 3,
+ "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0
+ "needs_human": 0,
+ "counted": [
+  [
+   "t01_word_accuracy",
+   3
+  ]
+ ]
 }

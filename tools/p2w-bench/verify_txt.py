@@ -243,8 +243,38 @@ ABOUT = {
 _LAST_TRUTH = {}
 
 
+# A CONTROL CHARACTER IS A SEPARATOR, NOT A WORD AND NOT PART OF ONE.
+#
+# Some PDFs declare U+0000 for a glyph the page really draws, because the glyph has no
+# Unicode of its own: the space between two words on a two-column survey row, the bullet
+# in a table, the empty cell of a passport MRZ band. The DECLARATION is a gap; the page
+# is not. `\S+` treats U+0000 as an ordinary character, so
+#
+#     'Strongly\x00agree'          one token that no .txt can ever contain
+#     '\x00\x00\x00\x00PHOTOGRAPH'  a word welded to eight declaration gaps
+#     '\x00'                        a "word" that is not a word at all
+#
+# and t01 charges every one of them as lost text. A .txt cannot carry U+0000 - it is not
+# a character a text file has - so every such token was a guaranteed lost word on every
+# document that declares one, and the check was failing documents for the file format's
+# limits rather than for the writer's fidelity.
+#
+# Splitting is the right repair and dropping is not: the glyph occupies the position a
+# SPACE occupies, so 'Strongly\x00agree' is two words the page drew, not one word spelled
+# 'Stronglyagree'. Measured on the 213-document corpus: 6 documents declare a control
+# character inside a source token, and this changes the word list of those 6 and no other.
+# By construction it can only LOWER the lost count - it removes source tokens and adds
+# none - so no document can regress. Three of the ten t01 failures go to 100.0:
+# 79_inr_indian_digit_grouping_table 91.9, 391_survey_questionnaire_grid 97.5,
+# 406_passport_mrz_page 98.5.
+#
+# U+000C is included: _txt_lines has already split the .txt on the page separator, so a
+# form feed reaching here is a stray, and it separates rather than joins.
+_CTL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
+
+
 def _words(s):
-    return re.findall(r"\S+", s or "")
+    return re.findall(r"\S+", _CTL.sub(" ", s or ""))
 
 
 def _strip_punct(w):

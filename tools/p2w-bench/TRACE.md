@@ -6,12 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 16 Nov 08:53 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
-| 16 Nov 08:54 | fixer | build-engine | started |
-| 16 Nov 09:54 | fixer | claim | fixer claimed the slot |
-| 16 Nov 09:55 | fixer | build-engine | started |
-| 16 Nov 09:56 | fixer | build-engine | started |
-| 16 Nov 09:59 | fixer | classify | 45 classes from 211 documents |
 | 16 Nov 10:50 | fixer | claim | fixer claimed the slot |
 | 16 Nov 10:52 | fixer | build-engine | started |
 | 16 Nov 10:52 | fixer | build-engine | started |
@@ -406,3 +400,9 @@
 | 20 Nov 20:39 | fixer | build-engine | started |
 | 20 Nov 20:40 | fixer | build-engine | engine built in 52s |
 | 20 Nov 20:44 | fixer | attempt | 47_margins -> reverted (0/14 moved) |
+| 20 Nov 20:58 | fixer | claim | fixer claimed the slot |
+| 20 Nov 20:59 | fixer | attempt | t01_word_accuracy -> reverted (0/10 moved) |
+| 20 Nov 21:18 | fixer | build-engine | started |
+| 20 Nov 21:18 | fixer | build-engine | engine built in 37s |
+| 20 Nov 21:22 | fixer | attempt | t01_word_accuracy -> kept (3/10 moved) |
+| 20 Nov 21:42 | fixer | commit-gate | started |

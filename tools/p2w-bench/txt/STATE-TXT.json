@@ -1,10 +1,10 @@
 {
  "scored": 213,
- "clean": 182,
- "failing": 31,
- "pct": 85.4,
+ "clean": 186,
+ "failing": 27,
+ "pct": 87.3,
  "docx_rank_sha": "1cce5e2ef2e39442",
  "at": "2026-11-20 19:22",
  "docx_moved_during_txt": false,
- "engine": "49cffd4"
+ "engine": "853e033"
 }

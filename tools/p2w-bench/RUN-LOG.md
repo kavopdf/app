@@ -1,7 +1,3 @@
-| 12 Nov 13:11 | baseline | corpus 208 pdfs, engine built (2a68de6) |
-| 12 Nov 13:13 | baseline | measured magazine-2col-pullquote-spanning 36/59 docx, magazine-2col-pullquote-spanning.txt 4/5 txt |
-| 12 Nov 13:15 | baseline | measured marksheet-subject-left-marks-right 41/59 docx, marksheet-subject-left-marks-right.txt 4/5 txt |
-| 12 Nov 13:15 | baseline | measured marksheet-university-consolidated 49/59 docx, marksheet-university-consolidated.txt 4/5 txt |
 | 12 Nov 13:15 | baseline | measured mobile-bill 48/59 docx, mobile-bill.txt 4/5 txt |
 | 12 Nov 13:15 | baseline | measured mutual-fund-statement 43/59 docx, mutual-fund-statement.txt 4/5 txt |
 | 12 Nov 13:15 | baseline | measured newsletter-3col-header-footer 40/59 docx, newsletter-3col-header-footer.txt 4/5 txt |
@@ -199,3 +195,6 @@
 | 20 Nov 20:28 | fixer | attempt 47_margins -> reverted (0/14 moved) |
 | 20 Nov 20:44 | fixer | attempt 47_margins -> reverted (0/14 moved) |
 | 20 Nov 20:46 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 20 Nov 20:58 | fixer | slot claimed - fixer running |
+| 20 Nov 20:59 | fixer | attempt t01_word_accuracy -> reverted (0/10 moved) |
+| 20 Nov 21:22 | fixer | attempt t01_word_accuracy -> kept (3/10 moved) |
