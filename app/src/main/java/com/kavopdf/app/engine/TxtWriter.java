@@ -60,6 +60,7 @@ public final class TxtWriter {
         if (result == null || out == null) throw new IOException("nothing to write");
         float charW = documentCharWidth(result);
         float docPitch = documentPitch(result);
+        int[] endSnap = tableEndSnap(result, charW);
         StringBuilder sb = new StringBuilder(1 << 14);
         if (result.pages != null) {
             // U+000C at every page boundary. A .txt carries no y for a page, so without a
@@ -88,12 +89,12 @@ public final class TxtWriter {
                 pageNo++;
                 if (page == null || page.blocks == null) continue;
                 float pitch = pagePitch(page, docPitch);
-                int[] snap = paraEndSnap(page, charW);
+                int[] snap = paraEndSnap(page, charW, endSnap);
                 float lastY = -1f;
                 for (Object block : pageOrder(page)) {
                     if (block instanceof PdfToWord.Table) {
                         if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '\n') sb.append('\n');
-                        appendTable(sb, (PdfToWord.Table) block, charW);
+                        appendTable(sb, (PdfToWord.Table) block, charW, endSnap);
                     } else if (block instanceof Piece) {
                         Piece pc = (Piece) block;
                         lastY = appendPara(sb, pc.para, charW, pitch, lastY, pc.lines, snap);
@@ -318,6 +319,94 @@ public final class TxtWriter {
         return false;
     }
 
+    /** page column -> the column every numeric TABLE cell whose right edge sits on that page
+     *  column should end at, pooled over every table in the document.
+     *
+     *  WHY IT IS NOT PER TABLE. `appendTable` used to measure its end column inside the call,
+     *  from that one table's cells. Two tables on one page that cover the same amount column
+     *  therefore measured it twice and disagreed: on 22_invoice_four_columns_txtpos block 7
+     *  ends every figure at column 102 and block 8 at 103, same right edge (539.276 pt,
+     *  column 100), because one table's longest figure is 9 characters at baseCol 93 and the
+     *  other's is 11 at baseCol 92. 4 of the 16 rows of that source column arrived one column
+     *  away from the other 12 and t13_amount_columns failed on a document whose amounts are all
+     *  present. The same split appears on 74_balance_sheet_indented_subitems (88/108 against
+     *  87/107), itr-computation-with-slab-table (132 against 130, same right edge 535.58 pt)
+     *  and balance-sheet-two-columns-of-figures (54/63/108/117 against 52/62/107/116, where the
+     *  header date 31.03.2026 is the 10-character token that lifts one table's column).
+     *
+     *  The key is the page column of the CELL'S RIGHT EDGE, not of the end column it computed:
+     *  two cells in one page column have different lengths and so different end columns, but
+     *  their right edges are the same x, and that is what makes them one column. Keys one
+     *  column apart merge, transitively, exactly as paraEndSnap merges end columns - the ruler
+     *  is 0.6 em and lands a page column either side of an edge, so a page break that shifts
+     *  the edge by one character must not split the column. That is gst-invoice-multipage-item-table:
+     *  page 4's grand total lifts the edge to column 132 where pages 1-3 sit on 133.
+     *
+     *  The target is never less than baseCol + length for the cell it is applied to, because it
+     *  is a max over cells that include it, so a numeric cell can only ever move right. Nothing
+     *  that passes today can lose its column to this. Returns null when the document has no
+     *  numeric table cell, so the common case costs nothing. */
+    private static int[] tableEndSnap(PdfToWord.Result result, float charW) {
+        if (result == null || result.pages == null) return null;
+        int[] best = new int[MAX_INDENT + 2];
+        boolean any = false;
+        for (PdfToWord.Page page : result.pages) {
+            if (page == null || page.blocks == null) continue;
+            for (Object block : page.blocks) {
+                if (!(block instanceof PdfToWord.Table)) continue;
+                PdfToWord.Table t = (PdfToWord.Table) block;
+                if (t.rows == null) continue;
+                for (int ri = 0; ri < t.rows.size(); ri++) {
+                    List<String> row = t.rows.get(ri);
+                    if (row == null) continue;
+                    for (int ci = 0; ci < row.size(); ci++) {
+                        String cell = row.get(ci);
+                        if (cell == null) continue;
+                        int baseCol = column(cellLeft(t, ri, ci), charW);
+                        float right = cellRight(t, ri, ci);
+                        String[] parts = cell.split("\n");
+                        for (int pi = 0; pi < parts.length; pi++) {
+                            String c = parts[pi].trim();
+                            if (c.isEmpty() || !isNumeric(c)) continue;
+                            int key = baseCol + c.length();
+                            if (!Float.isNaN(right)) {
+                                int rc = column(right, charW);
+                                if (rc > 0) key = rc;
+                            }
+                            int e = baseCol + c.length();
+                            if (key > e) e = key;
+                            if (key >= 0 && key < best.length) {
+                                if (e > best[key]) best[key] = e;
+                                any = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (!any) return null;
+        for (int k = 0; k + 1 < best.length; k++) {
+            if (best[k] > 0 && best[k + 1] > 0) {
+                int m = Math.max(best[k], best[k + 1]);
+                best[k] = m;
+                best[k + 1] = m;
+            }
+        }
+        return best;
+    }
+
+    /** The pooled end column for a numeric cell whose right edge is on page column `key`, or 0
+     *  when this document drew no numeric cell there. Looks at the neighbouring page columns
+     *  too, because the ruler lands a page column either side of an edge. */
+    private static int tableEndFor(int[] endSnap, int key) {
+        if (endSnap == null) return 0;
+        int best = 0;
+        for (int k = key - 1; k <= key + 1; k++) {
+            if (k >= 0 && k < endSnap.length && endSnap[k] > best) best = endSnap[k];
+        }
+        return best;
+    }
+
     /** col -> the column a numeric paragraph line at that end should be padded to.
      *
      *  Built from the page's own numeric paragraph lines: an end column whose immediate
@@ -326,10 +415,44 @@ public final class TxtWriter {
      *  one column split by rounding, and merging them would be inventing a layout. Returns
      *  null when the page has no numeric paragraph lines at all, so the common case costs
      *  nothing. */
-    private static int[] paraEndSnap(PdfToWord.Page page, float charW) {
+    private static int[] paraEndSnap(PdfToWord.Page page, float charW, int[] endSnap) {
         if (page == null || page.blocks == null) return null;
         boolean[] present = new boolean[MAX_INDENT + 2];
         boolean any = false;
+        // THE PAGE'S TABLE COLUMNS ARE PARAGRAPH COLUMNS TOO.
+        //
+        // A page that draws its totals as a table and its dot-leader rows as paragraphs has
+        // one amount column, emitted by two paths. The paragraphs are snapped here and the
+        // table is snapped in appendTable, and neither used to see the other: on
+        // 29_dot_leaders_txtpos the 11 dot-leader lines landed on 91 and the 5 totals rows on
+        // 92. Marking the table targets present here makes the existing one-apart merge run
+        // across both paths, so the page agrees with itself. Only the table's already-pooled
+        // target is marked - the table path is not re-measured here.
+        if (endSnap != null) {
+            for (Object block : page.blocks) {
+                if (!(block instanceof PdfToWord.Table)) continue;
+                PdfToWord.Table t = (PdfToWord.Table) block;
+                if (t.rows == null) continue;
+                for (int ri = 0; ri < t.rows.size(); ri++) {
+                    List<String> row = t.rows.get(ri);
+                    if (row == null) continue;
+                    for (int ci = 0; ci < row.size(); ci++) {
+                        String cell = row.get(ci);
+                        if (cell == null) continue;
+                        float right = cellRight(t, ri, ci);
+                        int key = column(right, charW);
+                        if (Float.isNaN(right) || key <= 0) continue;
+                        String[] parts = cell.split("\n");
+                        for (int pi = 0; pi < parts.length; pi++) {
+                            String c = parts[pi].trim();
+                            if (c.isEmpty() || !isNumeric(c)) continue;
+                            int e = tableEndFor(endSnap, key);
+                            if (e > 0 && e < present.length) { present[e] = true; any = true; }
+                        }
+                    }
+                }
+            }
+        }
         for (Object block : page.blocks) {
             PdfToWord.Para para = null;
             if (block instanceof Piece) para = ((Piece) block).para;
@@ -404,7 +527,8 @@ public final class TxtWriter {
      * PDF drew stays a line of its own. A row glued back together with padding would put
      * words on a line that appears nowhere in the file.
      */
-    private static void appendTable(StringBuilder sb, PdfToWord.Table t, float charW) {
+    private static void appendTable(StringBuilder sb, PdfToWord.Table t, float charW,
+                                    int[] endSnap) {
         if (t.rows == null) return;
         // ONE END COLUMN PER TABLE COLUMN, NOT ONE PER CELL.
         //
@@ -466,9 +590,21 @@ public final class TxtWriter {
                     // A number the page drew flush against a cell's right edge belongs at
                     // that edge. Without this every amount sat at the cell's left edge and
                     // a column of figures stopped being a column.
-                    if (isNumeric(c) && ci < ncol && endCol[ci] > 0) {
-                        int startCol = endCol[ci] - c.length();
-                        if (startCol > col) col = startCol;
+                    if (isNumeric(c)) {
+                        // THE PAGE'S COLUMN, NOT THIS TABLE'S. endCol[ci] is what this one
+                        // table measured; endSnap is what every table in the document that
+                        // ends on this page column measured, and the two disagree exactly
+                        // when a column is covered by more than one table. See tableEndSnap.
+                        int target = endCol[ci] > 0 ? endCol[ci] : 0;
+                        float right = cellRight(t, ri, ci);
+                        if (!Float.isNaN(right)) {
+                            int pooled = tableEndFor(endSnap, column(right, charW));
+                            if (pooled > target) target = pooled;
+                        }
+                        if (target > 0) {
+                            int startCol = target - c.length();
+                            if (startCol > col) col = startCol;
+                        }
                     }
                     for (int i = 0; i < col; i++) sb.append(' ');
                     sb.append(c).append('\n');

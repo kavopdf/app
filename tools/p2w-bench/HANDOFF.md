@@ -9,10 +9,10 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 15:12 |
+| started | 15:55 |
 | ended | still running |
 | how it ended | - |
-| plan | Measure the reach of every construct before building the next one: 47_margins has 26 documents and the two constructs on the table reach 3 and 5 of them, so the class was being attacked from the wrong end. Traced all 26, corrected SETTLED's run-size lead, added verify_google --detail so a FAIL names its page and its distance. |
+| plan | - |
 
 ## The picture, in the words of the run that left it
 
@@ -50,16 +50,14 @@ unfinished work, not as a result.
 | t13_B-01 | t13_amount_columns | B | census of the 18 documents: table path vs paragraph path | 12:00 | 11:06 | landed |  |
 | 47_mA-01-01 | 47_margins | A-01 | what 47_margins actually compares, and where the page margin is emitte | 13:36 | 13:00 | landed | FINDINGS/47_margins-MECHANISM-133500-f2.md |
 | 47_mB-01-01 | 47_margins | B-01 | the space-led indent construct on 47_margins | 13:36 | 13:00 | landed | FINDINGS/47_margins-MECHANISM-133500-f2.md |
-| 47_mA-01 | 47_margins | A | which code path emits a table-cell line, and how a cell's horizontal p | 15:12 | landed | landed | tools/p2w-bench/FINDINGS/47_margins-CELLPATH-A-150000.md |
-| 47_mB-01 | 47_margins | B | why 40_devanagari_shaping_font and 76_devanagari_table score 10.48 and | 15:12 | landed | landed | tools/p2w-bench/FINDINGS/47_margins-DIAGNOSE40-B-150000.md |
+| 47_mA-01 | 47_margins | A | which code path emits a table-cell line, and how a cell's horizontal p | 14:02 | landed | landed | tools/p2w-bench/FINDINGS/47_margins-CELLPATH-A-150000.md |
+| 47_mB-01 | 47_margins | B | why 40_devanagari_shaping_font and 76_devanagari_table score 10.48 and | 14:02 | landed | landed | tools/p2w-bench/FINDINGS/47_margins-DIAGNOSE40-B-150000.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `10:38` attempt 2 on 18_displacement -> reverted (0/107 moved)
-- `10:41` attempt 3 on 18_displacement -> reverted (0/107 moved)
 - `10:42` agent landed: 18_dA-01 /  -> tools/p2w-bench/FINDINGS/18_displacement-dy-shape-101323-4fa7.md
 - `10:42` agent landed: 18_dB-01 /  -> tools/p2w-bench/FINDINGS/18_displacement-engine-topoffset-101951-cda8.md
 - `10:52` attempt 1 on t13_amount_columns -> error
@@ -83,6 +81,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:12` agent deployed: 47_margins / B - why 40_devanagari_shaping_font and 76_devanagari_table score 10.48 and 7.91 - is
 - `15:12` agent landed: 47_mA-01 /  -> tools/p2w-bench/FINDINGS/47_margins-CELLPATH-A-150000.md
 - `15:12` agent landed: 47_mB-01 /  -> tools/p2w-bench/FINDINGS/47_margins-DIAGNOSE40-B-150000.md
+- `16:14` attempt 4 on t13_amount_columns -> reverted (0/26 moved)
+- `17:06` attempt 5 on t13_amount_columns -> kept (5/6 moved)
 
 ## Where the rest of the state lives
 

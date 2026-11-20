@@ -937,3 +937,20 @@
 {"t": 1795167808.9955153, "ist": "15:13:28", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795167810.1150396, "ist": "15:13:30", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795167811.0288882, "ist": "15:13:31", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795170303.4692028, "ist": "15:55:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795170303.4816751, "ist": "15:55:03", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795170303.5706978, "ist": "15:55:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795170303.584548, "ist": "15:55:03", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795170303.7969537, "ist": "15:55:03", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795170303.9196768, "ist": "15:55:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795170313.9338531, "ist": "15:55:13", "ev": "beat", "d": "(no activity given)"}
+{"t": 1795170334.830842, "ist": "15:55:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795171444.2165816, "ist": "16:14:04", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795171447.9890215, "ist": "16:14:07", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795171448.3331416, "ist": "16:14:08", "ev": "attempt", "d": "t13_amount_columns -> reverted"}
+{"t": 1795171448.41672, "ist": "16:14:08", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795171448.5735648, "ist": "16:14:08", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795174561.3836918, "ist": "17:06:01", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795174562.1544802, "ist": "17:06:02", "ev": "attempt", "d": "t13_amount_columns -> kept"}
+{"t": 1795174562.378554, "ist": "17:06:02", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795174562.624651, "ist": "17:06:02", "ev": "beat", "d": "classrow.py: refreshing the class file"}

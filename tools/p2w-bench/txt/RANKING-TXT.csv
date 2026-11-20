@@ -21,14 +21,14 @@ document,applicable,passed,failed,abstained,failed_ids
 19_hanging_indent_txtpos,9,9,0,0,
 20_numbered_list_separate_column_txtpos,9,9,0,0,
 21_form_labels_x60_values_x300_txtpos,9,9,0,0,
-22_invoice_four_columns_txtpos,10,9,1,1,t13_amount_columns
+22_invoice_four_columns_txtpos,10,10,0,0,
 23_timetable_grid_txtpos,9,9,0,0,
 24_address_block_indents_txtpos,9,9,0,0,
 25_signature_block_underscores_txtpos,10,10,0,0,
 26_footnote_marker_bottom_note_txtpos,9,9,0,0,
 27_two_column_left_short_txtpos,9,9,0,0,
 28_value_overflows_cell_txtpos,10,10,0,0,
-29_dot_leaders_txtpos,10,9,1,1,t13_amount_columns
+29_dot_leaders_txtpos,10,10,0,0,
 300_prescription_rx,9,9,0,0,
 301_lab_report_panel,7,7,0,0,
 302_radiology_report,7,7,0,0,
@@ -151,7 +151,7 @@ document,applicable,passed,failed,abstained,failed_ids
 71_invoice_space_aligned_no_rules,10,10,0,0,
 72_bank_statement_no_rules_right_amounts,10,10,0,0,
 73_marksheet_subject_marks_grade,9,9,0,0,
-74_balance_sheet_indented_subitems,10,8,2,2,t02_position t13_amount_columns
+74_balance_sheet_indented_subitems,10,9,1,1,t02_position
 75_merged_header_cell_three_columns,10,10,0,0,
 76_devanagari_table,10,10,0,0,
 77_arabic_rtl_document,9,7,2,2,t01_word_accuracy t12_word_invention
@@ -164,7 +164,7 @@ admission-form-labels-left-boxes-right,9,9,0,0,
 admit-card,9,9,0,0,
 annual-review-2col-uneven-columns,9,9,0,0,
 balance-sheet-and-profit-loss,11,11,0,0,
-balance-sheet-two-columns-of-figures,10,9,1,1,t13_amount_columns
+balance-sheet-two-columns-of-figures,10,10,0,0,
 bank-statement-5-pages,12,12,0,0,
 bank-statement-horizontal-rules-only,10,10,0,0,
 boq-horizontal-rules-only,10,10,0,0,
@@ -177,7 +177,7 @@ eway-bill,10,10,0,0,
 form16-part-b,11,11,0,0,
 gst-invoice-3line-items,10,10,0,0,
 gst-invoice-horizontal-rules-only,10,10,0,0,
-gst-invoice-multipage-item-table,12,10,2,2,t09_page_furniture t13_amount_columns
+gst-invoice-multipage-item-table,12,11,1,1,t09_page_furniture
 gst-invoice-with-qr-code,10,10,0,0,
 insurance-policy-schedule,10,10,0,0,
 invoice-line-items-qty-rate-amount,10,10,0,0,
