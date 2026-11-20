@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 20:01 → running IST · 44 min**
+**20 Nov 2026 · slot 20:01 → 20:46 IST · 45 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -74,16 +74,16 @@ FINDINGS/47\_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md with their numbers.
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `47maanchor trace-01` | which writer construct puts 360_restaurant_menu's bo | 20:45 | 15:15 | 0 min |
-| `47maclass census-01` | which clause of 47_margins each document fails, grou | 20:45 | 15:15 | 0 min |
+| `47maanchor trace-01` | which writer construct puts 360_restaurant_menu's bo | 20:07 | 20:32 | 25 min |
+| `47maclass census-01` | which clause of 47_margins each document fails, grou | 20:33 | 20:37 | 4 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 20:01 → running · 44 min |
+| Slot window | 20:01 → 20:46 · 45 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 19 |
+| Tool beats | 25 |
 | Longest silence | **26.4 min** — from 20:02:06, after `archive.py: housekeeping` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 need a human |
@@ -95,7 +95,7 @@ FINDINGS/47\_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md with their numbers.
 |:--|--:|:--|
 | fix - diagnose and change the engine | **42 min** | `#####################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

@@ -922,11 +922,11 @@
    "angle": "anchor trace",
    "question": "which writer construct puts 360_restaurant_menu's body column 12 pt left, and does removing it move anything else",
    "expected": "FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md",
-   "deployed": "20:45",
+   "deployed": "20:07",
    "status": "landed",
    "finding": "FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md",
-   "deployed_at": "2026-11-20T15:15",
-   "landed_at": "2026-11-20T15:15"
+   "deployed_at": "2026-11-20T20:07",
+   "landed_at": "2026-11-20T20:32"
   },
   {
    "id": "47maclass census-01",
@@ -934,11 +934,11 @@
    "angle": "class census",
    "question": "which clause of 47_margins each document fails, grouped by mechanism, and whether regress.py would allow the patch",
    "expected": "FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md",
-   "deployed": "20:45",
+   "deployed": "20:33",
    "status": "landed",
    "finding": "FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md",
-   "deployed_at": "2026-11-20T15:15",
-   "landed_at": "2026-11-20T15:15"
+   "deployed_at": "2026-11-20T20:33",
+   "landed_at": "2026-11-20T20:37"
   }
  ],
  "run": {
