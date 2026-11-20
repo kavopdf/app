@@ -254,3 +254,24 @@ each:
     each stage done/moving/stopped        health.py
     the day's trend row                  progress.py
 
+
+---
+
+## YOUR REPORT IS GENERATED. YOU DO NOT WRITE IT.
+
+The fixer's report has always come out of `report.py`. Yours now comes out of `cronreport.py`, from the
+same files the verifier reads, so the numbers and the shape are both fixed before a run touches them.
+
+    python3 tools/p2w-bench/cronreport.py --for watchdog > /tmp/report.md
+    python3 tools/p2w-bench/lastmessage.py --file /tmp/report.md --for watchdog
+
+Then add **one short paragraph, in your own words, under the pull-quote**, saying what THIS run did -
+"nothing needed moving", "measured twenty, committed them", "shipped v3.53.27". No numbers in that
+paragraph; the tables already carry them, and a number you type is a number you can get wrong.
+
+Post `/tmp/report.md` as your final message. Exit 3 from lastmessage.py means a number in the message
+is not one the tool printed - re-run the generator, do not edit the numbers.
+
+**Never write the report by hand, and never paste this prompt into it.** The verifier refuses a message
+that contains its own instructions; that is what turned the 20 Nov gverify report into two pages of dark
+slab with the real report starting at the bottom of page three.
