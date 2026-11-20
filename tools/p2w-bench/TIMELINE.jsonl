@@ -730,3 +730,14 @@
 {"t": 1795146820.2784486, "ist": "09:23:40", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795146820.568773, "ist": "09:23:40", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795146820.707867, "ist": "09:23:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146856.6658797, "ist": "09:24:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795146868.9654613, "ist": "09:24:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795146870.5763848, "ist": "09:24:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795146896.1599104, "ist": "09:24:56", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795146896.1741292, "ist": "09:24:56", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795146896.2593164, "ist": "09:24:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795146896.271659, "ist": "09:24:56", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795146900.268825, "ist": "09:25:00", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146900.8677604, "ist": "09:25:00", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146901.2402549, "ist": "09:25:01", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146901.3713896, "ist": "09:25:01", "ev": "beat", "d": "report.py: building the report"}

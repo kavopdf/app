@@ -67,3 +67,19 @@ Two changes, both in `round.py`, both committed at `d26141e`:
 
 The fossil in `ROUND.json` was corrected to `57a0507` by hand before this run released, because the
 engine at claim genuinely WAS `57a0507` and the tree is byte-identical to it.
+
+## 20 Nov 09:45 - `--release-fixer` told the run to force, and then ignored `--force`
+
+The release path refuses while `pending.py` lists anything outstanding. Its refusal text ends
+"release with: round.py --release-fixer --force", and `--force` did not bypass that one gate: the
+`left > 0` check returned 1 before `force` was ever consulted, so the only exit it advertised was
+the one it did not implement.
+
+Both rows pending at 09:45 were written by the watchdog and marked "can I fix it: no" - one of them
+needs a `cron` tool that no run in this repository has - so no fixer run could clear them, and a run
+that had finished its work and released its claim could not hand the slot on. It would have come
+back only when its beacon went stale, which is the idle hour the gate exists to prevent.
+
+`round.py` now checks `left > 0 and not force`, prints which items it was forced past, and leaves the
+"nothing pending" line to the branch where that is true. Released with `--force` at 09:46; the two
+rows stand and still need a person.

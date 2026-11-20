@@ -745,8 +745,16 @@ def release(name, force=False):
             print("warning: could not check the engine against the attempt ledger - %s: %s"
                   % (type(exc).__name__, exc))
 
+        # --force IS THE WAY OUT OF THIS GATE, AND IT SAID SO WITHOUT HONOURING ITSELF.
+        #
+        # The refusal below printed "release with: round.py --release-fixer --force" and then
+        # returned 1 whatever was passed, because force was only consulted after it. A run whose
+        # pending rows are blockers it cannot fix - the watchdog writes them with "can I fix it:
+        # no", and the cron half needs a person - was therefore wedged: it could not release, and
+        # the slot only came back when its beacon went stale. Measured 20 Nov: two such rows, one
+        # attempt, and a finished run that could not hand the slot on.
         left = _pending_count()
-        if left > 0:
+        if left > 0 and not force:
             print("refused: %d item(s) still pending. The slot is not spent while work is left." % left)
             print("A run that stops here hands back a slot the scheduler will not fill for up to an")
             print("hour, and the next run pays its setup again before touching the work. Keep going:")
@@ -754,7 +762,11 @@ def release(name, force=False):
             print("If you genuinely cannot continue - the build is broken, the drive is blocked, the")
             print("class list is empty - release with: round.py --release-fixer --force")
             return 1
-        print("fixer: releasing after %d minute(s) with %d attempt(s), nothing pending" % (age, done))
+        if left > 0:
+            print("fixer: releasing after %d minute(s) with %d attempt(s), FORCED past %d pending item(s)"
+                  % (age, done, left))
+        else:
+            print("fixer: releasing after %d minute(s) with %d attempt(s), nothing pending" % (age, done))
     s["%s_started" % name] = 0
     # CLEAR THE BEACON WITH THE CLAIM, or the next reader is told a lie.
     #

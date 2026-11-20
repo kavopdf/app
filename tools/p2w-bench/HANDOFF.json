@@ -571,8 +571,8 @@
  ],
  "run": {
   "started": "08:52",
-  "ended": null,
-  "ended_how": null
+  "ended": "09:24",
+  "ended_how": "forced"
  },
  "history": [
   {
@@ -664,6 +664,11 @@
    "at": "06:21",
    "how": "forced",
    "plan": "READ FINDINGS/content-present-partly-displaced-rules-are-flow-neutral-065000-f1x.md BEFORE TOUCHING THE RULE CLASS. Two handoff claims are now measured FALSE: (1) the flush-by-top precondition is a regression, not a precondition - with the border path OFF it takes bank-statement 0.10 -> 17.07 and gst-invoice 0.38 -> 15.13, because every shape moved into the flow charges ~9.6 pt; (2) the residual on 18_displacement was never the gap or the flowY bookkeeping - a carrier paragraph costs 9.6 pt in LibreOffice whatever it contains (measured four ways), which is the whole of 0.00 -> 77.01. A flow-neutral construct exists and is in FINDINGS/rules-top-border-FLOW-NEUTRAL-065000-f1x.patch: a pre-pass hands each rule to the paragraph that follows it as a w:top border, the gap becomes w:before and the rule-to-text distance becomes w:space, nothing is reordered and no paragraph is added. It measures EXACTLY baseline on all 8 documents tried (18_centred 0.00, 411 0.00, 62 0.00, bank-statement 0.10, gst-invoice 0.38, mobile-bill 1.55, 315 1.91, 64 3.46) - and places pBdr=0, because its own safety guards decline every rule it could reach. Where a border IS placed, 18_centred goes 0.00 -> 0.53. THAT is the wall and it is not an engine bug: regress.py scores share@5 on a LibreOffice render, LibreOffice draws the floating drawing exactly, and a border can never be pixel-identical - so a fix Google needs is always a small LibreOffice regression, and the brief forbids landing one. DO NOT start another rule-class attempt until a human answers: gate this class in Google (32_stroke_lines / 05_chars_extra on the Google result), declare the class out of scope, or authorise a stated tolerance. Spend the next slot on a class the gate can see."
+  },
+  {
+   "at": "09:24",
+   "how": "forced",
+   "plan": ""
   }
  ],
  "context": "Attempt 14 reverted. The pBdr patch applies and its guard was relaxed twice; the guard is not the ceiling - the paragraph hook is. Screen 23/23: 0 better, 8 worse, and the 8 worse are the documents where a border actually got placed, so placement accounting is not yet free. scipy was missing on this pod and cost two 280s calls in prerender; install it first.",

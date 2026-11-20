@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 08:52 → running IST · 30 min**
+**20 Nov 2026 · slot 08:52 → 09:24 IST · 32 min**
 
 
 > No change was kept this run, and the reason is worth more than the change would have been.
@@ -28,6 +28,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `content-present-partly-displaced` |
+| Committed | **13** files in 1 commit(s) from `facbd30` — ...ed-rule-guard-was-not-the-blocker-100700-f1x.md, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md |
 
 ## The fix that was not kept
 
@@ -93,12 +94,13 @@ class is re-screened.
 
 | | |
 |:--|:--|
-| Slot window | 08:52 → running · 30 min |
+| Slot window | 08:52 → 09:24 · 32 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 20 |
+| Tool beats | 27 |
 | Longest silence | **7.6 min** — from 09:06:08, after `screen pass 2 of the displacement class` |
 | Silences over 2 min | 6 |
-| Obstacles | 0 cleared · 0 need a human |
+| Obstacles | 0 cleared · 2 need a human |
+| Still a wall | **This watchdog run has no `cron` tool**, so a paused or zombie cron cannot be moved by automation - a person  |
 
 
 ### Where the time went
@@ -107,9 +109,9 @@ class is re-screened.
 |:--|--:|:--|
 | fix - diagnose and change the engine | **9 min** | `#######` |
 | measure or build - a conversion, screen or compile writes no beacon | **12 min** | `#########` |
-| record - attempt, handoff, class rows | **2 min** | `##` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **4 min** | `###` |
+| record - attempt, handoff, class rows | **3 min** | `##` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **5 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -137,3 +139,9 @@ takes the 40-mask fallback: the screen sat in prerender through two consecutive 
 without measuring a single document. `SETTLED.md` says to install it before measuring anything;
 `screen.py` would serve the next run better by refusing to start when it is absent.
 
+Second tooling note, and this one I fixed. `round.py --release-fixer` refuses while `pending.py`
+lists anything outstanding, and it printed "release with: round.py --release-fixer --force" while
+returning 1 whatever was passed - force was only consulted after the refusal. Both rows pending
+tonight are watchdog blockers marked "can I fix it: no", one of them needing a `cron` tool no run in
+this repository has, so a finished run could not hand the slot on and the slot would only come back
+when its beacon went stale. The gate now honours `--force` and says which items it was forced past.
