@@ -1,8 +1,8 @@
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 20:58 → running IST · 50 min**
+**20 Nov 2026 · slot 20:58 → running IST · 1h 25m**
 
-> **79_inr, 391_survey and 406_passport** now pass every .txt check they are given. A control character was being read as part of a word.
+> **391_survey_questionnaire_grid** improved — 2.00 → 0.00. Corpus ratchet clean across 213 documents.
 
 ## Progress
 
@@ -18,7 +18,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
-| Committed | **23** files in 4 commit(s) from `766d382` — ATTEMPTS.json, CAUSES-TXT.json, CENSUS-TXT.csv, CLASS-HISTORY.jsonl, DEFECT-CLASSES-TXT.md, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, REPORT.md, RESTAMP-TXT.jsonl, ROTATION.jso |
+| Committed | **23** files in 5 commit(s) from `e5268fe` — ATTEMPTS.json, CAUSES-TXT.json, CENSUS-TXT.csv, CLASS-HISTORY.jsonl, DEFECT-CLASSES-TXT.md, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, REPORT.md, RESTAMP-TXT.jsonl, ROTATION.jso |
 
 ## What was tried
 
@@ -50,11 +50,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 20:58 → running · 50 min |
+| Slot window | 20:58 → running · 1h 25m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 41 |
-| Longest silence | **22.9 min** — from 20:59:33, after `classrow.py: refreshing the class file` |
-| Silences over 2 min | 6 |
+| Longest silence | **35.0 min** — from 21:49:36, after `report.py: building the report` |
+| Silences over 2 min | 7 |
 | Obstacles | 0 cleared · 2 need a human |
 | Still a wall | **It is not - it is stalled at classify, and `health.py` cannot say so.** `stage.py` names `classify` as the s |
 
@@ -63,11 +63,11 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **3 min** | `##` |
-| measure or build - a conversion, screen or compile writes no beacon | **28 min** | `############` |
+| fix - diagnose and change the engine | **3 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **28 min** | `#######` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **15 min** | `#######` |
+| report - the report and the chain | **36 min** | `#########` |
+| other - not attributed to a tool | **15 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |
