@@ -34,3 +34,4 @@
 {"at": "2026-11-20 09:22", "attempt": 14, "class": "content-present-partly-displaced", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-20 10:36", "attempt": 1, "class": "18_displacement", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-20 10:38", "attempt": 2, "class": "18_displacement", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-20 10:41", "attempt": 3, "class": "18_displacement", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}

@@ -20,7 +20,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> 18_displacement is a PAGE-TOP construct, and it is now proven: Google Docs DROPS w:before on the first paragraph after a w:br w:type=page. The engine emits the page's top gap exactly there (bank-statement-5-pages: w:before=1103 twips = 55.15 pt) and Google's measured dy on pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Fix: emit that gap as a 1x1 table row with w:trHeight w:val=<gapTw> w:hRule=exact right after the page break, and set the paragraph's w:before to 0. Probe measured 55.83 pt of 55.15 asked in Google and exact in LibreOffice; w:before 0.33 pt; w:line exact 11.89 pt. See FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md. LibreOffice CANNOT see this fix - it already places w:before correctly - so judge it only through Drive.
+> 18_displacement: the page-top gap is PROVEN to be the cause (Google drops w:before there; a trHeight-exact 1x1 table row is honoured to 0.97 pt). Applying it by hand to bank-statement-5-pages fixes the displacement itself (dy median -53.8 -> +0.8) but the document goes 6 pages -> 10 with a blank after each, because (a) the break paragraph already emits a blank page 1 in Google and (b) the 55 pt gap is not charged to the page fill budget. So it is NOT a construct swap: make the gap real AND charge it to the page capacity, and fix the blank page. Engine work, needs a full corpus ratchet. See FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md, second section.
 
 ## Agents deployed and not yet accounted for
 
@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:03` attempt 9 on content-present-partly-displaced -> error (0/23 moved)
 - `04:03` health.py: _age() now takes the last COMMIT time of the path, not mtime (every cron clones fresh, so every mtime was the clone's, and the report read 0.0 h for all five stages while --stalled could never turn red). _attempts_recent() now parses the ledger's IST stamps with calendar.timegm - IST_OFFSET instead of time.mktime, which read them as pod-local UTC and put every attempt 5.5 h in the future: the watchdog's '6 attempt(s) in 3 h' was 2. Verified: ages 0.0 h -> 0.4 h on all five stages, attempts 6 -> 2. Both blockers closed in BLOCKERS.md.
 - `04:04` agent landed: contA-06 /  -> FINDINGS/content-present-partly-displaced-zerowidth-040040-7c1e.md
 - `04:13` classrow.py fixed: load_rank() now reads max_pt and the row writer emits (share5, max_pt) into the columns the header names. Every row the tool ever wrote carried share1 under the share5 heading and share5 under max_pt - mobile-bill read 'share@5 43.87, max_pt 1.55', which is impossible arithmetic and cost an agent its whole budget proving the page was fine. Also: the clean-row branch discarded the c[2]=prob correction with out.append(line), so no FIXED-and-clean row ever got its numbers or its problem name repaired; both branches now write the row, and the measured class is preserved on those rows. Verified: 212 of 212 rows now match RANKING.csv on both columns, 0 status changes, 0 document changes, class summary counts identical (12/1 6/16 6/4 6/0 23/0 7/1 130). The queue's real shape: content-present-partly-displaced 23 open at share@5 1.0-4.0 with max_pt 13-17, not the sub-2pt figures the table used to show.
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `09:59` agent deployed: 18_displacement / B - Find the engine code path that decides each line's vertical position in the emit
 - `10:36` attempt 1 on 18_displacement -> reverted (0/107 moved)
 - `10:38` attempt 2 on 18_displacement -> reverted (0/107 moved)
+- `10:41` attempt 3 on 18_displacement -> reverted (0/107 moved)
 
 ## Where the rest of the state lives
 

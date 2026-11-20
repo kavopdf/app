@@ -6,7 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 07:43 | fixer | hypothesis | 20_within_10pt (+4) -> untested |
 | 13 Nov 07:43 | fixer | attempt | 20_within_10pt (+4) -> error (OPEN) |
 | 13 Nov 07:43 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 07:43 | ? | commit-gate | started |
@@ -406,3 +405,4 @@
 | 20 Nov 10:31 | fixer | build-engine | engine built in 35s |
 | 20 Nov 10:36 | fixer | attempt | 18_displacement -> reverted (0/107 moved) |
 | 20 Nov 10:38 | fixer | attempt | 18_displacement -> reverted (0/107 moved) |
+| 20 Nov 10:41 | fixer | attempt | 18_displacement -> reverted (0/107 moved) |

@@ -77,3 +77,36 @@ Scope of the measurement: 1 probe document (5 pages) + 1 corpus document (5 page
 plus 3 corpus documents through LibreOffice for the regression side.
 
 Status: complete
+
+## Second result, 20 Nov: the construct swap fixes the displacement but overflows the page
+
+The construct was applied to a REAL document by hand - `bank-statement-5-pages`, the four
+page-top `w:before` gaps replaced with 1x1 `w:trHeight hRule="exact"` table rows and each
+paragraph's `w:before` zeroed - and measured through Drive. No engine code was touched.
+
+  LibreOffice   5 pages, first line of every page at y=45.30 (source 45.60). Unchanged.
+  Google, before  6 pages, words/page 257, 0, 245, 247, 228, 253
+                  per-page dy median 8.6 / LOST / -53.8 / LOST / -54.9
+  Google, after  10 pages, words/page 257, 0, 245, 0, 247, 0, 228, 0, 253, 0
+                  per-page dy median 8.6 / LOST / +0.8 / LOST / +0.6
+
+Read it in two halves, because they say different things.
+
+1. **The displacement itself is fixed.** On the pages that still have enough matched runs, the
+   median dy goes from -53.8 to +0.8 and from -54.9 to +0.6, against a tolerance of 1.5-4.5 pt.
+   The construct does what the probe said it would.
+
+2. **It cannot be landed as a construct swap.** The document goes from 6 pages to 10 with a blank
+   page after every real one. Two causes, both measured:
+   - the baseline ALREADY emits a blank page 1 in Google (words/page 257, **0**, 245, ...), so this
+     document's page-break construct is producing an empty page on its own. That is a separate
+     defect and it is why `31_pages_lost_their_text` reads source=5 render=1.
+   - the 55 pt page-top gap costs 55 pt of page capacity. The flow's fill budget assumed that gap
+     was free, because in Google it was: the content fitted. Make the gap real and every page
+     overflows by its own top gap.
+
+So the next run's job is not "swap the construct". It is: make the gap real **and** charge it to
+the page's fill budget, and deal with the blank page the break paragraph already produces. Both
+are engine work and both need the full corpus ratchet, which no probe can substitute for.
+
+Status: complete. Two attempts on 18_displacement this run, both reverted, both carrying numbers.

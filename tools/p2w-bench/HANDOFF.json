@@ -376,9 +376,13 @@
   {
    "at": "10:38",
    "text": "attempt 2 on 18_displacement -> reverted (0/107 moved)"
+  },
+  {
+   "at": "10:41",
+   "text": "attempt 3 on 18_displacement -> reverted (0/107 moved)"
   }
  ],
- "next": "18_displacement is a PAGE-TOP construct, and it is now proven: Google Docs DROPS w:before on the first paragraph after a w:br w:type=page. The engine emits the page's top gap exactly there (bank-statement-5-pages: w:before=1103 twips = 55.15 pt) and Google's measured dy on pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Fix: emit that gap as a 1x1 table row with w:trHeight w:val=<gapTw> w:hRule=exact right after the page break, and set the paragraph's w:before to 0. Probe measured 55.83 pt of 55.15 asked in Google and exact in LibreOffice; w:before 0.33 pt; w:line exact 11.89 pt. See FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md. LibreOffice CANNOT see this fix - it already places w:before correctly - so judge it only through Drive.",
+ "next": "18_displacement: the page-top gap is PROVEN to be the cause (Google drops w:before there; a trHeight-exact 1x1 table row is honoured to 0.97 pt). Applying it by hand to bank-statement-5-pages fixes the displacement itself (dy median -53.8 -> +0.8) but the document goes 6 pages -> 10 with a blank after each, because (a) the break paragraph already emits a blank page 1 in Google and (b) the 55 pt gap is not charged to the page fill budget. So it is NOT a construct swap: make the gap real AND charge it to the page capacity, and fix the blank page. Engine work, needs a full corpus ratchet. See FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md, second section.",
  "agents": [
   {
    "id": "contA-01",
