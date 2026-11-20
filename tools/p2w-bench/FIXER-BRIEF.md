@@ -883,6 +883,12 @@ The brief told a run to read the `.txt` numbers and never told it how to produce
 
 The whole loop, in order:
 
+    # 0. the corpus and the .txt BOTH come from p2w.py - one run sets up the whole sandbox.
+    #    It downloads the corpus-v1 release, builds the engine, and calls ConvertOne, which writes
+    #    the .docx AND the .txt into /scratch/work/p2w/out. Nothing else creates those directories.
+    cp benchmarks/p2w.py /scratch/work/ && python3 /scratch/work/p2w.py --validate
+    python3 /scratch/work/p2w.py --budget 250        # repeat until it says the corpus is complete
+
     # 1. change the engine, then rebuild the .txt files with the new one
     #    ConvertOne writes BOTH: PdfToWord.writeTxt(r, new File(outDir, base + ".txt"))
     cd tools/engine-verify && javac -cp <classpath> ConvertOne.java

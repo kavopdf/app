@@ -59,7 +59,37 @@ def universe(v):
     return hashlib.sha256(("|".join(ids)).encode()).hexdigest()[:12], len(ids)
 
 
+def ensure_inputs():
+    """Refuse to score against an empty sandbox. Nothing here can work without the corpus and the .txt.
+
+    MEASURED 20 Nov IN A FRESH SANDBOX: this scored all 213 documents in zero seconds and wrote 213
+    `{"error": "missing pdf or txt"}` records. It did not crash, it did not warn - it produced a file
+    that looks like a completed measurement and is entirely errors, and every later run would then treat
+    those 213 documents as "already scored".
+
+    The corpus and the .txt both come from p2w.py: it builds the corpus from the corpus-v1 release, builds
+    the engine, and calls ConvertOne, which writes BOTH formats into /scratch/work/p2w/out. So one run of
+    p2w.py sets up this half as well - and this tool has to say so rather than quietly scoring nothing.
+    """
+    import glob as _g
+    n_pdf = len(_g.glob(os.path.join(CORPUS, "*.pdf")))
+    n_txt = len(_g.glob(os.path.join(OUT, "*.txt")))
+    if n_pdf >= 200 and n_txt >= 200:
+        return True
+    print("refused: %d pdf in %s, %d .txt in %s" % (n_pdf, CORPUS, n_txt, OUT))
+    print("  Both come from p2w.py: it builds the corpus from the corpus-v1 release, builds the engine,")
+    print("  and calls ConvertOne, which writes the .docx AND the .txt into the same output directory.")
+    print("  Run it first:")
+    print("      cp benchmarks/p2w.py /scratch/work/ && python3 /scratch/work/p2w.py --validate")
+    print("      python3 /scratch/work/p2w.py --budget 250      # repeat until it says complete")
+    print("  Then come back to this tool. Scoring against an empty directory writes 213 errors that")
+    print("  every later run will read as 'already scored'.")
+    return False
+
+
 def run(budget):
+    if not ensure_inputs():
+        return 3
     v = verifier()
     seen = done()
     rows = list(csv.DictReader(open(RANK, encoding="utf-8")))

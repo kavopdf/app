@@ -46,6 +46,17 @@ BASELINE = os.path.join(TXT_DIR, "RANKING-TXT-BASELINE.csv")
 CORPUS = "/scratch/work/p2w/corpus"
 TXT = "/scratch/work/p2w/out"
 
+# LEGACY PATH. restamp_txt.py --apply is the supported way to write RANKING-TXT.csv now, and it is the
+# one the brief gives. This tool still works when the work directories are present, and it must not
+# pretend otherwise when they are not: in a fresh cron sandbox it exited 2 with no explanation.
+if not (os.path.isdir(CORPUS) and os.path.isdir(TXT)):
+    print("refused: this is the legacy ranking builder and it needs the work directories.")
+    print("  %s and %s are not both present." % (CORPUS, TXT))
+    print("  Use the supported path instead:")
+    print("      python3 tools/p2w-bench/restamp_txt.py --run   # measure (after p2w.py built the corpus)")
+    print("      python3 tools/p2w-bench/restamp_txt.py --apply # write RANKING-TXT.csv")
+    raise SystemExit(3)
+
 
 def _universe():
     """(ids, sha12, error) for the .txt verifier, asked of the instrument right now.
