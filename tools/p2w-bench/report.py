@@ -145,18 +145,39 @@ def run_docs():
         lo, hi = run.get("started_ts"), run.get("ended_ts")
         if not lo:
             return []
-        out = _sp.run(["git", "-C", ROOT, "log", "-1", "--format=%H %ct", "--",
-                       "benchmarks/RANKING.csv"], capture_output=True, text=True, timeout=20).stdout.split()
+        # BOTH RANKINGS. This looked only at benchmarks/RANKING.csv, so a run that worked the .txt
+        # half - which commits RANKING-TXT.csv instead - always came back empty, and the report told
+        # the user "the run did not commit benchmarks/RANKING.csv" while it had committed exactly the
+        # right file. Found 20 Nov by asking what the report says about a .txt run.
+        out = []
+        # TAKE THE NEWER OF THE TWO, NOT THE FIRST. Looping and breaking on the first hit always chose
+        # RANKING.csv, because it always has a commit - so a .txt run still reported the docx ranking and
+        # said the wrong file was missing.
+        out = []
+        _best_when = -1.0
+        for _path in ("benchmarks/RANKING.csv", "tools/p2w-bench/txt/RANKING-TXT.csv"):
+            _r = _sp.run(["git", "-C", ROOT, "log", "-1", "--format=%H %ct", "--", _path],
+                         capture_output=True, text=True, timeout=20).stdout.split()
+            if len(_r) >= 2:
+                try:
+                    _w = float(_r[1])
+                except ValueError:
+                    continue
+                if _w > _best_when:
+                    _best_when = _w
+                    out = _r + [_path]
         if len(out) < 2:
             return []
         sha, when = out[0], float(out[1])
+        rank_path = out[2] if len(out) > 2 else "benchmarks/RANKING.csv"
+        is_txt = "RANKING-TXT" in rank_path
         if hi and when > hi + 300:
             return []                       # committed after the run ended
         if when < lo - 300:
             return []                       # committed before the run started
-        prev = _sp.run(["git", "-C", ROOT, "show", "%s^:benchmarks/RANKING.csv" % sha],
+        prev = _sp.run(["git", "-C", ROOT, "show", "%s^:%s" % (sha, rank_path)],
                        capture_output=True, text=True, timeout=20).stdout
-        now = _sp.run(["git", "-C", ROOT, "show", "%s:benchmarks/RANKING.csv" % sha],
+        now = _sp.run(["git", "-C", ROOT, "show", "%s:%s" % (sha, rank_path)],
                       capture_output=True, text=True, timeout=20).stdout
         if not prev or not now:
             return []
@@ -165,7 +186,9 @@ def run_docs():
             d = {}
             for row in csv.DictReader(txt.splitlines()):
                 try:
-                    d[row["document"]] = float(row["share5"])
+                    # the .txt table has no share5 - its measure is how many checks a document fails
+                    d[row["document"]] = (float(row["failed"]) if is_txt
+                                          else float(row["share5"]))
                 except Exception:
                     pass
             return d
