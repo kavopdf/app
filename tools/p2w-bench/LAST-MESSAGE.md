@@ -1,8 +1,9 @@
+# Fixer report - 2026-11-20 17:59
 
-  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
+```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 17:59 → running IST · 1h 32m**
+**20 Nov 2026 · slot 17:59 → running IST · 1h 34m**
 
 > **itr-computation-with-slab-table** improved — 2.00 → 1.00. Corpus ratchet clean across 213 documents.
 
@@ -42,11 +43,22 @@ token, and its punctuation strip does not remove it - so the clean word the writ
 as invented. Treating NUL as whitespace on the source side would clear those three and harm nothing.
 The verifier was not touched: it is the instrument, and the finding is recorded instead.
 
+## The third attempt: t08 is one displaced line, not a shuffled page
+
+`t08_line_order` was next, and it is not ten broken documents. Six of its eight measurable documents
+are off by exactly one line, and in all six the displaced line is secondary text the page set among
+its body lines - a stamp note, a certificate disclaimer, a drawing note, a speech bubble, a drop cap, a
+sub-caption. The line is present and in the right column; it is emitted at a different point in the
+sequence, which is what a writer that lays out its primary block first and its secondary blocks
+afterwards does. No change landed, because a block-order change reorders lines in every document with
+secondary text and cannot be proven on six: it needs the whole corpus re-converted and re-scored.
+Recorded in FINDINGS so the next run starts from the mechanism instead of from the symptom.
+
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **1** — 4 attempt(s), 1 kept |
+| Documents improved this run | **1** — 6 attempt(s), 1 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -55,7 +67,7 @@ The verifier was not touched: it is the instrument, and the finding is recorded 
 | Fixed - LibreOffice proxy | 32 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `t12_word_invention` |
+| Working on | `t08_line_order` |
 
 ## What was tried
 
@@ -65,6 +77,8 @@ The verifier was not touched: it is the instrument, and the finding is recorded 
 | 19:24 | **kept** | 1/0 | KEPT - the class is CLOSED, not parked: 0 of 213 documents fail t13_amount_columns (was 1). itr-computation-with-slab-table was not table geometry as the previous run concluded, it was a WELDED CELL: |
 | 19:27 | **reverted** | 0/12 | claimed (second attempt, same slot). t12_word_invention, 12 documents, the biggest .txt class after t13 closed. Plan: read the check, census the invented tokens per document, group by mechanism (furni |
 | 19:29 | **reverted** | 0/12 | NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_in |
+| 19:33 | **reverted** | 0/10 | claimed (third attempt, same slot). t08_line_order, 10 documents, the largest .txt class left. Census only: group the ten by the mechanism that reorders their lines (column interleave, page furniture, |
+| 19:33 | **reverted** | 0/10 | NO ENGINE CHANGE - a census, which is the result. t08_line_order is not 'ten documents with broken order': SIX of its eight measurable documents are off by exactly ONE line, and in all six the displac |
 
 ## The txt
 
@@ -87,9 +101,9 @@ The verifier was not touched: it is the instrument, and the finding is recorded 
 
 | | |
 |:--|:--|
-| Slot window | 17:59 → running · 1h 32m |
+| Slot window | 17:59 → running · 1h 34m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 25 |
+| Tool beats | 33 |
 | Longest silence | **55.3 min** — from 18:28:39, after `report.py: building the report` |
 | Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 4 need a human |
@@ -101,8 +115,8 @@ The verifier was not touched: it is the instrument, and the finding is recorded 
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **58 min** | `##############` |
-| record - attempt, handoff, class rows | **5 min** | `#` |
-| report - the report and the chain | **29 min** | `#######` |
+| record - attempt, handoff, class rows | **6 min** | `#` |
+| report - the report and the chain | **30 min** | `#######` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -119,3 +133,9 @@ The verifier was not touched: it is the instrument, and the finding is recorded 
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+```
+
+Written by report.py from committed files only. Every number above is read from
+ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
+and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.

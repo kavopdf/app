@@ -532,6 +532,41 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "t08_line_order": {
+  "attempts": 2,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-20 19:33",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "claimed (third attempt, same slot). t08_line_order, 10 documents, the largest .txt class left. Census only: group the ten by the mechanism that reorders their lines (column interleave, page furniture,",
+    "total": 10
+   },
+   {
+    "at": "2026-11-20 19:33",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "NO ENGINE CHANGE - a census, which is the result. t08_line_order is not 'ten documents with broken order': SIX of its eight measurable documents are off by exactly ONE line, and in all six the displac",
+    "total": 10
+   }
+  ],
+  "last": null,
+  "last_engine": "49cffd4",
+  "last_moved": 0,
+  "last_total": 10,
+  "outcomes": [
+   "reverted",
+   "reverted"
+  ],
+  "reason": "NO ENGINE CHANGE - a census, which is the result. t08_line_order is not 'ten documents with broken order': SIX of its eight measurable documents are off by exactly ONE line, and in all six the displaced line is secondary text the page set among its body lines - a stamp note (09_stamp_font_not_embedded), a certificate disclaimer (305_vaccination_certificate), a drawing note (330_cad_drawing_sheet), a speech bubble ('I will fix it', 400_comic_page_speech_bubbles), the drop cap 'T' (70_magazine_drop_cap_photo_caption) and a sub-caption (itr-computation-with-slab-table). The line is present and in the right column in every case; it is emitted at a different point in the sequence, which is what a writer that lays out its primary block first and its secondary blocks afterwards does. Two documents are off by more - 46_chart_coloured_labels_body_text 6, 65_two_col_full_width_figure_caption 4 - and may be a different fault. Two of the ten (041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled) have no PDF in any corpus-v1 release zip. Not attempted because a block-order change reorders lines in EVERY document with secondary text and cannot be proven on six: it needs the whole corpus re-converted and re-scored, about twenty minutes of conversion across five calls, which is what was left of this slot. Also: t08 has zero tolerance, so a fix that puts 88 of 89 paired lines in order reads as no movement. FINDINGS/t08-is-one-displaced-secondary-line-1950.md.",
+  "reasons": [
+   "claimed (third attempt, same slot). t08_line_order, 10 documents, the largest .txt class left. Census only: group the ten by the mechanism that reorders their lines (column interleave, page furniture, table row order, RTL, footnote) and name which of them a TxtWriter change could reach, so the next run does not treat the class as one construct the way t12 had to be disproved.",
+   "NO ENGINE CHANGE - a census, which is the result. t08_line_order is not 'ten documents with broken order': SIX of its eight measurable documents are off by exactly ONE line, and in all six the displaced line is secondary text the page set among its body lines - a stamp note (09_stamp_font_not_embedded), a certificate disclaimer (305_vaccination_certificate), a drawing note (330_cad_drawing_sheet), a speech bubble ('I will fix it', 400_comic_page_speech_bubbles), the drop cap 'T' (70_magazine_drop_cap_photo_caption) and a sub-caption (itr-computation-with-slab-table). The line is present and in the right column in every case; it is emitted at a different point in the sequence, which is what a writer that lays out its primary block first and its secondary blocks afterwards does. Two documents are off by more - 46_chart_coloured_labels_body_text 6, 65_two_col_full_width_figure_caption 4 - and may be a different fault. Two of the ten (041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled) have no PDF in any corpus-v1 release zip. Not attempted because a block-order change reorders lines in EVERY document with secondary text and cannot be proven on six: it needs the whole corpus re-converted and re-scored, about twenty minutes of conversion across five calls, which is what was left of this slot. Also: t08 has zero tolerance, so a fix that puts 88 of 89 paired lines in order reads as no movement. FINDINGS/t08-is-one-displaced-secondary-line-1950.md."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "t12_word_invention": {
   "attempts": 2,
   "first_seen": null,
