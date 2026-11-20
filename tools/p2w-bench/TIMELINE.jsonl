@@ -1230,3 +1230,19 @@
 {"t": 1795197105.400131, "ist": "23:21:45", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795197106.369964, "ist": "23:21:46", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795197106.7394998, "ist": "23:21:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795197194.6159806, "ist": "23:23:14", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795197194.9211426, "ist": "23:23:14", "ev": "attempt", "d": "t01_word_accuracy -> reverted"}
+{"t": 1795197195.0464442, "ist": "23:23:15", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795197195.1986244, "ist": "23:23:15", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795197202.110091, "ist": "23:23:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795197202.2829092, "ist": "23:23:22", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795197216.739192, "ist": "23:23:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795197217.5291436, "ist": "23:23:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795197217.889419, "ist": "23:23:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795197236.665474, "ist": "23:23:56", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795197237.6041377, "ist": "23:23:57", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795197237.9415624, "ist": "23:23:57", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795197254.0863786, "ist": "23:24:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795197255.1307125, "ist": "23:24:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795197256.453429, "ist": "23:24:16", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795197256.8408043, "ist": "23:24:16", "ev": "beat", "d": "report.py: building the report"}

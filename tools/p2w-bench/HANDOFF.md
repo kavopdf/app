@@ -20,7 +20,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> The 127 U+FFFD on the two bank forms are SETTLED on both sides: the glyphs are ff/fi/ffi/ffl, read from the FontFile2 outlines, and the ligature IDENTITY is not in the file - no cmap in any of 303 embedded programs, no glyph names, no GSUB, and both the /W widths and the glyf outlines leave ffi vs ffl and fi vs fl ambiguous. FINDINGS/ligature-identity-UNRECOVERABLE-2350.md has the numbers; do not rebuild a width or outline matcher. What is left for those two documents is t06_encoding (127 U+FFFD in the .txt), t08_line_order (40 of 461 out of order) and t09_page_furniture (197 where 21 are owed) - the .docx/.txt writer, not the font. t01_word_accuracy now holds 5 documents: 38_faux_bold_italic_synthesised, 39_small_caps_letter_spacing, 411_nested_xobject_transforms, 601_fillable_admission_form and 77_arabic_rtl_document. Two of those five is the bar. 38 loses the SECOND draw of its title - the source carries 'PROJECT REPORT - CIVIL' twice because faux bold strokes the fill, and our .txt carries it once, which is right; that is a source-side duplicate, and the 21:46 attempt that collapsed identical spans was REJECTED, so it needs a different construct. 411 loses 'S' and 'O': pymupdf and PDFBox disagree about a nested form's /Matrix and the rotated line runs off the page (y to -16.4). 601 loses two ZapfDingbats checkmarks that PDFBox never delivers - they are drawn in a widget appearance stream, and the source calls a tick '3', so both sides need the same fix or neither is honest.
+> t01_word_accuracy holds 5 documents and two of those five is the bar. Two of them now have a measured, named cause and a fix shape, so start there rather than re-diagnosing. (1) 601_fillable_admission_form loses exactly three tokens and two of them are ticked checkboxes drawn in widget appearance streams as 'BT /ZaDb 9 Tf (3) Tj ET' - PDFBox never processes annotation appearance streams, so the engine emits nothing, which is real content loss on a filled form. FINDINGS/601-tick-is-a-widget-appearance-2342.md has the xrefs; the engine side is a glyph walk over each widget's /AP /N, the shape formValuesOf/widgetValue already have, and the instrument side already reads that stream in _ap_stream_text - both sides must call a /ZaDb glyph a tick or neither is honest. (2) 38_faux_bold_italic_synthesised loses the SECOND draw of its title because faux bold strokes the fill and the source carries 'PROJECT REPORT - CIVIL' twice while our .txt carries it once, which is correct; the 21:46 attempt that collapsed identical spans was REJECTED, so it needs a different construct. (3) 411_nested_xobject_transforms loses 'S' and 'O' - pymupdf and PDFBox disagree about a nested form's matrix and the rotated line runs off the page to y=-16.4. The two bank forms have LEFT this class; what is left on them is t06_encoding, t08_line_order and t09_page_furniture, which is the writer and not the font. Do not rebuild a ligature matcher: FINDINGS/ligature-identity-UNRECOVERABLE-2350.md proves the identity is not in the file.
 
 ## Agents deployed and not yet accounted for
 
@@ -70,7 +70,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `19:33` attempt 2 on t08_line_order -> reverted (0/10 moved)
 - `20:28` attempt 9 on 47_margins -> reverted (0/14 moved)
 - `20:44` attempt 10 on 47_margins -> reverted (0/14 moved)
 - `20:45` agent deployed: 47margins / anchor trace - which writer construct puts 360_restaurant_menu's body column 12 pt left, and do
@@ -95,6 +94,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `23:20` agent deployed: t01_word_accuracy / B - how many of the 213 documents a cmap-based recovery would reach, and does any em
 - `23:20` agent landed: t01_word_accuracy / A -> FINDINGS/ligature-identity-UNRECOVERABLE-2350.md
 - `23:20` agent landed: t01_word_accuracy / B -> FINDINGS/ligature-identity-UNRECOVERABLE-2350.md
+- `23:23` attempt 7 on t01_word_accuracy -> reverted (0/5 moved)
 
 ## Where the rest of the state lives
 

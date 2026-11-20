@@ -1,4 +1,3 @@
-| 12 Nov 13:18 | baseline | txt backfill: 10 more documents recorded (324_loan_amortisation_schedule, 325_demat_holdings_statement, 326_itr_computation, 32_serif_nondefault_body, 330_cad_drawing_sheet, 331_pid_diagram, 332_bom_on_drawing, 333_datasheet_spec_tables, 334_patent_document, 335_msds_safety_data_sheet), gap 79 -> 69 |
 | 12 Nov 13:18 | baseline | ratchet held (docx 190/208 scored, txt 121/208, backfill gap 69); measure gate NOT READY (18 rows unscored); slot released |
 | 12 Nov 14:10 | started | phase measure |
 | 12 Nov 14:13 | baseline | measured price-list-2col-dense-right-aligned 35/59 docx, 3/5 txt |
@@ -198,3 +197,4 @@
 | 20 Nov 22:43 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 20 Nov 22:54 | fixer | slot claimed - fixer running |
 | 20 Nov 23:16 | fixer | attempt t01_word_accuracy -> kept (2/7 moved) |
+| 20 Nov 23:23 | fixer | attempt t01_word_accuracy -> reverted (0/5 moved) |
