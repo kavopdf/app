@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-20 15:55
+# Fixer report - 2026-11-20 17:59
 
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 15:55 → 17:12 IST · 1h 17m**
+**20 Nov 2026 · slot 17:59 → running IST · 1h 32m**
 
-> **22_invoice_four_columns_txtpos** improved — 1.00 → 0.00. Corpus ratchet clean across 213 documents.
+> **itr-computation-with-slab-table** improved — 2.00 → 1.00. Corpus ratchet clean across 213 documents.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **5** — 3 attempt(s), 1 kept |
+| Documents improved this run | **1** — 4 attempt(s), 1 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,15 +20,16 @@
 | Fixed - LibreOffice proxy | 32 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `t13_amount_columns` |
+| Working on | `t12_word_invention` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 16:14 | **reverted** | 0/26 | IN PROGRESS - claiming the class: per-Table endCol is not per-page; the six remaining t13 docs differ only by which Table set the column. Will be corrected in place with the real measurement. |
-| 17:06 | **kept** | 5/6 | TxtWriter: hoist the table amount end column from per-Table to one set per page column of the cell's right edge, pooled over every table in the document and marked in paraEndSnap so paragraph and tabl |
-| 17:08 | **reverted** | 0/1 | itr-computation-with-slab-table is not a padding fault. Its failing source amount column (7 rows, end column 130) arrives as 1 row at 130 and 6 at 132, because 61,000.00 is in a different Table whose |
+| 18:00 | **reverted** | 0/6 | claimed. .txt half. 6 documents still fail t13 per DEFECT-CLASSES-TXT: 22_invoice_four_columns_txtpos, 29_dot_leaders_txtpos, 74_balance_sheet_indented_subitems, balance-sheet-two-columns-of-figures, |
+| 19:24 | **kept** | 1/0 | KEPT - the class is CLOSED, not parked: 0 of 213 documents fail t13_amount_columns (was 1). itr-computation-with-slab-table was not table geometry as the previous run concluded, it was a WELDED CELL: |
+| 19:27 | **reverted** | 0/12 | claimed (second attempt, same slot). t12_word_invention, 12 documents, the biggest .txt class after t13 closed. Plan: read the check, census the invented tokens per document, group by mechanism (furni |
+| 19:29 | **reverted** | 0/12 | NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_in |
 
 ## The txt
 
@@ -44,28 +45,29 @@
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `t13_A-02` | per-document map of every offending t13 line: source | 17:09 | 11:39 | 0 min |
-| `t13_B-02` | reach of a per-page end column across the whole .txt | 17:09 | 11:39 | 0 min |
+| `t13column census-01` | which of the six t13 documents still fail at head, t | 18:01 | 18:10 | 9 min |
+| `t13itr weld fix-01` | implement and measure the TxtWriter change that clea | 18:11 | 18:34 | 23 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 15:55 → 17:12 · 1h 17m |
+| Slot window | 17:59 → running · 1h 32m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 31 |
-| Longest silence | **51.9 min** — from 16:14:08, after `classrow.py: refreshing the class file` |
-| Silences over 2 min | 3 |
-| Obstacles | 0 cleared · 0 need a human |
+| Tool beats | 25 |
+| Longest silence | **55.3 min** — from 18:28:39, after `report.py: building the report` |
+| Silences over 2 min | 4 |
+| Obstacles | 0 cleared · 4 need a human |
+| Still a wall | The fixer run 15:55-17:12 released its slot and its report was committed at 17:24 IST; `RUN-LOG.md` has no cla |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **1h 13m** | `#####################` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **3 min** | `#` |
+| fix - diagnose and change the engine | **58 min** | `##############` |
+| record - attempt, handoff, class rows | **5 min** | `#` |
+| report - the report and the chain | **29 min** | `#######` |
 ## Best results this round
 
 | Document | Before | After | Change |

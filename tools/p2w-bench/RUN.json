@@ -7,7 +7,10 @@
  "attempts": 4,
  "kept": 1,
  "docs_improved": 1,
- "agents": [],
+ "agents": [
+  "t13column census-01",
+  "t13itr weld fix-01"
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0,
  "ratchets": 1,

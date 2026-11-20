@@ -516,6 +516,22 @@
   {
    "at": "19:29",
    "text": "attempt 2 on t12_word_invention -> reverted (0/12 moved)"
+  },
+  {
+   "at": "19:31",
+   "text": "agent deployed: t13 / column census - which of the six t13 documents still fail at head, the exact end column of every"
+  },
+  {
+   "at": "19:31",
+   "text": "agent deployed: t13 / itr weld fix - implement and measure the TxtWriter change that clears itr-computation-with-slab"
+  },
+  {
+   "at": "19:31",
+   "text": "agent landed: t13 / column census -> tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md"
+  },
+  {
+   "at": "19:31",
+   "text": "agent landed: t13 / itr weld fix -> tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md"
   }
  ],
  "next": "47_margins: re-measure the class against a fresh render, not the tables - 392_statistical_console_output already reads 0.06 and passes all 42 checks on this engine while RANKING.csv says 1.61 and both gverify tables say 47_margins FAIL, so the class is at most 25 documents. Then pull the thread FINDINGS/47_margins-REACH-140500.md leaves open: 360_restaurant_menu's body column was 12 pt left (source 52, render 40) and 9 runs are still 11.9 pt out; the leading-space indent and the centred-line constructs are both capped under the 25% bar and must not be retried.",
@@ -843,6 +859,30 @@
    "finding": "FINDINGS/t13-page-end-column-KEPT-172000.md",
    "deployed_at": "2026-11-20T11:39",
    "landed_at": "2026-11-20T11:39"
+  },
+  {
+   "id": "t13column census-01",
+   "class": "t13",
+   "angle": "column census",
+   "question": "which of the six t13 documents still fail at head, the exact end column of every row of the failing source column, and whether the writer or the PDF table geometry owns each one",
+   "expected": "a per-document table with columns, path and a fixable/geometry verdict",
+   "deployed": "18:01",
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md",
+   "deployed_at": "2026-11-20T18:01",
+   "landed_at": "2026-11-20T18:10"
+  },
+  {
+   "id": "t13itr weld fix-01",
+   "class": "t13",
+   "angle": "itr weld fix",
+   "question": "implement and measure the TxtWriter change that clears itr-computation-with-slab-table without regressing the five documents that pass",
+   "expected": "a unified diff plus before and after scores for the six and for a wider set",
+   "deployed": "18:11",
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md",
+   "deployed_at": "2026-11-20T18:11",
+   "landed_at": "2026-11-20T18:34"
   }
  ],
  "run": {

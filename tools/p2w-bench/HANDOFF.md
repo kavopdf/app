@@ -54,16 +54,14 @@ unfinished work, not as a result.
 | 47_mB-01 | 47_margins | B | why 40_devanagari_shaping_font and 76_devanagari_table score 10.48 and | 14:02 | landed | landed | tools/p2w-bench/FINDINGS/47_margins-DIAGNOSE40-B-150000.md |
 | t13_A-02 | t13_amount_columns | A | per-document map of every offending t13 line: source column x, leading | 17:09 | six remaining docs diagnosed line by line | landed | FINDINGS/t13-page-end-column-KEPT-172000.md |
 | t13_B-02 | t13_amount_columns | B | reach of a per-page end column across the whole .txt corpus, before an | 17:09 | which of 213 improve and which regress | landed | FINDINGS/t13-page-end-column-KEPT-172000.md |
+| t13column census-01 | t13 | column census | which of the six t13 documents still fail at head, the exact end colum | 19:31 | a per-document table with columns, path and a fixable/geometry verdict | landed | tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md |
+| t13itr weld fix-01 | t13 | itr weld fix | implement and measure the TxtWriter change that clears itr-computation | 19:31 | a unified diff plus before and after scores for the six and for a wider set | landed | tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `13:34` attempt 4 on 47_margins -> partial (3/13 moved)
-- `13:34` attempt 5 on 47_margins -> reverted (0/13 moved)
-- `13:34` two attempts on 47_margins, both reverted, both measured; the mechanism is now in FINDINGS and the class is no longer a mystery
-- `13:36` agent deployed: 47_margins / A-01 - what 47_margins actually compares, and where the page margin is emitted
 - `13:36` agent deployed: 47_margins / B-01 - the space-led indent construct on 47_margins
 - `13:36` agent landed: 47_margins / A-01 -> FINDINGS/47_margins-MECHANISM-133500-f2.md
 - `13:36` agent landed: 47_margins / B-01 -> FINDINGS/47_margins-MECHANISM-133500-f2.md
@@ -85,6 +83,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `19:24` attempt 8 on t13_amount_columns -> kept
 - `19:27` attempt 1 on t12_word_invention -> reverted (0/12 moved)
 - `19:29` attempt 2 on t12_word_invention -> reverted (0/12 moved)
+- `19:31` agent deployed: t13 / column census - which of the six t13 documents still fail at head, the exact end column of every
+- `19:31` agent deployed: t13 / itr weld fix - implement and measure the TxtWriter change that clears itr-computation-with-slab
+- `19:31` agent landed: t13 / column census -> tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md
+- `19:31` agent landed: t13 / itr weld fix -> tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md
 
 ## Where the rest of the state lives
 
