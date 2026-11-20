@@ -1,4 +1,3 @@
-| 12 Nov 14:16 | baseline | measured report-2col-table-spanning-both-columns 48/59 docx, 4/5 txt |
 | 12 Nov 14:16 | baseline | measured salary-slip-corporate 39/59 docx, 4/5 txt |
 | 12 Nov 14:17 | baseline | measured salary-slip-factory-wages 49/59 docx, 4/5 txt |
 | 12 Nov 14:18 | baseline | measured table-across-page-break-repeated-header 49/59 docx, 4/5 txt |
@@ -198,3 +197,4 @@
 | 21 Nov 01:51 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 21 Nov 02:52 | fixer | slot claimed - fixer running |
 | 21 Nov 03:25 | fixer | attempt 47_margins -> partial (2/26 moved) |
+| 21 Nov 03:36 | fixer | attempt 47_margins -> partial (2/26 moved) |

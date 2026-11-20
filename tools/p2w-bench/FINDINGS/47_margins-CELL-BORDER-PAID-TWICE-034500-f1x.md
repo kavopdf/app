@@ -68,6 +68,38 @@ On the seven documents the patch does not move, the check's own **median error i
 the margin itself is right - and what fails is the per-page **tail of unregistered runs**. That is a
 different defect from this one and it is not the border. Do not re-aim this patch at them.
 
+
+## GOOGLE DECIDES, AND GOOGLE AGREES
+
+Measured 21 Nov 03:38 in the user's renderer: the .docx uploaded to Drive, converted to a Google Doc,
+exported as PDF, and the text layer read with PyMuPDF. Page 1, the grid digits, x in points.
+
+| | first column | second | fifth |
+|:--|--:|--:|--:|
+| source PDF | 115.91 | 159.91 | 291.91 |
+| Google, HEAD build | **117.00** (+1.09) | 161.25 (+1.34) | 294.00 (+2.09) |
+| Google, patched build | **115.50** (-0.41) | 159.75 (-0.16) | 292.50 (+0.59) |
+
+So **Google also lays cell content inside the cell's border**, exactly as LibreOffice does, and the
+border was being paid twice in the renderer the user opens. The same document through the same 42
+checks in Google:
+
+    404_sudoku_grid   HEAD     43/47 FAIL  47_margins source=2.1  render=18
+    404_sudoku_grid   patched  44/47 FAIL  47_margins PASS
+
+One document improved in Google, no check newly failed, and the three that still fail
+(18_displacement, 23_line_pitch, 59_shape_anchor) are untouched by this change.
+
+## The measurement a sub-agent cannot take
+
+A sub-agent has no `upload` tool, so it cannot stage a local .docx into Drive, and every
+`GOOGLEDRIVE_CREATE_FILE` / `GOOGLEDRIVE_UPLOAD_FILE` path fails with "the file does not exist in
+storage" for a `/scratch` path. The loop only runs from the top-level run: `upload(path=...)` from
+`/scratch/output` gives the `s3key`, then CREATE_FILE with that key and
+`mimeType=application/vnd.google-apps.document`, then EXPORT to `application/pdf`. Two Google Docs
+were created for this measurement and both should be deleted (p2w-fixer-404-sudoku,
+p2w-fixer-404-sudoku-fixed).
+
 ## To land it
 
     git apply tools/p2w-bench/patches/47-margins-cell-border-inset.patch

@@ -72,7 +72,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `21:47` agent deployed: t01_word_accuracy / verifier-tokenisation - Does verify_txt.py's t01 tokenisation charge a correct .txt for words the page d
 - `21:47` agent deployed: t01_word_accuracy / writer-word-drop - Which construct in TxtWriter.java/PdfToWord.java drops words the PDF draws, rank
 - `21:47` agent landed: t01_word_accuracy / verifier-tokenisation -> Verdict ENGINE for the two bank forms (127 tokens of U+FFFD where the source declares U+0124); two real instrument bugs found (widget /AP double-count, source word boundaries) but neither makes any of the ten pass; 15 asymmetries tested and ruled harmless with numbers. Ruled the instrument out as the explanation for 79/391/406 - which the run then found was wrong: the NUL declaration WAS the instrument's fault. See FINDINGS/t01_word_accuracy-CONTROL-CHARS-2135.md
 - `21:47` agent landed: t01_word_accuracy / writer-word-drop -> No writer drop on either measurable document: 041122's 131 lost tokens are 127 ligature U+FFFD plus 4 genuine; the filled form's 145 are the same 127 plus 18 widget values counted twice by the source. Measured negatives that remove possibilities permanently: nested XObject with a scaling CTM LOST 0, Arabic through logicalOrder LOST 0 (length-preserving), below-paper LOST 0, letterspacing 0.16-0.30em identical both sides. Also: clipToPaper() is dead code and the live filter uses the CropBox ignoring its offset - a page whose CropBox origin is not (0,0) drops visible text (measured: VISIBLE -> V).
@@ -97,6 +96,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `01:47` attempt 10 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:51` attempt 11 on t01_word_accuracy -> reverted (0/5 moved)
 - `03:25` attempt 11 on 47_margins -> partial (2/26 moved)
+- `03:36` attempt 12 on 47_margins -> partial (2/26 moved)
 
 ## Where the rest of the state lives
 

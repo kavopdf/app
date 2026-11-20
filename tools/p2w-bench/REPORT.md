@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 02:52 → running IST · 35 min**
+**21 Nov 2026 · slot 02:52 → running IST · 44 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -27,6 +27,7 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 03:25 | **partial** | 2/26 | THE CELL'S OWN BORDER WAS PAID TWICE. insetTw measures a cell's text x from the cell's left EDGE on the page, and the writer then draws a rule on that edge; a renderer puts cell content inside its bor |
+| 03:36 | **partial** | 2/26 | SECOND RECORD, same construct, now measured in GOOGLE. The patched build was uploaded to Drive, converted to a Google Doc and exported as PDF: 404_sudoku_grid goes 43/47 FAIL -> 44/47, with 47_margins |
 
 ## The txt
 
@@ -46,11 +47,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 02:52 → running · 35 min |
+| Slot window | 02:52 → running · 44 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 8 |
+| Tool beats | 12 |
 | Longest silence | **33.8 min** — from 02:52:05, after `(no activity given)` |
-| Silences over 2 min | 1 |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 4 need a human |
 | Still a wall | Today's `PROGRESS.md` row records 46 `.txt` failing and `health.py` now reads 27 from the same table, the same |
 
@@ -59,7 +60,7 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **33 min** | `#####################` |
+| fix - diagnose and change the engine | **42 min** | `#####################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
 ## Best results this round
 

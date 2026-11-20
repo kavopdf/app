@@ -1,8 +1,8 @@
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 02:52 → running IST · 35 min**
+**21 Nov 2026 · slot 02:52 → running IST · 44 min**
 
-> No engine change was kept this run: the mechanism is proved, the patch is written, and the gate refuses an unmeasured engine. What landed is the patch and the proof, not a tree change.
+> No engine change was kept this run: the mechanism is proved in Google, the patch is written, and the gate refuses an unmeasured engine. What landed is the patch and the proof, not a tree change.
 >
 > The class was not my choice. classpick.py ranked the capability table by documents and printed 47_margins, 26 documents in Google, so that is what this run worked. Ten attempts sat on it already; the last two concluded that 360_restaurant_menu cannot be won by any writer construct that keeps the page's own grid, and this run did not rebuild either of those.
 
@@ -10,7 +10,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,6 +26,7 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 03:25 | **partial** | 2/26 | THE CELL'S OWN BORDER WAS PAID TWICE. insetTw measures a cell's text x from the cell's left EDGE on the page, and the writer then draws a rule on that edge; a renderer puts cell content inside its bor |
+| 03:36 | **partial** | 2/26 | SECOND RECORD, same construct, now measured in GOOGLE. The patched build was uploaded to Drive, converted to a Google Doc and exported as PDF: 404_sudoku_grid goes 43/47 FAIL -> 44/47, with 47_margins |
 
 ### The mechanism, and the proof
 
@@ -33,9 +34,15 @@ A table cell's text x is measured from the cell's left edge on the page, and the
 
 Proved by editing only the emitted XML on 404_sudoku_grid: its nine columns carry a 2 pt left and insideV rule, all 30 of its unregistered runs sat exactly 2.1 pt right of the page, and setting those two sides to nil moved all 30 to within 0.1 pt.
 
-### Same-engine pair, nine documents
+### Google decides, and Google agrees
 
-A HEAD build and a patched build of the same tree, both through soffice, both scored by the 42 checks. LibreOffice is the proxy here and this table says so.
+The .docx was uploaded to Drive, converted to a Google Doc and exported as PDF, and the text layer read with PyMuPDF. Page 1 grid digit x in points: source 115.91 / 159.91 / 291.91; Google on the HEAD build 117.00 / 161.25 / 294.00; Google on the patched build 115.50 / 159.75 / 292.50. So Google lays cell content inside the cell's border exactly as LibreOffice does, and the border was paid twice in the renderer the user opens.
+
+The same document through the same 42 checks in Google: **43/47 FAIL with 47_margins at 18 unregistered runs and a 2.1 pt median, to 44/47 with 47_margins PASS**. No check newly fails; the three that still fail are 18_displacement, 23_line_pitch and 59_shape_anchor, none of which this change touches.
+
+### Same-engine pair, nine documents, LibreOffice proxy
+
+A HEAD build and a patched build of the same tree, both through soffice, both scored by the 42 checks.
 
 | document | before | after | 47_margins |
 |:--|--:|--:|:--|
@@ -49,7 +56,7 @@ A HEAD build and a patched build of the same tree, both through soffice, both sc
 | `brochure-3col-with-sidebar-box` | 41/42 | 41/42 | unchanged |
 | `product-catalogue-code-left-price-right` | 41/42 | 41/42 | unchanged |
 
-Two moved, seven did not, none got worse. The patch is in `patches/47-margins-cell-border-inset.patch`; the method, the proof and the landing sequence are in `FINDINGS/47_margins-CELL-BORDER-PAID-TWICE-034500-f1x.md`.
+Two moved, seven did not, none got worse. The patch is in `patches/47-margins-cell-border-inset.patch`; the method, both measurements and the landing sequence are in `FINDINGS/47_margins-CELL-BORDER-PAID-TWICE-034500-f1x.md`.
 
 ### What the next run must not repeat
 
@@ -73,17 +80,20 @@ The remaining 47_margins failures are a different defect. On the seven documents
 
 ## Subagents
 
-One Explore agent, run before the attempt: a reach census over the 26 documents. It reported that no per-document JSON carries 47_margins detail, so it measured the class rather than quoting a table, and it is what named the table-cell cluster as the only construct clearing the class's quarter bar. A second agent was not run; the time went on the engine work.
+Two agents, both before the run's own attempt and neither waited on.
+
+1. Explore - a reach census over the 26 documents. No per-document JSON carries 47_margins detail, so it measured the class rather than quoting a table, and it is what named the table-cell cluster as the only construct clearing the class's quarter bar.
+2. general-purpose - asked to measure Google's cell-border inset. It confirmed the mechanism in LibreOffice at two border weights (2 pt on 404, 0.5 pt on 76) and could not reach Google: a sub-agent has no upload tool, so a local .docx cannot be staged into Drive. That blocker is why the Google measurement was taken by the run itself, and the loop is written down in the finding. It also left an empty Netlify project, p2w-gverify-tmp, that needs deleting by hand.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 02:52 → running · 35 min |
+| Slot window | 02:52 → running · 44 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 8 |
+| Tool beats | 12 |
 | Longest silence | **33.8 min** — from 02:52:05, after `(no activity given)` |
-| Silences over 2 min | 1 |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 4 need a human |
 | Still a wall | Today's `PROGRESS.md` row records 46 `.txt` failing and `health.py` now reads 27 from the same table, the same |
 
@@ -92,7 +102,7 @@ One Explore agent, run before the attempt: a reach census over the 26 documents.
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **33 min** | `#####################` |
+| fix - diagnose and change the engine | **42 min** | `#####################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
 ## Best results this round
 
