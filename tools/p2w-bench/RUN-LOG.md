@@ -1,6 +1,3 @@
-| 12 Nov 12:16 | baseline | txt backfill: 10 more documents recorded (314_tender_rfp_boq, 315_gazette_notification, 316_contract_with_schedules, 317_rti_response, 318_court_summons_form, 31_times_body_arial_headings, 320_balance_sheet_statutory, 321_auditors_report, 322_mutual_fund_factsheet, 323_credit_card_statement), gap now 79 |
-| 12 Nov 12:16 | baseline | ratchet held (docx 180/208 scored, txt 101/208, backfill gap 79); measure gate NOT READY (28 rows unscored); slot released |
-| 12 Nov 13:09 | started | phase measure |
 | 12 Nov 13:11 | baseline | corpus 208 pdfs, engine built (2a68de6) |
 | 12 Nov 13:13 | baseline | measured magazine-2col-pullquote-spanning 36/59 docx, magazine-2col-pullquote-spanning.txt 4/5 txt |
 | 12 Nov 13:15 | baseline | measured marksheet-subject-left-marks-right 41/59 docx, marksheet-subject-left-marks-right.txt 4/5 txt |
@@ -198,3 +195,6 @@
 | 20 Nov 19:29 | fixer | attempt t12_word_invention -> reverted (0/12 moved) |
 | 20 Nov 19:33 | fixer | attempt t08_line_order -> reverted (0/10 moved) |
 | 20 Nov 19:33 | fixer | attempt t08_line_order -> reverted (0/10 moved) |
+| 20 Nov 20:01 | fixer | slot claimed - fixer running |
+| 20 Nov 20:28 | fixer | attempt 47_margins -> reverted (0/14 moved) |
+| 20 Nov 20:44 | fixer | attempt 47_margins -> reverted (0/14 moved) |

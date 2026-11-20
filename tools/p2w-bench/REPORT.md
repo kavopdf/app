@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-20 17:59
+# Fixer report - 2026-11-20 20:01
 
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 17:59 → running IST · 1h 34m**
+**20 Nov 2026 · slot 20:01 → running IST · 44 min**
 
-> **itr-computation-with-slab-table** improved — 2.00 → 1.00. Corpus ratchet clean across 213 documents.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **1** — 6 attempt(s), 1 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,18 +20,14 @@
 | Fixed - LibreOffice proxy | 32 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `t08_line_order` |
+| Working on | `47_margins` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 18:00 | **reverted** | 0/6 | claimed. .txt half. 6 documents still fail t13 per DEFECT-CLASSES-TXT: 22_invoice_four_columns_txtpos, 29_dot_leaders_txtpos, 74_balance_sheet_indented_subitems, balance-sheet-two-columns-of-figures, |
-| 19:24 | **kept** | 1/0 | KEPT - the class is CLOSED, not parked: 0 of 213 documents fail t13_amount_columns (was 1). itr-computation-with-slab-table was not table geometry as the previous run concluded, it was a WELDED CELL: |
-| 19:27 | **reverted** | 0/12 | claimed (second attempt, same slot). t12_word_invention, 12 documents, the biggest .txt class after t13 closed. Plan: read the check, census the invented tokens per document, group by mechanism (furni |
-| 19:29 | **reverted** | 0/12 | NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_in |
-| 19:33 | **reverted** | 0/10 | claimed (third attempt, same slot). t08_line_order, 10 documents, the largest .txt class left. Census only: group the ten by the mechanism that reorders their lines (column interleave, page furniture, |
-| 19:33 | **reverted** | 0/10 | NO ENGINE CHANGE - a census, which is the result. t08_line_order is not 'ten documents with broken order': SIX of its eight measurable documents are off by exactly ONE line, and in all six the displac |
+| 20:28 | **reverted** | 0/14 | claimed. 47_margins (.docx, 14 in LO / 26 in Google). MECHANISM FOUND for the one document with a real 12 pt column error: 360_restaurant_menu's menu body is a TABLE, not a flow block (writer=table tw |
+| 20:44 | **reverted** | 0/14 | SECOND ATTEMPT, different construct: WIDEN THE CELL OVER ITS LEADER-DOT COLUMN instead of selling its indent. DocxWriter tableBody's widening loop could only take room from EMPTY neighbours; a menu/in |
 
 ## The txt
 
@@ -47,29 +43,28 @@
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `t13column census-01` | which of the six t13 documents still fail at head, t | 18:01 | 18:10 | 9 min |
-| `t13itr weld fix-01` | implement and measure the TxtWriter change that clea | 18:11 | 18:34 | 23 min |
+| `47maanchor trace-01` | which writer construct puts 360_restaurant_menu's bo | 20:45 | 15:15 | 0 min |
+| `47maclass census-01` | which clause of 47_margins each document fails, grou | 20:45 | 15:15 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 17:59 → running · 1h 34m |
+| Slot window | 20:01 → running · 44 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 33 |
-| Longest silence | **55.3 min** — from 18:28:39, after `report.py: building the report` |
-| Silences over 2 min | 4 |
-| Obstacles | 0 cleared · 4 need a human |
-| Still a wall | The fixer run 15:55-17:12 released its slot and its report was committed at 17:24 IST; `RUN-LOG.md` has no cla |
+| Tool beats | 19 |
+| Longest silence | **26.4 min** — from 20:02:06, after `archive.py: housekeeping` |
+| Silences over 2 min | 2 |
+| Obstacles | 0 cleared · 0 need a human |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **58 min** | `##############` |
-| record - attempt, handoff, class rows | **6 min** | `#` |
-| report - the report and the chain | **30 min** | `#######` |
+| fix - diagnose and change the engine | **42 min** | `#####################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

@@ -79,7 +79,7 @@
   "status": "OPEN"
  },
  "47_margins": {
-  "attempts": 8,
+  "attempts": 10,
   "first_seen": 1794518680.890611,
   "history": [
    {
@@ -116,12 +116,26 @@
     "outcome": "reverted",
     "reason": "CORRECTED 15:25 - the claim this row was first recorded with was wrong. The 'ungated' build turned out to be a NO-OP: the line it changed is semantically identical to HEAD's, so the docx it produced is HEAD's docx. What was read as '392 1.61 -> 0.06' is therefore HEAD's own score, not the patch's, and HEAD already reads 0.06 where RANKING.csv says 1.61. Measured directly on a pristine HEAD build: 392 share@5 = 0.06 and 42 of 42 checks PASS, while benchmarks/RANKING.csv carries 1.61 and both gverify tables carry a 47_margins FAIL for it. 360 reads 34.18 on HEAD against 34.43 in RANKING. No engine change was kept: the patch does nothing. See FINDINGS/47_margins-STALE-TABLES-152500.md.",
     "total": 26
+   },
+   {
+    "at": "2026-11-20 20:28",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "claimed. 47_margins (.docx, 14 in LO / 26 in Google). MECHANISM FOUND for the one document with a real 12 pt column error: 360_restaurant_menu's menu body is a TABLE, not a flow block (writer=table tw",
+    "total": 14
+   },
+   {
+    "at": "2026-11-20 20:44",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "SECOND ATTEMPT, different construct: WIDEN THE CELL OVER ITS LEADER-DOT COLUMN instead of selling its indent. DocxWriter tableBody's widening loop could only take room from EMPTY neighbours; a menu/in",
+    "total": 14
    }
   ],
   "last": 1794521923.5603442,
-  "last_engine": "c18ae16",
+  "last_engine": "49cffd4",
   "last_moved": 0,
-  "last_total": 26,
+  "last_total": 14,
   "outcomes": [
    "error",
    "error",
@@ -130,15 +144,19 @@
    "reverted",
    "reverted",
    "reverted",
+   "reverted",
+   "reverted",
    "reverted"
   ],
-  "reason": "CORRECTED 15:25 - the claim this row was first recorded with was wrong. The 'ungated' build turned out to be a NO-OP: the line it changed is semantically identical to HEAD's, so the docx it produced is HEAD's docx. What was read as '392 1.61 -> 0.06' is therefore HEAD's own score, not the patch's, and HEAD already reads 0.06 where RANKING.csv says 1.61. Measured directly on a pristine HEAD build: 392 share@5 = 0.06 and 42 of 42 checks PASS, while benchmarks/RANKING.csv carries 1.61 and both gverify tables carry a 47_margins FAIL for it. 360 reads 34.18 on HEAD against 34.43 in RANKING. No engine change was kept: the patch does nothing. See FINDINGS/47_margins-STALE-TABLES-152500.md.",
+  "reason": "SECOND ATTEMPT, different construct: WIDEN THE CELL OVER ITS LEADER-DOT COLUMN instead of selling its indent. DocxWriter tableBody's widening loop could only take room from EMPTY neighbours; a menu/invoice/contents cell to the right holds leader dots, so it could not be widened over them and the writer fell through to the indent sale at :6366. New helper isLeaderOnly() (dots, bullets, ellipsis, spaces only) plus a guard that merges only when the merged text provably fits; the dots are appended into the merged cell so no character is lost and no column index moves. MEASURED on 360_restaurant_menu (LO render, verify_google.py on the fresh pair): the merge FIRES - the name cell becomes gridSpan=2, tcW 4588 twips, w:ind 240 (x pinned at 52) - and share@5px improves 34.43 -> 26.25 (-8.18, the best single-document move this class has had). But the CHECK COUNT gets WORSE, 37/42 -> 36/42: 47_margins 9 -> 14 unregistered (the dots' own xink moves from 112 pt to 144 pt, +32 pt, so every dot run becomes an unregistered run - the merge pins the name by displacing the leader), 13_text_colours newly fails (the dots were #666666 and a merged cell carries one colour, so they become black, grey share -33%), 43_within_10pt_x newly fails (2 spans moved together -35.1 pt), 26_text_overlap unchanged at 6. REVERTED on the checks, not on the pixels. THE FINDING: the page's own ink does not fit its own column - the name is drawn at x=52 and runs to 144 while its column ends at 111.85, and the dots are drawn starting at 112, INSIDE the name's column. All three cannot be pinned at once: pin the name and the dots move 32 pt; keep the dots and the name must either wrap or give up its indent. That is why both constructs measured so far trade one for the other, and it means the class is not reachable on this document by any writer construct that keeps the page's own grid. Do not rebuild either variant.",
   "reasons": [
    "The spaces a page wrote as indent were emitted as run text, so the indent was n x whichever face's space advance rendered it: 392's 20-space row landed at 64.2 instead of 107.5 pt under a substituted face. Stripping the leading spaces and emitting inkX-b.x as w:ind w:left drives the check's own counter to zero (392 2->0, 380 3->0, 383 7->0 under the substitution proxy) and moves nothing the wrong way anywhere: 9 class documents same or better on share@5px, line and page counts unchanged, p2w.py --validate GATE PASS. Not kept because flowFromBox is the emitter in only 3 of 13 documents - the space-led lines in 40, 77 and 78 are anchored, in a cell, or merged - and a Google-only mechanism is flat in a LibreOffice measurement by construction. Diff and numbers in FINDINGS/47_margins-MECHANISM-133500-f2.md.",
    "Pin the centred line's own extent [b.x, b.right] and drop w:jc, so a centred line stops delegating its left edge to the renderer's text width. Under the substitution proxy it fixes the check on 317_rti_response ((0.1,3)->(0.1,0)) but moves the whole width error onto the line's right end: screen over all 13 class documents gave 11 same, 0 better, 2 worse - 317 share@5px 0.65->2.54, 318 0.00->0.71. A patch that moves the number up and looks worse is not a fix. Diff in FINDINGS/47_margins-MECHANISM-133500-f2.md.",
    "anchorBox/lineParagraph: anchor at Box.inkX and strip the leading ASCII spaces, so a space-led anchored line's indent is a position instead of n space-advances of the rendering face. Measured reach by tracing the writer over all 26 class documents: anchorBox is called 0 times on 22 of them, and the 4 it reaches (28_value_overflows, 330_cad, 331_pid, academic-paper, magazine-2col) have no space-led line at all. 4 of 26 screened identical, 0 better, 0 worse. Reverted: nothing to improve.",
    "g.size from getFontSize() (exact) instead of getFontSizeInPt() (rounded), gated OFF monospaced faces. The gate fires on 360 (8.5/8.0 DejaVuSerif) and not on 392 (6.6/6.0 DejaVuSansMono). Measured: 360 34.43 -> 34.43, 365 0.02 -> 0.02, 07_stamp_over_table 1.82 -> 1.82, 21_form_labels 0.00 -> 0.00 - all unchanged. 392 was NOT measured on this build; do not read the next row as its continuation. The gate is aimed at nothing: the 360 gain it was written for does not exist. Reverted.",
-   "CORRECTED 15:25 - the claim this row was first recorded with was wrong. The 'ungated' build turned out to be a NO-OP: the line it changed is semantically identical to HEAD's, so the docx it produced is HEAD's docx. What was read as '392 1.61 -> 0.06' is therefore HEAD's own score, not the patch's, and HEAD already reads 0.06 where RANKING.csv says 1.61. Measured directly on a pristine HEAD build: 392 share@5 = 0.06 and 42 of 42 checks PASS, while benchmarks/RANKING.csv carries 1.61 and both gverify tables carry a 47_margins FAIL for it. 360 reads 34.18 on HEAD against 34.43 in RANKING. No engine change was kept: the patch does nothing. See FINDINGS/47_margins-STALE-TABLES-152500.md."
+   "CORRECTED 15:25 - the claim this row was first recorded with was wrong. The 'ungated' build turned out to be a NO-OP: the line it changed is semantically identical to HEAD's, so the docx it produced is HEAD's docx. What was read as '392 1.61 -> 0.06' is therefore HEAD's own score, not the patch's, and HEAD already reads 0.06 where RANKING.csv says 1.61. Measured directly on a pristine HEAD build: 392 share@5 = 0.06 and 42 of 42 checks PASS, while benchmarks/RANKING.csv carries 1.61 and both gverify tables carry a 47_margins FAIL for it. 360 reads 34.18 on HEAD against 34.43 in RANKING. No engine change was kept: the patch does nothing. See FINDINGS/47_margins-STALE-TABLES-152500.md.",
+   "claimed. 47_margins (.docx, 14 in LO / 26 in Google). MECHANISM FOUND for the one document with a real 12 pt column error: 360_restaurant_menu's menu body is a TABLE, not a flow block (writer=table twice in the -Dp2w.traceLines trace). PdfToWord:9469 records each cell's ink x (52 pt) and the column edge is 40 pt, so insetTw() gives w:ind left = 240 twips = 12 pt. DocxWriter.java:6362-6366 then SELLS that inset to buy one line: if (textOverflows) insetTw = Math.max(0, spanTw - needTw). Menu names run 60-92 pt in a 71.85 pt column, so 5 cells gave up 240, 225, 182 twips and were set at x=40, and the page anchor read 40 against the source's 52 - clause (a) fail. Patch measured (removing the sale): anchor 52->52, clause (a) PASS, 0 unregistered runs, worst displacement -11.9 -> +0.1 pt, 47_margins FAIL -> PASS and the document 37/42 -> 38/42 checks. NOT KEPT: screen.py 16 documents, 15 same, 0 better, 1 worse - 360 share@5px 34.43 -> 41.04 (+6.61) because 13 menu names that were squeezed onto one line at the wrong x now wrap at the right x. The sale genuinely buys the line where needTw < spanTw; a variant keeping only that regime was built and measured (needTw <= spanTw) and is worse still, 34.43 -> 47.78. So the construct is real, reachable and fully explained, and the ratchet is what refuses it - not the engine. NEXT: the landable form is pinning the x AND keeping the line, i.e. widen the overrunning cell over its EMPTY neighbour, which DocxWriter:6344-6360 already does for the empty-neighbour case and refuses for 360 because the neighbour holds the leader dots. Do not rebuild the plain removal.",
+   "SECOND ATTEMPT, different construct: WIDEN THE CELL OVER ITS LEADER-DOT COLUMN instead of selling its indent. DocxWriter tableBody's widening loop could only take room from EMPTY neighbours; a menu/invoice/contents cell to the right holds leader dots, so it could not be widened over them and the writer fell through to the indent sale at :6366. New helper isLeaderOnly() (dots, bullets, ellipsis, spaces only) plus a guard that merges only when the merged text provably fits; the dots are appended into the merged cell so no character is lost and no column index moves. MEASURED on 360_restaurant_menu (LO render, verify_google.py on the fresh pair): the merge FIRES - the name cell becomes gridSpan=2, tcW 4588 twips, w:ind 240 (x pinned at 52) - and share@5px improves 34.43 -> 26.25 (-8.18, the best single-document move this class has had). But the CHECK COUNT gets WORSE, 37/42 -> 36/42: 47_margins 9 -> 14 unregistered (the dots' own xink moves from 112 pt to 144 pt, +32 pt, so every dot run becomes an unregistered run - the merge pins the name by displacing the leader), 13_text_colours newly fails (the dots were #666666 and a merged cell carries one colour, so they become black, grey share -33%), 43_within_10pt_x newly fails (2 spans moved together -35.1 pt), 26_text_overlap unchanged at 6. REVERTED on the checks, not on the pixels. THE FINDING: the page's own ink does not fit its own column - the name is drawn at x=52 and runs to 144 while its column ends at 111.85, and the dots are drawn starting at 112, INSIDE the name's column. All three cannot be pinned at once: pin the name and the dots move 32 pt; keep the dots and the name must either wrap or give up its indent. That is why both constructs measured so far trade one for the other, and it means the class is not reachable on this document by any writer construct that keeps the page's own grid. Do not rebuild either variant."
   ],
   "requeues": 0,
   "status": "OPEN"

@@ -9,14 +9,14 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 17:59 |
+| started | 20:01 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> 47_margins taken on the rotation (classpick rotated off 18_displacement: 3 attempts, 0 moved). The class is DEFINED: 47_margins is verify_google.py:3960-4170 - per page, horizontally only: (a) the page's left ink anchor must be within 3.0 pt of the source's, (b) matched run pairs are unregistered at |d|>2.0 pt with budget max(2, round(5% n)). w:pgMar is 0 on all four sides, a hard constant at DocxWriter.java:2268-2269, and is NOT the mechanism - Google places ink at pgMar+ind. The lever is flowFromBox (DocxWriter.java:4159-4188, :4391-4392): left-aligned lines pin their ink, centred and right lines delegate their left edge to the renderer's text width. Two constructs measured, both reverted, both diffs in FINDINGS/47_margins-MECHANISM-133500-f2.md. The one to carry forward is the space-led indent: strip the leading ASCII spaces and emit inkX-b.x as w:ind w:left (needs Box.inkX = visibleX in PdfToWord). It is position-neutral in the declared face, moves nothing worse on any of the 13, and drives the Google counter to zero on 392/380/383 under the substitution proxy - but reaches flowFromBox in only 3 of 13, and a Google-only mechanism is flat in a LibreOffice measurement by construction, so the corpus pass cannot see it. Next: extend it to the cell emitter, where 40/77/78's space-led lines live, then run benchmarks/gate.py --budget 250 in its own call and confirm RANKING.csv's mtime moved.
+> 47_margins: the 12 pt on 360_restaurant_menu is the INDENT SALE at DocxWriter.java:6366 - if (textOverflows) insetTw = Math.max(0, spanTw - needTw) - and the page's own ink does not fit its own column, so no writer construct pins all three of name, leader dots and figure. Construct A (remove the sale) flips 47_margins to PASS and takes the document 37/42 -> 38/42 but costs share@5px 34.43 -> 41.04. Construct B (widen the cell over its leader-dot column, new isLeaderOnly()) pins x at 52 with no wrap and is the best pixel move the class has had, 34.43 -> 26.25, but the dots' xink moves +32 pt so 47_margins goes 9 -> 14, 13_text_colours and 43_within_10pt_x newly fail, and the document reads 37/42 -> 36/42. Both reverted; both measured in FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md. The remaining untried direction on this class is its .txt half.
 
 ## What the next run should do first
 
@@ -56,18 +56,14 @@ unfinished work, not as a result.
 | t13_B-02 | t13_amount_columns | B | reach of a per-page end column across the whole .txt corpus, before an | 17:09 | which of 213 improve and which regress | landed | FINDINGS/t13-page-end-column-KEPT-172000.md |
 | t13column census-01 | t13 | column census | which of the six t13 documents still fail at head, the exact end colum | 18:01 | a per-document table with columns, path and a fixable/geometry verdict | landed | tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md |
 | t13itr weld fix-01 | t13 | itr weld fix | implement and measure the TxtWriter change that clears itr-computation | 18:11 | a unified diff plus before and after scores for the six and for a wider set | landed | tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md |
+| 47maanchor trace-01 | 47margins | anchor trace | which writer construct puts 360_restaurant_menu's body column 12 pt le | 20:45 | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md | landed | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md |
+| 47maclass census-01 | 47margins | class census | which clause of 47_margins each document fails, grouped by mechanism,  | 20:45 | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md | landed | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `13:36` agent landed: 47_margins / B-01 -> FINDINGS/47_margins-MECHANISM-133500-f2.md
-- `14:35` attempt 6 on 47_margins -> reverted (0/26 moved)
-- `15:07` attempt 7 on 47_margins -> reverted (0/26 moved)
-- `15:08` attempt 8 on 47_margins -> partial (2/26 moved)
-- `15:12` agent deployed: 47_margins / A - which code path emits a table-cell line, and how a cell's horizontal position is
-- `15:12` agent deployed: 47_margins / B - why 40_devanagari_shaping_font and 76_devanagari_table score 10.48 and 7.91 - is
 - `15:12` agent landed: 47_mA-01 /  -> tools/p2w-bench/FINDINGS/47_margins-CELLPATH-A-150000.md
 - `15:12` agent landed: 47_mB-01 /  -> tools/p2w-bench/FINDINGS/47_margins-DIAGNOSE40-B-150000.md
 - `16:14` attempt 4 on t13_amount_columns -> reverted (0/26 moved)
@@ -87,6 +83,12 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `19:31` agent landed: t13 / itr weld fix -> tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md
 - `19:33` attempt 1 on t08_line_order -> reverted (0/10 moved)
 - `19:33` attempt 2 on t08_line_order -> reverted (0/10 moved)
+- `20:28` attempt 9 on 47_margins -> reverted (0/14 moved)
+- `20:44` attempt 10 on 47_margins -> reverted (0/14 moved)
+- `20:45` agent deployed: 47margins / anchor trace - which writer construct puts 360_restaurant_menu's body column 12 pt left, and do
+- `20:45` agent landed: 47margins / anchor trace -> FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md
+- `20:45` agent deployed: 47margins / class census - which clause of 47_margins each document fails, grouped by mechanism, and whethe
+- `20:45` agent landed: 47margins / class census -> FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md
 
 ## Where the rest of the state lives
 

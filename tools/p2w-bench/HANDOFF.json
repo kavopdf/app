@@ -540,6 +540,30 @@
   {
    "at": "19:33",
    "text": "attempt 2 on t08_line_order -> reverted (0/10 moved)"
+  },
+  {
+   "at": "20:28",
+   "text": "attempt 9 on 47_margins -> reverted (0/14 moved)"
+  },
+  {
+   "at": "20:44",
+   "text": "attempt 10 on 47_margins -> reverted (0/14 moved)"
+  },
+  {
+   "at": "20:45",
+   "text": "agent deployed: 47margins / anchor trace - which writer construct puts 360_restaurant_menu's body column 12 pt left, and do"
+  },
+  {
+   "at": "20:45",
+   "text": "agent landed: 47margins / anchor trace -> FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md"
+  },
+  {
+   "at": "20:45",
+   "text": "agent deployed: 47margins / class census - which clause of 47_margins each document fails, grouped by mechanism, and whethe"
+  },
+  {
+   "at": "20:45",
+   "text": "agent landed: 47margins / class census -> FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md"
   }
  ],
  "next": "47_margins: re-measure the class against a fresh render, not the tables - 392_statistical_console_output already reads 0.06 and passes all 42 checks on this engine while RANKING.csv says 1.61 and both gverify tables say 47_margins FAIL, so the class is at most 25 documents. Then pull the thread FINDINGS/47_margins-REACH-140500.md leaves open: 360_restaurant_menu's body column was 12 pt left (source 52, render 40) and 9 runs are still 11.9 pt out; the leading-space indent and the centred-line constructs are both capped under the 25% bar and must not be retried.",
@@ -891,10 +915,34 @@
    "finding": "tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md",
    "deployed_at": "2026-11-20T18:11",
    "landed_at": "2026-11-20T18:34"
+  },
+  {
+   "id": "47maanchor trace-01",
+   "class": "47margins",
+   "angle": "anchor trace",
+   "question": "which writer construct puts 360_restaurant_menu's body column 12 pt left, and does removing it move anything else",
+   "expected": "FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md",
+   "deployed": "20:45",
+   "status": "landed",
+   "finding": "FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md",
+   "deployed_at": "2026-11-20T15:15",
+   "landed_at": "2026-11-20T15:15"
+  },
+  {
+   "id": "47maclass census-01",
+   "class": "47margins",
+   "angle": "class census",
+   "question": "which clause of 47_margins each document fails, grouped by mechanism, and whether regress.py would allow the patch",
+   "expected": "FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md",
+   "deployed": "20:45",
+   "status": "landed",
+   "finding": "FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md",
+   "deployed_at": "2026-11-20T15:15",
+   "landed_at": "2026-11-20T15:15"
   }
  ],
  "run": {
-  "started": "17:59",
+  "started": "20:01",
   "ended": null,
   "ended_how": null
  },
@@ -1000,7 +1048,7 @@
    "plan": ""
   }
  ],
- "context": "47_margins taken on the rotation (classpick rotated off 18_displacement: 3 attempts, 0 moved). The class is DEFINED: 47_margins is verify_google.py:3960-4170 - per page, horizontally only: (a) the page's left ink anchor must be within 3.0 pt of the source's, (b) matched run pairs are unregistered at |d|>2.0 pt with budget max(2, round(5% n)). w:pgMar is 0 on all four sides, a hard constant at DocxWriter.java:2268-2269, and is NOT the mechanism - Google places ink at pgMar+ind. The lever is flowFromBox (DocxWriter.java:4159-4188, :4391-4392): left-aligned lines pin their ink, centred and right lines delegate their left edge to the renderer's text width. Two constructs measured, both reverted, both diffs in FINDINGS/47_margins-MECHANISM-133500-f2.md. The one to carry forward is the space-led indent: strip the leading ASCII spaces and emit inkX-b.x as w:ind w:left (needs Box.inkX = visibleX in PdfToWord). It is position-neutral in the declared face, moves nothing worse on any of the 13, and drives the Google counter to zero on 392/380/383 under the substitution proxy - but reaches flowFromBox in only 3 of 13, and a Google-only mechanism is flat in a LibreOffice measurement by construction, so the corpus pass cannot see it. Next: extend it to the cell emitter, where 40/77/78's space-led lines live, then run benchmarks/gate.py --budget 250 in its own call and confirm RANKING.csv's mtime moved.",
+ "context": "47_margins: the 12 pt on 360_restaurant_menu is the INDENT SALE at DocxWriter.java:6366 - if (textOverflows) insetTw = Math.max(0, spanTw - needTw) - and the page's own ink does not fit its own column, so no writer construct pins all three of name, leader dots and figure. Construct A (remove the sale) flips 47_margins to PASS and takes the document 37/42 -> 38/42 but costs share@5px 34.43 -> 41.04. Construct B (widen the cell over its leader-dot column, new isLeaderOnly()) pins x at 52 with no wrap and is the best pixel move the class has had, 34.43 -> 26.25, but the dots' xink moves +32 pt so 47_margins goes 9 -> 14, 13_text_colours and 43_within_10pt_x newly fail, and the document reads 37/42 -> 36/42. Both reverted; both measured in FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md. The remaining untried direction on this class is its .txt half.",
  "needs_human": [],
  "next_class": ""
 }

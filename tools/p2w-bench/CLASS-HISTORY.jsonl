@@ -52,3 +52,5 @@
 {"at": "2026-11-20 19:29", "attempt": 2, "class": "t12_word_invention", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-20 19:33", "attempt": 1, "class": "t08_line_order", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-20 19:33", "attempt": 2, "class": "t08_line_order", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-20 20:28", "attempt": 9, "class": "47_margins", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-20 20:44", "attempt": 10, "class": "47_margins", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}

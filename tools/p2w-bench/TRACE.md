@@ -6,14 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 14 Nov 22:40 | ? | build-engine | started |
-| 16 Nov 06:07 | baseline | claim | baseline claimed the slot |
-| 16 Nov 07:46 | classifier | claim | classifier claimed the slot |
-| 16 Nov 07:48 | fixer | claim | fixer claimed the slot |
-| 16 Nov 07:49 | fixer | build-engine | started |
-| 16 Nov 07:59 | fixer | build-engine | started |
-| 16 Nov 08:04 | fixer | commit-gate | started |
-| 16 Nov 08:53 | fixer | claim | fixer claimed the slot |
 | 16 Nov 08:53 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 16 Nov 08:54 | fixer | build-engine | started |
 | 16 Nov 09:54 | fixer | claim | fixer claimed the slot |
@@ -406,3 +398,11 @@
 | 20 Nov 19:29 | fixer | attempt | t12_word_invention -> reverted (0/12 moved) |
 | 20 Nov 19:33 | fixer | attempt | t08_line_order -> reverted (0/10 moved) |
 | 20 Nov 19:33 | fixer | attempt | t08_line_order -> reverted (0/10 moved) |
+| 20 Nov 20:01 | fixer | claim | fixer claimed the slot |
+| 20 Nov 20:01 | fixer | stale-claim | fixer slot was stale (27 min) - the previous run ended without releasing it |
+| 20 Nov 20:28 | fixer | attempt | 47_margins -> reverted (0/14 moved) |
+| 20 Nov 20:33 | fixer | build-engine | started |
+| 20 Nov 20:34 | fixer | build-engine | engine built in 48s |
+| 20 Nov 20:39 | fixer | build-engine | started |
+| 20 Nov 20:40 | fixer | build-engine | engine built in 52s |
+| 20 Nov 20:44 | fixer | attempt | 47_margins -> reverted (0/14 moved) |
