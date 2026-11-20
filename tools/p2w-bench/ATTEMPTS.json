@@ -533,7 +533,7 @@
   "status": "OPEN"
  },
  "t13_amount_columns": {
-  "attempts": 6,
+  "attempts": 8,
   "first_seen": null,
   "history": [
    {
@@ -577,30 +577,48 @@
     "outcome": "reverted",
     "reason": "itr-computation-with-slab-table is not a padding fault. Its failing source amount column (7 rows, end column 130) arrives as 1 row at 130 and 6 at 132, because 61,000.00 is in a different Table whose ",
     "total": 1
+   },
+   {
+    "at": "2026-11-20 18:00",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "claimed. .txt half. 6 documents still fail t13 per DEFECT-CLASSES-TXT: 22_invoice_four_columns_txtpos, 29_dot_leaders_txtpos, 74_balance_sheet_indented_subitems, balance-sheet-two-columns-of-figures, ",
+    "total": 6
+   },
+   {
+    "at": "2026-11-20 19:24",
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "KEPT - the class is CLOSED, not parked: 0 of 213 documents fail t13_amount_columns (was 1). itr-computation-with-slab-table was not table geometry as the previous run concluded, it was a WELDED CELL: ",
+    "total": 0
    }
   ],
   "last": null,
   "last_engine": "0fc8b7e",
   "last_moved": 0,
-  "last_total": 1,
+  "last_total": 6,
   "outcomes": [
    "error",
    "kept",
    "kept",
    "reverted",
    "kept",
-   "reverted"
+   "reverted",
+   "reverted",
+   "kept"
   ],
-  "ratchet_at": "20 Nov 17:06",
-  "ratchet_docs": 5,
-  "reason": "itr-computation-with-slab-table is not a padding fault. Its failing source amount column (7 rows, end column 130) arrives as 1 row at 130 and 6 at 132, because 61,000.00 is in a different Table whose cell right edge is 535.58 pt against the other table's 549.92 pt - 14.34 pt, 3.4 columns on this document's 4.1616 pt ruler. No pooling keyed on cell geometry can join those without inventing a column, and the source's figures all end within one column of each other: the fault is one table's cell right edge, i.e. PdfToWord table geometry, which owns the .docx and needs a .docx measurement. Measured and recorded so the next run does not retry the padding path.",
+  "ratchet_at": "20 Nov 19:24",
+  "ratchet_docs": 211,
+  "reason": "KEPT - the class is CLOSED, not parked: 0 of 213 documents fail t13_amount_columns (was 1). itr-computation-with-slab-table was not table geometry as the previous run concluded, it was a WELDED CELL: Table.rows welds a cell's lines with a newline and Table.cellX is the box, i.e. the FIRST line's x (517.18, the running head 'Page 1 of 1') while the figure '10,000.00' sits at 502.66 - 3.4 columns on that document's 4.2 pt ruler. Table.paras already records each line's own x and right. TxtWriter now measures a numeric part from its own line in tableEndSnap and in both appendTable passes, falling back to the cell box when the cell recorded no paragraphs (nearly every cell), and uses that line's own base column instead of the cell box as the floor for where the figure starts - the second half is what moved the number, because the guard 'if (startCol > col)' was keeping the box at 123 and holding the figure at 132 while the rest of its column sat at 130. Corpus: all 211 PDFs re-converted with the new engine and all 213 rows re-scored; 1 newly clean, 0 newly failing, 210 unchanged; itr 8/10 -> 9/10 (t08_line_order remains, a different class). Published RANKING-TXT.csv diff is one line. regress.py --check PASS, txt scope, no document worse than baseline. Recorded through this tool's own add() because regenerating DEFECT-CLASSES-TXT.md removed the name from the table the refusal check reads. Also in FINDINGS/t13-WELDED-CELL-CLOSED-1820.md: the class table was a whole engine behind - it claimed 6 documents on t13 when 5 already passed, because classify_txt.py was not run after the last keep.",
   "reasons": [
    "claimed. .txt half. PATCH-t13 (row-per-line) was rejected 19 Nov: it breaks t04_structure line-count drift, 101 worse 0 better. Working the other direction: keep one cell per line, fix only where an amount ENDS, since t13 compares rows of a column to each other and not to the source column.",
    "KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over-estimates a 7pt numeric token by one column, so amounts ended at baseCol+length = 133/134. Whole corpus: 10 better, 0 worse, 203 same; checks 1784->1794; clean 167->177. Line count unchanged, so t04 cannot drift. 8 of 18 remain: 2 are paragraph-path with no right edge on Para, 2 mixed.",
    "KEPT (second construct, same slot). paraEndSnap(): per page, an end column whose immediate neighbour is also an end column of the page's numeric paragraph lines merges into it transitively and keeps the highest value; appendPara pads to it. The paragraph path has no right edge, so its amounts ended at column(lineX)+len and rounding split one page column into two adjacent .txt columns (91/92, 107/108, 142/143). Only documents that can change were re-converted: scanning all 213 .txt for amount end columns one apart found 10; all 213 re-scored. 2 better, 0 worse, 211 same; checks 1794->1796. t13 now holds 6 of the original 18; clean 179 of 213.",
    "IN PROGRESS - claiming the class: per-Table endCol is not per-page; the six remaining t13 docs differ only by which Table set the column. Will be corrected in place with the real measurement.",
    "TxtWriter: hoist the table amount end column from per-Table to one set per page column of the cell's right edge, pooled over every table in the document and marked in paraEndSnap so paragraph and table paths agree. Whole corpus 213 re-converted and re-scored: 5 docs no longer fail t13, 0 newly failing, 208 unchanged. itr-computation-with-slab-table unmoved - its two cells end on different right edges (535.58 vs 549.92 pt), so it is table geometry, not padding.",
-   "itr-computation-with-slab-table is not a padding fault. Its failing source amount column (7 rows, end column 130) arrives as 1 row at 130 and 6 at 132, because 61,000.00 is in a different Table whose cell right edge is 535.58 pt against the other table's 549.92 pt - 14.34 pt, 3.4 columns on this document's 4.1616 pt ruler. No pooling keyed on cell geometry can join those without inventing a column, and the source's figures all end within one column of each other: the fault is one table's cell right edge, i.e. PdfToWord table geometry, which owns the .docx and needs a .docx measurement. Measured and recorded so the next run does not retry the padding path."
+   "itr-computation-with-slab-table is not a padding fault. Its failing source amount column (7 rows, end column 130) arrives as 1 row at 130 and 6 at 132, because 61,000.00 is in a different Table whose cell right edge is 535.58 pt against the other table's 549.92 pt - 14.34 pt, 3.4 columns on this document's 4.1616 pt ruler. No pooling keyed on cell geometry can join those without inventing a column, and the source's figures all end within one column of each other: the fault is one table's cell right edge, i.e. PdfToWord table geometry, which owns the .docx and needs a .docx measurement. Measured and recorded so the next run does not retry the padding path.",
+   "claimed. .txt half. 6 documents still fail t13 per DEFECT-CLASSES-TXT: 22_invoice_four_columns_txtpos, 29_dot_leaders_txtpos, 74_balance_sheet_indented_subitems, balance-sheet-two-columns-of-figures, gst-invoice-multipage-item-table, itr-computation-with-slab-table. Prior run pooled table end columns per page and kept 5; itr written off as table geometry. This run: per-document column census separating padding-path from geometry-path, then attack the largest group.",
+   "KEPT - the class is CLOSED, not parked: 0 of 213 documents fail t13_amount_columns (was 1). itr-computation-with-slab-table was not table geometry as the previous run concluded, it was a WELDED CELL: Table.rows welds a cell's lines with a newline and Table.cellX is the box, i.e. the FIRST line's x (517.18, the running head 'Page 1 of 1') while the figure '10,000.00' sits at 502.66 - 3.4 columns on that document's 4.2 pt ruler. Table.paras already records each line's own x and right. TxtWriter now measures a numeric part from its own line in tableEndSnap and in both appendTable passes, falling back to the cell box when the cell recorded no paragraphs (nearly every cell), and uses that line's own base column instead of the cell box as the floor for where the figure starts - the second half is what moved the number, because the guard 'if (startCol > col)' was keeping the box at 123 and holding the figure at 132 while the rest of its column sat at 130. Corpus: all 211 PDFs re-converted with the new engine and all 213 rows re-scored; 1 newly clean, 0 newly failing, 210 unchanged; itr 8/10 -> 9/10 (t08_line_order remains, a different class). Published RANKING-TXT.csv diff is one line. regress.py --check PASS, txt scope, no document worse than baseline. Recorded through this tool's own add() because regenerating DEFECT-CLASSES-TXT.md removed the name from the table the refusal check reads. Also in FINDINGS/t13-WELDED-CELL-CLOSED-1820.md: the class table was a whole engine behind - it claimed 6 documents on t13 when 5 already passed, because classify_txt.py was not run after the last keep."
   ],
   "requeues": 0,
   "status": "OPEN"

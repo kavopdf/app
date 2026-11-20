@@ -743,14 +743,14 @@
 {"t": 1795146901.3713896, "ist": "09:25:01", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795146920.4644794, "ist": "09:25:20", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795146920.6127841, "ist": "09:25:20", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795150612.6963754, "ist": "10:26:52", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795150995.5765555, "ist": "10:33:15", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795148909.4514964, "ist": "09:58:29", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795148909.582133, "ist": "09:58:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795148920.8438432, "ist": "09:58:40", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795148978.3495245, "ist": "09:59:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795148990.9437265, "ist": "09:59:50", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795148991.067203, "ist": "09:59:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795150612.6963754, "ist": "10:26:52", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795150995.5765555, "ist": "10:33:15", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795151184.0502257, "ist": "10:36:24", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795151189.2128413, "ist": "10:36:29", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795151189.4822319, "ist": "10:36:29", "ev": "attempt", "d": "18_displacement -> reverted"}
@@ -988,4 +988,17 @@
 {"t": 1795175004.9773276, "ist": "17:13:24", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795175006.8489285, "ist": "17:13:26", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795175007.5943027, "ist": "17:13:27", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795177765.0497725, "ist": "17:59:25", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795177765.1933105, "ist": "17:59:25", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795177774.2111259, "ist": "17:59:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795177799.8525636, "ist": "17:59:59", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795177802.5696533, "ist": "18:00:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795177802.8695648, "ist": "18:00:02", "ev": "attempt", "d": "t13_amount_columns -> reverted"}
+{"t": 1795177802.9819617, "ist": "18:00:02", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795177803.0961602, "ist": "18:00:03", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795179519.9260824, "ist": "18:28:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795182835.2645566, "ist": "19:23:55", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795182846.7131414, "ist": "19:24:06", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795182873.1948733, "ist": "19:24:33", "ev": "attempt", "d": "t13_amount_columns -> kept"}
+{"t": 1795182873.3654656, "ist": "19:24:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795182873.6283154, "ist": "19:24:33", "ev": "beat", "d": "classrow.py: refreshing the class file"}

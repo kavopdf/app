@@ -1,7 +1,7 @@
 {
  "01_stamp_rotated_15deg_upright": {
   "applicable": 10,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []
@@ -83,7 +83,7 @@
  },
  "10_stamp_as_image": {
   "applicable": 10,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []
@@ -169,12 +169,10 @@
  },
  "22_invoice_four_columns_txtpos": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "23_timetable_grid_txtpos": {
   "applicable": 9,
@@ -220,12 +218,10 @@
  },
  "29_dot_leaders_txtpos": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "300_prescription_rx": {
   "applicable": 9,
@@ -563,7 +559,7 @@
  },
  "362_price_list_dense": {
   "applicable": 8,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []
@@ -1109,7 +1105,7 @@
  },
  "72_bank_statement_no_rules_right_amounts": {
   "applicable": 10,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []
@@ -1123,12 +1119,11 @@
  },
  "74_balance_sheet_indented_subitems": {
   "applicable": 10,
-  "baseline_failed": 2,
-  "cause": "t02_position + t13_amount_columns",
-  "failed": 2,
+  "baseline_failed": 1,
+  "cause": "t02_position",
+  "failed": 1,
   "failed_ids": [
-   "t02_position",
-   "t13_amount_columns"
+   "t02_position"
   ]
  },
  "75_merged_header_cell_three_columns": {
@@ -1223,19 +1218,17 @@
  },
  "balance-sheet-and-profit-loss": {
   "applicable": 11,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []
  },
  "balance-sheet-two-columns-of-figures": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "bank-statement-5-pages": {
   "applicable": 12,
@@ -1246,7 +1239,7 @@
  },
  "bank-statement-horizontal-rules-only": {
   "applicable": 10,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []
@@ -1288,7 +1281,7 @@
  },
  "electricity-bill": {
   "applicable": 10,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []
@@ -1302,33 +1295,32 @@
  },
  "form16-part-b": {
   "applicable": 11,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []
  },
  "gst-invoice-3line-items": {
   "applicable": 10,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []
  },
  "gst-invoice-horizontal-rules-only": {
   "applicable": 10,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []
  },
  "gst-invoice-multipage-item-table": {
   "applicable": 12,
-  "baseline_failed": 2,
-  "cause": "t09_page_furniture + t13_amount_columns",
-  "failed": 2,
+  "baseline_failed": 1,
+  "cause": "t09_page_furniture",
+  "failed": 1,
   "failed_ids": [
-   "t09_page_furniture",
-   "t13_amount_columns"
+   "t09_page_furniture"
   ]
  },
  "gst-invoice-with-qr-code": {
@@ -1354,12 +1346,11 @@
  },
  "itr-computation-with-slab-table": {
   "applicable": 10,
-  "baseline_failed": 2,
-  "cause": "t08_line_order + t13_amount_columns",
-  "failed": 2,
+  "baseline_failed": 1,
+  "cause": "t08_line_order",
+  "failed": 1,
   "failed_ids": [
-   "t08_line_order",
-   "t13_amount_columns"
+   "t08_line_order"
   ]
  },
  "journal-2col-with-footnotes": {
@@ -1438,7 +1429,7 @@
  },
  "payslip-label-left-amount-right": {
   "applicable": 10,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []
@@ -1482,7 +1473,7 @@
  },
  "purchase-order": {
   "applicable": 10,
-  "baseline_failed": 1,
+  "baseline_failed": 0,
   "cause": "clean",
   "failed": 0,
   "failed_ids": []

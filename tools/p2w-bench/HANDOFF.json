@@ -500,6 +500,14 @@
   {
    "at": "17:09",
    "text": "agent landed: t13_amount_columns / B -> FINDINGS/t13-page-end-column-KEPT-172000.md"
+  },
+  {
+   "at": "18:00",
+   "text": "attempt 7 on t13_amount_columns -> reverted (0/6 moved)"
+  },
+  {
+   "at": "19:24",
+   "text": "attempt 8 on t13_amount_columns -> kept"
   }
  ],
  "next": "47_margins: re-measure the class against a fresh render, not the tables - 392_statistical_console_output already reads 0.06 and passes all 42 checks on this engine while RANKING.csv says 1.61 and both gverify tables say 47_margins FAIL, so the class is at most 25 documents. Then pull the thread FINDINGS/47_margins-REACH-140500.md leaves open: 360_restaurant_menu's body column was 12 pt left (source 52, render 40) and 9 runs are still 11.9 pt out; the leading-space indent and the centred-line constructs are both capped under the 25% bar and must not be retried.",
@@ -830,9 +838,9 @@
   }
  ],
  "run": {
-  "started": "15:55",
-  "ended": "17:12",
-  "ended_how": "forced"
+  "started": "17:59",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

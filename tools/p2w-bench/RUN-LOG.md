@@ -1,7 +1,3 @@
-| 12 Nov 12:11 | baseline | measured gst-invoice-horizontal-rules-only 42/59 docx, gst-invoice-horizontal-rules-only.txt 4/5 txt |
-| 12 Nov 12:12 | baseline | measured gst-invoice-multipage-item-table 45/59 docx, gst-invoice-multipage-item-table.txt 4/5 txt |
-| 12 Nov 12:12 | baseline | measured gst-invoice-with-qr-code 43/59 docx, gst-invoice-with-qr-code.txt 4/5 txt |
-| 12 Nov 12:13 | baseline | measured insurance-policy-schedule 48/59 docx, insurance-policy-schedule.txt 4/5 txt |
 | 12 Nov 12:13 | baseline | measured invoice-line-items-qty-rate-amount 49/59 docx, invoice-line-items-qty-rate-amount.txt 4/5 txt |
 | 12 Nov 12:14 | baseline | measured itr-computation-with-slab-table 43/59 docx, itr-computation-with-slab-table.txt 4/5 txt |
 | 12 Nov 12:14 | baseline | measured journal-2col-with-footnotes 43/59 docx, journal-2col-with-footnotes.txt 5/5 txt |
@@ -199,3 +195,6 @@
 | 20 Nov 17:06 | fixer | attempt t13_amount_columns -> kept (5/6 moved) |
 | 20 Nov 17:08 | fixer | attempt t13_amount_columns -> reverted (0/1 moved) |
 | 20 Nov 17:12 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 20 Nov 17:59 | fixer | slot claimed - fixer running |
+| 20 Nov 18:00 | fixer | attempt t13_amount_columns -> reverted (0/6 moved) |
+| 20 Nov 19:24 | fixer | attempt t13_amount_columns -> kept (1/? moved) |

@@ -362,12 +362,18 @@ public final class TxtWriter {
                     for (int ci = 0; ci < row.size(); ci++) {
                         String cell = row.get(ci);
                         if (cell == null) continue;
-                        int baseCol = column(cellLeft(t, ri, ci), charW);
-                        float right = cellRight(t, ri, ci);
                         String[] parts = cell.split("\n");
                         for (int pi = 0; pi < parts.length; pi++) {
                             String c = parts[pi].trim();
                             if (c.isEmpty() || !isNumeric(c)) continue;
+                            // THE FIGURE'S OWN LINE, NOT THE WELDED CELL'S BOX. See
+                            // cellPartX: a cell that holds a running head above a figure
+                            // has one cellX, taken from the head, and measuring the figure
+                            // from it puts it three columns right of where the page drew it.
+                            int baseCol = column(cellPartX(t, ri, ci, pi, parts.length,
+                                    cellLeft(t, ri, ci)), charW);
+                            float right = cellPartRight(t, ri, ci, pi, parts.length,
+                                    cellRight(t, ri, ci));
                             int key = baseCol + c.length();
                             if (!Float.isNaN(right)) {
                                 int rc = column(right, charW);
@@ -560,12 +566,14 @@ public final class TxtWriter {
             for (int ci = 0; ci < row.size() && ci < ncol; ci++) {
                 String cell = row.get(ci);
                 if (cell == null) continue;
-                int baseCol = column(cellLeft(t, ri, ci), charW);
-                float right = cellRight(t, ri, ci);
                 String[] parts = cell.split("\n");
                 for (int pi = 0; pi < parts.length; pi++) {
                     String c = parts[pi].trim();
                     if (c.isEmpty() || !isNumeric(c)) continue;
+                    int baseCol = column(cellPartX(t, ri, ci, pi, parts.length,
+                            cellLeft(t, ri, ci)), charW);
+                    float right = cellPartRight(t, ri, ci, pi, parts.length,
+                            cellRight(t, ri, ci));
                     int e = baseCol + c.length();
                     if (!Float.isNaN(right)) {
                         int rc = column(right, charW);
@@ -591,12 +599,28 @@ public final class TxtWriter {
                     // that edge. Without this every amount sat at the cell's left edge and
                     // a column of figures stopped being a column.
                     if (isNumeric(c)) {
+                        // The figure is measured from its OWN line, the same way the two
+                        // passes above measured it, so the column it is padded to and the
+                        // column it was counted in are the same column.
+                        // The figure starts where ITS OWN line started, not where the cell
+                        // box starts. Taking the box as the floor keeps a figure welded under
+                        // a running head at the head's x: on itr-computation-with-slab-table
+                        // the box is column 123 and the figure's own line column 120, so a
+                        // target of 130 asked for a start of 121, the guard kept 123, and the
+                        // figure ended at 132 while the six others in its column ended at 130.
+                        // `target` is never less than this line's own base + length, because
+                        // the two passes above counted this cell into it, so nothing moves
+                        // left of where the page drew it.
+                        int nbase = column(cellPartX(t, ri, ci, pi, parts.length,
+                                cellLeft(t, ri, ci)), charW);
+                        col = nbase;
                         // THE PAGE'S COLUMN, NOT THIS TABLE'S. endCol[ci] is what this one
                         // table measured; endSnap is what every table in the document that
                         // ends on this page column measured, and the two disagree exactly
                         // when a column is covered by more than one table. See tableEndSnap.
                         int target = endCol[ci] > 0 ? endCol[ci] : 0;
-                        float right = cellRight(t, ri, ci);
+                        float right = cellPartRight(t, ri, ci, pi, parts.length,
+                                cellRight(t, ri, ci));
                         if (!Float.isNaN(right)) {
                             int pooled = tableEndFor(endSnap, column(right, charW));
                             if (pooled > target) target = pooled;
@@ -643,6 +667,49 @@ public final class TxtWriter {
         if (row == null || ci >= row.size()) return Float.NaN;
         Float v = row.get(ci);
         return v == null ? Float.NaN : v;
+    }
+
+    /** Where the page drew THIS LINE of a cell, or `fallback` when the table pass did not
+     *  record the cell's paragraphs.
+     *
+     *  WHY A CELL IS NOT ONE X. `rows` holds one string per cell, so a cell the page drew two
+     *  lines in arrives as those lines welded with a newline, and `cellX` is the cell's box -
+     *  the x of the FIRST line in it. When the second line is the figure, measuring it from
+     *  the box measures it from the line above: on itr-computation-with-slab-table the cell
+     *  holds the running head "Page 1 of 1" at x 517.18 and the figure "10,000.00" at
+     *  x 502.66, and the 14.5 pt difference is 3.4 columns on that document's 4.2 pt ruler -
+     *  enough to put one figure three columns right of the six others in its own column, and
+     *  t13_amount_columns fails on a column whose figures are all present and all right.
+     *  `Table.paras` carries each line's own x and right, so the figure is measured where the
+     *  page drew it.
+     *
+     *  Empty `paras` means "one paragraph, use rows" - nearly every table - so this falls
+     *  back to the cell box and changes nothing on them. The paragraph count must match the
+     *  part count, because a part list that does not correspond to the recorded paragraphs
+     *  would pair the wrong x with the wrong text. */
+    private static float cellPartX(PdfToWord.Table t, int ri, int ci, int pi, int nparts,
+                                   float fallback) {
+        PdfToWord.Table.CellPara cp = cellPart(t, ri, ci, pi, nparts);
+        if (cp == null || Float.isNaN(cp.x)) return fallback;
+        return cp.x;
+    }
+
+    /** Where this line of the cell ENDED, or `fallback` - the same reasoning as cellPartX. */
+    private static float cellPartRight(PdfToWord.Table t, int ri, int ci, int pi, int nparts,
+                                       float fallback) {
+        PdfToWord.Table.CellPara cp = cellPart(t, ri, ci, pi, nparts);
+        if (cp == null || Float.isNaN(cp.right)) return fallback;
+        return cp.right;
+    }
+
+    private static PdfToWord.Table.CellPara cellPart(PdfToWord.Table t, int ri, int ci, int pi,
+                                                     int nparts) {
+        if (t.paras == null || ri >= t.paras.size()) return null;
+        List<List<PdfToWord.Table.CellPara>> row = t.paras.get(ri);
+        if (row == null || ci >= row.size()) return null;
+        List<PdfToWord.Table.CellPara> cell = row.get(ci);
+        if (cell == null || cell.size() != nparts || pi >= cell.size()) return null;
+        return cell.get(pi);
     }
 
     /** True when the text is only a number and its punctuation, which is what a page

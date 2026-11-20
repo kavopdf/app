@@ -9,9 +9,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 15:55 |
-| ended | 17:12 |
-| how it ended | forced |
+| started | 17:59 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -60,8 +60,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `12:00` agent deployed: t13_amount_columns / A - which writer path emits the misaligned amounts, proven by build
-- `12:00` agent deployed: t13_amount_columns / B - census of the 18 documents: table path vs paragraph path
 - `12:00` agent landed: t13_amount_columns / A -> FINDINGS/t13-writer-path-110501-f3de.md
 - `12:00` agent landed: t13_amount_columns / B -> (no file)
 - `13:34` attempt 4 on 47_margins -> partial (3/13 moved)
@@ -85,6 +83,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `17:09` agent deployed: t13_amount_columns / B - reach of a per-page end column across the whole .txt corpus, before and after
 - `17:09` agent landed: t13_amount_columns / A -> FINDINGS/t13-page-end-column-KEPT-172000.md
 - `17:09` agent landed: t13_amount_columns / B -> FINDINGS/t13-page-end-column-KEPT-172000.md
+- `18:00` attempt 7 on t13_amount_columns -> reverted (0/6 moved)
+- `19:24` attempt 8 on t13_amount_columns -> kept
 
 ## Where the rest of the state lives
 

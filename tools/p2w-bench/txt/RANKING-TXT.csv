@@ -181,7 +181,7 @@ gst-invoice-multipage-item-table,12,11,1,1,t09_page_furniture
 gst-invoice-with-qr-code,10,10,0,0,
 insurance-policy-schedule,10,10,0,0,
 invoice-line-items-qty-rate-amount,10,10,0,0,
-itr-computation-with-slab-table,10,8,2,2,t08_line_order t13_amount_columns
+itr-computation-with-slab-table,10,9,1,1,t08_line_order
 journal-2col-with-footnotes,9,8,1,1,t12_word_invention
 landscape-page-inside-portrait-document,11,11,0,0,
 magazine-2col-pullquote-spanning,9,9,0,0,

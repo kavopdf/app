@@ -6,15 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 14:46 | ? | ratchet | FAIL DRIFT 211 rows/211 marks; STALE 211 |
-| 13 Nov 14:46 | ? | ratchet | NOT COMPARED (--allow-stale) DRIFT 211 rows/211 marks; STALE 211 |
-| 13 Nov 14:46 | ? | ratchet --txt | held or rose |
-| 13 Nov 14:51 | ? | ratchet | FAIL DRIFT 211 rows/211 marks; STALE 211 |
-| 14 Nov 15:57 | ? | build-engine | started |
-| 14 Nov 15:57 | ? | build-engine | started |
-| 14 Nov 15:58 | ? | build-engine | started |
-| 14 Nov 15:59 | ? | build-engine | started |
-| 14 Nov 16:04 | ? | build-engine | started |
 | 14 Nov 21:41 | ? | build-engine | started |
 | 14 Nov 21:45 | ? | build-engine | started |
 | 14 Nov 21:58 | ? | build-engine | started |
@@ -406,3 +397,12 @@
 | 20 Nov 16:45 | fixer | build-engine | engine built in 37s |
 | 20 Nov 17:06 | fixer | attempt | t13_amount_columns -> kept (5/6 moved) |
 | 20 Nov 17:08 | fixer | attempt | t13_amount_columns -> reverted (0/1 moved) |
+| 20 Nov 17:59 | fixer | claim | fixer claimed the slot |
+| 20 Nov 18:00 | fixer | attempt | t13_amount_columns -> reverted (0/6 moved) |
+| 20 Nov 18:38 | fixer | build-engine | started |
+| 20 Nov 18:39 | fixer | build-engine | engine built in 57s |
+| 20 Nov 18:42 | fixer | build-engine | started |
+| 20 Nov 18:42 | fixer | build-engine | engine built in 44s |
+| 20 Nov 18:44 | fixer | build-engine | started |
+| 20 Nov 18:45 | fixer | build-engine | engine built in 55s |
+| 20 Nov 19:24 | fixer | attempt | t13_amount_columns -> kept (1/? moved) |
