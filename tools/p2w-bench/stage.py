@@ -120,7 +120,15 @@ def compute():
     # THE SECOND HALF OF EVERY DOCUMENT. A Google number alone says a document fails; only the pair
     # says WHICH CONSTRUCT Google drops, because LibreOffice honours nearly all of them. Measuring both
     # in the same pass is what makes the capability table possible at all.
-    lo_dir = "/scratch/work/p2w/lo-res"
+    # THE COMMITTED DIRECTORY, NOT THE WORK ONE. This read /scratch/work/p2w/lo-res, which does not
+    # survive a sandbox - so on any fresh run it counted whatever happened to be left there (90) and
+    # reported "measure the LibreOffice side of 102 documents" when all 213 were already committed in
+    # benchmarks/gverify-lo/. The gverify cron would have re-measured 102 documents that were done,
+    # for ever, and never reached classify.
+    #
+    # Found 20 Nov by reading what stage.py actually returns instead of trusting it. The same mistake
+    # as class_files() looking for the .txt classes in the wrong directory.
+    lo_dir = os.path.join(ROOT, "benchmarks", "gverify-lo")
     lo = 0
     if os.path.isdir(lo_dir):
         lo = len([f for f in os.listdir(lo_dir) if f.endswith(".json")])
@@ -139,12 +147,15 @@ def compute():
                 newest = max(newest, os.path.getmtime(os.path.join(GVERIFY, f)))
         if have < newest:
             return {"stage": "classify", "total": total, "measured": done,
+                    "scored": ok, "refused": refused,
                     "failing": len(bad),
                     "next": "classify %d failing documents - the table is older than the results"
                             % len(bad)}
-        return {"stage": "fix", "total": total, "measured": done, "failing": len(bad),
+        return {"stage": "fix", "total": total, "measured": done,
+                "scored": ok, "refused": refused, "failing": len(bad),
                 "next": "fix one class at a time; %d documents still fail a check" % len(bad)}
-    return {"stage": "ship", "total": total, "measured": done, "failing": 0,
+    return {"stage": "ship", "total": total, "measured": done,
+            "scored": ok, "refused": refused, "failing": 0,
             "next": "every document passes all 42 checks - nothing to ship unless a release is due"}
 
 
