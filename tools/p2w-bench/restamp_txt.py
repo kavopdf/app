@@ -63,7 +63,30 @@ def run(budget):
     v = verifier()
     seen = done()
     rows = list(csv.DictReader(open(RANK, encoding="utf-8")))
-    todo = [r for r in rows if r["document"] not in seen]
+    # A DOCUMENT IS RE-MEASURED WHEN ITS .txt CHANGED, NOT ONLY WHEN IT WAS NEVER MEASURED.
+    #
+    # This read `todo = [r for r in rows if r["document"] not in seen]`, so a document scored once was
+    # skipped for ever. The fixer changes TxtWriter, ConvertOne writes new .txt files, and --run answers
+    # "already scored: 213 | to do: 0" and measures nothing - so a .txt fix could never be seen, and the
+    # .txt half could not improve by construction. That is why 46 documents have failed the same checks
+    # for a month.
+    #
+    # Each record now carries the .txt file's size and mtime at the moment it was scored. A file that
+    # differs from its record is re-measured. --force re-measures everything.
+    force = "--force" in sys.argv
+    def stale(r):
+        d = r["document"]
+        if force or d not in seen:
+            return True
+        rec = seen[d]
+        path = os.path.join(OUT, d + ".txt")
+        try:
+            st = os.stat(path)
+        except OSError:
+            return True
+        return (rec.get("txt_size") != st.st_size
+                or abs((rec.get("txt_mtime") or 0) - st.st_mtime) > 1.0)
+    todo = [r for r in rows if stale(r)]
     print("  already scored: %d | to do: %d" % (len(seen), len(todo)))
     t0 = time.time()
     f = open(NEW, "a", encoding="utf-8")
@@ -83,11 +106,14 @@ def run(budget):
             with contextlib.redirect_stderr(io.StringIO()):
                 c = v.compare(pdf, txt)
             failed = sorted(k for k, (s, g, ok, a) in c.items() if a and not ok)
+            _st = os.stat(txt)
             rec = {"document": d,
                    "applicable": sum(1 for k, (s, g, ok, a) in c.items() if a),
                    "passed": sum(1 for k, (s, g, ok, a) in c.items() if a and ok),
                    "failed": len(failed),
-                   "failed_ids": " ".join(failed)}
+                   "failed_ids": " ".join(failed),
+                   "txt_size": _st.st_size,
+                   "txt_mtime": _st.st_mtime}
         except Exception as e:
             rec = {"document": d, "error": "%s: %s" % (type(e).__name__, e)}
         f.write(json.dumps(rec) + "\n"); f.flush(); n += 1
@@ -183,6 +209,7 @@ def main(argv):
     ap.add_argument("--report", action="store_true")
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--budget", type=int, default=260)
+    ap.add_argument("--force", action="store_true", help="re-measure every document")
     a = ap.parse_args(argv)
     if a.run:    return run(a.budget)
     if a.report: return report()

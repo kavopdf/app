@@ -868,3 +868,46 @@ ends it, and not before. While you still have time:
 **One attempt in thirty-two minutes is not a full slot.** The run that reported that spent 9 minutes on
 the fix and 12 on the screen. Two attempts is the floor, three is normal, and the only reason to stop
 early is that the platform has taken the slot back.
+
+---
+
+## HOW TO MEASURE A .txt CHANGE. THIS SEQUENCE DID NOT EXIST IN THE BRIEF.
+
+The brief told a run to read the `.txt` numbers and never told it how to produce new ones. Measured
+20 Nov: `restamp_txt.py --run` skipped every document it had already scored —
+
+    already scored: 213 | to do: 0
+
+— so even a run that changed `TxtWriter` would have re-measured nothing and seen the same 46 failures.
+**The .txt half could not improve by construction.** That is why it never did.
+
+The whole loop, in order:
+
+    # 1. change the engine, then rebuild the .txt files with the new one
+    #    ConvertOne writes BOTH: PdfToWord.writeTxt(r, new File(outDir, base + ".txt"))
+    cd tools/engine-verify && javac -cp <classpath> ConvertOne.java
+    java -cp "<classpath>" ConvertOne <the.pdf> /scratch/work/p2w/out
+
+    # 2. re-score. It now re-measures any document whose .txt changed since it was last scored.
+    python3 tools/p2w-bench/restamp_txt.py --run --budget 260
+    python3 tools/p2w-bench/restamp_txt.py --run --budget 260      # repeat until "to do: 0"
+    python3 tools/p2w-bench/restamp_txt.py --run --force            # re-score everything, after an engine change
+
+    # 3. look before you publish
+    python3 tools/p2w-bench/restamp_txt.py --report
+
+    # 4. only if the report looks right
+    python3 tools/p2w-bench/restamp_txt.py --apply
+
+    # 5. gate it - the .txt has its own gate, never the .docx one
+    python3 tools/p2w-bench/txt_gate.py --gate
+    python3 tools/p2w-bench/regress.py --check          # covers both halves
+
+    # 6. rebuild the class table so the next run aims at the corpus that exists
+    python3 tools/p2w-bench/classify_txt.py
+
+**`--apply` is the step that writes `RANKING-TXT.csv`.** Without it the measurement lives in
+`RESTAMP-TXT.jsonl` and no report, no gate and no class table can see it.
+
+**Never edit `verify_txt.py` to move a number.** It is the instrument. If a check is wrong, that is a
+finding to write down.
