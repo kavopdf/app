@@ -450,22 +450,29 @@ def verify_names_intact(text, cmds):
     return bad
 
 
+def _gen(cron):
+    return "python3 tools/p2w-bench/cronreport.py --numbers --for %s" % cron
+
+
 _CMDS = {
-    "gverify": ["python3 tools/p2w-bench/gverify.py --report",
+    "gverify": [_gen("gverify"), "python3 tools/p2w-bench/gverify.py --report",
                 "python3 tools/p2w-bench/stage.py --json",
                 "python3 tools/p2w-bench/gverify.py --matrix"],
-    "health": ["python3 tools/p2w-bench/health.py --json",
-               "python3 tools/p2w-bench/progress.py --json",
-               "python3 tools/p2w-bench/round.py --phase"],
+    # health.py --json and progress.py --json were listed here too, and the watchdog generator already
+    # calls both - so the verifier ran health.py twice and timed out at 180 s (exit 124). The generator
+    # is the authority for what its own report can contain; the tools behind it do not need repeating.
+    "health": [_gen("watchdog"), "python3 tools/p2w-bench/round.py --phase"],
     # THE APK CRON'S NUMBERS ARE NOT THE FIXER'S. `--for apk` used to fall through to report.py's
     # full Progress+Timing check, which demanded a fixer slot window and tool beats - so a correct
     # APK report was refused for not having them, and the run had no way to comply. Its real sources
     # are the tag, the build config and the round state.
-    "apk": ["git describe --tags --abbrev=0 2>/dev/null || true",
+    "apk": [_gen("apk"), "git describe --tags --abbrev=0 2>/dev/null || true",
             "git tag --sort=-creatordate | head -20",
             "grep -oE 'versionName *\"[^\"]+\"' app/build.gradle 2>/dev/null || true",
             "grep -oE 'versionCode *[0-9]+' app/build.gradle 2>/dev/null || true",
             "python3 tools/p2w-bench/round.py --phase"],
+    "baseline":   [_gen("baseline"), "python3 tools/p2w-bench/round.py --phase"],
+    "classifier": [_gen("classifier"), "python3 tools/p2w-bench/round.py --phase"],
 }
 
 
@@ -507,7 +514,7 @@ def main(argv):
         _i = argv.index("--for") + 1
         if _i < len(argv):
             _for = argv[_i].strip().lower()
-    if _for in ("gverify", "health", "apk"):
+    if _for in ("gverify", "health", "apk", "baseline", "classifier"):
         _cmds = _CMDS.get(_for, [])
         _p = (verify_not_a_transcript(text)
               + verify_names_intact(text, _cmds)
