@@ -1,0 +1,117 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index a3c39db..faac7c9 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -4187,6 +4187,39 @@ public final class DocxWriter {
+             leftTw = 0;
+             rightTw = (int) Math.max(0L, Math.round((ctx.pageWidthPt - b.right) * TWIPS_PER_PT));
+         }
++        // THE INDENT A LINE WROTE AS SPACES IS AN INDENT, NOT TEXT.
++        //
++        // A page that aligns a column by drawing spaces - an R console's column headings, a
++        // shell transcript's continuation - arrives here as a run whose text begins with n
++        // ASCII spaces, and b.x is the LEFT EDGE OF THE FIRST SPACE. The indent is therefore
++        // never written as w:ind: it is n x the space advance of whichever face ends up
++        // rendering the line. With the face the page used the ink lands where the page put it
++        // and nothing is wrong. With a substitute it moves by n x the change in advance, and n
++        // is not small: 392_statistical_console_output's "Estimate Std. Error" row is 20 spaces,
++        // 79.5 pt of ink offset in DejaVu Sans Mono and 36.2 pt when the same spaces are set in
++        // Liberation Sans (measured: the ink lands at 64.2 instead of 107.5).
++        //
++        // So the spaces come out of the run text and what they stood for becomes a real
++        // w:ind w:left: the ink is pinned at b.inkX - the x the page drew the first glyph that
++        // puts ink on the page, recorded per box from the box's own glyphs (PdfToWord.visibleX)
++        // - and the line stops depending on any face's space advance. Where the rendering face
++        // is the page's own the two numbers are the same, so the change is position-neutral
++        // there and only bites under substitution. Left-aligned only: a centred or right line
++        // has its left edge delegated to the renderer already, and its indent is not this.
++        int leadTw = 0;
++        int leadSp = 0;
++        if (p.align == 0 && !b.rotated && !b.ring && !Float.isNaN(b.inkX)) {
++            for (int i = 0; i < text.length() && text.charAt(i) == ' '; i++) leadSp++;
++            float inkOffPt = b.inkX - b.x;
++            if (leadSp > 0 && inkOffPt > 0.05f) {
++                leadTw = (int) Math.max(0L, Math.round(inkOffPt * TWIPS_PER_PT));
++            } else {
++                // Nothing to pin - a box whose glyphs say the ink starts where the text does.
++                // Stripping the spaces here would move the line left by n advances, so the
++                // line is left exactly as it was.
++                leadSp = 0;
++            }
++        }
+         // The pitch this page used between this baseline and the one above it. Measured, so the
+         // box is the page's own line height rather than a guess at it - see flowLinePt.
+         float pitch = !ctx.newPage && ctx.lastBaseline >= 0f ? b.y - ctx.lastBaseline : -1f;
+@@ -4384,15 +4417,30 @@ public final class DocxWriter {
+         }
+         sb.append("<w:snapToGrid w:val=\"0\"/>")
+                 .append(spacing(beforeTw, lineTw, b.size, autoFlowLines(), ctx.newPage))
+-                .append("<w:ind w:left=\"").append(Math.max(0, leftTw - bandLeftTw(ctx, p.column)))
++                .append("<w:ind w:left=\"")
++                .append(Math.max(0, leftTw + leadTw - bandLeftTw(ctx, p.column)))
+                 .append("\" w:right=\"").append(rightTw).append("\" w:firstLine=\"0\"/>");
+         if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");
+         else if (p.align == 2) sb.append("<w:jc w:val=\"right\"/>");
+         sb.append("</w:pPr>");
+         int spacingTw = p.align == 0 ? stretchTw(b) : 0;
++        // The spaces leadTw stands for are not written: the indent carries them now. Only as
++        // many as the indent was actually built from, so a box that pinned nothing is emitted
++        // unchanged.
++        int strip = leadSp;
+         for (PdfToWord.Run run : b.runs) {
+             if (run.text.isEmpty()) continue;
+-            runXml(sb, run, p.heading > 0, spacingTw);
++            String rt = run.text;
++            if (strip > 0) {
++                int k = 0;
++                while (k < rt.length() && k < strip && rt.charAt(k) == ' ') k++;
++                strip -= k;
++                rt = rt.substring(k);
++                if (rt.isEmpty()) continue;
++            }
++            if (rt == run.text) runXml(sb, run, p.heading > 0, spacingTw);
++            else runXml(sb, new PdfToWord.Run(rt, run.bold, run.italic, run.sizePt,
++                    run.font, run.color), p.heading > 0, spacingTw);
+         }
+         sb.append("</w:p>");
+     }
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 4f0e6a5..b6185cb 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -211,6 +211,19 @@ public final class PdfToWord {
+      */
+     public static final class Box {
+         public float x, y, right, size;
++        /**
++         * The x of the leftmost glyph that puts ink on the page - the line's left edge with the
++         * leading spaces a page draws to align a column taken off.
++         *
++         * <p>{@link #x} is the left edge of the line's first glyph, and on a page that aligns a
++         * column with spaces that glyph IS a space. The indent is then carried by n x the space
++         * advance of whatever face renders the line rather than by a position, so it moves when
++         * the face is substituted. This field is the position: {@code DocxWriter.flowFromBox}
++         * writes the difference from {@code x} as {@code w:ind w:left} and drops the spaces.
++         * NaN where the box was never given glyphs to ask - the writer then leaves the line as
++         * it was.
++         */
++        public float inkX = Float.NaN;
+         /** Bottom edge of the line's box on the page, y down. */
+         public float bottom;
+         /** The line's extent along its own baseline - the width a text box needs. */
+@@ -4146,6 +4159,7 @@ public final class PdfToWord {
+             box.rotated = ln.rotated;
+             box.angle = ln.angle;
+             box.ring = ln.ring;
++            box.inkX = visibleX(ln.glyphs, ln.x);
+             box.runs.addAll(runsOf(ln));
+             p.boxes.add(box);
+         }
+@@ -5403,6 +5417,7 @@ public final class PdfToWord {
+             box.angle = line.angle;
+             box.ring = line.ring;
+             box.stretchPt = stretchOf(line, gapFloor);
++            box.inkX = visibleX(line.glyphs, line.x);
+             List<Run> lineRuns = coalesceRuns(runsOf(line));
+             // A fragment that opens with a combining mark is not a line of its own - it is the
+             // tail of the word the previous fragment began. The page draws "केवल" as one line,

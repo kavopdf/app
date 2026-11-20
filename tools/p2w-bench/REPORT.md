@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-20 10:51
+# Fixer report - 2026-11-20 12:52
 
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 10:51 → 12:03 IST · 1h 12m**
+**20 Nov 2026 · slot 12:52 → running IST · 42 min**
 
-> **bank-statement-horizontal-rules-only** improved — 1.00 → 0.00. Corpus ratchet clean across 213 documents.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **12** — 3 attempt(s), 2 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,15 +20,14 @@
 | Fixed - LibreOffice proxy | 32 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `t13_amount_columns` |
+| Working on | `47_margins` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 10:52 | **error** | None/None | claimed. .txt half. PATCH-t13 (row-per-line) was rejected 19 Nov: it breaks t04_structure line-count drift, 101 worse 0 better. Working the other direction: keep one cell per line, fix only where an a |
-| 11:51 | **kept** | 10/18 | KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over |
-| 11:59 | **kept** | 2/18 | KEPT (second construct, same slot). paraEndSnap(): per page, an end column whose immediate neighbour is also an end column of the page's numeric paragraph lines merges into it transitively and keeps t |
+| 13:34 | **partial** | 3/13 | The spaces a page wrote as indent were emitted as run text, so the indent was n x whichever face's space advance rendered it: 392's 20-space row landed at 64.2 instead of 107.5 pt under a substituted |
+| 13:34 | **reverted** | 0/13 | Pin the centred line's own extent [b.x, b.right] and drop w:jc, so a centred line stops delegating its left edge to the renderer's text width. Under the substitution proxy it fixes the check on 317_rt |
 
 ## The txt
 
@@ -42,20 +41,17 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `t13_A-01` | which writer path emits the misaligned amounts, prov | 12:00 | - | - |
-| `t13_B-01` | census of the 18 documents: table path vs paragraph  | 12:00 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 10:51 → 12:03 · 1h 12m |
+| Slot window | 12:52 → running · 42 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 29 |
-| Longest silence | **58.6 min** — from 10:52:49, after `classrow.py: refreshing the class file` |
-| Silences over 2 min | 2 |
+| Tool beats | 15 |
+| Longest silence | **40.9 min** — from 12:53:03, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 need a human |
 
 
@@ -63,9 +59,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **1h 07m** | `####################` |
-| record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **2 min** | `#` |
+| fix - diagnose and change the engine | **40 min** | `#####################` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -78,7 +74,7 @@
 
 ## Next run
 
-18_displacement: the page-top gap is PROVEN to be the cause (Google drops w:before there; a trHeight-exact 1x1 table row is honoured to 0.97 pt). Applying it by hand to bank-statement-5-pages fixes the displacement itself (dy median -53.8 -> +0.8) but the document goes 6 pages -> 10 with a blank after each, because (a) the break paragraph already emits a blank page 1 in Google and (b) the 55 pt gap is not charged to the page fill budget. So it is NOT a construct swap: make the gap real AND charge it to the page capacity, and fix the blank page. Engine work, needs a full corpus ratchet. See FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md, second section.
+47_margins: extend the strip-and-pin indent construct from flowFromBox to the table-cell emitter (40_devanagari_shaping_font, 77_arabic_rtl_document, 78_mixed_english_devanagari_line), then a corpus pass in its own call. Read FINDINGS/47_margins-MECHANISM-133500-f2.md first - the class definition is already measured and the two failed constructs are already ruled out.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

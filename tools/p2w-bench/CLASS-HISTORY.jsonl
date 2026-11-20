@@ -38,3 +38,5 @@
 {"at": "2026-11-20 10:52", "attempt": 1, "class": "t13_amount_columns", "outcome": "error", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-20 11:51", "attempt": 2, "class": "t13_amount_columns", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-20 11:59", "attempt": 3, "class": "t13_amount_columns", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-20 13:34", "attempt": 4, "class": "47_margins", "outcome": "partial", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-20 13:34", "attempt": 5, "class": "47_margins", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}

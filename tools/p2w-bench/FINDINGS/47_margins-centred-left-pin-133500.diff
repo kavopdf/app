@@ -1,0 +1,41 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index a3c39db..15383e7 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -4181,10 +4181,20 @@ public final class DocxWriter {
+             if (Math.abs(centre - ctx.pageWidthPt / 2f) > 2f) {
+                 rightTw = (int) Math.max(0L, Math.round((ctx.pageWidthPt - b.right) * TWIPS_PER_PT));
+             } else {
+-                leftTw = 0;
++                // CANDIDATE 47: THE LEFT EDGE IS NOT DELEGATED. A line centred on the paper
++                // used to get leftTw = 0 and the whole text area, so its LEFT edge was decided
++                // by the renderer's own line width - (pageWidth - lineWidth)/2 - and a
++                // substituted face therefore moves the ink left edge by half the width it
++                // gained or lost. Measured on 317_rti_response: its three centred paragraphs
++                // are drawn at x = 141.7, 158.8, 243.2 by the page, and by LibreOffice with the
++                // declared face; replace every rFonts name with one LibreOffice does not have
++                // and the same three land at 170.0 (+28.3), 169.6 (+10.8) and 248.9 (+5.7) -
++                // nothing moved, no margin moved, the face did. Pinning the paragraph's span to
++                // the line's own measured extent [b.x, b.right] makes w:jc a no-op and puts the
++                // ink at b.x whatever the face. See FINDINGS/47-margins-*.md.
++                rightTw = (int) Math.max(0L, Math.round((ctx.pageWidthPt - b.right) * TWIPS_PER_PT));
+             }
+         } else if (p.align == 2) {
+-            leftTw = 0;
+             rightTw = (int) Math.max(0L, Math.round((ctx.pageWidthPt - b.right) * TWIPS_PER_PT));
+         }
+         // The pitch this page used between this baseline and the one above it. Measured, so the
+@@ -4386,8 +4396,11 @@ public final class DocxWriter {
+                 .append(spacing(beforeTw, lineTw, b.size, autoFlowLines(), ctx.newPage))
+                 .append("<w:ind w:left=\"").append(Math.max(0, leftTw - bandLeftTw(ctx, p.column)))
+                 .append("\" w:right=\"").append(rightTw).append("\" w:firstLine=\"0\"/>");
+-        if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");
+-        else if (p.align == 2) sb.append("<w:jc w:val=\"right\"/>");
++        // CANDIDATE 47: NO w:jc ON A LINE WHOSE SPAN IS ITS OWN EXTENT. The indents above are
++        // now [b.x, b.right] - the line's own measured extent - so a centred or right-aligned
++        // line has nothing left to centre or push: any justification re-derives the left edge
++        // from the RENDERER's width of the text, which is exactly what a substituted face
++        // changes. Emitting no w:jc leaves the text starting at the indent whatever it measures.
+         sb.append("</w:pPr>");
+         int spacingTw = p.align == 0 ? stretchTw(b) : 0;
+         for (PdfToWord.Run run : b.runs) {

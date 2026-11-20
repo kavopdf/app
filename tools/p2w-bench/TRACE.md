@@ -6,13 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 09:45 | fixer | claim | fixer claimed the slot |
-| 13 Nov 09:46 | fixer | build-engine | started |
-| 13 Nov 09:53 | fixer | ratchet | REGRESSED 2 |
-| 13 Nov 09:54 | fixer | ratchet | REGRESSED 2 |
-| 13 Nov 09:54 | fixer | ratchet | REGRESSED 2 |
-| 13 Nov 09:54 | fixer | hypothesis | 53_embedded_faces -> confirmed |
-| 13 Nov 09:55 | fixer | attempt | 53_embedded_faces -> error (OPEN) |
 | 13 Nov 09:55 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 09:55 | fixer | classify --txt | 4 classes from 208 documents |
 | 13 Nov 09:55 | fixer | classify | 43 classes from 208 documents |
@@ -406,3 +399,10 @@
 | 20 Nov 11:56 | fixer | build-engine | started |
 | 20 Nov 11:56 | fixer | build-engine | engine built in 38s |
 | 20 Nov 11:59 | fixer | attempt | t13_amount_columns -> kept (2/18 moved) |
+| 20 Nov 12:52 | fixer | claim | fixer claimed the slot |
+| 20 Nov 12:53 | fixer | build-engine | started |
+| 20 Nov 12:54 | fixer | build-engine | engine built in 39s |
+| 20 Nov 13:26 | fixer | build-engine | started |
+| 20 Nov 13:26 | fixer | build-engine | engine built in 49s |
+| 20 Nov 13:34 | fixer | attempt | 47_margins -> partial (3/13 moved) |
+| 20 Nov 13:34 | fixer | attempt | 47_margins -> reverted (0/13 moved) |

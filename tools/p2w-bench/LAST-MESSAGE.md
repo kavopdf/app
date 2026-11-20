@@ -1,47 +1,30 @@
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 10:51 → 12:03 IST · 1h 12m**
+**20 Nov 2026 · slot 12:52 → running IST · 42 min**
 
-> **t13\_amount\_columns** went from 18 documents to 6, and two constructs were kept. The gate itself was the reason the .txt half could never land a commit, and that is fixed too.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **12** — 3 attempt(s), 2 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
+| **Fixed - Google, all 42 checks** | **7** |
+| Fixed - LibreOffice proxy | 32 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `t13_amount_columns` |
+| Working on | `47_margins` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 11:51 | **kept** | 10/18 | One end column per TABLE column. `appendTable` aimed each numeric cell at its own cell's right edge and then discarded that aim whenever it landed left of the cell's left edge. On a 7 pt amount column it always does: the document-wide 0.6 em ruler over-estimates a numeric token by a column, so `startCol` fell 1-2 columns left of `baseCol` and the guard kept the left edge. The amount then ended at `baseCol + length` - 134 for a 9-character figure, 133 for an 8-character one: the same page column, two .txt columns. Measure the column once, as the furthest right any numeric cell in it already reaches, and end every numeric cell there. Nothing moves left; the line count is unchanged, so `t04\_structure` cannot drift. |
-| 11:59 | **kept** | 2/18 | `paraEndSnap()`. The paragraph path has no right edge at all - `Para` carries `lineX/lineY/lineSize` only - so a numeric paragraph line ends at `column(lineX) + length` and the ruler's rounding split one page column across two adjacent .txt columns: 91/92 on `29\_dot\_leaders\_txtpos`, 142/143 on `bank-statement-horizontal-rules-only`. Per page, an end column whose immediate neighbour is also an end column of that page's numeric paragraph lines merges into it, transitively, keeping the highest value; `appendPara` pads to it. It only ever pads, and it cannot change a line count. |
-
-Both are inside `TxtWriter`, which the .docx path never calls. Measured over the whole corpus, one JVM
-per document, `verify_txt.compare()` on every document: 12 documents better, 0 worse, 201 unchanged.
-Corpus checks 1784 to 1796, and 179 documents now pass every applicable .txt check against 167 before.
-Neither attempt moved a single document the wrong way, at any point.
-
-## The gate could not have landed either of them
-
-`scope.py` fell back to "both formats" for any method it did not recognise, and `regress.py` then
-demanded a re-stamped docx table - while `engine_fingerprint()` hashes every `.java` in the engine, so
-any `TxtWriter` edit staled the docx stamp by construction. A .txt-only change could therefore never
-pass the gate. That is the mechanical reason 46 documents have failed the same .txt checks for a month:
-not that nobody tried, but that nothing a .txt run produced could be committed.
-
-* `scope.py` now maps `TxtWriter.appendTable` and `TxtWriter.appendPara` to `txt`. Both are private
-  static in `TxtWriter` and are called only from `TxtWriter.write()`, which no .docx path invokes.
-* `regress.py` no longer stamp-checks a format `scope.py` has proved out of scope. A change `scope.py`
-  cannot attribute still leaves the scope empty and stays strict on both stamps, and
-  `docx_regressions()` still runs unconditionally, so nothing is waved through.
+| 13:34 | **partial** | 3/13 | The spaces a page wrote as indent were emitted as run text, so the indent was n x whichever face's space advance rendered it: 392's 20-space row landed at 64.2 in place of the page's 107.5 pt under a substituted |
+| 13:34 | **reverted** | 0/13 | Pin the centred line's own extent [b.x, b.right] and drop w:jc, so a centred line stops delegating its left edge to the renderer's text width. Under the substitution proxy it fixes the check on 317_rt |
 
 ## The txt
 
@@ -55,20 +38,17 @@ not that nobody tried, but that nothing a .txt run produced could be committed.
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | What it proved |
-|:--|:--|--:|--:|:--|
-| `t13_A-01` | which writer path emits the misaligned amounts | 11:05 | 11:18 | Built the engine and ran it. The amounts come from `appendTable`, `cellR` is not NaN and does not differ per row - the clamp at `TxtWriter.java:375` is the mechanism. Measured two candidate patches on 60 documents; the per-column one was 6 better, 0 worse. |
-| `t13_B-01` | a path census of all 18 documents | 11:06 | 11:29 | Built the engine, converted all 18, instrumented `TxtWriter`: 14 table-only, 2 paragraph-only, 2 mixed. Measured the three constructs at 10, 13 and 15 of 18. Ran out of its budget before writing its file; the census is in `FINDINGS/t13-path-census-120600-f2y.md`. |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 10:51 → 12:03 · 1h 12m |
+| Slot window | 12:52 → running · 42 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 29 |
-| Longest silence | **58.6 min** — from 10:52:49, after `classrow.py: refreshing the class file` |
-| Silences over 2 min | 2 |
+| Tool beats | 15 |
+| Longest silence | **40.9 min** — from 12:53:03, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 need a human |
 
 
@@ -76,27 +56,42 @@ not that nobody tried, but that nothing a .txt run produced could be committed.
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **1h 07m** | `####################` |
-| record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **2 min** | `#` |
+| fix - diagnose and change the engine | **40 min** | `#####################` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
+## Best results this round
+
+| Document | Before | After | Change |
+|:--|--:|--:|--:|
+| `415_inline_images` | 89.04 | 0.00 | -89.04 |
+| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
+| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
+| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
+| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
 
 ## Next run
 
-`t13\_amount\_columns` holds 6 documents and none of them is a one-column split. Four of the six
-(`74\_balance\_sheet\_indented\_subitems`, `29\_dot\_leaders\_txtpos`,
-`gst-invoice-multipage-item-table`, `itr-computation-with-slab-table`) fail because the table path and
-the paragraph path are measured separately: the table cells converge on their own end column, the
-paragraph lines converge on theirs, and the two maxima differ. Pooling both emitters onto one per-page
-ruler is the next construct - the census agent measured that variant at 15 of 18 - and it is a change
-to how the two emitters share a ruler, not another special case.
-`balance-sheet-two-columns-of-figures` needs one pair merged that is TWO columns apart (52 and 54); no
-one-column window reaches it, and widening the window is a layout claim the measurement does not
-support.
-
-The class is not exhausted: it moved twice this slot, 18 documents to 6, and the rotation should stay
-on it.
+47_margins: extend the strip-and-pin indent construct from flowFromBox to the table-cell emitter (40_devanagari_shaping_font, 77_arabic_rtl_document, 78_mixed_english_devanagari_line), then a corpus pass in its own call. Read FINDINGS/47_margins-MECHANISM-133500-f2.md first - the class definition is already measured and the two failed constructs are already ruled out.
 
 ---
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md,
-TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never
-estimated.*
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+## What the tables cannot show
+
+`47_margins` was a class nobody had opened. It is now defined: it is not a four-margin check at all
+but a per-page left-ink-edge check with an indent-structure clause, and the code that fails it is
+`flowFromBox`, where a centred line or a line indented with spaces hands its left edge to whichever
+face ends up rendering it. `w:pgMar` is a hard zero and is not the mechanism; that ruled out the
+obvious first theory and is worth a run to have known.
+
+Both constructs were built, measured and reverted. The centred-line one is ruled out for good - it
+satisfies the check and makes the document worse. The space-led indent one is the one worth carrying
+forward: it moves nothing the wrong way anywhere, leaves line and page counts untouched, and drives
+the check's own counter to zero on the documents it reaches. It is not kept only because it reaches
+`flowFromBox` in three of the class's documents and the local instrument cannot see a Google-only
+defect at all - which is the honest reason, and it is written down with both diffs so the next run
+starts from a measured mechanism instead of a guess.
+
+One tool note for whoever follows: `benchmarks/gate.py --budget 250` produced no output and did not
+touch `RANKING.csv` in a five-minute call. Give it its own call and check that file's mtime before
+believing a corpus pass happened.

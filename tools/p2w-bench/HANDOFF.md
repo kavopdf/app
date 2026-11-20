@@ -9,18 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 10:51 |
-| ended | 12:03 |
-| how it ended | forced |
+| started | 12:52 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> t13_amount_columns (.txt half) is now 6 documents, not 18. Two constructs landed, both in TxtWriter only: (1) appendTable ends every numeric cell at ONE end column per table column instead of each cell's own right edge, which the 'if (startCol > col)' guard always discarded because the 0.6em ruler over-estimates a 7pt numeric token by a column; (2) paraEndSnap merges a page's numeric paragraph end columns that sit one apart. The remaining 6 need the table and paragraph paths POOLED onto one per-page ruler - measured by an agent at 15 of 18 - plus one doc whose split is two columns wide. The gate itself was the reason the .txt half could never land: engine_fingerprint hashes every .java so a TxtWriter edit always staled the docx stamp and regress.py refused; scope.py now knows TxtWriter.appendTable/appendPara are txt and regress.py does not stamp-check a format scope.py proved out of scope.
+> 47_margins taken on the rotation (classpick rotated off 18_displacement: 3 attempts, 0 moved). The class is DEFINED: 47_margins is verify_google.py:3960-4170 - per page, horizontally only: (a) the page's left ink anchor must be within 3.0 pt of the source's, (b) matched run pairs are unregistered at |d|>2.0 pt with budget max(2, round(5% n)). w:pgMar is 0 on all four sides, a hard constant at DocxWriter.java:2268-2269, and is NOT the mechanism - Google places ink at pgMar+ind. The lever is flowFromBox (DocxWriter.java:4159-4188, :4391-4392): left-aligned lines pin their ink, centred and right lines delegate their left edge to the renderer's text width. Two constructs measured, both reverted, both diffs in FINDINGS/47_margins-MECHANISM-133500-f2.md. The one to carry forward is the space-led indent: strip the leading ASCII spaces and emit inkX-b.x as w:ind w:left (needs Box.inkX = visibleX in PdfToWord). It is position-neutral in the declared face, moves nothing worse on any of the 13, and drives the Google counter to zero on 392/380/383 under the substitution proxy - but reaches flowFromBox in only 3 of 13, and a Google-only mechanism is flat in a LibreOffice measurement by construction, so the corpus pass cannot see it. Next: extend it to the cell emitter, where 40/77/78's space-led lines live, then run benchmarks/gate.py --budget 250 in its own call and confirm RANKING.csv's mtime moved.
 
 ## What the next run should do first
 
-> 18_displacement: the page-top gap is PROVEN to be the cause (Google drops w:before there; a trHeight-exact 1x1 table row is honoured to 0.97 pt). Applying it by hand to bank-statement-5-pages fixes the displacement itself (dy median -53.8 -> +0.8) but the document goes 6 pages -> 10 with a blank after each, because (a) the break paragraph already emits a blank page 1 in Google and (b) the 55 pt gap is not charged to the page fill budget. So it is NOT a construct swap: make the gap real AND charge it to the page capacity, and fix the blank page. Engine work, needs a full corpus ratchet. See FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md, second section.
+> 47_margins: extend the strip-and-pin indent construct from flowFromBox to the table-cell emitter (40_devanagari_shaping_font, 77_arabic_rtl_document, 78_mixed_english_devanagari_line), then a corpus pass in its own call. Read FINDINGS/47_margins-MECHANISM-133500-f2.md first - the class definition is already measured and the two failed constructs are already ruled out.
 
 ## Agents deployed and not yet accounted for
 
@@ -54,9 +54,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `07:59` attempt 6 on content-partly-lost-and-displaced -> kept (1/6 moved)
-- `07:59` agent deployed: content-partly-lost-and-displaced / B - why two corpus documents lose ~60% of their ink at 5px: absent or moved
-- `07:59` agent landed: contB-07 /  -> tools/p2w-bench/FINDINGS/content-partly-lost-and-displaced-twocol-tables-0700-f1x.md
 - `07:59` agent deployed: content-partly-lost / A - is the justified-line spacing fix missing from the engine or already landed
 - `07:59` agent landed: contA-07 /  -> tools/p2w-bench/FINDINGS/content-partly-lost-JUSTIFY-already-landed-0700-f1x.md
 - `08:00` attempt 7 on content-partly-lost-and-displaced -> kept (1/6 moved)
@@ -79,6 +76,9 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `12:00` agent deployed: t13_amount_columns / B - census of the 18 documents: table path vs paragraph path
 - `12:00` agent landed: t13_amount_columns / A -> FINDINGS/t13-writer-path-110501-f3de.md
 - `12:00` agent landed: t13_amount_columns / B -> (no file)
+- `13:34` attempt 4 on 47_margins -> partial (3/13 moved)
+- `13:34` attempt 5 on 47_margins -> reverted (0/13 moved)
+- `13:34` two attempts on 47_margins, both reverted, both measured; the mechanism is now in FINDINGS and the class is no longer a mystery
 
 ## Where the rest of the state lives
 

@@ -1,7 +1,3 @@
-| 12 Nov 11:09 | baseline | measured balance-sheet-two-columns-of-figures 40/59 docx, balance-sheet-two-columns-of-figures.txt 4/5 FAIL txt |
-| 12 Nov 11:11 | baseline | measured bank-statement-5-pages 40/59 docx, bank-statement-5-pages.txt 4/5 FAIL txt |
-| 12 Nov 11:11 | baseline | measured bank-statement-horizontal-rules-only 42/59 docx, bank-statement-horizontal-rules-only.txt 4/5 FAIL txt |
-| 12 Nov 11:12 | baseline | measured boq-horizontal-rules-only 43/59 docx, boq-horizontal-rules-only.txt 4/5 FAIL txt |
 | 12 Nov 11:12 | baseline | measured boq-tender-bill-of-quantities 51/59 docx, boq-tender-bill-of-quantities.txt 4/5 FAIL txt |
 | 12 Nov 11:13 | baseline | measured brochure-3col-with-sidebar-box 38/59 docx, brochure-3col-with-sidebar-box.txt 4/5 FAIL txt |
 | 12 Nov 11:14 | baseline | measured bus-timetable-station-left-times-right 51/59 docx, bus-timetable-station-left-times-right.txt 4/5 FAIL txt |
@@ -199,3 +195,6 @@
 | 20 Nov 11:51 | fixer | attempt t13_amount_columns -> kept (10/18 moved) |
 | 20 Nov 11:59 | fixer | attempt t13_amount_columns -> kept (2/18 moved) |
 | 20 Nov 12:03 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 20 Nov 12:52 | fixer | slot claimed - fixer running |
+| 20 Nov 13:34 | fixer | attempt 47_margins -> partial (3/13 moved) |
+| 20 Nov 13:34 | fixer | attempt 47_margins -> reverted (0/13 moved) |
