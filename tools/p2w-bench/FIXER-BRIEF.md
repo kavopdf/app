@@ -552,9 +552,25 @@ Read the `txt` row. It reports `N clean, M failing` and how long since the table
     python3 tools/p2w-bench/restamp_txt.py --report      # failures by check
     python3 tools/p2w-bench/txt/RANKING-TXT.csv          # per document
 
-**Alternate.** One run takes the largest `.docx` class; the next takes the largest `.txt` check. Not
-because the two are equal in size - they are not - but because a pipeline that fixes only the format
-with more failures is a pipeline that never finishes the other one.
+**The alternation is now automatic, because a rule in a brief was not enough.**
+
+Measured 20 Nov: `ATTEMPTS.json` held ten classes and **not one of them was a `.txt` check**, while 46
+documents still failed a `.txt` check and the class table still claimed 64. Every run had read the
+paragraph that used to sit here and every run had taken a `.docx` class anyway, because the picker only
+ever read the Google table. A rule a run has to remember is a rule a run skips.
+
+`classpick.py` now carries which half is next and flips it every call:
+
+    run 1   class: 18_displacement      (125 documents, .docx)   next: the .txt half
+    run 2   class: t13_amount_columns   (18 documents, .txt)     next: the .docx half
+    run 3   class: 18_displacement      (125 documents, .docx)   next: the .txt half
+
+**Do not skip the `.txt` run because the class looks small.** 18 documents is small next to 125, and that
+is exactly the reasoning that left the half untouched for a month. A `.txt` check cleared once serves
+every document under it, and the `.txt` is half of what the user asked for.
+
+The report now carries a **Moved since the last commit** row in the `.txt` section. It has read `none -
+nothing changed` on every run for a month, and nobody could see that because the row did not exist.
 
 **The rule that does not bend:** a `.txt` change is verified with the `.txt` instrument and the `.txt`
 ratchet, never with the `.docx` tools. Line 244 above says the same thing for a reason - the two halves
