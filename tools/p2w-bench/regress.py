@@ -298,7 +298,23 @@ def check(allow_engine_change, only=None):
         # being passed on the strength of the table alone, so the table's stamp is the ONLY thing
         # standing between this commit and an unmeasured corpus. Checking it only for the formats
         # that are being measured checks it exactly where it is least needed.
+        #
+        # EXCEPT WHEN scope.py HAS PROVED THE FORMAT CANNOT MOVE, AND THAT EXCEPTION IS THE ONLY
+        # WAY THE .TXT HALF COULD EVER LAND A COMMIT. engine_fingerprint() hashes every .java in
+        # the engine, so a change to TxtWriter.java moves the hash the DOCX table was stamped
+        # with - and this loop then refused the commit for an unmeasured docx change that scope.py
+        # had just proved (method by method) cannot reach a docx byte. Measured 20 Nov: the
+        # per-table-column .txt fix, 10 documents better and 0 worse, could not be committed at
+        # all, and that is why 46 documents have failed the same .txt checks for a month.
+        # The proof is scope.py's METHOD_FORMAT table; the format still gets its own table check
+        # below (docx_regressions() runs unconditionally), so nothing is being waved through.
+        # A change scope.py cannot attribute leaves scope EMPTY, and that stays strict: an
+        # unproven change checks both stamps, exactly as before.
+        strict = not scope
         for f in ("docx", "txt"):
+            if not strict and f not in scope:
+                print("  %s: out of scope - scope.py proved this change cannot move it" % f)
+                continue
             was = st.get(f)
             if was is None:
                 print("  UNSTAMPED (%s): the table does not say which engine made it, so" % f)

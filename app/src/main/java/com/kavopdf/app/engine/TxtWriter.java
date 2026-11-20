@@ -354,6 +354,51 @@ public final class TxtWriter {
      */
     private static void appendTable(StringBuilder sb, PdfToWord.Table t, float charW) {
         if (t.rows == null) return;
+        // ONE END COLUMN PER TABLE COLUMN, NOT ONE PER CELL.
+        //
+        // The right-align below used to aim every numeric cell at ITS OWN cell's right edge
+        // (column(cellRight) - c.length()), and then throw that away whenever it landed left
+        // of the cell's left edge: `if (startCol > col) col = startCol`. On a 7 pt amount
+        // column that is every row - the document-wide ruler (0.6 em) over-estimates a
+        // numeric token's width by about one column, so the cell is 7 ruler columns wide
+        // while its content is 8 or 9 characters, startCol falls 1-2 columns left of
+        // baseCol, and the guard keeps the left edge. The amount then ends at
+        // baseCol + length, which is 134 for a 9-character figure and 133 for an 8-character
+        // one: the same page column, two .txt columns.
+        //
+        // So measure the column once, as the furthest right any numeric cell in it already
+        // reaches (its left edge plus its own length, or its right edge when that is further),
+        // and end every numeric cell in that column there. Nothing moves left: the target is
+        // never less than the cell's own baseCol + length, so `startCol >= baseCol` always
+        // and the guard can no longer discard it. The number of lines is unchanged - only
+        // the padding in front of a figure moves - so t04_structure's line count cannot drift.
+        int ncol = 0;
+        for (int ri = 0; ri < t.rows.size(); ri++) {
+            List<String> row = t.rows.get(ri);
+            if (row != null && row.size() > ncol) ncol = row.size();
+        }
+        int[] endCol = new int[ncol];
+        for (int ri = 0; ri < t.rows.size(); ri++) {
+            List<String> row = t.rows.get(ri);
+            if (row == null) continue;
+            for (int ci = 0; ci < row.size() && ci < ncol; ci++) {
+                String cell = row.get(ci);
+                if (cell == null) continue;
+                int baseCol = column(cellLeft(t, ri, ci), charW);
+                float right = cellRight(t, ri, ci);
+                String[] parts = cell.split("\n");
+                for (int pi = 0; pi < parts.length; pi++) {
+                    String c = parts[pi].trim();
+                    if (c.isEmpty() || !isNumeric(c)) continue;
+                    int e = baseCol + c.length();
+                    if (!Float.isNaN(right)) {
+                        int rc = column(right, charW);
+                        if (rc > e) e = rc;
+                    }
+                    if (e > endCol[ci]) endCol[ci] = e;
+                }
+            }
+        }
         for (int ri = 0; ri < t.rows.size(); ri++) {
             List<String> row = t.rows.get(ri);
             if (row == null) continue;
@@ -361,7 +406,6 @@ public final class TxtWriter {
                 String cell = row.get(ci);
                 if (cell == null) continue;
                 int baseCol = column(cellLeft(t, ri, ci), charW);
-                float right = cellRight(t, ri, ci);
                 String[] parts = cell.split("\n");
                 for (int pi = 0; pi < parts.length; pi++) {
                     String c = parts[pi].trim();
@@ -370,8 +414,8 @@ public final class TxtWriter {
                     // A number the page drew flush against a cell's right edge belongs at
                     // that edge. Without this every amount sat at the cell's left edge and
                     // a column of figures stopped being a column.
-                    if (isNumeric(c) && !Float.isNaN(right)) {
-                        int startCol = column(right, charW) - c.length();
+                    if (isNumeric(c) && ci < ncol && endCol[ci] > 0) {
+                        int startCol = endCol[ci] - c.length();
                         if (startCol > col) col = startCol;
                     }
                     for (int i = 0; i < col; i++) sb.append(' ');

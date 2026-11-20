@@ -2,11 +2,9 @@
  "01_stamp_rotated_15deg_upright": {
   "applicable": 10,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "02_stamp_rotated_15deg_upleft": {
   "applicable": 9,
@@ -86,11 +84,9 @@
  "10_stamp_as_image": {
   "applicable": 10,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "11_stamp_with_signature_image": {
   "applicable": 9,
@@ -568,11 +564,9 @@
  "362_price_list_dense": {
   "applicable": 8,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "363_warranty_card": {
   "applicable": 7,
@@ -1116,11 +1110,9 @@
  "72_bank_statement_no_rules_right_amounts": {
   "applicable": 10,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "73_marksheet_subject_marks_grade": {
   "applicable": 9,
@@ -1232,11 +1224,9 @@
  "balance-sheet-and-profit-loss": {
   "applicable": 11,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "balance-sheet-two-columns-of-figures": {
   "applicable": 10,
@@ -1301,11 +1291,9 @@
  "electricity-bill": {
   "applicable": 10,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "eway-bill": {
   "applicable": 10,
@@ -1317,20 +1305,16 @@
  "form16-part-b": {
   "applicable": 11,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "gst-invoice-3line-items": {
   "applicable": 10,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "gst-invoice-horizontal-rules-only": {
   "applicable": 10,
@@ -1459,11 +1443,9 @@
  "payslip-label-left-amount-right": {
   "applicable": 10,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "policy-2col-spanning-section-heading": {
   "applicable": 9,
@@ -1505,11 +1487,9 @@
  "purchase-order": {
   "applicable": 10,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "question-paper-marks-right-margin": {
   "applicable": 9,

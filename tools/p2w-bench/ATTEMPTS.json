@@ -479,5 +479,42 @@
   ],
   "requeues": 0,
   "status": "OPEN"
+ },
+ "t13_amount_columns": {
+  "attempts": 2,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-20 10:52",
+    "moved": null,
+    "outcome": "error",
+    "reason": "claimed. .txt half. PATCH-t13 (row-per-line) was rejected 19 Nov: it breaks t04_structure line-count drift, 101 worse 0 better. Working the other direction: keep one cell per line, fix only where an a",
+    "total": null
+   },
+   {
+    "at": "2026-11-20 11:51",
+    "moved": 10,
+    "outcome": "kept",
+    "reason": "KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over",
+    "total": 18
+   }
+  ],
+  "last": null,
+  "last_engine": "ea9dfd7+3a5a7bf7cc",
+  "last_moved": 10,
+  "last_total": 18,
+  "outcomes": [
+   "error",
+   "kept"
+  ],
+  "ratchet_at": "20 Nov 11:51",
+  "ratchet_docs": 213,
+  "reason": "KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over-estimates a 7pt numeric token by one column, so amounts ended at baseCol+length = 133/134. Whole corpus: 10 better, 0 worse, 203 same; checks 1784->1794; clean 167->177. Line count unchanged, so t04 cannot drift. 8 of 18 remain: 2 are paragraph-path with no right edge on Para, 2 mixed.",
+  "reasons": [
+   "claimed. .txt half. PATCH-t13 (row-per-line) was rejected 19 Nov: it breaks t04_structure line-count drift, 101 worse 0 better. Working the other direction: keep one cell per line, fix only where an amount ENDS, since t13 compares rows of a column to each other and not to the source column.",
+   "KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over-estimates a 7pt numeric token by one column, so amounts ended at baseCol+length = 133/134. Whole corpus: 10 better, 0 worse, 203 same; checks 1784->1794; clean 167->177. Line count unchanged, so t04 cannot drift. 8 of 18 remain: 2 are paragraph-path with no right edge on Para, 2 mixed."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
  }
 }

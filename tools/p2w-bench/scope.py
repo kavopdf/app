@@ -36,6 +36,14 @@ ENGINE = "app/src/main/java/com/kavopdf/app/engine"
 # Result that PdfToWord.convert() built.
 METHOD_FORMAT = {
     "TxtWriter.write": "txt",
+    # appendTable is private static in TxtWriter and is called only from TxtWriter.write(). The
+    # .docx is written by DocxWriter.write() from the Result that PdfToWord.convert() built;
+    # TxtWriter is never invoked on that path, so a change here cannot reach a .docx byte.
+    # Added 20 Nov with the per-table-column end column, which the fixer measured as
+    # 10 documents better and 0 worse on the .txt and could not commit because this table
+    # did not know the method and fell back to "both".
+    "TxtWriter.appendTable": "txt",
+    "TxtWriter.appendPara": "txt",
     "PdfToWord.writeTxt": "txt",
     "DocxWriter.write": "docx",
     "DocxWriter.orderStamps": "both",   # reorders page.blocks, which TxtWriter walks
