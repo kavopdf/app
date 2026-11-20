@@ -12,7 +12,7 @@ Every other class table comes from `RANKING.csv`, a soffice render — a rendere
 
 `round.py --close-round` reads this file. A round cannot close while a row here says OPEN.
 
-Last regenerated: 2026-11-20 10:35 IST
+Last regenerated: 2026-11-20 15:22 IST
 
 ## Classes, ranked by gap (Google fails − LibreOffice fails)
 
