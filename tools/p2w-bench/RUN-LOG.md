@@ -1,4 +1,3 @@
-| 12 Nov 12:10 | baseline | measured gst-invoice-3line-items 46/59 docx, gst-invoice-3line-items.txt 4/5 txt |
 | 12 Nov 12:11 | baseline | measured gst-invoice-horizontal-rules-only 42/59 docx, gst-invoice-horizontal-rules-only.txt 4/5 txt |
 | 12 Nov 12:12 | baseline | measured gst-invoice-multipage-item-table 45/59 docx, gst-invoice-multipage-item-table.txt 4/5 txt |
 | 12 Nov 12:12 | baseline | measured gst-invoice-with-qr-code 43/59 docx, gst-invoice-with-qr-code.txt 4/5 txt |
@@ -198,3 +197,4 @@
 | 20 Nov 15:55 | fixer | slot claimed - fixer running |
 | 20 Nov 16:14 | fixer | attempt t13_amount_columns -> reverted (0/26 moved) |
 | 20 Nov 17:06 | fixer | attempt t13_amount_columns -> kept (5/6 moved) |
+| 20 Nov 17:08 | fixer | attempt t13_amount_columns -> reverted (0/1 moved) |

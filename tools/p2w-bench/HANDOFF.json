@@ -480,6 +480,26 @@
   {
    "at": "17:06",
    "text": "attempt 5 on t13_amount_columns -> kept (5/6 moved)"
+  },
+  {
+   "at": "17:08",
+   "text": "attempt 6 on t13_amount_columns -> reverted (0/1 moved)"
+  },
+  {
+   "at": "17:09",
+   "text": "agent deployed: t13_amount_columns / A - per-document map of every offending t13 line: source column x, leading spaces, e"
+  },
+  {
+   "at": "17:09",
+   "text": "agent deployed: t13_amount_columns / B - reach of a per-page end column across the whole .txt corpus, before and after"
+  },
+  {
+   "at": "17:09",
+   "text": "agent landed: t13_amount_columns / A -> FINDINGS/t13-page-end-column-KEPT-172000.md"
+  },
+  {
+   "at": "17:09",
+   "text": "agent landed: t13_amount_columns / B -> FINDINGS/t13-page-end-column-KEPT-172000.md"
   }
  ],
  "next": "47_margins: re-measure the class against a fresh render, not the tables - 392_statistical_console_output already reads 0.06 and passes all 42 checks on this engine while RANKING.csv says 1.61 and both gverify tables say 47_margins FAIL, so the class is at most 25 documents. Then pull the thread FINDINGS/47_margins-REACH-140500.md leaves open: 360_restaurant_menu's body column was 12 pt left (source 52, render 40) and 9 runs are still 11.9 pt out; the leading-space indent and the centred-line constructs are both capped under the 25% bar and must not be retried.",
@@ -783,6 +803,30 @@
    "finding": "tools/p2w-bench/FINDINGS/47_margins-DIAGNOSE40-B-150000.md",
    "deployed_at": "2026-11-20T08:33",
    "landed_at": "2026-11-20T08:46"
+  },
+  {
+   "id": "t13_A-02",
+   "class": "t13_amount_columns",
+   "angle": "A",
+   "question": "per-document map of every offending t13 line: source column x, leading spaces, emitting path",
+   "expected": "six remaining docs diagnosed line by line",
+   "deployed": "17:09",
+   "status": "landed",
+   "finding": "FINDINGS/t13-page-end-column-KEPT-172000.md",
+   "deployed_at": "2026-11-20T11:39",
+   "landed_at": "2026-11-20T11:39"
+  },
+  {
+   "id": "t13_B-02",
+   "class": "t13_amount_columns",
+   "angle": "B",
+   "question": "reach of a per-page end column across the whole .txt corpus, before and after",
+   "expected": "which of 213 improve and which regress",
+   "deployed": "17:09",
+   "status": "landed",
+   "finding": "FINDINGS/t13-page-end-column-KEPT-172000.md",
+   "deployed_at": "2026-11-20T11:39",
+   "landed_at": "2026-11-20T11:39"
   }
  ],
  "run": {

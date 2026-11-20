@@ -4,10 +4,13 @@
  "ended_ts": null,
  "ended": null,
  "class": "t13_amount_columns",
- "attempts": 2,
+ "attempts": 3,
  "kept": 1,
  "docs_improved": 5,
- "agents": [],
+ "agents": [
+  "t13_A-02",
+  "t13_B-02"
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0,
  "ratchets": 1,

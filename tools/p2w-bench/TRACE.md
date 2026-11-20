@@ -6,7 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 14:17 | ? | ratchet | held or rose |
 | 13 Nov 14:46 | ? | ratchet | FAIL DRIFT 211 rows/211 marks; STALE 211 |
 | 13 Nov 14:46 | ? | ratchet | NOT COMPARED (--allow-stale) DRIFT 211 rows/211 marks; STALE 211 |
 | 13 Nov 14:46 | ? | ratchet --txt | held or rose |
@@ -406,3 +405,4 @@
 | 20 Nov 16:45 | fixer | build-engine | started |
 | 20 Nov 16:45 | fixer | build-engine | engine built in 37s |
 | 20 Nov 17:06 | fixer | attempt | t13_amount_columns -> kept (5/6 moved) |
+| 20 Nov 17:08 | fixer | attempt | t13_amount_columns -> reverted (0/1 moved) |
