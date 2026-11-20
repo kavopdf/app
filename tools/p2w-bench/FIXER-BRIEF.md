@@ -887,7 +887,12 @@ The whole loop, in order:
     #    It downloads the corpus-v1 release, builds the engine, and calls ConvertOne, which writes
     #    the .docx AND the .txt into /scratch/work/p2w/out. Nothing else creates those directories.
     cp benchmarks/p2w.py /scratch/work/ && python3 /scratch/work/p2w.py --validate
+    python3 /scratch/work/p2w.py --force --budget 250   # --force AFTER ANY ENGINE CHANGE
     python3 /scratch/work/p2w.py --budget 250        # repeat until it says the corpus is complete
+
+    #    AFTER AN ENGINE CHANGE USE --force. Without it p2w.py converts only documents whose
+    #    .docx is missing - and a TxtWriter change leaves the .docx correct and the .txt stale, so
+    #    nothing is rebuilt and the measurement scores the old files. --force rebuilds every document.
 
     # 1. change the engine, then rebuild the .txt files with the new one
     #    ConvertOne writes BOTH: PdfToWord.writeTxt(r, new File(outDir, base + ".txt"))

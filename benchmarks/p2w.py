@@ -912,7 +912,23 @@ def engine():
     return ok
 def docx(end):
     pdfs=sorted(glob.glob(CORPUS+"/*.pdf"))
-    miss=[p for p in pdfs if not os.path.exists(DOCX+"/"+os.path.basename(p)[:-4]+".docx")]
+    # BOTH FORMATS COUNT AS OUTPUT, AND --force REBUILDS EVERYTHING.
+    #
+    # This asked only for the .docx. ConvertOne writes the .docx AND the .txt from the same
+    # PdfToWord.Result, so a document whose .docx exists may still have no .txt - and after a change
+    # to TxtWriter the .docx is correctly unchanged while the .txt is stale, so `miss` was empty and
+    # nothing was rebuilt. A .txt fix could then never reach the measurement: restamp_txt would score
+    # the old files and report no movement. Found 20 Nov by asking what happens after an engine edit.
+    #
+    # --force rebuilds every document whatever exists, which is what an engine change needs.
+    _force = "--force" in sys.argv
+    def _need(p):
+        b = os.path.basename(p)[:-4]
+        if _force:
+            return True
+        return not (os.path.exists(DOCX + "/" + b + ".docx")
+                    and os.path.exists(DOCX + "/" + b + ".txt"))
+    miss=[p for p in pdfs if _need(p)]
     if not miss: return len(pdfs)
     log(f"docx {len(pdfs)-len(miss)}/{len(pdfs)} -- converting {len(miss)}")
     os.makedirs(DOCX,exist_ok=True)
@@ -1186,7 +1202,9 @@ def main():
     global INSTRUMENT_MODE
     ap=argparse.ArgumentParser(); ap.add_argument("--budget",type=int,default=250)
     ap.add_argument("--status",action="store_true"); ap.add_argument("--validate",action="store_true")
-    ap.add_argument("--diagnose",type=int,default=0); a=ap.parse_args()
+    ap.add_argument("--diagnose",type=int,default=0)
+    ap.add_argument("--force",action="store_true",help="rebuild every document, after an engine change")
+    a=ap.parse_args()
     if a.status: status(); return 0
     if a.validate: return 0 if validate() else 3
     if a.diagnose:
