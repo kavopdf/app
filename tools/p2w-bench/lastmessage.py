@@ -318,7 +318,10 @@ def verify_facts(text, data):
 # one the tool actually printed. A run cannot type a count it did not measure, because the count it
 # typed is compared against the tool's own output character for character.
 
-NUM_RE = r"\b\d{1,4}\b"
+# ANY LENGTH. This read `\d{1,4}`, so a fabricated 987654 was invisible to the checker - a run could
+# type any number of five digits or more and be told "every number is one the tool printed". Found on
+# 20 Nov by falsifying the generated reports: three of them carried 987654 and all three passed.
+NUM_RE = r"\b\d+\b"
 
 
 def _tool_numbers(cmds):
@@ -361,7 +364,7 @@ def verify_tool_numbers(text, cmds, label):
     text = re.sub(r"\b\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b", " ", text)
     text = re.sub(r"\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\b", " ", text)
     bad = []
-    for m in re.finditer(r"(?<![\w.])(\d{1,4})(?![\w.])", text):
+    for m in re.finditer(r"(?<![\w.])(\d+)(?![\w.])", text):
         n = int(m.group(1))
         if n not in have:
             ctx = text[max(0, m.start() - 45):m.end() + 45].replace("\n", " ")
