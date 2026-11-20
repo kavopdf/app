@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 15:55 → running IST · 1h 15m**
+**20 Nov 2026 · slot 15:55 → 17:12 IST · 1h 17m**
 
 > **22_invoice_four_columns_txtpos** improved — 1.00 → 0.00. Corpus ratchet clean across 213 documents.
 
@@ -51,9 +51,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 15:55 → running · 1h 15m |
+| Slot window | 15:55 → 17:12 · 1h 17m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 25 |
+| Tool beats | 31 |
 | Longest silence | **51.9 min** — from 16:14:08, after `classrow.py: refreshing the class file` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 need a human |
@@ -64,8 +64,8 @@
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **1h 13m** | `#####################` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **3 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

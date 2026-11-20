@@ -1,8 +1,8 @@
 {
  "started_ts": 1795170303.9325814,
  "started": "15:55",
- "ended_ts": null,
- "ended": null,
+ "ended_ts": 1795174978.1264997,
+ "ended": "17:12",
  "class": "t13_amount_columns",
  "attempts": 3,
  "kept": 1,
@@ -19,5 +19,6 @@
    "t13_amount_columns",
    5
   ]
- ]
+ ],
+ "ended_how": "released - forced past 5 pending rows, all watchdog/cron blockers the fixer cannot fix"
 }

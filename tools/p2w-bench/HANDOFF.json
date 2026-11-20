@@ -831,15 +831,10 @@
  ],
  "run": {
   "started": "15:55",
-  "ended": null,
-  "ended_how": null
+  "ended": "17:12",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "14:34",
-   "how": "released",
-   "plan": ""
-  },
   {
    "at": "15:40",
    "how": "released",
@@ -934,6 +929,11 @@
    "at": "15:55",
    "how": "forced",
    "plan": "Measure the reach of every construct before building the next one: 47_margins has 26 documents and the two constructs on the table reach 3 and 5 of them, so the class was being attacked from the wrong end. Traced all 26, corrected SETTLED's run-size lead, added verify_google --detail so a FAIL names its page and its distance."
+  },
+  {
+   "at": "17:12",
+   "how": "forced",
+   "plan": ""
   }
  ],
  "context": "47_margins taken on the rotation (classpick rotated off 18_displacement: 3 attempts, 0 moved). The class is DEFINED: 47_margins is verify_google.py:3960-4170 - per page, horizontally only: (a) the page's left ink anchor must be within 3.0 pt of the source's, (b) matched run pairs are unregistered at |d|>2.0 pt with budget max(2, round(5% n)). w:pgMar is 0 on all four sides, a hard constant at DocxWriter.java:2268-2269, and is NOT the mechanism - Google places ink at pgMar+ind. The lever is flowFromBox (DocxWriter.java:4159-4188, :4391-4392): left-aligned lines pin their ink, centred and right lines delegate their left edge to the renderer's text width. Two constructs measured, both reverted, both diffs in FINDINGS/47_margins-MECHANISM-133500-f2.md. The one to carry forward is the space-led indent: strip the leading ASCII spaces and emit inkX-b.x as w:ind w:left (needs Box.inkX = visibleX in PdfToWord). It is position-neutral in the declared face, moves nothing worse on any of the 13, and drives the Google counter to zero on 392/380/383 under the substitution proxy - but reaches flowFromBox in only 3 of 13, and a Google-only mechanism is flat in a LibreOffice measurement by construction, so the corpus pass cannot see it. Next: extend it to the cell emitter, where 40/77/78's space-led lines live, then run benchmarks/gate.py --budget 250 in its own call and confirm RANKING.csv's mtime moved.",

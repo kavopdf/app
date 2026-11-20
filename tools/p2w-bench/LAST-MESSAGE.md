@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 15:55 → running IST · 1h 15m**
+**20 Nov 2026 · slot 15:55 → 17:12 IST · 1h 17m**
 
 > **22_invoice_four_columns_txtpos** improved — 1.00 → 0.00. Corpus ratchet clean across 213 documents.
 
@@ -43,6 +43,16 @@ TxtWriter.java only, and scope.py proves it cannot reach a .docx byte. The table
 
 The change pools every numeric table cell in the document by the page column of its right edge, merging keys one column apart the way the paragraph path already merged end columns, and marks those targets in paraEndSnap so both paths agree on a page that uses both. Two structural properties rather than measured ones: the key is the page column of the right edge, so cells of different lengths in one page column are one column by construction; and the target is a maximum over a set that includes the cell's own left edge plus length, so a numeric cell can only move right. Nothing moves left, so nothing that passes today can lose its column.
 
+| document | before | after |
+|:--|:--|:--|
+| `22_invoice_four_columns_txtpos` | t13 | clean |
+| `29_dot_leaders_txtpos` | t13 | clean |
+| `balance-sheet-two-columns-of-figures` | t13 | clean |
+| `74_balance_sheet_indented_subitems` | t02, t13 | t02 |
+| `gst-invoice-multipage-item-table` | t09, t13 | t09 |
+
+The whole corpus was re-converted and re-scored with the new engine, 213 of 213. The baseline table was deliberately left untouched, so the gate compared fresh scores against a table this run never wrote and still found no document worse.
+
 ## The one it did not fix
 
 itr-computation-with-slab-table keeps t13. Its failing source amount column has 7 rows at end column 130 and arrives as 1 row at 130 and 6 at 132. The odd row is 61,000.00, in a different Table whose cell right edge is 535.58 pt against the other's 549.92 pt - 3.4 columns on this document's 4.1616 pt ruler. The source's own figures all end within one column of each other, so one table's cell right edge is 14 pt left of where the page draws them. That is table geometry in PdfToWord, which owns the .docx too, and it needs a .docx measurement. Padding cannot reach it, and a wider merge window would be inventing a column the page did not draw.
@@ -51,16 +61,18 @@ itr-computation-with-slab-table keeps t13. Its failing source amount column has 
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `t13_A-02` | per-document map of every offending t13 line: source | 17:09 | 11:39 | 0 min |
-| `t13_B-02` | reach of a per-page end column across the whole .txt | 17:09 | 11:39 | 0 min |
+| `t13_A-02` | every offending t13 line, per document: source column x, leading spaces, emitting path | 15:58 | 16:15 | 17 min |
+| `t13_B-02` | the reach of a per-page end column over the whole .txt corpus, before and after | 16:00 | 16:24 | 24 min |
+
+The first produced the line-by-line map the fix was built from and proved the emitting path by replaying the writer byte for byte. The second confirmed the structure in the source but ran out of its budget before the before/after pass, and said so rather than estimating - its measured throughput is why the corpus pass here was run in chunks of sixty and not attempted as one call.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 15:55 → running · 1h 15m |
+| Slot window | 15:55 → 17:12 · 1h 17m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 25 |
+| Tool beats | 31 |
 | Longest silence | **51.9 min** — from 16:14:08, after `classrow.py: refreshing the class file` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 need a human |
@@ -71,8 +83,8 @@ itr-computation-with-slab-table keeps t13. Its failing source amount column has 
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **1h 13m** | `#####################` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **3 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
