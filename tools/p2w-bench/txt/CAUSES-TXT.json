@@ -22,14 +22,11 @@
  },
  "041122-Account_Opening_Form": {
   "applicable": 10,
-  "baseline_failed": 7,
-  "cause": "7 checks",
-  "failed": 7,
+  "baseline_failed": 4,
+  "cause": "4 checks",
+  "failed": 4,
   "failed_ids": [
-   "t01_word_accuracy",
-   "t03_symbols",
    "t06_encoding",
-   "t07_symbol_counts",
    "t08_line_order",
    "t09_page_furniture",
    "t12_word_invention"
@@ -1165,14 +1162,11 @@
  },
  "Account_Opening_Form_Fillable_filled": {
   "applicable": 10,
-  "baseline_failed": 7,
-  "cause": "7 checks",
-  "failed": 7,
+  "baseline_failed": 4,
+  "cause": "4 checks",
+  "failed": 4,
   "failed_ids": [
-   "t01_word_accuracy",
-   "t03_symbols",
    "t06_encoding",
-   "t07_symbol_counts",
    "t08_line_order",
    "t09_page_furniture",
    "t12_word_invention"

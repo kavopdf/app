@@ -13,18 +13,17 @@ serves every document under it.
 |---|---|---:|---|---:|
 | `t08_line_order` | lines arrive in the order the page drew them | 10 | OPEN | 5% |
 | `t12_word_invention` | the .txt carries no word the source never drew | 9 | OPEN | 4% |
-| `t01_word_accuracy` | the source's words survive, 99 % of them | 7 | OPEN | 3% |
+| `t01_word_accuracy` | the source's words survive, 99 % of them | 5 | OPEN | 2% |
 | `t02_position` | a line's x survives as its leading spaces | 5 | OPEN | 2% |
 | `t09_page_furniture` | one copy of each running head per page it belongs to | 4 | OPEN | 2% |
-| `t07_symbol_counts` | each symbol arrives as many times as the page drew it | 3 | OPEN | 1% |
-| `t03_symbols` | every character the page DRAWS survives, read from the glyphs | 2 | OPEN | 1% |
 | `t06_encoding` | the bytes decode as the UTF-8 the writer declares | 2 | OPEN | 1% |
+| `t07_symbol_counts` | each symbol arrives as many times as the page drew it | 1 | OPEN | 0% |
 
 ## Documents
 
 | document | class | failed | failing checks | vs baseline |
 |---|---|---:|---|---|
-| `041122-Account_Opening_Form` | `7 checks` | 7/10 | `t01_word_accuracy`, `t03_symbols`, `t06_encoding`, `t07_symbol_counts`, `t08_line_order`, `t09_page_furniture`, `t12_word_invention` | was 7 |
+| `041122-Account_Opening_Form` | `4 checks` | 4/10 | `t06_encoding`, `t08_line_order`, `t09_page_furniture`, `t12_word_invention` | was 4 |
 | `05_round_company_seal_curved_text` | `t12_word_invention` | 1/9 | `t12_word_invention` | was 1 |
 | `09_stamp_font_not_embedded` | `t08_line_order` | 1/9 | `t08_line_order` | was 1 |
 | `12_stamp_across_page_break` | `t12_word_invention` | 1/10 | `t12_word_invention` | was 1 |
@@ -45,7 +44,7 @@ serves every document under it.
 | `70_magazine_drop_cap_photo_caption` | `t08_line_order` | 1/9 | `t08_line_order` | was 1 |
 | `74_balance_sheet_indented_subitems` | `t02_position` | 1/10 | `t02_position` | was 1 |
 | `77_arabic_rtl_document` | `t01_word_accuracy + t12_word_invention` | 2/9 | `t01_word_accuracy`, `t12_word_invention` | was 2 |
-| `Account_Opening_Form_Fillable_filled` | `7 checks` | 7/10 | `t01_word_accuracy`, `t03_symbols`, `t06_encoding`, `t07_symbol_counts`, `t08_line_order`, `t09_page_furniture`, `t12_word_invention` | was 7 |
+| `Account_Opening_Form_Fillable_filled` | `4 checks` | 4/10 | `t06_encoding`, `t08_line_order`, `t09_page_furniture`, `t12_word_invention` | was 4 |
 | `gst-invoice-multipage-item-table` | `t09_page_furniture` | 1/12 | `t09_page_furniture` | was 1 |
 | `itr-computation-with-slab-table` | `t08_line_order` | 1/10 | `t08_line_order` | was 1 |
 | `journal-2col-with-footnotes` | `t12_word_invention` | 1/9 | `t12_word_invention` | was 1 |

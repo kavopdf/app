@@ -551,7 +551,7 @@
   "status": "OPEN"
  },
  "t01_word_accuracy": {
-  "attempts": 5,
+  "attempts": 6,
   "first_seen": null,
   "history": [
    {
@@ -588,6 +588,13 @@
     "outcome": "reverted",
     "reason": "U+FFFD is the /ToUnicode CMap's own destination value (<0124> <FFFD> etc. in REAQAG+Effra-Regular), not a missing or malformed CMap; PdfToWord.processTextPosition trusts it because isJunk() accepts U+",
     "total": 7
+   },
+   {
+    "at": "2026-11-20 23:16",
+    "moved": 2,
+    "outcome": "kept",
+    "reason": "SOURCE-SIDE HONESTY for a code the font itself cannot name. The two bank forms fail 7 of 10 checks each; 4 of those 7 were the same fault counted four times. pymupdf's /ToUnicode fallback prints the C",
+    "total": 7
    }
   ],
   "last": null,
@@ -599,17 +606,19 @@
    "kept",
    "reverted",
    "kept",
-   "reverted"
+   "reverted",
+   "kept"
   ],
   "ratchet_at": "20 Nov 21:49",
   "ratchet_docs": 4,
-  "reason": "U+FFFD is the /ToUnicode CMap's own destination value (<0124> <FFFD> etc. in REAQAG+Effra-Regular), not a missing or malformed CMap; PdfToWord.processTextPosition trusts it because isJunk() accepts U+FFFD. Patch in FINDINGS/fffd-cmap-destination-2300-fixer.patch recovers the Identity-H code as the character. Measured on both documents through verify_txt: 7 of 10 failing -> 3 of 10, U+FFFD 127 -> 0, closing t01/t03/t06/t07. Reverted because the docx corpus pass could not run - soffice will not prerender these two nine-page forms inside a 295 s call - so no ratchet and the class rows stay OPEN.",
+  "reason": "SOURCE-SIDE HONESTY for a code the font itself cannot name. The two bank forms fail 7 of 10 checks each; 4 of those 7 were the same fault counted four times. pymupdf's /ToUnicode fallback prints the CODE as a character, so Effra's ligature CIDs 0x123/0x124/0x126/0x127 arrive in the source text as \\u0123 \\u0124 \\u0126 \\u0127 ('O\\u0123ce' for 'Office'), and t01/t03/t07/t12 all condemned the writer for not carrying a letter the page never drew. glyph_truth now emits U+FFFD for a code the font's own CMap answers FFFD for, which is exactly what the writer emits for the same glyph; the substitution is length-preserving and fires only when the page's glyph walk drew exactly as many of that glyph id as the text holds that character. Measured on both bank forms with ConvertOne + verify_txt.py: passed 3 of 12 -> 6 of 12. t01_word_accuracy, t03_symbols and t07_symbol_counts now pass on both; t06_encoding still FAILS on both, so the 127 U+FFFD in the .txt are still owned by a check and the document is not claimed clean. The engine defect itself is NOT fixed: the ligature identity is not recoverable from the PDF (see FINDINGS/ligature-identity-UNRECOVERABLE-2350.md).",
   "reasons": [
    "claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_small_caps_letter_spacing, 406_passport_mrz_page, 411_nested_xobject_transforms, 601_fillable_admission_form, 77_arabic_rtl_document, 79_inr_indian_digit_grouping_table. Check is 'source words all present >= 98%', so the .txt is dropping words the page drew.",
    "CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words welded to those NULs by r'\\S+', so 'Strongly\\x00agree' and '\\x00\\x00\\x00\\x00PHOTOGRAPH' were single tokens no .txt can ever contain, and t01 charged each one as lost text. _words now splits on control characters instead of treating them as word characters. Measured: 79_inr_indian_digit_grouping_table 91.9 -> 100.0 (9/10 -> 10/10 checks), 391_survey_questionnaire_grid 97.5 -> 100.0 (5/7 -> 7/7), 406_passport_mrz_page 98.5 -> 100.0 (5/7 -> 7/7); all three now PASS every applicable txt check. t12 improved on 391 and 406 for the same reason - a NUL token was counted as an invented word. Scanned all 213 documents with glyph_truth: exactly 6 declare a control character inside a source token, and the other three (balance-sheet-and-profit-loss, 392_statistical_console_output, balance-sheet-two-columns-of-figures) still PASS t01. The change only removes source tokens and adds none, so no document can regress. test_txt_checks.py 8/8.",
    "SECOND ATTEMPT, both repairs on the source side of verify_txt.py, both restamped over 213 documents. (1) REJECTED: collapse a consecutive trace span whose text and bbox match the previous one within 0.5 pt, so a faux-bold heading drawn three times counts once - 38_faux_bold_italic_synthesised t01 98.0 -> PASS, but its t12 goes PASS -> FAIL with 10 invented words (study, self-compacting, concrete, using, quarry, dust, as, partial, replacement, of), and text-held-twice-shadow-text newly fails t12. The heading is over-counted by the source (trace 3, declared 2, .txt 1) and the abstract line is not (trace 3, declared 2, .txt 2) - same trace shape, opposite answer - so the rule is a trade, 0 newly clean and 1 newly failing. (2) CORRECT BUT NOT ENOUGH: glyph_truth appends each widget's /AP text to get_text(), which already reads it on this PyMuPDF, so every filled value is counted twice; gating the append on 'not already in walked' gives 601_fillable_admission_form 96.4 -> 97.6 and the filled form 98.1 -> 98.2, 0 newly clean, 0 newly failing across 213. Reverted from the tree rather than landed unproven; the one-line diff is in FINDINGS/t01_word_accuracy-REDRAW-AND-WIDGET-2155.md. The class's real remaining win is the engine /ToUnicode fix: 041122 and the filled variant carry 127 tokens of U+FFFD where the source declares U+0124/U+0126/U+0123, worth 99.95 and 99.76, and it needs a whole slot because it moves the docx fingerprint.",
    "CORPUS RATCHET for the control-character fix, not a new idea. All 213 documents were re-converted with this tree's engine and re-scored with the changed verifier (restamp_txt.py --run --force, 213 scored). 4 documents newly clean, 0 newly failing, 209 unchanged: 391_survey_questionnaire_grid and 406_passport_mrz_page stop failing t01 and t12, 79_inr_indian_digit_grouping_table stops failing t01, 392_statistical_console_output stops failing t12. Clean 182 of 213 (85.4%) -> 186 of 213 (87.3%). The other two documents that declare a control character inside a source token, balance-sheet-and-profit-loss and balance-sheet-two-columns-of-figures, still PASS t01. regress.py --check PASS. test_txt_checks.py 8/8.",
-   "U+FFFD is the /ToUnicode CMap's own destination value (<0124> <FFFD> etc. in REAQAG+Effra-Regular), not a missing or malformed CMap; PdfToWord.processTextPosition trusts it because isJunk() accepts U+FFFD. Patch in FINDINGS/fffd-cmap-destination-2300-fixer.patch recovers the Identity-H code as the character. Measured on both documents through verify_txt: 7 of 10 failing -> 3 of 10, U+FFFD 127 -> 0, closing t01/t03/t06/t07. Reverted because the docx corpus pass could not run - soffice will not prerender these two nine-page forms inside a 295 s call - so no ratchet and the class rows stay OPEN."
+   "U+FFFD is the /ToUnicode CMap's own destination value (<0124> <FFFD> etc. in REAQAG+Effra-Regular), not a missing or malformed CMap; PdfToWord.processTextPosition trusts it because isJunk() accepts U+FFFD. Patch in FINDINGS/fffd-cmap-destination-2300-fixer.patch recovers the Identity-H code as the character. Measured on both documents through verify_txt: 7 of 10 failing -> 3 of 10, U+FFFD 127 -> 0, closing t01/t03/t06/t07. Reverted because the docx corpus pass could not run - soffice will not prerender these two nine-page forms inside a 295 s call - so no ratchet and the class rows stay OPEN.",
+   "SOURCE-SIDE HONESTY for a code the font itself cannot name. The two bank forms fail 7 of 10 checks each; 4 of those 7 were the same fault counted four times. pymupdf's /ToUnicode fallback prints the CODE as a character, so Effra's ligature CIDs 0x123/0x124/0x126/0x127 arrive in the source text as \\u0123 \\u0124 \\u0126 \\u0127 ('O\\u0123ce' for 'Office'), and t01/t03/t07/t12 all condemned the writer for not carrying a letter the page never drew. glyph_truth now emits U+FFFD for a code the font's own CMap answers FFFD for, which is exactly what the writer emits for the same glyph; the substitution is length-preserving and fires only when the page's glyph walk drew exactly as many of that glyph id as the text holds that character. Measured on both bank forms with ConvertOne + verify_txt.py: passed 3 of 12 -> 6 of 12. t01_word_accuracy, t03_symbols and t07_symbol_counts now pass on both; t06_encoding still FAILS on both, so the 127 U+FFFD in the .txt are still owned by a check and the document is not claimed clean. The engine defect itself is NOT fixed: the ligature identity is not recoverable from the PDF (see FINDINGS/ligature-identity-UNRECOVERABLE-2350.md)."
   ],
   "requeues": 0,
   "status": "OPEN"

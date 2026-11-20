@@ -9,9 +9,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 21:57 |
-| ended | 22:43 |
-| how it ended | forced |
+| started | 22:54 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -68,7 +68,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `19:31` agent deployed: t13 / column census - which of the six t13 documents still fail at head, the exact end column of every
 - `19:31` agent deployed: t13 / itr weld fix - implement and measure the TxtWriter change that clears itr-computation-with-slab
 - `19:31` agent landed: t13 / column census -> tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md
 - `19:31` agent landed: t13 / itr weld fix -> tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md
@@ -93,6 +92,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `22:39` agent landed: t01_word_accuracy / ToUnicode CMap destination -> FINDINGS/t01_word_accuracy-FFFD-CMAP-2300-fixer.md
 - `22:43` agent deployed: t01_word_accuracy / adversarial patch review - How can this Identity-H recovery write wrong text into the document?
 - `22:43` agent landed: t01_word_accuracy / adversarial patch review -> FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md
+- `23:16` attempt 6 on t01_word_accuracy -> kept (2/7 moved)
 
 ## Where the rest of the state lives
 

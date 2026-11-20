@@ -616,6 +616,10 @@
   {
    "at": "22:43",
    "text": "agent landed: t01_word_accuracy / adversarial patch review -> FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md"
+  },
+  {
+   "at": "23:16",
+   "text": "attempt 6 on t01_word_accuracy -> kept (2/7 moved)"
   }
  ],
  "next": "Do not apply the FFFD patch first. Render page 1 of 041122-Account_Opening_Form at 150 DPI and look at the 127 glyph sites - ligature or not decides whether the patch is right. Read FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md. If ligature, the fix is CIDToGIDMap plus the descendant cmap; if not, apply FINDINGS/fffd-cmap-destination-2300-fixer.patch and budget the whole slot for p2w.py --budget 250 to completion, then restamp_txt.py --run/--apply, classrow.py --write, regress.py --check.",
@@ -1044,9 +1048,9 @@
   }
  ],
  "run": {
-  "started": "21:57",
-  "ended": "22:43",
-  "ended_how": "forced"
+  "started": "22:54",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

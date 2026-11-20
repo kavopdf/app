@@ -1,16 +1,19 @@
 {
- "started_ts": 1795192024.3831508,
- "started": "21:57",
- "ended_ts": 1795194831.108416,
- "ended": "22:43",
+ "started_ts": 1795195472.5423703,
+ "started": "22:54",
+ "ended_ts": null,
+ "ended": null,
  "class": "t01_word_accuracy",
  "attempts": 1,
- "kept": 0,
- "docs_improved": 0,
- "agents": [
-  "t01_ToUnicode CMap destination-01",
-  "t01_adversarial patch review-01"
- ],
+ "kept": 1,
+ "docs_improved": 2,
+ "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0
+ "needs_human": 0,
+ "counted": [
+  [
+   "t01_word_accuracy",
+   2
+  ]
+ ]
 }

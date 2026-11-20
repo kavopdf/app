@@ -348,6 +348,58 @@ def _annex_d(basefont):
     return None
 
 
+def _unnameable_codes(doc, xref):
+    """The codes whose /ToUnicode answers U+FFFD: the font says it cannot name them.
+
+    A Type0/Identity-* font whose CMap maps a code to FFFD has told the reader, in the
+    file's own words, that the code has no Unicode. What an extractor does next decides
+    whether the source side is telling the truth: pymupdf falls back to printing the code
+    NUMBER as a character, and for a ligature glyph that is a letter that does not exist.
+
+    MEASURED on the two bank forms in benchmarks/realworld/. Effra's subset maps CIDs
+    0x123, 0x124, 0x126, 0x127 to FFFD and the page draws them 127 times each; the glyphs
+    are ff, fi, ffi and ffl (read from the FontFile2 outlines - see
+    FINDINGS/ligature-identity-UNRECOVERABLE-2340.md), so the raw-code fallback turns
+    "Office" into "O\u0123ce" and "Staff" into "Sta\u0123". Counting that invented letter
+    as a word the .txt must carry accuses the writer of losing a word that neither side
+    could name: the writer emits U+FFFD for the same glyph, which is the honest character
+    for a code the font declines to name.
+
+    So the source side emits U+FFFD too, and the defect stays owned by t06_encoding,
+    which counts U+FFFD in the .txt and still fails these documents. This is not a fix to
+    the conversion - it stops one fault being counted as four.
+    """
+    codes = set()
+    try:
+        kind, val = doc.xref_get_key(xref, "ToUnicode")
+    except Exception:
+        return codes
+    if kind != "xref":
+        return codes
+    m = re.match(r"\s*(\d+)\s+\d+\s+R", val or "")
+    if not m:
+        return codes
+    try:
+        raw = doc.xref_stream(int(m.group(1)))
+    except Exception:
+        return codes
+    if not raw:
+        return codes
+    body = raw.decode("latin-1", "replace")
+    for blk in re.findall(r"beginbfchar(.*?)endbfchar", body, re.S):
+        for src, dst in re.findall(r"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>", blk):
+            if dst.upper().strip("0") == "":
+                continue
+            if int(dst, 16) == 0xFFFD:
+                codes.add(int(src, 16))
+    for blk in re.findall(r"beginbfrange(.*?)endbfrange", body, re.S):
+        for lo, hi, dst in re.findall(
+                r"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>", blk):
+            if int(dst, 16) == 0xFFFD:
+                codes.update(range(int(lo, 16), int(hi, 16) + 1))
+    return codes
+
+
 def _single_byte_code(ch, encoding):
     """The code a declared character stood for, under a single-byte encoding.
 
@@ -470,10 +522,12 @@ def glyph_truth(path):
         from_glyphs     characters the Annex D table supplied INSTEAD of the declaration
         widget_glyphs   characters recovered from widget appearance streams
         undeclared_face faces with no table to decode through, by name
+        unnameable      characters the font's own CMap maps to U+FFFD, which the source
+                        side therefore reports as U+FFFD instead of the code number
     """
     import fitz
     stats = {"glyphs": 0, "declared": 0, "from_glyphs": 0, "widget_glyphs": 0,
-             "undeclared_face": [], "structure_fallback": 0}
+             "undeclared_face": [], "structure_fallback": 0, "unnameable": 0}
     d = fitz.open(path)
     pages = []
     try:
@@ -487,8 +541,17 @@ def glyph_truth(path):
                 pass
             # (resource name -> (basefont, encoding)) read from the dictionary itself.
             facts = {}
+            # Codes this page's fonts answer U+FFFD for, keyed the same way, so a span
+            # can be told that the letter it holds is a code number the font never named.
+            unnamed_by = {}
             for name, f in fonts.items():
                 got = _font_facts(d, f[0])
+                codes = _unnameable_codes(d, f[0])
+                if codes:
+                    unnamed_by[name] = codes
+                    unnamed_by[got[0] or ""] = codes
+                    unnamed_by[(got[0] or "").lstrip("/")] = codes
+                    unnamed_by[re.sub(r"^[A-Z]{6}\+", "", (got[0] or "").lstrip("/"))] = codes
                 # Keyed by the resource name AND by the base font, because a span's
                 # "font" is whichever of the two the extractor decided to report, and a
                 # lookup that knows only one of them silently finds no table at all -
@@ -508,6 +571,39 @@ def glyph_truth(path):
                 declared_page = pg.get_text()
             except Exception:
                 declared_page = ""
+            # A CODE THE FONT ITSELF SAYS HAS NO UNICODE COMES BACK AS ITS OWN NUMBER.
+            #
+            # The extractor's last resort for a Type0/Identity-* font whose CMap answers
+            # U+FFFD is to print the code as a character. For a ligature glyph that
+            # invents a letter the page never drew - Effra's CIDs 0x123/0x124/0x126/0x127
+            # are ff/fi/ffi/ffl and arrive as \u0123 \u0124 \u0126 \u0127, so "Office"
+            # reads "O\u0123ce". Replacing them with U+FFFD, which is what the writer emits
+            # for the same glyph, keeps the source side from asserting a word the page
+            # does not contain.
+            #
+            # Length-preserving, so every newline and space the declaration put down stays
+            # where it was. Applied only when the page's own glyph walk found exactly as
+            # many drawn glyphs carrying that code as the text holds that character - a
+            # count that disagrees leaves the page alone rather than guessing.
+            if unnamed_by:
+                unnameable = set()
+                for s in unnamed_by.values():
+                    unnameable |= s
+                # The glyph walk gives (unicode, glyph id) per glyph, and for these faces
+                # /CIDToGIDMap is /Identity, so the glyph id IS the code. Counted only
+                # where the walk itself could not name the glyph (U+FFFD or nothing),
+                # because that is the same admission the replacement makes.
+                drawn = {}
+                for span in trace:
+                    for c in span.get("chars", ()):
+                        u, gid = c[0], (c[1] if len(c) > 1 else None)
+                        if gid in unnameable and (u == 0 or u == 0xFFFD):
+                            drawn[gid] = drawn.get(gid, 0) + 1
+                for u, n in drawn.items():
+                    ch = chr(u)
+                    if declared_page.count(ch) == n:
+                        declared_page = declared_page.replace(ch, "\ufffd")
+                        stats["unnameable"] += n
             # THE LAYOUT IS THE DECLARATION'S; ONLY THE CHARACTERS ARE THE GLYPHS'.
             #
             # A span's declared text and its glyph-decoded text are the same length - one
@@ -523,6 +619,7 @@ def glyph_truth(path):
             cursor = 0
             for span in trace:
                 base, enc = facts.get((span.get("font") or "").lstrip("/"), ("", ""))
+                unnamed = unnamed_by.get((span.get("font") or "").lstrip("/"), ())
                 table = _annex_d(base)
                 if table is None and base:
                     face = re.sub(r"^[A-Z]{6}\+", "", base)

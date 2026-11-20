@@ -6,10 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 16 Nov 11:53 | fixer | claim | fixer claimed the slot |
-| 16 Nov 11:54 | fixer | build-engine | started |
-| 16 Nov 11:54 | fixer | build-engine | started |
-| 16 Nov 11:55 | fixer | build-engine | started |
 | 16 Nov 11:55 | fixer | build-engine | started |
 | 16 Nov 11:55 | fixer | build-engine | engine unchanged, compile skipped |
 | 16 Nov 12:24 | fixer | hypothesis | content-missing-nothing-in-its-place -> confirmed |
@@ -406,3 +402,7 @@
 | 20 Nov 22:21 | fixer | build-engine | started |
 | 20 Nov 22:22 | fixer | build-engine | engine built in 36s |
 | 20 Nov 22:39 | fixer | attempt | t01_word_accuracy -> reverted (2/7 moved) |
+| 20 Nov 22:54 | fixer | claim | fixer claimed the slot |
+| 20 Nov 23:06 | fixer | build-engine | started |
+| 20 Nov 23:07 | fixer | build-engine | engine built in 35s |
+| 20 Nov 23:16 | fixer | attempt | t01_word_accuracy -> kept (2/7 moved) |

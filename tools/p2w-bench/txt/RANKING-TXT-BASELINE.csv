@@ -2,7 +2,7 @@ document,applicable,passed,failed,abstained,failed_ids
 01_stamp_rotated_15deg_upright,10,10,0,0,
 02_stamp_rotated_15deg_upleft,9,9,0,0,
 03_stamp_vertical_90deg,10,10,0,0,
-041122-Account_Opening_Form,10,3,7,7,t01_word_accuracy t03_symbols t06_encoding t07_symbol_counts t08_line_order t09_page_furniture t12_word_invention
+041122-Account_Opening_Form,10,6,4,4,t06_encoding t08_line_order t09_page_furniture t12_word_invention
 04_stamp_180deg_upside_down,10,10,0,0,
 05_round_company_seal_curved_text,9,8,1,1,t12_word_invention
 06_rect_paid_stamp_red_transparent,10,10,0,0,
@@ -158,7 +158,7 @@ document,applicable,passed,failed,abstained,failed_ids
 78_mixed_english_devanagari_line,9,9,0,0,
 79_inr_indian_digit_grouping_table,10,10,0,0,
 80_gstin_pan_cin_ifsc_table,9,9,0,0,
-Account_Opening_Form_Fillable_filled,10,3,7,7,t01_word_accuracy t03_symbols t06_encoding t07_symbol_counts t08_line_order t09_page_furniture t12_word_invention
+Account_Opening_Form_Fillable_filled,10,6,4,4,t06_encoding t08_line_order t09_page_furniture t12_word_invention
 academic-paper-ieee-2col-abstract,10,10,0,0,
 admission-form-labels-left-boxes-right,9,9,0,0,
 admit-card,9,9,0,0,

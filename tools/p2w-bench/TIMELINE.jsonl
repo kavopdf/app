@@ -1194,3 +1194,15 @@
 {"t": 1795194887.7612991, "ist": "22:44:47", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795194888.3663204, "ist": "22:44:48", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795194888.6792789, "ist": "22:44:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795195472.3912218, "ist": "22:54:32", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795195472.53017, "ist": "22:54:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795195481.3796773, "ist": "22:54:41", "ev": "beat", "d": "claimed, reading the handoff"}
+{"t": 1795195481.544911, "ist": "22:54:41", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1795195484.1461954, "ist": "22:54:44", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795196160.301132, "ist": "23:06:00", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795196781.4349854, "ist": "23:16:21", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795196781.7372065, "ist": "23:16:21", "ev": "attempt", "d": "t01_word_accuracy -> kept"}
+{"t": 1795196781.851166, "ist": "23:16:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795196781.9768264, "ist": "23:16:21", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795196935.69565, "ist": "23:18:55", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795196948.7588336, "ist": "23:19:08", "ev": "beat", "d": "classrow.py: refreshing the class file"}
