@@ -9,7 +9,6 @@
 | 16 Nov 10:52 | fixer | build-engine | started |
 | 16 Nov 10:52 | fixer | build-engine | started |
 | 16 Nov 10:52 | fixer | build-engine | started |
-| 16 Nov 10:52 | fixer | build-engine | started |
 | 16 Nov 11:11 | fixer | attempt | content-missing-partly-replaced -> error |
 | 16 Nov 11:53 | fixer | claim | fixer claimed the slot |
 | 16 Nov 11:54 | fixer | build-engine | started |
@@ -406,3 +405,4 @@
 | 20 Nov 21:22 | fixer | attempt | t01_word_accuracy -> kept (3/10 moved) |
 | 20 Nov 21:42 | fixer | commit-gate | started |
 | 20 Nov 21:46 | fixer | attempt | t01_word_accuracy -> reverted (0/10 moved) |
+| 20 Nov 21:49 | fixer | attempt | t01_word_accuracy -> kept (0/10 moved) |

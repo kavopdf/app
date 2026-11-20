@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 20:58 → running IST · 49 min**
+**20 Nov 2026 · slot 20:58 → running IST · 50 min**
 
 > **79_inr, 391_survey and 406_passport** now pass every .txt check they are given. A control character was being read as part of a word.
 
@@ -8,7 +8,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **3** — 3 attempt(s), 1 kept |
+| Documents improved this run | **3** — 4 attempt(s), 2 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -18,15 +18,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
-| Committed | **21** files in 3 commit(s) from `afa9708` — ATTEMPTS.json, CAUSES-TXT.json, CENSUS-TXT.csv, CLASS-HISTORY.jsonl, DEFECT-CLASSES-TXT.md, HANDOFF.json, HANDOFF.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, RESTAMP-TXT.jsonl, ROTATION.json, ROUND.json, RUN-LOG.md, R |
-
-## What the run found
-
-The class handed over was t01_word_accuracy, ten documents, and the first useful thing was that they are not one defect. Each of the ten was converted with this tree's engine and its lost tokens listed against the verifier's own source side: they are at least five different faults sharing a check id. That list is the run's main product and it is in FINDINGS.
-
-Three of the ten were the INSTRUMENT's fault, and this is the fix that landed. A PDF declares U+0000 for any glyph it has no Unicode for - the space between two words of a survey row, a bullet in a table, the empty cells of an MRZ band. The verifier tokenised with a plain non-space pattern, so "Strongly" followed by that glyph followed by "agree" became one token no .txt can ever contain, eight of them welded a word to "PHOTOGRAPH", and fifteen lone ones counted as fifteen words. A text file cannot carry U+0000, so every such token was a guaranteed lost word and t01 was failing these documents for the file format's limits rather than for the writer's fidelity. Splitting on control characters instead of dropping them - the glyph sits where a space sits, so it is two words the page drew, not one word spelled wrong - takes 79_inr_indian_digit_grouping_table 91.9 to 100.0, 391_survey_questionnaire_grid 97.5 to 100.0 and 406_passport_mrz_page 98.5 to 100.0, and clears t12 as well on the last two because a token made of U+0000 was being counted as a word the writer had invented.
-
-It cannot regress, and that was proved rather than argued: the source side was run over all 213 documents, exactly six declare a control character inside a source token, the change alters the word list of those six and no other, and it only removes source tokens. The full restamp over 213 freshly converted documents reads four newly clean, none newly failing, 209 unchanged.
+| Committed | **23** files in 4 commit(s) from `766d382` — ATTEMPTS.json, CAUSES-TXT.json, CENSUS-TXT.csv, CLASS-HISTORY.jsonl, DEFECT-CLASSES-TXT.md, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, REPORT.md, RESTAMP-TXT.jsonl, ROTATION.jso |
 
 ## What was tried
 
@@ -35,6 +27,7 @@ It cannot regress, and that was proved rather than argued: the source side was r
 | 20:59 | **reverted** | 0/10 | claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_sma |
 | 21:22 | **kept** | 3/10 | CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words wel |
 | 21:46 | **reverted** | 0/10 | SECOND ATTEMPT, both repairs on the source side of verify_txt.py, both restamped over 213 documents. (1) REJECTED: collapse a consecutive trace span whose text and bbox match the previous one within 0 |
+| 21:49 | **kept** | 0/10 | CORPUS RATCHET for the control-character fix, not a new idea. All 213 documents were re-converted with this tree's engine and re-scored with the changed verifier (restamp_txt.py --run --force, 213 sco |
 
 ## The txt
 
@@ -57,9 +50,9 @@ It cannot regress, and that was proved rather than argued: the source side was r
 
 | | |
 |:--|:--|
-| Slot window | 20:58 → running · 49 min |
+| Slot window | 20:58 → running · 50 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 33 |
+| Tool beats | 41 |
 | Longest silence | **22.9 min** — from 20:59:33, after `classrow.py: refreshing the class file` |
 | Silences over 2 min | 6 |
 | Obstacles | 0 cleared · 2 need a human |
@@ -71,9 +64,9 @@ It cannot regress, and that was proved rather than argued: the source side was r
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **3 min** | `##` |
-| measure or build - a conversion, screen or compile writes no beacon | **28 min** | `#############` |
+| measure or build - a conversion, screen or compile writes no beacon | **28 min** | `############` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 | other - not attributed to a tool | **15 min** | `#######` |
 ## Best results this round
 
@@ -87,11 +80,7 @@ It cannot regress, and that was proved rather than argued: the source side was r
 
 ## Next run
 
-t01_word_accuracy is at seven open and the rest of the class is one engine fix away from two of them. 041122-Account_Opening_Form and its filled variant each carry 127 tokens that reach the .txt as U+FFFD where the source declares U+0124, U+0126 and U+0123: the engine is failing to read /ToUnicode for REAQAG+Effra-Regular, a Type0 Identity-H face, and falling back to the replacement character. Fixing that reads 99.95 and 99.76 - both pass. It was not attempted here because the same mapping feeds DocxWriter, so it moves the docx fingerprint and the gate then demands a 213-document docx re-measure; that is a whole slot, and it is the slot to give it.
-
-Land the widget de-duplication from FINDINGS in the same attempt, not before it. On its own it is 601_fillable_admission_form 96.4 to 97.6 and nothing passes, which is why it was reverted rather than committed - but the filled form needs it as well as the /ToUnicode fix to reach 99.76.
-
-Do not retry the redraw suppression. It looks obvious - faux bold is the same line drawn two or three times - and it is a trade: 38_faux_bold_italic_synthesised passes t01 and immediately fails t12 with ten invented words, text-held-twice-shadow-text newly fails t12, and the corpus reads zero newly clean and one newly failing. The heading is over-counted by the source and the abstract line under it is not, and both carry three trace spans at one identical bbox, so the rule that separates them is not in the trace.
+t01_word_accuracy, 7 open after this run. The engine /ToUnicode fix is the whole remaining win and it needs a full slot: 041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled each carry 127 tokens of U+FFFD where the source declares U+0124/U+0126/U+0123, from REAQAG+Effra-Regular (Type0/Identity-H). Fixing it reads 99.95 and 99.76 - two documents - and it moves the docx fingerprint, so budget the 213-document docx re-measure with it. Land the widget /AP de-duplication from FINDINGS/t01_word_accuracy-REDRAW-AND-WIDGET-2155.md in the same attempt, not before it: on its own it is 601 96.4 -> 97.6 and nothing passes. Do NOT retry the redraw suppression - it is a t01/t12 trade, 0 newly clean and 1 newly failing, and the two lines it has to separate have identical trace bboxes.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

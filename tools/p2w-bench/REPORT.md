@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 20:58 → running IST · 49 min**
+**20 Nov 2026 · slot 20:58 → running IST · 50 min**
 
 > **391_survey_questionnaire_grid** improved — 2.00 → 0.00. Corpus ratchet clean across 213 documents.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **3** — 3 attempt(s), 1 kept |
+| Documents improved this run | **3** — 4 attempt(s), 2 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -21,7 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
-| Committed | **21** files in 3 commit(s) from `afa9708` — ATTEMPTS.json, CAUSES-TXT.json, CENSUS-TXT.csv, CLASS-HISTORY.jsonl, DEFECT-CLASSES-TXT.md, HANDOFF.json, HANDOFF.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, RESTAMP-TXT.jsonl, ROTATION.json, ROUND.json, RUN-LOG.md, R |
+| Committed | **23** files in 4 commit(s) from `766d382` — ATTEMPTS.json, CAUSES-TXT.json, CENSUS-TXT.csv, CLASS-HISTORY.jsonl, DEFECT-CLASSES-TXT.md, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, REPORT.md, RESTAMP-TXT.jsonl, ROTATION.jso |
 
 ## What was tried
 
@@ -30,6 +30,7 @@
 | 20:59 | **reverted** | 0/10 | claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_sma |
 | 21:22 | **kept** | 3/10 | CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words wel |
 | 21:46 | **reverted** | 0/10 | SECOND ATTEMPT, both repairs on the source side of verify_txt.py, both restamped over 213 documents. (1) REJECTED: collapse a consecutive trace span whose text and bbox match the previous one within 0 |
+| 21:49 | **kept** | 0/10 | CORPUS RATCHET for the control-character fix, not a new idea. All 213 documents were re-converted with this tree's engine and re-scored with the changed verifier (restamp_txt.py --run --force, 213 sco |
 
 ## The txt
 
@@ -52,9 +53,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 20:58 → running · 49 min |
+| Slot window | 20:58 → running · 50 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 33 |
+| Tool beats | 41 |
 | Longest silence | **22.9 min** — from 20:59:33, after `classrow.py: refreshing the class file` |
 | Silences over 2 min | 6 |
 | Obstacles | 0 cleared · 2 need a human |
@@ -66,9 +67,9 @@
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **3 min** | `##` |
-| measure or build - a conversion, screen or compile writes no beacon | **28 min** | `#############` |
+| measure or build - a conversion, screen or compile writes no beacon | **28 min** | `############` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 | other - not attributed to a tool | **15 min** | `#######` |
 ## Best results this round
 

@@ -551,7 +551,7 @@
   "status": "OPEN"
  },
  "t01_word_accuracy": {
-  "attempts": 3,
+  "attempts": 4,
   "first_seen": null,
   "history": [
    {
@@ -574,6 +574,13 @@
     "outcome": "reverted",
     "reason": "SECOND ATTEMPT, both repairs on the source side of verify_txt.py, both restamped over 213 documents. (1) REJECTED: collapse a consecutive trace span whose text and bbox match the previous one within 0",
     "total": 10
+   },
+   {
+    "at": "2026-11-20 21:49",
+    "moved": 0,
+    "outcome": "kept",
+    "reason": "CORPUS RATCHET for the control-character fix, not a new idea. All 213 documents were re-converted with this tree's engine and re-scored with the changed verifier (restamp_txt.py --run --force, 213 sco",
+    "total": 10
    }
   ],
   "last": null,
@@ -583,13 +590,17 @@
   "outcomes": [
    "reverted",
    "kept",
-   "reverted"
+   "reverted",
+   "kept"
   ],
-  "reason": "SECOND ATTEMPT, both repairs on the source side of verify_txt.py, both restamped over 213 documents. (1) REJECTED: collapse a consecutive trace span whose text and bbox match the previous one within 0.5 pt, so a faux-bold heading drawn three times counts once - 38_faux_bold_italic_synthesised t01 98.0 -> PASS, but its t12 goes PASS -> FAIL with 10 invented words (study, self-compacting, concrete, using, quarry, dust, as, partial, replacement, of), and text-held-twice-shadow-text newly fails t12. The heading is over-counted by the source (trace 3, declared 2, .txt 1) and the abstract line is not (trace 3, declared 2, .txt 2) - same trace shape, opposite answer - so the rule is a trade, 0 newly clean and 1 newly failing. (2) CORRECT BUT NOT ENOUGH: glyph_truth appends each widget's /AP text to get_text(), which already reads it on this PyMuPDF, so every filled value is counted twice; gating the append on 'not already in walked' gives 601_fillable_admission_form 96.4 -> 97.6 and the filled form 98.1 -> 98.2, 0 newly clean, 0 newly failing across 213. Reverted from the tree rather than landed unproven; the one-line diff is in FINDINGS/t01_word_accuracy-REDRAW-AND-WIDGET-2155.md. The class's real remaining win is the engine /ToUnicode fix: 041122 and the filled variant carry 127 tokens of U+FFFD where the source declares U+0124/U+0126/U+0123, worth 99.95 and 99.76, and it needs a whole slot because it moves the docx fingerprint.",
+  "ratchet_at": "20 Nov 21:49",
+  "ratchet_docs": 4,
+  "reason": "CORPUS RATCHET for the control-character fix, not a new idea. All 213 documents were re-converted with this tree's engine and re-scored with the changed verifier (restamp_txt.py --run --force, 213 scored). 4 documents newly clean, 0 newly failing, 209 unchanged: 391_survey_questionnaire_grid and 406_passport_mrz_page stop failing t01 and t12, 79_inr_indian_digit_grouping_table stops failing t01, 392_statistical_console_output stops failing t12. Clean 182 of 213 (85.4%) -> 186 of 213 (87.3%). The other two documents that declare a control character inside a source token, balance-sheet-and-profit-loss and balance-sheet-two-columns-of-figures, still PASS t01. regress.py --check PASS. test_txt_checks.py 8/8.",
   "reasons": [
    "claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_small_caps_letter_spacing, 406_passport_mrz_page, 411_nested_xobject_transforms, 601_fillable_admission_form, 77_arabic_rtl_document, 79_inr_indian_digit_grouping_table. Check is 'source words all present >= 98%', so the .txt is dropping words the page drew.",
    "CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words welded to those NULs by r'\\S+', so 'Strongly\\x00agree' and '\\x00\\x00\\x00\\x00PHOTOGRAPH' were single tokens no .txt can ever contain, and t01 charged each one as lost text. _words now splits on control characters instead of treating them as word characters. Measured: 79_inr_indian_digit_grouping_table 91.9 -> 100.0 (9/10 -> 10/10 checks), 391_survey_questionnaire_grid 97.5 -> 100.0 (5/7 -> 7/7), 406_passport_mrz_page 98.5 -> 100.0 (5/7 -> 7/7); all three now PASS every applicable txt check. t12 improved on 391 and 406 for the same reason - a NUL token was counted as an invented word. Scanned all 213 documents with glyph_truth: exactly 6 declare a control character inside a source token, and the other three (balance-sheet-and-profit-loss, 392_statistical_console_output, balance-sheet-two-columns-of-figures) still PASS t01. The change only removes source tokens and adds none, so no document can regress. test_txt_checks.py 8/8.",
-   "SECOND ATTEMPT, both repairs on the source side of verify_txt.py, both restamped over 213 documents. (1) REJECTED: collapse a consecutive trace span whose text and bbox match the previous one within 0.5 pt, so a faux-bold heading drawn three times counts once - 38_faux_bold_italic_synthesised t01 98.0 -> PASS, but its t12 goes PASS -> FAIL with 10 invented words (study, self-compacting, concrete, using, quarry, dust, as, partial, replacement, of), and text-held-twice-shadow-text newly fails t12. The heading is over-counted by the source (trace 3, declared 2, .txt 1) and the abstract line is not (trace 3, declared 2, .txt 2) - same trace shape, opposite answer - so the rule is a trade, 0 newly clean and 1 newly failing. (2) CORRECT BUT NOT ENOUGH: glyph_truth appends each widget's /AP text to get_text(), which already reads it on this PyMuPDF, so every filled value is counted twice; gating the append on 'not already in walked' gives 601_fillable_admission_form 96.4 -> 97.6 and the filled form 98.1 -> 98.2, 0 newly clean, 0 newly failing across 213. Reverted from the tree rather than landed unproven; the one-line diff is in FINDINGS/t01_word_accuracy-REDRAW-AND-WIDGET-2155.md. The class's real remaining win is the engine /ToUnicode fix: 041122 and the filled variant carry 127 tokens of U+FFFD where the source declares U+0124/U+0126/U+0123, worth 99.95 and 99.76, and it needs a whole slot because it moves the docx fingerprint."
+   "SECOND ATTEMPT, both repairs on the source side of verify_txt.py, both restamped over 213 documents. (1) REJECTED: collapse a consecutive trace span whose text and bbox match the previous one within 0.5 pt, so a faux-bold heading drawn three times counts once - 38_faux_bold_italic_synthesised t01 98.0 -> PASS, but its t12 goes PASS -> FAIL with 10 invented words (study, self-compacting, concrete, using, quarry, dust, as, partial, replacement, of), and text-held-twice-shadow-text newly fails t12. The heading is over-counted by the source (trace 3, declared 2, .txt 1) and the abstract line is not (trace 3, declared 2, .txt 2) - same trace shape, opposite answer - so the rule is a trade, 0 newly clean and 1 newly failing. (2) CORRECT BUT NOT ENOUGH: glyph_truth appends each widget's /AP text to get_text(), which already reads it on this PyMuPDF, so every filled value is counted twice; gating the append on 'not already in walked' gives 601_fillable_admission_form 96.4 -> 97.6 and the filled form 98.1 -> 98.2, 0 newly clean, 0 newly failing across 213. Reverted from the tree rather than landed unproven; the one-line diff is in FINDINGS/t01_word_accuracy-REDRAW-AND-WIDGET-2155.md. The class's real remaining win is the engine /ToUnicode fix: 041122 and the filled variant carry 127 tokens of U+FFFD where the source declares U+0124/U+0126/U+0123, worth 99.95 and 99.76, and it needs a whole slot because it moves the docx fingerprint.",
+   "CORPUS RATCHET for the control-character fix, not a new idea. All 213 documents were re-converted with this tree's engine and re-scored with the changed verifier (restamp_txt.py --run --force, 213 scored). 4 documents newly clean, 0 newly failing, 209 unchanged: 391_survey_questionnaire_grid and 406_passport_mrz_page stop failing t01 and t12, 79_inr_indian_digit_grouping_table stops failing t01, 392_statistical_console_output stops failing t12. Clean 182 of 213 (85.4%) -> 186 of 213 (87.3%). The other two documents that declare a control character inside a source token, balance-sheet-and-profit-loss and balance-sheet-two-columns-of-figures, still PASS t01. regress.py --check PASS. test_txt_checks.py 8/8."
   ],
   "requeues": 0,
   "status": "OPEN"

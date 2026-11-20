@@ -1,4 +1,3 @@
-| 12 Nov 13:15 | baseline | measured mutual-fund-statement 43/59 docx, mutual-fund-statement.txt 4/5 txt |
 | 12 Nov 13:15 | baseline | measured newsletter-3col-header-footer 40/59 docx, newsletter-3col-header-footer.txt 4/5 txt |
 | 12 Nov 13:15 | baseline | measured newspaper-2col-fullwidth-headline 37/59 docx, newspaper-2col-fullwidth-headline.txt 4/5 txt |
 | 12 Nov 13:16 | baseline | measured one-page-rotated-180-degrees 40/59 docx, one-page-rotated-180-degrees.txt 3/5 txt |
@@ -198,3 +197,4 @@
 | 20 Nov 20:59 | fixer | attempt t01_word_accuracy -> reverted (0/10 moved) |
 | 20 Nov 21:22 | fixer | attempt t01_word_accuracy -> kept (3/10 moved) |
 | 20 Nov 21:46 | fixer | attempt t01_word_accuracy -> reverted (0/10 moved) |
+| 20 Nov 21:49 | fixer | attempt t01_word_accuracy -> kept (0/10 moved) |

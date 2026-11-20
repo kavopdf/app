@@ -1114,3 +1114,19 @@
 {"t": 1795191510.8187292, "ist": "21:48:30", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795191511.9095385, "ist": "21:48:31", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795191512.2829995, "ist": "21:48:32", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795191529.567286, "ist": "21:48:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795191533.2897258, "ist": "21:48:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795191535.4314184, "ist": "21:48:55", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795191549.479055, "ist": "21:49:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795191549.7515452, "ist": "21:49:09", "ev": "attempt", "d": "t01_word_accuracy -> kept"}
+{"t": 1795191549.847919, "ist": "21:49:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795191549.9731362, "ist": "21:49:09", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795191552.6150353, "ist": "21:49:12", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795191553.787174, "ist": "21:49:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795191558.1996, "ist": "21:49:18", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795191559.0258954, "ist": "21:49:19", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795191559.3437645, "ist": "21:49:19", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795191573.6416233, "ist": "21:49:33", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795191574.878884, "ist": "21:49:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795191575.7410014, "ist": "21:49:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795191576.0354476, "ist": "21:49:36", "ev": "beat", "d": "report.py: building the report"}

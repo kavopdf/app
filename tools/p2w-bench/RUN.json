@@ -4,8 +4,8 @@
  "ended_ts": null,
  "ended": null,
  "class": "t01_word_accuracy",
- "attempts": 3,
- "kept": 1,
+ "attempts": 4,
+ "kept": 2,
  "docs_improved": 3,
  "agents": [
   "t01_verifier-tokenisation-01",
@@ -17,6 +17,11 @@
   [
    "t01_word_accuracy",
    3
+  ],
+  [
+   "t01_word_accuracy",
+   0
   ]
- ]
+ ],
+ "ratchets": 1
 }
