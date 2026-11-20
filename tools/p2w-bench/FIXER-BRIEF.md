@@ -766,3 +766,31 @@ Google says.
 * `FINDINGS/rules-top-border-FLOW-NEUTRAL-065000-f1x.patch` is a flow-neutral construct that measures
   exactly baseline on eight documents. It places zero borders because its guards decline every rule it
   can reach - **loosen them and let the gate above decide.**
+
+---
+
+## WHAT TO SEND A SUBAGENT. NOT A FACT, A PROBLEM.
+
+Measured 20 Nov from the run's own report: both agents were deployed at 08:58 and both landed at 09:05 -
+**seven minutes each** - sent to find:
+
+    contA-08  "is the rule-as-drawing construct still in the engine"
+    contB-08  "how much of 18_displacement the rule construct can explain"
+
+The first is a `grep`. It has a one-line answer and an agent given it returns in seven minutes having
+found nothing, because there is nothing to find. **A subagent is not a search box.** If the question can
+be answered by reading one file, read the file - do not spend a slot on it.
+
+**Send a subagent the thing you cannot do yourself in the time you have:**
+
+    BAD   "is X still in the engine"                 -> grep, 2 minutes, no result
+    BAD   "how much does X explain"                  -> one measurement, no result
+    GOOD  "the rules in table rows never reach the paragraph path. Find a construct that
+           writes a table row's rule as a border without moving the row, and prove it on
+           bank-statement-horizontal-rules-only without regressing it."
+
+A good brief names **the blocker**, **the document to prove it on**, and **what would count as success**.
+Two agents working a real blocker for the whole slot are worth more than ten answering greps.
+
+**And deploy them in the first ten minutes, before your own attempt** - not at 08:58 when the slot is
+already half spent. Their whole value is that they work in parallel with you, not after you.

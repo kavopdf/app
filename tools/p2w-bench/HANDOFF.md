@@ -1,4 +1,31 @@
-# HANDOFF - read this before you pick a class
+# HANDOFF — read this before touching anything
+
+## STOP ATTACKING `content-present-partly-displaced`. IT HAS 14 ATTEMPTS AND ZERO KEPT.
+
+Measured 20 Nov from `ATTEMPTS.json`: that class has **14 attempts**, all reverted. The rules-as-border
+construct has now absorbed four more on top of that. The last one applied cleanly, had its guard loosened
+twice, placed 3 borders on `bank-statement-horizontal-rules-only`, and the screen said **23 documents
+measured, 0 better, 8 worse** — and the eight that got worse are exactly the ones where a border was
+actually placed. That is not a guard problem. A border placed well still costs the flow, and the class
+cannot be won by loosening anything.
+
+**36 of the 39 rules in that document belong to table rows**, which are written by the table path and
+never reach the paragraph path at all — so the pending rule set for them is overwritten before anything
+consumes it. A paragraph-only fix cannot reach them, and the table path is a separate construct.
+
+## THREE CLASSES HAVE A CLEAN GAP AND HAVE NEVER BEEN TRIED
+
+The gate refuses a change that makes LibreOffice worse. A class where LibreOffice is already clean cannot
+lose that way — the gate has nothing to refuse. From the same 192 paired results:
+
+| class | Google fails | LibreOffice fails | attempted |
+|---|---:|---:|---|
+| `25_invisible_text` | **49** | 1 | **never** |
+| `13_text_colours` | **32** | 1 | **never** |
+| `27_text_off_page` | **17** | 3 | **never** |
+
+**Take `25_invisible_text` first.** 49 documents, one LibreOffice failure, no attempt ever made. That is
+the largest untouched, gate-safe class in the corpus, and it is worth more than a fifth run at the rules.
 
 Written by handoff.py on every claim, every attempt, every agent and every release.
 It is never more than one attempt old. If the claim in ROUND.json is older than the
