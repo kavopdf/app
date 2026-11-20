@@ -44,10 +44,37 @@ def load(d):
     return out
 
 
+PAGE_CLASS = "00_page_count"
+
+
 def counts():
     g, l = load(G), load(L)
     paired = sorted(set(g) & set(l))
     gf, lf = {}, {}
+    # A PAGE-COUNT MISMATCH IS THE WORST DEFECT THERE IS, AND IT WAS BEING THROWN AWAY.
+    #
+    # gverify.py writes status page_count_refused when Google reflows the document onto a different
+    # number of pages, and its own comment says why: "A REFUSAL, NOT A RESULT." That is right as a
+    # measurement - a pixel score against the wrong page count means nothing - but it meant those
+    # documents were then invisible: not scored, so not failing, so in no class, so no run ever looked
+    # at them. Measured 20 Nov: 21 of 213.
+    #
+    # The user's own words: "original pdf me kai me sirf 1 page hai jabki docs me 2 page hai" - extra
+    # pages are a defect. So a reflowed document is counted as failing its own class, at the top of the
+    # table, where the rotation will reach it.
+    # load() drops refused documents on purpose - they have no score. Read them separately, or the
+    # class that exists to make them visible is empty. That is what happened on the first attempt.
+    g_refused = set()
+    for _f in glob.glob(os.path.join(G, "*.json")):
+        try:
+            _j = json.load(open(_f, encoding="utf-8"))
+        except Exception:
+            continue
+        if _j.get("status") == "page_count_refused":
+            g_refused.add(_j.get("name") or os.path.basename(_f)[:-5])
+    for n in g_refused:
+        gf[PAGE_CLASS] = gf.get(PAGE_CLASS, 0) + 1
+        lf[PAGE_CLASS] = lf.get(PAGE_CLASS, 0) + 1 if l.get(n, {}).get("status") == "page_count_refused" else lf.get(PAGE_CLASS, 0)
     for n in paired:
         for c in (g[n].get("failed") or []):
             gf[c] = gf.get(c, 0) + 1
