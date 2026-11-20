@@ -20,7 +20,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> Do not apply the FFFD patch first. Render page 1 of 041122-Account_Opening_Form at 150 DPI and look at the 127 glyph sites - ligature or not decides whether the patch is right. Read FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md. If ligature, the fix is CIDToGIDMap plus the descendant cmap; if not, apply FINDINGS/fffd-cmap-destination-2300-fixer.patch and budget the whole slot for p2w.py --budget 250 to completion, then restamp_txt.py --run/--apply, classrow.py --write, regress.py --check.
+> The 127 U+FFFD on the two bank forms are SETTLED on both sides: the glyphs are ff/fi/ffi/ffl, read from the FontFile2 outlines, and the ligature IDENTITY is not in the file - no cmap in any of 303 embedded programs, no glyph names, no GSUB, and both the /W widths and the glyf outlines leave ffi vs ffl and fi vs fl ambiguous. FINDINGS/ligature-identity-UNRECOVERABLE-2350.md has the numbers; do not rebuild a width or outline matcher. What is left for those two documents is t06_encoding (127 U+FFFD in the .txt), t08_line_order (40 of 461 out of order) and t09_page_furniture (197 where 21 are owed) - the .docx/.txt writer, not the font. t01_word_accuracy now holds 5 documents: 38_faux_bold_italic_synthesised, 39_small_caps_letter_spacing, 411_nested_xobject_transforms, 601_fillable_admission_form and 77_arabic_rtl_document. Two of those five is the bar. 38 loses the SECOND draw of its title - the source carries 'PROJECT REPORT - CIVIL' twice because faux bold strokes the fill, and our .txt carries it once, which is right; that is a source-side duplicate, and the 21:46 attempt that collapsed identical spans was REJECTED, so it needs a different construct. 411 loses 'S' and 'O': pymupdf and PDFBox disagree about a nested form's /Matrix and the rotated line runs off the page (y to -16.4). 601 loses two ZapfDingbats checkmarks that PDFBox never delivers - they are drawn in a widget appearance stream, and the source calls a tick '3', so both sides need the same fix or neither is honest.
 
 ## Agents deployed and not yet accounted for
 
@@ -62,16 +62,14 @@ unfinished work, not as a result.
 | t01_writer-word-drop-01 | t01_word_accuracy | writer-word-drop | Which construct in TxtWriter.java/PdfToWord.java drops words the PDF d | 21:02 | a ranked table with file:line, the exact condition, measured evidence and the minimal fix | landed | No writer drop on either measurable document: 041122's 131 lost tokens are 127 ligature U+FFFD plus 4 genuine; the filled form's 145 are the same 127 plus 18 widget values counted twice by the source. Measured negatives that remove possibilities permanently: nested XObject with a scaling CTM LOST 0, Arabic through logicalOrder LOST 0 (length-preserving), below-paper LOST 0, letterspacing 0.16-0.30em identical both sides. Also: clipToPaper() is dead code and the live filter uses the CropBox ignoring its offset - a page whose CropBox origin is not (0,0) drops visible text (measured: VISIBLE -> V). |
 | t01_ToUnicode CMap destination-01 | t01_word_accuracy | ToUnicode CMap destination | Is the U+FFFD the CMap's own answer or a parse failure, and what is th | 22:39 | the root cause with file:line and a patch proven on the two documents | landed | FINDINGS/t01_word_accuracy-FFFD-CMAP-2300-fixer.md |
 | t01_adversarial patch review-01 | t01_word_accuracy | adversarial patch review | How can this Identity-H recovery write wrong text into the document? | 22:43 | a ranked list of regression risks with a one-line test each | landed | FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md |
+| t01_A-01 | t01_word_accuracy | A | is the U+FFFD glyph a ligature or a single letter, read from the embed | 23:20 | 23:00 | landed | FINDINGS/ligature-identity-UNRECOVERABLE-2350.md |
+| t01_B-01 | t01_word_accuracy | B | how many of the 213 documents a cmap-based recovery would reach, and d | 23:20 | 23:04 | landed | FINDINGS/ligature-identity-UNRECOVERABLE-2350.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `19:31` agent deployed: t13 / itr weld fix - implement and measure the TxtWriter change that clears itr-computation-with-slab
-- `19:31` agent landed: t13 / column census -> tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md
-- `19:31` agent landed: t13 / itr weld fix -> tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md
-- `19:33` attempt 1 on t08_line_order -> reverted (0/10 moved)
 - `19:33` attempt 2 on t08_line_order -> reverted (0/10 moved)
 - `20:28` attempt 9 on 47_margins -> reverted (0/14 moved)
 - `20:44` attempt 10 on 47_margins -> reverted (0/14 moved)
@@ -93,6 +91,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `22:43` agent deployed: t01_word_accuracy / adversarial patch review - How can this Identity-H recovery write wrong text into the document?
 - `22:43` agent landed: t01_word_accuracy / adversarial patch review -> FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md
 - `23:16` attempt 6 on t01_word_accuracy -> kept (2/7 moved)
+- `23:20` agent deployed: t01_word_accuracy / A - is the U+FFFD glyph a ligature or a single letter, read from the embedded outlin
+- `23:20` agent deployed: t01_word_accuracy / B - how many of the 213 documents a cmap-based recovery would reach, and does any em
+- `23:20` agent landed: t01_word_accuracy / A -> FINDINGS/ligature-identity-UNRECOVERABLE-2350.md
+- `23:20` agent landed: t01_word_accuracy / B -> FINDINGS/ligature-identity-UNRECOVERABLE-2350.md
 
 ## Where the rest of the state lives
 
