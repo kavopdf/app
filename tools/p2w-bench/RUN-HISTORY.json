@@ -159,5 +159,19 @@
   "needs_human": 0,
   "partial": 1,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795134093.113132,
+  "started": "05:51",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "content-present-partly-displaced",
+  "attempts": 2,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

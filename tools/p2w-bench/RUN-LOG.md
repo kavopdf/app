@@ -198,3 +198,4 @@
 | 20 Nov 05:51 | fixer | slot claimed - fixer running |
 | 20 Nov 05:53 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |
 | 20 Nov 06:20 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |
+| 20 Nov 06:21 | fixer | slot FORCED released - see INCIDENTS.md for why |
