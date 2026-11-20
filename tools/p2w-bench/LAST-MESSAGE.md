@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 10:51 → running IST · 1h 10m**
+**20 Nov 2026 · slot 10:51 → 12:03 IST · 1h 12m**
 
 > **t13\_amount\_columns** went from 18 documents to 6, and two constructs were kept. The gate itself was the reason the .txt half could never land a commit, and that is fixed too.
 
@@ -64,9 +64,9 @@ not that nobody tried, but that nothing a .txt run produced could be committed.
 
 | | |
 |:--|:--|
-| Slot window | 10:51 → running · 1h 10m |
+| Slot window | 10:51 → 12:03 · 1h 12m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 22 |
+| Tool beats | 29 |
 | Longest silence | **58.6 min** — from 10:52:49, after `classrow.py: refreshing the class file` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 need a human |
@@ -76,9 +76,9 @@ not that nobody tried, but that nothing a .txt run produced could be committed.
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **1h 07m** | `#####################` |
+| fix - diagnose and change the engine | **1h 07m** | `####################` |
 | record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
+| report - the report and the chain | **2 min** | `#` |
 
 ## Next run
 

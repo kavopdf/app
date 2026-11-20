@@ -198,3 +198,4 @@
 | 20 Nov 10:52 | fixer | attempt t13_amount_columns -> error |
 | 20 Nov 11:51 | fixer | attempt t13_amount_columns -> kept (10/18 moved) |
 | 20 Nov 11:59 | fixer | attempt t13_amount_columns -> kept (2/18 moved) |
+| 20 Nov 12:03 | fixer | slot FORCED released - see INCIDENTS.md for why |

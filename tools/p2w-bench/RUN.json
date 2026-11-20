@@ -1,8 +1,8 @@
 {
  "started_ts": 1795152088.1033015,
  "started": "10:51",
- "ended_ts": null,
- "ended": null,
+ "ended_ts": 1795156436.1270914,
+ "ended": "12:03",
  "class": "t13_amount_columns",
  "attempts": 3,
  "kept": 2,
