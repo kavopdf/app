@@ -428,7 +428,10 @@ def verify_versions_intact(text, cmds):
     # shape and made a correct watchdog report fail - the check refused a report for stating the age
     # of a stage. Only a bare dotted token counts.
     UNIT = r"\s*(?:h|hr|hrs|min|mins|s|sec|pt|px|%|MB|KB|GB|d|day|days)\b"
-    for m in re.finditer(r"(?<![\w.])\d{1,2}\.\d{1,3}(?:\.\d{1,3})?(?!\w|\.\d)", text):
+    # ANY LENGTH, SAME AS THE INTEGER SCAN. This required 1-2 digits before the dot, so a fabricated
+    # version 987654.1 matched neither this check (wrong shape) nor the integer scan (the lookarounds
+    # reject a dotted token) and passed as "every number is one the tool printed".
+    for m in re.finditer(r"(?<![\w.])\d+(?:\.\d+)+(?!\w|\.\d)", text):
         v = m.group(0)
         if re.match(UNIT, text[m.end():m.end() + 8], re.I):
             continue
