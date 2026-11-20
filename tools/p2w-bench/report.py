@@ -128,6 +128,34 @@ def this_run():
 
 
 
+def google_fixed():
+    """What GOOGLE calls fixed: a document that passes every applicable check in its renderer.
+
+    THE REPORT'S "Fixed to 99%" WAS A LIBREOFFICE CLAIM. It read share5 <= 1.0 from RANKING.csv, a
+    soffice render - and LibreOffice draws constructs Google drops, so a document can be perfect there
+    and broken for the user. Measured 20 Nov: the report said 153 of 213 fixed while Google passed all
+    42 checks on 7 of the 192 it could measure.
+
+    The user's rule, in his words: "poore fixing google ke according hee karna, jo documents google ki
+    render par original document se 99% ya usse zyada match karega wahi documents fix mana jaayega".
+    So Google's count is the headline and the LibreOffice count is shown beside it as the proxy it is.
+    """
+    import glob as _g
+    fixed = scored = 0
+    for f in _g.glob(os.path.join(ROOT, "benchmarks", "gverify", "*.json")):
+        try:
+            j = json.load(open(f, encoding="utf-8"))
+        except Exception:
+            continue
+        if j.get("status") == "page_count_refused":
+            continue
+        scored += 1
+        if not (j.get("failed") or []):
+            fixed += 1
+    return fixed, scored
+
+
+
 def run_docs():
     """The documents whose score changed inside THIS run's window.
 
@@ -236,7 +264,9 @@ def corpus():
     # this field was the only one available, and the fixer then copied it into a sentence about the
     # corpus. Both numbers are reported now, each under the name that says what it counts.
     corpus_total = len(c)
+    _gf, _gs = google_fixed()
     return {"available": True, "docs": corpus_total, "compared": len(common),
+            "google_fixed": _gf, "google_scored": _gs,
             "fixed": len(fixed), "moved_open": len(moved_open),
             "still_open": len([k for k in common if c[k] > FIXED_BAR]),
             "baseline_mean": round(bm, 2), "current_mean": round(cm, 2),
@@ -828,7 +858,14 @@ def main(argv):
                  % ("**none**" if not co["regressed"] else "**%d** — %s"
                     % (co["regressed"], ", ".join(x["doc"] for x in best[:3]) or "see RANKING.csv")))
         L.append("| Exempt, not measured | **%d** — %s |" % (len(_exempt()), ", ".join(_exempt()) or "none"))
-        L.append("| **Fixed to 99%%** | **%d** of %d — the rest are still off |" % (co.get("fixed", 0), co.get("docs", 0)))
+        # GOOGLE FIRST. The user's rule: a document is fixed when it matches the original in
+        # Google's render at 99% or better. The LibreOffice count is a proxy and is labelled as one,
+        # because LibreOffice draws what Google drops and 32-vs-7 on the same corpus is not a rounding
+        # difference - it is two different products.
+        L.append("| **Fixed - Google, all 42 checks** | **%d** of %d measured |"
+                 % (co.get("google_fixed", 0), co.get("google_scored", 0)))
+        L.append("| Fixed - LibreOffice proxy | %d of %d - a renderer the user does not open |"
+                 % (co.get("fixed", 0), co.get("docs", 0)))
         L.append("| Moved but still open | **%d** — improved, not fixed |" % co.get("moved_open", 0))
     else:
         L.append("| Corpus improvement | not measurable — %s |" % co.get("why"))

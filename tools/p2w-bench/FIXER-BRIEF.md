@@ -922,3 +922,44 @@ The whole loop, in order:
 
 **Never edit `verify_txt.py` to move a number.** It is the instrument. If a check is wrong, that is a
 finding to write down.
+
+---
+
+## WHAT "FIXED" MEANS. GOOGLE, NOT LIBREOFFICE.
+
+The user's words, 20 Nov:
+
+> "fixer ko yeh baat pta hona chahiye ki LO me jo cheez support karta hai jaruri nhi google me uska
+> support ho kyunki google me bohot limited cheez ka support hota hai aur hamara primary render google
+> ka hee hai toh poora fixing google ke according hee karna jo documents google ki render par original
+> document se 99% ya usse zyada match karega wahi documents fix mana jaayega"
+
+**A document is fixed when it matches the original in Google's render at 99% or better. Nothing else
+counts.** Not a LibreOffice render, not a soffice pixel score, not a share@5 from RANKING.csv.
+
+### Why this is not a nuance
+
+The same corpus, the same engine, the same day:
+
+| | documents fixed |
+|---|---:|
+| LibreOffice, `share5 <= 1.0` | **32 of 213** |
+| Google, all 42 checks pass | **7 of 192 measured** |
+
+LibreOffice draws constructs Google drops. A rule written as a floating `<w:drawing>` is drawn exactly
+where the PDF drew it by LibreOffice and **silently discarded by Google** — so the document is perfect in
+a renderer nobody opens and broken in the one the user has. 145 documents fail `32_stroke_lines` in
+Google against 1 in LibreOffice.
+
+### What this means for you
+
+* **The report now leads with Google's number.** "Fixed - Google, all 42 checks" is the real one;
+  "Fixed - LibreOffice proxy" is shown beside it and labelled as a renderer the user does not open.
+* **Never report a LibreOffice improvement as a fix.** A soffice score that falls while Google is
+  unchanged is not progress, it is a measurement of the wrong product.
+* **A construct LibreOffice supports is not a construct you can use.** Check whether Google keeps it
+  before building on it. `FINDINGS/GOOGLE-IGNORES-CHARACTER-WIDTH-2424.md` and
+  `FINDINGS/RULES-ARE-DRAWINGS-GOOGLE-DROPS-THEM.md` are two measured examples.
+* **The gate already allows a LibreOffice regression when Google improved on the same document.** That
+  is the same rule from the other side: Google decides, LibreOffice is a proxy that must not block a fix
+  the user will actually see.
