@@ -514,11 +514,28 @@ def main(argv):
         _i = argv.index("--for") + 1
         if _i < len(argv):
             _for = argv[_i].strip().lower()
+    # A GENERATED REPORT SAYS WHICH CRON IT IS. `--for` is still the explicit way, but every report
+    # cronreport.py prints starts with its own title, so a run that forgets the flag - or whose prompt
+    # predates it - is still checked against the right sources instead of falling through to report.py's
+    # fixer check and being refused for not having a slot window.
+    if not _for:
+        _title = text.lstrip().split("\n", 1)[0].lower()
+        for _key, _pat in (("baseline", "baseline - run report"),
+                           ("classifier", "classifier - run report"),
+                           ("gverify", "google verify - run report"),
+                           ("health", "watchdog - run report"),
+                           ("apk", "apk - run report")):
+            if _pat in _title:
+                _for = _key
+                break
     if _for in ("gverify", "health", "apk", "baseline", "classifier"):
         _cmds = _CMDS.get(_for, [])
         _p = (verify_not_a_transcript(text)
               + verify_names_intact(text, _cmds)
-              + verify_versions_intact(text, _cmds)
+              # A DECIMAL SCORE IS NOT A VERSION. 39.7, 3.71 and 39.73 are share@5 means and the
+              # version check refused a correct baseline report for them. Only the APK cron has a
+              # version that is a fact worth checking whole.
+              + (verify_versions_intact(text, _cmds) if _for == "apk" else [])
               + verify_for(_for, text))
         if _p:
             print("REFUSED - %d number(s) in this %s report are not in the tool output:" % (len(_p), _for))
