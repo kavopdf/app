@@ -1,31 +1,4 @@
-# HANDOFF — read this before touching anything
-
-## STOP ATTACKING `content-present-partly-displaced`. IT HAS 14 ATTEMPTS AND ZERO KEPT.
-
-Measured 20 Nov from `ATTEMPTS.json`: that class has **14 attempts**, all reverted. The rules-as-border
-construct has now absorbed four more on top of that. The last one applied cleanly, had its guard loosened
-twice, placed 3 borders on `bank-statement-horizontal-rules-only`, and the screen said **23 documents
-measured, 0 better, 8 worse** — and the eight that got worse are exactly the ones where a border was
-actually placed. That is not a guard problem. A border placed well still costs the flow, and the class
-cannot be won by loosening anything.
-
-**36 of the 39 rules in that document belong to table rows**, which are written by the table path and
-never reach the paragraph path at all — so the pending rule set for them is overwritten before anything
-consumes it. A paragraph-only fix cannot reach them, and the table path is a separate construct.
-
-## THREE CLASSES HAVE A CLEAN GAP AND HAVE NEVER BEEN TRIED
-
-The gate refuses a change that makes LibreOffice worse. A class where LibreOffice is already clean cannot
-lose that way — the gate has nothing to refuse. From the same 192 paired results:
-
-| class | Google fails | LibreOffice fails | attempted |
-|---|---:|---:|---|
-| `25_invisible_text` | **49** | 1 | **never** |
-| `13_text_colours` | **32** | 1 | **never** |
-| `27_text_off_page` | **17** | 3 | **never** |
-
-**Take `25_invisible_text` first.** 49 documents, one LibreOffice failure, no attempt ever made. That is
-the largest untouched, gate-safe class in the corpus, and it is worth more than a fifth run at the rules.
+# HANDOFF - read this before you pick a class
 
 Written by handoff.py on every claim, every attempt, every agent and every release.
 It is never more than one attempt old. If the claim in ROUND.json is older than the
@@ -36,18 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 08:52 |
-| ended | 09:24 |
-| how it ended | forced |
+| started | 09:58 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> Attempt 14 reverted. The pBdr patch applies and its guard was relaxed twice; the guard is not the ceiling - the paragraph hook is. Screen 23/23: 0 better, 8 worse, and the 8 worse are the documents where a border actually got placed, so placement accounting is not yet free. scipy was missing on this pod and cost two 280s calls in prerender; install it first.
+> Two attempts on 18_displacement, both reverted, both carrying measured facts. (1) the table-spacer construct named by both agents is NOT the cause and forcing its gap into w:before REGRESSES Google 40/47 -> 36/47 on bank-statement-5-pages (LO unchanged 47/47). (2) the real cause is w:before being dropped at page top by Google; proven by a 5-variant probe. The corpus reproduces exactly in LibreOffice against the committed gverify-lo records (362_price_list_dense 42/42, purchase-order 46/47, mobile-bill 47/47, bank-statement-5-pages 47/47 - all MATCH), so the sandbox can measure for real.
 
 ## What the next run should do first
 
-> the rule class is a TABLE-PATH job, not a guard job: 36 of 39 rules on bank-statement-horizontal-rules-only belong to table rows and never reach flowFromBox, so give the rule to the row or cell (w:tcBorders top) instead of loosening the guard again. Verify per document by counting w:pBdr in word/document.xml before screening - a count of 0 means the change is not being exercised
+> 18_displacement is a PAGE-TOP construct, and it is now proven: Google Docs DROPS w:before on the first paragraph after a w:br w:type=page. The engine emits the page's top gap exactly there (bank-statement-5-pages: w:before=1103 twips = 55.15 pt) and Google's measured dy on pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Fix: emit that gap as a 1x1 table row with w:trHeight w:val=<gapTw> w:hRule=exact right after the page break, and set the paragraph's w:before to 0. Probe measured 55.83 pt of 55.15 asked in Google and exact in LibreOffice; w:before 0.33 pt; w:line exact 11.89 pt. See FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md. LibreOffice CANNOT see this fix - it already places w:before correctly - so judge it only through Drive.
 
 ## Agents deployed and not yet accounted for
 
@@ -71,16 +44,14 @@ unfinished work, not as a result.
 | contA-07 | content-partly-lost | A | is the justified-line spacing fix missing from the engine or already l | 07:59 | landed | landed | tools/p2w-bench/FINDINGS/content-partly-lost-JUSTIFY-already-landed-0700-f1x.md |
 | contA-08 | content-present-partly-displaced | A | is the rule-as-drawing construct still in the engine and is the pBdr p | 08:58 | 09:00 | landed | FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md |
 | contB-08 | content-present-partly-displaced | B | how much of 18_displacement the rule construct can explain, and which  | 08:58 | 09:00 | landed | FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md |
+| 18_dA-01 | 18_displacement | A | Quantify the dy signature: across the Google renders that fail 18_disp | 09:59 | expected by 10:45 | running |  |
+| 18_dB-01 | 18_displacement | B | Find the engine code path that decides each line's vertical position i | 09:59 | expected by 10:45 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `03:41` One fix landed: recutColumnBands takes the row top as the minimum over the columns (64_newspaper 9.11 -> 3.46, corpus 212/212 with nothing worse, .txt 213 unchanged, gate PASS, commits 4e61dfd and 97e2e1f). Two things for the next run: (1) the class queue was stale by one run - the carry-over named 75_merged_header_cell_three_columns at 27.31 when the previous run had already taken it to 7.62 and reclassified it to content-partly-lost-and-displaced; always re-read RANKING.csv before believing the carry-over. (2) The corpus pass in p2w.py cannot finish inside a sandbox command and does not resume - it re-converts from zero every call because it measures ROOT/repo, not the working tree. screen.py --docs with the whole RANKING list DOES resume and measures the working tree including the uncommitted diff; 212 of 213 took 9 calls. Build RANKING.csv from screen-out/dist/*.json. Two documents block a batch: Account_Opening_Form_Fillable_filled and one-page-rotated-180-degrees must be measured alone or they eat the whole budget. The .txt half re-scores from screen-out/*.txt copied into /scratch/work/p2w/out after deleting txt/RESTAMP-TXT.jsonl.
-- `03:42` Slot released with --force: one agent was deployed, not two. A subagent in a scheduled run runs synchronously inside the turn (background=true still blocks), and the one deployed spent 26 minutes instrumenting the newspaper page - it found the mechanism that became the fix, but a second would have eaten the ratchet budget. The gate's agent rule counts registrations, and this run's agent was never registered with --agent-add before it was deployed; do that first next time.
-- `03:54` agent deployed: content-present-partly-displaced / A - after rules become w:pBdr, which construct still emits the U+200B anchor at y~79
-- `03:54` agent deployed: content-present-partly-displaced / B - mobile-bill share5 43.87 and electricity-bill 46.85 with max_pt only 1.55/1.33: 
 - `04:03` attempt 9 on content-present-partly-displaced -> error (0/23 moved)
 - `04:03` health.py: _age() now takes the last COMMIT time of the path, not mtime (every cron clones fresh, so every mtime was the clone's, and the report read 0.0 h for all five stages while --stalled could never turn red). _attempts_recent() now parses the ledger's IST stamps with calendar.timegm - IST_OFFSET instead of time.mktime, which read them as pod-local UTC and put every attempt 5.5 h in the future: the watchdog's '6 attempt(s) in 3 h' was 2. Verified: ages 0.0 h -> 0.4 h on all five stages, attempts 6 -> 2. Both blockers closed in BLOCKERS.md.
 - `04:04` agent landed: contA-06 /  -> FINDINGS/content-present-partly-displaced-zerowidth-040040-7c1e.md
@@ -102,6 +73,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `09:22` agent landed: content-present-partly-displaced / A -> FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md
 - `09:22` agent deployed: content-present-partly-displaced / B - how much of 18_displacement the rule construct can explain, and which displaceme
 - `09:22` agent landed: content-present-partly-displaced / B -> FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md
+- `09:59` agent deployed: 18_displacement / A - Quantify the dy signature: across the Google renders that fail 18_displacement, 
+- `09:59` agent deployed: 18_displacement / B - Find the engine code path that decides each line's vertical position in the emit
+- `10:36` attempt 1 on 18_displacement -> reverted (0/107 moved)
+- `10:38` attempt 2 on 18_displacement -> reverted (0/107 moved)
 
 ## Where the rest of the state lives
 

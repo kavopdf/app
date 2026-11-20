@@ -360,9 +360,25 @@
   {
    "at": "09:22",
    "text": "agent landed: content-present-partly-displaced / B -> FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md"
+  },
+  {
+   "at": "09:59",
+   "text": "agent deployed: 18_displacement / A - Quantify the dy signature: across the Google renders that fail 18_displacement, "
+  },
+  {
+   "at": "09:59",
+   "text": "agent deployed: 18_displacement / B - Find the engine code path that decides each line's vertical position in the emit"
+  },
+  {
+   "at": "10:36",
+   "text": "attempt 1 on 18_displacement -> reverted (0/107 moved)"
+  },
+  {
+   "at": "10:38",
+   "text": "attempt 2 on 18_displacement -> reverted (0/107 moved)"
   }
  ],
- "next": "the rule class is a TABLE-PATH job, not a guard job: 36 of 39 rules on bank-statement-horizontal-rules-only belong to table rows and never reach flowFromBox, so give the rule to the row or cell (w:tcBorders top) instead of loosening the guard again. Verify per document by counting w:pBdr in word/document.xml before screening - a count of 0 means the change is not being exercised",
+ "next": "18_displacement is a PAGE-TOP construct, and it is now proven: Google Docs DROPS w:before on the first paragraph after a w:br w:type=page. The engine emits the page's top gap exactly there (bank-statement-5-pages: w:before=1103 twips = 55.15 pt) and Google's measured dy on pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Fix: emit that gap as a 1x1 table row with w:trHeight w:val=<gapTw> w:hRule=exact right after the page break, and set the paragraph's w:before to 0. Probe measured 55.83 pt of 55.15 asked in Google and exact in LibreOffice; w:before 0.33 pt; w:line exact 11.89 pt. See FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md. LibreOffice CANNOT see this fix - it already places w:before correctly - so judge it only through Drive.",
  "agents": [
   {
    "id": "contA-01",
@@ -567,12 +583,34 @@
    "finding": "FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md",
    "deployed_at": "2026-11-20T08:58",
    "landed_at": "2026-11-20T09:05"
+  },
+  {
+   "id": "18_dA-01",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "Quantify the dy signature: across the Google renders that fail 18_displacement, is the displacement a whole-page uniform shift, a progressive drift down the page, or per-line scatter? Determine which construct in word/document.xml carries it (w:spacing line/lineRule, w:before/w:after, empty spacer paragraphs, w:ind firstLine/hanging) by correlating with the per-page n_out and worst_here numbers. Deliver a FINDINGS file with the distribution and the named construct.",
+   "expected": "expected by 10:45",
+   "deployed": "09:59",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-20T04:29"
+  },
+  {
+   "id": "18_dB-01",
+   "class": "18_displacement",
+   "angle": "B",
+   "question": "Find the engine code path that decides each line's vertical position in the emitted docx (PdfToWord.java / DocxWriter.java): where w:spacing, w:before/w:after, exact line rules, spacer paragraphs and page margins are written. State for each whether Google Docs would honour it, and name the one construct most likely to make Google place 125 documents' lines outside a clamp(0.35em,1.5,4.5)pt tolerance when LibreOffice keeps 173 of them inside. Deliver a FINDINGS file naming file:line.",
+   "expected": "expected by 10:45",
+   "deployed": "09:59",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-20T04:29"
   }
  ],
  "run": {
-  "started": "08:52",
-  "ended": "09:24",
-  "ended_how": "forced"
+  "started": "09:58",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {
@@ -671,7 +709,7 @@
    "plan": ""
   }
  ],
- "context": "Attempt 14 reverted. The pBdr patch applies and its guard was relaxed twice; the guard is not the ceiling - the paragraph hook is. Screen 23/23: 0 better, 8 worse, and the 8 worse are the documents where a border actually got placed, so placement accounting is not yet free. scipy was missing on this pod and cost two 280s calls in prerender; install it first.",
+ "context": "Two attempts on 18_displacement, both reverted, both carrying measured facts. (1) the table-spacer construct named by both agents is NOT the cause and forcing its gap into w:before REGRESSES Google 40/47 -> 36/47 on bank-statement-5-pages (LO unchanged 47/47). (2) the real cause is w:before being dropped at page top by Google; proven by a 5-variant probe. The corpus reproduces exactly in LibreOffice against the committed gverify-lo records (362_price_list_dense 42/42, purchase-order 46/47, mobile-bill 47/47, bank-statement-5-pages 47/47 - all MATCH), so the sandbox can measure for real.",
  "needs_human": [],
- "next_class": "bank-statement-horizontal-rules-only"
+ "next_class": "bank-statement-5-pages"
 }
