@@ -693,3 +693,6 @@
 {"t": 1795141821.1855242, "ist": "08:00:21", "ev": "attempt", "d": "content-partly-lost-and-displaced -> kept"}
 {"t": 1795141821.2823596, "ist": "08:00:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795141821.383265, "ist": "08:00:21", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795141847.696048, "ist": "08:00:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795141849.6874173, "ist": "08:00:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795141872.824812, "ist": "08:01:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
