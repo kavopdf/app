@@ -6,18 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 06:56 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 06:56 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
-| 13 Nov 06:56 | fixer | ratchet | held or rose |
-| 13 Nov 06:56 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 06:56 | ? | commit-gate | started |
-| 13 Nov 06:57 | fixer | claim | fixer claimed the slot |
-| 13 Nov 06:57 | fixer | build-engine | started |
-| 13 Nov 07:00 | fixer | ratchet | REGRESSED 7 |
-| 13 Nov 07:00 | fixer | hypothesis | 20_within_10pt (+4) -> ruled-out |
-| 13 Nov 07:00 | fixer | hypothesis | 20_within_10pt (+4) -> untested |
-| 13 Nov 07:00 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
-| 13 Nov 07:00 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 07:00 | fixer | commit-gate | started |
 | 13 Nov 07:00 | ? | commit-gate | started |
 | 13 Nov 07:40 | fixer | claim | fixer claimed the slot |
@@ -406,3 +394,15 @@
 | 20 Nov 07:13 | fixer | attempt | content-partly-lost-and-displaced -> partial (1/6 moved) |
 | 20 Nov 07:59 | fixer | attempt | content-partly-lost-and-displaced -> kept (1/6 moved) |
 | 20 Nov 08:00 | fixer | attempt | content-partly-lost-and-displaced -> kept (1/6 moved) |
+| 20 Nov 08:52 | fixer | claim | fixer claimed the slot |
+| 20 Nov 08:59 | fixer | build-engine | started |
+| 20 Nov 09:00 | fixer | build-engine | engine built in 35s |
+| 20 Nov 09:00 | fixer | build-engine | started |
+| 20 Nov 09:01 | fixer | build-engine | engine built in 35s |
+| 20 Nov 09:15 | fixer | build-engine | started |
+| 20 Nov 09:16 | fixer | build-engine | engine built in 36s |
+| 20 Nov 09:16 | fixer | build-engine | started |
+| 20 Nov 09:17 | fixer | build-engine | engine built in 36s |
+| 20 Nov 09:17 | fixer | build-engine | started |
+| 20 Nov 09:18 | fixer | build-engine | engine built in 37s |
+| 20 Nov 09:22 | fixer | attempt | content-present-partly-displaced -> reverted (0/23 moved) |

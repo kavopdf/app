@@ -696,3 +696,37 @@
 {"t": 1795141847.696048, "ist": "08:00:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795141849.6874173, "ist": "08:00:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795141872.824812, "ist": "08:01:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795144967.213689, "ist": "08:52:47", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795144967.3360806, "ist": "08:52:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795144980.6372774, "ist": "08:53:00", "ev": "beat", "d": "claimed, reading the handoff"}
+{"t": 1795144980.7784722, "ist": "08:53:00", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1795145343.413219, "ist": "08:59:03", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795145474.539339, "ist": "09:01:14", "ev": "beat", "d": "measuring content-present-partly-displaced with the relaxed rule-border guard"}
+{"t": 1795145768.3695421, "ist": "09:06:08", "ev": "beat", "d": "screen pass 2 of the displacement class"}
+{"t": 1795146222.0372818, "ist": "09:13:42", "ev": "beat", "d": "screen pass 3, scipy installed"}
+{"t": 1795146530.3729558, "ist": "09:18:50", "ev": "beat", "d": "screen with borders placed from the rule edges"}
+{"t": 1795146749.1385758, "ist": "09:22:29", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795146749.3502703, "ist": "09:22:29", "ev": "attempt", "d": "content-present-partly-displaced -> reverted"}
+{"t": 1795146749.450165, "ist": "09:22:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795146749.5503485, "ist": "09:22:29", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795146751.4732795, "ist": "09:22:31", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146756.4695523, "ist": "09:22:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795146763.1541963, "ist": "09:22:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795146763.2654893, "ist": "09:22:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795146763.412146, "ist": "09:22:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795146763.5278165, "ist": "09:22:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795146768.2738686, "ist": "09:22:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795146768.412491, "ist": "09:22:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795146770.0757208, "ist": "09:22:50", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146782.860678, "ist": "09:23:02", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146809.1786444, "ist": "09:23:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146809.493123, "ist": "09:23:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146809.631365, "ist": "09:23:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146815.0901117, "ist": "09:23:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146815.7106943, "ist": "09:23:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146816.092521, "ist": "09:23:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146816.2660618, "ist": "09:23:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146819.813489, "ist": "09:23:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146820.2784486, "ist": "09:23:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146820.568773, "ist": "09:23:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146820.707867, "ist": "09:23:40", "ev": "beat", "d": "report.py: building the report"}

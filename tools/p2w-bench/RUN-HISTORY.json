@@ -173,5 +173,30 @@
   "obstacles_cleared": 0,
   "needs_human": 0,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795137815.0990586,
+  "started": "06:53",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "content-partly-lost-and-displaced",
+  "attempts": 3,
+  "kept": 2,
+  "docs_improved": 1,
+  "agents": [
+   "contB-07",
+   "contA-07"
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "partial": 1,
+  "ratchets": 2,
+  "counted": [
+   [
+    "content-partly-lost-and-displaced",
+    1
+   ]
+  ],
+  "ended_how": "killed - never released the slot"
  }
 ]

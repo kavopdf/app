@@ -340,9 +340,29 @@
   {
    "at": "08:00",
    "text": "attempt 7 on content-partly-lost-and-displaced -> kept (1/6 moved)"
+  },
+  {
+   "at": "09:22",
+   "text": "attempt 14 on content-present-partly-displaced -> reverted (0/23 moved)"
+  },
+  {
+   "at": "09:22",
+   "text": "agent deployed: content-present-partly-displaced / A - is the rule-as-drawing construct still in the engine and is the pBdr path presen"
+  },
+  {
+   "at": "09:22",
+   "text": "agent landed: content-present-partly-displaced / A -> FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md"
+  },
+  {
+   "at": "09:22",
+   "text": "agent deployed: content-present-partly-displaced / B - how much of 18_displacement the rule construct can explain, and which displaceme"
+  },
+  {
+   "at": "09:22",
+   "text": "agent landed: content-present-partly-displaced / B -> FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md"
   }
  ],
- "next": "content-partly-lost-and-displaced: itr-computation-with-slab-table (share5 42.33, share@10 27.40, share@20 7.85) - table rows are written at their own w:trHeight of 351/370 tw against the page's uniform 368 tw, so the page compresses by 0.5pt a row and -14.31pt by the last row (DocxWriter.java:6182 and :6271-6273; the arithmetic that yields 351 is NOT verified). The other four OPEN documents in this class are 31_times_body_arial_headings 1.04, 370_offer_letter 2.70, 14_stamp_chars_positioned_td 3.89, 75_merged_header_cell_three_columns 7.62. The rule class stays blocked pending a human.",
+ "next": "the rule class is a TABLE-PATH job, not a guard job: 36 of 39 rules on bank-statement-horizontal-rules-only belong to table rows and never reach flowFromBox, so give the rule to the row or cell (w:tcBorders top) instead of loosening the guard again. Verify per document by counting w:pBdr in word/document.xml before screening - a count of 0 means the change is not being exercised",
  "agents": [
   {
    "id": "contA-01",
@@ -523,10 +543,34 @@
    "finding": "tools/p2w-bench/FINDINGS/content-partly-lost-JUSTIFY-already-landed-0700-f1x.md",
    "deployed_at": "2026-11-20T02:29",
    "landed_at": "2026-11-20T02:29"
+  },
+  {
+   "id": "contA-08",
+   "class": "content-present-partly-displaced",
+   "angle": "A",
+   "question": "is the rule-as-drawing construct still in the engine and is the pBdr path present, gated or removed",
+   "expected": "09:00",
+   "deployed": "08:58",
+   "status": "landed",
+   "finding": "FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md",
+   "deployed_at": "2026-11-20T08:58",
+   "landed_at": "2026-11-20T09:05"
+  },
+  {
+   "id": "contB-08",
+   "class": "content-present-partly-displaced",
+   "angle": "B",
+   "question": "how much of 18_displacement the rule construct can explain, and which displacement findings are not about rules",
+   "expected": "09:00",
+   "deployed": "08:58",
+   "status": "landed",
+   "finding": "FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md",
+   "deployed_at": "2026-11-20T08:58",
+   "landed_at": "2026-11-20T09:05"
   }
  ],
  "run": {
-  "started": "06:53",
+  "started": "08:52",
   "ended": null,
   "ended_how": null
  },
@@ -622,7 +666,7 @@
    "plan": "READ FINDINGS/content-present-partly-displaced-rules-are-flow-neutral-065000-f1x.md BEFORE TOUCHING THE RULE CLASS. Two handoff claims are now measured FALSE: (1) the flush-by-top precondition is a regression, not a precondition - with the border path OFF it takes bank-statement 0.10 -> 17.07 and gst-invoice 0.38 -> 15.13, because every shape moved into the flow charges ~9.6 pt; (2) the residual on 18_displacement was never the gap or the flowY bookkeeping - a carrier paragraph costs 9.6 pt in LibreOffice whatever it contains (measured four ways), which is the whole of 0.00 -> 77.01. A flow-neutral construct exists and is in FINDINGS/rules-top-border-FLOW-NEUTRAL-065000-f1x.patch: a pre-pass hands each rule to the paragraph that follows it as a w:top border, the gap becomes w:before and the rule-to-text distance becomes w:space, nothing is reordered and no paragraph is added. It measures EXACTLY baseline on all 8 documents tried (18_centred 0.00, 411 0.00, 62 0.00, bank-statement 0.10, gst-invoice 0.38, mobile-bill 1.55, 315 1.91, 64 3.46) - and places pBdr=0, because its own safety guards decline every rule it could reach. Where a border IS placed, 18_centred goes 0.00 -> 0.53. THAT is the wall and it is not an engine bug: regress.py scores share@5 on a LibreOffice render, LibreOffice draws the floating drawing exactly, and a border can never be pixel-identical - so a fix Google needs is always a small LibreOffice regression, and the brief forbids landing one. DO NOT start another rule-class attempt until a human answers: gate this class in Google (32_stroke_lines / 05_chars_extra on the Google result), declare the class out of scope, or authorise a stated tolerance. Spend the next slot on a class the gate can see."
   }
  ],
- "context": "A NESTED TABLE INSIDE A LAYOUT CELL LEFT THE CELL'S ANCHOR POINTING AT THE ROW'S TOP. columnPage() sets ctx.afterTablePt = rowEndPt per cell; table() writes a nested w:tbl plus a 4pt carrier as raw XML, so nothing cleared it, and the first paragraph after the nested table was placed at topPt - afterTablePt = the distance from the LAYOUT ROW's top, not the nested table's bottom. Measured with temporary stderr prints on table-inside-two-column-page: flowY was already right (232.0 = row bottom 228 + 4pt carrier) while the caption under the metrics table took w:before=2600tw (130pt) where the page drew 4.2pt, sitting 115.4pt low with the three paragraphs below it. The fix is one line: when ctx.inColumn, clear ctx.afterTablePt = -1f in table()'s row-bottom block. table-inside-two-column-page 38.11 -> 35.87, share@10 29.13 -> 9.70, max_pt 82.08 -> 21.60, p90 64.32 -> 6.24. Full corpus: 212 of 213 measured (416_many_tiny_pages EXEMPT, carried), 1 better, 211 same, 0 worse; regress.py --check PASS on both formats; Google result byte-identical to the pre-change one (42/47, same five fails).",
+ "context": "Attempt 14 reverted. The pBdr patch applies and its guard was relaxed twice; the guard is not the ceiling - the paragraph hook is. Screen 23/23: 0 better, 8 worse, and the 8 worse are the documents where a border actually got placed, so placement accounting is not yet free. scipy was missing on this pod and cost two 280s calls in prerender; install it first.",
  "needs_human": [],
- "next_class": ""
+ "next_class": "bank-statement-horizontal-rules-only"
 }

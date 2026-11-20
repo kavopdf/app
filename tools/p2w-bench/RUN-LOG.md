@@ -1,5 +1,3 @@
-| 12 Nov 10:05 | baseline | measured 77_arabic_rtl_document 36/59 docx, 77_arabic_rtl_document.txt               1/5 FAIL txt |
-| 12 Nov 10:05 | baseline | measured 78_mixed_english_devanagari_line 41/59 docx, 78_mixed_english_devanagari_line.txt     4/5 FAIL txt |
 | 12 Nov 10:06 | baseline | measured 79_inr_indian_digit_grouping_table 46/59 docx, 79_inr_indian_digit_grouping_table.txt   3/5 FAIL txt |
 | 12 Nov 10:06 | baseline | measured 80_gstin_pan_cin_ifsc_table 42/59 docx, 80_gstin_pan_cin_ifsc_table.txt          4/5 FAIL txt |
 | 12 Nov 10:07 | baseline | measured academic-paper-ieee-2col-abstract 46/59 docx, academic-paper-ieee-2col-abstract.txt    5/5 PASS txt |
@@ -198,3 +196,5 @@
 | 20 Nov 07:13 | fixer | attempt content-partly-lost-and-displaced -> partial (1/6 moved) |
 | 20 Nov 07:59 | fixer | attempt content-partly-lost-and-displaced -> kept (1/6 moved) |
 | 20 Nov 08:00 | fixer | attempt content-partly-lost-and-displaced -> kept (1/6 moved) |
+| 20 Nov 08:52 | fixer | slot claimed - fixer running |
+| 20 Nov 09:22 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |
