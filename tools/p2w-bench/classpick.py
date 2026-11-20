@@ -35,6 +35,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 IST = timezone(timedelta(hours=5, minutes=30))
 
 CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES-GOOGLE.md")
+CLASSES_TXT = os.path.join(HERE, "txt", "DEFECT-CLASSES-TXT.md")
 ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 ROTATION = os.path.join(HERE, "ROTATION.json")
 
@@ -77,6 +78,24 @@ def ranking():
     return sorted(out, key=lambda x: -x[1])
 
 
+def ranking_txt():
+    """[(check, documents)] for the .txt half, biggest first."""
+    out = []
+    if not os.path.exists(CLASSES_TXT):
+        return out
+    for line in open(CLASSES_TXT, encoding="utf-8"):
+        if not line.startswith("| `"):
+            continue
+        c = [x.strip() for x in line.strip().strip("|").split("|")]
+        if len(c) < 4:
+            continue
+        try:
+            out.append((c[0].strip("` "), int(c[2].strip("*"))))
+        except ValueError:
+            continue
+    return sorted(out, key=lambda x: -x[1])
+
+
 def attempts_for(cls, since=None):
     """The attempts recorded on a class, optionally only those at or after `since`."""
     d = load(ATTEMPTS, {})
@@ -109,24 +128,20 @@ def exhausted():
     return rot.get("exhausted") or {}
 
 
-def decide():
-    """Return (class, why, rotation_state). Pure function of the files on disk."""
-    rank = ranking()
+def _pick(fmt, rot, dead):
+    """The class for this format, and the reason. Same stay/rotate rule for both halves."""
+    rank = ranking() if fmt == "docx" else ranking_txt()
     if not rank:
-        return None, "benchmarks/DEFECT-CLASSES-GOOGLE.md names no classes", {}
+        return None, "no class table for the .%s half" % fmt, rot
     names = [n for n, _ in rank]
     docs = dict(rank)
-    rot = load(ROTATION, {})
     cur = rot.get("class")
     since = rot.get("since")
 
-    dead = exhausted()
-
     if cur not in names:
         cur = next((n for n in names if n not in dead), names[0])
-        since = now_str()
-        return cur, ("starting the rotation at the biggest class: %s, %d documents"
-                     % (cur, docs[cur])), {"class": cur, "since": since}
+        return cur, ("starting the .%s rotation at the biggest: %s, %d documents"
+                     % (fmt, cur, docs[cur])), {"class": cur, "since": now_str()}
 
     h = attempts_for(cur, since)
     moved = moved_of(h)
@@ -141,16 +156,48 @@ def decide():
                 nxt = cand
                 break
         return nxt, ("%s had %d attempt(s) since %s and moved 0 documents - rotating to the next "
-                     "biggest: %s, %d documents" % (cur, n, since, nxt, docs[nxt])), \
+                     "biggest in the .%s half: %s, %d documents"
+                     % (cur, n, since, fmt, nxt, docs[nxt])), \
                {"class": nxt, "since": now_str()}
 
     if n == 0:
-        return cur, ("staying on %s (%d documents): no attempt recorded on it since %s yet"
-                     % (cur, docs[cur], since)), rot
+        return cur, ("staying on %s (%d documents, .%s): nothing recorded on it since %s yet"
+                     % (cur, docs[cur], fmt, since)), rot
 
-    return cur, ("staying on %s (%d documents): %d attempt(s) since %s moved %d document(s) - "
-                 "it is still producing, so it keeps the slot"
-                 % (cur, docs[cur], n, since, moved)), rot
+    return cur, ("staying on %s (%d documents, .%s): %d attempt(s) since %s moved %d document(s)"
+                 % (cur, docs[cur], fmt, n, since, moved)), rot
+
+
+def decide():
+    """Return (class, why, new_state). Alternates the two halves, run about.
+
+    THE .TXT HALF WAS NEVER REACHED. The brief has said since the beginning to alternate - one run on the
+    largest .docx class, the next on the largest .txt check - and no run ever did, because the picker only
+    ever read the Google table. Measured 20 Nov: ATTEMPTS.json held ten classes and not one of them was a
+    .txt check, while 46 documents still failed a .txt check. A rule in a brief is not a mechanism.
+
+    So the alternation is here, where a run cannot skip it: the state carries which half is next, and each
+    call flips it. A .docx run is followed by a .txt run, whatever the sizes are - a pipeline that only
+    fixes the format with more failures never finishes the other one.
+    """
+    rot = load(ROTATION, {})
+    dead = rot.get("exhausted") or {}
+    fmt = rot.get("next") or "docx"
+    if fmt not in ("docx", "txt"):
+        fmt = "docx"
+
+    sub = rot.get(fmt) or {}
+    cls, why, newsub = _pick(fmt, sub, dead)
+    other = "txt" if fmt == "docx" else "docx"
+
+    state = dict(rot)
+    state[fmt] = newsub if isinstance(newsub, dict) and newsub.get("class") else sub
+    state["next"] = other
+    state["exhausted"] = dead
+    if cls:
+        state[fmt] = {"class": cls, "since": (newsub or {}).get("since") or now_str()}
+        why = why + " | next run: the .%s half" % other
+    return cls, why, state
 
 
 def main(argv):

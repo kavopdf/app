@@ -591,8 +591,39 @@ def txt():
         for cid in r["ids"].split():
             tally[cid] = tally.get(cid, 0) + 1
     top = sorted(tally.items(), key=lambda t: -t[1])[:3]
+    # HOW MANY .TXT IMPROVED, NOT JUST HOW MANY ARE CLEAN.
+    # The user asked on 20 Nov why the report never says whether the .txt is moving. It did not: the
+    # section gave the standing total and stopped, so 46 failing read the same on a run that fixed
+    # three of them and a run that touched none. A number that cannot move cannot show progress.
+    #
+    # The comparison is against the committed table - the same reference the gate uses - so moved is
+    # what this run actually changed, not a guess from a baseline three days old.
+    moved = regressed = 0
+    try:
+        import subprocess as _sp
+        _r = _sp.run(["git", "-C", ROOT, "show",
+                     "HEAD:tools/p2w-bench/txt/RANKING-TXT.csv"],
+                    capture_output=True, text=True, timeout=60)
+        if _r.returncode == 0 and _r.stdout.strip():
+            _before = {}
+            for _b in csv.DictReader(_r.stdout.splitlines()):
+                try:
+                    _before[_b["document"]] = int(_b.get("failed") or 0)
+                except (ValueError, KeyError):
+                    continue
+            for _row in rows:
+                _was = _before.get(_row["doc"])
+                if _was is None:
+                    continue
+                if _row["failed"] < _was:
+                    moved += 1
+                elif _row["failed"] > _was:
+                    regressed += 1
+    except Exception:
+        pass
     return {"available": True, "scored": len(rows), "clean": len(clean),
             "failing": len(bad), "top": top,
+            "moved": moved, "regressed": regressed,
             "pct": round(100.0 * len(clean) / len(rows), 1)}
 
 
@@ -808,6 +839,12 @@ def main(argv):
         L.append("| Scored | **%d** of 213 |" % tx["scored"])
         L.append("| Clean - every applicable check passes | **%d** (%.1f%%) |" % (tx["clean"], tx["pct"]))
         L.append("| Failing at least one check | **%d** |" % tx["failing"])
+        # THE LINE THE USER ASKED FOR: is the .txt moving, not just how many are clean.
+        if tx.get("moved") or tx.get("regressed"):
+            L.append("| Moved since the last commit | **%d** improved, %d worse |"
+                     % (tx["moved"], tx["regressed"]))
+        else:
+            L.append("| Moved since the last commit | **none** - nothing changed |")
         if tx["top"]:
             L.append("| Most common failure | `%s` - %d documents |" % tx["top"][0])
         L.append("")
