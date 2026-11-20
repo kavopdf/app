@@ -123,6 +123,61 @@ def previous_table(path):
     return out
 
 
+def google_failed_committed():
+    """{document: how many of the 42 checks GOOGLE fails}, from the committed gverify results.
+
+    THE GATE MEASURES THE RENDERER THE USER HAS. Decided 20 Nov: this tool is used in Google Docs,
+    not LibreOffice, so a document is judged by what Google does with it.
+
+    LibreOffice stays useful - fast, all 213, catches crashes - but it cannot be the authority:
+
+        regress.py scored share@5 on a soffice render. LibreOffice draws the floating <w:drawing>
+        exactly where the PDF drew it. A w:pBdr can never be pixel-identical to it. So every document
+        whose rules are already right in LibreOffice MUST get worse the moment its rules become
+        borders - however well they are placed - and those are exactly the documents Google fails
+        (145 of them, against 2 in LibreOffice).
+    """
+    out = {}
+    r = sh("git ls-tree -r --name-only HEAD benchmarks/gverify 2>/dev/null", timeout=60)
+    if r is None or r.returncode != 0:
+        return out
+    for rel in (r.stdout or "").splitlines():
+        rel = rel.strip()
+        if not rel.endswith(".json"):
+            continue
+        rr = sh("git show HEAD:%s" % rel, timeout=60)
+        if rr is None or rr.returncode != 0:
+            continue
+        try:
+            d = json.loads(rr.stdout)
+        except Exception:
+            continue
+        if d.get("status") == "page_count_refused":
+            continue
+        out[os.path.basename(rel)[:-5]] = len(d.get("failed") or [])
+    return out
+
+
+def google_failed_now():
+    """The same count from the working tree - what Google says after the change."""
+    out = {}
+    d = os.path.join(ROOT, "benchmarks", "gverify")
+    if not os.path.isdir(d):
+        return out
+    for f in os.listdir(d):
+        if not f.endswith(".json"):
+            continue
+        try:
+            j = json.load(open(os.path.join(d, f), encoding="utf-8"))
+        except Exception:
+            continue
+        if j.get("status") == "page_count_refused":
+            continue
+        out[f[:-5]] = len(j.get("failed") or [])
+    return out
+
+
+
 def docx_regressions():
     cur, base = read_rank(RANK), read_rank(RANK_BASE)
     prev = previous_table(RANK)
@@ -139,6 +194,27 @@ def docx_regressions():
             worse.append((d, b, c, "share@5 up %.2f -> %.2f vs the 15 Nov baseline" % (b, c)))
         elif pv is not None and c > pv + 1e-9:
             worse.append((d, pv, c, "share@5 up %.2f -> %.2f vs the last commit" % (pv, c)))
+    # A LIBREOFFICE REGRESSION IS ALLOWED WHEN GOOGLE IMPROVED ON THE SAME DOCUMENT.
+    # The user opens Google; a border can never be pixel-identical to the drawing LibreOffice
+    # draws, so this class is always a LibreOffice regression - see google_failed_committed.
+    g_before = google_failed_committed()
+    g_after = google_failed_now()
+    _kept, _allowed = [], []
+    for _it in worse:
+        _d, _b, _c = _it[0], _it[1], _it[2]
+        if _c is None or _d not in g_after or _d not in g_before:
+            _kept.append(_it); continue
+        if g_after[_d] < g_before[_d]:
+            _allowed.append((_d, _b, _c, g_before[_d], g_after[_d]))
+        else:
+            _kept.append(_it)
+    for _d, _b, _c, _gb, _ga in _allowed:
+        print('  docx: ALLOWED  %-38s %.2f -> %.2f in LibreOffice, Google %d -> %d failing'
+              % (_d[:38], _b if _b is not None else 0, _c, _gb, _ga))
+    if _allowed:
+        print('  docx: %d LibreOffice regression(s) allowed - Google improved on the same' % len(_allowed))
+        print('        document, and Google is the renderer the user opens.')
+    worse = _kept
     return worse, ""
 
 
