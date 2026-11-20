@@ -654,3 +654,16 @@
 {"t": 1795135918.7636738, "ist": "06:21:58", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795135918.8596087, "ist": "06:21:58", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795135918.877228, "ist": "06:21:58", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795137814.9586134, "ist": "06:53:34", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795137815.0894074, "ist": "06:53:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795137822.3450897, "ist": "06:53:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795137822.4689043, "ist": "06:53:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795137822.58513, "ist": "06:53:42", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795138667.7780278, "ist": "07:07:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795138667.945254, "ist": "07:07:47", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795139012.7824504, "ist": "07:13:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795139013.0034974, "ist": "07:13:33", "ev": "attempt", "d": "content-partly-lost-and-displaced -> partial"}
+{"t": 1795139013.1040368, "ist": "07:13:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795139013.2103925, "ist": "07:13:33", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795141744.7084222, "ist": "07:59:04", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795141744.8661299, "ist": "07:59:04", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

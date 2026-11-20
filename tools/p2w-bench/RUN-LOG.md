@@ -1,6 +1,3 @@
-| 12 Nov 09:47 | baseline | txt backfill: 10 more documents recorded (11_stamp_with_signature_image, 12_stamp_across_page_break, 13_stamp_non_english, 14_stamp_chars_positioned_td, 15_stamp_on_scanned_page, 16_right_aligned_amounts_txtpos, 17_three_column_widths_txtpos, 18_centred_heading_left_body_txtpos, 19_hanging_indent_txtpos, 20_numbered_list_separate_column_txtpos), gap 119 -> 109 |
-| 12 Nov 09:48 | baseline | ratchet held (docx 150/208 scored, txt 41/208, backfill gap 109); measure gate NOT READY (58 rows unscored); slot released |
-| 12 Nov 10:01 | started | phase measure |
 | 12 Nov 10:03 | baseline | corpus 208 pdfs, engine built (2a68de6) |
 | 12 Nov 10:04 | baseline | measured 76_devanagari_table 45/59 docx, 4/5 txt |
 | 12 Nov 10:05 | baseline | measured 77_arabic_rtl_document 36/59 docx, 77_arabic_rtl_document.txt               1/5 FAIL txt |
@@ -199,3 +196,5 @@
 | 20 Nov 05:53 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |
 | 20 Nov 06:20 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |
 | 20 Nov 06:21 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 20 Nov 06:53 | fixer | slot claimed - fixer running |
+| 20 Nov 07:13 | fixer | attempt content-partly-lost-and-displaced -> partial (1/6 moved) |

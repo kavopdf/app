@@ -1,9 +1,9 @@
 {
  "scored": 213,
- "clean": 149,
- "failing": 64,
- "pct": 70.0,
- "docx_rank_sha": "cd4692786e6a0a93",
- "at": "2026-11-18 18:59",
+ "clean": 167,
+ "failing": 46,
+ "pct": 78.4,
+ "docx_rank_sha": "1cce5e2ef2e39442",
+ "at": "2026-11-20 07:57",
  "docx_moved_during_txt": false
 }

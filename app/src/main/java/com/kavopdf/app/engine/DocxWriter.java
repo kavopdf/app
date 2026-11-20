@@ -6786,7 +6786,24 @@ public final class DocxWriter {
         // The flow's real position after a table is the row's box bottom plus the 4 pt carrier
         // Word requires after it, because that carrier is a line the next paragraph starts under
         // (D-26: the position is where the reader is, not where the PDF drew).
-        if (ctx.inColumn) ctx.cenCellFlowY++;
+        if (ctx.inColumn) {
+            ctx.cenCellFlowY++;
+            // A NESTED TABLE ENDS THE CELL'S ANCHOR, IT DOES NOT MOVE IT.
+            //
+            // The cell loop sets afterTablePt to the LAYOUT ROW's top edge, so the cell's first
+            // line is placed against the row's edge. That edge is still there when the cell's
+            // content is a nested w:tbl, and nothing cleared it when the table closed - the
+            // carrier paragraph the table writes is raw XML and never passes through the
+            // paragraph path. So the first paragraph AFTER a nested table was placed against
+            // the layout row's top instead of the nested table's bottom: measured on
+            // table-inside-two-column-page, the caption under the metrics table carried
+            // w:before="2600" (130 pt) where the page drew 4.2 pt, because 237.4 - 107.4 = 130,
+            // and the caption and the three paragraphs below it sat 115.4 pt too low - 78% of
+            // that document's whole share@5 deficit. flowY is already the row's bottom edge plus
+            // the carrier (232.0 against a caption box top of 237.4), so the anchor is cleared
+            // and the paragraph is placed from the flow, which is where the reader really is.
+            ctx.afterTablePt = -1f;
+        }
         else cenSetY(ctx, rowBottomPt + (carrier ? carrierTw / (float) TWIPS_PER_PT : 0f), false, "table-bottom");
         ctx.flowY = rowBottomPt
                 + (carrier ? carrierTw / (float) TWIPS_PER_PT : 0f);

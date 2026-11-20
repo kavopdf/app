@@ -6,16 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 05:44 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 05:44 | ? | commit-gate | started |
-| 13 Nov 05:44 | ? | commit-gate | started |
-| 13 Nov 06:47 | fixer | claim | fixer claimed the slot |
-| 13 Nov 06:48 | fixer | build-engine | started |
-| 13 Nov 06:50 | fixer | build-engine | started |
-| 13 Nov 06:55 | fixer | ratchet | held or rose |
-| 13 Nov 06:55 | fixer | ratchet | held or rose |
-| 13 Nov 06:55 | fixer | ratchet | REGRESSED 6 |
-| 13 Nov 06:56 | fixer | hypothesis | 20_within_10pt (+4) -> confirmed |
 | 13 Nov 06:56 | fixer | hypothesis | 20_within_10pt (+4) -> ruled-out |
 | 13 Nov 06:56 | fixer | hypothesis | 20_within_10pt (+4) -> untested |
 | 13 Nov 06:56 | fixer | classify | 43 classes from 208 documents |
@@ -406,3 +396,13 @@
 | 20 Nov 06:19 | fixer | build-engine | started |
 | 20 Nov 06:20 | fixer | build-engine | engine built in 35s |
 | 20 Nov 06:20 | fixer | attempt | content-present-partly-displaced -> reverted (0/23 moved) |
+| 20 Nov 06:53 | fixer | claim | fixer claimed the slot |
+| 20 Nov 07:08 | fixer | build-engine | started |
+| 20 Nov 07:09 | fixer | build-engine | engine built in 36s |
+| 20 Nov 07:10 | fixer | build-engine | started |
+| 20 Nov 07:10 | fixer | build-engine | engine unchanged, compile skipped |
+| 20 Nov 07:10 | fixer | build-engine | started |
+| 20 Nov 07:10 | fixer | build-engine | engine built in 35s |
+| 20 Nov 07:11 | fixer | build-engine | started |
+| 20 Nov 07:11 | fixer | build-engine | engine built in 35s |
+| 20 Nov 07:13 | fixer | attempt | content-partly-lost-and-displaced -> partial (1/6 moved) |
