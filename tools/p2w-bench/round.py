@@ -681,6 +681,22 @@ def release(name, force=False):
                     _kept = (_st.get("engine") or "").strip() == _now
             except Exception:
                 pass
+            # THE .TXT HALF HAS ITS OWN STATE RECORD, AND IT IS THE ONLY ONE THAT CAN PROVE A .TXT
+            # CHANGE WAS MEASURED. benchmarks/STATE.json carries the engine the .docx table was
+            # measured on; a run that changed TxtWriter leaves that field alone - correctly - so
+            # `_have_state` was true and the ledger fallback below was never reached, and _kept
+            # could never be true. Measured 20 Nov: the release refused a run that had kept two
+            # measured attempts, and would have reverted both. STATE-TXT.json is written by the
+            # .txt measurement and now records the engine it scored.
+            if not _kept:
+                try:
+                    _stt = _j.load(open(os.path.join(HERE, "txt", "STATE-TXT.json"),
+                                        encoding="utf-8"))
+                    if (_stt.get("engine") or "").strip():
+                        _have_state = True
+                        _kept = (_stt.get("engine") or "").strip() == _now
+                except Exception:
+                    pass
             # WHEN THE STATE RECORD KNOWS THE ENGINE, IT IS THE ONLY AUTHORITY. The ledger is a
             # claim; STATE.json is the measurement. On 18 Nov the 15:30 run recorded its attempt as
             # kept and released, while benchmarks/RANKING.csv still read 68.82 - the measurement had

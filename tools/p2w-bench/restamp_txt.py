@@ -228,6 +228,30 @@ def apply():
             w.writerows(rows)
         os.replace(tmp, path)
         print("  wrote %s (%d rows)" % (tag, len(rows)))
+    # THE ENGINE THIS MEASUREMENT WAS TAKEN WITH. Without it the .txt state could not say whether
+    # its numbers belong to the tree, and round.py's release guard could never see a .txt change as
+    # measured - the .docx state names its engine, so the fallback to the ledger was never reached.
+    try:
+        import subprocess as _sp
+        eng = _sp.run(["git", "-C", REPO, "log", "-1", "--format=%h", "--",
+                       "app/src/main/java/com/kavopdf/app/engine/"],
+                      capture_output=True, text=True).stdout.strip()
+        st_path = os.path.join(HERE, "txt", "STATE-TXT.json")
+        st = {}
+        if os.path.exists(st_path):
+            try:
+                st = json.load(open(st_path, encoding="utf-8"))
+            except Exception:
+                st = {}
+        st["engine"] = eng
+        st["scored"] = len(rows)
+        st["clean"] = sum(1 for r in rows if r["failed"] == 0)
+        st["failing"] = len(rows) - st["clean"]
+        st["pct"] = round(100.0 * st["clean"] / len(rows), 1) if rows else 0.0
+        json.dump(st, open(st_path, "w", encoding="utf-8"), indent=1)
+        print("  wrote STATE-TXT.json (engine %s)" % eng)
+    except Exception as e:
+        print("  STATE-TXT.json not written: %s" % e)
     clean = sum(1 for r in rows if r["failed"] == 0)
     print("  %d of %d clean (%.1f%%)" % (clean, len(rows), 100.0 * clean / len(rows)))
     return 0
