@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 05:51 → running IST · 29 min**
+**20 Nov 2026 · slot 05:51 → running IST · 30 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -20,6 +20,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `content-present-partly-displaced` |
+| Committed | **14** files in 1 commit(s) from `17bc575` — ...-displaced-rules-are-flow-neutral-065000-f1x.md, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md,  |
 
 ## What was tried
 
@@ -45,12 +46,13 @@
 
 | | |
 |:--|:--|
-| Slot window | 05:51 → running · 29 min |
+| Slot window | 05:51 → running · 30 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 11 |
 | Longest silence | **27.2 min** — from 05:53:11, after `classrow.py: refreshing the class file` |
 | Silences over 2 min | 1 |
-| Obstacles | 0 cleared · 0 need a human |
+| Obstacles | 0 cleared · 1 need a human |
+| Still a wall | The fixer run that claimed the slot at 05:17:58 IST (23:47:58 UTC) beat until 05:18:43 IST, committed `6dfe946 |
 
 
 ### Where the time went
@@ -59,7 +61,7 @@
 |:--|--:|:--|
 | fix - diagnose and change the engine | **27 min** | `####################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
