@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 00:57 → running IST · 54 min**
+**21 Nov 2026 · slot 00:57 → 01:51 IST · 54 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,7 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
-| Committed | **19** files in 6 commit(s) from `e840302` — ...NT-PROPOSAL-clip-flag-NOT-APPLIED-0210-fixer.md, 38-faux-bold-TRIPLE-DRAW-0225-fixer.md, 39-small-caps-gap-threshold-0150-fixer.md, ATTEMPTS.json, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSA |
+| Committed | **19** files in 8 commit(s) from `4411394` — ...NT-PROPOSAL-clip-flag-NOT-APPLIED-0210-fixer.md, 38-faux-bold-TRIPLE-DRAW-0225-fixer.md, 39-small-caps-gap-threshold-0150-fixer.md, ATTEMPTS.json, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSA |
 
 ## What was tried
 
@@ -53,9 +53,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 00:57 → running · 54 min |
+| Slot window | 00:57 → 01:51 · 54 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 31 |
+| Tool beats | 35 |
 | Longest silence | **28.3 min** — from 00:57:53, after `classrow.py: refreshing the class file` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 1 need a human |
