@@ -6,7 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 16 Nov 13:51 | fixer | hypothesis | content-missing-partly-replaced -> confirmed |
 | 16 Nov 13:51 | fixer | attempt | content-missing-partly-replaced -> error |
 | 16 Nov 13:52 | fixer | attempt | content-missing-nothing-in-its-place -> kept (31/212 moved) |
 | 16 Nov 14:55 | fixer | claim | fixer claimed the slot |
@@ -406,3 +405,4 @@
 | 21 Nov 00:57 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |
 | 21 Nov 01:41 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |
 | 21 Nov 01:47 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |
+| 21 Nov 01:51 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |

@@ -1,4 +1,3 @@
-| 12 Nov 14:14 | baseline | measured product-catalogue-code-left-price-right 44/59 docx, 5/5 txt |
 | 12 Nov 14:14 | baseline | measured property-tax-receipt 47/59 docx, 4/5 txt |
 | 12 Nov 14:15 | baseline | measured purchase-order 44/59 docx, 4/5 txt |
 | 12 Nov 14:15 | baseline | measured question-paper-marks-right-margin 47/59 docx, 4/5 txt |
@@ -198,3 +197,4 @@
 | 21 Nov 00:57 | fixer | attempt t01_word_accuracy -> reverted (0/5 moved) |
 | 21 Nov 01:41 | fixer | attempt t01_word_accuracy -> reverted (0/5 moved) |
 | 21 Nov 01:47 | fixer | attempt t01_word_accuracy -> reverted (0/5 moved) |
+| 21 Nov 01:51 | fixer | attempt t01_word_accuracy -> reverted (0/5 moved) |
