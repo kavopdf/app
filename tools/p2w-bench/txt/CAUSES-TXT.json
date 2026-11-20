@@ -23,12 +23,12 @@
   "failed_ids": []
  },
  "041122-Account_Opening_Form": {
-  "applicable": 11,
+  "applicable": 10,
   "baseline_failed": 7,
   "cause": "7 checks",
   "failed": 7,
   "failed_ids": [
-   "t02_position",
+   "t01_word_accuracy",
    "t03_symbols",
    "t06_encoding",
    "t07_symbol_counts",
@@ -55,21 +55,17 @@
  },
  "06_rect_paid_stamp_red_transparent": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "07_stamp_over_table": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "08_two_overlapping_stamps": {
   "applicable": 10,
@@ -80,11 +76,10 @@
  },
  "09_stamp_font_not_embedded": {
   "applicable": 9,
-  "baseline_failed": 2,
-  "cause": "t02_position + t08_line_order",
-  "failed": 2,
+  "baseline_failed": 1,
+  "cause": "t08_line_order",
+  "failed": 1,
   "failed_ids": [
-   "t02_position",
    "t08_line_order"
   ]
  },
@@ -296,12 +291,10 @@
  },
  "310_court_judgment": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t02_position",
-  "failed": 1,
-  "failed_ids": [
-   "t02_position"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "311_fir_police_form": {
   "applicable": 7,
@@ -335,12 +328,10 @@
  },
  "315_gazette_notification": {
   "applicable": 7,
-  "baseline_failed": 1,
-  "cause": "t02_position",
-  "failed": 1,
-  "failed_ids": [
-   "t02_position"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "316_contract_with_schedules": {
   "applicable": 10,
@@ -386,12 +377,10 @@
  },
  "322_mutual_fund_factsheet": {
   "applicable": 8,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "323_credit_card_statement": {
   "applicable": 8,
@@ -402,12 +391,11 @@
  },
  "324_loan_amortisation_schedule": {
   "applicable": 10,
-  "baseline_failed": 2,
-  "cause": "t09_page_furniture + t13_amount_columns",
-  "failed": 2,
+  "baseline_failed": 1,
+  "cause": "t09_page_furniture",
+  "failed": 1,
   "failed_ids": [
-   "t09_page_furniture",
-   "t13_amount_columns"
+   "t09_page_furniture"
   ]
  },
  "325_demat_holdings_statement": {
@@ -693,21 +681,20 @@
  },
  "38_faux_bold_italic_synthesised": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t07_symbol_counts",
-  "failed": 1,
+  "baseline_failed": 2,
+  "cause": "t01_word_accuracy + t07_symbol_counts",
+  "failed": 2,
   "failed_ids": [
+   "t01_word_accuracy",
    "t07_symbol_counts"
   ]
  },
  "390_wide_data_appendix": {
   "applicable": 8,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "391_survey_questionnaire_grid": {
   "applicable": 7,
@@ -798,10 +785,11 @@
  },
  "406_passport_mrz_page": {
   "applicable": 7,
-  "baseline_failed": 1,
-  "cause": "t12_word_invention",
-  "failed": 1,
+  "baseline_failed": 2,
+  "cause": "t01_word_accuracy + t12_word_invention",
+  "failed": 2,
   "failed_ids": [
+   "t01_word_accuracy",
    "t12_word_invention"
   ]
  },
@@ -872,12 +860,10 @@
  },
  "417_rotate180_and_mirrored": {
   "applicable": 8,
-  "baseline_failed": 1,
-  "cause": "t02_position",
-  "failed": 1,
-  "failed_ids": [
-   "t02_position"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "41_coloured_headings_white_bg": {
   "applicable": 10,
@@ -1002,12 +988,10 @@
  },
  "58_header_rule_footer_rule": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t02_position",
-  "failed": 1,
-  "failed_ids": [
-   "t02_position"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "59_landscape_mixed_portrait": {
   "applicable": 10,
@@ -1115,11 +1099,10 @@
  },
  "70_magazine_drop_cap_photo_caption": {
   "applicable": 9,
-  "baseline_failed": 2,
-  "cause": "t02_position + t08_line_order",
-  "failed": 2,
+  "baseline_failed": 1,
+  "cause": "t08_line_order",
+  "failed": 1,
   "failed_ids": [
-   "t02_position",
    "t08_line_order"
   ]
  },
@@ -1158,21 +1141,17 @@
  },
  "75_merged_header_cell_three_columns": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "76_devanagari_table": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "77_arabic_rtl_document": {
   "applicable": 9,
@@ -1186,12 +1165,10 @@
  },
  "78_mixed_english_devanagari_line": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t12_word_invention",
-  "failed": 1,
-  "failed_ids": [
-   "t12_word_invention"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "79_inr_indian_digit_grouping_table": {
   "applicable": 10,
@@ -1210,12 +1187,12 @@
   "failed_ids": []
  },
  "Account_Opening_Form_Fillable_filled": {
-  "applicable": 11,
+  "applicable": 10,
   "baseline_failed": 7,
   "cause": "7 checks",
   "failed": 7,
   "failed_ids": [
-   "t02_position",
+   "t01_word_accuracy",
    "t03_symbols",
    "t06_encoding",
    "t07_symbol_counts",
@@ -1254,32 +1231,28 @@
  },
  "balance-sheet-and-profit-loss": {
   "applicable": 11,
-  "baseline_failed": 2,
-  "cause": "t12_word_invention + t13_amount_columns",
-  "failed": 2,
-  "failed_ids": [
-   "t12_word_invention",
-   "t13_amount_columns"
-  ]
- },
- "balance-sheet-two-columns-of-figures": {
-  "applicable": 10,
-  "baseline_failed": 2,
-  "cause": "t12_word_invention + t13_amount_columns",
-  "failed": 2,
-  "failed_ids": [
-   "t12_word_invention",
-   "t13_amount_columns"
-  ]
- },
- "bank-statement-5-pages": {
-  "applicable": 12,
   "baseline_failed": 1,
   "cause": "t13_amount_columns",
   "failed": 1,
   "failed_ids": [
    "t13_amount_columns"
   ]
+ },
+ "balance-sheet-two-columns-of-figures": {
+  "applicable": 10,
+  "baseline_failed": 1,
+  "cause": "t13_amount_columns",
+  "failed": 1,
+  "failed_ids": [
+   "t13_amount_columns"
+  ]
+ },
+ "bank-statement-5-pages": {
+  "applicable": 12,
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "bank-statement-horizontal-rules-only": {
   "applicable": 10,
@@ -1299,12 +1272,10 @@
  },
  "boq-tender-bill-of-quantities": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "brochure-3col-with-sidebar-box": {
   "applicable": 9,
@@ -1429,12 +1400,10 @@
  },
  "magazine-2col-pullquote-spanning": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t02_position",
-  "failed": 1,
-  "failed_ids": [
-   "t02_position"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "marksheet-subject-left-marks-right": {
   "applicable": 9,
@@ -1452,21 +1421,17 @@
  },
  "mobile-bill": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "mutual-fund-statement": {
   "applicable": 11,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "newsletter-3col-header-footer": {
   "applicable": 9,
@@ -1502,12 +1467,10 @@
  },
  "policy-2col-spanning-section-heading": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t02_position",
-  "failed": 1,
-  "failed_ids": [
-   "t02_position"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "price-list-2col-dense-right-aligned": {
   "applicable": 10,
@@ -1571,12 +1534,10 @@
  },
  "salary-slip-factory-wages": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "table-across-page-break-repeated-header": {
   "applicable": 12,
