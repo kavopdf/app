@@ -4,7 +4,7 @@
  "ended_ts": null,
  "ended": null,
  "class": "t01_word_accuracy",
- "attempts": 2,
+ "attempts": 3,
  "kept": 1,
  "docs_improved": 3,
  "agents": [],

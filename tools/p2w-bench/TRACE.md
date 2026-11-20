@@ -6,7 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 16 Nov 10:50 | fixer | claim | fixer claimed the slot |
 | 16 Nov 10:52 | fixer | build-engine | started |
 | 16 Nov 10:52 | fixer | build-engine | started |
 | 16 Nov 10:52 | fixer | build-engine | started |
@@ -406,3 +405,4 @@
 | 20 Nov 21:18 | fixer | build-engine | engine built in 37s |
 | 20 Nov 21:22 | fixer | attempt | t01_word_accuracy -> kept (3/10 moved) |
 | 20 Nov 21:42 | fixer | commit-gate | started |
+| 20 Nov 21:46 | fixer | attempt | t01_word_accuracy -> reverted (0/10 moved) |

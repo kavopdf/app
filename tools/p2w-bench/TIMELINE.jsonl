@@ -1095,3 +1095,8 @@
 {"t": 1795190837.109901, "ist": "21:37:17", "ev": "beat", "d": "(no activity given)"}
 {"t": 1795191062.7730057, "ist": "21:41:02", "ev": "beat", "d": "(no activity given)"}
 {"t": 1795191152.5168774, "ist": "21:42:32", "ev": "beat", "d": "(no activity given)"}
+{"t": 1795191386.963691, "ist": "21:46:26", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795191387.2785335, "ist": "21:46:27", "ev": "attempt", "d": "t01_word_accuracy -> reverted"}
+{"t": 1795191387.3945334, "ist": "21:46:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795191387.4821692, "ist": "21:46:27", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795191391.7875578, "ist": "21:46:31", "ev": "beat", "d": "(no activity given)"}

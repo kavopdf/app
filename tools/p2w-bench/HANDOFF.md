@@ -64,7 +64,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `16:14` attempt 4 on t13_amount_columns -> reverted (0/26 moved)
 - `17:06` attempt 5 on t13_amount_columns -> kept (5/6 moved)
 - `17:08` attempt 6 on t13_amount_columns -> reverted (0/1 moved)
 - `17:09` agent deployed: t13_amount_columns / A - per-document map of every offending t13 line: source column x, leading spaces, e
@@ -89,6 +88,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `20:45` agent landed: 47margins / class census -> FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md
 - `20:59` attempt 1 on t01_word_accuracy -> reverted (0/10 moved)
 - `21:22` attempt 2 on t01_word_accuracy -> kept (3/10 moved)
+- `21:46` attempt 3 on t01_word_accuracy -> reverted (0/10 moved)
 
 ## Where the rest of the state lives
 
