@@ -1,6 +1,3 @@
-| 12 Nov 08:14 | baseline | ratchet held (docx 140/208 scored, txt 21/208); slot released |
-| 12 Nov 09:06 | baseline | started | phase measure |
-| 12 Nov 09:45 | baseline | 10 documents measured, each committed (66_two_col_footnotes_bottom, 67_two_col_with_sidebar, 68_journal_wide_table_spanning, 69_two_col_legal_numbered_clauses, 70_magazine_drop_cap_photo_caption, 71_invoice_space_aligned_no_rules, 72_bank_statement_no_rules_right_amounts, 73_marksheet_subject_marks_grade, 74_balance_sheet_indented_subitems, 75_merged_header_cell_three_columns) |
 | 12 Nov 09:47 | baseline | txt backfill: 10 more documents recorded (11_stamp_with_signature_image, 12_stamp_across_page_break, 13_stamp_non_english, 14_stamp_chars_positioned_td, 15_stamp_on_scanned_page, 16_right_aligned_amounts_txtpos, 17_three_column_widths_txtpos, 18_centred_heading_left_body_txtpos, 19_hanging_indent_txtpos, 20_numbered_list_separate_column_txtpos), gap 119 -> 109 |
 | 12 Nov 09:48 | baseline | ratchet held (docx 150/208 scored, txt 41/208, backfill gap 109); measure gate NOT READY (58 rows unscored); slot released |
 | 12 Nov 10:01 | started | phase measure |
@@ -198,3 +195,6 @@
 | 20 Nov 04:59 | fixer | slot claimed - fixer running |
 | 20 Nov 05:11 | fixer | attempt content-present-partly-displaced -> partial (2/23 moved) |
 | 20 Nov 05:17 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |
+| 20 Nov 05:51 | fixer | slot claimed - fixer running |
+| 20 Nov 05:53 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |
+| 20 Nov 06:20 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |

@@ -1,5 +1,5 @@
 {
- "plan": "",
+ "plan": "READ FINDINGS/content-present-partly-displaced-rules-are-flow-neutral-065000-f1x.md BEFORE TOUCHING THE RULE CLASS. Two handoff claims are now measured FALSE: (1) the flush-by-top precondition is a regression, not a precondition - with the border path OFF it takes bank-statement 0.10 -> 17.07 and gst-invoice 0.38 -> 15.13, because every shape moved into the flow charges ~9.6 pt; (2) the residual on 18_displacement was never the gap or the flowY bookkeeping - a carrier paragraph costs 9.6 pt in LibreOffice whatever it contains (measured four ways), which is the whole of 0.00 -> 77.01. A flow-neutral construct exists and is in FINDINGS/rules-top-border-FLOW-NEUTRAL-065000-f1x.patch: a pre-pass hands each rule to the paragraph that follows it as a w:top border, the gap becomes w:before and the rule-to-text distance becomes w:space, nothing is reordered and no paragraph is added. It measures EXACTLY baseline on all 8 documents tried (18_centred 0.00, 411 0.00, 62 0.00, bank-statement 0.10, gst-invoice 0.38, mobile-bill 1.55, 315 1.91, 64 3.46) - and places pBdr=0, because its own safety guards decline every rule it could reach. Where a border IS placed, 18_centred goes 0.00 -> 0.53. THAT is the wall and it is not an engine bug: regress.py scores share@5 on a LibreOffice render, LibreOffice draws the floating drawing exactly, and a border can never be pixel-identical - so a fix Google needs is always a small LibreOffice regression, and the brief forbids landing one. DO NOT start another rule-class attempt until a human answers: gate this class in Google (32_stroke_lines / 05_chars_extra on the Google result), declare the class out of scope, or authorise a stated tolerance. Spend the next slot on a class the gate can see.",
  "notes": [
   {
    "at": "13:08",
@@ -304,9 +304,17 @@
   {
    "at": "05:17",
    "text": "attempt 11 on content-present-partly-displaced -> reverted (0/23 moved)"
+  },
+  {
+   "at": "05:53",
+   "text": "attempt 12 on content-present-partly-displaced -> reverted (0/23 moved)"
+  },
+  {
+   "at": "06:20",
+   "text": "attempt 13 on content-present-partly-displaced -> reverted (0/23 moved)"
   }
  ],
- "next": "Re-apply FINDINGS/rules-flush-by-top-WORKS-DISPLACES-055000-f1x.patch with 'git apply' - the flush-by-top change is PROVEN (18_centred: 0->2 pBdr, 2->0 drawings, both rules at the page's own ys 110.0 and 793.89, 32_stroke_lines FAIL->PASS in Google) and it is the precondition the last three runs were missing. Then fix the ONE thing it breaks: 18_displacement. It is NOT the gap (border 1 lands within 0.5 pt of its rule), NOT the below=flowBoxPt*(1-LINE_BASE) term (flowBoxPt is 0 when the rule is flushed) and NOT the kind!=0 guard (removing it changed nothing). It is the reader's position AFTER the carrier paragraph. Measure both variants on 18_centred through gverify: (a) ctx.flowY = s.topPt as written, (b) ctx.flowY left unchanged. One build, one Google round trip, and 18_displacement decides. THEN, separately: columnPage() (DocxWriter.java:2005, :2146, :2214) emits before/cells/after with plain emitBlock loops and returns before pageXml's emit loop, so no multi-column document can be reached - 315_gazette_notification measures pBdr 0 / drawings 5 / 40-42 unchanged because its two horizontal rules land in 'after' with flowY already 751.87. That is a second construct and the bigger share of the corpus.",
+ "next": "READ FINDINGS/content-present-partly-displaced-rules-are-flow-neutral-065000-f1x.md BEFORE TOUCHING THE RULE CLASS. Two handoff claims are now measured FALSE: (1) the flush-by-top precondition is a regression, not a precondition - with the border path OFF it takes bank-statement 0.10 -> 17.07 and gst-invoice 0.38 -> 15.13, because every shape moved into the flow charges ~9.6 pt; (2) the residual on 18_displacement was never the gap or the flowY bookkeeping - a carrier paragraph costs 9.6 pt in LibreOffice whatever it contains (measured four ways), which is the whole of 0.00 -> 77.01. A flow-neutral construct exists and is in FINDINGS/rules-top-border-FLOW-NEUTRAL-065000-f1x.patch: a pre-pass hands each rule to the paragraph that follows it as a w:top border, the gap becomes w:before and the rule-to-text distance becomes w:space, nothing is reordered and no paragraph is added. It measures EXACTLY baseline on all 8 documents tried (18_centred 0.00, 411 0.00, 62 0.00, bank-statement 0.10, gst-invoice 0.38, mobile-bill 1.55, 315 1.91, 64 3.46) - and places pBdr=0, because its own safety guards decline every rule it could reach. Where a border IS placed, 18_centred goes 0.00 -> 0.53. THAT is the wall and it is not an engine bug: regress.py scores share@5 on a LibreOffice render, LibreOffice draws the floating drawing exactly, and a border can never be pixel-identical - so a fix Google needs is always a small LibreOffice regression, and the brief forbids landing one. DO NOT start another rule-class attempt until a human answers: gate this class in Google (32_stroke_lines / 05_chars_extra on the Google result), declare the class out of scope, or authorise a stated tolerance. Spend the next slot on a class the gate can see.",
  "agents": [
   {
    "id": "contA-01",
@@ -466,7 +474,7 @@
   }
  ],
  "run": {
-  "started": "04:59",
+  "started": "06:20",
   "ended": null,
   "ended_how": null
  },
@@ -559,5 +567,5 @@
  ],
  "context": "THE FLUSH-BY-TOP PRECONDITION IS SOLVED; THE RESIDUAL IS DISPLACEMENT, NOT THE RULE. The rule class (Google 32_stroke_lines 145 docs, 05_chars_extra 141) needs a rule written as w:pBdr, and the pBdr fix was inert because attachShapes appends shapes after the paragraphs so the flow was always at the foot. This run built the flush: DocxWriter.pageXml now emits a page's shapes in TOP ORDER among its blocks (flush any unwritten shape whose topPt <= the next Para/Table top, rest after the loop; paragraph/table order untouched). That works exactly as predicted - on 18_centred_heading_left_body_txtpos the emitted XML goes 0->2 w:pBdr and 2->0 w:drawing, both rules landing at the page's own ys 110.0 and 793.89 (the earlier finding's 805.9-pt flow problem is gone), and 32_stroke_lines flips FAIL->PASS in Google. It is REVERTED because it makes 18_displacement fail where it passed - LibreOffice 42/42 -> 41/42 on a document that was clean, Google 18_displacement PASS->FAIL - and the brief says a fix for the largest class that breaks the second-largest is not a fix. The exact diff is FINDINGS/rules-flush-by-top-WORKS-DISPLACES-055000-f1x.patch; re-apply it with 'git apply' and fix the flow. THREE THINGS ARE RULED OUT and must not be retried: the below=flowBoxPt*(1-LINE_BASE) term (flowBoxPt is 0 when the rule is flushed, it contributes nothing), the kind!=0 path guard (removing it changed nothing), and the gap arithmetic (border 1 lands within 0.5 pt of its rule). The residual is the READER'S POSITION AFTER the carrier paragraph, not the gap before it: try emitting the border with ctx.flowY UNCHANGED and compare 18_displacement against the ctx.flowY=s.topPt version - one build and one Google round trip. SECOND BLOCKER, larger than it looks: 315_gazette_notification is three-column and takes columnPage(), which returns BEFORE the emit loop, so its two horizontal rules (y 59.6 and 77.8) are written at the foot (flowY 751.87), both declined, and the document measures pBdr 0 / drawings 5 and 40/42 unchanged in Google. columnPage emits three lists (before, cells[c], after) with plain emitBlock loops at DocxWriter.java:2005, :2146 and :2214; the horizontal rules land in 'after'. A pageXml-only fix cannot reach ANY multi-column document, and the corpus has many. That is the next structural question and it is separate from this one.",
  "needs_human": [],
- "next_class": ""
+ "next_class": "content-present-partly-displaced"
 }

@@ -1,0 +1,231 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index efa7c30..c27e342 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -793,6 +793,24 @@ public final class DocxWriter {
+         float flowBoxPt = 0f;
+         /** Set at a page break so the first line on a page carries no gap. */
+         boolean newPage = true;
++        /**
++         * A rule the paragraph about to be written must carry as a TOP BORDER. -1 = none.
++         *
++         * <p>Why not a paragraph of its own: measured on 18_centred_heading_left_body_txtpos, an
++         * empty {@code <w:p>} with {@code w:line="1" w:lineRule="exact"} and {@code w:sz=2} costs
++         * the flow 9.6 pt in LibreOffice - with a border, without a border, with a run, without
++         * one. A carrier paragraph is therefore a 9.6 pt displacement on every line below the
++         * rule, and the pBdr-carrier construct measured 0.00 -> 77.01 on that document. The
++         * border goes on a paragraph that already exists, where it costs nothing.
++         */
++        float pendRulePt = -1f;
++        /** The pending rule's colour, border weight (eighths of a point) and page edges. */
++        int pendRuleRgb = -1;
++        int pendRuleSz = 6;
++        int pendRuleLeftTw = 0;
++        int pendRuleRightTw = 0;
++        /** True when the last pending rule was actually written as a paragraph border. */
++        boolean pendRulePlaced = false;
+         /** Flow height already spent on this page, in twips. */
+         int flowTw;
+         /** The page's own height in twips - the budget the flow must not exceed. */
+@@ -1325,17 +1343,156 @@ public final class DocxWriter {
+         // so must not charge the flow. Decided from the page's own geometry before anything is
+         // written, so both of the budget guard's passes see the same answer (see pinShortParas).
+         pinShortParas(page);
++        // A RULE IS GIVEN TO THE PARAGRAPH THAT FOLLOWS IT, BEFORE ANYTHING IS WRITTEN.
++        //
++        // The border cannot be written where the shape is, because attachShapes appends every
++        // shape to page.blocks AFTER the page's paragraphs (PdfToWord.java:7122): by the time
++        // the loop reaches a rule the flow is already at the foot of the page, and a paragraph
++        // border is placed by flow, so the rule can only land at the foot.
++        //
++        // REORDERING THE BLOCKS IS NOT THE ANSWER, and this is the measurement that rules it
++        // out: emitting the shapes in top order among the paragraphs puts a paragraph of their
++        // own into the flow, and one such paragraph costs 9.6 pt (see Ctx#pendRulePt). With the
++        // border path switched off and only the reordering in place, bank-statement-horizontal-
++        // rules-only went 0.10 -> 17.07 and gst-invoice-horizontal-rules-only 0.38 -> 15.13 in
++        // LibreOffice - one rule per row, one charge each. Putting the drawing's run inside the
++        // paragraph already on the page is no better (17.04, and 3.63 pt of drift inside table
++        // cells). So nothing is reordered and no paragraph is added: the rule is looked up here,
++        // by geometry, and handed to the paragraph that the page drew it above.
++        int[] ruleFor = ruleAssignment(page);
++        boolean[] rulePlaced = new boolean[page.blocks.size()];
+         for (int bi = 0; bi < page.blocks.size(); bi++) {
+             Object block = page.blocks.get(bi);
++            if (block instanceof PdfToWord.Para && ruleFor[bi] >= 0) {
++                pendRuleFrom(page, (Shape) page.blocks.get(ruleFor[bi]), ctx);
++            }
+             ctx.nextIsPara = bi + 1 < page.blocks.size()
+                     && page.blocks.get(bi + 1) instanceof PdfToWord.Para;
+             ctx.nextIsTable = bi + 1 < page.blocks.size()
+                     && page.blocks.get(bi + 1) instanceof PdfToWord.Table;
++            // EVERY SHAPE IS WRITTEN AFTER THE PAGE'S PARAGRAPHS, IN BLOCK ORDER, exactly as it
++            // always was: attachShapes already put them there, and keeping that order keeps the
++            // emitted document identical to the one that measured 0.10 on
++            // bank-statement-horizontal-rules-only. Re-ordering them at all is a regression -
++            // the same 39 drawings in a different order measured 8.57 on that document, because
++            // a drawing anchored into a table cell moves with the paragraph it hangs in.
++            if (block instanceof Shape) continue;
++            ctx.pendRulePlaced = false;
+             emitBlock(sb, block, ctx);
++            if (ruleFor[bi] >= 0) rulePlaced[ruleFor[bi]] = ctx.pendRulePlaced;
++        }
++        ctx.pendRulePt = -1f;
++        for (int i = 0; i < page.blocks.size(); i++) {
++            Object b = page.blocks.get(i);
++            if (!(b instanceof Shape)) continue;
++            // A rule the paragraph took is not written at all; everything else is.
++            if (ruleFor[i] == i && rulePlaced[i]) continue;
++            emitBlock(sb, b, ctx);
+         }
+         cenEmit(ctx, page);
+     }
+ 
++    /**
++     * Which shape each paragraph of this page must carry as a top border.
++     *
++     * <p>Entry {@code j} is the index of the shape that becomes paragraph {@code j}'s top border,
++     * or -1. A SHAPE entry equal to its own index means "this shape is a rule and has been given
++     * away - do not write it".
++     *
++     * <p>The rule goes to the first paragraph whose top it is at or above, within a paragraph's
++     * height, and only when the two agree on their horizontal extent: a paragraph border spans
++     * the paragraph's own indents and OOXML gives {@code w:pBdr} no indent of its own, so a rule
++     * whose x differs from the line under it cannot be written as that line's border. Measured on
++     * 18_centred_heading_left_body_txtpos: rule 1 spans 56.0..539.3 pt, the centred heading under
++     * it is indented to 102.4, and the border came out 46.4 pt right of the rule and 56 pt past
++     * the paper edge.
++     */
++    private static int[] ruleAssignment(PdfToWord.Page page) {
++        int n = page.blocks.size();
++        int[] out = new int[n];
++        java.util.Arrays.fill(out, -1);
++        for (int i = 0; i < n; i++) {
++            if (!(page.blocks.get(i) instanceof Shape)) continue;
++            Shape s = (Shape) page.blocks.get(i);
++            if (!isHairline(s)) continue;
++            if (Math.abs(s.hPt) > Math.abs(s.wPt)) continue;   // vertical rules are not pBdr top
++            int rgb = s.lineRgb >= 0 ? s.lineRgb : s.fillRgb;
++            if (rgb < 0) continue;
++            int pick = -1;
++            float pickTop = Float.POSITIVE_INFINITY;
++            for (int j = 0; j < n; j++) {
++                Object b = page.blocks.get(j);
++                if (!(b instanceof PdfToWord.Para)) continue;
++                PdfToWord.Para q = (PdfToWord.Para) b;
++                if (!(q.top >= s.topPt - 0.5f)) continue;
++                if (out[j] >= 0) continue;                     // one top border per paragraph
++                if (q.top < pickTop) { pick = j; pickTop = q.top; }
++            }
++            if (pick < 0) continue;
++            out[pick] = i;
++            out[i] = i;
++        }
++        return out;
++    }
++
++    /** Loads a rule into {@link Ctx#pendRulePt} so the next paragraph writes it as its border. */
++    private static void pendRuleFrom(PdfToWord.Page page, Shape s, Ctx ctx) {
++        int rgb = s.lineRgb >= 0 ? s.lineRgb : s.fillRgb;
++        // A rule painted by its fill has no stroke width: taking the weight from lineWidthPt
++        // alone drew every filled rule as a 0.25 pt border while the page drew it 1.2 pt wide.
++        float weightPt = s.lineWidthPt > 0f ? s.lineWidthPt : s.hPt;
++        ctx.pendRulePt = s.topPt;
++        ctx.pendRuleRgb = rgb;
++        ctx.pendRuleSz = (int) Math.max(2L, Math.min(96L, Math.round(weightPt * 8f)));
++        ctx.pendRuleLeftTw = (int) Math.max(0L, Math.round(s.xPt * TWIPS_PER_PT));
++        ctx.pendRuleRightTw = (int) Math.max(0L,
++                Math.round((ctx.pageWidthPt - (s.xPt + s.wPt)) * TWIPS_PER_PT));
++    }
++
++    /**
++     * Turns the pending rule into this paragraph's top border.
++     *
++     * <p>The gap down to the rule becomes the paragraph's {@code w:before} and the distance from
++     * the rule to the text becomes the border's {@code w:space}, so the paragraph's OUTER TOP
++     * lands on the rule and its text lands where the page drew it: the border spends a gap the
++     * paragraph was going to spend anyway, and nothing is added to the flow.
++     *
++     * @param absTop the top of this line's box, in points from the sheet's top edge
++     * @return the {@code w:space} the border carries, or -1 when the rule must keep its drawing
++     */
++    private static int pendRuleConsume(float absTop, int leftTw, int rightTw, Ctx ctx) {
++        if (ctx.pendRulePt < 0f) return -1;
++        float from = flowTopPt(ctx);
++        float gapPt = ctx.pendRulePt - from;
++        float spacePt = absTop - ctx.pendRulePt;
++        ctx.pendRulePt = -1f;
++        ctx.pendRulePlaced = false;
++        // w:space is whole points and its schema maximum is 31; a rule further than that above
++        // the text, or one the flow has not reached, keeps its drawing.
++        if (ctx.inColumn || ctx.newPage || gapPt < -0.5f || spacePt < 0f || spacePt > 31f) {
++            return -1;
++        }
++        // The border spans this paragraph's indents and cannot be given its own (see
++        // ruleAssignment), so the two must agree before the rule is written this way.
++        float ruleLeftPt = (float) (ctx.pendRuleLeftTw / TWIPS_PER_PT);
++        float ruleRightPt = (float) (ctx.pageWidthPt - ctx.pendRuleRightTw / TWIPS_PER_PT);
++        float textLeftPt = (float) (leftTw / TWIPS_PER_PT);
++        float textRightPt = (float) (ctx.pageWidthPt - rightTw / TWIPS_PER_PT);
++        if (Math.abs(ruleLeftPt - textLeftPt) > 1.5f
++                || Math.abs(ruleRightPt - textRightPt) > 1.5f) {
++            return -1;
++        }
++        ctx.pendRulePlaced = true;
++        return Math.round(spacePt);
++    }
++
++    /** The {@code w:pBdr} a pending rule becomes, as a paragraph's top border. */
++    private static String pendRuleXml(Ctx ctx, int spacePt) {
++        return "<w:pBdr><w:top w:val=\"single\" w:sz=\"" + ctx.pendRuleSz
++                + "\" w:space=\"" + spacePt + "\" w:color=\"" + hex(ctx.pendRuleRgb)
++                + "\"/></w:pBdr>";
++    }
++
+     /**
+      * The column each box of a cross-gutter "row" belongs to, or null when the block is a
+      * genuine full-width line.
+@@ -4278,6 +4435,18 @@ public final class DocxWriter {
+             absBeforeTw = (int) Math.max(0L,
+                     Math.round(Math.min(absTop - ctx.flowY, gapCapTw(ctx) / TWIPS_PER_PT) * TWIPS_PER_PT));
+         }
++        // A RULE THIS PARAGRAPH MUST CARRY IS ITS TOP BORDER. The gap down to the rule is this
++        // paragraph's space-before and the rule-to-text distance is the border's w:space, so the
++        // paragraph's outer top lands on the rule and its text lands where the page drew it.
++        int ruleSpacePt = -1;
++        if (ctx.pendRulePt >= 0f) {
++            float ruleTopPt = ctx.pendRulePt;
++            ruleSpacePt = pendRuleConsume(absTop, leftTw, rightTw, ctx);
++            if (ruleSpacePt >= 0) {
++                beforeTw = (int) Math.max(0L,
++                        Math.round((ruleTopPt - flowTopPt(ctx)) * TWIPS_PER_PT));
++            }
++        }
+         // ZERO-GAP MEASUREMENT. A gap is white space the flow spends going down, so it cannot
+         // be negative: when the page puts this line ABOVE where the flow already is, the gap
+         // is written as 0 and the line lands wherever the flow happens to be - low by the
+@@ -4376,14 +4545,21 @@ public final class DocxWriter {
+         // position rather than from the PDF's (D-26) - and to the position this paragraph was
+         // really placed at, which is the table/row edge when the branch above used one.
+         float beforeY = ctx.flowY;
+-        resync(ctx, placeTopPt, beforeTw, lineTw);
+-        traceLine(ctx, "flowFromBox", b.y, beforeTw, lineTw, beforeY, text);
++        // THE BORDER'S w:space IS SPENT BY THE READER, SO THE MODEL MUST SPEND IT TOO. The XML
++        // carries the gap to the rule in w:before and the rule-to-text distance in the border's
++        // w:space, but the reader walks past both. Re-syncing on w:before alone left the model
++        // that many points above the line it had just written, so the next paragraph's gap came
++        // out that much too large and the error repeated once per rule.
++        int modelTw = beforeTw + (ruleSpacePt >= 0 ? ruleSpacePt * (int) TWIPS_PER_PT : 0);
++        resync(ctx, placeTopPt, modelTw, lineTw);
++        traceLine(ctx, "flowFromBox", b.y, modelTw, lineTw, beforeY, text);
+         sb.append("<w:p><w:pPr>");
+         if (p.heading > 0) {
+             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
+         }
+-        sb.append("<w:snapToGrid w:val=\"0\"/>")
+-                .append(spacing(beforeTw, lineTw, b.size, autoFlowLines(), ctx.newPage))
++        sb.append("<w:snapToGrid w:val=\"0\"/>");
++        if (ruleSpacePt >= 0) sb.append(pendRuleXml(ctx, ruleSpacePt));
++        sb.append(spacing(beforeTw, lineTw, b.size, autoFlowLines(), ctx.newPage))
+                 .append("<w:ind w:left=\"").append(Math.max(0, leftTw - bandLeftTw(ctx, p.column)))
+                 .append("\" w:right=\"").append(rightTw).append("\" w:firstLine=\"0\"/>");
+         if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");

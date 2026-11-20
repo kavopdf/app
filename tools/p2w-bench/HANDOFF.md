@@ -9,10 +9,10 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 04:59 |
+| started | 06:20 |
 | ended | still running |
 | how it ended | - |
-| plan | - |
+| plan | READ FINDINGS/content-present-partly-displaced-rules-are-flow-neutral-065000-f1x.md BEFORE TOUCHING THE RULE CLASS. Two handoff claims are now measured FALSE: (1) the flush-by-top precondition is a regression, not a precondition - with the border path OFF it takes bank-statement 0.10 -> 17.07 and gst-invoice 0.38 -> 15.13, because every shape moved into the flow charges ~9.6 pt; (2) the residual on 18_displacement was never the gap or the flowY bookkeeping - a carrier paragraph costs 9.6 pt in LibreOffice whatever it contains (measured four ways), which is the whole of 0.00 -> 77.01. A flow-neutral construct exists and is in FINDINGS/rules-top-border-FLOW-NEUTRAL-065000-f1x.patch: a pre-pass hands each rule to the paragraph that follows it as a w:top border, the gap becomes w:before and the rule-to-text distance becomes w:space, nothing is reordered and no paragraph is added. It measures EXACTLY baseline on all 8 documents tried (18_centred 0.00, 411 0.00, 62 0.00, bank-statement 0.10, gst-invoice 0.38, mobile-bill 1.55, 315 1.91, 64 3.46) - and places pBdr=0, because its own safety guards decline every rule it could reach. Where a border IS placed, 18_centred goes 0.00 -> 0.53. THAT is the wall and it is not an engine bug: regress.py scores share@5 on a LibreOffice render, LibreOffice draws the floating drawing exactly, and a border can never be pixel-identical - so a fix Google needs is always a small LibreOffice regression, and the brief forbids landing one. DO NOT start another rule-class attempt until a human answers: gate this class in Google (32_stroke_lines / 05_chars_extra on the Google result), declare the class out of scope, or authorise a stated tolerance. Spend the next slot on a class the gate can see. |
 
 ## The picture, in the words of the run that left it
 
@@ -46,8 +46,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `22:32` attempt 3 on content-present-partly-displaced -> kept (13/18 moved)
-- `22:35` agent landed: contA-04 /  -> FINDINGS/content-present-partly-displaced-bankpitch-133100-d68d.md
 - `22:35` agent landed: contB-04 /  -> FINDINGS/content-present-partly-displaced-vmergescope-133908-a7c4.md
 - `22:59` attempt 3 on content-present-partly-displaced -> reverted (0/24 moved)
 - `23:00` attempt 4 on content-present-partly-displaced -> kept (13/18 moved)
@@ -71,6 +69,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `04:13` agent landed: contB-06 /  -> FINDINGS/content-present-partly-displaced-subpx-041118-ed1d.md
 - `05:11` attempt 10 on content-present-partly-displaced -> partial (2/23 moved)
 - `05:17` attempt 11 on content-present-partly-displaced -> reverted (0/23 moved)
+- `05:53` attempt 12 on content-present-partly-displaced -> reverted (0/23 moved)
+- `06:20` attempt 13 on content-present-partly-displaced -> reverted (0/23 moved)
 
 ## Where the rest of the state lives
 

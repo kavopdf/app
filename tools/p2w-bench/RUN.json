@@ -1,6 +1,6 @@
 {
- "started_ts": 1795130940.7651992,
- "started": "04:59",
+ "started_ts": 1795134093.113132,
+ "started": "05:51",
  "ended_ts": null,
  "ended": null,
  "class": "content-present-partly-displaced",
@@ -9,6 +9,5 @@
  "docs_improved": 0,
  "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0,
- "partial": 1
+ "needs_human": 0
 }
