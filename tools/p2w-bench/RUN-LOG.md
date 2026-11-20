@@ -198,3 +198,4 @@
 | 20 Nov 10:36 | fixer | attempt 18_displacement -> reverted (0/107 moved) |
 | 20 Nov 10:38 | fixer | attempt 18_displacement -> reverted (0/107 moved) |
 | 20 Nov 10:41 | fixer | attempt 18_displacement -> reverted (0/107 moved) |
+| 20 Nov 10:43 | fixer | slot FORCED released - see INCIDENTS.md for why |
