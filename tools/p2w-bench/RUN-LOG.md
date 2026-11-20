@@ -199,3 +199,4 @@
 | 20 Nov 08:52 | fixer | slot claimed - fixer running |
 | 20 Nov 09:22 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |
 | 20 Nov 09:24 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 20 Nov 09:25 | fixer | slot re-claimed by a status check, then released again - the claim was accidental, no work was done under it |

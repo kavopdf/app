@@ -6,7 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 07:00 | fixer | commit-gate | started |
 | 13 Nov 07:00 | ? | commit-gate | started |
 | 13 Nov 07:40 | fixer | claim | fixer claimed the slot |
 | 13 Nov 07:40 | fixer | classify | 43 classes from 208 documents |
@@ -406,3 +405,4 @@
 | 20 Nov 09:17 | fixer | build-engine | started |
 | 20 Nov 09:18 | fixer | build-engine | engine built in 37s |
 | 20 Nov 09:22 | fixer | attempt | content-present-partly-displaced -> reverted (0/23 moved) |
+| 20 Nov 09:25 | fixer | claim | fixer claimed the slot |

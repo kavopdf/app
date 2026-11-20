@@ -741,3 +741,5 @@
 {"t": 1795146900.8677604, "ist": "09:25:00", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795146901.2402549, "ist": "09:25:01", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795146901.3713896, "ist": "09:25:01", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795146920.4644794, "ist": "09:25:20", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795146920.6127841, "ist": "09:25:20", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
