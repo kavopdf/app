@@ -429,5 +429,22 @@
    ]
   ],
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795202848.4655814,
+  "started": "00:57",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "t01_word_accuracy",
+  "attempts": 4,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   "t01_A-02",
+   "t01_B-02"
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

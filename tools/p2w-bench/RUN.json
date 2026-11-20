@@ -1,8 +1,8 @@
 {
  "started_ts": 1795202848.4655814,
  "started": "00:57",
- "ended_ts": null,
- "ended": null,
+ "ended_ts": 1795206110.7137089,
+ "ended": "01:51",
  "class": "t01_word_accuracy",
  "attempts": 4,
  "kept": 0,
