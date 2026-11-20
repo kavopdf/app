@@ -39,7 +39,18 @@ OUT = "/scratch/work/p2w/out"
 CORPUS = "/scratch/work/p2w/corpus"
 STAGE = "/scratch/work/p2w/gverify/stage"
 GD = "/scratch/work/p2w/gverify/gd"
-RES = "/scratch/work/p2w/gverify/results"
+# THE COMMITTED DIRECTORY IS THE RECORD; THE WORK ONE IS A SCRATCH AREA.
+#
+# These read /scratch/work/p2w/*, which does not survive a sandbox. So on a fresh run --report said
+# "90 verified, 32_stroke_lines 53 docs" while the committed results said 192 scored and 145 - and a
+# report generated from that would have been wrong in every number while looking entirely reasonable.
+# Found 20 Nov while checking why a real number failed verification.
+#
+# The committed benchmarks/ copies win whenever they exist. The work path stays as the fallback for
+# a run that has just measured something and not yet committed it.
+_RES_WORK = "/scratch/work/p2w/gverify/results"
+_RES_REPO = os.path.normpath(os.path.join(HERE, "..", "..", "benchmarks", "gverify"))
+RES = _RES_REPO if os.path.isdir(_RES_REPO) and os.listdir(_RES_REPO) else _RES_WORK
 
 
 def _names():
@@ -135,7 +146,9 @@ def collect(name, url):
 
 
 SOFFICE = "/usr/lib/libreoffice/program/soffice.bin"
-LORES = "/scratch/work/p2w/lo-res"
+_LO_WORK = "/scratch/work/p2w/lo-res"
+_LO_REPO = os.path.normpath(os.path.join(HERE, "..", "..", "benchmarks", "gverify-lo"))
+LORES = _LO_REPO if os.path.isdir(_LO_REPO) and os.listdir(_LO_REPO) else _LO_WORK
 
 
 def collect_lo(name):
@@ -193,7 +206,7 @@ def matrix():
     cannot be written without both numbers on the same document.
     """
     from collections import Counter
-    lo_dir = "/scratch/work/p2w/lo-res"
+    lo_dir = LORES
     if not os.path.isdir(RES):
         print("no Google results yet")
         return 2

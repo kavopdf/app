@@ -307,6 +307,83 @@ def verify_facts(text, data):
     return problems
 
 
+# ---------------------------------------------------------------- gverify and health
+#
+# THESE TWO CRONS HAD NO VERIFICATION AT ALL. report.py and lastmessage.py covered the baseline, the
+# classifier, the fixer and the APK; the gverify and watchdog reports were prose a run wrote by hand,
+# and the only thing standing between a number and the message was the run's own care. The two
+# reports audited on 20 Nov were accurate - and nothing would have caught them if they had not been.
+#
+# The check is the same one that makes the others trustworthy: every number in the message must be
+# one the tool actually printed. A run cannot type a count it did not measure, because the count it
+# typed is compared against the tool's own output character for character.
+
+NUM_RE = r"\b\d{1,4}\b"
+
+
+def _tool_numbers(cmds):
+    """Every integer any of these tools prints, plus the tool output itself for the record."""
+    seen = set()
+    text = ""
+    for cmd in cmds:
+        try:
+            r = subprocess.run(cmd, shell=True, cwd=os.path.dirname(os.path.dirname(HERE)),
+                               capture_output=True, text=True,
+                               timeout=180)
+            out = (r.stdout or "") + (r.stderr or "")
+        except Exception as e:
+            out = ""
+            print("warning: %s did not run - %s" % (cmd, e))
+        text += out + "\n"
+        for m in re.findall(NUM_RE, out):
+            seen.add(int(m))
+    return seen, text
+
+
+def verify_tool_numbers(text, cmds, label):
+    """Every number in the message must appear in what the tools printed.
+
+    Numbers that legitimately come from elsewhere - a date, a commit sha, the corpus size - are
+    allowed by the caller passing them in the tool output, which is why the commands include the
+    tools that print those too.
+    """
+    have, _ = _tool_numbers(cmds)
+    if not have:
+        return ["%s: no tool output could be read - nothing in this message is verified" % label]
+    # A DATE OR A CLOCK IS NOT A MEASUREMENT. "20 Nov 2026" and "05:51" carry numbers no tool prints
+    # and no reader mistakes for a count. Everything else must be traceable.
+    text = re.sub(r"\b(19|20)\d{2}\b", " ", text)
+    text = re.sub(r"\b\d{1,2}:\d{2}(:\d{2})?\b", " ", text)
+    text = re.sub(r"\b\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b", " ", text)
+    text = re.sub(r"\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\b", " ", text)
+    bad = []
+    for m in re.finditer(r"(?<![\w.])(\d{1,4})(?![\w.])", text):
+        n = int(m.group(1))
+        if n not in have:
+            ctx = text[max(0, m.start() - 45):m.end() + 45].replace("\n", " ")
+            bad.append("%s: %d is not in the %s output - ...%s..." % (label, n, label, ctx))
+    return bad
+
+
+def verify_for(cron, text):
+    """Dispatch the per-cron verification. Returns a list of problems."""
+    if cron == "gverify":
+        return verify_tool_numbers(
+            text,
+            ["python3 tools/p2w-bench/gverify.py --report",
+             "python3 tools/p2w-bench/stage.py --json",
+             "python3 tools/p2w-bench/gverify.py --matrix"],
+            "gverify")
+    if cron == "health":
+        return verify_tool_numbers(
+            text,
+            ["python3 tools/p2w-bench/health.py --json",
+             "python3 tools/p2w-bench/progress.py --json",
+             "python3 tools/p2w-bench/round.py --phase"],
+            "health")
+    return []
+
+
 def main(argv):
     if "--check" in argv:
         if not os.path.exists(OUT):
@@ -332,6 +409,23 @@ def main(argv):
     # BOTH CHECKS RUN, AND EVERY PROBLEM IS PRINTED. The row check used to return before the fact
     # check ran, so a report with a wrong table row was rejected without ever telling the run that
     # its header clock was wrong too - and the run fixed the row and shipped the clock.
+    _for = ""
+    if "--for" in argv:
+        _i = argv.index("--for") + 1
+        if _i < len(argv):
+            _for = argv[_i].strip().lower()
+    if _for in ("gverify", "health"):
+        _p = verify_for(_for, text)
+        if _p:
+            print("REFUSED - %d number(s) in this %s report are not in the tool output:" % (len(_p), _for))
+            for x in _p[:12]:
+                print("  " + x)
+            print("A number a run types is a number a run can get wrong. Re-run the tool and copy")
+            print("what it prints, or delete the sentence that needs the number.")
+            return 3
+        print("ok - every number in this %s report is one the tool printed" % _for)
+        return 0
+
     problems, checked = verify(text)
     data = _report_json()
     facts = verify_facts(text, data) + verify_sections(text)
