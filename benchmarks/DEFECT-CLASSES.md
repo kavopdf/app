@@ -16,10 +16,10 @@ dominates it.
 |---|---|---|---|
 | content-loss | content-missing-partly-replaced | 12 | 1 |
 | content-loss | content-missing-nothing-in-its-place | 6 | 16 |
-| mixed | content-partly-lost-and-displaced | 6 | 4 |
 | mixed | content-partly-lost | 6 | 0 |
+| mixed | content-partly-lost-and-displaced | 5 | 4 |
 | displacement | content-present-partly-displaced | 23 | 0 |
-| displacement | content-present-wholly-displaced | 7 | 1 |
+| displacement | content-present-wholly-displaced | 8 | 1 |
 | clean | none | 0 | 130 |
 
 `single-element-far-out` is closed: it held one document, `newsletter-3col-header-footer`, and
@@ -75,7 +75,7 @@ only a work queue.
 | 33 | `one-page-rotated-180-degrees` | content-missing-partly-replaced | 81.64 | 177.60 | 2 | OPEN | - |
 | 34 | `600_reviewed_invoice_with_annotations` | content-missing-partly-replaced | 62.46 | 62.88 | 1 | OPEN | - |
 | 35 | `601_fillable_admission_form` | content-missing-partly-replaced | 52.39 | 27.84 | 1 | OPEN | - |
-| 36 | `table-inside-two-column-page` | content-partly-lost-and-displaced | 38.11 | 82.08 | 1 | OPEN | - |
+| 36 | `table-inside-two-column-page` | content-present-wholly-displaced | 35.87 | 21.60 | 1 | OPEN | - |
 | 37 | `360_restaurant_menu` | content-missing-partly-replaced | 34.43 | 45.60 | 1 | OPEN | - |
 | 38 | `text-held-twice-shadow-text` | content-missing-partly-replaced | 30.29 | 60.48 | 1 | OPEN | - |
 | 39 | `77_arabic_rtl_document` | content-missing-partly-replaced | 11.89 | 19.68 | 1 | OPEN | - |

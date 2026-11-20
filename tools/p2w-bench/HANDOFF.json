@@ -316,6 +316,26 @@
   {
    "at": "07:13",
    "text": "attempt 5 on content-partly-lost-and-displaced -> partial (1/6 moved)"
+  },
+  {
+   "at": "07:59",
+   "text": "attempt 6 on content-partly-lost-and-displaced -> kept (1/6 moved)"
+  },
+  {
+   "at": "07:59",
+   "text": "agent deployed: content-partly-lost-and-displaced / B - why two corpus documents lose ~60% of their ink at 5px: absent or moved"
+  },
+  {
+   "at": "07:59",
+   "text": "agent landed: contB-07 /  -> tools/p2w-bench/FINDINGS/content-partly-lost-and-displaced-twocol-tables-0700-f1x.md"
+  },
+  {
+   "at": "07:59",
+   "text": "agent deployed: content-partly-lost / A - is the justified-line spacing fix missing from the engine or already landed"
+  },
+  {
+   "at": "07:59",
+   "text": "agent landed: contA-07 /  -> tools/p2w-bench/FINDINGS/content-partly-lost-JUSTIFY-already-landed-0700-f1x.md"
   }
  ],
  "next": "content-partly-lost-and-displaced: itr-computation-with-slab-table (share5 42.33, share@10 27.40, share@20 7.85) - table rows are written at their own w:trHeight of 351/370 tw against the page's uniform 368 tw, so the page compresses by 0.5pt a row and -14.31pt by the last row (DocxWriter.java:6182 and :6271-6273; the arithmetic that yields 351 is NOT verified). The other four OPEN documents in this class are 31_times_body_arial_headings 1.04, 370_offer_letter 2.70, 14_stamp_chars_positioned_td 3.89, 75_merged_header_cell_three_columns 7.62. The rule class stays blocked pending a human.",
@@ -475,6 +495,30 @@
    "finding": "FINDINGS/content-present-partly-displaced-subpx-041118-ed1d.md",
    "deployed_at": "2026-11-19T22:24",
    "landed_at": "2026-11-19T22:43"
+  },
+  {
+   "id": "contB-07",
+   "class": "content-partly-lost-and-displaced",
+   "angle": "B",
+   "question": "why two corpus documents lose ~60% of their ink at 5px: absent or moved",
+   "expected": "landed",
+   "deployed": "07:59",
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/content-partly-lost-and-displaced-twocol-tables-0700-f1x.md",
+   "deployed_at": "2026-11-20T02:29",
+   "landed_at": "2026-11-20T02:29"
+  },
+  {
+   "id": "contA-07",
+   "class": "content-partly-lost",
+   "angle": "A",
+   "question": "is the justified-line spacing fix missing from the engine or already landed",
+   "expected": "landed",
+   "deployed": "07:59",
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/content-partly-lost-JUSTIFY-already-landed-0700-f1x.md",
+   "deployed_at": "2026-11-20T02:29",
+   "landed_at": "2026-11-20T02:29"
   }
  ],
  "run": {

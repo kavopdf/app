@@ -40,17 +40,14 @@ unfinished work, not as a result.
 | contB-05 | content-present-partly-displaced | B | what does check 65_table_span_down assert and why does 75_merged_heade | 00:46 | 00:41 | landed | FINDINGS/content-present-partly-displaced-mergedheader-vmerge-192600-c3f1.md |
 | contA-06 | content-present-partly-displaced | A | after rules become w:pBdr, which construct still emits the U+200B anch | 03:54 | expected by 05:00 | landed | FINDINGS/content-present-partly-displaced-zerowidth-040040-7c1e.md |
 | contB-06 | content-present-partly-displaced | B | mobile-bill share5 43.87 and electricity-bill 46.85 with max_pt only 1 | 03:54 | expected by 05:00 | landed | FINDINGS/content-present-partly-displaced-subpx-041118-ed1d.md |
+| contB-07 | content-partly-lost-and-displaced | B | why two corpus documents lose ~60% of their ink at 5px: absent or move | 07:59 | landed | landed | tools/p2w-bench/FINDINGS/content-partly-lost-and-displaced-twocol-tables-0700-f1x.md |
+| contA-07 | content-partly-lost | A | is the justified-line spacing fix missing from the engine or already l | 07:59 | landed | landed | tools/p2w-bench/FINDINGS/content-partly-lost-JUSTIFY-already-landed-0700-f1x.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `22:59` attempt 3 on content-present-partly-displaced -> reverted (0/24 moved)
-- `23:00` attempt 4 on content-present-partly-displaced -> kept (13/18 moved)
-- `23:00` ATTEMPTS.json attempt 4 on content-present-partly-displaced is a RATCHET STAMP for attempt 2 (the 22:30 recordBaseline split-row fix, 13/18 moved, corpus ratcheted at d129d46), not a second fix - attempt.py has no way to stamp a ratchet without appending an attempt, so a later report.py will read '2 kept'. One fix was kept this round on this class.
-- `23:56` attempt 5 on content-present-partly-displaced -> error (0/18 moved)
-- `00:24` attempt 6 on content-present-partly-displaced -> kept (2/18 moved)
 - `00:46` agent deployed: content-present-partly-displaced / A - can RuleCollector carry the PDF paint operator so a shading fill stops acting as
 - `00:46` agent deployed: content-present-partly-displaced / B - what does check 65_table_span_down assert and why does 75_merged_header_cell_thr
 - `02:25` attempt 7 on content-present-partly-displaced -> kept (1/23 moved)
@@ -71,6 +68,11 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `05:53` attempt 12 on content-present-partly-displaced -> reverted (0/23 moved)
 - `06:20` attempt 13 on content-present-partly-displaced -> reverted (0/23 moved)
 - `07:13` attempt 5 on content-partly-lost-and-displaced -> partial (1/6 moved)
+- `07:59` attempt 6 on content-partly-lost-and-displaced -> kept (1/6 moved)
+- `07:59` agent deployed: content-partly-lost-and-displaced / B - why two corpus documents lose ~60% of their ink at 5px: absent or moved
+- `07:59` agent landed: contB-07 /  -> tools/p2w-bench/FINDINGS/content-partly-lost-and-displaced-twocol-tables-0700-f1x.md
+- `07:59` agent deployed: content-partly-lost / A - is the justified-line spacing fix missing from the engine or already landed
+- `07:59` agent landed: contA-07 /  -> tools/p2w-bench/FINDINGS/content-partly-lost-JUSTIFY-already-landed-0700-f1x.md
 
 ## Where the rest of the state lives
 

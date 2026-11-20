@@ -6,7 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 06:56 | fixer | hypothesis | 20_within_10pt (+4) -> ruled-out |
 | 13 Nov 06:56 | fixer | hypothesis | 20_within_10pt (+4) -> untested |
 | 13 Nov 06:56 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 06:56 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
@@ -406,3 +405,4 @@
 | 20 Nov 07:11 | fixer | build-engine | started |
 | 20 Nov 07:11 | fixer | build-engine | engine built in 35s |
 | 20 Nov 07:13 | fixer | attempt | content-partly-lost-and-displaced -> partial (1/6 moved) |
+| 20 Nov 07:59 | fixer | attempt | content-partly-lost-and-displaced -> kept (1/6 moved) |

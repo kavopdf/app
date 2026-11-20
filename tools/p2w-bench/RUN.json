@@ -4,11 +4,21 @@
  "ended_ts": null,
  "ended": null,
  "class": "content-partly-lost-and-displaced",
- "attempts": 1,
- "kept": 0,
- "docs_improved": 0,
- "agents": [],
+ "attempts": 2,
+ "kept": 1,
+ "docs_improved": 1,
+ "agents": [
+  "contB-07",
+  "contA-07"
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0,
- "partial": 1
+ "partial": 1,
+ "ratchets": 1,
+ "counted": [
+  [
+   "content-partly-lost-and-displaced",
+   1
+  ]
+ ]
 }
