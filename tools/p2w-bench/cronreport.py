@@ -108,9 +108,33 @@ def google_state():
     return scored, refused, clean, failed_by
 
 
-def lo_failed_by():
+def scored_names():
+    """The documents the Google count is over: a result that is not a page-count refusal.
+
+    THE LIBREOFFICE COLUMN MUST BE COUNTED OVER THE SAME DOCUMENTS AS THE GOOGLE COLUMN, or the
+    report compares two different corpora in one sentence. It counted every file in gverify-lo -
+    including the ones Google refused - and printed "Google passes all 42 on 7; LibreOffice on 122"
+    over a stated 192 measured. The 14 documents Google refused and LibreOffice passed were inside
+    that 122, so the gap looked wider than the paired evidence supports. gverify.py --matrix has
+    always used this denominator; the report now does too.
+    """
+    names = set()
+    for f in sorted(glob.glob(GV + "/*.json")):
+        try:
+            j = json.load(open(f, encoding="utf-8"))
+        except Exception:
+            continue
+        if j.get("status") == "page_count_refused":
+            continue
+        names.add(os.path.basename(f)[:-5])
+    return names
+
+
+def lo_failed_by(names=None):
     out = {}
     for f in sorted(glob.glob(GLO + "/*.json")):
+        if names is not None and os.path.basename(f)[:-5] not in names:
+            continue
         try:
             j = json.load(open(f, encoding="utf-8"))
         except Exception:
@@ -267,9 +291,12 @@ def gverify():
     d, t = stamp()
     scored, refused, gclean, gf = google_state()
     need(scored, "benchmarks/gverify has no scored results")
-    lf = lo_failed_by()
+    names = scored_names()
+    lf = lo_failed_by(names)
     lclean = 0
     for f in sorted(glob.glob(GLO + "/*.json")):
+        if os.path.basename(f)[:-5] not in names:
+            continue
         try:
             j = json.load(open(f, encoding="utf-8"))
         except Exception:
