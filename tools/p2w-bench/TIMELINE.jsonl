@@ -1246,3 +1246,5 @@
 {"t": 1795197255.1307125, "ist": "23:24:15", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795197256.453429, "ist": "23:24:16", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795197256.8408043, "ist": "23:24:16", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795204572.207559, "ist": "01:26:12", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795204627.0906565, "ist": "01:27:07", "ev": "beat", "d": "classrow.py: refreshing the class file"}
