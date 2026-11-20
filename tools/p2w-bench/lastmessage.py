@@ -365,6 +365,36 @@ def verify_tool_numbers(text, cmds, label):
     return bad
 
 
+# A REPORT IS NOT A TRANSCRIPT OF ITS OWN INSTRUCTIONS.
+#
+# The 20 Nov gverify report pasted its whole prompt into the message. The numbers were right and the
+# layout was destroyed: the prompt rendered as one enormous dark code block that ran across two pages,
+# inline code spans came out as empty white rectangles, and the report itself did not begin until the
+# bottom of page three. The user's words: "layout bohot zyada toota hai".
+#
+# Nothing in the prompt belongs in the report. A run that has to paste its instructions to explain
+# itself has not understood what it did.
+PROMPT_MARKERS = (
+    "You measure every document through BOTH renderers",
+    "READ THIS FIRST, ALL OF IT",
+    "STEP 0 - WHOSE STAGE IS IT",
+    "FIVE THINGS THAT COST A RUN",
+    "git clone github.com",
+    "bash tools/install-gate.sh",
+    "COORDINATION.md",
+    "THE ONE STEP THAT IS NOT AUTOMATIC",
+)
+
+
+def verify_not_a_transcript(text):
+    """Refuse a report that has pasted the prompt into itself."""
+    bad = [m for m in PROMPT_MARKERS if m in text]
+    if not bad:
+        return []
+    return ["the report contains its own instructions (%d marker(s), first: %r). The prompt is not the"
+            " report - delete it and keep only what the run measured." % (len(bad), bad[0])]
+
+
 def verify_for(cron, text):
     """Dispatch the per-cron verification. Returns a list of problems."""
     if cron == "gverify":
@@ -415,7 +445,7 @@ def main(argv):
         if _i < len(argv):
             _for = argv[_i].strip().lower()
     if _for in ("gverify", "health"):
-        _p = verify_for(_for, text)
+        _p = verify_not_a_transcript(text) + verify_for(_for, text)
         if _p:
             print("REFUSED - %d number(s) in this %s report are not in the tool output:" % (len(_p), _for))
             for x in _p[:12]:

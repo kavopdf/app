@@ -261,3 +261,39 @@ each:
     each stage done/moving/stopped        health.py
     the day's trend row                  progress.py
 
+
+---
+
+## THE REPORT IS THE REPORT. NOT THE PROMPT, NOT A TRANSCRIPT.
+
+The 20 Nov report pasted its whole prompt into the message. The numbers were right and the layout was
+destroyed — the prompt rendered as one enormous dark block across two pages, inline code came out as
+empty white rectangles, and the report itself did not start until the bottom of page three. The user's
+words: **"layout bohot zyada toota hai"**.
+
+`lastmessage.py --for gverify` now refuses a message that contains its own instructions. Seven markers
+are checked, including `You measure every document through BOTH renderers`, `STEP 0 - WHOSE STAGE IS IT`
+and `FIVE THINGS THAT COST A RUN`.
+
+**What the report looks like.** Short, plain, no fences:
+
+    gverify run — 20 Nov 2026
+
+    Stage: classify. 213 measured, 192 scored, 21 refused on page count.
+    LibreOffice passes all 42 on 108 of 192; Google on 7 of 192.
+
+    | check | Google | LibreOffice |
+    |---|---:|---:|
+    | 32_stroke_lines | 145 | 1 |
+    | 05_chars_extra | 141 | 7 |
+
+    Next: classify — 185 documents fail at least one check.
+
+**Rules that keep it readable:**
+
+* **No fenced code blocks.** They render as a solid dark slab and swallow the page. Use a table or a
+  plain indented line.
+* **No inline backticks around whole sentences.** Each one renders as an empty light box; the text
+  inside it disappears. Backticks are for a file path or a check name, three words at most.
+* **No headings deeper than `##`.** The report is five or six short sections.
+* **One screen, not four.** If it needs a page, it is too long.
