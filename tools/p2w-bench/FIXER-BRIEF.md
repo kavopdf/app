@@ -730,3 +730,39 @@ not understand into `FINDINGS/`.** That is a real result. Silence is not.
 `status.py` will call an unannounced silence LIKELY DEAD at 20 minutes, and it is right to: the
 conversion loops and soffice renders the brief mentions are steps you **announce** with
 `--heartbeat --doing`, not a place to hide for half an hour.
+
+---
+
+## GOOGLE IS THE AUTHORITY. LIBREOFFICE IS A PROXY. (decided 20 Nov)
+
+The user's words: *"hamara poora pdf to word tool google ke hisab se 99% ya usse zyada perfect hona
+chahiye na ki LO ke according kyunki main aur mere users iss tool ko google docs par hee use karenge."*
+
+That settles the wall four runs died on. `regress.py` scored `share@5` on a soffice render, and:
+
+    LibreOffice draws the floating <w:drawing> exactly where the PDF drew it.
+    A w:pBdr can never be pixel-identical to it.
+    So every document whose rules are already right in LibreOffice MUST get worse the moment its
+    rules become borders - however well they are placed - and those are exactly the documents Google
+    fails.
+
+    32_stroke_lines   LibreOffice 2 of 213    Google 145 of 192
+    05_chars_extra    LibreOffice 9 of 213    Google 141 of 192
+
+**The gate now allows a LibreOffice regression when Google improved on the same document.** It reads
+the committed `benchmarks/gverify/` result and the working-tree one and compares the failing-check
+count. A document whose Google count fell is let through, printed as `ALLOWED`. Everything else still
+refuses: no Google improvement means still a regression, and a missing document is still one whatever
+Google says.
+
+**What this changes for you:**
+
+* **Take the class from `benchmarks/DEFECT-CLASSES-GOOGLE.md`**, not from the soffice table. The top
+  rows are 145 and 141 documents and they are invisible to every LibreOffice measurement.
+* **A LibreOffice score that goes up is no longer a reason to revert** - if Google went down. Measure
+  both and let Google decide.
+* **LibreOffice is still worth running**: it is fast, it covers all 213, and it catches crashes Google
+  would show too. It is a smoke test, not the judge.
+* `FINDINGS/rules-top-border-FLOW-NEUTRAL-065000-f1x.patch` is a flow-neutral construct that measures
+  exactly baseline on eight documents. It places zero borders because its guards decline every rule it
+  can reach - **loosen them and let the gate above decide.**
