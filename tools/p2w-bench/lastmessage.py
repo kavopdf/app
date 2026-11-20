@@ -408,6 +408,34 @@ def verify_not_a_transcript(text):
 #
 # So: every check name the tool prints must appear INTACT if it appears at all. A stripped name is a
 # wrong name, and it is checkable exactly.
+def verify_versions_intact(text, cmds):
+    """A VERSION IS ONE TOKEN, NOT THREE INTEGERS. 9.99.99 must not pass because 9 and 99 exist.
+
+    Found by falsification on 20 Nov: the APK report claimed versionName 9.99.99 and the check said
+    "every number is one the tool printed", because it had split the version into 9, 99 and 99 and all
+    three appear somewhere in the tag list. A version is the one number where the whole string is the
+    fact.
+    """
+    _, out = _tool_numbers(cmds)
+    bad = []
+    # A VERSION AT THE END OF A SENTENCE IS STILL A VERSION. `9.99.99.` did not match because the
+    # lookahead rejected the full stop - so the one fabricated version this check exists to catch was
+    # the one shape it missed. The lookahead now rejects only a further digit or a word character.
+    # A MEASUREMENT WITH A UNIT IS NOT A VERSION. `1.6 h`, `3.9 h` and `12.5 %` matched the version
+    # shape and made a correct watchdog report fail - the check refused a report for stating the age
+    # of a stage. Only a bare dotted token counts.
+    UNIT = r"\s*(?:h|hr|hrs|min|mins|s|sec|pt|px|%|MB|KB|GB|d|day|days)\b"
+    for m in re.finditer(r"(?<![\w.])\d{1,2}\.\d{1,3}(?:\.\d{1,3})?(?!\w|\.\d)", text):
+        v = m.group(0)
+        if re.match(UNIT, text[m.end():m.end() + 8], re.I):
+            continue
+        if v in out:
+            continue
+        bad.append("%r is not in the tool output - a version is one token, and this one was not"
+                   " printed by any tool. Copy it from git tag or app/build.gradle." % v)
+    return bad
+
+
 def verify_names_intact(text, cmds):
     _, out = _tool_numbers(cmds)
     names = sorted({n for n in re.findall(r"\b[a-z0-9]+(?:_[a-z0-9]+)+\b", out)})
@@ -429,6 +457,15 @@ _CMDS = {
     "health": ["python3 tools/p2w-bench/health.py --json",
                "python3 tools/p2w-bench/progress.py --json",
                "python3 tools/p2w-bench/round.py --phase"],
+    # THE APK CRON'S NUMBERS ARE NOT THE FIXER'S. `--for apk` used to fall through to report.py's
+    # full Progress+Timing check, which demanded a fixer slot window and tool beats - so a correct
+    # APK report was refused for not having them, and the run had no way to comply. Its real sources
+    # are the tag, the build config and the round state.
+    "apk": ["git describe --tags --abbrev=0 2>/dev/null || true",
+            "git tag --sort=-creatordate | head -20",
+            "grep -oE 'versionName *\"[^\"]+\"' app/build.gradle 2>/dev/null || true",
+            "grep -oE 'versionCode *[0-9]+' app/build.gradle 2>/dev/null || true",
+            "python3 tools/p2w-bench/round.py --phase"],
 }
 
 
@@ -470,10 +507,11 @@ def main(argv):
         _i = argv.index("--for") + 1
         if _i < len(argv):
             _for = argv[_i].strip().lower()
-    if _for in ("gverify", "health"):
+    if _for in ("gverify", "health", "apk"):
         _cmds = _CMDS.get(_for, [])
         _p = (verify_not_a_transcript(text)
               + verify_names_intact(text, _cmds)
+              + verify_versions_intact(text, _cmds)
               + verify_for(_for, text))
         if _p:
             print("REFUSED - %d number(s) in this %s report are not in the tool output:" % (len(_p), _for))
