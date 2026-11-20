@@ -1247,11 +1247,9 @@
  "bank-statement-horizontal-rules-only": {
   "applicable": 10,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "boq-horizontal-rules-only": {
   "applicable": 10,
@@ -1319,11 +1317,9 @@
  "gst-invoice-horizontal-rules-only": {
   "applicable": 10,
   "baseline_failed": 1,
-  "cause": "t13_amount_columns",
-  "failed": 1,
-  "failed_ids": [
-   "t13_amount_columns"
-  ]
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "gst-invoice-multipage-item-table": {
   "applicable": 12,

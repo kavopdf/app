@@ -88,6 +88,7 @@ public final class TxtWriter {
                 pageNo++;
                 if (page == null || page.blocks == null) continue;
                 float pitch = pagePitch(page, docPitch);
+                int[] snap = paraEndSnap(page, charW);
                 float lastY = -1f;
                 for (Object block : pageOrder(page)) {
                     if (block instanceof PdfToWord.Table) {
@@ -95,9 +96,9 @@ public final class TxtWriter {
                         appendTable(sb, (PdfToWord.Table) block, charW);
                     } else if (block instanceof Piece) {
                         Piece pc = (Piece) block;
-                        lastY = appendPara(sb, pc.para, charW, pitch, lastY, pc.lines);
+                        lastY = appendPara(sb, pc.para, charW, pitch, lastY, pc.lines, snap);
                     } else if (block instanceof PdfToWord.Para) {
-                        lastY = appendPara(sb, (PdfToWord.Para) block, charW, pitch, lastY, null);
+                        lastY = appendPara(sb, (PdfToWord.Para) block, charW, pitch, lastY, null, snap);
                     }
                 }
             }
@@ -317,9 +318,44 @@ public final class TxtWriter {
         return false;
     }
 
+    /** col -> the column a numeric paragraph line at that end should be padded to.
+     *
+     *  Built from the page's own numeric paragraph lines: an end column whose immediate
+     *  neighbour is also an end column merges into it, transitively, and the component keeps
+     *  its highest value. Values two or more apart are left alone - that is two columns, not
+     *  one column split by rounding, and merging them would be inventing a layout. Returns
+     *  null when the page has no numeric paragraph lines at all, so the common case costs
+     *  nothing. */
+    private static int[] paraEndSnap(PdfToWord.Page page, float charW) {
+        if (page == null || page.blocks == null) return null;
+        boolean[] present = new boolean[MAX_INDENT + 2];
+        boolean any = false;
+        for (Object block : page.blocks) {
+            PdfToWord.Para para = null;
+            if (block instanceof Piece) para = ((Piece) block).para;
+            else if (block instanceof PdfToWord.Para) para = (PdfToWord.Para) block;
+            if (para == null || para.lines == null || para.lineX == null) continue;
+            for (int li = 0; li < para.lines.size(); li++) {
+                String ln = para.lines.get(li);
+                if (ln == null) continue;
+                String t = rtrim(ln);
+                if (t.isEmpty() || !isNumeric(t)) continue;
+                float lx = li < para.lineX.size() ? para.lineX.get(li) : 0f;
+                int e = column(lx, charW) + t.length();
+                if (e >= 0 && e < present.length) { present[e] = true; any = true; }
+            }
+        }
+        if (!any) return null;
+        int[] snap = new int[present.length];
+        for (int e = present.length - 1; e >= 0; e--) {
+            snap[e] = (e + 1 < present.length && present[e + 1]) ? snap[e + 1] : e;
+        }
+        return snap;
+    }
+
     /** Writes one paragraph, opening blank lines for the gap the page left above it. */
     private static float appendPara(StringBuilder sb, PdfToWord.Para para, float charW,
-                                    float pitch, float lastY, int[] only) {
+                                    float pitch, float lastY, int[] only, int[] snap) {
         if (only == null && para.text().trim().isEmpty()) return lastY;
         if (para.lines == null || para.lines.isEmpty()) {
             if (only != null) return lastY;
@@ -340,6 +376,22 @@ public final class TxtWriter {
                 for (int b = 0; b < blanks; b++) sb.append('\n');
             }
             int pad = column(lx, charW);
+            // A PAGE COLUMN OF FIGURES IS ONE COLUMN IN THE .txt, EVEN WHEN ROUNDING SPLITS IT.
+            //
+            // The paragraph path has no right edge - Para carries lineX/lineY/lineSize and
+            // nothing else - so a numeric line ends at column(lineX) + length, and the whole
+            // estimate of its right edge is that ruler. The ruler (0.6 em of the document's
+            // median size) over-estimates a small numeric face, and it rounds: two amounts
+            // right-aligned on the page end one character column apart in the .txt. Measured
+            // on 29_dot_leaders_txtpos, 91 eleven times and 92 five times; on
+            // 74_balance_sheet_indented_subitems, 87/88 and 107/108. `snap` is built from this
+            // page's own numeric paragraph lines and merges values exactly one column apart,
+            // so those amounts end at one column again. It only ever pads - a line never moves
+            // left - and it cannot change a line count.
+            if (snap != null && isNumeric(trimmed)) {
+                int e = pad + trimmed.length();
+                if (e < snap.length && snap[e] > e) pad += snap[e] - e;
+            }
             for (int i = 0; i < pad; i++) sb.append(' ');
             sb.append(trimmed).append('\n');
             lastY = ly;

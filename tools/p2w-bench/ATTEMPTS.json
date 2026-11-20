@@ -481,7 +481,7 @@
   "status": "OPEN"
  },
  "t13_amount_columns": {
-  "attempts": 2,
+  "attempts": 3,
   "first_seen": null,
   "history": [
    {
@@ -497,22 +497,31 @@
     "outcome": "kept",
     "reason": "KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over",
     "total": 18
+   },
+   {
+    "at": "2026-11-20 11:59",
+    "moved": 2,
+    "outcome": "kept",
+    "reason": "KEPT (second construct, same slot). paraEndSnap(): per page, an end column whose immediate neighbour is also an end column of the page's numeric paragraph lines merges into it transitively and keeps t",
+    "total": 18
    }
   ],
   "last": null,
-  "last_engine": "ea9dfd7+3a5a7bf7cc",
-  "last_moved": 10,
+  "last_engine": "98e7279+e5675d692f",
+  "last_moved": 2,
   "last_total": 18,
   "outcomes": [
    "error",
+   "kept",
    "kept"
   ],
-  "ratchet_at": "20 Nov 11:51",
+  "ratchet_at": "20 Nov 11:59",
   "ratchet_docs": 213,
-  "reason": "KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over-estimates a 7pt numeric token by one column, so amounts ended at baseCol+length = 133/134. Whole corpus: 10 better, 0 worse, 203 same; checks 1784->1794; clean 167->177. Line count unchanged, so t04 cannot drift. 8 of 18 remain: 2 are paragraph-path with no right edge on Para, 2 mixed.",
+  "reason": "KEPT (second construct, same slot). paraEndSnap(): per page, an end column whose immediate neighbour is also an end column of the page's numeric paragraph lines merges into it transitively and keeps the highest value; appendPara pads to it. The paragraph path has no right edge, so its amounts ended at column(lineX)+len and rounding split one page column into two adjacent .txt columns (91/92, 107/108, 142/143). Only documents that can change were re-converted: scanning all 213 .txt for amount end columns one apart found 10; all 213 re-scored. 2 better, 0 worse, 211 same; checks 1794->1796. t13 now holds 6 of the original 18; clean 179 of 213.",
   "reasons": [
    "claimed. .txt half. PATCH-t13 (row-per-line) was rejected 19 Nov: it breaks t04_structure line-count drift, 101 worse 0 better. Working the other direction: keep one cell per line, fix only where an amount ENDS, since t13 compares rows of a column to each other and not to the source column.",
-   "KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over-estimates a 7pt numeric token by one column, so amounts ended at baseCol+length = 133/134. Whole corpus: 10 better, 0 worse, 203 same; checks 1784->1794; clean 167->177. Line count unchanged, so t04 cannot drift. 8 of 18 remain: 2 are paragraph-path with no right edge on Para, 2 mixed."
+   "KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over-estimates a 7pt numeric token by one column, so amounts ended at baseCol+length = 133/134. Whole corpus: 10 better, 0 worse, 203 same; checks 1784->1794; clean 167->177. Line count unchanged, so t04 cannot drift. 8 of 18 remain: 2 are paragraph-path with no right edge on Para, 2 mixed.",
+   "KEPT (second construct, same slot). paraEndSnap(): per page, an end column whose immediate neighbour is also an end column of the page's numeric paragraph lines merges into it transitively and keeps the highest value; appendPara pads to it. The paragraph path has no right edge, so its amounts ended at column(lineX)+len and rounding split one page column into two adjacent .txt columns (91/92, 107/108, 142/143). Only documents that can change were re-converted: scanning all 213 .txt for amount end columns one apart found 10; all 213 re-scored. 2 better, 0 worse, 211 same; checks 1794->1796. t13 now holds 6 of the original 18; clean 179 of 213."
   ],
   "requeues": 0,
   "status": "OPEN"

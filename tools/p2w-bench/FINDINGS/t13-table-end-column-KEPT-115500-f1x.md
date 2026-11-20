@@ -83,3 +83,60 @@ never pass the gate at all. Two edits:
 
 That is the mechanical reason 46 documents failed the same `.txt` checks for a month: not that nobody
 tried, but that nothing a `.txt` run produced could be committed.
+
+---
+
+# Second attempt, same slot: the paragraph path, and what it is worth
+
+`t13` after the table fix holds 8 documents. Two of them (bank-statement-horizontal-rules-only,
+gst-invoice-horizontal-rules-only) emit their amounts from the PARAGRAPH path, which has no right
+edge at all: `Para` carries `lineX/lineY/lineSize` and `appendPara` writes `column(lineX)` and
+nothing else. So a numeric paragraph line ends at `column(lineX) + length`, and the ruler's rounding
+splits a page column across two adjacent `.txt` columns. Measured, in the .txt:
+
+    29_dot_leaders_txtpos            91 x11, 92 x5
+    74_balance_sheet_indented_subitems  87 x6, 88 x6, 107 x6, 108 x6
+    balance-sheet-two-columns-of-figures 52 x9, 54 x2, 62 x9, 63 x2, 107 x10, 108 x3, 116 x10, 117 x3
+    gst-invoice-horizontal-rules-only  94 x5, 95 x1, 109 x3, 110 x4, 131 x3, 132 x4
+    bank-statement-horizontal-rules-only 142 x14, 143 x14
+
+Every remaining failure is an off-by-one split, not a layout error.
+
+## The change
+
+`paraEndSnap()` builds, per page, a map from an end column to the column it should be padded to: an
+end column whose immediate neighbour is also an end column (of the page's own numeric paragraph
+lines) merges into it, transitively, and the component keeps its highest value. `appendPara` applies
+it to a numeric line after computing its pad. It only ever pads - a line never moves left - and it
+cannot change a line count.
+
+## The measurement, and how it was bounded honestly
+
+Whole corpus, compared with the table fix alone:
+
+    better 2   worse 0   same 211        checks passed 1794 -> 1796
+    bank-statement-horizontal-rules-only 9 -> 10   gst-invoice-horizontal-rules-only 9 -> 10
+
+Only documents whose .txt CAN change were re-converted, and that is a proof, not a shortcut: the snap
+is the identity map unless the page already has two numeric paragraph lines whose end columns differ
+by exactly one. Scanning all 213 `.txt` files for any pair of amount end columns one apart - a superset
+of the paragraph-only condition, since it also counts table cells - found **10 documents**. Those ten
+were re-converted and all 213 were re-scored. A document with no adjacent pair cannot have a paragraph
+adjacency either, so its snap is the identity and its bytes cannot move.
+
+## What is left, measured
+
+6 of the original 18 still fail `t13_amount_columns`, and none of them is a one-column split:
+
+* `balance-sheet-two-columns-of-figures` needs one pair merged that is TWO columns apart (52 and 54).
+  Widening the window to two is a layout claim the measurement does not support; left alone.
+* `74_balance_sheet_indented_subitems`, `29_dot_leaders_txtpos`, `gst-invoice-multipage-item-table`
+  and `itr-computation-with-slab-table` fail because the table path and the paragraph path are
+  measured separately: the table cells converge on their own end column, the paragraph lines converge
+  on theirs, and the two maxima differ. Pooling them per page - the census agent measured that
+  variant at 15 of 18 - is the next construct, and it is a change to how the two emitters share one
+  ruler, not another special case.
+* `22_invoice_four_columns_txtpos` fails one column of two.
+
+Total for the slot: `t13_amount_columns` 18 documents -> 6, clean documents 167 -> 179, corpus checks
+1784 -> 1796, 0 documents worse at any point.

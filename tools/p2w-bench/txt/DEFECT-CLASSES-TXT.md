@@ -1,6 +1,6 @@
 # .txt defect classes
 
-Documents measured: **213 of 213** - 177 clean, 36 failing at least one check.
+Documents measured: **213 of 213** - 179 clean, 34 failing at least one check.
 
 Grouped from `tools/p2w-bench/txt/RANKING-TXT.csv` only. A document's class is the check
 that fails it; a document failing several is counted under each and its own row names all
@@ -14,7 +14,7 @@ serves every document under it.
 | `t12_word_invention` | the .txt carries no word the source never drew | 12 | OPEN | 6% |
 | `t01_word_accuracy` | the source's words survive, 99 % of them | 10 | OPEN | 5% |
 | `t08_line_order` | lines arrive in the order the page drew them | 10 | OPEN | 5% |
-| `t13_amount_columns` | amount columns stay right-aligned | 8 | OPEN | 4% |
+| `t13_amount_columns` | amount columns stay right-aligned | 6 | OPEN | 3% |
 | `t02_position` | a line's x survives as its leading spaces | 5 | OPEN | 2% |
 | `t09_page_furniture` | one copy of each running head per page it belongs to | 4 | OPEN | 2% |
 | `t07_symbol_counts` | each symbol arrives as many times as the page drew it | 3 | OPEN | 1% |
@@ -54,8 +54,6 @@ serves every document under it.
 | `79_inr_indian_digit_grouping_table` | `t01_word_accuracy` | 1/10 | `t01_word_accuracy` | was 1 |
 | `Account_Opening_Form_Fillable_filled` | `7 checks` | 7/10 | `t01_word_accuracy`, `t03_symbols`, `t06_encoding`, `t07_symbol_counts`, `t08_line_order`, `t09_page_furniture`, `t12_word_invention` | was 7 |
 | `balance-sheet-two-columns-of-figures` | `t13_amount_columns` | 1/10 | `t13_amount_columns` | was 1 |
-| `bank-statement-horizontal-rules-only` | `t13_amount_columns` | 1/10 | `t13_amount_columns` | was 1 |
-| `gst-invoice-horizontal-rules-only` | `t13_amount_columns` | 1/10 | `t13_amount_columns` | was 1 |
 | `gst-invoice-multipage-item-table` | `t09_page_furniture + t13_amount_columns` | 2/12 | `t09_page_furniture`, `t13_amount_columns` | was 2 |
 | `itr-computation-with-slab-table` | `t08_line_order + t13_amount_columns` | 2/10 | `t08_line_order`, `t13_amount_columns` | was 2 |
 | `journal-2col-with-footnotes` | `t12_word_invention` | 1/9 | `t12_word_invention` | was 1 |

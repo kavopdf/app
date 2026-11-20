@@ -166,7 +166,7 @@ annual-review-2col-uneven-columns,9,9,0,0,,clean,0
 balance-sheet-and-profit-loss,11,11,0,0,,clean,1
 balance-sheet-two-columns-of-figures,10,9,1,1,t13_amount_columns,t13_amount_columns,1
 bank-statement-5-pages,12,12,0,0,,clean,0
-bank-statement-horizontal-rules-only,10,9,1,1,t13_amount_columns,t13_amount_columns,1
+bank-statement-horizontal-rules-only,10,10,0,0,,clean,1
 boq-horizontal-rules-only,10,10,0,0,,clean,0
 boq-tender-bill-of-quantities,10,10,0,0,,clean,0
 brochure-3col-with-sidebar-box,9,9,0,0,,clean,0
@@ -176,7 +176,7 @@ electricity-bill,10,10,0,0,,clean,1
 eway-bill,10,10,0,0,,clean,0
 form16-part-b,11,11,0,0,,clean,1
 gst-invoice-3line-items,10,10,0,0,,clean,1
-gst-invoice-horizontal-rules-only,10,9,1,1,t13_amount_columns,t13_amount_columns,1
+gst-invoice-horizontal-rules-only,10,10,0,0,,clean,1
 gst-invoice-multipage-item-table,12,10,2,2,t09_page_furniture t13_amount_columns,t09_page_furniture + t13_amount_columns,2
 gst-invoice-with-qr-code,10,10,0,0,,clean,0
 insurance-policy-schedule,10,10,0,0,,clean,0
