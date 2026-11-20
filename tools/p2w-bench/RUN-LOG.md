@@ -198,3 +198,4 @@
 | 20 Nov 21:49 | fixer | attempt t01_word_accuracy -> kept (0/10 moved) |
 | 20 Nov 21:57 | fixer | slot claimed - fixer running |
 | 20 Nov 22:39 | fixer | attempt t01_word_accuracy -> reverted (2/7 moved) |
+| 20 Nov 22:43 | fixer | slot FORCED released - see INCIDENTS.md for why |
