@@ -556,7 +556,7 @@ def release(name, force=False):
         if any_open:
             break
 
-    if name == "fixer" and started and not force and s.get("phase") == "fix" and any_open:
+    if name == "fixer" and started and s.get("phase") == "fix" and any_open:
         age = claim_age_min(started) or 0.0
         done = _attempts_this_run()
         # NO CLOCK. ONE ATTEMPT, THEN THE WORK DECIDES.
@@ -581,6 +581,32 @@ def release(name, force=False):
             _rr = {}
         _agents = len((s.get("fixer") or {}).get("agents") or []) or \
                   len((_rr.get("agents") or []))
+        # A FORCE RELEASE WITH NO AGENTS NEEDS A BLOCKER FROM TODAY, UNRESOLVED.
+        if _agents < 2 and force:
+            _blk = os.path.join(HERE, "BLOCKERS.md")
+            _txt = ""
+            try:
+                for _line in open(_blk, encoding="utf-8"):
+                    _l = _line.strip()
+                    if not _l.startswith("| ") or _l.startswith("|---"):
+                        continue
+                    if "what I was doing" in _l or "the obstacle" in _l:
+                        continue
+                    if "resolved" in _l.lower():
+                        continue
+                    if time.strftime("%Y-%m-%d") not in _l:
+                        continue
+                    _txt += _l.lower() + "\n"
+            except Exception:
+                pass
+            _why = ("broken build", "build broken", "drive blocked", "blocked drive",
+                    "no findings", "empty list", "cannot reach drive")
+            if not any(w in _txt for w in _why):
+                print("refused: %d agent(s) with --force, and no unresolved blocker from today." % _agents)
+                print("'Budget gone' is not a blocker - it is what happens when the two agents the")
+                print("brief asks for in the first ten minutes are deployed last, or not at all.")
+                print("Deploy them, or write a real blocker into BLOCKERS.md.")
+                return 1
         if _agents < 2 and not force:
             print("refused: this run deployed %d agent(s). The brief requires TWO every run." % _agents)
             print("Two angles working for the whole slot is two more than a run that works alone, and")
