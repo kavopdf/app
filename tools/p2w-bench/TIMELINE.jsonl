@@ -1267,3 +1267,4 @@
 {"t": 1795205506.8729327, "ist": "01:41:46", "ev": "attempt", "d": "t01_word_accuracy -> reverted"}
 {"t": 1795205506.980276, "ist": "01:41:46", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795205507.0799441, "ist": "01:41:47", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795205642.2587378, "ist": "01:44:02", "ev": "beat", "d": "report.py: building the report"}

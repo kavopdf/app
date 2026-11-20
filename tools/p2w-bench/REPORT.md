@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-20 22:54
+# Fixer report - 2026-11-21 00:57
 
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 22:54 → running IST · 29 min**
+**21 Nov 2026 · slot 00:57 → running IST · 46 min**
 
-> **041122-Account_Opening_Form** improved — 7.00 → 4.00. Corpus ratchet clean across 213 documents.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **2** — 2 attempt(s), 1 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -21,14 +21,14 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
-| Committed | **21** files in 2 commit(s) from `952d58e` — ATTEMPTS.json, BLOCKERS.md, CAUSES-TXT.json, CENSUS-TXT.csv, CLASS-HISTORY.jsonl, DEFECT-CLASSES-TXT.md, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, REPORT.md, RESTAMP-TXT.jsonl, |
+| Committed | **13** files in 1 commit(s) from `cbfe9c4` — 39-small-caps-gap-threshold-0150-fixer.md, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md, t01-census-WHICH-SIDE- |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 23:16 | **kept** | 2/7 | SOURCE-SIDE HONESTY for a code the font itself cannot name. The two bank forms fail 7 of 10 checks each; 4 of those 7 were the same fault counted four times. pymupdf's /ToUnicode fallback prints the C |
-| 23:23 | **reverted** | 0/5 | SECOND ATTEMPT, measurement only, no code changed. 601_fillable_admission_form loses exactly three tokens - '3', '3' and 'General'. The two '3's are ticked checkboxes: the page's /Resources name only |
+| 00:57 | **reverted** | 0/5 | claimed (8th attempt). t01_word_accuracy, 5 documents, .txt half. Two bank forms now carry t06/t08/t09 only. Remaining: 38_faux_bold_italic_synthesised, 39_small_caps_letter_spacing, 411_nested_xobjec |
+| 01:41 | **reverted** | 0/5 | SECOND ATTEMPT, measurement only, no engine change. Two subagents on the class. 411_nested_xobject_transforms: the handed diagnosis (matrix disagreement, line off page) is FALSE - both parsers compute |
 
 ## The txt
 
@@ -44,30 +44,30 @@
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `t01_A-01` | is the U+FFFD glyph a ligature or a single letter, r | 23:20 | 17:50 | 0 min |
-| `t01_B-01` | how many of the 213 documents a cmap-based recovery  | 23:20 | 17:50 | 0 min |
+| `t01_A-02` | is the handed diagnosis (nested form matrix disagree | 01:41 | 20:11 | 0 min |
+| `t01_B-02` | why does 39_small_caps_letter_spacing lose 8 words a | 01:41 | 20:11 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 22:54 → running · 29 min |
+| Slot window | 00:57 → running · 46 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 23 |
-| Longest silence | **11.3 min** — from 22:54:44, after `attempt.py: recording an attempt` |
+| Tool beats | 21 |
+| Longest silence | **28.3 min** — from 00:57:53, after `classrow.py: refreshing the class file` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 1 need a human |
-| Still a wall | the ligature identity at Effra CIDs 0x123/0x124/0x126/0x127 is not in the file: no cmap table in any embedded  |
+| Still a wall | two of the five documents (411_nested_xobject_transforms, 39_small_caps_letter_spacing) fail t01 only because  |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **10 min** | `########` |
-| measure or build - a conversion, screen or compile writes no beacon | **11 min** | `########` |
-| record - attempt, handoff, class rows | **4 min** | `###` |
-| report - the report and the chain | **3 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **41 min** | `####################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **2 min** | `#` |
+| other - not attributed to a tool | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
