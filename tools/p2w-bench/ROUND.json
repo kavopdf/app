@@ -1,9 +1,11 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_engine_at_claim": "08afa3c",
-  "fixer_last_beat": 1795152125.5605185,
-  "fixer_started": 0,
+  "fixer_doing": "attempt 2 built: exact glyph size gated off monospaced faces",
+  "fixer_doing_since": 1795165778.2607143,
+  "fixer_engine_at_claim": "c18ae16",
+  "fixer_last_beat": 1795165778.260715,
+  "fixer_started": 1795167480.9738982,
   "history": [
     {
       "at": "2026-11-12 09:46",

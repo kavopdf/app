@@ -9,9 +9,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 12:52 |
-| ended | 13:37 |
-| how it ended | forced |
+| started | 13:54 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -20,7 +20,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> 47_margins: extend the strip-and-pin indent construct from flowFromBox to the table-cell emitter (40_devanagari_shaping_font, 77_arabic_rtl_document, 78_mixed_english_devanagari_line), then a corpus pass in its own call. Read FINDINGS/47_margins-MECHANISM-133500-f2.md first - the class definition is already measured and the two failed constructs are already ruled out.
+> 47_margins: re-measure the class against a fresh render, not the tables - 392_statistical_console_output already reads 0.06 and passes all 42 checks on this engine while RANKING.csv says 1.61 and both gverify tables say 47_margins FAIL, so the class is at most 25 documents. Then pull the thread FINDINGS/47_margins-REACH-140500.md leaves open: 360_restaurant_menu's body column was 12 pt left (source 52, render 40) and 9 runs are still 11.9 pt out; the leading-space indent and the centred-line constructs are both capped under the 25% bar and must not be retried.
 
 ## Agents deployed and not yet accounted for
 
@@ -56,9 +56,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `09:22` agent deployed: content-present-partly-displaced / A - is the rule-as-drawing construct still in the engine and is the pBdr path presen
-- `09:22` agent landed: content-present-partly-displaced / A -> FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md
-- `09:22` agent deployed: content-present-partly-displaced / B - how much of 18_displacement the rule construct can explain, and which displaceme
 - `09:22` agent landed: content-present-partly-displaced / B -> FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md
 - `09:59` agent deployed: 18_displacement / A - Quantify the dy signature: across the Google renders that fail 18_displacement, 
 - `09:59` agent deployed: 18_displacement / B - Find the engine code path that decides each line's vertical position in the emit
@@ -81,6 +78,9 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `13:36` agent deployed: 47_margins / B-01 - the space-led indent construct on 47_margins
 - `13:36` agent landed: 47_margins / A-01 -> FINDINGS/47_margins-MECHANISM-133500-f2.md
 - `13:36` agent landed: 47_margins / B-01 -> FINDINGS/47_margins-MECHANISM-133500-f2.md
+- `14:35` attempt 6 on 47_margins -> reverted (0/26 moved)
+- `15:07` attempt 7 on 47_margins -> reverted (0/26 moved)
+- `15:08` attempt 8 on 47_margins -> partial (2/26 moved)
 
 ## Where the rest of the state lives
 

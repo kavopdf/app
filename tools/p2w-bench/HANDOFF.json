@@ -444,9 +444,21 @@
   {
    "at": "13:36",
    "text": "agent landed: 47_margins / B-01 -> FINDINGS/47_margins-MECHANISM-133500-f2.md"
+  },
+  {
+   "at": "14:35",
+   "text": "attempt 6 on 47_margins -> reverted (0/26 moved)"
+  },
+  {
+   "at": "15:07",
+   "text": "attempt 7 on 47_margins -> reverted (0/26 moved)"
+  },
+  {
+   "at": "15:08",
+   "text": "attempt 8 on 47_margins -> partial (2/26 moved)"
   }
  ],
- "next": "47_margins: extend the strip-and-pin indent construct from flowFromBox to the table-cell emitter (40_devanagari_shaping_font, 77_arabic_rtl_document, 78_mixed_english_devanagari_line), then a corpus pass in its own call. Read FINDINGS/47_margins-MECHANISM-133500-f2.md first - the class definition is already measured and the two failed constructs are already ruled out.",
+ "next": "47_margins: re-measure the class against a fresh render, not the tables - 392_statistical_console_output already reads 0.06 and passes all 42 checks on this engine while RANKING.csv says 1.61 and both gverify tables say 47_margins FAIL, so the class is at most 25 documents. Then pull the thread FINDINGS/47_margins-REACH-140500.md leaves open: 360_restaurant_menu's body column was 12 pt left (source 52, render 40) and 9 runs are still 11.9 pt out; the leading-space indent and the centred-line constructs are both capped under the 25% bar and must not be retried.",
  "agents": [
   {
    "id": "contA-01",
@@ -726,9 +738,9 @@
   }
  ],
  "run": {
-  "started": "12:52",
-  "ended": "13:37",
-  "ended_how": "forced"
+  "started": "13:54",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

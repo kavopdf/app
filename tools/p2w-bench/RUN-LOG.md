@@ -1,8 +1,3 @@
-| 12 Nov 11:12 | baseline | measured boq-tender-bill-of-quantities 51/59 docx, boq-tender-bill-of-quantities.txt 4/5 FAIL txt |
-| 12 Nov 11:13 | baseline | measured brochure-3col-with-sidebar-box 38/59 docx, brochure-3col-with-sidebar-box.txt 4/5 FAIL txt |
-| 12 Nov 11:14 | baseline | measured bus-timetable-station-left-times-right 51/59 docx, bus-timetable-station-left-times-right.txt 4/5 FAIL txt |
-| 12 Nov 11:14 | baseline | measured delivery-challan 42/59 docx, delivery-challan.txt 4/5 FAIL txt |
-| 12 Nov 11:15 | baseline | measured electricity-bill 45/59 docx, electricity-bill.txt 4/5 FAIL txt |
 | 12 Nov 11:15 | baseline | measured eway-bill 47/59 docx, eway-bill.txt 4/5 FAIL txt |
 | 12 Nov 11:16 | baseline | txt backfill: 10 more documents recorded (302_radiology_report, 303_discharge_summary, 304_package_insert_small_print, 305_vaccination_certificate, 306_clinical_protocol_synopsis, 30_mixed_font_sizes_one_baseline_txtpos, 310_court_judgment, 311_fir_police_form, 312_affidavit_stamp_paper, 313_power_of_attorney), gap 99 -> 89 |
 | 12 Nov 11:16 | baseline | ratchet held (docx 170/208 scored, txt 81/208, backfill gap 89); measure gate NOT READY (38 rows unscored); slot released |
@@ -199,3 +194,7 @@
 | 20 Nov 13:34 | fixer | attempt 47_margins -> partial (3/13 moved) |
 | 20 Nov 13:34 | fixer | attempt 47_margins -> reverted (0/13 moved) |
 | 20 Nov 13:37 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 20 Nov 13:54 | fixer | slot claimed - fixer running |
+| 20 Nov 14:35 | fixer | attempt 47_margins -> reverted (0/26 moved) |
+| 20 Nov 15:07 | fixer | attempt 47_margins -> reverted (0/26 moved) |
+| 20 Nov 15:08 | fixer | attempt 47_margins -> partial (2/26 moved) |

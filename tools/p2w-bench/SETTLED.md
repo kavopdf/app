@@ -36,11 +36,28 @@ verification attempt that "timed out" on 18 Nov was a missing package, not a bro
 `PATCH-AUDIT.md` has the measurement for every one. The files stay in `patches/` because the mechanism
 each tried is written in its diff - read it, do not apply it.
 
-**ONE IDEA WORTH CARRYING FORWARD.** `run-size-from-sizePt-not-Tf` takes `360_restaurant_menu` from
-**34.43 to 1.31** - a 96 % improvement, the largest single-document gain measured on this corpus - and
-in the same breath takes `392_statistical_console_output` from 1.61 to 13.94. The mechanism is real
-and aimed at the right thing; it is too broad. A version gated on the case it fixes, rather than
-applied to every run, is the best single change available. That is new work, not a patch to apply.
+**THE ONE IDEA WORTH CARRYING FORWARD - RE-MEASURED 20 Nov, AND IT IS NOT THE TRADE IT SAYS.**
+`run-size-from-sizePt-not-Tf` was recorded as taking `360_restaurant_menu` 34.43 -> 1.31 while taking
+`392_statistical_console_output` 1.61 -> 13.94. On the engine in the tree it does neither:
+
+    360_restaurant_menu          34.43 -> 34.18   (0.25 better, not 33 points)
+    392_statistical_console_output 1.61 -> 0.06   (1.55 BETTER, not 12 points worse)
+    and 392 goes from failing 47_margins to 42 of 42 checks PASS
+
+Worse than stale: **there is no win there at all.** The gate the lead asks for - exact size on a
+proportional face, rounded on a monospaced one - was built and measured and moves neither document. The
+real one-liner changes 360 by 0.25 and 392 by nothing. Retire the lead; it was measured against an
+engine two days old.
+
+**AND THE TABLES THEMSELVES ARE STALE FOR AT LEAST ONE DOCUMENT.** A pristine build of the current
+tree scores `392_statistical_console_output` at 0.06 with **42 of 42 checks PASS**, where
+`benchmarks/RANKING.csv` carries 1.61 and both `gverify` tables carry a `47_margins` FAIL. 360 reads
+34.18 against 34.43. Judge an attempt against a fresh render of the document, not against the table,
+until a corpus pass rewrites it. Numbers: `FINDINGS/47_margins-STALE-TABLES-152500.md`.
+
+**AND DO NOT SPEND A RUN ON THE LEADING-SPACE INDENT FOR `47_margins`.** It reaches 3 of that class's
+26 documents and can reach no more - the trace in `FINDINGS/47_margins-REACH-140500.md` counts every
+writer on all 26. The 25 % bar is 7.
 
 ## The four commits after the baseline are decided. Do not re-verify.
 

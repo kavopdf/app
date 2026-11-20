@@ -889,3 +889,30 @@
 {"t": 1795162073.936978, "ist": "13:37:53", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795162074.0368989, "ist": "13:37:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795162074.050524, "ist": "13:37:54", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795163096.0128825, "ist": "13:54:56", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795163096.1330423, "ist": "13:54:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795163100.4306448, "ist": "13:55:00", "ev": "beat", "d": "claimed, reading the handoff"}
+{"t": 1795163100.568966, "ist": "13:55:00", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1795163103.0217946, "ist": "13:55:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795163103.1425815, "ist": "13:55:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795163105.1734545, "ist": "13:55:05", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795163948.3075514, "ist": "14:09:08", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795164044.671765, "ist": "14:10:44", "ev": "beat", "d": "attempt 1 built: ink-edge anchor for space-led anchored lines"}
+{"t": 1795165556.350904, "ist": "14:35:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795165556.77371, "ist": "14:35:56", "ev": "attempt", "d": "47_margins -> reverted"}
+{"t": 1795165556.8987834, "ist": "14:35:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795165557.0482426, "ist": "14:35:57", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795165778.260257, "ist": "14:39:38", "ev": "beat", "d": "attempt 2 built: exact glyph size gated off monospaced faces"}
+{"t": 1795167478.7313077, "ist": "15:07:58", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795167479.3114653, "ist": "15:07:59", "ev": "attempt", "d": "47_margins -> reverted"}
+{"t": 1795167479.5606315, "ist": "15:07:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795167479.8488812, "ist": "15:07:59", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795167480.3905218, "ist": "15:08:00", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795167480.9730911, "ist": "15:08:00", "ev": "attempt", "d": "47_margins -> partial"}
+{"t": 1795167481.2410564, "ist": "15:08:01", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795167481.5348346, "ist": "15:08:01", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795167512.5516555, "ist": "15:08:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795167515.3353117, "ist": "15:08:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795167515.775892, "ist": "15:08:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795167516.0595806, "ist": "15:08:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795167647.8984952, "ist": "15:10:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

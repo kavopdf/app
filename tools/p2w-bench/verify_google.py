@@ -4168,8 +4168,26 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # without re-running: "47_margins: pages 3,7 left edge 56->48" is what a fixer needs.
     c["47_margins"] = (round(worst_med, 1), int(worst_tail),
                        not margin_bad and not indent_bad)
-    # A detail check would be counted as a check: all_check_ids() discovers ids by running
-    # the verifier, so a second key here would add a free pass to every document's score.
+    # THE EVIDENCE A FIXER NEEDS, KEPT SOMEWHERE THAT IS NOT A CHECK.
+    #
+    # The verdict above is a three-number summary and the two lists behind it were thrown
+    # away, so a fixer reading a FAIL could not learn WHICH page or HOW far out: the only
+    # way to find out was to re-run the verifier by hand, which is what the note above
+    # ("the page numbers and the actual edges are in margin_bad / indent_bad so a failure
+    # can be read without re-running") claims is unnecessary and is not.
+    #
+    # It cannot go in `c`. all_check_ids() discovers the universe by running the verifier,
+    # so any second key in there is scored as a check and hands every document a free
+    # pass - the reason the del below exists at all. DETAIL is a module global, read by
+    # main() and by nothing that counts checks.
+    DETAIL["47_margins"] = {
+        "worst_median_pt": round(worst_med, 1),
+        "worst_unregistered": int(worst_tail),
+        "margin_bad": [{"page": p_, "source": round(s_, 1), "render": round(g_, 1)}
+                       for p_, s_, g_ in margin_bad],
+        "indent_bad": [{"page": p_, "unregistered": n_, "worst_pt": w_}
+                       for p_, n_, w_ in indent_bad],
+    }
     del margin_bad, indent_bad
 
 
@@ -4492,6 +4510,12 @@ except ImportError:
 # they land as 62-66. See the mapping at the top of tablechecks.py.
 TABLE_CHECK_IDS = ("62_table_columns", "63_table_rows", "64_table_span_across",
                    "65_table_span_down", "66_table_cell_width")
+
+
+# Per-check evidence for the checks that carry their own arithmetic, keyed by check id.
+# Filled by compare(), printed by main() when --detail is asked for. Never a check id
+# itself: see the note in the 47 block.
+DETAIL = {}
 
 
 def compare(src_path, gd_path, docx_path=None):
@@ -6252,6 +6276,18 @@ def main(argv):
         for k in res["failed"]:
             c = res["checks"][k]
             print("    %-28s source=%-8s render=%-8s" % (k, c["source"], c["render"]))
+    if "--detail" in argv:
+        for k, v in sorted(DETAIL.items()):
+            if not isinstance(v, dict):
+                continue
+            print("    %s detail: median %s pt, %s unregistered" % (
+                k, v.get("worst_median_pt"), v.get("worst_unregistered")))
+            for row in v.get("margin_bad", [])[:8]:
+                print("      page %-3s left edge  source %s  render %s" % (
+                    row["page"], row["source"], row["render"]))
+            for row in v.get("indent_bad", [])[:8]:
+                print("      page %-3s %s run(s) unregistered, worst %s pt" % (
+                    row["page"], row["unregistered"], row["worst_pt"]))
     if out:
         # The run may be told to write into a directory it has not made yet - that is
         # exactly how the .txt half measured nothing for a whole day: restxt/ never existed,
@@ -6259,6 +6295,8 @@ def main(argv):
         os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
 
         with open(out, "w") as f:
+            if DETAIL:
+                res["detail"] = DETAIL
             res["document"] = os.path.splitext(os.path.basename(src))[0]
             res["source_file"] = src
             res["render_file"] = gd

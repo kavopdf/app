@@ -6,22 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 09:55 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 09:55 | fixer | classify --txt | 4 classes from 208 documents |
-| 13 Nov 09:55 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 09:55 | fixer | commit-gate | started |
-| 13 Nov 09:56 | fixer | hypothesis | 32_stroke_lines -> untested |
-| 13 Nov 09:56 | fixer | attempt | 32_stroke_lines -> error (OPEN) |
-| 13 Nov 09:56 | fixer | classify | 43 classes from 208 documents |
-| 13 Nov 09:56 | fixer | hypothesis | 32_stroke_lines -> untested |
-| 13 Nov 09:56 | ? | commit-gate | started |
-| 13 Nov 11:24 | classifier | claim | classifier claimed the slot |
-| 13 Nov 11:24 | classifier | classify | 45 classes from 211 documents |
-| 13 Nov 11:24 | classifier | classify --txt | 4 classes from 211 documents |
-| 13 Nov 11:24 | classifier | ratchet --txt | held or rose |
-| 13 Nov 11:24 | classifier | ratchet | held or rose |
-| 13 Nov 11:59 | ? | ratchet | REGRESSED 191 |
-| 13 Nov 11:59 | ? | ratchet | REGRESSED 191 |
 | 13 Nov 11:59 | ? | ratchet | REGRESSED 191 |
 | 13 Nov 11:59 | ? | ratchet | held or rose |
 | 13 Nov 11:59 | ? | ratchet | held or rose |
@@ -406,3 +390,19 @@
 | 20 Nov 13:26 | fixer | build-engine | engine built in 49s |
 | 20 Nov 13:34 | fixer | attempt | 47_margins -> partial (3/13 moved) |
 | 20 Nov 13:34 | fixer | attempt | 47_margins -> reverted (0/13 moved) |
+| 20 Nov 13:54 | fixer | claim | fixer claimed the slot |
+| 20 Nov 14:09 | fixer | build-engine | started |
+| 20 Nov 14:10 | fixer | build-engine | engine built in 42s |
+| 20 Nov 14:35 | fixer | attempt | 47_margins -> reverted (0/26 moved) |
+| 20 Nov 14:36 | fixer | build-engine | started |
+| 20 Nov 14:37 | fixer | build-engine | engine built in 39s |
+| 20 Nov 14:38 | fixer | build-engine | started |
+| 20 Nov 14:38 | fixer | build-engine | engine built in 41s |
+| 20 Nov 14:38 | fixer | build-engine | started |
+| 20 Nov 14:39 | fixer | build-engine | engine built in 42s |
+| 20 Nov 14:59 | fixer | build-engine | started |
+| 20 Nov 15:00 | fixer | build-engine | engine built in 53s |
+| 20 Nov 15:06 | fixer | build-engine | started |
+| 20 Nov 15:07 | fixer | build-engine | engine built in 52s |
+| 20 Nov 15:07 | fixer | attempt | 47_margins -> reverted (0/26 moved) |
+| 20 Nov 15:08 | fixer | attempt | 47_margins -> partial (2/26 moved) |

@@ -1,0 +1,133 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index a3c39db..948085a 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -2619,8 +2619,20 @@ public final class DocxWriter {
+     private static void anchorBox(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b, Ctx ctx) {
+         cenLine(ctx, "anchorBox");
+         traceLine(ctx, "anchorBox", b.y, 0, 0, ctx.flowY, b.text());
++        // THE INDENT OF A SPACE-LED LINE IS A POSITION, NOT TEXT.
++        //
++        // This anchored a line at b.x, the point the page started DRAWING, and then wrote the
++        // line's leading spaces into the run. The first letter therefore sat n space-advances
++        // right of the box's left edge, in whatever face rendered the file - and the face that
++        // renders a .docx is often not the one the PDF embedded. 392_statistical_console_output's
++        // "Estimate Std. Error" row is 20 spaces: 79.5 pt in DejaVu Sans Mono, 36.2 pt in
++        // Liberation Sans, and Google Docs substitutes. Pin the ink edge and drop the spaces and
++        // the indent is a number in points, which no substitution can move.
++        float indent = Float.isNaN(b.inkX) ? 0f : b.inkX - b.x;
++        boolean strip = indent > 0.5f;
++        float ax = strip ? b.inkX : b.x;
+         StringBuilder inner = new StringBuilder(256);
+-        lineParagraph(inner, p, b);
++        lineParagraph(inner, p, b, strip);
+         // A text box has a fixed width and a fixed height, so a box narrower than its own line
+         // does not overflow - it WRAPS, and with w:lineRule="exact" the second line is clipped
+         // away. The page's advance is the measurement, except where the measurement is the
+@@ -2633,12 +2645,12 @@ public final class DocxWriter {
+         // "8. " and nothing else - 48 characters lost, 04_chars_missing.
+         int chars = 0;
+         for (PdfToWord.Run r : b.runs) chars += r.text.length();
+-        float advance = b.right - b.x;
++        float advance = b.right - ax;
+         float needed = chars * b.size * 0.5f;
+         if (advance < needed * 0.6f) advance = needed;
+         float wPt = Math.max(4f, advance) * 1.12f + b.size * 1.5f;
+         float hPt = Math.max(4f, b.size * LINE_FACTOR);
+-        anchor(sb, ctx, b.x, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), 0f, -1, 0.6f);
++        anchor(sb, ctx, ax, b.y - ASCENT * b.size, wPt, hPt, inner.toString(), 0f, -1, 0.6f);
+     }
+ 
+     private static String hex(int rgb) {
+@@ -3557,6 +3569,22 @@ public final class DocxWriter {
+ 
+     /** One drawn line, as the single paragraph inside its own text box. */
+     private static void lineParagraph(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b) {
++        lineParagraph(sb, p, b, false);
++    }
++
++    /**
++     * The same paragraph, with the white space the line opens with taken OUT of its text.
++     *
++     * <p>Only for a caller that has already pinned that white space as a position - see
++     * {@link #anchorBox}. A run that begins with n spaces puts n times the rendering face's
++     * space advance between the box's left edge and the first letter, and the face that
++     * renders a .docx is not always the face the PDF embedded: Google Docs substitutes, and a
++     * monospaced console line's 20-space indent then lands 43 pt left of where the page drew
++     * it. The indent is {@code Box.inkX - Box.x} points and belongs in the anchor, not in the
++     * text, because a number does not change when the face does.
++     */
++    private static void lineParagraph(StringBuilder sb, PdfToWord.Para p, PdfToWord.Box b,
++                                      boolean stripLeadSpaces) {
+         int lineTw = Math.max(1, Math.round((float) (Math.max(4f, b.size * LINE_FACTOR) * TWIPS_PER_PT)));
+         sb.append("<w:p><w:pPr>");
+         if (p.heading > 0) {
+@@ -3574,13 +3602,28 @@ public final class DocxWriter {
+         }
+         sb.append("</w:pPr>");
+         int spacingTw = p.align == 0 ? stretchTw(b) : 0;
++        boolean leading = stripLeadSpaces;
+         for (PdfToWord.Run run : b.runs) {
+             if (run.text.isEmpty()) continue;
+-            runXml(sb, run, p.heading > 0, spacingTw);
++            PdfToWord.Run out = run;
++            if (leading) {
++                String t = stripLead(run.text);
++                if (!t.isEmpty()) leading = false;
++                if (t.isEmpty()) continue;
++                out = new PdfToWord.Run(t, run.bold, run.italic, run.sizePt, run.font, run.color);
++            }
++            runXml(sb, out, p.heading > 0, spacingTw);
+         }
+         sb.append("</w:p>");
+     }
+ 
++    /** This text with its leading ASCII spaces removed - the indent a caller has pinned. */
++    private static String stripLead(String s) {
++        int i = 0;
++        while (i < s.length() && s.charAt(i) == ' ') i++;
++        return i == 0 ? s : s.substring(i);
++    }
++
+     /**
+      * Does this page's own content fit inside the paper?
+      *
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 4f0e6a5..c117440 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -243,6 +243,18 @@ public final class PdfToWord {
+          * which carry few spaces to absorb it.
+          */
+         public float stretchPt;
++        /**
++         * The left edge of the first glyph on this line that puts INK on the page - the
++         * page's {@code x} plus however much leading white space the line opens with.
++         *
++         * <p>{@code x} is the line's origin, which is where the PDF started drawing, and a
++         * line that opens with spaces starts drawing them. A writer that anchors such a line
++         * at {@code x} and then emits the spaces as text puts the indent in the FACE: n times
++         * whichever font's space advance renders it. The page's indent is {@code inkX - x}
++         * points, a number, and it does not change when the face does. NaN when the pass that
++         * built the line did not measure it.
++         */
++        public float inkX = Float.NaN;
+         public final List<Run> runs = new ArrayList<>();
+ 
+         public String text() {
+@@ -4146,6 +4158,7 @@ public final class PdfToWord {
+             box.rotated = ln.rotated;
+             box.angle = ln.angle;
+             box.ring = ln.ring;
++            box.inkX = visibleX(ln.glyphs, box.x);
+             box.runs.addAll(runsOf(ln));
+             p.boxes.add(box);
+         }
+@@ -5402,6 +5415,7 @@ public final class PdfToWord {
+             box.rotated = line.rotated;
+             box.angle = line.angle;
+             box.ring = line.ring;
++            box.inkX = visibleX(line.glyphs, box.x);
+             box.stretchPt = stretchOf(line, gapFloor);
+             List<Run> lineRuns = coalesceRuns(runsOf(line));
+             // A fragment that opens with a combining mark is not a line of its own - it is the
