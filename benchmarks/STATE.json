@@ -1,6 +1,6 @@
 {
- "ran_at": "2026-11-19T17:05:09",
- "engine": "13518ff",
+ "ran_at": "2026-11-20T09:00:00",
+ "engine": "ea9dfd7",
  "layers": {
   "ground_truth": {
    "status": "pass",
@@ -29,6 +29,7 @@
   "current_docs": 213,
   "regressions": [],
   "improvements": [
+   "table-inside-two-column-page 38.11 -> 35.87",
    "report-2col-table-spanning-both-columns 16.10 -> 0.76",
    "78_mixed_english_devanagari_line 13.51 -> 1.73",
    "66_two_col_footnotes_bottom 13.03 -> 2.92",

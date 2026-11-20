@@ -48,7 +48,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `00:46` agent deployed: content-present-partly-displaced / A - can RuleCollector carry the PDF paint operator so a shading fill stops acting as
 - `00:46` agent deployed: content-present-partly-displaced / B - what does check 65_table_span_down assert and why does 75_merged_header_cell_thr
 - `02:25` attempt 7 on content-present-partly-displaced -> kept (1/23 moved)
 - `03:40` attempt 8 on content-present-partly-displaced -> kept (1/23 moved)
@@ -73,6 +72,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `07:59` agent landed: contB-07 /  -> tools/p2w-bench/FINDINGS/content-partly-lost-and-displaced-twocol-tables-0700-f1x.md
 - `07:59` agent deployed: content-partly-lost / A - is the justified-line spacing fix missing from the engine or already landed
 - `07:59` agent landed: contA-07 /  -> tools/p2w-bench/FINDINGS/content-partly-lost-JUSTIFY-already-landed-0700-f1x.md
+- `08:00` attempt 7 on content-partly-lost-and-displaced -> kept (1/6 moved)
 
 ## Where the rest of the state lives
 

@@ -336,6 +336,10 @@
   {
    "at": "07:59",
    "text": "agent landed: contA-07 /  -> tools/p2w-bench/FINDINGS/content-partly-lost-JUSTIFY-already-landed-0700-f1x.md"
+  },
+  {
+   "at": "08:00",
+   "text": "attempt 7 on content-partly-lost-and-displaced -> kept (1/6 moved)"
   }
  ],
  "next": "content-partly-lost-and-displaced: itr-computation-with-slab-table (share5 42.33, share@10 27.40, share@20 7.85) - table rows are written at their own w:trHeight of 351/370 tw against the page's uniform 368 tw, so the page compresses by 0.5pt a row and -14.31pt by the last row (DocxWriter.java:6182 and :6271-6273; the arithmetic that yields 351 is NOT verified). The other four OPEN documents in this class are 31_times_body_arial_headings 1.04, 370_offer_letter 2.70, 14_stamp_chars_positioned_td 3.89, 75_merged_header_cell_three_columns 7.62. The rule class stays blocked pending a human.",
