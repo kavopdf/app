@@ -64,13 +64,29 @@ pre-existing quirk of `isNumeric`, and it is not what this fix needed.
 
 ## The one it did not fix, and why
 
-`itr-computation-with-slab-table`: block 8 column 1 lands on 132 (123 + 9) and block 6 column 2 on
-130 (118 + 12), and their right edges are 535.58 pt and 549.92 pt - **not the same page column**.
-Pooling by right edge therefore cannot join them, and joining them would be inventing a column the
-page did not draw: the two cells really do end at different x. Whatever is wrong here is upstream of
-the end column - two figures that belong to one source column are being placed in cells with
-different right edges. That is a table-geometry question, not a .txt padding question, and it is
-where the next run should start.
+`itr-computation-with-slab-table`, measured after the change and left open. The verifier's own ruler
+for this document is 4.1616 pt per character and it groups the source's line-final amounts by end
+column into 93 (6 rows), 107 (7), 129 (1), 130 (7) and 131 (4). Four of those are columns. The
+failing one is 130, and its seven rows arrive in the .txt as 1 at column 130 and 6 at column 132:
+
+    source x   token           .txt end
+     503.6     61,000.00            130
+     496.5     3,68,680.00          132
+     502.7     14,747.20            132
+     496.5     3,83,427.20          132
+     496.5     3,60,000.00          132
+     502.7     10,000.00            132
+     502.7     13,427.20            132
+
+`61,000.00` is in a different `PdfToWord.Table` from the other six. Those two tables report cell right
+edges of 535.58 pt and 549.92 pt - 14.34 pt apart, which is 3.4 columns on this document's ruler, and
+`column()` puts them on 129 and 132. Pooling keys three columns apart are three columns apart, and
+joining them would be inventing a column the page did not draw. The source's figures all end within
+one column of each other, so the fault is that one table's cell right edge is 14 pt left of where the
+page draws the figures - **table geometry in `PdfToWord`, not padding in `TxtWriter`**. `PdfToWord`
+owns the .docx as well, so that change needs a .docx measurement and is not a .txt-slot change. That
+is where the next run on this class should start, and it should start by measuring which of the two
+`cellRight` values is the wrong one.
 
 ## How it was measured, so it can be re-derived
 

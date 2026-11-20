@@ -533,7 +533,7 @@
   "status": "OPEN"
  },
  "t13_amount_columns": {
-  "attempts": 5,
+  "attempts": 6,
   "first_seen": null,
   "history": [
    {
@@ -570,28 +570,37 @@
     "outcome": "kept",
     "reason": "TxtWriter: hoist the table amount end column from per-Table to one set per page column of the cell's right edge, pooled over every table in the document and marked in paraEndSnap so paragraph and tabl",
     "total": 6
+   },
+   {
+    "at": "2026-11-20 17:08",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "itr-computation-with-slab-table is not a padding fault. Its failing source amount column (7 rows, end column 130) arrives as 1 row at 130 and 6 at 132, because 61,000.00 is in a different Table whose ",
+    "total": 1
    }
   ],
   "last": null,
-  "last_engine": "c18ae16+b8361f8505",
-  "last_moved": 5,
-  "last_total": 6,
+  "last_engine": "0fc8b7e",
+  "last_moved": 0,
+  "last_total": 1,
   "outcomes": [
    "error",
    "kept",
    "kept",
    "reverted",
-   "kept"
+   "kept",
+   "reverted"
   ],
   "ratchet_at": "20 Nov 17:06",
   "ratchet_docs": 5,
-  "reason": "TxtWriter: hoist the table amount end column from per-Table to one set per page column of the cell's right edge, pooled over every table in the document and marked in paraEndSnap so paragraph and table paths agree. Whole corpus 213 re-converted and re-scored: 5 docs no longer fail t13, 0 newly failing, 208 unchanged. itr-computation-with-slab-table unmoved - its two cells end on different right edges (535.58 vs 549.92 pt), so it is table geometry, not padding.",
+  "reason": "itr-computation-with-slab-table is not a padding fault. Its failing source amount column (7 rows, end column 130) arrives as 1 row at 130 and 6 at 132, because 61,000.00 is in a different Table whose cell right edge is 535.58 pt against the other table's 549.92 pt - 14.34 pt, 3.4 columns on this document's 4.1616 pt ruler. No pooling keyed on cell geometry can join those without inventing a column, and the source's figures all end within one column of each other: the fault is one table's cell right edge, i.e. PdfToWord table geometry, which owns the .docx and needs a .docx measurement. Measured and recorded so the next run does not retry the padding path.",
   "reasons": [
    "claimed. .txt half. PATCH-t13 (row-per-line) was rejected 19 Nov: it breaks t04_structure line-count drift, 101 worse 0 better. Working the other direction: keep one cell per line, fix only where an amount ENDS, since t13 compares rows of a column to each other and not to the source column.",
    "KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over-estimates a 7pt numeric token by one column, so amounts ended at baseCol+length = 133/134. Whole corpus: 10 better, 0 worse, 203 same; checks 1784->1794; clean 167->177. Line count unchanged, so t04 cannot drift. 8 of 18 remain: 2 are paragraph-path with no right edge on Para, 2 mixed.",
    "KEPT (second construct, same slot). paraEndSnap(): per page, an end column whose immediate neighbour is also an end column of the page's numeric paragraph lines merges into it transitively and keeps the highest value; appendPara pads to it. The paragraph path has no right edge, so its amounts ended at column(lineX)+len and rounding split one page column into two adjacent .txt columns (91/92, 107/108, 142/143). Only documents that can change were re-converted: scanning all 213 .txt for amount end columns one apart found 10; all 213 re-scored. 2 better, 0 worse, 211 same; checks 1794->1796. t13 now holds 6 of the original 18; clean 179 of 213.",
    "IN PROGRESS - claiming the class: per-Table endCol is not per-page; the six remaining t13 docs differ only by which Table set the column. Will be corrected in place with the real measurement.",
-   "TxtWriter: hoist the table amount end column from per-Table to one set per page column of the cell's right edge, pooled over every table in the document and marked in paraEndSnap so paragraph and table paths agree. Whole corpus 213 re-converted and re-scored: 5 docs no longer fail t13, 0 newly failing, 208 unchanged. itr-computation-with-slab-table unmoved - its two cells end on different right edges (535.58 vs 549.92 pt), so it is table geometry, not padding."
+   "TxtWriter: hoist the table amount end column from per-Table to one set per page column of the cell's right edge, pooled over every table in the document and marked in paraEndSnap so paragraph and table paths agree. Whole corpus 213 re-converted and re-scored: 5 docs no longer fail t13, 0 newly failing, 208 unchanged. itr-computation-with-slab-table unmoved - its two cells end on different right edges (535.58 vs 549.92 pt), so it is table geometry, not padding.",
+   "itr-computation-with-slab-table is not a padding fault. Its failing source amount column (7 rows, end column 130) arrives as 1 row at 130 and 6 at 132, because 61,000.00 is in a different Table whose cell right edge is 535.58 pt against the other table's 549.92 pt - 14.34 pt, 3.4 columns on this document's 4.1616 pt ruler. No pooling keyed on cell geometry can join those without inventing a column, and the source's figures all end within one column of each other: the fault is one table's cell right edge, i.e. PdfToWord table geometry, which owns the .docx and needs a .docx measurement. Measured and recorded so the next run does not retry the padding path."
   ],
   "requeues": 0,
   "status": "OPEN"
