@@ -688,6 +688,22 @@
   {
    "at": "04:34",
    "text": "attempt 13 on t01_word_accuracy -> partial (1/5 moved)"
+  },
+  {
+   "at": "04:36",
+   "text": "agent deployed: t01_word_accuracy / A - census of every widget appearance stream over all 213 documents - how many widge"
+  },
+  {
+   "at": "04:36",
+   "text": "agent deployed: t01_word_accuracy / B - implement the /AP /N glyph walk in its own clone and measure 601 and the Account"
+  },
+  {
+   "at": "04:36",
+   "text": "agent landed: t01_word_accuracy / A -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md"
+  },
+  {
+   "at": "04:36",
+   "text": "agent landed: t01_word_accuracy / B -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md"
   }
  ],
  "next": "PUSH FINDINGS/widget-ap-glyph-walk-0436-f1x.patch and measure it: 601 goes 37/42 -> 42/42 docx checks in LibreOffice, blast radius is 2 documents of 213, and p2w builds from origin main so nothing corpus-wide can be measured until the patch is on main. Then measure 601 through Drive before and after (Google is the authority), and watch the Account form's two new fails (42_justification_edges, 63_table_rows). Do not chase t01 to 100% on 601 from the engine: verify_txt double-counts 'General' (glyph_truth appends _ap_stream_text to a page text pymupdf already synthesised the widget into), so only a duplicating engine can reach 100 and that costs 601 five docx checks. That is a person's decision, same as the 01:43 row.",
@@ -1161,6 +1177,30 @@
    "finding": "FINDINGS/39-small-caps-gap-threshold-0150-fixer.md",
    "deployed_at": "2026-11-20T20:11",
    "landed_at": "2026-11-20T20:11"
+  },
+  {
+   "id": "t01_A-03",
+   "class": "t01_word_accuracy",
+   "angle": "A",
+   "question": "census of every widget appearance stream over all 213 documents - how many widgets, what they emit, what duplicates the page text",
+   "expected": "a blast radius small enough to measure in one run",
+   "deployed": "04:36",
+   "status": "landed",
+   "finding": "FINDINGS/widget-ap-glyph-walk-0436-f1x.md",
+   "deployed_at": "2026-11-20T23:06",
+   "landed_at": "2026-11-20T23:06"
+  },
+  {
+   "id": "t01_B-03",
+   "class": "t01_word_accuracy",
+   "angle": "B",
+   "question": "implement the /AP /N glyph walk in its own clone and measure 601 and the Account form before and after",
+   "expected": "601 from 37/42 to 42/42 docx checks, with the instrument's own answer for a tick",
+   "deployed": "04:36",
+   "status": "landed",
+   "finding": "FINDINGS/widget-ap-glyph-walk-0436-f1x.md",
+   "deployed_at": "2026-11-20T23:06",
+   "landed_at": "2026-11-20T23:06"
   }
  ],
  "run": {

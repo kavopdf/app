@@ -66,16 +66,14 @@ unfinished work, not as a result.
 | t01_B-01 | t01_word_accuracy | B | how many of the 213 documents a cmap-based recovery would reach, and d | 23:20 | 23:04 | landed | FINDINGS/ligature-identity-UNRECOVERABLE-2350.md |
 | t01_A-02 | t01_word_accuracy | A | is the handed diagnosis (nested form matrix disagreement, rotated line | 01:41 | 01:15 | landed | FINDINGS/411-nested-xobject-matrix-1940.md |
 | t01_B-02 | t01_word_accuracy | B | why does 39_small_caps_letter_spacing lose 8 words and invent 2 - writ | 01:41 | 01:20 | landed | FINDINGS/39-small-caps-gap-threshold-0150-fixer.md |
+| t01_A-03 | t01_word_accuracy | A | census of every widget appearance stream over all 213 documents - how  | 04:36 | a blast radius small enough to measure in one run | landed | FINDINGS/widget-ap-glyph-walk-0436-f1x.md |
+| t01_B-03 | t01_word_accuracy | B | implement the /AP /N glyph walk in its own clone and measure 601 and t | 04:36 | 601 from 37/42 to 42/42 docx checks, with the instrument's own answer for a tick | landed | FINDINGS/widget-ap-glyph-walk-0436-f1x.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `21:47` agent landed: t01_word_accuracy / writer-word-drop -> No writer drop on either measurable document: 041122's 131 lost tokens are 127 ligature U+FFFD plus 4 genuine; the filled form's 145 are the same 127 plus 18 widget values counted twice by the source. Measured negatives that remove possibilities permanently: nested XObject with a scaling CTM LOST 0, Arabic through logicalOrder LOST 0 (length-preserving), below-paper LOST 0, letterspacing 0.16-0.30em identical both sides. Also: clipToPaper() is dead code and the live filter uses the CropBox ignoring its offset - a page whose CropBox origin is not (0,0) drops visible text (measured: VISIBLE -> V).
-- `21:49` attempt 4 on t01_word_accuracy -> kept (0/10 moved)
-- `22:39` attempt 5 on t01_word_accuracy -> reverted (2/7 moved)
-- `22:39` agent deployed: t01_word_accuracy / ToUnicode CMap destination - Is the U+FFFD the CMap's own answer or a parse failure, and what is the smallest
 - `22:39` agent landed: t01_word_accuracy / ToUnicode CMap destination -> FINDINGS/t01_word_accuracy-FFFD-CMAP-2300-fixer.md
 - `22:43` agent deployed: t01_word_accuracy / adversarial patch review - How can this Identity-H recovery write wrong text into the document?
 - `22:43` agent landed: t01_word_accuracy / adversarial patch review -> FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md
@@ -97,6 +95,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `03:36` attempt 12 on 47_margins -> partial (2/26 moved)
 - `04:34` attempt 12 on t01_word_accuracy -> partial
 - `04:34` attempt 13 on t01_word_accuracy -> partial (1/5 moved)
+- `04:36` agent deployed: t01_word_accuracy / A - census of every widget appearance stream over all 213 documents - how many widge
+- `04:36` agent deployed: t01_word_accuracy / B - implement the /AP /N glyph walk in its own clone and measure 601 and the Account
+- `04:36` agent landed: t01_word_accuracy / A -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
+- `04:36` agent landed: t01_word_accuracy / B -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
 
 ## Where the rest of the state lives
 
