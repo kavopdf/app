@@ -9,9 +9,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 00:57 |
-| ended | 01:51 |
-| how it ended | forced |
+| started | 02:52 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -72,7 +72,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `21:46` attempt 3 on t01_word_accuracy -> reverted (0/10 moved)
 - `21:47` agent deployed: t01_word_accuracy / verifier-tokenisation - Does verify_txt.py's t01 tokenisation charge a correct .txt for words the page d
 - `21:47` agent deployed: t01_word_accuracy / writer-word-drop - Which construct in TxtWriter.java/PdfToWord.java drops words the PDF draws, rank
 - `21:47` agent landed: t01_word_accuracy / verifier-tokenisation -> Verdict ENGINE for the two bank forms (127 tokens of U+FFFD where the source declares U+0124); two real instrument bugs found (widget /AP double-count, source word boundaries) but neither makes any of the ten pass; 15 asymmetries tested and ruled harmless with numbers. Ruled the instrument out as the explanation for 79/391/406 - which the run then found was wrong: the NUL declaration WAS the instrument's fault. See FINDINGS/t01_word_accuracy-CONTROL-CHARS-2135.md
@@ -97,6 +96,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `01:41` attempt 9 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:47` attempt 10 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:51` attempt 11 on t01_word_accuracy -> reverted (0/5 moved)
+- `03:25` attempt 11 on 47_margins -> partial (2/26 moved)
 
 ## Where the rest of the state lives
 

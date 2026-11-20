@@ -1,16 +1,14 @@
 {
- "started_ts": 1795202848.4655814,
- "started": "00:57",
- "ended_ts": 1795206110.7137089,
- "ended": "01:51",
- "class": "t01_word_accuracy",
- "attempts": 4,
+ "started_ts": 1795209725.7643123,
+ "started": "02:52",
+ "ended_ts": null,
+ "ended": null,
+ "class": "47_margins",
+ "attempts": 1,
  "kept": 0,
  "docs_improved": 0,
- "agents": [
-  "t01_A-02",
-  "t01_B-02"
- ],
+ "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0
+ "needs_human": 0,
+ "partial": 1
 }

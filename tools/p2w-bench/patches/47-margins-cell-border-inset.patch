@@ -1,0 +1,54 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index a3c39db..5d8b52f 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6363,6 +6363,28 @@ public final class DocxWriter {
+                 boolean textOverflows = !Float.isNaN(textR) && textR > 0f
+                         && insetTw + needTw > spanTw;
+                 if (textOverflows) insetTw = Math.max(0, spanTw - needTw);
++                // THE CELL'S OWN BORDER IS PART OF THE INSET, AND IT WAS PAID TWICE.
++                //
++                // insetTw measures the text's x from the cell's left EDGE in the page, and the
++                // writer then puts a rule of its own on that edge. A renderer draws the cell's
++                // content inside its border, so the text lands at edge + borderWidth + w:ind -
++                // the page's own inset plus the width of the rule the writer added on top of
++                // it. Measured on 404_sudoku_grid: nine 44 pt columns, sz 16 = 2 pt on left and
++                // insideV, every digit 2.1 pt right of the page, and setting those two sides to
++                // nil in the emitted XML alone moved all 30 of them to within 0.1 pt.
++                //
++                // The subtraction is the border the writer draws on THIS cell's left side: the
++                // table's left border in the first column, the insideV rule in every other.
++                // w:sz is in eighths of a point and a twip is a twentieth, so twips = sz * 2.5.
++                //
++                // IT IS APPLIED HERE AND NOT TO insetTw ITSELF. The widening and the overflow
++                // correction above ask whether the text fits the column, and that question is
++                // about the page's own geometry, not about the rule this writer adds. Subtracting
++                // earlier changed which cells got widened and moved four runs 36.8 pt on
++                // 78_mixed_english_devanagari_line - a layout decision taken to fix a position.
++                int leftBorderTw = (c == 0 ? (sideDrawn[1] ? sideSz[1] : 0)
++                                           : (sideDrawn[5] ? sideSz[5] : 0)) * 5 / 2;
++                int indTw = Math.max(0, insetTw - leftBorderTw);
+                 inner.append("<w:tc><w:tcPr><w:tcW w:w=\"").append(spanTw)
+                         .append("\" w:type=\"dxa\"/>");
+                 if (span > 1) inner.append("<w:gridSpan w:val=\"").append(span).append("\"/>");
+@@ -6589,8 +6611,9 @@ public final class DocxWriter {
+                         int boxTw = paraBoxTw(cps, q, rowLineTw);
+                         int beforeTw = q == 0 ? before0 : paraBeforeTw(cps, q, rowLineTw);
+                         stackTw += (q == 0 ? 0 : beforeTw) + boxTw;
+-                        int pInset = Float.isNaN(cp.indentPt) ? insetTw
+-                                : (int) Math.max(0L, Math.round(cp.indentPt * TWIPS_PER_PT));
++                        int pInset = Float.isNaN(cp.indentPt) ? indTw
++                                : (int) Math.max(0L, Math.round(cp.indentPt * TWIPS_PER_PT)
++                                                 - leftBorderTw);
+                         cellParaXml(inner, cp, beforeTw, boxTw, pInset, cellSz);
+                     }
+                     if (r == keepRows - 1) {
+@@ -6604,7 +6627,7 @@ public final class DocxWriter {
+                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
+                         .append("<w:snapToGrid w:val=\"0\"/>")
+                         .append(spacing(cellBeforeTw, cellBoxTw, cellSz, autoCellBoxes(), false));
+-                if (insetTw > 0) inner.append("<w:ind w:left=\"").append(insetTw).append("\"/>");
++                if (indTw > 0) inner.append("<w:ind w:left=\"").append(indTw).append("\"/>");
+                 inner.append("</w:pPr>");
+                 if (!cell.isEmpty()) {
+                     inner.append("<w:r><w:rPr>");
