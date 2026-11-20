@@ -13,3 +13,4 @@ watchdog's job is to find out why.
 | date | docx open | txt failing | google | google clean | note |
 |---|---:|---:|---:|---:|---|
 | 2026-11-19 | 65 | 47 | 84 | 7 |  |
+| 2026-11-20 | 60 | 46 | 192 | 7 |  |
