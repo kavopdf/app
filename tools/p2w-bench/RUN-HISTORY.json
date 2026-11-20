@@ -344,5 +344,22 @@
    ]
   ],
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795185064.7096055,
+  "started": "20:01",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "47_margins",
+  "attempts": 2,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   "47maanchor trace-01",
+   "47maclass census-01"
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
