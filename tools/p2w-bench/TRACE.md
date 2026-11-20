@@ -6,8 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 14 Nov 21:41 | ? | build-engine | started |
-| 14 Nov 21:45 | ? | build-engine | started |
 | 14 Nov 21:58 | ? | build-engine | started |
 | 14 Nov 22:16 | ? | build-engine | started |
 | 14 Nov 22:40 | ? | build-engine | started |
@@ -406,3 +404,5 @@
 | 20 Nov 18:44 | fixer | build-engine | started |
 | 20 Nov 18:45 | fixer | build-engine | engine built in 55s |
 | 20 Nov 19:24 | fixer | attempt | t13_amount_columns -> kept (1/? moved) |
+| 20 Nov 19:27 | fixer | attempt | t12_word_invention -> reverted (0/12 moved) |
+| 20 Nov 19:29 | fixer | attempt | t12_word_invention -> reverted (0/12 moved) |

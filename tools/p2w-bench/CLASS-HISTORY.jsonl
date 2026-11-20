@@ -48,3 +48,5 @@
 {"at": "2026-11-20 17:08", "attempt": 6, "class": "t13_amount_columns", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-20 18:00", "attempt": 7, "class": "t13_amount_columns", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-20 19:24", "attempt": 8, "class": "t13_amount_columns", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-20 19:27", "attempt": 1, "class": "t12_word_invention", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-20 19:29", "attempt": 2, "class": "t12_word_invention", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}

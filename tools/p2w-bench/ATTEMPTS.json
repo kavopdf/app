@@ -532,6 +532,41 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "t12_word_invention": {
+  "attempts": 2,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-20 19:27",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "claimed (second attempt, same slot). t12_word_invention, 12 documents, the biggest .txt class after t13 closed. Plan: read the check, census the invented tokens per document, group by mechanism (furni",
+    "total": 12
+   },
+   {
+    "at": "2026-11-20 19:29",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_in",
+    "total": 12
+   }
+  ],
+  "last": null,
+  "last_engine": "49cffd4",
+  "last_moved": 0,
+  "last_total": 12,
+  "outcomes": [
+   "reverted",
+   "reverted"
+  ],
+  "reason": "NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_invoice_with_annotations are the six review ANNOTATIONS, which page.get_text() does not read and the engine does (measured: 'confirmed' absent from get_text(), present in the annotation stream). 12_stamp_across_page_break is duplication across the break - KUNIGAL is drawn once on page 1 and arrives twice - which is t09's question. 311_fir_police_form is cell welding: 60067 and Mobile are two drawn lines in one cell and arrive as '60067Mobile'. 77_arabic_rtl_document is RTL order, 05_round_company_seal_curved_text is single letters from a curve, 39_small_caps_letter_spacing is letter-spaced caps. And THREE OF THE TWELVE ARE THE INSTRUMENT'S OWN ARTIFACT: the PDF text layer carries U+0000 as a zero-width cell separator, _words splits on \\S+ so NUL is not whitespace and glues to the token beside it ('\\x00\\x00\\x00PHOTOGRAPH', 'DisagreeStrongly\\x00disagree', '0.8412,\\x00Adjusted'), and _strip_punct does not strip NUL - so the clean token the writer emitted is counted as invented. Replacing U+0000 with a space on the source side clears 391_survey_questionnaire_grid, 392_statistical_console_output and 406_passport_mrz_page and BREAKS NO DOCUMENT (0 of the 205 passing). Not edited into verify_txt.py: the verifier is the instrument. FINDINGS/t12-is-five-faults-and-three-are-the-instrument-1925.md.",
+  "reasons": [
+   "claimed (second attempt, same slot). t12_word_invention, 12 documents, the biggest .txt class after t13 closed. Plan: read the check, census the invented tokens per document, group by mechanism (furniture duplication, hyphenation join, symbol decode, dropped glyph fallback) and attack the largest group. No engine change until the census names one.",
+   "NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_invoice_with_annotations are the six review ANNOTATIONS, which page.get_text() does not read and the engine does (measured: 'confirmed' absent from get_text(), present in the annotation stream). 12_stamp_across_page_break is duplication across the break - KUNIGAL is drawn once on page 1 and arrives twice - which is t09's question. 311_fir_police_form is cell welding: 60067 and Mobile are two drawn lines in one cell and arrive as '60067Mobile'. 77_arabic_rtl_document is RTL order, 05_round_company_seal_curved_text is single letters from a curve, 39_small_caps_letter_spacing is letter-spaced caps. And THREE OF THE TWELVE ARE THE INSTRUMENT'S OWN ARTIFACT: the PDF text layer carries U+0000 as a zero-width cell separator, _words splits on \\S+ so NUL is not whitespace and glues to the token beside it ('\\x00\\x00\\x00PHOTOGRAPH', 'DisagreeStrongly\\x00disagree', '0.8412,\\x00Adjusted'), and _strip_punct does not strip NUL - so the clean token the writer emitted is counted as invented. Replacing U+0000 with a space on the source side clears 391_survey_questionnaire_grid, 392_statistical_console_output and 406_passport_mrz_page and BREAKS NO DOCUMENT (0 of the 205 passing). Not edited into verify_txt.py: the verifier is the instrument. FINDINGS/t12-is-five-faults-and-three-are-the-instrument-1925.md."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "t13_amount_columns": {
   "attempts": 8,
   "first_seen": null,

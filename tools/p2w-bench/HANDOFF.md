@@ -60,8 +60,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `12:00` agent landed: t13_amount_columns / A -> FINDINGS/t13-writer-path-110501-f3de.md
-- `12:00` agent landed: t13_amount_columns / B -> (no file)
 - `13:34` attempt 4 on 47_margins -> partial (3/13 moved)
 - `13:34` attempt 5 on 47_margins -> reverted (0/13 moved)
 - `13:34` two attempts on 47_margins, both reverted, both measured; the mechanism is now in FINDINGS and the class is no longer a mystery
@@ -85,6 +83,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `17:09` agent landed: t13_amount_columns / B -> FINDINGS/t13-page-end-column-KEPT-172000.md
 - `18:00` attempt 7 on t13_amount_columns -> reverted (0/6 moved)
 - `19:24` attempt 8 on t13_amount_columns -> kept
+- `19:27` attempt 1 on t12_word_invention -> reverted (0/12 moved)
+- `19:29` attempt 2 on t12_word_invention -> reverted (0/12 moved)
 
 ## Where the rest of the state lives
 
