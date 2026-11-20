@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 00:57 → running IST · 50 min**
+**21 Nov 2026 · slot 00:57 → running IST · 51 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,7 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
-| Committed | **17** files in 3 commit(s) from `4e676a7` — ...NT-PROPOSAL-clip-flag-NOT-APPLIED-0210-fixer.md, 39-small-caps-gap-threshold-0150-fixer.md, ATTEMPTS.json, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROTATION.json, ROUND.j |
+| Committed | **18** files in 4 commit(s) from `bfab76e` — ...NT-PROPOSAL-clip-flag-NOT-APPLIED-0210-fixer.md, 38-faux-bold-TRIPLE-DRAW-0225-fixer.md, 39-small-caps-gap-threshold-0150-fixer.md, ATTEMPTS.json, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSA |
 
 ## What was tried
 
@@ -52,7 +52,7 @@
 
 | | |
 |:--|:--|
-| Slot window | 00:57 → running · 50 min |
+| Slot window | 00:57 → running · 51 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 25 |
 | Longest silence | **28.3 min** — from 00:57:53, after `classrow.py: refreshing the class file` |
@@ -67,7 +67,7 @@
 |:--|--:|:--|
 | measure or build - a conversion, screen or compile writes no beacon | **41 min** | `##################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **5 min** | `###` |
+| report - the report and the chain | **7 min** | `###` |
 | other - not attributed to a tool | **0 min** | `#` |
 ## Best results this round
 
