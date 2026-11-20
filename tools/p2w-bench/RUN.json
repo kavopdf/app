@@ -1,22 +1,16 @@
 {
- "started_ts": 1795195472.5423703,
- "started": "22:54",
+ "started_ts": 1795202848.4655814,
+ "started": "00:57",
  "ended_ts": null,
  "ended": null,
  "class": "t01_word_accuracy",
  "attempts": 2,
- "kept": 1,
- "docs_improved": 2,
+ "kept": 0,
+ "docs_improved": 0,
  "agents": [
-  "t01_A-01",
-  "t01_B-01"
+  "t01_A-02",
+  "t01_B-02"
  ],
  "obstacles_cleared": 0,
- "needs_human": 0,
- "counted": [
-  [
-   "t01_word_accuracy",
-   2
-  ]
- ]
+ "needs_human": 0
 }

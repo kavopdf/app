@@ -1,6 +1,3 @@
-| 12 Nov 13:18 | baseline | ratchet held (docx 190/208 scored, txt 121/208, backfill gap 69); measure gate NOT READY (18 rows unscored); slot released |
-| 12 Nov 14:10 | started | phase measure |
-| 12 Nov 14:13 | baseline | measured price-list-2col-dense-right-aligned 35/59 docx, 3/5 txt |
 | 12 Nov 14:13 | baseline | measured price-list-right-aligned-amounts 38/59 docx, 4/5 txt |
 | 12 Nov 14:14 | baseline | measured product-catalogue-code-left-price-right 44/59 docx, 5/5 txt |
 | 12 Nov 14:14 | baseline | measured property-tax-receipt 47/59 docx, 4/5 txt |
@@ -198,3 +195,6 @@
 | 20 Nov 22:54 | fixer | slot claimed - fixer running |
 | 20 Nov 23:16 | fixer | attempt t01_word_accuracy -> kept (2/7 moved) |
 | 20 Nov 23:23 | fixer | attempt t01_word_accuracy -> reverted (0/5 moved) |
+| 21 Nov 00:57 | fixer | slot claimed - fixer running |
+| 21 Nov 00:57 | fixer | attempt t01_word_accuracy -> reverted (0/5 moved) |
+| 21 Nov 01:41 | fixer | attempt t01_word_accuracy -> reverted (0/5 moved) |

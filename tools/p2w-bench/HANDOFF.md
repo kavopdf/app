@@ -9,7 +9,7 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 22:54 |
+| started | 00:57 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
@@ -64,18 +64,14 @@ unfinished work, not as a result.
 | t01_adversarial patch review-01 | t01_word_accuracy | adversarial patch review | How can this Identity-H recovery write wrong text into the document? | 22:43 | a ranked list of regression risks with a one-line test each | landed | FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md |
 | t01_A-01 | t01_word_accuracy | A | is the U+FFFD glyph a ligature or a single letter, read from the embed | 23:20 | 23:00 | landed | FINDINGS/ligature-identity-UNRECOVERABLE-2350.md |
 | t01_B-01 | t01_word_accuracy | B | how many of the 213 documents a cmap-based recovery would reach, and d | 23:20 | 23:04 | landed | FINDINGS/ligature-identity-UNRECOVERABLE-2350.md |
+| t01_A-02 | t01_word_accuracy | A | is the handed diagnosis (nested form matrix disagreement, rotated line | 01:41 | 01:15 | landed | FINDINGS/411-nested-xobject-matrix-1940.md |
+| t01_B-02 | t01_word_accuracy | B | why does 39_small_caps_letter_spacing lose 8 words and invent 2 - writ | 01:41 | 01:20 | landed | FINDINGS/39-small-caps-gap-threshold-0150-fixer.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `20:28` attempt 9 on 47_margins -> reverted (0/14 moved)
-- `20:44` attempt 10 on 47_margins -> reverted (0/14 moved)
-- `20:45` agent deployed: 47margins / anchor trace - which writer construct puts 360_restaurant_menu's body column 12 pt left, and do
-- `20:45` agent landed: 47margins / anchor trace -> FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md
-- `20:45` agent deployed: 47margins / class census - which clause of 47_margins each document fails, grouped by mechanism, and whethe
-- `20:45` agent landed: 47margins / class census -> FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md
 - `20:59` attempt 1 on t01_word_accuracy -> reverted (0/10 moved)
 - `21:22` attempt 2 on t01_word_accuracy -> kept (3/10 moved)
 - `21:46` attempt 3 on t01_word_accuracy -> reverted (0/10 moved)
@@ -95,6 +91,12 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `23:20` agent landed: t01_word_accuracy / A -> FINDINGS/ligature-identity-UNRECOVERABLE-2350.md
 - `23:20` agent landed: t01_word_accuracy / B -> FINDINGS/ligature-identity-UNRECOVERABLE-2350.md
 - `23:23` attempt 7 on t01_word_accuracy -> reverted (0/5 moved)
+- `00:57` attempt 8 on t01_word_accuracy -> reverted (0/5 moved)
+- `01:41` agent deployed: t01_word_accuracy / A - is the handed diagnosis (nested form matrix disagreement, rotated line off page)
+- `01:41` agent deployed: t01_word_accuracy / B - why does 39_small_caps_letter_spacing lose 8 words and invent 2 - writer or refe
+- `01:41` agent landed: t01_word_accuracy / A -> FINDINGS/411-nested-xobject-matrix-1940.md
+- `01:41` agent landed: t01_word_accuracy / B -> FINDINGS/39-small-caps-gap-threshold-0150-fixer.md
+- `01:41` attempt 9 on t01_word_accuracy -> reverted (0/5 moved)
 
 ## Where the rest of the state lives
 

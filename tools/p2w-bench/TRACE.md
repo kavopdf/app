@@ -6,10 +6,6 @@
 | 13 Nov 00:53 | fixer | classify | 43 classes from 208 documents |
 | 13 Nov 00:54 | fixer | attempt | 20_within_10pt (+4) -> reverted (OPEN) |
 | 13 Nov 00:54 | fixer | classify | 43 classes from 208 documents |
-| 16 Nov 11:55 | fixer | build-engine | engine unchanged, compile skipped |
-| 16 Nov 12:24 | fixer | hypothesis | content-missing-nothing-in-its-place -> confirmed |
-| 16 Nov 12:24 | fixer | attempt | content-missing-nothing-in-its-place -> kept (22/30 moved) |
-| 16 Nov 12:46 | fixer | claim | fixer claimed the slot |
 | 16 Nov 13:51 | fixer | hypothesis | content-missing-partly-replaced -> untested |
 | 16 Nov 13:51 | fixer | hypothesis | content-missing-partly-replaced -> confirmed |
 | 16 Nov 13:51 | fixer | attempt | content-missing-partly-replaced -> error |
@@ -406,3 +402,7 @@
 | 20 Nov 23:07 | fixer | build-engine | engine built in 35s |
 | 20 Nov 23:16 | fixer | attempt | t01_word_accuracy -> kept (2/7 moved) |
 | 20 Nov 23:23 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |
+| 21 Nov 00:57 | fixer | claim | fixer claimed the slot |
+| 21 Nov 00:57 | fixer | stale-claim | fixer slot was stale (93 min) - the previous run ended without releasing it |
+| 21 Nov 00:57 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |
+| 21 Nov 01:41 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |
