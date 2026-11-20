@@ -289,6 +289,26 @@ and `FIVE THINGS THAT COST A RUN`.
 
     Next: classify — 185 documents fail at least one check.
 
+**THE TABLE IS THE PART THAT BREAKS. IT BROKE ON 20 NOV.**
+
+The report printed its table as `32strokelines`, `05charsextra`, `18displacement` — **every underscore
+eaten by markdown italic** — and not one line began with a pipe, so four columns became loose text. A
+reader could not match a row to a check.
+
+Two rules, both enforced now:
+
+1. **Escape the underscores in a check name.** `32\_stroke\_lines`, not `32_stroke_lines`. Unescaped,
+   markdown reads the underscores as italics and deletes them. `lastmessage.py` refuses a report where
+   a check name the tool printed appears with its underscores stripped.
+2. **Write a real table.** A header row, a `|---:|` separator, then one row per check. Without the
+   pipes there is no table — only text that used to be one.
+
+    | check | Google | LibreOffice |
+    |---|---:|---:|
+    | 32\_stroke\_lines | 145 | 1 |
+    | 05\_chars\_extra | 141 | 7 |
+    | 18\_displacement | 125 | 19 |
+
 **Rules that keep it readable:**
 
 * **No fenced code blocks.** They render as a solid dark slab and swallow the page. Use a table or a

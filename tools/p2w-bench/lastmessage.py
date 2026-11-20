@@ -352,6 +352,10 @@ def verify_tool_numbers(text, cmds, label):
         return ["%s: no tool output could be read - nothing in this message is verified" % label]
     # A DATE OR A CLOCK IS NOT A MEASUREMENT. "20 Nov 2026" and "05:51" carry numbers no tool prints
     # and no reader mistakes for a count. Everything else must be traceable.
+    # A NUMBER INSIDE A CHECK NAME IS NOT A MEASUREMENT. `18_displacement` and `59_shape_anchor`
+    # begin with digits; counting those as measurements made a correct table fail on "18" and "59".
+    # Strip every check-name token first, escaped or not.
+    text = re.sub(r"\b\d{1,3}\\?_[a-z0-9_]+", " ", text)
     text = re.sub(r"\b(19|20)\d{2}\b", " ", text)
     text = re.sub(r"\b\d{1,2}:\d{2}(:\d{2})?\b", " ", text)
     text = re.sub(r"\b\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b", " ", text)
@@ -395,23 +399,45 @@ def verify_not_a_transcript(text):
             " report - delete it and keep only what the run measured." % (len(bad), bad[0])]
 
 
+# A CHECK NAME IS AN IDENTIFIER, NOT PROSE. MARKDOWN EATS ITS UNDERSCORES.
+#
+# The 20 Nov report printed its whole table as `32strokelines`, `05charsextra`, `18displacement`.
+# Every underscore had been read as italic markup and swallowed, so the names in the report were not
+# the names in the tool - and a reader could not match a row to a check. The table itself was gone too:
+# not one line began with a pipe, so what should have been four columns was loose text.
+#
+# So: every check name the tool prints must appear INTACT if it appears at all. A stripped name is a
+# wrong name, and it is checkable exactly.
+def verify_names_intact(text, cmds):
+    _, out = _tool_numbers(cmds)
+    names = sorted({n for n in re.findall(r"\b[a-z0-9]+(?:_[a-z0-9]+)+\b", out)})
+    bad = []
+    for n in names:
+        if n in text:
+            continue
+        flat = n.replace("_", "")
+        if flat and flat in text:
+            bad.append("%r appears as %r - the underscores were eaten by markdown italic. Escape them"
+                       " (32\\_stroke\\_lines) or the name is not the name." % (n, flat))
+    return bad
+
+
+_CMDS = {
+    "gverify": ["python3 tools/p2w-bench/gverify.py --report",
+                "python3 tools/p2w-bench/stage.py --json",
+                "python3 tools/p2w-bench/gverify.py --matrix"],
+    "health": ["python3 tools/p2w-bench/health.py --json",
+               "python3 tools/p2w-bench/progress.py --json",
+               "python3 tools/p2w-bench/round.py --phase"],
+}
+
+
 def verify_for(cron, text):
     """Dispatch the per-cron verification. Returns a list of problems."""
-    if cron == "gverify":
-        return verify_tool_numbers(
-            text,
-            ["python3 tools/p2w-bench/gverify.py --report",
-             "python3 tools/p2w-bench/stage.py --json",
-             "python3 tools/p2w-bench/gverify.py --matrix"],
-            "gverify")
-    if cron == "health":
-        return verify_tool_numbers(
-            text,
-            ["python3 tools/p2w-bench/health.py --json",
-             "python3 tools/p2w-bench/progress.py --json",
-             "python3 tools/p2w-bench/round.py --phase"],
-            "health")
-    return []
+    cmds = _CMDS.get(cron)
+    if not cmds:
+        return []
+    return verify_tool_numbers(text, cmds, cron)
 
 
 def main(argv):
@@ -445,7 +471,10 @@ def main(argv):
         if _i < len(argv):
             _for = argv[_i].strip().lower()
     if _for in ("gverify", "health"):
-        _p = verify_not_a_transcript(text) + verify_for(_for, text)
+        _cmds = _CMDS.get(_for, [])
+        _p = (verify_not_a_transcript(text)
+              + verify_names_intact(text, _cmds)
+              + verify_for(_for, text))
         if _p:
             print("REFUSED - %d number(s) in this %s report are not in the tool output:" % (len(_p), _for))
             for x in _p[:12]:
