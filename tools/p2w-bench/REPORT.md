@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**20 Nov 2026 · slot 12:52 → running IST · 42 min**
+**20 Nov 2026 · slot 12:52 → running IST · 43 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -41,15 +41,18 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `47_mA-01-01` | what 47_margins actually compares, and where the pag | 13:36 | 08:06 | 0 min |
+| `47_mB-01-01` | the space-led indent construct on 47_margins | 13:36 | 08:06 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 12:52 → running · 42 min |
+| Slot window | 12:52 → running · 43 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 15 |
+| Tool beats | 20 |
 | Longest silence | **40.9 min** — from 12:53:03, after `pending.py: reading the pending gate` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 need a human |
@@ -60,8 +63,8 @@
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **40 min** | `#####################` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

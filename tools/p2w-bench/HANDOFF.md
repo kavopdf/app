@@ -48,16 +48,14 @@ unfinished work, not as a result.
 | 18_dB-01 | 18_displacement | B | Find the engine code path that decides each line's vertical position i | 09:59 | expected by 10:45 | landed | tools/p2w-bench/FINDINGS/18_displacement-engine-topoffset-101951-cda8.md |
 | t13_A-01 | t13_amount_columns | A | which writer path emits the misaligned amounts, proven by build | 12:00 | 11:05 | landed | FINDINGS/t13-writer-path-110501-f3de.md |
 | t13_B-01 | t13_amount_columns | B | census of the 18 documents: table path vs paragraph path | 12:00 | 11:06 | landed |  |
+| 47_mA-01-01 | 47_margins | A-01 | what 47_margins actually compares, and where the page margin is emitte | 13:36 | 13:00 | landed | FINDINGS/47_margins-MECHANISM-133500-f2.md |
+| 47_mB-01-01 | 47_margins | B-01 | the space-led indent construct on 47_margins | 13:36 | 13:00 | landed | FINDINGS/47_margins-MECHANISM-133500-f2.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `07:59` agent deployed: content-partly-lost / A - is the justified-line spacing fix missing from the engine or already landed
-- `07:59` agent landed: contA-07 /  -> tools/p2w-bench/FINDINGS/content-partly-lost-JUSTIFY-already-landed-0700-f1x.md
-- `08:00` attempt 7 on content-partly-lost-and-displaced -> kept (1/6 moved)
-- `09:22` attempt 14 on content-present-partly-displaced -> reverted (0/23 moved)
 - `09:22` agent deployed: content-present-partly-displaced / A - is the rule-as-drawing construct still in the engine and is the pBdr path presen
 - `09:22` agent landed: content-present-partly-displaced / A -> FINDINGS/content-present-partly-displaced-rule-guard-was-not-the-blocker-100700-f1x.md
 - `09:22` agent deployed: content-present-partly-displaced / B - how much of 18_displacement the rule construct can explain, and which displaceme
@@ -79,6 +77,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `13:34` attempt 4 on 47_margins -> partial (3/13 moved)
 - `13:34` attempt 5 on 47_margins -> reverted (0/13 moved)
 - `13:34` two attempts on 47_margins, both reverted, both measured; the mechanism is now in FINDINGS and the class is no longer a mystery
+- `13:36` agent deployed: 47_margins / A-01 - what 47_margins actually compares, and where the page margin is emitted
+- `13:36` agent deployed: 47_margins / B-01 - the space-led indent construct on 47_margins
+- `13:36` agent landed: 47_margins / A-01 -> FINDINGS/47_margins-MECHANISM-133500-f2.md
+- `13:36` agent landed: 47_margins / B-01 -> FINDINGS/47_margins-MECHANISM-133500-f2.md
 
 ## Where the rest of the state lives
 

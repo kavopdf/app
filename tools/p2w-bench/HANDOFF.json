@@ -428,6 +428,22 @@
   {
    "at": "13:34",
    "text": "two attempts on 47_margins, both reverted, both measured; the mechanism is now in FINDINGS and the class is no longer a mystery"
+  },
+  {
+   "at": "13:36",
+   "text": "agent deployed: 47_margins / A-01 - what 47_margins actually compares, and where the page margin is emitted"
+  },
+  {
+   "at": "13:36",
+   "text": "agent deployed: 47_margins / B-01 - the space-led indent construct on 47_margins"
+  },
+  {
+   "at": "13:36",
+   "text": "agent landed: 47_margins / A-01 -> FINDINGS/47_margins-MECHANISM-133500-f2.md"
+  },
+  {
+   "at": "13:36",
+   "text": "agent landed: 47_margins / B-01 -> FINDINGS/47_margins-MECHANISM-133500-f2.md"
   }
  ],
  "next": "47_margins: extend the strip-and-pin indent construct from flowFromBox to the table-cell emitter (40_devanagari_shaping_font, 77_arabic_rtl_document, 78_mixed_english_devanagari_line), then a corpus pass in its own call. Read FINDINGS/47_margins-MECHANISM-133500-f2.md first - the class definition is already measured and the two failed constructs are already ruled out.",
@@ -683,6 +699,30 @@
    "finding": "",
    "deployed_at": "11:06",
    "landed_at": "11:29"
+  },
+  {
+   "id": "47_mA-01-01",
+   "class": "47_margins",
+   "angle": "A-01",
+   "question": "what 47_margins actually compares, and where the page margin is emitted",
+   "expected": "13:00",
+   "deployed": "13:36",
+   "status": "landed",
+   "finding": "FINDINGS/47_margins-MECHANISM-133500-f2.md",
+   "deployed_at": "2026-11-20T08:06",
+   "landed_at": "2026-11-20T08:06"
+  },
+  {
+   "id": "47_mB-01-01",
+   "class": "47_margins",
+   "angle": "B-01",
+   "question": "the space-led indent construct on 47_margins",
+   "expected": "13:00",
+   "deployed": "13:36",
+   "status": "landed",
+   "finding": "FINDINGS/47_margins-MECHANISM-133500-f2.md",
+   "deployed_at": "2026-11-20T08:06",
+   "landed_at": "2026-11-20T08:06"
   }
  ],
  "run": {
