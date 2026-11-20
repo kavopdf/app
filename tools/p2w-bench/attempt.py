@@ -58,7 +58,13 @@ LEDGER = os.path.join(HERE, "ATTEMPTS.json")
 ROUND = os.path.join(HERE, "ROUND.json")
 RUNLOG = os.path.join(HERE, "RUN-LOG.md")
 CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
-CLASSES_TXT = os.path.join(HERE, "DEFECT-CLASSES-TXT.md")
+# THE .TXT TABLE LIVES IN A SUBDIRECTORY. This pointed at HERE/DEFECT-CLASSES-TXT.md, which does not
+# exist, so every .txt class was rejected as "not a class" - the same wrong-path mistake class_files()
+# made. Measured 20 Nov: attempt.py refused `t13_amount_columns` while classpick.py was handing it out.
+CLASSES_GOOGLE = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES-GOOGLE.md")
+CLASSES_TXT = os.path.join(HERE, "txt", "DEFECT-CLASSES-TXT.md")
+if not os.path.exists(CLASSES_TXT):
+    CLASSES_TXT = os.path.join(HERE, "DEFECT-CLASSES-TXT.md")   # the old flat location, if it returns
 
 OUTCOMES = ("kept", "partial", "reverted", "error")
 
@@ -67,7 +73,22 @@ OUTCOMES = ("kept", "partial", "reverted", "error")
 # carries a per-document table whose first cell is a rank number, and a first-cell match
 # picked up "1", "10", "11" instead of a single class name. Matching the vocabulary itself
 # cannot do that: nothing else in the file starts with these prefixes.
-CLASS_RE = re.compile(r"^(content-(missing|partly|present)-[a-z-]+|single-element-far-out|none)$")
+# THREE NAMESPACES, AND ALL THREE ARE REAL CLASS NAMES.
+#
+#   the classifier's own names   content-present-partly-displaced, single-element-far-out
+#   the Google check names       18_displacement, 34a_span_size_match, 04_chars_missing
+#   the .txt check ids           t13_amount_columns, t01_word_accuracy
+#
+# classpick.py hands out the check names - it ranks the capability tables, which are keyed by check -
+# while the older ledger rows use the classifier names. This matched only the first, so a run could not
+# record an attempt on the class it had just been told to take, and the rotation saw zero attempts and
+# moved on immediately. The .txt half could never accumulate a single attempt.
+CLASS_RE = re.compile(
+    r"^(content-(missing|partly|present)-[a-z-]+"
+    r"|single-element-far-out"
+    r"|t\d+_[a-z0-9_]+"
+    r"|\d+[a-z]?_[a-z0-9_]+"
+    r"|none)$")
 
 
 def known_classes():
@@ -78,7 +99,12 @@ def known_classes():
     problem names are classes; the per-document rows are the documents inside them.
     """
     names = set()
-    for path in (CLASSES, CLASSES_TXT):
+    # THE GOOGLE TABLE TOO. classpick.py ranks benchmarks/DEFECT-CLASSES-GOOGLE.md and hands out its
+    # check names - 18_displacement, 04_chars_missing - while this read only the classifier's table,
+    # whose names are content-present-partly-displaced and so on. So a run could not record an attempt
+    # on the docx class it had just been given either, and the rotation saw zero attempts every time.
+    # The .txt table was missing for the same reason and had the same effect.
+    for path in (CLASSES, CLASSES_GOOGLE, CLASSES_TXT):
         if not os.path.exists(path):
             continue
         with open(path, encoding="utf-8") as f:
@@ -86,6 +112,11 @@ def known_classes():
                 if not line.startswith("| "):
                     continue
                 for cell in (c.strip() for c in line.strip().strip("|").split("|")):
+                    # A CHECK NAME IN A TABLE IS WRAPPED IN BACKTICKS - `18_displacement`. The class
+                    # files write it that way so markdown does not eat the underscores, and matching
+                    # the raw cell meant every check name failed the pattern while the backtick-free
+                    # classifier names passed. Strip them before matching.
+                    cell = cell.strip("`").strip()
                     if CLASS_RE.match(cell):
                         names.add(cell)
     return names
