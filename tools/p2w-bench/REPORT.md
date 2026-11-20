@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 03:57 → running IST · 38 min**
+**21 Nov 2026 · slot 03:57 → 04:36 IST · 39 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,6 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
+| Committed | **18** files in 2 commit(s) from `e7c49dd` — ARCHIVE.json, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md, TRACE.md.head, attempt. |
 
 ## What was tried
 
@@ -41,15 +42,18 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `t01_A-03` | census of every widget appearance stream over all 21 | 04:36 | 23:06 | 0 min |
+| `t01_B-03` | implement the /AP /N glyph walk in its own clone and | 04:36 | 23:06 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 03:57 → running · 38 min |
+| Slot window | 03:57 → 04:36 · 39 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 18 |
+| Tool beats | 28 |
 | Longest silence | **30.0 min** — from 03:57:32, after `pending.py: reading the pending gate` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 need a human |
@@ -62,6 +66,7 @@
 | fix - diagnose and change the engine | **7 min** | `####` |
 | measure or build - a conversion, screen or compile writes no beacon | **30 min** | `#################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

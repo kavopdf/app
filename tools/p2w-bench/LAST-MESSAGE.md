@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 03:57 → running IST · 38 min**
+**21 Nov 2026 · slot 03:57 → 04:36 IST · 39 min**
 
 > No engine change was kept this run. The patch is measured, the blast radius is proved over all 213 documents, and the gate refuses an unmeasured engine - so what landed is the patch, the finding, and a census, not a tree change.
 >
@@ -84,9 +84,9 @@ Both returned inside the turn - a scheduled run has no one to answer later - so 
 
 | | |
 |:--|:--|
-| Slot window | 03:57 → running · 38 min |
+| Slot window | 03:57 → 04:36 · 39 min |
 | Before the claim | 4 min - clone, install-gate, brief |
-| Tool beats | 18 |
+| Tool beats | 28 |
 | Longest silence | **30.0 min** — from 03:57:32, after `pending.py: reading the pending gate` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 need a human |
@@ -98,6 +98,7 @@ Both returned inside the turn - a scheduled run has no one to answer later - so 
 | fix - diagnose and change the engine | **7 min** | `####` |
 | measure or build - a conversion, screen or compile writes no beacon | **30 min** | `#################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
 
 ## Next run
 
