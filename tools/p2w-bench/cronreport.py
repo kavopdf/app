@@ -175,14 +175,33 @@ def bar(n, of, width=18):
 
 # ---------------------------------------------------------------- the five
 
+class NoData(Exception):
+    """The report cannot be made, because the thing it describes is not there."""
+
+
+def need(value, what):
+    """A report is a claim. A claim about nothing is not a report.
+
+    Found on 20 Nov by running the generators against an empty tree: every one of them printed a
+    confident report about zero documents - "0 of 0 documents are fixed to 99%", "Google passes all 42
+    on 0" - and the baseline one even mixed a missing RANKING.csv with a present .txt table, so the same
+    page said Documents 0 and .txt clean 167. A run that posts that has told the user something false in
+    a format that looks verified. It must refuse instead.
+    """
+    if not value:
+        raise NoData(what)
+    return value
+
+
 def baseline():
     d, t = stamp()
     scores, base = rank_scores(RANK), rank_scores(RANK_BASE)
-    total = len(scores)
+    total = need(len(scores), "benchmarks/RANKING.csv has no scored rows - nothing to report on")
     open_ = sum(1 for v in scores.values() if v > 1.0)
     fixed = total - open_
     trows, tclean, tfail = txt_state()
     scored, refused, gclean, _ = google_state()
+    need(trows, "tools/p2w-bench/txt/RANKING-TXT.csv has no rows")
     improved = sum(1 for k, v in scores.items() if k in base and v < base[k] - 0.005)
     worse = [k for k, v in scores.items() if k in base and v > base[k] + 0.005]
     mean_now = sum(scores.values()) / total if total else 0
@@ -218,7 +237,7 @@ def baseline():
 
 def classifier():
     d, t = stamp()
-    cl = classes()
+    cl = need(classes(), "benchmarks/DEFECT-CLASSES-GOOGLE.md names no classes")
     scored, refused, gclean, _ = google_state()
     r = round_state()
     total = sum(c[3] for c in cl)
@@ -247,6 +266,7 @@ def classifier():
 def gverify():
     d, t = stamp()
     scored, refused, gclean, gf = google_state()
+    need(scored, "benchmarks/gverify has no scored results")
     lf = lo_failed_by()
     lclean = 0
     for f in sorted(glob.glob(GLO + "/*.json")):
@@ -303,7 +323,8 @@ def watchdog():
         h = json.loads(out)
     except Exception:
         pass
-    stages = h.get("stages") or {}
+    stages = need(h.get("stages") or {}, "health.py printed no stages")
+    need(h.get("corpus"), "health.py reports a corpus of 0 - there is nothing to watch")
     stopped = [k for k, v in stages.items() if v.get("state") == "stopped"]
     rows = progress_rows()
     L = ["# P2W Watchdog - Run Report", "",
@@ -321,7 +342,12 @@ def watchdog():
             prog = "%d clean, %d failing" % (v["clean"], v.get("failing") or 0)
         state = v.get("state") or "-"
         mark = "**%s**" % state if state == "stopped" else state
-        L.append("| %s | %s | %s | %.1f h |" % (name, mark, prog, v.get("age_h") or 0))
+        # health.py uses a large sentinel for "no evidence at all" and it was printed as a real age:
+        # "measure-google stopped, 1000000000.0 h" is 114,000 years and reads as a measurement. A
+        # sentinel is not a number; show it as one dash.
+        age = v.get("age_h")
+        age_s = "\u2014" if (age is None or age >= 1e6) else "%.1f h" % age
+        L.append("| %s | %s | %s | %s |" % (name, mark, prog, age_s))
     L.append("")
     if len(rows) >= 2:
         cur, prev = rows[-1], rows[-2]
@@ -419,7 +445,13 @@ def main(argv):
     if not fn:
         print("unknown cron %r - one of: %s" % (cron, ", ".join(sorted(BUILDERS))), file=sys.stderr)
         return 2
-    print(fn())
+    try:
+        print(fn())
+    except NoData as e:
+        print("refused: %s" % e, file=sys.stderr)
+        print("A report about nothing is not a report. Check the source, then run this again.",
+              file=sys.stderr)
+        return 3
     return 0
 
 
