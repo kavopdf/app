@@ -16,11 +16,11 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> 47_margins: the 12 pt on 360_restaurant_menu is the INDENT SALE at DocxWriter.java:6366 - if (textOverflows) insetTw = Math.max(0, spanTw - needTw) - and the page's own ink does not fit its own column, so no writer construct pins all three of name, leader dots and figure. Construct A (remove the sale) flips 47_margins to PASS and takes the document 37/42 -> 38/42 but costs share@5px 34.43 -> 41.04. Construct B (widen the cell over its leader-dot column, new isLeaderOnly()) pins x at 52 with no wrap and is the best pixel move the class has had, 34.43 -> 26.25, but the dots' xink moves +32 pt so 47_margins goes 9 -> 14, 13_text_colours and 43_within_10pt_x newly fail, and the document reads 37/42 -> 36/42. Both reverted; both measured in FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md. The remaining untried direction on this class is its .txt half.
+> The .txt half is being fixed through the instrument as much as through the engine, and that is correct: t01's source side rebuilds the page's own text, and three of its ten failures were the rebuild charging the writer for things a text file cannot contain. The control-character fix is the precedent - it landed, it is monotone, and it also cleared t12 on two documents. Judge every future t01 idea the same way: does the source side describe a document a .txt COULD be, and does the change only remove source tokens. Anything that removes text the .txt legitimately writes is a trade - 38_faux_bold proved that this run.
 
 ## What the next run should do first
 
-> 47_margins: re-measure the class against a fresh render, not the tables - 392_statistical_console_output already reads 0.06 and passes all 42 checks on this engine while RANKING.csv says 1.61 and both gverify tables say 47_margins FAIL, so the class is at most 25 documents. Then pull the thread FINDINGS/47_margins-REACH-140500.md leaves open: 360_restaurant_menu's body column was 12 pt left (source 52, render 40) and 9 runs are still 11.9 pt out; the leading-space indent and the centred-line constructs are both capped under the 25% bar and must not be retried.
+> t01_word_accuracy, 7 open after this run. The engine /ToUnicode fix is the whole remaining win and it needs a full slot: 041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled each carry 127 tokens of U+FFFD where the source declares U+0124/U+0126/U+0123, from REAQAG+Effra-Regular (Type0/Identity-H). Fixing it reads 99.95 and 99.76 - two documents - and it moves the docx fingerprint, so budget the 213-document docx re-measure with it. Land the widget /AP de-duplication from FINDINGS/t01_word_accuracy-REDRAW-AND-WIDGET-2155.md in the same attempt, not before it: on its own it is 601 96.4 -> 97.6 and nothing passes. Do NOT retry the redraw suppression - it is a t01/t12 trade, 0 newly clean and 1 newly failing, and the two lines it has to separate have identical trace bboxes.
 
 ## Agents deployed and not yet accounted for
 
@@ -58,16 +58,14 @@ unfinished work, not as a result.
 | t13itr weld fix-01 | t13 | itr weld fix | implement and measure the TxtWriter change that clears itr-computation | 18:11 | a unified diff plus before and after scores for the six and for a wider set | landed | tools/p2w-bench/FINDINGS/t13-WELDED-CELL-CLOSED-1820.md |
 | 47maanchor trace-01 | 47margins | anchor trace | which writer construct puts 360_restaurant_menu's body column 12 pt le | 20:07 | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md | landed | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md |
 | 47maclass census-01 | 47margins | class census | which clause of 47_margins each document fails, grouped by mechanism,  | 20:33 | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md | landed | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md |
+| t01_verifier-tokenisation-01 | t01_word_accuracy | verifier-tokenisation | Does verify_txt.py's t01 tokenisation charge a correct .txt for words  | 21:47 | a per-asymmetry verdict with measured before/after on synthetic cases, and a diff for any instrument bug | landed | Verdict ENGINE for the two bank forms (127 tokens of U+FFFD where the source declares U+0124); two real instrument bugs found (widget /AP double-count, source word boundaries) but neither makes any of the ten pass; 15 asymmetries tested and ruled harmless with numbers. Ruled the instrument out as the explanation for 79/391/406 - which the run then found was wrong: the NUL declaration WAS the instrument's fault. See FINDINGS/t01_word_accuracy-CONTROL-CHARS-2135.md |
+| t01_writer-word-drop-01 | t01_word_accuracy | writer-word-drop | Which construct in TxtWriter.java/PdfToWord.java drops words the PDF d | 21:47 | a ranked table with file:line, the exact condition, measured evidence and the minimal fix | landed | No writer drop on either measurable document: 041122's 131 lost tokens are 127 ligature U+FFFD plus 4 genuine; the filled form's 145 are the same 127 plus 18 widget values counted twice by the source. Measured negatives that remove possibilities permanently: nested XObject with a scaling CTM LOST 0, Arabic through logicalOrder LOST 0 (length-preserving), below-paper LOST 0, letterspacing 0.16-0.30em identical both sides. Also: clipToPaper() is dead code and the live filter uses the CropBox ignoring its offset - a page whose CropBox origin is not (0,0) drops visible text (measured: VISIBLE -> V). |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `17:06` attempt 5 on t13_amount_columns -> kept (5/6 moved)
-- `17:08` attempt 6 on t13_amount_columns -> reverted (0/1 moved)
-- `17:09` agent deployed: t13_amount_columns / A - per-document map of every offending t13 line: source column x, leading spaces, e
-- `17:09` agent deployed: t13_amount_columns / B - reach of a per-page end column across the whole .txt corpus, before and after
 - `17:09` agent landed: t13_amount_columns / A -> FINDINGS/t13-page-end-column-KEPT-172000.md
 - `17:09` agent landed: t13_amount_columns / B -> FINDINGS/t13-page-end-column-KEPT-172000.md
 - `18:00` attempt 7 on t13_amount_columns -> reverted (0/6 moved)
@@ -89,6 +87,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `20:59` attempt 1 on t01_word_accuracy -> reverted (0/10 moved)
 - `21:22` attempt 2 on t01_word_accuracy -> kept (3/10 moved)
 - `21:46` attempt 3 on t01_word_accuracy -> reverted (0/10 moved)
+- `21:47` agent deployed: t01_word_accuracy / verifier-tokenisation - Does verify_txt.py's t01 tokenisation charge a correct .txt for words the page d
+- `21:47` agent deployed: t01_word_accuracy / writer-word-drop - Which construct in TxtWriter.java/PdfToWord.java drops words the PDF draws, rank
+- `21:47` agent landed: t01_word_accuracy / verifier-tokenisation -> Verdict ENGINE for the two bank forms (127 tokens of U+FFFD where the source declares U+0124); two real instrument bugs found (widget /AP double-count, source word boundaries) but neither makes any of the ten pass; 15 asymmetries tested and ruled harmless with numbers. Ruled the instrument out as the explanation for 79/391/406 - which the run then found was wrong: the NUL declaration WAS the instrument's fault. See FINDINGS/t01_word_accuracy-CONTROL-CHARS-2135.md
+- `21:47` agent landed: t01_word_accuracy / writer-word-drop -> No writer drop on either measurable document: 041122's 131 lost tokens are 127 ligature U+FFFD plus 4 genuine; the filled form's 145 are the same 127 plus 18 widget values counted twice by the source. Measured negatives that remove possibilities permanently: nested XObject with a scaling CTM LOST 0, Arabic through logicalOrder LOST 0 (length-preserving), below-paper LOST 0, letterspacing 0.16-0.30em identical both sides. Also: clipToPaper() is dead code and the live filter uses the CropBox ignoring its offset - a page whose CropBox origin is not (0,0) drops visible text (measured: VISIBLE -> V).
 
 ## Where the rest of the state lives
 

@@ -1,33 +1,97 @@
-# P2W Google Verify - Run Report
+# P2W Fixer - Run Report
 
-**20 Nov 2026 · 21:27 IST · stage classify**
+**20 Nov 2026 · slot 20:58 → running IST · 49 min**
 
-> 192 of 213 measured in Google, 21 refused on page count. Google passes all 42 on 7; LibreOffice on 122.
+> **79_inr, 391_survey and 406_passport** now pass every .txt check they are given. A control character was being read as part of a word.
 
-This run closed the measuring pass: the Google side was already complete, so it regenerated the capability table from the committed results for both renderers, committed it, and stopped. The engine was not touched and no document was re-measured.
-
-
-## Measured
+## Progress
 
 | | |
-|:--|--:|
-| scored | **192** |
-| refused on page count | **21** |
-| clean in Google | **7** |
-| clean in LibreOffice | **122** |
+|:--|:--|
+| Documents improved this run | **3** — 3 attempt(s), 1 kept |
+| Documents improved, round total | 60 of 213 |
+| Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
+| Regressions | **none** |
+| Exempt, not measured | **0** — none |
+| **Fixed - Google, all 42 checks** | **7**, out of the 192 documents both renderers measured |
+| Fixed - LibreOffice proxy | 32 of 213 - a renderer the user does not open |
+| Moved but still open | **28** — improved, not fixed |
+| Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
+| Working on | `t01_word_accuracy` |
+| Committed | **21** files in 3 commit(s) from `afa9708` — ATTEMPTS.json, CAUSES-TXT.json, CENSUS-TXT.csv, CLASS-HISTORY.jsonl, DEFECT-CLASSES-TXT.md, HANDOFF.json, HANDOFF.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, RESTAMP-TXT.jsonl, ROTATION.json, ROUND.json, RUN-LOG.md, R |
 
-## Checks Google fails and LibreOffice does not
+## What the run found
 
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `32\_stroke\_lines` | **145** | 2 |
-| `05\_chars\_extra` | **141** | 9 |
-| `18\_displacement` | **125** | 21 |
-| `04\_chars\_missing` | **67** | 9 |
-| `25\_invisible\_text` | **49** | 1 |
-| `59\_shape\_anchor` | **58** | 13 |
-| `13\_text\_colours` | **32** | 1 |
-| `45\_char\_accuracy` | **38** | 9 |
+The class handed over was t01_word_accuracy, ten documents, and the first useful thing was that they are not one defect. Each of the ten was converted with this tree's engine and its lost tokens listed against the verifier's own source side: they are at least five different faults sharing a check id. That list is the run's main product and it is in FINDINGS.
 
-The first row is the class to take: `32\_stroke\_lines`, 145 documents in Google against 2 in LibreOffice.
+Three of the ten were the INSTRUMENT's fault, and this is the fix that landed. A PDF declares U+0000 for any glyph it has no Unicode for - the space between two words of a survey row, a bullet in a table, the empty cells of an MRZ band. The verifier tokenised with a plain non-space pattern, so "Strongly" followed by that glyph followed by "agree" became one token no .txt can ever contain, eight of them welded a word to "PHOTOGRAPH", and fifteen lone ones counted as fifteen words. A text file cannot carry U+0000, so every such token was a guaranteed lost word and t01 was failing these documents for the file format's limits rather than for the writer's fidelity. Splitting on control characters instead of dropping them - the glyph sits where a space sits, so it is two words the page drew, not one word spelled wrong - takes 79_inr_indian_digit_grouping_table 91.9 to 100.0, 391_survey_questionnaire_grid 97.5 to 100.0 and 406_passport_mrz_page 98.5 to 100.0, and clears t12 as well on the last two because a token made of U+0000 was being counted as a word the writer had invented.
 
+It cannot regress, and that was proved rather than argued: the source side was run over all 213 documents, exactly six declare a control character inside a source token, the change alters the word list of those six and no other, and it only removes source tokens. The full restamp over 213 freshly converted documents reads four newly clean, none newly failing, 209 unchanged.
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 20:59 | **reverted** | 0/10 | claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_sma |
+| 21:22 | **kept** | 3/10 | CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words wel |
+| 21:46 | **reverted** | 0/10 | SECOND ATTEMPT, both repairs on the source side of verify_txt.py, both restamped over 213 documents. (1) REJECTED: collapse a consecutive trace span whose text and bbox match the previous one within 0 |
+
+## The txt
+
+| | |
+|:--|:--|
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **186** (87.3%) |
+| Failing at least one check | **27** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t08_line_order` - 10 documents |
+
+## Subagents
+
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `t01_verifier-tokenisation-01` | Does verify_txt.py's t01 tokenisation charge a corre | 21:02 | 21:20 | 18 min |
+| `t01_writer-word-drop-01` | Which construct in TxtWriter.java/PdfToWord.java dro | 21:02 | 21:13 | 11 min |
+
+## Timing
+
+| | |
+|:--|:--|
+| Slot window | 20:58 → running · 49 min |
+| Before the claim | not recorded - nothing writes a beat until step.py runs |
+| Tool beats | 33 |
+| Longest silence | **22.9 min** — from 20:59:33, after `classrow.py: refreshing the class file` |
+| Silences over 2 min | 6 |
+| Obstacles | 0 cleared · 2 need a human |
+| Still a wall | **It is not - it is stalled at classify, and `health.py` cannot say so.** `stage.py` names `classify` as the s |
+
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| fix - diagnose and change the engine | **3 min** | `##` |
+| measure or build - a conversion, screen or compile writes no beacon | **28 min** | `#############` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **15 min** | `#######` |
+## Best results this round
+
+| Document | Before | After | Change |
+|:--|--:|--:|--:|
+| `415_inline_images` | 89.04 | 0.00 | -89.04 |
+| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
+| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
+| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
+| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+
+## Next run
+
+t01_word_accuracy is at seven open and the rest of the class is one engine fix away from two of them. 041122-Account_Opening_Form and its filled variant each carry 127 tokens that reach the .txt as U+FFFD where the source declares U+0124, U+0126 and U+0123: the engine is failing to read /ToUnicode for REAQAG+Effra-Regular, a Type0 Identity-H face, and falling back to the replacement character. Fixing that reads 99.95 and 99.76 - both pass. It was not attempted here because the same mapping feeds DocxWriter, so it moves the docx fingerprint and the gate then demands a 213-document docx re-measure; that is a whole slot, and it is the slot to give it.
+
+Land the widget de-duplication from FINDINGS in the same attempt, not before it. On its own it is 601_fillable_admission_form 96.4 to 97.6 and nothing passes, which is why it was reverted rather than committed - but the filled form needs it as well as the /ToUnicode fix to reach 99.76.
+
+Do not retry the redraw suppression. It looks obvious - faux bold is the same line drawn two or three times - and it is a trade: 38_faux_bold_italic_synthesised passes t01 and immediately fails t12 with ten invented words, text-held-twice-shadow-text newly fails t12, and the corpus reads zero newly clean and one newly failing. The heading is over-counted by the source and the abstract line under it is not, and both carry three trace spans at one identical bbox, so the rule that separates them is not in the trace.
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

@@ -7,7 +7,10 @@
  "attempts": 3,
  "kept": 1,
  "docs_improved": 3,
- "agents": [],
+ "agents": [
+  "t01_verifier-tokenisation-01",
+  "t01_writer-word-drop-01"
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0,
  "counted": [
