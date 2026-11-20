@@ -9,7 +9,7 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 02:52 |
+| started | 03:57 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
@@ -20,7 +20,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> t01_word_accuracy holds 5 documents and two of those five is the bar. Two of them now have a measured, named cause and a fix shape, so start there rather than re-diagnosing. (1) 601_fillable_admission_form loses exactly three tokens and two of them are ticked checkboxes drawn in widget appearance streams as 'BT /ZaDb 9 Tf (3) Tj ET' - PDFBox never processes annotation appearance streams, so the engine emits nothing, which is real content loss on a filled form. FINDINGS/601-tick-is-a-widget-appearance-2342.md has the xrefs; the engine side is a glyph walk over each widget's /AP /N, the shape formValuesOf/widgetValue already have, and the instrument side already reads that stream in _ap_stream_text - both sides must call a /ZaDb glyph a tick or neither is honest. (2) 38_faux_bold_italic_synthesised loses the SECOND draw of its title because faux bold strokes the fill and the source carries 'PROJECT REPORT - CIVIL' twice while our .txt carries it once, which is correct; the 21:46 attempt that collapsed identical spans was REJECTED, so it needs a different construct. (3) 411_nested_xobject_transforms loses 'S' and 'O' - pymupdf and PDFBox disagree about a nested form's matrix and the rotated line runs off the page to y=-16.4. The two bank forms have LEFT this class; what is left on them is t06_encoding, t08_line_order and t09_page_furniture, which is the writer and not the font. Do not rebuild a ligature matcher: FINDINGS/ligature-identity-UNRECOVERABLE-2350.md proves the identity is not in the file.
+> PUSH FINDINGS/widget-ap-glyph-walk-0436-f1x.patch and measure it: 601 goes 37/42 -> 42/42 docx checks in LibreOffice, blast radius is 2 documents of 213, and p2w builds from origin main so nothing corpus-wide can be measured until the patch is on main. Then measure 601 through Drive before and after (Google is the authority), and watch the Account form's two new fails (42_justification_edges, 63_table_rows). Do not chase t01 to 100% on 601 from the engine: verify_txt double-counts 'General' (glyph_truth appends _ap_stream_text to a page text pymupdf already synthesised the widget into), so only a duplicating engine can reach 100 and that costs 601 five docx checks. That is a person's decision, same as the 01:43 row.
 
 ## Agents deployed and not yet accounted for
 
@@ -72,8 +72,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `21:47` agent deployed: t01_word_accuracy / writer-word-drop - Which construct in TxtWriter.java/PdfToWord.java drops words the PDF draws, rank
-- `21:47` agent landed: t01_word_accuracy / verifier-tokenisation -> Verdict ENGINE for the two bank forms (127 tokens of U+FFFD where the source declares U+0124); two real instrument bugs found (widget /AP double-count, source word boundaries) but neither makes any of the ten pass; 15 asymmetries tested and ruled harmless with numbers. Ruled the instrument out as the explanation for 79/391/406 - which the run then found was wrong: the NUL declaration WAS the instrument's fault. See FINDINGS/t01_word_accuracy-CONTROL-CHARS-2135.md
 - `21:47` agent landed: t01_word_accuracy / writer-word-drop -> No writer drop on either measurable document: 041122's 131 lost tokens are 127 ligature U+FFFD plus 4 genuine; the filled form's 145 are the same 127 plus 18 widget values counted twice by the source. Measured negatives that remove possibilities permanently: nested XObject with a scaling CTM LOST 0, Arabic through logicalOrder LOST 0 (length-preserving), below-paper LOST 0, letterspacing 0.16-0.30em identical both sides. Also: clipToPaper() is dead code and the live filter uses the CropBox ignoring its offset - a page whose CropBox origin is not (0,0) drops visible text (measured: VISIBLE -> V).
 - `21:49` attempt 4 on t01_word_accuracy -> kept (0/10 moved)
 - `22:39` attempt 5 on t01_word_accuracy -> reverted (2/7 moved)
@@ -97,6 +95,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `01:51` attempt 11 on t01_word_accuracy -> reverted (0/5 moved)
 - `03:25` attempt 11 on 47_margins -> partial (2/26 moved)
 - `03:36` attempt 12 on 47_margins -> partial (2/26 moved)
+- `04:34` attempt 12 on t01_word_accuracy -> partial
+- `04:34` attempt 13 on t01_word_accuracy -> partial (1/5 moved)
 
 ## Where the rest of the state lives
 

@@ -572,7 +572,8 @@ def add(args):
         pass
     print("%s: attempt %d recorded as %s%s"
           % (name, row["attempts"], outcome,
-             "  (%d/%d moved)" % (args.moved, args.total) if args.moved is not None else ""))
+             "  (%d/%s moved)" % (args.moved, args.total if args.total is not None else "?")
+             if args.moved is not None else ""))
     return 0
 
 
