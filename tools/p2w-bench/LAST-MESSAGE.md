@@ -1,14 +1,15 @@
-# P2W Fixer - Run Report
+# Fixer report - 2026-11-20 21:57
 
-**20 Nov 2026 · slot 20:58 → running IST · 1h 25m**
+**20 Nov 2026 · slot 21:57 → running IST · 42 min**
 
-> **391_survey_questionnaire_grid** improved — 2.00 → 0.00. Corpus ratchet clean across 213 documents.
+> No engine change was kept this run. What the slot bought is a proven root cause and a patch that
+> needs a corpus pass the slot could not afford - and a named wall that has now eaten three runs.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **3** — 4 attempt(s), 2 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 60 of 213 |
 | Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -18,16 +19,60 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
-| Committed | **23** files in 5 commit(s) from `e5268fe` — ATTEMPTS.json, CAUSES-TXT.json, CENSUS-TXT.csv, CLASS-HISTORY.jsonl, DEFECT-CLASSES-TXT.md, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, REPORT.md, RESTAMP-TXT.jsonl, ROTATION.jso |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 20:59 | **reverted** | 0/10 | claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_sma |
-| 21:22 | **kept** | 3/10 | CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words wel |
-| 21:46 | **reverted** | 0/10 | SECOND ATTEMPT, both repairs on the source side of verify_txt.py, both restamped over 213 documents. (1) REJECTED: collapse a consecutive trace span whose text and bbox match the previous one within 0 |
-| 21:49 | **kept** | 0/10 | CORPUS RATCHET for the control-character fix, not a new idea. All 213 documents were re-converted with this tree's engine and re-scored with the changed verifier (restamp_txt.py --run --force, 213 sco |
+| 22:39 | **reverted** | 2/7 | The U+FFFD is the /ToUnicode CMap's own destination value, not a missing or malformed CMap |
+
+## The finding: the U+FFFD is the CMap's answer, not a failure to parse one
+
+Both bank forms carry 127 tokens of U+FFFD. The carry-over said the source declares U+0124, U+0126,
+U+0123 from REAQAG+Effra-Regular, a Type0/Identity-H font. That much was right. What was not known is
+where the replacement character comes from, and it is not a missing CMap:
+
+- REAQAG+Effra-Regular carries 91 well-formed beginbfchar entries, one per CID. Four of them map
+  their code to FFFD outright: 0123, 0124, 0126, 0127. WWLUSW+Effra-Medium adds 0124 and 0126,
+  IWIJEY+Effra-Bold adds 0124.
+- pdfbox-android 2.0.27.0 returns that value verbatim. PDFont.toUnicode returns the CMap's mapping at
+  PDFont.java:474, and PDType0Font.toUnicode returns at PDType0Font.java:489 before its own
+  embedded-cmap fallback can run. A non-null mapping is authoritative.
+- The engine then trusts it: PdfToWord.processTextPosition takes the string at line 2101, and
+  isJunk() at line 2501 returns false for U+FFFD, so the existing re-decode fallback at lines
+  2107-2110 never fires.
+
+Identity-H says the code is the CID, so the code is the only handle the font still gives - which is
+also what PDFBox already does for an Identity font with no /ToUnicode at all (PDFont.java:459). The
+patch makes the two cases agree, keyed on the font's structure and never on a document id, with
+control codes (below 0x20, and 0x7F-0x9F) deliberately keeping their U+FFFD.
+
+Measured with the engine built from the patched tree, both documents converted with ConvertOne and
+scored by verify\_txt.py - the live .txt check, not a proxy:
+
+| Document | Before | After |
+|:--|:--|:--|
+| 041122-Account\_Opening\_Form | 7 of 10 checks failing | 3 of 10 checks failing |
+| Account\_Opening\_Form\_Fillable\_filled | 7 of 10 checks failing | 3 of 10 checks failing |
+| U+FFFD in our .txt, both documents | 127 and 127 | 0 and 0 |
+
+Four checks close on each document - t01\_word\_accuracy, t03\_symbols, t06\_encoding,
+t07\_symbol\_counts - and both leave the t01 class. The patch is committed as
+FINDINGS/fffd-cmap-destination-2300-fixer.patch and applies clean to e5268fe.
+
+## Why it was reverted, and the wall the next run must go round
+
+The engine change moves the docx fingerprint, so it needs a corpus pass, and the corpus pass is the
+part this slot could not buy. screen.py --docs on these two documents did not get past prerender in
+three consecutive 295 s calls: soffice takes about 80 s to start and these are nine-page forms, so the
+call limit is gone before one document is scored. restamp\_txt.py --run needs /scratch/work/p2w/out,
+which only p2w.py --budget populates, and that would have taken four or five more calls.
+
+That is why the change was reverted rather than left in the tree: no RANKING.csv, no STATE-TXT.json,
+no ratchet, so the class rows stay OPEN and an unmeasured engine change must not ship. The next run
+should budget the whole slot for p2w.py --budget 250 repeated to completion - it fills the .docx and
+the .txt for all 213 in one pass - then restamp\_txt.py --run and --apply, classrow.py --write, and
+regress.py --check before any commit.
 
 ## The txt
 
@@ -43,44 +88,47 @@
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `t01_verifier-tokenisation-01` | Does verify_txt.py's t01 tokenisation charge a corre | 21:02 | 21:20 | 18 min |
-| `t01_writer-word-drop-01` | Which construct in TxtWriter.java/PdfToWord.java dro | 21:02 | 21:13 | 11 min |
+| `t01_ToUnicode CMap destination-01` | Is the U+FFFD the CMap's own answer or a parse failu | 22:39 | 17:09 | 0 min |
+
+One agent, not two. It found the mechanism, the file and line, the CMap bytes and a patch that
+compiles - then ran past its budget and had to be cut off, which is also the 23 minute silence in the
+timing table below. The second angle was not deployed before the slot ran out.
 
 ## Timing
 
+
 | | |
 |:--|:--|
-| Slot window | 20:58 → running · 1h 25m |
+| Slot window | 21:57 → running · 43 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 41 |
-| Longest silence | **35.0 min** — from 21:49:36, after `report.py: building the report` |
-| Silences over 2 min | 7 |
-| Obstacles | 0 cleared · 2 need a human |
-| Still a wall | **It is not - it is stalled at classify, and `health.py` cannot say so.** `stage.py` names `classify` as the s |
+| Tool beats | 13 |
+| Longest silence | **23.3 min** — from 21:57:13, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 2 |
+| Obstacles | 0 cleared · 0 need a human |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **3 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **28 min** | `#######` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **36 min** | `#########` |
-| other - not attributed to a tool | **15 min** | `####` |
-## Best results this round
+| fix - diagnose and change the engine | **42 min** | `#####################` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
 
-| Document | Before | After | Change |
-|:--|--:|--:|--:|
-| `415_inline_images` | 89.04 | 0.00 | -89.04 |
-| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
-| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
-| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
-| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+The 23 minute silence is the subagent running inline, not a dead run.
+
+## One thing the pipeline got wrong today, worth a person's eye
+
+The 21:36 run pushed its final report at 16:19:40 UTC and exited without releasing the fixer slot.
+This run's claim was refused at 21:57 because the slot still read busy - and the busy check takes the
+newest of the claim, the last beat and the mtime of TIMELINE.jsonl, so a run that has already
+finished its report can hold the slot for another ten minutes. The claim was cleared by hand after
+checking that HEAD was that run's report commit and that no beacon had been written for eight
+minutes. A release at the end of a run matters as much as the claim at the start of one.
 
 ## Next run
 
-t01_word_accuracy, 7 open after this run. The engine /ToUnicode fix is the whole remaining win and it needs a full slot: 041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled each carry 127 tokens of U+FFFD where the source declares U+0124/U+0126/U+0123, from REAQAG+Effra-Regular (Type0/Identity-H). Fixing it reads 99.95 and 99.76 - two documents - and it moves the docx fingerprint, so budget the 213-document docx re-measure with it. Land the widget /AP de-duplication from FINDINGS/t01_word_accuracy-REDRAW-AND-WIDGET-2155.md in the same attempt, not before it: on its own it is 601 96.4 -> 97.6 and nothing passes. Do NOT retry the redraw suppression - it is a t01/t12 trade, 0 newly clean and 1 newly failing, and the two lines it has to separate have identical trace bboxes.
-
----
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+Apply FINDINGS/fffd-cmap-destination-2300-fixer.patch, then run p2w.py --budget 250 repeatedly until
+complete. Then restamp\_txt.py --run and --apply, classrow.py --write, regress.py --check, and commit
+RANKING.csv with STATE-TXT.json. Do not screen these two documents on their own - soffice cannot
+prerender them inside a call.

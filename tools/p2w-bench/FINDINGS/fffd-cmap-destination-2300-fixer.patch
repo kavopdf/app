@@ -1,0 +1,109 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfEngine.java b/app/src/main/java/com/kavopdf/app/engine/PdfEngine.java
+index 4f8446b..abbd68c 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfEngine.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfEngine.java
+@@ -1751,6 +1751,14 @@ public final class PdfEngine {
+             int pg = getCurrentPageNo();
+             for (com.tom_roush.pdfbox.text.TextPosition tp : tps) {
+                 String u = tp.getUnicode();
++                // Same recovery as the writer path - see PdfToWord.recoverUndefinedCids().
++                // Without it a search for a word the page draws as a ligature finds nothing,
++                // because the index would hold U+FFFD where the page holds the glyph.
++                if (u != null && u.indexOf('\uFFFD') >= 0) {
++                    com.tom_roush.pdfbox.pdmodel.font.PDFont f = tp.getFont();
++                    String again = f == null ? null : PdfToWord.recoverUndefinedCids(tp, f);
++                    if (again != null) u = again;
++                }
+                 if (u == null || u.isEmpty()) continue;
+                 chars.add(u);
+                 pos.add(tp);
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 4f0e6a5..3da41fb 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -2108,6 +2108,27 @@ public final class PdfToWord {
+                 String again = decodeThroughFont(tp, f0);
+                 if (again != null && !isJunk(again)) u = again;
+             }
++            // A ToUnicode CMap that answers U+FFFD has not answered.
++            //
++            // A producer that cannot name a glyph writes the replacement character into the
++            // CMap's own bfchar DESTINATION, and PDFBox returns it verbatim: a non-null
++            // mapping is authoritative (PDFont.toUnicode, pdfbox-android 2.0.27.0, line 474),
++            // so PDType0Font.toUnicode returns at line 489 before its own embedded-cmap
++            // fallback can run. The engine then trusts U+FFFD as the page's word.
++            //
++            // MEASURED on 041122-Account_Opening_Form and its filled variant: the three
++            // Effra faces of the document are Type0/Identity-H and each names its ligatures
++            // this way - REAQAG+Effra-Regular declares <0123>/<0124>/<0126>/<0127> -> FFFD,
++            // WWLUSW+Effra-Medium <0124>/<0126> -> FFFD, IWIJEY+Effra-Bold <0124> -> FFFD.
++            // The pages draw 127 characters through those CIDs and every one arrived as
++            // U+FFFD. Identity-H says the code IS the character identifier, so the code is
++            // the only answer the font has left; it is also what PDFBox already does for an
++            // Identity font with no ToUnicode at all (PDFont.toUnicode, line 459), and what
++            // the readers show for these glyphs. See recoverUndefinedCids() for the guard.
++            if (f0 != null && u != null && u.indexOf('\uFFFD') >= 0) {
++                String again = recoverUndefinedCids(tp, f0);
++                if (again != null) u = again;
++            }
+             if (u == null || u.isEmpty()) return;
+             Glyph g = new Glyph();
+             g.text = u;
+@@ -2527,6 +2548,57 @@ public final class PdfToWord {
+         }
+     }
+ 
++    /**
++     * The characters a Type0 font draws for the codes its own ToUnicode CMap declines to name.
++     *
++     * <p>U+FFFD in a CMap is not a character the page draws; it is the producer saying it does
++     * not know which character the glyph is. Three things it is NOT, each ruled out on
++     * 041122-Account_Opening_Form: the CMap is present (every Effra face carries /ToUnicode);
++     * it parses (91 well-formed beginbfchar entries in REAQAG+Effra-Regular, one per CID);
++     * and PDFBox is not inventing the fallback (it returns the CMap's own value). What is
++     * left is the code.
++     *
++     * <p>Identity-H is a two-byte code space in which the code is the CID, and the CID is the
++     * only handle the font still gives. So a code whose mapping is U+FFFD is written as the
++     * character with that code point - which is exactly what PDFBox already does for an
++     * Identity font with NO /ToUnicode (PDFont.toUnicode, pdfbox-android 2.0.27.0, line 459),
++     * and what a MuPDF reader extracts for the same glyphs. This makes the two cases agree
++     * instead of letting the second one win on a technicality.
++     *
++     * <p>A code below U+0020 or inside the C1 block is not text, whatever the font says: a
++     * control code written into the document would be a NUL or a form feed where the page
++     * drew a glyph, and the .txt half already reads those as word separators. Such a code
++     * keeps its U+FFFD: a visible gap the reader can see is better than a NUL it cannot.
++     *
++     * @return the decoded string, or null when nothing could be recovered
++     */
++    static String recoverUndefinedCids(TextPosition tp, PDFont font) {
++        try {
++            COSBase enc = font.getCOSObject().getDictionaryObject(COSName.ENCODING);
++            if (!(enc instanceof COSName)) return null;
++            if (!((COSName) enc).getName().startsWith("Identity-")) return null;
++            int[] codes = tp.getCharacterCodes();
++            if (codes == null || codes.length == 0) return null;
++            StringBuilder sb = new StringBuilder();
++            for (int code : codes) {
++                String part = font.toUnicode(code);
++                if (part != null && part.indexOf('\uFFFD') < 0) {
++                    sb.append(part);
++                    continue;
++                }
++                if (code < 0x20 || (code >= 0x7F && code <= 0x9F) || code > 0xFFFF) {
++                    if (part != null) sb.append(part);
++                    continue;
++                }
++                sb.append((char) code);
++            }
++            String out = sb.toString();
++            return out.isEmpty() || out.equals(tp.getUnicode()) ? null : out;
++        } catch (Throwable t) {
++            return null;
++        }
++    }
++
+     /** Every answer a page's form fields hold, in page order. */
+     private static List<String> formValuesOf(PDPage page) {
+         List<String> out = new ArrayList<>();

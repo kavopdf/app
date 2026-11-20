@@ -9,18 +9,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 20:58 |
+| started | 21:57 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> The .txt half is being fixed through the instrument as much as through the engine, and that is correct: t01's source side rebuilds the page's own text, and three of its ten failures were the rebuild charging the writer for things a text file cannot contain. The control-character fix is the precedent - it landed, it is monotone, and it also cleared t12 on two documents. Judge every future t01 idea the same way: does the source side describe a document a .txt COULD be, and does the change only remove source tokens. Anything that removes text the .txt legitimately writes is a trade - 38_faux_bold proved that this run.
+> The U+FFFD in the two bank forms is the /ToUnicode CMap's own destination value - REAQAG+Effra-Regular declares <0123>/<0124>/<0126>/<0127> -> FFFD and pdfbox returns it verbatim (PDFont.java:474; PDType0Font returns at 489 before its fallback). PdfToWord.processTextPosition:2101 trusts it because isJunk():2501 accepts U+FFFD. The patch in FINDINGS/fffd-cmap-destination-2300-fixer.patch applies clean to e5268fe and was measured: both documents go 7 of 10 failing -> 3 of 10 on verify_txt, U+FFFD 127 -> 0, closing t01/t03/t06/t07 on each. It was reverted unmeasured at corpus scale. THE WALL IS THE INSTRUMENT, NOT THE FIX: screen.py --docs on these two documents could not get past prerender in three consecutive 295 s calls, and restamp_txt.py --run needs /scratch/work/p2w/out which only p2w.py --budget populates. Budget a full slot for p2w.py --budget 250 repeated to completion, then restamp_txt --run/--apply and classrow.py --write.
 
 ## What the next run should do first
 
-> t01_word_accuracy, 7 open after this run. The engine /ToUnicode fix is the whole remaining win and it needs a full slot: 041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled each carry 127 tokens of U+FFFD where the source declares U+0124/U+0126/U+0123, from REAQAG+Effra-Regular (Type0/Identity-H). Fixing it reads 99.95 and 99.76 - two documents - and it moves the docx fingerprint, so budget the 213-document docx re-measure with it. Land the widget /AP de-duplication from FINDINGS/t01_word_accuracy-REDRAW-AND-WIDGET-2155.md in the same attempt, not before it: on its own it is 601 96.4 -> 97.6 and nothing passes. Do NOT retry the redraw suppression - it is a t01/t12 trade, 0 newly clean and 1 newly failing, and the two lines it has to separate have identical trace bboxes.
+> Apply FINDINGS/fffd-cmap-destination-2300-fixer.patch, then run p2w.py --budget 250 repeatedly until complete - it populates the .docx AND the .txt for all 213 in one pass and gives the docx ratchet the patch needs. Then restamp_txt.py --run and --apply, classrow.py --write, regress.py --check, commit RANKING.csv and STATE-TXT.json. Do not screen these two documents on their own: soffice cannot prerender them inside a call.
 
 ## Agents deployed and not yet accounted for
 
@@ -60,15 +60,13 @@ unfinished work, not as a result.
 | 47maclass census-01 | 47margins | class census | which clause of 47_margins each document fails, grouped by mechanism,  | 20:33 | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md | landed | FINDINGS/47_margins-INDENT-SALE-AND-LEADER-MERGE-2030.md |
 | t01_verifier-tokenisation-01 | t01_word_accuracy | verifier-tokenisation | Does verify_txt.py's t01 tokenisation charge a correct .txt for words  | 21:02 | a per-asymmetry verdict with measured before/after on synthetic cases, and a diff for any instrument bug | landed | Verdict ENGINE for the two bank forms (127 tokens of U+FFFD where the source declares U+0124); two real instrument bugs found (widget /AP double-count, source word boundaries) but neither makes any of the ten pass; 15 asymmetries tested and ruled harmless with numbers. Ruled the instrument out as the explanation for 79/391/406 - which the run then found was wrong: the NUL declaration WAS the instrument's fault. See FINDINGS/t01_word_accuracy-CONTROL-CHARS-2135.md |
 | t01_writer-word-drop-01 | t01_word_accuracy | writer-word-drop | Which construct in TxtWriter.java/PdfToWord.java drops words the PDF d | 21:02 | a ranked table with file:line, the exact condition, measured evidence and the minimal fix | landed | No writer drop on either measurable document: 041122's 131 lost tokens are 127 ligature U+FFFD plus 4 genuine; the filled form's 145 are the same 127 plus 18 widget values counted twice by the source. Measured negatives that remove possibilities permanently: nested XObject with a scaling CTM LOST 0, Arabic through logicalOrder LOST 0 (length-preserving), below-paper LOST 0, letterspacing 0.16-0.30em identical both sides. Also: clipToPaper() is dead code and the live filter uses the CropBox ignoring its offset - a page whose CropBox origin is not (0,0) drops visible text (measured: VISIBLE -> V). |
+| t01_ToUnicode CMap destination-01 | t01_word_accuracy | ToUnicode CMap destination | Is the U+FFFD the CMap's own answer or a parse failure, and what is th | 22:39 | the root cause with file:line and a patch proven on the two documents | landed | FINDINGS/t01_word_accuracy-FFFD-CMAP-2300-fixer.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `17:09` agent landed: t13_amount_columns / B -> FINDINGS/t13-page-end-column-KEPT-172000.md
-- `18:00` attempt 7 on t13_amount_columns -> reverted (0/6 moved)
-- `19:24` attempt 8 on t13_amount_columns -> kept
 - `19:27` attempt 1 on t12_word_invention -> reverted (0/12 moved)
 - `19:29` attempt 2 on t12_word_invention -> reverted (0/12 moved)
 - `19:31` agent deployed: t13 / column census - which of the six t13 documents still fail at head, the exact end column of every
@@ -91,6 +89,9 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `21:47` agent landed: t01_word_accuracy / verifier-tokenisation -> Verdict ENGINE for the two bank forms (127 tokens of U+FFFD where the source declares U+0124); two real instrument bugs found (widget /AP double-count, source word boundaries) but neither makes any of the ten pass; 15 asymmetries tested and ruled harmless with numbers. Ruled the instrument out as the explanation for 79/391/406 - which the run then found was wrong: the NUL declaration WAS the instrument's fault. See FINDINGS/t01_word_accuracy-CONTROL-CHARS-2135.md
 - `21:47` agent landed: t01_word_accuracy / writer-word-drop -> No writer drop on either measurable document: 041122's 131 lost tokens are 127 ligature U+FFFD plus 4 genuine; the filled form's 145 are the same 127 plus 18 widget values counted twice by the source. Measured negatives that remove possibilities permanently: nested XObject with a scaling CTM LOST 0, Arabic through logicalOrder LOST 0 (length-preserving), below-paper LOST 0, letterspacing 0.16-0.30em identical both sides. Also: clipToPaper() is dead code and the live filter uses the CropBox ignoring its offset - a page whose CropBox origin is not (0,0) drops visible text (measured: VISIBLE -> V).
 - `21:49` attempt 4 on t01_word_accuracy -> kept (0/10 moved)
+- `22:39` attempt 5 on t01_word_accuracy -> reverted (2/7 moved)
+- `22:39` agent deployed: t01_word_accuracy / ToUnicode CMap destination - Is the U+FFFD the CMap's own answer or a parse failure, and what is the smallest
+- `22:39` agent landed: t01_word_accuracy / ToUnicode CMap destination -> FINDINGS/t01_word_accuracy-FFFD-CMAP-2300-fixer.md
 
 ## Where the rest of the state lives
 

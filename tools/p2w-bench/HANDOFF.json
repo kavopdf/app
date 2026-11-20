@@ -596,9 +596,21 @@
   {
    "at": "21:49",
    "text": "attempt 4 on t01_word_accuracy -> kept (0/10 moved)"
+  },
+  {
+   "at": "22:39",
+   "text": "attempt 5 on t01_word_accuracy -> reverted (2/7 moved)"
+  },
+  {
+   "at": "22:39",
+   "text": "agent deployed: t01_word_accuracy / ToUnicode CMap destination - Is the U+FFFD the CMap's own answer or a parse failure, and what is the smallest"
+  },
+  {
+   "at": "22:39",
+   "text": "agent landed: t01_word_accuracy / ToUnicode CMap destination -> FINDINGS/t01_word_accuracy-FFFD-CMAP-2300-fixer.md"
   }
  ],
- "next": "t01_word_accuracy, 7 open after this run. The engine /ToUnicode fix is the whole remaining win and it needs a full slot: 041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled each carry 127 tokens of U+FFFD where the source declares U+0124/U+0126/U+0123, from REAQAG+Effra-Regular (Type0/Identity-H). Fixing it reads 99.95 and 99.76 - two documents - and it moves the docx fingerprint, so budget the 213-document docx re-measure with it. Land the widget /AP de-duplication from FINDINGS/t01_word_accuracy-REDRAW-AND-WIDGET-2155.md in the same attempt, not before it: on its own it is 601 96.4 -> 97.6 and nothing passes. Do NOT retry the redraw suppression - it is a t01/t12 trade, 0 newly clean and 1 newly failing, and the two lines it has to separate have identical trace bboxes.",
+ "next": "Apply FINDINGS/fffd-cmap-destination-2300-fixer.patch, then run p2w.py --budget 250 repeatedly until complete - it populates the .docx AND the .txt for all 213 in one pass and gives the docx ratchet the patch needs. Then restamp_txt.py --run and --apply, classrow.py --write, regress.py --check, commit RANKING.csv and STATE-TXT.json. Do not screen these two documents on their own: soffice cannot prerender them inside a call.",
  "agents": [
   {
    "id": "contA-01",
@@ -997,10 +1009,22 @@
    "deployed_at": "2026-11-20T21:02",
    "landed_at": "2026-11-20T21:13",
    "landed": "21:13"
+  },
+  {
+   "id": "t01_ToUnicode CMap destination-01",
+   "class": "t01_word_accuracy",
+   "angle": "ToUnicode CMap destination",
+   "question": "Is the U+FFFD the CMap's own answer or a parse failure, and what is the smallest general patch?",
+   "expected": "the root cause with file:line and a patch proven on the two documents",
+   "deployed": "22:39",
+   "status": "landed",
+   "finding": "FINDINGS/t01_word_accuracy-FFFD-CMAP-2300-fixer.md",
+   "deployed_at": "2026-11-20T17:09",
+   "landed_at": "2026-11-20T17:09"
   }
  ],
  "run": {
-  "started": "20:58",
+  "started": "21:57",
   "ended": null,
   "ended_how": null
  },
@@ -1106,7 +1130,7 @@
    "plan": ""
   }
  ],
- "context": "The .txt half is being fixed through the instrument as much as through the engine, and that is correct: t01's source side rebuilds the page's own text, and three of its ten failures were the rebuild charging the writer for things a text file cannot contain. The control-character fix is the precedent - it landed, it is monotone, and it also cleared t12 on two documents. Judge every future t01 idea the same way: does the source side describe a document a .txt COULD be, and does the change only remove source tokens. Anything that removes text the .txt legitimately writes is a trade - 38_faux_bold proved that this run.",
+ "context": "The U+FFFD in the two bank forms is the /ToUnicode CMap's own destination value - REAQAG+Effra-Regular declares <0123>/<0124>/<0126>/<0127> -> FFFD and pdfbox returns it verbatim (PDFont.java:474; PDType0Font returns at 489 before its fallback). PdfToWord.processTextPosition:2101 trusts it because isJunk():2501 accepts U+FFFD. The patch in FINDINGS/fffd-cmap-destination-2300-fixer.patch applies clean to e5268fe and was measured: both documents go 7 of 10 failing -> 3 of 10 on verify_txt, U+FFFD 127 -> 0, closing t01/t03/t06/t07 on each. It was reverted unmeasured at corpus scale. THE WALL IS THE INSTRUMENT, NOT THE FIX: screen.py --docs on these two documents could not get past prerender in three consecutive 295 s calls, and restamp_txt.py --run needs /scratch/work/p2w/out which only p2w.py --budget populates. Budget a full slot for p2w.py --budget 250 repeated to completion, then restamp_txt --run/--apply and classrow.py --write.",
  "needs_human": [],
  "next_class": ""
 }

@@ -1,5 +1,3 @@
-| 12 Nov 13:15 | baseline | measured newsletter-3col-header-footer 40/59 docx, newsletter-3col-header-footer.txt 4/5 txt |
-| 12 Nov 13:15 | baseline | measured newspaper-2col-fullwidth-headline 37/59 docx, newspaper-2col-fullwidth-headline.txt 4/5 txt |
 | 12 Nov 13:16 | baseline | measured one-page-rotated-180-degrees 40/59 docx, one-page-rotated-180-degrees.txt 3/5 txt |
 | 12 Nov 13:16 | baseline | measured payslip-label-left-amount-right 37/59 docx, payslip-label-left-amount-right.txt 4/5 txt |
 | 12 Nov 13:16 | baseline | measured policy-2col-spanning-section-heading 44/59 docx, policy-2col-spanning-section-heading.txt 3/5 txt |
@@ -198,3 +196,5 @@
 | 20 Nov 21:22 | fixer | attempt t01_word_accuracy -> kept (3/10 moved) |
 | 20 Nov 21:46 | fixer | attempt t01_word_accuracy -> reverted (0/10 moved) |
 | 20 Nov 21:49 | fixer | attempt t01_word_accuracy -> kept (0/10 moved) |
+| 20 Nov 21:57 | fixer | slot claimed - fixer running |
+| 20 Nov 22:39 | fixer | attempt t01_word_accuracy -> reverted (2/7 moved) |
