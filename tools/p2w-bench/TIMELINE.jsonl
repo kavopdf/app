@@ -884,3 +884,8 @@
 {"t": 1795161972.1767166, "ist": "13:36:12", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795161972.769888, "ist": "13:36:12", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795161973.0622013, "ist": "13:36:13", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795162070.6333647, "ist": "13:37:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795162073.925406, "ist": "13:37:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795162073.936978, "ist": "13:37:53", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795162074.0368989, "ist": "13:37:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795162074.050524, "ist": "13:37:54", "ev": "killed", "d": "dead claim cleared by force release"}

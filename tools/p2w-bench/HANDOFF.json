@@ -727,15 +727,10 @@
  ],
  "run": {
   "started": "12:52",
-  "ended": null,
-  "ended_how": null
+  "ended": "13:37",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "11:21",
-   "how": "released",
-   "plan": "clear carry-over: fix the 041122 page-7 welded cell inset (first line's x -> block's leftmost line x), measure with an empty render dir"
-  },
   {
    "at": "12:39",
    "how": "released",
@@ -828,6 +823,11 @@
   },
   {
    "at": "12:03",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "13:37",
    "how": "forced",
    "plan": ""
   }
