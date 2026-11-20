@@ -1,8 +1,8 @@
 {
  "counts": {
   "baseline_not_scored": [],
-  "clean": 182,
-  "failing": 31,
+  "clean": 186,
+  "failing": 27,
   "in_baseline": 213,
   "in_marks": 213,
   "scored": 213,

@@ -688,22 +688,17 @@
  },
  "391_survey_questionnaire_grid": {
   "applicable": 7,
-  "baseline_failed": 2,
-  "cause": "t01_word_accuracy + t12_word_invention",
-  "failed": 2,
-  "failed_ids": [
-   "t01_word_accuracy",
-   "t12_word_invention"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "392_statistical_console_output": {
   "applicable": 7,
-  "baseline_failed": 1,
-  "cause": "t12_word_invention",
-  "failed": 1,
-  "failed_ids": [
-   "t12_word_invention"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "393_spectrum_peak_table": {
   "applicable": 7,
@@ -775,13 +770,10 @@
  },
  "406_passport_mrz_page": {
   "applicable": 7,
-  "baseline_failed": 2,
-  "cause": "t01_word_accuracy + t12_word_invention",
-  "failed": 2,
-  "failed_ids": [
-   "t01_word_accuracy",
-   "t12_word_invention"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "407_id_card_front_back": {
   "applicable": 7,
@@ -1159,12 +1151,10 @@
  },
  "79_inr_indian_digit_grouping_table": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t01_word_accuracy",
-  "failed": 1,
-  "failed_ids": [
-   "t01_word_accuracy"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "80_gstin_pan_cin_ifsc_table": {
   "applicable": 9,

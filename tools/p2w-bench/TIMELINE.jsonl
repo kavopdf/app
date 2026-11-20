@@ -1100,3 +1100,5 @@
 {"t": 1795191387.3945334, "ist": "21:46:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795191387.4821692, "ist": "21:46:27", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795191391.7875578, "ist": "21:46:31", "ev": "beat", "d": "(no activity given)"}
+{"t": 1795191420.1366658, "ist": "21:47:00", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795191425.6955378, "ist": "21:47:05", "ev": "beat", "d": "classrow.py: refreshing the class file"}

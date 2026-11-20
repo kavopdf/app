@@ -1,6 +1,6 @@
 # .txt defect classes
 
-Documents measured: **213 of 213** - 182 clean, 31 failing at least one check.
+Documents measured: **213 of 213** - 186 clean, 27 failing at least one check.
 
 Grouped from `tools/p2w-bench/txt/RANKING-TXT.csv` only. A document's class is the check
 that fails it; a document failing several is counted under each and its own row names all
@@ -11,9 +11,9 @@ serves every document under it.
 
 | check | what it means | documents | status | share |
 |---|---|---:|---|---:|
-| `t12_word_invention` | the .txt carries no word the source never drew | 12 | OPEN | 6% |
-| `t01_word_accuracy` | the source's words survive, 99 % of them | 10 | OPEN | 5% |
 | `t08_line_order` | lines arrive in the order the page drew them | 10 | OPEN | 5% |
+| `t12_word_invention` | the .txt carries no word the source never drew | 9 | OPEN | 4% |
+| `t01_word_accuracy` | the source's words survive, 99 % of them | 7 | OPEN | 3% |
 | `t02_position` | a line's x survives as its leading spaces | 5 | OPEN | 2% |
 | `t09_page_furniture` | one copy of each running head per page it belongs to | 4 | OPEN | 2% |
 | `t07_symbol_counts` | each symbol arrives as many times as the page drew it | 3 | OPEN | 1% |
@@ -35,11 +35,8 @@ serves every document under it.
 | `332_bom_on_drawing` | `t02_position` | 1/8 | `t02_position` | was 1 |
 | `334_patent_document` | `t02_position` | 1/7 | `t02_position` | was 1 |
 | `38_faux_bold_italic_synthesised` | `t01_word_accuracy + t07_symbol_counts` | 2/9 | `t01_word_accuracy`, `t07_symbol_counts` | was 2 |
-| `391_survey_questionnaire_grid` | `t01_word_accuracy + t12_word_invention` | 2/7 | `t01_word_accuracy`, `t12_word_invention` | was 2 |
-| `392_statistical_console_output` | `t12_word_invention` | 1/7 | `t12_word_invention` | was 1 |
 | `39_small_caps_letter_spacing` | `t01_word_accuracy + t12_word_invention` | 2/9 | `t01_word_accuracy`, `t12_word_invention` | was 2 |
 | `400_comic_page_speech_bubbles` | `t08_line_order` | 1/7 | `t08_line_order` | was 1 |
-| `406_passport_mrz_page` | `t01_word_accuracy + t12_word_invention` | 2/7 | `t01_word_accuracy`, `t12_word_invention` | was 2 |
 | `411_nested_xobject_transforms` | `t01_word_accuracy` | 1/4 | `t01_word_accuracy` | was 1 |
 | `46_chart_coloured_labels_body_text` | `t08_line_order` | 1/9 | `t08_line_order` | was 1 |
 | `600_reviewed_invoice_with_annotations` | `t12_word_invention` | 1/8 | `t12_word_invention` | was 1 |
@@ -48,7 +45,6 @@ serves every document under it.
 | `70_magazine_drop_cap_photo_caption` | `t08_line_order` | 1/9 | `t08_line_order` | was 1 |
 | `74_balance_sheet_indented_subitems` | `t02_position` | 1/10 | `t02_position` | was 1 |
 | `77_arabic_rtl_document` | `t01_word_accuracy + t12_word_invention` | 2/9 | `t01_word_accuracy`, `t12_word_invention` | was 2 |
-| `79_inr_indian_digit_grouping_table` | `t01_word_accuracy` | 1/10 | `t01_word_accuracy` | was 1 |
 | `Account_Opening_Form_Fillable_filled` | `7 checks` | 7/10 | `t01_word_accuracy`, `t03_symbols`, `t06_encoding`, `t07_symbol_counts`, `t08_line_order`, `t09_page_furniture`, `t12_word_invention` | was 7 |
 | `gst-invoice-multipage-item-table` | `t09_page_furniture` | 1/12 | `t09_page_furniture` | was 1 |
 | `itr-computation-with-slab-table` | `t08_line_order` | 1/10 | `t08_line_order` | was 1 |
