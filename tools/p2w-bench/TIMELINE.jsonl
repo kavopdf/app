@@ -1765,3 +1765,9 @@
 {"t": 1795267640.9455633, "ist": "18:57:20", "ev": "beat", "d": "gaps.py: reading the timeline"}
 {"t": 1795267681.2908313, "ist": "18:58:01", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795267681.518107, "ist": "18:58:01", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795267857.0778809, "ist": "19:00:57", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795267857.3021219, "ist": "19:00:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795267923.703752, "ist": "19:02:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795267923.7209153, "ist": "19:02:03", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795267923.8212183, "ist": "19:02:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795267923.8551862, "ist": "19:02:03", "ev": "killed", "d": "dead claim cleared by force release"}

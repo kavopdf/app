@@ -1,18 +1,13 @@
 {
- "started_ts": 1795256939.3584,
- "started": "15:58",
- "ended_ts": 1795263265.4131575,
- "ended": "17:44",
- "class": "32_stroke_lines",
- "attempts": 2,
+ "started_ts": 1795267857.3149703,
+ "started": "19:00",
+ "ended_ts": 1795267923.8560867,
+ "ended": "19:02",
+ "class": "",
+ "attempts": 0,
  "kept": 0,
  "docs_improved": 0,
- "agents": [
-  "32_sA-01",
-  "t02_B-01",
-  "t08_B-01"
- ],
+ "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0,
- "partial": 1
+ "needs_human": 0
 }
