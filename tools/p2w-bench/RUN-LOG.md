@@ -1,6 +1,3 @@
-| 12 Nov 15:09 | baseline | measured table-inside-two-column-page 48/59 docx, 5/5 txt |
-| 12 Nov 15:10 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders 46/59 docx 4/5 txt |
-| 12 Nov 15:10 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders, table-with-merged-cells 51/59 docx 4/5 txt |
 | 12 Nov 15:11 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders, table-with-merged-cells, table-with-no-header-row 54/59 docx 4/5 txt |
 | 12 Nov 15:12 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders, table-with-merged-cells, table-with-no-header-row, table-with-rotated-header 46/59 docx 4/5 txt |
 | 12 Nov 15:12 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders, table-with-merged-cells, table-with-no-header-row, table-with-rotated-header, text-held-twice-shadow-text 43/59 docx 4/5 txt |
@@ -201,3 +198,5 @@
 | 21 Nov 09:23 | fixer | slot claimed - fixer running |
 | 21 Nov 09:25 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 21 Nov 09:25 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 21 Nov 09:49 | fixer | slot claimed - fixer running |
+| 21 Nov 09:50 | fixer | slot FORCED released - see INCIDENTS.md for why |

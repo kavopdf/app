@@ -9,8 +9,8 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 09:23 |
-| ended | 09:25 |
+| started | 09:49 |
+| ended | 09:50 |
 | how it ended | forced |
 | plan | - |
 
