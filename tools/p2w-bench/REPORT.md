@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 12:12 → running IST · 36 min**
+**21 Nov 2026 · slot 12:12 → 12:49 IST · 37 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,7 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `32_stroke_lines` |
-| Committed | **20** files in 4 commit(s) from `8206f46` — ...-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md, ...troke_lines-A-pbdr-verification-124000-relay.md, ...troke_lines-B-rule-flow-neutral-124500-relay.md, ATTEMPTS.json, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, H |
+| Committed | **20** files in 5 commit(s) from `92cb190` — ...-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md, ...troke_lines-A-pbdr-verification-124000-relay.md, ...troke_lines-B-rule-flow-neutral-124500-relay.md, ATTEMPTS.json, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, H |
 
 ## What was tried
 
@@ -50,9 +50,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 12:12 → running · 36 min |
+| Slot window | 12:12 → 12:49 · 37 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 22 |
+| Tool beats | 26 |
 | Longest silence | **24.6 min** — from 12:14:42, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 3 |
 | Obstacles | 1 cleared · 1 parked, with the evidence to re-open them |
