@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 15:58 → running IST · 1h 24m**
+**21 Nov 2026 · slot 15:58 → running IST · 1h 26m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -43,7 +43,7 @@
 
 | | |
 |:--|:--|
-| Slot window | 15:58 → running · 1h 24m |
+| Slot window | 15:58 → running · 1h 26m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 20 |
 | Longest silence | **44.7 min** — from 16:37:48, after `HEAD rebuilt; converting all 213 to out-head for a byte-for-byte docx ` |
@@ -58,7 +58,7 @@
 |:--|--:|:--|
 | measure or build - a conversion, screen or compile writes no beacon | **1h 18m** | `####################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **2 min** | `#` |
 | other - not attributed to a tool | **3 min** | `#` |
 ## Best results this round
 

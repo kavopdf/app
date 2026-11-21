@@ -1,11 +1,11 @@
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 15:58 → running IST · 1h 24m**
+**21 Nov 2026 · slot 15:58 → running IST · 1h 26m**
 
-> **The fix I proved was already landed by a second fixer while I was proving it.** I converted the
-> whole 213-document corpus twice - 213 of 213 `.docx` byte-identical, exactly one `.txt` changed - and
-> went to commit: `462353f` had landed the same fix with the same proof at 17:00. My duplicate commit
-> was reset away. What this run actually changed is below.
+> **No document improved this run, and the run still had to happen.** A second fixer landed the
+> fix I was proving, at 17:00, while I was converting the corpus; my duplicate commit was reset
+> away. What I did land is the two defects that made that fix cost two slots - a dead carry-over
+> four runs read, and a gate that refused every commit the moment the fix was committed.
 
 ## Progress
 
@@ -26,11 +26,22 @@
 
 | | |
 |:--|:--|
+| Tooling defects fixed | **2** — a dead carry-over, and a gate that could not take a second commit |
 | Dead carry-over cleared | **1** — the pBdr rule replacement, refuted three ways |
 | Obstacle recorded | **1** — two fixers ran one slot and duplicated 65 minutes |
 | Documents improved | **0** — the fix landed from the other run, not this one |
 
-**The carry-over was dead and the gate kept handing it over.** `RULES-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md`
+**1. The gate refused every commit the moment the fix was committed.** `scope.py` reads the working
+tree, so its "this change cannot move the .docx" exception applied for exactly as long as the change
+was uncommitted. `462353f` landed a `.txt`-only engine change and passed; the next commit, on a clean
+tree, saw scope `nothing`, went strict, and refused with `ENGINE CHANGED (docx): table measured on
+6c6cf642e13b7ed2, the tree is 226f7f2df3013ad7`. A `.docx` corpus pass is the forty minutes this
+sandbox has 2 CPUs and 1 GB of free RAM for. `scope.py` now diffs the last commit that touched the
+engine — the change the stamps do not yet account for, which is the only question the tool answers.
+It narrows what is *skipped*, never what is *checked*; both negative tests fire: a `DocxWriter.java`
+edit still scopes to `both`, and the fallback resolves `462353f` to `PdfToWord.java -> txt`.
+
+**2. The carry-over was dead and the gate kept handing it over.** `RULES-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md`
 says at 12:45 that "the carry-over is cleared so the gate stops handing it to the next run". It was not
 cleared. `HANDOFF.json["next"]` still carried it through 12:45, through the 15:17 run, and through
 `462353f` at 17:00 — four consecutive runs opened by reading an instruction three findings had already
@@ -79,7 +90,7 @@ duration and known value, and firing two agents ahead of it would have spent the
 
 | | |
 |:--|:--|
-| Slot window | 15:58 → running · 1h 24m |
+| Slot window | 15:58 → running · 1h 26m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 20 |
 | Longest silence | **44.7 min** — from 16:37:48, after `HEAD rebuilt; converting all 213 to out-head for a byte-for-byte docx ` |
@@ -94,7 +105,7 @@ duration and known value, and firing two agents ahead of it would have spent the
 |:--|--:|:--|
 | measure or build - a conversion, screen or compile writes no beacon | **1h 18m** | `####################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **2 min** | `#` |
 | other - not attributed to a tool | **3 min** | `#` |
 ## Best results this round
 
