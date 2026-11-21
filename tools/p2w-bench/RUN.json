@@ -3,11 +3,17 @@
  "started": "22:56",
  "ended_ts": 1795283127.4831588,
  "ended": "23:15",
- "class": "32_stroke_lines",
- "attempts": 1,
- "kept": 0,
- "docs_improved": 0,
+ "class": "05_chars_extra",
+ "attempts": 2,
+ "kept": 1,
+ "docs_improved": 11,
  "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0
+ "needs_human": 0,
+ "counted": [
+  [
+   "05_chars_extra",
+   11
+  ]
+ ]
 }

@@ -89,3 +89,4 @@
 {"at": "2026-11-21 21:31", "attempt": 6, "class": "32_stroke_lines", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-21 22:38", "attempt": 3, "class": "t08_line_order", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-21 23:13", "attempt": 7, "class": "32_stroke_lines", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-21 23:37", "attempt": 1, "class": "05_chars_extra", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}

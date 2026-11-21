@@ -1932,3 +1932,7 @@
 {"t": 1795284414.8354015, "ist": "23:36:54", "ev": "beat", "d": "relay: instrument fix measured, 45 clean; writing finding"}
 {"t": 1795284452.674536, "ist": "23:37:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795284456.4037974, "ist": "23:37:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795284459.691418, "ist": "23:37:39", "ev": "attempt", "d": "05_chars_extra -> kept"}
+{"t": 1795284459.8096561, "ist": "23:37:39", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795284459.9326754, "ist": "23:37:39", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795284465.2704473, "ist": "23:37:45", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

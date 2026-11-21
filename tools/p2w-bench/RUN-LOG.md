@@ -1,5 +1,3 @@
-| 13 Nov 11:10 | baseline | measured 602_bookmarked_annual_report 53/59 docx, 4/5 txt |
-| 13 Nov 11:11 | baseline | released slot, advanced measure -> classify |
 | 13 Nov 11:24 | classifier | slot claimed - classifier running |
 | 16 Nov 06:07 | baseline | slot claimed - baseline running |
 | 16 Nov 07:46 | classifier | slot claimed - classifier running |
@@ -199,3 +197,4 @@
 | 21 Nov 22:56 | fixer | slot claimed - fixer running |
 | 21 Nov 23:13 | fixer | attempt 32_stroke_lines -> lead (0/192 moved) |
 | 21 Nov 23:15 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 21 Nov 23:37 | fixer | attempt 05_chars_extra -> kept (11/192 moved) |

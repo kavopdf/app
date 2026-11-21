@@ -309,8 +309,22 @@ def norm_word(w):
 
 
 def norm_text(t):
-    """The comparison unit, as characters: whitespace, C0 controls and case dropped."""
-    return re.sub(r"[\s\u00a0\x00-\x1f]+", "", t).lower()
+    """The comparison unit, as characters: whitespace, C0 controls and case dropped.
+
+    ZERO-WIDTH CHARACTERS ARE NOT CHARACTERS. Google's PDF export writes one U+200B for
+    every {@code <w:tab/>} in the .docx - a tab advance is a position, and the exporter
+    marks it with a zero-width space - so 05_chars_extra read every tab in the document as
+    "one character added" and failed 141 of the 192 scored documents on it. Measured 21 Nov
+    on all 192: fail 05 = 141, every one with tabs > 0; pass 05 = 51, every one with tabs
+    == 0; not one exception in either direction. Proved causal on 17_three_column_widths
+    (23 tabs): the same .docx with its 23 {@code <w:tab/>} removed exports with 23 U+200B
+    fewer and zero extras, nothing else changed. A zero-width space has no ink, so the page
+    never drew it and the comparison must not count it - on either side, which is why this
+    is stripped from both multisets and can only ever remove a disagreement.
+    U+200C/U+200D are deliberately NOT stripped: they are ZWNJ/ZWJ and they shape Indic
+    text, so a difference in them is a real difference in the document.
+    """
+    return re.sub(r"[\s\u00a0\x00-\x1f\u200b\ufeff]+", "", t).lower()
 
 
 def fill_rects(page):
