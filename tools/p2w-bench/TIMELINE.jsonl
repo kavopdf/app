@@ -1797,3 +1797,5 @@
 {"t": 1795270584.5057292, "ist": "19:46:24", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795270585.445234, "ist": "19:46:25", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795270585.9836962, "ist": "19:46:25", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795271570.551084, "ist": "20:02:50", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795271894.309522, "ist": "20:08:14", "ev": "beat", "d": "attempt.py: recording an attempt"}

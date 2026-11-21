@@ -95,3 +95,26 @@ CGST position and passes for the wrong reason.
 **Fixing it will make more documents fail, not fewer.** Do it deliberately, in its own commit,
 with the baseline re-stamped — and **after** the writer patch, so it is possible to tell which of
 the two moved a number.
+
+---
+
+## 21 Nov 19:26 — the rule carrier for `32_stroke_lines`, measured in Google and ready to apply
+
+`tools/p2w-bench/patches/rule-carrier-tblppr-2008.patch` — 186 lines, one file, `DocxWriter.java`.
+
+`394_map_with_legend` is **41/42 in Google today** (committed record, engine `7112d76`) and **42/42 with
+this patch**, measured through Drive in this run. LibreOffice reads 42/42 both ways. The evidence, the two
+numbers the probe did not know (`w:tblCellMar` zeroed, and a 4.0 pt predicate to match `RULE_THIN`), and
+what is still unmeasured are in `FINDINGS/32_stroke_lines-RULE-CARRIER-LANDED-2008.md`.
+
+**It is a patch and not a commit because the corpus measurement does not fit a slot.** `regress.py --check`
+refuses an engine change the tables were not measured on, and measuring 213 documents costs ~21 s of JVM
+per document to convert alone — measured here, not estimated. To land it:
+
+    git apply tools/p2w-bench/patches/rule-carrier-tblppr-2008.patch
+    # rebuild tools/engine-verify, then:
+    python3 benchmarks/gate.py --budget 250      # repeat until it reports complete
+    python3 tools/p2w-bench/regress.py --check   # must pass
+    git commit                                   # the hook runs regress.py itself
+
+The patch rebuilds to a `.docx` whose `word/document.xml` is byte-identical to the one Google scored 42/42.

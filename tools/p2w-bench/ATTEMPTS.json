@@ -84,7 +84,7 @@
   "status": "OPEN"
  },
  "32_stroke_lines": {
-  "attempts": 3,
+  "attempts": 4,
   "first_seen": 1794543973.3763752,
   "history": [
    {
@@ -107,27 +107,36 @@
     "outcome": "lead",
     "reason": "RECLASSIFIED 21 Nov from \"reverted\" to \"lead\": the construct WAS measured through Google and the finding is committed - it is not a refuted idea, the implementation ran out of slot. tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is cl",
     "total": 15
+   },
+   {
+    "at": "2026-11-21 20:08",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "floating w:tblpPr rule carrier: 394_map_with_legend 41/42 -> 42/42 in Google, patch saved, not committed - a 213-document corpus measurement is ~75 min of conversion and does not fit the slot",
+    "total": 213
    }
   ],
   "last": 1794543973.3763797,
   "last_engine": "462353f",
   "last_moved": 0,
-  "last_total": 15,
+  "last_total": 213,
   "outcomes": [
    "error",
    "error",
    "reverted",
    "error",
    "error",
+   "reverted",
    "reverted"
   ],
-  "reason": "tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is closed. trHeight val=1 exact costs 0.91pt. No engine patch: no time to convert and score a real document.",
+  "reason": "floating w:tblpPr rule carrier: 394_map_with_legend 41/42 -> 42/42 in Google, patch saved, not committed - a 213-document corpus measurement is ~75 min of conversion and does not fit the slot",
   "reasons": [
    "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH.",
    "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md",
    "namespace test",
    "commit test",
-   "tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is closed. trHeight val=1 exact costs 0.91pt. No engine patch: no time to convert and score a real document."
+   "tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is closed. trHeight val=1 exact costs 0.91pt. No engine patch: no time to convert and score a real document.",
+   "floating w:tblpPr rule carrier: 394_map_with_legend 41/42 -> 42/42 in Google, patch saved, not committed - a 213-document corpus measurement is ~75 min of conversion and does not fit the slot"
   ],
   "requeues": 0,
   "status": "OPEN"
