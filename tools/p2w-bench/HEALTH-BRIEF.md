@@ -99,7 +99,7 @@ pause/resume on a run that will not die is noise, not a fix.
 
     baseline    01M7N3RTAM7SATT9TXMQPP7QRM     hourly :00
     classifier  01M733RFR3D71C2E0T2TQ9PW0R     hourly :40
-    fixer       01M7VCEDHJ9CR2TH1TP1NXZFP1     hourly :50   <- the one that matters
+    fixer       01M7Y5WNJ9E0N78KRHX2TRJGQ6     hourly :50   <- the one that matters
     apk         01M72XD9FD9MDM35X4Z7TQ6RRW     daily 22:00
     gverify     01M7T6STKQJ2KPZAYFMCZVCG85     hourly :20
     watchdog    01M7T903P1BTMEEG8SJ9SA47MQ     every 3 h
