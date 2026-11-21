@@ -87,14 +87,14 @@ unfinished work, not as a result.
 | 32_sA-01 | 32_stroke_lines | A | Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md act | 15:59 | expected by 16:20 | landed | FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md |
 | t02_B-01 | t02_position | B | The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0)  | 15:59 | expected by 16:20 | landed | FINDINGS/47_margins-DOCX-BLAST-RADIUS-155500-6930.md |
 | t08_B-01 | t08_line_order | B | which code path decides the .txt line order, and what single structura | 17:39 | expected by 17:45 | landed | FINDINGS/t08_line_order-DRAWING-ORDER-1740.md |
+| t08_A-01 | t08_line_order | A | does t08 measure line order or drawing order, decided by synthetic pag | 22:39 | a verdict with both falsifications, not a fix | running |  |
+| 32_sA-02 | 32_stroke_lines | A | a census of every rule in the failing documents by placement, and what | 22:39 | counts per sub-population and the cheapest 5 documents | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:34` agent landed: t02_position / A -> tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md
-- `11:35` attempt 1 on t02_position -> error
 - `13:43` attempt 14 on 47_margins -> error
 - `14:42` attempt 17 on t01_word_accuracy -> kept (1/5 moved)
 - `14:42` attempt 18 on t01_word_accuracy -> kept (1/5 moved)
@@ -118,6 +118,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `20:17` attempt 5 on 32_stroke_lines -> lead (0/210 moved)
 - `21:31` attempt 6 on 32_stroke_lines -> lead
 - `22:38` attempt 3 on t08_line_order -> kept (9/10 moved)
+- `22:39` agent deployed: t08_line_order / A - does t08 measure line order or drawing order, decided by synthetic pages whose p
+- `22:39` agent deployed: 32_stroke_lines / A - a census of every rule in the failing documents by placement, and what DocxWrite
 
 ## Where the rest of the state lives
 
