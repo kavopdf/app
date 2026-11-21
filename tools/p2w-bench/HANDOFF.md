@@ -19,10 +19,10 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 04:49 |
-| ended | 04:50 |
-| how it ended | forced |
-| plan | 32_stroke_lines: land rule-carrier-horizontal-only-2008 by closing the 38 missing Google results, not by narrowing the predicate |
+| started | 05:14 |
+| ended | still running |
+| how it ended | - |
+| plan | - |
 
 ## The picture, in the words of the run that left it
 
@@ -91,17 +91,14 @@ unfinished work, not as a result.
 | 32_sA-02 | 32_stroke_lines | A | a census of every rule in the failing documents by placement, and what | 22:39 | counts per sub-population and the cheapest 5 documents | landed | FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md |
 | 32_sA-03 | 32_stroke_lines | A | can the emitter tell its drawing anchor is inside a w:tc, and is the p | 04:49 | 04:20 | landed | FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md |
 | 32_sB-02 | 32_stroke_lines | B | is the 54-document carrier regression cell nesting or body-flow page o | 04:49 | 04:20 | landed | FINDINGS/32_stroke_lines-CARRIER-REGRESSION-IS-PAGE-OVERFLOW-0450-f1x.md |
+| 32_sA-audit-01 | 32_stroke_lines | A-audit | are the 16 carrier Google results genuine measurement artifacts or han | 05:18 | a per-check map, an export hash, a real timestamp | landed | FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md |
+| 32_sB-local-01 | 32_stroke_lines | B-local | does the carrier patch damage clean documents when measured in a clean | 05:18 | 4 of 10 controls worse | landed | FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `19:04` attempt 3 on 32_stroke_lines -> error
-- `19:10` attempt 3 on 32_stroke_lines -> reverted (0/15 moved)
-- `20:08` attempt 4 on 32_stroke_lines -> reverted (0/213 moved)
-- `20:17` attempt 5 on 32_stroke_lines -> lead (0/210 moved)
-- `21:31` attempt 6 on 32_stroke_lines -> lead
 - `22:38` attempt 3 on t08_line_order -> kept (9/10 moved)
 - `22:39` agent deployed: t08_line_order / A - does t08 measure line order or drawing order, decided by synthetic pages whose p
 - `22:39` agent deployed: 32_stroke_lines / A - a census of every rule in the failing documents by placement, and what DocxWrite
@@ -122,6 +119,11 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `04:49` relay slot: the previous fixer (03:53) pushed its message at 04:09 and never released; attempt.py re-stamps fixer_started so the claim read 2 min old at 04:10 and the :10 cron stood down. The claim went stale at 04:18 and this run took it. That re-stamp is why a run that ends after an attempt leaves a fresh-looking claim.
 - `04:49` agent landed: 32_sA-03 /  -> FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md
 - `04:50` blocker 2026-11-21 23:39 ('the relay's claim opened no run window') is FALSIFIED by the code and by this run: round.py claim() calls _run_record('start') at line ~512, RUN.json reads started 04:18 for this slot, and the 03:53 run it displaced was archived into RUN-HISTORY.json as 'killed - never released the slot' (2 attempts, 0 kept). The window opens; close that row rather than writing the fix.
+- `05:18` agent deployed: 32_stroke_lines / A-audit - are the 16 carrier Google results genuine measurement artifacts or hand-authored
+- `05:18` agent deployed: 32_stroke_lines / B-local - does the carrier patch damage clean documents when measured in a clean clone
+- `05:18` agent landed: 32_stroke_lines / A-audit -> FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md
+- `05:18` agent landed: 32_stroke_lines / B-local -> FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md
+- `05:18` attempt 15 on 32_stroke_lines -> lead
 
 ## Where the rest of the state lives
 

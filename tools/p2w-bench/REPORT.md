@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 04:18
+# Fixer report - 2026-11-22 05:14
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 04:18 → 04:50 IST · 31 min**
+**22 Nov 2026 · slot 05:14 → running IST · 3 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 0 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,13 +20,7 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `32_stroke_lines` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 04:49 | **lead** | 0/None | Measured the two things the last two runs left open, on committed evidence and two independent measurements: (1) the prescribed cell guard cannot fire - no Shape is ever routed into a w:tc, guard buil |
+| Working on | `-` |
 
 ## The txt
 
@@ -40,19 +34,16 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `32_sA-03` | can the emitter tell its drawing anchor is inside a  | 04:49 | 23:19 | 0 min |
-| `32_sB-02` | is the 54-document carrier regression cell nesting o | 04:49 | 23:19 | 0 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 04:18 → 04:50 · 31 min |
+| Slot window | 05:14 → running · 3 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 22 |
-| Longest silence | **29.6 min** — from 04:18:54, after `handoff.py: reading or writing the handoff` |
+| Tool beats | 2 |
+| Longest silence | **3.1 min** — from 05:14:57, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
@@ -61,9 +52,7 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **29 min** | `#####################` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **3 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |
