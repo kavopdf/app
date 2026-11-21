@@ -1,5 +1,22 @@
 # BLOCKERS — what stopped a run, and what it was doing when it happened
 
+> **READ THIS FIRST: NOBODY IS COMING.**
+>
+> Fifteen rows below end in "a person has to look" or "a person has to decide". They are kept because
+> this file is a record and records are not deleted. **They are not a precedent and they are not a
+> model.** Every one of them describes a technical question with a technical answer that was available
+> the whole time.
+>
+> The rule from 21 Nov: **every decision is the fixer's.** Decide on research, verification, proof and
+> evidence; take the reversible option when the evidence does not settle it; record the decision, the
+> evidence and what would overturn it. "A person has to decide" is not a blocker, it is a run that
+> stopped working.
+>
+> **The only thing genuinely outside this repository** is a permission or a tool that does not exist - a
+> Drive authorisation the account owner has not given, an integration that is not connected, a binary
+> that cannot be installed. For those, state the exact call and the exact error, then work on the next
+> thing.
+
 One row per obstacle that a run could not clear. INCIDENTS.md records a *document* that was
 skipped; RETRY.md records how to retry a *class*. This file records a *wall*: something that
 stopped the run itself, that the run could not fix with the access it had.
