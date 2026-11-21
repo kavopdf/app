@@ -169,7 +169,10 @@ def main(argv):
         print("%d gap(s) over %.0f min. A gap is silence, not proof of a stop - check the"
               % (bad, thr))
         print("'was doing' line: an announced long measurement explains it, nothing does not.")
-        return 1
+        # A gap is DATA, not a failure. This returned 1, so a run that ran it - and the brief tells it to -
+        # saw a non-zero exit and could read it as the command having failed. The output already says what
+        # the gap means; the exit code should not contradict it.
+        return 0
     print("No gap over %.0f min in any run." % thr)
     return 0
 
