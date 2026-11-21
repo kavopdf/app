@@ -1186,3 +1186,57 @@ of those seven, three are blocked by the construct above:
 **So the same fix that clears the largest class also takes the clean count from 7 to 10.** That is worth
 more than any single document, and it is why the rotation keeps coming back to this construct instead of
 chasing a class with fewer documents.
+
+---
+
+## AFTER YOU CHANGE ANYTHING, TRY TO PROVE IT WRONG. THIS IS THE ONE DISCIPLINE THAT MATTERS.
+
+**Every bug that has cost this project days had the same shape: a tool that ran, exited 0, and was
+wrong.** Not one of them crashed. Not one of them failed its own check. They were found by comparing what
+a tool SAID against something else that knew the truth.
+
+Measured, all of it in the last two days:
+
+| what was wrong | what it said | what was true |
+|---|---|---|
+| `classpick.py` ranked by column position | `60_text_column_right_edge` 28 docs | google column said 57; `32_stroke_lines` at 145 was missing entirely |
+| `restamp_txt.py --run` | `already scored: 213, to do: 0` | the .txt files had changed and none were re-measured |
+| `gverify.py _done()` | `213 of 213, 0 to go` | 21 were refused and the rest were two days stale |
+| `attempt.py` | `refused: not a class` | `classpick` had just printed that class |
+| `report.py` | `the run did not commit RANKING.csv` | it had committed RANKING-TXT.csv |
+| `round.py open_classes()` | 64 open | 104 open - two tables had no `OPEN` cell |
+
+**Six tools. Six green ticks. Six lies.** Every one was found the same way: by taking the number the tool
+printed and checking it against the thing the number was supposed to describe.
+
+### So, every time you change anything, do this
+
+1. **Write down what you expect the number to be BEFORE you run it.** "Fixing the ranking column should
+   give 32_stroke_lines 145 at the top." If you cannot say what you expect, you do not yet know what you
+   are doing.
+2. **Run it, and compare against an INDEPENDENT source** - not the tool you just edited, and not a
+   restatement of its own output. The capability table, the ledger, `git show`, the .docx bytes, the PDF.
+3. **Try to break it.** Lower the mark and see whether the gate refuses. Delete one file and see whether
+   the tool notices. Feed it a class it should reject. **A check you have never seen fail is not a check,
+   it is decoration.**
+4. **NEVER TRUST A TOOL YOU JUST EDITED.** You are the worst possible judge of it. Read its output against
+   the raw data by hand, once.
+5. **If the number moved and you did not expect it to, stop.** That is the most valuable signal in this
+   whole pipeline. An unexpected improvement is as suspicious as an unexpected regression.
+
+### And when you find one of these, say so plainly
+
+Write it into `BLOCKERS.md` or a `FINDINGS/` file with what the tool said and what was true. **Do not
+quietly fix it and move on** - the next run needs to know that this class of bug exists here, because the
+next one will look different and be just as green.
+
+**"It ran and exited 0" is not evidence of anything. It is the shape of every failure this project has
+had.**
+
+### The one goal, and it is the only goal
+
+**The engine must match the original document at 99% or better, in Google, for the .docx AND the .txt.**
+
+Not "a class was worked". Not "an attempt was recorded". Not "the gate passed". **A document that matches
+the original at 99% in Google, and the same document's .txt matching it too.** Everything else in this
+brief is a means to that, and any run that produced none of it produced nothing.
