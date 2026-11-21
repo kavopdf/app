@@ -839,26 +839,71 @@ The user's instruction, 20 Nov, in his words:
 > rahe aur jaruri nhi easy class hee choose kare ... class choose karne ki priority set karo jisme
 > sabse jyada documents fix karna ho aur classes ka selection rotation based ho"
 
-### The class is not your choice
+### The class starts from the rotation, and then YOU decide
 
     python3 tools/p2w-bench/classpick.py
 
-It prints one class and the reason. **Take that one.** It ranks the capability table by how many
-documents each class costs, biggest first, and it rotates:
+It prints one class and its reason. **That is a starting point, not an order.** For two months this
+section said "take that one", and that is why the pipeline produced a follower: a run did the
+procedure, recorded an attempt, reported honestly and moved one document - while 145 documents waited on
+a class that was exhausted and a 3-document class absorbed 19 attempts.
 
-* **Stay on a class while it is producing.** If the attempts since you took it moved at least one
-  document, it keeps the slot - that is the user's "jab tak improvement ho raha hai tab tak kaam hota
-  rahe".
-* **Rotate when a class stalls.** Two or more attempts on it, and not one document moved: the next run
-  takes the next biggest class. That is "poore ek run me multiple attempt try karne ke baad bhi ek bhi
-  document improvement nhi ho raha hai toh next turn me dusre sabse jyada documents wale class par".
-* **Wrap round.** When the ranking runs out it starts again from the top, skipping the classes recorded
-  as exhausted. A class that failed is not a class that failed for ever.
+**Before you accept it, run the arithmetic yourself. It takes one minute and it is the difference between
+a run that moves one document and a run that moves fifty.**
 
-**Do not pick a class because it looks easy.** The rotation reaches the easy ones soon enough - the
-three cleanest gaps are 7th, 9th and 14th by size - and picking them first is how the hard classes go
-untouched for two months.
+    python3 tools/p2w-bench/classpick.py --leverage     # what each check is worth in CLEAN documents
 
+### The only number that matters is how much of a CLEAN document a fix is worth
+
+"Documents affected" is the wrong metric and it is the one the table ranks by. Measured 21 Nov:
+
+    by documents affected   32_stroke_lines 145, 05_chars_extra 141, 18_displacement 124
+    by clean leverage       32_stroke_lines 36.3, 05_chars_extra 35.0, 18_displacement 28.6
+
+**Fixing 32_stroke_lines alone takes exactly TWO documents to clean**, because those 145 documents each
+fail several checks and losing one failure does not make a document clean. The user's bar is 99% or
+better, which means all 42 checks pass. So before every attempt ask:
+
+**"If this works, which documents become CLEAN?"** If the answer is none, the attempt cannot be a fix,
+whatever the class table says.
+
+### And check whether several checks are one construct
+
+    python3 -c "import json,glob,collections; \
+      print(collections.Counter(frozenset(json.load(open(p)).get('failed') or []) \
+      for p in glob.glob('benchmarks/gverify/*.json') if json.load(open(p)).get('status')!='page_count_refused').most_common(5))"
+
+On 21 Nov that showed 15 documents failing exactly {05_chars_extra, 18_displacement, 32_stroke_lines}
+and 15 more failing exactly {05_chars_extra, 32_stroke_lines}. **Checks that always travel together are
+one construct, and one fix clears all of them.** The three above are one floating `<w:drawing>` per rule:
+
+    fix 05 + 18 + 32                      -> 35 documents become clean   (6 -> 41)
+    add 59_shape_anchor                   -> 44 clean
+    add 25_invisible_text                 -> 57 clean
+
+**A run that fixes one check of a five-check construct has done a fifth of the work and reported a
+success.**
+
+### So you may override the rotation, and you must say why
+
+Take the rotation's class when the arithmetic agrees with it - it usually will, because it now ranks by
+clean leverage. **Override it when the arithmetic disagrees**, and put the reason in the report:
+
+* the class it gave is a fraction of a bigger one that has never had a verdict
+* the class it gave is one check of a construct that five checks share
+* the class it gave cannot move any document to clean in one fix
+* a class recorded as exhausted was parked for a reason that names only ONE approach, and another exists
+
+**Never override it because a class looks easy, and never override it without the numbers.** "I thought
+this was better" is not an override; "this is 5x larger and one construct clears three checks on it" is.
+
+### The rotation's own rules, which still hold
+
+* **Stay while it is producing** - the user's "jab tak improvement ho raha hai tab tak kaam hota rahe".
+* **Rotate when it stalls** - two or more attempts and nothing moved.
+* **Wrap round**, skipping exhausted classes. A class that failed is not a class that failed for ever.
+* **Do not pick a class because it looks easy.** The three cleanest gaps are 7th, 9th and 14th by size,
+  and picking them first is how the hard classes go untouched for two months.
 ### When you give up on a class, say so
 
     python3 tools/p2w-bench/classpick.py --exhaust <class> "<what you proved>"
@@ -1498,3 +1543,42 @@ If you are about to do something that will take more than a few minutes, ask: **
 next run be able to tell what I was doing?** If the answer is no, beacon first. That is the whole of
 self-monitoring that is in your power, and it is worth more than any status line, because it is the only
 evidence that survives you.
+
+---
+
+## AND THE ONE THING THAT MADE THIS PIPELINE A FOLLOWER: IT STOPPED WHEN THE PROCEDURE ENDED, NOT WHEN THE WORK DID
+
+The user, 21 Nov: *"yehi sab fixer cron kyun nhi decide karta hai sala sirf chalata hai aur rukta hai
+chahe kuch kaam ho ya na ho"*
+
+**That is a fair description of what this brief produced, and the fault is in the brief, not in the run.**
+
+A run read its steps, did them in order, recorded two attempts, wrote an honest report and stopped - even
+when nothing had improved, even when the class it was given was a fifth of a bigger one, even when the
+three checks it was chasing were one construct that five checks shared. It followed the procedure
+perfectly and moved one document. **Every gate passed. The report was accurate. Nothing was wrong except
+that no document got closer to 99%.**
+
+### So the run does not end when the steps end. It ends when the work does.
+
+**Before you stop, answer this in one line: what moved?** If the answer is "nothing", you are not finished -
+you have used your attempts on the wrong thing, and the evidence to find the right thing is one command
+away:
+
+    python3 tools/p2w-bench/classpick.py --leverage
+
+**If two attempts on a class moved nothing, do not report and stop. Change the class, or change the
+construct, and spend the rest of the slot on the thing the arithmetic says is worth the most.** The user's
+instruction is explicit: *"fixer kisi kisi run me ek bhi documents fix nhi karta aur ek hee attempt karta
+hai kuch aisa karo jisse yeh apni poori timings tak poori takat se kaam karta rahe"*.
+
+**Three things are not a reason to stop:**
+
+* **the procedure is finished** - it is a floor, not a ceiling
+* **the attempts are used** - "two attempts is the floor" means at least two, not at most two
+* **the report is due** - a report of nothing is worse than a report written at the end of a slot that
+  spent its last twenty minutes on the class with the highest clean leverage
+
+**A run that ends with 0 documents improved must say, in the report, what it learned about WHY and what
+the next run should do instead.** A bare "0 improved" with no next move is the failure mode the user is
+describing, and it is the one thing in this brief that costs more than any wrong fix.

@@ -293,6 +293,50 @@ def decide():
 
 
 def main(argv):
+    if "--leverage" in argv:
+        # WHAT EACH CHECK IS WORTH IN CLEAN DOCUMENTS.
+        #
+        # "Documents affected" is the metric the table ranks by, and it is the wrong one: fixing
+        # 32_stroke_lines alone takes exactly TWO documents to clean, because those 145 documents each
+        # fail several checks and losing one failure does not make a document clean.
+        #
+        # This prints what a fix is actually worth, and then shows which checks travel together - because
+        # checks that always co-occur are one construct and one fix clears all of them.
+        lv = clean_leverage()
+        if not lv:
+            print("no gverify results - cannot compute leverage", file=sys.stderr)
+            return 3
+        print("  %-30s %s" % ("check", "worth, in CLEAN documents"))
+        print("  " + "-" * 52)
+        for c, v in sorted(lv.items(), key=lambda x: -x[1]):
+            print("  %-30s %.1f" % (c, v))
+        # the shapes: which sets of checks a document fails, most common first
+        from collections import Counter
+        sets = Counter()
+        for f in os.listdir(GV):
+            if not f.endswith(".json"):
+                continue
+            try:
+                j = json.load(open(os.path.join(GV, f), encoding="utf-8"))
+            except Exception:
+                continue
+            if j.get("status") == "page_count_refused":
+                continue
+            fs = frozenset(j.get("failed") or [])
+            if fs:
+                sets[fs] += 1
+        if sets:
+            print()
+            print("  the shapes - a set of checks one document fails, most common first:")
+            print("  %5s  %s" % ("docs", "checks"))
+            print("  " + "-" * 52)
+            for st, n in sets.most_common(8):
+                print("  %5d  %s" % (n, ", ".join(sorted(st))[:60]))
+            print()
+            print("  Checks that always travel together are ONE CONSTRUCT. One fix clears all of them;")
+            print("  fixing one of five has done a fifth of the work.")
+        return 0
+
     cls, why, state = decide()
     if "--exhaust" in argv:
         # the run records the class it gave up on, and why. Never silently.
