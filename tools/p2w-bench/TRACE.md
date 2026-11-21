@@ -6,55 +6,6 @@
 | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 09:30 | fixer | build-engine | started |
-| 17 Nov 18:24 | fixer | build-engine | started |
-| 17 Nov 18:24 | fixer | build-engine | engine built in 42s |
-| 17 Nov 18:33 | fixer | build-engine | started |
-| 17 Nov 18:34 | fixer | build-engine | engine built in 40s |
-| 17 Nov 18:34 | fixer | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |
-| 17 Nov 18:34 | fixer | build-engine | started |
-| 17 Nov 18:35 | fixer | build-engine | engine built in 43s |
-| 17 Nov 18:44 | fixer | build-engine | started |
-| 17 Nov 18:44 | fixer | build-engine | engine built in 41s |
-| 17 Nov 18:45 | fixer | attempt | content-missing-partly-replaced -> reverted (0/16 moved) |
-| 17 Nov 18:56 | fixer | claim | fixer claimed the slot |
-| 17 Nov 18:56 | fixer | build-engine | started |
-| 17 Nov 18:57 | fixer | build-engine | engine built in 36s |
-| 17 Nov 19:24 | fixer | build-engine | started |
-| 17 Nov 19:24 | fixer | build-engine | engine built in 40s |
-| 17 Nov 19:31 | fixer | attempt | content-missing-partly-replaced -> partial (1/3 moved) |
-| 17 Nov 19:35 | fixer | attempt | content-missing-partly-replaced -> kept (3/3 moved) |
-| 17 Nov 23:02 | baseline | claim | baseline claimed the slot |
-| 17 Nov 23:43 | classifier | claim | classifier claimed the slot |
-| 18 Nov 09:54 | fixer | claim | fixer claimed the slot |
-| 18 Nov 09:55 | fixer | build-engine | started |
-| 18 Nov 09:55 | fixer | build-engine | engine built in 35s |
-| 18 Nov 09:56 | fixer | build-engine | started |
-| 18 Nov 09:56 | fixer | build-engine | engine unchanged, compile skipped |
-| 18 Nov 10:51 | fixer | build-engine | started |
-| 18 Nov 10:52 | fixer | build-engine | started |
-| 18 Nov 10:53 | fixer | build-engine | engine built in 46s |
-| 18 Nov 11:49 | fixer | attempt | content-missing-nothing-in-its-place -> kept (1/30 moved) |
-| 18 Nov 11:50 | fixer | hypothesis | content-missing-nothing-in-its-place -> confirmed |
-| 18 Nov 11:50 | fixer | hypothesis | content-missing-nothing-in-its-place -> untested |
-| 18 Nov 11:52 | fixer | build-engine | started |
-| 18 Nov 11:53 | fixer | build-engine | engine built in 39s |
-| 18 Nov 11:54 | fixer | build-engine | started |
-| 18 Nov 11:55 | fixer | build-engine | engine built in 37s |
-| 18 Nov 11:55 | fixer | attempt | content-missing-nothing-in-its-place -> reverted (0/30 moved) |
-| 18 Nov 11:55 | fixer | hypothesis | content-missing-nothing-in-its-place -> ruled-out |
-| 18 Nov 12:58 | fixer | claim | fixer claimed the slot |
-| 18 Nov 12:58 | fixer | build-engine | started |
-| 18 Nov 12:58 | fixer | build-engine | engine built in 36s |
-| 18 Nov 13:04 | fixer | build-engine | started |
-| 18 Nov 13:05 | fixer | build-engine | engine built in 39s |
-| 18 Nov 13:44 | fixer | attempt | single-element-far-out -> partial (1/1 moved) |
-| 18 Nov 14:50 | classifier | build-engine | started |
-| 18 Nov 14:50 | classifier | build-engine | engine built in 38s |
-| 18 Nov 14:50 | fixer | claim | fixer claimed the slot |
-| 18 Nov 14:50 | fixer | build-engine | started |
-| 18 Nov 14:50 | fixer | build-engine | engine unchanged, compile skipped |
-| 18 Nov 14:51 | fixer | attempt | content-partly-lost-and-displaced -> partial (1/7 moved) |
-| 18 Nov 15:28 | fixer | attempt | content-partly-lost-and-displaced -> kept (1/210 moved) |
 | 18 Nov 15:58 | fixer | claim | fixer claimed the slot |
 | 18 Nov 15:58 | fixer | build-engine | started |
 | 18 Nov 16:00 | fixer | build-engine | engine built in 60s |
@@ -444,3 +395,14 @@
 | 21 Nov 13:39 | fixer | build-engine | started |
 | 21 Nov 13:39 | fixer | build-engine | engine unchanged, compile skipped |
 | 21 Nov 13:43 | fixer | attempt | 47_margins -> error |
+| 21 Nov 13:54 | fixer | claim | fixer claimed the slot |
+| 21 Nov 14:15 | fixer | build-engine | started |
+| 21 Nov 14:16 | fixer | build-engine | engine built in 38s |
+| 21 Nov 14:22 | fixer | build-engine | started |
+| 21 Nov 14:23 | fixer | build-engine | engine built in 37s |
+| 21 Nov 14:26 | fixer | build-engine | started |
+| 21 Nov 14:27 | fixer | build-engine | engine built in 45s |
+| 21 Nov 14:34 | fixer | build-engine | started |
+| 21 Nov 14:35 | fixer | build-engine | engine built in 46s |
+| 21 Nov 14:38 | fixer | build-engine | started |
+| 21 Nov 14:39 | fixer | build-engine | engine built in 77s |

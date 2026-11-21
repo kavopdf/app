@@ -1578,3 +1578,18 @@
 {"t": 1795248821.2643147, "ist": "13:43:41", "ev": "attempt", "d": "47_margins -> error"}
 {"t": 1795248821.3710656, "ist": "13:43:41", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795248821.5219288, "ist": "13:43:41", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795249432.667501, "ist": "13:53:52", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795249458.131466, "ist": "13:54:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795249458.1442075, "ist": "13:54:18", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795249458.2206922, "ist": "13:54:18", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795249458.2357306, "ist": "13:54:18", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795249458.431683, "ist": "13:54:18", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795249458.5667777, "ist": "13:54:18", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795250684.0261936, "ist": "14:14:44", "ev": "beat", "d": "two subagents landed: t01 source-side clip/dedupe, blast radius 208->210 of 213, 0 regressions"}
+{"t": 1795250708.02184, "ist": "14:15:08", "ev": "beat", "d": "setting up corpus + engine build for the t01 source-side clip fix"}
+{"t": 1795250867.5423362, "ist": "14:17:47", "ev": "beat", "d": "corpus 213 txt built; scoring all 213 with the UNMODIFIED verifier to reproduce 186/27"}
+{"t": 1795251046.7471662, "ist": "14:20:46", "ev": "beat", "d": "clip-off landed in verify_txt.py; re-stamping the txt table with the new checker"}
+{"t": 1795251191.0699563, "ist": "14:23:11", "ev": "beat", "d": "TxtWriter doubled-draw dedupe built; converting 213 to txt and diffing"}
+{"t": 1795251683.0505073, "ist": "14:31:23", "ev": "beat", "d": "writer dedupe + checker dedupe measured: 188->189, 0 regressions, 1 of 213 txt changed"}
+{"t": 1795251785.8911533, "ist": "14:33:05", "ev": "beat", "d": "gate PASS; proving docx byte-identity (convert corpus to .docx on both trees)"}
+{"t": 1795252275.8673005, "ist": "14:41:15", "ev": "beat", "d": "two commits pushed: clip-off and doubled-draw; 186->189 clean"}
