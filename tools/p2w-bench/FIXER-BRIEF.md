@@ -1043,6 +1043,42 @@ implementation is one build away" is. "The biggest class is 5x this one and has 
 **What you may never do is pick a class because it looks easy**, or because the previous run picked it, or
 because the tool printed it. Those are the three ways this decision has gone wrong before.
 
+### So what actually happens, run to run: CONTINUE IS THE DEFAULT
+
+**Free choice without continuity is thrash** - a run picks something new every hour and nothing is ever
+finished. That is not freedom, it is the other failure mode, and it is why a rotation existed at all.
+
+**So the default is: continue what the last run was doing.** Change it only when one of these is true, and
+say which:
+
+| change when | because |
+|---|---|
+| **the class holds an open `lead`** | **do not change. Finish it. A measured lead is the most valuable state there is** |
+| it is moving - attempts moved documents | do not change. It is working |
+| **two or more attempts moved nothing** | it is stuck. Go to the next biggest, or to a construct the checks share |
+| **a class 3x bigger has never had a verdict** | that is not a trickle worth protecting, it is a bigger prize unmeasured |
+| **the checks you are chasing are one construct five checks share** | fixing one of five is a fifth of the work |
+| **the instrument is wrong, not the engine** | stop fixing documents and fix the check |
+
+**Everything else is a reason to stay.** And "I want to try something else" is not a reason - it is the
+thrash this section exists to prevent.
+
+### What the tool prints, and what each answer means
+
+    suggest : <class>
+    because : <the reason, in one line>
+
+**Four shapes of `because`, and only two of them mean change:**
+
+* *"it holds an open LEAD"* - **stay.** Nothing outranks finishing a measured construct.
+* *"N attempt(s) moved M document(s)"* - **stay** while M is above zero.
+* *"had N attempt(s) and moved 0 documents - rotating to the next biggest"* - **change**, and the tool has
+  already picked the next biggest for you.
+* *"is Nx larger, and has not had its verdict"* - **change**, the leverage case.
+
+**You may override any of them. If you do, the report carries the reason. If you do not, the report still
+carries the reason - one line is enough.**
+
 ### The only number that matters is how much of a CLEAN document a fix is worth
 
 "Documents affected" is the wrong metric and it is the one the table ranks by. Measured 21 Nov:
