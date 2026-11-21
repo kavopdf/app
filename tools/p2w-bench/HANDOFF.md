@@ -20,8 +20,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 04:49 |
-| ended | still running |
-| how it ended | - |
+| ended | 04:50 |
+| how it ended | forced |
 | plan | 32_stroke_lines: land rule-carrier-horizontal-only-2008 by closing the 38 missing Google results, not by narrowing the predicate |
 
 ## The picture, in the words of the run that left it

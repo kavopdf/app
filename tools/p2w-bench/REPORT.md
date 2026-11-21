@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 04:18 → running IST · 30 min**
+**22 Nov 2026 · slot 04:18 → 04:50 IST · 31 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -49,9 +49,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 04:18 → running · 30 min |
+| Slot window | 04:18 → 04:50 · 31 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 15 |
+| Tool beats | 22 |
 | Longest silence | **29.6 min** — from 04:18:54, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -63,6 +63,7 @@
 |:--|--:|:--|
 | fix - diagnose and change the engine | **29 min** | `#####################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

@@ -1558,15 +1558,10 @@
  ],
  "run": {
   "started": "04:49",
-  "ended": null,
-  "ended_how": null
+  "ended": "04:50",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "12:03",
-   "how": "forced",
-   "plan": ""
-  },
   {
    "at": "13:37",
    "how": "forced",
@@ -1661,6 +1656,11 @@
    "at": "00:13",
    "how": "forced",
    "plan": ""
+  },
+  {
+   "at": "04:50",
+   "how": "forced",
+   "plan": "32_stroke_lines: land rule-carrier-horizontal-only-2008 by closing the 38 missing Google results, not by narrowing the predicate"
   }
  ],
  "context": "The t02_position patch is LANDED and committed (462353f): uprightIfPageIsUpsideDown is now txt-only BY MEASUREMENT, not by argument - HEAD vs patched, all 213 documents converted both ways, 213 of 213 word/document.xml byte-identical and 212 of 213 .txt byte-identical, the one difference being one-page-rotated-180-degrees (8986 -> 9312 bytes, t02_position FAIL -> PASS). 190 of 213 .txt documents are clean now (was 189), 0 newly failing. scope.py gained PdfToWord.uprightIfPageIsUpsideDown -> txt with that proof in the comment; without it the gate fell back to 'change outside a known method -> both' and refused the commit for an unmeasured .docx, which is the same wall that has kept .txt fixes from landing for a month. THE pBdr CARRIER IS REFUTED - do not retry it: 12 class documents, 68 rules became w:pBdr but 48 of 68 land >24 pt off and LibreOffice gets worse on 8 of 12 (32_stroke 0->52 lost across the sample). The next 32_stroke_lines slot should try a table-cell border (DocxWriter.java:6420 already writes w:tcBorders/w:bottom and can carry the 102 vertical rules the pBdr path refuses). t08_line_order: the engine's .txt order is geometric (baseline y) while the check's ground truth is PyMuPDF's raw drawing order; reordering only our own lines into drawing order clears 10 of 10 rows. DO NOT take the agent's proposed fix as written - it edits verify_txt.py's _src_pages to sort the source, which makes t08 compare sorted-vs-sorted and nearly tautological; that is a measurement change and must be judged as one.",

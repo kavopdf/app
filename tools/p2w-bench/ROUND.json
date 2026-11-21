@@ -1,11 +1,9 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "16 Google exports downloaded; scoring the 42 checks",
-  "fixer_doing_since": 1795293353.6580129,
   "fixer_engine_at_claim": "462353f9",
   "fixer_last_beat": 1795293353.6580136,
-  "fixer_started": 1795303157.7224953,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
