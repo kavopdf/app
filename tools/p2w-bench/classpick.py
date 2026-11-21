@@ -352,6 +352,23 @@ def main(argv):
             print("  fixing one of five has done a fifth of the work.")
         return 0
 
+    # IT ADVISES. IT DOES NOT DECIDE.
+    #
+    # The user, 21 Nov: "agar ham rotation wala kaam hee khatam kar de aur poora decision fixer ko hee de de
+    # ... mujhe lagta hai rotation ki wajah se bohot saare leads choot gye honge".
+    #
+    # They were right, and the record says so. The rotation ranked by the LibreOffice column for two days
+    # and dropped the 145-document class off the list. It sat on a 3-document class for 19 attempts. It
+    # parked the two largest classes on the strength of one approach. And on 21 Nov it was about to walk
+    # away from a measured lead worth 36.3 clean documents because sum(moved) said zero.
+    #
+    # What it was good for is one thing: remembering. That memory is not the rotation - it is
+    # ATTEMPTS.json, FINDINGS/, HYPOTHESES.md and the class tables, and every one of them is read by the
+    # run anyway.
+    #
+    # So this prints the evidence and a suggestion, and the run decides. There is no rule that the run must
+    # take the suggestion, and there is no penalty for not taking it - only the requirement that whatever
+    # it takes, it says why in the report.
     cls, why, state = decide()
     if "--exhaust" in argv:
         # the run records the class it gave up on, and why. Never silently.
@@ -403,8 +420,12 @@ def main(argv):
     merged["exhausted"] = (load(ROTATION, {}).get("exhausted")
                            or state.get("exhausted") or {})
     save(ROTATION, merged)
-    print("class   : %s" % cls)
-    print("why     : %s" % why)
+    print("suggest : %s" % cls)
+    print("because : %s" % why)
+    print("")
+    print("  THAT IS A SUGGESTION, NOT AN ORDER. You decide, on this evidence plus what you have read")
+    print("  in FINDINGS/ and HYPOTHESES.md. Take it, or take something else and say why. What you may")
+    print("  not do is take something without a reason - the report has to carry the reason.")
     return 0
 
 

@@ -1019,19 +1019,29 @@ The user's instruction, 20 Nov, in his words:
 > rahe aur jaruri nhi easy class hee choose kare ... class choose karne ki priority set karo jisme
 > sabse jyada documents fix karna ho aur classes ka selection rotation based ho"
 
-### The class starts from the rotation, and then YOU decide
+### THE CLASS IS YOUR DECISION. THE TOOL ADVISES.
 
-    python3 tools/p2w-bench/classpick.py
+    python3 tools/p2w-bench/classpick.py            # evidence and a suggestion
+    python3 tools/p2w-bench/classpick.py --leverage # what each check is worth in CLEAN documents
 
-It prints one class and its reason. **That is a starting point, not an order.** For two months this
-section said "take that one", and that is why the pipeline produced a follower: a run did the
-procedure, recorded an attempt, reported honestly and moved one document - while 145 documents waited on
-a class that was exhausted and a 3-document class absorbed 19 attempts.
+**There is no rotation any more, in the sense that mattered.** For two months a tool decided the class and
+the brief said "take that one". The user's verdict, 21 Nov: *"rotation ki wajah se bohot saare leads choot
+gye honge"* - and the record agrees. That rotation ranked by the LibreOffice column for two days and
+dropped the 145-document class off its own list. It sat on a 3-document class for 19 attempts. It parked
+the two largest classes on the strength of one approach. And on 21 Nov it was about to walk away from a
+measured lead worth 36.3 clean documents because the sum of documents moved was zero.
 
-**Before you accept it, run the arithmetic yourself. It takes one minute and it is the difference between
-a run that moves one document and a run that moves fifty.**
+**So you decide.** The tool prints the evidence - what each check is worth in clean documents, which
+checks travel together, what has been tried, what a lead holds open - and one suggestion with its
+reasoning. **You may take it, or take something else.**
 
-    python3 tools/p2w-bench/classpick.py --leverage     # what each check is worth in CLEAN documents
+**The only requirement is that the choice has a reason and the reason is in the report.** "I thought this
+was better" is not a reason. "This class holds an open lead worth 36.3 clean documents and the
+implementation is one build away" is. "The biggest class is 5x this one and has never had a verdict" is.
+"Four documents fail this check alone, so one fix makes four clean" is.
+
+**What you may never do is pick a class because it looks easy**, or because the previous run picked it, or
+because the tool printed it. Those are the three ways this decision has gone wrong before.
 
 ### The only number that matters is how much of a CLEAN document a fix is worth
 
