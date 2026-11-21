@@ -1,15 +1,15 @@
 {
- "started_ts": 1795301334.0620563,
- "started": "04:18",
- "ended_ts": 1795303233.2397661,
- "ended": "04:50",
- "class": "32_stroke_lines",
- "attempts": 1,
+ "started_ts": 1795304697.4796817,
+ "started": "05:14",
+ "ended_ts": null,
+ "ended": null,
+ "class": "",
+ "attempts": 0,
  "kept": 0,
  "docs_improved": 0,
  "agents": [
-  "32_sA-03",
-  "32_sB-02"
+  "32_sA-audit-01",
+  "32_sB-local-01"
  ],
  "obstacles_cleared": 0,
  "needs_human": 0
