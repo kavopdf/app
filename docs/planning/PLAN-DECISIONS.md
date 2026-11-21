@@ -40,15 +40,29 @@ built. Recorded as a follow-up, not a blocker.
 
 ## F2 — Does Google Drive drop `w:framePr`?
 
-**Status: BLOCKED** — needs Drive authorisation.
+**Status: ANSWERED — YES, IT DOES. DO NOT USE `w:framePr`. EVER.**
 
-**Why it matters.** The stamp fix rests on `w:framePr`. Google's docx importer may
-drop it or move it. If it does, the stamp breaks again in the very renderer the
-pipeline measures with, and the pipeline would report a pass while the user sees
-a broken stamp.
+**Answer, measured.** Google Docs does not honour `w:framePr` at all. It renders the framed
+paragraph as ordinary body text at the left margin. LibreOffice honours it exactly, which is what
+makes it dangerous: the document looks perfect in the renderer nobody opens and is broken in the one
+the user has.
 
-**Test.** Upload one stamp docx, export it as PDF, and check whether the framed
-paragraphs kept their position.
+**What it already cost.** It shipped as **3.53.5 and broke every stamp on the phone**, with every
+count in CI identical — because CI measured LibreOffice. That is the single worst regression in this
+project's history and it is recorded in `tools/p2w-bench/LESSONS.md`.
+
+**Current state, checked 21 Nov.** The engine does not emit it: the eight `framePr` references in
+`DocxWriter.java` are all comments explaining why it was removed, `PdfToWord.java` carries one
+comment saying the same, no string literal writes the element, and 40 of the corpus's `.docx` files
+were opened and none carries it.
+
+**The rule this establishes, and it is the rule the whole pipeline now runs on.** A construct that
+LibreOffice supports and Google does not is not a fix. LibreOffice is a proxy; Google is the
+renderer the user opens. `FINDINGS/GOOGLE-IGNORES-CHARACTER-WIDTH-2424.md`,
+`FINDINGS/RULES-ARE-DRAWINGS-GOOGLE-DROPS-THEM.md` and
+`FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md` are the same lesson measured three
+more times — `w:w`, `w:spacing`, embedded faces, floating `<w:drawing>` rules, and `w:before` at a
+page top are all ignored by Google and all honoured by LibreOffice.
 
 ---
 
