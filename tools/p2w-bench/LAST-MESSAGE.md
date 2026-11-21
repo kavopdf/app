@@ -1,68 +1,8 @@
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 21:11 → running IST** — class `32_stroke_lines`, taken on the open lead.
+**21 Nov 2026 · slot 21:11 → running IST · 11 min**
 
-> **No engine change was kept, and the reason is a measurement, not a shortage of time.** The lead
-> was priced: the carrier patch two runs wrote is worth **one** document of the 192 Google scores,
-> and as it stands it puts floating tables into documents that have no rules at all and moves a
-> paragraph 122 pt. Both numbers were measured in this sandbox this slot, before and after, and
-> both are committed with the patch reverted.
-
-## What this run actually changed
-
-| | |
-|:--|:--|
-| Corpus in the sandbox | **213 of 213**, from the `corpus-v1` release assets, in 6 minutes |
-| Engine built | yes, 37 s |
-| Commits pushed | 3 — a FINDINGS file and two new tools |
-| Engine commits | **none** — see below |
-| Documents made clean | 0 |
-
-**The wall two runs hit is gone.** `regress.py` refuses any docx engine change whose table was not
-measured on that engine, and the corpus is not in the repository, so every run ended with an
-unlandable patch. The corpus is four release assets and five PDFs that travel in the repo.
-`tools/p2w-bench/corpus-fetch.sh` now does it and refuses if any of the 213 is missing. `p2w.py
---budget` is a *time* budget and manages ~26 documents per 250 s, so a full pass is ~33 minutes of
-wall clock across several commands — a known number now instead of a guess.
-
-## What the census found
-
-Every page of every corpus PDF, read with the instrument's own rule definition
-(`verify_google._rules`, imported, not re-implemented):
-
-| | |
-|:--|--:|
-| documents drawing no rule on any page | **53** |
-| documents with at least one rule | **160** |
-| … busiest page holds at most one | **14** |
-| … busiest page holds two or more | **146** |
-| rules counted across the corpus | **1170** |
-
-Crossed with the committed Google results: **35** documents fail only within `{05_chars_extra,
-18_displacement, 32_stroke_lines}`. **32** of them carry rules, and **31 of those 32 have two or more
-rules on a page**. The floating-table carrier that is already written and measured on
-`394_map_with_legend` places one table per page and stacks every later one, so it can make at most
-**one** of them clean. The row-per-rule construct is the precondition for the lead, not an
-optimisation of it.
-
-## What the second measurement falsified
-
-Built the patched engine, converted six documents, byte-compared against HEAD, reverted.
-
-| document | rules (instrument) | `w:tblpPr` the patch emits |
-|:--|--:|--:|
-| `305_vaccination_certificate` | **0** | **20** |
-| `303_discharge_summary` | **0** | **15** |
-| `77_arabic_rtl_document` | **0** | **4** |
-| `80_gstin_pan_cin_ifsc_table` | 0 | 2 |
-| `76_devanagari_table` | 0 | 0 |
-| `15_stamp_on_scanned_page` | **0** | 0 |
-
-`isRuleShape` has no isolation test; the instrument's `_rules` has one (`RULE_GAP` 3 pt). So the
-carrier takes every table grid line drawn as a thin fill — and the carrier stacks. On
-`303_discharge_summary` the same paragraph's `w:spacing w:before` also went **6740 → 4291 twips**:
-the carrier is not zero-flow there, and the `.txt` is byte-identical on all three, so no `.txt` check
-would have seen it. The narrow predicate is the next build, before the row construct.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
@@ -89,32 +29,9 @@ would have seen it. The narrow predicate is the next build, before the row const
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t08_line_order` - 10 documents |
 
-## Why the class was taken
-
-`classpick.py` suggested `32_stroke_lines` because it holds an open lead, and `--leverage` prices the
-class at 36.3 clean documents. I took it on that arithmetic and then tested the arithmetic itself:
-the 36.3 is reachable only through a carrier that handles multiple rules per page, and 31 of the 32
-candidate documents need exactly that. The lead was worth taking; the patch that carries it was not.
-
-## What the next run should do
-
-1. **Narrow `isRuleShape` to the instrument's definition** — thin face ≤ 4.0 pt, long face ≥ 10 pt,
-   and not touching another stroke within 3 pt. Re-convert the six documents above and confirm
-   `tblpPr` counts fall to the census's rule counts. That is one build and six conversions, ~5 min.
-2. **Probe `w:hRule="exact"` on a floating-table row through Google** before building rows: three
-   rows, 40 pt gaps, read the three border y's out of the export. If exact is not honoured every
-   rule after the first drifts by the empty cell's line box.
-3. **Then build one table per page with rules as rows**, and measure the 31.
-
-Do not land `rule-carrier-tblppr-2008.patch`. It is worth one document and it changes 146.
-
 ## Subagents
 
-One agent, on the carrier design. It could not read the repo — its sandbox had no clone and no
-`/scratch/input`, and it said so instead of inventing line numbers, which is the useful part. Its
-OOXML element ordering and its list of unmeasured questions are in this run's reasoning; the design
-detail it produced that this run verified independently is the `w:sz` eighths-of-a-point rule and
-the `w:tblCellMar` 5.4 pt inset, which matches the landed finding.
+*None deployed this run.*
 
 ## Timing
 
@@ -132,8 +49,25 @@ the `w:tblCellMar` 5.4 pt inset, which matches the landed finding.
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **4 min** | `#########` |
+| setup - claim, housekeeping, reading the gate | **4 min** | `########` |
 | measure or build - a conversion, screen or compile writes no beacon | **0 min** | `##` |
-| report - the report and the chain | **0 min** | `##` |
-| other - not attributed to a tool | **5 min** | `##########` |
+| report - the report and the chain | **1 min** | `###` |
+| other - not attributed to a tool | **5 min** | `#########` |
+## Best results this round
 
+| Document | Before | After | Change |
+|:--|--:|--:|--:|
+| `415_inline_images` | 89.04 | 0.00 | -89.04 |
+| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
+| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
+| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
+| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+
+## Next run
+
+Judge the t08 verifier question before touching the engine: is t08_line_order measuring line order or drawing order? FINDINGS/t08_line_order-DRAWING-ORDER-1740.md has the numbers (10 of 10 rows clear when only our own line sequence is put into drawing order). The agent's proposed one-line sort of _src_pages is NOT obviously right - it would compare sorted-vs-sorted. Decide with a falsification: construct a .txt whose lines are deliberately swapped in y and confirm t08 still fires after the change. Then take t01_word_accuracy's .docx half or 32_stroke_lines' cell-border construct.
+
+> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

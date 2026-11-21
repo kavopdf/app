@@ -52,10 +52,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **4 min** | `#########` |
+| setup - claim, housekeeping, reading the gate | **4 min** | `########` |
 | measure or build - a conversion, screen or compile writes no beacon | **0 min** | `##` |
-| report - the report and the chain | **0 min** | `##` |
-| other - not attributed to a tool | **5 min** | `##########` |
+| report - the report and the chain | **1 min** | `###` |
+| other - not attributed to a tool | **5 min** | `#########` |
 ## Best results this round
 
 | Document | Before | After | Change |
