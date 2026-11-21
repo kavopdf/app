@@ -1,8 +1,10 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
+  "fixer_doing": "converting all 213 to test: does 32 fail iff the docx carries no table-cell border",
+  "fixer_doing_since": 1795286395.1655967,
   "fixer_engine_at_claim": "462353f",
-  "fixer_last_beat": 1795284414.8360453,
+  "fixer_last_beat": 1795286395.1655972,
   "fixer_started": 1795285655.0183506,
   "history": [
     {

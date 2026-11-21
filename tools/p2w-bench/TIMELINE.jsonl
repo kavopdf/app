@@ -1957,3 +1957,10 @@
 {"t": 1795285219.453534, "ist": "23:50:19", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795285219.5530524, "ist": "23:50:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795285219.575009, "ist": "23:50:19", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795285668.6746066, "ist": "23:57:48", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795285668.8665543, "ist": "23:57:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795286275.5936666, "ist": "00:07:55", "ev": "beat", "d": "fetching corpus; probing whether 32_stroke_lines can see Google's rasterized rules"}
+{"t": 1795286309.4813325, "ist": "00:08:29", "ev": "beat", "d": "converting 373+64 to find why their rules survive Google while 145 lose theirs"}
+{"t": 1795286395.165278, "ist": "00:09:55", "ev": "beat", "d": "converting all 213 to test: does 32 fail iff the docx carries no table-cell border"}
+{"t": 1795286516.5385041, "ist": "00:11:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795286528.9215398, "ist": "00:12:08", "ev": "beat", "d": "attempt.py: recording an attempt"}
