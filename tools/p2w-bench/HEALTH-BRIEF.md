@@ -229,6 +229,12 @@ cron and a zombie run - are not automatable at all.
     for two days while it was not true, and the watchdog was told to write "a person has to look" into
     BLOCKERS.md instead of doing the one thing it exists for.
 
+    **Measured again 21 Nov 15:08: this run does NOT have it.** Its declared tool list carries no `cron`
+    operation and two `tool_search` calls for one returned nothing, so the paragraph above describes the
+    prompt, not the tool list. The two are not the same thing, and this is the second time that
+    distinction has cost a day. **A watchdog must check its own tool list every run and say which world
+    it is in**, rather than trusting a sentence in this file - including this one.
+
 * **No `cron` tool** → do health, progress, `round.py --reopen` and `round.py --release-fixer`, then
   write into BLOCKERS.md: *"this watchdog has no cron tool; a paused or zombie cron cannot be moved
   by automation"* with the exact call it would have made. **Say it in the report.** A watchdog that
