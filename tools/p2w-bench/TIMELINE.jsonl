@@ -1823,3 +1823,8 @@
 {"t": 1795272531.3239717, "ist": "20:18:51", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795272531.4202552, "ist": "20:18:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795272531.4390335, "ist": "20:18:51", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795275682.6747506, "ist": "21:11:22", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795275682.7762985, "ist": "21:11:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795275690.8446636, "ist": "21:11:30", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795275954.0511837, "ist": "21:15:54", "ev": "beat", "d": "relay: corpus assembled 213/213, building engine"}
+{"t": 1795276112.4067822, "ist": "21:18:32", "ev": "beat", "d": "relay: census done, committing finding + tools"}
