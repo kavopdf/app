@@ -2,13 +2,13 @@ document,applicable,passed,failed,abstained,failed_ids
 01_stamp_rotated_15deg_upright,10,10,0,0,
 02_stamp_rotated_15deg_upleft,9,9,0,0,
 03_stamp_vertical_90deg,10,10,0,0,
-041122-Account_Opening_Form,10,6,4,4,t06_encoding t08_line_order t09_page_furniture t12_word_invention
+041122-Account_Opening_Form,10,7,3,3,t06_encoding t09_page_furniture t12_word_invention
 04_stamp_180deg_upside_down,10,10,0,0,
 05_round_company_seal_curved_text,9,8,1,1,t12_word_invention
 06_rect_paid_stamp_red_transparent,10,10,0,0,
 07_stamp_over_table,10,10,0,0,
 08_two_overlapping_stamps,10,10,0,0,
-09_stamp_font_not_embedded,9,8,1,1,t08_line_order
+09_stamp_font_not_embedded,9,9,0,0,
 10_stamp_as_image,10,10,0,0,
 11_stamp_with_signature_image,9,9,0,0,
 12_stamp_across_page_break,10,10,0,0,
@@ -55,7 +55,7 @@ document,applicable,passed,failed,abstained,failed_ids
 325_demat_holdings_statement,8,8,0,0,
 326_itr_computation,7,7,0,0,
 32_serif_nondefault_body,9,9,0,0,
-330_cad_drawing_sheet,7,6,1,1,t08_line_order
+330_cad_drawing_sheet,7,7,0,0,
 331_pid_diagram,7,7,0,0,
 332_bom_on_drawing,8,7,1,1,t02_position
 333_datasheet_spec_tables,7,7,0,0,
@@ -97,8 +97,8 @@ document,applicable,passed,failed,abstained,failed_ids
 392_statistical_console_output,7,7,0,0,
 393_spectrum_peak_table,7,7,0,0,
 394_map_with_legend,7,7,0,0,
-39_small_caps_letter_spacing,9,7,2,2,t01_word_accuracy t12_word_invention
-400_comic_page_speech_bubbles,7,6,1,1,t08_line_order
+39_small_caps_letter_spacing,9,6,3,3,t01_word_accuracy t08_line_order t12_word_invention
+400_comic_page_speech_bubbles,7,7,0,0,
 401_trifold_brochure,7,7,0,0,
 402_calendar_month_grid,7,7,0,0,
 403_crossword_puzzle,7,7,0,0,
@@ -120,7 +120,7 @@ document,applicable,passed,failed,abstained,failed_ids
 43_red_stamp_over_black_text,9,9,0,0,
 44_coloured_underlined_hyperlinks,9,9,0,0,
 45_coloured_callout_box,9,9,0,0,
-46_chart_coloured_labels_body_text,9,8,1,1,t08_line_order
+46_chart_coloured_labels_body_text,9,9,0,0,
 47_grey_body_black_headings,9,9,0,0,
 48_form_coloured_border_coloured_values,9,9,0,0,
 49_coloured_background_block_paragraph,9,9,0,0,
@@ -142,12 +142,12 @@ document,applicable,passed,failed,abstained,failed_ids
 62_two_col_newsletter_pull_quote,9,9,0,0,
 63_three_column_brochure,9,9,0,0,
 64_newspaper_uneven_columns_ad_boxes,9,9,0,0,
-65_two_col_full_width_figure_caption,9,8,1,1,t08_line_order
+65_two_col_full_width_figure_caption,9,9,0,0,
 66_two_col_footnotes_bottom,9,9,0,0,
 67_two_col_with_sidebar,9,9,0,0,
 68_journal_wide_table_spanning,9,9,0,0,
 69_two_col_legal_numbered_clauses,9,9,0,0,
-70_magazine_drop_cap_photo_caption,9,8,1,1,t08_line_order
+70_magazine_drop_cap_photo_caption,9,9,0,0,
 71_invoice_space_aligned_no_rules,10,10,0,0,
 72_bank_statement_no_rules_right_amounts,10,10,0,0,
 73_marksheet_subject_marks_grade,9,9,0,0,
@@ -158,7 +158,7 @@ document,applicable,passed,failed,abstained,failed_ids
 78_mixed_english_devanagari_line,9,9,0,0,
 79_inr_indian_digit_grouping_table,10,10,0,0,
 80_gstin_pan_cin_ifsc_table,9,9,0,0,
-Account_Opening_Form_Fillable_filled,10,6,4,4,t06_encoding t08_line_order t09_page_furniture t12_word_invention
+Account_Opening_Form_Fillable_filled,10,7,3,3,t06_encoding t09_page_furniture t12_word_invention
 academic-paper-ieee-2col-abstract,10,10,0,0,
 admission-form-labels-left-boxes-right,9,9,0,0,
 admit-card,9,9,0,0,
@@ -181,7 +181,7 @@ gst-invoice-multipage-item-table,12,11,1,1,t09_page_furniture
 gst-invoice-with-qr-code,10,10,0,0,
 insurance-policy-schedule,10,10,0,0,
 invoice-line-items-qty-rate-amount,10,10,0,0,
-itr-computation-with-slab-table,10,9,1,1,t08_line_order
+itr-computation-with-slab-table,10,10,0,0,
 journal-2col-with-footnotes,9,8,1,1,t12_word_invention
 landscape-page-inside-portrait-document,11,11,0,0,
 magazine-2col-pullquote-spanning,9,9,0,0,
