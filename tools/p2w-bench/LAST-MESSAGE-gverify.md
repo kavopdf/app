@@ -1,45 +1,44 @@
-# P2W Google Verify - Run Report
+# Google Verify - run report
 
-**21 Nov 2026 · 20:32 IST · stage classify**
+**Stage: classify.** This run measured nothing and changed no engine code. At classify the last job is
+the capability table, so it was regenerated from the committed results and pushed.
 
-> 192 of 213 measured in Google, 21 refused on page count. Google passes all 42 on 6; LibreOffice on 122.
-
-## Measured
+## The corpus, as the tools count it
 
 | | |
 |:--|--:|
-| scored | **192** |
+| documents in the corpus | **213** |
+| scored in Google | **192** |
 | refused on page count | **21** |
-| clean in Google | **6** |
-| clean in LibreOffice | **122** |
+| fail at least one check | **186** |
+| pass all 42 in Google | **6** |
+| pass all 42 in LibreOffice | **122** |
 
-## Checks Google fails and LibreOffice does not
+## Where the two renderers disagree
 
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `32\_stroke\_lines` | **145** | 1 |
-| `05\_chars\_extra` | **141** | 3 |
-| `18\_displacement` | **124** | 20 |
-| `04\_chars\_missing` | **66** | 2 |
-| `25\_invisible\_text` | **49** | 0 |
-| `59\_shape\_anchor` | **58** | 11 |
-| `60\_text\_column\_right\_edge` | **58** | 18 |
-| `45\_char\_accuracy` | **37** | 2 |
+| check | LibreOffice fails | Google fails |
+|---|---:|---:|
+| `32\_stroke\_lines` | 1 | **145** |
+| `05\_chars\_extra` | 3 | **141** |
+| `18\_displacement` | 20 | **124** |
+| `04\_chars\_missing` | 2 | **66** |
+| `25\_invisible\_text` | 0 | **49** |
+| `59\_shape\_anchor` | 11 | **58** |
+| `60\_text\_column\_right\_edge` | 18 | **58** |
+| `45\_char\_accuracy` | 2 | **37** |
 
-The first row is the class to take: `32\_stroke\_lines`, 145 documents in Google against 1 in LibreOffice.
+The first row is the class to take first: `32\_stroke\_lines`, 145 documents in Google against 1 in
+LibreOffice. A rule is emitted as a floating drawing, Google drops the shape and keeps the anchor.
 
-## What this run did
+## The stamp, stated plainly
 
-The stage is `classify`, so this run did no measuring and changed no engine code. It regenerated the
-capability table from the committed results of both renderers and committed it as
-`benchmarks/GOOGLE-VS-LIBREOFFICE.md`, so the classifier cron reads a table that matches the results
-on disk. The counts are unchanged from the previous run; only the ordering of tied rows moved.
+`gverify.py --report` is stricter than the table and counts only results written under the current
+engine stamp: 81 verified, of which 1 passes all 42, 59 fail at least one and 21 were refused on page
+count. The table joins all 192 scored documents, because the pair of renders is what names a construct
+and the stamp does not say which construct failed. So 81 is a re-measurement queue, not a second corpus.
 
-One caveat about the engine stamp. `gverify.py --report` counts only results written under the current
-engine stamp, while the table joins every scored document, because a renderer pair is what names a
-construct and the stamp says nothing about which construct failed. The results committed before the
-stamp existed were measured on a `.docx` the tree still produces byte-identically, so the pair is
-sound; the stamp gap is a re-measurement queue, not a wrong table.
+## What is next
 
-Next: the classifier groups the 186 failing documents into classes, and the fixer takes one class at a
-time.
+`stage.py` says: classify 186 failing documents - the table is older than the results. That table is
+`DEFECT-CLASSES-GOOGLE.md`, written by the classifier cron. Until that cron rewrites it the stage cannot
+advance to fix, and this cron's classify action repeats. Nothing in this run's remit can move it.
