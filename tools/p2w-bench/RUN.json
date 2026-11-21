@@ -3,11 +3,17 @@
  "started": "13:54",
  "ended_ts": null,
  "ended": null,
- "class": "",
- "attempts": 0,
- "kept": 0,
- "docs_improved": 0,
+ "class": "t01_word_accuracy",
+ "attempts": 2,
+ "kept": 2,
+ "docs_improved": 1,
  "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0
+ "needs_human": 0,
+ "counted": [
+  [
+   "t01_word_accuracy",
+   1
+  ]
+ ]
 }

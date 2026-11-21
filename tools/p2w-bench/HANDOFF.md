@@ -86,8 +86,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `00:57` attempt 8 on t01_word_accuracy -> reverted (0/5 moved)
-- `01:41` agent deployed: t01_word_accuracy / A - is the handed diagnosis (nested form matrix disagreement, rotated line off page)
 - `01:41` agent deployed: t01_word_accuracy / B - why does 39_small_caps_letter_spacing lose 8 words and invent 2 - writer or refe
 - `01:41` agent landed: t01_word_accuracy / A -> FINDINGS/411-nested-xobject-matrix-1940.md
 - `01:41` agent landed: t01_word_accuracy / B -> FINDINGS/39-small-caps-gap-threshold-0150-fixer.md
@@ -111,6 +109,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `11:34` agent landed: t02_position / A -> tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md
 - `11:35` attempt 1 on t02_position -> error
 - `13:43` attempt 14 on 47_margins -> error
+- `14:42` attempt 17 on t01_word_accuracy -> kept (1/5 moved)
+- `14:42` attempt 18 on t01_word_accuracy -> kept (1/5 moved)
 
 ## Where the rest of the state lives
 

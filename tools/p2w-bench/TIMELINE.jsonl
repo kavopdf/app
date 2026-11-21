@@ -1593,3 +1593,12 @@
 {"t": 1795251683.0505073, "ist": "14:31:23", "ev": "beat", "d": "writer dedupe + checker dedupe measured: 188->189, 0 regressions, 1 of 213 txt changed"}
 {"t": 1795251785.8911533, "ist": "14:33:05", "ev": "beat", "d": "gate PASS; proving docx byte-identity (convert corpus to .docx on both trees)"}
 {"t": 1795252275.8673005, "ist": "14:41:15", "ev": "beat", "d": "two commits pushed: clip-off and doubled-draw; 186->189 clean"}
+{"t": 1795252338.8249803, "ist": "14:42:18", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795252339.20004, "ist": "14:42:19", "ev": "attempt", "d": "t01_word_accuracy -> kept"}
+{"t": 1795252339.3418176, "ist": "14:42:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795252339.492226, "ist": "14:42:19", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795252342.578779, "ist": "14:42:22", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795252343.0300753, "ist": "14:42:23", "ev": "attempt", "d": "t01_word_accuracy -> kept"}
+{"t": 1795252343.225882, "ist": "14:42:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795252343.4538686, "ist": "14:42:23", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795252343.8505237, "ist": "14:42:23", "ev": "beat", "d": "classrow.py: refreshing the class file"}
