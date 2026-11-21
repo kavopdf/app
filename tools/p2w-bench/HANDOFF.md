@@ -20,7 +20,7 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 19:00 |
-| ended | 19:02 |
+| ended | 19:22 |
 | how it ended | forced |
 | plan | - |
 
