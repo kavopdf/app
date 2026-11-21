@@ -1,18 +1,16 @@
-# P2W Fixer — Run Report
+**21 Nov 2026 · slot 22:56 → running IST · 18 min**
 
-**21 Nov 2026 · slot 21:53 → running IST · 59 min** (this relay claimed it at 22:13)
-
-> This relay force-released a claim it called dead. The claim was alive: the 21:53 run had been
-> working for 20 minutes without a single beacon and pushed its fix at 17:08 UTC, 25 minutes after
-> I took its slot. It had already landed the t08 correction. So this run rebuilt the same fix,
-> measured it independently, and then found the thing nobody had noticed — **that landed fix had
-> wedged the commit gate for every run after it.** That is what this slot actually repaired.
+> I spent this slot answering a question nobody had asked, and the answer is that the largest
+> class in the corpus is measured by an instrument that cannot see the thing it is measuring.
+> Check 32 scores a rule **LOST when Google drew it**. I proved that in both directions on
+> Google's own exports, and then proved that fixing it still does not make one document clean -
+> so it is a correction and a lead, not a fix, and I have not landed it.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **9** — 1 attempt(s), 1 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -21,106 +19,92 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `t08_line_order` |
+| Working on | `32_stroke_lines` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 22:38 | **kept** | 9/10 | t08 ground truth was PyMuPDF paint order, not reading order: sort each page's upright lines by (round(y,1),x) in the t08 block only. All 213 .txt rescored with the same engine: clean 190->197, t08 fai |
-| 23:00 | **kept** | 0/0 | the gate, not the corpus: `RANKING-TXT-BASELINE.csv` was never restamped for that correction, so 10 rows disagreed with `RANKING-TXT.csv` and `regress.py` refused every commit — 39_small_caps as a "new failing: t08_line_order". Restamped both tables from one pass over the 213 .txt files. |
+| 23:13 | **lead** | 0/192 | CHECK BLIND TO PICTURES, measured both ways. _rule_segments() (verify_google.py:1082) walks get_drawings() only; Google exports every anchored shape as a raster image, so a rule it drew reads as zero |
 
-## The one measurement this run made that the other run did not
+## The class I chose, and why
 
-The 21:53 run falsified its own change. This run falsified it again, independently, with a different
-instrument: a synthetic page whose six lines are **painted in scrambled order** (DELTA, ALPHA,
-FOXTROT, BRAVO, ECHO, CHARLIE) at descending visual y, and two `.txt` files over it — one in visual
-order, which is the correct `.txt`, and one with two lines deliberately exchanged.
+I did not take the tool's suggestion. `classpick.py` said `t08_line_order`, worth about 10 clean
+documents, whose `.txt` half already moved 9. I took `32_stroke_lines` for the arithmetic in
+`classpick.py --leverage`: it is worth **36.3 clean documents**, the largest single figure in the
+corpus, and it travels with `05_chars_extra` (35.0) and `18_displacement` (28.6) as **one construct** -
+41 of the 192 scored documents fail *nothing but* those three checks. One fix there is 41 documents.
+It is also the class with six attempts and zero movement, which by the brief's own standard is the
+reason to look harder at it rather than the reason to leave.
 
-| `.txt` over that page | before the sort | after the sort |
-|:--|:--|:--|
-| visual order (correct) | **FAIL** — t08 4 of 6 in order | **PASS** — 6 of 6 |
-| two lines swapped | FAIL — 4 of 6 | **FAIL** — 5 of 6 |
+## Why nothing landed
 
-Both halves matter. The old check failed a `.txt` that was right; the new one still fails a `.txt`
-that is wrong. On the corpus, both verifiers run over **identical** `.txt` bytes: **190 clean → 197,
-0 lost.**
+Because the fix I found is not a fix. Two documents fail nothing but `32_stroke_lines`:
+`394_map_with_legend` and `407_id_card_front_back`. I converted both with the current engine, put them
+through Google Docs, exported them and scored them with check 32's own predicate. Making the check see
+picture-drawn rules recovers **1 of the 3 rules on `394`** and **18 of the 46 on `407`** (its vertical ones, drawn as
+15.0 x 1.5 pt raster strips at exactly the source x positions). Both still fail. The brief is explicit:
+if nothing becomes clean, it cannot be a fix. So it is recorded as a lead with the patch on disk.
 
-## The document that gains a check, and why it is not a loss
+## The one measurement this run made that nobody had made
 
-`39_small_caps_letter_spacing` flips t08 pass → fail (21 of 22 lines in visual order). It is not clean
-under either verifier — it fails `t01_word_accuracy` at 97.4 % and `t12_word_invention` at 2 — so no
-clean document is lost. The line really is out of visual order in its `.txt`; the old check could not
-see it because the paint order happened to match. `305_vaccination_certificate` is the same story (32
-of 33). Those two are now a real, honest class: **the writer's line order**, 2 documents, visible for
-the first time.
+Six previous attempts argued about **which construct** to emit, because the class table said Google
+drops the rules. It does not. Uploaded one at a time to Google Docs and measured from the export:
 
-## The gate was wedged, and that was the emergency
+| construct | asked | Google drew | error | chars added | body text moved |
+|:--|--:|--:|--:|--:|--:|
+| the engine's own carrier paragraph | y = 140.0 | **139.88** | **-0.12 pt** | 0 | 0.69 pt |
+| the same anchor inside a body paragraph | y = 140.0 | **139.88** | **-0.12 pt** | 0 | **0.00 pt** |
+| floating table, `tcBorders/bottom` | y = 140.0 | 140.50 | +0.50 pt | 0 | 0.00 pt |
+| `w:pBdr` on an empty paragraph | y = 140.0 | 141.50 | +1.50 pt | 0 | **+19.91 pt** |
+| `w:pgBorders` | y = 140.0 | not drawn | - | 0 | 0.00 pt |
 
-`bd1c2e5` rewrote `RANKING-TXT.csv` but not `RANKING-TXT-BASELINE.csv`. Ten rows disagreed. The
-pre-commit hook reads that as a regression and refuses — not just a txt commit, **every** commit from
-every cron. From 17:08 UTC nothing could land. `restamp_txt.py --run --apply` rewrote both tables from
-one scoring pass: 213 rows, 197 clean (92.5 %), and `regress.py --check` passes again.
+Google honours the engine's existing construct to a tenth of a point. `w:pgBorders` is the only one it
+drops, and `w:pBdr` costs 19.91 pt of flow - the same per-carrier cost the 17:39 refutation measured,
+which is why that path has died twice.
 
-## Why the relay took a live run's slot
+## The lead that outlives the run
 
-A corpus pass writes no beacon. `corpus-fetch.sh` (20 s), `build-engine.sh` (49 s), `ConvertAll` over
-213 PDFs (124 s) and 213 `compare()` calls (59 s) are six minutes of the work the brief asks for, and
-not one of them touches `fixer_last_beat`. Two in sequence beat the 20-minute window `status.py` calls
-SILENT and the 45-minute window `CLAIM_STALE_MIN["fixer"]` calls stale. A healthy run and a dead one
-are the same object in git. Recorded in `BLOCKERS.md` with the two fixes: beat inside the long steps,
-and size the window above the longest measurement a run performs.
+The isolated rule draws perfectly on a clean page. The same construct draws **1 of its 3** on `394` and
+**0 of 28 horizontals** on `407`. `394` carries 25 images on one page; `407` carries 41. The variable
+that separates the probe from the corpus is **how crowded the page is, not the construct** - a
+hypothesis no previous attempt has tested, because every one of them was changing the XML.
 
-## Subagents
+Cheap test for the next run: N copies of the same anchored rule on one page, N = 1, 2, 4, 8, 16, 32,
+one export, find where Google stops placing them. If there is a threshold, the fix is to stop emitting
+one anchored object per rule, not to change what a rule is made of.
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|:--:|:--:|--:|
-| `t08_A-01` | does t08 measure line order or drawing order, decide | 22:39 | code reading | 24 min |
-| `32_sA-02` | a census of every rule in the failing documents by p | 22:39 | - | - |
+## The instrument defect, and why it is not landed
 
-**One agent, not two, and the second one did not run at all.** The one that did returned the code
-reading that named the asymmetry (`_src_pages` appends unsorted; `PdfToWord.java:3733/5018` sorts by
-y), verified the 10-document set against the committed tables, and ran out of its budget before the
-falsification — so I built the control pair myself. It also ran synchronously and cost 24 minutes of
-the slot, which is why this run had one angle and not three.
+`_rule_segments()` (`verify_google.py:1082`) walks `get_drawings()` and nothing else. The file already
+says in capitals, above `_strokes()`, that Google's export has no vector paths at all and that
+`_stroke_pictures()` fixes the render side - and `_strokes()` calls it. `_rule_segments()` was written
+later, is the path check 32 actually uses, and never calls it. The two return different shapes
+(`{rect,width,colour}` against `{o,perp,a,b,t,col}`), which is why they were never merged; merging them
+naively raises `KeyError: 't'`. The patch that maps one into the other is
+`patches/rule-segments-see-pictures.patch`.
 
+It is not applied. It can only turn lost to matched, so it can never make a document worse, but the size
+of the flip across 192 Google documents is **unmeasured**, and changing a check on an unmeasured corpus
+is how a tool ends up passing everything. A corpus pass measures that column first; then it is a
+one-line switch.
 
-## The gate was wedged, and that was the emergency
+## Falsification, in both directions
 
-`bd1c2e5` rewrote `RANKING-TXT.csv` but not `RANKING-TXT-BASELINE.csv`. Ten rows disagreed. The
-pre-commit hook reads that as a regression and refuses — not just a txt commit, **every** commit from
-every cron. From 17:08 UTC nothing could land. `restamp_txt.py --run --apply` rewrote both tables from
-one scoring pass: 213 rows, 197 clean (92.5 %), and `regress.py --check` passes again.
+Ten probe `.docx` were uploaded to Google Docs and exported. `rule-base` asks for no rule at all;
+`rule-v6_pgborder` uses `w:pgBorders`, which Google drops. Those are the negatives.
 
+| Google export | construct | BEFORE | AFTER | must be |
+|:--|:--|:--|:--|:--|
+| `rule-base` | no rule in the docx | 0 matched / **1 lost** | 0 matched / **1 lost** | stays LOST |
+| `rule-v6_pgborder` | `w:pgBorders` | 0 matched / **1 lost** | 0 matched / **1 lost** | stays LOST |
+| `rule-v1_drawing` | the engine's own carrier | 0 matched / 1 lost | **1 matched / 0 lost** | becomes MATCHED |
+| `rule-v1b_inline` | anchor in a body paragraph | 0 matched / 1 lost | **1 matched / 0 lost** | becomes MATCHED |
+| `rule-v3_tblppr` | floating table border | 1 matched / 0 lost | 1 matched / 0 lost | unchanged |
+| `rule-v2_pbdr` | `w:pBdr/w:bottom` | 1 matched / 0 lost | 1 matched / 0 lost | unchanged |
 
-## Why the relay
-
-A corpus pass writes no beacon. `corpus-fetch.sh` (20 s), `build-engine.sh` (49 s), `ConvertAll` over
-213 PDFs (124 s) and 213 `compare()` calls (59 s) are six minutes of the work the brief asks for, and
-not one of them touches `fixer_last_beat`. Two in sequence beat the 20-minute window `status.py` calls
-SILENT and the 45-minute window `CLAIM_STALE_MIN["fixer"]` calls stale. A healthy run and a dead one
-are the same object in git. Recorded in `BLOCKERS.md` with the two fixes: beat inside the long steps,
-and size the window above the longest measurement a run performs.
-
-
-
-## The gate was wedged, and that was the emergency
-
-`bd1c2e5` rewrote `RANKING-TXT.csv` but not `RANKING-TXT-BASELINE.csv`. Ten rows disagreed. The
-pre-commit hook reads that as a regression and refuses — not just a txt commit, **every** commit from
-every cron. From 17:08 UTC nothing could land. `restamp_txt.py --run --apply` rewrote both tables from
-one scoring pass: 213 rows, 197 clean (92.5 %), and `regress.py --check` passes again.
-
-
-## Why the relay
-
-A corpus pass writes no beacon. `corpus-fetch.sh` (20 s), `build-engine.sh` (49 s), `ConvertAll` over
-213 PDFs (124 s) and 213 `compare()` calls (59 s) are six minutes of the work the brief asks for, and
-not one of them touches `fixer_last_beat`. Two in sequence beat the 20-minute window `status.py` calls
-SILENT and the 45-minute window `CLAIM_STALE_MIN["fixer"]` calls stale. A healthy run and a dead one
-are the same object in git. Recorded in `BLOCKERS.md` with the two fixes: beat inside the long steps,
-and size the window above the longest measurement a run performs.
-
+Both negatives held and both positives gained: the change invents no rule where there is none and does
+not paper over a rule Google genuinely lost.
 
 ## The txt
 
@@ -135,30 +119,34 @@ and size the window above the longest measurement a run performs.
 ## Subagents
 
 | Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `t08_A-01` | does t08 measure line order or drawing order, decide | 22:39 | - | - |
-| `32_sA-02` | a census of every rule in the failing documents by p | 22:39 | - | - |
+|:--|:--|:--:|:--:|:--|
+| `rule-census` | which construct Google actually draws, at what y, with what cost | 22:58 | **the construct table above**, 10 Google round trips | 12 min |
+
+**One agent, not two.** The second would have been the `t08` `.docx` half, and I did not send it
+because the leverage arithmetic put `32_stroke_lines` at 36.3 against `t08`'s 10. The census agent
+returned inside the turn, so it cost nothing in waiting - but it also means this run has one angle,
+and the crowding hypothesis it produced is untested.
+
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 21:53 → running · 1h 00m |
+| Slot window | 22:56 → running · 18 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 16 |
-| Longest silence | **24.3 min** — from 21:53:34, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 5 |
-| Obstacles | 1 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 11 |
+| Longest silence | **14.4 min** — from 22:56:17, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 1 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **13 min** | `#####` |
-| measure or build - a conversion, screen or compile writes no beacon | **30 min** | `###########` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **14 min** | `#####` |
+| measure or build - a conversion, screen or compile writes no beacon | **16 min** | `###################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| other - not attributed to a tool | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -171,16 +159,9 @@ and size the window above the longest measurement a run performs.
 
 ## Next run
 
-The txt half is at 197 of 213 and the biggest single remaining class is `t12_word_invention` (8
-documents) — not t08, which is now down to 2 and both are real writer faults. But the reason this slot
-was worth spending is the gap the charter names: **6 clean in Google across 192 scored documents, against 197 of 213 in
-txt.** Nothing this run touched the .docx half. The 20:57 run's bottom-edge probe is still the whole
-of the next run's first ten minutes and it is written out in full in its own report: take the
-per-rule carrier's `73_marksheet` output, set table 2 to `tblpY 12000` (600 pt), and read whether the
-second band honours its anchor. If it does, the `32_stroke_lines` class is worth 134 documents instead
-of 1. Stage the `.docx` through Google Drive directly — this sandbox has the Drive tools, and the
-release-asset detour the last run recorded as a breach is not needed.
+Judge the t08 verifier question before touching the engine: is t08_line_order measuring line order or drawing order? FINDINGS/t08_line_order-DRAWING-ORDER-1740.md has the numbers (10 of 10 rows clear when only our own line sequence is put into drawing order). The agent's proposed one-line sort of _src_pages is NOT obviously right - it would compare sorted-vs-sorted. Decide with a falsification: construct a .txt whose lines are deliberately swapped in y and confirm t08 still fires after the change. Then take t01_word_accuracy's .docx half or 32_stroke_lines' cell-border construct.
+
+> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
 ---
-*Every number read from `RANKING-TXT.csv`, `RANKING-TXT-BASELINE.csv`, `RESULTS`/`pair.json` on
-identical bytes, `ROUND.json`, `TIMELINE.jsonl`, `report.py` and `git log`. Never remembered.*
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

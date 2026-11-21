@@ -711,5 +711,28 @@
   "obstacles_cleared": 0,
   "needs_human": 0,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795278214.9096668,
+  "started": "21:53",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "t08_line_order",
+  "attempts": 1,
+  "kept": 1,
+  "docs_improved": 9,
+  "agents": [
+   "t08_A-01",
+   "32_sA-02"
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "counted": [
+   [
+    "t08_line_order",
+    9
+   ]
+  ],
+  "ended_how": "killed - never released the slot"
  }
 ]

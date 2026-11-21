@@ -1902,3 +1902,18 @@
 {"t": 1795282941.4886272, "ist": "23:12:21", "ev": "beat", "d": "docs converted; trying Drive round trip for 394+407 to measure the instrument fix on real documents"}
 {"t": 1795283010.5599263, "ist": "23:13:30", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795283029.8994038, "ist": "23:13:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795283032.67239, "ist": "23:13:52", "ev": "attempt", "d": "32_stroke_lines -> lead"}
+{"t": 1795283032.7446432, "ist": "23:13:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795283032.8466048, "ist": "23:13:52", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795283078.0173192, "ist": "23:14:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795283078.4935994, "ist": "23:14:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795283078.7678094, "ist": "23:14:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795283081.3807213, "ist": "23:14:41", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795283083.7725654, "ist": "23:14:43", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795283086.85778, "ist": "23:14:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795283098.9950082, "ist": "23:14:58", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795283099.5073435, "ist": "23:14:59", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795283099.8207972, "ist": "23:14:59", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795283104.9023669, "ist": "23:15:04", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795283105.4021418, "ist": "23:15:05", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795283105.7086146, "ist": "23:15:05", "ev": "beat", "d": "report.py: building the report"}

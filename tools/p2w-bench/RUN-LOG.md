@@ -1,5 +1,3 @@
-| 13 Nov 11:08 | baseline | measured 600_reviewed_invoice_with_annotations 43/59 docx, 4/5 txt |
-| 13 Nov 11:09 | baseline | measured 601_fillable_admission_form 44/59 docx, 4/5 txt |
 | 13 Nov 11:10 | baseline | measured 602_bookmarked_annual_report 53/59 docx, 4/5 txt |
 | 13 Nov 11:11 | baseline | released slot, advanced measure -> classify |
 | 13 Nov 11:24 | classifier | slot claimed - classifier running |
@@ -198,3 +196,5 @@
 | 21 Nov 21:33 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 21 Nov 21:53 | fixer | slot claimed - fixer running |
 | 21 Nov 22:38 | fixer | attempt t08_line_order -> kept (9/10 moved) |
+| 21 Nov 22:56 | fixer | slot claimed - fixer running |
+| 21 Nov 23:13 | fixer | attempt 32_stroke_lines -> lead (0/192 moved) |

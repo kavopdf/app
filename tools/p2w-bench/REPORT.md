@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-21 21:53
+# Fixer report - 2026-11-21 22:56
 
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 21:53 → running IST · 1h 00m**
+**21 Nov 2026 · slot 22:56 → running IST · 18 min**
 
-> **041122-Account_Opening_Form** improved — 4.00 → 3.00. Corpus ratchet clean across 213 documents.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **9** — 1 attempt(s), 1 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,13 +20,13 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `t08_line_order` |
+| Working on | `32_stroke_lines` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 22:38 | **kept** | 9/10 | t08 ground truth was PyMuPDF paint order, not reading order: sort each page's upright lines by (round(y,1),x) in the t08 block only. All 213 .txt rescored with the same engine: clean 190->197, t08 fai |
+| 23:13 | **lead** | 0/192 | CHECK BLIND TO PICTURES, measured both ways. _rule_segments() (verify_google.py:1082) walks get_drawings() only; Google exports every anchored shape as a raster image, so a rule it drew reads as zero |
 
 ## The txt
 
@@ -40,31 +40,27 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `t08_A-01` | does t08 measure line order or drawing order, decide | 22:39 | - | - |
-| `32_sA-02` | a census of every rule in the failing documents by p | 22:39 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 21:53 → running · 1h 00m |
+| Slot window | 22:56 → running · 18 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 16 |
-| Longest silence | **24.3 min** — from 21:53:34, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 5 |
-| Obstacles | 1 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 11 |
+| Longest silence | **14.4 min** — from 22:56:17, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 1 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **13 min** | `#####` |
-| measure or build - a conversion, screen or compile writes no beacon | **30 min** | `###########` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **14 min** | `#####` |
+| measure or build - a conversion, screen or compile writes no beacon | **16 min** | `###################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| other - not attributed to a tool | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
