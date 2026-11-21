@@ -1,17 +1,14 @@
-# Fixer report - 2026-11-21 13:18
-
-```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 13:18 → running IST · 13 min**
+**21 Nov 2026 · slot 13:54 → running IST · 50 min**
 
-> No change was kept this run. The numbers below say what was tried.
+> **38_faux_bold_italic_synthesised** improved — 2.00 → 0.00. Corpus ratchet clean across 213 documents.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **1** — 2 attempt(s), 2 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -21,51 +18,55 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
+| Committed | **19** files in 4 commit(s) from `8add959` — ATTEMPTS.json, CLASS-HISTORY.jsonl, ENGINE-STAMP.json, HANDOFF.json, HANDOFF.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, RESTAMP-TXT.jsonl, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, STATE-TXT. |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 13:30 | **reverted** | 0/6 | SIXTEENTH ATTEMPT, measurement only, no code changed. The open question from 23:25 - is the raw-code fallback right, or does it write a ligature as an accented letter - is answered from the rendered p |
+| 14:42 | **kept** | 1/5 | clip-off: 411_nested_xobject_transforms t01 90.0->100.0, 12_stamp_across_page_break t12 also clean; corpus 186->188, 0 regressions |
+| 14:42 | **kept** | 1/5 | doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical |
 
 ## The txt
 
 | | |
 |:--|:--|
 | Scored | **213** of 213 |
-| Clean - every applicable check passes | **186** (87.3%) |
-| Failing at least one check | **27** |
+| Clean - every applicable check passes | **189** (88.7%) |
+| Failing at least one check | **24** |
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t08_line_order` - 10 documents |
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `t01_sA-01` | What Unicode each of the four Effra CIDs really is,  | 13:20 | 13:25 | 5 min |
-| `t01_sB-02` | What letters the rendered page visibly draws at thos | 13:23 | 13:26 | 3 min |
+Two, both on the class itself, both returned before the first attempt:
+
+| Agent | Sent to find | What it returned |
+|:--|:--|:--|
+| `t01-A` | which words each of the five documents actually loses, and why | the five lost-token lists and a cause per document; 411 and 38 were source-side artefacts, 601 the only writer loss |
+| `t01-B` | the corpus blast radius of the two source-side changes | 208 -> 210 of 213 on t01, 0 regressions, 3 documents touched - reproduced here before anything was changed |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:18 → running · 13 min |
+| Slot window | 13:54 → running · 50 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 16 |
-| Longest silence | **10.0 min** — from 13:19:20, after `relay/fixer: t01, launching two agents then the 4c render` |
-| Silences over 2 min | 1 |
-| Obstacles | 4 cleared · 2 parked, with the evidence to re-open them |
-| Still a wall | **`stage.py` still counts a result file as a measurement, so it says `classify` while the measurement is not f |
+| Tool beats | 23 |
+| Longest silence | **20.4 min** — from 13:54:18, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 6 |
+| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | **`stage.py` can never print `measure-google` again, so the results with no engine stamp will never be re-meas |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **0 min** | `##` |
-| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `#################` |
-| report - the report and the chain | **1 min** | `##` |
-| other - not attributed to a tool | **0 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **38 min** | `#################` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **9 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -76,13 +77,41 @@
 | `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
 | `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
 
+## What the .txt work was, and why the .docx table is right to be still
+
+The class was `t01_word_accuracy` (5 documents). Two attempts, both kept, and both were
+source-side or writer-side faults rather than a converter that could not draw:
+
+* **The check clipped the page to the media box.** `get_text()` with its default flags drops
+  a line drawn even slightly outside the media box from the SOURCE word list, so the writer
+  was charged for a word it had faithfully emitted. On `411_nested_xobject_transforms` a
+  rotated heading at y = -2.5..-16.4 survived as the two stray characters S and O.
+* **A line drawn more than once at one place is one line** - and both sides got it wrong.
+  Faux bold draws the same string two or three times at an identical bounding box; the writer
+  built two paragraphs from the overlapping draws, and the check counted every copy. Fixed
+  together, because each half alone was a wash: the check alone moved the fault to `t12`, the
+  writer alone gained nothing while the check still charged it.
+
+The `.docx` table did not move, and that is the correct answer, not an omission. `scope.py`
+named `TxtWriter.write` and `TxtWriter.appendPara` - scope `txt`. Proved rather than trusted:
+the whole corpus converted to `.docx` on the patched tree and on HEAD, every zip member
+compared - 213 of 213 identical, 0 differing.
+
+## Next run
+
+`t01_word_accuracy` is down to three documents and none of them is a clipping or a doubling
+fault. `FINDINGS/t01-doubled-draw-both-sides-142100.md` carries the measurement for each:
+
+* `39_small_caps_letter_spacing` and `77_arabic_rtl_document` are **word-boundary
+  disagreements** between PyMuPDF and PDFBox, in opposite directions. Both already fail `t12`
+  too, which is the signature of segmentation rather than missing content. A segmentation
+  change moves both t01 and t12 on every RTL and letter-spaced document and needs its own
+  blast radius before it lands.
+* `601_fillable_admission_form` is the only genuine writer-side loss left: the two ticks exist
+  only in widget `/AP` streams and PDFBox never walks appearances. That is a `convert()` change
+  - scope BOTH - so it needs the `.docx` score measured, not just its bytes proved.
+
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-```
-
-Written by report.py from committed files only. Every number above is read from
-ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
-and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
