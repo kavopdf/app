@@ -32,7 +32,7 @@ WHAT THIS DELIBERATELY DOES NOT DO. It does not decide anything a measurement ca
 carry a list of classes, a list of documents or a list of checks - all three come from the results. It
 only records which stage the evidence says we are in, so that five crons do not disagree about it.
 """
-import argparse, json, os, sys
+import argparse, json, os, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -88,6 +88,27 @@ def measured():
     return ok, refused
 
 
+def _last_commit(rel):
+    """Unix time of the last commit that touched `rel`, or 0 when git cannot say.
+
+    NOT mtime. A fresh clone stamps every file with the checkout time, so on any
+    sandbox that starts from `git clone` two files' mtimes differ by whatever order
+    tar happened to unpack them in. Measured 21 Nov: benchmarks/DEFECT-CLASSES.md
+    read 05:47:52 against gverify's newest 05:47:53 - one second apart, decided by
+    extraction order, and therefore a coin flip that landed on `classify` on every
+    single run. Three watchdog passes blamed the classifier cron for it.
+
+    A commit timestamp is real history and survives the clone. It is the only clock
+    in this repository that means the same thing on every sandbox.
+    """
+    try:
+        out = subprocess.run(["git", "-C", ROOT, "log", "-1", "--format=%ct", "--", rel],
+                             capture_output=True, text=True, timeout=30)
+        return int((out.stdout or "").strip() or 0)
+    except Exception:
+        return 0
+
+
 def failing():
     """Documents with at least one failing check, from the Google results."""
     out = []
@@ -139,13 +160,22 @@ def compute():
                         % (ok - lo)}
     if bad:
         # Classification is done when the table names a class for every failing document.
-        classes = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
-        have = os.path.getmtime(classes) if os.path.exists(classes) else 0
-        newest = 0
-        if os.path.isdir(GVERIFY):
-            for f in os.listdir(GVERIFY):
-                newest = max(newest, os.path.getmtime(os.path.join(GVERIFY, f)))
-        if have < newest:
+        #
+        # TWO DEFECTS FIXED HERE, 21 Nov, and they are why this stage read `classify` for a
+        # day while the table was three hours newer than the results it summarises:
+        #
+        #  1. It compared against benchmarks/DEFECT-CLASSES.md - the PREVIOUS pipeline's ghost
+        #     of verify_google check ids, which nothing regenerates. The live table is
+        #     DEFECT-CLASSES-GOOGLE.md, written by classify_google.py and read by classpick.py
+        #     and the fixer. This comparison could not see the classifier's work at all.
+        #  2. It compared filesystem mtimes, which a fresh clone destroys. See _last_commit().
+        #
+        # Proved on 21 Nov: gverify's last commit 42bdcda 01:44:38, the live table's last
+        # commit e86a88a 04:47:32. The table is current; the old code called it stale.
+        classes = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES-GOOGLE.md")
+        have = _last_commit(os.path.join("benchmarks", "DEFECT-CLASSES-GOOGLE.md"))
+        newest = _last_commit(os.path.join("benchmarks", "gverify"))
+        if not os.path.exists(classes) or (have and have < newest):
             return {"stage": "classify", "total": total, "measured": done,
                     "scored": ok, "refused": refused,
                     "failing": len(bad),

@@ -405,4 +405,4 @@
 | 21 Nov 10:36 | fixer | build-engine | started |
 | 21 Nov 10:37 | fixer | build-engine | engine built in 37s |
 | 21 Nov 10:39 | fixer | attempt | t01_word_accuracy -> reverted (0/213 moved) |
-| 21 Nov 11:16 | ? | attempt | t01_word_accuracy -> partial (0/5 moved) |
+| 21 Nov 11:18 | fixer | claim | fixer claimed the slot |

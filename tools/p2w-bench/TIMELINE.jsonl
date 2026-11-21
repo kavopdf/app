@@ -1443,29 +1443,10 @@
 {"t": 1795238138.3074818, "ist": "10:45:38", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795238138.4004817, "ist": "10:45:38", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795238138.416112, "ist": "10:45:38", "ev": "killed", "d": "dead claim cleared by force release"}
-{"t": 1795240001.0167267, "ist": "11:16:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795240001.268367, "ist": "11:16:41", "ev": "attempt", "d": "t01_word_accuracy -> partial"}
-{"t": 1795240001.3603103, "ist": "11:16:41", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795240001.4544535, "ist": "11:16:41", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795240034.9731765, "ist": "11:17:14", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240035.4009175, "ist": "11:17:15", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240035.6947405, "ist": "11:17:15", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240039.1225476, "ist": "11:17:19", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240049.6553369, "ist": "11:17:29", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240052.4131315, "ist": "11:17:32", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240059.5426598, "ist": "11:17:39", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240060.0112963, "ist": "11:17:40", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240060.3254647, "ist": "11:17:40", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240065.0091083, "ist": "11:17:45", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240065.4759097, "ist": "11:17:45", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240065.7684877, "ist": "11:17:45", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240073.9436214, "ist": "11:17:53", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240080.780859, "ist": "11:18:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795240080.973421, "ist": "11:18:00", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240089.1234593, "ist": "11:18:09", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240103.706055, "ist": "11:18:23", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240104.1727743, "ist": "11:18:24", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240104.4526584, "ist": "11:18:24", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240112.0321007, "ist": "11:18:32", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240112.5128734, "ist": "11:18:32", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795240112.7998245, "ist": "11:18:32", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795240115.1341026, "ist": "11:18:35", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795240115.410613, "ist": "11:18:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795240132.1216989, "ist": "11:18:52", "ev": "beat", "d": "claimed, reading handoff"}
+{"t": 1795240132.551983, "ist": "11:18:52", "ev": "beat", "d": "archive.py: housekeeping"}
+{"t": 1795240136.5835953, "ist": "11:18:56", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795240170.4146197, "ist": "11:19:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795240176.6038265, "ist": "11:19:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
