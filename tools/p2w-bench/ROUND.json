@@ -1,8 +1,10 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
+  "fixer_doing": "relay: writing the finding; engine change is a measured lead, patch saved",
+  "fixer_doing_since": 1795288657.553894,
   "fixer_engine_at_claim": "462353f",
-  "fixer_last_beat": 1795286395.1655972,
+  "fixer_last_beat": 1795288657.5538952,
   "fixer_started": 1795286707.6863673,
   "history": [
     {

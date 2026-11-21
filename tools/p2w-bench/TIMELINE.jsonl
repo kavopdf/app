@@ -1977,3 +1977,33 @@
 {"t": 1795286588.9139733, "ist": "00:13:08", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795286589.0084462, "ist": "00:13:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795286589.0293412, "ist": "00:13:09", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795286723.257143, "ist": "00:15:23", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795286723.4399855, "ist": "00:15:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795286730.4805405, "ist": "00:15:30", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795287813.426886, "ist": "00:33:33", "ev": "beat", "d": "relay: trailing-para theory refuted corpus-wide (100% prevalence, 373 counter-example); building engine to test tcBorders carrier in Google"}
+{"t": 1795288004.3748617, "ist": "00:36:44", "ev": "beat", "d": "relay: carrier geometry verified in XML (tblpX/tblpY exact); uploading 17+53 to Google for the export diagnostic"}
+{"t": 1795288202.0474708, "ist": "00:40:02", "ev": "beat", "d": "relay: fix landed in engine (empty block after each rule carrier); rebuilding and converting corpus"}
+{"t": 1795288657.5532086, "ist": "00:47:37", "ev": "beat", "d": "relay: writing the finding; engine change is a measured lead, patch saved"}
+{"t": 1795288980.5121267, "ist": "00:53:00", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795288986.8464534, "ist": "00:53:06", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795288997.1247017, "ist": "00:53:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795288997.6467028, "ist": "00:53:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795288997.984232, "ist": "00:53:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289002.5598776, "ist": "00:53:22", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289003.3435042, "ist": "00:53:23", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289003.6846194, "ist": "00:53:23", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289007.8869116, "ist": "00:53:27", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289009.0343761, "ist": "00:53:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289009.7655797, "ist": "00:53:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289010.1184914, "ist": "00:53:30", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289014.5348105, "ist": "00:53:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289015.0093217, "ist": "00:53:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289015.3236558, "ist": "00:53:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289019.4352953, "ist": "00:53:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289020.2380145, "ist": "00:53:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289020.7823036, "ist": "00:53:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289021.1123872, "ist": "00:53:41", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289030.5775125, "ist": "00:53:50", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289031.1832323, "ist": "00:53:51", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289031.6862164, "ist": "00:53:51", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795289032.0450153, "ist": "00:53:52", "ev": "beat", "d": "report.py: building the report"}
