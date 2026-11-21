@@ -942,12 +942,29 @@ def docx(end):
     #
     # --force rebuilds every document whatever exists, which is what an engine change needs.
     _force = "--force" in sys.argv
+    # --force IS NOT RESUMABLE, AND THE BRIEF TELLS A RUN TO REPEAT IT UNTIL DONE.
+    #
+    # Measured 21 Nov, in this sandbox: `--force --budget 275` converted 75 documents and stopped;
+    # the next call converted 75 again - the SAME 75, because `_need` answered True for every
+    # document and the loop starts at the top of a sorted list. Three calls produced 75, 75, 75 and
+    # the corpus could never be rebuilt inside a slot. The same bug means "repeat until it says the
+    # corpus is complete" is an instruction no run can follow.
+    #
+    # A document is stale when it is older than the engine that must write it, so --force skips the
+    # ones this build has already rewritten and the loop advances. `_eng_mtime` is the build, not
+    # the clock: a document converted before the engine changed is still rebuilt, which is what
+    # --force is for.
+    _eng = REPO + "/tools/engine-verify/out/com/kavopdf/app/engine/PdfToWord.class"
+    _eng_mtime = os.path.getmtime(_eng) if os.path.exists(_eng) else 0.0
     def _need(p):
         b = os.path.basename(p)[:-4]
+        dx = DOCX + "/" + b + ".docx"
+        tx = DOCX + "/" + b + ".txt"
         if _force:
-            return True
-        return not (os.path.exists(DOCX + "/" + b + ".docx")
-                    and os.path.exists(DOCX + "/" + b + ".txt"))
+            if not (os.path.exists(dx) and os.path.exists(tx)):
+                return True
+            return min(os.path.getmtime(dx), os.path.getmtime(tx)) < _eng_mtime
+        return not (os.path.exists(dx) and os.path.exists(tx))
     miss=[p for p in pdfs if _need(p)]
     if not miss: return len(pdfs)
     log(f"docx {len(pdfs)-len(miss)}/{len(pdfs)} -- converting {len(miss)}")

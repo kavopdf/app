@@ -1,0 +1,69 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index 4f0e6a5..08d7471 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -2249,14 +2249,40 @@ public final class PdfToWord {
+         for (PDAnnotation ann : anns) {
+             if (ann == null) continue;
+             try {
+-                // A widget's appearance is the field's /V, and that is already painted onto
+-                // the page by paintField; reading it again would draw the answer twice.
+-                if (ann.isHidden() || ann instanceof PDAnnotationWidget) continue;
++                // A WIDGET IS READ HERE TOO, AND ITS /N IS USUALLY A STATE DICTIONARY.
++                //
++                // This loop used to skip every widget on the theory that its appearance was
++                // "already painted onto the page by paintField". There is no paintField in this
++                // file: a widget was read from its field's /V by widgetValue() and from nowhere
++                // else, so whatever the widget DRAWS and /V does not say was lost. Measured on
++                // 601_fillable_admission_form: two ticked check boxes whose appearance streams
++                // are `BT 0 g .9 1.7999992 Td /ZaDb 9 Tf (3) Tj ET` (xrefs 51 and 57) draw a
++                // ZapfDingbats checkmark each, and widgetValue() returns null for a /Btn by
++                // design ("a box that is on says nothing a reader can read"), so the .docx had
++                // two blank boxes where the form was answered. The page draws them; the reader
++                // shows them; the converter must carry them.
++                //
++                // A check box's /AP /N is not a stream but `<< /Off 49 0 R /Yes 51 0 R >>`, and
++                // /Off is the blank one. /AS names the state the field is actually in, so the
++                // stream is resolved through /AS and never by taking /N's first entry - reading
++                // /N blindly reads the blank /Off stream and reports that nothing is drawn,
++                // which is the answer the old skip gave by a different route.
++                if (ann.isHidden()) continue;
+                 PDAppearanceDictionary apd = ann.getAppearance();
+                 if (apd == null) continue;
+                 PDAppearanceEntry entry = apd.getNormalAppearance();
+-                if (entry == null || !entry.isStream()) continue;   // a state dictionary
+-                PDAppearanceStream ap = entry.getAppearanceStream();
++                if (entry == null) continue;
++                PDAppearanceStream ap;
++                if (entry.isStream()) {
++                    ap = entry.getAppearanceStream();
++                } else if (ann instanceof PDAnnotationWidget) {
++                    COSName as = ann.getAppearanceState();
++                    if (as == null) continue;                   // no state chosen: say nothing
++                    java.util.Map<COSName, PDAppearanceStream> states = entry.getSubDictionary();
++                    ap = states == null ? null : states.get(as);
++                } else {
++                    continue;                                   // a state dictionary
++                }
+                 if (ap == null) continue;
+                 PDRectangle rect = ann.getRectangle();
+                 if (rect == null) continue;
+@@ -2296,7 +2322,17 @@ public final class PdfToWord {
+ 
+                 StringBuilder text = new StringBuilder();
+                 for (Glyph g : apGlyphs) {
+-                    if (g.text == null || g.text.isEmpty()) continue;
++                    // A BLANK APPEARANCE IS NOT A GLYPH. Every widget on a form carries an
++                    // /AP /N even when it draws nothing: a text field's empty state is a stream
++                    // whose only operator is a border rectangle, and its text is a run of
++                    // spaces. Reading the widget's appearance (the fix above) therefore also
++                    // collected those spaces, and each one became a line in the .txt and a run
++                    // in the .docx. Measured on 601_fillable_admission_form: 51 lines became
++                    // 188, and the words were pushed down the page, while the two ticked boxes
++                    // - the whole reason for the walk - added exactly two characters.
++                    // Whitespace carries no word, so it is skipped here, where the walk decides
++                    // what the page drew.
++                    if (g.text == null || g.text.trim().isEmpty()) continue;
+                     // The scratch page counts x from the box's left edge and y down from its
+                     // top; the page counts x from its own left and y down from its top.
+                     float xUp = g.x;

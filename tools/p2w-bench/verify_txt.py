@@ -667,7 +667,18 @@ def glyph_truth(path):
                 widgets = []
             for w in widgets:
                 t = _ap_stream_text(d, w.xref)
-                if t.strip():
+                # A WIDGET'S APPEARANCE IS READ ONLY WHEN THE PAGE DID NOT ALREADY DRAW IT.
+                #
+                # The page's own content stream draws the value a reader sees; a widget's
+                # /AP /N draws it a second time for the reader that paints the field. Adding
+                # both counts one word twice, and t01 then reports it as LOST from a .txt that
+                # carries it - the .txt can hold a word once. Measured on
+                # 601_fillable_admission_form, 21 Nov: the page draws "General" at
+                # (258.0, 244.9) and one widget's appearance stream draws it again, so
+                # glyph_truth() carried it twice and the .txt's single copy read as a lost
+                # word - 82 of 83 = 98.8% against a 99% threshold, on a document that loses
+                # nothing. With the guard the same .txt scores 100.0.
+                if t.strip() and t.strip() not in walked:
                     stats["widget_glyphs"] += len(t)
                     walked += "\n" + t
             pages.append(walked)
