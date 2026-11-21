@@ -88,3 +88,19 @@ then nests in a cell and displaces it.
     FINDINGS/32_stroke_lines-CLEAN-DOC-SURVIVES-CARRIER-2200-f1x.md   this file
 
 The engine is reverted to HEAD; the tree is clean; nothing in this finding is a commit of the patch.
+
+## A contradiction with the 00:15 relay finding, recorded rather than smoothed
+
+`FINDINGS/32_stroke_lines-A-FOLLOWING-BLOCK-IS-THE-WHOLE-FIX-0022-relay.md` measured
+`17_three_column_widths_txtpos` at **41/42 under the carrier alone** (one of two rules lost, the second
+carrier stacked under the first) and **42/42 only with one empty `<w:p/>` after each carrier**. This run
+measured **42/42 under the carrier alone**, with no extra paragraph added.
+
+The two are not the same patch. The relay used `patches/rule-carrier-per-rule-2008.patch` on HEAD
+`cef8de6`; this run used `patches/rule-carrier-horizontal-only-2008.patch` on HEAD `c55e1916`, and the
+emitted `.docx` differs - `17` carries **2 carrier tables and 0 drawings** here. Either the horizontal-only
+patch already interleaves its carriers, or `17`'s two rules happen to land interleaved in it. **This was
+not isolated and the next run should not assume either patch is the other.** What both measurements agree
+on is the thing that matters: `17` is reachable at 42/42, and the target set is not blocked by a lost
+shape.
+
