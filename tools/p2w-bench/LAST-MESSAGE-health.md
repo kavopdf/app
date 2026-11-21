@@ -1,18 +1,18 @@
 # P2W Watchdog - Run Report
 
-**21 Nov 2026 · 21:07 IST**
+**22 Nov 2026 · 00:20 IST**
 
-> **1 stage(s) stopped: classify**
+> **The pipeline is moving. Two stages done, two moving, one red - and the red one is a phase gate, not a stopped stage.**
 
 ## Stages
 
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 3.4 h |
-| matrix | done | 213 of 213 | 7.9 h |
-| classify | **stopped** |  | 7.4 h |
-| fix | moving |  | 0.9 h |
-| txt | moving | 190 clean, 23 failing | 4.1 h |
+| measure-google | done | 213 of 213 | 0.2 h |
+| matrix | done | 213 of 213 | 0.1 h |
+| classify | **stopped** |  | 10.3 h |
+| fix | moving |  | 0.4 h |
+| txt | moving | 197 clean, 16 failing | 1.4 h |
 
 ## Trend
 
@@ -23,48 +23,25 @@
 | Google measured | 192 | **192** | no change |
 | Google clean | 7 | **6** | -1 |
 
-## What this pass did
+The row is not new work: `progress.py` found today already has one, so this pass appended nothing and edited no past row. That row stands at 23 failing .txt while the live table reads 16 of 213, because the .txt table was rewritten after the row was written. Read today's number from the stages table above, not from the trend.
 
-* Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
-* **A stage is stopped** - see BLOCKERS.md.
+## The one red row, read to the evidence
 
+`stage.py` says the stage is classify - the class table is older than the results. `round.py --phase` says the phase is fix. `CLASSIFIER-BRIEF.md` opens with "if the phase is not classify, output not my turn and stop", so the classifier cron has been exiting without work since the class table was last regenerated this morning. From fix there is no way back: `round.py --advance` refuses, and `round.py --reopen` refuses because the phase is not done. That is a phase gate, not a dead cron.
 
-## The stopped row, read against the evidence
+What the content actually says, checked with the tools that own the question:
 
-health.py --stalled exits 1 on classify. The stage is not behind. Both class tables are current in
-content: classify_google.py --check reports up to date, and a dry run of classrow.py reports 0 rows
-would change. What is old is the commit date. The docx class table was last committed at 08:14, the
-Google class table at 08:56, the newest gverify result at 12:12, and a table whose content does not
-change never gets a new commit, so health.py's classify state - which compares commit dates - reads
-stopped for as long as the fixer keeps nothing.
+* `classrow.py` dry run prints 0 rows would change. The LibreOffice class table is current in content; `health.py`'s red row on it compares commit dates, so that half of the red is the instrument, not the work.
+* `classify_google.py --check` prints STALE, regenerate it, against the 213 documents measured on the current engine at 18:19-18:28 UTC. The Google class table is genuinely behind those results.
+* Neither half blocks the fixer. `classpick.py` computes leverage from `benchmarks/gverify/` directly and printed `t08_line_order` from live results, and the last kept attempt moved 11 documents. The fixer is choosing on current evidence.
 
-I did not edit health.py to clear it. A watchdog that greens its own red light in the run it went red
-is the failure it exists to catch. The change that would clear it honestly, and the measurement that
-would overturn this reading, are in BLOCKERS.md.
+## What this pass did not do, and why
 
-## The other four rows
+* Did not classify. Grouping and ranking is the classifier's job, not the watchdog's.
+* Did not close the round to get back to measure. It archives a round whose fix phase is working and blanks the scores.
+* Did not force-release the fixer slot. `ROUND.json` holds a claim minutes old and `health.py` reads fix moving; the 22:13 blocker row records a force release that killed a live run and made the next run rebuild its fix from scratch.
+* Did not run STEP 3 or STEP 4 A/B. This watchdog has no `cron` tool, so a paused or zombie cron cannot be moved by automation. That is a missing tool, not a decision for a person, and BLOCKERS.md carries the exact calls that are unavailable: `cron(action="list")`, then `cron(action="runs", cron_id=...)` on the classifier, then pause and resume once if `next_fire_at` is stale, never left paused.
 
-measure-google and matrix are done, 213 of 213 each. The txt is moving at 190 clean and 23 failing,
-against 46 failing yesterday. The fixer is moving: the slot was claimed at 15:27 and status.py reads
-WORKING on a 6-minute-old beacon; the run before it ended at 20:18 with 6 attempts recorded and 0
-kept, so the corpus gained nothing from that slot and gained a cleaner txt table from the baseline.
+## The decision, recorded in BLOCKERS.md
 
-## Round state
-
-round.py --phase reads round 1 of 3, phase fix, 213 documents scored, and classes still OPEN. STEP 4 C does
-not apply - the phase is fix, not a finished phase with documents still failing. STEP 4 D does not
-apply - the slot is held by a live run, not by a dead one.
-
-## No cron tool
-
-This agent has no cron operation, so STEP 3 and STEP 4 A and B could not run, and a paused or zombie
-cron cannot be moved by automation from here. The exact call it would have made first for the stopped
-stage is cron(action="runs", cron_id="01M733RFR3D71C2E0T2TQ9PW0R") - the classifier, hourly, its id
-read from HEALTH-BRIEF's table - then pause and resume once each if next_fire_at were stale. Without
-the tool a zombie run or a stale schedule is invisible to this pass.
-
-## What I wrote
-
-Today's PROGRESS.md row was amended from the live tables: it now reads docx open 59, txt failing 23,
-Google 192 with 6 clean, and its note says what it used to record. Yesterday's row is untouched.
-3 rows were appended to BLOCKERS.md. Both files are committed and pushed.
+One code change fixes this and nothing else does: give `round.py` a reclassify path - when `stage.py` says classify and the class table's content is stale, allow fix to classify without closing the round and without touching the fixer slot - or let `CLASSIFIER-BRIEF.md` regenerate the class tables on stale content regardless of phase. Overturned if a fixer run ever picks a class the current table no longer lists, or if `classpick.py` starts ranking from the class table instead of `benchmarks/gverify/`. Until then classify reads red every pass while the fixer keeps working.
