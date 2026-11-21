@@ -80,15 +80,14 @@ unfinished work, not as a result.
 | t01_B-03 | t01_word_accuracy | B | implement the /AP /N glyph walk in its own clone and measure 601 and t | 04:36 | 601 from 37/42 to 42/42 docx checks, with the instrument's own answer for a tick | landed | FINDINGS/widget-ap-glyph-walk-0436-f1x.md |
 | 32_sB-01 | 32_stroke_lines | B | why Google drops the rules LibreOffice draws, and which construct repl | 11:34 | landed | landed | tools/p2w-bench/FINDINGS/32_stroke_lines-google-drop-113048-9597.md |
 | t02_A-01 | t02_position | A | is the two-line 47_margins/t02 claim a real two-format fix | 11:34 | landed | landed | tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md |
-| t01lostwords-01 | t01 | lostwords | which words each of the five documents loses, and why | 14:45 | the missing token list per document | running |  |
-| t01blastradius-01 | t01 | blastradius | which of 213 documents change verdict under the two source-side change | 14:45 | 2 fixed, 0 regressions | running |  |
+| t01lostwords-01 | t01 | lostwords | which words each of the five documents loses, and why | 13:57 | the missing token list per document | landed | FINDINGS/t01-doubled-draw-both-sides-142100.md |
+| t01blastradius-01 | t01 | blastradius | which of 213 documents change verdict under the two source-side change | 13:57 | 2 fixed, 0 regressions | landed | FINDINGS/t01-doubled-draw-both-sides-142100.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `01:41` agent landed: t01_word_accuracy / B -> FINDINGS/39-small-caps-gap-threshold-0150-fixer.md
 - `01:41` attempt 9 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:47` attempt 10 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:51` attempt 11 on t01_word_accuracy -> reverted (0/5 moved)
@@ -113,6 +112,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:42` attempt 18 on t01_word_accuracy -> kept (1/5 moved)
 - `14:45` agent deployed: t01 / lostwords - which words each of the five documents loses, and why
 - `14:45` agent deployed: t01 / blastradius - which of 213 documents change verdict under the two source-side changes
+- `14:49` attempt 19 on t01_word_accuracy -> reverted (0/3 moved)
 
 ## Where the rest of the state lives
 

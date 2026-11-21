@@ -1,4 +1,3 @@
-| 12 Nov 20:43 | fixer | slot claimed - fixer running |
 | 12 Nov 21:47 | fixer | slot claimed - fixer running |
 | 12 Nov 22:27 | fixer | slot released; 20_within_10pt (+4) left OPEN with 3 attempts. Calibration on 362_price_list_dense, 5 docx variants through Drive, only the table spacer varied: as emitted (w:line=276, mark sz=2) first-row dy -13.59, spacer deleted -16.75, w:line=1 -16.58, w:line=240 auto -14.00, w:before=276 + w:line=1 -2.78 (18_median_dy FAIL->pass, 51/59->53/59). Root cause CONFIRMED: w:line is a multiple of the paragraph mark's line height, so the spacer bought 3.16 pt of the 13.8 asked and every table rose 10.6 pt. Engine fix written and built, then reverted unmeasured: the 20-document Drive round was blocked (every staged upload rejected as expired), so no ratchet evidence existed. Patch kept at patches/table-spacer-before-not-line.patch - one append() in DocxWriter ~line 4157. Recorded 'error'; 2 confirmed hypotheses written; 5 Google Docs deleted |
 | 12 Nov 22:46 | fixer | slot claimed - fixer running |
@@ -198,3 +197,4 @@
 | 21 Nov 13:54 | fixer | slot claimed - fixer running |
 | 21 Nov 14:42 | fixer | attempt t01_word_accuracy -> kept (1/5 moved) |
 | 21 Nov 14:42 | fixer | attempt t01_word_accuracy -> kept (1/5 moved) |
+| 21 Nov 14:49 | fixer | attempt t01_word_accuracy -> reverted (0/3 moved) |

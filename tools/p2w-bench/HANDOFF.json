@@ -756,6 +756,10 @@
   {
    "at": "14:45",
    "text": "agent deployed: t01 / blastradius - which of 213 documents change verdict under the two source-side changes"
+  },
+  {
+   "at": "14:49",
+   "text": "attempt 19 on t01_word_accuracy -> reverted (0/3 moved)"
   }
  ],
  "next": "Land the pBdr rule replacement: FINDINGS/RULES-PBDR-IMPLEMENTATION.md, first statement of DocxWriter.shape() at line 2772 (return before line 2779), carrying the ctx.flowY = s.topPt update. Screen 32_stroke_lines first, then the full corpus pass. The finding predicts 124 documents cleared among the 144 LibreOffice-only ones, and all 145 if the residual is only the footer rule.",

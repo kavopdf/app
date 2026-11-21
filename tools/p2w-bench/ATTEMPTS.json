@@ -603,7 +603,7 @@
   "status": "OPEN"
  },
  "t01_word_accuracy": {
-  "attempts": 18,
+  "attempts": 19,
   "first_seen": null,
   "history": [
    {
@@ -731,12 +731,19 @@
     "outcome": "kept",
     "reason": "doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical",
     "total": 5
+   },
+   {
+    "at": "2026-11-21 14:49",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "DUPLICATE, not a second fix. The relay claimed the slot at 14:11 and picked the same lead the :50 run landed at 14:21 (d2ea491, TEXT_MEDIABOX_CLIP). Found on the push: the commit was already on main. ",
+    "total": 3
    }
   ],
   "last": null,
   "last_engine": "2d44a3a",
-  "last_moved": 1,
-  "last_total": 5,
+  "last_moved": 0,
+  "last_total": 3,
   "outcomes": [
    "reverted",
    "kept",
@@ -755,11 +762,12 @@
    "partial",
    "reverted",
    "kept",
-   "kept"
+   "kept",
+   "reverted"
   ],
   "ratchet_at": "20 Nov 21:49",
   "ratchet_docs": 4,
-  "reason": "doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical",
+  "reason": "DUPLICATE, not a second fix. The relay claimed the slot at 14:11 and picked the same lead the :50 run landed at 14:21 (d2ea491, TEXT_MEDIABOX_CLIP). Found on the push: the commit was already on main. This run did not land it and takes no credit for it - the 411/12_stamp movement belongs to d2ea491. What this run adds is the independent confirmation (a second build, a second harness, 211 documents, same 2 rows, same direction) and the class table that commit left stale: DEFECT-CLASSES-TXT.md still said t01 5 / t12 9 / 25 failing, now 3 / 8 / 24, regenerated from the committed ranking. And two writer changes the agents killed: 39 gs=sizePt->size 97.4->78.8 and 38 dedupe window 40->200 98.0->93.0; the position-aware dedupe that DID clear 38 (2d44a3a) is the version the agent called defensible.",
   "reasons": [
    "claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_small_caps_letter_spacing, 406_passport_mrz_page, 411_nested_xobject_transforms, 601_fillable_admission_form, 77_arabic_rtl_document, 79_inr_indian_digit_grouping_table. Check is 'source words all present >= 98%', so the .txt is dropping words the page drew.",
    "CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words welded to those NULs by r'\\S+', so 'Strongly\\x00agree' and '\\x00\\x00\\x00\\x00PHOTOGRAPH' were single tokens no .txt can ever contain, and t01 charged each one as lost text. _words now splits on control characters instead of treating them as word characters. Measured: 79_inr_indian_digit_grouping_table 91.9 -> 100.0 (9/10 -> 10/10 checks), 391_survey_questionnaire_grid 97.5 -> 100.0 (5/7 -> 7/7), 406_passport_mrz_page 98.5 -> 100.0 (5/7 -> 7/7); all three now PASS every applicable txt check. t12 improved on 391 and 406 for the same reason - a NUL token was counted as an invented word. Scanned all 213 documents with glyph_truth: exactly 6 declare a control character inside a source token, and the other three (balance-sheet-and-profit-loss, 392_statistical_console_output, balance-sheet-two-columns-of-figures) still PASS t01. The change only removes source tokens and adds none, so no document can regress. test_txt_checks.py 8/8.",
@@ -778,7 +786,8 @@
    "601's last lost word was the reference counting General twice; guard added to glyph_truth (211 docs A/B: 0 newly failing, 1 newly clean on the patched engine). The engine /AP walk that supplies the other half is measured and saved as a patch; the gate refuses it until the docx half is re-measured (114 of 211 done).",
    "SIXTEENTH ATTEMPT, measurement only, no code changed. The open question from 23:25 - is the raw-code fallback right, or does it write a ligature as an accented letter - is answered from the rendered page and from the font program, by two agents and by my own eye. The four Effra CIDs are ff/fi/ffi/ffl, not U+0123/U+0124/U+0126/U+0127: the font program has no cmap and no post table, every one of the four glyphs has yMin 0 and yMax 684 (a cedilla needs -212 and a circumflex ~847, neither exists in all 1225 glyphs), and 300 DPI crops of eight sites read 'Staff', 'Differently', 'Registered Office', 'Qualification', 'Offline'. Measured over the nine pages of 041122: 13 u0123 + 89 u0124 + 23 u0126 + 2 u0127 = 127 wrong characters standing where 279 correct letters belong, and pymupdf reports 0 U+FFFD because it prints the code as a character. So fffd-cmap-destination-2300-fixer.patch is WRONG: it would have made t01 pass by agreeing with a wrong reference. Renamed -REJECTED with an unapplyable banner; gate PASS; FINDINGS/t01_word_accuracy-FFFD-PATCH-REJECTED-133200-b3e7.md plus the two agent files and crops/. This does not overturn ligature-identity-UNRECOVERABLE-2350.md - widths and outlines really are ambiguous at ffi/ffl and fi/fl - it supersedes only the claim that the identity cannot be known at all. It moves no document: t01/t03/t07 already closed on both bank forms at 22:54, t06 is the only check still open. Also recorded: RANKING-TXT.csv names six t01 failures (391, 39, 411, 601, 77, 79) with 391 and 79 back on it although the 21:35 control-character fix recorded both as clean - the table could not be re-measured on this slot and the next run must.",
    "clip-off: 411_nested_xobject_transforms t01 90.0->100.0, 12_stamp_across_page_break t12 also clean; corpus 186->188, 0 regressions",
-   "doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical"
+   "doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical",
+   "DUPLICATE, not a second fix. The relay claimed the slot at 14:11 and picked the same lead the :50 run landed at 14:21 (d2ea491, TEXT_MEDIABOX_CLIP). Found on the push: the commit was already on main. This run did not land it and takes no credit for it - the 411/12_stamp movement belongs to d2ea491. What this run adds is the independent confirmation (a second build, a second harness, 211 documents, same 2 rows, same direction) and the class table that commit left stale: DEFECT-CLASSES-TXT.md still said t01 5 / t12 9 / 25 failing, now 3 / 8 / 24, regenerated from the committed ranking. And two writer changes the agents killed: 39 gs=sizePt->size 97.4->78.8 and 38 dedupe window 40->200 98.0->93.0; the position-aware dedupe that DID clear 38 (2d44a3a) is the version the agent called defensible."
   ],
   "requeues": 0,
   "status": "OPEN"

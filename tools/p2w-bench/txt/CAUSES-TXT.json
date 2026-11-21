@@ -94,12 +94,10 @@
  },
  "12_stamp_across_page_break": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t12_word_invention",
-  "failed": 1,
-  "failed_ids": [
-   "t12_word_invention"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "13_stamp_non_english": {
   "applicable": 9,
@@ -668,13 +666,10 @@
  },
  "38_faux_bold_italic_synthesised": {
   "applicable": 9,
-  "baseline_failed": 2,
-  "cause": "t01_word_accuracy + t07_symbol_counts",
-  "failed": 2,
-  "failed_ids": [
-   "t01_word_accuracy",
-   "t07_symbol_counts"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "390_wide_data_appendix": {
   "applicable": 8,
@@ -795,12 +790,10 @@
  },
  "411_nested_xobject_transforms": {
   "applicable": 4,
-  "baseline_failed": 1,
-  "cause": "t01_word_accuracy",
-  "failed": 1,
-  "failed_ids": [
-   "t01_word_accuracy"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "412_page_labels_roman": {
   "applicable": 9,
