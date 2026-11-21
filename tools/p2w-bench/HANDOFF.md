@@ -20,8 +20,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 15:58 |
-| ended | still running |
-| how it ended | - |
+| ended | 17:44 |
+| how it ended | forced |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -30,11 +30,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-<<<<<<< Updated upstream
-> Take 32_stroke_lines from 'no new paragraph'. The pBdr carrier is refuted three ways (RULES-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md): w:pBdr needs a paragraph and a paragraph costs 9.6 pt on this engine, so the carrier IS the displacement. Not yet tried: a table-row bottom border, or a border on the paragraph the page already drew above the rule. Also: a full .txt corpus pass is 21 minutes (213 conversions at ~5.8s serial, 2 CPUs / 1 GB free - it cannot be parallelised) plus 71s to re-score, so it fits in about half a slot.
-=======
 > Judge the t08 verifier question before touching the engine: is t08_line_order measuring line order or drawing order? FINDINGS/t08_line_order-DRAWING-ORDER-1740.md has the numbers (10 of 10 rows clear when only our own line sequence is put into drawing order). The agent's proposed one-line sort of _src_pages is NOT obviously right - it would compare sorted-vs-sorted. Decide with a falsification: construct a .txt whose lines are deliberately swapped in y and confirm t08 still fires after the change. Then take t01_word_accuracy's .docx half or 32_stroke_lines' cell-border construct.
->>>>>>> Stashed changes
 
 ## Agents deployed and not yet accounted for
 
@@ -97,13 +93,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-<<<<<<< Updated upstream
-- `04:36` agent deployed: t01_word_accuracy / A - census of every widget appearance stream over all 213 documents - how many widge
-- `04:36` agent deployed: t01_word_accuracy / B - implement the /AP /N glyph walk in its own clone and measure 601 and the Account
-- `04:36` agent landed: t01_word_accuracy / A -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
-- `04:36` agent landed: t01_word_accuracy / B -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
-=======
->>>>>>> Stashed changes
 - `07:16` attempt 13 on 47_margins -> partial (0/26 moved)
 - `10:39` attempt 14 on t01_word_accuracy -> reverted (0/213 moved)
 - `11:16` attempt 15 on t01_word_accuracy -> partial (0/5 moved)
@@ -123,17 +112,12 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:48` attempt 15 on 47_margins -> partial (1/213 moved)
 - `15:59` agent deployed: 32_stroke_lines / A - Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md actually clea
 - `15:59` agent deployed: t02_position / B - The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0) is measure
-<<<<<<< Updated upstream
-- `17:22` CLEARED a carry-over that three findings refuted and that survived the commit which superseded it. RULES-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md says 'the carry-over is cleared so the gate stops handing it to the next run', but HANDOFF.json[next] still carried it through 12:45, through 15:17 and through 462353f - so every run since 12:45 read a refuted instruction first. A finding cannot clear a carry-over; only handoff.py --next can, and nobody ran it. It is run now.
-- `17:25` attempt 16 on 47_margins -> reverted (0/5 moved)
-=======
 - `17:00` attempt 2 on t02_position -> partial (1/5 moved)
 - `17:39` attempt 3 on 32_stroke_lines -> reverted (0/145 moved)
 - `17:39` agent landed: t02_position / B -> FINDINGS/47_margins-DOCX-BLAST-RADIUS-155500-6930.md
 - `17:39` agent deployed: t08_line_order / B - which code path decides the .txt line order, and what single structural conditio
 - `17:39` agent landed: t08_line_order / B -> FINDINGS/t08_line_order-DRAWING-ORDER-1740.md
 - `17:40` agent landed: 32_stroke_lines / A -> FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md
->>>>>>> Stashed changes
 
 ## Where the rest of the state lives
 

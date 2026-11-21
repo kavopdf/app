@@ -200,3 +200,4 @@
 | 21 Nov 17:25 | fixer | attempt 47_margins -> reverted (0/5 moved) |
 | 21 Nov 17:00 | fixer | attempt t02_position -> partial (1/5 moved) |
 | 21 Nov 17:39 | fixer | attempt 32_stroke_lines -> reverted (0/145 moved) |
+| 21 Nov 17:44 | fixer | slot FORCED released - see INCIDENTS.md for why |

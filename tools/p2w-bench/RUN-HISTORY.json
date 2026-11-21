@@ -616,5 +616,24 @@
   "needs_human": 0,
   "partial": 1,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795256939.3584,
+  "started": "15:58",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "32_stroke_lines",
+  "attempts": 2,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   "32_sA-01",
+   "t02_B-01",
+   "t08_B-01"
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "partial": 1,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

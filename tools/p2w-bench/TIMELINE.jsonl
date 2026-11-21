@@ -1743,3 +1743,9 @@
 {"t": 1795263173.7278047, "ist": "17:42:53", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795263174.8046527, "ist": "17:42:54", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795263175.3715053, "ist": "17:42:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795263265.1943579, "ist": "17:44:25", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795263265.249236, "ist": "17:44:25", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795263265.3838038, "ist": "17:44:25", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795263265.411396, "ist": "17:44:25", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795263280.8988447, "ist": "17:44:40", "ev": "beat", "d": "heartbeat before any claim: post-release self-check: heartbeat no longer rewrites the claim"}
+{"t": 1795263287.7363958, "ist": "17:44:47", "ev": "beat", "d": "test: a stranger heartbeat must not refresh the claim"}

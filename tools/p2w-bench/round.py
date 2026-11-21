@@ -749,7 +749,17 @@ def release(name, force=False):
                             break
                 except Exception:
                     pass
-            if _start and _now and _start != _now and not _kept:
+            # --FORCE IS NAMED IN THE MESSAGE BELOW AND WAS NOT CONSULTED HERE.
+            # The refusal printed "If you genuinely must ship it unmeasured: --force" and then
+            # returned 1 whatever was passed, so a run whose engine change HAD been measured but
+            # whose state file could not prove it - see STATE-TXT.json below - could never hand the
+            # slot on, and the next fire paid its setup again. Measured 21 Nov 18:26: the .txt table
+            # was re-measured on all 213 and stamped, the .docx was proved byte-identical on all 213,
+            # and this branch still refused the release because restamp_txt.py writes STATE-TXT.json
+            # with the engine commit hash from BEFORE the commit that contains the change, so it can
+            # never equal the post-commit hash. Same defect as the `done < 1` branch above, found by
+            # the same audit and fixed the same way.
+            if _start and _now and _start != _now and not _kept and not force:
                 # REVERT IT, DO NOT REFUSE IT.
                 #
                 # Refusing kept the quality guarantee and cost the throughput: a refused release leaves
@@ -927,7 +937,18 @@ def main(argv):
                       + (argv[argv.index("--doing") + 1] if "--doing" in argv else "started"))
             print("no fixer claim to refresh - beacon written anyway")
             return 0
-        s2[key] = time.time()
+        # A HEARTBEAT MUST NOT REWRITE THE CLAIM. It did, and that one line caused two faults.
+        #
+        # `s2[key] = time.time()` re-stamped fixer_started on every beat, and fixer_started is the
+        # claim: its age is what --claim-fixer compares against the stale window, and what the release
+        # reports as the run's duration. Measured 21 Nov, on a run that had held the slot for 2h 37m:
+        # the release printed "releasing after 5 minute(s)", and at 16:15 a second fixer found the
+        # claim "not stale" only because a heartbeat seconds earlier had pushed the clock forward -
+        # so two runs worked the same tree for 65 minutes and duplicated the work.
+        #
+        # The liveness fields are fixer_last_beat and fixer_doing_since, and claim() already reads
+        # both: `newest = max(started, last_beat, doing_since)`. So the heartbeat keeps its whole
+        # purpose without touching the claim, and the claim's age means what it says again.
         # WHAT IT IS DOING, NOT JUST THAT IT IS ALIVE.
         #
         # A heartbeat with no description answers "is the process up", which is not the question
