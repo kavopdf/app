@@ -784,6 +784,10 @@
   {
    "at": "17:22",
    "text": "CLEARED a carry-over that three findings refuted and that survived the commit which superseded it. RULES-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md says 'the carry-over is cleared so the gate stops handing it to the next run', but HANDOFF.json[next] still carried it through 12:45, through 15:17 and through 462353f - so every run since 12:45 read a refuted instruction first. A finding cannot clear a carry-over; only handoff.py --next can, and nobody ran it. It is run now."
+  },
+  {
+   "at": "17:25",
+   "text": "attempt 16 on 47_margins -> reverted (0/5 moved)"
   }
  ],
  "next": "Take 32_stroke_lines from 'no new paragraph'. The pBdr carrier is refuted three ways (RULES-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md): w:pBdr needs a paragraph and a paragraph costs 9.6 pt on this engine, so the carrier IS the displacement. Not yet tried: a table-row bottom border, or a border on the paragraph the page already drew above the rule. Also: a full .txt corpus pass is 21 minutes (213 conversions at ~5.8s serial, 2 CPUs / 1 GB free - it cannot be parallelised) plus 71s to re-score, so it fits in about half a slot.",

@@ -92,7 +92,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:34` attempt 13 on t01_word_accuracy -> partial (1/5 moved)
 - `04:36` agent deployed: t01_word_accuracy / A - census of every widget appearance stream over all 213 documents - how many widge
 - `04:36` agent deployed: t01_word_accuracy / B - implement the /AP /N glyph walk in its own clone and measure 601 and the Account
 - `04:36` agent landed: t01_word_accuracy / A -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
@@ -117,6 +116,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:59` agent deployed: 32_stroke_lines / A - Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md actually clea
 - `15:59` agent deployed: t02_position / B - The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0) is measure
 - `17:22` CLEARED a carry-over that three findings refuted and that survived the commit which superseded it. RULES-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md says 'the carry-over is cleared so the gate stops handing it to the next run', but HANDOFF.json[next] still carried it through 12:45, through 15:17 and through 462353f - so every run since 12:45 read a refuted instruction first. A finding cannot clear a carry-over; only handoff.py --next can, and nobody ran it. It is run now.
+- `17:25` attempt 16 on 47_margins -> reverted (0/5 moved)
 
 ## Where the rest of the state lives
 

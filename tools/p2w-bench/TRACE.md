@@ -6,7 +6,6 @@
 | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 09:30 | fixer | build-engine | started |
-| 18 Nov 16:53 | fixer | build-engine | engine built in 43s |
 | 18 Nov 16:54 | fixer | ratchet | UNMEASURED 211 of 211 not compared; DRIFT 211 rows/0 marks |
 | 18 Nov 16:57 | fixer | build-engine | started |
 | 18 Nov 16:58 | fixer | build-engine | engine built in 56s |
@@ -406,3 +405,4 @@
 | 21 Nov 16:37 | fixer | build-engine | engine built in 58s |
 | 21 Nov 16:59 | fixer | build-engine | started |
 | 21 Nov 16:59 | fixer | build-engine | engine built in 41s |
+| 21 Nov 17:25 | fixer | attempt | 47_margins -> reverted (0/5 moved) |
