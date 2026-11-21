@@ -704,6 +704,10 @@
   {
    "at": "04:36",
    "text": "agent landed: t01_word_accuracy / B -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md"
+  },
+  {
+   "at": "07:16",
+   "text": "attempt 13 on 47_margins -> partial (0/26 moved)"
   }
  ],
  "next": "PUSH FINDINGS/widget-ap-glyph-walk-0436-f1x.patch and measure it: 601 goes 37/42 -> 42/42 docx checks in LibreOffice, blast radius is 2 documents of 213, and p2w builds from origin main so nothing corpus-wide can be measured until the patch is on main. Then measure 601 through Drive before and after (Google is the authority), and watch the Account form's two new fails (42_justification_edges, 63_table_rows). Do not chase t01 to 100% on 601 from the engine: verify_txt double-counts 'General' (glyph_truth appends _ap_stream_text to a page text pymupdf already synthesised the widget into), so only a duplicating engine can reach 100 and that costs 601 five docx checks. That is a person's decision, same as the 01:43 row.",
@@ -1204,9 +1208,9 @@
   }
  ],
  "run": {
-  "started": "03:57",
-  "ended": "04:36",
-  "ended_how": "forced"
+  "started": "07:14",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

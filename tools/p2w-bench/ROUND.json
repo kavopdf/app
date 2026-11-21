@@ -1,9 +1,11 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_engine_at_claim": "49cffd4",
-  "fixer_last_beat": 1795215451.7311287,
-  "fixer_started": 0,
+  "fixer_doing": "second attempt: the 47_margins per-page tail",
+  "fixer_doing_since": 1795225489.9763258,
+  "fixer_engine_at_claim": "7112d76",
+  "fixer_last_beat": 1795225489.976349,
+  "fixer_started": 1795225560.8054934,
   "history": [
     {
       "at": "2026-11-12 09:46",

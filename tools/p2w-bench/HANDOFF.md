@@ -9,9 +9,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 03:57 |
-| ended | 04:36 |
-| how it ended | forced |
+| started | 07:14 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -74,7 +74,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `22:39` agent landed: t01_word_accuracy / ToUnicode CMap destination -> FINDINGS/t01_word_accuracy-FFFD-CMAP-2300-fixer.md
 - `22:43` agent deployed: t01_word_accuracy / adversarial patch review - How can this Identity-H recovery write wrong text into the document?
 - `22:43` agent landed: t01_word_accuracy / adversarial patch review -> FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md
 - `23:16` attempt 6 on t01_word_accuracy -> kept (2/7 moved)
@@ -99,6 +98,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `04:36` agent deployed: t01_word_accuracy / B - implement the /AP /N glyph walk in its own clone and measure 601 and the Account
 - `04:36` agent landed: t01_word_accuracy / A -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
 - `04:36` agent landed: t01_word_accuracy / B -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
+- `07:16` attempt 13 on 47_margins -> partial (0/26 moved)
 
 ## Where the rest of the state lives
 

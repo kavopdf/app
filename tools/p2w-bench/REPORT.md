@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-21 03:57
+# Fixer report - 2026-11-21 07:14
 
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 03:57 → 04:36 IST · 39 min**
+**21 Nov 2026 · slot 07:14 → running IST · 1 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,24 +11,22 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 2 attempt(s), 0 kept |
-| Documents improved, round total | 60 of 213 |
-| Corpus improvement vs 15 Nov | **+39.61%** — mean 6.15 → 3.71 |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved, round total | 61 of 213 |
+| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
 | **Fixed - Google, all 42 checks** | **7**, out of the 192 documents both renderers measured |
-| Fixed - LibreOffice proxy | 32 of 213 - a renderer the user does not open |
+| Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `t01_word_accuracy` |
-| Committed | **18** files in 2 commit(s) from `e7c49dd` — ARCHIVE.json, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md, TRACE.md.head, attempt. |
+| Working on | `47_margins` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 04:34 | **partial** | 1/None | widget /AP /N glyph walk: 601 37/42 -> 42/42 docx checks on the same tree; t01 96.4 -> 98.8 (residual is the instrument double-counting 'General'); Account form 21/47 -> 25/47 with two new fails; patc |
-| 04:34 | **partial** | 1/5 | widget /AP /N glyph walk: 601 37/42 -> 42/42 docx checks on the same tree; t01 96.4 -> 98.8 (residual is the instrument double-counting 'General'); Account form 21/47 -> 25/47 with two new fails; patc |
+| 07:16 | **partial** | 0/26 | SECOND ATTEMPT, different construct: 365_recipe_card's -2.01 pt is a SPACE's advance, not an indent. The five METHOD steps are w:ind 800 (40 pt, correct: source 40.00 render 40.10) and the run text li |
 
 ## The txt
 
@@ -42,20 +40,16 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `t01_A-03` | census of every widget appearance stream over all 21 | 04:36 | 23:06 | 0 min |
-| `t01_B-03` | implement the /AP /N glyph walk in its own clone and | 04:36 | 23:06 | 0 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 03:57 → 04:36 · 39 min |
+| Slot window | 07:14 → running · 1 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 28 |
-| Longest silence | **30.0 min** — from 03:57:32, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 2 |
+| Tool beats | 7 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 need a human |
 
 
@@ -63,10 +57,7 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **7 min** | `####` |
-| measure or build - a conversion, screen or compile writes no beacon | **30 min** | `#################` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **1 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |
