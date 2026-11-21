@@ -1,17 +1,16 @@
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 18:17 → 19:22 IST · 1h 05m**
+**21 Nov 2026 · slot 19:58 → running IST · 16 min**
 
-> No engine change was kept. What landed is the fix that makes an engine change landable at all: the
-> corpus pass could not finish, so `RANKING.csv` was never written, so `regress.py --check` could
-> never pass, so no patch could be gated. Two silent defects in `benchmarks/p2w.py` are fixed and
-> proved. The cell-border patch that had been waiting on that measurement is refuted by it.
+> No change was kept. The rule carrier now DRAWS in Google for the first time - and it draws only
+> one rule per document, because two floating tables stack under the first. That is the finding;
+> the engine is back at HEAD.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 4 attempt(s), 0 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,30 +25,60 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 18:20 | **reverted** | 1/210 | `patches/47-margins-cell-border-inset.patch` measured on all 210 documents instead of the nine it was proposed on. `404_sudoku_grid` 0.27 → 0.00 and three more improved, but 24 got worse - `table-with-no-header-row` 0.61 → 0.86, `two-tables-stacked-with-no-gap` 0.77 → 1.07, `bank-statement-5-pages` 0.56 → 0.60 - and the gate refused. The nine-document sample was too small, not wrong: every document in it had a 2 pt rule, and the documents that got worse have thin or absent left rules where subtracting the full border moves text off a position the renderer had already placed correctly. Reverted; the engine is back at the committed state. |
-| 18:05 | **kept (tools)** | - | `benchmarks/p2w.py`: `rank()` crashed with `KeyError: 'doc'` on `DIST/416_many_tiny_pages.partial.json` - the resumable-window note `measure()` itself writes - **after** 211 of 212 documents were measured, killing the run before `RANKING.csv` was written. And `EXEMPT.json` was read from one hard-coded path that does not exist when the script is run from `/scratch/work`, which `FIXER-BRIEF.md` tells every run to do; the `except` swallowed it, `want` counted the exempt 300-page document, and `complete` could never be true. Both fixed, `RANKING.csv` now written with 210 rows. |
+| 20:15 | **lead** | 0/210 | FLOATING-TABLE CARRIER BUILT AND MEASURED THROUGH GOOGLE, not landed. DocxWriter.ruleCarrier() turns a hairline shape into a one-cell w:tblpPr table with a w:tcBorders bottom edge. Measured on 73_mark |
 
-## What actually landed
+## The one thing that changed in the render
 
-Commit `8ef686e`, gate PASS, two defects in `benchmarks/p2w.py`.
+`73_marksheet_subject_marks_grade` fails exactly `05_chars_extra, 18_displacement, 32_stroke_lines`
+in Google and passes 42/42 in LibreOffice on the same engine. It carries two rules. Before this run
+Google drew **0 of them**; with the carrier built this run it drew **2 of 2, at the requested weight
+and colour** - and still read 39/42, because only the first floating table in a document is placed
+at its `w:tblpY`. Rule 1 asked for 83.6 pt and landed at 83.5. Rule 2 asked for 793.6 and landed at
+84.5, stacked one rule-thickness under rule 1. `w:tblOverlap w:val="overlap"` changed the bytes and
+not the render; an inline carrier lost x entirely (both rules to x = 0).
 
-The first: `measure()` keeps a resumable window for any document over 80 pages in
-`DIST/<doc>.partial.json`, which has no `doc` key. `rank()` read every `DIST/*.json` and indexed
-`d['doc']`. Measured at 13:58, the traceback arrived after `chunk 1: measured 211 of 212` - the pass
-was finished and only the report was lost. `results()` now returns `DIST/*.json` minus
-`*.partial.json`, and the three readers of `DIST` use it.
+Two other things are settled and cost nothing to keep:
 
-The second: `EXEMPT.json` was opened at `dirname(__file__)/../tools/p2w-bench/EXEMPT.json`, which
-resolves only when the script runs from `benchmarks/` inside a clone. From `/scratch/work` it does not
-exist, the `except` returned an empty set, and `want` counted `416_many_tiny_pages` - excluded by
-design because 300 pages cannot be measured inside one command. `complete` was never true, so this
-tool wrote `RANKING.partial.csv` on every run of its life. `_exempt_paths()` now uses the same
-list-of-places shape as `_realworld_dirs()`, which already solved this exact problem for
-`benchmarks/realworld/`, and a miss warns instead of passing silently.
+* **A rule on this corpus is a FILL, not a stroke.** Both of that document's rules leave the writer
+  as a filled 483 × 0.9 pt rectangle with `a:ln noFill` and `lineRgb = -1`. A carrier gated on "has a
+  stroke colour" would have skipped every rule on the class's own document - which is probably why
+  the earlier `w:pBdr` and cell-border attempts kept finding nothing to carry.
+* **A table costs no character.** A four-case probe - a paragraph, a normal table with text, a
+  normal table with an empty cell, a floating table with an empty cell - rendered through Google with
+  **0** `U+200B`. So the two `U+200B` on `73_marksheet` are not the table: they sit at the two points
+  where the carrier band overlaps running text. A carrier in white space may cost nothing at all.
+  That is a hypothesis with one probe behind it, not a measurement.
 
-Before: `measured 210/211 remaining 1`, published table untouched. After: `measured 210/210
-remaining 0`, `RANKING.csv` written. That is 211 PDFs minus one exempt, which is the arithmetic
-`want` should always have done.
+## Why the class was taken
+
+`classpick.py` suggested `32_stroke_lines` because it holds an open lead. The lead was worth taking
+on arithmetic, not on the suggestion: `--leverage` prices the class at 36.3 clean documents, and a
+census of the committed Google results (delegated, below) puts **35 documents** at clean if the
+carrier clears `32` plus `05` and `18` - 15 that fail exactly those three, 15 that fail exactly
+`32+05`, 2 that fail `32` alone, and 3 that fail only a subset of `05`/`18`. 41 of the 213, from
+6. The construct was measured end to end through the renderer that matters before anything was
+built into the engine, which is the part the last two runs did not have.
+
+## Subagents
+
+One agent, on the census above. It read all 426 committed verification files, reported the failing
+set of every document, and - the useful part - flagged which Google/LibreOffice pairs were measured
+on **different engine stamps** (13 of 35) and so are not controlled comparisons, and which carry no
+stamp at all (8). Those 21 documents are the ones whose "it is clean in LibreOffice" claim has not
+actually been established.
+
+## What the next run should do
+
+One floating table **per page**, holding that page's rules as rows: `tblpY` = the first rule's y and
+each row's exact height = the gap to the next rule. Rows inside one table do stack, so that places
+every rule at its own y with one band - and one wrap region, which is the `05_chars_extra` question
+too. Before building it, one probe settles the ZWSP: draw a rule through a paragraph and a rule in
+white space in the same document and count `U+200B` in the export.
+
+Do not retry: the per-rule floating table (stacks, measured), the inline table (loses x, measured),
+`tblOverlap` (no effect, measured).
+
+## The txt
 
 ## The txt
 
@@ -61,57 +90,23 @@ remaining 0`, `RANKING.csv` written. That is 211 PDFs minus one exempt, which is
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t08_line_order` - 10 documents |
 
-## Subagents
-
-One agent, on `47_margins`: which documents carry the class, which check fails on each, what the
-twelve existing findings already refute, and the one change with the highest measured reach. It
-returned the class table, the refutation list, and the cell-border arithmetic - which is what this
-run then measured on the whole corpus and refuted. No second agent ran; the slot went to the corpus
-pass that the first agent's answer required.
+## Timing
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 18:17 → 19:22 · 1h 05m |
+| Slot window | 19:58 → running · 16 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 28 |
-| Longest silence | **9.2 min** — from 19:11:04, after `report.py: building the report` |
-| Silences over 2 min | 7 |
-| Obstacles | 4 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 13 |
+| Longest silence | **9.6 min** — from 20:04:52, after `engine patched: hairline rule -> floating tblpPr carrier (ruleCarrier(` |
+| Silences over 2 min | 2 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **4 min** | `##` |
-| fix - diagnose and change the engine | **7 min** | `#####` |
-| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `######` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **13 min** | `########` |
-
-## A gate that passed while measuring the wrong table
-
-Worth more than the patch it cost. After the corpus pass, `regress.py --check` printed PASS with the
-patched engine stamped. It had compared `benchmarks/RANKING.csv` - still the old table, still the old
-engine's numbers - and the `--stamp` had written the new fingerprint over it. A table measured on one
-engine, stamped as another, and a green tick.
-
-Writing the real measurement into `benchmarks/RANKING.csv` and re-checking turned the same gate into
-`docx: 24 REGRESSION(S)`. The first PASS was not a pass; it was the gate reading a file nobody had
-updated. This is the sixth-tool shape the brief describes, caught only because the number was
-compared against the table rather than against the tool that printed it.
-
-## Next run
-
-The boundary the refutation leaves is `w:sz`. Subtract the cell's border only where the rule the
-writer draws is at least 1 pt (`sz >= 8`): `404_sudoku_grid` carries `sz=16` and the 24 documents that
-got worse carry thin or nil left rules. That is a hypothesis with a number attached, not a
-measurement - it needs one 210-document pass, and the number to beat is 4 improved / 24 worse
-becoming at least 2 improved / 0 worse. With the corpus pass working, that pass now ends in a
-`RANKING.csv` instead of a traceback, which is the whole reason this run spent its slot on the tool.
-
-Two runs held this tree at once again: a second fixer claimed at 18:17 while this one held the slot
-from 17:53, and the rebase put its `RUN.json` in place of this run's, which is why the slot window
-above is that run's clock and not this one's.
+| measure or build - a conversion, screen or compile writes no beacon | **15 min** | `####################` |
+| record - attempt, handoff, class rows | **1 min** | `##` |

@@ -1,0 +1,105 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4ead19d..c1a7a93 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -2762,6 +2762,92 @@ public final class DocxWriter {
+         g.append("<a:pt x=\"").append(px).append("\" y=\"").append(py).append("\"/>");
+     }
+ 
++    /**
++     * Whether a rule leaves the writer as a floating table instead of a floating drawing.
++     *
++     * <p>Measured through Google Docs on 21 Nov: a rule written as a {@code wp:anchor} drawing is
++     * <b>dropped</b> by Google (no segment, no picture, nothing), and the one-twip carrier
++     * paragraph that holds the anchor leaves two stray space characters behind, so
++     * {@code 32_stroke_lines} and {@code 05_chars_extra} fail together on documents that pass
++     * every check in LibreOffice. See FINDINGS/32_stroke_lines-CELL-BORDER-HONOURED-1830-f1x.md.
++     *
++     * <p>A floating table ({@code w:tblpPr}) is honoured: it draws its cell border at the exact
++     * requested page y (400.0 pt asked, 399.5 pt drawn) and costs <b>0.00 pt</b> of flow, which
++     * the inline table could not do. See
++     * FINDINGS/32_stroke_lines-TBLPPR-ZERO-FLOW-1905-f1x.md.
++     */
++    static final boolean RULE_CARRIER = !"false".equals(System.getProperty("p2w.rulecarrier"));
++
++    /**
++     * Writes a hairline as a floating one-cell table with a cell border, and says so.
++     *
++     * <p>Returns false for every shape that is not a plain axis-aligned hairline: bands, filled
++     * areas, freeform paths, ellipses, stamp frames and anything inside a layout-table cell keep
++     * the drawing they have always had. A vertical rule is only carried when
++     * {@code -Dp2w.rulecarrier.v=true}, because a tall floating table wraps the text beside it
++     * and that has not been measured.
++     */
++    private static boolean ruleCarrier(StringBuilder sb, Shape s, Ctx ctx) {
++        if (!RULE_CARRIER) return false;
++        if (s.kind != 0 || s.freeform != null) return false;
++        if (s.stampFrame || s.consumed) return false;
++        if (ctx.inColumn) return false;
++        // A rule is drawn either way round. Measured on 73_marksheet_subject_marks_grade: both of
++        // its rules leave the writer as a FILLED 483 x 0.9 pt rectangle with a:ln noFill - the
++        // stroke colour is -1, so a test for a stroke would have skipped every rule on the
++        // document the class was opened on.
++        if (s.lineRgb < 0 && s.fillRgb < 0) return false;
++        if (!isHairline(s)) return false;
++        boolean horizontal = s.hPt <= 1.5f && s.wPt > 2f;
++        boolean vertical = s.wPt <= 1.5f && s.hPt > 2f;
++        if (!horizontal && !vertical) return false;
++        if (vertical && !"true".equals(System.getProperty("p2w.rulecarrier.v"))) return false;
++
++        int lenTw = Math.max(1, tw(horizontal ? s.wPt : s.hPt));
++        // Weight and colour from the paint the page used: the stroke when there is one, the fill
++        // when the rule is a thin filled rectangle (which is the common case on this corpus).
++        float weightPt = s.lineRgb >= 0 ? s.lineWidthPt : Math.min(s.wPt, s.hPt);
++        int paintRgb = s.lineRgb >= 0 ? s.lineRgb : s.fillRgb;
++        float paintAlpha = s.lineRgb >= 0 ? s.lineAlpha : s.fillAlpha;
++        int sz = szOf(weightPt);
++        String colour = borderColour(new float[]{weightPt, paintRgb, paintAlpha});
++        // The page box and the text box are the same box here (w:pgMar is zero on every page
++        // this writer emits), so tblpX/tblpY anchored to the page ARE the PDF's own x and y.
++        int pxTw = (int) Math.round(s.xPt * TWIPS_PER_PT);
++        int pyTw = (int) Math.round(s.topPt * TWIPS_PER_PT);
++        String side = horizontal ? "bottom" : "left";
++        int rowTw = horizontal ? 1 : lenTw;
++
++        sb.append("<w:tbl><w:tblPr>")
++                .append("<w:tblStyle w:val=\"KavoTable\"/>")
++                .append("<w:tblpPr w:leftFromText=\"0\" w:rightFromText=\"0\" w:topFromText=\"0\"")
++                .append(" w:bottomFromText=\"0\" w:vertAnchor=\"page\" w:horzAnchor=\"page\"")
++                .append(" w:tblpX=\"").append(pxTw).append("\" w:tblpY=\"").append(pyTw).append("\"/>")
++                .append("<w:tblW w:w=\"").append(lenTw).append("\" w:type=\"dxa\"/>")
++                .append("<w:tblInd w:w=\"0\" w:type=\"dxa\"/>")
++                .append("<w:tblBorders>")
++                .append("<w:top w:val=\"nil\"/><w:left w:val=\"nil\"/><w:bottom w:val=\"nil\"/>")
++                .append("<w:right w:val=\"nil\"/><w:insideH w:val=\"nil\"/><w:insideV w:val=\"nil\"/>")
++                .append("</w:tblBorders>")
++                .append("<w:tblLayout w:type=\"fixed\"/>")
++                .append("<w:tblCellMar><w:top w:w=\"0\" w:type=\"dxa\"/><w:left w:w=\"0\" w:type=\"dxa\"/>")
++                .append("<w:bottom w:w=\"0\" w:type=\"dxa\"/><w:right w:w=\"0\" w:type=\"dxa\"/></w:tblCellMar>")
++                .append("<w:tblLook w:val=\"0000\"/>")
++                .append("</w:tblPr>")
++                .append("<w:tblGrid><w:gridCol w:w=\"").append(lenTw).append("\"/></w:tblGrid>")
++                .append("<w:tr><w:trPr><w:trHeight w:val=\"").append(rowTw)
++                .append("\" w:hRule=\"exact\"/></w:trPr>")
++                .append("<w:tc><w:tcPr><w:tcW w:w=\"").append(lenTw).append("\" w:type=\"dxa\"/>")
++                .append("<w:tcBorders><w:").append(side).append(" w:val=\"single\" w:sz=\"").append(sz)
++                .append("\" w:space=\"0\" w:color=\"").append(colour).append("\"/>")
++                .append("</w:tcBorders></w:tcPr>")
++                .append("<w:p><w:pPr><w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\"")
++                .append(" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
++                .append("<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr></w:pPr></w:p>")
++                .append("</w:tc></w:tr></w:tbl>");
++        return true;
++    }
++
+     /**
+      * A shape pinned to the page, behind the text.
+      *
+@@ -2770,6 +2856,7 @@ public final class DocxWriter {
+      * it exists to make visible. A rule drawn behind text is still a rule.
+      */
+     private static void shape(StringBuilder sb, Shape s, Ctx ctx) {
++        if (ruleCarrier(sb, s, ctx)) return;
+         int id = SHAPE_ID_BASE + (ctx.shapeSeq++);
+         long cx = Math.max(1, Math.round(s.wPt * EMU_PER_PT));
+         long cy = Math.max(1, Math.round(s.hPt * EMU_PER_PT));

@@ -1804,3 +1804,16 @@
 {"t": 1795272267.1327941, "ist": "20:14:27", "ev": "beat", "d": "measured: carrier draws the rule in Google but 2 floating tables stack; reverting, writing finding"}
 {"t": 1795272295.165352, "ist": "20:14:55", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795272299.8491287, "ist": "20:14:59", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795272302.7563343, "ist": "20:15:02", "ev": "attempt", "d": "32_stroke_lines -> lead"}
+{"t": 1795272302.9642763, "ist": "20:15:02", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795272303.1599398, "ist": "20:15:03", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795272328.480292, "ist": "20:15:28", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795272331.5350378, "ist": "20:15:31", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795272335.662302, "ist": "20:15:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795272335.829541, "ist": "20:15:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795272348.1317492, "ist": "20:15:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795272349.17032, "ist": "20:15:49", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795272349.8007178, "ist": "20:15:49", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795272353.7246737, "ist": "20:15:53", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795272354.3576195, "ist": "20:15:54", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795272354.7083538, "ist": "20:15:54", "ev": "beat", "d": "report.py: building the report"}
