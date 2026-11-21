@@ -84,7 +84,7 @@
   "status": "OPEN"
  },
  "32_stroke_lines": {
-  "attempts": 3,
+  "attempts": 2,
   "first_seen": 1794543973.3763752,
   "history": [
    {
@@ -100,13 +100,6 @@
     "outcome": "reverted",
     "reason": "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more",
     "total": 145
-   },
-   {
-    "at": "2026-11-21 19:04",
-    "moved": null,
-    "outcome": "error",
-    "reason": "commit test",
-    "total": null
    }
   ],
   "last": 1794543973.3763797,

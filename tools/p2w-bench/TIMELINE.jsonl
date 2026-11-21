@@ -1772,3 +1772,6 @@
 {"t": 1795267923.8212183, "ist": "19:02:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795267923.8551862, "ist": "19:02:03", "ev": "killed", "d": "dead claim cleared by force release"}
 {"t": 1795268069.9528813, "ist": "19:04:29", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795268075.5567274, "ist": "19:04:35", "ev": "attempt", "d": "32_stroke_lines -> error"}
+{"t": 1795268075.709606, "ist": "19:04:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795268075.9569337, "ist": "19:04:35", "ev": "beat", "d": "classrow.py: refreshing the class file"}

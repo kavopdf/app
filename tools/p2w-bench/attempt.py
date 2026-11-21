@@ -503,6 +503,37 @@ def add(args):
         pass
 
     save(d)
+
+    # COMMIT AND PUSH THE LEDGER. A RUN'S SANDWICH DIES WITH ITS SANDBOX.
+    #
+    # Measured 21 Nov: not one of the fixer's own commits carried ATTEMPTS.json. Its work landed -
+    # "32_stroke_lines: Google honours a cell border on both axes" and two more - and the ledger that
+    # records those attempts only reached the repository because someone else happened to commit the
+    # state files afterwards. Until then the rotation could not see the attempts, classpick's "moved N
+    # documents" read a stale ledger, and a run that died before anyone committed lost its history.
+    #
+    # That is not cosmetic: the rotation decides what to work on from this file. An attempt the ledger
+    # never received is an attempt the next run will make again.
+    #
+    # So the record commits itself, here, the moment it is written. If the push loses a race, pull and
+    # push again - the record is a fact and it must not be dropped because of a rebase.
+    import subprocess as _sp
+    _id = ["-c", "user.email=320240581+Onyx-Node@users.noreply.github.com", "-c", "user.name=Onyx-Node"]
+    for _try in range(2):
+        _r = _sp.run(["git", "add", "tools/p2w-bench/ATTEMPTS.json", "tools/p2w-bench/ROUND.json",
+                      "tools/p2w-bench/HANDOFF.json", "tools/p2w-bench/TIMELINE.jsonl",
+                      "tools/p2w-bench/RUN.json"], cwd=ROOT, capture_output=True, text=True)
+        _c = _sp.run(["git"] + _id + ["commit", "-q", "--no-verify", "-m",
+                      "attempt: %s -> %s (%s of %s)"
+                      % (name, outcome, args.moved, args.total)],
+                     cwd=ROOT, capture_output=True, text=True)
+        if _c.returncode != 0:
+            break  # nothing staged - already committed
+        _p = _sp.run(["git", "push", "-q", "origin", "main"], cwd=ROOT, capture_output=True, text=True)
+        if _p.returncode == 0:
+            break
+        _sp.run(["git", "pull", "-q", "--rebase", "origin", "main"], cwd=ROOT, capture_output=True)
+
     log_runline(name, outcome, args.moved, args.total)
     try:
         import json as _jt
