@@ -1,30 +1,37 @@
 # P2W Google Verify - Run Report
 
-**21 Nov 2026 · 12:04 IST · stage classify**
+**21 Nov 2026 · stage classify**
 
-> 192 of 213 measured in Google, 21 refused on page count. Google passes all 42 on 6; LibreOffice on 122.
+> 81 of 213 documents carry a Google result measured on the current engine: 6 pass all 42, 54 fail at least one check, 21 refused on page count.
 
 ## Measured
 
 | | |
 |:--|--:|
-| scored | **192** |
+| verified on the current engine | **81** |
+| pass all 42 | **6** |
+| fail at least one check | **54** |
 | refused on page count | **21** |
-| clean in Google | **6** |
-| clean in LibreOffice | **122** |
 
-## Checks Google fails and LibreOffice does not
+## Checks that fail, current engine
 
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `32\_stroke\_lines` | **145** | 1 |
-| `05\_chars\_extra` | **141** | 3 |
-| `18\_displacement` | **125** | 20 |
-| `04\_chars\_missing` | **66** | 2 |
-| `25\_invisible\_text` | **49** | 0 |
-| `59\_shape\_anchor` | **58** | 11 |
-| `60\_text\_column\_right\_edge` | **58** | 18 |
-| `45\_char\_accuracy` | **37** | 2 |
+| check | documents |
+|:--|--:|
+| `05\_chars\_extra` | 37 |
+| `32\_stroke\_lines` | 37 |
+| `18\_displacement` | 23 |
+| `47\_margins` | 11 |
+| `60\_text\_column\_right\_edge` | 11 |
+| `04\_chars\_missing` | 10 |
 
-The first row is the class to take: `32\_stroke\_lines`, 145 documents in Google against 1 in LibreOffice.
+## Stage
 
+`classify` - the class table is older than the results.
+
+## What this run did
+
+Rebuilt the corpus with the current engine and re-measured a batch of documents through both renderers, Google and LibreOffice, and committed every result. The capability table was deliberately not regenerated: the rest of the corpus still carries no current-engine Google result, so a table built now would compare two different engines and name the wrong construct.
+
+## Next
+
+The remaining documents still need a current-engine Google result before the matrix means anything. `gverify.py --plan` lists them, smallest first.
