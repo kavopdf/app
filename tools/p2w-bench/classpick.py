@@ -38,6 +38,7 @@ CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES-GOOGLE.md")
 CLASSES_TXT = os.path.join(HERE, "txt", "DEFECT-CLASSES-TXT.md")
 ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 ROTATION = os.path.join(HERE, "ROTATION.json")
+GV = os.path.join(ROOT, "benchmarks", "gverify")
 
 LEVERAGE_RATIO = 3.0
 MIN_ATTEMPTS_FOR_A_VERDICT = 2
@@ -150,6 +151,50 @@ def exhausted():
     """
     rot = load(ROTATION, {})
     return rot.get("exhausted") or {}
+
+
+def clean_leverage():
+    """{check: how much of a CLEAN document it is worth}, biggest first.
+
+    WHY THIS AND NOT "documents affected".
+
+    Ranking by documents affected says 32_stroke_lines is worth 145 documents. Measured 21 Nov, fixing
+    it alone takes exactly TWO documents to clean, because those 145 documents each fail several checks
+    and losing one failure does not make a document clean.
+
+    The user wants 99% or better, and a document is only at 99% when ALL 42 checks pass. So the question
+    is not "how many documents does this check touch" but "how much of a clean document is this check
+    holding back". A check that is the ONLY failure on a document is worth 1.0 of that document. A check
+    that is one of five failures is worth 0.2 - clearing it moves the document a fifth of the way.
+
+    Measured on the corpus:
+
+        fix 05_chars_extra + 18_displacement + 32_stroke_lines   -> 35 documents become clean (6 -> 41)
+        add 59_shape_anchor                                      -> 44 clean
+        add 25_invisible_text                                    -> 57 clean
+
+    Those five are one construct family - a floating <w:drawing> per rule, plus the shapes it carries -
+    which is why they travel together. One fix, five checks, 51 documents.
+    """
+    out = {}
+    if not os.path.isdir(GV):
+        return out
+    for f in os.listdir(GV):
+        if not f.endswith(".json"):
+            continue
+        try:
+            j = json.load(open(os.path.join(GV, f), encoding="utf-8"))
+        except Exception:
+            continue
+        if j.get("status") == "page_count_refused":
+            continue
+        failed = j.get("failed") or []
+        if not failed:
+            continue
+        share = 1.0 / len(failed)
+        for c in failed:
+            out[c] = out.get(c, 0.0) + share
+    return out
 
 
 def _pick(fmt, rot, dead):
