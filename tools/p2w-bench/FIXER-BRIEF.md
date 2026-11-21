@@ -1020,3 +1020,89 @@ The engine already knows some of the answers, and each one is in FINDINGS/:
 
 **When a construct has no Google-honoured replacement, that is a finding to write down, not a licence to
 ship the LibreOffice-only version.**
+
+---
+
+## THE REPO ALREADY KNOWS A LOT. SEARCH IT BEFORE YOU BUILD ANYTHING.
+
+You have the whole repository cloned at `/scratch/work/CS` and you may read all of it. Weeks of work sit
+in it and most of what you are about to try has been tried, measured and written down. **Searching costs
+a minute; rebuilding a dead end costs a run.**
+
+    ls tools/p2w-bench/FINDINGS/          # one file per measured question, named by class and time
+    grep -rn "framePr" tools/p2w-bench/ docs/planning/ app/src/main/java/ 2>/dev/null
+    grep -rln "w:before\|w:drawing\|w:w\b" tools/p2w-bench/FINDINGS/
+    cat tools/p2w-bench/LESSONS.md        # what went wrong in the WORK, not in a class
+    cat docs/planning/PLAN-DECISIONS.md   # F1..Fn: what was decided, what is answered, what is open
+    cat tools/p2w-bench/SETTLED.md        # leads already closed
+    cat tools/p2w-bench/HYPOTHESES.md     # what was tried on the class you are on
+
+**Before you write a single line of engine code:** search for the construct, the class, and the document
+name. If a finding answers it, use that answer and say which finding in your attempt. If nothing answers
+it, then measure it yourself.
+
+**If the search turns up nothing, do what you judge right** - an empty search is not a reason to stop, it
+is a reason to start.
+
+### NEVER DELETE ANYTHING FROM THE REPOSITORY
+
+Not a file, not a row, not a line, not a branch, not a release asset, not a Drive file. Your work is to
+add and to change what is wrong; deletion is how evidence disappears and how the next run repeats this
+one. `git clean`, `rm -rf`, `git push --force`, `git reset --hard` and deleting a Drive file are all out.
+
+The one exception is a file you created earlier in the same run and no longer need, and even then it must
+never have been committed.
+
+---
+
+## REMOVING THE CONSTRUCTS ALREADY IN THE ENGINE. SLOWLY, MEASURED, NEVER BLIND.
+
+The engine still emits constructs Google ignores - measured 21 Nov, in the corpus as it stands:
+
+    2 992 shapes   (a rule, a box, a line - emitted by DocxWriter.shape())
+       4 pictures (emitted by DocxWriter.anchoredPicture())
+       0 <wp:inline> anywhere - every one of them is <wp:anchor>, which Google drops
+
+**They are 99.9% shapes.** That is the rules problem, and it is the single largest thing left in this
+tool: `32_stroke_lines` fails 145 documents in Google and 2 in LibreOffice.
+
+**The goal is zero. `google_safe.py --corpus --check` prints how far away it is and the mark can only
+fall** - `--mark` refuses to raise it, so no run can set the target to whatever it just did.
+
+### One construct per run. In this order.
+
+Work down `google_safe.py --corpus` by how many documents each one costs. **Shapes first**, because they
+are 2 992 of the 2 996 and they hold 143 documents.
+
+### The procedure for each one - do not skip a step
+
+1. **Search first.** `grep -rn "<the construct>" tools/p2w-bench/FINDINGS/ docs/`. It has probably been
+   tried. Four attempts on the rule-as-border are recorded there with what each one measured.
+2. **Pick ONE document** where that construct is the whole defect - `bank-statement-horizontal-rules-only`
+   is 39 rules and nothing else. Never start on the corpus.
+3. **Write the replacement in the engine**, then rebuild that one document and look at it in Google -
+   upload, convert to a Google Doc, export as PDF. Three Drive calls.
+4. **Only if that document improves and nothing else about it got worse**, run the corpus pass and the
+   gate. `regress.py --check` must pass and `google_safe.py --corpus --check` must show the count FALL.
+5. **`--mark` again** so the new, lower count becomes the ceiling.
+6. **One construct, one commit.** Not two.
+
+### What "removed" means, and what it does not
+
+**Removed means the engine no longer emits it and the document still looks right in Google.** Deleting
+the emitter and leaving the layout broken is not removal - it is the 3.53.5 mistake with the sign
+flipped, and the gate will refuse it because the corpus will get worse.
+
+**Never touch the engine directly to see what happens.** Every engine change goes through the build, the
+corpus measurement and the gate. A change you cannot measure is a change you do not commit; write it into
+`FINDINGS/` as a proposal instead, which is what `FINDINGS/PROPOSAL-*` files are for.
+
+**If a construct has no Google-honoured replacement, that is a finding, not a licence.** Write it down,
+park the class with `classpick.py --exhaust`, and move to the next one. The rotation already handles this.
+
+### Why this order and not a rewrite
+
+The user's rule, and it is absolute: **never rewrite the whole engine.** Work on known information, one
+document at a time, and verify before and after every change. A rewrite would take the one thing that
+works - 28 documents clean in Google, 61 improved since 15 Nov - and lose it with no measurement able to
+say where it went.
