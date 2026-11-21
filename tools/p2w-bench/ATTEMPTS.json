@@ -84,7 +84,7 @@
   "status": "OPEN"
  },
  "32_stroke_lines": {
-  "attempts": 2,
+  "attempts": 3,
   "first_seen": 1794543973.3763752,
   "history": [
    {
@@ -100,6 +100,13 @@
     "outcome": "reverted",
     "reason": "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more",
     "total": 145
+   },
+   {
+    "at": "2026-11-21 19:04",
+    "moved": null,
+    "outcome": "error",
+    "reason": "commit test",
+    "total": null
    }
   ],
   "last": 1794543973.3763797,
@@ -110,13 +117,15 @@
    "error",
    "error",
    "reverted",
+   "error",
    "error"
   ],
-  "reason": "namespace test",
+  "reason": "commit test",
   "reasons": [
    "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH.",
    "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md",
-   "namespace test"
+   "namespace test",
+   "commit test"
   ],
   "requeues": 0,
   "status": "OPEN"
