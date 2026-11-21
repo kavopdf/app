@@ -100,7 +100,16 @@ def _done():
         if d.get("status") == "page_count_refused":
             out.add(name)          # a recorded outcome, not a missing one
             continue
-        if now and d.get("engine") == now:
+        # THE ENGINE ID IS A GIT ABBREVIATION, AND ITS LENGTH IS NOT THE SAME EVERYWHERE.
+        #
+        # `git log --format=%h` prints 7 characters in a repository that has never needed 8 and 8
+        # once a collision forces it - and the machine that wrote the committed results printed 7.
+        # A plain string compare therefore matched NOTHING: measured 22 Nov, `--report` said
+        # "21 verified | 0 pass all 42 | 0 fail at least one" while 192 documents were scored and
+        # 6 passed all 42. An instrument that reports zero is not a quiet instrument, it is a wrong
+        # one, and it was one character away from being believed.
+        _e = d.get("engine") or ""
+        if now and _e and (_e == now or now.startswith(_e) or _e.startswith(now)):
             out.add(name)
     return out
 

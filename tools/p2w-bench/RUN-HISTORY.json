@@ -809,5 +809,19 @@
   "obstacles_cleared": 0,
   "needs_human": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795290397.3312974,
+  "started": "01:16",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "32_stroke_lines",
+  "attempts": 1,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]

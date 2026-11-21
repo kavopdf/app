@@ -1,5 +1,3 @@
-| 16 Nov 09:54 | fixer | slot claimed - fixer running |
-| 16 Nov 10:00 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 16 Nov 10:50 | fixer | slot claimed - fixer running |
 | 16 Nov 05:39 | fixer | attempt content-missing-partly-replaced -> error |
 | 16 Nov 05:40 | fixer | attempt content-missing-nothing-in-its-place -> error |
@@ -198,3 +196,5 @@
 | 22 Nov 00:15 | fixer | slot claimed - fixer running |
 | 22 Nov 01:16 | fixer | slot claimed - fixer running |
 | 22 Nov 01:43 | fixer | attempt 32_stroke_lines -> lead (0/? moved) |
+| 22 Nov 01:53 | fixer | slot claimed - fixer running |
+| 22 Nov 02:09 | fixer | attempt 32_stroke_lines -> lead (13/213 moved) |

@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 01:16
+# Fixer report - 2026-11-22 01:53
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 01:16 → running IST · 27 min**
+**22 Nov 2026 · slot 01:53 → running IST · 16 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -26,7 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 01:43 | **lead** | 0/None | carrier patch measured corpus-wide: 4595 carriers, 3608 of them 8-twip vertical cell separators; 375 goes 13 rows -> 455. Horizontal-only guard proven to restore byte-identity on 324/341/375 and keep |
+| 02:09 | **lead** | 13/213 | guarded carrier: 13 of the 16 {05,32} documents measured 40/42 -> 42/42 in Google on HEAD+rule-carrier-horizontal-only-2008; .txt byte-identical on all 16 and the guard restores HEAD exactly on 375/34 |
 
 ## The txt
 
@@ -46,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 01:16 → running · 27 min |
+| Slot window | 01:53 → running · 16 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 13 |
-| Longest silence | **10.6 min** — from 01:18:37, after `relay: patch scope read - followed-by-block is a superset, applying th` |
-| Silences over 2 min | 4 |
+| Tool beats | 11 |
+| Longest silence | **7.9 min** — from 01:53:55, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -58,9 +58,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **1 min** | `##` |
-| measure or build - a conversion, screen or compile writes no beacon | **22 min** | `##################` |
-| report - the report and the chain | **2 min** | `##` |
+| fix - diagnose and change the engine | **3 min** | `####` |
+| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `#############` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| other - not attributed to a tool | **2 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |

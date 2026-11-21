@@ -1,0 +1,14 @@
+{
+ "name": "49_coloured_background_block_paragraph",
+ "status": "ok",
+ "rc": 1,
+ "passed": 41,
+ "total": 42,
+ "failed": [
+  "32_stroke_lines"
+ ],
+ "engine": "462353f9",
+ "engine_patch": "rule-carrier-horizontal-only-2008",
+ "engine_note": "built from HEAD 462353f + patches/rule-carrier-horizontal-only-2008.patch; NOT the engine the main table is measured on",
+ "measured": "2026-11-22T02:2xZ fixer slot 01:53"
+}

@@ -92,3 +92,4 @@
 {"at": "2026-11-21 23:37", "attempt": 1, "class": "05_chars_extra", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-22 00:12", "attempt": 8, "class": "32_stroke_lines", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-22 01:43", "attempt": 9, "class": "32_stroke_lines", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-22 02:09", "attempt": 10, "class": "32_stroke_lines", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
