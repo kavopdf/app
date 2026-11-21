@@ -1,5 +1,5 @@
 {
- "plan": "",
+ "plan": "32_stroke_lines: land rule-carrier-horizontal-only-2008 by closing the 38 missing Google results, not by narrowing the predicate",
  "notes": [
   {
    "at": "13:08",
@@ -872,9 +872,37 @@
   {
    "at": "04:08",
    "text": "attempt 13 on 32_stroke_lines -> lead"
+  },
+  {
+   "at": "04:49",
+   "text": "attempt 14 on 32_stroke_lines -> lead"
+  },
+  {
+   "at": "04:49",
+   "text": "agent deployed: 32_stroke_lines / A - can the emitter tell its drawing anchor is inside a w:tc, and is the prescribed "
+  },
+  {
+   "at": "04:49",
+   "text": "agent deployed: 32_stroke_lines / B - is the 54-document carrier regression cell nesting or body-flow page overflow"
+  },
+  {
+   "at": "04:49",
+   "text": "agent landed: 32_stroke_lines / A -> FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md"
+  },
+  {
+   "at": "04:49",
+   "text": "agent landed: 32_stroke_lines / B -> FINDINGS/32_stroke_lines-CARRIER-REGRESSION-IS-PAGE-OVERFLOW-0450-f1x.md"
+  },
+  {
+   "at": "04:49",
+   "text": "relay slot: the previous fixer (03:53) pushed its message at 04:09 and never released; attempt.py re-stamps fixer_started so the claim read 2 min old at 04:10 and the :10 cron stood down. The claim went stale at 04:18 and this run took it. That re-stamp is why a run that ends after an attempt leaves a fresh-looking claim."
+  },
+  {
+   "at": "04:49",
+   "text": "agent landed: 32_sA-03 /  -> FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md"
   }
  ],
- "next": "Do not apply rule-carrier-horizontal-only-2008 as a global substitution. Narrow isRuleShape so a band that sits on a table cell/row edge or a stamp frame gets no carrier, then screen the 54 regressed documents before any corpus pass. Or Google-score 08_two_overlapping_stamps, 50_invoice_coloured_total_row and product-catalogue-code-left-price-right first: if Google is clean the 54 are an LO artefact of nested floating tables and the predicate needs no narrowing",
+ "next": "Apply tools/p2w-bench/patches/rule-carrier-horizontal-only-2008.patch, build, run the corpus pass and take the exact LO regressions. The 16 documents already measured in Google under this patch are in benchmarks/gverify-carrier-2008/: 13 reach 42/42, 3 reach 41/42, none regress, all 16 clear 05_chars_extra. regress.py already exempts a LibreOffice regression when Google improved on the same document - it needs benchmarks/gverify/<doc>.json in the working tree. So run gverify --plan 60 over the regressed documents that have no carrier result, and land the patch with those results in the same push. Do NOT build the cell guard the last report asked for: no Shape is ever routed into a w:tc (max tc-depth 0 across 156 carriers in 22 docs) and the guard built byte-identical output on five PDFs.",
  "agents": [
   {
    "id": "contA-01",
@@ -1494,13 +1522,38 @@
    "question": "a census of every rule in the failing documents by placement, and what DocxWriter's tcBorders path can actually reach",
    "expected": "counts per sub-population and the cheapest 5 documents",
    "deployed": "22:39",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-21T17:09"
+   "status": "landed",
+   "finding": "FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md",
+   "deployed_at": "2026-11-21T17:09",
+   "landed_at": "2026-11-21T23:19"
+  },
+  {
+   "id": "32_sA-03",
+   "class": "32_stroke_lines",
+   "angle": "A",
+   "question": "can the emitter tell its drawing anchor is inside a w:tc, and is the prescribed guard a no-op",
+   "expected": "04:20",
+   "deployed": "04:49",
+   "status": "landed",
+   "finding": "FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md",
+   "deployed_at": "2026-11-21T23:19",
+   "landed_at": "2026-11-21T23:19"
+  },
+  {
+   "id": "32_sB-02",
+   "class": "32_stroke_lines",
+   "angle": "B",
+   "question": "is the 54-document carrier regression cell nesting or body-flow page overflow",
+   "expected": "04:20",
+   "deployed": "04:49",
+   "status": "landed",
+   "finding": "FINDINGS/32_stroke_lines-CARRIER-REGRESSION-IS-PAGE-OVERFLOW-0450-f1x.md",
+   "deployed_at": "2026-11-21T23:19",
+   "landed_at": "2026-11-21T23:19"
   }
  ],
  "run": {
-  "started": "04:18",
+  "started": "04:49",
   "ended": null,
   "ended_how": null
  },
@@ -1615,5 +1668,5 @@
    "change": "a person must either authorise the trade (a 1.03 rise on a document already at 97.62 for 601 going to 0.00), or give share@5px a companion axis that separates 'more ink, some far' from 'the same ink, further' - see FINDINGS/widget-walk-REFUSED-BY-ONE-DOCUMENT-1050-f1x.md"
   }
  ],
- "next_class": "product-catalogue-code-left-price-right"
+ "next_class": ""
 }

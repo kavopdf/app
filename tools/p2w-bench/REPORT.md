@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 03:14
+# Fixer report - 2026-11-22 04:18
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 03:14 → running IST · 47 min**
+**22 Nov 2026 · slot 04:18 → running IST · 30 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 2 attempt(s), 0 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,9 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 03:35 | **lead** | 0/213 | Blast radius of the horizontal-only carrier patch measured for the first time on all 213: 161 documents change .docx content, not 16. 143 of them fail 32 (gain candidates), 5 pass 32 (pure risk) and 1 |
-| 04:01 | **reverted** | 0/16 | corpus pass on HEAD+horizontal-only carrier: 52 better, 54 worse, regress.py REFUSED 58; regressed docs median 9 carriers vs 1 unchanged; HEAD reproduces baseline on 3 controls so the instrument is so |
-| 04:08 | **lead** | 1/None | Google measurement of the carrier on two documents: 51_two_cm_margins stays 42/42 (rewritten, not worse), 17_three_column_widths_txtpos 40/42 -> 42/42. Refuted the 02:50 prescription: 32_stroke_lines |
+| 04:49 | **lead** | 0/None | Measured the two things the last two runs left open, on committed evidence and two independent measurements: (1) the prescribed cell guard cannot fire - no Shape is ever routed into a w:tc, guard buil |
 
 ## The txt
 
@@ -42,17 +40,20 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `32_sA-03` | can the emitter tell its drawing anchor is inside a  | 04:49 | 23:19 | 0 min |
+| `32_sB-02` | is the 54-document carrier regression cell nesting o | 04:49 | 23:19 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 03:14 → running · 47 min |
+| Slot window | 04:18 → running · 30 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 13 |
-| Longest silence | **23.9 min** — from 03:36:51, after `report.py: building the report` |
-| Silences over 2 min | 2 |
+| Tool beats | 15 |
+| Longest silence | **29.6 min** — from 04:18:54, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -60,10 +61,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **18 min** | `#########` |
-| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `############` |
+| fix - diagnose and change the engine | **29 min** | `#####################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -76,7 +75,7 @@
 
 ## Next run
 
-Do not apply rule-carrier-horizontal-only-2008 as a global substitution. Narrow isRuleShape so a band that sits on a table cell/row edge or a stamp frame gets no carrier, then screen the 54 regressed documents before any corpus pass. Or Google-score 08_two_overlapping_stamps, 50_invoice_coloured_total_row and product-catalogue-code-left-price-right first: if Google is clean the 54 are an LO artefact of nested floating tables and the predicate needs no narrowing
+Apply tools/p2w-bench/patches/rule-carrier-horizontal-only-2008.patch, build, run the corpus pass and take the exact LO regressions. The 16 documents already measured in Google under this patch are in benchmarks/gverify-carrier-2008/: 13 reach 42/42, 3 reach 41/42, none regress, all 16 clear 05_chars_extra. regress.py already exempts a LibreOffice regression when Google improved on the same document - it needs benchmarks/gverify/<doc>.json in the working tree. So run gverify --plan 60 over the regressed documents that have no carrier result, and land the patch with those results in the same push. Do NOT build the cell guard the last report asked for: no Shape is ever routed into a w:tc (max tc-depth 0 across 156 carriers in 22 docs) and the guard built byte-identical output on five PDFs.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

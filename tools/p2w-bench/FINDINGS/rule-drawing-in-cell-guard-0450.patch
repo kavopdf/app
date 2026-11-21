@@ -1,0 +1,31 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4ead19d..dd60f9a 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -834,6 +834,8 @@ public final class DocxWriter {
+         int cellWrapHits;
+         /** The shapes on the page being written, so a stamp can find its own outline. */
+         java.util.List<Shape> curShapes;
++        /** Drawings not written because their anchor paragraph sits inside a table cell. */
++        int shapesInCell;
+         /**
+          * The lines of each stamp, keyed by the shape that carries that stamp's frame.
+          *
+@@ -2770,6 +2772,17 @@ public final class DocxWriter {
+      * it exists to make visible. A rule drawn behind text is still a rule.
+      */
+     private static void shape(StringBuilder sb, Shape s, Ctx ctx) {
++        // A PAGE-ANCHORED DRAWING WRITTEN FROM INSIDE A CELL LANDS OUTSIDE IT.
++        //
++        // wp:positionH/positionV below are relativeFrom="page" and the run's own paragraph is
++        // a block of the w:tc it sits in, so the offset is read from the wrong origin: the same
++        // reason anchorBox() refuses to anchor a line in a column cell (see ZERO_GAP_ANCHOR and
++        // ctx.inColumn). The rule is suppressed here and stays a drawing everywhere else - this
++        // is a placement guard, not a change of construct.
++        if (ctx.inColumn) {
++            ctx.shapesInCell++;
++            return;
++        }
+         int id = SHAPE_ID_BASE + (ctx.shapeSeq++);
+         long cx = Math.max(1, Math.round(s.wPt * EMU_PER_PT));
+         long cy = Math.max(1, Math.round(s.hPt * EMU_PER_PT));
