@@ -35,6 +35,16 @@ LORES = os.path.join(ROOT, "benchmarks", "gverify-lo")
 TXT = os.path.join(HERE, "txt", "RANKING-TXT.csv")
 RANK = os.path.join(ROOT, "benchmarks", "RANKING.csv")
 CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
+# THE TABLE THE FIXER ACTUALLY RANKS IS THE GOOGLE ONE, AND THIS WATCHED THE OTHER.
+#
+# classpick.py ranks benchmarks/DEFECT-CLASSES-GOOGLE.md, which classify_google.py regenerates on the
+# classifier cron. health.py measured only benchmarks/DEFECT-CLASSES.md - the LibreOffice-derived table
+# that attempt.py writes but no run picks a class from. Measured 21 Nov 21:35 UTC: the classifier
+# regenerated the GOOGLE table at 19:51 (1.7 h old, current against the 18:19 results), while this
+# row read `stopped` at 13.3 h because the .md had not been touched since 08:14. A watchdog that
+# reports a stall on a file nobody ranks is the false alarm that makes a watchdog ignorable, so the
+# row is current when EITHER table is current, and the age shown is the younger of the two.
+CLASSES_GOOGLE = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES-GOOGLE.md")
 ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 BLOCKERS = os.path.join(HERE, "BLOCKERS.md")
 
@@ -212,10 +222,15 @@ def compute():
     # results land; when it is newer than the newest result, no run is behind and an age past six
     # hours is the age of the inputs, not of the work. Reading `stopped` there is the false alarm
     # that makes a watchdog ignorable - BLOCKERS.md 20 Nov 18:10 asked for exactly this state.
+    # Both tables are read: the GOOGLE one is the queue the fixer ranks (classpick.py), the .md is the
+    # ledger attempt.py records into. Either being newer than the results means no classify run is
+    # behind. See the CLASSES_GOOGLE note above for the 21 Nov false alarm this repairs.
+    _class_age = min(_age(CLASSES), _age(CLASSES_GOOGLE))
+    _class_current = _is_current(CLASSES, GVERIFY) or _is_current(CLASSES_GOOGLE, GVERIFY)
     out["stages"]["classify"] = {
-        "age_h": round(_age(CLASSES), 1),
-        "state": ("superseded" if _is_current(CLASSES, GVERIFY) else
-                  ("moving" if _age(CLASSES) < THRESHOLD["classify"] else "stopped"))
+        "age_h": round(_class_age, 1),
+        "state": ("superseded" if _class_current else
+                  ("moving" if _class_age < THRESHOLD["classify"] else "stopped"))
                  if g >= total and total else "waiting"}
 
     recent = _attempts_recent(3.0)
