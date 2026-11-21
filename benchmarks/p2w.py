@@ -1141,7 +1141,16 @@ def _invalidate_if_engine_changed():
         was = open(stamp_path, encoding="utf-8").read().strip()
     except Exception:
         was = ""
-    if was and was != now:
+    # "UNKNOWN" IS NOT EVIDENCE OF A CHANGE, AND DELETING ON IT COSTS THE WHOLE PASS.
+    #
+    # Measured 22 Nov: a full 212-document pass (213 docx, 30 min of conversion and measurement)
+    # was complete, and the very next invocation - gate.py, which resolves ENGINE_SRC to its own
+    # clone at /scratch/work/p2w/repo rather than the tree P2W_ENGINE_SRC named - read a stamp of
+    # "unknown" left by the previous call, computed the real hash, and did `rm -rf DOCX DIST PRE`.
+    # 212 measurements and 213 docx were destroyed between two commands, and the run had no time
+    # left to rebuild them. A stamp we could not read says nothing about which engine the cache
+    # came from; it must not be treated as a different one.
+    if was and was != "unknown" and now != "unknown" and was != now:
         log(f"engine changed {was} -> {now} - discarding docx and measurements built on {was}")
         for d in (DOCX, DIST, PRE):
             sh(f"rm -rf {d}", 120)
