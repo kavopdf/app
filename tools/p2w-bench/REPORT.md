@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 13:54 → running IST · 50 min**
+**21 Nov 2026 · slot 13:54 → running IST · 51 min**
 
 > **38_faux_bold_italic_synthesised** improved — 2.00 → 0.00. Corpus ratchet clean across 213 documents.
 
@@ -21,7 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
-| Committed | **19** files in 4 commit(s) from `8add959` — ATTEMPTS.json, CLASS-HISTORY.jsonl, ENGINE-STAMP.json, HANDOFF.json, HANDOFF.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, RESTAMP-TXT.jsonl, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, STATE-TXT. |
+| Committed | **21** files in 5 commit(s) from `f702b40` — ATTEMPTS.json, CLASS-HISTORY.jsonl, ENGINE-STAMP.json, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, REPORT.md, RESTAMP-TXT.jsonl, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN- |
 
 ## What was tried
 
@@ -42,15 +42,18 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `t01lostwords-01` | which words each of the five documents loses, and wh | 13:57 | 14:06 | 9 min |
+| `t01blastradius-01` | which of 213 documents change verdict under the two  | 13:57 | 14:08 | 11 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:54 → running · 50 min |
+| Slot window | 13:54 → running · 51 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 23 |
+| Tool beats | 27 |
 | Longest silence | **20.4 min** — from 13:54:18, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 6 |
 | Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
@@ -61,9 +64,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **38 min** | `#################` |
+| measure or build - a conversion, screen or compile writes no beacon | **38 min** | `################` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
+| report - the report and the chain | **2 min** | `#` |
 | other - not attributed to a tool | **9 min** | `####` |
 ## Best results this round
 

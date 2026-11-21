@@ -748,6 +748,14 @@
   {
    "at": "14:42",
    "text": "attempt 18 on t01_word_accuracy -> kept (1/5 moved)"
+  },
+  {
+   "at": "14:45",
+   "text": "agent deployed: t01 / lostwords - which words each of the five documents loses, and why"
+  },
+  {
+   "at": "14:45",
+   "text": "agent deployed: t01 / blastradius - which of 213 documents change verdict under the two source-side changes"
   }
  ],
  "next": "Land the pBdr rule replacement: FINDINGS/RULES-PBDR-IMPLEMENTATION.md, first statement of DocxWriter.shape() at line 2772 (return before line 2779), carrying the ctx.flowY = s.topPt update. Screen 32_stroke_lines first, then the full corpus pass. The finding predicts 124 documents cleared among the 144 LibreOffice-only ones, and all 145 if the residual is only the footer rule.",
@@ -1269,6 +1277,30 @@
    "finding": "tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md",
    "deployed_at": "2026-11-21T06:04",
    "landed_at": "2026-11-21T06:04"
+  },
+  {
+   "id": "t01lostwords-01",
+   "class": "t01",
+   "angle": "lostwords",
+   "question": "which words each of the five documents loses, and why",
+   "expected": "the missing token list per document",
+   "deployed": "13:57",
+   "status": "landed",
+   "finding": "FINDINGS/t01-doubled-draw-both-sides-142100.md",
+   "deployed_at": "2026-11-21T13:57",
+   "landed_at": "2026-11-21T14:06"
+  },
+  {
+   "id": "t01blastradius-01",
+   "class": "t01",
+   "angle": "blastradius",
+   "question": "which of 213 documents change verdict under the two source-side changes",
+   "expected": "2 fixed, 0 regressions",
+   "deployed": "13:57",
+   "status": "landed",
+   "finding": "FINDINGS/t01-doubled-draw-both-sides-142100.md",
+   "deployed_at": "2026-11-21T13:57",
+   "landed_at": "2026-11-21T14:08"
   }
  ],
  "run": {
