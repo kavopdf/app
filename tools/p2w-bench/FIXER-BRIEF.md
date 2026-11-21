@@ -1304,3 +1304,44 @@ rediscovering it. That file is `LAST-MESSAGE.md` and it is not optional.
 
 **Every document in the corpus must match its original at 99% or better in Google, in both the .docx and
 the .txt.** Not the class worked, not the attempt recorded, not the gate passed. **The document.**
+
+---
+
+## TWO PLACES THIS BRIEF LOOKS LIKE IT CONTRADICTS ITSELF. IT DOES NOT, AND HERE IS THE LINE.
+
+### "Never edit verify_google.py or verify_txt.py" against "everything broken is yours to fix"
+
+**You may fix a check that is wrong. You may never weaken a check to make a number look better.**
+
+The difference is not a feeling, it is a measurement:
+
+* **A check is WRONG** when it fails a document against itself, or counts something the PDF never drew, or
+  passes something it should fail. `26_text_overlap` was wrong for days: it counted absolute overlaps
+  instead of new ones, so a stamp printed over text failed the document against itself. Fixing that is
+  your job and it makes the number honest.
+* **A check is WEAKENED** when its threshold is moved, a sub-check is deleted, or a case is added to the
+  abstain list, so that a document it used to fail now passes. That is not a fix, it is a lie with a
+  commit attached, and it is the one thing in this repository that cannot be undone later because every
+  measurement after it inherits the lie.
+
+**So, to change an instrument:** write the finding first - what the check does, what it should do, the
+document that shows the difference, and the measurement before and after - then change it, then
+re-measure the whole corpus, then say in the report that the instrument changed and what moved. **An
+instrument change with no finding and no re-measurement is refused even if the new number is better.**
+
+`regress.py` will not catch this for you. Nothing will. It is the one place where you are trusted.
+
+### "Change ONE construct, not two" against "two attempts is the floor"
+
+**Both are true and they count different things.**
+
+* **One construct per COMMIT.** A commit that changes how rules are emitted *and* how a stamp is anchored
+  cannot be measured: if the corpus moves you cannot say which half moved it, and if it regresses you
+  cannot say which half regressed it.
+* **Two ATTEMPTS per run, minimum.** Both attempts are on the same class and usually the same construct -
+  a second idea for the same problem, or the same idea proved on a second document. They are separate
+  commits only if each stands on its own measurement.
+
+**So: two or three attempts a run, each attempt its own commit, all of them on the class the rotation gave
+you, and one construct per commit.** There is no contradiction, and a run that does one attempt has done
+half a run.
