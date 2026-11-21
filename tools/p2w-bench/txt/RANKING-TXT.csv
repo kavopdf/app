@@ -11,7 +11,7 @@ document,applicable,passed,failed,abstained,failed_ids
 09_stamp_font_not_embedded,9,8,1,1,t08_line_order
 10_stamp_as_image,10,10,0,0,
 11_stamp_with_signature_image,9,9,0,0,
-12_stamp_across_page_break,10,9,1,1,t12_word_invention
+12_stamp_across_page_break,10,10,0,0,
 13_stamp_non_english,9,9,0,0,
 14_stamp_chars_positioned_td,9,9,0,0,
 15_stamp_on_scanned_page,4,4,0,0,
@@ -108,7 +108,7 @@ document,applicable,passed,failed,abstained,failed_ids
 407_id_card_front_back,7,7,0,0,
 40_devanagari_shaping_font,9,9,0,0,
 410_form_xobject_reused,7,7,0,0,
-411_nested_xobject_transforms,4,3,1,1,t01_word_accuracy
+411_nested_xobject_transforms,4,4,0,0,
 412_page_labels_roman,9,9,0,0,
 413_tagged_pdf_actualtext,4,4,0,0,
 414_transparency_softmask,4,4,0,0,

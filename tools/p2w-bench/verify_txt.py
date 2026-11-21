@@ -567,8 +567,21 @@ def glyph_truth(path):
                 trace = pg.get_texttrace()
             except Exception:
                 trace = []
+            # THE CLIP FLAG IS THE SOURCE'S, NOT THE PAGE'S.
+            #
+            # get_text() with its default flags sets TEXT_MEDIABOX_CLIP, so a line the page
+            # drew even slightly outside the media box is dropped from the source word list
+            # while the writer faithfully emits it. Measured 21 Nov on
+            # 411_nested_xobject_transforms: a rotated heading at y = -2.5..-16.4 survived
+            # as the two stray characters "S" and "O", the source list collapsed to 20 words,
+            # and a .txt whose 24 words are the same multiset scored 90.0 against a 99 bar.
+            # With the flag off the source is word-for-word the .txt. Corpus blast radius,
+            # measured over all 213: one document's verdict moves (411, FAIL -> PASS), one
+            # document's source text gains 3 tokens with no verdict change
+            # (12_stamp_across_page_break), and 211 documents are byte-identical.
             try:
-                declared_page = pg.get_text()
+                declared_page = pg.get_text(
+                    flags=fitz.TEXTFLAGS_TEXT & ~fitz.TEXT_MEDIABOX_CLIP)
             except Exception:
                 declared_page = ""
             # A CODE THE FONT ITSELF SAYS HAS NO UNICODE COMES BACK AS ITS OWN NUMBER.
