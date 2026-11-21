@@ -19,8 +19,8 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 21:11 |
-| ended | 21:23 |
+| started | 20:57 |
+| ended | 21:33 |
 | how it ended | forced |
 | plan | - |
 
@@ -93,7 +93,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:34` agent deployed: t02_position / A - is the two-line 47_margins/t02 claim a real two-format fix
 - `11:34` agent landed: 32_stroke_lines / B -> tools/p2w-bench/FINDINGS/32_stroke_lines-google-drop-113048-9597.md
 - `11:34` agent landed: t02_position / A -> tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md
 - `11:35` attempt 1 on t02_position -> error
@@ -118,6 +117,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `19:10` attempt 3 on 32_stroke_lines -> reverted (0/15 moved)
 - `20:08` attempt 4 on 32_stroke_lines -> reverted (0/213 moved)
 - `20:17` attempt 5 on 32_stroke_lines -> lead (0/210 moved)
+- `21:31` attempt 6 on 32_stroke_lines -> lead
 
 ## Where the rest of the state lives
 
