@@ -1490,6 +1490,21 @@ public final class DocxWriter {
     private static final float COLUMN_START_TOL = 40f;
 
     /**
+     * How far a cluster's MEAN start may sit right of its LEFTMOST start before the cluster is
+     * treated as two places rather than one, and its edge taken from the leftmost.
+     *
+     * <p>A layout-table cell's text is drawn at the cell's left edge plus its w:ind, and w:ind
+     * cannot be negative - {@code Math.max(0, leftTw - bandLeftTw(...))} drops the difference -
+     * so a line drawn LEFT of its column's edge is displaced right by that difference, in every
+     * cell of the column, by a constant. The cluster mean is a place no line starts, so a
+     * column whose rows begin at two places gets an edge between them and every line at the
+     * left place is displaced. Below 2 pt the mean is the column's start within the
+     * measurement's own noise, which is DX_MED_TOL - the tolerance the margin check already
+     * calls "registered". Above it the cluster is two places and its edge is the leftmost.
+     */
+    private static final float COLUMN_EDGE_SPLIT = 2f;
+
+    /**
      * The column whose left edge a fragment starts at, or -1 when it starts at none of them.
      *
      * <p>NEAREST edge, not "the last edge it is past". The edges are read off the page's own rows
@@ -1581,18 +1596,49 @@ public final class DocxWriter {
         }
         if (xs.size() < 6) return null;
         java.util.Collections.sort(xs);
-        java.util.List<float[]> cand = new ArrayList<>();       // {x, count}
+        // THE CLUSTER'S EDGE IS A PLACE ITS LINES START, NOT THEIR AVERAGE.
+        //
+        // The mean is a place no line starts, and a column whose rows begin at two places gets
+        // an edge between them: a layout-table cell's text is drawn at the cell's left edge plus
+        // its w:ind, w:ind cannot be negative (see the Math.max(0, ...) at the w:ind emission),
+        // so every line drawn LEFT of the edge is displaced right by the difference - a constant
+        // offset over the whole group, which is exactly the 47_margins shape this class keeps
+        // coming back in.
+        //
+        // Measured, and both are borderless tables with every border "none", every tblCellMar 0
+        // and every tblInd right - so the "cell border charged twice" defect is not this one:
+        //   brochure-3col-with-sidebar-box  the third column's 25 fragments are 15 at 392.13
+        //     (the body) and 10 at 400.13 (the sidebar's key/value list, 8 pt inside it). The
+        //     mean is 395.33, so the grid's third edge is 395.33 and the body's indent is
+        //     clamped to 0: 15 runs render at 395.40, a constant +3.27 over a 0.00 spread.
+        //   product-catalogue-code-left-price-right  the second column's 41 fragments are 7 at
+        //     516.07, 7 at 521.57, 20 at 526.44 (its "incl. GST" sub-lines), 6 at 529.82 and
+        //     the footer: the mean is 524.12, the edge is 524.12, and 14 runs at 516.07 and
+        //     521.57 are clamped to indent 0 - the constant +8.1 and +2.6 the class reports.
+        // Taking the leftmost start instead gives 392.13 and 516.07, the indent of every line
+        // becomes its own distance from the column's start, and every line lands on its page x.
+        //
+        // Membership is decided exactly as before: the running mean still answers "does this x
+        // join the cluster", so the clusters HEAD found are the clusters this finds. Only the
+        // number a cluster REPORTS changes.
+        java.util.List<float[]> cand = new ArrayList<>();       // {mean, count, leftmost}
         float cur = xs.get(0);
+        float curMin = xs.get(0);
         int curN = 1;
         for (int i = 1; i < xs.size(); i++) {
             float v = xs.get(i);
             if (v - cur <= 8f) { cur = (cur * curN + v) / (curN + 1); curN++; }
-            else { cand.add(new float[]{cur, curN}); cur = v; curN = 1; }
+            else { cand.add(new float[]{cur, curN, curMin}); cur = v; curMin = v; curN = 1; }
         }
-        cand.add(new float[]{cur, curN});
+        cand.add(new float[]{cur, curN, curMin});
         int need = Math.max(3, Math.round(rows.size() * 0.3f));
         java.util.List<Float> starts = new ArrayList<>();
-        for (float[] c : cand) if (c[1] >= need) starts.add(c[0]);
+        for (float[] c : cand) {
+            if (c[1] < need) continue;
+            // xs is sorted, so curMin is the cluster's first x. Sub-tolerance spread is the
+            // page's own raggedness and keeps the mean; beyond it the cluster is two places.
+            starts.add(c[0] - c[2] > COLUMN_EDGE_SPLIT ? c[2] : c[0]);
+        }
         if (starts.size() < 2 || starts.size() > 4) return null;
 
         float[] edge = new float[starts.size() + 1];
