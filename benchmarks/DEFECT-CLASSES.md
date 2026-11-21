@@ -1,5 +1,5 @@
 # Defect classes - round 1
-Documents measured: **213 of 213**.
+Documents measured: **213 of 214** - 1 exempt (`416_many_tiny_pages`), counted in the total and never scored.
 Documents measured: **213 of 213**.
 Documents measured: **213 of 213**.
 

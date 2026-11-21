@@ -1,4 +1,6 @@
 {
- "docx": {},
+ "docx": {
+  "416_many_tiny_pages": "300 pages; no per-command budget can measure it, and measure_doc_chunked cannot walk 300 one-line pages inside 280 s. Exempt by design - it is measured when the window is large enough, and its absence is recorded here rather than silently dropped."
+ },
  "txt": {}
 }

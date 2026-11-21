@@ -1,11 +1,11 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "relay/fixer: findings written, running the gate",
-  "fixer_doing_since": 1795247960.3593736,
+  "fixer_doing": "font rename reverted (it regressed 392 and 406); gate check on the tooling fixes only",
+  "fixer_doing_since": 1795248796.5795174,
   "fixer_engine_at_claim": "7112d76",
-  "fixer_last_beat": 1795247960.359374,
-  "fixer_started": 1795248016.460409,
+  "fixer_last_beat": 1795248796.5795183,
+  "fixer_started": 1795248821.2662044,
   "history": [
     {
       "at": "2026-11-12 09:46",

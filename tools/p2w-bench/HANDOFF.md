@@ -19,14 +19,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 13:18 |
+| started | 11:52 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> The pBdr carry-over is CLOSED, not parked: three findings (044000, 055000, 065000) plus today's independent verification prove the carrier paragraph charges 9.6 pt of flow whatever it contains, the 065000 guard is unsatisfiable by construction (flowFromBox sets rightTw=0 for a left-aligned paragraph, so the right-edge test demands the rule reach the paper edge - 0 of 2136 rules pass both edges), and the hook ceiling is 3 of 39 rules on the document made entirely of rules. Any future 32_stroke_lines attempt must start from NO NEW PARAGRAPH. Also landed: health.py THRESHOLD was in seconds while every age is in hours, so four of five stages could never read stopped; txt read moving at 13.3 h against a 12 h intent and now reads stopped. classify gained a superseded state for a table newer than its results.
+> stage.py was reporting 'classify' on every fresh clone for a day, and three watchdog passes blamed the classifier cron for it. The cause was in stage.py, not the cron: it compared benchmarks/DEFECT-CLASSES.md (the previous pipeline's ghost, which nothing regenerates) against the gverify results by filesystem mtime, and a git clone stamps every file with the checkout time, so the comparison was decided by unpack order - measured 21 Nov, 05:47:52 against 05:47:53. Fixed and pushed de5d216: the live table is DEFECT-CLASSES-GOOGLE.md and currency is judged by the last commit touching each path (gverify 42bdcda 01:44:38, table e86a88a 04:47:32). stage.py now reads 'fix' with 185 failing documents, and both negative tests still fire. Two agents landed: 32_stroke_lines is the biggest open Google class (145 docs, 144 of them LibreOffice-draws-Google-drops) and its root cause is that every standalone rule leaves DocxWriter.shape() at line 2772 as a floating <w:drawing>/<wp:anchor>, which google_safe.py already lists twice as ignored by Google; FINDINGS/RULES-PBDR-IMPLEMENTATION.md holds the measured pBdr replacement (0 -> 2 rules on the probe document) and the ctx.flowY = s.topPt line whose omission turns it into a regression. The t02_position two-line claim from 47_margins-TXT-HALF-IS-T02-1055-f1x.md is REFUTED as a two-format fix: flippedPage reaches only buildPara, lineX is read only by TxtWriter, and 47_margins already passes on all five t02 documents in the stored LibreOffice table. Its third line as written deletes the only guard protecting 15_stamp_on_scanned_page; use 'if (g.dirx > -0.5f) return false;' instead.
+
+## What the next run should do first
+
+> Land the pBdr rule replacement: FINDINGS/RULES-PBDR-IMPLEMENTATION.md, first statement of DocxWriter.shape() at line 2772 (return before line 2779), carrying the ctx.flowY = s.topPt update. Screen 32_stroke_lines first, then the full corpus pass. The finding predicts 124 documents cleared among the 144 LibreOffice-only ones, and all 145 if the residual is only the footer rule.
 
 ## Agents deployed and not yet accounted for
 
@@ -76,14 +80,18 @@ unfinished work, not as a result.
 | t01_B-03 | t01_word_accuracy | B | implement the /AP /N glyph walk in its own clone and measure 601 and t | 04:36 | 601 from 37/42 to 42/42 docx checks, with the instrument's own answer for a tick | landed | FINDINGS/widget-ap-glyph-walk-0436-f1x.md |
 | 32_sB-01 | 32_stroke_lines | B | why Google drops the rules LibreOffice draws, and which construct repl | 11:34 | landed | landed | tools/p2w-bench/FINDINGS/32_stroke_lines-google-drop-113048-9597.md |
 | t02_A-01 | t02_position | A | is the two-line 47_margins/t02 claim a real two-format fix | 11:34 | landed | landed | tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md |
-| 32_sA-01 | 32_stroke_lines | A | Verify the pBdr implementation in FINDINGS/RULES-PBDR-IMPLEMENTATION.m | 12:14 | by 12:50 | landed | FINDINGS/32_stroke_lines-A-pbdr-verification-124000-relay.md |
-| 32_sB-02 | 32_stroke_lines | B | From the source PDFs, count horizontal hairline rules per document cor | 12:14 | by 12:50 | landed | FINDINGS/32_stroke_lines-B-rule-flow-neutral-124500-relay.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
+- `00:57` attempt 8 on t01_word_accuracy -> reverted (0/5 moved)
+- `01:41` agent deployed: t01_word_accuracy / A - is the handed diagnosis (nested form matrix disagreement, rotated line off page)
+- `01:41` agent deployed: t01_word_accuracy / B - why does 39_small_caps_letter_spacing lose 8 words and invent 2 - writer or refe
+- `01:41` agent landed: t01_word_accuracy / A -> FINDINGS/411-nested-xobject-matrix-1940.md
+- `01:41` agent landed: t01_word_accuracy / B -> FINDINGS/39-small-caps-gap-threshold-0150-fixer.md
+- `01:41` attempt 9 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:47` attempt 10 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:51` attempt 11 on t01_word_accuracy -> reverted (0/5 moved)
 - `03:25` attempt 11 on 47_margins -> partial (2/26 moved)
@@ -102,13 +110,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `11:34` agent landed: 32_stroke_lines / B -> tools/p2w-bench/FINDINGS/32_stroke_lines-google-drop-113048-9597.md
 - `11:34` agent landed: t02_position / A -> tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md
 - `11:35` attempt 1 on t02_position -> error
-- `12:14` agent deployed: 32_stroke_lines / A - Verify the pBdr implementation in FINDINGS/RULES-PBDR-IMPLEMENTATION.md applies 
-- `12:14` agent deployed: 32_stroke_lines / B - From the source PDFs, count horizontal hairline rules per document corpus-wide a
-- `12:39` relay: carry-over closed with evidence, health.py unit bug fixed and proven (txt moving->stopped at 13.3 h), unit guard added
-- `12:40` agent landed: 32_sA-01 /  -> FINDINGS/32_stroke_lines-A-pbdr-verification-124000-relay.md
-- `12:40` agent landed: 32_sB-02 /  -> FINDINGS/32_stroke_lines-B-rule-flow-neutral-124500-relay.md
-- `12:46` attempt 2 on 32_stroke_lines -> error (0/37 moved)
-- `13:30` attempt 16 on t01_word_accuracy -> reverted (0/6 moved)
+- `13:43` attempt 14 on 47_margins -> error
 
 ## Where the rest of the state lives
 

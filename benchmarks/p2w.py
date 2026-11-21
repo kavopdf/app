@@ -56,7 +56,7 @@ block. Every run begins here.
     p2w.py --status
     p2w.py --diagnose 20
 """
-import sys, os, json, subprocess, time, argparse, glob, csv, re
+import sys, os, json, subprocess, time, argparse, glob, csv, re, shutil
 import numpy as np
 try:
     import fitz
@@ -217,6 +217,54 @@ def text_of(p):
 # measurement path, not one function. The regression gate caught it, which is what it is for.
 SOFFICE_BIN = "/usr/lib/libreoffice/program/soffice.bin"
 
+# SOFFICE NEEDS A PROFILE OF ITS OWN, AND WITHOUT ONE THE FIRST LAUNCH ON A FRESH POD
+# CONVERTS NOTHING AND SAYS NOTHING.
+#
+# Measured 21 Nov, on this image, from a clean /scratch: the corpus pass ran three times
+# in a row and reported "prerender 12 docx in soffice batches of 12 / chunk 1: measured 0
+# of 213" every time, with /scratch/work/p2w/pre left EMPTY and 101 .docx already
+# converted. A single hand-run of the same binary with the same arguments converted the
+# document in 3 s. The difference is the user profile: soffice writes
+# $HOME/.config/libreoffice/4 on first use, and when that directory has to be created by
+# a process whose stdout and stderr are DEVNULL - which is exactly how soffice_pdf starts
+# it - the run is lost with no diagnostic at all. Once the profile exists every later run
+# works, which is why this looked like an intermittent failure and never like a missing
+# profile.
+#
+# A fixed path, not a temp dir: the profile is expensive to build and cheap to reuse, and
+# a fixed path means the "first launch" cost is paid once per pod rather than once per
+# chunk. It is created here so soffice never has to.
+# THE FIRST SOFFICE LAUNCH ON A FRESH POD CONVERTS NOTHING, AND THE FIX IS TO SPEND IT
+# ON SOMETHING THAT IS NOT A DOCUMENT.
+#
+# Measured 21 Nov, from a clean /scratch, four corpus passes in a row: "prerender 12 docx
+# in soffice batches of 12 / chunk 1: measured 0 of 213" every time, with
+# /scratch/work/p2w/pre left EMPTY while 101 .docx had already been converted. Running the
+# same binary by hand on the same .docx converted it in 3 s. The difference is that the
+# hand-run printed its message to a terminal: soffice_pdf starts it with stdout and stderr
+# on DEVNULL, and the launch that has to CREATE $HOME/.config/libreoffice/4 for the first
+# time is the one that goes wrong - silently, exit code 0, no file, no diagnostic. Every
+# later launch works, which is why this read as an intermittent fault for four runs.
+#
+# A per-call -env:UserInstallation profile was tried as the fix and is WORSE: on this image
+# every launch pointed at a fresh profile exits rc=81 having written 260 KB of a profile
+# and no PDF, so the retry below recursed instead of recovering. Reverted; the warm-up is
+# the fix. One `--version` per process costs ~3 s and pays the profile cost once.
+_LO_WARMED = False
+
+
+def _soffice_warm():
+    global _LO_WARMED
+    if _LO_WARMED:
+        return
+    _LO_WARMED = True
+    try:
+        subprocess.run([_soffice_exe(), "--version"], timeout=90,
+                       stdin=subprocess.DEVNULL,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
+
 
 def _soffice_exe():
     return SOFFICE_BIN if os.path.exists(SOFFICE_BIN) else "soffice"
@@ -243,6 +291,7 @@ def soffice_pdf(files, outdir, deadline=None, extra=None):
     """
     os.makedirs(outdir, exist_ok=True)
     want = [os.path.join(outdir, os.path.splitext(os.path.basename(f))[0] + ".pdf") for f in files]
+    _soffice_warm()
     cmd = [_soffice_exe(), "--headless", "--norestore"] + list(extra or []) + \
           ["--convert-to", "pdf", "--outdir", outdir] + list(files)
     end = deadline if deadline else time.time() + 280
@@ -288,6 +337,17 @@ def soffice_pdf(files, outdir, deadline=None, extra=None):
             pass
     if not got:
         got = [w for w in want if os.path.exists(w) and os.path.getsize(w) > 0]
+    # A LAUNCH THAT PRODUCED NOTHING GETS ONE MORE CHANCE, AND IT IS ANNOUNCED.
+    #
+    # The profile above is the cause found on 21 Nov, but the failure it produced was
+    # silent, and a silent zero is the most expensive thing this file can return: three
+    # corpus passes in a row read "measured 0 of 213" and every one of them looked like
+    # the measurement loop's fault. A retry costs 3 s on a chunk that would otherwise be
+    # lost, and the line on stderr means the next run can tell a one-off from a pattern.
+    if not got and time.time() < end:
+        log("soffice produced nothing for %d file(s) - retrying once (see _LO_PROFILE note)"
+            % len(files))
+        return soffice_pdf(files, outdir, deadline=end, extra=extra)
     return got
 
 # THE RENDER CACHE IS KEYED BY THE DOCX, NOT BY ITS NAME.
