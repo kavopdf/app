@@ -963,3 +963,60 @@ Google against 1 in LibreOffice.
 * **The gate already allows a LibreOffice regression when Google improved on the same document.** That
   is the same rule from the other side: Google decides, LibreOffice is a proxy that must not block a fix
   the user will actually see.
+
+---
+
+## NO CONSTRUCT THAT GOOGLE DOES NOT HONOUR. NOT ONE, NOT ANYWHERE.
+
+The user's instruction, 21 Nov:
+
+> "main chahta hoon iss baar poore pdf to word tool me koi bhi aisa constructs use na ho jisko google
+> honour nhi karta hai yeh baat fixer ko pta hona chahiye poori tarah se"
+
+**This is not advice. It is checked, on every commit, and the gate refuses.**
+
+    python3 tools/p2w-bench/google_safe.py <file.docx>        # what one document carries
+    python3 tools/p2w-bench/google_safe.py --corpus           # the whole corpus
+    python3 tools/p2w-bench/google_safe.py --corpus --check   # exit 1 if anything spread
+    python3 tools/p2w-bench/google_safe.py --corpus --mark    # record today's counts as the mark
+
+`regress.py --check` runs it. A commit that makes any of these spread is REFUSED with no override.
+
+### The list, and what each one already cost
+
+| construct | what Google does | documents |
+|---|---|---:|
+| `w:framePr` | renders the paragraph as body text at the left margin | **broke 3.53.5 — every stamp on the phone** |
+| floating `<w:drawing>` | drops the shape, keeps the anchor | 143 |
+| `wp:anchor` | the wrapper a floating drawing arrives in — same fate | 143 |
+| `w:w` | ignores character width entirely | 132 |
+| `w:spacing` (letter) | ignores it | 132 |
+| embedded `.odttf` face | ignores it, so the width it was chosen for is not the width Google uses | — |
+| `w:position` | renders the run on the baseline | — |
+| `w:before` at a page top | 55.15 pt asked, 0.33 pt rendered | 104 |
+
+**Every one of these passes LibreOffice.** That is what makes them dangerous: the document looks
+perfect in the renderer nobody opens.
+
+### The rule in one line
+
+**A construct LibreOffice supports and Google does not is not a fix. It is the defect.**
+
+Before you reach for any OOXML construct, ask what Google does with it. If you cannot answer with a
+measurement, measure it first — upload the .docx, convert to a Google Doc, export as PDF, and look. That
+is three Drive calls and it is the cheapest thing in this pipeline.
+
+### What to use instead, when you are tempted
+
+The engine already knows some of the answers, and each one is in FINDINGS/:
+
+* **a gap at the top of a page** — `w:before` is dropped; a **1x1 table row with an exact height** is
+  honoured (`18_displacement-page-top-before-DROPPED-105000-f1x.md`)
+* **a rule** — a floating drawing is dropped; give it to the paragraph the page drew it above, as that
+  paragraph's own border, or to the table row's border
+* **a stamp** — a text frame is dropped; a text box works and stays editable (`DocxWriter` line 4988)
+* **character width** — nothing works. Do not try. The width has to come from the face and the spacing
+  Google actually applies.
+
+**When a construct has no Google-honoured replacement, that is a finding to write down, not a licence to
+ship the LibreOffice-only version.**

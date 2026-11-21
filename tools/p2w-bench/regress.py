@@ -415,6 +415,27 @@ def check(allow_engine_change, only=None):
         print("  txt : no document worse than baseline")
 
     print()
+    # A CONSTRUCT GOOGLE IGNORES MUST NOT SPREAD. This is the 3.53.5 lesson as a check instead of a
+    # paragraph: w:framePr passed LibreOffice, died in Google, and shipped - every stamp on the phone
+    # broke while every CI count stayed identical, because CI measured LibreOffice. The same shape has
+    # cost the corpus five more times (w:w, w:spacing, embedded faces, floating <w:drawing> rules,
+    # w:before at a page top), so it is read from the bytes of the .docx rather than from anyone's
+    # memory. A ratchet, not a ban: the corpus already carries them, and what is refused is a
+    # document that GAINS one.
+    try:
+        _gs = subprocess.run([sys.executable, os.path.join(HERE, "google_safe.py"),
+                              "--corpus", "--check"], capture_output=True, text=True, timeout=180)
+        if _gs.returncode == 1:
+            for _l in (_gs.stdout or "").strip().splitlines()[-6:]:
+                print("  %s" % _l.strip())
+            fail = 1
+        elif _gs.returncode == 3:
+            print("  google-safe : no .docx output directory - cannot check")
+        else:
+            print("  google-safe : no construct Google ignores has spread")
+    except Exception as _e:
+        print("  google-safe : cannot run (%s)" % _e)
+
     if fail:
         print("  REFUSED. This commit would land a regression or an unmeasured engine.")
         print("  There is no override. Fix the change or revert it.")

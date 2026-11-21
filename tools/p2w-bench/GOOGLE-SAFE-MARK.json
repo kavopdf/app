@@ -1,0 +1,15 @@
+{
+ "at": "recorded by google_safe.py --mark",
+ "carriers": {
+  "w:drawing": 28,
+  "wp:anchor": 28,
+  "w:before-page-top": 28,
+  "w:spacing-letter": 1
+ },
+ "totals": {
+  "w:drawing": 2996,
+  "wp:anchor": 2996,
+  "w:before-page-top": 5533,
+  "w:spacing-letter": 2
+ }
+}
