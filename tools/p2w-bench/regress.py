@@ -231,6 +231,25 @@ def docx_regressions():
     if _allowed:
         print('  docx: %d LibreOffice regression(s) allowed - Google improved on the same' % len(_allowed))
         print('        document, and Google is the renderer the user opens.')
+    # A GOOGLE REGRESSION IS THE ONE THAT MATTERS, AND IT WAS INVISIBLE HERE.
+    #
+    # g_before/g_after above is used only to ALLOW a LibreOffice regression when Google improved on
+    # the same document. Nothing refused the opposite: an engine change that takes a document from
+    # 42/42 in Google to 39/42. Found on 21 Nov - 310_court_judgment went 42/42 to 39/42
+    # (43_within_10pt_x, 47_margins, 60_text_column_right_edge) on engine 462353f, the run's report
+    # said 'Regressions: none', and the gate passed - because the ratchet measures LibreOffice share
+    # and the user does not open LibreOffice.
+    #
+    # The user's rule: Google is the authority. A document that fails MORE of Google's 42 checks than
+    # it did in the committed results is a regression, whatever LibreOffice says.
+    _gbad = [(d, g_before[d], g_after[d]) for d in sorted(g_after)
+             if d in g_before and g_after[d] > g_before[d]]
+    if _gbad:
+        _lines = ['%d document(s) fail MORE of Google\'s 42 checks than the committed results:' % len(_gbad)]
+        for _d, _b, _a in _gbad[:10]:
+            _lines.append('  %s  %d -> %d failing' % (_d, _b, _a))
+        _lines.append('Google is the renderer the user opens. LibreOffice agreeing is not a defence.')
+        return _kept, chr(10).join(_lines)
     worse = _kept
     return worse, ""
 
