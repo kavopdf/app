@@ -72,3 +72,4 @@
 {"at": "2026-11-21 07:16", "attempt": 13, "class": "47_margins", "outcome": "partial", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-21 10:39", "attempt": 14, "class": "t01_word_accuracy", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-21 11:35", "attempt": 1, "class": "t02_position", "outcome": "error", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-21 12:46", "attempt": 2, "class": "32_stroke_lines", "outcome": "error", "requeues": 0, "round": 1, "status": "OPEN"}

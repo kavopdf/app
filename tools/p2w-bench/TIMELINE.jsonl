@@ -1507,3 +1507,9 @@
 {"t": 1795245334.4409149, "ist": "12:45:34", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795245334.9943538, "ist": "12:45:34", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795245335.293099, "ist": "12:45:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795245384.565447, "ist": "12:46:24", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795245392.2568986, "ist": "12:46:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795245392.528636, "ist": "12:46:32", "ev": "attempt", "d": "32_stroke_lines -> error"}
+{"t": 1795245392.5951917, "ist": "12:46:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795245392.7237933, "ist": "12:46:32", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795245400.1957748, "ist": "12:46:40", "ev": "beat", "d": "pending.py: reading the pending gate"}

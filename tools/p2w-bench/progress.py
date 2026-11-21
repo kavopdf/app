@@ -126,6 +126,50 @@ def rows():
     return out
 
 
+def amend(t):
+    """Rewrite TODAY's row with the live numbers, keeping what it used to say in the note.
+
+    ONCE PER DAY IS RIGHT; NEVER CORRECTED IS NOT. A row is written from the tables as they stood at
+    the moment it was appended, and the tables move for the rest of the day - so the committed row
+    disagrees with the corpus it summarises, and a reader comparing the two cannot tell which one is
+    the day's truth. Measured on 21 Nov: the row recorded `.docx open` 60 while `RANKING.csv` read 61,
+    and `.txt failing` 46 against 27. Three blocker rows (20 Nov 18:10, 21 Nov 00:07 and 12:10) asked
+    for this and none of them could do it, because this file had no way to say "today, again".
+
+    It only ever touches a row whose date is TODAY, so the history is still append-only: yesterday's
+    row is not a draft. The note names what the row used to say, so the correction is visible rather
+    than silent - a row that changes without saying so is the `number that looks better` trap.
+    """
+    if not os.path.exists(OUT):
+        return False
+    lines = open(OUT, encoding="utf-8").read().split("\n")
+    def v(x):
+        return "?" if x is None else str(x)
+    hit = None
+    for i, line in enumerate(lines):
+        if not line.startswith("| %s |" % t["date"]):
+            continue
+        c = [x.strip() for x in line.strip().strip("|").split("|")]
+        if len(c) < 5:
+            continue
+        if (c[1] == v(t["docx_open"]) and c[2] == v(t["txt_failing"])
+                and c[3] == str(t["google"]) and c[4] == str(t["google_clean"])):
+            return "unchanged"
+        hit = (i, c)
+    if not hit:
+        return "no row for today"
+    i, c = hit
+    note = "amended: was docx %s, txt %s, google %s/%s" % (c[1], c[2], c[3], c[4])
+    lines[i] = ("| %s | %s | %s | %d | %d | %s |"
+                % (t["date"], v(t["docx_open"]), v(t["txt_failing"]),
+                   t["google"], t["google_clean"], note))
+    tmp = OUT + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    os.replace(tmp, OUT)
+    return note
+
+
 def append(t, note=""):
     have = {r["date"] for r in rows()}
     if not os.path.exists(OUT):
@@ -163,8 +207,20 @@ def main(argv):
     ap.add_argument("--show", action="store_true")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--note", default="")
+    ap.add_argument("--amend", action="store_true",
+                    help="rewrite TODAY's row from the live tables, naming what it used to say")
     a = ap.parse_args(argv)
     t = today()
+    if a.amend:
+        r = amend(t)
+        print("  %s  docx open %s/%s | txt failing %s/%s | google %d (clean %d)"
+              % (t["date"], t["docx_open"], t["docx_total"], t["txt_failing"], t["txt_total"],
+                 t["google"], t["google_clean"]))
+        print("  %s" % (r if r not in (True, False) else
+                        ("today has no row to amend" if r is False else "amended")))
+        print()
+        trend()
+        return 0
     if a.json:
         print(json.dumps(t, indent=1))
         return 0

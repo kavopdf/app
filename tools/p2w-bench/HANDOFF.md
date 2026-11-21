@@ -84,7 +84,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `01:41` agent landed: t01_word_accuracy / B -> FINDINGS/39-small-caps-gap-threshold-0150-fixer.md
 - `01:41` attempt 9 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:47` attempt 10 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:51` attempt 11 on t01_word_accuracy -> reverted (0/5 moved)
@@ -109,6 +108,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `12:39` relay: carry-over closed with evidence, health.py unit bug fixed and proven (txt moving->stopped at 13.3 h), unit guard added
 - `12:40` agent landed: 32_sA-01 /  -> FINDINGS/32_stroke_lines-A-pbdr-verification-124000-relay.md
 - `12:40` agent landed: 32_sB-02 /  -> FINDINGS/32_stroke_lines-B-rule-flow-neutral-124500-relay.md
+- `12:46` attempt 2 on 32_stroke_lines -> error (0/37 moved)
 
 ## Where the rest of the state lives
 

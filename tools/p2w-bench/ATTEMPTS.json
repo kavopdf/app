@@ -68,13 +68,29 @@
   "status": "OPEN"
  },
  "32_stroke_lines": {
-  "attempts": 1,
+  "attempts": 2,
   "first_seen": 1794543973.3763752,
+  "history": [
+   {
+    "at": "2026-11-21 12:46",
+    "moved": 0,
+    "outcome": "error",
+    "reason": "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) ",
+    "total": 37
+   }
+  ],
   "last": 1794543973.3763797,
+  "last_engine": "7112d76",
+  "last_moved": 0,
+  "last_total": 37,
   "outcomes": [
+   "error",
    "error"
   ],
-  "reason": "",
+  "reason": "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH.",
+  "reasons": [
+   "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH."
+  ],
   "requeues": 0,
   "status": "OPEN"
  },

@@ -3,8 +3,8 @@
  "started": "12:12",
  "ended_ts": null,
  "ended": null,
- "class": "",
- "attempts": 0,
+ "class": "32_stroke_lines",
+ "attempts": 1,
  "kept": 0,
  "docs_improved": 0,
  "agents": [
