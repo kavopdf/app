@@ -1,10 +1,8 @@
 # P2W Google Verify - Run Report
 
-**21 Nov 2026 · 18:22 IST · stage classify**
+**21 Nov 2026 · 20:32 IST · stage classify**
 
 > 192 of 213 measured in Google, 21 refused on page count. Google passes all 42 on 6; LibreOffice on 122.
-
-This run found the stage at classify, so it did no measuring: it rebuilt the capability table from the committed results of both renderers and committed it for the classifier to read. No engine code was touched.
 
 ## Measured
 
@@ -30,3 +28,18 @@ This run found the stage at classify, so it did no measuring: it rebuilt the cap
 
 The first row is the class to take: `32\_stroke\_lines`, 145 documents in Google against 1 in LibreOffice.
 
+## What this run did
+
+The stage is `classify`, so this run did no measuring and changed no engine code. It regenerated the
+capability table from the committed results of both renderers and committed it as
+`benchmarks/GOOGLE-VS-LIBREOFFICE.md`, so the classifier cron reads a table that matches the results
+on disk. The counts are unchanged from the previous run; only the ordering of tied rows moved.
+
+One caveat about the engine stamp. `gverify.py --report` counts only results written under the current
+engine stamp, while the table joins every scored document, because a renderer pair is what names a
+construct and the stamp says nothing about which construct failed. The results committed before the
+stamp existed were measured on a `.docx` the tree still produces byte-identically, so the pair is
+sound; the stamp gap is a re-measurement queue, not a wrong table.
+
+Next: the classifier groups the 186 failing documents into classes, and the fixer takes one class at a
+time.
