@@ -1,17 +1,17 @@
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 04:18 → 04:50 IST · 31 min**
+**22 Nov 2026 · slot 05:14 → running IST · 3 min**
 
-> The carrier is not falsified. It is **Google-clean on 13 of the 16 documents already measured through
-> Google Docs under it** - all 16 clear `05_chars_extra`, none regresses - and the two runs before this
-> one were chasing a blocker that does not exist in the XML. What is missing is 38 Google results, not a
-> fix. Nothing was kept this run: the corpus pass that would land it does not fit in a slot.
+> Two measurements, no engine change. The lead the last report left — land the carrier patch — is
+> falsified: its Google evidence is a hand-typed summary and the patch damages clean documents. What
+> replaces it is a real Google round trip, run twice, and it says the table the pipeline steers by is
+> measured on an engine that no longer exists.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 0 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,13 +20,40 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `32_stroke_lines` |
+| Working on | `05_chars_extra` and `32_stroke_lines` — measured, not yet fixed |
 
-## What was tried
+## What this run measured
 
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 04:49 | **lead** | 0/None | Measured the two things the last two runs left open, on committed evidence and two independent measurements: (1) the prescribed cell guard cannot fire - no Shape is ever routed into a w:tc, guard buil |
+**1. The carrier's "13 of 16 clean in Google" is not a measurement record.** The sixteen files in
+`benchmarks/gverify-carrier-2008/` carry three fields (`engine_patch`, `engine_note`, `measured`) that
+no script in the repo writes — `grep -rn "engine_patch\|engine_note" --include=*.py .` returns nothing —
+no per-check map, and a `measured` value of `2026-11-22T02:2xZ` with a placeholder digit and a timestamp
+six hours before the files were committed. `engine: 462353f9` cannot identify a build either: `git apply`
+creates no commit, so patched and unpatched trees return the same string.
+
+**2. The patch damages clean documents.** Own clone, patch applied, rebuilt: of the 16 target documents
+plus 10 controls that pass everything at HEAD, **4 of 10 controls got worse**. `16_right_aligned_amounts`
+loses six checks and grows a second page; `product-catalogue-code-left-price-right` goes 42/42 → 37/42
+with 21 carriers and 1 → 3 pages. Damage tracks carrier count; documents with 1–4 carriers do not move.
+`regress.py --check` refuses the patch.
+
+**3. The local renderer cannot see the class the patch is for.** `32_stroke_lines` fails 145 of 213 in
+Google and 2 of 213 in LibreOffice; `05_chars_extra` 141 and 5. Every local pass on the 16 was a pass
+they already had.
+
+**4. So this run did the Google round trip itself, twice.** Two documents converted on the current
+engine, uploaded, exported from Google Docs, scored, probes deleted:
+
+| document | committed Google (engine `462353f`) | measured now (engine at HEAD) |
+|:--|:--|:--|
+| `315_gazette_notification` | 40/42 — fails `05_chars_extra`, `32_stroke_lines` | **41/42** — fails `32_stroke_lines` only |
+| `17_three_column_widths_txtpos` | 40/42 — fails `05_chars_extra`, `32_stroke_lines` | **41/42** — fails `32_stroke_lines` only |
+
+`05_chars_extra` passes in Google on both, on the current engine, where the table says it fails. The
+table's `engine` field reads `462353f`; the tree is `6c6cf642e13b7ed2`. **The 192 Google rows are stale,
+and part of the 186-document gap is already closed.** The loop costs about four minutes a document and
+`verify_google.py --json` writes the per-check map — that is the instrument the two largest Google
+classes never had.
 
 ## The txt
 
@@ -38,94 +65,43 @@
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 8 documents |
 
-## What this run adds
-
-The last two runs both worked `32_stroke_lines` and both stopped on a reason that does not survive
-measurement. This run measured the two things they left open, and one of them was sitting in the repo
-the whole time.
-
-**1. The carrier is Google-clean.** `benchmarks/gverify-carrier-2008/` holds 16 documents scored through
-Google Docs with `engine_patch: rule-carrier-horizontal-only-2008` on this same engine (462353f9).
-Against the committed HEAD Google results:
-
-| | |
-|:--|:--|
-| measured under the carrier | **16** |
-| reach 42/42 | **13** |
-| reach 41/42, `32_stroke_lines` still open | **3** — `315_gazette_notification`, `49_coloured_background_block_paragraph`, `product-catalogue-code-left-price-right` |
-| regress in Google | **0** |
-| clear `05_chars_extra` | **16 of 16** |
-
-`32_stroke_lines` is worth 36.5 clean documents and `05_chars_extra` 35.2; the `{05,32}` shape is the
-largest in the corpus at 16 documents. This one construct clears both, in the renderer the user opens.
-
-**2. The blocker is the proxy, and the prescribed fix for it is a no-op.** The last report named
-"a floating table nested inside a table cell" as what kills the carrier, and asked the next run to
-guard on it. Two independent measurements:
-
-| test | expected | measured |
-|:--|:--|:--|
-| carriers are nested in a `w:tc` | tc-depth > 0 somewhere | **max tc-depth 0** across 156 carriers in 22 documents — every carrier's parent is `w:body` |
-| the prescribed guard changes the output | some drawings kept | **byte-identical to HEAD on five PDFs** (43→43, 65→65, 1→1, 2→2, 2→2); it never fired once |
-| the 54 regressions are cell nesting | displacement inside cells | **no** — 7 of 8 regressed documents gain a page (1 → 2–3 pages), 0 of 14 unchanged documents do |
-| displacement scales with carriers per page | dose–response | **no** — 41 carriers gives +15.57, 10 carriers gives +83.89 |
-
-The regressions are body-flow page overflow in LibreOffice. Google does not see them: the same
-`product-catalogue-code-left-price-right` that is +85.26 on the proxy scores **41/42 in Google**.
-
-**3. The gate already has the door open.** `regress.py` says, in its own words: *a LibreOffice
-regression is allowed when Google improved on the same document*. It needs `benchmarks/gverify/<doc>.json`
-in the working tree. Sixteen documents have a carrier result; the rest of the regressed set does not.
-
-## What the next run should build
-
-Not a narrowed predicate, and not the cell guard. **Apply `patches/rule-carrier-horizontal-only-2008.patch`,
-run the corpus pass, and close the missing Google results** with `gverify.py --plan 60` on the documents
-that regressed and have no carrier result. Each one that improves in Google is then allowed by the gate's
-own rule; each one that does not is a real regression and stays out. Land the patch and the gverify
-results in the same push.
-
-## Subagents
-
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `32_sA-03` | can the emitter tell its drawing anchor is inside a  | 04:49 | 23:19 | 0 min |
-| `32_sB-02` | is the 54-document carrier regression cell nesting o | 04:49 | 23:19 | 0 min |
-
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 04:18 → 04:50 · 31 min |
+| Slot window | 05:14 → running · 3 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 22 |
-| Longest silence | **29.6 min** — from 04:18:54, after `handoff.py: reading or writing the handoff` |
+| Tool beats | 2 |
+| Longest silence | **3.1 min** — from 05:14:57, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+> The Timing rows count tool beats, and this run worked mostly through subagents and Drive calls that
+> write none — the slot ran from 04:50 to 05:55, and the claim was only taken at 05:14 because
+> `--claim-fixer` read its own rejected claim back after a failed `pull --rebase` and stood down twice
+> on a slot that was free.
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **29 min** | `#####################` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
-## Best results this round
-
-| Document | Before | After | Change |
-|:--|--:|--:|--:|
-| `415_inline_images` | 89.04 | 0.00 | -89.04 |
-| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
-| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
-| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
-| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+| report - the report and the chain | **3 min** | `######################` |
 
 ## Next run
 
-Apply tools/p2w-bench/patches/rule-carrier-horizontal-only-2008.patch, build, run the corpus pass and take the exact LO regressions. The 16 documents already measured in Google under this patch are in benchmarks/gverify-carrier-2008/: 13 reach 42/42, 3 reach 41/42, none regress, all 16 clear 05_chars_extra. regress.py already exempts a LibreOffice regression when Google improved on the same document - it needs benchmarks/gverify/<doc>.json in the working tree. So run gverify --plan 60 over the regressed documents that have no carrier result, and land the patch with those results in the same push. Do NOT build the cell guard the last report asked for: no Shape is ever routed into a w:tc (max tc-depth 0 across 156 carriers in 22 docs) and the guard built byte-identical output on five PDFs.
+**Do not apply `rule-carrier-horizontal-only-2008.patch`.** It is falsified twice: the 03:14 corpus pass
+(54 documents worse, gate refused) and this run's controls (4 of 10 clean documents worse).
 
-> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
+Instead, spend the slot re-measuring. Take the documents that fail `{05_chars_extra, 32_stroke_lines}`
+and have a Google row stamped `462353f`, and run twenty of them through the round trip in this order:
+`ConvertOne` → `GOOGLEDRIVE_CREATE_FILE` into `KavoPDF-Verify` → `GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE`
+→ `verify_google.py --json` → `GOOGLEDRIVE_DELETE_FILE`. Write the export's sha256 and `regress.py`'s
+engine fingerprint beside the result. Two of two came back one check better than the table says, so the
+first twenty will tell you how much of the gap is already closed before any engine work is done — and
+`32_stroke_lines`, the one check still failing on both, is worth 36.5 clean documents.
+
+Details and the exact commands: `FINDINGS/05_chars_extra-GOOGLE-TABLE-IS-STALE-ON-BOTH-DOCUMENTS-REMEASURED-0545-f1x.md`
+and `FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md`.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
