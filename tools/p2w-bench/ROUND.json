@@ -1,8 +1,10 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
+  "fixer_doing": "relay: instrument fix measured, 45 clean; writing finding",
+  "fixer_doing_since": 1795284414.8360445,
   "fixer_engine_at_claim": "462353f",
-  "fixer_last_beat": 1795282941.488966,
+  "fixer_last_beat": 1795284414.8360453,
   "fixer_started": 1795283393.945205,
   "history": [
     {

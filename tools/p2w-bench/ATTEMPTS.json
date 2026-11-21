@@ -15,6 +15,32 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "05_chars_extra": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-21 23:37",
+    "moved": 11,
+    "outcome": "kept",
+    "reason": "05_chars_extra counted one U+200B per w:tab - Google's export marks every tab advance with a zero-width space. Full-corpus separation 141/141 vs 51/51, causal on 17 (23 tabs -> 23 extras, 0 tabs -> 0)",
+    "total": 192
+   }
+  ],
+  "last": null,
+  "last_engine": "462353f",
+  "last_moved": 11,
+  "last_total": 192,
+  "outcomes": [
+   "kept"
+  ],
+  "reason": "05_chars_extra counted one U+200B per w:tab - Google's export marks every tab advance with a zero-width space. Full-corpus separation 141/141 vs 51/51, causal on 17 (23 tabs -> 23 extras, 0 tabs -> 0). norm_text now strips U+200B symmetrically. 11 of 11 measured documents cleared 05, none worse.",
+  "reasons": [
+   "05_chars_extra counted one U+200B per w:tab - Google's export marks every tab advance with a zero-width space. Full-corpus separation 141/141 vs 51/51, causal on 17 (23 tabs -> 23 extras, 0 tabs -> 0). norm_text now strips U+200B symmetrically. 11 of 11 measured documents cleared 05, none worse."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "18_displacement": {
   "attempts": 3,
   "first_seen": null,

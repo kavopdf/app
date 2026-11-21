@@ -1921,3 +1921,14 @@
 {"t": 1795283127.3889396, "ist": "23:15:27", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795283127.4651222, "ist": "23:15:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795283127.4826245, "ist": "23:15:27", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795283408.2528682, "ist": "23:20:08", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795283420.4903452, "ist": "23:20:20", "ev": "beat", "d": "relay: reading lead evidence"}
+{"t": 1795283794.9037423, "ist": "23:26:34", "ev": "beat", "d": "relay: census returned, building the carrier probe"}
+{"t": 1795283863.5544455, "ist": "23:27:43", "ev": "beat", "d": "relay: carrier built, fetching corpus"}
+{"t": 1795283965.5594544, "ist": "23:29:25", "ev": "beat", "d": "relay: 11 docs staged, uploading to Google"}
+{"t": 1795284089.2841783, "ist": "23:31:29", "ev": "beat", "d": "relay: 11 google exports in, scoring"}
+{"t": 1795284220.2812502, "ist": "23:33:40", "ev": "beat", "d": "relay: converting 213 with carrier build"}
+{"t": 1795284349.7240283, "ist": "23:35:49", "ev": "beat", "d": "relay: tab->U+200B proven 141/141; applying instrument fix"}
+{"t": 1795284414.8354015, "ist": "23:36:54", "ev": "beat", "d": "relay: instrument fix measured, 45 clean; writing finding"}
+{"t": 1795284452.674536, "ist": "23:37:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795284456.4037974, "ist": "23:37:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
