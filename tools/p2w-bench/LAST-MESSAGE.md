@@ -1,10 +1,10 @@
 # P2W Google Verify - Run Report
 
-**21 Nov 2026 · 07:30 IST · stage classify**
+**21 Nov 2026 · 08:25 IST · stage classify**
 
 > 192 of 213 measured in Google, 21 refused on page count. Google passes all 42 on 7; LibreOffice on 108.
 
-This run was in the classify stage, so it measured nothing. It regenerated the capability table from the committed results, committed the table alongside both renderer result sets, and stopped. The next move belongs to the classifier cron.
+This run measured nothing new: the Google side and the LibreOffice side were already complete and committed. What it did was regenerate the capability table from the committed results and commit it, so the classifier has a current pair of renderers to work from. The table is the deliverable; the engine is untouched.
 
 ## Measured
 
