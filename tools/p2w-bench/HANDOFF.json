@@ -1430,9 +1430,9 @@
   }
  ],
  "run": {
-  "started": "20:57",
-  "ended": "21:33",
-  "ended_how": "forced"
+  "started": "21:53",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

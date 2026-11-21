@@ -1850,3 +1850,9 @@
 {"t": 1795277027.5111344, "ist": "21:33:47", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795277027.6260355, "ist": "21:33:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795277027.6503823, "ist": "21:33:47", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795278214.7344527, "ist": "21:53:34", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795278214.8917046, "ist": "21:53:34", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795279670.905362, "ist": "22:17:50", "ev": "beat", "d": "t08 verdict in: check measures drawing order; measuring before/after"}
+{"t": 1795280068.87252, "ist": "22:24:28", "ev": "beat", "d": "t08 sort applied, rescoring 213 txt"}
+{"t": 1795280600.2708623, "ist": "22:33:20", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795280888.6725872, "ist": "22:38:08", "ev": "beat", "d": "attempt.py: recording an attempt"}
