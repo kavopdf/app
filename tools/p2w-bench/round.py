@@ -640,7 +640,12 @@ def release(name, force=False):
             print("If a genuine blocker stopped both (no findings to answer, budget gone), say so in the")
             print("report and release with --force.")
             return 1
-        if done < 1:
+        # --force MUST WORK HERE, because the message below tells the run to use it.
+        # It did not: this branch had no `and not force`, so a run that claimed the slot and then
+        # did nothing could never release it - it had to wait out the stale window, and the
+        # next run lost its first ten minutes to a slot nobody was using. Found by the final
+        # audit, which ran the command the error message recommends and watched it fail.
+        if done < 1 and not force:
             print("refused: this run has recorded no attempt at all.")
             print("An attempt is a patch, a measurement and a line in ATTEMPTS.json - or an honest")
             print("'error' because the root cause was not found. Any of those counts.")

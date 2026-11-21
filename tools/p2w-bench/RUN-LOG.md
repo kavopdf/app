@@ -199,3 +199,5 @@
 | 21 Nov 07:14 | fixer | slot claimed - fixer running |
 | 21 Nov 07:16 | fixer | attempt 47_margins -> partial (0/26 moved) |
 | 21 Nov 09:23 | fixer | slot claimed - fixer running |
+| 21 Nov 09:25 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 21 Nov 09:25 | fixer | slot FORCED released - see INCIDENTS.md for why |

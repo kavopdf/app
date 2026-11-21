@@ -1209,20 +1209,10 @@
  ],
  "run": {
   "started": "09:23",
-  "ended": null,
-  "ended_how": null
+  "ended": "09:25",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "17:19",
-   "how": "released",
-   "plan": ""
-  },
-  {
-   "at": "19:07",
-   "how": "released",
-   "plan": ""
-  },
   {
    "at": "19:08",
    "how": "released",
@@ -1310,6 +1300,16 @@
   },
   {
    "at": "04:36",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "09:25",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "09:25",
    "how": "forced",
    "plan": ""
   }
