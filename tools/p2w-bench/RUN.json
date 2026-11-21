@@ -1,16 +1,13 @@
 {
- "started_ts": 1795265226.0,
- "started": "18:17",
- "ended_ts": 1795269141.0639663,
- "ended": "19:22",
- "class": "32_stroke_lines",
- "attempts": 4,
+ "started_ts": 1795271339.1180453,
+ "started": "19:58",
+ "ended_ts": null,
+ "ended": null,
+ "class": "",
+ "attempts": 0,
  "kept": 0,
  "docs_improved": 0,
- "agents": [
-  "47_margins-docx-half",
-  "zero-flow-carrier"
- ],
+ "agents": [],
  "obstacles_cleared": 0,
  "needs_human": 0
 }

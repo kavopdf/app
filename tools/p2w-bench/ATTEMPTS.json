@@ -84,7 +84,7 @@
   "status": "OPEN"
  },
  "32_stroke_lines": {
-  "attempts": 3,
+  "attempts": 4,
   "first_seen": 1794543973.3763752,
   "history": [
    {
@@ -107,27 +107,36 @@
     "outcome": "lead",
     "reason": "RECLASSIFIED 21 Nov from \"reverted\" to \"lead\": the construct WAS measured through Google and the finding is committed - it is not a refuted idea, the implementation ran out of slot. tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is cl",
     "total": 15
+   },
+   {
+    "at": "2026-11-21 20:15",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "FLOATING-TABLE CARRIER BUILT AND MEASURED THROUGH GOOGLE, not landed. DocxWriter.ruleCarrier() turns a hairline shape into a one-cell w:tblpPr table with a w:tcBorders bottom edge. Measured on 73_mark",
+    "total": 210
    }
   ],
   "last": 1794543973.3763797,
   "last_engine": "462353f",
   "last_moved": 0,
-  "last_total": 15,
+  "last_total": 210,
   "outcomes": [
    "error",
    "error",
    "reverted",
    "error",
    "error",
-   "reverted"
+   "reverted",
+   "lead"
   ],
-  "reason": "tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is closed. trHeight val=1 exact costs 0.91pt. No engine patch: no time to convert and score a real document.",
+  "reason": "FLOATING-TABLE CARRIER BUILT AND MEASURED THROUGH GOOGLE, not landed. DocxWriter.ruleCarrier() turns a hairline shape into a one-cell w:tblpPr table with a w:tcBorders bottom edge. Measured on 73_marksheet_subject_marks_grade, three variants, three Google exports: BEFORE 0 of 2 rules drawn; AFTER 2 of 2 drawn at the requested weight and colour - the first time Google has drawn a rule this engine emitted. But only the FIRST floating table in a document is placed at its tblpY (rule 1 asked 83.6, drawn 83.5; rule 2 asked 793.6, drawn 84.5, stacked under rule 1), tblOverlap=overlap changes nothing (variant B render-identical), and an inline carrier loses x entirely (both rules to x=0, y~793). Verdict unchanged 39/42 both ways. Also settled: a rule on this corpus is a FILL not a stroke (lineRgb=-1, filled 483x0.9pt rect) - a stroke-gated carrier skips every rule on the class's own document; and a plain table costs no character (4-case probe: 0 U+200B) so the 2 U+200B on 73 come from text wrapping around the floating band, not from the table. NEXT: one floating table per PAGE holding all its rules as exact-height rows. See FINDINGS/32_stroke_lines-FLOATING-CARRIER-DRAWS-BUT-STACKS-2050-f1x.md",
   "reasons": [
    "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH.",
    "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md",
    "namespace test",
    "commit test",
-   "tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is closed. trHeight val=1 exact costs 0.91pt. No engine patch: no time to convert and score a real document."
+   "tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is closed. trHeight val=1 exact costs 0.91pt. No engine patch: no time to convert and score a real document.",
+   "FLOATING-TABLE CARRIER BUILT AND MEASURED THROUGH GOOGLE, not landed. DocxWriter.ruleCarrier() turns a hairline shape into a one-cell w:tblpPr table with a w:tcBorders bottom edge. Measured on 73_marksheet_subject_marks_grade, three variants, three Google exports: BEFORE 0 of 2 rules drawn; AFTER 2 of 2 drawn at the requested weight and colour - the first time Google has drawn a rule this engine emitted. But only the FIRST floating table in a document is placed at its tblpY (rule 1 asked 83.6, drawn 83.5; rule 2 asked 793.6, drawn 84.5, stacked under rule 1), tblOverlap=overlap changes nothing (variant B render-identical), and an inline carrier loses x entirely (both rules to x=0, y~793). Verdict unchanged 39/42 both ways. Also settled: a rule on this corpus is a FILL not a stroke (lineRgb=-1, filled 483x0.9pt rect) - a stroke-gated carrier skips every rule on the class's own document; and a plain table costs no character (4-case probe: 0 U+200B) so the 2 U+200B on 73 come from text wrapping around the floating band, not from the table. NEXT: one floating table per PAGE holding all its rules as exact-height rows. See FINDINGS/32_stroke_lines-FLOATING-CARRIER-DRAWS-BUT-STACKS-2050-f1x.md"
   ],
   "requeues": 0,
   "status": "OPEN"

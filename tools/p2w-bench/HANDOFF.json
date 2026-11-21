@@ -1418,9 +1418,9 @@
   }
  ],
  "run": {
-  "started": "19:00",
-  "ended": "19:22",
-  "ended_how": "forced"
+  "started": "19:58",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

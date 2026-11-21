@@ -1797,3 +1797,10 @@
 {"t": 1795270584.5057292, "ist": "19:46:24", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795270585.445234, "ist": "19:46:25", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795270585.9836962, "ist": "19:46:25", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795271338.92392, "ist": "19:58:58", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795271339.0949647, "ist": "19:58:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795271385.7525158, "ist": "19:59:45", "ev": "beat", "d": "lead read: tblpPr zero-flow carrier proven in Google; now locating engine rule path"}
+{"t": 1795271692.9965947, "ist": "20:04:52", "ev": "beat", "d": "engine patched: hairline rule -> floating tblpPr carrier (ruleCarrier()); building"}
+{"t": 1795272267.1327941, "ist": "20:14:27", "ev": "beat", "d": "measured: carrier draws the rule in Google but 2 floating tables stack; reverting, writing finding"}
+{"t": 1795272295.165352, "ist": "20:14:55", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795272299.8491287, "ist": "20:14:59", "ev": "beat", "d": "attempt.py: recording an attempt"}
