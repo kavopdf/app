@@ -1856,3 +1856,6 @@
 {"t": 1795280068.87252, "ist": "22:24:28", "ev": "beat", "d": "t08 sort applied, rescoring 213 txt"}
 {"t": 1795280600.2708623, "ist": "22:33:20", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795280888.6725872, "ist": "22:38:08", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795280890.7989514, "ist": "22:38:10", "ev": "attempt", "d": "t08_line_order -> kept"}
+{"t": 1795280890.9301093, "ist": "22:38:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795280891.0763896, "ist": "22:38:11", "ev": "beat", "d": "classrow.py: refreshing the class file"}

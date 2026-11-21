@@ -6,19 +6,6 @@
 | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 09:30 | fixer | build-engine | started |
-| 19 Nov 16:33 | fixer | build-engine | started |
-| 19 Nov 16:34 | fixer | build-engine | engine built in 39s |
-| 19 Nov 16:37 | fixer | build-engine | started |
-| 19 Nov 16:37 | fixer | build-engine | engine built in 37s |
-| 19 Nov 16:38 | fixer | build-engine | started |
-| 19 Nov 16:38 | fixer | build-engine | engine built in 38s |
-| 19 Nov 16:39 | fixer | build-engine | started |
-| 19 Nov 16:39 | fixer | build-engine | engine built in 40s |
-| 19 Nov 16:41 | fixer | ratchet | UNMEASURED 211 of 211 not compared; DRIFT 211 rows/0 marks |
-| 19 Nov 16:41 | fixer | build-engine | started |
-| 19 Nov 16:42 | fixer | build-engine | engine built in 38s |
-| 19 Nov 16:57 | fixer | build-engine | started |
-| 19 Nov 16:57 | fixer | build-engine | engine built in 41s |
 | 19 Nov 16:58 | fixer | attempt | content-partly-lost -> partial (5/10 moved) |
 | 19 Nov 18:00 | fixer | claim | fixer claimed the slot |
 | 19 Nov 18:03 | fixer | build-engine | started |
@@ -415,3 +402,7 @@
 | 21 Nov 21:30 | fixer | build-engine | engine built in 51s |
 | 21 Nov 21:31 | fixer | attempt | 32_stroke_lines -> lead (0/? moved) |
 >>>>>>> cc7e18d (finding: the per-page rule carrier is killed, and 'floating tables stack' is false)
+| 21 Nov 21:53 | fixer | claim | fixer claimed the slot |
+| 21 Nov 22:18 | fixer | build-engine | started |
+| 21 Nov 22:20 | fixer | build-engine | engine built in 70s |
+| 21 Nov 22:38 | fixer | attempt | t08_line_order -> kept (9/10 moved) |

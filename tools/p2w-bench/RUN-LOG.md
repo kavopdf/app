@@ -1,7 +1,3 @@
-| 13 Nov 08:40 | fixer | slot claimed - fixer running |
-| 13 Nov 09:45 | fixer | slot claimed - fixer running |
-| 13 Nov 11:05 | baseline | started | phase measure |
-| 13 Nov 11:06 | baseline | slot claimed - baseline running |
 | 13 Nov 11:08 | baseline | measured 600_reviewed_invoice_with_annotations 43/59 docx, 4/5 txt |
 | 13 Nov 11:09 | baseline | measured 601_fillable_admission_form 44/59 docx, 4/5 txt |
 | 13 Nov 11:10 | baseline | measured 602_bookmarked_annual_report 53/59 docx, 4/5 txt |
@@ -200,3 +196,5 @@
 | 21 Nov 21:11 | fixer | slot claimed - fixer running |
 | 21 Nov 21:23 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 21 Nov 21:33 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 21 Nov 21:53 | fixer | slot claimed - fixer running |
+| 21 Nov 22:38 | fixer | attempt t08_line_order -> kept (9/10 moved) |

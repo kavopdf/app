@@ -1095,9 +1095,17 @@ def compare(src_pdf, txt_path):
     # present are ordered, which is why source counts partners rather than source lines.
     src_seq = []
     for pg in _src_pages(src_pdf):
-        for ln in pg["lines"]:
-            if ln.get("upright", True):
-                src_seq.append(ln)
+        # MEASURED 21 Nov: this check was reading PyMuPDF's CONTENT-STREAM order - the order
+        # the page painted its glyph runs - and calling it line order. A page that paints a
+        # chart axis bottom-up, or a table from its last row, therefore scored as broken even
+        # when the .txt was in correct reading order. Falsified both ways: a synthetic page
+        # painted D,C,B,A with the .txt in A,B,C,D order FAILED before this line and PASSES
+        # after it; the same page with the .txt deliberately swapped still FAILS (so the check
+        # is not merely quiet), and a .txt in paint order that passed before now fails.
+        # The ground truth is the reader's order: page by page, top to bottom.
+        for ln in sorted((l for l in pg["lines"] if l.get("upright", True)),
+                         key=lambda l: (round(l["y"], 1), l["x"])):
+            src_seq.append(ln)
     txt_seq = [(ln.strip(), _column(ln)) for ln in lines]
     # The COLUMN is what decides which pairs are comparable, not just what identifies a
     # line. A form that puts "Invoice Date" at column 11 and "Order Ref" at column 60 is
