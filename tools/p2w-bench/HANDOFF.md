@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 19:58 |
-| ended | still running |
-| how it ended | - |
+| started | 19:00 |
+| ended | 19:22 |
+| how it ended | forced |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -87,13 +87,14 @@ unfinished work, not as a result.
 | 32_sA-01 | 32_stroke_lines | A | Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md act | 15:59 | expected by 16:20 | landed | FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md |
 | t02_B-01 | t02_position | B | The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0)  | 15:59 | expected by 16:20 | landed | FINDINGS/47_margins-DOCX-BLAST-RADIUS-155500-6930.md |
 | t08_B-01 | t08_line_order | B | which code path decides the .txt line order, and what single structura | 17:39 | expected by 17:45 | landed | FINDINGS/t08_line_order-DRAWING-ORDER-1740.md |
-| 32_sA-02 | 32_stroke_lines | A | which corpus documents become CLEAN if the floating-drawing rule carri | 20:15 | 19:30 | landed | FINDINGS/32_stroke_lines-FLOATING-CARRIER-DRAWS-BUT-STACKS-2050-f1x.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
+- `11:34` agent deployed: 32_stroke_lines / B - why Google drops the rules LibreOffice draws, and which construct replaces them
+- `11:34` agent deployed: t02_position / A - is the two-line 47_margins/t02 claim a real two-format fix
 - `11:34` agent landed: 32_stroke_lines / B -> tools/p2w-bench/FINDINGS/32_stroke_lines-google-drop-113048-9597.md
 - `11:34` agent landed: t02_position / A -> tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md
 - `11:35` attempt 1 on t02_position -> error
@@ -116,9 +117,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `17:40` agent landed: 32_stroke_lines / A -> FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md
 - `19:04` attempt 3 on 32_stroke_lines -> error
 - `19:10` attempt 3 on 32_stroke_lines -> reverted (0/15 moved)
-- `20:15` attempt 4 on 32_stroke_lines -> lead (0/210 moved)
-- `20:15` agent deployed: 32_stroke_lines / A - which corpus documents become CLEAN if the floating-drawing rule carrier is repl
-- `20:15` agent landed: 32_stroke_lines / A -> FINDINGS/32_stroke_lines-FLOATING-CARRIER-DRAWS-BUT-STACKS-2050-f1x.md
+- `20:08` attempt 4 on 32_stroke_lines -> reverted (0/213 moved)
 
 ## Where the rest of the state lives
 
