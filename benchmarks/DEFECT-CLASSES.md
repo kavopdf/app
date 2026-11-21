@@ -19,7 +19,7 @@ dominates it.
 | mixed | content-partly-lost | 6 | 0 |
 | mixed | content-partly-lost-and-displaced | 5 | 4 |
 | displacement | content-present-partly-displaced | 23 | 0 |
-| displacement | content-present-wholly-displaced | 8 | 1 |
+| displacement | content-present-wholly-displaced | 7 | 2 |
 | clean | none | 0 | 130 |
 
 `single-element-far-out` is closed: it held one document, `newsletter-3col-header-footer`, and
@@ -112,12 +112,12 @@ only a work queue.
 | 70 | `66_two_col_footnotes_bottom` | content-present-partly-displaced | 2.92 | 8.16 | 1 | OPEN | - |
 | 71 | `68_journal_wide_table_spanning` | content-present-wholly-displaced | 12.09 | 8.64 | 1 | OPEN | - |
 | 72 | `363_warranty_card` | content-present-wholly-displaced | 10.58 | 4.32 | 1 | OPEN | - |
-| 73 | `brochure-3col-with-sidebar-box` | content-present-partly-displaced | 2.30 | 12.96 | 1 | OPEN | - |
+| 73 | `brochure-3col-with-sidebar-box` | content-present-partly-displaced | 2.45 | 12.96 | 1 | OPEN | - |
 | 74 | `gst-invoice-horizontal-rules-only` | none | 0.38 | 9.12 | 1 | FIXED | no defect |
 | 75 | `374_org_chart` | content-present-partly-displaced | 5.92 | 4.80 | 1 | OPEN | - |
 | 76 | `payslip-label-left-amount-right` | content-present-partly-displaced | 5.59 | 4.32 | 1 | OPEN | - |
 | 77 | `417_rotate180_and_mirrored` | content-present-wholly-displaced | 5.50 | 5.76 | 2 | OPEN | - |
-| 78 | `product-catalogue-code-left-price-right` | content-present-wholly-displaced | 1.71 | 8.16 | 1 | OPEN | - |
+| 78 | `product-catalogue-code-left-price-right` | content-present-wholly-displaced | 0.47 | 3.84 | 1 | FIXED | no defect |
 | 79 | `316_contract_with_schedules` | content-present-wholly-displaced | 0.26 | 7.20 | 1 | FIXED | share@5 0.26 |
 | 80 | `table-of-contents-dot-leaders` | content-present-partly-displaced | 4.97 | 26.40 | 1 | OPEN | - |
 | 81 | `64_newspaper_uneven_columns_ad_boxes` | content-present-partly-displaced | 3.46 | 6.72 | 1 | OPEN | - |

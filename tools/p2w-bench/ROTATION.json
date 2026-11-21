@@ -1,6 +1,9 @@
 {
- "exhausted": {},
- "next": "docx",
+ "exhausted": {
+  "32_stroke_lines": "2026-11-20 09:52 - 18 attempts, all reverted; 36 of 39 rules are in table rows and never reach the paragraph path; where a border was placed, 8 documents got worse",
+  "05_chars_extra": "2026-11-20 09:52 - same construct as 32_stroke_lines - the missing rule is one check, its U+200B anchor is the other"
+ },
+ "next": "txt",
  "docx": {
   "class": "47_margins",
   "since": "2026-11-20 12:52"

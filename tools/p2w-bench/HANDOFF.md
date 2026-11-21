@@ -1,5 +1,14 @@
 # HANDOFF - read this before you pick a class
 
+## NEEDS A HUMAN - no future run can clear these
+
+A run tried, could not, and it was not a system limit. Every run after this one
+will hit the same wall until one of these is changed by a person.
+
+| # | what it is | what was tried | what must change | when |
+|---|---|---|---|---|
+| 0 | the widget-AP walk is refused by one document, and the decision is not a fixer's | measured all three variants corpus-wide: 601 52.39 -> 0.00 and 42/42 d | a person must either authorise the trade (a 1.03 rise on a document al | 10:40 |
+
 Written by handoff.py on every claim, every attempt, every agent and every release.
 It is never more than one attempt old. If the claim in ROUND.json is older than the
 stale limit, the run that wrote this died without releasing - treat its plan as
@@ -9,18 +18,14 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 09:49 |
-| ended | 09:50 |
-| how it ended | forced |
+| started | 07:58 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
 > The U+FFFD root cause is known (CMap destination), but TWO agents disagree on whether the fix is right and the .txt measurement cannot settle it: pymupdf resolves Identity fonts the same way, so agreement between extractors is not evidence. FIRST ACTION NEXT RUN: render page 1 of 041122-Account_Opening_Form at 150 DPI and look at the 127 glyph sites - ligature or not. If ligature, the fix is CIDToGIDMap plus the descendant cmap; if not, apply FINDINGS/fffd-cmap-destination-2300-fixer.patch. Read FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md before touching the engine.
-
-## What the next run should do first
-
-> PUSH FINDINGS/widget-ap-glyph-walk-0436-f1x.patch and measure it: 601 goes 37/42 -> 42/42 docx checks in LibreOffice, blast radius is 2 documents of 213, and p2w builds from origin main so nothing corpus-wide can be measured until the patch is on main. Then measure 601 through Drive before and after (Google is the authority), and watch the Account form's two new fails (42_justification_edges, 63_table_rows). Do not chase t01 to 100% on 601 from the engine: verify_txt double-counts 'General' (glyph_truth appends _ap_stream_text to a page text pymupdf already synthesised the widget into), so only a duplicating engine can reach 100 and that costs 601 five docx checks. That is a person's decision, same as the 01:43 row.
 
 ## Agents deployed and not yet accounted for
 
@@ -74,7 +79,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `22:43` agent deployed: t01_word_accuracy / adversarial patch review - How can this Identity-H recovery write wrong text into the document?
 - `22:43` agent landed: t01_word_accuracy / adversarial patch review -> FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md
 - `23:16` attempt 6 on t01_word_accuracy -> kept (2/7 moved)
 - `23:20` agent deployed: t01_word_accuracy / A - is the U+FFFD glyph a ligature or a single letter, read from the embedded outlin
@@ -99,6 +103,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `04:36` agent landed: t01_word_accuracy / A -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
 - `04:36` agent landed: t01_word_accuracy / B -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
 - `07:16` attempt 13 on 47_margins -> partial (0/26 moved)
+- `10:39` attempt 14 on t01_word_accuracy -> reverted (0/213 moved)
 
 ## Where the rest of the state lives
 

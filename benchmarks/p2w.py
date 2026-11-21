@@ -68,6 +68,18 @@ ROOT="/scratch/work/p2w"; CORPUS=ROOT+"/corpus"; DOCX=ROOT+"/out"
 # repository beside it, not in the release zips, so the script must find its own tree.
 HERE=os.path.dirname(os.path.abspath(__file__))
 DIST=ROOT+"/dist2"; CACHE="/scratch/output/_cache"; REPO=ROOT+"/repo"
+# WHICH TREE THE ENGINE IS BUILT FROM - AND WHY IT IS NOT ALWAYS origin/main.
+#
+# engine() used to sync REPO to origin FETCH_HEAD unconditionally, so the only engine this script
+# could ever build was the one already on main. regress.py --check, meanwhile, REFUSES a commit whose
+# engine fingerprint is not the one the corpus tables were measured on. Those two rules together made
+# every engine patch uncommittable: the gate demands a corpus measurement of the tree, and the only
+# tool that measures cannot build the tree. It cost the 03:36 and 03:57 runs their attempt, and it is
+# why FINDINGS/widget-ap-glyph-walk-0436-f1x.patch sat measured on two documents and unlanded.
+#
+# P2W_ENGINE_SRC names the clone to measure instead. Unset - the baseline cron, the apk cron, every
+# run that has nothing local to measure - it is REPO, and the behaviour is exactly what it was.
+ENGINE_SRC=os.environ.get("P2W_ENGINE_SRC") or REPO
 IMG=ROOT+"/diag"; PRE=ROOT+"/pre"; CHUNK=12; ZIPS=["p2w-all-groups","p2w-batch-1","pdf-to-word-test-corpus-v3","p2w-round2-additions"]
 JH="/scratch/work/.p2w-jdk/jdk"; INK=68; DPI=150; PT=72.0/DPI
 SWEEP=[1,2,3,5,10]
@@ -899,15 +911,23 @@ def engine():
 
     It now fetches the head and rebuilds when the engine differs, so the binary and the branch agree.
     """
-    log("engine -- syncing to head and building")
+    log("engine -- building from " + ENGINE_SRC)
     os.makedirs(ROOT, exist_ok=True)
-    if not os.path.exists(REPO + "/.git"):
-        sh("git clone -q https://github.com/kavopdf/app.git " + REPO, 240)
-    sh("cd " + REPO + " && git fetch -q origin main && git checkout -q -f FETCH_HEAD", 180)
-    sh("cd " + REPO + " && bash tools/p2w-bench/build-engine.sh", 280)
-    ok = os.path.exists(REPO + "/tools/engine-verify/out")
-    head = sh("cd " + REPO + " && git log -1 --format=%h", 30)
-    eng = sh("cd " + REPO + " && git log -1 --format=%h -- app/src/main/java/com/kavopdf/app/engine/", 30)
+    if os.environ.get("P2W_ENGINE_SRC"):
+        # A LOCAL TREE. Never fetched and never checked out: the whole point is to measure the
+        # working tree, and `git checkout -f` would throw the patch away.
+        if not os.path.exists(ENGINE_SRC + "/.git"):
+            log("P2W_ENGINE_SRC=" + ENGINE_SRC + " is not a git clone")
+            return False
+        log("engine -- local tree, not syncing to origin")
+    else:
+        if not os.path.exists(REPO + "/.git"):
+            sh("git clone -q https://github.com/kavopdf/app.git " + REPO, 240)
+        sh("cd " + REPO + " && git fetch -q origin main && git checkout -q -f FETCH_HEAD", 180)
+    sh("cd " + ENGINE_SRC + " && bash tools/p2w-bench/build-engine.sh", 280)
+    ok = os.path.exists(ENGINE_SRC + "/tools/engine-verify/out")
+    head = sh("cd " + ENGINE_SRC + " && git log -1 --format=%h", 30)
+    eng = sh("cd " + ENGINE_SRC + " && git log -1 --format=%h -- app/src/main/java/com/kavopdf/app/engine/", 30)
     log(f"engine: {'ok' if ok else 'FAILED'} head={str(head).strip()[:9]} engine={str(eng).strip()[:9]}")
     return ok
 def docx(end):
@@ -932,7 +952,7 @@ def docx(end):
     if not miss: return len(pdfs)
     log(f"docx {len(pdfs)-len(miss)}/{len(pdfs)} -- converting {len(miss)}")
     os.makedirs(DOCX,exist_ok=True)
-    E=REPO+"/tools/engine-verify"
+    E=ENGINE_SRC+"/tools/engine-verify"
     cp=":".join([E+"/out",E+"/libs/aar/classes.jar",E+"/libs/bcprov.jar",E+"/libs/bcpkix.jar",E+"/libs/bcutil.jar"])
     env='JAVA_HOME='+JH+' PATH='+JH+'/bin:$PATH JAVA_TOOL_OPTIONS="-XX:CompressedClassSpaceSize=64m -XX:MaxMetaspaceSize=200m"'
     # ONE DOCUMENT PER JVM. NOT AN OPTIMISATION - A CORRECTNESS REQUIREMENT.
@@ -957,7 +977,7 @@ def docx(end):
         sh('cd ' + E + ' && ' + env + ' java -Xmx700m -cp "' + cp + '" ConvertOne '
            + p + ' ' + DOCX, min(max(25, int(end - time.time())), 90))
     return len(glob.glob(DOCX+"/*.docx"))
-def measure_doc_chunked(pdf, dx, chunk=40, budget=240.0, first=0):
+def measure_doc_chunked(pdf, dx, chunk=40, budget=240.0, first=0, seed=None):
     """Measure a long document in page windows, merging the windows into one result.
 
     A 300-page document takes about 4m40s here - 300 pages, each rendered twice at 150 DPI and
@@ -976,7 +996,12 @@ def measure_doc_chunked(pdf, dx, chunk=40, budget=240.0, first=0):
     """
     ds = fitz.open(pdf)
     total = len(ds); ds.close()
-    merged = None
+    # A SEED IS WHAT MAKES THE RESUME REAL. `first` told this function which page to start at and
+    # then threw away every window before it, so a 300-page document measured 60 pages per run,
+    # five runs in a row, and reached page 60 every time - the corpus could never close at 213 and
+    # every baseline pass reported "measured 114 of 213" while spending its whole budget on the
+    # same document. Measured 21 Nov: six consecutive 290 s passes, all ending on 416_many_tiny_pages.
+    merged = dict(seed) if seed else None
     # `first` MAKES THIS RESUMABLE, WHICH IS THE WHOLE POINT OF IT BEING CHUNKED.
     # The function reported pages_done so a caller could carry on, and then always started at
     # page 0 - so a second call re-measured the first 240 pages of 416_many_tiny_pages and never
@@ -1010,7 +1035,7 @@ def measure_doc_chunked(pdf, dx, chunk=40, budget=240.0, first=0):
 def _engine_stamp():
     """The engine commit this measurement belongs to, or 'unknown'."""
     try:
-        return subprocess.run(["git", "-C", REPO, "log", "-1", "--format=%h", "--",
+        return subprocess.run(["git", "-C", ENGINE_SRC, "log", "-1", "--format=%h", "--",
                                "app/src/main/java/com/kavopdf/app/engine/"],
                               capture_output=True, text=True, timeout=30).stdout.strip() or "unknown"
     except Exception:
@@ -1052,6 +1077,16 @@ def _invalidate_if_engine_changed():
     return now
 
 
+def _exempt_docx_set():
+    """The documents EXEMPT.json excludes from the .docx measurement, by name."""
+    try:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
+                               "tools", "p2w-bench", "EXEMPT.json"), encoding="utf-8") as f:
+            return set(json.load(f).get("docx") or {})
+    except Exception:
+        return set()
+
+
 def run(end):
     """Measure, one chunk at a time, so a run always makes progress.
 
@@ -1067,8 +1102,28 @@ def run(end):
     budget a run has, it leaves measured documents behind instead of a warm cache and nothing else.
     """
     os.makedirs(DIST,exist_ok=True)
+    # AN EXEMPT DOCUMENT IS NOT MEASURED, AND THE LOOP USED TO MEASURE IT ANYWAY.
+    #
+    # rank() excludes EXEMPT.json's "docx" set from `want`, so a document exempted as too large to
+    # measure could never make `complete` true - that half was fixed. The other half was not: this
+    # list was built from the corpus alone, so 416_many_tiny_pages (300 pages) was still measured
+    # first, alphabetically, on every single run. It never finished, `if time.time()>=end: break`
+    # fired on it every time, and the run left 114 of 213 measured and no movement behind it.
+    # Measured 21 Nov: 6 consecutive 290 s passes each ended on the same document.
+    _exempt_docx = _exempt_docx_set()
+    def _pages(nm):
+        # SHORTEST FIRST. A run that starts with a 300-page document leaves nothing measured,
+        # whatever the budget, because the first chunk never completes. Ordered by page count, a
+        # 290 s pass measures sixty small documents and the long one lands at the end of the
+        # queue, where a resumable window is the only thing it can cost.
+        try:
+            _d=fitz.open(CORPUS+"/"+nm+".pdf"); n=len(_d); _d.close(); return n
+        except Exception:
+            return 9999
     todo=[os.path.basename(p)[:-4] for p in sorted(glob.glob(CORPUS+"/*.pdf"))
-          if not os.path.exists(DIST+"/"+os.path.basename(p)[:-4]+".json")]
+          if not os.path.exists(DIST+"/"+os.path.basename(p)[:-4]+".json")
+          and os.path.basename(p)[:-4] not in _exempt_docx]
+    todo.sort(key=_pages)
     if not todo:
         return
     for i in range(0,len(todo),CHUNK):
@@ -1091,11 +1146,25 @@ def run(end):
                 _dd=fitz.open(p); n_pg=len(_dd); _dd.close()
             except Exception: pass
             if n_pg>80:
-                try: r=measure_doc_chunked(p,d,chunk=60,budget=max(30,int(end-time.time())-20))
+                pf=f"{DIST}/{b}.partial.json"
+                _first=0; _seed=None
+                try:
+                    _pj=json.load(open(pf)); _first=int(_pj.get("first") or 0); _seed=_pj.get("merged")
+                except Exception: pass
+                try: r=measure_doc_chunked(p,d,chunk=60,budget=max(30,int(end-time.time())-20),
+                                           first=_first, seed=_seed)
                 except Exception as e: r=dict(doc=os.path.basename(d),error=str(e)[:100])
                 if r and r.get("pages_done",0)<r.get("pages_total",0):
-                    log(f"{b}: {r.get('pages_done')} of {r.get('pages_total')} pages - not cached, next run resumes")
+                    # KEEP THE WINDOWS THAT WERE PAID FOR. Without this file the next run starts
+                    # at page 0 again and the document is never finished.
+                    try:
+                        json.dump({"first": r.get("pages_done"), "merged": r}, open(pf,"w"))
+                    except Exception: pass
+                    log(f"{b}: {r.get('pages_done')} of {r.get('pages_total')} pages - "
+                        f"progress kept in {os.path.basename(pf)}, next run resumes there")
                     continue
+                try: os.path.exists(pf) and os.remove(pf)
+                except Exception: pass
             else:
                 try: r=measure_doc(p,d)
                 except Exception as e: r=dict(doc=os.path.basename(d),error=str(e)[:100])
