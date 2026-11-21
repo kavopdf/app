@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 12:12 → running IST · 32 min**
+**21 Nov 2026 · slot 12:12 → running IST · 36 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -8,7 +8,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 0 attempt(s), 0 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -17,8 +17,14 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `-` |
-| Committed | **14** files in 2 commit(s) from `6347cd3` — ...-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md, ...troke_lines-A-pbdr-verification-124000-relay.md, ...troke_lines-B-rule-flow-neutral-124500-relay.md, BLOCKERS.md, HANDOFF.json, HANDOFF.md, ROTATION.json, ROUND.json |
+| Working on | `32_stroke_lines` |
+| Committed | **20** files in 4 commit(s) from `8206f46` — ...-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md, ...troke_lines-A-pbdr-verification-124000-relay.md, ...troke_lines-B-rule-flow-neutral-124500-relay.md, ATTEMPTS.json, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, H |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 12:46 | **error** | 0/37 | pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) |
 
 ## The txt
 
@@ -41,11 +47,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 12:12 → running · 32 min |
+| Slot window | 12:12 → running · 36 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 14 |
+| Tool beats | 22 |
 | Longest silence | **24.6 min** — from 12:14:42, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 3 |
 | Obstacles | 1 cleared · 1 parked, with the evidence to re-open them |
 | Still a wall | `_done()` in gverify.py counts a document as measured only when its result carries the CURRENT engine stamp (` |
 
@@ -55,9 +61,9 @@
 | Phase | Time | |
 |:--|--:|:--|
 | setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **24 min** | `#################` |
-| record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **5 min** | `####` |
+| measure or build - a conversion, screen or compile writes no beacon | **24 min** | `###############` |
+| record - attempt, handoff, class rows | **5 min** | `###` |
+| report - the report and the chain | **6 min** | `####` |
 ## What this run did
 
 Two things, both proved with a number, neither of them an engine change. The class `classpick.py`
@@ -95,21 +101,6 @@ newer than the results it summarises is not a false alarm; the branch was proved
 fixer's committed message with a watchdog table (it happened on 20 Nov). It now gives the fixer that
 file and every other cron `LAST-MESSAGE-<cron>.md`; a real write through `--for health` created its
 own file and left the fixer's **byte-identical**.
-
-## Ruled out, so it is not retried
-
-| what | number | where |
-|:--|:--|:--|
-| loosening the 065000 guard (4 variants) | ceiling 3 of 39 rules | 10:07 finding |
-| flush-by-top | `18_displacement` PASS -> FAIL | 055000 finding |
-| carrier paragraph, any form | 9.6 pt, not portable | 065000 finding |
-| pBdr as the next action | 0 of 2136 rules pass both edges | this run |
-
-## Why the long silence
-
-**24.6 minutes with no tool call, 12:14:42 to ~12:39.** Both subagents were running inside this
-turn (a scheduled run has no one to answer later, so they ran foreground), and their two reports are
-the two `FINDINGS/32_stroke_lines-*` files committed above. It was work, not a hang.
 
 ## Best results this round
 
