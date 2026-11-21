@@ -163,6 +163,22 @@ Four more probes, same procedure, all with `w:pgMar` at zero and every table bor
   displace the following paragraph by the same amount. A `behindDoc` drawing displaced nothing, which is
   the one thing it had over a table.
 
+### The flow cost is already measured, and it is worse than 38 pt
+
+`ATTEMPTS.json` under `18_displacement` records this same construct being tried on 20 Nov, and its third
+probe is the number to read before spending a slot here: a `trHeight hRule="exact"` row **is** honoured for
+height (55.83 pt rendered of 55.15 asked, exact in LibreOffice too), and swapping the four page-top gaps in
+`bank-statement-5-pages` for such rows **fixed the displacement** (median dy −53.8 → +0.8 pt on page 2,
+−54.9 → +0.6 on page 4, against a 1.5–4.5 pt tolerance) — but the document then rendered as **ten pages in
+Google instead of six**, one blank page after each, because a gap that was free in the flow accounting
+became real and cost 55 pt of page capacity. That entry's verdict is that the construct cannot land alone:
+the page-fill budget has to be recomputed first.
+
+So `trHeight="0"` being ignored (this run) and `trHeight="55.15"` being honoured (that run) are the same
+finding from two sides: a table row occupies exactly the height it is given, and zero is not a height
+Google accepts. A rule carried by a table therefore always costs flow, and the cost is the rule's own
+height plus the row's minimum.
+
 So the next run's problem is a single one, and it is not rendering, not x, and not length: **make a table
 occupy no flow space.** Untried and plausible: a nested table inside a cell of an outer zero-height row, a
 `w:tblpPr` floating table (`tblpPr` positions a table absolutely, which is the OOXML feature built for
