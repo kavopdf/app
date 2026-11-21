@@ -7,7 +7,28 @@
  "attempts": 1,
  "kept": 0,
  "docs_improved": 0,
- "agents": [],
+ "agents": [
+  {
+   "id": "t01_sA-01",
+   "class": "t01_word_accuracy",
+   "angle": "the font program",
+   "question": "What Unicode each of the four Effra CIDs really is, from the font program itself",
+   "status": "landed",
+   "deployed": "13:20",
+   "deployed_at": "2026-11-21 13:20",
+   "landed_at": "2026-11-21 13:25"
+  },
+  {
+   "id": "t01_sB-02",
+   "class": "t01_word_accuracy",
+   "angle": "the rendered page",
+   "question": "What letters the rendered page visibly draws at those CIDs",
+   "status": "landed",
+   "deployed": "13:23",
+   "deployed_at": "2026-11-21 13:23",
+   "landed_at": "2026-11-21 13:26"
+  }
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0
 }

@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 13:18 → running IST · 12 min**
+**21 Nov 2026 · slot 13:18 → running IST · 13 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -40,19 +40,22 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `t01_sA-01` | What Unicode each of the four Effra CIDs really is,  | 13:20 | 13:25 | 5 min |
+| `t01_sB-02` | What letters the rendered page visibly draws at thos | 13:23 | 13:26 | 3 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:18 → running · 12 min |
+| Slot window | 13:18 → running · 13 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 16 |
 | Longest silence | **10.0 min** — from 13:19:20, after `relay/fixer: t01, launching two agents then the 4c render` |
 | Silences over 2 min | 1 |
-| Obstacles | 4 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | **The gate refuses a release while 24 rows are open, and every one of the 24 is a wall a fixer may not clear.* |
+| Obstacles | 4 cleared · 2 parked, with the evidence to re-open them |
+| Still a wall | **`stage.py` still counts a result file as a measurement, so it says `classify` while the measurement is not f |
 
 
 ### Where the time went
@@ -60,7 +63,8 @@
 | Phase | Time | |
 |:--|--:|:--|
 | setup - claim, housekeeping, reading the gate | **0 min** | `##` |
-| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `###################` |
+| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `#################` |
+| report - the report and the chain | **1 min** | `##` |
 | other - not attributed to a tool | **0 min** | `#` |
 ## Best results this round
 

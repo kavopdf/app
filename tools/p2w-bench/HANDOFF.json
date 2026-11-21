@@ -1309,6 +1309,26 @@
    "finding": "FINDINGS/32_stroke_lines-B-rule-flow-neutral-124500-relay.md",
    "deployed_at": "2026-11-21T06:44",
    "landed_at": "2026-11-21T07:10"
+  },
+  {
+   "id": "t01_sA-01",
+   "class": "t01_word_accuracy",
+   "angle": "the font program",
+   "question": "What Unicode each of the four Effra CIDs really is, from the font program itself",
+   "status": "landed",
+   "deployed": "13:20",
+   "deployed_at": "2026-11-21 13:20",
+   "landed_at": "2026-11-21 13:25"
+  },
+  {
+   "id": "t01_sB-02",
+   "class": "t01_word_accuracy",
+   "angle": "the rendered page",
+   "question": "What letters the rendered page visibly draws at those CIDs",
+   "status": "landed",
+   "deployed": "13:23",
+   "deployed_at": "2026-11-21 13:23",
+   "landed_at": "2026-11-21 13:26"
   }
  ],
  "run": {
