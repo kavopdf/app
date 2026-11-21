@@ -1756,3 +1756,12 @@
 {"t": 1795266972.3739192, "ist": "18:46:12", "ev": "beat", "d": "heartbeat before any claim: relay: new brief read - metric is CLEAN not affected; running --leverage"}
 {"t": 1795267175.053026, "ist": "18:49:35", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795267247.050415, "ist": "18:50:47", "ev": "beat", "d": "heartbeat before any claim: relay: committing the cell-border finding, then the t08 line-order falsification"}
+{"t": 1795267557.874888, "ist": "18:55:57", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795267560.73788, "ist": "18:56:00", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795267600.550259, "ist": "18:56:40", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795267605.789606, "ist": "18:56:45", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795267623.9498572, "ist": "18:57:03", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795267631.6851861, "ist": "18:57:11", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795267640.9455633, "ist": "18:57:20", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795267681.2908313, "ist": "18:58:01", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795267681.518107, "ist": "18:58:01", "ev": "beat", "d": "report.py: building the report"}
