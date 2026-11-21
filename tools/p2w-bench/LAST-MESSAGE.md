@@ -1,17 +1,74 @@
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 18:17 → 19:22 IST · 1h 05m** — the clock of the run whose ROUND.json
-survived the merge; this run held the slot 19:58 → 21:15 and is the `lead` row at 20:15 below.
+**21 Nov 2026 · slot 21:11 → running IST** — class `32_stroke_lines`, taken on the open lead.
 
-> No change was kept. The rule carrier now DRAWS in Google for the first time - and it draws only
-> one rule per document, because two floating tables stack under the first. That is the finding;
-> the engine is back at HEAD.
+> **No engine change was kept, and the reason is a measurement, not a shortage of time.** The lead
+> was priced: the carrier patch two runs wrote is worth **one** document of the 192 Google scores,
+> and as it stands it puts floating tables into documents that have no rules at all and moves a
+> paragraph 122 pt. Both numbers were measured in this sandbox this slot, before and after, and
+> both are committed with the patch reverted.
+
+## What this run actually changed
+
+| | |
+|:--|:--|
+| Corpus in the sandbox | **213 of 213**, from the `corpus-v1` release assets, in 6 minutes |
+| Engine built | yes, 37 s |
+| Commits pushed | 3 — a FINDINGS file and two new tools |
+| Engine commits | **none** — see below |
+| Documents made clean | 0 |
+
+**The wall two runs hit is gone.** `regress.py` refuses any docx engine change whose table was not
+measured on that engine, and the corpus is not in the repository, so every run ended with an
+unlandable patch. The corpus is four release assets and five PDFs that travel in the repo.
+`tools/p2w-bench/corpus-fetch.sh` now does it and refuses if any of the 213 is missing. `p2w.py
+--budget` is a *time* budget and manages ~26 documents per 250 s, so a full pass is ~33 minutes of
+wall clock across several commands — a known number now instead of a guess.
+
+## What the census found
+
+Every page of every corpus PDF, read with the instrument's own rule definition
+(`verify_google._rules`, imported, not re-implemented):
+
+| | |
+|:--|--:|
+| documents drawing no rule on any page | **53** |
+| documents with at least one rule | **160** |
+| … busiest page holds at most one | **14** |
+| … busiest page holds two or more | **146** |
+| rules counted across the corpus | **1170** |
+
+Crossed with the committed Google results: **35** documents fail only within `{05_chars_extra,
+18_displacement, 32_stroke_lines}`. **32** of them carry rules, and **31 of those 32 have two or more
+rules on a page**. The floating-table carrier that is already written and measured on
+`394_map_with_legend` places one table per page and stacks every later one, so it can make at most
+**one** of them clean. The row-per-rule construct is the precondition for the lead, not an
+optimisation of it.
+
+## What the second measurement falsified
+
+Built the patched engine, converted six documents, byte-compared against HEAD, reverted.
+
+| document | rules (instrument) | `w:tblpPr` the patch emits |
+|:--|--:|--:|
+| `305_vaccination_certificate` | **0** | **20** |
+| `303_discharge_summary` | **0** | **15** |
+| `77_arabic_rtl_document` | **0** | **4** |
+| `80_gstin_pan_cin_ifsc_table` | 0 | 2 |
+| `76_devanagari_table` | 0 | 0 |
+| `15_stamp_on_scanned_page` | **0** | 0 |
+
+`isRuleShape` has no isolation test; the instrument's `_rules` has one (`RULE_GAP` 3 pt). So the
+carrier takes every table grid line drawn as a thin fill — and the carrier stacks. On
+`303_discharge_summary` the same paragraph's `w:spacing w:before` also went **6740 → 4291 twips**:
+the carrier is not zero-flow there, and the `.txt` is byte-identical on all three, so no `.txt` check
+would have seen it. The narrow predicate is the next build, before the row construct.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 6 attempt(s), 0 kept |
+| Documents improved this run | **0** — 0 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,126 +77,53 @@ survived the merge; this run held the slot 19:58 → 21:15 and is the `lead` row
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `32_stroke_lines` |
+| Working on | `-` |
 
-## What was tried
+## The txt
 
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 20:15 | **lead** | 0/210 | FLOATING-TABLE CARRIER BUILT AND MEASURED THROUGH GOOGLE, not landed. DocxWriter.ruleCarrier() turns a hairline shape into a one-cell w:tblpPr table with a w:tcBorders bottom edge. Measured on 73_mark |
-
-## The one thing that changed in the render
-
-`73_marksheet_subject_marks_grade` fails exactly `05_chars_extra, 18_displacement, 32_stroke_lines`
-in Google and passes 42/42 in LibreOffice on the same engine. It carries two rules. Before this run
-Google drew **0 of them**; with the carrier built this run it drew **2 of 2, at the requested weight
-and colour** - and still read 39/42, because only the first floating table in a document is placed
-at its `w:tblpY`. Rule 1 asked for 83.6 pt and landed at 83.5. Rule 2 asked for 793.6 and landed at
-84.5, stacked one rule-thickness under rule 1. `w:tblOverlap w:val="overlap"` changed the bytes and
-not the render; an inline carrier lost x entirely (both rules to x = 0).
-
-Two other things are settled and cost nothing to keep:
-
-* **A rule on this corpus is a FILL, not a stroke.** Both of that document's rules leave the writer
-  as a filled 483 × 0.9 pt rectangle with `a:ln noFill` and `lineRgb = -1`. A carrier gated on "has a
-  stroke colour" would have skipped every rule on the class's own document - which is probably why
-  the earlier `w:pBdr` and cell-border attempts kept finding nothing to carry.
-* **A table costs no character.** A four-case probe - a paragraph, a normal table with text, a
-  normal table with an empty cell, a floating table with an empty cell - rendered through Google with
-  **0** `U+200B`. So the two `U+200B` on `73_marksheet` are not the table: they sit at the two points
-  where the carrier band overlaps running text. A carrier in white space may cost nothing at all.
-  That is a hypothesis with one probe behind it, not a measurement.
+| | |
+|:--|:--|
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **190** (89.2%) |
+| Failing at least one check | **23** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t08_line_order` - 10 documents |
 
 ## Why the class was taken
 
-`classpick.py` suggested `32_stroke_lines` because it holds an open lead. The lead was worth taking
-on arithmetic, not on the suggestion: `--leverage` prices the class at 36.3 clean documents, and a
-census of the committed Google results (delegated, below) puts **35 documents** at clean if the
-carrier clears `32` plus `05` and `18` - 15 that fail exactly those three, 15 that fail exactly
-`32+05`, 2 that fail `32` alone, and 3 that fail only a subset of `05`/`18`. 41 of the 213, from
-6. The construct was measured end to end through the renderer that matters before anything was
-built into the engine, which is the part the last two runs did not have.
-
-## The other fixer, and why both numbers stand
-
-While this run held the slot the concurrent run pushed a measurement of the same construct:
-`FINDINGS/32_stroke_lines-RULE-CARRIER-LANDED-2008.md` — `394_map_with_legend` 41/42 → **42/42** in
-Google with a floating-table carrier, plus the number this run's patch was missing: `w:tblCellMar`
-must be zeroed or every rule lands 5.4 pt left. That document has one rule. This run's document has
-two, and that is exactly where the construct breaks — so the two measurements are not in conflict,
-they are the two halves of the same limit: **the carrier is exact for the first floating table on a
-page and stacks every one after it.** One table per page holding all of a page's rules as rows is the
-construct that reconciles them.
-
-## Subagents
-
-One agent, on the census above. It read all 426 committed verification files, reported the failing
-set of every document, and - the useful part - flagged which Google/LibreOffice pairs were measured
-on **different engine stamps** (13 of 35) and so are not controlled comparisons, and which carry no
-stamp at all (8). Those 21 documents are the ones whose "it is clean in LibreOffice" claim has not
-actually been established.
+`classpick.py` suggested `32_stroke_lines` because it holds an open lead, and `--leverage` prices the
+class at 36.3 clean documents. I took it on that arithmetic and then tested the arithmetic itself:
+the 36.3 is reachable only through a carrier that handles multiple rules per page, and 31 of the 32
+candidate documents need exactly that. The lead was worth taking; the patch that carries it was not.
 
 ## What the next run should do
 
-One floating table **per page**, holding that page's rules as rows: `tblpY` = the first rule's y and
-each row's exact height = the gap to the next rule. Rows inside one table do stack, so that places
-every rule at its own y with one band - and one wrap region, which is the `05_chars_extra` question
-too. Before building it, one probe settles the ZWSP: draw a rule through a paragraph and a rule in
-white space in the same document and count `U+200B` in the export.
+1. **Narrow `isRuleShape` to the instrument's definition** — thin face ≤ 4.0 pt, long face ≥ 10 pt,
+   and not touching another stroke within 3 pt. Re-convert the six documents above and confirm
+   `tblpPr` counts fall to the census's rule counts. That is one build and six conversions, ~5 min.
+2. **Probe `w:hRule="exact"` on a floating-table row through Google** before building rows: three
+   rows, 40 pt gaps, read the three border y's out of the export. If exact is not honoured every
+   rule after the first drifts by the empty cell's line box.
+3. **Then build one table per page with rules as rows**, and measure the 31.
 
-Do not retry: the per-rule floating table (stacks, measured), the inline table (loses x, measured),
-`tblOverlap` (no effect, measured).
+Do not land `rule-carrier-tblppr-2008.patch`. It is worth one document and it changes 146.
 
-## The txt
+## Subagents
 
-| | |
-|:--|:--|
-| Scored | **213** of 213 |
-| Clean - every applicable check passes | **190** (89.2%) |
-| Failing at least one check | **23** |
-| Moved since the last commit | **none** - nothing changed |
-| Most common failure | `t08_line_order` - 10 documents |
-
-## The txt
-
-| | |
-|:--|:--|
-| Scored | **213** of 213 |
-| Clean - every applicable check passes | **190** (89.2%) |
-| Failing at least one check | **23** |
-| Moved since the last commit | **none** - nothing changed |
-| Most common failure | `t08_line_order` - 10 documents |
+One agent, on the carrier design. It could not read the repo — its sandbox had no clone and no
+`/scratch/input`, and it said so instead of inventing line numbers, which is the useful part. Its
+OOXML element ordering and its list of unmeasured questions are in this run's reasoning; the design
+detail it produced that this run verified independently is the `w:sz` eighths-of-a-point rule and
+the `w:tblCellMar` 5.4 pt inset, which matches the landed finding.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 18:17 → 19:22 · 1h 05m |
+| Slot window | 21:11 → running · 11 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 28 |
-| Longest silence | **9.2 min** — from 19:11:04, after `report.py: building the report` |
-| Silences over 2 min | 7 |
-| Obstacles | 4 cleared · 0 parked, with the evidence to re-open them |
-
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **4 min** | `##` |
-| fix - diagnose and change the engine | **7 min** | `#####` |
-| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `######` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **13 min** | `########` |
-
-## Timing
-
-| | |
-|:--|:--|
-| Slot window | 19:58 → running · 16 min |
-| Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 13 |
-| Longest silence | **9.6 min** — from 20:04:52, after `engine patched: hairline rule -> floating tblpPr carrier (ruleCarrier(` |
+| Tool beats | 7 |
+| Longest silence | **4.4 min** — from 21:11:30, after `gaps.py: reading the timeline` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
@@ -148,5 +132,8 @@ Do not retry: the per-rule floating table (stacks, measured), the inline table (
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **15 min** | `####################` |
-| record - attempt, handoff, class rows | **1 min** | `##` |
+| setup - claim, housekeeping, reading the gate | **4 min** | `#########` |
+| measure or build - a conversion, screen or compile writes no beacon | **0 min** | `##` |
+| report - the report and the chain | **0 min** | `##` |
+| other - not attributed to a tool | **5 min** | `##########` |
+

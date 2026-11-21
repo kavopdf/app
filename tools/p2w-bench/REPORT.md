@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-21 18:17
+# Fixer report - 2026-11-21 21:11
 
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 18:17 → 19:22 IST · 1h 05m**
+**21 Nov 2026 · slot 21:11 → running IST · 11 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 6 attempt(s), 0 kept |
+| Documents improved this run | **0** — 0 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,13 +20,7 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `32_stroke_lines` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 19:10 | **lead** | 0/15 | RECLASSIFIED 21 Nov from "reverted" to "lead": the construct WAS measured through Google and the finding is committed - it is not a refuted idea, the implementation ran out of slot. tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table contro |
+| Working on | `-` |
 
 ## The txt
 
@@ -46,23 +40,22 @@
 
 | | |
 |:--|:--|
-| Slot window | 18:17 → 19:22 · 1h 05m |
+| Slot window | 21:11 → running · 11 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 28 |
-| Longest silence | **9.2 min** — from 19:11:04, after `report.py: building the report` |
-| Silences over 2 min | 7 |
-| Obstacles | 4 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 7 |
+| Longest silence | **4.4 min** — from 21:11:30, after `gaps.py: reading the timeline` |
+| Silences over 2 min | 2 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **4 min** | `##` |
-| fix - diagnose and change the engine | **7 min** | `#####` |
-| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `######` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **13 min** | `########` |
+| setup - claim, housekeeping, reading the gate | **4 min** | `#########` |
+| measure or build - a conversion, screen or compile writes no beacon | **0 min** | `##` |
+| report - the report and the chain | **0 min** | `##` |
+| other - not attributed to a tool | **5 min** | `##########` |
 ## Best results this round
 
 | Document | Before | After | Change |
