@@ -1859,3 +1859,10 @@
 {"t": 1795280890.7989514, "ist": "22:38:10", "ev": "attempt", "d": "t08_line_order -> kept"}
 {"t": 1795280890.9301093, "ist": "22:38:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795280891.0763896, "ist": "22:38:11", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795280921.5251286, "ist": "22:38:41", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795280934.3082943, "ist": "22:38:54", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795280935.0062475, "ist": "22:38:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795280935.3859477, "ist": "22:38:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795280939.190461, "ist": "22:38:59", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795280940.2771463, "ist": "22:39:00", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795280940.7164967, "ist": "22:39:00", "ev": "beat", "d": "report.py: building the report"}
