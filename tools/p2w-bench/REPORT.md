@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 18:17 → 19:10 IST · 53 min**
+**21 Nov 2026 · slot 18:17 → 19:22 IST · 1h 05m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -26,7 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 19:10 | **reverted** | 0/15 | tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is cl |
+| 19:10 | **lead** | 0/15 | RECLASSIFIED 21 Nov from "reverted" to "lead": the construct WAS measured through Google and the finding is committed - it is not a refuted idea, the implementation ran out of slot. tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table contro |
 
 ## The txt
 
@@ -46,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 18:17 → 19:10 · 53 min |
+| Slot window | 18:17 → 19:22 · 1h 05m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 23 |
-| Longest silence | **5.4 min** — from 19:04:35, after `classrow.py: refreshing the class file` |
-| Silences over 2 min | 5 |
+| Tool beats | 28 |
+| Longest silence | **9.2 min** — from 19:11:04, after `report.py: building the report` |
+| Silences over 2 min | 7 |
 | Obstacles | 4 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -58,10 +58,11 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **1 min** | `##` |
-| fix - diagnose and change the engine | **7 min** | `#######` |
+| setup - claim, housekeeping, reading the gate | **4 min** | `##` |
+| fix - diagnose and change the engine | **7 min** | `#####` |
+| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `######` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **12 min** | `############` |
+| report - the report and the chain | **13 min** | `########` |
 ## Best results this round
 
 | Document | Before | After | Change |
