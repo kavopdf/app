@@ -127,3 +127,14 @@ everything else: what went wrong in the work itself.
   Converting 12 docx per soffice invocation (`benchmarks/p2w.py` `prerender()`) took the same
   budget from 26 to 48-72 documents and reproduced three documents' stored share5 and page counts
   exactly. When a measurement "cannot fit", time the parts before you blame the renderer.
+
+- **A run that starts and does nothing blocks every run after it, at the platform level.** Found 21 Nov:
+  the 07:57 run was still marked `running` at 09:54 - two hours - with no claim in `ROUND.json`, no beat
+  in `TIMELINE.jsonl` and no commit. The scheduler will not start a new run while one is marked running,
+  so the 09:50 fire silently did not happen and `next_fire_at` sat in the past.
+  **Cost: two hours of a slot and one lost fire, and it looks exactly like a healthy cron** - the list
+  shows `status: enabled`, `consecutive_failures: 0`.
+  The tell is `cron runs`: a run with `status: "running"` and `ended_at: null` older than the slot length
+  is dead, whatever the repo says. Only the agent can clear it - pause and resume recomputes
+  `next_fire_at`, and a trigger starts a fresh run. The repo-side stale window does not help here,
+  because this failure is above the repository.
