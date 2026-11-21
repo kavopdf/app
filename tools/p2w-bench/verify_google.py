@@ -4518,6 +4518,19 @@ TABLE_CHECK_IDS = ("62_table_columns", "63_table_rows", "64_table_span_across",
 DETAIL = {}
 
 
+def _engine_head():
+    """The engine commit this measurement is of. Provenance, not a score."""
+    import subprocess as _sp
+    try:
+        r = _sp.run(["git", "-C", os.path.dirname(os.path.dirname(os.path.dirname(
+            os.path.abspath(__file__)))), "log", "-1", "--format=%h", "--",
+            "app/src/main/java/com/kavopdf/app/engine/"],
+            capture_output=True, text=True, timeout=20)
+        return (r.stdout or "").strip() or "unknown"
+    except Exception:
+        return "unknown"
+
+
 def compare(src_path, gd_path, docx_path=None):
     src = fitz.open(src_path)
     gd = fitz.open(gd_path)
@@ -6207,6 +6220,12 @@ def compare(src_path, gd_path, docx_path=None):
         "passed": len(checks) - len(failed),
         "total": len(checks),
         "failed": sorted(failed),
+        # WHICH ENGINE PRODUCED THIS. Without it a Google result is a number with no date and
+        # no parent, and on 21 Nov that cost a run: the fixer reported "2 documents,
+        # Google-confirmed" against measurements taken 30 hours earlier, before the engine
+        # change it was confirming. All 213 stored results carried no engine at all, so
+        # nothing could tell a fresh score from a stale one. Provenance only - not a check.
+        "engine": _engine_head(),
         "ok": not failed,
         # A check may carry a fourth element: what its count is MADE OF. Reported only,
         # never scored - a document that passes writes no detail and its JSON is
