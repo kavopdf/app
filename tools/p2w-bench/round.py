@@ -448,6 +448,32 @@ def claim(name):
     had_stale = bool(s.get(key))
     s[key] = time.time()
     save(s)
+
+    # THE CLAIM IS ONLY REAL ONCE IT IS PUSHED. THIS IS THE LOCK.
+    #
+    # save() writes ROUND.json into THIS sandbox's clone. Every cron runs in its own sandbox, so a
+    # claim written locally is invisible to the other fixer - which reads its own clone, sees no claim,
+    # and claims too. Both then edit the engine and both push, and the later whole-file commit reverts
+    # the earlier one. That is not a theory: on 17 Nov a slot read DocxWriter at 9f7a094, another slot
+    # committed a 218-line engine fix at cf2f9c6, and the first slot's commit silently reverted it.
+    #
+    # Git is the only state the two sandboxes share, so git has to be the arbiter. Push the claim; if
+    # the push is rejected, someone else claimed first - pull, look at what they wrote, and stand down.
+    # A run that claims without pushing has claimed nothing.
+    _pushed = sh("git add tools/p2w-bench/ROUND.json && "
+                 "git -c user.email=320240581+Onyx-Node@users.noreply.github.com "
+                 "-c user.name=Onyx-Node commit -q -m 'claim: %s takes the slot' && "
+                 "git push -q origin main" % name, timeout=120)
+    if _pushed[0] != 0:
+        # either the push lost the race, or there was nothing to commit because the claim was already
+        # there. Pull and read what the winner wrote.
+        sh("git pull -q --rebase origin main", timeout=120)
+        s2 = load()
+        other = s2.get(key)
+        if other and claim_age_min(other) is not None and claim_age_min(other) < limit:
+            print("%s busy - another run claimed and pushed first (%s). Standing down."
+                  % (name, s2.get("%s_doing" % name) or "no detail"))
+            return 1
     print("%s claimed at %s" % (name, ist("%H:%M")))
     note("claim", "%s claimed the slot" % name)
     _timeline("claim", "%s claimed the slot" % name)
