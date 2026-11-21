@@ -406,3 +406,7 @@
 | 21 Nov 16:59 | fixer | build-engine | engine built in 41s |
 | 21 Nov 17:23 | fixer | build-engine | started |
 | 21 Nov 17:24 | fixer | build-engine | engine built in 41s |
+
+| 21 Nov 17:25 | fixer | attempt | 47_margins -> reverted (0/5 moved) |
+| 21 Nov 17:00 | fixer | attempt | t02_position -> partial (1/5 moved) |
+| 21 Nov 17:39 | fixer | attempt | 32_stroke_lines -> reverted (0/145 moved) |

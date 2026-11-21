@@ -1,11 +1,11 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "reconciled: the other fixer landed the same patch; clearing the dead pBdr carry-over and writing the report",
-  "fixer_doing_since": 1795261952.8952115,
+  "fixer_doing": "HEAD rebuilt; converting all 213 to out-head for a byte-for-byte docx proof (replaces the 140-doc sample)",
+  "fixer_doing_since": 1795259268.3402877,
   "fixer_engine_at_claim": "2d44a3a",
-  "fixer_last_beat": 1795261952.8952122,
-  "fixer_started": 1795262155.7491152,
+  "fixer_last_beat": 1795259268.3402884,
+  "fixer_started": 1795262952.8834631,
   "history": [
     {
       "at": "2026-11-12 09:46",

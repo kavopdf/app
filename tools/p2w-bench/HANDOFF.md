@@ -26,11 +26,15 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> stage.py was reporting 'classify' on every fresh clone for a day, and three watchdog passes blamed the classifier cron for it. The cause was in stage.py, not the cron: it compared benchmarks/DEFECT-CLASSES.md (the previous pipeline's ghost, which nothing regenerates) against the gverify results by filesystem mtime, and a git clone stamps every file with the checkout time, so the comparison was decided by unpack order - measured 21 Nov, 05:47:52 against 05:47:53. Fixed and pushed de5d216: the live table is DEFECT-CLASSES-GOOGLE.md and currency is judged by the last commit touching each path (gverify 42bdcda 01:44:38, table e86a88a 04:47:32). stage.py now reads 'fix' with 185 failing documents, and both negative tests still fire. Two agents landed: 32_stroke_lines is the biggest open Google class (145 docs, 144 of them LibreOffice-draws-Google-drops) and its root cause is that every standalone rule leaves DocxWriter.shape() at line 2772 as a floating <w:drawing>/<wp:anchor>, which google_safe.py already lists twice as ignored by Google; FINDINGS/RULES-PBDR-IMPLEMENTATION.md holds the measured pBdr replacement (0 -> 2 rules on the probe document) and the ctx.flowY = s.topPt line whose omission turns it into a regression. The t02_position two-line claim from 47_margins-TXT-HALF-IS-T02-1055-f1x.md is REFUTED as a two-format fix: flippedPage reaches only buildPara, lineX is read only by TxtWriter, and 47_margins already passes on all five t02 documents in the stored LibreOffice table. Its third line as written deletes the only guard protecting 15_stamp_on_scanned_page; use 'if (g.dirx > -0.5f) return false;' instead.
+> The t02_position patch is LANDED and committed (462353f): uprightIfPageIsUpsideDown is now txt-only BY MEASUREMENT, not by argument - HEAD vs patched, all 213 documents converted both ways, 213 of 213 word/document.xml byte-identical and 212 of 213 .txt byte-identical, the one difference being one-page-rotated-180-degrees (8986 -> 9312 bytes, t02_position FAIL -> PASS). 190 of 213 .txt documents are clean now (was 189), 0 newly failing. scope.py gained PdfToWord.uprightIfPageIsUpsideDown -> txt with that proof in the comment; without it the gate fell back to 'change outside a known method -> both' and refused the commit for an unmeasured .docx, which is the same wall that has kept .txt fixes from landing for a month. THE pBdr CARRIER IS REFUTED - do not retry it: 12 class documents, 68 rules became w:pBdr but 48 of 68 land >24 pt off and LibreOffice gets worse on 8 of 12 (32_stroke 0->52 lost across the sample). The next 32_stroke_lines slot should try a table-cell border (DocxWriter.java:6420 already writes w:tcBorders/w:bottom and can carry the 102 vertical rules the pBdr path refuses). t08_line_order: the engine's .txt order is geometric (baseline y) while the check's ground truth is PyMuPDF's raw drawing order; reordering only our own lines into drawing order clears 10 of 10 rows. DO NOT take the agent's proposed fix as written - it edits verify_txt.py's _src_pages to sort the source, which makes t08 compare sorted-vs-sorted and nearly tautological; that is a measurement change and must be judged as one.
 
 ## What the next run should do first
 
+<<<<<<< Updated upstream
 > Take 32_stroke_lines from 'no new paragraph'. The pBdr carrier is refuted three ways (RULES-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md): w:pBdr needs a paragraph and a paragraph costs 9.6 pt on this engine, so the carrier IS the displacement. Not yet tried: a table-row bottom border, or a border on the paragraph the page already drew above the rule. Also: a full .txt corpus pass is 21 minutes (213 conversions at ~5.8s serial, 2 CPUs / 1 GB free - it cannot be parallelised) plus 71s to re-score, so it fits in about half a slot.
+=======
+> Judge the t08 verifier question before touching the engine: is t08_line_order measuring line order or drawing order? FINDINGS/t08_line_order-DRAWING-ORDER-1740.md has the numbers (10 of 10 rows clear when only our own line sequence is put into drawing order). The agent's proposed one-line sort of _src_pages is NOT obviously right - it would compare sorted-vs-sorted. Decide with a falsification: construct a .txt whose lines are deliberately swapped in y and confirm t08 still fires after the change. Then take t01_word_accuracy's .docx half or 32_stroke_lines' cell-border construct.
+>>>>>>> Stashed changes
 
 ## Agents deployed and not yet accounted for
 
@@ -84,18 +88,22 @@ unfinished work, not as a result.
 | t01blastradius-01 | t01 | blastradius | which of 213 documents change verdict under the two source-side change | 13:57 | 2 fixed, 0 regressions | landed | FINDINGS/t01-doubled-draw-both-sides-142100.md |
 | 47_mA-02 | 47_margins | A | .docx blast radius of the uprightIfPageIsUpsideDown two-line fix: buil | 15:19 | expected by 16:15 | running |  |
 | 47_mB-02 | 47_margins | B | true size of 47_margins on the CURRENT engine: re-render the class's 2 | 15:19 | expected by 16:15 | running |  |
-| 32_sA-01 | 32_stroke_lines | A | Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md act | 15:59 | expected by 16:20 | running |  |
-| t02_B-01 | t02_position | B | The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0)  | 15:59 | expected by 16:20 | running |  |
+| 32_sA-01 | 32_stroke_lines | A | Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md act | 15:59 | expected by 16:20 | landed | FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md |
+| t02_B-01 | t02_position | B | The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0)  | 15:59 | expected by 16:20 | landed | FINDINGS/47_margins-DOCX-BLAST-RADIUS-155500-6930.md |
+| t08_B-01 | t08_line_order | B | which code path decides the .txt line order, and what single structura | 17:39 | expected by 17:45 | landed | FINDINGS/t08_line_order-DRAWING-ORDER-1740.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
+<<<<<<< Updated upstream
 - `04:36` agent deployed: t01_word_accuracy / A - census of every widget appearance stream over all 213 documents - how many widge
 - `04:36` agent deployed: t01_word_accuracy / B - implement the /AP /N glyph walk in its own clone and measure 601 and the Account
 - `04:36` agent landed: t01_word_accuracy / A -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
 - `04:36` agent landed: t01_word_accuracy / B -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
+=======
+>>>>>>> Stashed changes
 - `07:16` attempt 13 on 47_margins -> partial (0/26 moved)
 - `10:39` attempt 14 on t01_word_accuracy -> reverted (0/213 moved)
 - `11:16` attempt 15 on t01_word_accuracy -> partial (0/5 moved)
@@ -115,8 +123,17 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:48` attempt 15 on 47_margins -> partial (1/213 moved)
 - `15:59` agent deployed: 32_stroke_lines / A - Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md actually clea
 - `15:59` agent deployed: t02_position / B - The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0) is measure
+<<<<<<< Updated upstream
 - `17:22` CLEARED a carry-over that three findings refuted and that survived the commit which superseded it. RULES-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md says 'the carry-over is cleared so the gate stops handing it to the next run', but HANDOFF.json[next] still carried it through 12:45, through 15:17 and through 462353f - so every run since 12:45 read a refuted instruction first. A finding cannot clear a carry-over; only handoff.py --next can, and nobody ran it. It is run now.
 - `17:25` attempt 16 on 47_margins -> reverted (0/5 moved)
+=======
+- `17:00` attempt 2 on t02_position -> partial (1/5 moved)
+- `17:39` attempt 3 on 32_stroke_lines -> reverted (0/145 moved)
+- `17:39` agent landed: t02_position / B -> FINDINGS/47_margins-DOCX-BLAST-RADIUS-155500-6930.md
+- `17:39` agent deployed: t08_line_order / B - which code path decides the .txt line order, and what single structural conditio
+- `17:39` agent landed: t08_line_order / B -> FINDINGS/t08_line_order-DRAWING-ORDER-1740.md
+- `17:40` agent landed: 32_stroke_lines / A -> FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md
+>>>>>>> Stashed changes
 
 ## Where the rest of the state lives
 

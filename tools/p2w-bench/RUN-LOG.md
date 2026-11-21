@@ -198,3 +198,5 @@
 | 21 Nov 15:48 | fixer | attempt 47_margins -> partial (1/213 moved) |
 | 21 Nov 15:58 | fixer | slot claimed - fixer running |
 | 21 Nov 17:25 | fixer | attempt 47_margins -> reverted (0/5 moved) |
+| 21 Nov 17:00 | fixer | attempt t02_position -> partial (1/5 moved) |
+| 21 Nov 17:39 | fixer | attempt 32_stroke_lines -> reverted (0/145 moved) |

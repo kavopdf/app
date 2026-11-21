@@ -68,7 +68,7 @@
   "status": "OPEN"
  },
  "32_stroke_lines": {
-  "attempts": 2,
+  "attempts": 3,
   "first_seen": 1794543973.3763752,
   "history": [
    {
@@ -77,19 +77,28 @@
     "outcome": "error",
     "reason": "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) ",
     "total": 37
+   },
+   {
+    "at": "2026-11-21 17:39",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more",
+    "total": 145
    }
   ],
   "last": 1794543973.3763797,
-  "last_engine": "7112d76",
+  "last_engine": "462353f",
   "last_moved": 0,
-  "last_total": 37,
+  "last_total": 145,
   "outcomes": [
    "error",
-   "error"
+   "error",
+   "reverted"
   ],
-  "reason": "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH.",
+  "reason": "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md",
   "reasons": [
-   "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH."
+   "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH.",
+   "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md"
   ],
   "requeues": 0,
   "status": "OPEN"
@@ -811,7 +820,7 @@
   "status": "OPEN"
  },
  "t02_position": {
-  "attempts": 1,
+  "attempts": 2,
   "first_seen": null,
   "history": [
    {
@@ -820,16 +829,27 @@
     "outcome": "error",
     "reason": "the two-line claim in FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md is refuted as a two-format fix, before any engine change: flippedPage reaches only buildPara (PdfToWord:3677), lineX is read only ",
     "total": null
+   },
+   {
+    "at": "2026-11-21 17:00",
+    "moved": 1,
+    "outcome": "partial",
+    "reason": "uprightIfPageIsUpsideDown patch landed: one-page-rotated-180-degrees t02_position FAIL->PASS, 213 of 213 .txt converted+scored, 190 clean (was 189), 0 newly failing. .docx proved byte-identical on all",
+    "total": 5
    }
   ],
   "last": null,
-  "last_engine": "7112d76",
+  "last_engine": "462353f",
+  "last_moved": 1,
+  "last_total": 5,
   "outcomes": [
-   "error"
+   "error",
+   "partial"
   ],
-  "reason": "the two-line claim in FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md is refuted as a two-format fix, before any engine change: flippedPage reaches only buildPara (PdfToWord:3677), lineX is read only by TxtWriter (:5342-5345), and 47_margins already passes on all five t02 documents in benchmarks/gverify-lo. The third line as written deletes the only guard protecting 15_stamp_on_scanned_page (100% rotated glyphs at 9 deg, pageTurn does not catch it); if it is retried use 'if (g.dirx > -0.5f) return false;'. Root cause written, no document moved.",
+  "reason": "uprightIfPageIsUpsideDown patch landed: one-page-rotated-180-degrees t02_position FAIL->PASS, 213 of 213 .txt converted+scored, 190 clean (was 189), 0 newly failing. .docx proved byte-identical on all 213 (word/document.xml), so the change is txt-only by measurement. scope.py gained the method entry that made the commit possible.",
   "reasons": [
-   "the two-line claim in FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md is refuted as a two-format fix, before any engine change: flippedPage reaches only buildPara (PdfToWord:3677), lineX is read only by TxtWriter (:5342-5345), and 47_margins already passes on all five t02 documents in benchmarks/gverify-lo. The third line as written deletes the only guard protecting 15_stamp_on_scanned_page (100% rotated glyphs at 9 deg, pageTurn does not catch it); if it is retried use 'if (g.dirx > -0.5f) return false;'. Root cause written, no document moved."
+   "the two-line claim in FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md is refuted as a two-format fix, before any engine change: flippedPage reaches only buildPara (PdfToWord:3677), lineX is read only by TxtWriter (:5342-5345), and 47_margins already passes on all five t02 documents in benchmarks/gverify-lo. The third line as written deletes the only guard protecting 15_stamp_on_scanned_page (100% rotated glyphs at 9 deg, pageTurn does not catch it); if it is retried use 'if (g.dirx > -0.5f) return false;'. Root cause written, no document moved.",
+   "uprightIfPageIsUpsideDown patch landed: one-page-rotated-180-degrees t02_position FAIL->PASS, 213 of 213 .txt converted+scored, 190 clean (was 189), 0 newly failing. .docx proved byte-identical on all 213 (word/document.xml), so the change is txt-only by measurement. scope.py gained the method entry that made the commit possible."
   ],
   "requeues": 0,
   "status": "OPEN"
