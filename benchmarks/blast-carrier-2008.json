@@ -1,0 +1,3433 @@
+{
+ "engine_head": "HEAD c55e1916 (docx fingerprint 226f7f2df3013ad7)",
+ "engine_patched": "HEAD + rule-carrier-horizontal-only-2008.patch (docx fingerprint 78ab519d6e92a2ee)",
+ "method": "canonical .docx content hash (sha256 over sorted zip entry name+bytes), one JVM per document, W=2, corpus 213 PDFs",
+ "counts": {
+  "converted": 213,
+  "changed": 161,
+  "unchanged": 52
+ },
+ "rows": [
+  {
+   "document": "01_stamp_rotated_15deg_upright",
+   "head": "8606f8027ee7e529",
+   "patched": "378c30848a2f8a93",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 34,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "35_rotation",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "02_stamp_rotated_15deg_upleft",
+   "head": "806d8d9599ae6e24",
+   "patched": "d4d1e08467e6e085",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 34,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "35_rotation",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "03_stamp_vertical_90deg",
+   "head": "3c129656ad5566f1",
+   "patched": "681ea74e11754c4b",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 35,
+   "google_total": 44,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "32_stroke_lines",
+    "35_rotation",
+    "59_shape_anchor",
+    "62_table_columns",
+    "63_table_rows"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "041122-Account_Opening_Form",
+   "head": "3fdeb9c1b2043716",
+   "patched": "d205d232f4bb2110",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "04_stamp_180deg_upside_down",
+   "head": "c74da18001089eb6",
+   "patched": "6254f3b521de0b40",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 34,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "35_rotation",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "05_round_company_seal_curved_text",
+   "head": "2d75a6ca6148961e",
+   "patched": "e35d21c5e86176d8",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "06_rect_paid_stamp_red_transparent",
+   "head": "b0cea49687c9553d",
+   "patched": "212fcc6518014560",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 35,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "32_stroke_lines",
+    "35_rotation",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "07_stamp_over_table",
+   "head": "6ec66235617be460",
+   "patched": "19b876cbc9422118",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 31,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "25_invisible_text",
+    "26_text_overlap",
+    "32_stroke_lines",
+    "35_rotation",
+    "43_within_10pt_x",
+    "47_margins",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "08_two_overlapping_stamps",
+   "head": "01bcf9fdbee9d8b8",
+   "patched": "2d764dee6140e3ee",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 32,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "17_matched_runs",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "35_rotation",
+    "45_char_accuracy",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "09_stamp_font_not_embedded",
+   "head": "1c7558b7da3a9be1",
+   "patched": "6cac4e2a62e922de",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "32_stroke_lines",
+    "35_rotation",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "10_stamp_as_image",
+   "head": "95eccef795489457",
+   "patched": "1ff4ad629ae4e130",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "11_stamp_with_signature_image",
+   "head": "7c990f423c602223",
+   "patched": "b2ce5d3eda22875f",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 35,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "35_rotation",
+    "45_char_accuracy"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "12_stamp_across_page_break",
+   "head": "c3cdbbab18179888",
+   "patched": "dd9e97f956be3651",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "27_text_off_page",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "13_stamp_non_english",
+   "head": "a10ef28831f035b7",
+   "patched": "06c32b9c2c722c53",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 33,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "17_matched_runs",
+    "18_displacement",
+    "32_stroke_lines",
+    "35_rotation",
+    "45_char_accuracy",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "14_stamp_chars_positioned_td",
+   "head": "47dc2aa0fc2af1ea",
+   "patched": "d0fcf35c69b03ee5",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 33,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "15_stamp_on_scanned_page",
+   "head": "360c529300ff9b37",
+   "patched": "360c529300ff9b37",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 33,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "10_font_sizes",
+    "13_text_colours",
+    "17_matched_runs",
+    "31_pages_lost_their_text",
+    "35_rotation",
+    "44_header_footer",
+    "45_char_accuracy",
+    "59_shape_anchor"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "16_right_aligned_amounts_txtpos",
+   "head": "2dc8e2eebbfab0f4",
+   "patched": "e8f997299630c38d",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "17_three_column_widths_txtpos",
+   "head": "9e9aea1e7cb740c3",
+   "patched": "63ca1d822fafd80e",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "18_centred_heading_left_body_txtpos",
+   "head": "5c936c5c3ea408be",
+   "patched": "1c0108ad2d0c9114",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "19_hanging_indent_txtpos",
+   "head": "590023a253a6c099",
+   "patched": "ca9cb157310fac41",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "20_numbered_list_separate_column_txtpos",
+   "head": "9af8018b305b6aa8",
+   "patched": "42e79db6e15abb63",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "21_form_labels_x60_values_x300_txtpos",
+   "head": "97b0190233c989cf",
+   "patched": "3d051fedfb2691b6",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines",
+    "43_within_10pt_x",
+    "47_margins"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "22_invoice_four_columns_txtpos",
+   "head": "990336d2fe6fc468",
+   "patched": "132aed0f21de05bb",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "23_timetable_grid_txtpos",
+   "head": "7562c3a9f690ed71",
+   "patched": "8715a0dfec654381",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "24_address_block_indents_txtpos",
+   "head": "c8db1e1f940b91c1",
+   "patched": "dc0dddddf33664c4",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "25_signature_block_underscores_txtpos",
+   "head": "d118dbfba25bd151",
+   "patched": "6cafc8fbb42d8717",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "26_footnote_marker_bottom_note_txtpos",
+   "head": "c406f2a98f2a1769",
+   "patched": "b2300c0f14cae057",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "27_two_column_left_short_txtpos",
+   "head": "df9bd6a35ff2911a",
+   "patched": "15c8f641b3a0db61",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "32_stroke_lines",
+    "44_header_footer"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "28_value_overflows_cell_txtpos",
+   "head": "6b538a8d4faf1afb",
+   "patched": "9499c15b6bd811d9",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 34,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "32_stroke_lines",
+    "43_within_10pt_x",
+    "45_char_accuracy",
+    "47_margins",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "29_dot_leaders_txtpos",
+   "head": "479c768e585d4e2d",
+   "patched": "ee32d09e13938b13",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "300_prescription_rx",
+   "head": "1806d0a89306a1ee",
+   "patched": "4e6b4f1bc0a003b6",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "301_lab_report_panel",
+   "head": "dd24c599c1d97d36",
+   "patched": "013b6bdfb5da79c4",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "302_radiology_report",
+   "head": "3e594be4e9bd5e6c",
+   "patched": "1c641f0224efcaec",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "18_displacement",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "303_discharge_summary",
+   "head": "961fe7e912898d06",
+   "patched": "961fe7e912898d06",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 44,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "304_package_insert_small_print",
+   "head": "732f557347cf6e75",
+   "patched": "732f557347cf6e75",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 42,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "305_vaccination_certificate",
+   "head": "131370e5588b8318",
+   "patched": "131370e5588b8318",
+   "changed": false,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "306_clinical_protocol_synopsis",
+   "head": "8ea58de08c2b3c0c",
+   "patched": "8ea58de08c2b3c0c",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 44,
+   "google_total": 47,
+   "google_failed": [
+    "18_displacement",
+    "25_invisible_text",
+    "59_shape_anchor"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "30_mixed_font_sizes_one_baseline_txtpos",
+   "head": "1043b91a037e810a",
+   "patched": "a5722ad9a210ad4f",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "310_court_judgment",
+   "head": "1df43cc8726a4644",
+   "patched": "1df43cc8726a4644",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "43_within_10pt_x",
+    "47_margins",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "311_fir_police_form",
+   "head": "57989363b8e56e99",
+   "patched": "95c7b22837ccd3d6",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "18_displacement",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "312_affidavit_stamp_paper",
+   "head": "566afd0e30749ceb",
+   "patched": "566afd0e30749ceb",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "17_matched_runs",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "313_power_of_attorney",
+   "head": "0624fadb4b0f8b9d",
+   "patched": "0624fadb4b0f8b9d",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 42,
+   "google_failed": [
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "314_tender_rfp_boq",
+   "head": "6c7990d49e9f3a18",
+   "patched": "6c7990d49e9f3a18",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "18_displacement",
+    "25_invisible_text",
+    "42_justification_edges",
+    "59_shape_anchor",
+    "60_text_column_right_edge",
+    "63_table_rows"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "315_gazette_notification",
+   "head": "ffb3be958674277b",
+   "patched": "24726e828dfd8da7",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "316_contract_with_schedules",
+   "head": "4d636e2aabdfb273",
+   "patched": "4d636e2aabdfb273",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 45,
+   "google_total": 47,
+   "google_failed": [
+    "18_displacement",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "317_rti_response",
+   "head": "f0738a39ecea6b16",
+   "patched": "f0738a39ecea6b16",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "47_margins",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "318_court_summons_form",
+   "head": "452c075295bd450c",
+   "patched": "452c075295bd450c",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "13_text_colours",
+    "17_matched_runs",
+    "18_displacement",
+    "43_within_10pt_x",
+    "45_char_accuracy",
+    "47_margins",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "31_times_body_arial_headings",
+   "head": "9ce29b1afd5f0bf8",
+   "patched": "4137977b21f39660",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "320_balance_sheet_statutory",
+   "head": "2fceab7d7ddc036f",
+   "patched": "e284ee2228bacf43",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "321_auditors_report",
+   "head": "5a7fc817fb4a9898",
+   "patched": "5a7fc817fb4a9898",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 42,
+   "google_failed": [
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "322_mutual_fund_factsheet",
+   "head": "6291d9f9dd29a429",
+   "patched": "6291d9f9dd29a429",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "17_matched_runs",
+    "18_displacement",
+    "25_invisible_text",
+    "26_text_overlap",
+    "44_header_footer",
+    "45_char_accuracy",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "323_credit_card_statement",
+   "head": "9d35f1457e4f1eed",
+   "patched": "9d35f1457e4f1eed",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "17_matched_runs",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "60_text_column_right_edge",
+    "66_table_cell_width"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "324_loan_amortisation_schedule",
+   "head": "60def976a1b03fa0",
+   "patched": "60def976a1b03fa0",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "18_displacement",
+    "25_invisible_text",
+    "27_text_off_page",
+    "59_shape_anchor"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "325_demat_holdings_statement",
+   "head": "40ddd49b33e4f7d2",
+   "patched": "51049779a6df21d7",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "326_itr_computation",
+   "head": "748d4526cb05a2e2",
+   "patched": "748d4526cb05a2e2",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "59_shape_anchor",
+    "60_text_column_right_edge",
+    "63_table_rows"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "32_serif_nondefault_body",
+   "head": "c36e4f8ba5cd73b1",
+   "patched": "ba2dba660da6dcc1",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "330_cad_drawing_sheet",
+   "head": "d4624ce3c592642b",
+   "patched": "0e990c2960d181d8",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "47_margins"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "331_pid_diagram",
+   "head": "0ea11a7fad0bcd35",
+   "patched": "10e513bd5402878c",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 33,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "10_font_sizes",
+    "13_text_colours",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy",
+    "47_margins",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "332_bom_on_drawing",
+   "head": "1a364f4d1cf3f4d0",
+   "patched": "c8ad9e9d6a703e73",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "333_datasheet_spec_tables",
+   "head": "c24926f59ea9e9d5",
+   "patched": "c24926f59ea9e9d5",
+   "changed": false,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "334_patent_document",
+   "head": "fd5263ad6b6148ef",
+   "patched": "1275253ef1230855",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "335_msds_safety_data_sheet",
+   "head": "6487367a5c4635ea",
+   "patched": "6487367a5c4635ea",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "33_sans_nondefault_body",
+   "head": "27ed0319dca76268",
+   "patched": "6eedea38687cb8de",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "340_bill_of_lading",
+   "head": "5426c5d556689600",
+   "patched": "68dc43cf4291b46a",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "341_shipping_manifest",
+   "head": "c26e6a6e5f819b1d",
+   "patched": "c26e6a6e5f819b1d",
+   "changed": false,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "342_packing_list",
+   "head": "115ad594abd13dde",
+   "patched": "115ad594abd13dde",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "343_air_waybill",
+   "head": "a68c57bdf6c60d86",
+   "patched": "7e07103faaf31858",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "344_customs_declaration",
+   "head": "9416ec12e8ffda64",
+   "patched": "9416ec12e8ffda64",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "25_invisible_text",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "34_monospace_document",
+   "head": "adb2dcee1547c95a",
+   "patched": "c5438cad998c2fc8",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "350_question_paper",
+   "head": "725b7001eb848284",
+   "patched": "86e9aa8e7de686fd",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "351_omr_answer_sheet",
+   "head": "2318f8815bac3364",
+   "patched": "20aea75330923544",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "352_certificate_ornate_border",
+   "head": "f9a2cdf7d523f997",
+   "patched": "04674c24a94424ff",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 35,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "353_admit_card",
+   "head": "3acc2821992d78cd",
+   "patched": "c37350f2ecd34684",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "26_text_overlap",
+    "32_stroke_lines",
+    "44_header_footer",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "35_four_typefaces_one_page",
+   "head": "048e5d6c97110bb7",
+   "patched": "0189f031290d8759",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "360_restaurant_menu",
+   "head": "1168dbef15340ab3",
+   "patched": "6bb1461dc34e868c",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "18_displacement",
+    "32_stroke_lines",
+    "43_within_10pt_x",
+    "47_margins",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "361_product_catalogue_grid",
+   "head": "12c3801ce33fc06c",
+   "patched": "12c3801ce33fc06c",
+   "changed": false,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "362_price_list_dense",
+   "head": "0e514b28def0f297",
+   "patched": "0e514b28def0f297",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 42,
+   "google_failed": [
+    "18_displacement"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "363_warranty_card",
+   "head": "60ebd1f1f5390ee0",
+   "patched": "60ebd1f1f5390ee0",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "18_displacement",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "364_event_ticket",
+   "head": "9e7d8a7c4d75efe6",
+   "patched": "8b10f46cb310aff4",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "365_recipe_card",
+   "head": "d94b97082bff4846",
+   "patched": "84c5404b6c2abffd",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "18_displacement",
+    "32_stroke_lines",
+    "47_margins",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "36_embedded_subset_font",
+   "head": "12070220ca7104da",
+   "patched": "c704094c6234ae56",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "370_offer_letter",
+   "head": "5f3834f73815958a",
+   "patched": "5f3834f73815958a",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 45,
+   "google_total": 47,
+   "google_failed": [
+    "18_displacement",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "371_experience_certificate",
+   "head": "01b5f67ddcad5542",
+   "patched": "def4dd48ab84f125",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 35,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "13_text_colours",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "372_timesheet_grid",
+   "head": "903ad27e3b326f9f",
+   "patched": "903ad27e3b326f9f",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "18_displacement",
+    "25_invisible_text",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "373_leave_application_form",
+   "head": "9c2e36fcbb9b3029",
+   "patched": "274f29b313723738",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "23_line_pitch",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "374_org_chart",
+   "head": "10da273d390a86d3",
+   "patched": "ee209cb03c6e1c7a",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "26_text_overlap"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "375_attendance_register",
+   "head": "12f13e7f139fcdd9",
+   "patched": "12f13e7f139fcdd9",
+   "changed": false,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "37_font_not_embedded_substitution",
+   "head": "756e8e831aa57833",
+   "patched": "2e7f1bc51d905fa9",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "380_runbook_terminal_output",
+   "head": "a7116b12a209086f",
+   "patched": "a7116b12a209086f",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "25_invisible_text",
+    "47_margins"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "381_incident_report_timeline",
+   "head": "30fb178d4c7a3106",
+   "patched": "30fb178d4c7a3106",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "382_architecture_diagram",
+   "head": "2ec03336a26cd41d",
+   "patched": "1114691cd7517b68",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "383_api_docs_page",
+   "head": "dcf5460a4ae3f2ae",
+   "patched": "dcf5460a4ae3f2ae",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "18_displacement",
+    "25_invisible_text",
+    "47_margins",
+    "59_shape_anchor",
+    "60_text_column_right_edge",
+    "66_table_cell_width"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "38_faux_bold_italic_synthesised",
+   "head": "d6b782ffc99dc49c",
+   "patched": "12dd3f2451ee4246",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "390_wide_data_appendix",
+   "head": "3a2f27427eb60361",
+   "patched": "3a2f27427eb60361",
+   "changed": false,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "391_survey_questionnaire_grid",
+   "head": "9e745ea8091a7bad",
+   "patched": "759f581a9150289c",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "17_matched_runs",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "392_statistical_console_output",
+   "head": "4b352a4028d528cc",
+   "patched": "4b352a4028d528cc",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 42,
+   "google_failed": [
+    "47_margins"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "393_spectrum_peak_table",
+   "head": "227160d04384d9d3",
+   "patched": "227160d04384d9d3",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 45,
+   "google_total": 47,
+   "google_failed": [
+    "18_displacement",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "394_map_with_legend",
+   "head": "af096e0cbb45ad55",
+   "patched": "2a3bdb3e96dac04c",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 42,
+   "google_failed": [
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "39_small_caps_letter_spacing",
+   "head": "35efc69a126d321a",
+   "patched": "3aa4b1f116868e83",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "25_invisible_text",
+    "26_text_overlap",
+    "32_stroke_lines",
+    "43_within_10pt_x",
+    "47_margins"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "400_comic_page_speech_bubbles",
+   "head": "966ecd988eb18619",
+   "patched": "5c4d00ebb3a54f64",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 35,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "10_font_sizes",
+    "13_text_colours",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "401_trifold_brochure",
+   "head": "2af810055c72cf8b",
+   "patched": "2af810055c72cf8b",
+   "changed": false,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "402_calendar_month_grid",
+   "head": "24abdf3c27ff6559",
+   "patched": "24abdf3c27ff6559",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 45,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "403_crossword_puzzle",
+   "head": "17bd70c051e391c4",
+   "patched": "17bd70c051e391c4",
+   "changed": false,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "404_sudoku_grid",
+   "head": "164be9c1c45c6b9c",
+   "patched": "164be9c1c45c6b9c",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "18_displacement",
+    "23_line_pitch",
+    "47_margins",
+    "59_shape_anchor"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "405_sheet_music_lyrics",
+   "head": "eab66d729beb1a19",
+   "patched": "56f409607044763e",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "406_passport_mrz_page",
+   "head": "96cf19ed92246862",
+   "patched": "96cf19ed92246862",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "407_id_card_front_back",
+   "head": "50556bdbb08e7803",
+   "patched": "50556bdbb08e7803",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 42,
+   "google_failed": [
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "40_devanagari_shaping_font",
+   "head": "d3f3daba8b3eba52",
+   "patched": "ef417ce2955ea1f5",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "34a_span_size_match",
+    "38_list_markers",
+    "47_margins"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "410_form_xobject_reused",
+   "head": "95b09078dec4cba4",
+   "patched": "95b09078dec4cba4",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 42,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "411_nested_xobject_transforms",
+   "head": "baadfa69478f05a7",
+   "patched": "baadfa69478f05a7",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "17_matched_runs"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "412_page_labels_roman",
+   "head": "ec849ad82bc8526d",
+   "patched": "ec849ad82bc8526d",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "18_displacement",
+    "27_text_off_page"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "413_tagged_pdf_actualtext",
+   "head": "645a1b1166f4f748",
+   "patched": "645a1b1166f4f748",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 42,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "414_transparency_softmask",
+   "head": "08d448db43051ef4",
+   "patched": "08d448db43051ef4",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 42,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "415_inline_images",
+   "head": "af78a8352f4b9259",
+   "patched": "af78a8352f4b9259",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 42,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "416_many_tiny_pages",
+   "head": "12e53250a48522c3",
+   "patched": "12e53250a48522c3",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "18_displacement",
+    "27_text_off_page"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "417_rotate180_and_mirrored",
+   "head": "fdc984f9ecb13c98",
+   "patched": "fdc984f9ecb13c98",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "17_matched_runs",
+    "18_displacement",
+    "27_text_off_page"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "41_coloured_headings_white_bg",
+   "head": "d820cdeef169dbe7",
+   "patched": "acd6eef08f583686",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "42_table_coloured_header_alternating_rows",
+   "head": "498b48f67f8d532a",
+   "patched": "54a23a54768ea28f",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "43_red_stamp_over_black_text",
+   "head": "9e412aa17b6c20cd",
+   "patched": "1d7effd90d32ab02",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "35_rotation"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "44_coloured_underlined_hyperlinks",
+   "head": "5c04eacaa39b8041",
+   "patched": "3a3becae99d10eb4",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines",
+    "40_link_targets",
+    "46_text_crossing_rule"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "45_coloured_callout_box",
+   "head": "7d2a19a333ff4fc1",
+   "patched": "acdef794f72e5788",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "46_chart_coloured_labels_body_text",
+   "head": "13029c7d3464eaf8",
+   "patched": "84b9ae4208b02bac",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "47_grey_body_black_headings",
+   "head": "614bf199743d1a06",
+   "patched": "b9b7001f98f4d1d2",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "48_form_coloured_border_coloured_values",
+   "head": "d32b5051876d055b",
+   "patched": "ce9f2e7b63a99462",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "49_coloured_background_block_paragraph",
+   "head": "957f36cb2ee0c176",
+   "patched": "66d459c7230908e3",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "50_invoice_coloured_total_row",
+   "head": "613355213b6389f3",
+   "patched": "9f03e466c5020b0b",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "51_two_cm_margins",
+   "head": "ae5749838b002815",
+   "patched": "0775bafd8703d866",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 42,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "52_one_cm_margin_wide_body",
+   "head": "1798106b40c846b9",
+   "patched": "1035ac79c08cdb4f",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "53_single_space_body_15_headings",
+   "head": "4696a9211c33c0e3",
+   "patched": "1eb9714eead8c97c",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "54_two_column_body_full_width_header_footer",
+   "head": "a8f28d84958231be",
+   "patched": "5a5f9a3dea689010",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "13_text_colours",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "55_sidebar_box_beside_body",
+   "head": "657f1a88bbea130a",
+   "patched": "53bb97b0b136d3dd",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "56_table_indented_from_margin",
+   "head": "1800612595ec3256",
+   "patched": "43b0fd1e031361ef",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "57_centred_title_page_left_body_pages",
+   "head": "cc5488d089a09662",
+   "patched": "8d9ab1d822b36a82",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "27_text_off_page",
+    "32_stroke_lines",
+    "44_header_footer"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "58_header_rule_footer_rule",
+   "head": "018dd9c760a4ba0c",
+   "patched": "92a0b88a7a2555f8",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "27_text_off_page",
+    "32_stroke_lines",
+    "44_header_footer"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "59_landscape_mixed_portrait",
+   "head": "9687f9868a4357e9",
+   "patched": "eedd497670d3cccd",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "600_reviewed_invoice_with_annotations",
+   "head": "40f481711bfa2a9c",
+   "patched": "0952dc5469d47b13",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 44,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "28_clipped_at_edge",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "47_margins",
+    "62_table_columns"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "601_fillable_admission_form",
+   "head": "0c9310d4e76c86ff",
+   "patched": "5bcdde951831b2f7",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 35,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "51_field_values",
+    "53_embedded_faces",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "602_bookmarked_annual_report",
+   "head": "65a34032bfe12458",
+   "patched": "65a34032bfe12458",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "18_displacement",
+    "27_text_off_page",
+    "52_outline"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "60_page_border",
+   "head": "fe2d379b5c61639f",
+   "patched": "64af54f100bd0a28",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "61_two_col_abstract_spanning",
+   "head": "f6e9e52d1d707e93",
+   "patched": "0bd9973b756c5174",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "32_stroke_lines",
+    "44_header_footer"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "62_two_col_newsletter_pull_quote",
+   "head": "a8cddd3e524f07ec",
+   "patched": "3a5a5c1da0660d9b",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "63_three_column_brochure",
+   "head": "7369672c277631b6",
+   "patched": "0b731db838af004a",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "25_invisible_text",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "64_newspaper_uneven_columns_ad_boxes",
+   "head": "12633059ff4b184f",
+   "patched": "12633059ff4b184f",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "23_line_pitch",
+    "26_text_overlap",
+    "59_shape_anchor"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "65_two_col_full_width_figure_caption",
+   "head": "6f4691bd38ba4327",
+   "patched": "dc37e8266caaeb57",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 33,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "66_two_col_footnotes_bottom",
+   "head": "3cd373a5b92cbdd6",
+   "patched": "34640e5a15746264",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 35,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "67_two_col_with_sidebar",
+   "head": "3e1fce7782a8863c",
+   "patched": "c432855b148a95e3",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "68_journal_wide_table_spanning",
+   "head": "86e1494ddf0cdf3f",
+   "patched": "a2ffa94b17af1b10",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "69_two_col_legal_numbered_clauses",
+   "head": "5ed5d0723514e8f1",
+   "patched": "b75ce57045641d9e",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 33,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "10_font_sizes",
+    "13_text_colours",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "38_list_markers",
+    "44_header_footer",
+    "45_char_accuracy"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "70_magazine_drop_cap_photo_caption",
+   "head": "a0aa07e78ff01257",
+   "patched": "414764559ca1651c",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "18_displacement",
+    "32_stroke_lines",
+    "44_header_footer"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "71_invoice_space_aligned_no_rules",
+   "head": "e602b23cd5cfaa74",
+   "patched": "58468fc07b20d06c",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "72_bank_statement_no_rules_right_amounts",
+   "head": "52ae5d504b65d2f5",
+   "patched": "2be0615ca9a0e4bc",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "73_marksheet_subject_marks_grade",
+   "head": "92d61090ec236ccc",
+   "patched": "02a529e4db2c9734",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "74_balance_sheet_indented_subitems",
+   "head": "80f7075bb8f85156",
+   "patched": "6797a2ca796f6774",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "75_merged_header_cell_three_columns",
+   "head": "5954c01a2b4850ee",
+   "patched": "d861d2bb8eea18e0",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor",
+    "64_table_span_across",
+    "65_table_span_down"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "76_devanagari_table",
+   "head": "d4164b28c7826db3",
+   "patched": "d4164b28c7826db3",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "17_matched_runs",
+    "18_displacement",
+    "34a_span_size_match",
+    "47_margins"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "77_arabic_rtl_document",
+   "head": "081bf947bbf81b66",
+   "patched": "0e2c1e97f7a8242d",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "17_matched_runs",
+    "18_displacement",
+    "26_text_overlap",
+    "43_within_10pt_x",
+    "47_margins",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "78_mixed_english_devanagari_line",
+   "head": "5b53fae7363fd6b0",
+   "patched": "5b53fae7363fd6b0",
+   "changed": false,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "17_matched_runs",
+    "18_displacement",
+    "26_text_overlap",
+    "43_within_10pt_x",
+    "47_margins"
+   ],
+   "fails_32": false
+  },
+  {
+   "document": "79_inr_indian_digit_grouping_table",
+   "head": "029c9627d24dfc6a",
+   "patched": "007c086016f878c8",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "80_gstin_pan_cin_ifsc_table",
+   "head": "051537722e45e015",
+   "patched": "382477807c86823b",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 35,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "17_matched_runs",
+    "18_displacement",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "Account_Opening_Form_Fillable_filled",
+   "head": "b9420963c165b5b4",
+   "patched": "5e5e60807a83194e",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "academic-paper-ieee-2col-abstract",
+   "head": "49f90f0f167ef412",
+   "patched": "dc723eff147709b8",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "17_matched_runs",
+    "18_displacement",
+    "27_text_off_page",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy",
+    "47_margins",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "admission-form-labels-left-boxes-right",
+   "head": "9ce89388a78808e3",
+   "patched": "c8dd9d8aa0e34792",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "25_invisible_text",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "admit-card",
+   "head": "0ced3b35b3d2c662",
+   "patched": "f258d15cff930a34",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "annual-review-2col-uneven-columns",
+   "head": "3f8bf36aa41f65f1",
+   "patched": "c364ffd104765ef8",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "25_invisible_text",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "balance-sheet-and-profit-loss",
+   "head": "739a4f26aaa67396",
+   "patched": "030557a10e900ce9",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "27_text_off_page",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "balance-sheet-two-columns-of-figures",
+   "head": "ca02a38d6dbb14fc",
+   "patched": "61746ae4b2a9aef9",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "bank-statement-5-pages",
+   "head": "bbfed9e5e485b75f",
+   "patched": "d552b110095b744a",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "27_text_off_page",
+    "32_stroke_lines",
+    "44_header_footer",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "bank-statement-horizontal-rules-only",
+   "head": "d8f07d2559338d0a",
+   "patched": "00fc4564e2fc2f50",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "boq-horizontal-rules-only",
+   "head": "ba69054119bccc3d",
+   "patched": "89a8d120fa0eaaa7",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "boq-tender-bill-of-quantities",
+   "head": "698c9f021751d7a9",
+   "patched": "a80499386052e8db",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "brochure-3col-with-sidebar-box",
+   "head": "3abfcdae8dbbcada",
+   "patched": "c452094ddd3bb547",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "bus-timetable-station-left-times-right",
+   "head": "cfacdd499a20910e",
+   "patched": "1f32c2136a2c9dfd",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "delivery-challan",
+   "head": "4516b5842e3e629d",
+   "patched": "3f795727b1cb2846",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "25_invisible_text",
+    "26_text_overlap",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "electricity-bill",
+   "head": "3e5fed0136597eea",
+   "patched": "109c5d6267cf1f33",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "eway-bill",
+   "head": "fa4a3c809dd2377d",
+   "patched": "755e3008f954a28c",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "form16-part-b",
+   "head": "5d8c62377f1709a8",
+   "patched": "3ba004d51b236aea",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "27_text_off_page",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "gst-invoice-3line-items",
+   "head": "fc5a6251ccfa023b",
+   "patched": "f8b54a1c17e0eeec",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "gst-invoice-horizontal-rules-only",
+   "head": "6f1c157a7f052108",
+   "patched": "69f6661b859c0e06",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 34,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "26_text_overlap",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "gst-invoice-multipage-item-table",
+   "head": "b47af1aefed5f932",
+   "patched": "18fd055643100050",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "26_text_overlap",
+    "27_text_off_page",
+    "32_stroke_lines",
+    "44_header_footer"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "gst-invoice-with-qr-code",
+   "head": "5f7daa49348b90b9",
+   "patched": "fe244916f65a014d",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "26_text_overlap",
+    "32_stroke_lines",
+    "66_table_cell_width"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "insurance-policy-schedule",
+   "head": "089c70e51b7bf652",
+   "patched": "153ee39f276abd65",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 44,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "invoice-line-items-qty-rate-amount",
+   "head": "3d1b981e615a59d3",
+   "patched": "d8dadc51f7abd611",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "26_text_overlap",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "itr-computation-with-slab-table",
+   "head": "82dcd50539163f91",
+   "patched": "0faaafee1e4ecaf5",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "26_text_overlap",
+    "32_stroke_lines",
+    "63_table_rows"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "journal-2col-with-footnotes",
+   "head": "0281f273fb764a27",
+   "patched": "3e1cc816a3e75002",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 38,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "26_text_overlap",
+    "32_stroke_lines",
+    "37_super_subscript"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "landscape-page-inside-portrait-document",
+   "head": "4780a52cd75a2a4c",
+   "patched": "e09e5f2cb2874b23",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "magazine-2col-pullquote-spanning",
+   "head": "d21a5c9bbfbb97e5",
+   "patched": "512ffb008aea43a5",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 32,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "10_font_sizes",
+    "13_text_colours",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "43_within_10pt_x",
+    "44_header_footer",
+    "45_char_accuracy",
+    "47_margins",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "marksheet-subject-left-marks-right",
+   "head": "d6a04ecadb52095f",
+   "patched": "db11ae31a4af3aae",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "marksheet-university-consolidated",
+   "head": "1a37c8b24fa3d435",
+   "patched": "123e585b6f2bf285",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "mobile-bill",
+   "head": "8383a9186b499b8e",
+   "patched": "af26f01a795f8106",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 44,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "mutual-fund-statement",
+   "head": "e65439ef9a1eced8",
+   "patched": "e9caddce1b977f15",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "27_text_off_page",
+    "32_stroke_lines",
+    "60_text_column_right_edge",
+    "66_table_cell_width"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "newsletter-3col-header-footer",
+   "head": "e8059dc8e9135be4",
+   "patched": "55efa7b7d8da603b",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 35,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "newspaper-2col-fullwidth-headline",
+   "head": "57f5e0a9b940b4dc",
+   "patched": "3a1db128f16325e0",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "26_text_overlap",
+    "32_stroke_lines",
+    "45_char_accuracy"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "one-page-rotated-180-degrees",
+   "head": "2b449ccbb641d177",
+   "patched": "cd9d51e7b095fda2",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "27_text_off_page",
+    "32_stroke_lines",
+    "43_within_10pt_x",
+    "44_header_footer",
+    "60_text_column_right_edge",
+    "62_table_columns",
+    "63_table_rows"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "payslip-label-left-amount-right",
+   "head": "141bed6dd31c4670",
+   "patched": "d458e25d203f02bf",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "17_matched_runs",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "53_embedded_faces"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "policy-2col-spanning-section-heading",
+   "head": "532e36e5bdc7f84d",
+   "patched": "9d60d30f24d56e2b",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 32,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "10_font_sizes",
+    "13_text_colours",
+    "17_matched_runs",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "price-list-2col-dense-right-aligned",
+   "head": "16aba714a3b9e74a",
+   "patched": "5651c7c1cd7afb12",
+   "changed": true,
+   "google_status": "page_count_refused",
+   "google_passed": null,
+   "google_total": null,
+   "google_failed": [],
+   "fails_32": false
+  },
+  {
+   "document": "price-list-right-aligned-amounts",
+   "head": "e36d2310aa51a348",
+   "patched": "6a60c4f82991bbca",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 36,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "17_matched_runs",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "53_embedded_faces"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "product-catalogue-code-left-price-right",
+   "head": "da099947dea2a37a",
+   "patched": "eea2abf61bb880f8",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "property-tax-receipt",
+   "head": "0411710c40e1a83d",
+   "patched": "52f793f56720b77e",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "purchase-order",
+   "head": "30bfa63c359c3393",
+   "patched": "9e337cf045512ecb",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "25_invisible_text",
+    "26_text_overlap",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "question-paper-marks-right-margin",
+   "head": "933ceddc6f527980",
+   "patched": "673a4d336599cba5",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 39,
+   "google_total": 42,
+   "google_failed": [
+    "05_chars_extra",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "report-2col-table-spanning-both-columns",
+   "head": "18c2cf9abb67789b",
+   "patched": "4157d2795f9f2387",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "44_header_footer"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "salary-slip-corporate",
+   "head": "4c93c0901ab1d4b1",
+   "patched": "db51a21e2c1ba936",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "17_matched_runs",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "53_embedded_faces"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "salary-slip-factory-wages",
+   "head": "1a508c84ef3ffe87",
+   "patched": "74dbe145691f1152",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "59_shape_anchor",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "table-across-page-break-repeated-header",
+   "head": "2217592ae5cddee7",
+   "patched": "058b2a0ea1fcb0d6",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "27_text_off_page",
+    "32_stroke_lines",
+    "44_header_footer",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "table-inside-two-column-page",
+   "head": "246f9ed5d5495d3f",
+   "patched": "dcc145b03449af1c",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 42,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "44_header_footer"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "table-of-contents-dot-leaders",
+   "head": "f30ba0bac9c8f804",
+   "patched": "0f80e76599a47cf7",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 37,
+   "google_total": 42,
+   "google_failed": [
+    "04_chars_missing",
+    "32_stroke_lines",
+    "44_header_footer",
+    "45_char_accuracy",
+    "47_margins"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "table-with-merged-cells",
+   "head": "4c9ce865aa9fa3f1",
+   "patched": "4659645a2f469a28",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 43,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "table-with-no-header-row",
+   "head": "359bdf7e069ad800",
+   "patched": "8ec88a292447d86d",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 44,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "table-with-rotated-header",
+   "head": "4738eb9a211fc589",
+   "patched": "c3e97fd648bff184",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines",
+    "45_char_accuracy",
+    "47_margins",
+    "59_shape_anchor"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "text-held-twice-shadow-text",
+   "head": "8357588f7ad83a0a",
+   "patched": "f7c30f25ef747827",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 41,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "13_text_colours",
+    "18_displacement",
+    "25_invisible_text",
+    "32_stroke_lines",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "two-tables-stacked-with-no-gap",
+   "head": "abda966d0f56116f",
+   "patched": "e66718ed83aaf5a2",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 44,
+   "google_total": 47,
+   "google_failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "32_stroke_lines"
+   ],
+   "fails_32": true
+  },
+  {
+   "document": "very-long-single-column-table",
+   "head": "e24b60a374c79588",
+   "patched": "331daeed8c5047ca",
+   "changed": true,
+   "google_status": "ok",
+   "google_passed": 40,
+   "google_total": 47,
+   "google_failed": [
+    "04_chars_missing",
+    "05_chars_extra",
+    "18_displacement",
+    "27_text_off_page",
+    "32_stroke_lines",
+    "44_header_footer",
+    "60_text_column_right_edge"
+   ],
+   "fails_32": true
+  }
+ ]
+}

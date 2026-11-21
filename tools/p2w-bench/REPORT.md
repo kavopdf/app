@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 01:53 → running IST · 16 min**
+**22 Nov 2026 · slot 01:53 → running IST · 1h 42m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -27,6 +27,7 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 02:09 | **lead** | 13/213 | guarded carrier: 13 of the 16 {05,32} documents measured 40/42 -> 42/42 in Google on HEAD+rule-carrier-horizontal-only-2008; .txt byte-identical on all 16 and the guard restores HEAD exactly on 375/34 |
+| 03:35 | **lead** | 0/213 | Blast radius of the horizontal-only carrier patch measured for the first time on all 213: 161 documents change .docx content, not 16. 143 of them fail 32 (gain candidates), 5 pass 32 (pure risk) and 1 |
 
 ## The txt
 
@@ -46,11 +47,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 01:53 → running · 16 min |
+| Slot window | 01:53 → running · 1h 42m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 11 |
-| Longest silence | **7.9 min** — from 01:53:55, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 2 |
+| Tool beats | 19 |
+| Longest silence | **41.5 min** — from 02:10:08, after `report.py: building the report` |
+| Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -58,10 +59,11 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **3 min** | `####` |
-| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `#############` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| other - not attributed to a tool | **2 min** | `####` |
+| fix - diagnose and change the engine | **21 min** | `#####` |
+| measure or build - a conversion, screen or compile writes no beacon | **1h 15m** | `################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **3 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

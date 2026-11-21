@@ -95,7 +95,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `14:49` attempt 19 on t01_word_accuracy -> reverted (0/3 moved)
 - `15:19` agent deployed: 47_margins / A - .docx blast radius of the uprightIfPageIsUpsideDown two-line fix: build patched 
 - `15:19` agent deployed: 47_margins / B - true size of 47_margins on the CURRENT engine: re-render the class's 26 document
 - `15:48` attempt 15 on 47_margins -> partial (1/213 moved)
@@ -120,6 +119,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `00:12` attempt 8 on 32_stroke_lines -> lead (0/192 moved)
 - `01:43` attempt 9 on 32_stroke_lines -> lead
 - `02:09` attempt 10 on 32_stroke_lines -> lead (13/213 moved)
+- `03:35` attempt 11 on 32_stroke_lines -> lead (0/213 moved)
 
 ## Where the rest of the state lives
 
