@@ -30,19 +30,19 @@ Same source PDF, same .docx, same instrument. Only the renderer differs.
 | `42_justification_edges` | 0 | 1 | **Google** |
 | `31_pages_lost_their_text` | 0 | 1 | **Google** |
 | `38_list_markers` | 1 | 2 | **Google** |
-| `51_field_values` | 1 | 1 | same |
-| `28_clipped_at_edge` | 1 | 1 | same |
 | `53_embedded_faces` | 4 | 4 | same |
+| `35_rotation` | 12 | 12 | same |
+| `28_clipped_at_edge` | 1 | 1 | same |
+| `64_table_span_across` | 1 | 1 | same |
+| `63_table_rows` | 5 | 5 | same |
+| `51_field_values` | 1 | 1 | same |
+| `62_table_columns` | 3 | 3 | same |
+| `66_table_cell_width` | 4 | 4 | same |
+| `37_super_subscript` | 1 | 1 | same |
+| `65_table_span_down` | 1 | 1 | same |
+| `40_link_targets` | 1 | 1 | same |
 | `34a_span_size_match` | 2 | 2 | same |
 | `52_outline` | 1 | 1 | same |
-| `40_link_targets` | 1 | 1 | same |
-| `65_table_span_down` | 1 | 1 | same |
-| `66_table_cell_width` | 4 | 4 | same |
-| `64_table_span_across` | 1 | 1 | same |
-| `62_table_columns` | 3 | 3 | same |
-| `63_table_rows` | 5 | 5 | same |
-| `35_rotation` | 12 | 12 | same |
-| `37_super_subscript` | 1 | 1 | same |
 | `14_filled_shapes` | 2 | 0 | LibreOffice |
 
 ## Constructs LibreOffice honours and Google does not
