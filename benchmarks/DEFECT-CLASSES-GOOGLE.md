@@ -12,7 +12,7 @@ Every other class table comes from `RANKING.csv`, a soffice render — a rendere
 
 `round.py --close-round` reads this file. A round cannot close while a row here says OPEN.
 
-Last regenerated: 2026-11-21 14:25 IST
+Last regenerated: 2026-11-22 01:21 IST
 
 ## Classes, ranked by gap (Google fails − LibreOffice fails)
 
@@ -22,8 +22,8 @@ Last regenerated: 2026-11-21 14:25 IST
 | `05_chars_extra` | 05_chars_extra | 141 | OPEN | 138 | 3 | 141 |
 | `18_displacement` | 18_displacement | 124 | OPEN | 104 | 20 | 124 |
 | `04_chars_missing` | 04_chars_missing | 66 | OPEN | 64 | 2 | 66 |
+| `59_shape_anchor` | 59_shape_anchor | 58 | OPEN | 49 | 9 | 58 |
 | `25_invisible_text` | 25_invisible_text | 49 | OPEN | 49 | 0 | 49 |
-| `59_shape_anchor` | 59_shape_anchor | 58 | OPEN | 47 | 11 | 58 |
 | `60_text_column_right_edge` | 60_text_column_right_edge | 58 | OPEN | 40 | 18 | 58 |
 | `45_char_accuracy` | 45_char_accuracy | 37 | OPEN | 35 | 2 | 37 |
 | `44_header_footer` | 44_header_footer | 32 | OPEN | 32 | 0 | 32 |
@@ -32,9 +32,9 @@ Last regenerated: 2026-11-21 14:25 IST
 | `00_page_count` | 00_page_count | 21 | OPEN | 21 | 0 | 21 |
 | `26_text_overlap` | 26_text_overlap | 17 | OPEN | 15 | 2 | 17 |
 | `27_text_off_page` | 27_text_off_page | 17 | OPEN | 15 | 2 | 17 |
-| `47_margins` | 47_margins | 26 | OPEN | 8 | 18 | 26 |
+| `47_margins` | 47_margins | 24 | OPEN | 7 | 17 | 24 |
 | `10_font_sizes` | 10_font_sizes | 6 | OPEN | 6 | 0 | 6 |
-| `43_within_10pt_x` | 43_within_10pt_x | 12 | OPEN | 4 | 8 | 12 |
+| `43_within_10pt_x` | 43_within_10pt_x | 11 | OPEN | 4 | 7 | 11 |
 | `23_line_pitch` | 23_line_pitch | 3 | OPEN | 3 | 0 | 3 |
 | `38_list_markers` | 38_list_markers | 2 | OPEN | 1 | 1 | 2 |
 | `31_pages_lost_their_text` | 31_pages_lost_their_text | 1 | OPEN | 1 | 0 | 1 |
