@@ -1,77 +1,32 @@
-# P2W Fixer - Run Report
+# P2W Google Verify - Run Report
 
-**21 Nov 2026 · slot 07:14 → running IST · 2h 02m**
+**21 Nov 2026 · 09:25 IST · stage classify**
 
-> No change was kept this run. The numbers below say what was tried.
+> 192 of 213 measured in Google, 21 refused on page count. Google passes all 42 on 7; LibreOffice on 108.
 
-## Progress
+This run added no new measurements. The Google side and the LibreOffice side were already complete on disk, so the work was to regenerate the capability table from the committed results and commit it, which is this cron's last deliverable. Nothing in the engine was touched. The table is now newer than the results it is built from, and grouping the failing documents into classes passes to the classifier cron.
 
-| | |
-|:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
-| Documents improved, round total | 61 of 213 |
-| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
-| Regressions | **none** |
-| Exempt, not measured | **0** — none |
-| **Fixed - Google, all 42 checks** | **7**, out of the 192 documents both renderers measured |
-| Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
-| Moved but still open | **28** — improved, not fixed |
-| Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `47_margins` |
-| Committed | **12** files in 2 commit(s) from `11da083` — ...47_margins-SPACE-ADVANCE-TAB-STOP-073000-f1x.md, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 07:16 | **partial** | 0/26 | SECOND ATTEMPT, different construct: 365_recipe_card's -2.01 pt is a SPACE's advance, not an indent. The five METHOD steps are w:ind 800 (40 pt, correct: source 40.00 render 40.10) and the run text li |
-
-## The txt
+## Measured
 
 | | |
-|:--|:--|
-| Scored | **213** of 213 |
-| Clean - every applicable check passes | **186** (87.3%) |
-| Failing at least one check | **27** |
-| Moved since the last commit | **none** - nothing changed |
-| Most common failure | `t08_line_order` - 10 documents |
+|:--|--:|
+| scored | **192** |
+| refused on page count | **21** |
+| clean in Google | **7** |
+| clean in LibreOffice | **108** |
 
-## Subagents
+## Checks Google fails and LibreOffice does not
 
-*None deployed this run.*
+| check | Google | LibreOffice |
+|:--|--:|--:|
+| `32\_stroke\_lines` | **145** | 1 |
+| `05\_chars\_extra` | **141** | 7 |
+| `18\_displacement` | **125** | 19 |
+| `04\_chars\_missing` | **67** | 7 |
+| `25\_invisible\_text` | **49** | 1 |
+| `59\_shape\_anchor` | **58** | 10 |
+| `13\_text\_colours` | **32** | 1 |
+| `45\_char\_accuracy` | **38** | 7 |
 
-## Timing
+The first row is the class to take: `32\_stroke\_lines`, 145 documents in Google against 1 in LibreOffice.
 
-| | |
-|:--|:--|
-| Slot window | 07:14 → running · 2h 02m |
-| Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 7 |
-| Longest silence | **120.6 min** — from 07:17:13, after `report.py: building the report` |
-| Silences over 2 min | 1 |
-| Obstacles | 1 cleared · 3 need a human |
-| Still a wall | **Unchanged: the thresholds are in seconds and the ages are in hours, so four of the five stages cannot read ` |
-
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| report - the report and the chain | **2h 01m** | `######################` |
-| other - not attributed to a tool | **1 min** | `#` |
-## Best results this round
-
-| Document | Before | After | Change |
-|:--|--:|--:|--:|
-| `415_inline_images` | 89.04 | 0.00 | -89.04 |
-| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
-| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
-| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
-| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
-
-## Next run
-
-PUSH FINDINGS/widget-ap-glyph-walk-0436-f1x.patch and measure it: 601 goes 37/42 -> 42/42 docx checks in LibreOffice, blast radius is 2 documents of 213, and p2w builds from origin main so nothing corpus-wide can be measured until the patch is on main. Then measure 601 through Drive before and after (Google is the authority), and watch the Account form's two new fails (42_justification_edges, 63_table_rows). Do not chase t01 to 100% on 601 from the engine: verify_txt double-counts 'General' (glyph_truth appends _ap_stream_text to a page text pymupdf already synthesised the widget into), so only a duplicating engine can reach 100 and that costs 601 five docx checks. That is a person's decision, same as the 01:43 row.
-
----
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
