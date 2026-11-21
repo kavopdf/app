@@ -135,26 +135,48 @@ matters. The route named in the last run's handoff — "`DocxWriter.java:6420` a
 `<w:tcBorders><w:bottom>` and can carry the vertical rules" — is alive. The `w:pBdr` route is dead on
 placement, not on rendering, and this finding does not re-open it.
 
-**Not settled, and it is the hard half: PLACEMENT.** Both borders landed where the *table* put them, not
-where a coordinate said. The horizontal one starts at x = −6.0, five to six points left of the cell's
-text origin, because a cell border is drawn at the cell edge and the cell edge sits outside the text
-inset; the vertical one at x = −5.5 for the same reason. So the next attempt's problem is not "will
-Google draw it" but "can a 1 × 1 table be put at an arbitrary x and y" — `w:tblInd`, cell margins,
-`w:tblW` and `w:trHeight`. That is measurable with the same probe, and it is where the pBdr attempt
-actually failed (rules landing more than 24 pt from the source rule, LibreOffice worse on 8 of 12).
+**Not settled by §3: PLACEMENT.** Both borders landed where the *table* put them, not where a coordinate
+said. So the question became "can a 1 × 1 table be put at an arbitrary x, at an arbitrary length, without
+moving the text" — and §4 answers two of those three with an exact number.
 
-**Also not settled.** A table between flow paragraphs occupies flow space, which a `behindDoc` drawing
-does not — so a rule carried this way may push the text down unless it is placed in a zero-height row or
-in a nested table. Untested here, and it is the most likely way this construct fails.
+## 4. Measured: a cell-border rule can be placed EXACTLY in x and in length. Flow is the open problem.
 
-## 4. The tab stop, measured separately
+Four more probes, same procedure, all with `w:pgMar` at zero and every table border `nil` except one
+`w:tcBorders` edge. Requested `w:tblInd` = 1000 twips = 50.0 pt in every case; requested length =
+2000 twips = 100.0 pt where a length was requested.
+
+| probe | what the `.docx` asked for | segment measured in the Google export |
+|:--|:--|:--|
+| P1 | `tblInd` 50 pt, `tblW` 100 pt, cell margins 0 | x0 = **50.00**, x1 = 518.00, **w = 468.00** |
+| P2 | as P1 but one `w:tblW` (python-docx's default removed) and `trHeight` 0 exact | x0 = **50.00**, w = **468.00** |
+| P3 | as P2 plus `w:tblLayout w:type="fixed"` and `w:tblGrid`/`w:gridCol` = 2000 twips | x0 = **50.00**, x1 = 150.00, **w = 100.00** |
+
+* **`w:tblInd` places the left edge exactly.** 50.0 pt requested, 50.00 pt measured, in all three.
+* **Length needs `w:tblLayout="fixed"` AND a `w:tblGrid`.** `w:tblW` alone is ignored: P1 and P2 both
+  stretched the border to 468.00 pt, the full text width. Adding fixed layout and a 2000-twip grid
+  column made it **100.00 pt**, exactly as asked. The 100 pt bar in P3 starts at 50.00 and ends at
+  150.00 — position and length both exact to 0.00 pt.
+* **Flow is NOT solved, and it is now the only thing standing in the way.** `BELOW` sits at
+  y = **52.31** under every one of these tables, against y = **14.07** in the identical document with no
+  table at all (the §2 control). The row consumed about 38 pt of vertical flow, and `w:trHeight
+  w:val="0" w:hRule="exact"` did **not** prevent it — P2 and P3 ask for a zero-height row and both still
+  displace the following paragraph by the same amount. A `behindDoc` drawing displaced nothing, which is
+  the one thing it had over a table.
+
+So the next run's problem is a single one, and it is not rendering, not x, and not length: **make a table
+occupy no flow space.** Untried and plausible: a nested table inside a cell of an outer zero-height row, a
+`w:tblpPr` floating table (`tblpPr` positions a table absolutely, which is the OOXML feature built for
+this), or a table in a paragraph marked `w:framePr`. Note that `w:framePr` is on `google_safe.py`'s ignored
+list, so the third is the least likely of the three.
+
+## 5. The tab stop, measured separately
 
 `FINDINGS/47_margins-GOOGLE-HONOURS-TABSTOPS-1815-f1x.md` in this same commit: Google resolves
 `w:tab w:pos` exactly (216.0 pt requested, 216.00 pt measured) and resolves it from the **left margin**
 (72 pt margin + 216 pt stop → 288.00 pt). Worth reading together with this one, because it is the same
 question — which flow constructs survive the renderer — answered for a different construct.
 
-## 5. How to repeat it
+## 6. How to repeat it
 
     python-docx (or raw OOXML) -> build one paragraph / one table with the construct
     upload(path=..., toolkit="googledrive", tool_slug="GOOGLEDRIVE_CREATE_FILE")     # -> s3key
