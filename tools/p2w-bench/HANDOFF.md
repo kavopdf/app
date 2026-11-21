@@ -95,7 +95,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `15:19` agent deployed: 47_margins / B - true size of 47_margins on the CURRENT engine: re-render the class's 26 document
 - `15:48` attempt 15 on 47_margins -> partial (1/213 moved)
 - `15:59` agent deployed: 32_stroke_lines / A - Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md actually clea
 - `15:59` agent deployed: t02_position / B - The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0) is measure
@@ -120,6 +119,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `02:09` attempt 10 on 32_stroke_lines -> lead (13/213 moved)
 - `03:35` attempt 11 on 32_stroke_lines -> lead (0/213 moved)
 - `04:00` FALSIFIED on the corpus 22 Nov 04:00: the horizontal-only carrier is 13/16 in Google but 54 documents worse in the proxy (median 9 carriers vs 1 unchanged); regress.py REFUSED 58; HEAD reproduces the baseline on the 3 control docs, so the instrument is sound
+- `04:01` attempt 12 on 32_stroke_lines -> reverted (0/16 moved)
 
 ## Where the rest of the state lives
 

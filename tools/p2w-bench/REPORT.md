@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 01:53
+# Fixer report - 2026-11-22 03:14
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 01:53 → running IST · 1h 42m**
+**22 Nov 2026 · slot 03:14 → running IST · 47 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 2 attempt(s), 0 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,8 +26,8 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 02:09 | **lead** | 13/213 | guarded carrier: 13 of the 16 {05,32} documents measured 40/42 -> 42/42 in Google on HEAD+rule-carrier-horizontal-only-2008; .txt byte-identical on all 16 and the guard restores HEAD exactly on 375/34 |
 | 03:35 | **lead** | 0/213 | Blast radius of the horizontal-only carrier patch measured for the first time on all 213: 161 documents change .docx content, not 16. 143 of them fail 32 (gain candidates), 5 pass 32 (pure risk) and 1 |
+| 04:01 | **reverted** | 0/16 | corpus pass on HEAD+horizontal-only carrier: 52 better, 54 worse, regress.py REFUSED 58; regressed docs median 9 carriers vs 1 unchanged; HEAD reproduces baseline on 3 controls so the instrument is so |
 
 ## The txt
 
@@ -47,11 +47,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 01:53 → running · 1h 42m |
+| Slot window | 03:14 → running · 47 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 19 |
-| Longest silence | **41.5 min** — from 02:10:08, after `report.py: building the report` |
-| Silences over 2 min | 5 |
+| Tool beats | 13 |
+| Longest silence | **23.9 min** — from 03:36:51, after `report.py: building the report` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -59,11 +59,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **21 min** | `#####` |
-| measure or build - a conversion, screen or compile writes no beacon | **1h 15m** | `################` |
+| fix - diagnose and change the engine | **18 min** | `#########` |
+| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `############` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
 | report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **3 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -76,7 +75,7 @@
 
 ## Next run
 
-Judge the t08 verifier question before touching the engine: is t08_line_order measuring line order or drawing order? FINDINGS/t08_line_order-DRAWING-ORDER-1740.md has the numbers (10 of 10 rows clear when only our own line sequence is put into drawing order). The agent's proposed one-line sort of _src_pages is NOT obviously right - it would compare sorted-vs-sorted. Decide with a falsification: construct a .txt whose lines are deliberately swapped in y and confirm t08 still fires after the change. Then take t01_word_accuracy's .docx half or 32_stroke_lines' cell-border construct.
+Do not apply rule-carrier-horizontal-only-2008 as a global substitution. Narrow isRuleShape so a band that sits on a table cell/row edge or a stamp frame gets no carrier, then screen the 54 regressed documents before any corpus pass. Or Google-score 08_two_overlapping_stamps, 50_invoice_coloured_total_row and product-catalogue-code-left-price-right first: if Google is clean the 54 are an LO artefact of nested floating tables and the predicate needs no narrowing
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
