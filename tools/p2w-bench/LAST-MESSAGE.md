@@ -1,8 +1,9 @@
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 05:14 → running IST · 3 min**
+**22 Nov 2026 · slot 05:14 → running IST · 5 min**
 
-> Two measurements, no engine change. The lead the last report left — land the carrier patch — is
+> Three Google round trips, no engine change, and one document that is CLEAN in Google where the table
+> said it was not. The lead the last report left — land the carrier patch — is
 > falsified: its Google evidence is a hand-typed summary and the patch damages clean documents. What
 > replaces it is a real Google round trip, run twice, and it says the table the pipeline steers by is
 > measured on an engine that no longer exists.
@@ -11,16 +12,16 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 0 attempt(s), 0 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
-| **Fixed - Google, all 42 checks** | **6**, out of the 192 documents both renderers measured |
+| **Fixed - Google, all 42 checks** | **7**, out of the 192 documents both renderers measured |
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `05_chars_extra` and `32_stroke_lines` — measured, not yet fixed |
+| Working on | `32_stroke_lines` |
 
 ## What this run measured
 
@@ -49,7 +50,13 @@ engine, uploaded, exported from Google Docs, scored, probes deleted:
 | `315_gazette_notification` | 40/42 — fails `05_chars_extra`, `32_stroke_lines` | **41/42** — fails `32_stroke_lines` only |
 | `17_three_column_widths_txtpos` | 40/42 — fails `05_chars_extra`, `32_stroke_lines` | **41/42** — fails `32_stroke_lines` only |
 
-`05_chars_extra` passes in Google on both, on the current engine, where the table says it fails. The
+`05_chars_extra` passes in Google on both, on the current engine, where the table says it fails.
+
+**5. And one document is now clean.** `382_architecture_diagram` was the only document in the corpus whose
+committed Google row failed `05_chars_extra` and nothing else — 41/42. Re-measured on HEAD: **42/42 PASS**.
+Its `benchmarks/gverify/382_architecture_diagram.json` now carries the result with its provenance (docx
+engine fingerprint, export sha256, method, real timestamp), `regress.py --check` passes, and Google-clean
+goes **6 → 7** of the 192 scored. The
 table's `engine` field reads `462353f`; the tree is `6c6cf642e13b7ed2`. **The 192 Google rows are stale,
 and part of the 186-document gap is already closed.** The loop costs about four minutes a document and
 `verify_google.py --json` writes the per-check map — that is the instrument the two largest Google
@@ -69,23 +76,20 @@ classes never had.
 
 | | |
 |:--|:--|
-| Slot window | 05:14 → running · 3 min |
+| Slot window | 05:14 → running · 5 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 2 |
+| Tool beats | 12 |
 | Longest silence | **3.1 min** — from 05:14:57, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-> The Timing rows count tool beats, and this run worked mostly through subagents and Drive calls that
-> write none — the slot ran from 04:50 to 05:55, and the claim was only taken at 05:14 because
-> `--claim-fixer` read its own rejected claim back after a failed `pull --rebase` and stood down twice
-> on a slot that was free.
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **3 min** | `######################` |
+| record - attempt, handoff, class rows | **1 min** | `#####` |
+| report - the report and the chain | **4 min** | `#################` |
 
 ## Next run
 

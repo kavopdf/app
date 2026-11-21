@@ -1,11 +1,13 @@
 {
  "name": "382_architecture_diagram",
  "status": "ok",
- "rc": 1,
- "passed": 41,
+ "rc": 0,
+ "passed": 42,
  "total": 42,
- "failed": [
-  "05_chars_extra"
- ],
- "engine": "462353f"
+ "failed": [],
+ "engine": "226f7f2df3013ad7",
+ "engine_fingerprint": "226f7f2df3013ad7",
+ "export_sha256": "da5185907661e2a760a87505039af1b6fda4eefc3eefbf35e83d0e681c54a96c",
+ "measured": "2026-11-22T06:06+05:30 fixer slot 05:14, Google Docs round trip, probe deleted",
+ "method": "ConvertOne at HEAD -> GOOGLEDRIVE_CREATE_FILE (application/vnd.google-apps.document, parent KavoPDF-Verify) -> EXPORT_GOOGLE_WORKSPACE_FILE application/pdf -> verify_google.py --json"
 }

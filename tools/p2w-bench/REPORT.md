@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 05:14 → running IST · 3 min**
+**22 Nov 2026 · slot 05:14 → running IST · 5 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,16 +11,22 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 0 attempt(s), 0 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
-| **Fixed - Google, all 42 checks** | **6**, out of the 192 documents both renderers measured |
+| **Fixed - Google, all 42 checks** | **7**, out of the 192 documents both renderers measured |
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `32_stroke_lines` |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 05:18 | **lead** | 0/None | Measured the lead the last two runs left open and falsified it: the 16 carrier Google results carry fields no script writes (grep engine_patch: no matches), no per-check map, and a placeholder timesta |
 
 ## The txt
 
@@ -34,15 +40,18 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `32_sA-audit-01` | are the 16 carrier Google results genuine measuremen | 05:18 | 23:48 | 0 min |
+| `32_sB-local-01` | does the carrier patch damage clean documents when m | 05:18 | 23:48 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 05:14 → running · 3 min |
+| Slot window | 05:14 → running · 5 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 2 |
+| Tool beats | 12 |
 | Longest silence | **3.1 min** — from 05:14:57, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -52,7 +61,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **3 min** | `######################` |
+| record - attempt, handoff, class rows | **1 min** | `#####` |
+| report - the report and the chain | **4 min** | `#################` |
 ## Best results this round
 
 | Document | Before | After | Change |

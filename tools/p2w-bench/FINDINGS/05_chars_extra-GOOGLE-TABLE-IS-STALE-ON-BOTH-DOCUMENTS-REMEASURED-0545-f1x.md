@@ -53,3 +53,21 @@ Google classes (`32_stroke_lines` 145 of 213, `05_chars_extra` 141 of 213) are i
 Note for the next run: `java` is not on PATH; the JDK the build fetches lives at
 `/scratch/work/.p2w-jdk/jdk`, and the classpath must include `libs/aar/assets` or every Standard-14 font
 dies.
+
+## Third document, and the first CLEAN one — 06:06
+
+`382_architecture_diagram` was the only document in the corpus whose committed Google row failed
+`05_chars_extra` and nothing else: 41/42 on engine `462353f`. Taken through the same round trip on HEAD:
+
+| document | committed Google | measured now | sha256 of export |
+|:--|:--|:--|:--|
+| `382_architecture_diagram` | 41/42 — fails `05_chars_extra` | **42/42 PASS** | `da518590…54a96c` |
+
+**That is a document moving from failing to clean in Google Docs.** `benchmarks/gverify/382_architecture_diagram.json`
+has been updated with the result and its provenance — `engine_fingerprint` from `regress.py`, the export's
+sha256, the method, and a real timestamp — which is the shape every Google row should have. `regress.py
+--check` passes; Google-clean goes **6 → 7** of 192 scored.
+
+Three of three documents now pass `05_chars_extra` in Google on the current engine where the table says
+they fail. The class is not 141 documents of work on HEAD; it is at least partly already done and
+unmeasured.
