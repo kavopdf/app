@@ -748,5 +748,38 @@
   "obstacles_cleared": 0,
   "needs_human": 0,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795283340.0,
+  "started": "23:19",
+  "ended_ts": null,
+  "ended": "running",
+  "class": "05_chars_extra",
+  "attempts": 1,
+  "kept": 1,
+  "docs_improved": 11,
+  "agents": [
+   {
+    "id": "rule-emission-census",
+    "at": "23:22",
+    "took_min": 5,
+    "landed": true
+   },
+   {
+    "id": "txt-failures-diagnosis",
+    "at": "23:41",
+    "took_min": 10,
+    "landed": true
+   }
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "counted": [
+   [
+    "05_chars_extra",
+    11
+   ]
+  ],
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

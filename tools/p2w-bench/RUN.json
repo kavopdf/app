@@ -1,8 +1,8 @@
 {
  "started_ts": 1795283340.0,
  "started": "23:19",
- "ended_ts": null,
- "ended": "running",
+ "ended_ts": 1795285219.5757065,
+ "ended": "23:50",
  "class": "05_chars_extra",
  "attempts": 1,
  "kept": 1,
