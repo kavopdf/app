@@ -113,3 +113,45 @@ cannot be stamped without measuring all 213. It is four release assets, and it t
 38 s. `p2w.py --budget` is a **time** budget and manages ~26 documents per 250 s, so a full pass is
 ~33 minutes of wall clock and must be split across several commands — that is the real cost, and it is
 now a known number instead of a guess.
+
+---
+
+# Second measurement, same slot: the patch's blast radius is not the class
+
+Built the patched engine (`rule-carrier-tblppr-2008.patch`, 37 s), converted six documents, and
+compared the bytes against the same six from HEAD. The patch was then reverted; the tree is at HEAD.
+
+| document | rules, instrument's definition | `w:tblpPr` the patch emits |
+|:--|--:|--:|
+| `303_discharge_summary` | **0** | **15** |
+| `305_vaccination_certificate` | **0** | **20** |
+| `77_arabic_rtl_document` | **0** | **4** |
+| `80_gstin_pan_cin_ifsc_table` | 0 (not in the 32) | 2 |
+| `76_devanagari_table` | 0 | 0 |
+| `15_stamp_on_scanned_page` | 0 | 0 |
+| `73_marksheet_subject_marks_grade` | 2 | changed (known) |
+
+**The predicate the engine uses is far wider than the rule the check scores.** A document with no
+isolated rule on any page gets twenty floating tables. They are thin filled rects the instrument
+excludes because they touch another stroke - table grid lines and frames drawn as fills - and
+`isRuleShape` has no isolation test, so it takes them all.
+
+**And the text moved.** On `303_discharge_summary` the same paragraph's `w:spacing w:before` went
+**6740 -> 4291 twips** (337 pt -> 214.6 pt) with the carrier in place. The carrier is supposed to be
+zero-flow; on this document it is not, and it moved a block up the page by 122 pt. `.txt` unchanged
+on all three (SAME bytes), so the `.txt` checks would not see it and `share@5` would see it only as
+a large displacement on a page with little ink.
+
+Two things follow, and neither needs a Google round trip to be worth acting on:
+
+1. **The blast radius must be narrowed before the construct is worth measuring.** `isRuleShape` needs
+   the isolation test the instrument already has (`RULE_GAP` 3 pt), or every table border in the
+   corpus becomes a carrier - and the carrier stacks, so on those documents the change can only
+   make the render worse.
+2. **The 53 "no rule" documents are not free.** Two of the four sampled there gained carriers. The
+   claim in the section above that the patch "cannot change a byte" of them is **false as the patch
+   stands** - it is true only of a carrier gated on the instrument's own definition.
+
+What this does not establish: whether those 20 carriers draw anything visible in Google, and whether
+the moved paragraph was moved by the carrier or by something else the patch touched. Both are one
+document away, and both are worth the round trip before the row construct is built.

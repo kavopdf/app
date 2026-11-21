@@ -1828,3 +1828,5 @@
 {"t": 1795275690.8446636, "ist": "21:11:30", "ev": "beat", "d": "gaps.py: reading the timeline"}
 {"t": 1795275954.0511837, "ist": "21:15:54", "ev": "beat", "d": "relay: corpus assembled 213/213, building engine"}
 {"t": 1795276112.4067822, "ist": "21:18:32", "ev": "beat", "d": "relay: census done, committing finding + tools"}
+{"t": 1795276167.153679, "ist": "21:19:27", "ev": "beat", "d": "relay: measuring the 2008 patch blast radius on no-rule docs"}
+{"t": 1795276283.2829173, "ist": "21:21:23", "ev": "beat", "d": "relay: patch reverted, writing the falsification"}

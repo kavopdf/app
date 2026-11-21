@@ -6,8 +6,6 @@
 | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 09:30 | fixer | build-engine | started |
-| 19 Nov 16:26 | fixer | build-engine | started |
-| 19 Nov 16:28 | fixer | build-engine | engine built in 135s |
 | 19 Nov 16:33 | fixer | build-engine | started |
 | 19 Nov 16:34 | fixer | build-engine | engine built in 39s |
 | 19 Nov 16:37 | fixer | build-engine | started |
@@ -406,3 +404,5 @@
 | 21 Nov 21:11 | fixer | stale-claim | fixer slot was stale (14 min) - the previous run ended without releasing it |
 | 21 Nov 21:15 | fixer | build-engine | started |
 | 21 Nov 21:16 | fixer | build-engine | engine built in 38s |
+| 21 Nov 21:19 | fixer | build-engine | started |
+| 21 Nov 21:20 | fixer | build-engine | engine built in 37s |
