@@ -2040,3 +2040,11 @@
 {"t": 1795292026.387424, "ist": "01:43:46", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795292026.8293839, "ist": "01:43:46", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795292027.0782104, "ist": "01:43:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292635.5419884, "ist": "01:53:55", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795292635.6611464, "ist": "01:53:55", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795293108.4567327, "ist": "02:01:48", "ev": "beat", "d": "read carrier finding: handoff names the DESTRUCTIVE patch; horizontal-only is the guarded one. applying horizontal-only"}
+{"t": 1795293179.9001763, "ist": "02:02:59", "ev": "beat", "d": "engine built 34s with horizontal-only carrier patch; fetching corpus"}
+{"t": 1795293274.1118467, "ist": "02:04:34", "ev": "beat", "d": "16 docx converted with guarded carrier; staging for Google"}
+{"t": 1795293353.6576033, "ist": "02:05:53", "ev": "beat", "d": "16 Google exports downloaded; scoring the 42 checks"}
+{"t": 1795293542.5662205, "ist": "02:09:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795293544.814065, "ist": "02:09:04", "ev": "beat", "d": "attempt.py: recording an attempt"}

@@ -110,7 +110,7 @@
   "status": "OPEN"
  },
  "32_stroke_lines": {
-  "attempts": 9,
+  "attempts": 10,
   "first_seen": 1794543973.3763752,
   "history": [
    {
@@ -175,12 +175,19 @@
     "outcome": "lead",
     "reason": "carrier patch measured corpus-wide: 4595 carriers, 3608 of them 8-twip vertical cell separators; 375 goes 13 rows -> 455. Horizontal-only guard proven to restore byte-identity on 324/341/375 and keep ",
     "total": null
+   },
+   {
+    "at": "2026-11-22 02:09",
+    "moved": 13,
+    "outcome": "lead",
+    "reason": "guarded carrier: 13 of the 16 {05,32} documents measured 40/42 -> 42/42 in Google on HEAD+rule-carrier-horizontal-only-2008; .txt byte-identical on all 16 and the guard restores HEAD exactly on 375/34",
+    "total": 213
    }
   ],
   "last": 1794543973.3763797,
   "last_engine": "462353f9",
-  "last_moved": 0,
-  "last_total": 192,
+  "last_moved": 13,
+  "last_total": 213,
   "outcomes": [
    "error",
    "error",
@@ -193,9 +200,12 @@
    "lead",
    "lead",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "carrier patch measured corpus-wide: 4595 carriers, 3608 of them 8-twip vertical cell separators; 375 goes 13 rows -> 455. Horizontal-only guard proven to restore byte-identity on 324/341/375 and keep 17:2, bank-statement:39. Patch saved, Google unmeasured on the remaining 987.",
+  "park_reason": "no progress in the last 12 attempts (error, error, reverted, error, error, reverted, reverted, lead, lead, lead, lead, lead)",
+  "parked_at": "22 Nov 02:09",
+  "reason": "guarded carrier: 13 of the 16 {05,32} documents measured 40/42 -> 42/42 in Google on HEAD+rule-carrier-horizontal-only-2008; .txt byte-identical on all 16 and the guard restores HEAD exactly on 375/341/324, so no document can get worse. Not landed: the 213-document pass that would stamp the engine is 50 min and the slot had 45. HANDOFF CORRECTION: LAST-MESSAGE named rule-carrier-followed-by-block, which has no vertical guard and destroys 59 documents; the guarded patch is rule-carrier-horizontal-only.",
   "reasons": [
    "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH.",
    "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md",
@@ -207,10 +217,11 @@
    "per-page table built and measured: 73_marksheet 39->34/42, 394 42->39/42 in Google. Killed. Control disproves 'tables stack': 394 draws 5 floating tables at their own y (42/42); 73's rule at 793.9pt of an 841.9pt page is the only one moved. Census: carrier as built reaches 1 of 145.",
    "CHECK BLIND TO PICTURES, measured both ways. _rule_segments() (verify_google.py:1082) walks get_drawings() only; Google exports every anchored shape as a raster image, so a rule it drew reads as zero segments and is scored LOST. _stroke_pictures() exists and _strokes() calls it, but _rule_segments() - the path check 32 uses - never does, and the two return different shapes so they were never merged. Falsified on ten Google exports: rule-base (no rule) and rule-v6_pgborder (Google dropped it) both stay LOST; rule-v1_drawing (the engine's OWN carrier) and rule-v1b_inline go LOST->MATCHED. Google draws the engine's construct at y=139.88 for y=140.00 asked (-0.12 pt), 0 chars visible, 0.69 pt displacement from the carrier paragraph vs 0.00 pt with the anchor in a body paragraph. On the two real documents that fail ONLY 32: 394 recovers 1 of 3 rules (still fails), 407 recovers 18 of 46 (its vertical rules, still fails) - so NO document becomes clean and this is NOT a fix, it is a measurement correction. Patch saved as patches/rule-segments-see-pictures.patch, deliberately not applied: it can only turn lost->matched and the corpus-wide flip is unmeasured. NEW LEAD for the next run: the isolated probe rule draws perfectly on a clean page; the same construct draws 1 of 3 on 394 (25 images on one page) and 0 of 28 horizontals on 407 (41 images). The variable is how crowded the page is, not the construct - test N anchored rules on one page for N=1,2,4,8,16,32.",
    "Corpus-wide: 0 of 76 documents whose rules are carried only as floating <w:drawing> pass 32 in Google; the only 2 with source rules that pass carry the rule as a table-cell border. The drawing carrier is refuted; the tcBorders carrier is confirmed. Blocker isolated to the trailing-pair anchor, falsifiable in one build.",
-   "carrier patch measured corpus-wide: 4595 carriers, 3608 of them 8-twip vertical cell separators; 375 goes 13 rows -> 455. Horizontal-only guard proven to restore byte-identity on 324/341/375 and keep 17:2, bank-statement:39. Patch saved, Google unmeasured on the remaining 987."
+   "carrier patch measured corpus-wide: 4595 carriers, 3608 of them 8-twip vertical cell separators; 375 goes 13 rows -> 455. Horizontal-only guard proven to restore byte-identity on 324/341/375 and keep 17:2, bank-statement:39. Patch saved, Google unmeasured on the remaining 987.",
+   "guarded carrier: 13 of the 16 {05,32} documents measured 40/42 -> 42/42 in Google on HEAD+rule-carrier-horizontal-only-2008; .txt byte-identical on all 16 and the guard restores HEAD exactly on 375/341/324, so no document can get worse. Not landed: the 213-document pass that would stamp the engine is 50 min and the slot had 45. HANDOFF CORRECTION: LAST-MESSAGE named rule-carrier-followed-by-block, which has no vertical guard and destroys 59 documents; the guarded patch is rule-carrier-horizontal-only."
   ],
   "requeues": 0,
-  "status": "OPEN"
+  "status": "PARKED"
  },
  "47_margins": {
   "attempts": 17,
