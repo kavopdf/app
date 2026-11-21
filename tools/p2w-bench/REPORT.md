@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 21:11 → running IST · 11 min**
+**21 Nov 2026 · slot 21:11 → 21:23 IST · 12 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -40,9 +40,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 21:11 → running · 11 min |
+| Slot window | 21:11 → 21:23 · 12 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 7 |
+| Tool beats | 11 |
 | Longest silence | **4.4 min** — from 21:11:30, after `gaps.py: reading the timeline` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
