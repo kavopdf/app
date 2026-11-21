@@ -736,9 +736,29 @@
   {
    "at": "11:35",
    "text": "attempt 1 on t02_position -> error"
+  },
+  {
+   "at": "12:14",
+   "text": "agent deployed: 32_stroke_lines / A - Verify the pBdr implementation in FINDINGS/RULES-PBDR-IMPLEMENTATION.md applies "
+  },
+  {
+   "at": "12:14",
+   "text": "agent deployed: 32_stroke_lines / B - From the source PDFs, count horizontal hairline rules per document corpus-wide a"
+  },
+  {
+   "at": "12:39",
+   "text": "relay: carry-over closed with evidence, health.py unit bug fixed and proven (txt moving->stopped at 13.3 h), unit guard added"
+  },
+  {
+   "at": "12:40",
+   "text": "agent landed: 32_sA-01 /  -> FINDINGS/32_stroke_lines-A-pbdr-verification-124000-relay.md"
+  },
+  {
+   "at": "12:40",
+   "text": "agent landed: 32_sB-02 /  -> FINDINGS/32_stroke_lines-B-rule-flow-neutral-124500-relay.md"
   }
  ],
- "next": "Land the pBdr rule replacement: FINDINGS/RULES-PBDR-IMPLEMENTATION.md, first statement of DocxWriter.shape() at line 2772 (return before line 2779), carrying the ctx.flowY = s.topPt update. Screen 32_stroke_lines first, then the full corpus pass. The finding predicts 124 documents cleared among the 144 LibreOffice-only ones, and all 145 if the residual is only the footer rule.",
+ "next": "",
  "agents": [
   {
    "id": "contA-01",
@@ -1257,12 +1277,36 @@
    "finding": "tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md",
    "deployed_at": "2026-11-21T06:04",
    "landed_at": "2026-11-21T06:04"
+  },
+  {
+   "id": "32_sA-01",
+   "class": "32_stroke_lines",
+   "angle": "A",
+   "question": "Verify the pBdr implementation in FINDINGS/RULES-PBDR-IMPLEMENTATION.md applies to the CURRENT tree: exact insertion points, every symbol it uses exists, and w:pBdr is not on google_safe.py's ignored list",
+   "expected": "by 12:50",
+   "deployed": "12:14",
+   "status": "landed",
+   "finding": "FINDINGS/32_stroke_lines-A-pbdr-verification-124000-relay.md",
+   "deployed_at": "2026-11-21T06:44",
+   "landed_at": "2026-11-21T07:10"
+  },
+  {
+   "id": "32_sB-02",
+   "class": "32_stroke_lines",
+   "angle": "B",
+   "question": "From the source PDFs, count horizontal hairline rules per document corpus-wide and flag rules that must NOT become pBdr (vertical, thick, table cell borders) - the ceiling of this fix",
+   "expected": "by 12:50",
+   "deployed": "12:14",
+   "status": "landed",
+   "finding": "FINDINGS/32_stroke_lines-B-rule-flow-neutral-124500-relay.md",
+   "deployed_at": "2026-11-21T06:44",
+   "landed_at": "2026-11-21T07:10"
   }
  ],
  "run": {
-  "started": "11:18",
-  "ended": "11:36",
-  "ended_how": "forced"
+  "started": "12:12",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {
@@ -1366,7 +1410,7 @@
    "plan": ""
   }
  ],
- "context": "stage.py was reporting 'classify' on every fresh clone for a day, and three watchdog passes blamed the classifier cron for it. The cause was in stage.py, not the cron: it compared benchmarks/DEFECT-CLASSES.md (the previous pipeline's ghost, which nothing regenerates) against the gverify results by filesystem mtime, and a git clone stamps every file with the checkout time, so the comparison was decided by unpack order - measured 21 Nov, 05:47:52 against 05:47:53. Fixed and pushed de5d216: the live table is DEFECT-CLASSES-GOOGLE.md and currency is judged by the last commit touching each path (gverify 42bdcda 01:44:38, table e86a88a 04:47:32). stage.py now reads 'fix' with 185 failing documents, and both negative tests still fire. Two agents landed: 32_stroke_lines is the biggest open Google class (145 docs, 144 of them LibreOffice-draws-Google-drops) and its root cause is that every standalone rule leaves DocxWriter.shape() at line 2772 as a floating <w:drawing>/<wp:anchor>, which google_safe.py already lists twice as ignored by Google; FINDINGS/RULES-PBDR-IMPLEMENTATION.md holds the measured pBdr replacement (0 -> 2 rules on the probe document) and the ctx.flowY = s.topPt line whose omission turns it into a regression. The t02_position two-line claim from 47_margins-TXT-HALF-IS-T02-1055-f1x.md is REFUTED as a two-format fix: flippedPage reaches only buildPara, lineX is read only by TxtWriter, and 47_margins already passes on all five t02 documents in the stored LibreOffice table. Its third line as written deletes the only guard protecting 15_stamp_on_scanned_page; use 'if (g.dirx > -0.5f) return false;' instead.",
+ "context": "The pBdr carry-over is CLOSED, not parked: three findings (044000, 055000, 065000) plus today's independent verification prove the carrier paragraph charges 9.6 pt of flow whatever it contains, the 065000 guard is unsatisfiable by construction (flowFromBox sets rightTw=0 for a left-aligned paragraph, so the right-edge test demands the rule reach the paper edge - 0 of 2136 rules pass both edges), and the hook ceiling is 3 of 39 rules on the document made entirely of rules. Any future 32_stroke_lines attempt must start from NO NEW PARAGRAPH. Also landed: health.py THRESHOLD was in seconds while every age is in hours, so four of five stages could never read stopped; txt read moving at 13.3 h against a 12 h intent and now reads stopped. classify gained a superseded state for a table newer than its results.",
  "needs_human": [
   {
    "at": "10:40",

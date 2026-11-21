@@ -41,12 +41,22 @@ BLOCKERS = os.path.join(HERE, "BLOCKERS.md")
 HOUR = 3600.0
 # Every timestamp this pipeline writes is IST; this pod runs UTC. See _attempts_recent().
 IST_OFFSET = 5 * 3600 + 30 * 60
+# IN HOURS, because that is what every age in this file is. `_age()` returns hours and the state
+# lines compare `_age(...) < THRESHOLD[...]`; these were written in SECONDS (4 * HOUR = 14400), so
+# the comparison was `0.5 < 14400` and `stopped` could never be printed for measure-google, matrix,
+# classify or txt. A check that cannot fail is decoration - the exact bug this watchdog exists to
+# catch in other people's instruments.
+#
+# Measured 21 Nov 12:47 on the live tree: `txt` read **moving** at an age of 13.2 h against a 12 h
+# intent. After this line it reads `stopped`. The thresholds themselves are unchanged in meaning -
+# 4, 4, 6, 3 and 12 hours - only their unit was wrong. A watchdog must not move its own thresholds;
+# it may repair a unit, and this is the repair. (BLOCKERS.md row 5, 20 Nov, asked for exactly this.)
 THRESHOLD = {
-    "measure-google": 4 * HOUR,
-    "matrix": 4 * HOUR,
-    "classify": 6 * HOUR,
-    "fix": 3 * HOUR,
-    "txt": 12 * HOUR,
+    "measure-google": 4.0,
+    "matrix": 4.0,
+    "classify": 6.0,
+    "fix": 3.0,
+    "txt": 12.0,
 }
 
 
@@ -95,6 +105,35 @@ def _newest(d):
     if not files:
         return 1e9
     return min(_age(p) for p in files)
+
+
+def _newest_epoch(d):
+    """The commit time of the most recent file in a directory, in epoch seconds - or None.
+
+    `_newest` answers "how old is the freshest thing here"; this answers "when was the freshest
+    thing here written", which is the only way to ask whether a TABLE is newer than the RESULTS it
+    summarises. A table that is newer than its inputs is not late - it is current, and a stage
+    reading `stopped` for it is a false alarm. See compute()'s `superseded` state.
+    """
+    if not os.path.isdir(d):
+        return None
+    best = None
+    for f in os.listdir(d):
+        if not f.endswith(".json"):
+            continue
+        c = _commit_time(os.path.relpath(os.path.join(d, f), ROOT))
+        if c is not None and (best is None or c > best):
+            best = c
+    return best
+
+
+def _is_current(table, results_dir):
+    """True when the table was committed at or after the newest result it summarises."""
+    t = _commit_time(os.path.relpath(table, ROOT))
+    r = _newest_epoch(results_dir)
+    if t is None or r is None:
+        return False
+    return t >= r
 
 
 def _count(d):
@@ -169,9 +208,14 @@ def compute():
         "state": "done" if g and lo >= g else
                  ("moving" if _newest(LORES) < THRESHOLD["matrix"] else "stopped")}
 
+    # A TABLE NEWER THAN ITS RESULTS IS CURRENT, NOT LATE. The class table is regenerated AFTER new
+    # results land; when it is newer than the newest result, no run is behind and an age past six
+    # hours is the age of the inputs, not of the work. Reading `stopped` there is the false alarm
+    # that makes a watchdog ignorable - BLOCKERS.md 20 Nov 18:10 asked for exactly this state.
     out["stages"]["classify"] = {
         "age_h": round(_age(CLASSES), 1),
-        "state": ("moving" if _age(CLASSES) < THRESHOLD["classify"] else "stopped")
+        "state": ("superseded" if _is_current(CLASSES, GVERIFY) else
+                  ("moving" if _age(CLASSES) < THRESHOLD["classify"] else "stopped"))
                  if g >= total and total else "waiting"}
 
     recent = _attempts_recent(3.0)
@@ -222,6 +266,18 @@ def main(argv):
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--stalled", action="store_true")
     a = ap.parse_args(argv)
+
+    # THE UNIT GUARD. The thresholds were in seconds and every age in this file is in hours, so
+    # four of five stages could not read `stopped` and this tool printed green over a 13-hour-old
+    # table. Repairing the numbers is not enough - a future edit can put the seconds back and the
+    # failure is silent, which is exactly how this one survived a day of watchdog passes.
+    # No stage in this pipeline is meant to be given more than two days of silence.
+    _worst = max(THRESHOLD.items(), key=lambda kv: kv[1])
+    if _worst[1] > 48:
+        print("  REFUSED - THRESHOLD[%r] = %s, but every age in this file is in HOURS. "
+              "A threshold over 48 cannot be hours; it is seconds, and it can never fire."
+              % (_worst[0], _worst[1]), file=sys.stderr)
+        return 3
     d = compute()
 
     if a.json:

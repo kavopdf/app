@@ -1483,3 +1483,17 @@
 {"t": 1795241180.2788408, "ist": "11:36:20", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795241180.4372718, "ist": "11:36:20", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795241180.479038, "ist": "11:36:20", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795243376.0671027, "ist": "12:12:56", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795243376.2077646, "ist": "12:12:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795243408.4106767, "ist": "12:13:28", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795243438.739352, "ist": "12:13:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795243450.0806923, "ist": "12:14:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795243482.872473, "ist": "12:14:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795243482.9897447, "ist": "12:14:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795244956.2607305, "ist": "12:39:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795244956.4385762, "ist": "12:39:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795244956.6086357, "ist": "12:39:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795244985.4310498, "ist": "12:39:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795245009.7608182, "ist": "12:40:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795245010.1425662, "ist": "12:40:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795245010.4681685, "ist": "12:40:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
