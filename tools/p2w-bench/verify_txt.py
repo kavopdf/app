@@ -630,6 +630,17 @@ def glyph_truth(path):
             # declaration omitted, is left alone and counted.
             out = []
             cursor = 0
+            # A LINE DRAWN MORE THAN ONCE AT ONE PLACE IS ONE LINE.
+            #
+            # Faux bold is the page drawing the same text two or three times at the identical
+            # bounding box - two fills and a stroke. get_text() counts every copy; a reader
+            # sees one line, and the writer emits one. Measured 21 Nov on
+            # 38_faux_bold_italic_synthesised: "PROJECT REPORT - CIVIL" sits at
+            # (56.0, 99.5, 218.0, 112.5) three times, the .txt carries it once, and the
+            # source's second copy was charged as 4 lost words - 98.0 against a 99 bar.
+            # Keyed on the rounded bbox AND the text, so two different words at one place are
+            # still two words.
+            _seen_spans = set()
             for span in trace:
                 base, enc = facts.get((span.get("font") or "").lstrip("/"), ("", ""))
                 unnamed = unnamed_by.get((span.get("font") or "").lstrip("/"), ())
@@ -652,6 +663,17 @@ def glyph_truth(path):
                 # that falls back to offset 0 finds the FIRST copy again, appends the
                 # decoded text ahead of the cursor and duplicates the line. A span that
                 # is not ahead of the cursor is left as the declaration had it.
+                _key = (tuple(round(v, 1) for v in span.get("bbox", (0, 0, 0, 0))), stext)
+                if _key in _seen_spans:
+                    # Skip this copy the same way the forward-only search skips a repeat:
+                    # advance past the declaration's own next occurrence and append nothing.
+                    _i2 = declared_page.find(stext, cursor)
+                    if _i2 >= 0:
+                        out.append(declared_page[cursor:_i2])
+                        cursor = _i2 + len(stext)
+                    stats["dup_spans"] = stats.get("dup_spans", 0) + 1
+                    continue
+                _seen_spans.add(_key)
                 idx = declared_page.find(stext, cursor)
                 if idx < 0:
                     stats["declared"] += len(chars)

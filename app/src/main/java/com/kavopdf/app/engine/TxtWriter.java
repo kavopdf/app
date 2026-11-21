@@ -91,15 +91,16 @@ public final class TxtWriter {
                 float pitch = pagePitch(page, docPitch);
                 int[] snap = paraEndSnap(page, charW, endSnap);
                 float lastY = -1f;
+                LastLine lastLine = new LastLine();
                 for (Object block : pageOrder(page)) {
                     if (block instanceof PdfToWord.Table) {
                         if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '\n') sb.append('\n');
                         appendTable(sb, (PdfToWord.Table) block, charW, endSnap);
                     } else if (block instanceof Piece) {
                         Piece pc = (Piece) block;
-                        lastY = appendPara(sb, pc.para, charW, pitch, lastY, pc.lines, snap);
+                        lastY = appendPara(sb, pc.para, charW, pitch, lastY, pc.lines, snap, lastLine);
                     } else if (block instanceof PdfToWord.Para) {
-                        lastY = appendPara(sb, (PdfToWord.Para) block, charW, pitch, lastY, null, snap);
+                        lastY = appendPara(sb, (PdfToWord.Para) block, charW, pitch, lastY, null, snap, lastLine);
                     }
                 }
             }
@@ -134,6 +135,26 @@ public final class TxtWriter {
      * cannot separate them, because they are not separate blocks - the paragraph itself has
      * to be cut at the gutter, which is what {@link #lines} carries.
      */
+    /**
+     * The last line this page wrote, so that a line the page drew more than once is written
+     * once.
+     *
+     * <p>Faux bold is the page drawing the same string two or three times at the identical
+     * bounding box - two fills and a stroke. The model sees several draws and can build more
+     * than one paragraph from them; a reader sees one line, and a .txt must carry one.
+     * Measured on 38_faux_bold_italic_synthesised, 21 Nov: the second faux-bold heading
+     * arrived as two paragraphs and the file carried the line twice in a row.
+     *
+     * <p>Keyed on the text AND the position, because the same words legitimately sit at one
+     * baseline in two columns - 67_two_col_with_sidebar draws a body line and a sidebar line
+     * on one baseline - and those are two lines, not a doubled draw.
+     */
+    private static final class LastLine {
+        String text;
+        float x = Float.NaN;
+        float y = Float.NaN;
+    }
+
     private static final class Piece {
         final PdfToWord.Para para;
         /** The line indices of {@code para} this piece writes, or null for all of them. */
@@ -484,7 +505,8 @@ public final class TxtWriter {
 
     /** Writes one paragraph, opening blank lines for the gap the page left above it. */
     private static float appendPara(StringBuilder sb, PdfToWord.Para para, float charW,
-                                    float pitch, float lastY, int[] only, int[] snap) {
+                                    float pitch, float lastY, int[] only, int[] snap,
+                                    LastLine last) {
         if (only == null && para.text().trim().isEmpty()) return lastY;
         if (para.lines == null || para.lines.isEmpty()) {
             if (only != null) return lastY;
@@ -503,6 +525,11 @@ public final class TxtWriter {
                 int blanks = Math.round((ly - lastY) / pitch) - 1;
                 if (blanks > MAX_BLANK_LINES) blanks = MAX_BLANK_LINES;
                 for (int b = 0; b < blanks; b++) sb.append('\n');
+            }
+            // ONE LINE, NOT THREE. See LastLine: a doubled draw is one line to a reader.
+            if (last != null && trimmed.equals(last.text)
+                    && Math.abs(lx - last.x) <= 0.01f && Math.abs(ly - last.y) <= 0.01f) {
+                continue;
             }
             int pad = column(lx, charW);
             // A PAGE COLUMN OF FIGURES IS ONE COLUMN IN THE .txt, EVEN WHEN ROUNDING SPLITS IT.
@@ -523,6 +550,11 @@ public final class TxtWriter {
             }
             for (int i = 0; i < pad; i++) sb.append(' ');
             sb.append(trimmed).append('\n');
+            if (last != null) {
+                last.text = trimmed;
+                last.x = lx;
+                last.y = ly;
+            }
             lastY = ly;
         }
         return lastY;
