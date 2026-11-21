@@ -138,6 +138,27 @@ def main(argv):
             was = json.load(open(MARK))
         except Exception:
             was = None
+        # THE MARK IS ONLY COMPARABLE WITHIN ONE POPULATION, AND IT DID NOT SAY WHICH.
+        #
+        # It was recorded over 28 documents - a partial output directory in some earlier sandbox -
+        # and the corpus is 213. A full corpus therefore carries w:drawing in 197 documents against
+        # a mark of 28, and since the mark may only fall, EVERY commit was refused, including one
+        # that changed no engine code and no .docx at all. Found 21 Nov, on the report commit of the
+        # 07:58 fixer run. A mark that records what it was recorded over cannot be compared with a
+        # different-sized corpus by accident.
+        _was_n = (was or {}).get("corpus_docs")
+        if was and (_was_n is None or _was_n != len(files)):
+            print()
+            print("  RE-BASE - the mark was recorded over %s documents and this corpus is %d."
+                  % ("an unrecorded number of" if _was_n is None else _was_n, len(files)))
+            print("  Carrier counts are not comparable across populations; the mark is re-based to")
+            print("  this corpus and may only fall from here. Say so in the commit message.")
+            json.dump({"at": "recorded by google_safe.py --mark (re-based: %s -> %s documents)"
+                              % (_was_n, len(files)),
+                       "corpus_docs": len(files), "carriers": carriers, "totals": totals},
+                      open(MARK, "w"), indent=1)
+            print("  mark written: %s" % os.path.relpath(MARK, ROOT))
+            return 0
         if was:
             raised = []
             for k, v in carriers.items():
@@ -150,8 +171,8 @@ def main(argv):
                     print("    %s" % r)
                 print("  Fix the engine so it emits fewer of them, or do not commit.")
                 return 1
-        json.dump({"at": "recorded by google_safe.py --mark", "carriers": carriers, "totals": totals},
-                  open(MARK, "w"), indent=1)
+        json.dump({"at": "recorded by google_safe.py --mark", "corpus_docs": len(files),
+                   "carriers": carriers, "totals": totals}, open(MARK, "w"), indent=1)
         print()
         print("  mark written: %s" % os.path.relpath(MARK, ROOT))
         return 0
@@ -163,6 +184,13 @@ def main(argv):
             print()
             print("  no mark - run --mark once to record today's counts")
             return 0
+        _was_n = (was or {}).get("corpus_docs")
+        if was and (_was_n is None or _was_n != len(files)):
+            print()
+            print("  cannot compare: the mark was recorded over %s documents, this corpus is %d."
+                  % ("an unrecorded number of" if _was_n is None else _was_n, len(files)))
+            print("  Carrier counts are a property of the population. Run --mark to re-base it.")
+            return 3
         bad = []
         for k, v in carriers.items():
             if v > was.get("carriers", {}).get(k, 0):

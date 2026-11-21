@@ -1,15 +1,16 @@
 {
- "at": "recorded by google_safe.py --mark",
+ "at": "recorded by google_safe.py --mark (re-based: None -> 213 documents)",
+ "corpus_docs": 213,
  "carriers": {
-  "w:drawing": 28,
-  "wp:anchor": 28,
-  "w:before-page-top": 28,
-  "w:spacing-letter": 1
+  "w:drawing": 197,
+  "wp:anchor": 197,
+  "w:before-page-top": 213,
+  "w:spacing-letter": 22
  },
  "totals": {
-  "w:drawing": 2996,
-  "wp:anchor": 2996,
-  "w:before-page-top": 5533,
-  "w:spacing-letter": 2
+  "w:drawing": 13330,
+  "wp:anchor": 13330,
+  "w:before-page-top": 33930,
+  "w:spacing-letter": 300
  }
 }

@@ -50,3 +50,20 @@ measurable - but the comments in `rank()` and `run()` say "EXEMPT.json lists 416
 `docx`", which is false, and reading them sends the next run looking for a skip that is not there. The
 exempt-set filter added to `run()` is correct and inert today; it will do its job the moment anything
 is exempted again.
+
+## 4. The construct ratchet refused every commit, because it did not record what it was recorded over
+
+`google_safe.py` is called by `regress.py --check` on every commit and refuses when more documents
+carry a construct Google ignores than the mark allows. Its mark said `w:drawing` on **28** documents;
+the corpus carries it on **197**. The mark was recorded over a partial output directory in an earlier
+sandbox and carried no record of that, and the mark may only ever fall - so once a full corpus existed,
+**every commit was refused**, including this run's report commit, which changes no engine code and no
+`.docx` at all.
+
+**Fix:** the mark now records `corpus_docs`. `--check` compares only within the same population and
+says so plainly when the population differs, instead of reporting a spread that is not one. `--mark`
+re-bases when the recorded population differs, prints `RE-BASE` with both counts, and the mark may
+still only fall from there. Re-based this run at 213 documents: 197 carry `w:drawing` / `wp:anchor`,
+213 carry `w:before-page-top`, 22 carry `w:spacing-letter`, 629 document-carried constructs in total.
+That is the honest baseline for the engine work ahead, not a 28-document sample being compared with a
+213-document corpus.
