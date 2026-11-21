@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 07:14 → running IST · 2 min**
+**21 Nov 2026 · slot 07:14 → running IST · 2h 02m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,7 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `47_margins` |
-| Committed | **12** files in 1 commit(s) from `9a3d4d0` — ...47_margins-SPACE-ADVANCE-TAB-STOP-073000-f1x.md, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md |
+| Committed | **12** files in 2 commit(s) from `11da083` — ...47_margins-SPACE-ADVANCE-TAB-STOP-073000-f1x.md, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md |
 
 ## What was tried
 
@@ -47,19 +47,21 @@
 
 | | |
 |:--|:--|
-| Slot window | 07:14 → running · 2 min |
+| Slot window | 07:14 → running · 2h 02m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 7 |
-| Silences over 2 min | 0 |
-| Obstacles | 0 cleared · 0 need a human |
+| Longest silence | **120.6 min** — from 07:17:13, after `report.py: building the report` |
+| Silences over 2 min | 1 |
+| Obstacles | 1 cleared · 3 need a human |
+| Still a wall | **Unchanged: the thresholds are in seconds and the ages are in hours, so four of the five stages cannot read ` |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **1 min** | `###########` |
-| other - not attributed to a tool | **1 min** | `###########` |
+| report - the report and the chain | **2h 01m** | `######################` |
+| other - not attributed to a tool | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

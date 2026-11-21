@@ -421,25 +421,21 @@ def claim(name):
             # Both directions are wrong with an mtime: a dead run looks alive for ever, so its slot is
             # never reclaimed and the pipeline stalls. The content carries the real time. The key is
             # "t" - a float epoch, written by beacon.py as {"t": ..., "ist": ..., "ev": ...}.
-            _tl = os.path.join(HERE, "TIMELINE.jsonl")
-            _last = 0.0
-            with open(_tl, encoding="utf-8") as _f:
-                for _line in _f:
-                    _line = _line.strip()
-                    if not _line:
-                        continue
-                    try:
-                        _j = json.loads(_line)
-                    except Exception:
-                        continue
-                    for _k in ("t", "ts", "at", "time", "epoch"):
-                        _v = _j.get(_k)
-                        if isinstance(_v, (int, float)) and _v > _last:
-                            _last = float(_v)
-            if _last > 0:
-                newest = max(newest, _last)
-            else:
-                newest = max(newest, os.path.getmtime(_tl))
+            # THE TIMELINE CANNOT TELL WHO IS ALIVE, SO IT IS NOT READ HERE.
+            #
+            # Every tool writes a beat to it - attempt.py, report.py, classpick.py, and every tool a person or
+            # another cron runs outside this slot. Its last stamp therefore says "something ran recently", not
+            # "the fixer is working", and reading it made the slot unclaimable whenever any other tool had
+            # touched the repository.
+            #
+            # Found by the final audit: status.py said "LIKELY DEAD - the claim is 126 minutes old" while
+            # --claim-fixer said "fixer busy - last activity 4 min ago", because four minutes earlier a
+            # verification run had written a beat. Two tools, one state, opposite answers - and the one that
+            # gates the work was the wrong one.
+            #
+            # The explicit fields ARE per-run: attempt.py's heartbeat writes <name>_last_beat and
+            # <name>_doing_since for the run holding the slot, and those are read above. That is the evidence.
+            _tl = None
         except Exception:
             pass
         age_min = claim_age_min(newest)

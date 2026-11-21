@@ -6,8 +6,6 @@
 | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 09:30 | fixer | build-engine | started |
-| 17 Nov 09:35 | fixer | build-engine | started |
-| 17 Nov 09:36 | fixer | build-engine | engine built in 40s |
 | 17 Nov 09:39 | fixer | build-engine | started |
 | 17 Nov 09:40 | fixer | build-engine | engine built in 42s |
 | 17 Nov 09:43 | fixer | build-engine | started |
@@ -406,3 +404,5 @@
 | 21 Nov 07:14 | ? | classify (read-only) | 45 classes from 211 documents, class file untouched |
 | 21 Nov 07:14 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
+| 21 Nov 09:23 | fixer | claim | fixer claimed the slot |
+| 21 Nov 09:23 | fixer | stale-claim | fixer slot was stale (128 min) - the previous run ended without releasing it |
