@@ -398,3 +398,20 @@ touches every table on the corpus, so it needs a corpus pass, not a screen.
 cheapest of the three: the page draws the footer last (811.4) while the engine emits it between the
 816.4 and 834.8 rows. See FINDINGS/itr-slab-the-squeeze-is-not-the-defect-1645.md for the rendered
 line-by-line table that shows all three defects side by side.
+
+## 32_stroke_lines - re-opened 21 Nov, and why the 18 attempts did not settle it
+
+The class was exhausted on 20 Nov with "18 attempts, all reverted; 36 of 39 rules are in table rows and
+never reach the pBdr path". **That reason is a finding about ONE approach, not about the class.**
+
+It says the rules are inside table rows. The 18 attempts tried to give them to the PARAGRAPH
+(`w:pBdr`), which a rule inside a table cell can never reach - so of course all 18 reverted. **The
+untried approach is the one the finding points at: `w:tcBorders`, the cell's own border.**
+
+Until that is tried and measured, the class is open. It is 145 documents - the largest single lever in
+the tool - and leaving it parked is the reason the corpus moves one document at a time.
+
+What would settle it: build one document whose rules are in a table row, give the row's cells a
+`w:tcBorders` bottom border of the measured width and colour, and look at it in Google. If the rules
+appear, the class is winnable and the 18 attempts were aimed at the wrong construct. If they do not, the
+class is genuinely unwinnable with what the engine can emit and the exhaust reason becomes true.

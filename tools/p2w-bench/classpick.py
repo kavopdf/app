@@ -39,6 +39,7 @@ CLASSES_TXT = os.path.join(HERE, "txt", "DEFECT-CLASSES-TXT.md")
 ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 ROTATION = os.path.join(HERE, "ROTATION.json")
 
+LEVERAGE_RATIO = 3.0
 MIN_ATTEMPTS_FOR_A_VERDICT = 2
 
 
@@ -182,6 +183,29 @@ def _pick(fmt, rot, dead):
                      "biggest in the .%s half: %s, %d documents"
                      % (cur, n, since, fmt, nxt, docs[nxt])), \
                {"class": nxt, "since": now_str()}
+
+    # LEVERAGE. A small class that is trickling must not hold a large one hostage.
+    #
+    # Measured 21 Nov: the rotation sat on 47_margins - 26 documents, 13 attempts, 8 moved - while
+    # 32_stroke_lines (145 documents) and 05_chars_extra (141) had never been attempted. That is
+    # 8 documents for thirteen attempts' work, when one construct on the biggest class is worth 145.
+    # The user: "1 din me sirf 1 documents hee improvement ho toh yeh kaam 6 months se zyada lag
+    # jaayega" - and they are right: at 1 document a run the corpus never finishes.
+    #
+    # "Stay while it moves" is a good rule between classes of similar size and a bad one when the
+    # class being worked is a fifth of the biggest. So: after MIN_ATTEMPTS on the current class, if
+    # the biggest unwon class is LEVERAGE_RATIO times larger, go to the biggest. The trickle resumes
+    # once the big one has had its own verdict.
+    if n >= MIN_ATTEMPTS_FOR_A_VERDICT:
+        big = next((c for c in names if c not in dead), None)
+        if (big and big != cur and docs.get(big, 0) >= LEVERAGE_RATIO * max(1, docs.get(cur, 1))):
+            return big, ("%s has %d document(s) and %d attempt(s) moved only %d - %s is %d document(s),"
+                         " %.1fx larger, and has not had its verdict. Working the biggest first is the"
+                         " only way the corpus finishes: one construct there clears many documents at"
+                         " once. %s resumes when that one has had its attempts."
+                         % (cur, docs.get(cur, 0), n, moved, big, docs[big],
+                            docs[big] / max(1.0, docs.get(cur, 1)), cur)), \
+                   {"class": big, "since": now_str()}
 
     if n == 0:
         return cur, ("staying on %s (%d documents, .%s): nothing recorded on it since %s yet"
