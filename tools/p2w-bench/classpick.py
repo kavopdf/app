@@ -60,37 +60,60 @@ def save(path, obj):
 
 
 def ranking():
-    """[(class, google_docs)] biggest first, from the capability table."""
+    """[(class, google_docs)] biggest first, from the capability table.
+
+    READ THE COLUMN BY ITS HEADER, NEVER BY ITS POSITION.
+
+    This read c[5] because the table had six columns and google was the sixth. On 21 Nov a `status`
+    column was added for round.py's open_classes(), the table became seven columns, and c[5] silently
+    became `libreoffice` instead of `google`. Nothing crashed. The rotation simply started ranking by
+    the renderer nobody opens - 60_text_column_right_edge at 28 instead of 57, 18_displacement at 19
+    instead of 125 - and the two largest classes, 32_stroke_lines at 145 and 05_chars_extra at 141,
+    fell off the top of the list entirely. A positional read of a table someone else edits is a bug
+    waiting for an edit.
+    """
     out = []
     if not os.path.exists(CLASSES):
         return out
+    col = None
     for line in open(CLASSES, encoding="utf-8"):
-        if not line.startswith("| `"):
+        cells = [x.strip() for x in line.strip().strip("|").split("|")]
+        if col is None:
+            # the header row: find where `google` sits
+            if "google" in [c.lower() for c in cells]:
+                col = [c.lower() for c in cells].index("google")
             continue
-        c = [x.strip() for x in line.strip().strip("|").split("|")]
-        if len(c) < 6:
+        if not line.startswith("| `") or col >= len(cells):
             continue
-        name = c[0].strip("` ")
+        name = cells[0].strip("` ")
         try:
-            out.append((name, int(c[5])))
+            out.append((name, int(cells[col].strip("*"))))
         except ValueError:
             continue
     return sorted(out, key=lambda x: -x[1])
 
 
 def ranking_txt():
-    """[(check, documents)] for the .txt half, biggest first."""
+    """[(check, documents)] for the .txt half, biggest first.
+
+    Read by header, for the same reason as ranking() above: a status column was added to this table on
+    21 Nov and a positional read would have started counting the wrong cell the moment anyone added one
+    more.
+    """
     out = []
     if not os.path.exists(CLASSES_TXT):
         return out
+    col = None
     for line in open(CLASSES_TXT, encoding="utf-8"):
-        if not line.startswith("| `"):
+        cells = [x.strip() for x in line.strip().strip("|").split("|")]
+        if col is None:
+            if "documents" in [c.lower() for c in cells]:
+                col = [c.lower() for c in cells].index("documents")
             continue
-        c = [x.strip() for x in line.strip().strip("|").split("|")]
-        if len(c) < 4:
+        if not line.startswith("| `") or col >= len(cells):
             continue
         try:
-            out.append((c[0].strip("` "), int(c[2].strip("*"))))
+            out.append((cells[0].strip("` "), int(cells[col].strip("*"))))
         except ValueError:
             continue
     return sorted(out, key=lambda x: -x[1])
