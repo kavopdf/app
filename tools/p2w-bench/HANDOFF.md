@@ -19,7 +19,7 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 01:53 |
+| started | 03:14 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
@@ -30,7 +30,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> Judge the t08 verifier question before touching the engine: is t08_line_order measuring line order or drawing order? FINDINGS/t08_line_order-DRAWING-ORDER-1740.md has the numbers (10 of 10 rows clear when only our own line sequence is put into drawing order). The agent's proposed one-line sort of _src_pages is NOT obviously right - it would compare sorted-vs-sorted. Decide with a falsification: construct a .txt whose lines are deliberately swapped in y and confirm t08 still fires after the change. Then take t01_word_accuracy's .docx half or 32_stroke_lines' cell-border construct.
+> Do not apply rule-carrier-horizontal-only-2008 as a global substitution. Narrow isRuleShape so a band that sits on a table cell/row edge or a stamp frame gets no carrier, then screen the 54 regressed documents before any corpus pass. Or Google-score 08_two_overlapping_stamps, 50_invoice_coloured_total_row and product-catalogue-code-left-price-right first: if Google is clean the 54 are an LO artefact of nested floating tables and the predicate needs no narrowing
 
 ## Agents deployed and not yet accounted for
 
@@ -95,7 +95,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `15:19` agent deployed: 47_margins / A - .docx blast radius of the uprightIfPageIsUpsideDown two-line fix: build patched 
 - `15:19` agent deployed: 47_margins / B - true size of 47_margins on the CURRENT engine: re-render the class's 26 document
 - `15:48` attempt 15 on 47_margins -> partial (1/213 moved)
 - `15:59` agent deployed: 32_stroke_lines / A - Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md actually clea
@@ -120,6 +119,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `01:43` attempt 9 on 32_stroke_lines -> lead
 - `02:09` attempt 10 on 32_stroke_lines -> lead (13/213 moved)
 - `03:35` attempt 11 on 32_stroke_lines -> lead (0/213 moved)
+- `04:00` FALSIFIED on the corpus 22 Nov 04:00: the horizontal-only carrier is 13/16 in Google but 54 documents worse in the proxy (median 9 carriers vs 1 unchanged); regress.py REFUSED 58; HEAD reproduces the baseline on the 3 control docs, so the instrument is sound
 
 ## Where the rest of the state lives
 
