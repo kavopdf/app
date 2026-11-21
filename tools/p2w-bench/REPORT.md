@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-21 07:14
+# Fixer report - 2026-11-21 09:23
 
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 07:14 → running IST · 2h 02m**
+**21 Nov 2026 · slot 09:23 → 09:25 IST · 2 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 0 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,14 +20,7 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `47_margins` |
-| Committed | **12** files in 2 commit(s) from `11da083` — ...47_margins-SPACE-ADVANCE-TAB-STOP-073000-f1x.md, ATTEMPTS.json, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 07:16 | **partial** | 0/26 | SECOND ATTEMPT, different construct: 365_recipe_card's -2.01 pt is a SPACE's advance, not an indent. The five METHOD steps are w:ind 800 (40 pt, correct: source 40.00 render 40.10) and the run text li |
+| Working on | `-` |
 
 ## The txt
 
@@ -47,21 +40,19 @@
 
 | | |
 |:--|:--|
-| Slot window | 07:14 → running · 2h 02m |
+| Slot window | 09:23 → 09:25 · 2 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 7 |
-| Longest silence | **120.6 min** — from 07:17:13, after `report.py: building the report` |
+| Tool beats | 9 |
+| Longest silence | **2.0 min** — from 09:23:32, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 1 |
-| Obstacles | 1 cleared · 3 need a human |
-| Still a wall | **Unchanged: the thresholds are in seconds and the ages are in hours, so four of the five stages cannot read ` |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **2h 01m** | `######################` |
-| other - not attributed to a tool | **1 min** | `#` |
+| record - attempt, handoff, class rows | **2 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |
