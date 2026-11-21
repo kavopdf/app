@@ -216,6 +216,21 @@ def _pick(fmt, rot, dead):
     moved = moved_of(h)
     n = len(h)
 
+    # A LEAD HOLDS THE CLASS, WHATEVER IT DID TO THE DOCUMENT COUNT.
+    #
+    # The rotation's verdict was sum(moved), so a run that measured a construct through Google and ran
+    # out of slot to implement it - the most valuable thing a run can produce - read as zero progress and
+    # started counting towards rotating away. On 21 Nov that was w:tblpPr: measured, exact to 0.5 pt,
+    # zero flow cost, and the class that owns 145 documents was about to be abandoned with the answer in
+    # hand.
+    #
+    # A lead is unfinished work, not absent work. Stay until it is implemented or refuted.
+    if any((x.get("outcome") or "") == "lead" for x in h):
+        return cur, ("staying on %s (%d documents, .%s): it holds an open LEAD - a construct measured "
+                     "and not yet landed. Finish it before anything else; a measured lead is worth more "
+                     "than a fresh attempt on any other class."
+                     % (cur, docs[cur], fmt)), rot
+
     if n >= MIN_ATTEMPTS_FOR_A_VERDICT and moved == 0:
         i = names.index(cur)
         nxt = cur

@@ -104,8 +104,8 @@
    {
     "at": "2026-11-21 19:10",
     "moved": 0,
-    "outcome": "reverted",
-    "reason": "tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is cl",
+    "outcome": "lead",
+    "reason": "RECLASSIFIED 21 Nov from \"reverted\" to \"lead\": the construct WAS measured through Google and the finding is committed - it is not a refuted idea, the implementation ran out of slot. tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is cl",
     "total": 15
    }
   ],

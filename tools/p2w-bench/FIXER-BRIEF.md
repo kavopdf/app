@@ -1798,3 +1798,50 @@ Not a tidy desk - a shorter path. One of these, every run, whichever is true:
 * one document closer to 99%, named
 
 **If none of those is true of your run, the run did not happen.**
+
+---
+
+# A LEAD IS NOT A FAILURE. RECORD IT AS ONE AND THE ROTATION WILL NOT WALK AWAY.
+
+The user, 21 Nov: *"kya rotation ki wajah se kisi ek cheez par kaam karna iske liye muskil hai... koi
+improvement nhi hua toh dusra class lekin jo lead mila hai usko chodna padta hoga"*
+
+**They had found a real hole.** The rotation's verdict was `sum(moved)`, so a run that measured a construct
+through Google and ran out of slot to implement it read as **zero progress** - and the rotation started
+counting towards leaving the class.
+
+That is exactly what happened at 19:10 on 21 Nov. A run measured `w:tblpPr`: a floating table renders its
+rule at y=399.5 for 400 asked and costs **0.00 pt of flow**, which unblocks `32_stroke_lines` - 145
+documents, 36.3 clean, the largest prize in the tool. The implementation did not land, the run recorded it
+as `reverted`, and the rotation saw 0 moved.
+
+**`reverted` means the idea was refuted. That idea was not refuted - it was proved.** The run had done the
+hard part and labelled it a failure.
+
+### So there are five outcomes, and the middle one matters most
+
+| outcome | means | rotation |
+|---|---|---|
+| `kept` | landed, measured, documents moved | stays |
+| `partial` | moved some, not finished | stays |
+| **`lead`** | **a construct was measured and is ready to emit; nothing landed yet** | **stays, and nothing else starts** |
+| `reverted` | tried and refuted by measurement | counts towards rotating |
+| `error` | could not be attempted | counts towards rotating |
+
+    python3 tools/p2w-bench/attempt.py --class "<class>" --outcome lead \
+        --reason "w:tblpPr measured: rule at y=399.5 for 400 asked, 0.00 pt flow. Emit a floating table
+                  per rule. Not implemented yet - the build is the next run's first job."
+
+**A class holding an open lead is not rotated away from, whatever its document count says.** Finish it or
+refute it. A measured lead is worth more than a fresh attempt on any other class, because the measuring is
+the expensive part and it is already done.
+
+### And the honest corollary
+
+**If you cannot land a lead in your slot, you must still record it** - the finding, the exact construct, and
+what is left to do. A lead that dies with your sandbox is the same as no lead at all, and the next run pays
+for the measurement again.
+
+**Three attempts died on "the patch is ready and there is no time to build and measure it" in one run on 21
+Nov.** That is a run that measured three things and landed none. The build is not the afterthought; on a
+slot with a lead in hand, **the build is the slot.**

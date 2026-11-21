@@ -66,7 +66,19 @@ CLASSES_TXT = os.path.join(HERE, "txt", "DEFECT-CLASSES-TXT.md")
 if not os.path.exists(CLASSES_TXT):
     CLASSES_TXT = os.path.join(HERE, "DEFECT-CLASSES-TXT.md")   # the old flat location, if it returns
 
-OUTCOMES = ("kept", "partial", "reverted", "error")
+OUTCOMES = ("kept", "partial", "lead", "reverted", "error")
+
+# "lead" IS NOT A FAILURE AND MUST NOT BE READ AS ONE.
+#
+# On 21 Nov a run measured w:tblpPr through Google - a floating table renders its rule at y=399.5 for
+# 400 asked and costs 0.00 pt of flow - which unblocked 32_stroke_lines, the largest class in the tool.
+# The implementation did not land in the slot, so the run recorded it as "reverted". The rotation counts
+# progress as sum(moved), so it read that as zero and started counting towards rotating AWAY from the
+# class - abandoning the one thing that had just been learned.
+#
+# A measured construct with its implementation pending is the most valuable state a class can be in. It
+# is not "kept" (nothing landed), it is not "reverted" (the idea was not refuted), and it is not "error"
+# (nothing went wrong). It is a lead, and the rotation must not walk away from it.
 
 
 # The class vocabulary, and the only thing that identifies a class cell. A class file also
