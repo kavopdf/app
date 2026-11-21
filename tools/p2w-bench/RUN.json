@@ -1,8 +1,8 @@
 {
  "started_ts": 1795240115.4342377,
  "started": "11:18",
- "ended_ts": null,
- "ended": null,
+ "ended_ts": 1795241180.4801383,
+ "ended": "11:36",
  "class": "t02_position",
  "attempts": 1,
  "kept": 0,

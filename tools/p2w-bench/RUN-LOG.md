@@ -198,3 +198,4 @@
 | 21 Nov 10:45 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 21 Nov 11:18 | fixer | slot claimed - fixer running |
 | 21 Nov 11:35 | fixer | attempt t02_position -> error |
+| 21 Nov 11:36 | fixer | slot FORCED released - see INCIDENTS.md for why |

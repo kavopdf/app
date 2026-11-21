@@ -527,5 +527,22 @@
   "obstacles_cleared": 0,
   "needs_human": 1,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795240115.4342377,
+  "started": "11:18",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "t02_position",
+  "attempts": 1,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   "32_sB-01",
+   "t02_A-01"
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
