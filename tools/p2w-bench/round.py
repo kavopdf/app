@@ -914,8 +914,19 @@ def main(argv):
         s2 = load()
         key = "fixer_started"
         if not s2.get(key):
-            print("no fixer claim to refresh")
-            return 1
+            # A RUN THAT HAS NOT CLAIMED YET IS STILL A RUN, AND IT IS THE ONE MOST LIKELY TO HANG.
+            #
+            # This returned 1 with nothing written, so the heartbeat the prompt puts immediately after the
+            # clone was a no-op: the claim comes later, at STEP 0. A run that hung anywhere between starting
+            # and claiming therefore left no beacon, no claim and no commit - which is exactly what the 07:57
+            # run did on 21 Nov, and it swallowed the 09:50 fire while every status line said healthy.
+            #
+            # So: always write the beacon. Without a claim it cannot refresh the slot, but the timeline entry
+            # is the only evidence that this run existed at all, and it is what gaps.py reads.
+            _timeline("beat", "heartbeat before any claim: "
+                      + (argv[argv.index("--doing") + 1] if "--doing" in argv else "started"))
+            print("no fixer claim to refresh - beacon written anyway")
+            return 0
         s2[key] = time.time()
         # WHAT IT IS DOING, NOT JUST THAT IT IS ALIVE.
         #
