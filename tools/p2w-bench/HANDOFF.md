@@ -86,7 +86,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `23:20` agent landed: t01_word_accuracy / B -> FINDINGS/ligature-identity-UNRECOVERABLE-2350.md
 - `23:23` attempt 7 on t01_word_accuracy -> reverted (0/5 moved)
 - `00:57` attempt 8 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:41` agent deployed: t01_word_accuracy / A - is the handed diagnosis (nested form matrix disagreement, rotated line off page)
@@ -111,6 +110,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `11:34` agent deployed: t02_position / A - is the two-line 47_margins/t02 claim a real two-format fix
 - `11:34` agent landed: 32_stroke_lines / B -> tools/p2w-bench/FINDINGS/32_stroke_lines-google-drop-113048-9597.md
 - `11:34` agent landed: t02_position / A -> tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md
+- `11:35` attempt 1 on t02_position -> error
 
 ## Where the rest of the state lives
 

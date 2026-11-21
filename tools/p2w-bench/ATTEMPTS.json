@@ -731,6 +731,30 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "t02_position": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-21 11:35",
+    "moved": null,
+    "outcome": "error",
+    "reason": "the two-line claim in FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md is refuted as a two-format fix, before any engine change: flippedPage reaches only buildPara (PdfToWord:3677), lineX is read only ",
+    "total": null
+   }
+  ],
+  "last": null,
+  "last_engine": "7112d76",
+  "outcomes": [
+   "error"
+  ],
+  "reason": "the two-line claim in FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md is refuted as a two-format fix, before any engine change: flippedPage reaches only buildPara (PdfToWord:3677), lineX is read only by TxtWriter (:5342-5345), and 47_margins already passes on all five t02 documents in benchmarks/gverify-lo. The third line as written deletes the only guard protecting 15_stamp_on_scanned_page (100% rotated glyphs at 9 deg, pageTurn does not catch it); if it is retried use 'if (g.dirx > -0.5f) return false;'. Root cause written, no document moved.",
+  "reasons": [
+   "the two-line claim in FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md is refuted as a two-format fix, before any engine change: flippedPage reaches only buildPara (PdfToWord:3677), lineX is read only by TxtWriter (:5342-5345), and 47_margins already passes on all five t02 documents in benchmarks/gverify-lo. The third line as written deletes the only guard protecting 15_stamp_on_scanned_page (100% rotated glyphs at 9 deg, pageTurn does not catch it); if it is retried use 'if (g.dirx > -0.5f) return false;'. Root cause written, no document moved."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "t08_line_order": {
   "attempts": 2,
   "first_seen": null,

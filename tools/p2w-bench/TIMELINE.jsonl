@@ -1470,3 +1470,11 @@
 {"t": 1795241095.1809628, "ist": "11:34:55", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795241095.8696444, "ist": "11:34:55", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795241096.447757, "ist": "11:34:56", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795241134.9641433, "ist": "11:35:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795241135.3633838, "ist": "11:35:35", "ev": "attempt", "d": "t02_position -> error"}
+{"t": 1795241135.4873674, "ist": "11:35:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795241135.6520488, "ist": "11:35:35", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795241138.2557516, "ist": "11:35:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795241139.5314975, "ist": "11:35:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795241140.3789046, "ist": "11:35:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795241140.939389, "ist": "11:35:40", "ev": "beat", "d": "report.py: building the report"}

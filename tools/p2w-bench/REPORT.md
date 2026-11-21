@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 11:18 → running IST · 16 min**
+**21 Nov 2026 · slot 11:18 → running IST · 17 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 0 attempt(s), 0 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,13 +20,14 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `t02_position` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 11:16 | **partial** | 0/5 | 601's last lost word was the reference counting General twice; guard added to glyph_truth (211 docs A/B: 0 newly failing, 1 newly clean on the patched engine). The engine /AP walk that supplies the ot |
+| 11:35 | **error** | None/None | the two-line claim in FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md is refuted as a two-format fix, before any engine change: flippedPage reaches only buildPara (PdfToWord:3677), lineX is read only |
 
 ## The txt
 
@@ -49,9 +50,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 11:18 → running · 16 min |
+| Slot window | 11:18 → running · 17 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 18 |
+| Tool beats | 22 |
 | Longest silence | **13.8 min** — from 11:19:36, after `pending.py: reading the pending gate` |
 | Silences over 2 min | 1 |
 | Obstacles | 1 cleared · 0 parked, with the evidence to re-open them |
@@ -62,8 +63,9 @@
 | Phase | Time | |
 |:--|--:|:--|
 | setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **13 min** | `####################` |
-| record - attempt, handoff, class rows | **1 min** | `##` |
+| measure or build - a conversion, screen or compile writes no beacon | **13 min** | `##################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
