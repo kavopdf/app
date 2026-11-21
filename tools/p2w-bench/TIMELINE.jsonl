@@ -1483,6 +1483,19 @@
 {"t": 1795241180.2788408, "ist": "11:36:20", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795241180.4372718, "ist": "11:36:20", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795241180.479038, "ist": "11:36:20", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795242096.6973062, "ist": "11:51:36", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795242120.8386884, "ist": "11:52:00", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795242120.9724329, "ist": "11:52:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795242127.1448436, "ist": "11:52:07", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795242401.8887978, "ist": "11:56:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795242440.9030945, "ist": "11:57:20", "ev": "beat", "d": "class=47_margins; target doc 392_statistical_console_output (its only Google failure); checking build toolchain"}
+{"t": 1795242590.8813264, "ist": "11:59:50", "ev": "beat", "d": "downloading corpus-v1 release (211 synthetic PDFs) so 392 can be converted and Google-rendered"}
+{"t": 1795242675.058937, "ist": "12:01:15", "ev": "beat", "d": "uploading 392 docx to Drive for a Google render (the only way to see 47_margins DETAIL)"}
+{"t": 1795242797.9712484, "ist": "12:03:17", "ev": "beat", "d": "calibration: 392 fails only 47_margins because Google substitutes Verdana for DejaVuSansMono; testing Courier New"}
+{"t": 1795242910.274893, "ist": "12:05:10", "ev": "beat", "d": "census: which corpus docs draw DejaVuSansMono; then font metric check before changing BASE14"}
+{"t": 1795242966.073069, "ist": "12:06:06", "ev": "beat", "d": "applying BASE14 dejavusansmono->Courier New + SAME_FACE entry; rebuild; then Google-render 4 mono docs in 47_margins"}
+{"t": 1795243175.7569828, "ist": "12:09:35", "ev": "beat", "d": "gate: running regress.py --check (full corpus ratchet, ~40 min) on the Courier New rename"}
+{"t": 1795243228.9147403, "ist": "12:10:28", "ev": "beat", "d": "corpus pass 1/4: gate.py --budget 250 to re-measure all 213 on the Courier New engine"}
 {"t": 1795243376.0671027, "ist": "12:12:56", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795243376.2077646, "ist": "12:12:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795243408.4106767, "ist": "12:13:28", "ev": "beat", "d": "gaps.py: reading the timeline"}
@@ -1490,6 +1503,8 @@
 {"t": 1795243450.0806923, "ist": "12:14:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795243482.872473, "ist": "12:14:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795243482.9897447, "ist": "12:14:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795243776.5342808, "ist": "12:19:36", "ev": "beat", "d": "corpus pass: P2W_ENGINE_SRC=/scratch/work/CS so the ratchet measures MY tree, not a fresh clone of origin/main"}
+{"t": 1795244782.2079067, "ist": "12:36:22", "ev": "beat", "d": "corpus pass: soffice now runs with its own UserInstallation profile; retrying measurement"}
 {"t": 1795244956.2607305, "ist": "12:39:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795244956.4385762, "ist": "12:39:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795244956.6086357, "ist": "12:39:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
@@ -1527,6 +1542,8 @@
 {"t": 1795245628.5526361, "ist": "12:50:28", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795245629.325572, "ist": "12:50:29", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795245629.6073167, "ist": "12:50:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795245726.0021975, "ist": "12:52:06", "ev": "beat", "d": "corpus pass: soffice warm-up fix verified (1 doc in 9s); running the 213-document ratchet"}
+{"t": 1795246605.1519685, "ist": "13:06:45", "ev": "beat", "d": "corpus pass 78/213, 3 calls to go"}
 {"t": 1795247280.0953746, "ist": "13:18:00", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795247280.2640438, "ist": "13:18:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795247287.6656606, "ist": "13:18:07", "ev": "beat", "d": "gaps.py: reading the timeline"}
@@ -1555,23 +1572,6 @@
 {"t": 1795248082.2185903, "ist": "13:31:22", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795248082.8385894, "ist": "13:31:22", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795248083.1402571, "ist": "13:31:23", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795242096.6973062, "ist": "11:51:36", "ev": "beat", "d": "gaps.py: reading the timeline"}
-{"t": 1795242120.8386884, "ist": "11:52:00", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1795242120.9724329, "ist": "11:52:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795242127.1448436, "ist": "11:52:07", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795242401.8887978, "ist": "11:56:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795242440.9030945, "ist": "11:57:20", "ev": "beat", "d": "class=47_margins; target doc 392_statistical_console_output (its only Google failure); checking build toolchain"}
-{"t": 1795242590.8813264, "ist": "11:59:50", "ev": "beat", "d": "downloading corpus-v1 release (211 synthetic PDFs) so 392 can be converted and Google-rendered"}
-{"t": 1795242675.058937, "ist": "12:01:15", "ev": "beat", "d": "uploading 392 docx to Drive for a Google render (the only way to see 47_margins DETAIL)"}
-{"t": 1795242797.9712484, "ist": "12:03:17", "ev": "beat", "d": "calibration: 392 fails only 47_margins because Google substitutes Verdana for DejaVuSansMono; testing Courier New"}
-{"t": 1795242910.274893, "ist": "12:05:10", "ev": "beat", "d": "census: which corpus docs draw DejaVuSansMono; then font metric check before changing BASE14"}
-{"t": 1795242966.073069, "ist": "12:06:06", "ev": "beat", "d": "applying BASE14 dejavusansmono->Courier New + SAME_FACE entry; rebuild; then Google-render 4 mono docs in 47_margins"}
-{"t": 1795243175.7569828, "ist": "12:09:35", "ev": "beat", "d": "gate: running regress.py --check (full corpus ratchet, ~40 min) on the Courier New rename"}
-{"t": 1795243228.9147403, "ist": "12:10:28", "ev": "beat", "d": "corpus pass 1/4: gate.py --budget 250 to re-measure all 213 on the Courier New engine"}
-{"t": 1795243776.5342808, "ist": "12:19:36", "ev": "beat", "d": "corpus pass: P2W_ENGINE_SRC=/scratch/work/CS so the ratchet measures MY tree, not a fresh clone of origin/main"}
-{"t": 1795244782.2079067, "ist": "12:36:22", "ev": "beat", "d": "corpus pass: soffice now runs with its own UserInstallation profile; retrying measurement"}
-{"t": 1795245726.0021975, "ist": "12:52:06", "ev": "beat", "d": "corpus pass: soffice warm-up fix verified (1 doc in 9s); running the 213-document ratchet"}
-{"t": 1795246605.1519685, "ist": "13:06:45", "ev": "beat", "d": "corpus pass 78/213, 3 calls to go"}
 {"t": 1795248443.7776341, "ist": "13:37:23", "ev": "beat", "d": "corpus complete 212/213 (416 exempt); running gate.py to publish RANKING.csv and compare"}
 {"t": 1795248796.579037, "ist": "13:43:16", "ev": "beat", "d": "font rename reverted (it regressed 392 and 406); gate check on the tooling fixes only"}
 {"t": 1795248820.9632912, "ist": "13:43:40", "ev": "beat", "d": "attempt.py: recording an attempt"}
@@ -1688,6 +1688,11 @@
 {"t": 1795259008.2179492, "ist": "16:33:28", "ev": "beat", "d": "213/213 converted; scoring the txt corpus with verify_txt via restamp_txt --run"}
 {"t": 1795259131.5966203, "ist": "16:35:31", "ev": "beat", "d": "gate PASS on txt; committing the patch"}
 {"t": 1795259268.3394947, "ist": "16:37:48", "ev": "beat", "d": "HEAD rebuilt; converting all 213 to out-head for a byte-for-byte docx proof (replaces the 140-doc sample)"}
+{"t": 1795260633.207604, "ist": "17:00:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795260633.4629996, "ist": "17:00:33", "ev": "attempt", "d": "t02_position -> partial"}
+{"t": 1795260633.5773296, "ist": "17:00:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795260633.7145777, "ist": "17:00:33", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795261609.0837011, "ist": "17:16:49", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795261952.8948312, "ist": "17:22:32", "ev": "beat", "d": "reconciled: the other fixer landed the same patch; clearing the dead pBdr carry-over and writing the report"}
 {"t": 1795261953.0278392, "ist": "17:22:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795261953.1852117, "ist": "17:22:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
@@ -1712,11 +1717,6 @@
 {"t": 1795262155.747824, "ist": "17:25:55", "ev": "attempt", "d": "47_margins -> reverted"}
 {"t": 1795262155.896671, "ist": "17:25:55", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795262156.0585508, "ist": "17:25:56", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795260633.207604, "ist": "17:00:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795260633.4629996, "ist": "17:00:33", "ev": "attempt", "d": "t02_position -> partial"}
-{"t": 1795260633.5773296, "ist": "17:00:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795260633.7145777, "ist": "17:00:33", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795261609.0837011, "ist": "17:16:49", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795262952.3870354, "ist": "17:39:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795262952.601115, "ist": "17:39:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795262952.8823023, "ist": "17:39:12", "ev": "attempt", "d": "32_stroke_lines -> reverted"}
@@ -1753,4 +1753,6 @@
 {"t": 1795263345.3018851, "ist": "17:45:45", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795263346.730946, "ist": "17:45:46", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795263347.317893, "ist": "17:45:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795266972.3739192, "ist": "18:46:12", "ev": "beat", "d": "heartbeat before any claim: relay: new brief read - metric is CLEAN not affected; running --leverage"}
 {"t": 1795267175.053026, "ist": "18:49:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795267247.050415, "ist": "18:50:47", "ev": "beat", "d": "heartbeat before any claim: relay: committing the cell-border finding, then the t08 line-order falsification"}
