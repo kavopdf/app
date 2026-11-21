@@ -18,7 +18,7 @@ SHAPE of those displacements names the mechanism:
   horizontal-scale   dx grows with x - font size, character spacing, column width
   column-width       dx large and dy small, confined to one x band - a table column
   element-block      a run of adjacent lines far off, the rest clean - one table or image
-  scattered          none of the above - needs a human to look
+  scattered          none of the above - a different approach is needed, not a person
 
     python3 tools/p2w-bench/cause.py --docs a,b,c        # classify these
     python3 tools/p2w-bench/cause.py --open --limit 20   # the worst N open documents
@@ -189,7 +189,7 @@ def report():
             "horizontal-scale": "font size, character spacing or column width",
             "column-width": "table column widths",
             "element-block": "one table or image and the flow around it",
-            "scattered": "needs a human to look at one",
+            "scattered": "none of the known shapes - try a different approach",
             "not-built": "the docx was never built",
             "error": "the render failed"}
     for cause, docs in sorted(by.items(), key=lambda t: -len(t[1])):

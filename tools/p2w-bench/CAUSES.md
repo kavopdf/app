@@ -10,7 +10,7 @@ against the line the PDF drew and classifying the SHAPE of the displacement.
 | cause | documents | what one fix would serve |
 |---|---:|---|
 | `clean` | **4** |  |
-| `scattered` | **1** | needs a human to look at one |
+| `scattered` | **1** | none of the known shapes - try a different approach |
 | `page-shift` | **1** | margins, page size or an offset applied to the whole sheet |
 
 ## Documents

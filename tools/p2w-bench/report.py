@@ -977,7 +977,7 @@ def main(argv):
                      % (si["longest"]["min"], si["longest"]["at"], si["longest"]["doing"]))
         L.append("| Silences over 2 min | %d |" % si["n"])
     ob = obstacles()
-    L.append("| Obstacles | %d cleared · %d need a human |" % (ob["mine"], ob["human"]))
+    L.append("| Obstacles | %d cleared · %d parked, with the evidence to re-open them |" % (ob["mine"], ob["human"]))
     if ob.get("human"):
         L.append("| Still a wall | %s |" % ob["last"])
     L.append("")
@@ -1020,7 +1020,7 @@ def main(argv):
 
     nh = len(h.get("needs_human") or [])
     if nh:
-        L.append("> **%d item(s) need a human** — see the top of `HANDOFF.md`." % nh)
+        L.append("> **%d item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`." % nh)
         L.append("")
 
     L.append("---")

@@ -55,33 +55,47 @@ its own, it says so in one line and stops. That is not a wasted slot - it is the
 
 ## What a fixer run does, in order, every time
 
-1. `stage.py` - is it `fix`? If not, stop.
-2. `gverify.py --report` - which check fails the most documents. That is the class to take.
-3. **Read `FINDINGS/` first.** Four fixes are already measured and recorded. Re-deriving one of them is
-   the most expensive thing a run can do.
-4. Change ONE construct. Not a refactor, not a rewrite, not two constructs because they look related.
-5. Measure it on the documents it can affect, through Google: upload, export, `verify_google.py`.
-6. **Better or equal, and nothing worse, or revert.** A change that scores the same is not kept - it is
-   risk with no gain.
-7. Commit the measurement whether it helped or not. A recorded negative result is worth more than an
-   unrecorded idea, because it stops the next run spending a slot on it.
+**`round.py` decides the turn, not `stage.py`.** `stage.py` belongs to the gverify cron and tracks a
+different question - which measurement is behind. While the Google measurement is incomplete the two
+disagree by design, and that is not a blocker.
 
-## What is settled and must not be re-litigated
+1. `round.py --phase` - is it `fix`? If not, say so and stop. **Not `stage.py`.**
+2. `round.py --claim-fixer` - take the slot, or stop if another run holds it.
+3. `classpick.py` - it prints the class and the reason. **That is the class.** It ranks by how many
+   documents each one costs in GOOGLE and rotates; it is not the same thing as "whichever check
+   `gverify.py --report` lists first", which is why this line used to say that and was wrong.
+4. **Read `FINDINGS/` first.** Everything already measured is in there. Re-deriving one of them is the
+   most expensive thing a run can do.
+5. Change ONE construct. Not a refactor, not a rewrite, not two constructs because they look related.
+
+## What is settled - and what re-opens it
+
+These were measured, not argued. They stay unless a measurement contradicts them.
 
 * **The renderer is Google Docs.** LibreOffice is a fast local proxy that hides the faults the phone
-  shows: on the same 50 documents, LibreOffice passes 23 and Google passes 7.
+  shows. Measured 21 Nov on the full corpus: LibreOffice passes 122 of 213, Google passes 7 of the 192
+  it can score. (This line said "23 and 7 on the same 50 documents" until 21 Nov - true when it was
+  written, stale by then. **The numbers in a settled decision age like everything else.**)
 * **The model is flowing text.**
 * **No engine rewrite.** One construct, one measurement, one commit.
 * **Nothing changes without a measurement before and after.**
 * **`share@5px` is not a cross-renderer measure.** Use the 42 checks.
 * **A refused document is not a pass.**
 
+**"Settled" means settled until the evidence changes, not settled for ever.** If a measurement
+contradicts one of these, that is not re-litigating - that is the pipeline learning. Write the
+contradiction into `BLOCKERS.md` with the measurement, act on the measurement, and say in the report that
+a settled decision moved and why. **What is not allowed is re-arguing one of these from opinion.**
+
 ## When something is blocked
 
-Not every wall is a code problem. If a run cannot proceed, it writes the blocker to `BLOCKERS.md` with
-what it tried, and stops. The next run reads it. A blocker that is written down is a decision someone
-can make; a blocker that is not is a month.
+Not every wall is a code problem, and almost none of them needs a person. **Decide, record, continue.**
 
+A run that stops to wait has ended the work: the next run starts from the same question with less
+context. So take the reversible decision on the evidence you have, write it into `BLOCKERS.md` with that
+evidence and what would overturn it, and carry on with the next thing. The only wall that genuinely
+stops a run is a permission or a tool that does not exist - and even then, state the exact call and the
+exact error, then work on something else this slot.
 ---
 
 ## STARTING A RUN WHEN THE LAST ONE DIED

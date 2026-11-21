@@ -57,12 +57,17 @@ def render(d):
     L = ["# HANDOFF - read this before you pick a class", ""]
     nh = d.get("needs_human") or []
     if nh:
-        L.append("## NEEDS A HUMAN - no future run can clear these")
+        # "NEEDS A HUMAN - no future run can clear these" was the header here, and it was the most
+        # expensive sentence in the repository: it told every run that followed not to bother. Nobody
+        # is coming. What a run actually leaves behind is a wall plus the evidence about it, and the
+        # next run has every right to try a different approach through it.
+        L.append("## PARKED - what was tried, and what would re-open it")
         L.append("")
-        L.append("A run tried, could not, and it was not a system limit. Every run after this one")
-        L.append("will hit the same wall until one of these is changed by a person.")
+        L.append("A run tried these and could not get through. That is a record of one approach, not a")
+        L.append("verdict on the problem: the next run may take any of them again with a genuinely")
+        L.append("different idea. What is not worth repeating is the attempt listed below.")
         L.append("")
-        L.append("| # | what it is | what was tried | what must change | when |")
+        L.append("| # | what it is | what was tried | what would re-open it | when |")
         L.append("|---|---|---|---|---|")
         for n, x in enumerate(nh):
             L.append("| %d | %s | %s | %s | %s |" % (
