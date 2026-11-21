@@ -26,7 +26,11 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> The U+FFFD root cause is known (CMap destination), but TWO agents disagree on whether the fix is right and the .txt measurement cannot settle it: pymupdf resolves Identity fonts the same way, so agreement between extractors is not evidence. FIRST ACTION NEXT RUN: render page 1 of 041122-Account_Opening_Form at 150 DPI and look at the 127 glyph sites - ligature or not. If ligature, the fix is CIDToGIDMap plus the descendant cmap; if not, apply FINDINGS/fffd-cmap-destination-2300-fixer.patch. Read FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md before touching the engine.
+> stage.py was reporting 'classify' on every fresh clone for a day, and three watchdog passes blamed the classifier cron for it. The cause was in stage.py, not the cron: it compared benchmarks/DEFECT-CLASSES.md (the previous pipeline's ghost, which nothing regenerates) against the gverify results by filesystem mtime, and a git clone stamps every file with the checkout time, so the comparison was decided by unpack order - measured 21 Nov, 05:47:52 against 05:47:53. Fixed and pushed de5d216: the live table is DEFECT-CLASSES-GOOGLE.md and currency is judged by the last commit touching each path (gverify 42bdcda 01:44:38, table e86a88a 04:47:32). stage.py now reads 'fix' with 185 failing documents, and both negative tests still fire. Two agents landed: 32_stroke_lines is the biggest open Google class (145 docs, 144 of them LibreOffice-draws-Google-drops) and its root cause is that every standalone rule leaves DocxWriter.shape() at line 2772 as a floating <w:drawing>/<wp:anchor>, which google_safe.py already lists twice as ignored by Google; FINDINGS/RULES-PBDR-IMPLEMENTATION.md holds the measured pBdr replacement (0 -> 2 rules on the probe document) and the ctx.flowY = s.topPt line whose omission turns it into a regression. The t02_position two-line claim from 47_margins-TXT-HALF-IS-T02-1055-f1x.md is REFUTED as a two-format fix: flippedPage reaches only buildPara, lineX is read only by TxtWriter, and 47_margins already passes on all five t02 documents in the stored LibreOffice table. Its third line as written deletes the only guard protecting 15_stamp_on_scanned_page; use 'if (g.dirx > -0.5f) return false;' instead.
+
+## What the next run should do first
+
+> Land the pBdr rule replacement: FINDINGS/RULES-PBDR-IMPLEMENTATION.md, first statement of DocxWriter.shape() at line 2772 (return before line 2779), carrying the ctx.flowY = s.topPt update. Screen 32_stroke_lines first, then the full corpus pass. The finding predicts 124 documents cleared among the 144 LibreOffice-only ones, and all 145 if the residual is only the footer rule.
 
 ## Agents deployed and not yet accounted for
 
@@ -74,16 +78,14 @@ unfinished work, not as a result.
 | t01_B-02 | t01_word_accuracy | B | why does 39_small_caps_letter_spacing lose 8 words and invent 2 - writ | 01:41 | 01:20 | landed | FINDINGS/39-small-caps-gap-threshold-0150-fixer.md |
 | t01_A-03 | t01_word_accuracy | A | census of every widget appearance stream over all 213 documents - how  | 04:36 | a blast radius small enough to measure in one run | landed | FINDINGS/widget-ap-glyph-walk-0436-f1x.md |
 | t01_B-03 | t01_word_accuracy | B | implement the /AP /N glyph walk in its own clone and measure 601 and t | 04:36 | 601 from 37/42 to 42/42 docx checks, with the instrument's own answer for a tick | landed | FINDINGS/widget-ap-glyph-walk-0436-f1x.md |
+| 32_sB-01 | 32_stroke_lines | B | why Google drops the rules LibreOffice draws, and which construct repl | 11:34 | landed | landed | tools/p2w-bench/FINDINGS/32_stroke_lines-google-drop-113048-9597.md |
+| t02_A-01 | t02_position | A | is the two-line 47_margins/t02 claim a real two-format fix | 11:34 | landed | landed | tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `23:16` attempt 6 on t01_word_accuracy -> kept (2/7 moved)
-- `23:20` agent deployed: t01_word_accuracy / A - is the U+FFFD glyph a ligature or a single letter, read from the embedded outlin
-- `23:20` agent deployed: t01_word_accuracy / B - how many of the 213 documents a cmap-based recovery would reach, and does any em
-- `23:20` agent landed: t01_word_accuracy / A -> FINDINGS/ligature-identity-UNRECOVERABLE-2350.md
 - `23:20` agent landed: t01_word_accuracy / B -> FINDINGS/ligature-identity-UNRECOVERABLE-2350.md
 - `23:23` attempt 7 on t01_word_accuracy -> reverted (0/5 moved)
 - `00:57` attempt 8 on t01_word_accuracy -> reverted (0/5 moved)
@@ -105,6 +107,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `07:16` attempt 13 on 47_margins -> partial (0/26 moved)
 - `10:39` attempt 14 on t01_word_accuracy -> reverted (0/213 moved)
 - `11:16` attempt 15 on t01_word_accuracy -> partial (0/5 moved)
+- `11:34` agent deployed: 32_stroke_lines / B - why Google drops the rules LibreOffice draws, and which construct replaces them
+- `11:34` agent deployed: t02_position / A - is the two-line 47_margins/t02 claim a real two-format fix
+- `11:34` agent landed: 32_stroke_lines / B -> tools/p2w-bench/FINDINGS/32_stroke_lines-google-drop-113048-9597.md
+- `11:34` agent landed: t02_position / A -> tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md
 
 ## Where the rest of the state lives
 

@@ -716,9 +716,25 @@
   {
    "at": "11:16",
    "text": "attempt 15 on t01_word_accuracy -> partial (0/5 moved)"
+  },
+  {
+   "at": "11:34",
+   "text": "agent deployed: 32_stroke_lines / B - why Google drops the rules LibreOffice draws, and which construct replaces them"
+  },
+  {
+   "at": "11:34",
+   "text": "agent deployed: t02_position / A - is the two-line 47_margins/t02 claim a real two-format fix"
+  },
+  {
+   "at": "11:34",
+   "text": "agent landed: 32_stroke_lines / B -> tools/p2w-bench/FINDINGS/32_stroke_lines-google-drop-113048-9597.md"
+  },
+  {
+   "at": "11:34",
+   "text": "agent landed: t02_position / A -> tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md"
   }
  ],
- "next": "",
+ "next": "Land the pBdr rule replacement: FINDINGS/RULES-PBDR-IMPLEMENTATION.md, first statement of DocxWriter.shape() at line 2772 (return before line 2779), carrying the ctx.flowY = s.topPt update. Screen 32_stroke_lines first, then the full corpus pass. The finding predicts 124 documents cleared among the 144 LibreOffice-only ones, and all 145 if the residual is only the footer rule.",
  "agents": [
   {
    "id": "contA-01",
@@ -1213,6 +1229,30 @@
    "finding": "FINDINGS/widget-ap-glyph-walk-0436-f1x.md",
    "deployed_at": "2026-11-20T23:06",
    "landed_at": "2026-11-20T23:06"
+  },
+  {
+   "id": "32_sB-01",
+   "class": "32_stroke_lines",
+   "angle": "B",
+   "question": "why Google drops the rules LibreOffice draws, and which construct replaces them",
+   "expected": "landed",
+   "deployed": "11:34",
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/32_stroke_lines-google-drop-113048-9597.md",
+   "deployed_at": "2026-11-21T06:04",
+   "landed_at": "2026-11-21T06:04"
+  },
+  {
+   "id": "t02_A-01",
+   "class": "t02_position",
+   "angle": "A",
+   "question": "is the two-line 47_margins/t02 claim a real two-format fix",
+   "expected": "landed",
+   "deployed": "11:34",
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md",
+   "deployed_at": "2026-11-21T06:04",
+   "landed_at": "2026-11-21T06:04"
   }
  ],
  "run": {
@@ -1322,7 +1362,7 @@
    "plan": ""
   }
  ],
- "context": "The U+FFFD root cause is known (CMap destination), but TWO agents disagree on whether the fix is right and the .txt measurement cannot settle it: pymupdf resolves Identity fonts the same way, so agreement between extractors is not evidence. FIRST ACTION NEXT RUN: render page 1 of 041122-Account_Opening_Form at 150 DPI and look at the 127 glyph sites - ligature or not. If ligature, the fix is CIDToGIDMap plus the descendant cmap; if not, apply FINDINGS/fffd-cmap-destination-2300-fixer.patch. Read FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md before touching the engine.",
+ "context": "stage.py was reporting 'classify' on every fresh clone for a day, and three watchdog passes blamed the classifier cron for it. The cause was in stage.py, not the cron: it compared benchmarks/DEFECT-CLASSES.md (the previous pipeline's ghost, which nothing regenerates) against the gverify results by filesystem mtime, and a git clone stamps every file with the checkout time, so the comparison was decided by unpack order - measured 21 Nov, 05:47:52 against 05:47:53. Fixed and pushed de5d216: the live table is DEFECT-CLASSES-GOOGLE.md and currency is judged by the last commit touching each path (gverify 42bdcda 01:44:38, table e86a88a 04:47:32). stage.py now reads 'fix' with 185 failing documents, and both negative tests still fire. Two agents landed: 32_stroke_lines is the biggest open Google class (145 docs, 144 of them LibreOffice-draws-Google-drops) and its root cause is that every standalone rule leaves DocxWriter.shape() at line 2772 as a floating <w:drawing>/<wp:anchor>, which google_safe.py already lists twice as ignored by Google; FINDINGS/RULES-PBDR-IMPLEMENTATION.md holds the measured pBdr replacement (0 -> 2 rules on the probe document) and the ctx.flowY = s.topPt line whose omission turns it into a regression. The t02_position two-line claim from 47_margins-TXT-HALF-IS-T02-1055-f1x.md is REFUTED as a two-format fix: flippedPage reaches only buildPara, lineX is read only by TxtWriter, and 47_margins already passes on all five t02 documents in the stored LibreOffice table. Its third line as written deletes the only guard protecting 15_stamp_on_scanned_page; use 'if (g.dirx > -0.5f) return false;' instead.",
  "needs_human": [
   {
    "at": "10:40",
