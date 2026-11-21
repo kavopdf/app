@@ -111,3 +111,18 @@ pass, and the number to beat is `4 improved / 24 worse` becoming `2+ improved / 
 by method name and cannot see that `benchmarks/p2w.py` is a measurement tool, not the engine. It
 cannot move either format. The gate is right to pass; the sentence is wrong. Left standing, recorded
 here, because a wording change should not ride along with a measurement.
+
+## A fourth: `round.py --release-fixer` blames this run for a concurrent run's commit
+
+Released 19:31:
+
+    refused: the engine changed this run (2d44a3a -> 462353f) and no attempt was kept.
+
+`git diff --stat origin/main -- app/` is **empty** - the tree's engine is byte-identical to main.
+`462353f` is the previous run's `t02_position` commit, which landed on main while this run held the
+slot and was measured on all 213 documents before it landed. The guard compares the commit the slot
+started on against the one it ends on, so any commit that lands from another run during a slot reads
+as this run's unmeasured engine change. Released with `--force` and this note, which is what the
+guard's own message asks for when nothing unmeasured is actually shipping. The guard should compare
+the engine **files** (`git diff origin/main -- app/src`) rather than commit ids - not fixed here,
+because a release-path change should not ride along with a measurement.
