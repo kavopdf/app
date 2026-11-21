@@ -57,10 +57,52 @@ def _names():
     return sorted(f[:-5] for f in os.listdir(OUT) if f.endswith(".docx"))
 
 
+def _engine_now():
+    """The engine commit the corpus is built from right now."""
+    import subprocess as _sp
+    try:
+        r = _sp.run(["git", "-C", ROOT, "log", "-1", "--format=%h", "--",
+                     "app/src/main/java/com/kavopdf/app/engine/"],
+                    capture_output=True, text=True, timeout=20)
+        return (r.stdout or "").strip()
+    except Exception:
+        return ""
+
+
 def _done():
+    """Documents whose Google result is a measurement OF THE CURRENT ENGINE.
+
+    A FILE ON DISK IS NOT A MEASUREMENT. This returned every .json in the directory, so once all 213
+    existed `plan()` printed "213 of 213 have a Google result; 0 to go" and the gverify cron did nothing,
+    every hour, reporting success - while the results were two days old and 21 of them were
+    page_count_refused, which is not a score at all. Measured 21 Nov: the newest real Google result was
+    19 Nov 19:02, four engine commits behind, and the fixer was optimising against it.
+
+    So a document counts as done only when its result carries the CURRENT engine stamp. Results written
+    before the stamp existed carry none, which is the honest answer - nobody can say what engine they
+    measured - and they are re-measured once.
+
+    A page_count_refused result IS done: it is a real, recorded outcome (Google reflowed the document)
+    and re-running it every hour would loop for ever. It is counted, reported, and left alone.
+    """
     if not os.path.isdir(RES):
         return set()
-    return {f[:-5] for f in os.listdir(RES) if f.endswith(".json")}
+    now = _engine_now()
+    out = set()
+    for f in os.listdir(RES):
+        if not f.endswith(".json"):
+            continue
+        name = f[:-5]
+        try:
+            d = json.load(open(os.path.join(RES, f), encoding="utf-8"))
+        except Exception:
+            continue
+        if d.get("status") == "page_count_refused":
+            out.add(name)          # a recorded outcome, not a missing one
+            continue
+        if now and d.get("engine") == now:
+            out.add(name)
+    return out
 
 
 def plan(n):
