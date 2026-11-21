@@ -1,6 +1,3 @@
-| 13 Nov 11:24 | classifier | slot claimed - classifier running |
-| 16 Nov 06:07 | baseline | slot claimed - baseline running |
-| 16 Nov 07:46 | classifier | slot claimed - classifier running |
 | 16 Nov 07:48 | fixer | slot claimed - fixer running |
 | 16 Nov 08:53 | fixer | slot claimed - fixer running |
 | 16 Nov 03:42 | fixer | attempt content-missing-partly-replaced -> error (0/? moved) |
@@ -199,3 +196,5 @@
 | 21 Nov 23:15 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 21 Nov 23:37 | fixer | attempt 05_chars_extra -> kept (11/192 moved) |
 | 21 Nov 23:50 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 21 Nov 23:57 | fixer | slot claimed - fixer running |
+| 22 Nov 00:12 | fixer | attempt 32_stroke_lines -> lead (0/192 moved) |

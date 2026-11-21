@@ -844,6 +844,10 @@
   {
    "at": "23:37",
    "text": "attempt 1 on 05_chars_extra -> kept (11/192 moved)"
+  },
+  {
+   "at": "00:12",
+   "text": "attempt 8 on 32_stroke_lines -> lead (0/192 moved)"
   }
  ],
  "next": "Judge the t08 verifier question before touching the engine: is t08_line_order measuring line order or drawing order? FINDINGS/t08_line_order-DRAWING-ORDER-1740.md has the numbers (10 of 10 rows clear when only our own line sequence is put into drawing order). The agent's proposed one-line sort of _src_pages is NOT obviously right - it would compare sorted-vs-sorted. Decide with a falsification: construct a .txt whose lines are deliberately swapped in y and confirm t08 still fires after the change. Then take t01_word_accuracy's .docx half or 32_stroke_lines' cell-border construct.",

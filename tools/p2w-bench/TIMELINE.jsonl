@@ -1964,3 +1964,12 @@
 {"t": 1795286395.165278, "ist": "00:09:55", "ev": "beat", "d": "converting all 213 to test: does 32 fail iff the docx carries no table-cell border"}
 {"t": 1795286516.5385041, "ist": "00:11:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795286528.9215398, "ist": "00:12:08", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795286530.7895062, "ist": "00:12:10", "ev": "attempt", "d": "32_stroke_lines -> lead"}
+{"t": 1795286530.9005685, "ist": "00:12:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795286531.0319583, "ist": "00:12:11", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795286536.3056343, "ist": "00:12:16", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795286541.270346, "ist": "00:12:21", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795286541.9792652, "ist": "00:12:21", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795286560.9648952, "ist": "00:12:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795286561.57244, "ist": "00:12:41", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795286561.8964698, "ist": "00:12:41", "ev": "beat", "d": "report.py: building the report"}

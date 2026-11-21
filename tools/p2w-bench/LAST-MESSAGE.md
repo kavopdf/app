@@ -1,17 +1,16 @@
-**21 Nov 2026 · slot 23:19 → running IST · 30 min**
+**22 Nov 2026 · slot 23:57 → running IST · 14 min**
 
-> The largest class in the corpus was not a rendering defect at all. `05_chars_extra` failed 141 of
-> the 192 scored documents, and every one of them was failing on a character Google's exporter
-> writes to mark a **tab advance** — one `U+200B` per `<w:tab/>` in the `.docx`. The separation on
-> the corpus is total: 141 fail, all with tabs; 51 pass, none with tabs. I proved it causally by
-> deleting 23 tabs from one document's own `.docx` and watching 23 characters disappear. The check
-> now ignores zero-width characters, symmetrically, and 11 of 11 measured documents cleared `05`.
+> `32_stroke_lines` is not a hard class, it is a wrong carrier. Across the 192 scored documents
+> **not one document passes it on a rule carried as a floating `<w:drawing>`** — 76 of 76 fail.
+> The only two documents that carry a source rule *and* pass carry it as a **table-cell border**.
+> The class has been chasing a shape Google cannot see; `w:tcBorders` is the construct that
+> survives, and last slot's carrier patch already proved it on two more documents.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **11** — 1 attempt(s), 1 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,72 +19,66 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `05_chars_extra` |
-
-The **6** is the committed corpus record and it is now stale by construction: this slot changed the
-verifier, and 141 stored `05` verdicts are false until the next Google pass re-scores them. Two
-documents reached **42/42** on this slot's own fresh Google measurement and are not in that 6 —
-`394_map_with_legend` (41 → 42) and `45_coloured_callout_box` (40 → 42).
+| Working on | `32_stroke_lines` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 23:13 | **lead** | 0/192 | CHECK BLIND TO PICTURES, measured both ways. _rule_segments() walks get_drawings() only; Google exports every anchored shape as a raster image, so a rule it drew reads as zero |
-| 23:38 | **lead** | 0/192 | THE RULE CARRIER IS WORTH TWO DOCUMENTS, NOT 32. Applied, built, 11 documents through Google: `394` 41→42, `45` 40→42 with the `05` correction, clean control `51` stayed 42/42, seven others gained the `05` check only. Not landed: it changes 146 rule-carrying documents and 9 were measured |
-| 23:52 | **kept** | 11/192 | `05_chars_extra` WAS COUNTING GOOGLE'S TABS. 141 fail / 141 with tabs, 51 pass / 51 without, no exception. Causal on `17`: its own `.docx` minus 23 tabs exports with 0 extras. `norm_text()` now strips `U+200B`/`U+FEFF` on both sides |
+| 00:20 | **lead** | 0/192 | THE DRAWING CARRIER HAS NEVER PASSED IN GOOGLE. All 213 converted, cross-tabulated against the 192 committed Google verdicts: 76 documents carry a rule as a floating `<w:drawing>` and no border — **all 76 fail**; the 2 documents with a source rule that pass (`373`, `64`) carry it as a `w:tcBorders` border; 0 documents pass with rules and no border; 0 fail with no source rules |
 
 ## The class I chose, and why
 
-`classpick.py` suggested staying on `32_stroke_lines` because it holds an open lead. I took the
-instrument question inside that lead instead, and the arithmetic is why: `05_chars_extra` is worth
-**35.0 clean documents** by `classpick.py --leverage`, and it sits on 141 documents — three quarters
-of the scored corpus. A check that fails 141 documents for a reason no engine can fix is not a lead,
-it is a false floor under every other class, and two consecutive runs spent their slots chasing the
-"anchor becomes a stray U+200B" story that this measurement replaces.
+`classpick.py` suggested `t08_line_order` — a `.txt` check worth 10 documents in the renderer nobody
+opens. I took `32_stroke_lines` instead, and the arithmetic is why. Sixteen documents fail **exactly
+`{05_chars_extra, 32_stroke_lines}`** and nothing else: `17`, `18`, `19`, `24`, `26`, `32`, `34`,
+`37`, `45`, `47`, `49`, `53`, `74`, `315`, `334`, `product-catalogue-code-left-price-right`. `05`
+was cleared instrumentally last slot, so those sixteen are **one construct from clean**, and two
+more (`394`, `407`) fail `32` alone. Eighteen documents hang on this one class, in Google. No `.txt`
+class comes near it.
 
-The `32` lead was not abandoned. It was measured first, and it is now a lead with a number instead of
-an assumption: the carrier patch is worth two documents, not the 32 the census promised.
+The class also carries the five-check family `classpick.py` names as one construct — `05`, `18`,
+`32`, `59`, `25` — which the tool measures at **51 clean documents** if all five clear.
 
-## Why the carrier is a lead and not a fix
+## Why this is a lead and not a fix
 
-`patches/rule-carrier-per-rule-2008.patch` applies cleanly and works. Eleven documents through Google:
+The measurement refutes the carrier the engine ships and confirms the one it does not. It does not
+place the rules. The carrier patch (`patches/rule-carrier-per-rule-2008.patch`, rules as 1×1
+floating tables with `tcBorders`) puts `394` at 42/42 and `45` at 42/42, and still loses **one of
+two** carriers on the other sixteen, which read `{source: 2, render: 1}`.
 
-| document | committed | carrier | carrier + `05` |
-|:--|--:|--:|--:|
-| `394_map_with_legend` | 41/42 | **42/42** | 42/42 |
-| `45_coloured_callout_box` | 40/42 | 41/42 | **42/42** |
-| `51_two_cm_margins` (clean control) | 42/42 | 42/42 | 42/42 |
-| `17`, `18`, `19`, `24`, `26`, `53`, `74` | 40/42 | 40/42 | 41/42 |
-| `73_marksheet_subject_marks_grade` | 39/42 | 39/42 | 40/42 |
+A subagent read the XML of `17`, `45`, `53`, `74`, `394` and killed my first hypothesis. The carriers
+are **byte-identical** between `45` (both placed) and `17` (one lost): same `tblpX/tblpY`, same
+`trHeight 1 exact`, same `tcBorders`. Not the anchor context either — every carrier in all five
+documents is body-level, none inside a `w:tbl` or `w:txbxContent`. The only property that separates
+them is **position in the block sequence**: in `17`/`53`/`74` the two carriers are the **last two
+blocks of `<w:body>`**, with nothing after them; every placed carrier in `394` and `45` has a
+paragraph after it or between it and the next carrier.
 
-Nothing got worse — and that is the whole of what I can say. It changes the construct on **146**
-documents that carry a rule; I measured **9** of them. "No document gets worse" cannot be asserted
-for the other 137 inside one slot, so it stays measured and unlanded rather than landed and unproven.
-
-## The one thing that stops the class, and it is one number
-
-`32_stroke_lines` on `17`/`53`/`74` reads `{"source": 2, "render": 1}`: two rules on the page, two
-carriers emitted, **one placed**. `45` has the identical two rules at the identical positions and
-loses none. `394` places five on one page. So the construct is not wrong and the count is not the
-limit — something about where the second anchor sits in those three documents is. That is the next
-probe, and it is one Google round trip, not a build.
+That is a correlation on five documents, so it is stated as one and the falsification is written
+down: append one empty `<w:p/>` after each carrier and re-read `17`/`53`/`74`. `{2, 2}` and sixteen
+documents go clean; `{2, 1}` and the cause is elsewhere.
 
 ## Falsification
 
-The claim was that a tab becomes a character. Two ways to break it, and both were run:
+The claim was "a drawing-carried rule never passes". Three ways to break it, all run on the whole
+corpus:
 
 | test | expected if the claim is right | measured |
 |:--|:--|:--|
-| all 192 documents: does every `05` failure carry a tab, and does every pass carry none? | total separation | **141/141 and 51/51 — no exception** |
-| `17`'s own `.docx` with only its 23 `<w:tab/>` deleted | 23 fewer extras, nothing else | **`{'U+200B': 23}` → `{}`** |
-| the 5 documents already clean in Google | 0 tabs | **0 tabs in all 5** |
-| `test_checks.py` after the change | 44/44 unchanged | **44/44** |
+| documents with a source rule, no border, passing `32` | 0 | **0** |
+| documents with a source rule and a border, passing `32` | at least 1, else the border story is unsupported | **2** — `373`, `64` |
+| documents with no source rule failing `32` | 0 | **0** |
 
-The change strips from **both** multisets, so it can only remove a disagreement: it cannot hide
-missing text (`04_chars_missing` reads the other side) and it cannot mask a duplicated line, because
-a duplicate adds real characters. `U+200C`/`U+200D` are deliberately left in — they are ZWNJ/ZWJ and
-they shape Indic text.
+The direction that could have refuted it — one document passing with a drawing-carried rule — has
+**no instance in the corpus**. The 69 documents that fail *with* borders are not a counter-example:
+their borders are a real table's grid at the table's own coordinates, not a carrier at the rule's
+coordinates, and the check matches geometry.
+
+The weaker half of the story — that Google *rasterises* the drawing so `_rule_segments()` cannot see
+it — is **not proven here** and is not needed. Whether Google drops the shape or rasterises it, the
+check reads zero either way and the fix is the same. One Google round trip on a document with a
+known rule count would settle it; no export PDF exists in the repo and this slot did not spend one.
 
 ## The txt
 
@@ -99,59 +92,51 @@ they shape Indic text.
 
 ## Subagents
 
-One agent, deployed 23:22, returned in 5 minutes: `rule-emission-census`. It converted seven of the
-class's documents with the engine and compared every rule the source page draws with every rule the
-`.docx` emits — **107 rules matched at Δ 0.000 pt and one dropped**, and the dropped one is 127 pt
-below the bottom of the paper, where `attachShapes` discards it by design. So the engine is not
-losing rules before the writer and the carrier is not writing into a hole.
+One agent, `rule-carrier-probe`, deployed 23:58, returned in 9 minutes. It read `word/document.xml`
+for `17`, `45`, `53`, `74` and `394` at both HEAD and the patched build, and reported every carrier
+with byte offsets. It **refuted** the pipeline's own next probe ("the carrier Google drops is the one
+anchored inside a `w:tbl`") with the fact that all 17 carriers are body-level, and it found the
+byte-identical footer carrier in `17` and `45`. Its report is
+`rule-carrier-anchor-context-report.md`; the numbers are folded into the finding above.
 
-**A second agent, on the other half.** `txt-failures-diagnosis`, deployed 23:41, returned in 10
-minutes having reproduced all 16 `.txt` failures exactly and split them: **9 are the check, 7 are a
-real engine fault.** Five of the eight `t12_word_invention` documents are PyMuPDF token boundaries
-glued the other way (`cent.1` against `cent` + `1`, `2قهوة` against `قهوة` + `2`, `57 0 0 05`
-against `570 005`). Its one recommendation — `t12` should compare whitespace-stripped character
-multisets, in `verify_txt.py` and not in `TxtWriter.java` — is measured to flip **5 documents**
-clean while both duplication faults keep failing, so it is not a blanket silence. Not landed: the
-other 197 `.txt` were not re-measured. `FINDINGS/txt-16-failures-NINE-ARE-THE-CHECK-2355-relay.md`.
+A second agent was not deployed. The first took nine of the slot's fourteen working minutes and
+answered the question the second would have asked.
 
-**Why one of them was late.** The second was the `05` question and it became the slot's own build once the
-census came back in five minutes; sending it twice would have duplicated the measurement I was about
-to make by hand.
+**Its own caveat, kept:** `_rules_lost` consumes each render segment once, so `{source: 2, render: 1}`
+does **not** by itself prove a shape was dropped — it is equally what you see when two carriers land
+at one y and the first render segment is consumed by the first source rule. Attaching the loss to a
+named carrier needs a Google export, which no sandbox here can produce.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 23:19 → running · 30 min |
+| Slot window | 23:57 → running · 14 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 15 |
-| Longest silence | **10.5 min** — from 23:39:23, after `report.py: building the report` |
-| Silences over 2 min | 5 |
-| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | round.py --claim-fixer sets ROUND.json fixer_started but never starts RUN.json, so a slot that claims after an |
-
+| Tool beats | 10 |
+| Longest silence | **10.1 min** — from 23:57:48, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 2 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `########` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **11 min** | `#########` |
-| other - not attributed to a tool | **7 min** | `#####` |
+| fix - diagnose and change the engine | **2 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **11 min** | `##################` |
+| other - not attributed to a tool | **0 min** | `#` |
+
 ## Next run
 
-Two measurements, both cheap, both already specified:
+Three things, in this order, and the first is the slot.
 
-1. **One Google round trip** on `17_three_column_widths_txtpos` with its two carriers re-anchored —
-   one in the body, one inside the table — and read `32`'s `render` count. If the inside-the-table
-   anchor is the one Google drops, the fix is "never anchor a carrier inside a `w:tbl`", and it is
-   worth the 7 documents in the table above.
-2. **Re-score the corpus.** `benchmarks/gverify/*.json` still carries the pre-fix `05` verdicts on
-   141 documents. Until a Google pass replaces them, every count in this pipeline understates the
-   corpus by up to 141 documents on that one check.
-
-> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
-
----
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+1. **The trailing-pair build.** Apply `patches/rule-carrier-per-rule-2008.patch`, then append one
+   empty `<w:p/>` after each carrier. Convert and measure `17`, `53`, `74` through Google. Predicted
+   before the run: `{source: 2, render: 2}` on all three, sixteen documents clean. If it reads
+   `{2, 1}` the prediction is wrong and the paragraph-after theory dies with it — say so.
+2. **Re-score `32` on the corpus.** 145 stored verdicts are stale against any carrier change, exactly
+   as the 141 `05` verdicts are stale against last slot's `norm_text` fix. `benchmarks/gverify/`
+   still carries pre-fix `05` on 141 documents, so every count in this pipeline understates the
+   corpus.
+3. **Do not retry the pBdr carrier or the bare floating drawing.** Both are refuted by measurement:
+   pBdr in `HANDOFF.md`, the drawing here, 76 of 76 with no exception.

@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-21 23:19
+# Fixer report - 2026-11-21 23:57
 
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 23:19 → running IST · 30 min**
+**22 Nov 2026 · slot 23:57 → running IST · 14 min**
 
-> **11 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **11** — 1 attempt(s), 1 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,13 +20,13 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `05_chars_extra` |
+| Working on | `32_stroke_lines` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 23:37 | **kept** | 11/192 | 05_chars_extra counted one U+200B per w:tab - Google's export marks every tab advance with a zero-width space. Full-corpus separation 141/141 vs 51/51, causal on 17 (23 tabs -> 23 extras, 0 tabs -> 0) |
+| 00:12 | **lead** | 0/192 | Corpus-wide: 0 of 76 documents whose rules are carried only as floating <w:drawing> pass 32 in Google; the only 2 with source rules that pass carry the rule as a table-cell border. The drawing carrier |
 
 ## The txt
 
@@ -46,23 +46,21 @@
 
 | | |
 |:--|:--|
-| Slot window | 23:19 → running · 30 min |
+| Slot window | 23:57 → running · 14 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 15 |
-| Longest silence | **10.5 min** — from 23:39:23, after `report.py: building the report` |
-| Silences over 2 min | 5 |
-| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | round.py --claim-fixer sets ROUND.json fixer_started but never starts RUN.json, so a slot that claims after an |
+| Tool beats | 10 |
+| Longest silence | **10.1 min** — from 23:57:48, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 2 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `########` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **11 min** | `#########` |
-| other - not attributed to a tool | **7 min** | `#####` |
+| fix - diagnose and change the engine | **2 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **11 min** | `##################` |
+| other - not attributed to a tool | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
