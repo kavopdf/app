@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 00:15
+# Fixer report - 2026-11-22 01:16
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 00:15 → running IST · 38 min**
+**22 Nov 2026 · slot 01:16 → running IST · 27 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 0 attempt(s), 0 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,7 +20,13 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `32_stroke_lines` |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 01:43 | **lead** | 0/None | carrier patch measured corpus-wide: 4595 carriers, 3608 of them 8-twip vertical cell separators; 375 goes 13 rows -> 455. Horizontal-only guard proven to restore byte-identity on 324/341/375 and keep |
 
 ## The txt
 
@@ -40,22 +46,21 @@
 
 | | |
 |:--|:--|
-| Slot window | 00:15 → running · 38 min |
+| Slot window | 01:16 → running · 27 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 7 |
-| Longest silence | **18.0 min** — from 00:15:30, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 5 |
-| Obstacles | 2 cleared · 2 parked, with the evidence to re-open them |
-| Still a wall | **this watchdog has no `cron` tool, so a paused or zombie cron cannot be moved by automation.** STEP 3 and STE |
+| Tool beats | 13 |
+| Longest silence | **10.6 min** — from 01:18:37, after `relay: patch scope read - followed-by-block is a superset, applying th` |
+| Silences over 2 min | 4 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **25 min** | `###############` |
-| report - the report and the chain | **6 min** | `####` |
-| other - not attributed to a tool | **6 min** | `####` |
+| setup - claim, housekeeping, reading the gate | **1 min** | `##` |
+| measure or build - a conversion, screen or compile writes no beacon | **22 min** | `##################` |
+| report - the report and the chain | **2 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |

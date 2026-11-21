@@ -1,93 +1,97 @@
-**22 Nov 2026 · relay slot 00:15 → running IST · 38 min**
+**22 Nov 2026 · relay slot 01:16 → running IST · 27 min**
 
-> The class is not "a construct Google drops". It is **one block after the carrier**.
-> `17` and `53` go 40/42 → **42/42 PASS** in Google Docs with one empty paragraph added after each
-> rule carrier and nothing else changed. The change is written as a patch and **not landed**: the
-> re-measurement needs about 25 minutes of corpus rendering and this slot ran out before it finished.
+> The carrier fix handed over at 01:02 is **right on 2 documents and destroys 59**. Measured, not
+> argued: built the engine with the patch, rebuilt all 213 `.docx`, read the XML back. The patch
+> turns **4595** shapes into floating carriers across **183** documents - and **3608 of those are
+> 8-twip vertical table-cell separators**, not rules. `375_attendance_register` goes from 1 table
+> and 13 rows to **443 tables and 455 rows**. A one-line guard - a rule is horizontal - restores
+> `324`, `341` and `375` to **byte-identical with HEAD** while keeping `17`'s 2 carriers and
+> `bank-statement`'s 39. Patch saved; the remaining 987 carriers are unmeasured in Google.
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 00:40 | **refuted** | 0 | The trailing-block theory, corpus-wide. all 145 failures carry it **and** every one of the 146 documents with a floating carrier does too - 100% prevalence, no discriminating power on the HEAD build. `373` passes with the property present. The cross-tab was measuring the writer's block ordering, not the cause. |
-| 00:47 | **refuted** | 0 | "A drawing-carried rule never passes" (last slot's `76 of 76`). `373` passes `32_stroke_lines` on a floating `<w:drawing>` with **zero** `w:tcBorders` and **zero** floating tables - a real table's top border sits at y=108.00, the source rule at 87.70, inside the check's own 24 pt tolerance. |
-| 00:56 | **lead** | 0 | A six-rung `tblpY` ladder (80, 700, 750, 775, 785, 793.89 pt), all six carriers trailing, one Google export: the 80 pt carrier rendered at 80.5, **the other five at 81.5-84.5, every one ignoring its own `tblpY`**. Google lays a trailing carrier out in flow under the one before it. |
-| 01:02 | **fix, measured** | 2 | One empty `<w:p/>` after each carrier: `17` 40/42 → **42/42**, `53` 40/42 → **42/42**. The 793.89 pt rule renders at 794.5 pt, `_rules_lost` reads 0 on both. |
+| 01:43 | **lead** | 0 | The carrier patch, corpus-wide. 4595 carriers in 183 of 213 documents; `375` 1 table/13 rows/456 drawings → **443 tables/455 rows/14 drawings**, `341` 1/25/301 → **276/300/26**, `324` 6/246/1483 → **1236/1476/253**. Character counts unchanged in all three, so no existing check sees it. |
 
 ## The class I chose, and why
 
-`classpick.py` suggested `32_stroke_lines` and the arithmetic agreed, so I took it - but not for the
-reason the tool gave. Sixteen documents fail **exactly `{05_chars_extra, 32_stroke_lines}`** and
-nothing else, and `05` was cleared instrumentally two slots ago, so those sixteen are **one construct
-from clean in Google**. Two more (`394`, `407`) fail `32` alone. Eighteen documents, all of them
-`.docx`, in the renderer the user opens. No `.txt` class is near it.
+I did not choose a class - I finished the one the previous slot was one build away from. It left
+`17` and `53` at 42/42 in Google with one empty block after each carrier, and it left the reason
+it did not land: the full-corpus re-measurement. That measurement is the only thing standing
+between 18 documents and clean, so it was the slot.
 
-The class was worked to a measured fix, not to another lead. What stopped it landing is not the
-construct and not the evidence - it is that a 146-document construct change needs the full corpus
-re-measured before it may be stamped, and that is a 25-minute job this slot did not have left.
+It cost the slot, and it bought the answer: the construct as patched cannot land, and now we know
+exactly why and exactly how much it needs narrowing.
 
-## Why it is a lead and not landed
+## The cause, in one line
 
-`regress.py --check` passes - **no document worse than baseline, docx or txt**, and
-`google-safe` reports no ignored construct has spread. It refuses on the fingerprint alone:
-"ENGINE CHANGED (docx): table measured on `6c6cf642e13b7ed2`, the tree is `88ddb2bfdfe91962`."
+```java
+float lo = Math.min(s.wPt, s.hPt), hi = Math.max(s.wPt, s.hPt);
+return lo <= RULE_MAX_PT && hi > 2f && hi >= lo * 4f;
+```
 
-`benchmarks/gate.py` is the re-measurement and it caches per document in `/scratch/work/p2w/dist2/`,
-so repeated `--budget 280` calls make progress. This slot got **39 of 213 docx rendered, 0 of 212
-measured** before it had to stop. Stamping on that would be the exact "unmeasured change" the gate
-exists to refuse, so the engine is reverted to HEAD and the change ships as
-`patches/rule-carrier-followed-by-block-2008.patch`.
+Symmetric. A cell's **vertical** separator is 0.4 pt wide and a row tall: one side under 4 pt, the
+other more than four times longer. It passes. `ruleCarrier` writes it as a floating 1x1 table
+8 twips wide. Read out of the carriers the patch actually wrote: real rules are **9666** twips
+(`17`) and **10091** (`bank-statement`); every destructive one is **8**.
+
+Corpus split: **987 horizontal carriers in 160 documents, 3608 vertical in 59, 23 documents that
+are verticals-only and are now left alone.**
 
 ## Falsification
 
-The prediction was written to `/scratch/work/PREDICTION.txt` **before** the test ran: *"32_stroke_lines
-reads {source:2, lost:0} on both; the 793.89 rule appears within 24 pt of 793.89; page count stays 1.
-If it reads {2,1} the following-block theory is dead in Google too."*
+Prediction written to `/scratch/work/PREDICTION.txt` **before** the guarded build:
+*"324/341/375 become byte-identical to HEAD; 17 keeps 2; bank-statement keeps 39. If any of the
+three still differs, the vertical diagnosis is wrong."*
 
 | test | expected | measured |
 |:--|:--|:--|
-| `17` carrier alone, Google export | lost 1 | **lost 1** (rule at 793.89 absent) |
-| `17` + one empty block, Google export | lost 0 | **lost 0**, rule at 794.5 |
-| `53` + one empty block, Google export | lost 0 | **lost 0**, rule at 794.5 |
-| page count, both | stays 1 | **stays 1** |
-| six-rung ladder, all trailing | every rung at its own `tblpY` | **five of six stacked at 81.5-84.5** |
+| `324` guarded vs HEAD | identical | **identical** |
+| `341` guarded vs HEAD | identical | **identical** |
+| `375` guarded vs HEAD | identical | **identical** |
+| `17` guarded carriers | 2 | **2** |
+| `bank-statement` guarded carriers | 39 | **39** |
 
-The direction that could have refuted the mechanism - a trailing carrier landing at its own `tblpY`
-without a following block - has **no instance** in the ladder. The reading was taken with the check's
-own functions at the check's own constants, not with the tool I had just edited.
+Read with `zipfile` + `re` on `word/document.xml`, not with the tool I edited.
+
+## What I did not land, and why
+
+`regress.py --check` passes on the reverted tree (`PASS - nothing got worse in the .txt only, and
+the table matches this engine`). The engine is at HEAD. The change ships as
+`patches/rule-carrier-horizontal-only-2008.patch`, 211 lines, applies clean to the pristine tree,
+and **supersedes** `rule-carrier-followed-by-block-2008.patch`.
+
+It is not landed because a 160-document construct change needs the full corpus measured, and that
+is 85 minutes of `soffice`, not the 25 the last handoff guessed: **11 documents per 280-second
+budget**, 213 documents, 18 passes. That number is the real blocker on this class and on every
+class behind it, and it is worth a slot of its own.
+
+## Two things the next run needs
+
+1. `patches/rule-carrier-per-rule-2008.patch` and `patches/rule-carrier-tblppr-2008.patch` are
+   **byte-identical** (md5 `8473b14274c0aa827432895733cbba7f`), and both conflict with
+   `followed-by-block-2008` on the same hunk. LAST-MESSAGE.md's "apply `per-rule` then
+   `followed-by-block`" fails `git apply`. Only one of the three can ever land.
+2. The 987 horizontal carriers still need a Google export on a document where the rule is a
+   **table's own row border** rather than a standalone line. The guard removes the destruction; it
+   does not yet show a horizontal carrier is harmless there.
 
 ## Subagents
 
-Two, both deployed inside the first ten minutes.
+One, at 01:47, in the first ten minutes.
 
-**`carrier-geometry`** read the check's implementation and the XML of the passing and failing
-documents. It established that the check never reads XML - it is `page.get_drawings()` on both sides -
-and it refuted last slot's `w:tcBorders` claim: `373` and `64` carry **zero** `w:tcBorders`; `64` uses
-`w:tblBorders` on a real flow table, `373` passes on tolerance. Its own probes found the trailing-block
-effect in LibreOffice, which is what sent me to Google to test it properly.
-
-**`carrier-position`** built all 213 `.docx` and cross-tabulated carrier position against the
-committed Google verdicts: all 145 failures carry the property, **and so does every one of the 146 documents with a floating
-carrier**. That refuted the theory as a corpus claim - correctly, for the HEAD build -
-and it is why I did not spend the slot on a corpus-wide correlation and went to a single Google export
-instead.
-
-## Next run
-
-1. `python3 benchmarks/gate.py --budget 280` in a loop until `p2w.py` reports 213 of 213. It caches;
-   repeated calls make progress. Do not stamp before it completes.
-2. Apply `patches/rule-carrier-per-rule-2008.patch` then
-   `patches/rule-carrier-followed-by-block-2008.patch`, rebuild, convert, `regress.py --check`,
-   `regress.py --stamp`, commit.
-3. Re-measure the sixteen `{05, 32}` documents through Google. Predicted **42/42 on all sixteen**;
-   `394` and `407` should follow to 42/42. That is eighteen documents, and it takes the Google total
-   from 6 to 24.
+**`Patch scope analysis`** read the three patches and the writer source and returned the facts this
+slot was built on: the patch touches only `DocxWriter.shape()` behind a per-shape guard, documents
+with no rule shape are byte-identical, the following block is a **1-twip exact line** rather than a
+full line, and the three patches conflict. The last two changed the plan - I applied one patch
+instead of two, and I went looking for over-fire instead of assuming a zero-flow block was safe.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 0 attempt(s), 0 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -96,7 +100,7 @@ instead.
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `32_stroke_lines` |
 
 ## The txt
 
@@ -112,19 +116,17 @@ instead.
 
 | | |
 |:--|:--|
-| Slot window | 00:15 → running · 38 min |
+| Slot window | 01:16 → running · 27 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 7 |
-| Longest silence | **18.0 min** — from 00:15:30, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 5 |
-| Obstacles | 2 cleared · 2 parked, with the evidence to re-open them |
-| Still a wall | **this watchdog has no `cron` tool, so a paused or zombie cron cannot be moved by automation.** STEP 3 and STE |
-
+| Tool beats | 13 |
+| Longest silence | **10.6 min** — from 01:18:37, after `relay: patch scope read - followed-by-block is a superset, applying th` |
+| Silences over 2 min | 4 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **25 min** | `###############` |
-| report - the report and the chain | **6 min** | `####` |
-| other - not attributed to a tool | **6 min** | `####` |
+| setup - claim, housekeeping, reading the gate | **1 min** | `##` |
+| measure or build - a conversion, screen or compile writes no beacon | **22 min** | `##################` |
+| report - the report and the chain | **2 min** | `##` |

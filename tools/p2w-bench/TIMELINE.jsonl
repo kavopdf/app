@@ -2017,3 +2017,26 @@
 {"t": 1795291975.342997, "ist": "01:42:55", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795291989.591725, "ist": "01:43:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795291991.4930356, "ist": "01:43:11", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795291993.3537157, "ist": "01:43:13", "ev": "attempt", "d": "32_stroke_lines -> lead"}
+{"t": 1795291993.4595537, "ist": "01:43:13", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795291993.5726898, "ist": "01:43:13", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795291995.3899589, "ist": "01:43:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292003.5182884, "ist": "01:43:23", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292003.9390314, "ist": "01:43:23", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292004.1920278, "ist": "01:43:24", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292006.5163813, "ist": "01:43:26", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292010.1540136, "ist": "01:43:30", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292010.577658, "ist": "01:43:30", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292010.8499372, "ist": "01:43:30", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292012.8304534, "ist": "01:43:32", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292015.2494524, "ist": "01:43:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292015.6787164, "ist": "01:43:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292015.961615, "ist": "01:43:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292019.542877, "ist": "01:43:39", "ev": "beat", "d": "relay: writing the report"}
+{"t": 1795292019.7248561, "ist": "01:43:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292023.4367416, "ist": "01:43:43", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292023.8701148, "ist": "01:43:43", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292024.1452236, "ist": "01:43:44", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292026.387424, "ist": "01:43:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292026.8293839, "ist": "01:43:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795292027.0782104, "ist": "01:43:47", "ev": "beat", "d": "report.py: building the report"}
