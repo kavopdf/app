@@ -100,9 +100,23 @@ pause/resume on a run that will not die is noise, not a fix.
     baseline    01M7N3RTAM7SATT9TXMQPP7QRM     hourly :00
     classifier  01M733RFR3D71C2E0T2TQ9PW0R     hourly :40
     fixer       01M7Y5WNJ9E0N78KRHX2TRJGQ6     hourly :50   <- the one that matters
+      fixer relay 01M7Y6DSBB2KBYAREFVMHYAB4D     hourly :10   <- takes the slot when :50 is dead
     apk         01M72XD9FD9MDM35X4Z7TQ6RRW     daily 22:00
     gverify     01M7T6STKQJ2KPZAYFMCZVCG85     hourly :20
     watchdog    01M7T903P1BTMEEG8SJ9SA47MQ     every 3 h
+
+  **Two fixer crons, one slot - and that is what ends the silent-dead problem.** The platform will not
+  start a cron while one of its OWN runs is marked `running`, but it does not stop a different cron. So
+  when the :50 run wedges above the repository - as it did on 21 Nov, still `running` at 09:54 with no
+  claim, no beacon and no commit - the :10 relay fires anyway, finds the slot free (the stale window has
+  passed), claims it and does the work. Nothing has to wake anything up.
+
+  Both check the same `round.py --claim-fixer`. Whichever gets there first works; the other prints one
+  line and exits. **Do not "fix" this by making one of them skip its claim** - the claim is the only
+  thing keeping two runs out of the engine at the same time.
+
+  `:10` and not `:20`: gverify already owns `:20`. The grid is :00 baseline, :10 relay, :20 gverify,
+  :40 classifier, :50 fixer.
 
 **Never pause a cron and leave it paused.** Pause and resume in the same run, or do not pause at all.
 A paused cron is silent and nothing else in the system reports that it is paused.
