@@ -134,9 +134,15 @@ The eight classes in damage order, from `benchmarks/PROBLEM-NAMES.md`:
 **Take the class with the MOST DOCUMENTS**, because one mechanism fixed once clears every document
 under it. Not the one with the worst number.
 
-**Do not rebuild the class file.** It is the classifier's output and the classifier runs before
-you. If it is missing, stale, or has no OPEN row, the phase is wrong - say so and stop. `classify.py`
-is retired; running it produces the ghost list.
+  **The class file is yours to rebuild.** `classify.py` is retired - it produces the ghost list of a
+  pipeline that no longer exists - but the two generators that replaced it are yours and you own them:
+
+      python3 tools/p2w-bench/classify_google.py        # DEFECT-CLASSES-GOOGLE.md, from gverify/
+      python3 tools/p2w-bench/classify_txt.py           # txt/DEFECT-CLASSES-TXT.md, from RANKING-TXT.csv
+
+  **A stale or empty class file is not a reason to stop.** It is a table nobody regenerated, and this
+  brief already lists that among the things you fix. Regenerate it, then take the class. You stop only if
+  the measurement the table is built from does not exist - then the phase is wrong and you say so.
 
 **Before forming a theory, read `benchmarks/CENSUS.csv`.** A score says how far off a document is;
 the census says what is missing - characters, raster images, drawn rules, table cells, annotations,
@@ -314,7 +320,15 @@ names the dirty files. HEAD matching origin is not enough - an uncommitted edit 
 that say why: what was tried, what each attempt moved, and what the mechanism looks like from the
 evidence. **A park with no numbers is not a park, it is giving up with paperwork.**
 
-**Never attempt a PARKED class.** Always record the attempt, with numbers, honestly.
+**A parked class is parked until you have new evidence, not for ever.** The park is `attempt.py`'s
+judgement on the last five outcomes and it is right to make it - but the ledger only knows what was
+tried, not what you have just learned. **If you have something genuinely new** - a construct nobody
+tried, a measurement that contradicts the park's reasoning, a document that behaves differently - say
+what it is, re-open the class, and attempt it. Record the re-open in `BLOCKERS.md` with the new
+evidence, so the next run can judge whether you were right.
+
+**What is not allowed is repeating the parked attempt.** Same idea, same document, same result is not
+new evidence, it is a loop. Always record the attempt, with numbers, honestly.
 
 **You do not decide when a class parks - `attempt.py` does, on evidence.** The ledger already knows
 whether a class is still moving: `partial` means the attempt moved something and did not finish,
@@ -475,8 +489,11 @@ multiplying by the CTM, so every scaled image lands at 1/scale" is a root cause.
 document's table", "raise the threshold", "add a fallback", "special-case this page", "wrap it in a
 try" are not.
 
-**Do not loop on one class in one run.** Three consecutive `error` outcomes on one class means
-switch. A cap on repeating yourself, not on the run.
+  **Do not loop on one class in one run.** Three consecutive `error` outcomes on one class is a strong
+  signal that your approach is wrong - and the signal is about the APPROACH, not the class. Switch
+  approach, or switch class. **If you have a fourth idea genuinely different from the three that failed,
+  take it and say in one line what makes it different**, so the next run can judge. A cap on repeating
+  yourself, not on thinking.
 
 ## When something fails
 
@@ -1093,9 +1110,18 @@ are 2 992 of the 2 996 and they hold 143 documents.
 the emitter and leaving the layout broken is not removal - it is the 3.53.5 mistake with the sign
 flipped, and the gate will refuse it because the corpus will get worse.
 
-**Never touch the engine directly to see what happens.** Every engine change goes through the build, the
-corpus measurement and the gate. A change you cannot measure is a change you do not commit; write it into
-`FINDINGS/` as a proposal instead, which is what `FINDINGS/PROPOSAL-*` files are for.
+  **Probing is encouraged. Committing an unmeasured engine change is not.** The difference is the commit,
+  not the experiment:
+
+  * **Probe freely.** Hand-edit a .docx, build one document with a patched engine, upload it, look at what
+    Google does. That is the cheapest way to learn anything in this pipeline, and three of the findings in
+    `FINDINGS/` came from exactly that.
+  * **Commit only what you measured.** Every engine change that lands goes through the build, the corpus
+    measurement and the gate. A change you cannot measure is a change you do not commit - write it into
+    `FINDINGS/` as a proposal, which is what `FINDINGS/PROPOSAL-*` files are for.
+
+  **What you may never do is commit to the engine and hope.** The gate will refuse it and the next run
+  inherits a tree nobody can explain.
 
 **If a construct has no Google-honoured replacement, that is a finding, not a licence.** Write it down,
 park the class with `classpick.py --exhaust`, and move to the next one. The rotation already handles this.
