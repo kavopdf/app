@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 15:58 → running IST · 1h 43m**
+**21 Nov 2026 · slot 15:58 → 17:44 IST · 1h 45m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -52,13 +52,13 @@
 
 | | |
 |:--|:--|
-| Slot window | 15:58 → running · 1h 43m |
+| Slot window | 15:58 → 17:44 · 1h 45m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 40 |
+| Tool beats | 44 |
 | Longest silence | **22.7 min** — from 16:37:48, after `HEAD rebuilt; converting all 213 to out-head for a byte-for-byte docx ` |
 | Silences over 2 min | 11 |
-| Obstacles | 2 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | **Two fixers ran the same slot and duplicated 65 minutes of work.** This run claimed at 16:16 (`round.py --cla |
+| Obstacles | 2 cleared · 2 parked, with the evidence to re-open them |
+| Still a wall | `regress.py --check` refuses EVERY commit: the docx stamp is `6c6cf642e13b7ed2` while the tree's docx fingerpr |
 
 
 ### Where the time went
@@ -66,9 +66,9 @@
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **22 min** | `#####` |
-| measure or build - a conversion, screen or compile writes no beacon | **1h 09m** | `###############` |
+| measure or build - a conversion, screen or compile writes no beacon | **1h 09m** | `##############` |
 | record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **6 min** | `#` |
+| report - the report and the chain | **8 min** | `##` |
 | other - not attributed to a tool | **3 min** | `#` |
 ## Best results this round
 
