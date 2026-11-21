@@ -93,7 +93,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `07:16` attempt 13 on 47_margins -> partial (0/26 moved)
 - `10:39` attempt 14 on t01_word_accuracy -> reverted (0/213 moved)
 - `11:16` attempt 15 on t01_word_accuracy -> partial (0/5 moved)
 - `11:34` agent deployed: 32_stroke_lines / B - why Google drops the rules LibreOffice draws, and which construct replaces them
@@ -118,6 +117,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `17:39` agent deployed: t08_line_order / B - which code path decides the .txt line order, and what single structural conditio
 - `17:39` agent landed: t08_line_order / B -> FINDINGS/t08_line_order-DRAWING-ORDER-1740.md
 - `17:40` agent landed: 32_stroke_lines / A -> FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md
+- `19:04` attempt 3 on 32_stroke_lines -> error
 
 ## Where the rest of the state lives
 
