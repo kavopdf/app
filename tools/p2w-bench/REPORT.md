@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-21 15:58
+# Fixer report - 2026-11-21 18:17
 
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 15:58 → 17:44 IST · 1h 45m**
+**21 Nov 2026 · slot 18:17 → 19:10 IST · 53 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 2 attempt(s), 0 kept |
+| Documents improved this run | **0** — 4 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,9 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 17:00 | **partial** | 1/5 | uprightIfPageIsUpsideDown patch landed: one-page-rotated-180-degrees t02_position FAIL->PASS, 213 of 213 .txt converted+scored, 190 clean (was 189), 0 newly failing. .docx proved byte-identical on all |
-| 17:25 | **reverted** | 0/5 | The 180deg guard, built and measured on all 213 documents (213/213 .docx word/document.xml byte-identical, 212/213 .txt identical, one-page-rotated-180-degrees t02_position FAIL->PASS, t02_position 5- |
-| 17:39 | **reverted** | 0/145 | pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more |
+| 19:10 | **reverted** | 0/15 | tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is cl |
 
 ## The txt
 
@@ -42,34 +40,28 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `32_sA-01` | Does the pBdr replacement in FINDINGS/RULES-PBDR-IMP | 15:59 | 12:10 | 101 min |
-| `t02_B-01` | The 180deg uprightIfPageIsUpsideDown patch (FINDINGS | 15:59 | 12:09 | 100 min |
-| `t08_B-01` | which code path decides the .txt line order, and wha | 17:39 | 12:09 | 0 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 15:58 → 17:44 · 1h 45m |
+| Slot window | 18:17 → 19:10 · 53 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 44 |
-| Longest silence | **22.7 min** — from 16:37:48, after `HEAD rebuilt; converting all 213 to out-head for a byte-for-byte docx ` |
-| Silences over 2 min | 11 |
-| Obstacles | 2 cleared · 2 parked, with the evidence to re-open them |
-| Still a wall | `regress.py --check` refuses EVERY commit: the docx stamp is `6c6cf642e13b7ed2` while the tree's docx fingerpr |
+| Tool beats | 23 |
+| Longest silence | **5.4 min** — from 19:04:35, after `classrow.py: refreshing the class file` |
+| Silences over 2 min | 5 |
+| Obstacles | 4 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **22 min** | `#####` |
-| measure or build - a conversion, screen or compile writes no beacon | **1h 09m** | `##############` |
-| record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **8 min** | `##` |
-| other - not attributed to a tool | **3 min** | `#` |
+| setup - claim, housekeeping, reading the gate | **1 min** | `##` |
+| fix - diagnose and change the engine | **7 min** | `#######` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **12 min** | `############` |
 ## Best results this round
 
 | Document | Before | After | Change |
