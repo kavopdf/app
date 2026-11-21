@@ -410,7 +410,36 @@ def claim(name):
         for other in ("%s_last_beat" % name, "%s_doing_since" % name):
             newest = max(newest, s.get(other) or 0)
         try:
-            newest = max(newest, os.path.getmtime(os.path.join(HERE, "TIMELINE.jsonl")))
+            # READ THE LAST LINE'S STAMP, NOT THE FILE'S MTIME.
+            # The fixer's prompt makes every run execute `git checkout -- tools/p2w-bench/` before it
+            # does anything, and that checkout rewrites every tracked file in the directory - so
+            # TIMELINE.jsonl's mtime becomes "now" even for a run that then died without doing a thing.
+            # Found by the 04:36 run in its own words: "round.py --claim-fixer read 'last activity 0
+            # min ago' because the mandatory git checkout rewrites TIMELINE.jsonl and refreshes the very
+            # mtime the staleness check reads. The true last event in that file is 03:36:40."
+            #
+            # Both directions are wrong with an mtime: a dead run looks alive for ever, so its slot is
+            # never reclaimed and the pipeline stalls. The content carries the real time. The key is
+            # "t" - a float epoch, written by beacon.py as {"t": ..., "ist": ..., "ev": ...}.
+            _tl = os.path.join(HERE, "TIMELINE.jsonl")
+            _last = 0.0
+            with open(_tl, encoding="utf-8") as _f:
+                for _line in _f:
+                    _line = _line.strip()
+                    if not _line:
+                        continue
+                    try:
+                        _j = json.loads(_line)
+                    except Exception:
+                        continue
+                    for _k in ("t", "ts", "at", "time", "epoch"):
+                        _v = _j.get(_k)
+                        if isinstance(_v, (int, float)) and _v > _last:
+                            _last = float(_v)
+            if _last > 0:
+                newest = max(newest, _last)
+            else:
+                newest = max(newest, os.path.getmtime(_tl))
         except Exception:
             pass
         age_min = claim_age_min(newest)
