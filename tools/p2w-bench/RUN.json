@@ -1,17 +1,16 @@
 {
- "started_ts": 1795254464.5765238,
- "started": "15:17",
+ "started_ts": 1795256939.3584,
+ "started": "15:58",
  "ended_ts": null,
  "ended": null,
- "class": "47_margins",
- "attempts": 1,
+ "class": "",
+ "attempts": 0,
  "kept": 0,
  "docs_improved": 0,
  "agents": [
-  "47_mA-02",
-  "47_mB-02"
+  "32_sA-01",
+  "t02_B-01"
  ],
  "obstacles_cleared": 0,
- "needs_human": 0,
- "partial": 1
+ "needs_human": 0
 }

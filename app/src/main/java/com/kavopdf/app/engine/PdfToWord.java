@@ -3674,7 +3674,8 @@ public final class PdfToWord {
         int turned = 0;
         for (Glyph g : glyphs) {
             if (g.text == null || g.text.trim().isEmpty()) continue;
-            if (!g.rotated) return false;               // an upright glyph: an ordinary page
+            if (g.mirror) return false;                 // a reflection is not a turn round
+            if (!g.rotated && g.dirx >= 0f) return false; // upright and forward: an ordinary page
             if (Math.abs(g.diry) > 0.25f) return false; // the baseline is not horizontal
             if (g.dirx >= 0f) return false;             // not turned round
             turned++;

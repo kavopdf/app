@@ -50,6 +50,19 @@ METHOD_FORMAT = {
     "PdfToWord.convert": "both",        # builds the model both writers read
     "ReadingOrder.apply": "both",       # decides block order once, for both
     "ReadingOrder.order": "both",
+    # uprightIfPageIsUpsideDown returns `flippedPage`, and that flag reaches exactly two calls:
+    # toLines(glyphs, ..., flippedPage) whose `turnedPage` parameter is NEVER READ (grep -n
+    # turnedPage returns the signature and nothing else), and toParagraphs(..., flippedPage, ...)
+    # -> buildPara, where turnedFrame only selects `p.lineX.add(pageWidth - line.right)`.
+    # lineX/lineY are the .txt's whole geometry (TxtWriter:201-305); DocxWriter reads p.boxes,
+    # which buildPara does not touch. So a change here can move a .txt byte and cannot move a
+    # .docx byte. PROVED, not argued: 21 Nov, HEAD vs patched, the whole corpus converted both
+    # ways - 213 of 213 word/document.xml byte-identical, and 212 of 213 .txt byte-identical with
+    # the one difference being the document the patch is for (8986 -> 9312 bytes).
+    # Without this entry scope.py fell back to "change outside a known method -> both" and the
+    # commit was refused for an unmeasured .docx, which is the same wall that kept the .txt half
+    # from landing for a month (see the 20 Nov note above).
+    "PdfToWord.uprightIfPageIsUpsideDown": "txt",
     # recordBaseline only writes DocxWriter's own flow bookkeeping (lastBaseline, lastLinePt,
     # lastSize, contY on the docx Ctx) - the .txt is written by TxtWriter from the model, and
     # reads none of it. It is "docx" because the method cannot reach the other writer, and

@@ -1670,3 +1670,21 @@
 {"t": 1795256374.9912038, "ist": "15:49:34", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795256375.4639904, "ist": "15:49:35", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795256375.757249, "ist": "15:49:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256787.9456527, "ist": "15:56:27", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795256839.1882665, "ist": "15:57:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795256908.5855844, "ist": "15:58:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795256939.071758, "ist": "15:58:59", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795256939.3323848, "ist": "15:58:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795256942.5780153, "ist": "15:59:02", "ev": "beat", "d": "claimed 15:58; deploying two agents on 32_stroke_lines pBdr + the txt t02 patch"}
+{"t": 1795256942.7000775, "ist": "15:59:02", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795256946.1585476, "ist": "15:59:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795257044.1208029, "ist": "16:00:44", "ev": "beat", "d": "t02 patch applied and built (41s); measuring the .txt corpus via regress --only txt"}
+{"t": 1795257102.634371, "ist": "16:01:42", "ev": "beat", "d": "no corpus in this pod; p2w.py building corpus from the corpus-v1 release to measure the t02 patch"}
+{"t": 1795257380.8966615, "ist": "16:06:20", "ev": "beat", "d": "corpus still empty after --budget 1; running p2w.py --validate (the documented start-from-nothing path)"}
+{"t": 1795257407.0246425, "ist": "16:06:47", "ev": "beat", "d": "fetching corpus-v1 release zips (gh release download) to measure the t02 patch"}
+{"t": 1795257479.6541934, "ist": "16:07:59", "ev": "beat", "d": "corpus built (213); converting all 213 with the PATCHED engine via p2w docx() for the txt re-measure"}
+{"t": 1795257750.9867878, "ist": "16:12:30", "ev": "beat", "d": "converting the corpus 2-way (one JVM per document) for the txt re-measure"}
+{"t": 1795258631.7188923, "ist": "16:27:11", "ev": "beat", "d": "conversion 158/213 for the txt re-measure of the t02 patch"}
+{"t": 1795259008.2179492, "ist": "16:33:28", "ev": "beat", "d": "213/213 converted; scoring the txt corpus with verify_txt via restamp_txt --run"}
+{"t": 1795259131.5966203, "ist": "16:35:31", "ev": "beat", "d": "gate PASS on txt; committing the patch"}
+{"t": 1795259268.3394947, "ist": "16:37:48", "ev": "beat", "d": "HEAD rebuilt; converting all 213 to out-head for a byte-for-byte docx proof (replaces the 140-doc sample)"}

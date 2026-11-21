@@ -19,7 +19,7 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 15:17 |
+| started | 15:58 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
@@ -84,14 +84,14 @@ unfinished work, not as a result.
 | t01blastradius-01 | t01 | blastradius | which of 213 documents change verdict under the two source-side change | 13:57 | 2 fixed, 0 regressions | landed | FINDINGS/t01-doubled-draw-both-sides-142100.md |
 | 47_mA-02 | 47_margins | A | .docx blast radius of the uprightIfPageIsUpsideDown two-line fix: buil | 15:19 | expected by 16:15 | running |  |
 | 47_mB-02 | 47_margins | B | true size of 47_margins on the CURRENT engine: re-render the class's 2 | 15:19 | expected by 16:15 | running |  |
+| 32_sA-01 | 32_stroke_lines | A | Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md act | 15:59 | expected by 16:20 | running |  |
+| t02_B-01 | t02_position | B | The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0)  | 15:59 | expected by 16:20 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `03:25` attempt 11 on 47_margins -> partial (2/26 moved)
-- `03:36` attempt 12 on 47_margins -> partial (2/26 moved)
 - `04:34` attempt 12 on t01_word_accuracy -> partial
 - `04:34` attempt 13 on t01_word_accuracy -> partial (1/5 moved)
 - `04:36` agent deployed: t01_word_accuracy / A - census of every widget appearance stream over all 213 documents - how many widge
@@ -115,6 +115,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:19` agent deployed: 47_margins / A - .docx blast radius of the uprightIfPageIsUpsideDown two-line fix: build patched 
 - `15:19` agent deployed: 47_margins / B - true size of 47_margins on the CURRENT engine: re-render the class's 26 document
 - `15:48` attempt 15 on 47_margins -> partial (1/213 moved)
+- `15:59` agent deployed: 32_stroke_lines / A - Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md actually clea
+- `15:59` agent deployed: t02_position / B - The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0) is measure
 
 ## Where the rest of the state lives
 

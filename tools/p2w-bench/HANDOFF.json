@@ -772,6 +772,14 @@
   {
    "at": "15:48",
    "text": "attempt 15 on 47_margins -> partial (1/213 moved)"
+  },
+  {
+   "at": "15:59",
+   "text": "agent deployed: 32_stroke_lines / A - Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md actually clea"
+  },
+  {
+   "at": "15:59",
+   "text": "agent deployed: t02_position / B - The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0) is measure"
   }
  ],
  "next": "Land the pBdr rule replacement: FINDINGS/RULES-PBDR-IMPLEMENTATION.md, first statement of DocxWriter.shape() at line 2772 (return before line 2779), carrying the ctx.flowY = s.topPt update. Screen 32_stroke_lines first, then the full corpus pass. The finding predicts 124 documents cleared among the 144 LibreOffice-only ones, and all 145 if the residual is only the footer rule.",
@@ -1339,10 +1347,32 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-21T09:49"
+  },
+  {
+   "id": "32_sA-01",
+   "class": "32_stroke_lines",
+   "angle": "A",
+   "question": "Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md actually clear 32_stroke_lines documents in GOOGLE (not LibreOffice)? Build the patched engine, convert a sample of the class's documents, and report per-document rule counts and any check that gets worse. Name the exact construct google_safe.py lists as ignored.",
+   "expected": "expected by 16:20",
+   "deployed": "15:59",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-21T10:29"
+  },
+  {
+   "id": "t02_B-01",
+   "class": "t02_position",
+   "angle": "B",
+   "question": "The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0) is measured .docx-identical on 140/213 but never landed. Determine whether it can be landed as a .txt-only change with no .docx risk: check whether DocxWriter reaches Para.lineX/lineY through any path (Para.copy, Para.merge, cellParaXml), and report the exact expected txt numbers (t02_position failing docs, documents failing any txt check) before and after.",
+   "expected": "expected by 16:20",
+   "deployed": "15:59",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-21T10:29"
   }
  ],
  "run": {
-  "started": "15:17",
+  "started": "15:58",
   "ended": null,
   "ended_how": null
  },
