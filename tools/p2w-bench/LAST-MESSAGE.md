@@ -1,32 +1,84 @@
-# P2W Google Verify - Run Report
+# Fixer report - 2026-11-21 13:18
 
-**21 Nov 2026 · 13:24 IST · stage classify**
+```
+# P2W Fixer - Run Report
 
-> 192 of 213 measured in Google, 21 refused on page count. Google passes all 42 on 6; LibreOffice on 122.
+**21 Nov 2026 · slot 13:18 → running IST · 12 min**
 
-This run measured nothing new and touched no engine code. It regenerated the capability table from the committed results in both renderer directories, committed it, and pushed; that table is this stage's last deliverable.
+> No change was kept this run. The numbers below say what was tried.
 
-## Measured
+## Progress
 
 | | |
-|:--|--:|
-| scored | **192** |
-| refused on page count | **21** |
-| clean in Google | **6** |
-| clean in LibreOffice | **122** |
+|:--|:--|
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved, round total | 61 of 213 |
+| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Regressions | **none** |
+| Exempt, not measured | **0** — none |
+| **Fixed - Google, all 42 checks** | **6**, out of the 192 documents both renderers measured |
+| Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
+| Moved but still open | **28** — improved, not fixed |
+| Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
+| Working on | `t01_word_accuracy` |
 
-## Checks Google fails and LibreOffice does not
+## What was tried
 
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `32\_stroke\_lines` | **145** | 1 |
-| `05\_chars\_extra` | **141** | 3 |
-| `18\_displacement` | **124** | 20 |
-| `04\_chars\_missing` | **66** | 2 |
-| `25\_invisible\_text` | **49** | 0 |
-| `59\_shape\_anchor` | **58** | 11 |
-| `60\_text\_column\_right\_edge` | **58** | 18 |
-| `45\_char\_accuracy` | **37** | 2 |
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 13:30 | **reverted** | 0/6 | SIXTEENTH ATTEMPT, measurement only, no code changed. The open question from 23:25 - is the raw-code fallback right, or does it write a ligature as an accented letter - is answered from the rendered p |
 
-The first row is the class to take: `32\_stroke\_lines`, 145 documents in Google against 1 in LibreOffice.
+## The txt
 
+| | |
+|:--|:--|
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **186** (87.3%) |
+| Failing at least one check | **27** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t08_line_order` - 10 documents |
+
+## Subagents
+
+*None deployed this run.*
+
+## Timing
+
+| | |
+|:--|:--|
+| Slot window | 13:18 → running · 12 min |
+| Before the claim | not recorded - nothing writes a beat until step.py runs |
+| Tool beats | 16 |
+| Longest silence | **10.0 min** — from 13:19:20, after `relay/fixer: t01, launching two agents then the 4c render` |
+| Silences over 2 min | 1 |
+| Obstacles | 4 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | **The gate refuses a release while 24 rows are open, and every one of the 24 is a wall a fixer may not clear.* |
+
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| setup - claim, housekeeping, reading the gate | **0 min** | `##` |
+| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `###################` |
+| other - not attributed to a tool | **0 min** | `#` |
+## Best results this round
+
+| Document | Before | After | Change |
+|:--|--:|--:|--:|
+| `415_inline_images` | 89.04 | 0.00 | -89.04 |
+| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
+| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
+| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
+| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+
+> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+```
+
+Written by report.py from committed files only. Every number above is read from
+ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
+and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.

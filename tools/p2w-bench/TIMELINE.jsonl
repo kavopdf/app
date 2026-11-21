@@ -1527,3 +1527,27 @@
 {"t": 1795245628.5526361, "ist": "12:50:28", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795245629.325572, "ist": "12:50:29", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795245629.6073167, "ist": "12:50:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795247280.0953746, "ist": "13:18:00", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795247280.2640438, "ist": "13:18:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795247287.6656606, "ist": "13:18:07", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795247340.9132218, "ist": "13:19:00", "ev": "beat", "d": "relay/fixer: class t01_word_accuracy, reading findings"}
+{"t": 1795247360.4309182, "ist": "13:19:20", "ev": "beat", "d": "relay/fixer: t01, launching two agents then the 4c render"}
+{"t": 1795247960.35888, "ist": "13:29:20", "ev": "beat", "d": "relay/fixer: findings written, running the gate"}
+{"t": 1795247985.5339978, "ist": "13:29:45", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795247986.0134046, "ist": "13:29:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795247986.2877338, "ist": "13:29:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795247990.0556662, "ist": "13:29:50", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795247999.5324097, "ist": "13:29:59", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795248002.4037461, "ist": "13:30:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795248002.6496139, "ist": "13:30:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795248005.2198908, "ist": "13:30:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795248007.2198718, "ist": "13:30:07", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795248009.774319, "ist": "13:30:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795248016.1142528, "ist": "13:30:16", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795248016.4589791, "ist": "13:30:16", "ev": "attempt", "d": "t01_word_accuracy -> reverted"}
+{"t": 1795248016.5677173, "ist": "13:30:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795248016.6727161, "ist": "13:30:16", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795248020.6039376, "ist": "13:30:20", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795248021.176741, "ist": "13:30:21", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795248021.6780295, "ist": "13:30:21", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795248022.007551, "ist": "13:30:22", "ev": "beat", "d": "report.py: building the report"}

@@ -594,7 +594,7 @@
   "status": "OPEN"
  },
  "t01_word_accuracy": {
-  "attempts": 15,
+  "attempts": 16,
   "first_seen": null,
   "history": [
    {
@@ -701,12 +701,19 @@
     "outcome": "partial",
     "reason": "601's last lost word was the reference counting General twice; guard added to glyph_truth (211 docs A/B: 0 newly failing, 1 newly clean on the patched engine). The engine /AP walk that supplies the ot",
     "total": 5
+   },
+   {
+    "at": "2026-11-21 13:30",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "SIXTEENTH ATTEMPT, measurement only, no code changed. The open question from 23:25 - is the raw-code fallback right, or does it write a ligature as an accented letter - is answered from the rendered p",
+    "total": 6
    }
   ],
   "last": null,
   "last_engine": "7112d76",
   "last_moved": 0,
-  "last_total": 5,
+  "last_total": 6,
   "outcomes": [
    "reverted",
    "kept",
@@ -722,11 +729,12 @@
    "partial",
    "partial",
    "reverted",
-   "partial"
+   "partial",
+   "reverted"
   ],
   "ratchet_at": "20 Nov 21:49",
   "ratchet_docs": 4,
-  "reason": "601's last lost word was the reference counting General twice; guard added to glyph_truth (211 docs A/B: 0 newly failing, 1 newly clean on the patched engine). The engine /AP walk that supplies the other half is measured and saved as a patch; the gate refuses it until the docx half is re-measured (114 of 211 done).",
+  "reason": "SIXTEENTH ATTEMPT, measurement only, no code changed. The open question from 23:25 - is the raw-code fallback right, or does it write a ligature as an accented letter - is answered from the rendered page and from the font program, by two agents and by my own eye. The four Effra CIDs are ff/fi/ffi/ffl, not U+0123/U+0124/U+0126/U+0127: the font program has no cmap and no post table, every one of the four glyphs has yMin 0 and yMax 684 (a cedilla needs -212 and a circumflex ~847, neither exists in all 1225 glyphs), and 300 DPI crops of eight sites read 'Staff', 'Differently', 'Registered Office', 'Qualification', 'Offline'. Measured over the nine pages of 041122: 13 u0123 + 89 u0124 + 23 u0126 + 2 u0127 = 127 wrong characters standing where 279 correct letters belong, and pymupdf reports 0 U+FFFD because it prints the code as a character. So fffd-cmap-destination-2300-fixer.patch is WRONG: it would have made t01 pass by agreeing with a wrong reference. Renamed -REJECTED with an unapplyable banner; gate PASS; FINDINGS/t01_word_accuracy-FFFD-PATCH-REJECTED-133200-b3e7.md plus the two agent files and crops/. This does not overturn ligature-identity-UNRECOVERABLE-2350.md - widths and outlines really are ambiguous at ffi/ffl and fi/fl - it supersedes only the claim that the identity cannot be known at all. It moves no document: t01/t03/t07 already closed on both bank forms at 22:54, t06 is the only check still open. Also recorded: RANKING-TXT.csv names six t01 failures (391, 39, 411, 601, 77, 79) with 391 and 79 back on it although the 21:35 control-character fix recorded both as clean - the table could not be re-measured on this slot and the next run must.",
   "reasons": [
    "claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_small_caps_letter_spacing, 406_passport_mrz_page, 411_nested_xobject_transforms, 601_fillable_admission_form, 77_arabic_rtl_document, 79_inr_indian_digit_grouping_table. Check is 'source words all present >= 98%', so the .txt is dropping words the page drew.",
    "CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words welded to those NULs by r'\\S+', so 'Strongly\\x00agree' and '\\x00\\x00\\x00\\x00PHOTOGRAPH' were single tokens no .txt can ever contain, and t01 charged each one as lost text. _words now splits on control characters instead of treating them as word characters. Measured: 79_inr_indian_digit_grouping_table 91.9 -> 100.0 (9/10 -> 10/10 checks), 391_survey_questionnaire_grid 97.5 -> 100.0 (5/7 -> 7/7), 406_passport_mrz_page 98.5 -> 100.0 (5/7 -> 7/7); all three now PASS every applicable txt check. t12 improved on 391 and 406 for the same reason - a NUL token was counted as an invented word. Scanned all 213 documents with glyph_truth: exactly 6 declare a control character inside a source token, and the other three (balance-sheet-and-profit-loss, 392_statistical_console_output, balance-sheet-two-columns-of-figures) still PASS t01. The change only removes source tokens and adds none, so no document can regress. test_txt_checks.py 8/8.",
@@ -742,7 +750,8 @@
    "widget /AP /N glyph walk: 601 37/42 -> 42/42 docx checks on the same tree; t01 96.4 -> 98.8 (residual is the instrument double-counting 'General'); Account form 21/47 -> 25/47 with two new fails; patch saved, engine reverted - p2w builds from origin main so the corpus cannot be measured before the patch is pushed",
    "widget /AP /N glyph walk: 601 37/42 -> 42/42 docx checks on the same tree; t01 96.4 -> 98.8 (residual is the instrument double-counting 'General'); Account form 21/47 -> 25/47 with two new fails; patch saved, engine reverted - p2w builds from origin main so the corpus cannot be measured before the patch is pushed",
    "Carry-over measured, all three variants, corpus-wide: full widget-AP walk 601 52.39 -> 0.00 share@5px and 38/42 -> 42/42 docx checks, but Account_Opening_Form_Fillable_filled 97.62 -> 98.65 (+1.03) in every variant that emits widget text; the gate refuses one document worse. Streams-only: 601 0.25, Account 98.06. State-dict-only: 601 51.28, Account 98.65. Blast radius measured over 213: only 3 documents carry any annotation, 0 worse across 205 scored. Engine reverted; a person must decide whether a 1.03 rise on a document already at 97.62 may be traded for 601 going to 0.00. See FINDINGS/widget-walk-REFUSED-BY-ONE-DOCUMENT-1050-f1x.md",
-   "601's last lost word was the reference counting General twice; guard added to glyph_truth (211 docs A/B: 0 newly failing, 1 newly clean on the patched engine). The engine /AP walk that supplies the other half is measured and saved as a patch; the gate refuses it until the docx half is re-measured (114 of 211 done)."
+   "601's last lost word was the reference counting General twice; guard added to glyph_truth (211 docs A/B: 0 newly failing, 1 newly clean on the patched engine). The engine /AP walk that supplies the other half is measured and saved as a patch; the gate refuses it until the docx half is re-measured (114 of 211 done).",
+   "SIXTEENTH ATTEMPT, measurement only, no code changed. The open question from 23:25 - is the raw-code fallback right, or does it write a ligature as an accented letter - is answered from the rendered page and from the font program, by two agents and by my own eye. The four Effra CIDs are ff/fi/ffi/ffl, not U+0123/U+0124/U+0126/U+0127: the font program has no cmap and no post table, every one of the four glyphs has yMin 0 and yMax 684 (a cedilla needs -212 and a circumflex ~847, neither exists in all 1225 glyphs), and 300 DPI crops of eight sites read 'Staff', 'Differently', 'Registered Office', 'Qualification', 'Offline'. Measured over the nine pages of 041122: 13 u0123 + 89 u0124 + 23 u0126 + 2 u0127 = 127 wrong characters standing where 279 correct letters belong, and pymupdf reports 0 U+FFFD because it prints the code as a character. So fffd-cmap-destination-2300-fixer.patch is WRONG: it would have made t01 pass by agreeing with a wrong reference. Renamed -REJECTED with an unapplyable banner; gate PASS; FINDINGS/t01_word_accuracy-FFFD-PATCH-REJECTED-133200-b3e7.md plus the two agent files and crops/. This does not overturn ligature-identity-UNRECOVERABLE-2350.md - widths and outlines really are ambiguous at ffi/ffl and fi/fl - it supersedes only the claim that the identity cannot be known at all. It moves no document: t01/t03/t07 already closed on both bank forms at 22:54, t06 is the only check still open. Also recorded: RANKING-TXT.csv names six t01 failures (391, 39, 411, 601, 77, 79) with 391 and 79 back on it although the 21:35 control-character fix recorded both as clean - the table could not be re-measured on this slot and the next run must."
   ],
   "requeues": 0,
   "status": "OPEN"

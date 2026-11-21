@@ -760,6 +760,10 @@
   {
    "at": "12:46",
    "text": "attempt 2 on 32_stroke_lines -> error (0/37 moved)"
+  },
+  {
+   "at": "13:30",
+   "text": "attempt 16 on t01_word_accuracy -> reverted (0/6 moved)"
   }
  ],
  "next": "",
@@ -1308,9 +1312,9 @@
   }
  ],
  "run": {
-  "started": "12:12",
-  "ended": "12:49",
-  "ended_how": "forced"
+  "started": "13:18",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

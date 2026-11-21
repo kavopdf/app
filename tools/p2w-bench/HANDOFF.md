@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 12:12 |
-| ended | 12:49 |
-| how it ended | forced |
+| started | 13:18 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -84,7 +84,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `01:41` attempt 9 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:47` attempt 10 on t01_word_accuracy -> reverted (0/5 moved)
 - `01:51` attempt 11 on t01_word_accuracy -> reverted (0/5 moved)
 - `03:25` attempt 11 on 47_margins -> partial (2/26 moved)
@@ -109,6 +108,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `12:40` agent landed: 32_sA-01 /  -> FINDINGS/32_stroke_lines-A-pbdr-verification-124000-relay.md
 - `12:40` agent landed: 32_sB-02 /  -> FINDINGS/32_stroke_lines-B-rule-flow-neutral-124500-relay.md
 - `12:46` attempt 2 on 32_stroke_lines -> error (0/37 moved)
+- `13:30` attempt 16 on t01_word_accuracy -> reverted (0/6 moved)
 
 ## Where the rest of the state lives
 

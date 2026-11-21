@@ -1,3 +1,11 @@
+REJECTED 2026-11-21 13:32 - DO NOT APPLY.
+The four Effra CIDs are the ligatures ff / fi / ffi / ffl, not U+0123/U+0124/U+0126/U+0127.
+`sb.append((char) code)` therefore writes 127 wrong characters where 279 correct letters belong
+(measured on 041122-Account_Opening_Form, nine pages, three Effra faces). The page was rendered,
+cropped and read: "gistered Office", "ii. Differently ab", "Sta[ff]", "Quali[fi]cation".
+Evidence: FINDINGS/t01_word_accuracy-FFFD-PATCH-REJECTED-133200-b3e7.md and the two agent files it
+names, plus FINDINGS/crops/*.png. This banner makes the file unapplyable on purpose.
+
 diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfEngine.java b/app/src/main/java/com/kavopdf/app/engine/PdfEngine.java
 index 4f8446b..abbd68c 100644
 --- a/app/src/main/java/com/kavopdf/app/engine/PdfEngine.java
