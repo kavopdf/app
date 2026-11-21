@@ -1345,3 +1345,74 @@ instrument change with no finding and no re-measurement is refused even if the n
 **So: two or three attempts a run, each attempt its own commit, all of them on the class the rotation gave
 you, and one construct per commit.** There is no contradiction, and a run that does one attempt has done
 half a run.
+
+---
+
+## NOBODY IS COMING. EVERY DECISION IS YOURS.
+
+The user's instruction, 21 Nov:
+
+> "fixer ko yeh bhi batao ki kisi bhi decision ke liye koi nhi aayega tumhe har ek decision khud Lena
+> hoga research, verification, proof and evidence ke basis par"
+
+**There is no person behind this pipeline. No one reads `BLOCKERS.md` and acts on it, no one is waiting to
+answer a question, and no run is coming that will know more than you do about the thing you are looking
+at.** A run that stops and waits for a decision has not paused the work - it has ended it, because the
+next run starts from the same question with less context.
+
+### So you decide. All of it.
+
+Every one of these is yours, and none of them needs anyone's permission:
+
+* which document to prove a construct on
+* whether a class can be won, and when to park it
+* whether a check is wrong or whether the engine is wrong
+* whether a fix is worth its blast radius
+* whether a finding is good enough to stop on
+* whether two rules in this file contradict each other, and which one is right
+* whether a number in a report is real
+* whether to change a tool, a table, a brief, or the engine
+* what to do when the gate refuses, and what to do when it passes
+* what the next run should work on
+
+### On what basis
+
+**Research, verification, proof and evidence. In that order.**
+
+1. **Research first.** `grep` the repository before you build anything. Weeks of measured work sit in
+   `FINDINGS/`, `LESSONS.md`, `PLAN-DECISIONS.md`, `SETTLED.md`, `HYPOTHESES.md` and the git log. Most
+   questions have already been answered and the answer is written down.
+2. **Verify.** A claim you have not measured is an opinion. The three Drive calls that show you what
+   Google does with a construct cost less than the hour you would spend guessing.
+3. **Prove.** Write the number before and after. A change with no measurement is a guess with a commit.
+4. **Evidence, and say which.** "It seemed right" is not evidence. "FINDINGS/x says 55.15 asked and 0.33
+   rendered, and I reproduced it on document y" is.
+
+**When the evidence does not settle it, take the decision that is reversible and say what would settle
+it.** A run that guesses and records the guess is worth more than a run that waits, because the next run
+can overturn a recorded guess and cannot overturn silence.
+
+### The one thing that is not a decision: "a person has to decide"
+
+`BLOCKERS.md` carries fifteen rows that end in *"a person has to look"* or *"a person has to decide two
+things"*. **That is not a blocker, it is a run that stopped working.** Every one of those rows describes a
+technical question with a technical answer, and the answer was available the whole time.
+
+**Write it as a decision, with the evidence, and act on it:**
+
+    DECIDED 21 Nov: the .txt thresholds are normalised to share-of-applicable-checks, not raw counts,
+    because t02 and t08 were firing on documents that failed nothing else (CAUSES-TXT.json, 213 rows).
+    Re-measured the corpus; 3 documents changed class. Reversible: revert this commit.
+
+**The only thing that is genuinely outside the repository** is a permission or a tool that does not exist:
+a Drive authorisation the account owner has not given, an integration that is not connected, a binary that
+cannot be installed. For those, **state the exact call, the exact error, and what it blocks** - and then
+work on the next thing. Do not sit on it and do not dress it up as a decision.
+
+### And record it so the next run can disagree
+
+**Every decision goes into `BLOCKERS.md` or a `FINDINGS/` file with its evidence and what would overturn
+it.** Not for a person - for the next run, which is the only reader you will ever have. A decision with no
+record is a decision the next run will make again, differently, and one of the two will be wasted.
+
+**You are the last line. There is no one above you to escalate to.**
