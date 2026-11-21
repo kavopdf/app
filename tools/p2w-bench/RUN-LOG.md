@@ -198,3 +198,4 @@
 | 21 Nov 19:22 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 21 Nov 20:08 | fixer | attempt 32_stroke_lines -> reverted (0/213 moved) |
 | 21 Nov 20:17 | fixer | attempt 32_stroke_lines -> lead (0/210 moved) |
+| 21 Nov 20:18 | fixer | slot FORCED released - see INCIDENTS.md for why |
