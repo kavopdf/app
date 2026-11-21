@@ -4,7 +4,7 @@
  "ended_ts": 1795238138.417112,
  "ended": "10:45",
  "class": "t01_word_accuracy",
- "attempts": 1,
+ "attempts": 2,
  "kept": 0,
  "docs_improved": 0,
  "agents": [
@@ -28,5 +28,6 @@
   }
  ],
  "obstacles_cleared": 0,
- "needs_human": 1
+ "needs_human": 1,
+ "partial": 1
 }

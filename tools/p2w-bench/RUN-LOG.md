@@ -1,5 +1,3 @@
-| 12 Nov 15:10 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders, table-with-merged-cells 51/59 docx 4/5 txt |
-| 12 Nov 15:11 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders, table-with-merged-cells, table-with-no-header-row 54/59 docx 4/5 txt |
 | 12 Nov 15:12 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders, table-with-merged-cells, table-with-no-header-row, table-with-rotated-header 46/59 docx 4/5 txt |
 | 12 Nov 15:12 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders, table-with-merged-cells, table-with-no-header-row, table-with-rotated-header, text-held-twice-shadow-text 43/59 docx 4/5 txt |
 | 12 Nov 15:13 | baseline | measured table-inside-two-column-page, table-of-contents-dot-leaders, table-with-merged-cells, table-with-no-header-row, table-with-rotated-header, text-held-twice-shadow-text, two-tables-stacked-with-no-gap 54/59 docx 4/5 txt |
@@ -199,3 +197,4 @@
 | 21 Nov 07:58 | fixer | slot claimed - fixer running |
 | 21 Nov 10:39 | fixer | attempt t01_word_accuracy -> reverted (0/213 moved) |
 | 21 Nov 10:45 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 21 Nov 11:16 | fixer | attempt t01_word_accuracy -> partial (0/5 moved) |

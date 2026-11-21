@@ -80,7 +80,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `22:43` agent landed: t01_word_accuracy / adversarial patch review -> FINDINGS/fffd-cmap-destination-PATCH-REVIEW-2325.md
 - `23:16` attempt 6 on t01_word_accuracy -> kept (2/7 moved)
 - `23:20` agent deployed: t01_word_accuracy / A - is the U+FFFD glyph a ligature or a single letter, read from the embedded outlin
 - `23:20` agent deployed: t01_word_accuracy / B - how many of the 213 documents a cmap-based recovery would reach, and does any em
@@ -105,6 +104,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `04:36` agent landed: t01_word_accuracy / B -> FINDINGS/widget-ap-glyph-walk-0436-f1x.md
 - `07:16` attempt 13 on 47_margins -> partial (0/26 moved)
 - `10:39` attempt 14 on t01_word_accuracy -> reverted (0/213 moved)
+- `11:16` attempt 15 on t01_word_accuracy -> partial (0/5 moved)
 
 ## Where the rest of the state lives
 

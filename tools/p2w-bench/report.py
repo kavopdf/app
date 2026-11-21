@@ -693,7 +693,14 @@ def subagents():
     # used, so without this filter the report shows agents from three days ago beside today's and
     # the "Took" column fills with cross-day rows that belong to somebody else's run.
     run = _json(RUN, {})
-    mine = set(run.get("agents") or [])
+    # RUN.json's "agents" is a list of RECORDS now (id, class, angle, question, status), not a list
+    # of ids, and `set()` over dicts raises TypeError - report.py died with
+    # "unhashable type: 'dict'" on 21 Nov, which took the number-checker out of lastmessage.py with
+    # it, so every report that day was refused for a reason that had nothing to do with its numbers.
+    # Read the id out of a record, and keep accepting a bare id.
+    mine = set(a.get("id") if isinstance(a, dict) else a
+               for a in (run.get("agents") or [])
+               if (a.get("id") if isinstance(a, dict) else a))
     out = []
     for a in (h.get("agents") or []):
         if a.get("status") not in ("landed", "running", "dead"):

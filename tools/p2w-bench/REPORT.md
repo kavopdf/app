@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 07:58 → running IST · 2h 44m**
+**21 Nov 2026 · slot 07:58 → 10:45 IST · 2h 47m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -46,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 07:58 → running · 2h 44m |
+| Slot window | 07:58 → 10:45 · 2h 47m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 17 |
+| Tool beats | 23 |
 | Longest silence | **119.2 min** — from 08:40:45, after `attempt.py: recording an attempt` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
 | Still a wall | The walk fixes 601 completely - share@5px 52.39 -> 0.00 and docx checks 38/42 -> 42/42 - and it moves Account_ |
 
@@ -59,9 +59,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **2h 41m** | `######################` |
+| fix - diagnose and change the engine | **2h 41m** | `#####################` |
 | record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **2 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

@@ -712,6 +712,10 @@
   {
    "at": "10:39",
    "text": "attempt 14 on t01_word_accuracy -> reverted (0/213 moved)"
+  },
+  {
+   "at": "11:16",
+   "text": "attempt 15 on t01_word_accuracy -> partial (0/5 moved)"
   }
  ],
  "next": "",
