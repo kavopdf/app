@@ -1442,3 +1442,59 @@ it.** Not for a person - for the next run, which is the only reader you will eve
 record is a decision the next run will make again, differently, and one of the two will be wasted.
 
 **You are the last line. There is no one above you to escalate to.**
+
+---
+
+## BEFORE YOU DO ANYTHING ELSE, LOOK AT WHAT THE LAST RUN DID. INCLUDING WHETHER IT DID ANYTHING.
+
+The user, 21 Nov: *"kya fixer cron khud ko correct nhi kar sakta hai yaar uske paas poora access hai...
+isko khud hee khud ko dekhna hoga ki wo kaam kar raha hai ya nhi"*
+
+**You can. Nobody told you to.**
+
+### The first thing you run, before the class, before the engine, before anything
+
+    python3 tools/p2w-bench/gaps.py            # every silence over 5 minutes, per run, with what it was doing
+    python3 tools/p2w-bench/status.py          # is the slot clean, or did the last run die holding it
+    python3 tools/p2w-bench/health.py          # the pipeline's own verdict
+
+**Read what they say about the run before yours.** If a run shows a gap longer than the slot, or a run
+that claimed and then recorded nothing, **that is a finding, and it is yours to act on**:
+
+* a **stale claim** - `round.py --release-fixer --force`, then say in the report that you cleared it
+* a **run with no beacon at all** - it never got past the clone. Write it into `BLOCKERS.md`; the next
+  run needs to know the failure is above the repository
+* **a fire that never happened** - `TIMELINE.jsonl` has a hole wider than the schedule. That is a missed
+  slot, and no run can recover it; record it so the gap is visible instead of silent
+
+### The one thing you cannot see, and why
+
+**A run that never starts cannot check anything.** It runs no code, so it leaves no evidence and cannot
+report its own death. **And no cron in this pipeline has the `cron` tool** - `BLOCKERS.md` row 2026-11-17
+11:40 says so - so a live run cannot list its own runs, cannot see a sibling stuck at `status: running`,
+and cannot trigger, pause or resume itself.
+
+**That is not a gap in your access. It is what being a process means.** The only thing that can act on a
+dead process is something outside it.
+
+**What you CAN do, and what this section is for: leave enough evidence that the next run knows exactly
+what happened and where.** A run that writes a beacon before it starts reading, and a gap in the timeline
+when it dies, is a run whose death is diagnosable. A run that writes nothing is a two-hour hole nobody can
+explain - and that is what 21 Nov cost: a run from 07:57 that left no claim, no beacon and no commit, was
+still marked `running` at 09:54, and silently swallowed the 09:50 fire.
+
+### So beacon early, and beacon often
+
+    python3 tools/p2w-bench/round.py --heartbeat --doing "cloned, reading the brief"
+
+**The clone is the first thing that can hang, and you cannot beacon before it because the tool lives in the
+repository you are cloning.** So the moment the clone returns: beacon, before you read anything. Then
+beacon before every step that can take minutes - a corpus pass, a build, a Drive round-trip, a sub-agent
+wait. The gaps those beacons leave are the only map anyone will have of your run.
+
+### And check yourself while you are running
+
+If you are about to do something that will take more than a few minutes, ask: **if this hangs, will the
+next run be able to tell what I was doing?** If the answer is no, beacon first. That is the whole of
+self-monitoring that is in your power, and it is worth more than any status line, because it is the only
+evidence that survives you.
