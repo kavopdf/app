@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 23:19 → running IST · 20 min**
+**21 Nov 2026 · slot 23:19 → running IST · 30 min**
 
 > **11 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
 
@@ -46,22 +46,23 @@
 
 | | |
 |:--|:--|
-| Slot window | 23:19 → running · 20 min |
+| Slot window | 23:19 → running · 30 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 15 |
-| Longest silence | **6.2 min** — from 23:20:20, after `relay: reading lead evidence` |
-| Silences over 2 min | 4 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Longest silence | **10.5 min** — from 23:39:23, after `report.py: building the report` |
+| Silences over 2 min | 5 |
+| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | round.py --claim-fixer sets ROUND.json fixer_started but never starts RUN.json, so a slot that claims after an |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `############` |
+| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `########` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **7 min** | `########` |
+| report - the report and the chain | **11 min** | `#########` |
+| other - not attributed to a tool | **7 min** | `#####` |
 ## Best results this round
 
 | Document | Before | After | Change |

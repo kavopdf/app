@@ -9,9 +9,15 @@
  "docs_improved": 11,
  "agents": [
   {
-   "name": "rule-emission-census",
+   "id": "rule-emission-census",
    "at": "23:22",
    "took_min": 5,
+   "landed": true
+  },
+  {
+   "id": "txt-failures-diagnosis",
+   "at": "23:41",
+   "took_min": 10,
    "landed": true
   }
  ],

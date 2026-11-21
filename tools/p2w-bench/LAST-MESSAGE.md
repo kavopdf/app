@@ -1,4 +1,4 @@
-**21 Nov 2026 · slot 23:19 → running IST · 20 min**
+**21 Nov 2026 · slot 23:19 → running IST · 30 min**
 
 > The largest class in the corpus was not a rendering defect at all. `05_chars_extra` failed 141 of
 > the 192 scored documents, and every one of them was failing on a character Google's exporter
@@ -105,7 +105,16 @@ class's documents with the engine and compared every rule the source page draws 
 below the bottom of the paper, where `attachShapes` discards it by design. So the engine is not
 losing rules before the writer and the carrier is not writing into a hole.
 
-**One agent, not two.** The second was the `05` question and it became the slot's own build once the
+**A second agent, on the other half.** `txt-failures-diagnosis`, deployed 23:41, returned in 10
+minutes having reproduced all 16 `.txt` failures exactly and split them: **9 are the check, 7 are a
+real engine fault.** Five of the eight `t12_word_invention` documents are PyMuPDF token boundaries
+glued the other way (`cent.1` against `cent` + `1`, `2قهوة` against `قهوة` + `2`, `57 0 0 05`
+against `570 005`). Its one recommendation — `t12` should compare whitespace-stripped character
+multisets, in `verify_txt.py` and not in `TxtWriter.java` — is measured to flip **5 documents**
+clean while both duplication faults keep failing, so it is not a blanket silence. Not landed: the
+other 197 `.txt` were not re-measured. `FINDINGS/txt-16-failures-NINE-ARE-THE-CHECK-2355-relay.md`.
+
+**Why one of them was late.** The second was the `05` question and it became the slot's own build once the
 census came back in five minutes; sending it twice would have duplicated the measurement I was about
 to make by hand.
 
@@ -113,22 +122,23 @@ to make by hand.
 
 | | |
 |:--|:--|
-| Slot window | 23:19 → running · 20 min |
+| Slot window | 23:19 → running · 30 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 15 |
-| Longest silence | **6.2 min** — from 23:20:20, after `relay: reading lead evidence` |
-| Silences over 2 min | 4 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Longest silence | **10.5 min** — from 23:39:23, after `report.py: building the report` |
+| Silences over 2 min | 5 |
+| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | round.py --claim-fixer sets ROUND.json fixer_started but never starts RUN.json, so a slot that claims after an |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `############` |
+| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `########` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **7 min** | `########` |
+| report - the report and the chain | **11 min** | `#########` |
+| other - not attributed to a tool | **7 min** | `#####` |
 ## Next run
 
 Two measurements, both cheap, both already specified:
