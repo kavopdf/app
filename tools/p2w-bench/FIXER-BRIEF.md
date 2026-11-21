@@ -1106,3 +1106,83 @@ The user's rule, and it is absolute: **never rewrite the whole engine.** Work on
 document at a time, and verify before and after every change. A rewrite would take the one thing that
 works - 28 documents clean in Google, 61 improved since 15 Nov - and lose it with no measurement able to
 say where it went.
+
+---
+
+## ONE CONSTRUCT HAS FOUR CONSEQUENCES. KNOW ALL FOUR BEFORE YOU TOUCH IT.
+
+`32_stroke_lines` and `05_chars_extra` being one construct is already written above. **There are two
+more, and one of them is why 21 documents cannot be scored at all.**
+
+A rule is emitted as a floating `<w:drawing>`. Google drops the shape and keeps the `U+200B` anchor.
+That is the rule lost and the character added. But the drawing is emitted **inside its own paragraph**:
+
+    <w:p><w:pPr>
+        <w:snapToGrid w:val="0"/>
+        <w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/>
+        <w:rPr><w:sz w:val="2"/></w:rPr>
+    </w:pPr><w:r><w:drawing>...
+
+**The XML asks for one twip. Google does not give one twip.** Its own formula, written in `DocxWriter`
+line 79, is `w:before + max((w:line/240) * lineHeight(face, size), 0.069 * size)` - a multiple of the
+substitute face's line height with a floor. So every dropped drawing leaves a carrier paragraph that
+costs vertical space on the page.
+
+**Measured on the corpus, 21 Nov:**
+
+    05_round_company_seal_curved_text    70 drawings -> 150 paragraphs -> 1 page becomes 2
+    041122-Account_Opening_Form        2653 drawings -> 3913 paragraphs -> 9 pages become 14
+
+**19 of the 21 documents Google refuses are `1 page -> 2 pages`.** They are not unmeasurable because of
+a tool limitation. They are unmeasurable because the document overflows, and the overflow is the same
+construct. `classify_google.py` now counts them as `00_page_count`, 21 documents, and the user's own
+words about it: "original pdf me kai me sirf 1 page hai jabki docs me 2 page hai".
+
+**So one construct costs four checks and 21 unjudgeable documents:**
+
+| consequence | check | documents in Google |
+|---|---|---:|
+| the rule is dropped | `32_stroke_lines` | 145 |
+| the anchor is left behind | `05_chars_extra` | 141 |
+| the carrier paragraph pushes the flow | `18_displacement` | 125 |
+| the page overflows | `00_page_count` | 21 |
+
+**Every number above is from `benchmarks/DEFECT-CLASSES-GOOGLE.md`, not from memory.** Older notes in
+this file say "53 + 48" - those were true when the corpus was smaller; the table is the authority.
+
+### What this means for the fix, in one line
+
+**The fix has to remove the carrier paragraph as well as the drawing.** Move the rule onto the paragraph
+the page drew it above and the carrier disappears with it - one change, four checks. Move only the
+drawing and leave the carrier, and `00_page_count` and `18_displacement` get worse while `32` gets better.
+
+---
+
+## HOW CLOSE THE CORPUS ACTUALLY IS. 7 IS NOT THE WHOLE STORY.
+
+Google, 192 scored (21 refused), measured 21 Nov:
+
+    0 checks fail  (CLEAN) :   7
+    1 check                :   7    <- one check from clean
+    2 checks               :  24
+    3 checks               :  30
+    4 checks               :  33    <- the mode
+    5 checks               :  24
+    6 checks               :  23
+    7 or more              :  44
+
+    within 1 failure : 14 documents
+    within 2         : 38
+    within 3         : 68
+    within 4         : 101
+
+**Seven clean is the headline and it has not moved in three days. But fourteen are one check away**, and
+of those seven, three are blocked by the construct above:
+
+    394_map_with_legend              32_stroke_lines
+    407_id_card_front_back           32_stroke_lines
+    382_architecture_diagram         05_chars_extra
+
+**So the same fix that clears the largest class also takes the clean count from 7 to 10.** That is worth
+more than any single document, and it is why the rotation keeps coming back to this construct instead of
+chasing a class with fewer documents.
