@@ -1799,3 +1799,6 @@
 {"t": 1795270585.9836962, "ist": "19:46:25", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795271570.551084, "ist": "20:02:50", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795271894.309522, "ist": "20:08:14", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795271898.4952972, "ist": "20:08:18", "ev": "attempt", "d": "32_stroke_lines -> reverted"}
+{"t": 1795271898.7565107, "ist": "20:08:18", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795271898.9577293, "ist": "20:08:18", "ev": "beat", "d": "classrow.py: refreshing the class file"}

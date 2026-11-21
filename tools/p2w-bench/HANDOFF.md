@@ -93,7 +93,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:16` attempt 15 on t01_word_accuracy -> partial (0/5 moved)
 - `11:34` agent deployed: 32_stroke_lines / B - why Google drops the rules LibreOffice draws, and which construct replaces them
 - `11:34` agent deployed: t02_position / A - is the two-line 47_margins/t02 claim a real two-format fix
 - `11:34` agent landed: 32_stroke_lines / B -> tools/p2w-bench/FINDINGS/32_stroke_lines-google-drop-113048-9597.md
@@ -118,6 +117,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `17:40` agent landed: 32_stroke_lines / A -> FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md
 - `19:04` attempt 3 on 32_stroke_lines -> error
 - `19:10` attempt 3 on 32_stroke_lines -> reverted (0/15 moved)
+- `20:08` attempt 4 on 32_stroke_lines -> reverted (0/213 moved)
 
 ## Where the rest of the state lives
 
