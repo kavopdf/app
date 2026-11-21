@@ -1894,3 +1894,11 @@
 {"t": 1795281824.0022364, "ist": "22:53:44", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795281824.906948, "ist": "22:53:44", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795281825.3125868, "ist": "22:53:45", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795281976.6753287, "ist": "22:56:16", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795281976.8520145, "ist": "22:56:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795281977.001834, "ist": "22:56:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795282838.2282944, "ist": "23:10:38", "ev": "beat", "d": "check32 blind to picture-drawn rules: proven on Google exports both ways; now measuring 394+407 (fail only 32)"}
+{"t": 1795282905.5654798, "ist": "23:11:45", "ev": "beat", "d": "engine built; converting 394 and 407"}
+{"t": 1795282941.4886272, "ist": "23:12:21", "ev": "beat", "d": "docs converted; trying Drive round trip for 394+407 to measure the instrument fix on real documents"}
+{"t": 1795283010.5599263, "ist": "23:13:30", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795283029.8994038, "ist": "23:13:49", "ev": "beat", "d": "attempt.py: recording an attempt"}

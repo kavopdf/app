@@ -1,22 +1,13 @@
 {
- "started_ts": 1795278214.9096668,
- "started": "21:53",
+ "started_ts": 1795281976.8695977,
+ "started": "22:56",
  "ended_ts": null,
  "ended": null,
- "class": "t08_line_order",
- "attempts": 1,
- "kept": 1,
- "docs_improved": 9,
- "agents": [
-  "t08_A-01",
-  "32_sA-02"
- ],
+ "class": "",
+ "attempts": 0,
+ "kept": 0,
+ "docs_improved": 0,
+ "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0,
- "counted": [
-  [
-   "t08_line_order",
-   9
-  ]
- ]
+ "needs_human": 0
 }
