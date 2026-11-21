@@ -1154,14 +1154,41 @@ def _invalidate_if_engine_changed():
     return now
 
 
+def _exempt_paths():
+    """Every place EXEMPT.json might sit, most specific first.
+
+    It was read from `dirname(__file__)/../tools/p2w-bench/EXEMPT.json` and from nowhere else.
+    That is right when the script runs from `benchmarks/` inside a clone, and wrong for every
+    cron: the brief tells a run to `cp benchmarks/p2w.py /scratch/work/` and run it from there,
+    where that path is `/scratch/tools/p2w-bench/EXEMPT.json` and does not exist. The failure is
+    silent - the except returns an empty set - so `want` counted 416_many_tiny_pages, which
+    EXEMPT.json excludes by design and which cannot be measured inside one command, and `complete`
+    could never be true. RANKING.csv was therefore never written by this tool at all, and the gate
+    that demands a corpus measurement of the tree could never be satisfied.
+
+    Measured 21 Nov 14:09: copied to /scratch/work, 211 PDFs, want printed 211 where the truth is
+    210, measured 210, remaining 1, "the published RANKING.csv is untouched" - on a corpus that was
+    finished.
+
+    Same list-of-places shape as _realworld_dirs(), for the same reason.
+    """
+    return [os.path.join(HERE, "..", "tools", "p2w-bench", "EXEMPT.json"),
+            os.path.join(REPO, "tools", "p2w-bench", "EXEMPT.json"),
+            os.path.join(ENGINE_SRC, "tools", "p2w-bench", "EXEMPT.json"),
+            os.path.join(HERE, "tools", "p2w-bench", "EXEMPT.json")]
+
+
 def _exempt_docx_set():
     """The documents EXEMPT.json excludes from the .docx measurement, by name."""
-    try:
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
-                               "tools", "p2w-bench", "EXEMPT.json"), encoding="utf-8") as f:
-            return set(json.load(f).get("docx") or {})
-    except Exception:
-        return set()
+    for p in _exempt_paths():
+        try:
+            with open(p, encoding="utf-8") as f:
+                return set(json.load(f).get("docx") or {})
+        except Exception:
+            continue
+    log("  WARNING: EXEMPT.json not found in any of " + str(len(_exempt_paths())) +
+        " places - every document counts toward `want`, including the ones that cannot be measured")
+    return set()
 
 
 def run(end):
@@ -1246,11 +1273,24 @@ def run(end):
                 try: r=measure_doc(p,d)
                 except Exception as e: r=dict(doc=os.path.basename(d),error=str(e)[:100])
             json.dump(r,open(jf,"w"))
-        done=len(glob.glob(DIST+"/*.json"))
+        done=len(results())
         log(f"chunk {i//CHUNK+1}: measured {done} of {len(todo)+done}")
+def results():
+    """The result files, and ONLY the result files.
+
+    `measure()` keeps a resumable window for a 300-page document in DIST/<doc>.partial.json -
+    {"first": n, "merged": {...}} - which is a progress note, not a measurement: it has no "doc"
+    key. Every reader of DIST globbed `*.json`, so that file was read as a result. Measured 21 Nov
+    13:58: `rank()` raised KeyError: 'doc' on 416_many_tiny_pages.partial.json after a full corpus
+    pass had measured 211 of 212, and the traceback killed the run before RANKING.csv was written.
+    The pass was complete; only the report was lost, and the engine patch it measured stayed
+    unlandable.
+    """
+    return [f for f in glob.glob(DIST+"/*.json") if not f.endswith(".partial.json")]
+
 def rank():
     seen={}; errs={}
-    for f in glob.glob(DIST+"/*.json"):
+    for f in results():
         try: d=json.load(open(f))
         except: continue
         if 'error' in d: errs[d['doc']]=d
@@ -1280,14 +1320,7 @@ def rank():
     # Measured 19 Nov: corpus holds 213 PDFs, EXEMPT.json lists 416_many_tiny_pages under "docx",
     # and RANKING.csv carries that document with an empty share5.
     _exempt = set()
-    try:
-        _ep = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                           "..", "tools", "p2w-bench", "EXEMPT.json")
-        with open(_ep, encoding="utf-8") as _f:
-            _ex = json.load(_f)
-        _exempt = set((_ex.get("docx") or {}))
-    except Exception:
-        _exempt = set()
+    _exempt = _exempt_docx_set()
     want = len([_p for _p in glob.glob(CORPUS + "/*.pdf")
                 if os.path.basename(_p)[:-4] not in _exempt])
     have = len(seen) + len(errs)
@@ -1314,11 +1347,16 @@ def rank():
     if errs: log(f"  {len(errs)} MEASURE-ERROR rows written (never dropped)")
     return r
 def status():
-    p=len(glob.glob(CORPUS+"/*.pdf")); d=len(glob.glob(DOCX+"/*.docx")); m=len(glob.glob(DIST+"/*.json"))
+    p=len(glob.glob(CORPUS+"/*.pdf")); d=len(glob.glob(DOCX+"/*.docx")); m=len(results())
     # The corpus is 211 synthetic + the real documents, so the denominator is counted,
     # never assumed. A hard-coded 211 made a 213-document corpus look permanently short.
     want = p or (CORPUS_SYNTHETIC + _realworld_count()[0])
-    log(f"corpus {p}/{want}  docx {d}/{want}  measured {m}/{want}  remaining {max(0,want-m)}")
+    # The denominator excludes the documents EXEMPT.json removes from measurement, or `remaining`
+    # can never reach 0 and this line reports a corpus that is finished as one that is not.
+    want_measured = len([_f for _f in glob.glob(CORPUS+"/*.pdf")
+                         if os.path.basename(_f)[:-4] not in _exempt_docx_set()])
+    log(f"corpus {p}/{want}  docx {d}/{want}  measured {m}/{want_measured}  "
+        f"remaining {max(0,want_measured-m)}")
 
 def diagnose(n):
     os.makedirs(IMG,exist_ok=True)

@@ -133,7 +133,7 @@
   "status": "OPEN"
  },
  "47_margins": {
-  "attempts": 16,
+  "attempts": 17,
   "first_seen": 1794518680.890611,
   "history": [
    {
@@ -226,12 +226,19 @@
     "outcome": "reverted",
     "reason": "The 180deg guard, built and measured on all 213 documents (213/213 .docx word/document.xml byte-identical, 212/213 .txt identical, one-page-rotated-180-degrees t02_position FAIL->PASS, t02_position 5-",
     "total": 5
+   },
+   {
+    "at": "2026-11-21 19:44",
+    "moved": 1,
+    "outcome": "reverted",
+    "reason": "cell-border-inset patch measured on all 210 documents, not the nine it was proposed on: 404_sudoku_grid 0.27->0.00 and three others improved, but 24 documents got worse (table-with-no-header-row 0.61-",
+    "total": 210
    }
   ],
   "last": 1794521923.5603442,
   "last_engine": "462353f",
-  "last_moved": 0,
-  "last_total": 5,
+  "last_moved": 1,
+  "last_total": 210,
   "outcomes": [
    "error",
    "error",
@@ -248,9 +255,10 @@
    "partial",
    "error",
    "partial",
+   "reverted",
    "reverted"
   ],
-  "reason": "The 180deg guard, built and measured on all 213 documents (213/213 .docx word/document.xml byte-identical, 212/213 .txt identical, one-page-rotated-180-degrees t02_position FAIL->PASS, t02_position 5->4). It is recorded as 0 moved because 462353f had already landed the identical change with the identical proof at 17:00 while this run was still converting; this run's commit was reset away rather than duplicated in the tree. The run's own landed work is tooling: scope.py now judges the last engine commit when the tree is clean (462353f had made every subsequent commit unlandable), and the refuted pBdr carry-over is cleared from HANDOFF.json[next] after four runs read it.",
+  "reason": "cell-border-inset patch measured on all 210 documents, not the nine it was proposed on: 404_sudoku_grid 0.27->0.00 and three others improved, but 24 documents got worse (table-with-no-header-row 0.61->0.86, two-tables-stacked 0.77->1.07) and regress.py refused. The nine-document sample was too small, not wrong. Reverted. Next: subtract the border only where w:sz>=8, one 210-document pass, target 2+ improved / 0 worse. Also landed: two p2w.py bugs that made RANKING.csv unwritable - see FINDINGS/p2w-CORPUS-NEVER-COMPLETED-TWO-TOOL-BUGS-195500-f1x.md",
   "reasons": [
    "The spaces a page wrote as indent were emitted as run text, so the indent was n x whichever face's space advance rendered it: 392's 20-space row landed at 64.2 instead of 107.5 pt under a substituted face. Stripping the leading spaces and emitting inkX-b.x as w:ind w:left drives the check's own counter to zero (392 2->0, 380 3->0, 383 7->0 under the substitution proxy) and moves nothing the wrong way anywhere: 9 class documents same or better on share@5px, line and page counts unchanged, p2w.py --validate GATE PASS. Not kept because flowFromBox is the emitter in only 3 of 13 documents - the space-led lines in 40, 77 and 78 are anchored, in a cell, or merged - and a Google-only mechanism is flat in a LibreOffice measurement by construction. Diff and numbers in FINDINGS/47_margins-MECHANISM-133500-f2.md.",
    "Pin the centred line's own extent [b.x, b.right] and drop w:jc, so a centred line stops delegating its left edge to the renderer's text width. Under the substitution proxy it fixes the check on 317_rti_response ((0.1,3)->(0.1,0)) but moves the whole width error onto the line's right end: screen over all 13 class documents gave 11 same, 0 better, 2 worse - 317 share@5px 0.65->2.54, 318 0.00->0.71. A patch that moves the number up and looks worse is not a fix. Diff in FINDINGS/47_margins-MECHANISM-133500-f2.md.",
@@ -264,7 +272,8 @@
    "SECOND ATTEMPT, different construct: 365_recipe_card's -2.01 pt is a SPACE's advance, not an indent. The five METHOD steps are w:ind 800 (40 pt, correct: source 40.00 render 40.10) and the run text literally begins with a space, so the step ink x is paragraph pen + '1.' + the space's advance - 4.85 pt in the source face, 2.69 pt in the substituted DejaVuSerif. Proved the construct by editing the emitted XML only: tab stop at 1080 twips + <w:tab/> instead of the leading space puts the text at 54.10 vs the source's 54.00 (2.01 -> 0.10). NOT implemented in the emitter: a leading space that carries text to a column is the same shape as a word separator, and the corpus has both (71_invoice_space_aligned_no_rules is built of the second), so the guard is a page property and needs its own corpus pass. Written up in FINDINGS/47_margins-SPACE-ADVANCE-TAB-STOP-073000-f1x.md with the two earlier space-as-indent attempts named.",
    "DejaVuSansMono -> Courier New clears 47_margins on 4 documents and takes 392_statistical_console_output to 42/42 in Google, but regresses 392 (1.61->2.91) and 406 (3.45->4.05) on the LibreOffice ratchet. Reverted; lead and the settling test in FINDINGS/47_margins-DEJAVU-MONO-GOOGLE-SUBSTITUTES-VERDANA-081500-f1x.md. Landed instead: p2w soffice warm-up (corpus pass measured 0 of 213 four runs running, now 212 of 213) and gate.py expected-docs exempt fix.",
    "180deg patch measured on .docx for the first time: 140 of 213 byte-identical (136 full-conversion + the 4 rotation docs), .txt changes only one-page-rotated-180-degrees, t02_position FAIL->PASS. Not landed: regress.py refuses an unstamped engine change and a full .txt corpus re-measure does not fit this slot. Finding committed 09639d0.",
-   "The 180deg guard, built and measured on all 213 documents (213/213 .docx word/document.xml byte-identical, 212/213 .txt identical, one-page-rotated-180-degrees t02_position FAIL->PASS, t02_position 5->4). It is recorded as 0 moved because 462353f had already landed the identical change with the identical proof at 17:00 while this run was still converting; this run's commit was reset away rather than duplicated in the tree. The run's own landed work is tooling: scope.py now judges the last engine commit when the tree is clean (462353f had made every subsequent commit unlandable), and the refuted pBdr carry-over is cleared from HANDOFF.json[next] after four runs read it."
+   "The 180deg guard, built and measured on all 213 documents (213/213 .docx word/document.xml byte-identical, 212/213 .txt identical, one-page-rotated-180-degrees t02_position FAIL->PASS, t02_position 5->4). It is recorded as 0 moved because 462353f had already landed the identical change with the identical proof at 17:00 while this run was still converting; this run's commit was reset away rather than duplicated in the tree. The run's own landed work is tooling: scope.py now judges the last engine commit when the tree is clean (462353f had made every subsequent commit unlandable), and the refuted pBdr carry-over is cleared from HANDOFF.json[next] after four runs read it.",
+   "cell-border-inset patch measured on all 210 documents, not the nine it was proposed on: 404_sudoku_grid 0.27->0.00 and three others improved, but 24 documents got worse (table-with-no-header-row 0.61->0.86, two-tables-stacked 0.77->1.07) and regress.py refused. The nine-document sample was too small, not wrong. Reverted. Next: subtract the border only where w:sz>=8, one 210-document pass, target 2+ improved / 0 worse. Also landed: two p2w.py bugs that made RANKING.csv unwritable - see FINDINGS/p2w-CORPUS-NEVER-COMPLETED-TWO-TOOL-BUGS-195500-f1x.md"
   ],
   "requeues": 0,
   "status": "OPEN"
