@@ -1,6 +1,3 @@
-| 12 Nov 21:47 | fixer | slot claimed - fixer running |
-| 12 Nov 22:27 | fixer | slot released; 20_within_10pt (+4) left OPEN with 3 attempts. Calibration on 362_price_list_dense, 5 docx variants through Drive, only the table spacer varied: as emitted (w:line=276, mark sz=2) first-row dy -13.59, spacer deleted -16.75, w:line=1 -16.58, w:line=240 auto -14.00, w:before=276 + w:line=1 -2.78 (18_median_dy FAIL->pass, 51/59->53/59). Root cause CONFIRMED: w:line is a multiple of the paragraph mark's line height, so the spacer bought 3.16 pt of the 13.8 asked and every table rose 10.6 pt. Engine fix written and built, then reverted unmeasured: the 20-document Drive round was blocked (every staged upload rejected as expired), so no ratchet evidence existed. Patch kept at patches/table-spacer-before-not-line.patch - one append() in DocxWriter ~line 4157. Recorded 'error'; 2 confirmed hypotheses written; 5 Google Docs deleted |
-| 12 Nov 22:46 | fixer | slot claimed - fixer running |
 | 12 Nov 23:48 | fixer | slot claimed - fixer running |
 | 13 Nov 00:46 | fixer | slot claimed - fixer running |
 | 13 Nov 00:53 | fixer | round 1: applied the confirmed table-spacer patch (w:before carries the gap, w:line=1), 20 documents through Drive on 2a68de6-dc3d644: 20_within_10pt FAIL->pass on 362_price_list_dense (51->53) and balance-sheet-two-columns (40->44), 10 controls held; ratchet exit 1 with 4 regressions (362 44_header_footer, 316 59_shape_anchor newly failing; 40_devanagari 37->36, newsletter-3col 40->39), 3 of 18 moved; engine reverted |
@@ -199,3 +196,5 @@
 | 21 Nov 14:42 | fixer | attempt t01_word_accuracy -> kept (1/5 moved) |
 | 21 Nov 14:49 | fixer | attempt t01_word_accuracy -> reverted (0/3 moved) |
 | 21 Nov 14:51 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 21 Nov 15:17 | fixer | slot claimed - fixer running |
+| 21 Nov 15:48 | fixer | attempt 47_margins -> partial (1/213 moved) |

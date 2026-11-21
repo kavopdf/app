@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-21 13:54
+# Fixer report - 2026-11-21 15:17
 
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 13:54 → running IST · 56 min**
+**21 Nov 2026 · slot 15:17 → running IST · 31 min**
 
-> **38_faux_bold_italic_synthesised** improved — 2.00 → 0.00. Corpus ratchet clean across 213 documents.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **1** — 3 attempt(s), 2 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,16 +20,13 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `t01_word_accuracy` |
-| Committed | **21** files in 7 commit(s) from `a396617` — ATTEMPTS.json, CLASS-HISTORY.jsonl, ENGINE-STAMP.json, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, REPORT.md, RESTAMP-TXT.jsonl, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN- |
+| Working on | `47_margins` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 14:42 | **kept** | 1/5 | clip-off: 411_nested_xobject_transforms t01 90.0->100.0, 12_stamp_across_page_break t12 also clean; corpus 186->188, 0 regressions |
-| 14:42 | **kept** | 1/5 | doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical |
-| 14:49 | **reverted** | 0/3 | DUPLICATE, not a second fix. The relay claimed the slot at 14:11 and picked the same lead the :50 run landed at 14:21 (d2ea491, TEXT_MEDIABOX_CLIP). Found on the push: the commit was already on main. |
+| 15:48 | **partial** | 1/213 | 180deg patch measured on .docx for the first time: 140 of 213 byte-identical (136 full-conversion + the 4 rotation docs), .txt changes only one-page-rotated-180-degrees, t02_position FAIL->PASS. Not l |
 
 ## The txt
 
@@ -45,30 +42,30 @@
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `t01lostwords-01` | which words each of the five documents loses, and wh | 13:57 | 14:06 | 9 min |
-| `t01blastradius-01` | which of 213 documents change verdict under the two  | 13:57 | 14:08 | 11 min |
+| `47_mA-02` | .docx blast radius of the uprightIfPageIsUpsideDown  | 15:19 | - | - |
+| `47_mB-02` | true size of 47_margins on the CURRENT engine: re-re | 15:19 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:54 → running · 56 min |
+| Slot window | 15:17 → running · 31 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 28 |
-| Longest silence | **20.4 min** — from 13:54:18, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 7 |
-| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | **`stage.py` can never print `measure-google` again, so the results with no engine stamp will never be re-meas |
+| Tool beats | 15 |
+| Longest silence | **26.6 min** — from 15:19:03, after `deployed 2 agents, working my own angle: 47_margins .docx anchor` |
+| Silences over 2 min | 2 |
+| Obstacles | 1 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **38 min** | `###############` |
+| setup - claim, housekeeping, reading the gate | **0 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **29 min** | `####################` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **7 min** | `###` |
-| other - not attributed to a tool | **9 min** | `####` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

@@ -95,7 +95,7 @@
   "status": "OPEN"
  },
  "47_margins": {
-  "attempts": 14,
+  "attempts": 15,
   "first_seen": 1794518680.890611,
   "history": [
    {
@@ -174,12 +174,19 @@
     "outcome": "error",
     "reason": "DejaVuSansMono -> Courier New clears 47_margins on 4 documents and takes 392_statistical_console_output to 42/42 in Google, but regresses 392 (1.61->2.91) and 406 (3.45->4.05) on the LibreOffice ratch",
     "total": null
+   },
+   {
+    "at": "2026-11-21 15:48",
+    "moved": 1,
+    "outcome": "partial",
+    "reason": "180deg patch measured on .docx for the first time: 140 of 213 byte-identical (136 full-conversion + the 4 rotation docs), .txt changes only one-page-rotated-180-degrees, t02_position FAIL->PASS. Not l",
+    "total": 213
    }
   ],
   "last": 1794521923.5603442,
-  "last_engine": "7112d76",
-  "last_moved": 0,
-  "last_total": 26,
+  "last_engine": "2d44a3a",
+  "last_moved": 1,
+  "last_total": 213,
   "outcomes": [
    "error",
    "error",
@@ -194,9 +201,10 @@
    "partial",
    "partial",
    "partial",
-   "error"
+   "error",
+   "partial"
   ],
-  "reason": "DejaVuSansMono -> Courier New clears 47_margins on 4 documents and takes 392_statistical_console_output to 42/42 in Google, but regresses 392 (1.61->2.91) and 406 (3.45->4.05) on the LibreOffice ratchet. Reverted; lead and the settling test in FINDINGS/47_margins-DEJAVU-MONO-GOOGLE-SUBSTITUTES-VERDANA-081500-f1x.md. Landed instead: p2w soffice warm-up (corpus pass measured 0 of 213 four runs running, now 212 of 213) and gate.py expected-docs exempt fix.",
+  "reason": "180deg patch measured on .docx for the first time: 140 of 213 byte-identical (136 full-conversion + the 4 rotation docs), .txt changes only one-page-rotated-180-degrees, t02_position FAIL->PASS. Not landed: regress.py refuses an unstamped engine change and a full .txt corpus re-measure does not fit this slot. Finding committed 09639d0.",
   "reasons": [
    "The spaces a page wrote as indent were emitted as run text, so the indent was n x whichever face's space advance rendered it: 392's 20-space row landed at 64.2 instead of 107.5 pt under a substituted face. Stripping the leading spaces and emitting inkX-b.x as w:ind w:left drives the check's own counter to zero (392 2->0, 380 3->0, 383 7->0 under the substitution proxy) and moves nothing the wrong way anywhere: 9 class documents same or better on share@5px, line and page counts unchanged, p2w.py --validate GATE PASS. Not kept because flowFromBox is the emitter in only 3 of 13 documents - the space-led lines in 40, 77 and 78 are anchored, in a cell, or merged - and a Google-only mechanism is flat in a LibreOffice measurement by construction. Diff and numbers in FINDINGS/47_margins-MECHANISM-133500-f2.md.",
    "Pin the centred line's own extent [b.x, b.right] and drop w:jc, so a centred line stops delegating its left edge to the renderer's text width. Under the substitution proxy it fixes the check on 317_rti_response ((0.1,3)->(0.1,0)) but moves the whole width error onto the line's right end: screen over all 13 class documents gave 11 same, 0 better, 2 worse - 317 share@5px 0.65->2.54, 318 0.00->0.71. A patch that moves the number up and looks worse is not a fix. Diff in FINDINGS/47_margins-MECHANISM-133500-f2.md.",
@@ -208,7 +216,8 @@
    "THE CELL'S OWN BORDER WAS PAID TWICE. insetTw measures a cell's text x from the cell's left EDGE on the page, and the writer then draws a rule on that edge; a renderer puts cell content inside its border, so the text landed at edge + borderWidth + w:ind. Proved on 404_sudoku_grid by editing only the emitted XML: setting w:left and w:insideV to nil moved all 30 unregistered digits from 2.1 pt right to within 0.1 pt, and nothing else changed. The fix subtracts the border THIS cell gets on its left side (the table's left rule in column 0, insideV in every other), in twips = w:sz * 2.5, at the two w:ind emission sites (the string-cell path and cellParaXml via pInset). It is applied AFTER the widening and overflow arithmetic on purpose: subtracting from insetTw itself changed which cells got widened and moved four runs 36.8 pt on 78_mixed_english_devanagari_line. Measured on a same-engine pair (HEAD build vs patched build, soffice render, 42 checks): 404_sudoku_grid 46/47 -> 47/47 with 47_margins 30 unregistered -> 0; 76_devanagari_table 45/47 -> 46/47 with 47_margins 6 -> 2 unregistered and the check flips to PASS; seven other 47_margins documents (07, 21, 365, 39, 78, brochure-3col, product-catalogue) byte-for-byte unchanged in score. NOTE FOR THE NEXT RUN: benchmarks/gverify-lo is STALE for at least 76 and 78 - the committed rows read 39/47 and 36/42 where a pristine HEAD build scores 45/47 and 40/42 - so a same-engine pair is the only honest comparison. The remaining 47_margins failures are NOT this mechanism: their median error is already 0.1 pt and only the per-page tail of unregistered runs remains, which is a different defect.",
    "SECOND RECORD, same construct, now measured in GOOGLE. The patched build was uploaded to Drive, converted to a Google Doc and exported as PDF: 404_sudoku_grid goes 43/47 FAIL -> 44/47, with 47_margins flipping to PASS (HEAD: 18 unregistered at 2.1 pt median). Digit x on page 1: source 115.91 / 159.91 / 291.91; Google HEAD 117.00 / 161.25 / 294.00; Google patched 115.50 / 159.75 / 292.50. Google lays cell content inside the cell's border exactly as LibreOffice does, so the border was paid twice in the renderer the user opens. Still not landed: the gate refuses an unmeasured engine and a full corpus pass does not fit the slot. Patch in patches/47-margins-cell-border-inset.patch, finding in FINDINGS/47_margins-CELL-BORDER-PAID-TWICE-034500-f1x.md.",
    "SECOND ATTEMPT, different construct: 365_recipe_card's -2.01 pt is a SPACE's advance, not an indent. The five METHOD steps are w:ind 800 (40 pt, correct: source 40.00 render 40.10) and the run text literally begins with a space, so the step ink x is paragraph pen + '1.' + the space's advance - 4.85 pt in the source face, 2.69 pt in the substituted DejaVuSerif. Proved the construct by editing the emitted XML only: tab stop at 1080 twips + <w:tab/> instead of the leading space puts the text at 54.10 vs the source's 54.00 (2.01 -> 0.10). NOT implemented in the emitter: a leading space that carries text to a column is the same shape as a word separator, and the corpus has both (71_invoice_space_aligned_no_rules is built of the second), so the guard is a page property and needs its own corpus pass. Written up in FINDINGS/47_margins-SPACE-ADVANCE-TAB-STOP-073000-f1x.md with the two earlier space-as-indent attempts named.",
-   "DejaVuSansMono -> Courier New clears 47_margins on 4 documents and takes 392_statistical_console_output to 42/42 in Google, but regresses 392 (1.61->2.91) and 406 (3.45->4.05) on the LibreOffice ratchet. Reverted; lead and the settling test in FINDINGS/47_margins-DEJAVU-MONO-GOOGLE-SUBSTITUTES-VERDANA-081500-f1x.md. Landed instead: p2w soffice warm-up (corpus pass measured 0 of 213 four runs running, now 212 of 213) and gate.py expected-docs exempt fix."
+   "DejaVuSansMono -> Courier New clears 47_margins on 4 documents and takes 392_statistical_console_output to 42/42 in Google, but regresses 392 (1.61->2.91) and 406 (3.45->4.05) on the LibreOffice ratchet. Reverted; lead and the settling test in FINDINGS/47_margins-DEJAVU-MONO-GOOGLE-SUBSTITUTES-VERDANA-081500-f1x.md. Landed instead: p2w soffice warm-up (corpus pass measured 0 of 213 four runs running, now 212 of 213) and gate.py expected-docs exempt fix.",
+   "180deg patch measured on .docx for the first time: 140 of 213 byte-identical (136 full-conversion + the 4 rotation docs), .txt changes only one-page-rotated-180-degrees, t02_position FAIL->PASS. Not landed: regress.py refuses an unstamped engine change and a full .txt corpus re-measure does not fit this slot. Finding committed 09639d0."
   ],
   "requeues": 0,
   "status": "OPEN"

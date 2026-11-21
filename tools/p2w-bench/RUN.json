@@ -1,22 +1,17 @@
 {
- "started_ts": 1795249458.5973158,
- "started": "13:54",
- "ended_ts": 1795252866.5034716,
- "ended": "14:51",
- "class": "t01_word_accuracy",
- "attempts": 3,
- "kept": 2,
- "docs_improved": 1,
+ "started_ts": 1795254464.5765238,
+ "started": "15:17",
+ "ended_ts": null,
+ "ended": null,
+ "class": "47_margins",
+ "attempts": 1,
+ "kept": 0,
+ "docs_improved": 0,
  "agents": [
-  "t01lostwords-01",
-  "t01blastradius-01"
+  "47_mA-02",
+  "47_mB-02"
  ],
  "obstacles_cleared": 0,
  "needs_human": 0,
- "counted": [
-  [
-   "t01_word_accuracy",
-   1
-  ]
- ]
+ "partial": 1
 }

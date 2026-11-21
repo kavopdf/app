@@ -760,6 +760,18 @@
   {
    "at": "14:49",
    "text": "attempt 19 on t01_word_accuracy -> reverted (0/3 moved)"
+  },
+  {
+   "at": "15:19",
+   "text": "agent deployed: 47_margins / A - .docx blast radius of the uprightIfPageIsUpsideDown two-line fix: build patched "
+  },
+  {
+   "at": "15:19",
+   "text": "agent deployed: 47_margins / B - true size of 47_margins on the CURRENT engine: re-render the class's 26 document"
+  },
+  {
+   "at": "15:48",
+   "text": "attempt 15 on 47_margins -> partial (1/213 moved)"
   }
  ],
  "next": "Land the pBdr rule replacement: FINDINGS/RULES-PBDR-IMPLEMENTATION.md, first statement of DocxWriter.shape() at line 2772 (return before line 2779), carrying the ctx.flowY = s.topPt update. Screen 32_stroke_lines first, then the full corpus pass. The finding predicts 124 documents cleared among the 144 LibreOffice-only ones, and all 145 if the residual is only the footer rule.",
@@ -1305,12 +1317,34 @@
    "finding": "FINDINGS/t01-doubled-draw-both-sides-142100.md",
    "deployed_at": "2026-11-21T13:57",
    "landed_at": "2026-11-21T14:08"
+  },
+  {
+   "id": "47_mA-02",
+   "class": "47_margins",
+   "angle": "A",
+   "question": ".docx blast radius of the uprightIfPageIsUpsideDown two-line fix: build patched engine, convert all 213 to .docx, name every document that moves",
+   "expected": "expected by 16:15",
+   "deployed": "15:19",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-21T09:49"
+  },
+  {
+   "id": "47_mB-02",
+   "class": "47_margins",
+   "angle": "B",
+   "question": "true size of 47_margins on the CURRENT engine: re-render the class's 26 documents and re-run the check, since the table is stale (392 already passes)",
+   "expected": "expected by 16:15",
+   "deployed": "15:19",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-21T09:49"
   }
  ],
  "run": {
-  "started": "13:54",
-  "ended": "14:51",
-  "ended_how": "forced"
+  "started": "15:17",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

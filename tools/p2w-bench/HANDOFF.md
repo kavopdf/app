@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 13:54 |
-| ended | 14:51 |
-| how it ended | forced |
+| started | 15:17 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -82,15 +82,14 @@ unfinished work, not as a result.
 | t02_A-01 | t02_position | A | is the two-line 47_margins/t02 claim a real two-format fix | 11:34 | landed | landed | tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md |
 | t01lostwords-01 | t01 | lostwords | which words each of the five documents loses, and why | 13:57 | the missing token list per document | landed | FINDINGS/t01-doubled-draw-both-sides-142100.md |
 | t01blastradius-01 | t01 | blastradius | which of 213 documents change verdict under the two source-side change | 13:57 | 2 fixed, 0 regressions | landed | FINDINGS/t01-doubled-draw-both-sides-142100.md |
+| 47_mA-02 | 47_margins | A | .docx blast radius of the uprightIfPageIsUpsideDown two-line fix: buil | 15:19 | expected by 16:15 | running |  |
+| 47_mB-02 | 47_margins | B | true size of 47_margins on the CURRENT engine: re-render the class's 2 | 15:19 | expected by 16:15 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `01:41` attempt 9 on t01_word_accuracy -> reverted (0/5 moved)
-- `01:47` attempt 10 on t01_word_accuracy -> reverted (0/5 moved)
-- `01:51` attempt 11 on t01_word_accuracy -> reverted (0/5 moved)
 - `03:25` attempt 11 on 47_margins -> partial (2/26 moved)
 - `03:36` attempt 12 on 47_margins -> partial (2/26 moved)
 - `04:34` attempt 12 on t01_word_accuracy -> partial
@@ -113,6 +112,9 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:45` agent deployed: t01 / lostwords - which words each of the five documents loses, and why
 - `14:45` agent deployed: t01 / blastradius - which of 213 documents change verdict under the two source-side changes
 - `14:49` attempt 19 on t01_word_accuracy -> reverted (0/3 moved)
+- `15:19` agent deployed: 47_margins / A - .docx blast radius of the uprightIfPageIsUpsideDown two-line fix: build patched 
+- `15:19` agent deployed: 47_margins / B - true size of 47_margins on the CURRENT engine: re-render the class's 26 document
+- `15:48` attempt 15 on 47_margins -> partial (1/213 moved)
 
 ## Where the rest of the state lives
 

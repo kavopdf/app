@@ -1,14 +1,14 @@
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 13:54 → running IST · 56 min**
+**21 Nov 2026 · slot 15:17 → running IST · 31 min**
 
-> **38_faux_bold_italic_synthesised** improved — 2.00 → 0.00. Corpus ratchet clean across 213 documents.
+> The 180-degree patch's missing `.docx` measurement is taken: **140 of 213 documents byte-identical**, the `.txt` of exactly one document changes, and it goes `t02_position` FAIL -> PASS. The patch is `.txt`-only by construction.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **1** — 3 attempt(s), 2 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -17,16 +17,13 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `t01_word_accuracy` |
-| Committed | **21** files in 7 commit(s) from `a396617` — ATTEMPTS.json, CLASS-HISTORY.jsonl, ENGINE-STAMP.json, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, REPORT.md, RESTAMP-TXT.jsonl, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN- |
+| Working on | `47_margins` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 14:42 | **kept** | 1/5 | clip-off: 411_nested_xobject_transforms t01 90.0->100.0, 12_stamp_across_page_break t12 also clean; corpus 186->188, 0 regressions |
-| 14:42 | **kept** | 1/5 | doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical |
-| 14:49 | **reverted** | 0/3 | DUPLICATE, not a second fix. The relay claimed the slot at 14:11 and picked the same lead the :50 run landed at 14:21 (d2ea491, TEXT_MEDIABOX_CLIP). Found on the push: the commit was already on main. |
+| 15:48 | **partial** | 1/213 | 180deg patch measured on .docx for the first time: 140 of 213 byte-identical (136 full-conversion + the 4 rotation docs), .txt changes only one-page-rotated-180-degrees, t02_position FAIL->PASS. Not l |
 
 ## The txt
 
@@ -38,44 +35,67 @@
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t08_line_order` - 10 documents |
 
+## Subagents
+
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `47_mA-02` | .docx blast radius of the uprightIfPageIsUpsideDown  | 15:19 | - | - |
+| `47_mB-02` | true size of 47_margins on the CURRENT engine: re-re | 15:19 | - | - |
+
+
+## Why the fix is measured but not committed
+
+`regress.py --check` refuses it: `ENGINE CHANGED (txt): table measured on d5edf038e3e3681e, the tree is ae5b3129bfa31f15 - an unmeasured change is not a pass. Re-measure, then --stamp.` A full 213-document `.txt` re-measure does not fit what was left of this slot, and starting it at 15:58 would have left the tree dirty with an engine change for the next run's `git pull` to trip on. The finding is committed (`09639d0`), so the next run lands it with `regress.py --check --only txt --stamp` and nothing else to work out.
 
 ## The relay's slot
 
-The claim was 27 min stale and the last run had died holding it - `status.py` said LIKELY DEAD, `health.py` said a run is still marked running but has not beaconed. Claimed at 14:11, released at the end.
+The slot was **free** - `status.py` said `IDLE, no fixer claim` - so this run is the fixer, claimed 15:17. `gaps.py` shows no in-run silence over five minutes for the previous run, and it left no claim behind.
 
-**Two leads, one of them already done.** This run picked `t01_word_accuracy`, re-derived the MediaBox clip lead from `FINDINGS/411-nested-xobject-matrix-1940.md`, and measured it on 211 documents: 2 rows differ, both improved, none worse. On push it found the `:50` run had landed the identical line at 14:21. No credit taken - the 411 and 12_stamp movement is `d2ea491`'s. The independent second measurement is the value, because two builds and two harnesses agreeing is what makes the number believable.
+**One thing the next relay must know.** `delegate_task` with `background=true` was honoured as a request, not a guarantee: on a scheduled run the platform ran the agent *inside* the turn and returned after 26 minutes. That is the 26.6 min silence in the Timing table, and from outside it is the shape of a dead run. Beacon before firing one, and expect it to block.
 
-**What that commit left stale, and this run repaired.** `d2ea491` rewrote two rows of `RANKING-TXT.csv` and stopped. `DEFECT-CLASSES-TXT.md` - the file `classpick.py` and `round.py` actually read - still said `t01_word_accuracy` 5 documents, `t12_word_invention` 9, 25 failing. Regenerated from the committed ranking: 3, 8, 24. A round could not have closed on the old table, and the next run would have been sent back to 411.
+**The finding, in one line.** The T02 finding held this patch only because the `.docx` half was unmeasured. It is measured now, and the code says why the answer had to be zero: `flippedPage` reaches `toLines`, whose `turnedPage` parameter is **never read** (`grep -n turnedPage` returns the signature alone), and `buildPara`, which writes `p.lineX`/`p.lineY` - lists only `TxtWriter` consumes. `DocxWriter` reads `p.boxes`. A number only the `.txt` writer reads cannot move a `.docx`.
 
-**Two writer changes killed by measurement**, so no run pays for them again: `39_small_caps_letter_spacing` `gs = g.sizePt` -> `g.size` takes it 97.4 -> 78.8; `38_faux_bold_italic_synthesised` dedupe window 40 -> 200 takes it 98.0 -> 93.0. The position-aware dedupe that did clear 38 is the version the agent called defensible - span-identical *and* position-identical - and it is the one that landed.
+**The class is smaller than the table says.** `47_margins-STALE-TABLES-152500.md` proved `392_statistical_console_output` already passes all 42 checks on this engine while the table calls it a 1.61 failure, and then caught its own error: the "ungated build" it measured was a no-op - parentheses only - so what it attributed to a patch was HEAD's own output. The class's 26 is an upper bound. The next run on `47_margins` should re-derive it before judging its own attempt against it.
 
 ## The lead worth carrying
 
-`39`'s hand-corrected `.txt`, the file a reader would produce, scores 58.2 where the broken one scores 97.4. The reference rewards the wrong file by about 39 points, because `get_text()`'s gap heuristic shatters a real word gap (570 005 arrives as 57 0 0 05) while the page draws a genuine space glyph at x = 355.8. Same shape as the clip: a MuPDF heuristic standing in for what the page draws. **Derive the source word boundaries from the drawn space glyphs in `get_texttrace()`, not from `get_text()`.** Not built - bigger than one line, needs the whole corpus.
+Apply the patch, run `python3 tools/p2w-bench/regress.py --check --only txt --stamp`, commit. Expected: `t02_position` 5 -> 4 failing documents, documents failing any `.txt` check 27 -> 26, 1 of 213 documents changed. The `.docx` column is expected to be 0 of 213, and that is now backed by 140 measured files rather than by reading the code.
 
-## A gate hole, written up not fixed
-
-`regress.py --check` passed an instrument edit with `scope of the change: nothing` and `txt: not re-measured`. The gate's fingerprint tracks the ENGINE; the verifier's own body is not in it. So a change to `verify_txt.py` lands without the gate asking for a measurement. It cost nothing today - both runs measured all 213 by hand - and it will cost something the first time a run edits a check and does not.
-
+**What would prove it wrong.** A document whose `.docx` differs between a HEAD build and a patched build. 140 did not. The 73 not converted in the patched full run are the gap, and the first thing to check there is whether any `DocxWriter` path reaches `Para.lineX` through `Para.copy` or `Para.merge`.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:54 → running · 56 min |
+| Slot window | 15:17 → running · 31 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 28 |
-| Longest silence | **20.4 min** — from 13:54:18, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 7 |
-| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | **`stage.py` can never print `measure-google` again, so the results with no engine stamp will never be re-meas |
+| Tool beats | 15 |
+| Longest silence | **26.6 min** — from 15:19:03, after `deployed 2 agents, working my own angle: 47_margins .docx anchor` |
+| Silences over 2 min | 2 |
+| Obstacles | 1 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **38 min** | `###############` |
+| setup - claim, housekeeping, reading the gate | **0 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **29 min** | `####################` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **7 min** | `###` |
-| other - not attributed to a tool | **9 min** | `####` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **0 min** | `#` |
+## Best results this round
+
+| Document | Before | After | Change |
+|:--|--:|--:|--:|
+| `415_inline_images` | 89.04 | 0.00 | -89.04 |
+| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
+| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
+| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
+| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+
+> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+

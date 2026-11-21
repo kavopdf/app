@@ -1643,3 +1643,30 @@
 {"t": 1795252866.39403, "ist": "14:51:06", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795252866.484833, "ist": "14:51:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795252866.5027947, "ist": "14:51:06", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795254464.4376514, "ist": "15:17:44", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795254464.5630088, "ist": "15:17:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795254475.4519668, "ist": "15:17:55", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795254529.7970796, "ist": "15:18:49", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795254543.4160054, "ist": "15:19:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795254543.6921961, "ist": "15:19:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795254543.9337316, "ist": "15:19:03", "ev": "beat", "d": "deployed 2 agents, working my own angle: 47_margins .docx anchor"}
+{"t": 1795256140.2037559, "ist": "15:45:40", "ev": "beat", "d": "proving the 180deg patch: 136/213 .docx byte-identical, converting the one document that matters"}
+{"t": 1795256283.1000574, "ist": "15:48:03", "ev": "beat", "d": "finding written; committing the .docx blast radius, then attempting the engine commit through the gate"}
+{"t": 1795256324.6857252, "ist": "15:48:44", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256328.13186, "ist": "15:48:48", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795256330.8641872, "ist": "15:48:50", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795256333.3398316, "ist": "15:48:53", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795256333.5851986, "ist": "15:48:53", "ev": "attempt", "d": "47_margins -> partial"}
+{"t": 1795256333.6801922, "ist": "15:48:53", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795256333.8027325, "ist": "15:48:53", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795256333.9699233, "ist": "15:48:53", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256353.840671, "ist": "15:49:13", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256354.2865262, "ist": "15:49:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256354.5681074, "ist": "15:49:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256366.5173783, "ist": "15:49:26", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256366.9956212, "ist": "15:49:26", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256367.2935615, "ist": "15:49:27", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256374.3521209, "ist": "15:49:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256374.9912038, "ist": "15:49:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256375.4639904, "ist": "15:49:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795256375.757249, "ist": "15:49:35", "ev": "beat", "d": "report.py: building the report"}
