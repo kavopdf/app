@@ -1,9 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/311_fir_police_form.pdf",
-  "render": "/tmp/lob/311_fir_police_form.pdf",
+  "render": "/tmp/lo-one/311_fir_police_form.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
+  "engine": "7112d76",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -258,7 +259,15 @@
       "ok": true
     }
   },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.5,
+      "worst_unregistered": 1,
+      "margin_bad": [],
+      "indent_bad": []
+    }
+  },
   "document": "311_fir_police_form",
   "source_file": "/scratch/work/p2w/corpus/311_fir_police_form.pdf",
-  "render_file": "/tmp/lob/311_fir_police_form.pdf"
+  "render_file": "/tmp/lo-one/311_fir_police_form.pdf"
 }

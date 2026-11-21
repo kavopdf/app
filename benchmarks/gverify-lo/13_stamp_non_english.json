@@ -1,11 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/13_stamp_non_english.pdf",
-  "render": "/tmp/lob/13_stamp_non_english.pdf",
+  "render": "/tmp/lo-one/13_stamp_non_english.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "35_rotation"
   ],
+  "engine": "7112d76",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -235,7 +236,15 @@
       "ok": true
     }
   },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.1,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
+    }
+  },
   "document": "13_stamp_non_english",
   "source_file": "/scratch/work/p2w/corpus/13_stamp_non_english.pdf",
-  "render_file": "/tmp/lob/13_stamp_non_english.pdf"
+  "render_file": "/tmp/lo-one/13_stamp_non_english.pdf"
 }

@@ -1,9 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/23_timetable_grid_txtpos.pdf",
-  "render": "/tmp/lob/23_timetable_grid_txtpos.pdf",
+  "render": "/tmp/lo-one/23_timetable_grid_txtpos.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
+  "engine": "7112d76",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -258,7 +259,15 @@
       "ok": true
     }
   },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.9,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
+    }
+  },
   "document": "23_timetable_grid_txtpos",
   "source_file": "/scratch/work/p2w/corpus/23_timetable_grid_txtpos.pdf",
-  "render_file": "/tmp/lob/23_timetable_grid_txtpos.pdf"
+  "render_file": "/tmp/lo-one/23_timetable_grid_txtpos.pdf"
 }

@@ -6,6 +6,7 @@
   "failed": [
     "47_margins"
   ],
+  "engine": "7112d76",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -258,6 +259,20 @@
       "source": 1,
       "render": 0,
       "ok": true
+    }
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 2.1,
+      "worst_unregistered": 30,
+      "margin_bad": [],
+      "indent_bad": [
+        {
+          "page": 1,
+          "unregistered": 30,
+          "worst_pt": 2.1
+        }
+      ]
     }
   },
   "document": "404_sudoku_grid",

@@ -1,12 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/323_credit_card_statement.pdf",
-  "render": "/tmp/lob/323_credit_card_statement.pdf",
+  "render": "/tmp/lo-one/323_credit_card_statement.pdf",
   "passed": 45,
   "total": 47,
   "failed": [
     "60_text_column_right_edge",
     "66_table_cell_width"
   ],
+  "engine": "7112d76",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -261,7 +262,15 @@
       "ok": false
     }
   },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.5,
+      "worst_unregistered": 1,
+      "margin_bad": [],
+      "indent_bad": []
+    }
+  },
   "document": "323_credit_card_statement",
   "source_file": "/scratch/work/p2w/corpus/323_credit_card_statement.pdf",
-  "render_file": "/tmp/lob/323_credit_card_statement.pdf"
+  "render_file": "/tmp/lo-one/323_credit_card_statement.pdf"
 }

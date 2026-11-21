@@ -1,6 +1,6 @@
 {
   "source": "/scratch/work/p2w/corpus/28_value_overflows_cell_txtpos.pdf",
-  "render": "/tmp/lob/28_value_overflows_cell_txtpos.pdf",
+  "render": "/tmp/lo-one/28_value_overflows_cell_txtpos.pdf",
   "passed": 38,
   "total": 42,
   "failed": [
@@ -9,6 +9,7 @@
     "59_shape_anchor",
     "60_text_column_right_edge"
   ],
+  "engine": "7112d76",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -58,7 +59,7 @@
     },
     "23_line_pitch": {
       "source": 30.0,
-      "render": 30.0,
+      "render": 29.5,
       "ok": true
     },
     "25_invisible_text": {
@@ -238,7 +239,21 @@
       "ok": true
     }
   },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.1,
+      "worst_unregistered": 6,
+      "margin_bad": [],
+      "indent_bad": [
+        {
+          "page": 1,
+          "unregistered": 6,
+          "worst_pt": 70.2
+        }
+      ]
+    }
+  },
   "document": "28_value_overflows_cell_txtpos",
   "source_file": "/scratch/work/p2w/corpus/28_value_overflows_cell_txtpos.pdf",
-  "render_file": "/tmp/lob/28_value_overflows_cell_txtpos.pdf"
+  "render_file": "/tmp/lo-one/28_value_overflows_cell_txtpos.pdf"
 }

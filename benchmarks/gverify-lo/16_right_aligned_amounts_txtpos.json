@@ -1,9 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/16_right_aligned_amounts_txtpos.pdf",
-  "render": "/tmp/lob/16_right_aligned_amounts_txtpos.pdf",
+  "render": "/tmp/lo-one/16_right_aligned_amounts_txtpos.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
+  "engine": "7112d76",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -233,7 +234,15 @@
       "ok": true
     }
   },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.1,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
+    }
+  },
   "document": "16_right_aligned_amounts_txtpos",
   "source_file": "/scratch/work/p2w/corpus/16_right_aligned_amounts_txtpos.pdf",
-  "render_file": "/tmp/lob/16_right_aligned_amounts_txtpos.pdf"
+  "render_file": "/tmp/lo-one/16_right_aligned_amounts_txtpos.pdf"
 }

@@ -6,6 +6,7 @@
   "failed": [
     "66_table_cell_width"
   ],
+  "engine": "7112d76",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -258,6 +259,14 @@
       "source": 3,
       "render": 2,
       "ok": false
+    }
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.1,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
     }
   },
   "document": "383_api_docs_page",

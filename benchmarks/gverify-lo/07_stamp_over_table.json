@@ -1,6 +1,6 @@
 {
   "source": "/scratch/work/p2w/corpus/07_stamp_over_table.pdf",
-  "render": "/tmp/lob/07_stamp_over_table.pdf",
+  "render": "/tmp/lo-one/07_stamp_over_table.pdf",
   "passed": 37,
   "total": 42,
   "failed": [
@@ -10,6 +10,7 @@
     "43_within_10pt_x",
     "47_margins"
   ],
+  "engine": "7112d76",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -244,7 +245,21 @@
       "ok": true
     }
   },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.1,
+      "worst_unregistered": 4,
+      "margin_bad": [],
+      "indent_bad": [
+        {
+          "page": 1,
+          "unregistered": 4,
+          "worst_pt": 144.4
+        }
+      ]
+    }
+  },
   "document": "07_stamp_over_table",
   "source_file": "/scratch/work/p2w/corpus/07_stamp_over_table.pdf",
-  "render_file": "/tmp/lob/07_stamp_over_table.pdf"
+  "render_file": "/tmp/lo-one/07_stamp_over_table.pdf"
 }

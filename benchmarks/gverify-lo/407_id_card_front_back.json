@@ -6,6 +6,7 @@
   "failed": [
     "14_filled_shapes"
   ],
+  "engine": "7112d76",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -233,6 +234,14 @@
       "source": 0,
       "render": 0,
       "ok": true
+    }
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.1,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
     }
   },
   "document": "407_id_card_front_back",

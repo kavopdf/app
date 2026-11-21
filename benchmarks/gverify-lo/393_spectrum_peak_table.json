@@ -4,6 +4,7 @@
   "passed": 47,
   "total": 47,
   "failed": [],
+  "engine": "7112d76",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -256,6 +257,14 @@
       "source": 1,
       "render": 0,
       "ok": true
+    }
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.5,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
     }
   },
   "document": "393_spectrum_peak_table",

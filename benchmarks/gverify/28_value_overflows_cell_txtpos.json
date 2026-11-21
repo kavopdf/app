@@ -2,17 +2,17 @@
  "name": "28_value_overflows_cell_txtpos",
  "status": "ok",
  "rc": 1,
- "passed": 33,
+ "passed": 34,
  "total": 42,
  "failed": [
   "04_chars_missing",
   "05_chars_extra",
-  "18_displacement",
   "32_stroke_lines",
   "43_within_10pt_x",
   "45_char_accuracy",
   "47_margins",
   "59_shape_anchor",
   "60_text_column_right_edge"
- ]
+ ],
+ "engine": "7112d76"
 }

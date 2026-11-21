@@ -1,9 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/306_clinical_protocol_synopsis.pdf",
-  "render": "/tmp/lob/306_clinical_protocol_synopsis.pdf",
+  "render": "/tmp/lo-one/306_clinical_protocol_synopsis.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
+  "engine": "7112d76",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -258,7 +259,15 @@
       "ok": true
     }
   },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.5,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
+    }
+  },
   "document": "306_clinical_protocol_synopsis",
   "source_file": "/scratch/work/p2w/corpus/306_clinical_protocol_synopsis.pdf",
-  "render_file": "/tmp/lob/306_clinical_protocol_synopsis.pdf"
+  "render_file": "/tmp/lo-one/306_clinical_protocol_synopsis.pdf"
 }

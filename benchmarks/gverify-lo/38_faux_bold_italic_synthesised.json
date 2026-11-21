@@ -7,6 +7,7 @@
     "04_chars_missing",
     "60_text_column_right_edge"
   ],
+  "engine": "7112d76",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -234,6 +235,14 @@
       "source": 0,
       "render": 0,
       "ok": true
+    }
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.1,
+      "worst_unregistered": 1,
+      "margin_bad": [],
+      "indent_bad": []
     }
   },
   "document": "38_faux_bold_italic_synthesised",

@@ -1,9 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/343_air_waybill.pdf",
-  "render": "/tmp/lo-batch/343_air_waybill.pdf",
+  "render": "/tmp/lo-one/343_air_waybill.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
+  "engine": "7112d76",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -53,7 +54,7 @@
     },
     "23_line_pitch": {
       "source": 14.0,
-      "render": 14.0,
+      "render": 13.8,
       "ok": true
     },
     "25_invisible_text": {
@@ -233,7 +234,15 @@
       "ok": true
     }
   },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.1,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
+    }
+  },
   "document": "343_air_waybill",
   "source_file": "/scratch/work/p2w/corpus/343_air_waybill.pdf",
-  "render_file": "/tmp/lo-batch/343_air_waybill.pdf"
+  "render_file": "/tmp/lo-one/343_air_waybill.pdf"
 }

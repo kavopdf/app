@@ -1,11 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/330_cad_drawing_sheet.pdf",
-  "render": "/tmp/lob/330_cad_drawing_sheet.pdf",
+  "render": "/tmp/lo-one/330_cad_drawing_sheet.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "18_displacement"
   ],
+  "engine": "7112d76",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -260,7 +261,15 @@
       "ok": true
     }
   },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.5,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
+    }
+  },
   "document": "330_cad_drawing_sheet",
   "source_file": "/scratch/work/p2w/corpus/330_cad_drawing_sheet.pdf",
-  "render_file": "/tmp/lob/330_cad_drawing_sheet.pdf"
+  "render_file": "/tmp/lo-one/330_cad_drawing_sheet.pdf"
 }
