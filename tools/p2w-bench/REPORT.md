@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 21:53 → running IST · 45 min**
+**21 Nov 2026 · slot 21:53 → running IST · 1h 00m**
 
 > **041122-Account_Opening_Form** improved — 4.00 → 3.00. Corpus ratchet clean across 213 documents.
 
@@ -40,27 +40,31 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `t08_A-01` | does t08 measure line order or drawing order, decide | 22:39 | - | - |
+| `32_sA-02` | a census of every rule in the failing documents by p | 22:39 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 21:53 → running · 45 min |
+| Slot window | 21:53 → running · 1h 00m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 9 |
+| Tool beats | 16 |
 | Longest silence | **24.3 min** — from 21:53:34, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 4 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Silences over 2 min | 5 |
+| Obstacles | 1 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **13 min** | `#######` |
-| measure or build - a conversion, screen or compile writes no beacon | **30 min** | `###############` |
+| fix - diagnose and change the engine | **13 min** | `#####` |
+| measure or build - a conversion, screen or compile writes no beacon | **30 min** | `###########` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **14 min** | `#####` |
 ## Best results this round
 
 | Document | Before | After | Change |
