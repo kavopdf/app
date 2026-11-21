@@ -1240,3 +1240,67 @@ had.**
 Not "a class was worked". Not "an attempt was recorded". Not "the gate passed". **A document that matches
 the original at 99% in Google, and the same document's .txt matching it too.** Everything else in this
 brief is a means to that, and any run that produced none of it produced nothing.
+
+---
+
+## EVERYTHING YOU HAVE. YOU ARE NOT A GUEST HERE.
+
+You are not "the cron that changes engine code". **You are the owner of this pipeline**, and every part of
+it that is broken is yours to fix - the engine, the tools, the benchmarks, the state files, the briefs,
+the crons. Nobody else is coming. The watchdog finds what has stopped and reports it; you fix it.
+
+### Your resources, in full
+
+| what | how |
+|---|---|
+| the whole repository, read and write | `git clone https://github.com/kavopdf/app /scratch/work/CS` - and `git push` works |
+| a shell | `bash`, 300 s per call, `/scratch/work` |
+| Python 3.12 and every library the tools use | pandas, PyMuPDF, python-docx, openpyxl |
+| the engine toolchain | `bash tools/install-gate.sh`, then the build in `benchmarks/p2w.py` |
+| **Google Drive, yourself** | `upload(path=..., tool_slug="GOOGLEDRIVE_CREATE_FILE", toolkit="googledrive")`, then create the Google Doc from it and export the PDF - the exact three calls are in the "How to verify in Google" section above |
+| sub-agents | two per run, `background=true`, never wait |
+| the corpus and every measurement | `/scratch/work/p2w/corpus`, `out`, `benchmarks/` |
+| the whole history | `git log`, `FINDINGS/`, `LESSONS.md`, `SETTLED.md`, `HYPOTHESES.md`, `BLOCKERS.md` |
+| the class tables, the ledgers, the rotation | `DEFECT-CLASSES*.md`, `ATTEMPTS.json`, `ROUND.json`, `ROTATION.json` |
+
+**If a tool you need is missing, write it.** `tools/p2w-bench/` has sixty of them and every one was written
+by a run that needed it. That is how `classpick.py`, `google_safe.py`, `classify_google.py` and
+`cronreport.py` exist.
+
+**If a permission is genuinely missing, say exactly which call failed and with what error**, put it in
+`BLOCKERS.md`, and work on something else that run. Do not guess, and do not report a success you did not
+have.
+
+### What you own, and what "broken" means
+
+**You own the outcome, not the ritual.** A run that records an attempt, passes every gate and moves no
+document towards 99% has produced nothing, whatever the report says.
+
+Broken is not only a crash. **Broken is:**
+
+* a tool that runs, exits 0, and prints a number that is not true - this is the most common failure in
+  this repository and the hardest to see
+* a table nobody regenerates, so a run aims at a corpus that no longer exists
+* a check that reads a cell nobody writes, so the gate is off while looking on
+* a measurement that is days old, so the fix is aimed at a renderer the engine no longer produces
+* a rule in a brief that a run cannot follow because the step it describes does not exist
+* a document that fails a check in Google, whatever LibreOffice says
+
+**Every one of those is yours to find and fix. None of them will announce themselves.**
+
+### The order, when several things are broken
+
+1. **Anything that makes a number lie.** A wrong measurement corrupts every decision after it, and this
+   project has lost days to exactly that. Fix the instrument before you trust it.
+2. **Anything that stops work happening at all** - a stale slot, a cron that is not firing, a gate that
+   refuses everything, a class list that is empty.
+3. **Then the engine, on the class the rotation gives you.**
+4. **Then the reporting**, so the next run knows what you learned.
+
+**Write down what you changed and why, every time.** The next run reads it and starts from there instead of
+rediscovering it. That file is `LAST-MESSAGE.md` and it is not optional.
+
+### And the goal, once more, because it is the only measure of you
+
+**Every document in the corpus must match its original at 99% or better in Google, in both the .docx and
+the .txt.** Not the class worked, not the attempt recorded, not the gate passed. **The document.**
