@@ -21,6 +21,25 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "LAST-MESSAGE.md")
 MIN = 400
 
+
+def out_path(cron):
+    """Which state file a report for this cron may write.
+
+    ONE FILE PER CRON, BECAUSE ONE FILE WAS NOT ENOUGH. `OUT` used to be LAST-MESSAGE.md for every
+    caller, so a watchdog pass that ran `lastmessage.py --file /tmp/report.md` (its prompt does not
+    pass `--for`) wrote a WATCHDOG table into the FIXER's committed message. Measured 20 Nov: the
+    fixer's real handoff was replaced by a watchdog report and had to be restored from git by hand;
+    a pass that forgot would leave the next fixer run reading someone else's numbers. BLOCKERS.md
+    row 2026-11-20 12:11 asked for exactly this - either a watchdog-only path or a refusal.
+
+    The fixer keeps LAST-MESSAGE.md: the fixer's prompt names that file, and it is the message the
+    chat actually delivers. Every other cron gets its own file and can no longer reach it.
+    """
+    c = (cron or "").strip().lower()
+    if c in ("", "fix", "fixer"):
+        return OUT
+    return os.path.join(HERE, "LAST-MESSAGE-%s.md" % c)
+
 # Rows of the Progress table that MUST equal report.py's own value. Everything else in the
 # message is the run's to write: the headline, the per-idea verdicts, why the silence
 # happened, the subagent durations. These are not.
@@ -492,10 +511,16 @@ def verify_for(cron, text):
 
 def main(argv):
     if "--check" in argv:
-        if not os.path.exists(OUT):
-            print("MISSING - write the report to %s before you commit" % OUT)
+        _c = ""
+        if "--for" in argv:
+            _i = argv.index("--for") + 1
+            if _i < len(argv):
+                _c = argv[_i]
+        _chk = out_path(_c)
+        if not os.path.exists(_chk):
+            print("MISSING - write the report to %s before you commit" % _chk)
             return 1
-        n = len(open(OUT, encoding="utf-8").read().strip())
+        n = len(open(_chk, encoding="utf-8").read().strip())
         if n < MIN:
             print("TOO SHORT - %d characters. That is not a report." % n)
             return 1
@@ -575,8 +600,11 @@ def main(argv):
     if "--dry-run" in argv:
         print("dry run - nothing written")
         return 0
-    open(OUT, "w", encoding="utf-8").write(text)
-    print("wrote %s - %d characters" % (OUT, len(text.strip())))
+    _dest = out_path(_for)
+    open(_dest, "w", encoding="utf-8").write(text)
+    print("wrote %s - %d characters" % (_dest, len(text.strip())))
+    if _dest != OUT:
+        print("LAST-MESSAGE.md is the fixer's and was not touched by this %s report" % (_for or "?"))
     return 0
 
 
