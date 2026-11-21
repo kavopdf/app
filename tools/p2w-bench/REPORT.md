@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -28,6 +28,7 @@
 |--:|:--|--:|:--|
 | 03:35 | **lead** | 0/213 | Blast radius of the horizontal-only carrier patch measured for the first time on all 213: 161 documents change .docx content, not 16. 143 of them fail 32 (gain candidates), 5 pass 32 (pure risk) and 1 |
 | 04:01 | **reverted** | 0/16 | corpus pass on HEAD+horizontal-only carrier: 52 better, 54 worse, regress.py REFUSED 58; regressed docs median 9 carriers vs 1 unchanged; HEAD reproduces baseline on 3 controls so the instrument is so |
+| 04:08 | **lead** | 1/None | Google measurement of the carrier on two documents: 51_two_cm_margins stays 42/42 (rewritten, not worse), 17_three_column_widths_txtpos 40/42 -> 42/42. Refuted the 02:50 prescription: 32_stroke_lines |
 
 ## The txt
 

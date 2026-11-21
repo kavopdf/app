@@ -868,6 +868,10 @@
   {
    "at": "04:01",
    "text": "attempt 12 on 32_stroke_lines -> reverted (0/16 moved)"
+  },
+  {
+   "at": "04:08",
+   "text": "attempt 13 on 32_stroke_lines -> lead"
   }
  ],
  "next": "Do not apply rule-carrier-horizontal-only-2008 as a global substitution. Narrow isRuleShape so a band that sits on a table cell/row edge or a stamp frame gets no carrier, then screen the 54 regressed documents before any corpus pass. Or Google-score 08_two_overlapping_stamps, 50_invoice_coloured_total_row and product-catalogue-code-left-price-right first: if Google is clean the 54 are an LO artefact of nested floating tables and the predicate needs no narrowing",

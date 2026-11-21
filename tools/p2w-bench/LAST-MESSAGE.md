@@ -1,15 +1,17 @@
+# Fixer report - 2026-11-22 03:14
+
+```
 # P2W Fixer - Run Report
 
 **22 Nov 2026 · slot 03:14 → running IST · 47 min**
 
-> The lead the handoff carried for four slots is dead, and this run is what killed it. The carrier
-> patch is a real Google win and it cannot land: it takes 54 documents the wrong way on the proxy.
+> The carrier is dead as a patch, and the reason the last two runs gave for it was the wrong one. It does not damage the clean document in Google, and the narrowing it was told to build does not exist. What kills it is a floating table nested in a table cell.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 2 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,50 +22,13 @@
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `32_stroke_lines` |
 
-"Regressions: none" is true of the tree, and only because the change was reverted. The pass measured
-54 documents worse. None of them shipped.
+## What was tried
 
-## What this run did
-
-The slot was free when I arrived. The run before me claimed at 02:09, beat once, announced "16 Google
-exports downloaded; scoring the 42 checks" and went silent for 69 minutes; its Google measurement
-survived it and was already committed. What I inherited was the handoff's instruction to apply
-`rule-carrier-horizontal-only-2008.patch` and spend the slot on the 213-document pass.
-
-I did that. Applied the patch, built the engine, converted 213 documents and scored 212, then ran the
-gate.
-
-    docx: 58 REGRESSION(S) ... REFUSED. This commit would land a regression or an unmeasured engine.
-
-## The instrument was tested before the verdict was written
-
-The prediction, written first: if the regressions are the patch's, HEAD's engine reproduces the
-committed baseline on the same documents in this sandbox; if they are the instrument's, HEAD reads the
-same bad numbers.
-
-HEAD reproduced the baseline on all three regressed documents I control-tested, to the digit. The
-patched engine moved the same three by 8 to 98 share@5 points. The patch is the cause. The evidence,
-the three control numbers and what would prove this wrong are in
-`FINDINGS/32_stroke_lines-CARRIER-54-REGRESSIONS-0400-f1x.md`.
-
-The same control caught a second, older lie: `415_inline_images` scores 0.00 on a fresh HEAD render
-against 89.04 in `RANKING-BASELINE.csv`. My own first reading of this pass said "52 better, 0 worse"
-because `benchmarks/RANKING.csv` is copied by hand from `/scratch/output/RANKING.csv` and had not been
-replaced — I was comparing an older engine's table and calling it this run's. `regress.py --check`
-passes that, because the stamp moves and the table does not.
-
-## The cause, which is the part worth keeping
-
-Counting the floating carriers each document actually received in the patched `.docx`: regressed
-documents carry a median of 9, unchanged ones 1, and 14 of the 16 target documents — the ones that stay
-clean — carry 2 to 3. The horizontal guard removed the verticals; what is left still contains the
-horizontal table separators, and a floating table nested inside a table cell displaces the cell's flow.
-A document with 21 carriers is not a page with 21 rules.
-
-The narrowing is one predicate, not a cap: a band that sits on a table cell or row edge, or on a stamp
-frame, gets no carrier. The test that decides between that and "the proxy is over-weighting a construct
-Google honours" is in the handoff: Google-score the three regressed documents I control-tested. That is
-the measurement this slot did not have time for, and it is the whole question.
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 03:35 | **lead** | 0/213 | Blast radius of the horizontal-only carrier patch measured for the first time on all 213: 161 documents change .docx content, not 16. 143 of them fail 32 (gain candidates), 5 pass 32 (pure risk) and 1 |
+| 04:01 | **reverted** | 0/16 | corpus pass on HEAD+horizontal-only carrier: 52 better, 54 worse, regress.py REFUSED 58; regressed docs median 9 carriers vs 1 unchanged; HEAD reproduces baseline on 3 controls so the instrument is so |
+| 04:08 | **lead** | 1/None | Google measurement of the carrier on two documents: 51_two_cm_margins stays 42/42 (rewritten, not worse), 17_three_column_widths_txtpos 40/42 -> 42/42. Refuted the 02:50 prescription: 32_stroke_lines |
 
 ## The txt
 
@@ -75,17 +40,85 @@ the measurement this slot did not have time for, and it is the whole question.
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 8 documents |
 
-Measured on this engine rather than assumed: `restamp_txt.py --run` scored all 213 in 34 s and came
-back with 0 newly clean, 0 newly failing, 213 unchanged, and `RANKING-TXT-BASELINE.csv` byte-identical.
-The carrier does not touch the .txt anywhere in the corpus, not only on the 16 the last run checked.
+
+## What this run adds
+
+Two runs before this one worked `32_stroke_lines` and both stopped on a reason that does not survive
+measurement.
+
+The 02:50 run's reason: *"a document that is already right, rewritten by a patch that is supposed to
+fix documents that are wrong, is the definition of the trade the gate forbids."* That is a statement
+about a **change**. Non-negotiable 3 is about a **score**, and nobody had measured which one
+`51_two_cm_margins` was. Measured, through Google Docs itself - patched `.docx` uploaded as a Google
+Doc, exported as Google's own PDF, scored against the source:
+
+| document | committed Google (HEAD) | patched engine, this run | |
+|:--|:--|:--|:--|
+| `51_two_cm_margins` | **42/42** | **42/42** | rewritten, 2 drawings -> 1 drawing + 1 carrier table, score unchanged |
+| `17_three_column_widths_txtpos` | 40/42, fails `05_chars_extra` + `32_stroke_lines` | **42/42** | 0 drawings, 2 carrier tables, both failures gone |
+
+The 02:50 run's prescription: narrow the predicate *"so it cannot fire where the rule already
+renders"*, naming the five documents that pass `32_stroke_lines` while changing as the set it had to be
+right about. A subagent compared their `document.xml` against the documents Google fails. `51` and `17`
+differ in **four numbers only** - `cx`, `cy`, `posH`, `posV`. Every attribute is identical, from the one
+fixed template in `DocxWriter.shape()`.
+
+`51` passes `32_stroke_lines` because the check is **vacuous** on it: its 0.8 pt rule touches the page
+frame at both ends, the 3 pt isolation filter discards it, and the source set is empty. Corpus-wide the
+split is exact - **45 scored documents have zero isolated source rules and all 45 pass `32`; 147 have at
+least one and 145 fail.** The property that separates them is on the source side, which is what the
+check measures. No predicate over the engine's `Shape` fields can see it. **There is nothing to narrow.**
+
+So the carrier is not killed by the clean document and not killed by its predicate. It is killed by the
+04:00 run's measurement, which is the one that counts: **54 documents worse on the proxy, gate REFUSED,
+regressed documents carrying a median of 9 carriers against 1 for unchanged ones.** A floating table
+nested inside a table cell displaces the cell's flow. That is the blocker, and it is a placement
+problem, not a substitution problem.
+
+## Falsification
+
+| test | expected | measured |
+|:--|:--|:--|
+| the carrier damages the one clean document it rewrites | a score below 42 | **42/42, unchanged** - falsified |
+| a `{05,32}` document reaches 42/42 under the carrier | 42/42 | **42/42** |
+| the five "risk" documents share a structural property with the failing ones | a discriminator exists | **none exists** - the 45 vacuous documents are the whole explanation |
+| the carrier reaches every document that fails `32` | reaches all | **no** - `407_id_card_front_back` (41/42, fails `32` alone) keeps all 41 drawings and gets 0 carriers |
+| the 04:00 run's regressions are the instrument's | HEAD reads the same bad numbers | **no** - HEAD reproduced the baseline to the digit; the patch is the cause |
+
+## What the next run should build
+
+Not a narrowed predicate - that was measured and it is empty. The predicate already declines what it
+cannot reach. What is missing is a guard on **where the carrier goes**: a rule whose anchor paragraph
+sits inside a `w:tc` must keep the drawing, because the carrier's own floating table then nests in a
+cell. The 04:00 finding names the 54; `benchmarks/blast-carrier-2008.json` names the 161. The test is
+narrow and cheap - convert those 54 and count carriers per document; the number to beat is a median of 1.
+
+Two numbers to close first, both cheap:
+
+1. `17`'s 40/42 is a **possibly-stale record**. `05_chars_extra` was re-instrumented on 21 Nov 23:37
+   (one U+200B per `w:tab`) and the committed JSONs predate it; `17` has 23 tabs. The defensible
+   reading is HEAD 41/42 failing `32` alone, and the carrier takes it to 42/42.
+2. `407_id_card_front_back` is 41/42 failing `32` alone and the patched engine does not touch it - all
+   41 drawings survive `isRuleShape()`. The carrier is worth what it reaches, and this is a document it
+   never reaches.
 
 ## Subagents
 
-*None deployed this run, and that is a decision, not an oversight.* A scheduled run has no later turn
-for a background result to arrive in, so a subagent runs inside the slot — the 01:53 run measured one
-at seven minutes of a forty-five minute window. This slot had a pass to run and a falsification to
-finish; the falsification was done directly, in two bash calls and a control test, in about four
-minutes.
+Two, both run inside this turn (a scheduled run has no later turn for a background result).
+
+**Drawing XML discriminator** (general-purpose, 5.5 min): built the engine, converted `51`, `17`, `315`,
+`373`, `64` and the rule-heavy bank-statement and boq documents, and compared every drawing attribute
+against the Google verdict. **Negative result, and it is the most valuable thing the run produced** -
+no attribute separates them, and the 213-row correlation (`isolated-rules-vs-google-32.csv`) shows why.
+
+**Carrier collateral checks** (general-purpose, 4.8 min): read all 6341 lines of `verify_google.py` and
+said which of the 42 checks a correctly placed border can newly fail. Exactly one -
+`46_text_crossing_rule` - plus six conditional ones (`18_displacement`, `59_shape_anchor`,
+`60_text_column_right_edge`, `61_blank_not_filled`, `62/63`, `47_margins`). None fired on either document
+measured here; `51` is the sharper test of the two because it passes `46` today with source 0. It also
+found that 21 of 213 documents are `page_count_refused` and 64 are scored out of 47, so a corpus-wide
+42/42 yardstick is not like-for-like.
+
 
 ## Timing
 
@@ -98,9 +131,6 @@ minutes.
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-The longest silence is the rebase: another run claimed the slot at 03:59 and pushed bookkeeping commits
-while I was mid-pass, and the merge of `ROUND.json` and `ATTEMPTS.json` took that long to resolve
-without discarding either run's record.
 
 ### Where the time went
 
@@ -110,21 +140,27 @@ without discarding either run's record.
 | measure or build - a conversion, screen or compile writes no beacon | **23 min** | `############` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
 | report - the report and the chain | **1 min** | `#` |
+## Best results this round
 
-The pass is the slot. Four conversion slices and four measurement slices, each under the five-minute
-call limit, and there is no way to stamp an engine without it.
-
-## One thing that is not mine to fix
-
-Another run claimed the slot at 03:59 while I was mid-pass. I did not release the claim at the end:
-releasing a slot I do not hold would hand a live run's work to whoever fires next. Two runs overlapping
-one slot is the relay's own failure mode, and the heartbeat that keeps a claim alive is written by any
-caller, not only the owner — the same defect `BLOCKERS.md` already records for 21 Nov.
+| Document | Before | After | Change |
+|:--|--:|--:|--:|
+| `415_inline_images` | 89.04 | 0.00 | -89.04 |
+| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
+| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
+| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
+| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
 
 ## Next run
 
-Do not apply `rule-carrier-horizontal-only-2008` as a global substitution. Either Google-score
-`08_two_overlapping_stamps`, `50_invoice_coloured_total_row` and
-`product-catalogue-code-left-price-right` — if Google is clean, the 54 are an artefact of nested
-floating tables and the predicate needs no narrowing — or narrow `isRuleShape` so a band on a table cell
-edge or a stamp frame gets no carrier, and screen the 54 before spending a corpus pass.
+Do not apply rule-carrier-horizontal-only-2008 as a global substitution. Narrow isRuleShape so a band that sits on a table cell/row edge or a stamp frame gets no carrier, then screen the 54 regressed documents before any corpus pass. Or Google-score 08_two_overlapping_stamps, 50_invoice_coloured_total_row and product-catalogue-code-left-price-right first: if Google is clean the 54 are an LO artefact of nested floating tables and the predicate needs no narrowing
+
+> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+```
+
+Written by report.py from committed files only. Every number above is read from
+ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
+and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
