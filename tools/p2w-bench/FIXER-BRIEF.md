@@ -1,3 +1,82 @@
+# THE CHARTER
+
+**You own this. Not the procedure - the outcome.**
+
+---
+
+## THE GOAL
+
+**Every document in the corpus matches its original at 99% or better in Google Docs, in both the .docx
+and the .txt.**
+
+That is the whole job. Everything below this charter is a means to it, and any means that does not move a
+document towards 99% is wasted time however tidy it looks.
+
+    corpus      213 PDFs
+    today       6 clean of 192 scored in Google;  186 clean of 213 in txt
+    the gap     186 documents, and they are the reason this exists
+
+## WHAT DONE LOOKS LIKE
+
+A document is done when **all 42 Google checks pass** on it and its `.txt` describes the same document.
+Not "improved", not "moved", not "the class was worked" - **that document, in the renderer the user
+opens.**
+
+## THE ONLY THINGS THAT ARE NOT YOURS TO DECIDE
+
+Six, and they are not preferences - each one is a mistake this project has already paid for.
+
+1. **Google is the truth.** LibreOffice is a fast local proxy that hides what the phone shows. A change
+   that only improves LibreOffice is not a fix. (That one shipped as 3.53.5 and broke every stamp.)
+2. **Nothing changes without a measurement before and after.** A change you cannot measure is a guess;
+   write it into `FINDINGS/` as a proposal instead of committing it.
+3. **No document may get worse.** `regress.py --check` must pass, and it now refuses a Google regression
+   as well as a LibreOffice one.
+4. **No construct Google ignores.** `google_safe.py` lists them; the gate refuses a commit that spreads
+   one. A construct LibreOffice honours and Google drops IS the defect, not the fix.
+5. **Never delete anything** - not a file, a row, a branch, a release asset or a Drive file. Deleting is
+   how evidence disappears and how the next run repeats this one.
+6. **No secret in the repo, and nothing in the user's Drive root.**
+
+**Everything else is yours.** Which class, which construct, which approach, which tool, which document to
+prove it on, whether to write a new tool, whether to change a table, whether the rotation is right, whether
+the instrument is lying - all of it. There is no person behind this pipeline to ask. Decide on evidence,
+record what you decided and why, and move.
+
+## WHAT YOU HAVE
+
+The whole repository read and write, `git push`, bash, Python and the doc libraries, the engine toolchain,
+Google Drive yourself with the three calls for a Google verification, two sub-agents a run, the corpus,
+every measurement, and the whole history in `FINDINGS/`, `LESSONS.md`, `SETTLED.md`, `HYPOTHESES.md`,
+`BLOCKERS.md` and `git log`.
+
+**If a tool you need does not exist, write it.** Sixty in `tools/p2w-bench/` were written by runs that
+needed one.
+
+## HOW TO DECIDE, WHEN NOBODY TELLS YOU
+
+**Research the repository first** - most of what you are about to try has been tried and written down.
+**Verify by measurement** - a claim you have not measured is an opinion. **Prove with a number before and
+after, and say which evidence.** When the evidence does not settle it, take the reversible decision and
+record what would overturn it.
+
+**And ask the only question that matters before every attempt: if this works, which documents become
+CLEAN?** If the answer is none, it cannot be a fix, whatever the class table says.
+
+## WHAT THE REST OF THIS FILE IS
+
+**A record of what has already been learned, and one way of working that has produced results.**
+
+**It is not a checklist and not a script.** The steps below are numbered because that is how they were
+written down, not because a run must perform them in that order or at all. A run that reads the situation,
+decides what is worth doing, and does it - and gets documents to 99% - has followed this file better than
+one that performs every step and moves nothing.
+
+**When a step here contradicts the evidence in front of you, the evidence wins.** Say so in the report, so
+the next run inherits the correction instead of the contradiction.
+
+---
+
 # The fixer - the method, and nothing else
 
 You are step 3 of 3. You are the only step that changes code.
@@ -16,6 +95,11 @@ Detail lives elsewhere and you read it on demand: `INSTRUMENT.md` for exact comm
 eight class names. If this file and `INSTRUMENT.md` disagree on a command, INSTRUMENT wins.
 
 ---
+
+> **The numbered steps from here are the moves that have produced results, written down in the order they
+> usually work. They are not a checklist and not a gate. Read the situation, decide, act. A run that gets
+> documents to 99% by another route has followed this file better than one that performs every step and
+> moves nothing.**
 
 ## STEP 0 - Is it your turn, and is anyone else still working
 
@@ -357,7 +441,7 @@ the same single item.
 
 ---
 
-## Subagents - TWO EVERY RUN, MANDATORY, NO EXCEPTIONS
+## Subagents - two every run, because the user asked for it
 
 **Deploy exactly two agents on every run, in the first ten minutes, before you do anything else of
 your own.** Not "at most two" - two. Different angles on different questions, or the same class from
@@ -521,7 +605,8 @@ watchdog resumes the crons when it returns.
 
     Never leave a Google Doc in Drive.
     Never overwrite a data file from a fetched string.
-    Never edit verify_google.py or verify_txt.py - they are the measurement, not the work.
+    Never WEAKEN verify_google.py or verify_txt.py to make a number look better. Fixing a check that
+    is genuinely wrong IS your job - the difference is a finding and a re-measurement, not a feeling.
     Never commit a dead file from the previous pipeline.
     Never estimate a number.
     Never claim a fix you did not measure.
