@@ -2124,3 +2124,9 @@
 {"t": 1795300713.5500698, "ist": "04:08:33", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795300747.4919283, "ist": "04:09:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795300748.8966284, "ist": "04:09:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795301318.9899118, "ist": "04:18:38", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795301333.9342182, "ist": "04:18:53", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795301334.0491748, "ist": "04:18:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795303107.6098547, "ist": "04:48:27", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795303107.7677908, "ist": "04:48:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795303155.0125911, "ist": "04:49:15", "ev": "beat", "d": "attempt.py: recording an attempt"}
