@@ -1823,37 +1823,11 @@
 {"t": 1795272531.3239717, "ist": "20:18:51", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795272531.4202552, "ist": "20:18:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795272531.4390335, "ist": "20:18:51", "ev": "killed", "d": "dead claim cleared by force release"}
-{"t": 1795275682.6747506, "ist": "21:11:22", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1795275682.7762985, "ist": "21:11:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795275690.8446636, "ist": "21:11:30", "ev": "beat", "d": "gaps.py: reading the timeline"}
-{"t": 1795275954.0511837, "ist": "21:15:54", "ev": "beat", "d": "relay: corpus assembled 213/213, building engine"}
-{"t": 1795276112.4067822, "ist": "21:18:32", "ev": "beat", "d": "relay: census done, committing finding + tools"}
-{"t": 1795276167.153679, "ist": "21:19:27", "ev": "beat", "d": "relay: measuring the 2008 patch blast radius on no-rule docs"}
-{"t": 1795276283.2829173, "ist": "21:21:23", "ev": "beat", "d": "relay: patch reverted, writing the falsification"}
-{"t": 1795276309.5744894, "ist": "21:21:49", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276322.3445487, "ist": "21:22:02", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276322.8814726, "ist": "21:22:02", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276323.1577184, "ist": "21:22:03", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276328.9314814, "ist": "21:22:08", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276349.5673006, "ist": "21:22:29", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276350.07876, "ist": "21:22:30", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276350.431603, "ist": "21:22:30", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276357.1158326, "ist": "21:22:37", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276357.8373497, "ist": "21:22:37", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276358.3453317, "ist": "21:22:38", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276358.6159139, "ist": "21:22:38", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276389.5790672, "ist": "21:23:09", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276390.180951, "ist": "21:23:10", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276390.5078344, "ist": "21:23:10", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276403.0772138, "ist": "21:23:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795276403.1141012, "ist": "21:23:23", "ev": "release", "d": "fixer released (forced)"}
-{"t": 1795276403.1764848, "ist": "21:23:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795276403.2131467, "ist": "21:23:23", "ev": "killed", "d": "dead claim cleared by force release"}
-{"t": 1795276406.7424788, "ist": "21:23:26", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276407.3871038, "ist": "21:23:27", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276407.959609, "ist": "21:23:27", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276408.269632, "ist": "21:23:28", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276421.2209737, "ist": "21:23:41", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276421.977285, "ist": "21:23:41", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276422.4824522, "ist": "21:23:42", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795276422.762802, "ist": "21:23:42", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795274856.7659056, "ist": "20:57:36", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795274857.0014894, "ist": "20:57:37", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795274909.7063444, "ist": "20:58:29", "ev": "beat", "d": "reading lead: per-page rule carrier; building engine"}
+{"t": 1795276381.1070843, "ist": "21:23:01", "ev": "beat", "d": "subagent killed per-page carrier; census of one-rule documents"}
+{"t": 1795276697.1883855, "ist": "21:28:17", "ev": "beat", "d": "fetching corpus to rescore subagent exports"}
+{"t": 1795276859.2676492, "ist": "21:30:59", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795276859.5237038, "ist": "21:30:59", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795276883.182479, "ist": "21:31:23", "ev": "beat", "d": "attempt.py: recording an attempt"}

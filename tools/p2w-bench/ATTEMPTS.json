@@ -84,7 +84,7 @@
   "status": "OPEN"
  },
  "32_stroke_lines": {
-  "attempts": 5,
+  "attempts": 6,
   "first_seen": 1794543973.3763752,
   "history": [
    {
@@ -121,6 +121,13 @@
     "outcome": "lead",
     "reason": "RELAY 19:58, second measurement of the same class from the other side. Built DocxWriter.ruleCarrier() (patch saved, engine reverted) and measured it through Google on 73_marksheet_subject_marks_grade,",
     "total": 210
+   },
+   {
+    "at": "2026-11-21 21:31",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "per-page table built and measured: 73_marksheet 39->34/42, 394 42->39/42 in Google. Killed. Control disproves 'tables stack': 394 draws 5 floating tables at their own y (42/42); 73's rule at 793.9pt o",
+    "total": null
    }
   ],
   "last": 1794543973.3763797,
@@ -135,9 +142,10 @@
    "error",
    "reverted",
    "reverted",
+   "lead",
    "lead"
   ],
-  "reason": "RELAY 19:58, second measurement of the same class from the other side. Built DocxWriter.ruleCarrier() (patch saved, engine reverted) and measured it through Google on 73_marksheet_subject_marks_grade, three variants. The carrier DRAWS (0 of 2 rules before, 2 of 2 after, at the requested weight and colour) but only the FIRST floating table in a document is placed at its tblpY: rule 1 asked 83.6 and drew at 83.5, rule 2 asked 793.6 and drew at 84.5, stacked under rule 1. tblOverlap=overlap changes the bytes and not the render; an inline carrier loses x entirely (both rules to x=0). Two things this run settled that the 19:26 run did not have: a rule on this corpus is usually a FILL not a stroke (both of 73's rules are filled 483x0.9pt rects with lineRgb=-1), and a plain table costs no character (4-case probe: 0 U+200B), so the 2 U+200B on 73 come from text wrapping around the floating band. NEXT: one floating table per PAGE holding all its rules as exact-height rows. See FINDINGS/32_stroke_lines-FLOATING-CARRIER-DRAWS-BUT-STACKS-2050-f1x.md",
+  "reason": "per-page table built and measured: 73_marksheet 39->34/42, 394 42->39/42 in Google. Killed. Control disproves 'tables stack': 394 draws 5 floating tables at their own y (42/42); 73's rule at 793.9pt of an 841.9pt page is the only one moved. Census: carrier as built reaches 1 of 145.",
   "reasons": [
    "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH.",
    "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md",
@@ -145,7 +153,8 @@
    "commit test",
    "tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is closed. trHeight val=1 exact costs 0.91pt. No engine patch: no time to convert and score a real document.",
    "floating w:tblpPr rule carrier: 394_map_with_legend 41/42 -> 42/42 in Google, patch saved, not committed - a 213-document corpus measurement is ~75 min of conversion and does not fit the slot",
-   "RELAY 19:58, second measurement of the same class from the other side. Built DocxWriter.ruleCarrier() (patch saved, engine reverted) and measured it through Google on 73_marksheet_subject_marks_grade, three variants. The carrier DRAWS (0 of 2 rules before, 2 of 2 after, at the requested weight and colour) but only the FIRST floating table in a document is placed at its tblpY: rule 1 asked 83.6 and drew at 83.5, rule 2 asked 793.6 and drew at 84.5, stacked under rule 1. tblOverlap=overlap changes the bytes and not the render; an inline carrier loses x entirely (both rules to x=0). Two things this run settled that the 19:26 run did not have: a rule on this corpus is usually a FILL not a stroke (both of 73's rules are filled 483x0.9pt rects with lineRgb=-1), and a plain table costs no character (4-case probe: 0 U+200B), so the 2 U+200B on 73 come from text wrapping around the floating band. NEXT: one floating table per PAGE holding all its rules as exact-height rows. See FINDINGS/32_stroke_lines-FLOATING-CARRIER-DRAWS-BUT-STACKS-2050-f1x.md"
+   "RELAY 19:58, second measurement of the same class from the other side. Built DocxWriter.ruleCarrier() (patch saved, engine reverted) and measured it through Google on 73_marksheet_subject_marks_grade, three variants. The carrier DRAWS (0 of 2 rules before, 2 of 2 after, at the requested weight and colour) but only the FIRST floating table in a document is placed at its tblpY: rule 1 asked 83.6 and drew at 83.5, rule 2 asked 793.6 and drew at 84.5, stacked under rule 1. tblOverlap=overlap changes the bytes and not the render; an inline carrier loses x entirely (both rules to x=0). Two things this run settled that the 19:26 run did not have: a rule on this corpus is usually a FILL not a stroke (both of 73's rules are filled 483x0.9pt rects with lineRgb=-1), and a plain table costs no character (4-case probe: 0 U+200B), so the 2 U+200B on 73 come from text wrapping around the floating band. NEXT: one floating table per PAGE holding all its rules as exact-height rows. See FINDINGS/32_stroke_lines-FLOATING-CARRIER-DRAWS-BUT-STACKS-2050-f1x.md",
+   "per-page table built and measured: 73_marksheet 39->34/42, 394 42->39/42 in Google. Killed. Control disproves 'tables stack': 394 draws 5 floating tables at their own y (42/42); 73's rule at 793.9pt of an 841.9pt page is the only one moved. Census: carrier as built reaches 1 of 145."
   ],
   "requeues": 0,
   "status": "OPEN"
