@@ -77,7 +77,98 @@ the next run inherits the correction instead of the contradiction.
 
 ---
 
-# The fixer - the method, and nothing else
+# HOW TO THINK ABOUT A DEFECT. THIS IS THE PART THAT MATTERS.
+
+A check failing is not the problem. It is the symptom. **A run that fixes the symptom has done nothing that
+survives the next document.** This is how to get from the symptom to the thing that causes it.
+
+## 1. Three things, not one
+
+For any defect, look at all three before you touch code:
+
+| | what it is | how to look |
+|---|---|---|
+| **the page** | what the PDF actually draws - position, colour, width, the order things are in | render the page, and read the PDF's own operators; the text layer is not the page |
+| **the engine** | what our `.docx` says about it | unzip the `.docx`, find the construct, read the numbers it wrote |
+| **the renderer** | what Google does with that construct | upload, convert, export, look. LibreOffice does not count here |
+
+**The defect is the gap between the first and the third, and the second is the only thing you can change.**
+A run that looks at one of the three is guessing.
+
+## 2. The cause has to explain every symptom, not the loudest one
+
+If a document fails `32_stroke_lines` and `05_chars_extra`, **that is one cause with two symptoms, not two
+defects.** Find the thing that produces both - on 21 Nov it was one floating `<w:drawing>` per rule: Google
+drops the shape (the rule is lost) and leaves the anchor (a `U+200B` appears).
+
+**A hypothesis that explains one symptom and ignores the other is wrong, however well the fix works on the
+one you looked at.** Check the shapes:
+
+    python3 tools/p2w-bench/classpick.py --leverage
+
+Checks that always travel together share a cause. One fix clears all of them; fixing one of five has done a
+fifth of the work and reported a success.
+
+## 3. Three places a defect can live, and they need different fixes
+
+* **The engine is wrong** - it emits something the page did not draw, or the wrong number. Fix the engine.
+* **The instrument is wrong** - the check fails a document against itself, or counts what the page never
+  drew. Fix the instrument, with a finding and a re-measurement. `26_text_overlap` counted absolute overlaps
+  instead of new ones for days and made the hardest documents unfixable.
+* **Google cannot do it** - the construct is not honoured, or honoured differently. **That is not a fix, it
+  is a finding.** Write it down, use the construct Google does honour, or park the class with the proof.
+
+**Getting this wrong is the most expensive mistake in this repository.** Four attempts at the same rule
+went in as "engine fixes" when the answer was "Google drops it". Eighteen attempts at `32_stroke_lines` went
+in as paragraph-border fixes when 36 of 39 rules were inside table rows and could never reach a paragraph
+border.
+
+## 4. A fix that needs a special case is not a fix
+
+**If your change needs "and for this document, do X instead", you have not found the cause.** The corpus is
+213 documents; a special case per document is 213 patches and a codebase nobody can reason about.
+
+The right shape is: one rule that is true of every document, applied once. If you cannot state it that way,
+you are still at the symptom.
+
+## 5. Prove it on the hardest document, not the easiest
+
+Pick the document where the construct is the **whole** defect - `bank-statement-horizontal-rules-only` is 39
+rules and nothing else. If the fix works there it is a real fix. If you prove it on a document where the
+construct is one of eleven problems, you have learned nothing: the other ten hide the result.
+
+**And then prove it on a second document of a different shape.** A fix that works on one and not the other
+means the cause was wrong, and you found out for the price of one build.
+
+## 6. When a fix does not work, find out WHY before trying another
+
+**The second attempt must be informed by the first, or it is a coin flip.** After every failed attempt,
+answer one of these in writing:
+
+* the construct never reached the output - the code path was not taken (add a print, look at the `.docx`)
+* the construct reached the output and Google ignored it (that is a finding, not a bug)
+* the construct reached the output, Google honoured it, and the numbers were wrong (measure the number)
+* the construct reached the output, Google honoured it, and something else moved to compensate
+
+**"It did not work" is not an answer.** It is the absence of one, and the next run pays for it again.
+
+## 7. The one question before every attempt
+
+**If this works, which documents become CLEAN?**
+
+If the answer is none - because every document that carries this check also carries four others - then the
+attempt cannot move the goal, whatever it does to the table. Go and find the cause the checks share instead.
+
+## 8. And when you are finished, say what you now know that you did not know before
+
+A run's value is not its commits. It is the understanding it leaves behind. **One measured sentence in
+`FINDINGS/` that saves the next run an hour is worth more than three commits that move one document.**
+
+Write it as: what you believed, what you measured, what is now true, and what would prove it wrong.
+
+---
+
+# The fixer - the reference
 
 You are step 3 of 3. You are the only step that changes code.
 
@@ -1667,3 +1758,39 @@ hai kuch aisa karo jisse yeh apni poori timings tak poori takat se kaam karta ra
 **A run that ends with 0 documents improved must say, in the report, what it learned about WHY and what
 the next run should do instead.** A bare "0 improved" with no next move is the failure mode the user is
 describing, and it is the one thing in this brief that costs more than any wrong fix.
+
+---
+
+# THE RUN'S OWN VERDICT. ANSWER THIS BEFORE YOU RELEASE THE SLOT.
+
+The charter says the goal is documents at 99% in Google. **So the only question a run has to answer about
+itself is whether the number that measures that goal moved.**
+
+    python3 tools/p2w-bench/report.py | head -20      # the clean count, before and after
+
+**One of three answers, and the run must know which one it is:**
+
+* **The clean count went up.** Name the documents that became clean and the construct that did it. That is
+  the whole deliverable, and it is worth more than any number of attempts recorded.
+* **A document improved but none became clean.** Say which construct you moved and how far each document
+  now is - "three of these four are one check from clean" is a real result and tells the next run exactly
+  where to aim.
+* **Nothing moved.** Then the run has not finished; it has failed to find the cause, and the honest output
+  is what you ruled out. **A run that ends here must leave the next one a shorter list**, not the same one:
+  which approaches are now proved wrong, and what you would try if you had another hour.
+
+**A run that reports "0 improved" with no shorter list for the next run has produced nothing, however
+accurate its tables.** That is the failure the user described - "sirf chalata hai aur rukta hai" - and it is
+the one thing this file cannot check for you.
+
+## And then leave the place better than you found it
+
+Not a tidy desk - a shorter path. One of these, every run, whichever is true:
+
+* a finding in `FINDINGS/` the next run would otherwise have to rediscover
+* a tool that removes a guess someone was making by hand
+* a check that was lying, fixed and re-measured
+* a class that is genuinely unwinnable, parked with the proof, so no run spends a slot on it again
+* one document closer to 99%, named
+
+**If none of those is true of your run, the run did not happen.**
