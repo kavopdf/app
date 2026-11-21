@@ -97,7 +97,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `17:40` agent landed: 32_stroke_lines / A -> FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md
 - `19:04` attempt 3 on 32_stroke_lines -> error
 - `19:10` attempt 3 on 32_stroke_lines -> reverted (0/15 moved)
 - `20:08` attempt 4 on 32_stroke_lines -> reverted (0/213 moved)
@@ -122,6 +121,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `04:49` agent landed: 32_stroke_lines / B -> FINDINGS/32_stroke_lines-CARRIER-REGRESSION-IS-PAGE-OVERFLOW-0450-f1x.md
 - `04:49` relay slot: the previous fixer (03:53) pushed its message at 04:09 and never released; attempt.py re-stamps fixer_started so the claim read 2 min old at 04:10 and the :10 cron stood down. The claim went stale at 04:18 and this run took it. That re-stamp is why a run that ends after an attempt leaves a fresh-looking claim.
 - `04:49` agent landed: 32_sA-03 /  -> FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md
+- `04:50` blocker 2026-11-21 23:39 ('the relay's claim opened no run window') is FALSIFIED by the code and by this run: round.py claim() calls _run_record('start') at line ~512, RUN.json reads started 04:18 for this slot, and the 03:53 run it displaced was archived into RUN-HISTORY.json as 'killed - never released the slot' (2 attempts, 0 kept). The window opens; close that row rather than writing the fix.
 
 ## Where the rest of the state lives
 
