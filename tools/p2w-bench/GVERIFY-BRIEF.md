@@ -17,12 +17,37 @@ Measured, same engine, same source:
 
 ## STEP 0 — how many are left
 
-    python3 tools/p2w-bench/gverify.py --plan 20
+    python3 tools/p2w-bench/gverify.py --plan 60
 
-Prints `N of 213 have a Google result` and then the next twenty names, smallest .docx first (the
+Prints `N of 213 have a Google result` and then the next sixty names, smallest .docx first (the
 platform upload tool fails on files over ~120 KB; the planner already filters those out).
 
 **If it prints `213 of 213` the measurement is finished.** Go to STEP 4.
+
+  ### WHY 60 AND NOT 20. Measured, 21 Nov.
+
+  The measured history, from the commits that actually measured:
+
+      19 Nov 16:03   90 of 213   (+20 in 12 minutes)   <- the fastest run
+      19 Nov 15:04   50 of 213   (+19 in 38 minutes)
+      19 Nov 18:04  130 of 213   (+20 in 46 minutes)
+
+  **Twenty documents is twelve to fifteen minutes of work.** The cron fires once an hour, so
+  three-quarters of every hour was spent idle and the full corpus took eleven hours. Sixty is still
+  inside one run, and it takes the whole corpus from eleven hours to about four.
+
+  **The limit is not Google Drive.** Drive allows ~1000 requests per 100 s and each document is three -
+  that is 333 documents per 100 s, and it has never been the constraint. **The limit is the platform
+  upload tool: one call per document, and it cannot be batched.** That is what sets the pace, so the
+  only lever is how many documents one run takes on.
+
+  **60 is safe because every run commits what it finished.** If a run is cut off at 35 documents,
+  STEP 3 commits those 35 and the next run plans the remaining 178. There is no half-measurement to
+  clean up and no reason to take fewer.
+
+  **Do not go past 60 without measuring the next one.** If a 60-document run consistently finishes
+  with time to spare, say so in the report and take 80. If it is being cut off, say that and take 40.
+  The number is a measured quantity, not a setting.
 
 ## STEP 1 — stage and upload
 
