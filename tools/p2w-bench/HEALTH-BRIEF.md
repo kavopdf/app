@@ -223,8 +223,19 @@ cron and a zombie run - are not automatable at all.
 
 **The watchdog must therefore check its own tool list first and say which world it is in.**
 
+    **Measured 21 Nov: it has it.** The watchdog's own prompt carries
+    `cron(action="delete", cron_id="<id>")` and `cron(action="create", ...)`, so STEP 4 A and B are
+    executable and a zombie can be cleared without anyone being asked. This brief said the opposite
+    for two days while it was not true, and the watchdog was told to write "a person has to look" into
+    BLOCKERS.md instead of doing the one thing it exists for.
+
 * **No `cron` tool** → do health, progress, `round.py --reopen` and `round.py --release-fixer`, then
-  write into BLOCKERS.md: *"the watchdog has no cron tool; a paused or zombie cron needs a person."*
+  write into BLOCKERS.md: *"this watchdog has no cron tool; a paused or zombie cron cannot be moved
+  by automation"* with the exact call it would have made. **Say it in the report.** A watchdog that
+  reports "nothing to do" while unable to do the one thing it exists for is worse than no watchdog.
+  
+      **Do not write "needs a person".** A missing tool is a missing tool - say which one. There is no
+      person behind this pipeline, and a row that waits for one is a run that stopped working.
   **Say it in the report.** A watchdog that reports "nothing to do" while unable to do the one thing it
   exists for is worse than no watchdog.
 * **Has `cron`** → the zombie and stale-fire procedures above apply.
