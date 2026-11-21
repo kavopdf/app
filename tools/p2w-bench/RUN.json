@@ -1,13 +1,20 @@
 {
- "started_ts": 1795281976.8695977,
- "started": "22:56",
- "ended_ts": 1795283127.4831588,
- "ended": "23:15",
+ "started_ts": 1795283340.0,
+ "started": "23:19",
+ "ended_ts": null,
+ "ended": "running",
  "class": "05_chars_extra",
- "attempts": 2,
+ "attempts": 1,
  "kept": 1,
  "docs_improved": 11,
- "agents": [],
+ "agents": [
+  {
+   "name": "rule-emission-census",
+   "at": "23:22",
+   "took_min": 5,
+   "landed": true
+  }
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0,
  "counted": [
