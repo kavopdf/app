@@ -1,4 +1,20 @@
 {
+ "00_page_count": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [],
+  "last": null,
+  "last_engine": "a998beb",
+  "outcomes": [
+   "error"
+  ],
+  "reason": "namespace test",
+  "reasons": [
+   "namespace test"
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "18_displacement": {
   "attempts": 3,
   "first_seen": null,
@@ -68,7 +84,7 @@
   "status": "OPEN"
  },
  "32_stroke_lines": {
-  "attempts": 3,
+  "attempts": 2,
   "first_seen": 1794543973.3763752,
   "history": [
    {
@@ -87,18 +103,20 @@
    }
   ],
   "last": 1794543973.3763797,
-  "last_engine": "462353f",
+  "last_engine": "a998beb",
   "last_moved": 0,
   "last_total": 145,
   "outcomes": [
    "error",
    "error",
-   "reverted"
+   "reverted",
+   "error"
   ],
-  "reason": "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md",
+  "reason": "namespace test",
   "reasons": [
    "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH.",
-   "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md"
+   "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md",
+   "namespace test"
   ],
   "requeues": 0,
   "status": "OPEN"
@@ -874,17 +892,19 @@
    }
   ],
   "last": null,
-  "last_engine": "49cffd4",
+  "last_engine": "a998beb",
   "last_moved": 0,
   "last_total": 10,
   "outcomes": [
    "reverted",
-   "reverted"
+   "reverted",
+   "error"
   ],
-  "reason": "NO ENGINE CHANGE - a census, which is the result. t08_line_order is not 'ten documents with broken order': SIX of its eight measurable documents are off by exactly ONE line, and in all six the displaced line is secondary text the page set among its body lines - a stamp note (09_stamp_font_not_embedded), a certificate disclaimer (305_vaccination_certificate), a drawing note (330_cad_drawing_sheet), a speech bubble ('I will fix it', 400_comic_page_speech_bubbles), the drop cap 'T' (70_magazine_drop_cap_photo_caption) and a sub-caption (itr-computation-with-slab-table). The line is present and in the right column in every case; it is emitted at a different point in the sequence, which is what a writer that lays out its primary block first and its secondary blocks afterwards does. Two documents are off by more - 46_chart_coloured_labels_body_text 6, 65_two_col_full_width_figure_caption 4 - and may be a different fault. Two of the ten (041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled) have no PDF in any corpus-v1 release zip. Not attempted because a block-order change reorders lines in EVERY document with secondary text and cannot be proven on six: it needs the whole corpus re-converted and re-scored, about twenty minutes of conversion across five calls, which is what was left of this slot. Also: t08 has zero tolerance, so a fix that puts 88 of 89 paired lines in order reads as no movement. FINDINGS/t08-is-one-displaced-secondary-line-1950.md.",
+  "reason": "namespace test",
   "reasons": [
    "claimed (third attempt, same slot). t08_line_order, 10 documents, the largest .txt class left. Census only: group the ten by the mechanism that reorders their lines (column interleave, page furniture, table row order, RTL, footnote) and name which of them a TxtWriter change could reach, so the next run does not treat the class as one construct the way t12 had to be disproved.",
-   "NO ENGINE CHANGE - a census, which is the result. t08_line_order is not 'ten documents with broken order': SIX of its eight measurable documents are off by exactly ONE line, and in all six the displaced line is secondary text the page set among its body lines - a stamp note (09_stamp_font_not_embedded), a certificate disclaimer (305_vaccination_certificate), a drawing note (330_cad_drawing_sheet), a speech bubble ('I will fix it', 400_comic_page_speech_bubbles), the drop cap 'T' (70_magazine_drop_cap_photo_caption) and a sub-caption (itr-computation-with-slab-table). The line is present and in the right column in every case; it is emitted at a different point in the sequence, which is what a writer that lays out its primary block first and its secondary blocks afterwards does. Two documents are off by more - 46_chart_coloured_labels_body_text 6, 65_two_col_full_width_figure_caption 4 - and may be a different fault. Two of the ten (041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled) have no PDF in any corpus-v1 release zip. Not attempted because a block-order change reorders lines in EVERY document with secondary text and cannot be proven on six: it needs the whole corpus re-converted and re-scored, about twenty minutes of conversion across five calls, which is what was left of this slot. Also: t08 has zero tolerance, so a fix that puts 88 of 89 paired lines in order reads as no movement. FINDINGS/t08-is-one-displaced-secondary-line-1950.md."
+   "NO ENGINE CHANGE - a census, which is the result. t08_line_order is not 'ten documents with broken order': SIX of its eight measurable documents are off by exactly ONE line, and in all six the displaced line is secondary text the page set among its body lines - a stamp note (09_stamp_font_not_embedded), a certificate disclaimer (305_vaccination_certificate), a drawing note (330_cad_drawing_sheet), a speech bubble ('I will fix it', 400_comic_page_speech_bubbles), the drop cap 'T' (70_magazine_drop_cap_photo_caption) and a sub-caption (itr-computation-with-slab-table). The line is present and in the right column in every case; it is emitted at a different point in the sequence, which is what a writer that lays out its primary block first and its secondary blocks afterwards does. Two documents are off by more - 46_chart_coloured_labels_body_text 6, 65_two_col_full_width_figure_caption 4 - and may be a different fault. Two of the ten (041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled) have no PDF in any corpus-v1 release zip. Not attempted because a block-order change reorders lines in EVERY document with secondary text and cannot be proven on six: it needs the whole corpus re-converted and re-scored, about twenty minutes of conversion across five calls, which is what was left of this slot. Also: t08 has zero tolerance, so a fix that puts 88 of 89 paired lines in order reads as no movement. FINDINGS/t08-is-one-displaced-secondary-line-1950.md.",
+   "namespace test"
   ],
   "requeues": 0,
   "status": "OPEN"

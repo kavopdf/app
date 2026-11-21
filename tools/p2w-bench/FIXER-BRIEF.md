@@ -226,7 +226,11 @@ the whole investigation.
 `gaps.py` prints every silent stretch over five minutes, inside the previous run and between runs.
 Hours between runs means the crons were paused - say so at the top of your report.
 
-**Never git HEAD anything you did not check out.** Read the working tree.
+**Read the working tree for STATE, not `git show HEAD:`.** A state file read from HEAD is the
+previous run's, and the numbers in it are not the numbers you are working with. This is about
+`ROUND.json`, `ATTEMPTS.json`, `RANKING.csv` and the other live state - **not about history.**
+`git log`, `git show` and `git diff` on the past are yours to read freely and you should: the
+answer to most questions is already in a commit message.
 
 ## STEP 0b - The two questions, then no excuse
 
