@@ -1629,3 +1629,12 @@
 {"t": 1795252548.1913, "ist": "14:45:48", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795252549.2707987, "ist": "14:45:49", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795252603.7651997, "ist": "14:46:43", "ev": "beat", "d": "re-stamping STATE-TXT against the committed engine so the release guard can see the measurement"}
+{"t": 1795252748.7681885, "ist": "14:49:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795252752.7121964, "ist": "14:49:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795252763.4616396, "ist": "14:49:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795252769.384444, "ist": "14:49:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795252780.4769316, "ist": "14:49:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795252788.8089926, "ist": "14:49:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795252791.69947, "ist": "14:49:51", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795252793.4209504, "ist": "14:49:53", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795252794.2432222, "ist": "14:49:54", "ev": "beat", "d": "report.py: building the report"}

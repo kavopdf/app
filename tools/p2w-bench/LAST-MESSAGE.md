@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 13:54 → running IST · 51 min**
+**21 Nov 2026 · slot 13:54 → running IST · 55 min**
 
 > **38_faux_bold_italic_synthesised** improved — 2.00 → 0.00. Corpus ratchet clean across 213 documents.
 
@@ -18,7 +18,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `t01_word_accuracy` |
-| Committed | **21** files in 5 commit(s) from `f702b40` — ATTEMPTS.json, CLASS-HISTORY.jsonl, ENGINE-STAMP.json, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, REPORT.md, RESTAMP-TXT.jsonl, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN- |
+| Committed | **21** files in 7 commit(s) from `a396617` — ATTEMPTS.json, CLASS-HISTORY.jsonl, ENGINE-STAMP.json, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT-BASELINE.csv, RANKING-TXT.csv, REPORT.md, RESTAMP-TXT.jsonl, ROTATION.json, ROUND.json, RUN-HISTORY.json, RUN- |
 
 ## What was tried
 
@@ -48,11 +48,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 13:54 → running · 51 min |
+| Slot window | 13:54 → running · 55 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 27 |
+| Tool beats | 33 |
 | Longest silence | **20.4 min** — from 13:54:18, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 6 |
+| Silences over 2 min | 7 |
 | Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
 | Still a wall | **`stage.py` can never print `measure-google` again, so the results with no engine stamp will never be re-meas |
 
@@ -61,9 +61,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **38 min** | `################` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **2 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **40 min** | `################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **3 min** | `#` |
 | other - not attributed to a tool | **9 min** | `####` |
 ## Best results this round
 
