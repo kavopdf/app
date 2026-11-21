@@ -131,6 +131,25 @@ def main(argv):
         print("  %-20s %8d %8d" % (k, carriers.get(k, 0), totals[k]))
 
     if "--mark" in argv:
+        # THE MARK ONLY EVER FALLS. It is the record of how much of this damage the corpus still
+        # carries, and the whole point is that the number reaches zero. A --mark that could raise it
+        # would let a run make the target whatever it just did, which is the same as having no target.
+        try:
+            was = json.load(open(MARK))
+        except Exception:
+            was = None
+        if was:
+            raised = []
+            for k, v in carriers.items():
+                if v > was.get("carriers", {}).get(k, 0):
+                    raised.append("%s: %d now, the mark is %d" % (k, v, was.get("carriers", {}).get(k, 0)))
+            if raised:
+                print()
+                print("  REFUSED - the mark may only fall, and this would raise it:")
+                for r in raised:
+                    print("    %s" % r)
+                print("  Fix the engine so it emits fewer of them, or do not commit.")
+                return 1
         json.dump({"at": "recorded by google_safe.py --mark", "carriers": carriers, "totals": totals},
                   open(MARK, "w"), indent=1)
         print()
@@ -157,6 +176,12 @@ def main(argv):
             return 1
         print()
         print("  no construct spread beyond the mark")
+        # HOW FAR FROM ZERO. A ratchet that never says the distance is a ratchet nobody works down.
+        left = sum(carriers.values())
+        print("  %d document-carried constructs Google ignores remain - the target is 0" % left)
+        if left:
+            print("  Each one is a defect in a renderer the user opens. Removing them is engine work,")
+            print("  one construct at a time, each measured across the corpus before it is committed.")
     return 0
 
 
