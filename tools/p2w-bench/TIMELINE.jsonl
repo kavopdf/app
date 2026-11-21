@@ -2007,3 +2007,13 @@
 {"t": 1795289031.1832323, "ist": "00:53:51", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795289031.6862164, "ist": "00:53:51", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795289032.0450153, "ist": "00:53:52", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795290397.2083945, "ist": "01:16:37", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795290397.3193421, "ist": "01:16:37", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795290402.4591627, "ist": "01:16:42", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795290517.2373445, "ist": "01:18:37", "ev": "beat", "d": "relay: patch scope read - followed-by-block is a superset, applying that one only"}
+{"t": 1795291152.9262629, "ist": "01:29:12", "ev": "beat", "d": "relay: engine built with carrier patch, corpus 213/213, docx 70/213 converting"}
+{"t": 1795291435.9630733, "ist": "01:33:55", "ev": "beat", "d": "relay: docx 152/213 converting, measuring after"}
+{"t": 1795291849.7594533, "ist": "01:40:49", "ev": "beat", "d": "relay: found the patch over-fires - 3608 vertical cell separators become carriers; testing a horizontal-only guard"}
+{"t": 1795291975.342997, "ist": "01:42:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795291989.591725, "ist": "01:43:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795291991.4930356, "ist": "01:43:11", "ev": "beat", "d": "attempt.py: recording an attempt"}

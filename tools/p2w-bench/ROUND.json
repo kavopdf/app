@@ -1,10 +1,10 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "relay: writing the finding; engine change is a measured lead, patch saved",
-  "fixer_doing_since": 1795288657.553894,
-  "fixer_engine_at_claim": "462353f",
-  "fixer_last_beat": 1795288657.5538952,
+  "fixer_doing": "relay: found the patch over-fires - 3608 vertical cell separators become carriers; testing a horizontal-only guard",
+  "fixer_doing_since": 1795291849.7599409,
+  "fixer_engine_at_claim": "c8101c5",
+  "fixer_last_beat": 1795291849.7599416,
   "fixer_started": 1795290394.5200682,
   "history": [
     {
