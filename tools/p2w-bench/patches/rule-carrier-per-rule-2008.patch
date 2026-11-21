@@ -1,0 +1,186 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4ead19d..722fbc9 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -2770,6 +2770,18 @@ public final class DocxWriter {
+      * it exists to make visible. A rule drawn behind text is still a rule.
+      */
+     private static void shape(StringBuilder sb, Shape s, Ctx ctx) {
++        // A RULE IS NOT A DRAWING ANY MORE.
++        //
++        // Google Docs drops an anchored {@code <w:drawing>} and keeps its anchor, so a rule
++        // the page drew arrived as a stray U+200B and no line at all - 32_stroke_lines, 145
++        // documents, and the largest single class left in the pipeline. A page rule is now a
++        // floating 1x1 table whose one border IS the rule: measured to render, to sit within
++        // 0.5 pt of the requested twips, and to cost 0.00 pt of flow. See
++        // tools/p2w-bench/FINDINGS/32_stroke_lines-TBLPPR-ZERO-FLOW-1905-f1x.md.
++        if (isRuleShape(s)) {
++            ruleCarrier(sb, s, ctx);
++            return;
++        }
+         int id = SHAPE_ID_BASE + (ctx.shapeSeq++);
+         long cx = Math.max(1, Math.round(s.wPt * EMU_PER_PT));
+         long cy = Math.max(1, Math.round(s.hPt * EMU_PER_PT));
+@@ -2823,6 +2835,162 @@ public final class DocxWriter {
+                 .append("</wp:anchor></w:drawing></w:r></w:p>");
+     }
+ 
++    /**
++     * The heaviest short side a rule may have, in points.
++     *
++     * <p>{@code w:sz} accepts 2..96 eighths of a point, so 4 pt is still a border and not a
++     * block of colour: the corpus's rules are 0.1 to 3 pt, and the longest side has to be four
++     * times the short one besides (see {@link #isRuleShape}).
++     *
++     * <p>WHY 4.0 AND NOT 2.5. The check that decides whether a rule survived - 32_stroke_lines
++     * in verify_google.py - calls any straight segment up to {@code RULE_THIN} = 4.0 pt thick a
++     * rule. A predicate that stops at 2.5 therefore leaves every 2.5-4 pt rule on the old
++     * drawing path, which is the path Google drops: measured on 394_map_with_legend, whose third
++     * rule is a 20 x 3.0 pt legend swatch. With 2.5 the document scored 41/42 in Google with
++     * exactly that one rule lost; the carrier is only worth what it covers, so it covers the
++     * instrument's own definition.
++     */
++    private static final float RULE_MAX_PT = 4.0f;
++
++    /**
++     * Is this shape one of the page's RULES - a horizontal or vertical line drawn on the paper?
++     *
++     * <p>The page draws a rule two ways and both arrive here as the same box: a stroked line
++     * segment becomes a filled band as thick as the stroke ({@code PdfToWord.emitStroke}), and a
++     * generator that rules a page with thin filled rectangles produces that band directly. So a
++     * rule is a box with one side at or under {@link #RULE_MAX_PT} and the other at least four
++     * times longer - which is {@link #isHairline}'s test widened only far enough to take a 2 pt
++     * rule, and narrowed by the ratio so that a small filled square or a cell's shading, whose
++     * sides are comparable, is never mistaken for one.
++     *
++     * <p>A shape already folded into a text box's border ({@link Shape#consumed}) and a stamp's
++     * frame ({@link Shape#stampFrame}) are not rules here: each is drawn by something else, and
++     * a carrier for them would put a second copy of the line on the page. A freeform path
++     * ({@code kind == 2}) is a drawn shape, not a rule.
++     */
++    private static boolean isRuleShape(Shape s) {
++        if (s.consumed || s.stampFrame || s.kind != 0) return false;
++        if (s.fillRgb < 0 && s.lineRgb < 0) return false;
++        // A stroke-only box is a rule only when the stroke itself is a rule's weight: a 0.5 pt
++        // outline round a 2 pt tall sliver is a rule, a 3 pt one is a bar.
++        if (s.fillRgb < 0 && s.lineWidthPt > RULE_MAX_PT) return false;
++        float lo = Math.min(s.wPt, s.hPt), hi = Math.max(s.wPt, s.hPt);
++        return lo <= RULE_MAX_PT && hi > 2f && hi >= lo * 4f;
++    }
++
++    /**
++     * A page rule as a FLOATING 1x1 bordered table - the replacement for the anchored
++     * {@code wps:wsp} this writer used to emit for every line the page drew.
++     *
++     * <p>Why a table and not a shape: Google Docs imports a {@code <w:drawing>} and drops it,
++     * leaving the run's anchor behind as a zero-width space, so the rule disappears and a stray
++     * U+200B takes its place. A table's cell border is not a drawing - Google renders it - and
++     * a table floating on {@code w:tblpPr} occupies no flow space at all, which is what makes
++     * it usable for a rule that sits in the middle of a page's text.
++     *
++     * <p>Every number is the page's own: {@code w:tblpX}/{@code w:tblpY} are twips from the
++     * MARGIN anchor, and this writer's pages have zero margins ({@link #sectPrXml}), so the
++     * page's point IS the margin's point and no conversion is needed beyond pt -> twips. The
++     * length is written three times - {@code w:tblW}, the {@code w:tblGrid} column and
++     * {@code w:tcW} - because a fixed-layout table's width comes from its grid and not from
++     * {@code w:tblW} alone.
++     *
++     * <p>Traps this construct is written around, all of them measured or schema-backed:
++     * <ul>
++     *   <li>{@code w:vertAnchor="page"} is silently dropped - {@code "margin"} is the anchor
++     *       that survives.</li>
++     *   <li>an all-zero {@code w:tblpPr} is discarded, so both anchors are named and the offsets
++     *       are the page's real ones.</li>
++     *   <li>{@code w:tblPr}'s children are a SEQUENCE, not a set: {@code tblpPr} precedes
++     *       {@code tblW}, {@code tblBorders} precedes {@code tblLayout}, and {@code tblLayout}
++     *       follows {@code tblW} - see CT_TblPrBase in wml.xsd.</li>
++     *   <li>a {@code w:tbl} is not a legal child of a {@code w:p}, so this is written where a
++     *       block goes ({@code emitBlock}), never inside a paragraph.</li>
++     *   <li>a zero-height row does not exist ({@code w:trHeight w:val="0"} is discarded), so a
++     *       flat rule's row is {@code val="1" w:hRule="exact"}.</li>
++     * </ul>
++     */
++    private static void ruleCarrier(StringBuilder sb, Shape s, Ctx ctx) {
++        boolean horizontal = s.wPt >= s.hPt;
++        // The rule's LENGTH is its long side; its WEIGHT is the short one, or the stroke width
++        // where the page stroked an outline rather than filling a band.
++        float lenPt = horizontal ? s.wPt : s.hPt;
++        float weightPt = horizontal ? s.hPt : s.wPt;
++        if (s.fillRgb < 0) weightPt = s.lineWidthPt;
++        int rgb = s.fillRgb >= 0 ? s.fillRgb : s.lineRgb;
++        float alpha = s.fillRgb >= 0 ? s.fillAlpha : s.lineAlpha;
++        // The rule sits in the MIDDLE of the band the page painted, so half the weight is added
++        // back to the box's own edge before the border is placed on it.
++        int lenTw = (int) Math.max(2L, Math.round(lenPt * TWIPS_PER_PT));
++        int weightTw = (int) Math.max(2L, Math.round(Math.max(0.1f, weightPt) * TWIPS_PER_PT));
++        int xTw = (int) Math.max(0L, Math.round((s.xPt + (horizontal ? 0f : weightPt / 2f))
++                * TWIPS_PER_PT));
++        int yTw = (int) Math.max(0L, Math.round((s.topPt + (horizontal ? weightPt / 2f : 0f))
++                * TWIPS_PER_PT));
++        int sz = szOf(weightPt);
++        String colour = borderColour(new float[]{weightPt, rgb, alpha});
++        // The ONE edge that is the rule: a horizontal rule is the cell's top edge, so tblpY is
++        // the rule's own y, and a vertical one is the cell's left edge, so tblpX is its x.
++        String edge = horizontal ? "top" : "left";
++        // A horizontal rule's table is as wide as the rule and one twip tall; a vertical one is
++        // the other way round, its row as tall as the rule and its single column as wide as the
++        // stroke, because the border runs along the whole row height.
++        int cellTw = horizontal ? lenTw : weightTw;
++        int rowTw = horizontal ? 1 : lenTw;
++        sb.append("<w:tbl><w:tblPr>")
++                .append("<w:tblpPr w:vertAnchor=\"margin\" w:horzAnchor=\"margin\"")
++                .append(" w:tblpX=\"").append(xTw).append("\" w:tblpY=\"").append(yTw)
++                .append("\" w:leftFromText=\"0\" w:rightFromText=\"0\"")
++                .append(" w:topFromText=\"0\" w:bottomFromText=\"0\"/>")
++                .append("<w:tblW w:w=\"").append(cellTw).append("\" w:type=\"dxa\"/>")
++                .append("<w:tblBorders>")
++                .append("<w:top w:val=\"nil\"/><w:left w:val=\"nil\"/>")
++                .append("<w:bottom w:val=\"nil\"/><w:right w:val=\"nil\"/>")
++                .append("<w:insideH w:val=\"nil\"/><w:insideV w:val=\"nil\"/>")
++                .append("</w:tblBorders>")
++                .append("<w:tblLayout w:type=\"fixed\"/>")
++                // THE CELL MARGIN IS WHERE THE 5.4 pt CAME FROM. A table with no
++                // w:tblCellMar gets Word's default 0.075 in (108 twips, 5.4 pt) left
++                // inset, and the renderer puts the table's LEFT EDGE - which is the
++                // border this carrier draws - that far left of w:tblpX. Measured in the
++                // LibreOffice proxy on 394_map_with_legend: a 20 pt rule asked for at
++                // x 395.28 rendered at 389.9, covering 73 % of its own length against
++                // 32_stroke_lines' 80 % floor, and was reported lost. Every other table
++                // this writer emits already zeroes its margins for the same reason
++                // (see the corpus table above); the carrier has to do it too.
++                .append("<w:tblCellMar><w:top w:w=\"0\" w:type=\"dxa\"/>")
++                .append("<w:left w:w=\"0\" w:type=\"dxa\"/>")
++                .append("<w:bottom w:w=\"0\" w:type=\"dxa\"/>")
++                .append("<w:right w:w=\"0\" w:type=\"dxa\"/></w:tblCellMar>")
++                .append("</w:tblPr>")
++                .append("<w:tblGrid><w:gridCol w:w=\"").append(cellTw)
++                .append("\"/></w:tblGrid>")
++                .append("<w:tr><w:trPr><w:trHeight w:val=\"").append(rowTw)
++                .append("\" w:hRule=\"exact\"/></w:trPr>")
++                .append("<w:tc><w:tcPr>")
++                .append("<w:tcW w:w=\"").append(cellTw).append("\" w:type=\"dxa\"/>")
++                .append("<w:tcBorders>");
++        for (int i = 0; i < 4; i++) {
++            String side = TABLE_SIDES[i];
++            if (side.equals(edge)) {
++                sb.append("<w:").append(side).append(" w:val=\"single\" w:sz=\"").append(sz)
++                        .append("\" w:space=\"0\" w:color=\"").append(colour).append("\"/>");
++            } else {
++                sb.append("<w:").append(side).append(" w:val=\"nil\"/>");
++            }
++        }
++        // The cell's paragraph is empty and as short as a paragraph can be: the row's height is
++        // carried by w:trHeight, and a paragraph with a real line box would make the row taller
++        // than the 1 twip the carrier asked for.
++        sb.append("</w:tcBorders></w:tcPr>")
++                .append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
++                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\"")
++                .append(" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
++                .append("<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr>")
++                .append("</w:pPr></w:p>")
++                .append("</w:tc></w:tr></w:tbl>");
++    }
++
+     /**
+      * True when a 0xRRGGBB fill is the page's own colour to within {@link #PAGE_TOL}.
+      *

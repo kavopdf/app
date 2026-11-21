@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-21 21:11
+# Fixer report - 2026-11-21 20:57
 
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 21:11 → 21:23 IST · 12 min**
+**21 Nov 2026 · slot 20:57 → running IST · 34 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 0 attempt(s), 0 kept |
+| Documents improved this run | **0** — 1 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,7 +20,13 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `32_stroke_lines` |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 21:31 | **lead** | 0/None | per-page table built and measured: 73_marksheet 39->34/42, 394 42->39/42 in Google. Killed. Control disproves 'tables stack': 394 draws 5 floating tables at their own y (42/42); 73's rule at 793.9pt o |
 
 ## The txt
 
@@ -40,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 21:11 → 21:23 · 12 min |
+| Slot window | 20:57 → running · 34 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 11 |
-| Longest silence | **4.4 min** — from 21:11:30, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 2 |
+| Tool beats | 12 |
+| Longest silence | **24.5 min** — from 20:58:29, after `reading lead: per-page rule carrier; building engine` |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -52,10 +58,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **4 min** | `########` |
-| measure or build - a conversion, screen or compile writes no beacon | **0 min** | `##` |
-| report - the report and the chain | **1 min** | `###` |
-| other - not attributed to a tool | **5 min** | `#########` |
+| fix - diagnose and change the engine | **2 min** | `##` |
+| measure or build - a conversion, screen or compile writes no beacon | **29 min** | `###################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
