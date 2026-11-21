@@ -71,3 +71,12 @@ sha256, the method, and a real timestamp — which is the shape every Google row
 Three of three documents now pass `05_chars_extra` in Google on the current engine where the table says
 they fail. The class is not 141 documents of work on HEAD; it is at least partly already done and
 unmeasured.
+
+## A breach this run found and did not commit
+
+Listing Drive for `probe-` before finishing showed that this run's three probe documents are gone
+(deleted after scoring), but **earlier runs left at least ten probe documents in the user's My Drive
+root** (`p2w-probe-392`, `p2w-probe-51_two_cm_margins`, `394_map_with_legend (relay tblpPr probe)`,
+`17_three_column_widths_txtpos-carrier-probe`, `kavo-shape-probe` and others, parents
+`0ACQsL9VKTHGNUk9PVA`). That is non-negotiable 6, and they are not this run's to delete. They are named
+here so the next run with a free hand can clear them, or so the owner can.
