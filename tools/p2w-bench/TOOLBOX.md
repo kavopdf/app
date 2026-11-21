@@ -255,79 +255,27 @@ Always release the claim when you finish, even on failure.
 
 ---
 
-## classify.py — separate and rank the defects
+## classify.py — RETIRED, do not call
 
-**Used by:** classifier (writes), fixer (reads and records attempts).
+**Its own source says it: "THE DOCX HALF OF THIS TOOL IS RETIRED AND ITS COUNT WAS BEING READ AS LIVE."**
+It rewrote `DEFECT-CLASSES.md` with retired check-id classes and printed a document count taken from a
+baseline that no longer exists. Running it produces the ghost list of a pipeline that is gone, and a run
+that took its class from that list aimed at a corpus that is not this one.
 
-```
-python3 tools/p2w-bench/classify.py
-python3 tools/p2w-bench/classify.py --subclusters "<exact class name>"
-python3 tools/p2w-bench/classify.py --attempt "<exact class name>" --moved <n> --total <n>
-python3 tools/p2w-bench/classify.py --attempt "<exact class name>" --outcome error
-python3 tools/p2w-bench/classify.py --top <n>        # how many classes the table lists
-```
+**What replaced it:**
 
-Writes `DEFECT-CLASSES.md` on every run. `ATTEMPTS.json` appears only when the first
-attempt is recorded with `--attempt` - a plain run does not create it. Prints:
+    python3 tools/p2w-bench/classify_google.py    # DEFECT-CLASSES-GOOGLE.md, from benchmarks/gverify/
+    python3 tools/p2w-bench/classify_txt.py       # txt/DEFECT-CLASSES-TXT.md, from RANKING-TXT.csv
 
-```
-documents measured : 20
-checks firing      : 35
-classes (data-driven): 28
-  47_margins                          20 docs  OPEN
-  53_embedded_faces                   20 docs  OPEN
-```
+**And `--attempt` moved out of it entirely.** Recording an attempt is `attempt.py`, which is the ledger:
 
-Classes are named after the check that touches the most documents. There are no
-hand-written names, and adding one is a mistake: a friendly label written before
-the data was seen sends the fixer after the wrong cause.
+    python3 tools/p2w-bench/attempt.py --class "<exact class>" --outcome kept --moved 3 --total 12
+    python3 tools/p2w-bench/attempt.py --class "<exact class>" --outcome error --reason "..."
+    python3 tools/p2w-bench/attempt.py --show
 
-A check that fails on almost every document is its own class, because it cannot
-discriminate between causes. A class bigger than six checks is re-split at a
-stricter threshold until the parts can name one cause each.
-
-`--subclusters` splits one class by the checks its documents also fail:
-
-```
-class '47_margins' - 20 documents, 32 outside checks
-
-   16 docs  with 19_worst_dy
-    3 docs  with 09_font_names
-```
-
-Copy the class name exactly as printed, including the `(+N)` suffix. If it says no
-class matches, run `classify.py` first and copy from the output.
-
-The outcome is COMPUTED from `--moved` and `--total`, not chosen:
-
-```
-moved 12 of 20 (60%) -> kept        the target now passes on at least half
-moved  8 of 20 (40%) -> improved    moved on at least a third; day restarts, up to 3 times
-moved  3 of 20 (15%) -> reverted    real progress was not made
-```
-
-`--outcome kept` or `--outcome improved` without numbers is refused, and a claim
-that disagrees with the numbers is refused and NOT recorded. `--outcome error` is
-accepted without numbers, because an attempt that found no root cause has nothing
-to count. Limits: one day per class, 24 attempts, 3 requeues.
-
----
-
-
-**`--txt`** reads `RESULTS-TXT.jsonl` instead of `BASELINE.md`, so the classes it reports
-are the .txt checks `t01` to `t05` rather than the .docx checks `01` to `59`. Run both and
-take the largest OPEN class from either; which half you are in decides whether the rest of
-the run uses `verify_google.py` with `ratchet.py` or `verify_txt.py` with `ratchet.py --txt`.
-
-    python3 tools/p2w-bench/classify.py --pick [--txt]
-      The class this run should take, and the reason. A class gets six attempts in a pass, then the
-      queue moves on; the biggest class is still first among those with equal attempts, and every
-      class comes back. It prints the pick, how many attempts that class has had, how many classes
-      still have room, the next three in the queue, and - when the class has had three or more
-      tries - a reminder that an ENTANGLED class needs the structural path in STEP 5 rather than
-      another patch.
-      Exit 0 with "no class is OPEN" when the round is finished; close it with round.py
-      --close-round.
+**This section used to document classify.py as current, with `--attempt` under it.** A run reading this
+file would have used a retired tool for both jobs and got a class list from the wrong corpus - the exact
+failure the brief warns about, sitting in the interface document. Found by the end-to-end read, 21 Nov.
 
 ## seed.py - every corpus document gets a row, or nothing measures it
 
