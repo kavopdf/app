@@ -1,6 +1,7 @@
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 19:58 → running IST · 16 min**
+**21 Nov 2026 · slot 18:17 → 19:22 IST · 1h 05m** — the clock of the run whose ROUND.json
+survived the merge; this run held the slot 19:58 → 21:15 and is the `lead` row at 20:15 below.
 
 > No change was kept. The rule carrier now DRAWS in Google for the first time - and it draws only
 > one rule per document, because two floating tables stack under the first. That is the finding;
@@ -10,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 6 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -59,6 +60,17 @@ carrier clears `32` plus `05` and `18` - 15 that fail exactly those three, 15 th
 6. The construct was measured end to end through the renderer that matters before anything was
 built into the engine, which is the part the last two runs did not have.
 
+## The other fixer, and why both numbers stand
+
+While this run held the slot the concurrent run pushed a measurement of the same construct:
+`FINDINGS/32_stroke_lines-RULE-CARRIER-LANDED-2008.md` — `394_map_with_legend` 41/42 → **42/42** in
+Google with a floating-table carrier, plus the number this run's patch was missing: `w:tblCellMar`
+must be zeroed or every rule lands 5.4 pt left. That document has one rule. This run's document has
+two, and that is exactly where the construct breaks — so the two measurements are not in conflict,
+they are the two halves of the same limit: **the carrier is exact for the first floating table on a
+page and stacks every one after it.** One table per page holding all of a page's rules as rows is the
+construct that reconciles them.
+
 ## Subagents
 
 One agent, on the census above. It read all 426 committed verification files, reported the failing
@@ -80,6 +92,14 @@ Do not retry: the per-rule floating table (stacks, measured), the inline table (
 
 ## The txt
 
+| | |
+|:--|:--|
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **190** (89.2%) |
+| Failing at least one check | **23** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t08_line_order` - 10 documents |
+
 ## The txt
 
 | | |
@@ -91,6 +111,26 @@ Do not retry: the per-rule floating table (stacks, measured), the inline table (
 | Most common failure | `t08_line_order` - 10 documents |
 
 ## Timing
+
+| | |
+|:--|:--|
+| Slot window | 18:17 → 19:22 · 1h 05m |
+| Before the claim | not recorded - nothing writes a beat until step.py runs |
+| Tool beats | 28 |
+| Longest silence | **9.2 min** — from 19:11:04, after `report.py: building the report` |
+| Silences over 2 min | 7 |
+| Obstacles | 4 cleared · 0 parked, with the evidence to re-open them |
+
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| setup - claim, housekeeping, reading the gate | **4 min** | `##` |
+| fix - diagnose and change the engine | **7 min** | `#####` |
+| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `######` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **13 min** | `########` |
 
 ## Timing
 

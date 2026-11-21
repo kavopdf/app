@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-21 19:58
+# Fixer report - 2026-11-21 18:17
 
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 19:58 → running IST · 16 min**
+**21 Nov 2026 · slot 18:17 → 19:22 IST · 1h 05m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **0** — 6 attempt(s), 0 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,7 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 20:15 | **lead** | 0/210 | FLOATING-TABLE CARRIER BUILT AND MEASURED THROUGH GOOGLE, not landed. DocxWriter.ruleCarrier() turns a hairline shape into a one-cell w:tblpPr table with a w:tcBorders bottom edge. Measured on 73_mark |
+| 19:10 | **lead** | 0/15 | RECLASSIFIED 21 Nov from "reverted" to "lead": the construct WAS measured through Google and the finding is committed - it is not a refuted idea, the implementation ran out of slot. tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table contro |
 
 ## The txt
 
@@ -40,28 +40,29 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `32_sA-02` | which corpus documents become CLEAN if the floating- | 20:15 | 14:45 | 0 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 19:58 → running · 16 min |
+| Slot window | 18:17 → 19:22 · 1h 05m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 13 |
-| Longest silence | **9.6 min** — from 20:04:52, after `engine patched: hairline rule -> floating tblpPr carrier (ruleCarrier(` |
-| Silences over 2 min | 2 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 28 |
+| Longest silence | **9.2 min** — from 19:11:04, after `report.py: building the report` |
+| Silences over 2 min | 7 |
+| Obstacles | 4 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **15 min** | `####################` |
-| record - attempt, handoff, class rows | **1 min** | `##` |
+| setup - claim, housekeeping, reading the gate | **4 min** | `##` |
+| fix - diagnose and change the engine | **7 min** | `#####` |
+| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `######` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **13 min** | `########` |
 ## Best results this round
 
 | Document | Before | After | Change |
