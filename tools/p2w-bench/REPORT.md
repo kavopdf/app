@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**21 Nov 2026 · slot 13:54 → running IST · 55 min**
+**21 Nov 2026 · slot 13:54 → running IST · 56 min**
 
 > **38_faux_bold_italic_synthesised** improved — 2.00 → 0.00. Corpus ratchet clean across 213 documents.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **1** — 2 attempt(s), 2 kept |
+| Documents improved this run | **1** — 3 attempt(s), 2 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -29,6 +29,7 @@
 |--:|:--|--:|:--|
 | 14:42 | **kept** | 1/5 | clip-off: 411_nested_xobject_transforms t01 90.0->100.0, 12_stamp_across_page_break t12 also clean; corpus 186->188, 0 regressions |
 | 14:42 | **kept** | 1/5 | doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical |
+| 14:49 | **reverted** | 0/3 | DUPLICATE, not a second fix. The relay claimed the slot at 14:11 and picked the same lead the :50 run landed at 14:21 (d2ea491, TEXT_MEDIABOX_CLIP). Found on the push: the commit was already on main. |
 
 ## The txt
 
@@ -51,9 +52,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 13:54 → running · 55 min |
+| Slot window | 13:54 → running · 56 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 33 |
+| Tool beats | 28 |
 | Longest silence | **20.4 min** — from 13:54:18, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 7 |
 | Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
@@ -64,9 +65,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **40 min** | `################` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **3 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **38 min** | `###############` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **7 min** | `###` |
 | other - not attributed to a tool | **9 min** | `####` |
 ## Best results this round
 
