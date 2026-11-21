@@ -1,11 +1,12 @@
 # HANDOFF - read this before you pick a class
 
-## NEEDS A HUMAN - no future run can clear these
+## PARKED - what was tried, and what would re-open it
 
-A run tried, could not, and it was not a system limit. Every run after this one
-will hit the same wall until one of these is changed by a person.
+A run tried these and could not get through. That is a record of one approach, not a
+verdict on the problem: the next run may take any of them again with a genuinely
+different idea. What is not worth repeating is the attempt listed below.
 
-| # | what it is | what was tried | what must change | when |
+| # | what it is | what was tried | what would re-open it | when |
 |---|---|---|---|---|
 | 0 | the widget-AP walk is refused by one document, and the decision is not a fixer's | measured all three variants corpus-wide: 601 52.39 -> 0.00 and 42/42 d | a person must either authorise the trade (a 1.03 rise on a document al | 10:40 |
 

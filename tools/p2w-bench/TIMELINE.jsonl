@@ -1437,3 +1437,5 @@
 {"t": 1795237969.542981, "ist": "10:42:49", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795237970.1781402, "ist": "10:42:50", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795237970.5148108, "ist": "10:42:50", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795238105.240676, "ist": "10:45:05", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795238120.9164078, "ist": "10:45:20", "ev": "beat", "d": "pending.py: reading the pending gate"}
