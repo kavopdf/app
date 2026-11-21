@@ -30,7 +30,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> Land the pBdr rule replacement: FINDINGS/RULES-PBDR-IMPLEMENTATION.md, first statement of DocxWriter.shape() at line 2772 (return before line 2779), carrying the ctx.flowY = s.topPt update. Screen 32_stroke_lines first, then the full corpus pass. The finding predicts 124 documents cleared among the 144 LibreOffice-only ones, and all 145 if the residual is only the footer rule.
+> Take 32_stroke_lines from 'no new paragraph'. The pBdr carrier is refuted three ways (RULES-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md): w:pBdr needs a paragraph and a paragraph costs 9.6 pt on this engine, so the carrier IS the displacement. Not yet tried: a table-row bottom border, or a border on the paragraph the page already drew above the rule. Also: a full .txt corpus pass is 21 minutes (213 conversions at ~5.8s serial, 2 CPUs / 1 GB free - it cannot be parallelised) plus 71s to re-score, so it fits in about half a slot.
 
 ## Agents deployed and not yet accounted for
 
@@ -92,7 +92,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:34` attempt 12 on t01_word_accuracy -> partial
 - `04:34` attempt 13 on t01_word_accuracy -> partial (1/5 moved)
 - `04:36` agent deployed: t01_word_accuracy / A - census of every widget appearance stream over all 213 documents - how many widge
 - `04:36` agent deployed: t01_word_accuracy / B - implement the /AP /N glyph walk in its own clone and measure 601 and the Account
@@ -117,6 +116,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:48` attempt 15 on 47_margins -> partial (1/213 moved)
 - `15:59` agent deployed: 32_stroke_lines / A - Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md actually clea
 - `15:59` agent deployed: t02_position / B - The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0) is measure
+- `17:22` CLEARED a carry-over that three findings refuted and that survived the commit which superseded it. RULES-PBDR-IMPLEMENTATION-SUPERSEDED-124500-relay.md says 'the carry-over is cleared so the gate stops handing it to the next run', but HANDOFF.json[next] still carried it through 12:45, through 15:17 and through 462353f - so every run since 12:45 read a refuted instruction first. A finding cannot clear a carry-over; only handoff.py --next can, and nobody ran it. It is run now.
 
 ## Where the rest of the state lives
 

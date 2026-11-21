@@ -91,6 +91,28 @@ def changed_java():
         # nothing unstaged: try staged, then HEAD-vs-HEAD~1 is the author's business
         r = sh("git diff -U0 --cached -- %s" % ENGINE)
     if r is None or not r.stdout.strip():
+        # THE ENGINE CHANGE MAY ALREADY BE COMMITTED, AND THEN THIS TOOL SAW NOTHING.
+        #
+        # scope.py used to read the working tree only, so the exception it exists for applied
+        # for exactly as long as the change was uncommitted. A txt-only engine commit passed
+        # with "docx: out of scope" - and the very next commit, on a clean tree, saw scope
+        # "nothing", went strict, and demanded a .docx stamp that no txt-only change can
+        # produce. Measured 21 Nov: 462353f landed the 180deg guard that way and every later
+        # commit was refused with "ENGINE CHANGED (docx): table measured on 6c6cf642e13b7ed2,
+        # the tree is 226f7f2df3013ad7" - and a .docx corpus pass is the forty minutes this
+        # sandbox has 2 CPUs and 1 GB of free RAM for.
+        #
+        # So when the tree is clean, the change under judgement is the last commit that touched
+        # the engine. That is the change the stamps do not yet account for, which is the only
+        # question this tool answers. A change that really does move the .docx still scopes to
+        # docx or both and is still measured: the fallback narrows what is *skipped*, never
+        # what is *checked*. Line numbers come from that commit rather than from the working
+        # tree, so a method_at() miss here can only make the scope wider, never narrower.
+        last = sh("git log -1 --format=%%H -- %s" % ENGINE)
+        h = (last.stdout.strip() if last else "")
+        if h:
+            r = sh("git diff -U0 %s^ %s -- %s" % (h, h, ENGINE))
+    if r is None or not r.stdout.strip():
         return {}
     out, cur = {}, None
     for line in r.stdout.splitlines():

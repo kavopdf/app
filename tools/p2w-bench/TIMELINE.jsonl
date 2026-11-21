@@ -1688,3 +1688,19 @@
 {"t": 1795259008.2179492, "ist": "16:33:28", "ev": "beat", "d": "213/213 converted; scoring the txt corpus with verify_txt via restamp_txt --run"}
 {"t": 1795259131.5966203, "ist": "16:35:31", "ev": "beat", "d": "gate PASS on txt; committing the patch"}
 {"t": 1795259268.3394947, "ist": "16:37:48", "ev": "beat", "d": "HEAD rebuilt; converting all 213 to out-head for a byte-for-byte docx proof (replaces the 140-doc sample)"}
+{"t": 1795261952.8948312, "ist": "17:22:32", "ev": "beat", "d": "reconciled: the other fixer landed the same patch; clearing the dead pBdr carry-over and writing the report"}
+{"t": 1795261953.0278392, "ist": "17:22:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795261953.1852117, "ist": "17:22:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795261953.3169715, "ist": "17:22:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795261953.432944, "ist": "17:22:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795261957.357972, "ist": "17:22:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795261986.6538842, "ist": "17:23:06", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795261987.5599046, "ist": "17:23:07", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795261987.9826324, "ist": "17:23:07", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795262000.4310696, "ist": "17:23:20", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795262001.1360059, "ist": "17:23:21", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795262001.5801663, "ist": "17:23:21", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795262009.498077, "ist": "17:23:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795262010.8508403, "ist": "17:23:30", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795262011.7354584, "ist": "17:23:31", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795262012.099376, "ist": "17:23:32", "ev": "beat", "d": "report.py: building the report"}
