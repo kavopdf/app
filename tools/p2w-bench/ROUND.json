@@ -96,9 +96,14 @@
       "phase": "measure",
       "round": 1,
       "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-22 21:52",
+      "phase": "measure",
+      "round": 1
     }
   ],
-  "phase": "measure",
+  "phase": "classify",
   "round": 1,
   "rounds_total": 3,
   "session_start": "18:00",

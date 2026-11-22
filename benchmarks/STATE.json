@@ -1,51 +1,52 @@
 {
- "ran_at": "2026-11-20T09:00:00",
- "engine": "ea9dfd7",
+ "ran_at": "2026-11-22T16:20:09",
+ "engine": "unknown",
  "layers": {
   "ground_truth": {
    "status": "pass",
    "exit": 0,
    "tail": [
-    "GATE PASS"
+    "  warnings.warn("
    ]
   },
   "measurement": {
    "status": "ok",
    "docs_with_result": 212,
    "of": 212,
-   "complete": true,
-   "note": "full corpus measured with this engine; 416_many_tiny_pages is EXEMPT and carried at its previous value"
+   "complete": true
   },
   "txt_checks": {
    "status": "available",
    "exit": 0,
    "note": "named semantic checks; advisory, not a size"
+  },
+  "census": {
+   "status": "ok",
+   "summary": [
+    "  rules-not-tables         1",
+    "  text-missing             8",
+    "  annotations-present      1",
+    "  none-identified          52",
+    "  warnings.warn("
+   ]
   }
  },
+ "signatures": [
+  "[16:20:26]   content-loss    16 docs  median share@1px  39.4%",
+  "[16:20:26]   displacement    32 docs  median share@1px  29.6%",
+  "[16:20:26]   clean          153 docs  median share@1px   1.3%"
+ ],
  "round": 1,
  "ratchet": {
   "status": "compared",
   "baseline_docs": 213,
-  "current_docs": 213,
+  "current_docs": 212,
   "regressions": [],
-  "improvements": [
-   "table-inside-two-column-page 38.11 -> 35.87",
-   "report-2col-table-spanning-both-columns 16.10 -> 0.76",
-   "78_mixed_english_devanagari_line 13.51 -> 1.73",
-   "66_two_col_footnotes_bottom 13.03 -> 2.92",
-   "bank-statement-horizontal-rules-only 6.89 -> 0.10",
-   "gst-invoice-horizontal-rules-only 6.72 -> 0.38",
-   "table-of-contents-dot-leaders 10.72 -> 4.97",
-   "65_two_col_full_width_figure_caption 4.91 -> 1.75",
-   "newsletter-3col-header-footer 2.51 -> 0.20",
-   "brochure-3col-with-sidebar-box 4.51 -> 2.30",
-   "70_magazine_drop_cap_photo_caption 1.49 -> 1.16",
-   "315_gazette_notification 1.96 -> 1.91",
-   "28_value_overflows_cell_txtpos 0.74 -> 0.72",
-   "39_small_caps_letter_spacing 0.72 -> 0.70"
-  ],
+  "improvements": [],
   "new_documents": [],
-  "disappeared": []
+  "disappeared": [
+   "416_many_tiny_pages"
+  ]
  },
- "verdict": "OK: 212 of 212 measured documents, no regressions"
+ "verdict": "OK: no regressions against baseline"
 }
