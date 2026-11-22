@@ -2793,3 +2793,4 @@
 {"t": 1795369903.8530033, "ist": "23:21:43", "ev": "beat", "d": "relay: measuring BEFORE on 16 solo-18 docs"}
 {"t": 1795370155.4188452, "ist": "23:25:55", "ev": "beat", "d": "relay: spacer split applied, rebuilding"}
 {"t": 1795370560.2740617, "ist": "23:32:40", "ev": "beat", "d": "relay: 4 of 16 solo-18 docs now 42/42 in Google; full-corpus measure for the commit gate"}
+{"t": 1795374589.233354, "ist": "00:39:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
