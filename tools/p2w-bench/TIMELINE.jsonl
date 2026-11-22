@@ -2785,3 +2785,11 @@
 {"t": 1795368092.5870538, "ist": "22:51:32", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795368115.081754, "ist": "22:51:55", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795368155.5029666, "ist": "22:52:35", "ev": "release", "d": "classifier released"}
+{"t": 1795368511.760791, "ist": "22:58:31", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795368512.1971664, "ist": "22:58:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795369228.5420153, "ist": "23:10:28", "ev": "beat", "d": "engine build, corpus downloaded, working 18_displacement"}
+{"t": 1795369383.561476, "ist": "23:13:03", "ev": "beat", "d": "building a 5-variant row-pitch probe, one Google round trip"}
+{"t": 1795369494.7850063, "ist": "23:14:54", "ev": "beat", "d": "probe2 built: LO measured, about to spend one Google round trip"}
+{"t": 1795369635.5164797, "ist": "23:17:15", "ev": "beat", "d": "probe4 (pBdr rules, zero cell margins): LO 18/19 confirmed, one Google round trip"}
+{"t": 1795369665.1796029, "ist": "23:17:45", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795370626.7742243, "ist": "23:33:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
