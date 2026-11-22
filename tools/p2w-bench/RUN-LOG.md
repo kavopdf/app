@@ -198,3 +198,4 @@
 | 22 Nov 22:50 | classifier | slot claimed - classifier running |
 | 22 Nov 23:10 | fixer | slot claimed - fixer running |
 | 23 Nov 00:39 | fixer | attempt 18_displacement -> reverted (0/16 moved) |
+| 23 Nov 00:41 | fixer | slot FORCED released - see INCIDENTS.md for why |
