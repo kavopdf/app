@@ -750,7 +750,7 @@
   "status": "OPEN"
  },
  "content-present-partly-displaced": {
-  "attempts": 14,
+  "attempts": 15,
   "first_seen": null,
   "history": [
    {
@@ -850,12 +850,19 @@
     "outcome": "reverted",
     "reason": "relaxed the rule-border guard twice and wrote the paragraph indents from the rule so a border lands exactly on it: 3 of 39 rules on bank-statement-horizontal-rules-only now become w:pBdr, but 36 never",
     "total": 23
+   },
+   {
+    "at": "2026-11-22 12:06",
+    "moved": 1,
+    "outcome": "lead",
+    "reason": "18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 cl",
+    "total": 16
    }
   ],
   "last": null,
-  "last_engine": "ea9dfd7",
-  "last_moved": 0,
-  "last_total": 23,
+  "last_engine": "462353f9",
+  "last_moved": 1,
+  "last_total": 16,
   "outcomes": [
    "reverted",
    "kept",
@@ -870,11 +877,12 @@
    "reverted",
    "reverted",
    "reverted",
-   "reverted"
+   "reverted",
+   "lead"
   ],
   "ratchet_at": "20 Nov 03:40",
   "ratchet_docs": 213,
-  "reason": "relaxed the rule-border guard twice and wrote the paragraph indents from the rule so a border lands exactly on it: 3 of 39 rules on bank-statement-horizontal-rules-only now become w:pBdr, but 36 never reach the paragraph path at all because they belong to table rows; screen 23 of 23, 0 better, 8 worse, so reverted - the hook, not the guard, is the ceiling",
+  "reason": "18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 claim does not reproduce. Corpus ratchet still not run.",
   "reasons": [
    "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them refuted: 75_merged_header_cell_three_columns 27.31 -> 46.58 and 1 page -> 2, because the shading band's edges are the only rules that close those header cells. Reverted. The real fix is the finding's: lattice-cut cells plus w:vMerge, since spanR is computed and read by nothing.",
    "recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down the page (bank-statement 0.4554 pt x 12 rows = +5.85 pt). Whole corpus 13 improved, 0 worse. Also published the table this engine actually produces - ten rows were stale and had blocked every fixer run since 11:55.",
@@ -889,7 +897,8 @@
    "REVERTS attempt 10. attempt 10 was recorded 'partial 2/23' from the LibreOffice screen before the Google check existed; the Google check then decided against it. flushShapes (top-ordered shape emit in pageXml) + ruleAsBorder (w:pBdr with w:before and ctx.flowY=s.topPt) turned both rules on 18_centred_heading_left_body_txtpos into borders at the page's own ys (110.0 and 793.89, 2 pBdr / 0 drawings) and flipped 32_stroke_lines FAIL->PASS in Google, but made 18_displacement fail where it had passed, in BOTH renderers: LibreOffice 42/42 -> 41/42 on a document that was clean. Reverted. The exact diff is FINDINGS/rules-flush-by-top-WORKS-DISPLACES-055000-f1x.patch and the numbers are in the matching .md. Second blocker: 315_gazette_notification takes columnPage(), which returns before the emit loop, so no multi-column document can be reached by a pageXml-only fix - it measured pBdr 0 / drawings 5 and unchanged 40/42 in Google.",
    "attempt 12: rules flush-by-top re-applied + ctx.flowY residual test (flowY left at s.topPt vs carrier-bottom) on 18_centred",
    "attempt 13: rule as the FOLLOWING paragraph's w:top border, found by a pre-pass, no reordering, no extra paragraph - flow-neutral, measures exactly baseline on 8/8 documents (18_centred 0.00, bank-statement 0.10, gst-invoice 0.38, mobile-bill 1.55) but places pBdr=0 on all of them; where a border IS placed 18_centred goes 0.00->0.53 because regress.py scores share@5 in LibreOffice, where the drawing is already exact. Patch kept in FINDINGS/rules-top-border-FLOW-NEUTRAL-065000-f1x.patch",
-   "relaxed the rule-border guard twice and wrote the paragraph indents from the rule so a border lands exactly on it: 3 of 39 rules on bank-statement-horizontal-rules-only now become w:pBdr, but 36 never reach the paragraph path at all because they belong to table rows; screen 23 of 23, 0 better, 8 worse, so reverted - the hook, not the guard, is the ceiling"
+   "relaxed the rule-border guard twice and wrote the paragraph indents from the rule so a border lands exactly on it: 3 of 39 rules on bank-statement-horizontal-rules-only now become w:pBdr, but 36 never reach the paragraph path at all because they belong to table rows; screen 23 of 23, 0 better, 8 worse, so reverted - the hook, not the guard, is the ceiling",
+   "18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 claim does not reproduce. Corpus ratchet still not run."
   ],
   "requeues": 0,
   "status": "OPEN"

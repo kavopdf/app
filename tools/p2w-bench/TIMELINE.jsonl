@@ -2509,3 +2509,15 @@
 {"t": 1795327082.6588683, "ist": "11:28:02", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795327083.1620226, "ist": "11:28:03", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795327083.441202, "ist": "11:28:03", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795328614.860677, "ist": "11:53:34", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795328615.0205112, "ist": "11:53:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795328622.6821077, "ist": "11:53:42", "ev": "beat", "d": "reading state, deciding class"}
+{"t": 1795328950.6650605, "ist": "11:59:10", "ev": "beat", "d": "applied 18-spacer patch, building engine (JDK fetch + javac)"}
+{"t": 1795329013.3952048, "ist": "12:00:13", "ev": "beat", "d": "engine built with patch; fetching corpus (gh release corpus-v1)"}
+{"t": 1795329072.3567066, "ist": "12:01:12", "ev": "beat", "d": "converting the 23 Google-clean docs with patched engine to census spacers"}
+{"t": 1795329086.255516, "ist": "12:01:26", "ev": "beat", "d": "converting clean docs (classpath fixed) to census spacers"}
+{"t": 1795329104.9516737, "ist": "12:01:44", "ev": "beat", "d": "converting clean docs to census spacers"}
+{"t": 1795329219.4522603, "ist": "12:03:39", "ev": "beat", "d": "Google: 68_journal 41/42 -> 42/42 confirmed; converting 6 more candidates"}
+{"t": 1795329268.6547987, "ist": "12:04:28", "ev": "beat", "d": "control: rebuilding HEAD engine to test mobile-bill without the patch"}
+{"t": 1795329353.335562, "ist": "12:05:53", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795329369.084829, "ist": "12:06:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
