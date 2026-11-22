@@ -2594,3 +2594,18 @@
 {"t": 1795334495.8773603, "ist": "13:31:35", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795334496.5374684, "ist": "13:31:36", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795334496.9629054, "ist": "13:31:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795336017.33442, "ist": "13:56:57", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795336017.7829864, "ist": "13:56:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795336035.561326, "ist": "13:57:15", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795336035.6726422, "ist": "13:57:15", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795336067.1424935, "ist": "13:57:47", "ev": "beat", "d": "deploying two agents, reading 18_displacement leads"}
+{"t": 1795336067.309164, "ist": "13:57:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795336067.50654, "ist": "13:57:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795336467.3189015, "ist": "14:04:27", "ev": "beat", "d": "building engine, then 354tw probe"}
+{"t": 1795336863.9493606, "ist": "14:11:03", "ev": "beat", "d": "sweep build ready (344-392tw); uploading probe to Google"}
+{"t": 1795336931.8650987, "ist": "14:12:11", "ev": "beat", "d": "ladder measured: whole-point quantisation; building error-diffused row pitch"}
+{"t": 1795337336.8312023, "ist": "14:18:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795337337.0055084, "ist": "14:18:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795337340.7761657, "ist": "14:19:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795337340.9501412, "ist": "14:19:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795337345.586907, "ist": "14:19:05", "ev": "beat", "d": "attempt.py: recording an attempt"}

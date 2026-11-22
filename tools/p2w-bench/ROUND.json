@@ -1,10 +1,10 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "relay: patched sub-point row geometry + exact row height, rebuilding",
-  "fixer_doing_since": 1795334097.2491837,
+  "fixer_doing": "ladder measured: whole-point quantisation; building error-diffused row pitch",
+  "fixer_doing_since": 1795336931.8666327,
   "fixer_engine_at_claim": "462353f9",
-  "fixer_last_beat": 1795334097.2491846,
+  "fixer_last_beat": 1795336931.866634,
   "fixer_started": 1795336000.2311943,
   "history": [
     {
