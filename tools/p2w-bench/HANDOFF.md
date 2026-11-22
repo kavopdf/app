@@ -19,7 +19,7 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 15:17 |
+| started | 15:55 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
@@ -110,7 +110,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `09:20` agent deployed: 18_displacement / B - do 05/32/59/18 share ONE engine construct in the emitted docx, and name it
 - `09:21` agent landed: 18_displacement / A -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
 - `09:21` agent landed: 18_displacement / B -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
 - `10:06` attempt 10 on 18_displacement -> lead (0/3 moved)
@@ -135,6 +134,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:46` agent landed: 47_mB-02 /  -> FINDINGS/47_margins-DIAGNOSE40-B-150000.md
 - `15:28` attempt 18 on 18_displacement -> lead
 - `15:40` attempt 19 on 18_displacement -> lead (0/16 moved)
+- `16:36` attempt 20 on 18_displacement -> lead (0/16 moved)
 
 ## Where the rest of the state lives
 

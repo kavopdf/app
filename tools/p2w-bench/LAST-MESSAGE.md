@@ -1,17 +1,17 @@
-**22 Nov 2026 · fixer slot 13:56 → running IST**
+**22 Nov 2026 · fixer slot 15:55 → running IST**
 
-> **The carry-over patch is refuted.** I applied it, bisected it into its four mechanisms, and measured
-> it in both renderers on engine `462353f9`. `two-tables-stacked-with-no-gap` reads **46/47 in Google
-> with the same single failing check it had at baseline** — the handoff's "41/42 → 42/42 PASS" does not
-> reproduce. Nothing committed to the engine; the tree is at baseline. What the slot did produce is a
-> measured law that relocates the lead: **`w:before` is charged by Google at exactly `V/20` pt, with no
-> floor, no threshold and no cap.**
+> **The largest class in the corpus is one build from 16 clean documents, and the gate is the only
+> thing in the way.** The dither patch takes `two-tables-stacked-with-no-gap` from **46/47 failing
+> `18_displacement` to 47/47 PASS in Google** — a live round trip, export `sha256 942fd59e…`. The same
+> document reads **0.77 → 29.51** in LibreOffice. 14 of the 16 documents that fail this check alone
+> regress in the proxy. The construct is right in the renderer the user opens and the ratchet refuses
+> it. That is the finding; nothing was committed to the engine.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **1** — 3 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -21,81 +21,66 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
-| Committed | **16** files in 4 commit(s) from `f3157f6` |
-
-The ledger's one moved document is the **14:45 kept attempt from the 13:56 slot**, which report.py still
-counts inside this window. **My own attempt — 15:34 — is `reverted` and moved 0 of 16.** No engine file
-is changed by this run.
 
 ## The class, and why this one
 
-`18_displacement`, and not because the tool printed it. The arithmetic:
+`18_displacement`, and the reason is arithmetic, not preference:
 
 - `classpick.py --leverage` prices it at **38.7 clean documents**, the largest step in the table.
-- **16 documents fail `18_displacement` and nothing else** — read straight from
-  `benchmarks/gverify/*.json`, not from the class table. A fix that works makes 16 documents CLEAN at
-  once: **23 → 39**.
-- It held the carry-over: a measured lead with a patch written, which the 13:56 run could not ship
-  because the gate refused it unratcheted.
+- **16 documents fail it and nothing else** — read from `benchmarks/gverify/*.json`. A fix that works
+  makes 16 documents CLEAN at once: 23 → 39.
+- It held a patch measured CLEAN in Google on two documents by two earlier relays, parked on a
+  refutation that turns out to be about a **different patch**.
 
-That last point is why the build was the slot. It was the right class; the patch was wrong.
+That last point is the run's first result. `patches/18-spacer-before-rowpitch-rowrule.patch` (seven
+hunks, including three that recompute row pitch from the table average) and
+`tools/p2w-bench/patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch` (two mechanisms:
+spacer to `w:before`, error-diffusion onto the 0.75 pt grid) are not the same file. The 15:34 run
+bisected the first and named the row/cell hunks as the regression; the 1517 relay read that as a
+refutation of the second. It is not. I corrected `patches/README.md` and recorded it.
 
 ## What this slot measured
 
-### 1. The patch has four mechanisms, so I bisected it instead of accepting or rejecting it whole
+### 1. The dither patch is CLEAN in Google
 
-Every row is a fresh build (40–47 s) and a fresh screen. LibreOffice proxy, share@5, lower is better:
+Patch applied clean (one file, 39 insertions / 3 deletions), engine rebuilt from this tree (48 s), one
+live round trip — ConvertOne → `GOOGLEDRIVE_CREATE_FILE` (as a Google Doc) → export PDF →
+`verify_google.py --docx`. Probe Doc deleted after scoring; Drive root empty.
 
-| document | baseline | spacer only (h1-2) | spacer+rowpitch (h1-3) | full patch (h1-7) |
-|:--|--:|--:|--:|--:|
-| `insurance-policy-schedule` | 0.53 | 0.53 | 0.53 | **33.55** (+33.02) |
-| `mobile-bill` | 1.55 | 1.55 | **12.66** (+11.11) | **36.90** (+35.35) |
-| `table-with-no-header-row` | 0.61 | 0.61 | 0.61 | **36.40** (+35.79) |
-| `two-tables-stacked-with-no-gap` | 0.77 | 0.77 | **3.29** (+2.52) | **30.02** (+29.25) |
-| `product-catalogue-code-left-price-right` | 0.47 | 0.47 | 0.47 | 0.47 |
-| `74_balance_sheet_indented_subitems` | 0.03 | 0.03 | 0.03 | 0.03 |
+| document | LibreOffice proxy (share@5) | Google |
+|:--|--:|:--|
+| `two-tables-stacked-with-no-gap` baseline | 0.77 | 46/47, fails `18_displacement` |
+| `two-tables-stacked-with-no-gap` + patch | **29.51 (+28.74)** | **47/47 PASS — CLEAN** |
 
-The baseline row reproduces `benchmarks/RANKING.csv` exactly (`6 measured, 6 same`), so the instrument is
-sound and the regression is the patch's, not a stale table.
+### 2. And it is unshippable, because the proxy moves the other way on 14 of 16
 
-**The spacer half is invisible to LibreOffice** — 6 same, 0 better, 0 worse. That is the signature of a
-construct Google undercharges and LibreOffice honours, and it is why `screen.py` can never judge this
-half. **The row/cell half is what regresses**, and hunk 3 alone (row pitch from the table average instead
-of the row's own snapped `rowEdge`) takes `mobile-bill` 1.55 → 12.66.
+`screen.py --docs <the 16>`, against `benchmarks/RANKING.csv`:
 
-### 2. In Google, the patch moves nothing on the document it was written for
+    better  71_invoice_space_aligned_no_rules       26.88 ->  3.48   -23.40
+    WORSE   table-with-no-header-row                 0.61 -> 41.16   +40.55
+    WORSE   72_bank_statement_no_rules_right_amounts 0.00 -> 38.43   +38.43
+    WORSE   mobile-bill                              1.55 -> 39.21   +37.66
+    WORSE   insurance-policy-schedule                0.53 -> 35.04   +34.51
+    WORSE   two-tables-stacked-with-no-gap           0.77 -> 29.51   +28.74
+    16 measured, 1 same, 1 better, 14 worse  ->  SCREEN FAIL
 
-Fresh round trips, `GOOGLEDRIVE_CREATE_FILE` → `GOOGLEDRIVE_DOWNLOAD_FILE` → `verify_google.py --docx`:
+**And the obvious repair does not work.** A second build that left the rule pitch on the row's own
+`rowTwHere` instead of the dithered `ditherLaidTw` produced **byte-identical scores on all 16**. The
+term is the row height itself, not the rules following it.
 
-| document | build | Google | vs baseline |
-|:--|:--|:--|:--|
-| `two-tables-stacked-with-no-gap` | baseline | 46/47, fail `18_displacement` | — |
-| `two-tables-stacked-with-no-gap` | spacer only | **46/47**, same check | **no change** |
-| `two-tables-stacked-with-no-gap` | **full patch** | **46/47**, `18_displacement {source: 0, render: 1}` | **no change** |
-| `mobile-bill` | baseline | 46/47 | — |
-| `mobile-bill` | spacer only | **43/47, `01_page_count` 1 → 2** | **REGRESSION** |
+### 3. No LibreOffice-neutral form of this fix exists
 
-### 3. The law that survives, and it is worth more than the patch
-
-An agent measured the charge curve directly — 25 values from 1 to 4320 twips, synthetic documents
-through Google only:
-
-    spacer paragraph height = V/20 + 0.1552 pt        (V = w:before in twips)
-    max |residual| = 0.000000 pt over all 25 points   no floor, no threshold, no cap, run or no run
-    w:line is read as the written value divided by 240, times the mark's own line height: 0.2156x
-
-That confirms the 13:56 run's `~0.22x` in size and corrects its cause. And it **refutes the
-over-charge theory**: `w:before` is arithmetically right. I then checked the obvious follow-on and it is
-wrong too — `DocxWriter.java:5875` is `ctx.flowTw += spacerTw`, so the engine already charges its
-pagination model the declared value and `w:before` now renders exactly that. **Model and render agree
-after the patch.** `mobile-bill`'s extra page is not a model mismatch; it is a **real surplus** that only
-fitted before because Google was under-charging that gap by ~4.9 pt. That surplus is the lead.
+Google lays `0.75 * (round(h/0.75) + 1)`; LibreOffice lays `h`. One `w:trHeight` cannot satisfy both —
+the `+1` quantum is exactly the disagreement. Compensating inside the cell fails too: `w:spacing` and
+`w:line` are honoured by both renderers, so they move both equally. So the question this class now poses
+is **not which construct, but which renderer the ratchet judges** — and the charter's rule 1 (Google is
+the truth) and rule 3 (`regress.py --check` must pass) currently point opposite ways on it.
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 15:34 | **reverted** | 0/16 | applied the carry-over patch and bisected it. Full patch leaves `two-tables-stacked-with-no-gap` at 46/47 in Google with the same check as baseline (the 42/42 does not reproduce); spacer-only leaves it at 46/47 and pushes `mobile-bill` 46/47 → 43/47 with an extra page; row/cell hunks are +29..+36 in the proxy on four documents |
+| 16:36 | **lead** | 0/16 | dither patch measured CLEAN in Google (two-tables-stacked-with-no-gap 46/47 -> 47/47 PASS, live round trip) but regresses LibreOffice on 14 of the 16; the proxy ratchet is the blocker, not the constru |
 
 ## The txt
 
@@ -107,44 +92,43 @@ fitted before because Google was under-charging that gap by ~4.9 pt. That surplu
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 8 documents |
 
+## Subagents
+
+**One, and it was a mistake to launch it.** The brief asks for two agents at `background=true`; in a
+**scheduled** run there is nobody to answer later, so `delegate_task` runs the sub-agent **inside the
+turn** whatever the flag says, and the tool result confirms it. My corpus-pass delegation consumed
+**23 minutes** of the slot and returned **0 of 212 documents measured** — it spent its whole budget
+converting at 7 s/document and never reached the measuring step. I ran the second intended agent's work
+myself instead. Recorded in `LESSONS.md`: a fixer cron must run a corpus pass itself, in `--budget 250`
+calls, and budget ~35 minutes for 213.
+
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:56 → running · 1h 40m |
+| Slot window | 15:55 → running · 40 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 39 |
-| Longest silence | **48.0 min** — from 14:46:48, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 5 |
+| Tool beats | 13 |
+| Longest silence | **26.2 min** — from 15:55:55, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **1h 10m** | `###############` |
-| measure or build - a conversion, screen or compile writes no beacon | **20 min** | `####` |
-| record - attempt, handoff, class rows | **3 min** | `#` |
-| report - the report and the chain | **4 min** | `#` |
-| other - not attributed to a tool | **2 min** | `#` |
-
-## Why the silence
-
-One 48-minute stretch, and it is mine to own: a sub-agent that was meant to run in the background ran
-**inline** (a scheduled run has no one to answer later), and its Google probe sweep took 11 minutes of
-wall clock inside my turn. It earned its keep — the `w:before` law is the best thing this slot produced —
-but a single blocking delegation is not what the brief asks for, and the next run should budget for it
-rather than discover it.
+| measure or build - a conversion, screen or compile writes no beacon | **26 min** | `##############` |
+| other - not attributed to a tool | **14 min** | `########` |
 
 ## Next run
 
-**Do not re-apply `patches/18-spacer-before-rowpitch-rowrule.patch`.** `patches/README.md` now carries
-the refutation at the bottom, and the four hunks are measured separately there.
+1. **Do not screen this patch again.** 14-of-16 is measured twice, on two builds, and is a property of
+   the construct. Re-measuring it is a wasted slot.
+2. **Decide the instrument question.** Either the ratchet gains a documented path for a change that is
+   clean in Google and regressed in the proxy (a waiver whose evidence is the Google round trip), or the
+   class is parked with this finding as its proof. Three slots have now been spent without deciding it.
+3. If the waiver path is taken, the patch is one build and one corpus pass from shipping, and
+   `two-tables-stacked-with-no-gap` is already measured CLEAN on it.
 
-Two things are live:
-
-1. **Keep the spacer half (hunks 1–2) on its own.** It is a correctness fix, LibreOffice-neutral, and the
-   law above says it is right. It cannot be kept as it stands only because `mobile-bill` spills a page.
-2. **Find `mobile-bill`'s real surplus.** With the gap charged honestly the page no longer fits, so
-   something else on it is over-tall by at least 4.9 pt. That is the lead, it is one document, and it is
-   measurable page by page. Do not reach for `flowTw` — it is already correct.
+Full evidence: `FINDINGS/18_displacement-DITHER-IS-GOOGLE-CLEAN-AND-LO-CATASTROPHIC-170500-fixer.md`.

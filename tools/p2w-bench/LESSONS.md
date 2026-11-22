@@ -138,3 +138,16 @@ everything else: what went wrong in the work itself.
   is dead, whatever the repo says. Only the agent can clear it - pause and resume recomputes
   `next_fire_at`, and a trigger starts a fresh run. The repo-side stale window does not help here,
   because this failure is above the repository.
+
+## A scheduled run cannot delegate - `background=true` still runs inline. 22 Nov 17:05, fixer.
+
+The brief says "two agents in the first ten minutes, background=true, never wait". In a **scheduled**
+run there is nobody to answer later, so `delegate_task` runs the sub-agent **inside the turn** whatever
+`background` says, and the tool result says so. Measured: one delegation to run the 213-document corpus
+pass consumed **23 minutes of the slot's wall clock** and returned 0 of 212 documents measured (it
+spent its whole budget converting, 7 s/document, and never reached `run()`).
+
+This is the second run in a row to pay for it - the 13:56 slot lost 48 minutes to the same thing.
+
+**A fixer cron that wants a corpus pass must run it itself, in `--budget 250` calls, and budget ~35
+minutes for 213 documents (25 min convert + 10 min measure).** Delegation is for interactive turns only.

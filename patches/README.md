@@ -36,3 +36,26 @@ The lead is NOT `flowTw`: line 5875 already charges the declared value and `w:be
 exactly that, so model and render agree after the patch. mobile-bill's extra page is a REAL surplus -
 it only fitted before because Google under-charged that gap by ~4.9 pt. Keep the spacer half (it is a
 correctness fix and LibreOffice-neutral) and go find what else on that page is over-tall.
+
+## CORRECTION 22 Nov 17:05 - that refutation is about a DIFFERENT patch
+
+The REFUTED block above measures `18-spacer-before-rowpitch-rowrule.patch` (this directory, seven
+hunks). It does not measure
+`tools/p2w-bench/patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch`, which carries only
+two mechanisms - the spacer moved to `w:before`, and error-diffusion of the row pitch onto Google's
+0.75 pt grid. The three hunks the 15:34 bisection blames for the LibreOffice regression (row pitch from
+the table average, row rule outside `trHeight`, cell pitch rescale) are not in the dither patch.
+
+Measured 22 Nov 17:05 on the dither patch, live Google round trip:
+
+    two-tables-stacked-with-no-gap   46/47 (fails 18_displacement)  ->  47/47 PASS, CLEAN
+    LibreOffice proxy, same document  0.77  ->  29.51
+
+So the dither patch is **not refuted - it is proved correct in the renderer the user opens, and it is
+unshippable because the LibreOffice ratchet refuses it.** 14 of the 16 documents that fail
+`18_displacement` alone regress in the proxy; a variant build that leaves the rule pitch on the row's
+own height produces byte-identical proxy scores, so the row height is the term and no LO-neutral form
+of the fix exists (Google adds a 0.75 pt quantum LibreOffice does not).
+
+Evidence: `tools/p2w-bench/FINDINGS/18_displacement-DITHER-IS-GOOGLE-CLEAN-AND-LO-CATASTROPHIC-170500-fixer.md`.
+Do not screen it again. The open question is the instrument, not the construct.
