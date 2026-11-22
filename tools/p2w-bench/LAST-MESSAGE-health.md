@@ -1,18 +1,18 @@
 # P2W Watchdog - Run Report
 
-**22 Nov 2026 · 12:16 IST**
+**22 Nov 2026 · 15:15 IST**
 
-> **1 stage(s) stopped: txt**
+> Nothing is stopped.
 
 ## Stages
 
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 6.0 h |
-| matrix | done | 213 of 213 | 12.3 h |
-| classify | superseded |  | 5.4 h |
-| fix | moving |  | 0.2 h |
-| txt | **stopped** | 197 clean, 16 failing | 13.6 h |
+| measure-google | done | 213 of 213 | 9.0 h |
+| matrix | done | 213 of 213 | 15.3 h |
+| classify | superseded |  | 8.4 h |
+| fix | moving |  | 0.5 h |
+| txt | superseded | 197 clean, 16 failing | 16.6 h |
 
 ## Trend
 
@@ -25,14 +25,18 @@
 
 ## What this pass did
 
-Read health.py, health.py --stalled, stage.py, progress.py, round.py --phase and status.py. The round phase is fix, round 1. No cron was recreated, and none could be: this watchdog has no cron tool, so it cannot list a cron, read a run, pause or resume one, or delete and recreate a zombie. The exact calls it would have made are in BLOCKERS.md with their arguments. That is a missing tool, not a decision for a person.
+* Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
+* Nothing needed moving.
+* The .txt table is newer than the engine, verify_txt.py and restamp_txt.py, so it is current and not late - see BLOCKERS.md.
 
-## The stopped row is not a stall
+## The step that could not run
 
-The txt row ages the .txt ranking table. That table is stamped against the engine: the state file beside it records the engine commit it was measured on, and that is still the newest engine commit on the branch. Nothing has changed the converter since the table was written, so no re-measurement is due, and a re-measurement would print the same 197 clean and 16 failing. The threshold is twelve hours and the table is 13.6 h old, so the row goes red on age alone while the work underneath it has not stopped.
+This watchdog has no cron tool, so STEP THREE and STEP FOUR A/B - the steps that read and move the cron platform - could not run. That is a missing tool, not a judgement call: a paused or zombie cron cannot be moved by this run, and nothing in the repository can see one. The exact calls this pass would have made, with the fixer ids read from HEALTH-BRIEF's table rather than from memory, are written into BLOCKERS.md.
 
-What would overturn that, and make this a real stall: an engine commit newer than the table, or a fixer run that lands an engine change without re-scoring the .txt half. Either one, with the row still red, needs the .txt half to get its own scheduled re-measurement. I did not move the threshold to make the row green.
+## What was repaired
 
-## The other rows
+The txt row had been red on age alone. The table is a function of the engine, verify_txt.py and restamp_txt.py; every one of those is older than the table, and the txt fingerprint in ENGINE-STAMP.json matches the live engine exactly. health.py now tests that and prints superseded - the same state the classify row already uses for the same false alarm. The age and the threshold are untouched, and any commit to an input turns the row red again on its own.
 
-Nothing is wedged. status.py reports the fixer WORKING with a fresh beacon, so the slot is held by a live run and was not released; the reopen path does not apply because the phase is fix, not done. The trend row moved: .txt failing 23 to 16 and Google clean 6 to 23. .docx open is unchanged at 59 for the second row running, which is the number to watch, with the fixer's attempt count beside it in BLOCKERS.md.
+## What is still stuck
+
+The .docx half. benchmarks/RANKING.csv was last measured before the engine changed, so the docx table describes an engine that no longer exists, and the gate refuses the held-back row-grid patch for that reason. round.py --remeasure is the unblock, and it is not safe to pull while a live fixer run holds the slot.

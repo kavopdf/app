@@ -392,8 +392,15 @@ def watchdog():
         L.append("")
     L += ["## What this pass did", "",
           "* Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.",
-          "* %s" % ("**A stage is stopped** - see BLOCKERS.md." if stopped else "Nothing needed moving."),
-          ""]
+          "* %s" % ("**A stage is stopped** - see BLOCKERS.md." if stopped else "Nothing needed moving.")]
+    # A PASS THAT REPAIRED AN INSTRUMENT DID SOMETHING, AND "Nothing needed moving" WOULD SAY IT DID NOT.
+    # The txt row reads `superseded` when the table is newer than the engine and the two scripts that
+    # can change a .txt score; that state only exists because a watchdog pass put it there, so the
+    # report says so rather than reporting silence over a change it made.
+    if (stages.get("txt") or {}).get("state") == "superseded":
+        L.append("* The .txt table is newer than the engine, verify_txt.py and restamp_txt.py, so it is "
+                 "current and not late - see BLOCKERS.md.")
+    L.append("")
     return "\n".join(L)
 
 

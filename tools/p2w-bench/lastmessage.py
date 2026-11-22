@@ -576,6 +576,18 @@ def main(argv):
             print("what it prints, or delete the sentence that needs the number.")
             return 3
         print("ok - every number in this %s report is one the tool printed" % _for)
+        # A REPORT THAT PASSES MUST STILL BE WRITTEN. This branch returned before the write below, so
+        # every per-cron report that passed the number check was checked and then thrown away - the
+        # stored LAST-MESSAGE-health.md stayed at whatever an older, unverified pass had left there.
+        # Measured 22 Nov 15:09: the file still held the 12:16 IST pass while this run's checked report
+        # sat in /tmp. BLOCKERS.md recorded it at 00:22 and it survived three passes; a check that
+        # discards the artefact it approved is not a check.
+        if "--dry-run" in argv:
+            print("dry run - nothing written")
+            return 0
+        _dest = out_path(_for)
+        open(_dest, "w", encoding="utf-8").write(text)
+        print("wrote %s - %d characters" % (_dest, len(text.strip())))
         return 0
 
     problems, checked = verify(text)

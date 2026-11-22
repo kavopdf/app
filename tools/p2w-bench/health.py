@@ -45,6 +45,25 @@ CLASSES = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
 # reports a stall on a file nobody ranks is the false alarm that makes a watchdog ignorable, so the
 # row is current when EITHER table is current, and the age shown is the younger of the two.
 CLASSES_GOOGLE = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES-GOOGLE.md")
+# THE .TXT ROW HAD THE SAME FALSE ALARM THE `classify` ROW WAS REPAIRED FOR, AND IT RAN RED FOR 16 HOURS.
+#
+# RANKING-TXT.csv is a function of three things and nothing else: the engine sources, verify_txt.py and
+# restamp_txt.py. When none of those has moved since the table was committed, re-scoring the corpus
+# reproduces the table byte for byte - there is no work for any run to do, and an age past twelve hours
+# is the age of an unchanged engine, not of a stalled stage. Measured 22 Nov 15:09 IST: the table was
+# committed 21 Nov 17:08 UTC; verify_txt.py in that same commit; restamp_txt.py 20 Nov 06:33; the engine
+# 21 Nov 11:30. The table was newer than every input, ENGINE-STAMP.json's txt fingerprint
+# (ae5b3129bfa31f15) matched regress.py's fingerprint of the live engine, and STATE-TXT.json recorded
+# 462353f - the engine as it stands. The row still read `stopped` at 16.5 h, and would have read it
+# every three hours until an engine patch landed. A watchdog that reports a stall on a table nothing
+# can change is the false alarm that makes a watchdog ignorable.
+#
+# This adds a STATE, not a threshold: the age is still printed and still compared with the same twelve
+# hours. The moment the engine or either script is committed, the table is older than its inputs again
+# and the row goes back to moving/stopped by itself. See BLOCKERS.md 2026-11-22 15:09.
+VERIFY_TXT = os.path.join(HERE, "verify_txt.py")
+RESTAMP_TXT = os.path.join(HERE, "restamp_txt.py")
+ENGINE_DIR = os.path.join(ROOT, "app", "src", "main", "java", "com", "kavopdf", "app", "engine")
 ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 BLOCKERS = os.path.join(HERE, "BLOCKERS.md")
 
@@ -167,8 +186,19 @@ def _txt_state():
     except Exception:
         return {"measured": 0, "clean": 0, "failing": 0, "age_h": 1e9}
     clean = len([r for r in rows if int(r.get("failed") or 0) == 0])
+    # The age of the newest thing that can change a .txt score. The table is current when it is
+    # younger than all of them; `_age` is hours since the path last changed, so the newest input is
+    # the SMALLEST of the three.
+    # COMPARED AS COMMIT EPOCHS, NOT AS HOURS. The table and verify_txt.py were written by the SAME
+    # commit (bd1c2e52), so their ages are identical to the second and a strict `age <` comparison
+    # reads the tie as "stale" - which is the bug this repair exists to remove. A table committed at
+    # or after its newest input is current.
+    inputs = max(_commit_time(p) or 0.0 for p in (ENGINE_DIR, VERIFY_TXT, RESTAMP_TXT))
+    table = _commit_time(TXT) or 0.0
     return {"measured": len(rows), "clean": clean, "failing": len(rows) - clean,
-            "age_h": round(_age(TXT), 1)}
+            "age_h": round(_age(TXT), 1),
+            "inputs_age_h": round(max(0.0, (time.time() - inputs) / HOUR), 1),
+            "current": bool(table) and table >= inputs}
 
 
 def _attempts_recent(hours=3.0):
@@ -260,11 +290,18 @@ def compute():
                                        "- the slot is free, so the next scheduled run takes over; if "
                                        "the platform keeps the old one running it never will" % hung)
 
+    # A TABLE NEWER THAN EVERYTHING THAT CAN CHANGE IT IS CURRENT, NOT LATE - the same rule the
+    # `classify` row uses, applied to the inputs a .txt score actually has.
+    _txt_current = bool(txt["measured"]) and txt.get("current", False)
     out["stages"]["txt"] = {
         "measured": txt["measured"], "clean": txt["clean"], "failing": txt["failing"],
-        "age_h": txt["age_h"],
-        "state": ("moving" if txt["age_h"] < THRESHOLD["txt"] else "stopped")
+        "age_h": txt["age_h"], "inputs_age_h": txt["inputs_age_h"],
+        "state": ("superseded" if _txt_current else
+                  ("moving" if txt["age_h"] < THRESHOLD["txt"] else "stopped"))
                  if txt["measured"] else "never measured"}
+    if _txt_current:
+        out["stages"]["txt"]["why"] = ("the table was committed after the engine, verify_txt.py and "
+                                        "restamp_txt.py last changed - re-scoring reproduces it")
 
     out["blockers"] = []
     try:
