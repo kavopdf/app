@@ -2668,3 +2668,5 @@
 {"t": 1795339008.6672006, "ist": "14:46:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795339008.8384082, "ist": "14:46:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795339008.9905388, "ist": "14:46:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795341891.9016545, "ist": "15:34:51", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795341896.8297944, "ist": "15:34:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
