@@ -136,3 +136,71 @@ landed alone**: it needs the row height to be true in the same attempt.
 - `68_journal`'s 2880-twip cap is 4.05 pt short of the gap the page really draws (2961 twips).
 - `screen.py` is a LibreOffice instrument and cannot judge a construct whose whole effect is a
   Google-only reinterpretation.
+
+---
+
+## The blast radius, counted — 124 of 213 documents, and 13 that are clean today
+
+Measured after the revert, by converting the **whole corpus** with `ConvertAll` in three batches
+(213 of 213, 0 failed) against the patched build, so that every `sz=2` paragraph carrying a non-zero
+`w:before` is a spacer. The spacer's value is computed identically in both builds, so the census is
+valid for HEAD apart from the cap (below).
+
+| | |
+|:--|--:|
+| documents in the corpus | 213 |
+| **documents carrying a table spacer** | **124 (58.2 %)** |
+| documents with no spacer | 89 |
+| spacers in total | 245 |
+| spacer value, min / median / max | 2.10 / 11.45 / **178.05** pt |
+| documents with 3 or more spacers | 23 |
+| documents with a spacer over 30 pt | 15 |
+| **documents over the OLD 144 pt cap** | **5** |
+
+**A correction to my own text above.** I wrote that the 2880-twip cap "is reached by exactly one
+document in the 16 — the next largest spacer is 18.30 pt". That is true of the 16 that fail
+`18_displacement` and false of the corpus: **five** documents exceed 144 pt —
+
+    330_cad_drawing_sheet                 178.05 pt
+    Account_Opening_Form_Fillable_filled  166.00 pt
+    041122-Account_Opening_Form           166.00 pt
+    360_restaurant_menu                   157.95 pt
+    68_journal_wide_table_spanning        148.00 pt
+
+so raising the cap to 4320 is a five-document change, not a one-document change. Two of those five
+(`041122-Account_Opening_Form`, `Account_Opening_Form_Fillable_filled`) are in the Google-clean set.
+
+**The 13 documents that are clean today and carry a spacer** — these are the ratchet, and they are the
+reason the change cannot be landed unmeasured:
+
+| document | spacers (pt) |
+|:--|:--|
+| `041122-Account_Opening_Form` | 22 spacers, max **166.00** |
+| `Account_Opening_Form_Fillable_filled` | 22 spacers, max **166.00** |
+| `403_crossword_puzzle` | 58.15 |
+| `332_bom_on_drawing` | 29.90 |
+| `341_shipping_manifest` | 18.90 |
+| `301_lab_report_panel` | 17.85 |
+| `375_attendance_register` | 16.90 |
+| `390_wide_data_appendix` | 14.70 |
+| `320_balance_sheet_statutory` | 11.85, 7.90 |
+| `305_vaccination_certificate` | 10.85 |
+| `333_datasheet_spec_tables` | 9.90, 8.30, 9.90 |
+| `401_trifold_brochure` | 7.45 |
+| `74_balance_sheet_indented_subitems` | 3.25, 3.30 |
+
+A 166 pt spacer charged at 22 % instead of 100 % is a ~130 pt move if that document's table is
+positioned by the flow — so at least `041122-Account_Opening_Form` must be rendered before and after
+before this lands. If it moves, the change needs a guard that the 16-document measurement could not
+reveal.
+
+## The exact ratchet the next run must run
+
+1. Build both constructs (spacer as `w:before`; row height × 0.9634).
+2. `ConvertAll` the corpus, keep the 124 spacer-bearing documents.
+3. Render through Google the **13 that are clean today** plus the **16 that fail 18** — 29 documents,
+   87 Drive calls, about 20 minutes.
+4. Land only if none of the 13 regresses and at least 4 of the 16 (a quarter) come clean.
+
+The census is at `/scratch/work/gt/spacers.json` and the converted corpus at
+`/scratch/work/gt/census-out/` — both are pod-local and will be gone; the numbers above are not.

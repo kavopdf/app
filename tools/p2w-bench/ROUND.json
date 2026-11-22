@@ -1,10 +1,10 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "read findings; C2 spacer probe is the lead",
-  "fixer_doing_since": 1795318517.691191,
+  "fixer_doing": "census: counting corpus documents with a table spacer",
+  "fixer_doing_since": 1795319507.729819,
   "fixer_engine_at_claim": "462353f9",
-  "fixer_last_beat": 1795318517.691192,
+  "fixer_last_beat": 1795319507.72982,
   "fixer_started": 1795319371.7694144,
   "history": [
     {

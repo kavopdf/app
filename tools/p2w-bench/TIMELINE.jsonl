@@ -2355,6 +2355,12 @@
 {"t": 1795319453.5832427, "ist": "09:20:53", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795319454.2341726, "ist": "09:20:54", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795319454.5450437, "ist": "09:20:54", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795319029.1994512, "ist": "09:13:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795319029.220672, "ist": "09:13:49", "ev": "release", "d": "fixer released (forced) by the watchdog - the run was alive, see BLOCKERS.md 09:16"}
-{"t": 1795319029.3436646, "ist": "09:13:49", "ev": "killed", "d": "claim cleared by forced release"}
+{"t": 1795319477.1065383, "ist": "09:21:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795319479.3933587, "ist": "09:21:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795319488.017912, "ist": "09:21:28", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795319489.8766344, "ist": "09:21:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795319496.661693, "ist": "09:21:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795319496.9283345, "ist": "09:21:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795319497.1205442, "ist": "09:21:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795319507.728801, "ist": "09:21:47", "ev": "beat", "d": "census: counting corpus documents with a table spacer"}
+{"t": 1795320171.8813026, "ist": "09:32:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

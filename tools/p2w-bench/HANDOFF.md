@@ -30,7 +30,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured this slot (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866); only 68_journal reaches it and its real gap is 2961 twips. Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. Then COUNT the blast radius before committing: the spacer change touches every corpus document with a table spacer and only the 16 that fail 18 were measured; render the currently-clean ones that have one. Do NOT screen this class with screen.py - it renders in soffice, which honours w:line as a length and cannot see either state.
+> Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866). Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. THE RATCHET IS NOW COUNTED: 124 of 213 documents carry a table spacer (58.2%), 13 of the 44 Google-clean documents carry one (041122-Account_Opening_Form and its fillable twin have 22 spacers each, max 166 pt; 403_crossword_puzzle 58.15; 332_bom_on_drawing 29.9), and FIVE documents exceed the old 144 pt cap so the cap raise is a five-document change not a one-document one. Render the 13 clean ones before and after and land only if none regresses and at least 4 of the 16 come clean - 29 documents, 87 Drive calls, ~20 min. Do NOT screen this class with screen.py: it renders in soffice, which honours w:line as a length and cannot see either state.
 
 ## Agents deployed and not yet accounted for
 
@@ -96,16 +96,14 @@ unfinished work, not as a result.
 | 18_dA-02 | 18_displacement | A | what makes a single-page dense table drift in Google - row pitch or th | 07:36 | 07:38 | landed | FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md |
 | 18_dA-03 | 18_displacement | A | independently re-derive the sixteen and the spacer premise from the re | 08:31 | 08:20 | landed | FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md |
 | 18_dB-02 | 18_displacement | B | what places a page's first baseline, and is median_pt 0.96 a real offs | 08:31 | 08:40 | landed | FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md |
-| 18_dA-04 | 18_displacement | A | which clause of the check can fire on a 1.44-2.40 pt document, from th | 09:20 | landed 09:04 | running |  |
-| 18_dB-03 | 18_displacement | B | do 05/32/59/18 share ONE engine construct in the emitted docx, and nam | 09:20 | landed 09:04 | running |  |
+| 18_dA-04 | 18_displacement | A | which clause of the check can fire on a 1.44-2.40 pt document, from th | 09:20 | landed 09:04 | landed | FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md |
+| 18_dB-03 | 18_displacement | B | do 05/32/59/18 share ONE engine construct in the emitted docx, and nam | 09:20 | landed 09:04 | landed | FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:49` agent landed: 32_stroke_lines / A -> FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md
-- `04:49` agent landed: 32_stroke_lines / B -> FINDINGS/32_stroke_lines-CARRIER-REGRESSION-IS-PAGE-OVERFLOW-0450-f1x.md
 - `04:49` relay slot: the previous fixer (03:53) pushed its message at 04:09 and never released; attempt.py re-stamps fixer_started so the claim read 2 min old at 04:10 and the :10 cron stood down. The claim went stale at 04:18 and this run took it. That re-stamp is why a run that ends after an attempt leaves a fresh-looking claim.
 - `04:49` agent landed: 32_sA-03 /  -> FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md
 - `04:50` blocker 2026-11-21 23:39 ('the relay's claim opened no run window') is FALSIFIED by the code and by this run: round.py claim() calls _run_record('start') at line ~512, RUN.json reads started 04:18 for this slot, and the 03:53 run it displaced was archived into RUN-HISTORY.json as 'killed - never released the slot' (2 attempts, 0 kept). The window opens; close that row rather than writing the fix.
@@ -129,6 +127,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `09:19` attempt 9 on 18_displacement -> lead (6/16 moved)
 - `09:20` agent deployed: 18_displacement / A - which clause of the check can fire on a 1.44-2.40 pt document, from the source c
 - `09:20` agent deployed: 18_displacement / B - do 05/32/59/18 share ONE engine construct in the emitted docx, and name it
+- `09:21` agent landed: 18_displacement / A -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
+- `09:21` agent landed: 18_displacement / B -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
 
 ## Where the rest of the state lives
 
