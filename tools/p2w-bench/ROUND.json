@@ -1,11 +1,11 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "regress check",
-  "fixer_doing_since": 1795308027.6245716,
+  "fixer_doing": "gates after 20-doc round trip",
+  "fixer_doing_since": 1795308196.7859519,
   "fixer_engine_at_claim": "462353f9",
-  "fixer_last_beat": 1795308027.6245725,
-  "fixer_started": 1795307196.9041853,
+  "fixer_last_beat": 1795308196.7859528,
+  "fixer_started": 1795308048.8480504,
   "history": [
     {
       "at": "2026-11-12 09:46",

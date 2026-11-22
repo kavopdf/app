@@ -6,11 +6,6 @@
 | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 09:30 | fixer | build-engine | started |
-| 20 Nov 05:13 | fixer | build-engine | started |
-| 20 Nov 05:13 | fixer | build-engine | engine built in 34s |
-| 20 Nov 05:13 | fixer | build-engine | started |
-| 20 Nov 05:14 | fixer | build-engine | engine built in 36s |
-| 20 Nov 05:14 | fixer | build-engine | started |
 | 20 Nov 05:15 | fixer | build-engine | engine built in 34s |
 | 20 Nov 05:15 | fixer | build-engine | started |
 | 20 Nov 05:15 | fixer | build-engine | engine built in 34s |
@@ -406,3 +401,8 @@
 | 22 Nov 05:15 | fixer | build-engine | started |
 | 22 Nov 05:15 | fixer | build-engine | engine built in 33s |
 | 22 Nov 05:18 | fixer | attempt | 32_stroke_lines -> lead (0/? moved) |
+| 22 Nov 05:56 | fixer | claim | fixer claimed the slot |
+| 22 Nov 05:56 | fixer | stale-claim | fixer slot was stale (38 min) - the previous run ended without releasing it |
+| 22 Nov 06:05 | fixer | build-engine | started |
+| 22 Nov 06:06 | fixer | build-engine | engine built in 34s |
+| 22 Nov 06:10 | fixer | attempt | 32_stroke_lines -> kept (3/213 moved) |

@@ -917,8 +917,13 @@ def _picture_has_ink(page, xref, rect):
     return ok
 
 
-def _stroke_pictures(page):
-    """Rules the renderer drew as pictures: thin band, and ink in it."""
+def _stroke_pictures(page, band=1.5):
+    """Rules the renderer drew as pictures: thin band, and ink in it.
+
+    `band` is the widest the picture may be across and still be a rule. It defaults to the
+    1.5 pt this function was written with; check 32 passes RULE_BAND_REN, so a 3 pt rule
+    counts whether the renderer drew it as a vector band or as an image band.
+    """
     out = []
     try:
         infos = page.get_image_info(xrefs=True)
@@ -927,9 +932,9 @@ def _stroke_pictures(page):
     for info in infos:
         r = fitz.Rect(info["bbox"])
         h, w = r.height, r.width
-        if h <= 1.5 and w > 2:
+        if h <= band and w > h:
             thin = h
-        elif w <= 1.5 and h > 2:
+        elif w <= band and h > w:
             thin = w
         else:
             continue
@@ -1093,13 +1098,21 @@ def _paints(col, alpha):
     return lum < PAGE_WHITE
 
 
-def _rule_segments(page, band=None):
+def _rule_segments(page, band=None, pictures=False):
     """Every straight axis-aligned segment the page draws.
 
     perp is the coordinate across the segment (y for horizontal, x for vertical);
     a..b is its extent along it. A filled band counts whether it is a `re` or a closed
     `l`/`qu` path with a fill - the latter is how LibreOffice draws every cell border,
     and missing it reads a correct render as 1,009 rules against 11,983 segments.
+
+    pictures=True also reads the bands a renderer drew as IMAGES. Google Docs exports an
+    anchored shape as a small raster image at the shape's own geometry, so a rule it
+    rendered perfectly reads as zero vector segments. MEASURED 22 Nov on four Google
+    exports: 315_gazette_notification lost 5 of 5 rules to vector-only reading and has 5
+    image bands at exactly those coordinates, 17_three_column_widths_txtpos 2 of 2,
+    394_map_with_legend 3 of 3 (at 0.7, 2.25 and 3.75 pt - the last two are why the band
+    limit has to be RULE_BAND_REN and not 1.5 pt).
     """
     band = RULE_BAND if band is None else band
     out = []
@@ -1144,6 +1157,16 @@ def _rule_segments(page, band=None):
                                           (rr.x1, rr.y0, rr.y1, "v")):
                         out.append({"o": o, "perp": perp, "a": a, "b": b,
                                     "t": t_s, "col": col})
+    if pictures:
+        for pic in _stroke_pictures(page, band=band):
+            r = pic["rect"]
+            h, w = r.height, r.width
+            if h <= band and w > h:
+                out.append({"o": "h", "perp": (r.y0 + r.y1) / 2.0, "a": r.x0, "b": r.x1,
+                            "t": max(0.05, h), "col": pic.get("colour")})
+            elif w <= band and h > w:
+                out.append({"o": "v", "perp": (r.x0 + r.x1) / 2.0, "a": r.y0, "b": r.y1,
+                            "t": max(0.05, w), "col": pic.get("colour")})
     return out
 
 
@@ -1166,8 +1189,8 @@ def _rule_touches(seg, others, gap):
     return False
 
 
-def _rules(page, isolated=True, thin=None, band=None):
-    segs = _rule_segments(page, band)
+def _rules(page, isolated=True, thin=None, band=None, pictures=False):
+    segs = _rule_segments(page, band, pictures=pictures)
     thin = RULE_THIN if thin is None else thin
     out = []
     for s in segs:
@@ -1179,10 +1202,10 @@ def _rules(page, isolated=True, thin=None, band=None):
     return out
 
 
-def _doc_rules(doc, isolated=True, thin=None, band=None):
+def _doc_rules(doc, isolated=True, thin=None, band=None, pictures=False):
     out = []
     for i, p in enumerate(doc):
-        for s in _rules(p, isolated, thin, band):
+        for s in _rules(p, isolated, thin, band, pictures=pictures):
             s = dict(s)
             s["page"] = i
             out.append(s)
@@ -2841,14 +2864,19 @@ def extra_checks(src, gd, s_runs, g_runs, pairs, docx_path=None):
     # not a ratio of counts: a document with no isolated rule passes and says so with a
     # source of 0, rather than inventing a denominator out of table grid it does not own.
     s_rules = _doc_rules(src, isolated=True)
-    g_segs = _doc_rules(gd, isolated=False, thin=RULE_THIN_REN, band=RULE_BAND_REN)
+    # pictures=True: Google exports an anchored shape as a raster image at the shape's own
+    # geometry, so vector-only reading reports a rule it drew perfectly as LOST. MEASURED
+    # 22 Nov on four Google exports: 5/5, 2/2 and 3/3 lost rules are present as image bands
+    # at the source coordinates. The band limit is RULE_BAND_REN - the same width the vector
+    # path uses - so a 3 pt rule counts either way.
+    g_segs = _doc_rules(gd, isolated=False, thin=RULE_THIN_REN, band=RULE_BAND_REN,
+                        pictures=True)
     _, s_lost = _rules_lost(s_rules, g_segs)
     # THE SECOND FIELD IS "LOST", NOT "RENDERED". It read (source, render, ok) to anyone looking at
     # the JSON, so "source=2 render=2" looked like a document whose rules were intact and was in
     # fact a document that had lost both of them - 11 of the first 31 Google-measured documents show
     # exactly that pair. The count is negated so the field means what its name says: rules the render
     # is missing. The verdict is unchanged.
-    c["32_stroke_lines"] = (len(s_rules), len(s_lost), not s_lost)
     c["32_stroke_lines"] = (len(s_rules), len(s_lost), not s_lost)
 
     # ---- 33 RETIRED 13 Nov: it was 46 with a 2 pt inset ---------------------
