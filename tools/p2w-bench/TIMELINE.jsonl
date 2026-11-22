@@ -2746,3 +2746,11 @@
 {"t": 1795349214.7569387, "ist": "17:36:54", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795349215.2647388, "ist": "17:36:55", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795349215.5640798, "ist": "17:36:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795350584.8581371, "ist": "17:59:44", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795350678.4528756, "ist": "18:01:18", "ev": "beat", "d": "fetching corpus; analysing 05/18 evidence"}
+{"t": 1795352385.2110462, "ist": "18:29:45", "ev": "beat", "d": "agents returned: 05 stale-baseline + 18 two-term diagnosis; checking drive tools"}
+{"t": 1795352402.845313, "ist": "18:30:02", "ev": "beat", "d": "found: google baseline is 2+ engine commits stale (462353f9 vs HEAD 7112d766); fetching corpus to re-measure"}
+{"t": 1795352534.716686, "ist": "18:32:14", "ev": "beat", "d": "converting 213 with HEAD engine"}
+{"t": 1795352934.8043134, "ist": "18:38:54", "ev": "beat", "d": "18_displacement: building LO-neutral spacer split (before=G-20tw, line=20tw)"}
+{"t": 1795354722.4444754, "ist": "19:08:42", "ev": "beat", "d": "spacer split is LO-neutral (mobile-bill 43.87/1.55 identical); now testing Google side"}
+{"t": 1795354802.3281355, "ist": "19:10:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
