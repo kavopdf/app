@@ -1,0 +1,71 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4ead19de..b85975b8 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -5525,6 +5525,51 @@ public final class DocxWriter {
+      * <p>A side with no stroke ({@code sideStroke} null) keeps the old constant, sz 8 in
+      * 000000, so nothing that used to be right changes.
+      */
++
++    /**
++     * THE ROW'S RULE AS A PARAGRAPH BORDER, NOT A CELL BORDER - the charge, measured.
++     *
++     * <p>Google lays a ruled row at round(trHeight + the row's own rule) and LibreOffice lays
++     * it at trHeight exactly, so a table border on the row's top and bottom edge is a pitch
++     * the two renderers cannot agree on: a source pitch of 18.40 pt comes out 18/19 in
++     * LibreOffice and 19/20 in Google, and the difference accumulates down the table (+9.1 pt
++     * at the foot of 13 rows). Measured 22 Nov, four builds, two renderers, one round trip
++     * each: with the same trHeight and the same 0.5 pt rule, as a table border Google lays
++     * mean 19.08; as a paragraph border inside the cells it lays mean 18.25 and LibreOffice
++     * lays the declaration exactly in both. The rule is the charge, and a paragraph border is
++     * not charged.
++     *
++     * <p>Off by default: this moves the rules of every ruled table in the corpus, and a change
++     * of that size is measured across the corpus before it is committed. -Dp2w.pbdr=true turns
++     * it on so the two builds can be compared on the same document.
++     */
++    private static String rulesAsParagraphBorders(String tblXml, int sz, String colour) {
++        if (sz <= 0) return tblXml;
++        String bdr = "<w:pBdr><w:bottom w:val=\"single\" w:sz=\"" + sz
++                + "\" w:space=\"0\" w:color=\"" + colour + "\"/></w:pBdr>";
++        // The horizontal sides stop being table borders, or the row is charged twice.
++        String x = tblXml
++                .replace("<w:top w:val=\"single\"", "<w:top w:val=\"nil\"")
++                .replace("<w:bottom w:val=\"single\"", "<w:bottom w:val=\"nil\"")
+                .replace("<w:insideH w:val=\"single\"", "<w:insideH w:val=\"nil\"");
++        StringBuilder out = new StringBuilder();
++        int i = 0;
++        while (true) {
++            int tc = x.indexOf("<w:tc>", i);
++            if (tc < 0) { out.append(x, i, x.length()); break; }
++            out.append(x, i, tc + "<w:tc>".length());
++            int next = x.indexOf("<w:tc>", tc + 6);
++            int end = next < 0 ? x.length() : next;
++            String cell = x.substring(tc + 6, end);
++            // One rule per cell: the FIRST paragraph carries it, so a cell with two lines does
++            // not draw two rules.
++            int pp = cell.indexOf("<w:pPr>");
++            if (pp >= 0) cell = cell.substring(0, pp + 7) + bdr + cell.substring(pp + 7);
++            out.append(cell);
++            i = end;
++        }
++        return out.toString();
++    }
++
+     private static String borders(int[] sideSz, String[] sideColour, boolean[] sideDrawn) {
+         StringBuilder b = new StringBuilder("<w:tblBorders>");
+         for (int i = 0; i < TABLE_SIDES.length; i++) {
+@@ -6753,7 +6798,12 @@ public final class DocxWriter {
+             inner.append("</w:tr>");
+         }
+         inner.append("</w:tbl>");
+-        sb.append(inner);
++        String tblXml = inner.toString();
++        if (ruledTable && Boolean.getBoolean("p2w.pbdr")) {
++            int rsz = sideDrawn[4] ? sideSz[4] : 0;
++            tblXml = rulesAsParagraphBorders(tblXml, rsz, sideColour[4]);
++        }
++        sb.append(tblXml);
+         // A table must be followed by a paragraph of its own: Word inserts one if it is not
+         // there, and a paragraph the writer did not place is a paragraph it cannot measure.
+         //

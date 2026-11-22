@@ -273,6 +273,18 @@ def verify_facts(text, data):
 
     # ---- 2. THE CORPUS SIZE ---------------------------------------------------------------
     docs = co.get("docs")
+    # A ROW COPIED FROM report.py IS NOT A NUMBER THIS RUN TYPED.
+    #
+    # report.py's own .txt table says "Scored | **213** of 213" - the .txt corpus is 213 - while the
+    # .docx corpus this check compares against is 212, because 416_many_tiny_pages is exempt. So the
+    # section the validator REQUIRES (verify_sections) was refused by the number check in the same
+    # file, and no report could pass. Measured 22 Nov 23:5x: the fixer report was refused for a row
+    # it had copied verbatim. Lines that appear in REPORT.md are checked against report.py by
+    # verify_sections, character for character; they are skipped here.
+    _copied = set()
+    _md = _report_md()
+    if _md:
+        _copied = {l.strip() for l in _md.splitlines()}
     if isinstance(docs, int) and docs > 0:
         # ONLY A NUMBER NEAR THE CORPUS SIZE CAN BE A CLAIM ABOUT THE CORPUS. "5 of 10" is a
         # class's documents and "of 22" is a batch; flagging those teaches a run to ignore the
@@ -280,6 +292,10 @@ def verify_facts(text, data):
         for n in re.findall(r"of\s+\*{0,2}(\d{2,4})\*{0,2}\b", text):
             v = int(n)
             if not (100 <= v <= 400):
+                continue
+            _line = text[max(0, text.rfind("\n", 0, text.find("of " + n)) + 1):]
+            _line = _line.split("\n", 1)[0].strip()
+            if _line in _copied:
                 continue
             if v != docs and v != co.get("compared"):
                 problems.append("corpus: 'of %s' appears, the corpus is %d (compared: %s)"

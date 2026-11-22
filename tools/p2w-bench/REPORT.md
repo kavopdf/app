@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 21:00
+# Fixer report - 2026-11-22 22:58
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 21:00 → running IST · 14 min**
+**22 Nov 2026 · slot 22:58 → running IST · 36 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,16 +11,22 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
-| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
-| Exempt, not measured | **0** — none |
+| Exempt, not measured | **1** — 416_many_tiny_pages |
 | **Fixed - Google, all 42 checks** | **23**, out of the 192 documents both renderers measured |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `tooling: the measure/classify gates (no document class - the corpus must be re-measured on engine 226f7f2df3013ad7 first)` |
+| Working on | `18_displacement` |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 23:33 | **lead** | 0/None | Measured where Google's row-pitch charge lives: LibreOffice lays w:trHeight exactly and never charges the rule; Google charges the row's own rule and rounds to a whole point. A paragraph border is not |
 
 ## The txt
 
@@ -40,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 21:00 → running · 14 min |
+| Slot window | 22:58 → running · 36 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 3 |
-| Longest silence | **11.6 min** — from 21:00:02, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 1 |
+| Tool beats | 13 |
+| Longest silence | **16.0 min** — from 23:17:45, after `attempt.py: recording an attempt` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -52,9 +58,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **11 min** | `#################` |
-| record - attempt, handoff, class rows | **1 min** | `###` |
-| report - the report and the chain | **1 min** | `##` |
+| fix - diagnose and change the engine | **16 min** | `##########` |
+| measure or build - a conversion, screen or compile writes no beacon | **14 min** | `#########` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **4 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -67,7 +74,7 @@
 
 ## Next run
 
-APPLY patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch and ratchet it corpus-wide - measured clean on two-tables-stacked-with-no-gap (42/42 PASS, n_out 0) and it moves EVERY ruled table, so the gate refuses it unratcheted. The row grid is 0.75 pt, NOT whole points: nine identical rows per page read 18.00/18.75/19.50, and the law laid=0.75*(round(h/0.75)+1) reproduces the 13-declaration sweep exactly when its readings are rounded. Then close the small-spacer over-charge the patch exposes: mobile-bill's 128/124 tw spacers are now charged in full where Google previously charged ~0, leaving that page +2..+5 pt low. Evidence: FINDINGS/18_displacement-ROW-GRID-AND-SPACER-1518-relay.md
+DO NOT apply patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch - measured LO-regressive by 21.5 points on two-tables-stacked-with-no-gap (FINDINGS/18_displacement-RELAY-PATCH-REGRESSES-LIBREOFFICE-1930-f1x.md). Start from FINDINGS/18_displacement-RULES-AS-PBDR-PITCH-FIXED-PLACEMENT-BROKEN-2330-fixer.md: the Google row-pitch charge is the row's OWN RULE and a paragraph border is not charged (Google mean 18.25-18.33 vs 19.08 with cell borders, source 18.40; LibreOffice identical to 0.05 pt). The bottom-border build fixes the pitch and breaks text placement (median dy -4.66 -> -10.70, n_out 55 -> 69). Next round trip: pBdr TOP per row AND nil the table's own top side (the C build drew 18 rules vs 15 because the table top was still drawn), then re-run the A/B on two-tables-stacked-with-no-gap. Census first: only five of the sixteen documents that fail 18_displacement and nothing else are ruled tables with a sub-point pitch - the other eleven are a different term.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
