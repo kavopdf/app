@@ -225,7 +225,21 @@ def _pick(fmt, rot, dead):
     # hand.
     #
     # A lead is unfinished work, not absent work. Stay until it is implemented or refuted.
-    if any((x.get("outcome") or "") == "lead" for x in h):
+    # A LEAD IS OPEN ONLY UNTIL SOMETHING LANDS. This read any(lead) over the whole window, so a lead
+    # that had already been implemented - and followed by two `kept` attempts - still held the class for
+    # ever. On 22 Nov that meant the rotation stayed on 32_stroke_lines after the run had already taken
+    # it from 6 clean to 23.
+    #
+    # A lead is open when it is the most recent attempt, or when nothing since it was kept or partial.
+    _open_lead = False
+    for x in reversed(h):
+        _o = (x.get("outcome") or "")
+        if _o in ("kept", "partial"):
+            break            # something landed after the lead - it is closed
+        if _o == "lead":
+            _open_lead = True
+            break
+    if _open_lead:
         return cur, ("staying on %s (%d documents, .%s): it holds an open LEAD - a construct measured "
                      "and not yet landed. Finish it before anything else; a measured lead is worth more "
                      "than a fresh attempt on any other class."
