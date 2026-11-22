@@ -22,6 +22,32 @@ A document is done when **all 42 Google checks pass** on it and its `.txt` descr
 Not "improved", not "moved", not "the class was worked" - **that document, in the renderer the user
 opens.**
 
+## A RULE IS A METHOD. IT NEVER NAMES A CLASS.
+
+The user, 22 Nov: *"koi bhi rules kisi ek specific class ke liye nhi hona chahiye yeh iska kaam karne ka tareeka hona chahiye"*
+
+**Every rule in this file is a way of deciding, not a thing to do to one class.** The difference matters,
+because a class-specific rule is dead the moment that class is fixed, and it takes a run to notice.
+
+| a method (right) | a class rule (wrong) |
+|---|---|
+| "fix the construct the checks share, not one check of five" | "fix `32_stroke_lines`" |
+| "ask which documents become CLEAN if this works" | "work `18_displacement` next" |
+| "a measured lead outranks everything" | "finish `w:tblpPr`" |
+| "the biggest class with no verdict is the biggest prize" | "`47_margins` is 26 documents" |
+| "an unmeasured change is not a pass" | "re-stamp the table after `47_margins`" |
+
+**So no rule here may be written in terms of a class name.** Evidence may be - a measurement of
+`32_stroke_lines` on 21 Nov is a fact and belongs in the file - but a rule must be stateable without naming
+any class, because the class it names is the class that will not exist next month.
+
+**And if you find yourself writing a rule that only makes sense for one class, you have found a symptom, not
+a rule. Write it in `FINDINGS/` as a measurement and leave the method alone.**
+
+**The tools already obey this: no script in `tools/p2w-bench/` branches on a class name.** Class names
+appear in `verify_google.py` and `verify_txt.py` because those files ARE the check catalogue, and in tests
+because a test asserts a specific check catches a specific mutation. Neither is a rule about what to work on.
+
 ## THE ONLY THINGS THAT ARE NOT YOURS TO DECIDE
 
 Six, and they are not preferences - each one is a mistake this project has already paid for.
@@ -893,27 +919,40 @@ run can measure it.
 
 ---
 
-## START HERE: the largest class in the corpus is already diagnosed
+## START HERE: HOW TO FIND WHAT TO WORK ON, NOT WHICH CLASS TO WORK ON
 
-Before taking any class from any table, read these three, in this order:
+**This section used to say "do this one first" about a named class, with a document count beside it.**
+That was a class rule, its numbers were stale within a day, and it pointed at an approach - the paragraph
+border - that eighteen attempts had already refuted. A rule that names a class is dead as soon as the
+class is fixed, and a rule that names an approach is dead as soon as the approach is wrong.
 
-    benchmarks/DEFECT-CLASSES-GOOGLE.md          what Google fails, ranked by gap
-    FINDINGS/RULES-ARE-DRAWINGS-GOOGLE-DROPS-THEM.md   the cause
-    FINDINGS/RULES-PBDR-IMPLEMENTATION.md        the exact code, and the line the first attempt missed
+**So here is the method instead. Run it every time, in this order, and it will find the current answer
+whatever the current answer is:**
 
-**Worth 53 + 48 documents.** LibreOffice fails `32_stroke_lines` on zero of them; Google fails it on 53.
-A rule is emitted as a floating `<w:drawing>`, Google drops the shape and keeps the `U+200B` anchor -
-which is why `32_stroke_lines` and `05_chars_extra` are one construct and not two.
+    1  python3 tools/p2w-bench/classpick.py --leverage
+       What each check is worth in CLEAN documents. The top line is the biggest single prize today.
+       Read it fresh - last week's top line was a false positive and nobody knew.
 
-The implementation is written out. The one line that is easy to forget is `ctx.flowY = s.topPt` - omit
-it and every line below a rule moves up by the rule's gap, which is an `18_displacement` regression on
-every document with a rule. **The second-largest class made worse by the fix for the largest is not a
-fix.**
+    2  python3 tools/p2w-bench/classpick.py
+       The shapes: which sets of checks documents actually fail. Checks that always travel together
+       are ONE construct, and one fix clears all of them. This is where you find that three apparent
+       classes are one cause.
 
-**Do this one first.** It is the only class in the repository where the construct, the code and the
-failure signature are all already written down.
+    3  grep -l '<the top check>' tools/p2w-bench/FINDINGS/*.md
+       What is already known about it. Most of what you are about to try has been tried. A FINDINGS
+       file that says REFUTED saves you the whole slot; one that says HONOURED saves you the
+       measurement.
 
----
+    4  Pick the document where the construct is the WHOLE defect, not one of eleven problems.
+       Prove it there. A fix proved on a document with ten other failures has taught you nothing.
+
+**And the question before every attempt, which is the charter's and not this section's:** if this works,
+which documents become CLEAN?
+
+**What you must not do is start where a previous run said to start**, because that instruction was written
+for a corpus that no longer exists. Read it, check it against the tools, and if it still holds, it holds on
+the evidence you just read - not on its say-so.
+
 
 ## TEN MINUTES FROM CLAIM TO A RECORDED ATTEMPT. NO EXCEPTIONS.
 
@@ -1455,36 +1494,42 @@ drawing and leave the carrier, and `00_page_count` and `18_displacement` get wor
 
 ---
 
-## HOW CLOSE THE CORPUS ACTUALLY IS. 7 IS NOT THE WHOLE STORY.
+## HOW CLOSE THE CORPUS IS, AND HOW TO READ IT YOURSELF
 
-Google, 192 scored (21 refused), measured 21 Nov:
+**This is a method, not a number.** The numbers in this section were true on the date beside them and
+they are the reason the method exists - but the method is what you use, because any frozen count here is
+wrong by the next run.
 
-    0 checks fail  (CLEAN) :   7
-    1 check                :   7    <- one check from clean
-    2 checks               :  24
-    3 checks               :  30
-    4 checks               :  33    <- the mode
-    5 checks               :  24
-    6 checks               :  23
-    7 or more              :  44
+**Ask the corpus how close it is, every run, with the tool:**
 
-    within 1 failure : 14 documents
-    within 2         : 38
-    within 3         : 68
-    within 4         : 101
+    python3 tools/p2w-bench/classpick.py --leverage   # what each check is worth in CLEAN documents
+    python3 tools/p2w-bench/classpick.py              # the shapes: which checks travel together
 
-**Seven clean is the headline and it has not moved in three days. But fourteen are one check away**, and
-of those seven, three are blocked by the construct above:
+**And the shape of the answer matters more than the totals.** Measured 21 Nov, when 7 documents were
+clean out of 192 scored:
 
-    394_map_with_legend              32_stroke_lines
-    407_id_card_front_back           32_stroke_lines
-    382_architecture_diagram         05_chars_extra
+      0 checks fail  (CLEAN) :   7
+      1 check                :   7    <- one check from clean
+      2 checks               :  24
+      3 checks               :  30
+      4 checks               :  33    <- the mode
+      5 checks               :  24
+      6 checks               :  23
+      7 or more              :  44
 
-**So the same fix that clears the largest class also takes the clean count from 7 to 10.** That is worth
-more than any single document, and it is why the rotation keeps coming back to this construct instead of
-chasing a class with fewer documents.
+**Two things follow, and they are true of any corpus whatever the numbers are:**
 
----
+* **A document one check from clean is the shortest path there is.** Clearing one check on it takes the
+  clean count up by one for a single fix. That is why the near-misses are worth finding before the biggest
+  class is worth attacking.
+* **The mode is not the goal.** Most documents fail four checks. Fixing one of those four moves the
+  document and does not clean it, so a run that counts "documents improved" can look productive while the
+  clean count does not move at all.
+
+**So before every attempt, the question is the same one the charter asks:** if this works, which documents
+become CLEAN? A document one check from clean answers it with a number. A document seven checks away
+answers it with a shrug.
+
 
 ## AFTER YOU CHANGE ANYTHING, TRY TO PROVE IT WRONG. THIS IS THE ONE DISCIPLINE THAT MATTERS.
 
