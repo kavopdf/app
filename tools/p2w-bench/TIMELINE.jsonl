@@ -2535,3 +2535,9 @@
 {"t": 1795329429.5950234, "ist": "12:07:09", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795329430.2441351, "ist": "12:07:10", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795329430.5823839, "ist": "12:07:10", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795332272.616487, "ist": "12:54:32", "ev": "beat", "d": "installing scipy + building engine (JDK fetch)"}
+{"t": 1795332560.1062255, "ist": "12:59:20", "ev": "beat", "d": "building corpus from release assets"}
+{"t": 1795333011.4569623, "ist": "13:06:51", "ev": "beat", "d": "implementing row-pitch: Google +0.75pt rule charge + pointKey precision"}
+{"t": 1795333208.4233322, "ist": "13:10:08", "ev": "beat", "d": "google round trip: mobile-bill with rule-charge fix"}
+{"t": 1795333257.9870017, "ist": "13:10:57", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795333362.7355442, "ist": "13:12:42", "ev": "beat", "d": "attempt.py: recording an attempt"}
