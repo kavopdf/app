@@ -30,7 +30,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> Do not rebuild the table-top spacer and do not believe the -114.8 pt figure - both are refuted in SETTLED.md with the numbers: RANKING.csv gives 68_journal_wide_table_spanning max_pt 8.64, and the w:before build moved 1 of 16 by 0.85. The lead worth having is the uniform page offset: fourteen of the sixteen read median_pt 0.96 or 1.44, which at 150 DPI is two or three pixels out on EVERY line - one constant applied to the page, not sixteen constructs. Test it against the two em-offsets already measured and never tried here: the first baseline of a page sits 0.0565 em below the paper's top edge, and the first baseline of a cell 0.92 em below the row's top edge (REMAINING-DEFECTS.md). 71_invoice_space_aligned_no_rules is the exception - share@5 26.88, median_pt 3.84, no table spacer at all - and needs its own look. Also settled: screen.py was measuring NOTHING on a fresh pod (ENGINE_SRC frozen at import); it is fixed, so a screen that reports 0 of N measured should be treated as a tool failure, not as evidence.
+> Do not rebuild the table-top spacer and do not believe the -114.8 pt figure - both refuted in SETTLED.md with the numbers: RANKING.csv gives 68_journal_wide_table_spanning max_pt 8.64, and the w:before build moved 1 of 16 by 0.85. Do NOT read median_pt 0.96 as a two-pixel page offset either - it is the floor of the instrument (p2w.py filters the integer EDT to d>1, so 0.96 is the smallest value it can print) and a real 0.96 pt offset would PASS an 18_displacement whose tolerance floor is 1.5 pt. The live question is the opposite one: SIX of the sixteen (22_invoice_four_columns_txtpos, 41_coloured_headings_white_bg, 73_marksheet_subject_marks_grade, 16_right_aligned_amounts_txtpos, 29_dot_leaders_txtpos, 72_bank_statement_no_rules_right_amounts) have max_pt 1.44-2.40, under the check's own floor, and fail it anyway - so the check's dy and the ranking's dy are not the same quantity. Settle which one defines the class before building for those six. 71_invoice_space_aligned_no_rules (share@5 26.88, median_pt 3.84, no spacer) is genuinely displaced and a separate question. Also settled: screen.py was measuring NOTHING on a fresh pod (ENGINE_SRC frozen at import) - it is fixed, so a screen reporting '0 of N measured' is a tool failure, not evidence.
 
 ## Agents deployed and not yet accounted for
 
@@ -94,16 +94,14 @@ unfinished work, not as a result.
 | 32_sA-audit-01 | 32_stroke_lines | A-audit | are the 16 carrier Google results genuine measurement artifacts or han | 05:18 | a per-check map, an export hash, a real timestamp | landed | FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md |
 | 32_sB-local-01 | 32_stroke_lines | B-local | does the carrier patch damage clean documents when measured in a clean | 05:18 | 4 of 10 controls worse | landed | FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md |
 | 18_dA-02 | 18_displacement | A | what makes a single-page dense table drift in Google - row pitch or th | 07:36 | 07:38 | landed | FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md |
+| 18_dA-03 | 18_displacement | A | independently re-derive the sixteen and the spacer premise from the re | 08:31 | 08:20 | landed | FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md |
+| 18_dB-02 | 18_displacement | B | what places a page's first baseline, and is median_pt 0.96 a real offs | 08:31 | 08:40 | landed | FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `03:35` attempt 11 on 32_stroke_lines -> lead (0/213 moved)
-- `04:00` FALSIFIED on the corpus 22 Nov 04:00: the horizontal-only carrier is 13/16 in Google but 54 documents worse in the proxy (median 9 carriers vs 1 unchanged); regress.py REFUSED 58; HEAD reproduces the baseline on the 3 control docs, so the instrument is sound
-- `04:01` attempt 12 on 32_stroke_lines -> reverted (0/16 moved)
-- `04:08` attempt 13 on 32_stroke_lines -> lead
 - `04:49` attempt 14 on 32_stroke_lines -> lead
 - `04:49` agent deployed: 32_stroke_lines / A - can the emitter tell its drawing anchor is inside a w:tc, and is the prescribed 
 - `04:49` agent deployed: 32_stroke_lines / B - is the 54-document carrier regression cell nesting or body-flow page overflow
@@ -125,6 +123,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `07:36` agent landed: 18_displacement / A -> FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md
 - `07:51` attempt 6 on 18_displacement -> lead (0/16 moved)
 - `08:26` attempt 8 on 18_displacement -> reverted (1/16 moved)
+- `08:31` agent deployed: 18_displacement / A - independently re-derive the sixteen and the spacer premise from the repo
+- `08:31` agent landed: 18_displacement / A -> FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md
+- `08:31` agent deployed: 18_displacement / B - what places a page's first baseline, and is median_pt 0.96 a real offset
+- `08:31` agent landed: 18_displacement / B -> FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md
 
 ## Where the rest of the state lives
 

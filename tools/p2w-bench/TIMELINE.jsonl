@@ -2310,3 +2310,12 @@
 {"t": 1795316315.7363572, "ist": "08:28:35", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795316316.2875328, "ist": "08:28:36", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795316316.5678732, "ist": "08:28:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795316514.8794215, "ist": "08:31:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795316515.019744, "ist": "08:31:55", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795316515.130482, "ist": "08:31:55", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795316515.2598476, "ist": "08:31:55", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795316515.3839548, "ist": "08:31:55", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795316521.6903465, "ist": "08:32:01", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795316522.6491919, "ist": "08:32:02", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795316523.6514893, "ist": "08:32:03", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795316524.1526663, "ist": "08:32:04", "ev": "beat", "d": "report.py: building the report"}

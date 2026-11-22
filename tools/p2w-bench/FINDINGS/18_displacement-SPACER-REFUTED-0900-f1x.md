@@ -84,21 +84,55 @@ HEAD. `RANKING.csv` gives that same document `max_pt` 8.64. **Two records of one
 by a factor of thirteen**, and the table is the one the gate and the ratchet treat as truth. The
 spacer is a real construct with a real defect; it is not what fails these sixteen.
 
-## 4. What the numbers say the cause is instead — the next lead
+## 4. The `median_pt` 0.96 is the STATISTIC'S FLOOR, not a two-pixel page offset
 
-Fourteen of the sixteen read `median_pt` 0.96 or 1.44: at 150 DPI one pixel is 0.48 pt, so **the
-whole page is offset by two or three pixels**, uniformly, on every line. The distribution is not the
-signature of a block that starts in the wrong place; it is the signature of **one constant applied to
-the page**, with a small tail of lines that then tip over `18_displacement`'s floor
-(`clamp(0.35 * size, 1.5, 4.5)`) because they started near it.
+The first reading of the table above was that fourteen of the sixteen sit at `median_pt` 0.96 or 1.44,
+that one pixel is 0.48 pt at 150 DPI, and therefore the whole page is offset by two or three pixels
+uniformly — one constant, not sixteen constructs. **That reading is wrong, and the code says so.**
 
-That is one number, not sixteen constructs, and it is worth checking against the two constants
-`REMAINING-DEFECTS.md` already measured: the first baseline of a page sits 0.0565 em below the
-paper's top edge, and the first baseline of a table cell 0.92 em below the row's top edge. Neither
-has been tested against these sixteen.
+`benchmarks/p2w.py`, `position()`:
 
-`71_invoice_space_aligned_no_rules` is the exception and is a different question: share@5 26.88 with
-`median_pt` 3.84, no table spacer at all, and the largest single error in the class.
+    d,_ = edt(om, sm.shape)      # distance_transform_edt(...).astype(np.int32)  - INTEGER pixels
+    un  = sm & (d > 1)           # every pixel at distance 0 or 1 is EXCLUDED
+    dv  = d[un]
+    median_pt = round(float(np.percentile(dv,50)) * PT, 2)     # PT = 72/150 = 0.48
+
+`dv` holds integers and is filtered to `d > 1`, so the smallest value it can ever contain is 2, and
+**`median_pt` can never print below 0.96**. 0.96 is the floor of the statistic. It is also the worst
+page's value, not a page average. Reading it as "the page is two pixels out" is reading the
+instrument's own quantisation as a measurement.
+
+It is self-contradicting on its own terms as well: `18_displacement`'s tolerance is
+`clamp(0.35 * size, 1.5, 4.5)` pt, so a genuine uniform 0.96 pt offset is *inside the floor and would
+pass*. A number below the check's own floor cannot be the reason the check fails.
+
+**What the sixteen actually are, then, is still open — but it is a tail, not a shift.** `p90_pt` runs
+1.44 to 6.24 and `max_pt` 1.44 to 17.76: three to thirty-seven pixels, on a minority of the ink, not
+two pixels on all of it.
+
+## 4b. Six of the sixteen are under the check's own floor — the two instruments disagree
+
+This is the sharpest thing in the run and it is a question, not an answer. These six have an ink
+displacement that cannot fail a 1.5 pt tolerance:
+
+| document | share@5 | p90 pt | max pt |
+|:--|--:|--:|--:|
+| `22_invoice_four_columns_txtpos` | 0.00 | 1.44 | 1.44 |
+| `41_coloured_headings_white_bg` | 0.00 | 1.44 | 1.44 |
+| `73_marksheet_subject_marks_grade` | 0.00 | 0.96 | 1.44 |
+| `16_right_aligned_amounts_txtpos` | 0.00 | 1.44 | 2.40 |
+| `29_dot_leaders_txtpos` | 0.00 | 1.44 | 2.40 |
+| `72_bank_statement_no_rules_right_amounts` | 0.00 | 1.44 | 2.40 |
+
+`18_displacement` fails them, and `RANKING.csv` says the largest ink displacement anywhere on the page
+is 1.44–2.40 pt, under the 1.5 pt floor for every face size. **The two instruments are measuring
+different quantities.** Either the check's dy is not the ranking's dy, or the check's population is
+not the ranking's population. Until that is settled, "displacement" is unproven for six of the
+sixteen and nothing should be built for them — the 18.6 clean documents the class is worth may be
+partly an artefact of the check, not of the engine.
+
+`71_invoice_space_aligned_no_rules` is the opposite case and a different question: share@5 26.88 with
+`median_pt` 3.84 — genuinely displaced, and no table spacer at all.
 
 ## 5. A tool bug found on the way — screen.py measured nothing on a fresh pod
 

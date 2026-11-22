@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 08:16 → running IST · 12 min**
+**22 Nov 2026 · slot 08:16 → running IST · 16 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,7 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
-| Committed | **11** files in 1 commit(s) from `2ba798b` — 18_displacement-SPACER-REFUTED-0900-f1x.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, ROUND.json, RUN-LOG.md, RUN.json, SETTLED.md, TIMELINE.jsonl, TRACE.md, screen.py |
+| Committed | **13** files in 2 commit(s) from `38b0ce9` — 18_displacement-SPACER-REFUTED-0900-f1x.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, SETTLED.md, TIMELINE.jsonl, TRACE.md, screen.py |
 
 ## What was tried
 
@@ -41,17 +41,20 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dA-03` | independently re-derive the sixteen and the spacer p | 08:31 | 03:01 | 0 min |
+| `18_dB-02` | what places a page's first baseline, and is median_p | 08:31 | 03:01 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 08:16 → running · 12 min |
+| Slot window | 08:16 → running · 16 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 14 |
+| Tool beats | 19 |
 | Longest silence | **3.5 min** — from 08:16:26, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -59,11 +62,11 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **3 min** | `######` |
+| setup - claim, housekeeping, reading the gate | **3 min** | `#####` |
 | screen - the class's own documents | **0 min** | `#` |
 | record - attempt, handoff, class rows | **1 min** | `##` |
-| report - the report and the chain | **1 min** | `##` |
-| other - not attributed to a tool | **5 min** | `##########` |
+| report - the report and the chain | **4 min** | `######` |
+| other - not attributed to a tool | **5 min** | `########` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -76,7 +79,7 @@
 
 ## Next run
 
-Do not rebuild the table-top spacer and do not believe the -114.8 pt figure - both are refuted in SETTLED.md with the numbers: RANKING.csv gives 68_journal_wide_table_spanning max_pt 8.64, and the w:before build moved 1 of 16 by 0.85. The lead worth having is the uniform page offset: fourteen of the sixteen read median_pt 0.96 or 1.44, which at 150 DPI is two or three pixels out on EVERY line - one constant applied to the page, not sixteen constructs. Test it against the two em-offsets already measured and never tried here: the first baseline of a page sits 0.0565 em below the paper's top edge, and the first baseline of a cell 0.92 em below the row's top edge (REMAINING-DEFECTS.md). 71_invoice_space_aligned_no_rules is the exception - share@5 26.88, median_pt 3.84, no table spacer at all - and needs its own look. Also settled: screen.py was measuring NOTHING on a fresh pod (ENGINE_SRC frozen at import); it is fixed, so a screen that reports 0 of N measured should be treated as a tool failure, not as evidence.
+Do not rebuild the table-top spacer and do not believe the -114.8 pt figure - both refuted in SETTLED.md with the numbers: RANKING.csv gives 68_journal_wide_table_spanning max_pt 8.64, and the w:before build moved 1 of 16 by 0.85. Do NOT read median_pt 0.96 as a two-pixel page offset either - it is the floor of the instrument (p2w.py filters the integer EDT to d>1, so 0.96 is the smallest value it can print) and a real 0.96 pt offset would PASS an 18_displacement whose tolerance floor is 1.5 pt. The live question is the opposite one: SIX of the sixteen (22_invoice_four_columns_txtpos, 41_coloured_headings_white_bg, 73_marksheet_subject_marks_grade, 16_right_aligned_amounts_txtpos, 29_dot_leaders_txtpos, 72_bank_statement_no_rules_right_amounts) have max_pt 1.44-2.40, under the check's own floor, and fail it anyway - so the check's dy and the ranking's dy are not the same quantity. Settle which one defines the class before building for those six. 71_invoice_space_aligned_no_rules (share@5 26.88, median_pt 3.84, no spacer) is genuinely displaced and a separate question. Also settled: screen.py was measuring NOTHING on a fresh pod (ENGINE_SRC frozen at import) - it is fixed, so a screen reporting '0 of N measured' is a tool failure, not evidence.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

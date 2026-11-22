@@ -362,14 +362,25 @@ document, a factor of thirteen apart, and the table is the one the gate and the 
 130 pt spacer loss cannot produce a render whose largest error is 8.64 pt, and the after-render's
 median/p90/max are identical to the before row to the hundredth — the table never moved.
 
-**What the sixteen actually look like:** `median_pt` 0.96 or 1.44 on fourteen of them. One pixel is
-0.48 pt at 150 DPI, so the whole page is offset by two or three pixels, uniformly, with a short tail
-of lines that tip over the check's `clamp(0.35 * size, 1.5, 4.5)` floor because they started near
-it. That is ONE constant applied to the page, not sixteen constructs. The two constants already
-measured and never tested against these sixteen: the first baseline sits 0.0565 em below the
-paper's top edge, and the first baseline of a cell 0.92 em below the row's top edge.
-`71_invoice_space_aligned_no_rules` is the exception — share@5 26.88, `median_pt` 3.84, no spacer
-at all — and is a different question.
+**What the sixteen actually look like — and do NOT read `median_pt` 0.96 as an offset.**
+`benchmarks/p2w.py` computes it as `p50(dv) * 0.48` where `dv = d[sm & (d > 1)]` and `d` is an
+INTEGER distance transform. Every pixel at distance 0 or 1 is excluded, so the smallest value the
+statistic can hold is 2 px = **0.96 pt: that is the floor of the instrument, not a measurement.**
+Fourteen of the sixteen sitting on 0.96 means "at or below two pixels", nothing more. It is also
+self-contradicting as a cause: `18_displacement`'s tolerance is `clamp(0.35 * size, 1.5, 4.5)` pt, so
+a real 0.96 pt offset would PASS. This was written up as a lead and retracted inside the same run.
+
+**What is left is a tail, not a shift** — `p90_pt` 1.44 to 6.24, `max_pt` 1.44 to 17.76, three to
+thirty-seven pixels on a minority of the ink.
+
+**AND SIX OF THE SIXTEEN ARE UNDER THE CHECK'S OWN FLOOR.** `22_invoice_four_columns_txtpos`,
+`41_coloured_headings_white_bg`, `73_marksheet_subject_marks_grade`, `16_right_aligned_amounts_txtpos`,
+`29_dot_leaders_txtpos` and `72_bank_statement_no_rules_right_amounts` all have `max_pt` 1.44 to 2.40,
+under the 1.5 pt floor for every face size, and `18_displacement` fails them anyway. **The check's dy
+and the ranking's dy are therefore not the same quantity.** Settle which one the class is defined by
+before building anything for these six; part of the class's 18.6-clean-document leverage may be an
+artefact of the check rather than of the engine. `71_invoice_space_aligned_no_rules` is the opposite
+and a separate question: share@5 26.88, `median_pt` 3.84, no table spacer at all.
 
 Full numbers: `FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md`.
 
