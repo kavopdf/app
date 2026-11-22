@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 11:14 → 11:26 IST · 11 min**
+**22 Nov 2026 · slot 10:51 → 11:28 IST · 28 min**
 
 > The row growth that blocked the spacer is solved and measured in Google: mobile-bill 41/42 -> 42/42.
 > It is carried as a patch, not committed, because the trHeight edit needs the corpus-wide gate pass
@@ -10,7 +10,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,6 +26,7 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 11:21 | **lead** | 0/3 | One Google probe settles what a row is laid at: laid = max(declared trHeight, 1.15 x cell type size) + border, exactly, across 13 declared heights at 10 and 18 pt. No threshold; the 'content term' is |
+| 11:27 | **lead** | 3/4 | Google charges a table row's rule ON TOP of w:trHeight (dose-response: 368/358/348 twips -> 19.73/19.04/18.35 pt laid, measured in one probe document). Patch patches/18-spacer-before-rowpitch-rowrule. |
 
 ## The txt
 
@@ -53,9 +54,9 @@ task whose answer is a Google number has to be done by the run itself.
 
 | | |
 |:--|:--|
-| Slot window | 11:14 → 11:26 · 11 min |
+| Slot window | 10:51 → 11:28 · 28 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 22 |
+| Tool beats | 28 |
 | Longest silence | **5.0 min** — from 11:14:33, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
@@ -66,10 +67,10 @@ task whose answer is a Google number has to be done by the run itself.
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `#########` |
-| record - attempt, handoff, class rows | **1 min** | `##` |
-| report - the report and the chain | **1 min** | `##` |
-| other - not attributed to a tool | **4 min** | `#########` |
+| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `########` |
+| record - attempt, handoff, class rows | **1 min** | `###` |
+| report - the report and the chain | **2 min** | `###` |
+| other - not attributed to a tool | **5 min** | `########` |
 ## Best results this round
 
 | Document | Before | After | Change |

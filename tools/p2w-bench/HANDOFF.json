@@ -1032,6 +1032,10 @@
   {
    "at": "11:23",
    "text": "agent deployed: 18_displacement / B - recomputed leverage from benchmarks/gverify/*.json without classpick.py - 16 sol"
+  },
+  {
+   "at": "11:27",
+   "text": "attempt 13 on 18_displacement -> lead (3/4 moved)"
   }
  ],
  "next": "DO NOT build the 0.9634 row scale or the hairline cell box for single-line cells - both measured inert. Build against rowParts>1: raise the row floor to the true 368 twips (the floor is quantised 8 twips low at 360) OR take w:before off the continuation paragraphs inside a wrapped cell. Google grows 360-twip rows to 19.0/20.0; source pitch is 18.40; mobile-bill rows 5-12 hold 6 w:p on 3 columns and render at 20.0 = 2.0 pt of growth. Prove on mobile-bill and insurance-policy-schedule FIRST - they are the only two documents blocking a spacer construct already measured to take 6 documents clean (68_journal 42/42 this run). Then land the spacer (w:before + hairline w:line=1 at 5868-5875, cap 2880->4320 at 5852,5866) with it.",
