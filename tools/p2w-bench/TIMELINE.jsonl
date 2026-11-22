@@ -2364,3 +2364,11 @@
 {"t": 1795319497.1205442, "ist": "09:21:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795319507.728801, "ist": "09:21:47", "ev": "beat", "d": "census: counting corpus documents with a table spacer"}
 {"t": 1795320171.8813026, "ist": "09:32:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795320208.229441, "ist": "09:33:28", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795320209.1555376, "ist": "09:33:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795320209.77919, "ist": "09:33:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795320210.1638546, "ist": "09:33:30", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795320216.14851, "ist": "09:33:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795320216.8739295, "ist": "09:33:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795320217.428545, "ist": "09:33:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795320217.734218, "ist": "09:33:37", "ev": "beat", "d": "report.py: building the report"}

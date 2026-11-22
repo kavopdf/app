@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 08:56 → running IST · 24 min**
+**22 Nov 2026 · slot 08:56 → running IST · 36 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -42,29 +42,30 @@
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `18_dA-04` | which clause of the check can fire on a 1.44-2.40 pt | 09:20 | - | - |
-| `18_dB-03` | do 05/32/59/18 share ONE engine construct in the emi | 09:20 | - | - |
+| `18_dA-04` | which clause of the check can fire on a 1.44-2.40 pt | 09:20 | 03:51 | 1 min |
+| `18_dB-03` | do 05/32/59/18 share ONE engine construct in the emi | 09:20 | 03:51 | 1 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 08:56 → running · 24 min |
+| Slot window | 08:56 → running · 36 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 12 |
+| Tool beats | 21 |
 | Longest silence | **14.1 min** — from 09:05:17, after `read findings; C2 spacer probe is the lead` |
-| Silences over 2 min | 2 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Silences over 2 min | 3 |
+| Obstacles | 1 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | **I forced a release on a slot whose run was still alive, and this watchdog has no `cron` tool to look at the  |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **14 min** | `#############` |
-| measure or build - a conversion, screen or compile writes no beacon | **8 min** | `########` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| fix - diagnose and change the engine | **14 min** | `########` |
+| measure or build - a conversion, screen or compile writes no beacon | **19 min** | `############` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -77,7 +78,7 @@
 
 ## Next run
 
-Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured this slot (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866); only 68_journal reaches it and its real gap is 2961 twips. Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. Then COUNT the blast radius before committing: the spacer change touches every corpus document with a table spacer and only the 16 that fail 18 were measured; render the currently-clean ones that have one. Do NOT screen this class with screen.py - it renders in soffice, which honours w:line as a length and cannot see either state.
+Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866). Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. THE RATCHET IS NOW COUNTED: 124 of 213 documents carry a table spacer (58.2%), 13 of the 44 Google-clean documents carry one (041122-Account_Opening_Form and its fillable twin have 22 spacers each, max 166 pt; 403_crossword_puzzle 58.15; 332_bom_on_drawing 29.9), and FIVE documents exceed the old 144 pt cap so the cap raise is a five-document change not a one-document one. Render the 13 clean ones before and after and land only if none regresses and at least 4 of the 16 come clean - 29 documents, 87 Drive calls, ~20 min. Do NOT screen this class with screen.py: it renders in soffice, which honours w:line as a length and cannot see either state.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

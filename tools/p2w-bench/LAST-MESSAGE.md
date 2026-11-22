@@ -1,10 +1,10 @@
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 08:56 → running IST · 24 min**
+**22 Nov 2026 · slot 08:56 → running IST · 36 min**
 
 > No change was kept this run — and it is the most valuable slot `18_displacement` has had: the
-> cause is now measured in Google rather than inferred, and 6 of the 16 documents went clean in the
-> test before two others forced a revert.
+> cause is now measured in Google rather than inferred, 6 of the 16 documents went clean in the test,
+> and the ratchet that decides the build is now counted instead of guessed.
 
 ## Progress
 
@@ -73,6 +73,28 @@ ink error of the LibreOffice render — the renderer these 16 documents already 
 halves of that refutation were measured in the renderer where the defect does not exist.
 
 
+## The blast radius, counted
+
+The spacer change touches every document that has one, and this slot had measured only the 16 that
+fail `18_displacement`. Converting the whole corpus and reading each `word/document.xml`:
+
+| | |
+|:--|--:|
+| **documents carrying a table spacer** | **124 of the 213 (58.2 %)** |
+| spacers in total | 245 |
+| spacer value, min / median / max | 2.10 / 11.45 / **178.05** pt |
+| documents with 3 or more spacers | 23 |
+| documents over the OLD 144 pt cap | **5** |
+| **documents clean today that carry one** | **13** |
+
+Two of my own claims were wrong and are corrected in the finding: the cap raise is a **five**-document
+change, not the one-document change the 16-document view suggested; and two of those five
+(`041122-Account_Opening_Form` and its fillable twin, 22 spacers each, max 166 pt) are **clean today**.
+A 166 pt spacer charged at 22 % of its written value is a ~130 pt move if that table is positioned by
+the flow, so it must be rendered before and after before this lands. That is why the change is a lead
+and not a commit.
+
+
 ## The txt
 
 | | |
@@ -87,29 +109,30 @@ halves of that refutation were measured in the renderer where the defect does no
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `18_dA-04` | which clause of the check can fire on a 1.44-2.40 pt | 09:20 | - | - |
-| `18_dB-03` | do 05/32/59/18 share ONE engine construct in the emi | 09:20 | - | - |
+| `18_dA-04` | which clause of the check can fire on a 1.44-2.40 pt | 09:20 | 03:51 | 1 min |
+| `18_dB-03` | do 05/32/59/18 share ONE engine construct in the emi | 09:20 | 03:51 | 1 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 08:56 → running · 24 min |
+| Slot window | 08:56 → running · 36 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 12 |
+| Tool beats | 21 |
 | Longest silence | **14.1 min** — from 09:05:17, after `read findings; C2 spacer probe is the lead` |
-| Silences over 2 min | 2 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Silences over 2 min | 3 |
+| Obstacles | 1 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | **I forced a release on a slot whose run was still alive, and this watchdog has no `cron` tool to look at the  |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **14 min** | `#############` |
-| measure or build - a conversion, screen or compile writes no beacon | **8 min** | `########` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| fix - diagnose and change the engine | **14 min** | `########` |
+| measure or build - a conversion, screen or compile writes no beacon | **19 min** | `############` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -122,7 +145,7 @@ halves of that refutation were measured in the renderer where the defect does no
 
 ## Next run
 
-Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured this slot (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866); only 68_journal reaches it and its real gap is 2961 twips. Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. Then COUNT the blast radius before committing: the spacer change touches every corpus document with a table spacer and only the 16 that fail 18 were measured; render the currently-clean ones that have one. Do NOT screen this class with screen.py - it renders in soffice, which honours w:line as a length and cannot see either state.
+Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866). Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. THE RATCHET IS NOW COUNTED: 124 of 213 documents carry a table spacer (58.2%), 13 of the 44 Google-clean documents carry one (041122-Account_Opening_Form and its fillable twin have 22 spacers each, max 166 pt; 403_crossword_puzzle 58.15; 332_bom_on_drawing 29.9), and FIVE documents exceed the old 144 pt cap so the cap raise is a five-document change not a one-document one. Render the 13 clean ones before and after and land only if none regresses and at least 4 of the 16 come clean - 29 documents, 87 Drive calls, ~20 min. Do NOT screen this class with screen.py: it renders in soffice, which honours w:line as a length and cannot see either state.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
@@ -132,12 +155,13 @@ Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w
 ## What this run leaves behind
 
 The finding, with every number and its method: the four before-states, the dose-response, the
-six-clean list, the two regressions, and the measured row-pitch excess that explains them. A new
-instrument, `dy.py`, which reads per-run vertical displacement out of a real Google export by
-intercepting `verify_google.extra_checks`, so it cannot disagree with the check it explains. Both
-subagents landed and both changed the plan: agent A excluded the `if not ds` branch and showed that
-`RANKING.csv`'s `max_pt` is the soffice ink error rather than Google's dy, which killed the previous
-run's premise; agent B separated the four travelling checks into two causes and named the emitter.
+six-clean list, the two regressions, the measured row-pitch excess that explains them, and the
+blast-radius census. A new instrument, `dy.py`, which reads per-run vertical displacement out of a real
+Google export by intercepting `verify_google.extra_checks`, so it cannot disagree with the check it
+explains. Both subagents landed and both changed the plan: agent A excluded the `if not ds` branch and
+showed that `RANKING.csv`'s `max_pt` is the soffice ink error rather than Google's dy, which killed the
+previous run's premise; agent B separated the four travelling checks into two causes and named the
+emitter.
 
 All 24 probe Google Docs created this run were deleted after scoring; `KavoPDF-Verify` is empty. No
-corpus file, table row, branch or release asset was touched.
+corpus file, table row, branch or release asset was touched. The engine is back at HEAD.
