@@ -2326,3 +2326,8 @@
 {"t": 1795316575.004093, "ist": "08:32:55", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795316575.9888446, "ist": "08:32:55", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795316576.3287606, "ist": "08:32:56", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795318007.7635508, "ist": "08:56:47", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795318007.8773818, "ist": "08:56:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795318517.6905093, "ist": "09:05:17", "ev": "beat", "d": "read findings; C2 spacer probe is the lead"}
+{"t": 1795319363.1170936, "ist": "09:19:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795319368.8589516, "ist": "09:19:28", "ev": "beat", "d": "attempt.py: recording an attempt"}

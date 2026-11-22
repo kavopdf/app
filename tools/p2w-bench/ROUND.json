@@ -1,10 +1,10 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "relay: screen.py ENGINE_SRC fixed; verifying 2 docs without env var",
-  "fixer_doing_since": 1795316153.6837344,
+  "fixer_doing": "read findings; C2 spacer probe is the lead",
+  "fixer_doing_since": 1795318517.691191,
   "fixer_engine_at_claim": "462353f9",
-  "fixer_last_beat": 1795316153.6837356,
+  "fixer_last_beat": 1795318517.691192,
   "fixer_started": 1795317997.1397445,
   "history": [
     {

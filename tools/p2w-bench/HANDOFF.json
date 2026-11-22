@@ -1,5 +1,5 @@
 {
- "plan": "18_displacement: do NOT rebuild the table-top spacer (measured 22 Nov, 1 of 16 moved, refuted - see SETTLED.md and FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md); the sixteen are a uniform 0.96-1.44 pt page offset, one constant, test it against the 0.0565 em page-top and 0.92 em cell-baseline constants in REMAINING-DEFECTS.md; 71_invoice_space_aligned_no_rules (26.88, no spacer) is a separate question",
+ "plan": "",
  "notes": [
   {
    "at": "13:08",
@@ -1685,7 +1685,7 @@
   }
  ],
  "run": {
-  "started": "08:28",
+  "started": "08:56",
   "ended": null,
   "ended_how": null
  },
