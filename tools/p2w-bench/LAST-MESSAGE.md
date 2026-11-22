@@ -1,17 +1,16 @@
-
-  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 05:56 → 06:18 IST · 22 min**
+**22 Nov 2026 · slot 07:14 → running IST · 12 min**
 
-> **19 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **19** — 3 attempt(s), 2 kept (a sum: a document moved twice counts twice) |
-| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Improved in LibreOffice | **61** of the 212 compared (corpus 213) — a proxy, not the goal |
+| &nbsp;&nbsp;— of those, clean in Google | **3** — and **57** still open there |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
@@ -21,13 +20,31 @@
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
 
+## What this slot settled
+
+Two measurements, both through Google Docs on `bank-statement-5-pages`, engine `7112d766`, and both
+in `FINDINGS/18_displacement-page-top-gap-sectmargin-PROVEN-075600-f1x.md`.
+
+| variant | pages | score | failing |
+|:--|---:|---:|:--|
+| BASE (the engine's own output) | 5 | 37/42 | 18, 25, 27_text_off_page, 44, 59 |
+| 1x1 `trHeight` row in place of the page-top `w:before` | **6** | **33/42** | 01, 17, 18, 25, 31, 32, 44, 55, 59 |
+| `w:pgMar w:top` in place of the page-top `w:before` | 5 | **40/42** | 18, 25 |
+
+The row is **refuted**: it does not merely overflow by a few points, it takes the document from 5
+pages to 6, empties a page and drops matched runs from 585 to 220. The margin is **proven**: the
+-59.5 pt uniform shift on pages 1-4 collapses to the -4.3 pt the document already carries on page 1,
+the page count holds, and three checks recover with nothing new failing. All three probe Google Docs
+were deleted; the `KavoPDF-Verify` folder is empty.
+
+And the correction that matters more than either: **all 16 documents that fail `18_displacement`
+alone are single-page, with zero page breaks in their `.docx`.** The page top cannot be their cause.
+
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 06:10 | **kept** | 3/213 | check 32 read only vector segments; Google exports an anchored rule as a raster image at the same geometry. Made the check read image bands (band=RULE_BAND_REN, the same width the vector path uses). M |
-| 06:13 | **kept** | 16/213 | the check change measured on 20 Google exports from a live round trip: 16 documents 41/42 -> 42/42, 0 worse. 13 of 14 documents failing {05,32} came back 42/42 - 05_chars_extra passes on HEAD too, so |
-| 06:17 | **lead** | None/None | 15 documents that failed {05,18,32} were re-measured through Google on HEAD: every one is now 41/42 failing 18_displacement ALONE (4 are 46/47 failing it alone). 05_chars_extra and 32_stroke_lines bot |
+| 07:25 | **lead** | 0/213 | page-top gap: 1x1 trHeight row REFUTED through Google (bs5 37->33/42, 5->6 pages, page emptied); w:pgMar w:top PROVEN (bs5 37->40/42, 5 pages held, dy -59.5->-4.3 on pages 1-4, 3 checks recovered); al |
 
 ## The txt
 
@@ -47,24 +64,23 @@
 
 | | |
 |:--|:--|
-| Slot window | 05:56 → 06:18 · 22 min |
+| Slot window | 07:14 → running · 12 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 28 |
-| Longest silence | **8.8 min** — from 05:56:39, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 4 |
+| Tool beats | 16 |
+| Longest silence | **5.0 min** — from 07:14:12, after `gaps.py: reading the timeline` |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | **this watchdog has no `cron` tool, so a paused or zombie cron cannot be moved by automation.** STEP 3 and STE |
+| Still a wall | **Both scheduled slots between the last release and this claim produced no run at all.** `gaps.py` records `GA |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **2 min** | `###` |
-| measure or build - a conversion, screen or compile writes no beacon | **13 min** | `#############` |
-| record - attempt, handoff, class rows | **3 min** | `###` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **2 min** | `##` |
+| setup - claim, housekeeping, reading the gate | **5 min** | `#########` |
+| fix - diagnose and change the engine | **2 min** | `#####` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| other - not attributed to a tool | **3 min** | `#######` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -77,7 +93,7 @@
 
 ## Next run
 
-Apply tools/p2w-bench/patches/rule-carrier-horizontal-only-2008.patch, build, run the corpus pass and take the exact LO regressions. The 16 documents already measured in Google under this patch are in benchmarks/gverify-carrier-2008/: 13 reach 42/42, 3 reach 41/42, none regress, all 16 clear 05_chars_extra. regress.py already exempts a LibreOffice regression when Google improved on the same document - it needs benchmarks/gverify/<doc>.json in the working tree. So run gverify --plan 60 over the regressed documents that have no carrier result, and land the patch with those results in the same push. Do NOT build the cell guard the last report asked for: no Shape is ever routed into a w:tc (max tc-depth 0 across 156 carriers in 22 docs) and the guard built byte-identical output on five PDFs.
+Do NOT take the page top for the 16 documents that fail 18_displacement alone: all 16 are single-page PDFs and their converted .docx carries zero page breaks, so the page-top construct (proven this run) cannot make one of them clean. Their displacement is row/line pitch inside one dense table or form - start from the -4.3 pt median / -12.8..+2.9 pt spread on page 1 of bank-statement-5-pages, which is the residual after the page-top fix and sits on a page that was never broken. Land the section margin (w:pgMar w:top) as a separate build on multi-page documents: DocxWriter.java:1053-1075 already emits a sectPr with nextPage, so it is that path plus beforeTw=0 in the two ctx.newPage branches (3395-3401, 4277-4283) plus the same twips out of ctx.budgetTw (1116) and out of what pageFits is asked - the first two alone double the gap in LibreOffice, the third is what holds the page count. Do NOT retry the 1x1 trHeight row: measured this run, it takes bank-statement-5-pages from 5 pages to 6 and 37/42 to 33/42. Numbers: FINDINGS/18_displacement-page-top-gap-sectmargin-PROVEN-075600-f1x.md.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
