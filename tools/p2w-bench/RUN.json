@@ -7,7 +7,18 @@
  "attempts": 3,
  "kept": 2,
  "docs_improved": 19,
- "agents": [],
+ "agents": [
+  {
+   "id": "0H34Y3CEMS9C8V0YRXEZC8DWN4",
+   "what": "Google re-measurement batch: run the round trip on the documents the table said failed {05,32}, report committed-vs-measured check maps",
+   "outcome": "blocked in its own session - GOOGLEDRIVE_CREATE_FILE refused a sandbox path and the platform upload tool was not in its tool set; it returned the LibreOffice control, the engine fingerprint and a bookkeeping script instead of inventing a Google number"
+  },
+  {
+   "id": "45PTF6XMQ39R1A89QD23CZPR3M",
+   "what": "32_stroke_lines construct: what the check measures, what OOXML construct emits the rule, ranked responsible constructs",
+   "outcome": "landed - quoted the check code, found _stroke_pictures() written but never called from _rule_segments(), and identified the anchored <w:drawing> carrier as the construct"
+  }
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0,
  "counted": [

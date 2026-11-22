@@ -1,10 +1,10 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "gates after 20-doc round trip",
-  "fixer_doing_since": 1795308196.7859519,
+  "fixer_doing": "LibreOffice ratchet of the check change",
+  "fixer_doing_since": 1795308472.5981426,
   "fixer_engine_at_claim": "462353f9",
-  "fixer_last_beat": 1795308196.7859528,
+  "fixer_last_beat": 1795308472.5981436,
   "fixer_started": 1795308423.8335912,
   "history": [
     {

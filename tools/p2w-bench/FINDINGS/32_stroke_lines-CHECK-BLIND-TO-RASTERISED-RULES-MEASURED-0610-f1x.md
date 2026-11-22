@@ -103,3 +103,30 @@ drops — and it needs `w:tcBorders` on a 1×1 floating table carrier, not a che
 `--docx` makes five more checks applicable, and they were not applied when that row was
 written. Rows with different `total` values are not comparable, and the "all 42 checks"
 in the charter is a per-document denominator that varies from 42 to 47.
+
+## Ratchet — the check change against an independent renderer
+
+The pending list asks for a corpus-scale ratchet before a class is called done, and the
+falsifiable prediction for this change is specific: **the picture path must do nothing
+where the renderer draws rules as vectors.** LibreOffice does. So the change should be
+neutral on the LibreOffice column, and a document there that moved would be a false
+recovery.
+
+`soffice --headless --convert-to pdf` on the six documents, then the pre-change and
+post-change check on the same render:
+
+| document | LO before | LO after |
+|:--|:--|:--|
+| `394_map_with_legend` | 42/42 | 42/42 |
+| `17_three_column_widths_txtpos` | 42/42 | 42/42 |
+| `315_gazette_notification` | 42/42 | 42/42 |
+| `311_fir_police_form` | 42/42 | 42/42 |
+| `49_coloured_background_block_paragraph` | 42/42 | 42/42 |
+
+Five of five unchanged, and the prediction held: where rules are vector, the extra pass
+adds nothing. That is a sample, not the corpus — the full ratchet still wants a run — but
+it is the test that could have failed and did not.
+
+The false-recovery risk is bounded from the other side too: `407_id_card_front_back` has 46
+source rules and only 18 image bands, and the picture path takes it from 46 lost to 8, not
+to 0. `49_coloured_background_block_paragraph` still fails. The pass does not blanket-cover.
