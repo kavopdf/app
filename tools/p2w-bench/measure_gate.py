@@ -155,6 +155,27 @@ def main(argv):
             "the baseline must re-measure before this round can advance"
             % (sr if sr is not None else "?", pr))
 
+    # A COMPLETE TABLE CAN STILL BE FROM THE WRONG ENGINE, AND THIS GATE NEVER LOOKED.
+    # It compared round stamps and row counts only, so on 22 Nov it printed "213/213 scored ...
+    # READY - every document measured" for a table measured on 21 Nov 01:44, before commit
+    # 2d44a3a2 changed how a doubled line is drawn. The docx stamp said 6c6cf642e13b7ed2 and the
+    # tree was 226f7f2df3013ad7. A fixer reading READY has no way to learn why regress.py then
+    # refused every .docx change as unmeasured, which is exactly what three runs in a row did.
+    # The phase is 'measure' for a real reason and this is that reason, so it belongs in the gate.
+    _stamp_docx = _live_docx = None
+    try:
+        import regress as _regress
+        _stamp_docx = (_regress.load_stamp() or {}).get("docx")
+        _live_docx = _regress.engine_fingerprint("docx")
+    except Exception as _e:
+        sys.stderr.write("measure_gate: cannot compare the docx engine (%s: %s) - the engine "
+                         "check is SKIPPED for this run\n" % (type(_e).__name__, _e))
+    if _stamp_docx and _live_docx and _stamp_docx != _live_docx:
+        problems.append(
+            "RANKING.csv was measured on docx engine %s and the tree is %s - the corpus has "
+            "not been measured on this engine, so 'every document measured' is not true yet"
+            % (_stamp_docx, _live_docx))
+
     if s["total"] == 0:
         problems.append("RANKING.csv is missing or empty - nothing has been measured")
     elif s["total"] < s["expected"]:
@@ -180,6 +201,7 @@ def main(argv):
                  s["expected"]))
         print("round  measurement %s, machine %s" % (sr if sr is not None else "?",
                                                      pr if pr is not None else "?"))
+        print("engine docx %s, tree %s" % (_stamp_docx or "?", _live_docx or "?"))
         for p in problems:
             print("  - %s" % p)
         print("READY - every document measured" if ok else "NOT READY")
