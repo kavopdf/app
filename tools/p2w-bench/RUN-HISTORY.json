@@ -1,20 +1,5 @@
 [
  {
-  "started_ts": 1795130940.7651992,
-  "started": "04:59",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "content-present-partly-displaced",
-  "attempts": 2,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "partial": 1,
-  "ended_how": "killed - never released the slot"
- },
- {
   "started_ts": 1795134093.113132,
   "started": "05:51",
   "ended_ts": null,
@@ -1190,6 +1175,30 @@
   ],
   "obstacles_cleared": 0,
   "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795376663.2583754,
+  "started": "01:14",
+  "ended_ts": 1795377858.6134932,
+  "ended": "01:34",
+  "class": "18_displacement",
+  "attempts": 3,
+  "kept": 1,
+  "docs_improved": 3,
+  "agents": [
+   "18_dcarrier guard-01",
+   "18_dsolo-18 census-01"
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ratchets": 1,
+  "counted": [
+   [
+    "18_displacement",
+    3
+   ]
+  ],
   "ended_how": "killed - slot cleared by a force release"
  }
 ]

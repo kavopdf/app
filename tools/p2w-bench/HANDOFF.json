@@ -1912,15 +1912,10 @@
  ],
  "run": {
   "started": "00:51",
-  "ended": null,
-  "ended_how": null
+  "ended": "02:33",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "20:18",
-   "how": "forced",
-   "plan": ""
-  },
   {
    "at": "21:33",
    "how": "forced",
@@ -2013,6 +2008,11 @@
   },
   {
    "at": "00:41",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "02:33",
    "how": "forced",
    "plan": ""
   }
