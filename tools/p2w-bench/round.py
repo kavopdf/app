@@ -1050,11 +1050,17 @@ def main(argv):
         the engine that is actually in the tree. It is logged in RUN-LOG.md with the engine id,
         because "why did the phase go backwards" is a question someone will ask.
         """
+        # cwd must be the REPOSITORY ROOT, not the tools/ directory. os.path.dirname(HERE)
+        # is tools/, so the pathspec resolved to tools/app/src/... which does not exist, git
+        # printed nothing and every remeasure logged an empty engine id - the one thing the
+        # docstring says this call records. Found 22 Nov 18:11 by the watchdog, which ran the
+        # remeasure and read back "engine at HEAD: " with nothing after it.
         try:
             eng = subprocess.check_output(
                 ["git", "log", "-1", "--format=%h", "--",
                  "app/src/main/java/com/kavopdf/app/engine/"],
-                cwd=os.path.dirname(HERE), stderr=subprocess.DEVNULL).decode().strip()
+                cwd=os.path.dirname(os.path.dirname(HERE)),
+                stderr=subprocess.DEVNULL).decode().strip() or "unknown"
         except Exception:
             eng = "unknown"
         s = load()
