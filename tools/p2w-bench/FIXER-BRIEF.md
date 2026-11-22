@@ -1936,3 +1936,43 @@ for the measurement again.
 **Three attempts died on "the patch is ready and there is no time to build and measure it" in one run on 21
 Nov.** That is a run that measured three things and landed none. The build is not the afterthought; on a
 slot with a lead in hand, **the build is the slot.**
+
+---
+
+# A CLAIM NOBODY COMMITTED IS NOT A CLAIM
+
+The user, 22 Nov: *"fixer jab tak koi improvement ya findings commit na kare tab tak usko count ya dawa na kare ... fixer bol de itna improvement ho gya aur wo commit hee nhi hua fir iska koi matlab hoga nhi"*
+
+**He is right, and it had already happened.** The 06:54 run measured `bank-statement-5-pages` going 42/47 →
+45/47 through a live Google round trip, wrote it down, and the construct never reached the repository -
+`topGapRow` exists in no commit. The measurement was real and the improvement was not. A run that measures
+something and does not land it has produced **a finding**, which is valuable, and not **an improvement**,
+which is what the number claimed.
+
+### So the ledger enforces it now
+
+    python3 tools/p2w-bench/attempt.py --class <c> --moved 16 --total 16
+
+**refuses if `app/` or either instrument still carries uncommitted changes:**
+
+    REFUSED TO CLAIM 16 moved: the engine or an instrument has uncommitted changes, so
+    this measurement describes code that exists only in this sandbox.
+        M app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+    Commit what you measured, then record the attempt. Until then it is a FINDING, and
+    the honest outcome is `lead`, not a moved count.
+
+**The attempt is then recorded as `lead` with `moved: 0`**, because that is what it is: a measured thing
+waiting to be landed. The lead rule then holds the class until it is, which is exactly the behaviour you
+want - the work cannot be lost and the number cannot lie.
+
+### What this means in practice
+
+* **Measure, then commit, then record.** In that order. A measurement in a sandbox is worth nothing to the
+  next run unless the commit makes it real.
+* **If you cannot commit it - the gate refuses, the change is unproven, the slot ran out - record it as
+  `lead` and put the measurement in `FINDINGS/`.** That is an honest run, and the next run can finish it.
+* **Never write a number into a report that no commit backs.** The report is checked against tools, and this
+  is one of the checks.
+
+**A finding committed is worth more than a claim made.** The 06:54 run's 42/47 → 45/47 was true and is now
+recorded as a finding; the number it could have claimed would have been worth nothing.

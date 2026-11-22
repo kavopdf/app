@@ -310,6 +310,37 @@ def add(args):
         print("refused: outcome must be one of %s, or give --moved/--total so it is "
               "computed." % ", ".join(OUTCOMES))
         return 2
+    # A CLAIM NOBODY COMMITTED IS NOT A CLAIM.
+    #
+    # The user, 22 Nov: "fixer jab tak koi improvement ya findings commit na kare tab tak usko count
+    # ya dawa na kare ... fixer bol de itna improvement ho gya aur wo commit hee nhi hua fir iska koi
+    # matlab hoga nhi".
+    #
+    # He is right, and it had already happened: the 06:54 run measured bank-statement-5-pages going
+    # 42/47 -> 45/47 in its own sandbox, the construct never reached the repository, and nothing in the
+    # ledger said so. A run that measures an improvement and does not land it has produced a finding, not
+    # an improvement - and the two are recorded differently on purpose.
+    #
+    # So a moved count is only recorded when the engine and the instruments are clean: if the tree still
+    # carries uncommitted changes to them, the measurement describes code that exists nowhere but that
+    # sandbox, and the count is zeroed with the reason attached.
+    if (args.moved or 0) > 0:
+        import subprocess as _sp
+        _st = _sp.run(["git", "status", "--porcelain", "--", "app/",
+                       "tools/p2w-bench/verify_google.py", "tools/p2w-bench/verify_txt.py"],
+                      cwd=ROOT, capture_output=True, text=True)
+        _dirty = [x for x in (_st.stdout or "").splitlines() if x.strip()]
+        if _dirty:
+            print("REFUSED TO CLAIM %d moved: the engine or an instrument has uncommitted changes, so"
+                  % args.moved)
+            print("this measurement describes code that exists only in this sandbox.")
+            for _x in _dirty[:6]:
+                print("    %s" % _x.strip())
+            print("Commit what you measured, then record the attempt. Until then it is a FINDING, and")
+            print("the honest outcome is `lead`, not a moved count.")
+            args.moved = 0
+            if outcome in ("kept", "partial"):
+                outcome = "lead"
 
     d = load()
     row = d.setdefault(name, {"attempts": 0, "first_seen": None, "last": None,
