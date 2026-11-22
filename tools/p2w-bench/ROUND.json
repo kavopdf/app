@@ -1,5 +1,5 @@
 {
-  "baseline_started": 1795354552.462284,
+  "baseline_started": 0,
   "classifier_started": 0,
   "fixer_engine_at_claim": "462353f9",
   "fixer_last_beat": 1795347552.103368,
@@ -85,6 +85,17 @@
       "phase": "measure",
       "round": 1,
       "why": "docx table stamped 6c6cf642e13b7ed2, live engine 226f7f2df3013ad7 - re-measure before fixing (watchdog 18:11)"
+    },
+    {
+      "at": "2026-11-22 20:03",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "22 Nov 20:11",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
     }
   ],
   "phase": "measure",

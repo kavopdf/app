@@ -2754,7 +2754,9 @@
 {"t": 1795351266.827421, "ist": "18:11:06", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795351266.912102, "ist": "18:11:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795351266.934045, "ist": "18:11:06", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795354573.1738846, "ist": "19:06:13", "ev": "claim", "d": "baseline claimed the slot"}
 {"t": 1795357363.6657982, "ist": "19:52:43", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795357363.8125014, "ist": "19:52:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795357509.0973227, "ist": "19:55:09", "ev": "release", "d": "fixer released"}
 {"t": 1795357509.1893294, "ist": "19:55:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795358480.822929, "ist": "20:11:20", "ev": "release", "d": "baseline released"}

@@ -401,6 +401,7 @@
 | 22 Nov 18:31 | fixer | build-engine | engine built in 55s |
 | 22 Nov 18:39 | fixer | build-engine | started |
 | 22 Nov 18:40 | fixer | build-engine | engine built in 65s |
+| 22 Nov 19:06 | baseline | claim | baseline claimed the slot |
 | 22 Nov 19:10 | fixer | attempt | 18_displacement -> lead |
 | 22 Nov 19:11 | fixer | build-engine | started |
 | 22 Nov 19:12 | fixer | build-engine | engine built in 65s |
