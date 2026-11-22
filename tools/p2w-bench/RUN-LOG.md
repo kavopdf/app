@@ -199,3 +199,4 @@
 | 22 Nov 19:06 | baseline | slot claimed - baseline running |
 | 22 Nov 19:52 | fixer | slot claimed - fixer running |
 | 22 Nov 21:00 | fixer | slot claimed - fixer running |
+| 22 Nov 21:24 | fixer | slot FORCED released - see INCIDENTS.md for why |

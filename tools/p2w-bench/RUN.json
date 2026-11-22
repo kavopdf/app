@@ -1,8 +1,8 @@
 {
  "started_ts": 1795361402.5583084,
  "started": "21:00",
- "ended_ts": null,
- "ended": null,
+ "ended_ts": 1795362841.1357746,
+ "ended": "21:24",
  "class": "tooling: the measure/classify gates (no document class - the corpus must be re-measured on engine 226f7f2df3013ad7 first)",
  "attempts": 0,
  "kept": 0,

@@ -1,20 +1,20 @@
 # P2W Watchdog - Run Report
 
-**22 Nov 2026 · 21:15 IST**
+**22 Nov 2026 · 21:25 IST**
 
 > Nothing is stopped.
 
-This pass read all five stages, the trend row and the round phase. The stages are moving, but the round cannot leave measure: the table the baseline publishes is refused by an instrument that does not know the exempt document is exempt, so the phase stays in measure and the fixer keeps standing aside. I did not touch that instrument - it is named on the list I may not edit, the wall is an hour old, and a baseline is live in the slot; the exact edit and the condition under which I will make it are in BLOCKERS.md. This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation, and the calls it would have made are written into BLOCKERS.md too. The fixer claim is already past its stale window, so the next slot takes it and nothing was force-released.
+This pass read the five stages, the trend row and the round phase. The stages are moving and the round is in measure for an honest reason: the table was measured on an engine that has since moved, so the baseline has to re-measure the corpus before anything can be published, and the baseline is in its slot now. The fixer run that ended mid-pass had fixed the two gate defects that were hiding that reason - the exempt row read as a missing measurement, and a corpus count of two hundred and fourteen over a two-hundred-and-thirteen-row table - and then ended without releasing its slot, so this pass released it once its work was on main and the engine tree was clean. This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation; the calls it would have made are written into BLOCKERS.md. The fixer claim is now free and the next slot takes it.
 
 ## Stages
 
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 15.0 h |
-| matrix | done | 213 of 213 | 21.3 h |
-| classify | superseded |  | 14.4 h |
-| fix | moving |  | 2.0 h |
-| txt | superseded | 197 clean, 16 failing | 22.6 h |
+| measure-google | done | 213 of 213 | 15.1 h |
+| matrix | done | 213 of 213 | 21.4 h |
+| classify | superseded |  | 0.2 h |
+| fix | moving |  | 2.1 h |
+| txt | superseded | 197 clean, 16 failing | 22.8 h |
 
 ## Trend
 
@@ -28,6 +28,6 @@ This pass read all five stages, the trend row and the round phase. The stages ar
 ## What this pass did
 
 * Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
-* Nothing needed moving.
+* Released a dead fixer slot: the 21:00 run committed its gate fixes and its report, then ended without releasing the slot.
 * The .txt table is newer than the engine, verify_txt.py and restamp_txt.py, so it is current and not late - see BLOCKERS.md.
 
