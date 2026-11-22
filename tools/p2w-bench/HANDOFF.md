@@ -20,8 +20,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 04:56 |
-| ended | still running |
-| how it ended | - |
+| ended | 05:13 |
+| how it ended | forced |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -104,16 +104,14 @@ unfinished work, not as a result.
 | 18_dB-04 | 18_displacement | B | recomputed leverage from benchmarks/gverify/*.json without classpick.p | 11:23 | 11:20 | running |  |
 | 18_dA-06 | 18_displacement | A | static map of every writer that emits w:trHeight and cell w:spacing, a | 13:57 | expected by 14:30 | running |  |
 | 18_dB-05 | 18_displacement | B | from the three measured declared->laid points compute the declaration  | 13:57 | expected by 14:30 | running |  |
+| 00_pA-01 | 00_page_count | A | from the committed gverify JSONs and CENSUS.csv, how many documents do | 05:13 | 05:00 | landed | FINDINGS/18disp-prize-sizing-agentA.md |
+| 00_pB-01 | 00_page_count | B | re-measure every claim of the page-count finding from the exported PDF | 05:13 | 05:40 | landed | FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `10:37` attempt 11 on 18_displacement -> lead (0/3 moved)
-- `11:21` attempt 12 on 18_displacement -> lead (0/3 moved)
-- `11:23` agent deployed: 18_displacement / A - consolidated every FINDINGS file and the two row emitters into one dossier - ref
-- `11:23` agent deployed: 18_displacement / B - recomputed leverage from benchmarks/gverify/*.json without classpick.py - 16 sol
 - `11:27` attempt 13 on 18_displacement -> lead (3/4 moved)
 - `12:06` attempt 15 on content-present-partly-displaced -> lead (1/16 moved)
 - `13:12` attempt 14 on 18_displacement -> lead (0/1 moved)
@@ -135,6 +133,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `04:08` attempt 30 on 18_displacement -> lead
 - `04:09` attempt 31 on 18_displacement -> kept
 - `05:09` attempt 2 on 00_page_count -> lead (0/23 moved)
+- `05:13` agent deployed: 00_page_count / A - from the committed gverify JSONs and CENSUS.csv, how many documents does clearin
+- `05:13` agent deployed: 00_page_count / B - re-measure every claim of the page-count finding from the exported PDFs and docx
+- `05:13` agent landed: 00_page_count / A -> FINDINGS/18disp-prize-sizing-agentA.md
+- `05:13` agent landed: 00_page_count / B -> FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md
 
 ## Where the rest of the state lives
 

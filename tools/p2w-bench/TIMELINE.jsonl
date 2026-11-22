@@ -2027,3 +2027,13 @@
 {"t": 1795390972.7298968, "ist": "05:12:52", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795390973.0546641, "ist": "05:12:53", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795390973.5178206, "ist": "05:12:53", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795390992.9084995, "ist": "05:13:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795390996.1588314, "ist": "05:13:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795390996.277423, "ist": "05:13:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795390998.110273, "ist": "05:13:18", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795390998.2769876, "ist": "05:13:18", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795391000.2909346, "ist": "05:13:20", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795391005.3858354, "ist": "05:13:25", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795391005.4066117, "ist": "05:13:25", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795391005.496649, "ist": "05:13:25", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795391005.5153973, "ist": "05:13:25", "ev": "killed", "d": "dead claim cleared by force release"}

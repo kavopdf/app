@@ -1116,6 +1116,22 @@
   {
    "at": "05:09",
    "text": "attempt 2 on 00_page_count -> lead (0/23 moved)"
+  },
+  {
+   "at": "05:13",
+   "text": "agent deployed: 00_page_count / A - from the committed gverify JSONs and CENSUS.csv, how many documents does clearin"
+  },
+  {
+   "at": "05:13",
+   "text": "agent deployed: 00_page_count / B - re-measure every claim of the page-count finding from the exported PDFs and docx"
+  },
+  {
+   "at": "05:13",
+   "text": "agent landed: 00_page_count / A -> FINDINGS/18disp-prize-sizing-agentA.md"
+  },
+  {
+   "at": "05:13",
+   "text": "agent landed: 00_page_count / B -> FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md"
   }
  ],
  "next": "00_page_count: mechanism MEASURED, fix not landed. FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md. Google rasterises each page-positioned floating shape and keeps the paragraph that carries it, and that empty paragraph costs ~0.83 pt of flow (w:line=\"1\" exact is NOT honoured for it): 108 of them = 89.9 pt on 301_lab_report_panel against 44.5 pt of free page, so a 1-page source renders 2 pages. Deleting all 108 -> 1 page at the same text y (the control). 22 of the 23 refused documents emit ALL their drawing-only paragraphs AFTER the last text paragraph; counts 7..2464. 350_question_paper has 1 and is NOT explained by this. Refuted and measured, do not retry: drop-last, prstGeom-rect, wrapSquare, framePr. VOID (my probe bug, never measured): merge-into-one-paragraph and attach-to-text. NEXT LEVER, cheapest in the writer: merge the drawing-only paragraphs of a page into ONE (DocxWriter.shape(), DocxWriter.java:2726) - saves 107 x 0.83 = 88.8 pt against 89.9 pt needed here, a one-point margin, so measure it; then w:tcBorders through the table writer. This is the same construct as 32_stroke_lines and 05_chars_extra: one mechanism, three check families.",
@@ -1920,19 +1936,38 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-22T08:27"
+  },
+  {
+   "id": "00_pA-01",
+   "class": "00_page_count",
+   "angle": "A",
+   "question": "from the committed gverify JSONs and CENSUS.csv, how many documents does clearing 18_displacement alone make clean, and is the dy signature a constant or a tail",
+   "expected": "05:00",
+   "deployed": "05:13",
+   "status": "landed",
+   "finding": "FINDINGS/18disp-prize-sizing-agentA.md",
+   "deployed_at": "2026-11-22T23:43",
+   "landed_at": "2026-11-22T23:43"
+  },
+  {
+   "id": "00_pB-01",
+   "class": "00_page_count",
+   "angle": "B",
+   "question": "re-measure every claim of the page-count finding from the exported PDFs and docx alone - pages, image counts, paragraph counts",
+   "expected": "05:40",
+   "deployed": "05:13",
+   "status": "landed",
+   "finding": "FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md",
+   "deployed_at": "2026-11-22T23:43",
+   "landed_at": "2026-11-22T23:43"
   }
  ],
  "run": {
   "started": "04:56",
-  "ended": null,
-  "ended_how": null
+  "ended": "05:13",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "23:15",
-   "how": "forced",
-   "plan": ""
-  },
   {
    "at": "23:50",
    "how": "forced",
@@ -2025,6 +2060,11 @@
   },
   {
    "at": "04:11",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "05:13",
    "how": "forced",
    "plan": ""
   }
