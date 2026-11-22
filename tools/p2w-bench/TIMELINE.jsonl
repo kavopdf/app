@@ -2701,3 +2701,13 @@
 {"t": 1795342270.4502656, "ist": "15:41:10", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795342271.1943917, "ist": "15:41:11", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795342271.5811179, "ist": "15:41:11", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795343155.2333891, "ist": "15:55:55", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795343155.4006052, "ist": "15:55:55", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795344728.805887, "ist": "16:22:08", "ev": "beat", "d": "applying dither patch + building engine"}
+{"t": 1795345025.4739454, "ist": "16:27:05", "ev": "beat", "d": "screening 16 solo-18_displacement docs under dither patch"}
+{"t": 1795345044.397106, "ist": "16:27:24", "ev": "beat", "d": "installing JDK and building engine"}
+{"t": 1795345318.3938906, "ist": "16:31:58", "ev": "beat", "d": "google round trip: two-tables under dither patch"}
+{"t": 1795345346.102982, "ist": "16:32:26", "ev": "beat", "d": "build: dither declares Google's grid but keeps LO's own rule pitch"}
+{"t": 1795345564.2104537, "ist": "16:36:04", "ev": "beat", "d": "recording findings, writing report"}
+{"t": 1795345567.819642, "ist": "16:36:07", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795345571.409433, "ist": "16:36:11", "ev": "beat", "d": "attempt.py: recording an attempt"}
