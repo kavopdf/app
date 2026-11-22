@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 10:20 → running IST · 18 min**
+**22 Nov 2026 · slot 10:20 → running IST · 26 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -46,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 10:20 → running · 18 min |
+| Slot window | 10:20 → running · 26 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 14 |
-| Longest silence | **3.7 min** — from 10:33:51, after `relay: scoring the Google-box cap in Google` |
-| Silences over 2 min | 5 |
+| Longest silence | **7.6 min** — from 10:39:18, after `report.py: building the report` |
+| Silences over 2 min | 6 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -58,9 +58,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **3 min** | `#####` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **13 min** | `################` |
+| record - attempt, handoff, class rows | **3 min** | `###` |
+| report - the report and the chain | **8 min** | `#######` |
+| other - not attributed to a tool | **13 min** | `############` |
 ## Best results this round
 
 | Document | Before | After | Change |

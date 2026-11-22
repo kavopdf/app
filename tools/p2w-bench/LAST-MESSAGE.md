@@ -3,17 +3,19 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 10:20 → running IST · 18 min**
+**22 Nov 2026 · slot 10:20 → running IST · 26 min**
 
-> No change was kept this run, and the run is not empty: four constructs the last three slots
-> were steering towards are now **refuted by measurement in Google**, and the one construct that
-> does make Google lay the floor is built, measured and blocked on a second question with its
-> arithmetic on the record. The engine is at HEAD; nothing in the corpus, the tables, the
-> branches or the Drive was touched.
+> No change was kept this run, and the run is not empty. Three constructs the last slots were
+> steering towards were built and measured in Google and did not move a document; the audit that
+> the brief asks for then found **three of this run's own five claims overstated**, and they are
+> corrected in `FINDINGS/18_displacement-CORRECTION-1045-relay.md`. The engine is at HEAD;
+> nothing in the corpus, the tables, the branches or the Drive was touched.
 >
-> The short version: **Google does not lay a table row at its `w:trHeight`.** It stores the
-> number, exports it back unchanged, and lays something else. Every fix aimed at the row is
-> aimed at the wrong object, which is why three slots in a row reverted.
+> What survives, narrowed: **on mobile-bill's 18 pt rows, `w:hRule="exact"`, `w:before` and the
+> hairline `w:line` all produced a Google PDF identical rule for rule.** That is a fact about
+> those rows. It is not a law, and the repository already holds two findings where an `exact` row
+> of 72 pt and 55.8 pt *was* honoured — so the difference is row height, and the 09:51 reading
+> ("Google lays the row at max(trHeight, content)") is the one this run failed to disprove.
 
 ## Progress
 
@@ -48,17 +50,24 @@
 
 ## Subagents
 
-*None deployed this run.*
+*None recorded by `report.py` - it reads a registry `delegate_task` does not write to.*
+
+Two audits did run this slot, and both changed the report. One read `DocxWriter.java` and the
+repo's measurement history and confirmed the engine emits **no** `w:tcMar` anywhere and `w:vAlign`
+only as `top`, so there is no shipped construct that sets a row's height without also setting its
+baseline. The other set out to falsify this run's own finding and succeeded on three of its five
+claims - the corrections section above is its work, and without it the next slot would have been
+handed two overstatements as facts.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 10:20 → running · 18 min |
+| Slot window | 10:20 → running · 26 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 14 |
-| Longest silence | **3.7 min** — from 10:33:51, after `relay: scoring the Google-box cap in Google` |
-| Silences over 2 min | 5 |
+| Longest silence | **7.6 min** — from 10:39:18, after `report.py: building the report` |
+| Silences over 2 min | 6 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -66,9 +75,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **3 min** | `#####` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **13 min** | `################` |
+| record - attempt, handoff, class rows | **3 min** | `###` |
+| report - the report and the chain | **8 min** | `#######` |
+| other - not attributed to a tool | **13 min** | `############` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -81,68 +90,81 @@
 
 ## What this run measured, in Google
 
-Four constructs built and measured on the real renderer. Each one is a negative with a PDF or a
-read-back behind it, so none of them has to be tried again.
+Four builds, four Google round-trips, and one synthetic probe. Each line is what a PDF or a read-back
+showed, with the overstatements already removed.
 
-| construct | what it was supposed to do | what Google did |
-|:--|:--|:--|
-| `w:hRule="exact"` where the floor binds | pin the row at the floor | **inert** - the exported PDF is identical to `atLeast`, rule for rule, on all 24 rows |
-| `w:before` cut from 190-210 to 163-188 twips | keep content under the floor | **inert** - the exported PDF is identical again; a probe over before 5.0 to 17.0 pt on one floor laid every row the same |
-| the floor itself | be the row's height | Google **stores** `w:trHeight="360"` and exports it back unchanged, then lays 18.0/19.0/20.0 and lays a row written 380 at 18.0 |
-| the hairline `w:line` | be the cell's line box | **replaced** - written `w:line="10" lineRule="exact"`, read back from Google as `w:line="14.4" lineRule="auto"` |
+| what was tried | what Google did |
+|:--|:--|
+| `w:hRule="exact"` on mobile-bill's 360/380-twip rows | exported PDF **identical** to `atLeast`, all 24 rows. Not inert in general - see below |
+| `w:before` cut from 190-210 to 163-188 twips | exported PDF **identical** again |
+| a probe sweeping `w:before` 5.0 to 17.0 pt on one 18 pt floor | all thirteen rows laid 19.0. **Not sensitive to the question**: every value tested fits under 19.0, so this says nothing either way |
+| the hairline `w:line` (0.069 em) | Google's own `.docx` export returns it with a **changed value and `lineRule="auto"`**. The "14.4 pt substitute" this run first read out of that is **withdrawn** - under `auto` the attribute is 240ths of a line, not points |
+| `w:trHeight` | Google **stores** 360/380 and exports them back unchanged, then lays 18.0/19.0/20.0 - on these rows |
 
-The last one is the important one. `w:line` at 0.069 em is the box this engine writes into **every
-single-line table cell in the corpus**, and it is a construct Google ignores. `google_safe.py` lists
-only `w:position`. That list has a gap.
+**The one measurement that points anywhere.** A probe cell written `w:before="0"` with `w:line` equal
+to the row's own height, floors 360/360/380, eleven rows, laid **18.00, 18.00, 18.75** - the page's
+sawtooth, reproduced. One document, one font size, one column width, not repeated. It is a lead.
 
-## The construct that works, and what blocks it
+It still cannot land: a box the height of the row puts the baseline at `LINE_BASE` = 0.8 of the row
+and this corpus draws at 0.5, and `before + 0.8 * box = 184` with `before + box = 360` has no
+solution - it needs a box of 880 twips, taller than the row. **The row height and the baseline cannot
+both come from one paragraph's `spacing`.** Built with `w:vAlign="center"` to lift the line, it cost
+LibreOffice 47/47 to 45/47 on mobile-bill and 47/47 to 46/47 on insurance-policy-schedule, and was
+reverted **unmeasured in Google** - so whether that pair fixes the class in Google is unknown and
+must not be assumed.
 
-A probe table through Drive, cell written `w:before="0"` and `w:line` equal to the row's own height:
-floors 360/360/380 laid **18.00, 18.00, 18.75** - the page's own sawtooth, reproduced, eleven rows
-running. That is the floor binding at last.
+## The corrections, because they matter more than the negatives
 
-It cannot be landed as it stands, and the reason is arithmetic rather than a bug. A box the height of
-the row puts the baseline at `LINE_BASE` = 0.8 of the row; mobile-bill draws its cell text at 0.5 of
-it. `before + 0.8 * box = 184` twips with `before + box = 360` has no solution - it needs a box of
-880 twips, taller than the row. **The row height and the baseline cannot both come from one
-paragraph's `spacing`.**
-
-Built anyway with `w:vAlign="center"` to lift the line, and it cost LibreOffice: mobile-bill 47/47 to
-45/47, insurance-policy-schedule 47/47 to 46/47. Reverted unmeasured in Google, so **whether that
-pair fixes the class in Google is not known and must not be assumed.**
+- `google_safe.py` carries **seven** `IGNORED` constructs, not one. No entry matches `w:line` or
+  `lineRule`, which is the real and much smaller gap.
+- `hRule="exact"` is **not** inert in general: `FINDINGS/32_stroke_lines-CELL-BORDER-HONOURED-1830-f1x.md:119,124-127`
+  measures a 1440-twip `exact` row at 72.00 pt in Google, and
+  `FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md:25,36-37` measures a 1103-twip one
+  honoured. The engine's other row emitter already writes `exact` unconditionally at
+  `DocxWriter.java:2161` and that document passes.
+- The probe above cannot see `w:before`'s charge, and the "14.4 pt substitute" story contradicted it
+  outright. Both withdrawn.
 
 ## The probe loop, so the next slot does not pay for it again
 
 One document is four calls and about ninety seconds: `upload` to `GOOGLEDRIVE_CREATE_FILE`, then
 `GOOGLEDRIVE_CREATE_FILE` with the Google Doc mime type into `KavoPDF-Verify`, then
-`GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE` to PDF, then `verify_google.py`. Two things that cost time:
+`GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE` to PDF, then `verify_google.py`. Two traps that cost time:
 `upload` refuses a path under `/scratch/work` (copy to `/scratch/output` first), and
 `GOOGLEDRIVE_FIND_FOLDER` returns 170 KB of JSON to tell you a folder id you then paste forever.
-
 The loop reproduced the committed mobile-bill result, 46/47 with `18_displacement` alone, before it
-was used to judge anything. That control is why the four negatives above are worth believing.
+was used to judge anything. That control is why the negatives are worth believing and the
+overstatements were findable.
 
 ## Next run
 
-**Do not build the 0.9634 row scale, the hairline cell box for single-line cells, `hRule="exact"`, or
-a cut to `w:before`.** All four are measured inert in Google; the 09:51 handoff still recommends the
-first two and is wrong.
+**Do not build the 0.9634 row scale, the hairline cell box for single-line cells, `hRule="exact"` on
+short rows, or a cut to `w:before`.** All four are measured not to move these documents, and the
+09:51 handoff still recommends the first two.
 
-The open question is narrow: **a construct that sets the row's height without also setting the
-baseline.** `w:tcMar` top margin on the cell is the cheapest untried candidate - a margin, not a
-height, so it should lift the text inside a box at the pitch. One probe answers it, and the probe is
-the table in `FINDINGS/18_displacement-GOOGLE-IGNORES-TRHEIGHT-1045-relay.md`.
+The live question is the one the 09:51 run asked and this run could not close: **what makes Google lay
+a row at `max(trHeight, content)`, and what is the content term at 18 pt?** The committed evidence
+says a 72 pt and a 55.8 pt `exact` row are honoured and an 18 pt one is not, so the answer is a
+threshold or a content height near 18-19 pt - and a probe that sweeps the floor from 300 to 1500 twips
+on one cell is the cheapest way to find it. **That probe was not run.** It is the first thing to do,
+and it is one Google round-trip.
 
-Prove on `mobile-bill` and `insurance-policy-schedule` first: both fail only this check, in Google and
-in LibreOffice, so either one going 47/47 is the whole signal. Then `68_journal`, which also fails
-`59_shape_anchor` and cannot be the first test.
+If a construct is found, the second half is unchanged: the row height and the baseline cannot both
+come from one `spacing`, so the lift has to come from a construct that is not a height. `w:tcMar` is
+untried and unemitted anywhere in the engine - the audit confirms zero hits - and it is the cheapest
+candidate.
+
+Prove on `mobile-bill` and `insurance-policy-schedule` first: both fail only this check in Google and
+both are 47/47 in LibreOffice, so either one going 47/47 is the whole signal, and a LibreOffice
+regression is visible immediately. `68_journal` cannot be the first test - it already fails
+`59_shape_anchor` there.
 
 ---
 
-*The four negatives are from the exported PDFs and from Google's own `.docx` export of the same
-documents. The finding, with every rule position and every read-back, is
-`FINDINGS/18_displacement-GOOGLE-IGNORES-TRHEIGHT-1045-relay.md`. Five probe Google Docs were created
-and deleted; `KavoPDF-Verify` is empty.*
+*The four negatives are from exported PDFs and from Google's own `.docx` export of the same
+documents. The finding is `FINDINGS/18_displacement-GOOGLE-IGNORES-TRHEIGHT-1045-relay.md`; the
+corrections that narrow it are `FINDINGS/18_displacement-CORRECTION-1045-relay.md` and should be read
+first. Five probe Google Docs were created and deleted; `KavoPDF-Verify` is empty.*
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
