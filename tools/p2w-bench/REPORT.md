@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 08:56
+# Fixer report - 2026-11-22 09:51
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 08:56 → running IST · 36 min**
+**22 Nov 2026 · slot 09:51 → running IST · 15 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -26,7 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 09:19 | **lead** | 6/16 | Table spacer as w:before + hairline (DocxWriter 5872-5875) and the 2880->4320 twip cap (5852,5866). Measured in Google on all 16 solo-18 documents: 6 became 42/42 (16_right_aligned, 22_invoice, 29_dot |
+| 10:06 | **lead** | 0/3 | Three constructs built together and measured in Google on three documents: the table spacer as w:before + hairline w:line=1 (5872-5875), the 2880->4320 twip cap, and a hairline cell box for sizeless s |
 
 ## The txt
 
@@ -40,32 +40,28 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dA-04` | which clause of the check can fire on a 1.44-2.40 pt | 09:20 | 03:51 | 1 min |
-| `18_dB-03` | do 05/32/59/18 share ONE engine construct in the emi | 09:20 | 03:51 | 1 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 08:56 → running · 36 min |
+| Slot window | 09:51 → running · 15 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 21 |
-| Longest silence | **14.1 min** — from 09:05:17, after `read findings; C2 spacer probe is the lead` |
+| Tool beats | 12 |
+| Longest silence | **6.4 min** — from 09:55:15, after `building engine (~2 min)` |
 | Silences over 2 min | 3 |
-| Obstacles | 1 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | **I forced a release on a slot whose run was still alive, and this watchdog has no `cron` tool to look at the  |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **14 min** | `########` |
-| measure or build - a conversion, screen or compile writes no beacon | **19 min** | `############` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
+| fix - diagnose and change the engine | **4 min** | `######` |
+| measure or build - a conversion, screen or compile writes no beacon | **6 min** | `#########` |
+| record - attempt, handoff, class rows | **3 min** | `#####` |
+| report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

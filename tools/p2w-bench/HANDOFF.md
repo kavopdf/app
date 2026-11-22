@@ -1,3 +1,32 @@
+## 2026-11-22 10:40 — fixer, slot 09:51 (18_displacement, outcome `lead`, 0/3 moved)
+
+**DO NOT BUILD the 0.9634 row scale, and DO NOT build the hairline cell box for single-line cells.**
+Both are measured inert. See `FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md`.
+
+Built: spacer as `w:before` + hairline `w:line=1` (5868-5875), cap 2880->4320 (5852,5866), hairline
+cell box for `cellSz<=0 && rowParts==1 && vspan<=1`. Measured in Google on three documents:
+`68_journal_wide_table_spanning` **42/42 CLEAN** (spacer half still works); `mobile-bill` and
+`insurance-policy-schedule` **38/42, two pages** (41/42 at HEAD) — reverted.
+
+Measured off the Google export of `mobile-bill`, rule positions page 1: source pitch 18.40 pt
+(24 of 26 gaps exactly 18.4), Google pitch **19.00 pt**, histogram 19.0x16 / 20.0x5 / 18.0x3. The
+engine emits 360/360/380 twips repeating. Google honours 380 -> 19.0 and grows the 360 rows to 19.0
+and **20.0**. The growth concentrates on rows holding a cell with TWO paragraphs (rows 5-12 of
+`mobile-bill`, 6 `<w:p>` on 3 columns -> 20.0). Two paragraphs at ~9.7 pt = ~19.4 pt of content
+against an 18.0 pt floor = 2.0 pt of growth on exactly those rows.
+
+**NEXT BUILD, in this order:** (1) `rowParts > 1` — either raise the row floor to the true 368 twips
+so floor and content agree instead of the floor being quantised 8 twips low, or take the `w:before`
+off the continuation paragraphs inside a wrapped cell. (2) Prove it on `mobile-bill` and
+`insurance-policy-schedule` FIRST — they are the only two documents blocking a spacer construct
+already measured to take 6 documents clean. (3) Then land the spacer with it.
+
+Two things that cost this run time and should not cost the next one: the sub-agent sandbox does NOT
+share `/scratch/work/CS` — pass files explicitly with `files=`, or the agent reads a different
+checkout. And `lastmessage.py`'s Timing rows come from the beat counter, which stops at the last
+heartbeat: converting and Drive calls write no beat, so a Google-measuring slot under-reports its
+duration by ~30 min (49 real vs 15 reported).
+
 # HANDOFF - read this before you pick a class
 
 ## PARKED - what was tried, and what would re-open it
@@ -19,9 +48,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 08:56 |
-| ended | 09:34 |
-| how it ended | forced |
+| started | 09:51 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -104,7 +133,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:49` relay slot: the previous fixer (03:53) pushed its message at 04:09 and never released; attempt.py re-stamps fixer_started so the claim read 2 min old at 04:10 and the :10 cron stood down. The claim went stale at 04:18 and this run took it. That re-stamp is why a run that ends after an attempt leaves a fresh-looking claim.
 - `04:49` agent landed: 32_sA-03 /  -> FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md
 - `04:50` blocker 2026-11-21 23:39 ('the relay's claim opened no run window') is FALSIFIED by the code and by this run: round.py claim() calls _run_record('start') at line ~512, RUN.json reads started 04:18 for this slot, and the 03:53 run it displaced was archived into RUN-HISTORY.json as 'killed - never released the slot' (2 attempts, 0 kept). The window opens; close that row rather than writing the fix.
 - `05:18` agent deployed: 32_stroke_lines / A-audit - are the 16 carrier Google results genuine measurement artifacts or hand-authored
@@ -129,6 +157,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `09:20` agent deployed: 18_displacement / B - do 05/32/59/18 share ONE engine construct in the emitted docx, and name it
 - `09:21` agent landed: 18_displacement / A -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
 - `09:21` agent landed: 18_displacement / B -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
+- `10:06` attempt 10 on 18_displacement -> lead (0/3 moved)
 
 ## Where the rest of the state lives
 

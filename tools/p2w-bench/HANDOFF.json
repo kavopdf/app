@@ -992,6 +992,10 @@
   {
    "at": "09:21",
    "text": "agent landed: 18_displacement / B -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md"
+  },
+  {
+   "at": "10:06",
+   "text": "attempt 10 on 18_displacement -> lead (0/3 moved)"
   }
  ],
  "next": "Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866). Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. THE RATCHET IS NOW COUNTED: 124 of 213 documents carry a table spacer (58.2%), 13 of the 44 Google-clean documents carry one (041122-Account_Opening_Form and its fillable twin have 22 spacers each, max 166 pt; 403_crossword_puzzle 58.15; 332_bom_on_drawing 29.9), and FIVE documents exceed the old 144 pt cap so the cap raise is a five-document change not a one-document one. Render the 13 clean ones before and after and land only if none regresses and at least 4 of the 16 come clean - 29 documents, 87 Drive calls, ~20 min. Do NOT screen this class with screen.py: it renders in soffice, which honours w:line as a length and cannot see either state.",

@@ -2384,3 +2384,21 @@
 {"t": 1795321900.0434198, "ist": "10:01:40", "ev": "beat", "d": "3 edits applied: spacer w:before, cap 4320, cell hairline box; building"}
 {"t": 1795322165.646301, "ist": "10:06:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795322168.7556684, "ist": "10:06:08", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795322171.4646573, "ist": "10:06:11", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795322171.5679634, "ist": "10:06:11", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795322171.6690853, "ist": "10:06:11", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795322193.6955774, "ist": "10:06:33", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322212.724449, "ist": "10:06:52", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322213.2576091, "ist": "10:06:53", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322213.5180848, "ist": "10:06:53", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322219.499463, "ist": "10:06:59", "ev": "beat", "d": "reverted; writing finding and report"}
+{"t": 1795322219.6628313, "ist": "10:06:59", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322220.1956275, "ist": "10:07:00", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322227.059636, "ist": "10:07:07", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322227.5234199, "ist": "10:07:07", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322227.8050215, "ist": "10:07:07", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322232.3251424, "ist": "10:07:12", "ev": "beat", "d": "report"}
+{"t": 1795322232.447306, "ist": "10:07:12", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322235.2494557, "ist": "10:07:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322235.75202, "ist": "10:07:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322236.0412264, "ist": "10:07:16", "ev": "beat", "d": "report.py: building the report"}
