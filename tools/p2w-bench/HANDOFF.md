@@ -30,7 +30,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> 18_displacement: the pitch ladder is whole points and error-diffusion removes 92% of the drift (patch in patches/). The one remaining run out of tolerance is on the row the diffusion targets at 20 pt, which lays 21.0 - cap that row's cell content to its declaration and re-measure two-tables-stacked-with-no-gap.
+> APPLY patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch and ratchet it corpus-wide - measured clean on two-tables-stacked-with-no-gap (42/42 PASS, n_out 0) and it moves EVERY ruled table, so the gate refuses it unratcheted. The row grid is 0.75 pt, NOT whole points: nine identical rows per page read 18.00/18.75/19.50, and the law laid=0.75*(round(h/0.75)+1) reproduces the 13-declaration sweep exactly when its readings are rounded. Then close the small-spacer over-charge the patch exposes: mobile-bill's 128/124 tw spacers are now charged in full where Google previously charged ~0, leaving that page +2..+5 pt low. Evidence: FINDINGS/18_displacement-ROW-GRID-AND-SPACER-1518-relay.md
 
 ## Agents deployed and not yet accounted for
 
@@ -110,7 +110,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `08:31` agent landed: 18_displacement / A -> FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md
 - `08:31` agent deployed: 18_displacement / B - what places a page's first baseline, and is median_pt 0.96 a real offset
 - `08:31` agent landed: 18_displacement / B -> FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md
 - `09:19` attempt 9 on 18_displacement -> lead (6/16 moved)
@@ -135,6 +134,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `13:57` agent deployed: 18_displacement / A - static map of every writer that emits w:trHeight and cell w:spacing, and the exa
 - `13:57` agent deployed: 18_displacement / B - from the three measured declared->laid points compute the declaration that lands
 - `14:19` attempt 16 on 18_displacement -> lead (0/16 moved)
+- `14:45` attempt 17 on 18_displacement -> kept (1/16 moved)
 
 ## Where the rest of the state lives
 
