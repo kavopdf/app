@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 11:14 → running IST · 8 min**
+**22 Nov 2026 · slot 11:14 → 11:26 IST · 11 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -40,17 +40,20 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dA-05` | consolidated every FINDINGS file and the two row emi | 11:23 | - | - |
+| `18_dB-04` | recomputed leverage from benchmarks/gverify/*.json w | 11:23 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 11:14 → running · 8 min |
+| Slot window | 11:14 → 11:26 · 11 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 14 |
+| Tool beats | 22 |
 | Longest silence | **5.0 min** — from 11:14:33, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 1 |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
 | Still a wall | **The relay's own pre-claim heartbeat makes a dead claim read live.** `round.py --heartbeat` writes `fixer_las |
 
@@ -59,9 +62,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `##############` |
-| record - attempt, handoff, class rows | **1 min** | `###` |
-| other - not attributed to a tool | **1 min** | `#####` |
+| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `#########` |
+| record - attempt, handoff, class rows | **1 min** | `##` |
+| report - the report and the chain | **1 min** | `##` |
+| other - not attributed to a tool | **4 min** | `#########` |
 ## Best results this round
 
 | Document | Before | After | Change |

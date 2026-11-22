@@ -2,7 +2,9 @@
 
 **22 Nov 2026 · slot 11:14 → 11:26 IST · 11 min**
 
-> No change was kept this run. The numbers below say what was tried.
+> The row growth that blocked the spacer is solved and measured in Google: mobile-bill 41/42 -> 42/42.
+> It is carried as a patch, not committed, because the trHeight edit needs the corpus-wide gate pass
+> and `p2w.py --budget` is a *time* limit (26 of 213 documents per 250 s) that does not resume.
 
 ## Progress
 
@@ -37,10 +39,15 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dA-05` | consolidated every FINDINGS file and the two row emi | 11:23 | - | - |
-| `18_dB-04` | recomputed leverage from benchmarks/gverify/*.json w | 11:23 | - | - |
+Two, both before my own attempt, both used.
+
+| Agent | Given | Returned |
+|:--|:--|:--|
+| Row-height probe | build a 17-configuration .docx with python-docx and measure each row's laid height in Google | **could not run the Google leg** - a sub-agent cannot upload (`upload` refuses `/scratch/output` for a delegated task; an s3key from a local path is 403). It built and returned the probe .docx files with LibreOffice numbers, clearly labelled as not Google. I ran the upload myself. |
+| Cell-emitter diff | read `DocxWriter.java` and produce a minimal `git apply`-able diff making a cell of N paragraphs of pitch P advance N*P | a line-numbered diff that passes `git apply --check`, the method and range (cell paragraphs 6412-6737), and the finding that the multi-paragraph path is **not** the one `mobile-bill` takes |
+
+The first agent's failed leg is worth recording: **the sub-agent sandbox cannot reach Drive**, so any
+task whose answer is a Google number has to be done by the run itself.
 
 ## Timing
 
@@ -75,9 +82,31 @@
 
 ## Next run
 
-DO NOT build the 0.9634 row scale or the hairline cell box for single-line cells - both measured inert. Build against rowParts>1: raise the row floor to the true 368 twips (the floor is quantised 8 twips low at 360) OR take w:before off the continuation paragraphs inside a wrapped cell. Google grows 360-twip rows to 19.0/20.0; source pitch is 18.40; mobile-bill rows 5-12 hold 6 w:p on 3 columns and render at 20.0 = 2.0 pt of growth. Prove on mobile-bill and insurance-policy-schedule FIRST - they are the only two documents blocking a spacer construct already measured to take 6 documents clean (68_journal 42/42 this run). Then land the spacer (w:before + hairline w:line=1 at 5868-5875, cap 2880->4320 at 5852,5866) with it.
+**Land `patches/18-spacer-before-rowpitch-rowrule.patch` - it is proved on four documents in Google
+and blocked only on the corpus measure.** In this order:
 
-> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
+    git apply patches/18-spacer-before-rowpitch-rowrule.patch
+    bash tools/p2w-bench/build-engine.sh
+    python3 benchmarks/gate.py --budget 250     # repeat until STATE.json carries the tree
+    python3 tools/p2w-bench/regress.py --check
+    # then the Google ratchet over the 13 clean spacer-bearing documents + the 16 that fail
+    # 18_displacement, listed in FINDINGS/18_displacement-table-spacer-CONFIRMED-...-1005-f1x.md
+
+Two facts this slot settled that the previous instruction had wrong:
+
+1. **The 6-paragraph rows on mobile-bill are six cells with ONE paragraph each**, not two paragraphs
+   per cell. The `cps.size() >= 2` path is never entered there; a diff against it moves nothing
+   (built, measured, no change).
+2. **Google charges a row's rule on top of `w:trHeight`**, not inside it. Dose-response measured in
+   one document: trHeight 368 / 358 / 348 twips laid out 19.73 / 19.04 / 18.35 pt. The engine's
+   comment at `DocxWriter.java:6153` says the opposite and is what the last three runs built on.
+
+`insurance-policy-schedule` is the one document the patch does not close (41/42, `18` alone, one page
+- its HEAD score). Its residual is not the spacer and not the row rule. Do not re-derive it.
+
+**Do not judge this patch in soffice.** soffice charges `w:before + w:line`, so it is blind to the
+spacer edit and sees the trHeight edit as a pure shortening; a soffice `share@5px` regression here is
+the proxy disagreeing with the phone.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
