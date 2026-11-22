@@ -1,11 +1,19 @@
+# Fixer report - 2026-11-22 10:20
+
+```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 09:51 → running IST · 15 min**
+**22 Nov 2026 · slot 10:20 → running IST · 18 min**
 
-> No change was kept this run — and the lead the last run left is now **half settled and half
-> refuted**, measured in Google rather than reasoned about. The spacer construct still works. The
-> row-height construct the last run told me to build cannot work as described, and the row excess it
-> was meant to remove is in a different place than anyone thought.
+> No change was kept this run, and the run is not empty: four constructs the last three slots
+> were steering towards are now **refuted by measurement in Google**, and the one construct that
+> does make Google lay the floor is built, measured and blocked on a second question with its
+> arithmetic on the record. The engine is at HEAD; nothing in the corpus, the tables, the
+> branches or the Drive was touched.
+>
+> The short version: **Google does not lay a table row at its `w:trHeight`.** It stores the
+> number, exports it back unchanged, and lays something else. Every fix aimed at the row is
+> aimed at the wrong object, which is why three slots in a row reverted.
 
 ## Progress
 
@@ -26,60 +34,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 10:06 | **lead** | 0/3 | Three constructs built together and measured in Google on three documents: the table spacer as w:before + hairline w:line=1, the 2880→4320 twip cap, and a hairline cell box for sizeless single-line cells. `68_journal` **42/42 clean**; `mobile-bill` and `insurance-policy-schedule` **38/42, two pages** — a regression on HEAD's 41/42. Reverted. |
-
-## The class, and why it was this one
-
-`classpick.py` said `18_displacement`, "holds an open LEAD and nothing outranks it". That is the
-reason and I took it: 38.7 clean documents, the largest single check in the corpus, 16 documents
-failing it and nothing else, and a construct measured in Google last slot. No override.
-
-## The row excess is not 0.70 pt/row, and it is not the cell box
-
-The 10:05 instruction was explicit: land the spacer **and** scale the row height by 0.9634
-(18.40/19.10), "measured, NOT the 0.9785 in the 08:20 finding". I built the spacer and refused the
-scale, on two independent reads of the emitter. Then I measured the pitch off the Google export of
-`mobile-bill`, from the rule positions on page 1:
-
-| | source | Google, this build |
-|:--|--:|--:|
-| median row pitch | **18.40 pt** (24 of 26 gaps exactly 18.4) | **19.00 pt** |
-| pitch histogram | 18.4 ×24 | 19.0 ×16, 20.0 ×5, 18.0 ×3 |
-
-The engine writes these rows 360/360/380 twips repeating — 18.0/18.0/19.0, the `floor(18.4k)`
-quantisation. Google lays the 380 rows at 19.0, as it should, and grows the 360 rows to 19.0 and
-**20.0**. Two things follow:
-
-- **The 0.9634 scale is inert.** Under `hRule="atLeast"` the written `w:val` is a floor and the row
-  is laid out at `max(val, content)`. Every row Google grows is a row whose floor is *below* its
-  content, so scaling the floor down changes nothing; it would only shrink the two rows in the corpus
-  whose floor genuinely binds (`370_offer_letter` 620 tw, `table-with-rotated-header` 1480 tw). I
-  have recorded this as a withdrawal of the instruction in `LAST-MESSAGE.md`, with the arithmetic.
-- **The cell box is 14 % of it, not the cause.** The hypothesis I built the third edit on was that
-  Google prices the cell's `w:line` as a multiple of the face's line height —
-  `(w:line/240) × 1.164 × size` — which reproduces 19.1003 pt on an 18.40 pt pitch exactly. But these
-  cells were **already** hairline boxes before the edit: `w:before="194" w:line="10" exact` is 9.70 pt
-  of before and a 0.53 pt box, a charge of **10.23 pt** against an 18.40 pt floor. A cell charging
-  10.23 pt cannot grow an 18.40 pt row. Rewriting the pair moved the rendered pitch **0.10 pt**
-  (19.10 → 19.00), not 0.70.
-
-The growth concentrates where the evidence points: rows holding a cell with **two paragraphs**.
-`mobile-bill` rows 5–12 carry 6 `<w:p>` on a 3-column table and render at 20.0; the single-line rows
-render at 18.0–19.0. Two paragraphs at ~9.7 pt is ~19.4 pt of content against an 18.0 pt floor, which
-is 2.0 pt of growth on exactly those rows. Those are the rows my cell guard deliberately skipped
-(`rowParts == 1`), because there the box *is* the line advance and a hairline would collapse the two
-lines onto each other. **The next build has to reach the multi-paragraph path.**
-
-## Why it was reverted
-
-`mobile-bill` and `insurance-policy-schedule` were 41/42 at HEAD and came back **38/42 with two
-pages** — `01_page_count`, `18_displacement`, `32_stroke_lines`, `55_orientation_mix`. A change that
-makes a document worse is not a fix. The spacer construct is correct and still takes `68_journal` to
-**42/42**; it cannot land until the row excess on those two pages is removed, because before this
-change Google was *under*-spending the spacer by ~19.5 pt and that slack was absorbing the row
-overflow.
-
-The engine is back at HEAD. Nothing in the corpus, the tables, the branches or the Drive was touched.
+| 10:37 | **lead** | 0/3 | Four constructs measured in Google and refuted (hRule=exact inert, w:before inert, trHeight stored but not laid, hairline w:line replaced by Google); the working construct (box at the row's height) la |
 
 ## The txt
 
@@ -93,27 +48,17 @@ The engine is back at HEAD. Nothing in the corpus, the tables, the branches or t
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dA-04` | every place the engine emits trHeight/hRule, and whether 0.9634 belongs on w:val | 09:56 | 09:59 | 2 min |
-| `18_dB-03` | given the real `DocxWriter.java`, which emitted number Google ignores when it grows a row | 10:00 | 10:05 | 5 min |
-
-Both landed and both changed the plan. Agent A was given the wrong sandbox (it found a different
-checkout and could not see the engine), but its OOXML reading was still correct and it was the first
-to say `atLeast` makes `w:val` a floor. Agent B had the real file and produced the
-`(w:line/240) × 1.164 × size` mechanism that reproduces 19.1003 pt — **the measurement then refuted
-it**, because the cells were already hairline. That is the most useful kind of wrong: it is a
-falsified hypothesis with its arithmetic on the record, and the next run does not have to build it.
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 09:51 → running · 15 min |
+| Slot window | 10:20 → running · 18 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 12 |
-| Longest silence | **6.4 min** — from 09:55:15, after `building engine (~2 min)` |
-| Silences over 2 min | 3 |
+| Tool beats | 14 |
+| Longest silence | **3.7 min** — from 10:33:51, after `relay: scoring the Google-box cap in Google` |
+| Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -121,34 +66,89 @@ falsified hypothesis with its arithmetic on the record, and the next run does no
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **4 min** | `######` |
-| measure or build - a conversion, screen or compile writes no beacon | **6 min** | `#########` |
 | record - attempt, handoff, class rows | **3 min** | `#####` |
 | report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **13 min** | `################` |
+## Best results this round
 
-**The instrument is wrong and this row is why.** Wall clock for this slot was 49 minutes, not 15. The
-beat counter stops at the last heartbeat, and the two steps that took the most time — converting 16
-documents through 16 JVMs, and nine Drive calls to render three documents in Google — write no beacon,
-so they are invisible to it. The 3 min in "record" is likewise the tool's own floor. The row is
-reproduced verbatim because `lastmessage.py` checks it against `report.py`, and that check is right to
-exist; what is wrong is the number it checks. A fixer that renders in Google will always under-report
-here until `gverify.py` and the `ConvertOne` loop write a beat per document.
+| Document | Before | After | Change |
+|:--|--:|--:|--:|
+| `415_inline_images` | 89.04 | 0.00 | -89.04 |
+| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
+| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
+| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
+| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
 
-## What this run leaves behind
+## What this run measured, in Google
 
-A finding, `FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md`, that withdraws the
-0.9634 instruction with the arithmetic and the pitch histogram that refute it, refutes the cell-box
-mechanism with the emitted pairs and a 0.10 pt movement where 0.70 was predicted, and names where the
-excess actually lives — the multi-paragraph cell path, 2.0 pt per wrapped row.
+Four constructs built and measured on the real renderer. Each one is a negative with a PDF or a
+read-back behind it, so none of them has to be tried again.
 
-Three probe Google Docs created and deleted; `KavoPDF-Verify` is empty.
+| construct | what it was supposed to do | what Google did |
+|:--|:--|:--|
+| `w:hRule="exact"` where the floor binds | pin the row at the floor | **inert** - the exported PDF is identical to `atLeast`, rule for rule, on all 24 rows |
+| `w:before` cut from 190-210 to 163-188 twips | keep content under the floor | **inert** - the exported PDF is identical again; a probe over before 5.0 to 17.0 pt on one floor laid every row the same |
+| the floor itself | be the row's height | Google **stores** `w:trHeight="360"` and exports it back unchanged, then lays 18.0/19.0/20.0 and lays a row written 380 at 18.0 |
+| the hairline `w:line` | be the cell's line box | **replaced** - written `w:line="10" lineRule="exact"`, read back from Google as `w:line="14.4" lineRule="auto"` |
 
-**Next run:** do not build the 0.9634 scale, and do not build the hairline cell box for single-line
-cells — both are measured inert. Build against `rowParts > 1`: either raise the row floor to the true
-368 twips so floor and content agree instead of the floor being quantised 8 twips low, or take the
-`w:before` off the continuation paragraphs inside a wrapped cell. Prove it on `mobile-bill` and
-`insurance-policy-schedule` first — they are the only two documents blocking a construct already
-measured to take 6 documents clean.
+The last one is the important one. `w:line` at 0.069 em is the box this engine writes into **every
+single-line table cell in the corpus**, and it is a construct Google ignores. `google_safe.py` lists
+only `w:position`. That list has a gap.
+
+## The construct that works, and what blocks it
+
+A probe table through Drive, cell written `w:before="0"` and `w:line` equal to the row's own height:
+floors 360/360/380 laid **18.00, 18.00, 18.75** - the page's own sawtooth, reproduced, eleven rows
+running. That is the floor binding at last.
+
+It cannot be landed as it stands, and the reason is arithmetic rather than a bug. A box the height of
+the row puts the baseline at `LINE_BASE` = 0.8 of the row; mobile-bill draws its cell text at 0.5 of
+it. `before + 0.8 * box = 184` twips with `before + box = 360` has no solution - it needs a box of
+880 twips, taller than the row. **The row height and the baseline cannot both come from one
+paragraph's `spacing`.**
+
+Built anyway with `w:vAlign="center"` to lift the line, and it cost LibreOffice: mobile-bill 47/47 to
+45/47, insurance-policy-schedule 47/47 to 46/47. Reverted unmeasured in Google, so **whether that
+pair fixes the class in Google is not known and must not be assumed.**
+
+## The probe loop, so the next slot does not pay for it again
+
+One document is four calls and about ninety seconds: `upload` to `GOOGLEDRIVE_CREATE_FILE`, then
+`GOOGLEDRIVE_CREATE_FILE` with the Google Doc mime type into `KavoPDF-Verify`, then
+`GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE` to PDF, then `verify_google.py`. Two things that cost time:
+`upload` refuses a path under `/scratch/work` (copy to `/scratch/output` first), and
+`GOOGLEDRIVE_FIND_FOLDER` returns 170 KB of JSON to tell you a folder id you then paste forever.
+
+The loop reproduced the committed mobile-bill result, 46/47 with `18_displacement` alone, before it
+was used to judge anything. That control is why the four negatives above are worth believing.
+
+## Next run
+
+**Do not build the 0.9634 row scale, the hairline cell box for single-line cells, `hRule="exact"`, or
+a cut to `w:before`.** All four are measured inert in Google; the 09:51 handoff still recommends the
+first two and is wrong.
+
+The open question is narrow: **a construct that sets the row's height without also setting the
+baseline.** `w:tcMar` top margin on the cell is the cheapest untried candidate - a margin, not a
+height, so it should lift the text inside a box at the pitch. One probe answers it, and the probe is
+the table in `FINDINGS/18_displacement-GOOGLE-IGNORES-TRHEIGHT-1045-relay.md`.
+
+Prove on `mobile-bill` and `insurance-policy-schedule` first: both fail only this check, in Google and
+in LibreOffice, so either one going 47/47 is the whole signal. Then `68_journal`, which also fails
+`59_shape_anchor` and cannot be the first test.
 
 ---
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv, or measured this run off the corpus PDF and the Google export. Never remembered, never estimated.*
+
+*The four negatives are from the exported PDFs and from Google's own `.docx` export of the same
+documents. The finding, with every rule position and every read-back, is
+`FINDINGS/18_displacement-GOOGLE-IGNORES-TRHEIGHT-1045-relay.md`. Five probe Google Docs were created
+and deleted; `KavoPDF-Verify` is empty.*
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+```
+
+Written by report.py from committed files only. Every number above is read from
+ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
+and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.

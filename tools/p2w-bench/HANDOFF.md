@@ -19,7 +19,7 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 09:51 |
+| started | 10:20 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
@@ -106,7 +106,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `05:18` agent landed: 32_stroke_lines / B-local -> FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md
 - `05:18` attempt 15 on 32_stroke_lines -> lead
 - `06:10` attempt 16 on 32_stroke_lines -> kept (3/213 moved)
 - `06:13` attempt 17 on 32_stroke_lines -> kept (16/213 moved)
@@ -131,6 +130,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `10:08` 18_displacement 10:40 fixer: spacer-as-w:before confirmed in Google (68_journal 42/42); mobile-bill and insurance-policy-schedule 38/42 vs 41/42 at HEAD -> reverted. Measured pitch off the Google export: source 18.40, Google 19.00, histogram 19.0x16/20.0x5/18.0x3. The excess is 2.0 pt on rows with a two-paragraph cell, not a uniform 0.70 - a factor cannot describe it. FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md.
 - `10:09` agent deployed: 18_displacement / row-growth-mechanism - given the real DocxWriter.java, which emitted number Google ignores when it grow
 - `10:09` agent landed: 18_displacement / row-growth-mechanism -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md
+- `10:37` attempt 11 on 18_displacement -> lead (0/3 moved)
 
 ## Where the rest of the state lives
 

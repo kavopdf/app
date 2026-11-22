@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 09:51
+# Fixer report - 2026-11-22 10:20
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 09:51 → running IST · 15 min**
+**22 Nov 2026 · slot 10:20 → running IST · 18 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -26,7 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 10:06 | **lead** | 0/3 | Three constructs built together and measured in Google on three documents: the table spacer as w:before + hairline w:line=1 (5872-5875), the 2880->4320 twip cap, and a hairline cell box for sizeless s |
+| 10:37 | **lead** | 0/3 | Four constructs measured in Google and refuted (hRule=exact inert, w:before inert, trHeight stored but not laid, hairline w:line replaced by Google); the working construct (box at the row's height) la |
 
 ## The txt
 
@@ -46,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 09:51 → running · 15 min |
+| Slot window | 10:20 → running · 18 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 12 |
-| Longest silence | **6.4 min** — from 09:55:15, after `building engine (~2 min)` |
-| Silences over 2 min | 3 |
+| Tool beats | 14 |
+| Longest silence | **3.7 min** — from 10:33:51, after `relay: scoring the Google-box cap in Google` |
+| Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -58,10 +58,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **4 min** | `######` |
-| measure or build - a conversion, screen or compile writes no beacon | **6 min** | `#########` |
 | record - attempt, handoff, class rows | **3 min** | `#####` |
 | report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **13 min** | `################` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -74,7 +73,7 @@
 
 ## Next run
 
-Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866). Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. THE RATCHET IS NOW COUNTED: 124 of 213 documents carry a table spacer (58.2%), 13 of the 44 Google-clean documents carry one (041122-Account_Opening_Form and its fillable twin have 22 spacers each, max 166 pt; 403_crossword_puzzle 58.15; 332_bom_on_drawing 29.9), and FIVE documents exceed the old 144 pt cap so the cap raise is a five-document change not a one-document one. Render the 13 clean ones before and after and land only if none regresses and at least 4 of the 16 come clean - 29 documents, 87 Drive calls, ~20 min. Do NOT screen this class with screen.py: it renders in soffice, which honours w:line as a length and cannot see either state.
+DO NOT build the 0.9634 row scale or the hairline cell box for single-line cells - both measured inert. Build against rowParts>1: raise the row floor to the true 368 twips (the floor is quantised 8 twips low at 360) OR take w:before off the continuation paragraphs inside a wrapped cell. Google grows 360-twip rows to 19.0/20.0; source pitch is 18.40; mobile-bill rows 5-12 hold 6 w:p on 3 columns and render at 20.0 = 2.0 pt of growth. Prove on mobile-bill and insurance-policy-schedule FIRST - they are the only two documents blocking a spacer construct already measured to take 6 documents clean (68_journal 42/42 this run). Then land the spacer (w:before + hairline w:line=1 at 5868-5875, cap 2880->4320 at 5852,5866) with it.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

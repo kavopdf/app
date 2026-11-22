@@ -974,5 +974,22 @@
   "obstacles_cleared": 0,
   "needs_human": 0,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795321305.9937432,
+  "started": "09:51",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "18_displacement",
+  "attempts": 1,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   "18_dtrheight-emitter-01",
+   "18_drow-growth-mechanism-01"
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
