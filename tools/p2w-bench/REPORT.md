@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 13:18
+# Fixer report - 2026-11-22 13:56
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 13:18 → running IST · 13 min**
+**22 Nov 2026 · slot 13:56 → running IST · 24 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,12 +21,13 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
+| Committed | **13** files in 1 commit(s) from `ba0dfc9` — ...isplacement-ROWHEIGHT-CODE-MAP-142000-agentA.md, ...lacement-LADDER-IS-WHOLE-POINTS-152000-fixer.md, 18-row-pitch-error-diffused.patch, 18_displacement-SOLO-DOCS-16-142500-agentB.md, CLASS-HISTORY.jsonl, HANDOFF.json, |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 13:29 | **lead** | 0/1 | Declared-to-laid row-pitch law measured on a real-shaped ruled row in Google, 3 round trips: declared 360/380 atLeast lays 19.1 pt, declared 368 (the source 18.40) with hRule=exact lays 19.5 and REGRE |
+| 14:19 | **lead** | 0/16 | swept 13 declarations in one Google round trip: laid row pitch is WHOLE points (18/19/20), so the 18.5 ladder the relay left is void; laid = round(declared_pt + 0.875). Error-diffused the declaration |
 
 ## The txt
 
@@ -40,17 +41,20 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dA-06` | static map of every writer that emits w:trHeight and | 13:57 | - | - |
+| `18_dB-05` | from the three measured declared->laid points comput | 13:57 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:18 → running · 13 min |
+| Slot window | 13:56 → running · 24 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 10 |
-| Longest silence | **4.7 min** — from 13:18:54, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 2 |
+| Tool beats | 18 |
+| Longest silence | **6.7 min** — from 13:57:47, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -58,11 +62,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **4 min** | `########` |
-| fix - diagnose and change the engine | **4 min** | `########` |
-| record - attempt, handoff, class rows | **0 min** | `##` |
-| report - the report and the chain | **1 min** | `##` |
-| other - not attributed to a tool | **1 min** | `##` |
+| measure or build - a conversion, screen or compile writes no beacon | **20 min** | `##################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -75,7 +78,7 @@
 
 ## Next run
 
-DO NOT build the 0.9634 row scale or the hairline cell box for single-line cells - both measured inert. Build against rowParts>1: raise the row floor to the true 368 twips (the floor is quantised 8 twips low at 360) OR take w:before off the continuation paragraphs inside a wrapped cell. Google grows 360-twip rows to 19.0/20.0; source pitch is 18.40; mobile-bill rows 5-12 hold 6 w:p on 3 columns and render at 20.0 = 2.0 pt of growth. Prove on mobile-bill and insurance-policy-schedule FIRST - they are the only two documents blocking a spacer construct already measured to take 6 documents clean (68_journal 42/42 this run). Then land the spacer (w:before + hairline w:line=1 at 5868-5875, cap 2880->4320 at 5852,5866) with it.
+18_displacement: the pitch ladder is whole points and error-diffusion removes 92% of the drift (patch in patches/). The one remaining run out of tolerance is on the row the diffusion targets at 20 pt, which lays 21.0 - cap that row's cell content to its declaration and re-measure two-tables-stacked-with-no-gap.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

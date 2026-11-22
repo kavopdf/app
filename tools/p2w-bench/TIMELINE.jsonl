@@ -2612,3 +2612,20 @@
 {"t": 1795337347.7974317, "ist": "14:19:07", "ev": "attempt", "d": "18_displacement -> lead"}
 {"t": 1795337347.9132278, "ist": "14:19:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795337348.055784, "ist": "14:19:08", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795337370.0305448, "ist": "14:19:30", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337432.9975014, "ist": "14:20:32", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337433.77877, "ist": "14:20:33", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337434.2109923, "ist": "14:20:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337438.9785264, "ist": "14:20:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337439.8471477, "ist": "14:20:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337440.229775, "ist": "14:20:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337445.8371384, "ist": "14:20:45", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337454.2980082, "ist": "14:20:54", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337455.0692863, "ist": "14:20:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337455.4805145, "ist": "14:20:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337460.9569545, "ist": "14:21:00", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337461.967233, "ist": "14:21:01", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337462.4369237, "ist": "14:21:02", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337465.9790165, "ist": "14:21:05", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337466.7558486, "ist": "14:21:06", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337467.1276743, "ist": "14:21:07", "ev": "beat", "d": "report.py: building the report"}
