@@ -2541,3 +2541,8 @@
 {"t": 1795333208.4233322, "ist": "13:10:08", "ev": "beat", "d": "google round trip: mobile-bill with rule-charge fix"}
 {"t": 1795333257.9870017, "ist": "13:10:57", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795333362.7355442, "ist": "13:12:42", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795333366.8492582, "ist": "13:12:46", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795333366.9663212, "ist": "13:12:46", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795333367.0921183, "ist": "13:12:47", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795333371.015997, "ist": "13:12:51", "ev": "beat", "d": "recording lead, writing report"}
+{"t": 1795333373.3523395, "ist": "13:12:53", "ev": "beat", "d": "report.py: building the report"}

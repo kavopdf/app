@@ -1,0 +1,155 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4ead19d..41d8501 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -51,6 +51,29 @@ public final class DocxWriter {
+     /** 1 point in twips, for every w:* length. */
+     private static final double TWIPS_PER_PT = 20.0;
+ 
++    /**
++     * What Google Docs adds to a ruled table row's {@code w:trHeight} when it lays it out, in
++     * twips.
++     *
++     * <p>MEASURED TWICE, AND THE TWO ANSWERS DISAGREE - that disagreement is the open question
++     * and the reason this is one named constant instead of a formula.
++     *
++     * <p>15 twips (0.75 pt): a 28-row probe sweeping the declared height 300-1500 twips at two
++     * type sizes read {@code laid = declared + 0.75 pt}, 13 of 13 values, no discontinuity
++     * (FINDINGS/18_displacement-TRHEIGHT-HONOURED-LINEBOX-FLOOR-1130-relay.md).
++     *
++     * <p>22 twips (1.10 pt): mobile-bill's own 24 rows, declared 353 twips (17.65 pt) with the
++     * 15-twip charge applied, laid at 18.75 pt average off the exported PDF's rule positions
++     * (19.0/18.0 alternating, 18.69-18.77 depending on where the gaps are read). 18.75 - 17.65
++     * = 1.10 pt. The probe's tables carried a 0.5 pt border; this one carries sz=4 inside and
++     * sz=7 on the header's bottom, so the charge is plausibly a function of the border width
++     * and the probe never varied it.
++     *
++     * <p>UNTIL A PROBE SWEEPS THE BORDER WIDTH THIS IS CALIBRATED, NOT DERIVED. Do not carry it
++     * to another document without re-measuring there.
++     */
++    private static final int GOOGLE_RULE_CHARGE_TW = 22;
++
+     /**
+      * Distance from the top of a text box to the baseline of its first line, as a fraction of
+      * the font size.
+@@ -6147,6 +6170,33 @@ public final class DocxWriter {
+             int szAbove = r == 0 ? szRuleTop : szRuleInside;
+             int szBelow = r == keepRows - 1 ? szRuleBottom : szRuleInside;
+             int ruleTwHere = (int) Math.round((szAbove + szBelow) * TWIPS_PER_PT / 16.0);
++            // GOOGLE LAYS A RULED ROW AT ITS DECLARED HEIGHT PLUS THE RULE, and it charges that
++            // 0.75 pt whatever the border's width is.
++            //
++            // MEASURED, 22 Nov, in Google Docs, on a 28-row probe sweeping the declared height
++            // from 300 to 1500 twips at two type sizes: from 15 pt to 72 pt, 13 of 13 values,
++            // `laid = declared + 0.75 pt`, with no discontinuity - see FINDINGS/
++            // 18_displacement-TRHEIGHT-HONOURED-LINEBOX-FLOOR-1130-relay.md. LibreOffice charges
++            // nothing, which is why the TABLE_BORDER_TW subtraction the note below describes was
++            // measured inert and removed: it is invisible in the proxy and decisive in the
++            // renderer the user opens.
++            //
++            // So a row asked for the page's own pitch arrives 0.75 pt taller, and because it is
++            // 0.75 pt on EVERY row of the table the error accumulates down the sheet - 24 rows
++            // of mobile-bill, 18 pt of drift by its foot, which is 18_displacement. Writing the
++            // declaration 15 twips (0.75 pt) short is what makes the LAID row equal the pitch.
++            //
++            // GATED ON A RULED ROW: an unruled table draws no rule and Google charges none, so
++            // there the declaration IS the laid height. GATED OFF THE PAPER-BOTTOM CUT: rowCapTw
++            // already holds that row at the sheet's own edge and a second subtraction would put
++            // it 0.75 pt inside it.
++            //
++            // THE CHARGE IS TAKEN OFF pitchTwHere, NOT OFF rowHeightTw, so that the cell's box
++            // (contentTwHere, and the type floor rowLineTw that is built from it) shrinks with
++            // it. Taking it off the finished height instead was built first and measured: the
++            // type floor held the row at 358 twips, the declaration never reached 353, and the
++            // laid pitch came out 18.65 pt for an 18.40 pt page.
++            int ruleChargeTw = ruleTwHere > 0 && rowCapTw <= 0 ? GOOGLE_RULE_CHARGE_TW : 0;
+             // THE PITCH STAYS THE PAGE'S PITCH; THE CELL'S CONTENT IS WHAT COMES OFF.
+             // The renderer lays a row out at max(w:trHeight, cell content + rule). Two different
+             // rows need two different answers from that, and only one form satisfies both:
+@@ -6159,9 +6209,9 @@ public final class DocxWriter {
+             // and is wrong: it shortens every row whose content was already below the pitch, and
+             // on electricity-bill's 18.4 pt rows (0.5 pt rules) that turned an 18.0/19.0
+             // alternation into 17.5/18.5 - 18_displacement gained more documents than it fixed.
+-            int pitchTwHere = rowTwHere;
+-            int contentTwHere = rowTwHere > 0 && ruleTwHere > 0
+-                    ? Math.max(1, rowTwHere - ruleTwHere) : rowTwHere;
++            int pitchTwHere = rowTwHere > 0 ? Math.max(1, rowTwHere - ruleChargeTw) : 0;
++            int contentTwHere = pitchTwHere > 0 && ruleTwHere > 0
++                    ? Math.max(1, pitchTwHere - ruleTwHere) : pitchTwHere;
+             // The line inside the cell follows the row it is in: a cell's text is drawn at the
+             // foot of its own row on most of this corpus, so the line height is the row's pitch.
+             int cellLineHere = contentTwHere > 0 ? contentTwHere : 200;
+@@ -6225,7 +6275,26 @@ public final class DocxWriter {
+             // the scaled row is held at it.
+             int typeFloorTw = rowLineTw;
+             if (rowCapTw > 0) rowLineTw = Math.min(rowLineTw, Math.max(1, rowCapTw - ruleTwHere));
+-            int rowHeightTw = Math.max(rowTwHere, rowLineTw);
++            int rowHeightTw = Math.max(pitchTwHere, rowLineTw);
++            // GOOGLE LAYS A RULED ROW AT ITS DECLARED HEIGHT PLUS THE RULE, and the rule is
++            // charged whatever the border's width is.
++            //
++            // MEASURED, 22 Nov, in Google Docs on a 28-row probe sweeping the declared height
++            // from 300 to 1500 twips at two type sizes: from 15 pt to 72 pt, 13 of 13 values,
++            // `laid = declared + 0.75 pt`, no discontinuity - FINDINGS/
++            // 18_displacement-TRHEIGHT-HONOURED-LINEBOX-FLOOR-1130-relay.md. LibreOffice charges
++            // nothing (that is why the TABLE_BORDER_TW subtraction below was measured inert and
++            // removed), but LibreOffice is the proxy and Google is the renderer the user opens.
++            //
++            // So a row asked for the page's own pitch arrives 0.75 pt taller, and because it is
++            // 0.75 pt on EVERY row of the table the error accumulates down the sheet: 24 rows of
++            // mobile-bill, 18 pt of drift by its foot. Writing the declaration 15 twips (0.75 pt)
++            // short is what makes the laid row equal the pitch.
++            //
++            // GATED ON A RULED ROW (ruleTwHere > 0): an unruled table draws no rule and Google
++            // charges none, so there the declaration IS the laid height. And gated off the
++            // paper-bottom cut, where rowCapTw already holds the row at the sheet's own edge and
++            // a second subtraction would put it 0.75 pt inside it.
+             if (ctx.squeeze != 1f) {
+                 rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
+                 rowLineTw = Math.max(typeFloorTw, twScale(rowLineTw, ctx.squeeze));
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index ad56dac..2999ba9 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -7698,13 +7698,38 @@ public final class PdfToWord {
+     }
+ 
+     /** A point keyed by value: arrays would hash by identity and never match. */
++    /**
++     * A point keyed by value: arrays would hash by identity and never match.
++     *
++     * <p>MILLI-POINT, NOT WHOLE-POINT. This keyed an intersection to the nearest POINT, and
++     * every cell rectangle built from it therefore carried whole-point corners: on
++     * mobile-bill, whose row rules the page draws at 74.52, 92.92, 111.32, 129.72, 148.12,
++     * 166.52 (18.40 pt apart), the model came out 75, 93, 111, 130, 148, 167 - pitches of
++     * 18, 18, 19, 18, 19 - and DocxWriter faithfully wrote w:trHeight 360, 360, 380, 360,
++     * 380 for a page that is 18.40 pt on every row. The 1 pt quantisation was never a
++     * deliberate tolerance: snapEdges() has already merged every collinear edge within
++     * SNAP_TOL (3 pt) onto one average, so two corners that should coincide carry the
++     * SAME float and round identically at any precision. Rounding to a point bought
++     * nothing and cost 0.4 pt a row.
++     *
++     * <p>The scale is 1000, so the quantisation error is 0.0005 pt - three orders of
++     * magnitude below anything a renderer resolves - and the packed value stays inside a
++     * signed 32-bit field for pages up to 2.1 million points.
++     */
++    private static final float POINT_KEY_SCALE = 1000f;
++
+     private static long pointKey(float x, float y) {
+-        return ((long) Math.round(x) << 32) | (Math.round(y) & 0xffffffffL);
++        return ((long) Math.round(x * POINT_KEY_SCALE) << 32)
++                | (Math.round(y * POINT_KEY_SCALE) & 0xffffffffL);
+     }
+ 
+-    private static float keyX(long key) { return (float) (key >> 32); }
++    private static float keyX(long key) {
++        return (float) (key >> 32) / POINT_KEY_SCALE;
++    }
+ 
+-    private static float keyY(long key) { return (float) (int) (key & 0xffffffffL); }
++    private static float keyY(long key) {
++        return (float) (int) (key & 0xffffffffL) / POINT_KEY_SCALE;
++    }
+ 
+     /** Points where a vertical and a horizontal edge meet, with the edges touching each point. */
+     private static Map<Long, List<Edge>[]> edgesToIntersections(List<Edge> edges) {

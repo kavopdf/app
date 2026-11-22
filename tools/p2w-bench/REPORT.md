@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 11:53 → running IST · 13 min**
+**22 Nov 2026 · slot 11:53 → running IST · 1h 19m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,13 +20,15 @@
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `content-present-partly-displaced` |
+| Working on | `18_displacement` |
+| Committed | **12** files in 3 commit(s) from `c4766c2` — ...lacement-68_journal-CLEAN-IN-GOOGLE-1230-f1x.md, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 12:06 | **lead** | 1/16 | 18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 cl |
+| 13:12 | **lead** | 0/1 | pointKey whole-point quantisation fixed (trHeight 360/380 -> 368 exact); Google's laid pitch refuted as declared+0.75 on a real row (+1.04 and +0.74 measured); mobile-bill 46/47 unchanged, so a lead n |
 
 ## The txt
 
@@ -46,22 +48,23 @@
 
 | | |
 |:--|:--|
-| Slot window | 11:53 → running · 13 min |
+| Slot window | 11:53 → running · 1h 19m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 15 |
-| Longest silence | **5.5 min** — from 11:53:42, after `reading state, deciding class` |
-| Silences over 2 min | 1 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 25 |
+| Longest silence | **47.4 min** — from 12:07:10, after `report.py: building the report` |
+| Silences over 2 min | 5 |
+| Obstacles | 0 cleared · 3 parked, with the evidence to re-open them |
+| Still a wall | **Not a stall, and I am recording that rather than treating it as one.** The `txt` row ages `tools/p2w-bench/t |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **8 min** | `##############` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **1h 03m** | `##################` |
+| record - attempt, handoff, class rows | **2 min** | `#` |
 | report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **3 min** | `######` |
+| other - not attributed to a tool | **12 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |

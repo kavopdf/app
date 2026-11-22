@@ -1,4 +1,6 @@
-**22 Nov 2026 · slot 11:53 → running IST · 13 min**
+# P2W Fixer - Run Report
+
+**22 Nov 2026 · slot 11:53 → running IST · 1h 19m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -6,7 +8,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -15,13 +17,15 @@
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `content-present-partly-displaced` |
+| Working on | `18_displacement` |
+| Committed | **12** files in 3 commit(s) from `c4766c2` — ...lacement-68_journal-CLEAN-IN-GOOGLE-1230-f1x.md, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 12:06 | **lead** | 1/16 | 18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 cl |
+| 13:12 | **lead** | 0/1 | pointKey whole-point quantisation fixed (trHeight 360/380 -> 368 exact); Google's laid pitch refuted as declared+0.75 on a real row (+1.04 and +0.74 measured); mobile-bill 46/47 unchanged, so a lead n |
 
 ## The txt
 
@@ -33,65 +37,31 @@
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 8 documents |
 
-## The class, and why this one
-
-`classpick.py --leverage` puts `18_displacement` at **38.7 clean documents** — nearly double the next
-check (`32_stroke_lines`, 23.3) — and it is the only class carrying an implemented, Google-proved lead.
-The patch `patches/18-spacer-before-rowpitch-rowrule.patch` bundles five constructs aimed at it, and
-the last run left it blocked on the corpus measure, not on evidence.
-
-## What this slot settled
-
-**1. The construct works, on a real document, in Google.** `68_journal` — the document the old
-2880-twip spacer cap truncated by 4.05 pt — goes 41/42 → 42/42 on the patched engine. One round trip:
-ConvertOne → Drive create-as-Google-Doc → export PDF → `gverify.py --collect` → 42/42.
-
-**2. The blast radius is one document.** The 10:05 finding counted 124 spacer-bearing documents and
-could not say which of the clean ones would move. Converted the 23 documents that pass all their Google
-checks on the patched build and read every spacer paragraph out of their XML: **exactly one of them
-carries a spacer**, and it is `68_journal`, which was 41/42 and is now clean. Twenty-two carry none.
-The construct cannot reach them.
-
-**3. The `mobile-bill` claim does not reproduce — in either direction.** Patched, `mobile-bill` scores
-**31/42**, eleven checks failing. That reads as a catastrophe until the control: the unpatched HEAD
-engine, rebuilt and put through the identical round trip, also scores **31/42 with the same eleven
-checks failing, check for check**. The patch does not move that document at all. The `31/42` is this
-build's behaviour under the current verifier and is **not** comparable to the committed `46/47` (a
-47-check run); neither number should be quoted as the document's score. The 11:27 report's
-"41/42 → 42/42" on `mobile-bill` is therefore unsupported on this build, and the next run must not
-build on it.
-
-## Why nothing is committed
-
-`gate.py --budget 250` measures ~26 of 213 documents per call, and on a fresh pod the corpus has to be
-rebuilt from nothing first (~7 min of ConvertOne, then ~35 min of measurement). That does not fit a
-slot, and the pre-commit gate refuses an engine change it has not ratcheted. The patch stays a patch,
-the finding is written down, and the next run inherits both.
-
 ## Subagents
 
-Two were started before my own attempt. The first returned the blocker that matters, now measured twice over: **a sub-agent sandbox has neither the repository nor Drive.** It could not read `/scratch/work/CS` (its own pod is empty) and could not upload. Any task whose answer is a repo file or a Google number has to be done by the run itself; delegate only work whose inputs can be copied in with `files=`.
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 11:53 → running · 13 min |
+| Slot window | 11:53 → running · 1h 19m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 15 |
-| Longest silence | **5.5 min** — from 11:53:42, after `reading state, deciding class` |
-| Silences over 2 min | 1 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 25 |
+| Longest silence | **47.4 min** — from 12:07:10, after `report.py: building the report` |
+| Silences over 2 min | 5 |
+| Obstacles | 0 cleared · 3 parked, with the evidence to re-open them |
+| Still a wall | **Not a stall, and I am recording that rather than treating it as one.** The `txt` row ages `tools/p2w-bench/t |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **8 min** | `##############` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **1h 03m** | `##################` |
+| record - attempt, handoff, class rows | **2 min** | `#` |
 | report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **3 min** | `######` |
+| other - not attributed to a tool | **12 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |

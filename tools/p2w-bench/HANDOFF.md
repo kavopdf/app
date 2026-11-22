@@ -108,7 +108,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `07:36` agent deployed: 18_displacement / A - what makes a single-page dense table drift in Google - row pitch or the table-to
 - `07:36` agent landed: 18_displacement / A -> FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md
 - `07:51` attempt 6 on 18_displacement -> lead (0/16 moved)
 - `08:26` attempt 8 on 18_displacement -> reverted (1/16 moved)
@@ -133,6 +132,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `11:23` agent deployed: 18_displacement / B - recomputed leverage from benchmarks/gverify/*.json without classpick.py - 16 sol
 - `11:27` attempt 13 on 18_displacement -> lead (3/4 moved)
 - `12:06` attempt 15 on content-present-partly-displaced -> lead (1/16 moved)
+- `13:12` attempt 14 on 18_displacement -> lead (0/1 moved)
 
 ## Where the rest of the state lives
 
