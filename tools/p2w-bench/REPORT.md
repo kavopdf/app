@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 10:20
+# Fixer report - 2026-11-22 11:14
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 10:20 → 10:47 IST · 27 min**
+**22 Nov 2026 · slot 11:14 → running IST · 8 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -26,7 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 10:37 | **lead** | 0/3 | Four constructs built and measured in Google; none moved a document, and the audit afterwards found three of this run's own five claims overstated (corrected in FINDINGS/18_displacement-CORRECTION-1045-relay.md). The one construct that reproduces the page's sawtooth - box at the row's height - needs |
+| 11:21 | **lead** | 0/3 | One Google probe settles what a row is laid at: laid = max(declared trHeight, 1.15 x cell type size) + border, exactly, across 13 declared heights at 10 and 18 pt. No threshold; the 'content term' is |
 
 ## The txt
 
@@ -46,21 +46,22 @@
 
 | | |
 |:--|:--|
-| Slot window | 10:20 → 10:47 · 27 min |
+| Slot window | 11:14 → running · 8 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 19 |
-| Longest silence | **7.6 min** — from 10:39:18, after `report.py: building the report` |
-| Silences over 2 min | 6 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 14 |
+| Longest silence | **5.0 min** — from 11:14:33, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 1 |
+| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | **The relay's own pre-claim heartbeat makes a dead claim read live.** `round.py --heartbeat` writes `fixer_las |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **3 min** | `###` |
-| report - the report and the chain | **9 min** | `########` |
-| other - not attributed to a tool | **13 min** | `###########` |
+| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `##############` |
+| record - attempt, handoff, class rows | **1 min** | `###` |
+| other - not attributed to a tool | **1 min** | `#####` |
 ## Best results this round
 
 | Document | Before | After | Change |
