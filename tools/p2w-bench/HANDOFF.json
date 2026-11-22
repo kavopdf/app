@@ -1056,6 +1056,10 @@
   {
    "at": "13:57",
    "text": "agent deployed: 18_displacement / B - from the three measured declared->laid points compute the declaration that lands"
+  },
+  {
+   "at": "14:19",
+   "text": "attempt 16 on 18_displacement -> lead (0/16 moved)"
   }
  ],
  "next": "18_displacement: the pitch ladder is whole points and error-diffusion removes 92% of the drift (patch in patches/). The one remaining run out of tolerance is on the row the diffusion targets at 20 pt, which lays 21.0 - cap that row's cell content to its declaration and re-measure two-tables-stacked-with-no-gap.",

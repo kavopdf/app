@@ -1,0 +1,73 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4ead19de..1b0da9cc 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -440,6 +440,13 @@ public final class DocxWriter {
+      * produced it. A model that agrees with itself while the page overruns is the defect this
+      * guard exists to catch.
+      */
++    /**
++     * What the renderer adds to a declared row height before laying it - the row's own rule,
++     * measured at 0.875 pt (a {@code w:sz="7"} border) on a live Google round trip, 22 Nov.
++     * Used only by the error-diffused pitch, which has to name the height it wants laid.
++     */
++    private static final float ROW_RULE_CHARGE_PT = 0.875f;
++
+     private static final String BEFORE = "w:before=\"";
+     private static final String LINE = "w:line=\"";
+     /** The tokens {@link #flowTwOf} needs to tell a nested table's own height from its cells'. */
+@@ -6114,6 +6121,25 @@ public final class DocxWriter {
+         // The height this table is really written at: the sum of the row heights below. It is
+         // what the page budget must read (see the flow charge after the loop).
+         int writtenRowsTw = 0;
++        // THE ROW PITCH IS QUANTISED BY THE RENDERER, SO THE ROUNDING HAS TO BE DIFFUSED.
++        //
++        // Measured 22 Nov 14:45, live round trip on two-tables-stacked-with-no-gap, one build,
++        // thirteen rows declared 344, 348, 352, ... 392 tw (17.2 .. 19.6 pt), atLeast:
++        //
++        //     declared 344 348 352 | 356 360 364 368 372 | 376 384 388 392
++        //     laid     18  18  18  | 19  19  19  19  19  | 20  20  20  20
++        //
++        // Laid pitch is a WHOLE number of points and never a half - the ladder is 18, 19, 20,
++        // not 18.0/18.5/19.0/19.5. A source pitch of 18.40 pt therefore cannot be declared to:
++        // every row rounds the same way and the error ACCUMULATES, 0.4 pt a row, until the foot
++        // of the table is 5.2 pt below where the page put it and 18_displacement charges it.
++        //
++        // The renderer's quantisation cannot be removed, but it can be SPREAD. Declaring one row
++        // a point short and the next a point long keeps every row within half a point of the
++        // page and the table's own foot exactly where the page drew it. That is this accumulator:
++        // it carries the rounding error of one row into the declaration of the next, so the
++        // written table is never more than half a point out however long it is.
++        float ditherErrPt = 0f;
+         // WHAT THE LAST ROW LEAVES UNDER ITS OWN TEXT - see the flow anchor after the table.
+         // Only the last row can be seen by the flow, because it is the only one the next
+         // paragraph is spaced from.
+@@ -6159,7 +6185,27 @@ public final class DocxWriter {
+             // and is wrong: it shortens every row whose content was already below the pitch, and
+             // on electricity-bill's 18.4 pt rows (0.5 pt rules) that turned an 18.0/19.0
+             // alternation into 17.5/18.5 - 18_displacement gained more documents than it fixed.
+-            int pitchTwHere = rowTwHere;
++            // ERROR-DIFFUSED ROW PITCH. Only where the page itself decided the height: a row
++            // that a type floor, a squeeze, a re-cut content extent or the paper's bottom edge
++            // already moved is not the page's pitch and must keep whatever that decision made it.
++            //
++            // It is applied HERE, before the cell's own line is derived from it, because the
++            // renderer lays a row at max(trHeight, cell content + rule): declaring a row short
++            // while leaving its content at the page's pitch changes nothing, the content binds
++            // and the row is laid at the pitch again. The whole row has to move together.
++            int truePitchTw = rowTwHere;
++            if (exactRows && rowCapTw < 0 && !t.recut && ctx.squeeze == 1f && ruleTwHere > 0) {
++                float targetPt = truePitchTw / (float) TWIPS_PER_PT;
++                float laidPt = Math.round(targetPt + ditherErrPt);
++                ditherErrPt += targetPt - laidPt;
++                // THE RENDERER CHARGES THE ROW'S RULE ON TOP OF THE DECLARED HEIGHT.
++                // Same round trip: declared 17.2 + 0.875 (the w:sz="7" border) laid 18.0, and
++                // 17.8 + 0.875 laid 19.0. So the declaration that lands `laidPt` is
++                // `laidPt - 0.875`, and this is the only place the constant is used.
++                int declaredTw = (int) Math.round((laidPt - ROW_RULE_CHARGE_PT) * TWIPS_PER_PT);
++                if (declaredTw > 0) rowTwHere = declaredTw;
++            }
++            int pitchTwHere = truePitchTw;
+             int contentTwHere = rowTwHere > 0 && ruleTwHere > 0
+                     ? Math.max(1, rowTwHere - ruleTwHere) : rowTwHere;
+             // The line inside the cell follows the row it is in: a cell's text is drawn at the

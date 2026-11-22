@@ -19,18 +19,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 13:18 |
+| started | 13:56 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> TWO INSTRUMENTS LIED THIS RUN, both worth knowing before the next. (1) lastmessage.py's Timing rows come from the beat counter, which stops at the last heartbeat; converting and Drive calls write no beat, so a Google-measuring slot under-reports its duration by ~30 min (49 real vs 15 reported). (2) The sub-agent sandbox does NOT share /scratch/work/CS - an agent given 'read the repo at /scratch/work/CS' reads a DIFFERENT checkout (this run's agent A found kavopdf-render-probe and no Java at all). Pass files explicitly with files=[...] or the agent's analysis is about a repo that does not exist.
+> THE ROW-PITCH LADDER IS WHOLE POINTS. A 13-row sweep on two-tables-stacked-with-no-gap (declared 344..392 tw) laid 18/18/18/19/19/19/19/19/20/20/20/20 - never a half point. The 18.5 declaration the 13:18 relay left as the next build DOES NOT EXIST; laid = round(declared_pt + 0.875) where 0.875 is the row's own rule. A source pitch of 18.4 therefore rounds to 19 on every row and the error accumulates (+9.1 pt at the foot of 13 rows), which is the whole of 18_displacement on that document. Error-diffusing the declaration (patches/18-row-pitch-error-diffused.patch) took the foot from 326.5 to 317.5 against a source 316.7 - 92% of the drift gone, 23_line_pitch now reads the source's own 18.4 - and STILL 46/47: one run is more than 2x its tolerance out on the single row the diffusion hands a 20 pt target to (laid 21.0). Next attempt: find that row's binding term (cell content, not declaration) and cap it; do not re-derive the ladder.
 
 ## What the next run should do first
 
-> DO NOT build the 0.9634 row scale or the hairline cell box for single-line cells - both measured inert. Build against rowParts>1: raise the row floor to the true 368 twips (the floor is quantised 8 twips low at 360) OR take w:before off the continuation paragraphs inside a wrapped cell. Google grows 360-twip rows to 19.0/20.0; source pitch is 18.40; mobile-bill rows 5-12 hold 6 w:p on 3 columns and render at 20.0 = 2.0 pt of growth. Prove on mobile-bill and insurance-policy-schedule FIRST - they are the only two documents blocking a spacer construct already measured to take 6 documents clean (68_journal 42/42 this run). Then land the spacer (w:before + hairline w:line=1 at 5868-5875, cap 2880->4320 at 5852,5866) with it.
+> 18_displacement: the pitch ladder is whole points and error-diffusion removes 92% of the drift (patch in patches/). The one remaining run out of tolerance is on the row the diffusion targets at 20 pt, which lays 21.0 - cap that row's cell content to its declaration and re-measure two-tables-stacked-with-no-gap.
 
 ## Agents deployed and not yet accounted for
 
@@ -102,15 +102,14 @@ unfinished work, not as a result.
 | 18_drow-growth-mechanism-01 | 18_displacement | row-growth-mechanism | given the real DocxWriter.java, which emitted number Google ignores wh | 10:09 | the mechanism with arithmetic, one recommended edit, and the rows it must not touch | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
 | 18_dA-05 | 18_displacement | A | consolidated every FINDINGS file and the two row emitters into one dos | 11:23 | 11:19 | running |  |
 | 18_dB-04 | 18_displacement | B | recomputed leverage from benchmarks/gverify/*.json without classpick.p | 11:23 | 11:20 | running |  |
+| 18_dA-06 | 18_displacement | A | static map of every writer that emits w:trHeight and cell w:spacing, a | 13:57 | expected by 14:30 | running |  |
+| 18_dB-05 | 18_displacement | B | from the three measured declared->laid points compute the declaration  | 13:57 | expected by 14:30 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `07:51` attempt 6 on 18_displacement -> lead (0/16 moved)
-- `08:26` attempt 8 on 18_displacement -> reverted (1/16 moved)
-- `08:31` agent deployed: 18_displacement / A - independently re-derive the sixteen and the spacer premise from the repo
 - `08:31` agent landed: 18_displacement / A -> FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md
 - `08:31` agent deployed: 18_displacement / B - what places a page's first baseline, and is median_pt 0.96 a real offset
 - `08:31` agent landed: 18_displacement / B -> FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md
@@ -133,6 +132,9 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `12:06` attempt 15 on content-present-partly-displaced -> lead (1/16 moved)
 - `13:12` attempt 14 on 18_displacement -> lead (0/1 moved)
 - `13:29` attempt 15 on 18_displacement -> lead (0/1 moved)
+- `13:57` agent deployed: 18_displacement / A - static map of every writer that emits w:trHeight and cell w:spacing, and the exa
+- `13:57` agent deployed: 18_displacement / B - from the three measured declared->laid points compute the declaration that lands
+- `14:19` attempt 16 on 18_displacement -> lead (0/16 moved)
 
 ## Where the rest of the state lives
 

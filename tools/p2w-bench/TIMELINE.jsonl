@@ -2609,3 +2609,6 @@
 {"t": 1795337340.7761657, "ist": "14:19:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795337340.9501412, "ist": "14:19:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795337345.586907, "ist": "14:19:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795337347.7974317, "ist": "14:19:07", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795337347.9132278, "ist": "14:19:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795337348.055784, "ist": "14:19:08", "ev": "beat", "d": "classrow.py: refreshing the class file"}
