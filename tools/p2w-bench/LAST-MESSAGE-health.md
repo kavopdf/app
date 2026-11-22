@@ -1,18 +1,18 @@
 # P2W Watchdog - Run Report
 
-**22 Nov 2026 · 09:22 IST**
+**22 Nov 2026 · 12:16 IST**
 
-> Nothing is stopped.
+> **1 stage(s) stopped: txt**
 
 ## Stages
 
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 3.1 h |
-| matrix | done | 213 of 213 | 9.4 h |
-| classify | superseded |  | 2.5 h |
-| fix | moving |  | 0.9 h |
-| txt | moving | 197 clean, 16 failing | 10.7 h |
+| measure-google | done | 213 of 213 | 6.0 h |
+| matrix | done | 213 of 213 | 12.3 h |
+| classify | superseded |  | 5.4 h |
+| fix | moving |  | 0.2 h |
+| txt | **stopped** | 197 clean, 16 failing | 13.6 h |
 
 ## Trend
 
@@ -23,36 +23,16 @@
 | Google measured | 192 | **192** | no change |
 | Google clean | 6 | **23** | +17 |
 
-## The fix slot
-
-The fix stage is moving; the slot is what went wrong. The run that claimed it just before nine wrote no
-beacon for twenty minutes, and its claim aged past the fixer's own stale window of ten minutes, so I
-released it with round.py --release-fixer --force. The run was not dead. It landed its attempt, its
-finding and its run report about twenty minutes after my release, and the platform still marks it running.
-
-The stale window is the defect, not the run: the comment beside it says forty-five minutes and the value
-is ten, and a run inside one long measurement step writes no beacon until that step finishes. A watchdog
-that trusts the window will keep freeing live slots, and two runs editing the engine at once is the
-failure the claim exists to prevent. It is written up in BLOCKERS.md with what would close it.
-
-gaps.py also records two silences between a release and the next claim that are longer than the spacing
-between the two fixer slots. Whether those are missed fires or busy slots is exactly what
-cron(action="list") would answer, and no agent in this pipeline holds it.
-
-## The cron tool
-
-**This watchdog has no cron tool**, so a paused, zombie or stale-firing cron cannot be moved by
-automation. That is a missing tool, not a judgement call for a person to make. The exact calls I would
-have made: cron(action="list") to read the crons, and for a zombie run cron(action="delete",
-cron_id="<id>") followed by cron(action="create", name=<same>, schedule=<same>, prompt=<same>); for a
-stale next_fire_at, cron(action="pause", cron_id="<id>") followed by cron(action="resume",
-cron_id="<id>"). None of that ran.
-
 ## What this pass did
 
-* Read health.py, health.py --stalled, stage.py, progress.py, round.py --phase, status.py, gaps.py and
-  the tail of TIMELINE.jsonl.
-* Released a fixer claim that read stale and was not; corrected the record in BLOCKERS.md when the run's
-  own commits showed it had been alive.
-* Wrote the missing cron tool into BLOCKERS.md.
+Read health.py, health.py --stalled, stage.py, progress.py, round.py --phase and status.py. The round phase is fix, round 1. No cron was recreated, and none could be: this watchdog has no cron tool, so it cannot list a cron, read a run, pause or resume one, or delete and recreate a zombie. The exact calls it would have made are in BLOCKERS.md with their arguments. That is a missing tool, not a decision for a person.
 
+## The stopped row is not a stall
+
+The txt row ages the .txt ranking table. That table is stamped against the engine: the state file beside it records the engine commit it was measured on, and that is still the newest engine commit on the branch. Nothing has changed the converter since the table was written, so no re-measurement is due, and a re-measurement would print the same 197 clean and 16 failing. The threshold is twelve hours and the table is 13.6 h old, so the row goes red on age alone while the work underneath it has not stopped.
+
+What would overturn that, and make this a real stall: an engine commit newer than the table, or a fixer run that lands an engine change without re-scoring the .txt half. Either one, with the row still red, needs the .txt half to get its own scheduled re-measurement. I did not move the threshold to make the row green.
+
+## The other rows
+
+Nothing is wedged. status.py reports the fixer WORKING with a fresh beacon, so the slot is held by a live run and was not released; the reopen path does not apply because the phase is fix, not done. The trend row moved: .txt failing 23 to 16 and Google clean 6 to 23. .docx open is unchanged at 59 for the second row running, which is the number to watch, with the fixer's attempt count beside it in BLOCKERS.md.
