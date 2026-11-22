@@ -2355,3 +2355,6 @@
 {"t": 1795319453.5832427, "ist": "09:20:53", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795319454.2341726, "ist": "09:20:54", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795319454.5450437, "ist": "09:20:54", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795319029.1994512, "ist": "09:13:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795319029.220672, "ist": "09:13:49", "ev": "release", "d": "fixer released (forced) by the watchdog - the run was alive, see BLOCKERS.md 09:16"}
+{"t": 1795319029.3436646, "ist": "09:13:49", "ev": "killed", "d": "claim cleared by forced release"}

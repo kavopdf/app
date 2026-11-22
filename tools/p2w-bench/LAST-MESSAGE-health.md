@@ -1,31 +1,58 @@
-Watchdog, 22 Nov 06:10 IST. The pipeline is moving. Nothing is stopped.
+# P2W Watchdog - Run Report
+
+**22 Nov 2026 · 09:22 IST**
+
+> Nothing is stopped.
 
 ## Stages
 
 | stage | state | progress | age |
-|---|---|---|---|
-| measure-google | done | 213 of 213 | 0.0 h |
-| matrix | done | 213 of 213 | 6.3 h |
-| classify | moving | | 4.9 h |
-| fix | moving | 7 attempts in 3 h | 0.0 h |
-| txt | moving | 197 clean, 16 failing | 7.6 h |
-
-health.py --stalled exits 0: nothing is stopped.
+|:--|:--|--:|--:|
+| measure-google | done | 213 of 213 | 3.1 h |
+| matrix | done | 213 of 213 | 9.4 h |
+| classify | superseded |  | 2.5 h |
+| fix | moving |  | 0.9 h |
+| txt | moving | 197 clean, 16 failing | 10.7 h |
 
 ## Trend
 
-Today's row against yesterday's: docx open 59 to 59, no change; txt failing 23 to 16, down 7; Google measured 192 to 192, no change; Google clean 6 to 23, up 17. Two of the four columns moved, and the Google-clean jump is the day's real work. The 22 Nov row was already written by the fixer's own progress pass, so this pass did not append a second one for today.
+| | 2026-11-21 | 2026-11-22 | |
+|:--|--:|--:|:--|
+| .docx open | 59 | **59** | no change |
+| .txt failing | 23 | **16** | -7 |
+| Google measured | 192 | **192** | no change |
+| Google clean | 6 | **23** | +17 |
 
-## Round
+## The fix slot
 
-Phase is fix. The fixer runs until no class is open, and classes are still open.
+The fix stage is moving; the slot is what went wrong. The run that claimed it just before nine wrote no
+beacon for twenty minutes, and its claim aged past the fixer's own stale window of ten minutes, so I
+released it with round.py --release-fixer --force. The run was not dead. It landed its attempt, its
+finding and its run report about twenty minutes after my release, and the platform still marks it running.
 
-## Cron
+The stale window is the defect, not the run: the comment beside it says forty-five minutes and the value
+is ten, and a run inside one long measurement step writes no beacon until that step finishes. A watchdog
+that trusts the window will keep freeing live slots, and two runs editing the engine at once is the
+failure the claim exists to prevent. It is written up in BLOCKERS.md with what would close it.
 
-This watchdog has no cron tool, so STEP 3 and STEP 4 A/B of its own prompt could not run and did not run. No cron was recreated and no id changed. A paused or zombie cron cannot be moved by automation from here; the calls that were unavailable are cron list, then cron runs for any stopped stage, then pause and resume once, never left paused.
+gaps.py also records two silences between a release and the next claim that are longer than the spacing
+between the two fixer slots. Whether those are missed fires or busy slots is exactly what
+cron(action="list") would answer, and no agent in this pipeline holds it.
 
-The two slot checks that need no cron tool did not apply. The reopen check does not apply: phase is fix, not a finished phase with documents still failing. The release check does not apply: fix age reads 0.0 h with 7 attempts in the last 3 h, so the slot is held by a live run and no release was forced.
+## The cron tool
 
-## Recorded
+**This watchdog has no cron tool**, so a paused, zombie or stale-firing cron cannot be moved by
+automation. That is a missing tool, not a judgement call for a person to make. The exact calls I would
+have made: cron(action="list") to read the crons, and for a zombie run cron(action="delete",
+cron_id="<id>") followed by cron(action="create", name=<same>, schedule=<same>, prompt=<same>); for a
+stale next_fire_at, cron(action="pause", cron_id="<id>") followed by cron(action="resume",
+cron_id="<id>"). None of that ran.
 
-BLOCKERS.md gets one row: the missing cron tool, with the exact calls that were unavailable. docx open has held at 59 for two rows while txt failing fell 23 to 16 and Google clean rose 6 to 23. One flat column is not a stall, because the others moved, so the long-stall rule does not apply.
+## What this pass did
+
+* Read health.py, health.py --stalled, stage.py, progress.py, round.py --phase, status.py, gaps.py and
+  the tail of TIMELINE.jsonl.
+* Released a fixer claim that read stale and was not; corrected the record in BLOCKERS.md when the run's
+  own commits showed it had been alive.
+* Wrote the missing cron tool into BLOCKERS.md.
+
