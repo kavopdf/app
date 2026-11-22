@@ -75,7 +75,7 @@ documents were deleted from Drive afterwards.
 |:--|:--|:--|:--|
 | `73_marksheet_subject_marks_grade` | **41/42** | **42/42 PASS** | 0/64 |
 | `41_coloured_headings_white_bg` | 41/42 (recorded 23:10) | **42/42 PASS** | 0/36 |
-| `29_dot_leaders_txtpos` | 41/42 (recorded 23:10) | **42/42 PASS** | 0/52 |
+| `29_dot_leaders_txtpos` | 41/42 (recorded 23:10) | **42/42 PASS** (one render) | 0/52 |
 | `mobile-bill` | 46/47, 1 page | **46/47, 1 page** | unchanged |
 
 `73` was measured on both sides in this slot (base render 41/42, patched render 42/42, one
@@ -110,6 +110,38 @@ designed result, not a null one — the split moves a gap between two properties
 same value, so a renderer that honours both cannot see it. LibreOffice is that renderer. The three
 documents this slot moves are invisible to the proxy and visible to Google, which is the whole
 reason Google is the truth.
+
+
+## Reproducibility, and a reading this build does not reproduce
+
+`22_invoice_four_columns_txtpos` and `16_right_aligned_amounts_txtpos` also spend their gaps under
+this guard (133/215 tw and 93 tw, all under the page's room). `FINDINGS/18_displacement-GUARDED-SPACER-SPLIT-1-WIN-1-COST-0219-relay.md`,
+written by the 01:14 relay slot two hours ago, reads both at **42/42** under a split-only build.
+This build reads both at **41/42**, still failing `18_displacement`, on a round trip taken in this
+slot. Same construct, same documents, two hours apart.
+
+That is consistent with the 23:10 finding's own second lever: `22` and `16` fail with a **constant
+−2.5 pt step and a fitted slope of ~0**, which is a second term on those two documents that a spacer
+change does not touch. It is not consistent with a 42/42 reading on this build.
+
+**So the five does not reproduce, and the number this slot can defend is three.** Two further
+measurements were taken to make sure the three are not the same coin-flip:
+
+| document | render 1 | render 2 (fresh upload, fresh export) |
+|:--|:--|:--|
+| `73_marksheet_subject_marks_grade` | 42/42 | **42/42** |
+| `41_coloured_headings_white_bg` | 42/42 | **42/42** |
+
+`73` was also measured on the unpatched engine in this slot at 41/42. Both wins reproduce on an
+independent upload.
+
+**The general lesson, and it is worth more than the three documents.** A single Google round trip
+reading 41/42 or 42/42 at the margin is not a measurement of the construct — the same document and
+the same construct read differently two hours apart, in two runs that both did the work correctly.
+A claim of "N documents clean" needs either two renders of the same .docx or a before/after at the
+same hour, and the .docx hash should travel with it. Nine probe documents were created in Drive and
+all nine deleted; none of the readings above is recoverable without the .docx hash, which is the
+defect this lesson names.
 
 ## What the guard refuses, and the one document that costs
 
