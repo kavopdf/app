@@ -22,12 +22,11 @@
  },
  "041122-Account_Opening_Form": {
   "applicable": 10,
-  "baseline_failed": 4,
-  "cause": "4 checks",
-  "failed": 4,
+  "baseline_failed": 3,
+  "cause": "3 checks",
+  "failed": 3,
   "failed_ids": [
    "t06_encoding",
-   "t08_line_order",
    "t09_page_furniture",
    "t12_word_invention"
   ]
@@ -71,12 +70,10 @@
  },
  "09_stamp_font_not_embedded": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t08_line_order",
-  "failed": 1,
-  "failed_ids": [
-   "t08_line_order"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "10_stamp_as_image": {
   "applicable": 10,
@@ -408,12 +405,10 @@
  },
  "330_cad_drawing_sheet": {
   "applicable": 7,
-  "baseline_failed": 1,
-  "cause": "t08_line_order",
-  "failed": 1,
-  "failed_ids": [
-   "t08_line_order"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "331_pid_diagram": {
   "applicable": 7,
@@ -708,22 +703,21 @@
  },
  "39_small_caps_letter_spacing": {
   "applicable": 9,
-  "baseline_failed": 2,
-  "cause": "t01_word_accuracy + t12_word_invention",
-  "failed": 2,
+  "baseline_failed": 3,
+  "cause": "3 checks",
+  "failed": 3,
   "failed_ids": [
    "t01_word_accuracy",
+   "t08_line_order",
    "t12_word_invention"
   ]
  },
  "400_comic_page_speech_bubbles": {
   "applicable": 7,
-  "baseline_failed": 1,
-  "cause": "t08_line_order",
-  "failed": 1,
-  "failed_ids": [
-   "t08_line_order"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "401_trifold_brochure": {
   "applicable": 7,
@@ -874,12 +868,10 @@
  },
  "46_chart_coloured_labels_body_text": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t08_line_order",
-  "failed": 1,
-  "failed_ids": [
-   "t08_line_order"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "47_grey_body_black_headings": {
   "applicable": 9,
@@ -1034,12 +1026,10 @@
  },
  "65_two_col_full_width_figure_caption": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t08_line_order",
-  "failed": 1,
-  "failed_ids": [
-   "t08_line_order"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "66_two_col_footnotes_bottom": {
   "applicable": 9,
@@ -1071,12 +1061,10 @@
  },
  "70_magazine_drop_cap_photo_caption": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t08_line_order",
-  "failed": 1,
-  "failed_ids": [
-   "t08_line_order"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "71_invoice_space_aligned_no_rules": {
   "applicable": 10,
@@ -1155,12 +1143,11 @@
  },
  "Account_Opening_Form_Fillable_filled": {
   "applicable": 10,
-  "baseline_failed": 4,
-  "cause": "4 checks",
-  "failed": 4,
+  "baseline_failed": 3,
+  "cause": "3 checks",
+  "failed": 3,
   "failed_ids": [
    "t06_encoding",
-   "t08_line_order",
    "t09_page_furniture",
    "t12_word_invention"
   ]
@@ -1323,12 +1310,10 @@
  },
  "itr-computation-with-slab-table": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t08_line_order",
-  "failed": 1,
-  "failed_ids": [
-   "t08_line_order"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "journal-2col-with-footnotes": {
   "applicable": 9,
@@ -1397,12 +1382,10 @@
  },
  "one-page-rotated-180-degrees": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t02_position",
-  "failed": 1,
-  "failed_ids": [
-   "t02_position"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "payslip-label-left-amount-right": {
   "applicable": 10,
