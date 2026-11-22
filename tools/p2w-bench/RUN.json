@@ -4,9 +4,9 @@
  "ended_ts": null,
  "ended": null,
  "class": "32_stroke_lines",
- "attempts": 1,
- "kept": 1,
- "docs_improved": 3,
+ "attempts": 2,
+ "kept": 2,
+ "docs_improved": 19,
  "agents": [],
  "obstacles_cleared": 0,
  "needs_human": 0,
@@ -14,6 +14,10 @@
   [
    "32_stroke_lines",
    3
+  ],
+  [
+   "32_stroke_lines",
+   16
   ]
  ]
 }

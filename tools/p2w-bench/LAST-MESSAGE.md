@@ -1,67 +1,76 @@
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 05:14 → 05:20 IST · 5 min**
+**22 Nov 2026 · slot 05:56 → running IST · 17 min**
 
-> Three Google round trips, no engine change, and one document that is CLEAN in Google where the table
-> said it was not. The lead the last report left — land the carrier patch — is
-> falsified: its Google evidence is a hand-typed summary and the patch damages clean documents. What
-> replaces it is the Google round trip itself, run three times, and it says the table the pipeline
-> steers by is measured on an engine that no longer exists.
+> The largest Google class was not a document defect. `32_stroke_lines` read only vector
+> paths, and Google Docs exports every anchored rule as a small raster image at the rule's
+> own coordinates — so a rule Google rendered perfectly was counted as lost. Twenty
+> documents through a live Google round trip: **16 distinct documents went 41/42 → 42/42**,
+> none got worse, and **Google-clean went 6 → 23** of the 192 Google-scored documents.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **0** — 1 attempt(s), 0 kept |
+| Documents improved this run | **19** — 2 attempt(s), 2 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
-| **Fixed - Google, all 42 checks** | **7**, out of the 192 documents both renderers measured |
+| **Fixed - Google, all 42 checks** | **23**, out of the 192 documents both renderers measured |
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `32_stroke_lines` |
 
+The 19 is the ledger's count across two attempts; the distinct documents that went clean
+are 16, because the first attempt's three are also in the twenty-document batch.
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 06:10 | **kept** | 3/213 | `verify_google.py:_rule_segments()` reads `page.get_drawings()` — vector paths only. `_stroke_pictures()` sits in the same file, is already called by `_strokes()`, and was never called here. Google Docs exports an anchored shape as a small raster image at the shape's own geometry, so a rule it drew perfectly read as zero segments and was counted LOST. Made the check read image bands, at `RULE_BAND_REN` so a 3 pt rule counts whether Google drew it as a vector band or an image band. |
+| 06:13 | **kept** | 16/213 | The change measured on 20 Google exports from a live round trip: 16 documents 41/42 → 42/42, 0 worse. 13 of 14 documents failing `{05_chars_extra, 32_stroke_lines}` came back 42/42 — `05_chars_extra` passes on HEAD too, so the table's 05 column is stale as well. |
+
 ## What this run measured
 
-**1. The carrier's "13 of 16 clean in Google" is not a measurement record.** The sixteen files in
-`benchmarks/gverify-carrier-2008/` carry three fields (`engine_patch`, `engine_note`, `measured`) that
-no script in the repo writes — `grep -rn "engine_patch\|engine_note" --include=*.py .` returns nothing —
-no per-check map, and a `measured` value of `2026-11-22T02:2xZ` with a placeholder digit and a timestamp
-six hours before the files were committed. `engine: 462353f9` cannot identify a build either: `git apply`
-creates no commit, so patched and unpatched trees return the same string.
+**1. The check could not see what Google rendered.** From the exports of this run, printed
+straight out of `page.get_image_info()`:
 
-**2. The patch damages clean documents.** Own clone, patch applied, rebuilt: of the 16 target documents
-plus 10 controls that pass everything at HEAD, **4 of 10 controls got worse**. `16_right_aligned_amounts`
-loses six checks and grows a second page; `product-catalogue-code-left-price-right` goes 42/42 → 37/42
-with 21 carriers and 1 → 3 pages. Damage tracks carrier count; documents with 1–4 carriers do not move.
-`regress.py --check` refuses the patch.
+    394_map_with_legend  rule y=691.89 t=1.6  ->  image 21.00 x 2.25 at (394.9, 690.7)
+                         rule y=707.89 t=3.0  ->  image 21.00 x 3.75 at (394.9, 706.0)
+    315_gazette          5 source rules, 5 image bands, each at its own coordinates
+    17_three_column      2 source rules, 2 image bands, each at its own coordinates
 
-**3. The local renderer cannot see the class the patch is for.** `32_stroke_lines` fails 145 of 213 in
-Google and 2 of 213 in LibreOffice; `05_chars_extra` 141 and 5. Every local pass on the 16 was a pass
-they already had.
+Every rule the check called LOST was present in the document the user opens. The band limit
+matters: `_stroke_pictures()` was hardcoded at 1.5 pt and two of `394`'s three rules are
+2.25 pt and 3.75 pt — at 1.5 pt the fix recovers 1 of 3 and the document still fails.
 
-**4. So this run did the Google round trip itself, three times.** Documents converted on the current
-engine, uploaded, exported from Google Docs, scored, probes deleted:
+**2. Twenty documents through the round trip, before and after.** `ConvertOne` at HEAD,
+`GOOGLEDRIVE_CREATE_FILE` as a Google Doc in `KavoPDF-Verify`, `GOOGLEDRIVE_DOWNLOAD_FILE`
+as PDF, `verify_google.py --json`, probe deleted. Before and after are the same command on
+the same export, and the before column was re-taken with the pre-change file:
 
-| document | committed Google (engine `462353f`) | measured now (engine at HEAD) |
+| document | before | after |
 |:--|:--|:--|
-| `315_gazette_notification` | 40/42 — fails `05_chars_extra`, `32_stroke_lines` | **41/42** — fails `32_stroke_lines` only |
-| `17_three_column_widths_txtpos` | 40/42 — fails `05_chars_extra`, `32_stroke_lines` | **41/42** — fails `32_stroke_lines` only |
+| `394_map_with_legend` | 41/42 | **42/42 PASS** |
+| `17_three_column_widths_txtpos` | 41/42 | **42/42 PASS** |
+| `315_gazette_notification` | 41/42 | **42/42 PASS** |
+| 13 of 14 `{05,32}` documents | 40/42 | **42/42 PASS** |
+| `49_coloured_background_block_paragraph` | 40/42 | 41/42 — still fails 32 |
+| `407_id_card_front_back` | 41/42 | 41/42 — 46 lost rules → 8 |
+| `311_fir_police_form` | 42/47 | 43/47 — 32 passes, 4 Google checks fail |
+| `382_architecture_diagram` | 42/42 | **42/42 PASS** — clean control held |
 
-**5. And one document is now clean.** `382_architecture_diagram` was the only document in the corpus whose
-committed Google row failed `05_chars_extra` and nothing else — 41/42. Re-measured on HEAD: **42/42 PASS**.
-Its `benchmarks/gverify/382_architecture_diagram.json` now carries the result with its provenance (docx
-engine fingerprint, export sha256, method, real timestamp), `regress.py --check` passes, and Google-clean
-goes **6 → 7** of the 192 scored.
+**3. Why no document can get worse.** The change only ADDS render segments, and
+`_rules_lost()` matches 1:1, so it can only turn FAIL into PASS. `regress.py --check` passes
+and `google-gate.sh` passes; neither is relied on for the argument.
 
-**6. So the table is stale, not the engine.** `05_chars_extra` passes in Google on all three documents,
-on the current engine, where the committed rows say it fails. Those rows carry `engine: 462353f`; the tree
-is `6c6cf642e13b7ed2`. **The 192 Google rows were measured on an engine that no longer exists, and part of
-the 186-document gap is already closed.** The loop costs about four minutes a document and
-`verify_google.py --json` writes the per-check map — that is the instrument the two largest Google
-classes never had.
+**4. `407_id_card_front_back` is a real loss, not an instrument one.** 46 source rules, 18
+image bands, and its card borders (a 228 pt horizontal at y=220, x 46..274) are in none of
+them. That is the engine construct — a rule emitted as a floating `<w:drawing>` that Google
+drops — and it needs `w:tcBorders` on a 1×1 floating table carrier.
 
 ## The txt
 
@@ -77,11 +86,11 @@ classes never had.
 
 | | |
 |:--|:--|
-| Slot window | 05:14 → 05:20 · 5 min |
+| Slot window | 05:56 → running · 17 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 16 |
-| Longest silence | **3.1 min** — from 05:14:57, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 1 |
+| Tool beats | 17 |
+| Longest silence | **8.8 min** — from 05:56:39, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -89,24 +98,36 @@ classes never had.
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **1 min** | `#####` |
-| report - the report and the chain | **4 min** | `#################` |
+| measure or build - a conversion, screen or compile writes no beacon | **12 min** | `################` |
+| record - attempt, handoff, class rows | **2 min** | `####` |
+| other - not attributed to a tool | **2 min** | `###` |
+
+The 8.8-minute silence is the engine build, the corpus fetch and two agent delegations
+before the first `--heartbeat`. It is the reason the slot reads as short.
 
 ## Next run
 
-**Do not apply `rule-carrier-horizontal-only-2008.patch`.** It is falsified twice: the 03:14 corpus pass
-(54 documents worse, gate refused) and this run's controls (4 of 10 clean documents worse).
+**The measurement is the bottleneck now, not the fix.** 128 documents still carry a
+`32_stroke_lines` failure recorded by the vector-only check, and this run showed that
+sixteen of twenty such rows were wrong. The next slot should not write engine code: take
+the documents whose only recorded failure is `32_stroke_lines`, or
+`{05_chars_extra, 32_stroke_lines}`, and run them through the round trip. Twenty took
+seventeen minutes here, so sixty is inside one run and would settle most of the 128.
 
-Instead, spend the slot re-measuring. Take the documents that fail `{05_chars_extra, 32_stroke_lines}`
-and have a Google row stamped `462353f`, and run twenty of them through the round trip in this order:
-`ConvertOne` → `GOOGLEDRIVE_CREATE_FILE` into `KavoPDF-Verify` → `GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE`
-→ `verify_google.py --json` → `GOOGLEDRIVE_DELETE_FILE`. Write the export's sha256 and `regress.py`'s
-engine fingerprint beside the result. Two of two came back one check better than the table says, so the
-first twenty will tell you how much of the gap is already closed before any engine work is done — and
-`32_stroke_lines`, the one check still failing on both, is worth 36.5 clean documents.
+Two things a round trip needs that this run had and a sub-agent's did not: the platform
+`upload` tool, which mints the `s3key` — `GOOGLEDRIVE_CREATE_FILE` refuses a sandbox path
+with *"The file key does not belong to this project or session"* — and the file under
+`/scratch/output`. Do not route around it by publishing a probe to a public host.
 
-Details and the exact commands: `FINDINGS/05_chars_extra-GOOGLE-TABLE-IS-STALE-ON-BOTH-DOCUMENTS-REMEASURED-0545-f1x.md`
-and `FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md`.
+**Then the engine.** `407` is the proof that a floating `<w:drawing>` rule is genuinely
+dropped by Google while a `w:tcBorders` rule is not: `64_newspaper_uneven_columns_ad_boxes`
+passes with its rules as table borders. Route an isolated hairline rule to a 1×1 floating
+table carrier — `<w:tblpPr>` + `<w:trHeight w:hRule="exact" w:val="1"/>` +
+`<w:tcBorders><w:bottom>` — based on `patches/rule-carrier-per-rule-2008.patch`, never
+`rule-carrier-horizontal-only-2008.patch`, which is falsified twice: 54 documents worse on
+the corpus pass and 4 of 10 clean controls worse on the 05:14 controls.
+
+Details: `tools/p2w-bench/FINDINGS/32_stroke_lines-CHECK-BLIND-TO-RASTERISED-RULES-MEASURED-0610-f1x.md`.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

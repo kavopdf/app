@@ -99,7 +99,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `22:39` agent deployed: t08_line_order / A - does t08 measure line order or drawing order, decided by synthetic pages whose p
 - `22:39` agent deployed: 32_stroke_lines / A - a census of every rule in the failing documents by placement, and what DocxWrite
 - `23:13` attempt 7 on 32_stroke_lines -> lead (0/192 moved)
 - `23:37` attempt 1 on 05_chars_extra -> kept (11/192 moved)
@@ -124,6 +123,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `05:18` agent landed: 32_stroke_lines / B-local -> FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md
 - `05:18` attempt 15 on 32_stroke_lines -> lead
 - `06:10` attempt 16 on 32_stroke_lines -> kept (3/213 moved)
+- `06:13` attempt 17 on 32_stroke_lines -> kept (16/213 moved)
 
 ## Where the rest of the state lives
 
