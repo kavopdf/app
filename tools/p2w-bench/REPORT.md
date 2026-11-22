@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 16:12 → running IST · 14 min**
+**22 Nov 2026 · slot 16:12 → 16:29 IST · 16 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -46,9 +46,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 16:12 → running · 14 min |
+| Slot window | 16:12 → 16:29 · 16 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 11 |
+| Tool beats | 17 |
 | Longest silence | **8.3 min** — from 16:12:54, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -58,9 +58,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `###############` |
-| report - the report and the chain | **1 min** | `##` |
-| other - not attributed to a tool | **3 min** | `#####` |
+| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `#############` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **2 min** | `####` |
+| other - not attributed to a tool | **3 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |
