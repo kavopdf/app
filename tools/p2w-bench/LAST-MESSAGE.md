@@ -1,13 +1,10 @@
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 11:14 → running IST · 8 min**
+**22 Nov 2026 · slot 10:51 → running IST · 33 min**
 
-> **One Google probe answered the question three runs had been guessing at.** Google honours `w:trHeight`
-exactly, and floors a row at the cell text's own line box - `1.15 x` the type size - with no threshold
-anywhere. That is not a document move; it is the arithmetic the two blocking documents have been blamed
-on, and it names the two-line change that unblocks a spacer construct already measured to take 6
-documents to 42/42. Nothing in the corpus, the tables, the branches or the Drive was touched; the one
-probe Doc was created and deleted by this run.
+> The row growth that blocked the spacer is solved and measured in Google: mobile-bill 41/42 -> 42/42.
+> It is carried as a patch, not committed, because the trHeight edit needs the corpus-wide gate pass
+> and `p2w.py --budget` is a *time* limit (26 of 213 documents per 250 s) that does not resume.
 
 ## Progress
 
@@ -28,7 +25,7 @@ probe Doc was created and deleted by this run.
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 11:21 | **lead** | 0/3 | One Google probe settles what a row is laid at: laid = max(declared trHeight, 1.15 x cell type size) + border, exactly, across 13 declared heights at 10 and 18 pt. No threshold; the 'content term' is |
+| 11:24 | **lead** | 3/4 | Google charges a table row's rule ON TOP of w:trHeight (dose-response measured: 368/358/348 twips -> 19.73/19.04/18.35 pt laid). Patch: spacer as w:before + cap 4320 + trHeight prefers the exact table |
 
 ## The txt
 
@@ -48,22 +45,21 @@ probe Doc was created and deleted by this run.
 
 | | |
 |:--|:--|
-| Slot window | 11:14 → running · 8 min |
+| Slot window | 10:51 → running · 33 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 14 |
-| Longest silence | **5.0 min** — from 11:14:33, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 1 |
-| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | **The relay's own pre-claim heartbeat makes a dead claim read live.** `round.py --heartbeat` writes `fixer_las |
+| Tool beats | 10 |
+| Longest silence | **14.2 min** — from 11:04:53, after `18_displacement: built spacer(w:before)+cellPitch fix, fetching corpus` |
+| Silences over 2 min | 3 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `##############` |
-| record - attempt, handoff, class rows | **1 min** | `###` |
-| other - not attributed to a tool | **1 min** | `#####` |
+| fix - diagnose and change the engine | **5 min** | `####` |
+| measure or build - a conversion, screen or compile writes no beacon | **27 min** | `##################` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -76,61 +72,31 @@ probe Doc was created and deleted by this run.
 
 ## Next run
 
-DO NOT build the 0.9634 row scale or the hairline cell box for single-line cells - both measured inert. Build against rowParts>1: raise the row floor to the true 368 twips (the floor is quantised 8 twips low at 360) OR take w:before off the continuation paragraphs inside a wrapped cell. Google grows 360-twip rows to 19.0/20.0; source pitch is 18.40; mobile-bill rows 5-12 hold 6 w:p on 3 columns and render at 20.0 = 2.0 pt of growth. Prove on mobile-bill and insurance-policy-schedule FIRST - they are the only two documents blocking a spacer construct already measured to take 6 documents clean (68_journal 42/42 this run). Then land the spacer (w:before + hairline w:line=1 at 5868-5875, cap 2880->4320 at 5852,5866) with it.
+**Land `patches/18-spacer-before-rowpitch-rowrule.patch` - it is proved on four documents in Google
+and blocked only on the corpus measure.** In this order:
 
-> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
+    git apply patches/18-spacer-before-rowpitch-rowrule.patch
+    bash tools/p2w-bench/build-engine.sh
+    python3 benchmarks/gate.py --budget 250     # repeat until STATE.json carries the tree
+    python3 tools/p2w-bench/regress.py --check
+    # then the Google ratchet over the 13 clean spacer-bearing documents + the 16 that fail
+    # 18_displacement, listed in FINDINGS/18_displacement-table-spacer-CONFIRMED-...-1005-f1x.md
+
+Two facts this slot settled that the previous instruction had wrong:
+
+1. **The 6-paragraph rows on mobile-bill are six cells with ONE paragraph each**, not two
+   paragraphs per cell. The `cps.size() >= 2` path is never entered there; a diff against it moves
+   nothing (built, measured, no change).
+2. **Google charges a row's rule on top of `w:trHeight`**, not inside it. Dose-response measured in
+   one document: trHeight 368 / 358 / 348 twips laid out 19.73 / 19.04 / 18.35 pt. The engine's
+   comment at `DocxWriter.java:6153` says the opposite and is what the last three runs built on.
+
+`insurance-policy-schedule` is the one document the patch does not close (41/42, `18` alone, one
+page - its HEAD score). Its residual is not the spacer and not the row rule. Do not re-derive it.
+
+**Do not judge this patch in soffice.** soffice charges `w:before + w:line`, so it is blind to the
+spacer edit and sees the trHeight edit as a pure shortening; a soffice `share@5px` regression here is
+the proxy disagreeing with the phone.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-## What was measured
-
-A 28-row probe `.docx`, two tables, one row per declared height from 300 to 1500 twips, `hRule="atLeast"`,
-10 pt text in one table and 18 pt in the other. One round trip: upload, create as a Google Doc, export
-PDF, read the text origins.
-
-| declared | laid pitch, 10 pt text | laid pitch, 18 pt text |
-|--:|--:|--:|
-| 300 (15.0 pt) | 15.75 | **21.45** |
-| 360 (18.0 pt) | 18.75 | **21.45** |
-| 400 (20.0 pt) | 21.00 | **21.45** |
-| 500 (25.0 pt) | 25.50 | 25.50 |
-| 720 (36.0 pt) | 36.75 | 36.75 |
-| 1440 (72.0 pt) | 72.75 | 72.75 |
-
-Two facts, both exact on 13 of 13 values: **every laid pitch is the declared height plus one constant**
-(0.75 pt - the probe's table border), and **below the text's line box the row stops responding** and
-floors at `21.45 = 0.75 + 1.15 x 18`.
-
-## What it refutes
-
-- The "threshold somewhere between 19 pt and 55 pt" reading in the 10:45 correction is **wrong**. 19 pt
-  and 55 pt behave identically; both earlier measurements were right and on the same rule.
-- The "content term" is no longer opaque: it is the type's line box, `1.15 x w:sz`. Nothing needed
-  about the face, the cell margins or `w:before` explains it.
-- The 0.9634 row scale is not inert, it is **impossible**: declaring 18.0 pt where the line box is
-  18.35 cannot be honoured by any value of the declaration. No run needs to try it again.
-
-## The unblock this names
-
-The two blockers lay 19.10 pt on an 18.40 pt source pitch. `19.10 - 0.75 = 18.35 = 1.15 x 15.96`, so
-those cells carry ~16 pt text declared at 18.0 pt: Google floors every such row at 18.35 and the
-+0.70 pt/row excess is that floor, to two decimals. The engine charges its page budget the *declared*
-height, so it never budgeted the 14.7 pt those 21 rows really take - which is exactly why charging the
-spacer at its true value overflowed those two pages. **Charge the flow `max(declared, 1.15 x w:sz)` at
-`DocxWriter.java:6233-6236` and the engine's page model equals Google's**, and the spacer's measured 6
-documents can land without exposing an overflow.
-
-That is the next build and it was not attempted: the probe plus the slot's own forensics spent the
-window. It is one two-line change and one measured round trip on `mobile-bill`.
-
-## Why `18_displacement`
-
-`classpick.py` suggested it and the suggestion was audited rather than taken. Its 38.7 is fractional
-credit across 124 documents; the honest count is **16 documents failing it alone**, and no other check
-is a sole failure for more than 2. Those 16 are the entire distance from 23 clean to 39, and the
-construct that reaches 6 of them is already measured in Google - blocked only on the arithmetic above.
-
-## Cost
-
-One probe document, four Drive calls, about four minutes, deleted after scoring; `KavoPDF-Verify` empty.

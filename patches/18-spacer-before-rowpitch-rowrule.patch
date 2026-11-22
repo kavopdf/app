@@ -1,0 +1,187 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4ead19de..04ab513b 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -5849,7 +5849,7 @@ public final class DocxWriter {
+             // 23_timetable_grid_txtpos' whole grid that far above the page. Measured: every line
+             // of its header sat at dy -17.3.
+             if (extraAbs >= 2f) {
+-                spacerTw = (int) Math.min(2880L, Math.round(extraAbs * TWIPS_PER_PT));
++                spacerTw = (int) Math.min(4320L, Math.round(extraAbs * TWIPS_PER_PT));
+             }
+         } else if (!ctx.newPage && !ctx.lastWasTable && ctx.lastBaseline >= 0f && t.top > ctx.lastBaseline) {
+             float prevLine = Math.max(4f, ctx.lastSize * LINE_FACTOR);
+@@ -5863,15 +5863,29 @@ public final class DocxWriter {
+             // and a bit, the difference is the substitute face's line box, not white space,
+             // and charging it moved the table further down than the page had it.
+             if (extra >= prevLine * 1.2f) {
+-                spacerTw = (int) Math.min(2880L, Math.round(extra * TWIPS_PER_PT));
++                spacerTw = (int) Math.min(4320L, Math.round(extra * TWIPS_PER_PT));
+             }
+         }
+         if (spacerTw > 0) {
+             spacerTw = twScale(spacerTw, ctx.squeeze);
++            // THE GAP GOES IN w:before, NOT w:line, AND THIS IS MEASURED IN GOOGLE.
++            //
++            // Google does not read `w:line ... lineRule="exact"` as a length. On a 1 pt mark
++            // (sz=2) it charges about 0.22 of the written twips: 68_journal asked for 144 pt and
++            // the page moved 114 pt short of it. Three real documents and one isolated probe
++            // agree, with a dose-response (loss/written 0.79, 0.77, 0.40). `w:before` is the one
++            // vertical length Google honours exactly, so the gap moves there and the line box is
++            // cut to a hairline. ctx.flowTw already carries spacerTw, so the engine's page
++            // height and every page break are unchanged by this - only the render moves.
++            //
++            // The cap is 4320 twips (216 pt), not 2880: five documents in the corpus draw a gap
++            // over 144 pt (330_cad_drawing_sheet 178.05, the two account-opening forms 166.00,
++            // 360_restaurant_menu 157.95, 68_journal 148.00) and the old cap truncated 68_journal
++            // by 4.05 pt, which was the last thing keeping it off 42/42.
+             sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+-                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
++                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
+                     .append(spacerTw)
+-                    .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
++                    .append("\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+             ctx.flowTw += spacerTw;
+             // The spacer is a line of its own: the table now starts at the flow's position
+             // after it, which is the y the page drew the table's top at.
+@@ -6128,11 +6142,25 @@ public final class DocxWriter {
+             List<String> row = t.rows.get(r);
+             // This row's own pitch. A ruled table's rule lies inside the row's box, so it comes
+             // off here exactly as it comes off the average above.
++            // THE ROW'S PITCH IS THE PAGE'S PITCH, AND rowEdge IS NOT IT.
++            //
++            // rowEdge holds the row SEPARATORS the model detected, and they arrive snapped to
++            // whole points: on mobile-bill the page draws every row 18.40 pt apart and rowEdge
++            // alternates 18.0 / 19.0, so w:trHeight went out as 360 / 380 and Google laid every
++            // row at 19.0 where the page drew 18.4. Twenty-four rows of that is +11.4 pt, which
++            // is what pushed the table off the bottom of a page that was already full.
++            //
++            // rowTw is the same pitch measured the other way - the table's own extent divided by
++            // its row count - and on that table it is 368 twips, exact. Where a row's own pitch
++            // agrees with that average to within a point, the difference is the snapping and not
++            // the page: take the average. Where it does not - a tall header, a merged cell, a
++            // wrapped value - the row really is a different height and keeps its own pitch.
+             int rowTwHere = rowTw;
+             if (exactRows) {
+                 float pitchPt = rowEdge[r + 1] - rowEdge[r];
+                 if (pitchPt > 0.5f && pitchPt < 2000f) {
+-                    rowTwHere = (int) Math.round(pitchPt * TWIPS_PER_PT);
++                    int ownTw = (int) Math.round(pitchPt * TWIPS_PER_PT);
++                    rowTwHere = (rowTw > 0 && Math.abs(ownTw - rowTw) <= 20) ? rowTw : ownTw;
+                 }
+             }
+             // The row that straddles the paper's bottom edge is cut at it, so the table ends
+@@ -6225,7 +6253,26 @@ public final class DocxWriter {
+             // the scaled row is held at it.
+             int typeFloorTw = rowLineTw;
+             if (rowCapTw > 0) rowLineTw = Math.min(rowLineTw, Math.max(1, rowCapTw - ruleTwHere));
++            // GOOGLE CHARGES THE ROW'S RULE ON TOP OF w:trHeight, NOT INSIDE IT.
++            //
++            // Measured this slot with a controlled probe: the same table written three times in
++            // one document, trHeight 368 / 358 / 348 twips, rendered in Google and the rule
++            // positions read off the export. The rows laid out 19.73 / 19.04 / 18.35 pt - so
++            // every row is the declared height PLUS about one rule, and on mobile-bill's 26 rows
++            // that surplus is what pushed a page that was already full onto a second sheet.
++            //
++            // ruleTwHere is half of that rule (half lies in the row above, half in this one), so
++            // the row's own box is the pitch less the whole of it. Written as a floor, so a row
++            // can never be shortened past its own content - rowLineTw still holds the type size.
++            int rowRuleOutTw = rowTwHere > 0 ? 2 * ruleTwHere : 0;
+             int rowHeightTw = Math.max(rowTwHere, rowLineTw);
++            if (rowRuleOutTw > 0 && rowTwHere > rowRuleOutTw) {
++                // The floor is NOT rowLineTw: the cell's own w:line already carries the pitch
++                // less one rule, and holding trHeight at that is what kept the row at 19.04 pt
++                // instead of the page's 18.4. w:trHeight is a FLOOR - a row whose content needs
++                // more than this still grows to its content, so lowering it cannot clip.
++                rowHeightTw = Math.max(1, rowTwHere - rowRuleOutTw);
++            }
+             if (ctx.squeeze != 1f) {
+                 rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
+                 rowLineTw = Math.max(typeFloorTw, twScale(rowLineTw, ctx.squeeze));
+@@ -6619,7 +6666,25 @@ public final class DocxWriter {
+                                             * TWIPS_PER_PT));
+                         }
+                     }
+-                    int stackTw = before0;
++                    // ONE CELL, N LINES, ONE PITCH: the cell's advance is N*P.
++                    //
++                    // paraBeforeTw/paraBoxTw place every baseline at the page's own y, and that
++                    // placement is paid for in HEIGHT. before0 is the page's own distance from
++                    // the row's top edge to the first baseline, less LINE_BASE of the first box
++                    // - 0.2 of a pitch when the page draws its cell text at the foot of the
++                    // line - and paraBeforeTw hands back 0.2 of the PREVIOUS box on every line
++                    // below the first. A cell of two lines drawn 9.2 pt apart therefore
++                    // occupies 2 * 9.2 + 1.84 = 20.24 pt where the page drew 18.4, and because
++                    // w:trHeight is "atLeast" the row grows to that content and the surplus
++                    // accumulates down the page.
++                    //
++                    // Where every line of the cell is drawn at ONE pitch, that pitch is the
++                    // whole of the answer: before=0, line=P, exact, N times, is N*P and nothing
++                    // else. cellPitchTw returns 0 for a cell whose lines are not uniform - a
++                    // headline over body text, a paragraph gap, a size change - and those keep
++                    // the placement below unchanged.
++                    int pitchTw = cellPitchTw(cps);
++                    int stackTw = pitchTw > 0 ? 0 : before0;
+                     // TOP-ALIGNED, because every line in this cell is placed at an ABSOLUTE y:
+                     // w:before carries the page's own distance from the row's top edge. A cell
+                     // that is centred instead is a cell whose content is shifted by half the
+@@ -6632,8 +6697,9 @@ public final class DocxWriter {
+                         // THE LINE ADVANCE IS THE BOX, and it is the page's own leading: a
+                         // cell's paragraphs are the lines the page drew, so the distance to the
+                         // next one IS the advance. w:before then carries only a paragraph gap.
+-                        int boxTw = paraBoxTw(cps, q, rowLineTw);
+-                        int beforeTw = q == 0 ? before0 : paraBeforeTw(cps, q, rowLineTw);
++                        int boxTw = pitchTw > 0 ? pitchTw : paraBoxTw(cps, q, rowLineTw);
++                        int beforeTw = pitchTw > 0 ? 0
++                                : q == 0 ? before0 : paraBeforeTw(cps, q, rowLineTw);
+                         stackTw += (q == 0 ? 0 : beforeTw) + boxTw;
+                         int pInset = Float.isNaN(cp.indentPt) ? insetTw
+                                 : (int) Math.max(0L, Math.round(cp.indentPt * TWIPS_PER_PT));
+@@ -6905,11 +6971,47 @@ public final class DocxWriter {
+         return (int) Math.max(0L, want);
+     }
+ 
++    /**
++     * The pitch a cell's paragraphs are drawn at, in twips, when they are all drawn at ONE.
++     *
++     * <p>Returns 0 - "no single pitch, keep the per-paragraph placement" - unless every step is
++     * a LINE: positive, and no larger than 1.4 em of the type, which is the same test
++     * {@link #paraBoxTw} uses to tell a line from a paragraph gap. The step must also be the
++     * same to the twip between every pair of baselines, and the type size must not change
++     * through the cell; a 15 pt headline over 8.4 pt body text is not uniform and is not
++     * touched.
++     *
++     * <p>The step is measured between BASELINES, because that is what the page drew: the value
++     * returned is the page's own leading, not the substitute face's line box.
++     */
++    private static int cellPitchTw(java.util.List<PdfToWord.Table.CellPara> cps) {
++        int n = cps.size();
++        if (n < 2) return 0;
++        float sz0 = cps.get(0).size;
++        if (sz0 <= 0f) return 0;
++        int pitch = -1;
++        for (int q = 0; q + 1 < n; q++) {
++            PdfToWord.Table.CellPara cp = cps.get(q);
++            if (cp.size <= 0f || Math.abs(cp.size - sz0) > 0.05f) return 0;
++            float dy = cps.get(q + 1).baseY - cp.baseY;
++            if (!(dy > 0f) || dy > 1.4f * sz0) return 0;
++            int tw = (int) Math.max(1L, Math.round(dy * TWIPS_PER_PT));
++            if (pitch < 0) pitch = tw;
++            else if (Math.abs(tw - pitch) > 1) return 0;
++        }
++        return pitch > 0 ? pitch : 0;
++    }
++
+     /** What a paragraph-carrying cell occupies, in twips: its first line's placement plus every line. */
+     private static int cellParasTw(PdfToWord.Table t, int r, int c, float rowTopPagePt,
+                                    int rowLineTw) {
+         java.util.List<PdfToWord.Table.CellPara> cps = t.parasAt(r, c);
+         if (cps.size() < 2) return 0;
++        // ONE PITCH, N LINES: the cell emits N paragraphs of P, so what it occupies is N*P.
++        // Read off the same helper as the emission, so the row's declared floor and the
++        // paragraphs inside it cannot disagree.
++        int pitchTw = cellPitchTw(cps);
++        if (pitchTw > 0) return pitchTw * cps.size();
+         int box0 = paraBoxTw(cps, 0, rowLineTw);
+         int total = box0;
+         float first = cps.get(0).baseY;
