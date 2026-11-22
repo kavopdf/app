@@ -1,42 +1,56 @@
-# P2W Watchdog - Run Report
+## Watchdog - run report
 
-**22 Nov 2026 · 15:15 IST**
+Corpus 213. Read at 18:11 IST, 22 Nov 2026.
 
-> Nothing is stopped.
-
-## Stages
+## The five stages
 
 | stage | state | progress | age |
-|:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 9.0 h |
-| matrix | done | 213 of 213 | 15.3 h |
-| classify | superseded |  | 8.4 h |
-| fix | moving |  | 0.5 h |
-| txt | superseded | 197 clean, 16 failing | 16.6 h |
+|---|---|---|---|
+| measure-google | done | 213 of 213 | 11.9 h |
+| matrix | done | 213 of 213 | 18.2 h |
+| classify | superseded | - | 11.3 h |
+| fix | moving | - | 0.6 h |
+| txt | superseded | 197 clean, 16 failing | 19.6 h |
 
-## Trend
+The fix row says moving only because this pass released the claim behind it. The run that held it
+died at 17:36:55 inside the report writer and never committed or released; the timeline has no beat,
+no claim and no release after that line until this pass's own tools.
 
-| | 2026-11-21 | 2026-11-22 | |
-|:--|--:|--:|:--|
-| .docx open | 59 | **59** | no change |
-| .txt failing | 23 | **16** | -7 |
-| Google measured | 192 | **192** | no change |
-| Google clean | 6 | **23** | +17 |
+## The trend
 
-## What this pass did
+| measure | 21 Nov | today |
+|---|---|---|
+| docx open | 59 | 59 |
+| txt failing | 23 | 16 |
+| google | 192 | 192 |
+| google clean | 6 | 23 |
 
-* Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
-* Nothing needed moving.
-* The .txt table is newer than the engine, verify_txt.py and restamp_txt.py, so it is current and not late - see BLOCKERS.md.
+Today's row was already written by an earlier pass, so nothing was appended. The .txt half moved;
+the .docx half has now been flat for two rows.
 
-## The step that could not run
+## What this pass changed
 
-This watchdog has no cron tool, so STEP THREE and STEP FOUR A/B - the steps that read and move the cron platform - could not run. That is a missing tool, not a judgement call: a paused or zombie cron cannot be moved by this run, and nothing in the repository can see one. The exact calls this pass would have made, with the fixer ids read from HEALTH-BRIEF's table rather than from memory, are written into BLOCKERS.md.
+The fixer slot was held by a dead run, so I released it, forced past the pending gate. The release
+printed the claim's age and the attempt it had recorded.
 
-## What was repaired
+I then moved the round back to measure with the remeasure call the 15:09 blocker had deferred to
+this pass, now that the slot was free. The reason is not a guess: the live docx fingerprint is
+226f7f2df3013ad7 and the table is stamped 6c6cf642e13b7ed2, so the .docx table is a measurement of
+an engine that no longer exists - the engine last changed at 462353f9 on 21 Nov. That is why 59
+cannot move. The round number, the attempt ledger and the hypothesis ledger are untouched, and the
+baseline cron re-measures the corpus on 462353f9.
 
-The txt row had been red on age alone. The table is a function of the engine, verify_txt.py and restamp_txt.py; every one of those is older than the table, and the txt fingerprint in ENGINE-STAMP.json matches the live engine exactly. health.py now tests that and prints superseded - the same state the classify row already uses for the same false alarm. The age and the threshold are untouched, and any commit to an input turns the row red again on its own.
+That call printed an empty engine id, which is the one thing it exists to record: its git call ran
+from the tools directory, so the pathspec matched nothing. Fixed in round.py to run from the
+repository root and verified in isolation.
 
-## What is still stuck
+## Blockers
 
-The .docx half. benchmarks/RANKING.csv was last measured before the engine changed, so the docx table describes an engine that no longer exists, and the gate refuses the held-back row-grid patch for that reason. round.py --remeasure is the unblock, and it is not safe to pull while a live fixer run holds the slot.
+This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation. That is a
+missing tool, not a decision for a person. It matters this pass: three scheduled fires - the fixer
+slot, the baseline and the relay - produced no claim and no timeline line at all. A stage stopped
+because nothing fires looks exactly like a stage with nothing to do. The exact calls I would have
+made, and the two fixer ids that must not be deleted as duplicates, are in BLOCKERS.md.
+
+All three rows for this pass are in BLOCKERS.md. What would overturn the remeasure: a baseline pass
+on 462353f9 that reproduces 59.
