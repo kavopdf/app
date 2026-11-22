@@ -19,18 +19,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 08:28 |
+| started | 08:56 |
 | ended | still running |
 | how it ended | - |
-| plan | 18_displacement: do NOT rebuild the table-top spacer (measured 22 Nov, 1 of 16 moved, refuted - see SETTLED.md and FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md); the sixteen are a uniform 0.96-1.44 pt page offset, one constant, test it against the 0.0565 em page-top and 0.92 em cell-baseline constants in REMAINING-DEFECTS.md; 71_invoice_space_aligned_no_rules (26.88, no spacer) is a separate question |
+| plan | - |
 
 ## The picture, in the words of the run that left it
 
-> The page-top gap is settled in both directions: the trHeight row is refuted (bs5 37->33/42, 5->6 pages, a page emptied, matched runs 585->220) and w:pgMar w:top is proven (bs5 37->40/42, page count held at 5, dy -59.5->-4.3 on pages 1-4, 27_text_off_page/44_header_footer/59_shape_anchor all recovered, nothing new failing). Numbers in FINDINGS/18_displacement-page-top-gap-sectmargin-PROVEN-075600-f1x.md. The 06:18->07:14 gap of 55.2 min is two missed fires, recorded in BLOCKERS.md - if the next claim is again more than 45 min out with nothing in the timeline between, the crons are the fault and not the runs.
+> 18_displacement's table spacer is CONFIRMED as the cause and is one build from landing, blocked by one measured second construct. Google charges a w:line lineRule=exact spacer on a 1 pt mark at 0.22x its written twips, so 68_journal's 144 pt spacer put every run below it at dy -114.28 and 73_marksheet's 16.7 pt spacer at -12.85; documents with no spacer are unaffected (+1.06). Writing the gap as w:before instead made 6 of the 16 solo-18 documents 42/42 in Google (16_right_aligned, 22_invoice, 29_dot_leaders, 41_coloured, 68_journal, 73_marksheet), but insurance-policy-schedule and mobile-bill went 41/42 -> 38/42 with 2 pages and lost content, so the change was reverted rather than landed. Cause of those two, measured: Google renders w:trHeight hRule=atLeast rows at 19.10 pt against an 18.40 pt source pitch (+0.70 pt/row, 14.7-15.4 pt per table). The 0.22x spacer charge was accidentally absorbing that excess; charging the spacer at its true value exposes it and the two 3-spacer full pages overflow. Both constructs must land together.
 
 ## What the next run should do first
 
-> Before building anything for 18_displacement, read which clause of the check fired: verify_google.py --json on one of 22_invoice_four_columns_txtpos / 41_coloured_headings_white_bg / 73_marksheet_subject_marks_grade / 16_right_aligned_amounts_txtpos / 29_dot_leaders_txtpos / 72_bank_statement_no_rules_right_amounts. All six have max_pt 1.44-2.40 and share5 0.00, under the check's 1.5 pt tolerance floor, so they can only be failing through 'if not ds' - upright text with no matched run - which is run matching or reading order, not vertical position. That test needs no build and decides whether the class is real. Do not rebuild the table-top spacer and do not believe the -114.8 pt figure: both refuted in SETTLED.md (68_journal max_pt is 8.64, and the w:before build moved 1 of 16 by 0.85). Do not read median_pt 0.96 as an offset either - it is the floor of the instrument (p2w.py filters the integer EDT to d>1). 71_invoice_space_aligned_no_rules (share@5 26.88, median_pt 3.84, no spacer) is genuinely displaced and a separate question. Also settled: screen.py was measuring NOTHING on a fresh pod (ENGINE_SRC frozen at import) - fixed; a screen reporting '0 of N measured' is a tool failure, not evidence.
+> Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured this slot (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866); only 68_journal reaches it and its real gap is 2961 twips. Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. Then COUNT the blast radius before committing: the spacer change touches every corpus document with a table spacer and only the 16 that fail 18 were measured; render the currently-clean ones that have one. Do NOT screen this class with screen.py - it renders in soffice, which honours w:line as a length and cannot see either state.
 
 ## Agents deployed and not yet accounted for
 
@@ -102,7 +102,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:49` attempt 14 on 32_stroke_lines -> lead
 - `04:49` agent deployed: 32_stroke_lines / A - can the emitter tell its drawing anchor is inside a w:tc, and is the prescribed 
 - `04:49` agent deployed: 32_stroke_lines / B - is the 54-document carrier regression cell nesting or body-flow page overflow
 - `04:49` agent landed: 32_stroke_lines / A -> FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md
@@ -127,6 +126,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `08:31` agent landed: 18_displacement / A -> FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md
 - `08:31` agent deployed: 18_displacement / B - what places a page's first baseline, and is median_pt 0.96 a real offset
 - `08:31` agent landed: 18_displacement / B -> FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md
+- `09:19` attempt 9 on 18_displacement -> lead (6/16 moved)
 
 ## Where the rest of the state lives
 
