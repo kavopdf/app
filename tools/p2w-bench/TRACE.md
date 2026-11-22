@@ -6,20 +6,6 @@
 | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 09:30 | fixer | build-engine | started |
-
-| 20 Nov 18:42 | fixer | build-engine | engine built in 44s |
-| 20 Nov 18:44 | fixer | build-engine | started |
-| 20 Nov 18:45 | fixer | build-engine | engine built in 55s |
-| 20 Nov 19:24 | fixer | attempt | t13_amount_columns -> kept (1/? moved) |
-| 20 Nov 19:27 | fixer | attempt | t12_word_invention -> reverted (0/12 moved) |
-| 20 Nov 19:29 | fixer | attempt | t12_word_invention -> reverted (0/12 moved) |
-| 20 Nov 19:33 | fixer | attempt | t08_line_order -> reverted (0/10 moved) |
-| 20 Nov 19:33 | fixer | attempt | t08_line_order -> reverted (0/10 moved) |
-| 20 Nov 20:01 | fixer | claim | fixer claimed the slot |
-| 20 Nov 20:01 | fixer | stale-claim | fixer slot was stale (27 min) - the previous run ended without releasing it |
-| 20 Nov 20:28 | fixer | attempt | 47_margins -> reverted (0/14 moved) |
-| 20 Nov 20:33 | fixer | build-engine | started |
-| 20 Nov 20:34 | fixer | build-engine | engine built in 48s |
 | 20 Nov 20:39 | fixer | build-engine | started |
 | 20 Nov 20:40 | fixer | build-engine | engine built in 52s |
 | 20 Nov 20:44 | fixer | attempt | 47_margins -> reverted (0/14 moved) |
@@ -418,3 +404,5 @@
 | 22 Nov 23:21 | fixer | build-engine | engine built in 36s |
 | 22 Nov 23:25 | fixer | build-engine | started |
 | 22 Nov 23:26 | fixer | build-engine | engine built in 39s |
+| 23 Nov 00:37 | fixer | build-engine | started |
+| 23 Nov 00:38 | fixer | build-engine | engine built in 39s |

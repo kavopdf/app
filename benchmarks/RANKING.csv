@@ -211,3 +211,4 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 210,414_transparency_softmask,clean,none,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,100.0,0,1,1,,0,96.76,100.00,100.00
 211,415_inline_images,clean,none,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,100.0,0,1,1,,0,99.71,100.00,100.00
 212,412_page_labels_roman,clean,none,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,100.0,0,1,5,,0,91.71,100.00,100.00
+213,416_many_tiny_pages,exempt,exempt,,,,,,,,,,,,300,,,,,
