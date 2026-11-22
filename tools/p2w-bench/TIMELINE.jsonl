@@ -2685,3 +2685,19 @@
 {"t": 1795341790.9671626, "ist": "15:33:10", "ev": "beat", "d": "relay: corpus measure pass 2"}
 {"t": 1795342152.4325902, "ist": "15:39:12", "ev": "beat", "d": "relay: google-verifying patched output on 2 class docs"}
 {"t": 1795342217.421642, "ist": "15:40:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795342219.920373, "ist": "15:40:19", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795342220.0722165, "ist": "15:40:20", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795342220.2391567, "ist": "15:40:20", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795342223.8515716, "ist": "15:40:23", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342246.5603886, "ist": "15:40:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342247.2289855, "ist": "15:40:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342247.6108468, "ist": "15:40:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342250.6484041, "ist": "15:40:50", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342254.5980015, "ist": "15:40:54", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342263.2865894, "ist": "15:41:03", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342263.985089, "ist": "15:41:03", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342264.3880525, "ist": "15:41:04", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342269.6136413, "ist": "15:41:09", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342270.4502656, "ist": "15:41:10", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342271.1943917, "ist": "15:41:11", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342271.5811179, "ist": "15:41:11", "ev": "beat", "d": "report.py: building the report"}

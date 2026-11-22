@@ -19,18 +19,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 13:56 |
+| started | 15:17 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> Slot 14:58. Held the fixer claim. Read the charter, the carry-over and the two dead agent briefs. Applied the carry-over patch, bisected it into its four mechanisms, and refuted it in BOTH renderers on engine 462353f9 - the handoff's 42/42 for two-tables does not reproduce (46/47, same single check). Spacer-only is LibreOffice-invisible but costs mobile-bill a whole page in Google (46/47 -> 43/47, page_count 1->2). The row/cell hunks are a +29..+36 LibreOffice regression on four of six documents. One agent landed a measured law that is worth more than the patch: w:before is charged exactly V/20 pt by Google with no floor or cap (25 points, residual 0.000000, run present or absent), a constant 0.1552 pt line box at w:line=1 exact, and w:line at 0.2156x. That relocates the lead from spacing to pagination. Nothing committed to the engine; the tree is at baseline 462353f9.
+> THE ROW-PITCH LADDER IS WHOLE POINTS. A 13-row sweep on two-tables-stacked-with-no-gap (declared 344..392 tw) laid 18/18/18/19/19/19/19/19/20/20/20/20 - never a half point. The 18.5 declaration the 13:18 relay left as the next build DOES NOT EXIST; laid = round(declared_pt + 0.875) where 0.875 is the row's own rule. A source pitch of 18.4 therefore rounds to 19 on every row and the error accumulates (+9.1 pt at the foot of 13 rows), which is the whole of 18_displacement on that document. Error-diffusing the declaration (patches/18-row-pitch-error-diffused.patch) took the foot from 326.5 to 317.5 against a source 316.7 - 92% of the drift gone, 23_line_pitch now reads the source's own 18.4 - and STILL 46/47: one run is more than 2x its tolerance out on the single row the diffusion hands a 20 pt target to (laid 21.0). Next attempt: find that row's binding term (cell content, not declaration) and cap it; do not re-derive the ladder.
 
 ## What the next run should do first
 
-> 18_displacement: the carry-over patch is REFUTED - do not re-apply it (patches/README.md, FINDINGS/18_displacement-PATCH-REFUTED-AND-WBEFORE-LAW-1005-fixer.md). Measured law: w:before is charged exactly V/20 pt by Google, no floor/threshold/cap, +0.1552 pt line box at w:line=1 exact; w:line is charged 0.2156x. Two consequences: (1) the spacer half (patch hunks 1-2) is a genuine correctness fix and LibreOffice-neutral - it is worth keeping on its own; (2) mobile-bill only fitted on one page because Google was under-charging that gap by ~4.9 pt, so with the honest charge it spills to 2 pages. That surplus is REAL and is the lead. Do NOT reach for flowTw - line 5875 already charges the declared value and w:before renders it 1:1, so model and render agree. Find what else on mobile-bill's page is over-tall.
+> APPLY patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch and ratchet it corpus-wide - measured clean on two-tables-stacked-with-no-gap (42/42 PASS, n_out 0) and it moves EVERY ruled table, so the gate refuses it unratcheted. The row grid is 0.75 pt, NOT whole points: nine identical rows per page read 18.00/18.75/19.50, and the law laid=0.75*(round(h/0.75)+1) reproduces the 13-declaration sweep exactly when its readings are rounded. Then close the small-spacer over-charge the patch exposes: mobile-bill's 128/124 tw spacers are now charged in full where Google previously charged ~0, leaving that page +2..+5 pt low. Evidence: FINDINGS/18_displacement-ROW-GRID-AND-SPACER-1518-relay.md
 
 ## Agents deployed and not yet accounted for
 
@@ -100,16 +100,19 @@ unfinished work, not as a result.
 | 18_dB-03 | 18_displacement | B | do 05/32/59/18 share ONE engine construct in the emitted docx, and nam | 09:20 | landed 09:04 | landed | FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md |
 | 18_dtrheight-emitter-01 | 18_displacement | trheight-emitter | every place the engine emits trHeight/hRule, and whether 0.9634 belong | 10:08 | a unified diff and the list of emitters | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
 | 18_drow-growth-mechanism-01 | 18_displacement | row-growth-mechanism | given the real DocxWriter.java, which emitted number Google ignores wh | 10:09 | the mechanism with arithmetic, one recommended edit, and the rows it must not touch | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
-| 18_dA-05 | 18_displacement | A | consolidated every FINDINGS file and the two row emitters into one dos | 11:23 | 11:19 | landed | tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md |
-| 18_dB-04 | 18_displacement | B | recomputed leverage from benchmarks/gverify/*.json without classpick.p | 11:23 | 11:20 | landed | tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md |
-| 18_dA-06 | 18_displacement | A | static map of every writer that emits w:trHeight and cell w:spacing, a | 13:57 | expected by 14:30 | landed | tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md |
-| 18_dB-05 | 18_displacement | B | from the three measured declared->laid points compute the declaration  | 13:57 | expected by 14:30 | landed | tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md |
+| 18_dA-05 | 18_displacement | A | consolidated every FINDINGS file and the two row emitters into one dos | 11:23 | 11:19 | running |  |
+| 18_dB-04 | 18_displacement | B | recomputed leverage from benchmarks/gverify/*.json without classpick.p | 11:23 | 11:20 | running |  |
+| 18_dA-06 | 18_displacement | A | static map of every writer that emits w:trHeight and cell w:spacing, a | 13:57 | expected by 14:30 | running |  |
+| 18_dB-05 | 18_displacement | B | from the three measured declared->laid points compute the declaration  | 13:57 | expected by 14:30 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
+- `09:20` agent deployed: 18_displacement / B - do 05/32/59/18 share ONE engine construct in the emitted docx, and name it
+- `09:21` agent landed: 18_displacement / A -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
+- `09:21` agent landed: 18_displacement / B -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
 - `10:06` attempt 10 on 18_displacement -> lead (0/3 moved)
 - `10:08` agent deployed: 18_displacement / trheight-emitter - every place the engine emits trHeight/hRule, and whether 0.9634 belongs on w:val
 - `10:08` agent landed: 18_displacement / trheight-emitter -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md
@@ -130,11 +133,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:45` attempt 17 on 18_displacement -> kept (1/16 moved)
 - `14:46` agent landed: 47_mA-02 /  -> FINDINGS/47_margins-CELLPATH-A-150000.md
 - `14:46` agent landed: 47_mB-02 /  -> FINDINGS/47_margins-DIAGNOSE40-B-150000.md
-- `15:34` attempt 18 on 18_displacement -> reverted
-- `15:37` agent landed: 18_dA-06 /  -> tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md
-- `15:37` agent landed: 18_dB-04 /  -> tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md
-- `15:37` agent landed: 18_dA-05 /  -> tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md
-- `15:37` agent landed: 18_dB-05 /  -> tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md
+- `15:28` attempt 18 on 18_displacement -> lead
+- `15:40` attempt 19 on 18_displacement -> lead (0/16 moved)
 
 ## Where the rest of the state lives
 

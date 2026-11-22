@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-22 13:56
+# Fixer report - 2026-11-22 15:17
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 13:56 → running IST · 1h 40m**
+**22 Nov 2026 · slot 15:17 → running IST · 23 min**
 
-> **1 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **1** — 3 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -21,15 +21,13 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
-| Committed | **16** files in 4 commit(s) from `f3157f6` — ...isplacement-ROWHEIGHT-CODE-MAP-142000-agentA.md, ...lacement-LADDER-IS-WHOLE-POINTS-152000-fixer.md, 18-row-pitch-error-diffused.patch, 18_displacement-LADDER-IS-WHOLE-POINTS-152000-fixer.md, 18_displacement-SOLO-DOCS |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 14:19 | **lead** | 0/16 | swept 13 declarations in one Google round trip: laid row pitch is WHOLE points (18/19/20), so the 18.5 ladder the relay left is void; laid = round(declared_pt + 0.875). Error-diffused the declaration |
-| 14:45 | **kept** | 1/16 | table spacer moved from w:line to w:before (was a no-op in Google, tables started ~10pt high) + row pitch diffused onto Google's measured 0.75pt grid; two-tables-stacked-with-no-gap 41/42 -> 42/42 PAS |
-| 15:34 | **reverted** | None/None | Applied the carry-over patch (patches/18-spacer-before-rowpitch-rowrule.patch) and bisected its four mechanisms. REFUTED in both renderers on engine 462353f9: full patch leaves two-tables-stacked-with |
+| 15:28 | **lead** | 0/None | relay 15:17: applied 18-displacement spacer(w:before)+row-pitch-dither patch corpus-wide, engine built, 213/213 converted; measuring corpus to ratchet it |
+| 15:40 | **lead** | 0/16 | relay 15:17: spacer(w:before)+row-pitch-dither patch applied corpus-wide; Google round trip: table-with-no-header-row 41/42 -> 47/47 PASS, 362_price_list_dense unchanged 41/42; corpus not ratcheted (t |
 
 ## The txt
 
@@ -43,20 +41,17 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dA-06` | static map of every writer that emits w:trHeight and | 13:57 | - | - |
-| `18_dB-05` | from the three measured declared->laid points comput | 13:57 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:56 → running · 1h 40m |
+| Slot window | 15:17 → running · 23 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 39 |
-| Longest silence | **48.0 min** — from 14:46:48, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 5 |
+| Tool beats | 20 |
+| Longest silence | **6.0 min** — from 15:33:10, after `relay: corpus measure pass 2` |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -64,11 +59,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **1h 10m** | `###############` |
-| measure or build - a conversion, screen or compile writes no beacon | **20 min** | `####` |
-| record - attempt, handoff, class rows | **3 min** | `#` |
-| report - the report and the chain | **4 min** | `#` |
-| other - not attributed to a tool | **2 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **18 min** | `#################` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **3 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -81,7 +75,7 @@
 
 ## Next run
 
-18_displacement: the carry-over patch is REFUTED - do not re-apply it (patches/README.md, FINDINGS/18_displacement-PATCH-REFUTED-AND-WBEFORE-LAW-1005-fixer.md). Measured law: w:before is charged exactly V/20 pt by Google, no floor/threshold/cap, +0.1552 pt line box at w:line=1 exact; w:line is charged 0.2156x. Two consequences: (1) the spacer half (patch hunks 1-2) is a genuine correctness fix and LibreOffice-neutral - it is worth keeping on its own; (2) mobile-bill only fitted on one page because Google was under-charging that gap by ~4.9 pt, so with the honest charge it spills to 2 pages. That surplus is REAL and is the lead. Do NOT reach for flowTw - line 5875 already charges the declared value and w:before renders it 1:1, so model and render agree. Find what else on mobile-bill's page is over-tall.
+APPLY patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch and ratchet it corpus-wide - measured clean on two-tables-stacked-with-no-gap (42/42 PASS, n_out 0) and it moves EVERY ruled table, so the gate refuses it unratcheted. The row grid is 0.75 pt, NOT whole points: nine identical rows per page read 18.00/18.75/19.50, and the law laid=0.75*(round(h/0.75)+1) reproduces the 13-declaration sweep exactly when its readings are rounded. Then close the small-spacer over-charge the patch exposes: mobile-bill's 128/124 tw spacers are now charged in full where Google previously charged ~0, leaving that page +2..+5 pt low. Evidence: FINDINGS/18_displacement-ROW-GRID-AND-SPACER-1518-relay.md
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

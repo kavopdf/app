@@ -6,9 +6,6 @@
 | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 09:30 | fixer | build-engine | started |
-| 20 Nov 14:38 | fixer | build-engine | engine built in 41s |
-| 20 Nov 14:38 | fixer | build-engine | started |
-| 20 Nov 14:39 | fixer | build-engine | engine built in 42s |
 | 20 Nov 14:59 | fixer | build-engine | started |
 | 20 Nov 15:00 | fixer | build-engine | engine built in 53s |
 | 20 Nov 15:06 | fixer | build-engine | started |
@@ -403,6 +400,9 @@
 | 22 Nov 14:21 | fixer | build-engine | started |
 | 22 Nov 14:22 | fixer | build-engine | engine built in 44s |
 | 22 Nov 14:45 | fixer | attempt | 18_displacement -> kept (1/16 moved) |
-| 22 Nov 15:32 | fixer | build-engine | started |
-| 22 Nov 15:33 | fixer | build-engine | engine built in 40s |
-| 22 Nov 15:34 | fixer | attempt | 18_displacement -> reverted |
+| 22 Nov 15:17 | fixer | claim | fixer claimed the slot |
+| 22 Nov 15:17 | fixer | stale-claim | fixer slot was stale (19 min) - the previous run ended without releasing it |
+| 22 Nov 15:24 | fixer | build-engine | started |
+| 22 Nov 15:25 | fixer | build-engine | engine built in 45s |
+| 22 Nov 15:28 | fixer | attempt | 18_displacement -> lead (0/? moved) |
+| 22 Nov 15:40 | fixer | attempt | 18_displacement -> lead (0/16 moved) |

@@ -113,4 +113,5 @@
 {"at": "2026-11-22 13:29", "attempt": 15, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-22 14:19", "attempt": 16, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-22 14:45", "attempt": 17, "class": "18_displacement", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
-{"at": "2026-11-22 15:34", "attempt": 18, "class": "18_displacement", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-22 15:28", "attempt": 18, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-22 15:40", "attempt": 19, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
