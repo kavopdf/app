@@ -19,7 +19,7 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 15:55 |
+| started | 17:12 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
@@ -110,7 +110,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `09:21` agent landed: 18_displacement / A -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
 - `09:21` agent landed: 18_displacement / B -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
 - `10:06` attempt 10 on 18_displacement -> lead (0/3 moved)
 - `10:08` agent deployed: 18_displacement / trheight-emitter - every place the engine emits trHeight/hRule, and whether 0.9634 belongs on w:val
@@ -135,6 +134,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:28` attempt 18 on 18_displacement -> lead
 - `15:40` attempt 19 on 18_displacement -> lead (0/16 moved)
 - `16:36` attempt 20 on 18_displacement -> lead (0/16 moved)
+- `17:24` attempt 21 on 18_displacement -> reverted
 
 ## Where the rest of the state lives
 

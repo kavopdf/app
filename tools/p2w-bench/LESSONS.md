@@ -151,3 +151,26 @@ This is the second run in a row to pay for it - the 13:56 slot lost 48 minutes t
 
 **A fixer cron that wants a corpus pass must run it itself, in `--budget 250` calls, and budget ~35
 minutes for 213 documents (25 min convert + 10 min measure).** Delegation is for interactive turns only.
+
+## A shallow clone makes the gate refuse a clean tree. 22 Nov 17:45, relay.
+
+`git clone --depth 1` is the reflex and it breaks the instrument. `scope.py`'s fallback for a clean
+tree runs `git diff <last-engine-commit>^ <last-engine-commit>`; on a shallow clone the parent is
+absent, the diff fails, the scope comes back empty, `regress.py` goes **strict**, and the docx stamp is
+compared against a tree that a txt-only commit legitimately moved:
+
+    ENGINE CHANGED (docx): table measured on 6c6cf642e13b7ed2, the tree is 226f7f2df3013ad7
+
+Measured 22 Nov: the same tree after `git fetch --unshallow origin main` says
+`PASS - nothing got worse in the .txt only`. Nothing was wrong with main. **A run that clones shallow
+will spend its first ten minutes believing the repo carries an unmeasured engine** - and the only
+symptom is a gate message that reads exactly like a real one.
+
+## The Google-clean / proxy-worse waiver is in `regress.py`, not `ratchet.py`. 22 Nov 17:45, relay.
+
+Three slots asked for a "documented path for a change that is clean in Google and regressed in the
+proxy". `regress.py::docx_regressions()` has had it since 20 Nov: a LibreOffice regression is ALLOWED
+when `g_after < g_before` on the same document, read from `benchmarks/gverify/<doc>.json`. Tested with a
+control (`FINDINGS/18_displacement-WAIVER-EXISTS-DITHER-DOES-NOT-GENERALISE-174500-relay.md`): a proxy
+regression with no Google gain is still REFUSED. `ratchet.py` reads `BASELINE.md` and knows nothing
+about Google - it is not the gate and its refusal says nothing about what may land.

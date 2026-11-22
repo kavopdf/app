@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 15:55
+# Fixer report - 2026-11-22 17:12
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 15:55 → running IST · 40 min**
+**22 Nov 2026 · slot 17:12 → running IST · 12 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -26,7 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 16:36 | **lead** | 0/16 | dither patch measured CLEAN in Google (two-tables-stacked-with-no-gap 46/47 -> 47/47 PASS, live round trip) but regresses LibreOffice on 14 of the 16; the proxy ratchet is the blocker, not the constru |
+| 17:24 | **reverted** | 0/None | dither patch: LO mobile-bill 1.55->39.21 reproduced exactly, Google unchanged 46/47 (still fails 18_displacement). Costs the proxy, buys nothing in Google on this document. Gate's ALLOWED path needs a |
 
 ## The txt
 
@@ -46,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 15:55 → running · 40 min |
+| Slot window | 17:12 → running · 12 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 13 |
-| Longest silence | **26.2 min** — from 15:55:55, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 4 |
+| Tool beats | 10 |
+| Longest silence | **6.9 min** — from 17:17:46, after `relay: engine built with dither patch, converting 2 worst-regressed do` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -58,8 +58,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **26 min** | `##############` |
-| other - not attributed to a tool | **14 min** | `########` |
+| setup - claim, housekeeping, reading the gate | **2 min** | `#####` |
+| fix - diagnose and change the engine | **6 min** | `#############` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| other - not attributed to a tool | **1 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |

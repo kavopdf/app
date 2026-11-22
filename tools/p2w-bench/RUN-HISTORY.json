@@ -1,19 +1,5 @@
 [
  {
-  "started_ts": 1794830012.890204,
-  "started": "17:23",
-  "ended_ts": 1794832828.5943756,
-  "ended": "18:10",
-  "class": "",
-  "attempts": 0,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - hung 47 min with 0 attempts and 0 beacons; claim cleared"
- },
- {
   "started_ts": 1794887491.6388314,
   "started": "09:21",
   "ended_ts": null,
@@ -1127,6 +1113,31 @@
   "kept": 0,
   "docs_improved": 0,
   "agents": [],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795343155.425634,
+  "started": "15:55",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "18_displacement",
+  "attempts": 1,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   {
+    "id": "59QFMD824H9TCAF8VENANPSWX0",
+    "title": "Independent leverage audit",
+    "returned": "23 of 192 clean, 16 fail 18_displacement only, 38.7 is a percentage not a count"
+   },
+   {
+    "id": "3VGWXF6Z4S9J6VPPTTWSDP3M1P",
+    "title": "Spacer rule spec",
+    "returned": "engine writes the gap in w:line on a 1pt mark; w:before is the only vertical length Google honours; mobile-bill's +12.6 pt is the note's own spacers"
+   }
+  ],
   "obstacles_cleared": 0,
   "needs_human": 0,
   "ended_how": "killed - never released the slot"
