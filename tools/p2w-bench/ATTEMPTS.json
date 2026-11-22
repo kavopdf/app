@@ -42,7 +42,7 @@
   "status": "OPEN"
  },
  "18_displacement": {
-  "attempts": 6,
+  "attempts": 7,
   "first_seen": null,
   "history": [
    {
@@ -86,11 +86,18 @@
     "outcome": "lead",
     "reason": "",
     "total": 16
+   },
+   {
+    "at": "2026-11-22 07:52",
+    "moved": 5,
+    "outcome": "kept",
+    "reason": "",
+    "total": 16
    }
   ],
   "last": null,
-  "last_engine": "462353f9+567a54dbda",
-  "last_moved": 0,
+  "last_engine": "462353f9",
+  "last_moved": 5,
   "last_total": 16,
   "outcomes": [
    "reverted",
@@ -98,7 +105,8 @@
    "reverted",
    "lead",
    "lead",
-   "lead"
+   "lead",
+   "kept"
   ],
   "reason": "(no reason recorded for this attempt)",
   "reasons": [
@@ -107,6 +115,7 @@
    "Third probe, hand-edited docx (no engine change): replaced the four page-top w:before gaps in bank-statement-5-pages with 1x1 trHeight-exact table rows and zeroed the before. THE DISPLACEMENT ITSELF IS FIXED - median dy on the pages that still match went -53.8 -> +0.8 (p2) and -54.9 -> +0.6 (p4), against a tolerance of 1.5-4.5 pt. But the document now renders as TEN pages in Google instead of six, with a blank page after each: the baseline already emits a blank page 1 (words/page 257,0,245,247,228,253), and making the gap real costs 55 pt of page capacity that the flow accounting assumed was free, so every page spills. So the construct swap cannot be landed alone - the page-fill budget must be recomputed for the gap being real, which is engine work with a full corpus ratchet, not a one-line change. Confirms the probe, and rules out the naive fix.",
    "15 documents that failed {05,18,32} were re-measured through Google on HEAD: every one is now 41/42 failing 18_displacement ALONE (4 are 46/47 failing it alone). 05_chars_extra and 32_stroke_lines both pass on all 15, so 32_stroke_lines is cleared on 34 of the 35 documents re-measured this run. 18_displacement now blocks 15 documents by itself and is worth 28.7 clean documents corpus-wide - the next run should implement it, not re-measure it.",
    "page-top gap: 1x1 trHeight row REFUTED through Google (bs5 37->33/42, 5->6 pages, page emptied); w:pgMar w:top PROVEN (bs5 37->40/42, 5 pages held, dy -59.5->-4.3 on pages 1-4, 3 checks recovered); all 16 solo-18 docs are single-page with 0 page breaks, so the class is NOT the page top",
+   "",
    ""
   ],
   "requeues": 0,
