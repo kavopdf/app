@@ -259,7 +259,8 @@ def _soffice_warm():
         return
     _LO_WARMED = True
     try:
-        subprocess.run([_soffice_exe(), "--version"], timeout=90,
+        subprocess.run([_soffice_exe(), "--headless", "--norestore", "--terminate_after_init"],
+                       timeout=90,
                        stdin=subprocess.DEVNULL,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except Exception:
