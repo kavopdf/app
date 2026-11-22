@@ -19,10 +19,10 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 07:26 |
-| ended | 07:36 |
-| how it ended | forced |
-| plan | 18_displacement: do NOT take the page top for the 16 solo-18 documents - all 16 are single-page PDFs and their converted .docx carries zero page breaks, so the proven page-top construct cannot make one of them clean. Their displacement is row/line pitch inside one dense table or form: start from the -4.3 median / -12.8..+2.9 spread measured on page 1 of bank-statement-5-pages, which is the residual after the page-top fix and sits on a page that was never broken. Land the section margin (w:pgMar w:top) as a SEPARATE build on multi-page documents: DocxWriter.java:1053-1075 already emits a sectPr with nextPage, so it is that path plus beforeTw=0 in the two ctx.newPage branches (3395-3401, 4277-4283) plus the same twips out of ctx.budgetTw (1116) and out of what pageFits is asked - steps 1-2 alone double the gap in LibreOffice, step 3 is what holds the page count. Do NOT retry the 1x1 trHeight row: measured this run, it takes bank-statement-5-pages from 5 pages to 6 and 37/42 to 33/42. |
+| started | 08:16 |
+| ended | still running |
+| how it ended | - |
+| plan | - |
 
 ## The picture, in the words of the run that left it
 
@@ -30,7 +30,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> The 16 solo-18 documents: their emitted row pitch ALREADY equals the source (0.00 pt on 11 of 16, -0.10 to -0.40 on the rest), so no constant in the row-height path (DocxWriter.java:6228) can move them closer. The leading candidate is the TABLE-TOP SPACER at DocxWriter.java:5869-5881: the gap above a table is written as w:line on a 1 pt mark, and Google reads w:line as a multiple of the face's line height, so 68_journal_wide_table_spanning's 144.0 pt spacer may render as 13.74 pt (-130.3) or 160.9 (+16.9). One Drive probe settles which: an empty <w:p> with w:sz=2 and w:line=2880 w:lineRule="exact" - does it come back 13.74, 144 or 160.9 pt? The spacer moves 14 of the 16 by 4.2 to 130.3 pt; 71_invoice_space_aligned_no_rules and 31_times_body_arial_headings have no spacer, and 31_times has no table at all, so its failure cannot be pitch. Full numbers in FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md. Do NOT take the page top for these 16: they are single-page with zero page breaks.
+> The 16 solo-18 documents: their emitted row pitch ALREADY equals the source (0.00 pt on 11 of 16, -0.10 to -0.40 on the rest), so no constant in the row-height path (DocxWriter.java:6228) can move them closer. The leading candidate is the TABLE-TOP SPACER at DocxWriter.java:5869-5881: the gap above a table is written as w:line on a 1 pt mark, and Google reads w:line as a multiple of the face's line height, so 68_journal_wide_table_spanning's 144.0 pt spacer may render as 13.74 pt (-130.3) or 160.9 (+16.9). One Drive probe settles which: an empty <w:p> with w:sz=2 and w:line=2880 w:lineRule="exact" - does it come back 13.74, 144 or 160.9 pt? The spacer moves 14 of the 16 by 4.2 to 130.3 pt; 71_invoice_space_aligned_no_rules and 31_times_body_arial_headings have no spacer, and 31_times has no table at all, so its failure cannot be pitch. Full numbers in FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md. Do NOT take the page top for these 16: they are single-page with zero page breaks. CORROBORATION AND A TRAP, from the 06:54 run. The table-top spacer is right: 68_journal_wide_table_spanning measured at HEAD through Google reads dy 0.0 down to y=185 and then -114.8 pt for every line below - the same block, the same sign and the same order as a 144.0 pt spacer charged at 13.74 pt. THE TRAP: if you do run the page-top construct, the row must NOT be written on page 1. A table as the first element of w:body costs Google about 15 pt, page 1 overflows, a blank page 2 appears and the document goes 5 -> 6 pages; that is the 6-page / 33-42 result the relay measured, and it is the guard, not the construct. With `ctx.pageNo > 1 || ctx.brokePage > 0` the same construct gives 42/47 -> 45/47 on bank-statement-5-pages with page count 5 -> 5, pages 2-5 first line y -11.0 -> 44.5, median dy -59.5 -> -4.0. Patch: patches/PATCH-topgap-row-MEASURED-0654.patch. Details: FINDINGS/18_displacement-PAGETOP-ROW-BUILT-AND-MEASURED-0654-f1x.md.
 
 ## Agents deployed and not yet accounted for
 
@@ -100,8 +100,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `01:43` attempt 9 on 32_stroke_lines -> lead
-- `02:09` attempt 10 on 32_stroke_lines -> lead (13/213 moved)
 - `03:35` attempt 11 on 32_stroke_lines -> lead (0/213 moved)
 - `04:00` FALSIFIED on the corpus 22 Nov 04:00: the horizontal-only carrier is 13/16 in Google but 54 documents worse in the proxy (median 9 carriers vs 1 unchanged); regress.py REFUSED 58; HEAD reproduces the baseline on the 3 control docs, so the instrument is sound
 - `04:01` attempt 12 on 32_stroke_lines -> reverted (0/16 moved)
@@ -125,6 +123,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `07:25` attempt 5 on 18_displacement -> lead (0/213 moved)
 - `07:36` agent deployed: 18_displacement / A - what makes a single-page dense table drift in Google - row pitch or the table-to
 - `07:36` agent landed: 18_displacement / A -> FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md
+- `07:51` attempt 6 on 18_displacement -> lead (0/16 moved)
+- `08:26` attempt 8 on 18_displacement -> reverted (1/16 moved)
 
 ## Where the rest of the state lives
 

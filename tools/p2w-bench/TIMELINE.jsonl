@@ -2291,3 +2291,6 @@
 {"t": 1795315986.7703807, "ist": "08:23:06", "ev": "beat", "d": "relay: screening 16 with spacer fix (ENGINE_SRC via env)"}
 {"t": 1795316153.6829822, "ist": "08:25:53", "ev": "beat", "d": "relay: screen.py ENGINE_SRC fixed; verifying 2 docs without env var"}
 {"t": 1795316203.7791488, "ist": "08:26:43", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795316207.0750763, "ist": "08:26:47", "ev": "attempt", "d": "18_displacement -> reverted"}
+{"t": 1795316207.1774547, "ist": "08:26:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795316207.3111758, "ist": "08:26:47", "ev": "beat", "d": "classrow.py: refreshing the class file"}

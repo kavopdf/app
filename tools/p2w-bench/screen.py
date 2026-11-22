@@ -164,6 +164,19 @@ def main(argv):
     p2w.DIST = OUT + "/dist"
     p2w.PRE = OUT + "/pre"
     p2w.REPO = REPO
+    # AND ENGINE_SRC, WHICH IS NOT DERIVED FROM REPO AFTER IMPORT.
+    #
+    # p2w.py computes ENGINE_SRC=os.environ.get("P2W_ENGINE_SRC") or REPO at MODULE LEVEL, where
+    # REPO is ROOT+"/repo" = /scratch/work/p2w/repo. Setting p2w.REPO afterwards does not move it.
+    # On a pod that has never had a run, /scratch/work/p2w/repo does not exist, so the converter
+    # was invoked with a classpath under a directory that is not there, every ConvertOne died on
+    # ClassNotFoundException in under a second, nothing landed in dist/, and screen.py reported
+    # "PARTIAL - 0 of N measured. Call again" for ever. Measured 22 Nov: the same command with
+    # P2W_ENGINE_SRC set converted 16 of 16 and measured them.
+    #
+    # That is the most expensive shape of bug this tool has - it does not say "I could not run",
+    # it says the idea did nothing, and the next line of the brief tells the run to revert.
+    p2w.ENGINE_SRC = REPO
     os.makedirs(p2w.DIST, exist_ok=True)
 
     print("screening %d document(s) for %r  (engine %s)" % (len(docs), name[:44], now))

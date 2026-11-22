@@ -1,6 +1,3 @@
-| 16 Nov 18:10 | fixer | slot FORCED released - see INCIDENTS.md for why |
-| 17 Nov 09:21 | fixer | slot claimed - fixer running |
-| 17 Nov 11:16 | fixer | attempt content-missing-partly-replaced -> partial (1/13 moved) |
 | 17 Nov 12:04 | fixer | slot claimed - fixer running |
 | 17 Nov 12:30 | fixer | attempt content-missing-partly-replaced -> reverted (0/16 moved) |
 | 17 Nov 12:51 | fixer | slot claimed - fixer running |
@@ -199,3 +196,5 @@
 | 22 Nov 07:14 | fixer | slot claimed - fixer running |
 | 22 Nov 07:25 | fixer | attempt 18_displacement -> lead (0/213 moved) |
 | 22 Nov 07:36 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 22 Nov 08:16 | fixer | slot claimed - fixer running |
+| 22 Nov 08:26 | fixer | attempt 18_displacement -> reverted (1/16 moved) |

@@ -345,3 +345,43 @@ byte-identical**, and the one `.docx` that moved went 31.05 -> 0.00.
     regress.py --check              scope from scope.py
     regress.py --check --only txt   force it (for when scope.py cannot see your change)
     regress.py --stamp              stamp the formats in scope
+
+## The table-top spacer is NOT what fails the 16 solo `18_displacement` documents
+
+Built, measured through Google on 22 Nov, reverted. The gap above a table was written as
+`w:line="spacerTw" w:lineRule="exact"` on a `w:sz=2` mark, and Google reads `w:line` as a MULTIPLE
+of the face's line height, so 2880 twips came back 13.74 pt instead of 144. That is a real defect
+and the fix for it is real — `w:before` is honoured exactly, and the engine's own `ctx.flowTw` and
+`cenSetY` already charged the full spacer. Writing it as `w:before` with the box cut to a hairline
+moved **1 of 16**, `68_journal_wide_table_spanning` 12.09 -> 11.24, and nothing else. Reverted;
+the bar is 4.
+
+**Do not rebuild it, and do not believe the −114.8 pt figure.** It came from a FINDINGS measurement
+at HEAD; `benchmarks/RANKING.csv` gives the same document `max_pt` **8.64**. Two records of one
+document, a factor of thirteen apart, and the table is the one the gate and the ratchet read. A
+130 pt spacer loss cannot produce a render whose largest error is 8.64 pt, and the after-render's
+median/p90/max are identical to the before row to the hundredth — the table never moved.
+
+**What the sixteen actually look like:** `median_pt` 0.96 or 1.44 on fourteen of them. One pixel is
+0.48 pt at 150 DPI, so the whole page is offset by two or three pixels, uniformly, with a short tail
+of lines that tip over the check's `clamp(0.35 * size, 1.5, 4.5)` floor because they started near
+it. That is ONE constant applied to the page, not sixteen constructs. The two constants already
+measured and never tested against these sixteen: the first baseline sits 0.0565 em below the
+paper's top edge, and the first baseline of a cell 0.92 em below the row's top edge.
+`71_invoice_space_aligned_no_rules` is the exception — share@5 26.88, `median_pt` 3.84, no spacer
+at all — and is a different question.
+
+Full numbers: `FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md`.
+
+## `screen.py` measured NOTHING on a fresh pod, and said the idea had failed
+
+`screen.py` set `p2w.REPO` after importing `benchmarks/p2w.py`, but `p2w.py` computes
+`ENGINE_SRC = os.environ.get("P2W_ENGINE_SRC") or REPO` at MODULE level from `ROOT + "/repo"`.
+On a pod that has never run, that directory does not exist: every `ConvertOne` died on
+`ClassNotFoundException` in under a second, nothing reached `dist/`, and the tool printed
+`PARTIAL - 0 of N measured. Call again` for ever. A run following the brief would revert a good
+change on that verdict.
+
+**Settled:** `screen.py` sets `p2w.ENGINE_SRC = REPO` beside `p2w.REPO`. Verified 22 Nov: 0 of 2
+measured before, 2 of 2 after, with no environment variable set. If a screen ever reports
+"0 of N measured" again, check that `p2w.ENGINE_SRC` resolves to the tree before believing it.
