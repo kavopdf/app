@@ -1,16 +1,48 @@
-# Fixer report - 2026-11-22 23:54
 
-```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 23:54 → running IST · 17 min**
+**23 Nov 2026 · slot 23:10 → running IST · 1h 29m**
 
-> No document was made clean this run and none was made worse. The slot was handed a plan — land the
-> table spacer **and** a row-height correction together — and spent itself proving the second half of
-> that plan wrong before building it. **Google stores `w:trHeight` and does not lay it.** A dither on the
-> declaration is inert in the renderer it was designed for and takes 0.75 pt off every row in the one
-> that refuses it. What the spacer needs is a **scope**, not a row fix: one condition, not a rewrite of
-> every table in the corpus.
+> **The spacer split is worth 4 clean documents and costs 2. Reverted.** `18_displacement` is the largest single check in the corpus (38.7 clean documents by `classpick.py --leverage`) and 16 documents sit at 41/42 failing it and nothing else.
+
+## What the 16 said
+
+LibreOffice: `share5` identical to two decimals on every one of the 16. The `.docx` changed (that
+document's table-top spacer went from `before="0" line="247"` to `before="227" line="20"`), so this is
+exactly the asymmetry the split was built for: a construct LibreOffice does not measure and Google
+does.
+
+Google, one round trip each:
+
+| document | before | after the patch |
+|:--|:--|:--|
+| `73_marksheet_subject_marks_grade` | 41/42 | **42/42 PASS** |
+| `41_coloured_headings_white_bg` | 41/42 | **42/42 PASS** |
+| `29_dot_leaders_txtpos` | 41/42 | **42/42 PASS** |
+| `72_bank_statement_no_rules_right_amounts` | 41/42 | **42/42 PASS** |
+| `22_invoice_four_columns_txtpos` | 41/42 | 41/42 — 21/71 runs out, med -2.76 pt |
+| `16_right_aligned_amounts_txtpos` | 41/42 | 41/42 — 20/64 runs out, med -2.45 pt |
+
+The whole corpus was then rebuilt with the patched engine (213/213 converted, 212 scored) and
+`regress.py --check` passed: no document worse in `.docx` or `.txt`, google-safe clean. I committed
+it.
+
+## Then I tried to prove it wrong, and it was
+
+A run that landed while I was measuring (23:54 slot) wrote that this patch's blocker is **scope, not
+row height**, and that it costs two exactly-full pages. I Google-verified both of them at the same
+engine, and then again with the patch removed — same hour, same corpus, one edit between them:
+
+| document | patch | no patch |
+|:--|:--|:--|
+| `mobile-bill` | 43/47, **2 pages**, content lost | 46/47, 1 page |
+| `insurance-policy-schedule` | 43/47, **2 pages**, content lost | 46/47, 1 page |
+
+Not engine drift, not a stale baseline. Both pages are exactly full, so spending the gap at its true
+value removes the ~19.5 pt of slack that was absorbing Google's row excess. The patch is reverted in
+full — engine, `RANKING.csv`, engine stamp — and `regress.py --check` passes on the tree as it now
+stands.
+
 
 ## Progress
 
@@ -32,49 +64,8 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 00:11 | **lead** | 0/3 | Row-height dither refuted (trHeight stored not laid); census of the 11 non-ruled docs = 3 faults; spacer needs a scope guard, handed to next run |
-
-## Why this class
-
-`classpick.py --leverage` prices `18_displacement` at **38.7 clean documents**, nearly double
-`32_stroke_lines` (23.3), and 16 documents fail it and nothing else. It carries the only lead in the
-repository with a **proven document count**: the spacer construct is measured to take six documents to
-42/42 in Google, and a seventh (`68_journal_wide_table_spanning`) at 10:35 once its 2880→4320 twip cap
-was raised. No other class has a measured fix of that size sitting unlanded.
-
-## What was measured
-
-**The eleven non-ruled documents, counted for the first time.** Of the 16 that fail this check and
-nothing else, 5 are ruled tables; the other 11 had never been looked at. They are **three** faults, not
-one — 6 are the table gap spacer (the same term as the lead, and the same six documents), 2 are cell
-line-box growth, 3 are a placement offset present in *both* renderers. The discriminator between the 11
-and the ruled 5 is **who owns the rules**, not how many: all 11 emit `tblBorders` all-`nil` with rules
-as floating `<w:drawing>`; the ruled 5 carry `insideH w:val="single"`. A rule-count filter is wrong on
-two of the eleven.
-
-**The row-height instruction, refuted before it cost a build.** A subagent fitted a 0.75 pt quantum law
-to eleven published points (0.07 pt residual) and proposed a dither on `w:trHeight` to land the mean at
-18.40. Two findings the repository already holds kill it: Google normalises `hRule="exact"` back to
-`atLeast` on import and **stores the declaration while laying 18.0/19.0/20.0 on rows written 380**
-(`18_displacement-GOOGLE-IGNORES-TRHEIGHT-1045-relay.md` §1, §3), and the combined spacer+row build was
-already run at 09:51–10:35 (`18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md`). The 0.75 quantum is
-real, but it quantises the **cell's line box**, not the declaration — the law fits and the instrument is
-wrong.
-
-## The lead this run hands forward
-
-The spacer as `w:before` is worth **seven** clean documents. It costs exactly the two whose page is
-**already full** (`mobile-bill`, `insurance-policy-schedule`), because spending the spacer at its true
-value removes the ~19.5 pt of slack that was absorbing Google's row excess. On a page with slack nothing
-overflows.
-
-So spend the spacer **only where the flow budget still has slack after the table** — `(page height −
-table bottom) > 0.75 pt × rows` — and emit today's `w:line` everywhere else. `mobile-bill` and
-`insurance-policy-schedule` then come out **byte-identical to HEAD**, so `regress.py --check` has nothing
-to refuse and no construct two renderers disagree about is needed. One condition at the `spacerTw > 0`
-branch, ~`DocxWriter.java:5870`.
-
-The gate is unchanged: 124 documents carry a spacer and **13 of them are clean today** (largest:
-`041122-Account_Opening_Form`, 22 spacers, max 166.00 pt). Render those 13 plus the 16, before and after.
+| 00:39 | **reverted** | 0/16 | spacer split lands 4 of 16 in Google (73_marksheet, 41_coloured, 29_dot_leaders, 72_bank_statement 42/42) but breaks mobile-bill and insurance-policy-schedule 46/47 one page -> 43/47 two pages in a co |
+| 23:33 | **lead** | 0/None | Measured where Google's row-pitch charge lives: LibreOffice lays w:trHeight exactly and never charges the rule; Google charges the row's own rule and rounds to a whole point. A paragraph border is not |
 
 ## The txt
 
@@ -88,22 +79,22 @@ The gate is unchanged: 124 documents carry a spacer and **13 of them are clean t
 
 ## Subagents
 
-Two, deployed before my own attempt, on real problems and not greps.
+Two, both before my own attempt:
 
-| id | question | outcome |
-|:--|:--|:--|
-| census-01 | what do the 11 non-ruled `18_displacement` documents actually hold, and is it one construct | **landed** — three groups, not one; the discriminator is who owns the rules. `FINDINGS/18_displacement-ELEVEN-NON-RULED-IS-THREE-FAULTS-CENSUS-2354-fixer.md` |
-| rowlaw-01 | why does Google lay 19.10 where the engine declares 18.0/19.0, and what declaration lands 18.40 | **landed, then refuted by this run** — a 0.75 pt quantum law fitted to 0.07 pt, whose recommended dither is inert because `trHeight` is not the height. Kept so the next slot does not fit the same curve. `FINDINGS/18_displacement-ROW-GROWTH-075-QUANTUM-LAW-2354-fixer.md` |
+| Agent | What it answered |
+|:--|:--|
+| Explore - 18_displacement instrument | `18_displacement`'s `dy` is box-top against the **Google** export; `RANKING.csv`'s `*_pt` is nearest-ink against the **LibreOffice** render. Five independent differences - renderer, box vs ink, run-paired vs all pixels, signed vs unsigned, per-page vs worst-page - so the "max_pt 1.44-2.40 yet fails" comparison was never a comparison. It also showed branch `not ds` did not fire on any of the six, refuting SETTLED.md's own reading. |
+| Explore - dead-ends dossier | 17 prior attempts at `18_displacement` and their verdicts, `60_text_column_right_edge`'s zero recorded attempts, and which hypotheses are refuted with the evidence line quoted. Its ranked recommendation - land the split and score all 16 - is what this run executed. |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 23:54 → running · 18 min |
+| Slot window | 23:10 → running · 1h 29m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 11 |
-| Longest silence | **9.4 min** — from 23:54:49, after `reading state: handoff, leverage, pending` |
-| Silences over 2 min | 2 |
+| Tool beats | 12 |
+| Longest silence | **67.1 min** — from 23:32:40, after `relay: 4 of 16 solo-18 docs now 42/42 in Google; full-corpus measure f` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -111,8 +102,10 @@ Two, deployed before my own attempt, on real problems and not greps.
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **16 min** | `#####################` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
+| fix - diagnose and change the engine | **1h 07m** | `#################` |
+| measure or build - a conversion, screen or compile writes no beacon | **15 min** | `####` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **6 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -125,15 +118,9 @@ Two, deployed before my own attempt, on real problems and not greps.
 
 ## Next run
 
-DO NOT apply patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch - measured LO-regressive by 21.5 points on two-tables-stacked-with-no-gap (FINDINGS/18_displacement-RELAY-PATCH-REGRESSES-LIBREOFFICE-1930-f1x.md). Start from FINDINGS/18_displacement-RULES-AS-PBDR-PITCH-FIXED-PLACEMENT-BROKEN-2330-fixer.md: the Google row-pitch charge is the row's OWN RULE and a paragraph border is not charged (Google mean 18.25-18.33 vs 19.08 with cell borders, source 18.40; LibreOffice identical to 0.05 pt). The bottom-border build fixes the pitch and breaks text placement (median dy -4.66 -> -10.70, n_out 55 -> 69). Next round trip: pBdr TOP per row AND nil the table's own top side (the C build drew 18 rules vs 15 because the table top was still drawn), then re-run the A/B on two-tables-stacked-with-no-gap. Census first: only five of the sixteen documents that fail 18_displacement and nothing else are ruled tables with a sub-point pitch - the other eleven are a different term.
+APPLY patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch and ratchet it corpus-wide - measured clean on two-tables-stacked-with-no-gap (42/42 PASS, n_out 0) and it moves EVERY ruled table, so the gate refuses it unratcheted. The row grid is 0.75 pt, NOT whole points: nine identical rows per page read 18.00/18.75/19.50, and the law laid=0.75*(round(h/0.75)+1) reproduces the 13-declaration sweep exactly when its readings are rounded. Then close the small-spacer over-charge the patch exposes: mobile-bill's 128/124 tw spacers are now charged in full where Google previously charged ~0, leaving that page +2..+5 pt low. Evidence: FINDINGS/18_displacement-ROW-GRID-AND-SPACER-1518-relay.md
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-```
-
-Written by report.py from committed files only. Every number above is read from
-ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
-and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
