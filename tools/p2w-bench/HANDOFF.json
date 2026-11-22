@@ -1104,6 +1104,10 @@
   {
    "at": "02:31",
    "text": "attempt 29 on 18_displacement -> kept"
+  },
+  {
+   "at": "04:08",
+   "text": "attempt 30 on 18_displacement -> lead"
   }
  ],
  "next": "The spacer SCOPE GUARD is LANDED (FINDINGS/18_displacement-SPACER-SCOPE-GUARD-LANDS-3-GOOGLE-0051-fixer.md): the table gap is split (w:before = gap-20tw, w:line = 20tw) only where the page's own lowest ink leaves room for it plus 0.75 pt per table row on the page. 73_marksheet, 41_coloured_headings and 29_dot_leaders are 42/42 in Google; mobile-bill and insurance-policy-schedule are byte-identical at document.xml level and mobile-bill re-verified 46/47 one page. Corpus 212/212 re-measured on this engine, 0 worse, 0 better in the LibreOffice proxy (by design). Do NOT apply the dither patch - refuted twice. Two readings to settle before more of this class: (1) 22_invoice and 16_right_aligned spend their gaps and STILL fail 18_displacement with a constant -2.5 pt step and slope ~0 - that is a second term, and FINDINGS/18_displacement-GUARDED-SPACER-SPLIT-1-WIN-1-COST-0219-relay.md read them 42/42 where this build reads 41/42, so re-measure before trusting either; (2) 72_bank_statement is refused by the guard 58 twips short (18 rows -> 270tw row term, gap 346tw, room 558tw) - measure Google's real per-row excess on a ruled table and replace the inherited 15 tw/row, worth +1. Any Google reading at the 41/42-42/42 margin must be taken twice: the same construct read differently two hours apart.",

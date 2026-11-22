@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 00:51 |
-| ended | 02:33 |
-| how it ended | forced |
+| started | 02:57 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -110,7 +110,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `10:08` 18_displacement 10:40 fixer: spacer-as-w:before confirmed in Google (68_journal 42/42); mobile-bill and insurance-policy-schedule 38/42 vs 41/42 at HEAD -> reverted. Measured pitch off the Google export: source 18.40, Google 19.00, histogram 19.0x16/20.0x5/18.0x3. The excess is 2.0 pt on rows with a two-paragraph cell, not a uniform 0.70 - a factor cannot describe it. FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md.
 - `10:09` agent deployed: 18_displacement / row-growth-mechanism - given the real DocxWriter.java, which emitted number Google ignores when it grow
 - `10:09` agent landed: 18_displacement / row-growth-mechanism -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md
 - `10:37` attempt 11 on 18_displacement -> lead (0/3 moved)
@@ -135,6 +134,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `19:17` attempt 23 on 18_displacement -> lead
 - `00:39` attempt 26 on 18_displacement -> reverted (0/16 moved)
 - `02:31` attempt 29 on 18_displacement -> kept
+- `04:08` attempt 30 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 

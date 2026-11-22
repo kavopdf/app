@@ -5944,12 +5944,32 @@ public final class DocxWriter {
             // quantum the 22 Nov sweep measured). Where it does not, the paragraph is written
             // exactly as before and the document is byte-identical to the engine that had no
             // split at all - which is why regress.py has nothing to refuse.
-            int spacerHairTw = 20;
+            // THE HAIRLINE IS ONE TWIP, AND WHY IT USED TO BE TWENTY.
+            //
+            // The hairline is credited 1.00 pt of the gap (it is written as `w:line`), but Google
+            // lays `w:line` exact on an sz=2 mark at 2.5873 * max(L/240, 0.06) pt - 0.2156 pt at
+            // L=20. So twenty twips of the gap were declared, one fifth of a point delivered, and
+            // every table under a split spacer sat 0.78 pt high in Google - a constant, the same
+            // on every document, because the construct is the same. At L=1 the same law delivers
+            // 0.1552 pt against 0.05 pt credited: the shortfall goes 0.78 pt -> 0.10 pt of
+            // overshoot, and the sum `before + line` still equals the gap to the twip, so
+            // LibreOffice and Word see the page they always saw.
+            //
+            // THE ROOM TEST IS KEYED TO TWENTY, NOT TO THE HAIRLINE. The two must not be coupled:
+            // the hairline is an accuracy constant, and moving it by a twip must not move a
+            // document in or out of the spendable set - 22_invoice's second spacer is refused at
+            // hair=1 with a hair-keyed test and spent at hair=20, a 7.65 pt change in what Google
+            // draws, decided by a constant that has nothing to do with the page's room. So the
+            // test and the running charge stay exactly what they were at hair=20, and only the
+            // emission changes. Every document the guard refuses is byte-identical to the engine
+            // before this change.
+            int spacerHairTw = 1;
             int rowExcessTw = 15 * Math.max(0, ctx.pageRowCount);
             int slackTw = ctx.budgetTw - Math.round(ctx.pageInkBottomPt * (float) TWIPS_PER_PT);
+            int roomWantTw = Math.max(0, spacerTw - 20);
             int wantTw = Math.max(0, spacerTw - spacerHairTw);
             boolean spendable = slackTw > 0
-                    && ctx.spacerSplitTw + wantTw + rowExcessTw <= slackTw;
+                    && ctx.spacerSplitTw + roomWantTw + rowExcessTw <= slackTw;
             if (spendable) {
                 sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
                         .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
@@ -5957,7 +5977,7 @@ public final class DocxWriter {
                         .append("\" w:after=\"0\" w:line=\"")
                         .append(Math.min(spacerHairTw, spacerTw))
                         .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
-                ctx.spacerSplitTw += wantTw;
+                ctx.spacerSplitTw += roomWantTw;
             } else {
                 sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
                         .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")

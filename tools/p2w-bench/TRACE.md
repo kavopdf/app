@@ -6,32 +6,6 @@
 | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 09:30 | fixer | build-engine | started |
-| 20 Nov 21:49 | fixer | attempt | t01_word_accuracy -> kept (0/10 moved) |
-| 20 Nov 21:57 | fixer | claim | fixer claimed the slot |
-| 20 Nov 22:21 | fixer | build-engine | started |
-| 20 Nov 22:22 | fixer | build-engine | engine built in 36s |
-| 20 Nov 22:39 | fixer | attempt | t01_word_accuracy -> reverted (2/7 moved) |
-| 20 Nov 22:54 | fixer | claim | fixer claimed the slot |
-| 20 Nov 23:06 | fixer | build-engine | started |
-| 20 Nov 23:07 | fixer | build-engine | engine built in 35s |
-| 20 Nov 23:16 | fixer | attempt | t01_word_accuracy -> kept (2/7 moved) |
-| 20 Nov 23:23 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |
-| 21 Nov 00:57 | fixer | claim | fixer claimed the slot |
-| 21 Nov 00:57 | fixer | stale-claim | fixer slot was stale (93 min) - the previous run ended without releasing it |
-| 21 Nov 00:57 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |
-| 21 Nov 01:41 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |
-| 21 Nov 01:47 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |
-| 21 Nov 01:51 | fixer | attempt | t01_word_accuracy -> reverted (0/5 moved) |
-| 21 Nov 02:52 | fixer | claim | fixer claimed the slot |
-| 21 Nov 03:18 | fixer | build-engine | started |
-| 21 Nov 03:18 | fixer | build-engine | engine built in 37s |
-| 21 Nov 03:21 | fixer | build-engine | started |
-| 21 Nov 03:21 | fixer | build-engine | engine built in 35s |
-| 21 Nov 03:25 | fixer | attempt | 47_margins -> partial (2/26 moved) |
-| 21 Nov 03:36 | fixer | attempt | 47_margins -> partial (2/26 moved) |
-| 21 Nov 03:57 | fixer | claim | fixer claimed the slot |
-| 21 Nov 03:57 | fixer | stale-claim | fixer slot was stale (21 min) - the previous run ended without releasing it |
-| 21 Nov 04:27 | fixer | build-engine | started |
 | 21 Nov 04:28 | fixer | build-engine | engine built in 34s |
 | 21 Nov 04:31 | fixer | build-engine | started |
 | 21 Nov 04:32 | fixer | build-engine | engine built in 34s |
@@ -406,3 +380,29 @@
 | 23 Nov 01:32 | fixer | build-engine | engine built in 36s |
 | 23 Nov 01:33 | fixer | attempt | 18_displacement -> lead (0/? moved) |
 | 23 Nov 02:31 | fixer | attempt | 18_displacement -> kept (3/? moved) |
+| 23 Nov 02:57 | fixer | claim | fixer claimed the slot |
+| 23 Nov 03:04 | fixer | build-engine | started |
+| 23 Nov 03:05 | fixer | build-engine | engine built in 35s |
+| 23 Nov 03:06 | fixer | build-engine | started |
+| 23 Nov 03:07 | fixer | build-engine | engine built in 35s |
+| 23 Nov 03:07 | fixer | build-engine | started |
+| 23 Nov 03:08 | fixer | build-engine | engine built in 35s |
+| 23 Nov 03:15 | fixer | build-engine | started |
+| 23 Nov 03:15 | fixer | build-engine | engine unchanged, compile skipped |
+| 23 Nov 03:30 | fixer | build-engine | started |
+| 23 Nov 03:30 | fixer | build-engine | engine unchanged, compile skipped |
+| 23 Nov 03:35 | fixer | build-engine | started |
+| 23 Nov 03:35 | fixer | build-engine | engine unchanged, compile skipped |
+| 23 Nov 03:39 | fixer | build-engine | started |
+| 23 Nov 03:39 | fixer | build-engine | engine unchanged, compile skipped |
+| 23 Nov 03:44 | fixer | build-engine | started |
+| 23 Nov 03:44 | fixer | build-engine | engine unchanged, compile skipped |
+| 23 Nov 03:49 | fixer | build-engine | started |
+| 23 Nov 03:49 | fixer | build-engine | engine unchanged, compile skipped |
+| 23 Nov 03:54 | fixer | build-engine | started |
+| 23 Nov 03:54 | fixer | build-engine | engine unchanged, compile skipped |
+| 23 Nov 03:59 | fixer | build-engine | started |
+| 23 Nov 03:59 | fixer | build-engine | engine unchanged, compile skipped |
+| 23 Nov 04:04 | fixer | build-engine | started |
+| 23 Nov 04:04 | fixer | build-engine | engine unchanged, compile skipped |
+| 23 Nov 04:08 | fixer | attempt | 18_displacement -> lead (0/? moved) |
