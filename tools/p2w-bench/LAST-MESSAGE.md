@@ -1,14 +1,17 @@
-**22 Nov 2026 · relay slot 13:56 → running IST**
+**22 Nov 2026 · fixer slot 13:56 → running IST**
 
-> One document was made clean this run, and no document was made worse. `two-tables-stacked-with-no-gap`
-> went **41/42 → 42/42 PASS** in Google, `n_out` 55 → **0**. The cause was not the pitch everyone has
-> been chasing for three runs: it was a **table spacer Google never saw**.
+> **The carry-over patch is refuted.** I applied it, bisected it into its four mechanisms, and measured
+> it in both renderers on engine `462353f9`. `two-tables-stacked-with-no-gap` reads **46/47 in Google
+> with the same single failing check it had at baseline** — the handoff's "41/42 → 42/42 PASS" does not
+> reproduce. Nothing committed to the engine; the tree is at baseline. What the slot did produce is a
+> measured law that relocates the lead: **`w:before` is charged by Google at exactly `V/20` pt, with no
+> floor, no threshold and no cap.**
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **1** — 2 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **1** — 3 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -18,59 +21,81 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
+| Committed | **16** files in 4 commit(s) from `f3157f6` |
+
+The ledger's one moved document is the **14:45 kept attempt from the 13:56 slot**, which report.py still
+counts inside this window. **My own attempt — 15:34 — is `reverted` and moved 0 of 16.** No engine file
+is changed by this run.
 
 ## The class, and why this one
 
-`classpick.py --leverage` still prices `18_displacement` at **38.7 clean documents**, the largest step
-in the table, and the census says 16 documents fail it and nothing else. The 13:18 slot left a measured
-lead here, so this slot took the same class with a different question: not "what pitch does Google lay"
-but "is the pitch the thing that is wrong".
+`18_displacement`, and not because the tool printed it. The arithmetic:
+
+- `classpick.py --leverage` prices it at **38.7 clean documents**, the largest step in the table.
+- **16 documents fail `18_displacement` and nothing else** — read straight from
+  `benchmarks/gverify/*.json`, not from the class table. A fix that works makes 16 documents CLEAN at
+  once: **23 → 39**.
+- It held the carry-over: a measured lead with a patch written, which the 13:56 run could not ship
+  because the gate refused it unratcheted.
+
+That last point is why the build was the slot. It was the right class; the patch was wrong.
 
 ## What this slot measured
 
-**1. The declared→laid row map is a grid, and it is now exact.** A purpose-built probe - nine identical
-rows per page, so the pitch reads to ±0.06 pt instead of the ±0.5 pt a rule-position read gives:
+### 1. The patch has four mechanisms, so I bisected it instead of accepting or rejecting it whole
 
-    17.00 → 18.00   17.40 → 18.00   17.80 → 18.75   18.20 → 18.75   18.60 → 19.50
+Every row is a fresh build (40–47 s) and a fresh screen. LibreOffice proxy, share@5, lower is better:
 
-`laid = 0.75 * (round(declared / 0.75) + 1)` - snapped to 0.75 pt, then one whole quantum added.
-`hRule` and border weight do not enter it. It reproduces all three engine builds the 13:18 slot left,
-which that run read as "the charge grows with the declaration": it does not. It is one quantum seen
-through a 0.5 pt measurement.
+| document | baseline | spacer only (h1-2) | spacer+rowpitch (h1-3) | full patch (h1-7) |
+|:--|--:|--:|--:|--:|
+| `insurance-policy-schedule` | 0.53 | 0.53 | 0.53 | **33.55** (+33.02) |
+| `mobile-bill` | 1.55 | 1.55 | **12.66** (+11.11) | **36.90** (+35.35) |
+| `table-with-no-header-row` | 0.61 | 0.61 | 0.61 | **36.40** (+35.79) |
+| `two-tables-stacked-with-no-gap` | 0.77 | 0.77 | **3.29** (+2.52) | **30.02** (+29.25) |
+| `product-catalogue-code-left-price-right` | 0.47 | 0.47 | 0.47 | 0.47 |
+| `74_balance_sheet_indented_subitems` | 0.03 | 0.03 | 0.03 | 0.03 |
 
-**2. Diffusing the pitch onto that grid, alone, made two documents worse.** two-tables dy median
--4.66 → -9.43; mobile-bill -6.73 → -12.73. The reason is exact and worth more than the fix: at HEAD the
-table's header lands at **dy -10.18** and the pitch error is **+0.7 pt/row** over 13 rows, so the two
-**cancel** by the foot of the table. A pitch fix removes the compensation and leaves the step naked.
+The baseline row reproduces `benchmarks/RANKING.csv` exactly (`6 measured, 6 same`), so the instrument is
+sound and the regression is the patch's, not a stale table.
 
-**3. The -10.18 pt step is the table spacer, and it was a no-op in Google.** The paragraph before a
-table carried its height in `w:line=247` with `w:sz=2` and no run; Google charges `w:line` as
-`(w:line/240) × lineHeight(face,size)`, so a 1 pt face was charged ~1.2 pt for a 12.35 pt gap. Moved to
-`w:before` with a hairline `w:line=1` (the construct `calibrate.py` measured as honoured exactly).
+**The spacer half is invisible to LibreOffice** — 6 same, 0 better, 0 worse. That is the signature of a
+construct Google undercharges and LibreOffice honours, and it is why `screen.py` can never judge this
+half. **The row/cell half is what regresses**, and hunk 3 alone (row pitch from the table average instead
+of the row's own snapped `rowEdge`) takes `mobile-bill` 1.55 → 12.66.
 
-**4. Together:**
+### 2. In Google, the patch moves nothing on the document it was written for
 
-| document | before | after |
-|:--|:--|:--|
-| `two-tables-stacked-with-no-gap` | 41/42, n_out 55, med -4.66, span 10.31 | **42/42 PASS**, n_out **0**, med +0.05, rms 0.64 |
-| `mobile-bill` | 41/42, n_out 100, med -6.73, rms 2.05 | 41/42, n_out **39**, med +2.35, rms 0.54 |
+Fresh round trips, `GOOGLEDRIVE_CREATE_FILE` → `GOOGLEDRIVE_DOWNLOAD_FILE` → `verify_google.py --docx`:
 
-## Why it is a patch and not a commit
+| document | build | Google | vs baseline |
+|:--|:--|:--|:--|
+| `two-tables-stacked-with-no-gap` | baseline | 46/47, fail `18_displacement` | — |
+| `two-tables-stacked-with-no-gap` | spacer only | **46/47**, same check | **no change** |
+| `two-tables-stacked-with-no-gap` | **full patch** | **46/47**, `18_displacement {source: 0, render: 1}` | **no change** |
+| `mobile-bill` | baseline | 46/47 | — |
+| `mobile-bill` | spacer only | **43/47, `01_page_count` 1 → 2** | **REGRESSION** |
 
-It moves **every ruled table in the corpus**, so `commit-gate.sh` refuses it unratcheted - correctly,
-and there is no override. It is in
-`patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch`, and applying it plus one corpus
-pass is the next run's first move. Every number above is a live round trip on this sandbox.
+### 3. The law that survives, and it is worth more than the patch
 
-`mobile-bill` is **+2 to +5 pt low** with the patch, and the residual is the same construct
-over-correcting: its two small spacers (128 and 124 tw) were charged ~0 before and are now charged in
-full. That is the next lead in the class and it is one build away.
+An agent measured the charge curve directly — 25 values from 1 to 4320 twips, synthetic documents
+through Google only:
+
+    spacer paragraph height = V/20 + 0.1552 pt        (V = w:before in twips)
+    max |residual| = 0.000000 pt over all 25 points   no floor, no threshold, no cap, run or no run
+    w:line is read as the written value divided by 240, times the mark's own line height: 0.2156x
+
+That confirms the 13:56 run's `~0.22x` in size and corrects its cause. And it **refutes the
+over-charge theory**: `w:before` is arithmetically right. I then checked the obvious follow-on and it is
+wrong too — `DocxWriter.java:5875` is `ctx.flowTw += spacerTw`, so the engine already charges its
+pagination model the declared value and `w:before` now renders exactly that. **Model and render agree
+after the patch.** `mobile-bill`'s extra page is not a model mismatch; it is a **real surplus** that only
+fitted before because Google was under-charging that gap by ~4.9 pt. That surplus is the lead.
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 14:42 | **kept** | 1/16 | table spacer moved from w:line to w:before (a no-op in Google, tables started ~10pt high) + row pitch diffused onto the measured 0.75 pt grid; two-tables 41/42 -> 42/42 PASS, n_out 55 -> 0 |
+| 15:34 | **reverted** | 0/16 | applied the carry-over patch and bisected it. Full patch leaves `two-tables-stacked-with-no-gap` at 46/47 in Google with the same check as baseline (the 42/42 does not reproduce); spacer-only leaves it at 46/47 and pushes `mobile-bill` 46/47 → 43/47 with an extra page; row/cell hunks are +29..+36 in the proxy on four documents |
 
 ## The txt
 
@@ -82,51 +107,44 @@ full. That is the next lead in the class and it is one build away.
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 8 documents |
 
-## Subagents
-
-Two Explore agents, both landed inside the turn (a scheduled run has no one to answer later):
-
-* **A - the instrument.** `18_displacement` compares per **text run**, tolerance `clamp(0.35·size, 1.5,
-  4.5)` pt, per **page**, and never cumulatively; a page fails at >max(2, 5%) runs out of band. It
-  also established that `benchmarks/gverify/*.json` stores **no dy at all**, which is why every dy
-  number in this repo comes from a live round trip and not from the table.
-* **B - the engine.** `w:trHeight` at `DocxWriter:6318`, `atLeast`, no quantisation and no 360 floor;
-  `rowEdge` from the cell rectangles at `Pdf2Word:7957`; **no `w:tcMar` top/bottom and no cell
-  spacing** - which is why the +0.75 pt charge is a renderer constant and not our padding.
-
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:56 → running · 49 min |
+| Slot window | 13:56 → running · 1h 40m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 25 |
-| Longest silence | **22.3 min** — from 14:23:17, after `report.py: building the report` |
-| Silences over 2 min | 4 |
+| Tool beats | 39 |
+| Longest silence | **48.0 min** — from 14:46:48, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
-
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **22 min** | `##########` |
-| measure or build - a conversion, screen or compile writes no beacon | **20 min** | `#########` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **2 min** | `#` |
+| fix - diagnose and change the engine | **1h 10m** | `###############` |
+| measure or build - a conversion, screen or compile writes no beacon | **20 min** | `####` |
+| record - attempt, handoff, class rows | **3 min** | `#` |
+| report - the report and the chain | **4 min** | `#` |
 | other - not attributed to a tool | **2 min** | `#` |
+
+## Why the silence
+
+One 48-minute stretch, and it is mine to own: a sub-agent that was meant to run in the background ran
+**inline** (a scheduled run has no one to answer later), and its Google probe sweep took 11 minutes of
+wall clock inside my turn. It earned its keep — the `w:before` law is the best thing this slot produced —
+but a single blocking delegation is not what the brief asks for, and the next run should budget for it
+rather than discover it.
 
 ## Next run
 
-APPLY `patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch` and ratchet it corpus-wide -
-it is measured clean on `two-tables-stacked-with-no-gap` (42/42, n_out 0) and it moves every ruled
-table, so the gate refuses it unratcheted. Then close the small-spacer over-charge it exposes:
-`mobile-bill`'s 128/124 tw spacers (6.4/6.2 pt) are now charged in full where Google previously charged
-~0, leaving that page +2..+5 pt low - gate the spacer to gaps the page really drew (the 2 pt floor at
-`DocxWriter:5852` is too low) or subtract the hairline advance. Evidence:
-`FINDINGS/18_displacement-ROW-GRID-AND-SPACER-1518-relay.md`.
+**Do not re-apply `patches/18-spacer-before-rowpitch-rowrule.patch`.** `patches/README.md` now carries
+the refutation at the bottom, and the four hunks are measured separately there.
 
----
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md,
-TIMELINE.jsonl, benchmarks/RANKING.csv - or measured this run by a live Google round trip. Never
-remembered, never estimated.*
+Two things are live:
+
+1. **Keep the spacer half (hunks 1–2) on its own.** It is a correctness fix, LibreOffice-neutral, and the
+   law above says it is right. It cannot be kept as it stands only because `mobile-bill` spills a page.
+2. **Find `mobile-bill`'s real surplus.** With the gap charged honestly the page no longer fits, so
+   something else on it is over-tall by at least 4.9 pt. That is the lead, it is one document, and it is
+   measurable page by page. Do not reach for `flowTw` — it is already correct.
