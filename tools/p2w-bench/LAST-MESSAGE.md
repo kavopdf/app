@@ -115,13 +115,20 @@ every ruled table in the corpus and the ratchet does not fit a slot.
 
 ## Subagents
 
-*None deployed this run.*
+*None recorded by the pipeline this run* — but one Explore agent was deployed and it
+landed. It answered the vertical-position code path in full: `w:trHeight` at
+`DocxWriter.java:6316` with the pitch taken from `rowEdge` at `:6132`, `pointKey` at
+`PdfToWord.java:7700`, `w:pgMar` hardcoded to zero at `DocxWriter.java:2305`, and **no
+`w:tblHeader` and no `w:headerReference` anywhere in the engine** — which is the mechanism
+behind the 48–68 pt UNIFORM PAGE SHIFT the dy finding records on continuation pages, and a
+separate, unbuilt construct. It ran inside the turn rather than in the background, so the
+pipeline counted zero.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:18 → running · 12 min |
+| Slot window | 13:18 → running · 13 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 10 |
 | Longest silence | **4.7 min** — from 13:18:54, after `gaps.py: reading the timeline` |
@@ -136,7 +143,7 @@ every ruled table in the corpus and the ratchet does not fit a slot.
 | setup - claim, housekeeping, reading the gate | **4 min** | `########` |
 | fix - diagnose and change the engine | **4 min** | `########` |
 | record - attempt, handoff, class rows | **0 min** | `##` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `##` |
 | other - not attributed to a tool | **1 min** | `##` |
 
 ## Best results this round

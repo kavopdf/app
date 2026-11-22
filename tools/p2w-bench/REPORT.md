@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 13:18 → running IST · 12 min**
+**22 Nov 2026 · slot 13:18 → running IST · 13 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -46,7 +46,7 @@
 
 | | |
 |:--|:--|
-| Slot window | 13:18 → running · 12 min |
+| Slot window | 13:18 → running · 13 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 10 |
 | Longest silence | **4.7 min** — from 13:18:54, after `gaps.py: reading the timeline` |
@@ -61,7 +61,7 @@
 | setup - claim, housekeeping, reading the gate | **4 min** | `########` |
 | fix - diagnose and change the engine | **4 min** | `########` |
 | record - attempt, handoff, class rows | **0 min** | `##` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `##` |
 | other - not attributed to a tool | **1 min** | `##` |
 ## Best results this round
 
