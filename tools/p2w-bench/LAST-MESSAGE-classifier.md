@@ -1,10 +1,8 @@
 # P2W Classifier - Run Report
 
-**22 Nov 2026 · 22:52 IST**
+**22 Nov 2026 · 23:58 IST**
 
-> 35 classes cover 126 failing documents across 192 measured in Google.
-
-Regenerated the .docx classes from `RANKING.csv`, the .txt classes from `RANKING-TXT.csv`, and Google's classes from both gverify renders. All of them came back agreeing with the measurement: no document changed class, no class closed and none opened, so nothing needed moving and the phase advanced to fix.
+> 35 classes cover 169 failing documents across 192 measured in Google.
 
 ## Classes, biggest first
 

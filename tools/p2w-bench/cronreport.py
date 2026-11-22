@@ -234,12 +234,12 @@ def baseline():
 
     L = ["# P2W Baseline - Run Report", "",
          "**%s · %s IST**" % (d, t), "",
-         "> %d of %d documents are fixed to 99%%. The corpus is %.1f%% closer to the 15 Nov baseline"
+         "> %d of %d documents are at or under 1%% share@5px in LibreOffice. The corpus is %.1f%% closer to the 15 Nov baseline"
          " than it started." % (fixed, total, gain), "",
          "## Corpus", "",
          "| | |", "|:--|--:|",
          "| Documents | **%d** |" % total,
-         "| .docx fixed to 99%% | **%d** |" % fixed,
+         "| .docx at or under 1%% share@5px (LibreOffice) | **%d** |" % fixed,
          "| .docx still open | **%d** |" % open_,
          "| .txt clean | **%d** |" % tclean,
          "| .txt failing | **%d** |" % tfail,
@@ -248,7 +248,7 @@ def baseline():
          "", "## Against the 15 Nov baseline", "",
          "| | baseline | now | |", "|:--|--:|--:|:--|",
          "| mean share@5 | %.2f | **%.2f** | %+.2f%% |" % (mean_base, mean_now, -gain),
-         "| documents improved | | **%d** | |" % improved,
+         "| documents improved at all (any fall) | | **%d** | |" % improved,
          "| regressions | | **%d** | %s |" % (len(worse), "none" if not worse else "LOOK"),
          ""]
     if worse:
@@ -264,7 +264,23 @@ def classifier():
     cl = need(classes(), "benchmarks/DEFECT-CLASSES-GOOGLE.md names no classes")
     scored, refused, gclean, _ = google_state()
     r = round_state()
-    total = sum(c[3] for c in cl)
+    # A DOCUMENT THAT FAILS THREE CLASSES IS ONE DOCUMENT. This summed the per-class counts, so a
+    # document failing three checks was counted three times - and it summed the wrong column besides:
+    # c[3] is "newly clean in LibreOffice only", not "failing". Measured 22 Nov, the report said
+    # "35 classes cover 126 failing documents" when 169 documents fail at least one check.
+    #
+    # The honest total is the number of distinct documents with any failed check, read from the
+    # measurement rather than derived from a table that counts per class.
+    total = 0
+    for _f in glob.glob(os.path.join(ROOT, "benchmarks", "gverify", "*.json")):
+        try:
+            _r = json.load(open(_f, encoding="utf-8"))
+        except Exception:
+            continue
+        if _r.get("status") == "page_count_refused":
+            continue
+        if _r.get("failed"):
+            total += 1
     L = ["# P2W Classifier - Run Report", "",
          "**%s · %s IST**" % (d, t), "",
          "> %d classes cover %d failing documents across %d measured in Google."
