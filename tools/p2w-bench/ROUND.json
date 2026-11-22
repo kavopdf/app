@@ -1,11 +1,11 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "relay: engine built with dither patch, converting 2 worst-regressed docs",
-  "fixer_doing_since": 1795348066.2720377,
-  "fixer_engine_at_claim": "8929129",
-  "fixer_last_beat": 1795348066.2720387,
-  "fixer_started": 1795348487.464268,
+  "fixer_doing": "LO screen retry after soffice hiccup",
+  "fixer_doing_since": 1795347552.1033669,
+  "fixer_engine_at_claim": "462353f9",
+  "fixer_last_beat": 1795347552.103368,
+  "fixer_started": 1795347004.4684038,
   "history": [
     {
       "at": "2026-11-12 09:46",
