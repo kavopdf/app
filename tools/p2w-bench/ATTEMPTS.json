@@ -110,7 +110,7 @@
   "status": "OPEN"
  },
  "32_stroke_lines": {
-  "attempts": 16,
+  "attempts": 17,
   "first_seen": 1794543973.3763752,
   "history": [
    {
@@ -224,11 +224,18 @@
     "outcome": "kept",
     "reason": "check 32 read only vector segments; Google exports an anchored rule as a raster image at the same geometry. Made the check read image bands (band=RULE_BAND_REN, the same width the vector path uses). M",
     "total": 213
+   },
+   {
+    "at": "2026-11-22 06:13",
+    "moved": 16,
+    "outcome": "kept",
+    "reason": "the check change measured on 20 Google exports from a live round trip: 16 documents 41/42 -> 42/42, 0 worse. 13 of 14 documents failing {05,32} came back 42/42 - 05_chars_extra passes on HEAD too, so ",
+    "total": 213
    }
   ],
   "last": 1794543973.3763797,
   "last_engine": "462353f9",
-  "last_moved": 3,
+  "last_moved": 16,
   "last_total": 213,
   "outcomes": [
    "error",
@@ -249,11 +256,12 @@
    "lead",
    "lead",
    "lead",
+   "kept",
    "kept"
   ],
   "park_reason": "no progress in the last 12 attempts (error, error, reverted, error, error, reverted, reverted, lead, lead, lead, lead, lead)",
   "parked_at": "22 Nov 02:09",
-  "reason": "check 32 read only vector segments; Google exports an anchored rule as a raster image at the same geometry. Made the check read image bands (band=RULE_BAND_REN, the same width the vector path uses). Measured on 6 real Google exports from a live round trip: 394/17_three_column/315_gazette 41/42 -> 42/42 PASS, 407 46->8 lost rules but still fails, 311 +1 check, 382 clean control held. Zero regressions; monotone by construction - adding render segments can only reduce lost rules.",
+  "reason": "the check change measured on 20 Google exports from a live round trip: 16 documents 41/42 -> 42/42, 0 worse. 13 of 14 documents failing {05,32} came back 42/42 - 05_chars_extra passes on HEAD too, so the table's 05 column is stale as well.",
   "reasons": [
    "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH.",
    "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md",
@@ -272,7 +280,8 @@
    "Google measurement of the carrier on two documents: 51_two_cm_margins stays 42/42 (rewritten, not worse), 17_three_column_widths_txtpos 40/42 -> 42/42. Refuted the 02:50 prescription: 32_stroke_lines is vacuous on 45 scored docs (0 isolated source rules, all 45 pass), so no Shape-field predicate can separate the five risk documents - there is no narrowing to build. The landing blocker is the 04:00 run's 54 proxy regressions (nested carriers inside table cells), not the predicate.",
    "Measured the two things the last two runs left open, on committed evidence and two independent measurements: (1) the prescribed cell guard cannot fire - no Shape is ever routed into a w:tc, guard built and byte-identical output on 5 PDFs, max tc-depth 0 across 156 carriers in 22 docs; (2) the carrier is Google-clean on 13 of the 16 documents that already have a carrier Google result (all 16 clear 05_chars_extra, none regress), so the 54-document blocker is a LibreOffice page-overflow artefact (7 of 8 regressed docs gain a page) that regress.py already exempts when Google improved. What is missing is 38 unmeasured Google results, not a fix.",
    "Measured the lead the last two runs left open and falsified it: the 16 carrier Google results carry fields no script writes (grep engine_patch: no matches), no per-check map, and a placeholder timestamp, so 13-of-16 cannot be re-derived; and in a clean clone the patch makes 4 of 10 clean controls worse (16_right_aligned_amounts 42->36, product-catalogue 42->37, 1->3 pages). Did not land: nothing to land. Replacement lead recorded: a real Google round trip run twice on HEAD shows 05_chars_extra passing where the committed table (engine 462353f) says it fails - the Google table is stale.",
-   "check 32 read only vector segments; Google exports an anchored rule as a raster image at the same geometry. Made the check read image bands (band=RULE_BAND_REN, the same width the vector path uses). Measured on 6 real Google exports from a live round trip: 394/17_three_column/315_gazette 41/42 -> 42/42 PASS, 407 46->8 lost rules but still fails, 311 +1 check, 382 clean control held. Zero regressions; monotone by construction - adding render segments can only reduce lost rules."
+   "check 32 read only vector segments; Google exports an anchored rule as a raster image at the same geometry. Made the check read image bands (band=RULE_BAND_REN, the same width the vector path uses). Measured on 6 real Google exports from a live round trip: 394/17_three_column/315_gazette 41/42 -> 42/42 PASS, 407 46->8 lost rules but still fails, 311 +1 check, 382 clean control held. Zero regressions; monotone by construction - adding render segments can only reduce lost rules.",
+   "the check change measured on 20 Google exports from a live round trip: 16 documents 41/42 -> 42/42, 0 worse. 13 of 14 documents failing {05,32} came back 42/42 - 05_chars_extra passes on HEAD too, so the table's 05 column is stale as well."
   ],
   "requeues": 0,
   "status": "PARKED"

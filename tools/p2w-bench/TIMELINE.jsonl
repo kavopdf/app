@@ -2203,3 +2203,4 @@
 {"t": 1795308048.9163303, "ist": "06:10:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795308049.0210485, "ist": "06:10:49", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795308196.785518, "ist": "06:13:16", "ev": "beat", "d": "gates after 20-doc round trip"}
+{"t": 1795308223.9875343, "ist": "06:13:43", "ev": "beat", "d": "attempt.py: recording an attempt"}
