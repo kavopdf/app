@@ -1,8 +1,10 @@
 {
   "baseline_started": 1795361683.041859,
   "classifier_started": 0,
-  "fixer_engine_at_claim": "ff060d4c",
-  "fixer_last_beat": 1795387119.8591728,
+  "fixer_doing": "claimed, reading handoff",
+  "fixer_doing_since": 1795389995.315435,
+  "fixer_engine_at_claim": "98be7c3c",
+  "fixer_last_beat": 1795389995.315436,
   "fixer_started": 1795389983.2212079,
   "history": [
     {

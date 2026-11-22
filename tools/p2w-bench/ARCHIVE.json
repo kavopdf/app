@@ -1,10 +1,13 @@
 {
- "last": "2026-11-21",
+ "last": "2026-11-23",
  "moved": [
   "tools/p2w-bench/HYPOTHESES.md (rotated)",
   "tools/p2w-bench/TRACE.md (rotated)",
   "tools/p2w-bench/HYPOTHESES.md (rotated)",
   "tools/p2w-bench/TRACE.md (rotated)",
-  "tools/p2w-bench/TRACE.md (rotated)"
+  "tools/p2w-bench/TRACE.md (rotated)",
+  "tools/p2w-bench/TRACE.md (rotated)",
+  "tools/p2w-bench/TIMELINE.jsonl (rotated)",
+  "tools/p2w-bench/HYPOTHESES.md (rotated)"
  ]
 }

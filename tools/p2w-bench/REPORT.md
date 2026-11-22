@@ -1,33 +1,26 @@
-# Fixer report - 2026-11-23 02:57
+# Fixer report - 2026-11-23 04:56
 
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 02:57 → running IST · 1h 13m**
+**23 Nov 2026 · slot 04:56 → running IST · 0 min**
 
-> **1 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **1** — 2 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **1** — 416_many_tiny_pages |
-| **Fixed - Google, all 42 checks** | **26**, out of the 192 documents both renderers measured |
+| **Fixed - Google, all 42 checks** | **28**, out of the 190 documents both renderers measured |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `18_displacement` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 04:08 | **lead** | 0/None | spacer hairline 20tw->1tw with the guard's room test keyed to a fixed 20 so no document changes spendable/refused: 22_invoice_four_columns_txtpos 41/42 -> 42/42 in Google, measured base and patched in |
-| 04:09 | **kept** | 1/None | spacer hairline 20tw->1tw, guard room test keyed to a fixed 20 so no document changes side of the guard; 22_invoice_four_columns 41/42 -> 42/42 in Google, base and patched measured in the same hour |
+| Working on | `-` |
 
 ## The txt
 
@@ -47,24 +40,12 @@
 
 | | |
 |:--|:--|
-| Slot window | 02:57 → running · 1h 13m |
+| Slot window | 04:56 → running · 0 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 19 |
-| Longest silence | **37.9 min** — from 03:30:06, after `corpus converted 213, measuring` |
-| Silences over 2 min | 4 |
-| Obstacles | 0 cleared · 2 parked, with the evidence to re-open them |
-| Still a wall | **The .txt half has not moved in 28.5 h, and the table now predates the engine it describes.** `txt/RANKING-TX |
+| Tool beats | 6 |
+| Silences over 2 min | 0 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| fix - diagnose and change the engine | **37 min** | `###########` |
-| measure or build - a conversion, screen or compile writes no beacon | **26 min** | `########` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **5 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |

@@ -1,0 +1,17 @@
+  paragraph ("In case the estimated total income in column 22b exceeds the maximum amount...")
+  is 97 %. The renderer's usable width for that cell is 530.35 pt (x 43.0 -> 573.3 on the
+  rendered page) and the paragraph at 97 % is 546.8 pt, so four of the page's nine lines wrapped
+  into two: the row renders 13 lines / 154 pt where the page drew 9 / 118 pt, and it no longer
+  fits the 158 pt the page had left, so it broke to a new sheet.
+  recorded: 2026-11-17 19:00
+
+- CONFIRMED - Passing the cell's real width (span and all) closes the instruction page: the
+  ceiling becomes 92 % and the row fits the space the page left for it.
+  evidence: one-token change, `colTw[c] - pInset` -> `spanTw - pInset` (spanTw is the sum of the
+  columns the cell covers, already computed two blocks above for the tcW). Corpus diff over all
+  213: **3 .docx change, 210 byte-identical in every zip entry** - 041122-Account_Opening_Form,
+  Account_Opening_Form_Fillable_filled, 373_leave_application_form, all three form documents
+  with merged cells. All three measured: 373 5.46 -> 4.64 share@5 (improved, 1 page both);
+  041122 11 -> 10 pages and Account_Opening_Form_Fillable_filled 11 -> 10, both share@5
+  unchanged at 99.02 because of the entry below. 0 worse. Attempt recorded 1/3 (partial).
+  CARRIED AS A PATCH, NOT IN THE ENGINE, for the commit-path reason the cantSplit entry above
