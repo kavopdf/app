@@ -2822,3 +2822,11 @@
 {"t": 1795370789.4698553, "ist": "23:36:29", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795370789.5587876, "ist": "23:36:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795370789.5795639, "ist": "23:36:29", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795371873.4428782, "ist": "23:54:33", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795371873.5698986, "ist": "23:54:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795371875.186199, "ist": "23:54:35", "ev": "beat", "d": "claimed fixer slot, reading charter"}
+{"t": 1795371889.1430607, "ist": "23:54:49", "ev": "beat", "d": "reading state: handoff, leverage, pending"}
+{"t": 1795372451.2782307, "ist": "00:04:11", "ev": "beat", "d": "building combined spacer+rowheight construct from 10:05 ratchet"}
+{"t": 1795372873.148792, "ist": "00:11:13", "ev": "beat", "d": "row dither refuted by repo measurement; recording lead"}
+{"t": 1795372873.3200924, "ist": "00:11:13", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795372907.0614767, "ist": "00:11:47", "ev": "beat", "d": "attempt.py: recording an attempt"}
