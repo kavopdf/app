@@ -2849,3 +2849,5 @@
 {"t": 1795377679.1163976, "ist": "01:31:19", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795377679.3995652, "ist": "01:31:19", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795377679.864422, "ist": "01:31:19", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377687.3500772, "ist": "01:31:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795377836.9569583, "ist": "01:33:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
