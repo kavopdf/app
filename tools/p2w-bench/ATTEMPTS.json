@@ -119,7 +119,7 @@
     "at": "2026-11-22 10:37",
     "moved": 0,
     "outcome": "lead",
-    "reason": "Four constructs measured in Google and refuted (hRule=exact inert, w:before inert, trHeight stored but not laid, hairline w:line replaced by Google); the working construct (box at the row's height) la",
+    "reason": "Four constructs built and measured in Google; none moved a document, and the audit afterwards found three of this run's own five claims overstated (corrected in FINDINGS/18_displacement-CORRECTION-1045-relay.md). The one construct that reproduces the page's sawtooth - box at the row's height - needs w:vAlign to place the baseline and that regresses LibreOffice 47->45 on mobile-bill. Engine reverted.",
     "total": 3
    }
   ],

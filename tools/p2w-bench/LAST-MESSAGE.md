@@ -36,7 +36,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 10:37 | **lead** | 0/3 | Four constructs measured in Google and refuted (hRule=exact inert, w:before inert, trHeight stored but not laid, hairline w:line replaced by Google); the working construct (box at the row's height) la |
+| 10:37 | **lead** | 0/3 | Four constructs built and measured in Google; none moved a document, and the audit afterwards found three of this run's own five claims overstated (corrected in FINDINGS/18_displacement-CORRECTION-1045-relay.md). The one construct that reproduces the page's sawtooth - box at the row's height - needs |
 
 ## The txt
 
@@ -50,22 +50,15 @@
 
 ## Subagents
 
-*None recorded by `report.py` - it reads a registry `delegate_task` does not write to.*
-
-Two audits did run this slot, and both changed the report. One read `DocxWriter.java` and the
-repo's measurement history and confirmed the engine emits **no** `w:tcMar` anywhere and `w:vAlign`
-only as `top`, so there is no shipped construct that sets a row's height without also setting its
-baseline. The other set out to falsify this run's own finding and succeeded on three of its five
-claims - the corrections section above is its work, and without it the next slot would have been
-handed two overstatements as facts.
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 10:20 → running · 26 min |
+| Slot window | 10:20 → 10:47 · 27 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 14 |
+| Tool beats | 19 |
 | Longest silence | **7.6 min** — from 10:39:18, after `report.py: building the report` |
 | Silences over 2 min | 6 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -76,8 +69,8 @@ handed two overstatements as facts.
 | Phase | Time | |
 |:--|--:|:--|
 | record - attempt, handoff, class rows | **3 min** | `###` |
-| report - the report and the chain | **8 min** | `#######` |
-| other - not attributed to a tool | **13 min** | `############` |
+| report - the report and the chain | **9 min** | `########` |
+| other - not attributed to a tool | **13 min** | `###########` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -87,6 +80,21 @@ handed two overstatements as facts.
 | `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
 | `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
 | `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+
+## Next run
+
+DO NOT build the 0.9634 row scale or the hairline cell box for single-line cells - both measured inert. Build against rowParts>1: raise the row floor to the true 368 twips (the floor is quantised 8 twips low at 360) OR take w:before off the continuation paragraphs inside a wrapped cell. Google grows 360-twip rows to 19.0/20.0; source pitch is 18.40; mobile-bill rows 5-12 hold 6 w:p on 3 columns and render at 20.0 = 2.0 pt of growth. Prove on mobile-bill and insurance-policy-schedule FIRST - they are the only two documents blocking a spacer construct already measured to take 6 documents clean (68_journal 42/42 this run). Then land the spacer (w:before + hairline w:line=1 at 5868-5875, cap 2880->4320 at 5852,5866) with it.
+
+> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+```
+
+Written by report.py from committed files only. Every number above is read from
+ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
+and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
 
 ## What this run measured, in Google
 
