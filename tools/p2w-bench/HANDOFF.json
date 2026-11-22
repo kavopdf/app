@@ -1897,16 +1897,6 @@
  },
  "history": [
   {
-   "at": "11:36",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "13:54",
-   "how": "forced",
-   "plan": ""
-  },
-  {
    "at": "14:51",
    "how": "forced",
    "plan": ""
@@ -1993,6 +1983,16 @@
   },
   {
    "at": "13:14",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "16:12",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "16:29",
    "how": "forced",
    "plan": ""
   }

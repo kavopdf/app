@@ -76,7 +76,33 @@ the `+1` quantum is exactly the disagreement. Compensating inside the cell fails
 is **not which construct, but which renderer the ratchet judges** — and the charter's rule 1 (Google is
 the truth) and rule 3 (`regress.py --check` must pass) currently point opposite ways on it.
 
-## What was tried
+The corpus pass is 6.0 s/document — 17 min for 212 — and it must run with
+`P2W_ENGINE_SRC=/scratch/work/CS` or `p2w.py:82` builds a fresh clone of HEAD and measures an engine
+with none of the patch in it. Starting a 17-minute pass with 15 minutes left is how a slot ends with a
+half-built table and nothing committed, so the engine is reverted, the patch stays in `patches/`, and
+the next slot inherits a lead with the exact commands in the finding.
+
+## Instrument findings
+
+* **The brief's "6 clean" figure is not what the data says.** Recomputed from the 213 JSONs this
+  run: **23** have an empty `failed[]`, 169 fail at least one check. The 23 matches the report's own
+  Fixed-Google row.
+* **`classpick.py --leverage` prices every class in a unit its heading does not name.** `18_displacement`
+  is printed as "38.7 clean documents"; fixing it alone turns exactly 16 clean, and 38.7 % of 42 checks
+  is 16.25, so the column is a percentage of the suite, not a count of documents. A class picked on that
+  number is picked on a 2.4x overstatement.
+* 21 documents are `page_count_refused` in `gverify/` yet carry a numeric score and a defect signature in
+  `RANKING.csv`, so the 192 scored and the 213 ranked are different populations.
+
+## The next move
+
+    git apply patches/18-spacer-before-rowpitch-rowrule.patch
+    P2W_ENGINE_SRC=/scratch/work/CS python3 benchmarks/p2w.py --budget 250 --force
+    python3 tools/p2w-bench/ratchet.py && bash tools/commit-gate.sh
+
+Check that the pass's first log line names `/scratch/work/CS` before spending anything on it. Expect the
+LibreOffice proxy to be hostile to this patch; if `ratchet.py` refuses on the proxy while Google reads
+47/47, record the gate-instrument contradiction before overruling it.
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
