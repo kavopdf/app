@@ -2781,3 +2781,6 @@
 {"t": 1795362840.7065048, "ist": "21:24:00", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795362841.0522597, "ist": "21:24:01", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795362841.1336508, "ist": "21:24:01", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795368027.982406, "ist": "22:50:27", "ev": "claim", "d": "classifier claimed the slot"}
+{"t": 1795368092.5870538, "ist": "22:51:32", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795368115.081754, "ist": "22:51:55", "ev": "beat", "d": "classrow.py: refreshing the class file"}

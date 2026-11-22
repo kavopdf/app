@@ -101,9 +101,14 @@
       "at": "2026-11-22 21:52",
       "phase": "measure",
       "round": 1
+    },
+    {
+      "at": "2026-11-22 22:52",
+      "phase": "classify",
+      "round": 1
     }
   ],
-  "phase": "classify",
+  "phase": "fix",
   "round": 1,
   "rounds_total": 3,
   "session_start": "18:00",

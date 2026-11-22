@@ -1,5 +1,3 @@
-| 19 Nov 16:11 | fixer | slot claimed - fixer running |
-| 19 Nov 16:58 | fixer | attempt content-partly-lost -> partial (5/10 moved) |
 | 19 Nov 18:00 | fixer | slot claimed - fixer running |
 | 19 Nov 18:40 | fixer | attempt content-present-partly-displaced -> reverted (0/18 moved) |
 | 19 Nov 18:53 | fixer | slot claimed - fixer running |
@@ -200,3 +198,4 @@
 | 22 Nov 19:52 | fixer | slot claimed - fixer running |
 | 22 Nov 21:00 | fixer | slot claimed - fixer running |
 | 22 Nov 21:24 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 22 Nov 22:50 | classifier | slot claimed - classifier running |
