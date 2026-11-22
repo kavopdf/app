@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 07:14 → running IST · 12 min**
+**22 Nov 2026 · slot 07:14 → 07:36 IST · 22 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -12,8 +12,7 @@
 | | |
 |:--|:--|
 | Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
-| Improved in LibreOffice | **61** of the 212 compared (corpus 213) — a proxy, not the goal |
-| &nbsp;&nbsp;— of those, clean in Google | **3** — and **57** still open there |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
@@ -41,17 +40,19 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dA-02` | what makes a single-page dense table drift in Google | 07:36 | 02:06 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 07:14 → running · 12 min |
+| Slot window | 07:14 → 07:36 · 22 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 16 |
-| Longest silence | **5.0 min** — from 07:14:12, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 3 |
+| Tool beats | 24 |
+| Longest silence | **9.0 min** — from 07:26:45, after `report.py: building the report` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
 | Still a wall | **Both scheduled slots between the last release and this claim produced no run at all.** `gaps.py` records `GA |
 
@@ -60,10 +61,12 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **5 min** | `#########` |
-| fix - diagnose and change the engine | **2 min** | `#####` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| other - not attributed to a tool | **3 min** | `#######` |
+| setup - claim, housekeeping, reading the gate | **1 min** | `##` |
+| fix - diagnose and change the engine | **2 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `#########` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **3 min** | `####` |
+| other - not attributed to a tool | **3 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -76,7 +79,7 @@
 
 ## Next run
 
-Do NOT take the page top for the 16 documents that fail 18_displacement alone: all 16 are single-page PDFs and their converted .docx carries zero page breaks, so the page-top construct (proven this run) cannot make one of them clean. Their displacement is row/line pitch inside one dense table or form - start from the -4.3 pt median / -12.8..+2.9 pt spread on page 1 of bank-statement-5-pages, which is the residual after the page-top fix and sits on a page that was never broken. Land the section margin (w:pgMar w:top) as a separate build on multi-page documents: DocxWriter.java:1053-1075 already emits a sectPr with nextPage, so it is that path plus beforeTw=0 in the two ctx.newPage branches (3395-3401, 4277-4283) plus the same twips out of ctx.budgetTw (1116) and out of what pageFits is asked - the first two alone double the gap in LibreOffice, the third is what holds the page count. Do NOT retry the 1x1 trHeight row: measured this run, it takes bank-statement-5-pages from 5 pages to 6 and 37/42 to 33/42. Numbers: FINDINGS/18_displacement-page-top-gap-sectmargin-PROVEN-075600-f1x.md.
+The 16 solo-18 documents: their emitted row pitch ALREADY equals the source (0.00 pt on 11 of 16, -0.10 to -0.40 on the rest), so no constant in the row-height path (DocxWriter.java:6228) can move them closer. The leading candidate is the TABLE-TOP SPACER at DocxWriter.java:5869-5881: the gap above a table is written as w:line on a 1 pt mark, and Google reads w:line as a multiple of the face's line height, so 68_journal_wide_table_spanning's 144.0 pt spacer may render as 13.74 pt (-130.3) or 160.9 (+16.9). One Drive probe settles which: an empty <w:p> with w:sz=2 and w:line=2880 w:lineRule="exact" - does it come back 13.74, 144 or 160.9 pt? The spacer moves 14 of the 16 by 4.2 to 130.3 pt; 71_invoice_space_aligned_no_rules and 31_times_body_arial_headings have no spacer, and 31_times has no table at all, so its failure cannot be pitch. Full numbers in FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md. Do NOT take the page top for these 16: they are single-page with zero page breaks.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
