@@ -1,19 +1,5 @@
 [
  {
-  "started_ts": 1795134093.113132,
-  "started": "05:51",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "content-present-partly-displaced",
-  "attempts": 2,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795137815.0990586,
   "started": "06:53",
   "ended_ts": null,
@@ -1197,6 +1183,27 @@
    [
     "18_displacement",
     3
+   ]
+  ],
+  "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795382844.8750267,
+  "started": "02:57",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "18_displacement",
+  "attempts": 2,
+  "kept": 1,
+  "docs_improved": 1,
+  "agents": [],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ratchets": 1,
+  "counted": [
+   [
+    "18_displacement",
+    1
    ]
   ],
   "ended_how": "killed - slot cleared by a force release"

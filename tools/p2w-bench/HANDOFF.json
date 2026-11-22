@@ -1920,15 +1920,10 @@
  ],
  "run": {
   "started": "02:57",
-  "ended": null,
-  "ended_how": null
+  "ended": "04:11",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "21:33",
-   "how": "forced",
-   "plan": ""
-  },
   {
    "at": "23:15",
    "how": "forced",
@@ -2021,6 +2016,11 @@
   },
   {
    "at": "02:33",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "04:11",
    "how": "forced",
    "plan": ""
   }
