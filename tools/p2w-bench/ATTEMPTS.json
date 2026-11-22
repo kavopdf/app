@@ -7,7 +7,7 @@
     "at": "2026-11-23 05:09",
     "moved": 0,
     "outcome": "lead",
-    "reason": "Mechanism measured, fix not landed: Google converts each page-positioned floating shape into an inline image in the flow, ~0.79 pt each; 22 of 23 refused documents emit their shapes AFTER the last tex",
+    "reason": "corrected: see FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md - the cost is the empty paragraph (~0.83 pt), not an inline image",
     "total": 23
    }
   ],
@@ -19,7 +19,7 @@
    "error",
    "lead"
   ],
-  "reason": "Mechanism measured, fix not landed: Google converts each page-positioned floating shape into an inline image in the flow, ~0.79 pt each; 22 of 23 refused documents emit their shapes AFTER the last text paragraph, so a full page overflows. Six docx-level variants measured through Google (drop last, merge into one paragraph, attach to text paragraphs, prstGeom, wrapSquare, framePr) - all still 2 pages; deleting all shapes is 1 page, which proves the cause. Fix needs the table writer (w:tcBorders). FINDINGS/00_page_count-GOOGLE-INLINES-EVERY-SHAPE-0530-fixer.md",
+  "reason": "CORRECTED after an independent re-measurement: Google does NOT inline the shapes - it rasterises them at their page coordinates, and the flow cost is the empty paragraph that carries each one, ~0.83 pt (w:line=\"1\" exact is not honoured for it). 108 of them = 89.9 pt against 44.5 pt of free page on 301_lab_report_panel, so a 1-page source renders 2; deleting all 108 -> 1 page at the same text y (the control). 22 of the 23 refused documents emit ALL their drawing-only paragraphs after the last text paragraph (7..2464 of them); 350_question_paper has 1 and is not explained by this. Refuted by measurement, do not retry: drop-last, prstGeom-rect, wrapSquare, framePr. VOID (probe bug, never measured): merge-into-one-paragraph, attach-to-text. Next lever: merge a page's drawing-only paragraphs into one (DocxWriter.java:2726) - 88.8 pt saved vs 89.9 pt needed here, a one-point margin, measure it; then w:tcBorders through the table writer. FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md",
   "reasons": [
    "namespace test",
    "Mechanism measured, fix not landed: Google converts each page-positioned floating shape into an inline image in the flow, ~0.79 pt each; 22 of 23 refused documents emit their shapes AFTER the last text paragraph, so a full page overflows. Six docx-level variants measured through Google (drop last, merge into one paragraph, attach to text paragraphs, prstGeom, wrapSquare, framePr) - all still 2 pages; deleting all shapes is 1 page, which proves the cause. Fix needs the table writer (w:tcBorders). FINDINGS/00_page_count-GOOGLE-INLINES-EVERY-SHAPE-0530-fixer.md"
