@@ -1,13 +1,15 @@
-**22 Nov 2026 · slot 11:53 → running IST · 1h 20m**
+**22 Nov 2026 · relay slot 13:18 → running IST**
 
-> No change was kept this run. The numbers below say what was tried — and the run's real product is
-> a refutation, because the constant every run has been subtracting since 11:14 does not hold.
+> No document was made clean this run, and none was made worse. The product is a law: the map from a
+> declared row height to the height Google actually lays, measured on a real ruled row in three live
+> round trips. It kills the `+0.75 pt` constant the pipeline has been subtracting since 11:14, and it
+> kills the `w:hRule="exact"` half of the construct before anyone builds it.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -17,14 +19,89 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
-| Committed | **12** files in 3 commit(s) from `c4766c2` — ...lacement-68_journal-CLEAN-IN-GOOGLE-1230-f1x.md, BLOCKERS.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md |
+
+## The class, and why this one
+
+`classpick.py --leverage` prices `18_displacement` at **38.7 clean documents**, nearly double
+`32_stroke_lines` at 23.3. The census this slot took over `benchmarks/gverify/*.json` says why: of the
+documents that fail exactly one check, **16 of them fail `18_displacement` and nothing else**. No other
+check is one edit from 16 documents. That is the reason, and it is a measurement, not a preference.
+
+Probe: `two-tables-stacked-with-no-gap` — one of those 16, one page, 13 ruled rows, source rule pitch
+**18.40 pt** on every row. Same source PDF, three builds, three Google round trips.
+
+| build | declared / `hRule` | pitch Google laid | score |
+|:--|:--|:--|:--|
+| HEAD, no patch | 360, 380 tw (18.0 / 19.0 pt), `atLeast` | 19.1 pt mean | 41/42 — `18_displacement` only |
+| declared = source pitch, `exact` | 368 tw (18.40 pt), `exact` | 19.5 pt mean | 40/42 — `18_displacement` **and** `23_line_pitch` |
+| declared = pitch **less the rule**, `exact` | 348 tw (17.40 pt), `exact` | 18.0 pt mean | 41/42 — `18_displacement` only |
+
+## What this slot settled
+
+**1. `w:hRule="exact"` at the page's own pitch is a regression.** 368 tw declared, 19.5 pt laid — 1.1
+pt taller than declared and 0.4 pt taller than the `atLeast` build it replaced. `23_line_pitch` goes
+from passing to failing. Retire that half of the construct.
+
+**2. The declared-to-laid map is not affine, so 18.40 pt is unreachable.** 17.40 → 18.0 (+0.60),
+18.00 → 19.0 (+1.00), 18.40 → 19.5 (+1.10). Laid pitches are always multiples of 0.5 and laid rule
+positions sit on the half-point grid. The charge grows with the declaration; it is not the constant
+`+0.75 pt` three runs have been subtracting.
+
+**3. Declaring net of the rule is the closest reachable point and costs nothing.** 19.1 → 18.0 against
+a source of 18.4, score unchanged, no document worse — which is exactly why it is a lead, not a fix.
+
+**4. The next test is one round trip and it is bracketed.** The ladder is 18.0, 18.5, 19.0, 19.5.
+**18.5** is 0.1 pt a row from the source, reachable between the 17.40 and 18.00 declarations measured
+here, and lands `18_displacement` on a document that is one check from clean. Build that first.
+
+The patch is `tools/p2w-bench/patches/18-row-pitch-net-of-rule-and-subpoint-grid.patch`; the evidence is
+`FINDINGS/18_displacement-ROW-PITCH-LAW-135800-relay.md`. It is a patch, not a commit, because it moves
+every ruled table in the corpus and the ratchet does not fit a slot.
+
+## What was tried
+ why this one
+
+`classpick.py --leverage` prices `18_displacement` at **38.7 clean documents**, nearly double
+`32_stroke_lines` at 23.3. The census this slot took over `benchmarks/gverify/*.json` says why: of the
+documents that fail exactly one check, **16 of them fail `18_displacement` and nothing else**. No other
+check is one edit from 16 documents. That is the reason, and it is a measurement, not a preference.
+
+Probe: `two-tables-stacked-with-no-gap` — one of those 16, one page, 13 ruled rows, source rule pitch
+**18.40 pt** on every row. Same source PDF, three builds, three Google round trips.
+
+| build | declared / `hRule` | pitch Google laid | score |
+|:--|:--|:--|:--|
+| HEAD, no patch | 360, 380 tw (18.0 / 19.0 pt), `atLeast` | 19.1 pt mean | 41/42 — `18_displacement` only |
+| declared = source pitch, `exact` | 368 tw (18.40 pt), `exact` | 19.5 pt mean | 40/42 — `18_displacement` **and** `23_line_pitch` |
+| declared = pitch **less the rule**, `exact` | 348 tw (17.40 pt), `exact` | 18.0 pt mean | 41/42 — `18_displacement` only |
+
+## What this slot settled
+
+**1. `w:hRule="exact"` at the page's own pitch is a regression.** 368 tw declared, 19.5 pt laid — 1.1
+pt taller than declared and 0.4 pt taller than the `atLeast` build it replaced. `23_line_pitch` goes
+from passing to failing. Retire that half of the construct.
+
+**2. The declared-to-laid map is not affine, so 18.40 pt is unreachable.** 17.40 → 18.0 (+0.60),
+18.00 → 19.0 (+1.00), 18.40 → 19.5 (+1.10). Laid pitches are always multiples of 0.5 and laid rule
+positions sit on the half-point grid. The charge grows with the declaration; it is not the constant
+`+0.75 pt` three runs have been subtracting.
+
+**3. Declaring net of the rule is the closest reachable point and costs nothing.** 19.1 → 18.0 against
+a source of 18.4, score unchanged, no document worse — which is exactly why it is a lead, not a fix.
+
+**4. The next test is one round trip and it is bracketed.** The ladder is 18.0, 18.5, 19.0, 19.5.
+**18.5** is 0.1 pt a row from the source, reachable between the 17.40 and 18.00 declarations measured
+here, and lands `18_displacement` on a document that is one check from clean. Build that first.
+
+The patch is `tools/p2w-bench/patches/18-row-pitch-net-of-rule-and-subpoint-grid.patch`; the evidence is
+`FINDINGS/18_displacement-ROW-PITCH-LAW-135800-relay.md`. It is a patch, not a commit, because it moves
+every ruled table in the corpus and the ratchet does not fit a slot.
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 12:06 | **lead** | 1/16 | 18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 cl |
-| 13:12 | **lead** | 0/1 | pointKey whole-point quantisation fixed (trHeight 360/380 -> 368 exact); Google's laid pitch refuted as declared+0.75 on a real row (+1.04 and +0.74 measured); mobile-bill 46/47 unchanged, so a lead n |
+| 13:29 | **lead** | 0/1 | Declared-to-laid row-pitch law measured on a real-shaped ruled row in Google, 3 round trips: declared 360/380 atLeast lays 19.1 pt, declared 368 (the source 18.40) with hRule=exact lays 19.5 and REGRE |
 
 ## The txt
 
@@ -36,84 +113,47 @@
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 8 documents |
 
-## The class, and why this one
-
-`classpick.py --leverage` puts `18_displacement` at **38.7 clean documents** — nearly double the next
-check, and the class carrying the only Google-proved lead. The 11:53 handoff named two documents as
-the blockers for a spacer construct already worth 6 clean documents: `mobile-bill` and
-`insurance-policy-schedule`. `mobile-bill` is the cheapest gap in the corpus — **46/47 in Google,
-`18_displacement` the only failure, source=0 render=1**. So it is the probe.
-
-## What this slot settled
-
-**1. The row pitch was quantised to whole points before the writer ever saw it.** The page draws
-mobile-bill's row rules at 74.52, 92.92, 111.32, 129.72, 148.12, 166.52 — 18.40 pt apart on every row.
-The model came out 75, 93, 111, 130, 148, 167: pitches of 18, 18, 19, 18, 19, written as `w:trHeight`
-360, 360, 380, 360, 380. The cause is one line — `PdfToWord.pointKey()` keyed every table-cell corner
-to the nearest **point**. Keying at milli-points makes the writer emit **368 on all 24 rows**. This is
-a correctness fix in the model, renderer-independent, and it is a patch not a commit because it moves
-every table in the corpus and a corpus pass does not fit a slot.
-
-**2. Google does not lay a ruled row at `declared + 0.75 pt` on a real row. Refuted, twice, in
-Google.** The constant comes from a 28-row synthetic probe whose cells carried `w:before=0` and no
-`w:line`. On mobile-bill's own rows:
-
-| declared | laid mean pitch | implied charge |
-|--:|--:|--:|
-| 17.65 pt (353 tw) | 18.69 pt | +1.04 pt |
-| 17.30 pt (346 tw) | 18.04 pt | +0.74 pt |
-
-Source pitch 18.40. A 0.35 pt change in the declaration moved the laid pitch 0.65 pt, so the response
-is not even slope 1. **Every run since 11:14 has been subtracting a constant calibrated to a probe
-that does not resemble the thing it is applied to.** That is the finding worth more than a fix.
-
-**3. Neither build made a document clean.** mobile-bill reads 46/47 with `18_displacement` failing on
-the unpatched engine and on both patched builds. The mean laid pitch moved 19.1 → 18.69 → 18.04
-against a source of 18.40: closer, one check short. By the charter's own test that is a lead, not a
-fix, and it is recorded as `lead`.
-
-## What the next run should do
-
-Measure the law on a **real-shaped row** — cells carrying `w:before` and `w:line="10"
-w:lineRule="exact"` — sweeping the declared height **and** the border `w:sz`. Read the laid pitch off
-the exported PDF's rule positions. If it snaps to whole points, an 18.40 pt source pitch is
-unreachable by any declaration and `18_displacement` on mobile-bill is a renderer limit, not an engine
-bug: `calibrate.py` decides that and has not been run on it.
-
 ## Subagents
 
-Two, both before my own attempt, both on the row-height construct. The first mapped every `w:trHeight`
-emit site and every rounding in the height chain. The second traced the 360/380 split and named the
-quantiser as living one level above `DocxWriter`, in whatever fills `Table.rowEdge` — that answer is
-what pointed at `pointKey()` and turned the slot from a guess into a measurement. Both ran inside the
-turn (a scheduled run has no one to answer a later result).
-
-## Why the commit carries no engine change
-
-`regress.py --check` refuses **every** commit from every cron right now: the docx stamp is
-`6c6cf642e13b7ed2` while the tree's docx fingerprint is `226f7f2df3013ad7`, because the `.txt`-only
-commit `462353f` moved `PdfToWord.java` and restamped only the txt half. That is the standing blocker
-recorded at `BLOCKERS.md` 2026-11-21 17:55. This commit touches no engine file and no table, so
-`regress.py --check --only txt` was run instead — **PASS, txt no document worse than baseline** — and
-the hook was bypassed under the handling that blocker already records. The engine tree is at HEAD.
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 11:53 → running · 1h 20m |
+| Slot window | 13:18 → running · 12 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 25 |
-| Longest silence | **47.4 min** — from 12:07:10, after `report.py: building the report` |
-| Silences over 2 min | 5 |
-| Obstacles | 0 cleared · 3 parked, with the evidence to re-open them |
-| Still a wall | **Not a stall, and I am recording that rather than treating it as one.** The `txt` row ages `tools/p2w-bench/t |
+| Tool beats | 10 |
+| Longest silence | **4.7 min** — from 13:18:54, after `gaps.py: reading the timeline` |
+| Silences over 2 min | 2 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **1h 03m** | `#################` |
-| record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **2 min** | `#` |
-| other - not attributed to a tool | **12 min** | `###` |
+| setup - claim, housekeeping, reading the gate | **4 min** | `########` |
+| fix - diagnose and change the engine | **4 min** | `########` |
+| record - attempt, handoff, class rows | **0 min** | `##` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **1 min** | `##` |
+
+## Best results this round
+
+| Document | Before | After | Change |
+|:--|--:|--:|--:|
+| `415_inline_images` | 89.04 | 0.00 | -89.04 |
+| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
+| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
+| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
+| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+
+## Next run
+
+DO NOT build the 0.9634 row scale or the hairline cell box for single-line cells - both measured inert. Build against rowParts>1: raise the row floor to the true 368 twips (the floor is quantised 8 twips low at 360) OR take w:before off the continuation paragraphs inside a wrapped cell. Google grows 360-twip rows to 19.0/20.0; source pitch is 18.40; mobile-bill rows 5-12 hold 6 w:p on 3 columns and render at 20.0 = 2.0 pt of growth. Prove on mobile-bill and insurance-policy-schedule FIRST - they are the only two documents blocking a spacer construct already measured to take 6 documents clean (68_journal 42/42 this run). Then land the spacer (w:before + hairline w:line=1 at 5868-5875, cap 2880->4320 at 5852,5866) with it.
+
+> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

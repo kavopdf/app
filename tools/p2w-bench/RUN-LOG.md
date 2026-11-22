@@ -1,6 +1,3 @@
-| 17 Nov 23:02 | baseline | slot claimed - baseline running |
-| 17 Nov 23:43 | classifier | slot claimed - classifier running |
-| 18 Nov 09:54 | fixer | slot claimed - fixer running |
 | 18 Nov 11:55 | fixer | attempt content-missing-nothing-in-its-place -> reverted (0/30 moved) |
 | 18 Nov 12:58 | fixer | slot claimed - fixer running |
 | 18 Nov 13:44 | fixer | attempt single-element-far-out -> partial (1/1 moved) |
@@ -199,3 +196,5 @@
 | 22 Nov 12:06 | fixer | attempt content-present-partly-displaced -> lead (1/16 moved) |
 | 22 Nov 13:12 | fixer | attempt 18_displacement -> lead (0/1 moved) |
 | 22 Nov 13:14 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 22 Nov 13:18 | fixer | slot claimed - fixer running |
+| 22 Nov 13:29 | fixer | attempt 18_displacement -> lead (0/1 moved) |

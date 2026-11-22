@@ -2568,3 +2568,22 @@
 {"t": 1795334097.2487116, "ist": "13:24:57", "ev": "beat", "d": "relay: patched sub-point row geometry + exact row height, rebuilding"}
 {"t": 1795334379.6019447, "ist": "13:29:39", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795334382.539094, "ist": "13:29:42", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795334385.6736975, "ist": "13:29:45", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795334385.7579138, "ist": "13:29:45", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795334385.873535, "ist": "13:29:45", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795334409.1464856, "ist": "13:30:09", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334410.0011218, "ist": "13:30:10", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334410.4746916, "ist": "13:30:10", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334414.3902652, "ist": "13:30:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334419.4256437, "ist": "13:30:19", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334433.6714664, "ist": "13:30:33", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334434.241029, "ist": "13:30:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334434.5725584, "ist": "13:30:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334441.3659809, "ist": "13:30:41", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334442.1489747, "ist": "13:30:42", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334442.91577, "ist": "13:30:42", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334443.3302069, "ist": "13:30:43", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334448.2174559, "ist": "13:30:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334448.9685855, "ist": "13:30:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334449.5236583, "ist": "13:30:49", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795334449.8493044, "ist": "13:30:49", "ev": "beat", "d": "report.py: building the report"}

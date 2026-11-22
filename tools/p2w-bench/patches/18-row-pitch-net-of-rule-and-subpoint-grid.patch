@@ -1,0 +1,239 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4ead19de..7a60946c 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6313,10 +6313,36 @@ public final class DocxWriter {
+                     }
+                 }
+             }
++            // WHEN THE PAGE ITSELF DECIDED THE HEIGHT, DECLARE IT AS EXACT.
++            //
++            // w:hRule="atLeast" tells the renderer "this is a minimum, grow it if you think the
++            // content needs more". Google does exactly that, by a fraction of a point a row, and
++            // on a table of twenty rows that fraction is the whole of check 18's progressive
++            // drift: the block starts right and walks off the page. The pitch used here came
++            // from the page's OWN rules, so the page has already proved that its content fits in
++            // that pitch - laying the row at exactly that height is not an estimate, it is the
++            // measurement. Any floor that raised the row above the page's pitch (the type-size
++            // floor, the page squeeze, a re-cut table's content extent, a row cut at the paper's
++            // bottom edge) means the page's pitch is NOT what this row will be laid at, and those
++            // all fall back to atLeast, which is the old behaviour.
++            boolean rowExact = exactRows && rowCapTw < 0 && paraContentTw == 0
++                    && rowHeightTw == rowTwHere && ctx.squeeze == 1f;
++            if (rowExact) {
++                // GOOGLE CHARGES THE ROW'S RULE ON TOP OF THE DECLARED HEIGHT.
++                // Measured on two-tables-stacked-with-no-gap, live round trip, 22 Nov 13:56:
++                // declared 360/380 tw (18.0/19.0 pt) atLeast -> laid 19.0 pt on every row;
++                // declared 368 tw (18.40 pt) exact -> laid 19.5 pt on every row. Both are
++                // declared + 0.875 pt (the w:sz="7" bottom border) carried up to the nearest
++                // half point. So a declaration equal to the page's pitch is NOT laid at the
++                // page's pitch; it is laid one rule too tall, on every row, and on fifteen
++                // rows that is the whole of check 18. Declare the pitch LESS the rule.
++                rowHeightTw = Math.max(1, rowHeightTw - 2 * ruleTwHere);
++            }
+             inner.append("<w:tr>");
+             if (rowTwHere > 0) {
+                 inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
+-                     .append("\" w:hRule=\"atLeast\"/><w:cantSplit/></w:trPr>");
++                     .append(rowExact ? "\" w:hRule=\"exact\"/><w:cantSplit/></w:trPr>"
++                                      : "\" w:hRule=\"atLeast\"/><w:cantSplit/></w:trPr>");
+             }
+             int c = 0;
+             while (c < cols) {
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index ad56dac1..ff947de1 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -7706,6 +7706,34 @@ public final class PdfToWord {
+ 
+     private static float keyY(long key) { return (float) (int) (key & 0xffffffffL); }
+ 
++    /**
++     * THE SUB-POINT POSITION OF A KEYED CORNER.
++     *
++     * pointKey() rounds a corner to a whole point so that the corners of a grid group together -
++     * that is what it is for and it stays. What it must NOT do is decide the geometry: keyX/keyY
++     * hand back the rounded integer, so a ruled table whose rules sit 18.40 pt apart left this
++     * method as 18, 18, 19, 18, 19 and the writer emitted w:trHeight 360, 360, 380, 360, 380.
++     * The page drew one pitch on every row; the model said three.
++     *
++     * So the grouping key is unchanged and the coordinate is recovered by averaging the edges
++     * that produced it - same corners in the same slots, but 368 twips instead of 360.
++     */
++    private static float meanX(Map<Long, List<Edge>[]> isect, long key) {
++        List<Edge>[] slot = isect.get(key);
++        if (slot == null || slot[0].isEmpty()) return keyX(key);
++        double s = 0;
++        for (Edge e : slot[0]) s += e.x0;
++        return (float) (s / slot[0].size());
++    }
++
++    private static float meanY(Map<Long, List<Edge>[]> isect, long key) {
++        List<Edge>[] slot = isect.get(key);
++        if (slot == null || slot[1].isEmpty()) return keyY(key);
++        double s = 0;
++        for (Edge e : slot[1]) s += e.top;
++        return (float) (s / slot[1].size());
++    }
++
+     /** Points where a vertical and a horizontal edge meet, with the edges touching each point. */
+     private static Map<Long, List<Edge>[]> edgesToIntersections(List<Edge> edges) {
+         List<Edge> vs = new ArrayList<>(), hs = new ArrayList<>();
+@@ -7756,6 +7784,8 @@ public final class PdfToWord {
+         for (int i = 0; i < points.size(); i++) {
+             long pt = points.get(i);
+             float px = keyX(pt), py = keyY(pt);
++            // the key decides WHICH corners are the same corner; the mean decides WHERE it is
++            float mx = meanX(isect, pt), my = meanY(isect, pt);
+             List<Long> below = new ArrayList<>(), right = new ArrayList<>();
+             for (int j = i + 1; j < points.size(); j++) {
+                 long q = points.get(j);
+@@ -7769,7 +7799,7 @@ public final class PdfToWord {
+                     if (!edgeConnects(isect, pt, rp)) continue;
+                     long br = pointKey(keyX(rp), keyY(bp));
+                     if (isect.containsKey(br) && edgeConnects(isect, br, rp) && edgeConnects(isect, br, bp)) {
+-                        cells.add(new float[]{px, py, keyX(rp), keyY(bp)});
++                        cells.add(new float[]{mx, my, meanX(isect, rp), meanY(isect, bp)});
+                         found = true;
+                         break;
+                     }
+diff --git a/tools/p2w-bench/HANDOFF.json b/tools/p2w-bench/HANDOFF.json
+index d11680ff..d4fcccab 100644
+--- a/tools/p2w-bench/HANDOFF.json
++++ b/tools/p2w-bench/HANDOFF.json
+@@ -1827,9 +1827,9 @@
+   }
+  ],
+  "run": {
+-  "started": "11:53",
+-  "ended": "13:14",
+-  "ended_how": "forced"
++  "started": "13:18",
++  "ended": null,
++  "ended_how": null
+  },
+  "history": [
+   {
+diff --git a/tools/p2w-bench/HANDOFF.md b/tools/p2w-bench/HANDOFF.md
+index 779a99df..66961fd8 100644
+--- a/tools/p2w-bench/HANDOFF.md
++++ b/tools/p2w-bench/HANDOFF.md
+@@ -19,9 +19,9 @@ unfinished work, not as a result.
+ 
+ | | |
+ |---|---|
+-| started | 11:53 |
+-| ended | 13:14 |
+-| how it ended | forced |
++| started | 13:18 |
++| ended | still running |
++| how it ended | - |
+ | plan | - |
+ 
+ ## The picture, in the words of the run that left it
+diff --git a/tools/p2w-bench/ROTATION.json b/tools/p2w-bench/ROTATION.json
+index 01cd46a1..eb9d800a 100644
+--- a/tools/p2w-bench/ROTATION.json
++++ b/tools/p2w-bench/ROTATION.json
+@@ -1,6 +1,6 @@
+ {
+  "exhausted": {},
+- "next": "txt",
++ "next": "docx",
+  "docx": {
+   "class": "18_displacement",
+   "since": "2026-11-22 11:15"
+diff --git a/tools/p2w-bench/ROUND.json b/tools/p2w-bench/ROUND.json
+index 51ac9052..804826a7 100644
+--- a/tools/p2w-bench/ROUND.json
++++ b/tools/p2w-bench/ROUND.json
+@@ -1,8 +1,10 @@
+ {
+   "baseline_started": 0,
+   "classifier_started": 0,
++  "fixer_doing": "relay: patched sub-point row geometry + exact row height, rebuilding",
++  "fixer_doing_since": 1795334097.2491837,
+   "fixer_engine_at_claim": "462353f9",
+-  "fixer_last_beat": 1795333371.017571,
++  "fixer_last_beat": 1795334097.2491846,
+   "fixer_started": 1795333709.4273512,
+   "history": [
+     {
+diff --git a/tools/p2w-bench/RUN-LOG.md b/tools/p2w-bench/RUN-LOG.md
+index be1adc26..03b09270 100644
+--- a/tools/p2w-bench/RUN-LOG.md
++++ b/tools/p2w-bench/RUN-LOG.md
+@@ -1,5 +1,3 @@
+-| 17 Nov 23:02 | baseline | slot claimed - baseline running |
+-| 17 Nov 23:43 | classifier | slot claimed - classifier running |
+ | 18 Nov 09:54 | fixer | slot claimed - fixer running |
+ | 18 Nov 11:55 | fixer | attempt content-missing-nothing-in-its-place -> reverted (0/30 moved) |
+ | 18 Nov 12:58 | fixer | slot claimed - fixer running |
+@@ -199,3 +197,4 @@
+ | 22 Nov 12:06 | fixer | attempt content-present-partly-displaced -> lead (1/16 moved) |
+ | 22 Nov 13:12 | fixer | attempt 18_displacement -> lead (0/1 moved) |
+ | 22 Nov 13:14 | fixer | slot FORCED released - see INCIDENTS.md for why |
++| 22 Nov 13:18 | fixer | slot claimed - fixer running |
+diff --git a/tools/p2w-bench/RUN.json b/tools/p2w-bench/RUN.json
+index 43546d57..c6b53767 100644
+--- a/tools/p2w-bench/RUN.json
++++ b/tools/p2w-bench/RUN.json
+@@ -1,10 +1,10 @@
+ {
+- "started_ts": 1795328615.0443494,
+- "started": "11:53",
+- "ended_ts": 1795333494.4543614,
+- "ended": "13:14",
+- "class": "18_displacement",
+- "attempts": 2,
++ "started_ts": 1795333712.4812539,
++ "started": "13:18",
++ "ended_ts": null,
++ "ended": null,
++ "class": "",
++ "attempts": 0,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [],
+diff --git a/tools/p2w-bench/TIMELINE.jsonl b/tools/p2w-bench/TIMELINE.jsonl
+index f7f2f84b..720076a2 100644
+--- a/tools/p2w-bench/TIMELINE.jsonl
++++ b/tools/p2w-bench/TIMELINE.jsonl
+@@ -2561,3 +2561,8 @@
+ {"t": 1795333494.316025, "ist": "13:14:54", "ev": "release", "d": "fixer released (forced)"}
+ {"t": 1795333494.430519, "ist": "13:14:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+ {"t": 1795333494.4536169, "ist": "13:14:54", "ev": "killed", "d": "dead claim cleared by force release"}
++{"t": 1795333712.1863008, "ist": "13:18:32", "ev": "claim", "d": "fixer claimed the slot"}
++{"t": 1795333712.4539056, "ist": "13:18:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
++{"t": 1795333734.4785783, "ist": "13:18:54", "ev": "beat", "d": "gaps.py: reading the timeline"}
++{"t": 1795334013.9123542, "ist": "13:23:33", "ev": "beat", "d": "relay: engine built, fetching corpus for one doc"}
++{"t": 1795334097.2487116, "ist": "13:24:57", "ev": "beat", "d": "relay: patched sub-point row geometry + exact row height, rebuilding"}
+diff --git a/tools/p2w-bench/TRACE.md b/tools/p2w-bench/TRACE.md
+index ddef6732..9fbdcdcd 100644
+--- a/tools/p2w-bench/TRACE.md
++++ b/tools/p2w-bench/TRACE.md
+@@ -6,13 +6,6 @@
+ | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
+ | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
+ | 17 Nov 09:30 | fixer | build-engine | started |
+-| 20 Nov 09:25 | fixer | claim | fixer claimed the slot |
+-| 20 Nov 09:58 | fixer | claim | fixer claimed the slot |
+-| 20 Nov 10:21 | fixer | build-engine | started |
+-| 20 Nov 10:22 | fixer | build-engine | engine built in 38s |
+-| 20 Nov 10:31 | fixer | build-engine | started |
+-| 20 Nov 10:31 | fixer | build-engine | engine built in 35s |
+-| 20 Nov 10:36 | fixer | attempt | 18_displacement -> reverted (0/107 moved) |
+ | 20 Nov 10:38 | fixer | attempt | 18_displacement -> reverted (0/107 moved) |
+ | 20 Nov 10:41 | fixer | attempt | 18_displacement -> reverted (0/107 moved) |
+ | 20 Nov 10:51 | fixer | claim | fixer claimed the slot |
+@@ -406,3 +399,10 @@
+ | 22 Nov 13:11 | fixer | build-engine | started |
+ | 22 Nov 13:11 | fixer | build-engine | engine built in 38s |
+ | 22 Nov 13:12 | fixer | attempt | 18_displacement -> lead (0/1 moved) |
++| 22 Nov 13:18 | fixer | claim | fixer claimed the slot |
++| 22 Nov 13:22 | fixer | build-engine | started |
++| 22 Nov 13:23 | fixer | build-engine | engine built in 37s |
++| 22 Nov 13:24 | fixer | build-engine | started |
++| 22 Nov 13:25 | fixer | build-engine | engine built in 38s |
++| 22 Nov 13:27 | fixer | build-engine | started |
++| 22 Nov 13:28 | fixer | build-engine | engine built in 40s |
