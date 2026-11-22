@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 10:20 |
-| ended | 10:47 |
-| how it ended | forced |
+| started | 11:14 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -106,7 +106,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `05:18` attempt 15 on 32_stroke_lines -> lead
 - `06:10` attempt 16 on 32_stroke_lines -> kept (3/213 moved)
 - `06:13` attempt 17 on 32_stroke_lines -> kept (16/213 moved)
 - `06:17` attempt 4 on 18_displacement -> lead
@@ -131,6 +130,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `10:09` agent deployed: 18_displacement / row-growth-mechanism - given the real DocxWriter.java, which emitted number Google ignores when it grow
 - `10:09` agent landed: 18_displacement / row-growth-mechanism -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md
 - `10:37` attempt 11 on 18_displacement -> lead (0/3 moved)
+- `11:21` attempt 12 on 18_displacement -> lead (0/3 moved)
 
 ## Where the rest of the state lives
 

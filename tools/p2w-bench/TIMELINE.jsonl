@@ -2475,3 +2475,6 @@
 {"t": 1795326621.8240275, "ist": "11:20:21", "ev": "beat", "d": "relay: building the trHeight sweep probe"}
 {"t": 1795326681.535494, "ist": "11:21:21", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795326699.9817362, "ist": "11:21:39", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795326703.3283339, "ist": "11:21:43", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795326703.5135972, "ist": "11:21:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795326703.730867, "ist": "11:21:43", "ev": "beat", "d": "classrow.py: refreshing the class file"}
