@@ -186,7 +186,22 @@ def clean_leverage():
             j = json.load(open(os.path.join(GV, f), encoding="utf-8"))
         except Exception:
             continue
+        # A REFUSED DOCUMENT IS WORTH A WHOLE DOCUMENT, AND THIS USED TO SKIP IT.
+        #
+        # gverify writes page_count_refused when Google reflows the document into a different number of
+        # pages, and every other check on it is unknown. This loop skipped those files, so
+        # 00_page_count - the class that owns them - scored ZERO clean leverage while sitting on 21
+        # documents. Measured 22 Nov: 00_page_count was in the ranking at 21 documents and absent from
+        # the leverage table entirely, so the tool could never suggest it and the 21 could never be
+        # fixed. The user asked "jo 21 documents hai wo kab fix honge" and the honest answer was "never,
+        # because nothing scores them".
+        #
+        # They are not worthless - they are the opposite. A refused document fails exactly one thing
+        # (the page count) and is unmeasured on the rest, so clearing that one check makes the whole
+        # document measurable. That is worth 1.0 of a clean document, the maximum any single check can
+        # be worth.
         if j.get("status") == "page_count_refused":
+            out["00_page_count"] = out.get("00_page_count", 0.0) + 1.0
             continue
         failed = j.get("failed") or []
         if not failed:
