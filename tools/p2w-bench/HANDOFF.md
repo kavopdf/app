@@ -82,8 +82,8 @@ unfinished work, not as a result.
 | t02_A-01 | t02_position | A | is the two-line 47_margins/t02 claim a real two-format fix | 11:34 | landed | landed | tools/p2w-bench/FINDINGS/t02_position-two-line-claim-112617-0bfd.md |
 | t01lostwords-01 | t01 | lostwords | which words each of the five documents loses, and why | 13:57 | the missing token list per document | landed | FINDINGS/t01-doubled-draw-both-sides-142100.md |
 | t01blastradius-01 | t01 | blastradius | which of 213 documents change verdict under the two source-side change | 13:57 | 2 fixed, 0 regressions | landed | FINDINGS/t01-doubled-draw-both-sides-142100.md |
-| 47_mA-02 | 47_margins | A | .docx blast radius of the uprightIfPageIsUpsideDown two-line fix: buil | 15:19 | expected by 16:15 | running |  |
-| 47_mB-02 | 47_margins | B | true size of 47_margins on the CURRENT engine: re-render the class's 2 | 15:19 | expected by 16:15 | running |  |
+| 47_mA-02 | 47_margins | A | .docx blast radius of the uprightIfPageIsUpsideDown two-line fix: buil | 15:19 | expected by 16:15 | landed | FINDINGS/47_margins-CELLPATH-A-150000.md |
+| 47_mB-02 | 47_margins | B | true size of 47_margins on the CURRENT engine: re-render the class's 2 | 15:19 | expected by 16:15 | landed | FINDINGS/47_margins-DIAGNOSE40-B-150000.md |
 | 32_sA-01 | 32_stroke_lines | A | Does the pBdr replacement in FINDINGS/RULES-PBDR-IMPLEMENTATION.md act | 15:59 | expected by 16:20 | landed | FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md |
 | t02_B-01 | t02_position | B | The 180deg uprightIfPageIsUpsideDown patch (FINDINGS, commit 09639d0)  | 15:59 | expected by 16:20 | landed | FINDINGS/47_margins-DOCX-BLAST-RADIUS-155500-6930.md |
 | t08_B-01 | t08_line_order | B | which code path decides the .txt line order, and what single structura | 17:39 | expected by 17:45 | landed | FINDINGS/t08_line_order-DRAWING-ORDER-1740.md |
@@ -110,8 +110,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `08:31` agent deployed: 18_displacement / B - what places a page's first baseline, and is median_pt 0.96 a real offset
-- `08:31` agent landed: 18_displacement / B -> FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md
 - `09:19` attempt 9 on 18_displacement -> lead (6/16 moved)
 - `09:20` agent deployed: 18_displacement / A - which clause of the check can fire on a 1.44-2.40 pt document, from the source c
 - `09:20` agent deployed: 18_displacement / B - do 05/32/59/18 share ONE engine construct in the emitted docx, and name it
@@ -135,6 +133,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `13:57` agent deployed: 18_displacement / B - from the three measured declared->laid points compute the declaration that lands
 - `14:19` attempt 16 on 18_displacement -> lead (0/16 moved)
 - `14:45` attempt 17 on 18_displacement -> kept (1/16 moved)
+- `14:46` agent landed: 47_mA-02 /  -> FINDINGS/47_margins-CELLPATH-A-150000.md
+- `14:46` agent landed: 47_mB-02 /  -> FINDINGS/47_margins-DIAGNOSE40-B-150000.md
 
 ## Where the rest of the state lives
 

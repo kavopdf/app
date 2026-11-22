@@ -1064,6 +1064,14 @@
   {
    "at": "14:45",
    "text": "attempt 17 on 18_displacement -> kept (1/16 moved)"
+  },
+  {
+   "at": "14:46",
+   "text": "agent landed: 47_mA-02 /  -> FINDINGS/47_margins-CELLPATH-A-150000.md"
+  },
+  {
+   "at": "14:46",
+   "text": "agent landed: 47_mB-02 /  -> FINDINGS/47_margins-DIAGNOSE40-B-150000.md"
   }
  ],
  "next": "APPLY patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch and ratchet it corpus-wide - measured clean on two-tables-stacked-with-no-gap (42/42 PASS, n_out 0) and it moves EVERY ruled table, so the gate refuses it unratcheted. The row grid is 0.75 pt, NOT whole points: nine identical rows per page read 18.00/18.75/19.50, and the law laid=0.75*(round(h/0.75)+1) reproduces the 13-declaration sweep exactly when its readings are rounded. Then close the small-spacer over-charge the patch exposes: mobile-bill's 128/124 tw spacers are now charged in full where Google previously charged ~0, leaving that page +2..+5 pt low. Evidence: FINDINGS/18_displacement-ROW-GRID-AND-SPACER-1518-relay.md",
@@ -1617,9 +1625,10 @@
    "question": ".docx blast radius of the uprightIfPageIsUpsideDown two-line fix: build patched engine, convert all 213 to .docx, name every document that moves",
    "expected": "expected by 16:15",
    "deployed": "15:19",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-21T09:49"
+   "status": "landed",
+   "finding": "FINDINGS/47_margins-CELLPATH-A-150000.md",
+   "deployed_at": "2026-11-21T09:49",
+   "landed_at": "2026-11-22T09:16"
   },
   {
    "id": "47_mB-02",
@@ -1628,9 +1637,10 @@
    "question": "true size of 47_margins on the CURRENT engine: re-render the class's 26 documents and re-run the check, since the table is stale (392 already passes)",
    "expected": "expected by 16:15",
    "deployed": "15:19",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-21T09:49"
+   "status": "landed",
+   "finding": "FINDINGS/47_margins-DIAGNOSE40-B-150000.md",
+   "deployed_at": "2026-11-21T09:49",
+   "landed_at": "2026-11-22T09:16"
   },
   {
    "id": "32_sA-01",
