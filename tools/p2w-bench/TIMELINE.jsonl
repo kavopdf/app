@@ -2521,3 +2521,17 @@
 {"t": 1795329268.6547987, "ist": "12:04:28", "ev": "beat", "d": "control: rebuilding HEAD engine to test mobile-bill without the patch"}
 {"t": 1795329353.335562, "ist": "12:05:53", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795329369.084829, "ist": "12:06:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795329372.4133706, "ist": "12:06:12", "ev": "attempt", "d": "content-present-partly-displaced -> lead"}
+{"t": 1795329372.5458732, "ist": "12:06:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795329372.6958444, "ist": "12:06:12", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795329387.668156, "ist": "12:06:27", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795329403.3003478, "ist": "12:06:43", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795329403.9264088, "ist": "12:06:43", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795329404.2292607, "ist": "12:06:44", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795329421.7377348, "ist": "12:07:01", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795329422.4390233, "ist": "12:07:02", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795329422.9230103, "ist": "12:07:02", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795329428.851861, "ist": "12:07:08", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795329429.5950234, "ist": "12:07:09", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795329430.2441351, "ist": "12:07:10", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795329430.5823839, "ist": "12:07:10", "ev": "beat", "d": "report.py: building the report"}
