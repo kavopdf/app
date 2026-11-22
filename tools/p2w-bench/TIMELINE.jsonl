@@ -2402,3 +2402,10 @@
 {"t": 1795322235.2494557, "ist": "10:07:15", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795322235.75202, "ist": "10:07:15", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795322236.0412264, "ist": "10:07:16", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795322287.0718174, "ist": "10:08:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795322297.0964856, "ist": "10:08:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795322297.2473748, "ist": "10:08:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795322297.3651414, "ist": "10:08:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795322303.5291834, "ist": "10:08:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795322303.6975753, "ist": "10:08:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795322303.8614078, "ist": "10:08:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

@@ -1,32 +1,3 @@
-## 2026-11-22 10:40 — fixer, slot 09:51 (18_displacement, outcome `lead`, 0/3 moved)
-
-**DO NOT BUILD the 0.9634 row scale, and DO NOT build the hairline cell box for single-line cells.**
-Both are measured inert. See `FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md`.
-
-Built: spacer as `w:before` + hairline `w:line=1` (5868-5875), cap 2880->4320 (5852,5866), hairline
-cell box for `cellSz<=0 && rowParts==1 && vspan<=1`. Measured in Google on three documents:
-`68_journal_wide_table_spanning` **42/42 CLEAN** (spacer half still works); `mobile-bill` and
-`insurance-policy-schedule` **38/42, two pages** (41/42 at HEAD) — reverted.
-
-Measured off the Google export of `mobile-bill`, rule positions page 1: source pitch 18.40 pt
-(24 of 26 gaps exactly 18.4), Google pitch **19.00 pt**, histogram 19.0x16 / 20.0x5 / 18.0x3. The
-engine emits 360/360/380 twips repeating. Google honours 380 -> 19.0 and grows the 360 rows to 19.0
-and **20.0**. The growth concentrates on rows holding a cell with TWO paragraphs (rows 5-12 of
-`mobile-bill`, 6 `<w:p>` on 3 columns -> 20.0). Two paragraphs at ~9.7 pt = ~19.4 pt of content
-against an 18.0 pt floor = 2.0 pt of growth on exactly those rows.
-
-**NEXT BUILD, in this order:** (1) `rowParts > 1` — either raise the row floor to the true 368 twips
-so floor and content agree instead of the floor being quantised 8 twips low, or take the `w:before`
-off the continuation paragraphs inside a wrapped cell. (2) Prove it on `mobile-bill` and
-`insurance-policy-schedule` FIRST — they are the only two documents blocking a spacer construct
-already measured to take 6 documents clean. (3) Then land the spacer with it.
-
-Two things that cost this run time and should not cost the next one: the sub-agent sandbox does NOT
-share `/scratch/work/CS` — pass files explicitly with `files=`, or the agent reads a different
-checkout. And `lastmessage.py`'s Timing rows come from the beat counter, which stops at the last
-heartbeat: converting and Drive calls write no beat, so a Google-measuring slot under-reports its
-duration by ~30 min (49 real vs 15 reported).
-
 # HANDOFF - read this before you pick a class
 
 ## PARKED - what was tried, and what would re-open it
@@ -55,11 +26,11 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> 18_displacement's table spacer is CONFIRMED as the cause and is one build from landing, blocked by one measured second construct. Google charges a w:line lineRule=exact spacer on a 1 pt mark at 0.22x its written twips, so 68_journal's 144 pt spacer put every run below it at dy -114.28 and 73_marksheet's 16.7 pt spacer at -12.85; documents with no spacer are unaffected (+1.06). Writing the gap as w:before instead made 6 of the 16 solo-18 documents 42/42 in Google (16_right_aligned, 22_invoice, 29_dot_leaders, 41_coloured, 68_journal, 73_marksheet), but insurance-policy-schedule and mobile-bill went 41/42 -> 38/42 with 2 pages and lost content, so the change was reverted rather than landed. Cause of those two, measured: Google renders w:trHeight hRule=atLeast rows at 19.10 pt against an 18.40 pt source pitch (+0.70 pt/row, 14.7-15.4 pt per table). The 0.22x spacer charge was accidentally absorbing that excess; charging the spacer at its true value exposes it and the two 3-spacer full pages overflow. Both constructs must land together.
+> TWO INSTRUMENTS LIED THIS RUN, both worth knowing before the next. (1) lastmessage.py's Timing rows come from the beat counter, which stops at the last heartbeat; converting and Drive calls write no beat, so a Google-measuring slot under-reports its duration by ~30 min (49 real vs 15 reported). (2) The sub-agent sandbox does NOT share /scratch/work/CS - an agent given 'read the repo at /scratch/work/CS' reads a DIFFERENT checkout (this run's agent A found kavopdf-render-probe and no Java at all). Pass files explicitly with files=[...] or the agent's analysis is about a repo that does not exist.
 
 ## What the next run should do first
 
-> Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866). Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. THE RATCHET IS NOW COUNTED: 124 of 213 documents carry a table spacer (58.2%), 13 of the 44 Google-clean documents carry one (041122-Account_Opening_Form and its fillable twin have 22 spacers each, max 166 pt; 403_crossword_puzzle 58.15; 332_bom_on_drawing 29.9), and FIVE documents exceed the old 144 pt cap so the cap raise is a five-document change not a one-document one. Render the 13 clean ones before and after and land only if none regresses and at least 4 of the 16 come clean - 29 documents, 87 Drive calls, ~20 min. Do NOT screen this class with screen.py: it renders in soffice, which honours w:line as a length and cannot see either state.
+> DO NOT build the 0.9634 row scale or the hairline cell box for single-line cells - both measured inert. Build against rowParts>1: raise the row floor to the true 368 twips (the floor is quantised 8 twips low at 360) OR take w:before off the continuation paragraphs inside a wrapped cell. Google grows 360-twip rows to 19.0/20.0; source pitch is 18.40; mobile-bill rows 5-12 hold 6 w:p on 3 columns and render at 20.0 = 2.0 pt of growth. Prove on mobile-bill and insurance-policy-schedule FIRST - they are the only two documents blocking a spacer construct already measured to take 6 documents clean (68_journal 42/42 this run). Then land the spacer (w:before + hairline w:line=1 at 5868-5875, cap 2880->4320 at 5852,5866) with it.
 
 ## Agents deployed and not yet accounted for
 
@@ -127,15 +98,13 @@ unfinished work, not as a result.
 | 18_dB-02 | 18_displacement | B | what places a page's first baseline, and is median_pt 0.96 a real offs | 08:31 | 08:40 | landed | FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md |
 | 18_dA-04 | 18_displacement | A | which clause of the check can fire on a 1.44-2.40 pt document, from th | 09:20 | landed 09:04 | landed | FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md |
 | 18_dB-03 | 18_displacement | B | do 05/32/59/18 share ONE engine construct in the emitted docx, and nam | 09:20 | landed 09:04 | landed | FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md |
+| 18_dtrheight-emitter-01 | 18_displacement | trheight-emitter | every place the engine emits trHeight/hRule, and whether 0.9634 belong | 10:08 | a unified diff and the list of emitters | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:49` agent landed: 32_sA-03 /  -> FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md
-- `04:50` blocker 2026-11-21 23:39 ('the relay's claim opened no run window') is FALSIFIED by the code and by this run: round.py claim() calls _run_record('start') at line ~512, RUN.json reads started 04:18 for this slot, and the 03:53 run it displaced was archived into RUN-HISTORY.json as 'killed - never released the slot' (2 attempts, 0 kept). The window opens; close that row rather than writing the fix.
-- `05:18` agent deployed: 32_stroke_lines / A-audit - are the 16 carrier Google results genuine measurement artifacts or hand-authored
 - `05:18` agent deployed: 32_stroke_lines / B-local - does the carrier patch damage clean documents when measured in a clean clone
 - `05:18` agent landed: 32_stroke_lines / A-audit -> FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md
 - `05:18` agent landed: 32_stroke_lines / B-local -> FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md
@@ -158,6 +127,9 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `09:21` agent landed: 18_displacement / A -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
 - `09:21` agent landed: 18_displacement / B -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
 - `10:06` attempt 10 on 18_displacement -> lead (0/3 moved)
+- `10:08` agent deployed: 18_displacement / trheight-emitter - every place the engine emits trHeight/hRule, and whether 0.9634 belongs on w:val
+- `10:08` agent landed: 18_displacement / trheight-emitter -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md
+- `10:08` 18_displacement 10:40 fixer: spacer-as-w:before confirmed in Google (68_journal 42/42); mobile-bill and insurance-policy-schedule 38/42 vs 41/42 at HEAD -> reverted. Measured pitch off the Google export: source 18.40, Google 19.00, histogram 19.0x16/20.0x5/18.0x3. The excess is 2.0 pt on rows with a two-paragraph cell, not a uniform 0.70 - a factor cannot describe it. FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md.
 
 ## Where the rest of the state lives
 
