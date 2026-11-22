@@ -991,5 +991,40 @@
   "obstacles_cleared": 0,
   "needs_human": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795323035.6921647,
+  "started": "10:20",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "18_displacement",
+  "attempts": 1,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   {
+    "id": "2NEAECBFVF9AQV1BQJ542TS0E3",
+    "title": "Cell margin constructs",
+    "sent": "10:26",
+    "landed": "10:28",
+    "took": "2 min",
+    "deployed": true,
+    "landed_ok": true,
+    "found": "DocxWriter.java emits no w:tcMar anywhere and w:vAlign only as top (2164, 6629), so there is no shipped construct that sets a row's height without also setting its baseline"
+   },
+   {
+    "id": "7A659876RV8S1RR8GNAYEJE66Z",
+    "title": "Audit the finding",
+    "sent": "10:30",
+    "landed": "10:34",
+    "took": "4 min",
+    "deployed": true,
+    "landed_ok": true,
+    "found": "Falsified three of this run's five claims: google_safe.py has seven IGNORED entries not one; hRule=exact is honoured at 72 pt and 55.8 pt in two committed findings; the w:before probe is not sensitive to the question it was used to answer"
+   }
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
