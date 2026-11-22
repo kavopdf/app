@@ -1108,9 +1108,13 @@
   {
    "at": "04:08",
    "text": "attempt 30 on 18_displacement -> lead"
+  },
+  {
+   "at": "04:09",
+   "text": "attempt 31 on 18_displacement -> kept"
   }
  ],
- "next": "The spacer SCOPE GUARD is LANDED (FINDINGS/18_displacement-SPACER-SCOPE-GUARD-LANDS-3-GOOGLE-0051-fixer.md): the table gap is split (w:before = gap-20tw, w:line = 20tw) only where the page's own lowest ink leaves room for it plus 0.75 pt per table row on the page. 73_marksheet, 41_coloured_headings and 29_dot_leaders are 42/42 in Google; mobile-bill and insurance-policy-schedule are byte-identical at document.xml level and mobile-bill re-verified 46/47 one page. Corpus 212/212 re-measured on this engine, 0 worse, 0 better in the LibreOffice proxy (by design). Do NOT apply the dither patch - refuted twice. Two readings to settle before more of this class: (1) 22_invoice and 16_right_aligned spend their gaps and STILL fail 18_displacement with a constant -2.5 pt step and slope ~0 - that is a second term, and FINDINGS/18_displacement-GUARDED-SPACER-SPLIT-1-WIN-1-COST-0219-relay.md read them 42/42 where this build reads 41/42, so re-measure before trusting either; (2) 72_bank_statement is refused by the guard 58 twips short (18 rows -> 270tw row term, gap 346tw, room 558tw) - measure Google's real per-row excess on a ruled table and replace the inherited 15 tw/row, worth +1. Any Google reading at the 41/42-42/42 margin must be taken twice: the same construct read differently two hours apart.",
+ "next": "18_displacement: the spacer HAIRLINE is now 1 tw (was 20) and the guard's room test is keyed to a fixed 20 so no document changes side of the guard. FINDINGS/18_displacement-HAIRLINE-WAS-078PT-ONE-CLEAN-0402-fixer.md. 22_invoice_four_columns 41/42 -> 42/42 in Google (base and patched measured in the same hour); 16_right_aligned stays 41/42. Corpus 212/212 re-measured, 0 worse, share@5px changed on 0 of 213 (0.05 pt against a 5 px tolerance); txt 213 scored, 213 unchanged. NEXT LEVERS, in order of evidence: (1) the CELL LINE BOX is the remaining constant - declared 7.60+9.50=17.10 pt, Google lays 7.60+8.193=15.793, a -1.307 pt per row term identical on 22 and 16 (FINDINGS/18_displacement-RESIDUAL-2.5PT-ARITHMETIC-0355-fixer.md has the arithmetic); fixing it means inflating the cell's declared w:line, which moves text INSIDE the row in LibreOffice because trHeight 380 atLeast absorbs the height and not the position - measure both renderers. (2) 72_bank_statement is refused by the guard 58 tw short (18 rows -> 270 tw row term, gap 346 tw, room 558 tw): measure Google's real per-row excess on a ruled table and replace the inherited 15 tw/row, worth +1. (3) do NOT key the guard's room test to spacerHairTw - at hair=1 that flips 22_invoice's second spacer to refused and moves that table 7.65 pt. Any Google reading at the 41/42-42/42 margin must be taken twice.",
  "agents": [
   {
    "id": "contA-01",
@@ -2021,7 +2025,7 @@
    "plan": ""
   }
  ],
- "context": "THE ROW-PITCH LADDER IS WHOLE POINTS. A 13-row sweep on two-tables-stacked-with-no-gap (declared 344..392 tw) laid 18/18/18/19/19/19/19/19/20/20/20/20 - never a half point. The 18.5 declaration the 13:18 relay left as the next build DOES NOT EXIST; laid = round(declared_pt + 0.875) where 0.875 is the row's own rule. A source pitch of 18.4 therefore rounds to 19 on every row and the error accumulates (+9.1 pt at the foot of 13 rows), which is the whole of 18_displacement on that document. Error-diffusing the declaration (patches/18-row-pitch-error-diffused.patch) took the foot from 326.5 to 317.5 against a source 316.7 - 92% of the drift gone, 23_line_pitch now reads the source's own 18.4 - and STILL 46/47: one run is more than 2x its tolerance out on the single row the diffusion hands a 20 pt target to (laid 21.0). Next attempt: find that row's binding term (cell content, not declaration) and cap it; do not re-derive the ladder.",
+ "context": "This slot took the first of the two open leads on 18_displacement. Two subagent-style diagnoses were produced locally: the hairline arithmetic (landed) and the cell line box (not landed). The dither is still refuted - do not apply it. The corpus table is stamped on the current engine (e92e795f). gate.py dropped the exempt row from RANKING.csv and measure_gate refused the table; the row was restored by hand and the defect is in BLOCKERS.md - if a future gate.py run publishes 212 rows again, restore 213,416_many_tiny_pages,exempt,exempt,,,,,,,,,,,,300,,,,, before committing.",
  "needs_human": [
   {
    "at": "10:40",
@@ -2030,5 +2034,5 @@
    "change": "a person must either authorise the trade (a 1.03 rise on a document already at 97.62 for 601 going to 0.00), or give share@5px a companion axis that separates 'more ink, some far' from 'the same ink, further' - see FINDINGS/widget-walk-REFUSED-BY-ONE-DOCUMENT-1050-f1x.md"
   }
  ],
- "next_class": "two-tables-stacked-with-no-gap"
+ "next_class": ""
 }
