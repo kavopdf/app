@@ -797,6 +797,25 @@ public final class DocxWriter {
         int flowTw;
         /** The page's own height in twips - the budget the flow must not exceed. */
         int budgetTw;
+        /**
+         * The lowest ink on this page, in PDF points from the page top, taken from the page's own
+         * blocks before a single byte is written. This is the SOURCE's extent, not the writer's
+         * model of the page, and it is what the table-gap guard reads: a gap is only spent where
+         * the page has room below its own last mark.
+         */
+        float pageInkBottomPt;
+        /**
+         * Twips of table gap already spent as {@code w:before} on this page. The guard is
+         * cumulative: a page with two tables spends its slack once, not twice.
+         */
+        int spacerSplitTw;
+        /**
+         * Rows in every table on this page. Google lays a ruled row a little taller than the
+         * declaration (0.75 pt per row is the quantum the 22 Nov sweep measured), and that excess
+         * accumulates over the whole page whatever table the rows belong to - so the guard has to
+         * charge the page's row count, not the one table's.
+         */
+        int pageRowCount;
         /** True when this page's own content fits the sheet, so its white space can be spent. */
         boolean spendGaps;
         /**
@@ -1320,6 +1339,11 @@ public final class DocxWriter {
         // times by the budget guard, and each pass must write every stamp again.
         groupStamps(page, ctx.curShapes, ctx);
         cenReset(ctx);
+        // HOW FULL THE PAGE IS, measured off the page's own ink. See the spacer guard in
+        // emitTable: the gap is only worth spending where the page has room for it.
+        ctx.pageInkBottomPt = pageInkBottom(page);
+        ctx.pageRowCount = pageRows(page);
+        ctx.spacerSplitTw = 0;
         if (columnPage(sb, page, ctx, pw)) { cenEmit(ctx, page); return; }
         // Which of this page's short lines are drawn beside a table rather than in its text, and
         // so must not charge the flow. Decided from the page's own geometry before anything is
@@ -2315,6 +2339,37 @@ public final class DocxWriter {
                 + " w:header=\"0\" w:footer=\"0\" w:gutter=\"0\"/>"
                 + colsXml
                 + "<w:docGrid w:linePitch=\"360\"/>";
+    }
+
+    /**
+     * The lowest ink on a page, in PDF points from the page top.
+     *
+     * <p>Read from the page's own blocks before anything is written, so it is the SOURCE's
+     * extent and not the writer's model of the page. A paragraph's extent is read from the lines
+     * it drew, not from its own top - the top is where the reading order starts it.
+     */
+    private static int pageRows(PdfToWord.Page page) {
+        int n = 0;
+        for (Object o : page.blocks) {
+            if (o instanceof PdfToWord.Table) n += ((PdfToWord.Table) o).rows.size();
+        }
+        return n;
+    }
+
+    private static float pageInkBottom(PdfToWord.Page page) {
+        float b = 0f;
+        for (Object o : page.blocks) {
+            if (o instanceof PdfToWord.Table) {
+                b = Math.max(b, ((PdfToWord.Table) o).bottom);
+            } else if (o instanceof PdfToWord.Para) {
+                PdfToWord.Para p = (PdfToWord.Para) o;
+                float pb = p.top;
+                for (PdfToWord.Box box : p.boxes) pb = Math.max(pb, box.bottom);
+                for (Float y : p.lineY) pb = Math.max(pb, y + p.size());
+                b = Math.max(b, pb);
+            }
+        }
+        return b;
     }
 
     /** How many column bands this page's paragraphs occupy, and the widest gutter between them. */
@@ -5868,10 +5923,49 @@ public final class DocxWriter {
         }
         if (spacerTw > 0) {
             spacerTw = twScale(spacerTw, ctx.squeeze);
-            sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
-                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
-                    .append(spacerTw)
-                    .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+            // THE GAP IS SPENT ONLY WHERE THE PAGE HAS ROOM FOR IT.
+            //
+            // Google delivers w:before on an empty paragraph 1:1 and w:line on the same
+            // paragraph at roughly a fifth (measured 22 Nov: 3.5-18.3 pt declared arrives as
+            // 0.7-7.5 pt, 144 pt arrives as 30.2 on 68_journal_wide_table_spanning). So a gap
+            // written as w:line is a gap Google never draws, and the table under it sits that
+            // far too high. Splitting the gap - hairline in w:line, the rest in w:before - keeps
+            // the SUM identical, so LibreOffice and Word see the same page they always saw.
+            //
+            // WHAT IT COSTS WHEN SPENT UNGUARDED. Google now draws the gap it was not drawing,
+            // so every block below moves down by it. On a page whose own ink already reaches
+            // the paper's bottom there is nothing to move into: spending the gap unguarded took
+            // mobile-bill and insurance-policy-schedule from 46/47 on one page to 43/47 on two,
+            // content lost (slot 23:10, 22 Nov, measured in Google both ways).
+            //
+            // THE GUARD. The page has room if the source's lowest ink leaves at least the gap we
+            // are about to hand Google, plus the row excess the table itself will incur (Google
+            // lays a ruled row a little taller than the declaration - 0.75 pt per row is the
+            // quantum the 22 Nov sweep measured). Where it does not, the paragraph is written
+            // exactly as before and the document is byte-identical to the engine that had no
+            // split at all - which is why regress.py has nothing to refuse.
+            int spacerHairTw = 20;
+            int rowExcessTw = 15 * Math.max(0, ctx.pageRowCount);
+            int slackTw = ctx.budgetTw - Math.round(ctx.pageInkBottomPt * (float) TWIPS_PER_PT);
+            int wantTw = Math.max(0, spacerTw - spacerHairTw);
+            boolean spendable = slackTw > 0
+                    && ctx.spacerSplitTw + wantTw + rowExcessTw <= slackTw;
+            if (spendable) {
+                sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
+                        .append(wantTw)
+                        .append("\" w:after=\"0\" w:line=\"")
+                        .append(Math.min(spacerHairTw, spacerTw))
+                        .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+                ctx.spacerSplitTw += wantTw;
+            } else {
+                sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
+                        .append(spacerTw)
+                        .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+            }
+            // The page is charged the same gap either way: the split moves the gap between
+            // two properties, it does not add to it.
             ctx.flowTw += spacerTw;
             // The spacer is a line of its own: the table now starts at the flow's position
             // after it, which is the y the page drew the table's top at.

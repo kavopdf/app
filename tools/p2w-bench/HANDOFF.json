@@ -1100,33 +1100,9 @@
   {
    "at": "00:39",
    "text": "attempt 26 on 18_displacement -> reverted (0/16 moved)"
-  },
-  {
-   "at": "01:30",
-   "text": "attempt 27 on 18_displacement -> reverted"
-  },
-  {
-   "at": "01:31",
-   "text": "agent deployed: 18_displacement / carrier guard - why the spacer split breaks two documents and what a scope guard looks like"
-  },
-  {
-   "at": "01:31",
-   "text": "agent deployed: 18_displacement / solo-18 census - per-document spacer/border/row census of the 16 that fail only 18_displacement"
-  },
-  {
-   "at": "01:31",
-   "text": "agent landed: 18_displacement / carrier guard -> wins are non-ruled carriers, losses are ruled: the guard holds mobile-bill and insurance at 46/47 one page (measured in Google this run)"
-  },
-  {
-   "at": "01:31",
-   "text": "agent landed: 18_displacement / solo-18 census -> spacer size does not separate the wins from the losses; carrier does. Full table in the 0219 FINDINGS"
-  },
-  {
-   "at": "01:33",
-   "text": "attempt 28 on 18_displacement -> lead"
   }
  ],
- "next": "APPLY tools/p2w-bench/patches/18-displacement-SPACER-BEFORE-GUARDED-NO-DITHER.patch (spacer split, guard = non-ruled carrier and gap<=20pt, dither DISABLED - the dither is what ate 16_right), build, convert and measure the whole corpus, regress.py --check, then Google-verify the remaining eleven of the sixteen plus a sample of today's Google-clean documents that carry a non-ruled table. Measured this slot: 5 of 8 to 42/42, none worse, mobile-bill and insurance held at 46/47. Evidence: FINDINGS/18_displacement-GUARDED-SPACER-SPLIT-1-WIN-1-COST-0219-relay.md",
+ "next": "The spacer scope guard LANDED (FINDINGS/18_displacement-SPACER-SCOPE-GUARD-LANDS-3-GOOGLE-0051-fixer.md): the table gap is now split (w:before = gap-20tw, w:line = 20tw) ONLY where the page's own ink leaves room for it, and 73_marksheet, 41_coloured_headings and 29_dot_leaders are 42/42 in Google, with mobile-bill and insurance-policy-schedule byte-identical at document.xml level and mobile-bill re-verified 46/47 one page. Do NOT apply patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch - it is refuted twice (FINDINGS/18_displacement-DITHER-REFUTED-AND-THE-GUARD-THAT-REPLACES-IT-0030-fixer.md: Google stores w:trHeight and does not lay it). Next: 72_bank_statement_no_rules_right_amounts is refused by the guard 58 twips short (18 rows -> 270tw row term, gap 346tw, room 558tw, needs 616) - measure Google's actual per-row excess on a ruled table at several row counts and replace the inherited 15 tw/row term, which is worth +1 document; then 22_invoice and 16_right_aligned, which now spend their gap and still carry a constant -2.5 pt step.",
  "agents": [
   {
    "id": "contA-01",
@@ -1928,38 +1904,24 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-22T08:27"
-  },
-  {
-   "id": "18_dcarrier guard-01",
-   "class": "18_displacement",
-   "angle": "carrier guard",
-   "question": "why the spacer split breaks two documents and what a scope guard looks like",
-   "expected": "a guard the 16-document measurement could not reveal",
-   "deployed": "01:31",
-   "status": "landed",
-   "finding": "wins are non-ruled carriers, losses are ruled: the guard holds mobile-bill and insurance at 46/47 one page (measured in Google this run)",
-   "deployed_at": "2026-11-22T20:01",
-   "landed_at": "2026-11-22T20:01"
-  },
-  {
-   "id": "18_dsolo-18 census-01",
-   "class": "18_displacement",
-   "angle": "solo-18 census",
-   "question": "per-document spacer/border/row census of the 16 that fail only 18_displacement",
-   "expected": "a discriminator testable from the XML without a Google round trip",
-   "deployed": "01:31",
-   "status": "landed",
-   "finding": "spacer size does not separate the wins from the losses; carrier does. Full table in the 0219 FINDINGS",
-   "deployed_at": "2026-11-22T20:01",
-   "landed_at": "2026-11-22T20:01"
   }
  ],
  "run": {
-  "started": "01:14",
-  "ended": "01:34",
-  "ended_how": "forced"
+  "started": "00:51",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
+  {
+   "at": "20:18",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "21:33",
+   "how": "forced",
+   "plan": ""
+  },
   {
    "at": "23:15",
    "how": "forced",
@@ -2049,16 +2011,6 @@
    "at": "00:41",
    "how": "forced",
    "plan": ""
-  },
-  {
-   "at": "01:14",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "01:34",
-   "how": "forced",
-   "plan": ""
   }
  ],
  "context": "THE ROW-PITCH LADDER IS WHOLE POINTS. A 13-row sweep on two-tables-stacked-with-no-gap (declared 344..392 tw) laid 18/18/18/19/19/19/19/19/20/20/20/20 - never a half point. The 18.5 declaration the 13:18 relay left as the next build DOES NOT EXIST; laid = round(declared_pt + 0.875) where 0.875 is the row's own rule. A source pitch of 18.4 therefore rounds to 19 on every row and the error accumulates (+9.1 pt at the foot of 13 rows), which is the whole of 18_displacement on that document. Error-diffusing the declaration (patches/18-row-pitch-error-diffused.patch) took the foot from 326.5 to 317.5 against a source 316.7 - 92% of the drift gone, 23_line_pitch now reads the source's own 18.4 - and STILL 46/47: one run is more than 2x its tolerance out on the single row the diffusion hands a 20 pt target to (laid 21.0). Next attempt: find that row's binding term (cell content, not declaration) and cap it; do not re-derive the ladder.",
@@ -2070,5 +2022,5 @@
    "change": "a person must either authorise the trade (a 1.03 rise on a document already at 97.62 for 601 going to 0.00), or give share@5px a companion axis that separates 'more ink, some far' from 'the same ink, further' - see FINDINGS/widget-walk-REFUSED-BY-ONE-DOCUMENT-1050-f1x.md"
   }
  ],
- "next_class": ""
+ "next_class": "two-tables-stacked-with-no-gap"
 }
