@@ -2819,3 +2819,15 @@
 {"t": 1795374702.934672, "ist": "00:41:42", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795374703.0379295, "ist": "00:41:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795374703.057402, "ist": "00:41:43", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795376638.2230754, "ist": "01:13:58", "ev": "beat", "d": "relay: cloned, phase=fix, checking slot"}
+{"t": 1795376658.5220542, "ist": "01:14:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795376658.543185, "ist": "01:14:18", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795376658.6274564, "ist": "01:14:18", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795376658.6458056, "ist": "01:14:18", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795376663.124983, "ist": "01:14:23", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795376663.2439544, "ist": "01:14:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795376669.236694, "ist": "01:14:29", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795376671.1082554, "ist": "01:14:31", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377209.1213737, "ist": "01:23:29", "ev": "beat", "d": "relay: guarded spacer split built, converting corpus"}
+{"t": 1795377643.236337, "ist": "01:30:43", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795377655.0538669, "ist": "01:30:55", "ev": "beat", "d": "attempt.py: recording an attempt"}

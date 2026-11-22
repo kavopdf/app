@@ -1907,16 +1907,11 @@
   }
  ],
  "run": {
-  "started": "23:10",
-  "ended": "00:41",
-  "ended_how": "forced"
+  "started": "01:14",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
-  {
-   "at": "20:18",
-   "how": "forced",
-   "plan": ""
-  },
   {
    "at": "21:33",
    "how": "forced",
@@ -2009,6 +2004,11 @@
   },
   {
    "at": "00:41",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "01:14",
    "how": "forced",
    "plan": ""
   }
