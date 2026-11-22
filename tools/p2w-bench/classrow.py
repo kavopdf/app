@@ -50,11 +50,42 @@ BASELINE = os.path.join(ROOT, "benchmarks", "RANKING-BASELINE.csv")
 DEFAULT_FIXED_BELOW = 1.0
 
 
+def table_rows(path=RANK):
+    """How many documents have a ROW in the ranking, scored or not.
+
+    THE DENOMINATOR OF "Documents measured: N of M" IS THE ROW COUNT, NOT len(rank) + exempt.
+    load_rank() keeps a row only when its share columns parse as numbers, and the exempt document
+    416_many_tiny_pages carried share5=0.0 in the committed table (the fake "perfect" score
+    gate.py's publish step exists to blank), so len(rank) was 213 - already counting it - and then
+    `+ len(EXEMPTED)` added it a second time for a total of 214. The file said "213 of 214" while
+    RANKING.csv held 213 rows and classify_gate compares M against exactly that row count, so the
+    gate refused a corpus whose measurement was complete. The row count cannot double-count, and it
+    reads the same on an honest table (213 rows, 212 scored -> "212 of 213") and on this one.
+    """
+    try:
+        with open(path, encoding="utf-8") as f:
+            return sum(1 for r in csv.DictReader(f) if (r.get("document") or "").strip())
+    except Exception:
+        return 0
+
+
 def load_rank(path=RANK):
+    """{document: scores} for documents that were actually MEASURED.
+
+    EXEMPT.json IS THE AUTHORITY ON WHAT WAS MEASURED, AND THE RANKING DOES NOT KNOW IT. p2w.py
+    writes share5=0.0 for a document it could not measure, so an exempt document arrives here with
+    a score that parses - 416_many_tiny_pages, 300 pages, never measured, carried 0.0 and read as
+    PERFECT. Counting it as scored made the header claim "213 of 213" while its own note said one
+    document was exempt and never scored: two statements that cannot both be true. gate.py already
+    blanks that row on every publish for exactly this reason; this reads the exemption instead of
+    trusting a number that means "unknown".
+    """
     out = {}
     for r in csv.DictReader(open(path, encoding="utf-8")):
         d = r.get("document")
         if not d:
+            continue
+        if d in EXEMPTED:
             continue
         try:
             out[d] = (float(r["share1"]), float(r["share5"]), (r.get("problem") or "").strip(),
@@ -244,13 +275,14 @@ def main(argv):
     # documents only (measured 19 Nov: 212 of the table's 213 rows - 416_many_tiny_pages has an
     # empty share5 and is skipped). The total therefore has to add the exempt ones back.
     _scored = len(rank)
-    _total = len(rank) + len(EXEMPTED)
+    _total = table_rows() or (len(rank) + len(EXEMPTED))
     _head = ("Documents measured: **%d of %d**" % (_scored, _total))
     if EXEMPTED:
         _head += (" - %d exempt (%s), counted in the total and never scored"
                   % (len(EXEMPTED), ", ".join("`%s`" % e for e in sorted(EXEMPTED))))
     _head += "."
     _hit = False
+    _dupes = []
     for i, ln in enumerate(out):
         if ln.startswith("Documents measured:"):
             # _hit IS SET EVEN WHEN THE LINE ALREADY MATCHES. It used to be set only when the
@@ -259,11 +291,23 @@ def main(argv):
             # 19 Nov 22:5x: the file carried the same "Documents measured" line three times,
             # one per run that found nothing to change - and the line is what the brief tells a
             # reader to look for.
-            if ln.strip() != _head:
-                out[i] = _head
-                changed += 1
-            _hit = True
-            break
+            if not _hit:
+                if ln.strip() != _head:
+                    out[i] = _head
+                    changed += 1
+                _hit = True
+            else:
+                # ONE HEADER, OR NONE IS TRUE. The rewrite above fixed the FIRST line and left
+                # every later one standing, so the file accumulated a header per run and, by
+                # 22 Nov, carried four of them: "213 of 214" on line 2 and "213 of 213" three
+                # times below it. classify_gate reads the first, so the stale line won and the
+                # gate refused; a human reading the file saw four numbers for one corpus. A
+                # duplicate is not a second fact, it is the same fact gone stale - so the later
+                # copies go.
+                _dupes.append(i)
+    for i in reversed(_dupes):
+        del out[i]
+        changed += 1
     if not _hit:
         for i, ln in enumerate(out):
             if ln.startswith("# Defect classes"):

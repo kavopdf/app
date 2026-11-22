@@ -38,6 +38,7 @@ proves nothing there, while a count survives being copied, committed and checked
     python3 tools/p2w-bench/classify_gate.py --quiet    # exit code only
 """
 import csv
+import json
 import os
 import re
 import sys
@@ -62,6 +63,23 @@ def scored_docs():
     """
     docs = set()
     total = 0
+    # AN EXEMPT DOCUMENT IS NOT A SCORED DOCUMENT, WHATEVER NUMBER IT CARRIES.
+    # p2w.py writes share5=0.0 for a document it could not measure, so 416_many_tiny_pages - 300
+    # pages, never measured - parsed as a real score and was demanded in the class file as "1 scored
+    # document(s) are not in the class file". That demand could not be met honestly: the only way to
+    # satisfy it is to give a never-measured document a row claiming it was measured. EXEMPT.json
+    # says what was measured, and this is the same authority gate.py blanks the row against.
+    exempt = set()
+    try:
+        with open(os.path.join(HERE, "EXEMPT.json"), encoding="utf-8") as _f:
+            exempt = set((json.load(_f).get("docx") or {}))
+    except Exception as _e:
+        # A SILENT FALLBACK HERE IS A GATE THAT LIES. This block first landed without
+        # `import json` at the top of the file, so the NameError was caught, `exempt` stayed
+        # empty, and the gate went on demanding a row for a document nobody measured - while
+        # looking exactly like a working exemption. Say it out loud instead.
+        sys.stderr.write("classify_gate: EXEMPT.json unreadable (%s: %s) - counting every row "
+                         "with a number as scored\n" % (type(_e).__name__, _e))
     if not os.path.exists(RANKING):
         return docs, 0
     with open(RANKING, encoding="utf-8") as f:
@@ -70,6 +88,8 @@ def scored_docs():
             if not doc:
                 continue
             total += 1
+            if doc in exempt:
+                continue
             try:
                 float((r.get("share5") or "").strip())
             except (TypeError, ValueError):
@@ -118,6 +138,26 @@ def main(argv):
     docs, total_rows = scored_docs()
     head = header_count(DOCX_CLASSES)
     problems = []
+
+    # FOUR HEADERS FOR ONE CORPUS, AND THE GATE READ THE OLDEST. header_count() returns the FIRST
+    # match, and classrow.py rewrote the first line while leaving every later copy standing, so on
+    # 22 Nov benchmarks/DEFECT-CLASSES.md carried "213 of 214" on line 2 and "213 of 213" three
+    # times below it. The gate judged the corpus by a line three runs out of date and refused a
+    # complete measurement. A count that appears twice is not a second measurement, it is the same
+    # one gone stale - so the file is refused until there is exactly one, and the refusal names the
+    # numbers so the reader can see which line was believed.
+    _heads = []
+    if os.path.exists(DOCX_CLASSES):
+        with open(DOCX_CLASSES, encoding="utf-8") as _f:
+            for _ln in _f:
+                _m = MEASURED.search(_ln)
+                if _m:
+                    _heads.append("%s of %s" % (_m.group(1), _m.group(2)))
+    if len(_heads) > 1:
+        problems.append(
+            "DEFECT-CLASSES.md carries %d 'Documents measured' headers (%s) - a reader and this "
+            "gate can each believe a different one; keep exactly one"
+            % (len(_heads), ", ".join(_heads)))
 
     if not docs:
         problems.append("RANKING.csv scored no documents - there is nothing to classify")
