@@ -1,6 +1,6 @@
 {
  "ran_at": "2026-11-22T16:20:09",
- "engine": "unknown",
+ "engine": "ff060d4c",
  "layers": {
   "ground_truth": {
    "status": "pass",
