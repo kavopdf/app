@@ -1,8 +1,6 @@
-
-  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 07:14 → 07:36 IST · 22 min**
+**22 Nov 2026 · slot 08:16 → running IST · 12 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -20,13 +18,48 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
-| Committed | **3** files in 1 commit(s) from `188e333` — ...ment-PAGETOP-ROW-BUILT-AND-MEASURED-0654-f1x.md, HANDOFF.json, PATCH-topgap-row-MEASURED-0654.patch |
+| Committed | **11** files in 1 commit(s) from `2ba798b` — 18_displacement-SPACER-REFUTED-0900-f1x.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, ROUND.json, RUN-LOG.md, RUN.json, SETTLED.md, TIMELINE.jsonl, TRACE.md, screen.py |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 07:25 | **lead** | 0/213 | page-top gap: 1x1 trHeight row REFUTED through Google (bs5 37->33/42, 5->6 pages, page emptied); w:pgMar w:top PROVEN (bs5 37->40/42, 5 pages held, dy -59.5->-4.3 on pages 1-4, 3 checks recovered); al |
+| 08:26 | **reverted** | 1/16 | table-top spacer w:line -> w:before + hairline: 1 of 16 moved (68_journal 12.09->11.24), none worse. REFUTED as the cause: RANKING.csv gives 68_journal max_pt 8.64, not the -114.8 the lead assumed; af |
+
+## Why the lead died, and what replaces it
+
+The 07:14 run left one instruction: the gap above a table is written as `w:line` on a 1 pt mark, and
+Google reads `w:line` as a *multiple* of the face's line height, so a 144 pt spacer renders as
+13.74 pt. Both halves of that are true, and the fix for it is real - `w:before` is the one vertical
+length Google honours exactly, and the engine's own `ctx.flowTw` and `cenSetY` already charged the
+full spacer. I wrote it as `w:before` with the box cut to a hairline, confirmed the XML in the emitted
+document rather than assuming it, and screened all sixteen through Google. One moved, by 0.85 points.
+The bar is four.
+
+The reason is that the premise was already contradicted by the table the lead was reading. Every one
+of the sixteen has `max_pt` between 1.44 and 17.76 pt; `68_journal_wide_table_spanning` is 8.64, and
+the -114.8 pt figure came from a FINDINGS measurement that disagrees with `RANKING.csv` by a factor of
+thirteen. A 130 pt spacer loss cannot produce a render whose largest error is 8.64 pt, and the render
+after the change is the same document, line for line.
+
+What the sixteen actually look like: `median_pt` 0.96 or 1.44 on fourteen of them. One pixel is
+0.48 pt at 150 DPI, so the whole page is offset by two or three pixels, uniformly, with a short tail
+of lines that tip over the check's floor because they started near it. That is one constant applied
+to the page, not sixteen constructs. `71_invoice_space_aligned_no_rules` is the exception - share@5
+26.88, `median_pt` 3.84, no table spacer at all - and is a different question.
+
+## The bug that was worth more than the attempt
+
+`screen.py` set `p2w.REPO` after importing `benchmarks/p2w.py`, but that module computes
+`ENGINE_SRC = os.environ.get("P2W_ENGINE_SRC") or REPO` at module level, from
+`/scratch/work/p2w/repo`. On a pod with no previous run that directory does not exist, so every
+conversion died on `ClassNotFoundException` in under a second, nothing reached `dist/`, and the tool
+printed "PARTIAL - 0 of 16 measured. Call again" for ever. The identical command with
+`P2W_ENGINE_SRC` set converted and measured 16 of 16. This is the worst shape a bug can have here: it
+does not report that it could not run, it reports that the idea did nothing - and the brief's next
+line tells the run to revert. Any run on a fresh pod has been judging its ideas against a screen that
+never ran. Fixed, and verified without an environment variable: 0 of 2 measured before, 2 of 2 after.
+
 
 ## The txt
 
@@ -40,33 +73,29 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dA-02` | what makes a single-page dense table drift in Google | 07:36 | 02:06 | 0 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 07:14 → 07:36 · 22 min |
+| Slot window | 08:16 → running · 12 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 24 |
-| Longest silence | **9.0 min** — from 07:26:45, after `report.py: building the report` |
-| Silences over 2 min | 4 |
-| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | **Both scheduled slots between the last release and this claim produced no run at all.** `gaps.py` records `GA |
+| Tool beats | 14 |
+| Longest silence | **3.5 min** — from 08:16:26, after `gaps.py: reading the timeline` |
+| Silences over 2 min | 2 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **1 min** | `##` |
-| fix - diagnose and change the engine | **2 min** | `###` |
-| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `#########` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **3 min** | `####` |
-| other - not attributed to a tool | **3 min** | `####` |
+| setup - claim, housekeeping, reading the gate | **3 min** | `######` |
+| screen - the class's own documents | **0 min** | `#` |
+| record - attempt, handoff, class rows | **1 min** | `##` |
+| report - the report and the chain | **1 min** | `##` |
+| other - not attributed to a tool | **5 min** | `##########` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -79,7 +108,7 @@
 
 ## Next run
 
-The 16 solo-18 documents: their emitted row pitch ALREADY equals the source (0.00 pt on 11 of 16, -0.10 to -0.40 on the rest), so no constant in the row-height path (DocxWriter.java:6228) can move them closer. The leading candidate is the TABLE-TOP SPACER at DocxWriter.java:5869-5881: the gap above a table is written as w:line on a 1 pt mark, and Google reads w:line as a multiple of the face's line height, so 68_journal_wide_table_spanning's 144.0 pt spacer may render as 13.74 pt (-130.3) or 160.9 (+16.9). One Drive probe settles which: an empty <w:p> with w:sz=2 and w:line=2880 w:lineRule="exact" - does it come back 13.74, 144 or 160.9 pt? The spacer moves 14 of the 16 by 4.2 to 130.3 pt; 71_invoice_space_aligned_no_rules and 31_times_body_arial_headings have no spacer, and 31_times has no table at all, so its failure cannot be pitch. Full numbers in FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md. Do NOT take the page top for these 16: they are single-page with zero page breaks. CORROBORATION AND A TRAP, from the 06:54 run. The table-top spacer is right: 68_journal_wide_table_spanning measured at HEAD through Google reads dy 0.0 down to y=185 and then -114.8 pt for every line below - the same block, the same sign and the same order as a 144.0 pt spacer charged at 13.74 pt. THE TRAP: if you do run the page-top construct, the row must NOT be written on page 1. A table as the first element of w:body costs Google about 15 pt, page 1 overflows, a blank page 2 appears and the document goes 5 -> 6 pages; that is the 6-page / 33-42 result the relay measured, and it is the guard, not the construct. With `ctx.pageNo > 1 || ctx.brokePage > 0` the same construct gives 42/47 -> 45/47 on bank-statement-5-pages with page count 5 -> 5, pages 2-5 first line y -11.0 -> 44.5, median dy -59.5 -> -4.0. Patch: patches/PATCH-topgap-row-MEASURED-0654.patch. Details: FINDINGS/18_displacement-PAGETOP-ROW-BUILT-AND-MEASURED-0654-f1x.md.
+Do not rebuild the table-top spacer and do not believe the -114.8 pt figure - both are refuted in SETTLED.md with the numbers: RANKING.csv gives 68_journal_wide_table_spanning max_pt 8.64, and the w:before build moved 1 of 16 by 0.85. The lead worth having is the uniform page offset: fourteen of the sixteen read median_pt 0.96 or 1.44, which at 150 DPI is two or three pixels out on EVERY line - one constant applied to the page, not sixteen constructs. Test it against the two em-offsets already measured and never tried here: the first baseline of a page sits 0.0565 em below the paper's top edge, and the first baseline of a cell 0.92 em below the row's top edge (REMAINING-DEFECTS.md). 71_invoice_space_aligned_no_rules is the exception - share@5 26.88, median_pt 3.84, no table spacer at all - and needs its own look. Also settled: screen.py was measuring NOTHING on a fresh pod (ENGINE_SRC frozen at import); it is fixed, so a screen that reports 0 of N measured should be treated as a tool failure, not as evidence.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

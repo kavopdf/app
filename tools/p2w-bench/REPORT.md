@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 07:14
+# Fixer report - 2026-11-22 08:16
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 07:14 → 07:36 IST · 22 min**
+**22 Nov 2026 · slot 08:16 → running IST · 12 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -19,14 +19,15 @@
 | **Fixed - Google, all 42 checks** | **23**, out of the 192 documents both renderers measured |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
-| Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
+| Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
+| Committed | **11** files in 1 commit(s) from `2ba798b` — 18_displacement-SPACER-REFUTED-0900-f1x.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, ROUND.json, RUN-LOG.md, RUN.json, SETTLED.md, TIMELINE.jsonl, TRACE.md, screen.py |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 07:25 | **lead** | 0/213 | page-top gap: 1x1 trHeight row REFUTED through Google (bs5 37->33/42, 5->6 pages, page emptied); w:pgMar w:top PROVEN (bs5 37->40/42, 5 pages held, dy -59.5->-4.3 on pages 1-4, 3 checks recovered); al |
+| 08:26 | **reverted** | 1/16 | table-top spacer w:line -> w:before + hairline: 1 of 16 moved (68_journal 12.09->11.24), none worse. REFUTED as the cause: RANKING.csv gives 68_journal max_pt 8.64, not the -114.8 the lead assumed; af |
 
 ## The txt
 
@@ -40,33 +41,29 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dA-02` | what makes a single-page dense table drift in Google | 07:36 | 02:06 | 0 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 07:14 → 07:36 · 22 min |
+| Slot window | 08:16 → running · 12 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 24 |
-| Longest silence | **9.0 min** — from 07:26:45, after `report.py: building the report` |
-| Silences over 2 min | 4 |
-| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | **Both scheduled slots between the last release and this claim produced no run at all.** `gaps.py` records `GA |
+| Tool beats | 14 |
+| Longest silence | **3.5 min** — from 08:16:26, after `gaps.py: reading the timeline` |
+| Silences over 2 min | 2 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **1 min** | `##` |
-| fix - diagnose and change the engine | **2 min** | `###` |
-| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `#########` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **3 min** | `####` |
-| other - not attributed to a tool | **3 min** | `####` |
+| setup - claim, housekeeping, reading the gate | **3 min** | `######` |
+| screen - the class's own documents | **0 min** | `#` |
+| record - attempt, handoff, class rows | **1 min** | `##` |
+| report - the report and the chain | **1 min** | `##` |
+| other - not attributed to a tool | **5 min** | `##########` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -79,7 +76,7 @@
 
 ## Next run
 
-The 16 solo-18 documents: their emitted row pitch ALREADY equals the source (0.00 pt on 11 of 16, -0.10 to -0.40 on the rest), so no constant in the row-height path (DocxWriter.java:6228) can move them closer. The leading candidate is the TABLE-TOP SPACER at DocxWriter.java:5869-5881: the gap above a table is written as w:line on a 1 pt mark, and Google reads w:line as a multiple of the face's line height, so 68_journal_wide_table_spanning's 144.0 pt spacer may render as 13.74 pt (-130.3) or 160.9 (+16.9). One Drive probe settles which: an empty <w:p> with w:sz=2 and w:line=2880 w:lineRule="exact" - does it come back 13.74, 144 or 160.9 pt? The spacer moves 14 of the 16 by 4.2 to 130.3 pt; 71_invoice_space_aligned_no_rules and 31_times_body_arial_headings have no spacer, and 31_times has no table at all, so its failure cannot be pitch. Full numbers in FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md. Do NOT take the page top for these 16: they are single-page with zero page breaks.
+Do not rebuild the table-top spacer and do not believe the -114.8 pt figure - both are refuted in SETTLED.md with the numbers: RANKING.csv gives 68_journal_wide_table_spanning max_pt 8.64, and the w:before build moved 1 of 16 by 0.85. The lead worth having is the uniform page offset: fourteen of the sixteen read median_pt 0.96 or 1.44, which at 150 DPI is two or three pixels out on EVERY line - one constant applied to the page, not sixteen constructs. Test it against the two em-offsets already measured and never tried here: the first baseline of a page sits 0.0565 em below the paper's top edge, and the first baseline of a cell 0.92 em below the row's top edge (REMAINING-DEFECTS.md). 71_invoice_space_aligned_no_rules is the exception - share@5 26.88, median_pt 3.84, no table spacer at all - and needs its own look. Also settled: screen.py was measuring NOTHING on a fresh pod (ENGINE_SRC frozen at import); it is fixed, so a screen that reports 0 of N measured should be treated as a tool failure, not as evidence.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
