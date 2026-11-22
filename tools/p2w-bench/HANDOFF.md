@@ -20,8 +20,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 11:14 |
-| ended | still running |
-| how it ended | - |
+| ended | 11:23 |
+| how it ended | forced |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -100,14 +100,14 @@ unfinished work, not as a result.
 | 18_dB-03 | 18_displacement | B | do 05/32/59/18 share ONE engine construct in the emitted docx, and nam | 09:20 | landed 09:04 | landed | FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md |
 | 18_dtrheight-emitter-01 | 18_displacement | trheight-emitter | every place the engine emits trHeight/hRule, and whether 0.9634 belong | 10:08 | a unified diff and the list of emitters | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
 | 18_drow-growth-mechanism-01 | 18_displacement | row-growth-mechanism | given the real DocxWriter.java, which emitted number Google ignores wh | 10:09 | the mechanism with arithmetic, one recommended edit, and the rows it must not touch | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
+| 18_dA-05 | 18_displacement | A | consolidated every FINDINGS file and the two row emitters into one dos | 11:23 | 11:19 | running |  |
+| 18_dB-04 | 18_displacement | B | recomputed leverage from benchmarks/gverify/*.json without classpick.p | 11:23 | 11:20 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `06:10` attempt 16 on 32_stroke_lines -> kept (3/213 moved)
-- `06:13` attempt 17 on 32_stroke_lines -> kept (16/213 moved)
 - `06:17` attempt 4 on 18_displacement -> lead
 - `07:25` attempt 5 on 18_displacement -> lead (0/213 moved)
 - `07:36` agent deployed: 18_displacement / A - what makes a single-page dense table drift in Google - row pitch or the table-to
@@ -131,6 +131,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `10:09` agent landed: 18_displacement / row-growth-mechanism -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md
 - `10:37` attempt 11 on 18_displacement -> lead (0/3 moved)
 - `11:21` attempt 12 on 18_displacement -> lead (0/3 moved)
+- `11:23` agent deployed: 18_displacement / A - consolidated every FINDINGS file and the two row emitters into one dossier - ref
+- `11:23` agent deployed: 18_displacement / B - recomputed leverage from benchmarks/gverify/*.json without classpick.py - 16 sol
 
 ## Where the rest of the state lives
 

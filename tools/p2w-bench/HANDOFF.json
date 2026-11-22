@@ -1024,6 +1024,14 @@
   {
    "at": "11:21",
    "text": "attempt 12 on 18_displacement -> lead (0/3 moved)"
+  },
+  {
+   "at": "11:23",
+   "text": "agent deployed: 18_displacement / A - consolidated every FINDINGS file and the two row emitters into one dossier - ref"
+  },
+  {
+   "at": "11:23",
+   "text": "agent deployed: 18_displacement / B - recomputed leverage from benchmarks/gverify/*.json without classpick.py - 16 sol"
   }
  ],
  "next": "DO NOT build the 0.9634 row scale or the hairline cell box for single-line cells - both measured inert. Build against rowParts>1: raise the row floor to the true 368 twips (the floor is quantised 8 twips low at 360) OR take w:before off the continuation paragraphs inside a wrapped cell. Google grows 360-twip rows to 19.0/20.0; source pitch is 18.40; mobile-bill rows 5-12 hold 6 w:p on 3 columns and render at 20.0 = 2.0 pt of growth. Prove on mobile-bill and insurance-policy-schedule FIRST - they are the only two documents blocking a spacer construct already measured to take 6 documents clean (68_journal 42/42 this run). Then land the spacer (w:before + hairline w:line=1 at 5868-5875, cap 2880->4320 at 5852,5866) with it.",
@@ -1782,19 +1790,36 @@
    "finding": "FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md",
    "deployed_at": "2026-11-22T04:39",
    "landed_at": "2026-11-22T04:39"
+  },
+  {
+   "id": "18_dA-05",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "consolidated every FINDINGS file and the two row emitters into one dossier - refuted list and the unrun sweep named",
+   "expected": "11:19",
+   "deployed": "11:23",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-22T05:53"
+  },
+  {
+   "id": "18_dB-04",
+   "class": "18_displacement",
+   "angle": "B",
+   "question": "recomputed leverage from benchmarks/gverify/*.json without classpick.py - 16 solo documents, not 38.7",
+   "expected": "11:20",
+   "deployed": "11:23",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-22T05:53"
   }
  ],
  "run": {
   "started": "11:14",
-  "ended": null,
-  "ended_how": null
+  "ended": "11:23",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "01:51",
-   "how": "forced",
-   "plan": ""
-  },
   {
    "at": "04:36",
    "how": "forced",
@@ -1887,6 +1912,11 @@
   },
   {
    "at": "11:14",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "11:23",
    "how": "forced",
    "plan": ""
   }
