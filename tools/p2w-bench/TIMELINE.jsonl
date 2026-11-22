@@ -2003,3 +2003,7 @@
 {"t": 1795389997.3209271, "ist": "04:56:37", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795389997.7770872, "ist": "04:56:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795389999.2898483, "ist": "04:56:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795390136.5606065, "ist": "04:58:56", "ev": "beat", "d": "bundled agent inputs, fetching corpus"}
+{"t": 1795390224.7913501, "ist": "05:00:24", "ev": "beat", "d": "agent B landed: 12 docs fail 18_displacement alone; fetching corpus"}
+{"t": 1795390768.9257112, "ist": "05:09:28", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795390782.1306627, "ist": "05:09:42", "ev": "beat", "d": "attempt.py: recording an attempt"}
