@@ -2225,3 +2225,7 @@
 {"t": 1795308460.5780134, "ist": "06:17:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795308466.5305948, "ist": "06:17:46", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795308472.5977745, "ist": "06:17:52", "ev": "beat", "d": "LibreOffice ratchet of the check change"}
+{"t": 1795308532.5399766, "ist": "06:18:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795308532.5785522, "ist": "06:18:52", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795308532.6452265, "ist": "06:18:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795308532.680328, "ist": "06:18:52", "ev": "killed", "d": "dead claim cleared by force release"}

@@ -198,3 +198,4 @@
 | 22 Nov 06:10 | fixer | attempt 32_stroke_lines -> kept (3/213 moved) |
 | 22 Nov 06:13 | fixer | attempt 32_stroke_lines -> kept (16/213 moved) |
 | 22 Nov 06:17 | fixer | attempt 18_displacement -> lead |
+| 22 Nov 06:18 | fixer | slot FORCED released - see INCIDENTS.md for why |
