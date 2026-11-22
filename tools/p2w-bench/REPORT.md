@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 05:56 → running IST · 20 min**
+**22 Nov 2026 · slot 05:56 → 06:18 IST · 22 min**
 
 > **19 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
 
@@ -11,13 +11,13 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **19** — 3 attempt(s), 2 kept |
-| Documents improved, round total | 61 of 213 |
+| Document-moves this run | **19** — 3 attempt(s), 2 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
 | **Fixed - Google, all 42 checks** | **23**, out of the 192 documents both renderers measured |
-| Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
+| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
@@ -48,12 +48,13 @@
 
 | | |
 |:--|:--|
-| Slot window | 05:56 → running · 20 min |
+| Slot window | 05:56 → 06:18 · 22 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 21 |
+| Tool beats | 28 |
 | Longest silence | **8.8 min** — from 05:56:39, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 4 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | **this watchdog has no `cron` tool, so a paused or zombie cron cannot be moved by automation.** STEP 3 and STE |
 
 
 ### Where the time went
@@ -61,8 +62,9 @@
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **2 min** | `###` |
-| measure or build - a conversion, screen or compile writes no beacon | **12 min** | `#############` |
+| measure or build - a conversion, screen or compile writes no beacon | **13 min** | `#############` |
 | record - attempt, handoff, class rows | **3 min** | `###` |
+| report - the report and the chain | **0 min** | `#` |
 | other - not attributed to a tool | **2 min** | `##` |
 ## Best results this round
 

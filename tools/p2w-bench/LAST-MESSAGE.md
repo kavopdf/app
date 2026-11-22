@@ -11,8 +11,7 @@
 | | |
 |:--|:--|
 | Document-moves this run | **19** — 3 attempt(s), 2 kept (a sum: a document moved twice counts twice) |
-| Improved in LibreOffice | **61** of the 212 compared (corpus 213) — a proxy, not the goal |
-| &nbsp;&nbsp;— of those, clean in Google | **3** — and **57** still open there |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **0** — none |
