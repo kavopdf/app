@@ -42,16 +42,9 @@
   "status": "OPEN"
  },
  "18_displacement": {
-  "attempts": 20,
+  "attempts": 21,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-20 10:36",
-    "moved": 0,
-    "outcome": "reverted",
-    "reason": "table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 p",
-    "total": 107
-   },
    {
     "at": "2026-11-20 10:38",
     "moved": 0,
@@ -184,6 +177,13 @@
     "outcome": "lead",
     "reason": "dither patch measured CLEAN in Google (two-tables-stacked-with-no-gap 46/47 -> 47/47 PASS, live round trip) but regresses LibreOffice on 14 of the 16; the proxy ratchet is the blocker, not the constru",
     "total": 16
+   },
+   {
+    "at": "2026-11-22 17:24",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "dither patch: LO mobile-bill 1.55->39.21 reproduced exactly, Google unchanged 46/47 (still fails 18_displacement). Costs the proxy, buys nothing in Google on this document. Gate's ALLOWED path needs a",
+    "total": null
    }
   ],
   "last": null,
@@ -210,11 +210,12 @@
    "kept",
    "lead",
    "lead",
-   "lead"
+   "lead",
+   "reverted"
   ],
   "ratchet_at": "22 Nov 14:45",
   "ratchet_docs": 0,
-  "reason": "dither patch measured CLEAN in Google (two-tables-stacked-with-no-gap 46/47 -> 47/47 PASS, live round trip) but regresses LibreOffice on 14 of the 16; the proxy ratchet is the blocker, not the construct",
+  "reason": "dither patch: LO mobile-bill 1.55->39.21 reproduced exactly, Google unchanged 46/47 (still fails 18_displacement). Costs the proxy, buys nothing in Google on this document. Gate's ALLOWED path needs a Google improvement per document; mobile-bill has none, so the patch cannot ship and the 16-document claim is refuted.",
   "reasons": [
    "table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 pt mark, Google does not implement lineRule=exact and buys a fraction of it. Applied it (w:before=spacerTw, w:line=1) and measured bank-statement-5-pages through Drive: GOOGLE 40/47 -> 36/47, WORSE, and 27_text_off_page went 0 -> 12 as the extra space overflowed the page. LibreOffice unchanged at 47/47. The reason it cannot work: the spacer is NOT where the 57 pt comes from. Counted in the emitted docx, bank-statement-5-pages carries 9 spacers totalling 81.0 pt across 5 pages, max 16.2 pt - at most 16 pt per page against a measured uniform upward shift of 56.9-57.1 pt on pages 1-4. Forcing the full gap in therefore adds space the page never had and pushes rows off it.",
    "ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 pt - the paper's top edge), while LibreOffice places it at 56.80. The engine emits exactly that construct: bank-statement-5-pages carries w:before=1103 twips (55.15 pt) on the first paragraph of each page, and the measured Google dy on its pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Same number. The probe also found the construct Google DOES honour at a page top: a 1x1 table row with w:trHeight hRule=exact, 55.83 pt of 55.15 asked, exact in LibreOffice. Ruled out with numbers: the table-spacer paragraph (at most 16.2 pt per page against a 57 pt shift, and moving its gap into w:before took Google 40/47 -> 36/47, LO unchanged - reverted), w:line exact (LO honours it, so it cannot split the two renderers), auto line boxes (face-dependent in both). Next run: emit the page-first gap as a trHeight-exact table row and set that paragraph's w:before to 0. FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md has the probe table.",
@@ -235,7 +236,8 @@
    "table spacer moved from w:line to w:before (was a no-op in Google, tables started ~10pt high) + row pitch diffused onto Google's measured 0.75pt grid; two-tables-stacked-with-no-gap 41/42 -> 42/42 PASS (n_out 55->0), mobile-bill n_out 100->39; patch in patches/, corpus ratchet owed",
    "relay 15:17: applied 18-displacement spacer(w:before)+row-pitch-dither patch corpus-wide, engine built, 213/213 converted; measuring corpus to ratchet it",
    "relay 15:17: spacer(w:before)+row-pitch-dither patch applied corpus-wide; Google round trip: table-with-no-header-row 41/42 -> 47/47 PASS, 362_price_list_dense unchanged 41/42; corpus not ratcheted (throughput measured 41/240s, no slot left)",
-   "dither patch measured CLEAN in Google (two-tables-stacked-with-no-gap 46/47 -> 47/47 PASS, live round trip) but regresses LibreOffice on 14 of the 16; the proxy ratchet is the blocker, not the construct"
+   "dither patch measured CLEAN in Google (two-tables-stacked-with-no-gap 46/47 -> 47/47 PASS, live round trip) but regresses LibreOffice on 14 of the 16; the proxy ratchet is the blocker, not the construct",
+   "dither patch: LO mobile-bill 1.55->39.21 reproduced exactly, Google unchanged 46/47 (still fails 18_displacement). Costs the proxy, buys nothing in Google on this document. Gate's ALLOWED path needs a Google improvement per document; mobile-bill has none, so the patch cannot ship and the 16-document claim is refuted."
   ],
   "requeues": 0,
   "status": "OPEN"

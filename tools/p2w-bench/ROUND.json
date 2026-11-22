@@ -1,10 +1,10 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "recording findings, writing report",
-  "fixer_doing_since": 1795345564.2110991,
-  "fixer_engine_at_claim": "462353f9",
-  "fixer_last_beat": 1795345564.2110999,
+  "fixer_doing": "relay: engine built with dither patch, converting 2 worst-regressed docs",
+  "fixer_doing_since": 1795348066.2720377,
+  "fixer_engine_at_claim": "8929129",
+  "fixer_last_beat": 1795348066.2720387,
   "fixer_started": 1795347776.1852782,
   "history": [
     {

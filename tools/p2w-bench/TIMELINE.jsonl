@@ -2719,3 +2719,11 @@
 {"t": 1795345596.823637, "ist": "16:36:36", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795345597.5166497, "ist": "16:36:37", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795345597.935527, "ist": "16:36:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795347778.9150727, "ist": "17:12:58", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795347779.1321208, "ist": "17:12:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795347797.1611712, "ist": "17:13:17", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795347967.237767, "ist": "17:16:07", "ev": "beat", "d": "relay: gate passes after unshallow; testing the waiver path and the dither patch on 2 regressed docs"}
+{"t": 1795348066.270291, "ist": "17:17:46", "ev": "beat", "d": "relay: engine built with dither patch, converting 2 worst-regressed docs"}
+{"t": 1795348477.9128258, "ist": "17:24:37", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795348478.1241074, "ist": "17:24:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795348484.2484407, "ist": "17:24:44", "ev": "beat", "d": "attempt.py: recording an attempt"}
