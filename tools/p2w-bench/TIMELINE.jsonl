@@ -2631,3 +2631,10 @@
 {"t": 1795337467.1276743, "ist": "14:21:07", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795337491.5421867, "ist": "14:21:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795337503.0446994, "ist": "14:21:43", "ev": "beat", "d": "trying the 1.15 type floor with the dither"}
+{"t": 1795337581.8561974, "ist": "14:23:01", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337582.727767, "ist": "14:23:02", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337583.1296499, "ist": "14:23:03", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337588.1181338, "ist": "14:23:08", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337595.5365083, "ist": "14:23:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337596.6865046, "ist": "14:23:16", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337597.357658, "ist": "14:23:17", "ev": "beat", "d": "report.py: building the report"}

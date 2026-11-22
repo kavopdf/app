@@ -82,18 +82,26 @@ were deleted after scoring; Drive root left empty.
 
 | | |
 |:--|:--|
-| Slot window | 13:56 → running · 24 min |
+| Slot window | 13:56 → running · 26 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 18 |
+| Tool beats | 20 |
 | Longest silence | **6.7 min** — from 13:57:47, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **20 min** | `##################` |
+| measure or build - a conversion, screen or compile writes no beacon | **20 min** | `#################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **1 min** | `#` |
+| report - the report and the chain | **2 min** | `##` |
+| other - not attributed to a tool | **2 min** | `##` |
+
+## One negative worth having
+
+The engine's row floor is `1.25 × size` and Google's measured floor is `1.15 × size`, so lowering it looks
+like the obvious second half of this fix. It was built: **the declarations did not move one twip.** The
+row that lays 21.0 when the diffusion targets 20 is bound by its cell's paragraph spacing or a wrapped
+line, not by the type floor. Written into the finding so nobody spends a round trip on it.

@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 13:56 → running IST · 24 min**
+**22 Nov 2026 · slot 13:56 → running IST · 26 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,7 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
-| Committed | **13** files in 1 commit(s) from `ba0dfc9` — ...isplacement-ROWHEIGHT-CODE-MAP-142000-agentA.md, ...lacement-LADDER-IS-WHOLE-POINTS-152000-fixer.md, 18-row-pitch-error-diffused.patch, 18_displacement-SOLO-DOCS-16-142500-agentB.md, CLASS-HISTORY.jsonl, HANDOFF.json, |
+| Committed | **16** files in 3 commit(s) from `e0d4d90` — ...isplacement-ROWHEIGHT-CODE-MAP-142000-agentA.md, ...lacement-LADDER-IS-WHOLE-POINTS-152000-fixer.md, 18-row-pitch-error-diffused.patch, 18_displacement-LADDER-IS-WHOLE-POINTS-152000-fixer.md, 18_displacement-SOLO-DOCS |
 
 ## What was tried
 
@@ -50,9 +50,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 13:56 → running · 24 min |
+| Slot window | 13:56 → running · 26 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 18 |
+| Tool beats | 20 |
 | Longest silence | **6.7 min** — from 13:57:47, after `handoff.py: reading or writing the handoff` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -62,10 +62,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **20 min** | `##################` |
+| measure or build - a conversion, screen or compile writes no beacon | **20 min** | `#################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **1 min** | `#` |
+| report - the report and the chain | **2 min** | `##` |
+| other - not attributed to a tool | **2 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
