@@ -1,22 +1,5 @@
 [
  {
-  "started_ts": 1795127005.1946025,
-  "started": "03:53",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "content-present-partly-displaced",
-  "attempts": 1,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   "contA-06",
-   "contB-06"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795130940.7651992,
   "started": "04:59",
   "ended_ts": null,
@@ -1187,6 +1170,23 @@
     "status": "landed",
     "finding": "dead-ends-18-and-60.md (returned by the agent; its ranked recommendation is what this run executed)"
    }
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795376663.2583754,
+  "started": "01:14",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "18_displacement",
+  "attempts": 2,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   "18_dcarrier guard-01",
+   "18_dsolo-18 census-01"
   ],
   "obstacles_cleared": 0,
   "needs_human": 0,

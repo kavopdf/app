@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 01:14 → running IST · 19 min**
+**23 Nov 2026 · slot 01:14 → 01:34 IST · 19 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -50,9 +50,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 01:14 → running · 19 min |
+| Slot window | 01:14 → 01:34 · 19 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 24 |
+| Tool beats | 28 |
 | Longest silence | **9.0 min** — from 01:14:31, after `report.py: building the report` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -77,7 +77,7 @@
 
 ## Next run
 
-APPLY patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch and ratchet it corpus-wide - measured clean on two-tables-stacked-with-no-gap (42/42 PASS, n_out 0) and it moves EVERY ruled table, so the gate refuses it unratcheted. The row grid is 0.75 pt, NOT whole points: nine identical rows per page read 18.00/18.75/19.50, and the law laid=0.75*(round(h/0.75)+1) reproduces the 13-declaration sweep exactly when its readings are rounded. Then close the small-spacer over-charge the patch exposes: mobile-bill's 128/124 tw spacers are now charged in full where Google previously charged ~0, leaving that page +2..+5 pt low. Evidence: FINDINGS/18_displacement-ROW-GRID-AND-SPACER-1518-relay.md
+APPLY tools/p2w-bench/patches/18-displacement-SPACER-BEFORE-GUARDED-NO-DITHER.patch (spacer split, guard = non-ruled carrier and gap<=20pt, dither DISABLED - the dither is what ate 16_right), build, convert and measure the whole corpus, regress.py --check, then Google-verify the remaining eleven of the sixteen plus a sample of today's Google-clean documents that carry a non-ruled table. Measured this slot: 5 of 8 to 42/42, none worse, mobile-bill and insurance held at 46/47. Evidence: FINDINGS/18_displacement-GUARDED-SPACER-SPLIT-1-WIN-1-COST-0219-relay.md
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
