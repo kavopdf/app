@@ -2229,8 +2229,17 @@
 {"t": 1795308532.5785522, "ist": "06:18:52", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795308532.6452265, "ist": "06:18:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795308532.680328, "ist": "06:18:52", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795311847.461315, "ist": "07:14:07", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795311847.579676, "ist": "07:14:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795311852.2600787, "ist": "07:14:12", "ev": "beat", "d": "gaps.py: reading the timeline"}
 {"t": 1795311962.6521788, "ist": "07:16:02", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795311966.6172893, "ist": "07:16:06", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795311967.2841296, "ist": "07:16:07", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795311967.761728, "ist": "07:16:07", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795311968.0845227, "ist": "07:16:08", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795312150.7251468, "ist": "07:19:10", "ev": "beat", "d": "relay: read brief+handoff, lead=18_displacement page-top gap; checking build/corpus feasibility"}
+{"t": 1795312275.3320773, "ist": "07:21:15", "ev": "beat", "d": "relay: engine built, corpus fetched, 16 solo-18 docs confirmed from gverify; reading page-top offset code"}
+{"t": 1795312437.0414572, "ist": "07:23:57", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795312441.3756871, "ist": "07:24:01", "ev": "beat", "d": "relay: sectmargin construct PROVEN on bs5 (37->40/42, 5 pages, dy -59.5->-4.3); sizing it across the 16 solo-18 docs"}
+{"t": 1795312545.1195815, "ist": "07:25:45", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795312547.2490656, "ist": "07:25:47", "ev": "beat", "d": "attempt.py: recording an attempt"}
