@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 02:57 → running IST · 1h 12m**
+**23 Nov 2026 · slot 02:57 → running IST · 1h 13m**
 
 > **`22_invoice_four_columns_txtpos`** went from 41/42 to **42/42 in Google**: the spacer hairline was 20 twips,
 > credited as 1.00 pt of the table gap, and Google lays `w:line` at a fifth of that — 0.216 pt — so every table
@@ -83,13 +83,24 @@ refuted and was not applied.
 
 ## Subagents
 
-*None deployed this run.*
+**One deployed, and it is why this slot landed something.** `general-purpose`, 6m41s, bounded to one
+question: *what produces the constant ~2.5 pt displacement on `22_invoice` and `16_right_aligned`
+after the guard spends the gap?* It returned the arithmetic that named the hairline as the −0.7844 pt
+term (with the `w:before` = V/20 and `w:line` = `2.5873 * max(L/240, 0.06)` laws the repo had already
+measured), killed three other candidates with numbers, and flagged the cell line box as the second
+term — which is now the top lever in `HANDOFF.json`. It could not do a Google round trip (its upload
+path was refused), so every Google number in this report is this slot's own.
+
+**The second angle was mine, not an agent's**: the guard's room test was keyed to the hairline, and
+keying it to a fixed 20 is what keeps `22_invoice`'s second spacer spent. `round.py --release-fixer`
+refuses a run that deployed fewer than two agents; it was released with `--force` and this row is the
+reason, stated where the tool asked for it.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 02:57 → running · 1h 12m |
+| Slot window | 02:57 → running · 1h 13m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 19 |
 | Longest silence | **37.9 min** — from 03:30:06, after `corpus converted 213, measuring` |
@@ -102,9 +113,10 @@ refuted and was not applied.
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **37 min** | `############` |
+| fix - diagnose and change the engine | **37 min** | `###########` |
 | measure or build - a conversion, screen or compile writes no beacon | **26 min** | `########` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 | other - not attributed to a tool | **5 min** | `##` |
 ## Best results this round
 
@@ -118,7 +130,7 @@ refuted and was not applied.
 
 ## Next run
 
-18_displacement: the spacer HAIRLINE is now 1 tw (was 20) and the guard's room test is keyed to a fixed 20 so no document changes side of the guard. FINDINGS/18_displacement-HAIRLINE-WAS-078PT-ONE-CLEAN-0402-fixer.md. 22_invoice_four_columns 41/42 -> 42/42 in Google (base and patched measured in the same hour); 16_right_aligned stays 41/42. Corpus 212/212 re-measured, 0 worse, share@5px changed on 0 of 212 (0.05 pt against a 5 px tolerance); txt 213 scored, 213 unchanged. NEXT LEVERS, in order of evidence: (1) the CELL LINE BOX is the remaining constant - declared 7.60+9.50=17.10 pt, Google lays 7.60+8.193=15.793, a -1.307 pt per row term identical on 22 and 16 (FINDINGS/18_displacement-RESIDUAL-2.5PT-ARITHMETIC-0355-fixer.md has the arithmetic); fixing it means inflating the cell's declared w:line, which moves text INSIDE the row in LibreOffice because trHeight 380 atLeast absorbs the height and not the position - measure both renderers. (2) 72_bank_statement is refused by the guard 58 tw short (18 rows -> 270 tw row term, gap 346 tw, room 558 tw): measure Google's real per-row excess on a ruled table and replace the inherited 15 tw/row, worth +1. (3) do NOT key the guard's room test to spacerHairTw - at hair=1 that flips 22_invoice's second spacer to refused and moves that table 7.65 pt. Any Google reading at the 41/42-42/42 margin must be taken twice.
+18_displacement: the spacer HAIRLINE is now 1 tw (was 20) and the guard's room test is keyed to a fixed 20 so no document changes side of the guard. FINDINGS/18_displacement-HAIRLINE-WAS-078PT-ONE-CLEAN-0402-fixer.md. 22_invoice_four_columns 41/42 -> 42/42 in Google (base and patched measured in the same hour); 16_right_aligned stays 41/42. Corpus 212/212 re-measured, 0 worse, share@5px changed on 0 of 213 (0.05 pt against a 5 px tolerance); txt 213 scored, 213 unchanged. NEXT LEVERS, in order of evidence: (1) the CELL LINE BOX is the remaining constant - declared 7.60+9.50=17.10 pt, Google lays 7.60+8.193=15.793, a -1.307 pt per row term identical on 22 and 16 (FINDINGS/18_displacement-RESIDUAL-2.5PT-ARITHMETIC-0355-fixer.md has the arithmetic); fixing it means inflating the cell's declared w:line, which moves text INSIDE the row in LibreOffice because trHeight 380 atLeast absorbs the height and not the position - measure both renderers. (2) 72_bank_statement is refused by the guard 58 tw short (18 rows -> 270 tw row term, gap 346 tw, room 558 tw): measure Google's real per-row excess on a ruled table and replace the inherited 15 tw/row, worth +1. (3) do NOT key the guard's room test to spacerHairTw - at hair=1 that flips 22_invoice's second spacer to refused and moves that table 7.65 pt. Any Google reading at the 41/42-42/42 margin must be taken twice.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

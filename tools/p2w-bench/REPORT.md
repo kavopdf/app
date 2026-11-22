@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 02:57 → running IST · 1h 12m**
+**23 Nov 2026 · slot 02:57 → running IST · 1h 13m**
 
 > **1 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
 
@@ -47,7 +47,7 @@
 
 | | |
 |:--|:--|
-| Slot window | 02:57 → running · 1h 12m |
+| Slot window | 02:57 → running · 1h 13m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 19 |
 | Longest silence | **37.9 min** — from 03:30:06, after `corpus converted 213, measuring` |
@@ -60,9 +60,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **37 min** | `############` |
+| fix - diagnose and change the engine | **37 min** | `###########` |
 | measure or build - a conversion, screen or compile writes no beacon | **26 min** | `########` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 | other - not attributed to a tool | **5 min** | `##` |
 ## Best results this round
 
