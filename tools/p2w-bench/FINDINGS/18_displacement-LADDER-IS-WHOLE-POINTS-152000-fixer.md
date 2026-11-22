@@ -80,3 +80,13 @@ rather than assumed.
 One measurement patch, two builds, two round trips, three probe Docs and three staged `.docx` — all
 deleted after scoring. The patch is not committed to the engine: it moves every ruled table in the corpus
 and a corpus ratchet does not fit a slot.
+
+## The type floor is NOT the binding term on the row that still fails
+
+The engine's own row floor is `1.25 × size` (DocxWriter.java:6219) where Google's measured floor is
+`1.15 × size`, so the obvious second half of the fix is to lower it. **Built and converted: the
+declarations did not change by one twip** (`343,343,363,343,363,343,343,363,363,383,343,343,363` before
+and after), which proves `rowLineTw` was already below the dithered declaration on every row of this
+table. So the row that lays 21.0 when the diffusion targets 20 is bound by something else - the cell's
+paragraph spacing or a wrapped line, not the type floor. Do not spend a round trip on the 1.15 floor for
+this document; read that row's cell XML first.

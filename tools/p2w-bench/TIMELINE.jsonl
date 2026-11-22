@@ -2629,3 +2629,5 @@
 {"t": 1795337465.9790165, "ist": "14:21:05", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795337466.7558486, "ist": "14:21:06", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795337467.1276743, "ist": "14:21:07", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795337491.5421867, "ist": "14:21:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795337503.0446994, "ist": "14:21:43", "ev": "beat", "d": "trying the 1.15 type floor with the dither"}
