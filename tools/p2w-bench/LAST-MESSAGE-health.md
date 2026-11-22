@@ -1,32 +1,31 @@
-# P2W Watchdog - Run Report
-
-**22 Nov 2026 · 03:07 IST**
-
-> **1 stage(s) stopped: fix**
-
-This pass found one instrument lying and repaired it: the classify row was reading a class table no fixer ranks, while the Google table the fixer actually picks from was current, which two earlier watchdog passes had already mistaken for a stalled classifier. The only remaining stop is the fixer run that died mid-scoring with a free slot behind it, and the next scheduled fixer will take that slot on its own. This watchdog has no cron tool in its declared tool list, so it cannot see or clear a platform-side zombie run, and the exact calls it would have made are written into BLOCKERS.md rather than dressed up as a decision. No cron was paused, deleted or recreated by this pass.
+Watchdog, 22 Nov 06:10 IST. The pipeline is moving. Nothing is stopped.
 
 ## Stages
 
 | stage | state | progress | age |
-|:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 3.3 h |
-| matrix | done | 213 of 213 | 3.1 h |
-| classify | superseded |  | 1.8 h |
-| fix | **stopped** |  | 1.0 h |
-| txt | moving | 197 clean, 16 failing | 4.5 h |
+|---|---|---|---|
+| measure-google | done | 213 of 213 | 0.0 h |
+| matrix | done | 213 of 213 | 6.3 h |
+| classify | moving | | 4.9 h |
+| fix | moving | 7 attempts in 3 h | 0.0 h |
+| txt | moving | 197 clean, 16 failing | 7.6 h |
+
+health.py --stalled exits 0: nothing is stopped.
 
 ## Trend
 
-| | 2026-11-20 | 2026-11-21 | |
-|:--|--:|--:|:--|
-| .docx open | 60 | **59** | -1 |
-| .txt failing | 46 | **23** | -23 |
-| Google measured | 192 | **192** | no change |
-| Google clean | 7 | **6** | -1 |
+Today's row against yesterday's: docx open 59 to 59, no change; txt failing 23 to 16, down 7; Google measured 192 to 192, no change; Google clean 6 to 23, up 17. Two of the four columns moved, and the Google-clean jump is the day's real work. The 22 Nov row was already written by the fixer's own progress pass, so this pass did not append a second one for today.
 
-## What this pass did
+## Round
 
-* Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
-* **A stage is stopped** - see BLOCKERS.md.
+Phase is fix. The fixer runs until no class is open, and classes are still open.
 
+## Cron
+
+This watchdog has no cron tool, so STEP 3 and STEP 4 A/B of its own prompt could not run and did not run. No cron was recreated and no id changed. A paused or zombie cron cannot be moved by automation from here; the calls that were unavailable are cron list, then cron runs for any stopped stage, then pause and resume once, never left paused.
+
+The two slot checks that need no cron tool did not apply. The reopen check does not apply: phase is fix, not a finished phase with documents still failing. The release check does not apply: fix age reads 0.0 h with 7 attempts in the last 3 h, so the slot is held by a live run and no release was forced.
+
+## Recorded
+
+BLOCKERS.md gets one row: the missing cron tool, with the exact calls that were unavailable. docx open has held at 59 for two rows while txt failing fell 23 to 16 and Google clean rose 6 to 23. One flat column is not a stall, because the others moved, so the long-stall rule does not apply.
