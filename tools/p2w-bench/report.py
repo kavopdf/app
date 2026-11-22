@@ -128,6 +128,21 @@ def this_run():
 
 
 
+def google_state():
+    """{document: True if every applicable Google check passes, False if any fails}. Refused excluded."""
+    import glob as _g, json as _j
+    out = {}
+    for f in _g.glob(os.path.join(ROOT, "benchmarks", "gverify", "*.json")):
+        try:
+            j = _j.load(open(f, encoding="utf-8"))
+        except Exception:
+            continue
+        if j.get("status") == "page_count_refused":
+            continue
+        out[j.get("name")] = not (j.get("failed") or [])
+    return out
+
+
 def google_fixed():
     """What GOOGLE calls fixed: a document that passes every applicable check in its renderer.
 
@@ -265,7 +280,16 @@ def corpus():
     # corpus. Both numbers are reported now, each under the name that says what it counts.
     corpus_total = len(c)
     _gf, _gs = google_fixed()
+    # HOW MANY OF THE IMPROVED DOCUMENTS ARE ACTUALLY BETTER WHERE THE USER LOOKS.
+    #
+    # Measured 22 Nov: 61 documents are "improved" in LibreOffice and only 3 of them are clean in
+    # Google - 57 are still open. A count that says 61 without that breakdown told the user nothing
+    # about whether any document got better in the renderer they open.
+    _gs_state = google_state()
+    _imp_g_clean = len([k for k in improved if _gs_state.get(k) is True])
+    _imp_g_open = len([k for k in improved if _gs_state.get(k) is False])
     return {"available": True, "docs": corpus_total, "compared": len(common),
+            "improved_google_clean": _imp_g_clean, "improved_google_open": _imp_g_open,
             "google_fixed": _gf, "google_scored": _gs,
             "fixed": len(fixed), "moved_open": len(moved_open),
             "still_open": len([k for k in common if c[k] > FIXED_BAR]),
@@ -868,8 +892,21 @@ def main(argv):
         # baseline was taken. Printing it over the corpus total (213) put a 212-based numerator on a
         # 213-based denominator, and the user caught it on 22 Nov. Both numbers are true and they are not
         # the same number, so each is printed under the name that says what it counts.
-        L.append("| Documents improved, round total | **%d** of the %d compared (corpus %d) |"
+        # 61 IS ARITHMETICALLY TRUE AND MEASURES THE WRONG THING. The user asked on 22 Nov whether it was
+        # counting improvements that never landed. It is not - it is a set recomputed from one complete
+        # measurement against a fixed baseline. But measured against the renderer that decides:
+        #
+        #     improved in LibreOffice : 61
+        #       of which Google-clean :  3
+        #       Google still open     : 57
+        #
+        # So "61 documents improved" told the user almost nothing about whether any document got better
+        # where they will open it. The line now says which renderer it counts, and the Google breakdown
+        # follows it, so the two numbers cannot be read as one.
+        L.append("| Improved in LibreOffice | **%d** of the %d compared (corpus %d) — a proxy, not the goal |"
                  % (co["improved"], co.get("compared") or co["docs"], co["docs"]))
+        L.append("| &nbsp;&nbsp;— of those, clean in Google | **%d** — and **%d** still open there |"
+                 % (co.get("improved_google_clean", 0), co.get("improved_google_open", 0)))
         L.append("| Corpus improvement vs 15 Nov | **%+.2f%%** — mean %.2f → %.2f |"
                  % (co["pct"], co["baseline_mean"], co["current_mean"]))
         L.append("| Regressions | %s |"
