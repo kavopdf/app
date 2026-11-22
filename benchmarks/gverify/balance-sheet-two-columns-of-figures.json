@@ -2,12 +2,14 @@
  "name": "balance-sheet-two-columns-of-figures",
  "status": "ok",
  "rc": 1,
- "passed": 39,
+ "passed": 41,
  "total": 42,
  "failed": [
-  "05_chars_extra",
-  "18_displacement",
-  "32_stroke_lines"
+  "18_displacement"
  ],
- "engine": "462353f"
+ "engine": "462353f9",
+ "engine_fingerprint": "462353f9",
+ "export_sha256": "99390e4ebf3a1dafe05f415810d4d0ecc9a4ddd6cc1a1c3d00b20582fe7c5652",
+ "measured": "2026-11-22T06:32+05:30 fixer slot 05:56, Google Docs round trip, probe deleted",
+ "method": "ConvertOne at HEAD -> GOOGLEDRIVE_CREATE_FILE (application/vnd.google-apps.document, parent KavoPDF-Verify) -> GOOGLEDRIVE_DOWNLOAD_FILE application/pdf -> verify_google.py --json"
 }

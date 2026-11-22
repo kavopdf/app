@@ -2,12 +2,14 @@
  "name": "table-with-no-header-row",
  "status": "ok",
  "rc": 1,
- "passed": 44,
+ "passed": 46,
  "total": 47,
  "failed": [
-  "05_chars_extra",
-  "18_displacement",
-  "32_stroke_lines"
+  "18_displacement"
  ],
- "engine": "462353f"
+ "engine": "462353f9",
+ "engine_fingerprint": "462353f9",
+ "export_sha256": "d1843587b87cff137d7d7889e564a8a4b0000c5c679a1d1e12a24f4e5ca99c45",
+ "measured": "2026-11-22T06:32+05:30 fixer slot 05:56, Google Docs round trip, probe deleted",
+ "method": "ConvertOne at HEAD -> GOOGLEDRIVE_CREATE_FILE (application/vnd.google-apps.document, parent KavoPDF-Verify) -> GOOGLEDRIVE_DOWNLOAD_FILE application/pdf -> verify_google.py --json"
 }

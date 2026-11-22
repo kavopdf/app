@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 05:56 → running IST · 17 min**
+**22 Nov 2026 · slot 05:56 → running IST · 20 min**
 
 > **19 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Documents improved this run | **19** — 2 attempt(s), 2 kept |
+| Documents improved this run | **19** — 3 attempt(s), 2 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,7 +20,7 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `32_stroke_lines` |
+| Working on | `18_displacement` |
 
 ## What was tried
 
@@ -28,6 +28,7 @@
 |--:|:--|--:|:--|
 | 06:10 | **kept** | 3/213 | check 32 read only vector segments; Google exports an anchored rule as a raster image at the same geometry. Made the check read image bands (band=RULE_BAND_REN, the same width the vector path uses). M |
 | 06:13 | **kept** | 16/213 | the check change measured on 20 Google exports from a live round trip: 16 documents 41/42 -> 42/42, 0 worse. 13 of 14 documents failing {05,32} came back 42/42 - 05_chars_extra passes on HEAD too, so |
+| 06:17 | **lead** | None/None | 15 documents that failed {05,18,32} were re-measured through Google on HEAD: every one is now 41/42 failing 18_displacement ALONE (4 are 46/47 failing it alone). 05_chars_extra and 32_stroke_lines bot |
 
 ## The txt
 
@@ -47,11 +48,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 05:56 → running · 17 min |
+| Slot window | 05:56 → running · 20 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 17 |
+| Tool beats | 21 |
 | Longest silence | **8.8 min** — from 05:56:39, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 3 |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -59,9 +60,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **12 min** | `################` |
-| record - attempt, handoff, class rows | **2 min** | `####` |
-| other - not attributed to a tool | **2 min** | `###` |
+| fix - diagnose and change the engine | **2 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **12 min** | `#############` |
+| record - attempt, handoff, class rows | **3 min** | `###` |
+| other - not attributed to a tool | **2 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |

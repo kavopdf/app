@@ -1,18 +1,19 @@
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 05:56 → running IST · 17 min**
+**22 Nov 2026 · slot 05:56 → running IST · 20 min**
 
 > The largest Google class was not a document defect. `32_stroke_lines` read only vector
 > paths, and Google Docs exports every anchored rule as a small raster image at the rule's
-> own coordinates — so a rule Google rendered perfectly was counted as lost. Twenty
-> documents through a live Google round trip: **16 distinct documents went 41/42 → 42/42**,
-> none got worse, and **Google-clean went 6 → 23** of the 192 Google-scored documents.
+> own coordinates — so a rule Google rendered perfectly was counted as lost. Thirty-five
+> documents through a live Google round trip: **16 went 41/42 → 42/42**, none got worse,
+> **Google-clean 6 → 23**, and the class that actually blocks documents is now
+> `18_displacement`, which is the only failure left on 16 of them.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Documents improved this run | **19** — 2 attempt(s), 2 kept |
+| Documents improved this run | **19** — 3 attempt(s), 2 kept |
 | Documents improved, round total | 61 of 213 |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -21,9 +22,9 @@
 | Fixed - LibreOffice proxy | 33 of 213 - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
-| Working on | `32_stroke_lines` |
+| Working on | `18_displacement` |
 
-The 19 is the ledger's count across two attempts; the distinct documents that went clean
+The 19 is the ledger's count across three attempts; the distinct documents that went clean
 are 16, because the first attempt's three are also in the twenty-document batch.
 
 ## What was tried
@@ -32,6 +33,7 @@ are 16, because the first attempt's three are also in the twenty-document batch.
 |--:|:--|--:|:--|
 | 06:10 | **kept** | 3/213 | `verify_google.py:_rule_segments()` reads `page.get_drawings()` — vector paths only. `_stroke_pictures()` sits in the same file, is already called by `_strokes()`, and was never called here. Google Docs exports an anchored shape as a small raster image at the shape's own geometry, so a rule it drew perfectly read as zero segments and was counted LOST. Made the check read image bands, at `RULE_BAND_REN` so a 3 pt rule counts whether Google drew it as a vector band or an image band. |
 | 06:13 | **kept** | 16/213 | The change measured on 20 Google exports from a live round trip: 16 documents 41/42 → 42/42, 0 worse. 13 of 14 documents failing `{05_chars_extra, 32_stroke_lines}` came back 42/42 — `05_chars_extra` passes on HEAD too, so the table's 05 column is stale as well. |
+| 06:17 | **lead** | — | The 15 documents that failed `{05, 18, 32}` re-measured through Google on HEAD: every one is 41/42 failing `18_displacement` ALONE (4 are 46/47 failing it alone). `05` and `32` pass on all 15, so `32_stroke_lines` is cleared on 34 of the 35 documents re-measured this run. |
 
 ## What this run measured
 
@@ -47,7 +49,7 @@ Every rule the check called LOST was present in the document the user opens. The
 matters: `_stroke_pictures()` was hardcoded at 1.5 pt and two of `394`'s three rules are
 2.25 pt and 3.75 pt — at 1.5 pt the fix recovers 1 of 3 and the document still fails.
 
-**2. Twenty documents through the round trip, before and after.** `ConvertOne` at HEAD,
+**2. Thirty-five documents through the round trip, before and after.** `ConvertOne` at HEAD,
 `GOOGLEDRIVE_CREATE_FILE` as a Google Doc in `KavoPDF-Verify`, `GOOGLEDRIVE_DOWNLOAD_FILE`
 as PDF, `verify_google.py --json`, probe deleted. Before and after are the same command on
 the same export, and the before column was re-taken with the pre-change file:
@@ -58,6 +60,7 @@ the same export, and the before column was re-taken with the pre-change file:
 | `17_three_column_widths_txtpos` | 41/42 | **42/42 PASS** |
 | `315_gazette_notification` | 41/42 | **42/42 PASS** |
 | 13 of 14 `{05,32}` documents | 40/42 | **42/42 PASS** |
+| 15 `{05,18,32}` documents | 39/42 | 41/42 — `18_displacement` alone |
 | `49_coloured_background_block_paragraph` | 40/42 | 41/42 — still fails 32 |
 | `407_id_card_front_back` | 41/42 | 41/42 — 46 lost rules → 8 |
 | `311_fir_police_form` | 42/47 | 43/47 — 32 passes, 4 Google checks fail |
@@ -86,11 +89,11 @@ drops — and it needs `w:tcBorders` on a 1×1 floating table carrier.
 
 | | |
 |:--|:--|
-| Slot window | 05:56 → running · 17 min |
+| Slot window | 05:56 → running · 20 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 17 |
+| Tool beats | 21 |
 | Longest silence | **8.8 min** — from 05:56:39, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 3 |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -98,32 +101,37 @@ drops — and it needs `w:tcBorders` on a 1×1 floating table carrier.
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **12 min** | `################` |
-| record - attempt, handoff, class rows | **2 min** | `####` |
-| other - not attributed to a tool | **2 min** | `###` |
+| fix - diagnose and change the engine | **2 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **12 min** | `#############` |
+| record - attempt, handoff, class rows | **3 min** | `###` |
+| other - not attributed to a tool | **2 min** | `##` |
 
 The 8.8-minute silence is the engine build, the corpus fetch and two agent delegations
 before the first `--heartbeat`. It is the reason the slot reads as short.
 
 ## Next run
 
-**The measurement is the bottleneck now, not the fix.** 128 documents still carry a
-`32_stroke_lines` failure recorded by the vector-only check, and this run showed that
-sixteen of twenty such rows were wrong. The next slot should not write engine code: take
-the documents whose only recorded failure is `32_stroke_lines`, or
-`{05_chars_extra, 32_stroke_lines}`, and run them through the round trip. Twenty took
-seventeen minutes here, so sixty is inside one run and would settle most of the 128.
+**`18_displacement` is the class, and it is now a measured one.** It is the only failure
+left on 16 documents — 15 of them established this run, all uniform at 41/42 — and it is
+the largest column in the table at 124 documents. Implement it; do not re-measure it. A fix
+that lands takes those 16 straight to 42/42, and the class is worth 28.7 clean documents
+corpus-wide.
+
+**The remaining `32_stroke_lines` rows are still unmeasured.** 113 documents still carry the
+vector-only result; 34 of the 35 re-measured this run were wrong. A round trip on
+`{05, 32}` documents takes about a minute a document, so sixty fits in one run.
 
 Two things a round trip needs that this run had and a sub-agent's did not: the platform
 `upload` tool, which mints the `s3key` — `GOOGLEDRIVE_CREATE_FILE` refuses a sandbox path
 with *"The file key does not belong to this project or session"* — and the file under
 `/scratch/output`. Do not route around it by publishing a probe to a public host.
 
-**Then the engine.** `407` is the proof that a floating `<w:drawing>` rule is genuinely
-dropped by Google while a `w:tcBorders` rule is not: `64_newspaper_uneven_columns_ad_boxes`
-passes with its rules as table borders. Route an isolated hairline rule to a 1×1 floating
-table carrier — `<w:tblpPr>` + `<w:trHeight w:hRule="exact" w:val="1"/>` +
-`<w:tcBorders><w:bottom>` — based on `patches/rule-carrier-per-rule-2008.patch`, never
+**Then the engine, for `407`.** It is the proof that a floating `<w:drawing>` rule is
+genuinely dropped by Google while a `w:tcBorders` rule is not:
+`64_newspaper_uneven_columns_ad_boxes` passes with its rules as table borders. Route an
+isolated hairline rule to a 1×1 floating table carrier — `<w:tblpPr>` +
+`<w:trHeight w:hRule="exact" w:val="1"/>` + `<w:tcBorders><w:bottom>` — based on
+`patches/rule-carrier-per-rule-2008.patch`, never
 `rule-carrier-horizontal-only-2008.patch`, which is falsified twice: 54 documents worse on
 the corpus pass and 4 of 10 clean controls worse on the 05:14 controls.
 
