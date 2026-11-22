@@ -23,7 +23,13 @@ except Exception:
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-CLASSES  = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES.md")
+CLASSES  = os.path.join(ROOT, "benchmarks", "DEFECT-CLASSES-GOOGLE.md")
+# THE REPORT READ THE OLD LIBREOFFICE TABLE AND CALLED IT THE CLASS LIST. benchmarks/
+# DEFECT-CLASSES.md is one row per document from the round-one LibreOffice classification - six
+# classes. benchmarks/DEFECT-CLASSES-GOOGLE.md is the capability table built from the Google
+# renderer, one row per class - thirty-five of them. The user asked on 22 Nov why the report said
+# "0 of 6" when the table has 35, and the answer was that the report was reading a different file
+# from the one everything else works from.
 RANK     = os.path.join(ROOT, "benchmarks", "RANKING.csv")
 BASELINE = os.path.join(ROOT, "benchmarks", "RANKING-BASELINE.csv")
 RUN      = os.path.join(HERE, "RUN.json")
@@ -49,26 +55,35 @@ def classes():
 
     A class is solved when no document under it is still OPEN.
     """
+    # THE GOOGLE CAPABILITY TABLE HAS ONE ROW PER CLASS, NOT ONE PER DOCUMENT:
+    #
+    #   | signature | problem | open | status | fixed-in-LO-only | libreoffice | google |
+    #   | `32_stroke_lines` | 32_stroke_lines | 113 | OPEN | 112 | 1 | 113 |
+    #
+    # so `open` (cells[2]) is how many documents still fail that class, and a class is solved when it
+    # reaches zero. There is no per-document status to decode here, which is why the old eight-cell
+    # parser found six classes in a table of thirty-five.
     per_class = {}          # problem -> [open_count, fixed_count, never_broken]
     docs = 0
     try:
         for line in open(CLASSES, encoding="utf-8"):
-            s = line.strip()
-            if not s.startswith("| ") or s.startswith("|---"):
+            t = line.strip()
+            if not t.startswith("| `"):
                 continue
-            cells = [c.strip() for c in s.strip("|").split("|")]
-            if len(cells) < 8 or cells[0] in ("rank", "") or not cells[0].isdigit():
+            cells = [c.strip() for c in t.strip("|").split("|")]
+            if len(cells) < 4:
                 continue
-            docs += 1
-            problem, status, note = cells[2], cells[6].upper(), cells[7].lower()
-            rec = per_class.setdefault(problem, [0, 0, 0])
-            if "OPEN" in status:
-                rec[0] += 1
-            elif "no defect" in note or problem.lower() == "none":
-                rec[2] += 1
-            else:
-                rec[1] += 1
+            problem = cells[1].strip("`")
+            if not problem or problem.lower() == "none":
+                continue
+            try:
+                open_n = int(cells[2])
+            except Exception:
+                continue
+            docs += open_n
+            per_class[problem] = [open_n, 0, 0]
     except Exception:
+        pass
         pass
     # "none" is the pseudo-class for documents with no defect. It is a row in the file, not a
     # problem to solve, and counting it made the report say "0 of 7 clear" when six classes carry

@@ -1,3 +1,5 @@
+
+  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
 **22 Nov 2026 · slot 07:14 → 07:36 IST · 22 min**
@@ -16,28 +18,9 @@
 | **Fixed - Google, all 42 checks** | **23**, out of the 192 documents both renderers measured |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
-| Classes solved | 0 of 6 clear — 6 class(es) still have an OPEN document |
+| Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
-
-## What this slot settled
-
-Two measurements, both through Google Docs on `bank-statement-5-pages`, engine `7112d766`, and both
-in `FINDINGS/18_displacement-page-top-gap-sectmargin-PROVEN-075600-f1x.md`.
-
-| variant | pages | score | failing |
-|:--|---:|---:|:--|
-| BASE (the engine's own output) | 5 | 37/42 | 18, 25, 27_text_off_page, 44, 59 |
-| 1x1 `trHeight` row in place of the page-top `w:before` | **6** | **33/42** | 01, 17, 18, 25, 31, 32, 44, 55, 59 |
-| `w:pgMar w:top` in place of the page-top `w:before` | 5 | **40/42** | 18, 25 |
-
-The row is **refuted**: it does not merely overflow by a few points, it takes the document from 5
-pages to 6, empties a page and drops matched runs from 585 to 220. The margin is **proven**: the
--59.5 pt uniform shift on pages 1-4 collapses to the -4.3 pt the document already carries on page 1,
-the page count holds, and three checks recover with nothing new failing. All three probe Google Docs
-were deleted; the `KavoPDF-Verify` folder is empty.
-
-And the correction that matters more than either: **all 16 documents that fail `18_displacement`
-alone are single-page, with zero page breaks in their `.docx`.** The page top cannot be their cause.
+| Committed | **3** files in 1 commit(s) from `188e333` — ...ment-PAGETOP-ROW-BUILT-AND-MEASURED-0654-f1x.md, HANDOFF.json, PATCH-topgap-row-MEASURED-0654.patch |
 
 ## What was tried
 
@@ -96,7 +79,7 @@ alone are single-page, with zero page breaks in their `.docx`.** The page top ca
 
 ## Next run
 
-The 16 solo-18 documents: their emitted row pitch ALREADY equals the source (0.00 pt on 11 of 16, -0.10 to -0.40 on the rest), so no constant in the row-height path (DocxWriter.java:6228) can move them closer. The leading candidate is the TABLE-TOP SPACER at DocxWriter.java:5869-5881: the gap above a table is written as w:line on a 1 pt mark, and Google reads w:line as a multiple of the face's line height, so 68_journal_wide_table_spanning's 144.0 pt spacer may render as 13.74 pt (-130.3) or 160.9 (+16.9). One Drive probe settles which: an empty <w:p> with w:sz=2 and w:line=2880 w:lineRule="exact" - does it come back 13.74, 144 or 160.9 pt? The spacer moves 14 of the 16 by 4.2 to 130.3 pt; 71_invoice_space_aligned_no_rules and 31_times_body_arial_headings have no spacer, and 31_times has no table at all, so its failure cannot be pitch. Full numbers in FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md. Do NOT take the page top for these 16: they are single-page with zero page breaks.
+The 16 solo-18 documents: their emitted row pitch ALREADY equals the source (0.00 pt on 11 of 16, -0.10 to -0.40 on the rest), so no constant in the row-height path (DocxWriter.java:6228) can move them closer. The leading candidate is the TABLE-TOP SPACER at DocxWriter.java:5869-5881: the gap above a table is written as w:line on a 1 pt mark, and Google reads w:line as a multiple of the face's line height, so 68_journal_wide_table_spanning's 144.0 pt spacer may render as 13.74 pt (-130.3) or 160.9 (+16.9). One Drive probe settles which: an empty <w:p> with w:sz=2 and w:line=2880 w:lineRule="exact" - does it come back 13.74, 144 or 160.9 pt? The spacer moves 14 of the 16 by 4.2 to 130.3 pt; 71_invoice_space_aligned_no_rules and 31_times_body_arial_headings have no spacer, and 31_times has no table at all, so its failure cannot be pitch. Full numbers in FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md. Do NOT take the page top for these 16: they are single-page with zero page breaks. CORROBORATION AND A TRAP, from the 06:54 run. The table-top spacer is right: 68_journal_wide_table_spanning measured at HEAD through Google reads dy 0.0 down to y=185 and then -114.8 pt for every line below - the same block, the same sign and the same order as a 144.0 pt spacer charged at 13.74 pt. THE TRAP: if you do run the page-top construct, the row must NOT be written on page 1. A table as the first element of w:body costs Google about 15 pt, page 1 overflows, a blank page 2 appears and the document goes 5 -> 6 pages; that is the 6-page / 33-42 result the relay measured, and it is the guard, not the construct. With `ctx.pageNo > 1 || ctx.brokePage > 0` the same construct gives 42/47 -> 45/47 on bank-statement-5-pages with page count 5 -> 5, pages 2-5 first line y -11.0 -> 44.5, median dy -59.5 -> -4.0. Patch: patches/PATCH-topgap-row-MEASURED-0654.patch. Details: FINDINGS/18_displacement-PAGETOP-ROW-BUILT-AND-MEASURED-0654-f1x.md.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
