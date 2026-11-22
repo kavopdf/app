@@ -103,6 +103,41 @@ def read_rank(path):
     return out
 
 
+def read_documents(path):
+    """Every document that has a ROW in the table, scored or not.
+
+    read_rank() keeps only rows that carry a share5, so an exempt row - present, blank, and named
+    problem=exempt - is invisible to it. This is what separates an EXEMPTION (row there, score
+    blank) from a DELETION (row gone).
+    """
+    out = set()
+    if not os.path.exists(path):
+        return out
+    for r in csv.DictReader(open(path, encoding="utf-8")):
+        d = (r.get("document") or "").strip()
+        if d:
+            out.add(d)
+    return out
+
+
+def exempt_docx():
+    """The documents EXEMPT.json says cannot be measured, so their blank score is not a regression.
+
+    A BLANK SCORE MEANS "NOT MEASURED", NOT "NOT THERE". gate.py blanks an exempt row's scores and
+    names the problem "exempt" (the settled shape, SETTLED.md); read_rank() then drops the row, the
+    current table has no entry for the document, and the `c is None` branch below called that
+    "MISSING from the current table" - an exemption reported as a regression, for a document
+    EXEMPT.json says by design cannot be measured inside one command. Measured 22 Nov:
+    416_many_tiny_pages, 300 pages, killed at 290 s even chunked, so the honest table carries it
+    blank and the gate refused the honest table.
+    """
+    try:
+        return set(json.load(open(os.path.join(HERE, "EXEMPT.json"),
+                                  encoding="utf-8")).get("docx") or {})
+    except Exception:
+        return set()
+
+
 def read_txt(path):
     """{document: set(failing check ids)}. '-' is the published placeholder for 'fails nothing'."""
     out = {}
@@ -200,11 +235,19 @@ def docx_regressions():
     prev = previous_table(RANK)
     if not base:
         return [], "no baseline table"
+    # EXEMPT AND PRESENT IS NOT MISSING. Exempt AND ABSENT still is: a row that is gone from the
+    # table entirely is a deletion, whatever EXEMPT.json says about its score.
+    exempt = exempt_docx() & read_documents(RANK)
     worse = []
     for d in set(base) | set(prev):
         c = cur.get(d)
         b, pv = base.get(d), prev.get(d)
         if c is None:
+            if d in exempt:
+                print("  docx: EXEMPT  %-38s no score in the table, and EXEMPT.json says it"
+                      % d[:38])
+                print("        cannot be measured - not a missing measurement")
+                continue
             worse.append((d, b, None, "MISSING from the current table"))
             continue
         if b is not None and c > b + 1e-9:
