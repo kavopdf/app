@@ -1,11 +1,11 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "spacer split is LO-neutral (mobile-bill 43.87/1.55 identical); now testing Google side",
-  "fixer_doing_since": 1795354722.445554,
+  "fixer_doing": "combined: relay row-dither + LO-neutral spacer split, measuring",
+  "fixer_doing_since": 1795354936.3287504,
   "fixer_engine_at_claim": "462353f9",
-  "fixer_last_beat": 1795354722.445555,
-  "fixer_started": 1795349091.5419466,
+  "fixer_last_beat": 1795354936.3287513,
+  "fixer_started": 1795354806.8513782,
   "history": [
     {
       "at": "2026-11-12 09:46",

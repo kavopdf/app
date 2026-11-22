@@ -2754,3 +2754,9 @@
 {"t": 1795352934.8043134, "ist": "18:38:54", "ev": "beat", "d": "18_displacement: building LO-neutral spacer split (before=G-20tw, line=20tw)"}
 {"t": 1795354722.4444754, "ist": "19:08:42", "ev": "beat", "d": "spacer split is LO-neutral (mobile-bill 43.87/1.55 identical); now testing Google side"}
 {"t": 1795354802.3281355, "ist": "19:10:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795354806.8495293, "ist": "19:10:06", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795354807.1561859, "ist": "19:10:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795354807.5283358, "ist": "19:10:07", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795354824.5265288, "ist": "19:10:24", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795354936.3280785, "ist": "19:12:16", "ev": "beat", "d": "combined: relay row-dither + LO-neutral spacer split, measuring"}
+{"t": 1795355244.558093, "ist": "19:17:24", "ev": "beat", "d": "attempt.py: recording an attempt"}
