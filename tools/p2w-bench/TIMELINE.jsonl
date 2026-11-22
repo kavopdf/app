@@ -2785,73 +2785,11 @@
 {"t": 1795368092.5870538, "ist": "22:51:32", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795368115.081754, "ist": "22:51:55", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795368155.5029666, "ist": "22:52:35", "ev": "release", "d": "classifier released"}
-{"t": 1795368511.760791, "ist": "22:58:31", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1795368512.1971664, "ist": "22:58:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795369228.5420153, "ist": "23:10:28", "ev": "beat", "d": "engine build, corpus downloaded, working 18_displacement"}
-{"t": 1795369383.561476, "ist": "23:13:03", "ev": "beat", "d": "building a 5-variant row-pitch probe, one Google round trip"}
-{"t": 1795369494.7850063, "ist": "23:14:54", "ev": "beat", "d": "probe2 built: LO measured, about to spend one Google round trip"}
-{"t": 1795369635.5164797, "ist": "23:17:15", "ev": "beat", "d": "probe4 (pBdr rules, zero cell margins): LO 18/19 confirmed, one Google round trip"}
-{"t": 1795369665.1796029, "ist": "23:17:45", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795370626.7742243, "ist": "23:33:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795370629.173852, "ist": "23:33:49", "ev": "attempt", "d": "18_displacement -> lead"}
-{"t": 1795370629.2895842, "ist": "23:33:49", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795370629.4669416, "ist": "23:33:49", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795370638.4711215, "ist": "23:33:58", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370642.264252, "ist": "23:34:02", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370649.125216, "ist": "23:34:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795370654.455207, "ist": "23:34:14", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795370654.648951, "ist": "23:34:14", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370676.4634, "ist": "23:34:36", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370677.6537278, "ist": "23:34:37", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370678.119839, "ist": "23:34:38", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370681.856756, "ist": "23:34:41", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370686.4027498, "ist": "23:34:46", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370687.4420176, "ist": "23:34:47", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370687.859199, "ist": "23:34:47", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370709.8791082, "ist": "23:35:09", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370710.469911, "ist": "23:35:10", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370710.8075266, "ist": "23:35:10", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370711.4994528, "ist": "23:35:11", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370715.1669285, "ist": "23:35:15", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370715.8260944, "ist": "23:35:15", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370716.299194, "ist": "23:35:16", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370716.921238, "ist": "23:35:16", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795370786.7804537, "ist": "23:36:26", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795370786.9370098, "ist": "23:36:26", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795370789.4438705, "ist": "23:36:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795370789.4698553, "ist": "23:36:29", "ev": "release", "d": "fixer released (forced)"}
-{"t": 1795370789.5587876, "ist": "23:36:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795370789.5795639, "ist": "23:36:29", "ev": "killed", "d": "dead claim cleared by force release"}
-{"t": 1795371873.4428782, "ist": "23:54:33", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1795371873.5698986, "ist": "23:54:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795371875.186199, "ist": "23:54:35", "ev": "beat", "d": "claimed fixer slot, reading charter"}
-{"t": 1795371889.1430607, "ist": "23:54:49", "ev": "beat", "d": "reading state: handoff, leverage, pending"}
-{"t": 1795372451.2782307, "ist": "00:04:11", "ev": "beat", "d": "building combined spacer+rowheight construct from 10:05 ratchet"}
-{"t": 1795372873.148792, "ist": "00:11:13", "ev": "beat", "d": "row dither refuted by repo measurement; recording lead"}
-{"t": 1795372873.3200924, "ist": "00:11:13", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795372907.0614767, "ist": "00:11:47", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795372908.8920274, "ist": "00:11:48", "ev": "attempt", "d": "18_displacement -> lead"}
-{"t": 1795372908.9993732, "ist": "00:11:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795372909.0968442, "ist": "00:11:49", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795372938.9985702, "ist": "00:12:18", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372939.4860346, "ist": "00:12:19", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372939.766898, "ist": "00:12:19", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372940.265719, "ist": "00:12:20", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372942.739721, "ist": "00:12:22", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372951.599425, "ist": "00:12:31", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372952.0853655, "ist": "00:12:32", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372952.3485153, "ist": "00:12:32", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372952.8065424, "ist": "00:12:32", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372955.7902396, "ist": "00:12:35", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372956.3243058, "ist": "00:12:36", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372956.5977097, "ist": "00:12:36", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372957.0658338, "ist": "00:12:37", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372959.5236592, "ist": "00:12:39", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372960.0507822, "ist": "00:12:40", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372960.3033173, "ist": "00:12:40", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372960.7818098, "ist": "00:12:40", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795372993.6661825, "ist": "00:13:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795372997.4985573, "ist": "00:13:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795372997.5426726, "ist": "00:13:17", "ev": "release", "d": "fixer released (forced)"}
-{"t": 1795372997.6036787, "ist": "00:13:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795372997.6428716, "ist": "00:13:17", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795369253.2217638, "ist": "23:10:53", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795369253.4104104, "ist": "23:10:53", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795369273.459924, "ist": "23:11:13", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795369766.2846014, "ist": "23:19:26", "ev": "beat", "d": "relay: read two agent dossiers, now checking spacer SPLIT state"}
+{"t": 1795369813.661826, "ist": "23:20:13", "ev": "beat", "d": "relay: corpus 213/213 fetched, building engine"}
+{"t": 1795369903.8530033, "ist": "23:21:43", "ev": "beat", "d": "relay: measuring BEFORE on 16 solo-18 docs"}
+{"t": 1795370155.4188452, "ist": "23:25:55", "ev": "beat", "d": "relay: spacer split applied, rebuilding"}
+{"t": 1795370560.2740617, "ist": "23:32:40", "ev": "beat", "d": "relay: 4 of 16 solo-18 docs now 42/42 in Google; full-corpus measure for the commit gate"}

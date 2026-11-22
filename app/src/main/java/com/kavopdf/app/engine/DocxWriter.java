@@ -5868,9 +5868,22 @@ public final class DocxWriter {
         }
         if (spacerTw > 0) {
             spacerTw = twScale(spacerTw, ctx.squeeze);
+            // THE GAP IS SPLIT, NOT MOVED. Google's importer does not deliver w:line on an
+            // empty paragraph (measured 22 Nov: 3.5-18.3 pt declared arrives as 0.7-7.5 pt,
+            // and 144 pt declared arrives as 30.2 pt on 68_journal_wide_table_spanning), but
+            // it does deliver w:before 1:1. Moving the whole gap to w:before makes the
+            // paragraph taller in every renderer that honours w:line as well - that is the
+            // mobile-bill 1.55 -> 1.74 regression of 22 Nov 08:56, and why the ratchet
+            // refused it. Splitting keeps the SUM the same: the hairline that is already the
+            // paragraph's line box (sz=2, one point) stays in w:line and the rest goes to
+            // w:before, so a renderer that honours both sees spacerTw either way.
+            int spacerHairTw = 20;
+            int spacerBeforeTw = Math.max(0, spacerTw - spacerHairTw);
             sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
-                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
-                    .append(spacerTw)
+                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
+                    .append(spacerBeforeTw)
+                    .append("\" w:after=\"0\" w:line=\"")
+                    .append(Math.min(spacerHairTw, spacerTw))
                     .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
             ctx.flowTw += spacerTw;
             // The spacer is a line of its own: the table now starts at the flow's position
