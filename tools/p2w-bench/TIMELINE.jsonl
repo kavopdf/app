@@ -2190,3 +2190,12 @@
 {"t": 1795305017.1615949, "ist": "05:20:17", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795305017.6658893, "ist": "05:20:17", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795305017.9444597, "ist": "05:20:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795307199.3492353, "ist": "05:56:39", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795307199.446051, "ist": "05:56:39", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795307727.9515424, "ist": "06:05:27", "ev": "beat", "d": "corpus fetch + engine build"}
+{"t": 1795307758.5472665, "ist": "06:05:58", "ev": "beat", "d": "building engine"}
+{"t": 1795307809.5554345, "ist": "06:06:49", "ev": "beat", "d": "converting corpus"}
+{"t": 1795308027.6241684, "ist": "06:10:27", "ev": "beat", "d": "regress check"}
+{"t": 1795308042.0256321, "ist": "06:10:42", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795308044.076064, "ist": "06:10:44", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795308046.1069033, "ist": "06:10:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
