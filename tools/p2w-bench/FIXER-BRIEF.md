@@ -1976,3 +1976,40 @@ want - the work cannot be lost and the number cannot lie.
 
 **A finding committed is worth more than a claim made.** The 06:54 run's 42/47 → 45/47 was true and is now
 recorded as a finding; the number it could have claimed would have been worth nothing.
+
+---
+
+# WHEN A SLOT LANDS NOTHING, CHECK THE GATE BEFORE YOU BLAME THE CLASS
+
+Measured 22 Nov, and it cost three runs. Three slots in a row read `round.py --phase`, saw `measure`, and
+stood aside - correctly, in form, and uselessly in effect, because **nobody had established why the phase was
+measure.** A correctly blocked pipeline and a dead one look identical from outside.
+
+The cause: `benchmarks/RANKING.csv` was last written on 21 Nov at 01:44. Since then a renderer change had
+moved the engine. `regress.py` refuses every `.docx` change as unmeasured until the corpus is re-measured on
+the engine in the tree - so **no construct, however well chosen, could have landed a document in any of those
+three slots.** The runs were not failing to find a fix. The gate was refusing all of them.
+
+### So the first thing to check is whether you are allowed to land anything at all
+
+    python3 tools/p2w-bench/regress.py --check      # PASS, or what it refuses and why
+    python3 tools/p2w-bench/measure_gate.py         # READY, or which documents block it
+
+**If either says no, that refusal IS the work.** Re-measuring belongs to the baseline cron, but establishing
+that the block exists - and writing it where the next run reads it - is yours, and it is worth more than a
+slot spent choosing between classes that cannot be fixed.
+
+### And the four tool defects that run closed are the model for this
+
+Every one of them was a tool saying something untrue about a measurement that was fine:
+
+* `measure_gate` said READY for a table from the wrong engine - it compared round stamps and row counts and
+  never the engine, so the one thing actually wrong was the one thing it did not look at. Three runs read
+  READY, could not explain why `regress.py` refused every `.docx` change, and stood aside.
+* `regress.py` read an exemption as a deletion - `gate.py` blanks an exempt row's score and names it
+  `exempt`, `read_rank()` keeps only rows with a score, so `416_many_tiny_pages` vanished from the current
+  table and the gate called it MISSING. The baseline measured 212 of 212 on the live engine and could not
+  publish the honest table.
+
+**A gate that is wrong is worse than a gate that is strict**, because the strict one tells you what to fix
+and the wrong one tells you to stand aside.
