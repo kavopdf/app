@@ -1,0 +1,86 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4ead19de..9bdd01ca 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -5868,9 +5868,22 @@ public final class DocxWriter {
+         }
+         if (spacerTw > 0) {
+             spacerTw = twScale(spacerTw, ctx.squeeze);
++            // THE GAP IS SPLIT, NOT MOVED. Google's importer does not deliver w:line on an
++            // empty paragraph (measured 22 Nov: 3.5-18.3 pt declared arrives as 0.7-7.5 pt,
++            // and 144 pt declared arrives as 30.2 pt on 68_journal_wide_table_spanning), but
++            // it does deliver w:before 1:1. Moving the whole gap to w:before makes the
++            // paragraph taller in every renderer that honours w:line as well - that is the
++            // mobile-bill 1.55 -> 1.74 regression of 22 Nov 08:56, and why the ratchet
++            // refused it. Splitting keeps the SUM the same: the hairline that is already the
++            // paragraph's line box (sz=2, one point) stays in w:line and the rest goes to
++            // w:before, so a renderer that honours both sees spacerTw either way.
++            int spacerHairTw = 20;
++            int spacerBeforeTw = Math.max(0, spacerTw - spacerHairTw);
+             sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+-                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
+-                    .append(spacerTw)
++                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
++                    .append(spacerBeforeTw)
++                    .append("\" w:after=\"0\" w:line=\"")
++                    .append(Math.min(spacerHairTw, spacerTw))
+                     .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+             ctx.flowTw += spacerTw;
+             // The spacer is a line of its own: the table now starts at the flow's position
+diff --git a/tools/p2w-bench/ROTATION.json b/tools/p2w-bench/ROTATION.json
+index 6deb70aa..8f8fd707 100644
+--- a/tools/p2w-bench/ROTATION.json
++++ b/tools/p2w-bench/ROTATION.json
+@@ -1,6 +1,6 @@
+ {
+  "exhausted": {},
+- "next": "txt",
++ "next": "docx",
+  "docx": {
+   "class": "18_displacement",
+   "since": "2026-11-22 17:00"
+diff --git a/tools/p2w-bench/ROUND.json b/tools/p2w-bench/ROUND.json
+index fa3149cd..89cdcb04 100644
+--- a/tools/p2w-bench/ROUND.json
++++ b/tools/p2w-bench/ROUND.json
+@@ -1,10 +1,10 @@
+ {
+   "baseline_started": 0,
+   "classifier_started": 0,
+-  "fixer_doing": "LO screen retry after soffice hiccup",
+-  "fixer_doing_since": 1795347552.1033669,
++  "fixer_doing": "spacer split is LO-neutral (mobile-bill 43.87/1.55 identical); now testing Google side",
++  "fixer_doing_since": 1795354722.445554,
+   "fixer_engine_at_claim": "462353f9",
+-  "fixer_last_beat": 1795347552.103368,
++  "fixer_last_beat": 1795354722.445555,
+   "fixer_started": 1795349091.5419466,
+   "history": [
+     {
+diff --git a/tools/p2w-bench/TIMELINE.jsonl b/tools/p2w-bench/TIMELINE.jsonl
+index 17e9ccce..30f611b1 100644
+--- a/tools/p2w-bench/TIMELINE.jsonl
++++ b/tools/p2w-bench/TIMELINE.jsonl
+@@ -2746,3 +2746,10 @@
+ {"t": 1795349214.7569387, "ist": "17:36:54", "ev": "beat", "d": "report.py: building the report"}
+ {"t": 1795349215.2647388, "ist": "17:36:55", "ev": "beat", "d": "report.py: building the report"}
+ {"t": 1795349215.5640798, "ist": "17:36:55", "ev": "beat", "d": "report.py: building the report"}
++{"t": 1795350584.8581371, "ist": "17:59:44", "ev": "beat", "d": "pending.py: reading the pending gate"}
++{"t": 1795350678.4528756, "ist": "18:01:18", "ev": "beat", "d": "fetching corpus; analysing 05/18 evidence"}
++{"t": 1795352385.2110462, "ist": "18:29:45", "ev": "beat", "d": "agents returned: 05 stale-baseline + 18 two-term diagnosis; checking drive tools"}
++{"t": 1795352402.845313, "ist": "18:30:02", "ev": "beat", "d": "found: google baseline is 2+ engine commits stale (462353f9 vs HEAD 7112d766); fetching corpus to re-measure"}
++{"t": 1795352534.716686, "ist": "18:32:14", "ev": "beat", "d": "converting 213 with HEAD engine"}
++{"t": 1795352934.8043134, "ist": "18:38:54", "ev": "beat", "d": "18_displacement: building LO-neutral spacer split (before=G-20tw, line=20tw)"}
++{"t": 1795354722.4444754, "ist": "19:08:42", "ev": "beat", "d": "spacer split is LO-neutral (mobile-bill 43.87/1.55 identical); now testing Google side"}
+diff --git a/tools/p2w-bench/TRACE.md b/tools/p2w-bench/TRACE.md
+index 5f17d2ca..a8aaa91e 100644
+--- a/tools/p2w-bench/TRACE.md
++++ b/tools/p2w-bench/TRACE.md
+@@ -402,3 +402,7 @@
+ | 22 Nov 17:03 | fixer | build-engine | started |
+ | 22 Nov 17:04 | fixer | build-engine | engine built in 37s |
+ | 22 Nov 17:34 | fixer | attempt | 18_displacement -> lead (0/8 moved) |
++| 22 Nov 18:30 | fixer | build-engine | started |
++| 22 Nov 18:31 | fixer | build-engine | engine built in 55s |
++| 22 Nov 18:39 | fixer | build-engine | started |
++| 22 Nov 18:40 | fixer | build-engine | engine built in 65s |

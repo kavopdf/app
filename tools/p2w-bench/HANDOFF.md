@@ -110,8 +110,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `09:21` agent landed: 18_displacement / B -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
-- `10:06` attempt 10 on 18_displacement -> lead (0/3 moved)
 - `10:08` agent deployed: 18_displacement / trheight-emitter - every place the engine emits trHeight/hRule, and whether 0.9634 belongs on w:val
 - `10:08` agent landed: 18_displacement / trheight-emitter -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md
 - `10:08` 18_displacement 10:40 fixer: spacer-as-w:before confirmed in Google (68_journal 42/42); mobile-bill and insurance-policy-schedule 38/42 vs 41/42 at HEAD -> reverted. Measured pitch off the Google export: source 18.40, Google 19.00, histogram 19.0x16/20.0x5/18.0x3. The excess is 2.0 pt on rows with a two-paragraph cell, not a uniform 0.70 - a factor cannot describe it. FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md.
@@ -135,6 +133,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:40` attempt 19 on 18_displacement -> lead (0/16 moved)
 - `16:36` attempt 20 on 18_displacement -> lead (0/16 moved)
 - `17:34` attempt 21 on 18_displacement -> lead (0/8 moved)
+- `19:10` attempt 22 on 18_displacement -> lead
+- `19:17` attempt 23 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 
