@@ -100,20 +100,16 @@ unfinished work, not as a result.
 | 18_dB-03 | 18_displacement | B | do 05/32/59/18 share ONE engine construct in the emitted docx, and nam | 09:20 | landed 09:04 | landed | FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md |
 | 18_dtrheight-emitter-01 | 18_displacement | trheight-emitter | every place the engine emits trHeight/hRule, and whether 0.9634 belong | 10:08 | a unified diff and the list of emitters | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
 | 18_drow-growth-mechanism-01 | 18_displacement | row-growth-mechanism | given the real DocxWriter.java, which emitted number Google ignores wh | 10:09 | the mechanism with arithmetic, one recommended edit, and the rows it must not touch | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
-| 18_dA-05 | 18_displacement | A | consolidated every FINDINGS file and the two row emitters into one dos | 11:23 | 11:19 | running |  |
-| 18_dB-04 | 18_displacement | B | recomputed leverage from benchmarks/gverify/*.json without classpick.p | 11:23 | 11:20 | running |  |
-| 18_dA-06 | 18_displacement | A | static map of every writer that emits w:trHeight and cell w:spacing, a | 13:57 | expected by 14:30 | running |  |
-| 18_dB-05 | 18_displacement | B | from the three measured declared->laid points compute the declaration  | 13:57 | expected by 14:30 | running |  |
+| 18_dA-05 | 18_displacement | A | consolidated every FINDINGS file and the two row emitters into one dos | 11:23 | 11:19 | landed | tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md |
+| 18_dB-04 | 18_displacement | B | recomputed leverage from benchmarks/gverify/*.json without classpick.p | 11:23 | 11:20 | landed | tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md |
+| 18_dA-06 | 18_displacement | A | static map of every writer that emits w:trHeight and cell w:spacing, a | 13:57 | expected by 14:30 | landed | tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md |
+| 18_dB-05 | 18_displacement | B | from the three measured declared->laid points compute the declaration  | 13:57 | expected by 14:30 | landed | tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `09:20` agent deployed: 18_displacement / A - which clause of the check can fire on a 1.44-2.40 pt document, from the source c
-- `09:20` agent deployed: 18_displacement / B - do 05/32/59/18 share ONE engine construct in the emitted docx, and name it
-- `09:21` agent landed: 18_displacement / A -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
-- `09:21` agent landed: 18_displacement / B -> FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md
 - `10:06` attempt 10 on 18_displacement -> lead (0/3 moved)
 - `10:08` agent deployed: 18_displacement / trheight-emitter - every place the engine emits trHeight/hRule, and whether 0.9634 belongs on w:val
 - `10:08` agent landed: 18_displacement / trheight-emitter -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md
@@ -135,6 +131,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:46` agent landed: 47_mA-02 /  -> FINDINGS/47_margins-CELLPATH-A-150000.md
 - `14:46` agent landed: 47_mB-02 /  -> FINDINGS/47_margins-DIAGNOSE40-B-150000.md
 - `15:34` attempt 18 on 18_displacement -> reverted
+- `15:37` agent landed: 18_dA-06 /  -> tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md
+- `15:37` agent landed: 18_dB-04 /  -> tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md
+- `15:37` agent landed: 18_dA-05 /  -> tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md
+- `15:37` agent landed: 18_dB-05 /  -> tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md
 
 ## Where the rest of the state lives
 

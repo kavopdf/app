@@ -2690,3 +2690,8 @@
 {"t": 1795342029.1396327, "ist": "15:37:09", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795342029.8144877, "ist": "15:37:09", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795342030.1092567, "ist": "15:37:10", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795342064.3594909, "ist": "15:37:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795342064.5179136, "ist": "15:37:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795342064.6612115, "ist": "15:37:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795342064.8003614, "ist": "15:37:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795342064.9215264, "ist": "15:37:44", "ev": "beat", "d": "pending.py: reading the pending gate"}

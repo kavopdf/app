@@ -1076,6 +1076,22 @@
   {
    "at": "15:34",
    "text": "attempt 18 on 18_displacement -> reverted"
+  },
+  {
+   "at": "15:37",
+   "text": "agent landed: 18_dA-06 /  -> tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md"
+  },
+  {
+   "at": "15:37",
+   "text": "agent landed: 18_dB-04 /  -> tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md"
+  },
+  {
+   "at": "15:37",
+   "text": "agent landed: 18_dA-05 /  -> tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md"
+  },
+  {
+   "at": "15:37",
+   "text": "agent landed: 18_dB-05 /  -> tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md"
   }
  ],
  "next": "18_displacement: the carry-over patch is REFUTED - do not re-apply it (patches/README.md, FINDINGS/18_displacement-PATCH-REFUTED-AND-WBEFORE-LAW-1005-fixer.md). Measured law: w:before is charged exactly V/20 pt by Google, no floor/threshold/cap, +0.1552 pt line box at w:line=1 exact; w:line is charged 0.2156x. Two consequences: (1) the spacer half (patch hunks 1-2) is a genuine correctness fix and LibreOffice-neutral - it is worth keeping on its own; (2) mobile-bill only fitted on one page because Google was under-charging that gap by ~4.9 pt, so with the honest charge it spills to 2 pages. That surplus is REAL and is the lead. Do NOT reach for flowTw - line 5875 already charges the declared value and w:before renders it 1:1, so model and render agree. Find what else on mobile-bill's page is over-tall.",
@@ -1844,9 +1860,10 @@
    "question": "consolidated every FINDINGS file and the two row emitters into one dossier - refuted list and the unrun sweep named",
    "expected": "11:19",
    "deployed": "11:23",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-22T05:53"
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md",
+   "deployed_at": "2026-11-22T05:53",
+   "landed_at": "2026-11-22T10:07"
   },
   {
    "id": "18_dB-04",
@@ -1855,9 +1872,10 @@
    "question": "recomputed leverage from benchmarks/gverify/*.json without classpick.py - 16 solo documents, not 38.7",
    "expected": "11:20",
    "deployed": "11:23",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-22T05:53"
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md",
+   "deployed_at": "2026-11-22T05:53",
+   "landed_at": "2026-11-22T10:07"
   },
   {
    "id": "18_dA-06",
@@ -1866,9 +1884,10 @@
    "question": "static map of every writer that emits w:trHeight and cell w:spacing, and the exact lines to charge the page budget max(declared,1.15*sz) and to strip w:before on continuation paragraphs in wrapped cells",
    "expected": "expected by 14:30",
    "deployed": "13:57",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-22T08:27"
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md",
+   "deployed_at": "2026-11-22T08:27",
+   "landed_at": "2026-11-22T10:07"
   },
   {
    "id": "18_dB-05",
@@ -1877,9 +1896,10 @@
    "question": "from the three measured declared->laid points compute the declaration that lands laid pitch 18.5 on two-tables-stacked-with-no-gap, and the exact code lines that produce the declaration",
    "expected": "expected by 14:30",
    "deployed": "13:57",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-22T08:27"
+   "status": "landed",
+   "finding": "tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md",
+   "deployed_at": "2026-11-22T08:27",
+   "landed_at": "2026-11-22T10:07"
   }
  ],
  "run": {
