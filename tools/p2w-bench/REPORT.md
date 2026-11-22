@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 17:00
+# Fixer report - 2026-11-22 21:00
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 17:00 → running IST · 2h 18m**
+**22 Nov 2026 · slot 21:00 → running IST · 14 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,15 +20,7 @@
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `18_displacement` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 17:34 | **lead** | 0/8 | spacer->w:before built and screened in LibreOffice: mobile-bill 1.55 -> 1.74 (+0.19, WORSE), 16_right_aligned 0.00 -> 0.00. Corrects the 08:56 finding's claim that LO is blind to this construct; the c |
-| 19:10 | **lead** | None/None | spacer gap SPLIT (w:before=G-20, w:line=20) is LO-identical on mobile-bill 43.87/1.55 and removes 8.7 of the 11.3 pt Google table-top step on two-tables-stacked (80.1->88.8 vs source 91.4); still 46/4 |
-| 19:17 | **lead** | None/None | the ready relay patch (SPACER-BEFORE + ROW-PITCH-DITHER) regresses LibreOffice on two-tables-stacked-with-no-gap: share1 21.85 -> 43.33, share5 0.77 -> 30.01, measured with benchmarks/p2w.py measure_d |
+| Working on | `tooling: the measure/classify gates (no document class - the corpus must be re-measured on engine 226f7f2df3013ad7 first)` |
 
 ## The txt
 
@@ -48,11 +40,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 17:00 → running · 2h 18m |
+| Slot window | 21:00 → running · 14 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 26 |
-| Longest silence | **29.8 min** — from 18:38:54, after `18_displacement: building LO-neutral spacer split (before=G-20tw, line` |
-| Silences over 2 min | 9 |
+| Tool beats | 3 |
+| Longest silence | **11.6 min** — from 21:00:02, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -60,11 +52,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **30 min** | `#####` |
-| measure or build - a conversion, screen or compile writes no beacon | **1h 29m** | `##############` |
-| record - attempt, handoff, class rows | **5 min** | `#` |
-| report - the report and the chain | **4 min** | `#` |
-| other - not attributed to a tool | **7 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **11 min** | `#################` |
+| record - attempt, handoff, class rows | **1 min** | `###` |
+| report - the report and the chain | **1 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |

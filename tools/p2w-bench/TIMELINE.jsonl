@@ -2760,3 +2760,21 @@
 {"t": 1795357509.0973227, "ist": "19:55:09", "ev": "release", "d": "fixer released"}
 {"t": 1795357509.1893294, "ist": "19:55:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795358480.822929, "ist": "20:11:20", "ev": "release", "d": "baseline released"}
+{"t": 1795361402.4019804, "ist": "21:00:02", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795361402.5410736, "ist": "21:00:02", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795362097.3580203, "ist": "21:11:37", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795362205.8423808, "ist": "21:13:25", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362214.754976, "ist": "21:13:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362223.5530741, "ist": "21:13:43", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362232.2361379, "ist": "21:13:52", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362244.9151354, "ist": "21:14:04", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362245.456656, "ist": "21:14:05", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362245.7483463, "ist": "21:14:05", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362272.091271, "ist": "21:14:32", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362272.8911169, "ist": "21:14:32", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362273.427941, "ist": "21:14:33", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362273.701847, "ist": "21:14:33", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362277.959305, "ist": "21:14:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362278.682138, "ist": "21:14:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362279.1811004, "ist": "21:14:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795362279.4597676, "ist": "21:14:39", "ev": "beat", "d": "report.py: building the report"}

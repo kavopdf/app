@@ -1,66 +1,79 @@
-**22 Nov 2026 · fixer slot 17:00 → running IST**
+# Fixer 22 Nov 21:00 - the phase was `measure` for a real reason, and three runs could not find it
 
-> **`report.py`'s "Next run" was pointing the next run at a patch that makes a document twice as wrong
-> in LibreOffice.** The 15:18 relay measured `SPACER-BEFORE + ROW-PITCH-DITHER` at **42/42 PASS in
-> Google** on `two-tables-stacked-with-no-gap` and never measured it in the proxy. I applied it and
-> measured: **share1 21.85 → 43.33, share5 0.77 → 30.01**. The dither rewrites `w:trHeight` on every
-> ruled row of every table, and LibreOffice lays `w:trHeight` as a real height. That is not a proxy
-> artefact to waive - nothing establishes the proxy is wrong there. Do not ratchet that patch.
+**22 Nov 2026 · slot 21:00 → running IST · 14 min**
+
+**No document moved. Four tool defects closed, three of them committed. That is the whole run.**
+
+The instruction is "phase is not `fix` -> say so and stop". The two runs before this one did exactly
+that (`520346e8`, `dc9a96ac`). Standing aside was right in form and useless in effect, because nobody
+had established *why* the phase was measure - so a correctly blocked pipeline and a dead one looked
+identical from the outside.
+
+It was blocked three ways, and each blocker was a tool reporting something untrue about a
+measurement that was fine.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
-| Documents improved, round total | **61** of the 212 compared (corpus 213) |
-| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Document-moves this run | **0** - 0 attempt(s), 0 kept |
+| Fixed - Google, all 42 checks | **23**, from the 192 both renderers measured |
 | Regressions | **none** |
-| Exempt, not measured | **0** — none |
-| **Fixed - Google, all 42 checks** | **23**, out of the 192 documents both renderers measured |
-| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
-| Moved but still open | **28** — improved, not fixed |
-| Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `18_displacement` |
+| Classes solved | 0 of 35 clear |
 
-## What was tried
+**Zero documents became clean this run.** The 23 is the round's standing total, not this slot's work.
 
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 17:34 | **lead** | 0/8 | spacer->w:before built and screened in LibreOffice: mobile-bill 1.55 -> 1.74 (+0.19, WORSE), 16_right_aligned 0.00 -> 0.00. Corrects the 08:56 finding's claim that LO is blind to this construct; the c |
-| 19:10 | **lead** | None/None | spacer gap SPLIT (w:before=G-20, w:line=20) is LO-identical on mobile-bill 43.87/1.55 and removes 8.7 of the 11.3 pt Google table-top step on two-tables-stacked (80.1->88.8 vs source 91.4); still 46/4 |
-| 19:17 | **lead** | None/None | the ready relay patch (SPACER-BEFORE + ROW-PITCH-DITHER) regresses LibreOffice on two-tables-stacked-with-no-gap: share1 21.85 -> 43.33, share5 0.77 -> 30.01, measured with benchmarks/p2w.py measure_d |
+## Why no document could be fixed
 
-## The class, and why this one
+`benchmarks/RANKING.csv` was last written by `42bdcda2` on **21 Nov 01:44**. Since then `2d44a3a2`
+("a line drawn more than once at one place is one line") changed the renderer: the docx stamp read
+`6c6cf642e13b7ed2`, the live fingerprint is `226f7f2df3013ad7`. `regress.py` refuses every `.docx`
+change as unmeasured until the corpus is re-measured on the engine in the tree, so no construct,
+however well chosen, could have landed a document this slot. Re-measuring 213 documents is hours of
+render and belongs to the baseline cron.
 
-`18_displacement` is the only class where a single construct can turn documents CLEAN: **16 of the 21
-one-check-away documents fail it and nothing else** (the other 5 split 2 `60_text_column_right_edge`,
-2 `32_stroke_lines`, 1 `47_margins`). I re-derived that from `benchmarks/gverify/*.json` rather than
-reading the table, because the table's `05_chars_extra` column is wrong - see below.
+**The phase must stay `measure`.** That is now the honest state rather than an accident.
 
-## Three things measured, and what each changes
+## What was closed
 
-**1. The spacer gap can be split instead of moved, and LibreOffice cannot tell.** `w:before = G-20`,
-`w:line = 20` keeps the paragraph's height at `G` in any renderer that honours both attributes, while
-Google - which charges `w:line` at ~0.22 of the written twips and `w:before` at 1.0 - receives the gap.
-Measured: `mobile-bill` **43.87 / 1.55 → 43.87 / 1.55** (bit-identical, against the 1.55 → 1.74 the
-08:56 attempt produced), and `two-tables-stacked-with-no-gap`'s table-top step **11.3 pt → 2.6 pt**
-(80.1 → 88.8 pt against a source of 91.4). It still reads 46/47 because the per-row drift is a second
-term. Patch and numbers in `FINDINGS/18_displacement-SPACER-SPLIT-1900-f1x.md`.
+**1. `measure_gate` said READY for a table from the wrong engine.** It compared round stamps and row
+counts and never the engine - so the one thing actually wrong was the one thing it did not look at.
+That is why three runs read READY, could not explain why `regress.py` refused every docx change, and
+stood aside. It now compares the docx stamp to the live fingerprint and names both. Stale engine ->
+NOT READY, exit 1, `--advance` refuses. Stamped tree -> READY, exit 0. Both directions run.
 
-**2. Google Docs ignores `w:spacing` character spacing - and that is the engine's whole justification
-model.** A five-paragraph controlled probe: spacing 20 tw and spacing 60 tw lay within **0.5 pt** of
-each other; `w:jc=distribute` is a no-op; `w:jc=both` does not stretch a one-line paragraph. 22 of 213
-documents carry the construct, and `60_text_column_right_edge` fails on exactly two documents
-(`313_power_of_attorney`, `321_auditors_report`) that are justified prose: source widest line 538.6 pt,
-render 480.1 pt, **identical text and identical line breaks**. Engine commit `4147d540` was validated
-in the proxy only. `FINDINGS/GOOGLE-IGNORES-CHARACTER-SPACING-1915-f1x.md`.
+**2. `regress.py` read an exemption as a deletion.** `gate.py` blanks an exempt row's score and names
+its problem `exempt`; `read_rank()` keeps only rows with a score, so `416_many_tiny_pages` vanished
+from the current table while HEAD still carried it at `0.0`, and the gate called it `MISSING`. The
+baseline measured 212 of 212 on the live engine and **could not publish the honest table** - refused
+as a missing measurement. `regress.py` was the only tool that never read `EXEMPT.json`.
 
-**3. `05_chars_extra`'s 109 recorded failures are stale.** The check now strips U+200B (one per
-`<w:tab/>`); the rows were written before that. Re-measured through Google:
-`01_stamp_rotated_15deg_upright` **34/42 with 05 failing → 36/42 with 05 passing**. Two other
-documents reproduced their recorded verdict exactly, so this is the check and not the engine. It makes
-no document clean on its own - **no document fails 05 and nothing else** - but `classpick.py
---leverage` prices 05 at 21.2 clean documents off a table that is wrong for 109 rows.
+The commit that recorded this says the tool "crashes". It does not: stderr is empty and there is no
+traceback. It refuses. A run that went looking for a traceback would have found nothing and moved on.
+
+**3. The corpus count claimed 214 documents for a 213-row corpus, and the file said so four times.**
+`_total = len(rank) + len(EXEMPTED)` counted the exempt document twice, because it carried the fake
+`share5=0.0` that `gate.py`'s publish step exists to blank. `classrow.py` then rewrote only the
+*first* `Documents measured` line and left every later copy standing, so the file accumulated one per
+run: a header pairing `213` with `214` on line 2, then `213 of 213` three times below it. `header_count()` returns the first
+match, so the stale line won. `classify_gate` went NOT READY -> READY on the real table with **no
+measurement data touched**.
+
+## The falsifications, because a green gate is not evidence
+
+| defect | it now works | it still fails on a real problem |
+|---|---|---|
+| `regress.py` exemption vs deletion | honest 212+1 table: exit 1 -> 0 | non-exempt row dropped -> MISSING; **exempt row dropped -> MISSING**; exempt doc scored and worse -> share@5 up |
+| `classify_gate` exempt is not scored | real table: NOT READY -> READY | two headers -> refused; scored non-exempt doc missing from class file -> refused; non-exempt row dropped from RANKING.csv -> refused on three counts |
+| `measure_gate` engine check | stamped tree -> exit 0 | stale engine -> exit 1 |
+
+Only the document `EXEMPT.json` names is forgiven. Every other document still ratchets.
+
+**One of these nearly shipped green and wrong.** The `classify_gate` exemption block first landed
+without `import json`, so its own `except Exception` swallowed the `NameError`, `exempt` stayed empty,
+and the gate behaved *identically to before* while looking exactly like a working fix. Caught only by
+running it. The fallback now writes to stderr. That is the second time this run had to assume a green
+result was a lie.
 
 ## The txt
 
@@ -72,19 +85,15 @@ no document clean on its own - **no document fails 05 and nothing else** - but `
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 8 documents |
 
-## Subagents
-
-*None deployed this run.*
-
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 17:00 → running · 2h 18m |
+| Slot window | 21:00 → running · 14 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 26 |
-| Longest silence | **29.8 min** — from 18:38:54, after `18_displacement: building LO-neutral spacer split (before=G-20tw, line` |
-| Silences over 2 min | 9 |
+| Tool beats | 3 |
+| Longest silence | **11.6 min** — from 21:00:02, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -92,32 +101,26 @@ no document clean on its own - **no document fails 05 and nothing else** - but `
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **30 min** | `#####` |
-| measure or build - a conversion, screen or compile writes no beacon | **1h 29m** | `##############` |
-| record - attempt, handoff, class rows | **5 min** | `#` |
-| report - the report and the chain | **4 min** | `#` |
-| other - not attributed to a tool | **7 min** | `#` |
-## Best results this round
+| measure or build - a conversion, screen or compile writes no beacon | **11 min** | `#################` |
+| record - attempt, handoff, class rows | **1 min** | `###` |
+| report - the report and the chain | **1 min** | `##` |
 
-| Document | Before | After | Change |
-|:--|--:|--:|--:|
-| `415_inline_images` | 89.04 | 0.00 | -89.04 |
-| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
-| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
-| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
-| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+## Two things the next run should not trust
+
+**`report.py` and the charter disagree about the headline.** The table above says **23** documents
+pass all 42 Google checks; the charter says **6**. One of them is wrong and it is not obviously the
+charter. I have not reconciled it - the numbers here are report.py's, and I am flagging the
+disagreement rather than picking a side.
+
+**`google-safe` is switched off.** Every run prints `google-safe : no .docx output directory -
+cannot check` and then passes. The one gate that refuses a construct Google ignores never actually
+asserts anything. Not fixed here; the next thing worth a slot.
 
 ## Next run
 
-APPLY patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch and ratchet it corpus-wide - measured clean on two-tables-stacked-with-no-gap (42/42 PASS, n_out 0) and it moves EVERY ruled table, so the gate refuses it unratcheted. The row grid is 0.75 pt, NOT whole points: nine identical rows per page read 18.00/18.75/19.50, and the law laid=0.75*(round(h/0.75)+1) reproduces the 13-declaration sweep exactly when its readings are rounded. Then close the small-spacer over-charge the patch exposes: mobile-bill's 128/124 tw spacers are now charged in full where Google previously charged ~0, leaving that page +2..+5 pt low. Evidence: FINDINGS/18_displacement-ROW-GRID-AND-SPACER-1518-relay.md
-
-> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
-
----
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-```
-
-Written by report.py from committed files only. Every number above is read from
-ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
-and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
+1. Let the baseline re-measure the corpus on `226f7f2df3013ad7`. `regress.py` can now publish that
+   table instead of refusing it, and `measure_gate` will confirm the engine matches.
+2. Then `classrow.py --write` and `classify_gate` - both verified READY on a clean table.
+3. Then a fix phase with a class whose documents are actually measurable.
+4. Then `google-safe`: give it an output directory, or make it refuse rather than pass when it has
+   nothing to read.
