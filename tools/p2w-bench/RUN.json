@@ -1,16 +1,13 @@
 {
- "started_ts": 1795311847.592646,
- "started": "07:14",
- "ended_ts": 1795313173.0763268,
- "ended": "07:36",
- "class": "18_displacement",
- "attempts": 2,
+ "started_ts": 1795315560.6870751,
+ "started": "08:16",
+ "ended_ts": null,
+ "ended": null,
+ "class": "",
+ "attempts": 0,
  "kept": 0,
  "docs_improved": 0,
- "agents": [
-  "18_dA-02",
-  "18_dA-03"
- ],
- "obstacles_cleared": 2,
+ "agents": [],
+ "obstacles_cleared": 0,
  "needs_human": 0
 }

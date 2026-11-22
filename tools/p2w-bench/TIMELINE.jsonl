@@ -2281,3 +2281,13 @@
 {"t": 1795314115.344231, "ist": "07:51:55", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795314120.3233058, "ist": "07:52:00", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795314164.2759821, "ist": "07:52:44", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795315560.57687, "ist": "08:16:00", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795315560.673611, "ist": "08:16:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795315586.5440128, "ist": "08:16:26", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795315797.5444038, "ist": "08:19:57", "ev": "beat", "d": "relay: 18_displacement spacer - w:line is a multiple, w:before is exact; checking build"}
+{"t": 1795315857.466811, "ist": "08:20:57", "ev": "beat", "d": "relay: spacer w:line -> w:before patched; building engine"}
+{"t": 1795315932.748919, "ist": "08:22:12", "ev": "beat", "d": "relay: engine built; screening 18_displacement"}
+{"t": 1795315956.1290412, "ist": "08:22:36", "ev": "beat", "d": "relay: screening 16 solo-18 docs with spacer fix"}
+{"t": 1795315986.7703807, "ist": "08:23:06", "ev": "beat", "d": "relay: screening 16 with spacer fix (ENGINE_SRC via env)"}
+{"t": 1795316153.6829822, "ist": "08:25:53", "ev": "beat", "d": "relay: screen.py ENGINE_SRC fixed; verifying 2 docs without env var"}
+{"t": 1795316203.7791488, "ist": "08:26:43", "ev": "beat", "d": "attempt.py: recording an attempt"}
