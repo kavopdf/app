@@ -198,3 +198,4 @@
 | 22 Nov 11:53 | fixer | slot claimed - fixer running |
 | 22 Nov 12:06 | fixer | attempt content-present-partly-displaced -> lead (1/16 moved) |
 | 22 Nov 13:12 | fixer | attempt 18_displacement -> lead (0/1 moved) |
+| 22 Nov 13:14 | fixer | slot FORCED released - see INCIDENTS.md for why |
