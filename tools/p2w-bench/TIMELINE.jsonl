@@ -2851,3 +2851,12 @@
 {"t": 1795377679.864422, "ist": "01:31:19", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795377687.3500772, "ist": "01:31:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795377836.9569583, "ist": "01:33:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795377839.7125754, "ist": "01:33:59", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795377839.8273704, "ist": "01:33:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795377839.9378679, "ist": "01:33:59", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795377851.2152884, "ist": "01:34:11", "ev": "beat", "d": "relay: lead recorded (5 docs, spacer split alone), writing report"}
+{"t": 1795377851.3495667, "ist": "01:34:11", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377852.0553758, "ist": "01:34:12", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377852.5650775, "ist": "01:34:12", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377852.8460658, "ist": "01:34:12", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377853.3431077, "ist": "01:34:13", "ev": "beat", "d": "report.py: building the report"}

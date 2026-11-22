@@ -112,7 +112,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:21` attempt 12 on 18_displacement -> lead (0/3 moved)
 - `11:23` agent deployed: 18_displacement / A - consolidated every FINDINGS file and the two row emitters into one dossier - ref
 - `11:23` agent deployed: 18_displacement / B - recomputed leverage from benchmarks/gverify/*.json without classpick.py - 16 sol
 - `11:27` attempt 13 on 18_displacement -> lead (3/4 moved)
@@ -137,6 +136,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `01:31` agent deployed: 18_displacement / solo-18 census - per-document spacer/border/row census of the 16 that fail only 18_displacement
 - `01:31` agent landed: 18_displacement / carrier guard -> wins are non-ruled carriers, losses are ruled: the guard holds mobile-bill and insurance at 46/47 one page (measured in Google this run)
 - `01:31` agent landed: 18_displacement / solo-18 census -> spacer size does not separate the wins from the losses; carrier does. Full table in the 0219 FINDINGS
+- `01:33` attempt 28 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 

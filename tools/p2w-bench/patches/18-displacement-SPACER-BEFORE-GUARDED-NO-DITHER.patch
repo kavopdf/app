@@ -1,0 +1,87 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 4ead19de..00758d4b 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -5868,10 +5868,22 @@ public final class DocxWriter {
+         }
+         if (spacerTw > 0) {
+             spacerTw = twScale(spacerTw, ctx.squeeze);
++            // THE GAP IS SPENT AT ITS TRUE VALUE ONLY ON THE CARRIER IT WAS MEASURED ON.
++            // The wins are tables whose cell borders are all nil (rules are floating shapes); the
++            // two documents that lost a page to this are ruled tables on exactly-full pages. Outside
++            // the gate the paragraph is byte-identical to what it was.
++            boolean carrierRuled = t.ruled;
++            for (int i = 0; i < 6; i++) carrierRuled |= t.sideDrawn[i];
++            boolean gapAtTrue = !carrierRuled && spacerTw <= 400;
+             sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+-                    .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
++                    .append(gapAtTrue
++                            ? "<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\""
++                            : "<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
+                     .append(spacerTw)
+-                    .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
++                    .append(gapAtTrue
++                            ? "\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>"
++                            : "\" w:lineRule=\"exact\"/>")
++                    .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+             ctx.flowTw += spacerTw;
+             // The spacer is a line of its own: the table now starts at the flow's position
+             // after it, which is the y the page drew the table's top at.
+@@ -6124,6 +6136,26 @@ public final class DocxWriter {
+         // are stacked from the table's own top, so row 2 starts one WRITTEN row below row 1.
+         float recutTopPt = Float.NaN;
+         float rowTopPagePtHere = Float.NaN;
++        // THE RENDERER'S OWN ROW GRID, MEASURED, AND THE DECLARATION THAT LANDS ON IT.
++        //
++        // Google lays a row declared at h at 0.75 * (round(h / 0.75) + 1): the declaration is
++        // snapped to the nearest 0.75 pt and one whole 0.75 pt quantum is added. Measured
++        // 22 Nov on a probe built for the question (five declarations, nine identical rows
++        // each: 17.00 -> 18.00, 17.40 -> 18.00, 17.80 -> 18.75, 18.20 -> 18.75, 18.60 ->
++        // 19.50) and confirmed on three engine builds of two-tables-stacked-with-no-gap
++        // (18.00 -> 18.75, 17.40 -> 18.00, 18.40 -> 19.50). hRule and the border weight do
++        // not enter it: atLeast, exact, 0.5 pt and 1 pt all laid the same pitch.
++        //
++        // A page's pitch is not on that grid. 18.40 pt sits between 18.00 and 18.75 and no
++        // declaration reaches it, so declaring the page's pitch every row loses 0.40 pt a row
++        // - 5.2 pt at the foot of a 13-row table, which is 18_displacement. The error is
++        // therefore DIFFUSED: each row is declared so that the height laid SO FAR is the
++        // closest 0.75 multiple to the height the page has drawn so far. The rows alternate
++        // 18.75 / 18.00 and the displacement never grows past half a quantum, however long
++        // the table is. Same rule for every table; nothing here names a document.
++        final int ditherQTw = 15;               // 0.75 pt in twips
++        float ditherCarryTw = 0f;               // laid minus the page, carried to the next row
++        boolean ditherOn = false;   // SPACER ONLY, no dither - measured separately
+         for (int r = 0; r < keepRows; r++) {
+             List<String> row = t.rows.get(r);
+             // This row's own pitch. A ruled table's rule lies inside the row's box, so it comes
+@@ -6143,6 +6175,21 @@ public final class DocxWriter {
+                 int remainTw = (int) Math.round((paperHPt - rowEdge[r]) * TWIPS_PER_PT);
+                 if (remainTw > 0 && remainTw < rowTwHere) { rowTwHere = remainTw; rowCapTw = remainTw; }
+             }
++            // THE DECLARATION THIS ROW NEEDS TO LAND WHERE THE PAGE PUTS IT - see the note on
++            // the measured grid above. Skipped where the row is cut at the paper's bottom edge:
++            // that row is written at what is left of the sheet, not at a grid point.
++            int ditherLaidTw = 0;
++            if (ditherOn && rowCapTw <= 0) {
++                float wantTw = rowTwHere - ditherCarryTw;
++                int kq = Math.round(wantTw / (float) ditherQTw);
++                if (kq < 1) kq = 1;
++                int declTw = ditherQTw * (kq - 1);
++                if (declTw > 0 && declTw < rowTwHere) {
++                    ditherLaidTw = ditherQTw * kq;
++                    ditherCarryTw += ditherLaidTw - rowTwHere;
++                    rowTwHere = declTw;
++                }
++            }
+             // The rule this row pays: half of the rule above it plus half of the rule below it.
+             int szAbove = r == 0 ? szRuleTop : szRuleInside;
+             int szBelow = r == keepRows - 1 ? szRuleBottom : szRuleInside;
+@@ -6159,7 +6206,7 @@ public final class DocxWriter {
+             // and is wrong: it shortens every row whose content was already below the pitch, and
+             // on electricity-bill's 18.4 pt rows (0.5 pt rules) that turned an 18.0/19.0
+             // alternation into 17.5/18.5 - 18_displacement gained more documents than it fixed.
+-            int pitchTwHere = rowTwHere;
++            int pitchTwHere = ditherLaidTw > 0 ? ditherLaidTw : rowTwHere;
+             int contentTwHere = rowTwHere > 0 && ruleTwHere > 0
+                     ? Math.max(1, rowTwHere - ruleTwHere) : rowTwHere;
+             // The line inside the cell follows the row it is in: a cell's text is drawn at the

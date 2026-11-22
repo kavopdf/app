@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 01:14 → running IST · 16 min**
+**23 Nov 2026 · slot 01:14 → running IST · 19 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -27,6 +27,7 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 01:30 | **reverted** | 0/None | guarded spacer split (non-ruled carrier, gap<=20pt) reproduces 1 of the 4 wins the 23:10 run reported (29_dot_leaders 42/42) and costs 16_right_aligned_amounts 41/42 -> 40/42 via a new 23_line_pitch; |
+| 01:33 | **lead** | 0/None | spacer split ALONE (guard: non-ruled carrier, gap<=20pt; dither disabled) takes 5 of 8 measured documents to 42/42 in Google with no document worse: 29_dot_leaders, 41_coloured, 73_marksheet, 22_invoi |
 
 ## The txt
 
@@ -49,11 +50,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 01:14 → running · 16 min |
+| Slot window | 01:14 → running · 19 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 18 |
+| Tool beats | 24 |
 | Longest silence | **9.0 min** — from 01:14:31, after `report.py: building the report` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -61,8 +62,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **7 min** | `##########` |
-| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `############` |
+| fix - diagnose and change the engine | **9 min** | `###########` |
+| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `##########` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

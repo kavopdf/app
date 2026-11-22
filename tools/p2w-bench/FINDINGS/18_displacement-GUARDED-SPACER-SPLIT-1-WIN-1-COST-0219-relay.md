@@ -63,3 +63,41 @@ dither has cost a document it was not aimed at.
   (`29_dot_leaders_txtpos`, 15.85 pt gap, 5 rows) and the one loss (`16_right`, 4.65 pt gap, 13 rows)
   differ in gap size and row count, not in carrier — if the split alone is the win, the dither is
   what loses `16_right` and it should not travel with it.
+
+---
+
+# Second measurement, same slot: the spacer split WITHOUT the dither lands five and costs none
+
+Built from the same patch with the dither disabled (`ditherOn = false`), the guard unchanged
+(non-ruled carrier, gap <= 20 pt). Same eight documents, same conversion path, Google, one round
+trip each.
+
+| document | committed | split+dither | **split only** |
+|:--|:--|:--|:--|
+| `29_dot_leaders_txtpos` | 41/42 | 42/42 | **42/42** |
+| `41_coloured_headings_white_bg` | 41/42 | 41/42 | **42/42** |
+| `73_marksheet_subject_marks_grade` | 41/42 | 41/42 | **42/42** |
+| `22_invoice_four_columns_txtpos` | 41/42 | 41/42 | **42/42** |
+| `16_right_aligned_amounts_txtpos` | 41/42 | 40/42 | **42/42** |
+| `72_bank_statement_no_rules_right_amounts` | 41/42 | 41/42 | 41/42 (unchanged) |
+| `mobile-bill` | 46/47 | 46/47 | 46/47 (unchanged) |
+| `insurance-policy-schedule` | 46/47 | 46/47 | 46/47 (unchanged) |
+
+**Five documents to 42/42, none worse, none of the two full-page documents touched.** The dither was
+not carrying the wins - it was eating them, and it was the whole of `16_right`'s `23_line_pitch`.
+The spacer split alone is the construct.
+
+Why this is a lead and not a commit: the engine change needs a whole-corpus LibreOffice measurement
+before it may be committed (`regress.py --check`, the pre-commit gate) and the slot ran out before
+that conversion and measurement could be finished. The patch is ready to apply in one command:
+
+    git apply tools/p2w-bench/patches/18-displacement-SPACER-BEFORE-GUARDED-NO-DITHER.patch
+    bash tools/p2w-bench/build-engine.sh
+    P2W_ENGINE_SRC=/scratch/work/CS python3 benchmarks/p2w.py --force --budget 280   # repeat
+    python3 tools/p2w-bench/regress.py --check
+
+**What the next run must do, in order:** apply the patch, build, convert and measure the whole
+corpus, `regress.py --check`, then Google-verify the remaining eleven of the sixteen plus a sample of
+documents that are Google-clean today and carry a non-ruled table with a gap <= 20 pt. If the LO
+table does not regress and the Google sample holds, this is five clean documents - and the corpus
+count of documents fixed by all 42 checks goes from 23 to 28 of 192.
