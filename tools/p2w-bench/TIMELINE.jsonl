@@ -2462,3 +2462,16 @@
 {"t": 1795324714.0812042, "ist": "10:48:34", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795324714.7927601, "ist": "10:48:34", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795324715.1641486, "ist": "10:48:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795326227.7829099, "ist": "11:13:47", "ev": "beat", "d": "relay: cloned, about to read"}
+{"t": 1795326256.5940492, "ist": "11:14:16", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795326269.7802827, "ist": "11:14:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795326269.8184946, "ist": "11:14:29", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795326269.9306552, "ist": "11:14:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795326269.9580758, "ist": "11:14:29", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795326273.0995173, "ist": "11:14:33", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795326273.4497578, "ist": "11:14:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795326574.8388224, "ist": "11:19:34", "ev": "beat", "d": "relay: reading the CONFIRMED-6of16 spacer finding"}
+{"t": 1795326593.8288736, "ist": "11:19:53", "ev": "beat", "d": "relay: reading DocxWriter spacer + row emitters"}
+{"t": 1795326621.8240275, "ist": "11:20:21", "ev": "beat", "d": "relay: building the trHeight sweep probe"}
+{"t": 1795326681.535494, "ist": "11:21:21", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795326699.9817362, "ist": "11:21:39", "ev": "beat", "d": "attempt.py: recording an attempt"}
