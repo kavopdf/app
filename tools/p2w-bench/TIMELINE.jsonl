@@ -2830,3 +2830,23 @@
 {"t": 1795372873.148792, "ist": "00:11:13", "ev": "beat", "d": "row dither refuted by repo measurement; recording lead"}
 {"t": 1795372873.3200924, "ist": "00:11:13", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795372907.0614767, "ist": "00:11:47", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795372908.8920274, "ist": "00:11:48", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795372908.9993732, "ist": "00:11:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795372909.0968442, "ist": "00:11:49", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795372938.9985702, "ist": "00:12:18", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372939.4860346, "ist": "00:12:19", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372939.766898, "ist": "00:12:19", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372940.265719, "ist": "00:12:20", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372942.739721, "ist": "00:12:22", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372951.599425, "ist": "00:12:31", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372952.0853655, "ist": "00:12:32", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372952.3485153, "ist": "00:12:32", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372952.8065424, "ist": "00:12:32", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372955.7902396, "ist": "00:12:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372956.3243058, "ist": "00:12:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372956.5977097, "ist": "00:12:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372957.0658338, "ist": "00:12:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372959.5236592, "ist": "00:12:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372960.0507822, "ist": "00:12:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372960.3033173, "ist": "00:12:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795372960.7818098, "ist": "00:12:40", "ev": "beat", "d": "report.py: building the report"}

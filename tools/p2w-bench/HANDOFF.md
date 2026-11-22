@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 22:58 |
-| ended | 23:36 |
-| how it ended | forced |
+| started | 23:54 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -111,7 +111,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `10:09` agent landed: 18_displacement / row-growth-mechanism -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md
 - `10:37` attempt 11 on 18_displacement -> lead (0/3 moved)
 - `11:21` attempt 12 on 18_displacement -> lead (0/3 moved)
 - `11:23` agent deployed: 18_displacement / A - consolidated every FINDINGS file and the two row emitters into one dossier - ref
@@ -136,6 +135,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `23:34` attempt 24 lead: charge located, construct A/B measured in both renderers, no document clean, none worse
 - `23:36` agent deployed: 18_displacement / A - which declaration makes the second table's first row lay 21.0 pt when the diffus
 - `23:36` agent landed: 18_displacement / A -> FINDINGS/18_displacement-RULES-AS-PBDR-PITCH-FIXED-PLACEMENT-BROKEN-2330-fixer.md
+- `00:11` attempt 25 on 18_displacement -> lead (0/3 moved)
 
 ## Where the rest of the state lives
 

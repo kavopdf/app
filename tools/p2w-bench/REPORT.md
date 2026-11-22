@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 22:58
+# Fixer report - 2026-11-22 23:54
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 22:58 → running IST · 36 min**
+**23 Nov 2026 · slot 23:54 → running IST · 18 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -26,7 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 23:33 | **lead** | 0/None | Measured where Google's row-pitch charge lives: LibreOffice lays w:trHeight exactly and never charges the rule; Google charges the row's own rule and rounds to a whole point. A paragraph border is not |
+| 00:11 | **lead** | 0/3 | Row-height dither refuted (trHeight stored not laid); census of the 11 non-ruled docs = 3 faults; spacer needs a scope guard, handed to next run |
 
 ## The txt
 
@@ -46,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 22:58 → running · 36 min |
+| Slot window | 23:54 → running · 18 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 13 |
-| Longest silence | **16.0 min** — from 23:17:45, after `attempt.py: recording an attempt` |
-| Silences over 2 min | 4 |
+| Tool beats | 11 |
+| Longest silence | **9.4 min** — from 23:54:49, after `reading state: handoff, leverage, pending` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -58,10 +58,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **16 min** | `##########` |
-| measure or build - a conversion, screen or compile writes no beacon | **14 min** | `#########` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **4 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **16 min** | `#####################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

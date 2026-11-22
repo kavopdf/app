@@ -1112,6 +1112,10 @@
   {
    "at": "23:36",
    "text": "agent landed: 18_displacement / A -> FINDINGS/18_displacement-RULES-AS-PBDR-PITCH-FIXED-PLACEMENT-BROKEN-2330-fixer.md"
+  },
+  {
+   "at": "00:11",
+   "text": "attempt 25 on 18_displacement -> lead (0/3 moved)"
   }
  ],
  "next": "DO NOT apply patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch - measured LO-regressive by 21.5 points on two-tables-stacked-with-no-gap (FINDINGS/18_displacement-RELAY-PATCH-REGRESSES-LIBREOFFICE-1930-f1x.md). Start from FINDINGS/18_displacement-RULES-AS-PBDR-PITCH-FIXED-PLACEMENT-BROKEN-2330-fixer.md: the Google row-pitch charge is the row's OWN RULE and a paragraph border is not charged (Google mean 18.25-18.33 vs 19.08 with cell borders, source 18.40; LibreOffice identical to 0.05 pt). The bottom-border build fixes the pitch and breaks text placement (median dy -4.66 -> -10.70, n_out 55 -> 69). Next round trip: pBdr TOP per row AND nil the table's own top side (the C build drew 18 rules vs 15 because the table top was still drawn), then re-run the A/B on two-tables-stacked-with-no-gap. Census first: only five of the sixteen documents that fail 18_displacement and nothing else are ruled tables with a sub-point pitch - the other eleven are a different term.",
