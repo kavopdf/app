@@ -2701,3 +2701,16 @@
 {"t": 1795342270.4502656, "ist": "15:41:10", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795342271.1943917, "ist": "15:41:11", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795342271.5811179, "ist": "15:41:11", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795344112.6874275, "ist": "16:11:52", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795344155.7588603, "ist": "16:12:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795344155.7865376, "ist": "16:12:35", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795344155.8778229, "ist": "16:12:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795344155.9068534, "ist": "16:12:35", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795344174.009106, "ist": "16:12:54", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795344174.4060884, "ist": "16:12:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795344669.8840415, "ist": "16:21:09", "ev": "beat", "d": "relay: reading patch + checking google access"}
+{"t": 1795344703.5303555, "ist": "16:21:43", "ev": "beat", "d": "relay: applying patch + building engine"}
+{"t": 1795344737.986545, "ist": "16:22:17", "ev": "beat", "d": "relay: patch applied, building engine (cold pod: JDK fetch)"}
+{"t": 1795344847.6398308, "ist": "16:24:07", "ev": "beat", "d": "relay: converting 3 test docs with patched engine"}
+{"t": 1795344952.148088, "ist": "16:25:52", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795344970.598, "ist": "16:26:10", "ev": "beat", "d": "attempt.py: recording an attempt"}
