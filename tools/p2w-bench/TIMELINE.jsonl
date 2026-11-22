@@ -2377,3 +2377,10 @@
 {"t": 1795320243.8262966, "ist": "09:34:03", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795320243.9260106, "ist": "09:34:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795320243.945294, "ist": "09:34:03", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795321305.8505564, "ist": "09:51:45", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795321305.9796505, "ist": "09:51:45", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795321497.8128326, "ist": "09:54:57", "ev": "beat", "d": "fetching corpus (6 min)"}
+{"t": 1795321515.5102332, "ist": "09:55:15", "ev": "beat", "d": "building engine (~2 min)"}
+{"t": 1795321900.0434198, "ist": "10:01:40", "ev": "beat", "d": "3 edits applied: spacer w:before, cap 4320, cell hairline box; building"}
+{"t": 1795322165.646301, "ist": "10:06:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795322168.7556684, "ist": "10:06:08", "ev": "beat", "d": "attempt.py: recording an attempt"}
