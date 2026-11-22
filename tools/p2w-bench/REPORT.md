@@ -21,7 +21,7 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
-| Committed | **13** files in 2 commit(s) from `38b0ce9` — 18_displacement-SPACER-REFUTED-0900-f1x.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, SETTLED.md, TIMELINE.jsonl, TRACE.md, screen.py |
+| Committed | **13** files in 3 commit(s) from `091b271` — 18_displacement-SPACER-REFUTED-0900-f1x.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, SETTLED.md, TIMELINE.jsonl, TRACE.md, screen.py |
 
 ## What was tried
 
@@ -52,7 +52,7 @@
 |:--|:--|
 | Slot window | 08:16 → running · 16 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 19 |
+| Tool beats | 22 |
 | Longest silence | **3.5 min** — from 08:16:26, after `gaps.py: reading the timeline` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -79,7 +79,7 @@
 
 ## Next run
 
-Do not rebuild the table-top spacer and do not believe the -114.8 pt figure - both refuted in SETTLED.md with the numbers: RANKING.csv gives 68_journal_wide_table_spanning max_pt 8.64, and the w:before build moved 1 of 16 by 0.85. Do NOT read median_pt 0.96 as a two-pixel page offset either - it is the floor of the instrument (p2w.py filters the integer EDT to d>1, so 0.96 is the smallest value it can print) and a real 0.96 pt offset would PASS an 18_displacement whose tolerance floor is 1.5 pt. The live question is the opposite one: SIX of the sixteen (22_invoice_four_columns_txtpos, 41_coloured_headings_white_bg, 73_marksheet_subject_marks_grade, 16_right_aligned_amounts_txtpos, 29_dot_leaders_txtpos, 72_bank_statement_no_rules_right_amounts) have max_pt 1.44-2.40, under the check's own floor, and fail it anyway - so the check's dy and the ranking's dy are not the same quantity. Settle which one defines the class before building for those six. 71_invoice_space_aligned_no_rules (share@5 26.88, median_pt 3.84, no spacer) is genuinely displaced and a separate question. Also settled: screen.py was measuring NOTHING on a fresh pod (ENGINE_SRC frozen at import) - it is fixed, so a screen reporting '0 of N measured' is a tool failure, not evidence.
+Before building anything for 18_displacement, read which clause of the check fired: verify_google.py --json on one of 22_invoice_four_columns_txtpos / 41_coloured_headings_white_bg / 73_marksheet_subject_marks_grade / 16_right_aligned_amounts_txtpos / 29_dot_leaders_txtpos / 72_bank_statement_no_rules_right_amounts. All six have max_pt 1.44-2.40 and share5 0.00, under the check's 1.5 pt tolerance floor, so they can only be failing through 'if not ds' - upright text with no matched run - which is run matching or reading order, not vertical position. That test needs no build and decides whether the class is real. Do not rebuild the table-top spacer and do not believe the -114.8 pt figure: both refuted in SETTLED.md (68_journal max_pt is 8.64, and the w:before build moved 1 of 16 by 0.85). Do not read median_pt 0.96 as an offset either - it is the floor of the instrument (p2w.py filters the integer EDT to d>1). 71_invoice_space_aligned_no_rules (share@5 26.88, median_pt 3.84, no spacer) is genuinely displaced and a separate question. Also settled: screen.py was measuring NOTHING on a fresh pod (ENGINE_SRC frozen at import) - fixed; a screen reporting '0 of N measured' is a tool failure, not evidence.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

@@ -382,6 +382,14 @@ before building anything for these six; part of the class's 18.6-clean-document 
 artefact of the check rather than of the engine. `71_invoice_space_aligned_no_rules` is the opposite
 and a separate question: share@5 26.88, `median_pt` 3.84, no table spacer at all.
 
+**AND `18_displacement` IS NOT A DISPLACEMENT THRESHOLD.** Its tolerance `clamp(0.35 * size, 1.5, 4.5)`
+is never below 1.5 pt, so a page with nothing more than 1.5 pt out can only fail it through the
+`if not ds: bad_pages.append(pg)` branch — upright text on the page and none of it matched. Six of the
+sixteen have `max_pt` 1.44–2.40 and `share5` 0.00, i.e. under the tolerance, and fail anyway. Test
+which clause fired (`verify_google.py --json` on one of them, no build needed) before believing the
+class is about vertical position; if it is `not ds`, the fault is run matching or reading order and no
+vertical constant will fix it.
+
 Full numbers: `FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md`.
 
 ## `screen.py` measured NOTHING on a fresh pod, and said the idea had failed

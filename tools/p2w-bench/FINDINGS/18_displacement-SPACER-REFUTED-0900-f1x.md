@@ -134,6 +134,44 @@ partly an artefact of the check, not of the engine.
 `71_invoice_space_aligned_no_rules` is the opposite case and a different question: share@5 26.88 with
 `median_pt` 3.84 — genuinely displaced, and no table spacer at all.
 
+## 4c. The check has a branch that a displacement cannot reach — and it is the first thing to test
+
+`verify_google.py`, `18_displacement`, is not a displacement threshold. It is three clauses over
+matched text runs, `d = g["ry"] - r["ry"]` with `_tol(size) = clamp(0.35 * size, 1.5, 4.5)`:
+
+    n_out = sum(1 for d, sz in ds if abs(d) > _tol(sz))
+    worst_here = max(abs(d) / _tol(sz) for d, sz in ds)
+    if (n_out > max(2, -(-len(ds) * 5 // 100))   # a budget
+        or n_out == len(ds)                      # every matched run out
+        or worst_here > 2.0):                    # one run beyond twice its tolerance
+        bad_pages.append(pg)
+
+and, immediately before it,
+
+    if not ds:
+        bad_pages.append(pg)      # upright text on the page, none of it matched
+        continue
+
+**`_tol` can never be below 1.5 pt for any face size.** So for a page where no run is more than
+1.5 pt out, `n_out` is 0, `worst_here` is under 1, and the first two clauses cannot fire. The only
+remaining branch is `not ds` — the render lost the page, or its runs did not match the source's.
+
+That is the shape of at least `22_invoice_four_columns_txtpos` and `41_coloured_headings_white_bg`,
+whose largest ink displacement anywhere on the page is 1.44 pt and whose `share5` is **0.00**. A
+1.44 pt error cannot exceed a 1.5 pt tolerance; a page that fails this check with nothing 1.5 pt out
+is far more likely to have failed to MATCH than to have moved.
+
+**Stated honestly as a caveat:** `max_pt` is an ink distance-transform measure and `d` is a matched-run
+baseline difference, so they are not the same quantity and the argument is not airtight — a run can
+move 3 pt while its glyphs land near other source ink and the ink measure stays at 1.44. What is
+airtight is that **the ink metric is structurally blind to the `not ds` branch**, so six documents
+whose `share5` is 0.00 may be failing for a reason no number in `RANKING.csv` can express.
+
+**The test costs nothing and needs no build:** run `verify_google.py --json` on one of the six and
+read whether `18_displacement` failed through `n_out`, through `worst_here`, or through `not ds`. If
+it is `not ds`, the fault is in run matching or reading order, the class is misnamed, and no vertical
+constant will ever fix it.
+
 ## 5. A tool bug found on the way — screen.py measured nothing on a fresh pod
 
 `screen.py` set `p2w.REPO` after importing `benchmarks/p2w.py`, but `p2w.py` computes
