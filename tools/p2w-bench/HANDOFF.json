@@ -1074,27 +1074,11 @@
    "text": "agent landed: 47_mB-02 /  -> FINDINGS/47_margins-DIAGNOSE40-B-150000.md"
   },
   {
-   "at": "15:34",
-   "text": "attempt 18 on 18_displacement -> reverted"
-  },
-  {
-   "at": "15:37",
-   "text": "agent landed: 18_dA-06 /  -> tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md"
-  },
-  {
-   "at": "15:37",
-   "text": "agent landed: 18_dB-04 /  -> tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md"
-  },
-  {
-   "at": "15:37",
-   "text": "agent landed: 18_dA-05 /  -> tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md"
-  },
-  {
-   "at": "15:37",
-   "text": "agent landed: 18_dB-05 /  -> tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md"
+   "at": "15:28",
+   "text": "attempt 18 on 18_displacement -> lead"
   }
  ],
- "next": "18_displacement: the carry-over patch is REFUTED - do not re-apply it (patches/README.md, FINDINGS/18_displacement-PATCH-REFUTED-AND-WBEFORE-LAW-1005-fixer.md). Measured law: w:before is charged exactly V/20 pt by Google, no floor/threshold/cap, +0.1552 pt line box at w:line=1 exact; w:line is charged 0.2156x. Two consequences: (1) the spacer half (patch hunks 1-2) is a genuine correctness fix and LibreOffice-neutral - it is worth keeping on its own; (2) mobile-bill only fitted on one page because Google was under-charging that gap by ~4.9 pt, so with the honest charge it spills to 2 pages. That surplus is REAL and is the lead. Do NOT reach for flowTw - line 5875 already charges the declared value and w:before renders it 1:1, so model and render agree. Find what else on mobile-bill's page is over-tall.",
+ "next": "APPLY patches/18-displacement-SPACER-BEFORE-plus-ROW-PITCH-DITHER.patch and ratchet it corpus-wide - measured clean on two-tables-stacked-with-no-gap (42/42 PASS, n_out 0) and it moves EVERY ruled table, so the gate refuses it unratcheted. The row grid is 0.75 pt, NOT whole points: nine identical rows per page read 18.00/18.75/19.50, and the law laid=0.75*(round(h/0.75)+1) reproduces the 13-declaration sweep exactly when its readings are rounded. Then close the small-spacer over-charge the patch exposes: mobile-bill's 128/124 tw spacers are now charged in full where Google previously charged ~0, leaving that page +2..+5 pt low. Evidence: FINDINGS/18_displacement-ROW-GRID-AND-SPACER-1518-relay.md",
  "agents": [
   {
    "id": "contA-01",
@@ -1860,10 +1844,9 @@
    "question": "consolidated every FINDINGS file and the two row emitters into one dossier - refuted list and the unrun sweep named",
    "expected": "11:19",
    "deployed": "11:23",
-   "status": "landed",
-   "finding": "tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md",
-   "deployed_at": "2026-11-22T05:53",
-   "landed_at": "2026-11-22T10:07"
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-22T05:53"
   },
   {
    "id": "18_dB-04",
@@ -1872,10 +1855,9 @@
    "question": "recomputed leverage from benchmarks/gverify/*.json without classpick.py - 16 solo documents, not 38.7",
    "expected": "11:20",
    "deployed": "11:23",
-   "status": "landed",
-   "finding": "tools/p2w-bench/FINDINGS/18_displacement-SOLO-DOCS-16-142500-agentB.md",
-   "deployed_at": "2026-11-22T05:53",
-   "landed_at": "2026-11-22T10:07"
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-22T05:53"
   },
   {
    "id": "18_dA-06",
@@ -1884,10 +1866,9 @@
    "question": "static map of every writer that emits w:trHeight and cell w:spacing, and the exact lines to charge the page budget max(declared,1.15*sz) and to strip w:before on continuation paragraphs in wrapped cells",
    "expected": "expected by 14:30",
    "deployed": "13:57",
-   "status": "landed",
-   "finding": "tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md",
-   "deployed_at": "2026-11-22T08:27",
-   "landed_at": "2026-11-22T10:07"
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-22T08:27"
   },
   {
    "id": "18_dB-05",
@@ -1896,10 +1877,9 @@
    "question": "from the three measured declared->laid points compute the declaration that lands laid pitch 18.5 on two-tables-stacked-with-no-gap, and the exact code lines that produce the declaration",
    "expected": "expected by 14:30",
    "deployed": "13:57",
-   "status": "landed",
-   "finding": "tools/p2w-bench/FINDINGS/18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA.md",
-   "deployed_at": "2026-11-22T08:27",
-   "landed_at": "2026-11-22T10:07"
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-22T08:27"
   }
  ],
  "run": {
@@ -2009,7 +1989,7 @@
    "plan": ""
   }
  ],
- "context": "Slot 14:58. Held the fixer claim. Read the charter, the carry-over and the two dead agent briefs. Applied the carry-over patch, bisected it into its four mechanisms, and refuted it in BOTH renderers on engine 462353f9 - the handoff's 42/42 for two-tables does not reproduce (46/47, same single check). Spacer-only is LibreOffice-invisible but costs mobile-bill a whole page in Google (46/47 -> 43/47, page_count 1->2). The row/cell hunks are a +29..+36 LibreOffice regression on four of six documents. One agent landed a measured law that is worth more than the patch: w:before is charged exactly V/20 pt by Google with no floor or cap (25 points, residual 0.000000, run present or absent), a constant 0.1552 pt line box at w:line=1 exact, and w:line at 0.2156x. That relocates the lead from spacing to pagination. Nothing committed to the engine; the tree is at baseline 462353f9.",
+ "context": "THE ROW-PITCH LADDER IS WHOLE POINTS. A 13-row sweep on two-tables-stacked-with-no-gap (declared 344..392 tw) laid 18/18/18/19/19/19/19/19/20/20/20/20 - never a half point. The 18.5 declaration the 13:18 relay left as the next build DOES NOT EXIST; laid = round(declared_pt + 0.875) where 0.875 is the row's own rule. A source pitch of 18.4 therefore rounds to 19 on every row and the error accumulates (+9.1 pt at the foot of 13 rows), which is the whole of 18_displacement on that document. Error-diffusing the declaration (patches/18-row-pitch-error-diffused.patch) took the foot from 326.5 to 317.5 against a source 316.7 - 92% of the drift gone, 23_line_pitch now reads the source's own 18.4 - and STILL 46/47: one run is more than 2x its tolerance out on the single row the diffusion hands a 20 pt target to (laid 21.0). Next attempt: find that row's binding term (cell content, not declaration) and cap it; do not re-derive the ladder.",
  "needs_human": [
   {
    "at": "10:40",
@@ -2018,5 +1998,5 @@
    "change": "a person must either authorise the trade (a 1.03 rise on a document already at 97.62 for 601 going to 0.00), or give share@5px a companion axis that separates 'more ink, some far' from 'the same ink, further' - see FINDINGS/widget-walk-REFUSED-BY-ONE-DOCUMENT-1050-f1x.md"
   }
  ],
- "next_class": ""
+ "next_class": "two-tables-stacked-with-no-gap"
 }

@@ -2678,3 +2678,10 @@
 {"t": 1795341339.5778883, "ist": "15:25:39", "ev": "beat", "d": "relay: converting corpus with patched engine"}
 {"t": 1795341449.4697418, "ist": "15:27:29", "ev": "beat", "d": "relay: screening 18_displacement against baseline"}
 {"t": 1795341490.0846598, "ist": "15:28:10", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795341492.5363395, "ist": "15:28:12", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795341492.6432312, "ist": "15:28:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795341492.7767296, "ist": "15:28:12", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795341496.187923, "ist": "15:28:16", "ev": "beat", "d": "relay: corpus measure pass 1 of N (p2w --budget 250)"}
+{"t": 1795341790.9671626, "ist": "15:33:10", "ev": "beat", "d": "relay: corpus measure pass 2"}
+{"t": 1795342152.4325902, "ist": "15:39:12", "ev": "beat", "d": "relay: google-verifying patched output on 2 class docs"}
+{"t": 1795342217.421642, "ist": "15:40:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
