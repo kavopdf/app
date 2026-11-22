@@ -1,7 +1,3 @@
-| 19 Nov 21:59 | fixer | slot claimed - fixer running |
-| 19 Nov 22:30 | fixer | attempt content-present-partly-displaced -> kept (13/18 moved) |
-| 19 Nov 22:32 | fixer | attempt content-present-partly-displaced -> kept (13/18 moved) |
-| 19 Nov 22:59 | fixer | attempt content-present-partly-displaced -> reverted (0/24 moved) |
 | 19 Nov 23:00 | fixer | attempt content-present-partly-displaced -> kept (13/18 moved) |
 | 19 Nov 23:53 | fixer | slot claimed - fixer running |
 | 19 Nov 23:56 | fixer | attempt content-present-partly-displaced -> error (0/18 moved) |
@@ -199,3 +195,6 @@
 | 22 Nov 23:10 | fixer | slot claimed - fixer running |
 | 23 Nov 00:39 | fixer | attempt 18_displacement -> reverted (0/16 moved) |
 | 23 Nov 00:41 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 23 Nov 01:14 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 23 Nov 01:14 | fixer | slot claimed - fixer running |
+| 23 Nov 01:30 | fixer | attempt 18_displacement -> reverted (0/? moved) |

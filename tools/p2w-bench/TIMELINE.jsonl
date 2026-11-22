@@ -2831,3 +2831,21 @@
 {"t": 1795377209.1213737, "ist": "01:23:29", "ev": "beat", "d": "relay: guarded spacer split built, converting corpus"}
 {"t": 1795377643.236337, "ist": "01:30:43", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795377655.0538669, "ist": "01:30:55", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795377657.8574505, "ist": "01:30:57", "ev": "attempt", "d": "18_displacement -> reverted"}
+{"t": 1795377657.936696, "ist": "01:30:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795377658.0376606, "ist": "01:30:58", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795377661.296878, "ist": "01:31:01", "ev": "beat", "d": "relay: attempt recorded reverted, writing report"}
+{"t": 1795377661.4218612, "ist": "01:31:01", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377668.7970219, "ist": "01:31:08", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795377668.9121346, "ist": "01:31:08", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795377669.0125353, "ist": "01:31:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795377669.1123831, "ist": "01:31:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795377674.2490327, "ist": "01:31:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377674.865622, "ist": "01:31:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377675.3420107, "ist": "01:31:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377675.6203585, "ist": "01:31:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377676.1109295, "ist": "01:31:16", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377678.6387944, "ist": "01:31:18", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377679.1163976, "ist": "01:31:19", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377679.3995652, "ist": "01:31:19", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795377679.864422, "ist": "01:31:19", "ev": "beat", "d": "report.py: building the report"}

@@ -1,26 +1,5 @@
 [
  {
-  "started_ts": 1795119741.3465843,
-  "started": "01:52",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "content-present-partly-displaced",
-  "attempts": 2,
-  "kept": 2,
-  "docs_improved": 1,
-  "agents": [],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "counted": [
-   [
-    "content-present-partly-displaced",
-    1
-   ]
-  ],
-  "ratchets": 1,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795127005.1946025,
   "started": "03:53",
   "ended_ts": null,
@@ -1148,6 +1127,41 @@
   "started": "23:10",
   "ended_ts": null,
   "ended": "(never)",
+  "class": "18_displacement",
+  "attempts": 1,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   {
+    "id": "instrument-01",
+    "class": "18_displacement",
+    "angle": "instrument",
+    "question": "which clause of 18_displacement fires on the six documents under the check's own 1.5 pt floor, and is the check's dy the same quantity as RANKING.csv's *_pt",
+    "deployed": "23:12",
+    "expected": "landed",
+    "status": "landed",
+    "finding": "18-displacement-instrument.md (returned by the agent; summarised in the run report)"
+   },
+   {
+    "id": "deadends-01",
+    "class": "18_displacement",
+    "angle": "history",
+    "question": "every prior attempt at 18_displacement and 60_text_column_right_edge, which hypotheses are refuted and which are open, and the next attempt with the best clean-document yield",
+    "deployed": "23:14",
+    "expected": "landed",
+    "status": "landed",
+    "finding": "dead-ends-18-and-60.md (returned by the agent; its ranked recommendation is what this run executed)"
+   }
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795369253.4342782,
+  "started": "23:10",
+  "ended_ts": 1795374703.0585647,
+  "ended": "00:41",
   "class": "18_displacement",
   "attempts": 1,
   "kept": 0,

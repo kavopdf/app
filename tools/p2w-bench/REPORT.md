@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 23:10
+# Fixer report - 2026-11-23 01:14
 
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 23:10 → running IST · 1h 29m**
+**23 Nov 2026 · slot 01:14 → running IST · 16 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -26,9 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 00:11 | **lead** | 0/3 | Row-height dither refuted (trHeight stored not laid); census of the 11 non-ruled docs = 3 faults; spacer needs a scope guard, handed to next run |
-| 00:39 | **reverted** | 0/16 | spacer split lands 4 of 16 in Google (73_marksheet, 41_coloured, 29_dot_leaders, 72_bank_statement 42/42) but breaks mobile-bill and insurance-policy-schedule 46/47 one page -> 43/47 two pages in a co |
-| 23:33 | **lead** | 0/None | Measured where Google's row-pitch charge lives: LibreOffice lays w:trHeight exactly and never charges the rule; Google charges the row's own rule and rounds to a whole point. A paragraph border is not |
+| 01:30 | **reverted** | 0/None | guarded spacer split (non-ruled carrier, gap<=20pt) reproduces 1 of the 4 wins the 23:10 run reported (29_dot_leaders 42/42) and costs 16_right_aligned_amounts 41/42 -> 40/42 via a new 23_line_pitch; |
 
 ## The txt
 
@@ -42,17 +40,20 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dcarrier guard-01` | why the spacer split breaks two documents and what a | 01:31 | 20:01 | 0 min |
+| `18_dsolo-18 census-01` | per-document spacer/border/row census of the 16 that | 01:31 | 20:01 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 23:10 → running · 1h 29m |
+| Slot window | 01:14 → running · 16 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 12 |
-| Longest silence | **67.1 min** — from 23:32:40, after `relay: 4 of 16 solo-18 docs now 42/42 in Google; full-corpus measure f` |
-| Silences over 2 min | 4 |
+| Tool beats | 18 |
+| Longest silence | **9.0 min** — from 01:14:31, after `report.py: building the report` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -60,10 +61,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **1h 07m** | `#################` |
-| measure or build - a conversion, screen or compile writes no beacon | **15 min** | `####` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **6 min** | `##` |
+| fix - diagnose and change the engine | **7 min** | `##########` |
+| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `############` |
 ## Best results this round
 
 | Document | Before | After | Change |

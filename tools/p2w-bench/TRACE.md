@@ -6,10 +6,6 @@
 | 16 Nov 17:23 | fixer | stale-claim | fixer slot was stale (65 min) - the previous run ended without releasing it |
 | 17 Nov 09:21 | fixer | claim | fixer claimed the slot |
 | 17 Nov 09:30 | fixer | build-engine | started |
-| 20 Nov 20:44 | fixer | attempt | 47_margins -> reverted (0/14 moved) |
-| 20 Nov 20:58 | fixer | claim | fixer claimed the slot |
-| 20 Nov 20:59 | fixer | attempt | t01_word_accuracy -> reverted (0/10 moved) |
-| 20 Nov 21:18 | fixer | build-engine | started |
 | 20 Nov 21:18 | fixer | build-engine | engine built in 37s |
 | 20 Nov 21:22 | fixer | attempt | t01_word_accuracy -> kept (3/10 moved) |
 | 20 Nov 21:42 | fixer | commit-gate | started |
@@ -406,3 +402,7 @@
 | 23 Nov 00:38 | fixer | build-engine | engine built in 39s |
 | 23 Nov 00:39 | fixer | attempt | 18_displacement -> reverted (0/16 moved) |
 | 23 Nov 00:41 | fixer | release | forced: engine source byte-identical to claim state (git diff a6a5fbd HEAD -- engine/ is empty); the revert commit changed the sha, not the engine; attempt 26 recorded as reverted |
+| 23 Nov 01:14 | fixer | claim | fixer claimed the slot |
+| 23 Nov 01:22 | fixer | build-engine | started |
+| 23 Nov 01:23 | fixer | build-engine | engine built in 34s |
+| 23 Nov 01:30 | fixer | attempt | 18_displacement -> reverted (0/? moved) |
