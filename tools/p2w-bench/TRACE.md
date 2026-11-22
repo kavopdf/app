@@ -221,21 +221,12 @@
 | 21 Nov 20:00 | fixer | build-engine | engine unchanged, compile skipped |
 | 21 Nov 20:08 | fixer | attempt | 32_stroke_lines -> reverted (0/213 moved) |
 | 21 Nov 20:17 | fixer | attempt | 32_stroke_lines -> lead (0/210 moved) |
-<<<<<<< HEAD
-| 21 Nov 21:11 | fixer | claim | fixer claimed the slot |
-| 21 Nov 21:11 | fixer | stale-claim | fixer slot was stale (14 min) - the previous run ended without releasing it |
-| 21 Nov 21:15 | fixer | build-engine | started |
-| 21 Nov 21:16 | fixer | build-engine | engine built in 38s |
-| 21 Nov 21:19 | fixer | build-engine | started |
-| 21 Nov 21:20 | fixer | build-engine | engine built in 37s |
-=======
 | 21 Nov 20:57 | fixer | claim | fixer claimed the slot |
 | 21 Nov 20:58 | fixer | build-engine | started |
 | 21 Nov 20:59 | fixer | build-engine | engine built in 59s |
 | 21 Nov 21:29 | fixer | build-engine | started |
 | 21 Nov 21:30 | fixer | build-engine | engine built in 51s |
 | 21 Nov 21:31 | fixer | attempt | 32_stroke_lines -> lead (0/? moved) |
->>>>>>> cc7e18d (finding: the per-page rule carrier is killed, and 'floating tables stack' is false)
 | 21 Nov 21:53 | fixer | claim | fixer claimed the slot |
 | 21 Nov 22:18 | fixer | build-engine | started |
 | 21 Nov 22:20 | fixer | build-engine | engine built in 70s |
