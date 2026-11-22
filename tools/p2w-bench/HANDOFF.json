@@ -1730,15 +1730,10 @@
  ],
  "run": {
   "started": "08:56",
-  "ended": null,
-  "ended_how": null
+  "ended": "09:34",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "17:12",
-   "how": "forced",
-   "plan": ""
-  },
   {
    "at": "20:46",
    "how": "forced",
@@ -1833,6 +1828,11 @@
    "at": "07:36",
    "how": "forced",
    "plan": "18_displacement: do NOT take the page top for the 16 solo-18 documents - all 16 are single-page PDFs and their converted .docx carries zero page breaks, so the proven page-top construct cannot make one of them clean. Their displacement is row/line pitch inside one dense table or form: start from the -4.3 median / -12.8..+2.9 spread measured on page 1 of bank-statement-5-pages, which is the residual after the page-top fix and sits on a page that was never broken. Land the section margin (w:pgMar w:top) as a SEPARATE build on multi-page documents: DocxWriter.java:1053-1075 already emits a sectPr with nextPage, so it is that path plus beforeTw=0 in the two ctx.newPage branches (3395-3401, 4277-4283) plus the same twips out of ctx.budgetTw (1116) and out of what pageFits is asked - steps 1-2 alone double the gap in LibreOffice, step 3 is what holds the page count. Do NOT retry the 1x1 trHeight row: measured this run, it takes bank-statement-5-pages from 5 pages to 6 and 37/42 to 33/42."
+  },
+  {
+   "at": "09:34",
+   "how": "forced",
+   "plan": ""
   }
  ],
  "context": "18_displacement's table spacer is CONFIRMED as the cause and is one build from landing, blocked by one measured second construct. Google charges a w:line lineRule=exact spacer on a 1 pt mark at 0.22x its written twips, so 68_journal's 144 pt spacer put every run below it at dy -114.28 and 73_marksheet's 16.7 pt spacer at -12.85; documents with no spacer are unaffected (+1.06). Writing the gap as w:before instead made 6 of the 16 solo-18 documents 42/42 in Google (16_right_aligned, 22_invoice, 29_dot_leaders, 41_coloured, 68_journal, 73_marksheet), but insurance-policy-schedule and mobile-bill went 41/42 -> 38/42 with 2 pages and lost content, so the change was reverted rather than landed. Cause of those two, measured: Google renders w:trHeight hRule=atLeast rows at 19.10 pt against an 18.40 pt source pitch (+0.70 pt/row, 14.7-15.4 pt per table). The 0.22x spacer charge was accidentally absorbing that excess; charging the spacer at its true value exposes it and the two 3-spacer full pages overflow. Both constructs must land together.",

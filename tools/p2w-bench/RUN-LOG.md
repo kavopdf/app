@@ -199,3 +199,4 @@
 | 22 Nov 08:56 | fixer | slot claimed - fixer running |
 | 22 Nov 09:19 | fixer | attempt 18_displacement -> lead (6/16 moved) |
 | 22 Nov 09:13 | watchdog | slot FORCED released on a live run - see BLOCKERS.md 09:16 |
+| 22 Nov 09:34 | fixer | slot FORCED released - see INCIDENTS.md for why |

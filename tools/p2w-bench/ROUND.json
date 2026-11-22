@@ -1,11 +1,9 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "census: counting corpus documents with a table spacer",
-  "fixer_doing_since": 1795319507.729819,
   "fixer_engine_at_claim": "462353f9",
   "fixer_last_beat": 1795319507.72982,
-  "fixer_started": 1795319371.7694144,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
