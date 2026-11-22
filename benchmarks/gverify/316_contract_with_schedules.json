@@ -2,11 +2,10 @@
  "name": "316_contract_with_schedules",
  "status": "ok",
  "rc": 1,
- "passed": 45,
+ "passed": 46,
  "total": 47,
  "failed": [
-  "18_displacement",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

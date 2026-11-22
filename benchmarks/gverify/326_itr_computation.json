@@ -1,16 +1,6 @@
 {
  "name": "326_itr_computation",
- "status": "ok",
- "rc": 1,
- "passed": 41,
- "total": 47,
- "failed": [
-  "05_chars_extra",
-  "18_displacement",
-  "25_invisible_text",
-  "59_shape_anchor",
-  "60_text_column_right_edge",
-  "63_table_rows"
- ],
- "engine": "462353f"
+ "status": "page_count_refused",
+ "pages": 2,
+ "want": 1
 }

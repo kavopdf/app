@@ -2,13 +2,11 @@
  "name": "21_form_labels_x60_values_x300_txtpos",
  "status": "ok",
  "rc": 1,
- "passed": 38,
+ "passed": 40,
  "total": 42,
  "failed": [
-  "05_chars_extra",
-  "32_stroke_lines",
   "43_within_10pt_x",
   "47_margins"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

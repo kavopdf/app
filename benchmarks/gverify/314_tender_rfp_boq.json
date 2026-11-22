@@ -1,16 +1,6 @@
 {
  "name": "314_tender_rfp_boq",
- "status": "ok",
- "rc": 1,
- "passed": 41,
- "total": 47,
- "failed": [
-  "18_displacement",
-  "25_invisible_text",
-  "42_justification_edges",
-  "59_shape_anchor",
-  "60_text_column_right_edge",
-  "63_table_rows"
- ],
- "engine": "462353f"
+ "status": "page_count_refused",
+ "pages": 2,
+ "want": 1
 }

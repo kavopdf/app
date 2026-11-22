@@ -2,13 +2,11 @@
  "name": "23_timetable_grid_txtpos",
  "status": "ok",
  "rc": 1,
- "passed": 43,
+ "passed": 45,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
-  "32_stroke_lines",
   "59_shape_anchor"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

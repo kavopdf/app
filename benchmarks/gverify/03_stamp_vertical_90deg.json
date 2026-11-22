@@ -2,18 +2,16 @@
  "name": "03_stamp_vertical_90deg",
  "status": "ok",
  "rc": 1,
- "passed": 35,
+ "passed": 37,
  "total": 44,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "13_text_colours",
   "18_displacement",
-  "32_stroke_lines",
   "35_rotation",
   "59_shape_anchor",
   "62_table_columns",
   "63_table_rows"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

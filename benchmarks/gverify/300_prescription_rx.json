@@ -2,13 +2,12 @@
  "name": "300_prescription_rx",
  "status": "ok",
  "rc": 1,
- "passed": 43,
+ "passed": 44,
  "total": 47,
  "failed": [
   "18_displacement",
   "25_invisible_text",
-  "32_stroke_lines",
   "59_shape_anchor"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

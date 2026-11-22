@@ -2,12 +2,11 @@
  "name": "27_two_column_left_short_txtpos",
  "status": "ok",
  "rc": 1,
- "passed": 39,
+ "passed": 40,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "32_stroke_lines",
   "44_header_footer"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

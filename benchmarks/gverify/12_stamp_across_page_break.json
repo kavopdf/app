@@ -2,12 +2,11 @@
  "name": "12_stamp_across_page_break",
  "status": "ok",
  "rc": 1,
- "passed": 39,
+ "passed": 40,
  "total": 42,
  "failed": [
   "05_chars_extra",
-  "27_text_off_page",
-  "32_stroke_lines"
+  "27_text_off_page"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

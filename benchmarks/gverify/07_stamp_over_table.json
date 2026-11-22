@@ -2,20 +2,16 @@
  "name": "07_stamp_over_table",
  "status": "ok",
  "rc": 1,
- "passed": 31,
+ "passed": 35,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "13_text_colours",
-  "18_displacement",
   "25_invisible_text",
   "26_text_overlap",
-  "32_stroke_lines",
   "35_rotation",
   "43_within_10pt_x",
-  "47_margins",
-  "59_shape_anchor"
+  "47_margins"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

@@ -2,15 +2,13 @@
  "name": "25_signature_block_underscores_txtpos",
  "status": "ok",
  "rc": 1,
- "passed": 36,
+ "passed": 38,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "18_displacement",
-  "32_stroke_lines",
   "45_char_accuracy",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

@@ -1,14 +1,9 @@
 {
  "name": "33_sans_nondefault_body",
  "status": "ok",
- "rc": 1,
- "passed": 38,
+ "rc": 0,
+ "passed": 42,
  "total": 42,
- "failed": [
-  "05_chars_extra",
-  "18_displacement",
-  "32_stroke_lines",
-  "59_shape_anchor"
- ],
- "engine": "462353f"
+ "failed": [],
+ "engine": "98be7c3c"
 }

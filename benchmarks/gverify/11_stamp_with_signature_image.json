@@ -2,16 +2,14 @@
  "name": "11_stamp_with_signature_image",
  "status": "ok",
  "rc": 1,
- "passed": 35,
+ "passed": 37,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "13_text_colours",
   "17_matched_runs",
-  "32_stroke_lines",
   "35_rotation",
   "45_char_accuracy"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

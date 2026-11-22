@@ -2,14 +2,13 @@
  "name": "20_numbered_list_separate_column_txtpos",
  "status": "ok",
  "rc": 1,
- "passed": 37,
+ "passed": 38,
  "total": 42,
  "failed": [
   "04_chars_missing",
   "17_matched_runs",
-  "32_stroke_lines",
   "44_header_footer",
   "45_char_accuracy"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

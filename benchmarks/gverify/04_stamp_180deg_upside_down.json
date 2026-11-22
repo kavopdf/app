@@ -2,17 +2,15 @@
  "name": "04_stamp_180deg_upside_down",
  "status": "ok",
  "rc": 1,
- "passed": 34,
+ "passed": 36,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "13_text_colours",
   "18_displacement",
   "25_invisible_text",
-  "32_stroke_lines",
   "35_rotation",
   "59_shape_anchor"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

@@ -2,19 +2,17 @@
  "name": "323_credit_card_statement",
  "status": "ok",
  "rc": 1,
- "passed": 37,
+ "passed": 39,
  "total": 47,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "13_text_colours",
   "17_matched_runs",
   "18_displacement",
   "25_invisible_text",
-  "32_stroke_lines",
   "45_char_accuracy",
   "60_text_column_right_edge",
   "66_table_cell_width"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

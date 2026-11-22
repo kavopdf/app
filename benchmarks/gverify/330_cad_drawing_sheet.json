@@ -2,15 +2,13 @@
  "name": "330_cad_drawing_sheet",
  "status": "ok",
  "rc": 1,
- "passed": 41,
+ "passed": 43,
  "total": 47,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "18_displacement",
-  "32_stroke_lines",
   "45_char_accuracy",
   "47_margins"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

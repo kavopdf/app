@@ -7,9 +7,5 @@
  "failed": [
   "18_displacement"
  ],
- "engine": "462353f9",
- "engine_fingerprint": "462353f9",
- "export_sha256": "a553fad944daa04f2905b7c2186ba7ed9b33cdab592b870d30b6f2a26febf834",
- "measured": "2026-11-22T06:32+05:30 fixer slot 05:56, Google Docs round trip, probe deleted",
- "method": "ConvertOne at HEAD -> GOOGLEDRIVE_CREATE_FILE (application/vnd.google-apps.document, parent KavoPDF-Verify) -> GOOGLEDRIVE_DOWNLOAD_FILE application/pdf -> verify_google.py --json"
+ "engine": "98be7c3c"
 }

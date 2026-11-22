@@ -2,15 +2,13 @@
  "name": "09_stamp_font_not_embedded",
  "status": "ok",
  "rc": 1,
- "passed": 36,
+ "passed": 38,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "13_text_colours",
-  "32_stroke_lines",
   "35_rotation",
   "59_shape_anchor"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }
