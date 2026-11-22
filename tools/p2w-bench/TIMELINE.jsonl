@@ -2888,3 +2888,13 @@
 {"t": 1795381404.4981744, "ist": "02:33:24", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795381404.557494, "ist": "02:33:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795381404.5961442, "ist": "02:33:24", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795382844.743862, "ist": "02:57:24", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795382844.8613997, "ist": "02:57:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795382847.3987806, "ist": "02:57:27", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795383287.9522457, "ist": "03:04:47", "ev": "beat", "d": "applying hairline-1tw patch, building"}
+{"t": 1795383361.354364, "ist": "03:06:01", "ev": "beat", "d": "fetching corpus (6 min)"}
+{"t": 1795383637.4377024, "ist": "03:10:37", "ev": "beat", "d": "corpus rebuild with hair=1 engine"}
+{"t": 1795384806.3818831, "ist": "03:30:06", "ev": "beat", "d": "corpus converted 213, measuring"}
+{"t": 1795387082.7335126, "ist": "04:08:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795387119.858495, "ist": "04:08:39", "ev": "beat", "d": "gates pass; recording attempt"}
+{"t": 1795387120.0634916, "ist": "04:08:40", "ev": "beat", "d": "attempt.py: recording an attempt"}

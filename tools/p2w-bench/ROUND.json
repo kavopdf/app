@@ -1,8 +1,10 @@
 {
   "baseline_started": 1795361683.041859,
   "classifier_started": 0,
-  "fixer_engine_at_claim": "1779a130",
-  "fixer_last_beat": 1795377851.2156582,
+  "fixer_doing": "gates pass; recording attempt",
+  "fixer_doing_since": 1795387119.859172,
+  "fixer_engine_at_claim": "ff060d4c",
+  "fixer_last_beat": 1795387119.8591728,
   "fixer_started": 1795382834.16907,
   "history": [
     {
