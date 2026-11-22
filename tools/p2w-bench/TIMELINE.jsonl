@@ -2409,3 +2409,5 @@
 {"t": 1795322303.5291834, "ist": "10:08:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795322303.6975753, "ist": "10:08:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795322303.8614078, "ist": "10:08:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795322340.8543122, "ist": "10:09:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795322340.9758403, "ist": "10:09:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

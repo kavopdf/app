@@ -1008,6 +1008,14 @@
   {
    "at": "10:08",
    "text": "18_displacement 10:40 fixer: spacer-as-w:before confirmed in Google (68_journal 42/42); mobile-bill and insurance-policy-schedule 38/42 vs 41/42 at HEAD -> reverted. Measured pitch off the Google export: source 18.40, Google 19.00, histogram 19.0x16/20.0x5/18.0x3. The excess is 2.0 pt on rows with a two-paragraph cell, not a uniform 0.70 - a factor cannot describe it. FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md."
+  },
+  {
+   "at": "10:09",
+   "text": "agent deployed: 18_displacement / row-growth-mechanism - given the real DocxWriter.java, which emitted number Google ignores when it grow"
+  },
+  {
+   "at": "10:09",
+   "text": "agent landed: 18_displacement / row-growth-mechanism -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md"
   }
  ],
  "next": "DO NOT build the 0.9634 row scale or the hairline cell box for single-line cells - both measured inert. Build against rowParts>1: raise the row floor to the true 368 twips (the floor is quantised 8 twips low at 360) OR take w:before off the continuation paragraphs inside a wrapped cell. Google grows 360-twip rows to 19.0/20.0; source pitch is 18.40; mobile-bill rows 5-12 hold 6 w:p on 3 columns and render at 20.0 = 2.0 pt of growth. Prove on mobile-bill and insurance-policy-schedule FIRST - they are the only two documents blocking a spacer construct already measured to take 6 documents clean (68_journal 42/42 this run). Then land the spacer (w:before + hairline w:line=1 at 5868-5875, cap 2880->4320 at 5852,5866) with it.",
@@ -1754,6 +1762,18 @@
    "finding": "FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md",
    "deployed_at": "2026-11-22T04:38",
    "landed_at": "2026-11-22T04:38"
+  },
+  {
+   "id": "18_drow-growth-mechanism-01",
+   "class": "18_displacement",
+   "angle": "row-growth-mechanism",
+   "question": "given the real DocxWriter.java, which emitted number Google ignores when it grows a row, and what natural height 19.10 pt is",
+   "expected": "the mechanism with arithmetic, one recommended edit, and the rows it must not touch",
+   "deployed": "10:09",
+   "status": "landed",
+   "finding": "FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md",
+   "deployed_at": "2026-11-22T04:39",
+   "landed_at": "2026-11-22T04:39"
   }
  ],
  "run": {

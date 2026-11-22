@@ -99,14 +99,13 @@ unfinished work, not as a result.
 | 18_dA-04 | 18_displacement | A | which clause of the check can fire on a 1.44-2.40 pt document, from th | 09:20 | landed 09:04 | landed | FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md |
 | 18_dB-03 | 18_displacement | B | do 05/32/59/18 share ONE engine construct in the emitted docx, and nam | 09:20 | landed 09:04 | landed | FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md |
 | 18_dtrheight-emitter-01 | 18_displacement | trheight-emitter | every place the engine emits trHeight/hRule, and whether 0.9634 belong | 10:08 | a unified diff and the list of emitters | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
+| 18_drow-growth-mechanism-01 | 18_displacement | row-growth-mechanism | given the real DocxWriter.java, which emitted number Google ignores wh | 10:09 | the mechanism with arithmetic, one recommended edit, and the rows it must not touch | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `05:18` agent deployed: 32_stroke_lines / B-local - does the carrier patch damage clean documents when measured in a clean clone
-- `05:18` agent landed: 32_stroke_lines / A-audit -> FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md
 - `05:18` agent landed: 32_stroke_lines / B-local -> FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md
 - `05:18` attempt 15 on 32_stroke_lines -> lead
 - `06:10` attempt 16 on 32_stroke_lines -> kept (3/213 moved)
@@ -130,6 +129,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `10:08` agent deployed: 18_displacement / trheight-emitter - every place the engine emits trHeight/hRule, and whether 0.9634 belongs on w:val
 - `10:08` agent landed: 18_displacement / trheight-emitter -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md
 - `10:08` 18_displacement 10:40 fixer: spacer-as-w:before confirmed in Google (68_journal 42/42); mobile-bill and insurance-policy-schedule 38/42 vs 41/42 at HEAD -> reverted. Measured pitch off the Google export: source 18.40, Google 19.00, histogram 19.0x16/20.0x5/18.0x3. The excess is 2.0 pt on rows with a two-paragraph cell, not a uniform 0.70 - a factor cannot describe it. FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md.
+- `10:09` agent deployed: 18_displacement / row-growth-mechanism - given the real DocxWriter.java, which emitted number Google ignores when it grow
+- `10:09` agent landed: 18_displacement / row-growth-mechanism -> FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md
 
 ## Where the rest of the state lives
 

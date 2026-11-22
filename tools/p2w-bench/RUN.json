@@ -8,7 +8,8 @@
  "kept": 0,
  "docs_improved": 0,
  "agents": [
-  "18_dtrheight-emitter-01"
+  "18_dtrheight-emitter-01",
+  "18_drow-growth-mechanism-01"
  ],
  "obstacles_cleared": 0,
  "needs_human": 0
