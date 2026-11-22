@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 15:17
+# Fixer report - 2026-11-22 16:12
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 15:17 → running IST · 23 min**
+**22 Nov 2026 · slot 16:12 → running IST · 14 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,8 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 15:28 | **lead** | 0/None | relay 15:17: applied 18-displacement spacer(w:before)+row-pitch-dither patch corpus-wide, engine built, 213/213 converted; measuring corpus to ratchet it |
-| 15:40 | **lead** | 0/16 | relay 15:17: spacer(w:before)+row-pitch-dither patch applied corpus-wide; Google round trip: table-with-no-header-row 41/42 -> 47/47 PASS, 362_price_list_dense unchanged 41/42; corpus not ratcheted (t |
+| 16:26 | **lead** | 1/None | mobile-bill 46/47 -> 47/47 PASS in a live Google round trip under the spacer patch; the 15:34 '43/47 + extra page' refutation does not reproduce. Patch left in patches/, corpus pass is 17 min and did |
 
 ## The txt
 
@@ -47,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 15:17 → running · 23 min |
+| Slot window | 16:12 → running · 14 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 20 |
-| Longest silence | **6.0 min** — from 15:33:10, after `relay: corpus measure pass 2` |
-| Silences over 2 min | 3 |
+| Tool beats | 11 |
+| Longest silence | **8.3 min** — from 16:12:54, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -59,10 +58,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **18 min** | `#################` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **3 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `###############` |
+| report - the report and the chain | **1 min** | `##` |
+| other - not attributed to a tool | **3 min** | `#####` |
 ## Best results this round
 
 | Document | Before | After | Change |
