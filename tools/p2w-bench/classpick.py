@@ -197,6 +197,39 @@ def clean_leverage():
     return out
 
 
+def open_leads():
+    """{class: reason} for every class holding an unlanded lead, most recent first.
+
+    A LEAD WAS ONLY VISIBLE FROM INSIDE ITS OWN CLASS. `_pick` checked the lead on the class the
+    rotation was sitting on, so a lead on a DIFFERENT class was invisible: on 22 Nov 18_displacement
+    held an open lead from 06:17 - "15 documents re-measured through Google on HEAD, every one is
+    41/42 failing 18_displacement alone" - and the tool still said "staying on 32_stroke_lines".
+    The most valuable thing in the pipeline was sitting one class away, unread.
+
+    An open lead is the highest-priority work there is, whatever class holds it. This scans every
+    class, so it cannot be missed again.
+    """
+    out = {}
+    if not os.path.exists(ATTEMPTS):
+        return out
+    try:
+        d = json.load(open(ATTEMPTS, encoding="utf-8"))
+    except Exception:
+        return out
+    for cls, v in d.items():
+        if not isinstance(v, dict):
+            continue
+        h = v.get("history") or []
+        for x in reversed(h):
+            o = (x.get("outcome") or "")
+            if o in ("kept", "partial"):
+                break            # something landed after the lead - it is closed
+            if o == "lead":
+                out[cls] = "%s - %s" % (x.get("at") or "?", str(x.get("reason") or "")[:120])
+                break
+    return out
+
+
 def _pick(fmt, rot, dead):
     """The class for this format, and the reason. Same stay/rotate rule for both halves."""
     rank = ranking() if fmt == "docx" else ranking_txt()
@@ -206,6 +239,13 @@ def _pick(fmt, rot, dead):
     docs = dict(rank)
     cur = rot.get("class")
     since = rot.get("since")
+
+    # ANY OPEN LEAD, ON ANY CLASS, OUTRANKS THE ROTATION. See open_leads() for why.
+    _leads = open_leads()
+    for _lc in names:
+        if _lc in _leads:
+            return _lc, ("%s holds an open LEAD and nothing outranks it: %s"
+                         % (_lc, _leads[_lc])), {"class": _lc, "since": now_str()}
 
     if cur not in names:
         cur = next((n for n in names if n not in dead), names[0])

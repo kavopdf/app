@@ -48,7 +48,15 @@ def collect():
     doing_since = r.get("fixer_doing_since")
 
     claim_age = mins(started)
-    silent = mins(beat)
+    # CLAIMING IS SPEAKING. This read fixer_last_beat only, so a run that claimed two minutes ago
+    # inherited the PREVIOUS run's last beacon and read as silent for that whole age. Measured
+    # 22 Nov 07:56: the :50 run claimed at 07:50, the previous run's last beat was 62 min old, and
+    # status.py reported "SILENT - no beacon for 62 min ... or it has wedged" about a run that was
+    # six minutes old and still cloning. A watchdog reading that would force-release a healthy run.
+    #
+    # The silence clock starts when the run claims, not before it existed.
+    _beat_or_claim = max(beat or 0, started or 0)
+    silent = mins(_beat_or_claim)
     elapsed = mins(run.get("started_ts"))
     attempts = run.get("attempts", 0) or 0
 
