@@ -196,5 +196,5 @@
 | 22 Nov 15:40 | fixer | attempt 18_displacement -> lead (0/16 moved) |
 | 22 Nov 15:55 | fixer | slot claimed - fixer running |
 | 22 Nov 16:36 | fixer | attempt 18_displacement -> lead (0/16 moved) |
-| 22 Nov 17:12 | fixer | slot claimed - fixer running |
-| 22 Nov 17:24 | fixer | attempt 18_displacement -> reverted (0/? moved) |
+| 22 Nov 17:00 | fixer | slot claimed - fixer running |
+| 22 Nov 17:34 | fixer | attempt 18_displacement -> lead (0/8 moved) |

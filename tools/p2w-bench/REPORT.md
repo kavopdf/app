@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 17:12
+# Fixer report - 2026-11-22 17:00
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 17:12 → running IST · 12 min**
+**22 Nov 2026 · slot 17:00 → running IST · 36 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -26,7 +26,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 17:24 | **reverted** | 0/None | dither patch: LO mobile-bill 1.55->39.21 reproduced exactly, Google unchanged 46/47 (still fails 18_displacement). Costs the proxy, buys nothing in Google on this document. Gate's ALLOWED path needs a |
+| 17:34 | **lead** | 0/8 | spacer->w:before built and screened in LibreOffice: mobile-bill 1.55 -> 1.74 (+0.19, WORSE), 16_right_aligned 0.00 -> 0.00. Corrects the 08:56 finding's claim that LO is blind to this construct; the c |
 
 ## The txt
 
@@ -46,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 17:12 → running · 12 min |
+| Slot window | 17:00 → running · 36 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 10 |
-| Longest silence | **6.9 min** — from 17:17:46, after `relay: engine built with dither patch, converting 2 worst-regressed do` |
-| Silences over 2 min | 2 |
+| Longest silence | **25.6 min** — from 17:09:12, after `LO screen retry after soffice hiccup` |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -58,10 +58,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **2 min** | `#####` |
-| fix - diagnose and change the engine | **6 min** | `#############` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| other - not attributed to a tool | **1 min** | `###` |
+| fix - diagnose and change the engine | **25 min** | `###############` |
+| record - attempt, handoff, class rows | **3 min** | `##` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **6 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |
