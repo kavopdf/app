@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-22 08:16
+# Fixer report - 2026-11-22 08:56
 
 ```
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 08:16 → running IST · 16 min**
+**22 Nov 2026 · slot 08:56 → running IST · 24 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,13 +21,12 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
-| Committed | **13** files in 3 commit(s) from `091b271` — 18_displacement-SPACER-REFUTED-0900-f1x.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, SETTLED.md, TIMELINE.jsonl, TRACE.md, screen.py |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 08:26 | **reverted** | 1/16 | table-top spacer w:line -> w:before + hairline: 1 of 16 moved (68_journal 12.09->11.24), none worse. REFUTED as the cause: RANKING.csv gives 68_journal max_pt 8.64, not the -114.8 the lead assumed; af |
+| 09:19 | **lead** | 6/16 | Table spacer as w:before + hairline (DocxWriter 5872-5875) and the 2880->4320 twip cap (5852,5866). Measured in Google on all 16 solo-18 documents: 6 became 42/42 (16_right_aligned, 22_invoice, 29_dot |
 
 ## The txt
 
@@ -43,18 +42,18 @@
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `18_dA-03` | independently re-derive the sixteen and the spacer p | 08:31 | 03:01 | 0 min |
-| `18_dB-02` | what places a page's first baseline, and is median_p | 08:31 | 03:01 | 0 min |
+| `18_dA-04` | which clause of the check can fire on a 1.44-2.40 pt | 09:20 | - | - |
+| `18_dB-03` | do 05/32/59/18 share ONE engine construct in the emi | 09:20 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 08:16 → running · 16 min |
+| Slot window | 08:56 → running · 24 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 22 |
-| Longest silence | **3.5 min** — from 08:16:26, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 3 |
+| Tool beats | 12 |
+| Longest silence | **14.1 min** — from 09:05:17, after `read findings; C2 spacer probe is the lead` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -62,11 +61,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **3 min** | `#####` |
-| screen - the class's own documents | **0 min** | `#` |
-| record - attempt, handoff, class rows | **1 min** | `##` |
-| report - the report and the chain | **4 min** | `######` |
-| other - not attributed to a tool | **5 min** | `########` |
+| fix - diagnose and change the engine | **14 min** | `#############` |
+| measure or build - a conversion, screen or compile writes no beacon | **8 min** | `########` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -79,7 +77,7 @@
 
 ## Next run
 
-Before building anything for 18_displacement, read which clause of the check fired: verify_google.py --json on one of 22_invoice_four_columns_txtpos / 41_coloured_headings_white_bg / 73_marksheet_subject_marks_grade / 16_right_aligned_amounts_txtpos / 29_dot_leaders_txtpos / 72_bank_statement_no_rules_right_amounts. All six have max_pt 1.44-2.40 and share5 0.00, under the check's 1.5 pt tolerance floor, so they can only be failing through 'if not ds' - upright text with no matched run - which is run matching or reading order, not vertical position. That test needs no build and decides whether the class is real. Do not rebuild the table-top spacer and do not believe the -114.8 pt figure: both refuted in SETTLED.md (68_journal max_pt is 8.64, and the w:before build moved 1 of 16 by 0.85). Do not read median_pt 0.96 as an offset either - it is the floor of the instrument (p2w.py filters the integer EDT to d>1). 71_invoice_space_aligned_no_rules (share@5 26.88, median_pt 3.84, no spacer) is genuinely displaced and a separate question. Also settled: screen.py was measuring NOTHING on a fresh pod (ENGINE_SRC frozen at import) - fixed; a screen reporting '0 of N measured' is a tool failure, not evidence.
+Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured this slot (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866); only 68_journal reaches it and its real gap is 2961 twips. Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. Then COUNT the blast radius before committing: the spacer change touches every corpus document with a table spacer and only the 16 that fail 18 were measured; render the currently-clean ones that have one. Do NOT screen this class with screen.py - it renders in soffice, which honours w:line as a length and cannot see either state.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

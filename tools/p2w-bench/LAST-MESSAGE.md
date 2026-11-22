@@ -1,8 +1,10 @@
 # P2W Fixer - Run Report
 
-**22 Nov 2026 · slot 08:16 → running IST · 16 min**
+**22 Nov 2026 · slot 08:56 → running IST · 24 min**
 
-> No change was kept this run. The numbers below say what was tried.
+> No change was kept this run — and it is the most valuable slot `18_displacement` has had: the
+> cause is now measured in Google rather than inferred, and 6 of the 16 documents went clean in the
+> test before two others forced a revert.
 
 ## Progress
 
@@ -18,71 +20,57 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
 | Working on | `18_displacement` |
-| Committed | **13** files in 3 commit(s) from `091b271` — 18_displacement-SPACER-REFUTED-0900-f1x.md, CLASS-HISTORY.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, REPORT.md, ROUND.json, RUN-LOG.md, RUN.json, SETTLED.md, TIMELINE.jsonl, TRACE.md, screen.py |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 08:26 | **reverted** | 1/16 | table-top spacer w:line -> w:before + hairline: 1 of 16 moved (68_journal 12.09->11.24), none worse. REFUTED as the cause: RANKING.csv gives 68_journal max_pt 8.64, not the -114.8 the lead assumed; af |
+| 09:19 | **lead** | 6/16 | Table spacer as w:before + hairline (DocxWriter 5872-5875) and the 2880->4320 twip cap (5852,5866). Measured in Google on all 16 solo-18 documents: 6 became 42/42 (16_right_aligned, 22_invoice, 29_dot |
 
-## Why the lead died, and what replaces it
+## The gap above a table is the cause. Measured, not inferred.
 
-The 07:14 run left one instruction: the gap above a table is written as `w:line` on a 1 pt mark, and
-Google reads `w:line` as a *multiple* of the face's line height, so a 144 pt spacer renders as
-13.74 pt. Both halves of that are true, and the fix for it is real - `w:before` is the one vertical
-length Google honours exactly, and the engine's own `ctx.flowTw` and `cenSetY` already charged the
-full spacer. I wrote it as `w:before` with the box cut to a hairline, confirmed the XML in the emitted
-document rather than assuming it, and screened all sixteen through Google. One moved, by 0.85 points.
-The bar is four.
+`18_displacement` is worth 38.7 clean documents, the largest single check in the corpus, and 16
+documents fail it and nothing else at 41/42. Two runs were spent guessing at it. This one measured it.
 
-The reason is that the premise was already contradicted by the table the lead was reading. Every one
-of the sixteen has `max_pt` between 1.44 and 17.76 pt; `68_journal_wide_table_spanning` is 8.64, and
-the -114.8 pt figure came from a FINDINGS measurement that disagrees with `RANKING.csv` by a factor of
-thirteen. A 130 pt spacer loss cannot produce a render whose largest error is 8.64 pt, and the render
-after the change is the same document, line for line.
+Google reads `w:line` with `lineRule="exact"` as a *multiple* of the paragraph mark's line height, not
+as a length in twips. The engine writes the gap above a table as `w:line` on a 1 pt mark, so Google
+charges about a fifth of it. Four documents through the real renderer:
 
-## The lead I formed and had to retract inside the same run
+| document | spacer written | median dy | min | max |
+|:--|--:|--:|--:|--:|
+| 68_journal_wide_table_spanning | 144.0 | **−114.28** | −115.03 | +1.31 |
+| 73_marksheet_subject_marks_grade | 16.7 | **−12.85** | −145.35 | +6.40 |
+| 41_coloured_headings_white_bg | 3.5 ×3 | **−4.13** | −6.84 | +0.88 |
+| 71_invoice_space_aligned_no_rules | **none** | **+1.06** | +0.12 | +6.69 |
 
-Fourteen of the sixteen read `median_pt` 0.96 or 1.44, and at 150 DPI a pixel is 0.48 pt, so I read
-that as the whole page being two or three pixels out uniformly - one constant, not sixteen
-constructs. A second agent was sent to find the constant and came back with the opposite answer, and
-the code agrees with it: `benchmarks/p2w.py` computes `p50(dv) * 0.48` over `dv = d[sm & (d > 1)]`
-where `d` is an INTEGER distance transform. Pixels at distance 0 or 1 are excluded, so the smallest
-number the statistic can print is 2 px = 0.96 pt. **0.96 is the floor of the instrument, not a
-measurement.** It is also self-contradicting as a cause: `18_displacement`'s tolerance floor is 1.5 pt,
-so a real 0.96 pt offset would pass.
+That is a dose-response, and it agrees with the isolated TOPB probe (1103 twips asked → 12.22 pt
+rendered). On `68_journal` the signature is exact: the runs above the spacer sit at **+0.09** and every
+run below it at **−114 to −115**. One construct, one gap, everything under it moves.
 
-## The live question, which is the opposite one
+Writing the gap as `w:before` — the one vertical length Google honours exactly — took `68_journal` from
+**−114.28 to −3.08**, and with the 2880-twip cap raised to the 2961 twips the page really draws, it went
+**42/42**. Six of the sixteen came clean: `16_right_aligned_amounts_txtpos`,
+`22_invoice_four_columns_txtpos`, `29_dot_leaders_txtpos`, `41_coloured_headings_white_bg`,
+`68_journal_wide_table_spanning`, `73_marksheet_subject_marks_grade`.
 
-Six of the sixteen - `22_invoice_four_columns_txtpos`, `41_coloured_headings_white_bg`,
-`73_marksheet_subject_marks_grade`, `16_right_aligned_amounts_txtpos`, `29_dot_leaders_txtpos`,
-`72_bank_statement_no_rules_right_amounts` - have `max_pt` 1.44 to 2.40 and `share5` 0.00, and
-`18_displacement` fails them anyway. Reading the check settles how that is possible. Its tolerance
-`clamp(0.35 * size, 1.5, 4.5)` is never below 1.5 pt, so a page with nothing more than 1.5 pt out has
-`n_out` 0 and `worst_here` under 1, and neither the budget nor the tail clause can fire. The only
-branch left is `if not ds: bad_pages.append(pg)` - upright text on the page and none of it matched.
+## Why it was reverted
 
-So for at least two of the six, the fault is more likely run matching than vertical position, and no
-vertical constant will ever fix it. That is stated with its caveat in the finding: the ink measure and
-the check's run-dy are not the same quantity, so it is not airtight. What is airtight is that the ink
-metric is structurally blind to that branch. **The test needs no build**: run `verify_google.py --json`
-on one of the six and read which clause fired.
+Two documents got worse — `insurance-policy-schedule` and `mobile-bill`, 41/42 → **38/42**, two pages,
+content lost. A change that makes a document worse is not a fix, so the engine is back at HEAD and the
+measurement stands as a lead.
 
-`71_invoice_space_aligned_no_rules` is genuinely displaced (share@5 26.88, `median_pt` 3.84, no table
-spacer at all) and is a separate question.
+The cause is measured, not guessed. Google renders `w:trHeight hRule="atLeast"` rows at **19.10 pt**
+against an **18.40 pt** source pitch — **+0.70 pt per row** — because the cell's natural height is 19.10
+and `atLeast` lets the row grow to it. Over 21–22 rows that is 14.7–15.4 pt. Before the fix the
+under-charged spacer was accidentally absorbing that excess; charging the spacer truly exposes it, and
+the two pages with three spacers each are exactly full, so they overflow. The two constructs have to
+land together.
 
-## The bug that was worth more than the attempt
-
-`screen.py` set `p2w.REPO` after importing `benchmarks/p2w.py`, but that module computes
-`ENGINE_SRC = os.environ.get("P2W_ENGINE_SRC") or REPO` at module level, from
-`/scratch/work/p2w/repo`. On a pod with no previous run that directory does not exist, so every
-conversion died on `ClassNotFoundException` in under a second, nothing reached `dist/`, and the tool
-printed "PARTIAL - 0 of 16 measured. Call again" for ever. The identical command with
-`P2W_ENGINE_SRC` set converted and measured 16 of 16. This is the worst shape a bug can have here: it
-does not report that it could not run, it reports that the idea did nothing - and the brief's next
-line tells the run to revert. Any run on a fresh pod has been judging its ideas against a screen that
-never ran. Fixed, and verified without an environment variable: 0 of 2 measured before, 2 of 2 after.
+One correction worth carrying: the 08:16 run reported this construct *refuted* — "screened all sixteen
+through Google, 1 of 16 moved by 0.85 pt". `screen.py` renders with **soffice**, which honours `w:line`
+as a length and so cannot see either state. It also argued from `RANKING.csv`'s `max_pt`, which is the
+ink error of the LibreOffice render — the renderer these 16 documents already pass 42/42 in. Both
+halves of that refutation were measured in the renderer where the defect does not exist.
 
 
 ## The txt
@@ -99,18 +87,18 @@ never ran. Fixed, and verified without an environment variable: 0 of 2 measured 
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `18_dA-03` | independently re-derive the sixteen and the spacer p | 08:31 | 03:01 | 0 min |
-| `18_dB-02` | what places a page's first baseline, and is median_p | 08:31 | 03:01 | 0 min |
+| `18_dA-04` | which clause of the check can fire on a 1.44-2.40 pt | 09:20 | - | - |
+| `18_dB-03` | do 05/32/59/18 share ONE engine construct in the emi | 09:20 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 08:16 → running · 16 min |
+| Slot window | 08:56 → running · 24 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 22 |
-| Longest silence | **3.5 min** — from 08:16:26, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 3 |
+| Tool beats | 12 |
+| Longest silence | **14.1 min** — from 09:05:17, after `read findings; C2 spacer probe is the lead` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -118,11 +106,10 @@ never ran. Fixed, and verified without an environment variable: 0 of 2 measured 
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **3 min** | `#####` |
-| screen - the class's own documents | **0 min** | `#` |
-| record - attempt, handoff, class rows | **1 min** | `##` |
-| report - the report and the chain | **4 min** | `######` |
-| other - not attributed to a tool | **5 min** | `########` |
+| fix - diagnose and change the engine | **14 min** | `#############` |
+| measure or build - a conversion, screen or compile writes no beacon | **8 min** | `########` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -135,9 +122,22 @@ never ran. Fixed, and verified without an environment variable: 0 of 2 measured 
 
 ## Next run
 
-Before building anything for 18_displacement, read which clause of the check fired: verify_google.py --json on one of 22_invoice_four_columns_txtpos / 41_coloured_headings_white_bg / 73_marksheet_subject_marks_grade / 16_right_aligned_amounts_txtpos / 29_dot_leaders_txtpos / 72_bank_statement_no_rules_right_amounts. All six have max_pt 1.44-2.40 and share5 0.00, under the check's 1.5 pt tolerance floor, so they can only be failing through 'if not ds' - upright text with no matched run - which is run matching or reading order, not vertical position. That test needs no build and decides whether the class is real. Do not rebuild the table-top spacer and do not believe the -114.8 pt figure: both refuted in SETTLED.md (68_journal max_pt is 8.64, and the w:before build moved 1 of 16 by 0.85). Do not read median_pt 0.96 as an offset either - it is the floor of the instrument (p2w.py filters the integer EDT to d>1). 71_invoice_space_aligned_no_rules (share@5 26.88, median_pt 3.84, no spacer) is genuinely displaced and a separate question. Also settled: screen.py was measuring NOTHING on a fresh pod (ENGINE_SRC frozen at import) - fixed; a screen reporting '0 of N measured' is a tool failure, not evidence.
+Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured this slot (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866); only 68_journal reaches it and its real gap is 2961 twips. Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. Then COUNT the blast radius before committing: the spacer change touches every corpus document with a table spacer and only the 16 that fail 18 were measured; render the currently-clean ones that have one. Do NOT screen this class with screen.py - it renders in soffice, which honours w:line as a length and cannot see either state.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+## What this run leaves behind
+
+The finding, with every number and its method: the four before-states, the dose-response, the
+six-clean list, the two regressions, and the measured row-pitch excess that explains them. A new
+instrument, `dy.py`, which reads per-run vertical displacement out of a real Google export by
+intercepting `verify_google.extra_checks`, so it cannot disagree with the check it explains. Both
+subagents landed and both changed the plan: agent A excluded the `if not ds` branch and showed that
+`RANKING.csv`'s `max_pt` is the soffice ink error rather than Google's dy, which killed the previous
+run's premise; agent B separated the four travelling checks into two causes and named the emitter.
+
+All 24 probe Google Docs created this run were deleted after scoring; `KavoPDF-Verify` is empty. No
+corpus file, table row, branch or release asset was touched.

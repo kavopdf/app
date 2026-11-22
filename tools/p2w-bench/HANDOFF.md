@@ -96,14 +96,14 @@ unfinished work, not as a result.
 | 18_dA-02 | 18_displacement | A | what makes a single-page dense table drift in Google - row pitch or th | 07:36 | 07:38 | landed | FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md |
 | 18_dA-03 | 18_displacement | A | independently re-derive the sixteen and the spacer premise from the re | 08:31 | 08:20 | landed | FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md |
 | 18_dB-02 | 18_displacement | B | what places a page's first baseline, and is median_pt 0.96 a real offs | 08:31 | 08:40 | landed | FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md |
+| 18_dA-04 | 18_displacement | A | which clause of the check can fire on a 1.44-2.40 pt document, from th | 09:20 | landed 09:04 | running |  |
+| 18_dB-03 | 18_displacement | B | do 05/32/59/18 share ONE engine construct in the emitted docx, and nam | 09:20 | landed 09:04 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:49` agent deployed: 32_stroke_lines / A - can the emitter tell its drawing anchor is inside a w:tc, and is the prescribed 
-- `04:49` agent deployed: 32_stroke_lines / B - is the 54-document carrier regression cell nesting or body-flow page overflow
 - `04:49` agent landed: 32_stroke_lines / A -> FINDINGS/32_stroke_lines-CELL-GUARD-IS-A-NO-OP-0450-f1x.md
 - `04:49` agent landed: 32_stroke_lines / B -> FINDINGS/32_stroke_lines-CARRIER-REGRESSION-IS-PAGE-OVERFLOW-0450-f1x.md
 - `04:49` relay slot: the previous fixer (03:53) pushed its message at 04:09 and never released; attempt.py re-stamps fixer_started so the claim read 2 min old at 04:10 and the :10 cron stood down. The claim went stale at 04:18 and this run took it. That re-stamp is why a run that ends after an attempt leaves a fresh-looking claim.
@@ -127,6 +127,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `08:31` agent deployed: 18_displacement / B - what places a page's first baseline, and is median_pt 0.96 a real offset
 - `08:31` agent landed: 18_displacement / B -> FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md
 - `09:19` attempt 9 on 18_displacement -> lead (6/16 moved)
+- `09:20` agent deployed: 18_displacement / A - which clause of the check can fire on a 1.44-2.40 pt document, from the source c
+- `09:20` agent deployed: 18_displacement / B - do 05/32/59/18 share ONE engine construct in the emitted docx, and name it
 
 ## Where the rest of the state lives
 

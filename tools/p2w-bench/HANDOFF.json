@@ -976,6 +976,14 @@
   {
    "at": "09:19",
    "text": "attempt 9 on 18_displacement -> lead (6/16 moved)"
+  },
+  {
+   "at": "09:20",
+   "text": "agent deployed: 18_displacement / A - which clause of the check can fire on a 1.44-2.40 pt document, from the source c"
+  },
+  {
+   "at": "09:20",
+   "text": "agent deployed: 18_displacement / B - do 05/32/59/18 share ONE engine construct in the emitted docx, and name it"
   }
  ],
  "next": "Land BOTH constructs in one build: (1) the table spacer as w:before + hairline w:line=1 exact at DocxWriter.java:5872-5875, and (2) the row height scaled by 0.9634 at the trHeight emitter (line 6228 max(rowTwHere,rowLineTw)) so Google's atLeast growth cannot exceed the source pitch - 0.9634 is measured this slot (19.10/18.40 renders), NOT the 0.9785 in the 08:20 finding. Raise the spacer cap 2880->4320 (5852,5866); only 68_journal reaches it and its real gap is 2961 twips. Do not use hRule=exact - Google's cell content is 19.10 and exact would clip. Then COUNT the blast radius before committing: the spacer change touches every corpus document with a table spacer and only the 16 that fail 18 were measured; render the currently-clean ones that have one. Do NOT screen this class with screen.py - it renders in soffice, which honours w:line as a length and cannot see either state.",
@@ -1686,6 +1694,28 @@
    "finding": "FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md",
    "deployed_at": "2026-11-22T03:01",
    "landed_at": "2026-11-22T03:01"
+  },
+  {
+   "id": "18_dA-04",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "which clause of the check can fire on a 1.44-2.40 pt document, from the source code and the emitted XML",
+   "expected": "landed 09:04",
+   "deployed": "09:20",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-22T03:50"
+  },
+  {
+   "id": "18_dB-03",
+   "class": "18_displacement",
+   "angle": "B",
+   "question": "do 05/32/59/18 share ONE engine construct in the emitted docx, and name it",
+   "expected": "landed 09:04",
+   "deployed": "09:20",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-22T03:50"
   }
  ],
  "run": {
