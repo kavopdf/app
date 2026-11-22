@@ -20,8 +20,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 07:26 |
-| ended | still running |
-| how it ended | - |
+| ended | 07:36 |
+| how it ended | forced |
 | plan | 18_displacement: do NOT take the page top for the 16 solo-18 documents - all 16 are single-page PDFs and their converted .docx carries zero page breaks, so the proven page-top construct cannot make one of them clean. Their displacement is row/line pitch inside one dense table or form: start from the -4.3 median / -12.8..+2.9 spread measured on page 1 of bank-statement-5-pages, which is the residual after the page-top fix and sits on a page that was never broken. Land the section margin (w:pgMar w:top) as a SEPARATE build on multi-page documents: DocxWriter.java:1053-1075 already emits a sectPr with nextPage, so it is that path plus beforeTw=0 in the two ctx.newPage branches (3395-3401, 4277-4283) plus the same twips out of ctx.budgetTw (1116) and out of what pageFits is asked - steps 1-2 alone double the gap in LibreOffice, step 3 is what holds the page count. Do NOT retry the 1x1 trHeight row: measured this run, it takes bank-statement-5-pages from 5 pages to 6 and 37/42 to 33/42. |
 
 ## The picture, in the words of the run that left it
@@ -93,14 +93,13 @@ unfinished work, not as a result.
 | 32_sB-02 | 32_stroke_lines | B | is the 54-document carrier regression cell nesting or body-flow page o | 04:49 | 04:20 | landed | FINDINGS/32_stroke_lines-CARRIER-REGRESSION-IS-PAGE-OVERFLOW-0450-f1x.md |
 | 32_sA-audit-01 | 32_stroke_lines | A-audit | are the 16 carrier Google results genuine measurement artifacts or han | 05:18 | a per-check map, an export hash, a real timestamp | landed | FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md |
 | 32_sB-local-01 | 32_stroke_lines | B-local | does the carrier patch damage clean documents when measured in a clean | 05:18 | 4 of 10 controls worse | landed | FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md |
+| 18_dA-02 | 18_displacement | A | what makes a single-page dense table drift in Google - row pitch or th | 07:36 | 07:38 | landed | FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `23:37` attempt 1 on 05_chars_extra -> kept (11/192 moved)
-- `00:12` attempt 8 on 32_stroke_lines -> lead (0/192 moved)
 - `01:43` attempt 9 on 32_stroke_lines -> lead
 - `02:09` attempt 10 on 32_stroke_lines -> lead (13/213 moved)
 - `03:35` attempt 11 on 32_stroke_lines -> lead (0/213 moved)
@@ -124,6 +123,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `06:13` attempt 17 on 32_stroke_lines -> kept (16/213 moved)
 - `06:17` attempt 4 on 18_displacement -> lead
 - `07:25` attempt 5 on 18_displacement -> lead (0/213 moved)
+- `07:36` agent deployed: 18_displacement / A - what makes a single-page dense table drift in Google - row pitch or the table-to
+- `07:36` agent landed: 18_displacement / A -> FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md
 
 ## Where the rest of the state lives
 

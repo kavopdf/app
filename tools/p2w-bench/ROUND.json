@@ -1,11 +1,9 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "relay: sectmargin construct PROVEN on bs5 (37->40/42, 5 pages, dy -59.5->-4.3); sizing it across the 16 solo-18 docs",
-  "fixer_doing_since": 1795312441.3760016,
   "fixer_engine_at_claim": "462353f9",
   "fixer_last_beat": 1795312441.3760023,
-  "fixer_started": 1795312549.1175108,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",

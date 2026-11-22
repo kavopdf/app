@@ -940,6 +940,14 @@
   {
    "at": "07:25",
    "text": "attempt 5 on 18_displacement -> lead (0/213 moved)"
+  },
+  {
+   "at": "07:36",
+   "text": "agent deployed: 18_displacement / A - what makes a single-page dense table drift in Google - row pitch or the table-to"
+  },
+  {
+   "at": "07:36",
+   "text": "agent landed: 18_displacement / A -> FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md"
   }
  ],
  "next": "The 16 solo-18 documents: their emitted row pitch ALREADY equals the source (0.00 pt on 11 of 16, -0.10 to -0.40 on the rest), so no constant in the row-height path (DocxWriter.java:6228) can move them closer. The leading candidate is the TABLE-TOP SPACER at DocxWriter.java:5869-5881: the gap above a table is written as w:line on a 1 pt mark, and Google reads w:line as a multiple of the face's line height, so 68_journal_wide_table_spanning's 144.0 pt spacer may render as 13.74 pt (-130.3) or 160.9 (+16.9). One Drive probe settles which: an empty <w:p> with w:sz=2 and w:line=2880 w:lineRule=\"exact\" - does it come back 13.74, 144 or 160.9 pt? The spacer moves 14 of the 16 by 4.2 to 130.3 pt; 71_invoice_space_aligned_no_rules and 31_times_body_arial_headings have no spacer, and 31_times has no table at all, so its failure cannot be pitch. Full numbers in FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md. Do NOT take the page top for these 16: they are single-page with zero page breaks.",
@@ -1614,19 +1622,26 @@
    "finding": "FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md",
    "deployed_at": "2026-11-21T23:48",
    "landed_at": "2026-11-21T23:48"
+  },
+  {
+   "id": "18_dA-02",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "what makes a single-page dense table drift in Google - row pitch or the table-top spacer",
+   "expected": "07:38",
+   "deployed": "07:36",
+   "status": "landed",
+   "finding": "FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md",
+   "deployed_at": "2026-11-22T02:06",
+   "landed_at": "2026-11-22T02:06"
   }
  ],
  "run": {
   "started": "07:26",
-  "ended": null,
-  "ended_how": null
+  "ended": "07:36",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "15:55",
-   "how": "forced",
-   "plan": "Measure the reach of every construct before building the next one: 47_margins has 26 documents and the two constructs on the table reach 3 and 5 of them, so the class was being attacked from the wrong end. Traced all 26, corrected SETTLED's run-size lead, added verify_google --detail so a FAIL names its page and its distance."
-  },
   {
    "at": "17:12",
    "how": "forced",
@@ -1721,6 +1736,11 @@
    "at": "06:18",
    "how": "forced",
    "plan": ""
+  },
+  {
+   "at": "07:36",
+   "how": "forced",
+   "plan": "18_displacement: do NOT take the page top for the 16 solo-18 documents - all 16 are single-page PDFs and their converted .docx carries zero page breaks, so the proven page-top construct cannot make one of them clean. Their displacement is row/line pitch inside one dense table or form: start from the -4.3 median / -12.8..+2.9 spread measured on page 1 of bank-statement-5-pages, which is the residual after the page-top fix and sits on a page that was never broken. Land the section margin (w:pgMar w:top) as a SEPARATE build on multi-page documents: DocxWriter.java:1053-1075 already emits a sectPr with nextPage, so it is that path plus beforeTw=0 in the two ctx.newPage branches (3395-3401, 4277-4283) plus the same twips out of ctx.budgetTw (1116) and out of what pageFits is asked - steps 1-2 alone double the gap in LibreOffice, step 3 is what holds the page count. Do NOT retry the 1x1 trHeight row: measured this run, it takes bank-statement-5-pages from 5 pages to 6 and 37/42 to 33/42."
   }
  ],
  "context": "The page-top gap is settled in both directions: the trHeight row is refuted (bs5 37->33/42, 5->6 pages, a page emptied, matched runs 585->220) and w:pgMar w:top is proven (bs5 37->40/42, page count held at 5, dy -59.5->-4.3 on pages 1-4, 27_text_off_page/44_header_footer/59_shape_anchor all recovered, nothing new failing). Numbers in FINDINGS/18_displacement-page-top-gap-sectmargin-PROVEN-075600-f1x.md. The 06:18->07:14 gap of 55.2 min is two missed fires, recorded in BLOCKERS.md - if the next claim is again more than 45 min out with nothing in the timeline between, the crons are the fault and not the runs.",

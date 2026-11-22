@@ -923,5 +923,22 @@
    ]
   ],
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795311847.592646,
+  "started": "07:14",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "18_displacement",
+  "attempts": 1,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   "18_dA-02",
+   "18_dA-03"
+  ],
+  "obstacles_cleared": 2,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
