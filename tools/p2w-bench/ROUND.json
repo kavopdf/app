@@ -1,8 +1,10 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
+  "fixer_doing": "relay: patched sub-point row geometry + exact row height, rebuilding",
+  "fixer_doing_since": 1795334097.2491837,
   "fixer_engine_at_claim": "462353f9",
-  "fixer_last_beat": 1795333371.017571,
+  "fixer_last_beat": 1795334097.2491846,
   "fixer_started": 1795333709.4273512,
   "history": [
     {

@@ -2561,3 +2561,10 @@
 {"t": 1795333494.316025, "ist": "13:14:54", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795333494.430519, "ist": "13:14:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795333494.4536169, "ist": "13:14:54", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795333712.1863008, "ist": "13:18:32", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795333712.4539056, "ist": "13:18:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795333734.4785783, "ist": "13:18:54", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795334013.9123542, "ist": "13:23:33", "ev": "beat", "d": "relay: engine built, fetching corpus for one doc"}
+{"t": 1795334097.2487116, "ist": "13:24:57", "ev": "beat", "d": "relay: patched sub-point row geometry + exact row height, rebuilding"}
+{"t": 1795334379.6019447, "ist": "13:29:39", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795334382.539094, "ist": "13:29:42", "ev": "beat", "d": "attempt.py: recording an attempt"}
