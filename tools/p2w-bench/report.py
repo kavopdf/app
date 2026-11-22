@@ -852,13 +852,24 @@ def main(argv):
     L.append("| | |")
     L.append("|:--|:--|")
     if tr.get("present"):
-        L.append("| Documents improved this run | **%d** — %d attempt(s), %d kept |"
+        # A SUM IS NOT A COUNT OF DOCUMENTS. RUN.json accumulates `docs_improved` as the sum of every
+        # attempt's --moved, so three documents improved twice read as six. On 22 Nov that printed
+        # "19" when the distinct documents that changed were 16 - the first attempt's three are inside
+        # the second attempt's sixteen. The label now says what the number is, and the note below the
+        # table still gives the distinct figure where the run recorded it.
+        L.append("| Document-moves this run | **%d** — %d attempt(s), %d kept (a sum: a document moved "
+                 "twice counts twice) |"
                  % (tr["docs_improved"], tr["attempts"], tr["kept"]))
     else:
         L.append("| Documents improved this run | no run record |")
     if co.get("available"):
-        L.append("| Documents improved, round total | %d of %d |"
-                 % (co["improved"], co["docs"]))
+        # "61 OF 213" MIXED TWO DENOMINATORS. improved is counted over `common` - the documents in BOTH
+        # the baseline table and the current one, which is 212, because one document was exempt when the
+        # baseline was taken. Printing it over the corpus total (213) put a 212-based numerator on a
+        # 213-based denominator, and the user caught it on 22 Nov. Both numbers are true and they are not
+        # the same number, so each is printed under the name that says what it counts.
+        L.append("| Documents improved, round total | **%d** of the %d compared (corpus %d) |"
+                 % (co["improved"], co.get("compared") or co["docs"], co["docs"]))
         L.append("| Corpus improvement vs 15 Nov | **%+.2f%%** — mean %.2f → %.2f |"
                  % (co["pct"], co["baseline_mean"], co["current_mean"]))
         L.append("| Regressions | %s |"
@@ -875,8 +886,9 @@ def main(argv):
         # report. The two numbers are both right and the sentence has to say which is which.
         L.append("| **Fixed - Google, all 42 checks** | **%d**, out of the %d documents both renderers measured |"
                  % (co.get("google_fixed", 0), co.get("google_scored", 0)))
-        L.append("| Fixed - LibreOffice proxy | %d of %d - a renderer the user does not open |"
-                 % (co.get("fixed", 0), co.get("docs", 0)))
+        # SAME MIXED DENOMINATOR. `fixed` is also counted over `common` (212), not the corpus (213).
+        L.append("| Fixed - LibreOffice proxy | %d of the %d compared - a renderer the user does not open |"
+                 % (co.get("fixed", 0), co.get("compared") or co.get("docs", 0)))
         L.append("| Moved but still open | **%d** — improved, not fixed |" % co.get("moved_open", 0))
     else:
         L.append("| Corpus improvement | not measurable — %s |" % co.get("why"))
