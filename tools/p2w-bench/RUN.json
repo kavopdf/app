@@ -4,13 +4,20 @@
  "ended_ts": 1795377858.6134932,
  "ended": "01:34",
  "class": "18_displacement",
- "attempts": 2,
- "kept": 0,
- "docs_improved": 0,
+ "attempts": 3,
+ "kept": 1,
+ "docs_improved": 3,
  "agents": [
   "18_dcarrier guard-01",
   "18_dsolo-18 census-01"
  ],
  "obstacles_cleared": 0,
- "needs_human": 0
+ "needs_human": 0,
+ "ratchets": 1,
+ "counted": [
+  [
+   "18_displacement",
+   3
+  ]
+ ]
 }

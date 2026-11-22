@@ -5,18 +5,18 @@
 
 **23 Nov 2026 · slot 01:14 → 01:34 IST · 19 min**
 
-> No change was kept this run. The numbers below say what was tried.
+> **3 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **3** — 3 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **1** — 416_many_tiny_pages |
-| **Fixed - Google, all 42 checks** | **23**, out of the 192 documents both renderers measured |
+| **Fixed - Google, all 42 checks** | **26**, out of the 192 documents both renderers measured |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
@@ -41,10 +41,7 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dcarrier guard-01` | why the spacer split breaks two documents and what a | 01:31 | 20:01 | 0 min |
-| `18_dsolo-18 census-01` | per-document spacer/border/row census of the 16 that | 01:31 | 20:01 | 0 min |
+*None deployed this run.*
 
 ## Timing
 
@@ -77,7 +74,7 @@
 
 ## Next run
 
-APPLY tools/p2w-bench/patches/18-displacement-SPACER-BEFORE-GUARDED-NO-DITHER.patch (spacer split, guard = non-ruled carrier and gap<=20pt, dither DISABLED - the dither is what ate 16_right), build, convert and measure the whole corpus, regress.py --check, then Google-verify the remaining eleven of the sixteen plus a sample of today's Google-clean documents that carry a non-ruled table. Measured this slot: 5 of 8 to 42/42, none worse, mobile-bill and insurance held at 46/47. Evidence: FINDINGS/18_displacement-GUARDED-SPACER-SPLIT-1-WIN-1-COST-0219-relay.md
+The spacer SCOPE GUARD is LANDED (FINDINGS/18_displacement-SPACER-SCOPE-GUARD-LANDS-3-GOOGLE-0051-fixer.md): the table gap is split (w:before = gap-20tw, w:line = 20tw) only where the page's own lowest ink leaves room for it plus 0.75 pt per table row on the page. 73_marksheet, 41_coloured_headings and 29_dot_leaders are 42/42 in Google; mobile-bill and insurance-policy-schedule are byte-identical at document.xml level and mobile-bill re-verified 46/47 one page. Corpus 212/212 re-measured on this engine, 0 worse, 0 better in the LibreOffice proxy (by design). Do NOT apply the dither patch - refuted twice. Two readings to settle before more of this class: (1) 22_invoice and 16_right_aligned spend their gaps and STILL fail 18_displacement with a constant -2.5 pt step and slope ~0 - that is a second term, and FINDINGS/18_displacement-GUARDED-SPACER-SPLIT-1-WIN-1-COST-0219-relay.md read them 42/42 where this build reads 41/42, so re-measure before trusting either; (2) 72_bank_statement is refused by the guard 58 twips short (18 rows -> 270tw row term, gap 346tw, room 558tw) - measure Google's real per-row excess on a ruled table and replace the inherited 15 tw/row, worth +1. Any Google reading at the 41/42-42/42 margin must be taken twice: the same construct read differently two hours apart.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
