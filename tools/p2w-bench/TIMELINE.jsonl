@@ -2668,30 +2668,13 @@
 {"t": 1795339008.6672006, "ist": "14:46:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795339008.8384082, "ist": "14:46:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795339008.9905388, "ist": "14:46:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795341891.9016545, "ist": "15:34:51", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795341896.8297944, "ist": "15:34:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795341898.9362988, "ist": "15:34:58", "ev": "attempt", "d": "18_displacement -> reverted"}
-{"t": 1795341899.0565617, "ist": "15:34:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795341899.1955779, "ist": "15:34:59", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795341908.6302905, "ist": "15:35:08", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795341908.8073168, "ist": "15:35:08", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795341944.9485047, "ist": "15:35:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795341960.9236221, "ist": "15:36:00", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795341964.6568434, "ist": "15:36:04", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795341978.0640342, "ist": "15:36:18", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342007.9972403, "ist": "15:36:47", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342008.7382271, "ist": "15:36:48", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342009.082284, "ist": "15:36:49", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342017.9158344, "ist": "15:36:57", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342018.631987, "ist": "15:36:58", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342023.8358166, "ist": "15:37:03", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342024.4893258, "ist": "15:37:04", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342024.7662446, "ist": "15:37:04", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342029.1396327, "ist": "15:37:09", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342029.8144877, "ist": "15:37:09", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342030.1092567, "ist": "15:37:10", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795342064.3594909, "ist": "15:37:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795342064.5179136, "ist": "15:37:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795342064.6612115, "ist": "15:37:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795342064.8003614, "ist": "15:37:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795342064.9215264, "ist": "15:37:44", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795340868.8043191, "ist": "15:17:48", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795340869.004197, "ist": "15:17:49", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795340898.1980476, "ist": "15:18:18", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795341236.7956376, "ist": "15:23:56", "ev": "beat", "d": "relay: applying 18-displacement spacer+dither patch, then build"}
+{"t": 1795341242.5460637, "ist": "15:24:02", "ev": "beat", "d": "relay: patch applied, building engine"}
+{"t": 1795341311.6738224, "ist": "15:25:11", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795341314.8553188, "ist": "15:25:14", "ev": "beat", "d": "relay: fetching corpus (6 min)"}
+{"t": 1795341339.5778883, "ist": "15:25:39", "ev": "beat", "d": "relay: converting corpus with patched engine"}
+{"t": 1795341449.4697418, "ist": "15:27:29", "ev": "beat", "d": "relay: screening 18_displacement against baseline"}
+{"t": 1795341490.0846598, "ist": "15:28:10", "ev": "beat", "d": "attempt.py: recording an attempt"}

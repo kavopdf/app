@@ -1,11 +1,11 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "trying the 1.15 type floor with the dither",
-  "fixer_doing_since": 1795337503.0453358,
+  "fixer_doing": "relay: screening 18_displacement against baseline",
+  "fixer_doing_since": 1795341449.4709163,
   "fixer_engine_at_claim": "462353f9",
-  "fixer_last_beat": 1795337503.0453365,
-  "fixer_started": 1795341898.9373865,
+  "fixer_last_beat": 1795341449.4709175,
+  "fixer_started": 1795340865.3431182,
   "history": [
     {
       "at": "2026-11-12 09:46",
