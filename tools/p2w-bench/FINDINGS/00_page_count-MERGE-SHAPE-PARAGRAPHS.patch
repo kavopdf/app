@@ -1,0 +1,92 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 72ade6d..f043904 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -853,6 +853,21 @@ public final class DocxWriter {
+         int cellWrapHits;
+         /** The shapes on the page being written, so a stamp can find its own outline. */
+         java.util.List<Shape> curShapes;
++        /**
++         * The shapes the page being written has drawn so far, as bare runs waiting for the ONE
++         * paragraph the page pays for them.
++         *
++         * <p>{@link #shape} used to wrap each shape in a paragraph of its own. A
++         * page-positioned floating shape is anchored to the paper, so the paragraph carries
++         * nothing - but Google Docs rasterises the shape, keeps the paragraph, and bills it the
++         * line box of its own {@code sz=2} run (~0.83 pt, {@code w:line="1" exact} is not
++         * honoured). One paragraph per shape is therefore a flow cost the page never asked for:
++         * 361_product_catalogue_grid pays 91 of them, 401_trifold_brochure 21. The blocks that
++         * go through {@link #pageBody}'s own loop already share one carrier paragraph; this is
++         * the same rule for the shapes written from inside a table pass, which is the only
++         * other way one reaches {@link #shape}.
++         */
++        final StringBuilder shapeCarrier = new StringBuilder();
+         /**
+          * The lines of each stamp, keyed by the shape that carries that stamp's frame.
+          *
+@@ -1344,7 +1359,9 @@ public final class DocxWriter {
+         ctx.pageInkBottomPt = pageInkBottom(page);
+         ctx.pageRowCount = pageRows(page);
+         ctx.spacerSplitTw = 0;
+-        if (columnPage(sb, page, ctx, pw)) { cenEmit(ctx, page); return; }
++        // A page is written more than once by the budget guard; each pass writes its own shapes.
++        ctx.shapeCarrier.setLength(0);
++        if (columnPage(sb, page, ctx, pw)) { flushShapes(sb, ctx); cenEmit(ctx, page); return; }
+         // Which of this page's short lines are drawn beside a table rather than in its text, and
+         // so must not charge the flow. Decided from the page's own geometry before anything is
+         // written, so both of the budget guard's passes see the same answer (see pinShortParas).
+@@ -1410,6 +1427,7 @@ public final class DocxWriter {
+             sb.append("<w:p><w:pPr>").append(SHAPE_PARA_PPR).append("</w:pPr>")
+                     .append(orphanShapeRuns).append("</w:p>");
+         }
++        flushShapes(sb, ctx);
+         cenEmit(ctx, page);
+     }
+ 
+@@ -2206,7 +2224,9 @@ public final class DocxWriter {
+                 if (any) cenLine(ctx, "columnPage");
+                 // A cell must hold a block-level element, and a table must be followed by a
+                 // paragraph inside its cell. A 1-twip line is the cheapest one there is.
+-                if (!any) {
++                // ...and a cell whose only block was a shape now has none, because the shape
++                // went into the page's carrier paragraph instead (see Ctx.shapeCarrier).
++                if (!any || cellXml[c].indexOf("<w:p") < 0) {
+                     cellXml[c].append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                             .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\"")
+                             .append(" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+@@ -2890,10 +2910,32 @@ public final class DocxWriter {
+             + " w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>"
+             + "<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr>";
+ 
++    /**
++     * One shape, into the page's carrier rather than into a paragraph of its own.
++     *
++     * <p>The paragraph a shape is written in buys nothing: {@code wp:positionH/V
++     * relativeFrom="page"} with {@code wp:wrapNone} places the shape against the paper and never
++     * consults the paragraph. Google Docs charges for the paragraph anyway - see
++     * {@link Ctx#shapeCarrier} - so a page's shapes are collected and written as ONE paragraph by
++     * {@link #flushShapes}. Measured mechanism:
++     * FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md.
++     */
+     private static void shape(StringBuilder sb, Shape s, Ctx ctx) {
+-        sb.append("<w:p><w:pPr>").append(SHAPE_PARA_PPR).append("</w:pPr>");
+-        shapeRun(sb, s, ctx);
+-        sb.append("</w:p>");
++        shapeRun(ctx.shapeCarrier, s, ctx);
++    }
++
++    /**
++     * Writes the page's collected shape runs as one paragraph, and empties the carrier.
++     *
++     * <p>Called once per page, at both of {@link #pageBody}'s exits. The paragraph properties are
++     * {@link #SHAPE_PARA_PPR}, the same ones a shape's own paragraph carried, so the one line box
++     * the page now pays is the line box it always paid for the first of them.
++     */
++    private static void flushShapes(StringBuilder sb, Ctx ctx) {
++        if (ctx.shapeCarrier.length() == 0) return;
++        sb.append("<w:p><w:pPr>").append(SHAPE_PARA_PPR).append("</w:pPr>")
++                .append(ctx.shapeCarrier).append("</w:p>");
++        ctx.shapeCarrier.setLength(0);
+     }
+ 
+     /**
