@@ -2925,3 +2925,6 @@
 {"t": 1795459664.7653642, "ist": "00:17:44", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795459704.5831304, "ist": "00:18:24", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795460093.0786319, "ist": "00:24:53", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795460101.9632852, "ist": "00:25:01", "ev": "attempt", "d": "content-present-partly-displaced -> lead"}
+{"t": 1795460102.6652455, "ist": "00:25:02", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795460103.4822433, "ist": "00:25:03", "ev": "beat", "d": "classrow.py: refreshing the class file"}

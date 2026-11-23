@@ -100,18 +100,58 @@ correctly untouched. `68_journal_wide_table_spanning` also reads unruled now (ro
 it (`ENGINE CHANGED … An unmeasured change is not a pass`), and a corpus pass is ~40 minutes this run
 did not have. Recorded as a `lead`: measured, not landed.
 
-## 5 — The next run starts here
+## 5 — The second lead, built and REFUTED in the same slot
 
-1. **The 0.25 pt/row pitch excess on unruled rows is the whole of what is left** on
-   `72_bank_statement`: writing each unruled row 5 twips short of the page's pitch (the mirror of the
-   `TABLE_BORDER_TW` subtraction, applied only where no rule is drawn) should take worst_dy 4.9 → ~0.4
-   and the document to **42/42**. Build it together with the quantum change above — one corpus pass
-   proves both.
-2. **Do not re-propose a partial spend of this spacer.** It is inert (2315). Spend it *whole*, which
-   is what the guard's `spendable` branch already does, and only where the room test passes.
-3. **The instrument is now the first thing to read on this class.** `gverify/<name>.json` carries
+§4 leaves 7 runs at +3.2 … +4.9 pt, growing monotonically down the page. Measured directly from the
+Google export's own text layer, the **baseline pitch is 17.25 pt for 16 consecutive rows** against the
+page's 17.00, so the drift looked like 5 twips of row height and the obvious fix was to write each
+unruled row 5 twips short.
+
+Built it (`rowTwHere - 5` where `!t.ruled`), and measured it three ways:
+
+| | HEAD + quantum | + rows 5 twips short |
+|:--|--:|--:|
+| Google `med_dy` | **+1.1** | **-4.2** |
+| Google `worst_dy` | **4.8** | **8.7** |
+| Google score | 41/42 | 41/42 |
+| LibreOffice score | **42/42** | **41/42** — `18_displacement`, med_dy -1.1 |
+| LibreOffice `23_line_pitch` | 17.0 / 17.0 | 16.8 / 17.0 |
+
+**Refuted, and it costs a document in LibreOffice.** Shortening the row made Google *worse*, not
+better, which says Google is already honouring `w:trHeight` (340 twips laid as 17.0) and the 17.25 pt
+**text** pitch is produced INSIDE the cell — the cell paragraph's own line advance
+(`w:before="278" w:line="12" exact`, `sz=17`) — not by the row box. Shortening the row therefore moved
+the whole table up by 18 × 0.25 pt and left the drift intact: med_dy +1.1 → -4.2 is exactly the 5.3 pt
+of row height removed.
+
+So the residual is a **cell-line** fault, which is the census's construct #2 ("the cell's own line
+box, `:6892` — no run has yet converted into a clean document"), and it is not reachable by the row
+height. `23_line_pitch` is the check that constrains it: LO reads the page's 17.0 and the render's 16.8,
+so any row-height route pays the LO check to buy the Google one.
+
+## 6 — The corpus pass did not fit, and that is the measured reason
+
+Landing the §4 change needs `regress.py --check` to see a corpus measured on the new engine
+(`ENGINE CHANGED … An unmeasured change is not a pass`). `benchmarks/p2w.py --force` was run with scipy
+installed: **33 documents in 250 s, then 7 in the next 250 s** — 43 s a document on this pod, i.e.
+**~2.5 hours for 213**, against the 40 minutes the brief budgets. That is a fact about this run's pod,
+not about the change, and it is why the engine is reverted rather than landed. The next run should
+check the rate before committing to a pass.
+
+## 7 — The next run starts here
+
+1. **The quantum change in §4 is proven and small — re-apply it and land it with the corpus pass**:
+   `rowExcessTw = (t.ruled ? 15 : 5) * ctx.pageRowCount` at `DocxWriter.java:6093`. It is byte-identical
+   for every ruled table, LO-neutral (42/42 on the document measured), and worth **med_dy -13.0 →
+   +1.1** on a real Google render.
+2. **Do not shorten unruled rows.** §5 refuted it and it costs LO `18_displacement`.
+3. **The residual is the cell's line advance inside an unruled row.** On
+   `72_bank_statement` the cell paragraph is `w:before="278" w:line="12" exact` on an `sz=17` run
+   inside a 340-twip row, and Google advances 17.25 pt a row where the page drew 17.00. That is the
+   whole of what is left on this document, and it is ~4.9 pt against a 2.8 pt tolerance.
+4. **The instrument is now the first thing to read on this class.** `gverify/<name>.json` carries
    `displacement.med_dy` / `.worst_dy`; a fixer can tell a step from a drift before touching the
    engine. Run `gverify.py` on the other 10 of the 13 before choosing a construct — the step/drift
    split will say whether the quantum fix reaches them.
-4. `dy.py` and the new detail now report the same quantity from the same matcher; the independent
-   PyMuPDF match in §1 is the cross-check to keep using.
+5. `dy.py` and the new detail report the same quantity from the same matcher; the independent PyMuPDF
+   match in §1 is the cross-check to keep using.

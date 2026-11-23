@@ -1,4 +1,3 @@
-| 20 Nov 19:29 | fixer | attempt t12_word_invention -> reverted (0/12 moved) |
 | 20 Nov 19:33 | fixer | attempt t08_line_order -> reverted (0/10 moved) |
 | 20 Nov 19:33 | fixer | attempt t08_line_order -> reverted (0/10 moved) |
 | 20 Nov 20:01 | fixer | slot claimed - fixer running |
@@ -198,3 +197,4 @@
 | 23 Nov 23:32 | fixer | attempt 04_chars_missing -> lead (0/5 moved) |
 | 23 Nov 23:58 | fixer | slot claimed - fixer running |
 | 24 Nov 00:09 | fixer | attempt content-present-partly-displaced -> lead (0/13 moved) |
+| 24 Nov 00:25 | fixer | attempt content-present-partly-displaced -> lead (0/13 moved) |

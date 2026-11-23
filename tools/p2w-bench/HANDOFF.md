@@ -66,7 +66,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:28` attempt 4 on 00_page_count -> lead
 - `13:21` agent deployed: A1 / 18_displacement - writer-construct
 - `13:21` agent deployed: B1 / 60_text_column_right_edge - right-edge+shape_anchor
 - `14:03` attempt 36 on 18_displacement -> reverted
@@ -91,6 +90,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `23:32` agent deployed: 04_chars_missing construct: Google drops wps:txbx text; missing multiset fully explained by anchored boxes on 9 docs /  - 
 - `23:32` agent deployed: 44_header_footer: .txt half clean (0 lost/duplicated across 31); 20 of 28 feet are floating anchors, 8 flow and still fail /  - 
 - `00:09` attempt 16 on content-present-partly-displaced -> lead (0/13 moved)
+- `00:25` attempt 17 on content-present-partly-displaced -> lead (0/13 moved)
 
 ## Where the rest of the state lives
 
